@@ -5,32 +5,12 @@ export default /* glsl */`
 
 	#ifdef DUAL_QUATERNION_SKINNING
 
-	mat2x4 boneDualQuatX = getBoneDualQuaternion( skinIndex.x );
-	mat2x4 boneDualQuatY = getBoneDualQuaternion( skinIndex.y );
-	mat2x4 boneDualQuatZ = getBoneDualQuaternion( skinIndex.z );
-	mat2x4 boneDualQuatW = getBoneDualQuaternion( skinIndex.w );
-
-	vec4 normalizedSkinWeight = normalize( skinWeight );
-
-    if ( dot(boneDualQuatX[0], boneDualQuatY[0]) < 0.0 ) {
-        normalizedSkinWeight.y *= -1.0;
-    }
-
-    if ( dot(boneDualQuatX[0], boneDualQuatZ[0]) < 0.0 ) {
-        normalizedSkinWeight.z *= -1.0;
-    }
-
-    if ( dot(boneDualQuatX[0], boneDualQuatW[0]) < 0.0 ) {
-        normalizedSkinWeight.w *= -1.0;
-    }
-	
-	mat2x4 dq = boneDualQuatX * normalizedSkinWeight.x
-			  + boneDualQuatY * normalizedSkinWeight.y 
-			  + boneDualQuatZ * normalizedSkinWeight.z 
-			  + boneDualQuatW * normalizedSkinWeight.w;
-	dq /= length( dq[ 0 ] );
-
-	vec4 skinned = mulitplyVectorWithDualQuaternion( dq, skinVertex );
+	vec4 skinned = vec4( 0.0 );
+	skinned += scaleVecX * skinVertex * skinWeight.x;
+	skinned += scaleVecY * skinVertex * skinWeight.y;
+	skinned += scaleVecZ * skinVertex * skinWeight.z;
+	skinned += scaleVecW * skinVertex * skinWeight.w;
+	skinned = mulitplyVectorWithDualQuaternion( dq, skinned );
 
 	#else
 
