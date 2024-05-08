@@ -840,14 +840,14 @@ function Strings( config ) {
 			'menubar/add/mesh/lathe': '酒杯',
 			'menubar/add/mesh/sprite': '精灵',
 
-			'menubar/add/light': 'Light',
+			'menubar/add/light': '光源',
 			'menubar/add/light/ambient': '环境光',
 			'menubar/add/light/directional': '平行光',
 			'menubar/add/light/hemisphere': '半球光',
 			'menubar/add/light/point': '点光源',
 			'menubar/add/light/spot': '聚光灯',
 
-			'menubar/add/camera': 'Camera',
+			'menubar/add/camera': '摄像机',
 			'menubar/add/camera/perspective': '透视相机',
 			'menubar/add/camera/orthographic': '正交相机',
 
