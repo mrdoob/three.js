@@ -35,11 +35,6 @@ function MenubarAdd( editor ) {
 	} );
 	options.add( option );
 
-	//
-
-	options.add( new UIHorizontalRule() );
-
-
 	// Mesh
 
 	const meshSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/add/mesh' ) ).addClass( 'option' ).addClass( 'submenu-title' );

@@ -35,10 +35,6 @@ function MenubarFile( editor ) {
 	} );
 	options.add( option );
 
-	//
-
-	options.add( new UIHorizontalRule() );
-
 	// Import
 
 	const form = document.createElement( 'form' );
