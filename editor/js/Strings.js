@@ -1222,12 +1222,12 @@ function Strings( config ) {
 			'menubar/add/mesh/lathe': '旋盤形',
 			'menubar/add/mesh/sprite': 'スプライト',
 
-			'menubar/add/light': 'Light',
-			'menubar/add/light/ambient': 'アンビエントライト',
-			'menubar/add/light/directional': 'ディレクショナルライト',
-			'menubar/add/light/hemisphere': 'ヘミスフィアライト',
-			'menubar/add/light/point': 'ポイントライト',
-			'menubar/add/light/spot': 'スポットライト',
+			'menubar/add/light': 'ライト',
+			'menubar/add/light/ambient': 'アンビエント',
+			'menubar/add/light/directional': 'ディレクショナル',
+			'menubar/add/light/hemisphere': 'ヘミスフィア',
+			'menubar/add/light/point': 'ポイント',
+			'menubar/add/light/spot': 'スポット',
 
 			'menubar/add/perspectivecamera': '透視投影カメラ',
 			'menubar/add/orthographiccamera': '平行投影カメラ',
