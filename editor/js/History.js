@@ -266,7 +266,7 @@ class History {
 
 				cmd = this.undos[ this.undos.length - 1 ];	// next cmd to pop
 
-				if ( cmd === undefined || id === cmd.id ) break;
+				if ( cmd === undefined || id > cmd.id ) break;
 
 				this.undo();
 
