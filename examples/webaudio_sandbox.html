@@ -214,7 +214,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -228,6 +227,8 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				animate();
 
 			}
 
@@ -243,6 +244,14 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+
+			function render() {
 
 				const delta = clock.getDelta();
 

@@ -82,6 +82,11 @@
 
 				const container = document.getElementById( 'container' );
 
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
 				scene = new THREE.Scene();
 
 				camera = new THREE.Camera();
@@ -137,15 +142,9 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				container.appendChild( renderer.domElement );
-
-				//
-
 				window.addEventListener( 'resize', onWindowResize );
+
+				animate();
 
 			}
 
@@ -156,6 +155,14 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
 
 				analyser.getFrequencyData();
 

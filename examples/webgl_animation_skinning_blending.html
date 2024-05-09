@@ -126,7 +126,7 @@
 
 					activateAllActions();
 
-					renderer.setAnimationLoop( animate );
+					animate();
 
 				} );
 
@@ -466,6 +466,10 @@
 
 			function animate() {
 
+				// Render loop
+
+				requestAnimationFrame( animate );
+
 				idleWeight = idleAction.getEffectiveWeight();
 				walkWeight = walkAction.getEffectiveWeight();
 				runWeight = runAction.getEffectiveWeight();
@@ -495,9 +499,9 @@
 
 				mixer.update( mixerUpdateDelta );
 
-				renderer.render( scene, camera );
-
 				stats.update();
+
+				renderer.render( scene, camera );
 
 			}
 

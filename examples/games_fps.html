@@ -71,7 +71,6 @@
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setAnimationLoop( animate );
 			renderer.shadowMap.enabled = true;
 			renderer.shadowMap.type = THREE.VSMShadowMap;
 			renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -443,7 +442,9 @@
 						helper.visible = value;
 
 					} );
-			
+
+				animate();
+
 			} );
 
 			function teleportPlayerIfOob() {
@@ -483,6 +484,8 @@
 				renderer.render( scene, camera );
 
 				stats.update();
+
+				requestAnimationFrame( animate );
 
 			}
 

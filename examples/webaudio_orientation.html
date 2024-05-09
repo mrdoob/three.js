@@ -131,8 +131,7 @@
 
 				boomBox.add( positionalAudio );
 				scene.add( boomBox );
-		
-				renderer.setAnimationLoop( animate );
+				animate();
 
 			} );
 
@@ -180,6 +179,7 @@
 
 		function animate() {
 
+			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
 
 		}

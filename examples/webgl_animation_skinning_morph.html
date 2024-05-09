@@ -58,6 +58,7 @@
 			const api = { state: 'Walking' };
 
 			init();
+			animate();
 
 			function init() {
 
@@ -114,7 +115,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -255,6 +255,8 @@
 				const dt = clock.getDelta();
 
 				if ( mixer ) mixer.update( dt );
+
+				requestAnimationFrame( animate );
 
 				renderer.render( scene, camera );
 

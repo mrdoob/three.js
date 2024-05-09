@@ -57,6 +57,7 @@
 			};
 
 			init();
+			animate();
 
 			function initGUI() {
 
@@ -173,7 +174,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
+
 				container.appendChild( renderer.domElement );
 
 				//
@@ -274,9 +275,10 @@
 
 				pointCloud.geometry.attributes.position.needsUpdate = true;
 
-				render();
+				requestAnimationFrame( animate );
 
 				stats.update();
+				render();
 
 			}
 
