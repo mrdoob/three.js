@@ -38,7 +38,13 @@ function Strings( config ) {
 			'command/SetValue': 'Set Value',
 
 			'menubar/file': 'File',
-			'menubar/file/new': 'New',
+			'menubar/file/newProject': 'New Project',
+			'menubar/file/newProject/empty': 'Empty',
+			'menubar/file/newProject/Arkanoid': 'Arkanoid',
+			'menubar/file/newProject/Camera': 'Camera',
+			'menubar/file/newProject/Particles': 'Particles',
+			'menubar/file/newProject/Pong': 'Pong',
+			'menubar/file/newProject/Shaders': 'Shaders',
 			'menubar/file/import': 'Import',
 			'menubar/file/export': 'Export',
 
@@ -82,13 +88,6 @@ function Strings( config ) {
 			'menubar/add/camera/orthographic': 'Orthographic',
 
 			'menubar/status/autosave': 'autosave',
-
-			'menubar/examples': 'Examples',
-			'menubar/examples/Arkanoid': 'Arkanoid',
-			'menubar/examples/Camera': 'Camera',
-			'menubar/examples/Particles': 'Particles',
-			'menubar/examples/Pong': 'Pong',
-			'menubar/examples/Shaders': 'Shaders',
 
 			'menubar/view': 'View',
 			'menubar/view/fullscreen': 'Fullscreen',
@@ -423,7 +422,14 @@ function Strings( config ) {
 			'command/SetValue': 'Définir la valeur',
 
 			'menubar/file': 'Fichier',
-			'menubar/file/new': 'Nouveau',
+			'menubar/file/newProject': 'Nouveau projet',
+			'menubar/file/newProject/empty': 'Vide',
+			'menubar/file/newProject/Arkanoid': 'Arkanoid',
+			'menubar/file/newProject/Camera': 'Camera',
+			'menubar/file/newProject/Particles': 'Particles',
+			'menubar/file/newProject/Pong': 'Pong',
+			'menubar/file/newProject/Shaders': 'Shaders',
+
 			'menubar/file/import': 'Importer',
 			'menubar/file/export': 'Exporter',
 
@@ -467,13 +473,6 @@ function Strings( config ) {
 			'menubar/add/camera/orthographic': 'Orthographique',
 
 			'menubar/status/autosave': 'enregistrement automatique',
-
-			'menubar/examples': 'Exemples',
-			'menubar/examples/Arkanoid': 'Arkanoid',
-			'menubar/examples/Camera': 'Camera',
-			'menubar/examples/Particles': 'Particles',
-			'menubar/examples/Pong': 'Pong',
-			'menubar/examples/Shaders': 'Shaders',
 
 			'menubar/view': 'View',
 			'menubar/view/fullscreen': 'Fullscreen',
@@ -808,7 +807,13 @@ function Strings( config ) {
 			'command/SetValue': '设定值',
 
 			'menubar/file': '文件',
-			'menubar/file/new': '新建',
+			'menubar/file/newProject': '新建项目',
+			'menubar/file/newProject/empty': '空',
+			'menubar/file/newProject/Arkanoid': '打砖块',
+			'menubar/file/newProject/Camera': ' 摄像机',
+			'menubar/file/newProject/Particles': '粒子',
+			'menubar/file/newProject/Pong': '乒乓球',
+			'menubar/file/newProject/Shaders': '着色器',
 			'menubar/file/import': '导入',
 			'menubar/file/export': '导出',
 
@@ -852,13 +857,6 @@ function Strings( config ) {
 			'menubar/add/camera/orthographic': '正交相机',
 
 			'menubar/status/autosave': '自动保存',
-
-			'menubar/examples': '示例',
-			'menubar/examples/Arkanoid': '打砖块',
-			'menubar/examples/Camera': ' 摄像机',
-			'menubar/examples/Particles': '粒子',
-			'menubar/examples/Pong': '乒乓球',
-			'menubar/examples/Shaders': '着色器',
 
 			'menubar/view': '视图',
 			'menubar/view/fullscreen': '全屏',
@@ -1193,7 +1191,13 @@ function Strings( config ) {
 			'command/SetValue': '値の設定',
 
 			'menubar/file': 'ファイル',
-			'menubar/file/new': '新規',
+			'menubar/file/newProject': '新規プロジェクト',
+			'menubar/file/newProject/empty': '空',
+			'menubar/file/newProject/Arkanoid': 'ブロック崩し',
+			'menubar/file/newProject/Camera': 'カメラ',
+			'menubar/file/newProject/Particles': 'パーティクル',
+			'menubar/file/newProject/Pong': 'ピンポン',
+			'menubar/file/newProject/Shaders': 'シェーダー',
 			'menubar/file/import': 'インポート',
 			'menubar/file/export': 'エクスポート',
 
@@ -1237,13 +1241,6 @@ function Strings( config ) {
 			'menubar/add/camera/orthographic': '平行投影',
 
 			'menubar/status/autosave': '自動保存',
-
-			'menubar/examples': 'サンプル',
-			'menubar/examples/Arkanoid': 'ブロック崩し',
-			'menubar/examples/Camera': 'カメラ',
-			'menubar/examples/Particles': 'パーティクル',
-			'menubar/examples/Pong': 'ピンポン',
-			'menubar/examples/Shaders': 'シェーダー',
 
 			'menubar/view': '表示',
 			'menubar/view/fullscreen': 'フルスクリーン',
