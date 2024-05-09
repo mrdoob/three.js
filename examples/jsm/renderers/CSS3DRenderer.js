@@ -270,8 +270,7 @@ class CSS3DRenderer {
 
 			if ( object.isCSS3DObject ) {
 
-				const visible = ( object.visible === true ) && ( object.layers.test( camera.layers ) === true );
-				object.element.style.display = ( visible === true ) ? '' : 'none';
+				const visible = ( object.layers.test( camera.layers ) === true );
 
 				if ( visible === true ) {
 
@@ -307,6 +306,8 @@ class CSS3DRenderer {
 
 					const element = object.element;
 					const cachedObject = cache.objects.get( object );
+
+					element.style.display = '';
 
 					if ( cachedObject === undefined || cachedObject.style !== style ) {
 
