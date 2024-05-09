@@ -42,7 +42,7 @@
 			async function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( render );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -80,6 +80,8 @@
 
 				scene.add( gltf.scene );
 
+				render();
+
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
@@ -92,9 +94,11 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
-			function animate() {
+			function render() {
 
 				controls.update();
 				renderer.render( scene, camera );

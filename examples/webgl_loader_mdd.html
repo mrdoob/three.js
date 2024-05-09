@@ -61,6 +61,8 @@
 					mixer = new THREE.AnimationMixer( mesh );
 					mixer.clipAction( clip ).play(); // use clip
 
+					animate();
+
 				} );
 
 				//
@@ -68,7 +70,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -85,6 +86,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				const delta = clock.getDelta();
 

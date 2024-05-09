@@ -31,6 +31,7 @@
 			const meshes = [];
 
 			init();
+			animate();
 
 			function init() {
 
@@ -161,7 +162,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -178,6 +178,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				const time = Date.now() * 0.001;
 

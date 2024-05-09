@@ -61,6 +61,7 @@
 				kinematics = collada.kinematics;
 
 				init();
+				animate();
 
 			} );
 
@@ -91,7 +92,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -172,9 +172,11 @@
 
 			function animate() {
 
-				TWEEN.update();
+				requestAnimationFrame( animate );
+
 				render();
 				stats.update();
+				TWEEN.update();
 
 			}
 

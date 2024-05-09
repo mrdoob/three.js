@@ -78,6 +78,7 @@
 			let displacement, noise;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -127,7 +128,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 
 				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
@@ -151,6 +151,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

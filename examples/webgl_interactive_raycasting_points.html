@@ -44,6 +44,7 @@
 			const rotateY = new THREE.Matrix4().makeRotationY( 0.005 );
 
 			init();
+			animate();
 
 			function generatePointCloudGeometry( color, width, length ) {
 
@@ -202,7 +203,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -239,6 +239,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

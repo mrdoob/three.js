@@ -25,6 +25,7 @@
 			const AMOUNT = 6;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -85,7 +86,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
@@ -133,6 +133,8 @@
 				mesh.rotation.z += 0.01;
 
 				renderer.render( scene, camera );
+
+				requestAnimationFrame( animate );
 
 			}
 

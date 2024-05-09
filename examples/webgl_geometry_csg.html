@@ -58,6 +58,7 @@
 			};
 
 			init();
+			animate();
 
 			function init() {
 
@@ -84,7 +85,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				document.body.appendChild( renderer.domElement );
@@ -195,6 +195,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				// update the transforms
 				const t = window.performance.now() + 9000;

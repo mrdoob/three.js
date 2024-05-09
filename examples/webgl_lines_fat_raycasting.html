@@ -93,6 +93,7 @@
 			};
 
 			init();
+			animate();
 
 			function init() {
 
@@ -100,9 +101,8 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x000000, 0.0 );
-				renderer.setAnimationLoop( animate );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -228,6 +228,10 @@
 
 			function animate() {
 
+				requestAnimationFrame( animate );
+
+				stats.update();
+
 				const delta = clock.getDelta();
 
 				const obj = line.visible ? line : segments;
@@ -277,8 +281,6 @@
 				gpuPanel.startQuery();
 				renderer.render( scene, camera );
 				gpuPanel.endQuery();
-
-				stats.update();
 
 			}
 

@@ -60,6 +60,7 @@
 				Ammo = AmmoLib;
 
 				init();
+				animate();
 
 			} );
 
@@ -93,7 +94,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				effect = new OutlineEffect( renderer );
@@ -220,6 +220,8 @@
 			//
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();

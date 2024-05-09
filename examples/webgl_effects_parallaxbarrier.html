@@ -41,6 +41,7 @@
 			document.addEventListener( 'mousemove', onDocumentMouseMove );
 
 			init();
+			animate();
 
 			function init() {
 
@@ -86,7 +87,6 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				const width = window.innerWidth || 2;
@@ -123,6 +123,14 @@
 			//
 
 			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
 
 				const timer = 0.0001 * Date.now();
 

@@ -64,6 +64,7 @@
 			const clock = new THREE.Clock();
 
 			init();
+			animate();
 
 			function init() {
 
@@ -129,7 +130,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -306,6 +306,7 @@
 
 			function animate() {
 
+				requestAnimationFrame( animate );
 				render();
 
 				stats.update();

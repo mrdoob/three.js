@@ -53,6 +53,7 @@
 			const pointer = new THREE.Vector2();
 
 			init();
+			animate();
 
 			function init() {
 
@@ -62,7 +63,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -226,6 +226,8 @@
 			//
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

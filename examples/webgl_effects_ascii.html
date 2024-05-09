@@ -33,6 +33,7 @@
 			const start = Date.now();
 
 			init();
+			animate();
 
 			function init() {
 
@@ -63,7 +64,6 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 
 				effect = new AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
 				effect.setSize( window.innerWidth, window.innerHeight );
@@ -96,6 +96,14 @@
 			//
 
 			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
 
 				const timer = Date.now() - start;
 

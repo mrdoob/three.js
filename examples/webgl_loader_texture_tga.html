@@ -32,6 +32,7 @@
 			let camera, scene, renderer, stats;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -84,7 +85,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -115,8 +115,16 @@
 
 			function animate() {
 
-				renderer.render( scene, camera );
+				requestAnimationFrame( animate );
+
+				render();
 				stats.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
 
 			}
 

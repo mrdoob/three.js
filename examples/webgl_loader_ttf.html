@@ -54,6 +54,7 @@
 			let windowHalfX = window.innerWidth / 2;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -113,7 +114,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
@@ -280,6 +280,8 @@
 			//
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 

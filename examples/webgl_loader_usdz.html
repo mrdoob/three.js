@@ -40,6 +40,7 @@
 			let camera, scene, renderer;
 
 			init();
+			animate();
 
 			async function init() {
 
@@ -47,6 +48,19 @@
 				camera.position.set( 0, 0.75, - 1.5 );
 
 				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 2.0;
+				document.body.appendChild( renderer.domElement );
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 8;
+				// controls.target.y = 15;
+				// controls.update();
 
 				const rgbeLoader = new RGBELoader()
 					.setPath( 'textures/equirectangular/' );
@@ -73,22 +87,6 @@
 				model.position.z = - 0.25;
 				scene.add( model );
 
-				// renderer
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 2.0;
-				document.body.appendChild( renderer.domElement );
-
-				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 1;
-				controls.maxDistance = 8;
-				// controls.target.y = 15;
-				// controls.update();
-
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
@@ -103,6 +101,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				renderer.render( scene, camera );
 

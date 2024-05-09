@@ -28,6 +28,7 @@
 			let group, cubes;
 
 			init();
+			animate();
 
 			function addImageBitmap() {
 
@@ -113,7 +114,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				// TESTS
@@ -145,6 +145,8 @@
 				group.rotation.y = performance.now() / 3000;
 
 				renderer.render( scene, camera );
+
+				requestAnimationFrame( animate );
 
 			}
 

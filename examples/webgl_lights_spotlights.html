@@ -30,7 +30,6 @@
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setAnimationLoop( animate );
 
 			const camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 0.1, 100 );
 
@@ -134,17 +133,17 @@
 
 			}
 
-			function updateTweens() {
+			function animate() {
 
 				tween( spotLight1 );
 				tween( spotLight2 );
 				tween( spotLight3 );
 
-				setTimeout( updateTweens, 5000 );
+				setTimeout( animate, 5000 );
 
 			}
 
-			function animate() {
+			function render() {
 
 				TWEEN.update();
 
@@ -154,10 +153,13 @@
 
 				renderer.render( scene, camera );
 
+				requestAnimationFrame( render );
+
 			}
 
 			init();
-			updateTweens();
+			render();
+			animate();
 
 		</script>
 	</body>
