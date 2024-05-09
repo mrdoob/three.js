@@ -256,7 +256,9 @@ async function main() {
 
 	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
-	const build = ( await fs.readFile( 'build/three.module.js', 'utf8' ) ).replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
+	const build = ( await fs.readFile( 'build/three.module.js', 'utf8' ) )
+		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' )
+		.replace( /setAnimationLoop = function \( callback \) {/g, 'setAnimationLoop = function ( callback ) { setInterval( callback, 0 ) }; \n\n\t\tthis.foo = function foo() {' );
 
 	/* Prepare pages */
 
