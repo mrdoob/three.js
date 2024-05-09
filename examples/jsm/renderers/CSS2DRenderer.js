@@ -117,11 +117,11 @@ class CSS2DRenderer {
 
 		function hideObject( object ) {
 
-			if ( object.isCSS2DObject ) object.element.style.display = "none";
+			if ( object.isCSS2DObject ) object.element.style.display = 'none';
 
-			for ( let i = 0, l = object.children.length; i < l; i++ ) {
+			for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
-				hideObject( object.children[i] );
+				hideObject( object.children[ i ] );
 
 			}
 		}
