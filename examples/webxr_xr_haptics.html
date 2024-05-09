@@ -43,6 +43,7 @@
 			const musicScale = [ 0, 3, 5, 7, 10 ];
 
 			init();
+			animate();
 
 			function initAudio() {
 
@@ -139,7 +140,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
@@ -208,6 +208,12 @@
 			}
 
 			//
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
 
 			function handleCollisions() {
 
@@ -294,7 +300,7 @@
 
 			}
 
-			function animate() {
+			function render() {
 
 				handleCollisions();
 

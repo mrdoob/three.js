@@ -43,6 +43,7 @@
 			let group;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -51,7 +52,6 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
@@ -141,6 +141,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();

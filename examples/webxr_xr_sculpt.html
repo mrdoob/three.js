@@ -38,6 +38,7 @@
 
 			init();
 			initBlob();
+			animate();
 
 			function init() {
 
@@ -68,7 +69,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -168,6 +168,12 @@
 
 			//
 
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
 			function transformPoint( vector ) {
 
 				vector.x = ( vector.x + 1.0 ) / 2.0;
@@ -221,7 +227,7 @@
 
 			}
 
-			function animate() {
+			function render() {
 
 				handleController( controller1 );
 				handleController( controller2 );

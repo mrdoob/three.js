@@ -51,6 +51,7 @@
 			const postprocessing = {};
 
 			init();
+			animate();
 
 			function init() {
 
@@ -65,7 +66,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				const path = 'textures/cube/SwedishRoyalCastle/';
@@ -221,6 +221,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate, renderer.domElement );
 
 				stats.begin();
 				render();

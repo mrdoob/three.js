@@ -81,6 +81,7 @@
 			let uniforms;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -110,7 +111,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -126,6 +126,8 @@
 			//
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				uniforms[ 'time' ].value = performance.now() / 1000;
 

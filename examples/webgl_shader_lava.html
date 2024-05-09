@@ -97,6 +97,7 @@
 			let uniforms, mesh;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -146,10 +147,8 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
@@ -166,6 +165,8 @@
 				composer.addPass( outputPass );
 
 				//
+
+				onWindowResize();
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -184,6 +185,14 @@
 			//
 
 			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
 
 				const delta = 5 * clock.getDelta();
 

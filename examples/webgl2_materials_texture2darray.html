@@ -75,6 +75,7 @@
 			let depthStep = 0.4;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -123,7 +124,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -143,6 +143,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				if ( mesh ) {
 

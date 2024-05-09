@@ -120,7 +120,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
@@ -153,6 +152,7 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
+				animate();
 
 			}
 
@@ -168,6 +168,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				const halfWidth = container.offsetWidth / 2;
 

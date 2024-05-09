@@ -31,6 +31,7 @@
 			let camera, scene, renderer, sphere, clock;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -90,7 +91,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
 				renderer.xr.setReferenceSpaceType( 'local' );
 				container.appendChild( renderer.domElement );
@@ -113,6 +113,12 @@
 			}
 
 			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
 
 				// If we are not presenting move the camera a little so the effect is visible
 

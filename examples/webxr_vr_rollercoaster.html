@@ -34,7 +34,6 @@
 			const renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setAnimationLoop( animate );
 			renderer.xr.enabled = true;
 			renderer.xr.setReferenceSpaceType( 'local' );
 			document.body.appendChild( renderer.domElement );
@@ -208,7 +207,7 @@
 
 			let prevTime = performance.now();
 
-			function animate() {
+			function render() {
 
 				const time = performance.now();
 				const delta = time - prevTime;
@@ -243,6 +242,8 @@
 				prevTime = time;
 
 			}
+
+			renderer.setAnimationLoop( render );
 
 		</script>
 

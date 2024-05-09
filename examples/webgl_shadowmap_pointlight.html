@@ -32,6 +32,7 @@
 			let pointLight, pointLight2;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -105,7 +106,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.BasicShadowMap;
 				document.body.appendChild( renderer.domElement );
@@ -147,6 +147,13 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
 
 				let time = performance.now() * 0.001;
 

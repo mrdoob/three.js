@@ -44,6 +44,7 @@
 			const param = { TAAEnabled: '1', TAASampleLevel: 0 };
 
 			init();
+			animate();
 
 			clearGui();
 
@@ -95,7 +96,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -161,6 +161,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				index ++;
 

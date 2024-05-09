@@ -39,13 +39,14 @@
 			};
 
 			init();
+			createGUI();
+			animate();
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -72,6 +73,22 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
+				if ( typeof TESTING !== 'undefined' ) {
+
+					for ( let i = 0; i < 45; i ++ ) {
+
+						render();
+
+					}
+
+
+
+				}
+
+			}
+
+			function createGUI() {
+
 				const gui = new GUI( { title: 'Damp setting' } );
 				gui.add( afterimagePass.uniforms[ 'damp' ], 'value', 0, 1 ).step( 0.001 );
 				gui.add( params, 'enable' );
@@ -88,7 +105,7 @@
 
 			}
 
-			function animate() {
+			function render() {
 
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
@@ -97,6 +114,13 @@
 
 				composer.render();
 
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
 
 			}
 

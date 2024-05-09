@@ -66,6 +66,7 @@
 			const delta = 0.01;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -126,7 +127,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
-				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
 
 				//
@@ -315,6 +315,8 @@
 			//
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();

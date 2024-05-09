@@ -36,8 +36,8 @@
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
 
-			let room, spheres, physics;
-			const velocity = new THREE.Vector3();
+			let room, spheres;
+			let physics, velocity = new THREE.Vector3();
 
 			let count = 0;
 
@@ -70,7 +70,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( render );
 				renderer.xr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
@@ -277,7 +277,7 @@
 
 			}
 
-			function animate() {
+			function render() {
 
 				handleController( controller1 );
 				handleController( controller2 );

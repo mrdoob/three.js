@@ -39,6 +39,7 @@
 		let gui, params;
 
 		init();
+		animate();
 
 		function init() {
 
@@ -57,7 +58,6 @@
 			renderer.shadowMap.enabled = true;
 			//renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setAnimationLoop( animate );
 			document.body.appendChild( renderer.domElement );
 
 			composer = new EffectComposer( renderer );
@@ -171,6 +171,8 @@
 		}
 
 		function animate() {
+
+			requestAnimationFrame( animate );
 
 			const t = clock.getElapsedTime();
 

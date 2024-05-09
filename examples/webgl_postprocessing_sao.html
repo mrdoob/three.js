@@ -39,6 +39,7 @@
 			let group;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -48,10 +49,9 @@
 				const width = window.innerWidth;
 				const height = window.innerHeight;
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
-				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 65, width / height, 3, 10 );
@@ -157,6 +157,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();

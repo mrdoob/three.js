@@ -51,6 +51,7 @@
 			const godrayRenderTargetResolutionMultiplier = 1.0 / 4.0;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -92,7 +93,6 @@
 				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				renderer.autoClear = false;
@@ -223,6 +223,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();

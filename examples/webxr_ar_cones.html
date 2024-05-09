@@ -30,6 +30,7 @@
 			let controller;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -49,7 +50,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -93,6 +93,12 @@
 			//
 
 			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
 
 				renderer.render( scene, camera );
 
