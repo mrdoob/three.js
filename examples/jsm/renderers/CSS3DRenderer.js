@@ -254,11 +254,11 @@ class CSS3DRenderer {
 
 		function hideObject( object ) {
 
-			if ( object.isCSS3DObject ) object.element.style.display = "none";
+			if ( object.isCSS3DObject ) object.element.style.display = 'none';
 	  
-			for ( let i = 0, l = object.children.length; i < l; i++ ) {
+			for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
-			  hideObject( object.children[i] );
+			  hideObject( object.children[ i ] );
 
 			}
 
