@@ -44,6 +44,7 @@ function MenubarFile( editor ) {
 	const fileInput = document.createElement( 'input' );
 	fileInput.multiple = true;
 	fileInput.type = 'file';
+	fileInput.accept = '.3dm, .3ds, .3mf, .amf, .dae, .drc, .fbx, .glb, .gltf, .js, .json, .kmz, .ldr, .md2, .mpd, .obj, .pcd, .ply, .stl, .svg, .usdz, .vox, .vtk, .vtp, .wrl, .xyz, .zip';
 	fileInput.addEventListener( 'change', function () {
 
 		editor.loader.loadFiles( fileInput.files );
