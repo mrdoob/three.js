@@ -96,6 +96,7 @@ class CSS2DRenderer {
 			_viewMatrix.copy( camera.matrixWorldInverse );
 			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
+			hideObject( scene );
 			renderObject( scene, scene, camera );
 			zOrder( scene );
 
@@ -114,14 +115,27 @@ class CSS2DRenderer {
 
 		};
 
+		function hideObject( object ) {
+
+			if ( object.isCSS2DObject ) object.element.style.display = "none";
+
+			for ( let i = 0, l = object.children.length; i < l; i++ ) {
+
+				hideObject( object.children[i] );
+
+			}
+		}
+
 		function renderObject( object, scene, camera ) {
+
+			if ( object.visible === false ) return;
 
 			if ( object.isCSS2DObject ) {
 
 				_vector.setFromMatrixPosition( object.matrixWorld );
 				_vector.applyMatrix4( _viewProjectionMatrix );
 
-				const visible = ( object.visible === true && ancestorIsVisible( object.parent ) ) && ( _vector.z >= - 1 && _vector.z <= 1 ) && ( object.layers.test( camera.layers ) === true );
+				const visible = ( object.visible === true ) && ( _vector.z >= - 1 && _vector.z <= 1 ) && ( object.layers.test( camera.layers ) === true );
 				object.element.style.display = ( visible === true ) ? '' : 'none';
 
 				if ( visible === true ) {
@@ -156,20 +170,6 @@ class CSS2DRenderer {
 
 			}
 
-		}
-
-		function ancestorIsVisible( parent ) {
-
-			if ( parent ) {
-
-				if ( parent.visible )  return ancestorIsVisible( parent.parent );
-
-				return false;
-					
-			} 
-
-			return true;
-								
 		}
 
 		function getDistanceToSquared( object1, object2 ) {
