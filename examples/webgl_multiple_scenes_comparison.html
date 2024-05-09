@@ -87,7 +87,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setScissorTest( true );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -154,7 +154,7 @@
 
 			}
 
-			function animate() {
+			function render() {
 
 				renderer.setScissor( 0, 0, sliderPos, window.innerHeight );
 				renderer.render( sceneL, camera );

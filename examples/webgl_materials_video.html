@@ -67,6 +67,7 @@
 			startButton.addEventListener( 'click', function () {
 
 				init();
+				animate();
 
 			} );
 
@@ -90,7 +91,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				video = document.getElementById( 'video' );
@@ -217,9 +217,17 @@
 
 			//
 
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
 			let h, counter = 1;
 
-			function animate() {
+			function render() {
 
 				const time = Date.now() * 0.00005;
 

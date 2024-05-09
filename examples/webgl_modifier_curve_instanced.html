@@ -45,6 +45,7 @@
 				action = ACTION_NONE;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -163,7 +164,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				renderer.domElement.addEventListener( 'pointerdown', onPointerDown );
@@ -211,6 +211,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				if ( action === ACTION_SELECT ) {
 

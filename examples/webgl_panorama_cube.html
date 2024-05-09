@@ -32,6 +32,7 @@
 			let scene;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -40,7 +41,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -117,6 +117,8 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				controls.update(); // required when damping is enabled
 

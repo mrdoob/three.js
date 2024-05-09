@@ -38,6 +38,7 @@
 			const speed = 0.5;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -88,7 +89,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
+
 
 				container.appendChild( renderer.domElement );
 
@@ -115,6 +116,7 @@
 
 			function animate() {
 
+				requestAnimationFrame( animate );
 				timer.update();
 				render();
 

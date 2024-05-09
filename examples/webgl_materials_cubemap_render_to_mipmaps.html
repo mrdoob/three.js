@@ -84,6 +84,8 @@
 
 
 			init();
+			animate();
+
 
 			async function loadCubeTexture( urls ) {
 
@@ -167,7 +169,6 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -228,6 +229,7 @@
 
 			function animate() {
 
+				requestAnimationFrame( animate );
 				renderer.render( scene, camera );
 
 			}

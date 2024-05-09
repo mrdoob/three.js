@@ -64,6 +64,7 @@
 			let ninjaMeshRaw, curvatureAttribute, bufferGeo;
 
 			init();
+			animate();
 
 			//returns average of elements in a dictionary
 			function average( dict ) {
@@ -136,7 +137,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
 				document.body.appendChild( renderer.domElement );
 
@@ -354,6 +354,14 @@
 			}
 
 			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
 
 				renderer.render( scene, camera );
 

@@ -36,6 +36,7 @@
 			let windowHalfY = window.innerHeight / 2;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -74,7 +75,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -129,6 +129,8 @@
 			//
 
 			function animate() {
+
+				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

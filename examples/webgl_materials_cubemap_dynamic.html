@@ -48,7 +48,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
+				renderer.setAnimationLoop( animation );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				document.body.appendChild( renderer.domElement );
 
@@ -124,7 +124,7 @@
 
 			}
 
-			function animate( msTime ) {
+			function animation( msTime ) {
 
 				const time = msTime / 1000;
 
