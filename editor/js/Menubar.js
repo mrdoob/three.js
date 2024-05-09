@@ -16,7 +16,6 @@ function Menubar( editor ) {
 	container.add( new MenubarFile( editor ) );
 	container.add( new MenubarEdit( editor ) );
 	container.add( new MenubarAdd( editor ) );
-	container.add( new MenubarExamples( editor ) );
 	container.add( new MenubarView( editor ) );
 	container.add( new MenubarHelp( editor ) );
 
