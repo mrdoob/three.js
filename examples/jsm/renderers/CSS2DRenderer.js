@@ -124,6 +124,7 @@ class CSS2DRenderer {
 				hideObject( object.children[ i ] );
 
 			}
+
 		}
 
 		function renderObject( object, scene, camera ) {
@@ -186,7 +187,7 @@ class CSS2DRenderer {
 
 			const result = [];
 
-			scene.traverse( function ( object ) {
+			scene.traverseVisible( function ( object ) {
 
 				if ( object.isCSS2DObject ) result.push( object );
 
