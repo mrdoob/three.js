@@ -7,7 +7,7 @@ import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
 import ParameterNode from './ParameterNode.js';
 import FunctionNode from '../code/FunctionNode.js';
-import { createNodeMaterialFromType, default as NodeMaterial } from '../materials/NodeMaterial.js';
+import { createNodeMaterialFromType, default as NodeMaterial } from '../../materials/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -1090,10 +1090,9 @@ class NodeBuilder {
 
 		const { object, material } = this;
 
-
 		if ( material !== null ) {
 
-			NodeMaterial.fromMaterial( material ).build( this );
+			material.build( this );
 
 		} else {
 

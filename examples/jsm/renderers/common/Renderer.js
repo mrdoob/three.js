@@ -13,7 +13,7 @@ import Nodes from './nodes/Nodes.js';
 import Color4 from './Color4.js';
 import ClippingContext from './ClippingContext.js';
 import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, RenderTarget, HalfFloatType, RGBAFormat } from 'three';
-import { NodeMaterial } from '../../nodes/Nodes.js';
+import NodeMaterial from '../../materials/NodeMaterial.js';
 import QuadMesh from '../../objects/QuadMesh.js';
 
 const _scene = new Scene();

@@ -1,14 +1,14 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { shininess, specularColor } from '../core/PropertyNode.js';
-import { materialShininess, materialSpecular } from '../accessors/MaterialNode.js';
-import { float } from '../shadernode/ShaderNode.js';
-import PhongLightingModel from '../functions/PhongLightingModel.js';
+import {
+	shininess, specularColor,
+	materialShininess, materialSpecular,
+	float
+} from '../../nodes/Nodes.js';
 
-import { MeshPhongMaterial } from 'three';
+import PhongLightingModel from '../../nodes/functions/PhongLightingModel.js';
 
-const defaultValues = new MeshPhongMaterial();
+import MeshPhongMaterial from '../MeshPhongMaterial.js';
 
-class MeshPhongNodeMaterial extends NodeMaterial {
+class MeshPhongNodeMaterial extends MeshPhongMaterial {
 
 	constructor( parameters ) {
 
@@ -16,12 +16,8 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 		this.isMeshPhongNodeMaterial = true;
 
-		this.lights = true;
-
 		this.shininessNode = null;
 		this.specularNode = null;
-
-		this.setDefaultValues( defaultValues );
 
 		this.setValues( parameters );
 
@@ -61,5 +57,3 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 }
 
 export default MeshPhongNodeMaterial;
-
-addNodeMaterial( 'MeshPhongNodeMaterial', MeshPhongNodeMaterial );

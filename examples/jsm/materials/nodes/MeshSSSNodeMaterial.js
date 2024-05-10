@@ -1,9 +1,11 @@
 import { addNodeMaterial } from './NodeMaterial.js';
-import { transformedNormalView } from '../accessors/NormalNode.js';
-import { positionViewDirection } from '../accessors/PositionNode.js';
-import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
+import {
+	transformedNormalView,
+	positionViewDirection,
+	float, vec3
+} from '../nodes/Nodes.js';
+import PhysicalLightingModel from '../nodes/functions/PhysicalLightingModel.js';
 import MeshPhysicalNodeMaterial from './MeshPhysicalNodeMaterial.js';
-import { float, vec3 } from '../shadernode/ShaderNode.js';
 
 class SSSLightingModel extends PhysicalLightingModel {
 

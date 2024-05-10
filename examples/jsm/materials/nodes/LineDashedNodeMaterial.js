@@ -1,9 +1,12 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { attribute } from '../core/AttributeNode.js';
-import { varying } from '../core/VaryingNode.js';
-import { materialLineDashSize, materialLineGapSize, materialLineScale } from '../accessors/MaterialNode.js';
-import { dashSize, gapSize } from '../core/PropertyNode.js';
-import { float } from '../shadernode/ShaderNode.js';
+import {
+	attribute,
+	varying,
+	materialLineDashSize, materialLineGapSize, materialLineScale,
+	dashSize, gapSize,
+	float
+} from '../nodes/Nodes.js';
+
 import { LineDashedMaterial } from 'three';
 
 const defaultValues = new LineDashedMaterial();

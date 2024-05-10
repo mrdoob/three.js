@@ -1,17 +1,19 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { temp } from '../core/VarNode.js';
-import { varying } from '../core/VaryingNode.js';
-import { property, varyingProperty } from '../core/PropertyNode.js';
-import { attribute } from '../core/AttributeNode.js';
-import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
-import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../accessors/MaterialNode.js';
-import { modelViewMatrix } from '../accessors/ModelNode.js';
-import { positionGeometry } from '../accessors/PositionNode.js';
-import { mix, smoothstep } from '../math/MathNode.js';
-import { tslFn, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNode.js';
-import { uv } from '../accessors/UVNode.js';
-import { viewport } from '../display/ViewportNode.js';
-import { dashSize, gapSize } from '../core/PropertyNode.js';
+import {
+	temp,
+	varying,
+	property, varyingProperty,
+	attribute,
+	cameraProjectionMatrix,
+	materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth,
+	modelViewMatrix,
+	positionGeometry,
+	mix, smoothstep,
+	tslFn, float, vec2, vec3, vec4, If,
+	uv,
+	viewport,
+	dashSize, gapSize
+} from '../nodes/Nodes.js';
 
 import { LineDashedMaterial } from 'three';
 
