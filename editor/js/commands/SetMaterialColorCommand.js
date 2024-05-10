@@ -14,7 +14,7 @@ class SetMaterialColorCommand extends Command {
 		super( editor );
 
 		this.type = 'SetMaterialColorCommand';
-		this.name = `Set Material.${attributeName}`;
+		this.name = editor.strings.getKey( 'command/SetMaterialColor' ) + ': ' + attributeName;
 		this.updatable = true;
 
 		this.object = object;

@@ -32,7 +32,7 @@ const _unit = {
 };
 
 const _changeEvent = { type: 'change' };
-const _mouseDownEvent = { type: 'mouseDown' };
+const _mouseDownEvent = { type: 'mouseDown', mode: null };
 const _mouseUpEvent = { type: 'mouseUp', mode: null };
 const _objectChangeEvent = { type: 'objectChange' };
 

@@ -14,14 +14,18 @@ function ViewportInfo( editor ) {
 	container.setColor( '#fff' );
 	container.setTextTransform( 'lowercase' );
 
-	const objectsText  = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
+	const objectsText = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
 	const verticesText = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
 	const trianglesText = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
 	const frametimeText = new UIText( '0' ).setTextAlign( 'right' ).setWidth( '60px' ).setMarginRight( '6px' );
 
-	container.add( objectsText, new UIText( strings.getKey( 'viewport/info/objects' ) ), new UIBreak() );
-	container.add( verticesText, new UIText( strings.getKey( 'viewport/info/vertices' ) ), new UIBreak() );
-	container.add( trianglesText, new UIText( strings.getKey( 'viewport/info/triangles' ) ), new UIBreak() );
+	const objectsUnitText = new UIText( strings.getKey( 'viewport/info/objects' ) );
+	const verticesUnitText = new UIText( strings.getKey( 'viewport/info/vertices' ) );
+	const trianglesUnitText = new UIText( strings.getKey( 'viewport/info/triangles' ) );
+
+	container.add( objectsText, objectsUnitText, new UIBreak() );
+	container.add( verticesText, verticesUnitText, new UIBreak() );
+	container.add( trianglesText, trianglesUnitText, new UIBreak() );
 	container.add( frametimeText, new UIText( strings.getKey( 'viewport/info/rendertime' ) ), new UIBreak() );
 
 	signals.objectAdded.add( update );
@@ -71,9 +75,20 @@ function ViewportInfo( editor ) {
 
 		}
 
-		objectsText.setValue( objects.format() );
-		verticesText.setValue( vertices.format() );
-		trianglesText.setValue( triangles.format() );
+		objectsText.setValue( editor.utils.formatNumber( objects ) );
+		verticesText.setValue( editor.utils.formatNumber( vertices ) );
+		trianglesText.setValue( editor.utils.formatNumber( triangles ) );
+
+		const pluralRules = new Intl.PluralRules( editor.config.getKey( 'language' ) );
+
+		const objectsStringKey = ( pluralRules.select( objects ) === 'one' ) ? 'viewport/info/oneObject' : 'viewport/info/objects';
+		objectsUnitText.setValue( strings.getKey( objectsStringKey ) );
+
+		const verticesStringKey = ( pluralRules.select( vertices ) === 'one' ) ? 'viewport/info/oneVertex' : 'viewport/info/vertices';
+		verticesUnitText.setValue( strings.getKey( verticesStringKey ) );
+
+		const trianglesStringKey = ( pluralRules.select( triangles ) === 'one' ) ? 'viewport/info/oneTriangle' : 'viewport/info/triangles';
+		trianglesUnitText.setValue( strings.getKey( trianglesStringKey ) );
 
 	}
 

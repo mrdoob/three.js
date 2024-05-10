@@ -1,6 +1,8 @@
 class LoaderUtils {
 
-	static decodeText( array ) {
+	static decodeText( array ) { // @deprecated, r165
+
+		console.warn( 'THREE.LoaderUtils: decodeText() has been deprecated with r165 and will be removed with r175. Use TextDecoder instead.' );
 
 		if ( typeof TextDecoder !== 'undefined' ) {
 

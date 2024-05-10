@@ -10,6 +10,12 @@ class NodeSampler extends Sampler {
 
 	}
 
+	update() {
+
+		this.texture = this.textureNode.value;
+
+	}
+
 }
 
 export default NodeSampler;

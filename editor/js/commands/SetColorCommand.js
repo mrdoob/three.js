@@ -14,7 +14,7 @@ class SetColorCommand extends Command {
 		super( editor );
 
 		this.type = 'SetColorCommand';
-		this.name = `Set ${attributeName}`;
+		this.name = editor.strings.getKey( 'command/SetColor' ) + ': ' + attributeName;
 		this.updatable = true;
 
 		this.object = object;

@@ -15,7 +15,7 @@ class SetRotationCommand extends Command {
 		super( editor );
 
 		this.type = 'SetRotationCommand';
-		this.name = 'Set Rotation';
+		this.name = editor.strings.getKey( 'command/SetRotation' );
 		this.updatable = true;
 
 		this.object = object;

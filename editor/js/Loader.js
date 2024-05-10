@@ -70,7 +70,7 @@ function Loader( editor ) {
 		const reader = new FileReader();
 		reader.addEventListener( 'progress', function ( event ) {
 
-			const size = '(' + Math.floor( event.total / 1000 ).format() + ' KB)';
+			const size = '(' + editor.utils.formatNumber( Math.floor( event.total / 1000 ) ) + ' KB)';
 			const progress = Math.floor( ( event.loaded / event.total ) * 100 ) + '%';
 
 			console.log( 'Loading', filename, size, progress );
@@ -99,7 +99,7 @@ function Loader( editor ) {
 
 					}, function ( error ) {
 
-						console.error( error )
+						console.error( error );
 
 					} );
 
@@ -858,6 +858,24 @@ function Loader( editor ) {
 
 		const zip = unzipSync( new Uint8Array( contents ) );
 
+		const manager = new THREE.LoadingManager();
+		manager.setURLModifier( function ( url ) {
+
+			const file = zip[ url ];
+
+			if ( file ) {
+
+				console.log( 'Loading', url );
+
+				const blob = new Blob( [ file.buffer ], { type: 'application/octet-stream' } );
+				return URL.createObjectURL( blob );
+
+			}
+
+			return url;
+
+		} );
+
 		// Poly
 
 		if ( zip[ 'model.obj' ] && zip[ 'materials.mtl' ] ) {
@@ -865,9 +883,11 @@ function Loader( editor ) {
 			const { MTLLoader } = await import( 'three/addons/loaders/MTLLoader.js' );
 			const { OBJLoader } = await import( 'three/addons/loaders/OBJLoader.js' );
 
-			const materials = new MTLLoader().parse( strFromU8( zip[ 'materials.mtl' ] ) );
+			const materials = new MTLLoader( manager ).parse( strFromU8( zip[ 'materials.mtl' ] ) );
 			const object = new OBJLoader().setMaterials( materials ).parse( strFromU8( zip[ 'model.obj' ] ) );
+
 			editor.execute( new AddObjectCommand( editor, object ) );
+			return;
 
 		}
 
@@ -876,24 +896,6 @@ function Loader( editor ) {
 		for ( const path in zip ) {
 
 			const file = zip[ path ];
-
-			const manager = new THREE.LoadingManager();
-			manager.setURLModifier( function ( url ) {
-
-				const file = zip[ url ];
-
-				if ( file ) {
-
-					console.log( 'Loading', url );
-
-					const blob = new Blob( [ file.buffer ], { type: 'application/octet-stream' } );
-					return URL.createObjectURL( blob );
-
-				}
-
-				return url;
-
-			} );
 
 			const extension = path.split( '.' ).pop().toLowerCase();
 
@@ -941,7 +943,7 @@ function Loader( editor ) {
 				{
 
 					const loader = await createGLTFLoader( manager );
-					
+
 					loader.parse( strFromU8( file ), '', function ( result ) {
 
 						const scene = result.scene;

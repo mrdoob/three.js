@@ -73,7 +73,6 @@
 		init();
 		initGeometries();
 		initMesh();
-		animate();
 
 		//
 
@@ -225,6 +224,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( width, height );
+			renderer.setAnimationLoop( animate );
 			document.body.appendChild( renderer.domElement );
 
 			// scene
@@ -319,8 +319,6 @@
 		}
 
 		function animate() {
-
-			requestAnimationFrame( animate );
 
 			animateMeshes();
 

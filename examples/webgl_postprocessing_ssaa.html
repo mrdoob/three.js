@@ -52,7 +52,6 @@
 			};
 
 			init();
-			animate();
 
 			clearGui();
 
@@ -93,6 +92,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( devicePixelRatio );
 				renderer.setSize( width, height );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -196,8 +196,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				stats.begin();
 

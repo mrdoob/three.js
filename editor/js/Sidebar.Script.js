@@ -81,7 +81,7 @@ function SidebarScript( editor ) {
 					remove.setMarginLeft( '4px' );
 					remove.onClick( function () {
 
-						if ( confirm( 'Are you sure?' ) ) {
+						if ( confirm( strings.getKey( 'prompt/script/remove' ) ) ) {
 
 							editor.execute( new RemoveScriptCommand( editor, editor.selected, script ) );
 

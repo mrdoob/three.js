@@ -103,8 +103,8 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.setScissorTest( true );
-				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 
 				if ( isP3Context && window.matchMedia( '( color-gamut: p3 )' ).matches ) {
@@ -189,7 +189,7 @@
 
 			}
 
-			function containTexture ( aspect, target ) {
+			function containTexture( aspect, target ) {
 
 				// Sets the matrix uv transform so the texture image is contained in a region having the specified aspect ratio,
 				// and does so without distortion. Akin to CSS object-fit: contain.
@@ -213,7 +213,7 @@
 
 			}
 
-			function render() {
+			function animate() {
 
 				renderer.setScissor( 0, 0, sliderPos, window.innerHeight );
 				renderer.render( sceneL, camera );

@@ -46,6 +46,15 @@ function ViewportControls( editor ) {
 
 	signals.cameraAdded.add( update );
 	signals.cameraRemoved.add( update );
+	signals.objectChanged.add( function ( object ) {
+
+		if ( object.isCamera ) {
+
+			update();
+
+		}
+
+	} );
 
 	// shading
 
@@ -61,10 +70,14 @@ function ViewportControls( editor ) {
 
 	signals.editorCleared.add( function () {
 
+		editor.setViewportCamera( editor.camera.uuid );
+
 		shadingSelect.setValue( 'solid' );
 		editor.setViewportShading( shadingSelect.getValue() );
 
 	} );
+
+	signals.cameraResetted.add( update );
 
 	update();
 
@@ -84,7 +97,13 @@ function ViewportControls( editor ) {
 		}
 
 		cameraSelect.setOptions( options );
-		cameraSelect.setValue( editor.viewportCamera.uuid );
+
+		const selectedCamera = ( editor.viewportCamera.uuid in options )
+			? editor.viewportCamera
+			: editor.camera;
+
+		cameraSelect.setValue( selectedCamera.uuid );
+		editor.setViewportCamera( selectedCamera.uuid );
 
 	}
 

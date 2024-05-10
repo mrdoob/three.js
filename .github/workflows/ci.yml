@@ -69,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-latest ]
+        os: [ windows-latest ]
         CI: [ 0, 1, 2, 3 ]
     env:
       CI: ${{ matrix.CI }}
@@ -92,9 +92,19 @@ jobs:
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4
         if: always()
         with:
-          name: Output screenshots
+          name: Output screenshots-${{ matrix.os }}-${{ matrix.CI }}
           path: test/e2e/output-screenshots
           if-no-files-found: ignore
+
+  merge:
+    runs-on: ${{ matrix.os }}
+    needs: [ e2e ]
+    steps:
+      - name: Merge Artifacts
+        uses: actions/upload-artifact/merge@v4
+        with:
+          name: artifacts
+          pattern: Output screenshots-*
 
   e2e-cov:
     name: Examples ready for release

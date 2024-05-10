@@ -14,7 +14,7 @@ class MoveObjectCommand extends Command {
 		super( editor );
 
 		this.type = 'MoveObjectCommand';
-		this.name = 'Move Object';
+		this.name = editor.strings.getKey( 'command/MoveObject' );
 
 		this.object = object;
 		this.oldParent = ( object !== undefined ) ? object.parent : undefined;

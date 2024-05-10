@@ -122,11 +122,11 @@ class Bindings extends DataMap {
 
 				}
 
+			} else if ( binding.isSampler ) {
+
+				binding.update();
+
 			} else if ( binding.isSampledTexture ) {
-
-				const texture = binding.texture;
-
-				if ( binding.needsBindingsUpdate ) needsBindingsUpdate = true;
 
 				const updated = binding.update();
 
@@ -134,7 +134,11 @@ class Bindings extends DataMap {
 
 					this.textures.updateTexture( binding.texture );
 
+					needsBindingsUpdate = true;
+
 				}
+
+				const texture = binding.texture;
 
 				if ( texture.isStorageTexture === true ) {
 

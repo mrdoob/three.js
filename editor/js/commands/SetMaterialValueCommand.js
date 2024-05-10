@@ -14,7 +14,7 @@ class SetMaterialValueCommand extends Command {
 		super( editor );
 
 		this.type = 'SetMaterialValueCommand';
-		this.name = `Set Material.${attributeName}`;
+		this.name = editor.strings.getKey( 'command/SetMaterialValue' ) + ': ' + attributeName;
 		this.updatable = true;
 
 		this.object = object;

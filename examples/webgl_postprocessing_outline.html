@@ -115,7 +115,6 @@
 			} );
 
 			init();
-			animate();
 
 			function init() {
 
@@ -129,6 +128,7 @@
 				renderer.shadowMap.enabled = true;
 				// todo - support pixelRatio in this demo
 				renderer.setSize( width, height );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -326,8 +326,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				stats.begin();
 

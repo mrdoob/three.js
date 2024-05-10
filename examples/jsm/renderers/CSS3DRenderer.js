@@ -172,6 +172,7 @@ class CSS3DRenderer {
 
 			}
 
+			hideObject( scene );
 			renderObject( scene, scene, camera, cameraCSSMatrix );
 
 		};
@@ -251,12 +252,25 @@ class CSS3DRenderer {
 
 		}
 
+		function hideObject( object ) {
+
+			if ( object.isCSS3DObject ) object.element.style.display = 'none';
+	  
+			for ( let i = 0, l = object.children.length; i < l; i ++ ) {
+
+			  hideObject( object.children[ i ] );
+
+			}
+
+		}
+
 		function renderObject( object, scene, camera, cameraCSSMatrix ) {
+
+			if ( object.visible === false ) return;
 
 			if ( object.isCSS3DObject ) {
 
-				const visible = ( object.visible === true ) && ( object.layers.test( camera.layers ) === true );
-				object.element.style.display = ( visible === true ) ? '' : 'none';
+				const visible = ( object.layers.test( camera.layers ) === true );
 
 				if ( visible === true ) {
 
@@ -292,6 +306,8 @@ class CSS3DRenderer {
 
 					const element = object.element;
 					const cachedObject = cache.objects.get( object );
+
+					element.style.display = '';
 
 					if ( cachedObject === undefined || cachedObject.style !== style ) {
 

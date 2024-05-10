@@ -46,7 +46,6 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
@@ -108,6 +107,7 @@
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
@@ -208,12 +208,6 @@
 			}
 
 			function animate() {
-
-				renderer.setAnimationLoop( render );
-
-			}
-
-			function render() {
 
 				const time = performance.now() * 0.0002;
 				const torus = scene.getObjectByName( 'torus' );

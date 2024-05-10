@@ -110,6 +110,18 @@ class UIElement {
 
 	}
 
+	setHidden( isHidden ) {
+
+		this.dom.hidden = isHidden;
+
+	}
+
+	isHidden() {
+
+		return this.dom.hidden;
+
+	}
+
 	setDisabled( value ) {
 
 		this.dom.disabled = value;
@@ -151,7 +163,7 @@ const properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'hei
 
 properties.forEach( function ( property ) {
 
-	const method = 'set' + property.substr( 0, 1 ).toUpperCase() + property.substr( 1, property.length );
+	const method = 'set' + property.substring( 0, 1 ).toUpperCase() + property.substring( 1 );
 
 	UIElement.prototype[ method ] = function () {
 
@@ -314,7 +326,7 @@ class UITextArea extends UIElement {
 
 			event.stopPropagation();
 
-			if ( event.keyCode === 9 ) {
+			if ( event.code === 'Tab' ) {
 
 				event.preventDefault();
 
@@ -494,7 +506,7 @@ class UIColor extends UIElement {
 
 	getHexValue() {
 
-		return parseInt( this.dom.value.substr( 1 ), 16 );
+		return parseInt( this.dom.value.substring( 1 ), 16 );
 
 	}
 
@@ -542,8 +554,7 @@ class UINumber extends UIElement {
 
 		const scope = this;
 
-		const changeEvent = document.createEvent( 'HTMLEvents' );
-		changeEvent.initEvent( 'change', true, true );
+		const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 
 		let distance = 0;
 		let onMouseDownValue = 0;
@@ -686,19 +697,19 @@ class UINumber extends UIElement {
 
 			event.stopPropagation();
 
-			switch ( event.keyCode ) {
+			switch ( event.code ) {
 
-				case 13: // enter
+				case 'Enter':
 					scope.dom.blur();
 					break;
 
-				case 38: // up
+				case 'ArrowUp':
 					event.preventDefault();
 					scope.setValue( scope.getValue() + scope.nudge );
 					scope.dom.dispatchEvent( changeEvent );
 					break;
 
-				case 40: // down
+				case 'ArrowDown':
 					event.preventDefault();
 					scope.setValue( scope.getValue() - scope.nudge );
 					scope.dom.dispatchEvent( changeEvent );
@@ -782,6 +793,8 @@ class UINumber extends UIElement {
 
 		this.unit = unit;
 
+		this.setValue( this.value );
+
 		return this;
 
 	}
@@ -812,8 +825,7 @@ class UIInteger extends UIElement {
 
 		const scope = this;
 
-		const changeEvent = document.createEvent( 'HTMLEvents' );
-		changeEvent.initEvent( 'change', true, true );
+		const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 
 		let distance = 0;
 		let onMouseDownValue = 0;
@@ -901,19 +913,19 @@ class UIInteger extends UIElement {
 
 			event.stopPropagation();
 
-			switch ( event.keyCode ) {
+			switch ( event.code ) {
 
-				case 13: // enter
+				case 'Enter':
 					scope.dom.blur();
 					break;
 
-				case 38: // up
+				case 'ArrowUp':
 					event.preventDefault();
 					scope.setValue( scope.getValue() + scope.nudge );
 					scope.dom.dispatchEvent( changeEvent );
 					break;
 
-				case 40: // down
+				case 'ArrowDown':
 					event.preventDefault();
 					scope.setValue( scope.getValue() - scope.nudge );
 					scope.dom.dispatchEvent( changeEvent );
@@ -1266,8 +1278,7 @@ class UIListbox extends UIDiv {
 
 		this.selectedValue = value;
 
-		const changeEvent = document.createEvent( 'HTMLEvents' );
-		changeEvent.initEvent( 'change', true, true );
+		const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 		this.dom.dispatchEvent( changeEvent );
 
 	}

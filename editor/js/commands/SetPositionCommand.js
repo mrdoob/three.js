@@ -15,7 +15,7 @@ class SetPositionCommand extends Command {
 		super( editor );
 
 		this.type = 'SetPositionCommand';
-		this.name = 'Set Position';
+		this.name = editor.strings.getKey( 'command/SetPosition' );
 		this.updatable = true;
 
 		this.object = object;

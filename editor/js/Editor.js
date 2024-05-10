@@ -754,7 +754,8 @@ Editor.prototype = {
 
 		save: save,
 		saveArrayBuffer: saveArrayBuffer,
-		saveString: saveString
+		saveString: saveString,
+		formatNumber: formatNumber
 
 	}
 
@@ -785,6 +786,12 @@ function saveArrayBuffer( buffer, filename ) {
 function saveString( text, filename ) {
 
 	save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+}
+
+function formatNumber( number ) {
+
+	return new Intl.NumberFormat( 'en-us', { useGrouping: true } ).format( number );
 
 }
 
