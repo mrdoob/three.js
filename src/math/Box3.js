@@ -170,15 +170,20 @@ class Box3 {
 
 			if ( precise === true && positionAttribute !== undefined && object.isInstancedMesh !== true ) {
 
-				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
+				const indexAttribute = geometry.getIndex();
+				const vertexCount = indexAttribute ? indexAttribute.count : positionAttribute.count;
+
+				for ( let i = 0, l = vertexCount; i < l; i ++ ) {
+
+					const index = indexAttribute ? indexAttribute.getX( i ) : i;
 
 					if ( object.isMesh === true ) {
 
-						object.getVertexPosition( i, _vector );
+						object.getVertexPosition( index, _vector );
 
 					} else {
 
-						_vector.fromBufferAttribute( positionAttribute, i );
+						_vector.fromBufferAttribute( positionAttribute, index );
 
 					}
 
