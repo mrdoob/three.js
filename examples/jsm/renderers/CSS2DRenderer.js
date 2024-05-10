@@ -186,7 +186,7 @@ class CSS2DRenderer {
 
 			const result = [];
 
-			scene.traverse( function ( object ) {
+			scene.traverseVisible( function ( object ) {
 
 				if ( object.isCSS2DObject ) result.push( object );
 
@@ -206,11 +206,8 @@ class CSS2DRenderer {
 
 				}
 
-				const cacheDataA = cache.objects.get( a );
-				const distanceA = cacheDataA ? cacheDataA.distanceToCameraSquared : 0;
-				
-				const cacheDataB = cache.objects.get( b );
-				const distanceB = cacheDataB ? cacheDataB.distanceToCameraSquared : 0;
+				const distanceA = cache.objects.get( a ).distanceToCameraSquared;
+        			const distanceB = cache.objects.get( b ).distanceToCameraSquared;
 
 				return distanceA - distanceB;
 
