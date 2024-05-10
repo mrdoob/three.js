@@ -124,6 +124,7 @@ class CSS2DRenderer {
 				hideObject( object.children[ i ] );
 
 			}
+
 		}
 
 		function renderObject( object, scene, camera ) {
@@ -207,7 +208,7 @@ class CSS2DRenderer {
 				}
 
 				const distanceA = cache.objects.get( a ).distanceToCameraSquared;
-        			const distanceB = cache.objects.get( b ).distanceToCameraSquared;
+				const distanceB = cache.objects.get( b ).distanceToCameraSquared;
 
 				return distanceA - distanceB;
 
