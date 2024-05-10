@@ -206,8 +206,11 @@ class CSS2DRenderer {
 
 				}
 
-				const distanceA = cache.objects.get( a ).distanceToCameraSquared;
-				const distanceB = cache.objects.get( b ).distanceToCameraSquared;
+				const cacheDataA = cache.objects.get( a );
+				const distanceA = cacheDataA ? cacheDataA.distanceToCameraSquared : 0;
+				
+				const cacheDataB = cache.objects.get( b );
+				const distanceB = cacheDataB ? cacheDataB.distanceToCameraSquared : 0;
 
 				return distanceA - distanceB;
 
