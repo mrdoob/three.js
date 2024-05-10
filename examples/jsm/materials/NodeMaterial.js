@@ -1,29 +1,33 @@
 import { Material } from 'three';
-import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
-import { attribute } from '../core/AttributeNode.js';
-import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
-import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal } from '../accessors/MaterialNode.js';
-import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
-import { transformedNormalView, normalLocal } from '../accessors/NormalNode.js';
-import { instance } from '../accessors/InstanceNode.js';
-import { batch } from '../accessors/BatchNode.js';
-import { materialReference } from '../accessors/MaterialReferenceNode.js';
-import { positionLocal, positionView } from '../accessors/PositionNode.js';
-import { skinningReference } from '../accessors/SkinningNode.js';
-import { morphReference } from '../accessors/MorphNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { cubeTexture } from '../accessors/CubeTextureNode.js';
-import { lightsNode } from '../lighting/LightsNode.js';
-import { mix } from '../math/MathNode.js';
-import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
-import AONode from '../lighting/AONode.js';
-import { lightingContext } from '../lighting/LightingContextNode.js';
-import EnvironmentNode from '../lighting/EnvironmentNode.js';
-import IrradianceNode from '../lighting/IrradianceNode.js';
-import { depthPixel } from '../display/ViewportDepthNode.js';
-import { cameraLogDepth } from '../accessors/CameraNode.js';
-import { clipping, clippingAlpha } from '../accessors/ClippingNode.js';
-import { faceDirection } from '../display/FrontFacingNode.js';
+import {
+	attribute,
+	output, diffuseColor, varyingProperty,
+	materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal,
+	modelViewProjection,
+	transformedNormalView,
+	instance,
+	batch,
+	materialReference,
+	positionLocal, positionView,
+	skinningReference,
+	morphReference,
+	texture,
+	cubeTexture,
+	lightsNode,
+	mix,
+	float, vec3, vec4,
+	lightingContext,
+	depthPixel,
+	cameraLogDepth,
+	clipping, clippingAlpha,
+	faceDirection
+} from '../nodes/Nodes.js';
+
+import { getNodeChildren, getCacheKey } from '../nodes/core/NodeUtils.js';
+
+import AONode from '../nodes/lighting/AONode.js';
+import EnvironmentNode from '../nodes/lighting/EnvironmentNode.js';
+import IrradianceNode from '../nodes/lighting/IrradianceNode.js';
 
 const NodeMaterials = new Map();
 
