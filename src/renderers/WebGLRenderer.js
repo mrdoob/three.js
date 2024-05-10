@@ -1806,11 +1806,11 @@ class WebGLRenderer {
 
 					needsProgramChange = true;
 
-				} else if ( object.isBatchedMesh && materialProperties.batchingColor === true && object.colorTexture === null ) {
+				} else if ( object.isBatchedMesh && materialProperties.batchingColor === true ) {
 
 					needsProgramChange = true;
 
-				} else if ( object.isBatchedMesh && materialProperties.batchingColor === false && object.colorTexture !== null ) {
+				} else if ( object.isBatchedMesh && materialProperties.batchingColor === false ) {
 
 					needsProgramChange = true;
 
@@ -2007,9 +2007,9 @@ class WebGLRenderer {
 				p_uniforms.setValue( _gl, 'batchingTexture', object._matricesTexture, textures );
 
 				p_uniforms.setOptional( _gl, object, 'batchingColorTexture' );
-				if ( object.colorsTexture !== null ) {
+				if ( object._colorsTexture !== null ) {
 
-					p_uniforms.setValue( _gl, 'batchingColorTexture', object.colorsTexture, textures );
+					p_uniforms.setValue( _gl, 'batchingColorTexture', object._colorsTexture, textures );
 
 				}
 
