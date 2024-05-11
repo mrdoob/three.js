@@ -175,9 +175,6 @@
 
 				controls.update();
 
-				// renderer will set this eventually
-				matLine.resolution.set( window.innerWidth, window.innerHeight ); // resolution of the viewport
-
 				gpuPanel.startQuery();
 				renderer.render( scene, camera );
 				gpuPanel.endQuery();
