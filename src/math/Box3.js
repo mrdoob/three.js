@@ -440,17 +440,22 @@ class Box3 {
 		// transform of empty box is an empty box.
 		if ( this.isEmpty() ) return this;
 
-		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
-		_points[ 0 ].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
-		_points[ 1 ].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
-		_points[ 2 ].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
-		_points[ 3 ].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
-		_points[ 4 ].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
-		_points[ 5 ].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
-		_points[ 6 ].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
-		_points[ 7 ].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 111
+		// compute box center and extents
+		this.getCenter( _center );
+		_extents.subVectors( this.max, _center );
 
-		this.setFromPoints( _points );
+		// transform center
+		_center.applyMatrix4( matrix );
+
+		// transform extents as direction with abs matrix
+		const e = matrix.elements, n = _v0.copy( _extents );
+		_extents.x = Math.abs( e[ 0 ] ) * n.x + Math.abs( e[ 4 ] ) * n.y + Math.abs( e[ 8 ] ) * n.z; 
+		_extents.y = Math.abs( e[ 1 ] ) * n.x + Math.abs( e[ 5 ] ) * n.y + Math.abs( e[ 9 ] ) * n.z; 
+		_extents.z = Math.abs( e[ 2 ] ) * n.x + Math.abs( e[ 6 ] ) * n.y + Math.abs( e[ 10 ] ) * n.z; 
+
+		// reconstruct bounds
+		this.min.copy( _center ).sub( _extents );
+		this.max.copy( _center ).add( _extents );
 
 		return this;
 
@@ -472,17 +477,6 @@ class Box3 {
 	}
 
 }
-
-const _points = [
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3(),
-	/*@__PURE__*/ new Vector3()
-];
 
 const _vector = /*@__PURE__*/ new Vector3();
 
