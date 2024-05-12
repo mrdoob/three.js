@@ -448,16 +448,14 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	finishRender( renderContext, scene ) {
+	finishRender( renderContext ) {
 
 		const renderContextData = this.get( renderContext );
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
-		const sceneData = this.get( scene );
+		if ( renderContextData.renderBundles !== undefined && renderContextData.renderBundles.length > 0 ) {
 
-		if ( sceneData.renderBundles !== undefined && sceneData.renderBundles.length > 0 ) {
-
-			renderContextData.currentPass.executeBundles( sceneData.renderBundles );
+			renderContextData.currentPass.executeBundles( renderContextData.renderBundles );
 
 		}
 
@@ -805,18 +803,18 @@ class WebGPUBackend extends Backend {
 
 		const { bundleEncoder, renderBundle, lastPipelineGPU } = renderObjectData;
 
-		const sceneData = this.get( renderObject.scene );
+		const renderContextData = this.get( context );
 
-		if ( sceneData.renderBundles !== undefined && bundleEncoder !== undefined && lastPipelineGPU === pipelineGPU ) {
+		if ( renderContextData.renderBundles !== undefined && bundleEncoder !== undefined && lastPipelineGPU === pipelineGPU ) {
 
-			sceneData.renderBundles.push( renderBundle );
+			renderContextData.renderBundles.push( renderBundle );
 			return;
 
 		}
 
-		if ( sceneData.renderBundles !== undefined && sceneData.renderBundles.length > 0 ) {
+		if ( renderContextData.renderBundles !== undefined && renderContextData.renderBundles.length > 0 ) {
 
-			contextData.currentPass.executeBundles( sceneData.renderBundles );
+			contextData.currentPass.executeBundles( renderContextData.renderBundles );
 
 		}
 

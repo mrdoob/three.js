@@ -507,9 +507,10 @@ class Renderer {
 
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
-		const sceneData = this.backend.get( scene );
 
-		const needsUpdate = scene.bundleType === 'static' && sceneData.renderBundles !== undefined && sceneData.renderBundles.length > 0 ? false : true;
+		const renderContextData = this.backend.get( renderContext );
+
+		const needsUpdate = scene.bundleType === 'static' && renderContextData.renderBundles !== undefined && renderContextData.renderBundles.length > 0 ? false : true;
 
 		if ( needsUpdate ) {
 
@@ -574,7 +575,7 @@ class Renderer {
 
 		if ( needsUpdate ) {
 
-			sceneData.renderBundles = [];
+			renderContextData.renderBundles = [];
 
 
 			// process render lists
@@ -591,7 +592,7 @@ class Renderer {
 		}
 		// finish render pass
 
-		this.backend.finishRender( renderContext, scene );
+		this.backend.finishRender( renderContext );
 
 		// restore render tree
 
@@ -1391,6 +1392,14 @@ class Renderer {
 		//
 
 		object.onAfterRender( this, scene, camera, geometry, material, group );
+
+	}
+
+	recordBundle() {
+
+	}
+
+	renderBundle() {
 
 	}
 
