@@ -10,6 +10,7 @@ export { SetGeometryValueCommand } from './SetGeometryValueCommand.js';
 export { SetMaterialColorCommand } from './SetMaterialColorCommand.js';
 export { SetMaterialCommand } from './SetMaterialCommand.js';
 export { SetMaterialMapCommand } from './SetMaterialMapCommand.js';
+export { SetMaterialRangeCommand } from './SetMaterialRangeCommand.js';
 export { SetMaterialValueCommand } from './SetMaterialValueCommand.js';
 export { SetMaterialVectorCommand } from './SetMaterialVectorCommand.js';
 export { SetPositionCommand } from './SetPositionCommand.js';
