@@ -21,7 +21,7 @@ import {
  *   rigidBody: Rapier.RigidBody;
  *   colliderDesc: Rapier.ColliderDesc;
  *   collider: Rapier.Collider;
- * }} PhysicProperties
+ * }} PhysicsProperties
  */
 
 /**
@@ -30,6 +30,11 @@ import {
  * } & Object3D } Object3DWithGeometry
  */
 
+const RAPIER_PATH = "https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.12.0";
+
+/** @type {Rapier | null | undefined} */
+let RAPIER = null;
+
 /**
  * @initial_author mrdoob | info@mrdoob.com
  *
@@ -37,12 +42,7 @@ import {
  *
  * @docs https://rapier.rs/docs/api/javascript/JavaScript3D/
  */
-
-const RAPIER_PATH = "https://cdn.skypack.dev/@dimforge/rapier3d-compat@0.12.0";
-/** @type {Rapier | null | undefined} */
-let RAPIER = null;
-
-export class Physic {
+export class Physics {
 	/** @access private */
 	_vector = new Vector3();
 	/** @access private */
@@ -65,7 +65,7 @@ export class Physic {
 	 */
 	world;
 	/**
-	 * @description List of {@link Object3D} with physic applied.
+	 * @description List of {@link Object3D} with applied physics.
 	 *
 	 * @type {Object3DWithGeometry[]}
 	 */
@@ -85,11 +85,11 @@ export class Physic {
 	}
 
 	/**
-	 * @description Add the specified `object` to the physic `dynamicObjects` map.
+	 * @description Add the specified `object` to the physics `dynamicObjects` map.
 	 *
 	 * @param {Object3DWithGeometry} object `Object3D` based.
-	 * @param {number} mass Physic object mass.
-	 * @param {number} restitution Physic Object restitution.
+	 * @param {number} mass Physics object mass.
+	 * @param {number} restitution Physics Object restitution.
 	 *
 	 * @access private
 	 */
@@ -100,7 +100,7 @@ export class Physic {
 		colliderDesc.setMass(mass);
 		colliderDesc.setRestitution(restitution);
 
-		const physicProperties =
+		const physicsProperties =
 			object instanceof InstancedMesh
 				? this.createInstancedPhysicProperties(object, colliderDesc, mass)
 				: this.createPhysicProperties(
@@ -112,14 +112,14 @@ export class Physic {
 
 		if (mass > 0) {
 			this.dynamicObjects.push(object);
-			this.dynamicObjectMap.set(object, physicProperties);
+			this.dynamicObjectMap.set(object, physicsProperties);
 		}
 
-		return physicProperties;
+		return physicsProperties;
 	}
 
 	/**
-	 * Add objects children from the specified {@link Object3D} to the physic world using the userData.
+	 * Add objects children from the specified {@link Object3D} to the physics world using `userData`.
 	 *
 	 * @param {Object3DWithGeometry} object Object3D based.
 	 *
@@ -145,11 +145,11 @@ export class Physic {
 	}
 
 	/**
-	 * @description Apply physic to the specified object. Add the object to the physic `world`.
+	 * @description Apply physics to the specified object. Add the object to the physical `world`.
 	 *
 	 * @param {Object3D} object Object3D based.
-	 * @param {number} mass Physic mass.
-	 * @param {number} restitution Physic restitution.
+	 * @param {number} mass Physics mass.
+	 * @param {number} restitution Physics restitution.
 	 */
 	addToWorld(object, mass = 0, restitution = 0) {
 		if (object instanceof Object3D)
@@ -249,7 +249,7 @@ export class Physic {
 	}
 
 	/**
-	 * @description Create {@link Rapier.RigidBody} for each instance of the {@link InstancedMesh} specified mesh
+	 * @description Create a {@link Rapier.RigidBody} for each instance of the specified {@link InstancedMesh}
 	 *
 	 * @param {InstancedMesh} mesh {@link InstancedMesh}
 	 * @param {Rapier.ColliderDesc} colliderDesc {@link Rapier.ColliderDesc}
@@ -270,7 +270,7 @@ export class Physic {
 	}
 
 	/**
-	 * @description Create {@link Rapier.RigidBody} for the specified {@link Rapier.Collider}
+	 * @description Create a {@link Rapier.RigidBody} for the specified {@link Rapier.Collider}
 	 *
 	 * @param {Rapier.ColliderDesc} colliderDesc {@link Rapier.ColliderDesc}
 	 * @param {Rapier.Vector3} position {@link Rapier.Vector3}
@@ -292,22 +292,21 @@ export class Physic {
 	}
 
 	/**
-	 *
 	 * @param {Object3DWithGeometry} object
 	 * @param {number | number} index
 	 */
 	getPhysicPropertiesFromObject(object, index = 0) {
-		const _physicProperties = this.dynamicObjectMap.get(object);
-		/** @type {PhysicProperties} */
+		const _physicsProperties = this.dynamicObjectMap.get(object);
+		/** @type {PhysicsProperties} */
 		let body;
 
-		if (!_physicProperties) return undefined;
+		if (!_physicsProperties) return undefined;
 		if (
 			object instanceof InstancedMesh &&
-			typeof _physicProperties === "object"
+			typeof _physicsProperties === "object"
 		)
-			body = _physicProperties[index];
-		else body = _physicProperties;
+			body = _physicsProperties[index];
+		else body = _physicsProperties;
 
 		return body;
 	}
@@ -320,15 +319,15 @@ export class Physic {
 	 * @returns
 	 */
 	setObjectPosition(object, position, index = 0) {
-		const physicProperties = this.getPhysicPropertiesFromObject(object, index);
-		if (!physicProperties) return;
+		const physicsProperties = this.getPhysicPropertiesFromObject(object, index);
+		if (!physicsProperties) return;
 
 		const _vectorZero = new this.rapier.Vector3(0, 0, 0);
-		physicProperties.rigidBody.setAngvel(_vectorZero, true);
-		physicProperties.rigidBody.setLinvel(_vectorZero, true);
-		physicProperties.rigidBody.setTranslation(position, true);
+		physicsProperties.rigidBody.setAngvel(_vectorZero, true);
+		physicsProperties.rigidBody.setLinvel(_vectorZero, true);
+		physicsProperties.rigidBody.setTranslation(position, true);
 
-		return physicProperties;
+		return physicsProperties;
 	}
 
 	/**
@@ -338,16 +337,16 @@ export class Physic {
 	 * @param {number | undefined} index
 	 */
 	setObjectVelocity(object, velocity, index = 0) {
-		const physicProperties = this.getPhysicPropertiesFromObject(object, index);
-		if (!physicProperties) return;
+		const physicsProperties = this.getPhysicPropertiesFromObject(object, index);
+		if (!physicsProperties) return;
 
-		physicProperties.rigidBody.setLinvel(velocity, true);
+		physicsProperties.rigidBody.setLinvel(velocity, true);
 
-		return physicProperties;
+		return physicsProperties;
 	}
 
 	/**
-	 * @description Update the physic world.
+	 * @description Update the physics world.
 	 *
 	 * @param {number | undefined} timestep The timestep length, in seconds.
 	 */
@@ -360,16 +359,16 @@ export class Physic {
 
 			if (object instanceof InstancedMesh) {
 				const array = object.instanceMatrix.array;
-				/** @type {PhysicProperties[]} */
+				/** @type {PhysicsProperties[]} */
 				const bodies = this.dynamicObjectMap.get(object);
 
 				for (let j = 0; j < bodies.length; j++) {
-					const physicProperties = bodies[j];
+					const physicsProperties = bodies[j];
 
 					const position = new Vector3().copy(
-						physicProperties.rigidBody.translation()
+						physicsProperties.rigidBody.translation()
 					);
-					this._quaternion.copy(physicProperties.rigidBody.rotation());
+					this._quaternion.copy(physicsProperties.rigidBody.rotation());
 
 					this._matrix
 						.compose(position, this._quaternion, this._scale)
@@ -379,11 +378,11 @@ export class Physic {
 				object.instanceMatrix.needsUpdate = true;
 				object.computeBoundingSphere();
 			} else {
-				/** @type {PhysicProperties} */
-				const physicProperties = this.dynamicObjectMap.get(object);
+				/** @type {PhysicsProperties} */
+				const physicsProperties = this.dynamicObjectMap.get(object);
 
-				object.position.copy(physicProperties.rigidBody.translation());
-				object.quaternion.copy(physicProperties.rigidBody.rotation());
+				object.position.copy(physicsProperties.rigidBody.translation());
+				object.quaternion.copy(physicsProperties.rigidBody.rotation());
 			}
 		}
 	}
@@ -396,7 +395,7 @@ export class Physic {
 	removeFromWorld(object) {
 		for (let i = 0; i < this.dynamicObjects.length; i++) {
 			const dynamicObject = this.dynamicObjects[i];
-			/** @type PhysicProperties */
+			/** @type PhysicsProperties */
 			const dynamicObjectProps = this.dynamicObjectMap.get(dynamicObject);
 
 			if (dynamicObject.id === object.id && dynamicObjectProps) {
@@ -429,7 +428,7 @@ export class Physic {
 export async function RapierPhysics() {
 	if (RAPIER === null) await (RAPIER = await import(RAPIER_PATH)).init();
 
-	const _rapierPhysics = new Physic(RAPIER);
+	const _rapierPhysics = new Physics(RAPIER);
 
 	return _rapierPhysics;
 }
