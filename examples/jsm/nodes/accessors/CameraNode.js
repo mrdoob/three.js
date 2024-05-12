@@ -2,9 +2,9 @@ import Object3DNode from './Object3DNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
-import { sharedUniformGroup } from '../core/UniformGroupNode.js';
+// import { sharedUniformGroup } from '../core/UniformGroupNode.js';
 
-const cameraGroup = sharedUniformGroup( 'camera', true );
+// const cameraGroup = sharedUniformGroup( 'camera', true );
 
 class CameraNode extends Object3DNode {
 
@@ -14,7 +14,7 @@ class CameraNode extends Object3DNode {
 
 		this.updateType = NodeUpdateType.RENDER;
 
-		this._uniformNode.groupNode = cameraGroup;
+		// this._uniformNode.groupNode = cameraGroup;
 
 	}
 
@@ -42,7 +42,7 @@ class CameraNode extends Object3DNode {
 		const uniformNode = this._uniformNode;
 		const scope = this.scope;
 
-		cameraGroup.needsUpdate = true;
+		// cameraGroup.needsUpdate = true;
 
 		// TODO: Globally update this once per call in renderScene too?
 		// console.log( scope, camera.projectionMatrix.elements );
