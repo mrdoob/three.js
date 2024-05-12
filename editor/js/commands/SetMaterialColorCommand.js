@@ -81,7 +81,7 @@ class SetMaterialColorCommand extends Command {
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;
-		this.materialSlot = this.materialSlot;
+		this.materialSlot = json.materialSlot;
 
 	}
 
