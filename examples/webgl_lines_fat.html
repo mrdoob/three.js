@@ -194,9 +194,6 @@
 				camera2.position.copy( camera.position );
 				camera2.quaternion.copy( camera.quaternion );
 
-				// renderer will set this eventually
-				matLine.resolution.set( insetWidth, insetHeight ); // resolution of the inset viewport
-
 				renderer.render( scene, camera2 );
 
 				renderer.setScissorTest( false );
