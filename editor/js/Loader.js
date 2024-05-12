@@ -586,6 +586,7 @@ function Loader( editor ) {
 					//
 
 					const group = new THREE.Group();
+					group.name = filename;
 					group.scale.multiplyScalar( 0.1 );
 					group.scale.y *= - 1;
 
