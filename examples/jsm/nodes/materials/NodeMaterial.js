@@ -24,7 +24,7 @@ import { depthPixel } from '../display/ViewportDepthNode.js';
 import { cameraLogDepth, cameraProjectionMatrix } from '../accessors/CameraNode.js';
 import { clipping, clippingAlpha } from '../accessors/ClippingNode.js';
 import { faceDirection } from '../display/FrontFacingNode.js';
-import { modelViewMatrix } from '../Nodes.js';
+import { modelViewMatrix } from '../accessors/ModelNode.js';
 
 const NodeMaterials = new Map();
 
