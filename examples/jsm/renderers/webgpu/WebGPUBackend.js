@@ -297,8 +297,6 @@ class WebGPUBackend extends Backend {
 		const device = this.device;
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
-		this._renderBundles = [];
-
 		let occlusionQuerySet;
 
 		if ( occlusionQueryCount > 0 ) {
@@ -450,15 +448,16 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	finishRender( renderContext ) {
+	finishRender( renderContext, scene ) {
 
 		const renderContextData = this.get( renderContext );
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
+		const sceneData = this.get( scene );
 
-		if ( this._renderBundles.length > 0 ) {
+		if ( sceneData.renderBundles !== undefined && sceneData.renderBundles.length > 0 ) {
 
-			renderContextData.currentPass.executeBundles( this._renderBundles );
+			renderContextData.currentPass.executeBundles( sceneData.renderBundles );
 
 		}
 
@@ -806,16 +805,18 @@ class WebGPUBackend extends Backend {
 
 		const { bundleEncoder, renderBundle, lastPipelineGPU } = renderObjectData;
 
+		const sceneData = this.get( renderObject.scene );
+
 		if ( bundleEncoder !== undefined && lastPipelineGPU === pipelineGPU ) {
 
-			this._renderBundles.push( renderBundle );
+			sceneData.renderBundles.push( renderBundle );
 			return;
 
 		}
 
-		if ( this._renderBundles.length > 0 ) {
+		if ( sceneData.renderBundles !== undefined && sceneData.renderBundles.length > 0 ) {
 
-			contextData.currentPass.executeBundles( this._renderBundles );
+			contextData.currentPass.executeBundles( sceneData.renderBundles );
 
 		}
 

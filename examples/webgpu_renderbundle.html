@@ -39,9 +39,9 @@
 
 		import Stats from 'stats-gl';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+		import { MeshBasicNodeMaterial } from 'three/nodes';
 
 		let camera, scene, renderer;
 		let controls, stats;
@@ -57,12 +57,12 @@
 
 		//
 
-		const MAX_GEOMETRY_COUNT = 20000;
+		const MAX_GEOMETRY_COUNT = 2000;
 
 		const api = {
 			webgpu: true,
-			bundleType: 'static',
-			count: 8000,
+			bundleType: 'snapshot',
+			count: MAX_GEOMETRY_COUNT,
 			dynamic: 0,
 			opacity: 1,
 		};
@@ -102,9 +102,9 @@
 		function initGeometries() {
 
 			geometries = [
-				new THREE.ConeGeometry( 1.0, 2.0 ),
-				new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
-				new THREE.SphereGeometry( 1.0, 16, 8 ),
+				new THREE.ConeGeometry( 1.0, 2.0, 3, 1 ),
+				// new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
+				// new THREE.PlaneGeometry( 2., 2, 1, 1 ),
 			];
 
 		}
@@ -142,13 +142,17 @@
 
 			for ( let i = 0; i < api.count; i ++ ) {
 
-				const material = new THREE.MeshPhysicalMaterial( {
+				// const material = new THREE.MeshPhysicalMaterial( {
+				// 	color: new THREE.Color( Math.random() * 0xffffff ),
+				// 	roughness: Math.random(),
+				// 	metalness: Math.random(),
+				// 	clearcoatRoughness: Math.random(),
+				// 	reflectivity: Math.random(),
+				// 	specularIntensity: Math.random(),
+				// } );
+				const material = new MeshBasicNodeMaterial( {
 					color: new THREE.Color( Math.random() * 0xffffff ),
-					roughness: Math.random(),
-					metalness: Math.random(),
-					clearcoatRoughness: Math.random(),
-					reflectivity: Math.random(),
-					specularIntensity: Math.random(),
+					side: THREE.DoubleSide,
 				} );
 
 				const child = new THREE.Mesh( geometries[ i % geometries.length ], material );
@@ -194,7 +198,6 @@
 			// scene
 
 			scene = new THREE.Scene();
-
 			scene.bundleType = bundleType;
 
 			if ( forceWebGL ) {

@@ -503,10 +503,20 @@ class Renderer {
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromProjectionMatrix( _projScreenMatrix, coordinateSystem );
 
+		// TODO CameraNode.update() in sharedUniformGroup format -> update viewProjection, view, projection, vEyePosition
+
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
+		const sceneData = this.backend.get( scene );
 
-		this._projectObject( scene, camera, 0, renderList );
+		const needsUpdate = scene.bundleType === 'static' && sceneData.renderBundles !== undefined && sceneData.renderBundles.length > 0 ? false : true;
+
+		if ( needsUpdate ) {
+
+
+			this._projectObject( scene, camera, 0, renderList );
+
+		}
 
 		renderList.finish();
 
@@ -562,21 +572,26 @@ class Renderer {
 
 		this.backend.beginRender( renderContext );
 
-		// process render lists
+		if ( needsUpdate ) {
 
-		const opaqueObjects = renderList.opaque;
-		const transparentObjects = renderList.transparent;
-		const lightsNode = renderList.lightsNode;
+			sceneData.renderBundles = [];
 
 
+			// process render lists
 
-		// TODO: Potentially do not reset bundles and prevent update of render objects
-		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
-		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+			const opaqueObjects = renderList.opaque;
+			const transparentObjects = renderList.transparent;
+			const lightsNode = renderList.lightsNode;
 
+
+			// TODO: Potentially do not reset bundles and prevent update of render objects
+			if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+			if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+
+		}
 		// finish render pass
 
-		this.backend.finishRender( renderContext );
+		this.backend.finishRender( renderContext, scene );
 
 		// restore render tree
 
@@ -1384,7 +1399,6 @@ class Renderer {
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
 		renderObject.drawRange = group || object.geometry.drawRange;
 
-		const needsUpdate = scene.bundleType === 'static' && this.backend._renderBundles !== undefined && this.backend._renderBundles.length > 0 ? false : true;
 
 		//
 
@@ -1400,7 +1414,7 @@ class Renderer {
 
 		// TODO: Apply same logic in case of static scene
 		this._nodes.updateForRender( renderObject );
-		if ( needsUpdate ) this._geometries.updateForRender( renderObject );
+		this._geometries.updateForRender( renderObject );
 		// TODO: Apply same logic in case of static scene
 		this._bindings.updateForRender( renderObject );
 		// TODO: Apply same logic in case of static scene
