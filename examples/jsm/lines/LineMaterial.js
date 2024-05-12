@@ -17,10 +17,7 @@ import {
 	UniformsLib,
 	UniformsUtils,
 	Vector2,
-	Vector4,
 } from 'three';
-
-const _viewport = new Vector4();
 
 UniformsLib.line = {
 
@@ -439,13 +436,6 @@ class LineMaterial extends ShaderMaterial {
 		this.isLineMaterial = true;
 
 		this.setValues( parameters );
-
-	}
-
-	onBeforeRender( renderer ) {
-
-		renderer.getCurrentViewport( _viewport );
-		this.uniforms.resolution.value.set( _viewport.z, _viewport.w );
 
 	}
 
