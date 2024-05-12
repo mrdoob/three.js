@@ -101,7 +101,7 @@ jobs:
     needs: [ e2e ]
     steps:
       - name: Merge Artifacts
-        uses: actions/upload-artifact/merge@v4
+        uses: actions/upload-artifact/merge@65462800fd760344b1a7b4382951275a0abb4808 # v4
         with:
           name: artifacts
           pattern: Output screenshots-*
