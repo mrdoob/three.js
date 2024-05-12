@@ -100,6 +100,86 @@ function MenubarFile( editor ) {
 
 	}
 
+
+	// Save
+
+	const fileSaveProject = new UIRow()
+		.addClass( 'option' )
+		.setTextContent( strings.getKey( 'menubar/file/save' ) )
+		.onClick( function () {
+
+			const json = editor.toJSON();
+			const blob = new Blob( [ JSON.stringify( json ) ], { type: 'application/json' } );
+			editor.utils.save( blob, 'project.json' );
+
+		} );
+
+	options.add( fileSaveProject );
+
+	// Open
+
+	const openProjectForm = document.createElement( 'form' );
+	openProjectForm.style.display = 'none';
+	document.body.appendChild( openProjectForm );
+
+	const openProjectInput = document.createElement( 'input' );
+	openProjectInput.multiple = false;
+	openProjectInput.type = 'file';
+	openProjectInput.accept = '.json';
+	openProjectInput.addEventListener( 'change', async function () {
+
+		const file = openProjectInput.files[ 0 ];
+
+		if ( file === undefined ) return;
+
+		try {
+
+			const json = JSON.parse( await file.text() );
+
+			async function onEditorCleared() {
+
+				await editor.fromJSON( json );
+
+				editor.signals.editorCleared.remove( onEditorCleared );
+
+			}
+
+			editor.signals.editorCleared.add( onEditorCleared );
+
+			editor.clear();
+
+		} catch ( e ) {
+
+			alert( strings.getKey( 'prompt/file/failedToOpenProject' ) );
+			console.error( e );
+
+		} finally {
+
+			form.reset();
+
+		}
+
+	} );
+
+	openProjectForm.appendChild( openProjectInput );
+
+	option = new UIRow()
+		.addClass( 'option' )
+		.setTextContent( strings.getKey( 'menubar/file/open' ) )
+		.onClick( function () {
+
+			if ( confirm( strings.getKey( 'prompt/file/open' ) ) ) {
+
+				openProjectInput.click();
+
+			}
+
+		} );
+
+	options.add( option );
+
+	//
+
 	options.add( new UIHorizontalRule() );
 
 	// Import
