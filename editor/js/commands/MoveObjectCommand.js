@@ -14,30 +14,35 @@ class MoveObjectCommand extends Command {
 		super( editor );
 
 		this.type = 'MoveObjectCommand';
-		this.name = editor.strings.getKey( 'command/MoveObject' );
 
-		this.object = object;
-		this.oldParent = ( object !== undefined ) ? object.parent : undefined;
-		this.oldIndex = ( this.oldParent !== undefined ) ? this.oldParent.children.indexOf( this.object ) : undefined;
-		this.newParent = newParent;
+		if ( arguments.length > 1 ) {
 
-		if ( newBefore !== undefined ) {
+			this.name = editor.strings.getKey( 'command/MoveObject' );
 
-			this.newIndex = ( newParent !== undefined ) ? newParent.children.indexOf( newBefore ) : undefined;
+			this.object = object;
+			this.oldParent = object.parent;
+			this.oldIndex = this.oldParent.children.indexOf( this.object );
+			this.newParent = newParent;
 
-		} else {
+			if ( newBefore !== undefined ) {
 
-			this.newIndex = ( newParent !== undefined ) ? newParent.children.length : undefined;
+				this.newIndex = ( newParent !== undefined ) ? newParent.children.indexOf( newBefore ) : undefined;
+
+			} else {
+
+				this.newIndex = ( newParent !== undefined ) ? newParent.children.length : undefined;
+
+			}
+
+			if ( this.oldParent === this.newParent && this.newIndex > this.oldIndex ) {
+
+				this.newIndex --;
+
+			}
+
+			this.newBefore = newBefore;
 
 		}
-
-		if ( this.oldParent === this.newParent && this.newIndex > this.oldIndex ) {
-
-			this.newIndex --;
-
-		}
-
-		this.newBefore = newBefore;
 
 	}
 

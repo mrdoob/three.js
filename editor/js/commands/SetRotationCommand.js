@@ -15,21 +15,21 @@ class SetRotationCommand extends Command {
 		super( editor );
 
 		this.type = 'SetRotationCommand';
-		this.name = editor.strings.getKey( 'command/SetRotation' );
 		this.updatable = true;
 
-		this.object = object;
+		if ( arguments.length > 1 ) {
 
-		if ( object !== undefined && newRotation !== undefined ) {
+			this.name = editor.strings.getKey( 'command/SetRotation' );
+			this.object = object;
 
 			this.oldRotation = object.rotation.clone();
 			this.newRotation = newRotation.clone();
 
-		}
+			if ( optionalOldRotation !== undefined ) {
 
-		if ( optionalOldRotation !== undefined ) {
+				this.oldRotation = optionalOldRotation.clone();
 
-			this.oldRotation = optionalOldRotation.clone();
+			}
 
 		}
 

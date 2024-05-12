@@ -15,15 +15,20 @@ class SetScriptValueCommand extends Command {
 		super( editor );
 
 		this.type = 'SetScriptValueCommand';
-		this.name = editor.strings.getKey( 'command/SetScriptValue' ) + ': ' + attributeName;
 		this.updatable = true;
 
-		this.object = object;
-		this.script = script;
+		if ( arguments.length > 1 ) {
 
-		this.attributeName = attributeName;
-		this.oldValue = ( script !== undefined ) ? script[ this.attributeName ] : undefined;
-		this.newValue = newValue;
+			this.name = editor.strings.getKey( 'command/SetScriptValue' ) + ': ' + attributeName;
+
+			this.object = object;
+			this.script = script;
+
+			this.attributeName = attributeName;
+			this.oldValue = script[ this.attributeName ];
+			this.newValue = newValue;
+
+		}
 
 	}
 

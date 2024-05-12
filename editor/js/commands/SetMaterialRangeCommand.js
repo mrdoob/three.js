@@ -15,25 +15,33 @@ class SetMaterialRangeCommand extends Command {
 		super( editor );
 
 		this.type = 'SetMaterialRangeCommand';
-		this.name = editor.strings.getKey( 'command/SetMaterialRange' ) + ': ' + attributeName;
 		this.updatable = true;
 
-		this.object = object;
-		this.materialSlot = materialSlot;
+		if ( arguments.length > 1 ) {
 
-		this.material = this.editor.getObjectMaterial( object, materialSlot );
+			this.name = editor.strings.getKey( 'command/SetMaterialRange' ) + ': ' + attributeName;
 
-		this.oldRange = ( this.material !== undefined && this.material[ attributeName ] !== undefined ) ? [ ...this.material[ attributeName ] ] : undefined;
-		this.newRange = [ newMinValue, newMaxValue ];
+			this.object = object;
+			this.materialSlot = materialSlot;
 
-		this.attributeName = attributeName;
+			const oldMaterial = this.editor.getObjectMaterial( object, materialSlot );
+
+			// this.oldRange = ( this.material !== undefined && this.material[ attributeName ] !== undefined ) ? [ ...this.material[ attributeName ] ] : undefined;
+			this.oldRange = [ ...oldMaterial[ attributeName ] ];
+			this.newRange = [ newMinValue, newMaxValue ];
+
+			this.attributeName = attributeName;
+
+		}
 
 	}
 
 	execute() {
 
-		this.material[ this.attributeName ] = [ ...this.newRange ];
-		this.material.needsUpdate = true;
+		const material = this.editor.getObjectMaterial( this.object, this.materialSlot );
+
+		material[ this.attributeName ] = [ ...this.newRange ];
+		material.needsUpdate = true;
 
 		this.editor.signals.objectChanged.dispatch( this.object );
 		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
@@ -42,8 +50,10 @@ class SetMaterialRangeCommand extends Command {
 
 	undo() {
 
-		this.material[ this.attributeName ] = [ ...this.oldRange ];
-		this.material.needsUpdate = true;
+		const material = this.editor.getObjectMaterial( this.object, this.materialSlot );
+
+		material[ this.attributeName ] = [ ...this.oldRange ];
+		material.needsUpdate = true;
 
 		this.editor.signals.objectChanged.dispatch( this.object );
 		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
@@ -64,6 +74,7 @@ class SetMaterialRangeCommand extends Command {
 		output.attributeName = this.attributeName;
 		output.oldRange = [ ...this.oldRange ];
 		output.newRange = [ ...this.newRange ];
+		output.materialSlot = this.materialSlot;
 
 		return output;
 
@@ -77,6 +88,7 @@ class SetMaterialRangeCommand extends Command {
 		this.oldRange = [ ...json.oldRange ];
 		this.newRange = [ ...json.newRange ];
 		this.object = this.editor.objectByUuid( json.objectUuid );
+		this.materialSlot = json.materialSlot;
 
 	}
 

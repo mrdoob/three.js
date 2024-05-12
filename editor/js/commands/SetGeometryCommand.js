@@ -15,12 +15,16 @@ class SetGeometryCommand extends Command {
 		super( editor );
 
 		this.type = 'SetGeometryCommand';
-		this.name = editor.strings.getKey( 'command/SetGeometry' );
 		this.updatable = true;
 
-		this.object = object;
-		this.oldGeometry = ( object !== undefined ) ? object.geometry : undefined;
-		this.newGeometry = newGeometry;
+		if ( arguments.length > 1 ) {
+
+			this.name = editor.strings.getKey( 'command/SetGeometry' );
+			this.object = object;
+			this.oldGeometry = object.geometry;
+			this.newGeometry = newGeometry;
+
+		}
 
 	}
 
@@ -57,7 +61,7 @@ class SetGeometryCommand extends Command {
 		const output = super.toJSON( this );
 
 		output.objectUuid = this.object.uuid;
-		output.oldGeometry = this.object.geometry.toJSON();
+		output.oldGeometry = this.oldGeometry.toJSON();
 		output.newGeometry = this.newGeometry.toJSON();
 
 		return output;

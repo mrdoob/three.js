@@ -13,12 +13,12 @@ class RemoveScriptCommand extends Command {
 		super( editor );
 
 		this.type = 'RemoveScriptCommand';
-		this.name = editor.strings.getKey( 'command/RemoveScript' );
 
-		this.object = object;
-		this.script = script;
-		if ( this.object && this.script ) {
+		if ( arguments.length > 1 ) {
 
+			this.name = editor.strings.getKey( 'command/RemoveScript' );
+			this.object = object;
+			this.script = script;
 			this.index = this.editor.scripts[ this.object.uuid ].indexOf( this.script );
 
 		}

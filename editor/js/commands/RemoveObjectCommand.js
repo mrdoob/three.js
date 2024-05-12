@@ -14,12 +14,12 @@ class RemoveObjectCommand extends Command {
 		super( editor );
 
 		this.type = 'RemoveObjectCommand';
-		this.name = editor.strings.getKey( 'command/RemoveObject' ) + ': ' + object.name;
 
-		this.object = object;
-		this.parent = ( object !== undefined ) ? object.parent : undefined;
-		if ( this.parent !== undefined ) {
+		if ( arguments.length > 1 ) {
 
+			this.name = editor.strings.getKey( 'command/RemoveObject' ) + ': ' + object.name;
+			this.object = object;
+			this.parent = object.parent;
 			this.index = this.parent.children.indexOf( this.object );
 
 		}

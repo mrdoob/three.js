@@ -14,12 +14,16 @@ class SetGeometryValueCommand extends Command {
 		super( editor );
 
 		this.type = 'SetGeometryValueCommand';
-		this.name = editor.strings.getKey( 'command/SetGeometryValue' ) + ': ' + attributeName;
 
-		this.object = object;
-		this.attributeName = attributeName;
-		this.oldValue = ( object !== undefined ) ? object.geometry[ attributeName ] : undefined;
-		this.newValue = newValue;
+		if ( arguments.length > 1 ) {
+
+			this.name = editor.strings.getKey( 'command/SetGeometryValue' ) + ': ' + attributeName;
+			this.object = object;
+			this.attributeName = attributeName;
+			this.oldValue = object.geometry[ attributeName ];
+			this.newValue = newValue;
+
+		}
 
 	}
 

@@ -15,21 +15,22 @@ class SetScaleCommand extends Command {
 		super( editor );
 
 		this.type = 'SetScaleCommand';
-		this.name = editor.strings.getKey( 'command/SetScale' );
 		this.updatable = true;
 
-		this.object = object;
+		if ( arguments.length > 1 ) {
 
-		if ( object !== undefined && newScale !== undefined ) {
+			this.name = editor.strings.getKey( 'command/SetScale' );
+
+			this.object = object;
 
 			this.oldScale = object.scale.clone();
 			this.newScale = newScale.clone();
 
-		}
+			if ( optionalOldScale !== undefined ) {
 
-		if ( optionalOldScale !== undefined ) {
+				this.oldScale = optionalOldScale.clone();
 
-			this.oldScale = optionalOldScale.clone();
+			}
 
 		}
 

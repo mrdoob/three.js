@@ -13,12 +13,17 @@ class SetUuidCommand extends Command {
 		super( editor );
 
 		this.type = 'SetUuidCommand';
-		this.name = editor.strings.getKey( 'command/SetUuid' );
 
-		this.object = object;
+		if ( arguments.length > 1 ) {
 
-		this.oldUuid = ( object !== undefined ) ? object.uuid : undefined;
-		this.newUuid = newUuid;
+			this.name = editor.strings.getKey( 'command/SetUuid' );
+
+			this.object = object;
+
+			this.oldUuid = object.uuid;
+			this.newUuid = newUuid;
+
+		}
 
 	}
 

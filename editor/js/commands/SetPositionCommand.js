@@ -15,21 +15,21 @@ class SetPositionCommand extends Command {
 		super( editor );
 
 		this.type = 'SetPositionCommand';
-		this.name = editor.strings.getKey( 'command/SetPosition' );
 		this.updatable = true;
 
-		this.object = object;
+		if ( arguments.length > 1 ) {
 
-		if ( object !== undefined && newPosition !== undefined ) {
+			this.name = editor.strings.getKey( 'command/SetPosition' );
+			this.object = object;
 
 			this.oldPosition = object.position.clone();
 			this.newPosition = newPosition.clone();
 
-		}
+			if ( optionalOldPosition !== undefined ) {
 
-		if ( optionalOldPosition !== undefined ) {
+				this.oldPosition = optionalOldPosition.clone();
 
-			this.oldPosition = optionalOldPosition.clone();
+			}
 
 		}
 

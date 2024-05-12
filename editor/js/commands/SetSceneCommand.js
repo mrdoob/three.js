@@ -15,11 +15,12 @@ class SetSceneCommand extends Command {
 		super( editor );
 
 		this.type = 'SetSceneCommand';
-		this.name = editor.strings.getKey( 'command/SetScene' );
 
-		this.cmdArray = [];
+		if ( arguments.length > 1 ) {
 
-		if ( scene !== undefined ) {
+			this.name = editor.strings.getKey( 'command/SetScene' );
+
+			this.cmdArray = [];
 
 			this.cmdArray.push( new SetUuidCommand( this.editor, this.editor.scene, scene.uuid ) );
 			this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'name', scene.name ) );

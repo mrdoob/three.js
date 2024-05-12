@@ -14,13 +14,17 @@ class SetColorCommand extends Command {
 		super( editor );
 
 		this.type = 'SetColorCommand';
-		this.name = editor.strings.getKey( 'command/SetColor' ) + ': ' + attributeName;
 		this.updatable = true;
 
-		this.object = object;
-		this.attributeName = attributeName;
-		this.oldValue = ( object !== undefined ) ? this.object[ this.attributeName ].getHex() : undefined;
-		this.newValue = newValue;
+		if ( arguments.length > 1 ) {
+
+			this.name = editor.strings.getKey( 'command/SetColor' ) + ': ' + attributeName;
+			this.object = object;
+			this.attributeName = attributeName;
+			this.oldValue = this.object[ this.attributeName ].getHex();
+			this.newValue = newValue;
+
+		}
 
 	}
 

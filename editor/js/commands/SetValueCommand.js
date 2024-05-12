@@ -14,13 +14,18 @@ class SetValueCommand extends Command {
 		super( editor );
 
 		this.type = 'SetValueCommand';
-		this.name = editor.strings.getKey( 'command/SetValue' ) + ': ' + attributeName;
 		this.updatable = true;
 
-		this.object = object;
-		this.attributeName = attributeName;
-		this.oldValue = ( object !== undefined ) ? object[ attributeName ] : undefined;
-		this.newValue = newValue;
+		if ( arguments.length > 1 ) {
+
+			this.name = editor.strings.getKey( 'command/SetValue' ) + ': ' + attributeName;
+
+			this.object = object;
+			this.attributeName = attributeName;
+			this.oldValue = object[ attributeName ];
+			this.newValue = newValue;
+
+		}
 
 	}
 

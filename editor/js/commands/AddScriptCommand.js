@@ -13,10 +13,14 @@ class AddScriptCommand extends Command {
 		super( editor );
 
 		this.type = 'AddScriptCommand';
-		this.name = editor.strings.getKey( 'command/AddScript' );
 
-		this.object = object;
-		this.script = script;
+		if ( arguments.length > 1 ) {
+
+			this.name = editor.strings.getKey( 'command/AddScript' );
+			this.object = object;
+			this.script = script;
+
+		}
 
 	}
 

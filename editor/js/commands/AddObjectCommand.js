@@ -14,10 +14,10 @@ class AddObjectCommand extends Command {
 
 		this.type = 'AddObjectCommand';
 
-		this.object = object;
-		if ( object !== undefined ) {
+		if ( arguments.length > 1 ) {
 
 			this.name = editor.strings.getKey( 'command/AddObject' ) + ': ' + object.name;
+			this.object = object;
 
 		}
 

@@ -15,17 +15,22 @@ class SetMaterialMapCommand extends Command {
 		super( editor );
 
 		this.type = 'SetMaterialMapCommand';
-		this.name = editor.strings.getKey( 'command/SetMaterialMap' ) + ': ' + mapName;
 
-		this.object = object;
-		this.materialSlot = materialSlot;
+		if ( arguments.length > 1 ) {
 
-		this.material = this.editor.getObjectMaterial( object, materialSlot );
+			this.name = editor.strings.getKey( 'command/SetMaterialMap' ) + ': ' + mapName;
 
-		this.oldMap = ( object !== undefined ) ? this.material[ mapName ] : undefined;
-		this.newMap = newMap;
+			this.object = object;
+			this.materialSlot = materialSlot;
 
-		this.mapName = mapName;
+			const oldMaterial = this.editor.getObjectMaterial( object, materialSlot );
+
+			this.oldMap = oldMaterial[ mapName ];
+			this.newMap = newMap;
+
+			this.mapName = mapName;
+
+		}
 
 	}
 
@@ -33,8 +38,10 @@ class SetMaterialMapCommand extends Command {
 
 		if ( this.oldMap !== null && this.oldMap !== undefined ) this.oldMap.dispose();
 
-		this.material[ this.mapName ] = this.newMap;
-		this.material.needsUpdate = true;
+		const material = this.editor.getObjectMaterial( this.object, this.materialSlot );
+
+		material[ this.mapName ] = this.newMap;
+		material.needsUpdate = true;
 
 		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
 
@@ -42,8 +49,10 @@ class SetMaterialMapCommand extends Command {
 
 	undo() {
 
-		this.material[ this.mapName ] = this.oldMap;
-		this.material.needsUpdate = true;
+		const material = this.editor.getObjectMaterial( this.object, this.materialSlot );
+
+		material[ this.mapName ] = this.oldMap;
+		material.needsUpdate = true;
 
 		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
 
@@ -57,6 +66,7 @@ class SetMaterialMapCommand extends Command {
 		output.mapName = this.mapName;
 		output.newMap = serializeMap( this.newMap );
 		output.oldMap = serializeMap( this.oldMap );
+		output.materialSlot = this.materialSlot;
 
 		return output;
 
@@ -112,6 +122,7 @@ class SetMaterialMapCommand extends Command {
 		this.mapName = json.mapName;
 		this.oldMap = parseTexture( json.oldMap );
 		this.newMap = parseTexture( json.newMap );
+		this.materialSlot = json.materialSlot;
 
 		function parseTexture( json ) {
 

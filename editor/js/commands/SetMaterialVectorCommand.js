@@ -7,24 +7,30 @@ class SetMaterialVectorCommand extends Command {
 		super( editor );
 
 		this.type = 'SetMaterialVectorCommand';
-		this.name = editor.strings.getKey( 'command/SetMaterialVector' ) + ': ' + attributeName;
 		this.updatable = true;
 
-		this.object = object;
-		this.materialSlot = materialSlot;
+		if ( arguments.length > 1 ) {
 
-		this.material = this.editor.getObjectMaterial( object, materialSlot );
+			this.name = editor.strings.getKey( 'command/SetMaterialVector' ) + ': ' + attributeName;
+			this.object = object;
+			this.materialSlot = materialSlot;
 
-		this.oldValue = ( this.material !== undefined ) ? this.material[ attributeName ].toArray() : undefined;
-		this.newValue = newValue;
+			const oldMaterial = this.editor.getObjectMaterial( object, materialSlot );
 
-		this.attributeName = attributeName;
+			this.oldValue = oldMaterial[ attributeName ].toArray();
+			this.newValue = newValue;
+
+			this.attributeName = attributeName;
+
+		}
 
 	}
 
 	execute() {
 
-		this.material[ this.attributeName ].fromArray( this.newValue );
+		const material = this.editor.getObjectMaterial( this.object, this.materialSlot );
+
+		material[ this.attributeName ].fromArray( this.newValue );
 
 		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
 
@@ -32,7 +38,9 @@ class SetMaterialVectorCommand extends Command {
 
 	undo() {
 
-		this.material[ this.attributeName ].fromArray( this.oldValue );
+		const material = this.editor.getObjectMaterial( this.object, this.materialSlot );
+
+		material[ this.attributeName ].fromArray( this.oldValue );
 
 		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
 
@@ -52,6 +60,7 @@ class SetMaterialVectorCommand extends Command {
 		output.attributeName = this.attributeName;
 		output.oldValue = this.oldValue;
 		output.newValue = this.newValue;
+		output.materialSlot = this.materialSlot;
 
 		return output;
 
@@ -65,6 +74,7 @@ class SetMaterialVectorCommand extends Command {
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;
+		this.materialSlot = json.materialSlot;
 
 	}
 
