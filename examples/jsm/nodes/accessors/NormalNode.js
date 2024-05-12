@@ -6,8 +6,7 @@ import { normalize } from '../math/MathNode.js';
 import { cameraViewMatrix } from './CameraNode.js';
 // import { modelNormalMatrix } from './ModelNode.js';
 import { nodeImmutable, vec3 } from '../shadernode/ShaderNode.js';
-import { positionView } from './PositionNode.js';
-import { modelNormalMatrix, modelWorldMatrix } from './ModelNode.js';
+import { modelNormalMatrix } from './ModelNode.js';
 
 class NormalNode extends Node {
 

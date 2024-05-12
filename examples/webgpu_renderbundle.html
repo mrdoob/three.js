@@ -46,7 +46,7 @@
 		let camera, scene, renderer;
 		let controls, stats;
 		let gui;
-		let geometries, group, material;
+		let geometries, group;
 
 		//
 
@@ -210,8 +210,8 @@
 
 			}
 
-	const light = new THREE.DirectionalLight( 0xffffff, 2.4 );
-	scene.add( light );
+			const light = new THREE.DirectionalLight( 0xffffff, 2.4 );
+			scene.add( light );
 
 			document.body.appendChild( renderer.domElement );
 
@@ -257,26 +257,6 @@
 
 			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT ).step( 1 ).onChange( initMesh );
 			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT ).step( 1 );
-
-			gui.add( api, 'opacity', 0, 1 ).onChange( v => {
-
-				if ( v < 1 ) {
-
-					material.transparent = true;
-					material.depthWrite = false;
-
-				} else {
-
-					material.transparent = false;
-					material.depthWrite = true;
-
-				}
-
-				material.opacity = v;
-				material.needsUpdate = true;
-
-			} );
-
 
 			// listeners
 

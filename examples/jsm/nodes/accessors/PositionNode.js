@@ -4,7 +4,7 @@ import { varying } from '../core/VaryingNode.js';
 import { normalize } from '../math/MathNode.js';
 import { modelWorldMatrix, modelViewMatrix } from './ModelNode.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
-import { cameraViewMatrix } from './CameraNode.js';
+// import { cameraViewMatrix } from './CameraNode.js';
 
 class PositionNode extends Node {
 
