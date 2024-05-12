@@ -449,9 +449,9 @@ class Box3 {
 
 		// transform extents as direction with abs matrix
 		const e = matrix.elements, n = _v0.copy( _extents );
-		_extents.x = Math.abs( e[ 0 ] ) * n.x + Math.abs( e[ 4 ] ) * n.y + Math.abs( e[ 8 ] ) * n.z; 
-		_extents.y = Math.abs( e[ 1 ] ) * n.x + Math.abs( e[ 5 ] ) * n.y + Math.abs( e[ 9 ] ) * n.z; 
-		_extents.z = Math.abs( e[ 2 ] ) * n.x + Math.abs( e[ 6 ] ) * n.y + Math.abs( e[ 10 ] ) * n.z; 
+		_extents.x = Math.abs( e[ 0 ] ) * n.x + Math.abs( e[ 4 ] ) * n.y + Math.abs( e[ 8 ] ) * n.z;
+		_extents.y = Math.abs( e[ 1 ] ) * n.x + Math.abs( e[ 5 ] ) * n.y + Math.abs( e[ 9 ] ) * n.z;
+		_extents.z = Math.abs( e[ 2 ] ) * n.x + Math.abs( e[ 6 ] ) * n.y + Math.abs( e[ 10 ] ) * n.z;
 
 		// reconstruct bounds
 		this.min.copy( _center ).sub( _extents );
