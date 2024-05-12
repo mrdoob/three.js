@@ -211,7 +211,7 @@ const evalIridescence = tslFn( ( { outsideIOR, eta2, cosTheta1, thinFilmThicknes
 
 	// Second interface
 	const baseIOR = Fresnel0ToIor( baseF0.clamp( 0.0, 0.9999 ) ); // guard against 1.0
-	const R1 = IorToFresnel0( baseIOR, iridescenceIOR.vec3() );
+	const R1 = IorToFresnel0( baseIOR, iridescenceIOR.toVec3() );
 	const R23 = F_Schlick( { f0: R1, f90: 1.0, dotVH: cosTheta2 } );
 	const phi23 = vec3(
 		baseIOR.x.lessThan( iridescenceIOR ).cond( Math.PI, 0.0 ),
