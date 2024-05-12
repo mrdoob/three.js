@@ -2,13 +2,15 @@ import {
 	InstancedInterleavedBuffer,
 	InterleavedBufferAttribute,
 	Mesh,
-	Vector3
+	Vector3,
+	Vector4
 } from 'three';
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
 import { LineMaterial } from '../lines/LineMaterial.js';
 
 const _start = new Vector3();
 const _end = new Vector3();
+const _viewport = new Vector4();
 
 class Wireframe extends Mesh {
 
@@ -48,6 +50,17 @@ class Wireframe extends Mesh {
 		geometry.setAttribute( 'instanceDistanceEnd', new InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
 
 		return this;
+
+	}
+
+	onBeforeRender( renderer ) {
+
+		if ( this.material.uniforms.resolution ) {
+
+			renderer.getCurrentViewport( _viewport );
+			this.material.uniforms.resolution.value.set( _viewport.z, _viewport.w );
+
+		}
 
 	}
 
