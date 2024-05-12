@@ -106,13 +106,13 @@
 
 			editor.storage.init( function () {
 
-				editor.storage.get( function ( state ) {
+				editor.storage.get( async function ( state ) {
 
 					if ( isLoadingFromHash ) return;
 
 					if ( state !== undefined ) {
 
-						editor.fromJSON( state );
+						await editor.fromJSON( state );
 
 					}
 

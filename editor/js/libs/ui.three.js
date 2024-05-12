@@ -271,10 +271,10 @@ class UIOutliner extends UIDiv {
 		// Prevent native scroll behavior
 		this.dom.addEventListener( 'keydown', function ( event ) {
 
-			switch ( event.keyCode ) {
+			switch ( event.code ) {
 
-				case 38: // up
-				case 40: // down
+				case 'ArrowUp':
+				case 'ArrowDown':
 					event.preventDefault();
 					event.stopPropagation();
 					break;
@@ -286,12 +286,12 @@ class UIOutliner extends UIDiv {
 		// Keybindings to support arrow navigation
 		this.dom.addEventListener( 'keyup', function ( event ) {
 
-			switch ( event.keyCode ) {
+			switch ( event.code ) {
 
-				case 38: // up
+				case 'ArrowUp':
 					scope.selectIndex( scope.selectedIndex - 1 );
 					break;
-				case 40: // down
+				case 'ArrowDown':
 					scope.selectIndex( scope.selectedIndex + 1 );
 					break;
 
@@ -313,8 +313,7 @@ class UIOutliner extends UIDiv {
 
 			this.setValue( this.options[ index ].value );
 
-			const changeEvent = document.createEvent( 'HTMLEvents' );
-			changeEvent.initEvent( 'change', true, true );
+			const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 			this.dom.dispatchEvent( changeEvent );
 
 		}
@@ -335,8 +334,7 @@ class UIOutliner extends UIDiv {
 
 			scope.setValue( this.value );
 
-			const changeEvent = document.createEvent( 'HTMLEvents' );
-			changeEvent.initEvent( 'change', true, true );
+			const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 			scope.dom.dispatchEvent( changeEvent );
 
 		}
@@ -449,8 +447,7 @@ class UIOutliner extends UIDiv {
 			const editor = scope.editor;
 			editor.execute( new MoveObjectCommand( editor, object, newParent, nextObject ) );
 
-			const changeEvent = document.createEvent( 'HTMLEvents' );
-			changeEvent.initEvent( 'change', true, true );
+			const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 			scope.dom.dispatchEvent( changeEvent );
 
 		}

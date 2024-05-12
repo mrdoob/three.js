@@ -2,6 +2,10 @@
 	color-scheme: light dark;
 }
 
+[hidden] {
+	display: none !important;
+}
+
 body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 14px;
@@ -367,13 +371,14 @@ select {
 			display: none;
 			padding: 5px 0;
 			background: #eee;
-			width: 150px;
-			max-height: calc(100% - 80px);
+			min-width: 150px;
+			max-height: calc(100vh - 80px);
 			overflow: auto;
 		}
 
 		#menubar .menu:hover .options {
 			display: block;
+			box-shadow: 0 10px 10px -5px #00000033;
 		}
 
 			#menubar .menu .options hr {
@@ -397,11 +402,17 @@ select {
 					background: transparent;
 				}
 
+				#menubar .submenu-title::after {
+					content: '⏵';
+					float: right;
+				}
+
 		#menubar .menu .options .inactive {
 			color: #bbb;
 			background-color: transparent;
 			padding: 5px 10px;
 			margin: 0 !important;
+			cursor: not-allowed;
 		}
 
 #sidebar {
@@ -532,7 +543,7 @@ select {
 	}
 
 	#menubar .menu .options {
-		max-height: calc(100% - 372px);
+		max-height: calc(100% - 80px);
 	}
 
 	#menubar .menu.right {
