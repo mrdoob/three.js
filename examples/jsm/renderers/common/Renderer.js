@@ -1399,7 +1399,6 @@ class Renderer {
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
 		renderObject.drawRange = group || object.geometry.drawRange;
 
-
 		//
 
 		this._nodes.updateBefore( renderObject );
@@ -1411,13 +1410,9 @@ class Renderer {
 
 		//
 
-
-		// TODO: Apply same logic in case of static scene
 		this._nodes.updateForRender( renderObject );
 		this._geometries.updateForRender( renderObject );
-		// TODO: Apply same logic in case of static scene
 		this._bindings.updateForRender( renderObject );
-		// TODO: Apply same logic in case of static scene
 		this._pipelines.updateForRender( renderObject );
 
 		//
