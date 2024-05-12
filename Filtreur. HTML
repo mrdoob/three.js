@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modèle 3D du filtreur solaire</title>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // Création de la scène
+    const scene = new THREE.Scene();
+
+    // Création de la caméra
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 10;
+
+    // Création du rendu
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Création du filtreur solaire (forme simple pour l'exemple)
+    const geometry = new THREE.BoxGeometry(4, 4, 4);
+    const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+    const filtreur = new THREE.Mesh(geometry, material);
+    scene.add(filtreur);
+
+    // Création des réflecteurs solaires (forme simple pour l'exemple)
+    const reflecteurGeometry = new THREE.BoxGeometry(6, 1, 1);
+    const reflecteurMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00, wireframe: true });
+    const reflecteur1 = new THREE.Mesh(reflecteurGeometry, reflecteurMaterial);
+    reflecteur1.position.set(0, 3, 0);
+    scene.add(reflecteur1);
+
+    const reflecteur2 = new THREE.Mesh(reflecteurGeometry, reflecteurMaterial);
+    reflecteur2.position.set(0, -3, 0);
+    scene.add(reflecteur2);
+
+    // Animation
+    const animate = function () {
+      requestAnimationFrame(animate);
+
+      filtreur.rotation.x += 0.01;
+      filtreur.rotation.y += 0.01;
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+  </script>
+</body>
+</html>
