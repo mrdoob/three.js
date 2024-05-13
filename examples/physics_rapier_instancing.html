@@ -10,7 +10,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - <a href="https://github.com/dimforge/rapier.js" target="_blank">rapier</a> instancing<br />
-			Press any <strong>key</strong> to shake.
+			<button id="shake" style="margin-top: 25px;">Press to shake</button>
 		</div>
 
 		<script type="importmap">
@@ -129,7 +129,7 @@
 
 				//
 
-				window.onkeydown = () =>{
+				document.querySelector( 'button#shake' ).addEventListener( 'click', () => {
 
 					[ ...physicBoxes, ...physicSpheres ].map( ( item ) => {
 
@@ -144,7 +144,7 @@
 
 					} );
 
-				};
+				} );
 
 				//
 
