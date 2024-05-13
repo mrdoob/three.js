@@ -63,13 +63,21 @@ class DataTextureLoader extends Loader {
 
 			}
 
-			texture.wrapS = texData.wrapS !== undefined ? texData.wrapS : ClampToEdgeWrapping;
-			texture.wrapT = texData.wrapT !== undefined ? texData.wrapT : ClampToEdgeWrapping;
+			const {
+				wrapS = ClampToEdgeWrapping,
+				wrapT = ClampToEdgeWrapping,
+				magFilter = LinearFilter,
+				minFilter = LinearFilter,
+				anisotropy = 1,
+			} = texData;
 
-			texture.magFilter = texData.magFilter !== undefined ? texData.magFilter : LinearFilter;
-			texture.minFilter = texData.minFilter !== undefined ? texData.minFilter : LinearFilter;
+			texture.wrapS = wrapS;
+			texture.wrapT = wrapT;
 
-			texture.anisotropy = texData.anisotropy !== undefined ? texData.anisotropy : 1;
+			texture.magFilter = magFilter;
+			texture.minFilter = minFilter;
+
+			texture.anisotropy = anisotropy;
 
 			if ( texData.colorSpace !== undefined ) {
 
