@@ -1,5 +1,6 @@
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 import { Loader } from './Loader.js';
+import { AddObjectCommand } from './commands/AddObjectCommand.js';
 
 function MenubarFile( editor ) {
 
@@ -130,6 +131,98 @@ function MenubarFile( editor ) {
 
 	} );
 	options.add( option );
+
+	// Import Images as Planes
+
+	{
+
+		const IMAGE_HEIGHT = 4;
+		const IMAGE_GAP = 0.5;
+		let positionX = 0;
+
+		const form = document.createElement( 'form' );
+		form.style.display = 'none';
+		document.body.appendChild( form );
+
+		const fileInput = document.createElement( 'input' );
+		fileInput.multiple = true;
+		fileInput.type = 'file';
+
+		const accepts = [
+			'png',
+			'jpg',
+			'jpeg',
+			'bmp',
+			'webp',
+			'gif',
+			'avif',
+		];
+		fileInput.accept = accepts.map( format => '.' + format ).join( ', ' );
+		fileInput.addEventListener( 'change', function () {
+
+			const files = fileInput.files;
+
+			for ( let i = 0; i < files.length; i ++ ) {
+
+				const file = files[ i ];
+
+				handleImage( file );
+
+			}
+
+			form.reset();
+			positionX = 0;
+
+		} );
+		form.appendChild( fileInput );
+
+		function handleImage( file ) {
+
+			const image = new Image();
+			image.src = URL.createObjectURL( file );
+
+			image.onload = function () {
+
+				const texture = new THREE.Texture( image );
+				texture.colorSpace = THREE.SRGBColorSpace;
+				texture.needsUpdate = true;
+
+				const width = IMAGE_HEIGHT * image.width / image.height;
+				const height = IMAGE_HEIGHT;
+				const geometry = new THREE.PlaneGeometry( width, height );
+				const material = new THREE.MeshBasicMaterial( { map: texture, side: THREE.DoubleSide } );
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.name = file.name;
+
+				if ( positionX === 0 ) {
+
+					positionX += width / 2;
+
+				} else {
+
+					positionX += width / 2 + IMAGE_GAP;
+					mesh.position.x = positionX;
+					positionX += width / 2;
+
+				}
+
+				editor.execute( new AddObjectCommand( editor, mesh ) );
+
+			};
+
+		}
+
+		option = new UIRow();
+		option.setClass( 'option' );
+		option.setTextContent( strings.getKey( 'menubar/file/import_images_as_planes' ) );
+		option.onClick( function () {
+
+			fileInput.click();
+
+		} );
+		options.add( option );
+
+	}
 
 	// Export
 
