@@ -21,9 +21,9 @@ class SetMaterialRangeCommand extends Command {
 		this.object = object;
 		this.materialSlot = materialSlot;
 
-		this.material = this.editor.getObjectMaterial( object, materialSlot );
+		const oldMaterial = this.editor.getObjectMaterial( object, materialSlot );
 
-		this.oldRange = ( this.material !== undefined && this.material[ attributeName ] !== undefined ) ? [ ...this.material[ attributeName ] ] : undefined;
+		this.oldRange = ( oldMaterial !== undefined && oldMaterial[ attributeName ] !== undefined ) ? [ ...oldMaterial[ attributeName ] ] : undefined;
 		this.newRange = [ newMinValue, newMaxValue ];
 
 		this.attributeName = attributeName;
@@ -32,8 +32,10 @@ class SetMaterialRangeCommand extends Command {
 
 	execute() {
 
-		this.material[ this.attributeName ] = [ ...this.newRange ];
-		this.material.needsUpdate = true;
+		const material = this.editor.getObjectMaterial( this.object, this.materialSlot );
+
+		material[ this.attributeName ] = [ ...this.newRange ];
+		material.needsUpdate = true;
 
 		this.editor.signals.objectChanged.dispatch( this.object );
 		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
@@ -42,8 +44,10 @@ class SetMaterialRangeCommand extends Command {
 
 	undo() {
 
-		this.material[ this.attributeName ] = [ ...this.oldRange ];
-		this.material.needsUpdate = true;
+		const material = this.editor.getObjectMaterial( this.object, this.materialSlot );
+
+		material[ this.attributeName ] = [ ...this.oldRange ];
+		material.needsUpdate = true;
 
 		this.editor.signals.objectChanged.dispatch( this.object );
 		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
@@ -64,6 +68,7 @@ class SetMaterialRangeCommand extends Command {
 		output.attributeName = this.attributeName;
 		output.oldRange = [ ...this.oldRange ];
 		output.newRange = [ ...this.newRange ];
+		output.materialSlot = this.materialSlot;
 
 		return output;
 
@@ -77,6 +82,7 @@ class SetMaterialRangeCommand extends Command {
 		this.oldRange = [ ...json.oldRange ];
 		this.newRange = [ ...json.newRange ];
 		this.object = this.editor.objectByUuid( json.objectUuid );
+		this.materialSlot = json.materialSlot;
 
 	}
 
