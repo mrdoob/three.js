@@ -36,6 +36,20 @@ class ExtrudeGeometry extends BufferGeometry {
 
 		this.type = 'ExtrudeGeometry';
 
+		const { bevelThickness = 0.2 } = options;
+
+		options = Object.assign( {
+			curveSegments: 12,
+			steps: 1,
+			depth: 1,
+			bevelEnabled: true,
+			bevelThickness: bevelThickness,
+			bevelSize: bevelThickness - 0.1,
+			bevelOffset: 0,
+			bevelSegments: 3,
+			UVGenerator: WorldUVGenerator,
+		}, options );
+
 		this.parameters = {
 			shapes: shapes,
 			options: options
@@ -70,19 +84,8 @@ class ExtrudeGeometry extends BufferGeometry {
 
 			// options
 
-			const curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
-			const steps = options.steps !== undefined ? options.steps : 1;
-			const depth = options.depth !== undefined ? options.depth : 1;
-
-			let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
-			let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 0.2;
-			let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 0.1;
-			let bevelOffset = options.bevelOffset !== undefined ? options.bevelOffset : 0;
-			let bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
-
-			const extrudePath = options.extrudePath;
-
-			const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
+			const { curveSegments, steps, depth, extrudePath, UVGenerator: uvgen } = options;
+			let { bevelEnabled, bevelThickness, bevelSize, bevelOffset, bevelSegments } = options;
 
 			//
 
