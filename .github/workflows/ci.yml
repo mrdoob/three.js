@@ -69,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ macos-latest ]
+        os: [ windows-latest ]
         CI: [ 0, 1, 2, 3 ]
     env:
       CI: ${{ matrix.CI }}
@@ -104,7 +104,7 @@ jobs:
         uses: actions/upload-artifact/merge@v4
         with:
           name: artifacts
-          pattern:  Output screenshots-*
+          pattern: Output screenshots-*
 
   e2e-cov:
     name: Examples ready for release

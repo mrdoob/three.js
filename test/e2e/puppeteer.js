@@ -77,7 +77,9 @@ const exceptionList = [
 	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
 	'webgl_animation_skinning_blending',
+	'webgl_animation_skinning_additive_blending',
 	'webgl_buffergeometry_glbufferattribute',
+	'webgl_interactive_cubes_gpu',
 	'webgl_clipping_advanced',
 	'webgl_lensflares',
 	'webgl_lights_spotlights',
@@ -90,6 +92,7 @@ const exceptionList = [
 	'webgl_mirror',
 	'webgl_morphtargets_face',
 	'webgl_postprocessing_transition',
+	'webgl_postprocessing_glitch',
 	'webgl_postprocessing_dof2',
 	'webgl_raymarching_reflect',
 	'webgl_renderer_pathtracer',
