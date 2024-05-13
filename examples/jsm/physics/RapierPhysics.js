@@ -46,11 +46,13 @@ export class Physics {
 	/** @access private */
 	_vector = new Vector3();
 	/** @access private */
+	_position = new Vector3();
+	/** @access private */
 	_quaternion = new Quaternion();
 	/** @access private */
-	_matrix = new Matrix4();
-	/** @access private */
 	_scale = new Vector3(1, 1, 1);
+	/** @access private */
+	_matrix = new Matrix4();
 
 	/**
 	 * @description `Rapier3D.js`.
@@ -319,6 +321,7 @@ export class Physics {
 	 * @returns
 	 */
 	setObjectPosition(object, position, index = 0) {
+		/** @description Object physics properties (rigid body, collider, ...). */
 		const physicsProperties = this.getPhysicPropertiesFromObject(object, index);
 		if (!physicsProperties) return;
 
@@ -363,15 +366,28 @@ export class Physics {
 				const bodies = this.dynamicObjectMap.get(object);
 
 				for (let j = 0; j < bodies.length; j++) {
-					const physicsProperties = bodies[j];
+					const physicProperties = bodies[j];
 
-					const position = new Vector3().copy(
-						physicsProperties.rigidBody.translation()
+					/** @type {Vector3} */
+					let position = this._position;
+					/** @type {Quaternion} */
+					let quaternion = this._quaternion;
+					/** @type {Vector3} */
+					let scale = this._scale;
+
+					object.getMatrixAt(j, this._matrix);
+					this._matrix.decompose(position, quaternion, scale);
+
+					position = this._position.copy(
+						physicProperties.rigidBody.translation()
 					);
-					this._quaternion.copy(physicsProperties.rigidBody.rotation());
+					quaternion = this._quaternion.copy(
+						physicProperties.rigidBody.rotation()
+					);
+					scale = this._scale.copy(scale ?? object.scale);
 
 					this._matrix
-						.compose(position, this._quaternion, this._scale)
+						.compose(position, quaternion, scale)
 						.toArray(array, j * 16);
 				}
 
