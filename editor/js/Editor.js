@@ -659,7 +659,16 @@ Editor.prototype = {
 		var loader = new THREE.ObjectLoader();
 		var camera = await loader.parseAsync( json.camera );
 
+		const existingUuid = this.camera.uuid;
+		const incomingUuid = camera.uuid;
+
+		// copy all properties, including uuid
 		this.camera.copy( camera );
+		this.camera.uuid = incomingUuid;
+
+		delete this.cameras[ existingUuid ]; // remove old entry [existingUuid, this.camera]
+		this.cameras[ incomingUuid ] = this.camera; // add new entry [incomingUuid, this.camera]
+
 		this.signals.cameraResetted.dispatch();
 
 		this.history.fromJSON( json.history );
