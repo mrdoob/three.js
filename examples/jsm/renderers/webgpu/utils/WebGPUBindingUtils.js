@@ -204,6 +204,27 @@ class WebGPUBindingUtils {
 
 				entriesGPU.push( { binding: bindingPoint, resource: textureGPU.sampler } );
 
+			} else if ( binding.isSampledTexture && binding.texture.isVideoTexture ) {
+
+				const textureData = backend.get( binding.texture );
+
+				let resourceGPU;
+
+				if ( binding.texture.source !== undefined && binding.texture.source.data !== undefined ) {
+
+					textureData.externalTexture = binding.texture.source.data;
+
+					resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
+
+				} else {
+
+					resourceGPU = textureData.texture.createView( { aspect: GPUTextureAspect.All, dimension: GPUTextureViewDimension.TwoD, mipLevelCount: binding.store ? 1 : textureData.mipLevelCount } );
+
+				}
+
+
+				entriesGPU.push( { binding: bindingPoint, resource: resourceGPU } );
+
 			} else if ( binding.isSampledTexture ) {
 
 				const textureData = backend.get( binding.texture );
