@@ -78,13 +78,15 @@ function Loader( editor ) {
 
 		if ( extension in fileHandlers ) {
 
+			const handleRequest = fileHandlers[ extension ];
+
 			if ( extension === 'js' || extension === 'json' ) {
 
-				fileHandlers[ extension ]( editor, manager, reader, file, this.texturePath );
+				handleRequest( editor, manager, reader, file, this.texturePath );
 
 			} else {
 
-				fileHandlers[ extension ]( editor, manager, reader, file );
+				handleRequest( editor, manager, reader, file );
 
 			}
 
