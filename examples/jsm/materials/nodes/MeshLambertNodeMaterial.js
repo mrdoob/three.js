@@ -1,5 +1,5 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import PhongLightingModel from '../functions/PhongLightingModel.js';
+import PhongLightingModel from '../nodes/functions/PhongLightingModel.js';
 
 import { MeshLambertMaterial } from 'three';
 

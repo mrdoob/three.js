@@ -1,5 +1,5 @@
-import { createNodeFromType } from '../core/Node.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { createNodeFromType } from '../nodes/core/Node.js';
+import { nodeObject } from '../nodes/shadernode/ShaderNode.js';
 import { FileLoader, Loader } from 'three';
 
 class NodeLoader extends Loader {

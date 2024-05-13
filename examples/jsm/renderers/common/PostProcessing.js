@@ -1,5 +1,6 @@
-import { vec4, NodeMaterial } from '../../nodes/Nodes.js';
+import NodeMaterial from '../../materials/NodeMaterial.js';
 import QuadMesh from '../../objects/QuadMesh.js';
+import { vec4 } from '../../nodes/Nodes.js';
 
 const quadMesh = new QuadMesh( new NodeMaterial() );
 

@@ -1,10 +1,12 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { uniform } from '../core/UniformNode.js';
-import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
-import { materialRotation } from '../accessors/MaterialNode.js';
-import { modelViewMatrix, modelWorldMatrix } from '../accessors/ModelNode.js';
-import { positionLocal } from '../accessors/PositionNode.js';
-import { float, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import {
+	uniform,
+	cameraProjectionMatrix,
+	materialRotation,
+	modelViewMatrix, modelWorldMatrix,
+	positionLocal,
+	float, vec2, vec3, vec4
+} from '../nodes/Nodes.js';
 
 import { SpriteMaterial } from 'three';
 

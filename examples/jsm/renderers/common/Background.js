@@ -1,7 +1,8 @@
 import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
 import { Mesh, SphereGeometry, BackSide, LinearSRGBColorSpace } from 'three';
-import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, NodeMaterial, modelViewProjection } from '../../nodes/Nodes.js';
+import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, modelViewProjection } from '../../nodes/Nodes.js';
+import NodeMaterial from '../../materials/NodeMaterial.js';
 
 const _clearColor = new Color4();
 

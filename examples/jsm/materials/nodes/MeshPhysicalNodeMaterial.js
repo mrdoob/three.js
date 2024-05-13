@@ -1,12 +1,15 @@
-import { addNodeMaterial } from './NodeMaterial.js';
-import { transformedClearcoatNormalView } from '../accessors/NormalNode.js';
-import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor } from '../core/PropertyNode.js';
-import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor } from '../accessors/MaterialNode.js';
-import { float, vec2, vec3, If } from '../shadernode/ShaderNode.js';
-import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
-import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
+import { addNodeMaterial } from '../NodeMaterial.js';
+import {
+	transformedClearcoatNormalView,
+	clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor,
+	materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor,
+	float, vec2, vec3, If,
+	TBNViewMatrix,
+	mix, pow2, min
+} from '../../nodes/Nodes.js';
+import PhysicalLightingModel from '../../nodes/functions/PhysicalLightingModel.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
-import { mix, pow2, min } from '../math/MathNode.js';
+
 import { MeshPhysicalMaterial } from 'three';
 
 const defaultValues = new MeshPhysicalMaterial();
