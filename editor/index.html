@@ -201,15 +201,43 @@
 
 			} );
 
+			//
+
+			const language = editor.config.getKey( 'language' );
+			editor.config.setKey( 'sidebar/minWidth', editor.config.getSidebarMinWidth( language ) );
+
+			window.addEventListener( 'resize', onWindowResize );
+			window.dispatchEvent( new Event( 'resize' ) );
+
 			function onWindowResize() {
+
+				if ( window.innerWidth <= 600 ) { // @media all and ( max-width: 600px )
+
+					sidebar.setWidth( 'unset' );
+					viewport.setRight( '0' );
+					script.setRight( '0' );
+					player.setRight( '0' );
+					resizer.setRight( '0' );
+
+				} else {
+
+					const sidebarWidth = editor.config.getKey( 'sidebar/width' );
+					const sidebarMinWidth = editor.config.getKey( 'sidebar/minWidth' );
+					const effectiveSidebarWidth = Math.max( sidebarWidth, sidebarMinWidth );
+
+					sidebar.setWidth( effectiveSidebarWidth + 'px' );
+					viewport.setRight( effectiveSidebarWidth + 'px' );
+					script.setRight( effectiveSidebarWidth + 'px' );
+					player.setRight( effectiveSidebarWidth + 'px' );
+					resizer.setRight( effectiveSidebarWidth + 'px' );
+
+					sidebar.dom.style.setProperty( '--sidebar-min-width', sidebarMinWidth + 'px' );
+
+				}
 
 				editor.signals.windowResize.dispatch();
 
 			}
-
-			window.addEventListener( 'resize', onWindowResize );
-
-			onWindowResize();
 
 			//
 

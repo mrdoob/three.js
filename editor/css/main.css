@@ -71,7 +71,6 @@ textarea, input { outline: none; } /* osx */
 	position: relative;
 	display: block;
 	width: 100%;
-	min-width: 335px;
 }
 
 .TabbedPanel .Tabs {
@@ -420,7 +419,7 @@ select {
 	right: 0;
 	top: 32px;
 	bottom: 0;
-	width: 350px;
+	min-width: var(--sidebar-min-width, 335px);
 	background: #eee;
 	overflow: auto;
 }

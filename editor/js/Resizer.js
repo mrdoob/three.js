@@ -34,9 +34,9 @@ function Resizer( editor ) {
 		const offsetWidth = document.body.offsetWidth;
 		const clientX = event.clientX;
 
-		const cX = clientX < 0 ? 0 : clientX > offsetWidth ? offsetWidth : clientX;
+		const cX = Math.max( 10, Math.min( clientX, offsetWidth ) ); // leaves 10px for showing resizer
 
-		const x = Math.max( 335, offsetWidth - cX ); // .TabbedPanel min-width: 335px
+		const x = Math.max( editor.config.getKey( 'sidebar/minWidth' ), offsetWidth - cX );
 
 		dom.style.right = x + 'px';
 
@@ -44,6 +44,8 @@ function Resizer( editor ) {
 		document.getElementById( 'player' ).style.right = x + 'px';
 		document.getElementById( 'script' ).style.right = x + 'px';
 		document.getElementById( 'viewport' ).style.right = x + 'px';
+
+		editor.config.setKey( 'sidebar/width', x );
 
 		signals.windowResize.dispatch();
 

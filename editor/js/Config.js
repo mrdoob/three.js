@@ -3,10 +3,25 @@ function Config() {
 	const name = 'threejs-editor';
 
 	const userLanguage = navigator.language.split( '-' )[ 0 ];
-
 	const suggestedLanguage = [ 'fr', 'ja', 'zh' ].includes( userLanguage ) ? userLanguage : 'en';
 
+	function getSidebarMinWidth( language = suggestedLanguage ) {
+
+		return { // >= #sidebar min-width (335px)
+
+			'en': 350,
+			'fr': 355,
+			'ja': 395,
+			'zh': 335
+
+		}[ language ];
+
+	}
+
+	//
+
 	const storage = {
+
 		'language': suggestedLanguage,
 
 		'autosave': true,
@@ -27,7 +42,11 @@ function Config() {
 		'settings/shortcuts/rotate': 'e',
 		'settings/shortcuts/scale': 'r',
 		'settings/shortcuts/undo': 'z',
-		'settings/shortcuts/focus': 'f'
+		'settings/shortcuts/focus': 'f',
+
+		'sidebar/width': getSidebarMinWidth( suggestedLanguage ),
+		'sidebar/minWidth': getSidebarMinWidth( suggestedLanguage )
+
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {
@@ -72,7 +91,11 @@ function Config() {
 
 			delete window.localStorage[ name ];
 
-		}
+		},
+
+		//
+
+		getSidebarMinWidth: getSidebarMinWidth
 
 	};
 
