@@ -1,4 +1,4 @@
-import { Command } from '../Command.js';
+import { Command, Defer } from '../Command.js';
 import { Vector3 } from 'three';
 
 /**
@@ -11,6 +11,13 @@ import { Vector3 } from 'three';
 class SetScaleCommand extends Command {
 
 	constructor( editor, object, newScale, optionalOldScale ) {
+
+		if ( editor instanceof Defer ) {
+
+			super( editor.unwrap() );
+			return;
+
+		}
 
 		super( editor );
 

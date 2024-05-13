@@ -1,4 +1,4 @@
-import { Command } from '../Command.js';
+import { Command, Defer } from '../Command.js';
 
 /**
  * @param editor Editor
@@ -11,6 +11,13 @@ import { Command } from '../Command.js';
 class SetScriptValueCommand extends Command {
 
 	constructor( editor, object, script, attributeName, newValue ) {
+
+		if ( editor instanceof Defer ) {
+
+			super( editor.unwrap() );
+			return;
+
+		}
 
 		super( editor );
 

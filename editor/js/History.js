@@ -1,4 +1,5 @@
 import * as Commands from './commands/Commands.js';
+import { Defer } from './Command.js';
 
 class History {
 
@@ -201,7 +202,7 @@ class History {
 		for ( let i = 0; i < json.undos.length; i ++ ) {
 
 			const cmdJSON = json.undos[ i ];
-			const cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
+			const cmd = new Commands[ cmdJSON.type ]( new Defer( this.editor ) ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;

@@ -1,4 +1,4 @@
-import { Command } from '../Command.js';
+import { Command, Defer } from '../Command.js';
 import { ObjectLoader } from 'three';
 
 /**
@@ -10,16 +10,19 @@ class AddObjectCommand extends Command {
 
 	constructor( editor, object ) {
 
+		if ( editor instanceof Defer ) {
+
+			super( editor.unwrap() );
+			return;
+
+		}
+
 		super( editor );
 
 		this.type = 'AddObjectCommand';
 
 		this.object = object;
-		if ( object !== undefined ) {
-
-			this.name = editor.strings.getKey( 'command/AddObject' ) + ': ' + object.name;
-
-		}
+		this.name = editor.strings.getKey( 'command/AddObject' ) + ': ' + object.name;
 
 	}
 

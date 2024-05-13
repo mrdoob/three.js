@@ -1,4 +1,4 @@
-import { Command } from '../Command.js';
+import { Command, Defer } from '../Command.js';
 
 /**
  * @param editor Editor
@@ -8,6 +8,13 @@ import { Command } from '../Command.js';
 class MultiCmdsCommand extends Command {
 
 	constructor( editor, cmdArray ) {
+
+		if ( editor instanceof Defer ) {
+
+			super( editor.unwrap() );
+			return;
+
+		}
 
 		super( editor );
 

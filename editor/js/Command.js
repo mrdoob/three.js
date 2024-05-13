@@ -38,4 +38,20 @@ class Command {
 
 }
 
-export { Command };
+class Defer {
+
+	constructor( editor ) {
+
+		this._editor = editor;
+
+	}
+
+	unwrap() {
+
+		return this._editor;
+
+	}
+
+}
+
+export { Command, Defer };

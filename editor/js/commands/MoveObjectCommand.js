@@ -1,4 +1,4 @@
-import { Command } from '../Command.js';
+import { Command, Defer } from '../Command.js';
 
 /**
  * @param editor Editor
@@ -10,6 +10,13 @@ import { Command } from '../Command.js';
 class MoveObjectCommand extends Command {
 
 	constructor( editor, object, newParent, newBefore ) {
+
+		if ( editor instanceof Defer ) {
+
+			super( editor.unwrap() );
+			return;
+
+		}
 
 		super( editor );
 

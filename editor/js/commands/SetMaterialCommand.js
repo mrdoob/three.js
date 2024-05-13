@@ -1,4 +1,4 @@
-import { Command } from '../Command.js';
+import { Command, Defer } from '../Command.js';
 import { ObjectLoader } from 'three';
 
 /**
@@ -10,6 +10,13 @@ import { ObjectLoader } from 'three';
 class SetMaterialCommand extends Command {
 
 	constructor( editor, object, newMaterial, materialSlot ) {
+
+		if ( editor instanceof Defer ) {
+
+			super( editor.unwrap() );
+			return;
+
+		}
 
 		super( editor );
 

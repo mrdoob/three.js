@@ -1,4 +1,4 @@
-import { Command } from '../Command.js';
+import { Command, Defer } from '../Command.js';
 import { Euler } from 'three';
 
 /**
@@ -11,6 +11,13 @@ import { Euler } from 'three';
 class SetRotationCommand extends Command {
 
 	constructor( editor, object, newRotation, optionalOldRotation ) {
+
+		if ( editor instanceof Defer ) {
+
+			super( editor.unwrap() );
+			return;
+
+		}
 
 		super( editor );
 

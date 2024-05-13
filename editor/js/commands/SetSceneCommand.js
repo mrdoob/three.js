@@ -1,4 +1,4 @@
-import { Command } from '../Command.js';
+import { Command, Defer } from '../Command.js';
 import { SetUuidCommand } from './SetUuidCommand.js';
 import { SetValueCommand } from './SetValueCommand.js';
 import { AddObjectCommand } from './AddObjectCommand.js';
@@ -11,6 +11,13 @@ import { AddObjectCommand } from './AddObjectCommand.js';
 class SetSceneCommand extends Command {
 
 	constructor( editor, scene ) {
+
+		if ( editor instanceof Defer ) {
+
+			super( editor.unwrap() );
+			return;
+
+		}
 
 		super( editor );
 

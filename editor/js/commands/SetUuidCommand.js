@@ -1,4 +1,4 @@
-import { Command } from '../Command.js';
+import { Command, Defer } from '../Command.js';
 
 /**
  * @param editor Editor
@@ -9,6 +9,13 @@ import { Command } from '../Command.js';
 class SetUuidCommand extends Command {
 
 	constructor( editor, object, newUuid ) {
+
+		if ( editor instanceof Defer ) {
+
+			super( editor.unwrap() );
+			return;
+
+		}
 
 		super( editor );
 
