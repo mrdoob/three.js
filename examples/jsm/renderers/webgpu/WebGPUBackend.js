@@ -812,12 +812,6 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( renderContextData.renderBundles !== undefined && renderContextData.renderBundles.length > 0 ) {
-
-			contextData.currentPass.executeBundles( renderContextData.renderBundles );
-
-		}
-
 		const passEncoderGPU = useRenderBundle ? this.createBundleEncoder( context, renderObject ) : contextData.currentPass;
 
 		// pipeline

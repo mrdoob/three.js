@@ -1395,14 +1395,6 @@ class Renderer {
 
 	}
 
-	recordBundle() {
-
-	}
-
-	renderBundle() {
-
-	}
-
 	_renderObjectDirect( object, material, scene, camera, lightsNode, group, passId ) {
 
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
