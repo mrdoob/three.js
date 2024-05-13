@@ -47,7 +47,7 @@ function MenubarEdit( editor ) {
 	} );
 	options.add( redo );
 
-	editor.signals.historyChanged.add( function () {
+	function onHistoryChanged() {
 
 		const history = editor.history;
 
@@ -66,7 +66,10 @@ function MenubarEdit( editor ) {
 
 		}
 
-	} );
+	}
+
+	editor.signals.historyChanged.add( onHistoryChanged );
+	onHistoryChanged();
 
 	// ---
 

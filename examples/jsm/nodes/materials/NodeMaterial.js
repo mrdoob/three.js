@@ -1,4 +1,4 @@
-import { Material, ShaderMaterial } from 'three';
+import { Material } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
@@ -28,7 +28,7 @@ import { modelViewMatrix } from '../accessors/ModelNode.js';
 
 const NodeMaterials = new Map();
 
-class NodeMaterial extends ShaderMaterial {
+class NodeMaterial extends Material {
 
 	constructor() {
 
@@ -460,8 +460,6 @@ class NodeMaterial extends ShaderMaterial {
 			}
 
 		}
-
-		Object.assign( this.defines, material.defines );
 
 		const descriptors = Object.getOwnPropertyDescriptors( material.constructor.prototype );
 
