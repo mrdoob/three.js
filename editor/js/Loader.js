@@ -543,9 +543,10 @@ fileHandlers[ 'svg' ] = function ( editor, manager, reader, file ) {
 
 		//
 
-		const group = new THREE.Group();
-		group.scale.multiplyScalar( 0.1 );
-		group.scale.y *= - 1;
+					const group = new THREE.Group();
+					group.name = filename;
+					group.scale.multiplyScalar( 0.1 );
+					group.scale.y *= - 1;
 
 		for ( let i = 0; i < paths.length; i ++ ) {
 

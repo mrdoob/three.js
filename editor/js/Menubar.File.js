@@ -19,11 +19,31 @@ function MenubarFile( editor ) {
 	options.setClass( 'options' );
 	container.add( options );
 
-	// New
+	// New Project
 
-	let option = new UIRow();
-	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/new' ) );
+	const newProjectSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/file/newProject' ) ).addClass( 'option' ).addClass( 'submenu-title' );
+	newProjectSubmenuTitle.onMouseOver( function () {
+
+		const { top, right } = this.dom.getBoundingClientRect();
+		const { paddingTop } = getComputedStyle( this.dom );
+		newPorjectSubmenu.setLeft( right + 'px' );
+		newPorjectSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
+		newPorjectSubmenu.setDisplay( 'block' );
+
+	} );
+	newProjectSubmenuTitle.onMouseOut( function () {
+
+		newPorjectSubmenu.setDisplay( 'none' );
+
+	} );
+	options.add( newProjectSubmenuTitle );
+
+	const newPorjectSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	newProjectSubmenuTitle.add( newPorjectSubmenu );
+
+	// New Project / Empty
+
+	let option = new UIRow().setTextContent( strings.getKey( 'menubar/file/newProject/empty' ) ).setClass( 'option' );
 	option.onClick( function () {
 
 		if ( confirm( strings.getKey( 'prompt/file/open' ) ) ) {
@@ -33,7 +53,54 @@ function MenubarFile( editor ) {
 		}
 
 	} );
-	options.add( option );
+	newPorjectSubmenu.add( option );
+
+	//
+
+	newPorjectSubmenu.add( new UIHorizontalRule() );
+
+	// New Project / ...
+
+	const examples = [
+		{ title: 'menubar/file/newProject/Arkanoid', file: 'arkanoid.app.json' },
+		{ title: 'menubar/file/newProject/Camera', file: 'camera.app.json' },
+		{ title: 'menubar/file/newProject/Particles', file: 'particles.app.json' },
+		{ title: 'menubar/file/newProject/Pong', file: 'pong.app.json' },
+		{ title: 'menubar/file/newProject/Shaders', file: 'shaders.app.json' }
+	];
+
+	const loader = new THREE.FileLoader();
+
+	for ( let i = 0; i < examples.length; i ++ ) {
+
+		( function ( i ) {
+
+			const example = examples[ i ];
+
+			const option = new UIRow();
+			option.setClass( 'option' );
+			option.setTextContent( strings.getKey( example.title ) );
+			option.onClick( function () {
+
+				if ( confirm( strings.getKey( 'prompt/file/open' ) ) ) {
+
+					loader.load( 'examples/' + example.file, function ( text ) {
+
+						editor.clear();
+						editor.fromJSON( JSON.parse( text ) );
+
+					} );
+
+				}
+
+			} );
+			newPorjectSubmenu.add( option );
+
+		} )( i );
+
+	}
+
+	options.add( new UIHorizontalRule() );
 
 	// Import
 

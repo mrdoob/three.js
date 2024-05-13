@@ -2436,15 +2436,29 @@ class WebGLRenderer {
 
 		};
 
-		this.copyFramebufferToTexture = function ( position, texture, level = 0 ) {
+		this.copyFramebufferToTexture = function ( texture, position = null, level = 0 ) {
+
+			// support previous signature with position first
+			if ( texture.isTexture !== true ) {
+
+				// @deprecated, r165
+				console.warn( 'WebGLRenderer: copyFramebufferToTexture function signature has changed.' );
+
+				position = arguments[ 0 ] || null;
+				texture = arguments[ 1 ];
+
+			}
 
 			const levelScale = Math.pow( 2, - level );
 			const width = Math.floor( texture.image.width * levelScale );
 			const height = Math.floor( texture.image.height * levelScale );
 
+			const x = position !== null ? position.x : 0;
+			const y = position !== null ? position.y : 0;
+
 			textures.setTexture2D( texture, 0 );
 
-			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, level, 0, 0, position.x, position.y, width, height );
+			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, level, 0, 0, x, y, width, height );
 
 			state.unbindTexture();
 
