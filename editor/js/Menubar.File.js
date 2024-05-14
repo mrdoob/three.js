@@ -27,20 +27,20 @@ function MenubarFile( editor ) {
 
 		const { top, right } = this.dom.getBoundingClientRect();
 		const { paddingTop } = getComputedStyle( this.dom );
-		newPorjectSubmenu.setLeft( right + 'px' );
-		newPorjectSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
-		newPorjectSubmenu.setDisplay( 'block' );
+		newProjectSubmenu.setLeft( right + 'px' );
+		newProjectSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
+		newProjectSubmenu.setDisplay( 'block' );
 
 	} );
 	newProjectSubmenuTitle.onMouseOut( function () {
 
-		newPorjectSubmenu.setDisplay( 'none' );
+		newProjectSubmenu.setDisplay( 'none' );
 
 	} );
 	options.add( newProjectSubmenuTitle );
 
-	const newPorjectSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
-	newProjectSubmenuTitle.add( newPorjectSubmenu );
+	const newProjectSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	newProjectSubmenuTitle.add( newProjectSubmenu );
 
 	// New Project / Empty
 
@@ -54,11 +54,11 @@ function MenubarFile( editor ) {
 		}
 
 	} );
-	newPorjectSubmenu.add( option );
+	newProjectSubmenu.add( option );
 
 	//
 
-	newPorjectSubmenu.add( new UIHorizontalRule() );
+	newProjectSubmenu.add( new UIHorizontalRule() );
 
 	// New Project / ...
 
@@ -95,7 +95,7 @@ function MenubarFile( editor ) {
 				}
 
 			} );
-			newPorjectSubmenu.add( option );
+			newProjectSubmenu.add( option );
 
 		} )( i );
 
