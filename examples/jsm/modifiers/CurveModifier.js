@@ -10,7 +10,7 @@ import {
 	RepeatWrapping,
 	Mesh,
 	InstancedMesh,
-	NearestFilter,
+	LinearFilter,
 	DynamicDrawUsage,
 	Matrix4
 } from 'three';
@@ -33,7 +33,7 @@ export function initSplineTexture( numberOfCurves = 1 ) {
 
 	dataTexture.wrapS = RepeatWrapping;
 	dataTexture.wrapY = RepeatWrapping;
-	dataTexture.magFilter = NearestFilter;
+	dataTexture.magFilter = LinearFilter;
 	dataTexture.needsUpdate = true;
 
 	return dataTexture;
