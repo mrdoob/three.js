@@ -381,7 +381,7 @@ fileHandlers[ 'kmz' ] = function ( editor, manager, reader, file ) {
 
 };
 
-fileHandlers[ 'ldr' ] = fileHandlers[ 'mdp' ] = function ( editor, manager, reader, file ) {
+fileHandlers[ 'ldr' ] = fileHandlers[ 'mpd' ] = function ( editor, manager, reader, file ) {
 
 	reader.addEventListener( 'load', async function ( event ) {
 
