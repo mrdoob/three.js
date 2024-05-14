@@ -167,6 +167,8 @@ class PassNode extends TempNode {
 		const effectiveHeight = this._height * this._pixelRatio;
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
+		this._textureNode.value = this.renderTarget.texture;
+		this._depthTextureNode.value = this.renderTarget.depthTexture;
 
 	}
 

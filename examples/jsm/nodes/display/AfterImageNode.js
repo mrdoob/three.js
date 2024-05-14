@@ -43,6 +43,7 @@ class AfterImageNode extends TempNode {
 
 		this._compRT.setSize( width, height );
 		this._oldRT.setSize( width, height );
+		this._textureNode.value = this._compRT.texture;
 
 	}
 

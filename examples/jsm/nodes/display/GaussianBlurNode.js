@@ -49,6 +49,7 @@ class GaussianBlurNode extends TempNode {
 		this._invSize.value.set( 1 / width, 1 / height );
 		this._horizontalRT.setSize( width, height );
 		this._verticalRT.setSize( width, height );
+		this._textureNode.value = this._verticalRT.texture;
 
 	}
 

@@ -49,6 +49,7 @@ class AnamorphicNode extends TempNode {
 		height = Math.max( Math.round( height * this.resolution.y ), 1 );
 
 		this._renderTarget.setSize( width, height );
+		this._textureNode.value = this._renderTarget.texture;
 
 	}
 
