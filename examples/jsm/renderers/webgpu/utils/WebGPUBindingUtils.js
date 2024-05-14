@@ -210,14 +210,21 @@ class WebGPUBindingUtils {
 
 				let resourceGPU;
 
-				if ( binding.texture.source !== undefined && binding.texture.source.data !== undefined ) {
+				if ( textureData.externalTexture !== undefined ) {
 
-					textureData.externalTexture = binding.texture.source.data;
+					// When textureData.externalTexture is set by updateTexture, we can use it directly
 
 					resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
 
+				} else if ( binding.texture.source.data.readyState >= binding.texture.source.data.HAVE_CURRENT_DATA ) {
+
+					// When textureData.externalTexture is empty, but video is already ready, we can set it directly to avoid warnings
+
+					resourceGPU = device.importExternalTexture( { source: binding.texture.source.data } );
+
 				} else {
 
+					// Default
 					resourceGPU = textureData.texture.createView( { aspect: GPUTextureAspect.All, dimension: GPUTextureViewDimension.TwoD, mipLevelCount: binding.store ? 1 : textureData.mipLevelCount } );
 
 				}

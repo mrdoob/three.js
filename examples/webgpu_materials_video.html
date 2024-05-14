@@ -60,9 +60,14 @@
 				ygrid = 10;
 
 			const startButton = document.getElementById( 'startButton' );
-			startButton.addEventListener( 'click', function () {
 
-				init();
+			startButton.addEventListener( 'click', async function () {
+
+        video = document.getElementById( 'video' );
+
+        await video.play()
+
+        init()
 
 			} );
 
@@ -88,14 +93,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
-
-				video = document.getElementById( 'video' );
-				video.play();
-				video.addEventListener( 'play', function () {
-
-					this.currentTime = 3;
-
-				} );
 
 				texture = new THREE.VideoTexture( video );
 
