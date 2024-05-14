@@ -360,7 +360,9 @@ class LineSegments2 extends Mesh {
 
 	onBeforeRender( renderer ) {
 
-		if ( this.material.uniforms.resolution ) {
+		const uniforms = this.material.uniforms;
+
+		if ( uniforms && uniforms.resolution ) {
 
 			renderer.getViewport( _viewport );
 			this.material.uniforms.resolution.value.set( _viewport.z, _viewport.w );
