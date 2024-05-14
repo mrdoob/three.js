@@ -1,16 +1,3 @@
-/**
- * parameters = {
- *  color: <hex>,
- *  linewidth: <float>,
- *  dashed: <boolean>,
- *  dashScale: <float>,
- *  dashSize: <float>,
- *  dashOffset: <float>,
- *  gapSize: <float>,
- *  resolution: <Vector2>,
- * }
- */
-
 import {
 	ShaderLib,
 	ShaderMaterial,
