@@ -361,7 +361,7 @@
 		"webgpu_materials_texture_partialupdate",
 		"webgpu_sandbox",
 		"webgpu_shadertoy",
-    "webgpu_wgsl",
+    "webgpu_tsl_interoperability",
 		"webgpu_shadowmap",
 		"webgpu_skinning",
 		"webgpu_skinning_instancing",
