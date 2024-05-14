@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - line segments</title>
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+		/>
+		<link type="text/css" rel="stylesheet" href="main.css" />
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+			- line segments<br />
+			<a
+				href="https://en.wikipedia.org/wiki/Maze_generation_algorithm?oldformat=true"
+				target="_blank"
+				rel="noopener"
+				>Random Maze Algorithm</a
+			>
+			by
+			<a href="https://tholman.com/" target="_blank" rel="noopener"
+				>Tim Tholman</a
+			>
+			&
+			<a href="https://ruthjohn.com/" target="_blank" rel="noopener"
+				>Ruth John</a
+			>
+			<br />Put together by
+			<a href="http://twitter.com/eduardfossas" target="_blank" rel="noopener"
+				>@eduardfossas</a
+			>.
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+			import {
+				Vector2,
+				MathUtils,
+				LineSegments,
+				Scene,
+				PerspectiveCamera,
+				WebGLRenderer,
+				BufferGeometry,
+				BufferAttribute,
+				Shape,
+			} from "three";
+
+			const scene = new Scene();
+			const camera = new PerspectiveCamera(
+				75,
+				window.innerWidth / window.innerHeight,
+				0.1,
+				1000
+			);
+			const renderer = new WebGLRenderer();
+
+			// found in https://generativeartistry.com/tutorials/tiled-lines/
+			const points = [];
+			const step = 0.5;
+			const size = 10;
+
+			function drawLines(x, y, width, height) {
+				var leftToRight = MathUtils.randFloat(-1, 1) <= 0.5;
+				if (leftToRight) {
+					points.push(x, y, 0);
+					points.push(x + width, y + height, 0);
+				} else {
+					points.push(x + width, y, 0);
+					points.push(x, y + height, 0);
+				}
+			}
+
+			for (var x = 0; x < size; x += step) {
+				for (var y = 0; y < size; y += step) {
+					drawLines(x, y, step, step);
+				}
+			}
+
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(renderer.domElement);
+			const vertices = new Float32Array(points);
+			const linesGeometry = new BufferGeometry();
+
+			linesGeometry.setAttribute("position", new BufferAttribute(vertices, 3));
+			const lines = new LineSegments(linesGeometry);
+			lines.position.set(-size / 2, -size / 2, 0);
+			scene.add(lines);
+			camera.position.z = 10;
+
+			window.onresize = function () {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize(window.innerWidth, window.innerHeight);
+			};
+
+			function animate() {
+				requestAnimationFrame(animate);
+
+				renderer.render(scene, camera);
+			}
+			animate();
+		</script>
+	</body>
+</html>

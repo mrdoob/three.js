@@ -72,6 +72,7 @@
 		"webgl_lines_fat",
 		"webgl_lines_fat_raycasting",
 		"webgl_lines_fat_wireframe",
+		"webgl_lines_segments",
 		"webgl_loader_3dm",
 		"webgl_loader_3ds",
 		"webgl_loader_3mf",
