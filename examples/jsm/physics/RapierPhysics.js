@@ -384,7 +384,7 @@ export class Physics {
 					quaternion = this._quaternion.copy(
 						physicProperties.rigidBody.rotation()
 					);
-					scale = this._scale.copy(scale ?? object.scale);
+					scale = this._scale.copy(scale);
 
 					this._matrix
 						.compose(position, quaternion, scale)
