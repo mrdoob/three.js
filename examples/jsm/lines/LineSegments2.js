@@ -362,7 +362,7 @@ class LineSegments2 extends Mesh {
 
 		if ( this.material.uniforms.resolution ) {
 
-			renderer.getCurrentViewport( _viewport ).multiplyScalar( 1 / renderer.getPixelRatio() );
+			renderer.getViewport( _viewport );
 			this.material.uniforms.resolution.value.set( _viewport.z, _viewport.w );
 
 		}
