@@ -26,7 +26,9 @@ class Path extends CurvePath {
 
 	setFromPoints( points ) {
 
-		this.moveTo( points[ 0 ].x, points[ 0 ].y );
+		const point = points[ 0 ];
+
+		if ( point ) this.moveTo( points[ 0 ].x, points[ 0 ].y );
 
 		for ( let i = 1, l = points.length; i < l; i ++ ) {
 
