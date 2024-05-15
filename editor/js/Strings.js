@@ -7,6 +7,7 @@ function Strings( config ) {
 		en: {
 
 			'prompt/file/open': 'Any unsaved data will be lost. Are you sure?',
+			'prompt/file/failedToOpenProject': 'Failed to open project!',
 			'prompt/file/export/noMeshSelected': 'No Mesh selected!',
 			'prompt/file/export/noObjectSelected': 'No Object selected!',
 			'prompt/script/remove': 'Are you sure?',
@@ -45,6 +46,8 @@ function Strings( config ) {
 			'menubar/file/newProject/Particles': 'Particles',
 			'menubar/file/newProject/Pong': 'Pong',
 			'menubar/file/newProject/Shaders': 'Shaders',
+			'menubar/file/save': 'Save',
+			'menubar/file/open': 'Open',
 			'menubar/file/import': 'Import',
 			'menubar/file/export': 'Export',
 
@@ -189,7 +192,7 @@ function Strings( config ) {
 			'sidebar/geometry/extrude_geometry/curveSegments': 'Curve Segments',
 			'sidebar/geometry/extrude_geometry/steps': 'Steps',
 			'sidebar/geometry/extrude_geometry/depth': 'Depth',
-			'sidebar/geometry/extrude_geometry/bevelEnabled': 'Bevel?',
+			'sidebar/geometry/extrude_geometry/bevelEnabled': 'Bevel',
 			'sidebar/geometry/extrude_geometry/bevelThickness': 'Thickness',
 			'sidebar/geometry/extrude_geometry/bevelSize': 'Size',
 			'sidebar/geometry/extrude_geometry/bevelOffset': 'Offset',
@@ -391,6 +394,7 @@ function Strings( config ) {
 		fr: {
 
 			'prompt/file/open': 'Toutes les données non enregistrées seront perdues Êtes-vous sûr ?',
+			'prompt/file/failedToOpenProject': 'Échec de l\'ouverture du projet !',
 			'prompt/file/export/noMeshSelected': 'Aucun maillage sélectionné !',
 			'prompt/file/export/noObjectSelected': 'Aucun objet sélectionné !',
 			'prompt/script/remove': 'Es-tu sûr?',
@@ -429,7 +433,8 @@ function Strings( config ) {
 			'menubar/file/newProject/Particles': 'Particles',
 			'menubar/file/newProject/Pong': 'Pong',
 			'menubar/file/newProject/Shaders': 'Shaders',
-
+			'menubar/file/save': 'Save',
+			'menubar/file/open': 'Open',
 			'menubar/file/import': 'Importer',
 			'menubar/file/export': 'Exporter',
 
@@ -776,6 +781,7 @@ function Strings( config ) {
 		zh: {
 
 			'prompt/file/open': '您确定吗？未保存的数据将会丢失。',
+			'prompt/file/failedToOpenProject': '无法打开项目！',
 			'prompt/file/export/noMeshSelected': '未选择网格！',
 			'prompt/file/export/noObjectSelected': '未选择对象！',
 			'prompt/script/remove': '你确定吗？',
@@ -814,6 +820,8 @@ function Strings( config ) {
 			'menubar/file/newProject/Particles': '粒子',
 			'menubar/file/newProject/Pong': '乒乓球',
 			'menubar/file/newProject/Shaders': '着色器',
+			'menubar/file/save': '保存',
+			'menubar/file/open': '打开',
 			'menubar/file/import': '导入',
 			'menubar/file/export': '导出',
 
@@ -1160,6 +1168,7 @@ function Strings( config ) {
 		ja: {
 
 			'prompt/file/open': '保存されていないデータは失われます。 本気ですか？',
+			'prompt/file/failedToOpenProject': 'プロジェクトを開くことができませんでした!',
 			'prompt/file/export/noMeshSelected': 'メッシュが選択されていません!',
 			'prompt/file/export/noObjectSelected': 'オブジェクトが選択されていません!',
 			'prompt/script/remove': '本気ですか？',
@@ -1198,6 +1207,8 @@ function Strings( config ) {
 			'menubar/file/newProject/Particles': 'パーティクル',
 			'menubar/file/newProject/Pong': 'ピンポン',
 			'menubar/file/newProject/Shaders': 'シェーダー',
+			'menubar/file/save': '保存',
+			'menubar/file/open': '開く',
 			'menubar/file/import': 'インポート',
 			'menubar/file/export': 'エクスポート',
 
@@ -1342,7 +1353,7 @@ function Strings( config ) {
 			'sidebar/geometry/extrude_geometry/curveSegments': '分割数',
 			'sidebar/geometry/extrude_geometry/steps': 'ステップ',
 			'sidebar/geometry/extrude_geometry/depth': '深さ',
-			'sidebar/geometry/extrude_geometry/bevelEnabled': 'ベベルを有効にするか？',
+			'sidebar/geometry/extrude_geometry/bevelEnabled': 'ベベルを有効にするか',
 			'sidebar/geometry/extrude_geometry/bevelThickness': 'ベベルの厚さ',
 			'sidebar/geometry/extrude_geometry/bevelSize': 'ベベルのサイズ',
 			'sidebar/geometry/extrude_geometry/bevelOffset': 'ベベルのオフセット',

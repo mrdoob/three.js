@@ -549,9 +549,7 @@ class UIPoints extends UISpan {
 		this.lastPointIdx = 0;
 		this.onChangeCallback = null;
 
-		// TODO Remove this bind() stuff
-
-		this.update = function () {
+		this.update = () => { // bind lexical this
 
 			if ( this.onChangeCallback !== null ) {
 
@@ -559,7 +557,7 @@ class UIPoints extends UISpan {
 
 			}
 
-		}.bind( this );
+		};
 
 	}
 

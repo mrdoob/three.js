@@ -445,11 +445,7 @@ function SidebarMaterial( editor ) {
 
 		}
 
-		const left = ( screen.width - 500 ) / 2;
-		const top = ( screen.height - 500 ) / 2;
-
-		const url = URL.createObjectURL( new Blob( [ output ], { type: 'text/plain;charset=utf-8' } ) );
-		window.open( url, '_blank', `location=no,left=${left},top=${top},width=500,height=500` );
+		editor.utils.save( new Blob( [ output ] ), `${ materialName.getValue() || 'material' }.json` );
 
 	} );
 	container.add( exportJson );
