@@ -120,7 +120,6 @@
 
             var samplePoint = mask_coord / vec2<f32>(crtWidth, crtHeight);
             samplePoint.x += fract(time / 20);
-            samplePoint.y -= 0.1;
 
             var color = textureSample(
               tex,
@@ -214,7 +213,7 @@
 		      const samplePoint = maskCoord.div( dimensions );
 		      const time = timerLocal();
 		      samplePoint.x = samplePoint.x.add( fract( time.div( 20 ) ) );
-		      samplePoint.y = samplePoint.y.sub( 0.1 );
+		      samplePoint.y = samplePoint.y.sub( 1.52 );
 
 		      let color = texture( planetTexture, samplePoint );
 
