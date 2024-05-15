@@ -13,6 +13,8 @@ class StorageBufferNode extends BufferNode {
 
 		this.isStorageBufferNode = true;
 
+    this.writable = true;
+
 		this.bufferObject = false;
 
 		this._attribute = null;
@@ -49,6 +51,11 @@ class StorageBufferNode extends BufferNode {
 
 	}
 
+  setWritable(value) {
+    this.writable = value;
+    return this;
+  }
+
 	generate( builder ) {
 
 		if ( builder.isAvailable( 'storageBuffer' ) ) return super.generate( builder );
@@ -76,6 +83,7 @@ class StorageBufferNode extends BufferNode {
 export default StorageBufferNode;
 
 export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
+export const storageImmutable = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setWritable( false ) )
 export const storageObject = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setBufferObject( true ) );
 
 addNodeClass( 'StorageBufferNode', StorageBufferNode );
