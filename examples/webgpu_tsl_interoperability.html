@@ -31,8 +31,7 @@
 			import WebGL from 'three/addons/capabilities/WebGL.js';
 
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-      import { tslFn, attribute, varyingProperty, timerLocal, uniform, uniforms, wgslFn, color, texture, uv, clamp, float, vec2, vec3, fract, floor, MeshBasicNodeMaterial, positionGeometry, sin } from 'three/nodes';
-      import StorageBufferAttribute from 'three/addons/renderers/common/StorageBufferAttribute.js';
+      import { tslFn, attribute, varyingProperty, timerLocal, uniform, wgslFn, texture, uv, clamp, float, vec2, vec3, fract, floor, MeshBasicNodeMaterial, positionGeometry, sin } from 'three/nodes';
 
       import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -220,10 +219,6 @@
 		      let color = texture( planetTexture, samplePoint );
 
 		      const ind = floor( subCoord.x ).mod( 3 );
-
-		      const red = ind.equal( 0.0 );
-		      const green = ind.equal( 1.0 );
-		      const blue = ind.equal( 2.0 );
 
 		      let maskColor = vec3(
 			      ind.equal( 0.0 ),
