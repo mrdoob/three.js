@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 import { Config } from './Config.js';
-import { Loader } from './Loader.js';
+import { FileImporter } from './file/FileImporter.js';
 import { History as _History } from './History.js';
 import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
@@ -101,7 +101,7 @@ function Editor() {
 	this.storage = new _Storage();
 	this.strings = new Strings( this.config );
 
-	this.loader = new Loader( this );
+	this.fileImporter = new FileImporter( this );
 
 	this.camera = _DEFAULT_CAMERA.clone();
 

@@ -1,5 +1,5 @@
+import { FileImporter } from './file/FileImporter.js';
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
-import { Loader } from './Loader.js';
 
 function MenubarFile( editor ) {
 
@@ -112,10 +112,10 @@ function MenubarFile( editor ) {
 	const fileInput = document.createElement( 'input' );
 	fileInput.multiple = true;
 	fileInput.type = 'file';
-	fileInput.accept = Loader.getSupportedFileFormats().map( format => '.' + format ).join( ', ' );
-	fileInput.addEventListener( 'change', function () {
+	fileInput.accept = FileImporter.getAcceptedFileExts().join( ', ' );
+	fileInput.addEventListener( 'change', async function () {
 
-		editor.loader.loadFiles( fileInput.files );
+		await editor.fileImporter.import( fileInput.files );
 		form.reset();
 
 	} );

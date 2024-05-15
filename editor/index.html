@@ -181,7 +181,7 @@
 
 			} );
 
-			document.addEventListener( 'drop', function ( event ) {
+			document.addEventListener( 'drop', async function ( event ) {
 
 				event.preventDefault();
 
@@ -191,11 +191,12 @@
 
 					// DataTransferItemList supports folders
 
-					editor.loader.loadItemList( event.dataTransfer.items );
+					await editor.fileImporter.import( event.dataTransfer.items );
+			
 
 				} else {
 
-					editor.loader.loadFiles( event.dataTransfer.files );
+					await editor.fileImporter.import( event.dataTransfer.files );
 
 				}
 
