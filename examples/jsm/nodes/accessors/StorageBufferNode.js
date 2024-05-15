@@ -13,7 +13,7 @@ class StorageBufferNode extends BufferNode {
 
 		this.isStorageBufferNode = true;
 
-    this.writable = true;
+    this.readOnly = false;
 
 		this.bufferObject = false;
 
@@ -32,9 +32,10 @@ class StorageBufferNode extends BufferNode {
 	}
 
 	getInputType( /*builder*/ ) {
-
-		return 'storageBuffer';
-
+    if (this.readOnly) {
+      return 'storageReadOnlyBuffer';
+    } 
+    return 'storageBuffer'
 	}
 
 	element( indexNode ) {
@@ -51,8 +52,8 @@ class StorageBufferNode extends BufferNode {
 
 	}
 
-  setWritable(value) {
-    this.writable = value;
+  setReadOnly(value) {
+    this.readOnly = value;
     return this;
   }
 
@@ -83,7 +84,7 @@ class StorageBufferNode extends BufferNode {
 export default StorageBufferNode;
 
 export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
-export const storageImmutable = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setWritable( false ) )
+export const storageImmutable = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setReadOnly( true ) )
 export const storageObject = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setBufferObject( true ) );
 
 addNodeClass( 'StorageBufferNode', StorageBufferNode );

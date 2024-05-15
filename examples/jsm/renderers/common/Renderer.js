@@ -1000,6 +1000,7 @@ class Renderer {
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
+
 		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
 
 		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
