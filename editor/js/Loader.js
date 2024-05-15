@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import { TGALoader } from 'three/addons/loaders/TGALoader.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
-import { SetSceneCommand } from './commands/SetSceneCommand.js';
 
 import { LoaderUtils } from './LoaderUtils.js';
 
@@ -657,7 +656,7 @@ fileHandlers[ 'wrl' ] = function ( editor, manager, reader, file ) {
 
 		const result = new VRMLLoader().parse( contents );
 
-		editor.execute( new SetSceneCommand( editor, result ) );
+		editor.execute( new AddObjectCommand( editor, result ) );
 
 	}, false );
 	reader.readAsText( file );
@@ -758,15 +757,7 @@ function handleJSON( editor, texturePath, data ) {
 
 			loader.parse( data, function ( result ) {
 
-				if ( result.isScene ) {
-
-					editor.execute( new SetSceneCommand( editor, result ) );
-
-				} else {
-
-					editor.execute( new AddObjectCommand( editor, result ) );
-
-				}
+				editor.execute( new AddObjectCommand( editor, result ) );
 
 			} );
 
