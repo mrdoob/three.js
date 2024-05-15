@@ -33,6 +33,9 @@ const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 
 const shaderNodeHandler = {
 
 	setup( NodeClosure, params ) {
+    console.log('calling setup');
+    console.log(NodeClosure);
+    console.log(params);
 
 		const inputs = params.shift();
 

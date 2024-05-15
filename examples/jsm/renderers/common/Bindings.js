@@ -21,7 +21,6 @@ class Bindings extends DataMap {
 	getForRender( renderObject ) {
 
 		const bindings = renderObject.getBindings();
-
 		const data = this.get( renderObject );
 
 		if ( data.bindings !== bindings ) {

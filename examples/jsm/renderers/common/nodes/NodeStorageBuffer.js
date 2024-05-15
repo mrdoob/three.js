@@ -4,11 +4,14 @@ let _id = 0;
 
 class NodeStorageBuffer extends StorageBuffer {
 
-	constructor( nodeUniform ) {
-
-		super( 'StorageBuffer_' + _id ++, nodeUniform ? nodeUniform.value : null );
+	constructor( nodeUniform, readOnly) {
+    console.log(readOnly);
+    readOnly = readOnly ? readOnly : false;
+    const namePrefix = readOnly ? 'StorageReadOnlyBuffer_' : 'StorageBuffer_'
+		super( namePrefix + _id ++, nodeUniform ? nodeUniform.value : null );
 
 		this.nodeUniform = nodeUniform;
+    this.readOnly = readOnly;
 
 	}
 

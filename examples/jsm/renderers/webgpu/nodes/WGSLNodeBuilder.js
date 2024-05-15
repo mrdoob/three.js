@@ -320,7 +320,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				return name;
 
-			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
+			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'storageReadOnlyBuffer') {
 
 				return `NodeBuffer_${ node.id }.${name}`;
 
@@ -403,10 +403,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
+			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'storageReadOnlyBuffer') {
 
-				const bufferClass = type === 'storageBuffer' ? NodeStorageBuffer : NodeUniformBuffer;
-				const buffer = new bufferClass( node );
+				const bufferClass = type !== 'buffer' ? NodeStorageBuffer : NodeUniformBuffer;
+        const readOnly = type === 'storageReadOnlyBuffer';
+				const buffer = new bufferClass( node , readOnly);
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
@@ -636,6 +637,7 @@ ${ flowData.code }
 			snippet += this.getStructMembers( struct );
 			snippet += '\n}';
 
+
 			snippets.push( snippet );
 
 		}
@@ -787,17 +789,25 @@ ${ flowData.code }
 				bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name} : ${textureType};` );
 
 			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' ) {
+        console.log(`Uniform Type: ${uniform.type}`)
+        console.log(`Uniform Node:`);
+        console.log(uniform.node);
 
 				const bufferNode = uniform.node;
 				const bufferType = this.getType( bufferNode.bufferType );
+        console.log(bufferType);
 				const bufferCount = bufferNode.bufferCount;
 
 				const bufferCountSnippet = bufferCount > 0 ? ', ' + bufferCount : '';
 				const bufferSnippet = `\t${uniform.name} : array< ${bufferType}${bufferCountSnippet} >\n`;
-				const bufferAccessMode = bufferNode.isStorageBufferNode ? 'storage,read_write' : 'uniform';
+        console.log(`Buffer Snippet: ${bufferSnippet}`)
+				let bufferAccessMode = bufferNode.isStorageBufferNode ? 'storage,read' : 'uniform';
+        if (!bufferNode.readOnly) {
+          bufferAccessMode += '_write'
+        }
 
 				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, index ++ ) );
-
+        console.log(bufferSnippets);
 			} else {
 
 				const vectorType = this.getType( this.getVectorType( uniform.type ) );
@@ -909,17 +919,20 @@ ${ flowData.code }
 			}
 
 			stageData.flow = flow;
+      
 
 		}
 
 		if ( this.material !== null ) {
 
 			this.vertexShader = this._getWGSLVertexCode( shadersData.vertex );
+      console.log(this.vertexShader);
 			this.fragmentShader = this._getWGSLFragmentCode( shadersData.fragment );
 
 		} else {
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
+      console.log(this.computeShader);
 
 		}
 
