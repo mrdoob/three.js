@@ -103,7 +103,7 @@ function MenubarFile( editor ) {
 
 	// Save
 
-	const fileSaveProject = new UIRow()
+	option = new UIRow()
 		.addClass( 'option' )
 		.setTextContent( strings.getKey( 'menubar/file/save' ) )
 		.onClick( function () {
@@ -114,7 +114,7 @@ function MenubarFile( editor ) {
 
 		} );
 
-	options.add( fileSaveProject );
+	options.add( option );
 
 	// Open
 
