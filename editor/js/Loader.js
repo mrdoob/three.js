@@ -757,7 +757,7 @@ function handleJSON( editor, texturePath, data ) {
 
 			loader.parse( data, function ( result ) {
 
-					editor.execute( new AddObjectCommand( editor, result ) );
+				editor.execute( new AddObjectCommand( editor, result ) );
 
 			} );
 
