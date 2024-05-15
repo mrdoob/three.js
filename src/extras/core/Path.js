@@ -28,7 +28,7 @@ class Path extends CurvePath {
 
 		const point = points[ 0 ];
 
-		if ( point ) this.moveTo( points[ 0 ].x, points[ 0 ].y );
+		if ( point ) this.moveTo( point.x, point.y );
 
 		for ( let i = 1, l = points.length; i < l; i ++ ) {
 
