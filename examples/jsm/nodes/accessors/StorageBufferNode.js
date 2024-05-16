@@ -59,7 +59,12 @@ class StorageBufferNode extends BufferNode {
 
 	generate( builder ) {
 
-		if ( builder.isAvailable( 'storageBuffer' ) ) return super.generate( builder );
+		if ( 
+      builder.isAvailable( 'storageBuffer' ) && !this.readOnly ||
+      builder.isAvailable( 'storageReadOnlyBuffer' ) && this.readOnly
+    ) {
+      return super.generate( builder );
+    }
 
 		const nodeType = this.getNodeType( builder );
 
