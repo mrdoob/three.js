@@ -31,32 +31,31 @@
 			import WebGL from 'three/addons/capabilities/WebGL.js';
 
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-      import { tslFn, attribute, varyingProperty, timerLocal, uniform, wgslFn, texture, uv, clamp, float, vec2, vec3, fract, floor, MeshBasicNodeMaterial, positionGeometry, sin } from 'three/nodes';
+import { tslFn, attribute, varyingProperty, timerLocal, uniform, wgslFn, texture, uv, clamp, float, vec2, vec3, fract, floor, MeshBasicNodeMaterial, positionGeometry, sin } from 'three/nodes';
 
-      import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let renderer, camera, scene, canvas;
-      let crtWidthUniform, crtHeightUniform;
+			let renderer, camera, scene;
 			const dpr = window.devicePixelRatio;
 
-      crtWidthUniform = uniform( 1608 );
-      crtHeightUniform = uniform( 1608 );
+const crtWidthUniform = uniform( 1608 );
+const crtHeightUniform = uniform( 1608 );
 
-      canvas = document.getElementById( 'c' );
+const canvas = document.getElementById( 'c' );
 
-      function onWindowResize() {
+function onWindowResize() {
 
 	      camera.aspect = window.innerWidth / window.innerHeight;
 	      camera.updateProjectionMatrix();
 	      renderer.setSize( window.innerWidth, window.innerHeight );
 
-      }
+}
 
-      function animate() {
+function animate() {
 
 	      renderer.render( scene, camera );
 
-      }
+}
 
 			function init() {
 
@@ -205,8 +204,8 @@
 		      const subCoord = coord.mul( vec2( 3.0, 1.0 ) );
 
 		      const cellOffset = vec2(
-			      0.0,
-			      fract( floor( coord.x ).mul( cellOffsetUniform ) )
+						0.0,
+						fract( floor( coord.x ).mul( cellOffsetUniform ) )
 		      );
 
 		      const maskCoord = floor( coord.add( cellOffset ) ).mul( cellSizeUniform );
@@ -220,9 +219,9 @@
 		      const ind = floor( subCoord.x ).mod( 3 );
 
 		      let maskColor = vec3(
-			      ind.equal( 0.0 ),
-			      ind.equal( 1.0 ),
-			      ind.equal( 2.0 )
+						ind.equal( 0.0 ),
+						ind.equal( 1.0 ),
+						ind.equal( 2.0 )
 		      ).mul( 3.0 );
 
 		      const subCoordOffset = fract( subCoord.add( cellOffset ) );
@@ -230,7 +229,7 @@
 		      cellUV = cellUV.sub( 1.0 );
 
 		      const border = float( 1.0 ).sub(
-			      cellUV.mul( cellUV ).mul( borderMaskUniform )
+						cellUV.mul( cellUV ).mul( borderMaskUniform )
 		      );
 
 		      const clampX = clamp( border.x, 0.0, 1.0 );
@@ -285,7 +284,7 @@
 
 			}
 
-      init();
+init();
 
 		</script>
 	</body>
