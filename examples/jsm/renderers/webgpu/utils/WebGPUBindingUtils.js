@@ -234,21 +234,11 @@ class WebGPUBindingUtils {
 
 					if ( textureData.texture === undefined ) {
 
-						const currentRenderTarget = backend.renderer.getRenderTarget();
+						backend.createTexture( binding.texture );
 
-						if ( binding.texture.isRenderTargetTexture && currentRenderTarget !== null ) {
+						textureData = backend.get( binding.texture );
 
-							backend.renderer._textures.updateRenderTarget( currentRenderTarget, backend.renderer._activeMipmapLevel );
-
-							textureData = backend.get( binding.texture );
-
-						} else {
-
-							backend.createTexture( binding.texture );
-
-							textureData = backend.get( binding.texture );
-
-						}
+						console.warn( 'WebGPUBindingUtils: Texture is not initialized.', binding.texture );
 
 					}
 
