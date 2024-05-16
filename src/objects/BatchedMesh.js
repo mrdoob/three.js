@@ -5,6 +5,7 @@ import { FloatType } from '../constants.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Mesh } from './Mesh.js';
 import { RGBAFormat } from '../constants.js';
+import { ColorManagement } from '../math/ColorManagement.js';
 import { Box3 } from '../math/Box3.js';
 import { Sphere } from '../math/Sphere.js';
 import { Frustum } from '../math/Frustum.js';
@@ -192,6 +193,7 @@ class BatchedMesh extends Mesh {
 
 		const colorsArray = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
 		const colorsTexture = new DataTexture( colorsArray, size, size, RGBAFormat, FloatType );
+		colorsTexture.colorSpace = ColorManagement.workingColorSpace;
 
 		this._colorsTexture = colorsTexture;
 
