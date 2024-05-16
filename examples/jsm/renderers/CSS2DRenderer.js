@@ -96,7 +96,6 @@ class CSS2DRenderer {
 			_viewMatrix.copy( camera.matrixWorldInverse );
 			_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-			hideObject( scene );
 			renderObject( scene, scene, camera );
 			zOrder( scene );
 
@@ -129,8 +128,14 @@ class CSS2DRenderer {
 
 		function renderObject( object, scene, camera ) {
 
-			if ( object.visible === false ) return;
+			if ( object.visible === false ) {
 
+				hideObject( object );
+
+				return;
+
+			}
+			
 			if ( object.isCSS2DObject ) {
 
 				_vector.setFromMatrixPosition( object.matrixWorld );
@@ -138,13 +143,12 @@ class CSS2DRenderer {
 
 				const visible = ( _vector.z >= - 1 && _vector.z <= 1 ) && ( object.layers.test( camera.layers ) === true );
 
+				const element = object.element;
+				element.style.display = visible === true ? '' : 'none';
+
 				if ( visible === true ) {
 
 					object.onBeforeRender( _this, scene, camera );
-
-					const element = object.element;
-
-					element.style.display = '';
 
 					element.style.transform = 'translate(' + ( - 100 * object.center.x ) + '%,' + ( - 100 * object.center.y ) + '%)' + 'translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
 
