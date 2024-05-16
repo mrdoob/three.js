@@ -206,7 +206,7 @@ class WebGPUBindingUtils {
 
 			} else if ( binding.isSampledTexture ) {
 
-				let textureData = backend.get( binding.texture );
+				const textureData = backend.get( binding.texture );
 
 				let dimensionViewGPU;
 
@@ -230,25 +230,22 @@ class WebGPUBindingUtils {
 
 					resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
 
-				} else {
+					entriesGPU.push( { binding: bindingPoint, resource: resourceGPU } );
 
-					if ( textureData.texture === undefined ) {
-
-						backend.createTexture( binding.texture );
-
-						textureData = backend.get( binding.texture );
-
-						console.warn( 'WebGPUBindingUtils: Texture is not initialized.', binding.texture );
-
-					}
+				} else if ( textureData.texture !== undefined ) {
 
 					const aspectGPU = GPUTextureAspect.All;
 
 					resourceGPU = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount: binding.store ? 1 : textureData.mipLevelCount } );
 
+					entriesGPU.push( { binding: bindingPoint, resource: resourceGPU } );
+
+				} else {
+
+					console.error( 'WebGPUBindingUtils: Texture bound is undefined', binding );
+
 				}
 
-				entriesGPU.push( { binding: bindingPoint, resource: resourceGPU } );
 
 			}
 
