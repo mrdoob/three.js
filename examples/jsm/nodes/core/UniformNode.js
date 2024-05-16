@@ -62,8 +62,6 @@ class UniformNode extends InputNode {
 		const hash = this.getUniformHash( builder );
 
 		let sharedNode = builder.getNodeFromHash( hash );
-    
-    console.log(sharedNode)
 
 		if ( sharedNode === undefined ) {
 
@@ -74,7 +72,6 @@ class UniformNode extends InputNode {
 		}
 
 		const sharedNodeType = sharedNode.getInputType( builder );
-    console.log(sharedNodeType)
 
 		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, builder.context.label );
 		const propertyName = builder.getPropertyName( nodeUniform );
