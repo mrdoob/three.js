@@ -727,6 +727,7 @@ ${ flowData.code }
 	getUniforms( shaderStage ) {
 
 		const uniforms = this.uniforms[ shaderStage ];
+    console.log(uniforms);
 
 		const bindingSnippets = [];
 		const bufferSnippets = [];
@@ -789,7 +790,7 @@ ${ flowData.code }
 
 				bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name} : ${textureType};` );
 
-			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' ) {
+			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' || uniform.type === 'storageReadOnlyBuffer') {
 
 				const bufferNode = uniform.node;
 				const bufferType = this.getType( bufferNode.bufferType );
@@ -822,6 +823,7 @@ ${ flowData.code }
 		for ( const name in uniformGroups ) {
 
 			const group = uniformGroups[ name ];
+      console.log(group)
 
 			structSnippets.push( this._getWGSLStructBinding( name, group.snippets.join( ',\n' ), 'uniform', group.index ) );
 

@@ -12,7 +12,6 @@ class WebGPUBindingUtils {
 	}
 
 	createBindingsLayout( bindings ) {
-    console.log(bindings);
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -33,7 +32,6 @@ class WebGPUBindingUtils {
 				const buffer = {}; // GPUBufferBindingLayout
 
 				if ( binding.isStorageBuffer ) {
-          console.log(binding)
 
 					buffer.type = binding.readOnly ? GPUBufferBindingType.ReadOnlyStorage : GPUBufferBindingType.Storage;
 
