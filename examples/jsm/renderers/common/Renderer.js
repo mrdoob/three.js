@@ -212,7 +212,6 @@ class Renderer {
 
 		const renderTarget = this._renderTarget;
 		const renderContext = this._renderContexts.get( targetScene, camera, renderTarget );
-		const activeMipmapLevel = this._activeMipmapLevel;
 
 		const compilationPromises = [];
 
@@ -268,8 +267,6 @@ class Renderer {
 		//
 
 		if ( renderTarget !== null ) {
-
-			this._textures.updateRenderTarget( renderTarget, activeMipmapLevel );
 
 			const renderTargetData = this._textures.get( renderTarget );
 
@@ -519,7 +516,6 @@ class Renderer {
 
 		if ( renderTarget !== null ) {
 
-			this._textures.updateRenderTarget( renderTarget, activeMipmapLevel );
 
 			const renderTargetData = this._textures.get( renderTarget );
 
@@ -957,6 +953,12 @@ class Renderer {
 		this._renderTarget = renderTarget;
 		this._activeCubeFace = activeCubeFace;
 		this._activeMipmapLevel = activeMipmapLevel;
+
+		if ( renderTarget !== null ) {
+
+			this._textures.updateRenderTarget( renderTarget, activeMipmapLevel );
+
+		}
 
 	}
 
