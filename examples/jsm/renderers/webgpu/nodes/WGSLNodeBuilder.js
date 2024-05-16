@@ -26,7 +26,7 @@ const gpuShaderStageLib = {
 const supports = {
 	instance: true,
 	storageBuffer: true,
-  storageReadOnlyBuffer: true,
+	storageReadOnlyBuffer: true,
 };
 
 const wgslFnOpLib = {
@@ -321,7 +321,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				return name;
 
-			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'storageReadOnlyBuffer') {
+			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'storageReadOnlyBuffer' ) {
 
 				return `NodeBuffer_${ node.id }.${name}`;
 
@@ -404,11 +404,11 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'storageReadOnlyBuffer') {
+			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'storageReadOnlyBuffer' ) {
 
 				const bufferClass = type !== 'buffer' ? NodeStorageBuffer : NodeUniformBuffer;
-        const readOnly = type === 'storageReadOnlyBuffer';
-				const buffer = new bufferClass( node , readOnly);
+				const readOnly = type === 'storageReadOnlyBuffer';
+				const buffer = new bufferClass( node, readOnly );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
@@ -727,7 +727,7 @@ ${ flowData.code }
 	getUniforms( shaderStage ) {
 
 		const uniforms = this.uniforms[ shaderStage ];
-    console.log(uniforms);
+		console.log( uniforms );
 
 		const bindingSnippets = [];
 		const bufferSnippets = [];
@@ -790,7 +790,7 @@ ${ flowData.code }
 
 				bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name} : ${textureType};` );
 
-			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' || uniform.type === 'storageReadOnlyBuffer') {
+			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' || uniform.type === 'storageReadOnlyBuffer' ) {
 
 				const bufferNode = uniform.node;
 				const bufferType = this.getType( bufferNode.bufferType );
@@ -799,11 +799,14 @@ ${ flowData.code }
 				const bufferCountSnippet = bufferCount > 0 ? ', ' + bufferCount : '';
 				const bufferSnippet = `\t${uniform.name} : array< ${bufferType}${bufferCountSnippet} >\n`;
 				let bufferAccessMode = bufferNode.isStorageBufferNode ? 'storage,read' : 'uniform';
-        if (!bufferNode.readOnly) {
-          bufferAccessMode += '_write'
-        }
+				if ( ! bufferNode.readOnly ) {
+
+					bufferAccessMode += '_write';
+
+				}
 
 				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, index ++ ) );
+
 			} else {
 
 				const vectorType = this.getType( this.getVectorType( uniform.type ) );
@@ -823,7 +826,7 @@ ${ flowData.code }
 		for ( const name in uniformGroups ) {
 
 			const group = uniformGroups[ name ];
-      console.log(group)
+			console.log( group );
 
 			structSnippets.push( this._getWGSLStructBinding( name, group.snippets.join( ',\n' ), 'uniform', group.index ) );
 
@@ -916,7 +919,7 @@ ${ flowData.code }
 			}
 
 			stageData.flow = flow;
-      
+
 
 		}
 
@@ -928,7 +931,7 @@ ${ flowData.code }
 		} else {
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
-      console.log(this.computeShader);
+			console.log( this.computeShader );
 
 		}
 
