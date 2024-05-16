@@ -198,13 +198,24 @@ class History {
 
 		if ( json === undefined ) return;
 
+		function createCommand( editor, json ) {
+
+			const cmd = Object.create( Commands[ json.type ].prototype );
+			cmd.editor = editor;
+			cmd.type = json.type;
+			cmd.fromJSON( json );
+			cmd.json = json;
+			cmd.id = json.id;
+			cmd.name = json.name;
+
+			return cmd;
+
+		}
+
 		for ( let i = 0; i < json.undos.length; i ++ ) {
 
 			const cmdJSON = json.undos[ i ];
-			const cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
-			cmd.json = cmdJSON;
-			cmd.id = cmdJSON.id;
-			cmd.name = cmdJSON.name;
+			const cmd = createCommand( this.editor, cmdJSON );
 			this.undos.push( cmd );
 			this.idCounter = ( cmdJSON.id > this.idCounter ) ? cmdJSON.id : this.idCounter; // set last used idCounter
 
@@ -213,10 +224,7 @@ class History {
 		for ( let i = 0; i < json.redos.length; i ++ ) {
 
 			const cmdJSON = json.redos[ i ];
-			const cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
-			cmd.json = cmdJSON;
-			cmd.id = cmdJSON.id;
-			cmd.name = cmdJSON.name;
+			const cmd = createCommand( this.editor, cmdJSON );
 			this.redos.push( cmd );
 			this.idCounter = ( cmdJSON.id > this.idCounter ) ? cmdJSON.id : this.idCounter; // set last used idCounter
 
