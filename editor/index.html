@@ -203,8 +203,39 @@
 
 			//
 
-			const language = editor.config.getKey( 'language' );
-			editor.config.setKey( 'sidebar/minWidth', editor.config.getSidebarMinWidth( language ) );
+			function getTabbedPanelWidth( tabbedPanel ) {
+
+				const oldTabbedPanelHiddenState = tabbedPanel.isHidden();
+				tabbedPanel.setHidden( false );
+
+				let sumWidth = 0;
+
+				for ( let i = 0; i < tabbedPanel.tabs.length; i ++ ) {
+
+					const tab = tabbedPanel.tabs[ i ];
+
+					const oldHiddenState = tab.isHidden();
+
+					tab.setHidden( false );
+
+					sumWidth += tab.dom.offsetWidth;
+
+					tab.setHidden( oldHiddenState );
+
+				}
+
+				tabbedPanel.setHidden( oldTabbedPanelHiddenState );
+
+				return sumWidth;
+
+			}
+
+			const scrollbarWidth = 22; // no specs, just guess
+			const sidebarTabbedPanelWidth = getTabbedPanelWidth( sidebar ) + scrollbarWidth;
+			const sidebarPropertiesTabbedPanelWidth = getTabbedPanelWidth( sidebar.sidebarProperties ) + scrollbarWidth;
+			const sidebarMinWidth = Math.max( 335, sidebarTabbedPanelWidth, sidebarPropertiesTabbedPanelWidth );
+
+			editor.config.setKey( 'sidebar/minWidth', sidebarMinWidth );
 
 			window.addEventListener( 'resize', onWindowResize );
 			window.dispatchEvent( new Event( 'resize' ) );

@@ -5,19 +5,6 @@ function Config() {
 	const userLanguage = navigator.language.split( '-' )[ 0 ];
 	const suggestedLanguage = [ 'fr', 'ja', 'zh' ].includes( userLanguage ) ? userLanguage : 'en';
 
-	function getSidebarMinWidth( language = suggestedLanguage ) {
-
-		return { // >= #sidebar min-width (335px)
-
-			'en': 350,
-			'fr': 355,
-			'ja': 395,
-			'zh': 335
-
-		}[ language ];
-
-	}
-
 	//
 
 	const storage = {
@@ -44,8 +31,8 @@ function Config() {
 		'settings/shortcuts/undo': 'z',
 		'settings/shortcuts/focus': 'f',
 
-		'sidebar/width': getSidebarMinWidth( suggestedLanguage ),
-		'sidebar/minWidth': getSidebarMinWidth( suggestedLanguage )
+		'sidebar/width': 335,
+		'sidebar/minWidth': 335
 
 	};
 
@@ -92,10 +79,6 @@ function Config() {
 			delete window.localStorage[ name ];
 
 		},
-
-		//
-
-		getSidebarMinWidth: getSidebarMinWidth
 
 	};
 
