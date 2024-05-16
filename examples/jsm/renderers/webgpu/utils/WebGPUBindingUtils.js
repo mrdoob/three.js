@@ -206,7 +206,7 @@ class WebGPUBindingUtils {
 
 			} else if ( binding.isSampledTexture ) {
 
-				const textureData = backend.get( binding.texture );
+				let textureData = backend.get( binding.texture );
 
 				let dimensionViewGPU;
 
@@ -231,6 +231,26 @@ class WebGPUBindingUtils {
 					resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
 
 				} else {
+
+					if ( textureData.texture === undefined ) {
+
+						const currentRenderTarget = backend.renderer.getRenderTarget();
+
+						if ( binding.texture.isRenderTargetTexture && currentRenderTarget !== null ) {
+
+							backend.renderer._textures.updateRenderTarget( currentRenderTarget, backend.renderer._activeMipmapLevel );
+
+							textureData = backend.get( binding.texture );
+
+						} else {
+
+							backend.createTexture( binding.texture );
+
+							textureData = backend.get( binding.texture );
+
+						}
+
+					}
 
 					const aspectGPU = GPUTextureAspect.All;
 
