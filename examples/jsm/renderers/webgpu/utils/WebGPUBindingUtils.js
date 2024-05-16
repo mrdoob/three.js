@@ -246,17 +246,16 @@ class WebGPUBindingUtils {
 
 					resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
 
-					entriesGPU.push( { binding: bindingPoint, resource: resourceGPU } );
-
 				} else {
 
 					const aspectGPU = GPUTextureAspect.All;
 
 					resourceGPU = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount: binding.store ? 1 : textureData.mipLevelCount } );
 
-					entriesGPU.push( { binding: bindingPoint, resource: resourceGPU } );
-
 				}
+
+				entriesGPU.push( { binding: bindingPoint, resource: resourceGPU } );
+
 
 			}
 
