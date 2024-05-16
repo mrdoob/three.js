@@ -948,7 +948,23 @@ class Renderer {
 
 	}
 
+	async setRenderTargetAsync( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0 ) {
+
+		if ( this._initialized === false ) await this.init();
+
+		this.setRenderTarget( renderTarget, activeCubeFace, activeMipmapLevel );
+
+	}
+
 	setRenderTarget( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0 ) {
+
+		if ( this._initialized === false ) {
+
+			console.warn( 'THREE.Renderer: .setRenderTarget() called before the backend is initialized. Try using .setRenderTargetAsync() instead.' );
+
+			return this.setRenderTargetAsync( renderTarget, activeCubeFace, activeMipmapLevel );
+
+		}
 
 		this._renderTarget = renderTarget;
 		this._activeCubeFace = activeCubeFace;
