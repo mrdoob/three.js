@@ -192,7 +192,6 @@ function MenubarFile( editor ) {
 	const fileInput = document.createElement( 'input' );
 	fileInput.multiple = true;
 	fileInput.type = 'file';
-	fileInput.accept = Loader.getSupportedFileFormats().map( format => '.' + format ).join( ', ' );
 	fileInput.addEventListener( 'change', function () {
 
 		editor.loader.loadFiles( fileInput.files );
