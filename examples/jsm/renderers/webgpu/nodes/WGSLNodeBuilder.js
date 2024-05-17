@@ -727,7 +727,6 @@ ${ flowData.code }
 	getUniforms( shaderStage ) {
 
 		const uniforms = this.uniforms[ shaderStage ];
-		console.log( uniforms );
 
 		const bindingSnippets = [];
 		const bufferSnippets = [];
@@ -826,7 +825,6 @@ ${ flowData.code }
 		for ( const name in uniformGroups ) {
 
 			const group = uniformGroups[ name ];
-			console.log( group );
 
 			structSnippets.push( this._getWGSLStructBinding( name, group.snippets.join( ',\n' ), 'uniform', group.index ) );
 
@@ -931,7 +929,6 @@ ${ flowData.code }
 		} else {
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
-			console.log( this.computeShader );
 
 		}
 
