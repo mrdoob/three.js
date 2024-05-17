@@ -596,7 +596,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	deleteItem( id ) {
+	deleteInstance( id ) {
 
 		// Note: User needs to call optimize() afterward to pack the data.
 
