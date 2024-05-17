@@ -10,7 +10,7 @@ import { Vector3 } from 'three';
  */
 class SetPositionCommand extends Command {
 
-	constructor( editor, object, newPosition, optionalOldPosition ) {
+	constructor( editor, object = null, newPosition = null, optionalOldPosition = null ) {
 
 		super( editor );
 
@@ -20,14 +20,14 @@ class SetPositionCommand extends Command {
 
 		this.object = object;
 
-		if ( object !== undefined && newPosition !== undefined ) {
+		if ( object !== null && newPosition !== null ) {
 
 			this.oldPosition = object.position.clone();
 			this.newPosition = newPosition.clone();
 
 		}
 
-		if ( optionalOldPosition !== undefined ) {
+		if ( optionalOldPosition !== null ) {
 
 			this.oldPosition = optionalOldPosition.clone();
 

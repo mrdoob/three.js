@@ -10,7 +10,7 @@ import { Command } from '../Command.js';
  */
 class SetScriptValueCommand extends Command {
 
-	constructor( editor, object, script, attributeName, newValue ) {
+	constructor( editor, object = null, script = '', attributeName = '', newValue = null ) {
 
 		super( editor );
 
@@ -22,7 +22,7 @@ class SetScriptValueCommand extends Command {
 		this.script = script;
 
 		this.attributeName = attributeName;
-		this.oldValue = ( script !== undefined ) ? script[ this.attributeName ] : undefined;
+		this.oldValue = ( script !== '' ) ? script[ this.attributeName ] : null;
 		this.newValue = newValue;
 
 	}
