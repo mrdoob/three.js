@@ -4,9 +4,11 @@ import { nodeObject } from '../shadernode/ShaderNode.js';
 
 class AttributeNode extends Node {
 
-	constructor( attributeName, nodeType = null ) {
+	constructor( attributeName, nodeType = null, defaultNode = null ) {
 
 		super( nodeType );
+
+		this.defaultNode = defaultNode;
 
 		this._attributeName = attributeName;
 
@@ -93,7 +95,17 @@ class AttributeNode extends Node {
 
 			console.warn( `AttributeNode: Vertex attribute "${ attributeName }" not found on geometry.` );
 
-			return builder.generateConst( nodeType );
+			const { defaultNode } = this;
+
+			if ( defaultNode !== null ) {
+
+				return defaultNode.build( builder, nodeType );
+
+			} else {
+
+				return builder.generateConst( nodeType );
+
+			}
 
 		}
 
