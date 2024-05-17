@@ -46,12 +46,6 @@
 				'morph_test'
 			];
 
-			const transforms = {
-				'morph_test': {
-					scale: 0.5,
-					positionY: 70
-				}
-			};
 
 			init();
 
@@ -145,22 +139,6 @@
 					//
 
 					object = group;
-
-					if ( transforms[ asset ] ) {
-
-						if ( transforms[ asset ].scale ) {
-
-							object.scale.x = object.scale.y = object.scale.z = transforms[ asset ].scale;
-			
-						}
-
-						if ( transforms[ asset ].positionY ) {
-
-							object.position.y = transforms[ asset ].positionY;
-
-						}
-			
-					}
 
 					if ( object.animations && object.animations.length ) {
 
