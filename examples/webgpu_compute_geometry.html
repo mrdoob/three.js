@@ -72,8 +72,8 @@
 
 					const computeFn = tslFn( () => {
 
-						const positionAttribute = storage( positionBaseAttribute, 'vec3', positionBaseAttribute.count );
-						const normalAttribute = storage( normalBaseAttribute, 'vec3', normalBaseAttribute.count );
+						const positionAttribute = storageImmutable( positionBaseAttribute, 'vec3', positionBaseAttribute.count );
+						const normalAttribute = storageImmutable( normalBaseAttribute, 'vec3', normalBaseAttribute.count );
 
 						const positionStorageAttribute = storage( positionStorageBufferAttribute, 'vec4', positionStorageBufferAttribute.count );
 						const normalStorageAttribute = storage( normalStorageBufferAttribute, 'vec4', normalStorageBufferAttribute.count );
