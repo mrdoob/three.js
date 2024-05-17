@@ -22,7 +22,7 @@ function ViewportPathtracer( renderer ) {
 		if ( pathTracer === null ) return;
 
 		// path tracer size automatically updates based on the canvas
-		pathTracer.reset();
+		pathTracer.updateCamera();
 
 	}
 
