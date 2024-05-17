@@ -1716,6 +1716,7 @@ class WebGLRenderer {
 
 			materialProperties.outputColorSpace = parameters.outputColorSpace;
 			materialProperties.batching = parameters.batching;
+			materialProperties.batchingColor = parameters.batchingColor;
 			materialProperties.instancing = parameters.instancing;
 			materialProperties.instancingColor = parameters.instancingColor;
 			materialProperties.instancingMorph = parameters.instancingMorph;
@@ -1802,6 +1803,14 @@ class WebGLRenderer {
 					needsProgramChange = true;
 
 				} else if ( ! object.isBatchedMesh && materialProperties.batching === true ) {
+
+					needsProgramChange = true;
+
+				} else if ( object.isBatchedMesh && materialProperties.batchingColor === true && object.colorTexture === null ) {
+
+					needsProgramChange = true;
+
+				} else if ( object.isBatchedMesh && materialProperties.batchingColor === false && object.colorTexture !== null ) {
 
 					needsProgramChange = true;
 
@@ -1996,6 +2005,13 @@ class WebGLRenderer {
 
 				p_uniforms.setOptional( _gl, object, 'batchingTexture' );
 				p_uniforms.setValue( _gl, 'batchingTexture', object._matricesTexture, textures );
+
+				p_uniforms.setOptional( _gl, object, 'batchingColorTexture' );
+				if ( object._colorsTexture !== null ) {
+
+					p_uniforms.setValue( _gl, 'batchingColorTexture', object._colorsTexture, textures );
+
+				}
 
 			}
 

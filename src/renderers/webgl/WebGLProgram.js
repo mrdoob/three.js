@@ -522,6 +522,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.extensionClipCullDistance ? '#define USE_CLIP_DISTANCE' : '',
 			parameters.batching ? '#define USE_BATCHING' : '',
+			parameters.batchingColor ? '#define USE_BATCHING_COLOR' : '',
 			parameters.instancing ? '#define USE_INSTANCING' : '',
 			parameters.instancingColor ? '#define USE_INSTANCING_COLOR' : '',
 			parameters.instancingMorph ? '#define USE_INSTANCING_MORPH' : '',
@@ -773,7 +774,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.thicknessMap ? '#define USE_THICKNESSMAP' : '',
 
 			parameters.vertexTangents && parameters.flatShading === false ? '#define USE_TANGENT' : '',
-			parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '',
+			parameters.vertexColors || parameters.instancingColor || parameters.batchingColor ? '#define USE_COLOR' : '',
 			parameters.vertexAlphas ? '#define USE_COLOR_ALPHA' : '',
 			parameters.vertexUv1s ? '#define USE_UV1' : '',
 			parameters.vertexUv2s ? '#define USE_UV2' : '',
