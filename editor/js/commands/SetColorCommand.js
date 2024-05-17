@@ -9,7 +9,7 @@ import { Command } from '../Command.js';
  */
 class SetColorCommand extends Command {
 
-	constructor( editor, object, attributeName, newValue ) {
+	constructor( editor, object = null, attributeName = '', newValue = null ) {
 
 		super( editor );
 
@@ -19,7 +19,7 @@ class SetColorCommand extends Command {
 
 		this.object = object;
 		this.attributeName = attributeName;
-		this.oldValue = ( object !== undefined ) ? this.object[ this.attributeName ].getHex() : undefined;
+		this.oldValue = ( object !== null ) ? this.object[ this.attributeName ].getHex() : null;
 		this.newValue = newValue;
 
 	}
