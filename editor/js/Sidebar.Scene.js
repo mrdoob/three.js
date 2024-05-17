@@ -522,13 +522,13 @@ function SidebarScene( editor ) {
 
 	signals.scriptAdded.add( function () {
 
-		signals.objectChanged.dispatch( editor.selected );
+		if ( editor.selected !== null ) signals.objectChanged.dispatch( editor.selected );
 
 	} );
 
 	signals.scriptRemoved.add( function () {
 
-		signals.objectChanged.dispatch( editor.selected );
+		if ( editor.selected !== null ) signals.objectChanged.dispatch( editor.selected );
 
 	} );
 
