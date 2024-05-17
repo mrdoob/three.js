@@ -9,5 +9,5 @@ export const bitangentGeometry = varying( getBitangent( normalGeometry.cross( ta
 export const bitangentLocal = varying( getBitangent( normalLocal.cross( tangentLocal ) ) ).normalize();
 export const bitangentView = varying( getBitangent( normalView.cross( tangentView ) ) ).normalize();
 export const bitangentWorld = varying( getBitangent( normalWorld.cross( tangentWorld ) ) ).normalize();
-export const transformedBitangentView = transformedNormalView.cross( transformedTangentView ).mul( tangentGeometry.w ).normalize();
+export const transformedBitangentView = getBitangent( transformedNormalView.cross( transformedTangentView ) ).normalize();
 export const transformedBitangentWorld = transformedBitangentView.transformDirection( cameraViewMatrix ).normalize();
