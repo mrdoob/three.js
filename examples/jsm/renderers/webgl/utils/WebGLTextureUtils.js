@@ -83,6 +83,10 @@ class WebGLTextureUtils {
 
 			glTextureType = gl.TEXTURE_2D_ARRAY;
 
+		} else if ( texture.isData3DTexture === true ) {
+
+			glTextureType = gl.TEXTURE_3D;
+
 		} else {
 
 			glTextureType = gl.TEXTURE_2D;
@@ -286,6 +290,10 @@ class WebGLTextureUtils {
 
 			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
 
+		} else if ( texture.isData3DTexture ) {
+
+			gl.texStorage3D( gl.TEXTURE_3D, levels, glInternalFormat, width, height, depth );
+
 		} else if ( ! texture.isVideoTexture ) {
 
 			gl.texStorage2D( glTextureType, levels, glInternalFormat, width, height );
@@ -428,6 +436,12 @@ class WebGLTextureUtils {
 			const image = options.image;
 
 			gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
+
+		} else if ( texture.isData3DTexture ) {
+
+			const image = options.image;
+
+			gl.texSubImage3D( gl.TEXTURE_3D, 0, 0, 0, 0, image.width, image.height, image.depth, glFormat, glType, image.data );
 
 		} else if ( texture.isVideoTexture ) {
 

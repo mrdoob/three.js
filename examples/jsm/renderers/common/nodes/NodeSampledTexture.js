@@ -46,4 +46,16 @@ class NodeSampledCubeTexture extends NodeSampledTexture {
 
 }
 
-export { NodeSampledTexture, NodeSampledCubeTexture };
+class NodeSampledTexture3D extends NodeSampledTexture {
+
+	constructor( name, textureNode ) {
+
+		super( name, textureNode );
+
+		this.isSampledTexture3D = true;
+
+	}
+
+}
+
+export { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D };

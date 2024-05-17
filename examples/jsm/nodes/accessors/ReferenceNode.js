@@ -90,6 +90,12 @@ class ReferenceNode extends Node {
 
 	getNodeType( builder ) {
 
+		if ( this.node === null ) {
+
+			return this.uniformType;
+
+		}
+
 		return this.node.getNodeType( builder );
 
 	}
