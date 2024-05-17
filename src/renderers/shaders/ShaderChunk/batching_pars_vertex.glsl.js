@@ -2,6 +2,7 @@ export default /* glsl */`
 #ifdef USE_BATCHING
 	attribute float batchId;
 	uniform highp sampler2D batchingTexture;
+	uniform highp usampler2D batchingIdTexture;
 	mat4 getBatchingMatrix( const in float i ) {
 
 		int size = textureSize( batchingTexture, 0 ).x;
@@ -15,6 +16,16 @@ export default /* glsl */`
 		return mat4( v1, v2, v3, v4 );
 
 	}
+
+	float getIndirectIndex( const in int i ) {
+
+		int size = textureSize( batchingIdTexture, 0 ).x;
+		int x = i % size;
+		int y = i / size;
+		return float( texelFetch( batchingIdTexture, ivec2( x, y ), 0 ).r );
+
+	}
+
 #endif
 
 #ifdef USE_BATCHING_COLOR
