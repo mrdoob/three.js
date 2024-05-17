@@ -179,8 +179,8 @@
 		function initBatchedMesh() {
 
 			const geometryCount = api.count;
-			const vertexCount = api.count * 512;
-			const indexCount = api.count * 1024;
+			const vertexCount = geometries.length * 512;
+			const indexCount = geometries.length * 1024;
 
 			const euler = new THREE.Euler();
 			const matrix = new THREE.Matrix4();
@@ -194,7 +194,17 @@
 
 			for ( let i = 0; i < api.count; i ++ ) {
 
-				const id = mesh.addGeometry( geometries[ i % geometries.length ] );
+				let id;
+				if ( i < geometries.length ) {
+
+					id = mesh.addGeometry( geometries[ i % geometries.length ] );
+
+				} else {
+
+					id = mesh.addInstance( i % geometries.length );
+
+				}
+
 				mesh.setMatrixAt( id, randomizeMatrix( matrix ) );
 
 				const rotationMatrix = new THREE.Matrix4();

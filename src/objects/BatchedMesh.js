@@ -1085,10 +1085,6 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCount = count;
 		this._visibilityChanged = false;
 
-        material.extensions = {
-            multiDraw: true,
-        };
-
 	}
 
 	onBeforeShadow( renderer, object, camera, shadowCamera, geometry, depthMaterial/* , group */ ) {

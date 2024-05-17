@@ -146,7 +146,7 @@ function generateVertexExtensions( parameters ) {
 
 	const chunks = [
 		parameters.extensionClipCullDistance ? '#extension GL_ANGLE_clip_cull_distance : require' : '',
-		parameters.extensionMultiDraw || parameters.batching ? '#extension GL_ANGLE_multi_draw : require' : '',
+		parameters.extensionMultiDraw ? '#extension GL_ANGLE_multi_draw : require' : '',
 	];
 
 	return chunks.filter( filterEmptyLine ).join( '\n' );
