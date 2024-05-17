@@ -429,6 +429,26 @@ function Script( editor ) {
 
 	} );
 
+	signals.objectChanged.add( function ( object ) {
+
+		if ( editor.scripts[ object.uuid ].includes( currentScript ) ) {
+
+			signals.editScript.dispatch( currentObject, currentScript );
+
+		}
+
+	} );
+
+	signals.scriptChanged.add( function ( script ) {
+
+		if ( script === currentScript ) {
+
+			signals.editScript.dispatch( currentObject, currentScript );
+
+		}
+
+	} );
+
 	return container;
 
 }
