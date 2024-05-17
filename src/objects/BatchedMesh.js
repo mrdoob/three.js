@@ -5,6 +5,7 @@ import { FloatType, RedIntegerFormat, UnsignedIntType } from '../constants.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Mesh } from './Mesh.js';
 import { RGBAFormat } from '../constants.js';
+import { ColorManagement } from '../math/ColorManagement.js';
 import { Box3 } from '../math/Box3.js';
 import { Sphere } from '../math/Sphere.js';
 import { Frustum } from '../math/Frustum.js';
@@ -160,6 +161,7 @@ class BatchedMesh extends Mesh {
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
 		this._indirectTexture = null;
+		this._colorsTexture = null;
 
 		this._initMatricesTexture();
 		this._initIndirectTexture();
@@ -195,6 +197,19 @@ class BatchedMesh extends Mesh {
 		const indirectTexture = new DataTexture( indirectArray, size, size, RedIntegerFormat, UnsignedIntType );
 
 		this._indirectTexture = indirectTexture;
+
+	}
+
+	_initColorsTexture() {
+
+		let size = Math.sqrt( this._maxGeometryCount );
+		size = Math.ceil( size );
+
+		const colorsArray = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
+		const colorsTexture = new DataTexture( colorsArray, size, size, RGBAFormat, FloatType );
+		colorsTexture.colorSpace = ColorManagement.workingColorSpace;
+
+		this._colorsTexture = colorsTexture;
 
 	}
 
@@ -729,6 +744,49 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	setColorAt( geometryId, color ) {
+
+		if ( this._colorsTexture === null ) {
+
+			this._initColorsTexture();
+
+		}
+
+		// @TODO: Map geometryId to index of the arrays because
+		//        optimize() can make geometryId mismatch the index
+
+		const active = this._active;
+		const colorsTexture = this._colorsTexture;
+		const colorsArray = this._colorsTexture.image.data;
+		const geometryCount = this._geometryCount;
+		if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
+
+			return this;
+
+		}
+
+		color.toArray( colorsArray, geometryId * 4 );
+		colorsTexture.needsUpdate = true;
+
+		return this;
+
+	}
+
+	getColorAt( geometryId, color ) {
+
+		const active = this._active;
+		const colorsArray = this._colorsTexture.image.data;
+		const geometryCount = this._geometryCount;
+		if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
+
+			return null;
+
+		}
+
+		return color.fromArray( colorsArray, geometryId * 4 );
+
+	}
+
 	setVisibleAt( id, value ) {
 
 		// if the geometry is out of range, not active, or visibility state
@@ -861,6 +919,13 @@ class BatchedMesh extends Mesh {
 		this._matricesTexture = source._matricesTexture.clone();
 		this._matricesTexture.image.data = this._matricesTexture.image.slice();
 
+		if ( this._colorsTexture !== null ) {
+
+			this._colorsTexture = source._colorsTexture.clone();
+			this._colorsTexture.image.data = this._colorsTexture.image.slice();
+
+		}
+
 		return this;
 
 	}
@@ -875,6 +940,13 @@ class BatchedMesh extends Mesh {
 
 		this._indirectTexture.dispose();
 		this._indirectTexture = null;
+
+		if ( this._colorsTexture !== null ) {
+
+			this._colorsTexture.dispose();
+			this._colorsTexture = null;
+
+		}
 
 		return this;
 
