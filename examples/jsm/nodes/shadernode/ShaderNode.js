@@ -251,9 +251,15 @@ class ShaderCallNodeInternal extends Node {
 
 	getNodeType( builder ) {
 
-		const { outputNode } = builder.getNodeProperties( this );
+		const properties = builder.getNodeProperties( this );
 
-		return outputNode ? outputNode.getNodeType( builder ) : super.getNodeType( builder );
+		if ( properties.outputNode === null ) {
+
+			properties.outputNode = this.setupOutput( builder );
+
+		}
+
+		return properties.outputNode.getNodeType( builder );
 
 	}
 
@@ -301,6 +307,14 @@ class ShaderCallNodeInternal extends Node {
 	}
 
 	setup( builder ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		return outputNode || this.setupOutput( builder );
+
+	}
+
+	setupOutput( builder ) {
 
 		builder.addStack();
 
