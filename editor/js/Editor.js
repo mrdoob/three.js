@@ -671,11 +671,10 @@ Editor.prototype = {
 
 		this.signals.cameraResetted.dispatch();
 
+		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
 		this.setScene( await loader.parseAsync( json.scene ) );
-
-		this.history.fromJSON( json.history );
 
 		if ( json.environment === 'ModelViewer' ) {
 
