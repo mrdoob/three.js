@@ -353,7 +353,14 @@ class BatchedMesh extends Mesh {
 
 		} );
 
-		return this._drawInfo.length - 1;
+		// initialize the matrix
+		const drawId = this._drawInfo.length - 1;
+		const matricesTexture = this._matricesTexture;
+		const matricesArray = matricesTexture.image.data;
+		_identityMatrix.toArray( matricesArray, drawId * 16 );
+		matricesTexture.needsUpdate = true;
+
+		return drawId;
 
 	}
 
@@ -444,24 +451,9 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		const drawInfo = this._drawInfo;
-		const matricesTexture = this._matricesTexture;
-		const matricesArray = this._matricesTexture.image.data;
-
 		// update id
 		const geometryId = this._geometryCount;
 		this._geometryCount ++;
-
-		// push new visibility states
-		drawInfo.push( {
-			visible: true,
-			active: true,
-			geometryIndex: geometryId,
-		} );
-
-		// initialize matrix information
-		_identityMatrix.toArray( matricesArray, geometryId * 16 );
-		matricesTexture.needsUpdate = true;
 
 		// add the reserved range and draw range objects
 		reservedRanges.push( reservedRange );
@@ -477,11 +469,25 @@ class BatchedMesh extends Mesh {
 			sphere: new Sphere()
 		} );
 
-		// update the geometry
-		const id = drawInfo.length - 1;
-		this.setGeometryAt( id, geometry );
+		// push new draw info states
+		const drawInfo = this._drawInfo;
+		const matricesTexture = this._matricesTexture;
+		const matricesArray = this._matricesTexture.image.data;
+		const drawId = drawInfo.length;
+		drawInfo.push( {
+			visible: true,
+			active: true,
+			geometryIndex: geometryId,
+		} );
 
-		return id;
+		// initialize matrix information
+		_identityMatrix.toArray( matricesArray, drawId * 16 );
+		matricesTexture.needsUpdate = true;
+
+		// update the geometry
+		this.setGeometryAt( drawId, geometry );
+
+		return drawId;
 
 	}
 
