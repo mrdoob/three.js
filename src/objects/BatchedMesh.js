@@ -195,7 +195,7 @@ class BatchedMesh extends Mesh {
 		let size = Math.sqrt( this._maxGeometryCount );
 		size = Math.ceil( size );
 
-		// 4 floats per RGBA pixel initialized to opaque white
+		// 4 floats per RGBA pixel initialized to white
 		const colorsArray = new Float32Array( size * size * 4 ).fill( 1 );
 		const colorsTexture = new DataTexture( colorsArray, size, size, RGBAFormat, FloatType );
 		colorsTexture.colorSpace = ColorManagement.workingColorSpace;
