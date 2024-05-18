@@ -832,7 +832,6 @@ class BatchedMesh extends Mesh {
 
 		const drawInfo = this._drawInfo;
 		const drawRanges = this._drawRanges;
-		const geometryCount = this._geometryCount;
 		const matrixWorld = this.matrixWorld;
 		const batchGeometry = this.geometry;
 
@@ -852,7 +851,7 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		for ( let i = 0; i < geometryCount; i ++ ) {
+		for ( let i = 0, l = drawInfo.length; i < l; i ++ ) {
 
 			if ( ! drawInfo[ i ].visible || ! drawInfo[ i ].active ) {
 
@@ -860,6 +859,7 @@ class BatchedMesh extends Mesh {
 
 			}
 
+			const geometryId = drawInfo[ i ].geometryIndex;
 			const drawRange = drawRanges[ i ];
 			_mesh.geometry.setDrawRange( drawRange.start, drawRange.count );
 
