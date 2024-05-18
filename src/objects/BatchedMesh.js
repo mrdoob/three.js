@@ -860,7 +860,7 @@ class BatchedMesh extends Mesh {
 			}
 
 			const geometryId = drawInfo[ i ].geometryIndex;
-			const drawRange = drawRanges[ i ];
+			const drawRange = drawRanges[ geometryId ];
 			_mesh.geometry.setDrawRange( drawRange.start, drawRange.count );
 
 			// ge the intersects
