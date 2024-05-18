@@ -202,7 +202,7 @@ class BatchedMesh extends Mesh {
 
 	_initColorsTexture() {
 
-		let size = Math.sqrt( this._maxGeometryCount );
+		let size = Math.sqrt( this._maxIndexCount );
 		size = Math.ceil( size );
 
 		const colorsArray = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
@@ -478,9 +478,10 @@ class BatchedMesh extends Mesh {
 		} );
 
 		// update the geometry
-		this.setGeometryAt( geometryId, geometry );
+		const id = drawInfo.length - 1;
+		this.setGeometryAt( id, geometry );
 
-		return drawInfo.length - 1;
+		return id;
 
 	}
 
@@ -744,7 +745,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	setColorAt( geometryId, color ) {
+	setColorAt( id, color ) {
 
 		if ( this._colorsTexture === null ) {
 
@@ -752,38 +753,36 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		// @TODO: Map geometryId to index of the arrays because
-		//        optimize() can make geometryId mismatch the index
+		// @TODO: Map id to index of the arrays because
+		//        optimize() can make id mismatch the index
 
-		const active = this._active;
 		const colorsTexture = this._colorsTexture;
 		const colorsArray = this._colorsTexture.image.data;
-		const geometryCount = this._geometryCount;
-		if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
+		const drawInfo = this._drawInfo;
+		if ( id >= drawInfo.length || drawInfo[ id ].active === false ) {
 
 			return this;
 
 		}
 
-		color.toArray( colorsArray, geometryId * 4 );
+		color.toArray( colorsArray, id * 4 );
 		colorsTexture.needsUpdate = true;
 
 		return this;
 
 	}
 
-	getColorAt( geometryId, color ) {
+	getColorAt( id, color ) {
 
-		const active = this._active;
 		const colorsArray = this._colorsTexture.image.data;
-		const geometryCount = this._geometryCount;
-		if ( geometryId >= geometryCount || active[ geometryId ] === false ) {
+		const drawInfo = this._drawInfo;
+		if ( id >= drawInfo.length || drawInfo[ id ].active === false ) {
 
 			return null;
 
 		}
 
-		return color.fromArray( colorsArray, geometryId * 4 );
+		return color.fromArray( colorsArray, id * 4 );
 
 	}
 

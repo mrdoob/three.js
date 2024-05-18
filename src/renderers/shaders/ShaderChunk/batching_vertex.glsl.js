@@ -1,6 +1,5 @@
 export default /* glsl */`
 #ifdef USE_BATCHING
-	float batchId = getIndirectIndex( gl_DrawID );
-	mat4 batchingMatrix = getBatchingMatrix( batchId );
+	mat4 batchingMatrix = getBatchingMatrix( getIndirectIndex( gl_DrawID ) );
 #endif
 `;
