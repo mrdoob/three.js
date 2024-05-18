@@ -431,9 +431,9 @@ function Script( editor ) {
 
 	signals.objectChanged.add( function ( object ) {
 
-		if ( editor.scripts[ object.uuid ].includes( currentScript ) ) {
+		if ( object === currentObject ) {
 
-			signals.editScript.dispatch( currentObject, currentScript );
+			title.setValue( currentObject.name + ' / ' + currentScript.name );
 
 		}
 
@@ -443,7 +443,7 @@ function Script( editor ) {
 
 		if ( script === currentScript ) {
 
-			signals.editScript.dispatch( currentObject, currentScript );
+			title.setValue( currentObject.name + ' / ' + currentScript.name );
 
 		}
 
