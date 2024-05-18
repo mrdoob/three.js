@@ -1,4 +1,4 @@
-import { UIPanel, UIRow } from './libs/ui.js';
+import { UIHorizontalRule, UIPanel, UIRow } from './libs/ui.js';
 
 function MenubarView( editor ) {
 
@@ -19,7 +19,7 @@ function MenubarView( editor ) {
 
 	// Fullscreen
 
-	const option = new UIRow();
+	let option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/view/fullscreen' ) );
 	option.onClick( function () {
@@ -102,6 +102,100 @@ function MenubarView( editor ) {
 		}
 
 	}
+
+	//
+
+	options.add( new UIHorizontalRule() );
+
+	// Appearance
+
+	const appearanceStates = {
+
+		gridHelper: true,
+		cameraHelpers: true,
+		lightHelpers: true,
+		skeletonHelpers: true
+
+	};
+
+	const appearanceSubmenuTitle = new UIRow().setTextContent( 'Appearance' ).addClass( 'option' ).addClass( 'submenu-title' );
+	appearanceSubmenuTitle.onMouseOver( function () {
+
+		const { top, right } = appearanceSubmenuTitle.dom.getBoundingClientRect();
+		const { paddingTop } = getComputedStyle( this.dom );
+		appearanceSubmenu.setLeft( right + 'px' );
+		appearanceSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
+		appearanceSubmenu.setStyle( 'max-height', [ `calc( 100vh - ${top}px )` ] );
+		appearanceSubmenu.setDisplay( 'block' );
+
+	} );
+	appearanceSubmenuTitle.onMouseOut( function () {
+
+		appearanceSubmenu.setDisplay( 'none' );
+
+	} );
+	options.add( appearanceSubmenuTitle );
+
+	const appearanceSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	appearanceSubmenuTitle.add( appearanceSubmenu );
+
+	// Appearance / Grid Helper
+
+	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( 'Grid Helper' ).onClick( function () {
+
+		appearanceStates.gridHelper = ! appearanceStates.gridHelper;
+
+		this.toggleClass( 'toggle-on', appearanceStates.gridHelper );
+
+		signals.showHelpersChanged.dispatch( appearanceStates );
+
+	} ).toggleClass( 'toggle-on', appearanceStates.gridHelper );
+
+	appearanceSubmenu.add( option );
+
+	// Appearance / Camera Helpers
+
+	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( 'Camera Helpers' ).onClick( function () {
+
+		appearanceStates.cameraHelpers = ! appearanceStates.cameraHelpers;
+
+		this.toggleClass( 'toggle-on', appearanceStates.cameraHelpers );
+
+		signals.showHelpersChanged.dispatch( appearanceStates );
+
+	} ).toggleClass( 'toggle-on', appearanceStates.cameraHelpers );
+
+	appearanceSubmenu.add( option );
+
+	// Appearance / Light Helpers
+
+	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( 'Light Helpers' ).onClick( function () {
+
+		appearanceStates.lightHelpers = ! appearanceStates.lightHelpers;
+
+		this.toggleClass( 'toggle-on', appearanceStates.lightHelpers );
+
+		signals.showHelpersChanged.dispatch( appearanceStates );
+
+	} ).toggleClass( 'toggle-on', appearanceStates.lightHelpers );
+
+	appearanceSubmenu.add( option );
+
+	// Appearance / Skeleton Helpers
+
+	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( 'Skeleton Helpers' ).onClick( function () {
+
+		appearanceStates.skeletonHelpers = ! appearanceStates.skeletonHelpers;
+
+		this.toggleClass( 'toggle-on', appearanceStates.skeletonHelpers );
+
+		signals.showHelpersChanged.dispatch( appearanceStates );
+
+	} ).toggleClass( 'toggle-on', appearanceStates.skeletonHelpers );
+
+	appearanceSubmenu.add( option );
+
+	//
 
 	return container;
 

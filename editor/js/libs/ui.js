@@ -98,6 +98,14 @@ class UIElement {
 
 	}
 
+	toggleClass( name, toggle ) {
+
+		this.dom.classList.toggle( name, toggle );
+
+		return this;
+
+	}
+
 	setStyle( style, array ) {
 
 		for ( let i = 0; i < array.length; i ++ ) {
