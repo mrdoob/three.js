@@ -80,7 +80,7 @@ export { default as UniformsNode, uniforms } from './accessors/UniformsNode.js';
 export * from './accessors/BitangentNode.js';
 export { default as BufferAttributeNode, bufferAttribute, dynamicBufferAttribute, instancedBufferAttribute, instancedDynamicBufferAttribute } from './accessors/BufferAttributeNode.js';
 export { default as BufferNode, buffer } from './accessors/BufferNode.js';
-export { default as CameraNode, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraNormalMatrix, cameraWorldMatrix, cameraPosition, cameraNear, cameraFar, cameraLogDepth } from './accessors/CameraNode.js';
+export * from './accessors/CameraNode.js';
 export { default as VertexColorNode, vertexColor } from './accessors/VertexColorNode.js';
 export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTextureNode.js';
 export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
