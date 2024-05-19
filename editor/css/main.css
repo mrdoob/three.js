@@ -297,12 +297,23 @@ select {
 #resizer {
 	position: absolute;
 	top: 32px;
-	right: 345px;
+	right: 350px;
 	width: 5px;
 	bottom: 0px;
-	/* background-color: rgba(255,0,0,0.5); */
+	transform: translatex(2.5px);
 	cursor: col-resize;
 }
+
+	#resizer:hover {
+		background-color: #08f8;
+		transition-property: background-color;
+		transition-delay: 0.1s;
+		transition-duration: 0.2s;
+	}
+
+	#resizer:active {
+		background-color: #08f;
+	}
 
 #viewport {
 	position: absolute;
@@ -398,7 +409,7 @@ select {
 					background-color: #08f;
 				}
 
-				#menubar .menu .options .option:active {
+				#menubar .menu .options .option:not(.submenu-title):active {
 					color: #666;
 					background: transparent;
 				}

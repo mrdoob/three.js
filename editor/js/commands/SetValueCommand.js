@@ -9,7 +9,7 @@ import { Command } from '../Command.js';
  */
 class SetValueCommand extends Command {
 
-	constructor( editor, object, attributeName, newValue ) {
+	constructor( editor, object = null, attributeName = '', newValue = null ) {
 
 		super( editor );
 
@@ -19,7 +19,7 @@ class SetValueCommand extends Command {
 
 		this.object = object;
 		this.attributeName = attributeName;
-		this.oldValue = ( object !== undefined ) ? object[ attributeName ] : undefined;
+		this.oldValue = ( object !== null ) ? object[ attributeName ] : null;
 		this.newValue = newValue;
 
 	}
