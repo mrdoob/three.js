@@ -51,11 +51,7 @@ class CopyColorDepthMaterial extends ShaderMaterial {
 
 				void main() {
 
-					vec4 texel = texture2D( map, vUv );
-					gl_FragColor.rgb = vec3( int( texel.r * 1000.0 ) % 2 );
-					gl_FragColor.a = 1.0;
-
-					gl_FragColor.rgb = texel.rgb;
+					gl_FragColor = texture2D( map, vUv );
 					gl_FragDepth = texture2D( depthMap, vUv ).r;
 
 					#include <tonemapping_fragment>
