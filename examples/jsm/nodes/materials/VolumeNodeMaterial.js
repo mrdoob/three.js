@@ -70,7 +70,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 
 			const ac = property( 'vec4', 'ac' ).assign( vec4( materialReference( 'base', 'color' ), 0.0 ) );
 
-			loop( { type: 'float', start: bounds.x, end: bounds.y, update: '+= delta'  }, () => {
+			loop( { type: 'float', start: bounds.x, end: bounds.y, update: '+= delta' }, () => {
 
 				const d = property( 'float', 'd' ).assign( map.uv( p.add( 0.5 ) ).r );
 

@@ -14,23 +14,23 @@ const normal = tslFn( ( { texture, uv } ) => {
 
 	} ).elseif( uv.y.lessThan( epsilon ), () => {
 
-		ret.assign( vec3( 0, 1, 0  ) );
+		ret.assign( vec3( 0, 1, 0 ) );
 
 	} ).elseif( uv.z.lessThan( epsilon ), () => {
 
 		ret.assign( vec3( 0, 0, 1 ) );
 
-	} ).elseif( uv.x.greaterThan(  1 - epsilon ), () => {
+	} ).elseif( uv.x.greaterThan( 1 - epsilon ), () => {
 
-		ret.assign( vec3( -1, 0, 0 ) );
+		ret.assign( vec3( - 1, 0, 0 ) );
 
-	} ).elseif( uv.y.greaterThan(  1 - epsilon ), () => {
+	} ).elseif( uv.y.greaterThan( 1 - epsilon ), () => {
 
-		ret.assign( vec3( 0, -1, 0 ) );
+		ret.assign( vec3( 0, - 1, 0 ) );
 
-	} ).elseif( uv.z.greaterThan(  1 - epsilon ), () => {
+	} ).elseif( uv.z.greaterThan( 1 - epsilon ), () => {
 
-		ret.assign( vec3( 0, 0, -1 ) );
+		ret.assign( vec3( 0, 0, - 1 ) );
 
 	} ).else( () => {
 
@@ -40,7 +40,7 @@ const normal = tslFn( ( { texture, uv } ) => {
 		const y = texture.uv( uv.add( vec3( 0.0, - step, 0.0 ) ) ).r.sub( texture.uv( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
 		const z = texture.uv( uv.add( vec3( 0.0, 0.0, - step ) ) ).r.sub( texture.uv( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
 
-		ret.assign( vec3( x, y, z  ) );
+		ret.assign( vec3( x, y, z ) );
 
 	} );
 
