@@ -152,8 +152,19 @@ function Viewport( editor ) {
 
 	function updateAspectRatio() {
 
-		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-		camera.updateProjectionMatrix();
+		for ( const uuid in editor.cameras ) {
+
+			const camera = editor.cameras[ uuid ];
+
+			if ( camera.isPerspectiveCamera ) {
+
+				camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+
+				camera.updateProjectionMatrix();
+
+			}
+
+		}
 
 	}
 
