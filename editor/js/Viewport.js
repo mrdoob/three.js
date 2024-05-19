@@ -798,6 +798,7 @@ function Viewport( editor ) {
 		if ( editor.viewportShading === 'realistic' ) {
 
 			pathtracer.update();
+			editor.signals.pathTracerUpdated.dispatch( pathtracer.getSamples() );
 
 		}
 

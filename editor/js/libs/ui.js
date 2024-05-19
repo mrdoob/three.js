@@ -114,6 +114,8 @@ class UIElement {
 
 		this.dom.hidden = isHidden;
 
+		return this;
+
 	}
 
 	isHidden() {
