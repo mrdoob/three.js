@@ -180,12 +180,6 @@ class WebGPUPipelineUtils {
 		const renderContextData = backend.get( renderContext );
 		const renderObjectData = backend.get( renderObject );
 
-		if ( renderObjectData.bundleEncoder && renderContextData._renderBundleViewport === renderContext.width + '_' + renderContext.height ) {
-
-			return renderObjectData.bundleEncoder;
-
-		}
-
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderContext );
 		const colorFormat = utils.getCurrentColorFormat( renderContext );
 		const sampleCount = this._getSampleCount( renderObject.context );

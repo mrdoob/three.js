@@ -41,13 +41,15 @@
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+		import RenderBundle from 'three/addons/renderers/RenderBundle.js';
 		import { MeshBasicNodeMaterial } from 'three/nodes';
 
-		let camera, scene, renderer;
+		let camera, scene, renderer, renderBundle;
 		let controls, stats;
 		let gui;
 		let geometries, group;
 
+		let renderTimeAverages = [];
 		//
 
 		const position = new THREE.Vector3();
@@ -61,14 +63,14 @@
 
 		const api = {
 			webgpu: true,
-			bundleType: 'snapshot',
+			renderBundle: true,
 			count: MAX_GEOMETRY_COUNT,
 			dynamic: 0,
 			opacity: 1,
 		};
 
 
-		init( ! api.webgpu, api.bundleType );
+		init( ! api.webgpu, api.renderBundle );
 
 		//
 
@@ -169,7 +171,9 @@
 
 		}
 
-		function init( forceWebGL = false, bundleType = 'static' ) {
+		async function init( forceWebGL = false ) {
+
+			renderTimeAverages = [];
 
 			if ( renderer ) {
 
@@ -198,7 +202,7 @@
 			// scene
 
 			scene = new THREE.Scene();
-			scene.bundleType = bundleType;
+
 
 			if ( forceWebGL ) {
 
@@ -206,7 +210,7 @@
 
 			} else {
 
-				scene.background = new THREE.Color( 0x333333 );
+				scene.background = new THREE.Color( 0x330000 );
 
 			}
 
@@ -215,12 +219,20 @@
 
 			document.body.appendChild( renderer.domElement );
 
+			await renderer.init();
+			// renderer.render( scene, camera );
 
 
 			initGeometries();
 			initMesh();
 
-			// controls
+
+			if ( api.renderBundle ) {
+
+				renderBundle = new RenderBundle( scene, camera );
+
+			}
+
 
 			controls = new OrbitControls( camera, renderer.domElement );
 			controls.autoRotate = true;
@@ -232,20 +244,16 @@
 				precision: 3,
 				horizontal: false
 			} );
-			stats.init( renderer );
+			// stats.init( renderer );
 			document.body.appendChild( stats.dom );
 			stats.dom.style.position = 'absolute';
 
 			// gui
 
 			gui = new GUI();
-			gui.add( api, 'bundleType', [
-				null,
-				'snapshot',
-				'static'
-			] ).onChange( () => {
+			gui.add( api, 'renderBundle' ).onChange( () => {
 
-				init( ! api.webgpu, api.bundleType );
+				init( ! api.webgpu );
 
 			} );
 
@@ -284,11 +292,25 @@
 
 				controls.update();
 
-				await renderer.renderAsync( scene, camera );
+				const renderTimeAverage = performance.now();
+				if ( api.renderBundle ) {
+		
+					renderer.renderBundle( renderBundle );
 
+				} else {
+
+					renderer.render( scene, camera );
+		
+				}
+
+				// push only the last 60 render times
+				renderTimeAverages.push( performance.now() - renderTimeAverage );
+				if ( renderTimeAverages.length > 60 ) renderTimeAverages.shift();
+		
+				const average = renderTimeAverages.reduce( ( a, b ) => a + b, 0 ) / renderTimeAverages.length;
 				stats.update();
 
-				document.getElementById( 'backend' ).innerText = 'Draw Calls: ' + renderer.info.render.drawCalls;
+				document.getElementById( 'backend' ).innerText = `Average Render Time ${api.renderBundle ? '(Bundle)' : ''}: ` + average.toFixed( 2 ) + 'ms';
 
 			}
 
@@ -296,8 +318,6 @@
 
 				const loopNum = Math.min( api.count, api.dynamic );
 
-
-				if ( scene.bundleType === 'static' ) return;
 
 				for ( let i = 0; i < loopNum; i ++ ) {
 

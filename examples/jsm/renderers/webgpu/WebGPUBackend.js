@@ -455,6 +455,7 @@ class WebGPUBackend extends Backend {
 
 		if ( renderContextData.renderBundles !== undefined && renderContextData.renderBundles.length > 0 ) {
 
+			renderContextData.registerBundlesPhase = false;
 			renderContextData.currentPass.executeBundles( renderContextData.renderBundles );
 
 		}
@@ -799,20 +800,18 @@ class WebGPUBackend extends Backend {
 
 		const renderObjectData = this.get( renderObject );
 
-		const useRenderBundle = renderObject.scene.bundleType !== null ? true : false;
-
 		const { bundleEncoder, renderBundle, lastPipelineGPU } = renderObjectData;
 
 		const renderContextData = this.get( context );
-
-		if ( renderContextData.renderBundles !== undefined && bundleEncoder !== undefined && lastPipelineGPU === pipelineGPU ) {
+		
+		if ( renderContextData.registerBundlesPhase === true && renderContextData.renderBundles !== undefined && bundleEncoder !== undefined && lastPipelineGPU === pipelineGPU ) {
 
 			renderContextData.renderBundles.push( renderBundle );
 			return;
 
 		}
 
-		const passEncoderGPU = useRenderBundle ? this.createBundleEncoder( context, renderObject ) : contextData.currentPass;
+		const passEncoderGPU = this.renderer._currentRenderBundle ? this.createBundleEncoder( context, renderObject ) : contextData.currentPass;
 
 		// pipeline
 
@@ -927,7 +926,7 @@ class WebGPUBackend extends Backend {
 		}
 
 		
-		if ( useRenderBundle ) {
+		if ( this.renderer._currentRenderBundle ) {
 
 			const renderBundle = passEncoderGPU.finish();
 

@@ -4,7 +4,6 @@ import { varying } from '../core/VaryingNode.js';
 import { normalize } from '../math/MathNode.js';
 import { modelWorldMatrix, modelViewMatrix } from './ModelNode.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
-// import { cameraViewMatrix } from './CameraNode.js';
 
 class PositionNode extends Node {
 
@@ -49,11 +48,7 @@ class PositionNode extends Node {
 
 		} else if ( scope === PositionNode.VIEW ) {
 
-			// TODO: For static mode prevent the necessary usage of modelViewMatrix and keep camera dynamic
-			// cameraViewMatrix
-			// const vertexPositionNode = cameraViewMatrix.mul( modelWorldMatrix ).mul( positionLocal );
 			const vertexPositionNode = modelViewMatrix.mul( positionLocal );
-
 			outputNode = varying( vertexPositionNode );
 
 		} else if ( scope === PositionNode.VIEW_DIRECTION ) {

@@ -21,10 +21,9 @@ import { lightingContext } from '../lighting/LightingContextNode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
 import IrradianceNode from '../lighting/IrradianceNode.js';
 import { depthPixel } from '../display/ViewportDepthNode.js';
-import { cameraLogDepth, cameraProjectionMatrix } from '../accessors/CameraNode.js';
+import { cameraLogDepth } from '../accessors/CameraNode.js';
 import { clipping, clippingAlpha } from '../accessors/ClippingNode.js';
 import { faceDirection } from '../display/FrontFacingNode.js';
-import { modelViewMatrix } from '../accessors/ModelNode.js';
 
 const NodeMaterials = new Map();
 
@@ -245,9 +244,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		// TODO: Update this in mvp and modelViewMatrix for static mode to use camera (shared) * modelMatrix instead
-		const mvp = cameraProjectionMatrix.mul( modelViewMatrix ).mul( positionLocal );
-		// const mvp = modelViewProjection();
+		const mvp = modelViewProjection();
 
 		builder.context.vertex = builder.removeStack();
 		builder.context.mvp = mvp;
