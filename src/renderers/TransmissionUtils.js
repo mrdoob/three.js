@@ -1,3 +1,4 @@
+import { CustomBlending } from '../constants.js';
 import { PlaneGeometry } from '../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
 import { Mesh } from '../objects/Mesh.js';
@@ -21,6 +22,7 @@ class CopyColorDepthMaterial extends ShaderMaterial {
 		super( {
 
 			name: 'CopyColorDepthMaterial',
+			blending: CustomBlending,
 
 			uniforms: {
 
