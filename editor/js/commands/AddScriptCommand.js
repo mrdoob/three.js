@@ -8,7 +8,7 @@ import { Command } from '../Command.js';
  */
 class AddScriptCommand extends Command {
 
-	constructor( editor, object, script ) {
+	constructor( editor, object = null, script = '' ) {
 
 		super( editor );
 

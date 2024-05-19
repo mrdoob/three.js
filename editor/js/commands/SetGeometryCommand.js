@@ -10,7 +10,7 @@ import { ObjectLoader } from 'three';
 
 class SetGeometryCommand extends Command {
 
-	constructor( editor, object, newGeometry ) {
+	constructor( editor, object = null, newGeometry = null ) {
 
 		super( editor );
 
@@ -19,7 +19,7 @@ class SetGeometryCommand extends Command {
 		this.updatable = true;
 
 		this.object = object;
-		this.oldGeometry = ( object !== undefined ) ? object.geometry : undefined;
+		this.oldGeometry = ( object !== null ) ? object.geometry : null;
 		this.newGeometry = newGeometry;
 
 	}

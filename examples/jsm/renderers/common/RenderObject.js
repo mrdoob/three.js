@@ -225,7 +225,12 @@ export default class RenderObject {
 		if ( object.isBatchedMesh ) {
 
 			cacheKey += object._matricesTexture.uuid + ',';
-			cacheKey += object._colorsTexture.uuid + ',';
+
+			if ( object._colorsTexture !== null ) {
+
+				cacheKey += object._colorsTexture.uuid + ',';
+
+			}
 
 		}
 

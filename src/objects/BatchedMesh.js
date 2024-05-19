@@ -10,6 +10,7 @@ import { Box3 } from '../math/Box3.js';
 import { Sphere } from '../math/Sphere.js';
 import { Frustum } from '../math/Frustum.js';
 import { Vector3 } from '../math/Vector3.js';
+import { Color } from '../math/Color.js';
 
 function sortOpaque( a, b ) {
 
@@ -73,11 +74,14 @@ class MultiDrawRenderList {
 const _matrix = /*@__PURE__*/ new Matrix4();
 const _invMatrixWorld = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
+const _whiteColor = /*@__PURE__*/ new Color( 1, 1, 1 );
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _frustum = /*@__PURE__*/ new Frustum();
 const _box = /*@__PURE__*/ new Box3();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _vector = /*@__PURE__*/ new Vector3();
+const _forward = /*@__PURE__*/ new Vector3();
+const _temp = /*@__PURE__*/ new Vector3();
 const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
 const _mesh = /*@__PURE__*/ new Mesh();
 const _batchIntersects = [];
@@ -205,7 +209,8 @@ class BatchedMesh extends Mesh {
 		let size = Math.sqrt( this._maxIndexCount );
 		size = Math.ceil( size );
 
-		const colorsArray = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
+		// 4 floats per RGBA pixel initialized to white
+		const colorsArray = new Float32Array( size * size * 4 ).fill( 1 );
 		const colorsTexture = new DataTexture( colorsArray, size, size, RGBAFormat, FloatType );
 		colorsTexture.colorSpace = ColorManagement.workingColorSpace;
 
@@ -473,6 +478,7 @@ class BatchedMesh extends Mesh {
 		const drawInfo = this._drawInfo;
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = this._matricesTexture.image.data;
+		const colorsTexture = this._colorsTexture;
 		const drawId = drawInfo.length;
 		drawInfo.push( {
 			visible: true,
@@ -483,6 +489,14 @@ class BatchedMesh extends Mesh {
 		// initialize matrix information
 		_identityMatrix.toArray( matricesArray, drawId * 16 );
 		matricesTexture.needsUpdate = true;
+
+		// initialize the color to white
+		if ( colorsTexture !== null ) {
+
+			_whiteColor.toArray( colorsTexture.image.data, drawId * 4 );
+			colorsTexture.needsUpdate = true;
+
+		}
 
 		// update the geometry
 		this.setGeometryAt( drawId, geometry );
@@ -999,6 +1013,7 @@ class BatchedMesh extends Mesh {
 			// get the camera position in the local frame
 			_invMatrixWorld.copy( this.matrixWorld ).invert();
 			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _invMatrixWorld );
+			_forward.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _invMatrixWorld );
 
 			for ( let i = 0, l = drawInfo.length; i < l; i ++ ) {
 
@@ -1019,7 +1034,7 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						// get the distance from camera used for sorting
-						const z = _vector.distanceTo( _sphere.center );
+						const z = _temp.subVectors( _sphere.center, _vector ).dot( _forward );
 						_renderList.push( drawRanges[ drawInfo[ i ].geometryIndex ], z, i );
 
 					}
