@@ -334,8 +334,8 @@ class Renderer {
 
 		const renderBundleData = this.backend.get( renderBundle );
 
-
-		if ( renderBundleData.renderContexts === undefined ) {
+		const renderContexts = renderBundleData.renderContexts;
+		if ( renderContexts === undefined ) {
 
 			this._currentRenderBundle = renderBundle;
 
@@ -682,11 +682,11 @@ class Renderer {
 
 		if ( frameBufferTarget !== null ) {
 
-			// this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
+			this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
 
-			// _quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+			_quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
 
-			// this._renderScene( _quad, _quad.camera, false );
+			this._renderScene( _quad, _quad.camera, false );
 
 		}
 
