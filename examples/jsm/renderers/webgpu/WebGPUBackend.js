@@ -72,40 +72,40 @@ class WebGPUBackend extends Backend {
 
 		if ( parameters.device === undefined ) {
 
-		const adapterOptions = {
-			powerPreference: parameters.powerPreference
-		};
+			const adapterOptions = {
+				powerPreference: parameters.powerPreference
+			};
 
-		const adapter = await navigator.gpu.requestAdapter( adapterOptions );
+			const adapter = await navigator.gpu.requestAdapter( adapterOptions );
 
-		if ( adapter === null ) {
+			if ( adapter === null ) {
 
-			throw new Error( 'WebGPUBackend: Unable to create WebGPU adapter.' );
-
-		}
-
-		// feature support
-
-		const features = Object.values( GPUFeatureName );
-
-		const supportedFeatures = [];
-
-		for ( const name of features ) {
-
-			if ( adapter.features.has( name ) ) {
-
-				supportedFeatures.push( name );
+				throw new Error( 'WebGPUBackend: Unable to create WebGPU adapter.' );
 
 			}
 
-		}
+			// feature support
 
-		const deviceDescriptor = {
-			requiredFeatures: supportedFeatures,
-			requiredLimits: parameters.requiredLimits
-		};
+			const features = Object.values( GPUFeatureName );
 
-		device = await adapter.requestDevice( deviceDescriptor );
+			const supportedFeatures = [];
+
+			for ( const name of features ) {
+
+				if ( adapter.features.has( name ) ) {
+
+					supportedFeatures.push( name );
+
+				}
+
+			}
+
+			const deviceDescriptor = {
+				requiredFeatures: supportedFeatures,
+				requiredLimits: parameters.requiredLimits
+			};
+
+			device = await adapter.requestDevice( deviceDescriptor );
 
 		} else {
 
@@ -929,7 +929,6 @@ class WebGPUBackend extends Backend {
 		if ( this.renderer._currentRenderBundle ) {
 
 			const renderBundle = passEncoderGPU.finish();
-
 			renderObjectData.lastPipelineGPU = pipelineGPU;
 			renderObjectData.renderBundle = renderBundle;
 			renderObjectData.bundleEncoder = passEncoderGPU;

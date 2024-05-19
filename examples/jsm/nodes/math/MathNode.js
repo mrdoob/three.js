@@ -387,6 +387,6 @@ addNodeElement( 'faceForward', faceForward );
 addNodeElement( 'difference', difference );
 addNodeElement( 'saturate', saturate );
 addNodeElement( 'cbrt', cbrt );
-addNodeElement( 'bitcast', bitcast );
+
 
 addNodeClass( 'MathNode', MathNode );

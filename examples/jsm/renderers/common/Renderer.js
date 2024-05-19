@@ -600,7 +600,6 @@ class Renderer {
 
 		this._projectObject( scene, camera, 0, renderList );
 
-
 		renderList.finish();
 
 		if ( this.sortObjects === true ) {
@@ -659,7 +658,6 @@ class Renderer {
 		const opaqueObjects = renderList.opaque;
 		const transparentObjects = renderList.transparent;
 		const lightsNode = renderList.lightsNode;
-
 
 		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
