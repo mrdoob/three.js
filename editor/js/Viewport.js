@@ -622,8 +622,7 @@ function Viewport( editor ) {
 
 		if ( viewportCamera.isPerspectiveCamera ) {
 
-			viewportCamera.aspect = editor.camera.aspect;
-			viewportCamera.projectionMatrix.copy( editor.camera.projectionMatrix );
+			updateAspectRatio();
 
 		} else if ( viewportCamera.isOrthographicCamera ) {
 
@@ -635,6 +634,7 @@ function Viewport( editor ) {
 
 		controls.enabled = ( viewportCamera === editor.camera );
 
+		initPT();
 		render();
 
 	} );
@@ -646,7 +646,7 @@ function Viewport( editor ) {
 		switch ( viewportShading ) {
 
 			case 'realistic':
-				pathtracer.init( scene, camera );
+				pathtracer.init( scene, editor.viewportCamera );
 				break;
 
 			case 'solid':
@@ -757,7 +757,7 @@ function Viewport( editor ) {
 
 		if ( editor.viewportShading === 'realistic' ) {
 
-			pathtracer.init( scene, camera );
+			pathtracer.init( scene, editor.viewportCamera );
 
 		}
 
