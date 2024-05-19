@@ -192,6 +192,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			precision: precision,
 
 			batching: IS_BATCHEDMESH,
+			batchingColor: IS_BATCHEDMESH && object._colorsTexture !== null,
 			instancing: IS_INSTANCEDMESH,
 			instancingColor: IS_INSTANCEDMESH && object.instanceColor !== null,
 			instancingMorph: IS_INSTANCEDMESH && object.morphTexture !== null,
@@ -510,6 +511,8 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 19 );
 		if ( parameters.dispersion )
 			_programLayers.enable( 20 );
+		if ( parameters.batchingColor )
+			_programLayers.enable( 21 );
 
 		array.push( _programLayers.mask );
 		_programLayers.disableAll();

@@ -946,6 +946,7 @@ class ObjectLoader extends Loader {
 				object._geometryCount = data.geometryCount;
 
 				object._matricesTexture = getTexture( data.matricesTexture.uuid );
+				if ( data.colorsTexture !== undefined ) object._colorsTexture = getTexture( data.colorsTexture.uuid );
 
 				break;
 

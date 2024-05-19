@@ -10,6 +10,12 @@ class NodeSampledTexture extends SampledTexture {
 
 	}
 
+	get needsBindingsUpdate() {
+
+		return this.textureNode.value !== this.texture || super.needsBindingsUpdate;
+
+	}
+
 	update() {
 
 		const { textureNode } = this;

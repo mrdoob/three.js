@@ -57,7 +57,7 @@ class SetGeometryCommand extends Command {
 		const output = super.toJSON( this );
 
 		output.objectUuid = this.object.uuid;
-		output.oldGeometry = this.object.geometry.toJSON();
+		output.oldGeometry = this.oldGeometry.toJSON();
 		output.newGeometry = this.newGeometry.toJSON();
 
 		return output;
