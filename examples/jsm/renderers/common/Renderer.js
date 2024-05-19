@@ -244,7 +244,6 @@ class Renderer {
 
 		//
 
-		// TODO Render once and reuse renderList in static mode
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
 
@@ -596,8 +595,6 @@ class Renderer {
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromProjectionMatrix( _projScreenMatrix, coordinateSystem );
 
-		// TODO CameraNode.update() in sharedUniformGroup format -> update viewProjection, view, projection, vEyePosition
-
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
 
@@ -606,7 +603,6 @@ class Renderer {
 
 		renderList.finish();
 
-		// TODO: Sort on the GPU in static mode via indirect draw call and compute shader
 		if ( this.sortObjects === true ) {
 
 			renderList.sort( this._opaqueSort, this._transparentSort );
@@ -667,6 +663,7 @@ class Renderer {
 
 		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+
 		// finish render pass
 
 		this.backend.finishRender( renderContext );

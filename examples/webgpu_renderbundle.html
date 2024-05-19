@@ -65,12 +65,12 @@
 			webgpu: true,
 			renderBundle: true,
 			count: MAX_GEOMETRY_COUNT,
-			dynamic: 0,
+			dynamic: MAX_GEOMETRY_COUNT / 2,
 			opacity: 1,
 		};
 
 
-		init( ! api.webgpu, api.renderBundle );
+		init( ! api.webgpu );
 
 		//
 
@@ -94,9 +94,9 @@
 
 		function randomizeRotationSpeed( rotation ) {
 
-			rotation.x = Math.random() * 0.01;
-			rotation.y = Math.random() * 0.01;
-			rotation.z = Math.random() * 0.01;
+			rotation.x = Math.random() * .05;
+			rotation.y = Math.random() * .05;
+			rotation.z = Math.random() * .05;
 			return rotation;
 
 		}
@@ -162,7 +162,7 @@
 				child.matrix.decompose( child.position, child.quaternion, child.scale );
 				child.userData.rotationSpeed = randomizeRotationSpeed( new THREE.Euler() );
 				child.frustumCulled = false;
-				child.matrixAutoUpdate = false;
+				// child.matrixAutoUpdate = false;
 				group.add( child );
 
 			}
