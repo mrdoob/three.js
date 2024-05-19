@@ -334,6 +334,8 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		const visible = object.layers.test( camera.layers );
 
+		if ( visible === false && object.layers.recursive === true ) return;
+
 		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
 			if ( ( object.castShadow || ( object.receiveShadow && type === VSMShadowMap ) ) && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {

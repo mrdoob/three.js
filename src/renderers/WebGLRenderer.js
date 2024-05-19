@@ -917,9 +917,15 @@ class WebGLRenderer {
 
 			// gather lights from both the target scene and the new object that will be added to the scene.
 
+			let stopTraversal = false;
+
 			targetScene.traverseVisible( function ( object ) {
 
-				if ( object.isLight && object.layers.test( camera.layers ) ) {
+				const visible = object.layers.test( camera.layers );
+
+				if ( visible === false && object.layers.recursive === true ) stopTraversal = true;
+
+				if ( object.isLight && stopTraversal === false ) {
 
 					currentRenderState.pushLight( object );
 
@@ -935,9 +941,15 @@ class WebGLRenderer {
 
 			if ( scene !== targetScene ) {
 
+				let stopTraversal = false;
+
 				scene.traverseVisible( function ( object ) {
 
-					if ( object.isLight && object.layers.test( camera.layers ) ) {
+					const visible = object.layers.test( camera.layers );
+
+					if ( visible === false && object.layers.recursive === true ) stopTraversal = true;
+
+					if ( object.isLight && stopTraversal === false ) {
 
 						currentRenderState.pushLight( object );
 
@@ -1276,6 +1288,8 @@ class WebGLRenderer {
 			if ( object.visible === false ) return;
 
 			const visible = object.layers.test( camera.layers );
+
+			if ( visible === false && object.layers.recursive === true ) return;
 
 			if ( visible ) {
 

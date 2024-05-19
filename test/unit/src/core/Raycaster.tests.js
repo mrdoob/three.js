@@ -9,6 +9,7 @@ import { Line } from '../../../../src/objects/Line.js';
 import { Points } from '../../../../src/objects/Points.js';
 import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js';
 import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.js';
+import { Group } from '../../../../src/objects/Group.js';
 
 function checkRayDirectionAgainstReferenceVector( rayDirection, refVector, assert ) {
 
@@ -260,6 +261,33 @@ export default QUnit.module( 'Core', () => {
 			raycaster.params.Points.threshold = 2.001;
 			assert.ok( raycaster.intersectObject( points ).length === 1,
 				'successful Points intersection with a large-enough threshold' );
+
+		} );
+
+		QUnit.test( 'Recursive layers', ( assert ) => {
+
+			const raycaster = getRaycaster();
+			const geometry = new SphereGeometry();
+			const child = new Mesh( geometry );
+			const parent = new Group();
+
+			parent.add( child );
+
+			raycaster.ray.origin.set( 0, 0, - 2 );
+			raycaster.ray.direction.set( 0, 0, 1 );
+
+			parent.layers.recursive = true;
+			assert.ok( raycaster.intersectObject( parent, true ).length === 1,
+				'successful intersection with parent and child that matches recursive layer mask' );
+
+			parent.layers.recursive = false;
+			parent.layers.disableAll();
+			assert.ok( raycaster.intersectObject( parent, true ).length === 1,
+				'successful intersection with child that matches layer mask' );
+
+			parent.layers.recursive = true;
+			assert.ok( raycaster.intersectObject( parent, true ).length === 0,
+				'no intersection with recursive layer checking' );
 
 		} );
 

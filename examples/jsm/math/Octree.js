@@ -476,11 +476,17 @@ class Octree {
 
 		group.updateWorldMatrix( true, true );
 
+		let stopTraversal = false;
+
 		group.traverse( ( obj ) => {
 
 			if ( obj.isMesh === true ) {
 
-				if ( this.layers.test( obj.layers ) ) {
+				const visible = this.layers.test( obj.layers );
+
+				if ( visible === false && obj.layers.recursive === true ) stopTraversal = true;
+
+				if ( stopTraversal === false ) {
 
 					let geometry, isTemp = false;
 

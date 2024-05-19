@@ -107,6 +107,10 @@ function intersect( object, raycaster, intersects, recursive ) {
 
 		stopTraversal = object.raycast( raycaster, intersects );
 
+	} else if ( object.layers.recursive === true ) {
+
+		stopTraversal = true;
+
 	}
 
 	if ( recursive === true && stopTraversal !== true ) {

@@ -254,7 +254,7 @@ class CSS3DRenderer {
 		function hideObject( object ) {
 
 			if ( object.isCSS3DObject ) object.element.style.display = 'none';
-	  
+
 			for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
 			  hideObject( object.children[ i ] );
@@ -275,7 +275,9 @@ class CSS3DRenderer {
 
 			if ( object.isCSS3DObject ) {
 
-				const visible = ( object.layers.test( camera.layers ) === true );
+				const visible = object.layers.test( camera.layers );
+
+				if ( visible === false && object.layers.recursive === true ) return;
 
 				const element = object.element;
 				element.style.display = visible === true ? '' : 'none';

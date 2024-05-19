@@ -135,13 +135,18 @@ class CSS2DRenderer {
 				return;
 
 			}
-			
+
 			if ( object.isCSS2DObject ) {
 
 				_vector.setFromMatrixPosition( object.matrixWorld );
 				_vector.applyMatrix4( _viewProjectionMatrix );
 
-				const visible = ( _vector.z >= - 1 && _vector.z <= 1 ) && ( object.layers.test( camera.layers ) === true );
+				// Cull if outside NDC [-1, +1]
+				if ( _vector.z >= - 1 && _vector.z <= 1 ) return;
+
+				const visible = object.layers.test( camera.layers );
+
+				if ( visible === false && object.layers.recursive === true ) return;
 
 				const element = object.element;
 				element.style.display = visible === true ? '' : 'none';

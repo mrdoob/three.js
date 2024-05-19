@@ -3,6 +3,7 @@ class Layers {
 	constructor() {
 
 		this.mask = 1 | 0;
+		this.recursive = false;
 
 	}
 
