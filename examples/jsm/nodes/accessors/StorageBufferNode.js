@@ -13,7 +13,7 @@ class StorageBufferNode extends BufferNode {
 
 		this.isStorageBufferNode = true;
 
-    this.readOnly = false;
+		this.readOnly = false;
 
 		this.bufferObject = false;
 
@@ -32,10 +32,15 @@ class StorageBufferNode extends BufferNode {
 	}
 
 	getInputType( /*builder*/ ) {
-    if (this.readOnly) {
-      return 'storageReadOnlyBuffer';
-    } 
-    return 'storageBuffer'
+
+		if ( this.readOnly ) {
+
+			return 'storageReadOnlyBuffer';
+
+		}
+
+		return 'storageBuffer';
+
 	}
 
 	element( indexNode ) {
@@ -52,19 +57,21 @@ class StorageBufferNode extends BufferNode {
 
 	}
 
-  setReadOnly(value) {
-    this.readOnly = value;
-    return this;
-  }
+	setReadOnly( value ) {
+
+		this.readOnly = value;
+
+		return this;
+
+	}
 
 	generate( builder ) {
 
-		if ( 
-      builder.isAvailable( 'storageBuffer' ) && !this.readOnly ||
-      builder.isAvailable( 'storageReadOnlyBuffer' ) && this.readOnly
-    ) {
-      return super.generate( builder );
-    }
+		if ( builder.isAvailable( 'storageBuffer' ) && ! this.readOnly || builder.isAvailable( 'storageReadOnlyBuffer' ) && this.readOnly ) {
+
+			return super.generate( builder );
+
+		}
 
 		const nodeType = this.getNodeType( builder );
 
@@ -89,7 +96,7 @@ class StorageBufferNode extends BufferNode {
 export default StorageBufferNode;
 
 export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
-export const storageImmutable = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setReadOnly( true ) )
+export const storageImmutable = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setReadOnly( true ) );
 export const storageObject = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setBufferObject( true ) );
 
 addNodeClass( 'StorageBufferNode', StorageBufferNode );
