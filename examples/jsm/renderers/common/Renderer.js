@@ -333,8 +333,7 @@ class Renderer {
 
 		const renderBundleData = this.backend.get( renderBundle );
 
-		const renderContexts = renderBundleData.renderContexts;
-		if ( renderContexts === undefined ) {
+		if ( renderBundleData.renderContexts === undefined ) {
 
 			this._currentRenderBundle = renderBundle;
 
@@ -345,57 +344,55 @@ class Renderer {
 		}
 
 
-		for ( let i = 0; i < renderBundleData.renderContexts.length; i ++ ) {
+		if ( renderBundleData.renderContexts !== undefined ) {
 
-			const renderContext = renderBundleData.renderContexts[ i ];
-			const renderContextData = this.backend.get( renderContext );
+			for ( let i = 0; i < renderBundleData.renderContexts.length; i ++ ) {
 
-			const coordinateSystem = this.coordinateSystem;
+				const renderContext = renderBundleData.renderContexts[ i ];
+				const renderContextData = this.backend.get( renderContext );
 
-			if ( camera.coordinateSystem !== coordinateSystem ) {
+				const coordinateSystem = this.coordinateSystem;
 
-				camera.coordinateSystem = coordinateSystem;
+				if ( camera.coordinateSystem !== coordinateSystem ) {
 
-				camera.updateProjectionMatrix();
+					camera.coordinateSystem = coordinateSystem;
 
-			}
+					camera.updateProjectionMatrix();
 
-			//
-
-			if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
-
-			if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
-
-
-			this.backend.beginRender( renderContext );
-
-			for ( let i = 0, l = renderContextData.renderObjects.length; i < l; i ++ ) {
-
-				const renderObject = renderContextData.renderObjects[ i ];
-
-				this._nodes.updateBefore( renderObject );
+				}
 
 				//
 
-				renderObject.object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, renderObject.object.matrixWorld );
-				renderObject.object.normalMatrix.getNormalMatrix( renderObject.object.modelViewMatrix );
+				if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
-				this._nodes.updateForRender( renderObject );
-				this._bindings.updateForRender( renderObject );
+				if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-				this.backend.draw( renderObject, this.info );
+
+				this.backend.beginRender( renderContext );
+
+				for ( let i = 0, l = renderContextData.renderObjects.length; i < l; i ++ ) {
+
+					const renderObject = renderContextData.renderObjects[ i ];
+
+					this._nodes.updateBefore( renderObject );
+
+					//
+
+					renderObject.object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, renderObject.object.matrixWorld );
+					renderObject.object.normalMatrix.getNormalMatrix( renderObject.object.modelViewMatrix );
+
+					this._nodes.updateForRender( renderObject );
+					this._bindings.updateForRender( renderObject );
+
+					this.backend.draw( renderObject, this.info );
+
+				}
+
+				this.backend.finishRender( renderContext );
 
 			}
 
-			this.backend.finishRender( renderContext );
-
 		}
-
-
-		// }
-
-
-
 
 	}
 
