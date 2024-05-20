@@ -26,35 +26,21 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 	}
 
-	function renderMultiDraw( starts, counts, drawCount, p_uniforms ) {
+	function renderMultiDraw( starts, counts, drawCount ) {
 
 		if ( drawCount === 0 ) return;
 
 		const extension = extensions.get( 'WEBGL_multi_draw' );
+		extension.multiDrawArraysWEBGL( mode, starts, 0, counts, 0, drawCount );
 
-		if ( extension === null ) {
+		let elementCount = 0;
+		for ( let i = 0; i < drawCount; i ++ ) {
 
-			for ( let i = 0; i < drawCount; i ++ ) {
-
-				p_uniforms.setValue( gl, '_gl_DrawID', i );
-				this.render( starts[ i ], counts[ i ] );
-
-			}
-
-		} else {
-
-			extension.multiDrawArraysWEBGL( mode, starts, 0, counts, 0, drawCount );
-
-			let elementCount = 0;
-			for ( let i = 0; i < drawCount; i ++ ) {
-
-				elementCount += counts[ i ];
-
-			}
-
-			info.update( elementCount, mode, 1 );
+			elementCount += counts[ i ];
 
 		}
+
+		info.update( elementCount, mode, 1 );
 
 	}
 

@@ -282,8 +282,6 @@ class WebGLRenderer {
 
 		let utils, bindingStates, uniformsGroups;
 
-		let current_uniforms;
-
 		function initGLContext() {
 
 			extensions = new WebGLExtensions( _gl );
@@ -863,7 +861,25 @@ class WebGLRenderer {
 
 				} else {
 
-					renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, current_uniforms );
+					if ( ! extensions.get( 'WEBGL_multi_draw' ) ) {
+
+						const starts = object._multiDrawStarts;
+						const counts = object._multiDrawCounts;
+						const drawCount = object._multiDrawCount;
+						const bytesPerElement = index ? attributes.get( index ).bytesPerElement : 1;
+						const uniforms = properties.get( material ).currentProgram.getUniforms();
+						for ( let i = 0; i < drawCount; i ++ ) {
+
+							uniforms.setValue( _gl, '_gl_DrawID', i );
+							renderer.render( starts[ i ] / bytesPerElement, counts[ i ] );
+
+						}
+
+					} else {
+
+						renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+
+					}
 
 				}
 
@@ -1926,8 +1942,6 @@ class WebGLRenderer {
 
 			const p_uniforms = program.getUniforms(),
 				m_uniforms = materialProperties.uniforms;
-
-			current_uniforms = p_uniforms;
 
 			if ( state.useProgram( program.program ) ) {
 
