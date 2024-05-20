@@ -147,7 +147,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				const worldPos = varyingProperty( 'vec4', 'worldPos' );
 
-				worldPos.assign( positionGeometry.y.lessThan( 0.5 ).cond( start, end) );
+				worldPos.assign( positionGeometry.y.lessThan( 0.5 ).cond( start, end ) );
 
 				// height offset
 				const hw = materialLineWidth.mul( 0.5 );
