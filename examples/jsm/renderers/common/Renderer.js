@@ -351,7 +351,7 @@ class Renderer {
 				const renderContext = renderBundleData.renderContexts[ i ];
 				const renderContextData = this.backend.get( renderContext );
 
-
+				const scene = renderContextData.scene;
 				const camera = renderContextData.camera;
 
 				this._nodes.nodeFrame.renderId = renderContextData.renderId;
@@ -535,6 +535,7 @@ class Renderer {
 
 				renderContextData.renderObjects = [];
 				renderContextData.renderBundles = [];
+				renderContextData.scene = scene;
 				renderContextData.camera = camera;
 				renderContextData.renderId = nodeFrame.renderId;
 
