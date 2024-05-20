@@ -1114,7 +1114,9 @@ class Renderer {
 
 		const visible = object.layers.test( camera.layers );
 
-		if ( visible === false && object.layers.recursive === true ) return;
+		let stopTraversal = false;
+
+		if ( visible === false && object.layers.recursive === true ) stopTraversal = true;
 
 		if ( visible ) {
 
@@ -1202,11 +1204,15 @@ class Renderer {
 
 		}
 
-		const children = object.children;
+		if ( stopTraversal === false ) {
 
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
+			const children = object.children;
 
-			this._projectObject( children[ i ], camera, groupOrder, renderList );
+			for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+				this._projectObject( children[ i ], camera, groupOrder, renderList );
+
+			}
 
 		}
 
