@@ -78,5 +78,6 @@ export const transmission = nodeImmutable( PropertyNode, 'float', 'Transmission'
 export const thickness = nodeImmutable( PropertyNode, 'float', 'Thickness' );
 export const attenuationDistance = nodeImmutable( PropertyNode, 'float', 'AttenuationDistance' );
 export const attenuationColor = nodeImmutable( PropertyNode, 'color', 'AttenuationColor' );
+export const dispersion = nodeImmutable( PropertyNode, 'float', 'Dispersion' );
 
 addNodeClass( 'PropertyNode', PropertyNode );
