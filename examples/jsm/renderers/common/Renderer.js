@@ -351,19 +351,11 @@ class Renderer {
 				const renderContext = renderBundleData.renderContexts[ i ];
 				const renderContextData = this.backend.get( renderContext );
 
-				const coordinateSystem = this.coordinateSystem;
 
-				if ( camera.coordinateSystem !== coordinateSystem ) {
+				const camera = renderContextData.camera;
 
-					camera.coordinateSystem = coordinateSystem;
-
-					camera.updateProjectionMatrix();
-
-				}
-
+				this._nodes.nodeFrame.renderId = renderContextData.renderId;
 				//
-
-				if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
 
 				if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
@@ -457,7 +449,7 @@ class Renderer {
 
 	}
 
-	_renderScene( scene, camera, useFrameBufferTarget = false ) {
+	_renderScene( scene, camera, useFrameBufferTarget = true ) {
 
 		const frameBufferTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : null;
 
@@ -501,26 +493,6 @@ class Renderer {
 		this._currentRenderContext = renderContext;
 		this._currentRenderObjectFunction = this._renderObjectFunction || this.renderObject;
 
-
-		if ( this._currentRenderBundle !== null ) {
-
-			const renderBundleData = this.backend.get( this._currentRenderBundle );
-
-			if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = [];
-
-			renderBundleData.renderContexts.push( renderContext );
-
-			const renderContextData = this.backend.get( renderContext );
-
-			if ( renderContextData.renderObjects === undefined ) {
-
-				renderContextData.renderObjects = [];
-				renderContextData.renderBundles = [];
-				renderContextData.registerBundlesPhase = true;
-
-			}
-
-		}
 		//
 
 		this.info.calls ++;
@@ -546,6 +518,29 @@ class Renderer {
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
+
+		if ( this._currentRenderBundle !== null ) {
+
+			const renderBundleData = this.backend.get( this._currentRenderBundle );
+
+			if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = [];
+
+			renderBundleData.renderContexts.push( renderContext );
+
+			const renderContextData = this.backend.get( renderContext );
+
+			if ( renderContextData.renderObjects === undefined ) {
+
+				renderContextData.renderObjects = [];
+				renderContextData.renderBundles = [];
+				renderContextData.camera = camera;
+				renderContextData.renderId = nodeFrame.renderId;
+
+				renderContextData.registerBundlesPhase = true;
+
+			}
+
+		}
 
 		//
 
