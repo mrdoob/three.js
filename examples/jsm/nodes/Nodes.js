@@ -90,7 +90,7 @@ export { default as MaterialReferenceNode, materialReference } from './accessors
 export { default as RendererReferenceNode, rendererReference } from './accessors/RendererReferenceNode.js';
 export { default as MorphNode, morphReference } from './accessors/MorphNode.js';
 export { default as TextureBicubicNode, textureBicubic } from './accessors/TextureBicubicNode.js';
-export { default as ModelNode, modelDirection, modelViewMatrix, modelNormalMatrix, modelWorldMatrix, modelPosition, modelViewPosition, modelScale } from './accessors/ModelNode.js';
+export { default as ModelNode, modelDirection, modelViewMatrix, modelNormalMatrix, modelWorldMatrix, modelPosition, modelViewPosition, modelScale, modelWorldMatrixInverse } from './accessors/ModelNode.js';
 export { default as ModelViewProjectionNode, modelViewProjection } from './accessors/ModelViewProjectionNode.js';
 export * from './accessors/NormalNode.js';
 export { default as Object3DNode, objectDirection, objectViewMatrix, objectNormalMatrix, objectWorldMatrix, objectPosition, objectScale, objectViewPosition } from './accessors/Object3DNode.js';
