@@ -156,13 +156,23 @@ function Viewport( editor ) {
 
 			const camera = editor.cameras[ uuid ];
 
+			const aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+
 			if ( camera.isPerspectiveCamera ) {
 
-				camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+				camera.aspect = aspect;
 
-				camera.updateProjectionMatrix();
+			} else {
+
+				camera.left = - aspect;
+				camera.right = aspect;
 
 			}
+
+			camera.updateProjectionMatrix();
+
+			const cameraHelper = editor.helpers[ camera.id ];
+			if ( cameraHelper ) cameraHelper.update();
 
 		}
 
@@ -631,13 +641,9 @@ function Viewport( editor ) {
 
 		const viewportCamera = editor.viewportCamera;
 
-		if ( viewportCamera.isPerspectiveCamera ) {
+		if ( viewportCamera.isPerspectiveCamera || viewportCamera.isOrthographicCamera ) {
 
 			updateAspectRatio();
-
-		} else if ( viewportCamera.isOrthographicCamera ) {
-
-			// TODO
 
 		}
 
