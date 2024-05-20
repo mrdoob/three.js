@@ -357,6 +357,8 @@ class Renderer {
 				this._nodes.nodeFrame.renderId = renderContextData.renderId;
 				//
 
+				if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+
 				if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
 
