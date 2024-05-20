@@ -282,6 +282,8 @@ class WebGLRenderer {
 
 		let utils, bindingStates, uniformsGroups;
 
+		let current_uniforms;
+
 		function initGLContext() {
 
 			extensions = new WebGLExtensions( _gl );
@@ -861,7 +863,7 @@ class WebGLRenderer {
 
 				} else {
 
-					renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
+					renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, current_uniforms );
 
 				}
 
@@ -1924,6 +1926,8 @@ class WebGLRenderer {
 
 			const p_uniforms = program.getUniforms(),
 				m_uniforms = materialProperties.uniforms;
+
+			current_uniforms = p_uniforms;
 
 			if ( state.useProgram( program.program ) ) {
 

@@ -35,7 +35,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 
 	}
 
-	function renderMultiDraw( starts, counts, drawCount ) {
+	function renderMultiDraw( starts, counts, drawCount, p_uniforms ) {
 
 		if ( drawCount === 0 ) return;
 
@@ -45,6 +45,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 
+				p_uniforms.setValue( gl, '_gl_DrawID', i );
 				this.render( starts[ i ] / bytesPerElement, counts[ i ] );
 
 			}
