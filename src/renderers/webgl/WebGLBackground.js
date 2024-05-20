@@ -71,6 +71,12 @@ function WebGLBackground( renderer, cubemaps, cubeuvmaps, state, objects, alpha,
 
 		if ( renderer.autoClear || forceClear ) {
 
+			// buffers might not be writable which is required to ensure a correct clear
+
+			state.buffers.depth.setTest( true );
+			state.buffers.depth.setMask( true );
+			state.buffers.color.setMask( true );
+
 			renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
 
 		}
