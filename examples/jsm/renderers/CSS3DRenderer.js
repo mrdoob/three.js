@@ -172,7 +172,6 @@ class CSS3DRenderer {
 
 			}
 
-			hideObject( scene );
 			renderObject( scene, scene, camera, cameraCSSMatrix );
 
 		};
@@ -266,11 +265,20 @@ class CSS3DRenderer {
 
 		function renderObject( object, scene, camera, cameraCSSMatrix ) {
 
-			if ( object.visible === false ) return;
+			if ( object.visible === false ) {
+
+				hideObject( object );
+
+				return;
+
+			}
 
 			if ( object.isCSS3DObject ) {
 
 				const visible = ( object.layers.test( camera.layers ) === true );
+
+				const element = object.element;
+				element.style.display = visible === true ? '' : 'none';
 
 				if ( visible === true ) {
 
@@ -304,10 +312,7 @@ class CSS3DRenderer {
 
 					}
 
-					const element = object.element;
 					const cachedObject = cache.objects.get( object );
-
-					element.style.display = '';
 
 					if ( cachedObject === undefined || cachedObject.style !== style ) {
 

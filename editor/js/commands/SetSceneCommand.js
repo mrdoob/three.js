@@ -10,7 +10,7 @@ import { AddObjectCommand } from './AddObjectCommand.js';
  */
 class SetSceneCommand extends Command {
 
-	constructor( editor, scene ) {
+	constructor( editor, scene = null ) {
 
 		super( editor );
 
@@ -19,7 +19,7 @@ class SetSceneCommand extends Command {
 
 		this.cmdArray = [];
 
-		if ( scene !== undefined ) {
+		if ( scene !== null ) {
 
 			this.cmdArray.push( new SetUuidCommand( this.editor, this.editor.scene, scene.uuid ) );
 			this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'name', scene.name ) );

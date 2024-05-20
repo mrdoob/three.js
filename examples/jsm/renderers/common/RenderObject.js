@@ -226,6 +226,12 @@ export default class RenderObject {
 
 			cacheKey += object._matricesTexture.uuid + ',';
 
+			if ( object._colorsTexture !== null ) {
+
+				cacheKey += object._colorsTexture.uuid + ',';
+
+			}
+
 		}
 
 		return cacheKey;

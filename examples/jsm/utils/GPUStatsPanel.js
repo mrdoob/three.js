@@ -56,6 +56,8 @@ export class GPUStatsPanel extends Stats.Panel {
 
 					}
 
+					gl.deleteQuery( query );
+
 					this.activeQueries --;
 
 
