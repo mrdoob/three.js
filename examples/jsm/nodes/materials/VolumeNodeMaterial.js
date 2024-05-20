@@ -2,8 +2,8 @@ import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import { varying } from '../core/VaryingNode.js';
 import { property } from '../core/PropertyNode.js';
 import { materialReference } from '../accessors/MaterialReferenceNode.js';
+import { modelWorldMatrixInverse } from '../accessors/ModelNode.js';
 import { cameraPosition } from '../accessors/CameraNode.js';
-import { reference } from '../accessors/ReferenceNode.js';
 import { positionGeometry } from '../accessors/PositionNode.js';
 import { tslFn, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import { min, max } from '../math/MathNode.js';
@@ -51,7 +51,6 @@ class VolumeNodeMaterial extends NodeMaterial {
 
 		this.fragmentNode = tslFn( () => {
 
-			const modelWorldMatrixInverse = reference( 'matrixWorldInverse', 'mat4' );
 			const vOrigin = varying( vec3( modelWorldMatrixInverse.mul( vec4( cameraPosition, 1.0 ) ) ) );
 			const vDirection = varying( positionGeometry.sub( vOrigin ) );
 

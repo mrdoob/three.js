@@ -149,7 +149,6 @@
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );
-				mesh.matrixWorldInverse = mesh.matrixWorld.clone().invert();
 
 				scene.add( mesh );
 
@@ -193,8 +192,6 @@
 			function animate() {
 
 				mesh.rotation.y = - performance.now() / 7500;
-				mesh.matrixWorldInverse.copy( mesh.matrixWorld ).invert();
-
 
 				renderer.render( scene, camera );
 
