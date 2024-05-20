@@ -1,5 +1,6 @@
 export default /* glsl */`
 #ifdef USE_BATCHING
+	uniform int _gl_DrawID;
 	uniform highp sampler2D batchingTexture;
 	uniform highp usampler2D batchingIdTexture;
 	mat4 getBatchingMatrix( const in float i ) {
