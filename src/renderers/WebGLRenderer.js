@@ -1533,6 +1533,12 @@ class WebGLRenderer {
 
 			_this.toneMapping = currentToneMapping;
 
+			// buffers might not be writable after rendering transmission which is required to ensure a correct clear
+
+			state.buffers.depth.setTest( true );
+			state.buffers.depth.setMask( true );
+			state.buffers.color.setMask( true );
+
 		}
 
 		function renderObjects( renderList, scene, camera ) {
