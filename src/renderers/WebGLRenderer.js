@@ -197,7 +197,6 @@ class WebGLRenderer {
 
 		let _clippingEnabled = false;
 		let _localClippingEnabled = false;
-		let _renderBackground = false;
 
 		// camera matrices cache
 
@@ -206,6 +205,8 @@ class WebGLRenderer {
 		const _vector3 = new Vector3();
 
 		const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
+
+		let _renderBackground = false;
 
 		function getTargetPixelRatio() {
 
