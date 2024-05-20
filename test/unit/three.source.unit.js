@@ -285,5 +285,3 @@ import './src/textures/Source.tests.js';
 import './src/textures/Texture.tests.js';
 import './src/textures/VideoTexture.tests.js';
 
-//addons
-import './addons/utils/BufferGeometryUtils.tests.js';
