@@ -147,7 +147,7 @@ class CSS2DRenderer {
 				_vector.setFromMatrixPosition( object.matrixWorld );
 				_vector.applyMatrix4( _viewProjectionMatrix );
 
-				const visible = _vector.z >= - 1 && _vector.z <= 1 && layerTest;
+				const visible = ( _vector.z >= - 1 && _vector.z <= 1 ) && layerTest;
 
 				const element = object.element;
 				element.style.display = visible === true ? '' : 'none';
