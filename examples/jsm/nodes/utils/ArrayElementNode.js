@@ -15,7 +15,10 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 	getNodeType( builder ) {
 
-		return this.node.getNodeType( builder );
+		const type = this.node.getNodeType( builder );
+		const elementType = builder.getElementType( type );
+
+		return elementType;
 
 	}
 
