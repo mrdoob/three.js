@@ -136,17 +136,18 @@ class CSS2DRenderer {
 
 			}
 
+			let stopTraversal = false;
+
 			if ( object.isCSS2DObject ) {
+
+				const layerTest = object.layers.test( camera.layers );
+
+				if ( layerTest === false && object.layers.recursive === true ) stopTraversal = true;
 
 				_vector.setFromMatrixPosition( object.matrixWorld );
 				_vector.applyMatrix4( _viewProjectionMatrix );
 
-				// Cull if outside NDC [-1, +1]
-				if ( _vector.z >= - 1 && _vector.z <= 1 ) return;
-
-				const visible = object.layers.test( camera.layers );
-
-				if ( visible === false && object.layers.recursive === true ) return;
+				const visible = _vector.z >= - 1 && _vector.z <= 1 && layerTest;
 
 				const element = object.element;
 				element.style.display = visible === true ? '' : 'none';
@@ -175,9 +176,13 @@ class CSS2DRenderer {
 
 			}
 
-			for ( let i = 0, l = object.children.length; i < l; i ++ ) {
+			if ( stopTraversal === false ) {
 
-				renderObject( object.children[ i ], scene, camera );
+				for ( let i = 0, l = object.children.length; i < l; i ++ ) {
+
+					renderObject( object.children[ i ], scene, camera );
+
+				}
 
 			}
 
