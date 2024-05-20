@@ -10,7 +10,7 @@ const getGradientIrradiance = tslFn( ( { normal, lightDirection, builder } ) => 
 
 	// dotNL will be from -1.0 to 1.0
 	const dotNL = normal.dot( lightDirection );
-	const coord = vec2( dotNL.mul( 0.5 ).add(  0.5 ), 0.0 );
+	const coord = vec2( dotNL.mul( 0.5 ).add( 0.5 ), 0.0 );
 
 	if ( builder.material.gradientMap ) {
 
