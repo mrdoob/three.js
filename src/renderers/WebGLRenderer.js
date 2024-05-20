@@ -206,6 +206,8 @@ class WebGLRenderer {
 
 		const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
 
+		let _renderBackground = false;
+
 		function getTargetPixelRatio() {
 
 			return _currentRenderTarget === null ? _pixelRatio : 1;
@@ -1153,8 +1155,8 @@ class WebGLRenderer {
 
 			}
 
-			const renderBackground = xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false;
-			if ( renderBackground ) {
+			_renderBackground = xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false;
+			if ( _renderBackground ) {
 
 				background.addToRenderList( currentRenderList, scene );
 
@@ -1199,7 +1201,7 @@ class WebGLRenderer {
 
 				}
 
-				if ( renderBackground ) background.render( scene );
+				if ( _renderBackground ) background.render( scene );
 
 				for ( let i = 0, l = cameras.length; i < l; i ++ ) {
 
@@ -1213,7 +1215,7 @@ class WebGLRenderer {
 
 				if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
 
-				if ( renderBackground ) background.render( scene );
+				if ( _renderBackground ) background.render( scene );
 
 				renderScene( currentRenderList, scene, camera );
 
@@ -1430,7 +1432,8 @@ class WebGLRenderer {
 					samples: 4,
 					stencilBuffer: stencil,
 					resolveDepthBuffer: false,
-					resolveStencilBuffer: false
+					resolveStencilBuffer: false,
+					colorSpace: ColorManagement.workingColorSpace,
 				} );
 
 				// debug
@@ -1460,6 +1463,8 @@ class WebGLRenderer {
 			if ( _currentClearAlpha < 1 ) _this.setClearColor( 0xffffff, 0.5 );
 
 			_this.clear();
+
+			if ( _renderBackground ) background.render( scene );
 
 			// Turn off the features which can affect the frag color for opaque objects pass.
 			// Otherwise they are applied twice in opaque objects pass and transmission objects pass.
