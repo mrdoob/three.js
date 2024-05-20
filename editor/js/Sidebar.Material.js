@@ -430,7 +430,7 @@ function SidebarMaterial( editor ) {
 	exportJson.onClick( function () {
 
 		const object = editor.selected;
-		const material = object.material;
+		const material = Array.isArray( object.material ) ? object.material[ currentMaterialSlot ] : object.material;
 
 		let output = material.toJSON();
 

@@ -208,6 +208,8 @@ class WebGLRenderer {
 
 		const _emptyScene = { background: null, fog: null, environment: null, overrideMaterial: null, isScene: true };
 
+		let _renderBackground = false;
+
 		function getTargetPixelRatio() {
 
 			return _currentRenderTarget === null ? _pixelRatio : 1;
@@ -1155,8 +1157,8 @@ class WebGLRenderer {
 
 			}
 
-			const renderBackground = xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false;
-			if ( renderBackground ) {
+			_renderBackground = xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false;
+			if ( _renderBackground ) {
 
 				background.addToRenderList( currentRenderList, scene );
 
@@ -1201,7 +1203,7 @@ class WebGLRenderer {
 
 				}
 
-				if ( renderBackground ) background.render( scene );
+				if ( _renderBackground ) background.render( scene );
 
 				for ( let i = 0, l = cameras.length; i < l; i ++ ) {
 
@@ -1215,7 +1217,7 @@ class WebGLRenderer {
 
 				if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
 
-				if ( renderBackground ) background.render( scene );
+				if ( _renderBackground ) background.render( scene );
 
 				const transmissionRenderTarget = currentRenderState.state.transmissionRenderTarget[ camera.id ];
 				if ( transmissiveObjects.length > 0 ) {
@@ -1445,6 +1447,7 @@ class WebGLRenderer {
 					samples: 4,
 					stencilBuffer: stencil,
 					resolveStencilBuffer: false,
+					colorSpace: ColorManagement.workingColorSpace,
 					depthTexture: new DepthTexture(),
 				} );
 
@@ -1475,6 +1478,8 @@ class WebGLRenderer {
 			if ( _currentClearAlpha < 1 ) _this.setClearColor( 0xffffff, 0.5 );
 
 			_this.clear();
+
+			if ( _renderBackground ) background.render( scene );
 
 			// Turn off the features which can affect the frag color for opaque objects pass.
 			// Otherwise they are applied twice in opaque objects pass and transmission objects pass.
@@ -1542,6 +1547,12 @@ class WebGLRenderer {
 			if ( currentCameraViewport !== undefined ) camera.viewport = currentCameraViewport;
 
 			_this.toneMapping = currentToneMapping;
+
+			// buffers might not be writable after rendering transmission which is required to ensure a correct clear
+
+			state.buffers.depth.setTest( true );
+			state.buffers.depth.setMask( true );
+			state.buffers.color.setMask( true );
 
 		}
 

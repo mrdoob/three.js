@@ -366,6 +366,7 @@ MaterialNode.LINE_GAP_SIZE = 'gapSize';
 MaterialNode.LINE_WIDTH = 'linewidth';
 MaterialNode.LINE_DASH_OFFSET = 'dashOffset';
 MaterialNode.POINT_WIDTH = 'pointWidth';
+MaterialNode.DISPERSION = 'dispersion';
 
 export default MaterialNode;
 
@@ -405,6 +406,7 @@ export const materialLineGapSize = nodeImmutable( MaterialNode, MaterialNode.LIN
 export const materialLineWidth = nodeImmutable( MaterialNode, MaterialNode.LINE_WIDTH );
 export const materialLineDashOffset = nodeImmutable( MaterialNode, MaterialNode.LINE_DASH_OFFSET );
 export const materialPointWidth = nodeImmutable( MaterialNode, MaterialNode.POINT_WIDTH );
+export const materialDispersion = nodeImmutable( MaterialNode, MaterialNode.DISPERSION );
 export const materialAnisotropyVector = uniform( new Vector2() ).onReference( function ( frame ) {
 
 	return frame.material;

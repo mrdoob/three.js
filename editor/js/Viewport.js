@@ -152,8 +152,29 @@ function Viewport( editor ) {
 
 	function updateAspectRatio() {
 
-		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-		camera.updateProjectionMatrix();
+		for ( const uuid in editor.cameras ) {
+
+			const camera = editor.cameras[ uuid ];
+
+			const aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+
+			if ( camera.isPerspectiveCamera ) {
+
+				camera.aspect = aspect;
+
+			} else {
+
+				camera.left = - aspect;
+				camera.right = aspect;
+
+			}
+
+			camera.updateProjectionMatrix();
+
+			const cameraHelper = editor.helpers[ camera.id ];
+			if ( cameraHelper ) cameraHelper.update();
+
+		}
 
 	}
 
@@ -620,14 +641,9 @@ function Viewport( editor ) {
 
 		const viewportCamera = editor.viewportCamera;
 
-		if ( viewportCamera.isPerspectiveCamera ) {
+		if ( viewportCamera.isPerspectiveCamera || viewportCamera.isOrthographicCamera ) {
 
-			viewportCamera.aspect = editor.camera.aspect;
-			viewportCamera.projectionMatrix.copy( editor.camera.projectionMatrix );
-
-		} else if ( viewportCamera.isOrthographicCamera ) {
-
-			// TODO
+			updateAspectRatio();
 
 		}
 
@@ -635,6 +651,7 @@ function Viewport( editor ) {
 
 		controls.enabled = ( viewportCamera === editor.camera );
 
+		initPT();
 		render();
 
 	} );
@@ -646,7 +663,7 @@ function Viewport( editor ) {
 		switch ( viewportShading ) {
 
 			case 'realistic':
-				pathtracer.init( scene, camera );
+				pathtracer.init( scene, editor.viewportCamera );
 				break;
 
 			case 'solid':
@@ -757,7 +774,7 @@ function Viewport( editor ) {
 
 		if ( editor.viewportShading === 'realistic' ) {
 
-			pathtracer.init( scene, camera );
+			pathtracer.init( scene, editor.viewportCamera );
 
 		}
 

@@ -498,6 +498,16 @@ class NodeBuilder {
 
 	}
 
+	getElementType( type ) {
+
+		if ( type === 'mat2' ) return 'vec2';
+		if ( type === 'mat3' ) return 'vec3';
+		if ( type === 'mat4' ) return 'vec4';
+
+		return this.getComponentType( type );
+
+	}
+
 	getComponentType( type ) {
 
 		type = this.getVectorType( type );

@@ -10,6 +10,7 @@ import { Box3 } from '../math/Box3.js';
 import { Sphere } from '../math/Sphere.js';
 import { Frustum } from '../math/Frustum.js';
 import { Vector3 } from '../math/Vector3.js';
+import { Color } from '../math/Color.js';
 
 function sortOpaque( a, b ) {
 
@@ -72,6 +73,7 @@ const ID_ATTR_NAME = 'batchId';
 const _matrix = /*@__PURE__*/ new Matrix4();
 const _invMatrixWorld = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
+const _whiteColor = /*@__PURE__*/ new Color( 1, 1, 1 );
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _frustum = /*@__PURE__*/ new Frustum();
 const _box = /*@__PURE__*/ new Box3();
@@ -193,7 +195,8 @@ class BatchedMesh extends Mesh {
 		let size = Math.sqrt( this._maxGeometryCount );
 		size = Math.ceil( size );
 
-		const colorsArray = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
+		// 4 floats per RGBA pixel initialized to white
+		const colorsArray = new Float32Array( size * size * 4 ).fill( 1 );
 		const colorsTexture = new DataTexture( colorsArray, size, size, RGBAFormat, FloatType );
 		colorsTexture.colorSpace = ColorManagement.workingColorSpace;
 
@@ -434,6 +437,7 @@ class BatchedMesh extends Mesh {
 		const active = this._active;
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = this._matricesTexture.image.data;
+		const colorsTexture = this._colorsTexture;
 
 		// push new visibility states
 		visibility.push( true );
@@ -446,6 +450,14 @@ class BatchedMesh extends Mesh {
 		// initialize matrix information
 		_identityMatrix.toArray( matricesArray, geometryId * 16 );
 		matricesTexture.needsUpdate = true;
+
+		// initialize the color to white
+		if ( colorsTexture !== null ) {
+
+			_whiteColor.toArray( colorsTexture.image.data, geometryId * 4 );
+			colorsTexture.needsUpdate = true;
+
+		}
 
 		// add the reserved range and draw range objects
 		reservedRanges.push( reservedRange );

@@ -31,7 +31,7 @@ class SetScriptValueCommand extends Command {
 
 		this.script[ this.attributeName ] = this.newValue;
 
-		this.editor.signals.scriptChanged.dispatch();
+		this.editor.signals.scriptChanged.dispatch( this.script );
 
 	}
 
@@ -39,7 +39,7 @@ class SetScriptValueCommand extends Command {
 
 		this.script[ this.attributeName ] = this.oldValue;
 
-		this.editor.signals.scriptChanged.dispatch();
+		this.editor.signals.scriptChanged.dispatch( this.script );
 
 	}
 
