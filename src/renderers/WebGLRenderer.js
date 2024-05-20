@@ -1289,7 +1289,9 @@ class WebGLRenderer {
 
 			const visible = object.layers.test( camera.layers );
 
-			if ( visible === false && object.layers.recursive === true ) return;
+			let stopTraversal = false;
+
+			if ( visible === false && object.layers.recursive === true ) stopTraversal = true;
 
 			if ( visible ) {
 
@@ -1389,11 +1391,15 @@ class WebGLRenderer {
 
 			}
 
-			const children = object.children;
+			if ( stopTraversal === false ) {
 
-			for ( let i = 0, l = children.length; i < l; i ++ ) {
+				const children = object.children;
 
-				projectObject( children[ i ], camera, groupOrder, sortObjects );
+				for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+					projectObject( children[ i ], camera, groupOrder, sortObjects );
+
+				}
 
 			}
 
