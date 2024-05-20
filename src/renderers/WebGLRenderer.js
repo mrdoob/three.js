@@ -1430,7 +1430,8 @@ class WebGLRenderer {
 					samples: 4,
 					stencilBuffer: stencil,
 					resolveDepthBuffer: false,
-					resolveStencilBuffer: false
+					resolveStencilBuffer: false,
+					colorSpace: ColorManagement.workingColorSpace,
 				} );
 
 				// debug
@@ -1460,6 +1461,9 @@ class WebGLRenderer {
 			if ( _currentClearAlpha < 1 ) _this.setClearColor( 0xffffff, 0.5 );
 
 			_this.clear();
+
+			const renderBackground = xr.enabled === false || xr.isPresenting === false || xr.hasDepthSensing() === false;
+			if ( renderBackground ) background.render( scene );
 
 			// Turn off the features which can affect the frag color for opaque objects pass.
 			// Otherwise they are applied twice in opaque objects pass and transmission objects pass.
