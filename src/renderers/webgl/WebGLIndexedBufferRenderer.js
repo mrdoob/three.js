@@ -35,35 +35,22 @@ function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 
 	}
 
-	function renderMultiDraw( starts, counts, drawCount, p_uniforms ) {
+	function renderMultiDraw( starts, counts, drawCount ) {
 
 		if ( drawCount === 0 ) return;
 
 		const extension = extensions.get( 'WEBGL_multi_draw' );
+		extension.multiDrawElementsWEBGL( mode, counts, 0, type, starts, 0, drawCount );
 
-		if ( extension === null ) {
+		let elementCount = 0;
+		for ( let i = 0; i < drawCount; i ++ ) {
 
-			for ( let i = 0; i < drawCount; i ++ ) {
-
-				p_uniforms.setValue( gl, '_gl_DrawID', i );
-				this.render( starts[ i ] / bytesPerElement, counts[ i ] );
-
-			}
-
-		} else {
-
-			extension.multiDrawElementsWEBGL( mode, counts, 0, type, starts, 0, drawCount );
-
-			let elementCount = 0;
-			for ( let i = 0; i < drawCount; i ++ ) {
-
-				elementCount += counts[ i ];
-
-			}
-
-			info.update( elementCount, mode, 1 );
+			elementCount += counts[ i ];
 
 		}
+
+		info.update( elementCount, mode, 1 );
+
 
 	}
 
