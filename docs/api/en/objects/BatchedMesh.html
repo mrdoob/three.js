@@ -14,22 +14,22 @@
 		<p class="desc">
 			A special version of [page:Mesh] with multi draw batch rendering support. Use
 			[name] if you have to render a large number of objects with the same
-			material but with different world transformations and geometry. The usage
-			of [name] will help you to reduce the number of draw calls and thus
-			improve the overall rendering performance in your application.
+			material but with different world transformations. The usage of [name] will
+			help you to reduce the number of draw calls and thus improve the overall
+			rendering performance in your application.
 
 			<br/>
 			<br/>
 
 			If the [link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_multi_draw WEBGL_multi_draw extension] is
-			not supported then a less performant callback is used.
+			not supported then a less performant fallback is used.
 		</p>
 
 		<h2>Code Example</h2>
 
 		<code>
 		const box = new THREE.BoxGeometry( 1, 1, 1 );
-		const sphere = new THREE.BoxGeometry( 1, 1, 1 );
+		const sphere = new THREE.SphereGeometry( 1, 1, 1 );
 		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 
 		// initialize and add geometries into the batched mesh
@@ -37,9 +37,16 @@
 		const boxId = batchedMesh.addGeometry( box );
 		const sphereId = batchedMesh.addGeometry( sphere );
 
+		// create more instances of the same geometries
+		const boxId2 = batchedMesh.addInstance( boxId ); 
+		const sphereId2 = batchedMesh.addInstance( sphereId ); 
+
 		// position the geometries
 		batchedMesh.setMatrixAt( boxId, boxMatrix );
 		batchedMesh.setMatrixAt( sphereId, sphereMatrix );
+
+		batchedMesh.setMatrixAt( boxId2, boxMatrix2 );
+		batchedMesh.setMatrixAt( sphereId2, sphereMatrix2 );
 
 		scene.add( batchedMesh );
 		</code>
@@ -52,16 +59,15 @@
 		<h2>Constructor</h2>
 		<h3>
 			[name](
-				[param:Integer maxGeometryCount], [param:Integer maxVertexCount],
+				[param:Integer maxItemCount], [param:Integer maxVertexCount],
 				[param:Integer maxIndexCount], [param:Material material],
 			)
 		</h3>
 		<p>
-			[page:Integer maxGeometryCount] - the max number of individual geometries planned to be added.<br />
-			[page:Integer maxVertexCount] - the max number of vertices to be used by all geometries.<br />
-			[page:Integer maxIndexCount] - the max number of indices to be used by all geometries.<br />
-			[page:Material material] - an instance of [page:Material]. Default is a
-			new [page:MeshBasicMaterial].<br />
+			[page:Integer maxItemCount] - the max number of individual items planned to be added and rendered.<br />
+			[page:Integer maxVertexCount] - the max number of vertices to be used by all unique geometries.<br />
+			[page:Integer maxIndexCount] - the max number of indices to be used by all unique geometries.<br />
+			[page:Material material] - an instance of [page:Material]. Default is a new [page:MeshBasicMaterial].<br />
 		</p>
 
 		<h2>Properties</h2>
@@ -222,22 +228,35 @@
 			the length of the given geometry index buffer.
 		</p>
 		<p>
-			Adds the given geometry to the [name] and returns the associated index referring to it.
+			Adds the given geometry and a new instance to the [name] and returns the associated index referring to it to be used by other functions.
+		</p>
+
+		<h3>
+			[method:Integer addInstance]( [param:Integer id] )
+		</h3>
+		<p>
+			[page:Integer id]: The id of a previously added item via "addGeometry" or "addInstance" to add into the [name] to render. 
+		</p>
+		<p>
+			Adds a a new instance to the [name] using the same geometry from the given id and returns the associated index referring to it to be used
+			by other functions.
 		</p>
 
 		<h3>
 			[method:Integer setGeometryAt]( [param:Integer index], [param:BufferGeometry geometry] )
 		</h3>
 		<p>
-			[page:Integer index]: Which geometry index to replace with this geometry.
+			[page:Integer index]: Which item index to replace with this geometry.
 		</p>
 		<p>
 			[page:BufferGeometry geometry]: The geometry to substitute at the given geometry index.
 		</p>
 		<p>
-			Replaces the geometry at `index` with the provided geometry. Throws an error if there is not enough space reserved for geometry at the index.
+			Replaces the geometry used by the item at `index` with the provided geometry. Throws an error if there is not enough space reserved for geometry
+			at the index. Calling this will change all instances that are rendering that geometry.
 		</p>
 
+		<!--
 		<h3>
 			[method:Integer getInstanceCountAt]( [param:Integer index] )
 		</h3>
@@ -261,6 +280,7 @@
 		<p>
 			Sets an instance count of the geometry at `index`.
 		</p>
+		-->
 
 		<h2>Source</h2>
 
