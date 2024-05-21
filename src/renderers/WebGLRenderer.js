@@ -1462,7 +1462,15 @@ class WebGLRenderer {
 			_currentClearAlpha = _this.getClearAlpha();
 			if ( _currentClearAlpha < 1 ) _this.setClearColor( 0xffffff, 0.5 );
 
-			if ( _renderBackground ) background.render( scene );
+			if ( _renderBackground ) {
+
+				background.render( scene );
+
+			} else {
+
+				_this.clear();
+
+			}
 
 			// Turn off the features which can affect the frag color for opaque objects pass.
 			// Otherwise they are applied twice in opaque objects pass and transmission objects pass.
