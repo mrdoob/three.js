@@ -635,8 +635,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 
-			parameters.batching && ! parameters.extensionMultiDraw ? '#define gl_DrawID _gl_DrawID' : '',
-
 			'uniform mat4 modelMatrix;',
 			'uniform mat4 modelViewMatrix;',
 			'uniform mat4 projectionMatrix;',
