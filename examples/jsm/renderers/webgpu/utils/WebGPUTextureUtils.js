@@ -327,11 +327,11 @@ class WebGPUTextureUtils {
 
 		// transfer texture data
 
-		if ( texture.isDataTexture || texture.isData3DTexture ) {
+		if ( texture.isDataTexture ) {
 
 			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
 
-		} else if ( texture.isDataArrayTexture ) {
+		} else if ( texture.isDataArrayTexture || texture.isData3DTexture ) {
 
 			for ( let i = 0; i < options.image.depth; i ++ ) {
 
