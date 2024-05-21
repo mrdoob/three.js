@@ -191,6 +191,7 @@ class AnalyticLightNode extends LightingNode {
 		rtt.setSize( light.shadow.mapSize.width, light.shadow.mapSize.height );
 
 		light.shadow.updateMatrices( light );
+		light.shadow.camera.layers.mask = frame.camera.layers.mask;
 
 		const currentToneMapping = renderer.toneMapping;
 		const currentRenderTarget = renderer.getRenderTarget();
