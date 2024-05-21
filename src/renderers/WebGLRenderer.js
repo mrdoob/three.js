@@ -1461,13 +1461,13 @@ class WebGLRenderer {
 			_this.getClearColor( _currentClearColor );
 			_currentClearAlpha = _this.getClearAlpha();
 
+			if ( _currentClearAlpha < 1 ) _this.setClearColor( 0xffffff, 0.5 );
+
 			if ( _renderBackground ) {
 
 				background.render( scene );
 
 			} else {
-
-				if ( _currentClearAlpha < 1 ) _this.setClearColor( 0xffffff, 0.5 );
 
 				_this.clear();
 
