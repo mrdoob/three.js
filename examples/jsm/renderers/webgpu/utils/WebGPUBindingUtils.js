@@ -33,7 +33,7 @@ class WebGPUBindingUtils {
 
 				if ( binding.isStorageBuffer ) {
 
-					buffer.type = binding.readOnly ? GPUBufferBindingType.ReadOnlyStorage : GPUBufferBindingType.Storage;
+					buffer.type = binding.access === 'read' ? GPUBufferBindingType.ReadOnlyStorage : GPUBufferBindingType.Storage;
 
 				}
 

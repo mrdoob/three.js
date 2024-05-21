@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { vec3, cos, sin, mat3, storage, storageImmutable, tslFn, instanceIndex, timerLocal } from 'three/nodes';
+			import { vec3, cos, sin, mat3, storage, storageReadOnly, tslFn, instanceIndex, timerLocal } from 'three/nodes';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -72,8 +72,8 @@
 
 					const computeFn = tslFn( () => {
 
-						const positionAttribute = storageImmutable( positionBaseAttribute, 'vec3', positionBaseAttribute.count );
-						const normalAttribute = storageImmutable( normalBaseAttribute, 'vec3', normalBaseAttribute.count );
+						const positionAttribute = storageReadOnly( positionBaseAttribute, 'vec3', positionBaseAttribute.count );
+						const normalAttribute = storageReadOnly( normalBaseAttribute, 'vec3', normalBaseAttribute.count );
 
 						const positionStorageAttribute = storage( positionStorageBufferAttribute, 'vec4', positionStorageBufferAttribute.count );
 						const normalStorageAttribute = storage( normalStorageBufferAttribute, 'vec4', normalStorageBufferAttribute.count );

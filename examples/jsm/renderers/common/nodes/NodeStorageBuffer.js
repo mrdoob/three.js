@@ -1,18 +1,19 @@
 import StorageBuffer from '../StorageBuffer.js';
+import { StorageBufferAccessType } from '../../../nodes/accessors/StorageBufferNode.js';
 
 let _id = 0;
 
 class NodeStorageBuffer extends StorageBuffer {
 
-	constructor( nodeUniform, readOnly ) {
+	constructor( nodeUniform ) {
 
-		readOnly = readOnly ? readOnly : false;
-		const namePrefix = readOnly ? 'StorageReadOnlyBuffer_' : 'StorageBuffer_';
+		const access = nodeUniform ? nodeUniform.access : StorageBufferAccessType.ReadWrite;
+		const namePrefix = access === StorageBufferAccessType.Read ? 'StorageReadOnlyBuffer_' : 'StorageBuffer_';
 
 		super( namePrefix + _id ++, nodeUniform ? nodeUniform.value : null );
 
 		this.nodeUniform = nodeUniform;
-		this.readOnly = readOnly;
+		this.access = access;
 
 	}
 

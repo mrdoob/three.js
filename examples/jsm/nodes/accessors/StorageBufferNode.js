@@ -5,6 +5,11 @@ import { nodeObject } from '../shadernode/ShaderNode.js';
 import { varying } from '../core/VaryingNode.js';
 import { storageElement } from '../utils/StorageArrayElementNode.js';
 
+export const StorageBufferAccessType = {
+	Read: 'read',
+	ReadWrite: 'read_write',
+};
+
 class StorageBufferNode extends BufferNode {
 
 	constructor( value, bufferType, bufferCount = 0 ) {
@@ -13,7 +18,7 @@ class StorageBufferNode extends BufferNode {
 
 		this.isStorageBufferNode = true;
 
-		this.readOnly = false;
+		this.access = StorageBufferAccessType.ReadWrite;
 
 		this.bufferObject = false;
 
@@ -33,13 +38,7 @@ class StorageBufferNode extends BufferNode {
 
 	getInputType( /*builder*/ ) {
 
-		if ( this.readOnly ) {
-
-			return 'storageReadOnlyBuffer';
-
-		}
-
-		return 'storageBuffer';
+		return this.access === StorageBufferAccessType.ReadWrite ? 'storageBuffer' : 'storageReadOnlyBuffer';
 
 	}
 
@@ -57,9 +56,9 @@ class StorageBufferNode extends BufferNode {
 
 	}
 
-	setReadOnly( value ) {
+	setAccess( value ) {
 
-		this.readOnly = value;
+		this.access = value;
 
 		return this;
 
@@ -67,7 +66,7 @@ class StorageBufferNode extends BufferNode {
 
 	generate( builder ) {
 
-		if ( builder.isAvailable( 'storageBuffer' ) && ! this.readOnly || builder.isAvailable( 'storageReadOnlyBuffer' ) && this.readOnly ) {
+		if ( builder.isAvailable( 'storageBuffer' ) ) {
 
 			return super.generate( builder );
 
@@ -95,8 +94,11 @@ class StorageBufferNode extends BufferNode {
 
 export default StorageBufferNode;
 
+// Read-Write Storage
 export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
-export const storageImmutable = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setReadOnly( true ) );
 export const storageObject = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setBufferObject( true ) );
+
+// Read-Only Storage
+export const storageReadOnly = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setAccess( StorageBufferAccessType.Read ) );
 
 addNodeClass( 'StorageBufferNode', StorageBufferNode );

@@ -26,7 +26,6 @@ const gpuShaderStageLib = {
 const supports = {
 	instance: true,
 	storageBuffer: true,
-	storageReadOnlyBuffer: true,
 };
 
 const wgslFnOpLib = {
@@ -407,8 +406,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'storageReadOnlyBuffer' ) {
 
 				const bufferClass = type !== 'buffer' ? NodeStorageBuffer : NodeUniformBuffer;
-				const readOnly = type === 'storageReadOnlyBuffer';
-				const buffer = new bufferClass( node, readOnly );
+				const buffer = new bufferClass( node );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
@@ -797,12 +795,7 @@ ${ flowData.code }
 
 				const bufferCountSnippet = bufferCount > 0 ? ', ' + bufferCount : '';
 				const bufferSnippet = `\t${uniform.name} : array< ${bufferType}${bufferCountSnippet} >\n`;
-				let bufferAccessMode = bufferNode.isStorageBufferNode ? 'storage,read' : 'uniform';
-				if ( ! bufferNode.readOnly ) {
-
-					bufferAccessMode += '_write';
-
-				}
+				let bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${bufferNode.access}` : 'uniform';
 
 				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, index ++ ) );
 
