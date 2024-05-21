@@ -414,6 +414,21 @@ select {
 					background: transparent;
 				}
 
+				#menubar .menu .options .option.toggle::before {
+
+					content: ' ';
+					display: inline-block;
+					width: 16px;
+
+				}
+
+				#menubar .menu .options .option.toggle-on::before {
+
+					content: '✓';
+					font-size: 12px;
+
+				}
+
 				#menubar .submenu-title::after {
 					content: '⏵';
 					float: right;
@@ -426,6 +441,8 @@ select {
 			margin: 0 !important;
 			cursor: not-allowed;
 		}
+
+		
 
 #sidebar {
 	position: absolute;

@@ -697,18 +697,56 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.showGridChanged.add( function ( value ) {
+	signals.showHelpersChanged.add( function ( appearanceStates ) {
 
-		grid.visible = value;
+		grid.visible = appearanceStates.gridHelper;
 
-		render();
+		sceneHelpers.traverse( function ( object ) {
 
-	} );
+			switch ( object.type ) {
 
-	signals.showHelpersChanged.add( function ( value ) {
+				case 'CameraHelper':
 
-		sceneHelpers.visible = value;
-		transformControls.enabled = value;
+				{
+
+					object.visible = appearanceStates.cameraHelpers;
+					break;
+
+				}
+
+				case 'PointLightHelper':
+				case 'DirectionalLightHelper':
+				case 'SpotLightHelper':
+				case 'HemisphereLightHelper':
+
+				{
+
+					object.visible = appearanceStates.lightHelpers;
+					break;
+
+				}
+
+				case 'SkeletonHelper':
+
+				{
+
+					object.visible = appearanceStates.skeletonHelpers;
+					break;
+
+				}
+
+				default:
+
+				{
+
+					// not a helper, skip.
+
+				}
+
+			}
+
+		} );
+
 
 		render();
 
