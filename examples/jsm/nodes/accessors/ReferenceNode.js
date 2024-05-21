@@ -92,7 +92,7 @@ class ReferenceNode extends Node {
 
 		if ( this.node === null ) {
 
-			return this.uniformType;
+			this.updateValue();
 
 		}
 
