@@ -629,11 +629,11 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 			attr.normalized
 		);
 
-		const morphAttrCollection = geometry.morphAttributes[ name ];
-		if ( morphAttrCollection ) {
+		const morphAttributes = geometry.morphAttributes[ name ];
+		if ( morphAttributes ) {
 
 			if ( ! tmpMorphAttributes[ name ] ) tmpMorphAttributes[ name ] = [];
-			morphAttrCollection.forEach( ( morphAttr, i ) => {
+			morphAttributes.forEach( ( morphAttr, i ) => {
 
 				const array = new morphAttr.array.constructor( morphAttr.count * morphAttr.itemSize );
 				tmpMorphAttributes[ name ][ i ] = new morphAttr.constructor( array, morphAttr.itemSize, morphAttr.normalized );
@@ -683,7 +683,7 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 
 				const name = attributeNames[ j ];
 				const attribute = geometry.getAttribute( name );
-				const morphAttrCollection = geometry.morphAttributes[ name ];
+				const morphAttributes = geometry.morphAttributes[ name ];
 				const itemSize = attribute.itemSize;
 				const newArray = tmpAttributes[ name ];
 				const newMorphArrays = tmpMorphAttributes[ name ];
@@ -694,11 +694,11 @@ function mergeVertices( geometry, tolerance = 1e-4 ) {
 					const setterFunc = setters[ k ];
 					newArray[ setterFunc ]( nextIndex, attribute[ getterFunc ]( index ) );
 
-					if ( morphAttrCollection ) {
+					if ( morphAttributes ) {
 
-						for ( let m = 0, ml = morphAttrCollection.length; m < ml; m ++ ) {
+						for ( let m = 0, ml = morphAttributes.length; m < ml; m ++ ) {
 
-							newMorphArrays[ m ][ setterFunc ]( nextIndex, morphAttrCollection[ m ][ getterFunc ]( index ) );
+							newMorphArrays[ m ][ setterFunc ]( nextIndex, morphAttributes[ m ][ getterFunc ]( index ) );
 
 						}
 
