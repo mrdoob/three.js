@@ -32,7 +32,7 @@ class StorageTextureNode extends TextureNode {
 
 	}
 
-	setAccess(value) {
+	setAccess( value ) {
 
 		this.access = value;
 		return this;

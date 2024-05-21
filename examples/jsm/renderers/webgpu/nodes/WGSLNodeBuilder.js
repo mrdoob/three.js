@@ -148,7 +148,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	
+
 
 	_generateTextureSample( texture, textureProperty, uvSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
@@ -365,34 +365,34 @@ class WGSLNodeBuilder extends NodeBuilder {
 	// Convert GPUStorageTextureAccess or GPUBufferBindingType storage resources to WGSL syntax
 	getStorageAccess( node ) {
 
-		if (node.isStorageTextureNode) {
+		if ( node.isStorageTextureNode ) {
 
-			switch(node.access) {
+			switch ( node.access ) {
 
 				case GPUStorageTextureAccess.ReadOnly: {
 
 					return 'read';
 
-				};
+				}
 
 				case GPUStorageTextureAccess.WriteOnly: {
 
 					return 'write';
 
-				};
+				}
 
 				default: {
-					
-					return 'read_write'
+
+					return 'read_write';
 
 				}
 
-			};
+			}
 
 		} else {
 
 			// @TODO: Account for future read-only storage buffer pull request
-			return 'read_write'
+			return 'read_write';
 
 		}
 
@@ -821,12 +821,9 @@ ${ flowData.code }
 				} else if ( uniform.node.isStorageTextureNode === true ) {
 
 					const format = getFormat( texture );
-					console.log(uniform.node)
-					const access = this.getStorageAccess(uniform.node);
+					const access = this.getStorageAccess( uniform.node );
 
 					textureType = `texture_storage_2d<${ format }, ${access}>`;
-
-					console.log(textureType)
 
 				} else {
 
