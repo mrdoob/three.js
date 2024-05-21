@@ -6,12 +6,6 @@ function WebGLExtensions( gl ) {
 
 	function getExtension( name ) {
 
-		if ( name === 'WEBGL_multi_draw' ) {
-
-			return null;
-
-		}
-
 		if ( extensions[ name ] !== undefined ) {
 
 			return extensions[ name ];
