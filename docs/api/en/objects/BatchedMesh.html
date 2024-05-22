@@ -29,7 +29,7 @@
 
 		<code>
 		const box = new THREE.BoxGeometry( 1, 1, 1 );
-		const sphere = new THREE.SphereGeometry( 1, 1, 1 );
+		const sphere = new THREE.SphereGeometry( 1, 12, 12 );
 		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 
 		// initialize and add geometries into the batched mesh
@@ -238,7 +238,7 @@
 			[page:Integer id]: The id of a previously added item via "addGeometry" or "addInstance" to add into the [name] to render. 
 		</p>
 		<p>
-			Adds a a new instance to the [name] using the same geometry from the given id and returns the associated index referring to it to be used
+			Adds a new instance to the [name] using the same geometry from the given id and returns the associated index referring to it to be used
 			by other functions.
 		</p>
 
