@@ -31,16 +31,29 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 		if ( drawCount === 0 ) return;
 
 		const extension = extensions.get( 'WEBGL_multi_draw' );
-		extension.multiDrawArraysWEBGL( mode, starts, 0, counts, 0, drawCount );
 
-		let elementCount = 0;
-		for ( let i = 0; i < drawCount; i ++ ) {
+		if ( extension === null ) {
 
-			elementCount += counts[ i ];
+			for ( let i = 0; i < drawCount; i ++ ) {
+
+				this.render( starts[ i ], counts[ i ] );
+
+			}
+
+		} else {
+
+			extension.multiDrawArraysWEBGL( mode, starts, 0, counts, 0, drawCount );
+
+			let elementCount = 0;
+			for ( let i = 0; i < drawCount; i ++ ) {
+
+				elementCount += counts[ i ];
+
+			}
+
+			info.update( elementCount, mode, 1 );
 
 		}
-
-		info.update( elementCount, mode, 1 );
 
 	}
 
