@@ -1,4 +1,4 @@
-import { UIBreak, UIButton, UIInteger, UIPanel, UIRow, UIText } from './libs/ui.js';
+import { UIBreak, UIButton, UIInteger, UIPanel, UIRow, UIText, UISelect } from './libs/ui.js';
 
 import { APP } from './libs/app.js';
 
@@ -13,6 +13,37 @@ function SidebarProjectVideo( editor ) {
 
 	container.add( new UIText( strings.getKey( 'sidebar/project/video' ) ).setTextTransform( 'uppercase' ) );
 	container.add( new UIBreak(), new UIBreak() );
+
+	// Shading
+
+	const shadingRow = new UIRow();
+	container.add( shadingRow );
+
+	shadingRow.add( new UIText( strings.getKey( 'sidebar/project/shading' ) ).setClass( 'Label' ) );
+
+	const shadingTypeSelect = new UISelect().setOptions( {
+		'solid': 'SOLID',
+		'realistic': 'REALISTIC'
+	} ).setWidth( '170px' ).setTextTransform( 'unset' ).onChange( refreshShadingRow ).setValue( 'solid' );
+	shadingRow.add( shadingTypeSelect );
+
+	const pathTracerMinSamples = 3;
+	const pathTracerMaxSamples = 65536;
+	const samplesNumber = new UIInteger( 16 ).setRange( pathTracerMinSamples, pathTracerMaxSamples );
+
+	const samplesRow = new UIRow();
+	samplesRow.add( new UIText( 'Sample Count' ).setClass( 'Label' ) ); // TODO: l10n
+	samplesRow.add( samplesNumber );
+
+	container.add( samplesRow );
+
+	function refreshShadingRow() {
+
+		samplesRow.setHidden( shadingTypeSelect.getValue() !== 'realistic' );
+
+	}
+
+	refreshShadingRow();
 
 	// Resolution
 
@@ -51,7 +82,7 @@ function SidebarProjectVideo( editor ) {
 	renderButton.setMarginLeft( '120px' );
 	renderButton.onClick( async () => {
 
-		const player = new APP.Player();
+		const player = new APP.RenderingPlayer();
 		player.load( editor.toJSON() );
 		player.setPixelRatio( 1 );
 		player.setSize( videoWidth.getValue(), videoHeight.getValue() );
@@ -104,12 +135,16 @@ function SidebarProjectVideo( editor ) {
 		const fps = videoFPS.getValue();
 		const duration = videoDuration.getValue();
 		const frames = duration * fps;
+		const shadingType = shadingTypeSelect.getValue();
+		const maxSamples = Math.max( pathTracerMinSamples, Math.min( pathTracerMaxSamples, samplesNumber.getValue() ) );
 
 		let currentTime = 0;
 
+		player.start();
+
 		for ( let i = 0; i < frames; i ++ ) {
 
-			player.render( currentTime );
+			await player.render( currentTime, shadingType, maxSamples );
 
 			const num = i.toString().padStart( 5, '0' );
 			ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
@@ -118,6 +153,8 @@ function SidebarProjectVideo( editor ) {
 			progress.value = ( i / frames ) * 0.5;
 
 		}
+
+		player.stop();
 
 		await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 5 ), 'out.mp4' );
 

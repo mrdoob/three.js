@@ -1,37 +1,40 @@
+import { ViewportPathtracer } from '../Viewport.Pathtracer.js';
+
 var APP = {
 
 	Player: function () {
 
-		var renderer = new THREE.WebGLRenderer( { antialias: true } );
-		renderer.setPixelRatio( window.devicePixelRatio ); // TODO: Use player.setPixelRatio()
+		this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+		this.renderer.setPixelRatio( window.devicePixelRatio ); // TODO: Use player.setPixelRatio()
 
 		var loader = new THREE.ObjectLoader();
-		var camera, scene;
 
-		var events = {};
+		this.events = {};
 
 		var dom = document.createElement( 'div' );
-		dom.appendChild( renderer.domElement );
+		dom.appendChild( this.renderer.domElement );
 
 		this.dom = dom;
-		this.canvas = renderer.domElement;
+		this.canvas = this.renderer.domElement;
 
 		this.width = 500;
 		this.height = 500;
+
+		const scope = this;
 
 		this.load = function ( json ) {
 
 			var project = json.project;
 
-			if ( project.shadows !== undefined ) renderer.shadowMap.enabled = project.shadows;
-			if ( project.shadowType !== undefined ) renderer.shadowMap.type = project.shadowType;
-			if ( project.toneMapping !== undefined ) renderer.toneMapping = project.toneMapping;
-			if ( project.toneMappingExposure !== undefined ) renderer.toneMappingExposure = project.toneMappingExposure;
+			if ( project.shadows !== undefined ) scope.renderer.shadowMap.enabled = project.shadows;
+			if ( project.shadowType !== undefined ) scope.renderer.shadowMap.type = project.shadowType;
+			if ( project.toneMapping !== undefined ) scope.renderer.toneMapping = project.toneMapping;
+			if ( project.toneMappingExposure !== undefined ) scope.renderer.toneMappingExposure = project.toneMappingExposure;
 
-			this.setScene( loader.parse( json.scene ) );
-			this.setCamera( loader.parse( json.camera ) );
+			scope.setScene( loader.parse( json.scene ) );
+			scope.setCamera( loader.parse( json.camera ) );
 
-			events = {
+			scope.events = {
 				init: [],
 				start: [],
 				stop: [],
@@ -46,7 +49,7 @@ var APP = {
 			var scriptWrapParams = 'player,renderer,scene,camera';
 			var scriptWrapResultObj = {};
 
-			for ( var eventKey in events ) {
+			for ( var eventKey in scope.events ) {
 
 				scriptWrapParams += ',' + eventKey;
 				scriptWrapResultObj[ eventKey ] = eventKey;
@@ -57,7 +60,7 @@ var APP = {
 
 			for ( var uuid in json.scripts ) {
 
-				var object = scene.getObjectByProperty( 'uuid', uuid, true );
+				var object = scope.scene.getObjectByProperty( 'uuid', uuid, true );
 
 				if ( object === undefined ) {
 
@@ -72,20 +75,20 @@ var APP = {
 
 					var script = scripts[ i ];
 
-					var functions = ( new Function( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( this, renderer, scene, camera );
+					var functions = ( new Function( scriptWrapParams, script.source + '\nreturn ' + scriptWrapResult + ';' ).bind( object ) )( scope, scope.renderer, scope.scene, scope.camera );
 
 					for ( var name in functions ) {
 
 						if ( functions[ name ] === undefined ) continue;
 
-						if ( events[ name ] === undefined ) {
+						if ( scope.events[ name ] === undefined ) {
 
 							console.warn( 'APP.Player: Event type not supported (', name, ')' );
 							continue;
 
 						}
 
-						events[ name ].push( functions[ name ].bind( object ) );
+						scope.events[ name ].push( functions[ name ].bind( object ) );
 
 					}
 
@@ -93,47 +96,47 @@ var APP = {
 
 			}
 
-			dispatch( events.init, arguments );
+			scope.dispatch( scope.events.init, arguments );
 
 		};
 
 		this.setCamera = function ( value ) {
 
-			camera = value;
-			camera.aspect = this.width / this.height;
-			camera.updateProjectionMatrix();
+			scope.camera = value;
+			scope.camera.aspect = scope.width / scope.height;
+			scope.camera.updateProjectionMatrix();
 
 		};
 
 		this.setScene = function ( value ) {
 
-			scene = value;
+			scope.scene = value;
 
 		};
 
 		this.setPixelRatio = function ( pixelRatio ) {
 
-			renderer.setPixelRatio( pixelRatio );
+			scope.renderer.setPixelRatio( pixelRatio );
 
 		};
 
 		this.setSize = function ( width, height ) {
 
-			this.width = width;
-			this.height = height;
+			scope.width = width;
+			scope.height = height;
 
-			if ( camera ) {
+			if ( scope.camera ) {
 
-				camera.aspect = this.width / this.height;
-				camera.updateProjectionMatrix();
+				scope.camera.aspect = scope.width / scope.height;
+				scope.camera.updateProjectionMatrix();
 
 			}
 
-			renderer.setSize( width, height );
+			scope.renderer.setSize( width, height );
 
 		};
 
-		function dispatch( array, event ) {
+		this.dispatch = function ( array, event ) {
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
@@ -141,7 +144,7 @@ var APP = {
 
 			}
 
-		}
+		};
 
 		var time, startTime, prevTime;
 
@@ -151,7 +154,7 @@ var APP = {
 
 			try {
 
-				dispatch( events.update, { time: time - startTime, delta: time - prevTime } );
+				scope.dispatch( scope.events.update, { time: time - startTime, delta: time - prevTime } );
 
 			} catch ( e ) {
 
@@ -159,7 +162,7 @@ var APP = {
 
 			}
 
-			renderer.render( scene, camera );
+			scope.renderer.render( scope.scene, scope.camera );
 
 			prevTime = time;
 
@@ -175,9 +178,9 @@ var APP = {
 			document.addEventListener( 'pointerup', onPointerUp );
 			document.addEventListener( 'pointermove', onPointerMove );
 
-			dispatch( events.start, arguments );
+			scope.dispatch( scope.events.start, arguments );
 
-			renderer.setAnimationLoop( animate );
+			scope.renderer.setAnimationLoop( animate );
 
 		};
 
@@ -189,26 +192,26 @@ var APP = {
 			document.removeEventListener( 'pointerup', onPointerUp );
 			document.removeEventListener( 'pointermove', onPointerMove );
 
-			dispatch( events.stop, arguments );
+			scope.dispatch( scope.events.stop, arguments );
 
-			renderer.setAnimationLoop( null );
+			scope.renderer.setAnimationLoop( null );
 
 		};
 
 		this.render = function ( time ) {
 
-			dispatch( events.update, { time: time * 1000, delta: 0 /* TODO */ } );
+			scope.dispatch( scope.events.update, { time: time * 1000, delta: 0 /* TODO */ } );
 
-			renderer.render( scene, camera );
+			scope.renderer.render( scope.scene, scope.camera );
 
 		};
 
 		this.dispose = function () {
 
-			renderer.dispose();
+			scope.renderer.dispose();
 
-			camera = undefined;
-			scene = undefined;
+			scope.camera = undefined;
+			scope.scene = undefined;
 
 		};
 
@@ -216,33 +219,130 @@ var APP = {
 
 		function onKeyDown( event ) {
 
-			dispatch( events.keydown, event );
+			scope.dispatch( scope.events.keydown, event );
 
 		}
 
 		function onKeyUp( event ) {
 
-			dispatch( events.keyup, event );
+			scope.dispatch( scope.events.keyup, event );
 
 		}
 
 		function onPointerDown( event ) {
 
-			dispatch( events.pointerdown, event );
+			scope.dispatch( scope.events.pointerdown, event );
 
 		}
 
 		function onPointerUp( event ) {
 
-			dispatch( events.pointerup, event );
+			scope.dispatch( scope.events.pointerup, event );
 
 		}
 
 		function onPointerMove( event ) {
 
-			dispatch( events.pointermove, event );
+			scope.dispatch( scope.events.pointermove, event );
 
 		}
+
+	},
+
+	RenderingPlayer: function () {
+
+		APP.Player.apply( this, arguments );
+
+		let pathTracer = null;
+		let prevTime = - 1;
+
+		const scope = this;
+
+		this.start = function () {
+
+			scope.dispatch( scope.events.start, arguments );
+
+		};
+
+		this.stop = function () {
+
+			scope.dispatch( scope.events.stop, arguments );
+
+		};
+
+		this.render = function ( time, shadingType = 'solid', maxSamples = - 1 ) {
+
+			return new Promise( ( resolve ) => {
+
+				const delta = ( prevTime === - 1 ) ? 0 : ( time - prevTime ) * 1000;
+				scope.dispatch( scope.events.update, { time: time * 1000, delta } );
+
+				switch ( shadingType ) {
+
+					case 'solid':
+
+					{
+
+						scope.renderer.render( scope.scene, scope.camera );
+
+						prevTime = time;
+
+						resolve();
+
+						break;
+
+					}
+
+					case 'realistic':
+
+					{
+
+						function renderSample() {
+
+							const samples = Math.floor( pathTracer.getSamples() );
+
+							if ( samples < maxSamples ) {
+
+								requestAnimationFrame( renderSample );
+
+							} else {
+
+								prevTime = time;
+
+								resolve();
+
+							}
+
+							pathTracer.update();
+
+						}
+
+						if ( pathTracer === null ) {
+
+							pathTracer = new ViewportPathtracer( scope.renderer );
+
+						}
+
+						pathTracer.init( scope.scene, scope.camera );
+						renderSample();
+
+						break;
+
+					}
+
+					default:
+
+					{
+
+						console.error( 'APP.RenderingPlayer.render: Unknown shading type' );
+
+					}
+
+				}
+
+			} );
+
+		};
 
 	}
 
