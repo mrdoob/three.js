@@ -1446,6 +1446,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const depthTexture = renderTarget.depthTexture;
 			if ( renderTarget.stencilBuffer ) {
 
+				// TODO: enable other attach types
 				glInternalFormat = _gl.DEPTH24_STENCIL8;
 				glAttachmentType = _gl.DEPTH_STENCIL_ATTACHMENT;
 
@@ -1457,41 +1458,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			const samples = getRenderTargetSamples( renderTarget );
 			const isUseMultisampledRTT = useMultisampledRTT( renderTarget );
-			if ( renderTarget.stencilBuffer ) {
+			if ( isMultisample && isUseMultisampledRTT === false ) {
 
-				if ( isMultisample && isUseMultisampledRTT === false ) {
+				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
-					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+			} else if ( isUseMultisampledRTT ) {
 
-				} else if ( isUseMultisampledRTT ) {
-
-					multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
-
-				} else {
-
-					_gl.renderbufferStorage( _gl.RENDERBUFFER, glInternalFormat, renderTarget.width, renderTarget.height );
-
-				}
+				multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
 			} else {
 
-				if ( isMultisample || isUseMultisampledRTT ) {
-
-					if ( isUseMultisampledRTT ) {
-
-						multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
-
-					} else {
-
-						_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
-
-					}
-
-				} else {
-
-					_gl.renderbufferStorage( _gl.RENDERBUFFER, glInternalFormat, renderTarget.width, renderTarget.height );
-
-				}
+				_gl.renderbufferStorage( _gl.RENDERBUFFER, glInternalFormat, renderTarget.width, renderTarget.height );
 
 			}
 
