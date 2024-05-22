@@ -42,13 +42,14 @@ class RenderPass extends Pass {
 		if ( this.clearColor !== null ) {
 
 			renderer.getClearColor( this._oldClearColor );
-			renderer.setClearColor( this.clearColor );
+			oldClearAlpha = renderer.getClearAlpha();
+
+			renderer.setClearColor( this.clearColor, oldClearAlpha );
 
 		}
 
 		if ( this.clearAlpha !== null ) {
 
-			oldClearAlpha = renderer.getClearAlpha();
 			renderer.setClearAlpha( this.clearAlpha );
 
 		}
