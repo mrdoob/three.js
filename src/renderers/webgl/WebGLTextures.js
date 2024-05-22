@@ -1439,68 +1439,72 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
 
-		if ( renderTarget.depthBuffer && ! renderTarget.stencilBuffer ) {
+		if ( renderTarget.depthBuffer ) {
 
-			let glInternalFormat = _gl.DEPTH_COMPONENT24;
-
-			if ( isMultisample || useMultisampledRTT( renderTarget ) ) {
-
-				const depthTexture = renderTarget.depthTexture;
-
-				if ( depthTexture && depthTexture.isDepthTexture ) {
-
-					if ( depthTexture.type === FloatType ) {
-
-						glInternalFormat = _gl.DEPTH_COMPONENT32F;
-
-					} else if ( depthTexture.type === UnsignedIntType ) {
-
-						glInternalFormat = _gl.DEPTH_COMPONENT24;
-
-					}
-
-				}
+			if ( renderTarget.stencilBuffer ) {
 
 				const samples = getRenderTargetSamples( renderTarget );
 
-				if ( useMultisampledRTT( renderTarget ) ) {
+				if ( isMultisample && useMultisampledRTT( renderTarget ) === false ) {
 
-					multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, _gl.DEPTH24_STENCIL8, renderTarget.width, renderTarget.height );
+
+				} else if ( useMultisampledRTT( renderTarget ) ) {
+
+					multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, _gl.DEPTH24_STENCIL8, renderTarget.width, renderTarget.height );
 
 				} else {
 
-					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+					_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
 
 				}
 
-			} else {
 
-				_gl.renderbufferStorage( _gl.RENDERBUFFER, glInternalFormat, renderTarget.width, renderTarget.height );
-
-			}
-
-			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
-
-		} else if ( renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
-
-			const samples = getRenderTargetSamples( renderTarget );
-
-			if ( isMultisample && useMultisampledRTT( renderTarget ) === false ) {
-
-				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, _gl.DEPTH24_STENCIL8, renderTarget.width, renderTarget.height );
-
-			} else if ( useMultisampledRTT( renderTarget ) ) {
-
-				multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, _gl.DEPTH24_STENCIL8, renderTarget.width, renderTarget.height );
+				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
 
 			} else {
 
-				_gl.renderbufferStorage( _gl.RENDERBUFFER, _gl.DEPTH_STENCIL, renderTarget.width, renderTarget.height );
+				let glInternalFormat = _gl.DEPTH_COMPONENT24;
+
+				if ( isMultisample || useMultisampledRTT( renderTarget ) ) {
+
+					const depthTexture = renderTarget.depthTexture;
+
+					if ( depthTexture && depthTexture.isDepthTexture ) {
+
+						if ( depthTexture.type === FloatType ) {
+
+							glInternalFormat = _gl.DEPTH_COMPONENT32F;
+
+						} else if ( depthTexture.type === UnsignedIntType ) {
+
+							glInternalFormat = _gl.DEPTH_COMPONENT24;
+
+						}
+
+					}
+
+					const samples = getRenderTargetSamples( renderTarget );
+
+					if ( useMultisampledRTT( renderTarget ) ) {
+
+						multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+
+					} else {
+
+						_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+
+					}
+
+				} else {
+
+					_gl.renderbufferStorage( _gl.RENDERBUFFER, glInternalFormat, renderTarget.width, renderTarget.height );
+
+				}
+
+				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
 
 			}
-
-
-			_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
 
 		} else {
 
