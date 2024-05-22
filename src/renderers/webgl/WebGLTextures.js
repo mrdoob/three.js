@@ -1459,7 +1459,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-
 	// Setup storage for internal depth/stencil buffers and bind to correct framebuffer
 	function setupRenderBufferStorage( renderbuffer, renderTarget, isMultisample ) {
 
