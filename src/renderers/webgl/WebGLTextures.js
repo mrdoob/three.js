@@ -1441,30 +1441,51 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.depthBuffer ) {
 
-			let glInternalFormat = _gl.DEPTH_COMPONENT24;
-			let glAttachmentType = _gl.DEPTH_ATTACHMENT;
+			// retrieve the depth attachment types
+			let glInternalFormat;
+			let glAttachmentType;
 			const depthTexture = renderTarget.depthTexture;
+			const requiresFloat = depthTexture && depthTexture.isDepthTexture && depthTexture.type === FloatType;
 			if ( renderTarget.stencilBuffer ) {
 
-				// TODO: enable other attach types
-				glInternalFormat = _gl.DEPTH24_STENCIL8;
 				glAttachmentType = _gl.DEPTH_STENCIL_ATTACHMENT;
 
-			} else if ( depthTexture && depthTexture.isDepthTexture && depthTexture.type === FloatType ) {
+				if ( requiresFloat ) {
 
-				glInternalFormat = _gl.DEPTH_COMPONENT32F;
+					glInternalFormat = _gl.DEPTH32F_STENCIL8;
+
+				} else {
+
+					glInternalFormat = _gl.DEPTH24_STENCIL8;
+
+				}
+
+			} else {
+
+				glAttachmentType = _gl.DEPTH_ATTACHMENT;
+
+				if ( requiresFloat ) {
+
+					glInternalFormat = _gl.DEPTH_COMPONENT32F;
+
+				} else {
+
+					glInternalFormat = _gl.DEPTH_COMPONENT24;
+
+				}
 
 			}
 
+			// set up the attachment
 			const samples = getRenderTargetSamples( renderTarget );
 			const isUseMultisampledRTT = useMultisampledRTT( renderTarget );
-			if ( isMultisample && isUseMultisampledRTT === false ) {
-
-				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
-
-			} else if ( isUseMultisampledRTT ) {
+			if ( isUseMultisampledRTT ) {
 
 				multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+
+			} else if ( isMultisample ) {
+
+				_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
 			} else {
 
