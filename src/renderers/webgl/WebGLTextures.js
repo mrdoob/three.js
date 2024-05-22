@@ -1441,15 +1441,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.depthBuffer ) {
 
+			const samples = getRenderTargetSamples( renderTarget );
+			const isUseMultisampledRTT = useMultisampledRTT( renderTarget );
 			if ( renderTarget.stencilBuffer ) {
 
-				const samples = getRenderTargetSamples( renderTarget );
-
-				if ( isMultisample && useMultisampledRTT( renderTarget ) === false ) {
+				if ( isMultisample && isUseMultisampledRTT === false ) {
 
 					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, _gl.DEPTH24_STENCIL8, renderTarget.width, renderTarget.height );
 
-				} else if ( useMultisampledRTT( renderTarget ) ) {
+				} else if ( isUseMultisampledRTT ) {
 
 					multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, _gl.DEPTH24_STENCIL8, renderTarget.width, renderTarget.height );
 
@@ -1459,14 +1459,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-
 				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
 
 			} else {
 
 				let glInternalFormat = _gl.DEPTH_COMPONENT24;
 
-				if ( isMultisample || useMultisampledRTT( renderTarget ) ) {
+				if ( isMultisample || isUseMultisampledRTT ) {
 
 					const depthTexture = renderTarget.depthTexture;
 
@@ -1484,9 +1483,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					const samples = getRenderTargetSamples( renderTarget );
 
-					if ( useMultisampledRTT( renderTarget ) ) {
+					if ( isUseMultisampledRTT ) {
 
 						multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
