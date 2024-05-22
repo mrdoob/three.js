@@ -88,13 +88,13 @@ function ViewportInfo( editor ) {
 
 		const pluralRules = new Intl.PluralRules( editor.config.getKey( 'language' ) );
 
-		const objectsStringKey = ( pluralRules.select( objects ) === 'one' ) ? 'viewport/info/oneObject' : 'viewport/info/objects';
+		const objectsStringKey = ( pluralRules.select( objects ) === 'one' ) ? 'viewport/info/object' : 'viewport/info/objects';
 		objectsUnitText.setValue( strings.getKey( objectsStringKey ) );
 
-		const verticesStringKey = ( pluralRules.select( vertices ) === 'one' ) ? 'viewport/info/oneVertex' : 'viewport/info/vertices';
+		const verticesStringKey = ( pluralRules.select( vertices ) === 'one' ) ? 'viewport/info/vertex' : 'viewport/info/vertices';
 		verticesUnitText.setValue( strings.getKey( verticesStringKey ) );
 
-		const trianglesStringKey = ( pluralRules.select( triangles ) === 'one' ) ? 'viewport/info/oneTriangle' : 'viewport/info/triangles';
+		const trianglesStringKey = ( pluralRules.select( triangles ) === 'one' ) ? 'viewport/info/triangle' : 'viewport/info/triangles';
 		trianglesUnitText.setValue( strings.getKey( trianglesStringKey ) );
 
 	}
@@ -113,7 +113,7 @@ function ViewportInfo( editor ) {
 
 		samplesText.setValue( samples );
 
-		const samplesStringKey = ( pluralRules.select( samples ) === 'one' ) ? 'viewport/info/oneSample' : 'viewport/info/samples';
+		const samplesStringKey = ( pluralRules.select( samples ) === 'one' ) ? 'viewport/info/sample' : 'viewport/info/samples';
 		samplesUnitText.setValue( strings.getKey( samplesStringKey ) );
 
 	} );

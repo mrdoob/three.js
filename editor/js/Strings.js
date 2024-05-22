@@ -381,13 +381,13 @@ function Strings( config ) {
 			'viewport/controls/grid': 'Grid',
 			'viewport/controls/helpers': 'Helpers',
 
-			'viewport/info/oneObject': 'Object',
-			'viewport/info/oneVertex': 'Vertex',
-			'viewport/info/oneTriangle': 'Triangle',
-			'viewport/info/oneSample': 'Sample',
+			'viewport/info/object': 'Object',
 			'viewport/info/objects': 'Objects',
+			'viewport/info/vertex': 'Vertex',
 			'viewport/info/vertices': 'Vertices',
+			'viewport/info/triangle': 'Triangle',
 			'viewport/info/triangles': 'Triangles',
+			'viewport/info/sample': 'Sample',
 			'viewport/info/samples': 'Samples',
 			'viewport/info/rendertime': 'Render time',
 
@@ -770,13 +770,13 @@ function Strings( config ) {
 			'viewport/controls/grid': 'Grille',
 			'viewport/controls/helpers': 'Helpers',
 
-			'viewport/info/oneObject': 'Objet',
-			'viewport/info/oneVertex': 'Sommet',
-			'viewport/info/oneTriangle': 'Triangle',
-			'viewport/info/oneSample': 'Échantillon',
+			'viewport/info/object': 'Objet',
 			'viewport/info/objects': 'Objets',
+			'viewport/info/vertex': 'Sommet',
 			'viewport/info/vertices': 'Sommets',
+			'viewport/info/triangle': 'Triangle',
 			'viewport/info/triangles': 'Triangles',
+			'viewport/info/sample': 'Échantillon',
 			'viewport/info/samples': 'Échantillons',
 			'viewport/info/rendertime': 'Temps de rendu'
 
@@ -1159,13 +1159,13 @@ function Strings( config ) {
 			'viewport/controls/grid': '网格',
 			'viewport/controls/helpers': '辅助',
 
-			'viewport/info/oneObject': '物体',
-			'viewport/info/oneVertex': '顶点',
-			'viewport/info/oneTriangle': '三角形',
-			'viewport/info/oneSample': '样本',
+			'viewport/info/object': '物体',
 			'viewport/info/objects': '物体',
+			'viewport/info/vertex': '顶点',
 			'viewport/info/vertices': '顶点',
+			'viewport/info/triangle': '三角形',
 			'viewport/info/triangles': '三角形',
+			'viewport/info/sample': '样本',
 			'viewport/info/samples': '样本',
 			'viewport/info/rendertime': '渲染时间'
 
@@ -1548,13 +1548,13 @@ function Strings( config ) {
 			'viewport/controls/grid': 'グリッド',
 			'viewport/controls/helpers': 'オーバーレイ表示',
 
-			'viewport/info/oneObject': 'オブジェクト',
-			'viewport/info/oneVertex': '頂点',
-			'viewport/info/oneTriangle': '三角形',
-			'viewport/info/oneSample': 'サンプル',
+			'viewport/info/object': 'オブジェクト',
 			'viewport/info/objects': 'オブジェクト',
+			'viewport/info/vertex': '頂点',
 			'viewport/info/vertices': '頂点',
+			'viewport/info/triangle': '三角形',
 			'viewport/info/triangles': '三角形',
+			'viewport/info/sample': 'サンプル',
 			'viewport/info/samples': 'サンプル',
 			'viewport/info/rendertime': 'レンダリング時間'
 
