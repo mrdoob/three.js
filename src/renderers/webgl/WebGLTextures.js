@@ -1441,17 +1441,31 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.depthBuffer ) {
 
+			let glInternalFormat = _gl.DEPTH_COMPONENT24;
+			let glAttachmentType = _gl.DEPTH_ATTACHMENT;
+			const depthTexture = renderTarget.depthTexture;
+			if ( renderTarget.stencilBuffer ) {
+
+				glInternalFormat = _gl.DEPTH24_STENCIL8;
+				glAttachmentType = _gl.DEPTH_STENCIL_ATTACHMENT;
+
+			} else if ( depthTexture && depthTexture.isDepthTexture && depthTexture.type === FloatType ) {
+
+				glInternalFormat = _gl.DEPTH_COMPONENT32F;
+
+			}
+
 			const samples = getRenderTargetSamples( renderTarget );
 			const isUseMultisampledRTT = useMultisampledRTT( renderTarget );
 			if ( renderTarget.stencilBuffer ) {
 
 				if ( isMultisample && isUseMultisampledRTT === false ) {
 
-					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, _gl.DEPTH24_STENCIL8, renderTarget.width, renderTarget.height );
+					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
 				} else if ( isUseMultisampledRTT ) {
 
-					multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, _gl.DEPTH24_STENCIL8, renderTarget.width, renderTarget.height );
+					multisampledRTTExt.renderbufferStorageMultisampleEXT( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
 				} else {
 
@@ -1459,30 +1473,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
+				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, glAttachmentType, _gl.RENDERBUFFER, renderbuffer );
 
 			} else {
 
-				let glInternalFormat = _gl.DEPTH_COMPONENT24;
-
 				if ( isMultisample || isUseMultisampledRTT ) {
-
-					const depthTexture = renderTarget.depthTexture;
-
-					if ( depthTexture && depthTexture.isDepthTexture ) {
-
-						if ( depthTexture.type === FloatType ) {
-
-							glInternalFormat = _gl.DEPTH_COMPONENT32F;
-
-						} else if ( depthTexture.type === UnsignedIntType ) {
-
-							glInternalFormat = _gl.DEPTH_COMPONENT24;
-
-						}
-
-					}
-
 
 					if ( isUseMultisampledRTT ) {
 
@@ -1500,7 +1495,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderbuffer );
+				_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, glAttachmentType, _gl.RENDERBUFFER, renderbuffer );
 
 			}
 
