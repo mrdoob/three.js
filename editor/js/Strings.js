@@ -384,10 +384,12 @@ function Strings( config ) {
 			'viewport/info/oneObject': 'Object',
 			'viewport/info/oneVertex': 'Vertex',
 			'viewport/info/oneTriangle': 'Triangle',
+			'viewport/info/oneSample': 'Sample',
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
 			'viewport/info/triangles': 'Triangles',
-			'viewport/info/rendertime': 'Render time'
+			'viewport/info/samples': 'Samples',
+			'viewport/info/rendertime': 'Render time',
 
 		},
 
@@ -771,9 +773,11 @@ function Strings( config ) {
 			'viewport/info/oneObject': 'Objet',
 			'viewport/info/oneVertex': 'Sommet',
 			'viewport/info/oneTriangle': 'Triangle',
+			'viewport/info/oneSample': 'Échantillon',
 			'viewport/info/objects': 'Objets',
 			'viewport/info/vertices': 'Sommets',
 			'viewport/info/triangles': 'Triangles',
+			'viewport/info/samples': 'Échantillons',
 			'viewport/info/rendertime': 'Temps de rendu'
 
 		},
@@ -1158,9 +1162,11 @@ function Strings( config ) {
 			'viewport/info/oneObject': '物体',
 			'viewport/info/oneVertex': '顶点',
 			'viewport/info/oneTriangle': '三角形',
+			'viewport/info/oneSample': '样本',
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',
 			'viewport/info/triangles': '三角形',
+			'viewport/info/samples': '样本',
 			'viewport/info/rendertime': '渲染时间'
 
 		},
@@ -1545,9 +1551,11 @@ function Strings( config ) {
 			'viewport/info/oneObject': 'オブジェクト',
 			'viewport/info/oneVertex': '頂点',
 			'viewport/info/oneTriangle': '三角形',
+			'viewport/info/oneSample': 'サンプル',
 			'viewport/info/objects': 'オブジェクト',
 			'viewport/info/vertices': '頂点',
 			'viewport/info/triangles': '三角形',
+			'viewport/info/samples': 'サンプル',
 			'viewport/info/rendertime': 'レンダリング時間'
 
 		}

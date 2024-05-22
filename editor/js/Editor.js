@@ -92,6 +92,8 @@ function Editor() {
 
 		intersectionsDetected: new Signal(),
 
+		pathTracerUpdated: new Signal(),
+
 	};
 
 	this.config = new Config();
