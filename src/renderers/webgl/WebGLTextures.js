@@ -1,4 +1,4 @@
-import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedIntType, UnsignedInt248Type, FloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, UnsignedByteType, NoColorSpace, LinearSRGBColorSpace, NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, SRGBTransfer, LinearTransfer } from '../../constants.js';
+import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedIntType, UnsignedInt248Type, FloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping, UnsignedByteType, NoColorSpace, LinearSRGBColorSpace, NeverCompare, AlwaysCompare, LessCompare, LessEqualCompare, EqualCompare, GreaterEqualCompare, GreaterCompare, NotEqualCompare, SRGBTransfer, LinearTransfer, UnsignedShortType } from '../../constants.js';
 import { createElementNS } from '../../utils.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -1445,18 +1445,23 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			let glInternalFormat;
 			let glAttachmentType;
 			const depthTexture = renderTarget.depthTexture;
-			const requiresFloat = depthTexture && depthTexture.isDepthTexture && depthTexture.type === FloatType;
+			const depthType = depthTexture && depthTexture.isDepthTexture ? depthTexture.type : null;
 			if ( renderTarget.stencilBuffer ) {
 
 				glAttachmentType = _gl.DEPTH_STENCIL_ATTACHMENT;
 
-				if ( requiresFloat ) {
+				if ( depthType === null || depthType === UnsignedIntType ) {
+
+					glInternalFormat = _gl.DEPTH24_STENCIL8;
+
+				} else if ( depthType === FloatType ) {
 
 					glInternalFormat = _gl.DEPTH32F_STENCIL8;
 
-				} else {
+				} else if ( depthType === UnsignedShortType ) {
 
 					glInternalFormat = _gl.DEPTH24_STENCIL8;
+					console.warn( 'DepthTexture: 16 bit depth attachment is not supported with stencil. Using 24-bit attachment.' );
 
 				}
 
@@ -1464,13 +1469,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				glAttachmentType = _gl.DEPTH_ATTACHMENT;
 
-				if ( requiresFloat ) {
+				if ( depthType === null || depthType === UnsignedIntType ) {
+
+					glInternalFormat = _gl.DEPTH_COMPONENT24;
+
+				} else if ( depthType === FloatType ) {
 
 					glInternalFormat = _gl.DEPTH_COMPONENT32F;
 
-				} else {
+				} else if ( depthType === UnsignedShortType ) {
 
-					glInternalFormat = _gl.DEPTH_COMPONENT24;
+					glInternalFormat = _gl.DEPTH_COMPONENT16;
 
 				}
 
