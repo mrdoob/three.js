@@ -710,21 +710,40 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( texture.isDepthTexture ) {
 
-				// populate depth texture with dummy data
+				// retrieve the depth attachment types
+				const depthType = texture.type;
+				if ( texture.format === DepthStencilFormat ) {
 
-				glInternalFormat = _gl.DEPTH_COMPONENT16;
+					if ( depthType === null || depthType === UnsignedIntType ) {
 
-				if ( texture.type === FloatType ) {
+						glInternalFormat = _gl.DEPTH24_STENCIL8;
 
-					glInternalFormat = _gl.DEPTH_COMPONENT32F;
+					} else if ( depthType === FloatType ) {
 
-				} else if ( texture.type === UnsignedIntType ) {
+						glInternalFormat = _gl.DEPTH32F_STENCIL8;
 
-					glInternalFormat = _gl.DEPTH_COMPONENT24;
+					} else if ( depthType === UnsignedShortType ) {
 
-				} else if ( texture.type === UnsignedInt248Type ) {
+						glInternalFormat = _gl.DEPTH24_STENCIL8;
+						console.warn( 'DepthTexture: 16 bit depth attachment is not supported with stencil. Using 24-bit attachment.' );
 
-					glInternalFormat = _gl.DEPTH24_STENCIL8;
+					}
+
+				} else {
+
+					if ( depthType === null || depthType === UnsignedIntType ) {
+
+						glInternalFormat = _gl.DEPTH_COMPONENT24;
+
+					} else if ( depthType === FloatType ) {
+
+						glInternalFormat = _gl.DEPTH_COMPONENT32F;
+
+					} else if ( depthType === UnsignedShortType ) {
+
+						glInternalFormat = _gl.DEPTH_COMPONENT16;
+
+					}
 
 				}
 
