@@ -24,8 +24,8 @@ function SidebarProjectImage( editor ) {
 	shadingRow.add( new UIText( strings.getKey( 'sidebar/project/shading' ) ).setClass( 'Label' ) );
 
 	const shadingTypeSelect = new UISelect().setOptions( {
-		0: 'SOLID / WebGLRenderer',
-		1: 'REALISTIC / WebGLPathTracer'
+		0: 'SOLID',
+		1: 'REALISTIC'
 	} ).setWidth( '170px' ).setTextTransform( 'unset' ).onChange( refreshShadingRow ).setValue( 0 );
 	shadingRow.add( shadingTypeSelect );
 
