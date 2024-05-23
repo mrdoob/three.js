@@ -388,5 +388,4 @@ addNodeElement( 'difference', difference );
 addNodeElement( 'saturate', saturate );
 addNodeElement( 'cbrt', cbrt );
 
-
 addNodeClass( 'MathNode', MathNode );
