@@ -1027,7 +1027,7 @@ class BatchedMesh extends Mesh {
 
 						// get the distance from camera used for sorting
 						const z = _temp.subVectors( _sphere.center, _vector ).dot( _forward );
-						_renderList.push( drawRanges[ geometryId ], z );
+						_renderList.push( drawRanges[ geometryId ], z, i );
 
 					}
 
