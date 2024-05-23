@@ -1,8 +1,7 @@
 class RenderBundle {
 
-	constructor( scene, camera, name = '' ) {
+	constructor( scene, camera ) {
 
-		this.name = name;
 		this.scene = scene;
 		this.camera = camera;
 

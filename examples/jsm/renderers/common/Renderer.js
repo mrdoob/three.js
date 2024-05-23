@@ -15,6 +15,7 @@ import ClippingContext from './ClippingContext.js';
 import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, RenderTarget, HalfFloatType, RGBAFormat } from 'three';
 import { NodeMaterial } from '../../nodes/Nodes.js';
 import QuadMesh from '../../objects/QuadMesh.js';
+import RenderBundles from './RenderBundles.js';
 
 const _scene = new Scene();
 const _drawingBufferSize = new Vector2();
@@ -87,6 +88,7 @@ class Renderer {
 		this._bindings = null;
 		this._objects = null;
 		this._pipelines = null;
+		this._bundles = null;
 		this._renderLists = null;
 		this._renderContexts = null;
 		this._textures = null;
@@ -172,6 +174,7 @@ class Renderer {
 			this._bindings = new Bindings( backend, this._nodes, this._textures, this._attributes, this._pipelines, this.info );
 			this._objects = new RenderObjects( this, this._nodes, this._geometries, this._pipelines, this._bindings, this.info );
 			this._renderLists = new RenderLists();
+			this._bundles = new RenderBundles();
 			this._renderContexts = new RenderContexts();
 
 			//
@@ -327,68 +330,74 @@ class Renderer {
 
 	}
 
-	_renderBundle( renderBundle ) {
+	_renderBundle( bundle, sceneRef, lightsNode ) {
 
-		const { scene, camera } = renderBundle;
+		const { object, camera, renderList } = bundle;
+
+		const renderContext = this._currentRenderContext;
+		const renderContextData = this.backend.get( renderContext );
+
+		//
+
+		const renderBundle = this._bundles.get( object, camera );
 
 		const renderBundleData = this.backend.get( renderBundle );
+		if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = new Set();
 
-		const renderBundleNeedsUpdate = renderBundleData.renderContexts === undefined || renderBundle.needsUpdate === true;
+		//
+
+		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || object.needsUpdate === true;
+
+		renderBundleData.renderContexts.add( renderContext );
 
 		if ( renderBundleNeedsUpdate ) {
 
-			renderBundleData.renderContexts = undefined;
+			if ( renderContextData.renderObjects === undefined || object.needsUpdate === true ) {
+
+				const nodeFrame = this._nodes.nodeFrame;
+
+				renderContextData.renderObjects = [];
+				renderContextData.renderBundles = [];
+				renderContextData.scene = sceneRef;
+				renderContextData.camera = camera;
+				renderContextData.renderId = nodeFrame.renderId;
+
+				renderContextData.registerBundlesPhase = true;
+
+			}
 
 			this._currentRenderBundle = renderBundle;
 
-			this.render( scene, camera );
+			const opaqueObjects = renderList.opaque;
+
+			if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 
 			this._currentRenderBundle = null;
 
-			renderBundle.needsUpdate = false;
+			//
 
-		}
+			object.needsUpdate = false;
 
+		} else {
 
-		if ( renderBundleData.renderContexts !== undefined ) {
+			const renderContext = this._currentRenderContext;
+			const renderContextData = this.backend.get( renderContext );
 
-			for ( let i = 0; i < renderBundleData.renderContexts.length; i ++ ) {
+			for ( let i = 0, l = renderContextData.renderObjects.length; i < l; i ++ ) {
 
-				const renderContext = renderBundleData.renderContexts[ i ];
-				const renderContextData = this.backend.get( renderContext );
+				const renderObject = renderContextData.renderObjects[ i ];
 
-				const scene = renderContextData.scene;
-				const camera = renderContextData.camera;
+				this._nodes.updateBefore( renderObject );
 
-				this._nodes.nodeFrame.renderId = renderContextData.renderId;
 				//
 
-				if ( scene.matrixWorldAutoUpdate === true ) scene.updateMatrixWorld();
+				renderObject.object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, renderObject.object.matrixWorld );
+				renderObject.object.normalMatrix.getNormalMatrix( renderObject.object.modelViewMatrix );
 
-				if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
+				this._nodes.updateForRender( renderObject );
+				this._bindings.updateForRender( renderObject );
 
-
-				this.backend.beginRender( renderContext );
-
-				for ( let i = 0, l = renderContextData.renderObjects.length; i < l; i ++ ) {
-
-					const renderObject = renderContextData.renderObjects[ i ];
-
-					this._nodes.updateBefore( renderObject );
-
-					//
-
-					renderObject.object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, renderObject.object.matrixWorld );
-					renderObject.object.normalMatrix.getNormalMatrix( renderObject.object.modelViewMatrix );
-
-					this._nodes.updateForRender( renderObject );
-					this._bindings.updateForRender( renderObject );
-
-					this.backend.draw( renderObject, this.info );
-
-				}
-
-				this.backend.finishRender( renderContext );
+				this.backend.draw( renderObject, this.info );
 
 			}
 
@@ -526,31 +535,6 @@ class Renderer {
 
 		if ( camera.parent === null && camera.matrixWorldAutoUpdate === true ) camera.updateMatrixWorld();
 
-
-		if ( this._currentRenderBundle !== null ) {
-
-			const renderBundleData = this.backend.get( this._currentRenderBundle );
-
-			if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = [];
-
-			renderBundleData.renderContexts.push( renderContext );
-
-			const renderContextData = this.backend.get( renderContext );
-
-			if ( renderContextData.renderObjects === undefined || this._currentRenderBundle.needsUpdate === true ) {
-
-				renderContextData.renderObjects = [];
-				renderContextData.renderBundles = [];
-				renderContextData.scene = scene;
-				renderContextData.camera = camera;
-				renderContextData.renderId = nodeFrame.renderId;
-
-				renderContextData.registerBundlesPhase = true;
-
-			}
-
-		}
-
 		//
 
 		let viewport = this._viewport;
@@ -658,8 +642,10 @@ class Renderer {
 
 		const opaqueObjects = renderList.opaque;
 		const transparentObjects = renderList.transparent;
+		const bundles = renderList.bundles;
 		const lightsNode = renderList.lightsNode;
 
+		if ( bundles.length > 0 ) this._renderBundles( bundles, sceneRef, lightsNode );
 		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
 
@@ -1288,11 +1274,40 @@ class Renderer {
 
 		}
 
+		if ( object.static === true ) {
+
+			const baseRenderList = renderList;
+
+			// replace render list
+			renderList = this._renderLists.get( object, camera );
+
+			renderList.begin();
+
+			baseRenderList.pushBundle( {
+				object,
+				camera,
+				renderList,
+			} );
+
+			renderList.finish();
+
+		}
+
 		const children = object.children;
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
 			this._projectObject( children[ i ], camera, groupOrder, renderList );
+
+		}
+
+	}
+
+	_renderBundles( bundles, sceneRef, lightsNode ) {
+
+		for ( const bundle of bundles ) {
+
+			this._renderBundle( bundle, sceneRef, lightsNode );
 
 		}
 

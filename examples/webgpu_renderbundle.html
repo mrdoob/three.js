@@ -43,10 +43,9 @@
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-		import RenderBundle from 'three/addons/renderers/RenderBundle.js';
 		import { MeshToonNodeMaterial } from 'three/nodes';
 
-		let camera, scene, renderer, renderBundle;
+		let camera, scene, renderer;
 		let controls, stats;
 		let gui;
 		let geometries, group;
@@ -155,6 +154,7 @@
 		function initRegularMesh( count ) {
 
 			group = new THREE.Group();
+			group.static = api.renderBundle;
 
 			for ( let i = 0; i < count; i ++ ) {
 
@@ -209,7 +209,6 @@
 			// scene
 
 			scene = new THREE.Scene();
-
 			scene.background = new THREE.Color( 0xc1c1c1 );
 
 			const light = new THREE.DirectionalLight( 0xffffff, 3.4 );
@@ -222,14 +221,6 @@
 
 			initGeometries();
 			initMesh( count );
-
-
-			if ( api.renderBundle ) {
-
-				renderBundle = new RenderBundle( scene, camera );
-
-			}
-
 
 			controls = new OrbitControls( camera, renderer.domElement );
 			controls.autoRotate = true;
@@ -264,9 +255,6 @@
 
 			window.addEventListener( 'resize', onWindowResize );
 
-
-
-
 			function onWindowResize() {
 
 				const width = window.innerWidth;
@@ -276,10 +264,9 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				renderBundle.needsUpdate = true;
+				group.needsUpdate = true;
 		
 			}
-
 
 			async function animate() {
 
@@ -288,15 +275,7 @@
 				controls.update();
 
 				const renderTimeAverage = performance.now();
-				if ( api.renderBundle ) {
-
-					renderer._renderBundle( renderBundle );
-
-				} else {
-
-					renderer.render( scene, camera );
-		
-				}
+				renderer.render( scene, camera );
 
 				// push only the last 60 render times
 				renderTimeAverages.push( performance.now() - renderTimeAverage );
