@@ -192,19 +192,15 @@
 
 			ids.length = 0;
 
+			const geometryIds = [
+				mesh.addGeometry( geometries[ 0 ] ),
+				mesh.addGeometry( geometries[ 1 ] ),
+				mesh.addGeometry( geometries[ 2 ] ),
+			];
+
 			for ( let i = 0; i < api.count; i ++ ) {
 
-				let id;
-				if ( i < geometries.length ) {
-
-					id = mesh.addGeometry( geometries[ i % geometries.length ] );
-
-				} else {
-
-					id = mesh.addInstance( i % geometries.length );
-
-				}
-
+				const id = mesh.addInstance( geometryIds[ i % geometryIds.length ] );
 				mesh.setMatrixAt( id, randomizeMatrix( matrix ) );
 
 				const rotationMatrix = new THREE.Matrix4();

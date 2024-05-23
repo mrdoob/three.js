@@ -10,6 +10,7 @@ import { Box3 } from '../math/Box3.js';
 import { Sphere } from '../math/Sphere.js';
 import { Frustum } from '../math/Frustum.js';
 import { Vector3 } from '../math/Vector3.js';
+import { Color } from '../math/Color.js';
 
 function sortOpaque( a, b ) {
 
@@ -80,6 +81,7 @@ const _sphere = /*@__PURE__*/ new Sphere();
 const _vector = /*@__PURE__*/ new Vector3();
 const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
 const _mesh = /*@__PURE__*/ new Mesh();
+const _whiteColor = /*@__PURE__*/ new Color( 1, 1, 1 );
 const _batchIntersects = [];
 
 // @TODO: SkinnedMesh support?
@@ -205,7 +207,7 @@ class BatchedMesh extends Mesh {
 		let size = Math.sqrt( this._maxIndexCount );
 		size = Math.ceil( size );
 
-		const colorsArray = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
+		const colorsArray = new Float32Array( size * size * 4 ).fill( 1 ); // 4 floats per RGBA pixel
 		const colorsTexture = new DataTexture( colorsArray, size, size, RGBAFormat, FloatType );
 		colorsTexture.colorSpace = ColorManagement.workingColorSpace;
 
@@ -336,7 +338,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	addInstance( id ) {
+	addInstance( geometryId ) {
 
 		// ensure we're not over geometry
 		if ( this._drawInfo.length >= this._maxItemCount ) {
@@ -349,7 +351,7 @@ class BatchedMesh extends Mesh {
 
 			visible: true,
 			active: true,
-			geometryIndex: this._drawInfo[ id ].geometryIndex,
+			geometryIndex: geometryId,
 
 		} );
 
@@ -359,6 +361,13 @@ class BatchedMesh extends Mesh {
 		const matricesArray = matricesTexture.image.data;
 		_identityMatrix.toArray( matricesArray, drawId * 16 );
 		matricesTexture.needsUpdate = true;
+
+		const colorsTexture = this._colorsTexture;
+		if ( colorsTexture ) {
+
+			_whiteColor.toArray( colorsTexture.image.data, drawId * 4 );
+
+		}
 
 		return drawId;
 
@@ -469,31 +478,15 @@ class BatchedMesh extends Mesh {
 			sphere: new Sphere()
 		} );
 
-		// push new draw info states
-		const drawInfo = this._drawInfo;
-		const matricesTexture = this._matricesTexture;
-		const matricesArray = this._matricesTexture.image.data;
-		const drawId = drawInfo.length;
-		drawInfo.push( {
-			visible: true,
-			active: true,
-			geometryIndex: geometryId,
-		} );
-
-		// initialize matrix information
-		_identityMatrix.toArray( matricesArray, drawId * 16 );
-		matricesTexture.needsUpdate = true;
-
 		// update the geometry
-		this.setGeometryAt( drawId, geometry );
+		this.setGeometryAt( geometryId, geometry );
 
-		return drawId;
+		return geometryId;
 
 	}
 
-	setGeometryAt( id, geometry ) {
+	setGeometryAt( geometryId, geometry ) {
 
-		const geometryId = this._drawInfo[ id ].geometryIndex;
 		if ( geometryId >= this._geometryCount ) {
 
 			throw new Error( 'BatchedMesh: Maximum geometry count reached.' );
@@ -603,36 +596,44 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	deleteInstance( id ) {
+	/*
+	deleteGeometry( geometryId ) {
+
+		// TODO: delete geometry and associated instances
+
+	}
+	*/
+
+	/*
+	deleteInstance( instanceId ) {
 
 		// Note: User needs to call optimize() afterward to pack the data.
 
 		const drawInfo = this._drawInfo;
-		if ( id >= drawInfo.length || drawInfo[ id ].active === false ) {
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
 			return this;
 
 		}
 
-		drawInfo[ id ].active = false;
+		drawInfo[ instanceId ].active = false;
 		this._visibilityChanged = true;
 
 		return this;
 
 	}
+	*/
 
 	// get bounding box and compute it if it doesn't exist
-	getBoundingBoxAt( id, target ) {
+	getBoundingBoxAt( geometryId, target ) {
 
-		const drawInfo = this._drawInfo;
-		if ( drawInfo[ id ].active === false ) {
+		if ( geometryId >= this._geometryCount ) {
 
 			return null;
 
 		}
 
 		// compute bounding box
-		const geometryId = drawInfo[ id ].geometryIndex;
 		const bound = this._bounds[ geometryId ];
 		const box = bound.box;
 		const geometry = this.geometry;
@@ -666,17 +667,15 @@ class BatchedMesh extends Mesh {
 	}
 
 	// get bounding sphere and compute it if it doesn't exist
-	getBoundingSphereAt( id, target ) {
+	getBoundingSphereAt( geometryId, target ) {
 
-		const drawInfo = this._drawInfo;
-		if ( drawInfo[ id ].active === false ) {
+		if ( geometryId >= this._geometryCount ) {
 
 			return null;
 
 		}
 
 		// compute bounding sphere
-		const geometryId = drawInfo[ id ].geometryIndex;
 		const bound = this._bounds[ geometryId ];
 		const sphere = bound.sphere;
 		const geometry = this.geometry;
@@ -716,7 +715,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	setMatrixAt( id, matrix ) {
+	setMatrixAt( instanceId, matrix ) {
 
 		// @TODO: Map geometryId to index of the arrays because
 		//        optimize() can make geometryId mismatch the index
@@ -724,34 +723,34 @@ class BatchedMesh extends Mesh {
 		const drawInfo = this._drawInfo;
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = this._matricesTexture.image.data;
-		if ( id >= drawInfo.length || drawInfo[ id ].active === false ) {
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
 			return this;
 
 		}
 
-		matrix.toArray( matricesArray, id * 16 );
+		matrix.toArray( matricesArray, instanceId * 16 );
 		matricesTexture.needsUpdate = true;
 
 		return this;
 
 	}
 
-	getMatrixAt( id, matrix ) {
+	getMatrixAt( instanceId, matrix ) {
 
 		const drawInfo = this._drawInfo;
 		const matricesArray = this._matricesTexture.image.data;
-		if ( id >= drawInfo.length || drawInfo[ id ].active === false ) {
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
 			return null;
 
 		}
 
-		return matrix.fromArray( matricesArray, id * 16 );
+		return matrix.fromArray( matricesArray, instanceId * 16 );
 
 	}
 
-	setColorAt( id, color ) {
+	setColorAt( instanceId, color ) {
 
 		if ( this._colorsTexture === null ) {
 
@@ -765,66 +764,66 @@ class BatchedMesh extends Mesh {
 		const colorsTexture = this._colorsTexture;
 		const colorsArray = this._colorsTexture.image.data;
 		const drawInfo = this._drawInfo;
-		if ( id >= drawInfo.length || drawInfo[ id ].active === false ) {
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
 			return this;
 
 		}
 
-		color.toArray( colorsArray, id * 4 );
+		color.toArray( colorsArray, instanceId * 4 );
 		colorsTexture.needsUpdate = true;
 
 		return this;
 
 	}
 
-	getColorAt( id, color ) {
+	getColorAt( instanceId, color ) {
 
 		const colorsArray = this._colorsTexture.image.data;
 		const drawInfo = this._drawInfo;
-		if ( id >= drawInfo.length || drawInfo[ id ].active === false ) {
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
 			return null;
 
 		}
 
-		return color.fromArray( colorsArray, id * 4 );
+		return color.fromArray( colorsArray, instanceId * 4 );
 
 	}
 
-	setVisibleAt( id, value ) {
+	setVisibleAt( instanceId, value ) {
 
 		// if the geometry is out of range, not active, or visibility state
 		// does not change then return early
 		const drawInfo = this._drawInfo;
 		if (
-			id >= drawInfo.length ||
-			drawInfo[ id ].active === false ||
-			drawInfo[ id ].visible === value
+			instanceId >= drawInfo.length ||
+			drawInfo[ instanceId ].active === false ||
+			drawInfo[ instanceId ].visible === value
 		) {
 
 			return this;
 
 		}
 
-		drawInfo[ id ].visible = value;
+		drawInfo[ instanceId ].visible = value;
 		this._visibilityChanged = true;
 
 		return this;
 
 	}
 
-	getVisibleAt( id ) {
+	getVisibleAt( instanceId ) {
 
 		// return early if the geometry is out of range or not active
 		const drawInfo = this._drawInfo;
-		if ( id >= drawInfo.length || drawInfo[ id ].active === false ) {
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
 			return false;
 
 		}
 
-		return drawInfo[ id ].visible;
+		return drawInfo[ instanceId ].visible;
 
 	}
 
@@ -865,8 +864,8 @@ class BatchedMesh extends Mesh {
 
 			// ge the intersects
 			this.getMatrixAt( i, _mesh.matrixWorld ).premultiply( matrixWorld );
-			this.getBoundingBoxAt( i, _mesh.geometry.boundingBox );
-			this.getBoundingSphereAt( i, _mesh.geometry.boundingSphere );
+			this.getBoundingBoxAt( geometryId, _mesh.geometry.boundingBox );
+			this.getBoundingSphereAt( geometryId, _mesh.geometry.boundingSphere );
 			_mesh.raycast( raycaster, _batchIntersects );
 
 			// add batch id to the intersects
@@ -1004,9 +1003,11 @@ class BatchedMesh extends Mesh {
 
 				if ( drawInfo[ i ].visible && drawInfo[ i ].active ) {
 
+					const geometryId = drawInfo[ i ].geometryIndex;
+
 					// get the bounds in world space
 					this.getMatrixAt( i, _matrix );
-					this.getBoundingSphereAt( i, _sphere ).applyMatrix4( _matrix );
+					this.getBoundingSphereAt( geometryId, _sphere ).applyMatrix4( _matrix );
 
 					// determine whether the batched geometry is within the frustum
 					let culled = false;
@@ -1020,7 +1021,7 @@ class BatchedMesh extends Mesh {
 
 						// get the distance from camera used for sorting
 						const z = _vector.distanceTo( _sphere.center );
-						_renderList.push( drawRanges[ drawInfo[ i ].geometryIndex ], z, i );
+						_renderList.push( drawRanges[ geometryId ], z, i );
 
 					}
 
@@ -1059,20 +1060,22 @@ class BatchedMesh extends Mesh {
 
 				if ( drawInfo[ i ].visible && drawInfo[ i ].active ) {
 
+					const geometryId = drawInfo[ i ].geometryIndex;
+
 					// determine whether the batched geometry is within the frustum
 					let culled = false;
 					if ( perObjectFrustumCulled ) {
 
 						// get the bounds in world space
 						this.getMatrixAt( i, _matrix );
-						this.getBoundingSphereAt( i, _sphere ).applyMatrix4( _matrix );
+						this.getBoundingSphereAt( geometryId, _sphere ).applyMatrix4( _matrix );
 						culled = ! _frustum.intersectsSphere( _sphere );
 
 					}
 
 					if ( ! culled ) {
 
-						const range = drawRanges[ drawInfo[ i ].geometryIndex ];
+						const range = drawRanges[ geometryId ];
 						multiDrawStarts[ count ] = range.start * bytesPerElement;
 						multiDrawCounts[ count ] = range.count;
 						indirectArray[ count ] = i;
