@@ -30,7 +30,7 @@ function MenubarView( editor ) {
 
 	// Grid Helper
 
-	let option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( 'Grid Helper' ).onClick( function () {
+	let option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( strings.getKey( 'menubar/view/gridHelper' ) ).onClick( function () {
 
 		states.gridHelper = ! states.gridHelper;
 
@@ -44,7 +44,7 @@ function MenubarView( editor ) {
 
 	// Camera Helpers
 
-	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( 'Camera Helpers' ).onClick( function () {
+	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( strings.getKey( 'menubar/view/cameraHelpers' ) ).onClick( function () {
 
 		states.cameraHelpers = ! states.cameraHelpers;
 
@@ -58,7 +58,7 @@ function MenubarView( editor ) {
 
 	// Light Helpers
 
-	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( 'Light Helpers' ).onClick( function () {
+	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( strings.getKey( 'menubar/view/lightHelpers' ) ).onClick( function () {
 
 		states.lightHelpers = ! states.lightHelpers;
 
@@ -72,7 +72,7 @@ function MenubarView( editor ) {
 
 	// Skeleton Helpers
 
-	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( 'Skeleton Helpers' ).onClick( function () {
+	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( strings.getKey( 'menubar/view/skeletonHelpers' ) ).onClick( function () {
 
 		states.skeletonHelpers = ! states.skeletonHelpers;
 
