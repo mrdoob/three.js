@@ -6,6 +6,7 @@ import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 function Script( editor ) {
 
 	const signals = editor.signals;
+	const strings = editor.strings;
 
 	const container = new UIPanel();
 	container.setId( 'script' );
@@ -371,17 +372,17 @@ function Script( editor ) {
 
 				case 'vertexShader':
 
-					title.setValue( object.material.name + ' / Vertex Shader' ); // TODO: l10n
+					title.setValue( object.material.name + ' / ' + strings.getKey( 'script/title/vertexShader' ) );
 					break;
 
 				case 'fragmentShader':
 
-					title.setValue( object.material.name + ' / Fragment Shader' ); // TODO: l10n
+					title.setValue( object.material.name + ' / ' + strings.getKey( 'script/title/fragmentShader' ) );
 					break;
 
 				case 'programInfo':
 
-					title.setValue( object.material.name + ' / Program Properties ' ); // TODO: l10n
+					title.setValue( object.material.name + ' / ' + strings.getKey( 'script/title/programInfo' ) );
 					break;
 
 				default:
