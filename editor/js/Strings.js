@@ -784,8 +784,8 @@ function Strings( config ) {
 			'viewport/info/samples': 'Échantillons',
 			'viewport/info/rendertime': 'Temps de rendu',
 
-			'script/title/vertexShader': 'Shader de sommet',
-			'script/title/fragmentShader': 'Shader de fragments',
+			'script/title/vertexShader': 'Vertex Shader',
+			'script/title/fragmentShader': 'Fragment Shader',
 			'script/title/programInfo': 'Propriétés du programme'
 
 		},
