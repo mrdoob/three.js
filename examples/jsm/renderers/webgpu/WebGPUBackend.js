@@ -803,8 +803,8 @@ class WebGPUBackend extends Backend {
 		const { bundleEncoder, renderBundle, lastPipelineGPU } = renderObjectData;
 
 		const renderContextData = this.get( context );
-		
-		if ( renderContextData.registerBundlesPhase === true && renderContextData.renderBundles !== undefined && bundleEncoder !== undefined && lastPipelineGPU === pipelineGPU ) {
+
+		if ( renderContextData.registerBundlesPhase === true && bundleEncoder !== undefined && lastPipelineGPU === pipelineGPU ) {
 
 			renderContextData.renderBundles.push( renderBundle );
 			return;

@@ -282,6 +282,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
+				renderBundle.needsUpdate = true;
 		
 			}
 
@@ -294,8 +295,8 @@
 
 				const renderTimeAverage = performance.now();
 				if ( api.renderBundle ) {
-		
-					renderer.renderBundle( renderBundle );
+
+					renderer._renderBundle( renderBundle );
 
 				} else {
 

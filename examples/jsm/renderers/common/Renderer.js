@@ -327,19 +327,25 @@ class Renderer {
 
 	}
 
-	renderBundle( renderBundle ) {
+	_renderBundle( renderBundle ) {
 
 		const { scene, camera } = renderBundle;
 
 		const renderBundleData = this.backend.get( renderBundle );
 
-		if ( renderBundleData.renderContexts === undefined ) {
+		const renderBundleNeedsUpdate = renderBundleData.renderContexts === undefined || renderBundle.needsUpdate === true;
+
+		if ( renderBundleNeedsUpdate ) {
+
+			renderBundleData.renderContexts = undefined;
 
 			this._currentRenderBundle = renderBundle;
 
 			this.render( scene, camera );
 
 			this._currentRenderBundle = null;
+
+			renderBundle.needsUpdate = false;
 
 		}
 
@@ -531,7 +537,7 @@ class Renderer {
 
 			const renderContextData = this.backend.get( renderContext );
 
-			if ( renderContextData.renderObjects === undefined ) {
+			if ( renderContextData.renderObjects === undefined || this._currentRenderBundle.needsUpdate === true ) {
 
 				renderContextData.renderObjects = [];
 				renderContextData.renderBundles = [];
@@ -1484,6 +1490,15 @@ class Renderer {
 		this._pipelines.updateForRender( renderObject );
 
 		//
+
+		if ( this._currentRenderBundle !== null && this._currentRenderBundle.needsUpdate === true ) {
+
+			const renderObjectData = this.backend.get( renderObject );
+
+			renderObjectData.bundleEncoder = undefined;
+			renderObjectData.lastPipelineGPU = undefined;
+
+		}
 
 		this.backend.draw( renderObject, this.info );
 
