@@ -391,6 +391,10 @@ function Strings( config ) {
 			'viewport/info/samples': 'Samples',
 			'viewport/info/rendertime': 'Render time',
 
+			'script/title/vertexShader': 'Vertex Shader',
+			'script/title/fragmentShader': 'Fragment Shader',
+			'script/title/programInfo': 'Program Properties'
+
 		},
 
 		fr: {
@@ -778,7 +782,11 @@ function Strings( config ) {
 			'viewport/info/triangles': 'Triangles',
 			'viewport/info/sample': 'Échantillon',
 			'viewport/info/samples': 'Échantillons',
-			'viewport/info/rendertime': 'Temps de rendu'
+			'viewport/info/rendertime': 'Temps de rendu',
+
+			'script/title/vertexShader': 'Shader de sommet',
+			'script/title/fragmentShader': 'Shader de fragments',
+			'script/title/programInfo': 'Propriétés du programme'
 
 		},
 
@@ -1167,7 +1175,11 @@ function Strings( config ) {
 			'viewport/info/triangles': '三角形',
 			'viewport/info/sample': '样本',
 			'viewport/info/samples': '样本',
-			'viewport/info/rendertime': '渲染时间'
+			'viewport/info/rendertime': '渲染时间',
+
+			'script/title/vertexShader': '顶点着色器',
+			'script/title/fragmentShader': '片段着色器',
+			'script/title/programInfo': '程序属性'
 
 		},
 
@@ -1556,7 +1568,11 @@ function Strings( config ) {
 			'viewport/info/triangles': '三角形',
 			'viewport/info/sample': 'サンプル',
 			'viewport/info/samples': 'サンプル',
-			'viewport/info/rendertime': 'レンダリング時間'
+			'viewport/info/rendertime': 'レンダリング時間',
+
+			'script/title/vertexShader': '頂点シェーダー',
+			'script/title/fragmentShader': 'フラグメントシェーダ',
+			'script/title/programInfo': 'プログラムのプロパティ'
 
 		}
 
