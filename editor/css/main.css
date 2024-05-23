@@ -424,7 +424,7 @@ select {
 
 				#menubar .menu .options .option.toggle-on::before {
 
-					content: '✓';
+					content: '✔';
 					font-size: 12px;
 
 				}
