@@ -88,6 +88,14 @@ function SidebarProjectVideo( editor ) {
 		progress.value = 0;
 		output.document.body.appendChild( progress );
 
+		const video = document.createElement( 'video' );
+		video.width = width;
+		video.height = height;
+		video.controls = true;
+		video.loop = true;
+		video.hidden = true;
+		output.document.body.appendChild( video );
+
 		//
 
 		const { createFFmpeg, fetchFile } = FFmpeg; // eslint-disable-line no-undef
@@ -97,7 +105,24 @@ function SidebarProjectVideo( editor ) {
 
 		ffmpeg.setProgress( ( { ratio } ) => {
 
-			progress.value = ( ratio * 0.5 ) + 0.5;
+			// A ffmpeg bug:
+			//  `ratio` sometimes be NaN (ffmpegwasm/ffmpeg.wasm/issues/178)
+			//  `ratio` sometimes be Infinity when rendering multiple videos simultaneously
+			if ( Number.isFinite( ratio ) ) { // guards both Infinity and NaN
+
+				progress.value = ( ratio * 0.5 ) + 0.5;
+
+			}
+
+		} );
+
+		output.addEventListener( 'unload', function () {
+
+			if ( video.src.startsWith( 'blob:' ) === false ) {
+
+				ffmpeg.exit();
+
+			}
 
 		} );
 
@@ -105,41 +130,47 @@ function SidebarProjectVideo( editor ) {
 		const duration = videoDuration.getValue();
 		const frames = duration * fps;
 
-		let currentTime = 0;
+		//
 
-		for ( let i = 0; i < frames; i ++ ) {
+		await ( async function () {
 
-			player.render( currentTime );
+			let currentTime = 0;
 
-			const num = i.toString().padStart( 5, '0' );
-			ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
-			currentTime += 1 / fps;
+			for ( let i = 0; i < frames; i ++ ) {
 
-			progress.value = ( i / frames ) * 0.5;
+				player.render( currentTime );
 
-		}
+				const num = i.toString().padStart( 5, '0' );
 
-		await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 5 ), 'out.mp4' );
+				if ( output.closed ) return;
 
-		const data = ffmpeg.FS( 'readFile', 'out.mp4' );
+				ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
+				currentTime += 1 / fps;
 
-		for ( let i = 0; i < frames; i ++ ) {
+				progress.value = ( i / frames ) * 0.5;
 
-			const num = i.toString().padStart( 5, '0' );
-			ffmpeg.FS( 'unlink', `tmp.${num}.png` );
+			}
 
-		}
+			await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 5 ), 'out.mp4' );
 
-		output.document.body.removeChild( canvas );
-		output.document.body.removeChild( progress );
+			const videoData = ffmpeg.FS( 'readFile', 'out.mp4' );
 
-		const video = document.createElement( 'video' );
-		video.width = width;
-		video.height = height;
-		video.controls = true;
-		video.loop = true;
-		video.src = URL.createObjectURL( new Blob( [ data.buffer ], { type: 'video/mp4' } ) );
-		output.document.body.appendChild( video );
+			for ( let i = 0; i < frames; i ++ ) {
+
+				const num = i.toString().padStart( 5, '0' );
+				ffmpeg.FS( 'unlink', `tmp.${num}.png` );
+
+			}
+
+			ffmpeg.FS( 'unlink', 'out.mp4' );
+
+			output.document.body.removeChild( canvas );
+			output.document.body.removeChild( progress );
+
+			video.src = URL.createObjectURL( new Blob( [ videoData.buffer ], { type: 'video/mp4' } ) );
+			video.hidden = false;
+
+		} )();
 
 		player.dispose();
 
