@@ -8,7 +8,6 @@ import {
 	NoToneMapping,
 	LinearMipmapLinearFilter,
 	SRGBColorSpace,
-	LinearSRGBColorSpace,
 	RGBAIntegerFormat,
 	RGIntegerFormat,
 	RedIntegerFormat,
