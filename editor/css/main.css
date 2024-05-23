@@ -377,6 +377,17 @@ select {
 			line-height: 16px;
 		}
 
+		#menubar .menu .key {
+			position: absolute;
+			right: 10px;
+			color: #ccc;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			font-size: 9px;
+			padding: 2px 4px;
+			right: 10px;
+		}
+
 		#menubar .menu .options {
 			position: fixed;
 			z-index: 1; /* higher than resizer */
@@ -414,6 +425,21 @@ select {
 					background: transparent;
 				}
 
+				#menubar .menu .options .option.toggle::before {
+
+					content: ' ';
+					display: inline-block;
+					width: 16px;
+
+				}
+
+				#menubar .menu .options .option.toggle-on::before {
+
+					content: '✔';
+					font-size: 12px;
+
+				}
+
 				#menubar .submenu-title::after {
 					content: '⏵';
 					float: right;
@@ -426,6 +452,8 @@ select {
 			margin: 0 !important;
 			cursor: not-allowed;
 		}
+
+		
 
 #sidebar {
 	position: absolute;

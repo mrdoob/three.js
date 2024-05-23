@@ -3,7 +3,7 @@ import { NoColorSpace, FloatType } from 'three';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import NodeSampler from '../../common/nodes/NodeSampler.js';
-import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
+import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from '../../common/nodes/NodeSampledTexture.js';
 
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeStorageBuffer from '../../common/nodes/NodeStorageBuffer.js';
@@ -316,7 +316,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			const name = node.name;
 			const type = node.type;
 
-			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' ) {
+			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D' ) {
 
 				return name;
 
@@ -369,7 +369,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			const bindings = this.bindings[ shaderStage ];
 
-			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' ) {
+			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D' ) {
 
 				let texture = null;
 
@@ -380,6 +380,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 				} else if ( type === 'cubeTexture' ) {
 
 					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node );
+
+				} else if ( type === 'texture3D' ) {
+
+					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node );
 
 				}
 
@@ -455,7 +459,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	isReference( type ) {
 
-		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_depth_2d' || type === 'texture_storage_2d';
+		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_depth_2d' || type === 'texture_storage_2d' || type === 'texture_3d';
 
 	}
 
@@ -734,7 +738,7 @@ ${ flowData.code }
 
 		for ( const uniform of uniforms ) {
 
-			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'storageTexture' ) {
+			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
 
 				const texture = uniform.node.value;
 
@@ -769,6 +773,10 @@ ${ flowData.code }
 				} else if ( texture.isVideoTexture === true ) {
 
 					textureType = 'texture_external';
+
+				} else if ( texture.isData3DTexture === true ) {
+
+					textureType = 'texture_3d<f32>';
 
 				} else if ( uniform.node.isStoreTextureNode === true ) {
 

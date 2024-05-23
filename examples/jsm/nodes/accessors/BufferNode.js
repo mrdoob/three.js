@@ -15,6 +15,12 @@ class BufferNode extends UniformNode {
 
 	}
 
+	getElementType( builder ) {
+
+		return this.getNodeType( builder );
+
+	}
+
 	getInputType( /*builder*/ ) {
 
 		return 'buffer';

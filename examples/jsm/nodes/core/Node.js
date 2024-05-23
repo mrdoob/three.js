@@ -163,6 +163,15 @@ class Node extends EventDispatcher {
 
 	}
 
+	getElementType( builder ) {
+
+		const type = this.getNodeType( builder );
+		const elementType = builder.getElementType( type );
+
+		return elementType;
+
+	}
+
 	getNodeType( builder ) {
 
 		const nodeProperties = builder.getNodeProperties( this );
