@@ -76,17 +76,29 @@ textarea, input { outline: none; } /* osx */
 
 .TabbedPanel .Tabs {
 	position: relative;
+	z-index: 1; /** Above .Panels **/
 	display: block;
 	width: 100%;
+	white-space: pre;
+	overflow: hidden;
 }
+
+	.TabbedPanel .Tabs.entered {
+		overflow-x: auto;
+	}
 
 	.TabbedPanel .Tabs .Tab {
 		padding: 10px 9px;
 		text-transform: uppercase;
 	}
 
+	.TabbedPanel .Tabs .Tab:last-child {
+		margin-right: 22px;
+	}
+
 	.TabbedPanel .Panels {
-		position: relative;
+		position: absolute;
+		top: 40px;
 		display: block;
 		width: 100%;
 	}
@@ -296,6 +308,7 @@ select {
 
 #resizer {
 	position: absolute;
+	z-index: 2; /* Above #sidebar */
 	top: 32px;
 	right: 350px;
 	width: 5px;
@@ -463,6 +476,7 @@ select {
 	width: 350px;
 	background: #eee;
 	overflow: auto;
+	overflow-x: hidden;
 }
 
 	#sidebar .Panel {

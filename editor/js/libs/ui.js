@@ -187,7 +187,7 @@ properties.forEach( function ( property ) {
 
 // events
 
-const events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'DblClick', 'Change', 'Input' ];
+const events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'MouseLeave', 'MouseEnter', 'Click', 'DblClick', 'Change', 'Input' ];
 
 events.forEach( function ( event ) {
 
@@ -1079,6 +1079,34 @@ class UITabbedPanel extends UIDiv {
 		this.add( this.panelsDiv );
 
 		this.selected = '';
+
+		//
+
+		let delayHoveringTimer = null;
+
+		this.tabsDiv.onMouseEnter( () => {
+
+			if ( delayHoveringTimer !== null ) {
+
+				clearTimeout( delayHoveringTimer );
+
+			}
+
+			delayHoveringTimer = setTimeout( () => this.tabsDiv.addClass( 'entered' ), 200 );
+
+		} );
+
+		this.tabsDiv.onMouseLeave( () => {
+
+			if ( delayHoveringTimer !== null ) {
+
+				clearTimeout( delayHoveringTimer );
+
+			}
+
+			this.tabsDiv.removeClass( 'entered' );
+
+		} );
 
 	}
 
