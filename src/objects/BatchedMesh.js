@@ -74,14 +74,16 @@ class MultiDrawRenderList {
 const _matrix = /*@__PURE__*/ new Matrix4();
 const _invMatrixWorld = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
+const _whiteColor = /*@__PURE__*/ new Color( 1, 1, 1 );
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _frustum = /*@__PURE__*/ new Frustum();
 const _box = /*@__PURE__*/ new Box3();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _vector = /*@__PURE__*/ new Vector3();
+const _forward = /*@__PURE__*/ new Vector3();
+const _temp = /*@__PURE__*/ new Vector3();
 const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
 const _mesh = /*@__PURE__*/ new Mesh();
-const _whiteColor = /*@__PURE__*/ new Color( 1, 1, 1 );
 const _batchIntersects = [];
 
 // @TODO: SkinnedMesh support?
@@ -123,13 +125,13 @@ function copyAttributeData( src, target, targetOffset = 0 ) {
 
 class BatchedMesh extends Mesh {
 
-	get maxItemCount() {
+	get maxInstanceCount() {
 
-		return this._maxItemCount;
+		return this._maxInstanceCount;
 
 	}
 
-	constructor( maxDrawCount, maxVertexCount, maxIndexCount = maxVertexCount * 2, material ) {
+	constructor( maxInstanceCount, maxVertexCount, maxIndexCount = maxVertexCount * 2, material ) {
 
 		super( new BufferGeometry(), material );
 
@@ -148,14 +150,14 @@ class BatchedMesh extends Mesh {
 		this._reservedRanges = [];
 		this._bounds = [];
 
-		this._maxItemCount = maxDrawCount;
+		this._maxInstanceCount = maxInstanceCount;
 		this._maxVertexCount = maxVertexCount;
 		this._maxIndexCount = maxIndexCount;
 
 		this._geometryInitialized = false;
 		this._geometryCount = 0;
-		this._multiDrawCounts = new Int32Array( maxDrawCount );
-		this._multiDrawStarts = new Int32Array( maxDrawCount );
+		this._multiDrawCounts = new Int32Array( maxInstanceCount );
+		this._multiDrawStarts = new Int32Array( maxInstanceCount );
 		this._multiDrawCount = 0;
 		this._multiDrawInstances = null;
 		this._visibilityChanged = true;
@@ -179,7 +181,7 @@ class BatchedMesh extends Mesh {
 		//       32x32 pixel texture max  256 matrices * 4 pixels = (32 * 32)
 		//       64x64 pixel texture max 1024 matrices * 4 pixels = (64 * 64)
 
-		let size = Math.sqrt( this._maxItemCount * 4 ); // 4 pixels needed for 1 matrix
+		let size = Math.sqrt( this._maxInstanceCount * 4 ); // 4 pixels needed for 1 matrix
 		size = Math.ceil( size / 4 ) * 4;
 		size = Math.max( size, 4 );
 
@@ -192,7 +194,7 @@ class BatchedMesh extends Mesh {
 
 	_initIndirectTexture() {
 
-		let size = Math.sqrt( this._maxItemCount );
+		let size = Math.sqrt( this._maxInstanceCount );
 		size = Math.ceil( size );
 
 		const indirectArray = new Uint32Array( size * size );
@@ -207,7 +209,8 @@ class BatchedMesh extends Mesh {
 		let size = Math.sqrt( this._maxIndexCount );
 		size = Math.ceil( size );
 
-		const colorsArray = new Float32Array( size * size * 4 ).fill( 1 ); // 4 floats per RGBA pixel
+		// 4 floats per RGBA pixel initialized to white
+		const colorsArray = new Float32Array( size * size * 4 ).fill( 1 );
 		const colorsTexture = new DataTexture( colorsArray, size, size, RGBAFormat, FloatType );
 		colorsTexture.colorSpace = ColorManagement.workingColorSpace;
 
@@ -305,8 +308,9 @@ class BatchedMesh extends Mesh {
 
 			if ( drawInfo[ i ].active === false ) continue;
 
+			const geometryId = drawInfo[ i ].geometryId;
 			this.getMatrixAt( i, _matrix );
-			this.getBoundingBoxAt( i, _box ).applyMatrix4( _matrix );
+			this.getBoundingBoxAt( geometryId, _box ).applyMatrix4( _matrix );
 			boundingBox.union( _box );
 
 		}
@@ -330,8 +334,9 @@ class BatchedMesh extends Mesh {
 
 			if ( drawInfo[ i ].active === false ) continue;
 
+			const geometryId = drawInfo[ i ].geometryId;
 			this.getMatrixAt( i, _matrix );
-			this.getBoundingSphereAt( i, _sphere ).applyMatrix4( _matrix );
+			this.getBoundingSphereAt( geometryId, _sphere ).applyMatrix4( _matrix );
 			boundingSphere.union( _sphere );
 
 		}
@@ -341,7 +346,7 @@ class BatchedMesh extends Mesh {
 	addInstance( geometryId ) {
 
 		// ensure we're not over geometry
-		if ( this._drawInfo.length >= this._maxItemCount ) {
+		if ( this._drawInfo.length >= this._maxInstanceCount ) {
 
 			throw new Error( 'BatchedMesh: Maximum item count reached.' );
 
@@ -366,6 +371,7 @@ class BatchedMesh extends Mesh {
 		if ( colorsTexture ) {
 
 			_whiteColor.toArray( colorsTexture.image.data, drawId * 4 );
+			colorsTexture.needsUpdate = true;
 
 		}
 
@@ -380,7 +386,7 @@ class BatchedMesh extends Mesh {
 		this._validateGeometry( geometry );
 
 		// ensure we're not over geometry
-		if ( this._drawInfo.length >= this._maxItemCount ) {
+		if ( this._drawInfo.length >= this._maxInstanceCount ) {
 
 			throw new Error( 'BatchedMesh: Maximum item count reached.' );
 
@@ -902,7 +908,7 @@ class BatchedMesh extends Mesh {
 		this._drawRanges = source._drawRanges.map( range => ( { ...range } ) );
 		this._reservedRanges = source._reservedRanges.map( range => ( { ...range } ) );
 
-		this._drawInfo = source._info.map( inf => ( { ...inf } ) );
+		this._drawInfo = source._drawInfo.map( inf => ( { ...inf } ) );
 		this._bounds = source._bounds.map( bound => ( {
 			boxInitialized: bound.boxInitialized,
 			box: bound.box.clone(),
@@ -911,7 +917,7 @@ class BatchedMesh extends Mesh {
 			sphere: bound.sphere.clone()
 		} ) );
 
-		this._maxItemCount = source._maxItemCount;
+		this._maxInstanceCount = source._maxInstanceCount;
 		this._maxVertexCount = source._maxVertexCount;
 		this._maxIndexCount = source._maxIndexCount;
 
@@ -998,6 +1004,7 @@ class BatchedMesh extends Mesh {
 			// get the camera position in the local frame
 			_invMatrixWorld.copy( this.matrixWorld ).invert();
 			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _invMatrixWorld );
+			_forward.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _invMatrixWorld );
 
 			for ( let i = 0, l = drawInfo.length; i < l; i ++ ) {
 
@@ -1020,8 +1027,8 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						// get the distance from camera used for sorting
-						const z = _vector.distanceTo( _sphere.center );
-						_renderList.push( drawRanges[ geometryId ], z, i );
+						const z = _temp.subVectors( _sphere.center, _vector ).dot( _forward );
+						_renderList.push( drawRanges[ i ], z );
 
 					}
 
