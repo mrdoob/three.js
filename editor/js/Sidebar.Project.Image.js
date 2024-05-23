@@ -34,7 +34,7 @@ function SidebarProjectImage( editor ) {
 	const samplesNumber = new UIInteger( 16 ).setRange( pathTracerMinSamples, pathTracerMaxSamples );
 
 	const samplesRow = new UIRow();
-	samplesRow.add( new UIText( 'Sample Count' ).setClass( 'Label' ) ); // TODO: l10n
+	samplesRow.add( new UIText( strings.getKey( 'sidebar/project/image/sampleCount' ) ).setClass( 'Label' ) );
 	samplesRow.add( samplesNumber );
 
 	container.add( samplesRow );

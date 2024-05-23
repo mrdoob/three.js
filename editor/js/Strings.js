@@ -352,6 +352,7 @@ function Strings( config ) {
 			'sidebar/project/app/publish': 'Publish',
 
 			'sidebar/project/image': 'Image',
+			'sidebar/project/image/sampleCount': 'Sample Count',
 			'sidebar/project/video': 'Video',
 
 			'sidebar/project/shading': 'Shading',
@@ -745,6 +746,7 @@ function Strings( config ) {
 			'sidebar/project/app/publish': 'Publier',
 
 			'sidebar/project/image': 'Image',
+			'sidebar/project/image/sampleCount': 'Nombre d\'échantillons',
 			'sidebar/project/video': 'Video',
 
 			'sidebar/project/shading': 'Shading',
@@ -1138,6 +1140,7 @@ function Strings( config ) {
 			'sidebar/project/app/publish': '发布',
 
 			'sidebar/project/image': 'Image',
+			'sidebar/project/image/sampleCount': '样本计数',
 			'sidebar/project/video': '视频',
 
 			'sidebar/project/shading': 'Shading',
@@ -1531,6 +1534,7 @@ function Strings( config ) {
 			'sidebar/project/app/publish': 'アプリファイルとして保存',
 
 			'sidebar/project/image': '画像',
+			'sidebar/project/image/sampleCount': 'サンプル数',
 			'sidebar/project/video': '動画',
 
 			'sidebar/project/shading': 'シェーディング',
