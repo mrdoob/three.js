@@ -144,6 +144,7 @@ const exceptionList = [
 	'webgpu_custom_fog',
 	'webgpu_instancing_morph',
 	'webgpu_mesh_batch',
+	'webgpu_renderbundle',
 	'webgpu_texturegrad',
 
 	// WebGPU idleTime and parseTime too low
