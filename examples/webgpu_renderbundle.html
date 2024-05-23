@@ -67,7 +67,6 @@
 			webgpu: true,
 			renderBundle: true,
 			count: MAX_GEOMETRY_COUNT,
-			dynamic: MAX_GEOMETRY_COUNT / 2,
 			opacity: 1,
 		};
 
@@ -260,9 +259,6 @@
 				init( ! api.webgpu );
 
 			} );
-
-			gui.add( api, 'count', 1, MAX_GEOMETRY_COUNT ).step( 1 ).onChange( initMesh );
-			gui.add( api, 'dynamic', 0, MAX_GEOMETRY_COUNT ).step( 1 );
 
 			// listeners
 
