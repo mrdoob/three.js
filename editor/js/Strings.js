@@ -52,11 +52,11 @@ function Strings( config ) {
 			'menubar/file/export': 'Export',
 
 			'menubar/edit': 'Edit',
-			'menubar/edit/undo': 'Undo (Ctrl+Z)',
-			'menubar/edit/redo': 'Redo (Ctrl+Shift+Z)',
+			'menubar/edit/undo': 'Undo',
+			'menubar/edit/redo': 'Redo',
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Clone',
-			'menubar/edit/delete': 'Delete (Del)',
+			'menubar/edit/delete': 'Delete',
 
 			'menubar/add': 'Add',
 			'menubar/add/group': 'Group',
@@ -441,11 +441,11 @@ function Strings( config ) {
 			'menubar/file/export': 'Exporter',
 
 			'menubar/edit': 'Edition',
-			'menubar/edit/undo': 'Annuler (Ctrl+Z)',
-			'menubar/edit/redo': 'Refaire (Ctrl+Shift+Z)',
+			'menubar/edit/undo': 'Annuler',
+			'menubar/edit/redo': 'Refaire',
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Cloner',
-			'menubar/edit/delete': 'Supprimer (Supp)',
+			'menubar/edit/delete': 'Supprimer',
 
 			'menubar/add': 'Ajouter',
 			'menubar/add/group': 'Groupe',
@@ -830,11 +830,11 @@ function Strings( config ) {
 			'menubar/file/export': '导出',
 
 			'menubar/edit': '编辑',
-			'menubar/edit/undo': '撤销 (Ctrl+Z)',
-			'menubar/edit/redo': '重做 (Ctrl+Shift+Z)',
+			'menubar/edit/undo': '撤销',
+			'menubar/edit/redo': '重做',
 			'menubar/edit/center': '居中',
 			'menubar/edit/clone': '拷贝',
-			'menubar/edit/delete': '删除 (Del)',
+			'menubar/edit/delete': '删除',
 
 			'menubar/add': '添加',
 			'menubar/add/group': '组',
@@ -1219,11 +1219,11 @@ function Strings( config ) {
 			'menubar/file/export': 'エクスポート',
 
 			'menubar/edit': '編集',
-			'menubar/edit/undo': '元に戻す（Ctrl+Z）',
-			'menubar/edit/redo': 'やり直す（Ctrl+Shift+Z）',
+			'menubar/edit/undo': '元に戻す',
+			'menubar/edit/redo': 'やり直す',
 			'menubar/edit/center': '中央揃え',
 			'menubar/edit/clone': '複製',
-			'menubar/edit/delete': '削除（Del）',
+			'menubar/edit/delete': '削除',
 
 			'menubar/add': '追加',
 			'menubar/add/group': 'グループ',
