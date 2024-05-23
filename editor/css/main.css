@@ -377,6 +377,17 @@ select {
 			line-height: 16px;
 		}
 
+		#menubar .menu .key {
+			position: absolute;
+			right: 10px;
+			color: #ccc;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			font-size: 9px;
+			padding: 2px 4px;
+			right: 10px;
+		}
+
 		#menubar .menu .options {
 			position: fixed;
 			z-index: 1; /* higher than resizer */
