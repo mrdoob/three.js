@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Compute Ping/Pong Texture</title>
+		<title>three.js - WebGPU - Compute Read-Write Access Texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -8,7 +8,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Ping/Pong Texture
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Compute Read-Write Access Texture
 		</div>
 
 		<script type="importmap">
@@ -24,17 +24,16 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { texture, storageTexture, wgslFn, code, instanceIndex, uniform } from 'three/nodes';
+			import { storageTexture, wgslFn, code, instanceIndex, uniform } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 			import StorageTexture from 'three/addons/renderers/common/StorageTexture.js';
 
 			let camera, scene, renderer;
-			let computeInitNode, computeToPing, computeToPong;
-			let pingTexture, pongTexture;
+			let computeInitNode, computeToPong;
+			let pingTexture;
 			let material;
-			let phase = true;
 			let lastUpdate = - 1;
 
 			const seed = uniform( new THREE.Vector2() );
@@ -59,25 +58,17 @@
 
 				// texture
 
-				const hdr = true;
 				const width = 512, height = 512;
 
 				pingTexture = new StorageTexture( width, height );
-				pongTexture = new StorageTexture( width, height );
 
-				if ( hdr ) {
+				pingTexture.format = THREE.RedFormat;
+				pingTexture.type = THREE.FloatType;
 
-					pingTexture.type = THREE.HalfFloatType;
-					pongTexture.type = THREE.HalfFloatType;
+				const wgslFormat = 'r32float'; // MTLReadWriteTextureTier1
 
-				}
-
-				const wgslFormat = hdr ? 'rgba16float' : 'rgba8unorm';
-				
-				const readPing = storageTexture( pingTexture ).setAccess( 'read-only' );
-				const writePing = storageTexture( pingTexture ).setAccess( 'write-only' );
-				const readPong = storageTexture( pongTexture ).setAccess( 'read-only' );
-				const writePong = storageTexture( pongTexture ).setAccess( 'write-only' );
+				const ping = storageTexture( pingTexture ).setAccess( 'write-only' );
+				const pingPong = storageTexture( pingTexture ).setAccess( 'read-write' );
 
 				// compute init
 
@@ -88,7 +79,7 @@
 
 					}
 
-					fn blur( image : texture_storage_2d<${wgslFormat}, read>, uv : vec2i ) -> vec4f {
+					fn blur( image : texture_storage_2d<${wgslFormat}, read_write>, uv : vec2i ) -> vec4f {
 
 						var color = vec4f( 0.0 );
 
@@ -127,32 +118,31 @@
 					}
 				`, [ rand2 ] );
 
-				computeInitNode = computeInitWGSL( { writeTex: storageTexture( pingTexture ), index: instanceIndex, seed } ).compute( width * height );
+				computeInitNode = computeInitWGSL( { writeTex: ping, index: instanceIndex, seed } ).compute( width * height );
 
 				// compute loop
 
-				const computePingPongWGSL = wgslFn( `
-					fn computePingPongWGSL( readTex: texture_storage_2d<${wgslFormat}, read>, writeTex: texture_storage_2d<${ wgslFormat }, write>, index: u32 ) -> void {
+				const computeBlurWGSL = wgslFn( `
+					fn computeBlurWGSL( readWriteTex: texture_storage_2d<${wgslFormat}, read_write>, index: u32 ) -> void {
 
 						let posX = index % ${ width };
 						let posY = index / ${ width };
 						let indexUV = vec2i( i32( posX ), i32( posY ) );
 
-						let color = blur( readTex, indexUV ).rgb;
+						let color = blur( readWriteTex, indexUV ).rgb;
 
-						textureStore( writeTex, indexUV, vec4f( color * 1.05, 1 ) );
+						textureStore( readWriteTex, indexUV, vec4f( color * 1.05, 1 ) );
 
 					}
 				`, [ rand2 ] );
 
 				//
 
-				computeToPong = computePingPongWGSL( { readTex: readPing, writeTex: writePong, index: instanceIndex } ).compute( width * height );
-				computeToPing = computePingPongWGSL( { readTex: readPong, writeTex: writePing, index: instanceIndex } ).compute( width * height );
+				computeToPong = computeBlurWGSL( { readWriteTex: pingPong, index: instanceIndex } ).compute( width * height );
 
 				//
 
-				material = new THREE.MeshBasicMaterial( { color: 0xffffff, map: pongTexture } );
+				material = new THREE.MeshBasicMaterial( { color: 0xffffff, map: pingTexture } );
 
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( plane );
@@ -193,7 +183,7 @@
 
 				// reset every second
 
-				if ( phase && seconds !== lastUpdate ) {
+				if ( seconds !== lastUpdate ) {
 
 					seed.value.set( Math.random(), Math.random() );
 
@@ -205,11 +195,9 @@
 
 				// compute step
 
-				renderer.compute( phase ? computeToPong : computeToPing );
+				renderer.compute( computeToPong );
 
-				material.map = phase ? pongTexture : pingTexture;
-
-				phase = ! phase;
+				material.map = pingTexture;
 
 				// render step
 
