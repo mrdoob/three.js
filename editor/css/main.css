@@ -661,6 +661,11 @@ select {
 		background: #111;
 	}
 
+			#menubar .menu .key {
+				color: #444;
+				border-color: #444;
+			}
+
 			#menubar .menu .options {
 				background: #111;
 			}
