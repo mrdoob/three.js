@@ -16,6 +16,8 @@
 	<div id="info">
 
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - renderbundle
+		<br />
+		(WebGL uses 10 times fewer meshes to prevent performance issues.)
 
 	</div>
 
@@ -42,7 +44,7 @@
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 		import RenderBundle from 'three/addons/renderers/RenderBundle.js';
-		import { MeshBasicNodeMaterial } from 'three/nodes';
+		import { MeshToonNodeMaterial } from 'three/nodes';
 
 		let camera, scene, renderer, renderBundle;
 		let controls, stats;
@@ -86,7 +88,8 @@
 
 			quaternion.setFromEuler( rotation );
 
-			scale.x = scale.y = scale.z = 0.35 + ( Math.random() * 0.5 );
+			const factorScale = api.webgpu ? 1 : 2.0;
+			scale.x = scale.y = scale.z = 0.35 * factorScale + ( Math.random() * 0.5 * factorScale );
 
 			return matrix.compose( position, quaternion, scale );
 
@@ -105,8 +108,20 @@
 
 			geometries = [
 				new THREE.ConeGeometry( 1.0, 2.0, 3, 1 ),
-				// new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
-				// new THREE.PlaneGeometry( 2., 2, 1, 1 ),
+				new THREE.BoxGeometry( 2.0, 2.0, 2.0 ),
+				new THREE.PlaneGeometry( 2.0, 2, 1, 1 ),
+				new THREE.CapsuleGeometry( 1.0, 2.0, 4, 2 ),
+				new THREE.CircleGeometry( 1.0, 3 ),
+				new THREE.CylinderGeometry( 1.0, 1.0, 2.0, 3, 1 ),
+				new THREE.DodecahedronGeometry( 1.0, 0 ),
+				new THREE.IcosahedronGeometry( 1.0, 0 ),
+				new THREE.OctahedronGeometry( 1.0, 0 ),
+				new THREE.PolyhedronGeometry( [ 0, 0, 0 ], [ 0, 0, 0 ], 1, 0 ),
+				new THREE.RingGeometry( 1.0, 1.5, 3 ),
+				new THREE.SphereGeometry( 1.0, 3, 2 ),
+				new THREE.TetrahedronGeometry( 1.0, 0 ),
+				new THREE.TorusGeometry( 1.0, 0.5, 3, 3 ),
+				new THREE.TorusKnotGeometry( 1.0, 0.5, 20, 3, 1, 1 ),
 			];
 
 		}
@@ -130,29 +145,21 @@
 
 		}
 
-		function initMesh() {
+		function initMesh( count ) {
 
 			cleanup();
-			initRegularMesh();
+			initRegularMesh( count );
 
 		}
 
 
-		function initRegularMesh() {
+		function initRegularMesh( count ) {
 
 			group = new THREE.Group();
 
-			for ( let i = 0; i < api.count; i ++ ) {
+			for ( let i = 0; i < count; i ++ ) {
 
-				// const material = new THREE.MeshPhysicalMaterial( {
-				// 	color: new THREE.Color( Math.random() * 0xffffff ),
-				// 	roughness: Math.random(),
-				// 	metalness: Math.random(),
-				// 	clearcoatRoughness: Math.random(),
-				// 	reflectivity: Math.random(),
-				// 	specularIntensity: Math.random(),
-				// } );
-				const material = new MeshBasicNodeMaterial( {
+				const material = new MeshToonNodeMaterial( {
 					color: new THREE.Color( Math.random() * 0xffffff ),
 					side: THREE.DoubleSide,
 				} );
@@ -162,7 +169,6 @@
 				child.matrix.decompose( child.position, child.quaternion, child.scale );
 				child.userData.rotationSpeed = randomizeRotationSpeed( new THREE.Euler() );
 				child.frustumCulled = false;
-				// child.matrixAutoUpdate = false;
 				group.add( child );
 
 			}
@@ -172,6 +178,8 @@
 		}
 
 		async function init( forceWebGL = false ) {
+
+			const count = api.count / ( api.webgpu ? 1 : 10 );
 
 			renderTimeAverages = [];
 
@@ -203,28 +211,18 @@
 
 			scene = new THREE.Scene();
 
+			scene.background = new THREE.Color( 0xc1c1c1 );
 
-			if ( forceWebGL ) {
-
-				scene.background = new THREE.Color( 0xf10000 );
-
-			} else {
-
-				scene.background = new THREE.Color( 0x330000 );
-
-			}
-
-			const light = new THREE.DirectionalLight( 0xffffff, 2.4 );
+			const light = new THREE.DirectionalLight( 0xffffff, 3.4 );
 			scene.add( light );
 
 			document.body.appendChild( renderer.domElement );
 
 			await renderer.init();
-			// renderer.render( scene, camera );
 
 
 			initGeometries();
-			initMesh();
+			initMesh( count );
 
 
 			if ( api.renderBundle ) {
@@ -317,7 +315,10 @@
 
 			function animateMeshes() {
 
-				const loopNum = Math.min( api.count, api.dynamic );
+				const count = api.count / ( api.webgpu ? 1 : 10 );
+				const countDynamic = api.dynamic / ( api.webgpu ? 1 : 10 );
+
+				const loopNum = Math.min( count, countDynamic );
 
 
 				for ( let i = 0; i < loopNum; i ++ ) {
