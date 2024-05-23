@@ -94,6 +94,10 @@ function Strings( config ) {
 
 			'menubar/view': 'View',
 			'menubar/view/fullscreen': 'Fullscreen',
+			'menubar/view/gridHelper': 'Grid Helper',
+			'menubar/view/cameraHelpers': 'Camera Helpers',
+			'menubar/view/lightHelpers': 'Light Helpers',
+			'menubar/view/skeletonHelpers': 'Skeleton Helpers',
 
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
@@ -488,6 +492,10 @@ function Strings( config ) {
 
 			'menubar/view': 'View',
 			'menubar/view/fullscreen': 'Fullscreen',
+			'menubar/view/gridHelper': 'Assistant de grille',
+			'menubar/view/cameraHelpers': 'Aides à la caméra',
+			'menubar/view/lightHelpers': 'Aides Lumière',
+			'menubar/view/skeletonHelpers': 'Aides squelettes',
 
 			'menubar/help': 'Aide',
 			'menubar/help/source_code': 'Code Source',
@@ -882,6 +890,10 @@ function Strings( config ) {
 
 			'menubar/view': '视图',
 			'menubar/view/fullscreen': '全屏',
+			'menubar/view/gridHelper': '网格助手',
+			'menubar/view/cameraHelpers': '相机助手',
+			'menubar/view/lightHelpers': '光助手',
+			'menubar/view/skeletonHelpers': '骷髅助手',
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
@@ -1276,6 +1288,10 @@ function Strings( config ) {
 
 			'menubar/view': '表示',
 			'menubar/view/fullscreen': 'フルスクリーン',
+			'menubar/view/gridHelper': 'グリッドヘルパー',
+			'menubar/view/cameraHelpers': 'カメラヘルパー',
+			'menubar/view/lightHelpers': 'ライトヘルパー',
+			'menubar/view/skeletonHelpers': 'スケルトンヘルパー',
 
 			'menubar/help': 'ヘルプ',
 			'menubar/help/source_code': 'ソースコード',
