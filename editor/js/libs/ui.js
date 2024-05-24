@@ -1130,6 +1130,7 @@ class UITabbedPanel extends UIDiv {
 		if ( tab ) {
 
 			tab.addClass( 'selected' );
+			tab.dom.scrollIntoView( { inline: 'center', behavior: 'smooth' } );
 
 		}
 
