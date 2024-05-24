@@ -187,7 +187,7 @@ properties.forEach( function ( property ) {
 
 // events
 
-const events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'MouseMove', 'MouseDown', 'Click', 'DblClick', 'Change', 'Input' ];
+const events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'DblClick', 'Change', 'Input' ];
 
 events.forEach( function ( event ) {
 
@@ -1079,30 +1079,6 @@ class UITabbedPanel extends UIDiv {
 		this.add( this.panelsDiv );
 
 		this.selected = '';
-
-		//
-
-		// let grabbing = false;
-
-		// this.tabsDiv.onMouseMove( ( event ) => {
-
-		// 	if ( ! grabbing ) return;
-
-		// 	this.tabsDiv.dom.scrollLeft -= event.movementX;
-
-		// } );
-
-		// this.tabsDiv.onMouseDown( () => {
-
-		// 	grabbing = true;
-
-		// } );
-
-		// this.dom.ownerDocument.addEventListener( 'mouseup', () => {
-
-		// 	grabbing = false;
-
-		// } );
 
 	}
 
