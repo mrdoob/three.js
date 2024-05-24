@@ -62,12 +62,12 @@
 		<h2>Constructor</h2>
 		<h3>
 			[name](
-				[param:Integer maxItemCount], [param:Integer maxVertexCount],
+				[param:Integer maxInstanceCount], [param:Integer maxVertexCount],
 				[param:Integer maxIndexCount], [param:Material material],
 			)
 		</h3>
 		<p>
-			[page:Integer maxItemCount] - the max number of individual items planned to be added and rendered.<br />
+			[page:Integer maxInstanceCount] - the max number of individual instances planned to be added and rendered.<br />
 			[page:Integer maxVertexCount] - the max number of vertices to be used by all unique geometries.<br />
 			[page:Integer maxIndexCount] - the max number of indices to be used by all unique geometries.<br />
 			[page:Material material] - an instance of [page:Material]. Default is a new [page:MeshBasicMaterial].<br />
@@ -134,7 +134,7 @@
 
 		<h3>[method:this setCustomSort]( [param:Function sortFunction] )</h3>
 		<p>
-			Takes a sort a function that is run before render. The function takes a list of items to sort and a camera. The objects
+			Takes a sort a function that is run before render. The function takes a list of instances to sort and a camera. The objects
 			in the list include a "z" field to perform a depth-ordered sort with.
 		</p>
 
