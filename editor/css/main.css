@@ -386,6 +386,7 @@ select {
 			font-size: 9px;
 			padding: 2px 4px;
 			right: 10px;
+			pointer-events: none;
 		}
 
 		#menubar .menu .options {
