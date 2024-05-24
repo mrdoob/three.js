@@ -24,11 +24,7 @@ class RoomEnvironment extends Scene {
 		const roomMaterial = new MeshStandardMaterial( { side: BackSide } );
 		const boxMaterial = new MeshStandardMaterial();
 
-		let intensity = 5;
-
-		if ( renderer !== null && renderer._useLegacyLights === false ) intensity = 900;
-
-		const mainLight = new PointLight( 0xffffff, intensity, 28, 2 );
+		const mainLight = new PointLight( 0xffffff, 900, 28, 2 );
 		mainLight.position.set( 0.418, 16.199, 0.300 );
 		this.add( mainLight );
 

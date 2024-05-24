@@ -145,10 +145,6 @@ class WebGLRenderer {
 
 		this._outputColorSpace = SRGBColorSpace;
 
-		// physical lights
-
-		this._useLegacyLights = false;
-
 		// tone mapping
 
 		this.toneMapping = NoToneMapping;
@@ -955,7 +951,7 @@ class WebGLRenderer {
 
 			}
 
-			currentRenderState.setupLights( _this._useLegacyLights );
+			currentRenderState.setupLights();
 
 			// Only initialize materials in the new scene, not the targetScene.
 
@@ -1183,7 +1179,7 @@ class WebGLRenderer {
 			const opaqueObjects = currentRenderList.opaque;
 			const transmissiveObjects = currentRenderList.transmissive;
 
-			currentRenderState.setupLights( _this._useLegacyLights );
+			currentRenderState.setupLights();
 
 			if ( camera.isArrayCamera ) {
 
@@ -2785,20 +2781,6 @@ class WebGLRenderer {
 		const gl = this.getContext();
 		gl.drawingBufferColorSpace = colorSpace === DisplayP3ColorSpace ? 'display-p3' : 'srgb';
 		gl.unpackColorSpace = ColorManagement.workingColorSpace === LinearDisplayP3ColorSpace ? 'display-p3' : 'srgb';
-
-	}
-
-	get useLegacyLights() { // @deprecated, r155
-
-		console.warn( 'THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733.' );
-		return this._useLegacyLights;
-
-	}
-
-	set useLegacyLights( value ) { // @deprecated, r155
-
-		console.warn( 'THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733.' );
-		this._useLegacyLights = value;
 
 	}
 
