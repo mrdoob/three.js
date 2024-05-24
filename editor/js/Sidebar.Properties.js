@@ -28,7 +28,6 @@ function SidebarProperties( editor ) {
 
 	}
 
-	const objectTab = getTabByTabId( container.tabs, 'objectTab' );
 	const geometryTab = getTabByTabId( container.tabs, 'geometryTab' );
 	const materialTab = getTabByTabId( container.tabs, 'materialTab' );
 	const scriptTab = getTabByTabId( container.tabs, 'scriptTab' );
