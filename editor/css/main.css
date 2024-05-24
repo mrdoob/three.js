@@ -81,10 +81,19 @@ textarea, input { outline: none; } /* osx */
 	width: 100%;
 	white-space: pre;
 	overflow: hidden;
+	overflow-x: auto;
 }
 
-	.TabbedPanel .Tabs.entered {
-		overflow-x: auto;
+	.TabbedPanel .Tabs::-webkit-scrollbar {
+		height: 8px;
+		background: #eee;
+	}
+	.TabbedPanel .Tabs::-webkit-scrollbar-thumb {
+		background: #08f3;
+	}
+	.TabbedPanel .Tabs::-webkit-scrollbar-thumb:hover {
+		background: #08f;
+		cursor: ew-resize;
 	}
 
 	.TabbedPanel .Tabs .Tab {

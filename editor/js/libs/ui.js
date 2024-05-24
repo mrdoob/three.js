@@ -187,7 +187,7 @@ properties.forEach( function ( property ) {
 
 // events
 
-const events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'MouseLeave', 'MouseEnter', 'Click', 'DblClick', 'Change', 'Input' ];
+const events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'MouseMove', 'MouseDown', 'Click', 'DblClick', 'Change', 'Input' ];
 
 events.forEach( function ( event ) {
 
@@ -1082,31 +1082,27 @@ class UITabbedPanel extends UIDiv {
 
 		//
 
-		let delayHoveringTimer = null;
+		// let grabbing = false;
 
-		this.tabsDiv.onMouseEnter( () => {
+		// this.tabsDiv.onMouseMove( ( event ) => {
 
-			if ( delayHoveringTimer !== null ) {
+		// 	if ( ! grabbing ) return;
 
-				clearTimeout( delayHoveringTimer );
+		// 	this.tabsDiv.dom.scrollLeft -= event.movementX;
 
-			}
+		// } );
 
-			delayHoveringTimer = setTimeout( () => this.tabsDiv.addClass( 'entered' ), 200 );
+		// this.tabsDiv.onMouseDown( () => {
 
-		} );
+		// 	grabbing = true;
 
-		this.tabsDiv.onMouseLeave( () => {
+		// } );
 
-			if ( delayHoveringTimer !== null ) {
+		// this.dom.ownerDocument.addEventListener( 'mouseup', () => {
 
-				clearTimeout( delayHoveringTimer );
+		// 	grabbing = false;
 
-			}
-
-			this.tabsDiv.removeClass( 'entered' );
-
-		} );
+		// } );
 
 	}
 
