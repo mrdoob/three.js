@@ -762,7 +762,7 @@ select {
 	}
 
 		.TabbedPanel .Tabs::-webkit-scrollbar {
-			background: #222;
+			background: #111;
 		}
 
 		.TabbedPanel .Tab {
