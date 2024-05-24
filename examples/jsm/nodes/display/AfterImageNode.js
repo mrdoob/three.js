@@ -8,6 +8,9 @@ import { uniform } from '../core/UniformNode.js';
 import { RenderTarget } from 'three';
 import { sign, max } from '../math/MathNode.js';
 import QuadMesh from '../../objects/QuadMesh.js';
+import { NoToneMapping, Vector2 } from 'three';
+
+const _size = new Vector2();
 
 const quadMeshComp = new QuadMesh();
 
@@ -58,12 +61,21 @@ class AfterImageNode extends TempNode {
 		this._compRT.texture.type = textureType;
 		this._oldRT.texture.type = textureType;
 
+		renderer.getDrawingBufferSize( _size );
+
+		this.setSize( _size.x, _size.y );
+
+
+		const currentToneMapping = renderer.toneMapping;
+		const currentToneMappingNode = renderer.toneMappingNode;
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentTexture = textureNode.value;
 
 		this.textureNodeOld.value = this._oldRT.texture;
 
 		// comp
+		renderer.toneMapping = NoToneMapping;
+		renderer.toneMappingNode = null;
 		renderer.setRenderTarget( this._compRT );
 		quadMeshComp.render( renderer );
 
@@ -72,9 +84,9 @@ class AfterImageNode extends TempNode {
 		this._oldRT = this._compRT;
 		this._compRT = temp;
 
-		// set size before swapping fails
-		this.setSize( map.image.width, map.image.height );
 
+		renderer.toneMapping = currentToneMapping;
+		renderer.toneMappingNode = currentToneMappingNode;
 		renderer.setRenderTarget( currentRenderTarget );
 		textureNode.value = currentTexture;
 

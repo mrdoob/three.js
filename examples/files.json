@@ -337,6 +337,7 @@
 		"webgpu_loader_gltf",
 		"webgpu_loader_gltf_anisotropy",
 		"webgpu_loader_gltf_compressed",
+		"webgpu_loader_gltf_dispersion",
 		"webgpu_loader_gltf_iridescence",
 		"webgpu_loader_gltf_sheen",
 		"webgpu_loader_gltf_transmission",
@@ -383,7 +384,10 @@
 		"webgpu_storage_buffer",
 		"webgpu_mesh_batch",
 		"webgpu_instancing_morph",
-		"webgpu_texturegrad"
+		"webgpu_texturegrad",
+		"webgpu_volume_cloud",
+		"webgpu_volume_perlin",
+		"webgpu_renderbundle"
 	],
 	"webaudio": [
 		"webaudio_orientation",

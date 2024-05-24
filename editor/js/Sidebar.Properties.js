@@ -49,14 +49,17 @@ function SidebarProperties( editor ) {
 		if ( container.selected === 'geometryTab' ) {
 
 			container.select( geometryTab.isHidden() ? 'objectTab' : 'geometryTab' );
+			geometryTab.dom.scrollIntoView( { inline: 'center', behavior: 'smooth' } );
 
 		} else if ( container.selected === 'materialTab' ) {
 
 			container.select( materialTab.isHidden() ? 'objectTab' : 'materialTab' );
+			materialTab.dom.scrollIntoView( { inline: 'center', behavior: 'smooth' } );
 
 		} else if ( container.selected === 'scriptTab' ) {
 
 			container.select( scriptTab.isHidden() ? 'objectTab' : 'scriptTab' );
+			scriptTab.dom.scrollIntoView( { inline: 'center', behavior: 'smooth' } );
 
 		}
 

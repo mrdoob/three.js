@@ -15,7 +15,7 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 	getNodeType( builder ) {
 
-		return this.node.getNodeType( builder );
+		return this.node.getElementType( builder );
 
 	}
 

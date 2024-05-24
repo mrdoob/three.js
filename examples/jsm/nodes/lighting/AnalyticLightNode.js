@@ -182,7 +182,7 @@ class AnalyticLightNode extends LightingNode {
 	updateShadow( frame ) {
 
 		const { rtt, light } = this;
-		const { renderer, scene } = frame;
+		const { renderer, scene, camera } = frame;
 
 		const currentOverrideMaterial = scene.overrideMaterial;
 
@@ -191,6 +191,7 @@ class AnalyticLightNode extends LightingNode {
 		rtt.setSize( light.shadow.mapSize.width, light.shadow.mapSize.height );
 
 		light.shadow.updateMatrices( light );
+		light.shadow.camera.layers.mask = camera.layers.mask;
 
 		const currentToneMapping = renderer.toneMapping;
 		const currentRenderTarget = renderer.getRenderTarget();

@@ -8,7 +8,7 @@ import { Command } from '../Command.js';
  */
 class SetUuidCommand extends Command {
 
-	constructor( editor, object, newUuid ) {
+	constructor( editor, object = null, newUuid = null ) {
 
 		super( editor );
 
@@ -17,7 +17,7 @@ class SetUuidCommand extends Command {
 
 		this.object = object;
 
-		this.oldUuid = ( object !== undefined ) ? object.uuid : undefined;
+		this.oldUuid = ( object !== null ) ? object.uuid : null;
 		this.newUuid = newUuid;
 
 	}

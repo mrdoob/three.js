@@ -22,29 +22,29 @@ function MenubarFile( editor ) {
 
 	// New Project
 
-	const newProjectSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/file/newProject' ) ).addClass( 'option' ).addClass( 'submenu-title' );
+	const newProjectSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/file/new' ) ).addClass( 'option' ).addClass( 'submenu-title' );
 	newProjectSubmenuTitle.onMouseOver( function () {
 
 		const { top, right } = this.dom.getBoundingClientRect();
 		const { paddingTop } = getComputedStyle( this.dom );
-		newPorjectSubmenu.setLeft( right + 'px' );
-		newPorjectSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
-		newPorjectSubmenu.setDisplay( 'block' );
+		newProjectSubmenu.setLeft( right + 'px' );
+		newProjectSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
+		newProjectSubmenu.setDisplay( 'block' );
 
 	} );
 	newProjectSubmenuTitle.onMouseOut( function () {
 
-		newPorjectSubmenu.setDisplay( 'none' );
+		newProjectSubmenu.setDisplay( 'none' );
 
 	} );
 	options.add( newProjectSubmenuTitle );
 
-	const newPorjectSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
-	newProjectSubmenuTitle.add( newPorjectSubmenu );
+	const newProjectSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	newProjectSubmenuTitle.add( newProjectSubmenu );
 
 	// New Project / Empty
 
-	let option = new UIRow().setTextContent( strings.getKey( 'menubar/file/newProject/empty' ) ).setClass( 'option' );
+	let option = new UIRow().setTextContent( strings.getKey( 'menubar/file/new/empty' ) ).setClass( 'option' );
 	option.onClick( function () {
 
 		if ( confirm( strings.getKey( 'prompt/file/open' ) ) ) {
@@ -54,20 +54,20 @@ function MenubarFile( editor ) {
 		}
 
 	} );
-	newPorjectSubmenu.add( option );
+	newProjectSubmenu.add( option );
 
 	//
 
-	newPorjectSubmenu.add( new UIHorizontalRule() );
+	newProjectSubmenu.add( new UIHorizontalRule() );
 
 	// New Project / ...
 
 	const examples = [
-		{ title: 'menubar/file/newProject/Arkanoid', file: 'arkanoid.app.json' },
-		{ title: 'menubar/file/newProject/Camera', file: 'camera.app.json' },
-		{ title: 'menubar/file/newProject/Particles', file: 'particles.app.json' },
-		{ title: 'menubar/file/newProject/Pong', file: 'pong.app.json' },
-		{ title: 'menubar/file/newProject/Shaders', file: 'shaders.app.json' }
+		{ title: 'menubar/file/new/Arkanoid', file: 'arkanoid.app.json' },
+		{ title: 'menubar/file/new/Camera', file: 'camera.app.json' },
+		{ title: 'menubar/file/new/Particles', file: 'particles.app.json' },
+		{ title: 'menubar/file/new/Pong', file: 'pong.app.json' },
+		{ title: 'menubar/file/new/Shaders', file: 'shaders.app.json' }
 	];
 
 	const loader = new THREE.FileLoader();
@@ -95,11 +95,90 @@ function MenubarFile( editor ) {
 				}
 
 			} );
-			newPorjectSubmenu.add( option );
+			newProjectSubmenu.add( option );
 
 		} )( i );
 
 	}
+
+	// Open
+
+	const openProjectForm = document.createElement( 'form' );
+	openProjectForm.style.display = 'none';
+	document.body.appendChild( openProjectForm );
+
+	const openProjectInput = document.createElement( 'input' );
+	openProjectInput.multiple = false;
+	openProjectInput.type = 'file';
+	openProjectInput.accept = '.json';
+	openProjectInput.addEventListener( 'change', async function () {
+
+		const file = openProjectInput.files[ 0 ];
+
+		if ( file === undefined ) return;
+
+		try {
+
+			const json = JSON.parse( await file.text() );
+
+			async function onEditorCleared() {
+
+				await editor.fromJSON( json );
+
+				editor.signals.editorCleared.remove( onEditorCleared );
+
+			}
+
+			editor.signals.editorCleared.add( onEditorCleared );
+
+			editor.clear();
+
+		} catch ( e ) {
+
+			alert( strings.getKey( 'prompt/file/failedToOpenProject' ) );
+			console.error( e );
+
+		} finally {
+
+			form.reset();
+
+		}
+
+	} );
+
+	openProjectForm.appendChild( openProjectInput );
+
+	option = new UIRow()
+		.addClass( 'option' )
+		.setTextContent( strings.getKey( 'menubar/file/open' ) )
+		.onClick( function () {
+
+			if ( confirm( strings.getKey( 'prompt/file/open' ) ) ) {
+
+				openProjectInput.click();
+
+			}
+
+		} );
+
+	options.add( option );
+
+	// Save
+
+	option = new UIRow()
+		.addClass( 'option' )
+		.setTextContent( strings.getKey( 'menubar/file/save' ) )
+		.onClick( function () {
+
+			const json = editor.toJSON();
+			const blob = new Blob( [ JSON.stringify( json ) ], { type: 'application/json' } );
+			editor.utils.save( blob, 'project.json' );
+
+		} );
+
+	options.add( option );
+
+	//
 
 	options.add( new UIHorizontalRule() );
 
@@ -112,7 +191,6 @@ function MenubarFile( editor ) {
 	const fileInput = document.createElement( 'input' );
 	fileInput.multiple = true;
 	fileInput.type = 'file';
-	fileInput.accept = Loader.getSupportedFileFormats().map( format => '.' + format ).join( ', ' );
 	fileInput.addEventListener( 'change', function () {
 
 		editor.loader.loadFiles( fileInput.files );

@@ -22,7 +22,7 @@ function ViewportPathtracer( renderer ) {
 		if ( pathTracer === null ) return;
 
 		// path tracer size automatically updates based on the canvas
-		pathTracer.reset();
+		pathTracer.updateCamera();
 
 	}
 
@@ -67,6 +67,14 @@ function ViewportPathtracer( renderer ) {
 
 	}
 
+	function getSamples() {
+
+		if ( pathTracer === null ) return;
+
+		return pathTracer.samples;
+
+	}
+
 	return {
 		init: init,
 		setSize: setSize,
@@ -74,7 +82,8 @@ function ViewportPathtracer( renderer ) {
 		setEnvironment: setEnvironment,
 		updateMaterials: updateMaterials,
 		update: update,
-		reset: reset
+		reset: reset,
+		getSamples: getSamples
 	};
 
 }
