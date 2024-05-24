@@ -85,7 +85,7 @@ textarea, input { outline: none; } /* osx */
 }
 
 	.TabbedPanel .Tabs::-webkit-scrollbar {
-		height: 8px;
+		height: 5px;
 		background: #eee;
 	}
 	.TabbedPanel .Tabs::-webkit-scrollbar-thumb {
