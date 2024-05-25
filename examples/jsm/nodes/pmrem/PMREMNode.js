@@ -5,7 +5,6 @@ import { textureCubeUV } from './PMREMUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
-//import { WebGLCoordinateSystem } from 'three';
 
 let _generator = null;
 
@@ -162,7 +161,6 @@ class PMREMNode extends TempNode {
 
 		const texture = this.value;
 
-		//if ( builder.renderer.coordinateSystem === WebGLCoordinateSystem && texture.isPMREMTexture !== true && texture.isRenderTargetTexture === true ) {
 		if ( texture.isRenderTargetTexture === true ) {
 
 			uvNode = vec3( uvNode.x.negate(), uvNode.yz );
