@@ -1307,10 +1307,9 @@ class WebGLRenderer {
 
 						if ( sortObjects ) {
 
-							_vector4.setFromMatrixPosition( object.matrixWorld )
-								.applyMatrix4( camera.matrixWorldInverse );
-							_vector4.divideScalar( _vector4 )
-								.applyMatrix4( camera.projectionMatrix );
+							_vector3.setFromMatrixPosition( object.matrixWorld );
+							_vector4.copy( _vector3 )
+								.applyMatrix4( _projScreenMatrix );
 
 						}
 
@@ -1348,9 +1347,7 @@ class WebGLRenderer {
 
 							_vector4
 								.applyMatrix4( object.matrixWorld )
-								.applyMatrix4( camera.matrixWorldInverse );
-							_vector4.divideScalar( _vector4 )
-								.applyMatrix4( camera.projectionMatrix );
+								.applyMatrix4( _projScreenMatrix );
 
 						}
 
