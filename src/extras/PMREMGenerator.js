@@ -100,7 +100,7 @@ class PMREMGenerator {
 	 * Generates a PMREM from a supplied Scene, which can be faster than using an
 	 * image if networking bandwidth is low. Optional sigma specifies a blur radius
 	 * in radians to be applied to the scene before PMREM generation. Optional near
-	 * and far planes ensure the scene is rendered in its entirety 
+	 * and far planes ensure the scene is rendered in its entirety
 	 * Optional size, the renderTarget default size is 256
 	 * Optional cubeCamera position, the cubeCamera ist default position is the origin
 	 */
