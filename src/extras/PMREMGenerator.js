@@ -102,7 +102,8 @@ class PMREMGenerator {
 	 * in radians to be applied to the scene before PMREM generation. Optional near
 	 * and far planes ensure the scene is rendered in its entirety
 	 * Optional size, the renderTarget default size is 256
-	 * Optional cubeCamera position, the cubeCamera ist default position is the origin
+  	 * Optional cubeCamera position, the cubeCamera default position is the origin
+	 * is placed at the origin).
 	 */
 	fromScene( scene, sigma = 0, near = 0.1, far = 100, size = 256, position = new Vector3( 0, 0, 0) ) {
 
@@ -113,7 +114,7 @@ class PMREMGenerator {
 
 		this._renderer.xr.enabled = false;
 
-		this._setSize( size );
+		this._setSize( 256 );
 
 		const cubeUVRenderTarget = this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
