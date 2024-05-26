@@ -225,17 +225,21 @@ class WebGPUPipelineUtils {
 		let color, alpha;
 
 		const blending = material.blending;
+		const blendSrc = material.blendSrc;
+		const blendDst = material.blendDst;
+		const blendEquation = material.blendEquation;
+
 
 		if ( blending === CustomBlending ) {
 
-			const blendSrcAlpha = material.blendSrcAlpha !== null ? material.blendSrcAlpha : GPUBlendFactor.One;
-			const blendDstAlpha = material.blendDstAlpha !== null ? material.blendDstAlpha : GPUBlendFactor.Zero;
-			const blendEquationAlpha = material.blendEquationAlpha !== null ? material.blendEquationAlpha : GPUBlendFactor.Add;
+			const blendSrcAlpha = material.blendSrcAlpha !== null ? material.blendSrcAlpha : blendSrc;
+			const blendDstAlpha = material.blendDstAlpha !== null ? material.blendDstAlpha : blendDst;
+			const blendEquationAlpha = material.blendEquationAlpha !== null ? material.blendEquationAlpha : blendEquation;
 
 			color = {
-				srcFactor: this._getBlendFactor( material.blendSrc ),
-				dstFactor: this._getBlendFactor( material.blendDst ),
-				operation: this._getBlendOperation( material.blendEquation )
+				srcFactor: this._getBlendFactor( blendSrc ),
+				dstFactor: this._getBlendFactor( blendDst ),
+				operation: this._getBlendOperation( blendEquation )
 			};
 
 			alpha = {
