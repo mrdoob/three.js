@@ -105,7 +105,7 @@ class PMREMGenerator {
   	 * Optional cubeCamera position, the cubeCamera default position is the origin
 	 * is placed at the origin).
 	 */
-	fromScene( scene, sigma = 0, near = 0.1, far = 100, size = 256, position = new Vector3( 0, 0, 0) ) {
+	fromScene( scene, sigma = 0, near = 0.1, far = 100, size = 256, position = new Vector3( 0, 0, 0 ) ) {
 
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
