@@ -25,6 +25,8 @@ class Node extends EventDispatcher {
 		this._cacheKey = null;
 		this._cacheKeyVersion = 0;
 
+		this.global = false;
+
 		this.isNode = true;
 
 		Object.defineProperty( this, 'id', { value: _nodeId ++ } );
@@ -98,7 +100,7 @@ class Node extends EventDispatcher {
 
 	isGlobal( /*builder*/ ) {
 
-		return false;
+		return this.global;
 
 	}
 
