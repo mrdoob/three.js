@@ -80,7 +80,7 @@ class NodeBuilder {
 		this.computeShader = null;
 
 		this.flowNodes = { vertex: [], fragment: [], compute: [] };
-		this.flowCode = { vertex: '', fragment: '', compute: [] };
+		this.flowCode = { vertex: '', fragment: '', compute: '' };
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.bindings = { vertex: [], fragment: [], compute: [] };
