@@ -199,9 +199,11 @@ class Node extends EventDispatcher {
 
 		const nodeProperties = builder.getNodeProperties( this );
 
+		let index = 0;
+
 		for ( const childNode of this.getChildren() ) {
 
-			nodeProperties[ '_node' + childNode.id ] = childNode;
+			nodeProperties[ 'node' + index ++ ] = childNode;
 
 		}
 
