@@ -36,7 +36,7 @@ function GeometryParametersPanel( editor, object ) {
 	// thetaStart
 
 	const thetaStartRow = new UIRow();
-	const thetaStart = new UINumber( parameters.thetaStart * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
+	const thetaStart = new UINumber( parameters.thetaStart * THREE.MathUtils.RAD2DEG ).setUnit( '°' ).setStep( 10 ).onChange( update );
 
 	thetaStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/circle_geometry/thetastart' ) ).setClass( 'Label' ) );
 	thetaStartRow.add( thetaStart );
@@ -46,7 +46,7 @@ function GeometryParametersPanel( editor, object ) {
 	// thetaLength
 
 	const thetaLengthRow = new UIRow();
-	const thetaLength = new UINumber( parameters.thetaLength * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
+	const thetaLength = new UINumber( parameters.thetaLength * THREE.MathUtils.RAD2DEG ).setUnit( '°' ).setStep( 10 ).onChange( update );
 
 	thetaLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/circle_geometry/thetalength' ) ).setClass( 'Label' ) );
 	thetaLengthRow.add( thetaLength );
