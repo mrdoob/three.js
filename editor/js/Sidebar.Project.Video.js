@@ -18,7 +18,7 @@ function SidebarProjectVideo( editor ) {
 
 	function toDiv2() {
 
-		this.setValue( this.getValue() & 0xfffffffe );
+		this.setValue( 2 * Math.floor( this.getValue() / 2 ) );
 
 	}
 
