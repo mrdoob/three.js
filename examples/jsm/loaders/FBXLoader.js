@@ -434,6 +434,7 @@ class FBXTreeParser {
 		if ( nonNativeExtensions.has( extension ) ) {
 
 			const loader = this.manager.getHandler( `.${extension}` );
+
 			if ( loader === null ) {
 
 				console.warn(
