@@ -1,6 +1,7 @@
-import { UIBreak, UIButton, UIInteger, UIPanel, UIRow, UIText } from './libs/ui.js';
+import { UIBreak, UIButton, UIInteger, UIPanel, UIRow, UIText, UISelect } from './libs/ui.js';
 
 import { APP } from './libs/app.js';
+import { ViewportPathtracer } from './Viewport.Pathtracer.js';
 
 function SidebarProjectVideo( editor ) {
 
@@ -13,6 +14,37 @@ function SidebarProjectVideo( editor ) {
 
 	container.add( new UIText( strings.getKey( 'sidebar/project/video' ) ).setTextTransform( 'uppercase' ) );
 	container.add( new UIBreak(), new UIBreak() );
+
+	// Shading
+
+	const shadingRow = new UIRow();
+	container.add( shadingRow );
+
+	shadingRow.add( new UIText( strings.getKey( 'sidebar/project/shading' ) ).setClass( 'Label' ) );
+
+	const shadingTypeSelect = new UISelect().setOptions( {
+		'solid': 'SOLID',
+		'realistic': 'REALISTIC'
+	} ).setWidth( '170px' ).setTextTransform( 'unset' ).onChange( refreshShadingRow ).setValue( 'solid' );
+	shadingRow.add( shadingTypeSelect );
+
+	const pathTracerMinSamples = 3;
+	const pathTracerMaxSamples = 65536;
+	const samplesNumber = new UIInteger( 16 ).setRange( pathTracerMinSamples, pathTracerMaxSamples );
+
+	const samplesRow = new UIRow();
+	samplesRow.add( new UIText( 'Sample Count' ).setClass( 'Label' ) ); // TODO: l10n
+	samplesRow.add( samplesNumber );
+
+	container.add( samplesRow );
+
+	function refreshShadingRow() {
+
+		samplesRow.setHidden( shadingTypeSelect.getValue() !== 'realistic' );
+
+	}
+
+	refreshShadingRow();
 
 	// Resolution
 
@@ -168,10 +200,27 @@ function SidebarProjectVideo( editor ) {
 		await ( async function () {
 
 			let currentTime = 0;
+			let samples = - 1;
+
+			if ( shadingTypeSelect.getValue() === 'realistic' ) {
+
+				samples = Math.max( pathTracerMinSamples, Math.min( pathTracerMaxSamples, samplesNumber.getValue() ) );
+
+				player.setPathTracer( new ViewportPathtracer( player.renderer ) );
+
+			} else {
+
+				player.setPathTracer( null );
+
+			}
+
+			writeFileStatus.textContent = `0 / ${ frames } ( 0% )`;
+
+			player.start();
 
 			for ( let i = 0; i < frames; i ++ ) {
 
-				player.render( currentTime );
+				await player.render( currentTime, samples );
 
 				const num = i.toString().padStart( 5, '0' );
 
@@ -180,11 +229,11 @@ function SidebarProjectVideo( editor ) {
 				ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
 				currentTime += 1 / fps;
 
-				const frame = i + 1;
-				const progress = Math.floor( frame / frames * 100 );
-				writeFileStatus.textContent = `${ frame } / ${ frames } ( ${ progress }% )`;
+				writeFileStatus.textContent = `${ i + 1 } / ${ frames } ( ${ Math.floor( ( i + 1 ) / frames * 100 ) }% )`;
 
 			}
+
+			player.stop();
 
 			encodingText.hidden = false;
 			encodingStatus.hidden = false;
