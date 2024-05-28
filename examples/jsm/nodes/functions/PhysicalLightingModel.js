@@ -331,7 +331,7 @@ const IBLSheenBRDF = tslFn( ( { normal, viewDir, roughness } ) => {
 } );
 
 const clearcoatF0 = vec3( 0.04 );
-const clearcoatF90 = vec3( 1 );
+const clearcoatF90 = float( 1 );
 
 //
 
