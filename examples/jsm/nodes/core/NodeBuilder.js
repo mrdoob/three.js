@@ -911,7 +911,9 @@ class NodeBuilder {
 
 		const previousFlow = this.flow;
 		const previousVars = this.vars;
+		const previousCache = this.cache;
 		const previousBuildStage = this.buildStage;
+		const previousStack = this.stack;
 
 		const flow = {
 			code: ''
@@ -919,6 +921,8 @@ class NodeBuilder {
 
 		this.flow = flow;
 		this.vars = {};
+		this.cache = new NodeCache();
+		this.stack = stack();
 
 		for ( const buildStage of defaultBuildStages ) {
 
@@ -932,6 +936,9 @@ class NodeBuilder {
 
 		this.flow = previousFlow;
 		this.vars = previousVars;
+		this.cache = previousCache;
+		this.stack = previousStack;
+
 		this.setBuildStage( previousBuildStage );
 
 		return flow;
