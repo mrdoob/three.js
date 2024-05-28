@@ -427,15 +427,19 @@ class FBXTreeParser {
 
 		let texture;
 
-		const extension = textureNode.FileName.slice( - 3 ).toLowerCase();
+		const nonNativeExtensions = new Set( [ 'tga', 'tif', 'tiff', 'exr', 'dds', 'hdr', 'ktx2' ] );
 
-		if ( extension === 'tga' ) {
+		const extension = textureNode.FileName.split( '.' ).pop().toLowerCase();
 
-			const loader = this.manager.getHandler( '.tga' );
+		if ( nonNativeExtensions.has( extension ) ) {
 
+			const loader = this.manager.getHandler( `.${extension}` );
 			if ( loader === null ) {
 
-				console.warn( 'FBXLoader: TGA loader not found, creating placeholder texture for', textureNode.RelativeFilename );
+				console.warn(
+					`FBXLoader: ${extension.toUpperCase()} loader not found, creating placeholder texture for`,
+					textureNode.RelativeFilename
+				);
 				texture = new Texture();
 
 			} else {
@@ -444,30 +448,10 @@ class FBXTreeParser {
 				texture = loader.load( fileName );
 
 			}
-
-		} else if ( extension === 'dds' ) {
-
-			const loader = this.manager.getHandler( '.dds' );
-
-			if ( loader === null ) {
-
-				console.warn( 'FBXLoader: DDS loader not found, creating placeholder texture for', textureNode.RelativeFilename );
-				texture = new Texture();
-
-			} else {
-
-				loader.setPath( this.textureLoader.path );
-				texture = loader.load( fileName );
-
-			}
-
-		} else if ( extension === 'psd' ) {
-
-			console.warn( 'FBXLoader: PSD textures are not supported, creating placeholder texture for', textureNode.RelativeFilename );
-			texture = new Texture();
 
 		} else {
 
+			// TextureLoader#load() returns a texture in any case which can be used as placeholder if the image failed to load.
 			texture = this.textureLoader.load( fileName );
 
 		}

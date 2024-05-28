@@ -31,6 +31,25 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { TGALoader } from 'three/addons/loaders/TGALoader.js';
+			import { TIFFLoader } from 'three/addons/loaders/TIFFLoader.js';
+			import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';
+
+			export const defaultLoadingManager = THREE.DefaultLoadingManager;
+
+			export const exrLoader = new EXRLoader();
+			export const rgbeLoader = new RGBELoader();
+			export const tgaLoader = new TGALoader();
+			export const ddsLoader = new DDSLoader();
+			export const tiffLoader = new TIFFLoader();
+
+			defaultLoadingManager.addHandler( /\.tga$/i, tgaLoader );
+			defaultLoadingManager.addHandler( /\.dds$/i, ddsLoader );
+			defaultLoadingManager.addHandler( /\.exr$/i, exrLoader );
+			defaultLoadingManager.addHandler( /\.hdr$/i, rgbeLoader );
+			defaultLoadingManager.addHandler( /\.tiff$/i, tiffLoader );
 
 			let camera, scene, renderer, stats, object, loader, guiMorphsFolder;
 			const clock = new THREE.Clock();
@@ -43,7 +62,8 @@
 
 			const assets = [
 				'Samba Dancing',
-				'morph_test'
+				'morph_test',
+				'with_non_native_textures'
 			];
 
 
@@ -87,7 +107,7 @@
 				grid.material.transparent = true;
 				scene.add( grid );
 			
-				loader = new FBXLoader( );
+				loader = new FBXLoader( defaultLoadingManager );
 				loadAsset( params.asset );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -126,8 +146,18 @@
 
 						object.traverse( function ( child ) {
 
-							if ( child.material ) child.material.dispose();
-							if ( child.material && child.material.map ) child.material.map.dispose();
+							if ( child.material ) {
+
+								const materials = Array.isArray( child.material ) ? child.material : [ child.material ];
+								materials.forEach( material => {
+
+									if ( material.map ) material.map.dispose();
+									material.dispose();
+			
+								} );
+			
+							}
+			
 							if ( child.geometry ) child.geometry.dispose();
 
 						} );
