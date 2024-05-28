@@ -415,12 +415,6 @@ class NodeBuilder {
 
 	}
 
-	generateMethod( method ) {
-
-		return method;
-
-	}
-
 	hasGeometryAttribute( name ) {
 
 		return this.geometry && this.geometry.getAttribute( name ) !== undefined;
