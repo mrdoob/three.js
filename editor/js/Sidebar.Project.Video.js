@@ -139,26 +139,9 @@ function SidebarProjectVideo( editor ) {
 
 		await ffmpeg.load();
 
-		let isFirstProgressEvent = true;
 		ffmpeg.setProgress( ( { ratio } ) => {
 
-			// ffmpeg bug: `ratio` in first progress event sometimes wrong value
-			if ( isFirstProgressEvent ) {
-
-				isFirstProgressEvent = false;
-				encodingStatus.textContent = '( 0% )';
-				return;
-
-			}
-
-			// ffmpeg bug:
-			//  `ratio` sometimes be NaN (ffmpegwasm/ffmpeg.wasm/issues/178)
-			//  `ratio` sometimes be Infinity when rendering multiple videos simultaneously
-			if ( Number.isFinite( ratio ) ) { // guards both Infinity and NaN
-
-				encodingStatus.textContent = `( ${ Math.floor( ratio * 100 ) }% )`;
-
-			}
+			encodingStatus.textContent = `( ${ Math.floor( ratio * 100 ) }% )`;
 
 		} );
 
