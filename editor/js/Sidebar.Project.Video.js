@@ -147,7 +147,11 @@ function SidebarProjectVideo( editor ) {
 
 		output.addEventListener( 'unload', function () {
 
-			if ( video.src.startsWith( 'blob:' ) === false ) {
+			if ( video.src.startsWith( 'blob:' ) ) {
+
+				URL.revokeObjectURL( video.src );
+
+			} else {
 
 				ffmpeg.exit();
 
