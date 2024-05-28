@@ -18,6 +18,8 @@ function SidebarProjectVideo( editor ) {
 
 	function toDiv2() {
 
+		// Make sure dimensions are divisible by 2 (requirement of libx264)
+
 		this.setValue( 2 * Math.floor( this.getValue() / 2 ) );
 
 	}
