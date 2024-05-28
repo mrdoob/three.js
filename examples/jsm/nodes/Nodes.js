@@ -105,7 +105,7 @@ export * from './accessors/TangentNode.js';
 export { default as TextureNode, texture, textureLoad, /*textureLevel,*/ sampler } from './accessors/TextureNode.js';
 export { default as TextureStoreNode, textureStore } from './accessors/TextureStoreNode.js';
 export { default as Texture3DNode, texture3D } from './accessors/Texture3DNode.js';
-export { default as UVNode, uv } from './accessors/UVNode.js';
+export * from './accessors/UVNode.js';
 export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
 
 // display
