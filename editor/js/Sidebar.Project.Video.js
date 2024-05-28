@@ -88,13 +88,41 @@ function SidebarProjectVideo( editor ) {
 		output.document.body.style.overflow = 'hidden';
 		output.document.body.appendChild( canvas );
 
-		const progress = document.createElement( 'progress' );
-		progress.style.position = 'absolute';
-		progress.style.top = '10px';
-		progress.style.left = ( ( width - 170 ) / 2 ) + 'px';
-		progress.style.width = '170px';
-		progress.value = 0;
-		output.document.body.appendChild( progress );
+		const status = document.createElement( 'div' );
+		status.style.position = 'absolute';
+		status.style.top = '10px';
+		status.style.left = '10px';
+		status.style.color = 'white';
+		status.style.fontFamily = 'system-ui';
+		status.style.fontSize = '12px';
+		status.style.textShadow = '0 0 2px black';
+		output.document.body.appendChild( status );
+
+		const writeFileStatus = document.createElement( 'span' );
+		status.appendChild( writeFileStatus );
+
+		const encodingText = document.createElement( 'span' );
+		encodingText.textContent = ' encoding'; // TODO: l10n
+		encodingText.hidden = true;
+		status.appendChild( encodingText );
+
+		const encodingStatus = document.createElement( 'span' );
+		encodingStatus.hidden = true;
+		status.appendChild( encodingStatus );
+
+		const videoSizeText = document.createElement( 'span' );
+		videoSizeText.textContent = ' size'; // TODO: l10n
+		videoSizeText.hidden = true;
+		status.appendChild( videoSizeText );
+
+		const videoSizeStatus = document.createElement( 'span' );
+		videoSizeStatus.hidden = true;
+		status.appendChild( videoSizeStatus );
+
+		const completedStatus = document.createElement( 'span' );
+		completedStatus.textContent = ' ✓';
+		completedStatus.hidden = true;
+		status.appendChild( completedStatus );
 
 		const video = document.createElement( 'video' );
 		video.width = width;
@@ -113,14 +141,7 @@ function SidebarProjectVideo( editor ) {
 
 		ffmpeg.setProgress( ( { ratio } ) => {
 
-			// A ffmpeg bug:
-			//  `ratio` sometimes be NaN (ffmpegwasm/ffmpeg.wasm/issues/178)
-			//  `ratio` sometimes be Infinity when rendering multiple videos simultaneously
-			if ( Number.isFinite( ratio ) ) { // guards both Infinity and NaN
-
-				progress.value = ( ratio * 0.5 ) + 0.5;
-
-			}
+			encodingStatus.textContent = `( ${ Math.floor( ratio * 100 ) }% )`;
 
 		} );
 
@@ -155,9 +176,14 @@ function SidebarProjectVideo( editor ) {
 				ffmpeg.FS( 'writeFile', `tmp.${num}.png`, await fetchFile( canvas.toDataURL() ) );
 				currentTime += 1 / fps;
 
-				progress.value = ( i / frames ) * 0.5;
+				const frame = i + 1;
+				const progress = Math.floor( frame / frames * 100 );
+				writeFileStatus.textContent = `${ frame } / ${ frames } ( ${ progress }% )`;
 
 			}
+
+			encodingText.hidden = false;
+			encodingStatus.hidden = false;
 
 			await ffmpeg.run( '-framerate', String( fps ), '-pattern_type', 'glob', '-i', '*.png', '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-preset', 'slow', '-crf', String( 5 ), 'out.mp4' );
 
@@ -173,7 +199,12 @@ function SidebarProjectVideo( editor ) {
 			ffmpeg.FS( 'unlink', 'out.mp4' );
 
 			output.document.body.removeChild( canvas );
-			output.document.body.removeChild( progress );
+
+			videoSizeText.hidden = false;
+			videoSizeStatus.textContent = `( ${ formatFileSize( videoData.buffer.byteLength ) } )`;
+			videoSizeStatus.hidden = false;
+
+			completedStatus.hidden = false;
 
 			video.src = URL.createObjectURL( new Blob( [ videoData.buffer ], { type: 'video/mp4' } ) );
 			video.hidden = false;
@@ -188,6 +219,19 @@ function SidebarProjectVideo( editor ) {
 	//
 
 	return container;
+
+}
+
+function formatFileSize( sizeB, K = 1024 ) {
+
+	if ( sizeB === 0 ) return '0B';
+
+	const sizes = [ sizeB, sizeB / K, sizeB / K / K ].reverse();
+	const units = [ 'B', 'KB', 'MB' ].reverse();
+	const index = sizes.findIndex( size => size >= 1 );
+
+	return new Intl.NumberFormat( 'en-us', { useGrouping: true, maximumFractionDigits: 1 } )
+		.format( sizes[ index ] ) + units[ index ];
 
 }
 
