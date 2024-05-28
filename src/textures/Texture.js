@@ -290,6 +290,66 @@ class Texture extends EventDispatcher {
 
 	}
 
+	objectFit( R, size = 'fill' ) {
+
+		const r = this.image.width / this.image.height;
+
+		switch ( size ) {
+
+			case 'cover':
+				if ( r > R ) {
+
+					this.repeat.x = R / r;
+					this.repeat.y = 1;
+
+					this.offset.x = ( 1 - this.repeat.x ) / 2;
+					this.offset.y = 0;
+
+				} else {
+
+					this.repeat.x = 1;
+					this.repeat.y = r / R;
+
+					this.offset.x = 0;
+					this.offset.y = ( 1 - this.repeat.y ) / 2;
+
+				}
+
+				break;
+
+			case 'contain':
+				if ( r > R ) {
+
+					this.repeat.x = 1;
+					this.repeat.y = r / R;
+
+					this.offset.x = 0;
+					this.offset.y = ( 1 - this.repeat.y ) / 2;
+
+				} else {
+
+					this.repeat.x = R / r;
+					this.repeat.y = 1;
+
+					this.offset.x = ( 1 - this.repeat.x ) / 2;
+					this.offset.y = 0;
+
+				}
+
+				break;
+
+			case 'fill':
+			default:
+				this.repeat.x = 1;
+				this.repeat.y = 1;
+
+				this.offset.x = 0;
+				this.offset.y = 0;
+
+		}
+
+	}
+
 	set needsUpdate( value ) {
 
 		if ( value === true ) {
