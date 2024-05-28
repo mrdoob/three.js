@@ -16,17 +16,25 @@ function SidebarProjectVideo( editor ) {
 
 	// Resolution
 
+	function toDiv2() {
+
+		// Make sure dimensions are divisible by 2 (requirement of libx264)
+
+		this.setValue( 2 * Math.floor( this.getValue() / 2 ) );
+
+	}
+
 	const resolutionRow = new UIRow();
 	container.add( resolutionRow );
 
 	resolutionRow.add( new UIText( strings.getKey( 'sidebar/project/resolution' ) ).setClass( 'Label' ) );
 
-	const videoWidth = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
+	const videoWidth = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' ).setStep( 2 ).onChange( toDiv2 );
 	resolutionRow.add( videoWidth );
 
 	resolutionRow.add( new UIText( '×' ).setTextAlign( 'center' ).setFontSize( '12px' ).setWidth( '12px' ) );
 
-	const videoHeight = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
+	const videoHeight = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' ).setStep( 2 ).onChange( toDiv2 );
 	resolutionRow.add( videoHeight );
 
 	const videoFPS = new UIInteger( 30 ).setTextAlign( 'center' ).setWidth( '20px' );
