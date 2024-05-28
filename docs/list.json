@@ -403,7 +403,8 @@
 			"Misc": {
 				"Timer": "examples/en/misc/Timer"
 			},
-			"Modifier": {
+
+			"Modifiers": {
 				"EdgeSplit": "examples/en/modifiers/EdgeSplitModifier"
 			},
 
