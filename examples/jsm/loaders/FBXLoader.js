@@ -407,11 +407,33 @@ class FBXTreeParser {
 	// load a texture specified as a blob or data URI, or via an external URL using TextureLoader
 	loadTexture( textureNode, images ) {
 
-		let fileName;
+		const nonNativeExtensions = new Set( [ 'tga', 'tif', 'tiff', 'exr', 'dds', 'hdr', 'ktx2' ] );
 
-		const currentPath = this.textureLoader.path;
+		const extension = textureNode.FileName.split( '.' ).pop().toLowerCase();
+
+		const loader = nonNativeExtensions.has( extension ) ? this.manager.getHandler( `.${extension}` ) : this.textureLoader;
+
+		if ( ! loader ) {
+
+			console.warn(
+				`FBXLoader: ${extension.toUpperCase()} loader not found, creating placeholder texture for`,
+				textureNode.RelativeFilename
+			);
+			return new Texture();
+
+		}
+
+		const loaderPath = loader.path;
+
+		if ( ! loaderPath ) {
+
+			loader.setPath( this.textureLoader.path );
+
+		}
 
 		const children = connections.get( textureNode.id ).children;
+
+		let fileName;
 
 		if ( children !== undefined && children.length > 0 && images[ children[ 0 ].ID ] !== undefined ) {
 
@@ -419,45 +441,16 @@ class FBXTreeParser {
 
 			if ( fileName.indexOf( 'blob:' ) === 0 || fileName.indexOf( 'data:' ) === 0 ) {
 
-				this.textureLoader.setPath( undefined );
+				loader.setPath( undefined );
 
 			}
 
 		}
 
-		let texture;
+		const texture = loader.load( fileName );
 
-		const nonNativeExtensions = new Set( [ 'tga', 'tif', 'tiff', 'exr', 'dds', 'hdr', 'ktx2' ] );
-
-		const extension = textureNode.FileName.split( '.' ).pop().toLowerCase();
-
-		if ( nonNativeExtensions.has( extension ) ) {
-
-			const loader = this.manager.getHandler( `.${extension}` );
-
-			if ( loader === null ) {
-
-				console.warn(
-					`FBXLoader: ${extension.toUpperCase()} loader not found, creating placeholder texture for`,
-					textureNode.RelativeFilename
-				);
-				texture = new Texture();
-
-			} else {
-
-				loader.setPath( this.textureLoader.path );
-				texture = loader.load( fileName );
-
-			}
-
-		} else {
-
-			// TextureLoader#load() returns a texture in any case which can be used as placeholder if the image failed to load.
-			texture = this.textureLoader.load( fileName );
-
-		}
-
-		this.textureLoader.setPath( currentPath );
+		// revert to initial path
+		loader.setPath( loaderPath );
 
 		return texture;
 
