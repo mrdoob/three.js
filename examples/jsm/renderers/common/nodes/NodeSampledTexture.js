@@ -2,7 +2,7 @@ import { SampledTexture } from '../SampledTexture.js';
 
 class NodeSampledTexture extends SampledTexture {
 
-	constructor( name, textureNode, access = null) {
+	constructor( name, textureNode, access = null ) {
 
 		super( name, textureNode ? textureNode.value : null );
 

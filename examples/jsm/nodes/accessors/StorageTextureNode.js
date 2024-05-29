@@ -79,8 +79,8 @@ export default StorageTextureNode;
 
 export const storageTexture = nodeProxy( StorageTextureNode );
 
-export const storageTextureReadOnly = ( value, uvNode, storeNode ) => storageTexture( value, uvNode, storeNode ).setAccess( "read-only" );
-export const storageTextureReadWrite = ( value, uvNode, storeNode ) => storageTexture( value, uvNode, storeNode ).setAccess( "read-write" );
+export const storageTextureReadOnly = ( value, uvNode, storeNode ) => storageTexture( value, uvNode, storeNode ).setAccess( 'read-only' );
+export const storageTextureReadWrite = ( value, uvNode, storeNode ) => storageTexture( value, uvNode, storeNode ).setAccess( 'read-write' );
 
 export const textureStore = ( value, uvNode, storeNode ) => {
 

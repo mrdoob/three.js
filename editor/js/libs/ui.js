@@ -122,6 +122,8 @@ class UIElement {
 
 		this.dom.hidden = isHidden;
 
+		return this;
+
 	}
 
 	isHidden() {
@@ -1128,6 +1130,7 @@ class UITabbedPanel extends UIDiv {
 		if ( tab ) {
 
 			tab.addClass( 'selected' );
+			tab.dom.scrollIntoView( { inline: 'center', behavior: 'smooth' } );
 
 		}
 

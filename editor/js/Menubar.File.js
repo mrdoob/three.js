@@ -22,7 +22,7 @@ function MenubarFile( editor ) {
 
 	// New Project
 
-	const newProjectSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/file/newProject' ) ).addClass( 'option' ).addClass( 'submenu-title' );
+	const newProjectSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/file/new' ) ).addClass( 'option' ).addClass( 'submenu-title' );
 	newProjectSubmenuTitle.onMouseOver( function () {
 
 		const { top, right } = this.dom.getBoundingClientRect();
@@ -44,7 +44,7 @@ function MenubarFile( editor ) {
 
 	// New Project / Empty
 
-	let option = new UIRow().setTextContent( strings.getKey( 'menubar/file/newProject/empty' ) ).setClass( 'option' );
+	let option = new UIRow().setTextContent( strings.getKey( 'menubar/file/new/empty' ) ).setClass( 'option' );
 	option.onClick( function () {
 
 		if ( confirm( strings.getKey( 'prompt/file/open' ) ) ) {
@@ -63,11 +63,11 @@ function MenubarFile( editor ) {
 	// New Project / ...
 
 	const examples = [
-		{ title: 'menubar/file/newProject/Arkanoid', file: 'arkanoid.app.json' },
-		{ title: 'menubar/file/newProject/Camera', file: 'camera.app.json' },
-		{ title: 'menubar/file/newProject/Particles', file: 'particles.app.json' },
-		{ title: 'menubar/file/newProject/Pong', file: 'pong.app.json' },
-		{ title: 'menubar/file/newProject/Shaders', file: 'shaders.app.json' }
+		{ title: 'menubar/file/new/Arkanoid', file: 'arkanoid.app.json' },
+		{ title: 'menubar/file/new/Camera', file: 'camera.app.json' },
+		{ title: 'menubar/file/new/Particles', file: 'particles.app.json' },
+		{ title: 'menubar/file/new/Pong', file: 'pong.app.json' },
+		{ title: 'menubar/file/new/Shaders', file: 'shaders.app.json' }
 	];
 
 	const loader = new THREE.FileLoader();
@@ -100,22 +100,6 @@ function MenubarFile( editor ) {
 		} )( i );
 
 	}
-
-
-	// Save
-
-	option = new UIRow()
-		.addClass( 'option' )
-		.setTextContent( strings.getKey( 'menubar/file/save' ) )
-		.onClick( function () {
-
-			const json = editor.toJSON();
-			const blob = new Blob( [ JSON.stringify( json ) ], { type: 'application/json' } );
-			editor.utils.save( blob, 'project.json' );
-
-		} );
-
-	options.add( option );
 
 	// Open
 
@@ -174,6 +158,21 @@ function MenubarFile( editor ) {
 				openProjectInput.click();
 
 			}
+
+		} );
+
+	options.add( option );
+
+	// Save
+
+	option = new UIRow()
+		.addClass( 'option' )
+		.setTextContent( strings.getKey( 'menubar/file/save' ) )
+		.onClick( function () {
+
+			const json = editor.toJSON();
+			const blob = new Blob( [ JSON.stringify( json ) ], { type: 'application/json' } );
+			editor.utils.save( blob, 'project.json' );
 
 		} );
 

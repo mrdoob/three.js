@@ -148,8 +148,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-
-
 	_generateTextureSample( texture, textureProperty, uvSnippet, depthSnippet, shaderStage = this.shaderStage ) {
 
 		if ( shaderStage === 'fragment' ) {
@@ -362,7 +360,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	// Convert GPUStorageTextureAccess or GPUBufferBindingType storage resources to WGSL syntax
 	getStorageAccess( node ) {
 
 		if ( node.isStorageTextureNode ) {
