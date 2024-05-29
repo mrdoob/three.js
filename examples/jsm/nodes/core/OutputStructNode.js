@@ -33,7 +33,7 @@ class OutputStructNode extends Node {
 
 	generate( builder, output ) {
 
-		const propertyName = builder.getOutputName();
+		const propertyName = builder.getOutputStructName();
 		const members = this.members;
 
 		const structPrefix = propertyName !== '' ? propertyName + '.' : '';

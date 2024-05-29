@@ -55,7 +55,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getOutputName() {
+	getOutputStructName() {
 
 		return '';
 

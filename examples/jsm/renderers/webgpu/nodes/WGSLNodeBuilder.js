@@ -336,7 +336,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	getOutputName() {
+	getOutputStructName() {
 
 		return 'output';
 
