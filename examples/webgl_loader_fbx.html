@@ -37,24 +37,18 @@
 			import { TIFFLoader } from 'three/addons/loaders/TIFFLoader.js';
 			import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';
 
-			export const defaultLoadingManager = THREE.DefaultLoadingManager;
+			const manager = new THREE.LoadingManager();
 
-			export const exrLoader = new EXRLoader();
-			export const rgbeLoader = new RGBELoader();
-			export const tgaLoader = new TGALoader();
-			export const ddsLoader = new DDSLoader();
-			export const tiffLoader = new TIFFLoader();
-
-			defaultLoadingManager.addHandler( /\.tga$/i, tgaLoader );
-			defaultLoadingManager.addHandler( /\.dds$/i, ddsLoader );
-			defaultLoadingManager.addHandler( /\.exr$/i, exrLoader );
-			defaultLoadingManager.addHandler( /\.hdr$/i, rgbeLoader );
-			defaultLoadingManager.addHandler( /\.tiff$/i, tiffLoader );
+			manager.addHandler( /\.tga$/i, new TGALoader() );
+			manager.addHandler( /\.dds$/i, new DDSLoader() );
+			manager.addHandler( /\.exr$/i, new EXRLoader() );
+			manager.addHandler( /\.hdr$/i, new RGBELoader() );
+			manager.addHandler( /\.tiff$/i, new TIFFLoader() );
 
 			let camera, scene, renderer, stats, object, loader, guiMorphsFolder;
-			const clock = new THREE.Clock();
-
 			let mixer;
+
+			const clock = new THREE.Clock();
 
 			const params = {
 				asset: 'Samba Dancing'
@@ -107,7 +101,7 @@
 				grid.material.transparent = true;
 				scene.add( grid );
 			
-				loader = new FBXLoader( defaultLoadingManager );
+				loader = new FBXLoader( manager );
 				loadAsset( params.asset );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
