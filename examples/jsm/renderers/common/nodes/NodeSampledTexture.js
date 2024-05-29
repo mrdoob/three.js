@@ -38,9 +38,9 @@ class NodeSampledTexture extends SampledTexture {
 
 class NodeSampledCubeTexture extends NodeSampledTexture {
 
-	constructor( name, textureNode ) {
+	constructor( name, textureNode, access ) {
 
-		super( name, textureNode );
+		super( name, textureNode, access );
 
 		this.isSampledCubeTexture = true;
 
@@ -50,9 +50,9 @@ class NodeSampledCubeTexture extends NodeSampledTexture {
 
 class NodeSampledTexture3D extends NodeSampledTexture {
 
-	constructor( name, textureNode ) {
+	constructor( name, textureNode, access ) {
 
-		super( name, textureNode );
+		super( name, textureNode, access );
 
 		this.isSampledTexture3D = true;
 
