@@ -7,6 +7,8 @@ import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
 import { RenderTarget, Vector2, HalfFloatType, DepthTexture, NoToneMapping/*, FloatType*/ } from 'three';
 
+const _size = new Vector2();
+
 class PassTextureNode extends TextureNode {
 
 	constructor( passNode, texture ) {
@@ -135,7 +137,7 @@ class PassNode extends TempNode {
 
 		this._pixelRatio = renderer.getPixelRatio();
 
-		const size = renderer.getSize( new Vector2() );
+		const size = renderer.getSize( _size );
 
 		this.setSize( size.width, size.height );
 

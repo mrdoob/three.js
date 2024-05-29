@@ -3,7 +3,7 @@ import {
 } from './WebGPUConstants.js';
 
 import {
-	CubeTexture, Texture,
+	ByteType, ShortType, CubeTexture, Texture,
 	NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter,
 	RepeatWrapping, MirroredRepeatWrapping,
 	RGB_ETC2_Format, RGBA_ETC2_EAC_Format,
@@ -327,11 +327,11 @@ class WebGPUTextureUtils {
 
 		// transfer texture data
 
-		if ( texture.isDataTexture || texture.isData3DTexture ) {
+		if ( texture.isDataTexture ) {
 
 			this._copyBufferToTexture( options.image, textureData.texture, textureDescriptorGPU, 0, texture.flipY );
 
-		} else if ( texture.isDataArrayTexture ) {
+		} else if ( texture.isDataArrayTexture || texture.isData3DTexture ) {
 
 			for ( let i = 0; i < options.image.depth; i ++ ) {
 
@@ -913,6 +913,25 @@ export function getFormat( texture, device = null ) {
 
 				switch ( type ) {
 
+					case ByteType:
+						formatGPU = GPUTextureFormat.RGBA8Snorm;
+						break;
+
+					case ShortType:
+						formatGPU = GPUTextureFormat.RGBA16Sint;
+						break;
+
+					case UnsignedShortType:
+						formatGPU = GPUTextureFormat.RGBA16Uint;
+						break;
+					case UnsignedIntType:
+						formatGPU = GPUTextureFormat.RGBA32Uint;
+						break;
+
+					case IntType:
+						formatGPU = GPUTextureFormat.RGBA32Sint;
+						break;
+
 					case UnsignedByteType:
 						formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm;
 						break;
@@ -951,6 +970,26 @@ export function getFormat( texture, device = null ) {
 
 				switch ( type ) {
 
+					case ByteType:
+						formatGPU = GPUTextureFormat.R8Snorm;
+						break;
+
+					case ShortType:
+						formatGPU = GPUTextureFormat.R16Sint;
+						break;
+
+					case UnsignedShortType:
+						formatGPU = GPUTextureFormat.R16Uint;
+						break;
+
+					case UnsignedIntType:
+						formatGPU = GPUTextureFormat.R32Uint;
+						break;
+
+					case IntType:
+						formatGPU = GPUTextureFormat.R32Sint;
+						break;
+
 					case UnsignedByteType:
 						formatGPU = GPUTextureFormat.R8Unorm;
 						break;
@@ -973,6 +1012,26 @@ export function getFormat( texture, device = null ) {
 			case RGFormat:
 
 				switch ( type ) {
+
+					case ByteType:
+						formatGPU = GPUTextureFormat.RG8Snorm;
+						break;
+
+					case ShortType:
+						formatGPU = GPUTextureFormat.RG16Sint;
+						break;
+
+					case UnsignedShortType:
+						formatGPU = GPUTextureFormat.RG16Uint;
+						break;
+
+					case UnsignedIntType:
+						formatGPU = GPUTextureFormat.RG32Uint;
+						break;
+
+					case IntType:
+						formatGPU = GPUTextureFormat.RG32Sint;
+						break;
 
 					case UnsignedByteType:
 						formatGPU = GPUTextureFormat.RG8Unorm;

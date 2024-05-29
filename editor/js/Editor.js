@@ -82,7 +82,6 @@ function Editor() {
 
 		windowResize: new Signal(),
 
-		showGridChanged: new Signal(),
 		showHelpersChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
 		refreshSidebarEnvironment: new Signal(),
@@ -92,6 +91,8 @@ function Editor() {
 		viewportShadingChanged: new Signal(),
 
 		intersectionsDetected: new Signal(),
+
+		pathTracerUpdated: new Signal(),
 
 	};
 

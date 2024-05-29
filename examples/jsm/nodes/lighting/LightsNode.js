@@ -53,6 +53,18 @@ class LightsNode extends Node {
 
 	}
 
+	analyze( builder ) {
+
+		const properties = builder.getDataFromNode( this );
+
+		for ( const node of properties.nodes ) {
+
+			node.build( builder );
+
+		}
+
+	}
+
 	setup( builder ) {
 
 		const context = builder.context;
@@ -67,6 +79,11 @@ class LightsNode extends Node {
 			context.outgoingLight = outgoingLightNode;
 
 			const stack = builder.addStack();
+
+			//
+
+			const properties = builder.getDataFromNode( this );
+			properties.nodes = stack.nodes;
 
 			//
 
