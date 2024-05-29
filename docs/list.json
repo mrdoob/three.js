@@ -404,6 +404,10 @@
 				"Timer": "examples/en/misc/Timer"
 			},
 
+			"Modifiers": {
+				"EdgeSplit": "examples/en/modifiers/EdgeSplitModifier"
+			},
+
 			"ConvexHull": {
 				"Face": "examples/en/math/convexhull/Face",
 				"HalfEdge": "examples/en/math/convexhull/HalfEdge",
