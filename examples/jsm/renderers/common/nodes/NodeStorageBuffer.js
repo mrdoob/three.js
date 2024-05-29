@@ -1,5 +1,5 @@
 import StorageBuffer from '../StorageBuffer.js';
-import { StorageBufferAccessType } from '../../../nodes/accessors/StorageBufferNode.js';
+import { GPUBufferBindingType } from '../../webgpu/utils/WebGPUConstants.js';
 
 let _id = 0;
 
@@ -7,8 +7,8 @@ class NodeStorageBuffer extends StorageBuffer {
 
 	constructor( nodeUniform ) {
 
-		const access = nodeUniform ? nodeUniform.access : StorageBufferAccessType.ReadWrite;
-		const namePrefix = access === StorageBufferAccessType.Read ? 'StorageReadOnlyBuffer_' : 'StorageBuffer_';
+		const access = nodeUniform ? nodeUniform.access : GPUBufferBindingType.Storage;
+		const namePrefix = access === GPUBufferBindingType.Storage ? 'StorageBuffer_': 'StorageReadOnlyBuffer_';
 
 		super( namePrefix + _id ++, nodeUniform ? nodeUniform.value : null );
 

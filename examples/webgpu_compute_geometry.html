@@ -73,10 +73,13 @@
 					const computeFn = tslFn( () => {
 
 						const positionAttribute = storageReadOnly( positionBaseAttribute, 'vec3', positionBaseAttribute.count );
+						console.log(positionAttribute)
 						const normalAttribute = storageReadOnly( normalBaseAttribute, 'vec3', normalBaseAttribute.count );
 
 						const positionStorageAttribute = storage( positionStorageBufferAttribute, 'vec4', positionStorageBufferAttribute.count );
+						console.log(positionStorageAttribute)
 						const normalStorageAttribute = storage( normalStorageBufferAttribute, 'vec4', normalStorageBufferAttribute.count );
+						console.log(normalStorageBufferAttribute)
 
 						const time = timerLocal( 1 );
 						const scale = 0.3;

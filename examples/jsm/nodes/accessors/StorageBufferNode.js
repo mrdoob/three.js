@@ -4,11 +4,7 @@ import { addNodeClass } from '../core/Node.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 import { varying } from '../core/VaryingNode.js';
 import { storageElement } from '../utils/StorageArrayElementNode.js';
-
-export const StorageBufferAccessType = {
-	Read: 'read',
-	ReadWrite: 'read_write',
-};
+import { GPUBufferBindingType } from '../../renderers/webgpu/utils/WebGPUConstants.js';
 
 class StorageBufferNode extends BufferNode {
 
@@ -18,7 +14,7 @@ class StorageBufferNode extends BufferNode {
 
 		this.isStorageBufferNode = true;
 
-		this.access = StorageBufferAccessType.ReadWrite;
+		this.access = GPUBufferBindingType.Storage;
 
 		this.bufferObject = false;
 
@@ -38,7 +34,7 @@ class StorageBufferNode extends BufferNode {
 
 	getInputType( /*builder*/ ) {
 
-		return this.access === StorageBufferAccessType.ReadWrite ? 'storageBuffer' : 'storageReadOnlyBuffer';
+		return this.access === GPUBufferBindingType.Storage ? 'storageBuffer' : 'storageReadOnlyBuffer';
 
 	}
 
@@ -99,6 +95,6 @@ export const storage = ( value, type, count ) => nodeObject( new StorageBufferNo
 export const storageObject = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setBufferObject( true ) );
 
 // Read-Only Storage
-export const storageReadOnly = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setAccess( StorageBufferAccessType.Read ) );
+export const storageReadOnly = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setAccess( 'read-only-storage' ) );
 
 addNodeClass( 'StorageBufferNode', StorageBufferNode );
