@@ -97,6 +97,7 @@
 						cellSize: f32,
 						borderMask: f32,
 						time: f32,
+						speed: f32,
 						pulseIntensity: f32,
 						pulseWidth: f32,
 						pulseRate: f32
@@ -110,12 +111,12 @@
 						var coord = pixel / cellSize;
 						// Three color values for each cell (r, g, b)
 						var subcoord = coord * vec2f(3.0, 1.0);
-						var offset = vec2<f32>(0, fract(floor(coord.x) * offset));
+						var offset = vec2<f32>(0, fract(floor(coord.x) * cellOffset));
 
 						var maskCoord = floor(coord + offset) * cellSize;
 
 						var samplePoint = maskCoord / vec2<f32>(crtWidth, crtHeight);
-						samplePoint.x += fract(time / 20);
+						samplePoint.x += fract(time * speed / 20);
 
 						var color = textureSample(
 							tex,
@@ -162,6 +163,8 @@
 				const pulseIntensityUniform = uniform( 0.06 );
 				const pulseWidthUniform = uniform( 60 );
 				const pulseRateUniform = uniform( 20 );
+				const wgslShaderSpeedUniform = uniform( 1.0 );
+				const tslShaderSpeedUniform = uniform( 1.0 );
 
 				const wgslShaderMaterial = new MeshBasicNodeMaterial();
 				// Accessed attributes correspond to a Mesh or BufferGeometry's setAttribute() calls.
@@ -179,6 +182,7 @@
 					cellSize: cellSizeUniform,
 					borderMask: borderMaskUniform,
 					time: timerLocal(),
+					speed: wgslShaderSpeedUniform,
 					pulseIntensity: pulseIntensityUniform,
 					pulseWidth: pulseWidthUniform,
 					pulseRate: pulseRateUniform
@@ -194,7 +198,7 @@
 				const tslFragmentShader = tslFn( () => {
 
 					const dimensions = vec2( crtWidthUniform, crtHeightUniform );
-					const translatedUV = vUv.mul( 0.5 ).add( 0.5 );
+					const translatedUV = vUv.mul( 0.5 ).add( 0.5);
 					const pixel = translatedUV.mul( dimensions );
 
 					const coord = pixel.div( cellSizeUniform );
@@ -207,9 +211,9 @@
 
 					const maskCoord = floor( coord.add( cellOffset ) ).mul( cellSizeUniform );
 					const samplePoint = maskCoord.div( dimensions );
-					const time = timerLocal();
+					const time = timerLocal().mul(tslShaderSpeedUniform);
 					samplePoint.x = samplePoint.x.add( fract( time.div( 20 ) ) );
-					samplePoint.y = samplePoint.y.sub( 1.52 );
+					samplePoint.y = samplePoint.y.sub( 1.5 );
 
 					let color = texture( planetTexture, samplePoint );
 
@@ -252,7 +256,7 @@
 				camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.PlaneGeometry( 2, 0.9 );
+				const geometry = new THREE.PlaneGeometry( 2, 1 );
 
 				const wgslQuad = new THREE.Mesh( geometry, wgslShaderMaterial );
 				wgslQuad.position.y += 0.5;
@@ -278,6 +282,8 @@
 				gui.add( borderMaskUniform, 'value', 0, 5, 0.1 ).name( 'Border Mask' );
 				gui.add( pulseIntensityUniform, 'value', 0, 0.5, 0.01 ).name( 'Pulse Intensity' );
 				gui.add( pulseWidthUniform, 'value', 10, 100, 5 ).name( 'Pulse Width' );
+				gui.add( wgslShaderSpeedUniform, 'value', 1, 10 ).name( 'WGSL Shader Speed' );
+				gui.add( tslShaderSpeedUniform, 'value', 1, 10 ).name( 'TSL Shader Speed' );
 
 			}
 
