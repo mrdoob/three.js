@@ -51,9 +51,13 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	getPropertyName( node, shaderStage ) {
 
-		if ( node.isOutputStructVar ) return '';
-
 		return super.getPropertyName( node, shaderStage );
+
+	}
+
+	getOutputName() {
+
+		return '';
 
 	}
 
@@ -276,8 +280,6 @@ ${ flowData.code }
 		if ( vars !== undefined ) {
 
 			for ( const variable of vars ) {
-
-				if ( variable.isOutputStructVar ) continue;
 
 				snippets.push( `${ this.getVar( variable.type, variable.name ) };` );
 
