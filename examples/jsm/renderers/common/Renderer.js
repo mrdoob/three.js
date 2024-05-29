@@ -944,6 +944,13 @@ class Renderer {
 
 		this.backend.clear( color, depth, stencil, renderTargetData );
 
+		if ( renderTarget !== null && this._renderTarget === null ) {
+
+			_quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+			this._renderScene( _quad, _quad.camera, false );
+
+		}
+
 	}
 
 	clearColor() {
