@@ -502,7 +502,7 @@ function SidebarMaterial( editor ) {
 
 						if ( value === null ) continue;
 						
-						if ( value[ 'copy' ] !== undefined ) {
+						if ( value[ 'clone' ] !== undefined ) {
 
 							material[ property ] = value.clone();
 
