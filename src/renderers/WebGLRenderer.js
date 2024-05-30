@@ -1141,6 +1141,18 @@ class WebGLRenderer {
 
 			renderListStack.push( currentRenderList );
 
+			if ( xr.enabled === true && xr.isPresenting === true ) {
+
+				const depthSensingMesh = _this.xr.getDepthSensingMesh();
+
+				if ( depthSensingMesh !== null ) {
+
+					projectObject( depthSensingMesh, camera, - Infinity, _this.sortObjects );
+
+				}
+
+			}
+
 			projectObject( scene, camera, 0, _this.sortObjects );
 
 			currentRenderList.finish();
