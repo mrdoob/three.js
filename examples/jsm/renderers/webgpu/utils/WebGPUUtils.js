@@ -55,36 +55,12 @@ class WebGPUUtils {
 
 	}
 
-	getCurrentColorSpace( renderContext ) {
-
-		if ( renderContext.textures !== null ) {
-
-			return renderContext.textures[ 0 ].colorSpace;
-
-		}
-
-		return this.backend.renderer.outputColorSpace;
-
-	}
-
 	getPrimitiveTopology( object, material ) {
 
 		if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
 		else if ( object.isLineSegments || ( object.isMesh && material.wireframe === true ) ) return GPUPrimitiveTopology.LineList;
 		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
 		else if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-
-	}
-
-	getSampleCount( renderContext ) {
-
-		if ( renderContext.textures !== null ) {
-
-			return renderContext.sampleCount;
-
-		}
-
-		return this.backend.parameters.sampleCount;
 
 	}
 

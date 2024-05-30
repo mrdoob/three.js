@@ -47,11 +47,11 @@ class ViewportNode extends Node {
 
 		if ( this.scope === ViewportNode.VIEWPORT ) {
 
-			renderer.getViewport( viewportResult );
+			renderer.getActiveCanvasRenderTarget().getViewport( viewportResult );
 
 		} else {
 
-			renderer.getDrawingBufferSize( resolution );
+			renderer.getActiveCanvasRenderTarget().getDrawingBufferSize( resolution );
 
 		}
 

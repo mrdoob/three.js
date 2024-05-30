@@ -351,6 +351,7 @@
 		"webgpu_materials_toon",
 		"webgpu_materials_video",
 		"webgpu_materialx_noise",
+		"webgpu_multiple_canvases",
 		"webgpu_multiple_rendertargets",
 		"webgpu_multiple_rendertargets_readback",
 		"webgpu_morphtargets",
