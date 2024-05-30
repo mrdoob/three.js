@@ -338,6 +338,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getOutputStructName() {
+
+		return 'output';
+
+	}
+
 	_getUniformGroupCount( shaderStage ) {
 
 		return Object.keys( this.uniforms[ shaderStage ] ).length;
@@ -659,6 +665,10 @@ ${ flowData.code }
 
 		}
 
+		const builtins = this.getBuiltins( 'output' );
+
+		if ( builtins ) snippets.push( builtins );
+
 		return snippets.join( ',\n' );
 
 	}
@@ -678,6 +688,8 @@ ${ flowData.code }
 			snippet += '\n}';
 
 			snippets.push( snippet );
+
+			snippets.push( `\nvar<private> output : ${ name };\n\n`);
 
 		}
 
