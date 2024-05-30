@@ -51421,15 +51421,17 @@ function ascSort( a, b ) {
 
 function intersect( object, raycaster, intersects, recursive ) {
 
-	let stopTraversal = false;
+	let propagate = true;
 
 	if ( object.layers.test( raycaster.layers ) ) {
 
-		stopTraversal = object.raycast( raycaster, intersects );
+		const result = object.raycast( raycaster, intersects );
+
+		if ( result === false ) propagate = false;
 
 	}
 
-	if ( recursive === true && stopTraversal !== true ) {
+	if ( propagate === true && recursive === true ) {
 
 		const children = object.children;
 
