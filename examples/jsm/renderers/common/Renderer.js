@@ -887,7 +887,7 @@ class Renderer {
 
 		}
 
-		const renderTarget = this._renderTarget.isCanvasRenderTarget !== true ? this._renderTarget : this._getFrameBufferTarget();
+		const renderTarget = this._renderTarget.isCanvasRenderTarget === true ? this._getFrameBufferTarget() : this._renderTarget;
 
 		let renderTargetData = null;
 
@@ -901,7 +901,7 @@ class Renderer {
 
 		this.backend.clear( color, depth, stencil, renderTargetData, renderTarget );
 
-		if ( renderTarget !== null && this._renderTarget === null ) {
+		if ( renderTarget !== null && this._renderTarget.isCanvasRenderTarget === true ) {
 
 			// If a color space transform or tone mapping is required,
 			// the clear operation clears the intermediate renderTarget texture, but does not update the screen canvas.
