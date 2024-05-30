@@ -119,7 +119,7 @@ class WebGPUBackend extends Backend {
 		canvasRenderTargetData.contextGPU = context;
 		canvasRenderTargetData.ready = true;
 
-	};
+	}
 
 	get coordinateSystem() {
 
@@ -147,7 +147,9 @@ class WebGPUBackend extends Backend {
 
 		if ( ! canvasRenderTargetData.ready ) this._configureContext( canvasRenderTarget );
 
-		let { contextGPU, descriptor } = canvasRenderTargetData;
+		const contextGPU = canvasRenderTargetData.contextGPU;
+
+		let descriptor = canvasRenderTargetData.descriptor;
 
 		if ( canvasRenderTarget.version !== canvasRenderTargetData.version ) {
 
@@ -997,7 +999,7 @@ class WebGPUBackend extends Backend {
 
 		const renderContext = renderObject.context;
 
-		const sampleCount = renderContext.sampleCount;
+		const sampleCount = utils.getSampleCount( renderContext.sampleCount );
 		const colorSpace = renderContext.colorSpace;
 		const colorFormat = utils.getCurrentColorFormat( renderContext );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderContext );
@@ -1062,7 +1064,7 @@ class WebGPUBackend extends Backend {
 			material.stencilFail, material.stencilZFail, material.stencilZPass,
 			material.stencilFuncMask, material.stencilWriteMask,
 			material.side,
-			renderContext.sampleCount,
+			utils.getSampleCount( renderContext.sampleCount ),
 			renderContext.colorSpace, utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
 			utils.getPrimitiveTopology( object, material ),
 			renderObject.clippingContextVersion

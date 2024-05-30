@@ -5,7 +5,7 @@ import {
 import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
 
 import {
-	ByteType, ShortType, CubeTexture, Texture, Vector2,
+	ByteType, ShortType,
 	NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter,
 	RepeatWrapping, MirroredRepeatWrapping,
 	RGB_ETC2_Format, RGBA_ETC2_EAC_Format,
@@ -16,7 +16,7 @@ import {
 	CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping
 } from '../../../constants.js';
 import { CubeTexture } from '../../../textures/CubeTexture.js';
-import { DepthTexture } from '../../../textures/DepthTexture.js';
+import { Vector2 } from '../../../math/Vector2.js';
 import { Texture } from '../../../textures/Texture.js';
 
 const _compareToWebGPU = {

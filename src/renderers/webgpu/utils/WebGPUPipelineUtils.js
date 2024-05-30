@@ -25,7 +25,7 @@ class WebGPUPipelineUtils {
 
 	_getSampleCount( renderObjectContext ) {
 
-		return this.backend.utils.getSampleCountRenderContext( renderObjectContext );
+		return this.backend.utils.getSampleCount( renderObjectContext.sampleCount );
 
 	}
 
@@ -120,7 +120,7 @@ class WebGPUPipelineUtils {
 		const depthCompare = this._getDepthCompare( material );
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( context );
 
-		const sampleCount = context.sampleCount;
+		const sampleCount = this._getSampleCount( context );
 
 		const pipelineDescriptor = {
 			label: 'renderPipeline',
@@ -178,7 +178,7 @@ class WebGPUPipelineUtils {
 
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderContext );
 		const colorFormat = utils.getCurrentColorFormat( renderContext );
-		const sampleCount = renderContext.sampleCount;
+		const sampleCount =  this._getSampleCount( renderContext );
 
 		const descriptor = {
 			label: 'renderBundleEncoder',

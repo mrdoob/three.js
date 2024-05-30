@@ -64,6 +64,27 @@ class WebGPUUtils {
 
 	}
 
+	getSampleCount( sampleCount ) {
+
+		let count = 1;
+
+		if ( sampleCount > 1 ) {
+
+			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
+			count = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
+
+			if ( count === 2 ) {
+
+				count = 4;
+
+			}
+
+		}
+
+		return count;
+
+	}
+
 }
 
 export default WebGPUUtils;

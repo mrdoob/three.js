@@ -40,9 +40,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -51,13 +51,9 @@
 
 			import * as THREE from 'three';
 
-			import { MeshPhongNodeMaterial } from 'three/nodes';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import CanvasRenderTarget from 'three/addons/renderers/common/CanvasRenderTarget.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -111,7 +107,7 @@
 
 			function makeCanvasRenderTarget( container ) {
 
-				const canvasRenderTarget = new CanvasRenderTarget( { antialias: Math.random() < 0.5 ? true : false } );
+				const canvasRenderTarget = new THREE.CanvasRenderTarget( { antialias: Math.random() < 0.5 ? true : false } );
 
 				canvasRenderTarget.outputColorSpace = colorSpaces[ Math.floor( Math.random() * colorSpaces.length ) ];
 
@@ -178,7 +174,7 @@
 
 				}
 
-				renderer = new WebGPURenderer();
+				renderer = new THREE.WebGPURenderer();
 				renderer.setAnimationLoop( render );
 
 				stats = new Stats();
@@ -198,12 +194,12 @@
 				);
 
 				materials.push(
-					new MeshPhongNodeMaterial( { color: 0x00ee00 } ),
-					new MeshPhongNodeMaterial( { color: 0xee0000 } ),
-					new MeshPhongNodeMaterial( { color: 0xeeee00 } ),
-					new MeshPhongNodeMaterial( { color: 0x00eeee } ),
-					new MeshPhongNodeMaterial( { color: 0xee00ee } ),
-					new MeshPhongNodeMaterial( { color: 0x0000ee } ),
+					new THREE.MeshPhongNodeMaterial( { color: 0x00ee00 } ),
+					new THREE.MeshPhongNodeMaterial( { color: 0xee0000 } ),
+					new THREE.MeshPhongNodeMaterial( { color: 0xeeee00 } ),
+					new THREE.MeshPhongNodeMaterial( { color: 0x00eeee } ),
+					new THREE.MeshPhongNodeMaterial( { color: 0xee00ee } ),
+					new THREE.MeshPhongNodeMaterial( { color: 0x0000ee } ),
 				);
 
 			}

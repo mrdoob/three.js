@@ -25,7 +25,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat } from '../../constants.js';
+import { DoubleSide, BackSide, FrontSide, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat } from '../../constants.js';
 
 const _scene = new Scene();
 const _drawingBufferSize = new Vector2();
@@ -927,7 +927,7 @@ class Renderer {
 
 		}
 
-		const renderTarget = this._renderTarget.isCanvasRenderTarget !== true ? this._renderTarget : this._getFrameBufferTarget();
+		const renderTarget = this._renderTarget.isCanvasRenderTarget === true ? this._getFrameBufferTarget() : this._renderTarget;
 
 		let renderTargetData = null;
 
@@ -941,7 +941,7 @@ class Renderer {
 
 		this.backend.clear( color, depth, stencil, renderTargetData, renderTarget );
 
-		if ( renderTarget !== null && this._renderTarget === null ) {
+		if ( renderTarget !== null && this._renderTarget.isCanvasRenderTarget === true ) {
 
 			// If a color space transform or tone mapping is required,
 			// the clear operation clears the intermediate renderTarget texture, but does not update the screen canvas.

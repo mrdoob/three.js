@@ -1,4 +1,7 @@
-import { EventDispatcher, Vector4, REVISION, createCanvasElement, SRGBColorSpace } from 'three';
+import { createCanvasElement } from '../../utils.js';
+import { REVISION, SRGBColorSpace } from '../../constants';
+import { EventDispatcher } from '../../core/EventDispatcher';
+import { Vector4 } from '../../math/Vector4.js';
 
 class CanvasRenderTarget extends EventDispatcher {
 

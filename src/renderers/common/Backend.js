@@ -1,8 +1,6 @@
 let color4 = null;
 
 import Color4 from './Color4.js';
-import { Vector2 } from '../../math/Vector2.js';
-import { Vector4 } from '../../math/Vector4.js';
 import { createCanvasElement } from '../../utils.js';
 import { REVISION } from '../../constants.js';
 
