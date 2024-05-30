@@ -1053,6 +1053,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	this.vertexShader = glVertexShader;
 	this.fragmentShader = glFragmentShader;
 
+	this.setsPointSize = /gl_PointSize\s*=/.test( vertexShader );
+
 	return this;
 
 }

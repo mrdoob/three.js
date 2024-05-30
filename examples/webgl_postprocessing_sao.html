@@ -105,6 +105,28 @@
 
 				}
 
+
+				// Add points. Points don't affect SAO.
+
+				const pointsArray = [];
+
+				for ( let i = 0; i < 200; i ++ ) {
+
+					const x = Math.random() * 10 - 5;
+					const y = Math.random() * 10 - 5;
+					const z = Math.random() * 10 - 5;
+					pointsArray.push( x, y, z );
+
+				}
+
+				const pointsGeometry = new THREE.BufferGeometry();
+				const pointsBuffer = new Float32Array( pointsArray );
+				pointsGeometry.setAttribute( 'position', new THREE.BufferAttribute( pointsBuffer, 3 ) );
+
+				const pointsMesh = new THREE.Points( pointsGeometry, new THREE.PointsMaterial({ size: 0.02 }) );
+				group.add( pointsMesh );
+
+
 				stats = new Stats();
 				container.appendChild( stats.dom );
 

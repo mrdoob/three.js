@@ -738,6 +738,15 @@ class WebGLRenderer {
 
 			const program = setProgram( camera, scene, geometry, material, object );
 
+			if ( object.isPoints && ! program.setsPointSize ) {
+
+				// Rendering points with a shader that doesn't set point size results in effectively randomly sized points on M-series Macs.
+				// It's easy to run into this by rendering a scene that includes points with an override material.
+
+				return;
+
+			}
+
 			state.setMaterial( material, frontFaceCW );
 
 			//
