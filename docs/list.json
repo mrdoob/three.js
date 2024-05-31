@@ -378,7 +378,8 @@
 			},
 
 			"Objects": {
-				"Lensflare": "examples/en/objects/Lensflare"
+				"Lensflare": "examples/en/objects/Lensflare",
+				"Sky": "examples/en/objects/Sky"
 			},
 
 			"Post-Processing": {
