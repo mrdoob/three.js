@@ -838,8 +838,6 @@ ${ flowData.code }
 
 					textureType = `texture_storage_2d<${ format }, ${access}>`;
 
-					console.log( textureType, format, access );
-
 				} else {
 
 					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
