@@ -31,10 +31,21 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { TGALoader } from 'three/addons/loaders/TGALoader.js';
+			import { TIFFLoader } from 'three/addons/loaders/TIFFLoader.js';
+			import { DDSLoader } from 'three/addons/loaders/DDSLoader.js';
 
 			const manager = new THREE.LoadingManager();
 
-			let camera, scene, renderer, stats, object, loader, guiMorphsFolder, nonNativeHandlersLoaded;
+			manager.addHandler( /\.tga$/i, new TGALoader() );
+			manager.addHandler( /\.dds$/i, new DDSLoader() );
+			manager.addHandler( /\.exr$/i, new EXRLoader() );
+			manager.addHandler( /\.hdr$/i, new RGBELoader() );
+			manager.addHandler( /\.tiff$/i, new TIFFLoader() );
+
+			let camera, scene, renderer, stats, object, loader, guiMorphsFolder;
 			let mixer;
 
 			const clock = new THREE.Clock();
@@ -113,38 +124,12 @@
 				const gui = new GUI();
 				gui.add( params, 'asset', assets ).onChange( function ( value ) {
 
-					if ( value === 'with_non_native_textures' && ! nonNativeHandlersLoaded ) {
+					loadAsset( value );
 
-						importNonNativeTextureLoaders().then( () => {
-
-							nonNativeHandlersLoaded = true;
-							loadAsset( value );
-			
-						} );
-			
-					} else {
-
-						loadAsset( value );
-			
-					}
-			
 				} );
 
 				guiMorphsFolder = gui.addFolder( 'Morphs' ).hide();
 
-			}
-
-			async function importNonNativeTextureLoaders() {
-
-				const loaders = { 'EXRLoader': 'exr', 'RGBELoader': 'hdr', 'TGALoader': 'tga', 'TIFFLoader': 'tiff', 'DDSLoader': 'dds' };
-
-				for ( const [ loaderName, extension ] of Object.entries( loaders ) ) {
-
-					const module = await import( `three/addons/loaders/${loaderName}.js` );
-					manager.addHandler( new RegExp( `\\.${extension}$`, 'i' ), new module[ loaderName ]() );
-			
-				}
-			
 			}
 
 			function loadAsset( asset ) {

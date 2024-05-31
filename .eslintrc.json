@@ -3,10 +3,10 @@
   "env": {
     "browser": true,
     "node": true,
-    "es2023": true
+    "es2018": true
   },
   "parserOptions": {
-    "ecmaVersion": 2023,
+    "ecmaVersion": 2018,
     "sourceType": "module"
   },
   "extends": [
