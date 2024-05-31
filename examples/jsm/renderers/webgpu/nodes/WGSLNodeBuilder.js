@@ -208,11 +208,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0u' ) {
+	generateTextureLoad( texture, textureProperty, uvIndexSnippet, depthSnippet, levelSnippet = '0u', accessSnippet ) {
 
 		if ( depthSnippet ) {
 
 			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet }, ${ depthSnippet }, ${ levelSnippet } )`;
+
+		} else if ( accessSnippet ) {
+
+			return `textureLoad( ${ textureProperty }, ${ uvIndexSnippet } )`;
 
 		} else {
 
@@ -689,7 +693,7 @@ ${ flowData.code }
 
 			snippets.push( snippet );
 
-			snippets.push( `\nvar<private> output : ${ name };\n\n`);
+			snippets.push( `\nvar<private> output : ${ name };\n\n` );
 
 		}
 
@@ -833,6 +837,8 @@ ${ flowData.code }
 					const access = this.getStorageAccess( uniform.node );
 
 					textureType = `texture_storage_2d<${ format }, ${access}>`;
+
+					console.log( textureType, format, access );
 
 				} else {
 
@@ -978,6 +984,8 @@ ${ flowData.code }
 		} else {
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
+
+			console.log( this.computeShader );
 
 		}
 

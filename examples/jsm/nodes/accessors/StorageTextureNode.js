@@ -66,8 +66,9 @@ class StorageTextureNode extends TextureNode {
 		const textureProperty = super.generate( builder, 'property' );
 		const uvSnippet = uvNode.build( builder, 'uvec2' );
 		const storeSnippet = storeNode.build( builder, 'vec4' );
+		const accessSnippet = builder.getStorageAccess( this );
 
-		const snippet = builder.generateTextureStore( builder, textureProperty, uvSnippet, storeSnippet );
+		const snippet = builder.generateTextureStore( builder, textureProperty, uvSnippet, storeSnippet, accessSnippet );
 
 		builder.addLineFlowCode( snippet );
 
@@ -85,6 +86,8 @@ export const storageTextureReadWrite = ( value, uvNode, storeNode ) => storageTe
 export const textureStore = ( value, uvNode, storeNode ) => {
 
 	const node = storageTexture( value, uvNode, storeNode );
+
+	if ( value.access !== undefined && value.access !== GPUStorageTextureAccess.WriteOnly ) node.setAccess( value.access );
 
 	if ( storeNode !== null ) node.append();
 

@@ -21,6 +21,7 @@ class TextureNode extends UniformNode {
 		this.compareNode = null;
 		this.depthNode = null;
 		this.gradNode = null;
+		this.accessNode = null;
 
 		this.sampler = true;
 		this.updateMatrix = false;
@@ -158,6 +159,7 @@ class TextureNode extends UniformNode {
 		properties.compareNode = this.compareNode;
 		properties.gradNode = this.gradNode;
 		properties.depthNode = this.depthNode;
+		properties.accessNode = this.accessNode || this.value.access;
 
 	}
 
@@ -167,7 +169,7 @@ class TextureNode extends UniformNode {
 
 	}
 
-	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, depthSnippet, compareSnippet, gradSnippet ) {
+	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, depthSnippet, compareSnippet, gradSnippet, accessNode ) {
 
 		const texture = this.value;
 
@@ -187,7 +189,7 @@ class TextureNode extends UniformNode {
 
 		} else if ( this.sampler === false ) {
 
-			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, depthSnippet );
+			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, depthSnippet, null, accessNode );
 
 		} else {
 
@@ -229,19 +231,20 @@ class TextureNode extends UniformNode {
 
 			if ( propertyName === undefined ) {
 
-				const { uvNode, levelNode, compareNode, depthNode, gradNode } = properties;
+				const { uvNode, levelNode, compareNode, depthNode, gradNode, accessNode } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
 				const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
 				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
 				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
+				const accessSnippet = accessNode ? accessNode : null;
 
 				const nodeVar = builder.getVarFromNode( this );
 
 				propertyName = builder.getPropertyName( nodeVar );
 
-				const snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, depthSnippet, compareSnippet, gradSnippet );
+				const snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, depthSnippet, compareSnippet, gradSnippet, accessSnippet );
 
 				builder.addLineFlowCode( `${propertyName} = ${snippet}` );
 
@@ -346,6 +349,16 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.depthNode = nodeObject( depthNode );
+		textureNode.referenceNode = this;
+
+		return nodeObject( textureNode );
+
+	}
+
+	access( accessNode ) {
+
+		const textureNode = this.clone();
+		textureNode.accessNode = nodeObject( accessNode );
 		textureNode.referenceNode = this;
 
 		return nodeObject( textureNode );
