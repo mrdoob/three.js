@@ -189,7 +189,7 @@ class TextureNode extends UniformNode {
 
 		} else if ( this.sampler === false ) {
 
-			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, depthSnippet, null, accessNode );
+			snippet = builder.generateTextureLoad( texture, textureProperty, uvSnippet, depthSnippet, undefined, accessNode );
 
 		} else {
 
