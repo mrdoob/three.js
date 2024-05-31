@@ -251,9 +251,15 @@ class ShaderCallNodeInternal extends Node {
 
 	getNodeType( builder ) {
 
-		const { outputNode } = builder.getNodeProperties( this );
+		const properties = builder.getNodeProperties( this );
 
-		return outputNode ? outputNode.getNodeType( builder ) : super.getNodeType( builder );
+		if ( properties.outputNode === null ) {
+
+			properties.outputNode = this.setupOutput( builder );
+
+		}
+
+		return properties.outputNode.getNodeType( builder );
 
 	}
 
@@ -301,6 +307,14 @@ class ShaderCallNodeInternal extends Node {
 	}
 
 	setup( builder ) {
+
+		const { outputNode } = builder.getNodeProperties( this );
+
+		return outputNode || this.setupOutput( builder );
+
+	}
+
+	setupOutput( builder ) {
 
 		builder.addStack();
 
@@ -517,6 +531,16 @@ addNodeClass( 'ShaderNode', ShaderNode );
 
 //
 
+addNodeElement( 'toGlobal', ( node ) => {
+
+	node.global = true;
+
+	return node;
+
+} );
+
+//
+
 export const setCurrentStack = ( stack ) => {
 
 	if ( currentStack === stack ) {
@@ -586,37 +610,35 @@ export const bmat4 = new ConvertType( 'bmat4' );
 export const string = ( value = '' ) => nodeObject( new ConstNode( value, 'string' ) );
 export const arrayBuffer = ( value ) => nodeObject( new ConstNode( value, 'ArrayBuffer' ) );
 
-addNodeElement( 'color', color );
-addNodeElement( 'float', float );
-addNodeElement( 'int', int );
-addNodeElement( 'uint', uint );
-addNodeElement( 'bool', bool );
-addNodeElement( 'vec2', vec2 );
-addNodeElement( 'ivec2', ivec2 );
-addNodeElement( 'uvec2', uvec2 );
-addNodeElement( 'bvec2', bvec2 );
-addNodeElement( 'vec3', vec3 );
-addNodeElement( 'ivec3', ivec3 );
-addNodeElement( 'uvec3', uvec3 );
-addNodeElement( 'bvec3', bvec3 );
-addNodeElement( 'vec4', vec4 );
-addNodeElement( 'ivec4', ivec4 );
-addNodeElement( 'uvec4', uvec4 );
-addNodeElement( 'bvec4', bvec4 );
-addNodeElement( 'mat2', mat2 );
-addNodeElement( 'imat2', imat2 );
-addNodeElement( 'umat2', umat2 );
-addNodeElement( 'bmat2', bmat2 );
-addNodeElement( 'mat3', mat3 );
-addNodeElement( 'imat3', imat3 );
-addNodeElement( 'umat3', umat3 );
-addNodeElement( 'bmat3', bmat3 );
-addNodeElement( 'mat4', mat4 );
-addNodeElement( 'imat4', imat4 );
-addNodeElement( 'umat4', umat4 );
-addNodeElement( 'bmat4', bmat4 );
-addNodeElement( 'string', string );
-addNodeElement( 'arrayBuffer', arrayBuffer );
+addNodeElement( 'toColor', color );
+addNodeElement( 'toFloat', float );
+addNodeElement( 'toInt', int );
+addNodeElement( 'toUint', uint );
+addNodeElement( 'toBool', bool );
+addNodeElement( 'toVec2', vec2 );
+addNodeElement( 'toIvec2', ivec2 );
+addNodeElement( 'toUvec2', uvec2 );
+addNodeElement( 'toBvec2', bvec2 );
+addNodeElement( 'toVec3', vec3 );
+addNodeElement( 'toIvec3', ivec3 );
+addNodeElement( 'toUvec3', uvec3 );
+addNodeElement( 'toBvec3', bvec3 );
+addNodeElement( 'toVec4', vec4 );
+addNodeElement( 'toIvec4', ivec4 );
+addNodeElement( 'toUvec4', uvec4 );
+addNodeElement( 'toBvec4', bvec4 );
+addNodeElement( 'toMat2', mat2 );
+addNodeElement( 'toImat2', imat2 );
+addNodeElement( 'toUmat2', umat2 );
+addNodeElement( 'toBmat2', bmat2 );
+addNodeElement( 'toMat3', mat3 );
+addNodeElement( 'toImat3', imat3 );
+addNodeElement( 'toUmat3', umat3 );
+addNodeElement( 'toBmat3', bmat3 );
+addNodeElement( 'toMat4', mat4 );
+addNodeElement( 'toImat4', imat4 );
+addNodeElement( 'toUmat4', umat4 );
+addNodeElement( 'toBmat4', bmat4 );
 
 // basic nodes
 // HACK - we cannot export them from the corresponding files because of the cyclic dependency

@@ -6,7 +6,7 @@ import F_Schlick from './BSDF/F_Schlick.js';
 import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
 import LightingModel from '../core/LightingModel.js';
-import { diffuseColor, specularColor, specularF90, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor } from '../core/PropertyNode.js';
+import { diffuseColor, specularColor, specularF90, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
 import { positionViewDirection, positionWorld } from '../accessors/PositionNode.js';
 import { tslFn, float, vec2, vec3, vec4, mat3, If } from '../shadernode/ShaderNode.js';
@@ -17,6 +17,7 @@ import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../acc
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
 import { viewportResolution } from '../display/ViewportNode.js';
 import { viewportMipTexture } from '../display/ViewportTextureNode.js';
+import { loop } from '../utils/LoopNode.js';
 
 //
 // Transmission
@@ -102,21 +103,62 @@ const volumeAttenuation = tslFn( ( [ transmissionDistance, attenuationColor, att
 	]
 } );
 
-const getIBLVolumeRefraction = tslFn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance ] ) => {
+const getIBLVolumeRefraction = tslFn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion ] ) => {
 
-	const transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );
-	const refractedRayExit = position.add( transmissionRay );
+	let transmittedLight, transmittance;
 
-	// Project refracted vector on the framebuffer, while mapping to normalized device coordinates.
-	const ndcPos = projMatrix.mul( viewMatrix.mul( vec4( refractedRayExit, 1.0 ) ) );
-	const refractionCoords = vec2( ndcPos.xy.div( ndcPos.w ) ).toVar();
-	refractionCoords.addAssign( 1.0 );
-	refractionCoords.divAssign( 2.0 );
-	refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
+	if ( dispersion ) {
 
-	// Sample framebuffer to get pixel the refracted ray hits.
-	const transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );
-	const transmittance = diffuseColor.mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ) );
+		transmittedLight = vec4().toVar();
+		transmittance = vec3().toVar();
+
+		const halfSpread = ior.sub( 1.0 ).mul( dispersion.mul( 0.025 ) );
+		const iors = vec3( ior.sub( halfSpread ), ior, ior.add( halfSpread ) );
+
+		loop( { start: 0, end: 3 }, ( { i } ) => {
+
+			const ior = iors.element( i );
+
+			const transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );
+			const refractedRayExit = position.add( transmissionRay );
+
+			// Project refracted vector on the framebuffer, while mapping to normalized device coordinates.
+			const ndcPos = projMatrix.mul( viewMatrix.mul( vec4( refractedRayExit, 1.0 ) ) );
+			const refractionCoords = vec2( ndcPos.xy.div( ndcPos.w ) ).toVar();
+			refractionCoords.addAssign( 1.0 );
+			refractionCoords.divAssign( 2.0 );
+			refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
+
+			// Sample framebuffer to get pixel the refracted ray hits.
+			const transmissionSample = getTransmissionSample( refractionCoords, roughness, ior );
+
+			transmittedLight.element( i ).assign( transmissionSample.element( i ) );
+			transmittedLight.a.addAssign( transmissionSample.a );
+
+			transmittance.element( i ).assign( diffuseColor.element( i ).mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ).element( i ) ) );
+
+		} );
+
+		transmittedLight.a.divAssign( 3.0 );
+
+	} else {
+
+		const transmissionRay = getVolumeTransmissionRay( n, v, thickness, ior, modelMatrix );
+		const refractedRayExit = position.add( transmissionRay );
+
+		// Project refracted vector on the framebuffer, while mapping to normalized device coordinates.
+		const ndcPos = projMatrix.mul( viewMatrix.mul( vec4( refractedRayExit, 1.0 ) ) );
+		const refractionCoords = vec2( ndcPos.xy.div( ndcPos.w ) ).toVar();
+		refractionCoords.addAssign( 1.0 );
+		refractionCoords.divAssign( 2.0 );
+		refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
+
+		// Sample framebuffer to get pixel the refracted ray hits.
+		transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );
+		transmittance = diffuseColor.mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ) );
+
+	}
+
 	const attenuatedColor = transmittance.rgb.mul( transmittedLight.rgb );
 	const dotNV = n.dot( v ).clamp();
 
@@ -211,7 +253,7 @@ const evalIridescence = tslFn( ( { outsideIOR, eta2, cosTheta1, thinFilmThicknes
 
 	// Second interface
 	const baseIOR = Fresnel0ToIor( baseF0.clamp( 0.0, 0.9999 ) ); // guard against 1.0
-	const R1 = IorToFresnel0( baseIOR, iridescenceIOR.vec3() );
+	const R1 = IorToFresnel0( baseIOR, iridescenceIOR.toVec3() );
 	const R23 = F_Schlick( { f0: R1, f90: 1.0, dotVH: cosTheta2 } );
 	const phi23 = vec3(
 		baseIOR.x.lessThan( iridescenceIOR ).cond( Math.PI, 0.0 ),
@@ -289,13 +331,13 @@ const IBLSheenBRDF = tslFn( ( { normal, viewDir, roughness } ) => {
 } );
 
 const clearcoatF0 = vec3( 0.04 );
-const clearcoatF90 = vec3( 1 );
+const clearcoatF90 = float( 1 );
 
 //
 
 class PhysicalLightingModel extends LightingModel {
 
-	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false ) {
+	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false ) {
 
 		super();
 
@@ -304,6 +346,7 @@ class PhysicalLightingModel extends LightingModel {
 		this.iridescence = iridescence;
 		this.anisotropy = anisotropy;
 		this.transmission = transmission;
+		this.dispersion = dispersion;
 
 		this.clearcoatRadiance = null;
 		this.clearcoatSpecularDirect = null;
@@ -368,7 +411,8 @@ class PhysicalLightingModel extends LightingModel {
 				ior,
 				thickness,
 				attenuationColor,
-				attenuationDistance
+				attenuationDistance,
+				this.dispersion ? dispersion : null
 			);
 
 			context.backdropAlpha = transmission;

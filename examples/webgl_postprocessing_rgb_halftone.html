@@ -40,13 +40,13 @@
 			let composer, group;
 
 			init();
-			animate();
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 
 				clock = new THREE.Clock();
 
@@ -192,8 +192,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const delta = clock.getDelta();
 				stats.update();

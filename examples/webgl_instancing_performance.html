@@ -64,7 +64,6 @@
 
 		init();
 		initMesh();
-		animate();
 
 		//
 
@@ -250,6 +249,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( width, height );
+			renderer.setAnimationLoop( animate );
 			container = document.getElementById( 'container' );
 			container.appendChild( renderer.domElement );
 
@@ -306,18 +306,11 @@
 
 		function animate() {
 
-			requestAnimationFrame( animate );
-
 			controls.update();
-			stats.update();
-
-			render();
-
-		}
-
-		function render() {
 
 			renderer.render( scene, camera );
+
+			stats.update();
 
 		}
 

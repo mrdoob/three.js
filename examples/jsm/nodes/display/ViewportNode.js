@@ -33,7 +33,7 @@ class ViewportNode extends Node {
 
 		if ( this.scope === ViewportNode.RESOLUTION || this.scope === ViewportNode.VIEWPORT ) {
 
-			updateType = NodeUpdateType.FRAME;
+			updateType = NodeUpdateType.RENDER;
 
 		}
 

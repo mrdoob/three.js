@@ -1,10 +1,10 @@
-import { Material, ShaderMaterial } from 'three';
+import { Material } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
-import { transformedNormalView } from '../accessors/NormalNode.js';
+import { transformedNormalView, normalLocal } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
 import { batch } from '../accessors/BatchNode.js';
 import { materialReference } from '../accessors/MaterialReferenceNode.js';
@@ -27,7 +27,7 @@ import { faceDirection } from '../display/FrontFacingNode.js';
 
 const NodeMaterials = new Map();
 
-class NodeMaterial extends ShaderMaterial {
+class NodeMaterial extends Material {
 
 	constructor() {
 
@@ -213,6 +213,16 @@ class NodeMaterial extends ShaderMaterial {
 		if ( object.isSkinnedMesh === true ) {
 
 			skinningReference( object ).append();
+
+		}
+
+		if ( this.displacementMap ) {
+
+			const displacementMap = materialReference( 'displacementMap', 'texture' );
+			const displacementScale = materialReference( 'displacementScale', 'float' );
+			const displacementBias = materialReference( 'displacementBias', 'float' );
+
+			positionLocal.addAssign( normalLocal.normalize().mul( ( displacementMap.x.mul( displacementScale ).add( displacementBias ) ) ) );
 
 		}
 
@@ -447,8 +457,6 @@ class NodeMaterial extends ShaderMaterial {
 			}
 
 		}
-
-		Object.assign( this.defines, material.defines );
 
 		const descriptors = Object.getOwnPropertyDescriptors( material.constructor.prototype );
 

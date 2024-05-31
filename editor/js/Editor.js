@@ -82,7 +82,6 @@ function Editor() {
 
 		windowResize: new Signal(),
 
-		showGridChanged: new Signal(),
 		showHelpersChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
 		refreshSidebarEnvironment: new Signal(),
@@ -92,6 +91,8 @@ function Editor() {
 		viewportShadingChanged: new Signal(),
 
 		intersectionsDetected: new Signal(),
+
+		pathTracerUpdated: new Signal(),
 
 	};
 
@@ -659,7 +660,16 @@ Editor.prototype = {
 		var loader = new THREE.ObjectLoader();
 		var camera = await loader.parseAsync( json.camera );
 
+		const existingUuid = this.camera.uuid;
+		const incomingUuid = camera.uuid;
+
+		// copy all properties, including uuid
 		this.camera.copy( camera );
+		this.camera.uuid = incomingUuid;
+
+		delete this.cameras[ existingUuid ]; // remove old entry [existingUuid, this.camera]
+		this.cameras[ incomingUuid ] = this.camera; // add new entry [incomingUuid, this.camera]
+
 		this.signals.cameraResetted.dispatch();
 
 		this.history.fromJSON( json.history );
@@ -754,7 +764,8 @@ Editor.prototype = {
 
 		save: save,
 		saveArrayBuffer: saveArrayBuffer,
-		saveString: saveString
+		saveString: saveString,
+		formatNumber: formatNumber
 
 	}
 
@@ -785,6 +796,12 @@ function saveArrayBuffer( buffer, filename ) {
 function saveString( text, filename ) {
 
 	save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+}
+
+function formatNumber( number ) {
+
+	return new Intl.NumberFormat( 'en-us', { useGrouping: true } ).format( number );
 
 }
 

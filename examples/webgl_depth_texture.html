@@ -83,24 +83,24 @@
 			let camera, scene, renderer, controls, stats;
 			let target;
 			let postScene, postCamera, postMaterial;
-			const supportsExtension = true;
 
 			const params = {
 				format: THREE.DepthFormat,
-				type: THREE.UnsignedShortType
+				type: THREE.UnsignedShortType,
+				samples: 0,
 			};
 
 			const formats = { DepthFormat: THREE.DepthFormat, DepthStencilFormat: THREE.DepthStencilFormat };
-			const types = { UnsignedShortType: THREE.UnsignedShortType, UnsignedIntType: THREE.UnsignedIntType, UnsignedInt248Type: THREE.UnsignedInt248Type };
+			const types = { UnsignedShortType: THREE.UnsignedShortType, UnsignedIntType: THREE.UnsignedIntType, FloatType: THREE.FloatType };
 
 			init();
-			animate();
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				//
@@ -131,6 +131,7 @@
 
 				gui.add( params, 'format', formats ).onChange( setupRenderTarget );
 				gui.add( params, 'type', types ).onChange( setupRenderTarget );
+				gui.add( params, 'samples', 0, 16, 1 ).onChange( setupRenderTarget );
 				gui.open();
 
 			}
@@ -139,13 +140,17 @@
 
 				if ( target ) target.dispose();
 
-				const format = parseFloat( params.format );
-				const type = parseFloat( params.type );
+				const format = parseInt( params.format );
+				const type = parseInt( params.type );
+				const samples = parseInt( params.samples );
 
-				target = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight );
+				const dpr = renderer.getPixelRatio();
+				target = new THREE.WebGLRenderTarget( window.innerWidth * dpr, window.innerHeight * dpr );
 				target.texture.minFilter = THREE.NearestFilter;
 				target.texture.magFilter = THREE.NearestFilter;
 				target.stencilBuffer = ( format === THREE.DepthStencilFormat ) ? true : false;
+				target.samples = samples;
+
 				target.depthTexture = new THREE.DepthTexture();
 				target.depthTexture.format = format;
 				target.depthTexture.type = type;
@@ -215,10 +220,6 @@
 			}
 
 			function animate() {
-
-				if ( ! supportsExtension ) return;
-
-				requestAnimationFrame( animate );
 
 				// render scene into target
 				renderer.setRenderTarget( target );

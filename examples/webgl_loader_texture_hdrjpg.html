@@ -75,7 +75,6 @@
 			const resolutions = {};
 
 			init();
-			animate();
 
 			function init() {
 
@@ -166,6 +165,7 @@
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -236,9 +236,7 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-
+			
 				stats.begin();
 				render();
 				stats.end();

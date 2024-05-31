@@ -6,6 +6,7 @@ import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 function Script( editor ) {
 
 	const signals = editor.signals;
+	const strings = editor.strings;
 
 	const container = new UIPanel();
 	container.setId( 'script' );
@@ -342,8 +343,7 @@ function Script( editor ) {
 	codemirror.on( 'keypress', function ( cm, kb ) {
 
 		if ( currentMode !== 'javascript' ) return;
-		const typed = String.fromCharCode( kb.which || kb.keyCode );
-		if ( /[\w\.]/.exec( typed ) ) {
+		if ( /[\w\.]/.exec( kb.key ) ) {
 
 			server.complete( cm );
 
@@ -360,16 +360,49 @@ function Script( editor ) {
 
 	} );
 
+	function setTitle( object, script ) {
+
+		if ( typeof script === 'object' ) {
+
+			title.setValue( object.name + ' / ' + script.name );
+
+		} else {
+
+			switch ( script ) {
+
+				case 'vertexShader':
+
+					title.setValue( object.material.name + ' / ' + strings.getKey( 'script/title/vertexShader' ) );
+					break;
+
+				case 'fragmentShader':
+
+					title.setValue( object.material.name + ' / ' + strings.getKey( 'script/title/fragmentShader' ) );
+					break;
+
+				case 'programInfo':
+
+					title.setValue( object.material.name + ' / ' + strings.getKey( 'script/title/programInfo' ) );
+					break;
+
+				default:
+
+					throw new Error( 'setTitle: Unknown script' );
+
+			}
+
+		}
+
+	}
+
 	signals.editScript.add( function ( object, script ) {
 
-		let mode, name, source;
+		let mode, source;
 
 		if ( typeof ( script ) === 'object' ) {
 
 			mode = 'javascript';
-			name = script.name;
 			source = script.source;
-			title.setValue( object.name + ' / ' + name );
 
 		} else {
 
@@ -378,7 +411,6 @@ function Script( editor ) {
 				case 'vertexShader':
 
 					mode = 'glsl';
-					name = 'Vertex Shader';
 					source = object.material.vertexShader || '';
 
 					break;
@@ -386,7 +418,6 @@ function Script( editor ) {
 				case 'fragmentShader':
 
 					mode = 'glsl';
-					name = 'Fragment Shader';
 					source = object.material.fragmentShader || '';
 
 					break;
@@ -394,7 +425,6 @@ function Script( editor ) {
 				case 'programInfo':
 
 					mode = 'json';
-					name = 'Program Properties';
 					const json = {
 						defines: object.material.defines,
 						uniforms: object.material.uniforms,
@@ -402,11 +432,17 @@ function Script( editor ) {
 					};
 					source = JSON.stringify( json, null, '\t' );
 
+					break;
+
+				default:
+
+					throw new Error( 'editScript: Unknown script' );
+
 			}
 
-			title.setValue( object.material.name + ' / ' + name );
-
 		}
+
+		setTitle( object, script );
 
 		currentMode = mode;
 		currentScript = script;
@@ -427,6 +463,36 @@ function Script( editor ) {
 			container.setDisplay( 'none' );
 
 		}
+
+	} );
+
+	signals.objectChanged.add( function ( object ) {
+
+		if ( object !== currentObject ) return;
+
+		if ( [ 'programInfo', 'vertexShader', 'fragmentShader' ].includes( currentScript ) ) return;
+
+		setTitle( currentObject, currentScript );
+
+	} );
+
+	signals.scriptChanged.add( function ( script ) {
+
+		if ( script === currentScript ) {
+
+			setTitle( currentObject, currentScript );
+
+		}
+
+	} );
+
+	signals.materialChanged.add( function ( object, slot ) {
+
+		if ( object !== currentObject ) return;
+
+		// TODO: Adds multi-material support
+
+		setTitle( currentObject, currentScript );
 
 	} );
 

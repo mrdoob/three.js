@@ -35,22 +35,53 @@ class VaryingNode extends Node {
 
 	}
 
+	setupVarying( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+
+		let varying = properties.varying;
+
+		if ( varying === undefined ) {
+
+			const name = this.name;
+			const type = this.getNodeType( builder );
+
+			properties.varying = varying = builder.getVaryingFromNode( this, name, type );
+			properties.node = this.node;
+
+		}
+
+		// this property can be used to check if the varying can be optimized for a variable
+		varying.needsInterpolation || ( varying.needsInterpolation = ( builder.shaderStage === 'fragment' ) );
+
+		return varying;
+
+	}
+
+	setup( builder ) {
+
+		this.setupVarying( builder );
+
+	}
+
 	generate( builder ) {
 
-		const { name, node } = this;
-		const type = this.getNodeType( builder );
+		const properties = builder.getNodeProperties( this );
+		const varying = this.setupVarying( builder );
 
-		const nodeVarying = builder.getVaryingFromNode( this, name, type );
+		if ( properties.propertyName === undefined ) {
 
-		// this property can be used to check if the varying can be optimized for a var
-		nodeVarying.needsInterpolation || ( nodeVarying.needsInterpolation = ( builder.shaderStage === 'fragment' ) );
+			const type = this.getNodeType( builder );
+			const propertyName = builder.getPropertyName( varying, NodeShaderStage.VERTEX );
 
-		const propertyName = builder.getPropertyName( nodeVarying, NodeShaderStage.VERTEX );
+			// force node run in vertex stage
+			builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, this.node, type, propertyName );
 
-		// force node run in vertex stage
-		builder.flowNodeFromShaderStage( NodeShaderStage.VERTEX, node, type, propertyName );
+			properties.propertyName = propertyName;
 
-		return builder.getPropertyName( nodeVarying );
+		}
+
+		return builder.getPropertyName( varying );
 
 	}
 

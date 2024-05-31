@@ -57,6 +57,7 @@ class RenderList {
 
 		this.opaque = [];
 		this.transparent = [];
+		this.bundles = [];
 
 		this.lightsNode = new LightsNode( [] );
 		this.lightsArray = [];
@@ -71,6 +72,8 @@ class RenderList {
 
 		this.opaque.length = 0;
 		this.transparent.length = 0;
+		this.bundles.length = 0;
+
 		this.lightsArray.length = 0;
 
 		this.occlusionQueryCount = 0;
@@ -132,6 +135,12 @@ class RenderList {
 		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
 		( material.transparent === true ? this.transparent : this.opaque ).unshift( renderItem );
+
+	}
+
+	pushBundle( group ) {
+
+		this.bundles.push( group );
 
 	}
 

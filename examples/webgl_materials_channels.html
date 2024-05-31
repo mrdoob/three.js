@@ -59,18 +59,6 @@
 			const BIAS = - 0.428408; // from original model
 
 			init();
-			animate();
-			initGui();
-
-			// Init gui
-			function initGui() {
-
-				const gui = new GUI();
-				gui.add( params, 'material', [ 'standard', 'normal', 'velocity', 'depthBasic', 'depthRGBA' ] );
-				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
-				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
-
-			}
 
 			function init() {
 
@@ -80,6 +68,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -223,6 +212,13 @@
 
 				//
 
+				const gui = new GUI();
+				gui.add( params, 'material', [ 'standard', 'normal', 'velocity', 'depthBasic', 'depthRGBA' ] );
+				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
+				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
+
+				//
+
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
@@ -249,8 +245,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				stats.begin();
 				render();

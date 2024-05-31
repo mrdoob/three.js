@@ -106,7 +106,6 @@
 			snellenConfig.quadHeight = .5 * snellenConfig.heightMeters / snellenConfig.cropY;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -123,9 +122,10 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.setClearAlpha( 1 );
 				renderer.setClearColor( new THREE.Color( 0 ), 0 );
-				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.xr.enabled = true;
 
 				document.body.appendChild( renderer.domElement );
@@ -298,13 +298,7 @@
 			}
 			//
 
-			function animate() {
-
-				renderer.setAnimationLoop( render );
-
-			}
-
-			function render( t, frame ) {
+			function animate( t, frame ) {
 
 				const xr = renderer.xr;
 				const session = xr.getSession();

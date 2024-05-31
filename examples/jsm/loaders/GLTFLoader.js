@@ -3317,6 +3317,8 @@ class GLTFParser {
 
 			}
 
+			assignExtrasToUserData( texture, sourceDef );
+
 			texture.userData.mimeType = sourceDef.mimeType || getImageURIMimeType( sourceDef.uri );
 
 			return texture;

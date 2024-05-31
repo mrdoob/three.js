@@ -91,7 +91,6 @@ const assets = [
 	'./js/libs/codemirror/mode/glsl.js',
 
 	'./js/libs/esprima.js',
-	'./js/libs/ffmpeg.min.js',
 	'./js/libs/jsonlint.js',
 
 	'./js/libs/codemirror/addon/dialog.css',
@@ -137,7 +136,6 @@ const assets = [
 	'./js/Menubar.File.js',
 	'./js/Menubar.Edit.js',
 	'./js/Menubar.Add.js',
-	'./js/Menubar.Examples.js',
 	'./js/Menubar.Help.js',
 	'./js/Menubar.View.js',
 	'./js/Menubar.Status.js',

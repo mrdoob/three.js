@@ -57,7 +57,6 @@
 			let composer, effectFXAA;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -120,6 +119,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -190,8 +190,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 

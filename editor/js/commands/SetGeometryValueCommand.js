@@ -9,16 +9,16 @@ import { Command } from '../Command.js';
  */
 class SetGeometryValueCommand extends Command {
 
-	constructor( editor, object, attributeName, newValue ) {
+	constructor( editor, object = null, attributeName = '', newValue = null ) {
 
 		super( editor );
 
 		this.type = 'SetGeometryValueCommand';
-		this.name = `Set Geometry.${attributeName}`;
+		this.name = editor.strings.getKey( 'command/SetGeometryValue' ) + ': ' + attributeName;
 
 		this.object = object;
 		this.attributeName = attributeName;
-		this.oldValue = ( object !== undefined ) ? object.geometry[ attributeName ] : undefined;
+		this.oldValue = ( object !== null ) ? object.geometry[ attributeName ] : null;
 		this.newValue = newValue;
 
 	}

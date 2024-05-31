@@ -269,6 +269,12 @@ export const GPUBufferBindingType = {
 	ReadOnlyStorage: 'read-only-storage'
 };
 
+export const GPUStorageTextureAccess = {
+	WriteOnly: 'write-only',
+	ReadOnly: 'read-only',
+	ReadWrite: 'read-write',
+};
+
 export const GPUSamplerBindingType = {
 	Filtering: 'filtering',
 	NonFiltering: 'non-filtering',

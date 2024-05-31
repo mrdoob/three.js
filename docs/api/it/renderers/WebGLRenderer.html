@@ -321,22 +321,22 @@
 			Questo metodo utilizza *KHR_parallel_shader_compile*.
 		</p>
 
-		<h3>[method:undefined copyFramebufferToTexture]( [param:Vector2 position], [param:FramebufferTexture texture], [param:Number level] )</h3>
+		<h3>[method:undefined copyFramebufferToTexture]( [param:FramebufferTexture texture], [param:Vector2 position], [param:Number level] )</h3>
 		<p>
 			Copia i pixel dal WebGLFramebuffer corrente in una texture 2D. Abilita l'accesso a 
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexImage2D WebGLRenderingContext.copyTexImage2D].
 		</p>
 
-		<h3>[method:undefined copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )</h3>
+		<h3>[method:undefined copyTextureToTexture]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Box2 srcRegion], [param:Vector2 dstPosition], [param:Number level] )</h3>
 		<p>
-			Copia tutti i pixel della texture in una texture esistente partendo dalla posizione data. Abilita l'accesso a
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D WebGLRenderingContext.texSubImage2D].
+			Copies the pixels of a texture in the bounds '[page:Box2 srcRegion]' in the destination texture starting from the given position. 
+			Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D WebGLRenderingContext.texSubImage2D].
 		</p>
 
-		<h3>[method:undefined copyTextureToTexture3D]( [param:Box3 sourceBox], [param:Vector3 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )</h3>
+		<h3>[method:undefined copyTextureToTexture3D]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Box3 srcRegion], [param:Vector3 dstPosition], [param:Number level] )</h3>
 		<p>
-			Copia i pixel della texture nei limiti '[page:Box3 sourceBox]' nella texture di destinazione partendo dalla posizione data. Abilita l'accesso a
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texSubImage3D WebGL2RenderingContext.texSubImage3D].
+			Copies the pixels of a texture in the bounds '[page:Box3 srcRegion]' in the destination texture starting from the given position. 
+			Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texSubImage3D WebGL2RenderingContext.texSubImage3D].
 		</p>
 
 		<h3>[method:undefined dispose]( )</h3>

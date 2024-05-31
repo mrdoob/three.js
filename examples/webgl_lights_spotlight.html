@@ -41,16 +41,14 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
-
-				renderer.setAnimationLoop( render );
 
 				scene = new THREE.Scene();
 
@@ -230,7 +228,7 @@
 
 			}
 
-			function render() {
+			function animate() {
 
 				const time = performance.now() / 3000;
 

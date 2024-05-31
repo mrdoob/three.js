@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl2 - volume - cloud</title>
+		<title>three.js webgl2 - volume</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl2 - volume - cloud
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl2 - volume
 		</div>
 
 		<script type="importmap">
@@ -32,44 +32,21 @@
 			let mesh;
 
 			init();
-			animate();
 
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 0, 0, 1.5 );
+				camera.position.set( 0, 0, 2 );
 
 				new OrbitControls( camera, renderer.domElement );
-
-				// Sky
-
-				const canvas = document.createElement( 'canvas' );
-				canvas.width = 1;
-				canvas.height = 32;
-
-				const context = canvas.getContext( '2d' );
-				const gradient = context.createLinearGradient( 0, 0, 0, 32 );
-				gradient.addColorStop( 0.0, '#014a84' );
-				gradient.addColorStop( 0.5, '#0561a0' );
-				gradient.addColorStop( 1.0, '#437ab6' );
-				context.fillStyle = gradient;
-				context.fillRect( 0, 0, 1, 32 );
-
-				const skyMap = new THREE.CanvasTexture( canvas );
-				skyMap.colorSpace = THREE.SRGBColorSpace;
-
-				const sky = new THREE.Mesh(
-					new THREE.SphereGeometry( 10 ),
-					new THREE.MeshBasicMaterial( { map: skyMap, side: THREE.BackSide } )
-				);
-				scene.add( sky );
 
 				// Texture
 
@@ -77,7 +54,6 @@
 				const data = new Uint8Array( size * size * size );
 
 				let i = 0;
-				const scale = 0.05;
 				const perlin = new ImprovedNoise();
 				const vector = new THREE.Vector3();
 
@@ -87,9 +63,11 @@
 
 						for ( let x = 0; x < size; x ++ ) {
 
-							const d = 1.0 - vector.set( x, y, z ).subScalar( size / 2 ).divideScalar( size ).length();
-							data[ i ] = ( 128 + 128 * perlin.noise( x * scale / 1.5, y * scale, z * scale / 1.5 ) ) * d * d;
-							i ++;
+							vector.set( x, y, z ).divideScalar( size );
+
+							const d = perlin.noise( vector.x * 6.5, vector.y * 6.5, vector.z * 6.5 );
+
+							data[ i ++ ] = d * 128 + 128;
 
 						}
 
@@ -139,29 +117,10 @@
 
 					out vec4 color;
 
-					uniform vec3 base;
 					uniform sampler3D map;
 
 					uniform float threshold;
-					uniform float range;
-					uniform float opacity;
 					uniform float steps;
-					uniform float frame;
-
-					uint wang_hash(uint seed)
-					{
-							seed = (seed ^ 61u) ^ (seed >> 16u);
-							seed *= 9u;
-							seed = seed ^ (seed >> 4u);
-							seed *= 0x27d4eb2du;
-							seed = seed ^ (seed >> 15u);
-							return seed;
-					}
-
-					float randomFloat(inout uint seed)
-					{
-							return float(wang_hash(seed)) / 4294967296.;
-					}
 
 					vec2 hitBox( vec3 orig, vec3 dir ) {
 						const vec3 box_min = vec3( - 0.5 );
@@ -180,16 +139,26 @@
 						return texture( map, p ).r;
 					}
 
-					float shading( vec3 coord ) {
-						float step = 0.01;
-						return sample1( coord + vec3( - step ) ) - sample1( coord + vec3( step ) );
-					}
+					#define epsilon .0001
 
-					vec4 linearToSRGB( in vec4 value ) {
-						return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );
+					vec3 normal( vec3 coord ) {
+						if ( coord.x < epsilon ) return vec3( 1.0, 0.0, 0.0 );
+						if ( coord.y < epsilon ) return vec3( 0.0, 1.0, 0.0 );
+						if ( coord.z < epsilon ) return vec3( 0.0, 0.0, 1.0 );
+						if ( coord.x > 1.0 - epsilon ) return vec3( - 1.0, 0.0, 0.0 );
+						if ( coord.y > 1.0 - epsilon ) return vec3( 0.0, - 1.0, 0.0 );
+						if ( coord.z > 1.0 - epsilon ) return vec3( 0.0, 0.0, - 1.0 );
+
+						float step = 0.01;
+						float x = sample1( coord + vec3( - step, 0.0, 0.0 ) ) - sample1( coord + vec3( step, 0.0, 0.0 ) );
+						float y = sample1( coord + vec3( 0.0, - step, 0.0 ) ) - sample1( coord + vec3( 0.0, step, 0.0 ) );
+						float z = sample1( coord + vec3( 0.0, 0.0, - step ) ) - sample1( coord + vec3( 0.0, 0.0, step ) );
+
+						return normalize( vec3( x, y, z ) );
 					}
 
 					void main(){
+
 						vec3 rayDir = normalize( vDirection );
 						vec2 bounds = hitBox( vOrigin, rayDir );
 
@@ -202,38 +171,21 @@
 						float delta = min( inc.x, min( inc.y, inc.z ) );
 						delta /= steps;
 
-						// Jitter
-
-						// Nice little seed from
-						// https://blog.demofox.org/2020/05/25/casual-shadertoy-path-tracing-1-basic-camera-diffuse-emissive/
-						uint seed = uint( gl_FragCoord.x ) * uint( 1973 ) + uint( gl_FragCoord.y ) * uint( 9277 ) + uint( frame ) * uint( 26699 );
-						vec3 size = vec3( textureSize( map, 0 ) );
-						float randNum = randomFloat( seed ) * 2.0 - 1.0;
-						p += rayDir * randNum * ( 1.0 / size );
-
-						//
-
-						vec4 ac = vec4( base, 0.0 );
-
 						for ( float t = bounds.x; t < bounds.y; t += delta ) {
 
 							float d = sample1( p + 0.5 );
 
-							d = smoothstep( threshold - range, threshold + range, d ) * opacity;
+							if ( d > threshold ) {
 
-							float col = shading( p + 0.5 ) * 3.0 + ( ( p.x + p.y ) * 0.25 ) + 0.2;
+								color.rgb = normal( p + 0.5 ) * 0.5 + ( p * 1.5 + 0.25 );
+								color.a = 1.;
+								break;
 
-							ac.rgb += ( 1.0 - ac.a ) * d * col;
-
-							ac.a += ( 1.0 - ac.a ) * d;
-
-							if ( ac.a >= 0.95 ) break;
+							}
 
 							p += rayDir * delta;
 
 						}
-
-						color = linearToSRGB( ac );
 
 						if ( color.a == 0.0 ) discard;
 
@@ -244,19 +196,14 @@
 				const material = new THREE.RawShaderMaterial( {
 					glslVersion: THREE.GLSL3,
 					uniforms: {
-						base: { value: new THREE.Color( 0x798aa0 ) },
 						map: { value: texture },
 						cameraPos: { value: new THREE.Vector3() },
-						threshold: { value: 0.25 },
-						opacity: { value: 0.25 },
-						range: { value: 0.1 },
-						steps: { value: 100 },
-						frame: { value: 0 }
+						threshold: { value: 0.6 },
+						steps: { value: 200 }
 					},
 					vertexShader,
 					fragmentShader,
 					side: THREE.BackSide,
-					transparent: true
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -264,27 +211,18 @@
 
 				//
 
-				const parameters = {
-					threshold: 0.25,
-					opacity: 0.25,
-					range: 0.1,
-					steps: 100
-				};
+				const parameters = { threshold: 0.6, steps: 200 };
 
 				function update() {
 
 					material.uniforms.threshold.value = parameters.threshold;
-					material.uniforms.opacity.value = parameters.opacity;
-					material.uniforms.range.value = parameters.range;
 					material.uniforms.steps.value = parameters.steps;
 
 				}
 
 				const gui = new GUI();
 				gui.add( parameters, 'threshold', 0, 1, 0.01 ).onChange( update );
-				gui.add( parameters, 'opacity', 0, 1, 0.01 ).onChange( update );
-				gui.add( parameters, 'range', 0, 1, 0.01 ).onChange( update );
-				gui.add( parameters, 'steps', 0, 200, 1 ).onChange( update );
+				gui.add( parameters, 'steps', 0, 300, 1 ).onChange( update );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -301,12 +239,7 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				mesh.material.uniforms.cameraPos.value.copy( camera.position );
-				mesh.rotation.y = - performance.now() / 7500;
-
-				mesh.material.uniforms.frame.value ++;
 
 				renderer.render( scene, camera );
 

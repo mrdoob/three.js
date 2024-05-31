@@ -3,7 +3,7 @@ import { NoColorSpace, FloatType } from 'three';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import NodeSampler from '../../common/nodes/NodeSampler.js';
-import { NodeSampledTexture, NodeSampledCubeTexture } from '../../common/nodes/NodeSampledTexture.js';
+import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from '../../common/nodes/NodeSampledTexture.js';
 
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeStorageBuffer from '../../common/nodes/NodeStorageBuffer.js';
@@ -13,6 +13,8 @@ import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
 import { getFormat } from '../utils/WebGPUTextureUtils.js';
 
 import WGSLNodeParser from './WGSLNodeParser.js';
+import { GPUStorageTextureAccess } from '../utils/WebGPUConstants.js';
+
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
 const GPUShaderStage = self.GPUShaderStage;
@@ -316,7 +318,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			const name = node.name;
 			const type = node.type;
 
-			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' ) {
+			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D' ) {
 
 				return name;
 
@@ -333,6 +335,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 		}
 
 		return super.getPropertyName( node );
+
+	}
+
+	getOutputStructName() {
+
+		return 'output';
 
 	}
 
@@ -358,6 +366,41 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	getStorageAccess( node ) {
+
+		if ( node.isStorageTextureNode ) {
+
+			switch ( node.access ) {
+
+				case GPUStorageTextureAccess.ReadOnly: {
+
+					return 'read';
+
+				}
+
+				case GPUStorageTextureAccess.WriteOnly: {
+
+					return 'write';
+
+				}
+
+				default: {
+
+					return 'read_write';
+
+				}
+
+			}
+
+		} else {
+
+			// @TODO: Account for future read-only storage buffer pull request
+			return 'read_write';
+
+		}
+
+	}
+
 	getUniformFromNode( node, type, shaderStage, name = null ) {
 
 		const uniformNode = super.getUniformFromNode( node, type, shaderStage, name );
@@ -369,21 +412,25 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			const bindings = this.bindings[ shaderStage ];
 
-			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' ) {
+			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D' ) {
 
 				let texture = null;
 
 				if ( type === 'texture' || type === 'storageTexture' ) {
 
-					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node );
+					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, node.access ? node.access : null );
 
 				} else if ( type === 'cubeTexture' ) {
 
-					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node );
+					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, node.access ? node.access : null );
+
+				} else if ( type === 'texture3D' ) {
+
+					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, node.access ? node.access : null );
 
 				}
 
-				texture.store = node.isStoreTextureNode === true;
+				texture.store = node.isStorageTextureNode === true;
 				texture.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				if ( shaderStage === 'fragment' && this.isUnfilterable( node.value ) === false && texture.store === false ) {
@@ -455,7 +502,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	isReference( type ) {
 
-		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_depth_2d' || type === 'texture_storage_2d';
+		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_depth_2d' || type === 'texture_storage_2d' || type === 'texture_3d';
 
 	}
 
@@ -618,6 +665,10 @@ ${ flowData.code }
 
 		}
 
+		const builtins = this.getBuiltins( 'output' );
+
+		if ( builtins ) snippets.push( builtins );
+
 		return snippets.join( ',\n' );
 
 	}
@@ -637,6 +688,8 @@ ${ flowData.code }
 			snippet += '\n}';
 
 			snippets.push( snippet );
+
+			snippets.push( `\nvar<private> output : ${ name };\n\n`);
 
 		}
 
@@ -734,11 +787,11 @@ ${ flowData.code }
 
 		for ( const uniform of uniforms ) {
 
-			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'storageTexture' ) {
+			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
 
 				const texture = uniform.node.value;
 
-				if ( shaderStage === 'fragment' && this.isUnfilterable( texture ) === false && uniform.node.isStoreTextureNode !== true ) {
+				if ( shaderStage === 'fragment' && this.isUnfilterable( texture ) === false && uniform.node.isStorageTextureNode !== true ) {
 
 					if ( texture.isDepthTexture === true && texture.compareFunction !== null ) {
 
@@ -770,11 +823,16 @@ ${ flowData.code }
 
 					textureType = 'texture_external';
 
-				} else if ( uniform.node.isStoreTextureNode === true ) {
+				} else if ( texture.isData3DTexture === true ) {
+
+					textureType = 'texture_3d<f32>';
+
+				} else if ( uniform.node.isStorageTextureNode === true ) {
 
 					const format = getFormat( texture );
+					const access = this.getStorageAccess( uniform.node );
 
-					textureType = `texture_storage_2d<${ format }, write>`;
+					textureType = `texture_storage_2d<${ format }, ${access}>`;
 
 				} else {
 

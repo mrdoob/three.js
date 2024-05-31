@@ -36,8 +36,8 @@
 			let controller1, controller2;
 			let controllerGrip1, controllerGrip2;
 
-			let room, spheres;
-			let physics, velocity = new THREE.Vector3();
+			let room, spheres, physics;
+			const velocity = new THREE.Vector3();
 
 			let count = 0;
 
@@ -70,7 +70,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( render );
+				renderer.setAnimationLoop( animate );
 				renderer.xr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
@@ -81,7 +81,10 @@
 				controls.target.y = 1.6;
 				controls.update();
 
-				document.body.appendChild( XRButton.createButton( renderer, { 'optionalFeatures': [ 'depth-sensing'] } ) );
+				document.body.appendChild( XRButton.createButton( renderer, {
+					'optionalFeatures': [ 'depth-sensing' ],
+					'depthSensing': { 'usagePreference': [ 'gpu-optimized' ], 'dataFormatPreference': [] }
+				} ) );
 
 				// controllers
 
@@ -277,7 +280,7 @@
 
 			}
 
-			function render() {
+			function animate() {
 
 				handleController( controller1 );
 				handleController( controller2 );

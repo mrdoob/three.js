@@ -7,14 +7,14 @@ import { Command } from '../Command.js';
  */
 class MultiCmdsCommand extends Command {
 
-	constructor( editor, cmdArray ) {
+	constructor( editor, cmdArray = [] ) {
 
 		super( editor );
 
 		this.type = 'MultiCmdsCommand';
-		this.name = 'Multiple Changes';
+		this.name = editor.strings.getKey( 'command/MultiCmds' );
 
-		this.cmdArray = ( cmdArray !== undefined ) ? cmdArray : [];
+		this.cmdArray = cmdArray;
 
 	}
 

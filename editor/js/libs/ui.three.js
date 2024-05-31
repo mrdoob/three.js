@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { TGALoader } from 'three/addons/loaders/TGALoader.js';
+import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 
 import { UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
 import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
@@ -270,10 +271,10 @@ class UIOutliner extends UIDiv {
 		// Prevent native scroll behavior
 		this.dom.addEventListener( 'keydown', function ( event ) {
 
-			switch ( event.keyCode ) {
+			switch ( event.code ) {
 
-				case 38: // up
-				case 40: // down
+				case 'ArrowUp':
+				case 'ArrowDown':
 					event.preventDefault();
 					event.stopPropagation();
 					break;
@@ -285,12 +286,12 @@ class UIOutliner extends UIDiv {
 		// Keybindings to support arrow navigation
 		this.dom.addEventListener( 'keyup', function ( event ) {
 
-			switch ( event.keyCode ) {
+			switch ( event.code ) {
 
-				case 38: // up
+				case 'ArrowUp':
 					scope.selectIndex( scope.selectedIndex - 1 );
 					break;
-				case 40: // down
+				case 'ArrowDown':
 					scope.selectIndex( scope.selectedIndex + 1 );
 					break;
 
@@ -312,8 +313,7 @@ class UIOutliner extends UIDiv {
 
 			this.setValue( this.options[ index ].value );
 
-			const changeEvent = document.createEvent( 'HTMLEvents' );
-			changeEvent.initEvent( 'change', true, true );
+			const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 			this.dom.dispatchEvent( changeEvent );
 
 		}
@@ -334,8 +334,7 @@ class UIOutliner extends UIDiv {
 
 			scope.setValue( this.value );
 
-			const changeEvent = document.createEvent( 'HTMLEvents' );
-			changeEvent.initEvent( 'change', true, true );
+			const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 			scope.dom.dispatchEvent( changeEvent );
 
 		}
@@ -448,8 +447,7 @@ class UIOutliner extends UIDiv {
 			const editor = scope.editor;
 			editor.execute( new MoveObjectCommand( editor, object, newParent, nextObject ) );
 
-			const changeEvent = document.createEvent( 'HTMLEvents' );
-			changeEvent.initEvent( 'change', true, true );
+			const changeEvent = new Event( 'change', { bubbles: true, cancelable: true } );
 			scope.dom.dispatchEvent( changeEvent );
 
 		}
@@ -551,9 +549,7 @@ class UIPoints extends UISpan {
 		this.lastPointIdx = 0;
 		this.onChangeCallback = null;
 
-		// TODO Remove this bind() stuff
-
-		this.update = function () {
+		this.update = () => { // bind lexical this
 
 			if ( this.onChangeCallback !== null ) {
 
@@ -561,7 +557,7 @@ class UIPoints extends UISpan {
 
 			}
 
-		}.bind( this );
+		};
 
 	}
 
@@ -831,7 +827,7 @@ class UIBoolean extends UISpan {
 
 }
 
-let renderer;
+let renderer, fsQuad;
 
 function renderToCanvas( texture ) {
 
@@ -841,19 +837,18 @@ function renderToCanvas( texture ) {
 
 	}
 
+	if ( fsQuad === undefined ) {
+
+		fsQuad = new FullScreenQuad( new THREE.MeshBasicMaterial() );
+
+	}
+
 	const image = texture.image;
 
 	renderer.setSize( image.width, image.height, false );
 
-	const scene = new THREE.Scene();
-	const camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-	const material = new THREE.MeshBasicMaterial( { map: texture } );
-	const quad = new THREE.PlaneGeometry( 2, 2 );
-	const mesh = new THREE.Mesh( quad, material );
-	scene.add( mesh );
-
-	renderer.render( scene, camera );
+	fsQuad.material.map = texture;
+	fsQuad.render( renderer );
 
 	return renderer.domElement;
 

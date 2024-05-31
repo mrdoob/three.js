@@ -10,24 +10,24 @@ import { Euler } from 'three';
  */
 class SetRotationCommand extends Command {
 
-	constructor( editor, object, newRotation, optionalOldRotation ) {
+	constructor( editor, object = null, newRotation = null, optionalOldRotation = null ) {
 
 		super( editor );
 
 		this.type = 'SetRotationCommand';
-		this.name = 'Set Rotation';
+		this.name = editor.strings.getKey( 'command/SetRotation' );
 		this.updatable = true;
 
 		this.object = object;
 
-		if ( object !== undefined && newRotation !== undefined ) {
+		if ( object !== null && newRotation !== null ) {
 
 			this.oldRotation = object.rotation.clone();
 			this.newRotation = newRotation.clone();
 
 		}
 
-		if ( optionalOldRotation !== undefined ) {
+		if ( optionalOldRotation !== null ) {
 
 			this.oldRotation = optionalOldRotation.clone();
 

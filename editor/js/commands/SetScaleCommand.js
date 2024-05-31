@@ -10,24 +10,24 @@ import { Vector3 } from 'three';
  */
 class SetScaleCommand extends Command {
 
-	constructor( editor, object, newScale, optionalOldScale ) {
+	constructor( editor, object = null, newScale = null, optionalOldScale = null ) {
 
 		super( editor );
 
 		this.type = 'SetScaleCommand';
-		this.name = 'Set Scale';
+		this.name = editor.strings.getKey( 'command/SetScale' );
 		this.updatable = true;
 
 		this.object = object;
 
-		if ( object !== undefined && newScale !== undefined ) {
+		if ( object !== null && newScale !== null ) {
 
 			this.oldScale = object.scale.clone();
 			this.newScale = newScale.clone();
 
 		}
 
-		if ( optionalOldScale !== undefined ) {
+		if ( optionalOldScale !== null ) {
 
 			this.oldScale = optionalOldScale.clone();
 

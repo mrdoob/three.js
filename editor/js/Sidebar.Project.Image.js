@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import { UIBreak, UIButton, UIInteger, UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
 
-// import { ViewportPathtracer } from './Viewport.Pathtracer.js';
+import { ViewportPathtracer } from './Viewport.Pathtracer.js';
 
 function SidebarProjectImage( editor ) {
 
@@ -19,16 +19,33 @@ function SidebarProjectImage( editor ) {
 	// Shading
 
 	const shadingRow = new UIRow();
-	// container.add( shadingRow );
+	container.add( shadingRow );
 
 	shadingRow.add( new UIText( strings.getKey( 'sidebar/project/shading' ) ).setClass( 'Label' ) );
 
 	const shadingTypeSelect = new UISelect().setOptions( {
-		0: 'Solid',
-		1: 'Realistic'
-	} ).setWidth( '125px' );
-	shadingTypeSelect.setValue( 0 );
+		0: 'SOLID',
+		1: 'REALISTIC'
+	} ).setWidth( '170px' ).setTextTransform( 'unset' ).onChange( refreshShadingRow ).setValue( 0 );
 	shadingRow.add( shadingTypeSelect );
+
+	const pathTracerMinSamples = 3;
+	const pathTracerMaxSamples = 65536;
+	const samplesNumber = new UIInteger( 16 ).setRange( pathTracerMinSamples, pathTracerMaxSamples );
+
+	const samplesRow = new UIRow();
+	samplesRow.add( new UIText( strings.getKey( 'sidebar/project/image/samples' ) ).setClass( 'Label' ) );
+	samplesRow.add( samplesNumber );
+
+	container.add( samplesRow );
+
+	function refreshShadingRow() {
+
+		samplesRow.setHidden( shadingTypeSelect.getValue() !== '1' );
+
+	}
+
+	refreshShadingRow();
 
 	// Resolution
 
@@ -108,7 +125,7 @@ function SidebarProjectImage( editor ) {
 				renderer.dispose();
 
 				break;
-			/*
+
 			case 1: // REALISTIC
 
 				const status = document.createElement( 'div' );
@@ -120,26 +137,41 @@ function SidebarProjectImage( editor ) {
 				status.style.fontSize = '12px';
 				output.document.body.appendChild( status );
 
-				const pathtracer = new ViewportPathtracer( renderer );
-				pathtracer.init( scene, camera );
-				pathtracer.setSize( imageWidth.getValue(), imageHeight.getValue());
+				const pathTracer = new ViewportPathtracer( renderer );
+				pathTracer.init( scene, camera );
+				pathTracer.setSize( imageWidth.getValue(), imageHeight.getValue() );
+
+				const maxSamples = Math.max( pathTracerMinSamples, Math.min( pathTracerMaxSamples, samplesNumber.getValue() ) );
 
 				function animate() {
 
 					if ( output.closed === true ) return;
 
-					requestAnimationFrame( animate );
+					const samples = Math.floor( pathTracer.getSamples() ) + 1;
 
-					pathtracer.update();
+					if ( samples < maxSamples ) {
 
-					// status.textContent = Math.floor( samples );
+						requestAnimationFrame( animate );
+
+					}
+
+					pathTracer.update();
+
+					const progress = Math.floor( samples / maxSamples * 100 );
+
+					status.textContent = `${ samples } / ${ maxSamples } ( ${ progress }% )`;
+
+					if ( progress === 100 ) {
+
+						status.textContent += ' ✓';
+
+					}
 
 				}
 
 				animate();
 
 				break;
-			*/
 
 		}
 

@@ -20,6 +20,12 @@ class ContextNode extends Node {
 
 	}
 
+	analyze( builder ) {
+
+		this.node.build( builder );
+
+	}
+
 	setup( builder ) {
 
 		const previousContext = builder.getContext();

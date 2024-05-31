@@ -77,34 +77,35 @@ export * from './shadernode/ShaderNode.js';
 // accessors
 export { TBNViewMatrix, parallaxDirection, parallaxUV, transformedBentNormalView } from './accessors/AccessorsUtils.js';
 export { default as UniformsNode, uniforms } from './accessors/UniformsNode.js';
-export { default as BitangentNode, bitangentGeometry, bitangentLocal, bitangentView, bitangentWorld, transformedBitangentView, transformedBitangentWorld } from './accessors/BitangentNode.js';
+export * from './accessors/BitangentNode.js';
 export { default as BufferAttributeNode, bufferAttribute, dynamicBufferAttribute, instancedBufferAttribute, instancedDynamicBufferAttribute } from './accessors/BufferAttributeNode.js';
 export { default as BufferNode, buffer } from './accessors/BufferNode.js';
-export { default as CameraNode, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraNormalMatrix, cameraWorldMatrix, cameraPosition, cameraNear, cameraFar, cameraLogDepth } from './accessors/CameraNode.js';
+export * from './accessors/CameraNode.js';
 export { default as VertexColorNode, vertexColor } from './accessors/VertexColorNode.js';
 export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTextureNode.js';
 export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
 export { default as BatchNode, batch } from './accessors/BatchNode.js';
-export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecular, materialSpecularStrength, materialReflectivity, materialRoughness, materialMetalness, materialNormal, materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialRotation, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineWidth, materialLineDashOffset, materialPointWidth, materialAnisotropy, materialAnisotropyVector } from './accessors/MaterialNode.js';
+export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecular, materialSpecularStrength, materialReflectivity, materialRoughness, materialMetalness, materialNormal, materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialRotation, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineWidth, materialLineDashOffset, materialPointWidth, materialAnisotropy, materialAnisotropyVector, materialDispersion } from './accessors/MaterialNode.js';
 export { default as MaterialReferenceNode, materialReference } from './accessors/MaterialReferenceNode.js';
 export { default as RendererReferenceNode, rendererReference } from './accessors/RendererReferenceNode.js';
 export { default as MorphNode, morphReference } from './accessors/MorphNode.js';
 export { default as TextureBicubicNode, textureBicubic } from './accessors/TextureBicubicNode.js';
-export { default as ModelNode, modelDirection, modelViewMatrix, modelNormalMatrix, modelWorldMatrix, modelPosition, modelViewPosition, modelScale } from './accessors/ModelNode.js';
+export { default as ModelNode, modelDirection, modelViewMatrix, modelNormalMatrix, modelWorldMatrix, modelPosition, modelViewPosition, modelScale, modelWorldMatrixInverse } from './accessors/ModelNode.js';
 export { default as ModelViewProjectionNode, modelViewProjection } from './accessors/ModelViewProjectionNode.js';
-export { default as NormalNode, normalGeometry, normalLocal, normalView, normalWorld, transformedNormalView, transformedNormalWorld, transformedClearcoatNormalView } from './accessors/NormalNode.js';
+export * from './accessors/NormalNode.js';
 export { default as Object3DNode, objectDirection, objectViewMatrix, objectNormalMatrix, objectWorldMatrix, objectPosition, objectScale, objectViewPosition } from './accessors/Object3DNode.js';
 export { default as PointUVNode, pointUV } from './accessors/PointUVNode.js';
-export { default as PositionNode, positionGeometry, positionLocal, positionWorld, positionWorldDirection, positionView, positionViewDirection } from './accessors/PositionNode.js';
+export * from './accessors/PositionNode.js';
 export { default as ReferenceNode, reference, referenceBuffer } from './accessors/ReferenceNode.js';
-export { default as ReflectVectorNode, reflectVector } from './accessors/ReflectVectorNode.js';
+export * from './accessors/ReflectVectorNode.js';
 export { default as SkinningNode, skinning } from './accessors/SkinningNode.js';
 export { default as SceneNode, backgroundBlurriness, backgroundIntensity } from './accessors/SceneNode.js';
 export { default as StorageBufferNode, storage, storageObject } from './accessors/StorageBufferNode.js';
-export { default as TangentNode, tangentGeometry, tangentLocal, tangentView, tangentWorld, transformedTangentView, transformedTangentWorld } from './accessors/TangentNode.js';
+export * from './accessors/TangentNode.js';
 export { default as TextureNode, texture, textureLoad, /*textureLevel,*/ sampler } from './accessors/TextureNode.js';
-export { default as TextureStoreNode, textureStore } from './accessors/TextureStoreNode.js';
-export { default as UVNode, uv } from './accessors/UVNode.js';
+export { default as StorageTextureNode, storageTexture, textureStore, storageTextureReadOnly, storageTextureReadWrite } from './accessors/StorageTextureNode.js';
+export { default as Texture3DNode, texture3D } from './accessors/Texture3DNode.js';
+export * from './accessors/UVNode.js';
 export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
 
 // display
@@ -125,7 +126,7 @@ export { default as GaussianBlurNode, gaussianBlur } from './display/GaussianBlu
 export { default as AfterImageNode, afterImage } from './display/AfterImageNode.js';
 export { default as AnamorphicNode, anamorphic } from './display/AnamorphicNode.js';
 
-export { default as PassNode, pass, depthPass } from './display/PassNode.js';
+export { default as PassNode, pass, texturePass, depthPass } from './display/PassNode.js';
 
 // code
 export { default as ExpressionNode, expression } from './code/ExpressionNode.js';

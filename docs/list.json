@@ -378,7 +378,8 @@
 			},
 
 			"Objects": {
-				"Lensflare": "examples/en/objects/Lensflare"
+				"Lensflare": "examples/en/objects/Lensflare",
+				"Sky": "examples/en/objects/Sky"
 			},
 
 			"Post-Processing": {
@@ -402,6 +403,10 @@
 
 			"Misc": {
 				"Timer": "examples/en/misc/Timer"
+			},
+
+			"Modifiers": {
+				"EdgeSplit": "examples/en/modifiers/EdgeSplitModifier"
 			},
 
 			"ConvexHull": {

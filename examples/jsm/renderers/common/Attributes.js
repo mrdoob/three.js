@@ -22,6 +22,8 @@ class Attributes extends DataMap {
 
 		}
 
+		return attributeData;
+
 	}
 
 	update( attribute, type ) {

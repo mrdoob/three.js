@@ -19,7 +19,7 @@
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p>
 			[page:Object parameters] - (optional) object with properties defining the
-			renderer's behaviour. The constructor also accepts no parameters at all.
+			renderer's behavior. The constructor also accepts no parameters at all.
 			In all cases, it will assume sane defaults when parameters are missing.
 			The following are valid parameters:<br /><br />
 
@@ -367,7 +367,7 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined copyFramebufferToTexture]( [param:Vector2 position], [param:FramebufferTexture texture], [param:Number level] )
+			[method:undefined copyFramebufferToTexture]( [param:FramebufferTexture texture], [param:Vector2 position], [param:Number level] )
 		</h3>
 		<p>
 			Copies pixels from the current WebGLFramebuffer into a 2D texture. Enables
@@ -376,19 +376,20 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )
+			[method:undefined copyTextureToTexture]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Box2 srcRegion], [param:Vector2 dstPosition], [param:Number level] )
 		</h3>
 		<p>
-			Copies all pixels of a texture to an existing texture starting from the
-			given position. Enables access to
+			Copies the pixels of a texture in the bounds '[page:Box2 srcRegion]' in
+			the destination texture starting from the given position. Enables access
+			to
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D WebGLRenderingContext.texSubImage2D].
 		</p>
 
 		<h3>
-			[method:undefined copyTextureToTexture3D]( [param:Box3 sourceBox], [param:Vector3 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )
+			[method:undefined copyTextureToTexture3D]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Box3 srcRegion], [param:Vector3 dstPosition], [param:Number level] )
 		</h3>
 		<p>
-			Copies the pixels of a texture in the bounds '[page:Box3 sourceBox]' in
+			Copies the pixels of a texture in the bounds '[page:Box3 srcRegion]' in
 			the destination texture starting from the given position. Enables access
 			to
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texSubImage3D WebGL2RenderingContext.texSubImage3D].
@@ -492,6 +493,13 @@ document.body.appendChild( renderer.domElement );
 			and GPU upload overhead).
 		</p>
 
+		<h3>[method:undefined initRenderTarget]( [param:WebGLRenderTarget target] )</h3>
+		<p>
+			Initializes the given WebGLRenderTarget memory. Useful for initializing a render
+			target so data can be copied into it using [page:WebGLRenderer.copyTextureToTexture .copyTextureToTexture]
+			before it has been rendered to.
+		</p>
+
 		<h3>[method:undefined resetGLState]( )</h3>
 		<p>
 			Reset the GL state to default. Called internally if the WebGL context is
@@ -512,13 +520,20 @@ document.body.appendChild( renderer.domElement );
 			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().
 		</p>
 		<p>
-			See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu]
-			example.
-		</p>
-		<p>
 			For reading out a [page:WebGLCubeRenderTarget WebGLCubeRenderTarget] use
 			the optional parameter activeCubeFaceIndex to determine which face should
 			be read.
+		</p>
+
+		<h3>
+			[method:Promise readRenderTargetPixelsAsync]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer], [param:Integer activeCubeFaceIndex] )
+		</h3>
+		<p>
+			Asynchronous, non-blocking version of [page:WebGLRenderer.readRenderTargetPixels .readRenderTargetPixels]. The
+			returned promise resolves once the buffer data is ready to be used.
+		</p>
+		<p>
+			See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.
 		</p>
 
 		<h3>

@@ -36,7 +36,6 @@
 			let cloudTexture = null;
 
 			init();
-			animate();
 
 			function generateCloudTexture( size, scaleFactor = 1.0 ) {
 
@@ -74,6 +73,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -329,8 +329,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				const time = performance.now();
 				if ( time - prevTime > 1500.0 && curr < totalCount ) {
 
@@ -345,7 +343,7 @@
 					const scaleFactor = ( Math.random() + 0.5 ) * 0.5;
 					const source = generateCloudTexture( perElementPaddedSize, scaleFactor );
 
-					renderer.copyTextureToTexture3D( box, position, source, cloudTexture );
+					renderer.copyTextureToTexture3D( source, cloudTexture, box, position );
 
 					prevTime = time;
 

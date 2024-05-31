@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import { TGALoader } from 'three/addons/loaders/TGALoader.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
-import { SetSceneCommand } from './commands/SetSceneCommand.js';
 
 import { LoaderUtils } from './LoaderUtils.js';
 
@@ -70,7 +69,7 @@ function Loader( editor ) {
 		const reader = new FileReader();
 		reader.addEventListener( 'progress', function ( event ) {
 
-			const size = '(' + Math.floor( event.total / 1000 ).format() + ' KB)';
+			const size = '(' + editor.utils.formatNumber( Math.floor( event.total / 1000 ) ) + ' KB)';
 			const progress = Math.floor( ( event.loaded / event.total ) * 100 ) + '%';
 
 			console.log( 'Loading', filename, size, progress );
@@ -99,7 +98,7 @@ function Loader( editor ) {
 
 					}, function ( error ) {
 
-						console.error( error )
+						console.error( error );
 
 					} );
 
@@ -586,6 +585,7 @@ function Loader( editor ) {
 					//
 
 					const group = new THREE.Group();
+					group.name = filename;
 					group.scale.multiplyScalar( 0.1 );
 					group.scale.y *= - 1;
 
@@ -715,7 +715,7 @@ function Loader( editor ) {
 
 					const result = new VRMLLoader().parse( contents );
 
-					editor.execute( new SetSceneCommand( editor, result ) );
+					editor.execute( new AddObjectCommand( editor, result ) );
 
 				}, false );
 				reader.readAsText( file );
@@ -828,15 +828,7 @@ function Loader( editor ) {
 
 				loader.parse( data, function ( result ) {
 
-					if ( result.isScene ) {
-
-						editor.execute( new SetSceneCommand( editor, result ) );
-
-					} else {
-
-						editor.execute( new AddObjectCommand( editor, result ) );
-
-					}
+					editor.execute( new AddObjectCommand( editor, result ) );
 
 				} );
 
@@ -858,6 +850,24 @@ function Loader( editor ) {
 
 		const zip = unzipSync( new Uint8Array( contents ) );
 
+		const manager = new THREE.LoadingManager();
+		manager.setURLModifier( function ( url ) {
+
+			const file = zip[ url ];
+
+			if ( file ) {
+
+				console.log( 'Loading', url );
+
+				const blob = new Blob( [ file.buffer ], { type: 'application/octet-stream' } );
+				return URL.createObjectURL( blob );
+
+			}
+
+			return url;
+
+		} );
+
 		// Poly
 
 		if ( zip[ 'model.obj' ] && zip[ 'materials.mtl' ] ) {
@@ -865,9 +875,11 @@ function Loader( editor ) {
 			const { MTLLoader } = await import( 'three/addons/loaders/MTLLoader.js' );
 			const { OBJLoader } = await import( 'three/addons/loaders/OBJLoader.js' );
 
-			const materials = new MTLLoader().parse( strFromU8( zip[ 'materials.mtl' ] ) );
+			const materials = new MTLLoader( manager ).parse( strFromU8( zip[ 'materials.mtl' ] ) );
 			const object = new OBJLoader().setMaterials( materials ).parse( strFromU8( zip[ 'model.obj' ] ) );
+
 			editor.execute( new AddObjectCommand( editor, object ) );
+			return;
 
 		}
 
@@ -876,24 +888,6 @@ function Loader( editor ) {
 		for ( const path in zip ) {
 
 			const file = zip[ path ];
-
-			const manager = new THREE.LoadingManager();
-			manager.setURLModifier( function ( url ) {
-
-				const file = zip[ url ];
-
-				if ( file ) {
-
-					console.log( 'Loading', url );
-
-					const blob = new Blob( [ file.buffer ], { type: 'application/octet-stream' } );
-					return URL.createObjectURL( blob );
-
-				}
-
-				return url;
-
-			} );
 
 			const extension = path.split( '.' ).pop().toLowerCase();
 
@@ -941,7 +935,7 @@ function Loader( editor ) {
 				{
 
 					const loader = await createGLTFLoader( manager );
-					
+
 					loader.parse( strFromU8( file ), '', function ( result ) {
 
 						const scene = result.scene;

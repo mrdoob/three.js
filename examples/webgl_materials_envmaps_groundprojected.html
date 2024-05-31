@@ -147,15 +147,14 @@
 
 				const gui = new GUI();
 
-				gui.add( params, 'enabled' ).name( "Grounded" ).onChange( function ( value ) {
+				gui.add( params, 'enabled' ).name( 'Grounded' ).onChange( function ( value ) {
 
 					if ( value ) {
 
 						scene.add( skybox );
 						scene.background = null;
 
-					}
-					else {
+					} else {
 
 						scene.remove( skybox );
 						scene.background = scene.environment;
@@ -165,7 +164,9 @@
 					render();
 
 				} );
+
 				gui.open();
+			
 			}
 
 			function onWindowResize() {

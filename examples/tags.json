@@ -6,6 +6,7 @@
 	"misc_controls_trackball": [ "rotation" ],
 	"misc_controls_transform": [ "scale", "rotate", "translate" ],
 	"physics_ammo_cloth": [ "integration" ],
+	"physics_jolt_instancing": [ "external" ],
 	"physics_rapier_instancing": [ "external" ],
 	"webgl_clipping": [ "solid" ],
 	"webgl_clipping_advanced": [ "solid" ],
