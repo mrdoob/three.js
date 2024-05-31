@@ -60,16 +60,16 @@
 				}
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
-				camera.position.z = 2;
+				camera.position.z = 1.5;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
 				// lights
 
-				const sphereGeometry = new THREE.SphereGeometry( 0.02, 16, 8 );
+				const sphereGeometry = new THREE.SphereGeometry( 0.01, 16, 8 );
 
-				const addLight = ( hexColor, intensity = 2, distance = 1 ) => {
+				const addLight = ( hexColor ) => {
 
 					const material = new MeshStandardNodeMaterial();
 					material.colorNode = color( hexColor );
@@ -77,7 +77,7 @@
 
 					const mesh = new THREE.Mesh( sphereGeometry, material );
 
-					const light = new THREE.PointLight( hexColor, intensity, distance );
+					const light = new THREE.PointLight( hexColor, 0.1, 0.8 );
 					light.add( mesh );
 
 					scene.add( light );
@@ -98,7 +98,7 @@
 
 				const points = [];
 
-				for ( let i = 0; i < 3000; i ++ ) {
+				for ( let i = 0; i < 1_000_000; i ++ ) {
 
 					const point = new THREE.Vector3().random().subScalar( 0.5 ).multiplyScalar( 2 );
 					points.push( point );
@@ -126,7 +126,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, 1 );
+				renderer.toneMappingNode = toneMapping( THREE.NeutralToneMapping, 1 );
 				document.body.appendChild( renderer.domElement );
 
 				// controls
@@ -166,6 +166,8 @@
 				light3.position.x = Math.sin( time * 0.7 ) * scale;
 				light3.position.y = Math.cos( time * 0.3 ) * scale;
 				light3.position.z = Math.sin( time * 0.5 ) * scale;
+
+				scene.rotation.y = time * 0.6;
 
 				renderer.render( scene, camera );
 
