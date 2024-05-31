@@ -62,9 +62,16 @@ class WebGPUBindingUtils {
 			} else if ( binding.isSampledTexture && binding.store ) {
 
 				const format = this.backend.get( binding.texture ).texture.format;
+
+				bindingGPU.storageTexture = { format }; // GPUStorageTextureBindingLayout
+
 				const access = binding.access;
 
-				bindingGPU.storageTexture = { format, access }; // GPUStorageTextureBindingLayout
+				if ( access ) {
+
+					bindingGPU.storageTexture.access = access;
+
+				}
 
 			} else if ( binding.isSampledTexture ) {
 
