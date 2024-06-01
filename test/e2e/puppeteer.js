@@ -55,6 +55,7 @@ const exceptionList = [
 	'webxr_vr_sandbox',
 	'webxr_vr_video',
 	'webxr_xr_ballshooter',
+	'webxr_xr_dragging_custom_depth',
 
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
@@ -144,8 +145,8 @@ const exceptionList = [
 	'webgpu_custom_fog',
 	'webgpu_instancing_morph',
 	'webgpu_mesh_batch',
-	'webgpu_renderbundle',
 	'webgpu_texturegrad',
+	'webgpu_performance_renderbundle',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',
