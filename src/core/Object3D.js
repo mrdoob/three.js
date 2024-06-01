@@ -609,7 +609,7 @@ class Object3D extends EventDispatcher {
 
 		}
 
-		// update children
+		// make sure descendants are updated if required
 
 		const children = this.children;
 
@@ -617,11 +617,7 @@ class Object3D extends EventDispatcher {
 
 			const child = children[ i ];
 
-			if ( child.matrixWorldAutoUpdate === true || force === true ) {
-
-				child.updateMatrixWorld( force );
-
-			}
+			child.updateMatrixWorld( force );
 
 		}
 
