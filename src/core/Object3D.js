@@ -589,13 +589,17 @@ class Object3D extends EventDispatcher {
 
 		if ( this.matrixWorldNeedsUpdate || force ) {
 
-			if ( this.parent === null ) {
+			if ( this.matrixWorldAutoUpdate === true ) {
 
-				this.matrixWorld.copy( this.matrix );
+				if ( this.parent === null ) {
 
-			} else {
+					this.matrixWorld.copy( this.matrix );
 
-				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+				} else {
+
+					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+
+				}
 
 			}
 

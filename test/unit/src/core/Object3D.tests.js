@@ -987,7 +987,7 @@ export default QUnit.module( 'Core', () => {
 
 			parent.position.set( 3, 2, 1 );
 			parent.updateMatrix();
-			parent.matrixWorldNeedsUpdate = false;
+			parent.matrixWorldNeedsUpdate = true;
 
 			child.matrixWorldAutoUpdate = false;
 			parent.updateMatrixWorld();
