@@ -1015,6 +1015,7 @@ class ObjectLoader extends Loader {
 
 			if ( data.matrixAutoUpdate !== undefined ) object.matrixAutoUpdate = data.matrixAutoUpdate;
 			if ( object.matrixAutoUpdate ) object.matrix.decompose( object.position, object.quaternion, object.scale );
+			object.matrixNeedsUpdate = false;
 
 		} else {
 
