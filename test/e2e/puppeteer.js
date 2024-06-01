@@ -101,8 +101,6 @@ const exceptionList = [
 	'webgl_shadowmap_progressive',
 	'webgl_test_memory2',
 	'webgl_tiled_forward',
-	'webgl2_volume_instancing',
-	'webgl2_multisampled_renderbuffers',
 	'webgl_points_dynamic',
 	'webgpu_multisampled_renderbuffers',
 
