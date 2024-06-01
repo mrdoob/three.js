@@ -650,10 +650,9 @@ class Object3D extends EventDispatcher {
 
 			this.matrix.compose( this.position, this.quaternion, this.scale );
 			this.matrixNeedsUpdate = false;
+			this.matrixWorldNeedsUpdate = true;
 
 		}
-
-		this.matrixWorldNeedsUpdate = true;
 
 	}
 
