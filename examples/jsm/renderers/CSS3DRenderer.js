@@ -273,13 +273,13 @@ class CSS3DRenderer {
 
 			}
 
-			let stopTraversal = false;
+			let propagate = true;
 
 			if ( object.isCSS3DObject ) {
 
 				const visible = object.layers.test( camera.layers );
 
-				if ( visible === false && object.layers.recursive === true ) stopTraversal = true;
+				if ( visible === false && object.layers.recursive === true ) propagate = false;
 
 				const element = object.element;
 				element.style.display = visible === true ? '' : 'none';
@@ -339,7 +339,7 @@ class CSS3DRenderer {
 
 			}
 
-			if ( stopTraversal === false ) {
+			if ( propagate === true ) {
 
 				for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 

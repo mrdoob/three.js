@@ -933,15 +933,15 @@ class WebGLRenderer {
 
 			// gather lights from both the target scene and the new object that will be added to the scene.
 
-			let stopTraversal = false;
+			let propagate = true;
 
 			targetScene.traverseVisible( function ( object ) {
 
 				const visible = object.layers.test( camera.layers );
 
-				if ( visible === false && object.layers.recursive === true ) stopTraversal = true;
+				if ( visible === false && object.layers.recursive === true ) propagate = false;
 
-				if ( object.isLight && stopTraversal === false ) {
+				if ( object.isLight && propagate === true ) {
 
 					currentRenderState.pushLight( object );
 
@@ -957,15 +957,15 @@ class WebGLRenderer {
 
 			if ( scene !== targetScene ) {
 
-				let stopTraversal = false;
+				let propagate = true;
 
 				scene.traverseVisible( function ( object ) {
 
 					const visible = object.layers.test( camera.layers );
 
-					if ( visible === false && object.layers.recursive === true ) stopTraversal = true;
+					if ( visible === false && object.layers.recursive === true ) propagate = false;
 
-					if ( object.isLight && stopTraversal === false ) {
+					if ( object.isLight && propagate === true ) {
 
 						currentRenderState.pushLight( object );
 
@@ -1317,9 +1317,9 @@ class WebGLRenderer {
 
 			const visible = object.layers.test( camera.layers );
 
-			let stopTraversal = false;
+			let propagate = true;
 
-			if ( visible === false && object.layers.recursive === true ) stopTraversal = true;
+			if ( visible === false && object.layers.recursive === true ) propagate = false;
 
 			if ( visible ) {
 
@@ -1419,7 +1419,7 @@ class WebGLRenderer {
 
 			}
 
-			if ( stopTraversal === false ) {
+			if ( propagate === true ) {
 
 				const children = object.children;
 

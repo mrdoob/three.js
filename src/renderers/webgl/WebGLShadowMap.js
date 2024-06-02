@@ -334,9 +334,9 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		const visible = object.layers.test( camera.layers );
 
-		let stopTraversal = false;
+		let propagate = true;
 
-		if ( visible === false && object.layers.recursive === true ) stopTraversal = true;
+		if ( visible === false && object.layers.recursive === true ) propagate = false;
 
 		if ( visible && ( object.isMesh || object.isLine || object.isPoints ) ) {
 
@@ -386,7 +386,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		}
 
-		if ( stopTraversal === false ) {
+		if ( propagate === true ) {
 
 			const children = object.children;
 

@@ -255,15 +255,15 @@ class Renderer {
 		// include lights from target scene
 		if ( targetScene !== scene ) {
 
-			let stopTraversal = false;
+			let propagate = true;
 
 			targetScene.traverseVisible( function ( object ) {
 
 				const visible = object.layers.test( camera.layers );
 
-				if ( visible === false && object.layers.recursive === true ) stopTraversal = true;
+				if ( visible === false && object.layers.recursive === true ) propagate = false;
 
-				if ( object.isLight && stopTraversal === false ) {
+				if ( object.isLight && propagate === true ) {
 
 					renderList.pushLight( object );
 
@@ -1196,9 +1196,9 @@ class Renderer {
 
 		const visible = object.layers.test( camera.layers );
 
-		let stopTraversal = false;
+		let propagate = true;
 
-		if ( visible === false && object.layers.recursive === true ) stopTraversal = true;
+		if ( visible === false && object.layers.recursive === true ) propagate = false;
 
 		if ( visible ) {
 
@@ -1286,7 +1286,7 @@ class Renderer {
 
 		}
 
-		if ( stopTraversal === false ) {
+		if ( propagate === true ) {
 
 			if ( object.static === true ) {
 

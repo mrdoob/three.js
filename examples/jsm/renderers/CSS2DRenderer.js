@@ -136,13 +136,13 @@ class CSS2DRenderer {
 
 			}
 
-			let stopTraversal = false;
+			let propagate = true;
 
 			if ( object.isCSS2DObject ) {
 
 				const layerTest = object.layers.test( camera.layers );
 
-				if ( layerTest === false && object.layers.recursive === true ) stopTraversal = true;
+				if ( layerTest === false && object.layers.recursive === true ) propagate = false;
 
 				_vector.setFromMatrixPosition( object.matrixWorld );
 				_vector.applyMatrix4( _viewProjectionMatrix );
@@ -176,7 +176,7 @@ class CSS2DRenderer {
 
 			}
 
-			if ( stopTraversal === false ) {
+			if ( propagate === true ) {
 
 				for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
