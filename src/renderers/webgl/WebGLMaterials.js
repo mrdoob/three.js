@@ -121,6 +121,10 @@ function WebGLMaterials( renderer, properties ) {
 
 		uniforms.opacity.value = material.opacity;
 
+		const materialProperties = properties.get( material );
+
+		uniforms.primaryGradingCDL.value.copy( materialProperties.primaryGradingCDL );
+
 		if ( material.color ) {
 
 			uniforms.diffuse.value.copy( material.color );
@@ -213,8 +217,6 @@ function WebGLMaterials( renderer, properties ) {
 			uniforms.alphaTest.value = material.alphaTest;
 
 		}
-
-		const materialProperties = properties.get( material );
 
 		const envMap = materialProperties.envMap;
 		const envMapRotation = materialProperties.envMapRotation;

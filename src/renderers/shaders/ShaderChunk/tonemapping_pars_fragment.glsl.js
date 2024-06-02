@@ -1,10 +1,28 @@
-export default /* glsl */`
+export default /* glsl */ `
 #ifndef saturate
 // <common> may have defined saturate() already
 #define saturate( a ) clamp( a, 0.0, 1.0 )
 #endif
 
 uniform float toneMappingExposure;
+uniform vec4 primaryGradingCDL;
+
+// Applies ASC CDL v1.2 color grade to input color in an unspecified log or linear space.
+vec3 applyPrimaryGradingCDL( vec3 color ) {
+
+	float slope = primaryGradingCDL.x;
+	float offset = primaryGradingCDL.y;
+	float power = primaryGradingCDL.z;
+	float saturation = primaryGradingCDL.w;
+
+	// Fixed Rec. 709 weights for saturation as specified by ASC CDL v1.2.
+	float luma = dot( color, vec3( 0.2126, 0.7152, 0.0722 ) );
+
+	color = pow( max( color * slope + offset, 0.0 ), vec3( power ) );
+
+	return max( luma + saturation * ( color - luma ), 0.0 );
+
+}
 
 // exposure only
 vec3 LinearToneMapping( vec3 color ) {
@@ -62,6 +80,8 @@ vec3 ACESFilmicToneMapping( vec3 color ) {
 	color *= toneMappingExposure / 0.6;
 
 	color = ACESInputMat * color;
+
+	color = applyPrimaryGradingCDL( color );
 
 	// Apply RRT and ODT
 	color = RRTAndODTFit( color );
@@ -149,7 +169,7 @@ vec3 AgXToneMapping( vec3 color ) {
 	color = agxDefaultContrastApprox( color );
 
 	// Apply AgX look
-	// v = agxLook(v, look);
+	color = applyPrimaryGradingCDL( color );
 
 	color = AgXOutsetMatrix * color;
 
