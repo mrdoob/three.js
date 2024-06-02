@@ -111,7 +111,7 @@ function intersect( object, raycaster, intersects, recursive ) {
 
 	} else if ( object.layers.recursive === true ) {
 
-		propagate = true;
+		propagate = false;
 
 	}
 
