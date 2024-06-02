@@ -84,6 +84,14 @@ class PointLightHelper extends Mesh {
 
 	}
 
+	updateMatrixWorld( force ) {
+
+		this.update();
+
+		return super.updateMatrixWorld( force );
+
+	}
+
 }
 
 
