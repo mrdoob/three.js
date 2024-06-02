@@ -83,6 +83,9 @@ class Object3D extends EventDispatcher {
 		const quaternion = new Quaternion();
 		const scale = new Vector3( 1, 1, 1 );
 
+		const matrix = new Matrix4();
+		const matrixWorld = new Matrix4();
+
 		const self = this;
 		let rotationNeedsUpdate = false;
 		let quaternionNeedsUpdate = false;
@@ -131,10 +134,17 @@ class Object3D extends EventDispatcher {
 
 		}
 
+		function onLocalMatrixWrite() {
+
+			self.matrixWorldNeedsUpdate = true;
+
+		}
+
 		listenToProperties( position, [ 'x', 'y', 'z' ], undefined, onWrite );
 		listenToProperties( rotation, [ 'x', 'y', 'z', 'order' ], onRotationRead, onRotationWrite );
 		listenToProperties( quaternion, [ 'x', 'y', 'z', 'w' ], onQuaternionRead, onQuaternionWrite );
 		listenToProperties( scale, [ 'x', 'y', 'z' ], undefined, onWrite );
+		listenToProperties( matrix.elements, Array.from( { length: 16 }, ( _, i ) => i ), undefined, onLocalMatrixWrite );
 
 		Object.defineProperties( this, {
 			position: {
@@ -165,8 +175,8 @@ class Object3D extends EventDispatcher {
 			}
 		} );
 
-		this.matrix = new Matrix4();
-		this.matrixWorld = new Matrix4();
+		this.matrix = matrix;
+		this.matrixWorld = matrixWorld;
 
 		this.matrixAutoUpdate = Object3D.DEFAULT_MATRIX_AUTO_UPDATE;
 
