@@ -205,6 +205,8 @@ class Object3D extends EventDispatcher {
 
 		this.matrix.decompose( this.position, this.quaternion, this.scale );
 
+		this.matrixWorldNeedsUpdate = true;
+
 	}
 
 	applyQuaternion( q ) {
