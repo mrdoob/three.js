@@ -3,7 +3,7 @@ export default /* glsl */`
 
 	uniform float reflectivity;
 
-	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( LAMBERT ) || defined (SPHERELAMBERT)
+	#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( PHONG ) || defined( LAMBERT ) || defined( SPHERELAMBERT )
 
 		#define ENV_WORLDPOS
 
