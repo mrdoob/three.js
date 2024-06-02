@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { UIPanel, UIRow, UIText, UIInput, UIButton, UISpan } from './libs/ui.js';
+import { UIPanel, UIRow, UIText, UIInput, UIButton, UISpan, UITextArea } from './libs/ui.js';
 
 import { SetGeometryValueCommand } from './commands/SetGeometryValueCommand.js';
 
@@ -145,6 +145,53 @@ function SidebarGeometry( editor ) {
 	geometryBoundingBoxRow.add( geometryBoundingBox );
 	container.add( geometryBoundingBoxRow );
 
+	// userData
+
+	const geometryUserDataRow = new UIRow();
+	const geometryUserData = new UITextArea().setValue( '{}' ).setWidth( '150px' ).setHeight( '40px' ).setFontSize( '12px' ).onChange( function () {
+
+		try {
+
+			const userData = JSON.parse( geometryUserData.getValue() );
+
+			if ( JSON.stringify( editor.selected.geometry.userData ) != JSON.stringify( userData ) ) {
+
+				editor.execute( new SetGeometryValueCommand( editor, editor.selected, 'userData', userData ) );
+
+				build();
+
+			}
+
+		} catch ( exception ) {
+
+			console.warn( exception );
+
+		}
+
+	} );
+	geometryUserData.onKeyUp( function () {
+
+		try {
+
+			JSON.parse( geometryUserData.getValue() );
+
+			geometryUserData.dom.classList.add( 'success' );
+			geometryUserData.dom.classList.remove( 'fail' );
+
+		} catch ( error ) {
+
+			geometryUserData.dom.classList.remove( 'success' );
+			geometryUserData.dom.classList.add( 'fail' );
+
+		}
+
+	} );
+
+	geometryUserDataRow.add( new UIText( strings.getKey( 'sidebar/geometry/userdata' ) ).setClass( 'Label' ) );
+	geometryUserDataRow.add( geometryUserData );
+
+	container.add( geometryUserDataRow );
+
 	// Helpers
 
 	const helpersRow = new UIRow().setMarginLeft( '120px' );
@@ -246,6 +293,8 @@ function SidebarGeometry( editor ) {
 			geometryBoundingBox.setInnerHTML( `${x}<br/>${y}<br/>${z}` );
 
 			helpersRow.setDisplay( geometry.hasAttribute( 'normal' ) ? '' : 'none' );
+
+			geometryUserData.setValue( JSON.stringify( geometry.userData, null, '  ' ) );
 
 		} else {
 

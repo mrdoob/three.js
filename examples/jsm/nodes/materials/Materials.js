@@ -17,3 +17,4 @@ export { default as MeshMatcapNodeMaterial } from './MeshMatcapNodeMaterial.js';
 export { default as PointsNodeMaterial } from './PointsNodeMaterial.js';
 export { default as SpriteNodeMaterial } from './SpriteNodeMaterial.js';
 export { default as ShadowNodeMaterial } from './ShadowNodeMaterial.js';
+export { default as VolumeNodeMaterial } from './VolumeNodeMaterial.js';

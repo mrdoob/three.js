@@ -80,7 +80,7 @@ class NodeBuilder {
 		this.computeShader = null;
 
 		this.flowNodes = { vertex: [], fragment: [], compute: [] };
-		this.flowCode = { vertex: '', fragment: '', compute: [] };
+		this.flowCode = { vertex: '', fragment: '', compute: '' };
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.bindings = { vertex: [], fragment: [], compute: [] };
@@ -415,12 +415,6 @@ class NodeBuilder {
 
 	}
 
-	generateMethod( method ) {
-
-		return method;
-
-	}
-
 	hasGeometryAttribute( name ) {
 
 		return this.geometry && this.geometry.getAttribute( name ) !== undefined;
@@ -473,7 +467,7 @@ class NodeBuilder {
 
 	isReference( type ) {
 
-		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture' || type === 'storageTexture';
+		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D';
 
 	}
 
@@ -498,6 +492,16 @@ class NodeBuilder {
 
 	}
 
+	getElementType( type ) {
+
+		if ( type === 'mat2' ) return 'vec2';
+		if ( type === 'mat3' ) return 'vec3';
+		if ( type === 'mat4' ) return 'vec4';
+
+		return this.getComponentType( type );
+
+	}
+
 	getComponentType( type ) {
 
 		type = this.getVectorType( type );
@@ -519,7 +523,7 @@ class NodeBuilder {
 	getVectorType( type ) {
 
 		if ( type === 'color' ) return 'vec3';
-		if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' ) return 'vec4';
+		if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D' ) return 'vec4';
 
 		return type;
 
@@ -907,7 +911,9 @@ class NodeBuilder {
 
 		const previousFlow = this.flow;
 		const previousVars = this.vars;
+		const previousCache = this.cache;
 		const previousBuildStage = this.buildStage;
+		const previousStack = this.stack;
 
 		const flow = {
 			code: ''
@@ -915,6 +921,8 @@ class NodeBuilder {
 
 		this.flow = flow;
 		this.vars = {};
+		this.cache = new NodeCache();
+		this.stack = stack();
 
 		for ( const buildStage of defaultBuildStages ) {
 
@@ -928,6 +936,9 @@ class NodeBuilder {
 
 		this.flow = previousFlow;
 		this.vars = previousVars;
+		this.cache = previousCache;
+		this.stack = previousStack;
+
 		this.setBuildStage( previousBuildStage );
 
 		return flow;

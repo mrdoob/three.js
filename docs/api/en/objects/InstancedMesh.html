@@ -14,7 +14,7 @@
 		<p class="desc">
 			A special version of [page:Mesh] with instanced rendering support. Use
 			[name] if you have to render a large number of objects with the same
-			geometry and material but with different world transformations. The usage
+			geometry and material(s) but with different world transformations. The usage
 			of [name] will help you to reduce the number of draw calls and thus
 			improve the overall rendering performance in your application.
 		</p>
@@ -34,8 +34,8 @@
 		</h3>
 		<p>
 			[page:BufferGeometry geometry] - an instance of [page:BufferGeometry].<br />
-			[page:Material material] - an instance of [page:Material]. Default is a
-			new [page:MeshBasicMaterial].<br />
+			[page:Material material] — a single or an array of
+			[page:Material]. Default is a new [page:MeshBasicMaterial].<br />
 			[page:Integer count] - the number of instances.<br />
 		</p>
 

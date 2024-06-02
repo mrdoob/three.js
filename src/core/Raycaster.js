@@ -101,11 +101,13 @@ function ascSort( a, b ) {
 
 function intersect( object, raycaster, intersects, recursive ) {
 
-	let stopTraversal = false;
+	let propagate = true;
 
 	if ( object.layers.test( raycaster.layers ) ) {
 
-		stopTraversal = object.raycast( raycaster, intersects );
+		const result = object.raycast( raycaster, intersects );
+
+		if ( result === false ) propagate = false;
 
 	} else if ( object.layers.recursive === true ) {
 
@@ -113,7 +115,7 @@ function intersect( object, raycaster, intersects, recursive ) {
 
 	}
 
-	if ( recursive === true && stopTraversal !== true ) {
+	if ( propagate === true && recursive === true ) {
 
 		const children = object.children;
 
