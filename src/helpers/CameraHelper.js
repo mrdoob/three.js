@@ -107,9 +107,6 @@ class CameraHelper extends LineSegments {
 		this.camera = camera;
 		if ( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
 
-		this.matrix = camera.matrixWorld;
-		this.matrixAutoUpdate = false;
-
 		this.pointMap = pointMap;
 
 		this.update();
@@ -184,6 +181,9 @@ class CameraHelper extends LineSegments {
 	}
 
 	update() {
+
+		this.camera.updateWorldMatrix( true, false );
+		this.camera.matrixWorld.decompose( this.position, this.quaternion, this.scale );
 
 		const geometry = this.geometry;
 		const pointMap = this.pointMap;
