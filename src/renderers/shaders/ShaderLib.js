@@ -48,6 +48,29 @@ const ShaderLib = {
 
 	},
 
+	spherelambert : {
+
+		uniforms: /*@__PURE__*/ mergeUniforms( [
+			UniformsLib.common,
+			UniformsLib.specularmap,
+			UniformsLib.envmap,
+			UniformsLib.aomap,
+			UniformsLib.lightmap,
+			UniformsLib.emissivemap,
+			UniformsLib.bumpmap,
+			UniformsLib.normalmap,
+			UniformsLib.displacementmap,
+			UniformsLib.fog,
+			UniformsLib.lights,
+			{
+				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
+			}
+		] ),
+		
+		vertexShader: ShaderChunk.meshspherelambert_vert,
+		fragmentShader: ShaderChunk.meshspherelambert_frag
+	},
+
 	phong: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
