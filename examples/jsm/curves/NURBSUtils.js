@@ -513,13 +513,16 @@ function calcVolumePoint( p, q, r, U, V, W, P, u, v, w, target ) {
 		}
 
 	}
+
 	const Sw = new Vector4( 0, 0, 0, 0 );
 	for ( let m = 0; m <= r; ++ m ) {
+
 		for ( let l = 0; l <= q; ++ l ) {
 
 			Sw.add( temp[ m ][ l ].multiplyScalar( Nw[ m ] ).multiplyScalar( Nv[ l ] ) );
 
 		}
+
 	}
 
 	Sw.divideScalar( Sw.w );

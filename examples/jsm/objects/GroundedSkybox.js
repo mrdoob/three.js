@@ -1,9 +1,9 @@
 import { Mesh, MeshBasicMaterial, SphereGeometry, Vector3 } from 'three';
 
 /**
- * A ground-projected skybox. The height is how far the camera that took the photo was above the ground - 
- * a larger value will magnify the downward part of the image. By default the object is centered at the camera, 
- * so it is often helpful to set skybox.position.y = height to put the ground at the origin. Set the radius 
+ * A ground-projected skybox. The height is how far the camera that took the photo was above the ground -
+ * a larger value will magnify the downward part of the image. By default the object is centered at the camera,
+ * so it is often helpful to set skybox.position.y = height to put the ground at the origin. Set the radius
  * large enough to ensure your user's camera stays inside.
  */
 
@@ -18,7 +18,7 @@ class GroundedSkybox extends Mesh {
 		}
 
 		const geometry = new SphereGeometry( radius, 2 * resolution, resolution );
-		geometry.scale( 1, 1, -1 );
+		geometry.scale( 1, 1, - 1 );
 
 		const pos = geometry.getAttribute( 'position' );
 		const tmp = new Vector3();

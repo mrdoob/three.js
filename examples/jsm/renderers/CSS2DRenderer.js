@@ -135,7 +135,7 @@ class CSS2DRenderer {
 				return;
 
 			}
-			
+
 			if ( object.isCSS2DObject ) {
 
 				_vector.setFromMatrixPosition( object.matrixWorld );

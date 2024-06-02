@@ -5,7 +5,6 @@ import { WebGLShaderCache } from './WebGLShaderCache.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
-import { MeshSphereLambertMaterial } from '../../materials/MeshSphereLambertMatertial.js';
 
 function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities, bindingStates, clipping ) {
 
@@ -25,7 +24,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 		MeshNormalMaterial: 'normal',
 		MeshBasicMaterial: 'basic',
 		MeshLambertMaterial: 'lambert',
-		MeshSphereLambertMaterial : 'spherelambert',
+		MeshSphereLambertMaterial: 'spherelambert',
 		MeshPhongMaterial: 'phong',
 		MeshToonMaterial: 'toon',
 		MeshStandardMaterial: 'physical',

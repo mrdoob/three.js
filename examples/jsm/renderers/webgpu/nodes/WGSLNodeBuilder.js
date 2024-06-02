@@ -689,7 +689,7 @@ ${ flowData.code }
 
 			snippets.push( snippet );
 
-			snippets.push( `\nvar<private> output : ${ name };\n\n`);
+			snippets.push( `\nvar<private> output : ${ name };\n\n` );
 
 		}
 

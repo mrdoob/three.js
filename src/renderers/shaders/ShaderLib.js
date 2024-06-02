@@ -48,7 +48,7 @@ const ShaderLib = {
 
 	},
 
-	spherelambert : {
+	spherelambert: {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
 			UniformsLib.common,
@@ -66,7 +66,7 @@ const ShaderLib = {
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
 			}
 		] ),
-		
+
 		vertexShader: ShaderChunk.meshspherelambert_vert,
 		fragmentShader: ShaderChunk.meshspherelambert_frag
 	},
