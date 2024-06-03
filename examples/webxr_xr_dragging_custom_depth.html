@@ -425,7 +425,6 @@
 						child.material.uniforms.depthColor.value = renderer.xr.getDepthTexture();
 						child.material.uniforms.depthWidth.value = 1680;
 						child.material.uniforms.depthHeight.value = 1760;
-						child.material.uniforms.NeedUpdate = true;
 
 						isDepthSupplied = true;
 
@@ -437,7 +436,6 @@
 
 						child.material.uniforms.depthWidth.value = 0;
 						child.material.uniforms.depthHeight.value = 0;
-						child.material.uniforms.NeedUpdate = true;
 
 						isDepthSupplied = false;
 
