@@ -58,6 +58,29 @@ function listenToProperties( object, properties, onReadCallback, onWriteCallback
 
 }
 
+function listenToMethods( object, onChangeCallback ) {
+
+	const properties = Object.getOwnPropertyNames( object.constructor.prototype );
+
+	for ( let i = 0; i < properties.length; i ++ ) {
+
+		const property = properties[ i ];
+		const value = object[ property ];
+
+		if ( property === 'constructor' || typeof value !== 'function' ) continue;
+
+		object[ property ] = function () {
+
+			onChangeCallback();
+
+			return value.apply( this, arguments );
+
+		};
+
+	}
+
+}
+
 class Object3D extends EventDispatcher {
 
 	constructor() {
@@ -134,7 +157,7 @@ class Object3D extends EventDispatcher {
 
 		}
 
-		function onLocalMatrixWrite() {
+		function onMatrixChange() {
 
 			self.matrixWorldNeedsUpdate = true;
 
@@ -144,7 +167,7 @@ class Object3D extends EventDispatcher {
 		listenToProperties( rotation, [ 'x', 'y', 'z', 'order' ], onRotationRead, onRotationWrite );
 		listenToProperties( quaternion, [ 'x', 'y', 'z', 'w' ], onQuaternionRead, onQuaternionWrite );
 		listenToProperties( scale, [ 'x', 'y', 'z' ], undefined, onWrite );
-		listenToProperties( matrix.elements, Array.from( { length: 16 }, ( _, i ) => i ), undefined, onLocalMatrixWrite );
+		listenToMethods( matrix, onMatrixChange );
 
 		Object.defineProperties( this, {
 			position: {
