@@ -92,9 +92,9 @@
 				for ( let i = 0; i < 50; i ++ ) {
 
 					const geometry = geometries[ Math.floor( Math.random() * geometries.length ) ];
-					const material = new THREE.ShaderMaterial({
+					const material = new THREE.ShaderMaterial( {
 
-						vertexShader: `
+						vertexShader: /* glsl */`
 							varying vec3 vNormal;
 							varying vec2 vUv;
 							void main() {
@@ -104,7 +104,7 @@
 							}
 						`,
 
-						fragmentShader: `
+						fragmentShader: /* glsl */`
 							uniform vec3 diffuseColor;
 							uniform float roughness;
 							uniform float metalness;
@@ -223,7 +223,7 @@
 
 						uniforms: {
 
-							diffuseColor: { value: new THREE.Color( Math.random() * 0xffffff) },
+							diffuseColor: { value: new THREE.Color( Math.random() * 0xffffff ) },
 							roughness: { value: 0.7 },
 							metalness: { value: 0.0 },
 							emissive: { value: 0.0 },
@@ -233,7 +233,7 @@
 
 						}
 
-					});
+					} );
 
 					const object = new THREE.Mesh( geometry, material );
 
@@ -418,30 +418,28 @@
 
 			function render() {
 
-				if (renderer.xr.hasDepthSensing() && ! isDepthSupplied) {
+				if ( renderer.xr.hasDepthSensing() && ! isDepthSupplied ) {
 
-					group.children.forEach(child => {
+					group.children.forEach( child => {
 
 						child.material.uniforms.depthColor.value = renderer.xr.getDepthTexture();
 						child.material.uniforms.depthWidth.value = 1680;
 						child.material.uniforms.depthHeight.value = 1760;
-						child.material.uniforms.NeedUpdate = true;
 
 						isDepthSupplied = true;
 
-					});
+					} );
 
-				} else if (! renderer.xr.hasDepthSensing() && isDepthSupplied) {
+				} else if ( ! renderer.xr.hasDepthSensing() && isDepthSupplied ) {
 
-					group.children.forEach(child => {
+					group.children.forEach( child => {
 
 						child.material.uniforms.depthWidth.value = 0;
 						child.material.uniforms.depthHeight.value = 0;
-						child.material.uniforms.NeedUpdate = true;
 
 						isDepthSupplied = false;
 
-					});
+					} );
 
 				}
 

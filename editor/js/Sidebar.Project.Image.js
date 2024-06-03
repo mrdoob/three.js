@@ -24,9 +24,9 @@ function SidebarProjectImage( editor ) {
 	shadingRow.add( new UIText( strings.getKey( 'sidebar/project/shading' ) ).setClass( 'Label' ) );
 
 	const shadingTypeSelect = new UISelect().setOptions( {
-		0: 'SOLID',
-		1: 'REALISTIC'
-	} ).setWidth( '170px' ).setTextTransform( 'unset' ).onChange( refreshShadingRow ).setValue( 0 );
+		'solid': 'SOLID',
+		'realistic': 'REALISTIC'
+	} ).setWidth( '170px' ).onChange( refreshShadingRow ).setValue( 'solid' );
 	shadingRow.add( shadingTypeSelect );
 
 	const pathTracerMinSamples = 3;
@@ -41,7 +41,7 @@ function SidebarProjectImage( editor ) {
 
 	function refreshShadingRow() {
 
-		samplesRow.setHidden( shadingTypeSelect.getValue() !== '1' );
+		samplesRow.setHidden( shadingTypeSelect.getValue() !== 'realistic' );
 
 	}
 
@@ -68,6 +68,44 @@ function SidebarProjectImage( editor ) {
 	renderButton.setWidth( '170px' );
 	renderButton.setMarginLeft( '120px' );
 	renderButton.onClick( async () => {
+
+		if ( shadingTypeSelect.getValue() === 'realistic' ) {
+
+			let isMaterialsValid = true;
+
+			editor.scene.traverseVisible( ( object ) => {
+
+				if ( object.isMesh ) {
+
+					const materials = Array.isArray( object.material ) ? object.material : [ object.material ];
+
+					for ( let i = 0; i < materials.length; i ++ ) {
+
+						const material = materials[ i ];
+
+						if ( ! material.isMeshStandardMaterial ) {
+
+							isMaterialsValid = false;
+							return;
+
+						}
+
+					}
+
+				}
+
+			} );
+
+			if ( isMaterialsValid === false ) {
+
+				alert( strings.getKey( 'prompt/rendering/realistic/unsupportedMaterial' ) );
+				return;
+
+			}
+
+		}
+
+		//
 
 		const json = editor.toJSON();
 		const project = json.project;
@@ -117,16 +155,16 @@ function SidebarProjectImage( editor ) {
 
 		//
 
-		switch ( Number( shadingTypeSelect.getValue() ) ) {
+		switch ( shadingTypeSelect.getValue() ) {
 
-			case 0: // SOLID
+			case 'solid':
 
 				renderer.render( scene, camera );
 				renderer.dispose();
 
 				break;
 
-			case 1: // REALISTIC
+			case 'realistic':
 
 				const status = document.createElement( 'div' );
 				status.style.position = 'absolute';
