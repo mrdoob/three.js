@@ -1,4 +1,4 @@
-export default /* glsl */ `
+export default /* glsl */`
 #ifndef saturate
 // <common> may have defined saturate() already
 #define saturate( a ) clamp( a, 0.0, 1.0 )
@@ -81,7 +81,8 @@ vec3 ACESFilmicToneMapping( vec3 color ) {
 
 	color = ACESInputMat * color;
 
-	color = applyPrimaryGradingCDL( color );
+	// TODO: Convert to ACEScc or ACEScct, apply CDL, and convert back.
+	// color = applyPrimaryGradingCDL( color );
 
 	// Apply RRT and ODT
 	color = RRTAndODTFit( color );
