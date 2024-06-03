@@ -98,7 +98,7 @@ function SidebarProjectImage( editor ) {
 
 			if ( isMaterialsValid === false ) {
 
-				alert( 'REALISTIC Shading: Only MeshStandardMaterial and MeshPhysicalMaterial are supported' ); // TODO: l10n
+				alert( strings.getKey( 'prompt/rendering/realistic/unsupportedMaterial' ) );
 				return;
 
 			}
