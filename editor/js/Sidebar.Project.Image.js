@@ -83,7 +83,7 @@ function SidebarProjectImage( editor ) {
 
 						const material = materials[ i ];
 
-						if ( ! material.isMeshStandardMaterial && ! material.isMeshPhysicalMaterial ) {
+						if ( ! material.isMeshStandardMaterial ) {
 
 							isMaterialsValid = false;
 							return;
