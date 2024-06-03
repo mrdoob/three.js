@@ -44,9 +44,7 @@ vec3 shadeLambertianSphereBRDF(vec3 wi, vec3 wo, vec3 norm,vec3 kd) {
     
 }
 /* struct IncidentLight {
-	vec3 color;
 	vec3 direction;
-	bool visible;
 };
 
 struct ReflectedLight {
@@ -61,8 +59,8 @@ void RE_Direct_Lambert( const in IncidentLight directLight, const in vec3 geomet
 	vec3 kd = material.diffuseColor;
 	vec3 wo = directLight.direction;
 	vec3 wi = geometryViewDir;
-	vec3 irradiance  = shadeLambertianSphereBRDF(wi,wo,geometryNormal,kd);
-	reflectedLight.directDiffuse +=   irradiance;  // no need to multiply with BRDF_Lambert( material.diffuseColor );
+	vec3 color  = shadeLambertianSphereBRDF(wi,wo,geometryNormal,kd);
+	reflectedLight.directDiffuse +=   color;  // no need to multiply with BRDF_Lambert( material.diffuseColor );
 	
 }
 
