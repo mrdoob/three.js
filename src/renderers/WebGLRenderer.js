@@ -507,7 +507,7 @@ class WebGLRenderer {
 
 			this._primaryGradingCDL.set( slope, offset, power, saturation );
 
-		}
+		};
 
 		// Clearing
 
