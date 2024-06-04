@@ -17,6 +17,7 @@ class Node extends EventDispatcher {
 
 		this.updateType = NodeUpdateType.NONE;
 		this.updateBeforeType = NodeUpdateType.NONE;
+		this.updateAfterType = NodeUpdateType.NONE;
 
 		this.uuid = MathUtils.generateUUID();
 
@@ -165,6 +166,12 @@ class Node extends EventDispatcher {
 
 	}
 
+	getUpdateAfterType() {
+
+		return this.updateAfterType;
+
+	}
+
 	getElementType( builder ) {
 
 		const type = this.getNodeType( builder );
@@ -268,6 +275,12 @@ class Node extends EventDispatcher {
 	}
 
 	updateBefore( /*frame*/ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
+	updateAfter( /*frame*/ ) {
 
 		console.warn( 'Abstract function.' );
 
