@@ -399,6 +399,8 @@ class Renderer {
 
 				this.backend.draw( renderObject, this.info );
 
+				this._nodes.updateAfter( renderObject );
+
 			}
 
 		}
@@ -1527,6 +1529,8 @@ class Renderer {
 
 		}
 
+		this._nodes.updateAfter( renderObject );
+
 	}
 
 	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
@@ -1544,6 +1548,8 @@ class Renderer {
 		this._bindings.updateForRender( renderObject );
 
 		this._pipelines.getForRender( renderObject, this._compilationPromises );
+
+		this._nodes.updateAfter( renderObject );
 
 	}
 
