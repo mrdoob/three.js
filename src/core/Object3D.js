@@ -695,6 +695,54 @@ class Object3D extends EventDispatcher {
 
 		if ( this.matrixWorldNeedsUpdate || force ) {
 
+			if ( this.matrixWorldAutoUpdate === true ) {
+
+				if ( this.parent === null ) {
+
+					this.matrixWorld.copy( this.matrix );
+
+				} else {
+
+					this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+
+				}
+
+			}
+
+			this.matrixWorldNeedsUpdate = false;
+
+			force = true;
+
+		}
+
+		// make sure descendants are updated if required
+
+		const children = this.children;
+
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
+
+			const child = children[ i ];
+
+			child.updateMatrixWorld( force );
+
+		}
+
+	}
+
+	updateWorldMatrix( updateParents, updateChildren ) {
+
+		const parent = this.parent;
+
+		if ( updateParents === true && parent !== null ) {
+
+			parent.updateWorldMatrix( true, false );
+
+		}
+
+		if ( this.matrixAutoUpdate ) this.updateMatrix();
+
+		if ( this.matrixWorldAutoUpdate === true ) {
+
 			if ( this.parent === null ) {
 
 				this.matrixWorld.copy( this.matrix );
@@ -705,53 +753,9 @@ class Object3D extends EventDispatcher {
 
 			}
 
-			this.matrixWorldNeedsUpdate = false;
-
-			force = true;
-
 		}
 
-		// update children
-
-		const children = this.children;
-
-		for ( let i = 0, l = children.length; i < l; i ++ ) {
-
-			const child = children[ i ];
-
-			if ( child.matrixWorldAutoUpdate === true || force === true ) {
-
-				child.updateMatrixWorld( force );
-
-			}
-
-		}
-
-	}
-
-	updateWorldMatrix( updateParents, updateChildren ) {
-
-		const parent = this.parent;
-
-		if ( updateParents === true && parent !== null && parent.matrixWorldAutoUpdate === true ) {
-
-			parent.updateWorldMatrix( true, false );
-
-		}
-
-		if ( this.matrixAutoUpdate ) this.updateMatrix();
-
-		if ( this.parent === null ) {
-
-			this.matrixWorld.copy( this.matrix );
-
-		} else {
-
-			this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
-
-		}
-
-		// update children
+		// make sure descendants are updated
 
 		if ( updateChildren === true ) {
 
@@ -761,11 +765,7 @@ class Object3D extends EventDispatcher {
 
 				const child = children[ i ];
 
-				if ( child.matrixWorldAutoUpdate === true ) {
-
-					child.updateWorldMatrix( false, true );
-
-				}
+				child.updateWorldMatrix( false, true );
 
 			}
 

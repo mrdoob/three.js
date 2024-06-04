@@ -1127,7 +1127,8 @@
 			},
 
 			"物体": {
-				"Lensflare": "examples/zh/objects/Lensflare"
+				"Lensflare": "examples/zh/objects/Lensflare",
+				"Sky": "examples/zh/objects/Sky"
 			},
 
 			"后期处理": {
