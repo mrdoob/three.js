@@ -78,6 +78,13 @@
 		기본값은 [page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE] (true)입니다.
 		</p>
 
+		<h3>[property:Boolean matrixNeedsUpdate]</h3>
+		<p>
+			When this is set, it calculates the matrix of position, (rotation or
+			quaternion) and scale in that frame, matrixWorld for itself and descendants,
+			and resets this property to false. Default is `false`.
+		</p>
+
 		<h3>[property:Matrix4 matrixWorld]</h3>
 		<p>
 		객체의 글로벌 변형입니다. Object3D가 부모를 가지고 있지 않다면, 로컬 변형 [page:.matrix]와 동일합니다.
