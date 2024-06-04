@@ -19,6 +19,8 @@ class WebGLExtensions {
 
 			extension = this.gl.getExtension( name );
 
+			this.extensions[ name ] = extension;
+
 		}
 
 		return extension;
