@@ -1238,7 +1238,7 @@ export default QUnit.module( 'Core', () => {
 			child.matrixWorld.identity();
 			parent.matrixWorld.identity();
 
-			object.updateWorldMatrix( true, true );
+			child.updateWorldMatrix( true, true );
 
 			assert.deepEqual( child.matrixWorld.elements,
 				m.identity().elements,

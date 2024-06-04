@@ -627,7 +627,7 @@ class Object3D extends EventDispatcher {
 
 		const parent = this.parent;
 
-		if ( updateParents === true && parent !== null && parent.matrixWorldAutoUpdate === true ) {
+		if ( updateParents === true && parent !== null ) {
 
 			parent.updateWorldMatrix( true, false );
 
@@ -635,17 +635,21 @@ class Object3D extends EventDispatcher {
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
-		if ( this.parent === null ) {
+		if ( this.matrixWorldAutoUpdate === true ) {
 
-			this.matrixWorld.copy( this.matrix );
+			if ( this.parent === null ) {
 
-		} else {
+				this.matrixWorld.copy( this.matrix );
 
-			this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+			} else {
+
+				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+
+			}
 
 		}
 
-		// update children
+		// make sure descendants are updated
 
 		if ( updateChildren === true ) {
 
@@ -655,11 +659,7 @@ class Object3D extends EventDispatcher {
 
 				const child = children[ i ];
 
-				if ( child.matrixWorldAutoUpdate === true ) {
-
-					child.updateWorldMatrix( false, true );
-
-				}
+				child.updateWorldMatrix( false, true );
 
 			}
 
