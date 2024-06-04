@@ -17,6 +17,9 @@ class PointLightHelper extends Mesh {
 
 		this.type = 'PointLightHelper';
 
+		this.matrixWorld = this.light.matrixWorld;
+		this.matrixWorldAutoUpdate = false;
+
 		this.update();
 
 
@@ -55,7 +58,6 @@ class PointLightHelper extends Mesh {
 	update() {
 
 		this.light.updateWorldMatrix( true, false );
-		this.light.matrixWorld.decompose( this.position, this.quaternion, this.scale );
 
 		if ( this.color !== undefined ) {
 
@@ -81,14 +83,6 @@ class PointLightHelper extends Mesh {
 
 		}
 		*/
-
-	}
-
-	updateMatrixWorld( force ) {
-
-		this.update();
-
-		return super.updateMatrixWorld( force );
 
 	}
 

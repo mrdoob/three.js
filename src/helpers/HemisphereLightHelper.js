@@ -18,6 +18,9 @@ class HemisphereLightHelper extends Object3D {
 
 		this.light = light;
 
+		this.matrixWorld = light.matrixWorld;
+		this.matrixWorldAutoUpdate = false;
+
 		this.color = color;
 
 		this.type = 'HemisphereLightHelper';
@@ -74,8 +77,6 @@ class HemisphereLightHelper extends Object3D {
 		}
 
 		this.light.updateWorldMatrix( true, false );
-
-		this.light.matrixWorld.decompose( this.position, this.quaternion, this.scale );
 
 		mesh.lookAt( _vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 

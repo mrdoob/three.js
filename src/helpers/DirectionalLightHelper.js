@@ -17,6 +17,9 @@ class DirectionalLightHelper extends Object3D {
 
 		this.light = light;
 
+		this.matrixWorld = light.matrixWorld;
+		this.matrixWorldAutoUpdate = false;
+
 		this.color = color;
 
 		this.type = 'DirectionalLightHelper';
@@ -60,8 +63,6 @@ class DirectionalLightHelper extends Object3D {
 
 		this.light.updateWorldMatrix( true, false );
 		this.light.target.updateWorldMatrix( true, false );
-
-		this.light.matrixWorld.decompose( this.position, this.quaternion, this.scale );
 
 		_v1.setFromMatrixPosition( this.light.matrixWorld );
 		_v2.setFromMatrixPosition( this.light.target.matrixWorld );

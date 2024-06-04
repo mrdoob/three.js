@@ -54,12 +54,12 @@ class SkeletonHelper extends LineSegments {
 		this.root = object;
 		this.bones = bones;
 
+		this.matrixWorld = object.matrixWorld;
+		this.matrixWorldAutoUpdate = false;
+
 	}
 
 	updateMatrixWorld( force ) {
-
-		this.root.updateWorldMatrix( true, false );
-		this.root.matrixWorld.decompose( this.position, this.quaternion, this.scale );
 
 		const bones = this.bones;
 
