@@ -47,6 +47,10 @@ function WebGLMaterials( renderer, properties ) {
 
 			refreshUniformsCommon( uniforms, material );
 
+		} else if ( material.isMeshSphereLambertMaterial ) {
+
+			refreshUniformsCommon( uniforms, material );
+
 		} else if ( material.isMeshToonMaterial ) {
 
 			refreshUniformsCommon( uniforms, material );

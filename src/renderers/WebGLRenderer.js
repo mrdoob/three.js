@@ -1994,7 +1994,8 @@ class WebGLRenderer {
 				if ( material.isMeshPhongMaterial ||
 					material.isMeshToonMaterial ||
 					material.isMeshLambertMaterial ||
-					material.isMeshBasicMaterial ||
+					material.isMeshSphereLambertMaterial ||
+					 material.isMeshBasicMaterial ||
 					material.isMeshStandardMaterial ||
 					material.isShaderMaterial ) {
 
@@ -2179,7 +2180,7 @@ class WebGLRenderer {
 
 		function materialNeedsLights( material ) {
 
-			return material.isMeshLambertMaterial || material.isMeshToonMaterial || material.isMeshPhongMaterial ||
+			return material.isMeshLambertMaterial || material.isMeshSphereLambertMaterial || material.isMeshToonMaterial || material.isMeshPhongMaterial ||
 				material.isMeshStandardMaterial || material.isShadowMaterial ||
 				( material.isShaderMaterial && material.lights === true );
 

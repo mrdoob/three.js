@@ -43,6 +43,8 @@ import gradientmap_pars_fragment from './ShaderChunk/gradientmap_pars_fragment.g
 import lightmap_pars_fragment from './ShaderChunk/lightmap_pars_fragment.glsl.js';
 import lights_lambert_fragment from './ShaderChunk/lights_lambert_fragment.glsl.js';
 import lights_lambert_pars_fragment from './ShaderChunk/lights_lambert_pars_fragment.glsl.js';
+import lights_spherelambert_fragment from './ShaderChunk/lights_spherelambert_fragment.glsl.js';
+import lights_spherelambert_pars_fragment from './ShaderChunk/lights_spherelambert_pars_fragment.glsl.js';
 import lights_pars_begin from './ShaderChunk/lights_pars_begin.glsl.js';
 import envmap_physical_pars_fragment from './ShaderChunk/envmap_physical_pars_fragment.glsl.js';
 import lights_toon_fragment from './ShaderChunk/lights_toon_fragment.glsl.js';
@@ -115,6 +117,7 @@ import * as equirect from './ShaderLib/equirect.glsl.js';
 import * as linedashed from './ShaderLib/linedashed.glsl.js';
 import * as meshbasic from './ShaderLib/meshbasic.glsl.js';
 import * as meshlambert from './ShaderLib/meshlambert.glsl.js';
+import * as meshspherelambert from './ShaderLib/meshspherelambert.glsl.js';
 import * as meshmatcap from './ShaderLib/meshmatcap.glsl.js';
 import * as meshnormal from './ShaderLib/meshnormal.glsl.js';
 import * as meshphong from './ShaderLib/meshphong.glsl.js';
@@ -171,6 +174,8 @@ export const ShaderChunk = {
 	lightmap_pars_fragment: lightmap_pars_fragment,
 	lights_lambert_fragment: lights_lambert_fragment,
 	lights_lambert_pars_fragment: lights_lambert_pars_fragment,
+	lights_spherelambert_fragment: lights_spherelambert_fragment,
+	lights_spherelambert_pars_fragment: lights_spherelambert_pars_fragment,
 	lights_pars_begin: lights_pars_begin,
 	lights_toon_fragment: lights_toon_fragment,
 	lights_toon_pars_fragment: lights_toon_pars_fragment,
@@ -251,6 +256,8 @@ export const ShaderChunk = {
 	meshbasic_frag: meshbasic.fragment,
 	meshlambert_vert: meshlambert.vertex,
 	meshlambert_frag: meshlambert.fragment,
+	meshspherelambert_vert: meshspherelambert.vertex,
+	meshspherelambert_frag: meshspherelambert.fragment,
 	meshmatcap_vert: meshmatcap.vertex,
 	meshmatcap_frag: meshmatcap.fragment,
 	meshnormal_vert: meshnormal.vertex,
