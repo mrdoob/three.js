@@ -17,6 +17,7 @@ class XRHandPrimitiveModel {
 
 		this.controller = controller;
 		this.handModel = handModel;
+		this.handedness = handedness;
 		this.envMap = null;
 
 		if ( ! options || ! options.primitive || options.primitive === 'sphere' ) {
