@@ -399,6 +399,8 @@ class Renderer {
 
 				this.backend.draw( renderObject, this.info );
 
+				this._nodes.updateAfter( renderObject );
+
 			}
 
 		}
@@ -943,6 +945,16 @@ class Renderer {
 		}
 
 		this.backend.clear( color, depth, stencil, renderTargetData );
+
+		if ( renderTarget !== null && this._renderTarget === null ) {
+
+			// If a color space transform or tone mapping is required,
+			// the clear operation clears the intermediate renderTarget texture, but does not update the screen canvas.
+
+			_quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+			this._renderScene( _quad, _quad.camera, false );
+
+		}
 
 	}
 
@@ -1517,6 +1529,8 @@ class Renderer {
 
 		}
 
+		this._nodes.updateAfter( renderObject );
+
 	}
 
 	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
@@ -1534,6 +1548,8 @@ class Renderer {
 		this._bindings.updateForRender( renderObject );
 
 		this._pipelines.getForRender( renderObject, this._compilationPromises );
+
+		this._nodes.updateAfter( renderObject );
 
 	}
 

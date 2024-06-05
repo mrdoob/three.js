@@ -14,6 +14,7 @@ class NodeFrame {
 
 		this.updateMap = new WeakMap();
 		this.updateBeforeMap = new WeakMap();
+		this.updateAfterMap = new WeakMap();
 
 		this.renderer = null;
 		this.material = null;
@@ -78,6 +79,47 @@ class NodeFrame {
 		} else if ( updateType === NodeUpdateType.OBJECT ) {
 
 			node.updateBefore( this );
+
+		}
+
+	}
+
+	updateAfterNode( node ) {
+
+		const updateType = node.getUpdateAfterType();
+		const reference = node.updateReference( this );
+
+		if ( updateType === NodeUpdateType.FRAME ) {
+
+			const { frameMap } = this._getMaps( this.updateAfterMap, reference );
+
+			if ( frameMap.get( reference ) !== this.frameId ) {
+
+				if ( node.updateAfter( this ) !== false ) {
+
+					frameMap.set( reference, this.frameId );
+
+				}
+
+			}
+
+		} else if ( updateType === NodeUpdateType.RENDER ) {
+
+			const { renderMap } = this._getMaps( this.updateAfterMap, reference );
+
+			if ( renderMap.get( reference ) !== this.renderId ) {
+
+				if ( node.updateAfter( this ) !== false ) {
+
+					renderMap.set( reference, this.renderId );
+
+				}
+
+			}
+
+		} else if ( updateType === NodeUpdateType.OBJECT ) {
+
+			node.updateAfter( this );
 
 		}
 

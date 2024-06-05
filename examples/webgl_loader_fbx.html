@@ -32,10 +32,12 @@
 			import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			let camera, scene, renderer, stats, object, loader, guiMorphsFolder;
-			const clock = new THREE.Clock();
+			const manager = new THREE.LoadingManager();
 
+			let camera, scene, renderer, stats, object, loader, guiMorphsFolder;
 			let mixer;
+
+			const clock = new THREE.Clock();
 
 			const params = {
 				asset: 'Samba Dancing'
@@ -87,7 +89,7 @@
 				grid.material.transparent = true;
 				scene.add( grid );
 			
-				loader = new FBXLoader( );
+				loader = new FBXLoader( manager );
 				loadAsset( params.asset );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -126,8 +128,18 @@
 
 						object.traverse( function ( child ) {
 
-							if ( child.material ) child.material.dispose();
-							if ( child.material && child.material.map ) child.material.map.dispose();
+							if ( child.material ) {
+
+								const materials = Array.isArray( child.material ) ? child.material : [ child.material ];
+								materials.forEach( material => {
+
+									if ( material.map ) material.map.dispose();
+									material.dispose();
+			
+								} );
+			
+							}
+			
 							if ( child.geometry ) child.geometry.dispose();
 
 						} );
