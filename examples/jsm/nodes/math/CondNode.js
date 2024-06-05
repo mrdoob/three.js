@@ -37,10 +37,12 @@ class CondNode extends Node {
 
 	setup( builder ) {
 
+		const context = { tempWrite: false };
+
 		const properties = builder.getNodeProperties( this );
-		properties.condNode = this.condNode.cache();
-		properties.ifNode = this.ifNode.cache();
-		properties.elseNode = this.elseNode ? this.elseNode.cache() : null;
+		properties.condNode = this.condNode.cache().context( context );
+		properties.ifNode = this.ifNode.cache().context( context );
+		properties.elseNode = this.elseNode ? this.elseNode.cache().context( context ) : null;
 
 	}
 

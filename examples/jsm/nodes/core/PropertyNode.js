@@ -10,6 +10,8 @@ class PropertyNode extends Node {
 		this.name = name;
 		this.varying = varying;
 
+		this.global = true;
+
 		this.isPropertyNode = true;
 
 	}
@@ -17,12 +19,6 @@ class PropertyNode extends Node {
 	getHash( builder ) {
 
 		return this.name || super.getHash( builder );
-
-	}
-
-	isGlobal( /*builder*/ ) {
-
-		return true;
 
 	}
 

@@ -6,7 +6,7 @@ const normal = tslFn( ( { texture, uv } ) => {
 
 	const epsilon = 0.0001;
 
-	const ret = vec3().temp();
+	const ret = vec3().toVar();
 
 	If( uv.x.lessThan( epsilon ), () => {
 
