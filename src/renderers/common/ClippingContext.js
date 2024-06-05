@@ -158,6 +158,12 @@ class ClippingContext {
 
 	}
 
+	get unionClippingCount() {
+
+		return this.unionPlanes.length;
+
+	}
+
 }
 
 export default ClippingContext;

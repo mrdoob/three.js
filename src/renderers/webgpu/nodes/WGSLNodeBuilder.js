@@ -692,6 +692,12 @@ ${ flowData.code }
 
 	}
 
+	getClipDistance() {
+
+		return 'varyings.hw_clip_distances';
+
+	}
+
 	isFlipY() {
 
 		return false;
@@ -751,6 +757,13 @@ ${ flowData.code }
 	enableDualSourceBlending() {
 
 		this.enableDirective( 'dual_source_blending' );
+
+	}
+
+	enableHardwareClipping( planeCount ) {
+
+		this.enableClipDistances();
+		this.getBuiltin( 'clip_distances', 'hw_clip_distances', `array<f32, ${ planeCount } >`, 'vertex' );
 
 	}
 
@@ -1238,6 +1251,10 @@ ${ flowData.code }
 			if ( name === 'float32Filterable' ) {
 
 				result = this.renderer.hasFeature( 'float32-filterable' );
+
+			} else if ( name === 'clipDistance' ) {
+
+				result = this.renderer.hasFeature( 'clip-distances' );
 
 			}
 

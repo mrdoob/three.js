@@ -105,6 +105,12 @@ export default class RenderObject {
 
 	}
 
+	get hardwareClippingPlanes() {
+
+		return ( this.clippingContext === null || this.material.alphaToCoverage ) ? 0 : this.clippingContext.unionClippingCount;
+
+	}
+
 	getNodeBuilderState() {
 
 		return this._nodeBuilderState || ( this._nodeBuilderState = this._nodes.getForRender( this ) );

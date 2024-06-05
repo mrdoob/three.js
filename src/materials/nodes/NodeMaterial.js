@@ -20,7 +20,7 @@ import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
 import { depth, perspectiveDepthToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
 import { cameraFar, cameraNear } from '../../nodes/accessors/Camera.js';
-import { clipping, clippingAlpha } from '../../nodes/accessors/ClippingNode.js';
+import { clipping, clippingAlpha, hardwareClipping } from '../../nodes/accessors/ClippingNode.js';
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
 import getAlphaHashThreshold from '../../nodes/functions/material/getAlphaHashThreshold.js';
 
@@ -50,6 +50,7 @@ class NodeMaterial extends Material {
 
 		this.fog = true;
 		this.lights = false;
+		this.hardwareClipping = false;
 
 		this.lightsNode = null;
 		this.envNode = null;
@@ -241,6 +242,26 @@ class NodeMaterial extends Material {
 
 	}
 
+	setupHardwareClipping( builder ) {
+
+		if ( builder.clippingContext === null ) return;
+
+		const candidateCount = builder.clippingContext.unionPlanes.length;
+
+		// 8 planes supported by WebGL ANGLE_clip_cull_distance and WebGPU clip-distances
+
+		if ( ! this.alphaToCoverage && candidateCount > 0 && candidateCount <= 8 && builder.isAvailable( 'clipDistance' ) ) {
+
+			builder.stack.add( hardwareClipping() );
+
+			this.hardwareClipping = true;
+
+		}
+
+		return;
+
+	}
+
 	setupDepth( builder ) {
 
 		const { renderer, camera } = builder;
@@ -329,6 +350,8 @@ class NodeMaterial extends Material {
 			positionLocal.assign( this.positionNode );
 
 		}
+
+		this.setupHardwareClipping( builder );
 
 		const mvp = modelViewProjection();
 
