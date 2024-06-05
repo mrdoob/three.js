@@ -1117,6 +1117,7 @@
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
 				"KTX2Loader": "examples/zh/loaders/KTX2Loader",
 				"LDrawLoader": "examples/zh/loaders/LDrawLoader",
+				"LUTCubeLoader":"examples/en/loaders/LUTCubeLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
