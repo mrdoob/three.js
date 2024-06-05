@@ -19,21 +19,19 @@ class XRHandPrimitiveModel {
 		this.handModel = handModel;
 		this.envMap = null;
 
-		let geometry;
-
 		if ( ! options || ! options.primitive || options.primitive === 'sphere' ) {
 
-			geometry = new SphereGeometry( 1, 10, 10 );
+			this.geometry = new SphereGeometry( 1, 10, 10 );
 
 		} else if ( options.primitive === 'box' ) {
 
-			geometry = new BoxGeometry( 1, 1, 1 );
+			this.geometry = new BoxGeometry( 1, 1, 1 );
 
 		}
 
-		const material = new MeshStandardMaterial();
+		this.material = new MeshStandardMaterial();
 
-		this.handMesh = new InstancedMesh( geometry, material, 30 );
+		this.handMesh = new InstancedMesh( this.geometry, this.material, 30 );
 		this.handMesh.frustumCulled = false;
 		this.handMesh.instanceMatrix.setUsage( DynamicDrawUsage ); // will be updated every frame
 		this.handMesh.castShadow = true;
@@ -95,6 +93,16 @@ class XRHandPrimitiveModel {
 
 		this.handMesh.count = count;
 		this.handMesh.instanceMatrix.needsUpdate = true;
+
+	}
+
+	dispose() {
+
+		this.handModel.remove( this.handMesh );
+
+		this.geometry.dispose();
+
+		this.material.dispose();
 
 	}
 
