@@ -36,10 +36,18 @@ class CondNode extends Node {
 
 	}
 
+	setup( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+		properties.condNode = this.condNode.cache();
+		properties.ifNode = this.ifNode.cache();
+		properties.elseNode = this.elseNode ? this.elseNode.cache() : null;
+
+	}
+
 	generate( builder, output ) {
 
 		const type = this.getNodeType( builder );
-		const context = { tempWrite: false };
 
 		const nodeData = builder.getDataFromNode( this );
 
@@ -49,18 +57,18 @@ class CondNode extends Node {
 
 		}
 
-		const { ifNode, elseNode } = this;
+		const { condNode, ifNode, elseNode } = builder.getNodeProperties( this );
 
 		const needsOutput = output !== 'void';
 		const nodeProperty = needsOutput ? property( type ).build( builder ) : '';
 
 		nodeData.nodeProperty = nodeProperty;
 
-		const nodeSnippet = contextNode( this.condNode/*, context*/ ).build( builder, 'bool' );
+		const nodeSnippet = condNode.build( builder, 'bool' );
 
 		builder.addFlowCode( `\n${ builder.tab }if ( ${ nodeSnippet } ) {\n\n` ).addFlowTab();
 
-		let ifSnippet = contextNode( ifNode, context ).build( builder, type );
+		let ifSnippet = ifNode.build( builder, type );
 
 		if ( ifSnippet ) {
 
@@ -82,7 +90,7 @@ class CondNode extends Node {
 
 			builder.addFlowCode( ' else {\n\n' ).addFlowTab();
 
-			let elseSnippet = contextNode( elseNode, context ).build( builder, type );
+			let elseSnippet = elseNode.build( builder, type );
 
 			if ( elseSnippet ) {
 

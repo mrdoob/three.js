@@ -10,6 +10,8 @@ class FunctionOverloadingNode extends Node {
 		this.functionNodes = functionNodes;
 		this.parametersNodes = parametersNodes;
 
+		this.global = true;
+
 		this._candidateFnCall = null;
 
 	}

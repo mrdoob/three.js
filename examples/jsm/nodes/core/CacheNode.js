@@ -24,11 +24,15 @@ class CacheNode extends Node {
 	build( builder, ...params ) {
 
 		const previousCache = builder.getCache();
-		const cache = this.cache || builder.globalCache;
+		const cache = this.cache;
+
+		cache.parent = previousCache;
 
 		builder.setCache( cache );
 
 		const data = this.node.build( builder, ...params );
+
+		cache.parent = null;
 
 		builder.setCache( previousCache );
 
