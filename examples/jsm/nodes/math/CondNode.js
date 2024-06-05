@@ -1,6 +1,5 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { property } from '../core/PropertyNode.js';
-import { context as contextNode } from '../core/ContextNode.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class CondNode extends Node {
