@@ -1,6 +1,6 @@
 class NodeBuilderState {
 
-	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, transforms = [] ) {
+	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, transforms = [] ) {
 
 		this.vertexShader = vertexShader;
 		this.fragmentShader = fragmentShader;
@@ -12,6 +12,7 @@ class NodeBuilderState {
 
 		this.updateNodes = updateNodes;
 		this.updateBeforeNodes = updateBeforeNodes;
+		this.updateAfterNodes = updateAfterNodes;
 
 		this.usedTimes = 0;
 

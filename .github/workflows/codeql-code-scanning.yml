@@ -26,20 +26,20 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
+      uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@b7cec7526559c32f1616476ff32d17ba4c59b2d6 # v3
+      uses: github/codeql-action/init@f079b8493333aace61c81488f8bd40919487bd9f # v3
       with:
         languages: ${{ matrix.language }}
         config-file: ./.github/codeql-config.yml
         queries: security-and-quality
 
     - name: Autobuild
-      uses: github/codeql-action/autobuild@b7cec7526559c32f1616476ff32d17ba4c59b2d6 # v3
+      uses: github/codeql-action/autobuild@f079b8493333aace61c81488f8bd40919487bd9f # v3
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@b7cec7526559c32f1616476ff32d17ba4c59b2d6 # v3
+      uses: github/codeql-action/analyze@f079b8493333aace61c81488f8bd40919487bd9f # v3
       with:
         category: "/language:${{matrix.language}}"

@@ -101,10 +101,6 @@ textarea, input { outline: none; } /* osx */
 		text-transform: uppercase;
 	}
 
-	.TabbedPanel .Tabs .Tab:last-child {
-		margin-right: 22px;
-	}
-
 	.TabbedPanel .Panels {
 		position: absolute;
 		top: 40px;

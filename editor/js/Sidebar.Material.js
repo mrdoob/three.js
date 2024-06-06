@@ -484,15 +484,47 @@ function SidebarMaterial( editor ) {
 
 				}
 
-				if ( Array.isArray( currentObject.material ) ) {
+				const currentMaterial = currentObject.material;
+
+				if ( material.type === 'MeshPhysicalMaterial' && currentMaterial.type === 'MeshStandardMaterial' ) {
+
+					// TODO Find a easier to maintain approach
+
+					const properties = [
+						'color', 'emissive', 'roughness', 'metalness', 'map', 'emissiveMap', 'alphaMap',
+						'bumpMap', 'normalMap', 'normalScale', 'displacementMap', 'roughnessMap', 'metalnessMap',
+						'envMap', 'lightMap', 'aoMap', 'side'
+					];
+
+					for ( const property of properties ) {
+
+						const value = currentMaterial[ property ];
+
+						if ( value === null ) continue;
+						
+						if ( value[ 'clone' ] !== undefined ) {
+
+							material[ property ] = value.clone();
+
+						} else {
+
+							material[ property ] = value;
+
+						}
+
+					}
+
+				}
+
+				if ( Array.isArray( currentMaterial ) ) {
 
 					// don't remove the entire multi-material. just the material of the selected slot
 
-					editor.removeMaterial( currentObject.material[ currentMaterialSlot ] );
+					editor.removeMaterial( currentMaterial[ currentMaterialSlot ] );
 
 				} else {
 
-					editor.removeMaterial( currentObject.material );
+					editor.removeMaterial( currentMaterial );
 
 				}
 

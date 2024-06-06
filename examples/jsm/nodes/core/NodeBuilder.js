@@ -67,6 +67,7 @@ class NodeBuilder {
 		this.nodes = [];
 		this.updateNodes = [];
 		this.updateBeforeNodes = [];
+		this.updateAfterNodes = [];
 		this.hashNodes = {};
 
 		this.lightsNode = null;
@@ -80,7 +81,7 @@ class NodeBuilder {
 		this.computeShader = null;
 
 		this.flowNodes = { vertex: [], fragment: [], compute: [] };
-		this.flowCode = { vertex: '', fragment: '', compute: [] };
+		this.flowCode = { vertex: '', fragment: '', compute: '' };
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.bindings = { vertex: [], fragment: [], compute: [] };
@@ -215,6 +216,7 @@ class NodeBuilder {
 
 			const updateType = node.getUpdateType();
 			const updateBeforeType = node.getUpdateBeforeType();
+			const updateAfterType = node.getUpdateAfterType();
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
@@ -225,6 +227,12 @@ class NodeBuilder {
 			if ( updateBeforeType !== NodeUpdateType.NONE ) {
 
 				this.updateBeforeNodes.push( node );
+
+			}
+
+			if ( updateAfterType !== NodeUpdateType.NONE ) {
+
+				this.updateAfterNodes.push( node );
 
 			}
 
@@ -412,12 +420,6 @@ class NodeBuilder {
 		if ( type === 'color' ) return 'vec3';
 
 		return type;
-
-	}
-
-	generateMethod( method ) {
-
-		return method;
 
 	}
 
@@ -917,7 +919,9 @@ class NodeBuilder {
 
 		const previousFlow = this.flow;
 		const previousVars = this.vars;
+		const previousCache = this.cache;
 		const previousBuildStage = this.buildStage;
+		const previousStack = this.stack;
 
 		const flow = {
 			code: ''
@@ -925,6 +929,8 @@ class NodeBuilder {
 
 		this.flow = flow;
 		this.vars = {};
+		this.cache = new NodeCache();
+		this.stack = stack();
 
 		for ( const buildStage of defaultBuildStages ) {
 
@@ -938,6 +944,9 @@ class NodeBuilder {
 
 		this.flow = previousFlow;
 		this.vars = previousVars;
+		this.cache = previousCache;
+		this.stack = previousStack;
+
 		this.setBuildStage( previousBuildStage );
 
 		return flow;
@@ -1237,7 +1246,7 @@ class NodeBuilder {
 
 		}
 
-		if ( fromTypeLength === 1 && toTypeLength > 1 && fromType[ 0 ] !== toType[ 0 ] ) { // fromType is float-like
+		if ( fromTypeLength === 1 && toTypeLength > 1 && fromType !== this.getComponentType( toType ) ) { // fromType is float-like
 
 			// convert a number value to vector type, e.g:
 			// vec3( 1u ) -> vec3( float( 1u ) )

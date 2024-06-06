@@ -378,7 +378,8 @@
 			},
 
 			"Objects": {
-				"Lensflare": "examples/en/objects/Lensflare"
+				"Lensflare": "examples/en/objects/Lensflare",
+				"Sky": "examples/en/objects/Sky"
 			},
 
 			"Post-Processing": {
@@ -402,6 +403,10 @@
 
 			"Misc": {
 				"Timer": "examples/en/misc/Timer"
+			},
+
+			"Modifiers": {
+				"EdgeSplit": "examples/en/modifiers/EdgeSplitModifier"
 			},
 
 			"ConvexHull": {
@@ -1112,6 +1117,7 @@
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
 				"KTX2Loader": "examples/zh/loaders/KTX2Loader",
 				"LDrawLoader": "examples/zh/loaders/LDrawLoader",
+				"LUTCubeLoader": "examples/zh/loaders/LUTCubeLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
@@ -1122,7 +1128,8 @@
 			},
 
 			"物体": {
-				"Lensflare": "examples/zh/objects/Lensflare"
+				"Lensflare": "examples/zh/objects/Lensflare",
+				"Sky": "examples/zh/objects/Sky"
 			},
 
 			"后期处理": {

@@ -1,8 +1,9 @@
 import { addNodeClass } from '../core/Node.js';
 import TextureNode from './TextureNode.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { GPUStorageTextureAccess } from '../../renderers/webgpu/utils/WebGPUConstants.js';
 
-class TextureStoreNode extends TextureNode {
+class StorageTextureNode extends TextureNode {
 
 	constructor( value, uvNode, storeNode = null ) {
 
@@ -10,7 +11,9 @@ class TextureStoreNode extends TextureNode {
 
 		this.storeNode = storeNode;
 
-		this.isStoreTextureNode = true;
+		this.isStorageTextureNode = true;
+
+		this.access = GPUStorageTextureAccess.WriteOnly;
 
 	}
 
@@ -26,6 +29,13 @@ class TextureStoreNode extends TextureNode {
 
 		const properties = builder.getNodeProperties( this );
 		properties.storeNode = this.storeNode;
+
+	}
+
+	setAccess( value ) {
+
+		this.access = value;
+		return this;
 
 	}
 
@@ -65,13 +75,16 @@ class TextureStoreNode extends TextureNode {
 
 }
 
-export default TextureStoreNode;
+export default StorageTextureNode;
 
-const textureStoreBase = nodeProxy( TextureStoreNode );
+export const storageTexture = nodeProxy( StorageTextureNode );
+
+export const storageTextureReadOnly = ( value, uvNode, storeNode ) => storageTexture( value, uvNode, storeNode ).setAccess( 'read-only' );
+export const storageTextureReadWrite = ( value, uvNode, storeNode ) => storageTexture( value, uvNode, storeNode ).setAccess( 'read-write' );
 
 export const textureStore = ( value, uvNode, storeNode ) => {
 
-	const node = textureStoreBase( value, uvNode, storeNode );
+	const node = storageTexture( value, uvNode, storeNode );
 
 	if ( storeNode !== null ) node.append();
 
@@ -79,4 +92,4 @@ export const textureStore = ( value, uvNode, storeNode ) => {
 
 };
 
-addNodeClass( 'TextureStoreNode', TextureStoreNode );
+addNodeClass( 'StorageTextureNode', StorageTextureNode );

@@ -70,7 +70,7 @@ import * as THREE from 'three';
 			</li>
 			<li>
 				<p>
-					在项目文件夹中通过 [link:https://www.joshwcomeau.com/javascript/terminal-for-js-devs/ 终端] 安装 three.js 和构建工具 [link:https://vitejs.dev/ Vite]。Vite 将在开发过程中使用，但不会被打包成为最终网页的一部分。当然，除了 Vite 你也可以使用其他支持导入 [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC ES Modules] 的现代构建工具。
+					在项目文件夹中通过 [link:https://www.joshwcomeau.com/javascript/terminal-for-js-devs/ 终端] 安装 three.js 和构建工具 [link:https://cn.vitejs.dev/ Vite]。Vite 将在开发过程中使用，但不会被打包成为最终网页的一部分。当然，除了 Vite 你也可以使用其他支持导入 [link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC ES Modules] 的现代构建工具。
 				</p>
 				<code>
 # three.js
@@ -100,7 +100,7 @@ npm install --save-dev vite
 					<details>
 						<summary><i>npx</i> 是什么？</summary>
 						<p>
-							npx 与 Node.js 一同安装，可运行 Vite 等命令行程序，这样你就不必自己在 <i>node_modules/</i> 中搜索正确的文件。如果你愿意，可以将 [link:https://vitejs.dev/guide/#command-line-interface Vite 的常用命令] 放入 [link:https://docs.npmjs.com/cli/v9/using-npm/scripts package.json:scripts] 列表，然后使用 <i>npm run dev</i> 代替。
+							npx 与 Node.js 一同安装，可运行 Vite 等命令行程序，这样你就不必自己在 <i>node_modules/</i> 中搜索正确的文件。如果你愿意，可以将 [link:https://cn.vitejs.dev/guide/#command-line-interface Vite 的常用命令] 放入 [link:https://docs.npmjs.com/cli/v9/using-npm/scripts package.json:scripts] 列表，然后使用 <i>npm run dev</i> 代替。
 						</p>
 					</details>
 				</aside>
@@ -123,10 +123,10 @@ npm install --save-dev vite
 				[link:https://threejs-journey.com/lessons/local-server three.js journey: Local Server]
 			</li>
 			<li>
-				[link:https://vitejs.dev/guide/cli.html Vite: Command Line Interface]
+				[link:https://cn.vitejs.dev/guide/cli.html Vite: Command Line Interface]
 			</li>
 			<li>
-				[link:https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Package_management MDN: Package management basics]
+				[link:https://developer.mozilla.org/zh-CN/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Package_management MDN: Package management basics]
 			</li>
 		</ul>
 
@@ -145,7 +145,7 @@ npm install --save-dev vite
 		<ol>
 			<li>
 				<p>
-					我们在 <i>main.js</i> 中从 "three"（一个 npm 软件包）导入了代码，但网络浏览器并不知道这意味着什么。在 <i>index.html</i> 中，我们需要添加一个[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap 导入映射]（import map）来定义从哪里获取软件包。将下面的代码放在 <i>&lt;head>&lt/head></i> 标签内、样式（styles）之后。
+					我们在 <i>main.js</i> 中从 "three"（一个 npm 软件包）导入了代码，但网络浏览器并不知道这意味着什么。在 <i>index.html</i> 中，我们需要添加一个[link:https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/script/type/importmap 导入映射]（import map）来定义从哪里获取软件包。将下面的代码放在 <i>&lt;head>&lt/head></i> 标签内、样式（styles）之后。
 				</p>
 				<code>
 &lt;script type="importmap">
