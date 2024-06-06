@@ -1151,6 +1151,10 @@
 				"OBB": "examples/zh/math/OBB"
 			},
 
+			"修改器":{
+				"EdgeSplitModifier": "examples/zh/modifiers/EdgeSplitModifier"
+			},
+
 			"杂项": {
 				"Timer": "examples/zh/misc/Timer"
 			},
