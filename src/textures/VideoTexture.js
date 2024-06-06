@@ -42,7 +42,7 @@ class VideoTexture extends Texture {
 		const video = this.image;
 		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
 
-		if ( hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA && ( ! video.paused || ! this.firstFrame) ) {
+		if ( hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA && ( ! video.paused || ! this.firstFrame ) ) {
 
 			this.needsUpdate = true;
 			this.firstFrame = true;
