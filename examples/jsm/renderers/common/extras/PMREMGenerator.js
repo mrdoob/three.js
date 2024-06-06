@@ -119,21 +119,22 @@ class PMREMGenerator {
 	 * Generates a PMREM from a supplied Scene, which can be faster than using an
 	 * image if networking bandwidth is low. Optional sigma specifies a blur radius
 	 * in radians to be applied to the scene before PMREM generation. Optional near
-	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
-	 * is placed at the origin).
+	 * and far planes ensure the scene is rendered in its entirety 
+	 * Optional size, the renderTarget default size is 256
+	 * Optional cubeCamera position, the cubeCamera default position is the origin
 	 */
-	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
+	fromScene( scene, sigma = 0, near = 0.1, far = 100, size = 256, position = new Vector3( 0, 0, 0 ) ) {
 
 		_oldTarget = this._renderer.getRenderTarget();
 		_oldActiveCubeFace = this._renderer.getActiveCubeFace();
 		_oldActiveMipmapLevel = this._renderer.getActiveMipmapLevel();
 
-		this._setSize( 256 );
+		this._setSize( size );
 
 		const cubeUVRenderTarget = this._allocateTargets();
 		cubeUVRenderTarget.depthBuffer = true;
 
-		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
+		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget, position );
 
 		if ( sigma > 0 ) {
 
@@ -324,7 +325,7 @@ class PMREMGenerator {
 
 	}
 
-	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
+	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget, position ) {
 
 		const cubeCamera = _cubeCamera;
 		cubeCamera.near = near;
@@ -394,17 +395,20 @@ class PMREMGenerator {
 			if ( col === 0 ) {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.lookAt( forwardSign[ i ], 0, 0 );
+				cubeCamera.position.set( position.x, position.y, position.z );
+				cubeCamera.lookAt( position.x - forwardSign[ i ], position.y, position.z );
 
 			} else if ( col === 1 ) {
 
 				cubeCamera.up.set( 0, 0, upSign[ i ] );
-				cubeCamera.lookAt( 0, forwardSign[ i ], 0 );
+				cubeCamera.position.set( position.x, position.y, position.z );
+				cubeCamera.lookAt( position.x, position.y + forwardSign[ i ], position.z );
 
 			} else {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
-				cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
+				cubeCamera.position.set( position.x, position.y, position.z );
+				cubeCamera.lookAt( position.x, position.y, position.z + forwardSign[ i ] );
 
 			}
 
