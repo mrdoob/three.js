@@ -1332,7 +1332,7 @@ class WebGLRenderer {
 						if ( sortObjects ) {
 
 							_vector3.setFromMatrixPosition( object.matrixWorld )
-								.applyMatrix4( _projScreenMatrix );
+								.applyMatrix4( camera.matrixWorldInverse );
 
 						}
 
@@ -1341,7 +1341,7 @@ class WebGLRenderer {
 
 						if ( material.visible ) {
 
-							currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+							currentRenderList.push( object, geometry, material, groupOrder, - _vector3.z, null );
 
 						}
 
@@ -1370,7 +1370,7 @@ class WebGLRenderer {
 
 							_vector3
 								.applyMatrix4( object.matrixWorld )
-								.applyMatrix4( _projScreenMatrix );
+								.applyMatrix4( camera.matrixWorldInverse );
 
 						}
 
@@ -1385,7 +1385,7 @@ class WebGLRenderer {
 
 								if ( groupMaterial && groupMaterial.visible ) {
 
-									currentRenderList.push( object, geometry, groupMaterial, groupOrder, _vector3.z, group );
+									currentRenderList.push( object, geometry, groupMaterial, groupOrder, - _vector3.z, group );
 
 								}
 
@@ -1393,7 +1393,7 @@ class WebGLRenderer {
 
 						} else if ( material.visible ) {
 
-							currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+							currentRenderList.push( object, geometry, material, groupOrder, - _vector3.z, null );
 
 						}
 
