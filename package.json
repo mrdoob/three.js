@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.164.1",
+  "version": "0.165.0",
   "description": "JavaScript 3D library",
   "type": "module",
   "main": "./build/three.cjs",
@@ -41,7 +41,7 @@
   ],
   "scripts": {
     "start": "npm run dev",
-    "test": "npm run lint && npm run test-unit",
+    "test": "npm run lint && npm run test-unit && npm run test-unit-addons",
     "build": "rollup -c utils/build/rollup.config.js",
     "build-module": "rollup -c utils/build/rollup.config.js --configOnlyModule",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"servez -p 8080\"",
@@ -58,6 +58,7 @@
     "lint": "npm run lint-core",
     "lint-fix": "npm run lint-core -- --fix && npm run lint-addons -- --fix && npm run lint-examples -- --fix && npm run lint-docs -- --fix && npm run lint-editor -- --fix && npm run lint-playground -- --fix && npm run lint-manual -- --fix && npm run lint-test -- --fix && npm run lint-utils -- --fix",
     "test-unit": "qunit -r failonlyreporter -f !-webonly test/unit/three.source.unit.js",
+    "test-unit-addons": "qunit -r failonlyreporter -f !-webonly test/unit/three.addons.unit.js",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",

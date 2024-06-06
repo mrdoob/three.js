@@ -65,7 +65,7 @@ class WebXRDepthSensing {
 
 	}
 
-	render( renderer, cameraXR ) {
+	getMesh( cameraXR ) {
 
 		if ( this.texture !== null ) {
 
@@ -86,9 +86,9 @@ class WebXRDepthSensing {
 
 			}
 
-			renderer.render( this.mesh, cameraXR );
-
 		}
+
+		return this.mesh;
 
 	}
 
@@ -96,6 +96,12 @@ class WebXRDepthSensing {
 
 		this.texture = null;
 		this.mesh = null;
+
+	}
+
+	getDepthTexture() {
+
+		return this.texture;
 
 	}
 

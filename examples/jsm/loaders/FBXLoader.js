@@ -407,11 +407,33 @@ class FBXTreeParser {
 	// load a texture specified as a blob or data URI, or via an external URL using TextureLoader
 	loadTexture( textureNode, images ) {
 
-		let fileName;
+		const nonNativeExtensions = new Set( [ 'tga', 'tif', 'tiff', 'exr', 'dds', 'hdr', 'ktx2' ] );
 
-		const currentPath = this.textureLoader.path;
+		const extension = textureNode.FileName.split( '.' ).pop().toLowerCase();
+
+		const loader = nonNativeExtensions.has( extension ) ? this.manager.getHandler( `.${extension}` ) : this.textureLoader;
+
+		if ( ! loader ) {
+
+			console.warn(
+				`FBXLoader: ${extension.toUpperCase()} loader not found, creating placeholder texture for`,
+				textureNode.RelativeFilename
+			);
+			return new Texture();
+
+		}
+
+		const loaderPath = loader.path;
+
+		if ( ! loaderPath ) {
+
+			loader.setPath( this.textureLoader.path );
+
+		}
 
 		const children = connections.get( textureNode.id ).children;
+
+		let fileName;
 
 		if ( children !== undefined && children.length > 0 && images[ children[ 0 ].ID ] !== undefined ) {
 
@@ -419,60 +441,16 @@ class FBXTreeParser {
 
 			if ( fileName.indexOf( 'blob:' ) === 0 || fileName.indexOf( 'data:' ) === 0 ) {
 
-				this.textureLoader.setPath( undefined );
+				loader.setPath( undefined );
 
 			}
 
 		}
 
-		let texture;
+		const texture = loader.load( fileName );
 
-		const extension = textureNode.FileName.slice( - 3 ).toLowerCase();
-
-		if ( extension === 'tga' ) {
-
-			const loader = this.manager.getHandler( '.tga' );
-
-			if ( loader === null ) {
-
-				console.warn( 'FBXLoader: TGA loader not found, creating placeholder texture for', textureNode.RelativeFilename );
-				texture = new Texture();
-
-			} else {
-
-				loader.setPath( this.textureLoader.path );
-				texture = loader.load( fileName );
-
-			}
-
-		} else if ( extension === 'dds' ) {
-
-			const loader = this.manager.getHandler( '.dds' );
-
-			if ( loader === null ) {
-
-				console.warn( 'FBXLoader: DDS loader not found, creating placeholder texture for', textureNode.RelativeFilename );
-				texture = new Texture();
-
-			} else {
-
-				loader.setPath( this.textureLoader.path );
-				texture = loader.load( fileName );
-
-			}
-
-		} else if ( extension === 'psd' ) {
-
-			console.warn( 'FBXLoader: PSD textures are not supported, creating placeholder texture for', textureNode.RelativeFilename );
-			texture = new Texture();
-
-		} else {
-
-			texture = this.textureLoader.load( fileName );
-
-		}
-
-		this.textureLoader.setPath( currentPath );
+		// revert to initial path
+		loader.setPath( loaderPath );
 
 		return texture;
 
@@ -2051,14 +2029,18 @@ class GeometryParser {
 			// Triangulate n-gon using earcut
 
 			const vertices = [];
-
+			// in morphing scenario vertexPositions represent morphPositions
+			// while baseVertexPositions represent the original geometry's positions
+			const positions = geoInfo.baseVertexPositions || geoInfo.vertexPositions;
 			for ( let i = 0; i < facePositionIndexes.length; i += 3 ) {
 
-				vertices.push( new Vector3(
-					geoInfo.vertexPositions[ facePositionIndexes[ i ] ],
-					geoInfo.vertexPositions[ facePositionIndexes[ i + 1 ] ],
-					geoInfo.vertexPositions[ facePositionIndexes[ i + 2 ] ]
-				) );
+				vertices.push(
+					new Vector3(
+						positions[ facePositionIndexes[ i ] ],
+						positions[ facePositionIndexes[ i + 1 ] ],
+						positions[ facePositionIndexes[ i + 2 ] ]
+					)
+				);
 
 			}
 
@@ -2071,6 +2053,12 @@ class GeometryParser {
 
 			}
 
+			// When vertices is an array of [0,0,0] elements (which is the case for vertices not participating in morph)
+			// the triangulationInput will be an array of [0,0] elements
+			// resulting in an array of 0 triangles being returned from ShapeUtils.triangulateShape
+			// leading to not pushing into buffers.vertex the redundant vertices (the vertices that are not morphed).
+			// That's why, in order to support morphing scenario, "positions" is looking first for baseVertexPositions,
+			// so that we don't end up with an array of 0 triangles for the faces not participating in morph.
 			triangles = ShapeUtils.triangulateShape( triangulationInput, [] );
 
 		} else {
@@ -2225,17 +2213,18 @@ class GeometryParser {
 	// Normal and position attributes only have data for the vertices that are affected by the morph
 	genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, name ) {
 
-		const vertexIndices = ( parentGeoNode.PolygonVertexIndex !== undefined ) ? parentGeoNode.PolygonVertexIndex.a : [];
+		const basePositions = parentGeoNode.Vertices !== undefined ? parentGeoNode.Vertices.a : [];
+		const baseIndices = parentGeoNode.PolygonVertexIndex !== undefined ? parentGeoNode.PolygonVertexIndex.a : [];
 
-		const morphPositionsSparse = ( morphGeoNode.Vertices !== undefined ) ? morphGeoNode.Vertices.a : [];
-		const indices = ( morphGeoNode.Indexes !== undefined ) ? morphGeoNode.Indexes.a : [];
+		const morphPositionsSparse = morphGeoNode.Vertices !== undefined ? morphGeoNode.Vertices.a : [];
+		const morphIndices = morphGeoNode.Indexes !== undefined ? morphGeoNode.Indexes.a : [];
 
 		const length = parentGeo.attributes.position.count * 3;
 		const morphPositions = new Float32Array( length );
 
-		for ( let i = 0; i < indices.length; i ++ ) {
+		for ( let i = 0; i < morphIndices.length; i ++ ) {
 
-			const morphIndex = indices[ i ] * 3;
+			const morphIndex = morphIndices[ i ] * 3;
 
 			morphPositions[ morphIndex ] = morphPositionsSparse[ i * 3 ];
 			morphPositions[ morphIndex + 1 ] = morphPositionsSparse[ i * 3 + 1 ];
@@ -2245,9 +2234,9 @@ class GeometryParser {
 
 		// TODO: add morph normal support
 		const morphGeoInfo = {
-			vertexIndices: vertexIndices,
+			vertexIndices: baseIndices,
 			vertexPositions: morphPositions,
-
+			baseVertexPositions: basePositions
 		};
 
 		const morphBuffers = this.genBuffers( morphGeoInfo );

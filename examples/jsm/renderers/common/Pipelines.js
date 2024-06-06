@@ -67,7 +67,7 @@ class Pipelines extends DataMap {
 
 			if ( pipeline === undefined ) {
 
-				if ( previousPipeline && previousPipeline.usedTimes === 0 ) this._releasePipeline( computeNode );
+				if ( previousPipeline && previousPipeline.usedTimes === 0 ) this._releasePipeline( previousPipeline );
 
 				pipeline = this._getComputePipeline( computeNode, stageCompute, cacheKey, bindings );
 
@@ -205,7 +205,7 @@ class Pipelines extends DataMap {
 
 		}
 
-		super.delete( object );
+		return super.delete( object );
 
 	}
 

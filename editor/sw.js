@@ -91,7 +91,6 @@ const assets = [
 	'./js/libs/codemirror/mode/glsl.js',
 
 	'./js/libs/esprima.js',
-	'./js/libs/ffmpeg.min.js',
 	'./js/libs/jsonlint.js',
 
 	'./js/libs/codemirror/addon/dialog.css',

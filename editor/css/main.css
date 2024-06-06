@@ -76,9 +76,25 @@ textarea, input { outline: none; } /* osx */
 
 .TabbedPanel .Tabs {
 	position: relative;
+	z-index: 1; /** Above .Panels **/
 	display: block;
 	width: 100%;
+	white-space: pre;
+	overflow: hidden;
+	overflow-x: auto;
 }
+
+	.TabbedPanel .Tabs::-webkit-scrollbar {
+		height: 5px;
+		background: #eee;
+	}
+	.TabbedPanel .Tabs::-webkit-scrollbar-thumb {
+		background: #08f3;
+	}
+	.TabbedPanel .Tabs:hover::-webkit-scrollbar-thumb {
+		background: #08f;
+		cursor: ew-resize;
+	}
 
 	.TabbedPanel .Tabs .Tab {
 		padding: 10px 9px;
@@ -86,7 +102,8 @@ textarea, input { outline: none; } /* osx */
 	}
 
 	.TabbedPanel .Panels {
-		position: relative;
+		position: absolute;
+		top: 40px;
 		display: block;
 		width: 100%;
 	}
@@ -296,6 +313,7 @@ select {
 
 #resizer {
 	position: absolute;
+	z-index: 2; /* Above #sidebar */
 	top: 32px;
 	right: 350px;
 	width: 5px;
@@ -377,6 +395,18 @@ select {
 			line-height: 16px;
 		}
 
+		#menubar .menu .key {
+			position: absolute;
+			right: 10px;
+			color: #ccc;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			font-size: 9px;
+			padding: 2px 4px;
+			right: 10px;
+			pointer-events: none;
+		}
+
 		#menubar .menu .options {
 			position: fixed;
 			z-index: 1; /* higher than resizer */
@@ -414,6 +444,21 @@ select {
 					background: transparent;
 				}
 
+				#menubar .menu .options .option.toggle::before {
+
+					content: ' ';
+					display: inline-block;
+					width: 16px;
+
+				}
+
+				#menubar .menu .options .option.toggle-on::before {
+
+					content: '✔';
+					font-size: 12px;
+
+				}
+
 				#menubar .submenu-title::after {
 					content: '⏵';
 					float: right;
@@ -427,6 +472,8 @@ select {
 			cursor: not-allowed;
 		}
 
+		
+
 #sidebar {
 	position: absolute;
 	right: 0;
@@ -435,6 +482,7 @@ select {
 	width: 350px;
 	background: #eee;
 	overflow: auto;
+	overflow-x: hidden;
 }
 
 	#sidebar .Panel {
@@ -633,6 +681,11 @@ select {
 		background: #111;
 	}
 
+			#menubar .menu .key {
+				color: #444;
+				border-color: #444;
+			}
+
 			#menubar .menu .options {
 				background: #111;
 			}
@@ -703,6 +756,10 @@ select {
 		background-color: #1b1b1b;
 		border-top: 1px solid #222;
 	}
+
+		.TabbedPanel .Tabs::-webkit-scrollbar {
+			background: #111;
+		}
 
 		.TabbedPanel .Tab {
 			color: #555;

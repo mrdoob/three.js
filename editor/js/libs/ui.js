@@ -98,6 +98,14 @@ class UIElement {
 
 	}
 
+	toggleClass( name, toggle ) {
+
+		this.dom.classList.toggle( name, toggle );
+
+		return this;
+
+	}
+
 	setStyle( style, array ) {
 
 		for ( let i = 0; i < array.length; i ++ ) {
@@ -113,6 +121,8 @@ class UIElement {
 	setHidden( isHidden ) {
 
 		this.dom.hidden = isHidden;
+
+		return this;
 
 	}
 
@@ -1130,6 +1140,26 @@ class UITabbedPanel extends UIDiv {
 		}
 
 		this.selected = id;
+
+		// Scrolls to tab
+		if ( tab ) {
+
+			const tabOffsetRight = tab.dom.offsetLeft + tab.dom.offsetWidth;
+			const containerWidth = this.tabsDiv.dom.getBoundingClientRect().width;
+
+			if ( tabOffsetRight > containerWidth ) {
+
+				this.tabsDiv.dom.scrollTo( { left: tabOffsetRight - containerWidth, behavior: 'smooth' } );
+
+			}
+
+			if ( tab.dom.offsetLeft < this.tabsDiv.dom.scrollLeft ) {
+
+				this.tabsDiv.dom.scrollTo( { left: 0, behavior: 'smooth' } );
+
+			}
+
+		}
 
 		return this;
 

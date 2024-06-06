@@ -62,8 +62,9 @@ class WebGPUBindingUtils {
 			} else if ( binding.isSampledTexture && binding.store ) {
 
 				const format = this.backend.get( binding.texture ).texture.format;
+				const access = binding.access;
 
-				bindingGPU.storageTexture = { format }; // GPUStorageTextureBindingLayout
+				bindingGPU.storageTexture = { format, access }; // GPUStorageTextureBindingLayout
 
 			} else if ( binding.isSampledTexture ) {
 
@@ -102,6 +103,10 @@ class WebGPUBindingUtils {
 				} else if ( binding.texture.isDataArrayTexture ) {
 
 					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
+
+				} else if ( binding.isSampledTexture3D ) {
+
+					texture.viewDimension = GPUTextureViewDimension.ThreeD;
 
 				}
 
@@ -213,6 +218,10 @@ class WebGPUBindingUtils {
 				if ( binding.isSampledCubeTexture ) {
 
 					dimensionViewGPU = GPUTextureViewDimension.Cube;
+
+				} else if ( binding.isSampledTexture3D ) {
+
+					dimensionViewGPU = GPUTextureViewDimension.ThreeD;
 
 				} else if ( binding.texture.isDataArrayTexture ) {
 

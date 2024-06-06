@@ -3,7 +3,7 @@ class NodeKeywords {
 	constructor() {
 
 		this.keywords = [];
-		this.nodes = [];
+		this.nodes = {};
 		this.keywordsCallback = {};
 
 	}

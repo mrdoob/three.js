@@ -14,6 +14,7 @@ function Strings( config ) {
 			'prompt/history/clear': 'The Undo/Redo History will be cleared. Are you sure?',
 			'prompt/history/preserve': 'The history will be preserved across sessions.\nThis can have an impact on performance when working with textures.',
 			'prompt/history/forbid': 'Undo/Redo disabled while scene is playing.',
+			'prompt/rendering/realistic/unsupportedMaterial': 'REALISTIC Shading: Only MeshStandardMaterial and MeshPhysicalMaterial are supported',
 
 			'command/AddObject': 'Add Object',
 			'command/AddScript': 'Add Script',
@@ -39,24 +40,24 @@ function Strings( config ) {
 			'command/SetValue': 'Set Value',
 
 			'menubar/file': 'File',
-			'menubar/file/newProject': 'New Project',
-			'menubar/file/newProject/empty': 'Empty',
-			'menubar/file/newProject/Arkanoid': 'Arkanoid',
-			'menubar/file/newProject/Camera': 'Camera',
-			'menubar/file/newProject/Particles': 'Particles',
-			'menubar/file/newProject/Pong': 'Pong',
-			'menubar/file/newProject/Shaders': 'Shaders',
-			'menubar/file/save': 'Save',
+			'menubar/file/new': 'New',
+			'menubar/file/new/empty': 'Empty',
+			'menubar/file/new/Arkanoid': 'Arkanoid',
+			'menubar/file/new/Camera': 'Camera',
+			'menubar/file/new/Particles': 'Particles',
+			'menubar/file/new/Pong': 'Pong',
+			'menubar/file/new/Shaders': 'Shaders',
 			'menubar/file/open': 'Open',
+			'menubar/file/save': 'Save',
 			'menubar/file/import': 'Import',
 			'menubar/file/export': 'Export',
 
 			'menubar/edit': 'Edit',
-			'menubar/edit/undo': 'Undo (Ctrl+Z)',
-			'menubar/edit/redo': 'Redo (Ctrl+Shift+Z)',
+			'menubar/edit/undo': 'Undo',
+			'menubar/edit/redo': 'Redo',
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Clone',
-			'menubar/edit/delete': 'Delete (Del)',
+			'menubar/edit/delete': 'Delete',
 
 			'menubar/add': 'Add',
 			'menubar/add/group': 'Group',
@@ -94,6 +95,10 @@ function Strings( config ) {
 
 			'menubar/view': 'View',
 			'menubar/view/fullscreen': 'Fullscreen',
+			'menubar/view/gridHelper': 'Grid Helper',
+			'menubar/view/cameraHelpers': 'Camera Helpers',
+			'menubar/view/lightHelpers': 'Light Helpers',
+			'menubar/view/skeletonHelpers': 'Skeleton Helpers',
 
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
@@ -154,6 +159,7 @@ function Strings( config ) {
 			'sidebar/geometry/uuid': 'UUID',
 			'sidebar/geometry/name': 'Name',
 			'sidebar/geometry/bounds': 'Bounds',
+			'sidebar/geometry/userdata': 'User Data',
 			'sidebar/geometry/show_vertex_normals': 'Show Vertex Normals',
 			'sidebar/geometry/compute_vertex_normals': 'Compute Vertex Normals',
 			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
@@ -352,6 +358,7 @@ function Strings( config ) {
 			'sidebar/project/app/publish': 'Publish',
 
 			'sidebar/project/image': 'Image',
+			'sidebar/project/image/samples': 'Samples',
 			'sidebar/project/video': 'Video',
 
 			'sidebar/project/shading': 'Shading',
@@ -381,13 +388,19 @@ function Strings( config ) {
 			'viewport/controls/grid': 'Grid',
 			'viewport/controls/helpers': 'Helpers',
 
-			'viewport/info/oneObject': 'Object',
-			'viewport/info/oneVertex': 'Vertex',
-			'viewport/info/oneTriangle': 'Triangle',
+			'viewport/info/object': 'Object',
 			'viewport/info/objects': 'Objects',
+			'viewport/info/vertex': 'Vertex',
 			'viewport/info/vertices': 'Vertices',
+			'viewport/info/triangle': 'Triangle',
 			'viewport/info/triangles': 'Triangles',
-			'viewport/info/rendertime': 'Render time'
+			'viewport/info/sample': 'Sample',
+			'viewport/info/samples': 'Samples',
+			'viewport/info/rendertime': 'Render time',
+
+			'script/title/vertexShader': 'Vertex Shader',
+			'script/title/fragmentShader': 'Fragment Shader',
+			'script/title/programInfo': 'Program Properties'
 
 		},
 
@@ -401,6 +414,7 @@ function Strings( config ) {
 			'prompt/history/clear': 'L\'historique d\'annulation/rétablissement sera effacé Êtes-vous sûr ?',
 			'prompt/history/preserve': 'L\'histoire sera conservée entre les sessions.\nCela peut avoir un impact sur les performances lors de la manipulation des textures.',
 			'prompt/history/forbid': 'Les fonctions Annuler/Rétablir sont désactivées pendant la lecture de la scène.',
+			'prompt/rendering/realistic/unsupportedMaterial': 'Ombrage REALISTIC : seuls MeshStandardMaterial et MeshPhysicalMaterial sont pris en charge',
 
 			'command/AddObject': 'Ajouter un objet',
 			'command/AddScript': 'Ajouter un script',
@@ -426,24 +440,24 @@ function Strings( config ) {
 			'command/SetValue': 'Définir la valeur',
 
 			'menubar/file': 'Fichier',
-			'menubar/file/newProject': 'Nouveau projet',
-			'menubar/file/newProject/empty': 'Vide',
-			'menubar/file/newProject/Arkanoid': 'Arkanoid',
-			'menubar/file/newProject/Camera': 'Camera',
-			'menubar/file/newProject/Particles': 'Particles',
-			'menubar/file/newProject/Pong': 'Pong',
-			'menubar/file/newProject/Shaders': 'Shaders',
-			'menubar/file/save': 'Save',
+			'menubar/file/new': 'Nouveau',
+			'menubar/file/new/empty': 'Vide',
+			'menubar/file/new/Arkanoid': 'Arkanoid',
+			'menubar/file/new/Camera': 'Camera',
+			'menubar/file/new/Particles': 'Particles',
+			'menubar/file/new/Pong': 'Pong',
+			'menubar/file/new/Shaders': 'Shaders',
 			'menubar/file/open': 'Open',
+			'menubar/file/save': 'Save',
 			'menubar/file/import': 'Importer',
 			'menubar/file/export': 'Exporter',
 
 			'menubar/edit': 'Edition',
-			'menubar/edit/undo': 'Annuler (Ctrl+Z)',
-			'menubar/edit/redo': 'Refaire (Ctrl+Shift+Z)',
+			'menubar/edit/undo': 'Annuler',
+			'menubar/edit/redo': 'Refaire',
 			'menubar/edit/center': 'Center',
 			'menubar/edit/clone': 'Cloner',
-			'menubar/edit/delete': 'Supprimer (Supp)',
+			'menubar/edit/delete': 'Supprimer',
 
 			'menubar/add': 'Ajouter',
 			'menubar/add/group': 'Groupe',
@@ -481,6 +495,10 @@ function Strings( config ) {
 
 			'menubar/view': 'View',
 			'menubar/view/fullscreen': 'Fullscreen',
+			'menubar/view/gridHelper': 'Assistant de grille',
+			'menubar/view/cameraHelpers': 'Aides à la caméra',
+			'menubar/view/lightHelpers': 'Aides Lumière',
+			'menubar/view/skeletonHelpers': 'Aides squelettes',
 
 			'menubar/help': 'Aide',
 			'menubar/help/source_code': 'Code Source',
@@ -541,6 +559,7 @@ function Strings( config ) {
 			'sidebar/geometry/uuid': 'UUID',
 			'sidebar/geometry/name': 'Nom',
 			'sidebar/geometry/bounds': 'Limites',
+			'sidebar/geometry/userdata': 'Données utilisateur',
 			'sidebar/geometry/show_vertex_normals': 'Afficher normales',
 			'sidebar/geometry/compute_vertex_normals': 'Compute Vertex Normals',
 			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
@@ -739,6 +758,7 @@ function Strings( config ) {
 			'sidebar/project/app/publish': 'Publier',
 
 			'sidebar/project/image': 'Image',
+			'sidebar/project/image/samples': 'd\'échantillons',
 			'sidebar/project/video': 'Video',
 
 			'sidebar/project/shading': 'Shading',
@@ -768,13 +788,19 @@ function Strings( config ) {
 			'viewport/controls/grid': 'Grille',
 			'viewport/controls/helpers': 'Helpers',
 
-			'viewport/info/oneObject': 'Objet',
-			'viewport/info/oneVertex': 'Sommet',
-			'viewport/info/oneTriangle': 'Triangle',
+			'viewport/info/object': 'Objet',
 			'viewport/info/objects': 'Objets',
+			'viewport/info/vertex': 'Sommet',
 			'viewport/info/vertices': 'Sommets',
+			'viewport/info/triangle': 'Triangle',
 			'viewport/info/triangles': 'Triangles',
-			'viewport/info/rendertime': 'Temps de rendu'
+			'viewport/info/sample': 'Échantillon',
+			'viewport/info/samples': 'Échantillons',
+			'viewport/info/rendertime': 'Temps de rendu',
+
+			'script/title/vertexShader': 'Vertex Shader',
+			'script/title/fragmentShader': 'Fragment Shader',
+			'script/title/programInfo': 'Propriétés du programme'
 
 		},
 
@@ -788,6 +814,7 @@ function Strings( config ) {
 			'prompt/history/clear': '撤销/重做历史记录将被清除。您确定吗？',
 			'prompt/history/preserve': '历史将在会话之间保留。\n这可能会影响在处理纹理时的性能。',
 			'prompt/history/forbid': '在播放场景时，撤消/重做被禁用。',
+			'prompt/rendering/realistic/unsupportedMaterial': 'REALISTIC着色：仅支持 MeshStandardMaterial 和 MeshPhysicalMaterial',
 
 			'command/AddObject': '添加对象',
 			'command/AddScript': '添加脚本',
@@ -813,24 +840,24 @@ function Strings( config ) {
 			'command/SetValue': '设定值',
 
 			'menubar/file': '文件',
-			'menubar/file/newProject': '新建项目',
-			'menubar/file/newProject/empty': '空',
-			'menubar/file/newProject/Arkanoid': '打砖块',
-			'menubar/file/newProject/Camera': ' 摄像机',
-			'menubar/file/newProject/Particles': '粒子',
-			'menubar/file/newProject/Pong': '乒乓球',
-			'menubar/file/newProject/Shaders': '着色器',
-			'menubar/file/save': '保存',
+			'menubar/file/new': '新建项目',
+			'menubar/file/new/empty': '空',
+			'menubar/file/new/Arkanoid': '打砖块',
+			'menubar/file/new/Camera': ' 摄像机',
+			'menubar/file/new/Particles': '粒子',
+			'menubar/file/new/Pong': '乒乓球',
+			'menubar/file/new/Shaders': '着色器',
 			'menubar/file/open': '打开',
+			'menubar/file/save': '保存',
 			'menubar/file/import': '导入',
 			'menubar/file/export': '导出',
 
 			'menubar/edit': '编辑',
-			'menubar/edit/undo': '撤销 (Ctrl+Z)',
-			'menubar/edit/redo': '重做 (Ctrl+Shift+Z)',
+			'menubar/edit/undo': '撤销',
+			'menubar/edit/redo': '重做',
 			'menubar/edit/center': '居中',
 			'menubar/edit/clone': '拷贝',
-			'menubar/edit/delete': '删除 (Del)',
+			'menubar/edit/delete': '删除',
 
 			'menubar/add': '添加',
 			'menubar/add/group': '组',
@@ -868,6 +895,10 @@ function Strings( config ) {
 
 			'menubar/view': '视图',
 			'menubar/view/fullscreen': '全屏',
+			'menubar/view/gridHelper': '网格助手',
+			'menubar/view/cameraHelpers': '相机助手',
+			'menubar/view/lightHelpers': '光助手',
+			'menubar/view/skeletonHelpers': '骷髅助手',
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
@@ -928,6 +959,7 @@ function Strings( config ) {
 			'sidebar/geometry/uuid': '识别码',
 			'sidebar/geometry/name': '名称',
 			'sidebar/geometry/bounds': '界限',
+			'sidebar/geometry/userdata': '自定义数据',
 			'sidebar/geometry/show_vertex_normals': '显示顶点法线',
 			'sidebar/geometry/compute_vertex_normals': '计算顶点法线',
 			'sidebar/geometry/compute_vertex_tangents': 'Compute Tangents',
@@ -1126,6 +1158,7 @@ function Strings( config ) {
 			'sidebar/project/app/publish': '发布',
 
 			'sidebar/project/image': 'Image',
+			'sidebar/project/image/samples': '样本',
 			'sidebar/project/video': '视频',
 
 			'sidebar/project/shading': 'Shading',
@@ -1155,13 +1188,19 @@ function Strings( config ) {
 			'viewport/controls/grid': '网格',
 			'viewport/controls/helpers': '辅助',
 
-			'viewport/info/oneObject': '物体',
-			'viewport/info/oneVertex': '顶点',
-			'viewport/info/oneTriangle': '三角形',
+			'viewport/info/object': '物体',
 			'viewport/info/objects': '物体',
+			'viewport/info/vertex': '顶点',
 			'viewport/info/vertices': '顶点',
+			'viewport/info/triangle': '三角形',
 			'viewport/info/triangles': '三角形',
-			'viewport/info/rendertime': '渲染时间'
+			'viewport/info/sample': '样本',
+			'viewport/info/samples': '样本',
+			'viewport/info/rendertime': '渲染时间',
+
+			'script/title/vertexShader': '顶点着色器',
+			'script/title/fragmentShader': '片段着色器',
+			'script/title/programInfo': '程序属性'
 
 		},
 
@@ -1175,6 +1214,7 @@ function Strings( config ) {
 			'prompt/history/clear': '元に戻す/やり直しの履歴が消去されます。 本気ですか？',
 			'prompt/history/preserve': '履歴はセッションをまたいで保存されます。\nこれは、テクスチャを操作する際のパフォーマンスに影響を与える可能性があります。',
 			'prompt/history/forbid': 'シーンの再生中は元に戻す/やり直しは無効になります。',
+			'prompt/rendering/realistic/unsupportedMaterial': 'REALISTIC シェーディング: MeshStandardmaterial と MeshPhysicalmaterial のみがサポートされています',
 
 			'command/AddObject': 'オブジェクトを追加',
 			'command/AddScript': 'スクリプトを追加',
@@ -1200,24 +1240,24 @@ function Strings( config ) {
 			'command/SetValue': '値の設定',
 
 			'menubar/file': 'ファイル',
-			'menubar/file/newProject': '新規プロジェクト',
-			'menubar/file/newProject/empty': '空',
-			'menubar/file/newProject/Arkanoid': 'ブロック崩し',
-			'menubar/file/newProject/Camera': 'カメラ',
-			'menubar/file/newProject/Particles': 'パーティクル',
-			'menubar/file/newProject/Pong': 'ピンポン',
-			'menubar/file/newProject/Shaders': 'シェーダー',
-			'menubar/file/save': '保存',
+			'menubar/file/new': '新規プロジェクト',
+			'menubar/file/new/empty': '空',
+			'menubar/file/new/Arkanoid': 'ブロック崩し',
+			'menubar/file/new/Camera': 'カメラ',
+			'menubar/file/new/Particles': 'パーティクル',
+			'menubar/file/new/Pong': 'ピンポン',
+			'menubar/file/new/Shaders': 'シェーダー',
 			'menubar/file/open': '開く',
+			'menubar/file/save': '保存',
 			'menubar/file/import': 'インポート',
 			'menubar/file/export': 'エクスポート',
 
 			'menubar/edit': '編集',
-			'menubar/edit/undo': '元に戻す（Ctrl+Z）',
-			'menubar/edit/redo': 'やり直す（Ctrl+Shift+Z）',
+			'menubar/edit/undo': '元に戻す',
+			'menubar/edit/redo': 'やり直す',
 			'menubar/edit/center': '中央揃え',
 			'menubar/edit/clone': '複製',
-			'menubar/edit/delete': '削除（Del）',
+			'menubar/edit/delete': '削除',
 
 			'menubar/add': '追加',
 			'menubar/add/group': 'グループ',
@@ -1255,6 +1295,10 @@ function Strings( config ) {
 
 			'menubar/view': '表示',
 			'menubar/view/fullscreen': 'フルスクリーン',
+			'menubar/view/gridHelper': 'グリッドヘルパー',
+			'menubar/view/cameraHelpers': 'カメラヘルパー',
+			'menubar/view/lightHelpers': 'ライトヘルパー',
+			'menubar/view/skeletonHelpers': 'スケルトンヘルパー',
 
 			'menubar/help': 'ヘルプ',
 			'menubar/help/source_code': 'ソースコード',
@@ -1315,6 +1359,7 @@ function Strings( config ) {
 			'sidebar/geometry/uuid': 'UUID',
 			'sidebar/geometry/name': '名前',
 			'sidebar/geometry/bounds': '境界',
+			'sidebar/geometry/userdata': 'ユーザーデータ',
 			'sidebar/geometry/show_vertex_normals': '頂点法線を表示',
 			'sidebar/geometry/compute_vertex_normals': '頂点法線を計算',
 			'sidebar/geometry/compute_vertex_tangents': '接線を計算',
@@ -1513,6 +1558,7 @@ function Strings( config ) {
 			'sidebar/project/app/publish': 'アプリファイルとして保存',
 
 			'sidebar/project/image': '画像',
+			'sidebar/project/image/samples': 'サンプル',
 			'sidebar/project/video': '動画',
 
 			'sidebar/project/shading': 'シェーディング',
@@ -1542,13 +1588,19 @@ function Strings( config ) {
 			'viewport/controls/grid': 'グリッド',
 			'viewport/controls/helpers': 'オーバーレイ表示',
 
-			'viewport/info/oneObject': 'オブジェクト',
-			'viewport/info/oneVertex': '頂点',
-			'viewport/info/oneTriangle': '三角形',
+			'viewport/info/object': 'オブジェクト',
 			'viewport/info/objects': 'オブジェクト',
+			'viewport/info/vertex': '頂点',
 			'viewport/info/vertices': '頂点',
+			'viewport/info/triangle': '三角形',
 			'viewport/info/triangles': '三角形',
-			'viewport/info/rendertime': 'レンダリング時間'
+			'viewport/info/sample': 'サンプル',
+			'viewport/info/samples': 'サンプル',
+			'viewport/info/rendertime': 'レンダリング時間',
+
+			'script/title/vertexShader': '頂点シェーダー',
+			'script/title/fragmentShader': 'フラグメントシェーダ',
+			'script/title/programInfo': 'プログラムのプロパティ'
 
 		}
 

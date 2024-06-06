@@ -531,6 +531,16 @@ addNodeClass( 'ShaderNode', ShaderNode );
 
 //
 
+addNodeElement( 'toGlobal', ( node ) => {
+
+	node.global = true;
+
+	return node;
+
+} );
+
+//
+
 export const setCurrentStack = ( stack ) => {
 
 	if ( currentStack === stack ) {
