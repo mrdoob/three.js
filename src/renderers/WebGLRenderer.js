@@ -2268,6 +2268,22 @@ class WebGLRenderer {
 					// Color and depth texture must be rebound in order for the swapchain to update.
 					textures.rebindTextures( renderTarget, properties.get( renderTarget.texture ).__webglTexture, properties.get( renderTarget.depthTexture ).__webglTexture );
 
+				} else {
+
+					// Swap the depth buffer to the currently attached one
+					const depthTexture = renderTarget.depthTexture;
+					if (
+						depthTexture &&
+						properties.has( depthTexture ) &&
+						( renderTarget.width !== depthTexture.image.width || renderTarget.height !== depthTexture.image.height )
+					) {
+
+						throw new Error( 'WebGLRenderTarget: Attached DepthTexture is initialized to the incorrect size.' );
+
+					}
+
+					textures.setupDepthRenderbuffer( renderTarget );
+
 				}
 
 				const texture = renderTarget.texture;
