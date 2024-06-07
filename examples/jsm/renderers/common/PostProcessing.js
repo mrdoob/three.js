@@ -28,6 +28,12 @@ class PostProcessing {
 
 	}
 
+	set needsUpdate( value ) {
+
+		quadMesh.material.needsUpdate = value;
+
+	}
+
 }
 
 export default PostProcessing;
