@@ -94,12 +94,14 @@
     "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
     "concurrently": "^8.0.1",
+    "cross-env": "^7.0.3",
     "dpdm": "^3.14.0",
     "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-compat": "^4.1.2",
     "eslint-plugin-html": "^8.0.0",
     "eslint-plugin-import": "^2.27.5",
+    "express": "^4.17.2",
     "failonlyreporter": "^1.0.0",
     "jimp": "^0.22.7",
     "magic-string": "^0.30.0",
@@ -109,8 +111,6 @@
     "rollup": "^4.6.0",
     "rollup-plugin-filesize": "^10.0.0",
     "rollup-plugin-visualizer": "^5.9.0",
-    "express": "^4.17.2",
-    "cross-env": "^7.0.3",
     "servez": "^2.0.0"
   },
   "overrides": {
