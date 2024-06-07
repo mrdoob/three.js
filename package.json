@@ -110,7 +110,8 @@
     "rollup-plugin-filesize": "^10.0.0",
     "rollup-plugin-visualizer": "^5.9.0",
     "express": "^4.17.2",
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "servez": "^2.0.0"
   },
   "overrides": {
     "jpeg-js": "^0.4.4"
