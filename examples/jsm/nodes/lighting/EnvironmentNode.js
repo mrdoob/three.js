@@ -57,12 +57,13 @@ class EnvironmentNode extends LightingNode {
 		const irradiance = context( envNode, createIrradianceContext( transformedNormalWorld ) ).mul( Math.PI ).mul( intensity );
 
 		const isolateRadiance = cache( radiance );
+		const isolateIrradiance = cache( irradiance );
 
 		//
 
 		builder.context.radiance.addAssign( isolateRadiance );
 
-		builder.context.iblIrradiance.addAssign( irradiance );
+		builder.context.iblIrradiance.addAssign( isolateIrradiance );
 
 		//
 

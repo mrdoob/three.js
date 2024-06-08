@@ -316,6 +316,15 @@ class NodeBuilder {
 
 	}
 
+	getCacheFromNode( node ) {
+
+		const data = this.getDataFromNode( node );
+		if ( data.cache === undefined ) data.cache = new NodeCache( this.getCache() );
+
+		return data.cache;
+
+	}
+
 	isAvailable( /*name*/ ) {
 
 		return false;
