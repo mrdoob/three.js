@@ -1792,7 +1792,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				if ( renderTarget.depthBuffer && renderTargetProperties.__webglDepthRenderbuffer === undefined ) {
 
 					renderTargetProperties.__webglDepthRenderbuffer = _gl.createRenderbuffer();
-					setupRenderBufferStorage( renderTargetProperties.__webglDepthRenderbuffer, renderTarget, true, true );
+					setupRenderBufferStorage( renderTargetProperties.__webglDepthRenderbuffer, renderTarget, true );
 
 				}
 
