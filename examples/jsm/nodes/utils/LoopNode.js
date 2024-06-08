@@ -1,8 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
 import { bypass } from '../core/BypassNode.js';
-import { context } from '../core/ContextNode.js';
-import { cache } from '../core/CacheNode.js';
 import { addNodeElement, nodeObject, nodeArray } from '../shadernode/ShaderNode.js';
 
 class LoopNode extends Node {
@@ -42,7 +40,7 @@ class LoopNode extends Node {
 
 		}
 
-		const stack = builder.addStack();
+		const stack = builder.addStack(); // TODO: cache() it
 
 		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, stack, builder );
 		properties.stackNode = stack;
