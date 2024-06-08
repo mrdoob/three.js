@@ -2268,7 +2268,7 @@ class WebGLRenderer {
 					// Color and depth texture must be rebound in order for the swapchain to update.
 					textures.rebindTextures( renderTarget, properties.get( renderTarget.texture ).__webglTexture, properties.get( renderTarget.depthTexture ).__webglTexture );
 
-				} else if ( ! renderTarget.isWebGLCubeRenderTarget ) {
+				} else if ( renderTarget.depthBuffer || renderTarget.depthTexture ) {
 
 					// Swap the depth buffer to the currently attached one
 					const depthTexture = renderTarget.depthTexture;
