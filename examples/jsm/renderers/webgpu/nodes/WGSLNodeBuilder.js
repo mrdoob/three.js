@@ -26,7 +26,6 @@ const gpuShaderStageLib = {
 };
 
 const supports = {
-	instance: true,
 	storageBuffer: true
 };
 

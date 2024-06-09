@@ -232,7 +232,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
+		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) ) {
 
 			instance( object ).append();
 
