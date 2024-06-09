@@ -69,8 +69,6 @@ const parse = ( source ) => {
 
 		let i = 0;
 
-		console.log(propsMatches)
-
 		while ( i < propsMatches.length ) {
 
 			// default
@@ -80,12 +78,12 @@ const parse = ( source ) => {
 
 			// precision
 
-			if ( i < propsMatches.length && propsMatches[ i ][ 0 ].startsWith( '<' ) === true) {
-				
-				const elementType = propsMatches[ i++ ][ 0 ];
+			if ( i < propsMatches.length && propsMatches[ i ][ 0 ].startsWith( '<' ) === true ) {
+
+				const elementType = propsMatches[ i ++ ][ 0 ];
 
 				// If primitive data type
-				if (!elementType.includes(',')) {
+				if ( ! elementType.includes( ',' ) ) {
 
 					type += elementType;
 
@@ -96,9 +94,6 @@ const parse = ( source ) => {
 			type = wgslTypeLib[ type ] || type;
 
 			// add input
-
-			console.log(name, type, i);
-
 			inputs.push( new NodeFunctionInput( type, name ) );
 
 		}
