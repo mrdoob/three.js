@@ -577,7 +577,7 @@ class WebGPUBackend extends Backend {
 		width = x + width > renderContext.width ? width - 1 : width;
 		y = Math.max( 0, renderContext.height - height - y );
 
-		currentPass.setViewport( x, renderContext.height - height - y, width, height, minDepth, maxDepth );
+		currentPass.setViewport( x, y, width, height, minDepth, maxDepth );
 
 	}
 
