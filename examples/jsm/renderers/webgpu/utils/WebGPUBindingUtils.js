@@ -1,5 +1,5 @@
 import {
-	GPUTextureAspect, GPUTextureViewDimension, GPUBufferBindingType, GPUTextureSampleType
+	GPUTextureAspect, GPUTextureViewDimension, GPUTextureSampleType
 } from './WebGPUConstants.js';
 import { FloatType, IntType, UnsignedIntType } from 'three';
 
