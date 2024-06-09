@@ -1010,7 +1010,20 @@ ${ flowData.code }
 
 	isAvailable( name ) {
 
-		return supports[ name ] === true;
+		if ( supports[ name ] === true ) return true;
+
+		if ( name === 'float32Filterable' ) {
+
+			if ( this.renderer.hasFeature( 'float32-filterable' ) )  {
+
+					supports.float32Filterable = true;
+					return true;
+
+			}
+
+		}
+
+		return false;
 
 	}
 

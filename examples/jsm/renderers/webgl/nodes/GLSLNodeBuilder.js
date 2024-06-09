@@ -550,7 +550,24 @@ ${ flowData.code }
 
 	isAvailable( name ) {
 
-		return supports[ name ] === true;
+		if ( supports[ name ] === true ) return true;
+
+		if ( name === 'float32Filterable' ) {
+
+			const extentions = this.renderer.backend.extensions;
+
+			if ( extentions.has( 'OES_texture_float_linear' ) )  {
+
+				extentions.get( 'OES_texture_float_linear' );
+				supports.float32Filterable = true;
+
+				return true;
+
+			}
+
+		}
+
+		return false;
 
 	}
 

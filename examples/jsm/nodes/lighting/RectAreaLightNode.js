@@ -49,8 +49,17 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 		if ( ltc_1 === undefined ) {
 
-			ltc_1 = texture( UniformsLib.LTC_HALF_1 );
-			ltc_2 = texture( UniformsLib.LTC_HALF_2 );
+			if ( builder.isAvailable( 'float32Filterable' ) ) {
+
+				ltc_1 = texture( UniformsLib.LTC_FLOAT_1 );
+				ltc_2 = texture( UniformsLib.LTC_FLOAT_2 );
+
+			} else {
+
+				ltc_1 = texture( UniformsLib.LTC_HALF_1 );
+				ltc_2 = texture( UniformsLib.LTC_HALF_2 );
+
+			}
 
 		}
 
