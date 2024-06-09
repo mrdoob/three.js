@@ -11,6 +11,8 @@ class UniformNode extends InputNode {
 
 		this.isUniformNode = true;
 
+		this.global = true;
+
 		this.name = '';
 		this.groupNode = objectGroup;
 
