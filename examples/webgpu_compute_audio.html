@@ -112,10 +112,9 @@
 
 				const waveStorageNode = storage( waveGPUBuffer, 'float', waveBuffer.length );
 
-
 				// read-only buffer
 
-				const waveNode = storage( new StorageInstancedBufferAttribute( waveBuffer, 1 ), 'float', waveBuffer.length ).setAccess( 'read-only-storage' );
+				const waveNode = storageReadOnly( new StorageInstancedBufferAttribute( waveBuffer, 1 ), 'float', waveBuffer.length ).setAccess( 'read-only-storage' );
 
 				// params
 
