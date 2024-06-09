@@ -11,13 +11,13 @@ class NodeCache {
 
 	}
 
-	getNodeData( node ) {
+	getData( node ) {
 
 		let data = this.nodesData.get( node );
 
 		if ( data === undefined && this.parent !== null ) {
 
-			data = this.parent.getNodeData( node );
+			data = this.parent.getData( node );
 
 		}
 
@@ -25,7 +25,7 @@ class NodeCache {
 
 	}
 
-	setNodeData( node, data ) {
+	setData( node, data ) {
 
 		this.nodesData.set( node, data );
 
