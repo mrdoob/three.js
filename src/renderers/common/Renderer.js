@@ -1376,7 +1376,7 @@ class Renderer {
 						const maxDepth = ( vp.maxDepth === undefined ) ? 1 : vp.maxDepth;
 
 						const viewportValue = this._currentRenderContext.viewportValue;
-						viewportValue.copy( vp ).multiplyScalar( this._pixelRatio ).floor();
+						viewportValue.copy( vp );
 						viewportValue.minDepth = minDepth;
 						viewportValue.maxDepth = maxDepth;
 
