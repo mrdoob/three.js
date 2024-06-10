@@ -25,11 +25,11 @@ class TempNode extends Node {
 			const type = builder.getVectorType( this.getNodeType( builder, output ) );
 			const nodeData = builder.getDataFromNode( this );
 
-			if ( builder.context.tempRead !== false && nodeData.propertyName !== undefined ) {
+			if ( nodeData.propertyName !== undefined ) {
 
 				return builder.format( nodeData.propertyName, type, output );
 
-			} else if ( builder.context.tempWrite !== false && type !== 'void' && output !== 'void' && this.hasDependencies( builder ) ) {
+			} else if ( type !== 'void' && output !== 'void' && this.hasDependencies( builder ) ) {
 
 				const snippet = super.build( builder, type );
 
