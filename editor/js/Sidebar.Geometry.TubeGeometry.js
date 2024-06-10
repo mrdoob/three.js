@@ -96,6 +96,7 @@ function GeometryParametersPanel( editor, object ) {
 
 		curveType.setValue( parameters.path.curveType );
 		tension.setValue( parameters.path.tension );
+		points.setValue( parameters.path.points );
 
 		tensionRow.setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
 
