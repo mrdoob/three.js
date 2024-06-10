@@ -139,6 +139,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		this.builtins = {};
 
+		this.directives = {};
+
 	}
 
 	needsColorSpaceToLinear( texture ) {
@@ -599,6 +601,44 @@ ${ flowData.code }
 
 	}
 
+	getDirective( name, shaderStage = this.shaderStage) {
+
+		const stage = this.directives[ shaderStage ] || ( this.directives[ shaderStage ] = [] );
+		stage.push(name);
+
+	}
+
+	getDirectives( shaderStage ) {
+
+		const snippets = [];
+		const directives = this.directives[ shaderStage ];
+
+		if ( directives !== undefined ) {
+
+			for ( const directive of directives ) {
+
+				snippets.push(`enable ${directive}`);
+
+			}
+
+		}
+
+		return snippets.join('\n');
+
+	}
+
+	enableClipDistances() {
+
+		this.getDirective('clip_distances');
+
+	}
+
+	enableShaderF16() {
+
+		this.getDirective('f16');
+
+	}
+
 	getBuiltins( shaderStage ) {
 
 		const snippets = [];
@@ -900,6 +940,7 @@ ${ flowData.code }
 			stageData.structs = this.getStructs( shaderStage );
 			stageData.vars = this.getVars( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
+			stageData.directives = this.getDirectives( shaderStage );
 
 			//
 
@@ -1044,6 +1085,8 @@ ${ flowData.code }
 	_getWGSLVertexCode( shaderData ) {
 
 		return `${ this.getSignature() }
+// directives
+${shaderData.directives};
 
 // uniforms
 ${shaderData.uniforms}
@@ -1101,6 +1144,9 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 	_getWGSLComputeCode( shaderData, workgroupSize ) {
 
 		return `${ this.getSignature() }
+// Directives
+${shaderData.directives}
+
 // system
 var<private> instanceIndex : u32;
 
