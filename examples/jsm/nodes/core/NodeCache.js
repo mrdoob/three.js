@@ -2,20 +2,30 @@ let id = 0;
 
 class NodeCache {
 
-	constructor() {
+	constructor( parent = null ) {
 
 		this.id = id ++;
 		this.nodesData = new WeakMap();
 
-	}
-
-	getNodeData( node ) {
-
-		return this.nodesData.get( node );
+		this.parent = parent;
 
 	}
 
-	setNodeData( node, data ) {
+	getData( node ) {
+
+		let data = this.nodesData.get( node );
+
+		if ( data === undefined && this.parent !== null ) {
+
+			data = this.parent.getData( node );
+
+		}
+
+		return data;
+
+	}
+
+	setData( node, data ) {
 
 		this.nodesData.set( node, data );
 

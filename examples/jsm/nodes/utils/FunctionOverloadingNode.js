@@ -12,6 +12,8 @@ class FunctionOverloadingNode extends Node {
 
 		this._candidateFnCall = null;
 
+		this.global = true;
+
 	}
 
 	getNodeType() {

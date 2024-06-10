@@ -320,7 +320,7 @@ class Node extends EventDispatcher {
 
 			const properties = builder.getNodeProperties( this );
 
-			if ( properties.initialized !== true || builder.context.tempRead === false ) {
+			if ( properties.initialized !== true ) {
 
 				const stackNodesBeforeSetup = builder.stack.nodes.length;
 
@@ -360,7 +360,7 @@ class Node extends EventDispatcher {
 
 				result = nodeData.snippet;
 
-				if ( result === undefined /*|| builder.context.tempRead === false*/ ) {
+				if ( result === undefined ) {
 
 					result = this.generate( builder ) || '';
 

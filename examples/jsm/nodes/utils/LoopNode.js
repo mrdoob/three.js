@@ -1,7 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
 import { bypass } from '../core/BypassNode.js';
-import { context } from '../core/ContextNode.js';
 import { addNodeElement, nodeObject, nodeArray } from '../shadernode/ShaderNode.js';
 
 class LoopNode extends Node {
@@ -41,8 +40,12 @@ class LoopNode extends Node {
 
 		}
 
-		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, builder.addStack(), builder );
-		properties.stackNode = builder.removeStack();
+		const stack = builder.addStack(); // TODO: cache() it
+
+		properties.returnsNode = this.params[ this.params.length - 1 ]( inputs, stack, builder );
+		properties.stackNode = stack;
+
+		builder.removeStack();
 
 		return properties;
 
@@ -67,8 +70,6 @@ class LoopNode extends Node {
 	generate( builder ) {
 
 		const properties = this.getProperties( builder );
-
-		const contextData = { tempWrite: false };
 
 		const params = this.params;
 		const stackNode = properties.stackNode;
@@ -169,7 +170,7 @@ class LoopNode extends Node {
 
 		}
 
-		const stackSnippet = context( stackNode, contextData ).build( builder, 'void' );
+		const stackSnippet = stackNode.build( builder, 'void' );
 
 		const returnsSnippet = properties.returnsNode ? properties.returnsNode.build( builder ) : '';
 
