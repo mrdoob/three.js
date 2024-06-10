@@ -351,7 +351,7 @@ ${ flowData.code }
 
 				let typePrefix = '';
 
-				if ( texture.isDataTexture === true ) {
+				if ( texture.isPBOTexture === true ) {
 
 					const prefix = texture.source.data.data.constructor.name.toLowerCase().charAt( 0 );
 
