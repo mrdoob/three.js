@@ -1,11 +1,12 @@
 import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, tslFn, nodeObject, float, mat3, vec3 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, tslFn, nodeObject, float, mat3, vec3, If } from '../shadernode/ShaderNode.js';
 import { rendererReference } from '../accessors/RendererReferenceNode.js';
-import { clamp, log2, max, pow } from '../math/MathNode.js';
-import { mul } from '../math/OperatorNode.js';
+import { cond } from '../math/CondNode.js';
+import { clamp, log2, max, min, pow, mix } from '../math/MathNode.js';
+import { mul, sub, div } from '../math/OperatorNode.js';
 
-import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping } from 'three';
+import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping } from 'three';
 
 // exposure only
 const LinearToneMappingNode = tslFn( ( { color, exposure } ) => {
@@ -117,13 +118,51 @@ const AGXToneMappingNode = tslFn( ( { color, exposure } ) => {
 
 } );
 
+// https://modelviewer.dev/examples/tone-mapping
+
+const NeutralToneMappingNode = tslFn( ( { color, exposure } ) => {
+
+	const StartCompression = float( 0.8 - 0.04 );
+	const Desaturation = float( 0.15 );
+
+	color = color.mul( exposure );
+
+	const x = min( color.r, min( color.g, color.b ) );
+	const offset = cond( x.lessThan( 0.08 ), x.sub( mul( 6.25, x.mul( x ) ) ), 0.04 );
+
+	color.subAssign( offset );
+
+	const peak = max( color.r, max( color.g, color.b ) );
+
+	If( peak.lessThan( StartCompression ), () => {
+
+		return color;
+
+	} );
+
+	const d = sub( 1, StartCompression );
+	const newPeak = sub( 1, d.mul( d ).div( peak.add( d.sub( StartCompression ) ) ) );
+	color.mulAssign( newPeak.div( peak ) );
+	const g = sub( 1, div( 1, Desaturation.mul( peak.sub( newPeak ) ).add( 1 ) ) );
+
+	return mix( color, vec3( newPeak ), g );
+
+} ).setLayout( {
+	name: 'NeutralToneMapping',
+	type: 'vec3',
+	inputs: [
+		{ name: 'color', type: 'vec3' },
+		{ name: 'exposure', type: 'float' }
+	]
+} );
 
 const toneMappingLib = {
 	[ LinearToneMapping ]: LinearToneMappingNode,
 	[ ReinhardToneMapping ]: ReinhardToneMappingNode,
 	[ CineonToneMapping ]: OptimizedCineonToneMappingNode,
 	[ ACESFilmicToneMapping ]: ACESFilmicToneMappingNode,
-	[ AgXToneMapping ]: AGXToneMappingNode
+	[ AgXToneMapping ]: AGXToneMappingNode,
+	[ NeutralToneMapping ]: NeutralToneMappingNode
 };
 
 class ToneMappingNode extends TempNode {
