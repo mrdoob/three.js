@@ -593,25 +593,25 @@ function SidebarObject( editor ) {
 
 				if ( object.shadow.intensity !== objectShadowIntensity.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'intensity', objectShadowIntensity.getValue() ) );
+					editor.execute( new SetValueCommand( editor, object, 'shadow.intensity', objectShadowIntensity.getValue() ) );
 
 				}
 
 				if ( object.shadow.bias !== objectShadowBias.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'bias', objectShadowBias.getValue() ) );
+					editor.execute( new SetValueCommand( editor, object, 'shadow.bias', objectShadowBias.getValue() ) );
 
 				}
 
 				if ( object.shadow.normalBias !== objectShadowNormalBias.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'normalBias', objectShadowNormalBias.getValue() ) );
+					editor.execute( new SetValueCommand( editor, object, 'shadow.normalBias', objectShadowNormalBias.getValue() ) );
 
 				}
 
 				if ( object.shadow.radius !== objectShadowRadius.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'radius', objectShadowRadius.getValue() ) );
+					editor.execute( new SetValueCommand( editor, object, 'shadow.radius', objectShadowRadius.getValue() ) );
 
 				}
 

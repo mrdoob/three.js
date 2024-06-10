@@ -1,5 +1,39 @@
 import { Command } from '../Command.js';
 
+function setValue( object, path, value ) {
+
+	const keys = path.split( '.' );
+	const key = keys.shift();
+
+	if ( keys.length === 0 ) {
+
+		object[ key ] = value;
+
+	} else {
+
+		setValue( object[ key ], keys.join( '.' ), value );
+
+	}
+
+}
+
+function getValue( object, path ) {
+
+	const keys = path.split( '.' );
+	const key = keys.shift();
+
+	if ( keys.length === 0 ) {
+
+		return object[ key ];
+
+	} else {
+
+		return getValue( object[ key ], keys.join( '.' ) );
+
+	}
+
+}
+
 /**
  * @param editor Editor
  * @param object THREE.Object3D
@@ -19,14 +53,14 @@ class SetValueCommand extends Command {
 
 		this.object = object;
 		this.attributeName = attributeName;
-		this.oldValue = ( object !== null ) ? object[ attributeName ] : null;
+		this.oldValue = ( object !== null ) ? getValue( object, attributeName ) : null;
 		this.newValue = newValue;
 
 	}
 
 	execute() {
 
-		this.object[ this.attributeName ] = this.newValue;
+		setValue( this.object, this.attributeName, this.newValue );
 		this.editor.signals.objectChanged.dispatch( this.object );
 		// this.editor.signals.sceneGraphChanged.dispatch();
 
@@ -34,7 +68,7 @@ class SetValueCommand extends Command {
 
 	undo() {
 
-		this.object[ this.attributeName ] = this.oldValue;
+		setValue( this.object, this.attributeName, this.oldValue );
 		this.editor.signals.objectChanged.dispatch( this.object );
 		// this.editor.signals.sceneGraphChanged.dispatch();
 
