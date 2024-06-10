@@ -469,6 +469,7 @@ Editor.prototype = {
 
 			var helper = this.helpers[ object.id ];
 			helper.parent.remove( helper );
+			helper.dispose();
 
 			delete this.helpers[ object.id ];
 
