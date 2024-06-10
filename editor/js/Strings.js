@@ -36,6 +36,7 @@ function Strings( config ) {
 			'command/SetScale': 'Set Scale',
 			'command/SetScene': 'Set Scene',
 			'command/SetScriptValue': 'Set Script Value',
+			'command/SetShadowValue': 'Set Shadow Value',
 			'command/SetUuid': 'Set UUID',
 			'command/SetValue': 'Set Value',
 
@@ -437,6 +438,7 @@ function Strings( config ) {
 			'command/SetScale': 'Définir l’échelle',
 			'command/SetScene': 'Planter le décor',
 			'command/SetScriptValue': 'Définir la valeur du script',
+			'command/SetShadowValue': 'Set Shadow Value',
 			'command/SetUuid': 'Définir l’UUID',
 			'command/SetValue': 'Définir la valeur',
 
@@ -838,6 +840,7 @@ function Strings( config ) {
 			'command/SetScale': '设置比例',
 			'command/SetScene': '设置布景',
 			'command/SetScriptValue': '设置脚本值',
+			'command/SetShadowValue': 'Set Shadow Value',
 			'command/SetUuid': '设置 UUID',
 			'command/SetValue': '设定值',
 
@@ -1239,6 +1242,7 @@ function Strings( config ) {
 			'command/SetScale': 'スケールを設定',
 			'command/SetScene': 'セットシーン',
 			'command/SetScriptValue': 'スクリプト値の設定',
+			'command/SetShadowValue': 'Set Shadow Value',
 			'command/SetUuid': 'UUIDの設定',
 			'command/SetValue': '値の設定',
 

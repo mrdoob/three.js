@@ -9,6 +9,7 @@ import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 import { SetColorCommand } from './commands/SetColorCommand.js';
+import { SetShadowValueCommand } from './commands/SetShadowValueCommand.js';
 
 import { SidebarObjectAnimation } from './Sidebar.Object.Animation.js';
 
@@ -593,25 +594,25 @@ function SidebarObject( editor ) {
 
 				if ( object.shadow.intensity !== objectShadowIntensity.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'intensity', objectShadowIntensity.getValue() ) );
+					editor.execute( new SetShadowValueCommand( editor, object, 'intensity', objectShadowIntensity.getValue() ) );
 
 				}
 
 				if ( object.shadow.bias !== objectShadowBias.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'bias', objectShadowBias.getValue() ) );
+					editor.execute( new SetShadowValueCommand( editor, object, 'bias', objectShadowBias.getValue() ) );
 
 				}
 
 				if ( object.shadow.normalBias !== objectShadowNormalBias.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'normalBias', objectShadowNormalBias.getValue() ) );
+					editor.execute( new SetShadowValueCommand( editor, object, 'normalBias', objectShadowNormalBias.getValue() ) );
 
 				}
 
 				if ( object.shadow.radius !== objectShadowRadius.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'radius', objectShadowRadius.getValue() ) );
+					editor.execute( new SetShadowValueCommand( editor, object, 'radius', objectShadowRadius.getValue() ) );
 
 				}
 
