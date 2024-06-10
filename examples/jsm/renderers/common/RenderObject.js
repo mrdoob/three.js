@@ -234,6 +234,12 @@ export default class RenderObject {
 
 		}
 
+		if ( object.isInstancedMesh ) {
+
+			cacheKey += object.count + ',';
+
+		}
+
 		return cacheKey;
 
 	}

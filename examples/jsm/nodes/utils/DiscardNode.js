@@ -21,6 +21,7 @@ export default DiscardNode;
 
 export const inlineDiscard = nodeProxy( DiscardNode );
 export const discard = ( condNode ) => inlineDiscard( condNode ).append();
+export const Return = () => expression( 'return' ).append();
 
 addNodeElement( 'discard', discard ); // @TODO: Check... this cause a little confusing using in chaining
 
