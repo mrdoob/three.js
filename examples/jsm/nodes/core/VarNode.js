@@ -10,13 +10,9 @@ class VarNode extends Node {
 		this.node = node;
 		this.name = name;
 
+		this.global = true;
+
 		this.isVarNode = true;
-
-	}
-
-	isGlobal() {
-
-		return true;
 
 	}
 

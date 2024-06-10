@@ -1,15 +1,16 @@
 import Node, { addNodeClass } from './Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addNodeElement, nodeObject } from '../shadernode/ShaderNode.js';
 
 class CacheNode extends Node {
 
-	constructor( node ) {
+	constructor( node, parent = true ) {
 
 		super();
 
-		this.isCacheNode = true;
-
 		this.node = node;
+		this.parent = parent;
+
+		this.isCacheNode = true;
 
 	}
 
@@ -22,7 +23,7 @@ class CacheNode extends Node {
 	build( builder, ...params ) {
 
 		const previousCache = builder.getCache();
-		const cache = builder.getCacheFromNode( this );
+		const cache = builder.getCacheFromNode( this, parent );
 
 		builder.setCache( cache );
 
@@ -38,7 +39,7 @@ class CacheNode extends Node {
 
 export default CacheNode;
 
-export const cache = nodeProxy( CacheNode );
+export const cache = ( node, ...params ) => nodeObject( new CacheNode( nodeObject( node ), ...params ) );
 
 addNodeElement( 'cache', cache );
 

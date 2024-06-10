@@ -316,10 +316,10 @@ class NodeBuilder {
 
 	}
 
-	getCacheFromNode( node ) {
+	getCacheFromNode( node, parent = true ) {
 
 		const data = this.getDataFromNode( node );
-		if ( data.cache === undefined ) data.cache = new NodeCache( this.getCache() );
+		if ( data.cache === undefined ) data.cache = new NodeCache( parent ? this.getCache() : null );
 
 		return data.cache;
 
