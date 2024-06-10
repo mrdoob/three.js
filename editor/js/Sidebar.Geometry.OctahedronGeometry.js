@@ -35,6 +35,18 @@ function GeometryParametersPanel( editor, object ) {
 
 	container.add( detailRow );
 
+	//
+
+	function refreshUI() {
+
+		const parameters = object.geometry.parameters;
+
+		radius.setValue( parameters.radius );
+		detail.setValue( parameters.detail );
+
+	}
+
+	signals.geometryChanged.add( refreshUI );
 
 	//
 
@@ -44,8 +56,6 @@ function GeometryParametersPanel( editor, object ) {
 			radius.getValue(),
 			detail.getValue()
 		) ) );
-
-		signals.objectChanged.dispatch( object );
 
 	}
 
