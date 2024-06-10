@@ -296,6 +296,17 @@ function SidebarGeometry( editor ) {
 
 			geometryUserData.setValue( JSON.stringify( geometry.userData, null, '  ' ) );
 
+			//
+
+			const helper = editor.helpers[ object.id ];
+
+			if ( helper !== undefined ) {
+
+				editor.removeHelper( object );
+				editor.addHelper( object, new VertexNormalsHelper( object ) );
+
+			}
+
 		} else {
 
 			container.setDisplay( 'none' );
