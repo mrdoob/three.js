@@ -655,7 +655,7 @@ function SidebarObject( editor ) {
 			'decay': objectDecayRow,
 			'castShadow': objectShadowRow,
 			'receiveShadow': objectReceiveShadow,
-			'shadow': [ objectShadowBiasRow, objectShadowNormalBiasRow, objectShadowRadiusRow ]
+			'shadow': [ objectShadowIntensityRow, objectShadowBiasRow, objectShadowNormalBiasRow, objectShadowRadiusRow ]
 		};
 
 		for ( const property in properties ) {
