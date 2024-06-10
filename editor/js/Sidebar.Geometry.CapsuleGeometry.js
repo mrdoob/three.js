@@ -37,7 +37,7 @@ function GeometryParametersPanel( editor, object ) {
 	// capSegments
 
 	const capSegmentsRow = new UIRow();
-	const capSegments = new UINumber( parameters.capSegments ).onChange( update );
+	const capSegments = new UIInteger( parameters.capSegments ).setRange( 1, Infinity ).onChange( update );
 
 	capSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/capsule_geometry/capseg' ) ).setClass( 'Label' ) );
 	capSegmentsRow.add( capSegments );
