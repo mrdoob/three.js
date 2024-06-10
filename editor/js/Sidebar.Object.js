@@ -298,6 +298,17 @@ function SidebarObject( editor ) {
 
 	container.add( objectShadowRow );
 
+	// shadow intensity
+
+	const objectShadowIntensityRow = new UIRow();
+
+	objectShadowIntensityRow.add( new UIText( strings.getKey( 'sidebar/object/shadowIntensity' ) ).setClass( 'Label' ) );
+
+	const objectShadowIntensity = new UINumber( 0 ).setRange( 0, 1 ).onChange( update );
+	objectShadowIntensityRow.add( objectShadowIntensity );
+
+	container.add( objectShadowIntensityRow );
+
 	// shadow bias
 
 	const objectShadowBiasRow = new UIRow();
@@ -580,6 +591,12 @@ function SidebarObject( editor ) {
 
 			if ( object.shadow !== undefined ) {
 
+				if ( object.shadow.intensity !== objectShadowIntensity.getValue() ) {
+
+					editor.execute( new SetValueCommand( editor, object.shadow, 'intensity', objectShadowIntensity.getValue() ) );
+
+				}
+
 				if ( object.shadow.bias !== objectShadowBias.getValue() ) {
 
 					editor.execute( new SetValueCommand( editor, object.shadow, 'bias', objectShadowBias.getValue() ) );
@@ -846,6 +863,7 @@ function SidebarObject( editor ) {
 
 		if ( object.shadow !== undefined ) {
 
+			objectShadowIntensity.setValue( object.shadow.intensity );
 			objectShadowBias.setValue( object.shadow.bias );
 			objectShadowNormalBias.setValue( object.shadow.normalBias );
 			objectShadowRadius.setValue( object.shadow.radius );
