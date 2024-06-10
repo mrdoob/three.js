@@ -237,7 +237,7 @@ self.addEventListener( 'install', async function () {
 
 		} catch {
 
-			console.warn( '[SW] Cound\'t cache:', asset );
+			console.warn( '[SW] Couldn\'t cache:', asset );
 
 		}
 
