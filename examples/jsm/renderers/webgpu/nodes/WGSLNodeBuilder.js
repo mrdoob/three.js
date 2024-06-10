@@ -1024,7 +1024,7 @@ ${ flowData.code }
 			supports[ name ] = result;
 
 		}
-console.log( supports );
+
 		return result;
 
 	}
