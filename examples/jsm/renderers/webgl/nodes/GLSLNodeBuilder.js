@@ -20,7 +20,6 @@ const precisionLib = {
 };
 
 const supports = {
-	instance: true,
 	swizzleAssign: true
 };
 
