@@ -15,6 +15,7 @@ class SetShadowValueCommand extends Command {
 
 		this.type = 'SetShadowValueCommand';
 		this.name = editor.strings.getKey( 'command/SetShadowValue' ) + ': ' + attributeName;
+		this.updatable = true;
 
 		this.object = object;
 		this.attributeName = attributeName;
@@ -34,6 +35,12 @@ class SetShadowValueCommand extends Command {
 
 		this.object.shadow[ this.attributeName ] = this.oldValue;
 		this.editor.signals.objectChanged.dispatch( this.object );
+
+	}
+
+	update( cmd ) {
+
+		this.newValue = cmd.newValue;
 
 	}
 
