@@ -30,17 +30,17 @@ precision highp int;
 precision highp sampler2D;
 precision highp sampler3D;
 precision highp samplerCube;
-precision mediump sampler2DArray;
+precision highp sampler2DArray;
 
 precision highp usampler2D;
 precision highp usampler3D;
 precision highp usamplerCube;
-precision mediump usampler2DArray;
+precision highp usampler2DArray;
 
 precision highp isampler2D;
 precision highp isampler3D;
 precision highp isamplerCube;
-precision mediump isampler2DArray;
+precision highp isampler2DArray;
 
 precision lowp sampler2DShadow;
 `;
