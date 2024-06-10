@@ -689,7 +689,7 @@ ${ flowData.code }
 
 			snippets.push( snippet );
 
-			snippets.push( `\nvar<private> output : ${ name };\n\n`);
+			snippets.push( `\nvar<private> output : ${ name };\n\n` );
 
 		}
 
@@ -970,16 +970,29 @@ ${ flowData.code }
 
 		}
 
+		let outputCode = '';
+
 		if ( this.material !== null ) {
 
-			this.vertexShader = this._getWGSLVertexCode( shadersData.vertex );
-			this.fragmentShader = this._getWGSLFragmentCode( shadersData.fragment );
+			const vertexShader = this._getWGSLVertexCode( shadersData.vertex );
+			const fragmentShader = this._getWGSLFragmentCode( shadersData.fragment );
+
+			this.vertexShader = vertexShader;
+			this.fragmentShader = fragmentShader;
+
+			outputCode = '// vertex shader' + '\n\n' + vertexShader + '\n\n// fragment shader' + fragmentShader;
 
 		} else {
 
-			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
+			const computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
+
+			this.computeShader = computeShader;
+
+			outputCode = '// compute shader' + '\n\n' + computeShader;
 
 		}
+
+		this.object.outputCode = outputCode;
 
 	}
 

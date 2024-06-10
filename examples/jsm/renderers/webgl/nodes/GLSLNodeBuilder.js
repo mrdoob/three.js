@@ -732,16 +732,29 @@ void main() {
 
 		}
 
+		let outputCode = '';
+
 		if ( this.material !== null ) {
 
-			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
-			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
+			const vertexShader = this._getGLSLVertexCode( shadersData.vertex );
+			const fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
+
+			this.vertexShader = vertexShader;
+			this.fragmentShader = fragmentShader;
+
+			outputCode = '// vertex shader' + '\n\n' + vertexShader + '\n\n// fragment shader' + fragmentShader;
 
 		} else {
 
-			this.computeShader = this._getGLSLVertexCode( shadersData.compute );
+			const computeShader = this._getGLSLVertexCode( shadersData.compute );
+
+			this.computeShader = computeShader;
+
+			outputCode = '// compute shader' + '\n\n' + computeShader;
 
 		}
+
+		this.object.outputCode = outputCode;
 
 	}
 

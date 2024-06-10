@@ -875,6 +875,92 @@ class WebGLBackend extends Backend {
 
 	}
 
+
+
+	_handleSource( string, errorLine ) {
+
+		const lines = string.split( '\n' );
+		const lines2 = [];
+
+		const from = Math.max( errorLine - 6, 0 );
+		const to = Math.min( errorLine + 6, lines.length );
+
+		for ( let i = from; i < to; i ++ ) {
+
+			const line = i + 1;
+			lines2.push( `${line === errorLine ? '>' : ' '} ${line}: ${lines[ i ]}` );
+
+		}
+
+		return lines2.join( '\n' );
+
+	}
+
+	_getShaderErrors( gl, shader, type ) {
+
+		const status = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
+		const errors = gl.getShaderInfoLog( shader ).trim();
+
+		if ( status && errors === '' ) return '';
+
+		const errorMatches = /ERROR: 0:(\d+)/.exec( errors );
+		if ( errorMatches ) {
+
+			const errorLine = parseInt( errorMatches[ 1 ] );
+			return type.toUpperCase() + '\n\n' + errors + '\n\n' + this._handleSource( gl.getShaderSource( shader ), errorLine );
+
+		} else {
+
+			return errors;
+
+		}
+
+	}
+
+	_logProgramError( programGPU, glFragmentShader, glVertexShader ) {
+
+		if ( this.renderer.debug.checkShaderErrors ) {
+
+			const gl = this.gl;
+
+			const programLog = gl.getProgramInfoLog( programGPU ).trim();
+
+			if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
+
+
+				if ( typeof this.renderer.debug.onShaderError === 'function' ) {
+
+					this.renderer.debug.onShaderError( gl, programGPU, glVertexShader, glFragmentShader );
+
+				} else {
+
+					// default error reporting
+
+					const vertexErrors = this._getShaderErrors( gl, glVertexShader, 'vertex' );
+					const fragmentErrors = this._getShaderErrors( gl, glFragmentShader, 'fragment' );
+
+					console.error(
+						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
+						'VALIDATE_STATUS ' + gl.getProgramParameter( programGPU, gl.VALIDATE_STATUS ) + '\n\n' +
+						'Material Name: ' + self.name + '\n' +
+						'Material Type: ' + self.type + '\n\n' +
+						'Program Info Log: ' + programLog + '\n' +
+						vertexErrors + '\n' +
+						fragmentErrors
+					);
+
+				}
+
+			} else if ( programLog !== '' ) {
+
+				console.warn( 'THREE.WebGLProgram: Program Info Log:', programLog );
+
+			}
+
+		}
+
+	}
+
 	_completeCompile( renderObject, pipeline ) {
 
 		const gl = this.gl;
@@ -883,10 +969,7 @@ class WebGLBackend extends Backend {
 
 		if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
 
-			console.error( 'THREE.WebGLBackend:', gl.getProgramInfoLog( programGPU ) );
-
-			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( fragmentShader ) );
-			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( vertexShader ) );
+			this._logProgramError( programGPU, fragmentShader, vertexShader );
 
 		}
 
@@ -951,10 +1034,8 @@ class WebGLBackend extends Backend {
 
 		if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
 
-			console.error( 'THREE.WebGLBackend:', gl.getProgramInfoLog( programGPU ) );
+			this._logProgramError( programGPU, fragmentShader, vertexShader );
 
-			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( fragmentShader ) );
-			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( vertexShader ) );
 
 		}
 
