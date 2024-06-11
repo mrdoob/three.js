@@ -139,6 +139,7 @@ const exceptionList = [
 	'webgpu_shadowmap',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_transpiler',
+	'webgpu_tsl_interoperability',
 	'webgpu_portal',
 	'webgpu_custom_fog',
 	'webgpu_instancing_morph',
