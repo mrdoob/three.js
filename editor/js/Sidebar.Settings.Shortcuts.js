@@ -24,6 +24,7 @@ function SidebarSettingsShortcuts( editor ) {
 	container.add( headerRow );
 
 	const shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus' ];
+	const shortcutInputs = [];
 
 	function createShortcutInput( name ) {
 
@@ -40,6 +41,23 @@ function SidebarSettingsShortcuts( editor ) {
 			if ( isValidKeyBinding( value ) ) {
 
 				config.setKey( configName, value );
+
+				const otherShortcuts = shortcuts.filter( shortcut => shortcut !== name );
+				for ( let i = 0; i < otherShortcuts.length; i ++ ) {
+
+					const shortcut = otherShortcuts[ i ];
+					const configName = 'settings/shortcuts/' + shortcut;
+					const hotkey = config.getKey( configName );
+
+					if ( hotkey === value ) {
+
+						config.setKey( configName, '' );
+
+					}
+
+				}
+
+				refreshUI();
 
 			}
 
@@ -82,6 +100,9 @@ function SidebarSettingsShortcuts( editor ) {
 		}
 
 		shortcutInput.dom.maxLength = 1;
+
+		shortcutInputs.push( shortcutInput );
+
 		shortcutRow.add( new UIText( strings.getKey( 'sidebar/settings/shortcuts/' + name ) ).setTextTransform( 'capitalize' ).setClass( 'Label' ) );
 		shortcutRow.add( shortcutInput );
 
@@ -167,6 +188,20 @@ function SidebarSettingsShortcuts( editor ) {
 		}
 
 	} );
+
+
+	function refreshUI() {
+
+		for ( let i = 0; i < shortcuts.length; i ++ ) {
+
+			const shortcut = shortcuts[ i ];
+			const shortcutInput = shortcutInputs[ i ];
+
+			shortcutInput.setValue( config.getKey( 'settings/shortcuts/' + shortcut ) );
+
+		}
+
+	}
 
 	return container;
 
