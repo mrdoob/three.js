@@ -20,7 +20,8 @@ const precisionLib = {
 };
 
 const supports = {
-	swizzleAssign: true
+	swizzleAssign: true,
+	storageBuffer: false
 };
 
 const defaultPrecisions = `
@@ -606,7 +607,32 @@ ${ flowData.code }
 
 	isAvailable( name ) {
 
-		return supports[ name ] === true;
+		let result = supports[ name ];
+
+		if ( result === undefined ) {
+
+			if ( name === 'float32Filterable' ) {
+
+				const extentions = this.renderer.backend.extensions;
+
+				if ( extentions.has( 'OES_texture_float_linear' ) )  {
+
+					extentions.get( 'OES_texture_float_linear' );
+					result = true;
+
+				} else {
+
+					result = false;
+
+				}
+
+			}
+
+			supports[ name ] = result;
+
+		}
+
+		return result;
 
 	}
 

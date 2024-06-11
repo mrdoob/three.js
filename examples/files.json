@@ -331,6 +331,7 @@
 		"webgpu_lights_custom",
 		"webgpu_lights_ies_spotlight",
 		"webgpu_lights_phong",
+		"webgpu_lights_rectarealight",
 		"webgpu_lights_selective",
 		"webgpu_lines_fat",
 		"webgpu_loader_gltf",

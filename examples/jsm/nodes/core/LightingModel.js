@@ -6,6 +6,8 @@ class LightingModel {
 
 	direct( /*input, stack, builder*/ ) { }
 
+	directRectArea( /*input, stack, builder*/ ) {}
+
 	indirectDiffuse( /*input, stack, builder*/ ) { }
 
 	indirectSpecular( /*input, stack, builder*/ ) { }
