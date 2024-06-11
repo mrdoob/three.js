@@ -1594,6 +1594,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const renderTargetProperties = properties.get( renderTarget );
 		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 
+		// check if the depth texture is already bound to the frame buffer and that it's been initialized
+		if ( renderTargetProperties.__boundDepthTexture === renderTarget.depthTexture && properties.has( renderTarget.depthTexture ) ) {
+
+			return;
+
+		}
+
+		renderTargetProperties.__boundDepthTexture = renderTarget.depthTexture;
+
 		if ( renderTarget.depthTexture && ! renderTargetProperties.__autoAllocateDepthBuffer ) {
 
 			if ( isCube ) throw new Error( 'target.depthTexture not supported in Cube render targets' );
