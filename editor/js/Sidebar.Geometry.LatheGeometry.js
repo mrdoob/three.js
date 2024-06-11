@@ -61,7 +61,10 @@ function GeometryParametersPanel( editor, object ) {
 
 		const parameters = object.geometry.parameters;
 
+		points.onChange( null );
 		points.setValue( parameters.points );
+		points.onChange( update );
+
 		segments.setValue( parameters.segments );
 		phiStart.setValue( parameters.phiStart * THREE.MathUtils.RAD2DEG );
 		phiLength.setValue( parameters.phiLength * THREE.MathUtils.RAD2DEG );

@@ -684,6 +684,7 @@ class UIPoints2 extends UIPoints {
 
 		}
 
+		this.update();
 		return this;
 
 	}
@@ -780,6 +781,7 @@ class UIPoints3 extends UIPoints {
 
 		}
 
+		this.update();
 		return this;
 
 	}
