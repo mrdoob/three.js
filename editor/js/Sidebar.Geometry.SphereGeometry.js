@@ -100,7 +100,15 @@ function GeometryParametersPanel( editor, object ) {
 
 	}
 
-	signals.geometryChanged.add( refreshUI );
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
 
 	//
 
