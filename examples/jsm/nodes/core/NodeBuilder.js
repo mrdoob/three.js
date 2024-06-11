@@ -67,6 +67,7 @@ class NodeBuilder {
 		this.nodes = [];
 		this.updateNodes = [];
 		this.updateBeforeNodes = [];
+		this.updateAfterNodes = [];
 		this.hashNodes = {};
 
 		this.lightsNode = null;
@@ -215,6 +216,7 @@ class NodeBuilder {
 
 			const updateType = node.getUpdateType();
 			const updateBeforeType = node.getUpdateBeforeType();
+			const updateAfterType = node.getUpdateAfterType();
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
@@ -225,6 +227,12 @@ class NodeBuilder {
 			if ( updateBeforeType !== NodeUpdateType.NONE ) {
 
 				this.updateBeforeNodes.push( node );
+
+			}
+
+			if ( updateAfterType !== NodeUpdateType.NONE ) {
+
+				this.updateAfterNodes.push( node );
 
 			}
 
@@ -305,6 +313,15 @@ class NodeBuilder {
 	getCache() {
 
 		return this.cache;
+
+	}
+
+	getCacheFromNode( node, parent = true ) {
+
+		const data = this.getDataFromNode( node );
+		if ( data.cache === undefined ) data.cache = new NodeCache( parent ? this.getCache() : null );
+
+		return data.cache;
 
 	}
 
@@ -631,13 +648,13 @@ class NodeBuilder {
 
 		cache = cache === null ? ( node.isGlobal( this ) ? this.globalCache : this.cache ) : cache;
 
-		let nodeData = cache.getNodeData( node );
+		let nodeData = cache.getData( node );
 
 		if ( nodeData === undefined ) {
 
 			nodeData = {};
 
-			cache.setNodeData( node, nodeData );
+			cache.setData( node, nodeData );
 
 		}
 
@@ -1238,7 +1255,7 @@ class NodeBuilder {
 
 		}
 
-		if ( fromTypeLength === 1 && toTypeLength > 1 && fromType[ 0 ] !== toType[ 0 ] ) { // fromType is float-like
+		if ( fromTypeLength === 1 && toTypeLength > 1 && fromType !== this.getComponentType( toType ) ) { // fromType is float-like
 
 			// convert a number value to vector type, e.g:
 			// vec3( 1u ) -> vec3( float( 1u ) )

@@ -182,6 +182,7 @@ class Nodes extends DataMap {
 			nodeBuilder.getBindings(),
 			nodeBuilder.updateNodes,
 			nodeBuilder.updateBeforeNodes,
+			nodeBuilder.updateAfterNodes,
 			nodeBuilder.transforms
 		);
 
@@ -422,6 +423,19 @@ class Nodes extends DataMap {
 		for ( const node of nodeBuilder.updateBeforeNodes ) {
 
 			nodeFrame.updateBeforeNode( node );
+
+		}
+
+	}
+
+	updateAfter( renderObject ) {
+
+		const nodeFrame = this.getNodeFrameForRender( renderObject );
+		const nodeBuilder = renderObject.getNodeBuilderState();
+
+		for ( const node of nodeBuilder.updateAfterNodes ) {
+
+			nodeFrame.updateAfterNode( node );
 
 		}
 

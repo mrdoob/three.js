@@ -1032,6 +1032,7 @@ class ObjectLoader extends Loader {
 
 		if ( data.shadow ) {
 
+			if ( data.shadow.intensity !== undefined ) object.shadow.intensity = data.shadow.intensity;
 			if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
 			if ( data.shadow.normalBias !== undefined ) object.shadow.normalBias = data.shadow.normalBias;
 			if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;

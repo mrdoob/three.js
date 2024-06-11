@@ -14,9 +14,12 @@ class StorageBufferNode extends BufferNode {
 		this.isStorageBufferNode = true;
 
 		this.bufferObject = false;
+		this.bufferCount = bufferCount;
 
 		this._attribute = null;
 		this._varying = null;
+
+		this.global = true;
 
 		if ( value.isStorageBufferAttribute !== true && value.isStorageInstancedBufferAttribute !== true ) {
 
@@ -26,6 +29,30 @@ class StorageBufferNode extends BufferNode {
 			else value.isStorageBufferAttribute = true;
 
 		}
+
+	}
+
+	getHash( builder ) {
+
+		if ( this.bufferCount === 0 ) {
+
+			let bufferData = builder.globalCache.getData( this.value );
+
+			if ( bufferData === undefined ) {
+
+				bufferData = {
+					node: this
+				};
+
+				builder.globalCache.setData( this.value, bufferData );
+
+			}
+
+			return bufferData.node.uuid;
+
+		}
+
+		return this.uuid;
 
 	}
 
