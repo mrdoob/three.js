@@ -26,7 +26,8 @@ const gpuShaderStageLib = {
 
 const supports = {
 	instance: true,
-	storageBuffer: true,
+	swizzleAssign: false,
+	storageBuffer: true
 };
 
 const wgslFnOpLib = {
@@ -1012,7 +1013,21 @@ ${ flowData.code }
 
 	isAvailable( name ) {
 
-		return supports[ name ] === true;
+		let result = supports[ name ];
+
+		if ( result === undefined ) {
+
+			if ( name === 'float32Filterable' ) {
+
+				result = this.renderer.hasFeature( 'float32-filterable' );
+
+			}
+
+			supports[ name ] = result;
+
+		}
+
+		return result;
 
 	}
 

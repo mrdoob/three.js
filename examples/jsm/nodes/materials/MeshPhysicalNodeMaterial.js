@@ -157,7 +157,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 			} ).else( () => {
 
-				anisotropyV.divAssign( anisotropy );
+				anisotropyV.divAssign( vec2( anisotropy ) );
 				anisotropy.assign( anisotropy.saturate() );
 
 			} );

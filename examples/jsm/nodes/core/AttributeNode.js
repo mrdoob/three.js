@@ -10,13 +10,9 @@ class AttributeNode extends Node {
 
 		this.defaultNode = defaultNode;
 
+		this.global = true;
+
 		this._attributeName = attributeName;
-
-	}
-
-	isGlobal() {
-
-		return true;
 
 	}
 
