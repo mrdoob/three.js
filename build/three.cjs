@@ -110,6 +110,7 @@ const RedFormat = 1028;
 const RedIntegerFormat = 1029;
 const RGFormat = 1030;
 const RGIntegerFormat = 1031;
+const RGBIntegerFormat = 1032;
 const RGBAIntegerFormat = 1033;
 
 const RGB_S3TC_DXT1_Format = 33776;
@@ -53796,6 +53797,7 @@ exports.RGBA_S3TC_DXT1_Format = RGBA_S3TC_DXT1_Format;
 exports.RGBA_S3TC_DXT3_Format = RGBA_S3TC_DXT3_Format;
 exports.RGBA_S3TC_DXT5_Format = RGBA_S3TC_DXT5_Format;
 exports.RGBFormat = RGBFormat;
+exports.RGBIntegerFormat = RGBIntegerFormat;
 exports.RGB_BPTC_SIGNED_Format = RGB_BPTC_SIGNED_Format;
 exports.RGB_BPTC_UNSIGNED_Format = RGB_BPTC_UNSIGNED_Format;
 exports.RGB_ETC1_Format = RGB_ETC1_Format;
