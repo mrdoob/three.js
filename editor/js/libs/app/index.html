@@ -18,39 +18,42 @@
 		</style>
 	</head>
 	<body ontouchstart="">
-		<script type="importmap">
-			{
-				"imports": {
-					"three": "./js/three.module.js"
-				}
-			}
-		</script>
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { APP } from './js/app.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+			import { APP } from './src/app.js';
 
 			window.THREE = THREE; // Used by APP Scripts.
 
-			var loader = new THREE.FileLoader();
-			loader.load( 'app.json', function ( text ) {
+			if ( WebGL.isWebGL2Available() ) {
 
-				var player = new APP.Player();
-				player.load( JSON.parse( text ) );
-				player.setSize( window.innerWidth, window.innerHeight );
-				player.play();
+				var loader = new THREE.FileLoader();
+				loader.load( new URL( '/app.json', import.meta.url ).href, function ( text ) {
 
-				document.body.appendChild( player.dom );
-
-				window.addEventListener( 'resize', function () {
-
+					var player = new APP.Player();
+					player.load( JSON.parse( text ) );
 					player.setSize( window.innerWidth, window.innerHeight );
+					player.play();
+
+					document.body.appendChild( player.dom );
+
+					window.addEventListener( 'resize', function () {
+
+						player.setSize( window.innerWidth, window.innerHeight );
+
+					} );
 
 				} );
 
-			} );
+				/* edit button */
 
-			/* edit button */
+			} else {
+
+				const warning = WebGL.getWebGL2ErrorMessage();
+				document.body.appendChild( warning );
+
+			}
 
 		</script>
 	</body>
