@@ -52,6 +52,18 @@ class USDAParser {
 					target[ lhs ] = group;
 					target = group;
 
+				} else if ( rhs.endsWith( '(' ) ) {
+
+					// see #28631
+
+					const values = rhs.slice( 0, - 1 );
+					target[ lhs ] = values;
+
+					const meta = {};
+					stack.push( meta );
+
+					target = meta;
+
 				} else {
 
 					target[ lhs ] = rhs;
@@ -304,30 +316,6 @@ class USDZLoader extends Loader {
 				const object = data[ name ];
 
 				if ( name.startsWith( 'def Mesh' ) ) {
-
-					// Move points to Mesh
-
-					if ( 'point3f[] points' in data ) {
-
-						object[ 'point3f[] points' ] = data[ 'point3f[] points' ];
-
-					}
-
-					// Move st to Mesh
-
-					if ( 'texCoord2f[] primvars:st' in data ) {
-
-						object[ 'texCoord2f[] primvars:st' ] = data[ 'texCoord2f[] primvars:st' ];
-
-					}
-
-					// Move st indices to Mesh
-
-					if ( 'int[] primvars:st:indices' in data ) {
-
-						object[ 'int[] primvars:st:indices' ] = data[ 'int[] primvars:st:indices' ];
-
-					}
 
 					return object;
 
