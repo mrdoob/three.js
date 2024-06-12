@@ -7,6 +7,7 @@ import { Box3 } from "./Box3";
  *  @param {number} theta The cone angle
  *  @param {number} sup The maximum distance from v in the axis direction (truncated cone). If null or undefined, will be +infinity
  *  @param {number} inf The minimum distance from v in the axis direction (truncated cone). if null or undefined, will be 0
+ *  @deprecated
  */
 export function Cone( v, axis, theta, inf, sup ) {
 

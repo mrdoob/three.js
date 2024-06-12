@@ -5,8 +5,8 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // Minimum TypeScript Version: 3.6
 
-export * from './three/src/Three';
-export * from './dualbox-three-js/src/DualboxThree'
+export * from "three";
+export * from './DualboxThree'
 
 /*~ If this module is a UMD module that exposes a global variable 'myLib' when
  *~ loaded outside a module loader environment, declare that global here.

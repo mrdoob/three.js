@@ -132,5 +132,8 @@
     ],
     "directories": {}
   },
-  "private": false
+  "private": false,
+  "dependencies": {
+    "@types/three": "0.130.x"
+  }
 }
