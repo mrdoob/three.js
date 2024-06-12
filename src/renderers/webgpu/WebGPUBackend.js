@@ -1233,11 +1233,11 @@ class WebGPUBackend extends Backend {
 
 	createNodeBuilder( object, renderer ) {
 
-		const size = this.renderer.commonBufferSize;
+		const size = renderer.commonBufferSize;
 
 		if ( size > 0 && this.commonUniformBuffer === null ) {
 
-			this.commonUniformBuffer = new CommonUniformBuffer( 256 * size, this.device.limits.minUniformBufferOffsetAlignment );
+			this.commonUniformBuffer = new CommonUniformBuffer( 256 * size, this.device.limits.minUniformBufferOffsetAlignment, renderer.info );
 
 		}
 
