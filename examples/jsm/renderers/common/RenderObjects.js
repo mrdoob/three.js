@@ -83,6 +83,8 @@ class RenderObjects {
 
 		};
 
+		object.addEventListener( 'removed', () => renderObject.dispose() );
+
 		return renderObject;
 
 	}

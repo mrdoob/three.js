@@ -1,0 +1,191 @@
+<html lang="en">
+	<head>
+		<title>three.js - WebGPU - Sprites - Common buffer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Sprites - Common buffer
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/",
+					"three/nodes": "./jsm/nodes/Nodes.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { texture, uv, userData, rangeFog, color, SpriteNodeMaterial, reference } from 'three/nodes';
+
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
+			import WebGL from 'three/addons/capabilities/WebGL.js';
+
+			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+
+			let camera, scene, renderer, material;
+
+			let map;
+
+			let group;
+
+			let imageWidth = 1, imageHeight = 1;
+
+			const amount = 200;
+			const radius = 500;
+
+			init();
+
+			function addSprite( material ) {
+
+					const x = Math.random() - 0.5;
+					const y = Math.random() - 0.5;
+					const z = Math.random() - 0.5;
+
+					const sprite = new THREE.Sprite( material );
+
+					sprite.position.set( x, y, z );
+					sprite.position.normalize();
+					sprite.position.multiplyScalar( radius );
+					sprite.age = 0;
+
+					// individual rotation per sprite
+					sprite.userData.rotation = 0;
+
+					group.add( sprite );
+
+			}
+
+			function init() {
+
+				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw new Error( 'No WebGPU or WebGL2 support' );
+
+				}
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera = new THREE.PerspectiveCamera( 60, width / height, 1, 2100 );
+				camera.position.z = 1500;
+
+				scene = new THREE.Scene();
+				scene.fogNode = rangeFog( color( 0x0000ff ), 1500, 2100 );
+
+				// create sprites
+
+				const textureLoader = new THREE.TextureLoader();
+
+				map = textureLoader.load( 'textures/sprite1.png', ( map ) => {
+
+					imageWidth = map.image.width;
+					imageHeight = map.image.height;
+
+				} );
+
+				group = new THREE.Group();
+
+				const textureNode = texture( map );
+
+				material = new SpriteNodeMaterial();
+				const r = reference( 'age', 'float' );
+				material.colorNode = textureNode.mul( uv() ).mul( r ).saturate();
+				material.opacityNode = textureNode.a;
+				material.rotationNode = userData( 'rotation', 'float' ); // get value of: sprite.userData.rotation
+				material.transparent = true;
+
+				for ( let a = 0; a < amount; a ++ ) {
+
+					addSprite( material );
+
+				}
+
+				scene.add( group );
+
+				//
+
+				renderer = new WebGPURenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( render );
+				renderer.commonBufferSize = 1024;
+
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function render() {
+
+				const time = Date.now() / 1000;
+
+				for ( let i = 0, l = group.children.length; i < l; i ++ ) {
+
+					const sprite = group.children[ i ];
+
+					if ( sprite === undefined ) {
+
+						continue;
+
+
+					} else {
+
+						if ( Math.round( Math.random( ) * 1000 ) === 1 ) {
+
+							sprite.removeFromParent();
+
+							continue;
+
+						}
+
+					}
+
+					const scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
+
+					sprite.userData.rotation += 0.1 * ( i / l );
+					sprite.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
+					sprite.age = Math.min( 2, sprite.age + 0.01 );
+
+					if ( Math.round( Math.random( ) * 1000 ) === 1 ) {
+
+						addSprite( material );
+
+					}
+
+				}
+
+				group.rotation.x = time * 0.05;
+				group.rotation.y = time * 0.075;
+				group.rotation.z = time * 0.1;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

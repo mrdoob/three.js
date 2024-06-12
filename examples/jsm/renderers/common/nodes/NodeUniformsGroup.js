@@ -48,6 +48,12 @@ class NodeUniformsGroup extends UniformsGroup {
 
 	}
 
+	freeCommon() {
+
+		this.commonUniformBuffer.free( this._buffer );
+
+	}
+
 	get buffer() {
 
 		if ( this._buffer === null ) {
