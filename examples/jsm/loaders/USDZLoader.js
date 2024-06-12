@@ -717,7 +717,7 @@ class USDZLoader extends Loader {
 
 			if ( 'asset inputs:file' in data ) {
 
-				const path = data[ 'asset inputs:file' ].replace( /@*/g, '' );
+				const path = data[ 'asset inputs:file' ].replace( /@*/g, '' ).trim();
 
 				const loader = new TextureLoader();
 
