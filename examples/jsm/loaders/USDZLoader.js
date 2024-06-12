@@ -339,13 +339,9 @@ class USDZLoader extends Loader {
 			if ( ! data ) return undefined;
 
 			let geometry = new BufferGeometry();
+			let uvs = null;
 
-			if ( 'int[] faceVertexIndices' in data ) {
-
-				const indices = JSON.parse( data[ 'int[] faceVertexIndices' ] );
-				geometry.setIndex( indices );
-
-			}
+			// position
 
 			if ( 'point3f[] points' in data ) {
 
@@ -354,6 +350,46 @@ class USDZLoader extends Loader {
 				geometry.setAttribute( 'position', attribute );
 
 			}
+
+			// uv
+
+			if ( 'float2[] primvars:st' in data ) {
+
+				data[ 'texCoord2f[] primvars:st' ] = data[ 'float2[] primvars:st' ];
+
+			}
+
+			if ( 'texCoord2f[] primvars:st' in data ) {
+
+				uvs = JSON.parse( data[ 'texCoord2f[] primvars:st' ].replace( /[()]*/g, '' ) );
+				const attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
+				geometry.setAttribute( 'uv', attribute );
+
+			}
+
+			// index
+
+			if ( 'int[] faceVertexIndices' in data ) {
+
+				const indices = JSON.parse( data[ 'int[] faceVertexIndices' ] );
+				geometry.setIndex( indices );
+
+				geometry = geometry.toNonIndexed();
+
+			}
+
+			if ( 'int[] primvars:st:indices' in data && uvs !== null ) {
+
+				// custom uv index, overwrite uvs with new data
+
+				const attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
+
+				const indices = JSON.parse( data[ 'int[] primvars:st:indices' ] );
+				geometry.setAttribute( 'uv', toFlatBufferAttribute( attribute, indices ) );
+
+			}
+
+			// normal
 
 			if ( 'normal3f[] normals' in data ) {
 
@@ -364,32 +400,6 @@ class USDZLoader extends Loader {
 			} else {
 
 				geometry.computeVertexNormals();
-
-			}
-
-			if ( 'float2[] primvars:st' in data ) {
-
-				data[ 'texCoord2f[] primvars:st' ] = data[ 'float2[] primvars:st' ];
-
-			}
-
-			if ( 'texCoord2f[] primvars:st' in data ) {
-
-				const uvs = JSON.parse( data[ 'texCoord2f[] primvars:st' ].replace( /[()]*/g, '' ) );
-				const attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
-
-				if ( 'int[] primvars:st:indices' in data ) {
-
-					geometry = geometry.toNonIndexed();
-
-					const indices = JSON.parse( data[ 'int[] primvars:st:indices' ] );
-					geometry.setAttribute( 'uv', toFlatBufferAttribute( attribute, indices ) );
-
-				} else {
-
-					geometry.setAttribute( 'uv', attribute );
-
-				}
 
 			}
 
