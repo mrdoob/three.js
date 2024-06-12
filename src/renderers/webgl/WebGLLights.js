@@ -358,6 +358,7 @@ function WebGLLights( extensions ) {
 				uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
 				uniforms.distance = light.distance;
 				uniforms.decay = light.decay;
+				uniforms.mask = light.layers.mask;
 
 				if ( light.castShadow ) {
 

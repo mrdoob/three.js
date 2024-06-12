@@ -19,7 +19,9 @@ const UniformsLib = {
 		alphaMap: { value: null },
 		alphaMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 
-		alphaTest: { value: 0 }
+		alphaTest: { value: 0 },
+		
+		mask: 0,
 
 	},
 
@@ -166,7 +168,8 @@ const UniformsLib = {
 			color: {},
 			position: {},
 			decay: {},
-			distance: {}
+			distance: {},
+			mask: {}
 		} },
 
 		pointLightShadows: { value: [], properties: {

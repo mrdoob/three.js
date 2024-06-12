@@ -1,6 +1,7 @@
-export default /* glsl */`
+export default /* glsl */ `
 uniform bool receiveShadow;
 uniform vec3 ambientLightColor;
+uniform int mask;
 
 #if defined( USE_LIGHT_PROBES )
 
@@ -103,6 +104,7 @@ float getSpotAttenuation( const in float coneCosine, const in float penumbraCosi
 		vec3 color;
 		float distance;
 		float decay;
+		int mask;
 	};
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];

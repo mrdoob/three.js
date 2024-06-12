@@ -1,7 +1,7 @@
 import { BackSide } from '../../constants.js';
-import { getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
 import { Euler } from '../../math/Euler.js';
 import { Matrix4 } from '../../math/Matrix4.js';
+import { getUnlitUniformColorSpace } from '../shaders/UniformsUtils.js';
 
 const _e1 = /*@__PURE__*/ new Euler();
 const _m1 = /*@__PURE__*/ new Matrix4();
@@ -37,29 +37,29 @@ function WebGLMaterials( renderer, properties ) {
 
 	}
 
-	function refreshMaterialUniforms( uniforms, material, pixelRatio, height, transmissionRenderTarget ) {
+	function refreshMaterialUniforms( uniforms, material, pixelRatio, height, transmissionRenderTarget, layers ) {
 
 		if ( material.isMeshBasicMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, layers );
 
 		} else if ( material.isMeshLambertMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, layers );
 
 		} else if ( material.isMeshToonMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, layers );
 			refreshUniformsToon( uniforms, material );
 
 		} else if ( material.isMeshPhongMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, layers );
 			refreshUniformsPhong( uniforms, material );
 
 		} else if ( material.isMeshStandardMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, layers );
 			refreshUniformsStandard( uniforms, material );
 
 			if ( material.isMeshPhysicalMaterial ) {
@@ -70,21 +70,21 @@ function WebGLMaterials( renderer, properties ) {
 
 		} else if ( material.isMeshMatcapMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, layers );
 			refreshUniformsMatcap( uniforms, material );
 
 		} else if ( material.isMeshDepthMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, layers );
 
 		} else if ( material.isMeshDistanceMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, layers );
 			refreshUniformsDistance( uniforms, material );
 
 		} else if ( material.isMeshNormalMaterial ) {
 
-			refreshUniformsCommon( uniforms, material );
+			refreshUniformsCommon( uniforms, material, layers );
 
 		} else if ( material.isLineBasicMaterial ) {
 
@@ -117,7 +117,7 @@ function WebGLMaterials( renderer, properties ) {
 
 	}
 
-	function refreshUniformsCommon( uniforms, material ) {
+	function refreshUniformsCommon( uniforms, material, layers ) {
 
 		uniforms.opacity.value = material.opacity;
 
@@ -211,6 +211,12 @@ function WebGLMaterials( renderer, properties ) {
 		if ( material.alphaTest > 0 ) {
 
 			uniforms.alphaTest.value = material.alphaTest;
+
+		}
+
+		if ( layers ) {
+
+			uniforms.mask.value = layers.mask;
 
 		}
 
@@ -589,3 +595,4 @@ function WebGLMaterials( renderer, properties ) {
 }
 
 export { WebGLMaterials };
+
