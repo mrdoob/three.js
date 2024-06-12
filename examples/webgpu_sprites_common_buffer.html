@@ -9,6 +9,19 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Sprites - Common buffer
+			<div id="buffer-stats" style="
+				position: absolute;
+				top: 60px;
+				left: 0;
+				padding: 10px;
+				background: rgba( 0, 0, 0, 0.5 );
+				color: #fff;
+				font-family: monospace;
+				font-size: 12px;
+				line-height: 1.5;
+				pointer-events: none;
+				text-align: left;
+			"></div>
 		</div>
 
 		<script type="importmap">
@@ -24,7 +37,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { texture, uv, userData, rangeFog, color, SpriteNodeMaterial, reference } from 'three/nodes';
+			import { texture, uv, userData, rangeFog, color, SpriteNodeMaterial, reference, vec4, vec3 } from 'three/nodes';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 			import WebGL from 'three/addons/capabilities/WebGL.js';
@@ -42,6 +55,8 @@
 			const amount = 200;
 			const radius = 500;
 
+			const bufferStats = document.getElementById( 'buffer-stats' );
+
 			init();
 
 			function addSprite( material ) {
@@ -55,7 +70,6 @@
 					sprite.position.set( x, y, z );
 					sprite.position.normalize();
 					sprite.position.multiplyScalar( radius );
-					sprite.age = 0;
 
 					// individual rotation per sprite
 					sprite.userData.rotation = 0;
@@ -99,8 +113,7 @@
 				const textureNode = texture( map );
 
 				material = new SpriteNodeMaterial();
-				const r = reference( 'age', 'float' );
-				material.colorNode = textureNode.mul( uv() ).mul( r ).saturate();
+				material.colorNode = textureNode.mul( uv() ).mul( 2 ).saturate();
 				material.opacityNode = textureNode.a;
 				material.rotationNode = userData( 'rotation', 'float' ); // get value of: sprite.userData.rotation
 				material.transparent = true;
@@ -168,7 +181,6 @@
 
 					sprite.userData.rotation += 0.1 * ( i / l );
 					sprite.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
-					sprite.age = Math.min( 2, sprite.age + 0.01 );
 
 					if ( Math.round( Math.random( ) * 1000 ) === 1 ) {
 
@@ -183,6 +195,29 @@
 				group.rotation.z = time * 0.1;
 
 				renderer.render( scene, camera );
+
+				const info = renderer.info;
+
+				if ( info.render.calls % 20 === 0 ) {
+
+					const stats = info.memory.common;
+					const lists = stats.freeLists;
+
+					let listText = '';
+
+					for ( let i = 1, l = lists.length; i < l; i ++ ) {
+
+						listText += `Blocks ${ i } - length: ${ lists[ i ]} `;
+
+					}
+
+					bufferStats.innerHTML =
+						`Unused bytes: ${ stats.unused }<br>` +
+						`Alloc: ${ stats.alloc } (reused ${ stats.reused }) Free: ${ stats.free } <br><br>` +
+						`Free block lists (size: ${ stats.blockSize } B)<br>` +
+						listText;
+
+				}
 
 			}
 

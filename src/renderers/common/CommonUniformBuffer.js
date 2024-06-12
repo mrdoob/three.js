@@ -1,6 +1,6 @@
 class CommonUniformBuffer {
 
-	constructor( bufferSize = 0, alignment = 0 ) {
+	constructor( bufferSize = 0, alignment = 0, info ) {
 
 		let buffer = null;
 
@@ -17,6 +17,31 @@ class CommonUniformBuffer {
 		this.aligment = alignment;
 		this.freeLists = [];
 
+		this.info = {
+			size: buffer.byteLength,
+			blockSize: this.aligment,
+			free: 0,
+			alloc: 0,
+			reused: 0,
+		};
+
+		Object.defineProperties( this.info, {
+			'freeLists': {
+				get: () => {
+					const a = [];
+					for ( let i = 1, l = this.freeLists.length; i < l ; i ++ ) {
+						if ( this.freeLists[ i ] !== undefined ) a[ i ] = this.freeLists[ i ].length;
+					}
+					return a;
+				}
+			},
+			unused: {
+				get: () => buffer.byteLength - this.startFree
+			}
+		} );
+
+		info.memory.common = this.info;
+
 	}
 
 	allocate( byteLength ) {
@@ -26,29 +51,29 @@ class CommonUniformBuffer {
 		const aligment = this.aligment;
 		const freeLists = this.freeLists;
 
-		const listIndex = Math.ceil( byteLength / aligment );
+		const blockCount = Math.ceil( byteLength / aligment );
 
 		let start;
 
-		if ( freeLists.length > listIndex ) {
+		if ( freeLists.length > blockCount ) {
 
 			// scan freelists for space
 
-			for ( let i = listIndex, l = freeLists.length; i < l; i ++ ) {
+			for ( let i = blockCount, l = freeLists.length; i < l; i ++ ) {
 
 				if ( freeLists[ i ] !== undefined && freeLists[ i ].length > 0) {
 
-					console.log( 'allocate from free list size', i * aligment );
+//					console.log( 'allocate from free list size', i * aligment );
 
 					start = freeLists[ i ].shift();
+					this.info.reused ++;
 
-					if ( i > listIndex ) {
+					if ( i > blockCount ) {
 
 						// split overlarge list entries
-						this.free( start + aligment, ( i - listIndex ) * aligment );
+						this._free( start + ( blockCount * aligment ), ( i - blockCount ) * aligment );
 
 					}
-
 
 					break;
 
@@ -70,7 +95,7 @@ class CommonUniformBuffer {
 			}
 
 			// allocate from free area at the end of the buffer
-			const paddedByteLength = listIndex * aligment;
+			const paddedByteLength = blockCount * aligment;
 			start = this.startFree;
 
 			this.startFree += paddedByteLength;
@@ -80,7 +105,31 @@ class CommonUniformBuffer {
 		const bpe = this.buffer.BYTES_PER_ELEMENT;
 		const buffer = this.buffer.subarray( start / bpe , ( start + byteLength ) / bpe );
 
+		this.info.alloc ++;
+
 		return buffer;
+
+	}
+
+	_free( byteOffset, byteLength ) {
+
+		const freeLists = this.freeLists;
+		const blockCount = Math.ceil( byteLength / this.aligment );
+
+		if ( freeLists[ blockCount ] === undefined ) {
+
+			freeLists[ blockCount ] = [];
+
+		}
+
+		freeLists[ blockCount ].push( byteOffset );
+
+	}
+
+	free( buffer ) {
+
+		this._free( buffer.byteOffset, buffer.byteLength );
+		this.info.free ++;
 
 	}
 
@@ -93,23 +142,6 @@ class CommonUniformBuffer {
 	get arrayBuffer() {
 
 		return this.buffer.buffer;
-
-	}
-
-	free( buffer ) {
-
-		console.log( 'free', buffer.byteOffset, buffer.byteLength );
-
-		const freeLists = this.freeLists;
-		const listIndex = Math.ceil( buffer.byteLength / this.aligment );
-
-		if ( freeLists[ listIndex ] === undefined ) {
-
-			freeLists[ listIndex ] = [];
-
-		}
-
-		freeLists[ listIndex ].push( buffer.byteOffset );
 
 	}
 
