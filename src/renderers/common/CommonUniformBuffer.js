@@ -15,23 +15,70 @@ class CommonUniformBuffer {
 		this.startFree = 0;
 		this.buffer = buffer;
 		this.aligment = alignment;
+		this.freeLists = [];
 
 	}
 
 	allocate( byteLength ) {
 
-		if ( this.startFree + byteLength > this.byteLength ) {
+		// uniformGroups within buffer must be aligned correctly per WebGPU spec.
 
-			return false;
+		const aligment = this.aligment;
+		const freeLists = this.freeLists;
+
+		const listIndex = Math.ceil( byteLength / aligment );
+
+		let start;
+
+		if ( freeLists.length > listIndex ) {
+
+			// scan freelists for space
+
+			for ( let i = listIndex, l = freeLists.length; i < l; i ++ ) {
+
+				if ( freeLists[ i ] !== undefined && freeLists[ i ].length > 0) {
+
+					console.log( 'allocate from free list size', i * aligment );
+
+					start = freeLists[ i ].shift();
+
+					if ( i > listIndex ) {
+
+						// split overlarge list entries
+						this.free( start + aligment, ( i - listIndex ) * aligment );
+
+					}
+
+
+					break;
+
+				}
+
+
+			}
 
 		}
 
-		// uniformGroups within buffer must be aligned correctly per WebGPU spec.
-		const paddedByteLength = Math.ceil( byteLength / this.aligment ) * this.aligment;
-		const bpe = this.buffer.BYTES_PER_ELEMENT;
-		const buffer = this.buffer.subarray( this.startFree / bpe , ( this.startFree + byteLength ) / bpe );
+		if ( start === undefined ) {
 
-		this.startFree += paddedByteLength;
+			// not allocated from free lists
+
+			if ( this.startFree + byteLength > this.byteLength ) {
+
+				return false;
+
+			}
+
+			// allocate from free area at the end of the buffer
+			const paddedByteLength = listIndex * aligment;
+			start = this.startFree;
+
+			this.startFree += paddedByteLength;
+
+		}
+
+		const bpe = this.buffer.BYTES_PER_ELEMENT;
+		const buffer = this.buffer.subarray( start / bpe , ( start + byteLength ) / bpe );
 
 		return buffer;
 
@@ -46,6 +93,23 @@ class CommonUniformBuffer {
 	get arrayBuffer() {
 
 		return this.buffer.buffer;
+
+	}
+
+	free( buffer ) {
+
+		console.log( 'free', buffer.byteOffset, buffer.byteLength );
+
+		const freeLists = this.freeLists;
+		const listIndex = Math.ceil( buffer.byteLength / this.aligment );
+
+		if ( freeLists[ listIndex ] === undefined ) {
+
+			freeLists[ listIndex ] = [];
+
+		}
+
+		freeLists[ listIndex ].push( buffer.byteOffset );
 
 	}
 

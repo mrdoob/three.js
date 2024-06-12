@@ -200,6 +200,22 @@ class Bindings extends DataMap {
 
 	}
 
+	delete ( renderObject ) {
+
+		const bindings = this.get( renderObject ).bindings;
+
+		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
+
+			const binding = bindings[ i ];
+
+			if ( binding.isNodeUniformsGroup && binding._isCommon === true ) binding.freeCommon();
+
+		}
+
+		super.delete( renderObject );
+
+	}
+
 }
 
 export default Bindings;
