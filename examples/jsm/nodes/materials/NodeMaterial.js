@@ -1,4 +1,6 @@
 import { Material } from '../../../../src/materials/Material.js';
+import { NormalBlending } from '../../../../src/constants.js';
+
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
@@ -291,6 +293,12 @@ class NodeMaterial extends Material {
 			const alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
 			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
+
+		}
+
+		if ( this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false ) {
+
+			diffuseColor.a.assign( 1.0 );
 
 		}
 
