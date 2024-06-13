@@ -514,9 +514,11 @@ class USDZLoader extends Loader {
 
 			if ( data !== undefined ) {
 
-				if ( 'def Shader "PreviewSurface"' in data ) {
+				const surfaceConnection = data[ 'token outputs:surface.connect' ];
+				const surfaceName = /(\w+).output/.exec( surfaceConnection )[ 1 ];
+				const surface = data[ `def Shader "${surfaceName}"` ];
 
-					const surface = data[ 'def Shader "PreviewSurface"' ];
+				if ( surface !== undefined ) {
 
 					if ( 'color3f inputs:diffuseColor.connect' in surface ) {
 
@@ -682,24 +684,6 @@ class USDZLoader extends Loader {
 						}
 
 					}
-
-				}
-
-				if ( 'def Shader "diffuseColor_texture"' in data ) {
-
-					const sampler = data[ 'def Shader "diffuseColor_texture"' ];
-
-					material.map = buildTexture( sampler );
-					material.map.colorSpace = SRGBColorSpace;
-
-				}
-
-				if ( 'def Shader "normal_texture"' in data ) {
-
-					const sampler = data[ 'def Shader "normal_texture"' ];
-
-					material.normalMap = buildTexture( sampler );
-					material.normalMap.colorSpace = NoColorSpace;
 
 				}
 
