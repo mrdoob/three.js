@@ -978,7 +978,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( texture.layerUpdates.size > 0 ) {
 
-							const layerSize = TextureUtils.getByteLength( mipmap.width, mipmap.height, texture.format, texture.type );
+							const layerSize = TextureUtils.getByteLength( image.width, image.height, texture.format, texture.type );
 							const byteView = new Uint8Array( image.data.buffer, image.data.byteOffset );
 
 							for ( const layerIndex of texture.layerUpdates ) {
