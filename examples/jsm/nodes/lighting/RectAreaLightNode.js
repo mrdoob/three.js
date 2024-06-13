@@ -4,13 +4,15 @@ import { texture } from '../accessors/TextureNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { objectViewPosition } from '../accessors/Object3DNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { RectAreaLightTexturesLib } from '../../lights/RectAreaLightTexturesLib.js';
 
-import { RectAreaLight, Matrix4, Vector3 } from 'three';
+import { RectAreaLight } from '../../../../src/lights/RectAreaLight.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
 
 const _matrix41 = new Matrix4();
 const _matrix42 = new Matrix4();
-let ltc_1, ltc_2;
+
+let ltcLib = null;
 
 class RectAreaLightNode extends AnalyticLightNode {
 
@@ -48,25 +50,17 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 		super.setup( builder );
 
-		if ( ltc_1 === undefined ) {
+		let ltc_1, ltc_2;
 
-			if ( RectAreaLightTexturesLib.LTC_FLOAT_1 === null ) {
+		if ( builder.isAvailable( 'float32Filterable' ) ) {
 
-				RectAreaLightTexturesLib.init();
+			ltc_1 = texture( ltcLib.LTC_FLOAT_1 );
+			ltc_2 = texture( ltcLib.LTC_FLOAT_2 );
 
-			}
+		} else {
 
-			if ( builder.isAvailable( 'float32Filterable' ) ) {
-
-				ltc_1 = texture( RectAreaLightTexturesLib.LTC_FLOAT_1 );
-				ltc_2 = texture( RectAreaLightTexturesLib.LTC_FLOAT_2 );
-
-			} else {
-
-				ltc_1 = texture( RectAreaLightTexturesLib.LTC_HALF_1 );
-				ltc_2 = texture( RectAreaLightTexturesLib.LTC_HALF_2 );
-
-			}
+			ltc_1 = texture( ltcLib.LTC_HALF_1 );
+			ltc_2 = texture( ltcLib.LTC_HALF_2 );
 
 		}
 
@@ -85,6 +79,12 @@ class RectAreaLightNode extends AnalyticLightNode {
 			ltc_1,
 			ltc_2
 		}, builder.stack, builder );
+
+	}
+
+	static setLTC( ltc ) {
+
+		ltcLib = ltc;
 
 	}
 

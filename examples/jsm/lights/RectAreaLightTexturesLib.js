@@ -70,11 +70,13 @@ class RectAreaLightTexturesLib {
 		LTC_HALF_1.needsUpdate = true;
 		LTC_HALF_2.needsUpdate = true;
 
-		RectAreaLightTexturesLib.LTC_HALF_1 = LTC_HALF_1;
-		RectAreaLightTexturesLib.LTC_HALF_1 = LTC_HALF_2;
+		this.LTC_HALF_1 = LTC_HALF_1;
+		this.LTC_HALF_1 = LTC_HALF_2;
 
-		RectAreaLightTexturesLib.LTC_FLOAT_1 = LTC_FLOAT_1;
-		RectAreaLightTexturesLib.LTC_FLOAT_2 = LTC_FLOAT_2;
+		this.LTC_FLOAT_1 = LTC_FLOAT_1;
+		this.LTC_FLOAT_2 = LTC_FLOAT_2;
+
+		return this;
 
 	}
 

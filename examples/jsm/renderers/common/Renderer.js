@@ -12,7 +12,7 @@ import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
 import Color4 from './Color4.js';
 import ClippingContext from './ClippingContext.js';
-import QuadMesh from '../../objects/QuadMesh.js';
+import QuadMesh from './QuadMesh.js';
 import RenderBundles from './RenderBundles.js';
 
 import { NodeMaterial } from '../../nodes/Nodes.js';

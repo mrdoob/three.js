@@ -5,7 +5,7 @@ import { mul } from '../math/OperatorNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { texturePass } from './PassNode.js';
 import { uniform } from '../core/UniformNode.js';
-import QuadMesh from '../../objects/QuadMesh.js';
+import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 import { Vector2 } from '../../../../src/math/Vector2.js';
 import { RenderTarget } from '../../../../src/core/RenderTarget.js';

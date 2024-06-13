@@ -1,4 +1,7 @@
-import { BufferGeometry, Float32BufferAttribute, Mesh, OrthographicCamera } from 'three';
+import { BufferGeometry } from '../../../../src/core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../../../../src/core/BufferAttribute.js';
+import { Mesh } from '../../../../src/objects/Mesh.js';
+import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.js';
 
 // Helper for passes that need to fill the viewport with a single quad.
 

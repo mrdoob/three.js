@@ -6,7 +6,7 @@ import { texture } from '../accessors/TextureNode.js';
 import { texturePass } from './PassNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { sign, max } from '../math/MathNode.js';
-import QuadMesh from '../../objects/QuadMesh.js';
+import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 import { Vector2 } from '../../../../src/math/Vector2.js';
 import { NoToneMapping } from '../../../../src/constants.js';

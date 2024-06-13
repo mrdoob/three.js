@@ -25,8 +25,6 @@
 			import * as THREE from 'three';
 			import { texture, uniform } from 'three';
 
-			import QuadMesh from 'three/addons/objects/QuadMesh.js';
-
 			let camera, scene, renderer;
 			const mouse = new THREE.Vector2();
 
@@ -82,7 +80,7 @@
 				const materialFX = new THREE.MeshBasicNodeMaterial();
 				materialFX.colorNode = texture( renderTarget.texture ).rgb.saturation( screenFXNode.x.oneMinus() ).hue( screenFXNode.y );
 
-				quadMesh = new QuadMesh( materialFX );
+				quadMesh = new THREE.QuadMesh( materialFX );
 
 			}
 

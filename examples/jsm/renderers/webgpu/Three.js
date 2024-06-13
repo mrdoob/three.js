@@ -161,7 +161,7 @@ export * from '../../../../src/constants.js';
 export * from '../../../../src/Three.Legacy.js';
 
 export { default as WebGPURenderer } from './WebGPURenderer.js';
-export { default as QuadMesh } from '../../objects/QuadMesh.js';
+export { default as QuadMesh } from '../common/QuadMesh.js';
 export { default as PMREMGenerator } from '../common/extras/PMREMGenerator.js';
 export { default as PostProcessing } from '../common/PostProcessing.js';
 export { default as StorageTexture } from '../common/StorageTexture.js';
