@@ -340,7 +340,10 @@ class USDZLoader extends Loader {
 
 			const geometry = new BufferGeometry();
 			let indices = null;
+			let counts = null;
 			let uvs = null;
+
+			let positionsLength = - 1;
 
 			// index
 
@@ -350,11 +353,21 @@ class USDZLoader extends Loader {
 
 			}
 
+			// face count
+
+			if ( 'int[] faceVertexCounts' in data ) {
+
+				counts = JSON.parse( data[ 'int[] faceVertexCounts' ] );
+				indices = toTriangleIndices( indices, counts );
+
+			}
+
 			// position
 
 			if ( 'point3f[] points' in data ) {
 
 				const positions = JSON.parse( data[ 'point3f[] points' ].replace( /[()]*/g, '' ) );
+				positionsLength = positions.length;
 				let attribute = new BufferAttribute( new Float32Array( positions ), 3 );
 
 				if ( indices !== null ) attribute = toFlatBufferAttribute( attribute, indices );
@@ -387,7 +400,8 @@ class USDZLoader extends Loader {
 				// custom uv index, overwrite uvs with new data
 
 				const attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
-				const indices = JSON.parse( data[ 'int[] primvars:st:indices' ] );
+				let indices = JSON.parse( data[ 'int[] primvars:st:indices' ] );
+				indices = toTriangleIndices( indices, counts );
 				geometry.setAttribute( 'uv', toFlatBufferAttribute( attribute, indices ) );
 
 			}
@@ -399,8 +413,20 @@ class USDZLoader extends Loader {
 				const normals = JSON.parse( data[ 'normal3f[] normals' ].replace( /[()]*/g, '' ) );
 				let attribute = new BufferAttribute( new Float32Array( normals ), 3 );
 
-				if ( attribute.count !== geometry.attributes.position.count && indices !== null ) {
+				// normals require a special treatment in USD
 
+				if ( normals.length === positionsLength ) {
+
+					// raw normal and position data have equal length (like produced by USDZExporter)
+
+					if ( indices !== null ) attribute = toFlatBufferAttribute( attribute, indices );
+
+				} else {
+
+					// unequal length, normals are independent of faceVertexIndices
+
+					let indices = Array.from( Array( normals.length / 3 ).keys() ); // [ 0, 1, 2, 3 ... ]
+					indices = toTriangleIndices( indices, counts );
 					attribute = toFlatBufferAttribute( attribute, indices );
 
 				}
@@ -409,11 +435,53 @@ class USDZLoader extends Loader {
 
 			} else {
 
+				// compute flat vertex normals
+
 				geometry.computeVertexNormals();
 
 			}
 
 			return geometry;
+
+		}
+
+		function toTriangleIndices( rawIndices, counts ) {
+
+			const indices = [];
+
+			for ( let i = 0; i < counts.length; i ++ ) {
+
+				const count = counts[ i ];
+
+				const stride = i * count;
+
+				if ( count === 3 ) {
+
+					const a = rawIndices[ stride + 0 ];
+					const b = rawIndices[ stride + 1 ];
+					const c = rawIndices[ stride + 2 ];
+
+					indices.push( a, b, c );
+
+				} else if ( count === 4 ) {
+
+					const a = rawIndices[ stride + 0 ];
+					const b = rawIndices[ stride + 1 ];
+					const c = rawIndices[ stride + 2 ];
+					const d = rawIndices[ stride + 3 ];
+
+					indices.push( a, b, c );
+					indices.push( a, c, d );
+
+				} else {
+
+					console.warn( 'THREE.USDZLoader: Face vertex count of %s unsupported.', count );
+
+				}
+
+			}
+
+			return indices;
 
 		}
 
