@@ -2,7 +2,8 @@ import Object3DNode from './Object3DNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { Matrix4 } from 'three';
+
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
 
 class ModelNode extends Object3DNode {
 

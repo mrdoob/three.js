@@ -1,5 +1,6 @@
 import { uniform } from '../core/UniformNode.js';
-import { Vector3 } from 'three';
+
+import { Vector3 } from '../../../../src/math/Vector3.js';
 
 export const cameraNear = /*#__PURE__*/ uniform( 'float' ).onRenderUpdate( ( { camera } ) => camera.near );
 export const cameraFar = /*#__PURE__*/ uniform( 'float' ).onRenderUpdate( ( { camera } ) => camera.far );

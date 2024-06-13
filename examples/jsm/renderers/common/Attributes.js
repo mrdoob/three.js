@@ -1,6 +1,7 @@
 import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
-import { DynamicDrawUsage } from 'three';
+
+import { DynamicDrawUsage } from '../../../../src/constants.js';
 
 class Attributes extends DataMap {
 

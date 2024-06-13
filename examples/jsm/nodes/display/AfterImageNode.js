@@ -5,10 +5,12 @@ import { uv } from '../accessors/UVNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { texturePass } from './PassNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { RenderTarget } from 'three';
 import { sign, max } from '../math/MathNode.js';
 import QuadMesh from '../../objects/QuadMesh.js';
-import { NoToneMapping, Vector2 } from 'three';
+
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { NoToneMapping } from '../../../../src/constants.js';
+import { RenderTarget } from '../../../../src/core/RenderTarget.js';
 
 const _size = new Vector2();
 

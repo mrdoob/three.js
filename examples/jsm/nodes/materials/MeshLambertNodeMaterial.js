@@ -1,7 +1,7 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import PhongLightingModel from '../functions/PhongLightingModel.js';
 
-import { MeshLambertMaterial } from 'three';
+import { MeshLambertMaterial } from '../../../../src/materials/MeshLambertMaterial.js';
 
 const defaultValues = new MeshLambertMaterial();
 

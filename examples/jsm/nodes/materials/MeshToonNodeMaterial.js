@@ -1,7 +1,7 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import ToonLightingModel from '../functions/ToonLightingModel.js';
 
-import { MeshToonMaterial } from 'three';
+import { MeshToonMaterial } from '../../../../src/materials/MeshToonMaterial.js';
 
 const defaultValues = new MeshToonMaterial();
 

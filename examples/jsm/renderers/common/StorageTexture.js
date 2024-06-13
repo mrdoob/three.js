@@ -1,4 +1,5 @@
-import { Texture, LinearFilter } from 'three';
+import { Texture } from '../../../../src/textures/Texture.js';
+import { LinearFilter } from '../../../../src/constants.js';
 
 class StorageTexture extends Texture {
 

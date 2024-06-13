@@ -4,7 +4,10 @@ import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './Buf
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
 import { nodeProxy, vec3, mat3, mat4 } from '../shadernode/ShaderNode.js';
-import { DynamicDrawUsage, InstancedInterleavedBuffer, InstancedBufferAttribute } from 'three';
+
+import { InstancedInterleavedBuffer } from '../../../../src/core/InstancedInterleavedBuffer.js';
+import { InstancedBufferAttribute } from '../../../../src/core/InstancedBufferAttribute.js';
+import { DynamicDrawUsage } from '../../../../src/constants.js';
 
 class InstanceNode extends Node {
 

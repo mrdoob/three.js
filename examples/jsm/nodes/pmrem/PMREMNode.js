@@ -5,7 +5,8 @@ import { textureCubeUV } from './PMREMUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
-import { WebGLCoordinateSystem } from 'three';
+
+import { WebGLCoordinateSystem } from '../../../../src/constants.js';
 
 let _generator = null;
 

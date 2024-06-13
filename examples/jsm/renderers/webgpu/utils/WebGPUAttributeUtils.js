@@ -1,5 +1,6 @@
-import { Float16BufferAttribute } from 'three';
 import { GPUInputStepMode } from './WebGPUConstants.js';
+
+import { Float16BufferAttribute } from '../../../../../src/core/BufferAttribute.js';
 
 const typedArraysToVertexFormatPrefix = new Map( [
 	[ Int8Array, [ 'sint8', 'snorm8' ]],

@@ -1,4 +1,9 @@
-import { Color, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from 'three';
+import { Color } from '../../../../src/math/Color.js';
+import { Matrix3 } from '../../../../src/math/Matrix3.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
 
 export function getCacheKey( object, force = false ) {
 

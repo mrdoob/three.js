@@ -1,4 +1,4 @@
-import { Color } from 'three';
+import { Color } from '../../../../src/math/Color.js';
 
 class Color4 extends Color {
 

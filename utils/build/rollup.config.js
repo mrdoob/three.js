@@ -102,7 +102,32 @@ const builds = [
 				indent: '\t'
 			}
 		]
-	}
+	},
+	{
+		input: 'examples/jsm/renderers/webgpu/Three.js',
+		plugins: [
+			header()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.webgpu.js'
+			}
+		]
+	},
+	{
+		input: 'examples/jsm/renderers/webgpu/Three.js',
+		plugins: [
+			header(),
+			terser()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.webgpu.min.js'
+			}
+		]
+	},
 ];
 
 export default ( args ) => args.configOnlyModule ? builds[ 0 ] : builds;

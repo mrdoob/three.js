@@ -2,9 +2,10 @@ import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import { materialReference } from '../accessors/MaterialReferenceNode.js';
 import { diffuseColor } from '../core/PropertyNode.js';
 import { vec3 } from '../shadernode/ShaderNode.js';
-import { MeshMatcapMaterial } from 'three';
 import { mix } from '../math/MathNode.js';
 import { matcapUV } from '../utils/MatcapUVNode.js';
+
+import { MeshMatcapMaterial } from '../../../../src/materials/MeshMatcapMaterial.js';
 
 const defaultValues = new MeshMatcapMaterial();
 

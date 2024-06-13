@@ -1,4 +1,6 @@
-import { Matrix3, Plane, Vector4 } from 'three';
+import { Matrix3 } from '../../../../src/math/Matrix3.js';
+import { Plane } from '../../../../src/math/Plane.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
 
 const _plane = new Plane();
 

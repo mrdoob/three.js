@@ -6,7 +6,7 @@ import getRoughness from '../functions/material/getRoughness.js';
 import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
-import { MeshStandardMaterial } from 'three';
+import { MeshStandardMaterial } from '../../../../src/materials/MeshStandardMaterial.js';
 
 const defaultValues = new MeshStandardMaterial();
 

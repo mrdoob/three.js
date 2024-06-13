@@ -1,5 +1,3 @@
-import { NoColorSpace, FloatType } from 'three';
-
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import NodeSampler from '../../common/nodes/NodeSampler.js';
@@ -15,6 +13,7 @@ import { getFormat } from '../utils/WebGPUTextureUtils.js';
 import WGSLNodeParser from './WGSLNodeParser.js';
 import { GPUStorageTextureAccess } from '../utils/WebGPUConstants.js';
 
+import { NoColorSpace, FloatType } from '../../../../../src/constants.js';
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
 const GPUShaderStage = self.GPUShaderStage;

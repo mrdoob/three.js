@@ -1,4 +1,4 @@
-import { Material } from 'three';
+import { Material } from '../../../../src/materials/Material.js';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';

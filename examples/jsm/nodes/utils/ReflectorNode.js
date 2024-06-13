@@ -2,7 +2,15 @@ import TextureNode from '../accessors/TextureNode.js';
 import { nodeObject, vec2 } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { viewportTopLeft } from '../display/ViewportNode.js';
-import { Matrix4, Vector2, Vector3, Vector4, Object3D, Plane, RenderTarget, HalfFloatType, LinearMipMapLinearFilter } from 'three';
+
+import { HalfFloatType, LinearMipMapLinearFilter } from '../../../../src/constants.js';
+import { Plane } from '../../../../src/math/Plane.js';
+import { Object3D } from '../../../../src/core/Object3D.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { RenderTarget } from '../../../../src/core/RenderTarget.js';
 
 const _reflectorPlane = new Plane();
 const _normal = new Vector3();

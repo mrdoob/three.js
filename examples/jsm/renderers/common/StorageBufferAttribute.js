@@ -1,4 +1,4 @@
-import { BufferAttribute } from 'three';
+import { BufferAttribute } from '../../../../src/core/BufferAttribute.js';
 
 class StorageBufferAttribute extends BufferAttribute {
 

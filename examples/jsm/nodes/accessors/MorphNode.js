@@ -8,8 +8,12 @@ import { normalLocal } from './NormalNode.js';
 import { textureLoad } from './TextureNode.js';
 import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
 import { ivec2, int } from '../shadernode/ShaderNode.js';
-import { DataArrayTexture, Vector2, Vector4, FloatType } from 'three';
 import { loop } from '../utils/LoopNode.js';
+
+import { DataArrayTexture } from '../../../../src/textures/DataArrayTexture.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
+import { FloatType } from '../../../../src/constants.js';
 
 const morphTextures = new WeakMap();
 const morphVec4 = new Vector4();

@@ -12,10 +12,19 @@ import Background from './Background.js';
 import Nodes from './nodes/Nodes.js';
 import Color4 from './Color4.js';
 import ClippingContext from './ClippingContext.js';
-import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, RenderTarget, HalfFloatType, RGBAFormat } from 'three';
-import { NodeMaterial } from '../../nodes/Nodes.js';
 import QuadMesh from '../../objects/QuadMesh.js';
 import RenderBundles from './RenderBundles.js';
+
+import { NodeMaterial } from '../../nodes/Nodes.js';
+
+import { Scene } from '../../../../src/scenes/Scene.js';
+import { Frustum } from '../../../../src/math/Frustum.js';
+import { Matrix4 } from '../../../../src/math/Matrix4.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
+import { RenderTarget } from '../../../../src/core/RenderTarget.js';
+import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat } from '../../../../src/constants.js';
 
 const _scene = new Scene();
 const _drawingBufferSize = new Vector2();

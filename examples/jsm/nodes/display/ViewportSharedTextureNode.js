@@ -2,7 +2,8 @@ import ViewportTextureNode from './ViewportTextureNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 import { viewportTopLeft } from './ViewportNode.js';
-import { FramebufferTexture } from 'three';
+
+import { FramebufferTexture } from '../../../../src/textures/FramebufferTexture.js';
 
 let _sharedFramebuffer = null;
 

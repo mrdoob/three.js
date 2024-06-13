@@ -1,4 +1,4 @@
-import { Vector4 } from 'three';
+import { Vector4 } from '../../../../src/math/Vector4.js';
 
 let id = 0;
 

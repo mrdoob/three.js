@@ -4,8 +4,9 @@ import { texture } from '../accessors/TextureNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { objectViewPosition } from '../accessors/Object3DNode.js';
 import { addNodeClass } from '../core/Node.js';
+import { RectAreaLightTexturesLib } from '../../lights/RectAreaLightTexturesLib.js';
 
-import { RectAreaLight, Matrix4, Vector3, UniformsLib } from 'three';
+import { RectAreaLight, Matrix4, Vector3 } from 'three';
 
 const _matrix41 = new Matrix4();
 const _matrix42 = new Matrix4();
@@ -49,15 +50,21 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 		if ( ltc_1 === undefined ) {
 
+			if ( RectAreaLightTexturesLib.LTC_FLOAT_1 === null ) {
+
+				RectAreaLightTexturesLib.init();
+
+			}
+
 			if ( builder.isAvailable( 'float32Filterable' ) ) {
 
-				ltc_1 = texture( UniformsLib.LTC_FLOAT_1 );
-				ltc_2 = texture( UniformsLib.LTC_FLOAT_2 );
+				ltc_1 = texture( RectAreaLightTexturesLib.LTC_FLOAT_1 );
+				ltc_2 = texture( RectAreaLightTexturesLib.LTC_FLOAT_2 );
 
 			} else {
 
-				ltc_1 = texture( UniformsLib.LTC_HALF_1 );
-				ltc_2 = texture( UniformsLib.LTC_HALF_2 );
+				ltc_1 = texture( RectAreaLightTexturesLib.LTC_HALF_1 );
+				ltc_2 = texture( RectAreaLightTexturesLib.LTC_HALF_2 );
 
 			}
 

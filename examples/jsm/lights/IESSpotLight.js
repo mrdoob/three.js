@@ -1,4 +1,4 @@
-import { SpotLight } from 'three';
+import { SpotLight } from '../../../src/lights/SpotLight.js';
 
 class IESSpotLight extends SpotLight {
 

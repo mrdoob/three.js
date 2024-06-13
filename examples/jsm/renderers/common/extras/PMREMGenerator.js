@@ -8,14 +8,18 @@ import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
 import { float, vec3 } from '../../../nodes/shadernode/ShaderNode.js';
 import { uv } from '../../../nodes/accessors/UVNode.js';
 import { attribute } from '../../../nodes/core/AttributeNode.js';
+
+import { OrthographicCamera } from '../../../../../src/cameras/OrthographicCamera.js';
+import { Color } from '../../../../../src/math/Color.js';
+import { Vector3 } from '../../../../../src/math/Vector3.js';
+import { BufferGeometry } from '../../../../../src/core/BufferGeometry.js';
+import { BufferAttribute } from '../../../../../src/core/BufferAttribute.js';
+import { RenderTarget } from '../../../../../src/core/RenderTarget.js';
+import { Mesh } from '../../../../../src/objects/Mesh.js';
+import { PerspectiveCamera } from '../../../../../src/cameras/PerspectiveCamera.js';
+import { MeshBasicMaterial } from '../../../../../src/materials/MeshBasicMaterial.js';
+import { BoxGeometry } from '../../../../../src/geometries/BoxGeometry.js';
 import {
-	OrthographicCamera,
-	Color,
-	Vector3,
-	BufferGeometry,
-	BufferAttribute,
-	RenderTarget,
-	Mesh,
 	CubeReflectionMapping,
 	CubeRefractionMapping,
 	CubeUVReflectionMapping,
@@ -24,11 +28,8 @@ import {
 	RGBAFormat,
 	HalfFloatType,
 	BackSide,
-	LinearSRGBColorSpace,
-	PerspectiveCamera,
-	MeshBasicMaterial,
-	BoxGeometry
-} from 'three';
+	LinearSRGBColorSpace
+} from '../../../../../src/constants.js';
 
 const LOD_MIN = 4;
 

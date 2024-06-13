@@ -2,7 +2,8 @@ import ViewportTextureNode from './ViewportTextureNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 import { viewportTopLeft } from './ViewportNode.js';
-import { DepthTexture } from 'three';
+
+import { DepthTexture } from '../../../../src/textures/DepthTexture.js';
 
 let sharedDepthbuffer = null;
 

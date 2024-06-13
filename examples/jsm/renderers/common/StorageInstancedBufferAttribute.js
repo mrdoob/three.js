@@ -1,4 +1,4 @@
-import { InstancedBufferAttribute } from 'three';
+import { InstancedBufferAttribute } from '../../../../src/core/InstancedBufferAttribute.js';
 
 class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 

@@ -1,4 +1,4 @@
-import { IntType } from 'three';
+import { IntType } from '../../../../../src/constants.js';
 
 let _id = 0;
 

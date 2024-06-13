@@ -1,6 +1,8 @@
 import { createNodeFromType } from '../core/Node.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
-import { FileLoader, Loader } from 'three';
+
+import { Loader } from '../../../../src/loaders/Loader.js';
+import { FileLoader } from '../../../../src/loaders/FileLoader.js';
 
 class NodeLoader extends Loader {
 

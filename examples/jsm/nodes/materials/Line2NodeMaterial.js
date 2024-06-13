@@ -13,7 +13,7 @@ import { uv } from '../accessors/UVNode.js';
 import { viewport } from '../display/ViewportNode.js';
 import { dashSize, gapSize } from '../core/PropertyNode.js';
 
-import { LineDashedMaterial } from 'three';
+import { LineDashedMaterial } from '../../../../src/materials/LineDashedMaterial.js';
 
 const defaultValues = new LineDashedMaterial();
 

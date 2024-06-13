@@ -5,7 +5,11 @@ import { NodeUpdateType } from '../core/constants.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
-import { RenderTarget, Vector2, HalfFloatType, DepthTexture, NoToneMapping/*, FloatType*/ } from 'three';
+
+import { HalfFloatType, NoToneMapping/*, FloatType*/ } from '../../../../src/constants.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { DepthTexture } from '../../../../src/textures/DepthTexture.js';
+import { RenderTarget } from '../../../../src/core/RenderTarget.js';
 
 const _size = new Vector2();
 

@@ -2,7 +2,8 @@ import TextureNode from './TextureNode.js';
 import { reflectVector } from './ReflectVectorNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
-import { WebGPUCoordinateSystem } from 'three';
+
+import { WebGPUCoordinateSystem } from '../../../../src/constants.js';
 
 class CubeTextureNode extends TextureNode {
 

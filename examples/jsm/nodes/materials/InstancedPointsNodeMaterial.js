@@ -11,7 +11,7 @@ import { tslFn, vec2, vec4 } from '../shadernode/ShaderNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { viewport } from '../display/ViewportNode.js';
 
-import { PointsMaterial } from 'three';
+import { PointsMaterial } from '../../../../src/materials/PointsMaterial.js';
 
 const defaultValues = new PointsMaterial();
 

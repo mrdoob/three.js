@@ -15,8 +15,6 @@ import {
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from '../../renderers/common/nodes/NodeUniform.js';
 
-import { REVISION, RenderTarget, Color, Vector2, Vector3, Vector4, IntType, UnsignedIntType, Float16BufferAttribute } from 'three';
-
 import { stack } from './StackNode.js';
 import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
 
@@ -24,6 +22,15 @@ import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
 
 import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
+
+import { REVISION } from '../../../../src/constants.js';
+import { RenderTarget } from '../../../../src/core/RenderTarget.js';
+import { Color } from '../../../../src/math/Color.js';
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { Vector3 } from '../../../../src/math/Vector3.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
+import { Float16BufferAttribute } from '../../../../src/core/BufferAttribute.js';
+import { IntType, UnsignedIntType } from '../../../../src/constants.js';
 
 const uniformsGroupCache = new ChainMap();
 

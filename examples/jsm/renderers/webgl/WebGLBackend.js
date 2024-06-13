@@ -1,5 +1,3 @@
-import { WebGLCoordinateSystem } from 'three';
-
 import GLSLNodeBuilder from './nodes/GLSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
 
@@ -11,6 +9,8 @@ import WebGLExtensions from './utils/WebGLExtensions.js';
 import WebGLCapabilities from './utils/WebGLCapabilities.js';
 import { GLFeatureName } from './utils/WebGLConstants.js';
 import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
+
+import { WebGLCoordinateSystem } from '../../../../src/constants.js';
 
 //
 

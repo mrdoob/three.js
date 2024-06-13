@@ -3,7 +3,7 @@ import { mix } from '../math/MathNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, tslFn, nodeObject, nodeProxy, vec4 } from '../shadernode/ShaderNode.js';
 
-import { LinearSRGBColorSpace, SRGBColorSpace } from 'three';
+import { LinearSRGBColorSpace, SRGBColorSpace } from '../../../../src/constants.js';
 
 const sRGBToLinearShader = tslFn( ( inputs ) => {
 

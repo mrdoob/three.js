@@ -3,7 +3,10 @@ let vector4 = null;
 let color4 = null;
 
 import Color4 from './Color4.js';
-import { Vector2, Vector4, REVISION, createCanvasElement } from 'three';
+import { Vector2 } from '../../../../src/math/Vector2.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
+import { createCanvasElement } from '../../../../src/utils.js';
+import { REVISION } from '../../../../src/constants.js';
 
 class Backend {
 

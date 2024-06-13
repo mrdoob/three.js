@@ -1,7 +1,7 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import ShadowMaskModel from '../functions/ShadowMaskModel.js';
 
-import { ShadowMaterial } from 'three';
+import { ShadowMaterial } from '../../../../src/materials/ShadowMaterial.js';
 
 const defaultValues = new ShadowMaterial();
 
