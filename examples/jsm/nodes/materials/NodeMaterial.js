@@ -294,6 +294,12 @@ class NodeMaterial extends Material {
 
 		}
 
+		if ( this.transparent === false ) {
+
+			diffuseColor.a.assign( 1.0 );
+
+		}
+
 	}
 
 	setupVariants( /*builder*/ ) {
