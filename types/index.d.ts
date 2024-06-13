@@ -5,7 +5,9 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // Minimum TypeScript Version: 3.6
 
-export * from "three";
+export * from 'three';
+
+export { UniformsLib } from './DualboxThree'
 export * from './DualboxThree'
 
 /*~ If this module is a UMD module that exposes a global variable 'myLib' when
