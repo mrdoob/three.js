@@ -1,4 +1,4 @@
-import { Material } from 'three';
+import { Material, NormalBlending } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
@@ -294,7 +294,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( this.transparent === false ) {
+		if ( this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false ) {
 
 			diffuseColor.a.assign( 1.0 );
 
