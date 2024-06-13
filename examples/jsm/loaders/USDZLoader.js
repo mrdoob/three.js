@@ -338,15 +338,27 @@ class USDZLoader extends Loader {
 
 			if ( ! data ) return undefined;
 
-			let geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
+			let indices = null;
 			let uvs = null;
+
+			// index
+
+			if ( 'int[] faceVertexIndices' in data ) {
+
+				indices = JSON.parse( data[ 'int[] faceVertexIndices' ] );
+
+			}
 
 			// position
 
 			if ( 'point3f[] points' in data ) {
 
 				const positions = JSON.parse( data[ 'point3f[] points' ].replace( /[()]*/g, '' ) );
-				const attribute = new BufferAttribute( new Float32Array( positions ), 3 );
+				let attribute = new BufferAttribute( new Float32Array( positions ), 3 );
+
+				if ( indices !== null ) attribute = toFlatBufferAttribute( attribute, indices );
+
 				geometry.setAttribute( 'position', attribute );
 
 			}
@@ -362,19 +374,11 @@ class USDZLoader extends Loader {
 			if ( 'texCoord2f[] primvars:st' in data ) {
 
 				uvs = JSON.parse( data[ 'texCoord2f[] primvars:st' ].replace( /[()]*/g, '' ) );
-				const attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
+				let attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
+
+				if ( indices !== null ) attribute = toFlatBufferAttribute( attribute, indices );
+
 				geometry.setAttribute( 'uv', attribute );
-
-			}
-
-			// index
-
-			if ( 'int[] faceVertexIndices' in data ) {
-
-				const indices = JSON.parse( data[ 'int[] faceVertexIndices' ] );
-				geometry.setIndex( indices );
-
-				geometry = geometry.toNonIndexed();
 
 			}
 
@@ -383,7 +387,6 @@ class USDZLoader extends Loader {
 				// custom uv index, overwrite uvs with new data
 
 				const attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
-
 				const indices = JSON.parse( data[ 'int[] primvars:st:indices' ] );
 				geometry.setAttribute( 'uv', toFlatBufferAttribute( attribute, indices ) );
 
@@ -394,7 +397,14 @@ class USDZLoader extends Loader {
 			if ( 'normal3f[] normals' in data ) {
 
 				const normals = JSON.parse( data[ 'normal3f[] normals' ].replace( /[()]*/g, '' ) );
-				const attribute = new BufferAttribute( new Float32Array( normals ), 3 );
+				let attribute = new BufferAttribute( new Float32Array( normals ), 3 );
+
+				if ( attribute.count !== geometry.attributes.position.count && indices !== null ) {
+
+					attribute = toFlatBufferAttribute( attribute, indices );
+
+				}
+
 				geometry.setAttribute( 'normal', attribute );
 
 			} else {
