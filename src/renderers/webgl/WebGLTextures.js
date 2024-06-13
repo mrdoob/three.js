@@ -856,10 +856,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 										if ( texture.layerUpdates.size > 0 ) {
 
 											const layerSize = TextureUtils.getByteLength( mipmap.width, mipmap.height, texture.format, texture.type );
+											const byteView = new Uint8Array( mipmap.data.buffer, mipmap.data.byteOffset );
 
 											for ( const layerIndex of texture.layerUpdates ) {
 
-												state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, layerIndex, mipmap.width, mipmap.height, 1, glFormat, mipmap.data.subarray( layerSize * layerIndex, layerSize * ( layerIndex + 1 ) ), 0, 0 );
+												state.compressedTexSubImage3D( _gl.TEXTURE_2D_ARRAY, i, 0, 0, layerIndex, mipmap.width, mipmap.height, 1, glFormat, byteView.subarray( layerSize * layerIndex, layerSize * ( layerIndex + 1 ) ), 0, 0 );
 
 											}
 
@@ -978,10 +979,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 						if ( texture.layerUpdates.size > 0 ) {
 
 							const layerSize = TextureUtils.getByteLength( mipmap.width, mipmap.height, texture.format, texture.type );
+							const byteView = new Uint8Array( image.data.buffer, image.data.byteOffset );
 
 							for ( const layerIndex of texture.layerUpdates ) {
 
-								state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, layerIndex, image.width, image.height, 1, glFormat, glType, image.data.subarray( layerSize * layerIndex, layerSize * ( layerIndex + 1 ) ) );
+								state.texSubImage3D( _gl.TEXTURE_2D_ARRAY, 0, 0, 0, layerIndex, image.width, image.height, 1, glFormat, glType, byteView.subarray( layerSize * layerIndex, layerSize * ( layerIndex + 1 ) ) );
 
 							}
 
