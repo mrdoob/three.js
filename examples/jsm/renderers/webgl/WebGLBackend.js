@@ -1086,7 +1086,11 @@ class WebGLBackend extends Backend {
 
 	createStorageAttribute( attribute ) {
 
-		//console.warn( 'Abstract class.' );
+		if ( this.has( attribute ) ) return;
+
+		const gl = this.gl;
+
+		this.attributeUtils.createAttribute( attribute, gl.ARRAY_BUFFER );
 
 	}
 
