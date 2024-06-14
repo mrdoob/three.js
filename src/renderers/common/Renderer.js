@@ -142,6 +142,11 @@ class Renderer {
 			enabled: false
 		};
 
+		this.debug = {
+			checkShaderErrors: true,
+			onShaderError: null
+		};
+
 	}
 
 	async init() {
