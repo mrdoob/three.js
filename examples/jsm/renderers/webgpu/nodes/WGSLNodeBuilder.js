@@ -970,29 +970,16 @@ ${ flowData.code }
 
 		}
 
-		let outputCode = '';
-
 		if ( this.material !== null ) {
 
-			const vertexShader = this._getWGSLVertexCode( shadersData.vertex );
-			const fragmentShader = this._getWGSLFragmentCode( shadersData.fragment );
-
-			this.vertexShader = vertexShader;
-			this.fragmentShader = fragmentShader;
-
-			outputCode = '// vertex shader' + '\n\n' + vertexShader + '\n\n// fragment shader' + fragmentShader;
+			this.vertexShader = this._getWGSLVertexCode( shadersData.vertex );
+			this.fragmentShader = this._getWGSLFragmentCode( shadersData.fragment );
 
 		} else {
 
-			const computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
-
-			this.computeShader = computeShader;
-
-			outputCode = '// compute shader' + '\n\n' + computeShader;
+			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
 
 		}
-
-		this.object.outputCode = outputCode;
 
 	}
 

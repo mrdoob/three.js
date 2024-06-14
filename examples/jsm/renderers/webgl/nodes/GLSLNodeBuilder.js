@@ -615,7 +615,7 @@ ${ flowData.code }
 
 				const extentions = this.renderer.backend.extensions;
 
-				if ( extentions.has( 'OES_texture_float_linear' ) )  {
+				if ( extentions.has( 'OES_texture_float_linear' ) ) {
 
 					extentions.get( 'OES_texture_float_linear' );
 					result = true;
@@ -813,29 +813,16 @@ void main() {
 
 		}
 
-		let outputCode = '';
-
 		if ( this.material !== null ) {
 
-			const vertexShader = this._getGLSLVertexCode( shadersData.vertex );
-			const fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
-
-			this.vertexShader = vertexShader;
-			this.fragmentShader = fragmentShader;
-
-			outputCode = '// vertex shader' + '\n\n' + vertexShader + '\n\n// fragment shader' + fragmentShader;
+			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
+			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
 
 		} else {
 
-			const computeShader = this._getGLSLVertexCode( shadersData.compute );
-
-			this.computeShader = computeShader;
-
-			outputCode = '// compute shader' + '\n\n' + computeShader;
+			this.computeShader = this._getGLSLVertexCode( shadersData.compute );
 
 		}
-
-		this.object.outputCode = outputCode;
 
 	}
 
