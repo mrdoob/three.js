@@ -182,7 +182,12 @@
 			if ( mesh && mesh.isBatchedMesh ) {
 
 				// Delete all instances to recreate them
-				mesh.deleteAllInstances();
+				for ( let i = 0; i < ids.length; i ++ ) {
+
+					mesh.deleteInstance( ids[ i ] );
+		
+				}
+
 				mesh.optimize();
 
 			} else {
