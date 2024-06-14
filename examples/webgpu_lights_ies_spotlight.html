@@ -25,8 +25,6 @@
 
 			import * as THREE from 'three';
 
-			import IESSpotLight from 'three/addons/lights/IESSpotLight.js';
-
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			import { IESLoader } from './jsm/loaders/IESLoader.js';
@@ -52,7 +50,7 @@
 
 				//
 
-				const spotLight = new IESSpotLight( 0xff0000, 500 );
+				const spotLight = new THREE.IESSpotLight( 0xff0000, 500 );
 				spotLight.position.set( 6.5, 1.5, 6.5 );
 				spotLight.angle = Math.PI / 8;
 				spotLight.penumbra = 0.7;
@@ -62,7 +60,7 @@
 
 				//
 
-				const spotLight2 = new IESSpotLight( 0x00ff00, 500 );
+				const spotLight2 = new THREE.IESSpotLight( 0x00ff00, 500 );
 				spotLight2.position.set( 6.5, 1.5, - 6.5 );
 				spotLight2.angle = Math.PI / 8;
 				spotLight2.penumbra = 0.7;
@@ -72,7 +70,7 @@
 
 				//
 
-				const spotLight3 = new IESSpotLight( 0x0000ff, 500 );
+				const spotLight3 = new THREE.IESSpotLight( 0x0000ff, 500 );
 				spotLight3.position.set( - 6.5, 1.5, - 6.5 );
 				spotLight3.angle = Math.PI / 8;
 				spotLight3.penumbra = 0.7;
@@ -82,7 +80,7 @@
 
 				//
 
-				const spotLight4 = new IESSpotLight( 0xffffff, 500 );
+				const spotLight4 = new THREE.IESSpotLight( 0xffffff, 500 );
 				spotLight4.position.set( - 6.5, 1.5, 6.5 );
 				spotLight4.angle = Math.PI / 8;
 				spotLight4.penumbra = 0.7;

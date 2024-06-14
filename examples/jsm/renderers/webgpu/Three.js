@@ -167,6 +167,7 @@ export { default as PostProcessing } from '../common/PostProcessing.js';
 export { default as StorageTexture } from '../common/StorageTexture.js';
 export { default as StorageBufferAttribute } from '../common/StorageBufferAttribute.js';
 export { default as StorageInstancedBufferAttribute } from '../common/StorageInstancedBufferAttribute.js';
+export { default as IESSpotLight } from '../../lights/IESSpotLight.js';
 export * from '../../nodes/Nodes.js';
 
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
