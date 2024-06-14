@@ -657,10 +657,10 @@ ${ flowData.code }
 
 	}
 
-	getDirective( name, shaderStage = this.shaderStage) {
+	getDirective( name, shaderStage = this.shaderStage ) {
 
 		const stage = this.directives[ shaderStage ] || ( this.directives[ shaderStage ] = [] );
-		stage.push(name);
+		stage.push( name );
 
 	}
 
@@ -673,25 +673,25 @@ ${ flowData.code }
 
 			for ( const directive of directives ) {
 
-				snippets.push(`enable ${directive}`);
+				snippets.push( `enable ${directive}` );
 
 			}
 
 		}
 
-		return snippets.join('\n');
+		return snippets.join( '\n' );
 
 	}
 
 	enableClipDistances() {
 
-		this.getDirective('clip_distances');
+		this.getDirective( 'clip_distances' );
 
 	}
 
 	enableShaderF16() {
 
-		this.getDirective('f16');
+		this.getDirective( 'f16' );
 
 	}
 
