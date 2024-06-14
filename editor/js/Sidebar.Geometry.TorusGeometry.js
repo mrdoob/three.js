@@ -7,6 +7,7 @@ import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 function GeometryParametersPanel( editor, object ) {
 
 	const strings = editor.strings;
+	const signals = editor.signals;
 
 	const container = new UIDiv();
 
@@ -63,6 +64,29 @@ function GeometryParametersPanel( editor, object ) {
 
 	container.add( arcRow );
 
+	//
+
+	function refreshUI() {
+
+		const parameters = object.geometry.parameters;
+
+		radius.setValue( parameters.radius );
+		tube.setValue( parameters.tube );
+		radialSegments.setValue( parameters.radialSegments );
+		tubularSegments.setValue( parameters.tubularSegments );
+		arc.setValue( parameters.arc * THREE.MathUtils.RAD2DEG );
+
+	}
+
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
 
 	//
 

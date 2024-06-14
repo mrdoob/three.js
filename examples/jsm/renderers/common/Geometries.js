@@ -146,7 +146,15 @@ class Geometries extends DataMap {
 
 		for ( const attribute of attributes ) {
 
-			this.updateAttribute( attribute, AttributeType.VERTEX );
+			if ( attribute.isStorageBufferAttribute || attribute.isStorageInstancedBufferAttribute ) {
+
+				this.updateAttribute( attribute, AttributeType.STORAGE );
+
+			} else {
+
+				this.updateAttribute( attribute, AttributeType.VERTEX );
+
+			}
 
 		}
 

@@ -7,6 +7,7 @@ import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 function GeometryParametersPanel( editor, object ) {
 
 	const strings = editor.strings;
+	const signals = editor.signals;
 
 	const container = new UIDiv();
 
@@ -36,7 +37,7 @@ function GeometryParametersPanel( editor, object ) {
 	// capSegments
 
 	const capSegmentsRow = new UIRow();
-	const capSegments = new UINumber( parameters.capSegments ).onChange( update );
+	const capSegments = new UIInteger( parameters.capSegments ).setRange( 1, Infinity ).onChange( update );
 
 	capSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/capsule_geometry/capseg' ) ).setClass( 'Label' ) );
 	capSegmentsRow.add( capSegments );
@@ -52,6 +53,29 @@ function GeometryParametersPanel( editor, object ) {
 	radialSegmentsRow.add( radialSegments );
 
 	container.add( radialSegmentsRow );
+
+	//
+
+	function refreshUI() {
+
+		const parameters = object.geometry.parameters;
+
+		radius.setValue( parameters.radius );
+		length.setValue( parameters.length );
+		capSegments.setValue( parameters.capSegments );
+		radialSegments.setValue( parameters.radialSegments );
+
+	}
+
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
 
 	//
 

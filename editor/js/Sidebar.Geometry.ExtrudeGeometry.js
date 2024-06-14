@@ -7,6 +7,7 @@ import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 function GeometryParametersPanel( editor, object ) {
 
 	const strings = editor.strings;
+	const signals = editor.signals;
 
 	const container = new UIDiv();
 
@@ -129,6 +130,35 @@ function GeometryParametersPanel( editor, object ) {
 		}
 
 	}
+
+	function refreshUI() {
+
+		const options = object.geometry.parameters.options;
+
+		curveSegments.setValue( options.curveSegments );
+		steps.setValue( options.steps );
+		depth.setValue( options.depth );
+		enabled.setValue( options.bevelEnabled );
+		thickness.setValue( options.bevelThickness );
+		size.setValue( options.bevelSize );
+		offset.setValue( options.bevelOffset );
+		segments.setValue( options.bevelSegments );
+
+		updateBevelRow( options.bevelEnabled );
+
+	}
+
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
+
+	//
 
 	function update() {
 
