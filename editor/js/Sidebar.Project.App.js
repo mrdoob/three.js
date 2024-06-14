@@ -139,7 +139,7 @@ function SidebarProjectApp( editor ) {
 
 			if ( THREE.REVISION.endsWith( 'dev' ) === false ) {
 
-				content = content.replace( 'github:mrdoob/three.js#dev', `^0.${ THREE.REVISION }.0` );
+				content = content.replace( 'github:mrdoob/three.js#dev', `~0.${ THREE.REVISION }.0` );
 
 			}
 
