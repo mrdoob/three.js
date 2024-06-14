@@ -1,16 +1,14 @@
 import {
-	Camera,
 	ClampToEdgeWrapping,
 	DataTexture,
 	FloatType,
-	Mesh,
 	NearestFilter,
-	PlaneGeometry,
 	RGBAFormat,
-	Scene,
 	ShaderMaterial,
 	WebGLRenderTarget
 } from 'three';
+
+import { FullScreenQuad } from '../postprocessing/Pass.js';
 
 /**
  * GPUComputationRenderer, based on SimulationRenderer by zz85
@@ -119,20 +117,13 @@ class GPUComputationRenderer {
 
 		let dataType = FloatType;
 
-		const scene = new Scene();
-
-		const camera = new Camera();
-		camera.position.z = 1;
-
 		const passThruUniforms = {
 			passThruTexture: { value: null }
 		};
 
 		const passThruShader = createShaderMaterial( getPassThroughFragmentShader(), passThruUniforms );
 
-		const mesh = new Mesh( new PlaneGeometry( 2, 2 ), passThruShader );
-		scene.add( mesh );
-
+		const quad = new FullScreenQuad( passThruShader );
 
 		this.setDataType = function ( type ) {
 
@@ -284,8 +275,7 @@ class GPUComputationRenderer {
 
 		this.dispose = function () {
 
-			mesh.geometry.dispose();
-			mesh.material.dispose();
+			quad.dispose();
 
 			const variables = this.variables;
 
@@ -395,10 +385,10 @@ class GPUComputationRenderer {
 
 			renderer.xr.enabled = false; // Avoid camera modification
 			renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
-			mesh.material = material;
+			quad.material = material;
 			renderer.setRenderTarget( output );
-			renderer.render( scene, camera );
-			mesh.material = passThruShader;
+			quad.render( renderer );
+			quad.material = passThruShader;
 
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;

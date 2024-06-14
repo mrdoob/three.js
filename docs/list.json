@@ -1117,6 +1117,7 @@
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
 				"KTX2Loader": "examples/zh/loaders/KTX2Loader",
 				"LDrawLoader": "examples/zh/loaders/LDrawLoader",
+				"LUT3dlLoader": "examples/zh/loaders/LUT3dlLoader",
 				"LUTCubeLoader": "examples/zh/loaders/LUTCubeLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
@@ -1351,6 +1352,7 @@
 		"Addons": {
 
 			"컨트롤": {
+				"ArcballControls": "examples/ko/controls/ArcballControls",
 				"DragControls": "examples/ko/controls/DragControls",
 				"FirstPersonControls": "examples/ko/controls/FirstPersonControls",
 				"FlyControls": "examples/ko/controls/FlyControls",
