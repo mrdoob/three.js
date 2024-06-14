@@ -27,63 +27,63 @@ class Backend {
 
 	// render context
 
-	begin( renderContext ) { }
+	begin( /*renderContext*/ ) { }
 
-	finish( renderContext ) { }
+	finish( /*renderContext*/ ) { }
 
 	// render object
 
-	draw( renderObject, info ) { }
+	draw( /*renderObject, info*/ ) { }
 
 	// program
 
-	createProgram( program ) { }
+	createProgram( /*program*/ ) { }
 
-	destroyProgram( program ) { }
+	destroyProgram( /*program*/ ) { }
 
 	// bindings
 
-	createBindings( renderObject ) { }
+	createBindings( /*renderObject*/ ) { }
 
-	updateBindings( renderObject ) { }
+	updateBindings( /*renderObject*/ ) { }
 
 	// pipeline
 
-	createRenderPipeline( renderObject ) { }
+	createRenderPipeline( /*renderObject*/ ) { }
 
-	createComputePipeline( computeNode, pipeline ) { }
+	createComputePipeline( /*computeNode, pipeline*/ ) { }
 
-	destroyPipeline( pipeline ) { }
+	destroyPipeline( /*pipeline*/ ) { }
 
 	// cache key
 
-	needsRenderUpdate( renderObject ) { } // return Boolean ( fast test )
+	needsRenderUpdate( /*renderObject*/ ) { } // return Boolean ( fast test )
 
-	getRenderCacheKey( renderObject ) { } // return String
+	getRenderCacheKey( /*renderObject*/ ) { } // return String
 
 	// node builder
 
-	createNodeBuilder( renderObject ) { } // return NodeBuilder (ADD IT)
+	createNodeBuilder( /*renderObject*/ ) { } // return NodeBuilder (ADD IT)
 
 	// textures
 
-	createSampler( texture ) { }
+	createSampler( /*texture*/ ) { }
 
-	createDefaultTexture( texture ) { }
+	createDefaultTexture( /*texture*/ ) { }
 
-	createTexture( texture ) { }
+	createTexture( /*texture*/ ) { }
 
-	copyTextureToBuffer( texture, x, y, width, height ) {}
+	copyTextureToBuffer( /*texture, x, y, width, height*/ ) {}
 
 	// attributes
 
-	createAttribute( attribute ) { }
+	createAttribute( /*attribute*/ ) { }
 
-	createIndexAttribute( attribute ) { }
+	createIndexAttribute( /*attribute*/ ) { }
 
-	updateAttribute( attribute ) { }
+	updateAttribute( /*attribute*/ ) { }
 
-	destroyAttribute( attribute ) { }
+	destroyAttribute( /*attribute*/ ) { }
 
 	// canvas
 
@@ -93,11 +93,11 @@ class Backend {
 
 	// utils
 
-	resolveTimestampAsync( renderContext, type ) { }
+	resolveTimestampAsync( /*renderContext, type*/ ) { }
 
-	hasFeatureAsync( name ) { } // return Boolean
+	hasFeatureAsync( /*name*/ ) { } // return Boolean
 
-	hasFeature( name ) { } // return Boolean
+	hasFeature( /*name*/ ) { } // return Boolean
 
 	getInstanceCount( renderObject ) {
 
@@ -123,7 +123,7 @@ class Backend {
 
 	}
 
-	setScissorTest( boolean ) { }
+	setScissorTest( /*boolean*/ ) { }
 
 	getClearColor() {
 

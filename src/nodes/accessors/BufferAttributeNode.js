@@ -38,7 +38,7 @@ class BufferAttributeNode extends InputNode {
 
 	getHash( builder ) {
 
-		if ( this.bufferStride === 0 && this.bufferOffset === 0) {
+		if ( this.bufferStride === 0 && this.bufferOffset === 0 ) {
 
 			let bufferData = builder.globalCache.getData( this.value );
 

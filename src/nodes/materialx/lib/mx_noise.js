@@ -552,7 +552,7 @@ const mx_fractal_noise_float = tslFn( ( [ p_immutable, octaves_immutable, lacuna
 	const result = float( 0.0 ).toVar();
 	const amplitude = float( 1.0 ).toVar();
 
-	loop( { start: int( 0 ), end: octaves }, ( { i } ) => {
+	loop( octaves, () => {
 
 		result.addAssign( amplitude.mul( mx_perlin_noise_float( p ) ) );
 		amplitude.mulAssign( diminish );
@@ -573,7 +573,7 @@ const mx_fractal_noise_vec3 = tslFn( ( [ p_immutable, octaves_immutable, lacunar
 	const result = vec3( 0.0 ).toVar();
 	const amplitude = float( 1.0 ).toVar();
 
-	loop( { start: int( 0 ), end: octaves }, ( { i } ) => {
+	loop( octaves, () => {
 
 		result.addAssign( amplitude.mul( mx_perlin_noise_vec3( p ) ) );
 		amplitude.mulAssign( diminish );

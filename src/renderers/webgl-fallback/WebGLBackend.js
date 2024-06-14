@@ -567,7 +567,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	draw( renderObject, info ) {
+	draw( renderObject ) {
 
 		const { object, pipeline, material, context } = renderObject;
 		const { programGPU } = this.get( pipeline );

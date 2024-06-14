@@ -15540,7 +15540,8 @@ class BatchedMesh extends Mesh {
 
 			if ( reference.getIndex() !== null ) {
 
-				const indexArray = maxVertexCount > 65536
+				// Reserve last u16 index for primitive restart.
+				const indexArray = maxVertexCount > 65535
 					? new Uint32Array( maxIndexCount )
 					: new Uint16Array( maxIndexCount );
 
@@ -57482,7 +57483,7 @@ const mx_fractal_noise_float$1 = tslFn( ( [ p_immutable, octaves_immutable, lacu
 	const result = float( 0.0 ).toVar();
 	const amplitude = float( 1.0 ).toVar();
 
-	loop( { start: int( 0 ), end: octaves }, ( { i } ) => {
+	loop( octaves, () => {
 
 		result.addAssign( amplitude.mul( mx_perlin_noise_float( p ) ) );
 		amplitude.mulAssign( diminish );
@@ -57503,7 +57504,7 @@ const mx_fractal_noise_vec3$1 = tslFn( ( [ p_immutable, octaves_immutable, lacun
 	const result = vec3( 0.0 ).toVar();
 	const amplitude = float( 1.0 ).toVar();
 
-	loop( { start: int( 0 ), end: octaves }, ( { i } ) => {
+	loop( octaves, () => {
 
 		result.addAssign( amplitude.mul( mx_perlin_noise_vec3( p ) ) );
 		amplitude.mulAssign( diminish );
@@ -60072,6 +60073,11 @@ class Renderer {
 
 		this.xr = {
 			enabled: false
+		};
+
+		this.debug = {
+			checkShaderErrors: true,
+			onShaderError: null
 		};
 
 	}
@@ -62656,7 +62662,7 @@ ${ flowData.code }
 
 				const extentions = this.renderer.backend.extensions;
 
-				if ( extentions.has( 'OES_texture_float_linear' ) )  {
+				if ( extentions.has( 'OES_texture_float_linear' ) ) {
 
 					extentions.get( 'OES_texture_float_linear' );
 					result = true;
@@ -62964,63 +62970,63 @@ class Backend {
 
 	// render context
 
-	begin( renderContext ) { }
+	begin( /*renderContext*/ ) { }
 
-	finish( renderContext ) { }
+	finish( /*renderContext*/ ) { }
 
 	// render object
 
-	draw( renderObject, info ) { }
+	draw( /*renderObject, info*/ ) { }
 
 	// program
 
-	createProgram( program ) { }
+	createProgram( /*program*/ ) { }
 
-	destroyProgram( program ) { }
+	destroyProgram( /*program*/ ) { }
 
 	// bindings
 
-	createBindings( renderObject ) { }
+	createBindings( /*renderObject*/ ) { }
 
-	updateBindings( renderObject ) { }
+	updateBindings( /*renderObject*/ ) { }
 
 	// pipeline
 
-	createRenderPipeline( renderObject ) { }
+	createRenderPipeline( /*renderObject*/ ) { }
 
-	createComputePipeline( computeNode, pipeline ) { }
+	createComputePipeline( /*computeNode, pipeline*/ ) { }
 
-	destroyPipeline( pipeline ) { }
+	destroyPipeline( /*pipeline*/ ) { }
 
 	// cache key
 
-	needsRenderUpdate( renderObject ) { } // return Boolean ( fast test )
+	needsRenderUpdate( /*renderObject*/ ) { } // return Boolean ( fast test )
 
-	getRenderCacheKey( renderObject ) { } // return String
+	getRenderCacheKey( /*renderObject*/ ) { } // return String
 
 	// node builder
 
-	createNodeBuilder( renderObject ) { } // return NodeBuilder (ADD IT)
+	createNodeBuilder( /*renderObject*/ ) { } // return NodeBuilder (ADD IT)
 
 	// textures
 
-	createSampler( texture ) { }
+	createSampler( /*texture*/ ) { }
 
-	createDefaultTexture( texture ) { }
+	createDefaultTexture( /*texture*/ ) { }
 
-	createTexture( texture ) { }
+	createTexture( /*texture*/ ) { }
 
-	copyTextureToBuffer( texture, x, y, width, height ) {}
+	copyTextureToBuffer( /*texture, x, y, width, height*/ ) {}
 
 	// attributes
 
-	createAttribute( attribute ) { }
+	createAttribute( /*attribute*/ ) { }
 
-	createIndexAttribute( attribute ) { }
+	createIndexAttribute( /*attribute*/ ) { }
 
-	updateAttribute( attribute ) { }
+	updateAttribute( /*attribute*/ ) { }
 
-	destroyAttribute( attribute ) { }
+	destroyAttribute( /*attribute*/ ) { }
 
 	// canvas
 
@@ -63030,11 +63036,11 @@ class Backend {
 
 	// utils
 
-	resolveTimestampAsync( renderContext, type ) { }
+	resolveTimestampAsync( /*renderContext, type*/ ) { }
 
-	hasFeatureAsync( name ) { } // return Boolean
+	hasFeatureAsync( /*name*/ ) { } // return Boolean
 
-	hasFeature( name ) { } // return Boolean
+	hasFeature( /*name*/ ) { } // return Boolean
 
 	getInstanceCount( renderObject ) {
 
@@ -63060,7 +63066,7 @@ class Backend {
 
 	}
 
-	setScissorTest( boolean ) { }
+	setScissorTest( /*boolean*/ ) { }
 
 	getClearColor() {
 
@@ -65567,7 +65573,7 @@ class WebGLBackend extends Backend {
 
 	// timestamp utils
 
-	  prepareTimestampBuffer( renderContext ) {
+	prepareTimestampBuffer( renderContext ) {
 
 		if ( ! this.disjoint || ! this.trackTimestamp ) return;
 
@@ -66030,7 +66036,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	draw( renderObject, info ) {
+	draw( renderObject ) {
 
 		const { object, pipeline, material, context } = renderObject;
 		const { programGPU } = this.get( pipeline );
@@ -66338,6 +66344,88 @@ class WebGLBackend extends Backend {
 
 	}
 
+	_handleSource( string, errorLine ) {
+
+		const lines = string.split( '\n' );
+		const lines2 = [];
+
+		const from = Math.max( errorLine - 6, 0 );
+		const to = Math.min( errorLine + 6, lines.length );
+
+		for ( let i = from; i < to; i ++ ) {
+
+			const line = i + 1;
+			lines2.push( `${line === errorLine ? '>' : ' '} ${line}: ${lines[ i ]}` );
+
+		}
+
+		return lines2.join( '\n' );
+
+	}
+
+	_getShaderErrors( gl, shader, type ) {
+
+		const status = gl.getShaderParameter( shader, gl.COMPILE_STATUS );
+		const errors = gl.getShaderInfoLog( shader ).trim();
+
+		if ( status && errors === '' ) return '';
+
+		const errorMatches = /ERROR: 0:(\d+)/.exec( errors );
+		if ( errorMatches ) {
+
+			const errorLine = parseInt( errorMatches[ 1 ] );
+			return type.toUpperCase() + '\n\n' + errors + '\n\n' + this._handleSource( gl.getShaderSource( shader ), errorLine );
+
+		} else {
+
+			return errors;
+
+		}
+
+	}
+
+	_logProgramError( programGPU, glFragmentShader, glVertexShader ) {
+
+		if ( this.renderer.debug.checkShaderErrors ) {
+
+			const gl = this.gl;
+
+			const programLog = gl.getProgramInfoLog( programGPU ).trim();
+
+			if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
+
+
+				if ( typeof this.renderer.debug.onShaderError === 'function' ) {
+
+					this.renderer.debug.onShaderError( gl, programGPU, glVertexShader, glFragmentShader );
+
+				} else {
+
+					// default error reporting
+
+					const vertexErrors = this._getShaderErrors( gl, glVertexShader, 'vertex' );
+					const fragmentErrors = this._getShaderErrors( gl, glFragmentShader, 'fragment' );
+
+					console.error(
+						'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
+						'VALIDATE_STATUS ' + gl.getProgramParameter( programGPU, gl.VALIDATE_STATUS ) + '\n\n' +
+						'Program Info Log: ' + programLog + '\n' +
+						vertexErrors + '\n' +
+						fragmentErrors
+					);
+
+				}
+
+			} else if ( programLog !== '' ) {
+
+				console.warn( 'THREE.WebGLProgram: Program Info Log:', programLog );
+
+			}
+
+		}
+
+	}
+
 	_completeCompile( renderObject, pipeline ) {
 
 		const gl = this.gl;
@@ -66346,10 +66434,7 @@ class WebGLBackend extends Backend {
 
 		if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
 
-			console.error( 'THREE.WebGLBackend:', gl.getProgramInfoLog( programGPU ) );
-
-			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( fragmentShader ) );
-			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( vertexShader ) );
+			this._logProgramError( programGPU, fragmentShader, vertexShader );
 
 		}
 
@@ -66414,10 +66499,8 @@ class WebGLBackend extends Backend {
 
 		if ( gl.getProgramParameter( programGPU, gl.LINK_STATUS ) === false ) {
 
-			console.error( 'THREE.WebGLBackend:', gl.getProgramInfoLog( programGPU ) );
+			this._logProgramError( programGPU, fragmentShader, vertexShader );
 
-			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( fragmentShader ) );
-			console.error( 'THREE.WebGLBackend:', gl.getShaderInfoLog( vertexShader ) );
 
 		}
 
@@ -68462,42 +68545,8 @@ const declarationRegexp = /^[fn]*\s*([a-z_0-9]+)?\s*\(([\s\S]*?)\)\s*[\-\>]*\s*(
 const propertiesRegexp = /[a-z_0-9]+|<(.*?)>+/ig;
 
 const wgslTypeLib$1 = {
-	'f32': 'float',
-	'i32': 'int',
-	'u32': 'uint',
-	'bool': 'bool',
-
-	'vec2<f32>': 'vec2',
- 	'vec2<i32>': 'ivec2',
- 	'vec2<u32>': 'uvec2',
- 	'vec2<bool>': 'bvec2',
-
-	'vec3<f32>': 'vec3',
-	'vec3<i32>': 'ivec3',
-	'vec3<u32>': 'uvec3',
-	'vec3<bool>': 'bvec3',
-
-	'vec4<f32>': 'vec4',
-	'vec4<i32>': 'ivec4',
-	'vec4<u32>': 'uvec4',
-	'vec4<bool>': 'bvec4',
-
-	'mat2x2<f32>': 'mat2',
-	'mat2x2<i32>': 'imat2',
-	'mat2x2<u32>': 'umat2',
-	'mat2x2<bool>': 'bmat2',
-
-	'mat3x3<f32>': 'mat3',
-	'mat3x3<i32>': 'imat3',
-	'mat3x3<u32>': 'umat3',
-	'mat3x3<bool>': 'bmat3',
-
-	'mat4x4<f32>': 'mat4',
-	'mat4x4<i32>': 'imat4',
-	'mat4x4<u32>': 'umat4',
-	'mat4x4<bool>': 'bmat4'
+	f32: 'float'
 };
-
 
 const parse = ( source ) => {
 
@@ -68533,24 +68582,15 @@ const parse = ( source ) => {
 			const name = propsMatches[ i ++ ][ 0 ];
 			let type = propsMatches[ i ++ ][ 0 ];
 
-			// precision
-
-			if ( i < propsMatches.length && propsMatches[ i ][ 0 ].startsWith( '<' ) === true ) {
-
-				const elementType = propsMatches[ i ++ ][ 0 ];
-
-				// If primitive data type
-				if ( ! elementType.includes( ',' ) ) {
-
-					type += elementType;
-
-				}
-
-			}
-
 			type = wgslTypeLib$1[ type ] || type;
 
+			// precision
+
+			if ( i < propsMatches.length && propsMatches[ i ][ 0 ].startsWith( '<' ) === true )
+				i ++;
+
 			// add input
+
 			inputs.push( new NodeFunctionInput( type, name ) );
 
 		}
@@ -69284,7 +69324,7 @@ ${ flowData.code }
 
 			snippets.push( snippet );
 
-			snippets.push( `\nvar<private> output : ${ name };\n\n`);
+			snippets.push( `\nvar<private> output : ${ name };\n\n` );
 
 		}
 
