@@ -14,10 +14,10 @@
 
 	void main() {
 
-    vec3 translation = vec3(0, float(instancedIndex) * size.y - size.y, 0);
+		vec3 translation = vec3(0, float(instancedIndex) * size.y - size.y, 0);
 		gl_Position = projectionMatrix * modelViewMatrix * vec4( position + translation, 1.0 );
 
-    diffuseIndex = instancedIndex;
+		diffuseIndex = instancedIndex;
 
 		// Convert position.xy to 1.0-0.0
 
@@ -34,7 +34,7 @@
 
 	uniform sampler2DArray diffuse;
 	in vec2 vUv;
-  flat in uint diffuseIndex;
+	flat in uint diffuseIndex;
 
 	out vec4 outColor;
 
