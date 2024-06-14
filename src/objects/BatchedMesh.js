@@ -817,7 +817,7 @@ class BatchedMesh extends Mesh {
 
 			}
 
-			this._needsUpdateGeometry - false;
+			this._needsUpdateGeometry = false;
 
 		}
 
