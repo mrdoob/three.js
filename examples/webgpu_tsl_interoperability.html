@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, attribute, varyingProperty, timerLocal, uniform, wgslFn, texture, uv, clamp, float, vec2, vec3, fract, floor, MeshBasicNodeMaterial, positionGeometry, sin } from 'three';
+			import { tslFn, attribute, varyingProperty, timerLocal, uniform, wgslFn, texture, uv, clamp, float, vec2, vec3, fract, floor, positionGeometry, sin } from 'three';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -166,7 +166,7 @@
 
 				//
 
-				const wgslShaderMaterial = new MeshBasicNodeMaterial();
+				const wgslShaderMaterial = new THREE.MeshBasicNodeMaterial();
 
 				// Accessed attributes correspond to a Mesh or BufferGeometry's setAttribute() calls.
 				wgslShaderMaterial.positionNode = wgslVertexShader( {
@@ -253,7 +253,7 @@
 
 				} );
 
-				const tslShaderMaterial = new MeshBasicNodeMaterial();
+				const tslShaderMaterial = new THREE.MeshBasicNodeMaterial();
 				tslShaderMaterial.positionNode = tslVertexShader();
 				tslShaderMaterial.colorNode = tslFragmentShader();
 

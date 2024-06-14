@@ -104,7 +104,7 @@ const builds = [
 		]
 	},
 	{
-		input: 'examples/jsm/renderers/webgpu/Three.js',
+		input: 'src/Three.WebGPU.js',
 		plugins: [
 			header()
 		],
@@ -116,7 +116,7 @@ const builds = [
 		]
 	},
 	{
-		input: 'examples/jsm/renderers/webgpu/Three.js',
+		input: 'src/Three.WebGPU.js',
 		plugins: [
 			header(),
 			terser()
@@ -127,7 +127,7 @@ const builds = [
 				file: 'build/three.webgpu.min.js'
 			}
 		]
-	},
+	}
 ];
 
 export default ( args ) => args.configOnlyModule ? builds[ 0 ] : builds;

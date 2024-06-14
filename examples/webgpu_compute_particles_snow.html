@@ -28,8 +28,6 @@
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
-			import PostProcessing from 'three/addons/renderers/common/PostProcessing.js';
-
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import Stats from 'stats-gl';
@@ -312,7 +310,7 @@
 				totalPass = totalPass.mul( vignet );
 				totalPass = totalPass.add( teapotTreePass.mul( 10 ).add( teapotTreePassBlurred ) );
 
-				postProcessing = new PostProcessing( renderer );
+				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputNode = totalPass;
 
 				//
