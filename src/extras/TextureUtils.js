@@ -83,9 +83,7 @@ function getByteLength( width, height, format, type ) {
 		case RGBA_ASTC_12x10_Format:
 			return Math.floor( ( width + 11 ) / 12 ) * Math.floor( ( height + 9 ) / 10 ) * 16;
 		case RGBA_ASTC_12x12_Format:
-			return (
-				Math.floor( ( width + 11 ) / 12 ) * Math.floor( ( height + 11 ) / 12 ) * 16
-			);
+			return Math.floor( ( width + 11 ) / 12 ) * Math.floor( ( height + 11 ) / 12 ) * 16;
 
 		// https://registry.khronos.org/webgl/extensions/EXT_texture_compression_bptc/
 		case RGBA_BPTC_Format:

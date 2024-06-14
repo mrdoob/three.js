@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - texture array layer update</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<script id="vs" type="x-shader/x-vertex">
+	uniform vec2 size;
+  attribute uint instancedIndex;
+  flat out uint diffuseIndex; 
+	out vec2 vUv;
+
+	void main() {
+
+    vec3 translation = vec3(0, float(instancedIndex) * size.y - size.y, 0);
+		gl_Position = projectionMatrix * modelViewMatrix * vec4( position + translation, 1.0 );
+
+    diffuseIndex = instancedIndex;
+
+		// Convert position.xy to 1.0-0.0
+
+		vUv.xy = position.xy / size + 0.5;
+		vUv.y = 1.0 - vUv.y; // original data is upside down
+
+	}
+	</script>
+
+	<script id="fs" type="x-shader/x-fragment">
+	precision highp float;
+	precision highp int;
+	precision highp sampler2DArray;
+
+	uniform sampler2DArray diffuse;
+	in vec2 vUv;
+  flat in uint diffuseIndex;
+
+	out vec4 outColor;
+
+	void main() {
+
+		outColor = texture( diffuse, vec3( vUv, diffuseIndex ) );
+
+	}
+	</script>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - 2D Compressed Texture Array Layer Updates<br />
+			Loop from the movie Spirited away
+			by the <a href="https://www.ghibli.jp/" target="_blank" rel="noopener">Studio Ghibli</a><br />
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+
+			let camera, scene, mesh, renderer, stats;
+
+			const planeWidth = 20;
+			const planeHeight = 10;
+
+			init();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 2000 );
+				camera.position.z = 70;
+
+				scene = new THREE.Scene();
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				container.appendChild( renderer.domElement );
+
+				//
+
+				const ktx2Loader = new KTX2Loader();
+				ktx2Loader.setTranscoderPath( 'jsm/libs/basis/' );
+				ktx2Loader.detectSupport( renderer );
+
+				ktx2Loader.load( 'textures/spiritedaway.ktx2', function ( spiritedaway ) {
+
+					const baseData = new Uint8Array( spiritedaway.mipmaps[ 0 ].data.buffer );
+					const layerSize = THREE.TextureUtils.getByteLength(
+						spiritedaway.image.width,
+						spiritedaway.image.height,
+						spiritedaway.format,
+						spiritedaway.type,
+					);
+					const textureArray = new THREE.CompressedArrayTexture( [
+						{
+							data: new Uint8Array( layerSize * 3 ),
+							width: spiritedaway.image.width,
+							height: spiritedaway.image.height,
+						}
+					], spiritedaway.image.width, spiritedaway.image.height, 3, spiritedaway.format, spiritedaway.type );
+
+					let i = 0;
+					setInterval( () => {
+
+						textureArray.mipmaps[ 0 ].data.set(
+							baseData.subarray(
+								layerSize * ( i % spiritedaway.image.depth ),
+								layerSize * ( ( i % spiritedaway.image.depth ) + 1 ),
+							),
+							layerSize * ( i % 3 )
+						);
+						textureArray.addLayerUpdates( i % 3 );
+						textureArray.needsUpdate = true;
+						++ i;
+
+					}, 500 );
+
+					const material = new THREE.ShaderMaterial( {
+						uniforms: {
+							diffuse: { value: textureArray },
+							size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
+						},
+						vertexShader: document.getElementById( 'vs' ).textContent.trim(),
+						fragmentShader: document.getElementById( 'fs' ).textContent.trim(),
+						glslVersion: THREE.GLSL3
+					} );
+
+					const geometry = new THREE.InstancedBufferGeometry();
+					geometry.copy( new THREE.PlaneGeometry( planeWidth, planeHeight ) );
+					geometry.instanceCount = 3;
+
+					const instancedIndexAttribute = new THREE.InstancedBufferAttribute(
+						new Uint16Array( [ 0, 1, 2 ] ), 1, false, 1
+					);
+					instancedIndexAttribute.gpuType = THREE.IntType;
+					geometry.setAttribute( 'instancedIndex', instancedIndexAttribute );
+
+					mesh = new THREE.InstancedMesh( geometry, material, 3 );
+
+					scene.add( mesh );
+
+				} );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
