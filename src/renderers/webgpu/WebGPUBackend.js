@@ -925,7 +925,6 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		
 		if ( this.renderer._currentRenderBundle ) {
 
 			const renderBundle = passEncoderGPU.finish();
@@ -1125,29 +1124,39 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	async resolveTimestampAsync(renderContext, type = 'render') {
-		if (!this.hasFeature(GPUFeatureName.TimestampQuery) || !this.trackTimestamp) return;
-	
-		const renderContextData = this.get(renderContext);
+	async resolveTimestampAsync( renderContext, type = 'render' ) {
+
+		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
+
+		const renderContextData = this.get( renderContext );
 		const { currentTimestampQueryBuffer } = renderContextData;
-	
-		if (currentTimestampQueryBuffer === undefined) return;
+
+		if ( currentTimestampQueryBuffer === undefined ) return;
 
 		const buffer = currentTimestampQueryBuffer;
 
 		try {
-			await buffer.mapAsync(GPUMapMode.READ);
-			const times = new BigUint64Array(buffer.getMappedRange());
-			const duration = Number(times[1] - times[0]) / 1000000;
-			this.renderer.info.updateTimestamp(type, duration);
-		} catch (error) {
-			console.error(`Error mapping buffer: ${error}`);
+
+			await buffer.mapAsync( GPUMapMode.READ );
+
+			const times = new BigUint64Array( buffer.getMappedRange() );
+			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
+
+			this.renderer.info.updateTimestamp( type, duration );
+
+		} catch ( error ) {
+
 			// Optionally handle the error, e.g., re-queue the buffer or skip it
+
+			console.error( `Error mapping buffer: ${ error }` );
+
 		} finally {
-			buffer.unmap(); 
+
+			buffer.unmap();
+
 		}
+
 	}
-	
 
 	// node builder
 
@@ -1282,7 +1291,7 @@ class WebGPUBackend extends Backend {
 			dstY = dstPosition.y;
 
 		}
-		
+
 		const encoder = this.device.createCommandEncoder( { label: 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id } );
 
 		const sourceGPU = this.get( srcTexture ).texture;
