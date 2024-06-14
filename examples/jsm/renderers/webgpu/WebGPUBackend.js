@@ -446,6 +446,11 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		const bindingsData = this.get( renderContext.bindings );
+		const bindGroupGPU = bindingsData.group;
+
+		currentPass.setBindGroup( 0, bindGroupGPU );
+
 	}
 
 	finishRender( renderContext ) {
@@ -747,7 +752,7 @@ class WebGPUBackend extends Backend {
 		const groupGPU = this.get( computeGroup );
 
 
-		const descriptor = {};
+		const descriptor = { label: 'compute_pass' };
 
 		this.initTimestampQuery( computeGroup, descriptor );
 
@@ -825,8 +830,15 @@ class WebGPUBackend extends Backend {
 
 		// bind group
 
+		if ( this.renderer._currentRenderBundle ) {
+
+			const bindGroupGPU = this.get( context.bindings ).group;
+			passEncoderGPU.setBindGroup( 0, bindGroupGPU );
+
+		}
+
 		const bindGroupGPU = bindingsData.group;
-		passEncoderGPU.setBindGroup( 0, bindGroupGPU );
+		passEncoderGPU.setBindGroup( 1, bindGroupGPU );
 
 		// attributes
 
@@ -1198,9 +1210,9 @@ class WebGPUBackend extends Backend {
 
 	// bindings
 
-	createBindings( bindings ) {
+	createBindings( bindings, label ) {
 
-		this.bindingUtils.createBindings( bindings );
+		this.bindingUtils.createBindings( bindings, label );
 
 	}
 
@@ -1282,7 +1294,7 @@ class WebGPUBackend extends Backend {
 			dstY = dstPosition.y;
 
 		}
-		
+
 		const encoder = this.device.createCommandEncoder( { label: 'copyTextureToTexture_' + srcTexture.id + '_' + dstTexture.id } );
 
 		const sourceGPU = this.get( srcTexture ).texture;
@@ -1377,6 +1389,11 @@ class WebGPUBackend extends Backend {
 
 		renderContextData.currentPass = encoder.beginRenderPass( descriptor );
 		renderContextData.currentSets = { attributes: {} };
+
+		const bindingsData = this.get( renderContext.bindings );
+		const bindGroupGPU = bindingsData.group;
+
+		renderContextData.currentPass.setBindGroup( 0, bindGroupGPU );
 
 	}
 

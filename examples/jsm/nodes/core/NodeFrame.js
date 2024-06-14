@@ -162,6 +162,11 @@ class NodeFrame {
 
 			node.update( this );
 
+		} else if ( updateType === NodeUpdateType.ONCE ) {
+
+			node.update( this );
+			node.updateType = NodeUpdateType.NONE;
+
 		}
 
 	}

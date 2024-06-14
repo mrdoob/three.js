@@ -299,6 +299,7 @@ class Renderer {
 		//
 
 		this._background.update( sceneRef, renderList, renderContext );
+		this._nodes.updateRendererBindings( renderContext, camera );
 
 		// process render lists
 
@@ -638,6 +639,8 @@ class Renderer {
 		this._nodes.updateScene( sceneRef );
 
 		//
+
+		this._nodes.updateRendererBindings( renderContext, camera );
 
 		this._background.update( sceneRef, renderList, renderContext );
 

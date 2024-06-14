@@ -270,7 +270,9 @@ class UniformsGroup extends UniformBuffer {
 		let updated = false;
 
 		const a = this.buffer;
+
 		const e = uniform.getValue().elements;
+
 		const offset = uniform.offset;
 
 		if ( arraysEqual( a, e, offset ) === false ) {

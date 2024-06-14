@@ -14,11 +14,19 @@ class UniformGroupNode extends Node {
 
 		this.isUniformGroup = true;
 
+		this.registered = [];
+
 	}
 
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
+
+	}
+
+	register( name, type, callback = () => {} ) {
+
+		this.registered.push( { name, type, callback } );
 
 	}
 

@@ -7,7 +7,8 @@ export const NodeUpdateType = {
 	NONE: 'none',
 	FRAME: 'frame',
 	RENDER: 'render',
-	OBJECT: 'object'
+	OBJECT: 'object',
+	ONCE: 'once'
 };
 
 export const NodeType = {

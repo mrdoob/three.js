@@ -55,6 +55,7 @@ class WebGPUPipelineUtils {
 
 		const pipelineData = backend.get( pipeline );
 		const bindingsData = backend.get( renderObject.getBindings() );
+		const renderBindingData = backend.get( renderObject.context.bindings );
 
 		// vertex buffers
 
@@ -145,7 +146,7 @@ class WebGPUPipelineUtils {
 				alphaToCoverageEnabled: material.alphaToCoverage
 			},
 			layout: device.createPipelineLayout( {
-				bindGroupLayouts: [ bindingsData.layout ]
+				bindGroupLayouts: [ renderBindingData.layout, bindingsData.layout ]
 			} )
 		};
 

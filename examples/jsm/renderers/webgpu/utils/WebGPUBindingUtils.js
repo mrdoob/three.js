@@ -11,7 +11,7 @@ class WebGPUBindingUtils {
 
 	}
 
-	createBindingsLayout( bindings ) {
+	createBindingsLayout( bindings, label ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -122,19 +122,19 @@ class WebGPUBindingUtils {
 
 		}
 
-		return device.createBindGroupLayout( { entries } );
+		return device.createBindGroupLayout( { entries, label } );
 
 	}
 
-	createBindings( bindings ) {
+	createBindings( bindings, label = 'object' ) {
 
 		const backend = this.backend;
 		const bindingsData = backend.get( bindings );
 
 		// setup (static) binding layout and (dynamic) binding group
 
-		const bindLayoutGPU = this.createBindingsLayout( bindings );
-		const bindGroupGPU = this.createBindGroup( bindings, bindLayoutGPU );
+		const bindLayoutGPU = this.createBindingsLayout( bindings, label );
+		const bindGroupGPU = this.createBindGroup( bindings, bindLayoutGPU, label );
 
 		bindingsData.layout = bindLayoutGPU;
 		bindingsData.group = bindGroupGPU;
@@ -154,7 +154,7 @@ class WebGPUBindingUtils {
 
 	}
 
-	createBindGroup( bindings, layoutGPU ) {
+	createBindGroup( bindings, layoutGPU, label ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -257,7 +257,8 @@ class WebGPUBindingUtils {
 
 		return device.createBindGroup( {
 			layout: layoutGPU,
-			entries: entriesGPU
+			entries: entriesGPU,
+			label
 		} );
 
 	}

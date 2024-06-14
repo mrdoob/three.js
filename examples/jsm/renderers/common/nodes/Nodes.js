@@ -2,7 +2,12 @@ import DataMap from '../DataMap.js';
 import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
 import { EquirectangularReflectionMapping, EquirectangularRefractionMapping, NoToneMapping, SRGBColorSpace } from 'three';
-import { NodeFrame, vec4, objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, viewportBottomLeft, normalWorld, pmremTexture, viewportTopLeft } from '../../../nodes/Nodes.js';
+import { NodeFrame, vec4, objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, viewportBottomLeft, normalWorld, pmremTexture, viewportTopLeft, uniform, NodeUniform, NodeUpdateType } from '../../../nodes/Nodes.js';
+import {
+	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
+	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
+} from './NodeUniform.js';
+import NodeUniformsGroup from './NodeUniformsGroup.js';
 
 class Nodes extends DataMap {
 
@@ -16,6 +21,8 @@ class Nodes extends DataMap {
 		this.nodeBuilderCache = new Map();
 		this.callHashCache = new ChainMap();
 		this.groupsData = new ChainMap();
+
+		this._renderNodeUniformsGroup = null;
 
 	}
 
@@ -114,6 +121,7 @@ class Nodes extends DataMap {
 				nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
 				nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
 				nodeBuilder.clippingContext = renderObject.clippingContext;
+				nodeBuilder.renderNodeUniformsGroup = this._renderNodeUniformsGroup;
 				nodeBuilder.build();
 
 				nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
@@ -242,6 +250,76 @@ class Nodes extends DataMap {
 		this.updateEnvironment( scene );
 		this.updateFog( scene );
 		this.updateBackground( scene );
+
+	}
+
+	updateRendererBindings( renderContext, camera ) {
+
+		let initialUpdate = false;
+
+		if ( renderContext.bindings === undefined ) {
+
+			const registeredUniforms = renderGroup.registered;
+
+			const group = new NodeUniformsGroup( 'render', renderGroup );
+
+			for ( let i = 0, l = registeredUniforms.length; i < l; i ++ ) {
+
+				const uniformDesc = registeredUniforms[ i ];
+				const tempUniform = uniform( uniformDesc.type ).label( uniformDesc.name ).onUpdate( uniformDesc.callback, NodeUpdateType.ONCE );
+				const nodeUniform = this.getNodeUniform( new NodeUniform( uniformDesc.name, uniformDesc.type, tempUniform ), uniformDesc.type );
+
+				group.addUniform( nodeUniform );
+
+			}
+
+			// FIXME hardcode WebGPU visibility
+			group.setVisibility( 1 );
+			group.setVisibility( 2 );
+
+			renderContext.bindings = [ group ];
+			this.backend.createBindings( renderContext.bindings, 'render' );
+
+			initialUpdate = true;
+
+		}
+
+		const binding = renderContext.bindings[ 0 ];
+		this._renderNodeUniformsGroup = binding;
+
+		if ( this.updateGroup( binding ) || initialUpdate ) {
+
+			const nodes = binding.getNodes( false );
+
+			const nodeFrame = this.getNodeFrame( this.renderer, null, null, camera, null );
+
+			for ( let i = 0, l = nodes.length; i < l; i ++ ) {
+
+				nodeFrame.updateNode( nodes[ i ] );
+
+			}
+
+			if ( binding.update() ) {
+
+				this.backend.updateBinding( binding );
+
+			}
+
+		}
+
+	}
+
+	getNodeUniform( uniformNode, type ) {
+
+		if ( type === 'float' ) return new FloatNodeUniform( uniformNode );
+		if ( type === 'vec2' ) return new Vector2NodeUniform( uniformNode );
+		if ( type === 'vec3' ) return new Vector3NodeUniform( uniformNode );
+		if ( type === 'vec4' ) return new Vector4NodeUniform( uniformNode );
+		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
+		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
+		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
+
+		throw new Error( `Uniform "${type}" not declared.` );
 
 	}
 
