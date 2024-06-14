@@ -567,7 +567,7 @@ class WebGPUBackend extends Backend {
 
 			for ( let i = 0; i < currentOcclusionQueryObjects.length; i ++ ) {
 
-				if ( results[ i ] !== 0n ) {
+				if ( results[ i ] !== BigInt( 0 ) ) {
 
 					occluded.add( currentOcclusionQueryObjects[ i ] );
 
