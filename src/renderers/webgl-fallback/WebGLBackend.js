@@ -104,7 +104,7 @@ class WebGLBackend extends Backend {
 
 	// timestamp utils
 
-	  prepareTimestampBuffer( renderContext ) {
+	prepareTimestampBuffer( renderContext ) {
 
 		if ( ! this.disjoint || ! this.trackTimestamp ) return;
 
@@ -874,8 +874,6 @@ class WebGLBackend extends Backend {
 		this._completeCompile( renderObject, pipeline );
 
 	}
-
-
 
 	_handleSource( string, errorLine ) {
 
