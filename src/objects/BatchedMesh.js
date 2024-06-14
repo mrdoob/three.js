@@ -239,6 +239,7 @@ class BatchedMesh extends Mesh {
 
 			if ( reference.getIndex() !== null ) {
 
+				// Reserve last u16 index for primitive restart.
 				const indexArray = maxVertexCount > 65535
 					? new Uint32Array( maxIndexCount )
 					: new Uint16Array( maxIndexCount );
