@@ -255,8 +255,6 @@ class Nodes extends DataMap {
 
 	updateRendererBindings( renderContext, camera ) {
 
-		let initialUpdate = false;
-
 		if ( renderContext.bindings === undefined ) {
 
 			const registeredUniforms = renderGroup.registered;
@@ -282,8 +280,6 @@ class Nodes extends DataMap {
 
 			renderContext.bindings = [ group ];
 			this.backend.createBindings( renderContext.bindings, 'render' );
-
-			initialUpdate = true;
 
 		}
 
