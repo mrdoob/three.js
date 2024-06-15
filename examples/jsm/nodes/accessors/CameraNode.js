@@ -20,14 +20,14 @@ export const cameraProjectionMatrixInverse = /*#__PURE__*/ uniform( 'mat4' ).lab
 export const cameraViewMatrix = /*#__PURE__*/ uniform( 'mat4' ).label( 'cameraViewMatrix' ).setGroup( renderGroup ).onRenderUpdate( updateViewMatrix );
 export const cameraWorldMatrix = /*#__PURE__*/ uniform( 'mat4' ).label( 'cameraWorldMatrix' ).setGroup( renderGroup ).onRenderUpdate( updateWorldMatrix );
 export const cameraNormalMatrix = /*#__PURE__*/ uniform( 'mat3' ).label( 'cameraNormalMatrix' ).setGroup( renderGroup ).onRenderUpdate( updateNormalMatrix );
-export const cameraPosition = /*#__PURE__*/ uniform( new Vector3() ).label( 'cameraPosition' ).setGroup( renderGroup ).onRenderUpdate( ( { camera }, self ) => self.value.setFromMatrixPosition( camera.matrixWorld ) );
+export const cameraPosition = /*#__PURE__*/ uniform( new Vector3() ).label( 'cameraPosition' ).setGroup( renderGroup ).onRenderUpdate( updateCameraPosition );
 
 renderGroup.register( 'cameraViewMatrix', 'mat4', updateViewMatrix );
 renderGroup.register( 'cameraWorldMatrix', 'mat4', updateWorldMatrix );
 renderGroup.register( 'cameraProjectionMatrix', 'mat4', updateProjectionMatrix );
 renderGroup.register( 'cameraProjectionMatrixInverse', 'mat4', updateProjectionMatrixInverse );
 renderGroup.register( 'cameraNormalMatrix', 'mat3', updateNormalMatrix );
-renderGroup.register( 'cameraPosition', 'vec3' );
+renderGroup.register( 'cameraPosition', 'vec3', updateCameraPosition );
 renderGroup.register( 'cameraNear', 'float', updateNear );
 renderGroup.register( 'cameraFar', 'float', updateFar );
 renderGroup.register( 'cameraLogDepth', 'float', updateLogDepth );

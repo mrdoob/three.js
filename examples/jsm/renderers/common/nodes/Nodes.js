@@ -1,7 +1,7 @@
 import DataMap from '../DataMap.js';
 import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
-import { EquirectangularReflectionMapping, EquirectangularRefractionMapping, NoToneMapping, SRGBColorSpace } from 'three';
+import { EquirectangularReflectionMapping, EquirectangularRefractionMapping, NoToneMapping, SRGBColorSpace, Vector3 } from 'three';
 import { NodeFrame, vec4, objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, viewportBottomLeft, normalWorld, pmremTexture, viewportTopLeft, uniform, NodeUniform, NodeUpdateType } from '../../../nodes/Nodes.js';
 import {
 	FloatNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
@@ -266,7 +266,10 @@ class Nodes extends DataMap {
 			for ( let i = 0, l = registeredUniforms.length; i < l; i ++ ) {
 
 				const uniformDesc = registeredUniforms[ i ];
-				const tempUniform = uniform( uniformDesc.type ).label( uniformDesc.name ).onUpdate( uniformDesc.callback, NodeUpdateType.ONCE );
+
+				const v = uniformDesc.type === 'vec3' ? new Vector3() : uniformDesc.type;
+
+				const tempUniform = uniform( v ).label( uniformDesc.name ).onUpdate( uniformDesc.callback, NodeUpdateType.ONCE );
 				const nodeUniform = this.getNodeUniform( new NodeUniform( uniformDesc.name, uniformDesc.type, tempUniform ), uniformDesc.type );
 
 				group.addUniform( nodeUniform );
@@ -287,23 +290,18 @@ class Nodes extends DataMap {
 		const binding = renderContext.bindings[ 0 ];
 		this._renderNodeUniformsGroup = binding;
 
-		if ( this.updateGroup( binding ) || initialUpdate ) {
+		const nodes = binding.getNodes();
+		const nodeFrame = this.getNodeFrame( this.renderer, null, null, camera, null );
 
-			const nodes = binding.getNodes( false );
+		for ( let i = 0, l = nodes.length; i < l; i ++ ) {
 
-			const nodeFrame = this.getNodeFrame( this.renderer, null, null, camera, null );
+			nodeFrame.updateNode( nodes[ i ] );
 
-			for ( let i = 0, l = nodes.length; i < l; i ++ ) {
+		}
 
-				nodeFrame.updateNode( nodes[ i ] );
+		if ( binding.update() ) {
 
-			}
-
-			if ( binding.update() ) {
-
-				this.backend.updateBinding( binding );
-
-			}
+			this.backend.updateBinding( binding );
 
 		}
 
@@ -318,6 +316,8 @@ class Nodes extends DataMap {
 		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
 		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
 		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
+
+		if ( type.isVector3 ) return new Vector3NodeUniform( uniformNode );
 
 		throw new Error( `Uniform "${type}" not declared.` );
 
