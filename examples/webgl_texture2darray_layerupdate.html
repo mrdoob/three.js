@@ -64,10 +64,9 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 
-			let camera, scene, mesh, renderer, stats;
+			let camera, scene, mesh, renderer;
 
 			const planeWidth = 20;
 			const planeHeight = 10;
@@ -86,10 +85,9 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -98,70 +96,66 @@
 				ktx2Loader.setTranscoderPath( 'jsm/libs/basis/' );
 				ktx2Loader.detectSupport( renderer );
 
-				ktx2Loader.load( 'textures/spiritedaway.ktx2', function ( spiritedaway ) {
+				const spiritedaway = await ktx2Loader.loadAsync( 'textures/spiritedaway.ktx2' );
 
-					const baseData = new Uint8Array( spiritedaway.mipmaps[ 0 ].data.buffer );
-					const layerSize = THREE.TextureUtils.getByteLength(
-						spiritedaway.image.width,
-						spiritedaway.image.height,
-						spiritedaway.format,
-						spiritedaway.type,
-					);
-					const textureArray = new THREE.CompressedArrayTexture( [
-						{
-							data: new Uint8Array( layerSize * 3 ),
-							width: spiritedaway.image.width,
-							height: spiritedaway.image.height,
-						}
-					], spiritedaway.image.width, spiritedaway.image.height, 3, spiritedaway.format, spiritedaway.type );
+				const baseData = new Uint8Array( spiritedaway.mipmaps[ 0 ].data.buffer );
+				const layerSize = THREE.TextureUtils.getByteLength(
+					spiritedaway.image.width,
+					spiritedaway.image.height,
+					spiritedaway.format,
+					spiritedaway.type,
+				);
 
-			
-					const material = new THREE.ShaderMaterial( {
-						uniforms: {
-							diffuse: { value: textureArray },
-							size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
-						},
-						vertexShader: document.getElementById( 'vs' ).textContent.trim(),
-						fragmentShader: document.getElementById( 'fs' ).textContent.trim(),
-						glslVersion: THREE.GLSL3
-					} );
+				const textureArray = new THREE.CompressedArrayTexture( [
+					{
+						data: new Uint8Array( layerSize * 3 ),
+						width: spiritedaway.image.width,
+						height: spiritedaway.image.height,
+					}
+				], spiritedaway.image.width, spiritedaway.image.height, 3, spiritedaway.format, spiritedaway.type );
 
-					const geometry = new THREE.InstancedBufferGeometry();
-					geometry.copy( new THREE.PlaneGeometry( planeWidth, planeHeight ) );
-					geometry.instanceCount = 3;
-
-					const instancedIndexAttribute = new THREE.InstancedBufferAttribute(
-						new Uint16Array( [ 0, 1, 2 ] ), 1, false, 1
-					);
-					instancedIndexAttribute.gpuType = THREE.IntType;
-					geometry.setAttribute( 'instancedIndex', instancedIndexAttribute );
-
-					mesh = new THREE.InstancedMesh( geometry, material, 3 );
-
-					scene.add( mesh );
-
-					let i = 0;
-
-					setInterval( () => {
-
-						textureArray.mipmaps[ 0 ].data.set(
-							baseData.subarray(
-								layerSize * ( i % spiritedaway.image.depth ),
-								layerSize * ( ( i % spiritedaway.image.depth ) + 1 ),
-							),
-							layerSize * ( i % 3 )
-						);
-						textureArray.addLayerUpdates( i % 3 );
-						textureArray.needsUpdate = true;
-						++ i;
-						render();
-
-					}, 1000 );
-
+				const material = new THREE.ShaderMaterial( {
+					uniforms: {
+						diffuse: { value: textureArray },
+						size: { value: new THREE.Vector2( planeWidth, planeHeight ) }
+					},
+					vertexShader: document.getElementById( 'vs' ).textContent.trim(),
+					fragmentShader: document.getElementById( 'fs' ).textContent.trim(),
+					glslVersion: THREE.GLSL3
 				} );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+				const geometry = new THREE.InstancedBufferGeometry();
+				geometry.copy( new THREE.PlaneGeometry( planeWidth, planeHeight ) );
+				geometry.instanceCount = 3;
+
+				const instancedIndexAttribute = new THREE.InstancedBufferAttribute(
+					new Uint16Array( [ 0, 1, 2 ] ), 1, false, 1
+				);
+				instancedIndexAttribute.gpuType = THREE.IntType;
+				geometry.setAttribute( 'instancedIndex', instancedIndexAttribute );
+
+				mesh = new THREE.InstancedMesh( geometry, material, 3 );
+
+				scene.add( mesh );
+
+				let i = 0;
+
+				setInterval( () => {
+
+					textureArray.mipmaps[ 0 ].data.set(
+						baseData.subarray(
+							layerSize * ( i % spiritedaway.image.depth ),
+							layerSize * ( ( i % spiritedaway.image.depth ) + 1 ),
+						),
+						layerSize * ( i % 3 )
+					);
+					textureArray.addLayerUpdates( i % 3 );
+					textureArray.needsUpdate = true;
+					++ i;
+
+					renderer.render( scene, camera );
+
+				}, 1000 );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -173,18 +167,6 @@
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-
-				render();
-
-			}
-
-			function animate() {
-
-				stats.update();
-
-			}
-
-			function render() {
 
 				renderer.render( scene, camera );
 
