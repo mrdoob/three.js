@@ -50,8 +50,7 @@ import { LessEqualCompare } from '../../constants.js';
 
 const emptyTexture = /*@__PURE__*/ new Texture();
 
-const emptyShadowTexture = /*@__PURE__*/ new DepthTexture( 1, 1 );
-emptyShadowTexture.compareFunction = LessEqualCompare;
+let emptyShadowTexture = null;
 
 const emptyArrayTexture = /*@__PURE__*/ new DataArrayTexture();
 const empty3dTexture = /*@__PURE__*/ new Data3DTexture();
@@ -566,6 +565,13 @@ function setValueT1( gl, v, textures ) {
 
 		gl.uniform1i( this.addr, unit );
 		cache[ 0 ] = unit;
+
+	}
+
+	if ( this.type === gl.SAMPLER_2D_SHADOW && emptyShadowTexture === null ) {
+
+		emptyShadowTexture = new DepthTexture( 1, 1 );
+		emptyShadowTexture.compareFunction = LessEqualCompare;
 
 	}
 
