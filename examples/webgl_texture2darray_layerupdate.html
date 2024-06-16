@@ -74,7 +74,7 @@
 
 			init();
 
-			function init() {
+			async function init() {
 
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -115,22 +115,7 @@
 						}
 					], spiritedaway.image.width, spiritedaway.image.height, 3, spiritedaway.format, spiritedaway.type );
 
-					let i = 0;
-					setInterval( () => {
-
-						textureArray.mipmaps[ 0 ].data.set(
-							baseData.subarray(
-								layerSize * ( i % spiritedaway.image.depth ),
-								layerSize * ( ( i % spiritedaway.image.depth ) + 1 ),
-							),
-							layerSize * ( i % 3 )
-						);
-						textureArray.addLayerUpdates( i % 3 );
-						textureArray.needsUpdate = true;
-						++ i;
-
-					}, 500 );
-
+			
 					const material = new THREE.ShaderMaterial( {
 						uniforms: {
 							diffuse: { value: textureArray },
@@ -155,6 +140,24 @@
 
 					scene.add( mesh );
 
+					let i = 0;
+
+					setInterval( () => {
+
+						textureArray.mipmaps[ 0 ].data.set(
+							baseData.subarray(
+								layerSize * ( i % spiritedaway.image.depth ),
+								layerSize * ( ( i % spiritedaway.image.depth ) + 1 ),
+							),
+							layerSize * ( i % 3 )
+						);
+						textureArray.addLayerUpdates( i % 3 );
+						textureArray.needsUpdate = true;
+						++ i;
+						render();
+
+					}, 1000 );
+
 				} );
 
 				stats = new Stats();
@@ -166,16 +169,17 @@
 
 			function onWindowResize() {
 
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				render();
 
 			}
 
 			function animate() {
 
-				render();
 				stats.update();
 
 			}
