@@ -34,9 +34,9 @@ class UniformsElementNode extends ArrayElementNode {
 
 class UniformsNode extends BufferNode {
 
-	constructor( value, elementType = null ) {
+	constructor( value, elementType = null, bufferType = 'vec4' ) {
 
-		super( null, 'vec4' );
+		super( null, bufferType );
 
 		this.array = value;
 		this.elementType = elementType;
@@ -135,6 +135,6 @@ class UniformsNode extends BufferNode {
 
 export default UniformsNode;
 
-export const uniforms = ( values, nodeType ) => nodeObject( new UniformsNode( values, nodeType ) );
+export const uniforms = ( values, nodeType, bufferType ) => nodeObject( new UniformsNode( values, nodeType, bufferType ) );
 
 addNodeClass( 'UniformsNode', UniformsNode );
