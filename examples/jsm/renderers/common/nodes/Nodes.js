@@ -8,6 +8,7 @@ import {
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from './NodeUniform.js';
 import NodeUniformsGroup from './NodeUniformsGroup.js';
+import { getValueFromType } from '../../../nodes/core/NodeUtils.js';
 
 class Nodes extends DataMap {
 
@@ -22,8 +23,6 @@ class Nodes extends DataMap {
 		this.callHashCache = new ChainMap();
 		this.groupsData = new ChainMap();
 
-		this._renderNodeUniformsGroup = null;
-
 	}
 
 	updateGroup( nodeUniformsGroup ) {
@@ -35,6 +34,7 @@ class Nodes extends DataMap {
 
 		if ( name === objectGroup.name ) return true;
 
+		/*
 		// renderGroup is updated once per render/compute call
 
 		if ( name === renderGroup.name ) {
@@ -53,6 +53,7 @@ class Nodes extends DataMap {
 			return false;
 
 		}
+		*/
 
 		// frameGroup is updated once per frame
 
@@ -121,7 +122,7 @@ class Nodes extends DataMap {
 				nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );
 				nodeBuilder.fogNode = this.getFogNode( renderObject.scene );
 				nodeBuilder.clippingContext = renderObject.clippingContext;
-				nodeBuilder.renderNodeUniformsGroup = this._renderNodeUniformsGroup;
+				nodeBuilder.renderNodeUniformsGroup = renderObject.context.bindings[ 0 ];
 				nodeBuilder.build();
 
 				nodeBuilderState = this._createNodeBuilderState( nodeBuilder );
@@ -196,6 +197,35 @@ class Nodes extends DataMap {
 
 	}
 
+	_createRenderBindings(  renderContext ) {
+
+		const group = new NodeUniformsGroup( 'render', renderGroup );
+
+		const registeredUniforms = renderGroup.registered;
+
+		for ( let i = 0, l = registeredUniforms.length; i < l; i ++ ) {
+
+			const uniformDesc = registeredUniforms[ i ];
+
+			const t = getValueFromType( uniformDesc.type );
+			// const v = uniformDesc.type === 'vec3' ? new Vector3() : uniformDesc.type;
+
+			const tempUniform = uniform( t ).label( uniformDesc.name ).onUpdate( uniformDesc.callback, NodeUpdateType.ONCE );
+			const nodeUniform = this.getNodeUniform( new NodeUniform( uniformDesc.name, uniformDesc.type, tempUniform ), uniformDesc.type );
+
+			group.addUniform( nodeUniform );
+
+		}
+
+		// FIXME hardcode WebGPU visibility
+		group.setVisibility( 1 );
+		group.setVisibility( 2 );
+
+		renderContext.bindings = [ group ];
+		this.backend.createBindings( renderContext.bindings, 'render' );
+
+	};
+
 	getEnvironmentNode( scene ) {
 
 		return scene.environmentNode || this.get( scene ).environmentNode || null;
@@ -257,34 +287,11 @@ class Nodes extends DataMap {
 
 		if ( renderContext.bindings === undefined ) {
 
-			const registeredUniforms = renderGroup.registered;
-
-			const group = new NodeUniformsGroup( 'render', renderGroup );
-
-			for ( let i = 0, l = registeredUniforms.length; i < l; i ++ ) {
-
-				const uniformDesc = registeredUniforms[ i ];
-
-				const v = uniformDesc.type === 'vec3' ? new Vector3() : uniformDesc.type;
-
-				const tempUniform = uniform( v ).label( uniformDesc.name ).onUpdate( uniformDesc.callback, NodeUpdateType.ONCE );
-				const nodeUniform = this.getNodeUniform( new NodeUniform( uniformDesc.name, uniformDesc.type, tempUniform ), uniformDesc.type );
-
-				group.addUniform( nodeUniform );
-
-			}
-
-			// FIXME hardcode WebGPU visibility
-			group.setVisibility( 1 );
-			group.setVisibility( 2 );
-
-			renderContext.bindings = [ group ];
-			this.backend.createBindings( renderContext.bindings, 'render' );
+			this._createRenderBindings( renderContext );
 
 		}
 
 		const binding = renderContext.bindings[ 0 ];
-		this._renderNodeUniformsGroup = binding;
 
 		const nodes = binding.getNodes();
 		const nodeFrame = this.getNodeFrame( this.renderer, null, null, camera, null );
@@ -304,6 +311,8 @@ class Nodes extends DataMap {
 	}
 
 	getNodeUniform( uniformNode, type ) {
+
+		// duplicated from NodeBuilder - move to NodeUtils for reuse?
 
 		if ( type === 'float' ) return new FloatNodeUniform( uniformNode );
 		if ( type === 'vec2' ) return new Vector2NodeUniform( uniformNode );

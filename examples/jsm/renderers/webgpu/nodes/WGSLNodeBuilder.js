@@ -778,7 +778,6 @@ ${ flowData.code }
 
 						attributesSnippet += ' @interpolate( flat )';
 
-
 					}
 
 					snippets.push( `${ attributesSnippet } ${ varying.name } : ${ this.getType( varying.type ) }` );
