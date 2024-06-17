@@ -2604,7 +2604,7 @@ class WebGLRenderer {
 
 				} else {
 
-					_gl.texSubImage2D( _gl.TEXTURE_2D, level, dstX, dstY, glFormat, glType, image );
+					_gl.texSubImage2D( _gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
 
 				}
 
