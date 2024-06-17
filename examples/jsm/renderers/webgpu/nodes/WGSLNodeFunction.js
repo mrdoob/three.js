@@ -2,10 +2,24 @@ import NodeFunction from '../../../nodes/core/NodeFunction.js';
 import NodeFunctionInput from '../../../nodes/core/NodeFunctionInput.js';
 
 const declarationRegexp = /^[fn]*\s*([a-z_0-9]+)?\s*\(([\s\S]*?)\)\s*[\-\>]*\s*([a-z_0-9]+)?/i;
-const propertiesRegexp = /([a-z_0-9]+(?:<[\s\S]+?>)?)|<(.*?)>+/ig;
+const propertiesRegexp = /([a-z_0-9]+)\s*:\s*([a-z_0-9]+(?:<[\s\S]+?>)?)/ig;
 
 const wgslTypeLib = {
-	f32: 'float'
+	'f32': 'float',
+	'mat2x2': 'mat2',
+	'mat2x2': 'imat2',
+	'mat2x2': 'umat2',
+	'mat2x2': 'bmat2',
+
+	'mat3x3': 'mat3',
+	'mat3x3': 'imat3',
+	'mat3x3': 'umat3',
+	'mat3x3': 'bmat3',
+
+	'mat4x4': 'mat4',
+	'mat4x4': 'imat4',
+	'mat4x4': 'umat4',
+	'mat4x4': 'bmat4'
 };
 
 const parse = ( source ) => {
@@ -16,49 +30,32 @@ const parse = ( source ) => {
 
 	if ( declaration !== null && declaration.length === 4 ) {
 
-		// tokenizer
-
 		const inputsCode = declaration[ 2 ];
 		const propsMatches = [];
+		let match = null;
 
-		let nameMatch = null;
+		while ( ( match = propertiesRegexp.exec( inputsCode ) ) !== null ) {
 
-		while ( ( nameMatch = propertiesRegexp.exec( inputsCode ) ) !== null ) {
-
-			propsMatches.push( nameMatch );
+			propsMatches.push( { name: match[ 1 ], type: match[ 2 ] } );
 
 		}
 
-		// parser
-
+		// Process matches to correctly pair names and types
 		const inputs = [];
+		for ( let i = 0; i < propsMatches.length; i ++ ) {
 
-		let i = 0;
+			const { name, type } = propsMatches[ i ];
 
-		while ( i < propsMatches.length ) {
+			let resolvedType = type.replace( /<[^>]+>/, '' );
 
-			// default
+			resolvedType = wgslTypeLib[ resolvedType ] || resolvedType;
 
-			const name = propsMatches[ i ++ ][ 0 ];
-			let type = propsMatches[ i ++ ][ 0 ];
-
-			type = wgslTypeLib[ type ] || type;
-
-			// precision
-
-			if ( i < propsMatches.length && propsMatches[ i ][ 0 ].startsWith( '<' ) === true )
-				i ++;
-
-			// add input
-
-			inputs.push( new NodeFunctionInput( type, name ) );
+			// debugger;
+			inputs.push( new NodeFunctionInput( resolvedType, name ) );
 
 		}
-
-		//
 
 		const blockCode = source.substring( declaration[ 0 ].length );
-
 		const name = declaration[ 1 ] !== undefined ? declaration[ 1 ] : '';
 		const type = declaration[ 3 ] || 'void';
 
