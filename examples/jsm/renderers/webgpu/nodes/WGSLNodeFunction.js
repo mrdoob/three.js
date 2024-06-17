@@ -16,7 +16,7 @@ const wgslTypeLib = {
  	'vec2<bool>': 'bvec2',
 
 	'vec2f': 'vec2',
-	'vec3i': 'ivec2',
+	'vec2i': 'ivec2',
 	'vec2u': 'uvec2',
 	'vec2b': 'bvec2',
 
