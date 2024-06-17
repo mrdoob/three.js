@@ -185,9 +185,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			}
 
-		} else {
+		} else if ( this.isFilteredTexture( texture ) ) {
 
 			return this.generateFilteredTexture( texture, textureProperty, uvSnippet );
+
+		} else {
+
+			return this.generateTextureLod( texture, textureProperty, uvSnippet, '0' );
 
 		}
 
@@ -213,9 +217,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
-		} else {
+		} else if ( this.isFilteredTexture( texture ) ) {
 
 			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet );
+
+		} else {
+
+			return this.generateTextureLod( texture, textureProperty, uvSnippet, levelSnippet );
 
 		}
 

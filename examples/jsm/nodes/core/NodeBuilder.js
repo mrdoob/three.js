@@ -15,7 +15,10 @@ import {
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from '../../renderers/common/nodes/NodeUniform.js';
 
-import { REVISION, RenderTarget, Color, Vector2, Vector3, Vector4, IntType, UnsignedIntType, Float16BufferAttribute } from 'three';
+import {
+	REVISION, RenderTarget, Color, Vector2, Vector3, Vector4, IntType, UnsignedIntType, Float16BufferAttribute,
+	LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter
+} from 'three';
 
 import { stack } from './StackNode.js';
 import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
@@ -243,6 +246,13 @@ class NodeBuilder {
 	get currentNode() {
 
 		return this.chaining[ this.chaining.length - 1 ];
+
+	}
+
+	isFilteredTexture( texture ) {
+
+		return ( texture.magFilter === LinearFilter || texture.magFilter === LinearMipmapNearestFilter || texture.magFilter === NearestMipmapLinearFilter || texture.magFilter === LinearMipmapLinearFilter ||
+			texture.minFilter === LinearFilter || texture.minFilter === LinearMipmapNearestFilter || texture.minFilter === NearestMipmapLinearFilter || texture.minFilter === LinearMipmapLinearFilter );
 
 	}
 
