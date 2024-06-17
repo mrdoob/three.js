@@ -34,9 +34,9 @@ class UniformsElementNode extends ArrayElementNode {
 
 class UniformsNode extends BufferNode {
 
-	constructor( value, elementType = null, bufferType = 'vec4' ) {
+	constructor( value, elementType = null ) {
 
-		super( null, bufferType );
+		super( null, 'vec4' );
 
 		this.array = value;
 		this.elementType = elementType;
@@ -120,6 +120,8 @@ class UniformsNode extends BufferNode {
 
 		this.value = new Float32Array( length * 4 );
 		this.bufferCount = length;
+
+		this.bufferType = builder.changeComponentType( 'vec4', builder.getComponentType( this._elementType ) );
 
 		return super.setup( builder );
 
