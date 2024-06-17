@@ -28,13 +28,13 @@ class Uniform {
 
 }
 
-class FloatUniform extends Uniform {
+class NumberUniform extends Uniform {
 
 	constructor( name, value = 0 ) {
 
 		super( name, value );
 
-		this.isFloatUniform = true;
+		this.isNumberUniform = true;
 
 		this.boundary = 4;
 		this.itemSize = 1;
@@ -134,7 +134,7 @@ class Matrix4Uniform extends Uniform {
 }
 
 export {
-	FloatUniform,
+	NumberUniform,
 	Vector2Uniform, Vector3Uniform, Vector4Uniform, ColorUniform,
 	Matrix3Uniform, Matrix4Uniform
 };

@@ -116,7 +116,7 @@ class UniformsGroup extends UniformBuffer {
 
 	updateByType( uniform ) {
 
-		if ( uniform.isFloatUniform ) return this.updateNumber( uniform );
+		if ( uniform.isNumberUniform ) return this.updateNumber( uniform );
 		if ( uniform.isVector2Uniform ) return this.updateVector2( uniform );
 		if ( uniform.isVector3Uniform ) return this.updateVector3( uniform );
 		if ( uniform.isVector4Uniform ) return this.updateVector4( uniform );
