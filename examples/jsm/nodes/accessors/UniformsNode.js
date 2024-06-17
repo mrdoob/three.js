@@ -136,6 +136,6 @@ class UniformsNode extends BufferNode {
 
 export default UniformsNode;
 
-export const uniforms = ( values, nodeType, bufferType ) => nodeObject( new UniformsNode( values, nodeType, bufferType ) );
+export const uniforms = ( values, nodeType ) => nodeObject( new UniformsNode( values, nodeType ) );
 
 addNodeClass( 'UniformsNode', UniformsNode );
