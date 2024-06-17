@@ -572,7 +572,7 @@ function setValueT1( gl, v, textures ) {
 
 	if ( this.type === gl.SAMPLER_2D_SHADOW ) {
 
-		emptyShadowTexture.compareFunction = LessEqualCompare;
+		emptyShadowTexture.compareFunction = LessEqualCompare; // #28670
 		emptyTexture2D = emptyShadowTexture;
 
 	} else {
