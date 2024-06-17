@@ -531,12 +531,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	isReference( type ) {
-
-		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_depth_2d' || type === 'texture_storage_2d' || type === 'texture_3d';
-
-	}
-
 	getBuiltin( name, property, type, shaderStage = this.shaderStage ) {
 
 		const map = this.builtins[ shaderStage ] || ( this.builtins[ shaderStage ] = new Map() );

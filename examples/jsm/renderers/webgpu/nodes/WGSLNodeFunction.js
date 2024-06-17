@@ -15,30 +15,47 @@ const wgslTypeLib = {
  	'vec2<u32>': 'uvec2',
  	'vec2<bool>': 'bvec2',
 
+	'vec2f': 'vec2',
+	'vec2i': 'ivec2',
+	'vec2u': 'uvec2',
+	'vec2b': 'bvec2',
+
 	'vec3<f32>': 'vec3',
 	'vec3<i32>': 'ivec3',
 	'vec3<u32>': 'uvec3',
 	'vec3<bool>': 'bvec3',
+
+	'vec3f': 'vec3',
+	'vec3i': 'ivec3',
+	'vec3u': 'uvec3',
+	'vec3b': 'bvec3',
 
 	'vec4<f32>': 'vec4',
 	'vec4<i32>': 'ivec4',
 	'vec4<u32>': 'uvec4',
 	'vec4<bool>': 'bvec4',
 
+	'vec4f': 'vec4',
+	'vec4i': 'ivec4',
+	'vec4u': 'uvec4',
+	'vec4b': 'bvec4',
+
 	'mat2x2<f32>': 'mat2',
-	'mat2x2<i32>': 'imat2',
-	'mat2x2<u32>': 'umat2',
-	'mat2x2<bool>': 'bmat2',
+	'mat2x2f': 'mat2',
 
 	'mat3x3<f32>': 'mat3',
-	'mat3x3<i32>': 'imat3',
-	'mat3x3<u32>': 'umat3',
-	'mat3x3<bool>': 'bmat3',
+	'mat3x3f': 'mat3',
 
 	'mat4x4<f32>': 'mat4',
-	'mat4x4<i32>': 'imat4',
-	'mat4x4<u32>': 'umat4',
-	'mat4x4<bool>': 'bmat4'
+	'mat4x4f': 'mat4',
+
+	'sampler': 'sampler',
+	'texture_2d': 'texture',
+	'texture_cube': 'textureCube',
+	'texture_depth_2d': 'textureDepth',
+	'texture_storage_2d': 'textureStorage',
+	'texture_3d': 'texture3D'
+
 };
 
 const parse = ( source ) => {
