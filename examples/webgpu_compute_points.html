@@ -133,7 +133,6 @@
 				pointsMaterial.positionNode = particleNode;
 
 				const mesh = new THREE.Points( pointsGeometry, pointsMaterial );
-				mesh.isInstancedMesh = true;
 				mesh.count = particleNum;
 				scene.add( mesh );
 

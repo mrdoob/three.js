@@ -190,7 +190,7 @@ class MorphNode extends Node {
 
 			const influence = float( 0 ).toVar();
 
-			if ( this.mesh.isInstancedMesh === true && ( this.mesh.morphTexture !== null && this.mesh.morphTexture !== undefined ) ) {
+			if ( this.mesh.count > 1 && ( this.mesh.morphTexture !== null && this.mesh.morphTexture !== undefined ) ) {
 
 				influence.assign( textureLoad( this.mesh.morphTexture, ivec2( int( i ).add( 1 ), int( instanceIndex ) ) ).r );
 
