@@ -1,9 +1,9 @@
 import {
-	ScalarUniform, Vector2Uniform, Vector3Uniform, Vector4Uniform,
+	NumberUniform, Vector2Uniform, Vector3Uniform, Vector4Uniform,
 	ColorUniform, Matrix3Uniform, Matrix4Uniform
 } from '../Uniform.js';
 
-class ScalarNodeUniform extends ScalarUniform {
+class NumberNodeUniform extends NumberUniform {
 
 	constructor( nodeUniform ) {
 
@@ -130,6 +130,6 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 }
 
 export {
-	ScalarNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
+	NumberNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 };

@@ -11,7 +11,7 @@ import { createNodeMaterialFromType, default as NodeMaterial } from '../material
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
-	ScalarNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
+	NumberNodeUniform, Vector2NodeUniform, Vector3NodeUniform, Vector4NodeUniform,
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from '../../renderers/common/nodes/NodeUniform.js';
 
@@ -1181,7 +1181,7 @@ class NodeBuilder {
 
 	getNodeUniform( uniformNode, type ) {
 
-		if ( type === 'float' || type === 'int' || type === 'uint' ) return new ScalarNodeUniform( uniformNode );
+		if ( type === 'float' || type === 'int' || type === 'uint' ) return new NumberNodeUniform( uniformNode );
 		if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) return new Vector2NodeUniform( uniformNode );
 		if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) return new Vector3NodeUniform( uniformNode );
 		if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) return new Vector4NodeUniform( uniformNode );

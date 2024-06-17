@@ -28,13 +28,13 @@ class Uniform {
 
 }
 
-class ScalarUniform extends Uniform {
+class NumberUniform extends Uniform {
 
 	constructor( name, value = 0 ) {
 
 		super( name, value );
 
-		this.isScalarUniform = true;
+		this.isNumberUniform = true;
 
 		this.boundary = 4;
 		this.itemSize = 1;
@@ -134,7 +134,7 @@ class Matrix4Uniform extends Uniform {
 }
 
 export {
-	ScalarUniform,
+	NumberUniform,
 	Vector2Uniform, Vector3Uniform, Vector4Uniform, ColorUniform,
 	Matrix3Uniform, Matrix4Uniform
 };
