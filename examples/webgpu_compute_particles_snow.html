@@ -198,7 +198,6 @@
 					staticMaterial.positionNode = positionLocal.mul( scaleBuffer.toAttribute() ).add( posBuffer.toAttribute() );
 
 					const rainParticles = new THREE.Mesh( geometry, staticMaterial );
-					rainParticles.isInstancedMesh = true;
 					rainParticles.count = maxParticleCount;
 					rainParticles.castShadow = true;
 					rainParticles.layers.disableAll();
