@@ -94,6 +94,7 @@ function GeometryParametersPanel( editor, object ) {
 		radialSegments.setValue( parameters.radialSegments );
 		closed.setValue( parameters.closed );
 
+		points.setValue( parameters.path.points, false );
 		curveType.setValue( parameters.path.curveType );
 		tension.setValue( parameters.path.tension );
 
