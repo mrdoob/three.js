@@ -51,9 +51,9 @@ const wgslTypeLib = {
 
 	'sampler': 'sampler',
 	'texture_2d': 'texture',
-	'texture_cube': 'textureCube',
-	'texture_depth_2d': 'textureDepth',
-	'texture_storage_2d': 'textureStorage',
+	'texture_cube': 'cubeTexture',
+	'texture_depth_2d': 'depthTexture',
+	'texture_storage_2d': 'storageTexture',
 	'texture_3d': 'texture3D'
 
 };
