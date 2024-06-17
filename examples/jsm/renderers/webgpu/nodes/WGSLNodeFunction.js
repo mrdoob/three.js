@@ -6,20 +6,39 @@ const propertiesRegexp = /([a-z_0-9]+)\s*:\s*([a-z_0-9]+(?:<[\s\S]+?>)?)/ig;
 
 const wgslTypeLib = {
 	'f32': 'float',
-	'mat2x2': 'mat2',
-	'mat2x2': 'imat2',
-	'mat2x2': 'umat2',
-	'mat2x2': 'bmat2',
+	'i32': 'int',
+	'u32': 'uint',
+	'bool': 'bool',
 
-	'mat3x3': 'mat3',
-	'mat3x3': 'imat3',
-	'mat3x3': 'umat3',
-	'mat3x3': 'bmat3',
+	'vec2<f32>': 'vec2',
+ 	'vec2<i32>': 'ivec2',
+ 	'vec2<u32>': 'uvec2',
+ 	'vec2<bool>': 'bvec2',
 
-	'mat4x4': 'mat4',
-	'mat4x4': 'imat4',
-	'mat4x4': 'umat4',
-	'mat4x4': 'bmat4'
+	'vec3<f32>': 'vec3',
+	'vec3<i32>': 'ivec3',
+	'vec3<u32>': 'uvec3',
+	'vec3<bool>': 'bvec3',
+
+	'vec4<f32>': 'vec4',
+	'vec4<i32>': 'ivec4',
+	'vec4<u32>': 'uvec4',
+	'vec4<bool>': 'bvec4',
+
+	'mat2x2<f32>': 'mat2',
+	'mat2x2<i32>': 'imat2',
+	'mat2x2<u32>': 'umat2',
+	'mat2x2<bool>': 'bmat2',
+
+	'mat3x3<f32>': 'mat3',
+	'mat3x3<i32>': 'imat3',
+	'mat3x3<u32>': 'umat3',
+	'mat3x3<bool>': 'bmat3',
+
+	'mat4x4<f32>': 'mat4',
+	'mat4x4<i32>': 'imat4',
+	'mat4x4<u32>': 'umat4',
+	'mat4x4<bool>': 'bmat4'
 };
 
 const parse = ( source ) => {
@@ -46,11 +65,16 @@ const parse = ( source ) => {
 
 			const { name, type } = propsMatches[ i ];
 
-			let resolvedType = type.replace( /<[^>]+>/, '' );
+			let resolvedType = type;
+
+			if ( resolvedType.startsWith( 'texture' ) ) {
+
+				resolvedType = type.split( '<' )[ 0 ];
+
+			}
 
 			resolvedType = wgslTypeLib[ resolvedType ] || resolvedType;
 
-			// debugger;
 			inputs.push( new NodeFunctionInput( resolvedType, name ) );
 
 		}
@@ -80,7 +104,6 @@ class WGSLNodeFunction extends NodeFunction {
 	constructor( source ) {
 
 		const { type, inputs, name, inputsCode, blockCode } = parse( source );
-
 		super( type, inputs, name );
 
 		this.inputsCode = inputsCode;
@@ -91,7 +114,6 @@ class WGSLNodeFunction extends NodeFunction {
 	getCode( name = this.name ) {
 
 		const type = this.type !== 'void' ? '-> ' + this.type : '';
-
 		return `fn ${ name } ( ${ this.inputsCode.trim() } ) ${ type }` + this.blockCode;
 
 	}
