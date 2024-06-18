@@ -48,6 +48,7 @@ class Light extends Object3D {
 		if ( this.penumbra !== undefined ) data.object.penumbra = this.penumbra;
 
 		if ( this.shadow !== undefined ) data.object.shadow = this.shadow.toJSON();
+		if ( this.target !== undefined ) data.object.target = this.target.uuid;
 
 		return data;
 
