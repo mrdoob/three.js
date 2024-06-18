@@ -172,11 +172,13 @@ class Geometries extends DataMap {
 
 		const callId = this.info.render.calls;
 
-		if ( this.attributeCall.get( attribute ) !== callId ) {
+		const attributeData = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
+
+		if ( this.attributeCall.get( attributeData ) !== callId ) {
 
 			this.attributes.update( attribute, type );
 
-			this.attributeCall.set( attribute, callId );
+			this.attributeCall.set( attributeData, callId );
 
 		}
 
