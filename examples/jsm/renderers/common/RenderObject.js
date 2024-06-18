@@ -234,7 +234,7 @@ export default class RenderObject {
 
 		}
 
-		if ( object.isInstancedMesh ) {
+		if ( object.count > 1 ) {
 
 			cacheKey += object.count + ',';
 

@@ -2580,18 +2580,20 @@ class GLTFParser {
 		// expensive work of uploading a texture to the GPU off the main thread.
 
 		let isSafari = false;
+		let safariVersion = - 1;
 		let isFirefox = false;
 		let firefoxVersion = - 1;
 
 		if ( typeof navigator !== 'undefined' ) {
 
 			isSafari = /^((?!chrome|android).)*safari/i.test( navigator.userAgent ) === true;
+			safariVersion = isSafari ? navigator.userAgent.match( /Version\/(\d+)/ )[ 1 ] : - 1;
 			isFirefox = navigator.userAgent.indexOf( 'Firefox' ) > - 1;
 			firefoxVersion = isFirefox ? navigator.userAgent.match( /Firefox\/([0-9]+)\./ )[ 1 ] : - 1;
 
 		}
 
-		if ( typeof createImageBitmap === 'undefined' || isSafari || ( isFirefox && firefoxVersion < 98 ) ) {
+		if ( typeof createImageBitmap === 'undefined' || ( isSafari && safariVersion < 17 ) || ( isFirefox && firefoxVersion < 98 ) ) {
 
 			this.textureLoader = new TextureLoader( this.options.manager );
 

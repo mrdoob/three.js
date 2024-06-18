@@ -666,7 +666,7 @@ class WebGLTextureUtils {
 
 			} else {
 
-				gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, glFormat, glType, image );
+				gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
 
 			}
 

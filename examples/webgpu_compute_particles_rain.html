@@ -97,6 +97,8 @@
 
 				collisionPosRT = new THREE.RenderTarget( 1024, 1024 );
 				collisionPosRT.texture.type = THREE.HalfFloatType;
+				collisionPosRT.texture.magFilter = THREE.NearestFilter;
+				collisionPosRT.texture.minFilter = THREE.NearestFilter;
 
 				collisionPosMaterial = new MeshBasicNodeMaterial();
 				collisionPosMaterial.colorNode = positionWorld;
@@ -233,7 +235,6 @@
 				rainMaterial.transparent = true;
 
 				const rainParticles = new THREE.Mesh( new THREE.PlaneGeometry( .1, 2 ), rainMaterial );
-				rainParticles.isInstancedMesh = true;
 				rainParticles.count = instanceCount;
 				scene.add( rainParticles );
 
@@ -273,7 +274,6 @@
 				const rippleGeometry = BufferGeometryUtils.mergeGeometries( [ surfaceRippleGeometry, xRippleGeometry, zRippleGeometry ] );
 
 				const rippleParticles = new THREE.Mesh( rippleGeometry, rippleMaterial );
-				rippleParticles.isInstancedMesh = true;
 				rippleParticles.count = instanceCount;
 				scene.add( rippleParticles );
 
