@@ -164,7 +164,7 @@ class ObjectLoader extends Loader {
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
-		this.bindLights( object );
+		this.bindLightTargets( object );
 
 		//
 
@@ -1127,7 +1127,7 @@ class ObjectLoader extends Loader {
 
 	}
 
-	bindLights( object ) {
+	bindLightTargets( object ) {
 
 		object.traverse( function ( child ) {
 
