@@ -321,7 +321,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				return name;
 
-			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'storageReadOnlyBuffer' ) {
+			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
 
 				return `NodeBuffer_${ node.id }.${name}`;
 
@@ -393,10 +393,29 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		} else {
 
-			return node.access === GPUBufferBindingType.Storage ? 'read_write' : 'read';
+			switch ( node.access ) {
+
+				case GPUBufferBindingType.Storage: {
+
+					return 'read_write';
+
+				}
+
+				case GPUBufferBindingType.ReadOnlyStorage: {
+
+					return 'read';
+
+				}
+
+				default: {
+
+					return 'write';
+
+				}
+
+			}
 
 		}
-
 
 	}
 
@@ -449,7 +468,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'storageReadOnlyBuffer' ) {
+			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
 
 				const bufferClass = type !== 'buffer' ? NodeStorageBuffer : NodeUniformBuffer;
 				const buffer = new bufferClass( node );
@@ -689,7 +708,7 @@ ${ flowData.code }
 
 			snippets.push( snippet );
 
-			snippets.push( `\nvar<private> output : ${ name };\n\n`);
+			snippets.push( `\nvar<private> output : ${ name };\n\n` );
 
 		}
 
@@ -844,7 +863,7 @@ ${ flowData.code }
 
 				bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name} : ${textureType};` );
 
-			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' || uniform.type === 'storageReadOnlyBuffer' ) {
+			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' ) {
 
 				const bufferNode = uniform.node;
 				const bufferType = this.getType( bufferNode.bufferType );
