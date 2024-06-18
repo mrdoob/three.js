@@ -120,6 +120,7 @@ class UniformsNode extends BufferNode {
 
 		this.value = new Float32Array( length * 4 );
 		this.bufferCount = length;
+		this.bufferType = builder.changeComponentType( 'vec4', builder.getComponentType( this._elementType ) );
 
 		return super.setup( builder );
 

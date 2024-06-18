@@ -615,7 +615,7 @@ ${ flowData.code }
 
 				const extentions = this.renderer.backend.extensions;
 
-				if ( extentions.has( 'OES_texture_float_linear' ) )  {
+				if ( extentions.has( 'OES_texture_float_linear' ) ) {
 
 					extentions.get( 'OES_texture_float_linear' );
 					result = true;
