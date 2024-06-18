@@ -19,7 +19,7 @@ import {
 
 class ViewHelper extends Object3D {
 
-	constructor( camera, domElement ) {
+	constructor( camera, domElement, options ) {
 
 		super();
 
@@ -54,9 +54,11 @@ class ViewHelper extends Object3D {
 		this.add( zAxis );
 		this.add( yAxis );
 
-		const spriteMaterial1 = getSpriteMaterial( color1 );
-		const spriteMaterial2 = getSpriteMaterial( color2 );
-		const spriteMaterial3 = getSpriteMaterial( color3 );
+		const { posXLabel = null, posYLabel = null, posZLabel = null } = options || {};
+
+		const spriteMaterial1 = getSpriteMaterial( color1, posXLabel, options );
+		const spriteMaterial2 = getSpriteMaterial( color2, posYLabel, options );
+		const spriteMaterial3 = getSpriteMaterial( color3, posZLabel, options );
 		const spriteMaterial4 = getSpriteMaterial( color4 );
 
 		const posXAxisHelper = new Sprite( spriteMaterial1 );
@@ -271,7 +273,9 @@ class ViewHelper extends Object3D {
 
 		}
 
-		function getSpriteMaterial( color ) {
+		function getSpriteMaterial( color, text = null, options = {} ) {
+
+			const { font = '24px Arial', labelColor = '#000000', radius = 14 } = options;
 
 			const canvas = document.createElement( 'canvas' );
 			canvas.width = 64;
@@ -279,10 +283,19 @@ class ViewHelper extends Object3D {
 
 			const context = canvas.getContext( '2d' );
 			context.beginPath();
-			context.arc( 32, 32, 14, 0, 2 * Math.PI );
+			context.arc( 32, 32, radius, 0, 2 * Math.PI );
 			context.closePath();
 			context.fillStyle = color.getStyle();
 			context.fill();
+
+			if (text !== null) {
+
+				context.font = font;
+				context.textAlign = 'center';
+				context.fillStyle = labelColor;
+				context.fillText(text, 32, 41);
+
+			}
 
 			const texture = new CanvasTexture( canvas );
 			texture.colorSpace = SRGBColorSpace;
