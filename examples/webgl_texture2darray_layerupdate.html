@@ -64,6 +64,7 @@
 
 			import * as THREE from 'three';
 
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 
 			let camera, scene, mesh, renderer;
@@ -83,23 +84,27 @@
 
 				scene = new THREE.Scene();
 
-				//
+				// Configure the renderer.
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				//
+				// Configure the KTX2 loader.
 
 				const ktx2Loader = new KTX2Loader();
 				ktx2Loader.setTranscoderPath( 'jsm/libs/basis/' );
 				ktx2Loader.detectSupport( renderer );
 
+				// Load several KTX2 textures which will later be used to modify
+				// specific texture array layers.
+
 				const spiritedaway = await ktx2Loader.loadAsync( 'textures/spiritedaway.ktx2' );
 
-				const baseData = new Uint8Array( spiritedaway.mipmaps[ 0 ].data.buffer );
-				const layerSize = THREE.TextureUtils.getByteLength(
+				// Create a texture array for rendering.
+
+				const layerByteLength = THREE.TextureUtils.getByteLength(
 					spiritedaway.image.width,
 					spiritedaway.image.height,
 					spiritedaway.format,
@@ -108,11 +113,39 @@
 
 				const textureArray = new THREE.CompressedArrayTexture( [
 					{
-						data: new Uint8Array( layerSize * 3 ),
+						data: new Uint8Array( layerByteLength * 3 ),
 						width: spiritedaway.image.width,
 						height: spiritedaway.image.height,
 					}
 				], spiritedaway.image.width, spiritedaway.image.height, 3, spiritedaway.format, spiritedaway.type );
+
+				// Setup the GUI
+
+				const formData = {
+					srcLayer: 0,
+					destLayer: 0,
+					transfer() {
+						const layerElementLength = layerByteLength / spiritedaway.mipmaps[ 0 ].data.BYTES_PER_ELEMENT;
+						textureArray.mipmaps[ 0 ].data.set(
+							spiritedaway.mipmaps[ 0 ].data.subarray(
+								layerElementLength * ( formData.srcLayer % spiritedaway.image.depth ),
+								layerElementLength * ( ( formData.srcLayer % spiritedaway.image.depth ) + 1 ),
+							),
+							layerByteLength * formData.destLayer,
+						);
+						textureArray.addLayerUpdates( formData.destLayer );
+						textureArray.needsUpdate = true;
+
+						renderer.render( scene, camera );
+					},
+				};
+
+				const gui = new GUI();
+				gui.add(formData, 'srcLayer', 0, spiritedaway.image.depth - 1, 1);
+				gui.add(formData, 'destLayer', 0, textureArray.image.depth - 1, 1);
+				gui.add(formData, 'transfer');
+
+				/// Setup the scene.
 
 				const material = new THREE.ShaderMaterial( {
 					uniforms: {
@@ -137,25 +170,6 @@
 				mesh = new THREE.InstancedMesh( geometry, material, 3 );
 
 				scene.add( mesh );
-
-				let i = 0;
-
-				setInterval( () => {
-
-					textureArray.mipmaps[ 0 ].data.set(
-						baseData.subarray(
-							layerSize * ( i % spiritedaway.image.depth ),
-							layerSize * ( ( i % spiritedaway.image.depth ) + 1 ),
-						),
-						layerSize * ( i % 3 )
-					);
-					textureArray.addLayerUpdates( i % 3 );
-					textureArray.needsUpdate = true;
-					++ i;
-
-					renderer.render( scene, camera );
-
-				}, 1000 );
 
 				window.addEventListener( 'resize', onWindowResize );
 
