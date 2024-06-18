@@ -750,7 +750,7 @@ class UIPoints3 extends UIPoints {
 
 	}
 
-	setValue( points, update = true ) {
+	setValue( points, needsUpdate = true ) {
 
 		this.clear();
 
@@ -761,7 +761,7 @@ class UIPoints3 extends UIPoints {
 
 		}
 
-		if ( update === true ) this.update();
+		if ( needsUpdate === true ) this.update();
 
 		return this;
 
