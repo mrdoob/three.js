@@ -63,7 +63,7 @@ class FunctionNode extends CodeNode {
 
 		const propertyName = builder.getPropertyName( nodeCode );
 
-		let code = this.getNodeFunction( builder ).getCode( propertyName );
+		let code = this.getNodeFunction( builder ).getCode( propertyName, builder.getType(type) );
 
 		const keywords = this.keywords;
 		const keywordsProperties = Object.keys( keywords );

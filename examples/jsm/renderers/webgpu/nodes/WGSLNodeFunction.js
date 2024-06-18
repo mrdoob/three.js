@@ -1,7 +1,7 @@
 import NodeFunction from '../../../nodes/core/NodeFunction.js';
 import NodeFunctionInput from '../../../nodes/core/NodeFunctionInput.js';
 
-const declarationRegexp = /^[fn]*\s*([a-z_0-9]+)?\s*\(([\s\S]*?)\)\s*[\-\>]*\s*([a-z_0-9]+)?/i;
+const declarationRegexp = /^[fn]*\s*([a-z_0-9]+)?\s*\(([\s\S]*?)\)\s*[\-\>]*\s*([a-z_0-9]+(?:<[\s\S]+?>)?)/i;
 const propertiesRegexp = /([a-z_0-9]+)\s*:\s*([a-z_0-9]+(?:<[\s\S]+?>)?)/ig;
 
 const wgslTypeLib = {
@@ -99,7 +99,9 @@ const parse = ( source ) => {
 		const blockCode = source.substring( declaration[ 0 ].length );
 
 		const name = declaration[ 1 ] !== undefined ? declaration[ 1 ] : '';
-		const type = declaration[ 3 ] || 'void';
+		let type = declaration[ 3 ] || 'void';
+
+		type = wgslTypeLib[type] || type;
 
 		return {
 			type,
@@ -130,9 +132,9 @@ class WGSLNodeFunction extends NodeFunction {
 
 	}
 
-	getCode( name = this.name ) {
+	getCode( name = this.name, outputType = this.type ) {
 
-		const type = this.type !== 'void' ? '-> ' + this.type : '';
+		const type = outputType !== 'void' ? '-> ' + outputType : '';
 
 		return `fn ${ name } ( ${ this.inputsCode.trim() } ) ${ type }` + this.blockCode;
 
