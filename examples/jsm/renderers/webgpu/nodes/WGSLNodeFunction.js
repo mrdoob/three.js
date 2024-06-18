@@ -97,18 +97,18 @@ const parse = ( source ) => {
 		}
 
 		const blockCode = source.substring( declaration[ 0 ].length );
+		const outputType = declaration[ 3 ] || 'void';
 
 		const name = declaration[ 1 ] !== undefined ? declaration[ 1 ] : '';
-		let type = declaration[ 3 ] || 'void';
-
-		type = wgslTypeLib[type] || type;
+		const type = wgslTypeLib[ outputType ] || outputType;
 
 		return {
 			type,
 			inputs,
 			name,
 			inputsCode,
-			blockCode
+			blockCode,
+			outputType
 		};
 
 	} else {
@@ -123,20 +123,21 @@ class WGSLNodeFunction extends NodeFunction {
 
 	constructor( source ) {
 
-		const { type, inputs, name, inputsCode, blockCode } = parse( source );
+		const { type, inputs, name, inputsCode, blockCode, outputType } = parse( source );
 
 		super( type, inputs, name );
 
 		this.inputsCode = inputsCode;
 		this.blockCode = blockCode;
+		this.outputType = outputType;
 
 	}
 
-	getCode( name = this.name, outputType = this.type ) {
+	getCode( name = this.name ) {
 
-		const type = outputType !== 'void' ? '-> ' + outputType : '';
+		const outputType = this.outputType !== 'void' ? '-> ' + this.outputType : '';
 
-		return `fn ${ name } ( ${ this.inputsCode.trim() } ) ${ type }` + this.blockCode;
+		return `fn ${ name } ( ${ this.inputsCode.trim() } ) ${ outputType }` + this.blockCode;
 
 	}
 
