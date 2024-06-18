@@ -568,7 +568,7 @@ function setValueT1( gl, v, textures ) {
 
 	}
 
-	let emptyTexture2D = null;
+	let emptyTexture2D;
 
 	if ( this.type === gl.SAMPLER_2D_SHADOW ) {
 
