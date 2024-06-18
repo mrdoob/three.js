@@ -288,12 +288,12 @@ class ViewHelper extends Object3D {
 			context.fillStyle = color.getStyle();
 			context.fill();
 
-			if (text !== null) {
+			if ( text !== null ) {
 
 				context.font = font;
 				context.textAlign = 'center';
 				context.fillStyle = labelColor;
-				context.fillText(text, 32, 41);
+				context.fillText( text, 32, 41 );
 
 			}
 
