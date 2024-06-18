@@ -166,6 +166,8 @@ class TransformControls extends Object3D {
 		this._quaternionStart = new Quaternion();
 		this._scaleStart = new Vector3();
 
+		this._transformMatrixWorldInv = new Matrix4();
+
 		this._getPointer = getPointer.bind( this );
 		this._onPointerDown = onPointerDown.bind( this );
 		this._onPointerHover = onPointerHover.bind( this );
@@ -212,6 +214,14 @@ class TransformControls extends Object3D {
 		} else {
 
 			this.eye.copy( this.cameraPosition ).sub( this.worldPosition ).normalize();
+
+		}
+
+		// keep the matrixWorld to identity
+		if ( this.parent ) {
+
+			this._transformMatrixWorldInv.copy( this.parent.matrixWorld ).invert();
+			this._transformMatrixWorldInv.decompose( this.position, this.rotation, this.scale );
 
 		}
 
@@ -359,35 +369,27 @@ class TransformControls extends Object3D {
 
 				if ( space === 'world' ) {
 
-					if ( object.parent ) {
-
-						object.position.add( _tempVector.setFromMatrixPosition( object.parent.matrixWorld ) );
-
-					}
+					object.getWorldPosition( this.worldPosition );
 
 					if ( axis.search( 'X' ) !== - 1 ) {
 
-						object.position.x = Math.round( object.position.x / this.translationSnap ) * this.translationSnap;
+						this.worldPosition.x = Math.round( this.worldPosition.x / this.translationSnap ) * this.translationSnap;
 
 					}
 
 					if ( axis.search( 'Y' ) !== - 1 ) {
 
-						object.position.y = Math.round( object.position.y / this.translationSnap ) * this.translationSnap;
+						this.worldPosition.y = Math.round( this.worldPosition.y / this.translationSnap ) * this.translationSnap;
 
 					}
 
 					if ( axis.search( 'Z' ) !== - 1 ) {
 
-						object.position.z = Math.round( object.position.z / this.translationSnap ) * this.translationSnap;
+						this.worldPosition.z = Math.round( this.worldPosition.z / this.translationSnap ) * this.translationSnap;
 
 					}
 
-					if ( object.parent ) {
-
-						object.position.sub( _tempVector.setFromMatrixPosition( object.parent.matrixWorld ) );
-
-					}
+					object.position.copy( object.parent.worldToLocal( this.worldPosition ) );
 
 				}
 
