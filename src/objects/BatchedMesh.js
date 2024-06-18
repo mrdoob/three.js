@@ -734,10 +734,10 @@ class BatchedMesh extends Mesh {
 			let totalIndexCount = 0;
 
 			// NOTE: for maximum safety we can sort reservedRanges by vertexStart
-			reservedRanges.forEach( ( reservedRange ) => {
+			reservedRanges.forEach( ( reservedRange, geometryId ) => {
 
 				// copy geometry over
-				const drawRange = drawRanges.get( reservedRange.geometryId );
+				const drawRange = drawRanges.get( geometryId );
 				const vertexStart = reservedRange.vertexStart;
 				const vertexCount = reservedRange.vertexCount;
 
