@@ -2,13 +2,13 @@ import LightingNode from './LightingNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { /*vec2,*/ vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { vec3, vec4 } from '../shadernode/ShaderNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
 import { normalWorld } from '../accessors/NormalNode.js';
 import { WebGPUCoordinateSystem } from 'three';
-//import { add } from '../math/OperatorNode.js';
+import { mix } from '../math/MathNode.js';
 
 import { Color, DepthTexture, NearestFilter, LessCompare, NoToneMapping } from 'three';
 
@@ -83,6 +83,7 @@ class AnalyticLightNode extends LightingNode {
 
 			//
 
+			const shadowIntensity = reference( 'intensity', 'float', shadow );
 			const bias = reference( 'bias', 'float', shadow );
 			const normalBias = reference( 'normalBias', 'float', shadow );
 
@@ -159,7 +160,7 @@ class AnalyticLightNode extends LightingNode {
 			const shadowMaskNode = frustumTest.mix( 1, shadowNode.mix( shadowColor.a.mix( 1, shadowColor ), 1 ) );
 
 			this.rtt = rtt;
-			this.colorNode = this.colorNode.mul( shadowMaskNode );
+			this.colorNode = this.colorNode.mul( mix( 1, shadowMaskNode, shadowIntensity ) );
 
 			this.shadowNode = shadowNode;
 			this.shadowMaskNode = shadowMaskNode;

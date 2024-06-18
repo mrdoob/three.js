@@ -351,6 +351,8 @@ class ShaderNodeInternal extends Node {
 		this.jsFunc = jsFunc;
 		this.layout = null;
 
+		this.global = true;
+
 	}
 
 	get isArrayInput() {

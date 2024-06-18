@@ -51,7 +51,7 @@ export { triNoise3D } from './math/TriNoise3D.js';
 // utils
 export { default as ArrayElementNode } from './utils/ArrayElementNode.js';
 export { default as ConvertNode } from './utils/ConvertNode.js';
-export { default as DiscardNode, discard } from './utils/DiscardNode.js';
+export { default as DiscardNode, discard, Return } from './utils/DiscardNode.js';
 export { default as EquirectUVNode, equirectUV } from './utils/EquirectUVNode.js';
 export { default as FunctionOverloadingNode, overloadingFn } from './utils/FunctionOverloadingNode.js';
 export { default as JoinNode } from './utils/JoinNode.js';
@@ -151,6 +151,7 @@ export { default as ComputeNode, compute } from './gpgpu/ComputeNode.js';
 export { default as LightNode, lightTargetDirection } from './lighting/LightNode.js';
 export { default as PointLightNode } from './lighting/PointLightNode.js';
 export { default as DirectionalLightNode } from './lighting/DirectionalLightNode.js';
+export { default as RectAreaLightNode } from './lighting/RectAreaLightNode.js';
 export { default as SpotLightNode } from './lighting/SpotLightNode.js';
 export { default as IESSpotLightNode } from './lighting/IESSpotLightNode.js';
 export { default as AmbientLightNode } from './lighting/AmbientLightNode.js';

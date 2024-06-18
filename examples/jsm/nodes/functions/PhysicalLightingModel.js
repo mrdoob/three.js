@@ -5,10 +5,11 @@ import EnvironmentBRDF from './BSDF/EnvironmentBRDF.js';
 import F_Schlick from './BSDF/F_Schlick.js';
 import Schlick_to_F0 from './BSDF/Schlick_to_F0.js';
 import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
+import { LTC_Evaluate, LTC_Uv } from './BSDF/LTC.js';
 import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, specularColor, specularF90, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
-import { positionViewDirection, positionWorld } from '../accessors/PositionNode.js';
+import { positionViewDirection, positionView, positionWorld } from '../accessors/PositionNode.js';
 import { tslFn, float, vec2, vec3, vec4, mat3, If } from '../shadernode/ShaderNode.js';
 import { cond } from '../math/CondNode.js';
 import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
@@ -471,6 +472,38 @@ class PhysicalLightingModel extends LightingModel {
 		reflectedLight.directDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor: diffuseColor.rgb } ) ) );
 
 		reflectedLight.directSpecular.addAssign( irradiance.mul( BRDF_GGX( { lightDirection, f0: specularColor, f90: 1, roughness, iridescence: this.iridescence, f: this.iridescenceFresnel, USE_IRIDESCENCE: this.iridescence, USE_ANISOTROPY: this.anisotropy } ) ) );
+
+	}
+
+	directRectArea( { lightColor, lightPosition, halfWidth, halfHeight, reflectedLight, ltc_1, ltc_2 } ) {
+
+		const p0 = lightPosition.add( halfWidth ).sub( halfHeight ); // counterclockwise; light shines in local neg z direction
+		const p1 = lightPosition.sub( halfWidth ).sub( halfHeight );
+		const p2 = lightPosition.sub( halfWidth ).add( halfHeight );
+		const p3 = lightPosition.add( halfWidth ).add( halfHeight );
+
+		const N = transformedNormalView;
+		const V = positionViewDirection;
+		const P = positionView.toVar();
+
+		const uv = LTC_Uv( { N, V, roughness } );
+
+		const t1 = ltc_1.uv( uv ).toVar();
+		const t2 = ltc_2.uv( uv ).toVar();
+
+		const mInv = mat3(
+			vec3( t1.x, 0, t1.y ),
+			vec3( 0, 1, 0 ),
+			vec3( t1.z, 0, t1.w )
+		).toVar();
+
+		// LTC Fresnel Approximation by Stephen Hill
+		// http://blog.selfshadow.com/publications/s2016-advances/s2016_ltc_fresnel.pdf
+		const fresnel = specularColor.mul( t2.x ).add( specularColor.oneMinus().mul( t2.y ) ).toVar();
+
+		reflectedLight.directSpecular.addAssign( lightColor.mul( fresnel ).mul( LTC_Evaluate( { N, V, P, mInv, p0, p1, p2, p3 } ) ) );
+
+		reflectedLight.directDiffuse.addAssign( lightColor.mul( diffuseColor ).mul( LTC_Evaluate( { N, V, P, mInv: mat3( 1, 0, 0, 0, 1, 0, 0, 0, 1 ), p0, p1, p2, p3 } ) ) );
 
 	}
 

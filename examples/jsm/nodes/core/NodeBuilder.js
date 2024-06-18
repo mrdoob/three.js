@@ -316,6 +316,15 @@ class NodeBuilder {
 
 	}
 
+	getCacheFromNode( node, parent = true ) {
+
+		const data = this.getDataFromNode( node );
+		if ( data.cache === undefined ) data.cache = new NodeCache( parent ? this.getCache() : null );
+
+		return data.cache;
+
+	}
+
 	isAvailable( /*name*/ ) {
 
 		return false;
@@ -639,13 +648,13 @@ class NodeBuilder {
 
 		cache = cache === null ? ( node.isGlobal( this ) ? this.globalCache : this.cache ) : cache;
 
-		let nodeData = cache.getNodeData( node );
+		let nodeData = cache.getData( node );
 
 		if ( nodeData === undefined ) {
 
 			nodeData = {};
 
-			cache.setNodeData( node, nodeData );
+			cache.setData( node, nodeData );
 
 		}
 

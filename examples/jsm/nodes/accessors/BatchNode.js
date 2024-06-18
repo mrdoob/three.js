@@ -46,7 +46,6 @@ class BatchNode extends Node {
 			textureLoad( matriceTexture, ivec2( x.add( 3 ), y ) )
 		);
 
-
 		const bm = mat3(
 			batchingMatrix[ 0 ].xyz,
 			batchingMatrix[ 1 ].xyz,
