@@ -495,9 +495,6 @@ class BatchedMesh extends Mesh {
 		this._geometryLastId ++;
 		this._geometryCount ++;
 
-		// set id to reserved range for further optimizing
-		reservedRange.geometryId = geometryId;
-
 		// add the reserved range and draw range objects
 		reservedRanges.set( geometryId, reservedRange );
 		drawRanges.set(
@@ -1047,7 +1044,7 @@ class BatchedMesh extends Mesh {
 
 		// if the geometry is out of range, not active, or visibility state
 		// does not change then return early
-		const info = this._drawInfos.get( info => info.instanceId === instanceId );
+		const info = this._drawInfos.get( instanceId );
 		if ( info === undefined || info.active === false || info.visible === value ) {
 
 			return this;
