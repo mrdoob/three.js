@@ -33,7 +33,7 @@
 			let physics, position;
 
 			let boxes, spheres;
-			let physicBoxes = [], physicSpheres = [];
+			let physicsBoxes = [], physicsSpheres = [];
 
 			init();
 
@@ -113,8 +113,8 @@
 				}
 
 				physics.addToWorld( floor, 0 );
-				physicBoxes = physics.addToWorld( boxes, 1 );
-				physicSpheres = physics.addToWorld( spheres, 1 );
+				physicsBoxes = physics.addToWorld( boxes, 1 );
+				physicsSpheres = physics.addToWorld( spheres, 1 );
 
 				//
 
@@ -131,7 +131,7 @@
 
 				document.querySelector( 'button#shake' ).addEventListener( 'click', () => {
 
-					[ ...physicBoxes, ...physicSpheres ].map( ( item ) => {
+					[ ...physicsBoxes, ...physicsSpheres ].map( ( item ) => {
 
 						item.rigidBody.applyImpulse(
 							{

@@ -38,7 +38,7 @@ let RAPIER = null;
 /**
  * @initial_author mrdoob | info@mrdoob.com
  *
- * @description Physic helper based on `Rapier`
+ * @description Physics helper based on `Rapier`
  *
  * @docs https://rapier.rs/docs/api/javascript/JavaScript3D/
  */
@@ -104,8 +104,8 @@ export class Physics {
 
 		const physicsProperties =
 			object instanceof InstancedMesh
-				? this.createInstancedPhysicProperties(object, colliderDesc, mass)
-				: this.createPhysicProperties(
+				? this.createInstancedPhysicsProperties(object, colliderDesc, mass)
+				: this.createPhysicsProperties(
 						colliderDesc,
 						object.position,
 						object.quaternion,
@@ -257,14 +257,14 @@ export class Physics {
 	 * @param {Rapier.ColliderDesc} colliderDesc {@link Rapier.ColliderDesc}
 	 * @param {number | undefined} mass
 	 */
-	createInstancedPhysicProperties(mesh, colliderDesc, mass) {
+	createInstancedPhysicsProperties(mesh, colliderDesc, mass) {
 		const array = mesh.instanceMatrix.array;
 		const bodies = [];
 
 		for (let i = 0; i < mesh.count; i++) {
 			const position = this._vector.fromArray(array, i * 16 + 12);
 			bodies.push(
-				this.createPhysicProperties(colliderDesc, position, null, mass)
+				this.createPhysicsProperties(colliderDesc, position, null, mass)
 			);
 		}
 
@@ -279,7 +279,7 @@ export class Physics {
 	 * @param {Rapier.Rotation} rotation {@link Rapier.Rotation}
 	 * @param {number | null | undefined} mass
 	 */
-	createPhysicProperties(colliderDesc, position, rotation, mass = 0) {
+	createPhysicsProperties(colliderDesc, position, rotation, mass = 0) {
 		const rigidBodyDesc =
 			mass > 0
 				? this.rapier.RigidBodyDesc.dynamic()
@@ -297,7 +297,7 @@ export class Physics {
 	 * @param {Object3DWithGeometry} object
 	 * @param {number | number} index
 	 */
-	getPhysicPropertiesFromObject(object, index = 0) {
+	getPhysicsPropertiesFromObject(object, index = 0) {
 		const _physicsProperties = this.dynamicObjectMap.get(object);
 		/** @type {PhysicsProperties} */
 		let body;
@@ -322,7 +322,7 @@ export class Physics {
 	 */
 	setObjectPosition(object, position, index = 0) {
 		/** @description Object physics properties (rigid body, collider, ...). */
-		const physicsProperties = this.getPhysicPropertiesFromObject(object, index);
+		const physicsProperties = this.getPhysicsPropertiesFromObject(object, index);
 		if (!physicsProperties) return;
 
 		const _vectorZero = new this.rapier.Vector3(0, 0, 0);
@@ -340,7 +340,7 @@ export class Physics {
 	 * @param {number | undefined} index
 	 */
 	setObjectVelocity(object, velocity, index = 0) {
-		const physicsProperties = this.getPhysicPropertiesFromObject(object, index);
+		const physicsProperties = this.getPhysicsPropertiesFromObject(object, index);
 		if (!physicsProperties) return;
 
 		physicsProperties.rigidBody.setLinvel(velocity, true);
@@ -366,7 +366,7 @@ export class Physics {
 				const bodies = this.dynamicObjectMap.get(object);
 
 				for (let j = 0; j < bodies.length; j++) {
-					const physicProperties = bodies[j];
+					const physicsProperties = bodies[j];
 
 					/** @type {Vector3} */
 					let position = this._position;
@@ -379,10 +379,10 @@ export class Physics {
 					this._matrix.decompose(position, quaternion, scale);
 
 					position = this._position.copy(
-						physicProperties.rigidBody.translation()
+						physicsProperties.rigidBody.translation()
 					);
 					quaternion = this._quaternion.copy(
-						physicProperties.rigidBody.rotation()
+						physicsProperties.rigidBody.rotation()
 					);
 					scale = this._scale.copy(scale);
 
@@ -404,7 +404,7 @@ export class Physics {
 	}
 
 	/**
-	 * @description Remove the specified object to the physic `world`.
+	 * @description Remove the specified object to the physics `world`.
 	 *
 	 * @param {Object3D} object Object3D based.
 	 */
