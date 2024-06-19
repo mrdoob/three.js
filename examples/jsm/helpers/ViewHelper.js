@@ -295,7 +295,7 @@ class ViewHelper extends Object3D {
 
 		function getSpriteMaterial( color, text ) {
 
-			const { font = '24px Arial', labelColor = '#000000', radius = 14 } = options;
+			const { font = '24px Arial', color: labelColor = '#000000', radius = 14 } = options;
 
 			const canvas = document.createElement( 'canvas' );
 			canvas.width = 64;
