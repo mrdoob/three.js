@@ -449,7 +449,21 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			let uniformGPU;
 
-			const bindings = this.bindings[ shaderStage ];
+			const groupName = node.groupNode.name;
+
+			let bindings = this.bindings[ shaderStage ][ groupName ];
+
+			if ( bindings === undefined ) {
+
+				if ( this.bindingsIndexes[ groupName ] === undefined ) {
+
+					this.bindingsIndexes[ groupName ] = { binding: 0, group: Object.keys( this.bindingsIndexes ).length };
+
+				}
+
+				bindings = this.bindings[ shaderStage ][ groupName ] = [];
+
+			}
 
 			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D' ) {
 
@@ -457,15 +471,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( type === 'texture' || type === 'storageTexture' ) {
 
-					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, node.access ? node.access : null );
+					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, uniformNode.groupNode, node.access ? node.access : null );
 
 				} else if ( type === 'cubeTexture' ) {
 
-					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, node.access ? node.access : null );
+					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, uniformNode.groupNode, node.access ? node.access : null );
 
 				} else if ( type === 'texture3D' ) {
 
-					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, node.access ? node.access : null );
+					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, uniformNode.groupNode, node.access ? node.access : null );
 
 				}
 
@@ -474,7 +488,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( shaderStage === 'fragment' && this.isUnfilterable( node.value ) === false && texture.store === false ) {
 
-					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
+					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node, node.groupNode );
 					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 					bindings.push( sampler, texture );
@@ -492,7 +506,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
 
 				const bufferClass = type === 'storageBuffer' ? NodeStorageBuffer : NodeUniformBuffer;
-				const buffer = new bufferClass( node );
+				const buffer = new bufferClass( node, node.groupNode );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
@@ -526,12 +540,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 			}
 
 			nodeData.uniformGPU = uniformGPU;
-
-			if ( shaderStage === 'vertex' ) {
-
-				this.bindingsOffset[ 'fragment' ] = bindings.length;
-
-			}
 
 		}
 
@@ -816,9 +824,10 @@ ${ flowData.code }
 		const structSnippets = [];
 		const uniformGroups = {};
 
-		let index = this.bindingsOffset[ shaderStage ];
-
 		for ( const uniform of uniforms ) {
+
+			const groundName = uniform.groupNode.name;
+			const uniformIndexes = this.bindingsIndexes[ groundName ];
 
 			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
 
@@ -828,11 +837,11 @@ ${ flowData.code }
 
 					if ( texture.isDepthTexture === true && texture.compareFunction !== null ) {
 
-						bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler_comparison;` );
+						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 
 					} else {
 
-						bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler;` );
+						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler;` );
 
 					}
 
@@ -865,7 +874,7 @@ ${ flowData.code }
 					const format = getFormat( texture );
 					const access = this.getStorageAccess( uniform.node );
 
-					textureType = `texture_storage_2d<${ format }, ${access}>`;
+					textureType = `texture_storage_2d<${ format }, ${ access }>`;
 
 				} else {
 
@@ -875,7 +884,7 @@ ${ flowData.code }
 
 				}
 
-				bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name} : ${textureType};` );
+				bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name } : ${ textureType };` );
 
 			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' ) {
 
@@ -884,10 +893,10 @@ ${ flowData.code }
 				const bufferCount = bufferNode.bufferCount;
 
 				const bufferCountSnippet = bufferCount > 0 ? ', ' + bufferCount : '';
-				const bufferSnippet = `\t${uniform.name} : array< ${bufferType}${bufferCountSnippet} >\n`;
+				const bufferSnippet = `\t${ uniform.name } : array< ${ bufferType }${ bufferCountSnippet } >\n`;
 				const bufferAccessMode = bufferNode.isStorageBufferNode ? 'storage,read_write' : 'uniform';
 
-				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, index ++ ) );
+				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
 
 			} else {
 
@@ -895,7 +904,8 @@ ${ flowData.code }
 				const groupName = uniform.groupNode.name;
 
 				const group = uniformGroups[ groupName ] || ( uniformGroups[ groupName ] = {
-					index: index ++,
+					index: uniformIndexes.binding ++,
+					id: uniformIndexes.group,
 					snippets: []
 				} );
 
@@ -909,7 +919,7 @@ ${ flowData.code }
 
 			const group = uniformGroups[ name ];
 
-			structSnippets.push( this._getWGSLStructBinding( name, group.snippets.join( ',\n' ), 'uniform', group.index ) );
+			structSnippets.push( this._getWGSLStructBinding( name, group.snippets.join( ',\n' ), 'uniform', group.index, group.id ) );
 
 		}
 

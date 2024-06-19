@@ -1,3 +1,5 @@
+import BindGroup from '../BindGroup.js';
+
 class NodeBuilderState {
 
 	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, transforms = [] ) {
@@ -20,23 +22,32 @@ class NodeBuilderState {
 
 	createBindings() {
 
-		const bindingsArray = [];
+		const bindings = [];
 
-		for ( const instanceBinding of this.bindings ) {
+		for ( const instanceGroup of this.bindings ) {
 
-			let binding = instanceBinding;
+			const shared = instanceGroup.bindings[ 0 ].groupNode.shared;
 
-			if ( instanceBinding.shared !== true ) {
+			if ( shared !== true ) {
 
-				binding = instanceBinding.clone();
+				const bindingsGroup = new BindGroup( instanceGroup.name );
+				bindings.push( bindingsGroup );
+
+				for ( const instanceBinding of instanceGroup.bindings ) {
+
+					bindingsGroup.bindings.push( instanceBinding.clone() );
+
+				}
+
+			} else {
+
+				bindings.push( instanceGroup );
 
 			}
 
-			bindingsArray.push( binding );
-
 		}
 
-		return bindingsArray;
+		return bindings;
 
 	}
 

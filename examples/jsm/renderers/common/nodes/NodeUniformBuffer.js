@@ -4,11 +4,12 @@ let _id = 0;
 
 class NodeUniformBuffer extends UniformBuffer {
 
-	constructor( nodeUniform ) {
+	constructor( nodeUniform, groupNode ) {
 
 		super( 'UniformBuffer_' + _id ++, nodeUniform ? nodeUniform.value : null );
 
 		this.nodeUniform = nodeUniform;
+		this.groupNode = groupNode;
 
 	}
 
