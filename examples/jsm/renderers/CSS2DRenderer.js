@@ -155,6 +155,7 @@ class CSS2DRenderer {
 					if ( parameters.mode === 'scale' ) {
 
 						transformString += ' scale(' + camera.zoom + ', ' + camera.zoom + ')';
+						element.style.transform = transformString;
 
 					}
 
