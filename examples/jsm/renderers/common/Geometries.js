@@ -76,7 +76,7 @@ class Geometries extends DataMap {
 		this.info = info;
 
 		this.wireframes = new WeakMap();
-		this.attributeCall = new WeakMap();
+		this.attributeVersion = new WeakMap();
 
 	}
 
@@ -170,13 +170,13 @@ class Geometries extends DataMap {
 
 	updateAttribute( attribute, type ) {
 
-		const callId = this.info.render.calls;
+		const attributeData = attribute.isInterleavedBufferAttribute ? attribute.data : attribute;
 
-		if ( this.attributeCall.get( attribute ) !== callId ) {
+		if ( this.attributeVersion.get( attribute ) !== attributeData.version ) {
 
 			this.attributes.update( attribute, type );
 
-			this.attributeCall.set( attribute, callId );
+			this.attributeVersion.set( attribute, attributeData.version );
 
 		}
 
