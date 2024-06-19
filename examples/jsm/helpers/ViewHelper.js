@@ -19,7 +19,7 @@ import {
 
 class ViewHelper extends Object3D {
 
-	constructor( camera, domElement, options ) {
+	constructor( camera, domElement ) {
 
 		super();
 
@@ -32,6 +32,8 @@ class ViewHelper extends Object3D {
 		const color2 = new Color( '#88ff44' );
 		const color3 = new Color( '#4488ff' );
 		const color4 = new Color( '#000000' );
+
+		const options = { };
 
 		const interactiveObjects = [];
 		const raycaster = new Raycaster();
@@ -54,11 +56,9 @@ class ViewHelper extends Object3D {
 		this.add( zAxis );
 		this.add( yAxis );
 
-		const { posXLabel = null, posYLabel = null, posZLabel = null } = options || {};
-
-		const spriteMaterial1 = getSpriteMaterial( color1, posXLabel, options );
-		const spriteMaterial2 = getSpriteMaterial( color2, posYLabel, options );
-		const spriteMaterial3 = getSpriteMaterial( color3, posZLabel, options );
+		const spriteMaterial1 = getSpriteMaterial( color1 );
+		const spriteMaterial2 = getSpriteMaterial( color2 );
+		const spriteMaterial3 = getSpriteMaterial( color3 );
 		const spriteMaterial4 = getSpriteMaterial( color4 );
 
 		const posXAxisHelper = new Sprite( spriteMaterial1 );
@@ -168,6 +168,26 @@ class ViewHelper extends Object3D {
 
 		};
 
+		this.setLabels = function ( labelX, labelY, labelZ ) {
+
+			options.labelX = labelX;
+			options.labelY = labelY;
+			options.labelZ = labelZ;
+
+			updateLabels();
+
+		};
+
+		this.setLabelStyle = function ( font, color, radius ) {
+
+			options.font = font;
+			options.color = color;
+			options.radius = radius;
+
+			updateLabels();
+
+		};
+
 		this.update = function ( delta ) {
 
 			const step = delta * turnRate;
@@ -273,7 +293,7 @@ class ViewHelper extends Object3D {
 
 		}
 
-		function getSpriteMaterial( color, text = null, options = {} ) {
+		function getSpriteMaterial( color, text ) {
 
 			const { font = '24px Arial', labelColor = '#000000', radius = 14 } = options;
 
@@ -288,12 +308,12 @@ class ViewHelper extends Object3D {
 			context.fillStyle = color.getStyle();
 			context.fill();
 
-			if (text !== null) {
+			if ( text ) {
 
 				context.font = font;
 				context.textAlign = 'center';
 				context.fillStyle = labelColor;
-				context.fillText(text, 32, 41);
+				context.fillText( text, 32, 41 );
 
 			}
 
@@ -301,6 +321,22 @@ class ViewHelper extends Object3D {
 			texture.colorSpace = SRGBColorSpace;
 
 			return new SpriteMaterial( { map: texture, toneMapped: false } );
+
+		}
+
+		function updateLabels() {
+
+			posXAxisHelper.material.map.dispose();
+			posYAxisHelper.material.map.dispose();
+			posZAxisHelper.material.map.dispose();
+
+			posXAxisHelper.material.dispose();
+			posYAxisHelper.material.dispose();
+			posZAxisHelper.material.dispose();
+
+			posXAxisHelper.material = getSpriteMaterial( color1, options.labelX );
+			posYAxisHelper.material = getSpriteMaterial( color2, options.labelY );
+			posZAxisHelper.material = getSpriteMaterial( color3, options.labelZ );
 
 		}
 
