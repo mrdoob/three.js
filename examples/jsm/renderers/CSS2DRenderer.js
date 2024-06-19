@@ -62,7 +62,7 @@ const _b = new Vector3();
 
 class CSS2DRenderer {
 
-	constructor( parameters = {} ) {
+	constructor( parameters = { mode: 'default' } ) {
 
 		const _this = this;
 
@@ -150,7 +150,14 @@ class CSS2DRenderer {
 
 					object.onBeforeRender( _this, scene, camera );
 
-					element.style.transform = 'translate(' + ( - 100 * object.center.x ) + '%,' + ( - 100 * object.center.y ) + '%)' + 'translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px) scale(' + camera.zoom + ', ' + camera.zoom + ')';
+					let transformString = 'translate(' + ( - 100 * object.center.x ) + '%,' + ( - 100 * object.center.y ) + '%)' + 'translate(' + ( _vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - _vector.y * _heightHalf + _heightHalf ) + 'px)';
+					
+					if ( parameters.mode === 'scale' ) {
+
+						transformString += ' scale(' + camera.zoom + ', ' + camera.zoom + ')';
+
+					}
+
 
 					if ( element.parentNode !== domElement ) {
 
