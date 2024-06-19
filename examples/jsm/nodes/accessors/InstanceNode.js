@@ -95,13 +95,13 @@ class InstanceNode extends Node {
 
 	update( /*frame*/ ) {
 
-		if ( this.buffer !== null && this.instanceMesh.instanceMatrix.version !== this.buffer.version ) {
+		if ( this.instanceMesh.instanceMatrix.version !== this.buffer.version ) {
 
 			this.buffer.version = this.instanceMesh.instanceMatrix.version;
 
 		}
 
-		if ( this.bufferColor !== null && this.instanceMesh.instanceColor.version !== this.bufferColor.version ) {
+		if ( this.instanceMesh.instanceColor !== null && this.instanceMesh.instanceColor.version !== this.bufferColor.version ) {
 
 			this.bufferColor.version = this.instanceMesh.instanceColor.version;
 
