@@ -101,7 +101,7 @@ class InstanceNode extends Node {
 
 		}
 
-		if ( this.instanceMesh.instanceColor !== null && this.instanceMesh.instanceColor.version !== this.bufferColor.version ) {
+		if ( this.instanceMesh.instanceColor && this.instanceMesh.instanceColor.version !== this.bufferColor.version ) {
 
 			this.bufferColor.version = this.instanceMesh.instanceColor.version;
 
