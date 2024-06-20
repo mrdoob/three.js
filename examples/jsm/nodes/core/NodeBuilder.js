@@ -212,9 +212,11 @@ class NodeBuilder {
 
 	getBindGroupArray( groupName, shaderStage ) {
 
-		let bindings = this.bindings[ shaderStage ][ groupName ];
+		const bindings = this.bindings[ shaderStage ];
 
-		if ( bindings === undefined ) {
+		let bindGroup = bindings[ groupName ];
+
+		if ( bindGroup === undefined ) {
 
 			if ( this.bindingsIndexes[ groupName ] === undefined ) {
 
@@ -222,11 +224,11 @@ class NodeBuilder {
 
 			}
 
-			bindings = this.bindings[ shaderStage ][ groupName ] = [];
+			bindings[ groupName ] = bindGroup = [];
 
 		}
 
-		return bindings;
+		return bindGroup;
 
 	}
 
