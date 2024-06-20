@@ -501,7 +501,7 @@ ${ this.tab }} )`;
 
 		this.addImport( 'overloadingFn' );
 
-		return `const ${ name } = overloadingFn( [ ${ nodes.map( node => node.name + '_' + nodes.indexOf( node ) ).join( ', ' ) } ] );\n`;
+		return `export const ${ name } = /*#__PURE__*/ overloadingFn( [ ${ nodes.map( node => node.name + '_' + nodes.indexOf( node ) ).join( ', ' ) } ] );\n`;
 
 	}
 
