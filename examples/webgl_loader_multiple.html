@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js - Multi-File Viewer (FBX, glTF, USDZ, OBJ)</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Multi-File Viewer (FBX, glTF, USDZ, OBJ)<br />
+			Drag-and-drop model files with embedded textures<br />
+			<a href="https://hdrihaven.com/hdri/?h=quarry_01" target="_blank" rel="noopener">Quarry</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a><br />
+			<button id="download-gltf">Download glTF</button><button id="download-usdz">Download USDZ</button><button id="download-obj">Download OBJ</button>
+			<input id="file-input" name="file-input" type="file"/>
+		</div>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { KTX2Loader } from './jsm/loaders/KTX2Loader.js';
+			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+			import { MeshoptDecoder } from './jsm/libs/meshopt_decoder.module.js';
+
+			import { FBXLoader } from './jsm/loaders/FBXLoader.js';
+			import { USDZLoader } from './jsm/loaders/USDZLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+
+			import { USDZExporter } from './jsm/exporters/USDZExporter.js';
+			import { GLTFExporter } from './jsm/exporters/GLTFExporter.js';
+			import { OBJExporter } from './jsm/exporters/OBJExporter.js';
+
+			let camera, scene, renderer, controls, currentModel, ktx2Loader, dracoLoader, clock, mixer;
+			let link;
+
+			init();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( - 1.8, 0.6, 2.7 );
+
+				scene = new THREE.Scene();
+				clock = new THREE.Clock();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				container.appendChild( renderer.domElement );
+
+				ktx2Loader = new KTX2Loader()
+					.setTranscoderPath( 'js/libs/basis/' )
+					.detectSupport( renderer );
+
+				dracoLoader = new DRACOLoader()
+					.setDecoderPath( 'js/libs/draco/' );
+
+				new RGBELoader()
+					.setPath( 'textures/equirectangular/' )
+					.load( 'quarry_01_1k.hdr', function ( texture ) {
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+						texture.generateMipmaps = true;
+						texture.minFilter = THREE.LinearMipmapLinearFilter;
+
+						scene.environment = texture;
+						scene.backgroundBlurriness = 1.0;
+						scene.background = texture;
+
+						animate();
+
+					} );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 0.01;
+				controls.maxDistance = 10;
+				controls.target.set( 0, 0, - 0.2 );
+				controls.update();
+
+				// drag 'n drop
+				initDragAndDrop();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// add button click events to download glTF and USDZ
+
+				link = document.createElement( 'a' );
+				link.style.display = 'none';
+				document.body.appendChild( link ); // Firefox workaround, see #6594
+
+				document.getElementById( 'download-gltf' ).addEventListener( 'click', function () {
+
+					const gltfExporter = new GLTFExporter();
+
+					const options = {
+						trs: true,
+						onlyVisible: true,
+						binary: true,
+					};
+
+					gltfExporter.parse(
+
+						scene,
+						function ( result ) {
+
+							if ( result instanceof ArrayBuffer ) {
+
+								saveArrayBuffer( result, 'scene.glb' );
+
+							} else {
+
+								const output = JSON.stringify( result, null, 2 );
+								console.log( output );
+								saveString( output, 'scene.gltf' );
+
+							}
+
+						},
+						function ( error ) {
+
+							console.log( 'An error happened during glTF export', error );
+
+						},
+						options
+					);
+
+				} );
+
+				document.getElementById( 'download-usdz' ).addEventListener( 'click', function () {
+
+					const usdzExporter = new USDZExporter();
+
+					usdzExporter.parse( scene ).then( function ( result ) {
+
+						saveArrayBuffer( result, 'scene.usdz' );
+
+					} ).catch( function ( error ) {
+
+						console.log( 'An error happened during USDZ export', error );
+
+					} );
+
+				} );
+
+				document.getElementById( 'download-obj' ).addEventListener( 'click', function () {
+
+					const objExporter = new OBJExporter();
+
+					const result = objExporter.parse( scene );
+
+					saveString( result, 'scene.obj' );
+
+				} );
+
+			}
+
+			function saveArrayBuffer( buffer, filename ) {
+
+				save( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
+
+			}
+
+			function saveString( text, filename ) {
+
+				save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+			}
+
+			function save( blob, filename ) {
+
+				link.href = URL.createObjectURL( blob );
+				link.download = filename;
+				link.click();
+
+				// URL.revokeObjectURL( url ); breaks Firefox...
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				if ( mixer !== undefined ) {
+
+					var delta = clock.getDelta();
+					mixer.update( delta );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+			//
+
+			function addToScene( subscene, animations ) {
+
+				if ( currentModel !== undefined ) {
+
+					currentModel.removeFromParent();
+
+					// disposing all loaded meshes, materials and textures in the currently loaded model
+					currentModel.traverse( function ( node ) {
+
+						if ( ! node.isMesh ) return;
+
+						node.geometry.dispose();
+						const materials = Array.isArray( node.material ) ? node.material : [ node.material ];
+						materials.forEach( ( material ) => {
+
+							for ( const key of Object.keys( material ) ) {
+
+								if ( material[ key ] && material[ key ].isTexture ) {
+
+									material[ key ].dispose();
+
+								}
+
+							}
+
+							material.dispose();
+
+						} );
+
+					} );
+
+				}
+
+				currentModel = subscene;
+				scene.add( currentModel );
+
+				// enable shadows
+				currentModel.traverse( function ( node ) {
+
+					if ( ! node.isMesh ) return;
+
+					node.castShadow = true;
+					node.receiveShadow = true;
+
+					const materials = Array.isArray( node.material ) ? node.material : [ node.material ];
+					materials.forEach( ( material ) => {
+
+						for ( const key of Object.keys( material ) ) {
+
+							if ( material[ key ] && material[ key ].isTexture ) {
+
+								// example for how to do something per texture after loading.
+
+							}
+
+						}
+
+					} );
+
+				} );
+
+				if ( animations && animations.length > 0 ) {
+
+					mixer = new THREE.AnimationMixer( currentModel );
+
+					const action = mixer.clipAction( animations[ 0 ] );
+					action.play();
+
+				} else {
+
+					mixer = undefined;
+
+				}
+
+				fitCameraToObjects( camera, controls, [ currentModel ], 1.25 );
+
+			}
+
+    		// Adapted from https://discourse.threejs.org/t/camera-zoom-to-fit-object/936/24
+			// Slower but better implementation that takes bones and exact vertex positions into account: https://github.com/google/model-viewer/blob/04e900c5027de8c5306fe1fe9627707f42811b05/packages/model-viewer/src/three-components/ModelScene.ts#L321
+			function fitCameraToObjects( camera, controls, objects, fitOffset = 1.5 ) {
+
+				const size = new THREE.Vector3();
+				const center = new THREE.Vector3();
+				const box = new THREE.Box3();
+
+				box.makeEmpty();
+				for ( const object of objects )
+					box.expandByObject( object );
+
+				box.getSize( size );
+				box.getCenter( center );
+
+				const maxSize = Math.max( size.x, size.y, size.z );
+				const fitHeightDistance = maxSize / ( 2 * Math.atan( Math.PI * camera.fov / 360 ) );
+				const fitWidthDistance = fitHeightDistance / camera.aspect;
+				const distance = fitOffset * Math.max( fitHeightDistance, fitWidthDistance );
+
+				const direction = controls.target.clone()
+					.sub( camera.position )
+					.normalize()
+					.multiplyScalar( distance );
+
+				controls.maxDistance = distance * 10;
+				controls.minDistance = distance * 0.01;
+				controls.target.copy( center );
+
+				camera.near = distance / 100;
+				camera.far = distance * 100;
+				camera.updateProjectionMatrix();
+
+				camera.position.copy( controls.target ).sub( direction );
+
+				controls.update();
+
+			}
+
+			function loadFile( file ) {
+
+				const filename = file.name;
+				const extension = filename.split( '.' ).pop().toLowerCase();
+
+				// To support .gltf, folder drop support would need to be added and the GLTFLoader paths set correctly. Omitted here for briefness.
+				if ( extension == 'glb' ) {
+
+					var reader = new FileReader();
+
+					reader.addEventListener( 'load', function ( ) {
+
+						const loader = new GLTFLoader();
+						loader.setKTX2Loader( ktx2Loader );
+						loader.setMeshoptDecoder( MeshoptDecoder );
+						loader.setDRACOLoader( dracoLoader );
+						loader.parse( reader.result, '', gltf => addToScene( gltf.scene, gltf.animations ) );
+
+					} );
+
+					reader.readAsArrayBuffer( file );
+
+				} else if ( extension == 'fbx' ) {
+
+					var reader = new FileReader();
+
+					reader.addEventListener( 'load', function ( ) {
+
+						const loader = new FBXLoader();
+						loader.load( reader.result, function ( object ) {
+
+							// convert materials from the FBX (only supports Lambert / Phong) to MeshStandard (supports IBL)
+							object.traverse( function ( child ) {
+
+								if ( ! child.isMesh ) return;
+
+								const currentMaterial = child.material;
+
+								child.material = new THREE.MeshStandardMaterial();
+
+								if ( currentMaterial ) {
+
+									child.material.color.copy( currentMaterial.color );
+									child.material.emissive.copy( currentMaterial.emissive );
+									child.material.emissiveIntensity = currentMaterial.emissiveIntensity;
+									child.material.opacity = currentMaterial.opacity;
+									child.material.displacementScale = currentMaterial.displacementScale;
+									child.material.transparent = currentMaterial.transparent;
+
+									child.material.bumpMap = currentMaterial.bumpMap;
+									child.material.aoMap = currentMaterial.aoMap;
+									child.material.map = currentMaterial.map;
+									child.material.displacementMap = currentMaterial.displacementMap;
+									child.material.emissiveMap = currentMaterial.emissiveMap;
+									child.material.normalMap = currentMaterial.normalMap;
+									child.material.envMap = currentMaterial.envMap;
+									child.material.alphaMap = currentMaterial.alphaMap;
+
+									child.material.metalness = currentMaterial.reflectivity;
+
+									if ( currentMaterial.shininess ) {
+
+										// from blender source code // https://github.com/blender/blender-addons/blob/5e66092bcbe0df6855b3fa814b4826add8b01360/io_scene_fbx/import_fbx.py#L1442
+										child.material.roughness = 1.0 - ( Math.sqrt( currentMaterial.shininess ) / 10.0 );
+
+									}
+
+									child.material.needsUpdate = true;
+
+								}
+
+							} );
+
+							addToScene( object, object.animations );
+
+						} );
+
+					} );
+
+					reader.readAsDataURL( file );
+
+				} else if ( extension == 'usdz' ) {
+
+					var reader = new FileReader();
+
+					reader.addEventListener( 'load', function ( ) {
+
+						const loader = new USDZLoader();
+
+						loader.load( reader.result, function ( object ) {
+
+							addToScene( object, object.animations );
+
+						} );
+
+					} );
+
+					reader.readAsDataURL( file );
+
+				} else if ( extension == 'obj' ) {
+
+					var reader = new FileReader();
+
+					reader.addEventListener( 'load', function ( ) {
+
+						const loader = new OBJLoader();
+						loader.load( reader.result, function ( object ) {
+
+							object.traverse( function ( child ) {
+
+								if ( ! child.isMesh ) return;
+
+								child.material = new THREE.MeshStandardMaterial();
+
+							} );
+
+							addToScene( object, object.animations );
+
+						} );
+
+					} );
+
+					reader.readAsDataURL( file );
+
+				} 
+
+			}
+
+			function initDragAndDrop() {
+
+				document.addEventListener( 'dragover', function ( event ) {
+
+					event.preventDefault();
+					event.dataTransfer.dropEffect = 'copy';
+
+				} );
+
+				document.addEventListener( 'drop', function ( event ) {
+
+					event.preventDefault();
+
+					loadFile( event.dataTransfer.files[ 0 ] );
+
+				} );
+
+				document.getElementById( 'file-input' ).addEventListener( 'change', function ( event ) {
+
+					event.preventDefault();
+
+					loadFile( event.target.files[ 0 ] );
+
+				} );
+
+			}
+
+		</script>
+
+	</body>
+</html>
