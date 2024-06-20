@@ -1599,8 +1599,6 @@ class WebGLRenderer {
 			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
-			material.onBeforeRender( _this, scene, camera, geometry, object, group );
-
 			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 				material.side = BackSide;
@@ -1674,8 +1672,6 @@ class WebGLRenderer {
 			} else {
 
 				parameters.uniforms = programCache.getUniforms( material );
-
-				material.onBuild( object, parameters, _this );
 
 				material.onBeforeCompile( parameters, _this );
 

@@ -1382,8 +1382,6 @@ class Renderer {
 
 		object.onBeforeRender( this, scene, camera, geometry, material, group );
 
-		material.onBeforeRender( this, scene, camera, geometry, material, group );
-
 		//
 
 		if ( scene.overrideMaterial !== null ) {
