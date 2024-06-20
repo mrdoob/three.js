@@ -5,7 +5,7 @@ import { int, float, vec3, If, tslFn } from '../../shadernode/ShaderNode.js';
 import { add, sub, mul } from '../../math/OperatorNode.js';
 import { floor, trunc, max, min } from '../../math/MathNode.js';
 
-const mx_hsvtorgb = tslFn( ( [ hsv_immutable ] ) => {
+export const mx_hsvtorgb = /*#__PURE__*/ tslFn( ( [ hsv_immutable ] ) => {
 
 	const hsv = vec3( hsv_immutable ).toVar();
 	const h = float( hsv.x ).toVar();
@@ -51,9 +51,15 @@ const mx_hsvtorgb = tslFn( ( [ hsv_immutable ] ) => {
 
 	} );
 
+} ).setLayout( {
+	name: 'mx_hsvtorgb',
+	type: 'vec3',
+	inputs: [
+		{ name: 'hsv', type: 'vec3' }
+	]
 } );
 
-const mx_rgbtohsv = tslFn( ( [ c_immutable ] ) => {
+export const mx_rgbtohsv = /*#__PURE__*/ tslFn( ( [ c_immutable ] ) => {
 
 	const c = vec3( c_immutable ).toVar();
 	const r = float( c.x ).toVar();
@@ -107,24 +113,10 @@ const mx_rgbtohsv = tslFn( ( [ c_immutable ] ) => {
 
 	return vec3( h, s, v );
 
-} );
-
-// layouts
-
-mx_hsvtorgb.setLayout( {
-	name: 'mx_hsvtorgb',
-	type: 'vec3',
-	inputs: [
-		{ name: 'hsv', type: 'vec3' }
-	]
-} );
-
-mx_rgbtohsv.setLayout( {
+} ).setLayout( {
 	name: 'mx_rgbtohsv',
 	type: 'vec3',
 	inputs: [
 		{ name: 'c', type: 'vec3' }
 	]
 } );
-
-export { mx_hsvtorgb, mx_rgbtohsv };
