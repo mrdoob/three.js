@@ -4,6 +4,7 @@ import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './Buf
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
 import { nodeProxy, vec3, mat3, mat4 } from '../shadernode/ShaderNode.js';
+import { NodeUpdateType } from '../core/constants.js';
 
 import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffer.js';
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
@@ -21,6 +22,11 @@ class InstanceNode extends Node {
 
 		this.instanceColorNode = null;
 
+		this.updateType = NodeUpdateType.FRAME;
+
+		this.buffer = null;
+		this.bufferColor = null;
+
 	}
 
 	setup( /*builder*/ ) {
@@ -34,6 +40,7 @@ class InstanceNode extends Node {
 			const instanceAttribute = instanceMesh.instanceMatrix;
 			const buffer = new InstancedInterleavedBuffer( instanceAttribute.array, 16, 1 );
 
+			this.buffer = buffer;
 			const bufferFn = instanceAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
 			const instanceBuffers = [
@@ -57,6 +64,7 @@ class InstanceNode extends Node {
 			const buffer = new InstancedBufferAttribute( instanceColorAttribute.array, 3 );
 			const bufferFn = instanceColorAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
+			this.bufferColor = buffer;
 			this.instanceColorNode = vec3( bufferFn( buffer, 'vec3', 3, 0 ) );
 
 		}
@@ -83,6 +91,22 @@ class InstanceNode extends Node {
 		if ( this.instanceColorNode !== null ) {
 
 			varyingProperty( 'vec3', 'vInstanceColor' ).assign( this.instanceColorNode );
+
+		}
+
+	}
+
+	update( /*frame*/ ) {
+
+		if ( this.instanceMesh.instanceMatrix.version !== this.buffer.version ) {
+
+			this.buffer.version = this.instanceMesh.instanceMatrix.version;
+
+		}
+
+		if ( this.instanceMesh.instanceColor && this.instanceMesh.instanceColor.version !== this.bufferColor.version ) {
+
+			this.bufferColor.version = this.instanceMesh.instanceColor.version;
 
 		}
 

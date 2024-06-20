@@ -33,7 +33,7 @@ class RangeNode extends Node {
 
 	getNodeType( builder ) {
 
-		return builder.object.isInstancedMesh === true ? builder.getTypeFromLength( this.getVectorLength( builder ) ) : 'float';
+		return builder.object.count > 1 ? builder.getTypeFromLength( this.getVectorLength( builder ) ) : 'float';
 
 	}
 
@@ -43,7 +43,7 @@ class RangeNode extends Node {
 
 		let output = null;
 
-		if ( object.isInstancedMesh === true ) {
+		if ( object.count > 1 ) {
 
 			const minValue = this.minNode.value;
 			const maxValue = this.maxNode.value;

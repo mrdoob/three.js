@@ -47,7 +47,7 @@
 		let gui;
 		let geometries, mesh, material;
 		const ids = [];
-		
+
 		const matrix = new THREE.Matrix4();
 
 		//
@@ -310,7 +310,7 @@
 
 				controls.update();
 
-		
+
 				if ( mesh.isBatchedMesh ) {
 
 					mesh.sortObjects = api.sortObjects;
@@ -352,7 +352,7 @@
 			// initialize options
 			this._options = this._options || {
 				get: el => el.z,
-				aux: new Array( this.maxGeometryCount )
+				aux: new Array( this.maxInstanceCount )
 			};
 
 			const options = this._options;

@@ -126,6 +126,29 @@ fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> 
 	return ( ( uvScaled % dimension ) + dimension ) % dimension;
 
 }
+` ),
+	biquadraticTexture: new CodeNode( `
+fn threejs_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, level : i32 ) -> vec4f {
+
+	let res = vec2f( textureDimensions( map, level ) );
+
+	let uvScaled = coord * res;
+	let uvWrapping = ( ( uvScaled % res ) + res ) % res;
+
+	// https://www.shadertoy.com/view/WtyXRy
+
+	let uv = uvWrapping - 0.5;
+	let iuv = floor( uv );
+	let f = fract( uv );
+
+	let rg1 = textureLoad( map, vec2i( iuv + vec2( 0.5, 0.5 ) ), level );
+	let rg2 = textureLoad( map, vec2i( iuv + vec2( 1.5, 0.5 ) ), level );
+	let rg3 = textureLoad( map, vec2i( iuv + vec2( 0.5, 1.5 ) ), level );
+	let rg4 = textureLoad( map, vec2i( iuv + vec2( 1.5, 1.5 ) ), level );
+
+	return mix( mix( rg1, rg2, f.x ), mix( rg3, rg4, f.x ), f.y );
+
+}
 ` )
 };
 
@@ -161,9 +184,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			}
 
+		} else if ( this.isFilteredTexture( texture ) ) {
+
+			return this.generateFilteredTexture( texture, textureProperty, uvSnippet );
+
 		} else {
 
-			return this.generateTextureLod( texture, textureProperty, uvSnippet );
+			return this.generateTextureLod( texture, textureProperty, uvSnippet, '0' );
 
 		}
 
@@ -189,11 +216,23 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
+		} else if ( this.isFilteredTexture( texture ) ) {
+
+			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet );
+
 		} else {
 
 			return this.generateTextureLod( texture, textureProperty, uvSnippet, levelSnippet );
 
 		}
+
+	}
+
+	generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet = '0' ) {
+
+		this._include( 'biquadraticTexture' );
+
+		return `threejs_biquadraticTexture( ${ textureProperty }, ${ uvSnippet }, i32( ${ levelSnippet } ) )`;
 
 	}
 
@@ -496,12 +535,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 		}
 
 		return uniformNode;
-
-	}
-
-	isReference( type ) {
-
-		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_depth_2d' || type === 'texture_storage_2d' || type === 'texture_3d';
 
 	}
 

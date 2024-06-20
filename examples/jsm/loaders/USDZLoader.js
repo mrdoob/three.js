@@ -182,8 +182,7 @@ class USDZLoader extends Loader {
 
 					if ( isCrateFile( zip[ filename ] ) ) {
 
-						console.warn( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
-						continue;
+						throw Error( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
 
 					}
 
@@ -242,11 +241,9 @@ class USDZLoader extends Loader {
 
 			if ( isCrate ) {
 
-				console.warn( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
+				throw Error( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
 
 			}
-
-			return undefined;
 
 		}
 
@@ -259,15 +256,6 @@ class USDZLoader extends Loader {
 		// console.log( assets )
 
 		const file = findUSD( zip );
-
-		if ( file === undefined ) {
-
-			console.warn( 'THREE.USDZLoader: No usda file found.' );
-
-			return new Group();
-
-		}
-
 
 		// Parse file
 
