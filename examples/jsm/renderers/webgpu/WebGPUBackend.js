@@ -1210,15 +1210,15 @@ class WebGPUBackend extends Backend {
 
 	// bindings
 
-	createBindings( bindings ) {
+	createBindings( bindGroup ) {
 
-		this.bindingUtils.createBindings( bindings );
+		this.bindingUtils.createBindings( bindGroup );
 
 	}
 
-	updateBindings( bindings ) {
+	updateBindings( bindGroup ) {
 
-		this.bindingUtils.createBindings( bindings );
+		this.bindingUtils.createBindings( bindGroup );
 
 	}
 

@@ -183,6 +183,7 @@ class Nodes extends DataMap {
 			nodeBuilder.updateNodes,
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
+			nodeBuilder.instanceBindGroups,
 			nodeBuilder.transforms
 		);
 

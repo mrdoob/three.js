@@ -169,18 +169,6 @@ ${ flowData.code }
 
 	}
 
-	getPropertyName( node, shaderStage = this.shaderStage ) {
-
-		if ( node.isNodeUniform && node.node.isTextureNode !== true && node.node.isBufferNode !== true ) {
-
-			return shaderStage.charAt( 0 ) + '_' + node.name;
-
-		}
-
-		return super.getPropertyName( node, shaderStage );
-
-	}
-
 	generatePBO( storageArrayElementNode ) {
 
 		const { node, indexNode } = storageArrayElementNode;
@@ -352,6 +340,7 @@ ${ flowData.code }
 			let snippet = null;
 			let group = false;
 
+
 			if ( uniform.type === 'texture' ) {
 
 				const texture = uniform.node.value;
@@ -405,7 +394,7 @@ ${ flowData.code }
 
 				const vectorType = this.getVectorType( uniform.type );
 
-				snippet = `${ vectorType } ${ this.getPropertyName( uniform, shaderStage ) };`;
+				snippet = `${vectorType} ${uniform.name};`;
 
 				group = true;
 

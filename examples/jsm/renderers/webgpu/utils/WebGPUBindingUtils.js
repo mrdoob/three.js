@@ -126,19 +126,18 @@ class WebGPUBindingUtils {
 
 	}
 
-	createBindings( bindings ) {
+	createBindings( bindGroup ) {
 
 		const backend = this.backend;
-		const bindingsData = backend.get( bindings );
+		const bindingsData = backend.get( bindGroup );
 
 		// setup (static) binding layout and (dynamic) binding group
 
-		const bindLayoutGPU = this.createBindingsLayout( bindings );
-		const bindGroupGPU = this.createBindGroup( bindings, bindLayoutGPU );
+		const bindLayoutGPU = this.createBindingsLayout( bindGroup );
+		const bindGroupGPU = this.createBindGroup( bindGroup, bindLayoutGPU );
 
 		bindingsData.layout = bindLayoutGPU;
 		bindingsData.group = bindGroupGPU;
-		bindingsData.bindings = bindings;
 
 	}
 

@@ -449,21 +449,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			let uniformGPU;
 
-			const groupName = node.groupNode.name;
+			const group = node.groupNode;
+			const groupName = group.name;
 
-			let bindings = this.bindings[ shaderStage ][ groupName ];
-
-			if ( bindings === undefined ) {
-
-				if ( this.bindingsIndexes[ groupName ] === undefined ) {
-
-					this.bindingsIndexes[ groupName ] = { binding: 0, group: Object.keys( this.bindingsIndexes ).length };
-
-				}
-
-				bindings = this.bindings[ shaderStage ][ groupName ] = [];
-
-			}
+			const bindings = this.getBindGroupArray( groupName, shaderStage );
 
 			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D' ) {
 
@@ -471,15 +460,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( type === 'texture' || type === 'storageTexture' ) {
 
-					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, uniformNode.groupNode, node.access ? node.access : null );
+					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, group, node.access ? node.access : null );
 
 				} else if ( type === 'cubeTexture' ) {
 
-					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, uniformNode.groupNode, node.access ? node.access : null );
+					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, group, node.access ? node.access : null );
 
 				} else if ( type === 'texture3D' ) {
 
-					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, uniformNode.groupNode, node.access ? node.access : null );
+					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group, node.access ? node.access : null );
 
 				}
 
@@ -488,7 +477,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( shaderStage === 'fragment' && this.isUnfilterable( node.value ) === false && texture.store === false ) {
 
-					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node, node.groupNode );
+					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node, group );
 					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 					bindings.push( sampler, texture );
@@ -506,7 +495,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
 
 				const bufferClass = type === 'storageBuffer' ? NodeStorageBuffer : NodeUniformBuffer;
-				const buffer = new bufferClass( node, node.groupNode );
+				const buffer = new bufferClass( node, group );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
@@ -514,9 +503,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 				uniformGPU = buffer;
 
 			} else {
-
-				const group = node.groupNode;
-				const groupName = group.name;
 
 				const uniformsStage = this.uniformGroups[ shaderStage ] || ( this.uniformGroups[ shaderStage ] = {} );
 

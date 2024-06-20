@@ -103,6 +103,8 @@ class NodeBuilder {
 		this.stacks = [];
 		this.tab = '\t';
 
+		this.instanceBindGroups = true;
+
 		this.currentFunctionNode = null;
 
 		this.context = {
@@ -205,6 +207,26 @@ class NodeBuilder {
 		}
 
 		return bindGroup;
+
+	}
+
+	getBindGroupArray( groupName, shaderStage ) {
+
+		let bindings = this.bindings[ shaderStage ][ groupName ];
+
+		if ( bindings === undefined ) {
+
+			if ( this.bindingsIndexes[ groupName ] === undefined ) {
+
+				this.bindingsIndexes[ groupName ] = { binding: 0, group: Object.keys( this.bindingsIndexes ).length };
+
+			}
+
+			bindings = this.bindings[ shaderStage ][ groupName ] = [];
+
+		}
+
+		return bindings;
 
 	}
 
