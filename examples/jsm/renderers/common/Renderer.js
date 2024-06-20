@@ -70,6 +70,7 @@ class Renderer {
 		// nodes
 
 		this.toneMappingNode = null;
+		this.commonBufferSize = 0;
 
 		// internals
 
