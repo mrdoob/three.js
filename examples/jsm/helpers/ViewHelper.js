@@ -33,7 +33,7 @@ class ViewHelper extends Object3D {
 		const color3 = new Color( '#4488ff' );
 		const color4 = new Color( '#000000' );
 
-		const options = { };
+		const options = {};
 
 		const interactiveObjects = [];
 		const raycaster = new Raycaster();
