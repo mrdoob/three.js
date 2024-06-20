@@ -8,22 +8,22 @@ class OperatorNode extends TempNode {
 
 		super();
 
-		this.op = op;
-
 		if ( params.length > 0 ) {
 
-			let finalBNode = bNode;
+			let finalOp = new OperatorNode( op, aNode, bNode );
 
-			for ( let i = 0; i < params.length; i ++ ) {
+			for ( let i = 0; i < params.length - 1; i ++ ) {
 
-				finalBNode = new OperatorNode( op, finalBNode, params[ i ] );
+				finalOp = new OperatorNode( op, finalOp, params[ i ] );
 
 			}
 
-			bNode = finalBNode;
+			aNode = finalOp;
+			bNode = params[ params.length - 1 ];
 
 		}
 
+		this.op = op;
 		this.aNode = aNode;
 		this.bNode = bNode;
 
