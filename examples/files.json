@@ -293,6 +293,7 @@
 		"webgl_simple_gi",
 		"webgl_texture2darray",
 		"webgl_texture2darray_compressed",
+		"webgl_texture2darray_layerupdate",
 		"webgl_texture3d",
 		"webgl_texture3d_partialupdate",
 		"webgl_ubo",
