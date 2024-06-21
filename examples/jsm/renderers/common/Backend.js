@@ -42,8 +42,6 @@ class Backend {
 
 	createBindings( renderObject ) { }
 
-	_setupBindingsIndexes( renderObject ) { }
-
 	// pipeline
 
 	createRenderPipeline( renderObject ) { }
