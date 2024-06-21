@@ -103,7 +103,8 @@
 				"Earcut": "api/en/extras/Earcut",
 				"ImageUtils": "api/en/extras/ImageUtils",
 				"PMREMGenerator": "api/en/extras/PMREMGenerator",
-				"ShapeUtils": "api/en/extras/ShapeUtils"
+				"ShapeUtils": "api/en/extras/ShapeUtils",
+				"TextureUtils": "api/en/extras/TextureUtils"
 			},
 
 			"Extras / Core": {
