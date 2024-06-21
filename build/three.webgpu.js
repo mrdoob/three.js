@@ -7865,7 +7865,7 @@ class Object3D extends EventDispatcher {
 				sphereCenter: bound.sphere.center.toArray()
 			} ) );
 
-			object.maxGeometryCount = this._maxGeometryCount;
+			object.maxInstanceCount = this._maxInstanceCount;
 			object.maxVertexCount = this._maxVertexCount;
 			object.maxIndexCount = this._maxIndexCount;
 
@@ -9157,10 +9157,6 @@ class Material extends EventDispatcher {
 
 	}
 
-	onBuild( /* shaderobject, renderer */ ) {}
-
-	onBeforeRender( /* renderer, scene, camera, geometry, object, group */ ) {}
-
 	onBeforeCompile( /* shaderobject, renderer */ ) {}
 
 	customProgramCacheKey() {
@@ -9576,6 +9572,19 @@ class Material extends EventDispatcher {
 		if ( value === true ) this.version ++;
 
 	}
+
+	onBuild( /* shaderobject, renderer */ ) {
+
+		console.warn( 'Material: onBuild() has been removed.' ); // @deprecated, r166
+
+	}
+
+	onBeforeRender( /* renderer, scene, camera, geometry, object, group */ ) {
+
+		console.warn( 'Material: onBeforeRender() has been removed.' ); // @deprecated, r166
+
+	}
+
 
 }
 
@@ -10444,7 +10453,7 @@ class Float32BufferAttribute extends BufferAttribute {
 
 }
 
-let _id$5 = 0;
+let _id$6 = 0;
 
 const _m1 = /*@__PURE__*/ new Matrix4();
 const _obj = /*@__PURE__*/ new Object3D();
@@ -10461,7 +10470,7 @@ class BufferGeometry extends EventDispatcher {
 
 		this.isBufferGeometry = true;
 
-		Object.defineProperty( this, 'id', { value: _id$5 ++ } );
+		Object.defineProperty( this, 'id', { value: _id$6 ++ } );
 
 		this.uuid = generateUUID();
 
@@ -17081,7 +17090,7 @@ class CompressedArrayTexture extends CompressedTexture {
 
 	}
 
-	addLayerUpdates( layerIndex ) {
+	addLayerUpdate( layerIndex ) {
 
 		this.layerUpdates.add( layerIndex );
 
@@ -27124,6 +27133,7 @@ class Light extends Object3D {
 		if ( this.penumbra !== undefined ) data.object.penumbra = this.penumbra;
 
 		if ( this.shadow !== undefined ) data.object.shadow = this.shadow.toJSON();
+		if ( this.target !== undefined ) data.object.target = this.target.uuid;
 
 		return data;
 
@@ -28852,6 +28862,7 @@ class ObjectLoader extends Loader {
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
+		this.bindLightTargets( object );
 
 		//
 
@@ -29522,6 +29533,7 @@ class ObjectLoader extends Loader {
 			case 'DirectionalLight':
 
 				object = new DirectionalLight( data.color, data.intensity );
+				object.target = data.target || '';
 
 				break;
 
@@ -29540,6 +29552,7 @@ class ObjectLoader extends Loader {
 			case 'SpotLight':
 
 				object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
+				object.target = data.target || '';
 
 				break;
 
@@ -29596,7 +29609,7 @@ class ObjectLoader extends Loader {
 				geometry = getGeometry( data.geometry );
 				material = getMaterial( data.material );
 
-				object = new BatchedMesh( data.maxGeometryCount, data.maxVertexCount, data.maxIndexCount, material );
+				object = new BatchedMesh( data.maxInstanceCount, data.maxVertexCount, data.maxIndexCount, material );
 				object.geometry = geometry;
 				object.perObjectFrustumCulled = data.perObjectFrustumCulled;
 				object.sortObjects = data.sortObjects;
@@ -29626,7 +29639,7 @@ class ObjectLoader extends Loader {
 
 				} );
 
-				object._maxGeometryCount = data.maxGeometryCount;
+				object._maxInstanceCount = data.maxInstanceCount;
 				object._maxVertexCount = data.maxVertexCount;
 				object._maxIndexCount = data.maxIndexCount;
 
@@ -29803,6 +29816,32 @@ class ObjectLoader extends Loader {
 				} else {
 
 					child.bind( skeleton, child.bindMatrix );
+
+				}
+
+			}
+
+		} );
+
+	}
+
+	bindLightTargets( object ) {
+
+		object.traverse( function ( child ) {
+
+			if ( child.isDirectionalLight || child.isSpotLight ) {
+
+				const uuid = child.target;
+
+				const target = object.getObjectByProperty( 'uuid', uuid );
+
+				if ( target !== undefined ) {
+
+					child.target = target;
+
+				} else {
+
+					child.target = new Object3D();
 
 				}
 
@@ -33815,7 +33854,7 @@ let Uniform$1 = class Uniform {
 
 };
 
-let _id$4 = 0;
+let _id$5 = 0;
 
 let UniformsGroup$1 = class UniformsGroup extends EventDispatcher {
 
@@ -33825,7 +33864,7 @@ let UniformsGroup$1 = class UniformsGroup extends EventDispatcher {
 
 		this.isUniformsGroup = true;
 
-		Object.defineProperty( this, 'id', { value: _id$4 ++ } );
+		Object.defineProperty( this, 'id', { value: _id$5 ++ } );
 
 		this.name = '';
 
@@ -36689,7 +36728,7 @@ class RenderObject {
 
 		}
 
-		if ( object.isInstancedMesh ) {
+		if ( object.count > 1 ) {
 
 			cacheKey += object.count + ',';
 
@@ -37032,6 +37071,7 @@ class Geometries extends DataMap {
 		this.info = info;
 
 		this.wireframes = new WeakMap();
+
 		this.attributeCall = new WeakMap();
 
 	}
@@ -37128,11 +37168,33 @@ class Geometries extends DataMap {
 
 		const callId = this.info.render.calls;
 
-		if ( this.attributeCall.get( attribute ) !== callId ) {
+		if ( ! attribute.isInterleavedBufferAttribute ) {
 
-			this.attributes.update( attribute, type );
+			if ( this.attributeCall.get( attribute ) !== callId ) {
 
-			this.attributeCall.set( attribute, callId );
+				this.attributes.update( attribute, type );
+
+				this.attributeCall.set( attribute, callId );
+
+			}
+
+		} else {
+
+			if ( this.attributeCall.get( attribute ) === undefined ) {
+
+				this.attributes.update( attribute, type );
+
+				this.attributeCall.set( attribute, callId );
+
+			} else if ( this.attributeCall.get( attribute.data ) !== callId ) {
+
+				this.attributes.update( attribute, type );
+
+				this.attributeCall.set( attribute.data, callId );
+
+				this.attributeCall.set( attribute, callId );
+
+			}
 
 		}
 
@@ -37312,13 +37374,13 @@ class ComputePipeline extends Pipeline {
 
 }
 
-let _id$3 = 0;
+let _id$4 = 0;
 
 class ProgrammableStage {
 
 	constructor( code, type, transforms = null, attributes = null ) {
 
-		this.id = _id$3 ++;
+		this.id = _id$4 ++;
 
 		this.code = code;
 		this.stage = type;
@@ -37668,61 +37730,77 @@ class Bindings extends DataMap {
 
 		const bindings = renderObject.getBindings();
 
-		const data = this.get( renderObject );
+		for ( const bindGroup of bindings ) {
 
-		if ( data.bindings !== bindings ) {
+			const groupData = this.get( bindGroup );
 
-			// each object defines an array of bindings (ubos, textures, samplers etc.)
+			if ( groupData.bindGroup === undefined ) {
 
-			data.bindings = bindings;
+				// each object defines an array of bindings (ubos, textures, samplers etc.)
 
-			this._init( bindings );
+				this._init( bindGroup );
 
-			this.backend.createBindings( bindings );
+				this.backend.createBindings( bindGroup, bindings );
+
+				groupData.bindGroup = bindGroup;
+
+			}
 
 		}
 
-		return data.bindings;
+		return bindings;
 
 	}
 
 	getForCompute( computeNode ) {
 
-		const data = this.get( computeNode );
+		const bindings = this.nodes.getForCompute( computeNode ).bindings;
 
-		if ( data.bindings === undefined ) {
+		for ( const bindGroup of bindings ) {
 
-			const nodeBuilderState = this.nodes.getForCompute( computeNode );
+			const groupData = this.get( bindGroup );
 
-			const bindings = nodeBuilderState.bindings;
+			if ( groupData.bindGroup === undefined ) {
 
-			data.bindings = bindings;
+				this._init( bindGroup );
 
-			this._init( bindings );
+				this.backend.createBindings( bindGroup, bindings );
 
-			this.backend.createBindings( bindings );
+				groupData.bindGroup = bindGroup;
+
+			}
 
 		}
 
-		return data.bindings;
+		return bindings;
 
 	}
 
 	updateForCompute( computeNode ) {
 
-		this._update( computeNode, this.getForCompute( computeNode ) );
+		this._updateBindings( computeNode, this.getForCompute( computeNode ) );
 
 	}
 
 	updateForRender( renderObject ) {
 
-		this._update( renderObject, this.getForRender( renderObject ) );
+		this._updateBindings( renderObject, this.getForRender( renderObject ) );
 
 	}
 
-	_init( bindings ) {
+	_updateBindings( object, bindings ) {
 
-		for ( const binding of bindings ) {
+		for ( const bindGroup of bindings ) {
+
+			this._update( object, bindGroup, bindings );
+
+		}
+
+	}
+
+	_init( bindGroup ) {
+
+		for ( const binding of bindGroup.bindings ) {
 
 			if ( binding.isSampledTexture ) {
 
@@ -37740,7 +37818,7 @@ class Bindings extends DataMap {
 
 	}
 
-	_update( object, bindings ) {
+	_update( object, bindGroup, bindings ) {
 
 		const { backend } = this;
 
@@ -37748,7 +37826,7 @@ class Bindings extends DataMap {
 
 		// iterate over all bindings and check if buffer updates or a new binding group is required
 
-		for ( const binding of bindings ) {
+		for ( const binding of bindGroup.bindings ) {
 
 			if ( binding.isNodeUniformsGroup ) {
 
@@ -37798,7 +37876,6 @@ class Bindings extends DataMap {
 
 				}
 
-
 				if ( texture.isStorageTexture === true ) {
 
 					const textureData = this.get( texture );
@@ -37825,7 +37902,7 @@ class Bindings extends DataMap {
 
 			const pipeline = this.pipelines.getForRender( object );
 
-			this.backend.updateBindings( bindings, pipeline );
+			this.backend.updateBindings( bindGroup, bindings, pipeline );
 
 		}
 
@@ -40386,14 +40463,13 @@ class NodeAttribute {
 
 class NodeUniform {
 
-	constructor( name, type, node, needsUpdate = undefined ) {
+	constructor( name, type, node ) {
 
 		this.isNodeUniform = true;
 
 		this.name = name;
 		this.type = type;
 		this.node = node.getSelf();
-		this.needsUpdate = needsUpdate;
 
 	}
 
@@ -41063,22 +41139,22 @@ class OperatorNode extends TempNode {
 
 		super();
 
-		this.op = op;
-
 		if ( params.length > 0 ) {
 
-			let finalBNode = bNode;
+			let finalOp = new OperatorNode( op, aNode, bNode );
 
-			for ( let i = 0; i < params.length; i ++ ) {
+			for ( let i = 0; i < params.length - 1; i ++ ) {
 
-				finalBNode = new OperatorNode( op, finalBNode, params[ i ] );
+				finalOp = new OperatorNode( op, finalOp, params[ i ] );
 
 			}
 
-			bNode = finalBNode;
+			aNode = finalOp;
+			bNode = params[ params.length - 1 ];
 
 		}
 
+		this.op = op;
 		this.aNode = aNode;
 		this.bNode = bNode;
 
@@ -42426,6 +42502,7 @@ class UniformsNode extends BufferNode {
 
 		this.value = new Float32Array( length * 4 );
 		this.bufferCount = length;
+		this.bufferType = builder.changeComponentType( 'vec4', builder.getComponentType( this._elementType ) );
 
 		return super.setup( builder );
 
@@ -42633,15 +42710,21 @@ const materialReference = ( name, type, material ) => nodeObject( new MaterialRe
 
 addNodeClass( 'MaterialReferenceNode', MaterialReferenceNode );
 
-const cameraNear = /*#__PURE__*/ uniform( 'float' ).onRenderUpdate( ( { camera } ) => camera.near );
-const cameraFar = /*#__PURE__*/ uniform( 'float' ).onRenderUpdate( ( { camera } ) => camera.far );
-const cameraLogDepth = /*#__PURE__*/ uniform( 'float' ).onRenderUpdate( ( { camera } ) => 2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
-const cameraProjectionMatrix = /*#__PURE__*/ uniform( 'mat4' ).onRenderUpdate( ( { camera } ) => camera.projectionMatrix );
-const cameraProjectionMatrixInverse = /*#__PURE__*/ uniform( 'mat4' ).onRenderUpdate( ( { camera } ) => camera.projectionMatrixInverse );
-const cameraViewMatrix = /*#__PURE__*/ uniform( 'mat4' ).onRenderUpdate( ( { camera } ) => camera.matrixWorldInverse );
-const cameraWorldMatrix = /*#__PURE__*/ uniform( 'mat4' ).onRenderUpdate( ( { camera } ) => camera.matrixWorld );
-const cameraNormalMatrix = /*#__PURE__*/ uniform( 'mat3' ).onRenderUpdate( ( { camera } ) => camera.normalMatrix );
-const cameraPosition = /*#__PURE__*/ uniform( new Vector3() ).onRenderUpdate( ( { camera }, self ) => self.value.setFromMatrixPosition( camera.matrixWorld ) );
+const cameraGroup = /*#__PURE__*/ sharedUniformGroup( 'camera' ).onRenderUpdate( () => {
+
+	cameraGroup.needsUpdate = true;
+
+} );
+
+const cameraNear = /*#__PURE__*/ uniform( 'float' ).label( 'cameraNear' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.near );
+const cameraFar = /*#__PURE__*/ uniform( 'float' ).label( 'cameraFar' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.far );
+const cameraLogDepth = /*#__PURE__*/ uniform( 'float' ).label( 'cameraLogDepth' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => 2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
+const cameraProjectionMatrix = /*#__PURE__*/ uniform( 'mat4' ).label( 'cameraProjectionMatrix' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrix );
+const cameraProjectionMatrixInverse = /*#__PURE__*/ uniform( 'mat4' ).label( 'cameraProjectionMatrixInverse' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrixInverse );
+const cameraViewMatrix = /*#__PURE__*/ uniform( 'mat4' ).label( 'cameraViewMatrix' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.matrixWorldInverse );
+const cameraWorldMatrix = /*#__PURE__*/ uniform( 'mat4' ).label( 'cameraWorldMatrix' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.matrixWorld );
+const cameraNormalMatrix = /*#__PURE__*/ uniform( 'mat3' ).label( 'cameraNormalMatrix' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.normalMatrix );
+const cameraPosition = /*#__PURE__*/ uniform( new Vector3() ).label( 'cameraPosition' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera }, self ) => self.value.setFromMatrixPosition( camera.matrixWorld ) );
 
 class Object3DNode extends Node {
 
@@ -43428,6 +43511,11 @@ class InstanceNode extends Node {
 
 		this.instanceColorNode = null;
 
+		this.updateType = NodeUpdateType.FRAME;
+
+		this.buffer = null;
+		this.bufferColor = null;
+
 	}
 
 	setup( /*builder*/ ) {
@@ -43441,6 +43529,7 @@ class InstanceNode extends Node {
 			const instanceAttribute = instanceMesh.instanceMatrix;
 			const buffer = new InstancedInterleavedBuffer( instanceAttribute.array, 16, 1 );
 
+			this.buffer = buffer;
 			const bufferFn = instanceAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
 			const instanceBuffers = [
@@ -43464,6 +43553,7 @@ class InstanceNode extends Node {
 			const buffer = new InstancedBufferAttribute( instanceColorAttribute.array, 3 );
 			const bufferFn = instanceColorAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
+			this.bufferColor = buffer;
 			this.instanceColorNode = vec3( bufferFn( buffer, 'vec3', 3, 0 ) );
 
 		}
@@ -43490,6 +43580,22 @@ class InstanceNode extends Node {
 		if ( this.instanceColorNode !== null ) {
 
 			varyingProperty( 'vec3', 'vInstanceColor' ).assign( this.instanceColorNode );
+
+		}
+
+	}
+
+	update( /*frame*/ ) {
+
+		if ( this.instanceMesh.instanceMatrix.usage !== DynamicDrawUsage && this.instanceMesh.instanceMatrix.version !== this.buffer.version ) {
+
+			this.buffer.version = this.instanceMesh.instanceMatrix.version;
+
+		}
+
+		if ( this.instanceMesh.instanceColor && this.instanceMesh.instanceColor.usage !== DynamicDrawUsage && this.instanceMesh.instanceColor.version !== this.bufferColor.version ) {
+
+			this.bufferColor.version = this.instanceMesh.instanceColor.version;
 
 		}
 
@@ -44071,7 +44177,7 @@ class MorphNode extends Node {
 
 			const influence = float( 0 ).toVar();
 
-			if ( this.mesh.isInstancedMesh === true && ( this.mesh.morphTexture !== null && this.mesh.morphTexture !== undefined ) ) {
+			if ( this.mesh.count > 1 && ( this.mesh.morphTexture !== null && this.mesh.morphTexture !== undefined ) ) {
 
 				influence.assign( textureLoad( this.mesh.morphTexture, ivec2( int( i ).add( 1 ), int( instanceIndex ) ) ).r );
 
@@ -46608,13 +46714,13 @@ class Uniform {
 
 }
 
-class FloatUniform extends Uniform {
+class NumberUniform extends Uniform {
 
 	constructor( name, value = 0 ) {
 
 		super( name, value );
 
-		this.isFloatUniform = true;
+		this.isNumberUniform = true;
 
 		this.boundary = 4;
 		this.itemSize = 1;
@@ -46713,7 +46819,7 @@ class Matrix4Uniform extends Uniform {
 
 }
 
-class FloatNodeUniform extends FloatUniform {
+class NumberNodeUniform extends NumberUniform {
 
 	constructor( nodeUniform ) {
 
@@ -47748,7 +47854,22 @@ function _getEquirectMaterial( envTexture ) {
 
 }
 
-const uniformsGroupCache = new ChainMap();
+let _id$3 = 0;
+
+class BindGroup {
+
+	constructor( name = '', bindings = [] ) {
+
+		this.name = name;
+		this.bindings = bindings;
+
+		this.id = _id$3 ++;
+
+	}
+
+}
+
+const bindGroupsCache = new ChainMap();
 
 const typeFromLength = new Map( [
 	[ 2, 'vec2' ],
@@ -47807,9 +47928,9 @@ class NodeBuilder {
 		this.flowCode = { vertex: '', fragment: '', compute: '' };
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
-		this.bindings = { vertex: [], fragment: [], compute: [] };
-		this.bindingsOffset = { vertex: 0, fragment: 0, compute: 0 };
-		this.bindingsArray = null;
+		this.bindings = { vertex: {}, fragment: {}, compute: {} };
+		this.bindingsIndexes = {};
+		this.bindGroups = null;
 		this.attributes = [];
 		this.bufferAttributes = [];
 		this.varyings = [];
@@ -47820,6 +47941,8 @@ class NodeBuilder {
 		this.stack = stack();
 		this.stacks = [];
 		this.tab = '\t';
+
+		this.instanceBindGroups = true;
 
 		this.currentFunctionNode = null;
 
@@ -47864,54 +47987,129 @@ class NodeBuilder {
 
 	}
 
-	_getSharedBindings( bindings ) {
+	_getBindGroup( groupName, bindings ) {
 
-		const shared = [];
+		// cache individual uniforms group
+
+		const bindingsArray = [];
+
+		let sharedGroup = true;
 
 		for ( const binding of bindings ) {
 
-			if ( binding.shared === true ) {
+			if ( binding.groupNode.shared === true ) {
 
 				// nodes is the chainmap key
 				const nodes = binding.getNodes();
 
-				let sharedBinding = uniformsGroupCache.get( nodes );
+				let sharedBinding = bindGroupsCache.get( nodes );
 
 				if ( sharedBinding === undefined ) {
 
-					uniformsGroupCache.set( nodes, binding );
+					bindGroupsCache.set( nodes, binding );
 
 					sharedBinding = binding;
 
 				}
 
-				shared.push( sharedBinding );
+				bindingsArray.push( sharedBinding );
 
 			} else {
 
-				shared.push( binding );
+				bindingsArray.push( binding );
+
+				sharedGroup = false;
 
 			}
 
 		}
 
-		return shared;
+		//
+
+		let bindGroup;
+
+		if ( sharedGroup ) {
+
+			bindGroup = bindGroupsCache.get( bindingsArray );
+
+			if ( bindGroup === undefined ) {
+
+				bindGroup = new BindGroup( groupName, bindingsArray );
+				bindGroupsCache.set( bindingsArray, bindGroup );
+
+			}
+
+		} else {
+
+			bindGroup = new BindGroup( groupName, bindingsArray );
+
+		}
+
+		return bindGroup;
+
+	}
+
+	getBindGroupArray( groupName, shaderStage ) {
+
+		const bindings = this.bindings[ shaderStage ];
+
+		let bindGroup = bindings[ groupName ];
+
+		if ( bindGroup === undefined ) {
+
+			if ( this.bindingsIndexes[ groupName ] === undefined ) {
+
+				this.bindingsIndexes[ groupName ] = { binding: 0, group: Object.keys( this.bindingsIndexes ).length };
+
+			}
+
+			bindings[ groupName ] = bindGroup = [];
+
+		}
+
+		return bindGroup;
 
 	}
 
 	getBindings() {
 
-		let bindingsArray = this.bindingsArray;
+		let bindingsGroups = this.bindGroups;
 
-		if ( bindingsArray === null ) {
+		if ( bindingsGroups === null ) {
 
+			const groups = {};
 			const bindings = this.bindings;
 
-			this.bindingsArray = bindingsArray = this._getSharedBindings( ( this.material !== null ) ? [ ...bindings.vertex, ...bindings.fragment ] : bindings.compute );
+			for ( const shaderStage of shaderStages ) {
+
+				for ( const groupName in bindings[ shaderStage ] ) {
+
+					const uniforms = bindings[ shaderStage ][ groupName ];
+
+					const groupUniforms = groups[ groupName ] || ( groups[ groupName ] = [] );
+					groupUniforms.push( ...uniforms );
+
+				}
+
+			}
+
+			bindingsGroups = [];
+
+			for ( const groupName in groups ) {
+
+				const group = groups[ groupName ];
+
+				const bindingsGroup = this._getBindGroup( groupName, group );
+
+				bindingsGroups.push( bindingsGroup );
+
+			}
+
+			this.bindGroups = bindingsGroups;
 
 		}
 
-		return bindingsArray;
+		return bindingsGroups;
 
 	}
 
@@ -47966,6 +48164,13 @@ class NodeBuilder {
 	get currentNode() {
 
 		return this.chaining[ this.chaining.length - 1 ];
+
+	}
+
+	isFilteredTexture( texture ) {
+
+		return ( texture.magFilter === LinearFilter || texture.magFilter === LinearMipmapNearestFilter || texture.magFilter === NearestMipmapLinearFilter || texture.magFilter === LinearMipmapLinearFilter ||
+			texture.minFilter === LinearFilter || texture.minFilter === LinearMipmapNearestFilter || texture.minFilter === NearestMipmapLinearFilter || texture.minFilter === LinearMipmapLinearFilter );
 
 	}
 
@@ -48207,7 +48412,7 @@ class NodeBuilder {
 
 	isReference( type ) {
 
-		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D';
+		return type === 'void' || type === 'property' || type === 'sampler' || type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'depthTexture' || type === 'texture3D';
 
 	}
 
@@ -48904,10 +49109,10 @@ class NodeBuilder {
 
 	getNodeUniform( uniformNode, type ) {
 
-		if ( type === 'float' ) return new FloatNodeUniform( uniformNode );
-		if ( type === 'vec2' ) return new Vector2NodeUniform( uniformNode );
-		if ( type === 'vec3' ) return new Vector3NodeUniform( uniformNode );
-		if ( type === 'vec4' ) return new Vector4NodeUniform( uniformNode );
+		if ( type === 'float' || type === 'int' || type === 'uint' ) return new NumberNodeUniform( uniformNode );
+		if ( type === 'vec2' || type === 'ivec2' || type === 'uvec2' ) return new Vector2NodeUniform( uniformNode );
+		if ( type === 'vec3' || type === 'ivec3' || type === 'uvec3' ) return new Vector3NodeUniform( uniformNode );
+		if ( type === 'vec4' || type === 'ivec4' || type === 'uvec4' ) return new Vector4NodeUniform( uniformNode );
 		if ( type === 'color' ) return new ColorNodeUniform( uniformNode );
 		if ( type === 'mat3' ) return new Matrix3NodeUniform( uniformNode );
 		if ( type === 'mat4' ) return new Matrix4NodeUniform( uniformNode );
@@ -48993,7 +49198,7 @@ class NodeBuilder {
 
 	getSignature() {
 
-		return `// Three.js r${ REVISION } - NodeMaterial System\n`;
+		return `// Three.js r${ REVISION } - Node System\n`;
 
 	}
 
@@ -53303,7 +53508,7 @@ class RangeNode extends Node {
 
 	getNodeType( builder ) {
 
-		return builder.object.isInstancedMesh === true ? builder.getTypeFromLength( this.getVectorLength( builder ) ) : 'float';
+		return builder.object.count > 1 ? builder.getTypeFromLength( this.getVectorLength( builder ) ) : 'float';
 
 	}
 
@@ -53313,7 +53518,7 @@ class RangeNode extends Node {
 
 		let output = null;
 
-		if ( object.isInstancedMesh === true ) {
+		if ( object.count > 1 ) {
 
 			const minValue = this.minNode.value;
 			const maxValue = this.maxNode.value;
@@ -56751,12 +56956,12 @@ class NodeParser {
 
 class NodeFunction {
 
-	constructor( type, inputs, name = '', presicion = '' ) {
+	constructor( type, inputs, name = '', precision = '' ) {
 
 		this.type = type;
 		this.inputs = inputs;
 		this.name = name;
-		this.presicion = presicion;
+		this.precision = precision;
 
 	}
 
@@ -56848,7 +57053,7 @@ const parse$1 = ( source ) => {
 		const name = declaration[ 3 ] !== undefined ? declaration[ 3 ] : '';
 		const type = declaration[ 2 ];
 
-		const presicion = declaration[ 1 ] !== undefined ? declaration[ 1 ] : '';
+		const precision = declaration[ 1 ] !== undefined ? declaration[ 1 ] : '';
 
 		const headerCode = pragmaMainIndex !== - 1 ? source.slice( 0, pragmaMainIndex ) : '';
 
@@ -56856,7 +57061,7 @@ const parse$1 = ( source ) => {
 			type,
 			inputs,
 			name,
-			presicion,
+			precision,
 			inputsCode,
 			blockCode,
 			headerCode
@@ -56874,9 +57079,9 @@ class GLSLNodeFunction extends NodeFunction {
 
 	constructor( source ) {
 
-		const { type, inputs, name, presicion, inputsCode, blockCode, headerCode } = parse$1( source );
+		const { type, inputs, name, precision, inputsCode, blockCode, headerCode } = parse$1( source );
 
-		super( type, inputs, name, presicion );
+		super( type, inputs, name, precision );
 
 		this.inputsCode = inputsCode;
 		this.blockCode = blockCode;
@@ -56892,13 +57097,13 @@ class GLSLNodeFunction extends NodeFunction {
 
 		if ( blockCode !== '' ) {
 
-			const { type, inputsCode, headerCode, presicion } = this;
+			const { type, inputsCode, headerCode, precision } = this;
 
 			let declarationCode = `${ type } ${ name } ( ${ inputsCode.trim() } )`;
 
-			if ( presicion !== '' ) {
+			if ( precision !== '' ) {
 
-				declarationCode = `${ presicion } ${ declarationCode }`;
+				declarationCode = `${ precision } ${ declarationCode }`;
 
 			}
 
@@ -56932,7 +57137,8 @@ class GLSLNodeParser extends NodeParser {
 // https://raw.githubusercontent.com/AcademySoftwareFoundation/MaterialX/main/libraries/stdlib/genglsl/lib/mx_noise.glsl
 
 
-const mx_select = tslFn( ( [ b_immutable, t_immutable, f_immutable ] ) => {
+
+const mx_select = /*#__PURE__*/ tslFn( ( [ b_immutable, t_immutable, f_immutable ] ) => {
 
 	const f = float( f_immutable ).toVar();
 	const t = float( t_immutable ).toVar();
@@ -56940,26 +57146,47 @@ const mx_select = tslFn( ( [ b_immutable, t_immutable, f_immutable ] ) => {
 
 	return cond( b, t, f );
 
+} ).setLayout( {
+	name: 'mx_select',
+	type: 'float',
+	inputs: [
+		{ name: 'b', type: 'bool' },
+		{ name: 't', type: 'float' },
+		{ name: 'f', type: 'float' }
+	]
 } );
 
-const mx_negate_if = tslFn( ( [ val_immutable, b_immutable ] ) => {
+const mx_negate_if = /*#__PURE__*/ tslFn( ( [ val_immutable, b_immutable ] ) => {
 
 	const b = bool( b_immutable ).toVar();
 	const val = float( val_immutable ).toVar();
 
 	return cond( b, val.negate(), val );
 
+} ).setLayout( {
+	name: 'mx_negate_if',
+	type: 'float',
+	inputs: [
+		{ name: 'val', type: 'float' },
+		{ name: 'b', type: 'bool' }
+	]
 } );
 
-const mx_floor = tslFn( ( [ x_immutable ] ) => {
+const mx_floor = /*#__PURE__*/ tslFn( ( [ x_immutable ] ) => {
 
 	const x = float( x_immutable ).toVar();
 
 	return int( floor( x ) );
 
+} ).setLayout( {
+	name: 'mx_floor',
+	type: 'int',
+	inputs: [
+		{ name: 'x', type: 'float' }
+	]
 } );
 
-const mx_floorfrac = tslFn( ( [ x_immutable, i ] ) => {
+const mx_floorfrac = /*#__PURE__*/ tslFn( ( [ x_immutable, i ] ) => {
 
 	const x = float( x_immutable ).toVar();
 	i.assign( mx_floor( x ) );
@@ -56968,7 +57195,7 @@ const mx_floorfrac = tslFn( ( [ x_immutable, i ] ) => {
 
 } );
 
-const mx_bilerp_0 = tslFn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, s_immutable, t_immutable ] ) => {
+const mx_bilerp_0 = /*#__PURE__*/ tslFn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, s_immutable, t_immutable ] ) => {
 
 	const t = float( t_immutable ).toVar();
 	const s = float( s_immutable ).toVar();
@@ -56980,9 +57207,20 @@ const mx_bilerp_0 = tslFn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immu
 
 	return sub( 1.0, t ).mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) );
 
+} ).setLayout( {
+	name: 'mx_bilerp_0',
+	type: 'float',
+	inputs: [
+		{ name: 'v0', type: 'float' },
+		{ name: 'v1', type: 'float' },
+		{ name: 'v2', type: 'float' },
+		{ name: 'v3', type: 'float' },
+		{ name: 's', type: 'float' },
+		{ name: 't', type: 'float' }
+	]
 } );
 
-const mx_bilerp_1 = tslFn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, s_immutable, t_immutable ] ) => {
+const mx_bilerp_1 = /*#__PURE__*/ tslFn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, s_immutable, t_immutable ] ) => {
 
 	const t = float( t_immutable ).toVar();
 	const s = float( s_immutable ).toVar();
@@ -56994,11 +57232,22 @@ const mx_bilerp_1 = tslFn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immu
 
 	return sub( 1.0, t ).mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) );
 
+} ).setLayout( {
+	name: 'mx_bilerp_1',
+	type: 'vec3',
+	inputs: [
+		{ name: 'v0', type: 'vec3' },
+		{ name: 'v1', type: 'vec3' },
+		{ name: 'v2', type: 'vec3' },
+		{ name: 'v3', type: 'vec3' },
+		{ name: 's', type: 'float' },
+		{ name: 't', type: 'float' }
+	]
 } );
 
-const mx_bilerp = overloadingFn( [ mx_bilerp_0, mx_bilerp_1 ] );
+const mx_bilerp = /*#__PURE__*/ overloadingFn( [ mx_bilerp_0, mx_bilerp_1 ] );
 
-const mx_trilerp_0 = tslFn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, v4_immutable, v5_immutable, v6_immutable, v7_immutable, s_immutable, t_immutable, r_immutable ] ) => {
+const mx_trilerp_0 = /*#__PURE__*/ tslFn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, v4_immutable, v5_immutable, v6_immutable, v7_immutable, s_immutable, t_immutable, r_immutable ] ) => {
 
 	const r = float( r_immutable ).toVar();
 	const t = float( t_immutable ).toVar();
@@ -57017,9 +57266,25 @@ const mx_trilerp_0 = tslFn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_imm
 
 	return r1.mul( t1.mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) ) ).add( r.mul( t1.mul( v4.mul( s1 ).add( v5.mul( s ) ) ).add( t.mul( v6.mul( s1 ).add( v7.mul( s ) ) ) ) ) );
 
+} ).setLayout( {
+	name: 'mx_trilerp_0',
+	type: 'float',
+	inputs: [
+		{ name: 'v0', type: 'float' },
+		{ name: 'v1', type: 'float' },
+		{ name: 'v2', type: 'float' },
+		{ name: 'v3', type: 'float' },
+		{ name: 'v4', type: 'float' },
+		{ name: 'v5', type: 'float' },
+		{ name: 'v6', type: 'float' },
+		{ name: 'v7', type: 'float' },
+		{ name: 's', type: 'float' },
+		{ name: 't', type: 'float' },
+		{ name: 'r', type: 'float' }
+	]
 } );
 
-const mx_trilerp_1 = tslFn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, v4_immutable, v5_immutable, v6_immutable, v7_immutable, s_immutable, t_immutable, r_immutable ] ) => {
+const mx_trilerp_1 = /*#__PURE__*/ tslFn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, v4_immutable, v5_immutable, v6_immutable, v7_immutable, s_immutable, t_immutable, r_immutable ] ) => {
 
 	const r = float( r_immutable ).toVar();
 	const t = float( t_immutable ).toVar();
@@ -57038,11 +57303,27 @@ const mx_trilerp_1 = tslFn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_imm
 
 	return r1.mul( t1.mul( v0.mul( s1 ).add( v1.mul( s ) ) ).add( t.mul( v2.mul( s1 ).add( v3.mul( s ) ) ) ) ).add( r.mul( t1.mul( v4.mul( s1 ).add( v5.mul( s ) ) ).add( t.mul( v6.mul( s1 ).add( v7.mul( s ) ) ) ) ) );
 
+} ).setLayout( {
+	name: 'mx_trilerp_1',
+	type: 'vec3',
+	inputs: [
+		{ name: 'v0', type: 'vec3' },
+		{ name: 'v1', type: 'vec3' },
+		{ name: 'v2', type: 'vec3' },
+		{ name: 'v3', type: 'vec3' },
+		{ name: 'v4', type: 'vec3' },
+		{ name: 'v5', type: 'vec3' },
+		{ name: 'v6', type: 'vec3' },
+		{ name: 'v7', type: 'vec3' },
+		{ name: 's', type: 'float' },
+		{ name: 't', type: 'float' },
+		{ name: 'r', type: 'float' }
+	]
 } );
 
-const mx_trilerp = overloadingFn( [ mx_trilerp_0, mx_trilerp_1 ] );
+const mx_trilerp = /*#__PURE__*/ overloadingFn( [ mx_trilerp_0, mx_trilerp_1 ] );
 
-const mx_gradient_float_0 = tslFn( ( [ hash_immutable, x_immutable, y_immutable ] ) => {
+const mx_gradient_float_0 = /*#__PURE__*/ tslFn( ( [ hash_immutable, x_immutable, y_immutable ] ) => {
 
 	const y = float( y_immutable ).toVar();
 	const x = float( x_immutable ).toVar();
@@ -57053,9 +57334,17 @@ const mx_gradient_float_0 = tslFn( ( [ hash_immutable, x_immutable, y_immutable 
 
 	return mx_negate_if( u, bool( h.bitAnd( uint( 1 ) ) ) ).add( mx_negate_if( v, bool( h.bitAnd( uint( 2 ) ) ) ) );
 
+} ).setLayout( {
+	name: 'mx_gradient_float_0',
+	type: 'float',
+	inputs: [
+		{ name: 'hash', type: 'uint' },
+		{ name: 'x', type: 'float' },
+		{ name: 'y', type: 'float' }
+	]
 } );
 
-const mx_gradient_float_1 = tslFn( ( [ hash_immutable, x_immutable, y_immutable, z_immutable ] ) => {
+const mx_gradient_float_1 = /*#__PURE__*/ tslFn( ( [ hash_immutable, x_immutable, y_immutable, z_immutable ] ) => {
 
 	const z = float( z_immutable ).toVar();
 	const y = float( y_immutable ).toVar();
@@ -57067,11 +57356,20 @@ const mx_gradient_float_1 = tslFn( ( [ hash_immutable, x_immutable, y_immutable,
 
 	return mx_negate_if( u, bool( h.bitAnd( uint( 1 ) ) ) ).add( mx_negate_if( v, bool( h.bitAnd( uint( 2 ) ) ) ) );
 
+} ).setLayout( {
+	name: 'mx_gradient_float_1',
+	type: 'float',
+	inputs: [
+		{ name: 'hash', type: 'uint' },
+		{ name: 'x', type: 'float' },
+		{ name: 'y', type: 'float' },
+		{ name: 'z', type: 'float' }
+	]
 } );
 
-const mx_gradient_float = overloadingFn( [ mx_gradient_float_0, mx_gradient_float_1 ] );
+const mx_gradient_float = /*#__PURE__*/ overloadingFn( [ mx_gradient_float_0, mx_gradient_float_1 ] );
 
-const mx_gradient_vec3_0 = tslFn( ( [ hash_immutable, x_immutable, y_immutable ] ) => {
+const mx_gradient_vec3_0 = /*#__PURE__*/ tslFn( ( [ hash_immutable, x_immutable, y_immutable ] ) => {
 
 	const y = float( y_immutable ).toVar();
 	const x = float( x_immutable ).toVar();
@@ -57079,9 +57377,17 @@ const mx_gradient_vec3_0 = tslFn( ( [ hash_immutable, x_immutable, y_immutable ]
 
 	return vec3( mx_gradient_float( hash.x, x, y ), mx_gradient_float( hash.y, x, y ), mx_gradient_float( hash.z, x, y ) );
 
+} ).setLayout( {
+	name: 'mx_gradient_vec3_0',
+	type: 'vec3',
+	inputs: [
+		{ name: 'hash', type: 'uvec3' },
+		{ name: 'x', type: 'float' },
+		{ name: 'y', type: 'float' }
+	]
 } );
 
-const mx_gradient_vec3_1 = tslFn( ( [ hash_immutable, x_immutable, y_immutable, z_immutable ] ) => {
+const mx_gradient_vec3_1 = /*#__PURE__*/ tslFn( ( [ hash_immutable, x_immutable, y_immutable, z_immutable ] ) => {
 
 	const z = float( z_immutable ).toVar();
 	const y = float( y_immutable ).toVar();
@@ -57090,56 +57396,96 @@ const mx_gradient_vec3_1 = tslFn( ( [ hash_immutable, x_immutable, y_immutable, 
 
 	return vec3( mx_gradient_float( hash.x, x, y, z ), mx_gradient_float( hash.y, x, y, z ), mx_gradient_float( hash.z, x, y, z ) );
 
+} ).setLayout( {
+	name: 'mx_gradient_vec3_1',
+	type: 'vec3',
+	inputs: [
+		{ name: 'hash', type: 'uvec3' },
+		{ name: 'x', type: 'float' },
+		{ name: 'y', type: 'float' },
+		{ name: 'z', type: 'float' }
+	]
 } );
 
-const mx_gradient_vec3 = overloadingFn( [ mx_gradient_vec3_0, mx_gradient_vec3_1 ] );
+const mx_gradient_vec3 = /*#__PURE__*/ overloadingFn( [ mx_gradient_vec3_0, mx_gradient_vec3_1 ] );
 
-const mx_gradient_scale2d_0 = tslFn( ( [ v_immutable ] ) => {
+const mx_gradient_scale2d_0 = /*#__PURE__*/ tslFn( ( [ v_immutable ] ) => {
 
 	const v = float( v_immutable ).toVar();
 
 	return mul( 0.6616, v );
 
+} ).setLayout( {
+	name: 'mx_gradient_scale2d_0',
+	type: 'float',
+	inputs: [
+		{ name: 'v', type: 'float' }
+	]
 } );
 
-const mx_gradient_scale3d_0 = tslFn( ( [ v_immutable ] ) => {
+const mx_gradient_scale3d_0 = /*#__PURE__*/ tslFn( ( [ v_immutable ] ) => {
 
 	const v = float( v_immutable ).toVar();
 
 	return mul( 0.9820, v );
 
+} ).setLayout( {
+	name: 'mx_gradient_scale3d_0',
+	type: 'float',
+	inputs: [
+		{ name: 'v', type: 'float' }
+	]
 } );
 
-const mx_gradient_scale2d_1 = tslFn( ( [ v_immutable ] ) => {
+const mx_gradient_scale2d_1 = /*#__PURE__*/ tslFn( ( [ v_immutable ] ) => {
 
 	const v = vec3( v_immutable ).toVar();
 
 	return mul( 0.6616, v );
 
+} ).setLayout( {
+	name: 'mx_gradient_scale2d_1',
+	type: 'vec3',
+	inputs: [
+		{ name: 'v', type: 'vec3' }
+	]
 } );
 
-const mx_gradient_scale2d = overloadingFn( [ mx_gradient_scale2d_0, mx_gradient_scale2d_1 ] );
+const mx_gradient_scale2d = /*#__PURE__*/ overloadingFn( [ mx_gradient_scale2d_0, mx_gradient_scale2d_1 ] );
 
-const mx_gradient_scale3d_1 = tslFn( ( [ v_immutable ] ) => {
+const mx_gradient_scale3d_1 = /*#__PURE__*/ tslFn( ( [ v_immutable ] ) => {
 
 	const v = vec3( v_immutable ).toVar();
 
 	return mul( 0.9820, v );
 
+} ).setLayout( {
+	name: 'mx_gradient_scale3d_1',
+	type: 'vec3',
+	inputs: [
+		{ name: 'v', type: 'vec3' }
+	]
 } );
 
-const mx_gradient_scale3d = overloadingFn( [ mx_gradient_scale3d_0, mx_gradient_scale3d_1 ] );
+const mx_gradient_scale3d = /*#__PURE__*/ overloadingFn( [ mx_gradient_scale3d_0, mx_gradient_scale3d_1 ] );
 
-const mx_rotl32 = tslFn( ( [ x_immutable, k_immutable ] ) => {
+const mx_rotl32 = /*#__PURE__*/ tslFn( ( [ x_immutable, k_immutable ] ) => {
 
 	const k = int( k_immutable ).toVar();
 	const x = uint( x_immutable ).toVar();
 
 	return x.shiftLeft( k ).bitOr( x.shiftRight( int( 32 ).sub( k ) ) );
 
+} ).setLayout( {
+	name: 'mx_rotl32',
+	type: 'uint',
+	inputs: [
+		{ name: 'x', type: 'uint' },
+		{ name: 'k', type: 'int' }
+	]
 } );
 
-const mx_bjmix = tslFn( ( [ a, b, c ] ) => {
+const mx_bjmix = /*#__PURE__*/ tslFn( ( [ a, b, c ] ) => {
 
 	a.subAssign( c );
 	a.bitXorAssign( mx_rotl32( c, int( 4 ) ) );
@@ -57162,7 +57508,7 @@ const mx_bjmix = tslFn( ( [ a, b, c ] ) => {
 
 } );
 
-const mx_bjfinal = tslFn( ( [ a_immutable, b_immutable, c_immutable ] ) => {
+const mx_bjfinal = /*#__PURE__*/ tslFn( ( [ a_immutable, b_immutable, c_immutable ] ) => {
 
 	const c = uint( c_immutable ).toVar();
 	const b = uint( b_immutable ).toVar();
@@ -57184,65 +57530,106 @@ const mx_bjfinal = tslFn( ( [ a_immutable, b_immutable, c_immutable ] ) => {
 
 	return c;
 
+} ).setLayout( {
+	name: 'mx_bjfinal',
+	type: 'uint',
+	inputs: [
+		{ name: 'a', type: 'uint' },
+		{ name: 'b', type: 'uint' },
+		{ name: 'c', type: 'uint' }
+	]
 } );
 
-const mx_bits_to_01 = tslFn( ( [ bits_immutable ] ) => {
+const mx_bits_to_01 = /*#__PURE__*/ tslFn( ( [ bits_immutable ] ) => {
 
 	const bits = uint( bits_immutable ).toVar();
 
 	return float( bits ).div( float( uint( int( 0xffffffff ) ) ) );
 
+} ).setLayout( {
+	name: 'mx_bits_to_01',
+	type: 'float',
+	inputs: [
+		{ name: 'bits', type: 'uint' }
+	]
 } );
 
-const mx_fade = tslFn( ( [ t_immutable ] ) => {
+const mx_fade = /*#__PURE__*/ tslFn( ( [ t_immutable ] ) => {
 
 	const t = float( t_immutable ).toVar();
 
-	return t.mul( t.mul( t.mul( t.mul( t.mul( 6.0 ).sub( 15.0 ) ).add( 10.0 ) ) ) );
+	return t.mul( t ).mul( t ).mul( t.mul( t.mul( 6.0 ).sub( 15.0 ) ).add( 10.0 ) );
 
+} ).setLayout( {
+	name: 'mx_fade',
+	type: 'float',
+	inputs: [
+		{ name: 't', type: 'float' }
+	]
 } );
 
-const mx_hash_int_0 = tslFn( ( [ x_immutable ] ) => {
+const mx_hash_int_0 = /*#__PURE__*/ tslFn( ( [ x_immutable ] ) => {
 
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 1 ) ).toVar();
-	const seed = uint( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ).add( uint( 13 ) ) ) ).toVar();
+	const seed = uint( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ).toVar();
 
 	return mx_bjfinal( seed.add( uint( x ) ), seed, seed );
 
+} ).setLayout( {
+	name: 'mx_hash_int_0',
+	type: 'uint',
+	inputs: [
+		{ name: 'x', type: 'int' }
+	]
 } );
 
-const mx_hash_int_1 = tslFn( ( [ x_immutable, y_immutable ] ) => {
+const mx_hash_int_1 = /*#__PURE__*/ tslFn( ( [ x_immutable, y_immutable ] ) => {
 
 	const y = int( y_immutable ).toVar();
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 2 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ).add( uint( 13 ) ) ) ) ) );
+	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 
 	return mx_bjfinal( a, b, c );
 
+} ).setLayout( {
+	name: 'mx_hash_int_1',
+	type: 'uint',
+	inputs: [
+		{ name: 'x', type: 'int' },
+		{ name: 'y', type: 'int' }
+	]
 } );
 
-const mx_hash_int_2 = tslFn( ( [ x_immutable, y_immutable, z_immutable ] ) => {
+const mx_hash_int_2 = /*#__PURE__*/ tslFn( ( [ x_immutable, y_immutable, z_immutable ] ) => {
 
 	const z = int( z_immutable ).toVar();
 	const y = int( y_immutable ).toVar();
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 3 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ).add( uint( 13 ) ) ) ) ) );
+	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 	c.addAssign( uint( z ) );
 
 	return mx_bjfinal( a, b, c );
 
+} ).setLayout( {
+	name: 'mx_hash_int_2',
+	type: 'uint',
+	inputs: [
+		{ name: 'x', type: 'int' },
+		{ name: 'y', type: 'int' },
+		{ name: 'z', type: 'int' }
+	]
 } );
 
-const mx_hash_int_3 = tslFn( ( [ x_immutable, y_immutable, z_immutable, xx_immutable ] ) => {
+const mx_hash_int_3 = /*#__PURE__*/ tslFn( ( [ x_immutable, y_immutable, z_immutable, xx_immutable ] ) => {
 
 	const xx = int( xx_immutable ).toVar();
 	const z = int( z_immutable ).toVar();
@@ -57250,7 +57637,7 @@ const mx_hash_int_3 = tslFn( ( [ x_immutable, y_immutable, z_immutable, xx_immut
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 4 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ).add( uint( 13 ) ) ) ) ) );
+	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 	c.addAssign( uint( z ) );
@@ -57259,9 +57646,18 @@ const mx_hash_int_3 = tslFn( ( [ x_immutable, y_immutable, z_immutable, xx_immut
 
 	return mx_bjfinal( a, b, c );
 
+} ).setLayout( {
+	name: 'mx_hash_int_3',
+	type: 'uint',
+	inputs: [
+		{ name: 'x', type: 'int' },
+		{ name: 'y', type: 'int' },
+		{ name: 'z', type: 'int' },
+		{ name: 'xx', type: 'int' }
+	]
 } );
 
-const mx_hash_int_4 = tslFn( ( [ x_immutable, y_immutable, z_immutable, xx_immutable, yy_immutable ] ) => {
+const mx_hash_int_4 = /*#__PURE__*/ tslFn( ( [ x_immutable, y_immutable, z_immutable, xx_immutable, yy_immutable ] ) => {
 
 	const yy = int( yy_immutable ).toVar();
 	const xx = int( xx_immutable ).toVar();
@@ -57270,7 +57666,7 @@ const mx_hash_int_4 = tslFn( ( [ x_immutable, y_immutable, z_immutable, xx_immut
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 5 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ).add( uint( 13 ) ) ) ) ) );
+	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 	c.addAssign( uint( z ) );
@@ -57280,11 +57676,21 @@ const mx_hash_int_4 = tslFn( ( [ x_immutable, y_immutable, z_immutable, xx_immut
 
 	return mx_bjfinal( a, b, c );
 
+} ).setLayout( {
+	name: 'mx_hash_int_4',
+	type: 'uint',
+	inputs: [
+		{ name: 'x', type: 'int' },
+		{ name: 'y', type: 'int' },
+		{ name: 'z', type: 'int' },
+		{ name: 'xx', type: 'int' },
+		{ name: 'yy', type: 'int' }
+	]
 } );
 
-const mx_hash_int = overloadingFn( [ mx_hash_int_0, mx_hash_int_1, mx_hash_int_2, mx_hash_int_3, mx_hash_int_4 ] );
+const mx_hash_int = /*#__PURE__*/ overloadingFn( [ mx_hash_int_0, mx_hash_int_1, mx_hash_int_2, mx_hash_int_3, mx_hash_int_4 ] );
 
-const mx_hash_vec3_0 = tslFn( ( [ x_immutable, y_immutable ] ) => {
+const mx_hash_vec3_0 = /*#__PURE__*/ tslFn( ( [ x_immutable, y_immutable ] ) => {
 
 	const y = int( y_immutable ).toVar();
 	const x = int( x_immutable ).toVar();
@@ -57296,9 +57702,16 @@ const mx_hash_vec3_0 = tslFn( ( [ x_immutable, y_immutable ] ) => {
 
 	return result;
 
+} ).setLayout( {
+	name: 'mx_hash_vec3_0',
+	type: 'uvec3',
+	inputs: [
+		{ name: 'x', type: 'int' },
+		{ name: 'y', type: 'int' }
+	]
 } );
 
-const mx_hash_vec3_1 = tslFn( ( [ x_immutable, y_immutable, z_immutable ] ) => {
+const mx_hash_vec3_1 = /*#__PURE__*/ tslFn( ( [ x_immutable, y_immutable, z_immutable ] ) => {
 
 	const z = int( z_immutable ).toVar();
 	const y = int( y_immutable ).toVar();
@@ -57311,11 +57724,19 @@ const mx_hash_vec3_1 = tslFn( ( [ x_immutable, y_immutable, z_immutable ] ) => {
 
 	return result;
 
+} ).setLayout( {
+	name: 'mx_hash_vec3_1',
+	type: 'uvec3',
+	inputs: [
+		{ name: 'x', type: 'int' },
+		{ name: 'y', type: 'int' },
+		{ name: 'z', type: 'int' }
+	]
 } );
 
-const mx_hash_vec3 = overloadingFn( [ mx_hash_vec3_0, mx_hash_vec3_1 ] );
+const mx_hash_vec3 = /*#__PURE__*/ overloadingFn( [ mx_hash_vec3_0, mx_hash_vec3_1 ] );
 
-const mx_perlin_noise_float_0 = tslFn( ( [ p_immutable ] ) => {
+const mx_perlin_noise_float_0 = /*#__PURE__*/ tslFn( ( [ p_immutable ] ) => {
 
 	const p = vec2( p_immutable ).toVar();
 	const X = int().toVar(), Y = int().toVar();
@@ -57327,9 +57748,15 @@ const mx_perlin_noise_float_0 = tslFn( ( [ p_immutable ] ) => {
 
 	return mx_gradient_scale2d( result );
 
+} ).setLayout( {
+	name: 'mx_perlin_noise_float_0',
+	type: 'float',
+	inputs: [
+		{ name: 'p', type: 'vec2' }
+	]
 } );
 
-const mx_perlin_noise_float_1 = tslFn( ( [ p_immutable ] ) => {
+const mx_perlin_noise_float_1 = /*#__PURE__*/ tslFn( ( [ p_immutable ] ) => {
 
 	const p = vec3( p_immutable ).toVar();
 	const X = int().toVar(), Y = int().toVar(), Z = int().toVar();
@@ -57343,11 +57770,17 @@ const mx_perlin_noise_float_1 = tslFn( ( [ p_immutable ] ) => {
 
 	return mx_gradient_scale3d( result );
 
+} ).setLayout( {
+	name: 'mx_perlin_noise_float_1',
+	type: 'float',
+	inputs: [
+		{ name: 'p', type: 'vec3' }
+	]
 } );
 
-const mx_perlin_noise_float = overloadingFn( [ mx_perlin_noise_float_0, mx_perlin_noise_float_1 ] );
+const mx_perlin_noise_float = /*#__PURE__*/ overloadingFn( [ mx_perlin_noise_float_0, mx_perlin_noise_float_1 ] );
 
-const mx_perlin_noise_vec3_0 = tslFn( ( [ p_immutable ] ) => {
+const mx_perlin_noise_vec3_0 = /*#__PURE__*/ tslFn( ( [ p_immutable ] ) => {
 
 	const p = vec2( p_immutable ).toVar();
 	const X = int().toVar(), Y = int().toVar();
@@ -57359,9 +57792,15 @@ const mx_perlin_noise_vec3_0 = tslFn( ( [ p_immutable ] ) => {
 
 	return mx_gradient_scale2d( result );
 
+} ).setLayout( {
+	name: 'mx_perlin_noise_vec3_0',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec2' }
+	]
 } );
 
-const mx_perlin_noise_vec3_1 = tslFn( ( [ p_immutable ] ) => {
+const mx_perlin_noise_vec3_1 = /*#__PURE__*/ tslFn( ( [ p_immutable ] ) => {
 
 	const p = vec3( p_immutable ).toVar();
 	const X = int().toVar(), Y = int().toVar(), Z = int().toVar();
@@ -57375,20 +57814,32 @@ const mx_perlin_noise_vec3_1 = tslFn( ( [ p_immutable ] ) => {
 
 	return mx_gradient_scale3d( result );
 
+} ).setLayout( {
+	name: 'mx_perlin_noise_vec3_1',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec3' }
+	]
 } );
 
-const mx_perlin_noise_vec3 = overloadingFn( [ mx_perlin_noise_vec3_0, mx_perlin_noise_vec3_1 ] );
+const mx_perlin_noise_vec3 = /*#__PURE__*/ overloadingFn( [ mx_perlin_noise_vec3_0, mx_perlin_noise_vec3_1 ] );
 
-const mx_cell_noise_float_0 = tslFn( ( [ p_immutable ] ) => {
+const mx_cell_noise_float_0 = /*#__PURE__*/ tslFn( ( [ p_immutable ] ) => {
 
 	const p = float( p_immutable ).toVar();
 	const ix = int( mx_floor( p ) ).toVar();
 
 	return mx_bits_to_01( mx_hash_int( ix ) );
 
+} ).setLayout( {
+	name: 'mx_cell_noise_float_0',
+	type: 'float',
+	inputs: [
+		{ name: 'p', type: 'float' }
+	]
 } );
 
-const mx_cell_noise_float_1 = tslFn( ( [ p_immutable ] ) => {
+const mx_cell_noise_float_1 = /*#__PURE__*/ tslFn( ( [ p_immutable ] ) => {
 
 	const p = vec2( p_immutable ).toVar();
 	const ix = int( mx_floor( p.x ) ).toVar();
@@ -57396,9 +57847,15 @@ const mx_cell_noise_float_1 = tslFn( ( [ p_immutable ] ) => {
 
 	return mx_bits_to_01( mx_hash_int( ix, iy ) );
 
+} ).setLayout( {
+	name: 'mx_cell_noise_float_1',
+	type: 'float',
+	inputs: [
+		{ name: 'p', type: 'vec2' }
+	]
 } );
 
-const mx_cell_noise_float_2 = tslFn( ( [ p_immutable ] ) => {
+const mx_cell_noise_float_2 = /*#__PURE__*/ tslFn( ( [ p_immutable ] ) => {
 
 	const p = vec3( p_immutable ).toVar();
 	const ix = int( mx_floor( p.x ) ).toVar();
@@ -57407,9 +57864,15 @@ const mx_cell_noise_float_2 = tslFn( ( [ p_immutable ] ) => {
 
 	return mx_bits_to_01( mx_hash_int( ix, iy, iz ) );
 
+} ).setLayout( {
+	name: 'mx_cell_noise_float_2',
+	type: 'float',
+	inputs: [
+		{ name: 'p', type: 'vec3' }
+	]
 } );
 
-const mx_cell_noise_float_3 = tslFn( ( [ p_immutable ] ) => {
+const mx_cell_noise_float_3 = /*#__PURE__*/ tslFn( ( [ p_immutable ] ) => {
 
 	const p = vec4( p_immutable ).toVar();
 	const ix = int( mx_floor( p.x ) ).toVar();
@@ -57419,20 +57882,32 @@ const mx_cell_noise_float_3 = tslFn( ( [ p_immutable ] ) => {
 
 	return mx_bits_to_01( mx_hash_int( ix, iy, iz, iw ) );
 
+} ).setLayout( {
+	name: 'mx_cell_noise_float_3',
+	type: 'float',
+	inputs: [
+		{ name: 'p', type: 'vec4' }
+	]
 } );
 
-const mx_cell_noise_float$1 = overloadingFn( [ mx_cell_noise_float_0, mx_cell_noise_float_1, mx_cell_noise_float_2, mx_cell_noise_float_3 ] );
+const mx_cell_noise_float$1 = /*#__PURE__*/ overloadingFn( [ mx_cell_noise_float_0, mx_cell_noise_float_1, mx_cell_noise_float_2, mx_cell_noise_float_3 ] );
 
-const mx_cell_noise_vec3_0 = tslFn( ( [ p_immutable ] ) => {
+const mx_cell_noise_vec3_0 = /*#__PURE__*/ tslFn( ( [ p_immutable ] ) => {
 
 	const p = float( p_immutable ).toVar();
 	const ix = int( mx_floor( p ) ).toVar();
 
 	return vec3( mx_bits_to_01( mx_hash_int( ix, int( 0 ) ) ), mx_bits_to_01( mx_hash_int( ix, int( 1 ) ) ), mx_bits_to_01( mx_hash_int( ix, int( 2 ) ) ) );
 
+} ).setLayout( {
+	name: 'mx_cell_noise_vec3_0',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'float' }
+	]
 } );
 
-const mx_cell_noise_vec3_1 = tslFn( ( [ p_immutable ] ) => {
+const mx_cell_noise_vec3_1 = /*#__PURE__*/ tslFn( ( [ p_immutable ] ) => {
 
 	const p = vec2( p_immutable ).toVar();
 	const ix = int( mx_floor( p.x ) ).toVar();
@@ -57440,9 +57915,15 @@ const mx_cell_noise_vec3_1 = tslFn( ( [ p_immutable ] ) => {
 
 	return vec3( mx_bits_to_01( mx_hash_int( ix, iy, int( 0 ) ) ), mx_bits_to_01( mx_hash_int( ix, iy, int( 1 ) ) ), mx_bits_to_01( mx_hash_int( ix, iy, int( 2 ) ) ) );
 
+} ).setLayout( {
+	name: 'mx_cell_noise_vec3_1',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec2' }
+	]
 } );
 
-const mx_cell_noise_vec3_2 = tslFn( ( [ p_immutable ] ) => {
+const mx_cell_noise_vec3_2 = /*#__PURE__*/ tslFn( ( [ p_immutable ] ) => {
 
 	const p = vec3( p_immutable ).toVar();
 	const ix = int( mx_floor( p.x ) ).toVar();
@@ -57451,9 +57932,15 @@ const mx_cell_noise_vec3_2 = tslFn( ( [ p_immutable ] ) => {
 
 	return vec3( mx_bits_to_01( mx_hash_int( ix, iy, iz, int( 0 ) ) ), mx_bits_to_01( mx_hash_int( ix, iy, iz, int( 1 ) ) ), mx_bits_to_01( mx_hash_int( ix, iy, iz, int( 2 ) ) ) );
 
+} ).setLayout( {
+	name: 'mx_cell_noise_vec3_2',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec3' }
+	]
 } );
 
-const mx_cell_noise_vec3_3 = tslFn( ( [ p_immutable ] ) => {
+const mx_cell_noise_vec3_3 = /*#__PURE__*/ tslFn( ( [ p_immutable ] ) => {
 
 	const p = vec4( p_immutable ).toVar();
 	const ix = int( mx_floor( p.x ) ).toVar();
@@ -57463,11 +57950,17 @@ const mx_cell_noise_vec3_3 = tslFn( ( [ p_immutable ] ) => {
 
 	return vec3( mx_bits_to_01( mx_hash_int( ix, iy, iz, iw, int( 0 ) ) ), mx_bits_to_01( mx_hash_int( ix, iy, iz, iw, int( 1 ) ) ), mx_bits_to_01( mx_hash_int( ix, iy, iz, iw, int( 2 ) ) ) );
 
+} ).setLayout( {
+	name: 'mx_cell_noise_vec3_3',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec4' }
+	]
 } );
 
-const mx_cell_noise_vec3 = overloadingFn( [ mx_cell_noise_vec3_0, mx_cell_noise_vec3_1, mx_cell_noise_vec3_2, mx_cell_noise_vec3_3 ] );
+const mx_cell_noise_vec3 = /*#__PURE__*/ overloadingFn( [ mx_cell_noise_vec3_0, mx_cell_noise_vec3_1, mx_cell_noise_vec3_2, mx_cell_noise_vec3_3 ] );
 
-const mx_fractal_noise_float$1 = tslFn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
+const mx_fractal_noise_float$1 = /*#__PURE__*/ tslFn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
 
 	const diminish = float( diminish_immutable ).toVar();
 	const lacunarity = float( lacunarity_immutable ).toVar();
@@ -57486,9 +57979,18 @@ const mx_fractal_noise_float$1 = tslFn( ( [ p_immutable, octaves_immutable, lacu
 
 	return result;
 
+} ).setLayout( {
+	name: 'mx_fractal_noise_float',
+	type: 'float',
+	inputs: [
+		{ name: 'p', type: 'vec3' },
+		{ name: 'octaves', type: 'int' },
+		{ name: 'lacunarity', type: 'float' },
+		{ name: 'diminish', type: 'float' }
+	]
 } );
 
-const mx_fractal_noise_vec3$1 = tslFn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
+const mx_fractal_noise_vec3$1 = /*#__PURE__*/ tslFn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
 
 	const diminish = float( diminish_immutable ).toVar();
 	const lacunarity = float( lacunarity_immutable ).toVar();
@@ -57507,9 +58009,18 @@ const mx_fractal_noise_vec3$1 = tslFn( ( [ p_immutable, octaves_immutable, lacun
 
 	return result;
 
+} ).setLayout( {
+	name: 'mx_fractal_noise_vec3',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec3' },
+		{ name: 'octaves', type: 'int' },
+		{ name: 'lacunarity', type: 'float' },
+		{ name: 'diminish', type: 'float' }
+	]
 } );
 
-const mx_fractal_noise_vec2$1 = tslFn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
+const mx_fractal_noise_vec2$1 = /*#__PURE__*/ tslFn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
 
 	const diminish = float( diminish_immutable ).toVar();
 	const lacunarity = float( lacunarity_immutable ).toVar();
@@ -57518,9 +58029,18 @@ const mx_fractal_noise_vec2$1 = tslFn( ( [ p_immutable, octaves_immutable, lacun
 
 	return vec2( mx_fractal_noise_float$1( p, octaves, lacunarity, diminish ), mx_fractal_noise_float$1( p.add( vec3( int( 19 ), int( 193 ), int( 17 ) ) ), octaves, lacunarity, diminish ) );
 
+} ).setLayout( {
+	name: 'mx_fractal_noise_vec2',
+	type: 'vec2',
+	inputs: [
+		{ name: 'p', type: 'vec3' },
+		{ name: 'octaves', type: 'int' },
+		{ name: 'lacunarity', type: 'float' },
+		{ name: 'diminish', type: 'float' }
+	]
 } );
 
-const mx_fractal_noise_vec4$1 = tslFn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
+const mx_fractal_noise_vec4$1 = /*#__PURE__*/ tslFn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
 
 	const diminish = float( diminish_immutable ).toVar();
 	const lacunarity = float( lacunarity_immutable ).toVar();
@@ -57531,9 +58051,18 @@ const mx_fractal_noise_vec4$1 = tslFn( ( [ p_immutable, octaves_immutable, lacun
 
 	return vec4( c, f );
 
+} ).setLayout( {
+	name: 'mx_fractal_noise_vec4',
+	type: 'vec4',
+	inputs: [
+		{ name: 'p', type: 'vec3' },
+		{ name: 'octaves', type: 'int' },
+		{ name: 'lacunarity', type: 'float' },
+		{ name: 'diminish', type: 'float' }
+	]
 } );
 
-const mx_worley_distance_0 = tslFn( ( [ p_immutable, x_immutable, y_immutable, xoff_immutable, yoff_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_distance_0 = /*#__PURE__*/ tslFn( ( [ p_immutable, x_immutable, y_immutable, xoff_immutable, yoff_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -57564,9 +58093,21 @@ const mx_worley_distance_0 = tslFn( ( [ p_immutable, x_immutable, y_immutable, x
 
 	return dot( diff, diff );
 
+} ).setLayout( {
+	name: 'mx_worley_distance_0',
+	type: 'float',
+	inputs: [
+		{ name: 'p', type: 'vec2' },
+		{ name: 'x', type: 'int' },
+		{ name: 'y', type: 'int' },
+		{ name: 'xoff', type: 'int' },
+		{ name: 'yoff', type: 'int' },
+		{ name: 'jitter', type: 'float' },
+		{ name: 'metric', type: 'int' }
+	]
 } );
 
-const mx_worley_distance_1 = tslFn( ( [ p_immutable, x_immutable, y_immutable, z_immutable, xoff_immutable, yoff_immutable, zoff_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_distance_1 = /*#__PURE__*/ tslFn( ( [ p_immutable, x_immutable, y_immutable, z_immutable, xoff_immutable, yoff_immutable, zoff_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -57586,7 +58127,7 @@ const mx_worley_distance_1 = tslFn( ( [ p_immutable, x_immutable, y_immutable, z
 
 	If( metric.equal( int( 2 ) ), () => {
 
-		return abs( diff.x ).add( abs( diff.y ).add( abs( diff.z ) ) );
+		return abs( diff.x ).add( abs( diff.y ) ).add( abs( diff.z ) );
 
 	} );
 
@@ -57598,11 +58139,25 @@ const mx_worley_distance_1 = tslFn( ( [ p_immutable, x_immutable, y_immutable, z
 
 	return dot( diff, diff );
 
+} ).setLayout( {
+	name: 'mx_worley_distance_1',
+	type: 'float',
+	inputs: [
+		{ name: 'p', type: 'vec3' },
+		{ name: 'x', type: 'int' },
+		{ name: 'y', type: 'int' },
+		{ name: 'z', type: 'int' },
+		{ name: 'xoff', type: 'int' },
+		{ name: 'yoff', type: 'int' },
+		{ name: 'zoff', type: 'int' },
+		{ name: 'jitter', type: 'float' },
+		{ name: 'metric', type: 'int' }
+	]
 } );
 
-const mx_worley_distance = overloadingFn( [ mx_worley_distance_0, mx_worley_distance_1 ] );
+const mx_worley_distance = /*#__PURE__*/ overloadingFn( [ mx_worley_distance_0, mx_worley_distance_1 ] );
 
-const mx_worley_noise_float_0 = tslFn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_noise_float_0 = /*#__PURE__*/ tslFn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -57630,9 +58185,17 @@ const mx_worley_noise_float_0 = tslFn( ( [ p_immutable, jitter_immutable, metric
 
 	return sqdist;
 
+} ).setLayout( {
+	name: 'mx_worley_noise_float_0',
+	type: 'float',
+	inputs: [
+		{ name: 'p', type: 'vec2' },
+		{ name: 'jitter', type: 'float' },
+		{ name: 'metric', type: 'int' }
+	]
 } );
 
-const mx_worley_noise_vec2_0 = tslFn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_noise_vec2_0 = /*#__PURE__*/ tslFn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -57670,9 +58233,17 @@ const mx_worley_noise_vec2_0 = tslFn( ( [ p_immutable, jitter_immutable, metric_
 
 	return sqdist;
 
+} ).setLayout( {
+	name: 'mx_worley_noise_vec2_0',
+	type: 'vec2',
+	inputs: [
+		{ name: 'p', type: 'vec2' },
+		{ name: 'jitter', type: 'float' },
+		{ name: 'metric', type: 'int' }
+	]
 } );
 
-const mx_worley_noise_vec3_0 = tslFn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_noise_vec3_0 = /*#__PURE__*/ tslFn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -57716,9 +58287,17 @@ const mx_worley_noise_vec3_0 = tslFn( ( [ p_immutable, jitter_immutable, metric_
 
 	return sqdist;
 
+} ).setLayout( {
+	name: 'mx_worley_noise_vec3_0',
+	type: 'vec3',
+	inputs: [
+		{ name: 'p', type: 'vec2' },
+		{ name: 'jitter', type: 'float' },
+		{ name: 'metric', type: 'int' }
+	]
 } );
 
-const mx_worley_noise_float_1 = tslFn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_noise_float_1 = /*#__PURE__*/ tslFn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -57750,11 +58329,19 @@ const mx_worley_noise_float_1 = tslFn( ( [ p_immutable, jitter_immutable, metric
 
 	return sqdist;
 
+} ).setLayout( {
+	name: 'mx_worley_noise_float_1',
+	type: 'float',
+	inputs: [
+		{ name: 'p', type: 'vec3' },
+		{ name: 'jitter', type: 'float' },
+		{ name: 'metric', type: 'int' }
+	]
 } );
 
-const mx_worley_noise_float$1 = overloadingFn( [ mx_worley_noise_float_0, mx_worley_noise_float_1 ] );
+const mx_worley_noise_float$1 = /*#__PURE__*/ overloadingFn( [ mx_worley_noise_float_0, mx_worley_noise_float_1 ] );
 
-const mx_worley_noise_vec2_1 = tslFn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_noise_vec2_1 = /*#__PURE__*/ tslFn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -57796,11 +58383,19 @@ const mx_worley_noise_vec2_1 = tslFn( ( [ p_immutable, jitter_immutable, metric_
 
 	return sqdist;
 
+} ).setLayout( {
+	name: 'mx_worley_noise_vec2_1',
+	type: 'vec2',
+	inputs: [
+		{ name: 'p', type: 'vec3' },
+		{ name: 'jitter', type: 'float' },
+		{ name: 'metric', type: 'int' }
+	]
 } );
 
-const mx_worley_noise_vec2$1 = overloadingFn( [ mx_worley_noise_vec2_0, mx_worley_noise_vec2_1 ] );
+const mx_worley_noise_vec2$1 = /*#__PURE__*/ overloadingFn( [ mx_worley_noise_vec2_0, mx_worley_noise_vec2_1 ] );
 
-const mx_worley_noise_vec3_1 = tslFn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_noise_vec3_1 = /*#__PURE__*/ tslFn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -57848,500 +58443,7 @@ const mx_worley_noise_vec3_1 = tslFn( ( [ p_immutable, jitter_immutable, metric_
 
 	return sqdist;
 
-} );
-
-const mx_worley_noise_vec3$1 = overloadingFn( [ mx_worley_noise_vec3_0, mx_worley_noise_vec3_1 ] );
-
-// layouts
-
-mx_select.setLayout( {
-	name: 'mx_select',
-	type: 'float',
-	inputs: [
-		{ name: 'b', type: 'bool' },
-		{ name: 't', type: 'float' },
-		{ name: 'f', type: 'float' }
-	]
-} );
-
-mx_negate_if.setLayout( {
-	name: 'mx_negate_if',
-	type: 'float',
-	inputs: [
-		{ name: 'val', type: 'float' },
-		{ name: 'b', type: 'bool' }
-	]
-} );
-
-mx_floor.setLayout( {
-	name: 'mx_floor',
-	type: 'int',
-	inputs: [
-		{ name: 'x', type: 'float' }
-	]
-} );
-
-mx_bilerp_0.setLayout( {
-	name: 'mx_bilerp_0',
-	type: 'float',
-	inputs: [
-		{ name: 'v0', type: 'float' },
-		{ name: 'v1', type: 'float' },
-		{ name: 'v2', type: 'float' },
-		{ name: 'v3', type: 'float' },
-		{ name: 's', type: 'float' },
-		{ name: 't', type: 'float' }
-	]
-} );
-
-mx_bilerp_1.setLayout( {
-	name: 'mx_bilerp_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'v0', type: 'vec3' },
-		{ name: 'v1', type: 'vec3' },
-		{ name: 'v2', type: 'vec3' },
-		{ name: 'v3', type: 'vec3' },
-		{ name: 's', type: 'float' },
-		{ name: 't', type: 'float' }
-	]
-} );
-
-mx_trilerp_0.setLayout( {
-	name: 'mx_trilerp_0',
-	type: 'float',
-	inputs: [
-		{ name: 'v0', type: 'float' },
-		{ name: 'v1', type: 'float' },
-		{ name: 'v2', type: 'float' },
-		{ name: 'v3', type: 'float' },
-		{ name: 'v4', type: 'float' },
-		{ name: 'v5', type: 'float' },
-		{ name: 'v6', type: 'float' },
-		{ name: 'v7', type: 'float' },
-		{ name: 's', type: 'float' },
-		{ name: 't', type: 'float' },
-		{ name: 'r', type: 'float' }
-	]
-} );
-
-mx_trilerp_1.setLayout( {
-	name: 'mx_trilerp_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'v0', type: 'vec3' },
-		{ name: 'v1', type: 'vec3' },
-		{ name: 'v2', type: 'vec3' },
-		{ name: 'v3', type: 'vec3' },
-		{ name: 'v4', type: 'vec3' },
-		{ name: 'v5', type: 'vec3' },
-		{ name: 'v6', type: 'vec3' },
-		{ name: 'v7', type: 'vec3' },
-		{ name: 's', type: 'float' },
-		{ name: 't', type: 'float' },
-		{ name: 'r', type: 'float' }
-	]
-} );
-
-mx_gradient_float_0.setLayout( {
-	name: 'mx_gradient_float_0',
-	type: 'float',
-	inputs: [
-		{ name: 'hash', type: 'uint' },
-		{ name: 'x', type: 'float' },
-		{ name: 'y', type: 'float' }
-	]
-} );
-
-mx_gradient_float_1.setLayout( {
-	name: 'mx_gradient_float_1',
-	type: 'float',
-	inputs: [
-		{ name: 'hash', type: 'uint' },
-		{ name: 'x', type: 'float' },
-		{ name: 'y', type: 'float' },
-		{ name: 'z', type: 'float' }
-	]
-} );
-
-mx_gradient_vec3_0.setLayout( {
-	name: 'mx_gradient_vec3_0',
-	type: 'vec3',
-	inputs: [
-		{ name: 'hash', type: 'uvec3' },
-		{ name: 'x', type: 'float' },
-		{ name: 'y', type: 'float' }
-	]
-} );
-
-mx_gradient_vec3_1.setLayout( {
-	name: 'mx_gradient_vec3_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'hash', type: 'uvec3' },
-		{ name: 'x', type: 'float' },
-		{ name: 'y', type: 'float' },
-		{ name: 'z', type: 'float' }
-	]
-} );
-
-mx_gradient_scale2d_0.setLayout( {
-	name: 'mx_gradient_scale2d_0',
-	type: 'float',
-	inputs: [
-		{ name: 'v', type: 'float' }
-	]
-} );
-
-mx_gradient_scale3d_0.setLayout( {
-	name: 'mx_gradient_scale3d_0',
-	type: 'float',
-	inputs: [
-		{ name: 'v', type: 'float' }
-	]
-} );
-
-mx_gradient_scale2d_1.setLayout( {
-	name: 'mx_gradient_scale2d_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'v', type: 'vec3' }
-	]
-} );
-
-mx_gradient_scale3d_1.setLayout( {
-	name: 'mx_gradient_scale3d_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'v', type: 'vec3' }
-	]
-} );
-
-mx_rotl32.setLayout( {
-	name: 'mx_rotl32',
-	type: 'uint',
-	inputs: [
-		{ name: 'x', type: 'uint' },
-		{ name: 'k', type: 'int' }
-	]
-} );
-
-mx_bjfinal.setLayout( {
-	name: 'mx_bjfinal',
-	type: 'uint',
-	inputs: [
-		{ name: 'a', type: 'uint' },
-		{ name: 'b', type: 'uint' },
-		{ name: 'c', type: 'uint' }
-	]
-} );
-
-mx_bits_to_01.setLayout( {
-	name: 'mx_bits_to_01',
-	type: 'float',
-	inputs: [
-		{ name: 'bits', type: 'uint' }
-	]
-} );
-
-mx_fade.setLayout( {
-	name: 'mx_fade',
-	type: 'float',
-	inputs: [
-		{ name: 't', type: 'float' }
-	]
-} );
-
-mx_hash_int_0.setLayout( {
-	name: 'mx_hash_int_0',
-	type: 'uint',
-	inputs: [
-		{ name: 'x', type: 'int' }
-	]
-} );
-
-mx_hash_int_1.setLayout( {
-	name: 'mx_hash_int_1',
-	type: 'uint',
-	inputs: [
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' }
-	]
-} );
-
-mx_hash_int_2.setLayout( {
-	name: 'mx_hash_int_2',
-	type: 'uint',
-	inputs: [
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' },
-		{ name: 'z', type: 'int' }
-	]
-} );
-
-mx_hash_int_3.setLayout( {
-	name: 'mx_hash_int_3',
-	type: 'uint',
-	inputs: [
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' },
-		{ name: 'z', type: 'int' },
-		{ name: 'xx', type: 'int' }
-	]
-} );
-
-mx_hash_int_4.setLayout( {
-	name: 'mx_hash_int_4',
-	type: 'uint',
-	inputs: [
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' },
-		{ name: 'z', type: 'int' },
-		{ name: 'xx', type: 'int' },
-		{ name: 'yy', type: 'int' }
-	]
-} );
-
-mx_hash_vec3_0.setLayout( {
-	name: 'mx_hash_vec3_0',
-	type: 'uvec3',
-	inputs: [
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' }
-	]
-} );
-
-mx_hash_vec3_1.setLayout( {
-	name: 'mx_hash_vec3_1',
-	type: 'uvec3',
-	inputs: [
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' },
-		{ name: 'z', type: 'int' }
-	]
-} );
-
-mx_perlin_noise_float_0.setLayout( {
-	name: 'mx_perlin_noise_float_0',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec2' }
-	]
-} );
-
-mx_perlin_noise_float_1.setLayout( {
-	name: 'mx_perlin_noise_float_1',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec3' }
-	]
-} );
-
-mx_perlin_noise_vec3_0.setLayout( {
-	name: 'mx_perlin_noise_vec3_0',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec2' }
-	]
-} );
-
-mx_perlin_noise_vec3_1.setLayout( {
-	name: 'mx_perlin_noise_vec3_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec3' }
-	]
-} );
-
-mx_cell_noise_float_0.setLayout( {
-	name: 'mx_cell_noise_float_0',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'float' }
-	]
-} );
-
-mx_cell_noise_float_1.setLayout( {
-	name: 'mx_cell_noise_float_1',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec2' }
-	]
-} );
-
-mx_cell_noise_float_2.setLayout( {
-	name: 'mx_cell_noise_float_2',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec3' }
-	]
-} );
-
-mx_cell_noise_float_3.setLayout( {
-	name: 'mx_cell_noise_float_3',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec4' }
-	]
-} );
-
-mx_cell_noise_vec3_0.setLayout( {
-	name: 'mx_cell_noise_vec3_0',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'float' }
-	]
-} );
-
-mx_cell_noise_vec3_1.setLayout( {
-	name: 'mx_cell_noise_vec3_1',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec2' }
-	]
-} );
-
-mx_cell_noise_vec3_2.setLayout( {
-	name: 'mx_cell_noise_vec3_2',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec3' }
-	]
-} );
-
-mx_cell_noise_vec3_3.setLayout( {
-	name: 'mx_cell_noise_vec3_3',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec4' }
-	]
-} );
-
-mx_fractal_noise_float$1.setLayout( {
-	name: 'mx_fractal_noise_float',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'octaves', type: 'int' },
-		{ name: 'lacunarity', type: 'float' },
-		{ name: 'diminish', type: 'float' }
-	]
-} );
-
-mx_fractal_noise_vec3$1.setLayout( {
-	name: 'mx_fractal_noise_vec3',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'octaves', type: 'int' },
-		{ name: 'lacunarity', type: 'float' },
-		{ name: 'diminish', type: 'float' }
-	]
-} );
-
-mx_fractal_noise_vec2$1.setLayout( {
-	name: 'mx_fractal_noise_vec2',
-	type: 'vec2',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'octaves', type: 'int' },
-		{ name: 'lacunarity', type: 'float' },
-		{ name: 'diminish', type: 'float' }
-	]
-} );
-
-mx_fractal_noise_vec4$1.setLayout( {
-	name: 'mx_fractal_noise_vec4',
-	type: 'vec4',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'octaves', type: 'int' },
-		{ name: 'lacunarity', type: 'float' },
-		{ name: 'diminish', type: 'float' }
-	]
-} );
-
-mx_worley_distance_0.setLayout( {
-	name: 'mx_worley_distance_0',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec2' },
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' },
-		{ name: 'xoff', type: 'int' },
-		{ name: 'yoff', type: 'int' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
-} );
-
-mx_worley_distance_1.setLayout( {
-	name: 'mx_worley_distance_1',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'x', type: 'int' },
-		{ name: 'y', type: 'int' },
-		{ name: 'z', type: 'int' },
-		{ name: 'xoff', type: 'int' },
-		{ name: 'yoff', type: 'int' },
-		{ name: 'zoff', type: 'int' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
-} );
-
-mx_worley_noise_float_0.setLayout( {
-	name: 'mx_worley_noise_float_0',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec2' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
-} );
-
-mx_worley_noise_vec2_0.setLayout( {
-	name: 'mx_worley_noise_vec2_0',
-	type: 'vec2',
-	inputs: [
-		{ name: 'p', type: 'vec2' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
-} );
-
-mx_worley_noise_vec3_0.setLayout( {
-	name: 'mx_worley_noise_vec3_0',
-	type: 'vec3',
-	inputs: [
-		{ name: 'p', type: 'vec2' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
-} );
-
-mx_worley_noise_float_1.setLayout( {
-	name: 'mx_worley_noise_float_1',
-	type: 'float',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
-} );
-
-mx_worley_noise_vec2_1.setLayout( {
-	name: 'mx_worley_noise_vec2_1',
-	type: 'vec2',
-	inputs: [
-		{ name: 'p', type: 'vec3' },
-		{ name: 'jitter', type: 'float' },
-		{ name: 'metric', type: 'int' }
-	]
-} );
-
-mx_worley_noise_vec3_1.setLayout( {
+} ).setLayout( {
 	name: 'mx_worley_noise_vec3_1',
 	type: 'vec3',
 	inputs: [
@@ -58351,11 +58453,13 @@ mx_worley_noise_vec3_1.setLayout( {
 	]
 } );
 
+const mx_worley_noise_vec3$1 = /*#__PURE__*/ overloadingFn( [ mx_worley_noise_vec3_0, mx_worley_noise_vec3_1 ] );
+
 // Three.js Transpiler
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_hsv.glsl
 
 
-const mx_hsvtorgb = tslFn( ( [ hsv_immutable ] ) => {
+const mx_hsvtorgb = /*#__PURE__*/ tslFn( ( [ hsv_immutable ] ) => {
 
 	const hsv = vec3( hsv_immutable ).toVar();
 	const h = float( hsv.x ).toVar();
@@ -58401,9 +58505,15 @@ const mx_hsvtorgb = tslFn( ( [ hsv_immutable ] ) => {
 
 	} );
 
+} ).setLayout( {
+	name: 'mx_hsvtorgb',
+	type: 'vec3',
+	inputs: [
+		{ name: 'hsv', type: 'vec3' }
+	]
 } );
 
-const mx_rgbtohsv = tslFn( ( [ c_immutable ] ) => {
+const mx_rgbtohsv = /*#__PURE__*/ tslFn( ( [ c_immutable ] ) => {
 
 	const c = vec3( c_immutable ).toVar();
 	const r = float( c.x ).toVar();
@@ -58457,19 +58567,7 @@ const mx_rgbtohsv = tslFn( ( [ c_immutable ] ) => {
 
 	return vec3( h, s, v );
 
-} );
-
-// layouts
-
-mx_hsvtorgb.setLayout( {
-	name: 'mx_hsvtorgb',
-	type: 'vec3',
-	inputs: [
-		{ name: 'hsv', type: 'vec3' }
-	]
-} );
-
-mx_rgbtohsv.setLayout( {
+} ).setLayout( {
 	name: 'mx_rgbtohsv',
 	type: 'vec3',
 	inputs: [
@@ -58481,7 +58579,7 @@ mx_rgbtohsv.setLayout( {
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_transform_color.glsl
 
 
-const mx_srgb_texture_to_lin_rec709 = tslFn( ( [ color_immutable ] ) => {
+const mx_srgb_texture_to_lin_rec709 = /*#__PURE__*/ tslFn( ( [ color_immutable ] ) => {
 
 	const color = vec3( color_immutable ).toVar();
 	const isAbove = bvec3( greaterThan( color, vec3( 0.04045 ) ) ).toVar();
@@ -58490,11 +58588,7 @@ const mx_srgb_texture_to_lin_rec709 = tslFn( ( [ color_immutable ] ) => {
 
 	return mix( linSeg, powSeg, isAbove );
 
-} );
-
-// layouts
-
-mx_srgb_texture_to_lin_rec709.setLayout( {
+} ).setLayout( {
 	name: 'mx_srgb_texture_to_lin_rec709',
 	type: 'vec3',
 	inputs: [
@@ -59385,7 +59479,7 @@ class Background extends DataMap {
 
 class NodeBuilderState {
 
-	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, transforms = [] ) {
+	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, instanceBindGroups = true, transforms = [] ) {
 
 		this.vertexShader = vertexShader;
 		this.fragmentShader = fragmentShader;
@@ -59399,29 +59493,40 @@ class NodeBuilderState {
 		this.updateBeforeNodes = updateBeforeNodes;
 		this.updateAfterNodes = updateAfterNodes;
 
+		this.instanceBindGroups = instanceBindGroups;
+
 		this.usedTimes = 0;
 
 	}
 
 	createBindings() {
 
-		const bindingsArray = [];
+		const bindings = [];
 
-		for ( const instanceBinding of this.bindings ) {
+		for ( const instanceGroup of this.bindings ) {
 
-			let binding = instanceBinding;
+			const shared = this.instanceBindGroups && instanceGroup.bindings[ 0 ].groupNode.shared;
 
-			if ( instanceBinding.shared !== true ) {
+			if ( shared !== true ) {
 
-				binding = instanceBinding.clone();
+				const bindingsGroup = new BindGroup( instanceGroup.name );
+				bindings.push( bindingsGroup );
+
+				for ( const instanceBinding of instanceGroup.bindings ) {
+
+					bindingsGroup.bindings.push( instanceBinding.clone() );
+
+				}
+
+			} else {
+
+				bindings.push( instanceGroup );
 
 			}
 
-			bindingsArray.push( binding );
-
 		}
 
-		return bindingsArray;
+		return bindings;
 
 	}
 
@@ -59606,6 +59711,7 @@ class Nodes extends DataMap {
 			nodeBuilder.updateNodes,
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
+			nodeBuilder.instanceBindGroups,
 			nodeBuilder.transforms
 		);
 
@@ -61317,8 +61423,6 @@ class Renderer {
 
 		object.onBeforeRender( this, scene, camera, geometry, material, group );
 
-		material.onBeforeRender( this, scene, camera, geometry, material, group );
-
 		//
 
 		if ( scene.overrideMaterial !== null ) {
@@ -61589,11 +61693,12 @@ let _id$2 = 0;
 
 class NodeUniformBuffer extends UniformBuffer {
 
-	constructor( nodeUniform ) {
+	constructor( nodeUniform, groupNode ) {
 
 		super( 'UniformBuffer_' + _id$2 ++, nodeUniform ? nodeUniform.value : null );
 
 		this.nodeUniform = nodeUniform;
+		this.groupNode = groupNode;
 
 	}
 
@@ -61612,6 +61717,8 @@ class UniformsGroup extends UniformBuffer {
 		super( name );
 
 		this.isUniformsGroup = true;
+
+		this._values = null;
 
 		// the order of uniforms in this array must match the order of uniforms in the shader
 
@@ -61638,6 +61745,18 @@ class UniformsGroup extends UniformBuffer {
 		}
 
 		return this;
+
+	}
+
+	get values() {
+
+		if ( this._values === null ) {
+
+			this._values = Array.from( this.buffer );
+
+		}
+
+		return this._values;
 
 	}
 
@@ -61720,7 +61839,7 @@ class UniformsGroup extends UniformBuffer {
 
 	updateByType( uniform ) {
 
-		if ( uniform.isFloatUniform ) return this.updateNumber( uniform );
+		if ( uniform.isNumberUniform ) return this.updateNumber( uniform );
 		if ( uniform.isVector2Uniform ) return this.updateVector2( uniform );
 		if ( uniform.isVector3Uniform ) return this.updateVector3( uniform );
 		if ( uniform.isVector4Uniform ) return this.updateVector4( uniform );
@@ -61736,13 +61855,15 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.buffer;
+		const a = this.values;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
 
 		if ( a[ offset ] !== v ) {
 
-			a[ offset ] = v;
+			const b = this.buffer;
+
+			b[ offset ] = a[ offset ] = v;
 			updated = true;
 
 		}
@@ -61755,14 +61876,16 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.buffer;
+		const a = this.values;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y ) {
 
-			a[ offset + 0 ] = v.x;
-			a[ offset + 1 ] = v.y;
+			const b = this.buffer;
+
+			b[ offset + 0 ] = a[ offset + 0 ] = v.x;
+			b[ offset + 1 ] = a[ offset + 1 ] = v.y;
 
 			updated = true;
 
@@ -61776,15 +61899,17 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.buffer;
+		const a = this.values;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z ) {
 
-			a[ offset + 0 ] = v.x;
-			a[ offset + 1 ] = v.y;
-			a[ offset + 2 ] = v.z;
+			const b = this.buffer;
+
+			b[ offset + 0 ] = a[ offset + 0 ] = v.x;
+			b[ offset + 1 ] = a[ offset + 1 ] = v.y;
+			b[ offset + 2 ] = a[ offset + 2 ] = v.z;
 
 			updated = true;
 
@@ -61798,16 +61923,18 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.buffer;
+		const a = this.values;
 		const v = uniform.getValue();
 		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z || a[ offset + 4 ] !== v.w ) {
 
-			a[ offset + 0 ] = v.x;
-			a[ offset + 1 ] = v.y;
-			a[ offset + 2 ] = v.z;
-			a[ offset + 3 ] = v.w;
+			const b = this.buffer;
+
+			b[ offset + 0 ] = a[ offset + 0 ] = v.x;
+			b[ offset + 1 ] = a[ offset + 1 ] = v.y;
+			b[ offset + 2 ] = a[ offset + 2 ] = v.z;
+			b[ offset + 3 ] = a[ offset + 3 ] = v.w;
 
 			updated = true;
 
@@ -61821,15 +61948,17 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.buffer;
+		const a = this.values;
 		const c = uniform.getValue();
 		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== c.r || a[ offset + 1 ] !== c.g || a[ offset + 2 ] !== c.b ) {
 
-			a[ offset + 0 ] = c.r;
-			a[ offset + 1 ] = c.g;
-			a[ offset + 2 ] = c.b;
+			const b = this.buffer;
+
+			b[ offset + 0 ] = a[ offset + 0 ] = c.r;
+			b[ offset + 1 ] = a[ offset + 1 ] = c.g;
+			b[ offset + 2 ] = a[ offset + 2 ] = c.b;
 
 			updated = true;
 
@@ -61843,7 +61972,7 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.buffer;
+		const a = this.values;
 		const e = uniform.getValue().elements;
 		const offset = uniform.offset;
 
@@ -61851,15 +61980,17 @@ class UniformsGroup extends UniformBuffer {
 			a[ offset + 4 ] !== e[ 3 ] || a[ offset + 5 ] !== e[ 4 ] || a[ offset + 6 ] !== e[ 5 ] ||
 			a[ offset + 8 ] !== e[ 6 ] || a[ offset + 9 ] !== e[ 7 ] || a[ offset + 10 ] !== e[ 8 ] ) {
 
-			a[ offset + 0 ] = e[ 0 ];
-			a[ offset + 1 ] = e[ 1 ];
-			a[ offset + 2 ] = e[ 2 ];
-			a[ offset + 4 ] = e[ 3 ];
-			a[ offset + 5 ] = e[ 4 ];
-			a[ offset + 6 ] = e[ 5 ];
-			a[ offset + 8 ] = e[ 6 ];
-			a[ offset + 9 ] = e[ 7 ];
-			a[ offset + 10 ] = e[ 8 ];
+			const b = this.buffer;
+
+			b[ offset + 0 ] = a[ offset + 0 ] = e[ 0 ];
+			b[ offset + 1 ] = a[ offset + 1 ] = e[ 1 ];
+			b[ offset + 2 ] = a[ offset + 2 ] = e[ 2 ];
+			b[ offset + 4 ] = a[ offset + 4 ] = e[ 3 ];
+			b[ offset + 5 ] = a[ offset + 5 ] = e[ 4 ];
+			b[ offset + 6 ] = a[ offset + 6 ] = e[ 5 ];
+			b[ offset + 8 ] = a[ offset + 8 ] = e[ 6 ];
+			b[ offset + 9 ] = a[ offset + 9 ] = e[ 7 ];
+			b[ offset + 10 ] = a[ offset + 10 ] = e[ 8 ];
 
 			updated = true;
 
@@ -61873,18 +62004,30 @@ class UniformsGroup extends UniformBuffer {
 
 		let updated = false;
 
-		const a = this.buffer;
+		const a = this.values;
 		const e = uniform.getValue().elements;
 		const offset = uniform.offset;
 
 		if ( arraysEqual( a, e, offset ) === false ) {
 
-			a.set( e, offset );
+			const b = this.buffer;
+			b.set( e, offset );
+			setArray( a, e, offset );
 			updated = true;
 
 		}
 
 		return updated;
+
+	}
+
+}
+
+function setArray( a, b, offset ) {
+
+	for ( let i = 0, l = b.length; i < l; i ++ ) {
+
+		a[ offset + i ] = b[ i ];
 
 	}
 
@@ -61914,12 +62057,6 @@ class NodeUniformsGroup extends UniformsGroup {
 		this.groupNode = groupNode;
 
 		this.isNodeUniformsGroup = true;
-
-	}
-
-	get shared() {
-
-		return this.groupNode.shared;
 
 	}
 
@@ -61989,11 +62126,12 @@ class SampledTexture extends Binding {
 
 class NodeSampledTexture extends SampledTexture {
 
-	constructor( name, textureNode, access = null ) {
+	constructor( name, textureNode, groupNode, access = null ) {
 
 		super( name, textureNode ? textureNode.value : null );
 
 		this.textureNode = textureNode;
+		this.groupNode = groupNode;
 
 		this.access = access;
 
@@ -62025,9 +62163,9 @@ class NodeSampledTexture extends SampledTexture {
 
 class NodeSampledCubeTexture extends NodeSampledTexture {
 
-	constructor( name, textureNode, access ) {
+	constructor( name, textureNode, groupNode, access ) {
 
-		super( name, textureNode, access );
+		super( name, textureNode, groupNode, access );
 
 		this.isSampledCubeTexture = true;
 
@@ -62037,9 +62175,9 @@ class NodeSampledCubeTexture extends NodeSampledTexture {
 
 class NodeSampledTexture3D extends NodeSampledTexture {
 
-	constructor( name, textureNode, access ) {
+	constructor( name, textureNode, groupNode, access ) {
 
-		super( name, textureNode, access );
+		super( name, textureNode, groupNode, access );
 
 		this.isSampledTexture3D = true;
 
@@ -62094,17 +62232,13 @@ class GLSLNodeBuilder extends NodeBuilder {
 		this.uniformGroups = {};
 		this.transforms = [];
 
+		this.instanceBindGroups = false;
+
 	}
 
 	getMethod( method ) {
 
 		return glslMethods[ method ] || method;
-
-	}
-
-	getPropertyName( node, shaderStage ) {
-
-		return super.getPropertyName( node, shaderStage );
 
 	}
 
@@ -62210,6 +62344,18 @@ ${ flowData.code }
 			this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
 
 		}
+
+	}
+
+	getPropertyName( node, shaderStage = this.shaderStage ) {
+
+		if ( node.isNodeUniform && node.node.isTextureNode !== true && node.node.isBufferNode !== true ) {
+
+			return shaderStage.charAt( 0 ) + '_' + node.name;
+
+		}
+
+		return super.getPropertyName( node, shaderStage );
 
 	}
 
@@ -62384,7 +62530,6 @@ ${ flowData.code }
 			let snippet = null;
 			let group = false;
 
-
 			if ( uniform.type === 'texture' ) {
 
 				const texture = uniform.node.value;
@@ -62438,7 +62583,7 @@ ${ flowData.code }
 
 				const vectorType = this.getVectorType( uniform.type );
 
-				snippet = `${vectorType} ${uniform.name};`;
+				snippet = `${ vectorType } ${ this.getPropertyName( uniform, shaderStage ) };`;
 
 				group = true;
 
@@ -62875,39 +63020,39 @@ void main() {
 
 		if ( uniformGPU === undefined ) {
 
+			const group = node.groupNode;
+			const groupName = group.name;
+
+			const bindings = this.getBindGroupArray( groupName, shaderStage );
+
 			if ( type === 'texture' ) {
 
-				uniformGPU = new NodeSampledTexture( uniformNode.name, uniformNode.node );
-
-				this.bindings[ shaderStage ].push( uniformGPU );
+				uniformGPU = new NodeSampledTexture( uniformNode.name, uniformNode.node, group );
+				bindings.push( uniformGPU );
 
 			} else if ( type === 'cubeTexture' ) {
 
-				uniformGPU = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node );
-
-				this.bindings[ shaderStage ].push( uniformGPU );
+				uniformGPU = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, group );
+				bindings.push( uniformGPU );
 
 			} else if ( type === 'texture3D' ) {
 
-				uniformGPU = new NodeSampledTexture3D( uniformNode.name, uniformNode.node );
-				this.bindings[ shaderStage ].push( uniformGPU );
+				uniformGPU = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group );
+				bindings.push( uniformGPU );
 
 			} else if ( type === 'buffer' ) {
 
 				node.name = `NodeBuffer_${ node.id }`;
 				uniformNode.name = `buffer${ node.id }`;
 
-				const buffer = new NodeUniformBuffer( node );
+				const buffer = new NodeUniformBuffer( node, group );
 				buffer.name = node.name;
 
-				this.bindings[ shaderStage ].push( buffer );
+				bindings.push( buffer );
 
 				uniformGPU = buffer;
 
 			} else {
-
-				const group = node.groupNode;
-				const groupName = group.name;
 
 				const uniformsStage = this.uniformGroups[ shaderStage ] || ( this.uniformGroups[ shaderStage ] = {} );
 
@@ -62920,7 +63065,7 @@ void main() {
 
 					uniformsStage[ groupName ] = uniformsGroup;
 
-					this.bindings[ shaderStage ].push( uniformsGroup );
+					bindings.push( uniformsGroup );
 
 				}
 
@@ -63039,7 +63184,7 @@ class Backend {
 
 		const { object, geometry } = renderObject;
 
-		return geometry.isInstancedBufferGeometry ? geometry.instanceCount : ( object.isInstancedMesh ? object.count : 1 );
+		return geometry.isInstancedBufferGeometry ? geometry.instanceCount : ( object.count > 1 ? object.count : 1 );
 
 	}
 
@@ -65045,7 +65190,7 @@ class WebGLTextureUtils {
 
 			} else {
 
-				gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, glFormat, glType, image );
+				gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
 
 			}
 
@@ -66029,7 +66174,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	draw( renderObject ) {
+	draw( renderObject/*, info*/ ) {
 
 		const { object, pipeline, material, context } = renderObject;
 		const { programGPU } = this.get( pipeline );
@@ -66435,7 +66580,9 @@ class WebGLBackend extends Backend {
 
 		// Bindings
 
-		this._setupBindings( renderObject.getBindings(), programGPU );
+		const bindings = renderObject.getBindings();
+
+		this._setupBindings( bindings, programGPU );
 
 		//
 
@@ -66485,7 +66632,7 @@ class WebGLBackend extends Backend {
 		gl.transformFeedbackVaryings(
 			programGPU,
 			transformVaryingNames,
-			gl.SEPARATE_ATTRIBS,
+			gl.SEPARATE_ATTRIBS
 		);
 
 		gl.linkProgram( programGPU );
@@ -66501,7 +66648,7 @@ class WebGLBackend extends Backend {
 
 		// Bindings
 
-		this.createBindings( bindings );
+		this.createBindings( null, bindings );
 
 		this._setupBindings( bindings, programGPU );
 
@@ -66541,44 +66688,48 @@ class WebGLBackend extends Backend {
 
 	}
 
-	createBindings( bindings ) {
+	createBindings( bindGroup, bindings ) {
 
-		this.updateBindings( bindings );
+		this.updateBindings( bindGroup, bindings );
 
 	}
 
-	updateBindings( bindings ) {
+	updateBindings( bindGroup, bindings ) {
 
 		const { gl } = this;
 
 		let groupIndex = 0;
 		let textureIndex = 0;
 
-		for ( const binding of bindings ) {
+		for ( const bindGroup of bindings ) {
 
-			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+			for ( const binding of bindGroup.bindings ) {
 
-				const bufferGPU = gl.createBuffer();
-				const data = binding.buffer;
+				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
-				gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-				gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
-				gl.bindBufferBase( gl.UNIFORM_BUFFER, groupIndex, bufferGPU );
+					const bufferGPU = gl.createBuffer();
+					const data = binding.buffer;
 
-				this.set( binding, {
-					index: groupIndex ++,
-					bufferGPU
-				} );
+					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+					gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
+					gl.bindBufferBase( gl.UNIFORM_BUFFER, groupIndex, bufferGPU );
 
-			} else if ( binding.isSampledTexture ) {
+					this.set( binding, {
+						index: groupIndex ++,
+						bufferGPU
+					} );
 
-				const { textureGPU, glTextureType } = this.get( binding.texture );
+				} else if ( binding.isSampledTexture ) {
 
-				this.set( binding, {
-					index: textureIndex ++,
-					textureGPU,
-					glTextureType
-				} );
+					const { textureGPU, glTextureType } = this.get( binding.texture );
+
+					this.set( binding, {
+						index: textureIndex ++,
+						textureGPU,
+						glTextureType
+					} );
+
+				}
 
 			}
 
@@ -66986,20 +67137,24 @@ class WebGLBackend extends Backend {
 
 		const gl = this.gl;
 
-		for ( const binding of bindings ) {
+		for ( const bindGroup of bindings ) {
 
-			const bindingData = this.get( binding );
-			const index = bindingData.index;
+			for ( const binding of bindGroup.bindings ) {
 
-			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+				const bindingData = this.get( binding );
+				const index = bindingData.index;
 
-				const location = gl.getUniformBlockIndex( programGPU, binding.name );
-				gl.uniformBlockBinding( programGPU, location, index );
+				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
-			} else if ( binding.isSampledTexture ) {
+					const location = gl.getUniformBlockIndex( programGPU, binding.name );
+					gl.uniformBlockBinding( programGPU, location, index );
 
-				const location = gl.getUniformLocation( programGPU, binding.name );
-				gl.uniform1i( location, index );
+				} else if ( binding.isSampledTexture ) {
+
+					const location = gl.getUniformLocation( programGPU, binding.name );
+					gl.uniform1i( location, index );
+
+				}
 
 			}
 
@@ -67011,18 +67166,22 @@ class WebGLBackend extends Backend {
 
 		const { gl, state } = this;
 
-		for ( const binding of bindings ) {
+		for ( const bindGroup of bindings ) {
 
-			const bindingData = this.get( binding );
-			const index = bindingData.index;
+			for ( const binding of bindGroup.bindings ) {
 
-			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+				const bindingData = this.get( binding );
+				const index = bindingData.index;
 
-				gl.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
+				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
-			} else if ( binding.isSampledTexture ) {
+					gl.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
 
-				state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
+				} else if ( binding.isSampledTexture ) {
+
+					state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
+
+				}
 
 			}
 
@@ -67049,11 +67208,12 @@ class Sampler extends Binding {
 
 class NodeSampler extends Sampler {
 
-	constructor( name, textureNode ) {
+	constructor( name, textureNode, groupNode ) {
 
 		super( name, textureNode ? textureNode.value : null );
 
 		this.textureNode = textureNode;
+		this.groupNode = groupNode;
 
 	}
 
@@ -67083,11 +67243,12 @@ let _id = 0;
 
 class NodeStorageBuffer extends StorageBuffer {
 
-	constructor( nodeUniform ) {
+	constructor( nodeUniform, groupNode ) {
 
 		super( 'StorageBuffer_' + _id ++, nodeUniform ? nodeUniform.value : null );
 
 		this.nodeUniform = nodeUniform;
+		this.groupNode = groupNode;
 
 	}
 
@@ -68534,11 +68695,61 @@ function getFormat( texture, device = null ) {
 
 }
 
-const declarationRegexp = /^[fn]*\s*([a-z_0-9]+)?\s*\(([\s\S]*?)\)\s*[\-\>]*\s*([a-z_0-9]+)?/i;
-const propertiesRegexp = /[a-z_0-9]+|<(.*?)>+/ig;
+const declarationRegexp = /^[fn]*\s*([a-z_0-9]+)?\s*\(([\s\S]*?)\)\s*[\-\>]*\s*([a-z_0-9]+(?:<[\s\S]+?>)?)/i;
+const propertiesRegexp = /([a-z_0-9]+)\s*:\s*([a-z_0-9]+(?:<[\s\S]+?>)?)/ig;
 
 const wgslTypeLib$1 = {
-	f32: 'float'
+	'f32': 'float',
+	'i32': 'int',
+	'u32': 'uint',
+	'bool': 'bool',
+
+	'vec2<f32>': 'vec2',
+ 	'vec2<i32>': 'ivec2',
+ 	'vec2<u32>': 'uvec2',
+ 	'vec2<bool>': 'bvec2',
+
+	'vec2f': 'vec2',
+	'vec2i': 'ivec2',
+	'vec2u': 'uvec2',
+	'vec2b': 'bvec2',
+
+	'vec3<f32>': 'vec3',
+	'vec3<i32>': 'ivec3',
+	'vec3<u32>': 'uvec3',
+	'vec3<bool>': 'bvec3',
+
+	'vec3f': 'vec3',
+	'vec3i': 'ivec3',
+	'vec3u': 'uvec3',
+	'vec3b': 'bvec3',
+
+	'vec4<f32>': 'vec4',
+	'vec4<i32>': 'ivec4',
+	'vec4<u32>': 'uvec4',
+	'vec4<bool>': 'bvec4',
+
+	'vec4f': 'vec4',
+	'vec4i': 'ivec4',
+	'vec4u': 'uvec4',
+	'vec4b': 'bvec4',
+
+	'mat2x2<f32>': 'mat2',
+	'mat2x2f': 'mat2',
+
+	'mat3x3<f32>': 'mat3',
+	'mat3x3f': 'mat3',
+
+	'mat4x4<f32>': 'mat4',
+	'mat4x4f': 'mat4',
+
+	'sampler': 'sampler',
+	'texture_2d': 'texture',
+	'texture_cube': 'cubeTexture',
+	'texture_depth_2d': 'depthTexture',
+	'texture_storage_2d': 'storageTexture',
+	'texture_3d': 'texture3D'
+
 };
 
 const parse = ( source ) => {
@@ -68549,58 +68760,49 @@ const parse = ( source ) => {
 
 	if ( declaration !== null && declaration.length === 4 ) {
 
-		// tokenizer
-
 		const inputsCode = declaration[ 2 ];
 		const propsMatches = [];
+		let match = null;
 
-		let nameMatch = null;
+		while ( ( match = propertiesRegexp.exec( inputsCode ) ) !== null ) {
 
-		while ( ( nameMatch = propertiesRegexp.exec( inputsCode ) ) !== null ) {
-
-			propsMatches.push( nameMatch );
+			propsMatches.push( { name: match[ 1 ], type: match[ 2 ] } );
 
 		}
 
-		// parser
-
+		// Process matches to correctly pair names and types
 		const inputs = [];
+		for ( let i = 0; i < propsMatches.length; i ++ ) {
 
-		let i = 0;
+			const { name, type } = propsMatches[ i ];
 
-		while ( i < propsMatches.length ) {
+			let resolvedType = type;
 
-			// default
+			if ( resolvedType.startsWith( 'texture' ) ) {
 
-			const name = propsMatches[ i ++ ][ 0 ];
-			let type = propsMatches[ i ++ ][ 0 ];
+				resolvedType = type.split( '<' )[ 0 ];
 
-			type = wgslTypeLib$1[ type ] || type;
+			}
 
-			// precision
+			resolvedType = wgslTypeLib$1[ resolvedType ] || resolvedType;
 
-			if ( i < propsMatches.length && propsMatches[ i ][ 0 ].startsWith( '<' ) === true )
-				i ++;
-
-			// add input
-
-			inputs.push( new NodeFunctionInput( type, name ) );
+			inputs.push( new NodeFunctionInput( resolvedType, name ) );
 
 		}
-
-		//
 
 		const blockCode = source.substring( declaration[ 0 ].length );
+		const outputType = declaration[ 3 ] || 'void';
 
 		const name = declaration[ 1 ] !== undefined ? declaration[ 1 ] : '';
-		const type = declaration[ 3 ] || 'void';
+		const type = wgslTypeLib$1[ outputType ] || outputType;
 
 		return {
 			type,
 			inputs,
 			name,
 			inputsCode,
-			blockCode
+			blockCode,
+			outputType
 		};
 
 	} else {
@@ -68615,20 +68817,21 @@ class WGSLNodeFunction extends NodeFunction {
 
 	constructor( source ) {
 
-		const { type, inputs, name, inputsCode, blockCode } = parse( source );
+		const { type, inputs, name, inputsCode, blockCode, outputType } = parse( source );
 
 		super( type, inputs, name );
 
 		this.inputsCode = inputsCode;
 		this.blockCode = blockCode;
+		this.outputType = outputType;
 
 	}
 
 	getCode( name = this.name ) {
 
-		const type = this.type !== 'void' ? '-> ' + this.type : '';
+		const outputType = this.outputType !== 'void' ? '-> ' + this.outputType : '';
 
-		return `fn ${ name } ( ${ this.inputsCode.trim() } ) ${ type }` + this.blockCode;
+		return `fn ${ name } ( ${ this.inputsCode.trim() } ) ${ outputType }` + this.blockCode;
 
 	}
 
@@ -68755,6 +68958,29 @@ fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> 
 	return ( ( uvScaled % dimension ) + dimension ) % dimension;
 
 }
+` ),
+	biquadraticTexture: new CodeNode( `
+fn threejs_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, level : i32 ) -> vec4f {
+
+	let res = vec2f( textureDimensions( map, level ) );
+
+	let uvScaled = coord * res;
+	let uvWrapping = ( ( uvScaled % res ) + res ) % res;
+
+	// https://www.shadertoy.com/view/WtyXRy
+
+	let uv = uvWrapping - 0.5;
+	let iuv = floor( uv );
+	let f = fract( uv );
+
+	let rg1 = textureLoad( map, vec2i( iuv + vec2( 0.5, 0.5 ) ), level );
+	let rg2 = textureLoad( map, vec2i( iuv + vec2( 1.5, 0.5 ) ), level );
+	let rg3 = textureLoad( map, vec2i( iuv + vec2( 0.5, 1.5 ) ), level );
+	let rg4 = textureLoad( map, vec2i( iuv + vec2( 1.5, 1.5 ) ), level );
+
+	return mix( mix( rg1, rg2, f.x ), mix( rg3, rg4, f.x ), f.y );
+
+}
 ` )
 };
 
@@ -68790,9 +69016,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			}
 
+		} else if ( this.isFilteredTexture( texture ) ) {
+
+			return this.generateFilteredTexture( texture, textureProperty, uvSnippet );
+
 		} else {
 
-			return this.generateTextureLod( texture, textureProperty, uvSnippet );
+			return this.generateTextureLod( texture, textureProperty, uvSnippet, '0' );
 
 		}
 
@@ -68818,11 +69048,23 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
+		} else if ( this.isFilteredTexture( texture ) ) {
+
+			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet );
+
 		} else {
 
 			return this.generateTextureLod( texture, textureProperty, uvSnippet, levelSnippet );
 
 		}
+
+	}
+
+	generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet = '0' ) {
+
+		this._include( 'biquadraticTexture' );
+
+		return `threejs_biquadraticTexture( ${ textureProperty }, ${ uvSnippet }, i32( ${ levelSnippet } ) )`;
 
 	}
 
@@ -69038,7 +69280,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			let uniformGPU;
 
-			const bindings = this.bindings[ shaderStage ];
+			const group = node.groupNode;
+			const groupName = group.name;
+
+			const bindings = this.getBindGroupArray( groupName, shaderStage );
 
 			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D' ) {
 
@@ -69046,15 +69291,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( type === 'texture' || type === 'storageTexture' ) {
 
-					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, node.access ? node.access : null );
+					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, group, node.access ? node.access : null );
 
 				} else if ( type === 'cubeTexture' ) {
 
-					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, node.access ? node.access : null );
+					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, group, node.access ? node.access : null );
 
 				} else if ( type === 'texture3D' ) {
 
-					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, node.access ? node.access : null );
+					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group, node.access ? node.access : null );
 
 				}
 
@@ -69063,7 +69308,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( shaderStage === 'fragment' && this.isUnfilterable( node.value ) === false && texture.store === false ) {
 
-					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
+					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node, group );
 					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 					bindings.push( sampler, texture );
@@ -69081,7 +69326,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
 
 				const bufferClass = type === 'storageBuffer' ? NodeStorageBuffer : NodeUniformBuffer;
-				const buffer = new bufferClass( node );
+				const buffer = new bufferClass( node, group );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
@@ -69089,9 +69334,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 				uniformGPU = buffer;
 
 			} else {
-
-				const group = node.groupNode;
-				const groupName = group.name;
 
 				const uniformsStage = this.uniformGroups[ shaderStage ] || ( this.uniformGroups[ shaderStage ] = {} );
 
@@ -69116,21 +69358,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			nodeData.uniformGPU = uniformGPU;
 
-			if ( shaderStage === 'vertex' ) {
-
-				this.bindingsOffset[ 'fragment' ] = bindings.length;
-
-			}
-
 		}
 
 		return uniformNode;
-
-	}
-
-	isReference( type ) {
-
-		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_depth_2d' || type === 'texture_storage_2d' || type === 'texture_3d';
 
 	}
 
@@ -69411,9 +69641,10 @@ ${ flowData.code }
 		const structSnippets = [];
 		const uniformGroups = {};
 
-		let index = this.bindingsOffset[ shaderStage ];
-
 		for ( const uniform of uniforms ) {
+
+			const groundName = uniform.groupNode.name;
+			const uniformIndexes = this.bindingsIndexes[ groundName ];
 
 			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
 
@@ -69423,11 +69654,11 @@ ${ flowData.code }
 
 					if ( texture.isDepthTexture === true && texture.compareFunction !== null ) {
 
-						bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler_comparison;` );
+						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 
 					} else {
 
-						bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler;` );
+						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler;` );
 
 					}
 
@@ -69460,7 +69691,7 @@ ${ flowData.code }
 					const format = getFormat( texture );
 					const access = this.getStorageAccess( uniform.node );
 
-					textureType = `texture_storage_2d<${ format }, ${access}>`;
+					textureType = `texture_storage_2d<${ format }, ${ access }>`;
 
 				} else {
 
@@ -69470,7 +69701,7 @@ ${ flowData.code }
 
 				}
 
-				bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name} : ${textureType};` );
+				bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name } : ${ textureType };` );
 
 			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' ) {
 
@@ -69479,10 +69710,10 @@ ${ flowData.code }
 				const bufferCount = bufferNode.bufferCount;
 
 				const bufferCountSnippet = bufferCount > 0 ? ', ' + bufferCount : '';
-				const bufferSnippet = `\t${uniform.name} : array< ${bufferType}${bufferCountSnippet} >\n`;
+				const bufferSnippet = `\t${ uniform.name } : array< ${ bufferType }${ bufferCountSnippet } >\n`;
 				const bufferAccessMode = bufferNode.isStorageBufferNode ? 'storage,read_write' : 'uniform';
 
-				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, index ++ ) );
+				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
 
 			} else {
 
@@ -69490,7 +69721,8 @@ ${ flowData.code }
 				const groupName = uniform.groupNode.name;
 
 				const group = uniformGroups[ groupName ] || ( uniformGroups[ groupName ] = {
-					index: index ++,
+					index: uniformIndexes.binding ++,
+					id: uniformIndexes.group,
 					snippets: []
 				} );
 
@@ -69504,7 +69736,7 @@ ${ flowData.code }
 
 			const group = uniformGroups[ name ];
 
-			structSnippets.push( this._getWGSLStructBinding( name, group.snippets.join( ',\n' ), 'uniform', group.index ) );
+			structSnippets.push( this._getWGSLStructBinding( name, group.snippets.join( ',\n' ), 'uniform', group.index, group.id ) );
 
 		}
 
@@ -70207,7 +70439,7 @@ class WebGPUBindingUtils {
 
 	}
 
-	createBindingsLayout( bindings ) {
+	createBindingsLayout( bindGroup ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -70216,7 +70448,7 @@ class WebGPUBindingUtils {
 
 		let index = 0;
 
-		for ( const binding of bindings ) {
+		for ( const binding of bindGroup.bindings ) {
 
 			const bindingGPU = {
 				binding: index ++,
@@ -70322,19 +70554,18 @@ class WebGPUBindingUtils {
 
 	}
 
-	createBindings( bindings ) {
+	createBindings( bindGroup ) {
 
 		const backend = this.backend;
-		const bindingsData = backend.get( bindings );
+		const bindingsData = backend.get( bindGroup );
 
 		// setup (static) binding layout and (dynamic) binding group
 
-		const bindLayoutGPU = this.createBindingsLayout( bindings );
-		const bindGroupGPU = this.createBindGroup( bindings, bindLayoutGPU );
+		const bindLayoutGPU = this.createBindingsLayout( bindGroup );
+		const bindGroupGPU = this.createBindGroup( bindGroup, bindLayoutGPU );
 
 		bindingsData.layout = bindLayoutGPU;
 		bindingsData.group = bindGroupGPU;
-		bindingsData.bindings = bindings;
 
 	}
 
@@ -70350,7 +70581,7 @@ class WebGPUBindingUtils {
 
 	}
 
-	createBindGroup( bindings, layoutGPU ) {
+	createBindGroup( bindGroup, layoutGPU ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -70358,7 +70589,7 @@ class WebGPUBindingUtils {
 		let bindingPoint = 0;
 		const entriesGPU = [];
 
-		for ( const binding of bindings ) {
+		for ( const binding of bindGroup.bindings ) {
 
 			if ( binding.isUniformBuffer ) {
 
@@ -70452,6 +70683,7 @@ class WebGPUBindingUtils {
 		}
 
 		return device.createBindGroup( {
+			label: 'bindGroup_' + bindGroup.name,
 			layout: layoutGPU,
 			entries: entriesGPU
 		} );
@@ -70499,7 +70731,18 @@ class WebGPUPipelineUtils {
 		const utils = backend.utils;
 
 		const pipelineData = backend.get( pipeline );
-		const bindingsData = backend.get( renderObject.getBindings() );
+
+		// bind group layouts
+
+		const bindGroupLayouts = [];
+
+		for ( const bindGroup of renderObject.getBindings() ) {
+
+			const bindingsData = backend.get( bindGroup );
+
+			bindGroupLayouts.push( bindingsData.layout );
+
+		}
 
 		// vertex buffers
 
@@ -70590,7 +70833,7 @@ class WebGPUPipelineUtils {
 				alphaToCoverageEnabled: material.alphaToCoverage
 			},
 			layout: device.createPipelineLayout( {
-				bindGroupLayouts: [ bindingsData.layout ]
+				bindGroupLayouts
 			} )
 		};
 
@@ -70654,12 +70897,23 @@ class WebGPUPipelineUtils {
 		const computeProgram = backend.get( pipeline.computeProgram ).module;
 
 		const pipelineGPU = backend.get( pipeline );
-		const bindingsData = backend.get( bindings );
+
+		// bind group layouts
+
+		const bindGroupLayouts = [];
+
+		for ( const bindingsGroup of bindings ) {
+
+			const bindingsData = backend.get( bindingsGroup );
+
+			bindGroupLayouts.push( bindingsData.layout );
+
+		}
 
 		pipelineGPU.pipeline = device.createComputePipeline( {
 			compute: computeProgram,
 			layout: device.createPipelineLayout( {
-				bindGroupLayouts: [ bindingsData.layout ]
+				bindGroupLayouts
 			} )
 		} );
 
@@ -71832,10 +72086,16 @@ class WebGPUBackend extends Backend {
 		const pipelineGPU = this.get( pipeline ).pipeline;
 		passEncoderGPU.setPipeline( pipelineGPU );
 
-		// bind group
+		// bind groups
 
-		const bindGroupGPU = this.get( bindings ).group;
-		passEncoderGPU.setBindGroup( 0, bindGroupGPU );
+		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
+
+			const bindGroup = bindings[ i ];
+			const bindingsData = this.get( bindGroup );
+
+			passEncoderGPU.setBindGroup( i, bindingsData.group );
+
+		}
 
 		passEncoderGPU.dispatchWorkgroups( computeNode.dispatchCount );
 
@@ -71859,7 +72119,7 @@ class WebGPUBackend extends Backend {
 
 		const { object, geometry, context, pipeline } = renderObject;
 
-		const bindingsData = this.get( renderObject.getBindings() );
+		const bindings = renderObject.getBindings();
 		const contextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
 		const currentSets = contextData.currentSets;
@@ -71889,10 +72149,16 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		// bind group
+		// bind groups
 
-		const bindGroupGPU = bindingsData.group;
-		passEncoderGPU.setBindGroup( 0, bindGroupGPU );
+		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
+
+			const bindGroup = bindings[ i ];
+			const bindingsData = this.get( bindGroup );
+
+			passEncoderGPU.setBindGroup( i, bindingsData.group );
+
+		}
 
 		// attributes
 
@@ -72273,15 +72539,15 @@ class WebGPUBackend extends Backend {
 
 	// bindings
 
-	createBindings( bindings ) {
+	createBindings( bindGroup ) {
 
-		this.bindingUtils.createBindings( bindings );
+		this.bindingUtils.createBindings( bindGroup );
 
 	}
 
-	updateBindings( bindings ) {
+	updateBindings( bindGroup ) {
 
-		this.bindingUtils.createBindings( bindings );
+		this.bindingUtils.createBindings( bindGroup );
 
 	}
 
