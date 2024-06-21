@@ -567,7 +567,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	draw( renderObject ) {
+	draw( renderObject/*, info*/ ) {
 
 		const { object, pipeline, material, context } = renderObject;
 		const { programGPU } = this.get( pipeline );
@@ -973,7 +973,9 @@ class WebGLBackend extends Backend {
 
 		// Bindings
 
-		this._setupBindings( renderObject.getBindings(), programGPU );
+		const bindings = renderObject.getBindings();
+
+		this._setupBindings( bindings, programGPU );
 
 		//
 
@@ -1023,7 +1025,7 @@ class WebGLBackend extends Backend {
 		gl.transformFeedbackVaryings(
 			programGPU,
 			transformVaryingNames,
-			gl.SEPARATE_ATTRIBS,
+			gl.SEPARATE_ATTRIBS
 		);
 
 		gl.linkProgram( programGPU );
@@ -1039,7 +1041,7 @@ class WebGLBackend extends Backend {
 
 		// Bindings
 
-		this.createBindings( bindings );
+		this.createBindings( null, bindings );
 
 		this._setupBindings( bindings, programGPU );
 
@@ -1079,44 +1081,48 @@ class WebGLBackend extends Backend {
 
 	}
 
-	createBindings( bindings ) {
+	createBindings( bindGroup, bindings ) {
 
-		this.updateBindings( bindings );
+		this.updateBindings( bindGroup, bindings );
 
 	}
 
-	updateBindings( bindings ) {
+	updateBindings( bindGroup, bindings ) {
 
 		const { gl } = this;
 
 		let groupIndex = 0;
 		let textureIndex = 0;
 
-		for ( const binding of bindings ) {
+		for ( const bindGroup of bindings ) {
 
-			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+			for ( const binding of bindGroup.bindings ) {
 
-				const bufferGPU = gl.createBuffer();
-				const data = binding.buffer;
+				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
-				gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-				gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
-				gl.bindBufferBase( gl.UNIFORM_BUFFER, groupIndex, bufferGPU );
+					const bufferGPU = gl.createBuffer();
+					const data = binding.buffer;
 
-				this.set( binding, {
-					index: groupIndex ++,
-					bufferGPU
-				} );
+					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+					gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
+					gl.bindBufferBase( gl.UNIFORM_BUFFER, groupIndex, bufferGPU );
 
-			} else if ( binding.isSampledTexture ) {
+					this.set( binding, {
+						index: groupIndex ++,
+						bufferGPU
+					} );
 
-				const { textureGPU, glTextureType } = this.get( binding.texture );
+				} else if ( binding.isSampledTexture ) {
 
-				this.set( binding, {
-					index: textureIndex ++,
-					textureGPU,
-					glTextureType
-				} );
+					const { textureGPU, glTextureType } = this.get( binding.texture );
+
+					this.set( binding, {
+						index: textureIndex ++,
+						textureGPU,
+						glTextureType
+					} );
+
+				}
 
 			}
 
@@ -1524,20 +1530,24 @@ class WebGLBackend extends Backend {
 
 		const gl = this.gl;
 
-		for ( const binding of bindings ) {
+		for ( const bindGroup of bindings ) {
 
-			const bindingData = this.get( binding );
-			const index = bindingData.index;
+			for ( const binding of bindGroup.bindings ) {
 
-			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+				const bindingData = this.get( binding );
+				const index = bindingData.index;
 
-				const location = gl.getUniformBlockIndex( programGPU, binding.name );
-				gl.uniformBlockBinding( programGPU, location, index );
+				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
-			} else if ( binding.isSampledTexture ) {
+					const location = gl.getUniformBlockIndex( programGPU, binding.name );
+					gl.uniformBlockBinding( programGPU, location, index );
 
-				const location = gl.getUniformLocation( programGPU, binding.name );
-				gl.uniform1i( location, index );
+				} else if ( binding.isSampledTexture ) {
+
+					const location = gl.getUniformLocation( programGPU, binding.name );
+					gl.uniform1i( location, index );
+
+				}
 
 			}
 
@@ -1549,18 +1559,22 @@ class WebGLBackend extends Backend {
 
 		const { gl, state } = this;
 
-		for ( const binding of bindings ) {
+		for ( const bindGroup of bindings ) {
 
-			const bindingData = this.get( binding );
-			const index = bindingData.index;
+			for ( const binding of bindGroup.bindings ) {
 
-			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+				const bindingData = this.get( binding );
+				const index = bindingData.index;
 
-				gl.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
+				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
-			} else if ( binding.isSampledTexture ) {
+					gl.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
 
-				state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
+				} else if ( binding.isSampledTexture ) {
+
+					state.bindTexture( bindingData.glTextureType, bindingData.textureGPU, gl.TEXTURE0 + index );
+
+				}
 
 			}
 

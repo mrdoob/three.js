@@ -12,7 +12,7 @@ class WebGPUBindingUtils {
 
 	}
 
-	createBindingsLayout( bindings ) {
+	createBindingsLayout( bindGroup ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -21,7 +21,7 @@ class WebGPUBindingUtils {
 
 		let index = 0;
 
-		for ( const binding of bindings ) {
+		for ( const binding of bindGroup.bindings ) {
 
 			const bindingGPU = {
 				binding: index ++,
@@ -127,19 +127,18 @@ class WebGPUBindingUtils {
 
 	}
 
-	createBindings( bindings ) {
+	createBindings( bindGroup ) {
 
 		const backend = this.backend;
-		const bindingsData = backend.get( bindings );
+		const bindingsData = backend.get( bindGroup );
 
 		// setup (static) binding layout and (dynamic) binding group
 
-		const bindLayoutGPU = this.createBindingsLayout( bindings );
-		const bindGroupGPU = this.createBindGroup( bindings, bindLayoutGPU );
+		const bindLayoutGPU = this.createBindingsLayout( bindGroup );
+		const bindGroupGPU = this.createBindGroup( bindGroup, bindLayoutGPU );
 
 		bindingsData.layout = bindLayoutGPU;
 		bindingsData.group = bindGroupGPU;
-		bindingsData.bindings = bindings;
 
 	}
 
@@ -155,7 +154,7 @@ class WebGPUBindingUtils {
 
 	}
 
-	createBindGroup( bindings, layoutGPU ) {
+	createBindGroup( bindGroup, layoutGPU ) {
 
 		const backend = this.backend;
 		const device = backend.device;
@@ -163,7 +162,7 @@ class WebGPUBindingUtils {
 		let bindingPoint = 0;
 		const entriesGPU = [];
 
-		for ( const binding of bindings ) {
+		for ( const binding of bindGroup.bindings ) {
 
 			if ( binding.isUniformBuffer ) {
 
@@ -257,6 +256,7 @@ class WebGPUBindingUtils {
 		}
 
 		return device.createBindGroup( {
+			label: 'bindGroup_' + bindGroup.name,
 			layout: layoutGPU,
 			entries: entriesGPU
 		} );

@@ -54,7 +54,18 @@ class WebGPUPipelineUtils {
 		const utils = backend.utils;
 
 		const pipelineData = backend.get( pipeline );
-		const bindingsData = backend.get( renderObject.getBindings() );
+
+		// bind group layouts
+
+		const bindGroupLayouts = [];
+
+		for ( const bindGroup of renderObject.getBindings() ) {
+
+			const bindingsData = backend.get( bindGroup );
+
+			bindGroupLayouts.push( bindingsData.layout );
+
+		}
 
 		// vertex buffers
 
@@ -145,7 +156,7 @@ class WebGPUPipelineUtils {
 				alphaToCoverageEnabled: material.alphaToCoverage
 			},
 			layout: device.createPipelineLayout( {
-				bindGroupLayouts: [ bindingsData.layout ]
+				bindGroupLayouts
 			} )
 		};
 
@@ -209,12 +220,23 @@ class WebGPUPipelineUtils {
 		const computeProgram = backend.get( pipeline.computeProgram ).module;
 
 		const pipelineGPU = backend.get( pipeline );
-		const bindingsData = backend.get( bindings );
+
+		// bind group layouts
+
+		const bindGroupLayouts = [];
+
+		for ( const bindingsGroup of bindings ) {
+
+			const bindingsData = backend.get( bindingsGroup );
+
+			bindGroupLayouts.push( bindingsData.layout );
+
+		}
 
 		pipelineGPU.pipeline = device.createComputePipeline( {
 			compute: computeProgram,
 			layout: device.createPipelineLayout( {
-				bindGroupLayouts: [ bindingsData.layout ]
+				bindGroupLayouts
 			} )
 		} );
 

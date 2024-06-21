@@ -766,10 +766,16 @@ class WebGPUBackend extends Backend {
 		const pipelineGPU = this.get( pipeline ).pipeline;
 		passEncoderGPU.setPipeline( pipelineGPU );
 
-		// bind group
+		// bind groups
 
-		const bindGroupGPU = this.get( bindings ).group;
-		passEncoderGPU.setBindGroup( 0, bindGroupGPU );
+		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
+
+			const bindGroup = bindings[ i ];
+			const bindingsData = this.get( bindGroup );
+
+			passEncoderGPU.setBindGroup( i, bindingsData.group );
+
+		}
 
 		passEncoderGPU.dispatchWorkgroups( computeNode.dispatchCount );
 
@@ -793,7 +799,7 @@ class WebGPUBackend extends Backend {
 
 		const { object, geometry, context, pipeline } = renderObject;
 
-		const bindingsData = this.get( renderObject.getBindings() );
+		const bindings = renderObject.getBindings();
 		const contextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
 		const currentSets = contextData.currentSets;
@@ -823,10 +829,16 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		// bind group
+		// bind groups
 
-		const bindGroupGPU = bindingsData.group;
-		passEncoderGPU.setBindGroup( 0, bindGroupGPU );
+		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
+
+			const bindGroup = bindings[ i ];
+			const bindingsData = this.get( bindGroup );
+
+			passEncoderGPU.setBindGroup( i, bindingsData.group );
+
+		}
 
 		// attributes
 
@@ -1207,15 +1219,15 @@ class WebGPUBackend extends Backend {
 
 	// bindings
 
-	createBindings( bindings ) {
+	createBindings( bindGroup ) {
 
-		this.bindingUtils.createBindings( bindings );
+		this.bindingUtils.createBindings( bindGroup );
 
 	}
 
-	updateBindings( bindings ) {
+	updateBindings( bindGroup ) {
 
-		this.bindingUtils.createBindings( bindings );
+		this.bindingUtils.createBindings( bindGroup );
 
 	}
 
