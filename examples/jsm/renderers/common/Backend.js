@@ -42,7 +42,7 @@ class Backend {
 
 	createBindings( renderObject ) { }
 
-	updateBindings( renderObject ) { }
+	_setupBindingsIndexes( renderObject ) { }
 
 	// pipeline
 

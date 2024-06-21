@@ -1,13 +1,12 @@
 class NodeUniform {
 
-	constructor( name, type, node, needsUpdate = undefined ) {
+	constructor( name, type, node ) {
 
 		this.isNodeUniform = true;
 
 		this.name = name;
 		this.type = type;
 		this.node = node.getSelf();
-		this.needsUpdate = needsUpdate;
 
 	}
 

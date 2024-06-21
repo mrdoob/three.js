@@ -22,61 +22,77 @@ class Bindings extends DataMap {
 
 		const bindings = renderObject.getBindings();
 
-		const data = this.get( renderObject );
+		for ( const bindGroup of bindings ) {
 
-		if ( data.bindings !== bindings ) {
+			const groupData = this.get( bindGroup );
 
-			// each object defines an array of bindings (ubos, textures, samplers etc.)
+			if ( groupData.bindGroup === undefined ) {
 
-			data.bindings = bindings;
+				// each object defines an array of bindings (ubos, textures, samplers etc.)
 
-			this._init( bindings );
+				this._init( bindGroup );
 
-			this.backend.createBindings( bindings );
+				this.backend.createBindings( bindGroup, bindings );
+
+				groupData.bindGroup = bindGroup;
+
+			}
 
 		}
 
-		return data.bindings;
+		return bindings;
 
 	}
 
 	getForCompute( computeNode ) {
 
-		const data = this.get( computeNode );
+		const bindings = this.nodes.getForCompute( computeNode ).bindings;
 
-		if ( data.bindings === undefined ) {
+		for ( const bindGroup of bindings ) {
 
-			const nodeBuilderState = this.nodes.getForCompute( computeNode );
+			const groupData = this.get( bindGroup );
 
-			const bindings = nodeBuilderState.bindings;
+			if ( groupData.bindGroup === undefined ) {
 
-			data.bindings = bindings;
+				this._init( bindGroup );
 
-			this._init( bindings );
+				this.backend.createBindings( bindGroup, bindings );
 
-			this.backend.createBindings( bindings );
+				groupData.bindGroup = bindGroup;
+
+			}
 
 		}
 
-		return data.bindings;
+		return bindings;
 
 	}
 
 	updateForCompute( computeNode ) {
 
-		this._update( computeNode, this.getForCompute( computeNode ) );
+		this._updateBindings( computeNode, this.getForCompute( computeNode ) );
 
 	}
 
 	updateForRender( renderObject ) {
 
-		this._update( renderObject, this.getForRender( renderObject ) );
+		this._updateBindings( renderObject, this.getForRender( renderObject ) );
 
 	}
 
-	_init( bindings ) {
+	_updateBindings( object, bindings ) {
 
-		for ( const binding of bindings ) {
+		for ( const bindGroup of bindings ) {
+
+			this._update( object, bindGroup, bindings );
+
+		}
+
+	}
+
+	_init( bindGroup ) {
+
+		for ( const binding of bindGroup.bindings ) {
 
 			if ( binding.isSampledTexture ) {
 
@@ -94,7 +110,7 @@ class Bindings extends DataMap {
 
 	}
 
-	_update( object, bindings ) {
+	_update( object, bindGroup, bindings ) {
 
 		const { backend } = this;
 
@@ -102,7 +118,7 @@ class Bindings extends DataMap {
 
 		// iterate over all bindings and check if buffer updates or a new binding group is required
 
-		for ( const binding of bindings ) {
+		for ( const binding of bindGroup.bindings ) {
 
 			if ( binding.isNodeUniformsGroup ) {
 
@@ -152,7 +168,6 @@ class Bindings extends DataMap {
 
 				}
 
-
 				if ( texture.isStorageTexture === true ) {
 
 					const textureData = this.get( texture );
@@ -179,7 +194,7 @@ class Bindings extends DataMap {
 
 			const pipeline = this.pipelines.getForRender( object );
 
-			this.backend.updateBindings( bindings, pipeline );
+			this.backend.updateBindings( bindGroup, bindings, pipeline );
 
 		}
 

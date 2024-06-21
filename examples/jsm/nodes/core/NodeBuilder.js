@@ -15,6 +15,8 @@ import {
 	ColorNodeUniform, Matrix3NodeUniform, Matrix4NodeUniform
 } from '../../renderers/common/nodes/NodeUniform.js';
 
+import BindGroup from '../../renderers/common/BindGroup.js';
+
 import {
 	REVISION, RenderTarget, Color, Vector2, Vector3, Vector4, IntType, UnsignedIntType, Float16BufferAttribute,
 	LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter
@@ -28,7 +30,7 @@ import ChainMap from '../../renderers/common/ChainMap.js';
 
 import PMREMGenerator from '../../renderers/common/extras/PMREMGenerator.js';
 
-const uniformsGroupCache = new ChainMap();
+const bindGroupsCache = new ChainMap();
 
 const typeFromLength = new Map( [
 	[ 2, 'vec2' ],
@@ -87,9 +89,9 @@ class NodeBuilder {
 		this.flowCode = { vertex: '', fragment: '', compute: '' };
 		this.uniforms = { vertex: [], fragment: [], compute: [], index: 0 };
 		this.structs = { vertex: [], fragment: [], compute: [], index: 0 };
-		this.bindings = { vertex: [], fragment: [], compute: [] };
-		this.bindingsOffset = { vertex: 0, fragment: 0, compute: 0 };
-		this.bindingsArray = null;
+		this.bindings = { vertex: {}, fragment: {}, compute: {} };
+		this.bindingsIndexes = {};
+		this.bindGroups = null;
 		this.attributes = [];
 		this.bufferAttributes = [];
 		this.varyings = [];
@@ -100,6 +102,8 @@ class NodeBuilder {
 		this.stack = stack();
 		this.stacks = [];
 		this.tab = '\t';
+
+		this.instanceBindGroups = true;
 
 		this.currentFunctionNode = null;
 
@@ -144,54 +148,129 @@ class NodeBuilder {
 
 	}
 
-	_getSharedBindings( bindings ) {
+	_getBindGroup( groupName, bindings ) {
 
-		const shared = [];
+		// cache individual uniforms group
+
+		const bindingsArray = [];
+
+		let sharedGroup = true;
 
 		for ( const binding of bindings ) {
 
-			if ( binding.shared === true ) {
+			if ( binding.groupNode.shared === true ) {
 
 				// nodes is the chainmap key
 				const nodes = binding.getNodes();
 
-				let sharedBinding = uniformsGroupCache.get( nodes );
+				let sharedBinding = bindGroupsCache.get( nodes );
 
 				if ( sharedBinding === undefined ) {
 
-					uniformsGroupCache.set( nodes, binding );
+					bindGroupsCache.set( nodes, binding );
 
 					sharedBinding = binding;
 
 				}
 
-				shared.push( sharedBinding );
+				bindingsArray.push( sharedBinding );
 
 			} else {
 
-				shared.push( binding );
+				bindingsArray.push( binding );
+
+				sharedGroup = false;
 
 			}
 
 		}
 
-		return shared;
+		//
+
+		let bindGroup;
+
+		if ( sharedGroup ) {
+
+			bindGroup = bindGroupsCache.get( bindingsArray );
+
+			if ( bindGroup === undefined ) {
+
+				bindGroup = new BindGroup( groupName, bindingsArray );
+				bindGroupsCache.set( bindingsArray, bindGroup );
+
+			}
+
+		} else {
+
+			bindGroup = new BindGroup( groupName, bindingsArray );
+
+		}
+
+		return bindGroup;
+
+	}
+
+	getBindGroupArray( groupName, shaderStage ) {
+
+		const bindings = this.bindings[ shaderStage ];
+
+		let bindGroup = bindings[ groupName ];
+
+		if ( bindGroup === undefined ) {
+
+			if ( this.bindingsIndexes[ groupName ] === undefined ) {
+
+				this.bindingsIndexes[ groupName ] = { binding: 0, group: Object.keys( this.bindingsIndexes ).length };
+
+			}
+
+			bindings[ groupName ] = bindGroup = [];
+
+		}
+
+		return bindGroup;
 
 	}
 
 	getBindings() {
 
-		let bindingsArray = this.bindingsArray;
+		let bindingsGroups = this.bindGroups;
 
-		if ( bindingsArray === null ) {
+		if ( bindingsGroups === null ) {
 
+			const groups = {};
 			const bindings = this.bindings;
 
-			this.bindingsArray = bindingsArray = this._getSharedBindings( ( this.material !== null ) ? [ ...bindings.vertex, ...bindings.fragment ] : bindings.compute );
+			for ( const shaderStage of shaderStages ) {
+
+				for ( const groupName in bindings[ shaderStage ] ) {
+
+					const uniforms = bindings[ shaderStage ][ groupName ];
+
+					const groupUniforms = groups[ groupName ] || ( groups[ groupName ] = [] );
+					groupUniforms.push( ...uniforms );
+
+				}
+
+			}
+
+			bindingsGroups = [];
+
+			for ( const groupName in groups ) {
+
+				const group = groups[ groupName ];
+
+				const bindingsGroup = this._getBindGroup( groupName, group );
+
+				bindingsGroups.push( bindingsGroup );
+
+			}
+
+			this.bindGroups = bindingsGroups;
 
 		}
 
-		return bindingsArray;
+		return bindingsGroups;
 
 	}
 
@@ -1280,7 +1359,7 @@ class NodeBuilder {
 
 	getSignature() {
 
-		return `// Three.js r${ REVISION } - NodeMaterial System\n`;
+		return `// Three.js r${ REVISION } - Node System\n`;
 
 	}
 
