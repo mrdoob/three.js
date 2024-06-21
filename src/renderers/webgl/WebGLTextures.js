@@ -2,7 +2,7 @@ import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, Near
 import { createElementNS } from '../../utils.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { Vector2 } from '../../math/Vector2.js';
-import { TextureUtils } from '../../extras/TextureUtils.js';
+import { getByteLength } from '../../extras/TextureUtils.js';
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
@@ -855,7 +855,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 										if ( texture.layerUpdates.size > 0 ) {
 
-											const layerByteLength = TextureUtils.getByteLength( mipmap.width, mipmap.height, texture.format, texture.type );
+											const layerByteLength = getByteLength( mipmap.width, mipmap.height, texture.format, texture.type );
 
 											for ( const layerIndex of texture.layerUpdates ) {
 
@@ -981,7 +981,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						if ( texture.layerUpdates.size > 0 ) {
 
-							const layerByteLength = TextureUtils.getByteLength( image.width, image.height, texture.format, texture.type );
+							const layerByteLength = getByteLength( image.width, image.height, texture.format, texture.type );
 
 							for ( const layerIndex of texture.layerUpdates ) {
 
