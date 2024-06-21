@@ -207,4 +207,4 @@ const TextureUtils = {
 	getByteLength
 };
 
-export { cover, contain, fill, getByteLength, TextureUtils };
+export { contain, cover, fill, getByteLength, TextureUtils };
