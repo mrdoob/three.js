@@ -128,11 +128,8 @@
 				textureL.colorSpace = THREE.SRGBColorSpace;
 				textureR.colorSpace = THREE.DisplayP3ColorSpace;
 
-				THREE.TextureUtils.contain( textureL, window.innerWidth / window.innerHeight );
-				THREE.TextureUtils.contain( textureR, window.innerWidth / window.innerHeight );
-
-				sceneL.background = textureL;
-				sceneR.background = textureR;
+				sceneL.background = THREE.TextureUtils.contain( textureL, window.innerWidth / window.innerHeight );
+				sceneR.background = THREE.TextureUtils.contain( textureR, window.innerWidth / window.innerHeight );
 
 			}
 
