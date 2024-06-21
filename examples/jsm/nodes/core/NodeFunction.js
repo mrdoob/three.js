@@ -1,11 +1,11 @@
 class NodeFunction {
 
-	constructor( type, inputs, name = '', presicion = '' ) {
+	constructor( type, inputs, name = '', precision = '' ) {
 
 		this.type = type;
 		this.inputs = inputs;
 		this.name = name;
-		this.presicion = presicion;
+		this.precision = precision;
 
 	}
 
