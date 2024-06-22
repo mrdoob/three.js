@@ -1,4 +1,4 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, UniformNode, vectorComponents } from '../../../nodes/Nodes.js';
+import { MathNode, GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents } from '../../../nodes/Nodes.js';
 
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
@@ -157,7 +157,7 @@ ${ flowData.code }
 			pboTexture.needsUpdate = true;
 			pboTexture.isPBOTexture = true;
 
-			const pbo = new UniformNode( pboTexture );
+			const pbo = new TextureNode( pboTexture );
 			pbo.setPrecision( 'high' );
 
 			attribute.pboNode = pbo;
