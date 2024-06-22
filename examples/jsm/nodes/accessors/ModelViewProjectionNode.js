@@ -1,7 +1,7 @@
 import { addNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { cameraProjectionMatrix } from './CameraNode.js';
-import { modelViewMatrix } from './ModelNode.js';
+import { cameraProjectionMatrix, cameraViewMatrix } from './CameraNode.js';
+import { /*modelViewMatrix,*/ modelWorldMatrix } from './ModelNode.js';
 import { positionLocal } from './PositionNode.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 import { varying } from '../core/VaryingNode.js';
@@ -25,6 +25,7 @@ class ModelViewProjectionNode extends TempNode {
 		}
 
 		const position = this.positionNode || positionLocal;
+		const modelViewMatrix = cameraViewMatrix.mul( modelWorldMatrix );
 
 		return cameraProjectionMatrix.mul( modelViewMatrix ).mul( position );
 

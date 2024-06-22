@@ -14,6 +14,7 @@ import Color4 from './Color4.js';
 import ClippingContext from './ClippingContext.js';
 import { Scene, Frustum, Matrix4, Vector2, Vector3, Vector4, DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, RenderTarget, HalfFloatType, RGBAFormat } from 'three';
 import { NodeMaterial } from '../../nodes/Nodes.js';
+import { renderGroup } from '../../nodes/core/UniformGroupNode.js';
 import QuadMesh from '../../objects/QuadMesh.js';
 import RenderBundles from './RenderBundles.js';
 
@@ -392,19 +393,19 @@ class Renderer {
 
 				const renderObject = renderContextData.renderObjects[ i ];
 
-				this._nodes.updateBefore( renderObject );
+				//this._nodes.updateBefore( renderObject );
 
 				//
 
-				renderObject.object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, renderObject.object.matrixWorld );
-				renderObject.object.normalMatrix.getNormalMatrix( renderObject.object.modelViewMatrix );
+				//renderObject.object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, renderObject.object.matrixWorld );
+				//renderObject.object.normalMatrix.getNormalMatrix( renderObject.object.modelViewMatrix );
 
-				this._nodes.updateForRender( renderObject );
-				this._bindings.updateForRender( renderObject );
+				this._nodes.updateForRender( renderObject, renderGroup );
+				this._bindings.updateForRender( renderObject, renderGroup );
 
 				this.backend.draw( renderObject, this.info );
 
-				this._nodes.updateAfter( renderObject );
+				//this._nodes.updateAfter( renderObject );
 
 			}
 

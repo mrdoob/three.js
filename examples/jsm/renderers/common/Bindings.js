@@ -74,15 +74,17 @@ class Bindings extends DataMap {
 
 	}
 
-	updateForRender( renderObject ) {
+	updateForRender( renderObject, group = null ) {
 
-		this._updateBindings( renderObject, this.getForRender( renderObject ) );
+		this._updateBindings( renderObject, this.getForRender( renderObject ), group );
 
 	}
 
-	_updateBindings( object, bindings ) {
+	_updateBindings( object, bindings, group = null ) {
 
 		for ( const bindGroup of bindings ) {
+
+			if ( group && bindGroup.bindings[ 0 ].groupNode !== group ) continue;
 
 			this._update( object, bindGroup, bindings );
 

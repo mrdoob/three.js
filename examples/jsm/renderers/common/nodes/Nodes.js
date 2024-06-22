@@ -455,12 +455,14 @@ class Nodes extends DataMap {
 
 	}
 
-	updateForRender( renderObject ) {
+	updateForRender( renderObject, group = null ) {
 
 		const nodeFrame = this.getNodeFrameForRender( renderObject );
 		const nodeBuilder = renderObject.getNodeBuilderState();
 
 		for ( const node of nodeBuilder.updateNodes ) {
+
+			if ( group && node.groupNode !== group ) continue;
 
 			nodeFrame.updateNode( node );
 
