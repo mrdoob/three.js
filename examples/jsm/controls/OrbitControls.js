@@ -425,11 +425,10 @@ class OrbitControls extends EventDispatcher {
 			scope.domElement.removeEventListener( 'contextmenu', onContextMenu );
 
 			scope.domElement.removeEventListener( 'pointerdown', onPointerDown );
-			scope.domElement.removeEventListener( 'pointercancel', onPointerUp );
-			scope.domElement.removeEventListener( 'wheel', onMouseWheel );
-
 			scope.domElement.removeEventListener( 'pointermove', onPointerMove );
 			scope.domElement.removeEventListener( 'pointerup', onPointerUp );
+			scope.domElement.removeEventListener( 'pointercancel', onPointerUp );
+			scope.domElement.removeEventListener( 'wheel', onMouseWheel );
 
 			const document = scope.domElement.getRootNode(); // offscreen canvas compatibility
 
@@ -1016,9 +1015,6 @@ class OrbitControls extends EventDispatcher {
 
 				scope.domElement.setPointerCapture( event.pointerId );
 
-				scope.domElement.addEventListener( 'pointermove', onPointerMove );
-				scope.domElement.addEventListener( 'pointerup', onPointerUp );
-
 			}
 
 			//
@@ -1045,6 +1041,19 @@ class OrbitControls extends EventDispatcher {
 
 			if ( scope.enabled === false ) return;
 
+			if ( ! isTrackingPointer( event ) ) {
+
+				if ( event.button < 0 ) return;
+
+				// In some browsers (e.g. Safari), focusing another element and then
+				// clicking on the canvas will not fire a pointerdown event. However it
+				// will continue to fire pointermove events as normal, with the first
+				// pointermove event that is fired on click containing the "down" button
+				// info. In that case, we register a pointerdown.
+				onPointerDown( event );
+
+			}
+
 			if ( event.pointerType === 'touch' ) {
 
 				onTouchMove( event );
@@ -1059,6 +1068,8 @@ class OrbitControls extends EventDispatcher {
 
 		function onPointerUp( event ) {
 
+			if ( ! isTrackingPointer( event ) ) return;
+
 			removePointer( event );
 
 			switch ( pointers.length ) {
@@ -1066,9 +1077,6 @@ class OrbitControls extends EventDispatcher {
 				case 0:
 
 					scope.domElement.releasePointerCapture( event.pointerId );
-
-					scope.domElement.removeEventListener( 'pointermove', onPointerMove );
-					scope.domElement.removeEventListener( 'pointerup', onPointerUp );
 
 					scope.dispatchEvent( _endEvent );
 
@@ -1514,6 +1522,8 @@ class OrbitControls extends EventDispatcher {
 		scope.domElement.addEventListener( 'contextmenu', onContextMenu );
 
 		scope.domElement.addEventListener( 'pointerdown', onPointerDown );
+		scope.domElement.addEventListener( 'pointermove', onPointerMove );
+		scope.domElement.addEventListener( 'pointerup', onPointerUp );
 		scope.domElement.addEventListener( 'pointercancel', onPointerUp );
 		scope.domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
 
