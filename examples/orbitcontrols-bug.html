@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>orbitcontrols bug</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			html,
+			body,
+			#container {
+				height: 100%;
+			}
+			#container {
+				display: flex;
+				flex-direction: column;
+			}
+			#top {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background: #777;
+				padding: 10px;
+			}
+			#colorPicker {
+				width: 120px;
+			}
+			#scene {
+				flex: 1;
+				min-height: 0;
+				cursor: move;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container">
+			<div id="top">
+				<select id="colorPicker">
+					<option value="#0000ff">blue</option>
+					<option value="#00ff00">green</option>
+					<option value="#ff0000">red</option>
+				</select>
+			</div>
+			<canvas id="scene"></canvas>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.module.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			let renderer, scene, camera, mesh, orbitControls, colorPicker;
+
+			init();
+
+			function init() {
+
+				const canvas = document.getElementById( 'scene' );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, canvas } );
+				renderer.setAnimationLoop( animate );
+				scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera();
+				camera.position.set( 1, 1, 3 );
+
+				// LIGHTS
+
+				const ambientLight = new THREE.AmbientLight( '#fff', 0.5 );
+				scene.add( ambientLight );
+
+				const directionalLight = new THREE.DirectionalLight( '#fff', 2 );
+				directionalLight.position.set( 1, 3, 1 );
+				scene.add( directionalLight );
+
+				// MESH
+
+				mesh = new THREE.Mesh( new THREE.BoxGeometry() );
+				scene.add( mesh );
+
+				// ORBIT CONTROLS
+
+				orbitControls = new OrbitControls( camera, renderer.domElement );
+				orbitControls.enableDamping = true;
+				orbitControls.enablePan = true;
+				orbitControls.enableRotate = true;
+				orbitControls.enableZoom = true;
+
+				// COLOR PICKER
+
+				colorPicker = document.getElementById( 'colorPicker' );
+				colorPicker.addEventListener( 'change', onColorPicked );
+				onColorPicked();
+
+			}
+
+			function onColorPicked() {
+
+				mesh.material = new THREE.MeshStandardMaterial( { color: colorPicker.value } );
+
+			}
+
+			function animate() {
+
+				resizeRendererToDisplaySize();
+				orbitControls.update();
+				renderer.render( scene, camera );
+
+			}
+
+			function resizeRendererToDisplaySize() {
+
+				const canvas = renderer.domElement;
+				const pixelRatio = window.devicePixelRatio;
+				const width = Math.floor( canvas.clientWidth * pixelRatio );
+				const height = Math.floor( canvas.clientHeight * pixelRatio );
+				const needResize = canvas.width !== width || canvas.height !== height;
+
+				if ( needResize ) {
+
+					renderer.setSize( width, height, false );
+					camera.aspect = canvas.clientWidth / canvas.clientHeight;
+					camera.updateProjectionMatrix();
+
+				}
+
+			}
+
+		</script>
+	</body>
+</html>
