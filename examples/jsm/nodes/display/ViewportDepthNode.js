@@ -42,7 +42,7 @@ class ViewportDepthNode extends Node {
 
 			if ( texture !== null ) {
 
- 				node = depthBase().assign( this.valueNode );
+ 				node = depthBase().assign( texture );
 
 			} else {
 
