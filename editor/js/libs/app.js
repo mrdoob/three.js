@@ -19,6 +19,9 @@ var APP = {
 		this.width = 500;
 		this.height = 500;
 
+		this.renderer = renderer;
+		var pathTracer = null;
+
 		this.load = function ( json ) {
 
 			var project = json.project;
@@ -94,6 +97,12 @@ var APP = {
 			}
 
 			dispatch( events.init, arguments );
+
+		};
+
+		this.setPathTracer = function ( pathTracer_ ) {
+
+			pathTracer = pathTracer_;
 
 		};
 
@@ -181,6 +190,12 @@ var APP = {
 
 		};
 
+		this.start = function () {
+
+			dispatch( events.start, arguments );
+
+		};
+
 		this.stop = function () {
 
 			document.removeEventListener( 'keydown', onKeyDown );
@@ -195,11 +210,48 @@ var APP = {
 
 		};
 
-		this.render = function ( time ) {
+		this.render = function ( time, samples = - 1 ) {
 
-			dispatch( events.update, { time: time * 1000, delta: 0 /* TODO */ } );
+			return new Promise( ( resolve ) => {
 
-			renderer.render( scene, camera );
+				dispatch( events.update, { time: time * 1000, delta: ( prevTime ) ? ( time - prevTime ) * 1000 : 0 } );
+
+				if ( pathTracer === null ) {
+
+					renderer.render( scene, camera );
+
+					prevTime = time;
+
+					resolve();
+
+				} else {
+
+					const renderSample = () => {
+
+						const currentSamples = Math.floor( pathTracer.getSamples() );
+
+						if ( currentSamples < samples ) {
+
+							requestAnimationFrame( renderSample );
+
+						} else {
+
+							prevTime = time;
+
+							resolve();
+
+						}
+
+						pathTracer.update();
+
+					};
+
+					pathTracer.init( scene, camera );
+					renderSample();
+
+				}
+
+			} );
 
 		};
 
