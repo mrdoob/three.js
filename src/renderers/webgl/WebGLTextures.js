@@ -1594,14 +1594,36 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const renderTargetProperties = properties.get( renderTarget );
 		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 
-		// check if the depth texture is already bound to the frame buffer and that it's been initialized
-		if ( renderTargetProperties.__boundDepthTexture === renderTarget.depthTexture && properties.has( renderTarget.depthTexture ) ) {
+		// if the bound depth texture has changed
+		if ( renderTargetProperties.__boundDepthTexture !== renderTarget.depthTexture ) {
 
-			return;
+			// fire the dispose event to get rid of stored state associated with the previously bound depth buffer
+			const depthTexture = renderTarget.depthTexture;
+			if ( renderTargetProperties.__depthDisposeCallback ) {
+
+				renderTargetProperties.__depthDisposeCallback();
+
+			}
+
+			// set up dispose listeners to track when the currently attached buffer is implicitly unbound
+			if ( depthTexture ) {
+
+				const disposeEvent = () => {
+
+					delete renderTargetProperties.__boundDepthTexture;
+					delete renderTargetProperties.__depthDisposeCallback;
+					depthTexture.removeEventListener( 'dispose', disposeEvent );
+
+				};
+
+				depthTexture.addEventListener( 'dispose', disposeEvent );
+				renderTargetProperties.__depthDisposeCallback = disposeEvent;
+
+			}
+
+			renderTargetProperties.__boundDepthTexture = depthTexture;
 
 		}
-
-		renderTargetProperties.__boundDepthTexture = renderTarget.depthTexture;
 
 		if ( renderTarget.depthTexture && ! renderTargetProperties.__autoAllocateDepthBuffer ) {
 
@@ -1798,7 +1820,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
 
-				if ( renderTarget.depthBuffer && renderTargetProperties.__webglDepthRenderbuffer === undefined ) {
+				if ( renderTarget.depthBuffer ) {
 
 					renderTargetProperties.__webglDepthRenderbuffer = _gl.createRenderbuffer();
 					setupRenderBufferStorage( renderTargetProperties.__webglDepthRenderbuffer, renderTarget, true );

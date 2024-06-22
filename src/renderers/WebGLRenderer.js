@@ -2270,19 +2270,25 @@ class WebGLRenderer {
 
 				} else if ( renderTarget.depthBuffer ) {
 
-					// Swap the depth buffer to the currently attached one
+					// check if the depth texture is already bound to the frame buffer and that it's been initialized
 					const depthTexture = renderTarget.depthTexture;
-					if (
-						depthTexture &&
-						properties.has( depthTexture ) &&
-						( renderTarget.width !== depthTexture.image.width || renderTarget.height !== depthTexture.image.height )
-					) {
+					if ( renderTargetProperties.__boundDepthTexture !== depthTexture ) {
 
-						throw new Error( 'WebGLRenderTarget: Attached DepthTexture is initialized to the incorrect size.' );
+						// check if the depth texture is compatible
+						if (
+							depthTexture !== null &&
+							properties.has( depthTexture ) &&
+							( renderTarget.width !== depthTexture.image.width || renderTarget.height !== depthTexture.image.height )
+						) {
+
+							throw new Error( 'WebGLRenderTarget: Attached DepthTexture is initialized to the incorrect size.' );
+
+						}
+
+						// Swap the depth buffer to the currently attached one
+						textures.setupDepthRenderbuffer( renderTarget );
 
 					}
-
-					textures.setupDepthRenderbuffer( renderTarget );
 
 				}
 
