@@ -69,7 +69,7 @@ class InstanceNode extends Node {
 
 		const instanceColorAttribute = instanceMesh.instanceColor;
 
-		if ( instanceColorAttribute && this.instanceColorNode === null ) {
+		if ( instanceColorAttribute && instanceColorNode === null ) {
 
 			// Compatilbe with WebGL backend, WebGL2 limits UBO to 64kb. Color count number bigger than 5333 ( 3 * 4 * 5333 < 64kb ) will fallback to attribute.
 			if ( instanceMesh.count < 5333 ) {
