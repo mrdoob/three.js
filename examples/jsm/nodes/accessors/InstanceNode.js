@@ -6,6 +6,8 @@ import { positionLocal } from './PositionNode.js';
 import { nodeProxy, vec3, mat3, mat4 } from '../shadernode/ShaderNode.js';
 import { DynamicDrawUsage, InstancedInterleavedBuffer, InstancedBufferAttribute } from 'three';
 import { NodeUpdateType } from '../core/constants.js';
+import { buffer } from '../accessors/BufferNode.js';
+import { instanceIndex } from '../core/IndexNode.js';
 
 class InstanceNode extends Node {
 
@@ -26,7 +28,7 @@ class InstanceNode extends Node {
 
 	}
 
-	setup( /*builder*/ ) {
+	setup( builder ) {
 
 		let instanceMatrixNode = this.instanceMatrixNode;
 
@@ -35,20 +37,8 @@ class InstanceNode extends Node {
 		if ( instanceMatrixNode === null ) {
 
 			const instanceAttribute = instanceMesh.instanceMatrix;
-			const buffer = new InstancedInterleavedBuffer( instanceAttribute.array, 16, 1 );
 
-			this.buffer = buffer;
-			const bufferFn = instanceAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
-
-			const instanceBuffers = [
-				// F.Signature -> bufferAttribute( array, type, stride, offset )
-				bufferFn( buffer, 'vec4', 16, 0 ),
-				bufferFn( buffer, 'vec4', 16, 4 ),
-				bufferFn( buffer, 'vec4', 16, 8 ),
-				bufferFn( buffer, 'vec4', 16, 12 )
-			];
-
-			instanceMatrixNode = mat4( ...instanceBuffers );
+			instanceMatrixNode = buffer( instanceAttribute.array, 'mat4', instanceMesh.count ).element( instanceIndex );
 
 			this.instanceMatrixNode = instanceMatrixNode;
 
