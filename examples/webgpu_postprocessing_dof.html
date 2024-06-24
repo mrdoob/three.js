@@ -29,36 +29,6 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			class InstanceUniformNode extends Node {
-
-				constructor() {
-
-					super( 'vec3' );
-
-					this.updateType = NodeUpdateType.OBJECT;
-
-					this.uniformNode = uniform( new THREE.Color() );
-
-				}
-
-				update( frame ) {
-
-					const mesh = frame.object;
-
-					const meshColor = mesh.color;
-
-					this.uniformNode.value.copy( meshColor );
-
-				}
-
-				setup( /*builder*/ ) {
-
-					return this.uniformNode;
-
-				}
-
-			}
-
 			//
 
 			let camera, scene, renderer, stats;
@@ -95,8 +65,6 @@
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
 				const cubeTextureNode = cubeTexture( textureCube );
 
-				const material = new MeshBasicNodeMaterial();
-
 				const geo = new THREE.SphereGeometry( 1, 20, 10 );
 
 				const xgrid = 14, ygrid = 9, zgrid = 14;
@@ -109,11 +77,11 @@
 
 						for ( let k = 0; k < zgrid; k ++ ) {
 
+							const material = new MeshBasicNodeMaterial();
 							const mesh = new THREE.Mesh( geo, material );
-
-							const instanceUniform = nodeObject( new InstanceUniformNode() );
-							mesh.material.colorNode = instanceUniform.mul( cubeTextureNode );
-							mesh.color = new THREE.Color();
+			
+							mesh.color = uniform( new THREE.Color() );
+							mesh.material.colorNode = mesh.color.mul( cubeTextureNode );
 
 							const x = 200 * ( i - xgrid / 2 );
 							const y = 200 * ( j - ygrid / 2 );
@@ -237,7 +205,7 @@
 				for ( let i = 0; i < objects.length; i ++ ) {
 
 					const h = ( 360 * ( i / objects.length + time ) % 360 ) / 360;
-					objects[ i ].color.setHSL( h, 1, 0.5 );
+					objects[ i ].color.value.setHSL( h, 1, 0.5 );
 
 				}
 
