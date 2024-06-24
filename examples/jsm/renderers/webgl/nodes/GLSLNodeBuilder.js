@@ -47,9 +47,9 @@ precision lowp sampler2DShadow;
 
 class GLSLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer, scene = null ) {
+	constructor( object, renderer ) {
 
-		super( object, renderer, new GLSLNodeParser(), scene );
+		super( object, renderer, new GLSLNodeParser() );
 
 		this.uniformGroups = {};
 		this.transforms = [];
@@ -646,6 +646,12 @@ ${ flowData.code }
 	isFlipY() {
 
 		return true;
+
+	}
+
+	isWebGPU() {
+
+		return false;
 
 	}
 

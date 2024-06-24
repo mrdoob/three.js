@@ -787,9 +787,9 @@ class WebGLBackend extends Backend {
 
 	// node builder
 
-	createNodeBuilder( object, renderer, scene = null ) {
+	createNodeBuilder( object, renderer ) {
 
-		return new GLSLNodeBuilder( object, renderer, scene );
+		return new GLSLNodeBuilder( object, renderer );
 
 	}
 

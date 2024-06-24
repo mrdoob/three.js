@@ -155,9 +155,9 @@ fn threejs_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, level : i32
 
 class WGSLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer, scene = null ) {
+	constructor( object, renderer ) {
 
-		super( object, renderer, new WGSLNodeParser(), scene );
+		super( object, renderer, new WGSLNodeParser() );
 
 		this.uniformGroups = {};
 
@@ -624,6 +624,12 @@ ${ flowData.code }
 	isFlipY() {
 
 		return false;
+
+	}
+
+	isWebGPU() {
+
+		return true;
 
 	}
 

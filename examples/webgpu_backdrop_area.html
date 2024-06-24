@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, depth, depthTexture, toneMapping, viewportSharedTexture, viewportMipTexture, viewportTopLeft, checker, uv, modelScale, MeshBasicNodeMaterial } from 'three/nodes';
+			import { color, linearDepth, toneMapping, viewportLinearDepth, viewportSharedTexture, viewportMipTexture, viewportTopLeft, checker, uv, modelScale, MeshBasicNodeMaterial } from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -79,8 +79,12 @@
 
 				// volume
 
-				const depthDistance = depthTexture().distance( depth );
-				const depthAlphaNode = depthDistance.oneMinus().smoothstep( .90, 2 ).mul( 20 ).saturate();
+				// compare depth from viewportLinearDepth with linearDepth() to create a distance field
+				// viewportLinearDepth return the linear depth of the scene
+				// linearDepth() returns the linear depth of the mesh
+				const depthDistance = viewportLinearDepth.distance( linearDepth() );
+
+				const depthAlphaNode = depthDistance.oneMinus().smoothstep( .90, 2 ).mul( 10 ).saturate();
 				const depthBlurred = viewportMipTexture().bicubic( depthDistance.smoothstep( 0, .6 ).mul( 40 * 5 ).clamp( 0, 5 ) );
 
 				const blurredBlur = new MeshBasicNodeMaterial();
