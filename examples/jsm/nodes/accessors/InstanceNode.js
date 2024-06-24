@@ -40,6 +40,7 @@ class InstanceNode extends Node {
 			const instanceAttribute = instanceMesh.instanceMatrix;
 
 			// Compatilbe with WebGL backend, WebGL2 limits UBO to 64kb. Matrix count number bigger than 1000 ( 16 * 4 * 1000 = 64kb ) will fallback to attribute.
+      
 			if ( instanceMesh.count <= 1000 ) {
 
 				instanceMatrixNode = buffer( instanceAttribute.array, 'mat4', instanceMesh.count ).element( instanceIndex );
@@ -71,8 +72,9 @@ class InstanceNode extends Node {
 
 		if ( instanceColorAttribute && instanceColorNode === null ) {
 
-			// Compatilbe with WebGL backend, WebGL2 limits UBO to 64kb. Color count number bigger than 5333 ( 3 * 4 * 5333 < 64kb ) will fallback to attribute.
-			if ( instanceMesh.count < 5333 ) {
+			// Same as instanceMatrixNode
+
+			if ( instanceMesh.count <= 1000 ) {
 
 				instanceColorNode = buffer( instanceColorAttribute.array, 'vec3', instanceMesh.count ).element( instanceIndex );
 
