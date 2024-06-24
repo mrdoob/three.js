@@ -469,6 +469,12 @@ class NodeBuilder {
 
 	}
 
+	isWebGPU() {
+
+		return true;
+
+	}
+
 	generateTexture( /* texture, textureProperty, uvSnippet */ ) {
 
 		console.warn( 'Abstract function.' );
