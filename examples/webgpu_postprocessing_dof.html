@@ -23,7 +23,7 @@
 
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 			import PostProcessing from 'three/addons/renderers/common/PostProcessing.js';
-			import { MeshBasicNodeMaterial, cubeTexture, uniform, Node, NodeUpdateType, nodeObject } from 'three/nodes';
+			import { MeshBasicNodeMaterial, cubeTexture } from 'three/nodes';
 			import { pass } from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -31,7 +31,7 @@
 
 			//
 
-			let camera, scene, renderer, stats;
+			let camera, scene, renderer, mesh, stats;
 
 			let mouseX = 0, mouseY = 0;
 
@@ -41,9 +41,9 @@
 			let width = window.innerWidth;
 			let height = window.innerHeight;
 
-			const objects = [];
-
 			let postProcessing;
+
+			const color = new THREE.Color();
 
 			init();
 
@@ -65,11 +65,19 @@
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
 				const cubeTextureNode = cubeTexture( textureCube );
 
-				const geo = new THREE.SphereGeometry( 1, 20, 10 );
+				const geometry = new THREE.SphereGeometry( 60, 20, 10 );
+				const material = new MeshBasicNodeMaterial();
+				material.colorNode = cubeTextureNode;
 
 				const xgrid = 14, ygrid = 9, zgrid = 14;
+				const count = xgrid * ygrid * zgrid;
 
-				const s = 60;
+				mesh = new THREE.InstancedMesh( geometry, material, count );
+				scene.add( mesh );
+
+				const matrix = new THREE.Matrix4();
+
+				let index = 0;
 
 				for ( let i = 0; i < xgrid; i ++ ) {
 
@@ -77,24 +85,13 @@
 
 						for ( let k = 0; k < zgrid; k ++ ) {
 
-							const material = new MeshBasicNodeMaterial();
-							const mesh = new THREE.Mesh( geo, material );
-			
-							mesh.color = uniform( new THREE.Color() );
-							mesh.material.colorNode = mesh.color.mul( cubeTextureNode );
-
 							const x = 200 * ( i - xgrid / 2 );
 							const y = 200 * ( j - ygrid / 2 );
 							const z = 200 * ( k - zgrid / 2 );
 
-							mesh.position.set( x, y, z );
-							mesh.scale.set( s, s, s );
-
-							mesh.matrixAutoUpdate = false;
-							mesh.updateMatrix();
-
-							scene.add( mesh );
-							objects.push( mesh );
+							mesh.setMatrixAt( index, matrix.identity().setPosition( x, y, z ) );
+							mesh.setColorAt( index, color );
+							index ++;
 
 						}
 
@@ -202,12 +199,15 @@
 
 				camera.lookAt( scene.position );
 
-				for ( let i = 0; i < objects.length; i ++ ) {
+				for ( let i = 0; i < mesh.count; i ++ ) {
 
-					const h = ( 360 * ( i / objects.length + time ) % 360 ) / 360;
-					objects[ i ].color.value.setHSL( h, 1, 0.5 );
+					const h = ( 360 * ( i / mesh.count + time ) % 360 ) / 360;
+					color.setHSL( h, 1, 0.5 );
+					mesh.setColorAt( i, color );
 
 				}
+
+				mesh.instanceColor.needsUpdate = true;
 
 				postProcessing.render();
 
