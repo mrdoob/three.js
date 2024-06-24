@@ -37,7 +37,7 @@ class DepthOfFieldNode extends TempNode {
 
 		const uvNode = textureNode.uvNode || uv();
 
-		const sampleTexture = ( uv ) => this.textureNode.cache().context( { getUV: () => uv, forceUVContext: true } );
+		const sampleTexture = ( uv ) => this.textureNode.uv( uv );
 
 		const dof = tslFn( () => {
 
