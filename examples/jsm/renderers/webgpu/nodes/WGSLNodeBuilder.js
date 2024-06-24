@@ -627,6 +627,12 @@ ${ flowData.code }
 
 	}
 
+	isWebGPU() {
+
+		return true;
+
+	}
+
 	getBuiltins( shaderStage ) {
 
 		const snippets = [];
