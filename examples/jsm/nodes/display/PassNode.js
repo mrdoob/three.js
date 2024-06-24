@@ -1,6 +1,6 @@
 import { addNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import TextureNode from '../accessors/TextureNode.js';
+import { default as TextureNode/*, texture*/ } from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
@@ -67,7 +67,7 @@ class PassNode extends TempNode {
 		this._textureNode = nodeObject( new PassTextureNode( this, renderTarget.texture ) );
 		this._depthTextureNode = nodeObject( new PassTextureNode( this, depthTexture ) );
 
-		this._depthNode = null;
+		this._linearDepthNode = null;
 		this._viewZNode = null;
 		this._cameraNear = uniform( 0 );
 		this._cameraFar = uniform( 0 );
@@ -109,24 +109,26 @@ class PassNode extends TempNode {
 
 	}
 
-	getDepthNode() {
+	getLinearDepthNode() {
 
-		if ( this._depthNode === null ) {
+		if ( this._linearDepthNode === null ) {
 
 			const cameraNear = this._cameraNear;
 			const cameraFar = this._cameraFar;
 
-			this._depthNode = viewZToOrthographicDepth( this.getViewZNode(), cameraNear, cameraFar );
+			// TODO: just if ( builder.camera.isPerspectiveCamera )
+
+			this._linearDepthNode = viewZToOrthographicDepth( this.getViewZNode(), cameraNear, cameraFar );
 
 		}
 
-		return this._depthNode;
+		return this._linearDepthNode;
 
 	}
 
 	setup() {
 
-		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getDepthNode();
+		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 
 	}
 

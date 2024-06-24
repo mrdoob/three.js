@@ -233,12 +233,12 @@
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode();
-				const scenePassDepth = scenePass.getDepthNode().remapClamp( .3, .5 );
+				const scenePassDepth = scenePass.getLinearDepthNode().remapClamp( .3, .5 );
 
 				const waterMask = objectPosition( camera ).y.greaterThan( 0 );
 
 				const scenePassColorBlurred = scenePassColor.gaussianBlur();
-				scenePassColorBlurred.directionNode = waterMask.cond( scenePassDepth, scenePass.getDepthNode().mul( 5 ) );
+				scenePassColorBlurred.directionNode = waterMask.cond( scenePassDepth, scenePass.getLinearDepthNode().mul( 5 ) );
 
 				const vignet = viewportTopLeft.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
 
