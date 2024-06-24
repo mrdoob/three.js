@@ -39,6 +39,8 @@ class SobelOperatorNode extends TempNode {
 
 		const sobel = tslFn( () => {
 
+			// Sobel Edge Detection (see https://youtu.be/uihBwtPIBxM)
+
 			const texel = this._invSize;
 
 			// kernel definition (in glsl matrices are filled in column-major order)
