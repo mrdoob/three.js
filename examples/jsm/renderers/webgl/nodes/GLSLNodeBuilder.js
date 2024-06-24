@@ -649,12 +649,6 @@ ${ flowData.code }
 
 	}
 
-	isWebGPU() {
-
-		return false;
-
-	}
-
 	registerTransform( varyingName, attributeNode ) {
 
 		this.transforms.push( { varyingName, attributeNode } );
