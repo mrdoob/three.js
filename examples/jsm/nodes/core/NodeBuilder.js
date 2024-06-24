@@ -60,14 +60,15 @@ const toFloat = ( value ) => {
 
 class NodeBuilder {
 
-	constructor( object, renderer, parser, scene = null, material = null ) {
+	constructor( object, renderer, parser ) {
 
 		this.object = object;
-		this.material = material || ( object && object.material ) || null;
+		this.material = ( object && object.material ) || null;
 		this.geometry = ( object && object.geometry ) || null;
 		this.renderer = renderer;
 		this.parser = parser;
-		this.scene = scene;
+		this.scene = null;
+		this.camera = null;
 
 		this.nodes = [];
 		this.updateNodes = [];
