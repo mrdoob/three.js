@@ -65,10 +65,11 @@
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
 				const cubeTextureNode = cubeTexture( textureCube );
+				const oscPos = oscSine( positionWorld.div( 1000 /* scene distance */ ).add( timerGlobal( .2 /* speed */ ) ) );
 
 				const geometry = new THREE.SphereGeometry( 60, 20, 10 );
 				const material = new MeshBasicNodeMaterial();
-				material.colorNode = cubeTextureNode.mul( oscSine( positionWorld.div( 1000 /* scene distance */ ).add( timerGlobal( .2 /* speed */ ) ) ) );
+				material.colorNode = cubeTextureNode.mul( oscPos );
 
 				mesh = new THREE.InstancedMesh( geometry, material, count );
 				scene.add( mesh );
