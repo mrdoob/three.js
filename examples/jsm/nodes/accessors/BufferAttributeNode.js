@@ -126,6 +126,12 @@ class BufferAttributeNode extends InputNode {
 
 		this.usage = value;
 
+		if ( this.attribute && this.attribute.isBufferAttribute === true ) {
+
+			this.attribute.usage = value;
+
+		}
+
 		return this;
 
 	}

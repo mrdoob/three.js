@@ -99,6 +99,8 @@
 
 				}
 
+				mesh.instanceColor.setUsage( THREE.DynamicDrawUsage );
+
 				// renderer
 
 				renderer = new WebGPURenderer( { antialias: true } );
@@ -206,8 +208,6 @@
 					mesh.setColorAt( i, color );
 
 				}
-
-				mesh.instanceColor.needsUpdate = true;
 
 				postProcessing.render();
 
