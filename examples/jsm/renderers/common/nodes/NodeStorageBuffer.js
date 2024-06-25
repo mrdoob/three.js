@@ -5,12 +5,14 @@ let _id = 0;
 
 class NodeStorageBuffer extends StorageBuffer {
 
-	constructor( nodeUniform ) {
+	constructor( nodeUniform, groupNode ) {
 
 		super( 'StorageBuffer_' + _id ++, nodeUniform ? nodeUniform.value : null );
 
 		this.nodeUniform = nodeUniform;
-		this.access = nodeUniform.access ? nodeUniform.access : GPUBufferBindingType.Storage
+		this.access = nodeUniform ? nodeUniform.access : GPUBufferBindingType.Storage
+		this.groupNode = groupNode;
+
 
 	}
 

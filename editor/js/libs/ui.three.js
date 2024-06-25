@@ -571,13 +571,9 @@ class UIPoints extends UISpan {
 
 	clear() {
 
-		for ( let i = 0; i < this.pointsUI.length; ++ i ) {
+		for ( let i = this.pointsUI.length - 1; i >= 0; -- i ) {
 
-			if ( this.pointsUI[ i ] ) {
-
-				this.deletePointRow( i, true );
-
-			}
+			this.deletePointRow( i, false );
 
 		}
 
@@ -585,7 +581,7 @@ class UIPoints extends UISpan {
 
 	}
 
-	deletePointRow( idx, dontUpdate ) {
+	deletePointRow( idx, needsUpdate = true ) {
 
 		if ( ! this.pointsUI[ idx ] ) return;
 
@@ -593,7 +589,7 @@ class UIPoints extends UISpan {
 
 		this.pointsUI.splice( idx, 1 );
 
-		if ( dontUpdate !== true ) {
+		if ( needsUpdate === true ) {
 
 			this.update();
 
@@ -658,7 +654,7 @@ class UIPoints2 extends UIPoints {
 
 	}
 
-	setValue( points ) {
+	setValue( points, needsUpdate = true ) {
 
 		this.clear();
 
@@ -669,7 +665,8 @@ class UIPoints2 extends UIPoints {
 
 		}
 
-		this.update();
+		if ( needsUpdate === true ) this.update();
+
 		return this;
 
 	}
@@ -753,7 +750,7 @@ class UIPoints3 extends UIPoints {
 
 	}
 
-	setValue( points ) {
+	setValue( points, needsUpdate = true ) {
 
 		this.clear();
 
@@ -764,7 +761,8 @@ class UIPoints3 extends UIPoints {
 
 		}
 
-		this.update();
+		if ( needsUpdate === true ) this.update();
+
 		return this;
 
 	}

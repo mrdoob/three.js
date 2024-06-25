@@ -53,7 +53,6 @@ class TSLEncoder {
 		this.imports = new Set();
 		this.global = new Set();
 		this.overloadings = new Map();
-		this.layoutsCode = '';
 		this.iife = false;
 		this.uniqueNames = false;
 		this.reference = false;
@@ -502,7 +501,7 @@ ${ this.tab }} )`;
 
 		this.addImport( 'overloadingFn' );
 
-		return `const ${ name } = overloadingFn( [ ${ nodes.map( node => node.name + '_' + nodes.indexOf( node ) ).join( ', ' ) } ] );\n`;
+		return `export const ${ name } = /*#__PURE__*/ overloadingFn( [ ${ nodes.map( node => node.name + '_' + nodes.indexOf( node ) ).join( ', ' ) } ] );\n`;
 
 	}
 
@@ -583,11 +582,11 @@ ${ this.tab }} )`;
 
 		}
 
-		let funcStr = `const ${ fnName } = tslFn( (${ paramsStr }) => {
+		let funcStr = `export const ${ fnName } = /*#__PURE__*/ tslFn( (${ paramsStr }) => {
 
 ${ bodyStr }
 
-${ this.tab }} );\n`;
+${ this.tab }} )`;
 
 		const layoutInput = inputs.length > 0 ? '\n\t\t' + this.tab + inputs.join( ',\n\t\t' + this.tab ) + '\n\t' + this.tab : '';
 
@@ -595,13 +594,15 @@ ${ this.tab }} );\n`;
 
 			const uniqueName = this.uniqueNames ? fnName + '_' + Math.random().toString( 36 ).slice( 2 ) : fnName;
 
-			this.layoutsCode += `${ this.tab + fnName }.setLayout( {
+			funcStr += `.setLayout( {
 ${ this.tab }\tname: '${ uniqueName }',
 ${ this.tab }\ttype: '${ type }',
 ${ this.tab }\tinputs: [${ layoutInput }]
-${ this.tab }} );\n\n`;
+${ this.tab }} )`;
 
 		}
+
+		funcStr += ';\n';
 
 		this.imports.add( 'tslFn' );
 
@@ -683,9 +684,6 @@ ${ this.tab }} );\n\n`;
 		}
 
 		const imports = [ ...this.imports ];
-		const exports = [ ...this.global ];
-
-		const layouts = this.layoutsCode.length > 0 ? `\n${ this.tab }// layouts\n\n` + this.layoutsCode : '';
 
 		let header = '// Three.js Transpiler r' + REVISION + '\n\n';
 		let footer = '';
@@ -695,18 +693,16 @@ ${ this.tab }} );\n\n`;
 			header += '( function ( TSL, uniforms ) {\n\n';
 
 			header += imports.length > 0 ? '\tconst { ' + imports.join( ', ' ) + ' } = TSL;\n' : '';
-			footer += exports.length > 0 ? '\treturn { ' + exports.join( ', ' ) + ' };\n' : '';
 
 			footer += '\n} );';
 
 		} else {
 
 			header += imports.length > 0 ? 'import { ' + imports.join( ', ' ) + ' } from \'three/nodes\';\n' : '';
-			footer += exports.length > 0 ? 'export { ' + exports.join( ', ' ) + ' };\n' : '';
 
 		}
 
-		return header + code + layouts + footer;
+		return header + code + footer;
 
 	}
 

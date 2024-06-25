@@ -42,8 +42,6 @@ class Backend {
 
 	createBindings( renderObject ) { }
 
-	updateBindings( renderObject ) { }
-
 	// pipeline
 
 	createRenderPipeline( renderObject ) { }
@@ -100,7 +98,7 @@ class Backend {
 
 		const { object, geometry } = renderObject;
 
-		return geometry.isInstancedBufferGeometry ? geometry.instanceCount : ( object.isInstancedMesh ? object.count : 1 );
+		return geometry.isInstancedBufferGeometry ? geometry.instanceCount : ( object.count > 1 ? object.count : 1 );
 
 	}
 

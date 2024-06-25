@@ -61,13 +61,24 @@ function GeometryParametersPanel( editor, object ) {
 
 		const parameters = object.geometry.parameters;
 
+		points.setValue( parameters.points, false );
 		segments.setValue( parameters.segments );
 		phiStart.setValue( parameters.phiStart * THREE.MathUtils.RAD2DEG );
 		phiLength.setValue( parameters.phiLength * THREE.MathUtils.RAD2DEG );
 
 	}
 
-	signals.geometryChanged.add( refreshUI );
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
+
+	//
 
 	function update() {
 

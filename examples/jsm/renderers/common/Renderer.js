@@ -133,6 +133,11 @@ class Renderer {
 			enabled: false
 		};
 
+		this.debug = {
+			checkShaderErrors: true,
+			onShaderError: null
+		};
+
 	}
 
 	async init() {
@@ -1377,8 +1382,6 @@ class Renderer {
 		//
 
 		object.onBeforeRender( this, scene, camera, geometry, material, group );
-
-		material.onBeforeRender( this, scene, camera, geometry, material, group );
 
 		//
 

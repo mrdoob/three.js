@@ -128,8 +128,8 @@
 				textureL.colorSpace = THREE.SRGBColorSpace;
 				textureR.colorSpace = THREE.DisplayP3ColorSpace;
 
-				sceneL.background = containTexture( window.innerWidth / window.innerHeight, textureL );
-				sceneR.background = containTexture( window.innerWidth / window.innerHeight, textureR );
+				sceneL.background = THREE.TextureUtils.contain( textureL, window.innerWidth / window.innerHeight );
+				sceneR.background = THREE.TextureUtils.contain( textureR, window.innerWidth / window.innerHeight );
 
 			}
 
@@ -175,8 +175,8 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				containTexture( window.innerWidth / window.innerHeight, sceneL.background );
-				containTexture( window.innerWidth / window.innerHeight, sceneR.background );
+				THREE.TextureUtils.contain( sceneL.background, window.innerWidth / window.innerHeight );
+				THREE.TextureUtils.contain( sceneR.background, window.innerWidth / window.innerHeight );
 
 			}
 
@@ -186,30 +186,6 @@
 
 				textureL.needsUpdate = true;
 				textureR.needsUpdate = true;
-
-			}
-
-			function containTexture( aspect, target ) {
-
-				// Sets the matrix uv transform so the texture image is contained in a region having the specified aspect ratio,
-				// and does so without distortion. Akin to CSS object-fit: contain.
-				// Source: https://github.com/mrdoob/three.js/pull/17199
-
-				var imageAspect = ( target.image && target.image.width ) ? target.image.width / target.image.height : 1;
-
-				if ( aspect > imageAspect ) {
-
-					target.matrix.setUvTransform( 0, 0, aspect / imageAspect, 1, 0, 0.5, 0.5 );
-
-				} else {
-
-					target.matrix.setUvTransform( 0, 0, 1, imageAspect / aspect, 0, 0.5, 0.5 );
-
-				}
-
-				target.matrixAutoUpdate = false;
-
-				return target;
 
 			}
 

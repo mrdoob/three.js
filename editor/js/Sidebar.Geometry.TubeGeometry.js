@@ -94,6 +94,7 @@ function GeometryParametersPanel( editor, object ) {
 		radialSegments.setValue( parameters.radialSegments );
 		closed.setValue( parameters.closed );
 
+		points.setValue( parameters.path.points, false );
 		curveType.setValue( parameters.path.curveType );
 		tension.setValue( parameters.path.tension );
 
@@ -101,7 +102,15 @@ function GeometryParametersPanel( editor, object ) {
 
 	}
 
-	signals.geometryChanged.add( refreshUI );
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
 
 	//
 

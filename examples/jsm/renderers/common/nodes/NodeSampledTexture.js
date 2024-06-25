@@ -2,11 +2,12 @@ import { SampledTexture } from '../SampledTexture.js';
 
 class NodeSampledTexture extends SampledTexture {
 
-	constructor( name, textureNode, access = null ) {
+	constructor( name, textureNode, groupNode, access = null ) {
 
 		super( name, textureNode ? textureNode.value : null );
 
 		this.textureNode = textureNode;
+		this.groupNode = groupNode;
 
 		this.access = access;
 
@@ -38,9 +39,9 @@ class NodeSampledTexture extends SampledTexture {
 
 class NodeSampledCubeTexture extends NodeSampledTexture {
 
-	constructor( name, textureNode, access ) {
+	constructor( name, textureNode, groupNode, access ) {
 
-		super( name, textureNode, access );
+		super( name, textureNode, groupNode, access );
 
 		this.isSampledCubeTexture = true;
 
@@ -50,9 +51,9 @@ class NodeSampledCubeTexture extends NodeSampledTexture {
 
 class NodeSampledTexture3D extends NodeSampledTexture {
 
-	constructor( name, textureNode, access ) {
+	constructor( name, textureNode, groupNode, access ) {
 
-		super( name, textureNode, access );
+		super( name, textureNode, groupNode, access );
 
 		this.isSampledTexture3D = true;
 

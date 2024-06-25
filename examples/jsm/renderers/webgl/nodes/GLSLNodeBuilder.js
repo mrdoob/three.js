@@ -1,4 +1,4 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, UniformNode, vectorComponents } from '../../../nodes/Nodes.js';
+import { MathNode, GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents } from '../../../nodes/Nodes.js';
 
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
@@ -47,24 +47,20 @@ precision lowp sampler2DShadow;
 
 class GLSLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer, scene = null ) {
+	constructor( object, renderer ) {
 
-		super( object, renderer, new GLSLNodeParser(), scene );
+		super( object, renderer, new GLSLNodeParser() );
 
 		this.uniformGroups = {};
 		this.transforms = [];
+
+		this.instanceBindGroups = false;
 
 	}
 
 	getMethod( method ) {
 
 		return glslMethods[ method ] || method;
-
-	}
-
-	getPropertyName( node, shaderStage ) {
-
-		return super.getPropertyName( node, shaderStage );
 
 	}
 
@@ -161,7 +157,7 @@ ${ flowData.code }
 			pboTexture.needsUpdate = true;
 			pboTexture.isPBOTexture = true;
 
-			const pbo = new UniformNode( pboTexture );
+			const pbo = new TextureNode( pboTexture );
 			pbo.setPrecision( 'high' );
 
 			attribute.pboNode = pbo;
@@ -170,6 +166,18 @@ ${ flowData.code }
 			this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
 
 		}
+
+	}
+
+	getPropertyName( node, shaderStage = this.shaderStage ) {
+
+		if ( node.isNodeUniform && node.node.isTextureNode !== true && node.node.isBufferNode !== true ) {
+
+			return shaderStage.charAt( 0 ) + '_' + node.name;
+
+		}
+
+		return super.getPropertyName( node, shaderStage );
 
 	}
 
@@ -344,7 +352,6 @@ ${ flowData.code }
 			let snippet = null;
 			let group = false;
 
-
 			if ( uniform.type === 'texture' ) {
 
 				const texture = uniform.node.value;
@@ -398,7 +405,7 @@ ${ flowData.code }
 
 				const vectorType = this.getVectorType( uniform.type );
 
-				snippet = `${vectorType} ${uniform.name};`;
+				snippet = `${ vectorType } ${ this.getPropertyName( uniform, shaderStage ) };`;
 
 				group = true;
 
@@ -615,7 +622,7 @@ ${ flowData.code }
 
 				const extentions = this.renderer.backend.extensions;
 
-				if ( extentions.has( 'OES_texture_float_linear' ) )  {
+				if ( extentions.has( 'OES_texture_float_linear' ) ) {
 
 					extentions.get( 'OES_texture_float_linear' );
 					result = true;
@@ -835,39 +842,39 @@ void main() {
 
 		if ( uniformGPU === undefined ) {
 
+			const group = node.groupNode;
+			const groupName = group.name;
+
+			const bindings = this.getBindGroupArray( groupName, shaderStage );
+
 			if ( type === 'texture' ) {
 
-				uniformGPU = new NodeSampledTexture( uniformNode.name, uniformNode.node );
-
-				this.bindings[ shaderStage ].push( uniformGPU );
+				uniformGPU = new NodeSampledTexture( uniformNode.name, uniformNode.node, group );
+				bindings.push( uniformGPU );
 
 			} else if ( type === 'cubeTexture' ) {
 
-				uniformGPU = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node );
-
-				this.bindings[ shaderStage ].push( uniformGPU );
+				uniformGPU = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, group );
+				bindings.push( uniformGPU );
 
 			} else if ( type === 'texture3D' ) {
 
-				uniformGPU = new NodeSampledTexture3D( uniformNode.name, uniformNode.node );
-				this.bindings[ shaderStage ].push( uniformGPU );
+				uniformGPU = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group );
+				bindings.push( uniformGPU );
 
 			} else if ( type === 'buffer' ) {
 
 				node.name = `NodeBuffer_${ node.id }`;
 				uniformNode.name = `buffer${ node.id }`;
 
-				const buffer = new NodeUniformBuffer( node );
+				const buffer = new NodeUniformBuffer( node, group );
 				buffer.name = node.name;
 
-				this.bindings[ shaderStage ].push( buffer );
+				bindings.push( buffer );
 
 				uniformGPU = buffer;
 
 			} else {
-
-				const group = node.groupNode;
-				const groupName = group.name;
 
 				const uniformsStage = this.uniformGroups[ shaderStage ] || ( this.uniformGroups[ shaderStage ] = {} );
 
@@ -880,7 +887,7 @@ void main() {
 
 					uniformsStage[ groupName ] = uniformsGroup;
 
-					this.bindings[ shaderStage ].push( uniformsGroup );
+					bindings.push( uniformsGroup );
 
 				}
 

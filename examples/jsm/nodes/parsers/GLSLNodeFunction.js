@@ -79,7 +79,7 @@ const parse = ( source ) => {
 		const name = declaration[ 3 ] !== undefined ? declaration[ 3 ] : '';
 		const type = declaration[ 2 ];
 
-		const presicion = declaration[ 1 ] !== undefined ? declaration[ 1 ] : '';
+		const precision = declaration[ 1 ] !== undefined ? declaration[ 1 ] : '';
 
 		const headerCode = pragmaMainIndex !== - 1 ? source.slice( 0, pragmaMainIndex ) : '';
 
@@ -87,7 +87,7 @@ const parse = ( source ) => {
 			type,
 			inputs,
 			name,
-			presicion,
+			precision,
 			inputsCode,
 			blockCode,
 			headerCode
@@ -105,9 +105,9 @@ class GLSLNodeFunction extends NodeFunction {
 
 	constructor( source ) {
 
-		const { type, inputs, name, presicion, inputsCode, blockCode, headerCode } = parse( source );
+		const { type, inputs, name, precision, inputsCode, blockCode, headerCode } = parse( source );
 
-		super( type, inputs, name, presicion );
+		super( type, inputs, name, precision );
 
 		this.inputsCode = inputsCode;
 		this.blockCode = blockCode;
@@ -123,13 +123,13 @@ class GLSLNodeFunction extends NodeFunction {
 
 		if ( blockCode !== '' ) {
 
-			const { type, inputsCode, headerCode, presicion } = this;
+			const { type, inputsCode, headerCode, precision } = this;
 
 			let declarationCode = `${ type } ${ name } ( ${ inputsCode.trim() } )`;
 
-			if ( presicion !== '' ) {
+			if ( precision !== '' ) {
 
-				declarationCode = `${ presicion } ${ declarationCode }`;
+				declarationCode = `${ precision } ${ declarationCode }`;
 
 			}
 

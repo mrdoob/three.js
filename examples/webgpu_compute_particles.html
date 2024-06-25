@@ -160,7 +160,6 @@
 				particleMaterial.transparent = true;
 
 				const particles = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), particleMaterial );
-				particles.isInstancedMesh = true;
 				particles.count = particleCount;
 				particles.frustumCulled = false;
 				scene.add( particles );
