@@ -57,7 +57,7 @@
 				geometry = new THREE.PlaneGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
 
-				const position = geometry.attributes.position;
+				const position = geometry.vertices;
 				position.usage = THREE.DynamicDrawUsage;
 
 				for ( let i = 0; i < position.count; i ++ ) {
@@ -122,7 +122,7 @@
 				const delta = clock.getDelta();
 				const time = clock.getElapsedTime() * 10;
 
-				const position = geometry.attributes.position;
+				const position = geometry.vertices;
 
 				for ( let i = 0; i < position.count; i ++ ) {
 
