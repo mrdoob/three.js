@@ -126,6 +126,7 @@ export { default as GaussianBlurNode, gaussianBlur } from './display/GaussianBlu
 export { default as AfterImageNode, afterImage } from './display/AfterImageNode.js';
 export { default as AnamorphicNode, anamorphic } from './display/AnamorphicNode.js';
 export { default as SobelOperatorNode, sobel } from './display/SobelOperatorNode.js';
+export { default as DepthOfFieldNode, dof } from './display/DepthOfFieldNode.js';
 
 export { default as PassNode, pass, texturePass, depthPass } from './display/PassNode.js';
 
