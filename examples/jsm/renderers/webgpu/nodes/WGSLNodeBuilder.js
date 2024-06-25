@@ -13,8 +13,7 @@ import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
 import { getFormat } from '../utils/WebGPUTextureUtils.js';
 
 import WGSLNodeParser from './WGSLNodeParser.js';
-import { GPUStorageTextureAccess } from '../utils/WebGPUConstants.js';
-
+import { GPUBufferBindingType, GPUStorageTextureAccess } from '../utils/WebGPUConstants.js';
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
 const GPUShaderStage = self.GPUShaderStage;
@@ -26,6 +25,7 @@ const gpuShaderStageLib = {
 };
 
 const supports = {
+	instance: true,
 	swizzleAssign: false,
 	storageBuffer: true
 };
@@ -411,30 +411,38 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			switch ( node.access ) {
 
-				case GPUStorageTextureAccess.ReadOnly: {
+				case GPUStorageTextureAccess.ReadOnly:
 
 					return 'read';
 
-				}
-
-				case GPUStorageTextureAccess.WriteOnly: {
+				case GPUStorageTextureAccess.WriteOnly:
 
 					return 'write';
 
-				}
-
-				default: {
+				default:
 
 					return 'read_write';
-
-				}
 
 			}
 
 		} else {
 
-			// @TODO: Account for future read-only storage buffer pull request
-			return 'read_write';
+			switch ( node.access ) {
+
+				case GPUBufferBindingType.Storage:
+
+					return 'read_write';
+
+
+				case GPUBufferBindingType.ReadOnlyStorage:
+
+					return 'read';
+
+				default:
+
+					return 'write';
+
+			}
 
 		}
 
@@ -714,6 +722,7 @@ ${ flowData.code }
 			snippet += this.getStructMembers( struct );
 			snippet += '\n}';
 
+
 			snippets.push( snippet );
 
 			snippets.push( `\nvar<private> output : ${ name };\n\n` );
@@ -880,7 +889,7 @@ ${ flowData.code }
 
 				const bufferCountSnippet = bufferCount > 0 ? ', ' + bufferCount : '';
 				const bufferSnippet = `\t${ uniform.name } : array< ${ bufferType }${ bufferCountSnippet } >\n`;
-				const bufferAccessMode = bufferNode.isStorageBufferNode ? 'storage,read_write' : 'uniform';
+				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${ this.getStorageAccess( bufferNode ) }` : 'uniform';
 
 				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
 
@@ -996,6 +1005,7 @@ ${ flowData.code }
 			}
 
 			stageData.flow = flow;
+
 
 		}
 

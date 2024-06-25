@@ -1,5 +1,5 @@
 import {
-	GPUTextureAspect, GPUTextureViewDimension, GPUBufferBindingType, GPUTextureSampleType
+	GPUTextureAspect, GPUTextureViewDimension, GPUTextureSampleType
 } from './WebGPUConstants.js';
 import { FloatType, IntType, UnsignedIntType } from 'three';
 
@@ -33,7 +33,7 @@ class WebGPUBindingUtils {
 
 				if ( binding.isStorageBuffer ) {
 
-					buffer.type = GPUBufferBindingType.Storage;
+					buffer.type = binding.access;
 
 				}
 
