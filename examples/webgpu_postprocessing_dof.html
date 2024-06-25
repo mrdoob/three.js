@@ -23,7 +23,7 @@
 
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 			import PostProcessing from 'three/addons/renderers/common/PostProcessing.js';
-			import { MeshBasicNodeMaterial, cubeTexture } from 'three/nodes';
+			import { MeshBasicNodeMaterial, cubeTexture, positionWorld, oscSine, timerGlobal } from 'three/nodes';
 			import { pass } from 'three/nodes';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -43,8 +43,6 @@
 
 			let postProcessing;
 
-			const color = new THREE.Color();
-
 			init();
 
 			function init() {
@@ -62,15 +60,16 @@
 					path + 'pz' + format, path + 'nz' + format
 				];
 
+				const xgrid = 14, ygrid = 9, zgrid = 14;
+				const count = xgrid * ygrid * zgrid;
+
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
 				const cubeTextureNode = cubeTexture( textureCube );
+				const oscPos = oscSine( positionWorld.div( 1000 /* scene distance */ ).add( timerGlobal( .2 /* speed */ ) ) );
 
 				const geometry = new THREE.SphereGeometry( 60, 20, 10 );
 				const material = new MeshBasicNodeMaterial();
-				material.colorNode = cubeTextureNode;
-
-				const xgrid = 14, ygrid = 9, zgrid = 14;
-				const count = xgrid * ygrid * zgrid;
+				material.colorNode = cubeTextureNode.mul( oscPos );
 
 				mesh = new THREE.InstancedMesh( geometry, material, count );
 				scene.add( mesh );
@@ -90,7 +89,6 @@
 							const z = 200 * ( k - zgrid / 2 );
 
 							mesh.setMatrixAt( index, matrix.identity().setPosition( x, y, z ) );
-							mesh.setColorAt( index, color );
 							index ++;
 
 						}
@@ -192,22 +190,10 @@
 
 			function render() {
 
-				const time = Date.now() * 0.00005;
-
 				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
 				camera.position.y += ( - ( mouseY ) - camera.position.y ) * 0.036;
 
 				camera.lookAt( scene.position );
-
-				for ( let i = 0; i < mesh.count; i ++ ) {
-
-					const h = ( 360 * ( i / mesh.count + time ) % 360 ) / 360;
-					color.setHSL( h, 1, 0.5 );
-					mesh.setColorAt( i, color );
-
-				}
-
-				mesh.instanceColor.needsUpdate = true;
 
 				postProcessing.render();
 
