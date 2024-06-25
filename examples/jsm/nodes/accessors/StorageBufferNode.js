@@ -87,6 +87,12 @@ class StorageBufferNode extends BufferNode {
 
 	}
 
+	toReadOnly() {
+
+		return this.setAccess( GPUBufferBindingType.ReadOnlyStorage );
+
+	}
+
 	generate( builder ) {
 
 		if ( builder.isAvailable( 'storageBuffer' ) ) {
@@ -120,13 +126,5 @@ export default StorageBufferNode;
 // Read-Write Storage
 export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
 export const storageObject = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setBufferObject( true ) );
-
-// Read-Only Storage
-export const storageReadOnly = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setAccess( GPUBufferBindingType.ReadOnlyStorage ) );
-export const storageObjectReadOnly = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setAccess( GPUBufferBindingType.ReadOnlyStorage ).setBufferObject( true ) );
-
-// Write-Only Storage
-export const storageWriteOnly = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setAccess( 'write-only' ) );
-export const storageObjectWriteOnly = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setAccess( 'write-only' ).setBufferObject( true ) );
 
 addNodeClass( 'StorageBufferNode', StorageBufferNode );

@@ -899,8 +899,8 @@ ${ flowData.code }
 				const bufferCount = bufferNode.bufferCount;
 
 				const bufferCountSnippet = bufferCount > 0 ? ', ' + bufferCount : '';
-				const bufferSnippet = `\t${uniform.name} : array< ${bufferType}${bufferCountSnippet} >\n`;
-				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${this.getStorageAccess( bufferNode )}` : 'uniform';
+				const bufferSnippet = `\t${ uniform.name } : array< ${ bufferType }${ bufferCountSnippet } >\n`;
+				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${ this.getStorageAccess( bufferNode ) }` : 'uniform';
 
 				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
 

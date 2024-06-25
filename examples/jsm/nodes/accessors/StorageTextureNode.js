@@ -57,6 +57,18 @@ class StorageTextureNode extends TextureNode {
 
 	}
 
+	toReadOnly() {
+
+		return this.setAccess( GPUStorageTextureAccess.ReadOnly );
+
+	}
+
+	toWriteOnly() {
+
+		return this.setAccess( GPUStorageTextureAccess.WriteOnly );
+
+	}
+
 	generateStore( builder ) {
 
 		const properties = builder.getNodeProperties( this );
@@ -78,9 +90,6 @@ class StorageTextureNode extends TextureNode {
 export default StorageTextureNode;
 
 export const storageTexture = nodeProxy( StorageTextureNode );
-
-export const storageTextureReadOnly = ( value, uvNode, storeNode ) => storageTexture( value, uvNode, storeNode ).setAccess( 'read-only' );
-export const storageTextureReadWrite = ( value, uvNode, storeNode ) => storageTexture( value, uvNode, storeNode ).setAccess( 'read-write' );
 
 export const textureStore = ( value, uvNode, storeNode ) => {
 

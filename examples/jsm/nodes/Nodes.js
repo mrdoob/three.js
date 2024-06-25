@@ -100,10 +100,10 @@ export { default as ReferenceNode, reference, referenceBuffer } from './accessor
 export * from './accessors/ReflectVectorNode.js';
 export { default as SkinningNode, skinning } from './accessors/SkinningNode.js';
 export { default as SceneNode, backgroundBlurriness, backgroundIntensity } from './accessors/SceneNode.js';
-export { default as StorageBufferNode, storage, storageObject, storageReadOnly, storageObjectReadOnly, storageWriteOnly, storageObjectWriteOnly } from './accessors/StorageBufferNode.js';
+export { default as StorageBufferNode, storage, storageObject } from './accessors/StorageBufferNode.js';
 export * from './accessors/TangentNode.js';
 export { default as TextureNode, texture, textureLoad, /*textureLevel,*/ sampler } from './accessors/TextureNode.js';
-export { default as StorageTextureNode, storageTexture, textureStore, storageTextureReadOnly, storageTextureReadWrite } from './accessors/StorageTextureNode.js';
+export { default as StorageTextureNode, storageTexture, textureStore } from './accessors/StorageTextureNode.js';
 export { default as Texture3DNode, texture3D } from './accessors/Texture3DNode.js';
 export * from './accessors/UVNode.js';
 export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
