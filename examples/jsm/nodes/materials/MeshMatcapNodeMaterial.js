@@ -14,9 +14,9 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 
 		super();
 
-		this.isMeshMatcapNodeMaterial = true;
-
 		this.lights = false;
+
+		this.isMeshMatcapNodeMaterial = true;
 
 		this.setDefaultValues( defaultValues );
 
