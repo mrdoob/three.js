@@ -521,6 +521,7 @@ class Renderer {
 
 		this.info.calls ++;
 		this.info.render.calls ++;
+		this.info.render.frameCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
 
@@ -1079,7 +1080,7 @@ class Renderer {
 
 		this.info.calls ++;
 		this.info.compute.calls ++;
-		this.info.compute.computeCalls ++;
+		this.info.compute.frameCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
 
