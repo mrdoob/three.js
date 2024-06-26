@@ -1163,15 +1163,17 @@ class WebGPUBackend extends Backend {
 
         renderContextData.currentTimestampQueryBuffers.isMappingPending = true;
 
-		await resultBuffer.mapAsync( GPUMapMode.READ );
+		resultBuffer.mapAsync( GPUMapMode.READ ).then( () => {
+			const times = new BigUint64Array( resultBuffer.getMappedRange() );
+			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
 
-		const times = new BigUint64Array( resultBuffer.getMappedRange() );
-		const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
 
-		this.renderer.info.updateTimestamp( type, duration );
-		resultBuffer.unmap();
+			this.renderer.info.updateTimestamp( type, duration );
 
-		renderContextData.currentTimestampQueryBuffers.isMappingPending = false;
+			resultBuffer.unmap();
+
+			renderContextData.currentTimestampQueryBuffers.isMappingPending = false;
+		})
 
 	}
 	

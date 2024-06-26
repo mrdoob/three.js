@@ -9,17 +9,22 @@ class Info {
 
 		this.render = {
 			calls: 0,
+			frameCalls: 0,
 			drawCalls: 0,
 			triangles: 0,
 			points: 0,
 			lines: 0,
-			timestamp: 0
+			timestamp: 0,
+			previousFrameCalls: 0,
+			timestampCalls: 0
 		};
 
 		this.compute = {
 			calls: 0,
-			computeCalls: 0,
-			timestamp: 0
+			frameCalls: 0,
+			timestamp: 0,
+			previousFrameCalls: 0,
+			timestampCalls: 0
 		};
 
 		this.memory = {
@@ -59,21 +64,44 @@ class Info {
 
 	updateTimestamp( type, time ) {
 
+		if ( this[ type ].timestampCalls === 0 ) {
+
+			this[ type ].timestamp = 0;
+
+		}
+
+
 		this[ type ].timestamp += time;
+
+		this[ type ].timestampCalls ++;
+
+
+		if ( this[ type ].timestampCalls >= this[ type ].previousFrameCalls ) {
+
+			this[ type ].timestampCalls = 0;
+
+		}
+
 
 	}
 
 	reset() {
 
+		const previousRenderFrameCalls = this.render.frameCalls;
+		this.render.previousFrameCalls = previousRenderFrameCalls;
+
+		const previousComputeFrameCalls = this.compute.frameCalls;
+		this.compute.previousFrameCalls = previousComputeFrameCalls;
+
+
 		this.render.drawCalls = 0;
-		this.compute.computeCalls = 0;
+		this.render.frameCalls = 0;
+		this.compute.frameCalls = 0;
 
 		this.render.triangles = 0;
 		this.render.points = 0;
 		this.render.lines = 0;
 
-		this.render.timestamp = 0;
-		this.compute.timestamp = 0;
 
 	}
 
