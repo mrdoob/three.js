@@ -64,6 +64,14 @@ class VaryingNode extends Node {
 
 	}
 
+	analyze( builder ) {
+
+		this.setupVarying( builder );
+
+		return this.node.analyze( builder );
+
+	}
+
 	generate( builder ) {
 
 		const properties = builder.getNodeProperties( this );
