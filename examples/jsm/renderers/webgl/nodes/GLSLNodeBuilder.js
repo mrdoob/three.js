@@ -358,7 +358,7 @@ ${ flowData.code }
 
 				let typePrefix = '';
 
-				if ( texture.isPBOTexture === true ) {
+				if ( texture.isDataTexture === true ) {
 
 					const prefix = texture.source.data.data.constructor.name.toLowerCase().charAt( 0 );
 
@@ -594,6 +594,20 @@ ${ flowData.code }
 
 	}
 
+	getBatchingIndex() {
+
+		const extensions = this.renderer.backend.extensions;
+
+		if ( extensions.has( 'WEBGL_multi_draw' ) ) {
+
+			return 'uint( gl_DrawID )';
+
+		}
+
+		return false;
+
+	}
+
 	getFrontFacing() {
 
 		return 'gl_FrontFacing';
@@ -612,6 +626,27 @@ ${ flowData.code }
 
 	}
 
+	getExtensions( shaderStage ) {
+
+		let extensions = '';
+
+		if ( shaderStage === 'vertex' ) {
+
+			const ext = this.renderer.backend.extensions;
+			const isBatchedMesh = this.object.isBatchedMesh;
+
+			if ( isBatchedMesh && ext.has( 'WEBGL_multi_draw' ) ) {
+
+				extensions += '#extension GL_ANGLE_multi_draw : require\n';
+
+			}
+
+		}
+
+		return extensions;
+
+	}
+
 	isAvailable( name ) {
 
 		let result = supports[ name ];
@@ -620,11 +655,11 @@ ${ flowData.code }
 
 			if ( name === 'float32Filterable' ) {
 
-				const extentions = this.renderer.backend.extensions;
+				const extensions = this.renderer.backend.extensions;
 
-				if ( extentions.has( 'OES_texture_float_linear' ) ) {
+				if ( extensions.has( 'OES_texture_float_linear' ) ) {
 
-					extentions.get( 'OES_texture_float_linear' );
+					extensions.get( 'OES_texture_float_linear' );
 					result = true;
 
 				} else {
@@ -688,7 +723,8 @@ ${vars}
 
 		return `#version 300 es
 
-${ this.getSignature() }
+// extensions 
+${shaderData.extensions}
 
 // precision
 ${ defaultPrecisions }
@@ -809,6 +845,7 @@ void main() {
 
 			const stageData = shadersData[ shaderStage ];
 
+			stageData.extensions = this.getExtensions( shaderStage );
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
 			stageData.varyings = this.getVaryings( shaderStage );

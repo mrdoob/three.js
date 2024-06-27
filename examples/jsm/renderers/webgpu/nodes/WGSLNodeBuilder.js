@@ -603,6 +603,12 @@ ${ flowData.code }
 
 	}
 
+	getBatchingIndex() {
+
+		return false;
+
+	}
+
 	getFrontFacing() {
 
 		return this.getBuiltin( 'front_facing', 'isFront', 'bool' );

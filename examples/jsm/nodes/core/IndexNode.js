@@ -29,6 +29,10 @@ class IndexNode extends Node {
 
 			propertyName = builder.getInstanceIndex();
 
+		} else if ( scope === IndexNode.BATCH ) {
+
+			propertyName = builder.getBatchingIndex();
+
 		} else {
 
 			throw new Error( 'THREE.IndexNode: Unknown scope: ' + scope );
@@ -57,10 +61,12 @@ class IndexNode extends Node {
 
 IndexNode.VERTEX = 'vertex';
 IndexNode.INSTANCE = 'instance';
+IndexNode.BATCH = 'batch';
 
 export default IndexNode;
 
 export const vertexIndex = nodeImmutable( IndexNode, IndexNode.VERTEX );
 export const instanceIndex = nodeImmutable( IndexNode, IndexNode.INSTANCE );
+export const batchingIndex = nodeImmutable( IndexNode, IndexNode.BATCH );
 
 addNodeClass( 'IndexNode', IndexNode );

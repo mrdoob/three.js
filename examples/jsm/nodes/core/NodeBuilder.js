@@ -451,6 +451,12 @@ class NodeBuilder {
 
 	}
 
+	getBatchingIndex() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
 	getFrontFacing() {
 
 		console.warn( 'Abstract function.' );

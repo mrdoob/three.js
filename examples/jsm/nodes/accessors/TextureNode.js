@@ -64,6 +64,18 @@ class TextureNode extends UniformNode {
 
 		if ( this.value.isDepthTexture === true ) return 'float';
 
+		if ( this.value.isDataTexture === true ) {
+
+			const prefix = this.value.source.data.data.constructor.name.toLowerCase().charAt( 0 );
+
+			if ( prefix === 'u' || prefix === 'i' ) {
+
+				return prefix + 'vec4';
+
+			}
+
+		}
+
 		return 'vec4';
 
 	}
