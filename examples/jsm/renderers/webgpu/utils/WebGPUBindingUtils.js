@@ -208,6 +208,34 @@ class WebGPUBindingUtils {
 
 				entriesGPU.push( { binding: bindingPoint, resource: textureGPU.sampler } );
 
+			} else if ( binding.isSampledTexture && binding.texture.isVideoTexture ) {
+
+				const textureData = backend.get( binding.texture );
+
+				let resourceGPU;
+
+				if ( textureData.externalTexture !== undefined ) {
+
+					// When textureData.externalTexture is set by updateTexture, we can use it directly
+
+					resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
+
+				} else if ( binding.texture.source.data.readyState >= binding.texture.source.data.HAVE_CURRENT_DATA ) {
+
+					// When textureData.externalTexture is empty, but video is already ready, we can set it directly to avoid warnings
+
+					resourceGPU = device.importExternalTexture( { source: binding.texture.source.data } );
+
+				} else {
+
+					// Default
+					resourceGPU = textureData.texture.createView( { aspect: GPUTextureAspect.All, dimension: GPUTextureViewDimension.TwoD, mipLevelCount: binding.store ? 1 : textureData.mipLevelCount } );
+
+				}
+
+
+				entriesGPU.push( { binding: bindingPoint, resource: resourceGPU } );
+
 			} else if ( binding.isSampledTexture ) {
 
 				const textureData = backend.get( binding.texture );
