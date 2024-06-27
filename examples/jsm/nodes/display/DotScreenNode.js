@@ -13,11 +13,11 @@ const quadMesh = new QuadMesh();
 
 class DotScreenNode extends TempNode {
 
-	constructor( textureNode, center = new Vector2( 0.5, 0.5 ), angle = 1.57, scale = 1 ) {
+	constructor( colorNode, center = new Vector2( 0.5, 0.5 ), angle = 1.57, scale = 1 ) {
 
 		super( 'vec4' );
 
-		this.textureNode = textureNode;
+		this.colorNode = colorNode;
 		this.center = uniform( center );
 		this.angle = uniform( angle );
 		this.scale = uniform( scale );
@@ -50,13 +50,13 @@ class DotScreenNode extends TempNode {
 
 		const { renderer } = frame;
 
-		const textureNode = this.textureNode;
-		const map = textureNode.value;
+		const colorNode = this.colorNode;
+		const map = colorNode.value;
 
 		this._renderTarget.texture.type = map.type;
 
 		const currentRenderTarget = renderer.getRenderTarget();
-		const currentTexture = textureNode.value;
+		const currentTexture = colorNode.value;
 
 		quadMesh.material = this._material;
 
@@ -71,24 +71,20 @@ class DotScreenNode extends TempNode {
 		// restore
 
 		renderer.setRenderTarget( currentRenderTarget );
-		textureNode.value = currentTexture;
+		colorNode.value = currentTexture;
 
 	}
 
 	setup( builder ) {
 
-		const { textureNode } = this;
-
-		const uvNode = textureNode.uvNode || uv();
-
-		const sampleTexture = ( uv ) => this.textureNode.uv( uv );
+		const colorNode = this.colorNode;
 
 		const pattern = tslFn( () => {
 
 			const s = sin( this.angle );
 			const c = cos( this.angle );
 
-			const tex = uvNode.mul( this._size ).sub( this.center );
+			const tex = uv().mul( this._size ).sub( this.center );
 			const point = vec2( c.mul( tex.x ).sub( s.mul( tex.y ) ), s.mul( tex.x ).add( c.mul( tex.y ) ) ).mul( this.scale );
 
 			return sin( point.x ).mul( sin( point.y ) ).mul( 4 );
@@ -97,7 +93,7 @@ class DotScreenNode extends TempNode {
 
 		const dotScreen = tslFn( () => {
 
-			const color = sampleTexture( uvNode );
+			const color = colorNode;
 
 			const average = add( color.r, color.g, color.b ).div( 3 );
 
@@ -113,7 +109,7 @@ class DotScreenNode extends TempNode {
 		//
 
 		const properties = builder.getNodeProperties( this );
-		properties.textureNode = textureNode;
+		properties.textureNode = colorNode;
 
 		//
 
