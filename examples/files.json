@@ -310,6 +310,7 @@
 		"webgpu_camera_logarithmicdepthbuffer",
 		"webgpu_clearcoat",
 		"webgpu_clipping",
+		"webgpu_clipping_groups",
 		"webgpu_compute_audio",
 		"webgpu_compute_geometry",
 		"webgpu_compute_particles",

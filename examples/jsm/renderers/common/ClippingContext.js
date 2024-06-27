@@ -1,6 +1,7 @@
 import { Matrix3, Plane, Vector4 } from 'three';
 
 const _plane = new Plane();
+const _clippingGroupContexts = new WeakMap();
 
 let _clippingContextVersion = 0;
 
@@ -12,9 +13,11 @@ class ClippingContext {
 
 		this.globalClippingCount = 0;
 
-		this.localClippingCount = 0;
+		this._localClippingCount = 0;
 		this.localClippingEnabled = false;
 		this.localClipIntersection = false;
+
+		this.offset = 0;
 
 		this.planes = [];
 
@@ -39,7 +42,6 @@ class ClippingContext {
 			v.y = - normal.y;
 			v.z = - normal.z;
 			v.w = _plane.constant;
-
 		}
 
 	}
@@ -107,6 +109,8 @@ class ClippingContext {
 			this.parentVersion = parent.version;
 			this.viewMatrix = parent.viewMatrix;
 			this.viewNormalMatrix = parent.viewNormalMatrix;
+			this.offset = parent._localClippingCount + parent.offset;
+			this.isGroup = material.isClippingGroup;
 
 			update = true;
 
@@ -120,9 +124,9 @@ class ClippingContext {
 
 				const l = localClippingPlanes.length;
 				const planes = this.planes;
-				const offset = this.globalClippingCount;
+				const offset = this.globalClippingCount + this.offset;
 
-				if ( update || l !== this.localClippingCount ) {
+				if ( update || l !== this._localClippingCount ) {
 
 					planes.length = offset + l;
 
@@ -132,7 +136,7 @@ class ClippingContext {
 
 					}
 
-					this.localClippingCount = l;
+					this._localClippingCount = l;
 					update = true;
 
 				}
@@ -140,9 +144,9 @@ class ClippingContext {
 				this.projectPlanes( localClippingPlanes, offset );
 
 
-			} else if ( this.localClippingCount !== 0 ) {
+			} else if ( this._localClippingCount !== 0 ) {
 
-				this.localClippingCount = 0;
+				this._localClippingCount = 0;
 				update = true;
 
 			}
@@ -157,6 +161,29 @@ class ClippingContext {
 		}
 
 		if ( update ) this.version = _clippingContextVersion ++;
+
+	}
+
+	get localClippingCount() {
+
+		return this.localClippingEnabled ? this._localClippingCount + this.offset : 0;
+
+	}
+
+	static getGroupContext( clippingGroup, parentContext ) {
+
+		let context = _clippingGroupContexts.get( clippingGroup );
+
+		if ( context === undefined ) {
+
+			context = new ClippingContext()
+			_clippingGroupContexts.set( clippingGroup, context );
+
+		}
+
+		context.update( parentContext, clippingGroup );
+
+		return context;
 
 	}
 
