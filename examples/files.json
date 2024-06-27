@@ -371,6 +371,7 @@
 		"webgpu_postprocessing_anamorphic",
 		"webgpu_postprocessing_dof",
 		"webgpu_postprocessing_sobel",
+		"webgpu_postprocessing",
 		"webgpu_reflection",
 		"webgpu_rtt",
 		"webgpu_sandbox",
