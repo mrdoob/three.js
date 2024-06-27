@@ -935,14 +935,9 @@ class WebGPUBackend extends Backend {
 
 			const bytesPerElement = index.bytesPerElement || 1;
 
-			// const drawId = object.gl_DrawID;
-
 			for ( let i = 0; i < drawCount; i ++ ) {
 
-				// TODO: @Sunag how to manually update isolated uniform drawId
-				// drawId.value = i;
-
-				passEncoderGPU.drawIndexed( counts[ i ], instanceCount[ i ], starts[ i ] / bytesPerElement, 0, 0 );
+				passEncoderGPU.drawIndexed( counts[ i ], 1, starts[ i ] / bytesPerElement, 0, i );
 
 			}
 

@@ -5,7 +5,7 @@ import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, tslFn } from '../shader
 import { textureLoad } from './TextureNode.js';
 import { textureSize } from './TextureSizeNode.js';
 import { tangentLocal } from './TangentNode.js';
-import { batchingIndex } from '../core/IndexNode.js';
+import { instanceIndex, batchingIndex } from '../core/IndexNode.js';
 import { uniform } from '../core/UniformNode.js';
 
 class BatchNode extends Node {
@@ -31,10 +31,7 @@ class BatchNode extends Node {
 
 			if ( builder.getBatchingIndex() === false ) {
 
-				const gl_DrawID = uniform( 0, 'uint' ).label( 'gl_DrawID' );
-				this.batchMesh.gl_DrawID = gl_DrawID;
-
-				this.batchingIdNode = gl_DrawID;
+				this.batchingIdNode = instanceIndex;
 
 			} else {
 
