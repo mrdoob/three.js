@@ -5,7 +5,8 @@ import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, tslFn } from '../shader
 import { textureLoad } from './TextureNode.js';
 import { textureSize } from './TextureSizeNode.js';
 import { tangentLocal } from './TangentNode.js';
-import { batchingIndex, uniform } from '../Nodes.js';
+import { batchingIndex } from '../core/IndexNode.js';
+import { uniform } from '../core/UniformNode.js';
 
 class BatchNode extends Node {
 
