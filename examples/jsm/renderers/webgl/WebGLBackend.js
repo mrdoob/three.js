@@ -718,7 +718,7 @@ class WebGLBackend extends Backend {
 
 					for ( let i = 0; i < drawCount; i ++ ) {
 
-						// TODO: manually update isolated uniform drawId
+						// TODO: @Sunag how to manually update isolated uniform drawId
 						// drawId.value = i;
 						renderer.renderInstances( starts[ i ] / bytesPerElement, counts[ i ], instanceCount[ i ] );
 
@@ -744,7 +744,7 @@ class WebGLBackend extends Backend {
 
 					for ( let i = 0; i < drawCount; i ++ ) {
 
-						// TODO: manually update isolated uniform drawId
+						// TODO: @Sunag how to manually update isolated uniform drawId
 						// drawId.value = i;
 						renderer.render( starts[ i ] / bytesPerElement, counts[ i ] );
 

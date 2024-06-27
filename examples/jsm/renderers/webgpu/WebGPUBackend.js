@@ -939,7 +939,7 @@ class WebGPUBackend extends Backend {
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 
-				// TODO: properly manually bind isolated uniform drawId
+				// TODO: @Sunag how to manually update isolated uniform drawId
 				// drawId.value = i;
 
 				passEncoderGPU.drawIndexed( counts[ i ], instanceCount[ i ], starts[ i ] / bytesPerElement, 0, 0 );
