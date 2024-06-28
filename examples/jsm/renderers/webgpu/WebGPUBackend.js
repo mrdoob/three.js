@@ -929,11 +929,7 @@ class WebGPUBackend extends Backend {
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 
-				for ( let j = 0, l = drawRanges.length; j < l; j ++ ) {
-
-					passEncoderGPU.drawIndexed( counts[ i ] / bytesPerElement, 1, starts[ i ] / 4, 0, i );
-
-				}
+				passEncoderGPU.drawIndexed( counts[ i ] / bytesPerElement, 1, starts[ i ] / 4, 0, i );
 
 			}
 
