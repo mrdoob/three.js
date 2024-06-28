@@ -5,7 +5,7 @@ import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, tslFn } from '../shader
 import { textureLoad } from './TextureNode.js';
 import { textureSize } from './TextureSizeNode.js';
 import { tangentLocal } from './TangentNode.js';
-import { instanceIndex, batchingIndex } from '../core/IndexNode.js';
+import { instanceIndex, drawIndex } from '../core/IndexNode.js';
 
 class BatchNode extends Node {
 
@@ -34,7 +34,7 @@ class BatchNode extends Node {
 
 			} else {
 
-				this.batchingIdNode = batchingIndex;
+				this.batchingIdNode = drawIndex;
 
 			}
 

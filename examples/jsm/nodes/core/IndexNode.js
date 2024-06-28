@@ -67,6 +67,6 @@ export default IndexNode;
 
 export const vertexIndex = nodeImmutable( IndexNode, IndexNode.VERTEX );
 export const instanceIndex = nodeImmutable( IndexNode, IndexNode.INSTANCE );
-export const batchingIndex = nodeImmutable( IndexNode, IndexNode.BATCH );
+export const drawIndex = nodeImmutable( IndexNode, IndexNode.BATCH );
 
 addNodeClass( 'IndexNode', IndexNode );

@@ -6,9 +6,9 @@ import { WebGPUCoordinateSystem } from 'three';
 
 class CubeTextureNode extends TextureNode {
 
-	constructor( value, uvNode = null, levelNode = null ) {
+	constructor( value, uvNode = null, levelNode = null, _nodeType = null ) {
 
-		super( value, uvNode, levelNode );
+		super( value, uvNode, levelNode, _nodeType );
 
 		this.isCubeTextureNode = true;
 
