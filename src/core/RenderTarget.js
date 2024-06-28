@@ -28,7 +28,8 @@ class RenderTarget extends EventDispatcher {
 
 		const image = { width: width, height: height, depth: 1 };
 
-		options = Object.assign( {
+		const texture = new Texture( image );
+		texture.setValues( {
 			generateMipmaps: false,
 			internalFormat: null,
 			minFilter: LinearFilter,
@@ -38,34 +39,19 @@ class RenderTarget extends EventDispatcher {
 			resolveStencilBuffer: true,
 			depthTexture: null,
 			samples: 0,
-			count: 1
-		}, options );
-
-		const texture = new Texture( image, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.colorSpace );
-
-		texture.flipY = false;
-		texture.generateMipmaps = options.generateMipmaps;
-		texture.internalFormat = options.internalFormat;
+			flipY: false,
+			...options,
+		} );
 
 		this.textures = [];
 
-		const count = options.count;
+		const count = options.count !== undefined ? options.count : 1;
 		for ( let i = 0; i < count; i ++ ) {
 
 			this.textures[ i ] = texture.clone();
 			this.textures[ i ].isRenderTargetTexture = true;
 
 		}
-
-		this.depthBuffer = options.depthBuffer;
-		this.stencilBuffer = options.stencilBuffer;
-
-		this.resolveDepthBuffer = options.resolveDepthBuffer;
-		this.resolveStencilBuffer = options.resolveStencilBuffer;
-
-		this.depthTexture = options.depthTexture;
-
-		this.samples = options.samples;
 
 	}
 
