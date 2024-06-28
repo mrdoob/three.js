@@ -923,7 +923,6 @@ class WebGPUBackend extends Backend {
 			const starts = object._multiDrawStarts;
 			const counts = object._multiDrawCounts;
 			const drawCount = object._multiDrawCount;
-			const drawRanges = object._drawRanges;
 
 			const bytesPerElement = index.bytesPerElement || 1;
 
