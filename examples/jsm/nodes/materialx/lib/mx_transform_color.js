@@ -5,7 +5,7 @@ import { bvec3, vec3, tslFn } from '../../shadernode/ShaderNode.js';
 import { greaterThan } from '../../math/OperatorNode.js';
 import { max, pow, mix } from '../../math/MathNode.js';
 
-const mx_srgb_texture_to_lin_rec709 = tslFn( ( [ color_immutable ] ) => {
+export const mx_srgb_texture_to_lin_rec709 = /*#__PURE__*/ tslFn( ( [ color_immutable ] ) => {
 
 	const color = vec3( color_immutable ).toVar();
 	const isAbove = bvec3( greaterThan( color, vec3( 0.04045 ) ) ).toVar();
@@ -14,16 +14,10 @@ const mx_srgb_texture_to_lin_rec709 = tslFn( ( [ color_immutable ] ) => {
 
 	return mix( linSeg, powSeg, isAbove );
 
-} );
-
-// layouts
-
-mx_srgb_texture_to_lin_rec709.setLayout( {
+} ).setLayout( {
 	name: 'mx_srgb_texture_to_lin_rec709',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' }
 	]
 } );
-
-export { mx_srgb_texture_to_lin_rec709 };

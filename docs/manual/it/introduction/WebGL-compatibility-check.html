@@ -9,8 +9,8 @@
 	<body>
 		<h1>Controllo compatibilità WebGL ([name])</h1>
 		<p>
-		Anche se questo sta diventano sempre meno un problema, alcuni dispositivi o browser potrebbero ancora non supportare WebGL.
-		Il seguente codice è utile per controllare se WebGL è supportato, infatti se non lo fosse viene mostrato un messaggio di errore all'utente.
+		Anche se questo sta diventano sempre meno un problema, alcuni dispositivi o browser potrebbero ancora non supportare WebGL 2.
+		Il seguente codice è utile per controllare se WebGL 2 è supportato, infatti se non lo fosse viene mostrato un messaggio di errore all'utente.
 		Importa il modulo di rilevamento del supporto WebGL ed esegui quanto segue prima di tentare di eseguire il rendering di qualsiasi cosa.
 		</p>
 
@@ -18,14 +18,14 @@
 		<code>
 		import WebGL from 'three/addons/capabilities/WebGL.js';
 
-		if ( WebGL.isWebGLAvailable() ) {
+		if ( WebGL.isWebGL2Available() ) {
 
-			// Avviare qui la funzione o altre inizializzazioni
+			// Initiate function or other initializations here
 			animate();
 
 		} else {
 
-			const warning = WebGL.getWebGLErrorMessage();
+			const warning = WebGL.getWebGL2ErrorMessage();
 			document.getElementById( 'container' ).appendChild( warning );
 
 		}

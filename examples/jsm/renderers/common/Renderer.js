@@ -133,6 +133,11 @@ class Renderer {
 			enabled: false
 		};
 
+		this.debug = {
+			checkShaderErrors: true,
+			onShaderError: null
+		};
+
 	}
 
 	async init() {
@@ -399,6 +404,8 @@ class Renderer {
 
 				this.backend.draw( renderObject, this.info );
 
+				this._nodes.updateAfter( renderObject );
+
 			}
 
 		}
@@ -514,6 +521,7 @@ class Renderer {
 
 		this.info.calls ++;
 		this.info.render.calls ++;
+		this.info.render.frameCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
 
@@ -1072,7 +1080,7 @@ class Renderer {
 
 		this.info.calls ++;
 		this.info.compute.calls ++;
-		this.info.compute.computeCalls ++;
+		this.info.compute.frameCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
 
@@ -1082,6 +1090,7 @@ class Renderer {
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
+
 		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
 
 		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
@@ -1375,8 +1384,6 @@ class Renderer {
 
 		object.onBeforeRender( this, scene, camera, geometry, material, group );
 
-		material.onBeforeRender( this, scene, camera, geometry, material, group );
-
 		//
 
 		if ( scene.overrideMaterial !== null ) {
@@ -1527,6 +1534,8 @@ class Renderer {
 
 		}
 
+		this._nodes.updateAfter( renderObject );
+
 	}
 
 	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
@@ -1544,6 +1553,8 @@ class Renderer {
 		this._bindings.updateForRender( renderObject );
 
 		this._pipelines.getForRender( renderObject, this._compilationPromises );
+
+		this._nodes.updateAfter( renderObject );
 
 	}
 

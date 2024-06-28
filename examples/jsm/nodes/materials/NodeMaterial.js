@@ -1,4 +1,4 @@
-import { Material } from 'three';
+import { Material, NormalBlending } from 'three';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
@@ -20,7 +20,7 @@ import AONode from '../lighting/AONode.js';
 import { lightingContext } from '../lighting/LightingContextNode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
 import IrradianceNode from '../lighting/IrradianceNode.js';
-import { depthPixel } from '../display/ViewportDepthNode.js';
+import { depth } from '../display/ViewportDepthNode.js';
 import { cameraLogDepth } from '../accessors/CameraNode.js';
 import { clipping, clippingAlpha } from '../accessors/ClippingNode.js';
 import { faceDirection } from '../display/FrontFacingNode.js';
@@ -189,7 +189,7 @@ class NodeMaterial extends Material {
 
 		if ( depthNode !== null ) {
 
-			depthPixel.assign( depthNode ).append();
+			depth.assign( depthNode ).append();
 
 		}
 
@@ -232,7 +232,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) && builder.isAvailable( 'instance' ) === true ) {
+		if ( ( object.instanceMatrix && object.instanceMatrix.isInstancedBufferAttribute === true ) ) {
 
 			instance( object ).append();
 
@@ -291,6 +291,12 @@ class NodeMaterial extends Material {
 			const alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
 			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
+
+		}
+
+		if ( this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false ) {
+
+			diffuseColor.a.assign( 1.0 );
 
 		}
 
@@ -431,9 +437,13 @@ class NodeMaterial extends Material {
 
 		// FOG
 
-		const fogNode = builder.fogNode;
+		if ( this.fog === true ) {
 
-		if ( fogNode ) outputNode = vec4( fogNode.mix( outputNode.rgb, fogNode.colorNode ), outputNode.a );
+			const fogNode = builder.fogNode;
+
+			if ( fogNode ) outputNode = vec4( fogNode.mix( outputNode.rgb, fogNode.colorNode ), outputNode.a );
+
+		}
 
 		return outputNode;
 

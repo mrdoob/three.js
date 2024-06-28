@@ -14,6 +14,7 @@ function Strings( config ) {
 			'prompt/history/clear': 'The Undo/Redo History will be cleared. Are you sure?',
 			'prompt/history/preserve': 'The history will be preserved across sessions.\nThis can have an impact on performance when working with textures.',
 			'prompt/history/forbid': 'Undo/Redo disabled while scene is playing.',
+			'prompt/rendering/realistic/unsupportedMaterial': 'REALISTIC Shading: Only MeshStandardMaterial and MeshPhysicalMaterial are supported',
 
 			'command/AddObject': 'Add Object',
 			'command/AddScript': 'Add Script',
@@ -35,6 +36,7 @@ function Strings( config ) {
 			'command/SetScale': 'Set Scale',
 			'command/SetScene': 'Set Scene',
 			'command/SetScriptValue': 'Set Script Value',
+			'command/SetShadowValue': 'Set Shadow Value',
 			'command/SetUuid': 'Set UUID',
 			'command/SetValue': 'Set Value',
 
@@ -142,6 +144,7 @@ function Strings( config ) {
 			'sidebar/object/penumbra': 'Penumbra',
 			'sidebar/object/decay': 'Decay',
 			'sidebar/object/shadow': 'Shadow',
+			'sidebar/object/shadowIntensity': 'Shadow Intensity',
 			'sidebar/object/shadowBias': 'Shadow Bias',
 			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
 			'sidebar/object/shadowRadius': 'Shadow Radius',
@@ -413,6 +416,7 @@ function Strings( config ) {
 			'prompt/history/clear': 'L\'historique d\'annulation/rétablissement sera effacé Êtes-vous sûr ?',
 			'prompt/history/preserve': 'L\'histoire sera conservée entre les sessions.\nCela peut avoir un impact sur les performances lors de la manipulation des textures.',
 			'prompt/history/forbid': 'Les fonctions Annuler/Rétablir sont désactivées pendant la lecture de la scène.',
+			'prompt/rendering/realistic/unsupportedMaterial': 'Ombrage REALISTIC : seuls MeshStandardMaterial et MeshPhysicalMaterial sont pris en charge',
 
 			'command/AddObject': 'Ajouter un objet',
 			'command/AddScript': 'Ajouter un script',
@@ -434,6 +438,7 @@ function Strings( config ) {
 			'command/SetScale': 'Définir l’échelle',
 			'command/SetScene': 'Planter le décor',
 			'command/SetScriptValue': 'Définir la valeur du script',
+			'command/SetShadowValue': 'Set Shadow Value',
 			'command/SetUuid': 'Définir l’UUID',
 			'command/SetValue': 'Définir la valeur',
 
@@ -541,6 +546,7 @@ function Strings( config ) {
 			'sidebar/object/penumbra': 'Pénombre',
 			'sidebar/object/decay': 'Affaiblissement',
 			'sidebar/object/shadow': 'Ombre',
+			'sidebar/object/shadowIntensity': 'Shadow Intensity',
 			'sidebar/object/shadowBias': 'Biais directionnel des ombres',
 			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
 			'sidebar/object/shadowRadius': 'Rayon de l\'ombre',
@@ -812,6 +818,7 @@ function Strings( config ) {
 			'prompt/history/clear': '撤销/重做历史记录将被清除。您确定吗？',
 			'prompt/history/preserve': '历史将在会话之间保留。\n这可能会影响在处理纹理时的性能。',
 			'prompt/history/forbid': '在播放场景时，撤消/重做被禁用。',
+			'prompt/rendering/realistic/unsupportedMaterial': 'REALISTIC着色：仅支持 MeshStandardMaterial 和 MeshPhysicalMaterial',
 
 			'command/AddObject': '添加对象',
 			'command/AddScript': '添加脚本',
@@ -833,6 +840,7 @@ function Strings( config ) {
 			'command/SetScale': '设置比例',
 			'command/SetScene': '设置布景',
 			'command/SetScriptValue': '设置脚本值',
+			'command/SetShadowValue': 'Set Shadow Value',
 			'command/SetUuid': '设置 UUID',
 			'command/SetValue': '设定值',
 
@@ -940,6 +948,7 @@ function Strings( config ) {
 			'sidebar/object/penumbra': '边缘',
 			'sidebar/object/decay': '衰减',
 			'sidebar/object/shadow': '阴影',
+			'sidebar/object/shadowIntensity': 'Shadow Intensity',
 			'sidebar/object/shadowBias': '阴影偏移',
 			'sidebar/object/shadowNormalBias': '阴影法线偏移',
 			'sidebar/object/shadowRadius': '阴影半径',
@@ -1211,6 +1220,7 @@ function Strings( config ) {
 			'prompt/history/clear': '元に戻す/やり直しの履歴が消去されます。 本気ですか？',
 			'prompt/history/preserve': '履歴はセッションをまたいで保存されます。\nこれは、テクスチャを操作する際のパフォーマンスに影響を与える可能性があります。',
 			'prompt/history/forbid': 'シーンの再生中は元に戻す/やり直しは無効になります。',
+			'prompt/rendering/realistic/unsupportedMaterial': 'REALISTIC シェーディング: MeshStandardmaterial と MeshPhysicalmaterial のみがサポートされています',
 
 			'command/AddObject': 'オブジェクトを追加',
 			'command/AddScript': 'スクリプトを追加',
@@ -1232,6 +1242,7 @@ function Strings( config ) {
 			'command/SetScale': 'スケールを設定',
 			'command/SetScene': 'セットシーン',
 			'command/SetScriptValue': 'スクリプト値の設定',
+			'command/SetShadowValue': 'Set Shadow Value',
 			'command/SetUuid': 'UUIDの設定',
 			'command/SetValue': '値の設定',
 
@@ -1339,6 +1350,7 @@ function Strings( config ) {
 			'sidebar/object/penumbra': '半影',
 			'sidebar/object/decay': '減衰',
 			'sidebar/object/shadow': '影',
+			'sidebar/object/shadowIntensity': 'Shadow Intensity',
 			'sidebar/object/shadowBias': '影のバイアス',
 			'sidebar/object/shadowNormalBias': '影のノーマルバイアス',
 			'sidebar/object/shadowRadius': '影の半径',

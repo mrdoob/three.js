@@ -234,6 +234,12 @@ export default class RenderObject {
 
 		}
 
+		if ( object.count > 1 ) {
+
+			cacheKey += object.count + ',';
+
+		}
+
 		return cacheKey;
 
 	}

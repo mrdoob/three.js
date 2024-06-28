@@ -11,7 +11,16 @@ class UniformNode extends InputNode {
 
 		this.isUniformNode = true;
 
+		this.name = '';
 		this.groupNode = objectGroup;
+
+	}
+
+	label( name ) {
+
+		this.name = name;
+
+		return this;
 
 	}
 
@@ -73,7 +82,7 @@ class UniformNode extends InputNode {
 
 		const sharedNodeType = sharedNode.getInputType( builder );
 
-		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, builder.context.label );
+		const nodeUniform = builder.getUniformFromNode( sharedNode, sharedNodeType, builder.shaderStage, this.name || builder.context.label );
 		const propertyName = builder.getPropertyName( nodeUniform );
 
 		if ( builder.context.label !== undefined ) delete builder.context.label;

@@ -766,10 +766,16 @@ class WebGPUBackend extends Backend {
 		const pipelineGPU = this.get( pipeline ).pipeline;
 		passEncoderGPU.setPipeline( pipelineGPU );
 
-		// bind group
+		// bind groups
 
-		const bindGroupGPU = this.get( bindings ).group;
-		passEncoderGPU.setBindGroup( 0, bindGroupGPU );
+		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
+
+			const bindGroup = bindings[ i ];
+			const bindingsData = this.get( bindGroup );
+
+			passEncoderGPU.setBindGroup( i, bindingsData.group );
+
+		}
 
 		passEncoderGPU.dispatchWorkgroups( computeNode.dispatchCount );
 
@@ -793,7 +799,7 @@ class WebGPUBackend extends Backend {
 
 		const { object, geometry, context, pipeline } = renderObject;
 
-		const bindingsData = this.get( renderObject.getBindings() );
+		const bindings = renderObject.getBindings();
 		const contextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
 		const currentSets = contextData.currentSets;
@@ -823,10 +829,16 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		// bind group
+		// bind groups
 
-		const bindGroupGPU = bindingsData.group;
-		passEncoderGPU.setBindGroup( 0, bindGroupGPU );
+		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
+
+			const bindGroup = bindings[ i ];
+			const bindingsData = this.get( bindGroup );
+
+			passEncoderGPU.setBindGroup( i, bindingsData.group );
+
+		}
 
 		// attributes
 
@@ -1108,52 +1120,69 @@ class WebGPUBackend extends Backend {
 		const renderContextData = this.get( renderContext );
 
 		const size = 2 * BigInt64Array.BYTES_PER_ELEMENT;
-		const resolveBuffer = this.device.createBuffer( {
-			size,
-			usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC,
-		} );
 
-		const resultBuffer = this.device.createBuffer( {
-			size,
-			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
-		} );
+		if ( renderContextData.currentTimestampQueryBuffers === undefined ) {
+
+			renderContextData.currentTimestampQueryBuffers = {
+				resolveBuffer: this.device.createBuffer({
+					label: 'timestamp resolve buffer',
+					size: size,
+					usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC,
+				}),
+				resultBuffer: this.device.createBuffer({
+					label: 'timestamp result buffer',
+					size: size,
+					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+				}),
+				isMappingPending: false,
+			}
+
+		}
+
+		const { resolveBuffer, resultBuffer, isMappingPending } = renderContextData.currentTimestampQueryBuffers
+
+
+        if ( isMappingPending === true ) return;
 
 		encoder.resolveQuerySet( renderContextData.timeStampQuerySet, 0, 2, resolveBuffer, 0 );
 		encoder.copyBufferToBuffer( resolveBuffer, 0, resultBuffer, 0, size );
 
-		renderContextData.currentTimestampQueryBuffer = resultBuffer;
-
 	}
 
-	async resolveTimestampAsync(renderContext, type = 'render') {
-		if (!this.hasFeature(GPUFeatureName.TimestampQuery) || !this.trackTimestamp) return;
+	async resolveTimestampAsync( renderContext, type = 'render' ) {
+
+		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
 	
 		const renderContextData = this.get(renderContext);
-		const { currentTimestampQueryBuffer } = renderContextData;
-	
-		if (currentTimestampQueryBuffer === undefined) return;
 
-		const buffer = currentTimestampQueryBuffer;
+		if ( renderContextData.currentTimestampQueryBuffers === undefined ) return;
 
-		try {
-			await buffer.mapAsync(GPUMapMode.READ);
-			const times = new BigUint64Array(buffer.getMappedRange());
-			const duration = Number(times[1] - times[0]) / 1000000;
-			this.renderer.info.updateTimestamp(type, duration);
-		} catch (error) {
-			console.error(`Error mapping buffer: ${error}`);
-			// Optionally handle the error, e.g., re-queue the buffer or skip it
-		} finally {
-			buffer.unmap(); 
-		}
+		const { resultBuffer, isMappingPending } = renderContextData.currentTimestampQueryBuffers;
+
+        if ( isMappingPending === true ) return;
+
+        renderContextData.currentTimestampQueryBuffers.isMappingPending = true;
+
+		resultBuffer.mapAsync( GPUMapMode.READ ).then( () => {
+			const times = new BigUint64Array( resultBuffer.getMappedRange() );
+			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
+
+
+			this.renderer.info.updateTimestamp( type, duration );
+
+			resultBuffer.unmap();
+
+			renderContextData.currentTimestampQueryBuffers.isMappingPending = false;
+		})
+
 	}
 	
 
 	// node builder
 
-	createNodeBuilder( object, renderer, scene = null ) {
+	createNodeBuilder( object, renderer ) {
 
-		return new WGSLNodeBuilder( object, renderer, scene );
+		return new WGSLNodeBuilder( object, renderer );
 
 	}
 
@@ -1198,15 +1227,15 @@ class WebGPUBackend extends Backend {
 
 	// bindings
 
-	createBindings( bindings ) {
+	createBindings( bindGroup ) {
 
-		this.bindingUtils.createBindings( bindings );
+		this.bindingUtils.createBindings( bindGroup );
 
 	}
 
-	updateBindings( bindings ) {
+	updateBindings( bindGroup ) {
 
-		this.bindingUtils.createBindings( bindings );
+		this.bindingUtils.createBindings( bindGroup );
 
 	}
 

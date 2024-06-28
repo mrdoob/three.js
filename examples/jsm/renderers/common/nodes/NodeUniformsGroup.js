@@ -15,12 +15,6 @@ class NodeUniformsGroup extends UniformsGroup {
 
 	}
 
-	get shared() {
-
-		return this.groupNode.shared;
-
-	}
-
 	getNodes() {
 
 		const nodes = [];

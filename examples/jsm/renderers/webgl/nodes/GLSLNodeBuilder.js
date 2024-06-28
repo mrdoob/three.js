@@ -1,11 +1,11 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, UniformNode, vectorComponents } from '../../../nodes/Nodes.js';
+import { MathNode, GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents } from '../../../nodes/Nodes.js';
 
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from '../../common/nodes/NodeSampledTexture.js';
 
-import { RedFormat, RGFormat, IntType, DataTexture, RGBFormat, RGBAFormat, FloatType } from 'three';
+import { ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat, RedIntegerFormat, RGIntegerFormat, UnsignedByteType, UnsignedIntType, UnsignedShortType, RedFormat, RGFormat, IntType, DataTexture, RGBFormat, RGBAFormat, FloatType } from 'three';
 
 const glslMethods = {
 	[ MathNode.ATAN2 ]: 'atan',
@@ -20,38 +20,47 @@ const precisionLib = {
 };
 
 const supports = {
-	instance: true,
-	swizzleAssign: true
+	swizzleAssign: true,
+	storageBuffer: false
 };
 
 const defaultPrecisions = `
 precision highp float;
 precision highp int;
+precision highp sampler2D;
 precision highp sampler3D;
-precision mediump sampler2DArray;
+precision highp samplerCube;
+precision highp sampler2DArray;
+
+precision highp usampler2D;
+precision highp usampler3D;
+precision highp usamplerCube;
+precision highp usampler2DArray;
+
+precision highp isampler2D;
+precision highp isampler3D;
+precision highp isamplerCube;
+precision highp isampler2DArray;
+
 precision lowp sampler2DShadow;
 `;
 
 class GLSLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer, scene = null ) {
+	constructor( object, renderer ) {
 
-		super( object, renderer, new GLSLNodeParser(), scene );
+		super( object, renderer, new GLSLNodeParser() );
 
 		this.uniformGroups = {};
 		this.transforms = [];
+
+		this.instanceBindGroups = false;
 
 	}
 
 	getMethod( method ) {
 
 		return glslMethods[ method ] || method;
-
-	}
-
-	getPropertyName( node, shaderStage ) {
-
-		return super.getPropertyName( node, shaderStage );
 
 	}
 
@@ -101,21 +110,36 @@ ${ flowData.code }
 			const numElements = attribute.count * attribute.itemSize;
 
 			const { itemSize } = attribute;
-			let format = RedFormat;
+
+			const isInteger = attribute.array.constructor.name.toLowerCase().includes( 'int' );
+
+			let format = isInteger ? RedIntegerFormat : RedFormat;
+
 
 			if ( itemSize === 2 ) {
 
-				format = RGFormat;
+				format = isInteger ? RGIntegerFormat : RGFormat;
 
 			} else if ( itemSize === 3 ) {
 
-				format = RGBFormat;
+				format = isInteger ? RGBIntegerFormat : RGBFormat;
 
 			} else if ( itemSize === 4 ) {
 
-				format = RGBAFormat;
+				format = isInteger ? RGBAIntegerFormat : RGBAFormat;
 
 			}
+
+			const typeMap = {
+				Float32Array: FloatType,
+				Uint8Array: UnsignedByteType,
+				Uint16Array: UnsignedShortType,
+				Uint32Array: UnsignedIntType,
+				Int8Array: ByteType,
+				Int16Array: ShortType,
+				Int32Array: IntType,
+				Uint8ClampedArray: UnsignedByteType,
+			};
 
 			const width = Math.pow( 2, Math.ceil( Math.log2( Math.sqrt( numElements / itemSize ) ) ) );
 			let height = Math.ceil( ( numElements / itemSize ) / width );
@@ -123,17 +147,17 @@ ${ flowData.code }
 
 			const newSize = width * height * itemSize;
 
-			const newArray = new Float32Array( newSize );
+			const newArray = new originalArray.constructor( newSize );
 
 			newArray.set( originalArray, 0 );
 
 			attribute.array = newArray;
 
-			const pboTexture = new DataTexture( attribute.array, width, height, format, FloatType );
+			const pboTexture = new DataTexture( attribute.array, width, height, format, typeMap[ attribute.array.constructor.name ] || FloatType );
 			pboTexture.needsUpdate = true;
 			pboTexture.isPBOTexture = true;
 
-			const pbo = new UniformNode( pboTexture );
+			const pbo = new TextureNode( pboTexture );
 			pbo.setPrecision( 'high' );
 
 			attribute.pboNode = pbo;
@@ -142,6 +166,18 @@ ${ flowData.code }
 			this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
 
 		}
+
+	}
+
+	getPropertyName( node, shaderStage = this.shaderStage ) {
+
+		if ( node.isNodeUniform && node.node.isTextureNode !== true && node.node.isBufferNode !== true ) {
+
+			return shaderStage.charAt( 0 ) + '_' + node.name;
+
+		}
+
+		return super.getPropertyName( node, shaderStage );
 
 	}
 
@@ -205,7 +241,20 @@ ${ flowData.code }
 
 			//
 
-			this.addLineFlowCode( `${ propertyName } = ${ snippet + channel }` );
+			const typePrefix = attribute.array.constructor.name.toLowerCase().charAt( 0 );
+
+			let prefix = 'vec4';
+			if ( typePrefix === 'u' ) {
+
+				prefix = 'uvec4';
+
+			} else if ( typePrefix === 'i' ) {
+
+				prefix = 'ivec4';
+
+			}
+
+			this.addLineFlowCode( `${ propertyName } = ${prefix}(${ snippet })${channel}` );
 
 			elementNodeData.propertyName = propertyName;
 
@@ -307,17 +356,31 @@ ${ flowData.code }
 
 				const texture = uniform.node.value;
 
+				let typePrefix = '';
+
+				if ( texture.isPBOTexture === true ) {
+
+					const prefix = texture.source.data.data.constructor.name.toLowerCase().charAt( 0 );
+
+					if ( prefix === 'u' || prefix === 'i' ) {
+
+						typePrefix = prefix;
+
+					}
+
+				}
+
 				if ( texture.compareFunction ) {
 
 					snippet = `sampler2DShadow ${ uniform.name };`;
 
 				} else if ( texture.isDataArrayTexture === true ) {
 
-					snippet = `sampler2DArray ${ uniform.name };`;
+					snippet = `${typePrefix}sampler2DArray ${ uniform.name };`;
 
 				} else {
 
-					snippet = `sampler2D ${ uniform.name };`;
+					snippet = `${typePrefix}sampler2D ${ uniform.name };`;
 
 				}
 
@@ -342,7 +405,7 @@ ${ flowData.code }
 
 				const vectorType = this.getVectorType( uniform.type );
 
-				snippet = `${vectorType} ${uniform.name};`;
+				snippet = `${ vectorType } ${ this.getPropertyName( uniform, shaderStage ) };`;
 
 				group = true;
 
@@ -492,7 +555,7 @@ ${ flowData.code }
 
 				if ( shaderStage === 'compute' ) varying.needsInterpolation = true;
 				const type = varying.type;
-				const flat = type === 'int' || type === 'uint' ? 'flat ' : '';
+				const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
 
 				snippet += `${flat}${varying.needsInterpolation ? 'out' : '/*out*/'} ${type} ${varying.name};\n`;
 
@@ -505,7 +568,7 @@ ${ flowData.code }
 				if ( varying.needsInterpolation ) {
 
 					const type = varying.type;
-					const flat = type === 'int' || type === 'uint' ? 'flat ' : '';
+					const flat = type.includes( 'int' ) || type.includes( 'uv' ) || type.includes( 'iv' ) ? 'flat ' : '';
 
 					snippet += `${flat}in ${type} ${varying.name};\n`;
 
@@ -551,7 +614,32 @@ ${ flowData.code }
 
 	isAvailable( name ) {
 
-		return supports[ name ] === true;
+		let result = supports[ name ];
+
+		if ( result === undefined ) {
+
+			if ( name === 'float32Filterable' ) {
+
+				const extentions = this.renderer.backend.extensions;
+
+				if ( extentions.has( 'OES_texture_float_linear' ) ) {
+
+					extentions.get( 'OES_texture_float_linear' );
+					result = true;
+
+				} else {
+
+					result = false;
+
+				}
+
+			}
+
+			supports[ name ] = result;
+
+		}
+
+		return result;
 
 	}
 
@@ -754,39 +842,39 @@ void main() {
 
 		if ( uniformGPU === undefined ) {
 
+			const group = node.groupNode;
+			const groupName = group.name;
+
+			const bindings = this.getBindGroupArray( groupName, shaderStage );
+
 			if ( type === 'texture' ) {
 
-				uniformGPU = new NodeSampledTexture( uniformNode.name, uniformNode.node );
-
-				this.bindings[ shaderStage ].push( uniformGPU );
+				uniformGPU = new NodeSampledTexture( uniformNode.name, uniformNode.node, group );
+				bindings.push( uniformGPU );
 
 			} else if ( type === 'cubeTexture' ) {
 
-				uniformGPU = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node );
-
-				this.bindings[ shaderStage ].push( uniformGPU );
+				uniformGPU = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, group );
+				bindings.push( uniformGPU );
 
 			} else if ( type === 'texture3D' ) {
 
-				uniformGPU = new NodeSampledTexture3D( uniformNode.name, uniformNode.node );
-				this.bindings[ shaderStage ].push( uniformGPU );
+				uniformGPU = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group );
+				bindings.push( uniformGPU );
 
 			} else if ( type === 'buffer' ) {
 
 				node.name = `NodeBuffer_${ node.id }`;
 				uniformNode.name = `buffer${ node.id }`;
 
-				const buffer = new NodeUniformBuffer( node );
+				const buffer = new NodeUniformBuffer( node, group );
 				buffer.name = node.name;
 
-				this.bindings[ shaderStage ].push( buffer );
+				bindings.push( buffer );
 
 				uniformGPU = buffer;
 
 			} else {
-
-				const group = node.groupNode;
-				const groupName = group.name;
 
 				const uniformsStage = this.uniformGroups[ shaderStage ] || ( this.uniformGroups[ shaderStage ] = {} );
 
@@ -799,7 +887,7 @@ void main() {
 
 					uniformsStage[ groupName ] = uniformsGroup;
 
-					this.bindings[ shaderStage ].push( uniformsGroup );
+					bindings.push( uniformsGroup );
 
 				}
 

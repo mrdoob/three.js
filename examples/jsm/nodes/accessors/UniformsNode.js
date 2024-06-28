@@ -118,8 +118,14 @@ class UniformsNode extends BufferNode {
 		this._elementType = this.elementType === null ? getValueType( this.array[ 0 ] ) : this.elementType;
 		this._elementLength = builder.getTypeLength( this._elementType );
 
-		this.value = new Float32Array( length * 4 );
+		let arrayType = Float32Array;
+
+		if ( this._elementType.charAt( 0 ) === 'i' ) arrayType = Int32Array;
+		else if ( this._elementType.charAt( 0 ) === 'u' ) arrayType = Uint32Array;
+
+		this.value = new arrayType( length * 4 );
 		this.bufferCount = length;
+		this.bufferType = builder.changeComponentType( 'vec4', builder.getComponentType( this._elementType ) );
 
 		return super.setup( builder );
 

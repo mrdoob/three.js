@@ -237,6 +237,7 @@ MathNode.RECIPROCAL = 'reciprocal';
 MathNode.TRUNC = 'trunc';
 MathNode.FWIDTH = 'fwidth';
 MathNode.BITCAST = 'bitcast';
+MathNode.TRANSPOSE = 'transpose';
 
 // 2 inputs
 
@@ -302,6 +303,7 @@ export const reciprocal = nodeProxy( MathNode, MathNode.RECIPROCAL );
 export const trunc = nodeProxy( MathNode, MathNode.TRUNC );
 export const fwidth = nodeProxy( MathNode, MathNode.FWIDTH );
 export const bitcast = nodeProxy( MathNode, MathNode.BITCAST );
+export const transpose = nodeProxy( MathNode, MathNode.TRANSPOSE );
 
 export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
 export const min = nodeProxy( MathNode, MathNode.MIN );
@@ -387,5 +389,6 @@ addNodeElement( 'faceForward', faceForward );
 addNodeElement( 'difference', difference );
 addNodeElement( 'saturate', saturate );
 addNodeElement( 'cbrt', cbrt );
+addNodeElement( 'transpose', transpose );
 
 addNodeClass( 'MathNode', MathNode );

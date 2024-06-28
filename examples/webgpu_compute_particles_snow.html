@@ -97,6 +97,8 @@
 
 				collisionPosRT = new THREE.RenderTarget( 1024, 1024 );
 				collisionPosRT.texture.type = THREE.HalfFloatType;
+				collisionPosRT.texture.magFilter = THREE.NearestFilter;
+				collisionPosRT.texture.minFilter = THREE.NearestFilter;
 
 				collisionPosMaterial = new MeshBasicNodeMaterial();
 				collisionPosMaterial.fog = false;
@@ -198,7 +200,6 @@
 					staticMaterial.positionNode = positionLocal.mul( scaleBuffer.toAttribute() ).add( posBuffer.toAttribute() );
 
 					const rainParticles = new THREE.Mesh( geometry, staticMaterial );
-					rainParticles.isInstancedMesh = true;
 					rainParticles.count = maxParticleCount;
 					rainParticles.castShadow = true;
 					rainParticles.layers.disableAll();

@@ -147,6 +147,16 @@ class WebGLTextureUtils {
 			if ( glType === gl.SHORT ) internalFormat = gl.RG16I;
 			if ( glType === gl.INT ) internalFormat = gl.RG32I;
 
+		}
+
+		if ( glFormat === gl.RG_INTEGER ) {
+
+			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = gl.RG8UI;
+			if ( glType === gl.UNSIGNED_SHORT ) internalFormat = gl.RG16UI;
+			if ( glType === gl.UNSIGNED_INT ) internalFormat = gl.RG32UI;
+			if ( glType === gl.BYTE ) internalFormat = gl.RG8I;
+			if ( glType === gl.SHORT ) internalFormat = gl.RG16I;
+			if ( glType === gl.INT ) internalFormat = gl.RG32I;
 
 		}
 
@@ -168,6 +178,17 @@ class WebGLTextureUtils {
 
 		}
 
+		if ( glFormat === gl.RGB_INTEGER ) {
+
+			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = gl.RGB8UI;
+			if ( glType === gl.UNSIGNED_SHORT ) internalFormat = gl.RGB16UI;
+			if ( glType === gl.UNSIGNED_INT ) internalFormat = gl.RGB32UI;
+			if ( glType === gl.BYTE ) internalFormat = gl.RGB8I;
+			if ( glType === gl.SHORT ) internalFormat = gl.RGB16I;
+			if ( glType === gl.INT ) internalFormat = gl.RGB32I;
+
+		}
+
 		if ( glFormat === gl.RGBA ) {
 
 			if ( glType === gl.FLOAT ) internalFormat = gl.RGBA32F;
@@ -181,6 +202,17 @@ class WebGLTextureUtils {
 			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = ( colorSpace === SRGBColorSpace && forceLinearTransfer === false ) ? gl.SRGB8_ALPHA8 : gl.RGBA8;
 			if ( glType === gl.UNSIGNED_SHORT_4_4_4_4 ) internalFormat = gl.RGBA4;
 			if ( glType === gl.UNSIGNED_SHORT_5_5_5_1 ) internalFormat = gl.RGB5_A1;
+
+		}
+
+		if ( glFormat === gl.RGBA_INTEGER ) {
+
+			if ( glType === gl.UNSIGNED_BYTE ) internalFormat = gl.RGBA8UI;
+			if ( glType === gl.UNSIGNED_SHORT ) internalFormat = gl.RGBA16UI;
+			if ( glType === gl.UNSIGNED_INT ) internalFormat = gl.RGBA32UI;
+			if ( glType === gl.BYTE ) internalFormat = gl.RGBA8I;
+			if ( glType === gl.SHORT ) internalFormat = gl.RGBA16I;
+			if ( glType === gl.INT ) internalFormat = gl.RGBA32I;
 
 		}
 
@@ -634,7 +666,7 @@ class WebGLTextureUtils {
 
 			} else {
 
-				gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, glFormat, glType, image );
+				gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
 
 			}
 

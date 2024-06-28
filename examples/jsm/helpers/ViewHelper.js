@@ -33,6 +33,8 @@ class ViewHelper extends Object3D {
 		const color3 = new Color( '#4488ff' );
 		const color4 = new Color( '#000000' );
 
+		const options = {};
+
 		const interactiveObjects = [];
 		const raycaster = new Raycaster();
 		const mouse = new Vector2();
@@ -166,6 +168,26 @@ class ViewHelper extends Object3D {
 
 		};
 
+		this.setLabels = function ( labelX, labelY, labelZ ) {
+
+			options.labelX = labelX;
+			options.labelY = labelY;
+			options.labelZ = labelZ;
+
+			updateLabels();
+
+		};
+
+		this.setLabelStyle = function ( font, color, radius ) {
+
+			options.font = font;
+			options.color = color;
+			options.radius = radius;
+
+			updateLabels();
+
+		};
+
 		this.update = function ( delta ) {
 
 			const step = delta * turnRate;
@@ -271,7 +293,9 @@ class ViewHelper extends Object3D {
 
 		}
 
-		function getSpriteMaterial( color ) {
+		function getSpriteMaterial( color, text ) {
+
+			const { font = '24px Arial', color: labelColor = '#000000', radius = 14 } = options;
 
 			const canvas = document.createElement( 'canvas' );
 			canvas.width = 64;
@@ -279,15 +303,40 @@ class ViewHelper extends Object3D {
 
 			const context = canvas.getContext( '2d' );
 			context.beginPath();
-			context.arc( 32, 32, 14, 0, 2 * Math.PI );
+			context.arc( 32, 32, radius, 0, 2 * Math.PI );
 			context.closePath();
 			context.fillStyle = color.getStyle();
 			context.fill();
+
+			if ( text ) {
+
+				context.font = font;
+				context.textAlign = 'center';
+				context.fillStyle = labelColor;
+				context.fillText( text, 32, 41 );
+
+			}
 
 			const texture = new CanvasTexture( canvas );
 			texture.colorSpace = SRGBColorSpace;
 
 			return new SpriteMaterial( { map: texture, toneMapped: false } );
+
+		}
+
+		function updateLabels() {
+
+			posXAxisHelper.material.map.dispose();
+			posYAxisHelper.material.map.dispose();
+			posZAxisHelper.material.map.dispose();
+
+			posXAxisHelper.material.dispose();
+			posYAxisHelper.material.dispose();
+			posZAxisHelper.material.dispose();
+
+			posXAxisHelper.material = getSpriteMaterial( color1, options.labelX );
+			posYAxisHelper.material = getSpriteMaterial( color2, options.labelY );
+			posZAxisHelper.material = getSpriteMaterial( color3, options.labelZ );
 
 		}
 

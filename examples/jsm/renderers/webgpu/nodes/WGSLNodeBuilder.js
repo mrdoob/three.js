@@ -13,8 +13,7 @@ import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
 import { getFormat } from '../utils/WebGPUTextureUtils.js';
 
 import WGSLNodeParser from './WGSLNodeParser.js';
-import { GPUStorageTextureAccess } from '../utils/WebGPUConstants.js';
-
+import { GPUBufferBindingType, GPUStorageTextureAccess } from '../utils/WebGPUConstants.js';
 
 // GPUShaderStage is not defined in browsers not supporting WebGPU
 const GPUShaderStage = self.GPUShaderStage;
@@ -27,6 +26,7 @@ const gpuShaderStageLib = {
 
 const supports = {
 	instance: true,
+	swizzleAssign: false,
 	storageBuffer: true
 };
 
@@ -127,14 +127,37 @@ fn threejs_repeatWrapping( uv : vec2<f32>, dimension : vec2<u32> ) -> vec2<u32> 
 	return ( ( uvScaled % dimension ) + dimension ) % dimension;
 
 }
+` ),
+	biquadraticTexture: new CodeNode( `
+fn threejs_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, level : i32 ) -> vec4f {
+
+	let res = vec2f( textureDimensions( map, level ) );
+
+	let uvScaled = coord * res;
+	let uvWrapping = ( ( uvScaled % res ) + res ) % res;
+
+	// https://www.shadertoy.com/view/WtyXRy
+
+	let uv = uvWrapping - 0.5;
+	let iuv = floor( uv );
+	let f = fract( uv );
+
+	let rg1 = textureLoad( map, vec2i( iuv + vec2( 0.5, 0.5 ) ), level );
+	let rg2 = textureLoad( map, vec2i( iuv + vec2( 1.5, 0.5 ) ), level );
+	let rg3 = textureLoad( map, vec2i( iuv + vec2( 0.5, 1.5 ) ), level );
+	let rg4 = textureLoad( map, vec2i( iuv + vec2( 1.5, 1.5 ) ), level );
+
+	return mix( mix( rg1, rg2, f.x ), mix( rg3, rg4, f.x ), f.y );
+
+}
 ` )
 };
 
 class WGSLNodeBuilder extends NodeBuilder {
 
-	constructor( object, renderer, scene = null ) {
+	constructor( object, renderer ) {
 
-		super( object, renderer, new WGSLNodeParser(), scene );
+		super( object, renderer, new WGSLNodeParser() );
 
 		this.uniformGroups = {};
 
@@ -162,9 +185,13 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			}
 
+		} else if ( this.isFilteredTexture( texture ) ) {
+
+			return this.generateFilteredTexture( texture, textureProperty, uvSnippet );
+
 		} else {
 
-			return this.generateTextureLod( texture, textureProperty, uvSnippet );
+			return this.generateTextureLod( texture, textureProperty, uvSnippet, '0' );
 
 		}
 
@@ -190,11 +217,23 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			return `textureSampleLevel( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ levelSnippet } )`;
 
+		} else if ( this.isFilteredTexture( texture ) ) {
+
+			return this.generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet );
+
 		} else {
 
 			return this.generateTextureLod( texture, textureProperty, uvSnippet, levelSnippet );
 
 		}
+
+	}
+
+	generateFilteredTexture( texture, textureProperty, uvSnippet, levelSnippet = '0' ) {
+
+		this._include( 'biquadraticTexture' );
+
+		return `threejs_biquadraticTexture( ${ textureProperty }, ${ uvSnippet }, i32( ${ levelSnippet } ) )`;
 
 	}
 
@@ -372,30 +411,38 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			switch ( node.access ) {
 
-				case GPUStorageTextureAccess.ReadOnly: {
+				case GPUStorageTextureAccess.ReadOnly:
 
 					return 'read';
 
-				}
-
-				case GPUStorageTextureAccess.WriteOnly: {
+				case GPUStorageTextureAccess.WriteOnly:
 
 					return 'write';
 
-				}
-
-				default: {
+				default:
 
 					return 'read_write';
-
-				}
 
 			}
 
 		} else {
 
-			// @TODO: Account for future read-only storage buffer pull request
-			return 'read_write';
+			switch ( node.access ) {
+
+				case GPUBufferBindingType.Storage:
+
+					return 'read_write';
+
+
+				case GPUBufferBindingType.ReadOnlyStorage:
+
+					return 'read';
+
+				default:
+
+					return 'write';
+
+			}
 
 		}
 
@@ -410,7 +457,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			let uniformGPU;
 
-			const bindings = this.bindings[ shaderStage ];
+			const group = node.groupNode;
+			const groupName = group.name;
+
+			const bindings = this.getBindGroupArray( groupName, shaderStage );
 
 			if ( type === 'texture' || type === 'cubeTexture' || type === 'storageTexture' || type === 'texture3D' ) {
 
@@ -418,15 +468,15 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( type === 'texture' || type === 'storageTexture' ) {
 
-					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, node.access ? node.access : null );
+					texture = new NodeSampledTexture( uniformNode.name, uniformNode.node, group, node.access ? node.access : null );
 
 				} else if ( type === 'cubeTexture' ) {
 
-					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, node.access ? node.access : null );
+					texture = new NodeSampledCubeTexture( uniformNode.name, uniformNode.node, group, node.access ? node.access : null );
 
 				} else if ( type === 'texture3D' ) {
 
-					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, node.access ? node.access : null );
+					texture = new NodeSampledTexture3D( uniformNode.name, uniformNode.node, group, node.access ? node.access : null );
 
 				}
 
@@ -435,7 +485,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				if ( shaderStage === 'fragment' && this.isUnfilterable( node.value ) === false && texture.store === false ) {
 
-					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node );
+					const sampler = new NodeSampler( `${uniformNode.name}_sampler`, uniformNode.node, group );
 					sampler.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 					bindings.push( sampler, texture );
@@ -453,7 +503,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
 
 				const bufferClass = type === 'storageBuffer' ? NodeStorageBuffer : NodeUniformBuffer;
-				const buffer = new bufferClass( node );
+				const buffer = new bufferClass( node, group );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
@@ -461,9 +511,6 @@ class WGSLNodeBuilder extends NodeBuilder {
 				uniformGPU = buffer;
 
 			} else {
-
-				const group = node.groupNode;
-				const groupName = group.name;
 
 				const uniformsStage = this.uniformGroups[ shaderStage ] || ( this.uniformGroups[ shaderStage ] = {} );
 
@@ -488,21 +535,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			nodeData.uniformGPU = uniformGPU;
 
-			if ( shaderStage === 'vertex' ) {
-
-				this.bindingsOffset[ 'fragment' ] = bindings.length;
-
-			}
-
 		}
 
 		return uniformNode;
-
-	}
-
-	isReference( type ) {
-
-		return super.isReference( type ) || type === 'texture_2d' || type === 'texture_cube' || type === 'texture_depth_2d' || type === 'texture_storage_2d' || type === 'texture_3d';
 
 	}
 
@@ -687,9 +722,10 @@ ${ flowData.code }
 			snippet += this.getStructMembers( struct );
 			snippet += '\n}';
 
+
 			snippets.push( snippet );
 
-			snippets.push( `\nvar<private> output : ${ name };\n\n`);
+			snippets.push( `\nvar<private> output : ${ name };\n\n` );
 
 		}
 
@@ -783,9 +819,10 @@ ${ flowData.code }
 		const structSnippets = [];
 		const uniformGroups = {};
 
-		let index = this.bindingsOffset[ shaderStage ];
-
 		for ( const uniform of uniforms ) {
+
+			const groundName = uniform.groupNode.name;
+			const uniformIndexes = this.bindingsIndexes[ groundName ];
 
 			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
 
@@ -795,11 +832,11 @@ ${ flowData.code }
 
 					if ( texture.isDepthTexture === true && texture.compareFunction !== null ) {
 
-						bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler_comparison;` );
+						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler_comparison;` );
 
 					} else {
 
-						bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name}_sampler : sampler;` );
+						bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name }_sampler : sampler;` );
 
 					}
 
@@ -832,7 +869,7 @@ ${ flowData.code }
 					const format = getFormat( texture );
 					const access = this.getStorageAccess( uniform.node );
 
-					textureType = `texture_storage_2d<${ format }, ${access}>`;
+					textureType = `texture_storage_2d<${ format }, ${ access }>`;
 
 				} else {
 
@@ -842,7 +879,7 @@ ${ flowData.code }
 
 				}
 
-				bindingSnippets.push( `@binding( ${index ++} ) @group( 0 ) var ${uniform.name} : ${textureType};` );
+				bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name } : ${ textureType };` );
 
 			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' ) {
 
@@ -851,10 +888,10 @@ ${ flowData.code }
 				const bufferCount = bufferNode.bufferCount;
 
 				const bufferCountSnippet = bufferCount > 0 ? ', ' + bufferCount : '';
-				const bufferSnippet = `\t${uniform.name} : array< ${bufferType}${bufferCountSnippet} >\n`;
-				const bufferAccessMode = bufferNode.isStorageBufferNode ? 'storage,read_write' : 'uniform';
+				const bufferSnippet = `\t${ uniform.name } : array< ${ bufferType }${ bufferCountSnippet } >\n`;
+				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${ this.getStorageAccess( bufferNode ) }` : 'uniform';
 
-				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, index ++ ) );
+				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
 
 			} else {
 
@@ -862,7 +899,8 @@ ${ flowData.code }
 				const groupName = uniform.groupNode.name;
 
 				const group = uniformGroups[ groupName ] || ( uniformGroups[ groupName ] = {
-					index: index ++,
+					index: uniformIndexes.binding ++,
+					id: uniformIndexes.group,
 					snippets: []
 				} );
 
@@ -876,7 +914,7 @@ ${ flowData.code }
 
 			const group = uniformGroups[ name ];
 
-			structSnippets.push( this._getWGSLStructBinding( name, group.snippets.join( ',\n' ), 'uniform', group.index ) );
+			structSnippets.push( this._getWGSLStructBinding( name, group.snippets.join( ',\n' ), 'uniform', group.index, group.id ) );
 
 		}
 
@@ -968,6 +1006,7 @@ ${ flowData.code }
 
 			stageData.flow = flow;
 
+
 		}
 
 		if ( this.material !== null ) {
@@ -1011,7 +1050,21 @@ ${ flowData.code }
 
 	isAvailable( name ) {
 
-		return supports[ name ] === true;
+		let result = supports[ name ];
+
+		if ( result === undefined ) {
+
+			if ( name === 'float32Filterable' ) {
+
+				result = this.renderer.hasFeature( 'float32-filterable' );
+
+			}
+
+			supports[ name ] = result;
+
+		}
+
+		return result;
 
 	}
 

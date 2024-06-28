@@ -21,6 +21,8 @@ class BufferAttributeNode extends InputNode {
 
 		this.attribute = null;
 
+		this.global = true;
+
 		if ( value && value.isBufferAttribute === true ) {
 
 			this.attribute = value;
@@ -28,6 +30,30 @@ class BufferAttributeNode extends InputNode {
 			this.instanced = value.isInstancedBufferAttribute;
 
 		}
+
+	}
+
+	getHash( builder ) {
+
+		if ( this.bufferStride === 0 && this.bufferOffset === 0 ) {
+
+			let bufferData = builder.globalCache.getData( this.value );
+
+			if ( bufferData === undefined ) {
+
+				bufferData = {
+					node: this
+				};
+
+				builder.globalCache.setData( this.value, bufferData );
+
+			}
+
+			return bufferData.node.uuid;
+
+		}
+
+		return this.uuid;
 
 	}
 
@@ -99,6 +125,12 @@ class BufferAttributeNode extends InputNode {
 	setUsage( value ) {
 
 		this.usage = value;
+
+		if ( this.attribute && this.attribute.isBufferAttribute === true ) {
+
+			this.attribute.usage = value;
+
+		}
 
 		return this;
 

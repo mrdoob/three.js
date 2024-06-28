@@ -17,6 +17,7 @@ class Node extends EventDispatcher {
 
 		this.updateType = NodeUpdateType.NONE;
 		this.updateBeforeType = NodeUpdateType.NONE;
+		this.updateAfterType = NodeUpdateType.NONE;
 
 		this.uuid = MathUtils.generateUUID();
 
@@ -165,6 +166,12 @@ class Node extends EventDispatcher {
 
 	}
 
+	getUpdateAfterType() {
+
+		return this.updateAfterType;
+
+	}
+
 	getElementType( builder ) {
 
 		const type = this.getNodeType( builder );
@@ -273,6 +280,12 @@ class Node extends EventDispatcher {
 
 	}
 
+	updateAfter( /*frame*/ ) {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
 	update( /*frame*/ ) {
 
 		console.warn( 'Abstract function.' );
@@ -307,7 +320,7 @@ class Node extends EventDispatcher {
 
 			const properties = builder.getNodeProperties( this );
 
-			if ( properties.initialized !== true || builder.context.tempRead === false ) {
+			if ( properties.initialized !== true ) {
 
 				const stackNodesBeforeSetup = builder.stack.nodes.length;
 
@@ -347,7 +360,7 @@ class Node extends EventDispatcher {
 
 				result = nodeData.snippet;
 
-				if ( result === undefined /*|| builder.context.tempRead === false*/ ) {
+				if ( result === undefined ) {
 
 					result = this.generate( builder ) || '';
 

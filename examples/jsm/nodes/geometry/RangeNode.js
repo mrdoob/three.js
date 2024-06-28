@@ -1,11 +1,11 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { getValueType } from '../core/NodeUtils.js';
 import { buffer } from '../accessors/BufferNode.js';
-//import { bufferAttribute } from '../accessors/BufferAttributeNode.js';
+import { instancedBufferAttribute } from '../accessors/BufferAttributeNode.js';
 import { instanceIndex } from '../core/IndexNode.js';
 import { nodeProxy, float } from '../shadernode/ShaderNode.js';
 
-import { Vector4, MathUtils } from 'three';
+import { Vector4, MathUtils, InstancedBufferAttribute } from 'three';
 
 let min = null;
 let max = null;
@@ -32,7 +32,7 @@ class RangeNode extends Node {
 
 	getNodeType( builder ) {
 
-		return builder.object.isInstancedMesh === true ? builder.getTypeFromLength( this.getVectorLength( builder ) ) : 'float';
+		return builder.object.count > 1 ? builder.getTypeFromLength( this.getVectorLength( builder ) ) : 'float';
 
 	}
 
@@ -42,7 +42,7 @@ class RangeNode extends Node {
 
 		let output = null;
 
-		if ( object.isInstancedMesh === true ) {
+		if ( object.count > 1 ) {
 
 			const minValue = this.minNode.value;
 			const maxValue = this.maxNode.value;
@@ -82,8 +82,19 @@ class RangeNode extends Node {
 
 			const nodeType = this.getNodeType( builder );
 
-			output = buffer( array, 'vec4', object.count ).element( instanceIndex ).convert( nodeType );
-			//output = bufferAttribute( array, 'vec4', 4, 0 ).convert( nodeType );
+			if ( object.count <= 4096 ) {
+
+				output = buffer( array, 'vec4', object.count ).element( instanceIndex ).convert( nodeType );
+
+			} else {
+
+				// TODO: Improve anonymous buffer attribute creation removing this part
+				const bufferAttribute = new InstancedBufferAttribute( array, 4 );
+				builder.geometry.setAttribute( '__range' + this.id, bufferAttribute );
+
+				output = instancedBufferAttribute( bufferAttribute ).convert( nodeType );
+
+			}
 
 		} else {
 
