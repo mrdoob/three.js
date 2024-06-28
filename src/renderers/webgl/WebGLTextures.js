@@ -1555,6 +1555,37 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		const renderTargetProperties = properties.get( renderTarget );
 		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 
+		// if the bound depth texture has changed
+		if ( renderTargetProperties.__boundDepthTexture !== renderTarget.depthTexture ) {
+
+			// fire the dispose event to get rid of stored state associated with the previously bound depth buffer
+			const depthTexture = renderTarget.depthTexture;
+			if ( renderTargetProperties.__depthDisposeCallback ) {
+
+				renderTargetProperties.__depthDisposeCallback();
+
+			}
+
+			// set up dispose listeners to track when the currently attached buffer is implicitly unbound
+			if ( depthTexture ) {
+
+				const disposeEvent = () => {
+
+					delete renderTargetProperties.__boundDepthTexture;
+					delete renderTargetProperties.__depthDisposeCallback;
+					depthTexture.removeEventListener( 'dispose', disposeEvent );
+
+				};
+
+				depthTexture.addEventListener( 'dispose', disposeEvent );
+				renderTargetProperties.__depthDisposeCallback = disposeEvent;
+
+			}
+
+			renderTargetProperties.__boundDepthTexture = depthTexture;
+
+		}
+
 		if ( renderTarget.depthTexture && ! renderTargetProperties.__autoAllocateDepthBuffer ) {
 
 			if ( isCube ) throw new Error( 'target.depthTexture not supported in Cube render targets' );
@@ -1570,16 +1601,42 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				for ( let i = 0; i < 6; i ++ ) {
 
 					state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
-					renderTargetProperties.__webglDepthbuffer[ i ] = _gl.createRenderbuffer();
-					setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget, false );
+
+					if ( renderTargetProperties.__webglDepthbuffer[ i ] === undefined ) {
+
+						renderTargetProperties.__webglDepthbuffer[ i ] = _gl.createRenderbuffer();
+						setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget, false );
+
+					} else {
+
+						// attach buffer if it's been created already
+						const glAttachmentType = renderTarget.stencilBuffer ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT;
+						const renderbuffer = renderTargetProperties.__webglDepthbuffer[ i ];
+						_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
+						_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, glAttachmentType, _gl.RENDERBUFFER, renderbuffer );
+
+					}
 
 				}
 
 			} else {
 
 				state.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
-				renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
-				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget, false );
+
+				if ( renderTargetProperties.__webglDepthbuffer === undefined ) {
+
+					renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
+					setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget, false );
+
+				} else {
+
+					// attach buffer if it's been created already
+					const glAttachmentType = renderTarget.stencilBuffer ? _gl.DEPTH_STENCIL_ATTACHMENT : _gl.DEPTH_ATTACHMENT;
+					const renderbuffer = renderTargetProperties.__webglDepthbuffer;
+					_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
+					_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, glAttachmentType, _gl.RENDERBUFFER, renderbuffer );
+
+				}
 
 			}
 
