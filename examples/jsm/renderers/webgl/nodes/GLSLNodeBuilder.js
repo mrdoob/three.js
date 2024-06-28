@@ -371,7 +371,7 @@ ${ flowData.code }
 
 				if ( texture.isDataTexture === true ) {
 
-					const prefix = uniform.node._nodeType ? uniform.node._nodeType.charAt( 0 ) : texture.source.data.data.constructor.name.toLowerCase().charAt( 0 );
+					const prefix = uniform.node._nodeType;
 
 					if ( prefix === 'u' || prefix === 'i' ) {
 
