@@ -723,7 +723,7 @@ function _getBlurShader( lodMax, width, height ) {
 	const n = float( MAX_SAMPLES );
 	const latitudinal = uniform( 0 ); // false, bool
 	const samples = uniform( 1 ); // int
-	const envMap = texture( null, null, null, 'vec4' );
+	const envMap = texture( null );
 	const mipInt = uniform( 0 ); // int
 	const CUBEUV_TEXEL_WIDTH = float( 1 / width );
 	const CUBEUV_TEXEL_HEIGHT = float( 1 / height );
@@ -755,7 +755,7 @@ function _getBlurShader( lodMax, width, height ) {
 function _getCubemapMaterial( envTexture ) {
 
 	const material = _getMaterial();
-	material.fragmentNode = cubeTexture( envTexture, outputDirection, null, 'vec4' );
+	material.fragmentNode = cubeTexture( envTexture, outputDirection, null );
 
 	return material;
 
@@ -764,7 +764,7 @@ function _getCubemapMaterial( envTexture ) {
 function _getEquirectMaterial( envTexture ) {
 
 	const material = _getMaterial();
-	material.fragmentNode = texture( envTexture, equirectUV( outputDirection ), 0, 'vec4' );
+	material.fragmentNode = texture( envTexture, equirectUV( outputDirection ), 0 );
 
 	return material;
 

@@ -153,11 +153,22 @@ ${ flowData.code }
 
 			attribute.array = newArray;
 
-			const pboTexture = new DataTexture( attribute.array, width, height, format, typeMap[ attribute.array.constructor.name ] || FloatType );
+			const constructorName = attribute.array.constructor.name;
+
+			const pboTexture = new DataTexture( attribute.array, width, height, format, typeMap[ constructorName ] || FloatType );
 			pboTexture.needsUpdate = true;
 			pboTexture.isPBOTexture = true;
 
-			const pbo = new TextureNode( pboTexture );
+			const prefix = constructorName.toLowerCase().charAt( 0 );
+
+			let typePrefix = 'vec4';
+			if ( prefix === 'u' || prefix === 'i' ) {
+
+				typePrefix = prefix;
+
+			}
+
+			const pbo = new TextureNode( pboTexture, null, null, typePrefix );
 			pbo.setPrecision( 'high' );
 
 			attribute.pboNode = pbo;

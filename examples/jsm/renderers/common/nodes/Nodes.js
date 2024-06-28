@@ -345,11 +345,11 @@ class Nodes extends DataMap {
 
 				if ( environment.isCubeTexture === true ) {
 
-					environmentNode = cubeTexture( environment, null, null, 'vec4' );
+					environmentNode = cubeTexture( environment );
 
 				} else if ( environment.isTexture === true ) {
 
-					environmentNode = texture( environment, null, null, 'vec4' );
+					environmentNode = texture( environment );
 
 				} else {
 
