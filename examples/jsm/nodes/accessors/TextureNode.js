@@ -64,7 +64,7 @@ class TextureNode extends UniformNode {
 
 		if ( this.value.isDepthTexture === true ) return 'float';
 
-		if ( this.value.isDataTexture === true ) {
+		if ( this.value.isDataTexture === true && this.value.pmremVersion === undefined ) {
 
 			const prefix = this.value.source.data.data.constructor.name.toLowerCase().charAt( 0 );
 

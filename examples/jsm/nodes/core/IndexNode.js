@@ -31,7 +31,7 @@ class IndexNode extends Node {
 
 		} else if ( scope === IndexNode.BATCH ) {
 
-			propertyName = builder.getBatchingIndex();
+			propertyName = builder.getDrawIndex();
 
 		} else {
 

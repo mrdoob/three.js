@@ -11,6 +11,7 @@ import WebGLExtensions from './utils/WebGLExtensions.js';
 import WebGLCapabilities from './utils/WebGLCapabilities.js';
 import { GLFeatureName } from './utils/WebGLConstants.js';
 import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
+import { warnOnce } from '../../../../src/utils.js';
 
 //
 
@@ -703,58 +704,13 @@ class WebGLBackend extends Backend {
 
 		if ( object.isBatchedMesh ) {
 
-			if ( object._multiDrawInstances !== null ) {
+			if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
 
-				if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
-
-					const starts = object._multiDrawStarts;
-					const counts = object._multiDrawCounts;
-					const drawCount = object._multiDrawCount;
-					const instanceCount = object._multiDrawInstances;
-
-					const bytesPerElement = index ? this.get( index ).bytesPerElement : 1;
-
-					// const drawId = object.gl_DrawID;
-
-					for ( let i = 0; i < drawCount; i ++ ) {
-
-						// TODO: @Sunag how to manually update isolated uniform drawId
-						// drawId.value = i;
-						renderer.renderInstances( starts[ i ] / bytesPerElement, counts[ i ], instanceCount[ i ] );
-
-					}
-
-				} else {
-
-					renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
-
-				}
+				warnOnce( 'THREE.WebGLRenderer: WEBGL_multi_draw not supported.' );
 
 			} else {
 
-				if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
-
-					const starts = object._multiDrawStarts;
-					const counts = object._multiDrawCounts;
-					const drawCount = object._multiDrawCount;
-
-					const bytesPerElement = index ? this.get( index ).bytesPerElement : 1;
-
-					// const drawId = object.gl_DrawID;
-
-					for ( let i = 0; i < drawCount; i ++ ) {
-
-						// TODO: @Sunag how to manually update isolated uniform drawId
-						// drawId.value = i;
-						renderer.render( starts[ i ] / bytesPerElement, counts[ i ] );
-
-					}
-
-				} else {
-
-					renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
-
-				}
+				renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
 
 			}
 

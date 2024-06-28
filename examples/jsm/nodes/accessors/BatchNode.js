@@ -6,7 +6,6 @@ import { textureLoad } from './TextureNode.js';
 import { textureSize } from './TextureSizeNode.js';
 import { tangentLocal } from './TangentNode.js';
 import { instanceIndex, batchingIndex } from '../core/IndexNode.js';
-import { uniform } from '../core/UniformNode.js';
 
 class BatchNode extends Node {
 
@@ -29,7 +28,7 @@ class BatchNode extends Node {
 
 		if ( this.batchingIdNode === null ) {
 
-			if ( builder.getBatchingIndex() === false ) {
+			if ( builder.getDrawIndex() === null ) {
 
 				this.batchingIdNode = instanceIndex;
 

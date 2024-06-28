@@ -594,7 +594,7 @@ ${ flowData.code }
 
 	}
 
-	getBatchingIndex() {
+	getDrawIndex() {
 
 		const extensions = this.renderer.backend.extensions;
 
@@ -604,7 +604,7 @@ ${ flowData.code }
 
 		}
 
-		return false;
+		return null;
 
 	}
 

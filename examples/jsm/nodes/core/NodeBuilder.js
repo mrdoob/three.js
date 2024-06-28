@@ -451,7 +451,7 @@ class NodeBuilder {
 
 	}
 
-	getBatchingIndex() {
+	getDrawIndex() {
 
 		console.warn( 'Abstract function.' );
 

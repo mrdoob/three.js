@@ -603,9 +603,9 @@ ${ flowData.code }
 
 	}
 
-	getBatchingIndex() {
+	getDrawIndex() {
 
-		return false;
+		return null;
 
 	}
 
