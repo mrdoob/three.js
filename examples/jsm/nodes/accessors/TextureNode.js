@@ -10,7 +10,7 @@ import { NodeUpdateType } from '../core/constants.js';
 
 class TextureNode extends UniformNode {
 
-	constructor( value, uvNode = null, levelNode = null ) {
+	constructor( value, uvNode = null, levelNode = null, _nodeType = null ) {
 
 		super( value );
 
@@ -29,6 +29,7 @@ class TextureNode extends UniformNode {
 		this.referenceNode = null;
 
 		this._value = value;
+		this._nodeType = _nodeType;
 
 		this.setUpdateMatrix( uvNode === null );
 
@@ -62,9 +63,11 @@ class TextureNode extends UniformNode {
 
 	getNodeType( /*builder*/ ) {
 
+		if ( this._nodeType !== null ) return this._nodeType;
+
 		if ( this.value.isDepthTexture === true ) return 'float';
 
-		if ( this.value.isDataTexture === true && this.value.pmremVersion === undefined ) {
+		if ( this.value.isDataTexture === true ) {
 
 			const prefix = this.value.source.data.data.constructor.name.toLowerCase().charAt( 0 );
 

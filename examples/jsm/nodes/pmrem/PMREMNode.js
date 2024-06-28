@@ -76,7 +76,7 @@ class PMREMNode extends TempNode {
 		this.levelNode = levelNode;
 
 		this._generator = null;
-		this._texture = texture( null );
+		this._texture = texture( null, null, null, 'vec4' );
 		this._width = uniform( 0 );
 		this._height = uniform( 0 );
 		this._maxMip = uniform( 0 );
