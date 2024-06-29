@@ -157,7 +157,7 @@ ${ flowData.code }
 			pboTexture.needsUpdate = true;
 			pboTexture.isPBOTexture = true;
 
-			const pbo = new TextureNode( pboTexture );
+			const pbo = new TextureNode( pboTexture, null, null );
 			pbo.setPrecision( 'high' );
 
 			attribute.pboNode = pbo;
@@ -241,14 +241,14 @@ ${ flowData.code }
 
 			//
 
-			const typePrefix = attribute.array.constructor.name.toLowerCase().charAt( 0 );
 
 			let prefix = 'vec4';
-			if ( typePrefix === 'u' ) {
+
+			if ( attribute.pbo.type === UnsignedIntType ) {
 
 				prefix = 'uvec4';
 
-			} else if ( typePrefix === 'i' ) {
+			} else if ( attribute.pbo.type === IntType ) {
 
 				prefix = 'ivec4';
 
@@ -358,13 +358,16 @@ ${ flowData.code }
 
 				let typePrefix = '';
 
-				if ( texture.isPBOTexture === true ) {
+				if ( texture.isDataTexture === true ) {
 
-					const prefix = texture.source.data.data.constructor.name.toLowerCase().charAt( 0 );
 
-					if ( prefix === 'u' || prefix === 'i' ) {
+					if ( texture.type === UnsignedIntType ) {
 
-						typePrefix = prefix;
+						typePrefix = 'u';
+
+					} else if ( texture.type === IntType ) {
+
+						typePrefix = 'i';
 
 					}
 
@@ -594,6 +597,20 @@ ${ flowData.code }
 
 	}
 
+	getDrawIndex() {
+
+		const extensions = this.renderer.backend.extensions;
+
+		if ( extensions.has( 'WEBGL_multi_draw' ) ) {
+
+			return 'uint( gl_DrawID )';
+
+		}
+
+		return null;
+
+	}
+
 	getFrontFacing() {
 
 		return 'gl_FrontFacing';
@@ -612,6 +629,27 @@ ${ flowData.code }
 
 	}
 
+	getExtensions( shaderStage ) {
+
+		let extensions = '';
+
+		if ( shaderStage === 'vertex' ) {
+
+			const ext = this.renderer.backend.extensions;
+			const isBatchedMesh = this.object.isBatchedMesh;
+
+			if ( isBatchedMesh && ext.has( 'WEBGL_multi_draw' ) ) {
+
+				extensions += '#extension GL_ANGLE_multi_draw : require\n';
+
+			}
+
+		}
+
+		return extensions;
+
+	}
+
 	isAvailable( name ) {
 
 		let result = supports[ name ];
@@ -620,11 +658,11 @@ ${ flowData.code }
 
 			if ( name === 'float32Filterable' ) {
 
-				const extentions = this.renderer.backend.extensions;
+				const extensions = this.renderer.backend.extensions;
 
-				if ( extentions.has( 'OES_texture_float_linear' ) ) {
+				if ( extensions.has( 'OES_texture_float_linear' ) ) {
 
-					extentions.get( 'OES_texture_float_linear' );
+					extensions.get( 'OES_texture_float_linear' );
 					result = true;
 
 				} else {
@@ -688,7 +726,8 @@ ${vars}
 
 		return `#version 300 es
 
-${ this.getSignature() }
+// extensions 
+${shaderData.extensions}
 
 // precision
 ${ defaultPrecisions }
@@ -809,6 +848,7 @@ void main() {
 
 			const stageData = shadersData[ shaderStage ];
 
+			stageData.extensions = this.getExtensions( shaderStage );
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
 			stageData.varyings = this.getVaryings( shaderStage );
