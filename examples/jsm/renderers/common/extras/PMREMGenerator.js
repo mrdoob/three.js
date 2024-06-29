@@ -755,7 +755,7 @@ function _getBlurShader( lodMax, width, height ) {
 function _getCubemapMaterial( envTexture ) {
 
 	const material = _getMaterial();
-	material.fragmentNode = cubeTexture( envTexture, outputDirection, null );
+	material.fragmentNode = cubeTexture( envTexture, outputDirection );
 
 	return material;
 

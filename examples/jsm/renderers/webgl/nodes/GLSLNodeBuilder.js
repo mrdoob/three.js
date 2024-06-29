@@ -153,9 +153,7 @@ ${ flowData.code }
 
 			attribute.array = newArray;
 
-			const constructorName = attribute.array.constructor.name;
-
-			const pboTexture = new DataTexture( attribute.array, width, height, format, typeMap[ constructorName ] || FloatType );
+			const pboTexture = new DataTexture( attribute.array, width, height, format, typeMap[ attribute.array.constructor.name ] || FloatType );
 			pboTexture.needsUpdate = true;
 			pboTexture.isPBOTexture = true;
 
