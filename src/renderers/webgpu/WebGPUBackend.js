@@ -1138,8 +1138,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const { resolveBuffer, resultBuffer, isMappingPending } = renderContextData.currentTimestampQueryBuffers
-
+		const { resolveBuffer, resultBuffer, isMappingPending } = renderContextData.currentTimestampQueryBuffers;
 
 		if ( isMappingPending === true ) return;
 
@@ -1153,11 +1152,8 @@ class WebGPUBackend extends Backend {
 		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
 
 		const renderContextData = this.get( renderContext );
-		const { currentTimestampQueryBuffer } = renderContextData;
 
-		if ( currentTimestampQueryBuffer === undefined || renderContextData.currentTimestampQueryBuffers === undefined ) return;
-
-		const buffer = currentTimestampQueryBuffer;
+		if ( renderContextData.currentTimestampQueryBuffers === undefined ) return;
 
 		const { resultBuffer, isMappingPending } = renderContextData.currentTimestampQueryBuffers;
 
@@ -1178,27 +1174,6 @@ class WebGPUBackend extends Backend {
 			renderContextData.currentTimestampQueryBuffers.isMappingPending = false;
 
 		} );
-
-		try {
-
-			await buffer.mapAsync( GPUMapMode.READ );
-
-			const times = new BigUint64Array( buffer.getMappedRange() );
-			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
-
-			this.renderer.info.updateTimestamp( type, duration );
-
-		} catch ( error ) {
-
-			// Optionally handle the error, e.g., re-queue the buffer or skip it
-
-			console.error( `Error mapping buffer: ${ error }` );
-
-		} finally {
-
-			buffer.unmap();
-
-		}
 
 	}
 
