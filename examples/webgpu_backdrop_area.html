@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, depth, depthTexture, toneMapping, viewportSharedTexture, viewportMipTexture, viewportTopLeft, checker, uv, modelScale, MeshBasicNodeMaterial } from 'three';
+			import { color, linearDepth, toneMapping, viewportLinearDepth, viewportSharedTexture, viewportMipTexture, viewportTopLeft, checker, uv, modelScale } from 'three';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -65,11 +65,15 @@
 
 				// volume
 
-				const depthDistance = depthTexture().distance( depth );
-				const depthAlphaNode = depthDistance.oneMinus().smoothstep( .90, 2 ).mul( 20 ).saturate();
+				// compare depth from viewportLinearDepth with linearDepth() to create a distance field
+				// viewportLinearDepth return the linear depth of the scene
+				// linearDepth() returns the linear depth of the mesh
+				const depthDistance = viewportLinearDepth.distance( linearDepth() );
+
+				const depthAlphaNode = depthDistance.oneMinus().smoothstep( .90, 2 ).mul( 10 ).saturate();
 				const depthBlurred = viewportMipTexture().bicubic( depthDistance.smoothstep( 0, .6 ).mul( 40 * 5 ).clamp( 0, 5 ) );
 
-				const blurredBlur = new MeshBasicNodeMaterial();
+				const blurredBlur = new THREE.MeshBasicNodeMaterial();
 				blurredBlur.backdropNode = depthBlurred.add( depthAlphaNode.mix( color( 0x0066ff ), 0 ) );
 				blurredBlur.transparent = true;
 				blurredBlur.side = THREE.DoubleSide;
@@ -103,7 +107,7 @@
 				box.position.set( 0, 1, 0 );
 				scene.add( box );
 
-				const floor = new THREE.Mesh( new THREE.BoxGeometry( 1.99, .01, 1.99 ), new MeshBasicNodeMaterial( { color: 0x333333 } ) );
+				const floor = new THREE.Mesh( new THREE.BoxGeometry( 1.99, .01, 1.99 ), new THREE.MeshBasicNodeMaterial( { color: 0x333333 } ) );
 				floor.position.set( 0, 0, 0 );
 				scene.add( floor );
 

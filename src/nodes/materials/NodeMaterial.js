@@ -22,7 +22,7 @@ import AONode from '../lighting/AONode.js';
 import { lightingContext } from '../lighting/LightingContextNode.js';
 import EnvironmentNode from '../lighting/EnvironmentNode.js';
 import IrradianceNode from '../lighting/IrradianceNode.js';
-import { depthPixel } from '../display/ViewportDepthNode.js';
+import { depth } from '../display/ViewportDepthNode.js';
 import { cameraLogDepth } from '../accessors/CameraNode.js';
 import { clipping, clippingAlpha } from '../accessors/ClippingNode.js';
 import { faceDirection } from '../display/FrontFacingNode.js';
@@ -191,7 +191,7 @@ class NodeMaterial extends Material {
 
 		if ( depthNode !== null ) {
 
-			depthPixel.assign( depthNode ).append();
+			depth.assign( depthNode ).append();
 
 		}
 
@@ -439,9 +439,13 @@ class NodeMaterial extends Material {
 
 		// FOG
 
-		const fogNode = builder.fogNode;
+		if ( this.fog === true ) {
 
-		if ( fogNode ) outputNode = vec4( fogNode.mix( outputNode.rgb, fogNode.colorNode ), outputNode.a );
+			const fogNode = builder.fogNode;
+
+			if ( fogNode ) outputNode = vec4( fogNode.mix( outputNode.rgb, fogNode.colorNode ), outputNode.a );
+
+		}
 
 		return outputNode;
 

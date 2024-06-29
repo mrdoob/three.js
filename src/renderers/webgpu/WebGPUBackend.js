@@ -1119,20 +1119,32 @@ class WebGPUBackend extends Backend {
 		const renderContextData = this.get( renderContext );
 
 		const size = 2 * BigInt64Array.BYTES_PER_ELEMENT;
-		const resolveBuffer = this.device.createBuffer( {
-			size,
-			usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC,
-		} );
 
-		const resultBuffer = this.device.createBuffer( {
-			size,
-			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
-		} );
+		if ( renderContextData.currentTimestampQueryBuffers === undefined ) {
+
+			renderContextData.currentTimestampQueryBuffers = {
+				resolveBuffer: this.device.createBuffer( {
+					label: 'timestamp resolve buffer',
+					size: size,
+					usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC,
+				} ),
+				resultBuffer: this.device.createBuffer( {
+					label: 'timestamp result buffer',
+					size: size,
+					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+				} ),
+				isMappingPending: false,
+			};
+
+		}
+
+		const { resolveBuffer, resultBuffer, isMappingPending } = renderContextData.currentTimestampQueryBuffers
+
+
+		if ( isMappingPending === true ) return;
 
 		encoder.resolveQuerySet( renderContextData.timeStampQuerySet, 0, 2, resolveBuffer, 0 );
 		encoder.copyBufferToBuffer( resolveBuffer, 0, resultBuffer, 0, size );
-
-		renderContextData.currentTimestampQueryBuffer = resultBuffer;
 
 	}
 
@@ -1143,9 +1155,29 @@ class WebGPUBackend extends Backend {
 		const renderContextData = this.get( renderContext );
 		const { currentTimestampQueryBuffer } = renderContextData;
 
-		if ( currentTimestampQueryBuffer === undefined ) return;
+		if ( currentTimestampQueryBuffer === undefined || renderContextData.currentTimestampQueryBuffers === undefined ) return;
 
 		const buffer = currentTimestampQueryBuffer;
+
+		const { resultBuffer, isMappingPending } = renderContextData.currentTimestampQueryBuffers;
+
+		if ( isMappingPending === true ) return;
+
+		renderContextData.currentTimestampQueryBuffers.isMappingPending = true;
+
+		resultBuffer.mapAsync( GPUMapMode.READ ).then( () => {
+
+			const times = new BigUint64Array( resultBuffer.getMappedRange() );
+			const duration = Number( times[ 1 ] - times[ 0 ] ) / 1000000;
+
+
+			this.renderer.info.updateTimestamp( type, duration );
+
+			resultBuffer.unmap();
+
+			renderContextData.currentTimestampQueryBuffers.isMappingPending = false;
+
+		} );
 
 		try {
 
@@ -1172,9 +1204,9 @@ class WebGPUBackend extends Backend {
 
 	// node builder
 
-	createNodeBuilder( object, renderer, scene = null ) {
+	createNodeBuilder( object, renderer ) {
 
-		return new WGSLNodeBuilder( object, renderer, scene );
+		return new WGSLNodeBuilder( object, renderer );
 
 	}
 

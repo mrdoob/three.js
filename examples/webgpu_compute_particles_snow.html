@@ -81,6 +81,8 @@
 
 				collisionPosRT = new THREE.RenderTarget( 1024, 1024 );
 				collisionPosRT.texture.type = THREE.HalfFloatType;
+				collisionPosRT.texture.magFilter = THREE.NearestFilter;
+				collisionPosRT.texture.minFilter = THREE.NearestFilter;
 
 				collisionPosMaterial = new THREE.MeshBasicNodeMaterial();
 				collisionPosMaterial.fog = false;

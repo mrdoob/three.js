@@ -108,8 +108,10 @@ class Nodes extends DataMap {
 
 			if ( nodeBuilderState === undefined ) {
 
-				const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer, renderObject.scene );
+				const nodeBuilder = this.backend.createNodeBuilder( renderObject.object, this.renderer );
+				nodeBuilder.scene = renderObject.scene;
 				nodeBuilder.material = renderObject.material;
+				nodeBuilder.camera = renderObject.camera;
 				nodeBuilder.context.material = renderObject.material;
 				nodeBuilder.lightsNode = renderObject.lightsNode;
 				nodeBuilder.environmentNode = this.getEnvironmentNode( renderObject.scene );

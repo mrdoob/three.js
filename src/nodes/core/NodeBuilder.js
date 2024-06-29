@@ -34,7 +34,7 @@ import { Vector4 } from '../../math/Vector4.js';
 import { Float16BufferAttribute } from '../../core/BufferAttribute.js';
 import { IntType, UnsignedIntType, LinearFilter, LinearMipmapNearestFilter, NearestMipmapLinearFilter, LinearMipmapLinearFilter } from '../../constants.js';
 
-const bindGroupsCache = new ChainMap();
+const rendererCache = new WeakMap();
 
 const typeFromLength = new Map( [
 	[ 2, 'vec2' ],
@@ -64,14 +64,15 @@ const toFloat = ( value ) => {
 
 class NodeBuilder {
 
-	constructor( object, renderer, parser, scene = null, material = null ) {
+	constructor( object, renderer, parser ) {
 
 		this.object = object;
-		this.material = material || ( object && object.material ) || null;
+		this.material = ( object && object.material ) || null;
 		this.geometry = ( object && object.geometry ) || null;
 		this.renderer = renderer;
 		this.parser = parser;
-		this.scene = scene;
+		this.scene = null;
+		this.camera = null;
 
 		this.nodes = [];
 		this.updateNodes = [];
@@ -126,6 +127,22 @@ class NodeBuilder {
 
 	}
 
+	getBingGroupsCache() {
+
+		let bindGroupsCache = rendererCache.get( this.renderer );
+
+		if ( bindGroupsCache === undefined ) {
+
+			bindGroupsCache = new ChainMap();
+
+			rendererCache.set( this.renderer, bindGroupsCache );
+
+		}
+
+		return bindGroupsCache;
+
+	}
+
 	createRenderTarget( width, height, options ) {
 
 		return new RenderTarget( width, height, options );
@@ -153,6 +170,8 @@ class NodeBuilder {
 	}
 
 	_getBindGroup( groupName, bindings ) {
+
+		const bindGroupsCache = this.getBingGroupsCache();
 
 		// cache individual uniforms group
 

@@ -98,11 +98,9 @@
 
 				const waveStorageNode = storage( waveGPUBuffer, 'float', waveBuffer.length );
 
-
 				// read-only buffer
 
-				const waveNode = storageObject( new THREE.StorageInstancedBufferAttribute( waveBuffer, 1 ), 'float', waveBuffer.length );
-
+				const waveNode = storageObject( new THREE.StorageInstancedBufferAttribute( waveBuffer, 1 ), 'float', waveBuffer.length ).toReadOnly();
 
 				// params
 

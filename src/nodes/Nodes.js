@@ -103,7 +103,7 @@ export { default as SceneNode, backgroundBlurriness, backgroundIntensity } from 
 export { default as StorageBufferNode, storage, storageObject } from './accessors/StorageBufferNode.js';
 export * from './accessors/TangentNode.js';
 export { default as TextureNode, texture, textureLoad, /*textureLevel,*/ sampler } from './accessors/TextureNode.js';
-export { default as StorageTextureNode, storageTexture, textureStore, storageTextureReadOnly, storageTextureReadWrite } from './accessors/StorageTextureNode.js';
+export { default as StorageTextureNode, storageTexture, textureStore } from './accessors/StorageTextureNode.js';
 export { default as Texture3DNode, texture3D } from './accessors/Texture3DNode.js';
 export * from './accessors/UVNode.js';
 export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
@@ -121,10 +121,14 @@ export { default as ViewportNode, viewport, viewportCoordinate, viewportResoluti
 export { default as ViewportTextureNode, viewportTexture, viewportMipTexture } from './display/ViewportTextureNode.js';
 export { default as ViewportSharedTextureNode, viewportSharedTexture } from './display/ViewportSharedTextureNode.js';
 export { default as ViewportDepthTextureNode, viewportDepthTexture } from './display/ViewportDepthTextureNode.js';
-export { default as ViewportDepthNode, viewZToOrthographicDepth, orthographicDepthToViewZ, viewZToPerspectiveDepth, perspectiveDepthToViewZ, depth, depthTexture, depthPixel } from './display/ViewportDepthNode.js';
+export { default as ViewportDepthNode, viewZToOrthographicDepth, orthographicDepthToViewZ, viewZToPerspectiveDepth, perspectiveDepthToViewZ, depth, linearDepth, viewportLinearDepth } from './display/ViewportDepthNode.js';
 export { default as GaussianBlurNode, gaussianBlur } from './display/GaussianBlurNode.js';
 export { default as AfterImageNode, afterImage } from './display/AfterImageNode.js';
 export { default as AnamorphicNode, anamorphic } from './display/AnamorphicNode.js';
+export { default as SobelOperatorNode, sobel } from './display/SobelOperatorNode.js';
+export { default as DepthOfFieldNode, dof } from './display/DepthOfFieldNode.js';
+export { default as DotScreenNode, dotScreen } from './display/DotScreenNode.js';
+export { default as RGBShiftNode, rgbShift } from './display/RGBShiftNode.js';
 
 export { default as PassNode, pass, texturePass, depthPass } from './display/PassNode.js';
 

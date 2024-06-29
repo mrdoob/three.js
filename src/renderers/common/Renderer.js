@@ -530,6 +530,7 @@ class Renderer {
 
 		this.info.calls ++;
 		this.info.render.calls ++;
+		this.info.render.frameCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
 
@@ -1088,7 +1089,7 @@ class Renderer {
 
 		this.info.calls ++;
 		this.info.compute.calls ++;
-		this.info.compute.computeCalls ++;
+		this.info.compute.frameCalls ++;
 
 		nodeFrame.renderId = this.info.calls;
 
@@ -1098,6 +1099,7 @@ class Renderer {
 		const pipelines = this._pipelines;
 		const bindings = this._bindings;
 		const nodes = this._nodes;
+
 		const computeList = Array.isArray( computeNodes ) ? computeNodes : [ computeNodes ];
 
 		if ( computeList[ 0 ] === undefined || computeList[ 0 ].isComputeNode !== true ) {
