@@ -451,6 +451,12 @@ class NodeBuilder {
 
 	}
 
+	getDrawIndex() {
+
+		console.warn( 'Abstract function.' );
+
+	}
+
 	getFrontFacing() {
 
 		console.warn( 'Abstract function.' );

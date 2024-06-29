@@ -7,6 +7,7 @@ import { addNodeClass } from '../core/Node.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { addNodeElement, nodeProxy, vec3, nodeObject } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
+import { IntType, UnsignedIntType } from 'three';
 
 class TextureNode extends UniformNode {
 
@@ -63,6 +64,16 @@ class TextureNode extends UniformNode {
 	getNodeType( /*builder*/ ) {
 
 		if ( this.value.isDepthTexture === true ) return 'float';
+
+		if ( this.value.type === UnsignedIntType ) {
+
+			return 'uvec4';
+
+		} else if ( this.value.type === IntType ) {
+
+			return 'ivec4';
+
+		}
 
 		return 'vec4';
 
