@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { MeshBasicNodeMaterial, refractor, texture, uv } from 'three/nodes';
+			import { MeshBasicNodeMaterial, viewportSharedTexture, texture, uv } from 'three/nodes';
 
 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
@@ -65,24 +65,22 @@
 
 				// refractor
 
-				const verticalRefractor = refractor();
+				const verticalRefractor = viewportSharedTexture();
 
 				const verticalNormalScale = 0.1;
 				const verticalUVOffset = texture( floorNormal, uv().mul( 5 ) ).xy.mul( 2 ).sub( 1 ).mul( verticalNormalScale );
 				verticalRefractor.uvNode = verticalRefractor.uvNode.add( verticalUVOffset );
 
-				const refractorGeometry = new THREE.PlaneGeometry( 90, 90 );
+				const planeGeo = new THREE.PlaneGeometry( 100.1, 100.1 );
 
-				const planeRefractor = new THREE.Mesh( refractorGeometry, new MeshBasicNodeMaterial( {
+				const planeRefractor = new THREE.Mesh( planeGeo, new MeshBasicNodeMaterial( {
 					colorNode: verticalRefractor
 				} ) );
+				planeRefractor.material.transparent = true;
 				planeRefractor.position.y = 50;
-				planeRefractor.add( verticalRefractor.target );
 				scene.add( planeRefractor );
 
 				// walls
-
-				const planeGeo = new THREE.PlaneGeometry( 100.1, 100.1 );
 			
 				const planeTop = new THREE.Mesh( planeGeo, new THREE.MeshPhongMaterial( { color: 0xffffff } ) );
 				planeTop.position.y = 100;

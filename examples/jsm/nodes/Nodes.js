@@ -70,7 +70,6 @@ export { default as StorageArrayElementNode } from './utils/StorageArrayElementN
 export { default as TimerNode, timerLocal, timerGlobal, timerDelta, frameId } from './utils/TimerNode.js';
 export { default as TriplanarTexturesNode, triplanarTextures, triplanarTexture } from './utils/TriplanarTexturesNode.js';
 export { default as ReflectorNode, reflector } from './utils/ReflectorNode.js';
-export { default as RefractorNode, refractor } from './utils/RefractorNode.js';
 
 // shadernode
 export * from './shadernode/ShaderNode.js';
