@@ -708,6 +708,10 @@ class WebGLBackend extends Backend {
 
 				warnOnce( 'THREE.WebGLRenderer: WEBGL_multi_draw not supported.' );
 
+			} else if ( object._multiDrawInstances !== null ) {
+
+				renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
+
 			} else {
 
 				renderer.renderMultiDraw( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount );
