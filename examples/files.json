@@ -373,6 +373,7 @@
 		"webgpu_postprocessing_sobel",
 		"webgpu_postprocessing",
 		"webgpu_reflection",
+		"webgpu_refraction",
 		"webgpu_rtt",
 		"webgpu_sandbox",
 		"webgpu_shadertoy",
