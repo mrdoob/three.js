@@ -39,8 +39,8 @@ class InstanceNode extends Node {
 
 			const instanceAttribute = instanceMesh.instanceMatrix;
 
-			// Compatilbe with WebGL backend, WebGL2 limits UBO to 64kb. Matrix count number bigger than 1000 ( 16 * 4 * 1000 = 64kb ) will fallback to attribute.
-      
+			// Both WebGPU and WebGL backends have UBO max limited to 64kb. Matrix count number bigger than 1000 ( 16 * 4 * 1000 = 64kb ) will fallback to attribute.
+
 			if ( instanceMesh.count <= 1000 ) {
 
 				instanceMatrixNode = buffer( instanceAttribute.array, 'mat4', instanceMesh.count ).element( instanceIndex );
@@ -50,6 +50,7 @@ class InstanceNode extends Node {
 				const buffer = new InstancedInterleavedBuffer( instanceAttribute.array, 16, 1 );
 
 				this.buffer = buffer;
+
 				const bufferFn = instanceAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
 				const instanceBuffers = [
@@ -72,22 +73,13 @@ class InstanceNode extends Node {
 
 		if ( instanceColorAttribute && instanceColorNode === null ) {
 
-			// Same as instanceMatrixNode
+			const buffer = new InstancedBufferAttribute( instanceColorAttribute.array, 3 );
 
-			if ( instanceMesh.count <= 1000 ) {
+			const bufferFn = instanceColorAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
 
-				instanceColorNode = buffer( instanceColorAttribute.array, 'vec3', instanceMesh.count ).element( instanceIndex );
+			this.bufferColor = buffer;
 
-			} else {
-
-				const buffer = new InstancedBufferAttribute( instanceColorAttribute.array, 3 );
-				const bufferFn = instanceColorAttribute.usage === DynamicDrawUsage ? instancedDynamicBufferAttribute : instancedBufferAttribute;
-
-				this.bufferColor = buffer;
-
-				instanceColorNode = vec3( bufferFn( buffer, 'vec3', 3, 0 ) );
-
-			}
+			instanceColorNode = vec3( bufferFn( buffer, 'vec3', 3, 0 ) );
 
 			this.instanceColorNode = instanceColorNode;
 
