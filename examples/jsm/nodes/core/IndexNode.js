@@ -29,7 +29,7 @@ class IndexNode extends Node {
 
 			propertyName = builder.getInstanceIndex();
 
-		} else if ( scope === IndexNode.BATCH ) {
+		} else if ( scope === IndexNode.DRAW ) {
 
 			propertyName = builder.getDrawIndex();
 
@@ -61,12 +61,12 @@ class IndexNode extends Node {
 
 IndexNode.VERTEX = 'vertex';
 IndexNode.INSTANCE = 'instance';
-IndexNode.BATCH = 'batch';
+IndexNode.DRAW = 'draw';
 
 export default IndexNode;
 
 export const vertexIndex = nodeImmutable( IndexNode, IndexNode.VERTEX );
 export const instanceIndex = nodeImmutable( IndexNode, IndexNode.INSTANCE );
-export const drawIndex = nodeImmutable( IndexNode, IndexNode.BATCH );
+export const drawIndex = nodeImmutable( IndexNode, IndexNode.DRAW );
 
 addNodeClass( 'IndexNode', IndexNode );
