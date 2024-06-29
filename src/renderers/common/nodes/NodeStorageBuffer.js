@@ -10,7 +10,7 @@ class NodeStorageBuffer extends StorageBuffer {
 		super( 'StorageBuffer_' + _id ++, nodeUniform ? nodeUniform.value : null );
 
 		this.nodeUniform = nodeUniform;
-		this.access = nodeUniform ? nodeUniform.access : GPUBufferBindingType.Storage
+		this.access = nodeUniform ? nodeUniform.access : GPUBufferBindingType.Storage;
 		this.groupNode = groupNode;
 
 
