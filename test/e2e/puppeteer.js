@@ -135,6 +135,7 @@ const exceptionList = [
 	'webgpu_morphtargets_face',
 	'webgpu_occlusion',
 	'webgpu_particles',
+	'webgpu_refraction',
 	'webgpu_shadertoy',
 	'webgpu_shadowmap',
 	'webgpu_tsl_editor',
