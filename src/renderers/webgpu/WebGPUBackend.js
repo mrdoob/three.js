@@ -1304,6 +1304,21 @@ class WebGPUBackend extends Backend {
 		let dstX = 0;
 		let dstY = 0;
 
+		let srcX = 0;
+		let srcY = 0;
+
+		let srcWidth = srcTexture.image.width;
+		let srcHeight = srcTexture.image.height;
+
+		if ( srcRegion !== null ) {
+
+			srcX = srcRegion.x;
+			srcY = srcRegion.y;
+			srcWidth = srcRegion.width;
+			srcHeight = srcRegion.height;
+
+		}
+
 		if ( dstPosition !== null ) {
 
 			dstX = dstPosition.x;
@@ -1320,7 +1335,7 @@ class WebGPUBackend extends Backend {
 			{
 				texture: sourceGPU,
 				mipLevel: level,
-				origin: { x: 0, y: 0, z: 0 }
+				origin: { x: srcX, y: srcY, z: 0 }
 			},
 			{
 				texture: destinationGPU,
@@ -1328,8 +1343,8 @@ class WebGPUBackend extends Backend {
 				origin: { x: dstX, y: dstY, z: 0 }
 			},
 			[
-				srcTexture.image.width,
-				srcTexture.image.height
+				srcWidth,
+				srcHeight
 			]
 		);
 
