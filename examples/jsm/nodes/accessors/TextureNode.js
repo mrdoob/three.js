@@ -7,10 +7,11 @@ import { addNodeClass } from '../core/Node.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { addNodeElement, nodeProxy, vec3, nodeObject } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
+import { IntType, UnsignedIntType } from 'three';
 
 class TextureNode extends UniformNode {
 
-	constructor( value, uvNode = null, levelNode = null, _nodeType = null ) {
+	constructor( value, uvNode = null, levelNode = null ) {
 
 		super( value );
 
@@ -29,7 +30,6 @@ class TextureNode extends UniformNode {
 		this.referenceNode = null;
 
 		this._value = value;
-		this._nodeType = _nodeType;
 
 		this.setUpdateMatrix( uvNode === null );
 
@@ -63,9 +63,17 @@ class TextureNode extends UniformNode {
 
 	getNodeType( /*builder*/ ) {
 
-		if ( this._nodeType !== null ) return this._nodeType;
-
 		if ( this.value.isDepthTexture === true ) return 'float';
+
+		if ( this.value.type === UnsignedIntType ) {
+
+			return 'uvec4';
+
+		} else if ( this.value.type === IntType ) {
+
+			return 'ivec4';
+
+		}
 
 		return 'vec4';
 

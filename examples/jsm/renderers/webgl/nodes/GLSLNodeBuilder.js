@@ -159,16 +159,7 @@ ${ flowData.code }
 			pboTexture.needsUpdate = true;
 			pboTexture.isPBOTexture = true;
 
-			const prefix = constructorName.toLowerCase().charAt( 0 );
-
-			let typePrefix = 'vec4';
-			if ( prefix === 'u' || prefix === 'i' ) {
-
-				typePrefix = prefix;
-
-			}
-
-			const pbo = new TextureNode( pboTexture, null, null, typePrefix );
+			const pbo = new TextureNode( pboTexture, null, null );
 			pbo.setPrecision( 'high' );
 
 			attribute.pboNode = pbo;
@@ -252,14 +243,14 @@ ${ flowData.code }
 
 			//
 
-			const typePrefix = attribute.array.constructor.name.toLowerCase().charAt( 0 );
 
 			let prefix = 'vec4';
-			if ( typePrefix === 'u' ) {
+
+			if ( attribute.pbo.type === UnsignedIntType ) {
 
 				prefix = 'uvec4';
 
-			} else if ( typePrefix === 'i' ) {
+			} else if ( attribute.pbo.type === IntType ) {
 
 				prefix = 'ivec4';
 
@@ -371,11 +362,14 @@ ${ flowData.code }
 
 				if ( texture.isDataTexture === true ) {
 
-					const prefix = uniform.node._nodeType ? uniform.node._nodeType.toLowerCase().charAt( 0 ) : '';
 
-					if ( prefix === 'u' || prefix === 'i' ) {
+					if ( texture.type === UnsignedIntType ) {
 
-						typePrefix = prefix;
+						typePrefix = 'u';
+
+					} else if ( texture.type === IntType ) {
+
+						typePrefix = 'i';
 
 					}
 
