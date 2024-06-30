@@ -74,7 +74,7 @@
 				const planeGeo = new THREE.PlaneGeometry( 100.1, 100.1 );
 
 				const planeRefractor = new THREE.Mesh( planeGeo, new MeshBasicNodeMaterial( {
-					colorNode: verticalRefractor
+					backdropNode: verticalRefractor
 				} ) );
 				planeRefractor.material.transparent = true;
 				planeRefractor.position.y = 50;
