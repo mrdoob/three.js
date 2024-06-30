@@ -15,7 +15,8 @@
     "./addons": "./examples/jsm/Addons.js",
     "./addons/*": "./examples/jsm/*",
     "./src/*": "./src/*",
-    "./webgpu": "./build/three.webgpu.js"
+    "./webgpu": "./build/three.webgpu.js",
+    "./tsl": "./build/three.webgpu.js"
   },
   "repository": {
     "type": "git",
