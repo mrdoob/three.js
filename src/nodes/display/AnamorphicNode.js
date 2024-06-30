@@ -99,7 +99,7 @@ class AnamorphicNode extends TempNode {
 
 		const uvNode = textureNode.uvNode || uv();
 
-		const sampleTexture = ( uv ) => textureNode.cache().context( { getUV: () => uv, forceUVContext: true } );
+		const sampleTexture = ( uv ) => textureNode.uv( uv );
 
 		const anamorph = tslFn( () => {
 
@@ -142,7 +142,7 @@ class AnamorphicNode extends TempNode {
 
 }
 
-export const anamorphic = ( node, threshold = .9, scale = 3, samples = 32 ) => nodeObject( new AnamorphicNode( nodeObject( node ), nodeObject( threshold ), nodeObject( scale ), samples ) );
+export const anamorphic = ( node, threshold = .9, scale = 3, samples = 32 ) => nodeObject( new AnamorphicNode( nodeObject( node ).toTexture(), nodeObject( threshold ), nodeObject( scale ), samples ) );
 
 addNodeElement( 'anamorphic', anamorphic );
 
