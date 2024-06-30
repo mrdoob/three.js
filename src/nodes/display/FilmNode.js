@@ -6,36 +6,34 @@ import { timerLocal } from '../utils/TimerNode.js';
 
 class FilmNode extends TempNode {
 
-	constructor( textureNode, intensityNode = null ) {
+	constructor( inputNode, intensityNode = null, uvNode = null ) {
 
 		super();
 
-		this.textureNode = textureNode;
+		this.inputNode = inputNode;
 		this.intensityNode = intensityNode;
+		this.uvNode = uvNode;
 
 	}
 
 	setup() {
 
-		const { textureNode } = this;
-
-		const uvNode = textureNode.uvNode || uv();
+		const uvNode = this.uvNode || uv();
 
 		const film = tslFn( () => {
 
-			const base = textureNode;
-
+			const base = this.inputNode.rgb;
 			const noise = rand( fract( uvNode.add( timerLocal() ) ) );
 
-			let color = base.rgb.add( base.rgb.mul( clamp( noise.add( 0.1 ), 0, 1 ) ) );
+			let color = base.add( base.mul( clamp( noise.add( 0.1 ), 0, 1 ) ) );
 
 			if ( this.intensityNode !== null ) {
 
-				color = mix( base.rgb, color, this.intensityNode );
+				color = mix( base, color, this.intensityNode );
 
 			}
 
-			return vec4( color, base.a );
+			return vec4( color, this.inputNode.a );
 
 		} );
 
