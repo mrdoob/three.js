@@ -1,7 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { sub, mul, div } from './OperatorNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeObject, nodeProxy, float, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, nodeObject, nodeProxy, float, vec2, vec3, vec4, tslFn } from '../shadernode/ShaderNode.js';
 
 class MathNode extends TempNode {
 
@@ -330,6 +330,15 @@ export const refract = nodeProxy( MathNode, MathNode.REFRACT );
 export const smoothstep = nodeProxy( MathNode, MathNode.SMOOTHSTEP );
 export const faceForward = nodeProxy( MathNode, MathNode.FACEFORWARD );
 
+export const rand = tslFn( ( [ uv ] ) => {
+
+	const a = 12.9898, b = 78.233, c = 43758.5453;
+	const dt = dot( uv.xy, vec2( a, b ) ), sn = mod( dt, PI );
+
+	return fract( sin( sn ).mul( c ) );
+
+} );
+
 export const mixElement = ( t, e1, e2 ) => mix( e1, e2, t );
 export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
 
@@ -390,5 +399,6 @@ addNodeElement( 'difference', difference );
 addNodeElement( 'saturate', saturate );
 addNodeElement( 'cbrt', cbrt );
 addNodeElement( 'transpose', transpose );
+addNodeElement( 'rand', rand );
 
 addNodeClass( 'MathNode', MathNode );
