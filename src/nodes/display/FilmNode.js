@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, tslFn, nodeProxy, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, tslFn, nodeProxy, vec4 } from '../shadernode/ShaderNode.js';
 import { mix, fract, clamp, rand } from '../math/MathNode.js';
 import { timerLocal } from '../utils/TimerNode.js';
 
