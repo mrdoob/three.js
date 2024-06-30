@@ -7,7 +7,8 @@ import { addNodeClass } from '../core/Node.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { addNodeElement, nodeProxy, vec3, nodeObject } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { IntType, UnsignedIntType } from 'three';
+
+import { IntType, UnsignedIntType } from '../../constants.js';
 
 class TextureNode extends UniformNode {
 
