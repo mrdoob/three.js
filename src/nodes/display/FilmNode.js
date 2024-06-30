@@ -1,7 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-// import { luminance } from './ColorAdjustmentNode.js';
-import { addNodeElement, tslFn, nodeObject, /*vec3,*/ vec4 } from '../shadernode/ShaderNode.js';
+import { luminance } from './ColorAdjustmentNode.js';
+import { addNodeElement, tslFn, nodeObject, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { mix, fract, clamp, rand } from '../math/MathNode.js';
 import { timerLocal } from '../utils/TimerNode.js';
@@ -14,8 +14,8 @@ class FilmNode extends TempNode {
 
 		this.textureNode = textureNode;
 
-		this.intensity = uniform( intensity );
-		this.grayscale = uniform( Number( grayscale ) );
+		this.intensityNode = uniform( intensity );
+		this.grayscale = grayscale;
 
 	}
 
@@ -33,9 +33,13 @@ class FilmNode extends TempNode {
 
 			let color = base.rgb.add( base.rgb.mul( clamp( noise.add( 0.1 ), 0, 1 ) ) );
 
-			color = mix( base.rgb, color, this.intensity );
+			color = mix( base.rgb, color, this.intensityNode );
 
-			// this.grayscale.equal( 1 ).cond( color.assign( vec3( luminance( color ) ) ), color ); // TOOD: equal() is always true meaning grayscale is always applied
+			if ( this.grayscale === true ) {
+
+				color = vec3( luminance( color ) ); // assuming linear-srgb
+
+			}
 
 			return vec4( color, base.a );
 
