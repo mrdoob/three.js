@@ -1,21 +1,17 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { luminance } from './ColorAdjustmentNode.js';
-import { addNodeElement, tslFn, nodeObject, vec3, vec4 } from '../shadernode/ShaderNode.js';
-import { uniform } from '../core/UniformNode.js';
+import { addNodeElement, tslFn, nodeProxy, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import { mix, fract, clamp, rand } from '../math/MathNode.js';
 import { timerLocal } from '../utils/TimerNode.js';
 
 class FilmNode extends TempNode {
 
-	constructor( textureNode, intensity = 0.5, grayscale = false ) {
+	constructor( textureNode, intensityNode = null ) {
 
 		super();
 
 		this.textureNode = textureNode;
-
-		this.intensityNode = uniform( intensity );
-		this.grayscale = grayscale;
+		this.intensityNode = intensityNode;
 
 	}
 
@@ -33,11 +29,9 @@ class FilmNode extends TempNode {
 
 			let color = base.rgb.add( base.rgb.mul( clamp( noise.add( 0.1 ), 0, 1 ) ) );
 
-			color = mix( base.rgb, color, this.intensityNode );
+			if ( this.intensityNode !== null ) {
 
-			if ( this.grayscale === true ) {
-
-				color = vec3( luminance( color ) ); // assuming linear-srgb
+				color = mix( base.rgb, color, this.intensityNode );
 
 			}
 
@@ -53,7 +47,7 @@ class FilmNode extends TempNode {
 
 }
 
-export const film = ( node, intensity, grayscale ) => nodeObject( new FilmNode( nodeObject( node ), intensity, grayscale ) );
+export const film = nodeProxy( FilmNode );
 
 addNodeElement( 'film', film );
 
