@@ -132,6 +132,7 @@ class TextureNode extends UniformNode {
 	setup( builder ) {
 
 		const properties = builder.getNodeProperties( this );
+		properties.referenceNode = this.referenceNode;
 
 		//
 
