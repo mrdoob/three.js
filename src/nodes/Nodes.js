@@ -130,6 +130,7 @@ export { default as SobelOperatorNode, sobel } from './display/SobelOperatorNode
 export { default as DepthOfFieldNode, dof } from './display/DepthOfFieldNode.js';
 export { default as DotScreenNode, dotScreen } from './display/DotScreenNode.js';
 export { default as RGBShiftNode, rgbShift } from './display/RGBShiftNode.js';
+export { default as FilmNode, film } from './display/FilmNode.js';
 
 export { default as PassNode, pass, texturePass, depthPass } from './display/PassNode.js';
 
