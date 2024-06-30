@@ -7,16 +7,17 @@ import { clamp } from '../math/MathNode.js';
 
 class DepthOfFieldNode extends TempNode {
 
-	constructor( textureNode, viewZNode, focus = 1, aperture = 0.025, maxblur = 1 ) {
+	constructor( textureNode, viewZNode, focusNode, apertureNode, maxblurNode ) {
 
 		super();
 
 		this.textureNode = textureNode;
 		this.viewZNode = viewZNode;
 
-		this.focus = uniform( focus );
-		this.aperture = uniform( aperture );
-		this.maxblur = uniform( maxblur );
+		this.focusNode = focusNode;
+		this.apertureNode = apertureNode;
+		this.maxblurNode = maxblurNode;
+
 		this._aspect = uniform( 0 );
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
@@ -33,19 +34,18 @@ class DepthOfFieldNode extends TempNode {
 
 	setup() {
 
-		const { textureNode } = this;
-
+		const textureNode = this.textureNode;
 		const uvNode = textureNode.uvNode || uv();
 
-		const sampleTexture = ( uv ) => this.textureNode.uv( uv );
+		const sampleTexture = ( uv ) => textureNode.uv( uv );
 
 		const dof = tslFn( () => {
 
 			const aspectcorrect = vec2( 1.0, this._aspect );
 
-			const factor = this.focus.add( this.viewZNode );
+			const factor = this.focusNode.add( this.viewZNode );
 
-			const dofblur = vec2( clamp( factor.mul( this.aperture ), this.maxblur.negate(), this.maxblur ) );
+			const dofblur = vec2( clamp( factor.mul( this.apertureNode ), this.maxblurNode.negate(), this.maxblurNode ) );
 
 			const dofblur9 = dofblur.mul( 0.9 );
 			const dofblur7 = dofblur.mul( 0.7 );
@@ -112,7 +112,7 @@ class DepthOfFieldNode extends TempNode {
 
 }
 
-export const dof = ( node, viewZNode, focus, apeture, maxblur ) => nodeObject( new DepthOfFieldNode( nodeObject( node ), nodeObject( viewZNode ), focus, apeture, maxblur ) );
+export const dof = ( node, viewZNode, focus = 1, aperture = 0.025, maxblur = 1 ) => nodeObject( new DepthOfFieldNode( nodeObject( node ), nodeObject( viewZNode ), nodeObject( focus ), nodeObject( aperture ), nodeObject( maxblur ) ) );
 
 addNodeElement( 'dof', dof );
 
