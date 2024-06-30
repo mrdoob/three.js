@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { MeshBasicNodeMaterial, viewportSharedTexture, texture, uv } from 'three/tsl';
+			import { viewportSharedTexture, texture, uv } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -71,7 +71,7 @@
 
 				const planeGeo = new THREE.PlaneGeometry( 100.1, 100.1 );
 
-				const planeRefractor = new THREE.Mesh( planeGeo, new MeshBasicNodeMaterial( {
+				const planeRefractor = new THREE.Mesh( planeGeo, new THREE.MeshBasicNodeMaterial( {
 					backdropNode: verticalRefractor
 				} ) );
 				planeRefractor.material.transparent = true;
