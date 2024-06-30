@@ -586,9 +586,12 @@ class WebGPUBackend extends Backend {
 	updateViewport( renderContext ) {
 
 		const { currentPass } = this.get( renderContext );
-		const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
+		let { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
 
-		currentPass.setViewport( x, renderContext.height - height - y, width, height, minDepth, maxDepth );
+		width = x + width > renderContext.width ? width - 1 : width;
+		height = y + height > renderContext.height ? height - 1 : height;
+
+		currentPass.setViewport( x, y, width, height, minDepth, maxDepth );
 
 	}
 
