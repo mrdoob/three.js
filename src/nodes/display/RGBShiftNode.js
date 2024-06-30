@@ -41,7 +41,7 @@ class RGBShiftNode extends TempNode {
 
 }
 
-export const rgbShift = ( node, amount, angle ) => nodeObject( new RGBShiftNode( nodeObject( node ), amount, angle ) );
+export const rgbShift = ( node, amount, angle ) => nodeObject( new RGBShiftNode( nodeObject( node ).toTexture(), amount, angle ) );
 
 addNodeElement( 'rgbShift', rgbShift );
 
