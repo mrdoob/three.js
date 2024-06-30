@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js WebGPU - lights - ies spotlight</title>
+		<title>three.js webgpu - ies spotlight</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,15 +9,15 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - ies spotlight<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - ies spotlight<br />
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -26,14 +26,7 @@
 
 			import * as THREE from 'three';
 
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
-			import IESSpotLight from 'three/addons/lights/IESSpotLight.js';
-
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			import { IESLoader } from 'three/addons/loaders/IESLoader.js';
 
@@ -41,20 +34,6 @@
 			let lights;
 
 			async function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
-				//
-
-				scene = new THREE.Scene();
-
-				//
 
 				const iesLoader = new IESLoader().setPath( './ies/' );
 				//iesLoader.type = THREE.UnsignedByteType; // LDR
@@ -68,7 +47,11 @@
 
 				//
 
-				const spotLight = new IESSpotLight( 0xff0000, 500 );
+				scene = new THREE.Scene();
+
+				//
+
+				const spotLight = new THREE.IESSpotLight( 0xff0000, 500 );
 				spotLight.position.set( 6.5, 1.5, 6.5 );
 				spotLight.angle = Math.PI / 8;
 				spotLight.penumbra = 0.7;
@@ -78,7 +61,7 @@
 
 				//
 
-				const spotLight2 = new IESSpotLight( 0x00ff00, 500 );
+				const spotLight2 = new THREE.IESSpotLight( 0x00ff00, 500 );
 				spotLight2.position.set( 6.5, 1.5, - 6.5 );
 				spotLight2.angle = Math.PI / 8;
 				spotLight2.penumbra = 0.7;
@@ -88,7 +71,7 @@
 
 				//
 
-				const spotLight3 = new IESSpotLight( 0x0000ff, 500 );
+				const spotLight3 = new THREE.IESSpotLight( 0x0000ff, 500 );
 				spotLight3.position.set( - 6.5, 1.5, - 6.5 );
 				spotLight3.angle = Math.PI / 8;
 				spotLight3.penumbra = 0.7;
@@ -98,7 +81,7 @@
 
 				//
 
-				const spotLight4 = new IESSpotLight( 0xffffff, 500 );
+				const spotLight4 = new THREE.IESSpotLight( 0xffffff, 500 );
 				spotLight4.position.set( - 6.5, 1.5, 6.5 );
 				spotLight4.angle = Math.PI / 8;
 				spotLight4.penumbra = 0.7;
@@ -122,7 +105,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );

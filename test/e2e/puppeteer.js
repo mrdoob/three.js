@@ -263,9 +263,15 @@ async function main() {
 
 	/* Prepare injections */
 
+	const buildInjection = ( code ) => code.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
+
 	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
-	const build = ( await fs.readFile( 'build/three.module.js', 'utf8' ) ).replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
+
+	const builds = {
+		'three.module.js': buildInjection( await fs.readFile( 'build/three.module.js', 'utf8' ) ),
+		'three.webgpu.js': buildInjection( await fs.readFile( 'build/three.webgpu.js', 'utf8' ) )
+	};
 
 	/* Prepare pages */
 
@@ -274,7 +280,7 @@ async function main() {
 	const pages = await browser.pages();
 	while ( pages.length < numPages && pages.length < files.length ) pages.push( await browser.newPage() );
 
-	for ( const page of pages ) await preparePage( page, injection, build, errorMessagesCache );
+	for ( const page of pages ) await preparePage( page, injection, builds, errorMessagesCache );
 
 	/* Loop for each file */
 
@@ -315,7 +321,7 @@ async function main() {
 
 }
 
-async function preparePage( page, injection, build, errorMessages ) {
+async function preparePage( page, injection, builds, errorMessages ) {
 
 	/* let page.file, page.pageSize, page.error */
 
@@ -403,19 +409,25 @@ async function preparePage( page, injection, build, errorMessages ) {
 
 	page.on( 'request', async ( request ) => {
 
-		if ( request.url() === `http://localhost:${ port }/build/three.module.js` ) {
+		const url = request.url();
 
-			await request.respond( {
-				status: 200,
-				contentType: 'application/javascript; charset=utf-8',
-				body: build
-			} );
+		for ( const build in builds ) {
 
-		} else {
+			if ( url === `http://localhost:${ port }/build/${ build }` ) {
 
-			await request.continue();
+				await request.respond( {
+					status: 200,
+					contentType: 'application/javascript; charset=utf-8',
+					body: builds[ build ]
+				} );
+
+				return;
+
+			}
 
 		}
+
+		await request.continue();
 
 	} );
 

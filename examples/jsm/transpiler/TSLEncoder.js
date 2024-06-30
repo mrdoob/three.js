@@ -1,6 +1,6 @@
-import { REVISION } from 'three';
+import * as THREE from 'three';
+
 import { VariableDeclaration, Accessor } from './AST.js';
-import * as Nodes from '../nodes/Nodes.js';
 
 const opLib = {
 	'=': 'assign',
@@ -68,7 +68,7 @@ class TSLEncoder {
 
 		name = name.split( '.' )[ 0 ];
 
-		if ( Nodes[ name ] !== undefined && this.global.has( name ) === false && this._currentProperties[ name ] === undefined ) {
+		if ( THREE[ name ] !== undefined && this.global.has( name ) === false && this._currentProperties[ name ] === undefined ) {
 
 			this.imports.add( name );
 
@@ -685,7 +685,7 @@ ${ this.tab }} )`;
 
 		const imports = [ ...this.imports ];
 
-		let header = '// Three.js Transpiler r' + REVISION + '\n\n';
+		let header = '// Three.js Transpiler r' + THREE.REVISION + '\n\n';
 		let footer = '';
 
 		if ( this.iife ) {

@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Sprites</title>
+		<title>three.js webgpu - sprites</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -8,15 +8,15 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Sprites
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - sprites
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -24,12 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { texture, uv, userData, rangeFog, color, SpriteNodeMaterial } from 'three/nodes';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import { texture, uv, userData, rangeFog, color } from 'three/tsl';
 
 			let camera, scene, renderer;
 
@@ -42,14 +37,6 @@
 			init();
 
 			function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
 
 				const width = window.innerWidth;
 				const height = window.innerHeight;
@@ -78,7 +65,7 @@
 
 				const textureNode = texture( map );
 
-				const material = new SpriteNodeMaterial();
+				const material = new THREE.SpriteNodeMaterial();
 				material.colorNode = textureNode.mul( uv() ).mul( 2 ).saturate();
 				material.opacityNode = textureNode.a;
 				material.rotationNode = userData( 'rotation', 'float' ); // get value of: sprite.userData.rotation
@@ -107,7 +94,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );

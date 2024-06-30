@@ -13,9 +13,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -23,12 +23,6 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { MeshPhongNodeMaterial } from 'three/nodes';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -41,14 +35,6 @@
 			init();
 
 			function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
 
 				camera = new THREE.PerspectiveCamera( 36, window.innerWidth / window.innerHeight, 0.25, 16 );
 
@@ -91,12 +77,12 @@
 				// ***** Clipping planes: *****
 
 				const localPlane = new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), 0.8 );
-				const localPlane2 = new THREE.Plane( new THREE.Vector3( 0, 0, -1 ), 0.1 );
+				const localPlane2 = new THREE.Plane( new THREE.Vector3( 0, 0, - 1 ), 0.1 );
 				const globalPlane = new THREE.Plane( new THREE.Vector3( - 1, 0, 0 ), 0.1 );
 
 				// Geometry
 
-				const material = new MeshPhongNodeMaterial( {
+				const material = new THREE.MeshPhongNodeMaterial( {
 					color: 0x80ee10,
 					shininess: 0,
 					side: THREE.DoubleSide,
@@ -117,7 +103,7 @@
 
 				const ground = new THREE.Mesh(
 					new THREE.PlaneGeometry( 9, 9, 1, 1 ),
-					new MeshPhongNodeMaterial( { color: 0xa0adaf, shininess: 150 } )
+					new THREE.MeshPhongNodeMaterial( { color: 0xa0adaf, shininess: 150 } )
 				);
 
 				ground.rotation.x = - Math.PI / 2; // rotates X/Y to X/Z
@@ -131,7 +117,7 @@
 
 				// Renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

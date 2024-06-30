@@ -10,9 +10,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -20,10 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import PostProcessing from 'three/addons/renderers/common/PostProcessing.js';
-			import { pass } from 'three/nodes';
+			import { pass } from 'three/tsl';
 
 			let camera, renderer, postProcessing;
 			let object;
@@ -32,7 +29,7 @@
 
 			function init() {
 
-				renderer = new WebGPURenderer();
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -71,7 +68,7 @@
 
 				// postprocessing
 
-				postProcessing = new PostProcessing( renderer );
+				postProcessing = new THREE.PostProcessing( renderer );
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode();
