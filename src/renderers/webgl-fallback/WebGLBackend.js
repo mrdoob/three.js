@@ -9,8 +9,8 @@ import WebGLExtensions from './utils/WebGLExtensions.js';
 import WebGLCapabilities from './utils/WebGLCapabilities.js';
 import { GLFeatureName } from './utils/WebGLConstants.js';
 import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
-import { warnOnce } from '../../../../src/utils.js';
 
+import { warnOnce } from '../../utils.js';
 import { WebGLCoordinateSystem } from '../../constants.js';
 
 //
