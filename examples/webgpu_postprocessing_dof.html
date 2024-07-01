@@ -20,7 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { cubeTexture, positionWorld, oscSine, timerGlobal, pass } from 'three/tsl';
+			import { cubeTexture, positionWorld, oscSine, timerGlobal, pass, uniform } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -102,6 +102,12 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
+				const effectController = {
+					focus: uniform( 500.0 ),
+					aperture: uniform( 5 ),
+					maxblur: uniform( 0.01 )
+				};
+
 				// post processing
 
 				postProcessing = new THREE.PostProcessing( renderer );
@@ -111,7 +117,7 @@
 				const scenePassColor = scenePass.getTextureNode();
 				const scenePassViewZ = scenePass.getViewZNode();
 
-				const dofPass = scenePassColor.dof( scenePassViewZ );
+				const dofPass = scenePassColor.dof( scenePassViewZ, effectController.focus, effectController.aperture.mul( 0.00001 ), effectController.maxblur );
 
 				postProcessing.outputNode = dofPass;
 
@@ -129,28 +135,10 @@
 
 				// gui
 
-				const effectController = {
-
-					focus: 500.0,
-					aperture: 5,
-					maxblur: 0.01
-
-				};
-
-				function updateEffect( ) {
-
-					dofPass.focus.value = effectController.focus;
-					dofPass.aperture.value = effectController.aperture * 0.00001;
-					dofPass.maxblur.value = effectController.maxblur;
-
-				}
-
 				const gui = new GUI();
-				gui.add( effectController, 'focus', 10.0, 3000.0, 10 ).onChange( updateEffect );
-				gui.add( effectController, 'aperture', 0, 10, 0.1 ).onChange( updateEffect );
-				gui.add( effectController, 'maxblur', 0.0, 0.01, 0.001 ).onChange( updateEffect );
-
-				updateEffect();
+				gui.add( effectController.focus, 'value', 10.0, 3000.0, 10 ).name( 'focus' );
+				gui.add( effectController.aperture, 'value', 0, 10, 0.1 ).name( 'aperture' );
+				gui.add( effectController.maxblur, 'value', 0.0, 0.01, 0.001 ).name( 'maxblur' );
 
 			}
 
