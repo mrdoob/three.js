@@ -99,14 +99,6 @@ class AfterImageNode extends TempNode {
 		const textureNode = this.textureNode;
 		const textureNodeOld = this.textureNodeOld;
 
-		if ( textureNode.isTextureNode !== true ) {
-
-			console.error( 'AfterImageNode requires a TextureNode.' );
-
-			return vec4();
-
-		}
-
 		//
 
 		const uvNode = textureNode.uvNode || uv();

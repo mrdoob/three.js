@@ -87,14 +87,6 @@ class AnamorphicNode extends TempNode {
 
 		const textureNode = this.textureNode;
 
-		if ( textureNode.isTextureNode !== true ) {
-
-			console.error( 'AnamorphNode requires a TextureNode.' );
-
-			return vec4();
-
-		}
-
 		//
 
 		const uvNode = textureNode.uvNode || uv();
