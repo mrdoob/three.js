@@ -130,4 +130,4 @@ const builds = [
 	}
 ];
 
-export default ( args ) => args.configOnlyModule ? builds[ 0 ] : builds;
+export default ( args ) => args.configOnlyModule ? [ builds[ 0 ], builds[ 3 ] ] : builds;
