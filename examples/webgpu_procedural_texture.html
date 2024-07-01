@@ -44,12 +44,12 @@
 				// procedural to texture
 
 				const uvScale = uniform( 4 );
-				const blurIntensity = uniform( .5 );
+				const blurAmount = uniform( .5 );
 
 				const procedural = checker( uv().mul( uvScale ) );
 				const proceduralToTexture = procedural.toTexture( 512, 512 ); // ( width, height ) <- texture size
 
-				const colorNode = proceduralToTexture.gaussianBlur( blurIntensity, 10 );
+				const colorNode = proceduralToTexture.gaussianBlur( blurAmount, 10 );
 
 				// extra
 
@@ -78,7 +78,7 @@
 
 				const gui = new GUI();
 				gui.add( uvScale, 'value', 1, 10 ).name( 'uv scale ( before rtt )' );
-				gui.add( blurIntensity, 'value', 0, 2 ).name( 'blur intensity ( after rtt )' );
+				gui.add( blurAmount, 'value', 0, 2 ).name( 'blur amount ( after rtt )' );
 				gui.add( proceduralToTexture, 'autoUpdate' ).name( 'auto update' );
 
 			}
