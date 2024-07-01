@@ -3,83 +3,39 @@ import { nodeObject, addNodeElement, tslFn, vec2, vec3, vec4 } from '../shaderno
 import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uv } from '../accessors/UVNode.js';
-import { texturePass } from './PassNode.js';
 import { sin, cos } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
-import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 import { Vector2 } from '../../math/Vector2.js';
-import { RenderTarget } from '../../core/RenderTarget.js';
-
-const quadMesh = new QuadMesh();
 
 class DotScreenNode extends TempNode {
 
-	constructor( colorNode, center = new Vector2( 0.5, 0.5 ), angle = 1.57, scale = 1 ) {
+	constructor( inputNode, center = new Vector2( 0.5, 0.5 ), angle = 1.57, scale = 1 ) {
 
 		super( 'vec4' );
 
-		this.colorNode = colorNode;
+		this.inputNode = inputNode;
 		this.center = uniform( center );
 		this.angle = uniform( angle );
 		this.scale = uniform( scale );
 
-		this._renderTarget = new RenderTarget();
-		this._renderTarget.texture.name = 'dotScreen';
-
 		this._size = uniform( new Vector2() );
-
-		this._textureNode = texturePass( this, this._renderTarget.texture );
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
 	}
 
-	getTextureNode() {
+	updateBefore() {
 
-		return this._textureNode;
+		const map = this.inputNode.value;
 
-	}
-
-	setSize( width, height ) {
-
-		this._size.value.set( width, height );
-		this._renderTarget.setSize( width, height );
+		this._size.value.set( map.image.width, map.image.height );
 
 	}
 
-	updateBefore( frame ) {
+	setup() {
 
-		const { renderer } = frame;
-
-		const colorNode = this.colorNode;
-		const map = colorNode.value;
-
-		this._renderTarget.texture.type = map.type;
-
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentTexture = colorNode.value;
-
-		quadMesh.material = this._material;
-
-		this.setSize( map.image.width, map.image.height );
-
-		// render
-
-		renderer.setRenderTarget( this._renderTarget );
-
-		quadMesh.render( renderer );
-
-		// restore
-
-		renderer.setRenderTarget( currentRenderTarget );
-		colorNode.value = currentTexture;
-
-	}
-
-	setup( builder ) {
-
-		const colorNode = this.colorNode;
+		const inputNode = this.inputNode;
 
 		const pattern = tslFn( () => {
 
@@ -95,7 +51,7 @@ class DotScreenNode extends TempNode {
 
 		const dotScreen = tslFn( () => {
 
-			const color = colorNode;
+			const color = inputNode;
 
 			const average = add( color.r, color.g, color.b ).div( 3 );
 
@@ -103,19 +59,9 @@ class DotScreenNode extends TempNode {
 
 		} );
 
-		//
+		const outputNode = dotScreen();
 
-		const material = this._material || ( this._material = builder.createNodeMaterial() );
-		material.fragmentNode = dotScreen();
-
-		//
-
-		const properties = builder.getNodeProperties( this );
-		properties.textureNode = colorNode;
-
-		//
-
-		return this._textureNode;
+		return outputNode;
 
 	}
 

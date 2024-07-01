@@ -36,7 +36,7 @@ class SobelOperatorNode extends TempNode {
 
 		const uvNode = textureNode.uvNode || uv();
 
-		const sampleTexture = ( uv ) => this.textureNode.cache().context( { getUV: () => uv, forceUVContext: true } );
+		const sampleTexture = ( uv ) => textureNode.uv( uv );
 
 		const sobel = tslFn( () => {
 
@@ -114,7 +114,7 @@ class SobelOperatorNode extends TempNode {
 
 }
 
-export const sobel = ( node ) => nodeObject( new SobelOperatorNode( nodeObject( node ) ) );
+export const sobel = ( node ) => nodeObject( new SobelOperatorNode( nodeObject( node ).toTexture() ) );
 
 addNodeElement( 'sobel', sobel );
 

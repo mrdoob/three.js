@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { nodeObject, addNodeElement, tslFn, float, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { nodeObject, addNodeElement, tslFn, float, vec2, vec3 } from '../shadernode/ShaderNode.js';
 import { loop } from '../utils/LoopNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
@@ -86,17 +86,6 @@ class AnamorphicNode extends TempNode {
 	setup( builder ) {
 
 		const textureNode = this.textureNode;
-
-		if ( textureNode.isTextureNode !== true ) {
-
-			console.error( 'AnamorphNode requires a TextureNode.' );
-
-			return vec4();
-
-		}
-
-		//
-
 		const uvNode = textureNode.uvNode || uv();
 
 		const sampleTexture = ( uv ) => textureNode.uv( uv );

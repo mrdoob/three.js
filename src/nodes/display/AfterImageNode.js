@@ -99,21 +99,13 @@ class AfterImageNode extends TempNode {
 		const textureNode = this.textureNode;
 		const textureNodeOld = this.textureNodeOld;
 
-		if ( textureNode.isTextureNode !== true ) {
-
-			console.error( 'AfterImageNode requires a TextureNode.' );
-
-			return vec4();
-
-		}
-
 		//
 
 		const uvNode = textureNode.uvNode || uv();
 
 		textureNodeOld.uvNode = uvNode;
 
-		const sampleTexture = ( uv ) => textureNode.cache().context( { getUV: () => uv, forceUVContext: true } );
+		const sampleTexture = ( uv ) => textureNode.uv( uv );
 
 		const when_gt = tslFn( ( [ x_immutable, y_immutable ] ) => {
 
@@ -154,7 +146,7 @@ class AfterImageNode extends TempNode {
 
 }
 
-export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( nodeObject( node ), damp ) );
+export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( nodeObject( node ).toTexture(), damp ) );
 
 addNodeElement( 'afterImage', afterImage );
 
