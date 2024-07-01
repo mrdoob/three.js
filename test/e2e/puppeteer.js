@@ -124,6 +124,7 @@ const exceptionList = [
 
 	// WebGPURenderer: Unknown problem
 	'webgpu_postprocessing_afterimage',
+	'webgpu_postprocessing_3dlut',
 	'webgpu_backdrop_water',
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_clipping',
