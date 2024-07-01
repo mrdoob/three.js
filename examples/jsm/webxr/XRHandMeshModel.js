@@ -8,6 +8,7 @@ class XRHandMeshModel {
 
 		this.controller = controller;
 		this.handModel = handModel;
+		this.handedness = handedness;
 
 		this.bones = [];
 
@@ -106,6 +107,19 @@ class XRHandMeshModel {
 			}
 
 		}
+
+	}
+
+	dispose() {
+
+		this.handModel.children[ 0 ].traverse((obj) => {
+			if ( obj.isMesh || obj.isSkinnedMesh || obj.isInstancedMesh ) {
+				obj.geometry.dispose();
+				obj.material.dispose();
+			}
+		});
+
+		this.handModel.remove( this.handModel.children[ 0 ] );
 
 	}
 

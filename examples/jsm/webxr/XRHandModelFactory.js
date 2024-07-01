@@ -64,6 +64,13 @@ class XRHandModelFactory {
 
 			const xrInputSource = event.data;
 
+			if ( handModel.motionController && handModel.motionController.handedness !== xrInputSource.handedness ) {
+				
+				handModel.motionController.dispose();
+				handModel.motionController = null;
+
+			}
+
 			if ( xrInputSource.hand && ! handModel.motionController ) {
 
 				handModel.xrInputSource = xrInputSource;
