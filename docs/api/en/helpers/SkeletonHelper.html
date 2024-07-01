@@ -33,10 +33,20 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:Object3D object] )</h3>
+		<h3>[name]( [param:Object3D object], [param:Object options] )</h3>
 		<p>
 			object -- Usually an instance of [page:SkinnedMesh]. However, any instance
 			of [page:Object3D] can be used if it represents a hierarchy of [page:Bone Bone]s (via [page:Object3D.children]).
+		</p>
+
+		<p>
+			options -- Optional, an object with the following properties:<br />
+
+			<ul>
+				<li>
+					axesHelperSize - number - If greater than 0, an [page:AxesHelper] with the given size will be shown for each bone to aid in visual debugging. Defaults to 0.<br />
+				</li>
+			</ul>
 		</p>
 
 		<h2>Properties</h2>
