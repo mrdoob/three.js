@@ -184,7 +184,7 @@ class GaussianBlurNode extends TempNode {
 
 }
 
-export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( nodeObject( node ), directionNode, sigma ) );
+export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( nodeObject( node ).toTexture(), directionNode, sigma ) );
 
 addNodeElement( 'gaussianBlur', gaussianBlur );
 

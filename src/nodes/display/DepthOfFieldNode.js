@@ -112,7 +112,7 @@ class DepthOfFieldNode extends TempNode {
 
 }
 
-export const dof = ( node, viewZNode, focus = 1, aperture = 0.025, maxblur = 1 ) => nodeObject( new DepthOfFieldNode( nodeObject( node ), nodeObject( viewZNode ), nodeObject( focus ), nodeObject( aperture ), nodeObject( maxblur ) ) );
+export const dof = ( node, viewZNode, focus = 1, aperture = 0.025, maxblur = 1 ) => nodeObject( new DepthOfFieldNode( nodeObject( node ).toTexture(), nodeObject( viewZNode ), nodeObject( focus ), nodeObject( aperture ), nodeObject( maxblur ) ) );
 
 addNodeElement( 'dof', dof );
 
