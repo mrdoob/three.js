@@ -18,14 +18,13 @@ const quadMesh2 = new QuadMesh();
 
 class GaussianBlurNode extends TempNode {
 
-	constructor( textureNode, sigma = 2 ) {
+	constructor( textureNode, directionNode = null, sigma = 2 ) {
 
 		super( 'vec4' );
 
 		this.textureNode = textureNode;
+		this.directionNode = directionNode;
 		this.sigma = sigma;
-
-		this.directionNode = vec2( 1 );
 
 		this._invSize = uniform( new Vector2() );
 		this._passDirection = uniform( new Vector2() );
@@ -119,8 +118,9 @@ class GaussianBlurNode extends TempNode {
 		//
 
 		const uvNode = textureNode.uvNode || uv();
+		const directionNode = vec2( this.directionNode || 1 );
 
-		const sampleTexture = ( uv ) => textureNode.cache().context( { getUV: () => uv, forceUVContext: true } );
+		const sampleTexture = ( uv ) => textureNode.uv( uv );
 
 		const blur = tslFn( () => {
 
@@ -128,7 +128,7 @@ class GaussianBlurNode extends TempNode {
 			const gaussianCoefficients = this._getCoefficients( kernelSize );
 
 			const invSize = this._invSize;
-			const direction = vec2( this.directionNode ).mul( this._passDirection );
+			const direction = directionNode.mul( this._passDirection );
 
 			const weightSum = float( gaussianCoefficients[ 0 ] ).toVar();
 			const diffuseSum = vec4( sampleTexture( uvNode ).mul( weightSum ) ).toVar();
@@ -184,7 +184,7 @@ class GaussianBlurNode extends TempNode {
 
 }
 
-export const gaussianBlur = ( node, sigma ) => nodeObject( new GaussianBlurNode( nodeObject( node ), sigma ) );
+export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( nodeObject( node ), directionNode, sigma ) );
 
 addNodeElement( 'gaussianBlur', gaussianBlur );
 

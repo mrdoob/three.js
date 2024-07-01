@@ -76,7 +76,7 @@
 				const dotScreenPass = scenePassColor.dotScreen();
 				dotScreenPass.scale.value = 0.3;
 
-				const rgbShiftPass = dotScreenPass.getTextureNode().rgbShift();
+				const rgbShiftPass = dotScreenPass.rgbShift();
 				rgbShiftPass.amount.value = 0.001;
 
 				postProcessing.outputNode = rgbShiftPass;
