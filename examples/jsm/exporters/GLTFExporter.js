@@ -2,6 +2,7 @@ import {
 	BufferAttribute,
 	ClampToEdgeWrapping,
 	Color,
+	DataTexture,
 	DoubleSide,
 	InterpolateDiscrete,
 	InterpolateLinear,
@@ -539,7 +540,8 @@ class GLTFWriter {
 			onlyVisible: true,
 			maxTextureSize: Infinity,
 			animations: [],
-			includeCustomExtensions: false
+			includeCustomExtensions: false,
+			renderer: null
 		}, options );
 
 		if ( this.options.animations.length > 0 ) {
@@ -1420,6 +1422,20 @@ class GLTFWriter {
 			map = decompress( map, options.maxTextureSize );
 
 		}
+		else if ( map.isRenderTargetTexture ) {
+			
+			if ( this.options.renderer ) {
+
+				const width = map.image.width;
+				const height = map.image.height;
+				const buffer = new Uint8Array(width * height * 4);
+				this.options.renderer.readRenderTargetPixels(map.renderTargetTexture, 0, 0, width, height, buffer);
+				map = new DataTexture(buffer, width, height);
+				map.needsUpdate = true;
+
+			}
+		}
+
 
 		let mimeType = map.userData.mimeType;
 

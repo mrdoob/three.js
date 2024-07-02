@@ -30,6 +30,8 @@
 			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
+			let renderer;
+
 			function exportGLTF( input ) {
 
 				const gltfExporter = new GLTFExporter();
@@ -38,7 +40,8 @@
 					trs: params.trs,
 					onlyVisible: params.onlyVisible,
 					binary: params.binary,
-					maxTextureSize: params.maxTextureSize
+					maxTextureSize: params.maxTextureSize,
+					renderer: renderer
 				};
 				gltfExporter.parse(
 					input,
@@ -96,7 +99,7 @@
 
 			let container;
 
-			let camera, object, object2, material, geometry, scene1, scene2, renderer;
+			let camera, object, object2, material, geometry, scene1, scene2;
 			let gridHelper, sphere, model, coffeemat;
 
 			const params = {
@@ -468,6 +471,21 @@
 				renderer.toneMappingExposure = 1;
 
 				container.appendChild( renderer.domElement );
+
+
+				setTimeout(()=>{
+					
+					const renderTexture = new THREE.WebGLRenderTarget(256, 256);
+
+					renderer.setRenderTarget( renderTexture );
+					renderer.render( scene1, camera );
+					renderer.setRenderTarget( null );
+
+					// add the render texture to an object in the scene
+					const cube = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xffffff, map: renderTexture.texture } ) );				
+					scene1.add( cube );
+
+				}, 10)
 
 				//
 
