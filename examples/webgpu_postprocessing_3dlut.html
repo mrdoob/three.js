@@ -133,7 +133,13 @@
 				// post processing
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.defaultColorTransform = false; // ignore default output color transform, use renderOutput() instead
+
+				// ignore default output color transform ( toneMapping and outputColorSpace )
+				// use renderOutput() for control the sequence
+
+				postProcessing.defaultColorTransform = false;
+
+				// scene pass
 
 				const scenePass = pass( scene, camera );
 				const outputPass = renderOutput( scenePass );
