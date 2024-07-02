@@ -8,6 +8,7 @@ import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 function GeometryParametersPanel( editor, object ) {
 
 	const strings = editor.strings;
+	const signals = editor.signals;
 
 	const container = new UIDiv();
 
@@ -81,6 +82,35 @@ function GeometryParametersPanel( editor, object ) {
 	tensionRow.add( new UIText( strings.getKey( 'sidebar/geometry/tube_geometry/tension' ) ).setClass( 'Label' ), tension );
 
 	container.add( tensionRow );
+
+	//
+
+	function refreshUI() {
+
+		const parameters = object.geometry.parameters;
+
+		tubularSegments.setValue( parameters.tubularSegments );
+		radius.setValue( parameters.radius );
+		radialSegments.setValue( parameters.radialSegments );
+		closed.setValue( parameters.closed );
+
+		points.setValue( parameters.path.points, false );
+		curveType.setValue( parameters.path.curveType );
+		tension.setValue( parameters.path.tension );
+
+		tensionRow.setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
+
+	}
+
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
 
 	//
 

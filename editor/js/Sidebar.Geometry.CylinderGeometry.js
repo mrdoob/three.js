@@ -7,6 +7,7 @@ import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 function GeometryParametersPanel( editor, object ) {
 
 	const strings = editor.strings;
+	const signals = editor.signals;
 
 	const container = new UIDiv();
 
@@ -72,6 +73,31 @@ function GeometryParametersPanel( editor, object ) {
 	openEndedRow.add( openEnded );
 
 	container.add( openEndedRow );
+
+	//
+
+	function refreshUI() {
+
+		const parameters = object.geometry.parameters;
+
+		radiusTop.setValue( parameters.radiusTop );
+		radiusBottom.setValue( parameters.radiusBottom );
+		height.setValue( parameters.height );
+		radialSegments.setValue( parameters.radialSegments );
+		heightSegments.setValue( parameters.heightSegments );
+		openEnded.setValue( parameters.openEnded );
+
+	}
+
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
 
 	//
 

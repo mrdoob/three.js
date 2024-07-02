@@ -103,7 +103,8 @@
 				"Earcut": "api/en/extras/Earcut",
 				"ImageUtils": "api/en/extras/ImageUtils",
 				"PMREMGenerator": "api/en/extras/PMREMGenerator",
-				"ShapeUtils": "api/en/extras/ShapeUtils"
+				"ShapeUtils": "api/en/extras/ShapeUtils",
+				"TextureUtils": "api/en/extras/TextureUtils"
 			},
 
 			"Extras / Core": {
@@ -343,8 +344,9 @@
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/en/geometries/ParametricGeometry",
-				"TextGeometry": "examples/en/geometries/TextGeometry",
-				"SDFGeometryGenerator": "examples/en/geometries/SDFGeometryGenerator"
+				"SDFGeometryGenerator": "examples/en/geometries/SDFGeometryGenerator",
+				"TeapotGeometry": "examples/en/geometries/TeapotGeometry",
+				"TextGeometry": "examples/en/geometries/TextGeometry"
 			},
 
 			"Helpers": {
@@ -1117,17 +1119,20 @@
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
 				"KTX2Loader": "examples/zh/loaders/KTX2Loader",
 				"LDrawLoader": "examples/zh/loaders/LDrawLoader",
+				"LUT3dlLoader": "examples/zh/loaders/LUT3dlLoader",
+				"LUTCubeLoader": "examples/zh/loaders/LUTCubeLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
 				"PCDLoader": "examples/zh/loaders/PCDLoader",
-				"PDBLoader": "examples/en/loaders/PDBLoader",
+				"PDBLoader": "examples/zh/loaders/PDBLoader",
 				"SVGLoader": "examples/zh/loaders/SVGLoader",
 				"TGALoader": "examples/zh/loaders/TGALoader"
 			},
 
 			"物体": {
-				"Lensflare": "examples/zh/objects/Lensflare"
+				"Lensflare": "examples/zh/objects/Lensflare",
+				"Sky": "examples/zh/objects/Sky"
 			},
 
 			"后期处理": {
@@ -1147,6 +1152,10 @@
 				"LookupTable": "examples/zh/math/Lut",
 				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler",
 				"OBB": "examples/zh/math/OBB"
+			},
+
+			"修改器":{
+				"EdgeSplitModifier": "examples/zh/modifiers/EdgeSplitModifier"
 			},
 
 			"杂项": {
@@ -1345,6 +1354,7 @@
 		"Addons": {
 
 			"컨트롤": {
+				"ArcballControls": "examples/ko/controls/ArcballControls",
 				"DragControls": "examples/ko/controls/DragControls",
 				"FirstPersonControls": "examples/ko/controls/FirstPersonControls",
 				"FlyControls": "examples/ko/controls/FlyControls",

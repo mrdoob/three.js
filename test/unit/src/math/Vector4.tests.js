@@ -290,6 +290,19 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( 'setFromMatrixPosition', ( assert ) => {
+
+			const a = new Vector4();
+			const m = new Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
+
+			a.setFromMatrixPosition( m );
+			assert.strictEqual( a.x, 7, 'Check x' );
+			assert.strictEqual( a.y, 19, 'Check y' );
+			assert.strictEqual( a.z, 37, 'Check z' );
+			assert.strictEqual( a.w, 53, 'Check w' );
+
+		} );
+
 		QUnit.todo( 'min', ( assert ) => {
 
 			assert.ok( false, 'everything\'s gonna be alright' );

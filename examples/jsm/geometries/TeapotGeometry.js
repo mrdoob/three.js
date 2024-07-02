@@ -10,7 +10,7 @@ import {
  * Tessellates the famous Utah teapot database by Martin Newell into triangles.
  *
  * Parameters: size = 50, segments = 10, bottom = true, lid = true, body = true,
- *   fitLid = false, blinn = true
+ *   fitLid = true, blinn = true
  *
  * size is a relative scale: I've scaled the teapot to fit vertically between -1 and 1.
  * Think of it as a "radius".

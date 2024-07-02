@@ -59,50 +59,28 @@ class RenderTransitionPass extends Pass {
 
 	render( renderer, writeBuffer ) {
 
+		renderer.setRenderTarget( this.renderTargetA );
+		renderer.render( this.sceneA, this.cameraA );
+		renderer.setRenderTarget( this.renderTargetB );
+		renderer.render( this.sceneB, this.cameraB );
+
 		const uniforms = this.fsQuad.material.uniforms;
-		const transition = uniforms.mixRatio.value;
+		uniforms.tDiffuse1.value = this.renderTargetA.texture;
+		uniforms.tDiffuse2.value = this.renderTargetB.texture;
 
-		// Prevent render both scenes when it's not necessary
+		if ( this.renderToScreen ) {
 
-		if ( transition === 0 ) {
-
-			renderer.setRenderTarget( writeBuffer );
-			if ( this.clear ) renderer.clear();
-			renderer.render( this.sceneB, this.cameraB );
-
-		} else if ( transition === 1 ) {
-
-			renderer.setRenderTarget( writeBuffer );
-			if ( this.clear ) renderer.clear();
-			renderer.render( this.sceneA, this.cameraA );
+			renderer.setRenderTarget( null );
+			renderer.clear();
 
 		} else {
 
-			// When 0 < transition < 1 render transition between two scenes
-
-			renderer.setRenderTarget( this.renderTargetA );
-			renderer.render( this.sceneA, this.cameraA );
-			renderer.setRenderTarget( this.renderTargetB );
-			renderer.render( this.sceneB, this.cameraB );
-
-			uniforms.tDiffuse1.value = this.renderTargetA.texture;
-			uniforms.tDiffuse2.value = this.renderTargetB.texture;
-
-			if ( this.renderToScreen ) {
-
-				renderer.setRenderTarget( null );
-				renderer.clear();
-
-			} else {
-
-				renderer.setRenderTarget( writeBuffer );
-				if ( this.clear ) renderer.clear();
-
-			}
-
-			this.fsQuad.render( renderer );
+			renderer.setRenderTarget( writeBuffer );
+			if ( this.clear ) renderer.clear();
 
 		}
+
+		this.fsQuad.render( renderer );
 
 	}
 
@@ -178,9 +156,6 @@ class RenderTransitionPass extends Pass {
 						gl_FragColor = mix( texel2, texel1, mixRatio );
 
 					}
-
-					#include <tonemapping_fragment>
-					#include <colorspace_fragment>
 
 				}
 			`

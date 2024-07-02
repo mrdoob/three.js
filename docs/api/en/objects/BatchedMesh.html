@@ -14,32 +14,42 @@
 		<p class="desc">
 			A special version of [page:Mesh] with multi draw batch rendering support. Use
 			[name] if you have to render a large number of objects with the same
-			material but with different world transformations and geometry. The usage
-			of [name] will help you to reduce the number of draw calls and thus
-			improve the overall rendering performance in your application.
+			material but with different world transformations. The usage of [name] will
+			help you to reduce the number of draw calls and thus improve the overall
+			rendering performance in your application.
 
 			<br/>
 			<br/>
 
 			If the [link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_multi_draw WEBGL_multi_draw extension] is
-			not supported then a less performant callback is used.
+			not supported then a less performant fallback is used.
 		</p>
 
 		<h2>Code Example</h2>
 
 		<code>
 		const box = new THREE.BoxGeometry( 1, 1, 1 );
-		const sphere = new THREE.BoxGeometry( 1, 1, 1 );
+		const sphere = new THREE.SphereGeometry( 1, 12, 12 );
 		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 
 		// initialize and add geometries into the batched mesh
 		const batchedMesh = new BatchedMesh( 10, 5000, 10000, material );
-		const boxId = batchedMesh.addGeometry( box );
-		const sphereId = batchedMesh.addGeometry( sphere );
+		const boxGeometryId = batchedMesh.addGeometry( box );
+		const sphereGeometryId = batchedMesh.addGeometry( sphere );
+
+		// create instances of those geometries
+		const boxInstancedId1 = batchedMesh.addInstance( boxGeometryId );
+		const boxInstancedId2 = batchedMesh.addInstance( boxGeometryId );
+
+		const sphereInstancedId1 = batchedMesh.addInstance( sphereGeometryId );
+		const sphereInstancedId2 = batchedMesh.addInstance( sphereGeometryId );
 
 		// position the geometries
-		batchedMesh.setMatrixAt( boxId, boxMatrix );
-		batchedMesh.setMatrixAt( sphereId, sphereMatrix );
+		batchedMesh.setMatrixAt( boxInstancedId1, boxMatrix1 );
+		batchedMesh.setMatrixAt( boxInstancedId2, boxMatrix2 );
+
+		batchedMesh.setMatrixAt( sphereInstancedId1, sphereMatrix1 );
+		batchedMesh.setMatrixAt( sphereInstancedId2, sphereMatrix2 );
 
 		scene.add( batchedMesh );
 		</code>
@@ -52,16 +62,15 @@
 		<h2>Constructor</h2>
 		<h3>
 			[name](
-				[param:Integer maxGeometryCount], [param:Integer maxVertexCount],
+				[param:Integer maxInstanceCount], [param:Integer maxVertexCount],
 				[param:Integer maxIndexCount], [param:Material material],
 			)
 		</h3>
 		<p>
-			[page:Integer maxGeometryCount] - the max number of individual geometries planned to be added.<br />
-			[page:Integer maxVertexCount] - the max number of vertices to be used by all geometries.<br />
-			[page:Integer maxIndexCount] - the max number of indices to be used by all geometries.<br />
-			[page:Material material] - an instance of [page:Material]. Default is a
-			new [page:MeshBasicMaterial].<br />
+			[page:Integer maxInstanceCount] - the max number of individual instances planned to be added and rendered.<br />
+			[page:Integer maxVertexCount] - the max number of vertices to be used by all unique geometries.<br />
+			[page:Integer maxIndexCount] - the max number of indices to be used by all unique geometries.<br />
+			[page:Material material] - an instance of [page:Material]. Default is a new [page:MeshBasicMaterial].<br />
 		</p>
 
 		<h2>Properties</h2>
@@ -91,9 +100,9 @@
 			rendered front to back. Default is `true`.
 		</p>
 
-		<h3>[property:Integer maxGeometryCount]</h3>
+		<h3>[property:Integer maxInstanceCount]</h3>
 		<p>
-			The maximum number of individual geometries that can be stored in the [name]. Read only.
+			The maximum number of individual instances that can be stored in the [name]. Read only.
 		</p>
 
 		<h3>[property:Boolean isBatchedMesh]</h3>
@@ -125,63 +134,57 @@
 
 		<h3>[method:this setCustomSort]( [param:Function sortFunction] )</h3>
 		<p>
-			Takes a sort a function that is run before render. The function takes a list of items to sort and a camera. The objects
+			Takes a sort a function that is run before render. The function takes a list of instances to sort and a camera. The objects
 			in the list include a "z" field to perform a depth-ordered sort with.
 		</p>
 
 		<h3>
-			[method:undefined getColorAt]( [param:Integer index], [param:Color color] )
+			[method:undefined getColorAt]( [param:Integer instanceId], [param:Color target] )
 		</h3>
 		<p>
-			[page:Integer index]: The index of a geometry. Values have to be in the
-			range [0, count].
+			[page:Integer instanceId]: The id of an instance to get the color of.
 		</p>
 		<p>
-			[page:Color color]: This color object will be set to the color of the
-			defined geometry.
+			[page:Color target]: The target object to copy the color in to.
 		</p>
 		<p>Get the color of the defined geometry.</p>
 
 		<h3>
-			[method:Matrix4 getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
+			[method:Matrix4 getMatrixAt]( [param:Integer instanceId], [param:Matrix4 target] )
 		</h3>
 		<p>
-			[page:Integer index]: The index of an instance. Values have to be in the
-			range [0, count].
+			[page:Integer instanceId]: The id of an instance to get the matrix of.
 		</p>
 		<p>
-			[page:Matrix4 matrix]: This 4x4 matrix will be set to the local
+			[page:Matrix4 target]: This 4x4 matrix will be set to the local
 			transformation matrix of the defined instance.
 		</p>
 		<p>Get the local transformation matrix of the defined instance.</p>
 
 		<h3>
-			[method:Boolean getVisibleAt]( [param:Integer index] )
+			[method:Boolean getVisibleAt]( [param:Integer instanceId] )
 		</h3>
 		<p>
-			[page:Integer index]: The index of an instance. Values have to be in the
-			range [0, count].
+			[page:Integer instanceId]: The id of an instance to get the visibility state of.
 		</p>
 		<p>Get whether the given instance is marked as "visible" or not.</p>
 
 		<h3>
-			[method:undefined setColorAt]( [param:Integer index], [param:Color color] )
+			[method:undefined setColorAt]( [param:Integer instanceId], [param:Color color] )
 		</h3>
 		<p>
-			[page:Integer index]: The index of a geometry. Values have to be in the
-			range [0, count].
+			[page:Integer instanceId]: The id of the instance to set the color of.
 		</p>
-		<p>[page:Color color]: The color of a single geometry.</p>
+		<p>[page:Color color]: The color to set the instance to.</p>
 		<p>
-			Sets the given color to the defined geometry.
+			Sets the given color to the defined geometry instance.
 		</p>
 
 		<h3>
-			[method:this setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )
+			[method:this setMatrixAt]( [param:Integer instanceId], [param:Matrix4 matrix] )
 		</h3>
 		<p>
-			[page:Integer index]: The index of an instance. Values have to be in the
-			range [0, count].
+			[page:Integer instanceId]: The id of an instance to set the matrix of.
 		</p>
 		<p>
 			[page:Matrix4 matrix]: A 4x4 matrix representing the local transformation
@@ -192,17 +195,16 @@
 		</p>
 
 		<h3>
-			[method:this setVisibleAt]( [param:Integer index], [param:Boolean visible] )
+			[method:this setVisibleAt]( [param:Integer instanceId], [param:Boolean visible] )
 		</h3>
 		<p>
-			[page:Integer index]: The index of an instance. Values have to be in the
-			range [0, count].
+			[page:Integer instanceId]: The id of the instance to set the visibility of.
 		</p>
 		<p>
 			[page:Boolean visible]: A boolean value indicating the visibility state.
 		</p>
 		<p>
-			Sets the visibility of the object at the given index.
+			Sets the visibility of the instance at the given index.
 		</p>
 
 		<h3>
@@ -222,22 +224,35 @@
 			the length of the given geometry index buffer.
 		</p>
 		<p>
-			Adds the given geometry to the [name] and returns the associated index referring to it.
+			Adds the given geometry to the [name] and returns the associated geometry id referring to it to be used in other functions.
 		</p>
 
 		<h3>
-			[method:Integer setGeometryAt]( [param:Integer index], [param:BufferGeometry geometry] )
+			[method:Integer addInstance]( [param:Integer geometryId] )
 		</h3>
 		<p>
-			[page:Integer index]: Which geometry index to replace with this geometry.
+			[page:Integer geometryId]: The id of a previously added geometry via "addGeometry" to add into the [name] to render.
 		</p>
 		<p>
-			[page:BufferGeometry geometry]: The geometry to substitute at the given geometry index.
-		</p>
-		<p>
-			Replaces the geometry at `index` with the provided geometry. Throws an error if there is not enough space reserved for geometry at the index.
+			Adds a new instance to the [name] using the geometry of the given geometryId and returns a new id referring to the new instance to be used
+			by other functions.
 		</p>
 
+		<h3>
+			[method:Integer setGeometryAt]( [param:Integer geometryId], [param:BufferGeometry geometry] )
+		</h3>
+		<p>
+			[page:Integer geometryId]: Which geometry id to replace with this geometry.
+		</p>
+		<p>
+			[page:BufferGeometry geometry]: The geometry to substitute at the given geometry id.
+		</p>
+		<p>
+			Replaces the geometry at `geometryId` with the provided geometry. Throws an error if there is not enough space reserved for geometry.
+			Calling this will change all instances that are rendering that geometry.
+		</p>
+
+		<!--
 		<h3>
 			[method:Integer getInstanceCountAt]( [param:Integer index] )
 		</h3>
@@ -261,6 +276,7 @@
 		<p>
 			Sets an instance count of the geometry at `index`.
 		</p>
+		-->
 
 		<h2>Source</h2>
 

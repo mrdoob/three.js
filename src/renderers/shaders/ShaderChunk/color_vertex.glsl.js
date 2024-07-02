@@ -23,7 +23,7 @@ export default /* glsl */`
 
 #ifdef USE_BATCHING_COLOR
 
-	vec3 batchingColor = getBatchingColor( batchId );
+	vec3 batchingColor = getBatchingColor( getIndirectIndex( gl_DrawID ) );
 
 	vColor.xyz *= batchingColor.xyz;
 

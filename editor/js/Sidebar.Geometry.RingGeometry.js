@@ -7,6 +7,7 @@ import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 function GeometryParametersPanel( editor, object ) {
 
 	const strings = editor.strings;
+	const signals = editor.signals;
 
 	const container = new UIDiv();
 
@@ -72,6 +73,31 @@ function GeometryParametersPanel( editor, object ) {
 	thetaLengthRow.add( thetaLength );
 
 	container.add( thetaLengthRow );
+
+	//
+
+	function refreshUI() {
+
+		const parameters = object.geometry.parameters;
+
+		innerRadius.setValue( parameters.innerRadius );
+		outerRadius.setValue( parameters.outerRadius );
+		thetaSegments.setValue( parameters.thetaSegments );
+		phiSegments.setValue( parameters.phiSegments );
+		thetaStart.setValue( parameters.thetaStart * THREE.MathUtils.RAD2DEG );
+		thetaLength.setValue( parameters.thetaLength * THREE.MathUtils.RAD2DEG );
+
+	}
+
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
 
 	//
 

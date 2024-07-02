@@ -379,6 +379,12 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+		this.getDepthTexture = function () {
+
+			return depthSensing.getDepthTexture();
+
+		};
+
 		function onInputSourcesChange( event ) {
 
 			// Notify disconnected

@@ -49,12 +49,12 @@
 	<h2>构造函数</h2>
 	<h3>
 		[name](
-		[param:Integer maxGeometryCount], [param:Integer maxVertexCount],
+		[param:Integer maxInstanceCount], [param:Integer maxVertexCount],
 		[param:Integer maxIndexCount], [param:Material material],
 		)
 	</h3>
 	<p>
-		[page:Integer maxGeometryCount] - 计划添加的单个几何体的最大数量。<br />
+		[page:Integer maxInstanceCount] - 计划添加的单个几何体的最大数量。<br />
 		[page:Integer maxVertexCount] - 所有几何体使用的最大顶点数。<br />
 		[page:Integer maxIndexCount] - 所有几何图形使用的最大索引数。<br />
 		[page:Material material] - [page:Material] 的一个实例。默认是新的 [page:MeshBasicMaterial]。<br />
@@ -83,7 +83,7 @@
 		如果为 true，则对 [name] 中的各个对象进行排序以改善与过度绘制相关的工件。如果材质被标记为“透明”，则对象将从后到前渲染，如果没有，则它们从前到后渲染。默认为 `true`。
 	</p>
 
-	<h3>[property:Integer maxGeometryCount]</h3>
+	<h3>[property:Integer maxInstanceCount]</h3>
 	<p>
 		只读，[name] 中可以存储的单个几何体的最大数量。
 	</p>
