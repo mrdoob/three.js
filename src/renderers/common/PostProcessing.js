@@ -11,7 +11,7 @@ class PostProcessing {
 		this.renderer = renderer;
 		this.outputNode = outputNode;
 
-		this.defaultColorTransform = true;
+		this.outputColorTransform = true;
 
 		this.needsUpdate = true;
 
@@ -49,7 +49,7 @@ class PostProcessing {
 			const toneMapping = renderer.toneMapping;
 			const outputColorSpace = renderer.outputColorSpace;
 
-			quadMesh.material.fragmentNode = this.defaultColorTransform === true ? renderOutput( this.outputNode, toneMapping, outputColorSpace ) : this.outputNode.context( { toneMapping, outputColorSpace } );
+			quadMesh.material.fragmentNode = this.outputColorTransform === true ? renderOutput( this.outputNode, toneMapping, outputColorSpace ) : this.outputNode.context( { toneMapping, outputColorSpace } );
 			quadMesh.material.needsUpdate = true;
 
 			this.needsUpdate = false;
