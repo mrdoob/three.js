@@ -135,7 +135,7 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera, { samples: 4 } );
+				const scenePass = pass( scene, camera, { samples: params.samples } );
 				const scenePassColor = scenePass.getTextureNode();
 
 				const outputPass = scenePassColor.toneMapping( THREE.ACESFilmicToneMapping ).linearTosRGB();

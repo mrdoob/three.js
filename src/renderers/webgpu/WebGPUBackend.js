@@ -434,6 +434,7 @@ class WebGPUBackend extends Backend {
 		}
 
 		//
+
 		const encoder = device.createCommandEncoder( { label: 'renderContext_' + renderContext.id } );
 		const currentPass = encoder.beginRenderPass( descriptor );
 
