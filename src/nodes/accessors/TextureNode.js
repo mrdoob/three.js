@@ -304,17 +304,17 @@ class TextureNode extends UniformNode {
 	uv( uvNode ) {
 
 		const textureNode = this.clone();
-		textureNode.uvNode = uvNode;
+		textureNode.uvNode = nodeObject( uvNode );
 		textureNode.referenceNode = this;
 
 		return nodeObject( textureNode );
 
 	}
 
-	blur( levelNode ) {
+	blur( amountNode ) {
 
 		const textureNode = this.clone();
-		textureNode.levelNode = levelNode.mul( maxMipLevel( textureNode ) );
+		textureNode.biasNode = nodeObject( amountNode ).mul( maxMipLevel( textureNode ) );
 		textureNode.referenceNode = this;
 
 		return nodeObject( textureNode );
@@ -324,16 +324,26 @@ class TextureNode extends UniformNode {
 	level( levelNode ) {
 
 		const textureNode = this.clone();
-		textureNode.levelNode = levelNode;
+		textureNode.levelNode = nodeObject( levelNode );
 		textureNode.referenceNode = this;
 
-		return textureNode;
+		return nodeObject( textureNode );
 
 	}
 
 	size( levelNode ) {
 
 		return textureSize( this, levelNode );
+
+	}
+
+	bias( biasNode ) {
+
+		const textureNode = this.clone();
+		textureNode.biasNode = nodeObject( biasNode );
+		textureNode.referenceNode = this;
+
+		return nodeObject( textureNode );
 
 	}
 
@@ -400,7 +410,7 @@ class TextureNode extends UniformNode {
 
 	clone() {
 
-		const newNode = new this.constructor( this.value, this.uvNode, this.levelNode );
+		const newNode = new this.constructor( this.value, this.uvNode, this.levelNode, this.biasNode );
 		newNode.sampler = this.sampler;
 
 		return newNode;

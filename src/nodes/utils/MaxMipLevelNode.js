@@ -9,15 +9,21 @@ class MaxMipLevelNode extends UniformNode {
 
 		super( 0 );
 
-		this.textureNode = textureNode;
+		this._textureNode = textureNode;
 
 		this.updateType = NodeUpdateType.FRAME;
 
 	}
 
+	get textureNode() {
+
+		return this._textureNode;
+
+	}
+
 	get texture() {
 
-		return this.textureNode.value;
+		return this._textureNode.value;
 
 	}
 
