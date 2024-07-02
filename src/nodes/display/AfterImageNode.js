@@ -9,7 +9,6 @@ import { sign, max } from '../math/MathNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 import { Vector2 } from '../../math/Vector2.js';
-import { NoToneMapping } from '../../constants.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 
 const _size = new Vector2();
