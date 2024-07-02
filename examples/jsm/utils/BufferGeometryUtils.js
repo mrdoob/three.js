@@ -120,10 +120,13 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 	let offset = 0;
 
+	let nextGroupIndex = 0;
+
 	for ( let i = 0; i < geometries.length; ++ i ) {
 
 		const geometry = geometries[ i ];
 		let attributesCount = 0;
+		let groupIndex = nextGroupIndex;
 
 		// ensure that all geometries are indexed, or none
 
@@ -205,8 +208,25 @@ function mergeGeometries( geometries, useGroups = false ) {
 
 			}
 
-			mergedGeometry.addGroup( offset, count, i );
+			if ( geometry.groups.length > 0 ) {
 
+				// Keep existing groups
+
+				for ( let group of geometry.groups ) {
+
+					let offsetMaterialIndex = groupIndex + group.materialIndex;
+					mergedGeometry.addGroup( offset + group.start, Math.min( group.count, count ), offsetMaterialIndex );
+					nextGroupIndex = Math.max( nextGroupIndex, offsetMaterialIndex );
+
+				}
+
+			} else {
+
+				mergedGeometry.addGroup( offset, count, groupIndex );
+
+			}
+
+			++ nextGroupIndex;
 			offset += count;
 
 		}
