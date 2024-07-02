@@ -27,8 +27,9 @@
 		</script>
 
 		<script type="module">
+
 			import * as THREE from 'three';
-			import { pass, texture3D, uniform } from 'three/tsl';
+			import { pass, texture3D, uniform, renderOutput, tslFn } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -126,18 +127,18 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMapping = THREE.NoToneMapping;
-				renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
-				// postprocessing
+				// post processing
 
 				postProcessing = new THREE.PostProcessing( renderer );
+				postProcessing.defaultOutputTransform = false;
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode();
 
-				const outputPass = scenePassColor.toneMapping( THREE.ACESFilmicToneMapping ).linearTosRGB();
+				const outputPass = renderOutput( scenePassColor );
 
 				lutPass = outputPass.lut3D();
 				lutPass.lutNode = texture3D( lutMap[ params.lut ] );

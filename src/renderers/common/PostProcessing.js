@@ -1,4 +1,5 @@
-import { vec4, NodeMaterial } from '../../nodes/Nodes.js';
+import { vec4, renderOutput, NodeMaterial } from '../../nodes/Nodes.js';
+import { LinearSRGBColorSpace, NoToneMapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 const quadMesh = new QuadMesh( new NodeMaterial() );
@@ -10,27 +11,73 @@ class PostProcessing {
 		this.renderer = renderer;
 		this.outputNode = outputNode;
 
+		this.defaultOutputTransform = true;
+
+		this.needsUpdate = true;
+
 	}
 
 	render() {
 
-		quadMesh.material.fragmentNode = this.outputNode;
+		this.update();
+
+		const renderer = this.renderer;
+
+		const toneMapping = renderer.toneMapping;
+		const outputColorSpace = renderer.outputColorSpace;
+
+		renderer.toneMapping = NoToneMapping;
+		renderer.outputColorSpace = LinearSRGBColorSpace;
+
+		//
 
 		quadMesh.render( this.renderer );
 
-	}
+		//
 
-	renderAsync() {
-
-		quadMesh.material.fragmentNode = this.outputNode;
-
-		return quadMesh.renderAsync( this.renderer );
+		renderer.toneMapping = toneMapping;
+		renderer.outputColorSpace = outputColorSpace;
 
 	}
 
-	set needsUpdate( value ) {
+	update() {
 
-		quadMesh.material.needsUpdate = value;
+		if ( this.needsUpdate === true ) {
+
+			const renderer = this.renderer;
+
+			const toneMapping = renderer.toneMapping;
+			const outputColorSpace = renderer.outputColorSpace;
+
+			quadMesh.material.fragmentNode = this.defaultOutputTransform === true ? renderOutput( this.outputNode, toneMapping, outputColorSpace ) : this.outputNode.context( { toneMapping, outputColorSpace } );
+			quadMesh.material.needsUpdate = true;
+
+			this.needsUpdate = false;
+
+		}
+
+	}
+
+	async renderAsync() {
+
+		this.update();
+
+		const renderer = this.renderer;
+
+		const toneMapping = renderer.toneMapping;
+		const outputColorSpace = renderer.outputColorSpace;
+
+		renderer.toneMapping = NoToneMapping;
+		renderer.outputColorSpace = LinearSRGBColorSpace;
+
+		//
+
+		await quadMesh.renderAsync( this.renderer );
+
+		//
+
+		renderer.toneMapping = toneMapping;
+		renderer.outputColorSpace = outputColorSpace;
 
 	}
 
