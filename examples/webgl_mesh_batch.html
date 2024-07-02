@@ -41,6 +41,7 @@
 		let camera, controls, scene, renderer;
 		let geometries, mesh, material;
 		const ids = [];
+		const geometryIds = [];
 		const matrix = new THREE.Matrix4();
 
 		//
@@ -131,7 +132,7 @@
 
 				mesh.parent.remove( mesh );
 
-				if ( mesh.dispose ) {
+				if ( mesh.dispose && api.method === Method.NAIVE ) {
 
 					mesh.dispose();
 
@@ -178,25 +179,41 @@
 
 		function initBatchedMesh() {
 
-			const geometryCount = api.count;
-			const vertexCount = geometries.length * 512;
-			const indexCount = geometries.length * 1024;
+			if ( mesh && mesh.isBatchedMesh ) {
+
+				// Delete all instances to recreate them
+				for ( let i = 0; i < ids.length; i ++ ) {
+
+					mesh.deleteInstance( ids[ i ] );
+		
+				}
+
+				mesh.optimize();
+
+			} else {
+
+				const vertexCount = geometries.length * 512;
+				const indexCount = geometries.length * 1024;
+
+				mesh = new THREE.BatchedMesh( MAX_GEOMETRY_COUNT, vertexCount, indexCount, createMaterial() );
+				mesh.userData.rotationSpeeds = [];
+
+				// disable full-object frustum culling since all of the objects can be dynamic.
+				mesh.frustumCulled = false;
+
+				geometryIds.length = 0;
+				geometryIds.push(
+					mesh.addGeometry( geometries[ 0 ] ),
+					mesh.addGeometry( geometries[ 1 ] ),
+					mesh.addGeometry( geometries[ 2 ] ),
+				);
+
+			}
 
 			const euler = new THREE.Euler();
 			const matrix = new THREE.Matrix4();
-			mesh = new THREE.BatchedMesh( geometryCount, vertexCount, indexCount, createMaterial() );
-			mesh.userData.rotationSpeeds = [];
-
-			// disable full-object frustum culling since all of the objects can be dynamic.
-			mesh.frustumCulled = false;
 
 			ids.length = 0;
-
-			const geometryIds = [
-				mesh.addGeometry( geometries[ 0 ] ),
-				mesh.addGeometry( geometries[ 1 ] ),
-				mesh.addGeometry( geometries[ 2 ] ),
-			];
 
 			for ( let i = 0; i < api.count; i ++ ) {
 
