@@ -301,6 +301,12 @@ ${ flowData.code }
 
 	}
 
+	generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet ) {
+
+		return `texture( ${ textureProperty }, ${ uvSnippet }, ${ biasSnippet } )`;
+
+	}
+
 	generateTextureGrad( texture, textureProperty, uvSnippet, gradSnippet ) {
 
 		return `textureGrad( ${ textureProperty }, ${ uvSnippet }, ${ gradSnippet[ 0 ] }, ${ gradSnippet[ 1 ] } )`;
