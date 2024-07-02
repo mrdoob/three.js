@@ -43,7 +43,7 @@ class PassTextureNode extends TextureNode {
 
 class PassNode extends TempNode {
 
-	constructor( scope, scene, camera ) {
+	constructor( scope, scene, camera, options = {} ) {
 
 		super( 'vec4' );
 
@@ -60,7 +60,7 @@ class PassNode extends TempNode {
 		//depthTexture.type = FloatType;
 		depthTexture.name = 'PostProcessingDepth';
 
-		const renderTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType } );
+		const renderTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType, ...options } );
 		renderTarget.texture.name = 'PostProcessing';
 		renderTarget.depthTexture = depthTexture;
 
@@ -200,7 +200,7 @@ PassNode.DEPTH = 'depth';
 
 export default PassNode;
 
-export const pass = ( scene, camera ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera ) );
+export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
 export const texturePass = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
 export const depthPass = ( scene, camera ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera ) );
 

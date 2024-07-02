@@ -268,9 +268,24 @@ class WebGPUBackend extends Backend {
 
 			const depthTextureData = this.get( renderContext.depthTexture );
 
-			const depthStencilAttachment = {
-				view: depthTextureData.texture.createView(),
-			};
+			const depthTextureView = depthTextureData.texture.createView();
+			let depthStencilAttachment;
+			if ( depthTextureData.msaaTexture !== undefined ) {
+
+				depthStencilAttachment = {
+					view: depthTextureData.msaaTexture.createView(),
+					resolveTarget: depthTextureView
+
+				};
+
+			} else {
+
+				depthStencilAttachment = {
+					view: depthTextureView,
+					resolveTarget: undefined
+				};
+
+			}
 
 			descriptor = {
 				colorAttachments,
@@ -419,7 +434,6 @@ class WebGPUBackend extends Backend {
 		}
 
 		//
-
 		const encoder = device.createCommandEncoder( { label: 'renderContext_' + renderContext.id } );
 		const currentPass = encoder.beginRenderPass( descriptor );
 

@@ -40,7 +40,8 @@
 
 			const params = {
 				lut: 'Bourbon 64.CUBE',
-				intensity: 1
+				intensity: 1,
+				samples: 4
 			};
 
 			const lutMap = {
@@ -134,7 +135,7 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
+				const scenePass = pass( scene, camera, { samples: 4 } );
 				const scenePassColor = scenePass.getTextureNode();
 
 				const outputPass = scenePassColor.toneMapping( THREE.ACESFilmicToneMapping ).linearTosRGB();
@@ -157,6 +158,11 @@
 				gui.width = 350;
 				gui.add( params, 'lut', Object.keys( lutMap ) );
 				gui.add( params, 'intensity' ).min( 0 ).max( 1 );
+				gui.add( params, 'samples', 1, 4, 1 ).onChange( ( value ) => {
+
+					scenePass.renderTarget.samples = value;
+			
+				} );
 
 				window.addEventListener( 'resize', onWindowResize );
 
