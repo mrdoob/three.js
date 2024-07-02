@@ -9,7 +9,6 @@ import { sign, max } from '../math/MathNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 import { Vector2 } from '../../math/Vector2.js';
-import { NoToneMapping } from '../../constants.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 
 const _size = new Vector2();
@@ -67,17 +66,12 @@ class AfterImageNode extends TempNode {
 
 		this.setSize( _size.x, _size.y );
 
-
-		const currentToneMapping = renderer.toneMapping;
-		const currentToneMappingNode = renderer.toneMappingNode;
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentTexture = textureNode.value;
 
 		this.textureNodeOld.value = this._oldRT.texture;
 
 		// comp
-		renderer.toneMapping = NoToneMapping;
-		renderer.toneMappingNode = null;
 		renderer.setRenderTarget( this._compRT );
 		quadMeshComp.render( renderer );
 
@@ -86,9 +80,6 @@ class AfterImageNode extends TempNode {
 		this._oldRT = this._compRT;
 		this._compRT = temp;
 
-
-		renderer.toneMapping = currentToneMapping;
-		renderer.toneMappingNode = currentToneMappingNode;
 		renderer.setRenderTarget( currentRenderTarget );
 		textureNode.value = currentTexture;
 

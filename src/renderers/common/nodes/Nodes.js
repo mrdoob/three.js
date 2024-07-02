@@ -1,9 +1,11 @@
 import DataMap from '../DataMap.js';
 import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
-import { NodeFrame, vec4, objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, viewportBottomLeft, normalWorld, pmremTexture, viewportTopLeft } from '../../../nodes/Nodes.js';
+import { NodeFrame, objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, viewportBottomLeft, normalWorld, pmremTexture, viewportTopLeft } from '../../../nodes/Nodes.js';
 
-import { EquirectangularReflectionMapping, EquirectangularRefractionMapping, NoToneMapping, SRGBColorSpace } from '../../../constants.js';
+import { EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
+
+const outputNodeMap = new WeakMap();
 
 class Nodes extends DataMap {
 
@@ -391,29 +393,30 @@ class Nodes extends DataMap {
 
 	}
 
+	getOutputCacheKey() {
+
+		const renderer = this.renderer;
+
+		return renderer.toneMapping + ',' + renderer.currentColorSpace;
+
+	}
+
+	hasOutputChange( outputTarget ) {
+
+		const cacheKey = outputNodeMap.get( outputTarget );
+
+		return cacheKey !== this.getOutputCacheKey();
+
+	}
+
 	getOutputNode( outputTexture ) {
 
-		let output = texture( outputTexture, viewportTopLeft );
+		const renderer = this.renderer;
+		const cacheKey = this.getOutputCacheKey();
 
-		if ( this.isToneMappingState ) {
+		const output = texture( outputTexture, viewportTopLeft ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
 
-			if ( this.renderer.toneMappingNode ) {
-
-				output = vec4( this.renderer.toneMappingNode.context( { color: output.rgb } ), output.a );
-
-			} else if ( this.renderer.toneMapping !== NoToneMapping ) {
-
-				output = output.toneMapping( this.renderer.toneMapping );
-
-			}
-
-		}
-
-		if ( this.renderer.currentColorSpace === SRGBColorSpace ) {
-
-			output = output.linearToColorSpace( this.renderer.currentColorSpace );
-
-		}
+		outputNodeMap.set( outputTexture, cacheKey );
 
 		return output;
 

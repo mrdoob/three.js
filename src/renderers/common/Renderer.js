@@ -76,10 +76,6 @@ class Renderer {
 
 		this.info = new Info();
 
-		// nodes
-
-		this.toneMappingNode = null;
-
 		// internals
 
 		this._pixelRatio = 1;
@@ -439,7 +435,7 @@ class Renderer {
 
 		const { currentColorSpace } = this;
 
-		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping || this.toneMappingNode !== null );
+		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping );
 		const useColorSpace = currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace;
 
 		if ( useToneMapping === false && useColorSpace === false ) return null;
@@ -683,7 +679,12 @@ class Renderer {
 
 			this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
 
-			_quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+			if ( this._nodes.hasOutputChange( renderTarget.texture ) ) {
+
+				_quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+				_quad.material.needsUpdate = true;
+
+			}
 
 			this._renderScene( _quad, _quad.camera, false );
 
@@ -966,7 +967,13 @@ class Renderer {
 			// If a color space transform or tone mapping is required,
 			// the clear operation clears the intermediate renderTarget texture, but does not update the screen canvas.
 
-			_quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+			if ( this._nodes.hasOutputChange( renderTarget.texture ) ) {
+
+				_quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+				_quad.material.needsUpdate = true;
+
+			}
+
 			this._renderScene( _quad, _quad.camera, false );
 
 		}
