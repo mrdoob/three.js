@@ -11,6 +11,7 @@ import WebGLExtensions from './utils/WebGLExtensions.js';
 import WebGLCapabilities from './utils/WebGLCapabilities.js';
 import { GLFeatureName } from './utils/WebGLConstants.js';
 import { WebGLBufferRenderer } from './WebGLBufferRenderer.js';
+import { warnOnce } from '../../../../src/utils.js';
 
 //
 
@@ -51,6 +52,8 @@ class WebGLBackend extends Backend {
 		this.trackTimestamp = ( parameters.trackTimestamp === true );
 
 		this.extensions.get( 'EXT_color_buffer_float' );
+		this.extensions.get( 'WEBGL_multi_draw' );
+
 		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
 		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
 		this._currentContext = null;
@@ -704,6 +707,10 @@ class WebGLBackend extends Backend {
 			if ( object._multiDrawInstances !== null ) {
 
 				renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
+
+			} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
+
+				warnOnce( 'THREE.WebGLRenderer: WEBGL_multi_draw not supported.' );
 
 			} else {
 

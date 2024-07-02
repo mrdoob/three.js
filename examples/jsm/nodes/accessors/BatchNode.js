@@ -1,11 +1,11 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
-import { nodeProxy, vec3, mat3, mat4, int, ivec2, float } from '../shadernode/ShaderNode.js';
+import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, tslFn } from '../shadernode/ShaderNode.js';
 import { textureLoad } from './TextureNode.js';
 import { textureSize } from './TextureSizeNode.js';
-import { attribute } from '../core/AttributeNode.js';
 import { tangentLocal } from './TangentNode.js';
+import { instanceIndex, drawIndex } from '../core/IndexNode.js';
 
 class BatchNode extends Node {
 
@@ -28,14 +28,37 @@ class BatchNode extends Node {
 
 		if ( this.batchingIdNode === null ) {
 
-			this.batchingIdNode = attribute( 'batchId' );
+			if ( builder.getDrawIndex() === null ) {
+
+				this.batchingIdNode = instanceIndex;
+
+			} else {
+
+				this.batchingIdNode = drawIndex;
+
+			}
 
 		}
+
+		const getIndirectIndex = tslFn( ( [ id ] ) => {
+
+			const size = textureSize( textureLoad( this.batchMesh._indirectTexture ), 0 );
+			const x = int( id ).remainder( int( size ) );
+			const y = int( id ).div( int( size ) );
+			return textureLoad( this.batchMesh._indirectTexture, ivec2( x, y ), null, 'uvec4' ).x;
+
+		} ).setLayout( {
+			name: 'getIndirectIndex',
+			type: 'uint',
+			inputs: [
+				{ name: 'id', type: 'int' }
+			]
+		} );
 
 		const matriceTexture = this.batchMesh._matricesTexture;
 
 		const size = textureSize( textureLoad( matriceTexture ), 0 );
-		const j = float( int( this.batchingIdNode ) ).mul( 4 ).toVar();
+		const j = float( getIndirectIndex( int( this.batchingIdNode ) ) ).mul( 4 ).toVar();
 
 		const x = int( j.mod( size ) );
 		const y = int( j ).div( int( size ) );

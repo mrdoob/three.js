@@ -611,6 +611,12 @@ ${ flowData.code }
 
 	}
 
+	getDrawIndex() {
+
+		return null;
+
+	}
+
 	getFrontFacing() {
 
 		return this.getBuiltin( 'front_facing', 'isFront', 'bool' );
