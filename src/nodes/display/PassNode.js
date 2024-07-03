@@ -6,7 +6,7 @@ import { nodeObject } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
 
-import { FloatType, HalfFloatType/*, FloatType*/ } from '../../constants.js';
+import { HalfFloatType/*, FloatType*/ } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
@@ -143,13 +143,6 @@ class PassNode extends TempNode {
 		}
 
 		this.renderTarget.depthTexture.isMultisampleRenderTargetTexture = this.renderTarget.samples > 1;
-
-		for ( let i = 0; i < this.renderTarget.textures.length; i ++ ) {
-
-			const type = this.renderTarget.textures[ i ].type;
-			this.renderTarget.textures[ i ].isMultisampleRenderTargetTexture = this.renderTarget.samples > 1 && type !== HalfFloatType && type !== FloatType;
-
-		}
 
 		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 
