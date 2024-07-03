@@ -50,6 +50,7 @@ class PassNode extends TempNode {
 		this.scope = scope;
 		this.scene = scene;
 		this.camera = camera;
+		this.options = options;
 
 		this._pixelRatio = 1;
 		this._width = 1;
@@ -130,7 +131,9 @@ class PassNode extends TempNode {
 
 	}
 
-	setup() {
+	setup( { renderer } ) {
+
+		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
 
 		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 

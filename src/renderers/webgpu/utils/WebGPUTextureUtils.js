@@ -119,18 +119,7 @@ class WebGPUTextureUtils {
 
 		let sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
 
-		if ( sampleCount > 1 ) {
-
-			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
-			sampleCount = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
-
-			if ( sampleCount === 2 ) {
-
-				sampleCount = 4;
-
-			}
-
-		}
+		sampleCount = backend.utils.getSampleCount( sampleCount );
 
 		const primarySampleCount = texture.isRenderTargetTexture ? 1 : sampleCount;
 
@@ -263,7 +252,7 @@ class WebGPUTextureUtils {
 				height: height,
 				depthOrArrayLayers: 1
 			},
-			sampleCount: backend.parameters.sampleCount,
+			sampleCount: backend.utils.getSampleCount( backend.renderer.samples ),
 			format: GPUTextureFormat.BGRA8Unorm,
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
 		} );
@@ -312,7 +301,7 @@ class WebGPUTextureUtils {
 		depthTexture.image.width = width;
 		depthTexture.image.height = height;
 
-		this.createTexture( depthTexture, { sampleCount: backend.parameters.sampleCount, width, height } );
+		this.createTexture( depthTexture, { sampleCount: backend.utils.getSampleCount( backend.renderer.samples ), width, height } );
 
 		return backend.get( depthTexture ).texture;
 
