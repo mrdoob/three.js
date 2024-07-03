@@ -93,7 +93,6 @@ class WebGPUUtils {
 
 		}
 
-		// console.log( count );
 		return count;
 
 	}

@@ -151,6 +151,15 @@ class WebGPUTextureUtils {
 			usage: usage
 		};
 
+		if ( texture.isRenderTargetTexture === true && sampleCount > 1 && texture.type !== FloatType && texture.type !== HalfFloatType ) {
+
+			usage |= GPUTextureUsage.RENDER_ATTACHMENT;
+
+			textureDescriptorGPU.sampleCount = sampleCount;
+			texture.isMultisampleRenderTargetTexture = true;
+
+		}
+
 		// texture creation
 
 		if ( texture.isVideoTexture ) {
@@ -179,7 +188,7 @@ class WebGPUTextureUtils {
 
 		}
 
-		if ( texture.isRenderTargetTexture && sampleCount > 1 ) {
+		if ( texture.isRenderTargetTexture && sampleCount > 1 && ! texture.isMultisampleRenderTargetTexture ) {
 
 			const msaaTextureDescriptorGPU = Object.assign( {}, textureDescriptorGPU );
 
