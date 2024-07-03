@@ -112,10 +112,6 @@ const exceptionList = [
 	// Awaiting for WebGL backend support
 	'webgpu_compute_texture_pingpong',
 	'webgpu_materials',
-	'webgpu_video_panorama',
-
-	// Awaiting for WebGPU Backend support in Puppeteer
-	'webgpu_storage_buffer',
 
 	// WebGPURenderer: Unknown problem
 	'webgpu_postprocessing_afterimage',
@@ -241,7 +237,7 @@ async function main() {
 	/* Launch browser */
 
 	const flags = [ '--hide-scrollbars', '--enable-gpu' ];
-	flags.push( '--enable-unsafe-webgpu', '--enable-webgpu-developer-features', '--use-angle=metal' );
+	flags.push( '--enable-unsafe-webgpu', '--enable-webgpu-developer-features', '--use-angle=metal	' );
 	// flags.push( '--enable-unsafe-webgpu', '--enable-features=Vulkan', '--use-gl=swiftshader', '--use-angle=swiftshader', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader' );
 	// if ( process.platform === 'linux' ) flags.push( '--enable-features=Vulkan,UseSkiaRenderer', '--use-vulkan=native', '--disable-vulkan-surface', '--disable-features=VaapiVideoDecoder', '--ignore-gpu-blocklist', '--use-angle=vulkan' );
 
