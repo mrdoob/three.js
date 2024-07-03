@@ -1,10 +1,10 @@
 import { Material } from '../../materials/Material.js';
-import { NormalBlending } from '../../constants.js';
+import { NormalBlending, MultiplyOperation, MixOperation, AddOperation } from '../../constants.js';
 
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
-import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal } from '../accessors/MaterialNode.js';
+import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialSpecularStrength, materialReflectivity } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView, normalLocal } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
@@ -44,6 +44,8 @@ class NodeMaterial extends Material {
 		this.fog = true;
 		this.lights = true;
 		this.normals = true;
+
+		this.environment = false;
 
 		this.lightsNode = null;
 		this.envNode = null;
@@ -354,15 +356,17 @@ class NodeMaterial extends Material {
 
 	setupLights( builder ) {
 
-		const envNode = this.getEnvNode( builder );
-
-		//
-
 		const materialLightsNode = [];
 
-		if ( envNode ) {
+		if ( this.environment === true ) {
 
-			materialLightsNode.push( new EnvironmentNode( envNode ) );
+			const envNode = this.getEnvNode( builder );
+
+			if ( envNode ) {
+
+				materialLightsNode.push( new EnvironmentNode( envNode ) );
+
+			}
 
 		}
 
@@ -420,6 +424,38 @@ class NodeMaterial extends Material {
 		} else if ( backdropNode !== null ) {
 
 			outgoingLightNode = vec3( backdropAlphaNode !== null ? mix( outgoingLightNode, backdropNode, backdropAlphaNode ) : backdropNode );
+
+		}
+
+		// ENV MAP
+
+		if ( this.environment === false ) {
+
+			const envNode = this.getEnvNode( builder );
+
+			if ( envNode ) {
+
+				switch ( this.combine ) {
+
+					case MultiplyOperation:
+						outgoingLightNode = mix( outgoingLightNode, outgoingLightNode.mul( envNode.rgb ), materialSpecularStrength.mul( materialReflectivity ) );
+						break;
+
+					case MixOperation:
+						outgoingLightNode = mix( outgoingLightNode, envNode.rgb, materialSpecularStrength.mul( materialReflectivity ) );
+						break;
+
+					case AddOperation:
+						outgoingLightNode = outgoingLightNode.add( envNode.rgb.mul( materialSpecularStrength.mul( materialReflectivity ) ) );
+						break;
+
+					default:
+						console.warn( 'THREE.NodeMaterial: Unsupported .combine value:', this.combine );
+						break;
+
+				}
+
+			}
 
 		}
 

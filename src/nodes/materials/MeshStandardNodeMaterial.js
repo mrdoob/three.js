@@ -18,6 +18,8 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		this.isMeshStandardNodeMaterial = true;
 
+		this.environment = true;
+
 		this.emissiveNode = null;
 
 		this.metalnessNode = null;
