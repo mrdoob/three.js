@@ -342,6 +342,20 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet, shaderStage = this.shaderStage ) {
+
+		if ( shaderStage === 'fragment' ) {
+
+			return `textureSampleBias( ${ textureProperty }, ${ textureProperty }_sampler, ${ uvSnippet }, ${ biasSnippet } )`;
+
+		} else {
+
+			console.error( `WebGPURenderer: THREE.TextureNode.biasNode does not support ${ shaderStage } shader.` );
+
+		}
+
+	}
+
 	getPropertyName( node, shaderStage = this.shaderStage ) {
 
 		if ( node.isNodeVarying === true && node.needsInterpolation === true ) {

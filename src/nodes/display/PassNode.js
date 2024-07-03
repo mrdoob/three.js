@@ -6,7 +6,7 @@ import { nodeObject } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
 
-import { HalfFloatType, NoToneMapping/*, FloatType*/ } from '../../constants.js';
+import { HalfFloatType/*, FloatType*/ } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
@@ -150,21 +150,15 @@ class PassNode extends TempNode {
 
 		this.setSize( size.width, size.height );
 
-		const currentToneMapping = renderer.toneMapping;
-		const currentToneMappingNode = renderer.toneMappingNode;
 		const currentRenderTarget = renderer.getRenderTarget();
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
 
-		renderer.toneMapping = NoToneMapping;
-		renderer.toneMappingNode = null;
 		renderer.setRenderTarget( this.renderTarget );
 
 		renderer.render( scene, camera );
 
-		renderer.toneMapping = currentToneMapping;
-		renderer.toneMappingNode = currentToneMappingNode;
 		renderer.setRenderTarget( currentRenderTarget );
 
 	}

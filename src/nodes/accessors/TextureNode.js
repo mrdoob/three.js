@@ -12,7 +12,7 @@ import { IntType, UnsignedIntType } from '../../constants.js';
 
 class TextureNode extends UniformNode {
 
-	constructor( value, uvNode = null, levelNode = null ) {
+	constructor( value, uvNode = null, levelNode = null, biasNode = null ) {
 
 		super( value );
 
@@ -20,6 +20,7 @@ class TextureNode extends UniformNode {
 
 		this.uvNode = uvNode;
 		this.levelNode = levelNode;
+		this.biasNode = biasNode;
 		this.compareNode = null;
 		this.depthNode = null;
 		this.gradNode = null;
@@ -168,6 +169,7 @@ class TextureNode extends UniformNode {
 
 		properties.uvNode = uvNode;
 		properties.levelNode = levelNode;
+		properties.biasNode = this.biasNode;
 		properties.compareNode = this.compareNode;
 		properties.gradNode = this.gradNode;
 		properties.depthNode = this.depthNode;
@@ -180,7 +182,7 @@ class TextureNode extends UniformNode {
 
 	}
 
-	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, depthSnippet, compareSnippet, gradSnippet ) {
+	generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet ) {
 
 		const texture = this.value;
 
@@ -189,6 +191,10 @@ class TextureNode extends UniformNode {
 		if ( levelSnippet ) {
 
 			snippet = builder.generateTextureLevel( texture, textureProperty, uvSnippet, levelSnippet, depthSnippet );
+
+		} else if ( biasSnippet ) {
+
+			snippet = builder.generateTextureBias( texture, textureProperty, uvSnippet, biasSnippet, depthSnippet );
 
 		} else if ( gradSnippet ) {
 
@@ -242,10 +248,11 @@ class TextureNode extends UniformNode {
 
 			if ( propertyName === undefined ) {
 
-				const { uvNode, levelNode, compareNode, depthNode, gradNode } = properties;
+				const { uvNode, levelNode, biasNode, compareNode, depthNode, gradNode } = properties;
 
 				const uvSnippet = this.generateUV( builder, uvNode );
 				const levelSnippet = levelNode ? levelNode.build( builder, 'float' ) : null;
+				const biasSnippet = biasNode ? biasNode.build( builder, 'float' ) : null;
 				const depthSnippet = depthNode ? depthNode.build( builder, 'int' ) : null;
 				const compareSnippet = compareNode ? compareNode.build( builder, 'float' ) : null;
 				const gradSnippet = gradNode ? [ gradNode[ 0 ].build( builder, 'vec2' ), gradNode[ 1 ].build( builder, 'vec2' ) ] : null;
@@ -254,7 +261,7 @@ class TextureNode extends UniformNode {
 
 				propertyName = builder.getPropertyName( nodeVar );
 
-				const snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, depthSnippet, compareSnippet, gradSnippet );
+				const snippet = this.generateSnippet( builder, textureProperty, uvSnippet, levelSnippet, biasSnippet, depthSnippet, compareSnippet, gradSnippet );
 
 				builder.addLineFlowCode( `${propertyName} = ${snippet}` );
 
@@ -297,17 +304,17 @@ class TextureNode extends UniformNode {
 	uv( uvNode ) {
 
 		const textureNode = this.clone();
-		textureNode.uvNode = uvNode;
+		textureNode.uvNode = nodeObject( uvNode );
 		textureNode.referenceNode = this;
 
 		return nodeObject( textureNode );
 
 	}
 
-	blur( levelNode ) {
+	blur( amountNode ) {
 
 		const textureNode = this.clone();
-		textureNode.levelNode = levelNode.mul( maxMipLevel( textureNode ) );
+		textureNode.biasNode = nodeObject( amountNode ).mul( maxMipLevel( textureNode ) );
 		textureNode.referenceNode = this;
 
 		return nodeObject( textureNode );
@@ -317,16 +324,26 @@ class TextureNode extends UniformNode {
 	level( levelNode ) {
 
 		const textureNode = this.clone();
-		textureNode.levelNode = levelNode;
+		textureNode.levelNode = nodeObject( levelNode );
 		textureNode.referenceNode = this;
 
-		return textureNode;
+		return nodeObject( textureNode );
 
 	}
 
 	size( levelNode ) {
 
 		return textureSize( this, levelNode );
+
+	}
+
+	bias( biasNode ) {
+
+		const textureNode = this.clone();
+		textureNode.biasNode = nodeObject( biasNode );
+		textureNode.referenceNode = this;
+
+		return nodeObject( textureNode );
 
 	}
 
@@ -393,7 +410,7 @@ class TextureNode extends UniformNode {
 
 	clone() {
 
-		const newNode = new this.constructor( this.value, this.uvNode, this.levelNode );
+		const newNode = new this.constructor( this.value, this.uvNode, this.levelNode, this.biasNode );
 		newNode.sampler = this.sampler;
 
 		return newNode;
