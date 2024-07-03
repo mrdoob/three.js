@@ -75,6 +75,12 @@ class WebGPUBindingUtils {
 
 					texture.multisampled = true;
 
+					if ( ! binding.texture.isDepthTexture ) {
+
+						texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+
+					}
+
 				}
 
 				if ( binding.texture.isDepthTexture ) {

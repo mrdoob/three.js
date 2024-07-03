@@ -121,7 +121,7 @@ class WebGPUTextureUtils {
 
 		sampleCount = backend.utils.getSampleCount( sampleCount );
 
-		const primarySampleCount = texture.isRenderTargetTexture ? 1 : sampleCount;
+		const primarySampleCount = texture.isRenderTargetTexture && ! texture.isMultisampleRenderTargetTexture ? 1 : sampleCount;
 
 		let usage = GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.COPY_SRC;
 
@@ -150,15 +150,6 @@ class WebGPUTextureUtils {
 			format: format,
 			usage: usage
 		};
-
-		if ( texture.isRenderTargetTexture === true && sampleCount > 1 && texture.type !== FloatType && texture.type !== HalfFloatType ) {
-
-			usage |= GPUTextureUsage.RENDER_ATTACHMENT;
-
-			textureDescriptorGPU.sampleCount = sampleCount;
-			texture.isMultisampleRenderTargetTexture = true;
-
-		}
 
 		// texture creation
 
