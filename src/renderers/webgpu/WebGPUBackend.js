@@ -256,9 +256,6 @@ class WebGPUBackend extends Backend {
 
 			const depthTextureView = depthTextureData.texture.createView();
 
-			let depthStencilAttachment = {
-				view: depthTextureView
-			};
 			let viewDepth, resolveTargetDepth;
 
 			if ( depthTextureData.msaaTexture !== undefined ) {
@@ -273,7 +270,7 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			depthStencilAttachment = {
+			const depthStencilAttachment = {
 				view: viewDepth,
 				resolveTarget: resolveTargetDepth,
 			};
