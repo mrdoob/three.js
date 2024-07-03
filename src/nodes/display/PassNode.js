@@ -133,7 +133,7 @@ class PassNode extends TempNode {
 
 	setup( { renderer } ) {
 
-		this.renderTarget.samples = this.node && this.options.samples === undefined ? renderer.samples : this.options.samples;
+		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
 
 		// Disable MSAA for WebGL backend for now
 		if ( renderer.backend.isWebGLBackend === true ) {
