@@ -7,7 +7,6 @@ import { materialSpecularStrength } from '../accessors/MaterialNode.js';
 import { shininess, specularColor } from '../core/PropertyNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
 import { tslFn, float } from '../shadernode/ShaderNode.js';
-import { MultiplyOperation } from '../../constants.js';
 
 const G_BlinnPhong_Implicit = () => float( 0.25 );
 
@@ -34,9 +33,9 @@ const BRDF_BlinnPhong = tslFn( ( { lightDirection } ) => {
 
 class PhongLightingModel extends BasicLightingModel {
 
-	constructor( envNode = null, combine = MultiplyOperation, specular = true ) {
+	constructor( specular = true ) {
 
-		super( envNode, combine );
+		super();
 
 		this.specular = specular;
 

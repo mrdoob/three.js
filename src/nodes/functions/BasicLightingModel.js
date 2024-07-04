@@ -6,12 +6,9 @@ import { mix } from '../math/MathNode.js';
 
 class BasicLightingModel extends LightingModel {
 
-	constructor( envNode = null, combine = MultiplyOperation ) {
+	constructor() {
 
 		super();
-
-		this.envNode = envNode;
-		this.combine = combine;
 
 	}
 
@@ -21,14 +18,15 @@ class BasicLightingModel extends LightingModel {
 
 	}
 
-	finish( context ) {
+	finish( context, stack, builder ) {
 
+		const material = builder.material;
 		const outgoingLight = context.outgoingLight;
-		const envNode = this.envNode;
+		const envNode = material.getEnvNode( builder );
 
 		if ( envNode ) {
 
-			switch ( this.combine ) {
+			switch ( material.combine ) {
 
 				case MultiplyOperation:
 					outgoingLight.rgb.assign( mix( outgoingLight.rgb, outgoingLight.rgb.mul( envNode.rgb ), materialSpecularStrength.mul( materialReflectivity ) ) );
@@ -43,7 +41,7 @@ class BasicLightingModel extends LightingModel {
 					break;
 
 				default:
-					console.warn( 'THREE.BasicLightingModel: Unsupported .combine value:', this.combine );
+					console.warn( 'THREE.BasicLightingModel: Unsupported .combine value:', material.combine );
 					break;
 
 			}

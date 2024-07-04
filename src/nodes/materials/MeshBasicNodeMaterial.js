@@ -21,11 +21,9 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 	}
 
-	setupLightingModel( builder ) {
+	setupLightingModel() {
 
-		const envNode = this.getEnvNode( builder );
-
-		return new BasicLightingModel( envNode, this.combine );
+		return new BasicLightingModel();
 
 	}
 

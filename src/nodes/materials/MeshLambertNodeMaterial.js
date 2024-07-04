@@ -21,11 +21,9 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 
 	}
 
-	setupLightingModel( builder ) {
+	setupLightingModel() {
 
-		const envNode = this.getEnvNode( builder );
-
-		return new PhongLightingModel( envNode, this.combine, false, ); // set specular to false to force lambert
+		return new PhongLightingModel( false );
 
 	}
 

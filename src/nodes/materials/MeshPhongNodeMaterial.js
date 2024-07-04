@@ -27,11 +27,9 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
-	setupLightingModel( builder ) {
+	setupLightingModel() {
 
-		const envNode = this.getEnvNode( builder );
-
-		return new PhongLightingModel( envNode, this.combine );
+		return new PhongLightingModel();
 
 	}
 
