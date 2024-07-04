@@ -1,10 +1,10 @@
 import { Material } from '../../materials/Material.js';
-import { NormalBlending, MultiplyOperation, MixOperation, AddOperation } from '../../constants.js';
+import { NormalBlending } from '../../constants.js';
 
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
-import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialSpecularStrength, materialReflectivity } from '../accessors/MaterialNode.js';
+import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView, normalLocal } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
@@ -354,9 +354,11 @@ class NodeMaterial extends Material {
 
 	setupLights( builder ) {
 
-		const materialLightsNode = [];
-
 		const envNode = this.getEnvNode( builder );
+
+		//
+
+		const materialLightsNode = [];
 
 		if ( envNode ) {
 
