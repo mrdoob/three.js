@@ -27,7 +27,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
-	setupLightingModel() {
+	setupLightingModel( /*builder*/ ) {
 
 		return new PhongLightingModel();
 
