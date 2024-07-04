@@ -927,12 +927,12 @@ class BatchedMesh extends Mesh {
 		this._multiDrawStarts = source._multiDrawStarts.slice();
 
 		this._matricesTexture = source._matricesTexture.clone();
-		this._matricesTexture.image.data = this._matricesTexture.image.slice();
+		this._matricesTexture.image.data = this._matricesTexture.image.data.slice();
 
 		if ( this._colorsTexture !== null ) {
 
 			this._colorsTexture = source._colorsTexture.clone();
-			this._colorsTexture.image.data = this._colorsTexture.image.slice();
+			this._colorsTexture.image.data = this._colorsTexture.image.data.slice();
 
 		}
 
