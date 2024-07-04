@@ -32,7 +32,6 @@ const _screen = new Vector4();
 const _frustum = new Frustum();
 const _projScreenMatrix = new Matrix4();
 const _vector3 = new Vector3();
-const _quad = new QuadMesh( new NodeMaterial() );
 
 class Renderer {
 
@@ -98,6 +97,8 @@ class Renderer {
 		this._renderContexts = null;
 		this._textures = null;
 		this._background = null;
+
+		this._quad = new QuadMesh( new NodeMaterial() );
 
 		this._currentRenderContext = null;
 
@@ -679,14 +680,16 @@ class Renderer {
 
 			this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
 
+			const quad = this._quad;
+
 			if ( this._nodes.hasOutputChange( renderTarget.texture ) ) {
 
-				_quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
-				_quad.material.needsUpdate = true;
+				quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+				quad.material.needsUpdate = true;
 
 			}
 
-			this._renderScene( _quad, _quad.camera, false );
+			this._renderScene( quad, quad.camera, false );
 
 		}
 
@@ -967,14 +970,16 @@ class Renderer {
 			// If a color space transform or tone mapping is required,
 			// the clear operation clears the intermediate renderTarget texture, but does not update the screen canvas.
 
+			const quad = this._quad;
+
 			if ( this._nodes.hasOutputChange( renderTarget.texture ) ) {
 
-				_quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
-				_quad.material.needsUpdate = true;
+				quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+				quad.material.needsUpdate = true;
 
 			}
 
-			this._renderScene( _quad, _quad.camera, false );
+			this._renderScene( quad, quad.camera, false );
 
 		}
 
