@@ -46,8 +46,8 @@ import { FullScreenQuad } from '../postprocessing/Pass.js';
  * // and fill in here the texture data...
  *
  * // Add texture variables
- * const velVar = gpuCompute.addVariable( "textureVelocity", fragmentShaderVel, pos0 );
- * const posVar = gpuCompute.addVariable( "texturePosition", fragmentShaderPos, vel0 );
+ * const velVar = gpuCompute.addVariable( "textureVelocity", fragmentShaderVel, vel0 );
+ * const posVar = gpuCompute.addVariable( "texturePosition", fragmentShaderPos, pos0 );
  *
  * // Add variable dependencies
  * gpuCompute.setVariableDependencies( velVar, [ velVar, posVar ] );
