@@ -1,4 +1,4 @@
-import UniformNode, { uniform } from '../core/UniformNode.js';
+import UniformNode from '../core/UniformNode.js';
 import { uv } from './UVNode.js';
 import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToLinear } from '../display/ColorSpaceNode.js';
@@ -6,6 +6,7 @@ import { expression } from '../code/ExpressionNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { addNodeElement, nodeProxy, vec3, nodeObject } from '../shadernode/ShaderNode.js';
+import { reference } from '../accessors/ReferenceNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 
 import { IntType, UnsignedIntType } from '../../constants.js';
@@ -101,9 +102,7 @@ class TextureNode extends UniformNode {
 
 	getTransformedUV( uvNode ) {
 
-		const texture = this.value;
-
-		return uniform( texture.matrix ).mul( vec3( uvNode, 1 ) ).xy;
+		return reference( 'value.matrix', 'mat3', this ).mul( vec3( uvNode, 1 ) ).xy;
 
 	}
 
