@@ -1,4 +1,4 @@
-import LightingModel from '../core/LightingModel.js';
+import BasicLightingModel from './BasicLightingModel.js';
 import F_Schlick from './BSDF/F_Schlick.js';
 import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
 import { diffuseColor } from '../core/PropertyNode.js';
@@ -7,6 +7,7 @@ import { materialSpecularStrength } from '../accessors/MaterialNode.js';
 import { shininess, specularColor } from '../core/PropertyNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
 import { tslFn, float } from '../shadernode/ShaderNode.js';
+import { MultiplyOperation } from '../../constants.js';
 
 const G_BlinnPhong_Implicit = () => float( 0.25 );
 
@@ -31,11 +32,11 @@ const BRDF_BlinnPhong = tslFn( ( { lightDirection } ) => {
 
 } );
 
-class PhongLightingModel extends LightingModel {
+class PhongLightingModel extends BasicLightingModel {
 
-	constructor( specular = true ) {
+	constructor( envNode = null, combine = MultiplyOperation, specular = true ) {
 
-		super();
+		super( envNode, combine );
 
 		this.specular = specular;
 

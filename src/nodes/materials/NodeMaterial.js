@@ -45,8 +45,6 @@ class NodeMaterial extends Material {
 		this.lights = true;
 		this.normals = true;
 
-		this.environment = false;
-
 		this.lightsNode = null;
 		this.envNode = null;
 		this.aoNode = null;
@@ -358,15 +356,11 @@ class NodeMaterial extends Material {
 
 		const materialLightsNode = [];
 
-		if ( this.environment === true ) {
+		const envNode = this.getEnvNode( builder );
 
-			const envNode = this.getEnvNode( builder );
+		if ( envNode ) {
 
-			if ( envNode ) {
-
-				materialLightsNode.push( new EnvironmentNode( envNode ) );
-
-			}
+			materialLightsNode.push( new EnvironmentNode( envNode ) );
 
 		}
 
@@ -424,38 +418,6 @@ class NodeMaterial extends Material {
 		} else if ( backdropNode !== null ) {
 
 			outgoingLightNode = vec3( backdropAlphaNode !== null ? mix( outgoingLightNode, backdropNode, backdropAlphaNode ) : backdropNode );
-
-		}
-
-		// ENV MAP
-
-		if ( this.environment === false ) {
-
-			const envNode = this.getEnvNode( builder );
-
-			if ( envNode ) {
-
-				switch ( this.combine ) {
-
-					case MultiplyOperation:
-						outgoingLightNode = mix( outgoingLightNode, outgoingLightNode.mul( envNode.rgb ), materialSpecularStrength.mul( materialReflectivity ) );
-						break;
-
-					case MixOperation:
-						outgoingLightNode = mix( outgoingLightNode, envNode.rgb, materialSpecularStrength.mul( materialReflectivity ) );
-						break;
-
-					case AddOperation:
-						outgoingLightNode = outgoingLightNode.add( envNode.rgb.mul( materialSpecularStrength.mul( materialReflectivity ) ) );
-						break;
-
-					default:
-						console.warn( 'THREE.NodeMaterial: Unsupported .combine value:', this.combine );
-						break;
-
-				}
-
-			}
 
 		}
 
