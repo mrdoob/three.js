@@ -33,7 +33,7 @@
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-		import { pass, normalPass, uniform, pixelate } from 'three/tsl';
+		import { pass, normalPass, uniform, pixelation } from 'three/tsl';
 
 		let camera, scene, renderer, composer, crystalMesh, clock;
 		let gui, params;
@@ -131,6 +131,7 @@
 			document.body.appendChild( renderer.domElement );
 
 			const effectController = {
+				pixelSize: uniform(14),
 				normalEdgeStrength: uniform(0.3),
 				depthEdgeStrength: uniform(0.4)
 			}
@@ -141,7 +142,7 @@
 			const scenePassColor = scenePass.getTextureNode();
 			const scenePassDepth = scenePass.getTextureDepthNode();
 			const scenePassNormal = scenePass.getTextureNormalNode();
-			composer.outputNode = scenePass.pixelate(6, effectController.normalEdgeStrength, effectController.depthEdgeStrength);
+			composer.outputNode = scenePassColor.pixelation( scenePassDepth, scenePassNormal, 14, effectController.normalEdgeStrength, effectController.depthEdgeStrength);
 
 			window.addEventListener( 'resize', onWindowResize );
 

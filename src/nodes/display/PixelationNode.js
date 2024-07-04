@@ -5,143 +5,135 @@ import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { dot, clamp, smoothstep, sign, step, floor } from '../math/MathNode.js';
 import { float, If } from '../shadernode/ShaderNode.js';
-
-import { Vector2 } from '../../math/Vector2.js';
+import { Vector4 } from '../../math/Vector4.js';
+import { temp } from '../Nodes.js';
+import { property } from '../core/PropertyNode.js';
 
 class PixelationNode extends TempNode {
 
-	constructor( textureNode, pixelSize, normalEdgeStrengthNode, depthEdgeStrengthNode ) {
+	constructor( textureNode, depthNode, normalNode, pixelSizeNode, normalEdgeStrength, depthEdgeStrength ) {
 
 		super();
 
 		this.textureNode = textureNode;
-		this.pixelSize = pixelSize;
-		this.normalEdgeStrengthNode = normalEdgeStrengthNode;
-		this.depthEdgeStrengthNode = depthEdgeStrengthNode;
+		this.depthNode = depthNode;
+		this.normalNode = normalNode;
+
+		this.pixelSizeNode = pixelSizeNode;
+		this.normalEdgeStrength = normalEdgeStrength;
+		this.depthEdgeStrength = depthEdgeStrength;
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
-
-		this._resolution = uniform( new Vector2() );
-		this._renderResolution = uniform( new Vector2() );
+		this._resolution = uniform( new Vector4() );
 
 	}
 
 	updateBefore() {
 
+		const map = this.textureNode.value;
+		const width = map.image.width / this.pixelSizeNode.value;
+		const height = map.image.height / this.pixelSizeNode.value;
+
+		this._resolution.value.set( width, height, 1 / width, 1 / height );
 
 	}
 
 	setup() {
 
-		const { textureNode } = this;
+		const { textureNode, depthNode, normalNode } = this;
 
-		const uvNode = textureNode.uvNode || uv();
+		const uvNodeTexture = textureNode.uvNode || uv();
+		const uvNodeDepth = depthNode.uvNode || uv();
+		const uvNodeNormal = normalNode.uvNode || uv();
 
-		const sampleTexture = ( uv ) => textureNode.uv( uv );
-		const sampleDepthTexture = ( uv ) => textureNode.passNode._depthTextureNode.uv( uv );
-		const sampleNormalTexture = ( uv ) => textureNode.passNode._normalTextureNode.uv(uv);
+		const sampleTexture = () => textureNode.uv( uvNodeTexture );
 
-		const getDepth = ( uv, x, y ) => {
+		const sampleDepth = ( x, y ) => depthNode.uv( uvNodeDepth.add( vec2( x, y ).mul( this._resolution.zw ) ) ).r;
 
-			const newUV = uv.add(vec2( x, y ) );
-			newUV.mulAssign( this._resolution.zw );
+		const sampleNormal = ( x, y ) => normalNode.uv( uvNodeNormal.add( vec2( x, y ).mul( this._resolution.zw ) ) ).rgb.mul( 2.0 ).oneMinus();
 
-			return sampleDepthTexture(newUV).r
+		const depthEdgeIndicator = ( depth ) => {
 
-		}
+			const diff = property('float', 'diff');
+			diff.addAssign( clamp( sampleDepth( 1, 0 ).sub( depth ) ) );
+			diff.addAssign( clamp( sampleDepth( - 1, 0 ).sub( depth ) ) );
+			diff.addAssign( clamp( sampleDepth( 0, 1 ).sub( depth ) ) );
+			diff.addAssign( clamp( sampleDepth( 0, - 1 ).sub( depth ) ) );
 
-		const getNormal = ( uv, x, y ) => {
-
-			const newUV = uv.add(vec2( x, y ) );
-			newUV.mulAssign( this._resolution.zw );
-
-			const temp = sampleNormalTexture(newUV).rgb.mul(2.0);
-			return temp.sub(1.0);
+			return floor( smoothstep( 0.01, 0.02, diff ).mul( 2 ) ).div( 2 );
 
 		}
 
-		const clampNormal = ( valueNode ) => {
+		const neighborNormalEdgeIndicator = ( x, y, depth, normal ) => {
 
-			return clamp( valueNode, 0.0, 1.0)
+			const depthDiff = sampleDepth( x, y ).sub(depth);
+			const neighborNormal = sampleNormal( x, y );
 
-		}
+			// Edge pixels should yield to faces who's normals are closer to the bias normal.
 
-		const depthEdgeIndicator = ( uv, depth, normalNode ) => {
-
-			const diff = float(0.0);
-			diff.addAssign( clampNormal( getDepth(uv, 1, 0).sub(depth) ) );
-			diff.addAssign( clampNormal( getDepth(uv, -1, 0).sub(depth) ) );
-			diff.addAssign( clampNormal( getDepth(uv, 0, 1).sub(depth) ) );
-			diff.addAssign( clampNormal( getDepth(uv, 0, -1).sub(depth) ) );
-
-			return floor( smoothstep( 0.01, 0.02, diff ).mul(2.0) ).div(2.0);
-
-		}
-
-		const neighborNormalEdgeIndicator = ( xNode, yNode, depthNode, normalNode ) => {
-
-			const depthDiff = getDepth( xNode, yNode ).sub( depthNode );
-			const neighborNormal = getNormal( xNode, yNode );
-
-			const normalEdgeBias = vec3(1.0, 1.0, 1.0);
-			const normalDiff = dot( normalNode.sub( neighborNormal ), normalEdgeBias );
-			const normalIndicator = clampNormal( smoothstep( -.01, .01, normalDiff ) );
+			const normalEdgeBias = vec3( 1, 1, 1 ); // This should probably be a parameter.
+			const normalDiff = dot( normal.sub( neighborNormal ), normalEdgeBias );
+			const normalIndicator = clamp( smoothstep( - 0.01, 0.01, normalDiff ), 0.0, 1.0 );
 
 			// Only the shallower pixel should detect the normal edge.
-			const depthIndicator = clampNormal( sign( depthDiff.mul(0.25).add( .0025 ) ) );
+			const depthIndicator = clamp( sign( depthDiff.mul(0.25).add(.0025) ), 0.0, 1.0 );
 
-			const dotThing = float( 1.0 ).sub( dot( normal, neighborNormal ) );
-			return dotThing.mul( depthIndicator ).mul( normalIndicator );
+			return float( 1.0 ).sub( dot( normal, neighborNormal ) ).mul( depthIndicator ).mul( normalIndicator );
 
-		}
+		};
 
-		const normalEdgeIndicator = ( xNode, yNode, depthNode, normalNode ) => {
+		const normalEdgeIndicator = ( depth, normal ) => {
 
-			const indicator = float(0.0);
-			indicator.addAssign( neighborNormalEdgeIndicator( 0, -1, depthNode, normalNode ) );
-			indicator.addAssign( neighborNormalEdgeIndicator( 0, 1, depthNode, normalNode ) );
-			indicator.addAssign( neighborNormalEdgeIndicator( -1, 0, depthNode, normalNode ) );
-			indicator.addAssign( neighborNormalEdgeIndicator( 1, 0, depthNode, normalNode ) );
+			const indicator = property('float', 'indicator')
+
+			indicator.addAssign( neighborNormalEdgeIndicator( 0, - 1, depth, normal ) );
+			indicator.addAssign( neighborNormalEdgeIndicator( 0, 1, depth, normal ) );
+			indicator.addAssign( neighborNormalEdgeIndicator( - 1, 0, depth, normal ) );
+			indicator.addAssign( neighborNormalEdgeIndicator( 1, 0, depth, normal ) );
 
 			return step( 0.1, indicator );
 
 		}
 
-		const pixelate = tslFn( () => {
+		const pixelation = tslFn( () => {
 
-			const textureColor = sampleTexture(uvNode);
+			const texel = sampleTexture();
 
-			/*const depth = float( 0.0 );
-			const normal = vec3( 0.0 );
+			const depth = property( 'float', 'depth' );
+			const normal = property( 'vec3', 'normal' );
 
-			const dei = float( 0.0 );
-			If( this.depthEdgeStrengthNode.greaterThan( 0.0 ), () => {
-				
-				dei.assign( depthEdgeIndicator( depth, normal ) );
+			If( this.depthEdgeStrength.greaterThan( 0.0 ).or( this.normalEdgeStrength.greaterThan( 0.0 ) ), () => {
+
+				depth.assign( sampleDepth( 0, 0 ) );
+				normal.assign( sampleNormal( 0, 0 ) );
 
 			})
 
-			const nei = float(0.0);
+			const dei = property( 'float', 'dei' );
 
-			If( this.normalEdgeStrengthNode.greaterThan(0.0), () => {
+			If( this.depthEdgeStrength.greaterThan( 0.0 ), () => {
+				
+				dei.assign( depthEdgeIndicator( depth ) )
+
+			});
+
+			const nei = property( 'float', 'nei' );
+
+			If( this.normalEdgeStrength.greaterThan( 0.0 ), () => {
 
 				nei.assign( normalEdgeIndicator( depth, normal ) );
 
+			});
 
-			})
 
-			const strength = dei.greaterThan( 0.0 ).cond(
-				float( 1.0 ).sub( this.depthEdgeStrengthNode.mul( dei ) ),
-				float( 1.0 ).add( this.normalEdgeStrengthNode.mul( nei ) )
-			) */
+			const strength = dei.greaterThan( 0 ).cond( float( 1.0 ).sub( dei.mul( this.depthEdgeStrength ) ), nei.mul( this.normalEdgeStrength ).add( 1 ) );
 
-			return textureColor;//.mul( strength );
-
+			return texel.mul( strength );
 
 		} );
 
-		const outputNode = pixelate();
+		const outputNode = pixelation();
 
 		return outputNode;
 
@@ -149,12 +141,8 @@ class PixelationNode extends TempNode {
 
 }
 
-export const pixelate = ( node, pixelSize, normalEdgeStrength, depthEdgeStrength ) => {
-	return nodeObject( new PixelationNode( 
-		nodeObject( node ).toTexture(), pixelSize, normalEdgeStrength, depthEdgeStrength
-	));
-};
+export const pixelation = ( node, depthNode, normalNode, pixelSize, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), nodeObject( pixelSize ), normalEdgeStrength, depthEdgeStrength ) );
 
-addNodeElement( 'pixelate', pixelate );
+addNodeElement( 'pixelation', pixelation );
 
 export default PixelationNode;
