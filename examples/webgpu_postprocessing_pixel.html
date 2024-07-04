@@ -131,7 +131,7 @@
 			document.body.appendChild( renderer.domElement );
 
 			const effectController = {
-				pixelSize: uniform(14),
+				pixelSize: 14,
 				normalEdgeStrength: uniform(0.3),
 				depthEdgeStrength: uniform(0.4)
 			}
@@ -142,8 +142,8 @@
 			const scenePassColor = scenePass.getTextureNode();
 			const scenePassDepth = scenePass.getTextureDepthNode();
 			const scenePassNormal = scenePass.getTextureNormalNode();
-			composer.outputNode = scenePassColor.pixelation( scenePassDepth, scenePassNormal, 14, effectController.normalEdgeStrength, effectController.depthEdgeStrength);
-
+			const pixelationPass = scenePassColor.pixelation( scenePassDepth, scenePassNormal, 4, effectController.normalEdgeStrength, effectController.depthEdgeStrength);
+			composer.outputNode = pixelationPass;
 			window.addEventListener( 'resize', onWindowResize );
 
 			const controls = new OrbitControls( camera, renderer.domElement );
@@ -152,6 +152,7 @@
 			// gui
 
 			gui = new GUI();
+			gui.add( pixelationPass.pixelSizeNode, 'value', 0, 14, 1).name( 'Pixel Size' );
 			gui.add( effectController.normalEdgeStrength, 'value', 0, 2, 0.05 ).name( 'Normal Edge Strength' );
 			gui.add( effectController.depthEdgeStrength, 'value', 0, 1, 0.05 ).name( 'Depth Edge Strength' );
 
