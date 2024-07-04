@@ -32,6 +32,7 @@ class TextureNode extends UniformNode {
 		this.referenceNode = null;
 
 		this._value = value;
+		this._matrixValue = null;
 
 		this.setUpdateMatrix( uvNode === null );
 
@@ -101,9 +102,10 @@ class TextureNode extends UniformNode {
 
 	getTransformedUV( uvNode ) {
 
-		const texture = this.value;
+		if ( this._matrixValue === null ) this._matrixValue = uniform( this.value.matrix );
 
-		return uniform( texture.matrix ).mul( vec3( uvNode, 1 ) ).xy;
+		return this._matrixValue.mul( vec3( uvNode, 1 ) ).xy;
+
 
 	}
 
@@ -399,6 +401,9 @@ class TextureNode extends UniformNode {
 	update() {
 
 		const texture = this.value;
+		const matrixTexture = this._matrixValue;
+
+		if ( matrixTexture !== null ) matrixTexture.value = texture.matrix;
 
 		if ( texture.matrixAutoUpdate === true ) {
 
