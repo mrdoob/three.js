@@ -6,7 +6,6 @@ import { expression } from '../code/ExpressionNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { addNodeElement, nodeProxy, vec3, nodeObject } from '../shadernode/ShaderNode.js';
-import { reference } from '../accessors/ReferenceNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 
 import { IntType, UnsignedIntType } from '../../constants.js';
