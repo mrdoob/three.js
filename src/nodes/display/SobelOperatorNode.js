@@ -12,6 +12,8 @@ class SobelOperatorNode extends TempNode {
 
 	constructor( textureNode ) {
 
+		console.log(textureNode);
+
 		super();
 
 		this.textureNode = textureNode;

@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-	<title>three.js webgl - post processing - pixelation</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link type="text/css" rel="stylesheet" href="main.css">
-</head>
+	<head>
+		<title>three.js webgpu - postprocessing pixel</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
 
 <body>
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Pixelation pass with optional single pixel outlines by
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Node based pixelation pass with optional single pixel outlines by
 		<a href="https://github.com/KodyJKing" target="_blank" rel="noopener">Kody King</a><br /><br />
 	</div>
 
@@ -19,21 +18,22 @@
 	<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js",
+				"three": "../build/three.webgpu.js",
+				"three/tsl": "../build/three.webgpu.js",
 				"three/addons/": "./jsm/"
 			}
 		}
 	</script>
+	
 
 	<script type="module">
 
 		import * as THREE from 'three';
-
+		
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-		import { RenderPixelatedPass } from 'three/addons/postprocessing/RenderPixelatedPass.js';
-		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+		import { pass, normalPass, uniform, pixelate } from 'three/tsl';
 
 		let camera, scene, renderer, composer, crystalMesh, clock;
 		let gui, params;
@@ -52,39 +52,6 @@
 			scene.background = new THREE.Color( 0x151729 );
 
 			clock = new THREE.Clock();
-
-			renderer = new THREE.WebGLRenderer();
-			renderer.shadowMap.enabled = true;
-			//renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.setAnimationLoop( animate );
-			document.body.appendChild( renderer.domElement );
-
-			composer = new EffectComposer( renderer );
-			const renderPixelatedPass = new RenderPixelatedPass( 6, scene, camera );
-			composer.addPass( renderPixelatedPass );
-
-			const outputPass = new OutputPass();
-			composer.addPass( outputPass );
-
-			window.addEventListener( 'resize', onWindowResize );
-
-			const controls = new OrbitControls( camera, renderer.domElement );
-			controls.maxZoom = 2;
-
-			// gui
-
-			gui = new GUI();
-			params = { pixelSize: 6, normalEdgeStrength: .3, depthEdgeStrength: .4, pixelAlignedPanning: true };
-			gui.add( params, 'pixelSize' ).min( 1 ).max( 16 ).step( 1 )
-				.onChange( () => {
-
-					renderPixelatedPass.setPixelSize( params.pixelSize );
-
-				} );
-			gui.add( renderPixelatedPass, 'normalEdgeStrength' ).min( 0 ).max( 2 ).step( .05 );
-			gui.add( renderPixelatedPass, 'depthEdgeStrength' ).min( 0 ).max( 1 ).step( .05 );
-			gui.add( params, 'pixelAlignedPanning' );
 
 			// textures
 
@@ -156,6 +123,38 @@
 			spotLight.castShadow = true;
 			scene.add( spotLight );
 
+			renderer = new THREE.WebGPURenderer();
+			renderer.shadowMap.enabled = true;
+			//renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
+			document.body.appendChild( renderer.domElement );
+
+			const effectController = {
+				normalEdgeStrength: uniform(0.3),
+				depthEdgeStrength: uniform(0.4)
+			}
+
+			composer = new THREE.PostProcessing( renderer );
+
+			const scenePass = normalPass( scene, camera );
+			const scenePassColor = scenePass.getTextureNode();
+			const scenePassDepth = scenePass.getTextureDepthNode();
+			const scenePassNormal = scenePass.getTextureNormalNode();
+			composer.outputNode = scenePass.pixelate(6, effectController.normalEdgeStrength, effectController.depthEdgeStrength);
+
+			window.addEventListener( 'resize', onWindowResize );
+
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.maxZoom = 2;
+
+			// gui
+
+			gui = new GUI();
+			gui.add( effectController.normalEdgeStrength, 'value', 0, 2, 0.05 ).name( 'Normal Edge Strength' );
+			gui.add( effectController.depthEdgeStrength, 'value', 0, 1, 0.05 ).name( 'Depth Edge Strength' );
+
+
 		}
 
 		function onWindowResize() {
@@ -166,7 +165,6 @@
 			camera.updateProjectionMatrix();
 
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			composer.setSize( window.innerWidth, window.innerHeight );
 
 		}
 
@@ -180,12 +178,8 @@
 
 			const rendererSize = renderer.getSize( new THREE.Vector2() );
 			const aspectRatio = rendererSize.x / rendererSize.y;
-			if ( params[ 'pixelAlignedPanning' ] ) {
 
-				pixelAlignFrustum( camera, aspectRatio, Math.floor( rendererSize.x / params[ 'pixelSize' ] ),
-					Math.floor( rendererSize.y / params[ 'pixelSize' ] ) );
-
-			} else if ( camera.left != - aspectRatio || camera.top != 1.0 ) {
+			if ( camera.left != - aspectRatio || camera.top != 1.0 ) {
 
 				// Reset the Camera Frustum if it has been modified
 				camera.left = - aspectRatio;

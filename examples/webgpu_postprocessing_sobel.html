@@ -82,6 +82,8 @@
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode();
 
+				console.log(scenePassColor)
+
 				postProcessing.outputNode = scenePassColor.sobel();
 
 				//
