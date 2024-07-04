@@ -76,15 +76,36 @@ class WebGPUUtils {
 
 	}
 
-	getSampleCount( renderContext ) {
+	getSampleCount( sampleCount ) {
 
-		if ( renderContext.textures !== null ) {
+		let count = 1;
 
-			return renderContext.sampleCount;
+		if ( sampleCount > 1 ) {
+
+			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
+			count = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
+
+			if ( count === 2 ) {
+
+				count = 4;
+
+			}
 
 		}
 
-		return this.backend.parameters.sampleCount;
+		return count;
+
+	}
+
+	getSampleCountRenderContext( renderContext ) {
+
+		if ( renderContext.textures !== null ) {
+
+			return this.getSampleCount( renderContext.sampleCount );
+
+		}
+
+		return this.getSampleCount( this.backend.renderer.samples );
 
 	}
 

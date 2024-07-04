@@ -43,13 +43,14 @@ class PassTextureNode extends TextureNode {
 
 class PassNode extends TempNode {
 
-	constructor( scope, scene, camera ) {
+	constructor( scope, scene, camera, options = {} ) {
 
 		super( 'vec4' );
 
 		this.scope = scope;
 		this.scene = scene;
 		this.camera = camera;
+		this.options = options;
 
 		this._pixelRatio = 1;
 		this._width = 1;
@@ -60,7 +61,7 @@ class PassNode extends TempNode {
 		//depthTexture.type = FloatType;
 		depthTexture.name = 'PostProcessingDepth';
 
-		const renderTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType } );
+		const renderTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType, ...options } );
 		renderTarget.texture.name = 'PostProcessing';
 		renderTarget.depthTexture = depthTexture;
 
@@ -130,7 +131,18 @@ class PassNode extends TempNode {
 
 	}
 
-	setup() {
+	setup( { renderer } ) {
+
+		this.renderTarget.samples = this.options.samples === undefined ? renderer.samples : this.options.samples;
+
+		// Disable MSAA for WebGL backend for now
+		if ( renderer.backend.isWebGLBackend === true ) {
+
+			this.renderTarget.samples = 0;
+
+		}
+
+		this.renderTarget.depthTexture.isMultisampleRenderTargetTexture = this.renderTarget.samples > 1;
 
 		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 
@@ -194,7 +206,7 @@ PassNode.DEPTH = 'depth';
 
 export default PassNode;
 
-export const pass = ( scene, camera ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera ) );
+export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
 export const texturePass = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
 export const depthPass = ( scene, camera ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera ) );
 

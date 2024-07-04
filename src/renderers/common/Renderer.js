@@ -43,14 +43,17 @@ class Renderer {
 
 		const {
 			logarithmicDepthBuffer = false,
-			alpha = true
+			alpha = true,
+			antialias = false,
+			samples = 0
 		} = parameters;
 
 		// public
-
 		this.domElement = backend.getDomElement();
 
 		this.backend = backend;
+
+		this.samples = samples || ( antialias === true ) ? 4 : 0;
 
 		this.autoClear = true;
 		this.autoClearColor = true;
@@ -457,7 +460,7 @@ class Renderer {
 				generateMipmaps: false,
 				minFilter: LinearFilter,
 				magFilter: LinearFilter,
-				samples: this.backend.parameters.antialias ? 4 : 0
+				samples: this.samples
 			} );
 
 			frameBufferTarget.isPostProcessingRenderTarget = true;

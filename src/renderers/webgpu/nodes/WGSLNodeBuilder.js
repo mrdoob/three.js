@@ -241,7 +241,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		this._include( 'repeatWrapping' );
 
-		const dimension = `textureDimensions( ${ textureProperty }, 0 )`;
+		const dimension = texture.isMultisampleRenderTargetTexture === true ? `textureDimensions( ${ textureProperty } )` : `textureDimensions( ${ textureProperty }, 0 )`;
 
 		return `textureLoad( ${ textureProperty }, threejs_repeatWrapping( ${ uvSnippet }, ${ dimension } ), i32( ${ levelSnippet } ) )`;
 
@@ -269,7 +269,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	isUnfilterable( texture ) {
 
-		return this.getComponentTypeFromTexture( texture ) !== 'float' || ( texture.isDataTexture === true && texture.type === FloatType );
+		return this.getComponentTypeFromTexture( texture ) !== 'float' || ( texture.isDataTexture === true && texture.type === FloatType ) || texture.isMultisampleRenderTargetTexture === true;
 
 	}
 
@@ -864,6 +864,14 @@ ${ flowData.code }
 
 				let textureType;
 
+				let multisampled = '';
+
+				if ( texture.isMultisampleRenderTargetTexture === true ) {
+
+					multisampled = '_multisampled';
+
+				}
+
 				if ( texture.isCubeTexture === true ) {
 
 					textureType = 'texture_cube<f32>';
@@ -874,7 +882,7 @@ ${ flowData.code }
 
 				} else if ( texture.isDepthTexture === true ) {
 
-					textureType = 'texture_depth_2d';
+					textureType = `texture_depth${multisampled}_2d`;
 
 				} else if ( texture.isVideoTexture === true ) {
 
@@ -895,7 +903,7 @@ ${ flowData.code }
 
 					const componentPrefix = this.getComponentTypeFromTexture( texture ).charAt( 0 );
 
-					textureType = `texture_2d<${ componentPrefix }32>`;
+					textureType = `texture${multisampled}_2d<${ componentPrefix }32>`;
 
 				}
 
