@@ -1,4 +1,4 @@
-import UniformNode from '../core/UniformNode.js';
+import UniformNode, { uniform } from '../core/UniformNode.js';
 import { uv } from './UVNode.js';
 import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToLinear } from '../display/ColorSpaceNode.js';
@@ -33,6 +33,7 @@ class TextureNode extends UniformNode {
 		this.referenceNode = null;
 
 		this._value = value;
+		this._matrixValue = null;
 
 		this.setUpdateMatrix( uvNode === null );
 
@@ -102,7 +103,10 @@ class TextureNode extends UniformNode {
 
 	getTransformedUV( uvNode ) {
 
-		return reference( 'value.matrix', 'mat3', this ).mul( vec3( uvNode, 1 ) ).xy;
+		if ( this._matrixValue === null ) this._matrixValue = uniform( this.value.matrix );
+
+		return this._matrixValue.mul( vec3( uvNode, 1 ) ).xy;
+
 
 	}
 
@@ -398,6 +402,9 @@ class TextureNode extends UniformNode {
 	update() {
 
 		const texture = this.value;
+		const matrixTexture = this._matrixValue;
+
+		if ( matrixTexture !== null ) matrixTexture.value = texture.matrix;
 
 		if ( texture.matrixAutoUpdate === true ) {
 
