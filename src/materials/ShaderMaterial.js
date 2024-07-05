@@ -85,6 +85,23 @@ class ShaderMaterial extends Material {
 
 	}
 
+	dispose() {
+
+		for ( const i in this.uniforms ) {
+
+			const value = this.uniforms[i].value;
+
+			if ( value !== null ) {
+
+				if ( value.isTexture ) value.dispose();
+
+			}
+		}
+
+		super.dispose();
+
+	}
+
 	toJSON( meta ) {
 
 		const data = super.toJSON( meta );
