@@ -55,6 +55,18 @@ class Scene extends Object3D {
 
 	}
 
+	dispose() {
+
+		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'dispose', { detail: this } ) );
+
+		}
+
+		super.dispose();
+
+	}
+
 	toJSON( meta ) {
 
 		const data = super.toJSON( meta );
