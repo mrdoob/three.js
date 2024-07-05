@@ -351,6 +351,20 @@ class NodeMaterial extends Material {
 
 	}
 
+	setupLightMap( builder ) {
+
+		let node = null;
+
+		if ( builder.material.lightMap ) {
+
+			node = new IrradianceNode( materialLightMap );
+
+		}
+
+		return node;
+
+	}
+
 	setupLights( builder ) {
 
 		const materialLightsNode = [];
@@ -365,9 +379,11 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( builder.material.lightMap ) {
+		const lightMapNode = this.setupLightMap( builder );
 
-			materialLightsNode.push( new IrradianceNode( materialLightMap ) );
+		if ( lightMapNode && lightMapNode.isLightingNode ) {
+
+			materialLightsNode.push( lightMapNode );
 
 		}
 
