@@ -323,6 +323,10 @@ class MaterialNode extends Node {
 
 			node = this.getTexture( scope ).rgb.mul( this.getFloat( 'lightMapIntensity' ) );
 
+		} else if ( scope === MaterialNode.AO_MAP ) {
+
+			node = this.getTexture( scope ).r.sub( 1.0 ).mul( this.getFloat( 'aoMapIntensity' ) ).add( 1.0 );
+
 		} else {
 
 			const outputType = this.getNodeType( builder );
@@ -373,6 +377,7 @@ MaterialNode.LINE_DASH_OFFSET = 'dashOffset';
 MaterialNode.POINT_WIDTH = 'pointWidth';
 MaterialNode.DISPERSION = 'dispersion';
 MaterialNode.LIGHT_MAP = 'light';
+MaterialNode.AO_MAP = 'ao';
 
 export default MaterialNode;
 
@@ -414,6 +419,7 @@ export const materialLineDashOffset = nodeImmutable( MaterialNode, MaterialNode.
 export const materialPointWidth = nodeImmutable( MaterialNode, MaterialNode.POINT_WIDTH );
 export const materialDispersion = nodeImmutable( MaterialNode, MaterialNode.DISPERSION );
 export const materialLightMap = nodeImmutable( MaterialNode, MaterialNode.LIGHT_MAP );
+export const materialAOMap = nodeImmutable( MaterialNode, MaterialNode.AO_MAP );
 export const materialAnisotropyVector = uniform( new Vector2() ).onReference( function ( frame ) {
 
 	return frame.material;
