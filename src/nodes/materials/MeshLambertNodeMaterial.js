@@ -1,4 +1,5 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
+import BasicEnvironmentNode from '../lighting/BasicEnvironmentNode.js';
 import PhongLightingModel from '../functions/PhongLightingModel.js';
 
 import { MeshLambertMaterial } from '../../materials/MeshLambertMaterial.js';
@@ -18,6 +19,14 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 		this.setDefaultValues( defaultValues );
 
 		this.setValues( parameters );
+
+	}
+
+	setupEnvironment( builder ) {
+
+		const envNode = super.setupEnvironment( builder );
+
+		return envNode ? new BasicEnvironmentNode( envNode ) : null;
 
 	}
 
