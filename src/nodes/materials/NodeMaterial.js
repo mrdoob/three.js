@@ -4,7 +4,7 @@ import { NormalBlending } from '../../constants.js';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
-import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal } from '../accessors/MaterialNode.js';
+import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView, normalLocal } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
@@ -367,7 +367,7 @@ class NodeMaterial extends Material {
 
 		if ( builder.material.lightMap ) {
 
-			materialLightsNode.push( new IrradianceNode( materialReference( 'lightMap', 'texture' ) ) );
+			materialLightsNode.push( new IrradianceNode( materialLightMap ) );
 
 		}
 
