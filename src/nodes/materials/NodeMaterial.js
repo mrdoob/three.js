@@ -20,7 +20,6 @@ import { mix } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
 import { lightingContext } from '../lighting/LightingContextNode.js';
-import EnvironmentNode from '../lighting/EnvironmentNode.js';
 import IrradianceNode from '../lighting/IrradianceNode.js';
 import { depth } from '../display/ViewportDepthNode.js';
 import { cameraLogDepth } from '../accessors/CameraNode.js';
@@ -330,7 +329,7 @@ class NodeMaterial extends Material {
 
 	}
 
-	getEnvNode( builder ) {
+	setupEnvironment( builder ) {
 
 		let node = null;
 
@@ -354,15 +353,15 @@ class NodeMaterial extends Material {
 
 	setupLights( builder ) {
 
-		const envNode = this.getEnvNode( builder );
+		const materialLightsNode = [];
 
 		//
 
-		const materialLightsNode = [];
+		const envNode = this.setupEnvironment( builder );
 
-		if ( envNode ) {
+		if ( envNode && envNode.isLightingNode ) {
 
-			materialLightsNode.push( new EnvironmentNode( envNode ) );
+			materialLightsNode.push( envNode );
 
 		}
 
