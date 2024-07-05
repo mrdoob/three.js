@@ -6,6 +6,8 @@ class LightingNode extends Node {
 
 		super( 'vec3' );
 
+		this.isLightingNode = true;
+
 	}
 
 	generate( /*builder*/ ) {

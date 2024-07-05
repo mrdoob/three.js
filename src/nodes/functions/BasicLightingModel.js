@@ -22,7 +22,7 @@ class BasicLightingModel extends LightingModel {
 
 		const material = builder.material;
 		const outgoingLight = context.outgoingLight;
-		const envNode = material.getEnvNode( builder );
+		const envNode = builder.context.environment;
 
 		if ( envNode ) {
 
