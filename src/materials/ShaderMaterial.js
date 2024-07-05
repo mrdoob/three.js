@@ -89,13 +89,14 @@ class ShaderMaterial extends Material {
 
 		for ( const i in this.uniforms ) {
 
-			const value = this.uniforms[i].value;
+			const value = this.uniforms[ i ].value;
 
 			if ( value !== null ) {
 
 				if ( value.isTexture ) value.dispose();
 
 			}
+
 		}
 
 		super.dispose();

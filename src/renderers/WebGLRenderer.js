@@ -648,7 +648,7 @@ class WebGLRenderer {
 			if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 				__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'dispose', { detail: this } ) );
-	
+
 			}
 
 		};
