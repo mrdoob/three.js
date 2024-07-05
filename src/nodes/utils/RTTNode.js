@@ -10,7 +10,6 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { HalfFloatType } from '../../constants.js';
 
-const _quadMesh = new QuadMesh( new NodeMaterial() );
 const _size = new Vector2();
 
 class RTTNode extends TextureNode {
@@ -32,6 +31,9 @@ class RTTNode extends TextureNode {
 
 		this.updateMap = new WeakMap();
 
+		this._rttNode = null;
+		this._quadMesh = new QuadMesh( new NodeMaterial() );
+
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
 	}
@@ -42,14 +44,34 @@ class RTTNode extends TextureNode {
 
 	}
 
+	setup( builder ) {
+
+		this._rttNode = this.node.context( builder.getSharedContext() );
+		this._quadMesh.material.needsUpdate = true;
+
+		return super.setup( builder );
+
+	}
+
 	setSize( width, height ) {
 
 		this.width = width;
 		this.height = height;
 
-		this.renderTarget.setSize( width, height );
+		const effectiveWidth = width * this.pixelRatio;
+		const effectiveHeight = height * this.pixelRatio;
+
+		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
 
 		this.textureNeedsUpdate = true;
+
+	}
+
+	setPixelRatio( pixelRatio ) {
+
+		this.pixelRatio = pixelRatio;
+
+		this.setSize( this.width, this.height );
 
 	}
 
@@ -63,6 +85,8 @@ class RTTNode extends TextureNode {
 
 		if ( this.autoSize === true ) {
 
+			this.pixelRatio = renderer.getPixelRatio();
+
 			const size = renderer.getSize( _size );
 
 			this.setSize( size.width, size.height );
@@ -71,7 +95,7 @@ class RTTNode extends TextureNode {
 
 		//
 
-		_quadMesh.material.fragmentNode = this.node;
+		this._quadMesh.material.fragmentNode = this._rttNode;
 
 		//
 
@@ -79,7 +103,7 @@ class RTTNode extends TextureNode {
 
 		renderer.setRenderTarget( this.renderTarget );
 
-		_quadMesh.render( renderer );
+		this._quadMesh.render( renderer );
 
 		renderer.setRenderTarget( currentRenderTarget );
 
