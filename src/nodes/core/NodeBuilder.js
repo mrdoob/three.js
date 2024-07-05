@@ -395,6 +395,17 @@ class NodeBuilder {
 
 	}
 
+	getSharedContext() {
+
+		const context = { ...this.context };
+
+		delete context.keywords;
+		delete context.material;
+
+		return this.context;
+
+	}
+
 	setCache( cache ) {
 
 		this.cache = cache;
