@@ -1015,6 +1015,19 @@ class Object3D extends EventDispatcher {
 
 	}
 
+	dispose() {
+
+		while ( this.children.length > 0 ) {
+
+			const child = this.children[ 0 ];
+			child.dispose();
+
+		}
+
+		if ( this.parent !== null ) this.parent.remove( this );
+
+	}
+
 }
 
 Object3D.DEFAULT_UP = /*@__PURE__*/ new Vector3( 0, 1, 0 );
