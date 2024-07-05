@@ -72,6 +72,16 @@ class Mesh extends Object3D {
 
 	}
 
+	dispose() {
+
+		this.geometry.dispose();
+
+		this.material.dispose();
+
+		super.dispose();
+
+	}
+
 	updateMorphTargets() {
 
 		const geometry = this.geometry;
