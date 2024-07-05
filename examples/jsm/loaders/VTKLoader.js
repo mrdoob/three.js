@@ -4,7 +4,7 @@ import {
 	Color,
 	FileLoader,
 	Float32BufferAttribute,
-	Loader
+	Loader,
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
@@ -368,11 +368,12 @@ class VTKLoader extends Loader {
 
 				}
 
-				return { start: start,
+				return {
+					start,
 					end: index,
 					next: index + 1,
-					parsedString: s.join( '' ) };
-
+					parsedString: s.join( '' ),
+				};
 			}
 
 			let state, line;
@@ -446,7 +447,6 @@ class VTKLoader extends Loader {
 								indices[ indicesIndex ++ ] = strip[ j + 1 ];
 
 							} else {
-
 
 								indices[ indicesIndex ++ ] = strip[ j ];
 								indices[ indicesIndex ++ ] = strip[ j + 1 ];
@@ -620,7 +620,17 @@ class VTKLoader extends Loader {
 
 							const tmp = xmlToJson( item );
 
-							if ( tmp !== '' ) obj[ nodeName ] = tmp;
+							if ( tmp !== '' ) {
+
+								if ( Array.isArray( tmp[ '#text' ] ) ) {
+
+									tmp[ '#text' ] = tmp[ '#text' ][ 0 ];
+
+								}
+
+								obj[ nodeName ] = tmp;
+
+							}
 
 						} else {
 
@@ -633,7 +643,17 @@ class VTKLoader extends Loader {
 
 							const tmp = xmlToJson( item );
 
-							if ( tmp !== '' ) obj[ nodeName ].push( tmp );
+							if ( tmp !== '' ) {
+
+								if ( Array.isArray( tmp[ '#text' ] ) ) {
+
+									tmp[ '#text' ] = tmp[ '#text' ][ 0 ];
+
+								}
+
+								obj[ nodeName ].push( tmp );
+
+							}
 
 						}
 
@@ -894,6 +914,60 @@ class VTKLoader extends Loader {
 			let normals = [];
 			let indices = [];
 
+			if ( json.AppendedData ) {
+
+				const appendedData = json.AppendedData[ '#text' ].slice( 1 );
+				const piece = json.PolyData.Piece;
+
+				const sections = [ 'PointData', 'CellData', 'Points', 'Verts', 'Lines', 'Strips', 'Polys' ];
+				let sectionIndex = 0;
+
+				const offsets = sections.map( s => {
+
+					const sect = piece[ s ];
+
+					if ( sect && sect.DataArray ) {
+
+						const arr = Array.isArray( sect.DataArray ) ? sect.DataArray : [ sect.DataArray ];
+
+						return arr.map( a => a.attributes.offset );
+
+					}
+
+					return [];
+
+				} ).flat();
+
+				for ( const sect of sections ) {
+
+					const section = piece[ sect ];
+
+					if ( section && section.DataArray ) {
+
+						if ( Array.isArray( section.DataArray ) ) {
+
+							for ( const sectionEle of section.DataArray ) {
+
+								sectionEle[ '#text' ] = appendedData.slice( offsets[ sectionIndex ], offsets[ sectionIndex + 1 ] );
+								sectionEle.attributes.format = 'binary';
+								sectionIndex ++;
+
+							}
+
+						} else {
+
+							section.DataArray[ '#text' ] = appendedData.slice( offsets[ sectionIndex ], offsets[ sectionIndex + 1 ] );
+							section.DataArray.attributes.format = 'binary';
+							sectionIndex ++;
+
+						}
+
+					}
+
+				}
+
+			}
+
 			if ( json.PolyData ) {
 
 				const piece = json.PolyData.Piece;
@@ -948,161 +1022,161 @@ class VTKLoader extends Loader {
 							// if iti is point data
 							case 'PointData':
 
-								{
+							{
 
-									const numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
-									const normalsName = section.attributes.Normals;
+								const numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
+								const normalsName = section.attributes.Normals;
 
-									if ( numberOfPoints > 0 ) {
+								if ( numberOfPoints > 0 ) {
 
-										for ( let i = 0, len = arr.length; i < len; i ++ ) {
+									for ( let i = 0, len = arr.length; i < len; i ++ ) {
 
-											if ( normalsName === arr[ i ].attributes.Name ) {
+										if ( normalsName === arr[ i ].attributes.Name ) {
 
-												const components = arr[ i ].attributes.NumberOfComponents;
-												normals = new Float32Array( numberOfPoints * components );
-												normals.set( arr[ i ].text, 0 );
-
-											}
+											const components = arr[ i ].attributes.NumberOfComponents;
+											normals = new Float32Array( numberOfPoints * components );
+											normals.set( arr[ i ].text, 0 );
 
 										}
 
 									}
 
 								}
+
+							}
 
 								break;
 
 							// if it is points
 							case 'Points':
 
-								{
+							{
 
-									const numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
+								const numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
 
-									if ( numberOfPoints > 0 ) {
+								if ( numberOfPoints > 0 ) {
 
-										const components = section.DataArray.attributes.NumberOfComponents;
-										points = new Float32Array( numberOfPoints * components );
-										points.set( section.DataArray.text, 0 );
-
-									}
+									const components = section.DataArray.attributes.NumberOfComponents;
+									points = new Float32Array( numberOfPoints * components );
+									points.set( section.DataArray.text, 0 );
 
 								}
+
+							}
 
 								break;
 
 							// if it is strips
 							case 'Strips':
 
-								{
+							{
 
-									const numberOfStrips = parseInt( piece.attributes.NumberOfStrips );
+								const numberOfStrips = parseInt( piece.attributes.NumberOfStrips );
 
-									if ( numberOfStrips > 0 ) {
+								if ( numberOfStrips > 0 ) {
 
-										const connectivity = new Int32Array( section.DataArray[ 0 ].text.length );
-										const offset = new Int32Array( section.DataArray[ 1 ].text.length );
-										connectivity.set( section.DataArray[ 0 ].text, 0 );
-										offset.set( section.DataArray[ 1 ].text, 0 );
+									const connectivity = new Int32Array( section.DataArray[ 0 ].text.length );
+									const offset = new Int32Array( section.DataArray[ 1 ].text.length );
+									connectivity.set( section.DataArray[ 0 ].text, 0 );
+									offset.set( section.DataArray[ 1 ].text, 0 );
 
-										const size = numberOfStrips + connectivity.length;
-										indices = new Uint32Array( 3 * size - 9 * numberOfStrips );
+									const size = numberOfStrips + connectivity.length;
+									indices = new Uint32Array( 3 * size - 9 * numberOfStrips );
 
-										let indicesIndex = 0;
+									let indicesIndex = 0;
 
-										for ( let i = 0, len = numberOfStrips; i < len; i ++ ) {
+									for ( let i = 0, len = numberOfStrips; i < len; i ++ ) {
 
-											const strip = [];
+										const strip = [];
 
-											for ( let s = 0, len1 = offset[ i ], len0 = 0; s < len1 - len0; s ++ ) {
+										for ( let s = 0, len1 = offset[ i ], len0 = 0; s < len1 - len0; s ++ ) {
 
-												strip.push( connectivity[ s ] );
+											strip.push( connectivity[ s ] );
 
-												if ( i > 0 ) len0 = offset[ i - 1 ];
+											if ( i > 0 ) len0 = offset[ i - 1 ];
 
-											}
+										}
 
-											for ( let j = 0, len1 = offset[ i ], len0 = 0; j < len1 - len0 - 2; j ++ ) {
+										for ( let j = 0, len1 = offset[ i ], len0 = 0; j < len1 - len0 - 2; j ++ ) {
 
-												if ( j % 2 ) {
+											if ( j % 2 ) {
 
-													indices[ indicesIndex ++ ] = strip[ j ];
-													indices[ indicesIndex ++ ] = strip[ j + 2 ];
-													indices[ indicesIndex ++ ] = strip[ j + 1 ];
+												indices[ indicesIndex ++ ] = strip[ j ];
+												indices[ indicesIndex ++ ] = strip[ j + 2 ];
+												indices[ indicesIndex ++ ] = strip[ j + 1 ];
 
-												} else {
+											} else {
 
-													indices[ indicesIndex ++ ] = strip[ j ];
-													indices[ indicesIndex ++ ] = strip[ j + 1 ];
-													indices[ indicesIndex ++ ] = strip[ j + 2 ];
-
-												}
-
-												if ( i > 0 ) len0 = offset[ i - 1 ];
+												indices[ indicesIndex ++ ] = strip[ j ];
+												indices[ indicesIndex ++ ] = strip[ j + 1 ];
+												indices[ indicesIndex ++ ] = strip[ j + 2 ];
 
 											}
+
+											if ( i > 0 ) len0 = offset[ i - 1 ];
 
 										}
 
 									}
 
 								}
+
+							}
 
 								break;
 
 							// if it is polys
 							case 'Polys':
 
-								{
+							{
 
-									const numberOfPolys = parseInt( piece.attributes.NumberOfPolys );
+								const numberOfPolys = parseInt( piece.attributes.NumberOfPolys );
 
-									if ( numberOfPolys > 0 ) {
+								if ( numberOfPolys > 0 ) {
 
-										const connectivity = new Int32Array( section.DataArray[ 0 ].text.length );
-										const offset = new Int32Array( section.DataArray[ 1 ].text.length );
-										connectivity.set( section.DataArray[ 0 ].text, 0 );
-										offset.set( section.DataArray[ 1 ].text, 0 );
+									const connectivity = new Int32Array( section.DataArray[ 0 ].text.length );
+									const offset = new Int32Array( section.DataArray[ 1 ].text.length );
+									connectivity.set( section.DataArray[ 0 ].text, 0 );
+									offset.set( section.DataArray[ 1 ].text, 0 );
 
-										const size = numberOfPolys + connectivity.length;
-										indices = new Uint32Array( 3 * size - 9 * numberOfPolys );
-										let indicesIndex = 0, connectivityIndex = 0;
-										let i = 0, len0 = 0;
-										const len = numberOfPolys;
+									const size = numberOfPolys + connectivity.length;
+									indices = new Uint32Array( 3 * size - 9 * numberOfPolys );
+									let indicesIndex = 0, connectivityIndex = 0;
+									let i = 0, len0 = 0;
+									const len = numberOfPolys;
 
-										while ( i < len ) {
+									while ( i < len ) {
 
-											const poly = [];
-											let s = 0;
-											const len1 = offset[ i ];
+										const poly = [];
+										let s = 0;
+										const len1 = offset[ i ];
 
-											while ( s < len1 - len0 ) {
+										while ( s < len1 - len0 ) {
 
-												poly.push( connectivity[ connectivityIndex ++ ] );
-												s ++;
-
-											}
-
-											let j = 1;
-
-											while ( j < len1 - len0 - 1 ) {
-
-												indices[ indicesIndex ++ ] = poly[ 0 ];
-												indices[ indicesIndex ++ ] = poly[ j ];
-												indices[ indicesIndex ++ ] = poly[ j + 1 ];
-												j ++;
-
-											}
-
-											i ++;
-											len0 = offset[ i - 1 ];
+											poly.push( connectivity[ connectivityIndex ++ ] );
+											s ++;
 
 										}
+
+										let j = 1;
+
+										while ( j < len1 - len0 - 1 ) {
+
+											indices[ indicesIndex ++ ] = poly[ 0 ];
+											indices[ indicesIndex ++ ] = poly[ j ];
+											indices[ indicesIndex ++ ] = poly[ j + 1 ];
+											j ++;
+
+										}
+
+										i ++;
+										len0 = offset[ i - 1 ];
 
 									}
 
 								}
+
+							}
 
 								break;
 
