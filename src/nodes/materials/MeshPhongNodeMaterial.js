@@ -2,6 +2,7 @@ import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import { shininess, specularColor } from '../core/PropertyNode.js';
 import { materialShininess, materialSpecular } from '../accessors/MaterialNode.js';
 import { float } from '../shadernode/ShaderNode.js';
+import BasicEnvironmentNode from '../lighting/BasicEnvironmentNode.js';
 import PhongLightingModel from '../functions/PhongLightingModel.js';
 
 import { MeshPhongMaterial } from '../../materials/MeshPhongMaterial.js';
@@ -27,6 +28,13 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 	}
 
+	setupEnvironment( builder ) {
+
+		const envNode = super.setupEnvironment( builder );
+
+		return envNode ? new BasicEnvironmentNode( envNode ) : null;
+
+	}
 	setupLightingModel( /*builder*/ ) {
 
 		return new PhongLightingModel();
