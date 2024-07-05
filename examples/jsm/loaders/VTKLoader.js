@@ -368,12 +368,10 @@ class VTKLoader extends Loader {
 
 				}
 
-				return {
-					start,
+				return { start: start,
 					end: index,
 					next: index + 1,
-					parsedString: s.join( '' ),
-				};
+					parsedString: s.join( '' ) };
 
 			}
 
