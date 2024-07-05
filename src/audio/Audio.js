@@ -395,6 +395,14 @@ class Audio extends Object3D {
 
 	}
 
+	dispose() {
+
+		this.stop();
+
+		super.dispose();
+
+	}
+
 }
 
 export { Audio };
