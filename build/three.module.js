@@ -8159,6 +8159,19 @@ class Object3D extends EventDispatcher {
 
 	}
 
+	dispose() {
+
+		while ( this.children.length > 0 ) {
+
+			const child = this.children[ 0 ];
+			child.dispose();
+
+		}
+
+		if ( this.parent !== null ) this.parent.remove( this );
+
+	}
+
 }
 
 Object3D.DEFAULT_UP = /*@__PURE__*/ new Vector3( 0, 1, 0 );
@@ -9593,6 +9606,18 @@ class Material extends EventDispatcher {
 	}
 
 	dispose() {
+
+		for ( const i in this ) {
+
+			const value = this[ i ];
+
+			if ( value !== null ) {
+
+				if ( value.isTexture ) value.dispose();
+
+			}
+
+		}
 
 		this.dispatchEvent( { type: 'dispose' } );
 
@@ -11607,6 +11632,16 @@ class Mesh extends Object3D {
 
 	}
 
+	dispose() {
+
+		this.geometry.dispose();
+
+		this.material.dispose();
+
+		super.dispose();
+
+	}
+
 	updateMorphTargets() {
 
 		const geometry = this.geometry;
@@ -12327,6 +12362,24 @@ class ShaderMaterial extends Material {
 		this.glslVersion = source.glslVersion;
 
 		return this;
+
+	}
+
+	dispose() {
+
+		for ( const i in this.uniforms ) {
+
+			const value = this.uniforms[ i ].value;
+
+			if ( value !== null ) {
+
+				if ( value.isTexture ) value.dispose();
+
+			}
+
+		}
+
+		super.dispose();
 
 	}
 
@@ -29141,6 +29194,12 @@ class WebGLRenderer {
 
 			animation.stop();
 
+			if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+				__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'dispose', { detail: this } ) );
+
+			}
+
 		};
 
 		// Events
@@ -31425,6 +31484,18 @@ class Scene extends Object3D {
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
 		return this;
+
+	}
+
+	dispose() {
+
+		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'dispose', { detail: this } ) );
+
+		}
+
+		super.dispose();
 
 	}
 
@@ -48298,6 +48369,14 @@ class Audio extends Object3D {
 		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );
 
 		return this;
+
+	}
+
+	dispose() {
+
+		this.stop();
+
+		super.dispose();
 
 	}
 
