@@ -506,6 +506,18 @@ class Material extends EventDispatcher {
 
 	dispose() {
 
+		for ( const i in this ) {
+
+			const value = this[ i ];
+
+			if ( value !== null ) {
+
+				if ( value.isTexture ) value.dispose();
+
+			}
+
+		}
+
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
