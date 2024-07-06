@@ -193,18 +193,36 @@ export default class RenderObject {
 
 			if ( /^(is[A-Z]|_)|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
 
-			let value = material[ property ];
+			const value = material[ property ];
+
+			let valueKey;
 
 			if ( value !== null ) {
 
 				const type = typeof value;
 
-				if ( type === 'number' ) value = value !== 0 ? '1' : '0'; // Convert to on/off, important for clearcoat, transmission, etc
-				else if ( type === 'object' ) value = '{}';
+				if ( type === 'number' ) valueKey = value !== 0 ? '1' : '0'; // Convert to on/off, important for clearcoat, transmission, etc
+				else if ( type === 'object' ) {
+
+					valueKey = '{';
+
+					if ( value.isTexture ) {
+
+						valueKey += value.mapping;
+
+					}
+
+					valueKey += '}';
+
+				}
+
+			} else {
+
+				valueKey = String( value );
 
 			}
 
-			cacheKey += /*property + ':' +*/ value + ',';
+			cacheKey += /*property + ':' +*/ valueKey + ',';
 
 		}
 
