@@ -3,6 +3,7 @@ import { diffuseColor } from '../core/PropertyNode.js';
 import { MultiplyOperation, MixOperation, AddOperation } from '../../constants.js';
 import { materialSpecularStrength, materialReflectivity } from '../accessors/MaterialNode.js';
 import { mix } from '../math/MathNode.js';
+import { vec4 } from '../shadernode/ShaderNode.js';
 
 class BasicLightingModel extends LightingModel {
 
@@ -12,11 +13,31 @@ class BasicLightingModel extends LightingModel {
 
 	}
 
-	indirect( { ambientOcclusion, reflectedLight } ) {
+	indirect( context, stack, builder ) {
 
-		reflectedLight.indirectDiffuse.addAssign( diffuseColor.rgb );
+		const ambientOcclusion = context.ambientOcclusion;
+		const reflectedLight = context.reflectedLight;
+		const irradianceLightMap = builder.context.irradianceLightMap;
+
+		reflectedLight.indirectDiffuse.assign( vec4( 0.0 ) );
+
+		// accumulation (baked indirect lighting only)
+
+		if ( irradianceLightMap ) {
+
+			reflectedLight.indirectDiffuse.addAssign( irradianceLightMap );
+
+		} else {
+
+			reflectedLight.indirectDiffuse.addAssign( vec4( 1.0, 1.0, 1.0, 0.0 ) );
+
+		}
+
+		// modulation
 
 		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
+
+		reflectedLight.indirectDiffuse.mulAssign( diffuseColor.rgb );
 
 	}
 
