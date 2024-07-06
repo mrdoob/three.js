@@ -12,7 +12,7 @@ class BasicLightingModel extends LightingModel {
 
 	}
 
-	indirectDiffuse( { ambientOcclusion, reflectedLight } ) {
+	indirect( { ambientOcclusion, reflectedLight } ) {
 
 		reflectedLight.indirectDiffuse.addAssign( diffuseColor.rgb );
 

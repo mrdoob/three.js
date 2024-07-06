@@ -38,7 +38,7 @@ class ToonLightingModel extends LightingModel {
 
 	}
 
-	indirectDiffuse( { ambientOcclusion, irradiance, reflectedLight } ) {
+	indirect( { ambientOcclusion, irradiance, reflectedLight } ) {
 
 		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
 

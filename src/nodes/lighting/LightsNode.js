@@ -99,9 +99,7 @@ class LightsNode extends Node {
 
 			//
 
-			lightingModel.indirectDiffuse( context, stack, builder );
-			lightingModel.indirectSpecular( context, stack, builder );
-			lightingModel.ambientOcclusion( context, stack, builder );
+			lightingModel.indirect( context, stack, builder );
 
 			//
 
