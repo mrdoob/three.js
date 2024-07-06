@@ -21,7 +21,7 @@ class CubeTextureNode extends TextureNode {
 
 	}
 
-	getDefaultUV( ) {
+	getDefaultUV() {
 
 		const texture = this.value;
 
