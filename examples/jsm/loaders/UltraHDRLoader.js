@@ -72,7 +72,7 @@ class UltraHDRLoader extends Loader {
 		const dataAsString = textDecoder.decode( data );
 
 		/* Minimal sufficient validation - https://developer.android.com/media/platform/hdr-image-format#signal_of_the_format */
-		if ( ! dataAsString.includes( 'http://ns.adobe.com/hdr-gain-map/' ) ) {
+		if ( ! dataAsString.includes( 'hdrgm:Version="1.0"' ) ) {
 
 			throw new Error( 'THREE.UltraHDRLoader: Not a valid UltraHDR image' );
 
