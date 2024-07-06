@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js webgpu - mesh - batch</title>
+	<title>three.js webgpu - batch mesh</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="main.css">
@@ -14,9 +14,7 @@
 <body>
 
 	<div id="info">
-
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - mesh - batch
-
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - batch mesh
 	</div>
 
 	<div id="backend" style="position: absolute; top: 200px; left: 0; color: #fff; background-color: rgba(0,0,0,0.75); padding: 5px;">
@@ -26,31 +24,31 @@
 	<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js",
+				"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 				"three/addons/": "./jsm/",
-				"three/nodes": "./jsm/nodes/Nodes.js",
 				"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.7/dist/main.js"
 			}
 		}
 	</script>
 
 	<script type="module">
+
 		import * as THREE from 'three';
 
 		import Stats from 'stats-gl';
+
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { radixSort } from 'three/addons/utils/SortUtils.js';
-		import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-		import { MeshNormalNodeMaterial } from 'three/nodes';
 
 		let camera, scene, renderer;
 		let controls, stats;
 		let gui;
 		let geometries, mesh, material;
 		const ids = [];
-		
+
 		const matrix = new THREE.Matrix4();
 
 		//
@@ -121,7 +119,7 @@
 
 			if ( ! material ) {
 
-				material = new MeshNormalNodeMaterial();
+				material = new THREE.MeshNormalNodeMaterial();
 
 			}
 
@@ -155,8 +153,8 @@
 		function initBatchedMesh() {
 
 			const geometryCount = api.count;
-			const vertexCount = api.count * 512;
-			const indexCount = api.count * 1024;
+			const vertexCount = geometries.length * 512;
+			const indexCount = geometries.length * 1024;
 
 			const euler = new THREE.Euler();
 			const matrix = new THREE.Matrix4();
@@ -168,9 +166,14 @@
 
 			ids.length = 0;
 
+			const geometryIds = [
+				mesh.addGeometry( geometries[ 0 ] ),
+				mesh.addGeometry( geometries[ 1 ] ),
+				mesh.addGeometry( geometries[ 2 ] ),
+			];
 			for ( let i = 0; i < api.count; i ++ ) {
 
-				const id = mesh.addGeometry( geometries[ i % geometries.length ] );
+				const id = mesh.addInstance( geometryIds[ i % geometryIds.length ] );
 				mesh.setMatrixAt( id, randomizeMatrix( matrix ) );
 
 				const rotationMatrix = new THREE.Matrix4();
@@ -208,7 +211,7 @@
 
 			// renderer
 
-			renderer = new WebGPURenderer( { antialias: true, forceWebGL } );
+			renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -313,7 +316,7 @@
 
 				controls.update();
 
-		
+
 				if ( mesh.isBatchedMesh ) {
 
 					mesh.sortObjects = api.sortObjects;
@@ -355,7 +358,7 @@
 			// initialize options
 			this._options = this._options || {
 				get: el => el.z,
-				aux: new Array( this.maxGeometryCount )
+				aux: new Array( this.maxInstanceCount )
 			};
 
 			const options = this._options;

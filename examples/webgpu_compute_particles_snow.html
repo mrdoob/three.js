@@ -14,9 +14,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js",
 					"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.8/dist/main.js"
 				}
 			}
@@ -25,16 +25,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, texture, vec3, pass, color, uint, viewportTopLeft, positionWorld, positionLocal, timerLocal, vec2, MeshStandardNodeMaterial, instanceIndex, storage, MeshBasicNodeMaterial, If } from 'three/nodes';
+			import { tslFn, texture, vec3, pass, color, uint, viewportTopLeft, positionWorld, positionLocal, timerLocal, vec2, instanceIndex, storage, If } from 'three/tsl';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import StorageInstancedBufferAttribute from 'three/addons/renderers/common/StorageInstancedBufferAttribute.js';
-
-			import PostProcessing from 'three/addons/renderers/common/PostProcessing.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -52,14 +45,6 @@
 			init();
 
 			async function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
 
 				const { innerWidth, innerHeight } = window;
 
@@ -97,15 +82,17 @@
 
 				collisionPosRT = new THREE.RenderTarget( 1024, 1024 );
 				collisionPosRT.texture.type = THREE.HalfFloatType;
+				collisionPosRT.texture.magFilter = THREE.NearestFilter;
+				collisionPosRT.texture.minFilter = THREE.NearestFilter;
 
-				collisionPosMaterial = new MeshBasicNodeMaterial();
+				collisionPosMaterial = new THREE.MeshBasicNodeMaterial();
 				collisionPosMaterial.fog = false;
 				collisionPosMaterial.toneMapped = false;
 				collisionPosMaterial.colorNode = positionWorld.y;
 
 				//
 
-				const createBuffer = ( type = 'vec3' ) => storage( new StorageInstancedBufferAttribute( maxParticleCount, type === 'vec4' ? 4 : 3 ), type, maxParticleCount );
+				const createBuffer = ( type = 'vec3' ) => storage( new THREE.StorageInstancedBufferAttribute( maxParticleCount, type === 'vec4' ? 4 : 3 ), type, maxParticleCount );
 
 				const positionBuffer = createBuffer();
 				const scaleBuffer = createBuffer();
@@ -189,7 +176,7 @@
 					const posBuffer = staticParticles ? staticPositionBuffer : positionBuffer;
 					const layer = staticParticles ? 1 : 2;
 
-					const staticMaterial = new MeshStandardNodeMaterial( {
+					const staticMaterial = new THREE.MeshStandardNodeMaterial( {
 						color: 0xeeeeee,
 						roughness: .9,
 						metalness: 0
@@ -198,7 +185,6 @@
 					staticMaterial.positionNode = positionLocal.mul( scaleBuffer.toAttribute() ).add( posBuffer.toAttribute() );
 
 					const rainParticles = new THREE.Mesh( geometry, staticMaterial );
-					rainParticles.isInstancedMesh = true;
 					rainParticles.count = maxParticleCount;
 					rainParticles.castShadow = true;
 					rainParticles.layers.disableAll();
@@ -234,7 +220,7 @@
 
 				function tree( count = 8 ) {
 
-					const coneMaterial = new MeshStandardNodeMaterial( {
+					const coneMaterial = new THREE.MeshStandardNodeMaterial( {
 						color: 0x0d492c,
 						roughness: .6,
 						metalness: 0
@@ -264,7 +250,7 @@
 
 				}
 
-				const teapotTree = new THREE.Mesh( new TeapotGeometry( .5, 18 ), new MeshBasicNodeMaterial( {
+				const teapotTree = new THREE.Mesh( new TeapotGeometry( .5, 18 ), new THREE.MeshBasicNodeMaterial( {
 					color: 0xfcfb9e
 				} ) );
 
@@ -279,7 +265,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -312,7 +298,7 @@
 				const vignet = viewportTopLeft.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
 
 				const teapotTreePass = pass( teapotTree, camera ).getTextureNode();
-				const teapotTreePassBlurred = teapotTreePass.gaussianBlur( 3 );
+				const teapotTreePassBlurred = teapotTreePass.gaussianBlur( vec2( 1 ), 3 );
 				teapotTreePassBlurred.resolution = new THREE.Vector2( .2, .2 );
 
 				const scenePassColorBlurred = scenePassColor.gaussianBlur();
@@ -326,7 +312,7 @@
 				totalPass = totalPass.mul( vignet );
 				totalPass = totalPass.add( teapotTreePass.mul( 10 ).add( teapotTreePassBlurred ) );
 
-				postProcessing = new PostProcessing( renderer );
+				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputNode = totalPass;
 
 				//

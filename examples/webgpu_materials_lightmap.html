@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - lightmap</title>
+		<title>three.js webgpu - lightmap</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -11,9 +11,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -21,14 +21,11 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { vec4, color, positionLocal, mix } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-			import { MeshBasicNodeMaterial, vec4, color, positionLocal, mix } from 'three/nodes';
 
 			let container, stats;
 			let camera, scene, renderer;
@@ -68,7 +65,7 @@
 
 				const h = positionLocal.add( offset ).normalize().y;
 
-				const skyMat = new MeshBasicNodeMaterial();
+				const skyMat = new THREE.MeshBasicNodeMaterial();
 				skyMat.colorNode = vec4( mix( color( bottomColor ), color( topColor ), h.max( 0.0 ).pow( exponent ) ), 1.0 );
 				skyMat.side = THREE.BackSide;
 
@@ -83,7 +80,7 @@
 
 				// RENDERER
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setAnimationLoop( animate );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( innerWidth, innerHeight );

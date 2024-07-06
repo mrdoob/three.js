@@ -28,22 +28,23 @@
 	<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js",
+				"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 				"three/addons/": "./jsm/",
-				"three/nodes": "./jsm/nodes/Nodes.js",
 				"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.7/dist/main.js"
 			}
 		}
 	</script>
 
 	<script type="module">
+
 		import * as THREE from 'three';
 
 		import Stats from 'stats-gl';
+
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-		import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-		import { MeshToonNodeMaterial } from 'three/nodes';
 
 		let camera, scene, renderer;
 		let controls, stats;
@@ -158,7 +159,7 @@
 
 			for ( let i = 0; i < count; i ++ ) {
 
-				const material = new MeshToonNodeMaterial( {
+				const material = new THREE.MeshToonNodeMaterial( {
 					color: new THREE.Color( Math.random() * 0xffffff ),
 					side: THREE.DoubleSide,
 				} );
@@ -200,7 +201,7 @@
 
 			// renderer
 
-			renderer = new WebGPURenderer( { antialias: true, forceWebGL } );
+			renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 

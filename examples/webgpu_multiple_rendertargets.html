@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - Multiple Render Targets</title>
+		<title>three.js webgpu - multiple render targets</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+
 		<div id="info">
-			<a href="https://threejs.org" target="_blank">threejs</a> webgpu - Multiple RenderTargets
+			<a href="https://threejs.org" target="_blank">threejs</a> webgpu - multiple rendertargets
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -24,17 +25,10 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { NodeMaterial, mix, modelNormalMatrix, normalGeometry, normalize, outputStruct, step, texture, uniform, uv, varying, vec2, vec4 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			//import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import { NodeMaterial, mix, modelNormalMatrix, normalGeometry, normalize, outputStruct, step, texture, uniform, uv, varying, vec2, vec4 } from 'three/nodes';
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
-			import QuadMesh from 'three/addons/objects/QuadMesh.js';
 
 			let camera, scene, renderer, torus;
 			let quadMesh, renderTarget;
@@ -104,15 +98,7 @@
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
@@ -155,7 +141,7 @@
 
 				// PostProcessing setup
 
-				quadMesh = new QuadMesh( new ReadGBufferMaterial( renderTarget.textures[ 0 ], renderTarget.textures[ 1 ] ) );
+				quadMesh = new THREE.QuadMesh( new ReadGBufferMaterial( renderTarget.textures[ 0 ], renderTarget.textures[ 1 ] ) );
 
 				// Controls
 

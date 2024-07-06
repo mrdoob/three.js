@@ -38,11 +38,11 @@
 		const sphereGeometryId = batchedMesh.addGeometry( sphere );
 
 		// create instances of those geometries
-		const boxInstancedId1 = batchedMesh.addInstance( boxGeometryId ); 
+		const boxInstancedId1 = batchedMesh.addInstance( boxGeometryId );
 		const boxInstancedId2 = batchedMesh.addInstance( boxGeometryId );
 
-		const sphereInstancedId1 = batchedMesh.addInstance( sphereGeometryId ); 
-		const sphereInstancedId2 = batchedMesh.addInstance( sphereGeometryId ); 
+		const sphereInstancedId1 = batchedMesh.addInstance( sphereGeometryId );
+		const sphereInstancedId2 = batchedMesh.addInstance( sphereGeometryId );
 
 		// position the geometries
 		batchedMesh.setMatrixAt( boxInstancedId1, boxMatrix1 );
@@ -100,9 +100,9 @@
 			rendered front to back. Default is `true`.
 		</p>
 
-		<h3>[property:Integer maxGeometryCount]</h3>
+		<h3>[property:Integer maxInstanceCount]</h3>
 		<p>
-			The maximum number of individual geometries that can be stored in the [name]. Read only.
+			The maximum number of individual instances that can be stored in the [name]. Read only.
 		</p>
 
 		<h3>[property:Boolean isBatchedMesh]</h3>
@@ -231,7 +231,7 @@
 			[method:Integer addInstance]( [param:Integer geometryId] )
 		</h3>
 		<p>
-			[page:Integer geometryId]: The id of a previously added geometry via "addGeometry" to add into the [name] to render. 
+			[page:Integer geometryId]: The id of a previously added geometry via "addGeometry" to add into the [name] to render.
 		</p>
 		<p>
 			Adds a new instance to the [name] using the geometry of the given geometryId and returns a new id referring to the new instance to be used

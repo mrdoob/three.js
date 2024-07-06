@@ -22,6 +22,14 @@ const precedenceOperators = [
 	','
 ].reverse();
 
+const associativityRightToLeft = [
+	'=',
+	'+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '<<=', '>>=',
+	',',
+	'?',
+	':'
+];
+
 const spaceRegExp = /^((\t| )\n*)+/;
 const lineRegExp = /^\n+/;
 const commentRegExp = /^\/\*[\s\S]*?\*\//;
@@ -297,13 +305,13 @@ class GLSLDecoder {
 
 		for ( const operator of precedenceOperators ) {
 
-			for ( let i = 0; i < tokens.length; i ++ ) {
+			const parseToken = ( i, inverse = false ) => {
 
 				const token = tokens[ i ];
 
 				groupIndex += getGroupDelta( token.str );
 
-				if ( ! token.isOperator || i === 0 || i === tokens.length - 1 ) continue;
+				if ( ! token.isOperator || i === 0 || i === tokens.length - 1 ) return;
 
 				if ( groupIndex === 0 && token.str === operator ) {
 
@@ -330,9 +338,43 @@ class GLSLDecoder {
 
 				}
 
-				if ( groupIndex < 0 ) {
+				if ( inverse ) {
 
-					return this.parseExpressionFromTokens( tokens.slice( 0, i ) );
+					if ( groupIndex > 0 ) {
+
+						return this.parseExpressionFromTokens( tokens.slice( i ) );
+
+					}
+
+				} else {
+
+					if ( groupIndex < 0 ) {
+
+						return this.parseExpressionFromTokens( tokens.slice( 0, i ) );
+
+					}
+
+				}
+
+			};
+
+			if ( associativityRightToLeft.includes( operator ) ) {
+
+				for ( let i = 0; i < tokens.length; i ++ ) {
+
+					const result = parseToken( i );
+
+					if ( result ) return result;
+
+				}
+
+			} else {
+
+				for ( let i = tokens.length - 1; i >= 0; i -- ) {
+
+					const result = parseToken( i, true );
+
+					if ( result ) return result;
 
 				}
 

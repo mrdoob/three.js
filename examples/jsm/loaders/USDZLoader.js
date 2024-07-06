@@ -52,6 +52,18 @@ class USDAParser {
 					target[ lhs ] = group;
 					target = group;
 
+				} else if ( rhs.endsWith( '(' ) ) {
+
+					// see #28631
+
+					const values = rhs.slice( 0, - 1 );
+					target[ lhs ] = values;
+
+					const meta = {};
+					stack.push( meta );
+
+					target = meta;
+
 				} else {
 
 					target[ lhs ] = rhs;
@@ -170,8 +182,7 @@ class USDZLoader extends Loader {
 
 					if ( isCrateFile( zip[ filename ] ) ) {
 
-						console.warn( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
-						continue;
+						throw Error( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
 
 					}
 
@@ -230,11 +241,9 @@ class USDZLoader extends Loader {
 
 			if ( isCrate ) {
 
-				console.warn( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
+				throw Error( 'THREE.USDZLoader: Crate files (.usdc or binary .usd) are not supported.' );
 
 			}
-
-			return undefined;
 
 		}
 
@@ -247,15 +256,6 @@ class USDZLoader extends Loader {
 		// console.log( assets )
 
 		const file = findUSD( zip );
-
-		if ( file === undefined ) {
-
-			console.warn( 'THREE.USDZLoader: No usda file found.' );
-
-			return new Group();
-
-		}
-
 
 		// Parse file
 
@@ -305,30 +305,6 @@ class USDZLoader extends Loader {
 
 				if ( name.startsWith( 'def Mesh' ) ) {
 
-					// Move points to Mesh
-
-					if ( 'point3f[] points' in data ) {
-
-						object[ 'point3f[] points' ] = data[ 'point3f[] points' ];
-
-					}
-
-					// Move st to Mesh
-
-					if ( 'texCoord2f[] primvars:st' in data ) {
-
-						object[ 'texCoord2f[] primvars:st' ] = data[ 'texCoord2f[] primvars:st' ];
-
-					}
-
-					// Move st indices to Mesh
-
-					if ( 'int[] primvars:st:indices' in data ) {
-
-						object[ 'int[] primvars:st:indices' ] = data[ 'int[] primvars:st:indices' ];
-
-					}
-
 					return object;
 
 				}
@@ -350,34 +326,45 @@ class USDZLoader extends Loader {
 
 			if ( ! data ) return undefined;
 
-			let geometry = new BufferGeometry();
+			const geometry = new BufferGeometry();
+			let indices = null;
+			let counts = null;
+			let uvs = null;
+
+			let positionsLength = - 1;
+
+			// index
 
 			if ( 'int[] faceVertexIndices' in data ) {
 
-				const indices = JSON.parse( data[ 'int[] faceVertexIndices' ] );
-				geometry.setIndex( indices );
+				indices = JSON.parse( data[ 'int[] faceVertexIndices' ] );
 
 			}
+
+			// face count
+
+			if ( 'int[] faceVertexCounts' in data ) {
+
+				counts = JSON.parse( data[ 'int[] faceVertexCounts' ] );
+				indices = toTriangleIndices( indices, counts );
+
+			}
+
+			// position
 
 			if ( 'point3f[] points' in data ) {
 
 				const positions = JSON.parse( data[ 'point3f[] points' ].replace( /[()]*/g, '' ) );
-				const attribute = new BufferAttribute( new Float32Array( positions ), 3 );
+				positionsLength = positions.length;
+				let attribute = new BufferAttribute( new Float32Array( positions ), 3 );
+
+				if ( indices !== null ) attribute = toFlatBufferAttribute( attribute, indices );
+
 				geometry.setAttribute( 'position', attribute );
 
 			}
 
-			if ( 'normal3f[] normals' in data ) {
-
-				const normals = JSON.parse( data[ 'normal3f[] normals' ].replace( /[()]*/g, '' ) );
-				const attribute = new BufferAttribute( new Float32Array( normals ), 3 );
-				geometry.setAttribute( 'normal', attribute );
-
-			} else {
-
-				geometry.computeVertexNormals();
-
-			}
+			// uv
 
 			if ( 'float2[] primvars:st' in data ) {
 
@@ -387,25 +374,102 @@ class USDZLoader extends Loader {
 
 			if ( 'texCoord2f[] primvars:st' in data ) {
 
-				const uvs = JSON.parse( data[ 'texCoord2f[] primvars:st' ].replace( /[()]*/g, '' ) );
+				uvs = JSON.parse( data[ 'texCoord2f[] primvars:st' ].replace( /[()]*/g, '' ) );
+				let attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
+
+				if ( indices !== null ) attribute = toFlatBufferAttribute( attribute, indices );
+
+				geometry.setAttribute( 'uv', attribute );
+
+			}
+
+			if ( 'int[] primvars:st:indices' in data && uvs !== null ) {
+
+				// custom uv index, overwrite uvs with new data
+
 				const attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
+				let indices = JSON.parse( data[ 'int[] primvars:st:indices' ] );
+				indices = toTriangleIndices( indices, counts );
+				geometry.setAttribute( 'uv', toFlatBufferAttribute( attribute, indices ) );
 
-				if ( 'int[] primvars:st:indices' in data ) {
+			}
 
-					geometry = geometry.toNonIndexed();
+			// normal
 
-					const indices = JSON.parse( data[ 'int[] primvars:st:indices' ] );
-					geometry.setAttribute( 'uv', toFlatBufferAttribute( attribute, indices ) );
+			if ( 'normal3f[] normals' in data ) {
+
+				const normals = JSON.parse( data[ 'normal3f[] normals' ].replace( /[()]*/g, '' ) );
+				let attribute = new BufferAttribute( new Float32Array( normals ), 3 );
+
+				// normals require a special treatment in USD
+
+				if ( normals.length === positionsLength ) {
+
+					// raw normal and position data have equal length (like produced by USDZExporter)
+
+					if ( indices !== null ) attribute = toFlatBufferAttribute( attribute, indices );
 
 				} else {
 
-					geometry.setAttribute( 'uv', attribute );
+					// unequal length, normals are independent of faceVertexIndices
+
+					let indices = Array.from( Array( normals.length / 3 ).keys() ); // [ 0, 1, 2, 3 ... ]
+					indices = toTriangleIndices( indices, counts );
+					attribute = toFlatBufferAttribute( attribute, indices );
+
+				}
+
+				geometry.setAttribute( 'normal', attribute );
+
+			} else {
+
+				// compute flat vertex normals
+
+				geometry.computeVertexNormals();
+
+			}
+
+			return geometry;
+
+		}
+
+		function toTriangleIndices( rawIndices, counts ) {
+
+			const indices = [];
+
+			for ( let i = 0; i < counts.length; i ++ ) {
+
+				const count = counts[ i ];
+
+				const stride = i * count;
+
+				if ( count === 3 ) {
+
+					const a = rawIndices[ stride + 0 ];
+					const b = rawIndices[ stride + 1 ];
+					const c = rawIndices[ stride + 2 ];
+
+					indices.push( a, b, c );
+
+				} else if ( count === 4 ) {
+
+					const a = rawIndices[ stride + 0 ];
+					const b = rawIndices[ stride + 1 ];
+					const c = rawIndices[ stride + 2 ];
+					const d = rawIndices[ stride + 3 ];
+
+					indices.push( a, b, c );
+					indices.push( a, c, d );
+
+				} else {
+
+					console.warn( 'THREE.USDZLoader: Face vertex count of %s unsupported.', count );
 
 				}
 
 			}
 
-			return geometry;
+			return indices;
 
 		}
 
@@ -506,9 +570,11 @@ class USDZLoader extends Loader {
 
 			if ( data !== undefined ) {
 
-				if ( 'def Shader "PreviewSurface"' in data ) {
+				const surfaceConnection = data[ 'token outputs:surface.connect' ];
+				const surfaceName = /(\w+).output/.exec( surfaceConnection )[ 1 ];
+				const surface = data[ `def Shader "${surfaceName}"` ];
 
-					const surface = data[ 'def Shader "PreviewSurface"' ];
+				if ( surface !== undefined ) {
 
 					if ( 'color3f inputs:diffuseColor.connect' in surface ) {
 
@@ -677,24 +743,6 @@ class USDZLoader extends Loader {
 
 				}
 
-				if ( 'def Shader "diffuseColor_texture"' in data ) {
-
-					const sampler = data[ 'def Shader "diffuseColor_texture"' ];
-
-					material.map = buildTexture( sampler );
-					material.map.colorSpace = SRGBColorSpace;
-
-				}
-
-				if ( 'def Shader "normal_texture"' in data ) {
-
-					const sampler = data[ 'def Shader "normal_texture"' ];
-
-					material.normalMap = buildTexture( sampler );
-					material.normalMap.colorSpace = NoColorSpace;
-
-				}
-
 			}
 
 			return material;
@@ -729,7 +777,7 @@ class USDZLoader extends Loader {
 
 			if ( 'asset inputs:file' in data ) {
 
-				const path = data[ 'asset inputs:file' ].replace( /@*/g, '' );
+				const path = data[ 'asset inputs:file' ].replace( /@*/g, '' ).trim();
 
 				const loader = new TextureLoader();
 

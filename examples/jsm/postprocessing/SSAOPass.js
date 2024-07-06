@@ -39,6 +39,7 @@ class SSAOPass extends Pass {
 		this.height = ( height !== undefined ) ? height : 512;
 
 		this.clear = true;
+		this.needsSwap = false;
 
 		this.camera = camera;
 		this.scene = scene;
@@ -201,7 +202,7 @@ class SSAOPass extends Pass {
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
 
 				break;
 
@@ -209,13 +210,13 @@ class SSAOPass extends Pass {
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
 
 				break;
 
 			case SSAOPass.OUTPUT.Depth:
 
-				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : readBuffer );
 
 				break;
 
@@ -223,19 +224,15 @@ class SSAOPass extends Pass {
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
 
 				break;
 
 			case SSAOPass.OUTPUT.Default:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
-				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
-
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 				this.copyMaterial.blending = CustomBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
 
 				break;
 

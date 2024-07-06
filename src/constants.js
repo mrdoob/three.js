@@ -1,4 +1,4 @@
-export const REVISION = '166dev';
+export const REVISION = '167dev';
 
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -103,6 +103,7 @@ export const RedFormat = 1028;
 export const RedIntegerFormat = 1029;
 export const RGFormat = 1030;
 export const RGIntegerFormat = 1031;
+export const RGBIntegerFormat = 1032;
 export const RGBAIntegerFormat = 1033;
 
 export const RGB_S3TC_DXT1_Format = 33776;
@@ -153,6 +154,8 @@ export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
 export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
+export const RGBDepthPacking = 3202;
+export const RGDepthPacking = 3203;
 export const TangentSpaceNormalMap = 0;
 export const ObjectSpaceNormalMap = 1;
 

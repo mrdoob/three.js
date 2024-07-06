@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - materials - toon</title>
+		<title>three.js webgpu - toon material</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,14 +9,14 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Toon Material</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - toon material</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -24,13 +24,6 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-
-			import { MeshBasicNodeMaterial, MeshToonNodeMaterial } from 'three/nodes';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -52,14 +45,6 @@
 
 			function init( font ) {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -73,7 +58,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
@@ -108,7 +93,7 @@
 							// basic monochromatic energy preservation
 							const diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 ).multiplyScalar( 1 - beta * 0.2 );
 
-							const material = new MeshToonNodeMaterial( {
+							const material = new THREE.MeshToonNodeMaterial( {
 								color: diffuseColor,
 								gradientMap: gradientMap
 							} );
@@ -139,7 +124,7 @@
 
 					} );
 
-					const textMaterial = new MeshBasicNodeMaterial();
+					const textMaterial = new THREE.MeshBasicNodeMaterial();
 					const textMesh = new THREE.Mesh( textGeo, textMaterial );
 					textMesh.position.copy( location );
 					scene.add( textMesh );
@@ -154,7 +139,7 @@
 
 				particleLight = new THREE.Mesh(
 					new THREE.SphereGeometry( 4, 8, 8 ),
-					new MeshBasicNodeMaterial( { color: 0xffffff } )
+					new THREE.MeshBasicNodeMaterial( { color: 0xffffff } )
 				);
 				scene.add( particleLight );
 
