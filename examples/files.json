@@ -118,6 +118,7 @@
 		"webgl_loader_tilt",
 		"webgl_loader_texture_dds",
 		"webgl_loader_texture_exr",
+		"webgl_loader_texture_ultrahdr",
 		"webgl_loader_texture_hdr",
 		"webgl_loader_texture_hdrjpg",
 		"webgl_loader_texture_ktx",
