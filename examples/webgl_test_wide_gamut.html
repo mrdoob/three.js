@@ -13,18 +13,39 @@
 				height: 100%;
 			}
 
+			/* based on https://github.com/Paul-Browne/image-comparison-slider */
+
 			.slider {
-				position: absolute;
-				cursor: ew-resize;
+			    position: absolute;
+			    width: 200px;
+			    height: 100%;
+			    top: 0;
+			    left: 0;
+			    z-index: 1;
+			}
 
-				width: 40px;
-				height: 40px;
-				background-color: #F32196;
-				opacity: 0.7;
-				border-radius: 50%;
+			.slider:before,
+			.slider:after {
+			    position: absolute;
+			    left: 50%;
+			    content: "";
+			    background: #fff;
+			    cursor: grab;
+			}
 
-				top: calc(50% - 20px);
-				left: calc(50% - 20px);
+			.slider:before {
+			    top: 0;
+			    transform: translateX(-50%);
+			    width: 1px;
+			    height: 100%;
+			}
+
+			.slider:after {
+			    top: 50%;
+			    transform: translate(-50%, -50%);
+			    width: 5px;
+			    height: 33%;
+			    border-radius: 5px;
 			}
 
 			.label {
@@ -74,6 +95,8 @@
 			let sceneL, sceneR, textureL, textureR;
 
 			let sliderPos = window.innerWidth / 2;
+
+			const slider = document.querySelector( '.slider' );
 
 			const isP3Context = WebGL.isColorSpaceAvailable( THREE.DisplayP3ColorSpace );
 
@@ -135,8 +158,6 @@
 
 			function initSlider() {
 
-				const slider = document.querySelector( '.slider' );
-
 				function onPointerDown() {
 
 					if ( event.isPrimary === false ) return;
@@ -157,14 +178,22 @@
 
 					if ( event.isPrimary === false ) return;
 
-					sliderPos = Math.max( 0, Math.min( window.innerWidth, e.pageX ) );
-
-					slider.style.left = sliderPos - ( slider.offsetWidth / 2 ) + 'px';
+					updateSlider( e.pageX );
 
 				}
 
+				updateSlider( sliderPos );
+
 				slider.style.touchAction = 'none'; // disable touch scroll
 				slider.addEventListener( 'pointerdown', onPointerDown );
+
+			}
+
+			function updateSlider( offset ) {
+
+				sliderPos = Math.max( 10, Math.min( window.innerWidth - 10, offset ) );
+
+				slider.style.left = sliderPos - ( slider.offsetWidth / 2 ) + 'px';
 
 			}
 
@@ -177,6 +206,8 @@
 
 				THREE.TextureUtils.contain( sceneL.background, window.innerWidth / window.innerHeight );
 				THREE.TextureUtils.contain( sceneR.background, window.innerWidth / window.innerHeight );
+
+				updateSlider( sliderPos );
 
 			}
 
