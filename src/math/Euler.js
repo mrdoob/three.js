@@ -18,6 +18,54 @@ class Euler {
 
 	}
 
+	get _x() {
+
+		return this.x;
+
+	}
+
+	set _x( value ) {
+
+		this.x = value;
+
+	}
+
+	get _y() {
+
+		return this.y;
+
+	}
+
+	set _y( value ) {
+
+		this.y = value;
+
+	}
+
+	get _z() {
+
+		return this.z;
+
+	}
+
+	set _z( value ) {
+
+		this.z = value;
+
+	}
+
+	get _order() {
+
+		return this.order;
+
+	}
+
+	set _order( value ) {
+
+		this.order = value;
+
+	}
+
 	set( x, y, z, order = this.order ) {
 
 		this.x = x;

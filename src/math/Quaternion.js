@@ -13,6 +13,54 @@ class Quaternion {
 
 	}
 
+	get _x() {
+
+		return this.x;
+
+	}
+
+	set _x( value ) {
+
+		this.x = value;
+
+	}
+
+	get _y() {
+
+		return this.y;
+
+	}
+
+	set _y( value ) {
+
+		this.y = value;
+
+	}
+
+	get _z() {
+
+		return this.z;
+
+	}
+
+	set _z( value ) {
+
+		this.z = value;
+
+	}
+
+	get _w() {
+
+		return this.w;
+
+	}
+
+	set _w( value ) {
+
+		this.w = value;
+
+	}
+
 	static slerpFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
 
 		// fuzz-free, array-based Quaternion SLERP operation
