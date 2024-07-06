@@ -277,6 +277,18 @@ class Euler {
 
 	}
 
+	toJSON() {
+
+		return {
+			isEuler: true,
+			_x: this.x,
+			_y: this.y,
+			_z: this.z,
+			_order: this.order
+		};
+
+	}
+
 	*[ Symbol.iterator ]() {
 
 		yield this.x;
