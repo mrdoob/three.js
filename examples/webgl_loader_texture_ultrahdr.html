@@ -35,7 +35,8 @@
 				metalness: 1.0,
 				roughness: 0.0,
 				exposure: 1.0,
-				resolution: '2k'
+				resolution: '2k',
+				type: 'HalfFloatType'
 			};
 
 			let renderer, scene, camera, controls, torusMesh, loader;
@@ -73,8 +74,11 @@
 				controls = new OrbitControls( camera, renderer.domElement );
 			
 				loader = new UltraHDRLoader();
+				loader.setDataType( THREE.FloatType );
 
-				const loadEnvironment = function ( resolution = '2k' ) {
+				const loadEnvironment = function ( resolution = '2k', type = 'HalfFloatType' ) {
+
+					loader.setDataType( THREE[ type ] );
 
 					loader.load( `textures/equirectangular/spruit_sunrise_${resolution}.hdr.jpg`, function ( texture ) {
 
@@ -88,9 +92,7 @@
 
 				};
 
-				loadEnvironment( params.resolution );
-
-				//
+				loadEnvironment( params.resolution, params.type );
 
 				const gui = new GUI();
 
@@ -99,13 +101,16 @@
 				gui.add( params, 'exposure', 0, 4, 0.01 );
 				gui.add( params, 'resolution', [ '2k', '4k' ] ).onChange( ( value ) => {
 
-					loadEnvironment( value );
+					loadEnvironment( value, params.type );
+			
+				} );
+				gui.add( params, 'type', [ 'HalfFloatType', 'FloatType' ] ).onChange( ( value ) => {
+
+					loadEnvironment( params.resolution, value );
 			
 				} );
 
 				gui.open();
-
-				//
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -120,8 +125,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
-
-			//
 
 			function render() {
 

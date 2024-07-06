@@ -51,6 +51,16 @@ class UltraHDRLoader extends Loader {
 
 		super( manager );
 
+		this.type = HalfFloatType;
+
+	}
+
+	setDataType( value ) {
+
+		this.type = value;
+
+		return this;
+
 	}
 
 	parse( buffer, onLoad ) {
@@ -216,7 +226,7 @@ class UltraHDRLoader extends Loader {
 							height,
 							data: hdrBuffer,
 							format: RGBAFormat,
-							type: HalfFloatType,
+							type: this.type,
 						} );
 
 					}, ( error ) => {
@@ -236,7 +246,7 @@ class UltraHDRLoader extends Loader {
 			height: 0,
 			data: new Uint16Array(),
 			format: RGBAFormat,
-			type: HalfFloatType,
+			type: this.type,
 		};
 
 	}
@@ -261,7 +271,7 @@ class UltraHDRLoader extends Loader {
 							texData.width,
 							texData.height,
 							RGBAFormat,
-							HalfFloatType,
+							this.type,
 							UVMapping,
 							ClampToEdgeWrapping,
 							ClampToEdgeWrapping,
@@ -434,15 +444,24 @@ class UltraHDRLoader extends Loader {
 				const sdrImageData = ctx.getImageData( 0, 0, sdrImage.width, sdrImage.height, { colorSpace: 'srgb' } );
 
 				/* HDR Recovery formula - https://developer.android.com/media/platform/hdr-image-format#use_the_gain_map_to_create_adapted_HDR_rendition */
-				const hdrBuffer = new Uint16Array( sdrImageData.data.length ).fill( DataUtils.toHalfFloat( 255 ) );
+				let hdrBuffer;
+
+				if ( this.type === HalfFloatType ) {
+
+					hdrBuffer = new Uint16Array( sdrImageData.data.length ).fill( DataUtils.toHalfFloat( 255 ) );
+
+				} else {
+
+					hdrBuffer = new Float32Array( sdrImageData.data.length ).fill( 255 );
+
+				}
 
 				const maxDisplayBoost = Math.sqrt(
 					Math.pow(
 						/* 1.8 instead of 2 near-perfectly rectifies approximations introduced by precalculated SRGB_TO_LINEAR values */
 						1.8,
 						xmpMetadata.hdrCapacityMax
-					) )
-      ;
+					) );
 				const unclampedWeightFactor = ( Math.log2( maxDisplayBoost ) - xmpMetadata.hdrCapacityMin ) / ( xmpMetadata.hdrCapacityMax - xmpMetadata.hdrCapacityMin );
 				const weightFactor = this._clamp( unclampedWeightFactor, 0.0, 1.0 );
 
@@ -455,14 +474,14 @@ class UltraHDRLoader extends Loader {
 					const y = Math.floor( index / ( sdrImage.width * 4 ) );
 
 					const gainmapIndex = ( y * sdrImage.width * 4 ) + x;
-					const gainmapValue = gainmapImageData.data[ gainmapIndex ] / 256.0;
+					const gainmapValue = gainmapImageData.data[ gainmapIndex ] / 255.0;
 
 					const logRecovery = Math.pow( gainmapValue, 1.0 / xmpMetadata.gamma );
 					const logBoost = xmpMetadata.gainMapMin * ( 1.0 - logRecovery ) + xmpMetadata.gainMapMax * logRecovery;
 					const hdrValue = ( sdrValue + xmpMetadata.offsetSDR ) * Math.pow( 2, logBoost * weightFactor ) - xmpMetadata.offsetHDR;
-					const linearHDRValue = this._srgbToLinear( hdrValue );
+					const linearHDRValue = this._clamp( this._srgbToLinear( hdrValue ), 0, 65504 );
 
-					hdrBuffer[ index ] = DataUtils.toHalfFloat( linearHDRValue );
+					hdrBuffer[ index ] = this.type === HalfFloatType ? DataUtils.toHalfFloat( linearHDRValue ) : linearHDRValue;
 
 				} );
 
