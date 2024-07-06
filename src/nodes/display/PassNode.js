@@ -15,7 +15,7 @@ import MeshNormalNodeMaterial from '../materials/MeshNormalNodeMaterial.js';
 
 const _size = new Vector2();
 
-class PassTextureNode extends TextureNode {
+export class PassTextureNode extends TextureNode {
 
 	constructor( passNode, texture ) {
 
@@ -97,11 +97,11 @@ class PassNode extends TempNode {
 
 		if ( this.scope === PassNode.NORMAL ) {
 
-			const target = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType } );
-			renderTarget.texture.name = 'PostProcessingNormal';
-			this.normalRenderTarget = target;
+			const normalTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType } );
+			normalTarget.texture.name = 'PostProcessingNormal';
+			this.normalRenderTarget = normalTarget;
 
-			this._normalTextureNode = nodeObject( new PassTextureNode( this, target.texture ) );
+			this._normalTextureNode = nodeObject( new PassTextureNode( this, normalTarget.texture ) );
 
 		}
 

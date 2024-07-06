@@ -141,7 +141,7 @@ class PixelationNode extends TempNode {
 
 }
 
-export const pixelation = ( node, depthNode, normalNode, pixelSize, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), nodeObject( pixelSize ), normalEdgeStrength, depthEdgeStrength ) );
+export const pixelation = ( node, depthNode, normalNode, pixelSize = 4, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), pixelSize, normalEdgeStrength, depthEdgeStrength ) );
 
 addNodeElement( 'pixelation', pixelation );
 

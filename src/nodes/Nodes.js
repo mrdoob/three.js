@@ -136,6 +136,7 @@ export { default as FilmNode, film } from './display/FilmNode.js';
 export { default as Lut3DNode, lut3D } from './display/Lut3DNode.js';
 export { default as RenderOutputNode, renderOutput } from './display/RenderOutputNode.js';
 export { default as PixelationNode, pixelation } from './display/PixelationNode.js';
+export { default as PixelationPassNode, pixelationPass } from './display/PixelationPassNode.js'
 
 export { default as PassNode, pass, passTexture, depthPass } from './display/PassNode.js';
 
