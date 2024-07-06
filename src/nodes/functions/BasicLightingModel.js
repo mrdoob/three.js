@@ -13,7 +13,7 @@ class BasicLightingModel extends LightingModel {
 
 	}
 
-	indirectDiffuse( context, stack, builder ) {
+	indirect( context, stack, builder ) {
 
 		const ambientOcclusion = context.ambientOcclusion;
 		const reflectedLight = context.reflectedLight;

@@ -507,6 +507,14 @@ class PhysicalLightingModel extends LightingModel {
 
 	}
 
+	indirect( context, stack, builder ) {
+
+		this.indirectDiffuse( context, stack, builder );
+		this.indirectSpecular( context, stack, builder );
+		this.ambientOcclusion( context, stack, builder );
+
+	}
+
 	indirectDiffuse( { irradiance, reflectedLight } ) {
 
 		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );

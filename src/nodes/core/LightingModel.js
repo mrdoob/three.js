@@ -8,9 +8,7 @@ class LightingModel {
 
 	directRectArea( /*input, stack, builder*/ ) {}
 
-	indirectDiffuse( /*input, stack, builder*/ ) { }
-
-	indirectSpecular( /*input, stack, builder*/ ) { }
+	indirect( /*input, stack, builder*/ ) { }
 
 	ambientOcclusion( /*input, stack, builder*/ ) { }
 
