@@ -83,11 +83,11 @@ class UltraHDRLoader extends Loader {
 
 		while ( byteOffset < data.byteLength ) {
 
-			const byte = data.getUint8( byteOffset, false );
+			const byte = data.getUint8( byteOffset );
 
 			if ( byte === 0xff ) {
 
-				const leadingByte = data.getUint8( byteOffset + 1, false );
+				const leadingByte = data.getUint8( byteOffset + 1 );
 
 				if (
 					[
