@@ -2,9 +2,6 @@ import { nodeObject } from '../shadernode/ShaderNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import PassNode from './PassNode.js';
-import { RenderTarget } from '../../core/RenderTarget.js';
-import { HalfFloatType/*, FloatType*/ } from '../../constants.js';
-import { PassTextureNode } from './PassNode.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { MeshNormalNodeMaterial } from '../Nodes.js';
 
@@ -36,7 +33,7 @@ class PixelationPassNode extends PassNode {
 		const size = renderer.getSize( _size );
 		const pixelSize = this.pixelSize.value ? this.pixelSize.value : this.pixelSize;
 
-		this.setSize( pixelSize >= 1 ? size.width / pixelSize : size.width, pixelSize >= 1 ? size.height / pixelSize : size.height );
+		this.setSize( pixelSize >= 1 ? (size.width / pixelSize) | 0 : size.width, pixelSize >= 1 ? (size.height / pixelSize) | 0 : size.height );
 
 		const currentRenderTarget = renderer.getRenderTarget();
 
@@ -44,7 +41,6 @@ class PixelationPassNode extends PassNode {
 		this._cameraFar.value = camera.far;
 
 		renderer.setRenderTarget( this.renderTarget );
-		console.log(this.renderTarget)
 
 		renderer.render( scene, camera );
 
@@ -61,14 +57,12 @@ class PixelationPassNode extends PassNode {
 	setSize( width, height ) {
 
 		super.setSize( width, height );
-		this.normalRenderTarget.setSize( width * this._pixelRatio, height * this._pixelRatio );
 		
 	}
 
 	setup() {
 
-		const pass = super.getTextureDepthNode();
-		console.log( this.normalEdgeStrength )
+		const pass = super.getTextureNode();
 		return pass.pixelation( this._depthTextureNode, this._normalTextureNode, this.pixelSize, this.normalEdgeStrength, this.depthEdgeStrength );
 
 	}

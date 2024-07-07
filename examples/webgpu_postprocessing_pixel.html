@@ -33,7 +33,7 @@
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-		import { pass, normalPass, uniform, pixelation } from 'three/tsl';
+		import { pass, normalPass, uniform, pixelation, pixelationPass } from 'three/tsl';
 
 		let camera, scene, renderer, composer, crystalMesh, clock;
 		let gui, params;
@@ -68,8 +68,8 @@
 			function addBox( boxSideLength, x, z, rotation ) {
 
 				const mesh = new THREE.Mesh( new THREE.BoxGeometry( boxSideLength, boxSideLength, boxSideLength ), boxMaterial );
-				mesh.castShadow = true;
-				mesh.receiveShadow = true;
+				mesh.castShadow = false;
+				mesh.receiveShadow = false;
 				mesh.rotation.y = rotation;
 				mesh.position.y = boxSideLength / 2;
 				mesh.position.set( x, boxSideLength / 2 + .0001, z );
@@ -101,8 +101,8 @@
 					specular: 0xffffff
 				} )
 			);
-			crystalMesh.receiveShadow = true;
-			crystalMesh.castShadow = true;
+			crystalMesh.receiveShadow = false;
+			crystalMesh.castShadow = false;
 			scene.add( crystalMesh );
 
 			// lights
@@ -111,7 +111,7 @@
 
 			const directionalLight = new THREE.DirectionalLight( 0xfffecd, 1.5 );
 			directionalLight.position.set( 100, 100, 100 );
-			directionalLight.castShadow = true;
+			directionalLight.castShadow = false;
 			directionalLight.shadow.mapSize.set( 2048, 2048 );
 			scene.add( directionalLight );
 
@@ -120,10 +120,10 @@
 			const target = spotLight.target;
 			scene.add( target );
 			target.position.set( 0, 0, 0 );
-			spotLight.castShadow = true;
+			spotLight.castShadow = false;
 			scene.add( spotLight );
 
-			renderer = new THREE.WebGPURenderer();
+			renderer = new THREE.WebGPURenderer({ antialias: false });
 			renderer.shadowMap.enabled = true;
 			//renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -131,19 +131,15 @@
 			document.body.appendChild( renderer.domElement );
 
 			const effectController = {
-				pixelSize: 14,
+				pixelSize: uniform(14),
 				normalEdgeStrength: uniform(0.3),
 				depthEdgeStrength: uniform(0.4)
 			}
 
 			composer = new THREE.PostProcessing( renderer );
 
-			const scenePass = normalPass( scene, camera );
-			const scenePassColor = scenePass.getTextureNode();
-			const scenePassDepth = scenePass.getTextureDepthNode();
-			const scenePassNormal = scenePass.getTextureNormalNode();
-			const pixelationPass = scenePassColor.pixelation( scenePassDepth, scenePassNormal, 4, effectController.normalEdgeStrength, effectController.depthEdgeStrength);
-			composer.outputNode = pixelationPass;
+			const scenePass = pixelationPass( scene, camera, effectController.pixelSize, effectController.normalEdgeStrength, effectController.depthEdgeStrength );
+			composer.outputNode = scenePass;
 			window.addEventListener( 'resize', onWindowResize );
 
 			const controls = new OrbitControls( camera, renderer.domElement );
@@ -152,7 +148,7 @@
 			// gui
 
 			gui = new GUI();
-			gui.add( pixelationPass.pixelSizeNode, 'value', 0, 14, 1).name( 'Pixel Size' );
+			gui.add( effectController.pixelSize, 'value', 0, 14, 1).name( 'Pixel Size' );
 			gui.add( effectController.normalEdgeStrength, 'value', 0, 2, 0.05 ).name( 'Normal Edge Strength' );
 			gui.add( effectController.depthEdgeStrength, 'value', 0, 1, 0.05 ).name( 'Depth Edge Strength' );
 

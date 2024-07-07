@@ -6,7 +6,6 @@ import { uniform } from '../core/UniformNode.js';
 import { dot, clamp, smoothstep, sign, step, floor } from '../math/MathNode.js';
 import { float, If } from '../shadernode/ShaderNode.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { temp } from '../Nodes.js';
 import { property } from '../core/PropertyNode.js';
 
 class PixelationNode extends TempNode {
@@ -32,9 +31,8 @@ class PixelationNode extends TempNode {
 	updateBefore() {
 
 		const map = this.textureNode.value;
-		const width = map.image.width / this.pixelSizeNode.value;
-		const height = map.image.height / this.pixelSizeNode.value;
-
+		const width = map.image.width;
+		const height = map.image.height;
 		this._resolution.value.set( width, height, 1 / width, 1 / height );
 
 	}
@@ -141,7 +139,7 @@ class PixelationNode extends TempNode {
 
 }
 
-export const pixelation = ( node, depthNode, normalNode, pixelSize = 4, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), pixelSize, normalEdgeStrength, depthEdgeStrength ) );
+export const pixelation = ( node, depthNode, normalNode, pixelSize = 14, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), nodeObject(pixelSize), nodeObject(normalEdgeStrength), nodeObject(depthEdgeStrength) ) );
 
 addNodeElement( 'pixelation', pixelation );
 
