@@ -12,21 +12,22 @@ import {
 	UVMapping,
 } from 'three';
 
-// UltraHDR Image Format - https://developer.android.com/media/platform/hdr-image-format#signal_of_the_format
-// Originally propsed as gainmap-js using a WASM dependency - https://gainmap-creator.monogrid.com/
+// UltraHDR Image Format - https://developer.android.com/media/platform/hdr-image-format
+// Originally proposed as gainmap-js using a WASM dependency - https://github.com/MONOGRID/gainmap-js
 
 /**
  *
  * Short format brief:
  *
- *  [JPEG Headers]
- *  [XMP metadata describing the UltraHDR container and *both* SDR and HDR images]
+ *  [JPEG headers]
+ *  [XMP metadata describing the MPF container and *both* SDR and gainmap images]
  *  [Optional metadata] [EXIF] [ICC Profile]
- *  [SDR Image]
- *  [XMP metadata describing only the HDR image]
+ *  [SDR image]
+ *  [XMP metadata describing only the gainmap image]
+ *  [Gainmap image]
  *
- * Each section is separated by a 0xFF byte followed by a descriptor byte (0xE0, 0xE1, 0xE2.)
- * Binary image storage is separated with a unique 0xFFD8 16-bit descriptor.
+ * Each section is separated by a 0xFFXX byte followed by a descriptor byte (0xFFE0, 0xFFE1, 0xFFE2.)
+ * Binary image storages are prefixed with a unique 0xFFD8 16-bit descriptor.
  */
 
 /**
@@ -43,7 +44,11 @@ import {
  */
 
 /* Calculating this SRGB powers is extremely slow for 4K images and can be sufficiently precalculated for a 3-4x speed boost */
-const SRGB_TO_LINEAR = Array( 1024 ).fill( 0 ).map( ( _, value ) => Math.pow( value / 255 * 0.9478672986 + 0.0521327014, 2.4 ) );
+const SRGB_TO_LINEAR = Array( 1024 )
+	.fill( 0 )
+	.map( ( _, value ) =>
+		Math.pow( ( value / 255 ) * 0.9478672986 + 0.0521327014, 2.4 )
+	);
 
 class UltraHDRLoader extends Loader {
 
@@ -165,7 +170,7 @@ class UltraHDRLoader extends Loader {
 
 					/* MPF Section */
 
-					/* Section contains a list of static bytes and ends with offsets indicating location of SDR and Gainmap images */
+					/* Section contains a list of static bytes and ends with offsets indicating location of SDR and gainmap images */
 					/* First bytes after header indicate little / big endian ordering (0x49492A00 - LE / 0x4D4D002A - BE) */
 					/*
             ... 60 bytes indicating tags, versions, etc. ...
@@ -187,7 +192,7 @@ class UltraHDRLoader extends Loader {
 					const mpfLittleEndian = sectionData.getUint32( 6 ) === 0x49492a00;
 					const mpfBytesOffset = 60;
 
-					/* SDR size includes the XMP metadata length, SDR offset is always 0 */
+					/* SDR size includes the metadata length, SDR offset is always 0 */
 
 					const primaryImageSize = sectionData.getUint32(
 						mpfBytesOffset,
@@ -204,9 +209,9 @@ class UltraHDRLoader extends Loader {
 						mpfLittleEndian
 					);
 					const gainmapImageOffset =
-            sectionData.getUint32( mpfBytesOffset + 20, mpfLittleEndian ) +
-            sectionOffset +
-            6;
+						sectionData.getUint32( mpfBytesOffset + 20, mpfLittleEndian ) +
+						sectionOffset +
+						6;
 
 					const primaryImage = new Uint8Array(
 						data.buffer,
@@ -219,21 +224,27 @@ class UltraHDRLoader extends Loader {
 						gainmapImageSize
 					);
 
-					this._applyGainmapToSDR( xmpMetadata, primaryImage, gainmapImage, ( hdrBuffer, width, height ) => {
+					this._applyGainmapToSDR(
+						xmpMetadata,
+						primaryImage,
+						gainmapImage,
+						( hdrBuffer, width, height ) => {
 
-						onLoad( {
-							width,
-							height,
-							data: hdrBuffer,
-							format: RGBAFormat,
-							type: this.type,
-						} );
+							onLoad( {
+								width,
+								height,
+								data: hdrBuffer,
+								format: RGBAFormat,
+								type: this.type,
+							} );
 
-					}, ( error ) => {
+						},
+						( error ) => {
 
-						throw new Error( error );
+							throw new Error( error );
 
-					} );
+						}
+					);
 
 				}
 
@@ -241,17 +252,26 @@ class UltraHDRLoader extends Loader {
 
 		}
 
-		return {
-			width: 0,
-			height: 0,
-			data: new Uint16Array(),
-			format: RGBAFormat,
-			type: this.type,
-		};
-
 	}
 
 	load( url, onLoad, onError ) {
+
+		const texture = new DataTexture(
+			this.type === HalfFloatType ? new Uint16Array() : new Float32Array(),
+			0,
+			0,
+			RGBAFormat,
+			this.type,
+			UVMapping,
+			ClampToEdgeWrapping,
+			ClampToEdgeWrapping,
+			LinearFilter,
+			LinearMipMapLinearFilter,
+			1,
+			LinearSRGBColorSpace
+		);
+		texture.generateMipmaps = true;
+		texture.flipY = true;
 
 		const loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
@@ -266,22 +286,11 @@ class UltraHDRLoader extends Loader {
 					buffer,
 					( texData ) => {
 
-						const texture = new DataTexture(
-							texData.data,
-							texData.width,
-							texData.height,
-							RGBAFormat,
-							this.type,
-							UVMapping,
-							ClampToEdgeWrapping,
-							ClampToEdgeWrapping,
-							LinearFilter,
-							LinearMipMapLinearFilter,
-							1,
-							LinearSRGBColorSpace
-						);
-						texture.generateMipmaps = true;
-						texture.flipY = true;
+						texture.image = {
+							data: texData.data,
+							width: texData.width,
+							height: texData.height,
+						};
 						texture.needsUpdate = true;
 
 						if ( onLoad ) onLoad( texture, texData );
@@ -299,6 +308,8 @@ class UltraHDRLoader extends Loader {
 			}
 
 		} );
+
+		return texture;
 
 	}
 
@@ -326,11 +337,12 @@ class UltraHDRLoader extends Loader {
 		} else {
 
 			/* Gainmap descriptor - defaults from https://developer.android.com/media/platform/hdr-image-format#HDR_gain_map_metadata */
+
 			const [ gainmapNode ] = xmpXml.getElementsByTagName( 'rdf:Description' );
 
 			xmpMetadata.version = gainmapNode.getAttribute( 'hdrgm:Version' ) || '1.0';
 			xmpMetadata.baseRenditionIsHDR =
-        gainmapNode.getAttribute( 'hdrgm:BaseRenditionIsHDR' ) === 'True';
+				gainmapNode.getAttribute( 'hdrgm:BaseRenditionIsHDR' ) === 'True';
 			xmpMetadata.gainMapMin = parseFloat(
 				gainmapNode.getAttribute( 'hdrgm:GainMapMin' ) || 0.0
 			);
@@ -361,17 +373,17 @@ class UltraHDRLoader extends Loader {
 
 		if ( value / 255 < 0.04045 ) {
 
-			return value / 255 * 0.0773993808;
+			return ( value / 255 ) * 0.0773993808;
 
 		}
 
-		if ( value < 512 ) {
+		if ( value < 1024 ) {
 
 			return SRGB_TO_LINEAR[ ~ ~ value ];
 
 		}
 
-		return Math.pow( value / 255 * 0.9478672986 + 0.0521327014, 2.4 );
+		return Math.pow( ( value / 255 ) * 0.9478672986 + 0.0521327014, 2.4 );
 
 	}
 
@@ -381,37 +393,46 @@ class UltraHDRLoader extends Loader {
 
 	}
 
-	_applyGainmapToSDR( xmpMetadata, sdrBuffer, gainmapBuffer, onSuccess, onError ) {
+	_applyGainmapToSDR(
+		xmpMetadata,
+		sdrBuffer,
+		gainmapBuffer,
+		onSuccess,
+		onError
+	) {
 
-		const getImageDataFromBuffer = ( buffer ) => new Promise( ( resolve, reject ) => {
+		const getImageDataFromBuffer = ( buffer ) =>
+			new Promise( ( resolve, reject ) => {
 
-			const imageLoader = document.createElement( 'img' );
+				const imageLoader = document.createElement( 'img' );
 
-			imageLoader.onload = () => {
+				imageLoader.onload = () => {
 
-				const image = {
-					width: imageLoader.naturalWidth,
-					height: imageLoader.naturalHeight,
-					source: imageLoader,
+					const image = {
+						width: imageLoader.naturalWidth,
+						height: imageLoader.naturalHeight,
+						source: imageLoader,
+					};
+
+					URL.revokeObjectURL( imageLoader.src );
+
+					resolve( image );
+
 				};
 
-				URL.revokeObjectURL( imageLoader.src );
+				imageLoader.onerror = () => {
 
-				resolve( image );
+					URL.revokeObjectURL( imageLoader.src );
 
-			};
+					reject();
 
-			imageLoader.onerror = () => {
+				};
 
-				URL.revokeObjectURL( imageLoader.src );
+				imageLoader.src = URL.createObjectURL(
+					new Blob( [ buffer ], { type: 'image/jpeg' } )
+				);
 
-				reject();
-
-			};
-
-			imageLoader.src = URL.createObjectURL( new Blob( [ buffer ], { type: 'image/jpeg' } ) );
-
-		} );
+			} );
 
 		Promise.all( [
 			getImageDataFromBuffer( sdrBuffer ),
@@ -424,31 +445,60 @@ class UltraHDRLoader extends Loader {
 
 				if ( sdrImageAspect !== gainmapImageAspect ) {
 
-					onError( 'THREE.UltraHDRLoader Error: Aspect ratio mismatch between SDR and Gainmap images' );
+					onError(
+						'THREE.UltraHDRLoader Error: Aspect ratio mismatch between SDR and Gainmap images'
+					);
 
 					return;
 
 				}
 
 				const canvas = document.createElement( 'canvas' );
-				const ctx = canvas.getContext( '2d', { willReadFrequently: false, colorSpace: 'srgb' } );
+				const ctx = canvas.getContext( '2d', {
+					willReadFrequently: false,
+					colorSpace: 'srgb',
+				} );
 
 				canvas.width = sdrImage.width;
 				canvas.height = sdrImage.height;
 
 				/* Use out-of-the-box interpolation of Canvas API to scale gainmap to fit the SDR resolution */
-				ctx.drawImage( gainmapImage.source, 0, 0, gainmapImage.width, gainmapImage.height, 0, 0, sdrImage.width, sdrImage.height );
-				const gainmapImageData = ctx.getImageData( 0, 0, sdrImage.width, sdrImage.height, { colorSpace: 'srgb' } );
+				ctx.drawImage(
+					gainmapImage.source,
+					0,
+					0,
+					gainmapImage.width,
+					gainmapImage.height,
+					0,
+					0,
+					sdrImage.width,
+					sdrImage.height
+				);
+				const gainmapImageData = ctx.getImageData(
+					0,
+					0,
+					sdrImage.width,
+					sdrImage.height,
+					{ colorSpace: 'srgb' }
+				);
 
 				ctx.drawImage( sdrImage.source, 0, 0 );
-				const sdrImageData = ctx.getImageData( 0, 0, sdrImage.width, sdrImage.height, { colorSpace: 'srgb' } );
+				const sdrImageData = ctx.getImageData(
+					0,
+					0,
+					sdrImage.width,
+					sdrImage.height,
+					{ colorSpace: 'srgb' }
+				);
 
 				/* HDR Recovery formula - https://developer.android.com/media/platform/hdr-image-format#use_the_gain_map_to_create_adapted_HDR_rendition */
 				let hdrBuffer;
 
 				if ( this.type === HalfFloatType ) {
 
-					hdrBuffer = new Uint16Array( sdrImageData.data.length ).fill( DataUtils.toHalfFloat( 255 ) );
+					hdrBuffer = new Uint16Array( sdrImageData.data.length ).fill(
+						DataUtils.toHalfFloat( 255 )
+					);
 
 				} else {
 
@@ -461,8 +511,11 @@ class UltraHDRLoader extends Loader {
 						/* 1.8 instead of 2 near-perfectly rectifies approximations introduced by precalculated SRGB_TO_LINEAR values */
 						1.8,
 						xmpMetadata.hdrCapacityMax
-					) );
-				const unclampedWeightFactor = ( Math.log2( maxDisplayBoost ) - xmpMetadata.hdrCapacityMin ) / ( xmpMetadata.hdrCapacityMax - xmpMetadata.hdrCapacityMin );
+					)
+				);
+				const unclampedWeightFactor =
+					( Math.log2( maxDisplayBoost ) - xmpMetadata.hdrCapacityMin ) /
+					( xmpMetadata.hdrCapacityMax - xmpMetadata.hdrCapacityMin );
 				const weightFactor = this._clamp( unclampedWeightFactor, 0.0, 1.0 );
 
 				sdrImageData.data.forEach( ( sdrValue, index ) => {
@@ -473,26 +526,34 @@ class UltraHDRLoader extends Loader {
 					const x = index % ( sdrImage.width * 4 );
 					const y = Math.floor( index / ( sdrImage.width * 4 ) );
 
-					const gainmapIndex = ( y * sdrImage.width * 4 ) + x;
+					const gainmapIndex = y * sdrImage.width * 4 + x;
 					const gainmapValue = gainmapImageData.data[ gainmapIndex ] / 255.0;
 
 					const logRecovery = Math.pow( gainmapValue, 1.0 / xmpMetadata.gamma );
-					const logBoost = xmpMetadata.gainMapMin * ( 1.0 - logRecovery ) + xmpMetadata.gainMapMax * logRecovery;
-					const hdrValue = ( sdrValue + xmpMetadata.offsetSDR ) * Math.pow( 2, logBoost * weightFactor ) - xmpMetadata.offsetHDR;
-					const linearHDRValue = this._clamp( this._srgbToLinear( hdrValue ), 0, 65504 );
+					const logBoost =
+						xmpMetadata.gainMapMin * ( 1.0 - logRecovery ) +
+						xmpMetadata.gainMapMax * logRecovery;
+					const hdrValue =
+						( sdrValue + xmpMetadata.offsetSDR ) *
+							Math.pow( 2, logBoost * weightFactor ) -
+						xmpMetadata.offsetHDR;
+					const linearHDRValue = this._clamp(
+						this._srgbToLinear( hdrValue ),
+						0,
+						65504
+					);
 
-					hdrBuffer[ index ] = this.type === HalfFloatType ? DataUtils.toHalfFloat( linearHDRValue ) : linearHDRValue;
+					hdrBuffer[ index ] =
+						this.type === HalfFloatType
+							? DataUtils.toHalfFloat( linearHDRValue )
+							: linearHDRValue;
 
 				} );
 
-				onSuccess(
-					hdrBuffer,
-					sdrImage.width,
-					sdrImage.height
-				);
+				onSuccess( hdrBuffer, sdrImage.width, sdrImage.height );
 
 			} )
-			.catch( ( ) => {
+			.catch( () => {
 
 				throw new Error(
 					'THREE.UltraHDRLoader Error: Could not parse UltraHDR images'

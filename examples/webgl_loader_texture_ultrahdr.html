@@ -32,6 +32,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			const params = {
+				autoRotate: true,
 				metalness: 1.0,
 				roughness: 0.0,
 				exposure: 1.0,
@@ -96,6 +97,7 @@
 
 				const gui = new GUI();
 
+				gui.add( params, 'autoRotate' );
 				gui.add( params, 'metalness', 0, 1, 0.01 );
 				gui.add( params, 'roughness', 0, 1, 0.01 );
 				gui.add( params, 'exposure', 0, 4, 0.01 );
@@ -130,7 +132,12 @@
 
 				torusMesh.material.roughness = params.roughness;
 				torusMesh.material.metalness = params.metalness;
-				torusMesh.rotation.y += 0.005;
+
+				if ( params.autoRotate ) {
+
+					torusMesh.rotation.y += 0.005;
+
+				}
 
 				renderer.toneMappingExposure = params.exposure;
 
