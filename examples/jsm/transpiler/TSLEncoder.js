@@ -1,6 +1,6 @@
-import { REVISION } from 'three';
+import * as THREE from 'three';
+
 import { VariableDeclaration, Accessor } from './AST.js';
-import * as Nodes from '../nodes/Nodes.js';
 
 const opLib = {
 	'=': 'assign',
@@ -68,7 +68,7 @@ class TSLEncoder {
 
 		name = name.split( '.' )[ 0 ];
 
-		if ( Nodes[ name ] !== undefined && this.global.has( name ) === false && this._currentProperties[ name ] === undefined ) {
+		if ( THREE[ name ] !== undefined && this.global.has( name ) === false && this._currentProperties[ name ] === undefined ) {
 
 			this.imports.add( name );
 
@@ -501,7 +501,9 @@ ${ this.tab }} )`;
 
 		this.addImport( 'overloadingFn' );
 
-		return `export const ${ name } = /*#__PURE__*/ overloadingFn( [ ${ nodes.map( node => node.name + '_' + nodes.indexOf( node ) ).join( ', ' ) } ] );\n`;
+		const prefix = this.iife === false ? 'export ' : '';
+
+		return `${ prefix }const ${ name } = /*#__PURE__*/ overloadingFn( [ ${ nodes.map( node => node.name + '_' + nodes.indexOf( node ) ).join( ', ' ) } ] );\n`;
 
 	}
 
@@ -582,7 +584,9 @@ ${ this.tab }} )`;
 
 		}
 
-		let funcStr = `export const ${ fnName } = /*#__PURE__*/ tslFn( (${ paramsStr }) => {
+		const prefix = this.iife === false ? 'export ' : '';
+
+		let funcStr = `${ prefix }const ${ fnName } = /*#__PURE__*/ tslFn( (${ paramsStr }) => {
 
 ${ bodyStr }
 
@@ -684,8 +688,9 @@ ${ this.tab }} )`;
 		}
 
 		const imports = [ ...this.imports ];
+		const exports = [ ...this.global ];
 
-		let header = '// Three.js Transpiler r' + REVISION + '\n\n';
+		let header = '// Three.js Transpiler r' + THREE.REVISION + '\n\n';
 		let footer = '';
 
 		if ( this.iife ) {
@@ -693,12 +698,13 @@ ${ this.tab }} )`;
 			header += '( function ( TSL, uniforms ) {\n\n';
 
 			header += imports.length > 0 ? '\tconst { ' + imports.join( ', ' ) + ' } = TSL;\n' : '';
+			footer += exports.length > 0 ? '\treturn { ' + exports.join( ', ' ) + ' };\n' : '';
 
 			footer += '\n} );';
 
 		} else {
 
-			header += imports.length > 0 ? 'import { ' + imports.join( ', ' ) + ' } from \'three/nodes\';\n' : '';
+			header += imports.length > 0 ? 'import { ' + imports.join( ', ' ) + ' } from \'three/tsl\';\n' : '';
 
 		}
 

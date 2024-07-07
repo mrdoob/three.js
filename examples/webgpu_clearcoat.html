@@ -14,7 +14,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -23,8 +24,6 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -174,7 +173,7 @@
 
 				particleLight.add( new THREE.PointLight( 0xffffff, 30 ) );
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

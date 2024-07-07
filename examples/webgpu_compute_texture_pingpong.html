@@ -14,9 +14,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -24,11 +24,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { storageTexture, wgslFn, code, instanceIndex, uniform } from 'three/nodes';
+			import { storageTexture, wgslFn, code, instanceIndex, uniform } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import StorageTexture from 'three/addons/renderers/common/StorageTexture.js';
 
 			let camera, scene, renderer;
 			let computeInitNode, computeToPing, computeToPong;
@@ -62,8 +60,8 @@
 				const hdr = true;
 				const width = 512, height = 512;
 
-				pingTexture = new StorageTexture( width, height );
-				pongTexture = new StorageTexture( width, height );
+				pingTexture = new THREE.StorageTexture( width, height );
+				pongTexture = new THREE.StorageTexture( width, height );
 
 				if ( hdr ) {
 
@@ -157,7 +155,7 @@
 				const plane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( plane );
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
