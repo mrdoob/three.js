@@ -124,9 +124,9 @@ class UltraHDRLoader extends Loader {
 
 				} else {
 
-					sections[ sections.length - 1 ].section.push( byte );
+					sections[ sections.length - 1 ].section.push( byte, leadingByte );
 
-					byteOffset ++;
+					byteOffset += 2;
 
 				}
 
@@ -139,6 +139,8 @@ class UltraHDRLoader extends Loader {
 			}
 
 		}
+
+		let primaryImage, gainmapImage;
 
 		for ( let i = 0; i < sections.length; i ++ ) {
 
@@ -213,42 +215,51 @@ class UltraHDRLoader extends Loader {
 						sectionOffset +
 						6;
 
-					const primaryImage = new Uint8Array(
+					primaryImage = new Uint8Array(
 						data.buffer,
 						primaryImageOffset,
 						primaryImageSize
 					);
-					const gainmapImage = new Uint8Array(
+
+					gainmapImage = new Uint8Array(
 						data.buffer,
 						gainmapImageOffset,
 						gainmapImageSize
 					);
 
-					this._applyGainmapToSDR(
-						xmpMetadata,
-						primaryImage,
-						gainmapImage,
-						( hdrBuffer, width, height ) => {
-
-							onLoad( {
-								width,
-								height,
-								data: hdrBuffer,
-								format: RGBAFormat,
-								type: this.type,
-							} );
-
-						},
-						( error ) => {
-
-							throw new Error( error );
-
-						}
-					);
-
 				}
 
 			}
+
+		}
+
+		if ( primaryImage && gainmapImage ) {
+
+			this._applyGainmapToSDR(
+				xmpMetadata,
+				primaryImage,
+				gainmapImage,
+				( hdrBuffer, width, height ) => {
+
+					onLoad( {
+						width,
+						height,
+						data: hdrBuffer,
+						format: RGBAFormat,
+						type: this.type,
+					} );
+
+				},
+				( error ) => {
+
+					throw new Error( error );
+
+				}
+			);
+
+		} else {
+
+			throw new Error( 'THREE.UltraHDRLoader: Could not parse UltraHDR images' );
 
 		}
 
@@ -387,12 +398,6 @@ class UltraHDRLoader extends Loader {
 
 	}
 
-	_clamp( value, min, max ) {
-
-		return Math.min( Math.max( value, min ), max );
-
-	}
-
 	_applyGainmapToSDR(
 		xmpMetadata,
 		sdrBuffer,
@@ -455,7 +460,7 @@ class UltraHDRLoader extends Loader {
 
 				const canvas = document.createElement( 'canvas' );
 				const ctx = canvas.getContext( '2d', {
-					willReadFrequently: false,
+					willReadFrequently: true,
 					colorSpace: 'srgb',
 				} );
 
@@ -496,9 +501,7 @@ class UltraHDRLoader extends Loader {
 
 				if ( this.type === HalfFloatType ) {
 
-					hdrBuffer = new Uint16Array( sdrImageData.data.length ).fill(
-						DataUtils.toHalfFloat( 255 )
-					);
+					hdrBuffer = new Uint16Array( sdrImageData.data.length ).fill( 23544 );
 
 				} else {
 
@@ -516,39 +519,60 @@ class UltraHDRLoader extends Loader {
 				const unclampedWeightFactor =
 					( Math.log2( maxDisplayBoost ) - xmpMetadata.hdrCapacityMin ) /
 					( xmpMetadata.hdrCapacityMax - xmpMetadata.hdrCapacityMin );
-				const weightFactor = this._clamp( unclampedWeightFactor, 0.0, 1.0 );
+				const weightFactor = Math.min(
+					Math.max( unclampedWeightFactor, 0.0 ),
+					1.0
+				);
+				const useGammaOne = xmpMetadata.gamma === 1.0;
 
-				sdrImageData.data.forEach( ( sdrValue, index ) => {
+				for (
+					let pixelIndex = 0;
+					pixelIndex < sdrImageData.data.length;
+					pixelIndex += 4
+				) {
 
-					/* Prefilled buffer already contains the alpha channel */
-					if ( ( index + 1 ) % 4 === 0 ) return;
+					const x = ( pixelIndex / 4 ) % sdrImage.width;
+					const y = Math.floor( pixelIndex / 4 / sdrImage.width );
 
-					const x = index % ( sdrImage.width * 4 );
-					const y = Math.floor( index / ( sdrImage.width * 4 ) );
+					for ( let index = pixelIndex; index < pixelIndex + 3; index ++ ) {
 
-					const gainmapIndex = y * sdrImage.width * 4 + x;
-					const gainmapValue = gainmapImageData.data[ gainmapIndex ] / 255.0;
+						const sdrValue = sdrImageData.data[ index ];
 
-					const logRecovery = Math.pow( gainmapValue, 1.0 / xmpMetadata.gamma );
-					const logBoost =
-						xmpMetadata.gainMapMin * ( 1.0 - logRecovery ) +
-						xmpMetadata.gainMapMax * logRecovery;
-					const hdrValue =
+						const gainmapIndex = ( y * sdrImage.width + x ) * 4;
+						const gainmapValue = gainmapImageData.data[ gainmapIndex ] / 255.0;
+
+						/* Gamma is 1.0 by default */
+						const logRecovery = useGammaOne
+							? gainmapValue
+							: Math.pow( gainmapValue, 1.0 / xmpMetadata.gamma );
+
+						const logBoost =
+							xmpMetadata.gainMapMin * ( 1.0 - logRecovery ) +
+							xmpMetadata.gainMapMax * logRecovery;
+
+						const hdrValue =
 						( sdrValue + xmpMetadata.offsetSDR ) *
-							Math.pow( 2, logBoost * weightFactor ) -
-						xmpMetadata.offsetHDR;
-					const linearHDRValue = this._clamp(
-						this._srgbToLinear( hdrValue ),
-						0,
-						65504
-					);
+						( logBoost * weightFactor === 0.0
+							? 1.0
+							: Math.pow( 2, logBoost * weightFactor ) ) -
+					xmpMetadata.offsetHDR;
 
-					hdrBuffer[ index ] =
-						this.type === HalfFloatType
-							? DataUtils.toHalfFloat( linearHDRValue )
-							: linearHDRValue;
+						const linearHDRValue = Math.min(
+							Math.max(
+								this._srgbToLinear( hdrValue ),
+								0
+							),
+							65504
+						);
 
-				} );
+						hdrBuffer[ index ] =
+							this.type === HalfFloatType
+								? DataUtils.toHalfFloat( linearHDRValue )
+								: linearHDRValue;
+
+					}
+
+				}
 
 				onSuccess( hdrBuffer, sdrImage.width, sdrImage.height );
 
