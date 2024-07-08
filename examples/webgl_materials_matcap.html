@@ -86,7 +86,7 @@
 
 					mesh.material = new THREE.MeshMatcapMaterial( {
 
-						color: new THREE.Color().setHex( API.color ).convertSRGBToLinear(),
+						color: new THREE.Color().setHex( API.color ),
 						matcap: matcap,
 						normalMap: normalmap
 
@@ -103,7 +103,7 @@
 					.listen()
 					.onChange( function () {
 
-						mesh.material.color.set( API.color ).convertSRGBToLinear();
+						mesh.material.color.set( API.color );
 						render();
 
 					} );
