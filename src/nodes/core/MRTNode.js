@@ -61,8 +61,6 @@ class MRTNode extends OutputStructNode {
 
 		this.members = members;
 
-		console.log( mrt );
-
 		return super.setup( builder );
 
 	}

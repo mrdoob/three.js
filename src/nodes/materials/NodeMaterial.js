@@ -128,11 +128,17 @@ class NodeMaterial extends Material {
 
 			// MRT
 
-			const mrt = this.mrtNode || builder.renderer.getMRT();
+			const renderTarget = builder.renderer.getRenderTarget();
 
-			if ( mrt !== null ) {
+			if ( renderTarget !== null ) {
 
-				resultNode = mrt;
+				const mrt = this.mrtNode || builder.renderer.getMRT();
+
+				if ( mrt !== null ) {
+
+					resultNode = mrt;
+
+				}
 
 			}
 
