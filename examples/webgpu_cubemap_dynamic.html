@@ -18,8 +18,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/nodes": "./jsm/nodes/Nodes.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -28,12 +28,6 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import * as Nodes from 'three/nodes';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
@@ -50,24 +44,7 @@
 
 			init();
 
-			function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
-				renderer = new WebGPURenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animation );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				document.body.appendChild( renderer.domElement );
-
-				window.addEventListener( 'resize', onWindowResized );
+			async function init() {
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
@@ -80,10 +57,10 @@
 				const uvTexture = new THREE.TextureLoader().load( './textures/uv_grid_opengl.jpg' );
 
 				const rgbmUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
-				const texture = new RGBMLoader()
+				const texture = await new RGBMLoader()
 					.setMaxRange( 16 )
 					.setPath( './textures/cube/pisaRGBM16/' )
-					.loadCubemap( rgbmUrls );
+					.loadCubemapAsync( rgbmUrls );
 
 				texture.name = 'pisaRGBM16';
 				texture.minFilter = THREE.LinearMipmapLinearFilter;
@@ -104,27 +81,29 @@
 
 				//
 
-				material = new Nodes.MeshStandardNodeMaterial( {
+				material = new THREE.MeshStandardNodeMaterial( {
 					envMap: cubeRenderTarget.texture,
 					roughness: 0.05,
 					metalness: 1
 				} );
 
-				const gui = new GUI();
-				gui.add( material, 'roughness', 0, 1 );
-				gui.add( material, 'metalness', 0, 1 );
-				gui.add( renderer, 'toneMappingExposure', 0, 2 ).name( 'exposure' );
-
 				sphere = new THREE.Mesh( new THREE.IcosahedronGeometry( 15, 8 ), material );
 				scene.add( sphere );
 
-				const material2 = new THREE.MeshStandardMaterial( {
+				const material1 = new THREE.MeshStandardNodeMaterial( {
 					map: uvTexture,
 					roughness: 0.1,
-					metalness: 0
+					metalness: 0,
 				} );
 
-				cube = new THREE.Mesh( new THREE.BoxGeometry( 15, 15, 15 ), material2 );
+				const material2 = new THREE.MeshStandardNodeMaterial( {
+					map: uvTexture,
+					roughness: 0.1,
+					metalness: 0,
+					envMap: texture,
+				} );
+
+				cube = new THREE.Mesh( new THREE.BoxGeometry( 15, 15, 15 ), material1 );
 				scene.add( cube );
 
 				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 8, 3, 128, 16 ), material2 );
@@ -132,8 +111,24 @@
 
 				//
 
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: false } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animation );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResized );
+
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.autoRotate = true;
+
+				const gui = new GUI();
+				gui.add( material, 'roughness', 0, 1 );
+				gui.add( material, 'metalness', 0, 1 );
+				gui.add( renderer, 'toneMappingExposure', 0, 2 ).name( 'exposure' );
+				gui.add( scene, 'environmentIntensity', 0, 1 );
+				gui.add( material2, 'envMapIntensity', 0, 1 );
 
 			}
 

@@ -41,7 +41,6 @@
 			"Multiple Canvases, Multiple Scenes": "en/multiple-scenes",
 			"Picking Objects with the mouse": "en/picking",
 			"Post Processing": "en/post-processing",
-			"Applying a LUT File for effects": "en/post-processing-3dlut",
 			"Using Shadertoy shaders": "en/shadertoy",
 			"Aligning HTML Elements to 3D": "en/align-html-elements-to-3d",
 			"Using Indexed Textures for Picking and Color": "en/indexed-textures",
@@ -102,7 +101,6 @@
 			"Multiple Canvases, Multiple Scenes": "fr/multiple-scenes",
 			"Picking Objects with the mouse": "fr/picking",
 			"Post Processing": "fr/post-processing",
-			"Applying a LUT File for effects": "fr/post-processing-3dlut",
 			"Using Shadertoy shaders": "fr/shadertoy",
 			"Aligning HTML Elements to 3D": "fr/align-html-elements-to-3d",
 			"Using Indexed Textures for Picking and Color": "fr/indexed-textures",
@@ -163,7 +161,6 @@
 			"複数キャンバスと複数シーン": "ja/multiple-scenes",
 			"マウスでオブジェクトをピッキング": "ja/picking",
 			"ポストプロセス": "ja/post-processing",
-			"エフェクトにLUTファイルを適用する": "ja/post-processing-3dlut",
 			"Shadertoyのシェーダーを使う": "ja/shadertoy",
 			"HTML要素を3Dに揃える": "ja/align-html-elements-to-3d",
 			"圧縮テクスチャのピッキングとカラー": "ja/indexed-textures",
@@ -224,7 +221,6 @@
 			"다중 캔버스, 다중 장면 만들기": "ko/multiple-scenes",
 			"물체를 마우스로 피킹하기": "ko/picking",
 			"후처리": "ko/post-processing",
-			"LUT 파일로 후처리 효과 적용하기": "ko/post-processing-3dlut",
 			"쉐이더토이 쉐이더 활용하기": "ko/shadertoy",
 			"HTML 요소를 3D로 정렬하기": "ko/align-html-elements-to-3d",
 			"피킹과 색상에 인덱스 텍스처 사용하기": "ko/indexed-textures",
@@ -285,7 +281,6 @@
 			"Несколько холстов, несколько сцен": "ru/multiple-scenes",
 			"Picking Objects with the mouse": "ru/picking",
 			"Post Processing": "ru/post-processing",
-			"Applying a LUT File for effects": "ru/post-processing-3dlut",
 			"Using Shadertoy shaders": "ru/shadertoy",
 			"Aligning HTML Elements to 3D": "ru/align-html-elements-to-3d",
 			"Using Indexed Textures for Picking and Color": "ru/indexed-textures",
@@ -336,7 +331,7 @@
 		"优化": {
 			"大量对象的优化": "zh/optimize-lots-of-objects",
 			"优化对象的同时保持动画效果": "zh/optimize-lots-of-objects-animated",
-			"Using OffscreenCanvas in a Web Worker": "zh/offscreencanvas"
+			"在Web Worker中使用离屏渲染": "zh/offscreencanvas"
 		},
 		"解决方案": {
 			"加载 .OBJ 文件": "zh/load-obj",
@@ -346,20 +341,19 @@
 			"多个画布, 多个场景": "zh/multiple-scenes",
 			"鼠标选取对象": "zh/picking",
 			"后期处理": "zh/post-processing",
-			"Applying a LUT File for effects": "zh/post-processing-3dlut",
-			"Using Shadertoy shaders": "zh/shadertoy",
+			"使用Shadertoy中的着色器": "zh/shadertoy",
 			"对齐HTML元素到3D对象": "zh/align-html-elements-to-3d",
 			"使用纹理索引来拾取和着色": "zh/indexed-textures",
 			"使用Canvas生成动态纹理": "zh/canvas-textures",
 			"广告牌(Billboards)": "zh/billboards",
 			"释放资源": "zh/cleanup",
-			"Making Voxel Geometry (Minecraft)": "zh/voxel-geometry",
-			"Start making a Game": "zh/game"
+			"体素几何体 (Minecraft)": "zh/voxel-geometry",
+			"来试试做一个游戏吧": "zh/game"
 		},
 		"WebXR": {
-			"VR - Basics": "zh/webxr-basics",
-			"VR - Look To Select": "zh/webxr-look-to-select",
-			"VR - Point To Select": "zh/webxr-point-to-select"
+			"VR - 基础": "zh/webxr-basics",
+			"VR - 用目光进行选择": "zh/webxr-look-to-select",
+			"VR - 用点进行选择": "zh/webxr-point-to-select"
 		},
 		"参考": {
 			"材质特性表": "zh/material-table"

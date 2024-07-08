@@ -179,7 +179,6 @@
 			const onClickPosition = new THREE.Vector2();
 
 			init();
-			render();
 
 			function init() {
 
@@ -197,6 +196,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				// A cube, in the middle.
@@ -329,9 +329,7 @@
 
 			}
 
-			function render() {
-
-				requestAnimationFrame( render );
+			function animate() {
 
 				// update texture parameters
 

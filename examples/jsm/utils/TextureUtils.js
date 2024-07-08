@@ -48,7 +48,7 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 	if ( ! fullscreenQuad ) {
 
 		fullscreenQuad = new Mesh( fullscreenQuadGeometry, fullscreenQuadMaterial );
-		fullscreenQuad.frustrumCulled = false;
+		fullscreenQuad.frustumCulled = false;
 
 	}
 

@@ -55,7 +55,6 @@
 			};
 
 			init();
-			animate();
 
 			function updateOrthoCamera() {
 
@@ -82,6 +81,7 @@
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 				renderer.shadowMap.enabled = params.shadows;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -283,8 +283,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				camera.updateMatrixWorld();
 				csm.update();

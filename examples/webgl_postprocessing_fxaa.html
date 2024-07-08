@@ -57,7 +57,6 @@
 			let composer1, composer2, fxaaPass;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -112,6 +111,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
 
@@ -168,8 +168,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const halfWidth = container.offsetWidth / 2;
 

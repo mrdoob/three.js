@@ -2,6 +2,7 @@ import { ColorInput, ToggleInput, SliderInput, LabelElement } from 'flow';
 import { MaterialEditor } from './MaterialEditor.js';
 import { PointsNodeMaterial } from 'three/nodes';
 import * as THREE from 'three';
+import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
 export class PointsMaterialEditor extends MaterialEditor {
 
@@ -11,11 +12,11 @@ export class PointsMaterialEditor extends MaterialEditor {
 
 		super( 'Points Material', material );
 
-		const color = new LabelElement( 'color' ).setInput( 3 );
-		const opacity = new LabelElement( 'opacity' ).setInput( 1 );
-		const size = new LabelElement( 'size' ).setInput( 1 );
-		const position = new LabelElement( 'position' ).setInput( 3 );
-		const sizeAttenuation = new LabelElement( 'Size Attenuation' );
+		const color = setInputAestheticsFromType( new LabelElement( 'color' ), 'Color' );
+		const opacity = setInputAestheticsFromType( new LabelElement( 'opacity' ), 'Number' );
+		const size = setInputAestheticsFromType( new LabelElement( 'size' ), 'Number' );
+		const position = setInputAestheticsFromType( new LabelElement( 'position' ), 'Vector3' );
+		const sizeAttenuation = setInputAestheticsFromType( new LabelElement( 'Size Attenuation' ), 'Number' );
 
 		color.add( new ColorInput( material.color.getHex() ).onChange( ( input ) => {
 

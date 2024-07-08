@@ -1,6 +1,7 @@
 import { LabelElement } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { nodeObject, float } from 'three/nodes';
+import { setInputAestheticsFromType, setOutputAestheticsFromType } from '../DataTypeLib.js';
 
 export class SplitEditor extends BaseNodeEditor {
 
@@ -10,7 +11,7 @@ export class SplitEditor extends BaseNodeEditor {
 
 		let node = null;
 
-		const inputElement = new LabelElement( 'Input' ).setInput( 1 ).onConnect( () => {
+		const inputElement = setInputAestheticsFromType( new LabelElement( 'Input' ), 'node' ).onConnect( () => {
 
 			node = inputElement.getLinkedObject();
 
@@ -32,12 +33,10 @@ export class SplitEditor extends BaseNodeEditor {
 
 		} );
 
-		this.add( inputElement );
-
-		const xElement = new LabelElement( 'x | r' ).setOutput( 1 ).setObject( float() );
-		const yElement = new LabelElement( 'y | g' ).setOutput( 1 ).setObject( float() );
-		const zElement = new LabelElement( 'z | b' ).setOutput( 1 ).setObject( float() );
-		const wElement = new LabelElement( 'w | a' ).setOutput( 1 ).setObject( float() );
+		const xElement = setOutputAestheticsFromType( new LabelElement( 'x | r' ), 'Number' ).setObject( float() );
+		const yElement = setOutputAestheticsFromType( new LabelElement( 'y | g' ), 'Number' ).setObject( float() );
+		const zElement = setOutputAestheticsFromType( new LabelElement( 'z | b' ), 'Number' ).setObject( float() );
+		const wElement = setOutputAestheticsFromType( new LabelElement( 'w | a' ), 'Number' ).setObject( float() );
 
 		this.add( inputElement )
 			.add( xElement )

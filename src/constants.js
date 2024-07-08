@@ -1,4 +1,4 @@
-export const REVISION = '162dev';
+export const REVISION = '167dev';
 
 export const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -91,7 +91,9 @@ export const HalfFloatType = 1016;
 export const UnsignedShort4444Type = 1017;
 export const UnsignedShort5551Type = 1018;
 export const UnsignedInt248Type = 1020;
+export const UnsignedInt5999Type = 35902;
 export const AlphaFormat = 1021;
+export const RGBFormat = 1022;
 export const RGBAFormat = 1023;
 export const LuminanceFormat = 1024;
 export const LuminanceAlphaFormat = 1025;
@@ -101,6 +103,7 @@ export const RedFormat = 1028;
 export const RedIntegerFormat = 1029;
 export const RGFormat = 1030;
 export const RGIntegerFormat = 1031;
+export const RGBIntegerFormat = 1032;
 export const RGBAIntegerFormat = 1033;
 
 export const RGB_S3TC_DXT1_Format = 33776;
@@ -151,6 +154,8 @@ export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
 export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
+export const RGBDepthPacking = 3202;
+export const RGDepthPacking = 3203;
 export const TangentSpaceNormalMap = 0;
 export const ObjectSpaceNormalMap = 1;
 
@@ -206,8 +211,6 @@ export const StreamCopyUsage = 35042;
 
 export const GLSL1 = '100';
 export const GLSL3 = '300 es';
-
-export const _SRGBAFormat = 1035; // fallback for WebGL 1
 
 export const WebGLCoordinateSystem = 2000;
 export const WebGPUCoordinateSystem = 2001;

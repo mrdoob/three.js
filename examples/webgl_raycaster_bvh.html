@@ -29,7 +29,7 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.7.3/build/index.module.js"
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.3/build/index.module.js"
 				}
 			}
 		</script>
@@ -75,7 +75,6 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
@@ -93,6 +92,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -265,8 +265,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

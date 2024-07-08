@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			一个支持.cube文件格式的3D LUT加载器。<br />
+			基于以下参考：
+		</p>
+
+		<ul>
+			<li>[link:https://wwwimages2.adobe.com/content/dam/acom/en/products/speedgrade/cc/pdfs/cube-lut-specification-1.0.pdf]</li>
+		</ul>
+
+		<h2>导入</h2>
+
+		<p>
+			[name]是一个附加组件，必须显式导入。
+			参见 [link:#manual/introduction/Installation Installation / Addons]。
+		</p>
+
+		<code>
+			import { LUTCubeLoader } from 'three/addons/loaders/LUTCubeLoader.js';
+		</code>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+			[page:LoadingManager manager] — 要使用的加载管理器。默认值为[page:DefaultLoadingManager DefaultLoadingManager]<br />
+		</p>
+		<p>
+			创建一个新的[name]。
+		</p>
+
+		<h2>属性</h2>
+		<p>参见基础[page:Loader]类以获取公共属性。</p>
+
+		<h2>方法</h2>
+		<p>参见基础[page:Loader]类以获取公共方法。</p>
+
+		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+			[page:String url] — 包含 `.cube` 文件路径/URL 的字符串。<br />
+			[page:Function onLoad] — (可选的) 加载成功完成后要调用的函数。该函数接收 [page:Function parse] 方法的结果。<br />
+			[page:Function onProgress] — (可选的)加载过程中要调用的函数。参数将是 XMLHttpRequest 实例，其中包含 [page:Integer total] 和 [page:Integer loaded] 字节。如果服务器未设置 Content-Length 头部；则 [page:Integer total] 将为 0。<br />
+			[page:Function onError] — (可选的)加载过程中发生错误时要调用的函数。该函数将错误作为参数接收。<br />
+		</p>
+		<p>
+			从url开始加载并返回已加载的LUT。
+		</p>
+
+		<h3>[method:Object parse]( [param:String input] )</h3>
+		<p>
+			[page:String input] — cube数据字符串。<br />
+		</p>
+		<p>
+			解析一个 cube 数据字符串，并在解析完成时触发[page:Function onLoad]回调。传递给[page:Function onLoad]函数的参数将是一个[page:Object object]，它包含以下LUT（查找表）数据：[page:String .title]（标题），[page:Number .size]（大小），[page:Vector3 .domainMin]（域最小值），[page:Vector3 .domainMax]（域最大值），[page:DataTexture .texture]（纹理）和[page:Data3DTexture .texture3D]（3D纹理）。 
+		</p>
+
+		<h3>[method:this setType]( [param:Number type] )</h3>
+		<p>
+			[page:Number type] - 纹理类型。详情请参见[page:Textures texture constants]页面。<br />
+		</p>
+		<p>
+			设置所需的纹理类型。仅支持[page:Textures THREE.UnsignedByteType]（无符号字节类型）和[page:Textures THREE.FloatType]（浮点类型）。默认是[page:Textures THREE.UnsignedByteType]（无符号字节类型）。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/[name].js examples/jsm/loaders/[name].js]
+		</p>
+	</body>
+</html>

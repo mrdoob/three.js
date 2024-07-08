@@ -46,8 +46,11 @@
 		[page:Texture.anisotropy]<br />
 		[page:Constant colorSpace] - الافتراضي هو [page:Textures NoColorSpace].
 		<br />
+		[page:String internalFormat] - الافتراضي هو `null`.<br />
 		[page:Boolean depthBuffer] - الافتراضي هو `true`. <br />
 		[page:Boolean stencilBuffer] - الافتراضي هو `false`. <br />
+		[page:Boolean resolveDepthBuffer] - الافتراضي هو `true`. <br />
+		[page:Boolean resolveStencilBuffer] - الافتراضي هو `true`. <br />
 		[page:Number samples] - الافتراضي هو 0. <br /><br />
 		 
 		ينشئ جديدًا [name]
@@ -86,6 +89,19 @@
 	 
 		<h3>[property:Boolean stencilBuffer]</h3>
 		<p>يعرض على مخزن القالب. الافتراضي هو false.</p>
+
+		<h3>[property:Boolean resolveDepthBuffer]</h3>
+		<p>
+			Defines whether the depth buffer should be resolved when rendering into a multisampled render target. 
+			Default is `true`.
+		</p>
+
+		<h3>[property:Boolean resolveStencilBuffer]</h3>
+		<p>
+			Defines whether the stencil buffer should be resolved when rendering into a multisampled render target. 
+			This property has no effect when [page:.resolveDepthBuffer] is set to `false`. 
+			Default is `true`.
+		</p>
 	 
 		<h3>[property:DepthTexture depthTexture]</h3>
 		<p>

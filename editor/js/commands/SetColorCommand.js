@@ -9,17 +9,17 @@ import { Command } from '../Command.js';
  */
 class SetColorCommand extends Command {
 
-	constructor( editor, object, attributeName, newValue ) {
+	constructor( editor, object = null, attributeName = '', newValue = null ) {
 
 		super( editor );
 
 		this.type = 'SetColorCommand';
-		this.name = `Set ${attributeName}`;
+		this.name = editor.strings.getKey( 'command/SetColor' ) + ': ' + attributeName;
 		this.updatable = true;
 
 		this.object = object;
 		this.attributeName = attributeName;
-		this.oldValue = ( object !== undefined ) ? this.object[ this.attributeName ].getHex() : undefined;
+		this.oldValue = ( object !== null ) ? this.object[ this.attributeName ].getHex() : null;
 		this.newValue = newValue;
 
 	}

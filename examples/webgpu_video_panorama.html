@@ -26,7 +26,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -35,8 +36,6 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let camera, scene, renderer;
 
@@ -74,7 +73,7 @@
 				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

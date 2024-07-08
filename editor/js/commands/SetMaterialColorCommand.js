@@ -9,20 +9,20 @@ import { Command } from '../Command.js';
  */
 class SetMaterialColorCommand extends Command {
 
-	constructor( editor, object, attributeName, newValue, materialSlot ) {
+	constructor( editor, object = null, attributeName = '', newValue = null, materialSlot = - 1 ) {
 
 		super( editor );
 
 		this.type = 'SetMaterialColorCommand';
-		this.name = `Set Material.${attributeName}`;
+		this.name = editor.strings.getKey( 'command/SetMaterialColor' ) + ': ' + attributeName;
 		this.updatable = true;
 
 		this.object = object;
 		this.materialSlot = materialSlot;
 
-		this.material = ( this.object !== undefined ) ? this.editor.getObjectMaterial( object, materialSlot ) : undefined;
+		const material = ( object !== null ) ? editor.getObjectMaterial( object, materialSlot ) : null;
 
-		this.oldValue = ( this.material !== undefined ) ? this.material[ attributeName ].getHex() : undefined;
+		this.oldValue = ( material !== null ) ? material[ attributeName ].getHex() : null;
 		this.newValue = newValue;
 
 		this.attributeName = attributeName;
@@ -31,7 +31,9 @@ class SetMaterialColorCommand extends Command {
 
 	execute() {
 
-		this.material[ this.attributeName ].setHex( this.newValue );
+		const material = this.editor.getObjectMaterial( this.object, this.materialSlot );
+
+		material[ this.attributeName ].setHex( this.newValue );
 
 		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
 
@@ -39,7 +41,9 @@ class SetMaterialColorCommand extends Command {
 
 	undo() {
 
-		this.material[ this.attributeName ].setHex( this.oldValue );
+		const material = this.editor.getObjectMaterial( this.object, this.materialSlot );
+
+		material[ this.attributeName ].setHex( this.oldValue );
 
 		this.editor.signals.materialChanged.dispatch( this.object, this.materialSlot );
 
@@ -59,6 +63,7 @@ class SetMaterialColorCommand extends Command {
 		output.attributeName = this.attributeName;
 		output.oldValue = this.oldValue;
 		output.newValue = this.newValue;
+		output.materialSlot = this.materialSlot;
 
 		return output;
 
@@ -72,6 +77,7 @@ class SetMaterialColorCommand extends Command {
 		this.attributeName = json.attributeName;
 		this.oldValue = json.oldValue;
 		this.newValue = json.newValue;
+		this.materialSlot = json.materialSlot;
 
 	}
 

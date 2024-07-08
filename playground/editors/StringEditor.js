@@ -12,8 +12,6 @@ export class StringEditor extends BaseNodeEditor {
 
 		super( 'String', inputNode, 350 );
 
-		this.setOutputLength( 1 );
-
 		element.addEventListener( 'changeInput', () => this.invalidate() );
 
 		this.add( element );

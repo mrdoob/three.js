@@ -1,5 +1,6 @@
 import {
 	BufferGeometry,
+	Color,
 	Float32BufferAttribute,
 	Vector2,
 	Vector3,
@@ -81,7 +82,7 @@ class SimplifyModifier {
 
 			if ( colorAttribute ) {
 
-				col = new THREE.Color().fromBufferAttribute( colorAttribute, i );
+				col = new Color().fromBufferAttribute( colorAttribute, i );
 
 			}
 

@@ -164,6 +164,7 @@ class ObjectLoader extends Loader {
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
+		this.bindLightTargets( object );
 
 		//
 
@@ -205,6 +206,7 @@ class ObjectLoader extends Loader {
 		const skeletons = this.parseSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
+		this.bindLightTargets( object );
 
 		return object;
 
@@ -798,6 +800,8 @@ class ObjectLoader extends Loader {
 				if ( data.backgroundBlurriness !== undefined ) object.backgroundBlurriness = data.backgroundBlurriness;
 				if ( data.backgroundIntensity !== undefined ) object.backgroundIntensity = data.backgroundIntensity;
 				if ( data.backgroundRotation !== undefined ) object.backgroundRotation.fromArray( data.backgroundRotation );
+
+				if ( data.environmentIntensity !== undefined ) object.environmentIntensity = data.environmentIntensity;
 				if ( data.environmentRotation !== undefined ) object.environmentRotation.fromArray( data.environmentRotation );
 
 				break;
@@ -832,6 +836,7 @@ class ObjectLoader extends Loader {
 			case 'DirectionalLight':
 
 				object = new DirectionalLight( data.color, data.intensity );
+				object.target = data.target || '';
 
 				break;
 
@@ -850,6 +855,7 @@ class ObjectLoader extends Loader {
 			case 'SpotLight':
 
 				object = new SpotLight( data.color, data.intensity, data.distance, data.angle, data.penumbra, data.decay );
+				object.target = data.target || '';
 
 				break;
 
@@ -906,7 +912,7 @@ class ObjectLoader extends Loader {
 				geometry = getGeometry( data.geometry );
 				material = getMaterial( data.material );
 
-				object = new BatchedMesh( data.maxGeometryCount, data.maxVertexCount, data.maxIndexCount, material );
+				object = new BatchedMesh( data.maxInstanceCount, data.maxVertexCount, data.maxIndexCount, material );
 				object.geometry = geometry;
 				object.perObjectFrustumCulled = data.perObjectFrustumCulled;
 				object.sortObjects = data.sortObjects;
@@ -936,7 +942,7 @@ class ObjectLoader extends Loader {
 
 				} );
 
-				object._maxGeometryCount = data.maxGeometryCount;
+				object._maxInstanceCount = data.maxInstanceCount;
 				object._maxVertexCount = data.maxVertexCount;
 				object._maxIndexCount = data.maxIndexCount;
 
@@ -944,6 +950,7 @@ class ObjectLoader extends Loader {
 				object._geometryCount = data.geometryCount;
 
 				object._matricesTexture = getTexture( data.matricesTexture.uuid );
+				if ( data.colorsTexture !== undefined ) object._colorsTexture = getTexture( data.colorsTexture.uuid );
 
 				break;
 
@@ -1029,6 +1036,7 @@ class ObjectLoader extends Loader {
 
 		if ( data.shadow ) {
 
+			if ( data.shadow.intensity !== undefined ) object.shadow.intensity = data.shadow.intensity;
 			if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
 			if ( data.shadow.normalBias !== undefined ) object.shadow.normalBias = data.shadow.normalBias;
 			if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
@@ -1111,6 +1119,32 @@ class ObjectLoader extends Loader {
 				} else {
 
 					child.bind( skeleton, child.bindMatrix );
+
+				}
+
+			}
+
+		} );
+
+	}
+
+	bindLightTargets( object ) {
+
+		object.traverse( function ( child ) {
+
+			if ( child.isDirectionalLight || child.isSpotLight ) {
+
+				const uuid = child.target;
+
+				const target = object.getObjectByProperty( 'uuid', uuid );
+
+				if ( target !== undefined ) {
+
+					child.target = target;
+
+				} else {
+
+					child.target = new Object3D();
 
 				}
 

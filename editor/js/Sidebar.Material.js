@@ -111,6 +111,11 @@ function SidebarMaterial( editor ) {
 	const materialReflectivity = new SidebarMaterialNumberProperty( editor, 'reflectivity', strings.getKey( 'sidebar/material/reflectivity' ) );
 	container.add( materialReflectivity );
 
+	// ior
+
+	const materialIOR = new SidebarMaterialNumberProperty( editor, 'ior', strings.getKey( 'sidebar/material/ior' ), [ 1, 2.333 ], 3 );
+	container.add( materialIOR );
+
 	// roughness
 
 	const materialRoughness = new SidebarMaterialNumberProperty( editor, 'roughness', strings.getKey( 'sidebar/material/roughness' ), [ 0, 1 ] );
@@ -130,6 +135,11 @@ function SidebarMaterial( editor ) {
 
 	const materialClearcoatRoughness = new SidebarMaterialNumberProperty( editor, 'clearcoatRoughness', strings.getKey( 'sidebar/material/clearcoatroughness' ), [ 0, 1 ] );
 	container.add( materialClearcoatRoughness );
+
+	// dispersion
+
+	const materialDispersion = new SidebarMaterialNumberProperty( editor, 'dispersion', strings.getKey( 'sidebar/material/dispersion' ), [ 0, 10 ] );
+	container.add( materialDispersion );
 
 	// iridescence
 
@@ -420,7 +430,7 @@ function SidebarMaterial( editor ) {
 	exportJson.onClick( function () {
 
 		const object = editor.selected;
-		const material = object.material;
+		const material = Array.isArray( object.material ) ? object.material[ currentMaterialSlot ] : object.material;
 
 		let output = material.toJSON();
 
@@ -435,11 +445,7 @@ function SidebarMaterial( editor ) {
 
 		}
 
-		const left = ( screen.width - 500 ) / 2;
-		const top = ( screen.height - 500 ) / 2;
-
-		const url = URL.createObjectURL( new Blob( [ output ], { type: 'text/plain' } ) );
-		window.open( url, '_blank', `location=no,left=${left},top=${top},width=500,height=500` );
+		editor.utils.save( new Blob( [ output ] ), `${ materialName.getValue() || 'material' }.json` );
 
 	} );
 	container.add( exportJson );
@@ -478,19 +484,51 @@ function SidebarMaterial( editor ) {
 
 				}
 
-				if ( Array.isArray( currentObject.material ) ) {
+				const currentMaterial = currentObject.material;
 
-					// don't remove the entire multi-material. just the material of the selected slot
+				if ( material.type === 'MeshPhysicalMaterial' && currentMaterial.type === 'MeshStandardMaterial' ) {
 
-					editor.removeMaterial( currentObject.material[ currentMaterialSlot ] );
+					// TODO Find a easier to maintain approach
 
-				} else {
+					const properties = [
+						'color', 'emissive', 'roughness', 'metalness', 'map', 'emissiveMap', 'alphaMap',
+						'bumpMap', 'normalMap', 'normalScale', 'displacementMap', 'roughnessMap', 'metalnessMap',
+						'envMap', 'lightMap', 'aoMap', 'side'
+					];
 
-					editor.removeMaterial( currentObject.material );
+					for ( const property of properties ) {
+
+						const value = currentMaterial[ property ];
+
+						if ( value === null ) continue;
+						
+						if ( value[ 'clone' ] !== undefined ) {
+
+							material[ property ] = value.clone();
+
+						} else {
+
+							material[ property ] = value;
+
+						}
+
+					}
 
 				}
 
-				editor.execute( new SetMaterialCommand( editor, currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
+				if ( Array.isArray( currentMaterial ) ) {
+
+					// don't remove the entire multi-material. just the material of the selected slot
+
+					editor.removeMaterial( currentMaterial[ currentMaterialSlot ] );
+
+				} else {
+
+					editor.removeMaterial( currentMaterial );
+
+				}
+
+				editor.execute( new SetMaterialCommand( editor, currentObject, material, currentMaterialSlot ), strings.getKey( 'command/SetMaterial' ) + ': ' + materialClass.getValue() );
 				editor.addMaterial( material );
 				// TODO Copy other references in the scene graph
 				// keeping name and UUID then.

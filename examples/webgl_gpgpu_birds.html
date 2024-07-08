@@ -434,7 +434,6 @@
 			let birdUniforms;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -451,6 +450,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				initComputeRenderer();
@@ -498,12 +498,6 @@
 			function initComputeRenderer() {
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
-
-				if ( renderer.capabilities.isWebGL2 === false ) {
-
-					gpuCompute.setDataType( THREE.HalfFloatType );
-
-				}
 
 				const dtPosition = gpuCompute.createTexture();
 				const dtVelocity = gpuCompute.createTexture();
@@ -639,8 +633,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

@@ -56,7 +56,7 @@ jobs:
 
       # This runs on the base branch of the PR, meaning "dev"
       - name: Git checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - name: Install Node
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4
         with:
@@ -126,7 +126,7 @@ jobs:
           echo "TREESHAKEN_DIFF=$TREESHAKEN_DIFF" >> $GITHUB_OUTPUT
 
       - name: Find existing comment
-        uses: peter-evans/find-comment@d5fe37641ad8451bdd80312415672ba26c86575e # v3
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3
         id: find-comment
         with:
           issue-number: ${{ fromJSON(steps.download-artifact.outputs.result).pr }}

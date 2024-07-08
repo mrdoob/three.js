@@ -80,9 +80,7 @@ composer.addPass(bloomPass);
 </pre>
 <p>最終的には、元の入力の上にノイズとスキャンラインを描画する <code class="notranslate" translate="no">FilmPass</code> ができました。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const filmPass = new FilmPass(
-    0.35,   // noise intensity
-    0.025,  // scanline intensity
-    648,    // scanline count
+    0.5,   // intensity
     false,  // grayscale
 );
 composer.addPass(filmPass);
@@ -144,10 +142,8 @@ deltaTimeをアニメーションしてる様々なエフェクトに渡しま�
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">bloomPass.copyUniforms.opacity.value = someValue;
 </pre>
 <p>同様に<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>でこの行を見つけました。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">if ( grayscale !== undefined )    this.uniforms.grayscale.value = grayscale;
-if ( noiseIntensity !== undefined ) this.uniforms.nIntensity.value = noiseIntensity;
-if ( scanlinesIntensity !== undefined ) this.uniforms.sIntensity.value = scanlinesIntensity;
-if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.uniforms.intensity.value = intensity;
+this.uniforms.grayscale.value = grayscale;
 </pre>
 <p>これでどのように設定するか、かなり明確になりました。</p>
 <p>これらの値を設定する簡単なGUIを作ってみましょう。</p>
@@ -163,9 +159,7 @@ if ( scanlinesCount !== undefined ) this.uniforms.sCount.value = scanlinesCount;
 {
   const folder = gui.addFolder('FilmPass');
   folder.add(filmPass.uniforms.grayscale, 'value').name('grayscale');
-  folder.add(filmPass.uniforms.nIntensity, 'value', 0, 1).name('noise intensity');
-  folder.add(filmPass.uniforms.sIntensity, 'value', 0, 1).name('scanline intensity');
-  folder.add(filmPass.uniforms.sCount, 'value', 0, 1000).name('scanline count');
+  folder.add(filmPass.uniforms.intensity, 'value', 0, 1).name('intensity');
   folder.open();
 }
 </pre>

@@ -14,9 +14,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -24,15 +24,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, uniform, storage, attribute, float, vec2, vec3, color, instanceIndex, PointsNodeMaterial } from 'three/nodes';
+			import { tslFn, uniform, storage, attribute, float, vec2, vec3, color, instanceIndex } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import StorageInstancedBufferAttribute from 'three/addons/renderers/common/StorageInstancedBufferAttribute.js';
 
 			let camera, scene, renderer;
 			let computeNode;
@@ -43,14 +37,6 @@
 			init();
 
 			function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
 
 				camera = new THREE.OrthographicCamera( - 1.0, 1.0, 1.0, - 1.0, 0, 1 );
 				camera.position.z = 1;
@@ -64,8 +50,8 @@
 
 				// create buffers
 
-				const particleBuffer = new StorageInstancedBufferAttribute( particleNum, particleSize );
-				const velocityBuffer = new StorageInstancedBufferAttribute( particleNum, particleSize );
+				const particleBuffer = new THREE.StorageInstancedBufferAttribute( particleNum, particleSize );
+				const velocityBuffer = new THREE.StorageInstancedBufferAttribute( particleNum, particleSize );
 
 				const particleBufferNode = storage( particleBuffer, 'vec2', particleNum );
 				const velocityBufferNode = storage( velocityBuffer, 'vec2', particleNum );
@@ -128,16 +114,15 @@
 				pointsGeometry.setAttribute( 'particle', particleBuffer ); // dummy the position points as instances
 				pointsGeometry.drawRange.count = 1; // force render points as instances ( not triangle )
 
-				const pointsMaterial = new PointsNodeMaterial();
+				const pointsMaterial = new THREE.PointsNodeMaterial();
 				pointsMaterial.colorNode = particleNode.add( color( 0xFFFFFF ) );
 				pointsMaterial.positionNode = particleNode;
 
 				const mesh = new THREE.Points( pointsGeometry, pointsMaterial );
-				mesh.isInstancedMesh = true;
 				mesh.count = particleNum;
 				scene.add( mesh );
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

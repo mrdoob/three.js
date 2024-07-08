@@ -11,6 +11,20 @@ class CompressedArrayTexture extends CompressedTexture {
 		this.image.depth = depth;
 		this.wrapR = ClampToEdgeWrapping;
 
+		this.layerUpdates = new Set();
+
+	}
+
+	addLayerUpdate( layerIndex ) {
+
+		this.layerUpdates.add( layerIndex );
+
+	}
+
+	clearLayerUpdates() {
+
+		this.layerUpdates.clear();
+
 	}
 
 }

@@ -131,22 +131,40 @@ class MMDLoader extends Loader {
 
 		}
 
-		const modelExtension = this._extractExtension( url ).toLowerCase();
+		const parser = this._getParser();
+		const extractModelExtension = this._extractModelExtension;
 
-		// Should I detect by seeing header?
-		if ( modelExtension !== 'pmd' && modelExtension !== 'pmx' ) {
+		this.loader
+			.setMimeType( undefined )
+			.setPath( this.path )
+			.setResponseType( 'arraybuffer' )
+			.setRequestHeader( this.requestHeader )
+			.setWithCredentials( this.withCredentials )
+			.load( url, function ( buffer ) {
 
-			if ( onError ) onError( new Error( 'THREE.MMDLoader: Unknown model file extension .' + modelExtension + '.' ) );
+				try {
 
-			return;
+					const modelExtension = extractModelExtension( buffer );
 
-		}
+					if ( modelExtension !== 'pmd' && modelExtension !== 'pmx' ) {
 
-		this[ modelExtension === 'pmd' ? 'loadPMD' : 'loadPMX' ]( url, function ( data ) {
+						if ( onError ) onError( new Error( 'THREE.MMDLoader: Unknown model file extension .' + modelExtension + '.' ) );
 
-			onLoad(	builder.build( data, resourcePath, onProgress, onError )	);
+						return;
 
-		}, onProgress, onError );
+					}
+
+					const data = modelExtension === 'pmd' ? parser.parsePmd( buffer, true ) : parser.parsePmx( buffer, true );
+
+					onLoad( builder.build( data, resourcePath, onProgress, onError ) );
+
+				} catch ( e ) {
+
+					if ( onError ) onError( e );
+
+				}
+
+			}, onProgress, onError );
 
 	}
 
@@ -358,10 +376,11 @@ class MMDLoader extends Loader {
 
 	// private methods
 
-	_extractExtension( url ) {
+	_extractModelExtension( buffer ) {
 
-		const index = url.lastIndexOf( '.' );
-		return index < 0 ? '' : url.slice( index + 1 );
+		const decoder = new TextDecoder( 'utf-8' );
+		const bytes = new Uint8Array( buffer, 0, 3 );
+		return decoder.decode( bytes ).toLowerCase();
 
 	}
 

@@ -45,7 +45,7 @@ function header() {
 
 			code.prepend( `/**
  * @license
- * Copyright 2010-2023 Three.js Authors
+ * Copyright 2010-2024 Three.js Authors
  * SPDX-License-Identifier: MIT
  */\n` );
 
@@ -102,7 +102,32 @@ const builds = [
 				indent: '\t'
 			}
 		]
+	},
+	{
+		input: 'src/Three.WebGPU.js',
+		plugins: [
+			header()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.webgpu.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.WebGPU.js',
+		plugins: [
+			header(),
+			terser()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.webgpu.min.js'
+			}
+		]
 	}
 ];
 
-export default ( args ) => args.configOnlyModule ? builds[ 0 ] : builds;
+export default ( args ) => args.configOnlyModule ? [ builds[ 0 ], builds[ 3 ] ] : builds;

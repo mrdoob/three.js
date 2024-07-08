@@ -9,8 +9,8 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="description">Normal, Velocity, Depth, DepthRGBA, DepthRGBAUnpacked, Materials</span><br/>
-			by <a href="https://Clara.io">Ben Houston</a>. ninja head from <a href="https://gpuopen.com/archive/gamescgi/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="description">Normal, Velocity, and Depth Materials</span><br/>
+			ninja head from <a href="https://gpuopen.com/archive/gamescgi/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
 		</div>
 
 		<script type="importmap">
@@ -53,24 +53,12 @@
 			let cameraOrtho, cameraPerspective;
 			let controlsOrtho, controlsPerspective;
 
-			let mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialNormal, materialVelocity;
+			let mesh, materialStandard, materialDepthBasic, materialDepthRGBA, materialDepthRGB, materialDepthRG, materialNormal, materialVelocity;
 
 			const SCALE = 2.436143; // from original model
 			const BIAS = - 0.428408; // from original model
 
 			init();
-			animate();
-			initGui();
-
-			// Init gui
-			function initGui() {
-
-				const gui = new GUI();
-				gui.add( params, 'material', [ 'standard', 'normal', 'velocity', 'depthBasic', 'depthRGBA' ] );
-				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
-				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
-
-			}
 
 			function init() {
 
@@ -80,6 +68,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				//
@@ -101,13 +90,11 @@
 				controlsPerspective = new OrbitControls( cameraPerspective, renderer.domElement );
 				controlsPerspective.minDistance = 1000;
 				controlsPerspective.maxDistance = 2400;
-				controlsPerspective.enablePan = false;
 				controlsPerspective.enableDamping = true;
 
 				controlsOrtho = new OrbitControls( cameraOrtho, renderer.domElement );
 				controlsOrtho.minZoom = 0.5;
 				controlsOrtho.maxZoom = 1.5;
-				controlsOrtho.enablePan = false;
 				controlsOrtho.enableDamping = true;
 
 				// lights
@@ -176,6 +163,26 @@
 					side: THREE.DoubleSide
 				} );
 
+				materialDepthRGB = new THREE.MeshDepthMaterial( {
+					depthPacking: THREE.RGBDepthPacking,
+
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					side: THREE.DoubleSide
+				} );
+
+				materialDepthRG = new THREE.MeshDepthMaterial( {
+					depthPacking: THREE.RGDepthPacking,
+
+					displacementMap: displacementMap,
+					displacementScale: SCALE,
+					displacementBias: BIAS,
+
+					side: THREE.DoubleSide
+				} );
+
 				materialNormal = new THREE.MeshNormalMaterial( {
 					displacementMap: displacementMap,
 					displacementScale: SCALE,
@@ -199,7 +206,6 @@
 				materialVelocity.uniforms.displacementMap.value = displacementMap;
 				materialVelocity.uniforms.displacementScale.value = SCALE;
 				materialVelocity.uniforms.displacementBias.value = BIAS;
-				materialVelocity.extensions.derivatives = true;
 
 				//
 
@@ -221,6 +227,13 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
+
+				//
+
+				const gui = new GUI();
+				gui.add( params, 'material', [ 'standard', 'normal', 'velocity', 'depthBasic', 'depthRGBA', 'depthRGB', 'depthRG' ] );
+				gui.add( params, 'camera', [ 'perspective', 'ortho' ] );
+				gui.add( params, 'side', [ 'front', 'back', 'double' ] );
 
 				//
 
@@ -251,8 +264,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				stats.begin();
 				render();
 				stats.end();
@@ -270,6 +281,8 @@
 						case 'standard': material = materialStandard; break;
 						case 'depthBasic': material = materialDepthBasic; break;
 						case 'depthRGBA': material = materialDepthRGBA; break;
+						case 'depthRGB': material = materialDepthRGB; break;
+						case 'depthRG': material = materialDepthRG; break;
 						case 'normal': material = materialNormal; break;
 						case 'velocity': material = materialVelocity; break;
 

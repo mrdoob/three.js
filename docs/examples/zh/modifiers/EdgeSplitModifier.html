@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] 的设计目的是通过“溶解”边缘来修改几何体，使其看起来更加平滑。
+		</p>
+
+		<h2>导入</h2>
+
+		<p>
+			[name]是一个附加组件，必须显式导入。
+			参见 [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { EdgeSplitModifier } from 'three/addons/modifiers/EdgeSplitModifier.js';
+		</code>
+
+		<h2>代码示例</h2>
+
+		<code>
+			const geometry = new THREE.IcosahedronGeometry( 10, 3 );<br />
+			const modifier = new EdgeSplitModifier();<br />
+			const cutOffAngle = 0.5;<br />
+			const tryKeepNormals = false;<br />
+			<br />
+			modifier.modify( geometry, cutOffAngle, tryKeepNormals );
+		</code>
+
+		<h2>示例</h2>
+
+		<p>[example:webgl_modifier_edgesplit misc / modifiers / EdgeSplit ]</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]()</h3>
+		<p>
+			创建一个新的[name]对象。
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:undefined modify]( [param:geometry], [param:cutOffAngle], [param:tryKeepNormals] )</h3>
+		<p>
+			使用插值的顶点法线，网格的面会在边缘处变得模糊，从而呈现出平滑的外观。<br />
+
+			您可以通过设置 `cutOffAngle` 来控制平滑度。<br />
+
+			如果希望尝试保留原始法线，请将 `tryKeepNormals` 设置为 `true`。
+
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/modifiers/EdgeSplitModifier.js examples/jsm/modifiers/EdgeSplitModifier.js]
+		</p>
+	</body>
+</html>

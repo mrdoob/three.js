@@ -9,7 +9,7 @@
 	<body>
 		<h1>Проверка совместимости с WebGL ([name])</h1>
 		<p>
-			Несмотря на то, что это становится все менее и менее серьезной проблемой, но все еще некоторые устройства или браузеры могут не поддерживать WebGL.
+			Несмотря на то, что это становится все менее и менее серьезной проблемой, но все еще некоторые устройства или браузеры могут не поддерживать WebGL 2.
 			Следующий метод позволяет вам проверить, поддерживается ли он, и отобразить сообщение пользователю, если это не так.
 			Импортируйте модуль обнаружения поддержки WebGL и выполните следующее, прежде чем пытаться что-либо отобразить.
 		</p>
@@ -17,14 +17,14 @@
 		<code>
 		import WebGL from 'three/addons/capabilities/WebGL.js';
 
-		if ( WebGL.isWebGLAvailable() ) {
+		if ( WebGL.isWebGL2Available() ) {
 
-			// Инициализируйте функцию или другие инициализации здесь
+			// Initiate function or other initializations here
 			animate();
 
 		} else {
 
-			const warning = WebGL.getWebGLErrorMessage();
+			const warning = WebGL.getWebGL2ErrorMessage();
 			document.getElementById( 'container' ).appendChild( warning );
 
 		}

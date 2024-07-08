@@ -7,6 +7,7 @@ import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 function GeometryParametersPanel( editor, object ) {
 
 	const strings = editor.strings;
+	const signals = editor.signals;
 
 	const container = new UIDiv();
 
@@ -72,6 +73,31 @@ function GeometryParametersPanel( editor, object ) {
 	depthSegmentsRow.add( depthSegments );
 
 	container.add( depthSegmentsRow );
+
+	//
+
+	function refreshUI() {
+
+		const parameters = object.geometry.parameters;
+
+		width.setValue( parameters.width );
+		height.setValue( parameters.height );
+		depth.setValue( parameters.depth );
+		widthSegments.setValue( parameters.widthSegments );
+		heightSegments.setValue( parameters.heightSegments );
+		depthSegments.setValue( parameters.depthSegments );
+
+	}
+
+	signals.geometryChanged.add( function ( mesh ) {
+
+		if ( mesh === object ) {
+
+			refreshUI();
+
+		}
+
+	} );
 
 	//
 

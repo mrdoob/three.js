@@ -46,7 +46,6 @@
 				rightPortalTexture, bottomLeftCorner, bottomRightCorner, topLeftCorner;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -54,11 +53,12 @@
 
 				// renderer
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
+				renderer.setAnimationLoop( animate );
 				renderer.localClippingEnabled = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				container.appendChild( renderer.domElement );
 
 				// scene
 				scene = new THREE.Scene();
@@ -204,8 +204,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				// move the bouncing sphere(s)
 				const timerOne = Date.now() * 0.01;

@@ -86,7 +86,6 @@
 			loader.load( 'fonts/helvetiker_bold.typeface.json', function ( font ) {
 
 				init( font );
-				animate();
 
 			} );
 
@@ -105,7 +104,7 @@
 					font: font,
 
 					size: 40,
-					height: 5,
+					depth: 5,
 					curveSegments: 3,
 
 					bevelThickness: 2,
@@ -183,6 +182,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( WIDTH, HEIGHT );
+				renderer.setAnimationLoop( animate );
 
 				const container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
@@ -208,8 +208,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 

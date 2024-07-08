@@ -74,7 +74,6 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
@@ -227,10 +226,11 @@
 
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.shadowMap.enabled = true;
-				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.shadowMap.enabled = true;
+				renderer.toneMapping = THREE.ReinhardToneMapping;
 				container.appendChild( renderer.domElement );
 
 
@@ -263,14 +263,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-
-			}
-
-			function render() {
 
 				renderer.toneMappingExposure = Math.pow( params.exposure, 5.0 ); // to allow for very bright scenes.
 				renderer.shadowMap.enabled = params.shadows;

@@ -11,7 +11,7 @@
 
 		<p class="desc">一个用于操控场景的实用类。</p>
 
-		<h2>进口</h2>
+		<h2>导入</h2>
 
 		<p>
 			[name] 是一个附加组件，必须显式导入。
@@ -67,6 +67,30 @@
 		[page:InstancedMesh] instances automatically. Manually sorting may be
 		helpful to improve display of alpha blended materials (back to front),
 		and to reduce overdraw in opaque materials (front to back).
+		</p>
+
+		<h3>[method:Generator traverseGenerator]( [param:Object3D object] )</h3>
+		<p>
+		object -- The 3D object to traverse.
+		</p>
+		<p>
+		A generator based version of [page:Object3D.traverse]().
+		</p>
+
+		<h3>[method:Generator traverseVisibleGenerator]( [param:Object3D object] )</h3>
+		<p>
+		object -- The 3D object to traverse.
+		</p>
+		<p>
+		A generator based version of [page:Object3D.traverseVisible]().
+		</p>
+
+		<h3>[method:Generator traverseAncestorsGenerator]( [param:Object3D object] )</h3>
+		<p>
+		object -- The 3D object to traverse.
+		</p>
+		<p>
+		A generator based version of [page:Object3D.traverseAncestors]().
 		</p>
 
 		<h2>源代码</h2>

@@ -1,4 +1,4 @@
-import { UIPanel, UIBreak, UIText, UIButton, UIRow, UIInput } from './libs/ui.js';
+import { UIPanel, UIBreak, UIButton, UIRow, UIInput } from './libs/ui.js';
 
 import { AddScriptCommand } from './commands/AddScriptCommand.js';
 import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';
@@ -81,7 +81,7 @@ function SidebarScript( editor ) {
 					remove.setMarginLeft( '4px' );
 					remove.onClick( function () {
 
-						if ( confirm( 'Are you sure?' ) ) {
+						if ( confirm( strings.getKey( 'prompt/script/remove' ) ) ) {
 
 							editor.execute( new RemoveScriptCommand( editor, editor.selected, script ) );
 

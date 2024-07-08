@@ -1,8 +1,9 @@
 import { LabelElement, ToggleInput, SelectInput } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { onValidNode, onValidType, getColorFromType } from '../NodeEditorUtils.js';
+import { onValidNode, onValidType } from '../NodeEditorUtils.js';
 import { texture, uv } from 'three/nodes';
 import { Texture, TextureLoader, RepeatWrapping, ClampToEdgeWrapping, MirroredRepeatWrapping } from 'three';
+import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
 const textureLoader = new TextureLoader();
 const defaultTexture = new Texture();
@@ -23,8 +24,6 @@ export class TextureEditor extends BaseNodeEditor {
 
 		super( 'Texture', node, 250 );
 
-		this.setOutputLength( 4 );
-
 		this.texture = null;
 
 		this._initFile();
@@ -36,7 +35,7 @@ export class TextureEditor extends BaseNodeEditor {
 
 	_initFile() {
 
-		const fileElement = new LabelElement( 'File' ).setInputColor( getColorFromType( 'URL' ) ).setInput( 1 );
+		const fileElement = setInputAestheticsFromType( new LabelElement( 'File' ), 'URL' );
 
 		fileElement.onValid( onValidType( 'URL' ) ).onConnect( () => {
 
@@ -57,7 +56,7 @@ export class TextureEditor extends BaseNodeEditor {
 
 	_initParams() {
 
-		const uvField = new LabelElement( 'UV' ).setInput( 2 );
+		const uvField = setInputAestheticsFromType( new LabelElement( 'UV' ), 'Vector2' );
 
 		uvField.onValid( onValidNode ).onConnect( () => {
 

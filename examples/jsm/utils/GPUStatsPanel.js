@@ -1,6 +1,5 @@
 import Stats from '../libs/stats.module.js';
 
-// https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query/
 // https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query_webgl2/
 export class GPUStatsPanel extends Stats.Panel {
 
@@ -8,18 +7,11 @@ export class GPUStatsPanel extends Stats.Panel {
 
 		super( name, '#f90', '#210' );
 
-		let isWebGL2 = true;
-		let extension = context.getExtension( 'EXT_disjoint_timer_query_webgl2' );
+		const extension = context.getExtension( 'EXT_disjoint_timer_query_webgl2' );
+
 		if ( extension === null ) {
 
-			isWebGL2 = false;
-			extension = context.getExtension( 'EXT_disjoint_timer_query' );
-
-			if ( extension === null ) {
-
-				console.warn( 'GPUStatsPanel: disjoint_time_query extension not available.' );
-
-			}
+			console.warn( 'GPUStatsPanel: disjoint_time_query extension not available.' );
 
 		}
 
@@ -40,40 +32,21 @@ export class GPUStatsPanel extends Stats.Panel {
 			}
 
 			// create the query object
-			let query;
-			if ( isWebGL2 ) {
-
-				query = gl.createQuery();
-				gl.beginQuery( ext.TIME_ELAPSED_EXT, query );
-
-			} else {
-
-				query = ext.createQueryEXT();
-				ext.beginQueryEXT( ext.TIME_ELAPSED_EXT, query );
-
-			}
+			const query = gl.createQuery();
+			gl.beginQuery( ext.TIME_ELAPSED_EXT, query );
 
 			this.activeQueries ++;
 
 			const checkQuery = () => {
 
 				// check if the query is available and valid
-				let available, disjoint, ns;
-				if ( isWebGL2 ) {
 
-					available = gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE );
-					disjoint = gl.getParameter( ext.GPU_DISJOINT_EXT );
-					ns = gl.getQueryParameter( query, gl.QUERY_RESULT );
-
-				} else {
-
-					available = ext.getQueryObjectEXT( query, ext.QUERY_RESULT_AVAILABLE_EXT );
-					disjoint = gl.getParameter( ext.GPU_DISJOINT_EXT );
-					ns = ext.getQueryObjectEXT( query, ext.QUERY_RESULT_EXT );
-
-				}
+				const available = gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE );
+				const disjoint = gl.getParameter( ext.GPU_DISJOINT_EXT );
+				const ns = gl.getQueryParameter( query, gl.QUERY_RESULT );
 
 				const ms = ns * 1e-6;
+
 				if ( available ) {
 
 					// update the display if it is valid
@@ -82,6 +55,8 @@ export class GPUStatsPanel extends Stats.Panel {
 						this.update( ms, this.maxTime );
 
 					}
+
+					gl.deleteQuery( query );
 
 					this.activeQueries --;
 
@@ -111,15 +86,7 @@ export class GPUStatsPanel extends Stats.Panel {
 
 			}
 
-			if ( isWebGL2 ) {
-
-				gl.endQuery( ext.TIME_ELAPSED_EXT );
-
-			} else {
-
-				ext.endQueryEXT( ext.TIME_ELAPSED_EXT );
-
-			}
+			gl.endQuery( ext.TIME_ELAPSED_EXT );
 
 		};
 

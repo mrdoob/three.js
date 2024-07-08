@@ -294,7 +294,6 @@
 			const simplex = new SimplexNoise();
 
 			init();
-			animate();
 
 			function init() {
 
@@ -318,6 +317,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -441,12 +441,6 @@
 				// Creates the gpu computation class and sets it up
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
-
-				if ( renderer.capabilities.isWebGL2 === false ) {
-
-					gpuCompute.setDataType( THREE.HalfFloatType );
-
-				}
 
 				const heightmap0 = gpuCompute.createTexture();
 
@@ -672,8 +666,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				render();
 				stats.update();

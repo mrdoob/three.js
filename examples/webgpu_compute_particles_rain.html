@@ -14,9 +14,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -24,14 +24,10 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, texture, uv, uint, positionWorld, modelWorldMatrix, cameraViewMatrix, timerLocal, timerDelta, cameraProjectionMatrix, vec2, instanceIndex, positionGeometry, storage, MeshBasicNodeMaterial, If } from 'three/nodes';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import StorageInstancedBufferAttribute from 'three/addons/renderers/common/StorageInstancedBufferAttribute.js';
+			import { tslFn, texture, uv, uint, positionWorld, modelWorldMatrix, cameraViewMatrix, timerLocal, timerDelta, cameraProjectionMatrix, vec2, instanceIndex, positionGeometry, storage, If } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -53,14 +49,6 @@
 			init();
 
 			function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
 
 				const { innerWidth, innerHeight } = window;
 
@@ -97,13 +85,15 @@
 
 				collisionPosRT = new THREE.RenderTarget( 1024, 1024 );
 				collisionPosRT.texture.type = THREE.HalfFloatType;
+				collisionPosRT.texture.magFilter = THREE.NearestFilter;
+				collisionPosRT.texture.minFilter = THREE.NearestFilter;
 
-				collisionPosMaterial = new MeshBasicNodeMaterial();
+				collisionPosMaterial = new THREE.MeshBasicNodeMaterial();
 				collisionPosMaterial.colorNode = positionWorld;
 
 				//
 
-				const createBuffer = ( type = 'vec3' ) => storage( new StorageInstancedBufferAttribute( maxParticleCount, 3 ), type, maxParticleCount );
+				const createBuffer = ( type = 'vec3' ) => storage( new THREE.StorageInstancedBufferAttribute( maxParticleCount, 3 ), type, maxParticleCount );
 
 				const positionBuffer = createBuffer();
 				const velocityBuffer = createBuffer();
@@ -222,7 +212,7 @@
 
 				} );
 
-				const rainMaterial = new MeshBasicNodeMaterial();
+				const rainMaterial = new THREE.MeshBasicNodeMaterial();
 				rainMaterial.colorNode = uv().distance( vec2( .5, 0 ) ).oneMinus().mul( 3 ).exp().mul( .1 );
 				rainMaterial.vertexNode = billboarding();
 				rainMaterial.opacity = .2;
@@ -233,7 +223,6 @@
 				rainMaterial.transparent = true;
 
 				const rainParticles = new THREE.Mesh( new THREE.PlaneGeometry( .1, 2 ), rainMaterial );
-				rainParticles.isInstancedMesh = true;
 				rainParticles.count = instanceCount;
 				scene.add( rainParticles );
 
@@ -250,7 +239,7 @@
 
 				} );
 
-				const rippleMaterial = new MeshBasicNodeMaterial();
+				const rippleMaterial = new THREE.MeshBasicNodeMaterial();
 				rippleMaterial.colorNode = rippleEffect();
 				rippleMaterial.positionNode = positionGeometry.add( ripplePositionBuffer.toAttribute() );
 				rippleMaterial.opacityNode = rippleTime.mul( .3 ).oneMinus().max( 0 ).mul( .5 );
@@ -273,7 +262,6 @@
 				const rippleGeometry = BufferGeometryUtils.mergeGeometries( [ surfaceRippleGeometry, xRippleGeometry, zRippleGeometry ] );
 
 				const rippleParticles = new THREE.Mesh( rippleGeometry, rippleMaterial );
-				rippleParticles.isInstancedMesh = true;
 				rippleParticles.count = instanceCount;
 				scene.add( rippleParticles );
 
@@ -319,7 +307,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

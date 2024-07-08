@@ -4,7 +4,16 @@ import { KeyframeTrack } from '../KeyframeTrack.js';
 /**
  * A Track of Boolean keyframe values.
  */
-class BooleanKeyframeTrack extends KeyframeTrack {}
+class BooleanKeyframeTrack extends KeyframeTrack {
+
+	// No interpolation parameter because only InterpolateDiscrete is valid.
+	constructor( name, times, values ) {
+
+		super( name, times, values );
+
+	}
+
+}
 
 BooleanKeyframeTrack.prototype.ValueTypeName = 'bool';
 BooleanKeyframeTrack.prototype.ValueBufferType = Array;

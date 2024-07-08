@@ -129,6 +129,7 @@
 		THREE.UnsignedShort4444Type
 		THREE.UnsignedShort5551Type
 		THREE.UnsignedInt248Type
+		THREE.UnsignedInt5999Type
 		</code>
 		<p>
 		À utiliser avec la propriété [page:Texture.type type] d'une texture, qui doit correspondre au format correct. Voir ci-dessous pour plus de détails.<br /><br />
@@ -143,6 +144,7 @@
 		THREE.RedIntegerFormat
 		THREE.RGFormat
 		THREE.RGIntegerFormat
+		THREE.RGBFormat
 		THREE.RGBAFormat
 		THREE.RGBAIntegerFormat
 		THREE.LuminanceFormat
@@ -160,23 +162,19 @@
 
 		[page:constant RedIntegerFormat] supprime les composants vert et bleu et lit uniquement le composant rouge.
 		Les texels sont lus comme des entiers au lieu de points flottants.
-		(ne peut être utilisé qu'avec un contexte de rendu WebGL 2).
 		<br /><br />
 
 		[page:constant RGFormat] supprime les composants alpha et bleu et lit les composants rouge et vert.
-		(ne peut être utilisé qu'avec un contexte de rendu WebGL 2).
 		<br /><br />
 
 		[page:constant RGIntegerFormat] supprime les composants alpha et bleu et lit les composants rouge et vert.
 		Les texels sont lus comme des entiers au lieu de points flottants.
-		(ne peut être utilisé qu'avec un contexte de rendu WebGL 2).
 		<br /><br />
 
 		[page:constant RGBAFormat] est la valeur par défaut et lit les composants rouge, vert, bleu et alpha.<br /><br />
 
 		[page:constant RGBAIntegerFormat] est la valeur par défaut et lit les composants rouge, vert, bleu et alpha.
 		Les texels sont lus comme des entiers au lieu de points flottants.
-		(ne peut être utilisé qu'avec un contexte de rendu WebGL 2).
 		<br /><br />
 
 		[page:constant LuminanceFormat] lit chaque élément comme une seule composante de luminance.
@@ -346,10 +344,6 @@
 		</code>
 
 		<p>
-
-		Attention : changer le format interne d'une texture n'affectera que le
-		texture lors de l'utilisation d'un contexte de rendu WebGL 2.<br /><br />
-
 		À utiliser avec la propriété de texture [page:Texture.internalFormat internalFormat],
 		ceux-ci définissent comment les éléments d'une texture, ou "texels", sont stockés sur le GPU.<br /><br />
 

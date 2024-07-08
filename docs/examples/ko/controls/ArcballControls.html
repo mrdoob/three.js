@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+	<meta charset="utf-8" />
+	<base href="../../../" />
+	<script src="page.js"></script>
+	<link type="text/css" rel="stylesheet" href="page.css" />
+</head>
+
+<body>
+	[page:EventDispatcher] &rarr;
+
+	<h1>슬라이드 볼 컨트롤러([name])</h1>
+
+	<p class="desc">
+		ArcballControls 완전한 터치 지원과 고급 내비게이션 기능을 갖춘 가상 궤적구를 통해 카메라를 제어할 수 있습니다.<br>
+		커서/손가락 위치와 움직임은 작은 컨트롤로 표시된 가상 궤적구의 표면에 직관적이고 일관된 카메라 이동에 반사됩니다.커서를 드래그하거나 손가락을 드래그하면 사진기가 공의 중심을 중심으로 안정적으로 회전합니다. (원점으로 돌아가면 사진기가 원래 방향으로 돌아가게 됩니다).<br><br>
+
+		패닝, 확대/축소, 반공 제스처 지원 외에도 arcballcontrols는 두 번의 클릭/클릭을 통해 <i> 포커싱 </i> 기능을 제공하여, 오브젝트의 관심 지점을 가상 트랙볼의 중심으로 직관적으로 이동시킨다.초점은 복잡한 환경에서도 더 나은 검사와 방향을 제공한다.그밖에
+		arcballcontrols는 fov 동작 (아찔한 동작)과 z 축 회전을 허용한다.또한 클립보드를 통해 카메라 상태를 저장하고 복원할 수 있다 (ctrl+c, ctrl+v 단축키를 사용하여 복사 및 붙여넣기 상태).<br><br>
+
+		[page:orbitcontrols], [page:trackballcontrols]와 달리 [name]은 애니메이션이 열릴 때 외부에서 호출될 필요가 없다 [page:.update].<br><br>
+
+
+		이 기능을 사용하려면/examples 디렉터리에 있는 모든 파일과 마찬가지로 html 안에 별도로 포함시켜야 한다.。
+	</p>
+
+	<h2>수입</h2>
+
+	<p>
+		[name] 는 애드온이며 명시적으로 가져와야 합니다. 
+		See [link:#manual/introduction/Installation Installation / Addons]。
+	</p>
+
+	<code>
+			import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
+		</code>
+
+	<h2>코드 예시</h2>
+
+	<code>
+		const renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		const scene = new THREE.Scene();
+
+		const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+
+		const controls = new ArcballControls( camera, renderer.domElement, scene );
+
+		controls.addEventListener( 'change', function () {
+
+			renderer.render( scene, camera );
+
+		} );
+
+		//controls.update() must be called after any manual changes to the camera's transform
+		camera.position.set( 0, 20, 100 );
+		controls.update();
+		</code>
+
+	<h2>예시</h2>
+
+	<p>[example:misc_controls_arcball misc / controls / arcball ]</p>
+
+	<h2>생성자</h2>
+
+	<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement], [param:Scene scene] )</h3>
+	<p>
+		[page:Camera camera]：(필수) 제어해야 할 카메라입니다.객체가 장면 자체가 아닌 한 카메라는 다른 객체의 하위 객체가 될 수 없습니다.<br><br>
+
+		[page:HTMLDOMElement domElement]： 이벤트 리스너를 위한 HTML 요소.<br><br>
+
+		[page:Scene scene]：카메라가 렌더링한 장면입니다.표시되지 않으면 위젯을 표시할 수 없습니다.
+	</p>
+
+	<h2>이벤트</h2>
+
+	<h3>change</h3>
+	<p>
+		작은 컨트롤이 카메라를 변경할 때 작동합니다.
+	</p>
+
+	<h3>start</h3>
+	<p>
+		상호작용이 시작될 때 촉발된다.
+	</p>
+
+	<h3>end</h3>
+	<p>
+		상호 작용이 완료되었을 때 촉발된다.
+	</p>
+
+	<h2>특성</h2>
+
+	<h3>[property:Boolean adjustNearFar]</h3>
+	<p>
+		true 라면 확대/축소할 때마다 카메라의 근거리 엔드와 원격 엔드를 조정하여 원래의 근거리 엔드와 원격 엔드의 보이는 부분을 동일하게 유지하려고 한다 ([page:PerspectiveCamera] 제한).기본값은 false입니다.
+
+	</p>
+
+	<h3>[property:Camera camera]</h3>
+	<p>
+		카메라가 조종됩니다.
+	</p>
+
+	<h3>[property:Boolean cursorZoom]</h3>
+	<p>
+		크기 조정을 조정하려면 true로 설정했습니다.
+	</p>
+
+	<h3>
+		[property:Float dampingFactor]</h3>
+	<p>
+		[page:.enableanimations] 가 true인 경우 감쇠 관성을 사용한다.
+	</p>
+
+	<h3>[property:HTMLDOMElement domElement]</h3>
+	<p>
+		HTMLDOMElement 마우스/터치 이벤트를 듣는 데 사용합니다.이것은 생성자 (생성자)에 전달되어야 한다.여기에서 변경하면 새 이벤트 리스너가 설정되지 않습니다.
+	</p>
+
+	<h3>[property:Boolean enabled]</h3>
+	<p>
+		'false'로 설정되면 작은 컨트롤은 더 이상 사용자 상호작용에 응답하지 않습니다.기본값은'true'이다.
+	</p>
+
+	<h3>[property:Boolean enableAnimations]</h3>
+	<p>
+		true로 설정하여 회전 (감쇠)과 초점 맞추기 동작을 위한 애니메이션을 활성화합니다.기본값은 true입니다.
+	</p>
+
+	<h3>[property:Boolean enableGrid]</h3>
+	<p>
+		true로 설정하면 패닝 동작을 할 때 모드가 나타날 것입니다 (데스크톱 상호 작용할 때만).기본값은 false입니다.
+	</p>
+
+	<h3>[property:Boolean enablePan]</h3>
+	<p>
+		카메라 펴기를 사용하거나 사용하지 않습니다.기본값은 true입니다.
+	</p>
+
+	<h3>[property:Boolean enableRotate]</h3>
+	<p>
+		카메라 회전을 사용하거나 사용하지 않습니다.기본값은 true입니다.
+	</p>
+
+	<h3>[property:Boolean enableZoom]</h3>
+	<p>
+		카메라 줌을 사용하거나 사용하지 않습니다.
+	</p>
+
+	<h3>[property:Float focusAnimationTime]</h3>
+	<p>
+		초점 애니메이션의 지속 시간입니다.
+	</p>
+
+	<h3>[property:Float maxDistance]</h3>
+	<p>
+		최대 이동 거리(다만 [page:PerspectiveCamera]).무한대로 묵인하다.
+	</p>
+
+	<h3>[property:Float maxZoom]</h3>
+	<p>
+		최대 배율 값입니다(다만 [page:OrthographicCamera]).무한대로 묵인하다.
+	</p>
+
+	<h3>[property:Float minDistance]</h3>
+	<p>
+		최소 이동 거리(다만 [page:PerspectiveCamera])。기본값은 0입니다。
+	</p>
+
+	<h3>[property:Float minZoom]</h3>
+	<p>
+		최소 크기 조정（다만 [page:OrthographicCamera] ）。기본값은 0입니다。
+	</p>
+
+	<h3>[property:Float radiusFactor]</h3>
+	<p>
+		화면 너비와 높이에 대한 위젯의 크기입니다. 기본값은 0.67이다。
+	</p>
+
+	<h3>[property:Float rotateSpeed]</h3>
+	<p>
+		회전 속도.기본값은 1입니다.
+	</p>
+
+	<h3>[property:Float scaleFactor]</h3>
+	<p>
+		확대/축소 작업을 수행할 때 사용할 확대/축소 요인입니다.
+	</p>
+
+	<h3>[property:Scene scene]</h3>
+	<p>
+		카메라가 렌더링한 장면입니다.
+	</p>
+
+	<h3>[property:Float wMax]</h3>
+	<p>
+		회전 애니메이션을 시작할 때 허용되는 최대 각속도입니다.
+	</p>
+
+
+	<h2>메소드</h2>
+
+	<h3>[method:undefined activateGizmos] ( [param:Boolean isActive] )</h3>
+	<p>
+		작은 컨트롤을 어느 정도 보이게 합니다.
+	</p>
+
+	<h3>[method:undefined copyState] ()</h3>
+	<p>
+		현재 상태를 클립보드에 복사 (읽을 수 있는 json 텍스트로).
+	</p>
+
+	<h3>[method:undefined dispose] ()</h3>
+	<p>
+		모든 이벤트 리스너를 삭제하고, 처리할 애니메이션을 취소하며, 장면에서 작은 컨트롤과 그리드를 지운다.
+	</p>
+
+	<h3>[method:undefined pasteState] ()</h3>
+	<p>
+		클립보드에서 컨트롤 상태를 설정합니다. 클립보드가 [page:.copyState]에서 저장된 json 텍스트를 저장한다고 가정한다.
+	</p>
+
+	<h3>[method:undefined reset] ()</h3>
+		위젯을 마지막 호출 [page:. saveState] 때의 상태나 원래 상태로 초기화합니다.
+	</p>
+
+	<h3>[method:undefined saveState] ()</h3>
+	<p>
+		컨트롤의 현재 상태를 저장합니다.나중에 [page:.reset]을 통해 다시 시작할 수 있다.
+	</p>
+
+	<h3>[method:undefined setCamera] ( [param:Camera camera] )</h3>
+	<p>
+		컨트롤할 카메라를 설정합니다.새 카메라를 제어하려면 호출되어야 합니다.
+	</p>
+
+	<h3>[method:undefined setGizmosVisible] ( [param:Boolean value] )</h3>
+	<p>
+		작은 컨트롤의 보이는 속성을 설정합니다.
+	</p>
+
+	<h3>[method:undefined setTbRadius] ( [param:Float value] )</h3>
+	<p>
+		`radiusFactor` 값을 업데이트하고, 작은 위젯을 다시 그리고 `changeEvent` 를 시각적으로 보낸다.
+	</p>
+
+	<h3>[method:Boolean setMouseAction] ( [param:String operation], mouse, key )</h3>
+	<p>
+		실행할 동작과 마우스/키 조합을 지정하여 새로운 마우스 동작을 설정합니다.충돌이 발생하면 기존 것을 대체합니다.<br><br>
+		작업은'rotate','pan','fov','zoom'으로 지정할 수 있다.<br>
+		마우스 입력은 마우스 버튼 0, 1, 2 또는'휠'로 지정할 수 있다.<br>
+		키보드 수정자는'ctrl','shift'또는 null(더 이상 필요하지 않을 경우)로 지정할 수 있다.
+	</p>
+
+	<h3>[method:Boolean unsetMouseAction] ( mouse, key )</h3>
+	<p>
+		마우스/키 조합을 지정하여 마우스 동작을 삭제합니다.<br><br>
+		마우스 입력은 마우스 버튼 0, 1, 2 또는'휠'로 지정할 수 있다.<br>
+		키보드 수정자는'ctrl','shift'또는 null(더 이상 필요하지 않을 경우)로 지정할 수 있다.
+	</p>
+
+	<h3>[method:undefined update] ()</h3>
+	<p>
+		컨트롤 업데이트.수동으로 카메라 변경을 한 후에 호출되어야 합니다.
+	</p>
+
+	<h3>[method:Raycaster getRaycaster] ()</h3>
+	<p>
+		사용자 상호 작용을 위한 [page:raycaster] 객체를 되돌려준다.[name]의 [page:object3d.layer.layers] 속성이 설정되어 있으면 일치하는 값을 사용해야 한다. [page:raycaster.layers
+    layers]의 [page:raycaster] 속성, 그렇지 않으면 [name]이 작동되지 않는다.
+	</p>
+
+	<h2>Source</h2>
+
+	<p>
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/ArcballControls.js examples/jsm/controls/ArcballControls.js]
+	</p>
+</body>
+
+</html>

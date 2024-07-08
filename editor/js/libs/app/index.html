@@ -18,9 +18,16 @@
 		</style>
 	</head>
 	<body ontouchstart="">
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "./js/three.module.js"
+				}
+			}
+		</script>
 		<script type="module">
 
-			import * as THREE from './js/three.module.js';
+			import * as THREE from 'three';
 			import { APP } from './js/app.js';
 
 			window.THREE = THREE; // Used by APP Scripts.

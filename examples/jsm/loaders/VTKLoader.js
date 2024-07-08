@@ -447,7 +447,6 @@ class VTKLoader extends Loader {
 
 							} else {
 
-
 								indices[ indicesIndex ++ ] = strip[ j ];
 								indices[ indicesIndex ++ ] = strip[ j + 1 ];
 								indices[ indicesIndex ++ ] = strip[ j + 2 ];
@@ -620,7 +619,17 @@ class VTKLoader extends Loader {
 
 							const tmp = xmlToJson( item );
 
-							if ( tmp !== '' ) obj[ nodeName ] = tmp;
+							if ( tmp !== '' ) {
+
+								if ( Array.isArray( tmp[ '#text' ] ) ) {
+
+									tmp[ '#text' ] = tmp[ '#text' ][ 0 ];
+
+								}
+
+								obj[ nodeName ] = tmp;
+
+							}
 
 						} else {
 
@@ -633,7 +642,17 @@ class VTKLoader extends Loader {
 
 							const tmp = xmlToJson( item );
 
-							if ( tmp !== '' ) obj[ nodeName ].push( tmp );
+							if ( tmp !== '' ) {
+
+								if ( Array.isArray( tmp[ '#text' ] ) ) {
+
+									tmp[ '#text' ] = tmp[ '#text' ][ 0 ];
+
+								}
+
+								obj[ nodeName ].push( tmp );
+
+							}
 
 						}
 
@@ -893,6 +912,60 @@ class VTKLoader extends Loader {
 			let points = [];
 			let normals = [];
 			let indices = [];
+
+			if ( json.AppendedData ) {
+
+				const appendedData = json.AppendedData[ '#text' ].slice( 1 );
+				const piece = json.PolyData.Piece;
+
+				const sections = [ 'PointData', 'CellData', 'Points', 'Verts', 'Lines', 'Strips', 'Polys' ];
+				let sectionIndex = 0;
+
+				const offsets = sections.map( s => {
+
+					const sect = piece[ s ];
+
+					if ( sect && sect.DataArray ) {
+
+						const arr = Array.isArray( sect.DataArray ) ? sect.DataArray : [ sect.DataArray ];
+
+						return arr.map( a => a.attributes.offset );
+
+					}
+
+					return [];
+
+				} ).flat();
+
+				for ( const sect of sections ) {
+
+					const section = piece[ sect ];
+
+					if ( section && section.DataArray ) {
+
+						if ( Array.isArray( section.DataArray ) ) {
+
+							for ( const sectionEle of section.DataArray ) {
+
+								sectionEle[ '#text' ] = appendedData.slice( offsets[ sectionIndex ], offsets[ sectionIndex + 1 ] );
+								sectionEle.attributes.format = 'binary';
+								sectionIndex ++;
+
+							}
+
+						} else {
+
+							section.DataArray[ '#text' ] = appendedData.slice( offsets[ sectionIndex ], offsets[ sectionIndex + 1 ] );
+							section.DataArray.attributes.format = 'binary';
+							sectionIndex ++;
+
+						}
+
+					}
+
+				}
+
+			}
 
 			if ( json.PolyData ) {
 

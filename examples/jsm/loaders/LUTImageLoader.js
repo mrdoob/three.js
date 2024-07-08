@@ -1,7 +1,6 @@
 import {
 	Loader,
 	TextureLoader,
-	DataTexture,
 	Data3DTexture,
 	RGBAFormat,
 	UnsignedByteType,
@@ -124,18 +123,6 @@ export class LUTImageLoader extends Loader {
 	parse( dataArray, size ) {
 
 		const data = new Uint8Array( dataArray );
-		const texture = new DataTexture();
-		texture.image.data = data;
-		texture.image.width = size;
-		texture.image.height = size * size;
-		texture.format = RGBAFormat;
-		texture.type = UnsignedByteType;
-		texture.magFilter = LinearFilter;
-		texture.minFilter = LinearFilter;
-		texture.wrapS = ClampToEdgeWrapping;
-		texture.wrapT = ClampToEdgeWrapping;
-		texture.generateMipmaps = false;
-		texture.needsUpdate = true;
 
 		const texture3D = new Data3DTexture();
 		texture3D.image.data = data;
@@ -154,7 +141,6 @@ export class LUTImageLoader extends Loader {
 
 		return {
 			size,
-			texture,
 			texture3D,
 		};
 

@@ -8,12 +8,12 @@ import { Command } from '../Command.js';
  */
 class AddScriptCommand extends Command {
 
-	constructor( editor, object, script ) {
+	constructor( editor, object = null, script = '' ) {
 
 		super( editor );
 
 		this.type = 'AddScriptCommand';
-		this.name = 'Add Script';
+		this.name = editor.strings.getKey( 'command/AddScript' );
 
 		this.object = object;
 		this.script = script;

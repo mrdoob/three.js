@@ -1,6 +1,4 @@
-function WebGLAttributes( gl, capabilities ) {
-
-	const isWebGL2 = capabilities.isWebGL2;
+function WebGLAttributes( gl ) {
 
 	const buffers = new WeakMap();
 
@@ -27,15 +25,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 			if ( attribute.isFloat16BufferAttribute ) {
 
-				if ( isWebGL2 ) {
-
-					type = gl.HALF_FLOAT;
-
-				} else {
-
-					throw new Error( 'THREE.WebGLAttributes: Usage of Float16BufferAttribute requires WebGL2.' );
-
-				}
+				type = gl.HALF_FLOAT;
 
 			} else {
 
@@ -103,17 +93,9 @@ function WebGLAttributes( gl, capabilities ) {
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
 				const range = updateRanges[ i ];
-				if ( isWebGL2 ) {
 
-					gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
-						array, range.start, range.count );
-
-				} else {
-
-					gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
-						array.subarray( range.start, range.start + range.count ) );
-
-				}
+				gl.bufferSubData( bufferType, range.start * array.BYTES_PER_ELEMENT,
+					array, range.start, range.count );
 
 			}
 
@@ -124,17 +106,8 @@ function WebGLAttributes( gl, capabilities ) {
 		// @deprecated, r159
 		if ( updateRange.count !== - 1 ) {
 
-			if ( isWebGL2 ) {
-
-				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-					array, updateRange.offset, updateRange.count );
-
-			} else {
-
-				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-					array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
-
-			}
+			gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
+				array, updateRange.offset, updateRange.count );
 
 			updateRange.count = - 1; // reset range
 

@@ -45,7 +45,6 @@
 				action = ACTION_NONE;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -123,7 +122,7 @@
 					const geometry = new TextGeometry( 'Hello three.js!', {
 						font: font,
 						size: 0.2,
-						height: 0.05,
+						depth: 0.05,
 						curveSegments: 12,
 						bevelEnabled: true,
 						bevelThickness: 0.02,
@@ -164,6 +163,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				renderer.domElement.addEventListener( 'pointerdown', onPointerDown );
@@ -211,8 +211,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				if ( action === ACTION_SELECT ) {
 

@@ -14,14 +14,15 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_sheen" target="_blank" rel="noopener">KHR_materials_sheen</a><br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - glTF + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_sheen" target="_blank" rel="noopener">KHR_materials_sheen</a><br />
 			Sheen Chair from <a href="https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/SheenChair" target="_blank" rel="noopener">glTF-Sample-Models</a>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -30,11 +31,6 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -47,14 +43,6 @@
 			init();
 
 			function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
 
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -82,7 +70,7 @@
 
 					} );
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

@@ -40,7 +40,6 @@
 		const currentM = new THREE.Matrix4();
 
 		init();
-		animate();
 
 		function init() {
 
@@ -163,14 +162,8 @@
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
 			container.appendChild( renderer.domElement );
-
-			if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'ANGLE_instanced_arrays' ) === false ) {
-
-				document.getElementById( 'notSupported' ).style.display = '';
-				return;
-
-			}
 
 			stats = new Stats();
 			container.appendChild( stats.dom );
@@ -191,15 +184,6 @@
 		//
 
 		function animate() {
-
-			requestAnimationFrame( animate );
-
-			render();
-			stats.update();
-
-		}
-
-		function render() {
 
 			const time = performance.now();
 
@@ -223,6 +207,8 @@
 			lastTime = time;
 
 			renderer.render( scene, camera );
+
+			stats.update();
 
 		}
 

@@ -124,6 +124,7 @@
 		THREE.UnsignedShort4444Type
 		THREE.UnsignedShort5551Type 
 		THREE.UnsignedInt248Type
+		THREE.UnsignedInt5999Type
 		</code>
 		<p>
 			للاستخدام مع خاصية [page:Texture.type type] للقوام ، التي يجب
@@ -139,6 +140,7 @@
 		THREE.RedIntegerFormat 
 		THREE.RGFormat
 		THREE.RGIntegerFormat 
+		THREE.RGBFormat
 		THREE.RGBAFormat 
 		THREE.RGBAIntegerFormat
 		THREE.LuminanceFormat 
@@ -154,21 +156,21 @@
 			ويقرأ فقط المكون الألفا. <br /> <br />
 		 
 			[page:constant RedFormat] يتجاهل المكونات الخضراء والزرقاء ويقرأ
-			فقط المكون الأحمر. (يمكن استخدامه فقط مع سياق WebGL 2).
+			فقط المكون الأحمر.
 			<br /> <br />
 		 
 			[page:constant RedIntegerFormat] يتجاهل المكونات الخضراء والزرقاء
 			ويقرأ فقط المكون الأحمر. يتم قراءة `texels` كأعداد صحيحة بدلاً من
-			نقطة عائمة. (يمكن استخدامه فقط مع سياق WebGL 2).
+			نقطة عائمة.
 			<br /> <br />
 		 
 			[page:constant RGFormat] يتجاهل المكونات الألفا والزرقاء ويقرأ
-			المكونات الحمراء والخضراء. (يمكن استخدامه فقط مع سياق WebGL 2).
+			المكونات الحمراء والخضراء.
 			<br /> <br />
 		 
 			[page:constant RGIntegerFormat] يتجاهل المكونات الألفا والزرقاء
 			ويقرأ المكونات الحمراء والخضراء. يتم قراءة `texels` كأعداد صحيحة بدلاً من
-			نقطة عائمة. (يمكن استخدامه فقط مع سياق WebGL 2).
+			نقطة عائمة.
 			<br /> <br />
 		 
 			[page:constant RGBAFormat] هو الافتراضي ويلتقط المكونات الحمراء والخضراء والزرقاء
@@ -176,7 +178,7 @@
 		 
 			[page:constant RGBAIntegerFormat] هو الافتراضي ويلتقط المكونات الحمراء والخضراء ،
 			الزرقاء والألفا. يتم قراءة `texels` كأعداد صحيحة بدلاً من
-			نقطة عائمة. (يمكن استخدامه فقط مع سياق WebGL 2).
+			نقطة عائمة.
 			<br /> <br />
 		 
 			[page:constant LuminanceFormat] يقرأ كل عنصر كمكون إضاءة واحد
@@ -378,9 +380,6 @@
 		</code>
 
 		<p>
-			تنبيه: تغيير التنسيق الداخلي للقوام سيؤثر فقط على
-			القوام عند استخدام سياق WebGL 2. <br /> <br />
-		 
 			للاستخدام مع خاصية [page:Texture.internalFormat internalFormat] للقوام ،
 			هذه تحدد كيفية تخزين عناصر قوام ، أو `texels` ،
 			على وحدة معالجة الرسومات. <br /> <br />

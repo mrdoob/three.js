@@ -28,7 +28,7 @@
 			&lt;/head&gt;
 			&lt;body&gt;
 				&lt;script type="module"&gt;
-					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+					import * as THREE from 'https://cdn.jsdelivr.net/npm/three/build/three.module.js';
 ´
 					// Our Javascript will go here.
 				&lt;/script&gt;
@@ -63,7 +63,7 @@
 
 		<p>다음은 renderer입니다. 마법이 일어나는 곳입니다. 같이 사용하는 WebGLRenderer와 더불어, three.js는 다른 몇가지 renderer를 사용하는데, 오래된 브라우저 혹은 모종의 사유로 WebGL을 지원 안할때의 대비용으로 사용하는 것입니다.</p>
 
-		<p>renderer 인스턴스를 생섬함과 동시에, 렌더링 할 곳의 크기를 설정해줘야 합니다. 렌더링할 구역의 높이와 너비를 설정하는 것은 좋은 방법입니다. 이 경우, 높이와 너비는 각각 브라우저 윈도우의 크기가 됩니다. 성능 개선을 중시하는 앱의 경우, <strong>setSize</strong>를 사용하거나 <strong>window.innerWidth/2</strong>, <strong>window.innerHeight/2</strong>를 사용해서 화면 크기의 절반으로 구현할 수도 잇씁니다.</p>
+		<p>renderer 인스턴스를 생성함과 동시에, 렌더링할 곳의 크기를 설정해줘야 합니다. 렌더링할 구역의 높이와 너비를 설정하는 것은 좋은 방법입니다. 이 경우, 높이와 너비는 각각 브라우저 윈도우의 크기가 됩니다. 성능 개선을 중시하는 앱의 경우, <strong>setSize</strong>를 사용하거나 <strong>window.innerWidth/2</strong>, <strong>window.innerHeight/2</strong>를 사용해서 화면 크기의 절반으로 구현할 수도 있습니다.</p>
 
 		<p>사이즈는 그대로 유지하고 싶지만 더 낮은 해상도로 렌더링하고 싶을 경우, <strong>setSize</strong>의 <strong>updateStyle</strong> (세 번째 인자)를 false로 불러오면 됩니다. <strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong>처럼 사용하면 &lt;canvas&gt;가 100%의 높이, 너비로 되어있다는 기준 하에 절반의 해상도로 렌더링 될 것입니다.</p>
 
@@ -90,7 +90,7 @@
 
 		<h2>scene 렌더링</h2>
 
-		<p>맨 처음에 있던 HTML 파일을 복사해서 열어놨다면, 아무것도 보이지 않을 것입니다. 왜냐하면 아직 아무것도 렌더링하지 않았기 때문입니다. 이를 해결하려면 <strong>render or animate loop</strong>라는 것이 필요합니다..</p>
+		<p>맨 처음에 있던 HTML 파일을 복사해서 열어놨다면, 아무것도 보이지 않을 것입니다. 왜냐하면 아직 아무것도 렌더링하지 않았기 때문입니다. 이를 해결하려면 <strong>render or animate loop</strong>라는 것이 필요합니다.</p>
 
 		<code>
 		function animate() {
@@ -133,7 +133,7 @@
 			&lt;/head&gt;
 			&lt;body&gt;
 				&lt;script type="module"&gt;
-					import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+					import * as THREE from 'https://cdn.jsdelivr.net/npm/three/build/three.module.js';
 
 					const scene = new THREE.Scene();
 					const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );

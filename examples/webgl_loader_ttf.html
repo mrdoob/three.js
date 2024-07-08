@@ -35,7 +35,7 @@
 			let firstLetter = true;
 
 			let text = 'three.js';
-			const height = 20,
+			const depth = 20,
 				size = 70,
 				hover = 30,
 				curveSegments = 4,
@@ -54,7 +54,6 @@
 			let windowHalfX = window.innerWidth / 2;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -114,6 +113,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
@@ -193,7 +193,7 @@
 					font: font,
 
 					size: size,
-					height: height,
+					depth: depth,
 					curveSegments: curveSegments,
 
 					bevelThickness: bevelThickness,
@@ -224,7 +224,7 @@
 
 					textMesh2.position.x = centerOffset;
 					textMesh2.position.y = - hover;
-					textMesh2.position.z = height;
+					textMesh2.position.z = depth;
 
 					textMesh2.rotation.x = Math.PI;
 					textMesh2.rotation.y = Math.PI * 2;
@@ -280,8 +280,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 

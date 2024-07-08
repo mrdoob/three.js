@@ -195,8 +195,8 @@ Renderer.### <a href="">setViewport</a> ( x : Integer, y : Integer, width : Inte
 </pre>
 <p>最终效果如下：</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/threejs-multiple-scenes-v1.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/threejs-multiple-scenes-v1.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-v1.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/multiple-scenes-v1.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -215,24 +215,26 @@ Renderer.### <a href="">setViewport</a> ( x : Integer, y : Integer, width : Inte
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 +scene.background = new THREE.Color('red');
 </pre>
-<p>此时，我们快速滚动屏幕，就会发现这个问题。屏幕滚动时的动画放慢十倍后的效果如下：</p>
+<p>此时，我们<a href="../examples/multiple-scenes-v2.html" target="_blank">快速滚动屏幕</a>，就会发现这个问题。屏幕滚动时的动画放慢十倍后的效果如下：</p>
+<div class="threejs_center"><img class="border" src="../resources/images/multi-view-skew.gif"></div>
 <p>为了解决这个问题，先将<code class="notranslate" translate="no">Canvas</code>的定位方式由<code class="notranslate" translate="no">position: fixed</code> 改为<code class="notranslate" translate="no">position: absolute</code>。</p>
 <pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c {
 -  position: fixed;
 +  position: absolute;
 </pre>
-<p>为了解决这个问题，先将<code class="notranslate" translate="no">Canvas</code>的定位方式由<code class="notranslate" translate="no">position: fixed</code> 改为<code class="notranslate" translate="no">position: absolute</code>。</p>
+</pre>
+<p>然后，我们将设置<code class="notranslate" translate="no">Canvas</code>的<code class="notranslate" translate="no">transform</code>来移动它，使画布的顶部位于页面当前滚动到的任何部分的顶部。</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   ...
 
   const transform = `translateY(${window.scrollY}px)`;
   renderer.domElement.style.transform = transform;
 </pre>
-<p><code class="notranslate" translate="no">position: fixed</code> 会完全禁用画布的滚动，无论其他元素是否已经滚动到它的上；
+<p><code class="notranslate" translate="no">position: fixed</code> 会完全禁用画布的滚动，无论其他元素是否已经滚动经过它；
 <code class="notranslate" translate="no">position: absolute</code>则会保持画布与页面的其余部分一起滚动，这意味着我们绘制的任何东西都会与页面一起滚动，就算还未完全渲染出来。当场景完成渲染之后，然后移动画布，场景会与页面被滚动后的位置相匹配，并重新渲染，这就意味着，只有窗口的边缘会显示出一些还未被渲染的数据，当时页面中的场景不会出现这种现象。下面时利用以上方法后的效果（动画同样放慢了10倍）。</p>
 <h2 id="-">让它更加通用</h2>
 <p>现在，我们已经实现了在一个<code class="notranslate" translate="no">Canvas</code>中渲染多个场景的功能，接下来就来处理一下让它更加好用些。</p>
-<p>我们可以封装一个主渲染函数用来管理整个<code class="notranslate" translate="no">Canvas</code>,并定义一个场景元素列表和他们对应的场景初始化函数。对于每个元素，它将检查该元素是否滚动到了可视区域并调用相应的场景初始化函数。这样我们就构建了一个渲染系统，在这个系统中每个独立的<code class="notranslate" translate="no">scenes</code>都会在它们各自定义的空间内独立渲染且不互相影响。</p>
+<p>我们可以封装一个主渲染函数用来管理整个<code class="notranslate" translate="no">Canvas</code>，并定义一个场景元素列表和他们对应的场景初始化函数。对于每个元素，它将检查该元素是否滚动到了可视区域并调用相应的场景初始化函数。这样我们就构建了一个渲染系统，在这个系统中每个独立的<code class="notranslate" translate="no">scenes</code>都会在它们各自定义的空间内独立渲染且不互相影响。</p>
 <p>主渲染函数如下：</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const sceneElements = [];
 function addScene(elem, fn) {
@@ -316,8 +318,8 @@ function render(time) {
 </pre>
 <p>至此，我们不再需要分别定义<code class="notranslate" translate="no">sceneInfo1</code> 和 <code class="notranslate" translate="no">sceneInfo2</code>，但每个场景对应的场景初始化函数都已生效。</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/threejs-multiple-scenes-generic.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/threejs-multiple-scenes-generic.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-generic.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/multiple-scenes-generic.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>
@@ -473,12 +475,12 @@ function render(time) {
 </pre>
 <p>现在，控制器已经生效了，你可以拖动来查看效果：</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/threejs-multiple-scenes-controls.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/threejs-multiple-scenes-controls.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-controls.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/multiple-scenes-controls.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 
-上面提到的方法在本网站上可以找到很多实例，比如<a href="https://threejsfundamentals.org/threejs/lessons/threejs-primitives.html">Three.js 图元</a>和<a href="https://threejsfundamentals.org/threejs/lessons/threejs-materials.html">Three.js 材质</a> 这两篇文章。<p></p>
+上面提到的方法在本网站上可以找到很多实例，比如<a href="primitives.html">Three.js 图元</a>和<a href="materials.html">Three.js 材质</a> 这两篇文章。<p></p>
 <h2 id="-">另一个方法</h2>
 <p>还有一个方法也可以实现这种效果，原理是渲染到屏幕外的画布上，并将结果复制到对应的2D画布上。这个方法的优点是对如何组合每个独立区域没有限制，因此只需正常编写HTML即可。而第一种方法则需要在背景设置一个<code class="notranslate" translate="no">Canvas</code>。</p>
 <p>但这个方法的缺点就是速度较慢，因为每个区域都必须进行复制，因此速度快慢取决于浏览器本身和GPU的性能。</p>
@@ -592,8 +594,8 @@ function addScene(elem, fn) {
 </pre>
 <p>最终结果与方法一一样：</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/threejs-multiple-scenes-copy-canvas.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/threejs-multiple-scenes-copy-canvas.html" target="_blank">点击此处在新标签页中打开</a>
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-copy-canvas.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/multiple-scenes-copy-canvas.html" target="_blank">点击此处在新标签页中打开</a>
 </div>
 
 <p></p>

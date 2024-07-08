@@ -34,7 +34,6 @@
 			let camera, scene, renderer, controls;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -51,6 +50,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -181,8 +181,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				controls.update();
 				renderer.render( scene, camera );

@@ -114,7 +114,6 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
@@ -464,6 +463,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
 
@@ -572,14 +572,6 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
-				render();
-
-			}
-
-			function render() {
-
 				const timer = Date.now() * 0.0001;
 
 				camera.position.x = Math.cos( timer ) * 800;
@@ -589,6 +581,8 @@
 				renderer.render( scene1, camera );
 
 			}
+
+
 
 		</script>
 

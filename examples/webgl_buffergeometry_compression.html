@@ -32,8 +32,6 @@
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			const statsEnabled = true;
-
 			let container, stats, gui;
 
 			let camera, scene, renderer, controls;
@@ -70,8 +68,6 @@
 
 			//
 			init();
-			animate();
-
 
 			function init() {
 
@@ -80,21 +76,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
 				//
 
 				scene = new THREE.Scene();
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.setScalar( 2 * radius );
-
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.enablePan = false;
-				controls.enableZoom = false;
 
 				//
 
@@ -190,12 +177,22 @@
 
 				//
 
-				if ( statsEnabled ) {
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				container.appendChild( renderer.domElement );
 
-					stats = new Stats();
-					container.appendChild( stats.dom );
+				//
 
-				}
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.enablePan = false;
+				controls.enableZoom = false;
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -217,11 +214,9 @@
 
 			function animate() {
 
-				requestAnimationFrame( animate );
-
 				renderer.render( scene, camera );
 
-				if ( statsEnabled ) stats.update();
+				stats.update();
 
 			}
 

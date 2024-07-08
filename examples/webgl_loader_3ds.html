@@ -32,7 +32,6 @@
 			let camera, scene, renderer;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -74,6 +73,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				controls = new TrackballControls( camera, renderer.domElement );
@@ -95,8 +95,6 @@
 
 				controls.update();
 				renderer.render( scene, camera );
-
-				requestAnimationFrame( animate );
 
 			}
 		</script>

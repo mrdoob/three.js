@@ -103,6 +103,7 @@ class MaterialLoader extends Loader {
 		if ( json.shininess !== undefined ) material.shininess = json.shininess;
 		if ( json.clearcoat !== undefined ) material.clearcoat = json.clearcoat;
 		if ( json.clearcoatRoughness !== undefined ) material.clearcoatRoughness = json.clearcoatRoughness;
+		if ( json.dispersion !== undefined ) material.dispersion = json.dispersion;
 		if ( json.iridescence !== undefined ) material.iridescence = json.iridescence;
 		if ( json.iridescenceIOR !== undefined ) material.iridescenceIOR = json.iridescenceIOR;
 		if ( json.iridescenceThicknessRange !== undefined ) material.iridescenceThicknessRange = json.iridescenceThicknessRange;

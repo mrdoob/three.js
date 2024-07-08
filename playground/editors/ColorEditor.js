@@ -12,8 +12,6 @@ export class ColorEditor extends BaseNodeEditor {
 
 		super( 'Color', node );
 
-		this.setOutputLength( 3 );
-
 		const updateFields = ( editing ) => {
 
 			const value = node.value;

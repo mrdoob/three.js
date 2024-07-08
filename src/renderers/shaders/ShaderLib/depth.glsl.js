@@ -91,6 +91,14 @@ void main() {
 
 		gl_FragColor = packDepthToRGBA( fragCoordZ );
 
+	#elif DEPTH_PACKING == 3202
+
+		gl_FragColor = vec4( packDepthToRGB( fragCoordZ ), 1.0 );
+
+	#elif DEPTH_PACKING == 3203
+
+		gl_FragColor = vec4( packDepthToRG( fragCoordZ ), 0.0, 1.0 );
+
 	#endif
 
 }

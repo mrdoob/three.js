@@ -100,10 +100,6 @@ class Material extends EventDispatcher {
 
 	}
 
-	onBuild( /* shaderobject, renderer */ ) {}
-
-	onBeforeRender( /* renderer, scene, camera, geometry, object, group */ ) {}
-
 	onBeforeCompile( /* shaderobject, renderer */ ) {}
 
 	customProgramCacheKey() {
@@ -217,6 +213,8 @@ class Material extends EventDispatcher {
 			data.clearcoatNormalScale = this.clearcoatNormalScale.toArray();
 
 		}
+
+		if ( this.dispersion !== undefined ) data.dispersion = this.dispersion;
 
 		if ( this.iridescence !== undefined ) data.iridescence = this.iridescence;
 		if ( this.iridescenceIOR !== undefined ) data.iridescenceIOR = this.iridescenceIOR;
@@ -517,6 +515,19 @@ class Material extends EventDispatcher {
 		if ( value === true ) this.version ++;
 
 	}
+
+	onBuild( /* shaderobject, renderer */ ) {
+
+		console.warn( 'Material: onBuild() has been removed.' ); // @deprecated, r166
+
+	}
+
+	onBeforeRender( /* renderer, scene, camera, geometry, object, group */ ) {
+
+		console.warn( 'Material: onBeforeRender() has been removed.' ); // @deprecated, r166
+
+	}
+
 
 }
 

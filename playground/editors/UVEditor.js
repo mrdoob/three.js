@@ -10,8 +10,6 @@ export class UVEditor extends BaseNodeEditor {
 
 		super( 'UV', node, 200 );
 
-		this.setOutputLength( 2 );
-
 		const optionsField = new SelectInput( [ '0', '1', '2', '3' ], 0 ).onChange( () => {
 
 			node.index = Number( optionsField.getValue() );

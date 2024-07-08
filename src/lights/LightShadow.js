@@ -14,6 +14,8 @@ class LightShadow {
 
 		this.camera = camera;
 
+		this.intensity = 1;
+
 		this.bias = 0;
 		this.normalBias = 0;
 		this.radius = 1;
@@ -111,6 +113,8 @@ class LightShadow {
 
 		this.camera = source.camera.clone();
 
+		this.intensity = source.intensity;
+
 		this.bias = source.bias;
 		this.radius = source.radius;
 
@@ -130,6 +134,7 @@ class LightShadow {
 
 		const object = {};
 
+		if ( this.intensity !== 1 ) object.intensity = this.intensity;
 		if ( this.bias !== 0 ) object.bias = this.bias;
 		if ( this.normalBias !== 0 ) object.normalBias = this.normalBias;
 		if ( this.radius !== 1 ) object.radius = this.radius;

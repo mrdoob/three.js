@@ -33,7 +33,6 @@
 			let mesh;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -62,6 +61,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				const environment = new RoomEnvironment( renderer );
@@ -124,8 +124,6 @@
 			//
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				if ( mesh ) {
 

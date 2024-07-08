@@ -103,7 +103,8 @@
 				"Earcut": "api/en/extras/Earcut",
 				"ImageUtils": "api/en/extras/ImageUtils",
 				"PMREMGenerator": "api/en/extras/PMREMGenerator",
-				"ShapeUtils": "api/en/extras/ShapeUtils"
+				"ShapeUtils": "api/en/extras/ShapeUtils",
+				"TextureUtils": "api/en/extras/TextureUtils"
 			},
 
 			"Extras / Core": {
@@ -279,7 +280,6 @@
 
 			"Renderers": {
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
-				"WebGL1Renderer": "api/en/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
 				"WebGL3DRenderTarget": "api/en/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/en/renderers/WebGLArrayRenderTarget",
@@ -344,8 +344,9 @@
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/en/geometries/ParametricGeometry",
-				"TextGeometry": "examples/en/geometries/TextGeometry",
-				"SDFGeometryGenerator": "examples/en/geometries/SDFGeometryGenerator"
+				"SDFGeometryGenerator": "examples/en/geometries/SDFGeometryGenerator",
+				"TeapotGeometry": "examples/en/geometries/TeapotGeometry",
+				"TextGeometry": "examples/en/geometries/TextGeometry"
 			},
 
 			"Helpers": {
@@ -379,7 +380,8 @@
 			},
 
 			"Objects": {
-				"Lensflare": "examples/en/objects/Lensflare"
+				"Lensflare": "examples/en/objects/Lensflare",
+				"Sky": "examples/en/objects/Sky"
 			},
 
 			"Post-Processing": {
@@ -403,6 +405,10 @@
 
 			"Misc": {
 				"Timer": "examples/en/misc/Timer"
+			},
+
+			"Modifiers": {
+				"EdgeSplit": "examples/en/modifiers/EdgeSplitModifier"
 			},
 
 			"ConvexHull": {
@@ -720,7 +726,6 @@
 
 			"Renderers": {
 				"WebGLRenderer": "api/ar/renderers/WebGLRenderer",
-				"WebGL1Renderer": "api/ar/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/ar/renderers/WebGLRenderTarget",
 				"WebGL3DRenderTarget": "api/ar/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/ar/renderers/WebGLArrayRenderTarget",
@@ -1027,7 +1032,6 @@
 
 			"渲染器": {
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
-				"WebGL1Renderer": "api/zh/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
 				"WebGL3DRenderTarget": "api/zh/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/zh/renderers/WebGLArrayRenderTarget",
@@ -1115,17 +1119,20 @@
 				"GLTFLoader": "examples/zh/loaders/GLTFLoader",
 				"KTX2Loader": "examples/zh/loaders/KTX2Loader",
 				"LDrawLoader": "examples/zh/loaders/LDrawLoader",
+				"LUT3dlLoader": "examples/zh/loaders/LUT3dlLoader",
+				"LUTCubeLoader": "examples/zh/loaders/LUTCubeLoader",
 				"MMDLoader": "examples/zh/loaders/MMDLoader",
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
 				"PCDLoader": "examples/zh/loaders/PCDLoader",
-				"PDBLoader": "examples/en/loaders/PDBLoader",
+				"PDBLoader": "examples/zh/loaders/PDBLoader",
 				"SVGLoader": "examples/zh/loaders/SVGLoader",
 				"TGALoader": "examples/zh/loaders/TGALoader"
 			},
 
 			"物体": {
-				"Lensflare": "examples/zh/objects/Lensflare"
+				"Lensflare": "examples/zh/objects/Lensflare",
+				"Sky": "examples/zh/objects/Sky"
 			},
 
 			"后期处理": {
@@ -1145,6 +1152,10 @@
 				"LookupTable": "examples/zh/math/Lut",
 				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler",
 				"OBB": "examples/zh/math/OBB"
+			},
+
+			"修改器":{
+				"EdgeSplitModifier": "examples/zh/modifiers/EdgeSplitModifier"
 			},
 
 			"杂项": {
@@ -1343,6 +1354,7 @@
 		"Addons": {
 
 			"컨트롤": {
+				"ArcballControls": "examples/ko/controls/ArcballControls",
 				"DragControls": "examples/ko/controls/DragControls",
 				"FirstPersonControls": "examples/ko/controls/FirstPersonControls",
 				"FlyControls": "examples/ko/controls/FlyControls",
@@ -1663,7 +1675,6 @@
 
 			"Renderers": {
 				"WebGLRenderer": "api/it/renderers/WebGLRenderer",
-				"WebGL1Renderer": "api/it/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/it/renderers/WebGLRenderTarget",
 				"WebGL3DRenderTarget": "api/it/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/it/renderers/WebGLArrayRenderTarget",
@@ -2190,7 +2201,6 @@
 
 			"Renderers": {
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
-				"WebGL1Renderer": "api/en/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
 				"WebGL3DRenderTarget": "api/en/renderers/WebGL3DRenderTarget",
 				"WebGLArrayRenderTarget": "api/en/renderers/WebGLArrayRenderTarget",

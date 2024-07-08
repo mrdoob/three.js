@@ -43,8 +43,7 @@
 			const params = {
 				enabled: true,
 				lut: 'Bourbon 64.CUBE',
-				intensity: 1,
-				use2DLut: false,
+				intensity: 1
 			};
 
 			const lutMap = {
@@ -64,7 +63,6 @@
 			let composer, lutPass;
 
 			init();
-			render();
 
 			function init() {
 
@@ -107,15 +105,15 @@
 
 							} );
 
-					} else if ( /\LUT$/i.test( name ) ){
-						
+					} else if ( /\LUT$/i.test( name ) ) {
+			
 						new LUTImageLoader()
 							.load( `luts/${name}.png`, function ( result ) {
 
 								lutMap[ name ] = result;
 
 							} );
-					
+			
 					} else {
 
 						new LUT3dlLoader()
@@ -132,6 +130,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
@@ -156,16 +155,6 @@
 				gui.add( params, 'lut', Object.keys( lutMap ) );
 				gui.add( params, 'intensity' ).min( 0 ).max( 1 );
 
-				if ( renderer.capabilities.isWebGL2 ) {
-
-					gui.add( params, 'use2DLut' );
-
-				} else {
-
-					params.use2DLut = true;
-
-				}
-
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
@@ -178,22 +167,18 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				composer.setSize( window.innerWidth, window.innerHeight );
 
-				render();
-
 			}
 
 			//
 
-			function render() {
-
-				requestAnimationFrame( render );
+			function animate() {
 
 				lutPass.enabled = params.enabled && Boolean( lutMap[ params.lut ] );
 				lutPass.intensity = params.intensity;
 				if ( lutMap[ params.lut ] ) {
 
 					const lut = lutMap[ params.lut ];
-					lutPass.lut = params.use2DLut ? lut.texture : lut.texture3D;
+					lutPass.lut = lut.texture3D;
 
 				}
 

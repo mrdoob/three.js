@@ -39,7 +39,6 @@
 			const tempMatrix = new THREE.Matrix4();
 
 			init();
-			animate();
 
 			function init() {
 
@@ -78,6 +77,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 
 				renderer.xr.addEventListener( 'sessionstart', () => baseReferenceSpace = renderer.xr.getReferenceSpace() );
 				renderer.xr.enabled = true;
@@ -199,12 +199,6 @@
 			//
 
 			function animate() {
-
-				renderer.setAnimationLoop( render );
-
-			}
-
-			function render() {
 
 				INTERSECTION = undefined;
 

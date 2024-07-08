@@ -987,8 +987,10 @@ export default QUnit.module( 'Core', () => {
 
 			parent.position.set( 3, 2, 1 );
 			parent.updateMatrix();
-			parent.matrixWorldNeedsUpdate = false;
 
+			parent.matrixAutoUpdate = true;
+			child.matrixAutoUpdate = true;
+			parent.matrixWorldNeedsUpdate = true;
 			child.matrixWorldAutoUpdate = false;
 			parent.updateMatrixWorld();
 
@@ -1004,7 +1006,6 @@ export default QUnit.module( 'Core', () => {
 			child.position.set( 0, 0, 0 );
 			parent.position.set( 1, 2, 3 );
 			child.matrixWorldAutoUpdate = true;
-			parent.matrixAutoUpdate = true;
 			parent.updateMatrixWorld();
 
 			assert.deepEqual( child.matrixWorld.elements, [
@@ -1237,7 +1238,7 @@ export default QUnit.module( 'Core', () => {
 			child.matrixWorld.identity();
 			parent.matrixWorld.identity();
 
-			object.updateWorldMatrix( true, true );
+			child.updateWorldMatrix( true, true );
 
 			assert.deepEqual( child.matrixWorld.elements,
 				m.identity().elements,

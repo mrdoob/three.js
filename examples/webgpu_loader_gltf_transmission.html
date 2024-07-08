@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - glTF + transmission</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - glTF + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_transmission" target="_blank" rel="noopener">KHR_materials_transmission</a><br />
+			Iridescent Dish With Olives by <a href="https://github.com/echadwick-wayfair" target="_blank" rel="noopener">Eric Chadwick</a><br />
+			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+
+			let camera, scene, renderer, controls, clock, mixer;
+
+			init();
+
+			function init() {
+
+				clock = new THREE.Clock();
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( 0, 0.4, 0.7 );
+
+				scene = new THREE.Scene();
+
+				new RGBELoader()
+					.setPath( 'textures/equirectangular/' )
+					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
+
+						texture.mapping = THREE.EquirectangularReflectionMapping;
+
+						scene.background = texture;
+						scene.backgroundBlurriness = 0.35;
+
+						scene.environment = texture;
+
+						// model
+
+						new GLTFLoader()
+							.setPath( 'models/gltf/' )
+							.setDRACOLoader( new DRACOLoader().setDecoderPath( 'jsm/libs/draco/gltf/' ) )
+							.load( 'IridescentDishWithOlives.glb', function ( gltf ) {
+
+								mixer = new THREE.AnimationMixer( gltf.scene );
+								mixer.clipAction( gltf.animations[ 0 ] ).play();
+
+								scene.add( gltf.scene );
+
+							} );
+
+					} );
+
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.setAnimationLoop( render );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+				container.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = - 0.75;
+				controls.enableDamping = true;
+				controls.minDistance = 0.5;
+				controls.maxDistance = 1;
+				controls.target.set( 0, 0.1, 0 );
+				controls.update();
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function render() {
+
+				if ( mixer ) mixer.update( clock.getDelta() );
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

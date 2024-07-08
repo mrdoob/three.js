@@ -800,7 +800,7 @@ class VRMLLoader extends Loader {
 						break;
 
 					case 'rotation':
-						const axis = new Vector3( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
+						const axis = new Vector3( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] ).normalize();
 						const angle = fieldValues[ 3 ];
 						object.quaternion.setFromAxisAngle( axis, angle );
 						break;
@@ -1012,7 +1012,9 @@ class VRMLLoader extends Loader {
 
 					const pointsMaterial = new PointsMaterial( {
 						name: Loader.DEFAULT_MATERIAL_NAME,
-						color: 0xffffff
+						color: 0xffffff,
+						opacity: material.opacity,
+						transparent: material.transparent
 					} );
 
 					if ( geometry.attributes.color !== undefined ) {
@@ -1037,7 +1039,9 @@ class VRMLLoader extends Loader {
 
 					const lineMaterial = new LineBasicMaterial( {
 						name: Loader.DEFAULT_MATERIAL_NAME,
-						color: 0xffffff
+						color: 0xffffff,
+						opacity: material.opacity,
+						transparent: material.transparent
 					} );
 
 					if ( geometry.attributes.color !== undefined ) {

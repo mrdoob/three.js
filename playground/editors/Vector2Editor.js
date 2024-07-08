@@ -12,8 +12,6 @@ export class Vector2Editor extends BaseNodeEditor {
 
 		super( 'Vector 2', inputNode );
 
-		this.setOutputLength( 2 );
-
 		element.addEventListener( 'changeInput', () => this.invalidate() );
 
 		this.add( element );

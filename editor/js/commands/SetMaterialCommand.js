@@ -9,17 +9,17 @@ import { ObjectLoader } from 'three';
  */
 class SetMaterialCommand extends Command {
 
-	constructor( editor, object, newMaterial, materialSlot ) {
+	constructor( editor, object = null, newMaterial = null, materialSlot = - 1 ) {
 
 		super( editor );
 
 		this.type = 'SetMaterialCommand';
-		this.name = 'New Material';
+		this.name = editor.strings.getKey( 'command/SetMaterial' );
 
 		this.object = object;
 		this.materialSlot = materialSlot;
 
-		this.oldMaterial = this.editor.getObjectMaterial( object, materialSlot );
+		this.oldMaterial = ( object !== null ) ? editor.getObjectMaterial( object, materialSlot ) : null;
 		this.newMaterial = newMaterial;
 
 	}
@@ -47,6 +47,7 @@ class SetMaterialCommand extends Command {
 		output.objectUuid = this.object.uuid;
 		output.oldMaterial = this.oldMaterial.toJSON();
 		output.newMaterial = this.newMaterial.toJSON();
+		output.materialSlot = this.materialSlot;
 
 		return output;
 
@@ -59,6 +60,7 @@ class SetMaterialCommand extends Command {
 		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.oldMaterial = parseMaterial( json.oldMaterial );
 		this.newMaterial = parseMaterial( json.newMaterial );
+		this.materialSlot = json.materialSlot;
 
 		function parseMaterial( json ) {
 

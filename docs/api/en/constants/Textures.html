@@ -136,6 +136,7 @@
 		THREE.UnsignedShort4444Type
 		THREE.UnsignedShort5551Type 
 		THREE.UnsignedInt248Type
+		THREE.UnsignedInt5999Type
 		</code>
 		<p>
 			For use with a texture's [page:Texture.type type] property, which must
@@ -151,6 +152,7 @@
 		THREE.RedIntegerFormat 
 		THREE.RGFormat
 		THREE.RGIntegerFormat 
+		THREE.RGBFormat
 		THREE.RGBAFormat 
 		THREE.RGBAIntegerFormat
 		THREE.LuminanceFormat 
@@ -166,24 +168,21 @@
 			and reads just the alpha component.<br /><br />
 
 			[page:constant RedFormat] discards the green and blue components and reads
-			just the red component. (can only be used with a WebGL 2 rendering
-			context).
+			just the red component.
 			<br /><br />
 
 			[page:constant RedIntegerFormat] discards the green and blue components
 			and reads just the red component. The texels are read as integers instead
-			of floating point. (can only be used with a WebGL 2 rendering context).
+			of floating point.
 			<br /><br />
 
 			[page:constant RGFormat] discards the alpha, and blue components and reads
-			the red, and green components. (can only be used with a WebGL 2 rendering
-			context).
+			the red, and green components.
 			<br /><br />
 
 			[page:constant RGIntegerFormat] discards the alpha, and blue components
 			and reads the red, and green components. The texels are read as integers
-			instead of floating point. (can only be used with a WebGL 2 rendering
-			context).
+			instead of floating point.
 			<br /><br />
 
 			[page:constant RGBAFormat] is the default and reads the red, green, blue
@@ -191,7 +190,7 @@
 
 			[page:constant RGBAIntegerFormat] is the default and reads the red, green,
 			blue and alpha components. The texels are read as integers instead of
-			floating point. (can only be used with a WebGL 2 rendering context).
+			floating point.
 			<br /><br />
 
 			[page:constant LuminanceFormat] reads each element as a single luminance
@@ -393,9 +392,6 @@
 		</code>
 
 		<p>
-			Heads up: changing the internal format of a texture will only affect the
-			texture when using a WebGL 2 rendering context.<br /><br />
-
 			For use with a texture's [page:Texture.internalFormat internalFormat]
 			property, these define how elements of a texture, or `texels`, are stored
 			on the GPU.<br /><br />

@@ -41,7 +41,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 200 );
-				camera.position.set( - 0.7, 14.6, 43.2 );
+				camera.position.set( 0.7, 14.6, - 43.2 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
@@ -50,7 +50,7 @@
 				scene.add( ambientLight );
 
 				const light1 = new THREE.DirectionalLight( 0xc1c1c1, 3 );
-				light1.position.set( 0, 200, 100 );
+				light1.position.set( 0, 200, - 100 );
 				scene.add( light1 );
 
 				const grid = new THREE.GridHelper( 200, 20, 0x000000, 0x000000 );
@@ -62,13 +62,13 @@
 				loader.load( 'models/lwo/Objects/LWO3/Demo.lwo', function ( object ) {
 
 					const phong = object.meshes[ 0 ];
-					phong.position.set( - 2, 12, 0 );
+					phong.position.set( 2, 12, 0 );
 
 					const standard = object.meshes[ 1 ];
-					standard.position.set( 2, 12, 0 );
+					standard.position.set( - 2, 12, 0 );
 
 					const rocket = object.meshes[ 2 ];
-					rocket.position.set( 0, 10.5, - 1 );
+					rocket.position.set( 0, 10.5, 1 );
 
 					scene.add( phong, standard, rocket );
 
@@ -77,12 +77,12 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setAnimationLoop( animation );
+				renderer.setAnimationLoop( animate );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				container.appendChild( renderer.domElement );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 1.33, 10, - 6.7 );
+				controls.target.set( - 1.33, 10, 6.7 );
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -98,7 +98,7 @@
 
 			}
 
-			function animation() {
+			function animate() {
 
 				renderer.render( scene, camera );
 

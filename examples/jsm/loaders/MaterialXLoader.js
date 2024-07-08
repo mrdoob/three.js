@@ -1,12 +1,5 @@
 import {
-	FileLoader,
-	Loader,
-	TextureLoader,
-	RepeatWrapping
-} from 'three';
-
-import {
-	MeshBasicNodeMaterial, MeshPhysicalNodeMaterial,
+	FileLoader, Loader, TextureLoader, MeshBasicNodeMaterial, MeshPhysicalNodeMaterial, RepeatWrapping,
 	float, bool, int, vec2, vec3, vec4, color, texture,
 	positionLocal, positionWorld, uv, vertexColor,
 	normalLocal, normalWorld, tangentLocal, tangentWorld,
@@ -20,7 +13,7 @@ import {
 	mx_safepower, mx_contrast,
 	mx_srgb_texture_to_lin_rec709,
 	saturation
-} from '../nodes/Nodes.js';
+} from 'three';
 
 const colorSpaceLib = {
 	mx_srgb_texture_to_lin_rec709

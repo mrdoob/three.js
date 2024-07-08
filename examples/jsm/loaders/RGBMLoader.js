@@ -36,6 +36,12 @@ class RGBMLoader extends DataTextureLoader {
 
 		const texture = new CubeTexture();
 
+		for ( let i = 0; i < 6; i ++ ) {
+
+			texture.images[ i ] = undefined;
+
+		}
+
 		let loaded = 0;
 
 		const scope = this;
@@ -72,6 +78,16 @@ class RGBMLoader extends DataTextureLoader {
 		texture.generateMipmaps = false;
 
 		return texture;
+
+	}
+
+	loadCubemapAsync( urls, onProgress ) {
+
+		return new Promise( ( resolve, reject ) => {
+
+			this.loadCubemap( urls, resolve, onProgress, reject );
+
+		} );
 
 	}
 

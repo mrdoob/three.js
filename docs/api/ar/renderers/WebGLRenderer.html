@@ -50,7 +50,7 @@
 		 
 		[page:Boolean stencil] - ما إذا كانت ذاكرة التخزين المؤقت للرسم لديها
 		[link:https://en.wikipedia.org/wiki/Stencil_buffer stencil buffer] من على
-		الأقل 8 بت. الافتراضي هو `true`. <br />
+		الأقل 8 بت. الافتراضي هو `false`. <br />
 		 
 		[page:Boolean preserveDrawingBuffer] - ما إذا كان سيتم الحفاظ على المخابئ
 		حتى يتم مسحها يدويًا أو استبدالها. الافتراضي هو `false`. <br />
@@ -369,7 +369,7 @@
 		</p>
 		 
 		<h3>
-		[method:undefined copyFramebufferToTexture]( [param:Vector2 position], [param:FramebufferTexture texture], [param:Number level] )
+		[method:undefined copyFramebufferToTexture]( [param:FramebufferTexture texture], [param:Vector2 position], [param:Number level] )
 		</h3>
 		<p>
 		ينسخ بكسلات من WebGLFramebuffer الحالي إلى قوام ثنائي الأبعاد. يتيح
@@ -377,23 +377,16 @@
 		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexImage2D WebGLRenderingContext.copyTexImage2D].
 		</p>
 		 
-		<h3>
-		[method:undefined copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )
-		</h3>
+		<h3>[method:undefined copyTextureToTexture]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Box2 srcRegion], [param:Vector2 dstPosition], [param:Number level] )</h3>
 		<p>
-		ينسخ جميع بكسلات قوام إلى قوام موجود بدءًا من
-		الموضع المعطى. يتيح الوصول إلى
-		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D WebGLRenderingContext.texSubImage2D].
+			Copies the pixels of a texture in the bounds '[page:Box2 srcRegion]' in the destination texture starting from the given position. 
+			Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D WebGLRenderingContext.texSubImage2D].
 		</p>
-		 
-		<h3>
-		[method:undefined copyTextureToTexture3D]( [param:Box3 sourceBox], [param:Vector3 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )
-		</h3>
+
+		<h3>[method:undefined copyTextureToTexture3D]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Box3 srcRegion], [param:Vector3 dstPosition], [param:Number level] )</h3>
 		<p>
-		ينسخ بكسلات قوام في الحدود '[page:Box3 sourceBox]' في
-		قوام الوجهة بدءًا من الموضع المعطى. يتيح الوصول
-		إلى
-		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texSubImage3D WebGL2RenderingContext.texSubImage3D].
+			Copies the pixels of a texture in the bounds '[page:Box3 srcRegion]' in the destination texture starting from the given position. 
+			Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/texSubImage3D WebGL2RenderingContext.texSubImage3D].
 		</p>
 		 
 		<h3>[method:undefined dispose]( )</h3>

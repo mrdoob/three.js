@@ -65,7 +65,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -77,11 +78,6 @@
 
 			import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 			import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -118,30 +114,20 @@
 				{ size: 1e19, scale: 1.0, label: 'mind boggling (1000 light years)' }
 			];
 
-			init();
+			init().then( animate );
 
-			function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
+			async function init() {
 
 				container = document.getElementById( 'container' );
 
 				const loader = new FontLoader();
-				loader.load( 'fonts/helvetiker_regular.typeface.json', function ( font ) {
+				const font = await loader.loadAsync( 'fonts/helvetiker_regular.typeface.json' );
 
-					const scene = initScene( font );
+				const scene = initScene( font );
 
-					// Initialize two copies of the same scene, one with normal z-buffer and one with logarithmic z-buffer
-					objects.normal = initView( scene, 'normal', false );
-					objects.logzbuf = initView( scene, 'logzbuf', true );
-
-				} );
+				// Initialize two copies of the same scene, one with normal z-buffer and one with logarithmic z-buffer
+				objects.normal = await initView( scene, 'normal', false );
+				objects.logzbuf = await initView( scene, 'logzbuf', true );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -156,20 +142,21 @@
 
 			}
 
-			function initView( scene, name, logDepthBuf ) {
+			async function initView( scene, name, logDepthBuf ) {
 
 				const framecontainer = document.getElementById( 'container_' + name );
 
 				const camera = new THREE.PerspectiveCamera( 50, screensplit * SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
 				scene.add( camera );
 
-				const renderer = new WebGPURenderer( { antialias: true, logarithmicDepthBuffer: logDepthBuf } );
+				const renderer = new THREE.WebGPURenderer( { antialias: true, logarithmicDepthBuffer: logDepthBuf } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( SCREEN_WIDTH / 2, SCREEN_HEIGHT );
-				renderer.setAnimationLoop( render );
 				renderer.domElement.style.position = 'relative';
 				renderer.domElement.id = 'renderer_' + name;
 				framecontainer.appendChild( renderer.domElement );
+
+				await renderer.init();
 
 				return { container: framecontainer, renderer: renderer, scene: scene, camera: camera };
 
@@ -201,7 +188,7 @@
 					const labelgeo = new TextGeometry( labeldata[ i ].label, {
 						font: font,
 						size: labeldata[ i ].size,
-						height: labeldata[ i ].size / 2
+						depth: labeldata[ i ].size / 2
 					} );
 
 					labelgeo.computeBoundingSphere();
@@ -259,7 +246,9 @@
 
 			}
 
-			function render() {
+			function animate() {
+
+				requestAnimationFrame( animate );
 
 				// Put some limits on zooming
 				const minzoom = labeldata[ 0 ].size * labeldata[ 0 ].scale * 1;

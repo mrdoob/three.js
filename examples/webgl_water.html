@@ -42,7 +42,6 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
@@ -134,6 +133,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				// gui
@@ -186,14 +186,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-
-			}
-
-			function render() {
 
 				const delta = clock.getDelta();
 

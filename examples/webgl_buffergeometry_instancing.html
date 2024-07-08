@@ -86,7 +86,6 @@
 		let camera, scene, renderer;
 
 		init();
-		animate();
 
 		function init() {
 
@@ -177,14 +176,8 @@
 			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setAnimationLoop( animate );
 			container.appendChild( renderer.domElement );
-
-			if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.has( 'ANGLE_instanced_arrays' ) === false ) {
-
-				document.getElementById( 'notSupported' ).style.display = '';
-				return;
-
-			}
 
 			//
 
@@ -215,15 +208,6 @@
 
 		function animate() {
 
-			requestAnimationFrame( animate );
-
-			render();
-			stats.update();
-
-		}
-
-		function render() {
-
 			const time = performance.now();
 
 			const object = scene.children[ 0 ];
@@ -233,6 +217,8 @@
 			object.material.uniforms[ 'sineTime' ].value = Math.sin( object.material.uniforms[ 'time' ].value * 0.05 );
 
 			renderer.render( scene, camera );
+
+			stats.update();
 
 		}
 

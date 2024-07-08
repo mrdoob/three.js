@@ -1,4 +1,6 @@
-function WebGLCapabilities( gl, extensions, parameters ) {
+import { FloatType, HalfFloatType, RGBAFormat, UnsignedByteType } from '../../constants.js';
+
+function WebGLCapabilities( gl, extensions, parameters, utils ) {
 
 	let maxAnisotropy;
 
@@ -19,6 +21,33 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 		}
 
 		return maxAnisotropy;
+
+	}
+
+	function textureFormatReadable( textureFormat ) {
+
+		if ( textureFormat !== RGBAFormat && utils.convert( textureFormat ) !== gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_FORMAT ) ) {
+
+			return false;
+
+		}
+
+		return true;
+
+	}
+
+	function textureTypeReadable( textureType ) {
+
+		const halfFloatSupportedByExt = ( textureType === HalfFloatType ) && ( extensions.has( 'EXT_color_buffer_half_float' ) || extensions.has( 'EXT_color_buffer_float' ) );
+
+		if ( textureType !== UnsignedByteType && utils.convert( textureType ) !== gl.getParameter( gl.IMPLEMENTATION_COLOR_READ_TYPE ) && // Edge and Chrome Mac < 52 (#9513)
+			textureType !== FloatType && ! halfFloatSupportedByExt ) {
+
+			return false;
+
+		}
+
+		return true;
 
 	}
 
@@ -52,8 +81,6 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 	}
 
-	const isWebGL2 = typeof WebGL2RenderingContext !== 'undefined' && gl.constructor.name === 'WebGL2RenderingContext';
-
 	let precision = parameters.precision !== undefined ? parameters.precision : 'highp';
 	const maxPrecision = getMaxPrecision( precision );
 
@@ -63,8 +90,6 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 		precision = maxPrecision;
 
 	}
-
-	const drawBuffers = isWebGL2 || extensions.has( 'WEBGL_draw_buffers' );
 
 	const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
 
@@ -79,19 +104,18 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 	const maxFragmentUniforms = gl.getParameter( gl.MAX_FRAGMENT_UNIFORM_VECTORS );
 
 	const vertexTextures = maxVertexTextures > 0;
-	const floatFragmentTextures = isWebGL2 || extensions.has( 'OES_texture_float' );
-	const floatVertexTextures = vertexTextures && floatFragmentTextures;
 
-	const maxSamples = isWebGL2 ? gl.getParameter( gl.MAX_SAMPLES ) : 0;
+	const maxSamples = gl.getParameter( gl.MAX_SAMPLES );
 
 	return {
 
-		isWebGL2: isWebGL2,
-
-		drawBuffers: drawBuffers,
+		isWebGL2: true, // keeping this for backwards compatibility
 
 		getMaxAnisotropy: getMaxAnisotropy,
 		getMaxPrecision: getMaxPrecision,
+
+		textureFormatReadable: textureFormatReadable,
+		textureTypeReadable: textureTypeReadable,
 
 		precision: precision,
 		logarithmicDepthBuffer: logarithmicDepthBuffer,
@@ -107,8 +131,6 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 		maxFragmentUniforms: maxFragmentUniforms,
 
 		vertexTextures: vertexTextures,
-		floatFragmentTextures: floatFragmentTextures,
-		floatVertexTextures: floatVertexTextures,
 
 		maxSamples: maxSamples
 

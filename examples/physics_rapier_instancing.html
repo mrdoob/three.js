@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - rapier3d instancing
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - <a href="https://github.com/dimforge/rapier.js" target="_blank">rapier</a> instancing
 		</div>
 
 		<script type="importmap">
@@ -117,6 +117,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
@@ -128,8 +129,6 @@
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.y = 0.5;
 				controls.update();
-
-				animate();
 
 				setInterval( () => {
 
@@ -150,8 +149,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				renderer.render( scene, camera );
 

@@ -5,12 +5,13 @@ const TEXTURE_HEIGHT = 4;
 
 import {
 	DataTexture,
+	DataUtils,
 	RGBAFormat,
-	FloatType,
+	HalfFloatType,
 	RepeatWrapping,
 	Mesh,
 	InstancedMesh,
-	NearestFilter,
+	LinearFilter,
 	DynamicDrawUsage,
 	Matrix4
 } from 'three';
@@ -22,18 +23,19 @@ import {
  */
 export function initSplineTexture( numberOfCurves = 1 ) {
 
-	const dataArray = new Float32Array( TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * CHANNELS );
+	const dataArray = new Uint16Array( TEXTURE_WIDTH * TEXTURE_HEIGHT * numberOfCurves * CHANNELS );
 	const dataTexture = new DataTexture(
 		dataArray,
 		TEXTURE_WIDTH,
 		TEXTURE_HEIGHT * numberOfCurves,
 		RGBAFormat,
-		FloatType
+		HalfFloatType
 	);
 
 	dataTexture.wrapS = RepeatWrapping;
 	dataTexture.wrapY = RepeatWrapping;
-	dataTexture.magFilter = NearestFilter;
+	dataTexture.magFilter = LinearFilter;
+	dataTexture.minFilter = LinearFilter;
 	dataTexture.needsUpdate = true;
 
 	return dataTexture;
@@ -81,10 +83,10 @@ function setTextureValue( texture, index, x, y, z, o ) {
 	const image = texture.image;
 	const { data } = image;
 	const i = CHANNELS * TEXTURE_WIDTH * o; // Row Offset
-	data[ index * CHANNELS + i + 0 ] = x;
-	data[ index * CHANNELS + i + 1 ] = y;
-	data[ index * CHANNELS + i + 2 ] = z;
-	data[ index * CHANNELS + i + 3 ] = 1;
+	data[ index * CHANNELS + i + 0 ] = DataUtils.toHalfFloat( x );
+	data[ index * CHANNELS + i + 1 ] = DataUtils.toHalfFloat( y );
+	data[ index * CHANNELS + i + 2 ] = DataUtils.toHalfFloat( z );
+	data[ index * CHANNELS + i + 3 ] = DataUtils.toHalfFloat( 1 );
 
 }
 

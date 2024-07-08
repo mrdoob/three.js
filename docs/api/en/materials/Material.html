@@ -340,7 +340,7 @@
 		<h3>[property:Boolean toneMapped]</h3>
 		<p>
 			Defines whether this material is tone mapped according to the renderer's			
-			[page:WebGLRenderer.toneMapping toneMapping] setting. It is ignored when rendering to a render target.
+			[page:WebGLRenderer.toneMapping toneMapping] setting. It is ignored when rendering to a render target or using post processing.
 			Default is `true`.
 		</p>
 
@@ -407,7 +407,7 @@
 			method whenever this instance is no longer used in your app.
 		</p>
 		<p>
-			Material textures must be be disposed of by the dispose() method of
+			Material textures must be disposed of by the dispose() method of
 			[page:Texture Texture].
 		</p>
 

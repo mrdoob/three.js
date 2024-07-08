@@ -72,7 +72,7 @@
 				sample: Object.values( SAMPLES )[ 0 ],
 			};
 
-			init().then( animate );
+			init();
 
 			async function init() {
 
@@ -116,12 +116,11 @@
 
 				await loadTexture( params.sample );
 
+				renderer.setAnimationLoop( animate );
 
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				controls.update();
 

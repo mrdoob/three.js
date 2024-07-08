@@ -22,7 +22,7 @@ export class CodeEditorElement extends Element {
 
 		this.editor = null; // async
 
-		window.require.config( { paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@latest/min/vs' } } );
+		window.require.config( { paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.48.0/min/vs' } } );
 
 		require( [ 'vs/editor/editor.main' ], () => {
 
@@ -30,7 +30,8 @@ export class CodeEditorElement extends Element {
 				value: this.source,
 				language: 'javascript',
 				theme: 'vs-dark',
-				automaticLayout: true
+				automaticLayout: true,
+				minimap: { enabled: false }
 			} );
 
 			let timeout = null;

@@ -119,6 +119,14 @@
 			[page:WebGLRenderer]使用它来选择shaders。
 		</p>
 
+		<h3>[property:Float dispersion]</h3>
+		<p>
+			Defines the strength of the angular separation of colors (chromatic aberration) transmitting through a relatively clear volume.
+			Any value zero or larger is valid, the typical range of realistic values is `[0, 1]`.
+			Default is `0` (no dispersion).
+			This property can be only be used with transmissive objects, see [page:.transmission].
+		</p>
+
 		<h3>[property:Float ior]</h3>
 		<p>
 			为非金属材质所设置的折射率，范围由*1.0*到*2.333*。默认为*1.5*。

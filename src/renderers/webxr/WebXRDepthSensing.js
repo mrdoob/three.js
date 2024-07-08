@@ -21,11 +21,11 @@ void main() {
 
 	if ( coord.x >= 1.0 ) {
 
-		gl_FragDepthEXT = texture( depthColor, vec3( coord.x - 1.0, coord.y, 1 ) ).r;
+		gl_FragDepth = texture( depthColor, vec3( coord.x - 1.0, coord.y, 1 ) ).r;
 
 	} else {
 
-		gl_FragDepthEXT = texture( depthColor, vec3( coord.x, coord.y, 0 ) ).r;
+		gl_FragDepth = texture( depthColor, vec3( coord.x, coord.y, 0 ) ).r;
 
 	}
 
@@ -65,7 +65,7 @@ class WebXRDepthSensing {
 
 	}
 
-	render( renderer, cameraXR ) {
+	getMesh( cameraXR ) {
 
 		if ( this.texture !== null ) {
 
@@ -73,7 +73,6 @@ class WebXRDepthSensing {
 
 				const viewport = cameraXR.cameras[ 0 ].viewport;
 				const material = new ShaderMaterial( {
-					extensions: { fragDepth: true },
 					vertexShader: _occlusion_vertex,
 					fragmentShader: _occlusion_fragment,
 					uniforms: {
@@ -87,9 +86,9 @@ class WebXRDepthSensing {
 
 			}
 
-			renderer.render( this.mesh, cameraXR );
-
 		}
+
+		return this.mesh;
 
 	}
 
@@ -97,6 +96,12 @@ class WebXRDepthSensing {
 
 		this.texture = null;
 		this.mesh = null;
+
+	}
+
+	getDepthTexture() {
+
+		return this.texture;
 
 	}
 

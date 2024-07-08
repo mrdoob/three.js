@@ -95,19 +95,6 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( 'init', ( assert ) => {
-
-				const gl = new WebglContextMock();
-				const extensions = new WebGLExtensions( gl );
-				extensions.init( { isWebGL2: false } );
-				assert.ok( extensions );
-				const gl2 = new WebglContextMock();
-				const extensions2 = new WebGLExtensions( gl2 );
-				extensions2.init( { isWebGL2: true } );
-				assert.ok( extensions2 );
-
-			} );
-
 		} );
 
 	} );

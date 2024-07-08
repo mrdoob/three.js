@@ -87,6 +87,7 @@
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setAnimationLoop( animate );
 
 				views = document.querySelectorAll( '.view' );
 
@@ -183,13 +184,6 @@
 			}
 
 			function animate() {
-
-				render();
-				requestAnimationFrame( animate );
-
-			}
-
-			function render() {
 
 				updateSize();
 

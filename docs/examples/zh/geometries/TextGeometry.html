@@ -17,7 +17,7 @@
 				请参阅[page:FontLoader]页面来查看更多详细信息。
 			</p>
 
-		<h2>进口</h2>
+		<h2>导入</h2>
 
 		<p>
 			[name] 是一个附加组件，必须显式导入。
@@ -38,7 +38,7 @@
 			const geometry = new TextGeometry( 'Hello three.js!', {
 				font: font,
 				size: 80,
-				height: 5,
+				depth: 5,
 				curveSegments: 12,
 				bevelEnabled: true,
 				bevelThickness: 10,
@@ -63,7 +63,7 @@
 		<ul>
 			<li>font — THREE.Font的实例。</li>
 			<li>size — Float。字体大小，默认值为100。</li>
-			<li>height — Float。挤出文本的厚度。默认值为50。</li>
+			<li>depth — Float。挤出文本的厚度。默认值为50。</li>
 			<li>curveSegments — Integer。（表示文本的）曲线上点的数量。默认值为12。</li>
 			<li>bevelEnabled — Boolean。是否开启斜角，默认为false。</li>
 			<li>bevelThickness — Float。文本上斜角的深度，默认值为20。</li>

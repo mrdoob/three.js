@@ -29,8 +29,8 @@
 				"imports": {
 					"three": "../build/three.module.js",
 					"three/addons/": "./jsm/",
-					"three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.7.3/build/index.module.js",
-					"three-bvh-csg": "https://unpkg.com/three-bvh-csg@0.0.16/build/index.module.js"
+					"three-mesh-bvh": "https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.3/build/index.module.js",
+					"three-bvh-csg": "https://cdn.jsdelivr.net/npm/three-bvh-csg@0.0.16/build/index.module.js"
 				}
 			}
 		</script>
@@ -58,7 +58,6 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
@@ -85,6 +84,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 				document.body.appendChild( renderer.domElement );
@@ -195,8 +195,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				// update the transforms
 				const t = window.performance.now() + 9000;

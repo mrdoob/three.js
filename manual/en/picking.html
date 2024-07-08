@@ -279,7 +279,7 @@ for (let i = 0; i &lt; numObjects; ++i) {
   cube.scale.set(rand(3, 6), rand(3, 6), rand(3, 6));
 
 +  const pickingMaterial = new THREE.MeshPhongMaterial({
-+    emissive: new THREE.Color(id),
++    emissive: new THREE.Color().setHex(id, THREE.NoColorSpace),
 +    color: new THREE.Color(0, 0, 0),
 +    specular: new THREE.Color(0, 0, 0),
 +    map: texture,

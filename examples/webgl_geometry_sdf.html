@@ -24,7 +24,7 @@
 
 		<script type="module">
 			import * as THREE from 'three';
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { SDFGeometryGenerator } from 'three/addons/geometries/SDFGeometryGenerator.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -79,7 +79,6 @@
 			`;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -96,6 +95,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -191,8 +191,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				controls.update();
 

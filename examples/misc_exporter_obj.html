@@ -41,13 +41,13 @@
 			};
 
 			init();
-			animate();
 
 			function init() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -239,8 +239,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				renderer.render( scene, camera );
 

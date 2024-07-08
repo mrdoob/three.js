@@ -25,7 +25,7 @@ function SidebarSettingsHistory( editor ) {
 
 		if ( value ) {
 
-			alert( 'The history will be preserved across sessions.\nThis can have an impact on performance when working with textures.' );
+			alert( strings.getKey( 'prompt/history/preserve' ) );
 
 			const lastUndoCmd = history.undos[ history.undos.length - 1 ];
 			const lastUndoId = ( lastUndoCmd !== undefined ) ? lastUndoCmd.id : 0;
@@ -63,7 +63,7 @@ function SidebarSettingsHistory( editor ) {
 	const option = new UIButton( strings.getKey( 'sidebar/history/clear' ) );
 	option.onClick( function () {
 
-		if ( confirm( 'The Undo/Redo History will be cleared. Are you sure?' ) ) {
+		if ( confirm( strings.getKey( 'prompt/history/clear' ) ) ) {
 
 			editor.history.clear();
 

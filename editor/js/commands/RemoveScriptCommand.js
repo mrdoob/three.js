@@ -8,16 +8,17 @@ import { Command } from '../Command.js';
  */
 class RemoveScriptCommand extends Command {
 
-	constructor( editor, object, script ) {
+	constructor( editor, object = null, script = '' ) {
 
 		super( editor );
 
 		this.type = 'RemoveScriptCommand';
-		this.name = 'Remove Script';
+		this.name = editor.strings.getKey( 'command/RemoveScript' );
 
 		this.object = object;
 		this.script = script;
-		if ( this.object && this.script ) {
+
+		if ( this.object !== null && this.script !== '' ) {
 
 			this.index = this.editor.scripts[ this.object.uuid ].indexOf( this.script );
 

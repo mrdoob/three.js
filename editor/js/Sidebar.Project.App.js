@@ -115,10 +115,6 @@ function SidebarProjectApp( editor ) {
 
 			content = content.replace( '<!-- title -->', title );
 
-			const includes = [];
-
-			content = content.replace( '<!-- includes -->', includes.join( '\n\t\t' ) );
-
 			let editButton = '';
 
 			if ( config.getKey( 'project/editable' ) ) {

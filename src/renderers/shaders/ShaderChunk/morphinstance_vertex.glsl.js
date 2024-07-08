@@ -1,7 +1,7 @@
 export default /* glsl */`
 #ifdef USE_INSTANCING_MORPH
 
-	float morphTargetInfluences[MORPHTARGETS_COUNT];
+	float morphTargetInfluences[ MORPHTARGETS_COUNT ];
 
 	float morphTargetBaseInfluence = texelFetch( morphTexture, ivec2( 0, gl_InstanceID ), 0 ).r;
 

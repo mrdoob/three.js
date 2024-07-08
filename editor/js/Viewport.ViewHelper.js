@@ -1,6 +1,6 @@
 import { UIPanel } from './libs/ui.js';
 
-import { ViewHelper as ViewHelperBase } from '../../examples/jsm/helpers/ViewHelper.js';
+import { ViewHelper as ViewHelperBase } from 'three/addons/helpers/ViewHelper.js';
 
 class ViewHelper extends ViewHelperBase {
 

@@ -14,7 +14,6 @@ export default QUnit.module( 'Animation', () => {
 				name: '.name',
 				times: [ 0, 1 ],
 				values: [ 'foo', 'bar' ],
-				interpolation: StringKeyframeTrack.DefaultInterpolation
 			};
 
 			// INHERITANCE
@@ -34,10 +33,6 @@ export default QUnit.module( 'Animation', () => {
 				// name, times, values
 				const object = new StringKeyframeTrack( parameters.name, parameters.times, parameters.values );
 				assert.ok( object, 'Can instantiate a StringKeyframeTrack.' );
-
-				// name, times, values, interpolation
-				const object_all = new StringKeyframeTrack( parameters.name, parameters.times, parameters.values, parameters.interpolation );
-				assert.ok( object_all, 'Can instantiate a StringKeyframeTrack with name, times, values, interpolation.' );
 
 			} );
 

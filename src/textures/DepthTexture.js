@@ -3,9 +3,7 @@ import { NearestFilter, UnsignedIntType, UnsignedInt248Type, DepthFormat, DepthS
 
 class DepthTexture extends Texture {
 
-	constructor( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
-
-		format = format !== undefined ? format : DepthFormat;
+	constructor( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format = DepthFormat ) {
 
 		if ( format !== DepthFormat && format !== DepthStencilFormat ) {
 

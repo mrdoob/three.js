@@ -91,7 +91,6 @@ const assets = [
 	'./js/libs/codemirror/mode/glsl.js',
 
 	'./js/libs/esprima.js',
-	'./js/libs/ffmpeg.min.js',
 	'./js/libs/jsonlint.js',
 
 	'./js/libs/codemirror/addon/dialog.css',
@@ -137,7 +136,6 @@ const assets = [
 	'./js/Menubar.File.js',
 	'./js/Menubar.Edit.js',
 	'./js/Menubar.Add.js',
-	'./js/Menubar.Examples.js',
 	'./js/Menubar.Help.js',
 	'./js/Menubar.View.js',
 	'./js/Menubar.Status.js',
@@ -149,6 +147,7 @@ const assets = [
 	'./js/Sidebar.Project.Renderer.js',
 	'./js/Sidebar.Project.Materials.js',
 	'./js/Sidebar.Project.App.js',
+	'./js/Sidebar.Project.Image.js',
 	'./js/Sidebar.Project.Video.js',
 	'./js/Sidebar.Settings.js',
 	'./js/Sidebar.Settings.History.js',
@@ -238,7 +237,7 @@ self.addEventListener( 'install', async function () {
 
 		} catch {
 
-			console.warn( '[SW] Cound\'t cache:', asset );
+			console.warn( '[SW] Couldn\'t cache:', asset );
 
 		}
 

@@ -4,7 +4,8 @@ import {
 	Plane,
 	Sphere,
 	Triangle,
-	Vector3
+	Vector3,
+	Layers
 } from 'three';
 import { Capsule } from '../math/Capsule.js';
 
@@ -89,6 +90,7 @@ class Octree {
 
 		this.subTrees = [];
 		this.triangles = [];
+		this.layers = new Layers();
 
 	}
 
@@ -478,38 +480,42 @@ class Octree {
 
 			if ( obj.isMesh === true ) {
 
-				let geometry, isTemp = false;
+				if ( this.layers.test( obj.layers ) ) {
 
-				if ( obj.geometry.index !== null ) {
+					let geometry, isTemp = false;
 
-					isTemp = true;
-					geometry = obj.geometry.toNonIndexed();
+					if ( obj.geometry.index !== null ) {
 
-				} else {
+						isTemp = true;
+						geometry = obj.geometry.toNonIndexed();
 
-					geometry = obj.geometry;
+					} else {
 
-				}
+						geometry = obj.geometry;
 
-				const positionAttribute = geometry.getAttribute( 'position' );
+					}
 
-				for ( let i = 0; i < positionAttribute.count; i += 3 ) {
+					const positionAttribute = geometry.getAttribute( 'position' );
 
-					const v1 = new Vector3().fromBufferAttribute( positionAttribute, i );
-					const v2 = new Vector3().fromBufferAttribute( positionAttribute, i + 1 );
-					const v3 = new Vector3().fromBufferAttribute( positionAttribute, i + 2 );
+					for ( let i = 0; i < positionAttribute.count; i += 3 ) {
 
-					v1.applyMatrix4( obj.matrixWorld );
-					v2.applyMatrix4( obj.matrixWorld );
-					v3.applyMatrix4( obj.matrixWorld );
+						const v1 = new Vector3().fromBufferAttribute( positionAttribute, i );
+						const v2 = new Vector3().fromBufferAttribute( positionAttribute, i + 1 );
+						const v3 = new Vector3().fromBufferAttribute( positionAttribute, i + 2 );
 
-					this.addTriangle( new Triangle( v1, v2, v3 ) );
+						v1.applyMatrix4( obj.matrixWorld );
+						v2.applyMatrix4( obj.matrixWorld );
+						v3.applyMatrix4( obj.matrixWorld );
 
-				}
+						this.addTriangle( new Triangle( v1, v2, v3 ) );
 
-				if ( isTemp ) {
+					}
 
-					geometry.dispose();
+					if ( isTemp ) {
+
+						geometry.dispose();
+
+					}
 
 				}
 

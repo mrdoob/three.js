@@ -55,6 +55,7 @@ const exceptionList = [
 	'webxr_vr_sandbox',
 	'webxr_vr_video',
 	'webxr_xr_ballshooter',
+	'webxr_xr_dragging_custom_depth',
 
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
@@ -77,7 +78,9 @@ const exceptionList = [
 	// Unknown
 	// TODO: most of these can be fixed just by increasing idleTime and parseTime
 	'webgl_animation_skinning_blending',
+	'webgl_animation_skinning_additive_blending',
 	'webgl_buffergeometry_glbufferattribute',
+	'webgl_interactive_cubes_gpu',
 	'webgl_clipping_advanced',
 	'webgl_lensflares',
 	'webgl_lights_spotlights',
@@ -89,10 +92,8 @@ const exceptionList = [
 	'webgl_materials_blending',
 	'webgl_mirror',
 	'webgl_morphtargets_face',
-	'webgl_nodes_loader_materialx',
-	'webgl_nodes_materials_standard',
-	'webgl_nodes_materialx_noise',
-	'webgl_postprocessing_crossfade',
+	'webgl_postprocessing_transition',
+	'webgl_postprocessing_glitch',
 	'webgl_postprocessing_dof2',
 	'webgl_raymarching_reflect',
 	'webgl_renderer_pathtracer',
@@ -100,14 +101,14 @@ const exceptionList = [
 	'webgl_shadowmap_progressive',
 	'webgl_test_memory2',
 	'webgl_tiled_forward',
-	'webgl2_volume_instancing',
-	'webgl2_multisampled_renderbuffers',
 	'webgl_points_dynamic',
 	'webgpu_multisampled_renderbuffers',
+	'webgl_test_wide_gamut',
 
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?
 	'physics_rapier_instancing',
+	'physics_jolt_instancing',
 
 	// Awaiting for WebGL backend support
 	'webgpu_clearcoat',
@@ -124,21 +125,33 @@ const exceptionList = [
 
 	// WebGPURenderer: Unknown problem
 	'webgpu_postprocessing_afterimage',
+	'webgpu_postprocessing_3dlut',
 	'webgpu_backdrop_water',
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_clipping',
+	'webgpu_instance_points',
 	'webgpu_loader_materialx',
+	'webgpu_materials_displacementmap',
 	'webgpu_materials_video',
 	'webgpu_materialx_noise',
 	'webgpu_morphtargets_face',
 	'webgpu_occlusion',
 	'webgpu_particles',
+	'webgpu_refraction',
 	'webgpu_shadertoy',
 	'webgpu_shadowmap',
 	'webgpu_tsl_editor',
 	'webgpu_tsl_transpiler',
+	'webgpu_tsl_interoperability',
 	'webgpu_portal',
 	'webgpu_custom_fog',
+	'webgpu_instancing_morph',
+	'webgpu_mesh_batch',
+	'webgpu_texturegrad',
+	'webgpu_performance_renderbundle',
+	'webgpu_lights_rectarealight',
+	'webgpu_postprocessing',
+	'misc_controls_fly',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',
@@ -253,9 +266,15 @@ async function main() {
 
 	/* Prepare injections */
 
+	const buildInjection = ( code ) => code.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
+
 	const cleanPage = await fs.readFile( 'test/e2e/clean-page.js', 'utf8' );
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
-	const build = ( await fs.readFile( 'build/three.module.js', 'utf8' ) ).replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
+
+	const builds = {
+		'three.module.js': buildInjection( await fs.readFile( 'build/three.module.js', 'utf8' ) ),
+		'three.webgpu.js': buildInjection( await fs.readFile( 'build/three.webgpu.js', 'utf8' ) )
+	};
 
 	/* Prepare pages */
 
@@ -264,7 +283,7 @@ async function main() {
 	const pages = await browser.pages();
 	while ( pages.length < numPages && pages.length < files.length ) pages.push( await browser.newPage() );
 
-	for ( const page of pages ) await preparePage( page, injection, build, errorMessagesCache );
+	for ( const page of pages ) await preparePage( page, injection, builds, errorMessagesCache );
 
 	/* Loop for each file */
 
@@ -305,7 +324,7 @@ async function main() {
 
 }
 
-async function preparePage( page, injection, build, errorMessages ) {
+async function preparePage( page, injection, builds, errorMessages ) {
 
 	/* let page.file, page.pageSize, page.error */
 
@@ -393,19 +412,25 @@ async function preparePage( page, injection, build, errorMessages ) {
 
 	page.on( 'request', async ( request ) => {
 
-		if ( request.url() === `http://localhost:${ port }/build/three.module.js` ) {
+		const url = request.url();
 
-			await request.respond( {
-				status: 200,
-				contentType: 'application/javascript; charset=utf-8',
-				body: build
-			} );
+		for ( const build in builds ) {
 
-		} else {
+			if ( url === `http://localhost:${ port }/build/${ build }` ) {
 
-			await request.continue();
+				await request.respond( {
+					status: 200,
+					contentType: 'application/javascript; charset=utf-8',
+					body: builds[ build ]
+				} );
+
+				return;
+
+			}
 
 		}
+
+		await request.continue();
 
 	} );
 

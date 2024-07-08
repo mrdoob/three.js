@@ -144,6 +144,8 @@ class ThreeMFLoader extends Loader {
 
 			}
 
+			if ( relsName === undefined ) throw new Error( 'THREE.ThreeMFLoader: Cannot find relationship file `rels` in 3MF archive.' );
+
 			//
 
 			const relsView = zip[ relsName ];

@@ -33,7 +33,6 @@
 			let box, torus;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -53,6 +52,7 @@
 				renderer.setClearColor( 0xe0e0e0 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
 				document.body.appendChild( renderer.domElement );
 
@@ -110,8 +110,6 @@
 			}
 
 			function animate() {
-
-				requestAnimationFrame( animate );
 
 				const time = performance.now() * 0.001 + 6000;
 
