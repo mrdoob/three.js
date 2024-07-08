@@ -120,6 +120,8 @@ class Renderer {
 		this._activeCubeFace = 0;
 		this._activeMipmapLevel = 0;
 
+		this._mrt = null;
+
 		this._renderObjectFunction = null;
 		this._currentRenderObjectFunction = null;
 		this._currentRenderBundle = null;
@@ -341,6 +343,20 @@ class Renderer {
 		const renderContext = this._renderScene( scene, camera );
 
 		await this.backend.resolveTimestampAsync( renderContext, 'render' );
+
+	}
+
+	setMRT( mrt ) {
+
+		this._mrt = mrt;
+
+		return this;
+
+	}
+
+	getMRT() {
+
+		return this._mrt;
 
 	}
 

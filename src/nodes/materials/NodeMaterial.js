@@ -62,6 +62,7 @@ class NodeMaterial extends Material {
 		this.shadowPositionNode = null;
 
 		this.outputNode = null;
+		this.mrtNode = null;
 
 		this.fragmentNode = null;
 		this.vertexNode = null;
@@ -124,6 +125,16 @@ class NodeMaterial extends Material {
 			//
 
 			if ( this.outputNode !== null ) resultNode = this.outputNode;
+
+			// MRT
+
+			const mrt = this.mrtNode || builder.renderer.getMRT();
+
+			if ( mrt !== null ) {
+
+				resultNode = mrt;
+
+			}
 
 		} else {
 
@@ -578,6 +589,7 @@ class NodeMaterial extends Material {
 		this.shadowPositionNode = source.shadowPositionNode;
 
 		this.outputNode = source.outputNode;
+		this.mrtNode = source.mrtNode;
 
 		this.fragmentNode = source.fragmentNode;
 		this.vertexNode = source.vertexNode;
