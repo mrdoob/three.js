@@ -14,7 +14,7 @@ function getTextureIndex( textures, name ) {
 
 	}
 
-	return -1;
+	return - 1;
 
 }
 
