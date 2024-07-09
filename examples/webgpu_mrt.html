@@ -81,7 +81,7 @@
 
 				// post processing
 
-				const scenePass = pass( scene, camera );
+				const scenePass = pass( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
 				scenePass.setMRT( mrt( {
 					output: output,
 					normal: transformedNormalWorld.directionToColor(),
