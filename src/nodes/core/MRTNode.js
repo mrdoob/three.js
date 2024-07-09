@@ -30,6 +30,14 @@ class MRTNode extends OutputStructNode {
 
 	}
 
+	merge( mrtNode ) {
+
+		const outputs = { ...this.outputNodes, ...mrtNode.outputNodes };
+
+		return mrt( outputs );
+
+	}
+
 	setup( builder ) {
 
 		const outputNodes = this.outputNodes;
