@@ -1418,7 +1418,12 @@ class WebGPUBackend extends Backend {
 
 		if ( texture.generateMipmaps ) this.textureUtils.generateMipmaps( texture );
 
-		descriptor.colorAttachments[ 0 ].loadOp = GPULoadOp.Load;
+		for ( let i = 0; i < descriptor.colorAttachments.length; i ++ ) {
+
+			descriptor.colorAttachments[ i ].loadOp = GPULoadOp.Load;
+
+		}
+
 		if ( renderContext.depth ) descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
 		if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
