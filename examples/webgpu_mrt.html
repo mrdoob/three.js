@@ -100,12 +100,10 @@
 					const diffuse = scenePass.getTextureNode( 'diffuse' );
 					const emissive = scenePass.getTextureNode( 'emissive' );
 
-					const viewportX = viewportTopLeft.x;
-
-					const out = mix( output.renderOutput(), output, step( 0.2, viewportX.x ) );
-					const nor = mix( out, normal, step( 0.4, viewportX.x ) );
-					const emi = mix( nor, emissive, step( 0.6, viewportX.x ) );
-					const dif = mix( emi, diffuse, step( 0.8, viewportX.x ) );
+					const out = mix( output.renderOutput(), output, step( 0.2, viewportTopLeft.x ) );
+					const nor = mix( out, normal, step( 0.4, viewportTopLeft.x ) );
+					const emi = mix( nor, emissive, step( 0.6, viewportTopLeft.x ) );
+					const dif = mix( emi, diffuse, step( 0.8, viewportTopLeft.x ) );
 
 					return dif;
 
