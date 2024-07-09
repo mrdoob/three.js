@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, vec2, step, texture, uv, normalWorld, output, mrt } from 'three/tsl';
+			import { mix, vec2, step, texture, uv, viewportTopLeft, normalWorld, output, mrt } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -55,17 +55,13 @@
 				renderTarget.textures[ 0 ].name = 'output';
 				renderTarget.textures[ 1 ].name = 'normal';
 
-				// Scene setup
+				// Scene
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 50 );
 				camera.position.z = 4;
-
-				const sunLight = new THREE.DirectionalLight( 0xFFE499, 5 );
-				sunLight.position.set( .5, 3, .5 );
-				scene.add( sunLight );
 
 				const loader = new THREE.TextureLoader();
 
@@ -74,9 +70,10 @@
 				diffuse.wrapS = THREE.RepeatWrapping;
 				diffuse.wrapT = THREE.RepeatWrapping;
 
-				const basicMaterial = new THREE.MeshStandardNodeMaterial( { colorNode: texture( diffuse, uv().mul( vec2( 10, 4 ) ) ) } );
+				const torusMaterial = new THREE.NodeMaterial();
+				torusMaterial.colorNode = texture( diffuse, uv().mul( vec2( 10, 4 ) ) );
 
-				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 1, 0.3, 128, 32 ), basicMaterial );
+				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 1, 0.3, 128, 32 ), torusMaterial );
 				scene.add( torus );
 
 				// MRT
@@ -89,7 +86,7 @@
 				// Post Processing
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = mix( texture( renderTarget.textures[ 0 ] ), texture( renderTarget.textures[ 1 ] ), step( 0.5, uv().x ) );
+				postProcessing.outputNode = mix( texture( renderTarget.textures[ 0 ] ), texture( renderTarget.textures[ 1 ] ), step( 0.5, viewportTopLeft.x ) );
 
 				// Controls
 

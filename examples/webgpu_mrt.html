@@ -82,17 +82,15 @@
 				// post processing
 
 				const scenePass = pass( scene, camera );
-
-				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputColorTransform = false;
-
-				postProcessing.setMRT( mrt( {
+				scenePass.setMRT( mrt( {
 					output: output,
 					normal: transformedNormalWorld.directionToColor(),
 					diffuse: diffuseColor,
 					emissive: emissive
 				} ) );
 
+				postProcessing = new THREE.PostProcessing( renderer );
+				postProcessing.outputColorTransform = false;
 				postProcessing.outputNode = tslFn( () => {
 
 					const output = scenePass.getTextureNode( 'output' ); // output name is optional here
