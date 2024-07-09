@@ -3,7 +3,7 @@ import { NormalBlending } from '../../constants.js';
 
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
-import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
+import { output, diffuseColor, emissive, varyingProperty } from '../core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAOMap } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView, normalLocal } from '../accessors/NormalNode.js';
@@ -459,7 +459,9 @@ class NodeMaterial extends Material {
 
 		if ( ( emissiveNode && emissiveNode.isNode === true ) || ( material.emissive && material.emissive.isColor === true ) ) {
 
-			outgoingLightNode = outgoingLightNode.add( vec3( emissiveNode ? emissiveNode : materialEmissive ) );
+			emissive.assign( vec3( emissiveNode ? emissiveNode : materialEmissive ) );
+
+			outgoingLightNode = outgoingLightNode.add( emissive );
 
 		}
 

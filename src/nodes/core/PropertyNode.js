@@ -53,6 +53,7 @@ export const property = ( type, name ) => nodeObject( new PropertyNode( type, na
 export const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( type, name, true ) );
 
 export const diffuseColor = nodeImmutable( PropertyNode, 'vec4', 'DiffuseColor' );
+export const emissive = nodeImmutable( PropertyNode, 'vec3', 'EmissiveColor' );
 export const roughness = nodeImmutable( PropertyNode, 'float', 'Roughness' );
 export const metalness = nodeImmutable( PropertyNode, 'float', 'Metalness' );
 export const clearcoat = nodeImmutable( PropertyNode, 'float', 'Clearcoat' );
