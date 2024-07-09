@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, mix, pmremTexture, reference, positionLocal, positionWorld, normalWorld, positionWorldDirection, reflectVector, toneMapping } from 'three/tsl';
+			import { uniform, mix, pmremTexture, reference, positionLocal, positionWorld, normalWorld, positionWorldDirection, reflectVector } from 'three/tsl';
 
 			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
 
@@ -135,7 +135,7 @@
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, 1 );
+				renderer.toneMapping = THREE.LinearToneMapping;
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 

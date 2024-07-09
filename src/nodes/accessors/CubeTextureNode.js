@@ -1,15 +1,15 @@
 import TextureNode from './TextureNode.js';
-import { reflectVector } from './ReflectVectorNode.js';
+import { reflectVector, refractVector } from './ReflectVectorNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
 
-import { WebGPUCoordinateSystem } from '../../constants.js';
+import { CubeReflectionMapping, CubeRefractionMapping, WebGPUCoordinateSystem } from '../../constants.js';
 
 class CubeTextureNode extends TextureNode {
 
-	constructor( value, uvNode = null, levelNode = null ) {
+	constructor( value, uvNode = null, levelNode = null, biasNode = null ) {
 
-		super( value, uvNode, levelNode );
+		super( value, uvNode, levelNode, biasNode );
 
 		this.isCubeTextureNode = true;
 
@@ -23,7 +23,23 @@ class CubeTextureNode extends TextureNode {
 
 	getDefaultUV() {
 
-		return reflectVector;
+		const texture = this.value;
+
+		if ( texture.mapping === CubeReflectionMapping ) {
+
+			return reflectVector;
+
+		} else if ( texture.mapping === CubeRefractionMapping ) {
+
+			return refractVector;
+
+		} else {
+
+			console.error( 'THREE.CubeTextureNode: Mapping "%s" not supported.', texture.mapping );
+
+			return vec3( 0, 0, 0 );
+
+		}
 
 	}
 

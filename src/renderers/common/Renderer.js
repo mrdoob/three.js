@@ -32,7 +32,6 @@ const _screen = new Vector4();
 const _frustum = new Frustum();
 const _projScreenMatrix = new Matrix4();
 const _vector3 = new Vector3();
-const _quad = new QuadMesh( new NodeMaterial() );
 
 class Renderer {
 
@@ -44,14 +43,17 @@ class Renderer {
 
 		const {
 			logarithmicDepthBuffer = false,
-			alpha = true
+			alpha = true,
+			antialias = false,
+			samples = 0
 		} = parameters;
 
 		// public
-
 		this.domElement = backend.getDomElement();
 
 		this.backend = backend;
+
+		this.samples = samples || ( antialias === true ) ? 4 : 0;
 
 		this.autoClear = true;
 		this.autoClearColor = true;
@@ -76,10 +78,6 @@ class Renderer {
 
 		this.info = new Info();
 
-		// nodes
-
-		this.toneMappingNode = null;
-
 		// internals
 
 		this._pixelRatio = 1;
@@ -102,6 +100,8 @@ class Renderer {
 		this._renderContexts = null;
 		this._textures = null;
 		this._background = null;
+
+		this._quad = new QuadMesh( new NodeMaterial() );
 
 		this._currentRenderContext = null;
 
@@ -439,7 +439,7 @@ class Renderer {
 
 		const { currentColorSpace } = this;
 
-		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping || this.toneMappingNode !== null );
+		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping );
 		const useColorSpace = currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace;
 
 		if ( useToneMapping === false && useColorSpace === false ) return null;
@@ -460,7 +460,7 @@ class Renderer {
 				generateMipmaps: false,
 				minFilter: LinearFilter,
 				magFilter: LinearFilter,
-				samples: this.backend.parameters.antialias ? 4 : 0
+				samples: this.samples
 			} );
 
 			frameBufferTarget.isPostProcessingRenderTarget = true;
@@ -683,9 +683,16 @@ class Renderer {
 
 			this.setRenderTarget( outputRenderTarget, activeCubeFace, activeMipmapLevel );
 
-			_quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+			const quad = this._quad;
 
-			this._renderScene( _quad, _quad.camera, false );
+			if ( this._nodes.hasOutputChange( renderTarget.texture ) ) {
+
+				quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+				quad.material.needsUpdate = true;
+
+			}
+
+			this._renderScene( quad, quad.camera, false );
 
 		}
 
@@ -966,8 +973,16 @@ class Renderer {
 			// If a color space transform or tone mapping is required,
 			// the clear operation clears the intermediate renderTarget texture, but does not update the screen canvas.
 
-			_quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
-			this._renderScene( _quad, _quad.camera, false );
+			const quad = this._quad;
+
+			if ( this._nodes.hasOutputChange( renderTarget.texture ) ) {
+
+				quad.material.fragmentNode = this._nodes.getOutputNode( renderTarget.texture );
+				quad.material.needsUpdate = true;
+
+			}
+
+			this._renderScene( quad, quad.camera, false );
 
 		}
 

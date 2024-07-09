@@ -154,6 +154,8 @@ export const TriangleStripDrawMode = 1;
 export const TriangleFanDrawMode = 2;
 export const BasicDepthPacking = 3200;
 export const RGBADepthPacking = 3201;
+export const RGBDepthPacking = 3202;
+export const RGDepthPacking = 3203;
 export const TangentSpaceNormalMap = 0;
 export const ObjectSpaceNormalMap = 1;
 

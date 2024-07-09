@@ -86,7 +86,7 @@ export { default as VertexColorNode, vertexColor } from './accessors/VertexColor
 export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTextureNode.js';
 export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
 export { default as BatchNode, batch } from './accessors/BatchNode.js';
-export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecular, materialSpecularStrength, materialReflectivity, materialRoughness, materialMetalness, materialNormal, materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialRotation, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineWidth, materialLineDashOffset, materialPointWidth, materialAnisotropy, materialAnisotropyVector, materialDispersion } from './accessors/MaterialNode.js';
+export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecular, materialSpecularStrength, materialReflectivity, materialRoughness, materialMetalness, materialNormal, materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialRotation, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineWidth, materialLineDashOffset, materialPointWidth, materialAnisotropy, materialAnisotropyVector, materialDispersion, materialLightMap, materialAOMap } from './accessors/MaterialNode.js';
 export { default as MaterialReferenceNode, materialReference } from './accessors/MaterialReferenceNode.js';
 export { default as RendererReferenceNode, rendererReference } from './accessors/RendererReferenceNode.js';
 export { default as MorphNode, morphReference } from './accessors/MorphNode.js';
@@ -133,6 +133,7 @@ export { default as DotScreenNode, dotScreen } from './display/DotScreenNode.js'
 export { default as RGBShiftNode, rgbShift } from './display/RGBShiftNode.js';
 export { default as FilmNode, film } from './display/FilmNode.js';
 export { default as Lut3DNode, lut3D } from './display/Lut3DNode.js';
+export { default as RenderOutputNode, renderOutput } from './display/RenderOutputNode.js';
 
 export { default as PassNode, pass, texturePass, depthPass } from './display/PassNode.js';
 
@@ -168,6 +169,7 @@ export { default as LightingNode /* @TODO: lighting (abstract), light */ } from 
 export { default as LightingContextNode, lightingContext } from './lighting/LightingContextNode.js';
 export { default as HemisphereLightNode } from './lighting/HemisphereLightNode.js';
 export { default as EnvironmentNode } from './lighting/EnvironmentNode.js';
+export { default as BasicEnvironmentNode } from './lighting/BasicEnvironmentNode.js';
 export { default as IrradianceNode } from './lighting/IrradianceNode.js';
 export { default as AONode } from './lighting/AONode.js';
 export { default as AnalyticLightNode } from './lighting/AnalyticLightNode.js';

@@ -1,4 +1,4 @@
-import LightingModel from '../core/LightingModel.js';
+import BasicLightingModel from './BasicLightingModel.js';
 import F_Schlick from './BSDF/F_Schlick.js';
 import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
 import { diffuseColor } from '../core/PropertyNode.js';
@@ -31,7 +31,7 @@ const BRDF_BlinnPhong = tslFn( ( { lightDirection } ) => {
 
 } );
 
-class PhongLightingModel extends LightingModel {
+class PhongLightingModel extends BasicLightingModel {
 
 	constructor( specular = true ) {
 
@@ -56,9 +56,11 @@ class PhongLightingModel extends LightingModel {
 
 	}
 
-	indirectDiffuse( { irradiance, reflectedLight } ) {
+	indirect( { ambientOcclusion, irradiance, reflectedLight } ) {
 
 		reflectedLight.indirectDiffuse.addAssign( irradiance.mul( BRDF_Lambert( { diffuseColor } ) ) );
+
+		reflectedLight.indirectDiffuse.mulAssign( ambientOcclusion );
 
 	}
 

@@ -25,22 +25,7 @@ class WebGPUPipelineUtils {
 
 	_getSampleCount( renderObjectContext ) {
 
-		let sampleCount = this.backend.utils.getSampleCount( renderObjectContext );
-
-		if ( sampleCount > 1 ) {
-
-			// WebGPU only supports power-of-two sample counts and 2 is not a valid value
-			sampleCount = Math.pow( 2, Math.floor( Math.log2( sampleCount ) ) );
-
-			if ( sampleCount === 2 ) {
-
-				sampleCount = 4;
-
-			}
-
-		}
-
-		return sampleCount;
+		return this.backend.utils.getSampleCountRenderContext( renderObjectContext );
 
 	}
 

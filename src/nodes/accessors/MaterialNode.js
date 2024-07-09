@@ -319,6 +319,18 @@ class MaterialNode extends Node {
 
 			node = this.getFloat( scope );
 
+		} else if ( scope === MaterialNode.REFRACTION_RATIO ) {
+
+			node = this.getFloat( scope );
+
+		} else if ( scope === MaterialNode.LIGHT_MAP ) {
+
+			node = this.getTexture( scope ).rgb.mul( this.getFloat( 'lightMapIntensity' ) );
+
+		} else if ( scope === MaterialNode.AO_MAP ) {
+
+			node = this.getTexture( scope ).r.sub( 1.0 ).mul( this.getFloat( 'aoMapIntensity' ) ).add( 1.0 );
+
 		} else {
 
 			const outputType = this.getNodeType( builder );
@@ -368,6 +380,9 @@ MaterialNode.LINE_WIDTH = 'linewidth';
 MaterialNode.LINE_DASH_OFFSET = 'dashOffset';
 MaterialNode.POINT_WIDTH = 'pointWidth';
 MaterialNode.DISPERSION = 'dispersion';
+MaterialNode.LIGHT_MAP = 'light';
+MaterialNode.AO_MAP = 'ao';
+MaterialNode.REFRACTION_RATIO = 'refractionRatio';
 
 export default MaterialNode;
 
@@ -408,6 +423,9 @@ export const materialLineWidth = nodeImmutable( MaterialNode, MaterialNode.LINE_
 export const materialLineDashOffset = nodeImmutable( MaterialNode, MaterialNode.LINE_DASH_OFFSET );
 export const materialPointWidth = nodeImmutable( MaterialNode, MaterialNode.POINT_WIDTH );
 export const materialDispersion = nodeImmutable( MaterialNode, MaterialNode.DISPERSION );
+export const materialLightMap = nodeImmutable( MaterialNode, MaterialNode.LIGHT_MAP );
+export const materialAOMap = nodeImmutable( MaterialNode, MaterialNode.AO_MAP );
+export const materialRefractionRatio = nodeImmutable( MaterialNode, MaterialNode.REFRACTION_RATIO );
 export const materialAnisotropyVector = uniform( new Vector2() ).onReference( function ( frame ) {
 
 	return frame.material;

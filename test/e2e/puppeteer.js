@@ -103,6 +103,7 @@ const exceptionList = [
 	'webgl_tiled_forward',
 	'webgl_points_dynamic',
 	'webgpu_multisampled_renderbuffers',
+	'webgl_test_wide_gamut',
 
 	// TODO: implement determinism for setTimeout and setInterval
 	// could it fix some examples from above?

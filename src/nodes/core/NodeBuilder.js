@@ -173,7 +173,7 @@ class NodeBuilder {
 
 		const bindGroupsCache = this.getBingGroupsCache();
 
-		// cache individual uniforms group
+		//
 
 		const bindingsArray = [];
 
@@ -181,30 +181,9 @@ class NodeBuilder {
 
 		for ( const binding of bindings ) {
 
-			if ( binding.groupNode.shared === true ) {
+			bindingsArray.push( binding );
 
-				// nodes is the chainmap key
-				const nodes = binding.getNodes();
-
-				let sharedBinding = bindGroupsCache.get( nodes );
-
-				if ( sharedBinding === undefined ) {
-
-					bindGroupsCache.set( nodes, binding );
-
-					sharedBinding = binding;
-
-				}
-
-				bindingsArray.push( sharedBinding );
-
-			} else {
-
-				bindingsArray.push( binding );
-
-				sharedGroup = false;
-
-			}
+			sharedGroup = sharedGroup && binding.groupNode.shared !== true;
 
 		}
 
@@ -411,6 +390,17 @@ class NodeBuilder {
 	}
 
 	getContext() {
+
+		return this.context;
+
+	}
+
+	getSharedContext() {
+
+		const context = { ...this.context };
+
+		delete context.keywords;
+		delete context.material;
 
 		return this.context;
 

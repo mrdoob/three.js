@@ -4,7 +4,7 @@ import { NormalBlending } from '../../constants.js';
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
-import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal } from '../accessors/MaterialNode.js';
+import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAOMap } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView, normalLocal } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
@@ -20,7 +20,6 @@ import { mix } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import AONode from '../lighting/AONode.js';
 import { lightingContext } from '../lighting/LightingContextNode.js';
-import EnvironmentNode from '../lighting/EnvironmentNode.js';
 import IrradianceNode from '../lighting/IrradianceNode.js';
 import { depth } from '../display/ViewportDepthNode.js';
 import { cameraLogDepth } from '../accessors/CameraNode.js';
@@ -330,7 +329,7 @@ class NodeMaterial extends Material {
 
 	}
 
-	getEnvNode( builder ) {
+	setupEnvironment( builder ) {
 
 		let node = null;
 
@@ -352,29 +351,45 @@ class NodeMaterial extends Material {
 
 	}
 
-	setupLights( builder ) {
+	setupLightMap( builder ) {
 
-		const envNode = this.getEnvNode( builder );
-
-		//
-
-		const materialLightsNode = [];
-
-		if ( envNode ) {
-
-			materialLightsNode.push( new EnvironmentNode( envNode ) );
-
-		}
+		let node = null;
 
 		if ( builder.material.lightMap ) {
 
-			materialLightsNode.push( new IrradianceNode( materialReference( 'lightMap', 'texture' ) ) );
+			node = new IrradianceNode( materialLightMap );
+
+		}
+
+		return node;
+
+	}
+
+	setupLights( builder ) {
+
+		const materialLightsNode = [];
+
+		//
+
+		const envNode = this.setupEnvironment( builder );
+
+		if ( envNode && envNode.isLightingNode ) {
+
+			materialLightsNode.push( envNode );
+
+		}
+
+		const lightMapNode = this.setupLightMap( builder );
+
+		if ( lightMapNode && lightMapNode.isLightingNode ) {
+
+			materialLightsNode.push( lightMapNode );
 
 		}
 
 		if ( this.aoNode !== null || builder.material.aoMap ) {
 
-			const aoNode = this.aoNode !== null ? this.aoNode : texture( builder.material.aoMap );
+			const aoNode = this.aoNode !== null ? this.aoNode : materialAOMap;
 
 			materialLightsNode.push( new AONode( aoNode ) );
 

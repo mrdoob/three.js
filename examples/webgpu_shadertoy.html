@@ -169,7 +169,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { oscSine, timerLocal } from 'three/tsl';
+			import * as TSL from 'three/tsl';
 
 			import Transpiler from 'three/addons/transpiler/Transpiler.js';
 			import ShaderToyDecoder from 'three/addons/transpiler/ShaderToyDecoder.js';
@@ -203,7 +203,7 @@
 
 					const jsCode = this.transpile( glsl, true );
 
-					const { mainImage } = eval( jsCode )( THREE );
+					const { mainImage } = eval( jsCode )( TSL );
 
 					this.mainImage = mainImage;
 
@@ -258,7 +258,7 @@
 				const geometry = new THREE.PlaneGeometry( 2, 2 );
 
 				const material = new THREE.MeshBasicNodeMaterial();
-				material.colorNode = oscSine( timerLocal( .3 ) ).mix( shaderToy1Node, shaderToy2Node );
+				material.colorNode = TSL.oscSine( TSL.timerLocal( .3 ) ).mix( shaderToy1Node, shaderToy2Node );
 
 				const quad = new THREE.Mesh( geometry, material );
 				scene.add( quad );

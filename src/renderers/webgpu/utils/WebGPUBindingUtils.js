@@ -71,6 +71,12 @@ class WebGPUBindingUtils {
 
 				const texture = {}; // GPUTextureBindingLayout
 
+				if ( binding.texture.isMultisampleRenderTargetTexture === true ) {
+
+					texture.multisampled = true;
+
+				}
+
 				if ( binding.texture.isDepthTexture ) {
 
 					texture.sampleType = GPUTextureSampleType.Depth;
