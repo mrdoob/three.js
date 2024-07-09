@@ -61,6 +61,8 @@ class GaussianBlurNode extends TempNode {
 		const map = textureNode.value;
 
 		const currentRenderTarget = renderer.getRenderTarget();
+		const currentMRT = renderer.getMRT();
+
 		const currentTexture = textureNode.value;
 
 		quadMesh1.material = this._material;
@@ -72,6 +74,10 @@ class GaussianBlurNode extends TempNode {
 
 		this._horizontalRT.texture.type = textureType;
 		this._verticalRT.texture.type = textureType;
+
+		// clear
+
+		renderer.setMRT( null );
 
 		// horizontal
 
@@ -93,6 +99,7 @@ class GaussianBlurNode extends TempNode {
 		// restore
 
 		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setMRT( currentMRT );
 		textureNode.value = currentTexture;
 
 	}

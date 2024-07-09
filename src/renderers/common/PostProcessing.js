@@ -15,6 +15,22 @@ class PostProcessing {
 
 		this.needsUpdate = true;
 
+		this.mrt = null;
+
+	}
+
+	setMRT( mrt ) {
+
+		this.mrt = mrt;
+
+		return this;
+
+	}
+
+	getMRT() {
+
+		return this.mrt;
+
 	}
 
 	render() {
@@ -25,18 +41,22 @@ class PostProcessing {
 
 		const toneMapping = renderer.toneMapping;
 		const outputColorSpace = renderer.outputColorSpace;
+		const currentMRT = renderer.getMRT();
 
 		renderer.toneMapping = NoToneMapping;
 		renderer.outputColorSpace = LinearSRGBColorSpace;
 
 		//
 
-		quadMesh.render( this.renderer );
+		if ( this.mrt !== null ) renderer.setMRT( this.mrt );
+
+		quadMesh.render( renderer );
 
 		//
 
 		renderer.toneMapping = toneMapping;
 		renderer.outputColorSpace = outputColorSpace;
+		renderer.setMRT( currentMRT );
 
 	}
 
@@ -66,18 +86,22 @@ class PostProcessing {
 
 		const toneMapping = renderer.toneMapping;
 		const outputColorSpace = renderer.outputColorSpace;
+		const currentMRT = renderer.getMRT();
 
 		renderer.toneMapping = NoToneMapping;
 		renderer.outputColorSpace = LinearSRGBColorSpace;
 
 		//
 
-		await quadMesh.renderAsync( this.renderer );
+		if ( this.mrt !== null ) renderer.setMRT( this.mrt );
+
+		await quadMesh.renderAsync( renderer );
 
 		//
 
 		renderer.toneMapping = toneMapping;
 		renderer.outputColorSpace = outputColorSpace;
+		renderer.setMRT( currentMRT );
 
 	}
 
