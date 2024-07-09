@@ -236,7 +236,7 @@ class PassNode extends TempNode {
 		this._cameraFar.value = camera.far;
 
 		renderer.setRenderTarget( this.renderTarget );
-		if ( this._mrt !== null ) renderer.setMRT( this._mrt );
+		renderer.setMRT( this._mrt );
 
 		renderer.render( scene, camera );
 
