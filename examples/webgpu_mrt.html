@@ -89,6 +89,16 @@
 					emissive: emissive
 				} ) );
 
+				// optimize textures
+
+				const normalTexture = scenePass.getTexture( 'normal' );
+				const diffuseTexture = scenePass.getTexture( 'diffuse' );
+				const emissiveTexture = scenePass.getTexture( 'emissive' );
+
+				normalTexture.type = diffuseTexture.type = emissiveTexture.type = THREE.UnsignedByteType;
+
+				// post processing - mrt
+
 				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputColorTransform = false;
 				postProcessing.outputNode = tslFn( () => {
