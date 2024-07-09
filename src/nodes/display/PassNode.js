@@ -10,10 +10,6 @@ import { HalfFloatType/*, FloatType*/ } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { mrt } from '../core/MRTNode.js';
-import { output } from '../core/PropertyNode.js';
-import { normalWorld, transformedNormalWorld } from '../accessors/NormalNode.js';
-import { positionWorld } from '../accessors/PositionNode.js';
 
 const _size = new Vector2();
 
