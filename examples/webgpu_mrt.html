@@ -95,7 +95,7 @@
 
 				postProcessing.outputNode = tslFn( () => {
 
-					const output = scenePass.getTextureNode( 'output' );
+					const output = scenePass.getTextureNode( 'output' ); // output name is optional here
 					const normal = scenePass.getTextureNode( 'normal' );
 					const diffuse = scenePass.getTextureNode( 'diffuse' );
 					const emissive = scenePass.getTextureNode( 'emissive' );
