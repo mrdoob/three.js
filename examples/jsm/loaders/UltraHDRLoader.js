@@ -534,11 +534,11 @@ class UltraHDRLoader extends Loader {
 					const x = ( pixelIndex / 4 ) % sdrImage.width;
 					const y = Math.floor( pixelIndex / 4 / sdrImage.width );
 
-					for ( let index = pixelIndex; index < pixelIndex + 3; index ++ ) {
+					for ( let channelIndex = 0; channelIndex < 3; channelIndex ++ ) {
 
-						const sdrValue = sdrImageData.data[ index ];
+						const sdrValue = sdrImageData.data[ pixelIndex + channelIndex ];
 
-						const gainmapIndex = ( y * sdrImage.width + x ) * 4;
+						const gainmapIndex = ( y * sdrImage.width + x ) * 4 + channelIndex;
 						const gainmapValue = gainmapImageData.data[ gainmapIndex ] / 255.0;
 
 						/* Gamma is 1.0 by default */
@@ -547,28 +547,25 @@ class UltraHDRLoader extends Loader {
 							: Math.pow( gainmapValue, 1.0 / xmpMetadata.gamma );
 
 						const logBoost =
-							xmpMetadata.gainMapMin * ( 1.0 - logRecovery ) +
-							xmpMetadata.gainMapMax * logRecovery;
+						xmpMetadata.gainMapMin * ( 1.0 - logRecovery ) +
+						xmpMetadata.gainMapMax * logRecovery;
 
 						const hdrValue =
 						( sdrValue + xmpMetadata.offsetSDR ) *
-						( logBoost * weightFactor === 0.0
-							? 1.0
-							: Math.pow( 2, logBoost * weightFactor ) ) -
-					xmpMetadata.offsetHDR;
+							( logBoost * weightFactor === 0.0
+								? 1.0
+								: Math.pow( 2, logBoost * weightFactor ) ) -
+						xmpMetadata.offsetHDR;
 
 						const linearHDRValue = Math.min(
-							Math.max(
-								this._srgbToLinear( hdrValue ),
-								0
-							),
+							Math.max( this._srgbToLinear( hdrValue ), 0 ),
 							65504
 						);
 
-						hdrBuffer[ index ] =
-							this.type === HalfFloatType
-								? DataUtils.toHalfFloat( linearHDRValue )
-								: linearHDRValue;
+						hdrBuffer[ pixelIndex + channelIndex ] =
+						this.type === HalfFloatType
+							? DataUtils.toHalfFloat( linearHDRValue )
+							: linearHDRValue;
 
 					}
 
