@@ -29,14 +29,14 @@
 	<script type="module">
 
 		import * as THREE from 'three';
-		
+
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 		import { pass, mrt, output, pixelation, transformedNormalWorld, normalWorld, normalView, normalLocal, uniform, directionToColor, MeshNormalNodeMaterial} from 'three/tsl';
 
 		let camera, scene, renderer, postProcessing, crystalMesh, clock;
-		let gui, params;
+		let gui, effectController;
 
 		init();
 
@@ -130,25 +130,26 @@
 			renderer.setAnimationLoop( animate );
 			document.body.appendChild( renderer.domElement );
 
-			const effectController = {
-				pixelSize: uniform(14),
-				normalEdgeStrength: uniform(0.3),
-				depthEdgeStrength: uniform(0.4)
+			effectController = {
+				pixelSize: uniform( 14 ),
+				normalEdgeStrength: uniform( 0.3 ),
+				depthEdgeStrength: uniform( 0.4 ),
+				pixelAlignedPanning: true
 			}
 
 			postProcessing = new THREE.PostProcessing( renderer );
 
 			const scenePass = pass( scene, camera );
-			const normalMaterial = new MeshNormalNodeMaterial();
-			console.log(normalMaterial);
 			scenePass.setMRT( mrt( {
 				output: output,
 				normal: directionToColor(normalView),
 			} ) );
-			const colorNode = scenePass.getTextureNode('output');
-			const depthNode = scenePass.getTextureNode('depth');
-			const normalNode = scenePass.getTextureNode('normal')
+
+			const colorNode = scenePass.getTextureNode( 'output' );
+			const depthNode = scenePass.getTextureNode( 'depth' );
+			const normalNode = scenePass.getTextureNode( 'normal' )
 			postProcessing.outputNode = scenePass.getTextureNode('output').pixelation( depthNode, normalNode, effectController.pixelSize, effectController.normalEdgeStrength, effectController.depthEdgeStrength );
+
 			window.addEventListener( 'resize', onWindowResize );
 
 			const controls = new OrbitControls( camera, renderer.domElement );
@@ -157,9 +158,10 @@
 			// gui
 
 			gui = new GUI();
-			gui.add( effectController.pixelSize, 'value', 0, 14, 1).name( 'Pixel Size' );
+			gui.add( effectController.pixelSize, 'value', 1, 14, 1 ).name( 'Pixel Size' );
 			gui.add( effectController.normalEdgeStrength, 'value', 0, 2, 0.05 ).name( 'Normal Edge Strength' );
 			gui.add( effectController.depthEdgeStrength, 'value', 0, 1, 0.05 ).name( 'Depth Edge Strength' );
+			gui.add( effectController, 'pixelAlignedPanning' );
 
 
 		}
@@ -186,7 +188,14 @@
 			const rendererSize = renderer.getSize( new THREE.Vector2() );
 			const aspectRatio = rendererSize.x / rendererSize.y;
 
-			if ( camera.left != - aspectRatio || camera.top != 1.0 ) {
+			if ( effectController.pixelAlignedPanning ) {
+
+				const pixelSize = effectController.pixelSize.value;
+
+				pixelAlignFrustum( camera, aspectRatio, Math.floor( rendererSize.x / pixelSize ),
+					Math.floor( rendererSize.y / pixelSize ) );
+
+			} else if ( camera.left != - aspectRatio || camera.top != 1.0 ) {
 
 				// Reset the Camera Frustum if it has been modified
 				camera.left = - aspectRatio;
