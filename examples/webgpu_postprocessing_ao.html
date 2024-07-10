@@ -70,8 +70,9 @@
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output: output,
-					normal: transformedNormalWorld.directionToColor()
+					normal: transformedNormalWorld
 				} ) );
+				postProcessing.outputColorTransform = false;
 				const scenePassColor = scenePass.getTextureNode( 'output' );
 				const scenePassNormal = scenePass.getTextureNode( 'normal' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
