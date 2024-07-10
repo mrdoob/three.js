@@ -84,14 +84,6 @@ class UltraHDRLoader extends Loader {
 		const textDecoder = new TextDecoder();
 
 		const data = new DataView( buffer );
-		const dataAsString = textDecoder.decode( data );
-
-		/* Minimal sufficient validation - https://developer.android.com/media/platform/hdr-image-format#signal_of_the_format */
-		if ( ! dataAsString.includes( 'hdrgm:Version="1.0"' ) ) {
-
-			throw new Error( 'THREE.UltraHDRLoader: Not a valid UltraHDR image' );
-
-		}
 
 		let byteOffset = 0;
 		const sections = [];
@@ -147,9 +139,7 @@ class UltraHDRLoader extends Loader {
 			const { sectionType, section, sectionOffset } = sections[ i ];
 
 			if ( sectionType === 0xe0 ) {
-
 				/* JPEG Header - no useful information */
-
 			} else if ( sectionType === 0xe1 ) {
 
 				/* XMP Metadata */
@@ -230,6 +220,13 @@ class UltraHDRLoader extends Loader {
 				}
 
 			}
+
+		}
+
+		/* Minimal sufficient validation - https://developer.android.com/media/platform/hdr-image-format#signal_of_the_format */
+		if ( ! xmpMetadata.version ) {
+
+			throw new Error( 'THREE.UltraHDRLoader: Not a valid UltraHDR image' );
 
 		}
 
@@ -342,16 +339,14 @@ class UltraHDRLoader extends Loader {
 		);
 
 		if ( hasHDRContainerDescriptor ) {
-
 			/* There's not much useful information in the container descriptor besides memory-validation */
-
 		} else {
 
 			/* Gainmap descriptor - defaults from https://developer.android.com/media/platform/hdr-image-format#HDR_gain_map_metadata */
 
 			const [ gainmapNode ] = xmpXml.getElementsByTagName( 'rdf:Description' );
 
-			xmpMetadata.version = gainmapNode.getAttribute( 'hdrgm:Version' ) || '1.0';
+			xmpMetadata.version = gainmapNode.getAttribute( 'hdrgm:Version' );
 			xmpMetadata.baseRenditionIsHDR =
 				gainmapNode.getAttribute( 'hdrgm:BaseRenditionIsHDR' ) === 'True';
 			xmpMetadata.gainMapMin = parseFloat(
@@ -534,11 +529,11 @@ class UltraHDRLoader extends Loader {
 					const x = ( pixelIndex / 4 ) % sdrImage.width;
 					const y = Math.floor( pixelIndex / 4 / sdrImage.width );
 
-					for ( let index = pixelIndex; index < pixelIndex + 3; index ++ ) {
+					for ( let channelIndex = 0; channelIndex < 3; channelIndex ++ ) {
 
-						const sdrValue = sdrImageData.data[ index ];
+						const sdrValue = sdrImageData.data[ pixelIndex + channelIndex ];
 
-						const gainmapIndex = ( y * sdrImage.width + x ) * 4;
+						const gainmapIndex = ( y * sdrImage.width + x ) * 4 + channelIndex;
 						const gainmapValue = gainmapImageData.data[ gainmapIndex ] / 255.0;
 
 						/* Gamma is 1.0 by default */
@@ -551,21 +546,18 @@ class UltraHDRLoader extends Loader {
 							xmpMetadata.gainMapMax * logRecovery;
 
 						const hdrValue =
-						( sdrValue + xmpMetadata.offsetSDR ) *
-						( logBoost * weightFactor === 0.0
-							? 1.0
-							: Math.pow( 2, logBoost * weightFactor ) ) -
-					xmpMetadata.offsetHDR;
+							( sdrValue + xmpMetadata.offsetSDR ) *
+								( logBoost * weightFactor === 0.0
+									? 1.0
+									: Math.pow( 2, logBoost * weightFactor ) ) -
+							xmpMetadata.offsetHDR;
 
 						const linearHDRValue = Math.min(
-							Math.max(
-								this._srgbToLinear( hdrValue ),
-								0
-							),
+							Math.max( this._srgbToLinear( hdrValue ), 0 ),
 							65504
 						);
 
-						hdrBuffer[ index ] =
+						hdrBuffer[ pixelIndex + channelIndex ] =
 							this.type === HalfFloatType
 								? DataUtils.toHalfFloat( linearHDRValue )
 								: linearHDRValue;
