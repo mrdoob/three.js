@@ -44,7 +44,7 @@
 	"webgl_loader_ifc": [ "external" ],
 	"webgl_loader_ldraw": [ "lego" ],
 	"webgl_loader_pdb": [ "molecules", "css2d" ],
-	"webgl_loader_texture_hdrjpg": [ "external", "hdr", "jpg", "ultrahdr", "gainmap" ],
+	"webgl_loader_texture_ultrahdr": [ "hdr", "jpg", "ultrahdr" ],
 	"webgl_loader_ttf": [ "text", "font" ],
 	"webgl_lod": [ "level", "details" ],
 	"webgl_materials_blending": [ "alpha" ],
