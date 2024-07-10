@@ -10,12 +10,10 @@ import { HalfFloatType/*, FloatType*/ } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { MeshNormalMaterial } from '../../materials/MeshNormalMaterial.js';
-import MeshNormalNodeMaterial from '../materials/MeshNormalNodeMaterial.js';
 
 const _size = new Vector2();
 
-export class PassTextureNode extends TextureNode {
+class PassTextureNode extends TextureNode {
 
 	constructor( passNode, texture ) {
 
@@ -95,16 +93,6 @@ class PassNode extends TempNode {
 
 		this.renderTarget = renderTarget;
 
-		if ( this.scope === PassNode.NORMAL ) {
-
-			const normalTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType } );
-			normalTarget.texture.name = 'PostProcessingNormal';
-			this.normalRenderTarget = normalTarget;
-
-			this._normalTextureNode = nodeObject( new PassTextureNode( this, normalTarget.texture ) );
-
-		}
-
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		this._textures = {
@@ -181,12 +169,6 @@ class PassNode extends TempNode {
 
 	}
 
-	getTextureNormalNode() {
-
-		return this._normalTextureNode ? this._normalTextureNode : null;
-
-	}
-
 	getViewZNode() {
 
 		if ( this._viewZNode === null ) {
@@ -232,27 +214,7 @@ class PassNode extends TempNode {
 
 		this.renderTarget.depthTexture.isMultisampleRenderTargetTexture = this.renderTarget.samples > 1;
 
-		switch( this.scope ) {
-
-			case PassNode.COLOR: {
-
-				return this.getTextureNode();
-
-			};
-
-			case PassNode.DEPTH: {
-
-				return this.getLinearDepthNode();
-
-			};
-
-			case PassNode.NORMAL: {
-
-				return this.getTextureNormalNode();
-
-			}
-
-		}
+		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 
 	}
 
@@ -262,9 +224,8 @@ class PassNode extends TempNode {
 		const { scene, camera } = this;
 
 		this._pixelRatio = renderer.getPixelRatio();
-
+		
 		const size = renderer.getSize( _size );
-
 		this.setSize( size.width, size.height );
 
 		const currentRenderTarget = renderer.getRenderTarget();
@@ -277,16 +238,6 @@ class PassNode extends TempNode {
 		renderer.setMRT( this._mrt );
 
 		renderer.render( scene, camera );
-
-		if ( this._normalTextureNode ) {
-
-			renderer.setRenderTarget( this.normalRenderTarget );
-			const oldMaterial = scene.overrideMaterial;
-			scene.overrideMaterial = new MeshNormalNodeMaterial();
-			renderer.render( scene, camera );
-			scene.overrideMaterial = oldMaterial;
-
-		}
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
@@ -302,9 +253,6 @@ class PassNode extends TempNode {
 		const effectiveHeight = this._height * this._pixelRatio;
 
 		this.renderTarget.setSize( effectiveWidth, effectiveHeight );
-		if ( this.normalRenderTarget ) {
-			this.normalRenderTarget.setSize( effectiveWidth, effectiveHeight );
-		}
 
 	}
 
@@ -319,23 +267,19 @@ class PassNode extends TempNode {
 	dispose() {
 
 		this.renderTarget.dispose();
-		if (this.normalRenderTarget) {
-			this.normalRenderTarget.dispose()
-		}
 
 	}
+
 
 }
 
 PassNode.COLOR = 'color';
 PassNode.DEPTH = 'depth';
-PassNode.NORMAL = 'normal'
 
 export default PassNode;
 
 export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
 export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
 export const depthPass = ( scene, camera ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera ) );
-export const normalPass = ( scene, camera ) => nodeObject( new PassNode( PassNode.NORMAL, scene, camera ) );
 
 addNodeClass( 'PassNode', PassNode );
