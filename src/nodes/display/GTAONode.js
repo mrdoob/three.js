@@ -10,8 +10,8 @@ import { DataTexture } from '../../textures/DataTexture.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Noise } from '../../math/Noise.js';
-import { PI, cos, sin, pow, clamp, abs, max, mix, sqrt, acos } from '../math/MathNode.js';
-import { div, mul } from '../math/OperatorNode.js';
+import { PI, cos, sin, pow, clamp, abs, max, mix, sqrt, acos, dot, normalize, cross } from '../math/MathNode.js';
+import { div, mul, add, sub } from '../math/OperatorNode.js';
 import { loop } from '../utils/LoopNode.js';
 import { passTexture } from './PassNode.js';
 import { RepeatWrapping } from '../../constants.js';
@@ -128,13 +128,20 @@ class GTAONode extends TempNode {
 
 		} );
 
-		const getViewPosition = tslFn( ( [ screenPosition, depth ] )=> {
+		const getViewPosition = tslFn( ( [ screenPosition, depth ] ) => {
 
-			const clipSpacePosition = vec4( vec3( screenPosition.xy, depth ).mul( 2.0 ).sub( 1.0 ), 1.0 );
-			const viewSpacePosition = cameraProjectionMatrixInverse.mul( clipSpacePosition );
+			const clipSpacePosition = vec4( vec3( screenPosition, depth ).mul( 2.0 ).sub( 1.0 ), 1.0 ).toVar();
+			const viewSpacePosition = vec4( cameraProjectionMatrixInverse.mul( clipSpacePosition ) ).toVar();
 
 			return viewSpacePosition.xyz.div( viewSpacePosition.w );
 
+		} ).setLayout( {
+			name: 'getViewPosition',
+			type: 'vec3',
+			inputs: [
+				{ name: 'screenPosition', type: 'vec2', qualifier: 'in' },
+				{ name: 'depth', type: 'float', qualifier: 'in' }
+			]
 		} );
 
 		const ao = tslFn( () => {
@@ -157,23 +164,23 @@ class GTAONode extends TempNode {
 			const kernelMatrix = mat3( tangent, bitangent, vec3( 0.0, 0.0, 1.0 ) );
 
 			const DIRECTIONS = this.SAMPLES.lessThan( 30 ).cond( 3, 5 );
-			const STEPS = this.SAMPLES.add( DIRECTIONS.sub( 1 ) ).div( DIRECTIONS );
+			const STEPS = add( this.SAMPLES, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS );
 
 			let ao = float( 0 );
 
 			loop( DIRECTIONS, ( { i } ) => {
 
-				const angle = float( i ).div( DIRECTIONS ).mul( PI );
-				const sampleDir = vec4( cos( angle ), sin( angle ), 0.0, noiseTexel.w.mul( 0.5 ).add( 0.5 ) );
-				sampleDir.xyz = kernelMatrix.mul( sampleDir.xyz ).normalize();
+				const angle = float( i ).div( float( DIRECTIONS ).mul( PI ) );
+				const sampleDir = vec4( cos( angle ), sin( angle ), 0., add( 0.5, mul( 0.5, noiseTexel.w ) ) );
+				sampleDir.xyz = normalize( kernelMatrix.mul( sampleDir.xyz ) );
 
-				const viewDir = viewPosition.mul( - 1.0 ).normalize();
-				const sliceBitangent = sampleDir.xyz.cross( viewDir ).normalize();
-				const sliceTangent = sliceBitangent.cross( viewDir );
-				const normalInSlice = viewNormal.sub( sliceBitangent.mul( viewNormal.dot( sliceBitangent ) ) );
+				const viewDir = normalize( viewPosition.xyz.negate() );
+				const sliceBitangent = normalize( cross( sampleDir.xyz, viewDir ) );
+				const sliceTangent = cross( sliceBitangent, viewDir );
+				const normalInSlice = normalize( viewNormal.sub( sliceBitangent.mul( dot( viewNormal, sliceBitangent ) ) ) );
 
-				const tangentToNormalInSlice = normalInSlice.cross( sliceBitangent );
-				const cosHorizons = vec2( viewDir.dot( tangentToNormalInSlice ), viewDir.dot( tangentToNormalInSlice.mul( - 1.0 ) ) );
+				const tangentToNormalInSlice = cross( normalInSlice, sliceBitangent );
+				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) );
 
 				loop( STEPS, ( { i } ) => {
 
@@ -207,13 +214,13 @@ class GTAONode extends TempNode {
 
 				} );
 
-				const sinHorizons = sqrt( float( 1.0 ).sub( cosHorizons.mul( cosHorizons ) ) );
-				const nx = normalInSlice.dot( sliceTangent );
-				const ny = normalInSlice.dot( viewDir );
-				const nxb = float( 1.0 ).div( 2.0 ).mul( acos( cosHorizons.y ).sub( acos( cosHorizons.x ).add( sinHorizons.x.mul( cosHorizons.x ) ).sub( sinHorizons.y.mul( cosHorizons.y ) ) ) );
-				const nyb = float( 1.0 ).div( 2.0 ).mul( float( 2.0 ).sub( cosHorizons.x.mul( cosHorizons.x ) ).sub( cosHorizons.y.mul( cosHorizons.y ) ) );
+				const sinHorizons = sqrt( sub( 1., cosHorizons.mul( cosHorizons ) ) );
+				const nx = dot( normalInSlice, sliceTangent );
+				const ny = dot( normalInSlice, viewDir );
+				const nxb = div( 1.0, mul( 2.0, acos( cosHorizons.y ).sub( acos( cosHorizons.x ) ).add( sinHorizons.x.mul( cosHorizons.x ).sub( sinHorizons.y.mul( cosHorizons.y ) ) ) ) );
+				const nyb = div( 1.0, mul( 2.0, sub( 2.0, cosHorizons.x.mul( cosHorizons.x ) ).sub( cosHorizons.y.mul( cosHorizons.y ) ) ) );
 				const occlusion = nx.mul( nxb ).add( ny.mul( nyb ) );
-				ao = ao.add( occlusion );
+				ao.addAssign( occlusion );
 
 			} );
 
