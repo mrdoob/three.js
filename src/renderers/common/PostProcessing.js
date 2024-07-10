@@ -31,7 +31,7 @@ class PostProcessing {
 
 		//
 
-		quadMesh.render( this.renderer );
+		quadMesh.render( renderer );
 
 		//
 
@@ -72,7 +72,7 @@ class PostProcessing {
 
 		//
 
-		await quadMesh.renderAsync( this.renderer );
+		await quadMesh.renderAsync( renderer );
 
 		//
 

@@ -106,6 +106,8 @@
 
 				if ( validRedirects.has( file ) === true ) {
 
+					content.querySelector( `a[href="${ file }.html"]` ).scrollIntoView();
+
 					selectFile( file );
 					viewer.src = validRedirects.get( file );
 					viewer.style.display = 'unset';
