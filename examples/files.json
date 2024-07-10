@@ -373,6 +373,7 @@
 		"webgpu_postprocessing_3dlut",
 		"webgpu_postprocessing_afterimage",
 		"webgpu_postprocessing_anamorphic",
+		"webgpu_postprocessing_ao",
 		"webgpu_postprocessing_dof",
 		"webgpu_postprocessing_sobel",
 		"webgpu_postprocessing",
