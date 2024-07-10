@@ -175,33 +175,33 @@ class GTAONode extends TempNode {
 				const tangentToNormalInSlice = cross( normalInSlice, sliceBitangent );
 				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) );
 
-				loop( STEPS, ( { i } ) => {
+				loop( { end: STEPS, name: 'j' }, ( { j } ) => {
 
-					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( i ).add( 1.0 ), STEPS ), this.distanceExponent ) );
+					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( j ).add( 1.0 ), STEPS ), this.distanceExponent ) );
 
 					// x
 
-					let sampleSceneUvDepth = getSceneUvAndDepth( viewPosition.add( sampleViewOffset ) ).toVar();
+					let sampleSceneUvDepth = getSceneUvAndDepth( viewPosition.add( sampleViewOffset ) );
 					let sampleSceneViewPosition = getViewPosition( sampleSceneUvDepth.xy, sampleSceneUvDepth.z );
 					let viewDelta = sampleSceneViewPosition.sub( viewPosition );
 
 					If( abs( viewDelta.z ).lessThan( this.thickness ), () => {
 
 						const sampleCosHorizon = viewDir.dot( viewDelta.normalize() );
-						cosHorizons.x.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.x ), mix( 1.0, float( 2.0 ).div( float( i ).add( 2 ) ), this.distanceFallOff ) ) ) );
+						cosHorizons.x.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.x ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
 
 					} );
 
 					// y
 
-					sampleSceneUvDepth = getSceneUvAndDepth( viewPosition.sub( sampleViewOffset ) ).toVar();
+					sampleSceneUvDepth = getSceneUvAndDepth( viewPosition.sub( sampleViewOffset ) );
 					sampleSceneViewPosition = getViewPosition( sampleSceneUvDepth.xy, sampleSceneUvDepth.z );
 					viewDelta = sampleSceneViewPosition.sub( viewPosition );
 
 					If( abs( viewDelta.z ).lessThan( this.thickness ), () => {
 
 						const sampleCosHorizon = viewDir.dot( viewDelta.normalize() );
-						cosHorizons.y.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.y ), mix( 1.0, float( 2.0 ).div( float( i ).add( 2 ) ), this.distanceFallOff ) ) ) );
+						cosHorizons.y.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.y ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
 
 					} );
 
