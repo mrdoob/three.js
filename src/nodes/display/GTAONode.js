@@ -23,13 +23,14 @@ const _currentClearColor = new Color();
 
 class GTAONode extends TempNode {
 
-	constructor( textureNode, depthNode, normalNode, camera ) {
+	constructor( textureNode, depthNode, normalNode, positionViewNode, camera ) {
 
 		super();
 
 		this.textureNode = textureNode;
 		this.depthNode = depthNode;
 		this.normalNode = normalNode;
+		this.positionViewNode = positionViewNode;
 
 		this.radius = uniform( 0.25 );
 		this.resolution = uniform( new Vector2() );
@@ -145,7 +146,8 @@ class GTAONode extends TempNode {
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
-			const viewPosition = getViewPosition( uvNode, depth );
+			// const viewPosition = getViewPosition( uvNode, depth );
+			const viewPosition = this.positionViewNode.xyz;
 			const viewNormal = sampleNormal( uvNode ).rgb.normalize();
 
 			const radiusToUse = this.radius;
@@ -359,7 +361,7 @@ function generateMagicSquare( size ) {
 
 }
 
-export const ao = ( node, depthNode, normalNode, camera ) => nodeObject( new GTAONode( nodeObject( node ).toTexture(), nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
+export const ao = ( node, depthNode, normalNode, positionViewNode, camera ) => nodeObject( new GTAONode( nodeObject( node ).toTexture(), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( positionViewNode ), camera ) );
 
 addNodeElement( 'ao', ao );
 
