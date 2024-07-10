@@ -114,7 +114,7 @@ class GTAONode extends TempNode {
 
 		const uvNode = uv();
 
-		const sampleTexture = ( uv ) => textureNode.uv( uv );
+		// const sampleTexture = ( uv ) => textureNode.uv( uv );
 		const sampleDepth = ( uv ) => depthNode.uv( uv ).x;
 		const sampleNormal = ( uv ) => normalNode.uv( uv );
 		const sampleNoise = ( uv ) => noiseNode.uv( uv );
