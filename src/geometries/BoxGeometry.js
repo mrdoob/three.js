@@ -66,6 +66,8 @@ class BoxGeometry extends BufferGeometry {
 
 			const gridX1 = gridX + 1;
 			const gridY1 = gridY + 1;
+			const invGridX = 1 / gridX;
+			const invGridY = 1 / gridY;
 
 			let vertexCounter = 0;
 			let groupCount = 0;
@@ -104,8 +106,8 @@ class BoxGeometry extends BufferGeometry {
 
 					// uvs
 
-					uvs.push( ix / gridX );
-					uvs.push( 1 - ( iy / gridY ) );
+					uvs.push( ix * invGridX );
+					uvs.push( 1 - ( iy * invGridY ) );
 
 					// counters
 
