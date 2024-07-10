@@ -29,7 +29,8 @@ class PlaneGeometry extends BufferGeometry {
 		const segment_height = height / gridY;
 
 		//
-
+		const invGridX = 1 / gridX;
+       	const invGridY = 1 / gridY;
 		const indices = [];
 		const vertices = [];
 		const normals = [];
@@ -47,8 +48,8 @@ class PlaneGeometry extends BufferGeometry {
 
 				normals.push( 0, 0, 1 );
 
-				uvs.push( ix / gridX );
-				uvs.push( 1 - ( iy / gridY ) );
+				uvs.push( ix * invGridX );
+				uvs.push( 1 - ( iy * invGridY ) );
 
 			}
 
