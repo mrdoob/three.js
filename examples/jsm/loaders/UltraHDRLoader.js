@@ -13,7 +13,7 @@ import {
 } from 'three';
 
 // UltraHDR Image Format - https://developer.android.com/media/platform/hdr-image-format
-// Originally proposed as gainmap-js using a WASM dependency - https://github.com/MONOGRID/gainmap-js
+// HDR/EXR to UltraHDR Converter - https://gainmap-creator.monogrid.com/
 
 /**
  *
@@ -165,21 +165,21 @@ class UltraHDRLoader extends Loader {
 					/* Section contains a list of static bytes and ends with offsets indicating location of SDR and gainmap images */
 					/* First bytes after header indicate little / big endian ordering (0x49492A00 - LE / 0x4D4D002A - BE) */
 					/*
-            ... 60 bytes indicating tags, versions, etc. ...
+					... 60 bytes indicating tags, versions, etc. ...
 
-            bytes | bits | description
+					bytes | bits | description
 
-            4       32     primary image size
-            4       32     primary image offset
-            2       16     0x0000
-            2       16     0x0000
+					4       32     primary image size
+					4       32     primary image offset
+					2       16     0x0000
+					2       16     0x0000
 
-            4       32     0x00000000
-            4       32     gainmap image size
-            4       32     gainmap image offset
-            2       16     0x0000
-            2       16     0x0000
-          */
+					4       32     0x00000000
+					4       32     gainmap image size
+					4       32     gainmap image offset
+					2       16     0x0000
+					2       16     0x0000
+					*/
 
 					const mpfLittleEndian = sectionData.getUint32( 6 ) === 0x49492a00;
 					const mpfBytesOffset = 60;
