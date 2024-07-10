@@ -1,5 +1,4 @@
 import TempNode from '../core/TempNode.js';
-import { cameraProjectionMatrix, cameraProjectionMatrixInverse } from '../accessors/CameraNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
 import { uv } from '../accessors/UVNode.js';
@@ -24,7 +23,7 @@ const _currentClearColor = new Color();
 
 class GTAONode extends TempNode {
 
-	constructor( textureNode, depthNode, normalNode ) {
+	constructor( textureNode, depthNode, normalNode, camera ) {
 
 		super();
 
@@ -39,6 +38,9 @@ class GTAONode extends TempNode {
 		this.distanceFallOff = uniform( 1 );
 		this.scale = uniform( 1 );
 		this.noiseNode = texture( generateMagicSquareNoise() );
+
+		this.cameraProjectionMatrix = uniform( camera.projectionMatrix );
+		this.cameraProjectionMatrixInverse = uniform( camera.projectionMatrixInverse );
 
 		this.SAMPLES = uniform( 16 );
 
@@ -121,7 +123,7 @@ class GTAONode extends TempNode {
 
 		const getSceneUvAndDepth = tslFn( ( [ sampleViewPos ] )=> {
 
-			const sampleClipPos = cameraProjectionMatrix.mul( sampleViewPos, 1.0 );
+			const sampleClipPos = this.cameraProjectionMatrix.mul( sampleViewPos, 1.0 );
 			const sampleUv = sampleClipPos.xy.div( sampleClipPos.w.mul( 0.5 ).add( 0.5 ) );
 			const sampleSceneDepth = sampleDepth( sampleUv );
 			return vec3( sampleUv, sampleSceneDepth );
@@ -131,7 +133,7 @@ class GTAONode extends TempNode {
 		const getViewPosition = tslFn( ( [ screenPosition, depth ] ) => {
 
 			const clipSpacePosition = vec4( vec3( screenPosition, depth ).mul( 2.0 ).sub( 1.0 ), 1.0 );
-			const viewSpacePosition = vec4( cameraProjectionMatrixInverse.mul( clipSpacePosition ) );
+			const viewSpacePosition = vec4( this.cameraProjectionMatrixInverse.mul( clipSpacePosition ) );
 
 			return viewSpacePosition.xyz.div( viewSpacePosition.w );
 
@@ -357,7 +359,7 @@ function generateMagicSquare( size ) {
 
 }
 
-export const ao = ( node, depthNode, normalNode ) => nodeObject( new GTAONode( nodeObject( node ).toTexture(), nodeObject( depthNode ), nodeObject( normalNode ) ) );
+export const ao = ( node, depthNode, normalNode, camera ) => nodeObject( new GTAONode( nodeObject( node ).toTexture(), nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
 
 addNodeElement( 'ao', ao );
 
