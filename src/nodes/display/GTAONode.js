@@ -13,7 +13,14 @@ import { Noise } from '../../math/Noise.js';
 import { PI, cos, sin, pow, clamp, abs, max, mix, sqrt, acos } from '../math/MathNode.js';
 import { div, mul } from '../math/OperatorNode.js';
 import { loop } from '../utils/LoopNode.js';
+import { passTexture } from './PassNode.js';
 import { RepeatWrapping } from '../../constants.js';
+import QuadMesh from '../../renderers/common/QuadMesh.js';
+import { RenderTarget } from '../../core/RenderTarget.js';
+import { Color } from '../../math/Color.js';
+
+const _quadMesh = new QuadMesh();
+const _currentClearColor = new Color();
 
 class GTAONode extends TempNode {
 
@@ -35,25 +42,79 @@ class GTAONode extends TempNode {
 
 		this.SAMPLES = uniform( 16 );
 
+		this._aoRenderTarget = new RenderTarget();
+		this._aoRenderTarget.texture.name = 'GTAONode.AO';
+
+		this._material = null;
+		this._textureNode = passTexture( this, this._aoRenderTarget.texture );
+
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
 	}
 
-	updateBefore() {
+	getTextureNode() {
 
-		const map = this.textureNode.value;
-
-		this.resolution.value.set( map.image.width, map.image.height );
+		return this._textureNode;
 
 	}
 
-	setup() {
+	setSize( width, height ) {
 
-		const { /*textureNode,*/ depthNode, normalNode, noiseNode } = this;
+		this.resolution.value.set( width, height );
+		this._aoRenderTarget.setSize( width, height );
+
+	}
+
+	updateBefore( frame ) {
+
+		const { renderer } = frame;
+
+		const textureNode = this.textureNode;
+		const map = textureNode.value;
+
+		const currentRenderTarget = renderer.getRenderTarget();
+		const currentMRT = renderer.getMRT();
+		renderer.getClearColor( _currentClearColor );
+		const currentClearAlpha = renderer.getClearAlpha();
+
+
+		const currentTexture = textureNode.value;
+
+		_quadMesh.material = this._material;
+
+		this.setSize( map.image.width, map.image.height );
+
+
+		const textureType = map.type;
+
+		this._aoRenderTarget.texture.type = textureType;
+
+		// clear
+
+		renderer.setMRT( null );
+		renderer.setClearColor( 0xffffff, 1 );
+
+		// ao
+
+		renderer.setRenderTarget( this._aoRenderTarget );
+		_quadMesh.render( renderer );
+
+		// restore
+
+		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setMRT( currentMRT );
+		renderer.setClearColor( _currentClearColor, currentClearAlpha );
+		textureNode.value = currentTexture;
+
+	}
+
+	setup( builder ) {
+
+		const { textureNode, depthNode, normalNode, noiseNode } = this;
 
 		const uvNode = uv();
 
-		//const sampleTexture = ( uv ) => textureNode.uv( uv );
+		const sampleTexture = ( uv ) => textureNode.uv( uv );
 		const sampleDepth = ( uv ) => depthNode.uv( uv ).x;
 		const sampleNormal = ( uv ) => normalNode.uv( uv );
 		const sampleNoise = ( uv ) => noiseNode.uv( uv );
@@ -80,7 +141,7 @@ class GTAONode extends TempNode {
 
 			const depth = sampleDepth( uvNode );
 
-			depth.equal( 1.0 ).discard();
+			depth.greaterThanEqual( 1.0 ).discard();
 
 			const viewPosition = getViewPosition( uvNode, depth );
 			const viewNormal = sampleNormal( uvNode ).rgb.normalize();
@@ -163,9 +224,18 @@ class GTAONode extends TempNode {
 
 		} );
 
-		const outputNode = ao();
+		const material = this._material || ( this._material = builder.createNodeMaterial() );
+		material.fragmentNode = ao().context( builder.getSharedContext() );
+		material.needsUpdate = true;
 
-		return outputNode;
+		//
+
+		const properties = builder.getNodeProperties( this );
+		properties.textureNode = textureNode;
+
+		//
+
+		return this._textureNode;
 
 	}
 
