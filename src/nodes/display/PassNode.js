@@ -41,6 +41,32 @@ class PassTextureNode extends TextureNode {
 
 }
 
+class PassMultipleTextureNode extends PassTextureNode {
+
+	constructor( passNode, textureName ) {
+
+		super( passNode, null );
+
+		this.textureName = textureName;
+
+	}
+
+	setup( builder ) {
+
+		this.value = this.passNode.getTexture( this.textureName );
+
+		return super.setup( builder );
+
+	}
+
+	clone() {
+
+		return new this.constructor( this.passNode, this.textureName );
+
+	}
+
+}
+
 class PassNode extends TempNode {
 
 	constructor( scope, scene, camera, options = {} ) {
@@ -59,25 +85,45 @@ class PassNode extends TempNode {
 		const depthTexture = new DepthTexture();
 		depthTexture.isRenderTargetTexture = true;
 		//depthTexture.type = FloatType;
-		depthTexture.name = 'PostProcessingDepth';
+		depthTexture.name = 'depth';
 
-		const renderTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType, ...options } );
-		renderTarget.texture.name = 'PostProcessing';
+		const renderTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType, ...options, } );
+		renderTarget.texture.name = 'output';
 		renderTarget.depthTexture = depthTexture;
 
 		this.renderTarget = renderTarget;
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
-		this._textureNode = nodeObject( new PassTextureNode( this, renderTarget.texture ) );
-		this._depthTextureNode = nodeObject( new PassTextureNode( this, depthTexture ) );
+		this._textures = {
+			output: renderTarget.texture,
+			depth: depthTexture
+		};
+
+		this._nodes = {};
 
 		this._linearDepthNode = null;
 		this._viewZNode = null;
 		this._cameraNear = uniform( 0 );
 		this._cameraFar = uniform( 0 );
 
+		this._mrt = null;
+
 		this.isPassNode = true;
+
+	}
+
+	setMRT( mrt ) {
+
+		this._mrt = mrt;
+
+		return this;
+
+	}
+
+	getMRT() {
+
+		return this._mrt;
 
 	}
 
@@ -87,15 +133,39 @@ class PassNode extends TempNode {
 
 	}
 
-	getTextureNode() {
+	getTexture( name ) {
 
-		return this._textureNode;
+		let texture = this._textures[ name ];
+
+		if ( texture === undefined ) {
+
+			const refTexture = this.renderTarget.texture;
+
+			texture = refTexture.clone();
+			texture.isRenderTargetTexture = true;
+			texture.name = name;
+
+			this._textures[ name ] = texture;
+
+			this.renderTarget.textures.push( texture );
+
+		}
+
+		return texture;
 
 	}
 
-	getTextureDepthNode() {
+	getTextureNode( name = 'output' ) {
 
-		return this._depthTextureNode;
+		let textureNode = this._nodes[ name ];
+
+		if ( textureNode === undefined ) {
+
+			this._nodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
+
+		}
+
+		return textureNode;
 
 	}
 
@@ -106,7 +176,7 @@ class PassNode extends TempNode {
 			const cameraNear = this._cameraNear;
 			const cameraFar = this._cameraFar;
 
-			this._viewZNode = perspectiveDepthToViewZ( this._depthTextureNode, cameraNear, cameraFar );
+			this._viewZNode = perspectiveDepthToViewZ( this.getTextureNode( 'depth' ), cameraNear, cameraFar );
 
 		}
 
@@ -160,15 +230,18 @@ class PassNode extends TempNode {
 		this.setSize( size.width, size.height );
 
 		const currentRenderTarget = renderer.getRenderTarget();
+		const currentMRT = renderer.getMRT();
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
 
 		renderer.setRenderTarget( this.renderTarget );
+		renderer.setMRT( this._mrt );
 
 		renderer.render( scene, camera );
 
 		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setMRT( currentMRT );
 
 	}
 
@@ -207,7 +280,7 @@ PassNode.DEPTH = 'depth';
 export default PassNode;
 
 export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
-export const texturePass = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
+export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
 export const depthPass = ( scene, camera ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera ) );
 
 addNodeClass( 'PassNode', PassNode );

@@ -67,8 +67,9 @@ class Background extends DataMap {
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
 				nodeMaterial.fog = false;
+				nodeMaterial.lights = false;
 				nodeMaterial.vertexNode = viewProj;
-				nodeMaterial.fragmentNode = backgroundMeshNode;
+				nodeMaterial.colorNode = backgroundMeshNode;
 
 				sceneData.backgroundMeshNode = backgroundMeshNode;
 				sceneData.backgroundMesh = backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );

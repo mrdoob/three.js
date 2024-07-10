@@ -3,7 +3,7 @@ import { nodeObject, addNodeElement, tslFn, float, vec2, vec4 } from '../shadern
 import { NodeUpdateType } from '../core/constants.js';
 import { mul } from '../math/OperatorNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { texturePass } from './PassNode.js';
+import { passTexture } from './PassNode.js';
 import { uniform } from '../core/UniformNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
@@ -34,7 +34,7 @@ class GaussianBlurNode extends TempNode {
 		this._verticalRT = new RenderTarget();
 		this._verticalRT.texture.name = 'GaussianBlurNode.vertical';
 
-		this._textureNode = texturePass( this, this._verticalRT.texture );
+		this._textureNode = passTexture( this, this._verticalRT.texture );
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
@@ -61,6 +61,8 @@ class GaussianBlurNode extends TempNode {
 		const map = textureNode.value;
 
 		const currentRenderTarget = renderer.getRenderTarget();
+		const currentMRT = renderer.getMRT();
+
 		const currentTexture = textureNode.value;
 
 		quadMesh1.material = this._material;
@@ -72,6 +74,10 @@ class GaussianBlurNode extends TempNode {
 
 		this._horizontalRT.texture.type = textureType;
 		this._verticalRT.texture.type = textureType;
+
+		// clear
+
+		renderer.setMRT( null );
 
 		// horizontal
 
@@ -93,6 +99,7 @@ class GaussianBlurNode extends TempNode {
 		// restore
 
 		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setMRT( currentMRT );
 		textureNode.value = currentTexture;
 
 	}

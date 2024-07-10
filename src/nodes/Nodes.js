@@ -26,13 +26,14 @@ export { default as NodeUniform } from './core/NodeUniform.js';
 export { default as NodeVar } from './core/NodeVar.js';
 export { default as NodeVarying } from './core/NodeVarying.js';
 export { default as ParameterNode, parameter } from './core/ParameterNode.js';
-export { default as PropertyNode, property, varyingProperty, output, diffuseColor, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, shininess, dashSize, gapSize, pointWidth, alphaT, anisotropy, anisotropyB, anisotropyT } from './core/PropertyNode.js';
+export { default as PropertyNode, property, varyingProperty, output, diffuseColor, emissive, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, shininess, dashSize, gapSize, pointWidth, alphaT, anisotropy, anisotropyB, anisotropyT } from './core/PropertyNode.js';
 export { default as StackNode, stack } from './core/StackNode.js';
 export { default as TempNode } from './core/TempNode.js';
 export { default as UniformGroupNode, uniformGroup, objectGroup, renderGroup, frameGroup } from './core/UniformGroupNode.js';
 export { default as UniformNode, uniform } from './core/UniformNode.js';
 export { default as VaryingNode, varying } from './core/VaryingNode.js';
 export { default as OutputStructNode, outputStruct } from './core/OutputStructNode.js';
+export { default as MRTNode, mrt } from './core/MRTNode.js';
 
 import * as NodeUtils from './core/NodeUtils.js';
 export { NodeUtils };
@@ -135,7 +136,7 @@ export { default as FilmNode, film } from './display/FilmNode.js';
 export { default as Lut3DNode, lut3D } from './display/Lut3DNode.js';
 export { default as RenderOutputNode, renderOutput } from './display/RenderOutputNode.js';
 
-export { default as PassNode, pass, texturePass, depthPass } from './display/PassNode.js';
+export { default as PassNode, pass, passTexture, depthPass } from './display/PassNode.js';
 
 // code
 export { default as ExpressionNode, expression } from './code/ExpressionNode.js';
