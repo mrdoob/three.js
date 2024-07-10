@@ -130,18 +130,11 @@ class GTAONode extends TempNode {
 
 		const getViewPosition = tslFn( ( [ screenPosition, depth ] ) => {
 
-			const clipSpacePosition = vec4( vec3( screenPosition, depth ).mul( 2.0 ).sub( 1.0 ), 1.0 ).toVar();
-			const viewSpacePosition = vec4( cameraProjectionMatrixInverse.mul( clipSpacePosition ) ).toVar();
+			const clipSpacePosition = vec4( vec3( screenPosition, depth ).mul( 2.0 ).sub( 1.0 ), 1.0 );
+			const viewSpacePosition = vec4( cameraProjectionMatrixInverse.mul( clipSpacePosition ) );
 
 			return viewSpacePosition.xyz.div( viewSpacePosition.w );
 
-		} ).setLayout( {
-			name: 'getViewPosition',
-			type: 'vec3',
-			inputs: [
-				{ name: 'screenPosition', type: 'vec2', qualifier: 'in' },
-				{ name: 'depth', type: 'float', qualifier: 'in' }
-			]
 		} );
 
 		const ao = tslFn( () => {
