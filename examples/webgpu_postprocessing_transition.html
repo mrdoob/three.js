@@ -9,8 +9,8 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl scene transitions<br/>
-			by <a href="https://twitter.com/fernandojsg">fernandojsg</a> - <a href="https://github.com/kile/three.js-demos">github</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu scene transitions.<br/>
+			Original implementation by <a href="https://twitter.com/fernandojsg">fernandojsg</a> - <a href="https://github.com/kile/three.js-demos">github</a>
 		</div>
 
 		<script type="importmap">
@@ -31,7 +31,7 @@
 			import TWEEN from 'three/addons/libs/tween.module.js';
 			import { uniform, transition, pass } from 'three/tsl'
 
-			let renderer, postProcessing, renderTransitionPass;
+			let renderer, postProcessing;
 
 			const textures = [];
 			const clock = new THREE.Clock();
@@ -163,9 +163,6 @@
 
 				postProcessing.outputNode = transition( scenePassA, scenePassB, textures[ effectController.texture ], effectController.mixRatio, effectController.threshold );
 
-				//stats = new Stats();
-				//document.body.appendChild( stats.dom );
-
 				const gui = new GUI();
 
 				gui.add( effectController, 'animateScene' ).name( 'Animate Scene' );
@@ -210,7 +207,6 @@
 				fxSceneB.update( delta );
 
 				render();
-				//stats.update();
 
 			}
 

@@ -6,7 +6,7 @@ import { clamp, mix } from '../math/MathNode.js';
 
 class TransitionNode extends TempNode {
 
-	constructor( textureNodeA, textureNodeB, mixTextureNode, mixRatioNode, thresholdNode, useTextureNode ) {
+	constructor( textureNodeA, textureNodeB, mixTextureNode, mixRatioNode, thresholdNode ) {
 
 		super();
 
@@ -20,7 +20,6 @@ class TransitionNode extends TempNode {
 
 		this.mixRatioNode = mixRatioNode;
 		this.thresholdNode = thresholdNode;
-		this.useTextureNode = useTextureNode;
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
@@ -28,7 +27,7 @@ class TransitionNode extends TempNode {
 
 	setup() {
 
-		const { textureNodeA, textureNodeB, mixTextureNode, mixRatioNode, thresholdNode, useTextureNode } = this;
+		const { textureNodeA, textureNodeB, mixTextureNode, mixRatioNode, thresholdNode } = this;
 
 		const sampleTexture = ( textureNode ) => {
 
