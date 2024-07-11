@@ -210,15 +210,7 @@ class PixelationNode extends TempNode {
 
 			const strength = dei.greaterThan( 0 ).cond( float( 1.0 ).sub( dei.mul( this.depthEdgeStrength ) ), nei.mul( this.normalEdgeStrength ).add( 1 ) );
 
-			const color = texel.mul( strength );
-
-			return color;
-
-		} );
-
-		const lowerResolution = tslFn( () => {
-
-			return samplePixel();
+			return texel.mul( strength );
 
 		} );
 
@@ -228,6 +220,7 @@ class PixelationNode extends TempNode {
 
 		const lowerResolutionMaterial = this._lowerResolutionMaterial || ( this._lowerResolutionMaterial = builder.createNodeMaterial() );
 		lowerResolutionMaterial.fragmentNode = samplePixel().context( builder.getSharedContext() );
+		lowerResolutionMaterial.needsUpdate = true;
 
 		const properties = builder.getNodeProperties( this );
 		properties.textureNode = textureNode;
