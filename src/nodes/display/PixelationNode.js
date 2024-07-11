@@ -9,6 +9,7 @@ import { property } from '../core/PropertyNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { passTexture } from './PassNode.js';
+import { NearestFilter } from '../../constants.js';
 
 const createEdgesQuad = new QuadMesh();
 const lowerResolutionQuad = new QuadMesh();
@@ -39,8 +40,12 @@ class PixelationNode extends TempNode {
 
 		this._createEdgesRT = new RenderTarget();
 		this._createEdgesRT.texture.name = 'PixelationNode.renderEdges';
+		this._createEdgesRT.texture.minFilter = NearestFilter;
+		this._createEdgesRT.texture.magFilter = NearestFilter;
 		this._lowerResolutionRT = new RenderTarget();
 		this._lowerResolutionRT.texture.name = 'PixelationNode.lowerResolution';
+		this._lowerResolutionRT.texture.minFilter = NearestFilter;
+		this._lowerResolutionRT.texture.magFilter = NearestFilter;
 
 		// Output textures
 
