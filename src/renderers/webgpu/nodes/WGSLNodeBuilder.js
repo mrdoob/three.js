@@ -1157,6 +1157,8 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 
 		return `${ this.getSignature() }
 
+diagnostic( off, derivative_uniformity );
+
 // uniforms
 ${shaderData.uniforms}
 
