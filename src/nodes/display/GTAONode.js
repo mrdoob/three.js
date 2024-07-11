@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, nodeObject, tslFn, mat3, vec2, vec3, vec4, float, If } from '../shadernode/ShaderNode.js';
+import { addNodeElement, nodeObject, tslFn, mat3, vec2, vec3, vec4, float, int, If } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { DataTexture } from '../../textures/DataTexture.js';
@@ -151,7 +151,8 @@ class GTAONode extends TempNode {
 			const radiusToUse = this.radius;
 
 			const noiseResolution = textureSize( this.noiseNode, 0 );
-			const noiseUv = uvNode.xy.mul( this.resolution.div( noiseResolution ) );
+			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
+			noiseUv = noiseUv.mul( this.resolution.div( noiseResolution ) );
 			const noiseTexel = sampleNoise( noiseUv );
 			const randomVec = noiseTexel.xyz.mul( 2.0 ).sub( 1.0 );
 			const tangent = vec3( randomVec.xy, 0.0 ).normalize();
@@ -163,9 +164,9 @@ class GTAONode extends TempNode {
 
 			let ao = float( 0 );
 
-			loop( DIRECTIONS, ( { i } ) => {
+			loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
-				const angle = float( i ).div( float( DIRECTIONS ).mul( PI ) );
+				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI );
 				const sampleDir = vec4( cos( angle ), sin( angle ), 0., add( 0.5, mul( 0.5, noiseTexel.w ) ) );
 				sampleDir.xyz = normalize( kernelMatrix.mul( sampleDir.xyz ) );
 
@@ -177,7 +178,7 @@ class GTAONode extends TempNode {
 				const tangentToNormalInSlice = cross( normalInSlice, sliceBitangent );
 				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) );
 
-				loop( { end: STEPS, name: 'j' }, ( { j } ) => {
+				loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
 
 					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( j ).add( 1.0 ), STEPS ), this.distanceExponent ) );
 
@@ -209,11 +210,11 @@ class GTAONode extends TempNode {
 
 				} );
 
-				const sinHorizons = sqrt( sub( 1., cosHorizons.mul( cosHorizons ) ) );
+				const sinHorizons = sqrt( sub( 1.0, cosHorizons.mul( cosHorizons ) ) );
 				const nx = dot( normalInSlice, sliceTangent );
 				const ny = dot( normalInSlice, viewDir );
-				const nxb = div( 1.0, mul( 2.0, acos( cosHorizons.y ).sub( acos( cosHorizons.x ) ).add( sinHorizons.x.mul( cosHorizons.x ).sub( sinHorizons.y.mul( cosHorizons.y ) ) ) ) );
-				const nyb = div( 1.0, mul( 2.0, sub( 2.0, cosHorizons.x.mul( cosHorizons.x ) ).sub( cosHorizons.y.mul( cosHorizons.y ) ) ) );
+				const nxb = mul( 0.5, acos( cosHorizons.y ).sub( acos( cosHorizons.x ) ).add( sinHorizons.x.mul( cosHorizons.x ).sub( sinHorizons.y.mul( cosHorizons.y ) ) ) );
+				const nyb = mul( 0.5, sub( 2.0, cosHorizons.x.mul( cosHorizons.x ) ).sub( cosHorizons.y.mul( cosHorizons.y ) ) );
 				const occlusion = nx.mul( nxb ).add( ny.mul( nyb ) );
 				ao.addAssign( occlusion );
 
