@@ -20,7 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, mrt, output, transformedNormalView } from 'three/tsl';
+			import { pass, mrt, output, transformedNormalView, uniform, mix, vec3 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -28,8 +28,14 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer, postProcessing, controls, clock, stats, mixer;
+
+			const params = {
+				blendIntensity: 1,
+				enabled: true
+			};
 
 			init();
 
@@ -101,6 +107,31 @@
 				mixer.clipAction( gltf.animations[ 0 ] ).play();
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				//
+
+				const gui = new GUI();
+				gui.title( 'AO settings' );
+				gui.add( params, 'blendIntensity' ).min( 0 ).max( 1 ).onChange( ( value ) => {
+
+					aoPass.blendIntensity.value = value;
+
+				} );
+				gui.add( params, 'enabled' ).onChange( ( value ) => {
+			
+					if ( value === true ) {
+
+						postProcessing.outputNode = aoPass;
+
+					} else {
+
+						postProcessing.outputNode = scenePassColor;
+
+					}
+
+					postProcessing.needsUpdate = true;
+
+				} );
 
 			}
 
