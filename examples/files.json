@@ -377,6 +377,7 @@
 		"webgpu_postprocessing_dof",
 		"webgpu_postprocessing_fxaa",
 		"webgpu_postprocessing_sobel",
+		"webgpu_postprocessing_transition",
 		"webgpu_postprocessing",
 		"webgpu_procedural_texture",
 		"webgpu_reflection",

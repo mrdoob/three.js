@@ -136,6 +136,7 @@ export { default as FilmNode, film } from './display/FilmNode.js';
 export { default as Lut3DNode, lut3D } from './display/Lut3DNode.js';
 export { default as GTAONode, ao } from './display/GTAONode.js';
 export { default as FXAANode, fxaa } from './display/FXAANode.js';
+export { default as TransitionNode, transition } from './display/TransitionNode.js';
 export { default as RenderOutputNode, renderOutput } from './display/RenderOutputNode.js';
 
 export { default as PassNode, pass, passTexture, depthPass } from './display/PassNode.js';
