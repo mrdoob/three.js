@@ -20,7 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, mrt, output, transformedNormalView, positionView } from 'three/tsl';
+			import { pass, mrt, output, transformedNormalView } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -70,16 +70,14 @@
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
 					output: output,
-					normal: transformedNormalView,
-					view: positionView
+					normal: transformedNormalView
 				} ) );
 				postProcessing.outputColorTransform = false;
 				const scenePassColor = scenePass.getTextureNode( 'output' );
 				const scenePassNormal = scenePass.getTextureNode( 'normal' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
-				const scenePassView = scenePass.getTextureNode( 'view' );
 
-				const aoPass = scenePassColor.ao( scenePassDepth, scenePassNormal, scenePassView, camera );
+				const aoPass = scenePassColor.ao( scenePassDepth, scenePassNormal, camera );
 
 				postProcessing.outputNode = aoPass;
 

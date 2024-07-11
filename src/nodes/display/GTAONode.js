@@ -8,7 +8,6 @@ import { uniform } from '../core/UniformNode.js';
 import { DataTexture } from '../../textures/DataTexture.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
-import { Noise } from '../../math/Noise.js';
 import { PI, cos, sin, pow, clamp, abs, max, mix, sqrt, acos, dot, normalize, cross } from '../math/MathNode.js';
 import { div, mul, add, sub } from '../math/OperatorNode.js';
 import { loop } from '../utils/LoopNode.js';
@@ -23,14 +22,13 @@ const _currentClearColor = new Color();
 
 class GTAONode extends TempNode {
 
-	constructor( textureNode, depthNode, normalNode, positionViewNode, camera ) {
+	constructor( textureNode, depthNode, normalNode, camera ) {
 
 		super();
 
 		this.textureNode = textureNode;
 		this.depthNode = depthNode;
 		this.normalNode = normalNode;
-		this.positionViewNode = positionViewNode;
 
 		this.radius = uniform( 0.25 );
 		this.resolution = uniform( new Vector2() );
@@ -113,19 +111,18 @@ class GTAONode extends TempNode {
 
 	setup( builder ) {
 
-		const { textureNode, depthNode, normalNode, noiseNode } = this;
+		const { textureNode } = this;
 
 		const uvNode = uv();
 
 		// const sampleTexture = ( uv ) => textureNode.uv( uv );
-		const sampleDepth = ( uv ) => depthNode.uv( uv ).x;
-		const sampleNormal = ( uv ) => normalNode.uv( uv );
-		const sampleNoise = ( uv ) => noiseNode.uv( uv );
+		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
+		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
 
 		const getSceneUvAndDepth = tslFn( ( [ sampleViewPos ] )=> {
 
 			const sampleClipPos = this.cameraProjectionMatrix.mul( sampleViewPos, 1.0 );
-			const sampleUv = sampleClipPos.xy.div( sampleClipPos.w.mul( 0.5 ).add( 0.5 ) );
+			const sampleUv = sampleClipPos.xy.div( sampleClipPos.w );
 			const sampleSceneDepth = sampleDepth( sampleUv );
 			return vec3( sampleUv, sampleSceneDepth );
 
@@ -133,7 +130,9 @@ class GTAONode extends TempNode {
 
 		const getViewPosition = tslFn( ( [ screenPosition, depth ] ) => {
 
-			const clipSpacePosition = vec4( vec3( screenPosition, depth ).mul( 2.0 ).sub( 1.0 ), 1.0 );
+			screenPosition = vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 );
+
+			const clipSpacePosition = vec4( vec3( screenPosition, depth ), 1.0 );
 			const viewSpacePosition = vec4( this.cameraProjectionMatrixInverse.mul( clipSpacePosition ) );
 
 			return viewSpacePosition.xyz.div( viewSpacePosition.w );
@@ -146,9 +145,8 @@ class GTAONode extends TempNode {
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
-			// const viewPosition = getViewPosition( uvNode, depth );
-			const viewPosition = this.positionViewNode.xyz;
-			const viewNormal = sampleNormal( uvNode ).rgb.normalize();
+			const viewPosition = getViewPosition( uvNode, depth );
+			const viewNormal = this.normalNode.rgb.normalize();
 
 			const radiusToUse = this.radius;
 
@@ -243,38 +241,6 @@ class GTAONode extends TempNode {
 
 	}
 
-	generateNoise( size = 64 ) {
-
-		const simplex = new Noise();
-
-		const arraySize = size * size * 4;
-		const data = new Uint8Array( arraySize );
-
-		for ( let i = 0; i < size; i ++ ) {
-
-			for ( let j = 0; j < size; j ++ ) {
-
-				const x = i;
-				const y = j;
-
-				data[ ( i * size + j ) * 4 ] = ( simplex.noise2d( x, y ) * 0.5 + 0.5 ) * 255;
-				data[ ( i * size + j ) * 4 + 1 ] = ( simplex.noise2d( x + size, y ) * 0.5 + 0.5 ) * 255;
-				data[ ( i * size + j ) * 4 + 2 ] = ( simplex.noise2d( x, y + size ) * 0.5 + 0.5 ) * 255;
-				data[ ( i * size + j ) * 4 + 3 ] = ( simplex.noise2d( x + size, y + size ) * 0.5 + 0.5 ) * 255;
-
-			}
-
-		}
-
-		const noiseTexture = new DataTexture( data, size, size );
-		noiseTexture.wrapS = RepeatWrapping;
-		noiseTexture.wrapT = RepeatWrapping;
-		noiseTexture.needsUpdate = true;
-
-		return noiseTexture;
-
-	}
-
 }
 
 function generateMagicSquareNoise( size = 5 ) {
@@ -361,7 +327,7 @@ function generateMagicSquare( size ) {
 
 }
 
-export const ao = ( node, depthNode, normalNode, positionViewNode, camera ) => nodeObject( new GTAONode( nodeObject( node ).toTexture(), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( positionViewNode ), camera ) );
+export const ao = ( node, depthNode, normalNode, camera ) => nodeObject( new GTAONode( nodeObject( node ).toTexture(), nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
 
 addNodeElement( 'ao', ao );
 
