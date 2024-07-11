@@ -33,7 +33,7 @@
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-		import { pass, mrt, output, pixelation, transformedNormalWorld, normalWorld, normalView, normalLocal, uniform, directionToColor, MeshNormalNodeMaterial} from 'three/tsl';
+		import { pass, mrt, output, normalView, uniform, directionToColor } from 'three/tsl';
 
 		let camera, scene, renderer, postProcessing, crystalMesh, clock;
 		let gui, effectController;
@@ -147,7 +147,7 @@
 
 			const colorNode = scenePass.getTextureNode( 'output' );
 			const depthNode = scenePass.getTextureNode( 'depth' );
-			const normalNode = scenePass.getTextureNode( 'normal' )
+			const normalNode = scenePass.getTextureNode( 'normal' );
 			postProcessing.outputNode = scenePass.getTextureNode('output').pixelation( depthNode, normalNode, effectController.pixelSize, effectController.normalEdgeStrength, effectController.depthEdgeStrength );
 
 			window.addEventListener( 'resize', onWindowResize );

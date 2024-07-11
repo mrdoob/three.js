@@ -152,7 +152,7 @@ class PixelationNode extends TempNode {
 			const normalIndicator = clamp( smoothstep( - 0.01, 0.01, normalDiff ), 0.0, 1.0 );
 
 			// Only the shallower pixel should detect the normal edge.
-			
+
 			const depthIndicator = clamp( sign( depthDiff.mul( .25 ).add( .0025 ) ), 0.0, 1.0 );
 
 			return float( 1.0 ).sub( dot( normal, neighborNormal ) ).mul( depthIndicator ).mul( normalIndicator );
