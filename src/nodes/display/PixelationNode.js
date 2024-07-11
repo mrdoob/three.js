@@ -28,7 +28,7 @@ class PixelationNode extends TempNode {
 
 		// Input uniforms
 
-		this.pixelSizeNode = pixelSizeNode;
+		this.pixelSize = pixelSize;
 		this.normalEdgeStrength = normalEdgeStrength;
 		this.depthEdgeStrength = depthEdgeStrength;
 
@@ -71,8 +71,8 @@ class PixelationNode extends TempNode {
 
 		// Set resolution uniform
 
-		const adjustedWidth = map.image.width / this.pixelSizeNode.value;
-		const adjustedHeight = map.image.height / this.pixelSizeNode.value;
+		const adjustedWidth = Math.floor( map.image.width / this.pixelSizeNode.value );
+		const adjustedHeight = Math.floor( map.image.height / this.pixelSizeNode.value );
 		this._resolution.value.set( adjustedWidth, adjustedHeight, 1 / adjustedWidth, 1 / adjustedHeight );
 
 		const currentRenderTarget = renderer.getRenderTarget();
@@ -97,6 +97,7 @@ class PixelationNode extends TempNode {
 		createEdgesQuad.render( renderer );
 
 		// Set input of next pass to output of last step.
+		
 		textureNode.value = this._createEdgesRT.texture;
 
 		// Apply lower resolution post-process step to lowerResolutionQuad.
@@ -237,7 +238,7 @@ class PixelationNode extends TempNode {
 
 }
 
-export const pixelation = ( node, depthNode, normalNode, pixelSize = 14, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
+export const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
 
 addNodeElement( 'pixelation', pixelation );
 
