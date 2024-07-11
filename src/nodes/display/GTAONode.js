@@ -162,7 +162,7 @@ class GTAONode extends TempNode {
 			const DIRECTIONS = this.SAMPLES.lessThan( 30 ).cond( 3, 5 );
 			const STEPS = add( this.SAMPLES, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS );
 
-			let ao = float( 0 ).toVar();
+			const ao = float( 0 ).toVar();
 
 			loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
@@ -220,8 +220,8 @@ class GTAONode extends TempNode {
 
 			} );
 
-			ao = clamp( ao.div( DIRECTIONS ), 0, 1 );
-			ao = pow( ao, this.scale );
+			ao.assign( clamp( ao.div( DIRECTIONS ), 0, 1 ) );
+			ao.assign( pow( ao, this.scale ) );
 
 			return vec4( vec3( ao ), 1.0 );
 
