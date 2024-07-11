@@ -122,7 +122,7 @@ class GTAONode extends TempNode {
 		const getSceneUvAndDepth = tslFn( ( [ sampleViewPos ] )=> {
 
 			const sampleClipPos = this.cameraProjectionMatrix.mul( sampleViewPos, 1.0 );
-			const sampleUv = sampleClipPos.xy.div( sampleClipPos.w );
+			const sampleUv = sampleClipPos.xy.div( sampleClipPos.w ).mul( 0.5 ).add( 0.5 );
 			const sampleSceneDepth = sampleDepth( sampleUv );
 			return vec3( sampleUv, sampleSceneDepth );
 
@@ -162,7 +162,7 @@ class GTAONode extends TempNode {
 			const DIRECTIONS = this.SAMPLES.lessThan( 30 ).cond( 3, 5 );
 			const STEPS = add( this.SAMPLES, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS );
 
-			let ao = float( 0 );
+			let ao = float( 0 ).toVar();
 
 			loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
@@ -176,11 +176,11 @@ class GTAONode extends TempNode {
 				const normalInSlice = normalize( viewNormal.sub( sliceBitangent.mul( dot( viewNormal, sliceBitangent ) ) ) );
 
 				const tangentToNormalInSlice = cross( normalInSlice, sliceBitangent );
-				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) );
+				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) ).toVar();
 
 				loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
 
-					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( j ).add( 1.0 ), STEPS ), this.distanceExponent ) );
+					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( j ).add( 1.0 ), float( STEPS ) ), this.distanceExponent ) );
 
 					// x
 
