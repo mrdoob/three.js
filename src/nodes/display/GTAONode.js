@@ -36,6 +36,7 @@ class GTAONode extends TempNode {
 		this.distanceExponent = uniform( 1 );
 		this.distanceFallOff = uniform( 1 );
 		this.scale = uniform( 1 );
+		this.blendIntensity = uniform( 1 );
 		this.noiseNode = texture( generateMagicSquareNoise() );
 
 		this.cameraProjectionMatrix = uniform( camera.projectionMatrix );
@@ -50,12 +51,6 @@ class GTAONode extends TempNode {
 		this._textureNode = passTexture( this, this._aoRenderTarget.texture );
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
-
-	}
-
-	getTextureNode() {
-
-		return this._textureNode;
 
 	}
 
@@ -115,7 +110,7 @@ class GTAONode extends TempNode {
 
 		const uvNode = uv();
 
-		// const sampleTexture = ( uv ) => textureNode.uv( uv );
+		const sampleTexture = ( uv ) => textureNode.uv( uv );
 		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
 		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
 
@@ -228,18 +223,22 @@ class GTAONode extends TempNode {
 
 		} );
 
+		const composite = tslFn( () => {
+
+			const beauty = sampleTexture( uvNode );
+			const ao = this._textureNode.uv( uvNode );
+
+			return beauty.mul( mix( vec3( 1.0 ), ao, this.blendIntensity ) );
+
+		} );
+
 		const material = this._material || ( this._material = builder.createNodeMaterial() );
 		material.fragmentNode = ao().context( builder.getSharedContext() );
 		material.needsUpdate = true;
 
 		//
 
-		const properties = builder.getNodeProperties( this );
-		properties.textureNode = textureNode;
-
-		//
-
-		return this._textureNode;
+		return composite();
 
 	}
 
