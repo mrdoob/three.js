@@ -68,8 +68,8 @@
 			function addBox( boxSideLength, x, z, rotation ) {
 
 				const mesh = new THREE.Mesh( new THREE.BoxGeometry( boxSideLength, boxSideLength, boxSideLength ), boxMaterial );
-				mesh.castShadow = true;
-				mesh.receiveShadow = false;
+				mesh.castShadow = false;
+				mesh.receiveShadow = true;
 				mesh.rotation.y = rotation;
 				mesh.position.y = boxSideLength / 2;
 				mesh.position.set( x, boxSideLength / 2 + .0001, z );
@@ -102,7 +102,7 @@
 				} )
 			);
 			crystalMesh.receiveShadow = false;
-			crystalMesh.castShadow = true;
+			crystalMesh.castShadow = false;
 			scene.add( crystalMesh );
 
 			// lights
@@ -112,6 +112,12 @@
 			directionalLight.castShadow = true;
 			directionalLight.shadow.mapSize.set( 2048, 2048 );
 			scene.add( directionalLight );
+
+			const fillLight = new THREE.DirectionalLight( 0x2a3c6b, 1.2 );
+			fillLight.position.set(-100, 100, 100);
+			fillLight.castShadow = true;
+			fillLight.shadow.mapSize.set( 2048, 2048 );
+			scene.add( fillLight );
 
 			const spotLight = new THREE.SpotLight( 0xffc100, 10, 10, Math.PI / 16, .02, 2 );
 			spotLight.position.set( 2, 2, 0 );
