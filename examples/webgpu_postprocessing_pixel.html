@@ -68,7 +68,7 @@
 			function addBox( boxSideLength, x, z, rotation ) {
 
 				const mesh = new THREE.Mesh( new THREE.BoxGeometry( boxSideLength, boxSideLength, boxSideLength ), boxMaterial );
-				mesh.castShadow = false;
+				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				mesh.rotation.y = rotation;
 				mesh.position.y = boxSideLength / 2;
@@ -101,23 +101,19 @@
 					specular: 0xffffff
 				} )
 			);
-			crystalMesh.receiveShadow = false;
-			crystalMesh.castShadow = false;
+			crystalMesh.receiveShadow = true;
+			crystalMesh.castShadow = true;
 			scene.add( crystalMesh );
 
 			// lights
+
+			scene.add( new THREE.AmbientLight( 0x757f8e, 3 ) );
 
 			const directionalLight = new THREE.DirectionalLight( 0xfffecd, 1.5 );
 			directionalLight.position.set( 100, 100, 100 );
 			directionalLight.castShadow = true;
 			directionalLight.shadow.mapSize.set( 2048, 2048 );
 			scene.add( directionalLight );
-
-			const fillLight = new THREE.DirectionalLight( 0x2a3c6b, 1.2 );
-			fillLight.position.set(-100, 100, 100);
-			fillLight.castShadow = true;
-			fillLight.shadow.mapSize.set( 2048, 2048 );
-			scene.add( fillLight );
 
 			const spotLight = new THREE.SpotLight( 0xffc100, 10, 10, Math.PI / 16, .02, 2 );
 			spotLight.position.set( 2, 2, 0 );
@@ -135,7 +131,7 @@
 			document.body.appendChild( renderer.domElement );
 
 			effectController = {
-				pixelSize: uniform( 14 ),
+				pixelSize: uniform( 6 ),
 				normalEdgeStrength: uniform( 0.3 ),
 				depthEdgeStrength: uniform( 0.4 ),
 				pixelAlignedPanning: true
@@ -146,12 +142,12 @@
 			const scenePass = pass( scene, camera );
 			scenePass.setMRT( mrt( {
 				output: output,
-				normal: directionToColor(normalView),
+				normal: normalView,
 			} ) );
 
 			const depthNode = scenePass.getTextureNode( 'depth' );
 			const normalNode = scenePass.getTextureNode( 'normal' );
-			postProcessing.outputNode = scenePass.getTextureNode('output').pixelation( depthNode, normalNode, effectController.pixelSize, effectController.normalEdgeStrength, effectController.depthEdgeStrength );
+			postProcessing.outputNode = scenePass.getTextureNode( 'output' ).pixelation( depthNode, normalNode, effectController.pixelSize, effectController.normalEdgeStrength, effectController.depthEdgeStrength );
 
 			window.addEventListener( 'resize', onWindowResize );
 
