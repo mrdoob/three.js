@@ -121,7 +121,7 @@ class GTAONode extends TempNode {
 
 		const getSceneUvAndDepth = tslFn( ( [ sampleViewPos ] )=> {
 
-			const sampleClipPos = this.cameraProjectionMatrix.mul( sampleViewPos, 1.0 );
+			const sampleClipPos = this.cameraProjectionMatrix.mul( vec4( sampleViewPos, 1.0 ) );
 			const sampleUv = sampleClipPos.xy.div( sampleClipPos.w ).mul( 0.5 ).add( 0.5 );
 			const sampleSceneDepth = sampleDepth( sampleUv );
 			return vec3( sampleUv, sampleSceneDepth );
