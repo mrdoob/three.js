@@ -122,7 +122,8 @@ class GTAONode extends TempNode {
 		const getSceneUvAndDepth = tslFn( ( [ sampleViewPos ] )=> {
 
 			const sampleClipPos = this.cameraProjectionMatrix.mul( vec4( sampleViewPos, 1.0 ) );
-			const sampleUv = sampleClipPos.xy.div( sampleClipPos.w ).mul( 0.5 ).add( 0.5 );
+			let sampleUv = sampleClipPos.xy.div( sampleClipPos.w ).mul( 0.5 ).add( 0.5 ).toVar();
+			sampleUv = vec2( sampleUv.x, sampleUv.y.oneMinus() );
 			const sampleSceneDepth = sampleDepth( sampleUv );
 			return vec3( sampleUv, sampleSceneDepth );
 
@@ -190,7 +191,7 @@ class GTAONode extends TempNode {
 
 					If( abs( viewDelta.z ).lessThan( this.thickness ), () => {
 
-						const sampleCosHorizon = viewDir.dot( viewDelta.normalize() );
+						const sampleCosHorizon = dot( viewDir, normalize( viewDelta ) );
 						cosHorizons.x.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.x ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
 
 					} );
@@ -203,7 +204,7 @@ class GTAONode extends TempNode {
 
 					If( abs( viewDelta.z ).lessThan( this.thickness ), () => {
 
-						const sampleCosHorizon = viewDir.dot( viewDelta.normalize() );
+						const sampleCosHorizon = dot( viewDir, normalize( viewDelta ) );
 						cosHorizons.y.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.y ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
 
 					} );
