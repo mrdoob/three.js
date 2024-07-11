@@ -185,26 +185,26 @@ class GTAONode extends TempNode {
 
 					// x
 
-					let sampleSceneUvDepth = getSceneUvAndDepth( viewPosition.add( sampleViewOffset ) );
-					let sampleSceneViewPosition = getViewPosition( sampleSceneUvDepth.xy, sampleSceneUvDepth.z );
-					let viewDelta = sampleSceneViewPosition.sub( viewPosition );
+					const sampleSceneUvDepthX = getSceneUvAndDepth( viewPosition.add( sampleViewOffset ) );
+					const sampleSceneViewPositionX = getViewPosition( sampleSceneUvDepthX.xy, sampleSceneUvDepthX.z );
+					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition );
 
-					If( abs( viewDelta.z ).lessThan( this.thickness ), () => {
+					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
 
-						const sampleCosHorizon = dot( viewDir, normalize( viewDelta ) );
+						const sampleCosHorizon = dot( viewDir, normalize( viewDeltaX ) );
 						cosHorizons.x.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.x ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
 
 					} );
 
 					// y
 
-					sampleSceneUvDepth = getSceneUvAndDepth( viewPosition.sub( sampleViewOffset ) );
-					sampleSceneViewPosition = getViewPosition( sampleSceneUvDepth.xy, sampleSceneUvDepth.z );
-					viewDelta = sampleSceneViewPosition.sub( viewPosition );
+					const sampleSceneUvDepthY = getSceneUvAndDepth( viewPosition.sub( sampleViewOffset ) );
+					const sampleSceneViewPositionY = getViewPosition( sampleSceneUvDepthY.xy, sampleSceneUvDepthY.z );
+					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition );
 
-					If( abs( viewDelta.z ).lessThan( this.thickness ), () => {
+					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
 
-						const sampleCosHorizon = dot( viewDir, normalize( viewDelta ) );
+						const sampleCosHorizon = dot( viewDir, normalize( viewDeltaY ) );
 						cosHorizons.y.addAssign( max( 0, mul( sampleCosHorizon.sub( cosHorizons.y ), mix( 1.0, float( 2.0 ).div( float( j ).add( 2 ) ), this.distanceFallOff ) ) ) );
 
 					} );
