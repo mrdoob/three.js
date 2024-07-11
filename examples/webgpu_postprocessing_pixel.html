@@ -135,7 +135,7 @@
 				normalEdgeStrength: uniform( 0.3 ),
 				depthEdgeStrength: uniform( 0.4 ),
 				pixelAlignedPanning: true
-			}
+			};
 
 			postProcessing = new THREE.PostProcessing( renderer );
 
@@ -145,7 +145,6 @@
 				normal: directionToColor(normalView),
 			} ) );
 
-			const colorNode = scenePass.getTextureNode( 'output' );
 			const depthNode = scenePass.getTextureNode( 'depth' );
 			const normalNode = scenePass.getTextureNode( 'normal' );
 			postProcessing.outputNode = scenePass.getTextureNode('output').pixelation( depthNode, normalNode, effectController.pixelSize, effectController.normalEdgeStrength, effectController.depthEdgeStrength );
