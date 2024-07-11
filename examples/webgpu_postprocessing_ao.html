@@ -32,8 +32,15 @@
 
 			let camera, scene, renderer, postProcessing, controls, clock, stats, mixer;
 
+			let aoPass;
+
 			const params = {
 				blendIntensity: 1,
+				distanceExponent: 1,
+				distanceFallOff: 1,
+				radius: 0.25,
+				scale: 1,
+				thickness: 1,
 				enabled: true
 			};
 
@@ -83,7 +90,7 @@
 				const scenePassNormal = scenePass.getTextureNode( 'normal' );
 				const scenePassDepth = scenePass.getTextureNode( 'depth' );
 
-				const aoPass = scenePassColor.ao( scenePassDepth, scenePassNormal, camera );
+				aoPass = scenePassColor.ao( scenePassDepth, scenePassNormal, camera );
 
 				postProcessing.outputNode = aoPass;
 
@@ -112,11 +119,13 @@
 
 				const gui = new GUI();
 				gui.title( 'AO settings' );
-				gui.add( params, 'blendIntensity' ).min( 0 ).max( 1 ).onChange( ( value ) => {
+				gui.add( params, 'blendIntensity' ).min( 0 ).max( 1 ).onChange( updateParameters );
+				gui.add( params, 'distanceExponent' ).min( 1 ).max( 4 ).onChange( updateParameters );
+				gui.add( params, 'distanceFallOff' ).min( 0.01 ).max( 1 ).onChange( updateParameters );
+				gui.add( params, 'radius' ).min( 0.01 ).max( 1 ).onChange( updateParameters );
+				gui.add( params, 'scale' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
+				gui.add( params, 'thickness' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
 
-					aoPass.blendIntensity.value = value;
-
-				} );
 				gui.add( params, 'enabled' ).onChange( ( value ) => {
 			
 					if ( value === true ) {
@@ -132,6 +141,17 @@
 					postProcessing.needsUpdate = true;
 
 				} );
+
+			}
+
+			function updateParameters() {
+
+				aoPass.blendIntensity.value = params.blendIntensity;
+				aoPass.distanceExponent.value = params.distanceExponent;
+				aoPass.distanceFallOff.value = params.distanceFallOff;
+				aoPass.radius.value = params.radius;
+				aoPass.scale.value = params.scale;
+				aoPass.thickness.value = params.thickness;
 
 			}
 
