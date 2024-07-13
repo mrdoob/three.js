@@ -86,7 +86,7 @@ export const saturation = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.SA
 export const vibrance = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.VIBRANCE );
 export const hue = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.HUE );
 
-export const lumaCoeffs = vec3( 0.2125, 0.7154, 0.0721 );
+export const lumaCoeffs = vec3( 0.2126729, 0.7151522, 0.0721750 ); // // assumes rgb is in linear color space with sRGB primaries and D65 white point
 export const luminance = ( color, luma = lumaCoeffs ) => dot( color, luma );
 
 export const threshold = ( color, threshold ) => mix( vec3( 0.0 ), color, luminance( color ).sub( threshold ).max( 0 ) );
