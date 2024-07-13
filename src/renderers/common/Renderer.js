@@ -133,7 +133,8 @@ class Renderer {
 
 		this._compilationPromises = null;
 
-		// backwards compatibility
+		this.transparent = true;
+		this.opaque = true;
 
 		this.shadowMap = {
 			enabled: false,
@@ -317,8 +318,8 @@ class Renderer {
 		const transparentObjects = renderList.transparent;
 		const lightsNode = renderList.lightsNode;
 
-		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
-		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
 
 		// restore render tree
 
@@ -679,8 +680,8 @@ class Renderer {
 		const lightsNode = renderList.lightsNode;
 
 		if ( bundles.length > 0 ) this._renderBundles( bundles, sceneRef, lightsNode );
-		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
-		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
 
 		// finish render pass
 
