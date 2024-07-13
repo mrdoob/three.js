@@ -10,6 +10,7 @@ import { HalfFloatType/*, FloatType*/ } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
+import { viewportTopLeft } from './ViewportNode.js';
 
 const _size = new Vector2();
 
@@ -17,7 +18,7 @@ class PassTextureNode extends TextureNode {
 
 	constructor( passNode, texture ) {
 
-		super( texture );
+		super( texture, viewportTopLeft );
 
 		this.passNode = passNode;
 
@@ -77,6 +78,11 @@ class PassNode extends TempNode {
 		this.scene = scene;
 		this.camera = camera;
 		this.options = options;
+
+		this.opaque = true;
+		this.transparent = true;
+		this.overrideMaterial = null;
+		this.handler = null;
 
 		this._pixelRatio = 1;
 		this._width = 1;
@@ -231,17 +237,32 @@ class PassNode extends TempNode {
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
+		const currentOpaque = renderer.opaque;
+		const currentTransparent = renderer.transparent;
+		const currentNodeHandler = renderer.nodeHandler;
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
 
+		const currentOverrideMaterial = scene.overrideMaterial;
+		scene.overrideMaterial = this.overrideMaterial;
+
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
+
+		renderer.opaque = this.opaque;
+		renderer.transparent = this.transparent;
+		renderer.nodeHandler = this.handler;
 
 		renderer.render( scene, camera );
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
+		renderer.opaque = currentOpaque;
+		renderer.transparent = currentTransparent;
+		renderer.nodeHandler = currentNodeHandler;
+
+		scene.overrideMaterial = currentOverrideMaterial;
 
 	}
 

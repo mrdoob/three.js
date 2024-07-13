@@ -20,7 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, uniform, ao, transformedNormalView } from 'three/tsl';
+			import { standardPass, viewportSharedTexture } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -28,21 +28,8 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer, postProcessing, controls, clock, stats, mixer;
-			let blendIntensity;
-			let aoPass;
-
-			const params = {
-				blendIntensity: 1,
-				distanceExponent: 1,
-				distanceFallOff: 1,
-				radius: 0.25,
-				scale: 1,
-				thickness: 1,
-				enabled: true
-			};
 
 			init();
 
@@ -78,44 +65,31 @@
 
 				//
 
-				// Opaque Pass
+				const verticalRefractor = viewportSharedTexture();
 
-				const normalPassMaterial = new THREE.NodeMaterial();
-				normalPassMaterial.lights = false;
-				normalPassMaterial.fog = false;
-				normalPassMaterial.colorNode = transformedNormalView.directionToColor();
-
-				const opaquePass = pass( scene, camera, {
-					minFilter: THREE.NearestFilter,
-					magFilter: THREE.NearestFilter,
-					type: THREE.UnsignedByteType
-				} );
-
-				opaquePass.transparent = false;
-				opaquePass.overrideMaterial = normalPassMaterial;
-
-				// Textures
-
-				const normalView = opaquePass.getTextureNode().colorToDirection();
-				const depth = opaquePass.getTextureNode( 'depth' );
+				const planeRefractor = new THREE.Mesh( new THREE.PlaneGeometry( 3, 3 ), new THREE.MeshStandardNodeMaterial( {
+					backdropNode: verticalRefractor.saturation( 0 )
+				} ) );
+				planeRefractor.material.transparent = true;
+				planeRefractor.position.z = 3;
+				planeRefractor.position.y = 1;
+				scene.add( planeRefractor );
 
 				//
 
-				aoPass = ao( depth, normalView, camera );
-
-				blendIntensity = uniform( 1 );
+				const emissiveObject = new THREE.Mesh( new THREE.SphereGeometry( .5, 32, 32 ), new THREE.MeshStandardNodeMaterial( {
+					emissive: new THREE.Color( 0xFFFFFF )
+				} ) );
+				emissiveObject.position.z = 1;
+				emissiveObject.position.y = 1;
+				scene.add( emissiveObject );
 
 				//
+
+				const stdPass = standardPass( scene, camera );
 
 				postProcessing = new THREE.PostProcessing( renderer );
-
-				const scenePass = pass( scene, camera );
-
-				const aoFinal = blendIntensity.mix( scenePass, aoPass.mul( scenePass ) );
-
-				postProcessing.outputNode = aoFinal;
-
-				//
+				postProcessing.outputNode = stdPass;
 
 				const dracoLoader = new DRACOLoader();
 				dracoLoader.setDecoderPath( 'jsm/libs/draco/' );
@@ -135,44 +109,6 @@
 				mixer.clipAction( gltf.animations[ 0 ] ).play();
 
 				window.addEventListener( 'resize', onWindowResize );
-
-				//
-
-				const gui = new GUI();
-				gui.title( 'AO settings' );
-				gui.add( params, 'blendIntensity' ).min( 0 ).max( 1 ).onChange( updateParameters );
-				gui.add( params, 'distanceExponent' ).min( 1 ).max( 4 ).onChange( updateParameters );
-				gui.add( params, 'distanceFallOff' ).min( 0.01 ).max( 1 ).onChange( updateParameters );
-				gui.add( params, 'radius' ).min( 0.01 ).max( 1 ).onChange( updateParameters );
-				gui.add( params, 'scale' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
-				gui.add( params, 'thickness' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
-
-				gui.add( params, 'enabled' ).onChange( ( value ) => {
-			
-					if ( value === true ) {
-
-						postProcessing.outputNode = aoFinal;
-
-					} else {
-
-						postProcessing.outputNode = scenePass;
-
-					}
-
-					postProcessing.needsUpdate = true;
-
-				} );
-
-			}
-
-			function updateParameters() {
-
-				blendIntensity.value = params.blendIntensity;
-				aoPass.distanceExponent.value = params.distanceExponent;
-				aoPass.distanceFallOff.value = params.distanceFallOff;
-				aoPass.radius.value = params.radius;
-				aoPass.scale.value = params.scale;
-				aoPass.thickness.value = params.thickness;
 
 			}
 
