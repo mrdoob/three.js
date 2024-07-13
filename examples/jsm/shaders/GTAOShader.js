@@ -203,7 +203,7 @@ const GTAOShader = {
 
 			const int DIRECTIONS = SAMPLES < 30 ? 3 : 5;
 			const int STEPS = (SAMPLES + DIRECTIONS - 1) / DIRECTIONS;
-			float ao = 0.0, totalWeight = 0.0;
+			float ao = 0.0;
 			for (int i = 0; i < DIRECTIONS; ++i) {
 				
 				float angle = float(i) / float(DIRECTIONS) * PI;
