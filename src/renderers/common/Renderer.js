@@ -135,6 +135,8 @@ class Renderer {
 
 		// backwards compatibility
 
+		this.nodeHandler = null;
+
 		this.shadowMap = {
 			enabled: false,
 			type: null

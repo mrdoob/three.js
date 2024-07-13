@@ -34,6 +34,7 @@ export { default as UniformNode, uniform } from './core/UniformNode.js';
 export { default as VaryingNode, varying } from './core/VaryingNode.js';
 export { default as OutputStructNode, outputStruct } from './core/OutputStructNode.js';
 export { default as MRTNode, mrt } from './core/MRTNode.js';
+export { default as NodeHandler } from './core/NodeHandler.js';
 
 import * as NodeUtils from './core/NodeUtils.js';
 export { NodeUtils };

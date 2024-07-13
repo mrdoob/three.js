@@ -572,6 +572,14 @@ class NodeBuilder {
 
 	}
 
+	handle( name, node ) {
+
+		const handler = this.renderer.nodeHandler;
+
+		return handler !== null ? handler.handle( name, node, this ) : node;
+
+	}
+
 	getPropertyName( node/*, shaderStage*/ ) {
 
 		return node.name;
