@@ -27,9 +27,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -37,12 +37,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { texture, uv, userData, rangeFog, color, SpriteNodeMaterial, reference } from 'three/nodes';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import { texture, uv, userData, rangeFog, color, SpriteNodeMaterial, reference } from 'three/tsl';
 
 			let camera, scene, renderer, material;
 
@@ -80,14 +75,6 @@
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
 				const width = window.innerWidth;
 				const height = window.innerHeight;
 
@@ -112,7 +99,7 @@
 
 				const textureNode = texture( map );
 
-				material = new SpriteNodeMaterial();
+				material = new THREE.SpriteNodeMaterial();
 				material.colorNode = textureNode.mul( uv() ).mul( 2 ).saturate();
 				material.opacityNode = textureNode.a;
 				material.rotationNode = userData( 'rotation', 'float' ); // get value of: sprite.userData.rotation
@@ -128,7 +115,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
