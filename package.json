@@ -96,7 +96,7 @@
     "dpdm": "^3.14.0",
     "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",
-    "eslint-plugin-compat": "^5.0.0",
+    "eslint-plugin-compat": "^6.0.0",
     "eslint-plugin-html": "^8.0.0",
     "eslint-plugin-import": "^2.27.5",
     "failonlyreporter": "^1.0.0",
