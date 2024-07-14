@@ -1241,7 +1241,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		return new WGSLNodeBuilder( object, renderer, scene, this.commonUniformBuffer );
+		return new WGSLNodeBuilder( object, renderer, this.commonUniformBuffer );
 
 	}
 
