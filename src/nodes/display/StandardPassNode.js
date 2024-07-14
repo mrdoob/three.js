@@ -9,9 +9,11 @@ import { NearestFilter, UnsignedByteType } from '../../constants.js';
 
 class StandardPassNode extends Node {
 
-	constructor( scene, camera ) {
+	constructor( scene, camera, options = { enableAO: true } ) {
 
 		super( 'vec4' );
+
+		const { enableAO } = options;
 
 		// Opaque Pass
 
@@ -37,25 +39,10 @@ class StandardPassNode extends Node {
 		// AO
 
 		const aoPass = ao( depth, normalView, camera );
-		const aoTexture = aoPass.getTextureNode();
-
-		aoPass.scale.value = 2;
-		aoPass.thickness.value = 1;
-		aoPass.distanceExponent.value = 1;
-
-		// Node Handler
-
-		const handler = new NodeHandler();
-		handler.onHandle( 'ao', ( node ) => {
-
-			return node !== null ? aoTexture.mul( node ) : aoTexture;
-
-		} );
 
 		// Final
 
 		const scenePass = pass( scene, camera );
-		scenePass.handler = handler;
 
 		// Assigns
 
@@ -69,9 +56,28 @@ class StandardPassNode extends Node {
 		this.normalViewNode = normalView;
 		this.depthNode = depth;
 
+		this.enableAO = enableAO;
+		this.aoIntensityNode = null;
+
 		//
 
 		this.isStandardPassNode = true;
+
+	}
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) {
+
+			this.dispose();
+
+		}
+
+	}
+
+	dispose() {
+
+		this.scenePassNode.dispose();
 
 	}
 
@@ -101,7 +107,29 @@ class StandardPassNode extends Node {
 
 	setup() {
 
-		return this.aoPassNode.after( this.scenePassNode );
+		const handler = new NodeHandler();
+
+		let composer = this.scenePassNode;
+
+		if ( this.enableAO ) {
+
+			const aoTexture = this.aoPassNode.getTextureNode();
+
+			handler.onHandle( 'ao', ( node ) => {
+
+				const sceneAO = this.aoIntensityNode !== null ? this.aoIntensityNode.mix( 1, aoTexture ) : aoTexture;
+
+				return node !== null ? sceneAO.mul( node ) : sceneAO;
+
+			} );
+
+			composer = composer.before( this.aoPassNode );
+
+		}
+
+		this.scenePassNode.handler = handler;
+
+		return composer;
 
 	}
 
@@ -109,6 +137,6 @@ class StandardPassNode extends Node {
 
 export default StandardPassNode;
 
-export const standardPass = ( scene, camera ) => nodeObject( new StandardPassNode( scene, camera ) );
+export const standardPass = ( scene, camera, options ) => nodeObject( new StandardPassNode( scene, camera, options ) );
 
 addNodeClass( 'StandardPassNode', StandardPassNode );

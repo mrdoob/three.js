@@ -20,7 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, uniform, ao, transformedNormalView } from 'three/tsl';
+			import { uniform, pass, standardPass } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -31,8 +31,7 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer, postProcessing, controls, clock, stats, mixer;
-			let blendIntensity;
-			let aoPass;
+			let scenePass;
 
 			const params = {
 				blendIntensity: 1,
@@ -78,42 +77,12 @@
 
 				//
 
-				// Opaque Pass
-
-				const normalPassMaterial = new THREE.NodeMaterial();
-				normalPassMaterial.lights = false;
-				normalPassMaterial.fog = false;
-				normalPassMaterial.colorNode = transformedNormalView.directionToColor();
-
-				const opaquePass = pass( scene, camera, {
-					minFilter: THREE.NearestFilter,
-					magFilter: THREE.NearestFilter,
-					type: THREE.UnsignedByteType
-				} );
-
-				opaquePass.transparent = false;
-				opaquePass.overrideMaterial = normalPassMaterial;
-
-				// Textures
-
-				const normalView = opaquePass.getTextureNode().colorToDirection();
-				const depth = opaquePass.getTextureNode( 'depth' );
-
-				//
-
-				aoPass = ao( depth, normalView, camera );
-
-				blendIntensity = uniform( 1 );
-
-				//
-
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
+				scenePass = standardPass( scene, camera );
+				scenePass.aoIntensityNode = uniform( 1 );
 
-				const aoFinal = blendIntensity.mix( scenePass, aoPass.mul( scenePass ) );
-
-				postProcessing.outputNode = aoFinal;
+				postProcessing.outputNode = scenePass;
 
 				//
 
@@ -149,15 +118,8 @@
 
 				gui.add( params, 'enabled' ).onChange( ( value ) => {
 			
-					if ( value === true ) {
-
-						postProcessing.outputNode = aoFinal;
-
-					} else {
-
-						postProcessing.outputNode = scenePass;
-
-					}
+					scenePass.enableAO = value;
+					scenePass.needsUpdate = true;
 
 					postProcessing.needsUpdate = true;
 
@@ -167,7 +129,10 @@
 
 			function updateParameters() {
 
-				blendIntensity.value = params.blendIntensity;
+				const aoPass = scenePass.aoPassNode;
+
+				scenePass.aoIntensityNode.value = params.blendIntensity;
+
 				aoPass.distanceExponent.value = params.distanceExponent;
 				aoPass.distanceFallOff.value = params.distanceFallOff;
 				aoPass.radius.value = params.radius;
