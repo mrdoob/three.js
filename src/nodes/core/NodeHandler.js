@@ -1,7 +1,10 @@
+let _id = 0;
+
 class NodeHandler {
 
 	constructor() {
 
+		this.id = _id ++;
 		this.handlers = [];
 
 	}

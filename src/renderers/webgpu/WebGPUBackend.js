@@ -199,6 +199,18 @@ class WebGPUBackend extends Backend {
 
 			renderTargetData.descriptors = descriptors;
 
+			// dispose
+
+			const onDispose = () => {
+
+				renderTarget.removeEventListener( 'dispose', onDispose );
+
+				this.delete( renderTarget );
+
+			};
+
+			renderTarget.addEventListener( 'dispose', onDispose );
+
 		}
 
 		if ( renderTargetData.width !== renderTarget.width ||

@@ -119,6 +119,8 @@ class Textures extends DataMap {
 
 				this._destroyTexture( depthTexture );
 
+				this.delete( renderTarget );
+
 			};
 
 			renderTarget.addEventListener( 'dispose', onDispose );
