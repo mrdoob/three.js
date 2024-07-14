@@ -178,7 +178,7 @@ class WebGPUPipelineUtils {
 
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderContext );
 		const colorFormat = utils.getCurrentColorFormat( renderContext );
-		const sampleCount =  this._getSampleCount( renderContext );
+		const sampleCount = this._getSampleCount( renderContext );
 
 		const descriptor = {
 			label: 'renderBundleEncoder',
