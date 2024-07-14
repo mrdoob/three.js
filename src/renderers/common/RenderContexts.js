@@ -1,5 +1,8 @@
+import NodeHandler from '../../nodes/core/NodeHandler.js';
 import ChainMap from './ChainMap.js';
 import RenderContext from './RenderContext.js';
+
+const defaultHander = new NodeHandler();
 
 class RenderContexts {
 
@@ -9,9 +12,9 @@ class RenderContexts {
 
 	}
 
-	get( scene, camera, renderTarget = null ) {
+	get( scene, camera, handler, renderTarget = null ) {
 
-		const chainKey = [ scene, camera ];
+		const chainKey = [ scene, camera, handler || defaultHander ];
 
 		let attachmentState;
 
