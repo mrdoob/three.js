@@ -79,7 +79,7 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				scenePass = standardPass( scene, camera );
+				scenePass = standardPass( scene, camera, { enableAO: true } );
 				scenePass.aoIntensityNode = uniform( 1 );
 
 				postProcessing.outputNode = scenePass;

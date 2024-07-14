@@ -9,7 +9,7 @@ import { NearestFilter, UnsignedByteType } from '../../constants.js';
 
 class StandardPassNode extends Node {
 
-	constructor( scene, camera, options = { enableAO: true } ) {
+	constructor( scene, camera, options = { enableAO: false } ) {
 
 		super( 'vec4' );
 
