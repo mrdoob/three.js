@@ -763,7 +763,30 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		passEncoderGPU.dispatchWorkgroups( computeNode.dispatchCount );
+		const maxComputeWorkgroupsPerDimension = this.device.limits.maxComputeWorkgroupsPerDimension;
+
+		const computeNodeData = this.get( computeNode );
+
+		if ( computeNodeData.dispatchSize === undefined ) computeNodeData.dispatchSize = { x: 0, y: 1, z: 1 };
+
+		const { dispatchSize } = computeNodeData;
+
+		if ( computeNode.dispatchCount > maxComputeWorkgroupsPerDimension ) {
+
+			dispatchSize.x = Math.min( computeNode.dispatchCount, maxComputeWorkgroupsPerDimension );
+			dispatchSize.y = Math.ceil( computeNode.dispatchCount / maxComputeWorkgroupsPerDimension );
+
+		} else {
+
+			dispatchSize.x = computeNode.dispatchCount;
+
+		}
+
+		passEncoderGPU.dispatchWorkgroups(
+			dispatchSize.x,
+			dispatchSize.y,
+			dispatchSize.z
+		);
 
 	}
 

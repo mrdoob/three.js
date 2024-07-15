@@ -681,6 +681,9 @@ ${ flowData.code }
 		if ( shaderStage === 'compute' ) {
 
 			this.getBuiltin( 'global_invocation_id', 'id', 'vec3<u32>', 'attribute' );
+			this.getBuiltin( 'workgroup_id', 'workgroupId', 'vec3<u32>', 'attribute' );
+			this.getBuiltin( 'local_invocation_id', 'localId', 'vec3<u32>', 'attribute' );
+			this.getBuiltin( 'num_workgroups', 'numWorkgroups', 'vec3<u32>', 'attribute' );
 
 		}
 
@@ -1157,6 +1160,8 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 
 		return `${ this.getSignature() }
 
+diagnostic( off, derivative_uniformity );
+
 // uniforms
 ${shaderData.uniforms}
 
@@ -1196,7 +1201,7 @@ ${shaderData.codes}
 fn main( ${shaderData.attributes} ) {
 
 	// system
-	instanceIndex = id.x;
+	instanceIndex = id.x + id.y * numWorkgroups.x * u32(${workgroupSize}) + id.z * numWorkgroups.x * numWorkgroups.y * u32(${workgroupSize});
 
 	// vars
 	${shaderData.vars}

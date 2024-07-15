@@ -220,11 +220,9 @@ const FXAAShader = {
 			vec2 posN = posM;
 			vec2 posP = posM;
 
-			int iterationsUsed = 0;
 			int iterationsUsedN = 0;
 			int iterationsUsedP = 0;
 			for( int i = 0; i < NUM_SAMPLES; i++ ) {
-				iterationsUsed = i;
 
 				float increment = float(i + 1);
 
