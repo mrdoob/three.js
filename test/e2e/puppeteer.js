@@ -124,10 +124,6 @@ const exceptionList = [
 	'webgpu_storage_buffer',
 
 	// WebGPURenderer: Unknown problem
-	'webgpu_postprocessing_afterimage',
-	'webgpu_postprocessing_3dlut',
-	"webgpu_postprocessing_pixel",
-	'webgpu_postprocessing_ao',
 	'webgpu_backdrop_water',
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_clipping',
