@@ -69,7 +69,7 @@
 
 				const mesh = new THREE.Mesh( new THREE.BoxGeometry( boxSideLength, boxSideLength, boxSideLength ), boxMaterial );
 				mesh.castShadow = true;
-				mesh.receiveShadow = true;
+				//mesh.receiveShadow = true;
 				mesh.rotation.y = rotation;
 				mesh.position.y = boxSideLength / 2;
 				mesh.position.set( x, boxSideLength / 2 + .0001, z );
@@ -101,7 +101,7 @@
 					specular: 0xffffff
 				} )
 			);
-			crystalMesh.receiveShadow = true;
+			//crystalMesh.receiveShadow = true;
 			crystalMesh.castShadow = true;
 			scene.add( crystalMesh );
 
@@ -123,7 +123,7 @@
 			spotLight.castShadow = true;
 			scene.add( spotLight );
 
-			renderer = new THREE.WebGPURenderer({ antialias: false });
+			renderer = new THREE.WebGPURenderer( { antialias: false } );
 			renderer.shadowMap.enabled = true;
 			//renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -149,7 +149,7 @@
 			// gui
 
 			gui = new GUI();
-			gui.add( effectController.pixelSize, 'value', 1, 14, 1 ).name( 'Pixel Size' );
+			gui.add( effectController.pixelSize, 'value', 1, 16, 1 ).name( 'Pixel Size' );
 			gui.add( effectController.normalEdgeStrength, 'value', 0, 2, 0.05 ).name( 'Normal Edge Strength' );
 			gui.add( effectController.depthEdgeStrength, 'value', 0, 1, 0.05 ).name( 'Depth Edge Strength' );
 			gui.add( effectController, 'pixelAlignedPanning' );
