@@ -145,11 +145,7 @@ class DenoiseNode extends TempNode {
 
 function generatePdSamplePointInitializer( samples, rings, radiusExponent ) {
 
-	const poissonDisk = generateDenoiseSamples(
-		samples,
-		rings,
-		radiusExponent,
-	);
+	const poissonDisk = generateDenoiseSamples( samples, rings, radiusExponent );
 
 	const array = [];
 
