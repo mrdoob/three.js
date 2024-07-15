@@ -5,14 +5,11 @@ import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { dot, clamp, smoothstep, sign, step, floor } from '../math/MathNode.js';
 import { Vector4 } from '../../math/Vector4.js';
-import { property } from '../core/PropertyNode.js';
-import QuadMesh from '../../renderers/common/QuadMesh.js';
-import { RenderTarget } from '../../core/RenderTarget.js';
-import { passTexture } from './PassNode.js';
+import { output, property } from '../core/PropertyNode.js';
+import PassNode from './PassNode.js';
+import { mrt } from '../core/MRTNode.js';
+import { normalView } from '../accessors/NormalNode.js';
 import { NearestFilter } from '../../constants.js';
-
-const createEdgesQuad = new QuadMesh();
-const lowerResolutionQuad = new QuadMesh();
 
 class PixelationNode extends TempNode {
 
@@ -36,87 +33,22 @@ class PixelationNode extends TempNode {
 
 		this._resolution = uniform( new Vector4() );
 
-		// Intermediary render targets
-
-		this._createEdgesRT = new RenderTarget();
-		this._createEdgesRT.texture.name = 'PixelationNode.renderEdges';
-		this._createEdgesRT.texture.minFilter = NearestFilter;
-		this._createEdgesRT.texture.magFilter = NearestFilter;
-		this._lowerResolutionRT = new RenderTarget();
-		this._lowerResolutionRT.texture.name = 'PixelationNode.lowerResolution';
-		this._lowerResolutionRT.texture.minFilter = NearestFilter;
-		this._lowerResolutionRT.texture.magFilter = NearestFilter;
-
-		// Output textures
-
-		this._outputTextureNode = passTexture( this, this._lowerResolutionRT.texture );
-
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
 	}
 
-	setSize( width, height ) {
+	updateBefore() {
 
-		this._createEdgesRT.setSize( width, height );
-		this._lowerResolutionRT.setSize( width, height );
+		const map = this.textureNode.value;
 
-	}
+		const width = map.image.width;
+		const height = map.image.height;
 
-	updateBefore( frame ) {
-
-		const { renderer } = frame;
-
-		const textureNode = this.textureNode;
-		const map = textureNode.value;
-
-		// Set resolution uniform
-
-		const adjustedWidth = Math.floor( map.image.width / this.pixelSize.value );
-		const adjustedHeight = Math.floor( map.image.height / this.pixelSize.value );
-		this._resolution.value.set( adjustedWidth, adjustedHeight, 1 / adjustedWidth, 1 / adjustedHeight );
-
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentMRT = renderer.getMRT();
-		const currentTexture = textureNode.value;
-
-		createEdgesQuad.material = this._createEdgesMaterial;
-		lowerResolutionQuad.material = this._lowerResolutionMaterial;
-
-		// Set size of render edges to match size of initial render target.
-
-		this.setSize( map.image.width, map.image.height );
-
-		const textureType = map.type;
-		this._createEdgesRT.texture.type = textureType;
-		this._lowerResolutionRT.texture.type = textureType;
-
-		// Apply create edges post-process step to createEdgesQuad.
-
-		renderer.setMRT( null );
-		renderer.setRenderTarget( this._createEdgesRT );
-		createEdgesQuad.render( renderer );
-
-		// Set input of next pass to output of last step.
-
-		textureNode.value = this._createEdgesRT.texture;
-
-		// Apply lower resolution post-process step to lowerResolutionQuad.
-
-		renderer.setRenderTarget( this._lowerResolutionRT );
-		lowerResolutionQuad.render( renderer );
-
-		// Reset render target and MRT back to initial values.
-
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.setMRT( currentMRT );
-
-		// Set textureNode back to intial input texture for next pass.
-
-		textureNode.value = currentTexture;
+		this._resolution.value.set( width, height, 1 / width, 1 / height );
 
 	}
 
-	setup( builder ) {
+	setup() {
 
 		const { textureNode, depthNode, normalNode } = this;
 
@@ -124,11 +56,7 @@ class PixelationNode extends TempNode {
 		const uvNodeDepth = depthNode.uvNode || uv();
 		const uvNodeNormal = normalNode.uvNode || uv();
 
-		const pixelizeUV = ( coord ) => floor( coord.mul( this._resolution.xy ) ).div( this._resolution.xy );
-
 		const sampleTexture = () => textureNode.uv( uvNodeTexture );
-
-		const samplePixel = () => textureNode.uv( pixelizeUV( uvNodeTexture ) );
 
 		const sampleDepth = ( x, y ) => depthNode.uv( uvNodeDepth.add( vec2( x, y ).mul( this._resolution.zw ) ) ).r;
 
@@ -178,7 +106,7 @@ class PixelationNode extends TempNode {
 
 		};
 
-		const createEdges = tslFn( () => {
+		const pixelation = tslFn( () => {
 
 			const texel = sampleTexture();
 
@@ -214,25 +142,60 @@ class PixelationNode extends TempNode {
 
 		} );
 
-		const createEdgesMaterial = this._createEdgesMaterial || ( this._createEdgesMaterial = builder.createNodeMaterial() );
-		createEdgesMaterial.fragmentNode = createEdges().context( builder.getSharedContext() );
-		createEdgesMaterial.needsUpdate = true;
+		const outputNode = pixelation();
 
-		const lowerResolutionMaterial = this._lowerResolutionMaterial || ( this._lowerResolutionMaterial = builder.createNodeMaterial() );
-		lowerResolutionMaterial.fragmentNode = samplePixel().context( builder.getSharedContext() );
-		lowerResolutionMaterial.needsUpdate = true;
-
-		const properties = builder.getNodeProperties( this );
-		properties.textureNode = textureNode;
-
-		return this._outputTextureNode;
+		return outputNode;
 
 	}
 
 }
 
-export const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
+const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
 
 addNodeElement( 'pixelation', pixelation );
 
-export default PixelationNode;
+class PixelationPassNode extends PassNode {
+
+	constructor( scene, camera, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) {
+
+		super( 'color', scene, camera, { minFilter: NearestFilter, magFilter: NearestFilter } );
+
+		this.pixelSize = pixelSize;
+		this.normalEdgeStrength = normalEdgeStrength;
+		this.depthEdgeStrength = depthEdgeStrength;
+
+		this.isPixelationPassNode = true;
+
+		this._mrt = mrt( {
+			output: output,
+			normal: normalView
+		} );
+
+	}
+
+	setSize( width, height ) {
+
+		const pixelSize = this.pixelSize.value ? this.pixelSize.value : this.pixelSize;
+
+		const adjustedWidth = Math.floor( width / pixelSize );
+		const adjustedHeight = Math.floor( height / pixelSize );
+
+		super.setSize( adjustedWidth, adjustedHeight );
+
+	}
+
+	setup() {
+
+		const color = super.getTextureNode( 'output' );
+		const depth = super.getTextureNode( 'depth' );
+		const normal = super.getTextureNode( 'normal' );
+
+		return pixelation( color, depth, normal, this.pixelSize, this.normalEdgeStrength, this.depthEdgeStrength );
+
+	}
+
+}
+
+export const pixelationPass = ( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) => nodeObject( new PixelationPassNode( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) );
+
+export default PixelationPassNode;
