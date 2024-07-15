@@ -54,7 +54,13 @@ class AnalyticLightNode extends LightingNode {
 
 		const { object } = builder;
 
-		if ( object.receiveShadow === false ) return;
+		if ( object.receiveShadow === false ) {
+
+			this.colorNode = this._defaultColorNode;
+
+			return;
+
+		}
 
 		let shadowNode = this.shadowNode;
 
