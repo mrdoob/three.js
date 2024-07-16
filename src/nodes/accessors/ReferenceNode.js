@@ -42,6 +42,10 @@ class ReferenceNode extends Node {
 
 		super();
 
+		console.log( property );
+		console.log( uniformType );
+		console.log( object )
+
 		this.property = property;
 		this.uniformType = uniformType;
 		this.object = object;
@@ -71,7 +75,7 @@ class ReferenceNode extends Node {
 
 		} else if ( Array.isArray( this.getValueFromReference() ) ) {
 
-			node = uniform( null, uniformType );
+			node = uniform( [], uniformType );
 
 		} else if ( uniformType === 'texture' ) {
 
