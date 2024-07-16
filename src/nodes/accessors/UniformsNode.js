@@ -146,10 +146,10 @@ export default UniformsNode;
 export const uniform = ( uniformValue, elementType ) => {
 
 	if ( Array.isArray( uniformValue ) ) {
-		
-		return nodeObject( new UniformsNode( uniformValue, elementType ) )
 
-	} 
+		return nodeObject( new UniformsNode( uniformValue, elementType ) );
+
+	}
 
 	const nodeType = getConstNodeType( elementType || uniformValue );
 
