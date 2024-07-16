@@ -20,7 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, mrt, output, transformedNormalView, texture, ao } from 'three/tsl';
+			import { pass, mrt, output, transformedNormalView, texture, ao, denoise } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -33,7 +33,7 @@
 
 			let camera, scene, renderer, postProcessing, controls, clock, stats, mixer;
 
-			let aoPass, blendPassAO, blendPassDenoise, scenePassColor;
+			let aoPass, denoisePass, blendPassAO, blendPassDenoise, scenePassColor;
 
 			const params = {
 				distanceExponent: 1,
@@ -42,7 +42,11 @@
 				scale: 1,
 				thickness: 1,
 				denoised: true,
-				enabled: true
+				enabled: true,
+				denoiseRadius: 5,
+				lumaPhi: 5,
+				depthPhi: 5,
+				normalPhi: 5
 			};
 
 			init();
@@ -99,7 +103,7 @@
 				// denoise (optional)
 
 				const noiseTexture = texture( generateNoise() );
-				const denoisePass = aoPass.getTextureNode().denoise( scenePassDepth, scenePassNormal, noiseTexture, camera );
+				denoisePass = denoise( aoPass.getTextureNode(), scenePassDepth, scenePassNormal, noiseTexture, camera );
 				blendPassDenoise = denoisePass.mul( scenePassColor );
 
 				postProcessing.outputNode = blendPassDenoise;
@@ -136,6 +140,11 @@
 				gui.add( params, 'thickness' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
 				gui.add( params, 'denoised' ).onChange( updatePassChain );
 				gui.add( params, 'enabled' ).onChange( updatePassChain );
+				const folder = gui.addFolder( 'Denoise settings' );
+				folder.add( params, 'denoiseRadius' ).min( 0.01 ).max( 10 ).name( 'radius' ).onChange( updateParameters );
+				folder.add( params, 'lumaPhi' ).min( 0.01 ).max( 10 ).onChange( updateParameters );
+				folder.add( params, 'depthPhi' ).min( 0.01 ).max( 10 ).onChange( updateParameters );
+				folder.add( params, 'normalPhi' ).min( 0.01 ).max( 10 ).onChange( updateParameters );
 
 			}
 
@@ -171,6 +180,11 @@
 				aoPass.radius.value = params.radius;
 				aoPass.scale.value = params.scale;
 				aoPass.thickness.value = params.thickness;
+
+				denoisePass.radius.value = params.denoiseRadius;
+				denoisePass.lumaPhi.value = params.lumaPhi;
+				denoisePass.depthPhi.value = params.depthPhi;
+				denoisePass.normalPhi.value = params.normalPhi;
 
 			}
 
