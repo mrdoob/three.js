@@ -29,9 +29,9 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import TWEEN from 'three/addons/libs/tween.module.js';
-			import { uniform, transition, pass } from 'three/tsl'
+			import { uniform, transition, pass, texture } from 'three/tsl'
 
-			let renderer, postProcessing, transitionController;
+			let renderer, postProcessing, transitionController, transitionPass;
 
 			const textures = [];
 			const clock = new THREE.Clock();
@@ -147,8 +147,7 @@
 
 				for ( let i = 0; i < 6; i ++ ) {
 
-					const texture = loader.load( 'textures/transition/transition' + ( i + 1 ) + '.png' );
-					textures[ i ] = new THREE.TextureNode( texture );
+					textures[ i ] = loader.load( 'textures/transition/transition' + ( i + 1 ) + '.png' );;
 
 				}
 
@@ -163,7 +162,9 @@
 				const scenePassA = pass( fxSceneA.scene, fxSceneA.camera );
 				const scenePassB = pass( fxSceneB.scene, fxSceneB.camera );
 
-				postProcessing.outputNode = transition( scenePassA, scenePassB, textures[ effectController.texture ], effectController._transition, effectController.threshold, effectController._useTexture );
+				transitionPass = transition( scenePassA, scenePassB, new THREE.TextureNode(textures[ effectController.texture ]), effectController._transition, effectController.threshold, effectController._useTexture );
+
+				postProcessing.outputNode = transitionPass;
 
 				const gui = new GUI();
 
@@ -225,6 +226,13 @@
 			function animate() {
 
 				if ( effectController.animateTransition ) TWEEN.update();
+
+				if ( textures[ effectController.texture ]) {
+
+					const mixTexture = textures[ effectController.texture ];
+					transitionPass.mixTextureNode.value = mixTexture;
+
+				}
 
 				const delta = clock.getDelta();
 				fxSceneA.update( delta );
