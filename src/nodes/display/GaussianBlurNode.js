@@ -176,6 +176,13 @@ class GaussianBlurNode extends TempNode {
 
 	}
 
+	dispose() {
+
+		this._horizontalRT.dispose();
+		this._verticalRT.dispose();
+
+	}
+
 	_getCoefficients( kernelRadius ) {
 
 		const coefficients = [];
