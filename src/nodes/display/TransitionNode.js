@@ -6,7 +6,7 @@ import { clamp, mix } from '../math/MathNode.js';
 
 class TransitionNode extends TempNode {
 
-	constructor( textureNodeA, textureNodeB, mixTextureNode, mixRatioNode, thresholdNode ) {
+	constructor( textureNodeA, textureNodeB, mixTextureNode, mixRatioNode, thresholdNode, useTextureNode ) {
 
 		super();
 
@@ -20,14 +20,13 @@ class TransitionNode extends TempNode {
 
 		this.mixRatioNode = mixRatioNode;
 		this.thresholdNode = thresholdNode;
-
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.useTextureNode = useTextureNode;
 
 	}
 
 	setup() {
 
-		const { textureNodeA, textureNodeB, mixTextureNode, mixRatioNode, thresholdNode } = this;
+		const { textureNodeA, textureNodeB, mixTextureNode, mixRatioNode, thresholdNode, useTextureNode } = this;
 
 		const sampleTexture = ( textureNode ) => {
 
@@ -45,7 +44,7 @@ class TransitionNode extends TempNode {
 			const r = mixRatioNode.mul( thresholdNode.mul( 2.0 ).add( 1.0 ) ).sub( thresholdNode );
 			const mixf = clamp( transitionTexel.r.sub( r ).mul( float( 1.0 ).div( thresholdNode ) ), 0.0, 1.0 );
 
-			return mix( texelOne, texelTwo, mixf );
+			return mix( texelOne, texelTwo, useTextureNode.equal(1).cond( mixf, mixRatioNode ) );
 
 		} );
 
@@ -57,7 +56,7 @@ class TransitionNode extends TempNode {
 
 }
 
-export const transition = ( nodeA, nodeB, mixTexture, mixRatio, threshold ) => nodeObject( new TransitionNode( nodeObject( nodeA ).toTexture(), nodeObject( nodeB ).toTexture(), nodeObject( mixTexture ).toTexture(), nodeObject( mixRatio ), nodeObject( threshold  ) ) );
+export const transition = ( nodeA, nodeB, mixTexture, mixRatio, threshold, useTexture ) => nodeObject( new TransitionNode( nodeObject( nodeA ).toTexture(), nodeObject( nodeB ).toTexture(), nodeObject( mixTexture ).toTexture(), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) ) );
 
 addNodeElement( 'transition', transition );
 

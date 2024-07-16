@@ -31,7 +31,7 @@
 			import TWEEN from 'three/addons/libs/tween.module.js';
 			import { uniform, transition, pass } from 'three/tsl'
 
-			let renderer, postProcessing;
+			let renderer, postProcessing, transitionController;
 
 			const textures = [];
 			const clock = new THREE.Clock();
@@ -40,10 +40,12 @@
 				animateScene: true,
 				animateTransition: true,
 				transition: 0,
-				mixRatio: uniform( 0 ),
+				_transition: uniform( 0 ),
+				useTexture: true,
+				_useTexture: uniform( 1 ),
 				texture: 5,
 				cycle: true,
-				threshold: uniform( 0.1 ),
+				threshold: uniform(0.1),
 			};
 
 			function generateInstancedMesh( geometry, material, count ) {
@@ -161,13 +163,24 @@
 				const scenePassA = pass( fxSceneA.scene, fxSceneA.camera );
 				const scenePassB = pass( fxSceneB.scene, fxSceneB.camera );
 
-				postProcessing.outputNode = transition( scenePassA, scenePassB, textures[ effectController.texture ], effectController.mixRatio, effectController.threshold );
+				postProcessing.outputNode = transition( scenePassA, scenePassB, textures[ effectController.texture ], effectController._transition, effectController.threshold, effectController._useTexture );
 
 				const gui = new GUI();
 
 				gui.add( effectController, 'animateScene' ).name( 'Animate Scene' );
 				gui.add( effectController, 'animateTransition' ).name( 'Animate Transition' );
-				gui.add( effectController, 'transition', 0, 1, 0.01 ).name( 'transition' );
+				transitionController = gui.add( effectController, 'transition', 0, 1, 0.01 ).name( 'transition' ).onChange(() => {
+
+					effectController._transition.value = effectController.transition;
+
+				});
+				gui.add( effectController, 'useTexture').onChange(() => {
+
+					const value = effectController.useTexture ? 1 : 0;
+
+					effectController._useTexture.value = value;
+
+				});
 				gui.add( effectController, 'texture', { Perlin: 0, Squares: 1, Cells: 2, Distort: 3, Gradient: 4, Radial: 5 } );
 				gui.add( effectController, 'cycle' );
 				gui.add( effectController.threshold, 'value', 0, 1, 0.01 ).name( 'threshold' );
@@ -186,17 +199,28 @@
 
 			new TWEEN.Tween( effectController )
 				.to( { transition: 1 }, 1500 )
-				.onUpdate( () => {
+				.onUpdate( function ( ) {
 
-					effectController.mixRatio.value = effectController.transition;
 
-					if ( effectController.cycle && ( effectController.transition.value == 0 || effectController.transition.value == 1 ) ) {
+					transitionController.setValue( effectController.transition )
 
-						effectController.texture = ( effectController.texture + 1 ) % textures.length;
+					// Change the current alpha texture after each transition
+					if ( effectController.cycle ) {
+
+						if ( effectController.transition == 0 || effectController.transition == 1 ) {
+
+							effectController.texture = ( effectController.texture + 1 ) % textures.length;
+							//erenderTransitionPass.setTexture( textures[ params.texture ] );
+
+						}
 
 					}
 
-				} ).repeat( Infinity ).delay( 2000 ).yoyo( true ).start();
+				} )
+				.repeat( Infinity )
+				.delay( 2000 )
+				.yoyo( true )
+				.start();
 
 			function animate() {
 
@@ -213,11 +237,11 @@
 			function render() {
 
 				// Prevent render both scenes when it's not necessary
-				if ( effectController.transition.value === 0 ) {
+				if ( effectController.transition === 0 ) {
 
 					renderer.render( fxSceneB.scene, fxSceneB.camera );
 
-				} else if ( effectController.transition.value === 1 ) {
+				} else if ( effectController.transition === 1 ) {
 
 					renderer.render( fxSceneA.scene, fxSceneA.camera );
 
