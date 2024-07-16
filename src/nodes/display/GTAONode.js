@@ -70,7 +70,7 @@ class GTAONode extends TempNode {
 
 		const { renderer } = frame;
 
-		const size = renderer.getSize( _size );
+		const size = renderer.getDrawingBufferSize( _size );
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
