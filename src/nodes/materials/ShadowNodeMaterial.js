@@ -3,7 +3,7 @@ import ShadowMaskModel from '../functions/ShadowMaskModel.js';
 
 import { ShadowMaterial } from '../../materials/ShadowMaterial.js';
 
-const defaultValues = new ShadowMaterial();
+const _defaultValues = /*@__PURE__*/ new ShadowMaterial();
 
 class ShadowNodeMaterial extends NodeMaterial {
 
@@ -15,7 +15,7 @@ class ShadowNodeMaterial extends NodeMaterial {
 
 		this.lights = true;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
 

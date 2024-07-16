@@ -6,7 +6,7 @@ import BasicLightMapNode from '../lighting/BasicLightMapNode.js';
 import BasicLightingModel from '../functions/BasicLightingModel.js';
 import { transformedNormalView, normalView } from '../accessors/NormalNode.js';
 
-const defaultValues = new MeshBasicMaterial();
+const _defaultValues = /*@__PURE__*/ new MeshBasicMaterial();
 
 class MeshBasicNodeMaterial extends NodeMaterial {
 
@@ -19,7 +19,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 		this.lights = true;
 		//this.normals = false; @TODO: normals usage by context
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
 

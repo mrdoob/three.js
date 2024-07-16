@@ -1,6 +1,6 @@
 import Binding from './Binding.js';
 
-let id = 0;
+let _id = 0;
 
 class SampledTexture extends Binding {
 
@@ -8,7 +8,7 @@ class SampledTexture extends Binding {
 
 		super( name );
 
-		this.id = id ++;
+		this.id = _id ++;
 
 		this.texture = texture;
 		this.version = texture ? texture.version : 0;

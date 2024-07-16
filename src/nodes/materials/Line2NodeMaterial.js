@@ -15,7 +15,7 @@ import { dashSize, gapSize } from '../core/PropertyNode.js';
 
 import { LineDashedMaterial } from '../../materials/LineDashedMaterial.js';
 
-const defaultValues = new LineDashedMaterial();
+const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
 class Line2NodeMaterial extends NodeMaterial {
 
@@ -26,7 +26,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		this.normals = false;
 		this.lights = false;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.useAlphaToCoverage = true;
 		this.useColor = params.vertexColors;

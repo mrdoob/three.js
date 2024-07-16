@@ -2,7 +2,8 @@ import { vec4, renderOutput, NodeMaterial } from '../../nodes/Nodes.js';
 import { LinearSRGBColorSpace, NoToneMapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
-const quadMesh = new QuadMesh( new NodeMaterial() );
+const _material = /*@__PURE__*/ new NodeMaterial();
+const _quadMesh = /*@__PURE__*/ new QuadMesh( _material );
 
 class PostProcessing {
 
@@ -31,7 +32,7 @@ class PostProcessing {
 
 		//
 
-		quadMesh.render( renderer );
+		_quadMesh.render( renderer );
 
 		//
 
@@ -49,8 +50,8 @@ class PostProcessing {
 			const toneMapping = renderer.toneMapping;
 			const outputColorSpace = renderer.outputColorSpace;
 
-			quadMesh.material.fragmentNode = this.outputColorTransform === true ? renderOutput( this.outputNode, toneMapping, outputColorSpace ) : this.outputNode.context( { toneMapping, outputColorSpace } );
-			quadMesh.material.needsUpdate = true;
+			_quadMesh.material.fragmentNode = this.outputColorTransform === true ? renderOutput( this.outputNode, toneMapping, outputColorSpace ) : this.outputNode.context( { toneMapping, outputColorSpace } );
+			_quadMesh.material.needsUpdate = true;
 
 			this.needsUpdate = false;
 
@@ -72,7 +73,7 @@ class PostProcessing {
 
 		//
 
-		await quadMesh.renderAsync( renderer );
+		await _quadMesh.renderAsync( renderer );
 
 		//
 
