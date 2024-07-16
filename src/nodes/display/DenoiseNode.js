@@ -134,7 +134,7 @@ class DenoiseNode extends TempNode {
 
 			} );
 
-			return vec4( denoised, 1.0 );
+			return vec4( denoised, texel.a );
 
 		} ).setLayout( {
 			name: 'denoise',
