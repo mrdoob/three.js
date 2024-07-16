@@ -5,7 +5,9 @@ import {
 	MeshBasicMaterial,
 	PlaneGeometry,
 	SRGBColorSpace,
-	Color
+	Color,
+	ColorManagement,
+	Vector3
 } from 'three';
 
 class HTMLMesh extends Mesh {
@@ -126,6 +128,7 @@ function html2canvas( element ) {
 
 	const range = document.createRange();
 	const color = new Color();
+	const lumaCoeffs = new Vector3();
 
 	function Clipper( context ) {
 
@@ -371,7 +374,8 @@ function html2canvas( element ) {
 
 				color.set( accentColor );
 
-				const luminance = Math.sqrt( 0.299 * ( color.r ** 2 ) + 0.587 * ( color.g ** 2 ) + 0.114 * ( color.b ** 2 ) );
+				ColorManagement.getLuminanceCoefficients( lumaCoeffs );
+				const luminance = Math.sqrt( lumaCoeffs.x * ( color.r ** 2 ) + lumaCoeffs.y * ( color.g ** 2 ) + lumaCoeffs.z * ( color.b ** 2 ) );
 				const accentTextColor = luminance < 0.5 ? 'white' : '#111111';
 
 				if ( element.type === 'radio' ) {

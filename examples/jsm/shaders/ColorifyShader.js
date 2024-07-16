@@ -1,5 +1,7 @@
 import {
-	Color
+	Color,
+	ColorManagement,
+	Vector3
 } from 'three';
 
 /**
@@ -13,7 +15,8 @@ const ColorifyShader = {
 	uniforms: {
 
 		'tDiffuse': { value: null },
-		'color': { value: new Color( 0xffffff ) }
+		'color': { value: new Color( 0xffffff ) },
+		'luminanceCoefficients': { value: ColorManagement.getLuminanceCoefficients( new Vector3() ) },
 
 	},
 
@@ -31,6 +34,7 @@ const ColorifyShader = {
 	fragmentShader: /* glsl */`
 
 		uniform vec3 color;
+		uniform vec3 luminanceCoefficients;
 		uniform sampler2D tDiffuse;
 
 		varying vec2 vUv;
@@ -39,8 +43,7 @@ const ColorifyShader = {
 
 			vec4 texel = texture2D( tDiffuse, vUv );
 
-			vec3 luma = vec3( 0.299, 0.587, 0.114 );
-			float v = dot( texel.xyz, luma );
+			float v = dot( texel.xyz, luminanceCoefficients );
 
 			gl_FragColor = vec4( v * color, texel.w );
 

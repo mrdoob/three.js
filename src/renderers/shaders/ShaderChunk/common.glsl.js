@@ -89,7 +89,7 @@ float luminance( const in vec3 rgb ) {
 
 	// assumes rgb is in linear color space with sRGB primaries and D65 white point
 
-	const vec3 weights = vec3( 0.2126729, 0.7151522, 0.0721750 );
+	const vec3 weights = vec3( 0.2126, 0.7152, 0.0722 );
 
 	return dot( weights, rgb );
 
