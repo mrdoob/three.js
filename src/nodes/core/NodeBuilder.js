@@ -1323,6 +1323,19 @@ class NodeBuilder {
 		const fromTypeLength = this.getTypeLength( fromType );
 		const toTypeLength = this.getTypeLength( toType );
 
+		if ( fromTypeLength === 16 && toTypeLength === 9 ) {
+
+			return `${ this.getType( toType ) }(${ snippet }[0].xyz, ${ snippet }[1].xyz, ${ snippet }[2].xyz)`;
+
+		}
+
+		if ( fromTypeLength === 9 && toTypeLength === 4 ) {
+
+			return `${ this.getType( toType ) }(${ snippet }[0].xy, ${ snippet }[1].xy)`;
+
+		}
+
+
 		if ( fromTypeLength > 4 ) { // fromType is matrix-like
 
 			// @TODO: ignore for now
