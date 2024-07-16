@@ -13,7 +13,7 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
-const quadMeshComp = /*@__PURE__*/ new QuadMesh();
+const _quadMeshComp = /*@__PURE__*/ new QuadMesh();
 
 class AfterImageNode extends TempNode {
 
@@ -73,7 +73,7 @@ class AfterImageNode extends TempNode {
 
 		// comp
 		renderer.setRenderTarget( this._compRT );
-		quadMeshComp.render( renderer );
+		_quadMeshComp.render( renderer );
 
 		// Swap the textures
 		const temp = this._oldRT;
@@ -122,7 +122,7 @@ class AfterImageNode extends TempNode {
 		const materialComposed = this._materialComposed || ( this._materialComposed = builder.createNodeMaterial() );
 		materialComposed.fragmentNode = afterImg();
 
-		quadMeshComp.material = materialComposed;
+		_quadMeshComp.material = materialComposed;
 
 		//
 
