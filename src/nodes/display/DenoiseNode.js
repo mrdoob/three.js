@@ -84,15 +84,19 @@ class DenoiseNode extends TempNode {
 
 		} );
 
-		const denoise = tslFn( () => {
+		const denoise = tslFn( ( [ uvNode ] ) => {
 
 			const depth = sampleDepth( uvNode );
 			const viewNormal = sampleNormal( uvNode ).rgb.normalize();
 
-			depth.greaterThanEqual( 1.0 ).discard();
-			dot( viewNormal, viewNormal ).equal( 0.0 ).discard();
-
 			const texel = sampleTexture( uvNode );
+
+			If( depth.greaterThanEqual( 1.0 ).or( dot( viewNormal, viewNormal ).equal( 0.0 ) ), () => {
+
+				return texel;
+
+			} );
+
 			const center = vec3( texel.rgb );
 
 			const viewPosition = getViewPosition( uvNode, depth );
@@ -132,10 +136,21 @@ class DenoiseNode extends TempNode {
 
 			return vec4( denoised, 1.0 );
 
+		} ).setLayout( {
+			name: 'denoise',
+			type: 'vec4',
+			inputs: [
+				{ name: 'uv', type: 'vec2' }
+			]
+		} );
+
+		const output = tslFn( () => {
+
+			return denoise( uvNode );
 
 		} );
 
-		const outputNode = denoise();
+		const outputNode = output();
 
 		return outputNode;
 
