@@ -225,6 +225,12 @@ class GTAONode extends TempNode {
 
 	}
 
+	dispose() {
+
+		this._aoRenderTarget.dispose();
+
+	}
+
 }
 
 function generateMagicSquareNoise( size = 5 ) {

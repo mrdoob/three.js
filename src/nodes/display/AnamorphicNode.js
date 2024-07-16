@@ -129,6 +129,12 @@ class AnamorphicNode extends TempNode {
 
 	}
 
+	dispose() {
+
+		this._renderTarget.dispose();
+
+	}
+
 }
 
 export const anamorphic = ( node, threshold = .9, scale = 3, samples = 32 ) => nodeObject( new AnamorphicNode( nodeObject( node ).toTexture(), nodeObject( threshold ), nodeObject( scale ), samples ) );

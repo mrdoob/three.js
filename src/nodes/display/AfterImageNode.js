@@ -135,6 +135,13 @@ class AfterImageNode extends TempNode {
 
 	}
 
+	dispose() {
+
+		this._compRT.dispose();
+		this._oldRT.dispose();
+
+	}
+
 }
 
 export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( nodeObject( node ).toTexture(), damp ) );
