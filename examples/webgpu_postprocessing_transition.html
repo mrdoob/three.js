@@ -162,7 +162,7 @@
 				const scenePassA = pass( fxSceneA.scene, fxSceneA.camera );
 				const scenePassB = pass( fxSceneB.scene, fxSceneB.camera );
 
-				transitionPass = transition( scenePassA, scenePassB, new THREE.TextureNode(textures[ effectController.texture ]), effectController._transition, effectController.threshold, effectController._useTexture );
+				transitionPass = transition( scenePassA, scenePassB, new THREE.TextureNode( textures[ effectController.texture ] ), effectController._transition, effectController.threshold, effectController._useTexture );
 
 				postProcessing.outputNode = transitionPass;
 
@@ -174,14 +174,13 @@
 
 					effectController._transition.value = effectController.transition;
 
-				});
+				} );
 				gui.add( effectController, 'useTexture').onChange(() => {
 
 					const value = effectController.useTexture ? 1 : 0;
-
 					effectController._useTexture.value = value;
 
-				});
+				} );
 				gui.add( effectController, 'texture', { Perlin: 0, Squares: 1, Cells: 2, Distort: 3, Gradient: 4, Radial: 5 } );
 				gui.add( effectController, 'cycle' );
 				gui.add( effectController.threshold, 'value', 0, 1, 0.01 ).name( 'threshold' );
@@ -190,7 +189,7 @@
 
 			window.addEventListener( 'resize', onWindowResize );
 
-			function onWindowResize() {3
+			function onWindowResize() {
 
 				fxSceneA.resize();
 				fxSceneB.resize();
@@ -202,7 +201,6 @@
 				.to( { transition: 1 }, 1500 )
 				.onUpdate( function ( ) {
 
-
 					transitionController.setValue( effectController.transition )
 
 					// Change the current alpha texture after each transition
@@ -211,7 +209,6 @@
 						if ( effectController.transition == 0 || effectController.transition == 1 ) {
 
 							effectController.texture = ( effectController.texture + 1 ) % textures.length;
-							//erenderTransitionPass.setTexture( textures[ params.texture ] );
 
 						}
 

@@ -1,7 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, tslFn, nodeObject, float, If } from '../shadernode/ShaderNode.js';
-import { NodeUpdateType } from '../core/constants.js';
+import { addNodeElement, tslFn, nodeObject, float } from '../shadernode/ShaderNode.js';
 import { clamp, mix } from '../math/MathNode.js';
 
 class TransitionNode extends TempNode {
@@ -44,7 +43,7 @@ class TransitionNode extends TempNode {
 			const r = mixRatioNode.mul( thresholdNode.mul( 2.0 ).add( 1.0 ) ).sub( thresholdNode );
 			const mixf = clamp( transitionTexel.r.sub( r ).mul( float( 1.0 ).div( thresholdNode ) ), 0.0, 1.0 );
 
-			return mix( texelOne, texelTwo, useTextureNode.equal(1).cond( mixf, mixRatioNode ) );
+			return mix( texelOne, texelTwo, useTextureNode.equal( 1 ).cond( mixf, mixRatioNode ) );
 
 		} );
 
@@ -61,3 +60,4 @@ export const transition = ( nodeA, nodeB, mixTexture, mixRatio, threshold, useTe
 addNodeElement( 'transition', transition );
 
 export default TransitionNode;
+
