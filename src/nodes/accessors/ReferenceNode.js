@@ -44,7 +44,7 @@ class ReferenceNode extends Node {
 
 		console.log( property );
 		console.log( uniformType );
-		console.log( object )
+		console.log( object );
 
 		this.property = property;
 		this.uniformType = uniformType;
