@@ -75,7 +75,7 @@ class InstanceNode extends Node {
 
 		// NORMAL
 
-		const m = mat3( instanceMatrixNode[ 0 ].xyz, instanceMatrixNode[ 1 ].xyz, instanceMatrixNode[ 2 ].xyz );
+		const m = mat3( instanceMatrixNode );
 
 		const transformedNormal = normalLocal.div( vec3( m[ 0 ].dot( m[ 0 ] ), m[ 1 ].dot( m[ 1 ] ), m[ 2 ].dot( m[ 2 ] ) ) );
 
