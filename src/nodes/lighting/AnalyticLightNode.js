@@ -241,6 +241,7 @@ class AnalyticLightNode extends LightingNode {
 
 		this.shadowNode = null;
 		this.shadowMaskNode = null;
+		this._shadowColorNode = null;
 		this.rtt = null;
 
 		this.colorNode = this._defaultColorNode;
