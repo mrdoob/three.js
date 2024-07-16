@@ -95,7 +95,7 @@ class DenoiseNode extends TempNode {
 
 				return texel;
 
-			} );
+			} );
 
 			const center = vec3( texel.rgb );
 
