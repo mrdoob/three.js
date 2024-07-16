@@ -2,7 +2,7 @@ import { Matrix3 } from '../../math/Matrix3.js';
 import { Plane } from '../../math/Plane.js';
 import { Vector4 } from '../../math/Vector4.js';
 
-const _plane = new Plane();
+const _plane = /*@__PURE__*/ new Plane();
 
 let _clippingContextVersion = 0;
 

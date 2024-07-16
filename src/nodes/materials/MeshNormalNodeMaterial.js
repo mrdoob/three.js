@@ -7,7 +7,7 @@ import { float, vec4 } from '../shadernode/ShaderNode.js';
 
 import { MeshNormalMaterial } from '../../materials/MeshNormalMaterial.js';
 
-const defaultValues = new MeshNormalMaterial();
+const _defaultValues = /*@__PURE__*/ new MeshNormalMaterial();
 
 class MeshNormalNodeMaterial extends NodeMaterial {
 
@@ -19,7 +19,7 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 		this.isMeshNormalNodeMaterial = true;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
 

@@ -10,7 +10,7 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { HalfFloatType } from '../../constants.js';
 
-const _size = new Vector2();
+const _size = /*@__PURE__*/ new Vector2();
 
 class RTTNode extends TextureNode {
 

@@ -8,7 +8,7 @@ import { float, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
 import { SpriteMaterial } from '../../materials/SpriteMaterial.js';
 
-const defaultValues = new SpriteMaterial();
+const _defaultValues = /*@__PURE__*/ new SpriteMaterial();
 
 class SpriteNodeMaterial extends NodeMaterial {
 
@@ -25,7 +25,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 		this.rotationNode = null;
 		this.scaleNode = null;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
 

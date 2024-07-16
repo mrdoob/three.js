@@ -11,9 +11,9 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 
-const _size = new Vector2();
+const _size = /*@__PURE__*/ new Vector2();
 
-const quadMeshComp = new QuadMesh();
+const quadMeshComp = /*@__PURE__*/ new QuadMesh();
 
 class AfterImageNode extends TempNode {
 

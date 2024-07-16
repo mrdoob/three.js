@@ -1,6 +1,6 @@
 import UniformsGroup from '../UniformsGroup.js';
 
-let id = 0;
+let _id = 0;
 
 class NodeUniformsGroup extends UniformsGroup {
 
@@ -8,7 +8,7 @@ class NodeUniformsGroup extends UniformsGroup {
 
 		super( name );
 
-		this.id = id ++;
+		this.id = _id ++;
 		this.groupNode = groupNode;
 
 		this.isNodeUniformsGroup = true;

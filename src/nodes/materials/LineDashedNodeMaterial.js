@@ -7,7 +7,7 @@ import { float } from '../shadernode/ShaderNode.js';
 
 import { LineDashedMaterial } from '../../materials/LineDashedMaterial.js';
 
-const defaultValues = new LineDashedMaterial();
+const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
 class LineDashedNodeMaterial extends NodeMaterial {
 
@@ -20,7 +20,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		this.lights = false;
 		this.normals = false;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.offsetNode = null;
 		this.dashScaleNode = null;
