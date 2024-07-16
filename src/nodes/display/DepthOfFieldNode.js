@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { addNodeElement, tslFn, nodeObject, vec2, vec4 } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { clamp } from '../math/MathNode.js';
 
 class DepthOfFieldNode extends TempNode {

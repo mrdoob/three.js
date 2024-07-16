@@ -4,7 +4,7 @@ import { textureSize } from '../accessors/TextureSizeNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { addNodeElement, nodeObject, tslFn, mat3, vec2, vec3, vec4, float, int, If } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { DataTexture } from '../../textures/DataTexture.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';

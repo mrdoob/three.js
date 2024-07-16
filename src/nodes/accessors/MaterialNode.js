@@ -3,7 +3,7 @@ import { reference } from './ReferenceNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
 import { normalView } from './NormalNode.js';
 import { nodeImmutable, float, vec2, mat2 } from '../shadernode/ShaderNode.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 

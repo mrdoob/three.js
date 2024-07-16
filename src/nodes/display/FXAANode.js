@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { addNodeElement, tslFn, nodeObject, float, vec2, vec4, int, If } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { abs, max, min, mix, pow } from '../math/MathNode.js';
 import { sub } from '../math/OperatorNode.js';
 import { loop, Break } from '../utils/LoopNode.js';

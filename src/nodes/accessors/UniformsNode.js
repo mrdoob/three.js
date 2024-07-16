@@ -4,6 +4,8 @@ import { NodeUpdateType } from '../core/constants.js';
 import { getValueType } from '../core/NodeUtils.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import BufferNode from './BufferNode.js';
+import { getConstNodeType } from '../shadernode/ShaderNode.js';
+import UniformNode from '../core/UniformNode.js';
 
 class UniformsElementNode extends ArrayElementNode {
 
@@ -141,6 +143,21 @@ class UniformsNode extends BufferNode {
 
 export default UniformsNode;
 
-export const uniforms = ( values, nodeType ) => nodeObject( new UniformsNode( values, nodeType ) );
+export const uniform = ( uniformValue, elementType ) => {
+
+	if ( Array.isArray( uniformValue ) ) {
+		
+		return nodeObject( new UniformsNode( uniformValue, elementType ) )
+
+	} 
+
+	const nodeType = getConstNodeType( elementType || uniformValue );
+
+	// @TODO: get ConstNode from .traverse() in the future
+	const value = ( uniformValue && uniformValue.isNode === true ) ? ( uniformValue.node && uniformValue.node.value ) || uniformValue.value : uniformValue;
+
+	return nodeObject( new UniformNode( value, nodeType ) );
+
+};
 
 addNodeClass( 'UniformsNode', UniformsNode );

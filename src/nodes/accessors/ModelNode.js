@@ -1,7 +1,7 @@
 import Object3DNode from './Object3DNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { nodeImmutable } from '../shadernode/ShaderNode.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 
 import { Matrix4 } from '../../math/Matrix4.js';
 

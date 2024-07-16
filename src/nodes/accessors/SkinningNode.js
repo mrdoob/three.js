@@ -7,7 +7,7 @@ import { add } from '../math/OperatorNode.js';
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
 import { tangentLocal } from './TangentNode.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { buffer } from './BufferNode.js';
 
 class SkinningNode extends Node {

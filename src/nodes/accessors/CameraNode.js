@@ -1,4 +1,4 @@
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { sharedUniformGroup } from '../core/UniformGroupNode.js';
 import { Vector3 } from '../../math/Vector3.js';
 

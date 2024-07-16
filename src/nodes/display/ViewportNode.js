@@ -1,6 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { nodeImmutable, vec2 } from '../shadernode/ShaderNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';

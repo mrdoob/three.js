@@ -3,7 +3,7 @@ import { uv } from '../accessors/UVNode.js';
 import { luminance } from './ColorAdjustmentNode.js';
 import { addNodeElement, tslFn, nodeObject, vec2, vec3, vec4, mat3 } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { add } from '../math/OperatorNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';

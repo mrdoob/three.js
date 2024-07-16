@@ -30,7 +30,7 @@ export { default as PropertyNode, property, varyingProperty, output, diffuseColo
 export { default as StackNode, stack } from './core/StackNode.js';
 export { default as TempNode } from './core/TempNode.js';
 export { default as UniformGroupNode, uniformGroup, objectGroup, renderGroup, frameGroup } from './core/UniformGroupNode.js';
-export { default as UniformNode, uniform } from './core/UniformNode.js';
+export { default as UniformNode } from './core/UniformNode.js';
 export { default as VaryingNode, varying } from './core/VaryingNode.js';
 export { default as OutputStructNode, outputStruct } from './core/OutputStructNode.js';
 export { default as MRTNode, mrt } from './core/MRTNode.js';
@@ -78,7 +78,7 @@ export * from './shadernode/ShaderNode.js';
 
 // accessors
 export { TBNViewMatrix, parallaxDirection, parallaxUV, transformedBentNormalView } from './accessors/AccessorsUtils.js';
-export { default as UniformsNode, uniforms } from './accessors/UniformsNode.js';
+export { default as UniformsNode, uniform } from './accessors/UniformsNode.js';
 export * from './accessors/BitangentNode.js';
 export { default as BufferAttributeNode, bufferAttribute, dynamicBufferAttribute, instancedBufferAttribute, instancedDynamicBufferAttribute } from './accessors/BufferAttributeNode.js';
 export { default as BufferNode, buffer } from './accessors/BufferNode.js';

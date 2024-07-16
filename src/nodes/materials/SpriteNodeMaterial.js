@@ -1,5 +1,5 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
 import { materialRotation } from '../accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../accessors/ModelNode.js';

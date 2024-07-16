@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { nodeObject, addNodeElement, tslFn, vec2, vec4 } from '../shadernode/ShaderNode.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { sin, cos } from '../math/MathNode.js';
 

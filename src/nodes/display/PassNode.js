@@ -3,7 +3,7 @@ import TempNode from '../core/TempNode.js';
 import { default as TextureNode/*, texture*/ } from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
 
 import { HalfFloatType/*, FloatType*/ } from '../../constants.js';

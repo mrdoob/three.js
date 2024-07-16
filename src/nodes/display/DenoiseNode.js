@@ -2,8 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { addNodeElement, tslFn, nodeObject, float, int, vec2, vec3, vec4, mat2, If } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
-import { uniforms } from '../accessors/UniformsNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { abs, dot, sin, cos, PI, pow, max } from '../math/MathNode.js';
 import { loop } from '../utils/LoopNode.js';
 import { luminance } from './ColorAdjustmentNode.js';
@@ -30,7 +29,7 @@ class DenoiseNode extends TempNode {
 		this.index = uniform( 0 );
 
 		this._resolution = uniform( new Vector2() );
-		this._sampleVectors = uniforms( generatePdSamplePointInitializer( 16, 2, 1 ) );
+		this._sampleVectors = uniform( generatePdSamplePointInitializer( 16, 2, 1 ) );
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 

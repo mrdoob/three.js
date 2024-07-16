@@ -1,6 +1,6 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { addLightNode } from './LightsNode.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { mix } from '../math/MathNode.js';
 import { normalView } from '../accessors/NormalNode.js';
 import { objectPosition } from '../accessors/Object3DNode.js';

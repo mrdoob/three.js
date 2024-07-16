@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { texture } from '../accessors/TextureNode.js';
 import { textureCubeUV } from './PMREMUtils.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
 

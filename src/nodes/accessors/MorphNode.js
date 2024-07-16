@@ -1,7 +1,7 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { float, nodeProxy, tslFn } from '../shadernode/ShaderNode.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { reference } from './ReferenceNode.js';
 import { positionLocal } from './PositionNode.js';
 import { normalLocal } from './NormalNode.js';

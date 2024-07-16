@@ -4,7 +4,7 @@ import { NodeUpdateType } from '../core/constants.js';
 import { mul } from '../math/OperatorNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { passTexture } from './PassNode.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 import { Vector2 } from '../../math/Vector2.js';

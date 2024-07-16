@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { addNodeElement, tslFn, nodeObject, vec2, vec3, float, If } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { dot, clamp, smoothstep, sign, step, floor } from '../math/MathNode.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { output, property } from '../core/PropertyNode.js';

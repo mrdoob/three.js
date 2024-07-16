@@ -1,7 +1,7 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { addLightNode } from './LightsNode.js';
 import { getDistanceAttenuation } from './LightUtils.js';
-import { uniform } from '../core/UniformNode.js';
+import { uniform } from '../accessors/UniformsNode.js';
 import { objectViewPosition } from '../accessors/Object3DNode.js';
 import { positionView } from '../accessors/PositionNode.js';
 import { addNodeClass } from '../core/Node.js';
