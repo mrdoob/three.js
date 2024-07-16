@@ -29,7 +29,7 @@ class DotScreenNode extends TempNode {
 
 		const { renderer } = frame;
 
-		renderer.getSize( this._size.value );
+		renderer.getDrawingBufferSize( this._size.value );
 
 	}
 
