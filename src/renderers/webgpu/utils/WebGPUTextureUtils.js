@@ -473,7 +473,7 @@ class WebGPUTextureUtils {
 				format: 'RGBA',
 			};
 
-		  this.defaultVideoFrame = defaultVideoFrame = new VideoFrame( new Uint8Array( [ 0, 0, 0, 0xff ] ), init );
+			this.defaultVideoFrame = defaultVideoFrame = new VideoFrame( new Uint8Array( [ 0, 0, 0, 0xff ] ), init );
 
 		}
 
