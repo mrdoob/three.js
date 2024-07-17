@@ -92,7 +92,7 @@ class BloomNode extends TempNode {
 
 	getTextureNode() {
 
-		return this._textureNodeBlur;
+		return this._textureOutput;
 
 	}
 
