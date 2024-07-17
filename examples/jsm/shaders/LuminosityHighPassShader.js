@@ -1,7 +1,5 @@
 import {
 	Color,
-	ColorManagement,
-	Vector3
 } from 'three';
 
 /**
@@ -19,7 +17,6 @@ const LuminosityHighPassShader = {
 
 		'tDiffuse': { value: null },
 		'luminosityThreshold': { value: 1.0 },
-		'luminanceCoefficients': { value: ColorManagement.getLuminanceCoefficients( new Vector3() ) },
 		'smoothWidth': { value: 1.0 },
 		'defaultColor': { value: new Color( 0x000000 ) },
 		'defaultOpacity': { value: 0.0 }
@@ -44,7 +41,6 @@ const LuminosityHighPassShader = {
 		uniform vec3 defaultColor;
 		uniform float defaultOpacity;
 		uniform float luminosityThreshold;
-		uniform vec3 luminanceCoefficients;
 		uniform float smoothWidth;
 
 		varying vec2 vUv;
@@ -53,7 +49,7 @@ const LuminosityHighPassShader = {
 
 			vec4 texel = texture2D( tDiffuse, vUv );
 
-			float v = dot( texel.xyz, luminanceCoefficients );
+			float v = luminance( texel.xyz );
 
 			vec4 outputColor = vec4( defaultColor.rgb, defaultOpacity );
 
