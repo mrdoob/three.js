@@ -86,7 +86,7 @@
 
 				//
 
-				const stdPass = standardPass( scene, camera );
+				const stdPass = standardPass( scene, camera, { enableAO: true } );
 
 				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputNode = stdPass;
