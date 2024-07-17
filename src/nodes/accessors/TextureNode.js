@@ -94,7 +94,7 @@ class TextureNode extends UniformNode {
 
 	}
 
-	updateReference( /*state*/ ) {
+	updateReference( /*frame*/ ) {
 
 		return this.value;
 

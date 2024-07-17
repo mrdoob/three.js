@@ -116,9 +116,9 @@ class ReferenceNode extends Node {
 
 	}
 
-	updateReference( state ) {
+	updateReference( frame ) {
 
-		this.reference = this.object !== null ? this.object : state.object;
+		this.reference = this.object !== null ? this.object : frame.object;
 
 		return this.reference;
 

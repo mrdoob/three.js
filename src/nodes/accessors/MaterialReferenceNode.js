@@ -24,9 +24,9 @@ class MaterialReferenceNode extends ReferenceNode {
 
 	}*/
 
-	updateReference( state ) {
+	updateReference( frame ) {
 
-		this.reference = this.material !== null ? this.material : state.material;
+		this.reference = this.material !== null ? this.material : frame.material;
 
 		return this.reference;
 

@@ -94,7 +94,7 @@ class Node extends EventDispatcher {
 
 	}
 
-	updateReference( /*state*/ ) {
+	updateReference( /*frame*/ ) {
 
 		return this;
 
