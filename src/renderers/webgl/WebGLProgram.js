@@ -147,7 +147,7 @@ const _v0 = /*@__PURE__*/ new Vector3();
 
 function getLuminanceFunction() {
 
-	ColorManagement.getLuminanceCoefficients( _v0 )
+	ColorManagement.getLuminanceCoefficients( _v0 );
 
 	const r = _v0.x.toFixed( 4 );
 	const g = _v0.y.toFixed( 4 );

@@ -1,5 +1,5 @@
 import {
-	Color,
+	Color
 } from 'three';
 
 /**
