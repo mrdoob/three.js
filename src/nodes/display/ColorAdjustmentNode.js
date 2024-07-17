@@ -88,8 +88,11 @@ export const saturation = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.SA
 export const vibrance = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.VIBRANCE );
 export const hue = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.HUE );
 
-const _luminanceCoeffs = /*#__PURE__*/ new Vector3();
-export const luminance = ( color, luminanceCoeffs = vec3( ... ColorManagement.getLuminanceCoefficients( _luminanceCoeffs ) ) ) => dot( color, luminanceCoeffs );
+const _luminanceCoefficients = /*#__PURE__*/ new Vector3();
+export const luminance = (
+	color,
+	luminanceCoefficients = vec3( ... ColorManagement.getLuminanceCoefficients( _luminanceCoefficients ) )
+) => dot( color, luminanceCoefficients );
 
 export const threshold = ( color, threshold ) => mix( vec3( 0.0 ), color, luminance( color ).sub( threshold ).max( 0 ) );
 
