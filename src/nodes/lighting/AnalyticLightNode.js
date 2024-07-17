@@ -31,6 +31,7 @@ class AnalyticLightNode extends LightingNode {
 
 		this.color = new Color();
 		this._defaultColorNode = uniform( this.color );
+		this._shadowColorNode = null;
 
 		this.colorNode = this._defaultColorNode;
 
@@ -168,6 +169,7 @@ class AnalyticLightNode extends LightingNode {
 
 			this.rtt = rtt;
 			this.colorNode = this.colorNode.mul( mix( 1, shadowMaskNode, shadowIntensity ) );
+			this._shadowColorNode = this.colorNode;
 
 			this.shadowNode = shadowNode;
 			this.shadowMaskNode = shadowMaskNode;
@@ -175,6 +177,10 @@ class AnalyticLightNode extends LightingNode {
 			//
 
 			this.updateBeforeType = NodeUpdateType.RENDER;
+
+		} else {
+
+			this.colorNode = this._shadowColorNode;
 
 		}
 
@@ -235,6 +241,7 @@ class AnalyticLightNode extends LightingNode {
 
 		this.shadowNode = null;
 		this.shadowMaskNode = null;
+		this._shadowColorNode = null;
 		this.rtt = null;
 
 		this.colorNode = this._defaultColorNode;
