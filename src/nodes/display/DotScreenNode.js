@@ -25,11 +25,11 @@ class DotScreenNode extends TempNode {
 
 	}
 
-	updateBefore() {
+	updateBefore( frame ) {
 
-		const map = this.inputNode.value;
+		const { renderer } = frame;
 
-		this._size.value.set( map.image.width, map.image.height );
+		renderer.getDrawingBufferSize( this._size.value );
 
 	}
 

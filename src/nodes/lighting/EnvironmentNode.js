@@ -11,7 +11,7 @@ import { reference } from '../accessors/ReferenceNode.js';
 import { transformedBentNormalView } from '../accessors/AccessorsUtils.js';
 import { pmremTexture } from '../pmrem/PMREMNode.js';
 
-const envNodeCache = new WeakMap();
+const _envNodeCache = new WeakMap();
 
 class EnvironmentNode extends LightingNode {
 
@@ -29,13 +29,13 @@ class EnvironmentNode extends LightingNode {
 
 		if ( envNode.isTextureNode ) {
 
-			let cacheEnvNode = envNodeCache.get( envNode.value );
+			let cacheEnvNode = _envNodeCache.get( envNode.value );
 
 			if ( cacheEnvNode === undefined ) {
 
 				cacheEnvNode = pmremTexture( envNode.value );
 
-				envNodeCache.set( envNode.value, cacheEnvNode );
+				_envNodeCache.set( envNode.value, cacheEnvNode );
 
 			}
 

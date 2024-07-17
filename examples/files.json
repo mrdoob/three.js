@@ -375,6 +375,7 @@
 		"webgpu_postprocessing_anamorphic",
 		"webgpu_postprocessing_ao",
 		"webgpu_postprocessing_dof",
+		"webgpu_postprocessing_pixel",
 		"webgpu_postprocessing_fxaa",
 		"webgpu_postprocessing_sobel",
 		"webgpu_postprocessing",

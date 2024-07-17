@@ -26,12 +26,12 @@ import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat } from '../../constants.js';
 
-const _scene = new Scene();
-const _drawingBufferSize = new Vector2();
-const _screen = new Vector4();
-const _frustum = new Frustum();
-const _projScreenMatrix = new Matrix4();
-const _vector3 = new Vector3();
+const _scene = /*@__PURE__*/ new Scene();
+const _drawingBufferSize = /*@__PURE__*/ new Vector2();
+const _screen = /*@__PURE__*/ new Vector4();
+const _frustum = /*@__PURE__*/ new Frustum();
+const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
+const _vector3 = /*@__PURE__*/ new Vector3();
 
 class Renderer {
 

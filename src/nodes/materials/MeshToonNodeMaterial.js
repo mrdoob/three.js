@@ -3,7 +3,7 @@ import ToonLightingModel from '../functions/ToonLightingModel.js';
 
 import { MeshToonMaterial } from '../../materials/MeshToonMaterial.js';
 
-const defaultValues = new MeshToonMaterial();
+const _defaultValues = /*@__PURE__*/ new MeshToonMaterial();
 
 class MeshToonNodeMaterial extends NodeMaterial {
 
@@ -15,7 +15,7 @@ class MeshToonNodeMaterial extends NodeMaterial {
 
 		this.lights = true;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
 

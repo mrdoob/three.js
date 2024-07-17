@@ -7,7 +7,7 @@ import { matcapUV } from '../utils/MatcapUVNode.js';
 
 import { MeshMatcapMaterial } from '../../materials/MeshMatcapMaterial.js';
 
-const defaultValues = new MeshMatcapMaterial();
+const _defaultValues = /*@__PURE__*/ new MeshMatcapMaterial();
 
 class MeshMatcapNodeMaterial extends NodeMaterial {
 
@@ -19,7 +19,7 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 
 		this.isMeshMatcapNodeMaterial = true;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
 

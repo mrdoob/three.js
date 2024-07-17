@@ -13,7 +13,7 @@ import { viewport } from '../display/ViewportNode.js';
 
 import { PointsMaterial } from '../../materials/PointsMaterial.js';
 
-const defaultValues = new PointsMaterial();
+const _defaultValues = /*@__PURE__*/ new PointsMaterial();
 
 class InstancedPointsNodeMaterial extends NodeMaterial {
 
@@ -33,7 +33,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		this.pointColorNode = null;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setupShaders();
 

@@ -9,8 +9,8 @@ import { RectAreaLight } from '../../lights/RectAreaLight.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector3 } from '../../math/Vector3.js';
 
-const _matrix41 = new Matrix4();
-const _matrix42 = new Matrix4();
+const _matrix41 = /*@__PURE__*/ new Matrix4();
+const _matrix42 = /*@__PURE__*/ new Matrix4();
 
 let ltcLib = null;
 

@@ -12,7 +12,7 @@ import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { viewportTopLeft } from './ViewportNode.js';
 
-const _size = new Vector2();
+const _size = /*@__PURE__*/ new Vector2();
 
 class PassTextureNode extends TextureNode {
 

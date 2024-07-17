@@ -17,9 +17,9 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Color } from '../../math/Color.js';
 
-const _quadMesh = new QuadMesh();
-const _currentClearColor = new Color();
-const _size = new Vector2();
+const _quadMesh = /*@__PURE__*/ new QuadMesh();
+const _currentClearColor = /*@__PURE__*/ new Color();
+const _size = /*@__PURE__*/ new Vector2();
 
 class GTAONode extends TempNode {
 
@@ -70,7 +70,7 @@ class GTAONode extends TempNode {
 
 		const { renderer } = frame;
 
-		const size = renderer.getSize( _size );
+		const size = renderer.getDrawingBufferSize( _size );
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
@@ -222,6 +222,12 @@ class GTAONode extends TempNode {
 		//
 
 		return this._textureNode;
+
+	}
+
+	dispose() {
+
+		this._aoRenderTarget.dispose();
 
 	}
 

@@ -11,7 +11,7 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 
-const quadMesh = new QuadMesh();
+const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 class AnamorphicNode extends TempNode {
 
@@ -66,7 +66,7 @@ class AnamorphicNode extends TempNode {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentTexture = textureNode.value;
 
-		quadMesh.material = this._material;
+		_quadMesh.material = this._material;
 
 		this.setSize( map.image.width, map.image.height );
 
@@ -74,7 +74,7 @@ class AnamorphicNode extends TempNode {
 
 		renderer.setRenderTarget( this._renderTarget );
 
-		quadMesh.render( renderer );
+		_quadMesh.render( renderer );
 
 		// restore
 
@@ -126,6 +126,12 @@ class AnamorphicNode extends TempNode {
 		//
 
 		return this._textureNode;
+
+	}
+
+	dispose() {
+
+		this._renderTarget.dispose();
 
 	}
 

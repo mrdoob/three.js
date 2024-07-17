@@ -124,9 +124,6 @@ const exceptionList = [
 	'webgpu_storage_buffer',
 
 	// WebGPURenderer: Unknown problem
-	'webgpu_postprocessing_afterimage',
-	'webgpu_postprocessing_3dlut',
-	'webgpu_postprocessing_ao',
 	'webgpu_backdrop_water',
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_clipping',
@@ -151,8 +148,6 @@ const exceptionList = [
 	'webgpu_texturegrad',
 	'webgpu_performance_renderbundle',
 	'webgpu_lights_rectarealight',
-	'webgpu_postprocessing',
-	'misc_controls_fly',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',
