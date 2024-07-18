@@ -4,7 +4,7 @@ import { uniform } from '../core/UniformNode.js';
 import { texture } from './TextureNode.js';
 import { buffer } from './BufferNode.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
-import { uniforms } from './UniformsNode.js';
+import { uniformsArray } from './UniformsNode.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 
 class ReferenceElementNode extends ArrayElementNode {
@@ -72,7 +72,7 @@ class ReferenceNode extends Node {
 
 		} else if ( Array.isArray( this.getValueFromReference() ) ) {
 
-			node = uniforms( null, uniformType );
+			node = uniformsArray( null, uniformType );
 
 		} else if ( uniformType === 'texture' ) {
 
