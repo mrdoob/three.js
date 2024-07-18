@@ -1232,7 +1232,7 @@ fn main( ${shaderData.varyings} ) -> ${shaderData.returnType} {
 	_getWGSLComputeCode( shaderData, workgroupSize ) {
 
 		return `${ this.getSignature() }
-// Directives
+// directives
 ${shaderData.directives}
 
 // system
