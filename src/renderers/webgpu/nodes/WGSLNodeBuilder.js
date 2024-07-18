@@ -935,7 +935,6 @@ ${ flowData.code }
 		if ( shaderStage === 'vertex' || shaderStage === 'fragment' ) {
 
 			const varyings = this.varyings;
-			console.log( this.varyings );
 			const vars = this.vars[ shaderStage ];
 
 			for ( let index = 0; index < varyings.length; index ++ ) {
@@ -970,8 +969,6 @@ ${ flowData.code }
 		if ( builtins ) snippets.push( builtins );
 
 		const code = snippets.join( ',\n\t' );
-
-		console.log( code );
 
 		return shaderStage === 'vertex' ? this._getWGSLStruct( 'VaryingsStruct', '\t' + code ) : code;
 
@@ -1134,7 +1131,6 @@ ${ flowData.code }
 			for ( const node of flowNodes ) {
 
 				const flowSlotData = this.getFlowData( node/*, shaderStage*/ );
-				console.log( flowSlotData );
 				const slotName = node.name;
 
 				if ( slotName ) {
@@ -1193,9 +1189,7 @@ ${ flowData.code }
 		if ( this.material !== null ) {
 
 			this.vertexShader = this._getWGSLVertexCode( shadersData.vertex );
-			console.log( this.vertexShader );
 			this.fragmentShader = this._getWGSLFragmentCode( shadersData.fragment );
-			console.log( this.fragmentShader );
 
 		} else {
 
