@@ -30,6 +30,12 @@ class MRTNode extends OutputStructNode {
 
 	}
 
+	getNode( name ) {
+
+		return this.outputNodes[ name ];
+
+	}
+
 	merge( mrtNode ) {
 
 		const outputs = { ...this.outputNodes, ...mrtNode.outputNodes };
@@ -45,25 +51,13 @@ class MRTNode extends OutputStructNode {
 
 		const members = [];
 
-		if ( Array.isArray( outputNodes ) ) {
+		const textures = mrt.textures;
 
-			for ( let i = 0; i < outputNodes.length; i ++ ) {
+		for ( const name in outputNodes ) {
 
-				members.push( vec4( outputNodes[ i ] ) );
+			const index = getTextureIndex( textures, name );
 
-			}
-
-		} else {
-
-			const textures = mrt.textures;
-
-			for ( const name in outputNodes ) {
-
-				const index = getTextureIndex( textures, name );
-
-				members[ index ] = vec4( outputNodes[ name ] );
-
-			}
+			members[ index ] = vec4( outputNodes[ name ] );
 
 		}
 
