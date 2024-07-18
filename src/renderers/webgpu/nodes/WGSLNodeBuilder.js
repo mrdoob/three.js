@@ -657,7 +657,7 @@ ${ flowData.code }
 
 	}
 
-	getDirective( name, shaderStage = this.shaderStage ) {
+	enableDirective( name, shaderStage = this.shaderStage ) {
 
 		const stage = this.directives[ shaderStage ] || ( this.directives[ shaderStage ] = [] );
 		stage.push( name );
@@ -685,13 +685,19 @@ ${ flowData.code }
 
 	enableClipDistances() {
 
-		this.getDirective( 'clip_distances' );
+		this.enableDirective( 'clip_distances' );
 
 	}
 
 	enableShaderF16() {
 
-		this.getDirective( 'f16' );
+		this.enableDirective( 'f16' );
+
+	}
+
+	enableDualSourceBlending() {
+
+		this.enableDirective( 'dual_source_blending' );
 
 	}
 
