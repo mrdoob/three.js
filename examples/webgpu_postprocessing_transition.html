@@ -29,7 +29,7 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import TWEEN from 'three/addons/libs/tween.module.js';
-			import { uniform, transition, pass } from 'three/tsl'
+			import { uniform, transition, pass } from 'three/tsl';
 
 			let renderer, postProcessing, transitionController, transitionPass;
 
@@ -45,7 +45,7 @@
 				_useTexture: uniform( 1 ),
 				texture: 5,
 				cycle: true,
-				threshold: uniform(0.1),
+				threshold: uniform( 0.1 ),
 			};
 
 			function generateInstancedMesh( geometry, material, count ) {
@@ -147,7 +147,7 @@
 
 				for ( let i = 0; i < 6; i ++ ) {
 
-					textures[ i ] = loader.load( 'textures/transition/transition' + ( i + 1 ) + '.png' );;
+					textures[ i ] = loader.load( 'textures/transition/transition' + ( i + 1 ) + '.png' );
 
 				}
 
@@ -170,12 +170,12 @@
 
 				gui.add( effectController, 'animateScene' ).name( 'Animate Scene' );
 				gui.add( effectController, 'animateTransition' ).name( 'Animate Transition' );
-				transitionController = gui.add( effectController, 'transition', 0, 1, 0.01 ).name( 'transition' ).onChange(() => {
+				transitionController = gui.add( effectController, 'transition', 0, 1, 0.01 ).name( 'transition' ).onChange( () => {
 
 					effectController._transition.value = effectController.transition;
 
 				} );
-				gui.add( effectController, 'useTexture').onChange(() => {
+				gui.add( effectController, 'useTexture' ).onChange( () => {
 
 					const value = effectController.useTexture ? 1 : 0;
 					effectController._useTexture.value = value;
@@ -201,7 +201,7 @@
 				.to( { transition: 1 }, 1500 )
 				.onUpdate( function ( ) {
 
-					transitionController.setValue( effectController.transition )
+					transitionController.setValue( effectController.transition );
 
 					// Change the current alpha texture after each transition
 					if ( effectController.cycle ) {
@@ -224,7 +224,7 @@
 
 				if ( effectController.animateTransition ) TWEEN.update();
 
-				if ( textures[ effectController.texture ]) {
+				if ( textures[ effectController.texture ] ) {
 
 					const mixTexture = textures[ effectController.texture ];
 					transitionPass.mixTextureNode.value = mixTexture;
