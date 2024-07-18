@@ -4850,9 +4850,9 @@ class Box3 {
 
 	containsPoint( point ) {
 
-		return point.x < this.min.x || point.x > this.max.x ||
-			point.y < this.min.y || point.y > this.max.y ||
-			point.z < this.min.z || point.z > this.max.z ? false : true;
+		return point.x >= this.min.x && point.x <= this.max.x &&
+			point.y >= this.min.y && point.y <= this.max.y &&
+			point.z >= this.min.z && point.z <= this.max.z;
 
 	}
 
@@ -4880,9 +4880,9 @@ class Box3 {
 	intersectsBox( box ) {
 
 		// using 6 splitting planes to rule out intersections.
-		return box.max.x < this.min.x || box.min.x > this.max.x ||
-			box.max.y < this.min.y || box.min.y > this.max.y ||
-			box.max.z < this.min.z || box.min.z > this.max.z ? false : true;
+		return box.max.x >= this.min.x && box.min.x <= this.max.x &&
+			box.max.y >= this.min.y && box.min.y <= this.max.y &&
+			box.max.z >= this.min.z && box.min.z <= this.max.z;
 
 	}
 
@@ -33167,7 +33167,7 @@ class InstancedMesh extends Mesh {
 
 		if ( this.instanceColor === null ) {
 
-			this.instanceColor = new InstancedBufferAttribute( new Float32Array( this.instanceMatrix.count * 3 ), 3 );
+			this.instanceColor = new InstancedBufferAttribute( new Float32Array( this.instanceMatrix.count * 3 ).fill( 1 ), 3 );
 
 		}
 
@@ -51952,8 +51952,8 @@ class Box2 {
 
 	containsPoint( point ) {
 
-		return point.x < this.min.x || point.x > this.max.x ||
-			point.y < this.min.y || point.y > this.max.y ? false : true;
+		return point.x >= this.min.x && point.x <= this.max.x &&
+			point.y >= this.min.y && point.y <= this.max.y;
 
 	}
 
@@ -51980,8 +51980,8 @@ class Box2 {
 
 		// using 4 splitting planes to rule out intersections
 
-		return box.max.x < this.min.x || box.min.x > this.max.x ||
-			box.max.y < this.min.y || box.min.y > this.max.y ? false : true;
+		return box.max.x >= this.min.x && box.min.x <= this.max.x &&
+			box.max.y >= this.min.y && box.min.y <= this.max.y;
 
 	}
 

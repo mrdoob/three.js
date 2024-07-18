@@ -85,16 +85,6 @@ mat3 transposeMat3( const in mat3 m ) {
 
 }
 
-float luminance( const in vec3 rgb ) {
-
-	// assumes rgb is in linear color space with sRGB primaries and D65 white point
-
-	const vec3 weights = vec3( 0.2126729, 0.7151522, 0.0721750 );
-
-	return dot( weights, rgb );
-
-}
-
 bool isPerspectiveMatrix( mat4 m ) {
 
 	return m[ 2 ][ 3 ] == - 1.0;

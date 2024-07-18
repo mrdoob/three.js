@@ -7,7 +7,7 @@ import PhongLightingModel from '../functions/PhongLightingModel.js';
 
 import { MeshPhongMaterial } from '../../materials/MeshPhongMaterial.js';
 
-const defaultValues = new MeshPhongMaterial();
+const _defaultValues = /*@__PURE__*/ new MeshPhongMaterial();
 
 class MeshPhongNodeMaterial extends NodeMaterial {
 
@@ -22,7 +22,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 		this.shininessNode = null;
 		this.specularNode = null;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
 

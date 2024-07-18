@@ -3,6 +3,8 @@ import { dot, mix } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, tslFn, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
+import { Vector3 } from '../../math/Vector3.js';
 
 const saturationNode = tslFn( ( { color, adjustment } ) => {
 
@@ -86,8 +88,11 @@ export const saturation = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.SA
 export const vibrance = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.VIBRANCE );
 export const hue = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.HUE );
 
-export const lumaCoeffs = vec3( 0.2126729, 0.7151522, 0.0721750 ); // // assumes rgb is in linear color space with sRGB primaries and D65 white point
-export const luminance = ( color, luma = lumaCoeffs ) => dot( color, luma );
+const _luminanceCoefficients = /*#__PURE__*/ new Vector3();
+export const luminance = (
+	color,
+	luminanceCoefficients = vec3( ... ColorManagement.getLuminanceCoefficients( _luminanceCoefficients ) )
+) => dot( color, luminanceCoefficients );
 
 export const threshold = ( color, threshold ) => mix( vec3( 0.0 ), color, luminance( color ).sub( threshold ).max( 0 ) );
 

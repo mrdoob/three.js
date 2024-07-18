@@ -17,16 +17,16 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Color } from '../../math/Color.js';
 
-const _quadMesh = new QuadMesh();
-const _currentClearColor = new Color();
+const _quadMesh = /*@__PURE__*/ new QuadMesh();
+const _currentClearColor = /*@__PURE__*/ new Color();
+const _size = /*@__PURE__*/ new Vector2();
 
 class GTAONode extends TempNode {
 
-	constructor( textureNode, depthNode, normalNode, camera ) {
+	constructor( depthNode, normalNode, camera ) {
 
 		super();
 
-		this.textureNode = textureNode;
 		this.depthNode = depthNode;
 		this.normalNode = normalNode;
 
@@ -36,7 +36,6 @@ class GTAONode extends TempNode {
 		this.distanceExponent = uniform( 1 );
 		this.distanceFallOff = uniform( 1 );
 		this.scale = uniform( 1 );
-		this.blendIntensity = uniform( 1 );
 		this.noiseNode = texture( generateMagicSquareNoise() );
 
 		this.cameraProjectionMatrix = uniform( camera.projectionMatrix );
@@ -50,7 +49,13 @@ class GTAONode extends TempNode {
 		this._material = null;
 		this._textureNode = passTexture( this, this._aoRenderTarget.texture );
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
+
+	}
+
+	getTextureNode() {
+
+		return this._textureNode;
 
 	}
 
@@ -65,25 +70,16 @@ class GTAONode extends TempNode {
 
 		const { renderer } = frame;
 
-		const textureNode = this.textureNode;
-		const map = textureNode.value;
+		const size = renderer.getDrawingBufferSize( _size );
 
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentMRT = renderer.getMRT();
 		renderer.getClearColor( _currentClearColor );
 		const currentClearAlpha = renderer.getClearAlpha();
 
-
-		const currentTexture = textureNode.value;
-
 		_quadMesh.material = this._material;
 
-		this.setSize( map.image.width, map.image.height );
-
-
-		const textureType = map.type;
-
-		this._aoRenderTarget.texture.type = textureType;
+		this.setSize( size.width, size.height );
 
 		// clear
 
@@ -100,17 +96,13 @@ class GTAONode extends TempNode {
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );
 		renderer.setClearColor( _currentClearColor, currentClearAlpha );
-		textureNode.value = currentTexture;
 
 	}
 
 	setup( builder ) {
 
-		const { textureNode } = this;
-
 		const uvNode = uv();
 
-		const sampleTexture = ( uv ) => textureNode.uv( uv );
 		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
 		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
 
@@ -223,22 +215,19 @@ class GTAONode extends TempNode {
 
 		} );
 
-		const composite = tslFn( () => {
-
-			const beauty = sampleTexture( uvNode );
-			const ao = this._textureNode.uv( uvNode );
-
-			return beauty.mul( mix( vec3( 1.0 ), ao, this.blendIntensity ) );
-
-		} );
-
 		const material = this._material || ( this._material = builder.createNodeMaterial() );
 		material.fragmentNode = ao().context( builder.getSharedContext() );
 		material.needsUpdate = true;
 
 		//
 
-		return composite();
+		return this._textureNode;
+
+	}
+
+	dispose() {
+
+		this._aoRenderTarget.dispose();
 
 	}
 
@@ -328,7 +317,7 @@ function generateMagicSquare( size ) {
 
 }
 
-export const ao = ( node, depthNode, normalNode, camera ) => nodeObject( new GTAONode( nodeObject( node ).toTexture(), nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
+export const ao = ( depthNode, normalNode, camera ) => nodeObject( new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
 
 addNodeElement( 'ao', ao );
 

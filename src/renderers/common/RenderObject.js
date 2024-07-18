@@ -1,6 +1,6 @@
 import ClippingContext from './ClippingContext.js';
 
-let id = 0;
+let _id = 0;
 
 function getKeys( obj ) {
 
@@ -43,7 +43,7 @@ export default class RenderObject {
 		this._nodes = nodes;
 		this._geometries = geometries;
 
-		this.id = id ++;
+		this.id = _id ++;
 
 		this.renderer = renderer;
 		this.object = object;

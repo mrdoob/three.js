@@ -11,7 +11,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 
-const _size = new Vector2();
+const _size = /*@__PURE__*/ new Vector2();
 
 class PassTextureNode extends TextureNode {
 

@@ -114,7 +114,7 @@ export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
 // display
 export { default as BlendModeNode, burn, dodge, overlay, screen } from './display/BlendModeNode.js';
 export { default as BumpMapNode, bumpMap } from './display/BumpMapNode.js';
-export { default as ColorAdjustmentNode, saturation, vibrance, hue, lumaCoeffs, luminance, threshold } from './display/ColorAdjustmentNode.js';
+export { default as ColorAdjustmentNode, saturation, vibrance, hue, luminance, threshold } from './display/ColorAdjustmentNode.js';
 export { default as ColorSpaceNode, linearToColorSpace, colorSpaceToLinear, linearTosRGB, sRGBToLinear } from './display/ColorSpaceNode.js';
 export { default as FrontFacingNode, frontFacing, faceDirection } from './display/FrontFacingNode.js';
 export { default as NormalMapNode, normalMap } from './display/NormalMapNode.js';
@@ -135,9 +135,12 @@ export { default as RGBShiftNode, rgbShift } from './display/RGBShiftNode.js';
 export { default as FilmNode, film } from './display/FilmNode.js';
 export { default as Lut3DNode, lut3D } from './display/Lut3DNode.js';
 export { default as GTAONode, ao } from './display/GTAONode.js';
+export { default as DenoiseNode, denoise } from './display/DenoiseNode.js';
 export { default as FXAANode, fxaa } from './display/FXAANode.js';
+export { default as BloomNode, bloom } from './display/BloomNode.js';
 export { default as TransitionNode, transition } from './display/TransitionNode.js';
 export { default as RenderOutputNode, renderOutput } from './display/RenderOutputNode.js';
+export { default as PixelationPassNode, pixelationPass } from './display/PixelationPassNode.js';
 
 export { default as PassNode, pass, passTexture, depthPass } from './display/PassNode.js';
 

@@ -42,6 +42,7 @@ class WebGPUTextureUtils {
 
 		this.defaultTexture = {};
 		this.defaultCubeTexture = {};
+		this.defaultVideoFrame = null;
 
 		this.colorBuffer = null;
 
@@ -86,6 +87,10 @@ class WebGPUTextureUtils {
 		if ( texture.isCubeTexture ) {
 
 			textureGPU = this._getDefaultCubeTextureGPU( format );
+
+		} else if ( texture.isVideoTexture ) {
+
+			this.backend.get( texture ).externalTexture = this._getDefaultVideoFrame();
 
 		} else {
 
@@ -452,6 +457,27 @@ class WebGPUTextureUtils {
 		}
 
 		return this.backend.get( defaultCubeTexture ).texture;
+
+	}
+
+	_getDefaultVideoFrame() {
+
+		let defaultVideoFrame = this.defaultVideoFrame;
+
+		if ( defaultVideoFrame === null ) {
+
+			const init = {
+				timestamp: 0,
+				codedWidth: 1,
+				codedHeight: 1,
+				format: 'RGBA',
+			};
+
+			this.defaultVideoFrame = defaultVideoFrame = new VideoFrame( new Uint8Array( [ 0, 0, 0, 0xff ] ), init );
+
+		}
+
+		return defaultVideoFrame;
 
 	}
 
