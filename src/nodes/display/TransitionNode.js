@@ -1,7 +1,8 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, tslFn, nodeObject, float } from '../shadernode/ShaderNode.js';
+import { addNodeElement, tslFn, nodeObject, float, int, vec4, If } from '../shadernode/ShaderNode.js';
 import { clamp, mix } from '../math/MathNode.js';
+import { sub } from '../math/OperatorNode.js';
 
 class TransitionNode extends TempNode {
 
@@ -39,11 +40,23 @@ class TransitionNode extends TempNode {
 			const texelOne = sampleTexture( textureNodeA );
 			const texelTwo = sampleTexture( textureNodeB );
 
-			const transitionTexel = sampleTexture( mixTextureNode );
-			const r = mixRatioNode.mul( thresholdNode.mul( 2.0 ).add( 1.0 ) ).sub( thresholdNode );
-			const mixf = clamp( transitionTexel.r.sub( r ).mul( float( 1.0 ).div( thresholdNode ) ), 0.0, 1.0 );
+			const color = vec4().toVar();
 
-			return mix( texelOne, texelTwo, useTextureNode.equal( 1 ).cond( mixf, mixRatioNode ) );
+			If( useTextureNode.equal( int( 1 ) ), () => {
+
+				const transitionTexel = sampleTexture( mixTextureNode );
+				const r = mixRatioNode.mul( thresholdNode.mul( 2.0 ).add( 1.0 ) ).sub( thresholdNode );
+				const mixf = clamp( sub( transitionTexel.r, r ).mul( float( 1.0 ).div( thresholdNode ) ), 0.0, 1.0 );
+
+				color.assign( mix( texelOne, texelTwo, mixf ) );
+
+			} ).else( () => {
+
+				color.assign( mix( texelTwo, texelOne, mixRatioNode ) );
+
+			} );
+
+			return color;
 
 		} );
 
@@ -55,7 +68,7 @@ class TransitionNode extends TempNode {
 
 }
 
-export const transition = ( nodeA, nodeB, mixTexture, mixRatio, threshold, useTexture ) => nodeObject( new TransitionNode( nodeObject( nodeA ).toTexture(), nodeObject( nodeB ).toTexture(), nodeObject( mixTexture ).toTexture(), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) ) );
+export const transition = ( nodeA, nodeB, mixTexture, mixRatio = 0.0, threshold = 0.1, useTexture = 0 ) => nodeObject( new TransitionNode( nodeObject( nodeA ).toTexture(), nodeObject( nodeB ).toTexture(), nodeObject( mixTexture ).toTexture(), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) ) );
 
 addNodeElement( 'transition', transition );
 
