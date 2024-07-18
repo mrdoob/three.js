@@ -22,7 +22,7 @@ class RenderContexts {
 		} else {
 
 			const format = renderTarget.texture.format;
-			const count = renderTarget.count;
+			const count = renderTarget.textures.length;
 
 			attachmentState = `${ count }:${ format }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
 
