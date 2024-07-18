@@ -204,10 +204,23 @@ class WebGPUBackend extends Backend {
 		if ( renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
 			renderTargetData.activeMipmapLevel !== renderTarget.activeMipmapLevel ||
-			renderTargetData.samples !== renderTarget.samples
+			renderTargetData.samples !== renderTarget.samples ||
+			descriptors.length !== renderTarget.textures.length
 		) {
 
 			descriptors.length = 0;
+
+			// dispose
+
+			const onDispose = () => {
+
+				renderTarget.removeEventListener( 'dispose', onDispose );
+
+				this.delete( renderTarget );
+
+			};
+
+			renderTarget.addEventListener( 'dispose', onDispose );
 
 		}
 
