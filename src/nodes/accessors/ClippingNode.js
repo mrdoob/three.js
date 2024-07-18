@@ -7,6 +7,72 @@ import { Fn } from '../tsl/TSLBase.js';
 import { Loop } from '../utils/LoopNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { uniformArray } from './UniformArrayNode.js';
+import { ArrayElementNode } from '../Nodes.js';
+
+// ClippingNode: A node representing a TSL function that performs a clipping operation.
+// HardwareClipDistancesNode: A node representing an assignable, builtin shader object ( GLSL's gl_clipDistance or WGSL's clip_distances )
+
+class HardwareClipDistancesElementNode extends ArrayElementNode {
+
+	constructor( node, indexNode ) {
+
+		super( node, indexNode );
+
+		this.isHardwareClipDistancesElementNode = true;
+
+	}
+
+	generate( builder, output ) {
+
+		let snippet;
+
+		const isAssignContext = builder.context.assign;
+		snippet = super.generate( builder );
+
+		if ( isAssignContext !== true ) {
+
+			const type = this.getNodeType( builder );
+
+			snippet = builder.format( snippet, type, output );
+
+		}
+
+		return snippet;
+
+	}
+
+}
+
+class HardwareClipDistancesNode extends Node {
+
+	constructor() {
+
+		super( 'float' );
+
+		this.isHardwareClipDistancesNode = true;
+
+	}
+
+	generate( builder ) {
+
+		const clippingContext = builder.clippingContext;
+		const { localClippingCount, globalClippingCount } = clippingContext;
+
+		const numClippingPlanes = globalClippingCount + localClippingCount;
+
+		const propertyName = builder.getClipDistances( numClippingPlanes );
+
+		return propertyName;
+
+	}
+
+	element( indexNode ) {
+
+		return nodeObject( new HardwareClipDistancesElementNode( this, nodeObject( indexNode ) ) );
+
+	}
+
+}
 
 class ClippingNode extends Node {
 
@@ -21,6 +87,23 @@ class ClippingNode extends Node {
 		super();
 
 		this.scope = scope;
+
+	}
+
+	generate( builder ) {
+
+		if ( this.scope === ClippingNode.HARDWARE ) {
+
+			const clippingContext = builder.clippingContext;
+			const { localClippingCount, globalClippingCount } = clippingContext;
+
+			const numClippingPlanes = globalClippingCount + localClippingCount;
+
+			builder.getClipDistances( numClippingPlanes );
+
+		}
+
+		super.generate( builder );
 
 	}
 
@@ -143,6 +226,7 @@ class ClippingNode extends Node {
 
 ClippingNode.ALPHA_TO_COVERAGE = 'alphaToCoverage';
 ClippingNode.DEFAULT = 'default';
+ClippingNode.HARDWARE = 'hardware';
 
 export default ClippingNode;
 
