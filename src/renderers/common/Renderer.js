@@ -457,7 +457,7 @@ class Renderer {
 		const { currentColorSpace } = this;
 
 		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping );
-		const useColorSpace = currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace;
+		const useColorSpace = this._renderTarget === null && ( currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace );
 
 		if ( useToneMapping === false && useColorSpace === false ) return null;
 
