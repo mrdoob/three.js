@@ -63128,7 +63128,7 @@ class Renderer {
 		const { currentColorSpace } = this;
 
 		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping );
-		const useColorSpace = currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace;
+		const useColorSpace = this._renderTarget === null && ( currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace );
 
 		if ( useToneMapping === false && useColorSpace === false ) return null;
 
@@ -65326,7 +65326,7 @@ ${ flowData.code }
 
 			const array = dataAttribute.array;
 
-			if ( ( array instanceof Uint32Array || array instanceof Int32Array || array instanceof Uint16Array || array instanceof Int16Array ) === false ) {
+			if ( ( array instanceof Uint32Array || array instanceof Int32Array || array instanceof Int16Array ) === false ) {
 
 				nodeType = nodeType.slice( 1 );
 
@@ -66130,7 +66130,7 @@ class WebGLAttributeUtils {
 			bytesPerElement: array.BYTES_PER_ELEMENT,
 			version: attribute.version,
 			pbo: attribute.pbo,
-			isInteger: type === gl.INT || type === gl.UNSIGNED_INT || type === gl.UNSIGNED_SHORT || attribute.gpuType === IntType,
+			isInteger: type === gl.INT || type === gl.UNSIGNED_INT || attribute.gpuType === IntType,
 			id: _id$1 ++
 		};
 
