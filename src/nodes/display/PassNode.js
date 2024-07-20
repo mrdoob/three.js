@@ -188,7 +188,7 @@ class PassNode extends TempNode {
 
 	getLinearDepthNode( name = 'depth' ) {
 
-		let linearDepthNode = this._linearDepthNodes( name );
+		let linearDepthNode = this._linearDepthNodes[ name ];
 
 		if ( linearDepthNode === undefined ) {
 
