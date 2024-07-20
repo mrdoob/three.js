@@ -158,7 +158,8 @@ class MaterialNode extends Node {
 
 		} else if ( scope === MaterialNode.EMISSIVE ) {
 
-			const emissiveNode = this.getColor( scope );
+			const emissiveIntensityNode = this.getFloat( 'emissiveIntensity' );
+			const emissiveNode = this.getColor( scope ).mul( emissiveIntensityNode );
 
 			if ( material.emissiveMap && material.emissiveMap.isTexture === true ) {
 
