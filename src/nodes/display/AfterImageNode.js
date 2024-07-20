@@ -2,7 +2,6 @@ import TempNode from '../core/TempNode.js';
 import { nodeObject, addNodeElement, tslFn, float, vec4 } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uv } from '../accessors/UVNode.js';
-import { after } from '../utils/AfterNode.js'
 import { texture } from '../accessors/TextureNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { sign, max } from '../math/MathNode.js';
