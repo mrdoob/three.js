@@ -136,9 +136,6 @@ class Renderer {
 		this.transparent = true;
 		this.opaque = true;
 
-		this.transparent = true;
-		this.opaque = true;
-
 		this.nodeHandler = null;
 
 		this.shadowMap = {
