@@ -222,18 +222,6 @@ class WebGPUBackend extends Backend {
 
 			descriptors.length = 0;
 
-			// dispose
-
-			const onDispose = () => {
-
-				renderTarget.removeEventListener( 'dispose', onDispose );
-
-				this.delete( renderTarget );
-
-			};
-
-			renderTarget.addEventListener( 'dispose', onDispose );
-
 		}
 
 		let descriptor = descriptors[ renderContext.activeCubeFace ];
