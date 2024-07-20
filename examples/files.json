@@ -374,6 +374,7 @@
 		"webgpu_postprocessing_afterimage",
 		"webgpu_postprocessing_anamorphic",
 		"webgpu_postprocessing_ao",
+		"webgpu_postprocessing_ao_advanced",
 		"webgpu_postprocessing_bloom",
 		"webgpu_postprocessing_bloom_emissive",
 		"webgpu_postprocessing_bloom_selective",
