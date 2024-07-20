@@ -171,33 +171,53 @@ class PassNode extends TempNode {
 
 	getViewZNode( name = 'depth' ) {
 
-		if ( this._viewZNode === null ) {
+		const depthTextureNode = this.getTextureNode( name );
 
-			const cameraNear = this._cameraNear;
-			const cameraFar = this._cameraFar;
+		if ( ! depthTextureNode.value.isDepthTexture ) {
 
-			this._viewZNode = perspectiveDepthToViewZ( this.getTextureNode( name ), cameraNear, cameraFar );
+			throw new Error( 'PassNode: getViewZNode expects a depth texture' );
 
 		}
 
-		return this._viewZNode;
+		const cameraNear = this._cameraNear;
+		const cameraFar = this._cameraFar;
+
+		if ( name === 'depth' ) {
+
+			if ( this._viewZNode === null ) {
+
+				this._viewZNode = perspectiveDepthToViewZ( depthTextureNode, cameraNear, cameraFar );
+
+			}
+
+			return this._viewZNode;
+
+		}
+
+		return perspectiveDepthToViewZ( depthTextureNode, cameraNear, cameraFar );
 
 	}
 
 	getLinearDepthNode( name = 'depth' ) {
 
-		if ( this._linearDepthNode === null ) {
+		const viewZNode = this.getViewZNode( name );
 
-			const cameraNear = this._cameraNear;
-			const cameraFar = this._cameraFar;
+		const cameraNear = this._cameraNear;
+		const cameraFar = this._cameraFar;
 
-			// TODO: just if ( builder.camera.isPerspectiveCamera )
+		if ( name === 'depth' ) {
 
-			this._linearDepthNode = viewZToOrthographicDepth( this.getViewZNode( name ), cameraNear, cameraFar );
+			if ( this._linearDepthNode === null ) {
+
+				this._linearDepthNode = viewZToOrthographicDepth( viewZNode, cameraNear, cameraFar );
+
+			}
+
+			return this._linearDepthNode;
 
 		}
 
-		return this._linearDepthNode;
+		return viewZToOrthographicDepth( viewZNode, cameraNear, cameraFar );
 
 	}
 
