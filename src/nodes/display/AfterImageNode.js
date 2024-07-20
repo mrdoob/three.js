@@ -3,13 +3,13 @@ import { nodeObject, addNodeElement, tslFn, float, vec4 } from '../shadernode/Sh
 import { NodeUpdateType } from '../core/constants.js';
 import { uv } from '../accessors/UVNode.js';
 import { texture } from '../accessors/TextureNode.js';
+import { passTexture } from './PassNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { sign, max } from '../math/MathNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { viewportTopLeft } from './ViewportNode.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -31,7 +31,7 @@ class AfterImageNode extends TempNode {
 		this._oldRT = new RenderTarget();
 		this._oldRT.texture.name = 'AfterImageNode.old';
 
-		this._textureNode = texture( this._compRT.texture, viewportTopLeft ).before( this );
+		this._textureNode = passTexture( this, this._compRT.texture );
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
@@ -149,4 +149,3 @@ export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( node
 addNodeElement( 'afterImage', afterImage );
 
 export default AfterImageNode;
-
