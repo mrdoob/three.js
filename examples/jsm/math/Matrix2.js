@@ -44,8 +44,8 @@ export class Matrix2 {
 
 		const te = this.elements;
 
-		te[ 0 ] = n11; te[ 1 ] = n21;
-		te[ 2 ] = n12; te[ 3 ] = n22;
+		te[ 0 ] = n11; te[ 2 ] = n12;
+		te[ 1 ] = n21; te[ 3 ] = n22;
 
 		return this;
 
