@@ -71,8 +71,8 @@ export * from './interactive/InteractiveGroup.js';
 export * from './interactive/SelectionBox.js';
 export * from './interactive/SelectionHelper.js';
 
-export { default as IESSpotLight } from './lights/IESSpotLight.js';
 export * from './lights/LightProbeGenerator.js';
+export * from './lights/RectAreaLightTexturesLib.js';
 export * from './lights/RectAreaLightUniformsLib.js';
 
 export * from './lines/Line2.js';

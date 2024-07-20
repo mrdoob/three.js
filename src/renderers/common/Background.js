@@ -63,6 +63,7 @@ class Background extends DataMap {
 				viewProj = viewProj.setZ( viewProj.w );
 
 				const nodeMaterial = new NodeMaterial();
+				nodeMaterial.name = 'Background.material';
 				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
@@ -74,6 +75,7 @@ class Background extends DataMap {
 				sceneData.backgroundMeshNode = backgroundMeshNode;
 				sceneData.backgroundMesh = backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
 				backgroundMesh.frustumCulled = false;
+				backgroundMesh.name = 'Background.mesh';
 
 				backgroundMesh.onBeforeRender = function ( renderer, scene, camera ) {
 

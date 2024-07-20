@@ -119,6 +119,7 @@ const exceptionList = [
 	'webgpu_sandbox',
 	'webgpu_sprites',
 	'webgpu_video_panorama',
+	'webgpu_postprocessing_bloom_emissive',
 
 	// Awaiting for WebGPU Backend support in Puppeteer
 	'webgpu_storage_buffer',

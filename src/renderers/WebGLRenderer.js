@@ -54,7 +54,7 @@ import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
-import { createCanvasElement, probeAsync } from '../utils.js';
+import { createCanvasElement, probeAsync, warnOnce } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
 
 class WebGLRenderer {
@@ -2490,7 +2490,7 @@ class WebGLRenderer {
 			if ( texture.isTexture !== true ) {
 
 				// @deprecated, r165
-				console.warn( 'WebGLRenderer: copyFramebufferToTexture function signature has changed.' );
+				warnOnce( 'WebGLRenderer: copyFramebufferToTexture function signature has changed.' );
 
 				position = arguments[ 0 ] || null;
 				texture = arguments[ 1 ];
@@ -2518,7 +2518,7 @@ class WebGLRenderer {
 			if ( srcTexture.isTexture !== true ) {
 
 				// @deprecated, r165
-				console.warn( 'WebGLRenderer: copyTextureToTexture function signature has changed.' );
+				warnOnce( 'WebGLRenderer: copyTextureToTexture function signature has changed.' );
 
 				dstPosition = arguments[ 0 ] || null;
 				srcTexture = arguments[ 1 ];
@@ -2619,7 +2619,7 @@ class WebGLRenderer {
 			if ( srcTexture.isTexture !== true ) {
 
 				// @deprecated, r165
-				console.warn( 'WebGLRenderer: copyTextureToTexture3D function signature has changed.' );
+				warnOnce( 'WebGLRenderer: copyTextureToTexture3D function signature has changed.' );
 
 				srcRegion = arguments[ 0 ] || null;
 				dstPosition = arguments[ 1 ] || null;
