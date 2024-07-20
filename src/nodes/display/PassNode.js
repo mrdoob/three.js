@@ -100,10 +100,10 @@ class PassNode extends TempNode {
 			depth: depthTexture
 		};
 
-		this._nodes = {};
+		this._textureNodes = {};
+		this._linearDepthNodes = {};
+		this._viewZNodes = {};
 
-		this._linearDepthNode = null;
-		this._viewZNode = null;
 		this._cameraNear = uniform( 0 );
 		this._cameraFar = uniform( 0 );
 
@@ -157,11 +157,11 @@ class PassNode extends TempNode {
 
 	getTextureNode( name = 'output' ) {
 
-		let textureNode = this._nodes[ name ];
+		let textureNode = this._textureNodes[ name ];
 
 		if ( textureNode === undefined ) {
 
-			this._nodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
+			this._textureNodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
 
 		}
 
@@ -171,47 +171,36 @@ class PassNode extends TempNode {
 
 	getViewZNode( name = 'depth' ) {
 
-		const depthTextureNode = this.getTextureNode( name );
+		let viewZNode = this._viewZNodes[ name ];
 
-		const cameraNear = this._cameraNear;
-		const cameraFar = this._cameraFar;
+		if ( viewZNode === undefined ) {
 
-		if ( name === 'depth' ) {
+			const cameraNear = this._cameraNear;
+			const cameraFar = this._cameraFar;
 
-			if ( this._viewZNode === null ) {
-
-				this._viewZNode = perspectiveDepthToViewZ( depthTextureNode, cameraNear, cameraFar );
-
-			}
-
-			return this._viewZNode;
+			this._viewZNodes[ name ] = viewZNode = perspectiveDepthToViewZ( this.getTextureNode( name ), cameraNear, cameraFar );
 
 		}
 
-		return perspectiveDepthToViewZ( depthTextureNode, cameraNear, cameraFar );
+		return viewZNode;
 
 	}
 
 	getLinearDepthNode( name = 'depth' ) {
 
-		const viewZNode = this.getViewZNode( name );
+		let linearDepthNode = this._linearDepthNodes( name );
 
-		const cameraNear = this._cameraNear;
-		const cameraFar = this._cameraFar;
+		if ( linearDepthNode === undefined ) {
 
-		if ( name === 'depth' ) {
+			const cameraNear = this._cameraNear;
+			const cameraFar = this._cameraFar;
+			const viewZNode = this.getViewZNode( name );
 
-			if ( this._linearDepthNode === null ) {
-
-				this._linearDepthNode = viewZToOrthographicDepth( viewZNode, cameraNear, cameraFar );
-
-			}
-
-			return this._linearDepthNode;
+			this._linearDepthNodes[ name ] = linearDepthNode = viewZToOrthographicDepth( viewZNode, cameraNear, cameraFar );
 
 		}
 
-		return viewZToOrthographicDepth( viewZNode, cameraNear, cameraFar );
+		return linearDepthNode;
 
 	}
 
