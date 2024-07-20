@@ -173,12 +173,6 @@ class PassNode extends TempNode {
 
 		const depthTextureNode = this.getTextureNode( name );
 
-		if ( ! depthTextureNode.value.isDepthTexture ) {
-
-			throw new Error( 'PassNode: getViewZNode expects a depth texture' );
-
-		}
-
 		const cameraNear = this._cameraNear;
 		const cameraFar = this._cameraFar;
 
