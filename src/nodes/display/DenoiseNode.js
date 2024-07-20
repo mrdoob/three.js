@@ -191,7 +191,7 @@ function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 
 }
 
-export const denoise = ( node, depthNode, normalNode, noiseNode, camera ) => nodeObject( new DenoiseNode( nodeObject( node ).toTexture(), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( noiseNode ), camera ) );
+export const denoise = ( node, depthNode, normalNode, noiseNode, camera ) => nodeObject( new DenoiseNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), nodeObject( noiseNode ).toTexture(), camera ) );
 
 addNodeElement( 'denoise', denoise );
 
