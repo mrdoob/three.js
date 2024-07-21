@@ -262,7 +262,7 @@ class UltraHDRLoader extends Loader {
 
 	}
 
-	load( url, onLoad, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const texture = new DataTexture(
 			this.type === HalfFloatType ? new Uint16Array() : new Float32Array(),
@@ -303,8 +303,7 @@ class UltraHDRLoader extends Loader {
 
 						if ( onLoad ) onLoad( texture, texData );
 
-					},
-					onError
+					}
 				);
 
 			} catch ( error ) {
@@ -315,7 +314,7 @@ class UltraHDRLoader extends Loader {
 
 			}
 
-		} );
+		}, onProgress, onError );
 
 		return texture;
 
