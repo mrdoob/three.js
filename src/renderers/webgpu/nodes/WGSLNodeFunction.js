@@ -50,11 +50,24 @@ const wgslTypeLib = {
 	'mat4x4f': 'mat4',
 
 	'sampler': 'sampler',
+
+	'texture_1d': 'texture',
+
 	'texture_2d': 'texture',
-	'texture_cube': 'cubeTexture',
+	'texture_2d_array': 'texture',
+	'texture_multisampled_2d': 'cubeTexture',
+
 	'texture_depth_2d': 'depthTexture',
+
+	'texture_3d': 'texture3D',
+
+	'texture_cube': 'cubeTexture',
+	'texture_cube_array': 'cubeTexture',
+
+	'texture_storage_1d': 'storageTexture',
 	'texture_storage_2d': 'storageTexture',
-	'texture_3d': 'texture3D'
+	'texture_storage_2d_array': 'storageTexture',
+	'texture_storage_3d': 'storageTexture'
 
 };
 
