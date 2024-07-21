@@ -121,9 +121,9 @@ export class Physics {
 	}
 
 	/**
-	 * Add objects children from the specified {@link Object3D} to the physics world using `userData`.
+	 * Add {@link Object3D} children to the physics world using `userData`.
 	 *
-	 * @param {Object3DWithGeometry} object Object3D based.
+	 * @param {Object3DWithGeometry} object {@link Object3D} based.
 	 *
 	 * @example ```ts
 	 *  const floor = new Mesh(
