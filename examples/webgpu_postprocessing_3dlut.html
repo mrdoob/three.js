@@ -158,7 +158,7 @@
 				controls.target.set( 0, 0, - 0.2 );
 				controls.update();
 
-				gui = new GUI( { width: 350 } );
+				gui = new GUI();
 				gui.add( params, 'lut', Object.keys( lutMap ) );
 				gui.add( params, 'intensity' ).min( 0 ).max( 1 );
 
