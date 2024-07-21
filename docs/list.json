@@ -241,6 +241,7 @@
 				"Interpolant": "api/en/math/Interpolant",
 				"Line3": "api/en/math/Line3",
 				"MathUtils": "api/en/math/MathUtils",
+				"Matrix2": "api/en/math/Matrix2",
 				"Matrix3": "api/en/math/Matrix3",
 				"Matrix4": "api/en/math/Matrix4",
 				"Plane": "api/en/math/Plane",
