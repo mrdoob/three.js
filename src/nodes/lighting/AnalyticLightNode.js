@@ -2,7 +2,7 @@ import LightingNode from './LightingNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { float, int, If, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { float, If, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
@@ -87,7 +87,6 @@ class AnalyticLightNode extends LightingNode {
 			const shadowIntensity = reference( 'intensity', 'float', shadow );
 			const bias = reference( 'bias', 'float', shadow );
 			const normalBias = reference( 'normalBias', 'float', shadow );
-			const receiveShadow = reference( 'receiveShadow', 'int', object );
 
 			const position = object.material.shadowPositionNode || positionWorld;
 
@@ -174,7 +173,7 @@ class AnalyticLightNode extends LightingNode {
 
 
 			this.shadowMap = shadowMap;
-			this.colorNode = this.colorNode.mul( receiveShadow.greaterThan( int( 0 ) ).cond( mix( 1, shadowNode, shadowIntensity ), float( 1.0 ) ) );
+			this.colorNode = this.colorNode.mul( mix( 1, shadowNode, shadowIntensity ) );
 			this._shadowColorNode = this.colorNode;
 
 			this.shadowNode = shadowNode;
