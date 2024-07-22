@@ -251,21 +251,33 @@ class KTX2Loader extends Loader {
 
 		loader.load( url, ( buffer ) => {
 
-			// Check for an existing task using this buffer. A transferred buffer cannot be transferred
-			// again from this thread.
-			if ( _taskCache.has( buffer ) ) {
+			this.parse( buffer, onLoad, onError);
+
+		}, onProgress, onError );
+
+	}
+
+	parse( buffer, onLoad, onError ) {
+
+		if ( this.workerConfig === null ) {
+
+			throw new Error( 'THREE.KTX2Loader: Missing initialization with `.detectSupport( renderer )`.' );
+
+		}
+
+		// Check for an existing task using this buffer. A transferred buffer cannot be transferred
+		// again from this thread.
+		if ( _taskCache.has( buffer ) ) {
 
 				const cachedTask = _taskCache.get( buffer );
 
 				return cachedTask.promise.then( onLoad ).catch( onError );
 
-			}
+		}
 
-			this._createTexture( buffer )
+		this._createTexture( buffer )
 				.then( ( texture ) => onLoad ? onLoad( texture ) : null )
 				.catch( onError );
-
-		}, onProgress, onError );
 
 	}
 
