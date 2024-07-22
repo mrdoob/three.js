@@ -2113,7 +2113,7 @@ class GLTFWriter {
 			if ( ! trackNode || ! trackProperty ) {
 
 				console.warn( 'THREE.GLTFExporter: Could not export animation track "%s".', track.name );
-				return null;
+				continue;
 
 			}
 
