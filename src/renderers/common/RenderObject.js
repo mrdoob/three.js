@@ -272,7 +272,7 @@ export default class RenderObject {
 
 		// Environment Nodes Cache Key
 
-		return this._nodes.getCacheKey( this.scene, this.lightsNode );
+		return this.object.receiveShadow + ',' + this._nodes.getCacheKey( this.scene, this.lightsNode );
 
 	}
 

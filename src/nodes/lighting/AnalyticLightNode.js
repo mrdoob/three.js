@@ -113,64 +113,54 @@ class AnalyticLightNode extends LightingNode {
 				.and( shadowCoord.y.lessThanEqual( 1 ) )
 				.and( shadowCoord.z.lessThanEqual( 1 ) );
 
-			shadowNode = float( 1.0 ).toVar();
-
 			const textureCompare = ( depthTexture, shadowCoord, compare ) => texture( depthTexture, shadowCoord ).compare( compare );
+
+			shadowNode = float( 1 );
 
 			if ( renderer.shadowMap.type === BasicShadowMap ) {
 
-				If( frustumTest, () => {
-
-					shadowNode.assign( textureCompare( depthTexture, shadowCoord.xy, shadowCoord.z ) );
-
-				} );
+				shadowNode = frustumTest.cond( textureCompare( depthTexture, shadowCoord.xy, shadowCoord.z ), shadowNode );
 
 			} else if ( renderer.shadowMap.type === PCFShadowMap ) {
 
-				If( frustumTest, () => {
+				const mapSize = reference( 'mapSize', 'vec2', shadow );
+				const radius = reference( 'radius', 'float', shadow );
 
-					const mapSize = reference( 'mapSize', 'vec2', shadow );
-					const radius = reference( 'radius', 'float', shadow );
+				const texelSize = vec2( 1 ).div( mapSize );
+				const dx0 = texelSize.x.negate().mul( radius );
+				const dy0 = texelSize.y.negate().mul( radius );
+				const dx1 = texelSize.x.mul( radius );
+				const dy1 = texelSize.y.mul( radius );
+				const dx2 = dx0.div( 2 );
+				const dy2 = dy0.div( 2 );
+				const dx3 = dx1.div( 2 );
+				const dy3 = dy1.div( 2 );
 
-					const texelSize = vec2( 1 ).div( mapSize );
-					const dx0 = texelSize.x.negate().mul( radius );
-					const dy0 = texelSize.y.negate().mul( radius );
-					const dx1 = texelSize.x.mul( radius );
-					const dy1 = texelSize.y.mul( radius );
-					const dx2 = dx0.div( 2 );
-					const dy2 = dy0.div( 2 );
-					const dx3 = dx1.div( 2 );
-					const dy3 = dy1.div( 2 );
-
-					shadowNode.assign( add(
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx0, dy0 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy0 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx1, dy0 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx2, dy2 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy2 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx3, dy2 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx0, 0 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx2, 0 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy, shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx3, 0 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx1, 0 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx2, dy3 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy3 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx3, dy3 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx0, dy1 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy1 ) ), shadowCoord.z ),
-						textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx1, dy1 ) ), shadowCoord.z )
-					).mul( 1 / 17 ) );
-
-				} );
+				shadowNode = frustumTest.cond( add(
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx0, dy0 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy0 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx1, dy0 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx2, dy2 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy2 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx3, dy2 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx0, 0 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx2, 0 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy, shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx3, 0 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx1, 0 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx2, dy3 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy3 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx3, dy3 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx0, dy1 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( 0, dy1 ) ), shadowCoord.z ),
+					textureCompare( depthTexture, shadowCoord.xy.add( vec2( dx1, dy1 ) ), shadowCoord.z )
+				).mul( 1 / 17 ), shadowNode );
 
 			} else {
 
 				throw new Error( 'THREE.WebGPURendere: Shadow map type not supported yet.' );
 
 			}
-
-
 
 			this.shadowMap = shadowMap;
 			this.colorNode = this.colorNode.mul( mix( 1, shadowNode, shadowIntensity ) );
