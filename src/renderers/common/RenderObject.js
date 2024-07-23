@@ -66,7 +66,7 @@ export default class RenderObject {
 
 		this.clippingContextVersion = this.clippingContext.version;
 
-		this.initialNodesCacheKey = this.getNodesCacheKey();
+		this.initialNodesCacheKey = this.getDynamicCacheKey();
 		this.initialCacheKey = this.getCacheKey();
 
 		this._nodeBuilderState = null;
@@ -273,21 +273,21 @@ export default class RenderObject {
 
 	get needsUpdate() {
 
-		return this.initialNodesCacheKey !== this.getNodesCacheKey() || this.clippingNeedsUpdate;
+		return this.initialNodesCacheKey !== this.getDynamicCacheKey() || this.clippingNeedsUpdate;
 
 	}
 
-	getNodesCacheKey() {
+	getDynamicCacheKey() {
 
 		// Environment Nodes Cache Key
 
-		return this._nodes.getCacheKey( this.scene, this.lightsNode );
+		return this.object.receiveShadow + ',' + this._nodes.getCacheKey( this.scene, this.lightsNode );
 
 	}
 
 	getCacheKey() {
 
-		return this.getMaterialCacheKey() + ',' + this.getNodesCacheKey();
+		return this.getMaterialCacheKey() + ',' + this.getDynamicCacheKey();
 
 	}
 
