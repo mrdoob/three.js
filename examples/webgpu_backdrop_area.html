@@ -49,6 +49,13 @@
 
 				clock = new THREE.Clock();
 
+				const light = new THREE.PointLight( 0xffffff, 50 );
+				camera.add( light );
+				scene.add( camera );
+
+				const ambient = new THREE.AmbientLight( 0x4466ff, 1 );
+				scene.add( ambient );
+			
 				// model
 
 				const loader = new GLTFLoader();
