@@ -158,15 +158,15 @@ class AnalyticLightNode extends LightingNode {
 
 			//
 
-			const filterFuncion = shadow.filterNode || shadowFilterLib[ renderer.shadowMap.type ] || null;
+			const filterFn = shadow.filterNode || shadowFilterLib[ renderer.shadowMap.type ] || null;
 
-			if ( filterFuncion === null ) {
+			if ( filterFn === null ) {
 
 				throw new Error( 'THREE.WebGPURenderer: Shadow map type not supported yet.' );
 
 			}
 
-			const shadowNode = frustumTest.cond( filterFuncion( { depthTexture, shadowCoord, shadow } ), float( 1 ) );
+			const shadowNode = frustumTest.cond( filterFn( { depthTexture, shadowCoord, shadow } ), float( 1 ) );
 
 			this.shadowMap = shadowMap;
 
