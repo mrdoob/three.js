@@ -258,9 +258,7 @@ class AnalyticLightNode extends LightingNode {
 
 	updateBefore( frame ) {
 
-		const { light } = this;
-
-		if ( light.castShadow ) this.updateShadow( frame );
+		this.updateShadow( frame );
 
 	}
 
