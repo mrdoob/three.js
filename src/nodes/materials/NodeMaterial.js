@@ -337,6 +337,13 @@ class NodeMaterial extends Material {
 
 	}
 
+
+	setupOutgoingLight() {
+
+		return ( this.lights === true ) ? vec3( 0 ) : diffuseColor.rgb;
+
+	}
+
 	setupNormal() {
 
 		// NORMAL VIEW
@@ -452,7 +459,7 @@ class NodeMaterial extends Material {
 
 		const lightsNode = lights ? this.setupLights( builder ) : null;
 
-		let outgoingLightNode = diffuseColor.rgb;
+		let outgoingLightNode = this.setupOutgoingLight();
 
 		if ( lightsNode && lightsNode.hasLight !== false ) {
 

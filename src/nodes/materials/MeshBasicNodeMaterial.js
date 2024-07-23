@@ -5,6 +5,7 @@ import BasicEnvironmentNode from '../lighting/BasicEnvironmentNode.js';
 import BasicLightMapNode from '../lighting/BasicLightMapNode.js';
 import BasicLightingModel from '../functions/BasicLightingModel.js';
 import { transformedNormalView, normalView } from '../accessors/NormalNode.js';
+import { diffuseColor } from '../core/PropertyNode.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshBasicMaterial();
 
@@ -50,6 +51,12 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 		}
 
 		return node;
+
+	}
+
+	setupOutgoingLight() {
+
+		return diffuseColor.rgb;
 
 	}
 
