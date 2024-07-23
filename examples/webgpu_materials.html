@@ -333,7 +333,7 @@
 
 				material = new THREE.MeshBasicNodeMaterial();
 				material.colorNode = scriptableNode;
-				//materials.push( material );
+				materials.push( material );
 
 				scriptableNode.setLocal( 'material', material );
 
@@ -349,7 +349,7 @@
 
 				}
 
-				// const serializeMesh = scene.children[ scene.children.length - 1 ];
+				const serializeMesh = scene.children[ scene.children.length - 1 ];
 
 				//
 
@@ -370,7 +370,7 @@
 
 				//
 
-				// setTimeout( () => testSerialization( serializeMesh ), 1000 ); // FIXME, see #28933
+				setTimeout( () => testSerialization( serializeMesh ), 1000 ); // FIXME, see #28933
 
 			}
 
@@ -391,26 +391,26 @@
 
 			}
 
-			// function testSerialization( mesh ) {
+			function testSerialization( mesh ) {
 
-			// 	const json = mesh.toJSON();
-			// 	const loader = new THREE.NodeObjectLoader();
-			// 	const serializedMesh = loader.parse( json );
+				const json = mesh.toJSON();
+				const loader = new THREE.NodeObjectLoader();
+				const serializedMesh = loader.parse( json );
 
-			// 	serializedMesh.position.x = ( objects.length % 4 ) * 200 - 400;
-			// 	serializedMesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
+				serializedMesh.position.x = ( objects.length % 4 ) * 200 - 400;
+				serializedMesh.position.z = Math.floor( objects.length / 4 ) * 200 - 200;
 
-			// 	const scriptableNode = serializedMesh.material.colorNode;
+				const scriptableNode = serializedMesh.material.colorNode;
 
-			// 	// it's because local.get( 'material' ) is used in the example ( local/global is unserializable )
-			// 	scriptableNode.setLocal( 'material', serializedMesh.material );
-			// 	scriptableNode.setParameter( 'execFrom', 'serialized' );
+				// it's because local.get( 'material' ) is used in the example ( local/global is unserializable )
+				scriptableNode.setLocal( 'material', serializedMesh.material );
+				scriptableNode.setParameter( 'execFrom', 'serialized' );
 
-			// 	objects.push( serializedMesh );
+				objects.push( serializedMesh );
 
-			// 	scene.add( serializedMesh );
+				scene.add( serializedMesh );
 
-			// }
+			}
 
 			function onWindowResize() {
 

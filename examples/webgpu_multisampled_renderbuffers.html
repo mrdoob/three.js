@@ -85,8 +85,8 @@
 				// textured mesh
 
 				const geometryBox = new THREE.BoxGeometry( 7, 7, 7, 12, 12, 12 );
-				const materialBox = new THREE.MeshPhongNodeMaterial();
-				const materialBoxInner = new THREE.MeshPhongNodeMaterial( { color: 0xff0000 } );
+				const materialBox = new THREE.MeshBasicNodeMaterial();
+				const materialBoxInner = new THREE.MeshBasicNodeMaterial( { color: 0xff0000 } );
 
 				materialBox.wireframe = true;
 
