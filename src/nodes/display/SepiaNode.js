@@ -22,13 +22,15 @@ class SepiaNode extends TempNode {
 
 	setup() {
 
-		const { textureNode, amount } = this.textureNode;
+		const textureNode = this.textureNode;
+		const amount = this.amount;
+		const uvNode = textureNode.uvNode || uv();
 
-		const uvNode = this.textureNode.uvNode || uv();
+		const sampleTexture = ( uv ) => textureNode.uv( uv );
 
 		const sepia = tslFn( () => {
 
-			const color = textureNode.uv( uvNode );
+			const color = sampleTexture( uvNode );
 			const c = property( 'vec3', 'c' ).assign( color.rgb );
 
 			color.r = dot( c, vec3( float( 1.0 ).sub( amount.mul( 0.607 ) ), amount.mul( 0.769 ), amount.mul( 0.189 ) ) );
