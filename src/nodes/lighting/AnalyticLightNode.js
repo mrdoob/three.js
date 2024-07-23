@@ -162,7 +162,7 @@ class AnalyticLightNode extends LightingNode {
 
 			if ( filterFuncion === null ) {
 
-				throw new Error( 'THREE.WebGPURendere: Shadow map type not supported yet.' );
+				throw new Error( 'THREE.WebGPURenderer: Shadow map type not supported yet.' );
 
 			}
 
