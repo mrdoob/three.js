@@ -2,7 +2,7 @@ import LightingNode from './LightingNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { float, If, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { float, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
@@ -26,12 +26,13 @@ class AnalyticLightNode extends LightingNode {
 		this.light = light;
 
 		this.color = new Color();
-		this._defaultColorNode = uniform( this.color );
-		this.colorNode = this._defaultColorNode;
+		this.colorNode = uniform( this.color );
+
+		this.baseColorNode = null;
 
 		this.shadowMap = null;
 		this.shadowNode = null;
-		this._shadowColorNode = null;
+		this.shadowColorNode = null;
 
 		this.isAnalyticLightNode = true;
 
@@ -53,17 +54,9 @@ class AnalyticLightNode extends LightingNode {
 
 		const { object, renderer } = builder;
 
-		if ( object.receiveShadow === false ) {
+		let shadowColorNode = this.shadowColorNode;
 
-			this.colorNode = this._defaultColorNode;
-
-			return;
-
-		}
-
-		let shadowNode = this.shadowNode;
-
-		if ( shadowNode === null ) {
+		if ( shadowColorNode === null ) {
 
 			if ( overrideMaterial === null ) {
 
@@ -115,7 +108,7 @@ class AnalyticLightNode extends LightingNode {
 
 			const textureCompare = ( depthTexture, shadowCoord, compare ) => texture( depthTexture, shadowCoord ).compare( compare );
 
-			shadowNode = float( 1 );
+			let shadowNode = float( 1 );
 
 			if ( renderer.shadowMap.type === BasicShadowMap ) {
 
@@ -163,28 +156,33 @@ class AnalyticLightNode extends LightingNode {
 			}
 
 			this.shadowMap = shadowMap;
-			this.colorNode = this.colorNode.mul( mix( 1, shadowNode, shadowIntensity ) );
-			this._shadowColorNode = this.colorNode;
 
 			this.shadowNode = shadowNode;
+			this.shadowColorNode = shadowColorNode = this.colorNode.mul( mix( 1, shadowNode, shadowIntensity ) );
 
-			//
-
-			this.updateBeforeType = NodeUpdateType.RENDER;
-
-		} else {
-
-			this.colorNode = this._shadowColorNode;
+			this.baseColorNode = this.colorNode;
 
 		}
+
+		//
+
+		this.colorNode = shadowColorNode;
+
+		this.updateBeforeType = NodeUpdateType.RENDER;
 
 	}
 
 	setup( builder ) {
 
+		this.colorNode = this.baseColorNode || this.colorNode;
+
 		if ( this.light.castShadow ) {
 
-			this.setupShadow( builder );
+			if ( builder.object.receiveShadow ) {
+
+				this.setupShadow( builder );
+
+			}
 
 		} else if ( this.shadowNode !== null ) {
 
@@ -237,9 +235,11 @@ class AnalyticLightNode extends LightingNode {
 		this.shadowMap = null;
 
 		this.shadowNode = null;
-		this._shadowColorNode = null;
+		this.shadowColorNode = null;
 
-		this.colorNode = this._defaultColorNode;
+		this.baseColorNode = null;
+
+		this.updateBeforeType = NodeUpdateType.NONE;
 
 	}
 
