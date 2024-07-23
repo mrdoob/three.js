@@ -63,7 +63,7 @@ const PCFSoftShadowMap = tslFn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 
-	const mapSize = uniform( shadow.mapSize );
+	const mapSize = reference( 'mapSize', 'vec2', shadow );
 
 	const texelSize = vec2( 1 ).div( mapSize );
 	const dx = texelSize.x;
