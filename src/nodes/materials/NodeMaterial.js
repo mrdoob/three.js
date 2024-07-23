@@ -41,7 +41,7 @@ class NodeMaterial extends Material {
 		this.forceSinglePass = false;
 
 		this.fog = true;
-		this.lights = true;
+		this.lights = false;
 		this.normals = true;
 
 		this.lightsNode = null;
