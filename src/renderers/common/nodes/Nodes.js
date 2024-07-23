@@ -226,7 +226,7 @@ class Nodes extends DataMap {
 
 			const cacheKey = [];
 
-			if ( lightsNode ) cacheKey.push( lightsNode.getCacheKey() );
+			if ( lightsNode ) cacheKey.push( lightsNode.getCacheKey( true ) );
 			if ( environmentNode ) cacheKey.push( environmentNode.getCacheKey() );
 			if ( fogNode ) cacheKey.push( fogNode.getCacheKey() );
 
