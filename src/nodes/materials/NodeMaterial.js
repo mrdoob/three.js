@@ -459,7 +459,7 @@ class NodeMaterial extends Material {
 
 		const lightsNode = lights ? this.setupLights( builder ) : null;
 
-		let outgoingLightNode = this.setupOutgoingLight();
+		let outgoingLightNode = this.setupOutgoingLight( builder );
 
 		if ( lightsNode && lightsNode.hasLight !== false ) {
 
