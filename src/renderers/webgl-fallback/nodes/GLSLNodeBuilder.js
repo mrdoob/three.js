@@ -884,7 +884,6 @@ void main() {
 			const stageData = shadersData[ shaderStage ];
 
 			stageData.extensions = this.getExtensions( shaderStage );
-			console.log( stageData.extensions );
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
 			stageData.varyings = this.getVaryings( shaderStage );
