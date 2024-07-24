@@ -375,6 +375,7 @@
 		"webgpu_pmrem_scene",
 		"webgpu_portal",
 		"webgpu_postprocessing_3dlut",
+		"webgpu_postprocessing_advanced",
 		"webgpu_postprocessing_afterimage",
 		"webgpu_postprocessing_anamorphic",
 		"webgpu_postprocessing_ao",
