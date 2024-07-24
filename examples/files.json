@@ -401,6 +401,7 @@
 		"webgpu_textures_anisotropy",
 		"webgpu_textures_partialupdate",
 		"webgpu_tsl_editor",
+		"webgpu_tsl_galaxy",
 		"webgpu_tsl_transpiler",
 		"webgpu_video_panorama",
 		"webgpu_volume_cloud",
