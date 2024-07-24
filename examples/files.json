@@ -325,6 +325,7 @@
 		"webgpu_custom_fog_background",
 		"webgpu_depth_texture",
 		"webgpu_equirectangular",
+		"webgpu_galaxy",
 		"webgpu_instance_mesh",
 		"webgpu_instance_points",
 		"webgpu_instance_uniform",
