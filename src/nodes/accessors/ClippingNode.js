@@ -1,7 +1,12 @@
 
 import Node from '../core/Node.js';
+<<<<<<< HEAD
 import { nodeObject } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
+=======
+import { addNodeElement, nodeObject, nodeProxy } from '../shadernode/ShaderNode.js';
+import { positionView } from './PositionNode.js';
+>>>>>>> 93b66d8a45 (Modify node builder to work with latest version of Chrome ( there was no conditional extension support in GLSLNodeBuilder and clip_distances are no longer an enable feature as of Chrome 127, so we'll need to think of a way to support older systems that still need it enabled if that is what we want)
 import { diffuseColor, property } from '../core/PropertyNode.js';
 import { Fn } from '../tsl/TSLBase.js';
 import { Loop } from '../utils/LoopNode.js';
@@ -60,7 +65,7 @@ class HardwareClipDistancesNode extends Node {
 
 		const numClippingPlanes = globalClippingCount + localClippingCount;
 
-		const propertyName = builder.getClipDistances( numClippingPlanes );
+		const propertyName = builder.getClipDistances( numClippingPlanes || 1 );
 
 		return propertyName;
 
@@ -75,6 +80,8 @@ class HardwareClipDistancesNode extends Node {
 }
 
 export const clipDistances = () => nodeObject( new HardwareClipDistancesNode() );
+
+addNodeElement( 'clipDistances', clipDistances );
 
 class ClippingNode extends Node {
 

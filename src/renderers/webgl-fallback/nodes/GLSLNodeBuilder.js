@@ -56,6 +56,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 		this.transforms = [];
 		this.extensions = {};
 
+<<<<<<< HEAD
 		this.useComparisonMethod = true;
 
 	}
@@ -63,6 +64,10 @@ class GLSLNodeBuilder extends NodeBuilder {
 	needsColorSpaceToLinearSRGB( texture ) {
 
 		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
+=======
+		this.instanceBindGroups = false;
+		this.extensions = {};
+>>>>>>> 93b66d8a45 (Modify node builder to work with latest version of Chrome ( there was no conditional extension support in GLSLNodeBuilder and clip_distances are no longer an enable feature as of Chrome 127, so we'll need to think of a way to support older systems that still need it enabled if that is what we want)
 
 	}
 
@@ -621,11 +626,31 @@ ${ flowData.code }
 
 	}
 
+	
+	enableClipDistances() {
+
+		const extensions = this.renderer.backend.extensions;
+
+		if ( extensions.has( 'WEBGL_clip_cull_distance' ) ) {
+
+			console.log( 'Has extension clip_distances' );
+
+			extensions.get( 'WEBGL_clip_cull_distance' );
+
+			this.getExtension( 'GL_ANGLE_clip_cull_distance', 'enable' );
+
+		}
+
+
+	}
+
 	getClipDistances() {
 
 		const extensions = this.renderer.backend.extensions;
 
 		if ( extensions.has( 'WEBGL_clip_cull_distance' ) ) {
+
+			this.enableClipDistances();
 
 			return 'gl_ClipDistance';
 
@@ -932,6 +957,7 @@ void main() {
 		if ( this.material !== null ) {
 
 			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
+			console.log( this.vertexShader );
 			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
 
 		} else {
