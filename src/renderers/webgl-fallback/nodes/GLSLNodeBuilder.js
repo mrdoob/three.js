@@ -636,9 +636,24 @@ ${ flowData.code }
 
 	}
 
+	getExtension( name, mode, shaderStage = this.shaderStage ) {
+
+		const map = this.extensions[ shaderStage ] || ( this.extensions[ shaderStage ] = new Map() );
+
+		if ( map.has( name ) === false ) {
+
+			map.set( name, {
+				name,
+				mode
+			} );
+
+		}
+
+	}
+
 	getExtensions( shaderStage ) {
 
-		let extensions = '';
+		const snippets = [];
 
 		if ( shaderStage === 'vertex' ) {
 
@@ -647,13 +662,25 @@ ${ flowData.code }
 
 			if ( isBatchedMesh && ext.has( 'WEBGL_multi_draw' ) ) {
 
-				extensions += '#extension GL_ANGLE_multi_draw : require\n';
+				this.getExtension( 'GL_ANGLE_multi_draw', 'require', 'vertex' );
 
 			}
 
 		}
 
-		return extensions;
+		const extensions = this.extensions[ shaderStage ];
+
+		if ( extensions !== undefined ) {
+
+			for ( const { name, mode } of extensions.values() ) {
+
+				snippets.push( `#extension ${name} : ${mode}` );
+
+			}
+
+		}
+
+		return snippets.join( '\n' );
 
 	}
 
