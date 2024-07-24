@@ -49,7 +49,7 @@ class ReferenceNode extends Node {
 		this.count = count;
 
 		this.properties = property.split( '.' );
-		this.reference = null;
+		this.reference = object;
 		this.node = null;
 
 		this.updateType = NodeUpdateType.OBJECT;

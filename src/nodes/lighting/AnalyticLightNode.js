@@ -7,7 +7,7 @@ import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
 import { normalWorld } from '../accessors/NormalNode.js';
-import { mix } from '../math/MathNode.js';
+import { mix, fract } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
 import { Color } from '../../math/Color.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
@@ -59,7 +59,63 @@ const PCFShadowMap = tslFn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 } );
 
-const shadowFilterLib = [ BasicShadowMap, PCFShadowMap ];
+const PCFSoftShadowMap = tslFn( ( { depthTexture, shadowCoord, shadow } ) => {
+
+	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
+
+	const mapSize = reference( 'mapSize', 'vec2', shadow );
+
+	const texelSize = vec2( 1 ).div( mapSize );
+	const dx = texelSize.x;
+	const dy = texelSize.y;
+
+	const uv = shadowCoord.xy;
+	const f = fract( uv.mul( mapSize ).add( 0.5 ) );
+	uv.subAssign( f.mul( texelSize ) );
+
+	return add(
+		depthCompare( uv, shadowCoord.z ),
+		depthCompare( uv.add( vec2( dx, 0 ) ), shadowCoord.z ),
+		depthCompare( uv.add( vec2( 0, dy ) ), shadowCoord.z ),
+		depthCompare( uv.add( texelSize ), shadowCoord.z ),
+		mix(
+			depthCompare( uv.add( vec2( dx.negate(), 0 ) ), shadowCoord.z ),
+			depthCompare( uv.add( vec2( dx.mul( 2 ), 0 ) ), shadowCoord.z ),
+			f.x
+		),
+		mix(
+			depthCompare( uv.add( vec2( dx.negate(), dy ) ), shadowCoord.z ),
+			depthCompare( uv.add( vec2( dx.mul( 2 ), dy ) ), shadowCoord.z ),
+			f.x
+		),
+		mix(
+			depthCompare( uv.add( vec2( 0, dy.negate() ) ), shadowCoord.z ),
+			depthCompare( uv.add( vec2( 0, dy.mul( 2 ) ) ), shadowCoord.z ),
+			f.y
+		),
+		mix(
+			depthCompare( uv.add( vec2( dx, dy.negate() ) ), shadowCoord.z ),
+			depthCompare( uv.add( vec2( dx, dy.mul( 2 ) ) ), shadowCoord.z ),
+			f.y
+		),
+		mix(
+			mix(
+				depthCompare( uv.add( vec2( dx.negate(), dy.negate() ) ), shadowCoord.z ),
+				depthCompare( uv.add( vec2( dx.mul( 2 ), dy.negate() ) ), shadowCoord.z ),
+				f.x
+			),
+			mix(
+				depthCompare( uv.add( vec2( dx.negate(), dy.mul( 2 ) ) ), shadowCoord.z ),
+				depthCompare( uv.add( vec2( dx.mul( 2 ), dy.mul( 2 ) ) ), shadowCoord.z ),
+				f.x
+			),
+			f.y
+		)
+	).mul( 1 / 9 );
+
+} );
+
+const shadowFilterLib = [ BasicShadowMap, PCFShadowMap, PCFSoftShadowMap ];
 
 //
 
