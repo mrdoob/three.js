@@ -54,6 +54,7 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		this.uniformGroups = {};
 		this.transforms = [];
+		this.extensions = {};
 
 		this.instanceBindGroups = false;
 
@@ -662,7 +663,7 @@ ${ flowData.code }
 
 			if ( isBatchedMesh && ext.has( 'WEBGL_multi_draw' ) ) {
 
-				this.getExtension( 'GL_ANGLE_multi_draw', 'require', 'vertex' );
+				this.getExtension( 'GL_ANGLE_multi_draw', 'require', shaderStage );
 
 			}
 
@@ -883,6 +884,7 @@ void main() {
 			const stageData = shadersData[ shaderStage ];
 
 			stageData.extensions = this.getExtensions( shaderStage );
+			console.log( stageData.extensions );
 			stageData.uniforms = this.getUniforms( shaderStage );
 			stageData.attributes = this.getAttributes( shaderStage );
 			stageData.varyings = this.getVaryings( shaderStage );
