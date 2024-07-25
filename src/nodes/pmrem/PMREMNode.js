@@ -7,6 +7,7 @@ import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
 
 import { WebGLCoordinateSystem } from '../../constants.js';
+import { Texture } from '../../textures/Texture.js';
 
 let _generator = null;
 
@@ -32,25 +33,32 @@ function _getPMREMFromTexture( texture ) {
 
 	if ( pmremVersion !== texture.pmremVersion ) {
 
+		const image = texture.image;
+
 		if ( texture.isCubeTexture ) {
 
-			if ( texture.source.data.some( ( texture ) => texture === undefined ) ) {
+			if ( isCubeMapReady( image ) ) {
 
-				throw new Error( 'PMREMNode: Undefined texture in CubeTexture. Use onLoad callback or async loader' );
+				cacheTexture = _generator.fromCubemap( texture, cacheTexture );
+
+			} else {
+
+				return null;
 
 			}
 
-			cacheTexture = _generator.fromCubemap( texture, cacheTexture );
 
 		} else {
 
-			if ( texture.image === undefined ) {
+			if ( isEquirectangularMapReady( image ) ) {
 
-				throw new Error( 'PMREMNode: Undefined image in Texture. Use onLoad callback or async loader' );
+				cacheTexture = _generator.fromEquirectangular( texture, cacheTexture );
+
+			} else {
+
+				return null;
 
 			}
-
-			cacheTexture = _generator.fromEquirectangular( texture, cacheTexture );
 
 		}
 
@@ -77,7 +85,7 @@ class PMREMNode extends TempNode {
 		this.levelNode = levelNode;
 
 		this._generator = null;
-		this._texture = texture( null );
+		this._texture = texture( new Texture() );
 		this._width = uniform( 0 );
 		this._height = uniform( 0 );
 		this._maxMip = uniform( 0 );
@@ -129,9 +137,13 @@ class PMREMNode extends TempNode {
 
 			}
 
-			this._pmrem = pmrem;
+			if ( pmrem !== null ) {
 
-			this.updateFromTexture( pmrem );
+				this._pmrem = pmrem;
+
+				this.updateFromTexture( pmrem );
+
+			}
 
 		}
 
@@ -184,6 +196,32 @@ class PMREMNode extends TempNode {
 		return textureCubeUV( this._texture, uvNode, levelNode, this._width, this._height, this._maxMip );
 
 	}
+
+}
+
+function isCubeMapReady( image ) {
+
+	if ( image === null || image === undefined ) return false;
+
+	let count = 0;
+	const length = 6;
+
+	for ( let i = 0; i < length; i ++ ) {
+
+		if ( image[ i ] !== undefined ) count ++;
+
+	}
+
+	return count === length;
+
+
+}
+
+function isEquirectangularMapReady( image ) {
+
+	if ( image === null || image === undefined ) return false;
+
+	return image.height > 0;
 
 }
 
