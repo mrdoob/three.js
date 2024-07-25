@@ -22,7 +22,7 @@ const UniformsLib = {
 
 		alphaTest: { value: 0 },
 
-		primaryGradingCDL: { value: /*@__PURE__*/ new Vector4() },
+		lookCDL: { value: /*@__PURE__*/ new Vector4() },
 
 	},
 

@@ -5,15 +5,15 @@ export default /* glsl */`
 #endif
 
 uniform float toneMappingExposure;
-uniform vec4 primaryGradingCDL;
+uniform vec4 lookCDL;
 
 // Applies ASC CDL v1.2 color grade to input color in an unspecified log or linear space.
-vec3 applyPrimaryGradingCDL( vec3 color ) {
+vec3 applyLookCDL( vec3 color ) {
 
-	float slope = primaryGradingCDL.x;
-	float offset = primaryGradingCDL.y;
-	float power = primaryGradingCDL.z;
-	float saturation = primaryGradingCDL.w;
+	float slope = lookCDL.x;
+	float offset = lookCDL.y;
+	float power = lookCDL.z;
+	float saturation = lookCDL.w;
 
 	// Fixed Rec. 709 weights for saturation as specified by ASC CDL v1.2.
 	float luma = dot( color, vec3( 0.2126, 0.7152, 0.0722 ) );
@@ -82,7 +82,7 @@ vec3 ACESFilmicToneMapping( vec3 color ) {
 	color = ACESInputMat * color;
 
 	// TODO: Convert to ACEScc or ACEScct, apply CDL, and convert back.
-	// color = applyPrimaryGradingCDL( color );
+	// color = applyLookCDL( color );
 
 	// Apply RRT and ODT
 	color = RRTAndODTFit( color );
@@ -170,7 +170,7 @@ vec3 AgXToneMapping( vec3 color ) {
 	color = agxDefaultContrastApprox( color );
 
 	// Apply AgX look
-	color = applyPrimaryGradingCDL( color );
+	color = applyLookCDL( color );
 
 	color = AgXOutsetMatrix * color;
 

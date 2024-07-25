@@ -150,7 +150,7 @@ class WebGLRenderer {
 		this.toneMapping = NoToneMapping;
 		this.toneMappingExposure = 1.0;
 
-		this._primaryGradingCDL = new Vector4( 1, 0, 1, 1 );
+		this._lookCDL = new Vector4( 1, 0, 1, 1 );
 
 		// internal properties
 
@@ -503,9 +503,9 @@ class WebGLRenderer {
 
 		};
 
-		this.setPrimaryGradingCDL = function ( slope = 1, offset = 0, power = 1, saturation = 1 ) {
+		this.setLookCDL = function ( slope = 1, offset = 0, power = 1, saturation = 1 ) {
 
-			this._primaryGradingCDL.set( slope, offset, power, saturation );
+			this._lookCDL.set( slope, offset, power, saturation );
 
 		};
 
@@ -1651,7 +1651,7 @@ class WebGLRenderer {
 			materialProperties.fog = scene.fog;
 			materialProperties.envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || materialProperties.environment );
 			materialProperties.envMapRotation = ( materialProperties.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
-			materialProperties.primaryGradingCDL = _this._primaryGradingCDL;
+			materialProperties.lookCDL = _this._lookCDL;
 
 			if ( programs === undefined ) {
 

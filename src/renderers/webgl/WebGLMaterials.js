@@ -123,7 +123,7 @@ function WebGLMaterials( renderer, properties ) {
 
 		const materialProperties = properties.get( material );
 
-		uniforms.primaryGradingCDL.value.copy( materialProperties.primaryGradingCDL );
+		uniforms.lookCDL.value.copy( materialProperties.lookCDL );
 
 		if ( material.color ) {
 
