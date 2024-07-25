@@ -141,7 +141,7 @@ export { default as BloomNode, bloom } from './display/BloomNode.js';
 export { default as TransitionNode, transition } from './display/TransitionNode.js';
 export { default as RenderOutputNode, renderOutput } from './display/RenderOutputNode.js';
 export { default as PixelationPassNode, pixelationPass } from './display/PixelationPassNode.js';
-export { default as SepiaNode, sepia } from './display/SepiaNode.js';
+export { sepia } from './display/SepiaNode.js';
 
 export { default as PassNode, pass, passTexture, depthPass } from './display/PassNode.js';
 
