@@ -72,23 +72,6 @@ const wgslTypeLib = {
 	bmat4: 'mat4x4<bool>'
 };
 
-const wgslMethods = {
-	dFdx: 'dpdx',
-	dFdy: '- dpdy',
-	mod_float: 'threejs_mod_float',
-	mod_vec2: 'threejs_mod_vec2',
-	mod_vec3: 'threejs_mod_vec3',
-	mod_vec4: 'threejs_mod_vec4',
-	equals_bool: 'threejs_equals_bool',
-	equals_bvec2: 'threejs_equals_bvec2',
-	equals_bvec3: 'threejs_equals_bvec3',
-	equals_bvec4: 'threejs_equals_bvec4',
-	lessThanEqual: 'threejs_lessThanEqual',
-	greaterThan: 'threejs_greaterThan',
-	inversesqrt: 'inverseSqrt',
-	bitcast: 'bitcast<f32>'
-};
-
 const wgslPolyfill = {
 	threejs_xor: new CodeNode( `
 fn threejs_xor( a : bool, b : bool ) -> bool {
@@ -152,6 +135,41 @@ fn threejs_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, level : i32
 }
 ` )
 };
+
+const wgslMethods = {
+	dFdx: 'dpdx',
+	dFdy: '- dpdy',
+	mod_float: 'threejs_mod_float',
+	mod_vec2: 'threejs_mod_vec2',
+	mod_vec3: 'threejs_mod_vec3',
+	mod_vec4: 'threejs_mod_vec4',
+	equals_bool: 'threejs_equals_bool',
+	equals_bvec2: 'threejs_equals_bvec2',
+	equals_bvec3: 'threejs_equals_bvec3',
+	equals_bvec4: 'threejs_equals_bvec4',
+	lessThanEqual: 'threejs_lessThanEqual',
+	greaterThan: 'threejs_greaterThan',
+	inversesqrt: 'inverseSqrt',
+	bitcast: 'bitcast<f32>'
+};
+
+// WebGPU issue: does not support pow() with negative base on Windows
+
+if ( /Windows/g.test( navigator.userAgent ) ) {
+
+	wgslPolyfill.pow_float = new CodeNode( 'fn threejs_pow_float( a : f32, b : f32 ) -> f32 { return select( -pow( -a, b ), pow( a, b ), a > 0.0 ); }' );
+	wgslPolyfill.pow_vec2 = new CodeNode( 'fn threejs_pow_vec2( a : vec2f, b : vec2f ) -> vec2f { return vec2f( threejs_pow_float( a.x, b.x ), threejs_pow_float( a.y, b.y ) ); }', [ wgslPolyfill.pow_float ] );
+	wgslPolyfill.pow_vec3 = new CodeNode( 'fn threejs_pow_vec3( a : vec3f, b : vec3f ) -> vec3f { return vec3f( threejs_pow_float( a.x, b.x ), threejs_pow_float( a.y, b.y ), threejs_pow_float( a.z, b.z ) ); }', [ wgslPolyfill.pow_float ] );
+	wgslPolyfill.pow_vec4 = new CodeNode( 'fn threejs_pow_vec4( a : vec4f, b : vec4f ) -> vec4f { return vec4f( threejs_pow_float( a.x, b.x ), threejs_pow_float( a.y, b.y ), threejs_pow_float( a.z, b.z ), threejs_pow_float( a.w, b.w ) ); }', [ wgslPolyfill.pow_float ] );
+
+	wgslMethods.pow_float = 'threejs_pow_float';
+	wgslMethods.pow_vec2 = 'threejs_pow_vec2';
+	wgslMethods.pow_vec3 = 'threejs_pow_vec3';
+	wgslMethods.pow_vec4 = 'threejs_pow_vec4';
+
+}
+
+//
 
 class WGSLNodeBuilder extends NodeBuilder {
 
