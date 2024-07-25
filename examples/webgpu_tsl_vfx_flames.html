@@ -104,7 +104,7 @@
 
 				// flame 1 material
 
-				const flame1Material = new THREE.MeshBasicNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
+				const flame1Material = new THREE.SpriteNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
 
 				flame1Material.colorNode = tslFn( () => {
 
@@ -142,7 +142,7 @@
 
 				// flame 2 material
 
-				const flame2Material = new THREE.MeshBasicNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
+				const flame2Material = new THREE.SpriteNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
 
 				flame2Material.colorNode = tslFn( () => {
 
@@ -189,7 +189,8 @@
 
 				// geometry
 
-				const geometry = new THREE.PlaneGeometry( 1, 1, 64, 64 );
+				const geometry = new THREE.PlaneGeometry( 1, 1 );
+				geometry.translate( 0, 0.5, 0 );
 
 				// meshes
 
@@ -213,6 +214,7 @@
 				controls.enableDamping = true;
 				controls.minDistance = 0.1;
 				controls.maxDistance = 50;
+				controls.target.y = 0.5;
 
 				window.addEventListener( 'resize', onWindowResize );
 
