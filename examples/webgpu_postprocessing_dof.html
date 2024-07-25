@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - postprocessing - dof</title>
+		<title>three.js webgpu - postprocessing dof</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -10,9 +10,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -20,13 +20,10 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import PostProcessing from 'three/addons/renderers/common/PostProcessing.js';
-			import { MeshBasicNodeMaterial, cubeTexture, positionWorld, oscSine, timerGlobal } from 'three/nodes';
-			import { pass } from 'three/nodes';
+			import { cubeTexture, positionWorld, oscSine, timerGlobal, pass, uniform } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			//
@@ -68,7 +65,7 @@
 				const oscPos = oscSine( positionWorld.div( 1000 /* scene distance */ ).add( timerGlobal( .2 /* speed */ ) ) );
 
 				const geometry = new THREE.SphereGeometry( 60, 20, 10 );
-				const material = new MeshBasicNodeMaterial();
+				const material = new THREE.MeshBasicNodeMaterial();
 				material.colorNode = cubeTextureNode.mul( oscPos );
 
 				mesh = new THREE.InstancedMesh( geometry, material, count );
@@ -99,22 +96,28 @@
 
 				// renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
+				const effectController = {
+					focus: uniform( 500.0 ),
+					aperture: uniform( 5 ),
+					maxblur: uniform( 0.01 )
+				};
+
 				// post processing
 
-				postProcessing = new PostProcessing( renderer );
+				postProcessing = new THREE.PostProcessing( renderer );
 
 				const scenePass = pass( scene, camera );
 
 				const scenePassColor = scenePass.getTextureNode();
 				const scenePassViewZ = scenePass.getViewZNode();
 
-				const dofPass = scenePassColor.dof( scenePassViewZ );
+				const dofPass = scenePassColor.dof( scenePassViewZ, effectController.focus, effectController.aperture.mul( 0.00001 ), effectController.maxblur );
 
 				postProcessing.outputNode = dofPass;
 
@@ -132,28 +135,10 @@
 
 				// gui
 
-				const effectController = {
-
-					focus: 500.0,
-					aperture: 5,
-					maxblur: 0.01
-
-				};
-
-				function updateEffect( ) {
-
-					dofPass.focus.value = effectController.focus;
-					dofPass.aperture.value = effectController.aperture * 0.00001;
-					dofPass.maxblur.value = effectController.maxblur;
-
-				}
-
 				const gui = new GUI();
-				gui.add( effectController, 'focus', 10.0, 3000.0, 10 ).onChange( updateEffect );
-				gui.add( effectController, 'aperture', 0, 10, 0.1 ).onChange( updateEffect );
-				gui.add( effectController, 'maxblur', 0.0, 0.01, 0.001 ).onChange( updateEffect );
-
-				updateEffect();
+				gui.add( effectController.focus, 'value', 10.0, 3000.0, 10 ).name( 'focus' );
+				gui.add( effectController.aperture, 'value', 0, 10, 0.1 ).name( 'aperture' );
+				gui.add( effectController.maxblur, 'value', 0.0, 0.01, 0.001 ).name( 'maxblur' );
 
 			}
 

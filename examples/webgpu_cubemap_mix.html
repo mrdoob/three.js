@@ -17,9 +17,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,12 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, oscSine, timerLocal, pmremTexture, float, toneMapping } from 'three/nodes';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import { mix, oscSine, timerLocal, pmremTexture, float } from 'three/tsl';
 
 			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
 
@@ -44,14 +39,6 @@
 			init();
 
 			async function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
 
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -89,11 +76,11 @@
 
 				scene.add( gltf.scene );
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMappingNode = toneMapping( THREE.LinearToneMapping, 1 );
+				renderer.toneMapping = THREE.LinearToneMapping;
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
 

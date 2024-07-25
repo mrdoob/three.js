@@ -871,7 +871,9 @@ class GLTFWriter {
 		canvas.width = width;
 		canvas.height = height;
 
-		const context = canvas.getContext( '2d' );
+		const context = canvas.getContext( '2d', {
+			willReadFrequently: true,
+		} );
 		context.fillStyle = '#00ffff';
 		context.fillRect( 0, 0, width, height );
 
@@ -1273,7 +1275,9 @@ class GLTFWriter {
 			canvas.width = Math.min( image.width, options.maxTextureSize );
 			canvas.height = Math.min( image.height, options.maxTextureSize );
 
-			const ctx = canvas.getContext( '2d' );
+			const ctx = canvas.getContext( '2d', {
+				willReadFrequently: true,
+			} );
 
 			if ( flipY === true ) {
 
@@ -2109,7 +2113,7 @@ class GLTFWriter {
 			if ( ! trackNode || ! trackProperty ) {
 
 				console.warn( 'THREE.GLTFExporter: Could not export animation track "%s".', track.name );
-				return null;
+				continue;
 
 			}
 

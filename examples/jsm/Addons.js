@@ -71,8 +71,8 @@ export * from './interactive/InteractiveGroup.js';
 export * from './interactive/SelectionBox.js';
 export * from './interactive/SelectionHelper.js';
 
-export { default as IESSpotLight } from './lights/IESSpotLight.js';
 export * from './lights/LightProbeGenerator.js';
+export * from './lights/RectAreaLightTexturesLib.js';
 export * from './lights/RectAreaLightUniformsLib.js';
 
 export * from './lines/Line2.js';
@@ -117,6 +117,7 @@ export * from './loaders/PDBLoader.js';
 export * from './loaders/PLYLoader.js';
 export * from './loaders/PVRLoader.js';
 export * from './loaders/RGBELoader.js';
+export * from './loaders/UltraHDRLoader.js';
 export * from './loaders/RGBMLoader.js';
 export * from './loaders/STLLoader.js';
 export * from './loaders/SVGLoader.js';

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - materials - displacement map</title>
+		<title>three.js webgpu - displacement map</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -10,16 +10,16 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - (normal + ao + displacement + environment) map demo.<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - ( normal + ao + displacement + environment ) maps<br />
 			ninja head from <a href="https://gpuopen.com/archive/gamescgi/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -30,13 +30,9 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-
-			import { MeshStandardNodeMaterial } from 'three/nodes';
 
 			let stats;
 			let camera, scene, renderer, controls;
@@ -116,7 +112,7 @@
 				const container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				renderer = new WebGPURenderer();
+				renderer = new THREE.WebGPURenderer();
 				renderer.setAnimationLoop( animate );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -173,7 +169,7 @@
 
 				// material
 
-				material = new MeshStandardNodeMaterial( {
+				material = new THREE.MeshStandardNodeMaterial( {
 
 					color: 0xc1c1c1,
 					roughness: settings.roughness,

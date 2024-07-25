@@ -1,5 +1,4 @@
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
-import { Loader } from './Loader.js';
 
 function MenubarFile( editor ) {
 
