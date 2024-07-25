@@ -222,13 +222,12 @@ class AnalyticLightNode extends LightingNode {
 
 			}
 
-			const shadowColor = texture( shadowMap.texture, shadowCoord );
 			const shadowNode = frustumTest.cond( filterFn( { depthTexture, shadowCoord, shadow } ), float( 1 ) );
 
 			this.shadowMap = shadowMap;
 
 			this.shadowNode = shadowNode;
-			this.shadowColorNode = shadowColorNode = this.colorNode.mul( mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ) );
+			this.shadowColorNode = shadowColorNode = this.colorNode.mul( mix( 1, shadowNode, shadowIntensity ) );
 
 			this.baseColorNode = this.colorNode;
 
