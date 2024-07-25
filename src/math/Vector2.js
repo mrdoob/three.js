@@ -211,8 +211,10 @@ class Vector2 {
 		const x = this.x, y = this.y;
 		const e = m.elements;
 
-		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ];
-		this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ];
+		const w = 1 / (e[2] * x + e[5] * y + e[8]);
+		
+		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * w;
+		this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ] * w;
 
 		return this;
 
