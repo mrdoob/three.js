@@ -1,7 +1,7 @@
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { CodeEditorElement } from '../elements/CodeEditorElement.js';
 import { disposeScene, createElementFromJSON, isGPUNode, onValidType } from '../NodeEditorUtils.js';
-import { global, scriptable, js, scriptableValue } from 'three/nodes';
+import { global, scriptable, js, scriptableValue } from 'three/tsl';
 import { getColorFromType, setInputAestheticsFromType, setOutputAestheticsFromType } from '../DataTypeLib.js';
 
 const defaultTitle = 'Scriptable';
