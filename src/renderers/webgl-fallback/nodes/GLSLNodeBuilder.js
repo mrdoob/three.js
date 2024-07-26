@@ -637,7 +637,7 @@ ${ flowData.code }
 
 	}
 
-	getExtension( name, mode, shaderStage = this.shaderStage ) {
+	enableExtension( name, mode, shaderStage = this.shaderStage ) {
 
 		const map = this.extensions[ shaderStage ] || ( this.extensions[ shaderStage ] = new Map() );
 
@@ -663,7 +663,7 @@ ${ flowData.code }
 
 			if ( isBatchedMesh && ext.has( 'WEBGL_multi_draw' ) ) {
 
-				this.getExtension( 'GL_ANGLE_multi_draw', 'require', shaderStage );
+				this.enableExtension( 'GL_ANGLE_multi_draw', 'require' );
 
 			}
 
