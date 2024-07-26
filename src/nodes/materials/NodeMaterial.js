@@ -13,8 +13,6 @@ import { materialReference } from '../accessors/MaterialReferenceNode.js';
 import { positionLocal, positionView } from '../accessors/PositionNode.js';
 import { skinningReference } from '../accessors/SkinningNode.js';
 import { morphReference } from '../accessors/MorphNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { lightsNode } from '../lighting/LightsNode.js';
 import { mix } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
@@ -374,7 +372,7 @@ class NodeMaterial extends Material {
 
 		} else if ( this.envMap ) {
 
-			node = this.envMap.isCubeTexture ? cubeTexture( this.envMap ) : texture( this.envMap );
+			node = this.envMap.isCubeTexture ? materialReference( 'envMap', 'cubeTexture' ) : materialReference( 'envMap', 'texture' );
 
 		} else if ( builder.environmentNode ) {
 
