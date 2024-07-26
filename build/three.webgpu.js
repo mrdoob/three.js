@@ -44830,12 +44830,13 @@ class AnalyticLightNode extends LightingNode {
 
 			}
 
+			const shadowColor = texture( shadowMap.texture, shadowCoord );
 			const shadowNode = frustumTest.cond( filterFn( { depthTexture, shadowCoord, shadow } ), float( 1 ) );
 
 			this.shadowMap = shadowMap;
 
 			this.shadowNode = shadowNode;
-			this.shadowColorNode = shadowColorNode = this.colorNode.mul( mix( 1, shadowNode, shadowIntensity ) );
+			this.shadowColorNode = shadowColorNode = this.colorNode.mul( mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ) );
 
 			this.baseColorNode = this.colorNode;
 
@@ -56466,25 +56467,32 @@ function _getPMREMFromTexture( texture ) {
 
 	if ( pmremVersion !== texture.pmremVersion ) {
 
+		const image = texture.image;
+
 		if ( texture.isCubeTexture ) {
 
-			if ( texture.source.data.some( ( texture ) => texture === undefined ) ) {
+			if ( isCubeMapReady( image ) ) {
 
-				throw new Error( 'PMREMNode: Undefined texture in CubeTexture. Use onLoad callback or async loader' );
+				cacheTexture = _generator.fromCubemap( texture, cacheTexture );
+
+			} else {
+
+				return null;
 
 			}
 
-			cacheTexture = _generator.fromCubemap( texture, cacheTexture );
 
 		} else {
 
-			if ( texture.image === undefined ) {
+			if ( isEquirectangularMapReady( image ) ) {
 
-				throw new Error( 'PMREMNode: Undefined image in Texture. Use onLoad callback or async loader' );
+				cacheTexture = _generator.fromEquirectangular( texture, cacheTexture );
+
+			} else {
+
+				return null;
 
 			}
-
-			cacheTexture = _generator.fromEquirectangular( texture, cacheTexture );
 
 		}
 
@@ -56511,7 +56519,7 @@ class PMREMNode extends TempNode {
 		this.levelNode = levelNode;
 
 		this._generator = null;
-		this._texture = texture( null );
+		this._texture = texture( new Texture() );
 		this._width = uniform( 0 );
 		this._height = uniform( 0 );
 		this._maxMip = uniform( 0 );
@@ -56563,9 +56571,13 @@ class PMREMNode extends TempNode {
 
 			}
 
-			this._pmrem = pmrem;
+			if ( pmrem !== null ) {
 
-			this.updateFromTexture( pmrem );
+				this._pmrem = pmrem;
+
+				this.updateFromTexture( pmrem );
+
+			}
 
 		}
 
@@ -56618,6 +56630,32 @@ class PMREMNode extends TempNode {
 		return textureCubeUV( this._texture, uvNode, levelNode, this._width, this._height, this._maxMip );
 
 	}
+
+}
+
+function isCubeMapReady( image ) {
+
+	if ( image === null || image === undefined ) return false;
+
+	let count = 0;
+	const length = 6;
+
+	for ( let i = 0; i < length; i ++ ) {
+
+		if ( image[ i ] !== undefined ) count ++;
+
+	}
+
+	return count === length;
+
+
+}
+
+function isEquirectangularMapReady( image ) {
+
+	if ( image === null || image === undefined ) return false;
+
+	return image.height > 0;
 
 }
 
@@ -62282,6 +62320,7 @@ class Background extends DataMap {
 			if ( sceneData.backgroundCacheKey !== backgroundCacheKey ) {
 
 				sceneData.backgroundMeshNode.node = vec4( backgroundNode ).mul( backgroundIntensity );
+				sceneData.backgroundMeshNode.needsUpdate = true;
 
 				backgroundMesh.material.needsUpdate = true;
 
@@ -71878,23 +71917,6 @@ const wgslTypeLib = {
 	bmat4: 'mat4x4<bool>'
 };
 
-const wgslMethods = {
-	dFdx: 'dpdx',
-	dFdy: '- dpdy',
-	mod_float: 'threejs_mod_float',
-	mod_vec2: 'threejs_mod_vec2',
-	mod_vec3: 'threejs_mod_vec3',
-	mod_vec4: 'threejs_mod_vec4',
-	equals_bool: 'threejs_equals_bool',
-	equals_bvec2: 'threejs_equals_bvec2',
-	equals_bvec3: 'threejs_equals_bvec3',
-	equals_bvec4: 'threejs_equals_bvec4',
-	lessThanEqual: 'threejs_lessThanEqual',
-	greaterThan: 'threejs_greaterThan',
-	inversesqrt: 'inverseSqrt',
-	bitcast: 'bitcast<f32>'
-};
-
 const wgslPolyfill = {
 	threejs_xor: new CodeNode( `
 fn threejs_xor( a : bool, b : bool ) -> bool {
@@ -71958,6 +71980,41 @@ fn threejs_biquadraticTexture( map : texture_2d<f32>, coord : vec2f, level : i32
 }
 ` )
 };
+
+const wgslMethods = {
+	dFdx: 'dpdx',
+	dFdy: '- dpdy',
+	mod_float: 'threejs_mod_float',
+	mod_vec2: 'threejs_mod_vec2',
+	mod_vec3: 'threejs_mod_vec3',
+	mod_vec4: 'threejs_mod_vec4',
+	equals_bool: 'threejs_equals_bool',
+	equals_bvec2: 'threejs_equals_bvec2',
+	equals_bvec3: 'threejs_equals_bvec3',
+	equals_bvec4: 'threejs_equals_bvec4',
+	lessThanEqual: 'threejs_lessThanEqual',
+	greaterThan: 'threejs_greaterThan',
+	inversesqrt: 'inverseSqrt',
+	bitcast: 'bitcast<f32>'
+};
+
+// WebGPU issue: does not support pow() with negative base on Windows
+
+if ( /Windows/g.test( navigator.userAgent ) ) {
+
+	wgslPolyfill.pow_float = new CodeNode( 'fn threejs_pow_float( a : f32, b : f32 ) -> f32 { return select( -pow( -a, b ), pow( a, b ), a > 0.0 ); }' );
+	wgslPolyfill.pow_vec2 = new CodeNode( 'fn threejs_pow_vec2( a : vec2f, b : vec2f ) -> vec2f { return vec2f( threejs_pow_float( a.x, b.x ), threejs_pow_float( a.y, b.y ) ); }', [ wgslPolyfill.pow_float ] );
+	wgslPolyfill.pow_vec3 = new CodeNode( 'fn threejs_pow_vec3( a : vec3f, b : vec3f ) -> vec3f { return vec3f( threejs_pow_float( a.x, b.x ), threejs_pow_float( a.y, b.y ), threejs_pow_float( a.z, b.z ) ); }', [ wgslPolyfill.pow_float ] );
+	wgslPolyfill.pow_vec4 = new CodeNode( 'fn threejs_pow_vec4( a : vec4f, b : vec4f ) -> vec4f { return vec4f( threejs_pow_float( a.x, b.x ), threejs_pow_float( a.y, b.y ), threejs_pow_float( a.z, b.z ), threejs_pow_float( a.w, b.w ) ); }', [ wgslPolyfill.pow_float ] );
+
+	wgslMethods.pow_float = 'threejs_pow_float';
+	wgslMethods.pow_vec2 = 'threejs_pow_vec2';
+	wgslMethods.pow_vec3 = 'threejs_pow_vec3';
+	wgslMethods.pow_vec4 = 'threejs_pow_vec4';
+
+}
+
+//
 
 class WGSLNodeBuilder extends NodeBuilder {
 
