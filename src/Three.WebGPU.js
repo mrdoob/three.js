@@ -162,6 +162,8 @@ export * from './constants.js';
 export * from './Three.Legacy.js';
 
 export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.js';
+export { default as WGSLNodeBuilder } from './renderers/webgpu/nodes/WGSLNodeBuilder.js';
+export { default as GLSLNodeBuilder } from './renderers/webgl-fallback/nodes/GLSLNodeBuilder.js';
 export { default as QuadMesh } from './renderers/common/QuadMesh.js';
 export { default as PMREMGenerator } from './renderers/common/extras/PMREMGenerator.js';
 export { default as PostProcessing } from './renderers/common/PostProcessing.js';
