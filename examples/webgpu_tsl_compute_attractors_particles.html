@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { float, If, PI, SpriteNodeMaterial, color, cos, instanceIndex, loop, mix, mod, sin, storage, tslFn, uint, uniform, uniformArray, vec3, vec4 } from 'three/tsl';
+			import { float, If, PI, color, cos, instanceIndex, loop, mix, mod, sin, storage, tslFn, uint, uniform, uniformArray, vec3, vec4 } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -140,7 +140,7 @@
 				// particles
 
 				const count = Math.pow( 2, 18 );
-				const material = new SpriteNodeMaterial( { transparent: true, blending: THREE.AdditiveBlending, depthWrite: false } );
+				const material = new THREE.SpriteNodeMaterial( { transparent: true, blending: THREE.AdditiveBlending, depthWrite: false } );
 
 				const attractorMass = uniform( Number( `1e${7}` ) );
 				const particleGlobalMass = uniform( Number( `1e${4}` ) );
@@ -231,8 +231,8 @@
 
 						// spinning
 						const spinningForce = attractorRotationAxis.mul( gravityStrength ).mul( spinningStrength );
-						const SpinningVelocity = spinningForce.cross( toAttractor );
-						force.addAssign( SpinningVelocity );
+						const spinningVelocity = spinningForce.cross( toAttractor );
+						force.addAssign( spinningVelocity );
 			
 					} );
 
