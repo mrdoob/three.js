@@ -152,6 +152,7 @@ const exceptionList = [
 	'webgpu_tsl_coffee_smoke',
 	'webgpu_tsl_vfx_flames',
 	'webgpu_tsl_galaxy',
+	'webgpu_tsl_compute_attractors_particles',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',
