@@ -2,7 +2,7 @@ import NodeMaterial from '../../../nodes/materials/NodeMaterial.js';
 import { getDirection, blur } from '../../../nodes/pmrem/PMREMUtils.js';
 import { equirectUV } from '../../../nodes/utils/EquirectUVNode.js';
 import { uniform } from '../../../nodes/core/UniformNode.js';
-import { uniforms } from '../../../nodes/accessors/UniformsNode.js';
+import { uniformArray } from '../../../nodes/accessors/UniformArrayNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
 import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
 import { float, vec3 } from '../../../nodes/shadernode/ShaderNode.js';
@@ -718,7 +718,7 @@ function _getMaterial() {
 
 function _getBlurShader( lodMax, width, height ) {
 
-	const weights = uniforms( new Array( MAX_SAMPLES ).fill( 0 ) );
+	const weights = uniformArray( new Array( MAX_SAMPLES ).fill( 0 ) );
 	const poleAxis = uniform( new Vector3( 0, 1, 0 ) );
 	const dTheta = uniform( 0 );
 	const n = float( MAX_SAMPLES );
