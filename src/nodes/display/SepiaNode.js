@@ -8,6 +8,8 @@ export const sepia = /*@__PURE__*/ tslFn( ( { color } ) => {
 
 	const c = property( 'vec3', 'c' ).assign( color.rgb );
 
+	// https://github.com/evanw/glfx.js/blob/master/src/filters/adjust/sepia.js
+
 	color.r = dot( c, vec3( 0.393, 0.769, 0.189 ) );
 	color.g = dot( c, vec3( 0.349, 0.686, 0.168 ) );
 	color.b = dot( c, vec3( 0.272, 0.534, 0.131 ) );
