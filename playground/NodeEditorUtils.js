@@ -1,5 +1,5 @@
 import { StringInput, NumberInput, ColorInput, Element, LabelElement } from 'flow';
-import { string, float, vec2, vec3, vec4, color } from 'three/nodes';
+import { string, float, vec2, vec3, vec4, color } from 'three/tsl';
 import { setInputAestheticsFromType, setOutputAestheticsFromType } from './DataTypeLib.js';
 
 export function exportJSON( object, name ) {
