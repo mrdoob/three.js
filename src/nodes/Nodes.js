@@ -78,7 +78,7 @@ export * from './shadernode/ShaderNode.js';
 
 // accessors
 export { TBNViewMatrix, parallaxDirection, parallaxUV, transformedBentNormalView } from './accessors/AccessorsUtils.js';
-export { default as UniformsNode, uniforms } from './accessors/UniformsNode.js';
+export { default as UniformArrayNode, uniformArray } from './accessors/UniformArrayNode.js';
 export * from './accessors/BitangentNode.js';
 export { default as BufferAttributeNode, bufferAttribute, dynamicBufferAttribute, instancedBufferAttribute, instancedDynamicBufferAttribute } from './accessors/BufferAttributeNode.js';
 export { default as BufferNode, buffer } from './accessors/BufferNode.js';

@@ -3,7 +3,7 @@ import { addNodeElement, tslFn, nodeObject, float, vec4, int } from '../shaderno
 import { mix, smoothstep } from '../math/MathNode.js';
 import { luminance } from './ColorAdjustmentNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { uniforms } from '../accessors/UniformsNode.js';
+import { uniformArray } from '../accessors/UniformArrayNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { Color } from '../../math/Color.js';
 import { passTexture } from './PassNode.js';
@@ -210,8 +210,8 @@ class BloomNode extends TempNode {
 
 		// composite material
 
-		const bloomFactors = uniforms( [ 1.0, 0.8, 0.6, 0.4, 0.2 ] );
-		const bloomTintColors = uniforms( [ new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ) ] );
+		const bloomFactors = uniformArray( [ 1.0, 0.8, 0.6, 0.4, 0.2 ] );
+		const bloomTintColors = uniformArray( [ new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ) ] );
 
 		const lerpBloomFactor = tslFn( ( [ factor, radius ] ) => {
 
@@ -283,7 +283,7 @@ class BloomNode extends TempNode {
 		//
 
 		const colorTexture = texture();
-		const gaussianCoefficients = uniforms( coefficients );
+		const gaussianCoefficients = uniformArray( coefficients );
 		const invSize = uniform( new Vector2() );
 		const direction = uniform( new Vector2( 0.5, 0.5 ) );
 
