@@ -62,7 +62,7 @@ export { default as MaxMipLevelNode, maxMipLevel } from './utils/MaxMipLevelNode
 export { default as OscNode, oscSine, oscSquare, oscTriangle, oscSawtooth } from './utils/OscNode.js';
 export { default as PackingNode, directionToColor, colorToDirection } from './utils/PackingNode.js';
 export { default as RemapNode, remap, remapClamp } from './utils/RemapNode.js';
-export { default as RotateUVNode, rotateUV } from './utils/RotateUVNode.js';
+export * from './utils/UVUtils.js';
 export { default as RotateNode, rotate } from './utils/RotateNode.js';
 export { default as SetNode } from './utils/SetNode.js';
 export { default as SplitNode } from './utils/SplitNode.js';
