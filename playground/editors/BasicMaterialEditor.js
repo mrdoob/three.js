@@ -1,6 +1,6 @@
 import { ColorInput, SliderInput, LabelElement } from 'flow';
 import { MaterialEditor } from './MaterialEditor.js';
-import { MeshBasicNodeMaterial } from 'three/nodes';
+import { MeshBasicNodeMaterial } from 'three/tsl';
 import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
 export class BasicMaterialEditor extends MaterialEditor {

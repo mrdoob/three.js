@@ -143,4 +143,11 @@ export default UniformArrayNode;
 
 export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
 
+export const uniforms = ( values, nodeType ) => { // @deprecated, r168
+
+	console.warn( 'THREE.UniformArrayNode: uniforms() has been renamed to uniformArray().' );
+	return nodeObject( new UniformArrayNode( values, nodeType ) );
+
+};
+
 addNodeClass( 'UniformArrayNode', UniformArrayNode );
