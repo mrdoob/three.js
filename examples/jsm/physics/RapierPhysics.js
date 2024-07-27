@@ -28,6 +28,26 @@ function getShape( geometry ) {
 		const radius = parameters.radius !== undefined ? parameters.radius : 1;
 		return RAPIER.ColliderDesc.ball( radius );
 
+	} else if ( geometry.type === 'BufferGeometry' ) {
+
+		const vertices = [];
+		const vertex = new Vector3();
+		const position = geometry.getAttribute( 'position' );
+
+		for ( let i = 0; i < position.count; i ++ ) {
+
+			vertex.fromBufferAttribute( position, i );
+			vertices.push( vertex.x, vertex.y, vertex.z );
+
+		}
+
+		// if the buffer is non-indexed, generate an index buffer
+		const indices = geometry.getIndex() === null
+							? Uint32Array.from( Array( parseInt( vertices.length / 3 ) ).keys() )
+							: geometry.getIndex().array;
+
+		return RAPIER.ColliderDesc.trimesh( vertices, indices );
+
 	}
 
 	return null;
