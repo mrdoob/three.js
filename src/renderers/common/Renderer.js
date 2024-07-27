@@ -148,9 +148,20 @@ class Renderer {
 		this.debug = {
 			checkShaderErrors: true,
 			onShaderError: null,
-			getRawShader: ( object ) => {
+			getRawShaderAsync: async ( scene, camera, object ) => {
 
-				return backend.getRawShader( object );
+				await this.compileAsync( scene, camera );
+
+				const renderList = this._renderLists.get( scene, camera );
+				const renderContext = this._renderContexts.get( scene, camera, this._renderTarget );
+
+				const material = scene.overrideMaterial || object.material;
+
+				const renderObject = this._objects.get( object, material, scene, camera, renderList.lightsNode, renderContext );
+
+				const { fragmentShader, vertexShader } = renderObject.getNodeBuilderState();
+
+				return { fragmentShader, vertexShader };
 
 			}
 		};

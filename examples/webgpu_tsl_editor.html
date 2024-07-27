@@ -84,7 +84,13 @@
 				const mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), material );
 				scene.add( mesh );
 
+				//
+
+				let compiling = false;
+
 				renderer.setAnimationLoop( () => {
+
+					if ( compiling ) return;
 
 					renderer.render( scene, camera );
 
@@ -160,9 +166,8 @@ output = vec4( finalColor, opacity );
 					};
 
 					const webGLRenderer = new THREE.WebGPURenderer( { forceWebGL: true } );
-					webGLRenderer.init();
 
-					const build = () => {
+					const build = async () => {
 
 						try {
 
@@ -172,16 +177,20 @@ output = vec4( finalColor, opacity );
 							mesh.material.fragmentNode = nodes.output;
 							mesh.material.needsUpdate = true;
 
+							compiling = true;
+
 							if ( options.output === 'WGSL' ) {
 
-								rawShader = renderer.debug.getRawShader( mesh );
+								rawShader = await renderer.debug.getRawShaderAsync( scene, camera, mesh );
 
 
 							} else if ( options.output === 'GLSL ES 3.0' ) {
 
-								rawShader = webGLRenderer.debug.getRawShader( mesh );
+								rawShader = await webGLRenderer.debug.getRawShaderAsync( scene, camera, mesh );
 
 							}
+
+							compiling = false;
 
 							showCode();
 
@@ -192,7 +201,7 @@ output = vec4( finalColor, opacity );
 							console.log( '%c  [ WGSL ] Vertex Shader      ', style );
 							console.log( rawShader.vertexShader );
 							console.log( '%c  [ WGSL ] Fragment Shader    ', style );
-							console.log( rawShader.fragmentShader );*/
+							console.log( rawShader.fragmentShader );/**/
 
 						} catch ( e ) {
 
