@@ -34,7 +34,7 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 				gl_FragColor = vec4(vUv.xy, 0, 1);
 				
 				#ifdef IS_SRGB
-				gl_FragColor = LinearTosRGB( texture2D( blitTexture, vUv) );
+				gl_FragColor = sRGBTransferOETF( texture2D( blitTexture, vUv) );
 				#else
 				gl_FragColor = texture2D( blitTexture, vUv);
 				#endif
