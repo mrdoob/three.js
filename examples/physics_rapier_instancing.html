@@ -9,7 +9,8 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - <a href="https://github.com/dimforge/rapier.js" target="_blank">rapier</a> instancing
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - <a href="https://github.com/dimforge/rapier.js" target="_blank">rapier</a> instancing<br />
+			<button id="shake" style="margin-top: 25px;">Press to shake</button>
 		</div>
 
 		<script type="importmap">
@@ -28,10 +29,11 @@
 			import { RapierPhysics } from 'three/addons/physics/RapierPhysics.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 
-			let camera, scene, renderer, stats;
+			let camera, controls, scene, renderer, stats;
 			let physics, position;
 
 			let boxes, spheres;
+			let physicsBoxes = [], physicsSpheres = [];
 
 			init();
 
@@ -110,7 +112,9 @@
 
 				}
 
-				physics.addScene( scene );
+				physics.addToWorld( floor, 0 );
+				physicsBoxes = physics.addToWorld( boxes, 1 );
+				physicsSpheres = physics.addToWorld( spheres, 1 );
 
 				//
 
@@ -126,8 +130,28 @@
 
 				//
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				document.querySelector( 'button#shake' ).addEventListener( 'click', () => {
+
+					[ ...physicsBoxes, ...physicsSpheres ].map( ( item ) => {
+
+						item.rigidBody.applyImpulse(
+							{
+								x: ( Math.random() - 0.5 ) * 5,
+								y: Math.random() * 5,
+								z: ( Math.random() - 0.5 ) * 5
+							},
+							true
+						);
+
+					} );
+
+				} );
+
+				//
+
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.y = 0.5;
+				controls.autoRotate = true;
 				controls.update();
 
 				setInterval( () => {
@@ -135,20 +159,26 @@
 					let index = Math.floor( Math.random() * boxes.count );
 
 					position.set( 0, Math.random() + 1, 0 );
-					physics.setMeshPosition( boxes, position, index );
+					physics.setObjectPosition( boxes, position, index );
 
 					//
 
 					index = Math.floor( Math.random() * spheres.count );
 
 					position.set( 0, Math.random() + 1, 0 );
-					physics.setMeshPosition( spheres, position, index );
+					physics.setObjectPosition( spheres, position, index );
 
 				}, 1000 / 60 );
 
 			}
 
-			function animate() {
+			const clock = new THREE.Clock();
+
+ 			function animate() {
+
+				physics.step( clock.getDelta() );
+
+				controls.update();
 
 				renderer.render( scene, camera );
 

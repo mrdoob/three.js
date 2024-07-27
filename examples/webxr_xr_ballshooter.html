@@ -255,7 +255,7 @@
 
 				}
 
-				physics.addScene( scene );
+				physics.addSceneToWorld( scene );
 
 			}
 
@@ -265,14 +265,14 @@
 
 				if ( controller.userData.isSelecting ) {
 
-					physics.setMeshPosition( spheres, controller.position, count );
+					physics.setObjectPosition( spheres, controller.position, count );
 
 					velocity.x = ( Math.random() - 0.5 ) * 2;
 					velocity.y = ( Math.random() - 0.5 ) * 2;
 					velocity.z = ( Math.random() - 9 );
 					velocity.applyQuaternion( controller.quaternion );
 
-					physics.setMeshVelocity( spheres, velocity, count );
+					physics.setObjectVelocity( spheres, velocity, count );
 
 					if ( ++ count === spheres.count ) count = 0;
 
@@ -281,6 +281,8 @@
 			}
 
 			function animate() {
+
+				physics?.step();
 
 				handleController( controller1 );
 				handleController( controller2 );
