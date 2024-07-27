@@ -234,6 +234,7 @@
 				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = Math.PI * 0.45;
 				controls.target.y = - 0.5;
 				controls.enableDamping = true;
 				controls.minDistance = 0.1;
