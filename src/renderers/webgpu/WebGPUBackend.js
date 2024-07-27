@@ -1339,6 +1339,15 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	getRawShader( object ) {
+
+		const nodeBuilder = new WGSLNodeBuilder( object, this.renderer );
+		nodeBuilder.build();
+
+		return { vertexShader: nodeBuilder.vertexShader, fragmentShader: nodeBuilder.fragmentShader };
+
+	}
+
 	copyTextureToTexture( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
 
 		let dstX = 0;

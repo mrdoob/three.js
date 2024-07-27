@@ -147,7 +147,12 @@ class Renderer {
 
 		this.debug = {
 			checkShaderErrors: true,
-			onShaderError: null
+			onShaderError: null,
+			getRawShader: ( object ) => {
+
+				return backend.getRawShader( object );
+
+			}
 		};
 
 	}

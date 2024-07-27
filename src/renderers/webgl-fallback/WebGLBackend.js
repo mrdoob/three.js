@@ -1218,6 +1218,14 @@ class WebGLBackend extends Backend {
 
 	}
 
+	getRawShader( object ) {
+
+		const nodeBuilder = new GLSLNodeBuilder( object, this.renderer );
+		nodeBuilder.build();
+
+		return { vertexShader: nodeBuilder.vertexShader, fragmentShader: nodeBuilder.fragmentShader };
+
+	}
 
 	getMaxAnisotropy() {
 
