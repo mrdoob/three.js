@@ -99,8 +99,6 @@ class Backend {
 
 	hasFeature( /*name*/ ) { } // return Boolean
 
-	getRawShader( /*object*/ ) { } // return { vertexShader, fragmentShader }
-
 	getInstanceCount( renderObject ) {
 
 		const { object, geometry } = renderObject;
