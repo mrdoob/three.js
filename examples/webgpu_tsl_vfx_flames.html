@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { PI2, spherizeUV, sin, step, texture, timerLocal, tslFn, uv, vec2, vec3, vec4, mix } from 'three/tsl';
+			import { modelWorldMatrix, cameraViewMatrix, cameraProjectionMatrix, positionGeometry, PI2, spherizeUV, sin, step, texture, timerLocal, tslFn, uv, vec2, vec3, vec4, mix } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -90,9 +90,28 @@
 
 				gradient.update();
 
+				// TSL functions
+
+				const billboarding = tslFn( () => {
+
+					const modelViewMatrix = cameraViewMatrix.mul( modelWorldMatrix );
+					modelViewMatrix[ 0 ][ 0 ] = 1;
+					modelViewMatrix[ 0 ][ 1 ] = 0;
+					modelViewMatrix[ 0 ][ 2 ] = 0;
+
+					modelViewMatrix[ 2 ][ 0 ] = 0;
+					modelViewMatrix[ 2 ][ 1 ] = 0;
+					modelViewMatrix[ 2 ][ 2 ] = 0;
+
+					return cameraProjectionMatrix.mul( modelViewMatrix ).mul( positionGeometry );
+
+				} );
+
 				// flame 1 material
 
-				const flame1Material = new THREE.SpriteNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
+				const flame1Material = new THREE.MeshBasicNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
+
+				flame1Material.vertexNode = billboarding();
 
 				flame1Material.colorNode = tslFn( () => {
 
@@ -130,7 +149,9 @@
 
 				// flame 2 material
 
-				const flame2Material = new THREE.SpriteNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
+				const flame2Material = new THREE.MeshBasicNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
+
+				flame2Material.vertexNode = billboarding();
 
 				flame2Material.colorNode = tslFn( () => {
 
