@@ -63,6 +63,7 @@ export { default as OscNode, oscSine, oscSquare, oscTriangle, oscSawtooth } from
 export { default as PackingNode, directionToColor, colorToDirection } from './utils/PackingNode.js';
 export { default as RemapNode, remap, remapClamp } from './utils/RemapNode.js';
 export * from './utils/UVUtils.js';
+export * from './utils/SpriteUtils.js';
 export { default as RotateNode, rotate } from './utils/RotateNode.js';
 export { default as SetNode } from './utils/SetNode.js';
 export { default as SplitNode } from './utils/SplitNode.js';
