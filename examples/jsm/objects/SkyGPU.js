@@ -5,7 +5,7 @@ import {
 	NodeMaterial,
 	Vector3
 } from 'three';
-import { float, tslFn, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varying, 	varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
+import { float, tslFn, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varying, varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
 
 /**
  * Based on "A Practical Analytic Model for Daylight"
