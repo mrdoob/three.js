@@ -5,7 +5,7 @@ import {
 	NodeMaterial,
 	Vector3
 } from 'three';
-import { float, tslFn, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varying, 	varyingProperty, vec4, uniform } from 'three/tsl';
+import { float, tslFn, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varying, 	varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
 
 /**
  * Based on "A Practical Analytic Model for Daylight"
@@ -35,7 +35,6 @@ class Sky extends Mesh {
 		this.mieDirectionalG = uniform( 0.8 );
 		this.sunPosition = uniform( new Vector3() );
 		this.up = uniform( new Vector3( 0, 1, 0 ) );
-		this.cameraPosition = uniform( new Vector3() ).label( 'cameraPosition' ).onRenderUpdate( ( { camera }, self ) => self.value.setFromMatrixPosition( camera.matrixWorld ) ); // TODO replace with cameraPosition from CameraNode
 
 		this.isSky = true;
 
@@ -129,7 +128,7 @@ class Sky extends Mesh {
 
 			//
 
-			const direction = normalize( positionWorld.sub( this.cameraPosition ) );
+			const direction = normalize( positionWorld.sub( cameraPosition ) );
 
 			// optical length
 			// cutoff angle at 90 to avoid singularity in next formula.
