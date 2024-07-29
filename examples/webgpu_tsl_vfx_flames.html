@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { PI2, spherizeUV, sin, step, texture, timerLocal, tslFn, uv, vec2, vec3, vec4, mix } from 'three/tsl';
+			import { PI2, spherizeUV, sin, step, texture, timerLocal, tslFn, uv, vec2, vec3, vec4, mix, billboarding } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -92,7 +92,7 @@
 
 				// flame 1 material
 
-				const flame1Material = new THREE.MeshBasicNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
+				const flame1Material = new THREE.SpriteNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
 
 				flame1Material.colorNode = tslFn( () => {
 
@@ -130,7 +130,7 @@
 
 				// flame 2 material
 
-				const flame2Material = new THREE.MeshBasicNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
+				const flame2Material = new THREE.SpriteNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
 
 				flame2Material.colorNode = tslFn( () => {
 
@@ -175,17 +175,21 @@
 			
 				} )();
 
-				// geometry
+				// billboarding - follow the camera rotation only horizontally
 
-				const geometry = new THREE.PlaneGeometry( 1, 1, 64, 64 );
+				flame1Material.vertexNode = billboarding();
+				flame2Material.vertexNode = billboarding();
 
 				// meshes
 
-				const flame1 = new THREE.Mesh( geometry, flame1Material );
+				const flame1 = new THREE.Sprite( flame1Material );
+				flame1.center.set( 0.5, 0 );
+				flame1.scale.x = 0.5; // optional
 				flame1.position.x = - 0.5;
 				scene.add( flame1 );
 
-				const flame2 = new THREE.Mesh( geometry, flame2Material );
+				const flame2 = new THREE.Sprite( flame2Material );
+				flame2.center.set( 0.5, 0 );
 				flame2.position.x = 0.5;
 				scene.add( flame2 );
 
