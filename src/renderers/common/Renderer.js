@@ -148,7 +148,7 @@ class Renderer {
 		this.debug = {
 			checkShaderErrors: true,
 			onShaderError: null,
-			getRawShaderAsync: async ( scene, camera, object ) => {
+			getShaderAsync: async ( scene, camera, object ) => {
 
 				await this.compileAsync( scene, camera );
 
