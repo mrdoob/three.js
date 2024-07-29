@@ -472,7 +472,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 // exports
 
-export const defined = ( value ) => value.isNode ? ( value && value.value ) : value; // TODO: remove boolean conversion and defined function
+export const defined = ( v ) => typeof v === 'object' && v !== null ? v.value : v; // TODO: remove boolean conversion and defined function
 
 // utils
 
