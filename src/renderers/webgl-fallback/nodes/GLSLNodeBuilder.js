@@ -637,7 +637,7 @@ ${ flowData.code }
 
 	}
 
-	enableExtension( name, mode, shaderStage = this.shaderStage ) {
+	enableExtension( name, behavior, shaderStage = this.shaderStage ) {
 
 		const map = this.extensions[ shaderStage ] || ( this.extensions[ shaderStage ] = new Map() );
 
@@ -645,7 +645,7 @@ ${ flowData.code }
 
 			map.set( name, {
 				name,
-				mode
+				behavior
 			} );
 
 		}
@@ -673,9 +673,9 @@ ${ flowData.code }
 
 		if ( extensions !== undefined ) {
 
-			for ( const { name, mode } of extensions.values() ) {
+			for ( const { name, behavior } of extensions.values() ) {
 
-				snippets.push( `#extension ${name} : ${mode}` );
+				snippets.push( `#extension ${name} : ${behavior}` );
 
 			}
 
