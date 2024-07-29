@@ -858,7 +858,7 @@ class WebGPUBackend extends Backend {
 			const bindGroup = bindings[ i ];
 			const bindingsData = this.get( bindGroup );
 
-			passEncoderGPU.setBindGroup( i, bindingsData.group );
+			passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
 
 		}
 

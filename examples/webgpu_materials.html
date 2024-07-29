@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, wgslFn, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, loop } from 'three/tsl';
+			import { tslFn, wgslFn, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, loop, cameraProjectionMatrix } from 'three/tsl';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
@@ -116,6 +116,12 @@
 				material.opacityNode = texture( opacityTexture );
 				material.alphaTestNode = 0.5;
 				materials.push( material );
+
+				// camera
+				material = new THREE.MeshBasicNodeMaterial();
+				material.colorNode = cameraProjectionMatrix.mul( positionLocal );
+				materials.push( material );
+
 
 				// Normal
 				material = new THREE.MeshNormalMaterial();
