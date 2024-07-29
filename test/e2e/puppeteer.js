@@ -153,6 +153,7 @@ const exceptionList = [
 	'webgpu_tsl_vfx_flames',
 	'webgpu_tsl_galaxy',
 	'webgpu_tsl_compute_attractors_particles',
+	'webgpu_tsl_procedural_terrain',
 	'webgpu_tsl_raging_sea',
 	'webgpu_tsl_halftone',
 	'webgpu_tsl_earth',
