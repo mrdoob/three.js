@@ -32,7 +32,7 @@ class NodeBuilderState {
 
 			if ( shared !== true ) {
 
-				const bindingsGroup = new BindGroup( instanceGroup.name, [], instanceGroup.id );
+				const bindingsGroup = new BindGroup( instanceGroup.name, [], instanceGroup.index );
 				bindings.push( bindingsGroup );
 
 				for ( const instanceBinding of instanceGroup.bindings ) {

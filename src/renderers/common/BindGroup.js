@@ -2,12 +2,13 @@ let _id = 0;
 
 class BindGroup {
 
-	constructor( name = '', bindings = [], id = _id ++ ) {
+	constructor( name = '', bindings = [], index = 0 ) {
 
 		this.name = name;
 		this.bindings = bindings;
+		this.index = index;
 
-		this.id = id;
+		this.id = _id ++;
 
 	}
 
