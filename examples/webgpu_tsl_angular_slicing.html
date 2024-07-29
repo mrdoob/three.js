@@ -192,6 +192,8 @@
 				// renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
