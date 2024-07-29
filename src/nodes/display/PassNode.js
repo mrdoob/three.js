@@ -10,6 +10,7 @@ import { HalfFloatType/*, FloatType*/ } from '../../constants.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
+import { Color } from '../../math/Color.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -108,6 +109,8 @@ class PassNode extends TempNode {
 		this._cameraFar = uniform( 0 );
 
 		this._mrt = null;
+		this._prevClearColor = new Color();
+		this._clearColor = null;
 
 		this.isPassNode = true;
 
@@ -117,6 +120,13 @@ class PassNode extends TempNode {
 
 		this._mrt = mrt;
 
+		return this;
+
+	}
+
+	setClearColor( color ) {
+
+		this._clearColor = color;
 		return this;
 
 	}
@@ -240,10 +250,23 @@ class PassNode extends TempNode {
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
 
+		if ( this._clearColor !== null ) {
+
+			renderer.getClearColor( this._prevClearColor );
+			renderer.setClearColor( 0x000000 );
+
+		}
+
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
 
 		renderer.render( scene, camera );
+
+		if ( this._clearColor !== null ) {
+
+			renderer.setClearColor( this._prevClearColor );
+
+		}
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setMRT( currentMRT );

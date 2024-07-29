@@ -23,7 +23,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, uv, texture, applyMask, applyInverseMask } from 'three/tsl';
+			import { pass, uv, texture, applyMask, applyInverseMask, maskPass } from 'three/tsl';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, postProcessingForward, postProcessingInverse, renderer, gui, params;
@@ -75,13 +75,13 @@
 				const baseScenePass = pass( baseScene, camera );
 			
 				// Regular mask
-				const applyMask1 = applyMask( baseScenePass, maskScene1, camera, texture1Node );
-				const applyMask2 = applyMask( applyMask1, maskScene2, camera, texture2Node );
-				postProcessingForward.outputNode = applyMask2;
+				const maskPass1 = maskPass( maskScene1, camera );
+				const maskPass2 = maskPass( maskScene2, camera );
+				postProcessingForward.outputNode = applyMask( applyMask( baseScenePass, maskPass1, texture1Node ), maskPass2, texture2Node );
 
 				// Inverse mask
-				const applyInverseMask1 = applyInverseMask( baseScenePass, maskScene1, camera, texture1Node );
-				const applyInverseMask2 = applyInverseMask( applyInverseMask1, maskScene2, camera, texture2Node );
+				const applyInverseMask1 = applyInverseMask( baseScenePass, maskPass1, texture1Node );
+				const applyInverseMask2 = applyInverseMask( applyInverseMask1, maskPass2, texture2Node );
 				postProcessingInverse.outputNode = applyInverseMask2;
 
 				params = {
