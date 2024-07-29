@@ -395,6 +395,7 @@
 		"webgpu_skinning",
 		"webgpu_skinning_instancing",
 		"webgpu_skinning_points",
+		"webgpu_sky",
 		"webgpu_sprites",
 		"webgpu_storage_buffer",
 		"webgpu_texturegrad",
