@@ -691,7 +691,7 @@ ${ flowData.code }
 
 			for ( const directive of directives ) {
 
-				snippets.push( `enable ${directive}` );
+				snippets.push( `enable ${directive};` );
 
 			}
 
@@ -1195,7 +1195,7 @@ ${ flowData.code }
 
 		return `${ this.getSignature() }
 // directives
-${shaderData.directives};
+${shaderData.directives}
 
 // uniforms
 ${shaderData.uniforms}
