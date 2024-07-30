@@ -363,6 +363,7 @@
 		"webgpu_multiple_rendertargets_readback",
 		"webgpu_multisampled_renderbuffers",
 		"webgpu_occlusion",
+		"webgpu_ocean",
 		"webgpu_parallax_uv",
 		"webgpu_particles",
 		"webgpu_performance_renderbundle",
