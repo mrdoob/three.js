@@ -22,7 +22,7 @@ function SidebarSettings( editor ) {
 		fr: 'Français',
 		zh: '中文',
 		ja: '日本語',
-		kr: '한국어',
+		ko: '한국어',
 	};
 
 	const languageRow = new UIRow();

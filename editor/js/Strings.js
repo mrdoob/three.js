@@ -1612,7 +1612,7 @@ function Strings( config ) {
 
 		},
 
-		kr: {
+		ko: {
 			'prompt/file/open': '저장되지 않은 데이터는 손실됩니다. 진행하시겠습니까?',
 			'prompt/file/failedToOpenProject': '프로젝트를 여는 데 실패했습니다!',
 			'prompt/file/export/noMeshSelected': '메시가 선택되지 않았습니다!',
