@@ -4,7 +4,7 @@ import {
 	NodeMaterial,
 	Vector3
 } from 'three';
-import { add, cameraPosition, div, normalize, positionWorld, sub, timerLocal, tslFn, texture, vec2, vec3, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix, vec4, NodeUpdateType } from 'three/tsl';
+import { add, cameraPosition, div, normalize, positionWorld, sub, timerLocal, tslFn, texture, vec2, vec3, vec4, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * Work based on :
