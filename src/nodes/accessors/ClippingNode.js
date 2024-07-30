@@ -46,8 +46,7 @@ class HardwareClipDistancesElementNode extends ArrayElementNode {
 
 		}
 
-		// TODO: Potentially activate gl clip_distance index when element is accessed rather
-		// than globally based on clipping context.
+		// TODO: Possibly activate clip distance index on index access rather than from clipping context
 
 		return snippet;
 
