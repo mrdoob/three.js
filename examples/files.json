@@ -415,6 +415,7 @@
 		"webgpu_tsl_procedural_terrain",
 		"webgpu_tsl_transpiler",
 		"webgpu_tsl_vfx_flames",
+		"webgpu_tsl_vfx_tornado",
 		"webgpu_video_panorama",
 		"webgpu_volume_cloud",
 		"webgpu_volume_perlin"
