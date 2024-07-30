@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { dot, cos, float, min, timerLocal, atan2, uniform, pass, bloom, PI, PI2, color, positionLocal, sin, texture, tslFn, uv, vec2, vec3, vec4 } from 'three/tsl';
+			import { luminance, cos, float, min, timerLocal, atan2, uniform, pass, bloom, PI, PI2, color, positionLocal, sin, texture, tslFn, uv, vec2, vec3, vec4 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -96,11 +96,11 @@
 
 				} );
 
-				const luminance = tslFn( ( [ color ] ) => {
+				// const luminance = tslFn( ( [ color ] ) => {
 
-					return dot( color, vec3( 0.2126, 0.7152, 0.0722 ) );
+				// 	return dot( color, vec3( 0.2126, 0.7152, 0.0722 ) );
 
-				} );
+				// } );
 
 				// uniforms
 
