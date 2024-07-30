@@ -616,6 +616,7 @@ ${ flowData.code }
 
 	}
 
+<<<<<<< HEAD
 	getInvocationLocalIndex() {
 
 		const workgroupSize = this.object.workgroupSize;
@@ -628,29 +629,44 @@ ${ flowData.code }
 
 	
 	enableClipDistances() {
+=======
+	enableClipDistanceIndex( index ) {
+>>>>>>> aa81eb1654 (working webgl implementation)
 
 		const extensions = this.renderer.backend.extensions;
-
-		if ( extensions.has( 'WEBGL_clip_cull_distance' ) ) {
-
-			console.log( 'Has extension clip_distances' );
-
-			extensions.get( 'WEBGL_clip_cull_distance' );
-
-			this.getExtension( 'GL_ANGLE_clip_cull_distance', 'enable' );
-
-		}
-
 
 	}
 
-	getClipDistances() {
+	enableClipDistances( numClippingPlanes ) {
 
 		const extensions = this.renderer.backend.extensions;
 
 		if ( extensions.has( 'WEBGL_clip_cull_distance' ) ) {
 
-			this.enableClipDistances();
+			const ext = extensions.get( 'WEBGL_clip_cull_distance' );
+
+			this.enableExtension( 'GL_ANGLE_clip_cull_distance', 'enable' );
+
+			const gl = this.renderer.backend.getContext();
+
+			// Discretely enable each of a maximum of eight clipping planes
+			for ( let i = 0; i < numClippingPlanes; i ++ ) {
+
+				gl.enable( ext[ `CLIP_DISTANCE${i}_WEBGL` ] );
+
+			}
+
+		}
+
+	}
+
+	getClipDistances( numClippingPlanes ) {
+
+		const extensions = this.renderer.backend.extensions;
+
+		if ( extensions.has( 'WEBGL_clip_cull_distance' ) ) {
+
+			this.enableClipDistances( numClippingPlanes );
 
 			return 'gl_ClipDistance';
 

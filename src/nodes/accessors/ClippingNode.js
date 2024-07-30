@@ -1,10 +1,14 @@
 
 import Node from '../core/Node.js';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { nodeObject } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
 =======
 import { addNodeElement, nodeObject, nodeProxy } from '../shadernode/ShaderNode.js';
+=======
+import { addNodeElement, nodeObject } from '../shadernode/ShaderNode.js';
+>>>>>>> aa81eb1654 (working webgl implementation)
 import { positionView } from './PositionNode.js';
 >>>>>>> 93b66d8a45 (Modify node builder to work with latest version of Chrome ( there was no conditional extension support in GLSLNodeBuilder and clip_distances are no longer an enable feature as of Chrome 127, so we'll need to think of a way to support older systems that still need it enabled if that is what we want)
 import { diffuseColor, property } from '../core/PropertyNode.js';
@@ -41,6 +45,9 @@ class HardwareClipDistancesElementNode extends ArrayElementNode {
 			snippet = builder.format( snippet, type, output );
 
 		}
+
+		// TODO: Potentially activate gl clip_distance index when element is accessed rather
+		// than globally based on clipping context.
 
 		return snippet;
 
