@@ -5,7 +5,7 @@ import { getValueType } from '../core/NodeUtils.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import BufferNode from './BufferNode.js';
 
-class UniformsElementNode extends ArrayElementNode {
+class UniformArrayElementNode extends ArrayElementNode {
 
 	constructor( arrayBuffer, indexNode ) {
 
@@ -32,7 +32,7 @@ class UniformsElementNode extends ArrayElementNode {
 
 }
 
-class UniformsNode extends BufferNode {
+class UniformArrayNode extends BufferNode {
 
 	constructor( value, elementType = null ) {
 
@@ -133,14 +133,21 @@ class UniformsNode extends BufferNode {
 
 	element( indexNode ) {
 
-		return nodeObject( new UniformsElementNode( this, nodeObject( indexNode ) ) );
+		return nodeObject( new UniformArrayElementNode( this, nodeObject( indexNode ) ) );
 
 	}
 
 }
 
-export default UniformsNode;
+export default UniformArrayNode;
 
-export const uniforms = ( values, nodeType ) => nodeObject( new UniformsNode( values, nodeType ) );
+export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
 
-addNodeClass( 'UniformsNode', UniformsNode );
+export const uniforms = ( values, nodeType ) => { // @deprecated, r168
+
+	console.warn( 'THREE.UniformArrayNode: uniforms() has been renamed to uniformArray().' );
+	return nodeObject( new UniformArrayNode( values, nodeType ) );
+
+};
+
+addNodeClass( 'UniformArrayNode', UniformArrayNode );

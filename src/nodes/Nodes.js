@@ -62,7 +62,8 @@ export { default as MaxMipLevelNode, maxMipLevel } from './utils/MaxMipLevelNode
 export { default as OscNode, oscSine, oscSquare, oscTriangle, oscSawtooth } from './utils/OscNode.js';
 export { default as PackingNode, directionToColor, colorToDirection } from './utils/PackingNode.js';
 export { default as RemapNode, remap, remapClamp } from './utils/RemapNode.js';
-export { default as RotateUVNode, rotateUV } from './utils/RotateUVNode.js';
+export * from './utils/UVUtils.js';
+export * from './utils/SpriteUtils.js';
 export { default as RotateNode, rotate } from './utils/RotateNode.js';
 export { default as SetNode } from './utils/SetNode.js';
 export { default as SplitNode } from './utils/SplitNode.js';
@@ -78,7 +79,7 @@ export * from './shadernode/ShaderNode.js';
 
 // accessors
 export { TBNViewMatrix, parallaxDirection, parallaxUV, transformedBentNormalView } from './accessors/AccessorsUtils.js';
-export { default as UniformsNode, uniforms } from './accessors/UniformsNode.js';
+export { default as UniformArrayNode, uniformArray } from './accessors/UniformArrayNode.js';
 export * from './accessors/BitangentNode.js';
 export { default as BufferAttributeNode, bufferAttribute, dynamicBufferAttribute, instancedBufferAttribute, instancedDynamicBufferAttribute } from './accessors/BufferAttributeNode.js';
 export { default as BufferNode, buffer } from './accessors/BufferNode.js';
@@ -142,6 +143,8 @@ export { default as TransitionNode, transition } from './display/TransitionNode.
 export { default as RenderOutputNode, renderOutput } from './display/RenderOutputNode.js';
 export { default as PixelationPassNode, pixelationPass } from './display/PixelationPassNode.js';
 export { bleach } from './display/BleachBypassNode.js';
+export { sepia } from './display/SepiaNode.js';
+
 
 export { default as PassNode, pass, passTexture, depthPass } from './display/PassNode.js';
 

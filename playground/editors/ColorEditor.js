@@ -1,7 +1,7 @@
 import { ColorInput, StringInput, NumberInput, LabelElement, Element } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { Color } from 'three';
-import { UniformNode } from 'three/nodes';
+import { UniformNode } from 'three/tsl';
 
 export class ColorEditor extends BaseNodeEditor {
 

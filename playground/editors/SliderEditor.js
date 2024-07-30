@@ -1,6 +1,6 @@
 import { ButtonInput, SliderInput, NumberInput, LabelElement, Element } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { float } from 'three/nodes';
+import { float } from 'three/tsl';
 
 export class SliderEditor extends BaseNodeEditor {
 

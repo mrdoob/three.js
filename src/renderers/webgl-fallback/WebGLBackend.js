@@ -1218,7 +1218,6 @@ class WebGLBackend extends Backend {
 
 	}
 
-
 	getMaxAnisotropy() {
 
 		return this.capabilities.getMaxAnisotropy();

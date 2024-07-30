@@ -125,18 +125,14 @@ const exceptionList = [
 	'webgpu_storage_buffer',
 
 	// WebGPURenderer: Unknown problem
-	'webgpu_backdrop_water',
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_clipping',
-	'webgpu_instance_points',
 	'webgpu_loader_materialx',
-	'webgpu_materials_displacementmap',
 	'webgpu_materials_video',
 	'webgpu_materialx_noise',
 	'webgpu_morphtargets_face',
 	'webgpu_occlusion',
 	'webgpu_particles',
-	'webgpu_refraction',
 	'webgpu_shadertoy',
 	'webgpu_shadowmap',
 	'webgpu_tsl_editor',
@@ -149,14 +145,15 @@ const exceptionList = [
 	'webgpu_texturegrad',
 	'webgpu_performance_renderbundle',
 	'webgpu_lights_rectarealight',
+	'webgpu_tsl_coffee_smoke',
 	'webgpu_tsl_vfx_flames',
+	'webgpu_tsl_halftone',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',
 	'webgpu_compute_particles_rain',
 	'webgpu_compute_particles_snow',
-	'webgpu_compute_points',
-	'webgpu_materials_texture_anisotropy'
+	'webgpu_compute_points'
 
 ];
 
