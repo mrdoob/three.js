@@ -30,11 +30,9 @@
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import Stats from 'three/addons/libs/stats.module.js';
-			import { vec4, property, attribute, positionLocal, tslFn, modelViewProjection, cameraProjectionMatrix, modelViewMatrix, clipDistances, sin, timerLocal } from 'three/tsl';
+			import { attribute, positionLocal, tslFn, cameraProjectionMatrix, modelViewMatrix, clipDistances, sin, timerLocal } from 'three/tsl';
 
-			let camera, controls, clock, scene, renderer, stats;
-
-			let material;
+			let camera, controls, scene, renderer, stats;
 
 			init();
 
@@ -45,17 +43,12 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
-
-				//
-
 				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
-
-
+			
 				// geometry
 
 				const vertexCount = 200 * 4;
@@ -64,7 +57,6 @@
 
 				const positions = [];
 				const colors = [];
-				const opacities = [];
 
 				for ( let i = 0; i < vertexCount; i ++ ) {
 
@@ -91,7 +83,6 @@
 				const material = new THREE.MeshBasicNodeMaterial();
 				material.vertexNode = tslFn( () => {
 
-					const testProp = property( 'float', 'test' );
 					const clip = clipDistances( 1 );
 					const time = sin( timerLocal() );
 					clip.element( 0 ).assign( positionLocal.x.sub( time.mul( 0.5 ) ) );
@@ -99,6 +90,7 @@
 					return cameraProjectionMatrix.mul( modelViewMatrix ).mul( positionLocal );
 			
 				} )();
+			
 				material.colorNode = attribute( 'color', 'vec4' );
 				material.transparent = true;
 
