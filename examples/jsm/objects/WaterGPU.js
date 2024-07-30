@@ -57,7 +57,7 @@ class Water extends Mesh {
 
 		} );
 
-		const fragmentNode = /*@__PURE__*/ tslFn( () => {
+		const fragmentNode = tslFn( () => {
 
 			const noise = getNoise( positionWorld.xz.mul( this.size ) );
 			const surfaceNormal = normalize( noise.xzy.mul( 1.5, 1.0, 1.5 ) );
