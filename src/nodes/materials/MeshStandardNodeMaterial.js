@@ -34,7 +34,13 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	setupEnvironment( builder ) {
 
-		const envNode = super.setupEnvironment( builder );
+		let envNode = super.setupEnvironment( builder );
+
+		if ( envNode === null && builder.environmentNode ) {
+
+			envNode = builder.environmentNode;
+
+		}
 
 		return envNode ? new EnvironmentNode( envNode ) : null;
 
