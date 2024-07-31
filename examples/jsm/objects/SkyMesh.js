@@ -21,7 +21,7 @@ import { float, tslFn, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, mod
  * Three.js integration by zz85 http://twitter.com/blurspline
 */
 
-class Sky extends Mesh {
+class SkyMesh extends Mesh {
 
 	constructor() {
 
@@ -186,4 +186,4 @@ class Sky extends Mesh {
 
 }
 
-export { Sky };
+export { SkyMesh };

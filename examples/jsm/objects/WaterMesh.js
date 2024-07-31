@@ -13,7 +13,7 @@ import { add, cameraPosition, div, normalize, positionWorld, sub, timerLocal, ts
  * http://29a.ch/ && http://29a.ch/slides/2012/webglwater/ : Water shader explanations in WebGL
  */
 
-class Water extends Mesh {
+class WaterMesh extends Mesh {
 
 	constructor( geometry, options ) {
 
@@ -100,4 +100,4 @@ class Water extends Mesh {
 
 }
 
-export { Water };
+export { WaterMesh };
