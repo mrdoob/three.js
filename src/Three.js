@@ -156,6 +156,7 @@ export { ImageUtils } from './extras/ImageUtils.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
 export { TextureUtils } from './extras/TextureUtils.js';
 export { PMREMGenerator } from './extras/PMREMGenerator.js';
+export { default as Color4 } from './renderers/common/Color4.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
 export { createCanvasElement } from './utils.js';
 export * from './constants.js';
