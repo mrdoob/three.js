@@ -28,7 +28,11 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 	setupNormal() {
 
-		transformedNormalView.assign( normalView ); // see #28839
+		if ( this.envNode || this.envMap ) {
+
+			transformedNormalView.assign( normalView ); // see #28839
+
+		}
 
 	}
 
