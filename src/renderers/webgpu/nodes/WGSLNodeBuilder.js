@@ -645,6 +645,18 @@ ${ flowData.code }
 
 	}
 
+	getSubgroupSize() {
+
+		return this.getBuiltin( 'subgroup_size', 'subgroupSize', 'u32', 'attribute' );
+
+	}
+
+	getSubgroupIndex() {
+
+		return this.getBuiltin( 'subgroup_invocation_id', 'subgroupIndex', 'u32', 'attribute' );
+
+	}
+
 	getDrawIndex() {
 
 		return null;
@@ -701,6 +713,18 @@ ${ flowData.code }
 
 	}
 
+	enableSubGroups() {
+
+		this.enableDirective( 'subgroups' );
+
+	}
+
+	enableSubgroupsF16() {
+
+		this.enableDirective( 'subgroups-f16' );
+
+	}
+
 	enableClipDistances() {
 
 		this.enableDirective( 'clip_distances' );
@@ -748,6 +772,7 @@ ${ flowData.code }
 			this.getBuiltin( 'workgroup_id', 'workgroupId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'local_invocation_id', 'localId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'num_workgroups', 'numWorkgroups', 'vec3<u32>', 'attribute' );
+			this.getBuildStage( 'subgroup_size' );
 
 		}
 
