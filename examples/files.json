@@ -419,7 +419,7 @@
 		"webgpu_video_panorama",
 		"webgpu_volume_cloud",
 		"webgpu_volume_perlin",
-		"Webgpu_water"
+		"webgpu_water"
 	],
 	"webaudio": [
 		"webaudio_orientation",
