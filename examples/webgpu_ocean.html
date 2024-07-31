@@ -31,8 +31,8 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { Water } from 'three/addons/objects/WaterGPU.js';
-			import { Sky } from 'three/addons/objects/SkyGPU.js';
+			import { WaterMesh } from 'three/addons/objects/WaterMesh.js';
+			import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
 
 			let container, stats;
 			let camera, scene, renderer;
@@ -72,7 +72,7 @@
 				const waterNormals = loader.load( 'textures/waternormals.jpg' );
 				waterNormals.wrapS = waterNormals.wrapT = THREE.RepeatWrapping;
 
-				water = new Water(
+				water = new WaterMesh(
 					waterGeometry,
 					{
 						waterNormals: waterNormals,
@@ -89,7 +89,7 @@
 
 				// Skybox
 
-				const sky = new Sky();
+				const sky = new SkyMesh();
 				sky.scale.setScalar( 10000 );
 				scene.add( sky );
 
