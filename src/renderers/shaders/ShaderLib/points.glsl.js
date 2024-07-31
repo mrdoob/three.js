@@ -24,6 +24,7 @@ void main() {
 
 	#endif
 
+	#include <batching_vertex>
 	#include <color_vertex>
 	#include <morphinstance_vertex>
 	#include <morphcolor_vertex>
