@@ -175,7 +175,7 @@ export * from './objects/Water.js';
 export { Water as Water2 } from './objects/Water2.js';
 export * from './objects/SkyMesh.js';
 export * from './objects/WaterMesh.js';
-export { WaterMesh as Water2Mesh } from './objects/Water2.js';
+export { WaterMesh as Water2Mesh } from './objects/Water2Mesh.js';
 
 export * from './physics/AmmoPhysics.js';
 export * from './physics/RapierPhysics.js';
