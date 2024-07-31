@@ -1,6 +1,7 @@
 import { clamp, euclideanModulo, lerp } from './MathUtils.js';
 import { ColorManagement, SRGBToLinear, LinearToSRGB } from './ColorManagement.js';
 import { SRGBColorSpace } from '../constants.js';
+import { Vector3 } from "./Vector3.js";
 
 const _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 	'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
@@ -548,6 +549,12 @@ class Color {
 		this.b = v.z;
 
 		return this;
+
+	}
+
+	toVector3() {
+
+		return new Vector3( this.r, this.g, this.b );
 
 	}
 
