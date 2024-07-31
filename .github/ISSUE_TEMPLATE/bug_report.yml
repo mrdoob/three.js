@@ -34,8 +34,8 @@ body:
     attributes:
       label: Live example
       value: |
-        * [jsfiddle-latest-release](https://jsfiddle.net/g3atw6k5/)
-        * [jsfiddle-dev](https://jsfiddle.net/hjqw94c5/)
+        * [jsfiddle-latest-release](https://jsfiddle.net/0joy93mr/)
+        * [jsfiddle-dev](https://jsfiddle.net/3Lsvf8xp/)
     validations:
       required: true
   - type: textarea
