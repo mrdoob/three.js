@@ -1,4 +1,5 @@
 import { Color } from '../../math/Color.js';
+import { Vector4 } from '../../math/Vector4.js';
 
 class Color4 extends Color {
 
@@ -15,6 +16,37 @@ class Color4 extends Color {
 		this.a = a;
 
 		return super.set( r, g, b );
+
+	}
+
+	setFromVector4( v ) {
+
+		this.r = v.x;
+		this.g = v.y;
+		this.b = v.z;
+		this.a = v.w;
+
+		return this;
+
+	}
+
+	toVector4() {
+
+		return new Vector4( this.r, this.g, this.b, this.a );
+
+	}
+
+	applyMatrix4( m ) {
+
+		const r = this.r, g = this.g, b = this.b, a = this.a;
+		const e = m.elements;
+
+		this.r = e[ 0 ] * r + e[ 4 ] * g + e[ 8 ] * b;
+		this.g = e[ 1 ] * r + e[ 5 ] * g + e[ 9 ] * b;
+		this.b = e[ 2 ] * r + e[ 6 ] * g + e[ 10 ] * b;
+		this.b = e[ 3 ] * r + e[ 7 ] * g + e[ 11 ] * b;
+
+		return this;
 
 	}
 
