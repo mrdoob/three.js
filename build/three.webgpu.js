@@ -46090,7 +46090,7 @@ class NodeMaterial extends Material {
 
 	}
 
-	setupEnvironment( builder ) {
+	setupEnvironment( /*builder*/ ) {
 
 		let node = null;
 
@@ -46101,10 +46101,6 @@ class NodeMaterial extends Material {
 		} else if ( this.envMap ) {
 
 			node = this.envMap.isCubeTexture ? cubeTexture( this.envMap ) : texture( this.envMap );
-
-		} else if ( builder.environmentNode ) {
-
-			node = builder.environmentNode;
 
 		}
 
@@ -59031,7 +59027,13 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	setupEnvironment( builder ) {
 
-		const envNode = super.setupEnvironment( builder );
+		let envNode = super.setupEnvironment( builder );
+
+		if ( envNode === null && builder.environmentNode ) {
+
+			envNode = builder.environmentNode;
+
+		}
 
 		return envNode ? new EnvironmentNode( envNode ) : null;
 
