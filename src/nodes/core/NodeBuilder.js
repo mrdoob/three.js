@@ -125,6 +125,8 @@ class NodeBuilder {
 		this.shaderStage = null;
 		this.buildStage = null;
 
+		this.useComparisonMethod = false;
+
 	}
 
 	getBingGroupsCache() {

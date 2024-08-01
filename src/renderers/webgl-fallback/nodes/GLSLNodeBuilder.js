@@ -58,6 +58,8 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 		this.instanceBindGroups = false;
 
+		this.useComparisonMethod = true;
+
 	}
 
 	getMethod( method ) {

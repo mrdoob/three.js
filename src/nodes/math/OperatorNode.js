@@ -163,19 +163,51 @@ class OperatorNode extends TempNode {
 
 			if ( op === '<' && outputLength > 1 ) {
 
-				return builder.format( `${ builder.getMethod( 'lessThan' ) }( ${ a }, ${ b } )`, type, output );
+				if ( builder.useComparisonMethod ) {
+
+					return builder.format( `${ builder.getMethod( 'lessThan', output ) }( ${ a }, ${ b } )`, type, output );
+
+				} else {
+
+					return builder.format( `( ${ a } < ${ b } )`, type, output );
+
+				}
 
 			} else if ( op === '<=' && outputLength > 1 ) {
 
-				return builder.format( `${ builder.getMethod( 'lessThanEqual' ) }( ${ a }, ${ b } )`, type, output );
+				if ( builder.useComparisonMethod ) {
+
+					return builder.format( `${ builder.getMethod( 'lessThanEqual', output ) }( ${ a }, ${ b } )`, type, output );
+
+				} else {
+
+					return builder.format( `( ${ a } <= ${ b } )`, type, output );
+
+				}
 
 			} else if ( op === '>' && outputLength > 1 ) {
 
-				return builder.format( `${ builder.getMethod( 'greaterThan' ) }( ${ a }, ${ b } )`, type, output );
+				if ( builder.useComparisonMethod ) {
+
+					return builder.format( `${ builder.getMethod( 'greaterThan', output ) }( ${ a }, ${ b } )`, type, output );
+
+				} else {
+
+					return builder.format( `( ${ a } > ${ b } )`, type, output );
+
+				}
 
 			} else if ( op === '>=' && outputLength > 1 ) {
 
-				return builder.format( `${ builder.getMethod( 'greaterThanEqual' ) }( ${ a }, ${ b } )`, type, output );
+				if ( builder.useComparisonMethod ) {
+
+					return builder.format( `${ builder.getMethod( 'greaterThanEqual', output ) }( ${ a }, ${ b } )`, type, output );
+
+				} else {
+
+					return builder.format( `( ${ a } >= ${ b } )`, type, output );
+
+				}
 
 			} else if ( op === '!' || op === '~' ) {
 
