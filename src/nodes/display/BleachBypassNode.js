@@ -1,7 +1,7 @@
 import { addNodeElement, float, tslFn, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import { min, max, dot, mix } from '../math/MathNode.js';
 
-export const bleach = /*@__PURE__*/ tslFn( ( { color, opacity = 1.0 } ) => {
+export const bleach = /*@__PURE__*/ tslFn( ( [ color, opacity = 1 ] ) => {
 
 	const base = color;
 	const lum = dot( vec3( 0.25, 0.65, 0.1 ), base.rgb );
