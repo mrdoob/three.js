@@ -29,7 +29,7 @@ class EnvironmentNode extends LightingNode {
 
 		let envNode = this.envNode;
 
-		if ( envNode.isTextureNode || envNode.isMaterialReferenceNode ) {
+		if ( envNode.isTextureNode || envNode.isMaterialReferenceNode ) {
 
 			const value = ( envNode.isTextureNode ) ? envNode.value : material[ envNode.property ];
 
