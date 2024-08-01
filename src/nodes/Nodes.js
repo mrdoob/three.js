@@ -145,7 +145,6 @@ export { default as PixelationPassNode, pixelationPass } from './display/Pixelat
 export { bleach } from './display/BleachBypassNode.js';
 export { sepia } from './display/SepiaNode.js';
 
-
 export { default as PassNode, pass, passTexture, depthPass } from './display/PassNode.js';
 
 // code
