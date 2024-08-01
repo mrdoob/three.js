@@ -1,10 +1,11 @@
 import { addNodeElement, float, tslFn, vec3, vec4 } from '../shadernode/ShaderNode.js';
-import { min, max, dot, mix } from '../math/MathNode.js';
+import { min, max, mix } from '../math/MathNode.js';
+import { luminance } from './ColorAdjustmentNode.js';
 
 export const bleach = /*@__PURE__*/ tslFn( ( [ color, opacity = 1 ] ) => {
 
 	const base = color;
-	const lum = dot( vec3( 0.25, 0.65, 0.1 ), base.rgb );
+	const lum = luminance( base.rgb );
 	const blend = vec3( lum );
 
 	const L = min( 1.0, max( 0.0, float( 10.0 ).mul( lum.sub( 0.45 ) ) ) );
