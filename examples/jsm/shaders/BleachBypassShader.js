@@ -38,8 +38,7 @@ const BleachBypassShader = {
 
 			vec4 base = texture2D( tDiffuse, vUv );
 
-			vec3 lumCoeff = vec3( 0.25, 0.65, 0.1 );
-			float lum = dot( lumCoeff, base.rgb );
+			float lum = luminance( base.rgb );
 			vec3 blend = vec3( lum );
 
 			float L = min( 1.0, max( 0.0, 10.0 * ( lum - 0.45 ) ) );
