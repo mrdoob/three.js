@@ -2,7 +2,7 @@ import { addNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { modelWorldMatrix } from './ModelNode.js';
 import { positionLocal } from './PositionNode.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeImmutable } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { uniform } from '../core/UniformNode.js';
@@ -81,6 +81,6 @@ function getPreviousModelMatrix( object ) {
 
 export default VelocityNode;
 
-export const velocity = nodeProxy( VelocityNode );
+export const velocity = nodeImmutable( VelocityNode );
 
 addNodeClass( 'VelocityNode', VelocityNode );
