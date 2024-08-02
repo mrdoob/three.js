@@ -33,7 +33,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			let camera, scene, renderer;
+			let camera, scene, renderer, controls;
 			let postProcessing;
 
 			init();
@@ -119,10 +119,11 @@
 
 				// controls
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
 				controls.target.set( 0, 0, - 0.2 );
+				controls.enableDamping = true;
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -141,6 +142,8 @@
 			//
 
 			function render() {
+
+				controls.update();
 
 				postProcessing.render();
 
