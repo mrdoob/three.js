@@ -113,6 +113,7 @@ export { default as StorageTextureNode, storageTexture, textureStore } from './a
 export { default as Texture3DNode, texture3D } from './accessors/Texture3DNode.js';
 export * from './accessors/UVNode.js';
 export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
+export { default as VelocityNode, velocity } from './accessors/VelocityNode.js';
 
 // display
 export { default as BlendModeNode, burn, dodge, overlay, screen } from './display/BlendModeNode.js';
