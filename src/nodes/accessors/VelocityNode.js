@@ -16,7 +16,7 @@ class VelocityNode extends TempNode {
 
 		super( 'vec2' );
 
-		this.updateBeforeType = NodeUpdateType.OBJECT;
+		this.updateType = NodeUpdateType.OBJECT;
 		this.updateAfterType = NodeUpdateType.OBJECT;
 
 		this.previousProjectionViewMatrix = uniform( new Matrix4() );
@@ -25,16 +25,29 @@ class VelocityNode extends TempNode {
 
 	}
 
-	updateBefore( frame ) {
+	update( frame ) {
 
 		const camera = frame.camera;
 		const object = frame.object;
 
-		this.previousProjectionViewMatrix.value.copy( this.currentProjectionViewMatrix.value );
-		this.currentProjectionViewMatrix.value.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+		if ( this.firstFrame ) {
 
-		const previousModelMatrix = getPreviousModelMatrix( object );
-		this.previousModelMatrix.value.copy( previousModelMatrix );
+			this.firstFrame = false;
+
+			this.currentProjectionViewMatrix.value.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+			this.previousProjectionViewMatrix.value.copy( this.currentProjectionViewMatrix.value );
+
+			this.previousModelMatrix.value.copy( object.matrixWorld );
+
+		} else {
+
+			this.previousProjectionViewMatrix.value.copy( this.currentProjectionViewMatrix.value );
+			this.currentProjectionViewMatrix.value.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+
+			const previousModelMatrix = getPreviousModelMatrix( object );
+			this.previousModelMatrix.value.copy( previousModelMatrix );
+
+		}
 
 	}
 
@@ -50,11 +63,14 @@ class VelocityNode extends TempNode {
 
 	setup( /*builder*/ ) {
 
+		this.firstFrame = true;
+
 		const clipPositionCurrent = this.currentProjectionViewMatrix.mul( modelWorldMatrix ).mul( positionLocal ).toVar();
 		const clipPositionPrevious = this.previousProjectionViewMatrix.mul( this.previousModelMatrix ).mul( positionLocal ).toVar();
 
 		const ndcPositionCurrent = clipPositionCurrent.xy.div( clipPositionCurrent.w );
 		const ndcPositionPrevious = clipPositionPrevious.xy.div( clipPositionPrevious.w );
+
 		let velocity = sub( ndcPositionCurrent, ndcPositionPrevious ).mul( 0.5 );
 		velocity = velocity.mul( 0.5 ).add( 0.5 );
 
