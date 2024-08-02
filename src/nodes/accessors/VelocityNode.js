@@ -23,6 +23,8 @@ class VelocityNode extends TempNode {
 		this.currentProjectionViewMatrix = uniform( new Matrix4() );
 		this.previousModelMatrix = uniform( new Matrix4() );
 
+		this.firstFrame = true;
+
 	}
 
 	update( frame ) {
