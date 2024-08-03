@@ -73,8 +73,7 @@ class VelocityNode extends TempNode {
 		const ndcPositionCurrent = clipPositionCurrent.xy.div( clipPositionCurrent.w );
 		const ndcPositionPrevious = clipPositionPrevious.xy.div( clipPositionPrevious.w );
 
-		let velocity = sub( ndcPositionCurrent, ndcPositionPrevious ).mul( 0.5 );
-		velocity = velocity.mul( 0.5 ).add( 0.5 );
+		const velocity = sub( ndcPositionCurrent, ndcPositionPrevious );
 
 		return velocity;
 

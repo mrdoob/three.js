@@ -10,7 +10,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - mrt<br />
-			Final / Beauty / Normal / Velocity / Diffuse
+			Final / Beauty / Normal / Emissive / Diffuse
 		</div>
 
 		<script type="importmap">
@@ -26,14 +26,14 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { output, transformedNormalWorld, pass, step, diffuseColor, velocity, viewportTopLeft, mix, mrt, tslFn, vec2 } from 'three/tsl';
+			import { output, transformedNormalWorld, pass, step, diffuseColor, emissive, viewportTopLeft, mix, mrt, tslFn } from 'three/tsl';
 
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer;
 			let postProcessing;
 
 			init();
@@ -66,15 +66,6 @@
 
 							scene.add( gltf.scene );
 
-							const material = gltf.scene.children[ 0 ].material;
-
-							material.mrtNode = mrt( {
-								output: output,
-								normal: transformedNormalWorld.directionToColor(),
-								diffuse: diffuseColor,
-								velocity: velocity
-							} );
-
 						} );
 
 					} );
@@ -95,16 +86,16 @@
 					output: output,
 					normal: transformedNormalWorld.directionToColor(),
 					diffuse: diffuseColor,
-					velocity: vec2( 0.5 )
+					emissive: emissive
 				} ) );
 
 				// optimize textures
 
 				const normalTexture = scenePass.getTexture( 'normal' );
 				const diffuseTexture = scenePass.getTexture( 'diffuse' );
-				const velocityTexture = scenePass.getTexture( 'velocity' );
+				const emissiveTexture = scenePass.getTexture( 'emissive' );
 
-				normalTexture.type = diffuseTexture.type = velocityTexture.type = THREE.UnsignedByteType;
+				normalTexture.type = diffuseTexture.type = emissiveTexture.type = THREE.UnsignedByteType;
 
 				// post processing - mrt
 
@@ -115,11 +106,11 @@
 					const output = scenePass.getTextureNode( 'output' ); // output name is optional here
 					const normal = scenePass.getTextureNode( 'normal' );
 					const diffuse = scenePass.getTextureNode( 'diffuse' );
-					const velocity = scenePass.getTextureNode( 'velocity' );
+					const emissive = scenePass.getTextureNode( 'emissive' );
 
 					const out = mix( output.renderOutput(), output, step( 0.2, viewportTopLeft.x ) );
 					const nor = mix( out, normal, step( 0.4, viewportTopLeft.x ) );
-					const emi = mix( nor, velocity, step( 0.6, viewportTopLeft.x ) );
+					const emi = mix( nor, emissive, step( 0.6, viewportTopLeft.x ) );
 					const dif = mix( emi, diffuse, step( 0.8, viewportTopLeft.x ) );
 
 					return dif;
@@ -128,11 +119,10 @@
 
 				// controls
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
 				controls.target.set( 0, 0, - 0.2 );
-				controls.enableDamping = true;
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -151,8 +141,6 @@
 			//
 
 			function render() {
-
-				controls.update();
 
 				postProcessing.render();
 

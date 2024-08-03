@@ -138,6 +138,7 @@ export { default as DotScreenNode, dotScreen } from './display/DotScreenNode.js'
 export { default as RGBShiftNode, rgbShift } from './display/RGBShiftNode.js';
 export { default as FilmNode, film } from './display/FilmNode.js';
 export { default as Lut3DNode, lut3D } from './display/Lut3DNode.js';
+export { default as MotionBlurNode, motionBlur } from './display/MotionBlurNode.js';
 export { default as GTAONode, ao } from './display/GTAONode.js';
 export { default as DenoiseNode, denoise } from './display/DenoiseNode.js';
 export { default as FXAANode, fxaa } from './display/FXAANode.js';
