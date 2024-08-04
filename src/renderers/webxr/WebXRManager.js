@@ -170,6 +170,7 @@ class WebXRManager extends EventDispatcher {
 			_currentDepthFar = null;
 
 			depthSensing.reset();
+			depthSensingCpu.reset();
 
 			// restore framebuffer/rendering state
 
