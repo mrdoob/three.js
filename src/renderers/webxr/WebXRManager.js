@@ -279,6 +279,12 @@ class WebXRManager extends EventDispatcher {
 				currentPixelRatio = renderer.getPixelRatio();
 				renderer.getSize( currentSize );
 
+				if ( typeof XRWebGLBinding !== 'undefined' ) {
+
+					glBinding = new XRWebGLBinding( session, gl );
+
+				}
+
 				if ( session.renderState.layers === undefined ) {
 
 					const layerInit = {
@@ -326,8 +332,6 @@ class WebXRManager extends EventDispatcher {
 						depthFormat: glDepthFormat,
 						scaleFactor: framebufferScaleFactor
 					};
-
-					glBinding = new XRWebGLBinding( session, gl );
 
 					glProjLayer = glBinding.createProjectionLayer( projectionlayerInit );
 
@@ -823,7 +827,7 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
-		this.dispose = function () {};
+		this.dispose = function () { };
 
 	}
 
