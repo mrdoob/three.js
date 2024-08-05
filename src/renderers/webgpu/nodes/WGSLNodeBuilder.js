@@ -647,12 +647,14 @@ ${ flowData.code }
 
 	getSubgroupSize() {
 
+		this.enableSubGroups();
 		return this.getBuiltin( 'subgroup_size', 'subgroupSize', 'u32', 'attribute' );
 
 	}
 
 	getSubgroupIndex() {
 
+		this.enableSubGroups();
 		return this.getBuiltin( 'subgroup_invocation_id', 'subgroupIndex', 'u32', 'attribute' );
 
 	}
@@ -689,8 +691,8 @@ ${ flowData.code }
 
 	enableDirective( name, shaderStage = this.shaderStage ) {
 
-		const stage = this.directives[ shaderStage ] || ( this.directives[ shaderStage ] = [] );
-		stage.push( name );
+		const stage = this.directives[ shaderStage ] || ( this.directives[ shaderStage ] = new Set() );
+		stage.add( name );
 
 	}
 
