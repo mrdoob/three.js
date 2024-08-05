@@ -38,6 +38,24 @@ class RenderContext {
 
 	}
 
+	getCacheKey() {
+
+		const { textures, activeCubeFace } = this;
+
+		let key = '';
+
+		for ( const texture of textures ) {
+
+			key += texture.id + ',';
+
+		}
+
+		key += activeCubeFace;
+
+		return key;
+
+	}
+
 }
 
 export default RenderContext;

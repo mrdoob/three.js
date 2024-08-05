@@ -1253,21 +1253,21 @@ class WebGLBackend extends Backend {
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
 
+			const cacheKey = renderContext.getCacheKey();
+
 			let fb;
 
 			if ( isCube ) {
 
-				if ( renderTargetContextData.cubeFramebuffers === undefined ) {
-
-					renderTargetContextData.cubeFramebuffers = [];
-
-				}
+				renderTargetContextData.cubeFramebuffers || ( renderTargetContextData.cubeFramebuffers = {} );
 
 				fb = renderTargetContextData.cubeFramebuffers[ cubeFace ];
 
 			} else {
 
-				fb = renderTargetContextData.framebuffer;
+				renderTargetContextData.framebuffers || ( renderTargetContextData.framebuffers = {} );
+
+				fb = renderTargetContextData.framebuffers[ cacheKey ];
 
 			}
 
@@ -1281,12 +1281,15 @@ class WebGLBackend extends Backend {
 
 				if ( isCube ) {
 
-					renderTargetContextData.cubeFramebuffers[ cubeFace ] = fb;
+					renderTargetContextData.cubeFramebuffers[ cacheKey ] = fb;
+
 					const { textureGPU } = this.get( textures[ 0 ] );
 
 					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, 0 );
 
 				} else {
+
+					renderTargetContextData.framebuffers[ cacheKey ] = fb;
 
 					for ( let i = 0; i < textures.length; i ++ ) {
 
@@ -1299,8 +1302,6 @@ class WebGLBackend extends Backend {
 						gl.framebufferTexture2D( gl.FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureData.textureGPU, 0 );
 
 					}
-
-					renderTargetContextData.framebuffer = fb;
 
 					state.drawBuffers( renderContext, fb );
 
