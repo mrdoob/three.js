@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, tslFn, nodeProxy, vec4 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeProxy, vec4 } from '../shadernode/ShaderNode.js';
 import { mix, fract, clamp, rand } from '../math/MathNode.js';
 import { timerLocal } from '../utils/TimerNode.js';
 
@@ -20,7 +20,7 @@ class FilmNode extends TempNode {
 
 		const uvNode = this.uvNode || uv();
 
-		const film = tslFn( () => {
+		const film = Fn( () => {
 
 			const base = this.inputNode.rgb;
 			const noise = rand( fract( uvNode.add( timerLocal() ) ) );

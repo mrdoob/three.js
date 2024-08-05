@@ -1,11 +1,11 @@
 // Three.js Transpiler
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_hsv.glsl
 
-import { int, float, vec3, If, tslFn } from '../../shadernode/ShaderNode.js';
+import { int, float, vec3, If, Fn } from '../../shadernode/ShaderNode.js';
 import { add, sub, mul } from '../../math/OperatorNode.js';
 import { floor, trunc, max, min } from '../../math/MathNode.js';
 
-export const mx_hsvtorgb = /*#__PURE__*/ tslFn( ( [ hsv_immutable ] ) => {
+export const mx_hsvtorgb = /*#__PURE__*/ Fn( ( [ hsv_immutable ] ) => {
 
 	const hsv = vec3( hsv_immutable ).toVar();
 	const h = float( hsv.x ).toVar();
@@ -16,7 +16,7 @@ export const mx_hsvtorgb = /*#__PURE__*/ tslFn( ( [ hsv_immutable ] ) => {
 
 		return vec3( v, v, v );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		h.assign( mul( 6.0, h.sub( floor( h ) ) ) );
 		const hi = int( trunc( h ) ).toVar();
@@ -29,19 +29,19 @@ export const mx_hsvtorgb = /*#__PURE__*/ tslFn( ( [ hsv_immutable ] ) => {
 
 			return vec3( v, t, p );
 
-		} ).elseif( hi.equal( int( 1 ) ), () => {
+		} ).ElseIf( hi.equal( int( 1 ) ), () => {
 
 			return vec3( q, v, p );
 
-		} ).elseif( hi.equal( int( 2 ) ), () => {
+		} ).ElseIf( hi.equal( int( 2 ) ), () => {
 
 			return vec3( p, v, t );
 
-		} ).elseif( hi.equal( int( 3 ) ), () => {
+		} ).ElseIf( hi.equal( int( 3 ) ), () => {
 
 			return vec3( p, q, v );
 
-		} ).elseif( hi.equal( int( 4 ) ), () => {
+		} ).ElseIf( hi.equal( int( 4 ) ), () => {
 
 			return vec3( t, p, v );
 
@@ -59,7 +59,7 @@ export const mx_hsvtorgb = /*#__PURE__*/ tslFn( ( [ hsv_immutable ] ) => {
 	]
 } );
 
-export const mx_rgbtohsv = /*#__PURE__*/ tslFn( ( [ c_immutable ] ) => {
+export const mx_rgbtohsv = /*#__PURE__*/ Fn( ( [ c_immutable ] ) => {
 
 	const c = vec3( c_immutable ).toVar();
 	const r = float( c.x ).toVar();
@@ -75,7 +75,7 @@ export const mx_rgbtohsv = /*#__PURE__*/ tslFn( ( [ c_immutable ] ) => {
 
 		s.assign( delta.div( maxcomp ) );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		s.assign( 0.0 );
 
@@ -85,17 +85,17 @@ export const mx_rgbtohsv = /*#__PURE__*/ tslFn( ( [ c_immutable ] ) => {
 
 		h.assign( 0.0 );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		If( r.greaterThanEqual( maxcomp ), () => {
 
 			h.assign( g.sub( b ).div( delta ) );
 
-		} ).elseif( g.greaterThanEqual( maxcomp ), () => {
+		} ).ElseIf( g.greaterThanEqual( maxcomp ), () => {
 
 			h.assign( add( 2.0, b.sub( r ).div( delta ) ) );
 
-		} ).else( () => {
+		} ).Else( () => {
 
 			h.assign( add( 4.0, r.sub( g ).div( delta ) ) );
 

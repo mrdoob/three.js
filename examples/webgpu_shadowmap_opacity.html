@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, vec4 } from 'three/tsl';
+			import { Fn, vec4 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -94,7 +94,7 @@
 
 				// shadow node
 
-				const customShadow = tslFn( ( [ color, opacity = .8 ] ) => {
+				const customShadow = Fn( ( [ color, opacity = .8 ] ) => {
 
 					return vec4( color, opacity );
 

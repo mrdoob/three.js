@@ -1,8 +1,8 @@
-import { tslFn, int, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNode.js';
+import { Fn, int, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNode.js';
 import { cos, sin, abs, max, exp2, log2, clamp, fract, mix, floor, normalize, cross, all } from '../math/MathNode.js';
 import { mul } from '../math/OperatorNode.js';
-import { cond } from '../math/CondNode.js';
-import { loop, Break } from '../utils/LoopNode.js';
+import { select } from '../math/CondNode.js';
+import { Loop, Break } from '../utils/LoopNode.js';
 
 // These defines must match with PMREMGenerator
 
@@ -24,7 +24,7 @@ const cubeUV_minTileSize = float( 16.0 );
 // a cubemap, the 0-5 integer index of a cube face, and the direction vector for
 // sampling a textureCube (not generally normalized ).
 
-const getFace = tslFn( ( [ direction ] ) => {
+const getFace = Fn( ( [ direction ] ) => {
 
 	const absDirection = vec3( abs( direction ) ).toVar();
 	const face = float( - 1.0 ).toVar();
@@ -33,23 +33,23 @@ const getFace = tslFn( ( [ direction ] ) => {
 
 		If( absDirection.x.greaterThan( absDirection.y ), () => {
 
-			face.assign( cond( direction.x.greaterThan( 0.0 ), 0.0, 3.0 ) );
+			face.assign( select( direction.x.greaterThan( 0.0 ), 0.0, 3.0 ) );
 
-		} ).else( () => {
+		} ).Else( () => {
 
-			face.assign( cond( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
+			face.assign( select( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
 
 		} );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		If( absDirection.z.greaterThan( absDirection.y ), () => {
 
-			face.assign( cond( direction.z.greaterThan( 0.0 ), 2.0, 5.0 ) );
+			face.assign( select( direction.z.greaterThan( 0.0 ), 2.0, 5.0 ) );
 
-		} ).else( () => {
+		} ).Else( () => {
 
-			face.assign( cond( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
+			face.assign( select( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
 
 		} );
 
@@ -66,7 +66,7 @@ const getFace = tslFn( ( [ direction ] ) => {
 } );
 
 // RH coordinate system; PMREM face-indexing convention
-const getUV = tslFn( ( [ direction, face ] ) => {
+const getUV = Fn( ( [ direction, face ] ) => {
 
 	const uv = vec2().toVar();
 
@@ -74,23 +74,23 @@ const getUV = tslFn( ( [ direction, face ] ) => {
 
 		uv.assign( vec2( direction.z, direction.y ).div( abs( direction.x ) ) ); // pos x
 
-	} ).elseif( face.equal( 1.0 ), () => {
+	} ).ElseIf( face.equal( 1.0 ), () => {
 
 		uv.assign( vec2( direction.x.negate(), direction.z.negate() ).div( abs( direction.y ) ) ); // pos y
 
-	} ).elseif( face.equal( 2.0 ), () => {
+	} ).ElseIf( face.equal( 2.0 ), () => {
 
 		uv.assign( vec2( direction.x.negate(), direction.y ).div( abs( direction.z ) ) ); // pos z
 
-	} ).elseif( face.equal( 3.0 ), () => {
+	} ).ElseIf( face.equal( 3.0 ), () => {
 
 		uv.assign( vec2( direction.z.negate(), direction.y ).div( abs( direction.x ) ) ); // neg x
 
-	} ).elseif( face.equal( 4.0 ), () => {
+	} ).ElseIf( face.equal( 4.0 ), () => {
 
 		uv.assign( vec2( direction.x.negate(), direction.z ).div( abs( direction.y ) ) ); // neg y
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		uv.assign( vec2( direction.x, direction.y ).div( abs( direction.z ) ) ); // neg z
 
@@ -107,7 +107,7 @@ const getUV = tslFn( ( [ direction, face ] ) => {
 	]
 } );
 
-const roughnessToMip = tslFn( ( [ roughness ] ) => {
+const roughnessToMip = Fn( ( [ roughness ] ) => {
 
 	const mip = float( 0.0 ).toVar();
 
@@ -115,19 +115,19 @@ const roughnessToMip = tslFn( ( [ roughness ] ) => {
 
 		mip.assign( cubeUV_r0.sub( roughness ).mul( cubeUV_m1.sub( cubeUV_m0 ) ).div( cubeUV_r0.sub( cubeUV_r1 ) ).add( cubeUV_m0 ) );
 
-	} ).elseif( roughness.greaterThanEqual( cubeUV_r4 ), () => {
+	} ).ElseIf( roughness.greaterThanEqual( cubeUV_r4 ), () => {
 
 		mip.assign( cubeUV_r1.sub( roughness ).mul( cubeUV_m4.sub( cubeUV_m1 ) ).div( cubeUV_r1.sub( cubeUV_r4 ) ).add( cubeUV_m1 ) );
 
-	} ).elseif( roughness.greaterThanEqual( cubeUV_r5 ), () => {
+	} ).ElseIf( roughness.greaterThanEqual( cubeUV_r5 ), () => {
 
 		mip.assign( cubeUV_r4.sub( roughness ).mul( cubeUV_m5.sub( cubeUV_m4 ) ).div( cubeUV_r4.sub( cubeUV_r5 ) ).add( cubeUV_m4 ) );
 
-	} ).elseif( roughness.greaterThanEqual( cubeUV_r6 ), () => {
+	} ).ElseIf( roughness.greaterThanEqual( cubeUV_r6 ), () => {
 
 		mip.assign( cubeUV_r5.sub( roughness ).mul( cubeUV_m6.sub( cubeUV_m5 ) ).div( cubeUV_r5.sub( cubeUV_r6 ) ).add( cubeUV_m5 ) );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		mip.assign( float( - 2.0 ).mul( log2( mul( 1.16, roughness ) ) ) ); // 1.16 = 1.79^0.25
 
@@ -144,7 +144,7 @@ const roughnessToMip = tslFn( ( [ roughness ] ) => {
 } );
 
 // RH coordinate system; PMREM face-indexing convention
-export const getDirection = tslFn( ( [ uv_immutable, face ] ) => {
+export const getDirection = Fn( ( [ uv_immutable, face ] ) => {
 
 	const uv = uv_immutable.toVar();
 	uv.assign( mul( 2.0, uv ).sub( 1.0 ) );
@@ -154,26 +154,26 @@ export const getDirection = tslFn( ( [ uv_immutable, face ] ) => {
 
 		direction.assign( direction.zyx ); // ( 1, v, u ) pos x
 
-	} ).elseif( face.equal( 1.0 ), () => {
+	} ).ElseIf( face.equal( 1.0 ), () => {
 
 		direction.assign( direction.xzy );
 		direction.xz.mulAssign( - 1.0 ); // ( -u, 1, -v ) pos y
 
-	} ).elseif( face.equal( 2.0 ), () => {
+	} ).ElseIf( face.equal( 2.0 ), () => {
 
 		direction.x.mulAssign( - 1.0 ); // ( -u, v, 1 ) pos z
 
-	} ).elseif( face.equal( 3.0 ), () => {
+	} ).ElseIf( face.equal( 3.0 ), () => {
 
 		direction.assign( direction.zyx );
 		direction.xz.mulAssign( - 1.0 ); // ( -1, v, -u ) neg x
 
-	} ).elseif( face.equal( 4.0 ), () => {
+	} ).ElseIf( face.equal( 4.0 ), () => {
 
 		direction.assign( direction.xzy );
 		direction.xy.mulAssign( - 1.0 ); // ( -u, -1, v ) neg y
 
-	} ).elseif( face.equal( 5.0 ), () => {
+	} ).ElseIf( face.equal( 5.0 ), () => {
 
 		direction.z.mulAssign( - 1.0 ); // ( u, v, -1 ) neg zS
 
@@ -192,7 +192,7 @@ export const getDirection = tslFn( ( [ uv_immutable, face ] ) => {
 
 //
 
-export const textureCubeUV = tslFn( ( [ envMap, sampleDir_immutable, roughness_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
+export const textureCubeUV = Fn( ( [ envMap, sampleDir_immutable, roughness_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
 
 	const roughness = float( roughness_immutable );
 	const sampleDir = vec3( sampleDir_immutable );
@@ -214,7 +214,7 @@ export const textureCubeUV = tslFn( ( [ envMap, sampleDir_immutable, roughness_i
 
 } );
 
-const bilinearCubeUV = tslFn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
+const bilinearCubeUV = Fn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
 
 	const mipInt = float( mipInt_immutable ).toVar();
 	const direction = vec3( direction_immutable );
@@ -241,7 +241,7 @@ const bilinearCubeUV = tslFn( ( [ envMap, direction_immutable, mipInt_immutable,
 
 } );
 
-const getSample = tslFn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+const getSample = Fn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
 
 	const cosTheta = cos( theta );
 
@@ -254,9 +254,9 @@ const getSample = tslFn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEU
 
 } );
 
-export const blur = tslFn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+export const blur = Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
 
-	const axis = vec3( cond( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
+	const axis = vec3( select( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
 
 	If( all( axis.equals( vec3( 0.0 ) ) ), () => {
 
@@ -269,7 +269,7 @@ export const blur = tslFn( ( { n, latitudinal, poleAxis, outputDirection, weight
 	const gl_FragColor = vec3().toVar();
 	gl_FragColor.addAssign( weights.element( int( 0 ) ).mul( getSample( { theta: 0.0, axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
 
-	loop( { start: int( 1 ), end: n }, ( { i } ) => {
+	Loop( { start: int( 1 ), end: n }, ( { i } ) => {
 
 		If( i.greaterThanEqual( samples ), () => {
 

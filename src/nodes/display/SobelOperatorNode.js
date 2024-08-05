@@ -1,7 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { luminance } from './ColorAdjustmentNode.js';
-import { addNodeElement, tslFn, nodeObject, vec2, vec3, vec4, mat3 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeObject, vec2, vec3, vec4, mat3 } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { add } from '../math/OperatorNode.js';
@@ -38,7 +38,7 @@ class SobelOperatorNode extends TempNode {
 
 		const sampleTexture = ( uv ) => textureNode.uv( uv );
 
-		const sobel = tslFn( () => {
+		const sobel = Fn( () => {
 
 			// Sobel Edge Detection (see https://youtu.be/uihBwtPIBxM)
 

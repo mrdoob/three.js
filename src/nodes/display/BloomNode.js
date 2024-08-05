@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { addNodeElement, tslFn, nodeObject, float, vec4, int } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeObject, float, vec4, int } from '../shadernode/ShaderNode.js';
 import { mix, smoothstep } from '../math/MathNode.js';
 import { luminance } from './ColorAdjustmentNode.js';
 import { uniform } from '../core/UniformNode.js';
@@ -11,7 +11,7 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 import { HalfFloatType } from '../../constants.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { Vector2 } from '../../math/Vector2.js';
-import { loop } from '../utils/LoopNode.js';
+import { Loop } from '../utils/LoopNode.js';
 import { add } from '../math/OperatorNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { texture } from '../accessors/TextureNode.js';
@@ -183,7 +183,7 @@ class BloomNode extends TempNode {
 
 		// luminosity high pass material
 
-		const luminosityHighPass = tslFn( () => {
+		const luminosityHighPass = Fn( () => {
 
 			const texel = this.inputNode;
 			const v = luminance( texel.rgb );
@@ -213,7 +213,7 @@ class BloomNode extends TempNode {
 		const bloomFactors = uniformArray( [ 1.0, 0.8, 0.6, 0.4, 0.2 ] );
 		const bloomTintColors = uniformArray( [ new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ), new Vector3( 1, 1, 1 ) ] );
 
-		const lerpBloomFactor = tslFn( ( [ factor, radius ] ) => {
+		const lerpBloomFactor = Fn( ( [ factor, radius ] ) => {
 
 			const mirrorFactor = float( 1.2 ).sub( factor );
 			return mix( factor, mirrorFactor, radius );
@@ -228,7 +228,7 @@ class BloomNode extends TempNode {
 		} );
 
 
-		const compositePass = tslFn( () => {
+		const compositePass = Fn( () => {
 
 			const color0 = lerpBloomFactor( bloomFactors.element( 0 ), this.radius ).mul( vec4( bloomTintColors.element( 0 ), 1.0 ) ).mul( this._textureNodeBlur0 );
 			const color1 = lerpBloomFactor( bloomFactors.element( 1 ), this.radius ).mul( vec4( bloomTintColors.element( 1 ), 1.0 ) ).mul( this._textureNodeBlur1 );
@@ -290,12 +290,12 @@ class BloomNode extends TempNode {
 		const uvNode = uv();
 		const sampleTexel = ( uv ) => colorTexture.uv( uv );
 
-		const seperableBlurPass = tslFn( () => {
+		const seperableBlurPass = Fn( () => {
 
 			const weightSum = gaussianCoefficients.element( 0 ).toVar();
 			const diffuseSum = sampleTexel( uvNode ).rgb.mul( weightSum ).toVar();
 
-			loop( { start: int( 1 ), end: int( kernelRadius ), type: 'int', condition: '<' }, ( { i } ) => {
+			Loop( { start: int( 1 ), end: int( kernelRadius ), type: 'int', condition: '<' }, ( { i } ) => {
 
 				const x = float( i );
 				const w = gaussianCoefficients.element( i );

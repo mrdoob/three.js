@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { If, PI2, atan2, color, frontFacing, output, positionLocal, tslFn, uniform, vec4 } from 'three/tsl';
+			import { If, PI2, atan2, color, frontFacing, output, positionLocal, Fn, uniform, vec4 } from 'three/tsl';
 
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -77,7 +77,7 @@
 
 				// TSL functions
 			
-				const inAngle = tslFn( ( [ position, angleStart, angleArc ] ) => {
+				const inAngle = Fn( ( [ position, angleStart, angleArc ] ) => {
 
 					const angle = atan2( position.y, position.x ).sub( angleStart ).mod( PI2 ).toVar();
 					return angle.greaterThan( 0 ).and( angle.lessThan( angleArc ) );
@@ -115,7 +115,7 @@
 
 				// output
 
-				slicedMaterial.outputNode = tslFn( () => {
+				slicedMaterial.outputNode = Fn( () => {
 
 					// discard
 
@@ -136,7 +136,7 @@
 
 				// shadow
 
-				slicedMaterial.shadowNode = tslFn( () => {
+				slicedMaterial.shadowNode = Fn( () => {
 
 					// discard
 

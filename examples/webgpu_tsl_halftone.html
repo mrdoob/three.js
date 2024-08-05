@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, mix, normalWorld, output, tslFn, uniform, vec4, viewportCoordinate, viewportResolution } from 'three/tsl';
+			import { color, mix, normalWorld, output, Fn, uniform, vec4, viewportCoordinate, viewportResolution } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -129,7 +129,7 @@
 
 				// halftone functions
 
-				const halftone = tslFn( ( [ count, color, direction, start, end, radius, mixLow, mixHigh ] ) => {
+				const halftone = Fn( ( [ count, color, direction, start, end, radius, mixLow, mixHigh ] ) => {
 
 					// grid pattern
 
@@ -157,7 +157,7 @@
 			
 				} );
 
-				const halftones = tslFn( ( [ input ] ) => {
+				const halftones = Fn( ( [ input ] ) => {
 
 					const halftonesOutput = input;
 

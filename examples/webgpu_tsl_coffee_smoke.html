@@ -29,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, mul, positionLocal, smoothstep, texture, timerLocal, tslFn, uv, vec2, vec3, vec4 } from 'three/tsl';
+			import { mix, mul, positionLocal, smoothstep, texture, timerLocal, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -81,7 +81,7 @@
 
 				// position
 
-				smokeMaterial.positionNode = tslFn( () => {
+				smokeMaterial.positionNode = Fn( () => {
 
 					// twist
 
@@ -103,7 +103,7 @@
 
 				// color
 
-				smokeMaterial.colorNode = tslFn( () => {
+				smokeMaterial.colorNode = Fn( () => {
 
 					// alpha
 
