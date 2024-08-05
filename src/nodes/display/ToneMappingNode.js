@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, Fn, nodeObject, float, mat3, vec3, If } from '../shadernode/ShaderNode.js';
 import { rendererReference } from '../accessors/RendererReferenceNode.js';
-import { cond } from '../math/CondNode.js';
+import { select } from '../math/CondNode.js';
 import { clamp, log2, max, min, pow, mix } from '../math/MathNode.js';
 import { mul, sub, div } from '../math/OperatorNode.js';
 
@@ -128,7 +128,7 @@ const NeutralToneMappingNode = Fn( ( { color, exposure } ) => {
 	color = color.mul( exposure );
 
 	const x = min( color.r, min( color.g, color.b ) );
-	const offset = cond( x.lessThan( 0.08 ), x.sub( mul( 6.25, x.mul( x ) ) ), 0.04 );
+	const offset = select( x.lessThan( 0.08 ), x.sub( mul( 6.25, x.mul( x ) ) ), 0.04 );
 
 	color.subAssign( offset );
 

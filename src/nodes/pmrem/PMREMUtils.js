@@ -1,7 +1,7 @@
 import { Fn, int, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNode.js';
 import { cos, sin, abs, max, exp2, log2, clamp, fract, mix, floor, normalize, cross, all } from '../math/MathNode.js';
 import { mul } from '../math/OperatorNode.js';
-import { cond } from '../math/CondNode.js';
+import { select } from '../math/CondNode.js';
 import { Loop, Break } from '../utils/LoopNode.js';
 
 // These defines must match with PMREMGenerator
@@ -33,11 +33,11 @@ const getFace = Fn( ( [ direction ] ) => {
 
 		If( absDirection.x.greaterThan( absDirection.y ), () => {
 
-			face.assign( cond( direction.x.greaterThan( 0.0 ), 0.0, 3.0 ) );
+			face.assign( select( direction.x.greaterThan( 0.0 ), 0.0, 3.0 ) );
 
 		} ).Else( () => {
 
-			face.assign( cond( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
+			face.assign( select( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
 
 		} );
 
@@ -45,11 +45,11 @@ const getFace = Fn( ( [ direction ] ) => {
 
 		If( absDirection.z.greaterThan( absDirection.y ), () => {
 
-			face.assign( cond( direction.z.greaterThan( 0.0 ), 2.0, 5.0 ) );
+			face.assign( select( direction.z.greaterThan( 0.0 ), 2.0, 5.0 ) );
 
 		} ).Else( () => {
 
-			face.assign( cond( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
+			face.assign( select( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
 
 		} );
 
@@ -256,7 +256,7 @@ const getSample = Fn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_T
 
 export const blur = Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
 
-	const axis = vec3( cond( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
+	const axis = vec3( select( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
 
 	If( all( axis.equals( vec3( 0.0 ) ) ), () => {
 

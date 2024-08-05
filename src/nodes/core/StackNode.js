@@ -1,5 +1,5 @@
 import Node, { addNodeClass } from './Node.js';
-import { cond } from '../math/CondNode.js';
+import { select } from '../math/CondNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
 
 class StackNode extends Node {
@@ -36,7 +36,7 @@ class StackNode extends Node {
 	If( boolNode, method ) {
 
 		const methodNode = new ShaderNode( method );
-		this._currentCond = cond( boolNode, methodNode );
+		this._currentCond = select( boolNode, methodNode );
 
 		return this.add( this._currentCond );
 
@@ -45,7 +45,7 @@ class StackNode extends Node {
 	ElseIf( boolNode, method ) {
 
 		const methodNode = new ShaderNode( method );
-		const ifNode = cond( boolNode, methodNode );
+		const ifNode = select( boolNode, methodNode );
 
 		this._currentCond.elseNode = ifNode;
 		this._currentCond = ifNode;

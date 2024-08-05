@@ -322,9 +322,9 @@ class TSLEncoder {
 		const leftStr = this.emitExpression( node.left );
 		const rightStr = this.emitExpression( node.right );
 
-		this.addImport( 'cond' );
+		this.addImport( 'select' );
 
-		return `cond( ${ condStr }, ${ leftStr }, ${ rightStr } )`;
+		return `select( ${ condStr }, ${ leftStr }, ${ rightStr } )`;
 
 	}
 

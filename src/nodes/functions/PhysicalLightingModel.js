@@ -11,7 +11,7 @@ import { diffuseColor, specularColor, specularF90, roughness, clearcoat, clearco
 import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
 import { positionViewDirection, positionView, positionWorld } from '../accessors/PositionNode.js';
 import { Fn, float, vec2, vec3, vec4, mat3, If } from '../shadernode/ShaderNode.js';
-import { cond } from '../math/CondNode.js';
+import { select } from '../math/CondNode.js';
 import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
 import { div } from '../math/OperatorNode.js';
 import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/CameraNode.js';
@@ -313,19 +313,19 @@ const IBLSheenBRDF = Fn( ( { normal, viewDir, roughness } ) => {
 
 	const r2 = roughness.pow2();
 
-	const a = cond(
+	const a = select(
 		roughness.lessThan( 0.25 ),
 		float( - 339.2 ).mul( r2 ).add( float( 161.4 ).mul( roughness ) ).sub( 25.9 ),
 		float( - 8.48 ).mul( r2 ).add( float( 14.3 ).mul( roughness ) ).sub( 9.95 )
 	);
 
-	const b = cond(
+	const b = select(
 		roughness.lessThan( 0.25 ),
 		float( 44.0 ).mul( r2 ).sub( float( 23.7 ).mul( roughness ) ).add( 3.26 ),
 		float( 1.97 ).mul( r2 ).sub( float( 3.27 ).mul( roughness ) ).add( 0.72 )
 	);
 
-	const DG = cond( roughness.lessThan( 0.25 ), 0.0, float( 0.1 ).mul( roughness ).sub( 0.025 ) ).add( a.mul( dotNV ).add( b ).exp() );
+	const DG = select( roughness.lessThan( 0.25 ), 0.0, float( 0.1 ).mul( roughness ).sub( 0.025 ) ).add( a.mul( dotNV ).add( b ).exp() );
 
 	return DG.mul( 1.0 / Math.PI ).saturate();
 
