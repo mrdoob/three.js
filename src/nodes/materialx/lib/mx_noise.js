@@ -6,7 +6,7 @@ import { cond } from '../../math/CondNode.js';
 import { sub, mul } from '../../math/OperatorNode.js';
 import { floor, abs, max, dot, min, sqrt } from '../../math/MathNode.js';
 import { overloadingFn } from '../../utils/FunctionOverloadingNode.js';
-import { loop } from '../../utils/LoopNode.js';
+import { Loop } from '../../utils/LoopNode.js';
 
 
 export const mx_select = /*#__PURE__*/ tslFn( ( [ b_immutable, t_immutable, f_immutable ] ) => {
@@ -840,7 +840,7 @@ export const mx_fractal_noise_float = /*#__PURE__*/ tslFn( ( [ p_immutable, octa
 	const result = float( 0.0 ).toVar();
 	const amplitude = float( 1.0 ).toVar();
 
-	loop( octaves, () => {
+	Loop( octaves, () => {
 
 		result.addAssign( amplitude.mul( mx_perlin_noise_float( p ) ) );
 		amplitude.mulAssign( diminish );
@@ -870,7 +870,7 @@ export const mx_fractal_noise_vec3 = /*#__PURE__*/ tslFn( ( [ p_immutable, octav
 	const result = vec3( 0.0 ).toVar();
 	const amplitude = float( 1.0 ).toVar();
 
-	loop( octaves, () => {
+	Loop( octaves, () => {
 
 		result.addAssign( amplitude.mul( mx_perlin_noise_vec3( p ) ) );
 		amplitude.mulAssign( diminish );
@@ -1037,9 +1037,9 @@ export const mx_worley_noise_float_0 = /*#__PURE__*/ tslFn( ( [ p_immutable, jit
 	const localpos = vec2( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ) ).toVar();
 	const sqdist = float( 1e6 ).toVar();
 
-	loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-		loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
 			const dist = float( mx_worley_distance( localpos, x, y, X, Y, jitter, metric ) ).toVar();
 			sqdist.assign( min( sqdist, dist ) );
@@ -1075,9 +1075,9 @@ export const mx_worley_noise_vec2_0 = /*#__PURE__*/ tslFn( ( [ p_immutable, jitt
 	const localpos = vec2( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ) ).toVar();
 	const sqdist = vec2( 1e6, 1e6 ).toVar();
 
-	loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-		loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
 			const dist = float( mx_worley_distance( localpos, x, y, X, Y, jitter, metric ) ).toVar();
 
@@ -1123,9 +1123,9 @@ export const mx_worley_noise_vec3_0 = /*#__PURE__*/ tslFn( ( [ p_immutable, jitt
 	const localpos = vec2( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ) ).toVar();
 	const sqdist = vec3( 1e6, 1e6, 1e6 ).toVar();
 
-	loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-		loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
 			const dist = float( mx_worley_distance( localpos, x, y, X, Y, jitter, metric ) ).toVar();
 
@@ -1177,11 +1177,11 @@ export const mx_worley_noise_float_1 = /*#__PURE__*/ tslFn( ( [ p_immutable, jit
 	const localpos = vec3( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ), mx_floorfrac( p.z, Z ) ).toVar();
 	const sqdist = float( 1e6 ).toVar();
 
-	loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-		loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
-			loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
+			Loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
 
 				const dist = float( mx_worley_distance( localpos, x, y, z, X, Y, Z, jitter, metric ) ).toVar();
 				sqdist.assign( min( sqdist, dist ) );
@@ -1221,11 +1221,11 @@ export const mx_worley_noise_vec2_1 = /*#__PURE__*/ tslFn( ( [ p_immutable, jitt
 	const localpos = vec3( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ), mx_floorfrac( p.z, Z ) ).toVar();
 	const sqdist = vec2( 1e6, 1e6 ).toVar();
 
-	loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-		loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
-			loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
+			Loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
 
 				const dist = float( mx_worley_distance( localpos, x, y, z, X, Y, Z, jitter, metric ) ).toVar();
 
@@ -1275,11 +1275,11 @@ export const mx_worley_noise_vec3_1 = /*#__PURE__*/ tslFn( ( [ p_immutable, jitt
 	const localpos = vec3( mx_floorfrac( p.x, X ), mx_floorfrac( p.y, Y ), mx_floorfrac( p.z, Z ) ).toVar();
 	const sqdist = vec3( 1e6, 1e6, 1e6 ).toVar();
 
-	loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
+	Loop( { start: - 1, end: int( 1 ), name: 'x', condition: '<=' }, ( { x } ) => {
 
-		loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
+		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
-			loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
+			Loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
 
 				const dist = float( mx_worley_distance( localpos, x, y, z, X, Y, Z, jitter, metric ) ).toVar();
 

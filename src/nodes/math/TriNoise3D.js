@@ -1,6 +1,6 @@
 // https://github.com/cabbibo/glsl-tri-noise-3d
 
-import { loop } from '../utils/LoopNode.js';
+import { Loop } from '../utils/LoopNode.js';
 import { float, vec3, tslFn } from '../shadernode/ShaderNode.js';
 
 const tri = tslFn( ( [ x ] ) => {
@@ -22,7 +22,7 @@ const triNoise3D = tslFn( ( [ p_immutable, spd, time ] ) => {
 	const rz = float( 0.0 ).toVar();
 	const bp = vec3( p ).toVar();
 
-	loop( { start: float( 0.0 ), end: float( 3.0 ), type: 'float', condition: '<=' }, () => {
+	Loop( { start: float( 0.0 ), end: float( 3.0 ), type: 'float', condition: '<=' }, () => {
 
 		const dg = vec3( tri3( bp.mul( 2.0 ) ) ).toVar();
 		p.addAssign( dg.add( time.mul( float( 0.1 ).mul( spd ) ) ) );

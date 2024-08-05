@@ -391,13 +391,13 @@ ${ this.tab }} )`;
 		const conditionParam = condition !== '<' ? `, condition: '${ condition }'` : '';
 		const updateParam = update !== '++' ? `, update: '${ update }'` : '';
 
-		let loopStr = `loop( { start: ${ start }, end: ${ end + nameParam + typeParam + conditionParam + updateParam } }, ( { ${ name } } ) => {\n\n`;
+		let loopStr = `Loop( { start: ${ start }, end: ${ end + nameParam + typeParam + conditionParam + updateParam } }, ( { ${ name } } ) => {\n\n`;
 
 		loopStr += this.emitBody( node.body ) + '\n\n';
 
 		loopStr += this.tab + '} )';
 
-		this.imports.add( 'loop' );
+		this.imports.add( 'Loop' );
 
 		return loopStr;
 

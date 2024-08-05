@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mx_noise_float, color, cross, dot, float, modelNormalMatrix, positionLocal, sign, step, tslFn, uniform, varying, vec2, vec3, loop } from 'three/tsl';
+			import { mx_noise_float, color, cross, dot, float, modelNormalMatrix, positionLocal, sign, step, tslFn, uniform, varying, vec2, vec3, Loop } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -105,7 +105,7 @@
 					warpedPosition.addAssign( mx_noise_float( warpedPosition.mul( positionFrequency ).mul( warpFrequency ), 1, 0 ).mul( warpStrength ) );
 			
 					const elevation = float( 0 ).toVar();
-					loop( { type: 'float', start: float( 1 ), end: noiseIterations.toFloat(), condition: '<=' }, ( { i } ) => {
+					Loop( { type: 'float', start: float( 1 ), end: noiseIterations.toFloat(), condition: '<=' }, ( { i } ) => {
 
 						const noiseInput = warpedPosition.mul( positionFrequency ).mul( i.mul( 2 ) ).add( i.mul( 987 ) );
 						const noise = mx_noise_float( noiseInput, 1, 0 ).div( i.add( 1 ).mul( 2 ) );

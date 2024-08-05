@@ -18,7 +18,7 @@ import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../acc
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
 import { viewportResolution } from '../display/ViewportNode.js';
 import { viewportMipTexture } from '../display/ViewportTextureNode.js';
-import { loop } from '../utils/LoopNode.js';
+import { Loop } from '../utils/LoopNode.js';
 
 //
 // Transmission
@@ -116,7 +116,7 @@ const getIBLVolumeRefraction = tslFn( ( [ n, v, roughness, diffuseColor, specula
 		const halfSpread = ior.sub( 1.0 ).mul( dispersion.mul( 0.025 ) );
 		const iors = vec3( ior.sub( halfSpread ), ior, ior.add( halfSpread ) );
 
-		loop( { start: 0, end: 3 }, ( { i } ) => {
+		Loop( { start: 0, end: 3 }, ( { i } ) => {
 
 			const ior = iors.element( i );
 

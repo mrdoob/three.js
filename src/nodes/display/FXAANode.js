@@ -5,7 +5,7 @@ import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { abs, max, min, mix, pow } from '../math/MathNode.js';
 import { sub } from '../math/OperatorNode.js';
-import { loop, Break } from '../utils/LoopNode.js';
+import { Loop, Break } from '../utils/LoopNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 
@@ -212,7 +212,7 @@ class FXAANode extends TempNode {
 			const iterationsUsedN = int( 0 ).toVar();
 			const iterationsUsedP = int( 0 ).toVar();
 
-			loop( NUM_SAMPLES, ( { i } ) => {
+			Loop( NUM_SAMPLES, ( { i } ) => {
 
 				const increment = i.add( 1 ).toVar();
 

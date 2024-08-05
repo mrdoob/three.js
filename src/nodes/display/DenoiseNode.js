@@ -5,7 +5,7 @@ import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { uniformArray } from '../accessors/UniformArrayNode.js';
 import { abs, dot, sin, cos, PI, pow, max } from '../math/MathNode.js';
-import { loop } from '../utils/LoopNode.js';
+import { Loop } from '../utils/LoopNode.js';
 import { luminance } from './ColorAdjustmentNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -115,7 +115,7 @@ class DenoiseNode extends TempNode {
 			const totalWeight = float( 1.0 ).toVar();
 			const denoised = vec3( texel.rgb ).toVar();
 
-			loop( { start: int( 0 ), end: int( 16 ), type: 'int', condition: '<' }, ( { i } ) => {
+			Loop( { start: int( 0 ), end: int( 16 ), type: 'int', condition: '<' }, ( { i } ) => {
 
 				const sampleDir = this._sampleVectors.element( i ).toVar();
 				const offset = rotationMatrix.mul( sampleDir.xy.mul( float( 1.0 ).add( sampleDir.z.mul( this.radius.sub( 1 ) ) ) ) ).div( this._resolution ).toVar();

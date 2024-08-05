@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, wgslFn, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, loop, cameraProjectionMatrix } from 'three/tsl';
+			import { tslFn, wgslFn, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, Loop, cameraProjectionMatrix } from 'three/tsl';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
@@ -215,7 +215,7 @@
 				materials.push( material );
 
 				const loopCount = 10;
-				material.colorNode = loop( loopCount, ( { i } ) => {
+				material.colorNode = Loop( loopCount, ( { i } ) => {
 
 					const output = vec4().temp();
 					const scale = oscSine().mul( .09 ); // just a value to test

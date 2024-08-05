@@ -192,10 +192,15 @@ class LoopNode extends Node {
 
 export default LoopNode;
 
-export const loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();
+export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();
 export const Continue = () => expression( 'continue' ).append();
 export const Break = () => expression( 'break' ).append();
 
-addNodeElement( 'loop', ( returns, ...params ) => bypass( returns, loop( ...params ) ) );
+export const loop = ( ...params ) => { // @deprecated, r168
+
+	console.warn( 'TSL.LoopNode: loop() has been renamed to Loop().' );
+	return Loop( ...params );
+
+};
 
 addNodeClass( 'LoopNode', LoopNode );

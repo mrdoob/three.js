@@ -2,7 +2,7 @@ import { tslFn, int, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNod
 import { cos, sin, abs, max, exp2, log2, clamp, fract, mix, floor, normalize, cross, all } from '../math/MathNode.js';
 import { mul } from '../math/OperatorNode.js';
 import { cond } from '../math/CondNode.js';
-import { loop, Break } from '../utils/LoopNode.js';
+import { Loop, Break } from '../utils/LoopNode.js';
 
 // These defines must match with PMREMGenerator
 
@@ -269,7 +269,7 @@ export const blur = tslFn( ( { n, latitudinal, poleAxis, outputDirection, weight
 	const gl_FragColor = vec3().toVar();
 	gl_FragColor.addAssign( weights.element( int( 0 ) ).mul( getSample( { theta: 0.0, axis, outputDirection, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) ) );
 
-	loop( { start: int( 1 ), end: n }, ( { i } ) => {
+	Loop( { start: int( 1 ), end: n }, ( { i } ) => {
 
 		If( i.greaterThanEqual( samples ), () => {
 

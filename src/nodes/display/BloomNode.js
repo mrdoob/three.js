@@ -11,7 +11,7 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 import { HalfFloatType } from '../../constants.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { Vector2 } from '../../math/Vector2.js';
-import { loop } from '../utils/LoopNode.js';
+import { Loop } from '../utils/LoopNode.js';
 import { add } from '../math/OperatorNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { texture } from '../accessors/TextureNode.js';
@@ -295,7 +295,7 @@ class BloomNode extends TempNode {
 			const weightSum = gaussianCoefficients.element( 0 ).toVar();
 			const diffuseSum = sampleTexel( uvNode ).rgb.mul( weightSum ).toVar();
 
-			loop( { start: int( 1 ), end: int( kernelRadius ), type: 'int', condition: '<' }, ( { i } ) => {
+			Loop( { start: int( 1 ), end: int( kernelRadius ), type: 'int', condition: '<' }, ( { i } ) => {
 
 				const x = float( i );
 				const w = gaussianCoefficients.element( i );

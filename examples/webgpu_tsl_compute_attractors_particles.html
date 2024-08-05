@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { float, If, PI, color, cos, instanceIndex, loop, mix, mod, sin, storage, tslFn, uint, uniform, uniformArray, vec3, vec4 } from 'three/tsl';
+			import { float, If, PI, color, cos, instanceIndex, Loop, mix, mod, sin, storage, tslFn, uint, uniform, uniformArray, vec3, vec4 } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -216,7 +216,7 @@
 
 					const force = vec3( 0 ).toVar();
 
-					loop( attractorsLength, ( { i } ) => {
+					Loop( attractorsLength, ( { i } ) => {
 
 						const attractorPosition = attractorsPositions.element( i );
 						const attractorRotationAxis = attractorsRotationAxes.element( i );

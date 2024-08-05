@@ -10,7 +10,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { PI, cos, sin, pow, clamp, abs, max, mix, sqrt, acos, dot, normalize, cross } from '../math/MathNode.js';
 import { div, mul, add, sub } from '../math/OperatorNode.js';
-import { loop } from '../utils/LoopNode.js';
+import { Loop } from '../utils/LoopNode.js';
 import { passTexture } from './PassNode.js';
 import { RepeatWrapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
@@ -152,7 +152,7 @@ class GTAONode extends TempNode {
 
 			const ao = float( 0 ).toVar();
 
-			loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
+			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
 				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI );
 				const sampleDir = vec4( cos( angle ), sin( angle ), 0., add( 0.5, mul( 0.5, noiseTexel.w ) ) );
@@ -166,7 +166,7 @@ class GTAONode extends TempNode {
 				const tangentToNormalInSlice = cross( normalInSlice, sliceBitangent );
 				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) ).toVar();
 
-				loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
+				Loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
 
 					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( j ).add( 1.0 ), float( STEPS ) ), this.distanceExponent ) );
 

@@ -8,7 +8,7 @@ import { normalLocal } from './NormalNode.js';
 import { textureLoad } from './TextureNode.js';
 import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
 import { ivec2, int } from '../shadernode/ShaderNode.js';
-import { loop } from '../utils/LoopNode.js';
+import { Loop } from '../utils/LoopNode.js';
 
 import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -190,7 +190,7 @@ class MorphNode extends Node {
 
 		const width = int( size.width );
 
-		loop( morphTargetsCount, ( { i } ) => {
+		Loop( morphTargetsCount, ( { i } ) => {
 
 			const influence = float( 0 ).toVar();
 
