@@ -147,18 +147,18 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				const worldPos = varyingProperty( 'vec4', 'worldPos' );
 
-				worldPos.assign( positionGeometry.y.lessThan( 0.5 ).cond( start, end ) );
+				worldPos.assign( positionGeometry.y.lessThan( 0.5 ).select( start, end ) );
 
 				// height offset
 				const hw = materialLineWidth.mul( 0.5 );
-				worldPos.addAssign( vec4( positionGeometry.x.lessThan( 0.0 ).cond( worldUp.mul( hw ), worldUp.mul( hw ).negate() ), 0 ) );
+				worldPos.addAssign( vec4( positionGeometry.x.lessThan( 0.0 ).select( worldUp.mul( hw ), worldUp.mul( hw ).negate() ), 0 ) );
 
 				// don't extend the line if we're rendering dashes because we
 				// won't be rendering the endcaps
 				if ( ! useDash ) {
 
 					// cap extension
-					worldPos.addAssign( vec4( positionGeometry.y.lessThan( 0.5 ).cond( worldDir.mul( hw ).negate(), worldDir.mul( hw ) ), 0 ) );
+					worldPos.addAssign( vec4( positionGeometry.y.lessThan( 0.5 ).select( worldDir.mul( hw ).negate(), worldDir.mul( hw ) ), 0 ) );
 
 					// add width to the box
 					worldPos.addAssign( vec4( worldFwd.mul( hw ), 0 ) );
@@ -179,7 +179,7 @@ class Line2NodeMaterial extends NodeMaterial {
 				// segments overlap neatly
 				const clipPose = temp( vec3() );
 
-				clipPose.assign( positionGeometry.y.lessThan( 0.5 ).cond( ndcStart, ndcEnd ) );
+				clipPose.assign( positionGeometry.y.lessThan( 0.5 ).select( ndcStart, ndcEnd ) );
 				clip.z.assign( clipPose.z.mul( clip.w ) );
 
 			} else {
@@ -193,7 +193,7 @@ class Line2NodeMaterial extends NodeMaterial {
 				offset.x.assign( offset.x.div( aspect ) );
 
 				// sign flip
-				offset.assign( positionGeometry.x.lessThan( 0.0 ).cond( offset.negate(), offset ) );
+				offset.assign( positionGeometry.x.lessThan( 0.0 ).select( offset.negate(), offset ) );
 
 				// endcaps
 				If( positionGeometry.y.lessThan( 0.0 ), () => {
@@ -213,7 +213,7 @@ class Line2NodeMaterial extends NodeMaterial {
 				offset.assign( offset.div( viewport.w ) );
 
 				// select end
-				clip.assign( positionGeometry.y.lessThan( 0.5 ).cond( clipStart, clipEnd ) );
+				clip.assign( positionGeometry.y.lessThan( 0.5 ).select( clipStart, clipEnd ) );
 
 				// back to clip space
 				offset.assign( offset.mul( clip.w ) );
@@ -266,7 +266,7 @@ class Line2NodeMaterial extends NodeMaterial {
 				const instanceDistanceStart = attribute( 'instanceDistanceStart' );
 				const instanceDistanceEnd = attribute( 'instanceDistanceEnd' );
 
-				const lineDistance = positionGeometry.y.lessThan( 0.5 ).cond( dashScaleNode.mul( instanceDistanceStart ), materialLineScale.mul( instanceDistanceEnd ) );
+				const lineDistance = positionGeometry.y.lessThan( 0.5 ).select( dashScaleNode.mul( instanceDistanceStart ), materialLineScale.mul( instanceDistanceEnd ) );
 
 				const vLineDistance = varying( lineDistance.add( materialLineDashOffset ) );
 				const vLineDistanceOffset = offsetNode ? vLineDistance.add( offsetNode ) : vLineDistance;
@@ -318,7 +318,7 @@ class Line2NodeMaterial extends NodeMaterial {
 				if ( useAlphaToCoverage ) {
 
 					const a = vUv.x;
-					const b = vUv.y.greaterThan( 0.0 ).cond( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
+					const b = vUv.y.greaterThan( 0.0 ).select( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
 
 					const len2 = a.mul( a ).add( b.mul( b ) );
 
@@ -337,7 +337,7 @@ class Line2NodeMaterial extends NodeMaterial {
 					If( vUv.y.abs().greaterThan( 1.0 ), () => {
 
 						const a = vUv.x;
-						const b = vUv.y.greaterThan( 0.0 ).cond( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
+						const b = vUv.y.greaterThan( 0.0 ).select( vUv.y.sub( 1.0 ), vUv.y.add( 1.0 ) );
 						const len2 = a.mul( a ).add( b.mul( b ) );
 
 						len2.greaterThan( 1.0 ).discard();
@@ -361,7 +361,7 @@ class Line2NodeMaterial extends NodeMaterial {
 					const instanceColorStart = attribute( 'instanceColorStart' );
 					const instanceColorEnd = attribute( 'instanceColorEnd' );
 
-					const instanceColor = positionGeometry.y.lessThan( 0.5 ).cond( instanceColorStart, instanceColorEnd );
+					const instanceColor = positionGeometry.y.lessThan( 0.5 ).select( instanceColorStart, instanceColorEnd );
 
 					lineColorNode = instanceColor.mul( materialColor );
 

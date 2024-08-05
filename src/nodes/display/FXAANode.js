@@ -130,8 +130,8 @@ class FXAANode extends TempNode {
 
 				// locate the edge
 
-				const x = contrastE.greaterThan( contrastW ).cond( 1, - 1 ).toVar();
-				const y = contrastS.greaterThan( contrastN ).cond( 1, - 1 ).toVar();
+				const x = contrastE.greaterThan( contrastW ).select( 1, - 1 ).toVar();
+				const y = contrastS.greaterThan( contrastN ).select( 1, - 1 ).toVar();
 
 				const dirToEdge = vec2( x, y ).toVar();
 				// . 2 .      . 1 .

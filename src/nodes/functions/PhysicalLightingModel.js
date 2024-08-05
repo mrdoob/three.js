@@ -249,7 +249,7 @@ const evalIridescence = Fn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, 
 	const R12 = F_Schlick( { f0: R0, f90: 1.0, dotVH: cosTheta1 } );
 	//const R21 = R12;
 	const T121 = R12.oneMinus();
-	const phi12 = iridescenceIOR.lessThan( outsideIOR ).cond( Math.PI, 0.0 );
+	const phi12 = iridescenceIOR.lessThan( outsideIOR ).select( Math.PI, 0.0 );
 	const phi21 = float( Math.PI ).sub( phi12 );
 
 	// Second interface
@@ -257,9 +257,9 @@ const evalIridescence = Fn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, 
 	const R1 = IorToFresnel0( baseIOR, iridescenceIOR.toVec3() );
 	const R23 = F_Schlick( { f0: R1, f90: 1.0, dotVH: cosTheta2 } );
 	const phi23 = vec3(
-		baseIOR.x.lessThan( iridescenceIOR ).cond( Math.PI, 0.0 ),
-		baseIOR.y.lessThan( iridescenceIOR ).cond( Math.PI, 0.0 ),
-		baseIOR.z.lessThan( iridescenceIOR ).cond( Math.PI, 0.0 )
+		baseIOR.x.lessThan( iridescenceIOR ).select( Math.PI, 0.0 ),
+		baseIOR.y.lessThan( iridescenceIOR ).select( Math.PI, 0.0 ),
+		baseIOR.z.lessThan( iridescenceIOR ).select( Math.PI, 0.0 )
 	);
 
 	// Phase shift

@@ -147,7 +147,7 @@ class GTAONode extends TempNode {
 			const bitangent = vec3( tangent.y.mul( - 1.0 ), tangent.x, 0.0 );
 			const kernelMatrix = mat3( tangent, bitangent, vec3( 0.0, 0.0, 1.0 ) );
 
-			const DIRECTIONS = this.SAMPLES.lessThan( 30 ).cond( 3, 5 );
+			const DIRECTIONS = this.SAMPLES.lessThan( 30 ).select( 3, 5 );
 			const STEPS = add( this.SAMPLES, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS );
 
 			const ao = float( 0 ).toVar();
