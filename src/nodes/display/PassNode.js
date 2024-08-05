@@ -43,17 +43,32 @@ class PassTextureNode extends TextureNode {
 
 class PassMultipleTextureNode extends PassTextureNode {
 
-	constructor( passNode, textureName ) {
+	constructor( passNode, textureName, previousTexture = false ) {
 
 		super( passNode, null );
 
 		this.textureName = textureName;
+		this.previousTexture = previousTexture;
+
+		this.updateType = NodeUpdateType.RENDER;
+
+	}
+
+	updateTexture() {
+
+		this.value = this.previousTexture ? this.passNode.getPreviousTexture( this.textureName ) : this.passNode.getTexture( this.textureName );
+
+	}
+
+	update() {
+
+		this.updateTexture();
 
 	}
 
 	setup( builder ) {
 
-		this.value = this.passNode.getTexture( this.textureName );
+		this.updateTexture();
 
 		return super.setup( builder );
 
@@ -61,7 +76,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 
 	clone() {
 
-		return new this.constructor( this.passNode, this.textureName );
+		return new this.constructor( this.passNode, this.textureName, this.previousTexture );
 
 	}
 
@@ -103,6 +118,9 @@ class PassNode extends TempNode {
 		this._textureNodes = {};
 		this._linearDepthNodes = {};
 		this._viewZNodes = {};
+
+		this._previousTextures = {};
+		this._previousTextureNodes = {};
 
 		this._cameraNear = uniform( 0 );
 		this._cameraFar = uniform( 0 );
@@ -155,6 +173,41 @@ class PassNode extends TempNode {
 
 	}
 
+	getPreviousTexture( name ) {
+
+		let texture = this._previousTextures[ name ];
+
+		if ( texture === undefined ) {
+
+			texture = this.getTexture( name ).clone();
+			texture.isRenderTargetTexture = true;
+
+			this._previousTextures[ name ] = texture;
+
+		}
+
+		return texture;
+
+	}
+
+	toggleTexture( name ) {
+
+		const prevTexture = this._previousTextures[ name ];
+
+		if ( prevTexture !== undefined ) {
+
+			const texture = this._textures[ name ];
+
+			const index = this.renderTarget.textures.indexOf( texture );
+			this.renderTarget.textures[ index ] = prevTexture;
+
+			this._textures[ name ] = prevTexture;
+			this._previousTextures[ name ] = texture;
+
+		}
+
+	}
+
 	getTextureNode( name = 'output' ) {
 
 		let textureNode = this._textureNodes[ name ];
@@ -162,6 +215,20 @@ class PassNode extends TempNode {
 		if ( textureNode === undefined ) {
 
 			this._textureNodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
+
+		}
+
+		return textureNode;
+
+	}
+
+	getPreviousTextureNode( name = 'output' ) {
+
+		let textureNode = this._previousTextureNodes[ name ];
+
+		if ( textureNode === undefined ) {
+
+			this._previousTextureNodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name, true ) );
 
 		}
 
@@ -239,6 +306,12 @@ class PassNode extends TempNode {
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
+
+		for ( const name in this._previousTextures ) {
+
+			this.toggleTexture( name );
+
+		}
 
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
