@@ -125,9 +125,11 @@ class NodeBuilder {
 		this.shaderStage = null;
 		this.buildStage = null;
 
+		this.useComparisonMethod = false;
+
 	}
 
-	getBingGroupsCache() {
+	getBindGroupsCache() {
 
 		let bindGroupsCache = rendererCache.get( this.renderer );
 
@@ -171,7 +173,7 @@ class NodeBuilder {
 
 	_getBindGroup( groupName, bindings ) {
 
-		const bindGroupsCache = this.getBingGroupsCache();
+		const bindGroupsCache = this.getBindGroupsCache();
 
 		//
 

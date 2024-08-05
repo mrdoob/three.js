@@ -320,10 +320,6 @@ class MaterialNode extends Node {
 
 			node = this.getFloat( scope );
 
-		} else if ( scope === MaterialNode.REFRACTION_RATIO ) {
-
-			node = this.getFloat( scope );
-
 		} else if ( scope === MaterialNode.LIGHT_MAP ) {
 
 			node = this.getTexture( scope ).rgb.mul( this.getFloat( 'lightMapIntensity' ) );
@@ -383,7 +379,6 @@ MaterialNode.POINT_WIDTH = 'pointWidth';
 MaterialNode.DISPERSION = 'dispersion';
 MaterialNode.LIGHT_MAP = 'light';
 MaterialNode.AO_MAP = 'ao';
-MaterialNode.REFRACTION_RATIO = 'refractionRatio';
 
 export default MaterialNode;
 

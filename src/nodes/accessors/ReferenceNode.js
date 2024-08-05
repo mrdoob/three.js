@@ -2,6 +2,7 @@ import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { texture } from './TextureNode.js';
+import { cubeTexture } from './CubeTextureNode.js';
 import { buffer } from './BufferNode.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 import { uniformArray } from './UniformArrayNode.js';
@@ -77,6 +78,10 @@ class ReferenceNode extends Node {
 		} else if ( uniformType === 'texture' ) {
 
 			node = texture( null );
+
+		} else if ( uniformType === 'cubeTexture' ) {
+
+			node = cubeTexture( null );
 
 		} else {
 

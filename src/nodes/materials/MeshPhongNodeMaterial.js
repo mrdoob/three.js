@@ -35,6 +35,7 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 		return envNode ? new BasicEnvironmentNode( envNode ) : null;
 
 	}
+
 	setupLightingModel( /*builder*/ ) {
 
 		return new PhongLightingModel();

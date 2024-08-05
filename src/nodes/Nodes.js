@@ -90,6 +90,7 @@ export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTexture
 export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
 export { default as BatchNode, batch } from './accessors/BatchNode.js';
 export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecular, materialSpecularStrength, materialReflectivity, materialRoughness, materialMetalness, materialNormal, materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialRotation, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineWidth, materialLineDashOffset, materialPointWidth, materialAnisotropy, materialAnisotropyVector, materialDispersion, materialLightMap, materialAOMap } from './accessors/MaterialNode.js';
+export * from './accessors/MaterialProperties.js';
 export { default as MaterialReferenceNode, materialReference } from './accessors/MaterialReferenceNode.js';
 export { default as RendererReferenceNode, rendererReference } from './accessors/RendererReferenceNode.js';
 export { default as MorphNode, morphReference } from './accessors/MorphNode.js';
@@ -143,6 +144,7 @@ export { default as BloomNode, bloom } from './display/BloomNode.js';
 export { default as TransitionNode, transition } from './display/TransitionNode.js';
 export { default as RenderOutputNode, renderOutput } from './display/RenderOutputNode.js';
 export { default as PixelationPassNode, pixelationPass } from './display/PixelationPassNode.js';
+export { bleach } from './display/BleachBypassNode.js';
 export { sepia } from './display/SepiaNode.js';
 
 export { default as PassNode, pass, passTexture, depthPass } from './display/PassNode.js';

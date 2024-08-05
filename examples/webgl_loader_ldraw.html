@@ -93,7 +93,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xdeebed );
-				scene.environment = pmremGenerator.fromScene( new RoomEnvironment( renderer ) ).texture;
+				scene.environment = pmremGenerator.fromScene( new RoomEnvironment() ).texture;
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableDamping = true;
