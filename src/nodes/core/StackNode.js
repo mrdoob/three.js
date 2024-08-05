@@ -80,6 +80,22 @@ class StackNode extends Node {
 
 	}
 
+	//
+
+	else( ...params ) { // @deprecated, r168
+
+		console.warn( 'TSL.StackNode: .else() has been renamed to .Else().' );
+		return this.Else( ...params );
+
+	}
+
+	elseif( ...params ) { // @deprecated, r168
+
+		console.warn( 'TSL.StackNode: .elseif() has been renamed to .ElseIf().' );
+		return this.ElseIf( ...params );
+
+	}
+
 }
 
 export default StackNode;
