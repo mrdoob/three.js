@@ -12,27 +12,27 @@ const normal = Fn( ( { texture, uv } ) => {
 
 		ret.assign( vec3( 1, 0, 0 ) );
 
-	} ).elseif( uv.y.lessThan( epsilon ), () => {
+	} ).ElseIf( uv.y.lessThan( epsilon ), () => {
 
 		ret.assign( vec3( 0, 1, 0 ) );
 
-	} ).elseif( uv.z.lessThan( epsilon ), () => {
+	} ).ElseIf( uv.z.lessThan( epsilon ), () => {
 
 		ret.assign( vec3( 0, 0, 1 ) );
 
-	} ).elseif( uv.x.greaterThan( 1 - epsilon ), () => {
+	} ).ElseIf( uv.x.greaterThan( 1 - epsilon ), () => {
 
 		ret.assign( vec3( - 1, 0, 0 ) );
 
-	} ).elseif( uv.y.greaterThan( 1 - epsilon ), () => {
+	} ).ElseIf( uv.y.greaterThan( 1 - epsilon ), () => {
 
 		ret.assign( vec3( 0, - 1, 0 ) );
 
-	} ).elseif( uv.z.greaterThan( 1 - epsilon ), () => {
+	} ).ElseIf( uv.z.greaterThan( 1 - epsilon ), () => {
 
 		ret.assign( vec3( 0, 0, - 1 ) );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		const step = 0.01;
 

@@ -35,19 +35,19 @@ const getFace = Fn( ( [ direction ] ) => {
 
 			face.assign( cond( direction.x.greaterThan( 0.0 ), 0.0, 3.0 ) );
 
-		} ).else( () => {
+		} ).Else( () => {
 
 			face.assign( cond( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
 
 		} );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		If( absDirection.z.greaterThan( absDirection.y ), () => {
 
 			face.assign( cond( direction.z.greaterThan( 0.0 ), 2.0, 5.0 ) );
 
-		} ).else( () => {
+		} ).Else( () => {
 
 			face.assign( cond( direction.y.greaterThan( 0.0 ), 1.0, 4.0 ) );
 
@@ -74,23 +74,23 @@ const getUV = Fn( ( [ direction, face ] ) => {
 
 		uv.assign( vec2( direction.z, direction.y ).div( abs( direction.x ) ) ); // pos x
 
-	} ).elseif( face.equal( 1.0 ), () => {
+	} ).ElseIf( face.equal( 1.0 ), () => {
 
 		uv.assign( vec2( direction.x.negate(), direction.z.negate() ).div( abs( direction.y ) ) ); // pos y
 
-	} ).elseif( face.equal( 2.0 ), () => {
+	} ).ElseIf( face.equal( 2.0 ), () => {
 
 		uv.assign( vec2( direction.x.negate(), direction.y ).div( abs( direction.z ) ) ); // pos z
 
-	} ).elseif( face.equal( 3.0 ), () => {
+	} ).ElseIf( face.equal( 3.0 ), () => {
 
 		uv.assign( vec2( direction.z.negate(), direction.y ).div( abs( direction.x ) ) ); // neg x
 
-	} ).elseif( face.equal( 4.0 ), () => {
+	} ).ElseIf( face.equal( 4.0 ), () => {
 
 		uv.assign( vec2( direction.x.negate(), direction.z ).div( abs( direction.y ) ) ); // neg y
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		uv.assign( vec2( direction.x, direction.y ).div( abs( direction.z ) ) ); // neg z
 
@@ -115,19 +115,19 @@ const roughnessToMip = Fn( ( [ roughness ] ) => {
 
 		mip.assign( cubeUV_r0.sub( roughness ).mul( cubeUV_m1.sub( cubeUV_m0 ) ).div( cubeUV_r0.sub( cubeUV_r1 ) ).add( cubeUV_m0 ) );
 
-	} ).elseif( roughness.greaterThanEqual( cubeUV_r4 ), () => {
+	} ).ElseIf( roughness.greaterThanEqual( cubeUV_r4 ), () => {
 
 		mip.assign( cubeUV_r1.sub( roughness ).mul( cubeUV_m4.sub( cubeUV_m1 ) ).div( cubeUV_r1.sub( cubeUV_r4 ) ).add( cubeUV_m1 ) );
 
-	} ).elseif( roughness.greaterThanEqual( cubeUV_r5 ), () => {
+	} ).ElseIf( roughness.greaterThanEqual( cubeUV_r5 ), () => {
 
 		mip.assign( cubeUV_r4.sub( roughness ).mul( cubeUV_m5.sub( cubeUV_m4 ) ).div( cubeUV_r4.sub( cubeUV_r5 ) ).add( cubeUV_m4 ) );
 
-	} ).elseif( roughness.greaterThanEqual( cubeUV_r6 ), () => {
+	} ).ElseIf( roughness.greaterThanEqual( cubeUV_r6 ), () => {
 
 		mip.assign( cubeUV_r5.sub( roughness ).mul( cubeUV_m6.sub( cubeUV_m5 ) ).div( cubeUV_r5.sub( cubeUV_r6 ) ).add( cubeUV_m5 ) );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		mip.assign( float( - 2.0 ).mul( log2( mul( 1.16, roughness ) ) ) ); // 1.16 = 1.79^0.25
 
@@ -154,26 +154,26 @@ export const getDirection = Fn( ( [ uv_immutable, face ] ) => {
 
 		direction.assign( direction.zyx ); // ( 1, v, u ) pos x
 
-	} ).elseif( face.equal( 1.0 ), () => {
+	} ).ElseIf( face.equal( 1.0 ), () => {
 
 		direction.assign( direction.xzy );
 		direction.xz.mulAssign( - 1.0 ); // ( -u, 1, -v ) pos y
 
-	} ).elseif( face.equal( 2.0 ), () => {
+	} ).ElseIf( face.equal( 2.0 ), () => {
 
 		direction.x.mulAssign( - 1.0 ); // ( -u, v, 1 ) pos z
 
-	} ).elseif( face.equal( 3.0 ), () => {
+	} ).ElseIf( face.equal( 3.0 ), () => {
 
 		direction.assign( direction.zyx );
 		direction.xz.mulAssign( - 1.0 ); // ( -1, v, -u ) neg x
 
-	} ).elseif( face.equal( 4.0 ), () => {
+	} ).ElseIf( face.equal( 4.0 ), () => {
 
 		direction.assign( direction.xzy );
 		direction.xy.mulAssign( - 1.0 ); // ( -u, -1, v ) neg y
 
-	} ).elseif( face.equal( 5.0 ), () => {
+	} ).ElseIf( face.equal( 5.0 ), () => {
 
 		direction.z.mulAssign( - 1.0 ); // ( u, v, -1 ) neg zS
 

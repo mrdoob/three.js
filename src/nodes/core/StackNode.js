@@ -33,7 +33,7 @@ class StackNode extends Node {
 
 	}
 
-	if( boolNode, method ) {
+	If( boolNode, method ) {
 
 		const methodNode = new ShaderNode( method );
 		this._currentCond = cond( boolNode, methodNode );
@@ -42,7 +42,7 @@ class StackNode extends Node {
 
 	}
 
-	elseif( boolNode, method ) {
+	ElseIf( boolNode, method ) {
 
 		const methodNode = new ShaderNode( method );
 		const ifNode = cond( boolNode, methodNode );
@@ -54,7 +54,7 @@ class StackNode extends Node {
 
 	}
 
-	else( method ) {
+	Else( method ) {
 
 		this._currentCond.elseNode = new ShaderNode( method );
 

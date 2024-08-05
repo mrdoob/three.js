@@ -184,7 +184,7 @@ class FXAANode extends TempNode {
 				offNP.x.assign( 0 );
 				offNP.y.assign( fxaaQualityRcpFrame.y );
 
-			 } ).else( () => {
+			 } ).Else( () => {
 
 				offNP.x.assign( fxaaQualityRcpFrame.x );
 				offNP.y.assign( 0 );

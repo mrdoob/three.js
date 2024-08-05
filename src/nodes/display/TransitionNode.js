@@ -50,7 +50,7 @@ class TransitionNode extends TempNode {
 
 				color.assign( mix( texelOne, texelTwo, mixf ) );
 
-			} ).else( () => {
+			} ).Else( () => {
 
 				color.assign( mix( texelTwo, texelOne, mixRatioNode ) );
 

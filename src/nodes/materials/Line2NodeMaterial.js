@@ -111,7 +111,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 					end.assign( trimSegment( { start: start, end: end } ) );
 
-				} ).elseif( end.z.lessThan( 0.0 ).and( start.z.greaterThanEqual( 0.0 ) ), () => {
+				} ).ElseIf( end.z.lessThan( 0.0 ).and( start.z.greaterThanEqual( 0.0 ) ), () => {
 
 					start.assign( trimSegment( { start: end, end: start } ) );
 
@@ -200,7 +200,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 					offset.assign( offset.sub( dir ) );
 
-				} ).elseif( positionGeometry.y.greaterThan( 1.0 ), () => {
+				} ).ElseIf( positionGeometry.y.greaterThan( 1.0 ), () => {
 
 					offset.assign( offset.add( dir ) );
 

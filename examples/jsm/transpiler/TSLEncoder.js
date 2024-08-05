@@ -349,7 +349,7 @@ ${ this.tab }} )`;
 
 				const elseCondStr = this.emitExpression( current.elseConditional.cond );
 
-				ifStr += `.elseif( ${ elseCondStr }, () => {
+				ifStr += `.ElseIf( ${ elseCondStr }, () => {
 
 ${ elseBodyStr }
 
@@ -357,7 +357,7 @@ ${ this.tab }} )`;
 
 			} else {
 
-				ifStr += `.else( () => {
+				ifStr += `.Else( () => {
 
 ${ elseBodyStr }
 

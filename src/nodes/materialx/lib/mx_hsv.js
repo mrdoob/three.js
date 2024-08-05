@@ -16,7 +16,7 @@ export const mx_hsvtorgb = /*#__PURE__*/ Fn( ( [ hsv_immutable ] ) => {
 
 		return vec3( v, v, v );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		h.assign( mul( 6.0, h.sub( floor( h ) ) ) );
 		const hi = int( trunc( h ) ).toVar();
@@ -29,19 +29,19 @@ export const mx_hsvtorgb = /*#__PURE__*/ Fn( ( [ hsv_immutable ] ) => {
 
 			return vec3( v, t, p );
 
-		} ).elseif( hi.equal( int( 1 ) ), () => {
+		} ).ElseIf( hi.equal( int( 1 ) ), () => {
 
 			return vec3( q, v, p );
 
-		} ).elseif( hi.equal( int( 2 ) ), () => {
+		} ).ElseIf( hi.equal( int( 2 ) ), () => {
 
 			return vec3( p, v, t );
 
-		} ).elseif( hi.equal( int( 3 ) ), () => {
+		} ).ElseIf( hi.equal( int( 3 ) ), () => {
 
 			return vec3( p, q, v );
 
-		} ).elseif( hi.equal( int( 4 ) ), () => {
+		} ).ElseIf( hi.equal( int( 4 ) ), () => {
 
 			return vec3( t, p, v );
 
@@ -75,7 +75,7 @@ export const mx_rgbtohsv = /*#__PURE__*/ Fn( ( [ c_immutable ] ) => {
 
 		s.assign( delta.div( maxcomp ) );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		s.assign( 0.0 );
 
@@ -85,17 +85,17 @@ export const mx_rgbtohsv = /*#__PURE__*/ Fn( ( [ c_immutable ] ) => {
 
 		h.assign( 0.0 );
 
-	} ).else( () => {
+	} ).Else( () => {
 
 		If( r.greaterThanEqual( maxcomp ), () => {
 
 			h.assign( g.sub( b ).div( delta ) );
 
-		} ).elseif( g.greaterThanEqual( maxcomp ), () => {
+		} ).ElseIf( g.greaterThanEqual( maxcomp ), () => {
 
 			h.assign( add( 2.0, b.sub( r ).div( delta ) ) );
 
-		} ).else( () => {
+		} ).Else( () => {
 
 			h.assign( add( 4.0, r.sub( g ).div( delta ) ) );
 

@@ -1086,7 +1086,7 @@ export const mx_worley_noise_vec2_0 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_
 				sqdist.y.assign( sqdist.x );
 				sqdist.x.assign( dist );
 
-			} ).elseif( dist.lessThan( sqdist.y ), () => {
+			} ).ElseIf( dist.lessThan( sqdist.y ), () => {
 
 				sqdist.y.assign( dist );
 
@@ -1135,12 +1135,12 @@ export const mx_worley_noise_vec3_0 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_
 				sqdist.y.assign( sqdist.x );
 				sqdist.x.assign( dist );
 
-			} ).elseif( dist.lessThan( sqdist.y ), () => {
+			} ).ElseIf( dist.lessThan( sqdist.y ), () => {
 
 				sqdist.z.assign( sqdist.y );
 				sqdist.y.assign( dist );
 
-			} ).elseif( dist.lessThan( sqdist.z ), () => {
+			} ).ElseIf( dist.lessThan( sqdist.z ), () => {
 
 				sqdist.z.assign( dist );
 
@@ -1234,7 +1234,7 @@ export const mx_worley_noise_vec2_1 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_
 					sqdist.y.assign( sqdist.x );
 					sqdist.x.assign( dist );
 
-				} ).elseif( dist.lessThan( sqdist.y ), () => {
+				} ).ElseIf( dist.lessThan( sqdist.y ), () => {
 
 					sqdist.y.assign( dist );
 
@@ -1289,12 +1289,12 @@ export const mx_worley_noise_vec3_1 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_
 					sqdist.y.assign( sqdist.x );
 					sqdist.x.assign( dist );
 
-				} ).elseif( dist.lessThan( sqdist.y ), () => {
+				} ).ElseIf( dist.lessThan( sqdist.y ), () => {
 
 					sqdist.z.assign( sqdist.y );
 					sqdist.y.assign( dist );
 
-				} ).elseif( dist.lessThan( sqdist.z ), () => {
+				} ).ElseIf( dist.lessThan( sqdist.z ), () => {
 
 					sqdist.z.assign( dist );
 
