@@ -586,7 +586,7 @@ ${ this.tab }} )`;
 
 		const prefix = this.iife === false ? 'export ' : '';
 
-		let funcStr = `${ prefix }const ${ fnName } = /*#__PURE__*/ tslFn( (${ paramsStr }) => {
+		let funcStr = `${ prefix }const ${ fnName } = /*#__PURE__*/ Fn( (${ paramsStr }) => {
 
 ${ bodyStr }
 
@@ -608,7 +608,7 @@ ${ this.tab }} )`;
 
 		funcStr += ';\n';
 
-		this.imports.add( 'tslFn' );
+		this.imports.add( 'Fn' );
 
 		this.global.add( node.name );
 
