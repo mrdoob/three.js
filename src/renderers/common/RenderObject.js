@@ -191,7 +191,7 @@ export default class RenderObject {
 
 		for ( const property of getKeys( material ) ) {
 
-			if ( /^(is[A-Z]|_)|^(visible|version|name|opacity|userData)$/.test( property ) ) continue;
+			if ( /^(is[A-Z]|_)|^(visible|version|uuid|name|opacity|userData)$/.test( property ) ) continue;
 
 			const value = material[ property ];
 
@@ -263,7 +263,7 @@ export default class RenderObject {
 
 		if ( object.count > 1 ) {
 
-			cacheKey += object.count + ',';
+			cacheKey += object.count + ',' + object.uuid + ',';
 
 		}
 
