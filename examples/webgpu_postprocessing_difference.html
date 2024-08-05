@@ -44,7 +44,7 @@
 
 			function init() {
 
-				renderer = new THREE.WebGPURenderer( { forceWebGL: true });
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -58,7 +58,7 @@
 
 				const scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x0487e2, 7, 25 );
-				scene.background = new THREE.Color( 0x0487e2 )
+				scene.background = new THREE.Color( 0x0487e2 );
 
 				timer = new Timer();
 
