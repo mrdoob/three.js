@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, tslFn, nodeObject, float, vec2, vec4, int, If } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeObject, float, vec2, vec4, int, If } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { abs, max, min, mix, pow } from '../math/MathNode.js';
@@ -77,7 +77,7 @@ class FXAANode extends TempNode {
 
 		const NUM_SAMPLES = int( 5 );
 
-		const contrast = tslFn( ( [ a_immutable, b_immutable ] ) => {
+		const contrast = Fn( ( [ a_immutable, b_immutable ] ) => {
 
 			// assumes colors have premultipliedAlpha, so that the calculated color contrast is scaled by alpha
 
@@ -91,7 +91,7 @@ class FXAANode extends TempNode {
 
 		// FXAA3 QUALITY - PC
 
-		const FxaaPixelShader = tslFn( ( [ uv, fxaaQualityRcpFrame, fxaaQualityEdgeThreshold, fxaaQualityinvEdgeThreshold ] ) => {
+		const FxaaPixelShader = Fn( ( [ uv, fxaaQualityRcpFrame, fxaaQualityEdgeThreshold, fxaaQualityinvEdgeThreshold ] ) => {
 
 			const rgbaM = FxaaTexTop( uv ).toVar();
 			const rgbaS = FxaaTexOff( uv, vec2( 0.0, - 1.0 ), fxaaQualityRcpFrame.xy ).toVar();
@@ -303,7 +303,7 @@ class FXAANode extends TempNode {
 			]
 		} );
 
-		const fxaa = tslFn( () => {
+		const fxaa = Fn( () => {
 
 			const edgeDetectionQuality = float( 0.2 );
 			const invEdgeDetectionQuality = float( 1 ).div( edgeDetectionQuality );

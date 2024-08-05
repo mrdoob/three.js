@@ -5,7 +5,7 @@ import { materialReference } from '../accessors/MaterialReferenceNode.js';
 import { modelWorldMatrixInverse } from '../accessors/ModelNode.js';
 import { cameraPosition } from '../accessors/CameraNode.js';
 import { positionGeometry } from '../accessors/PositionNode.js';
-import { tslFn, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { Fn, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
 import { min, max } from '../math/MathNode.js';
 import { Loop, Break } from '../utils/LoopNode.js';
 import { texture3D } from '../accessors/Texture3DNode.js';
@@ -29,7 +29,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 
 		const map = texture3D( this.map, null, 0 );
 
-		const hitBox = tslFn( ( { orig, dir } ) => {
+		const hitBox = Fn( ( { orig, dir } ) => {
 
 			const box_min = vec3( - 0.5 );
 			const box_max = vec3( 0.5 );
@@ -49,7 +49,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 
 		} );
 
-		this.fragmentNode = tslFn( () => {
+		this.fragmentNode = Fn( () => {
 
 			const vOrigin = varying( vec3( modelWorldMatrixInverse.mul( vec4( cameraPosition, 1.0 ) ) ) );
 			const vDirection = varying( positionGeometry.sub( vOrigin ) );

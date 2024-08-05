@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, nodeObject, tslFn, mat3, vec2, vec3, vec4, float, int, If } from '../shadernode/ShaderNode.js';
+import { addNodeElement, nodeObject, Fn, mat3, vec2, vec3, vec4, float, int, If } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { DataTexture } from '../../textures/DataTexture.js';
@@ -106,7 +106,7 @@ class GTAONode extends TempNode {
 		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
 		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
 
-		const getSceneUvAndDepth = tslFn( ( [ sampleViewPos ] )=> {
+		const getSceneUvAndDepth = Fn( ( [ sampleViewPos ] )=> {
 
 			const sampleClipPos = this.cameraProjectionMatrix.mul( vec4( sampleViewPos, 1.0 ) );
 			let sampleUv = sampleClipPos.xy.div( sampleClipPos.w ).mul( 0.5 ).add( 0.5 ).toVar();
@@ -116,7 +116,7 @@ class GTAONode extends TempNode {
 
 		} );
 
-		const getViewPosition = tslFn( ( [ screenPosition, depth ] ) => {
+		const getViewPosition = Fn( ( [ screenPosition, depth ] ) => {
 
 			screenPosition = vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 );
 
@@ -127,7 +127,7 @@ class GTAONode extends TempNode {
 
 		} );
 
-		const ao = tslFn( () => {
+		const ao = Fn( () => {
 
 			const depth = sampleDepth( uvNode );
 

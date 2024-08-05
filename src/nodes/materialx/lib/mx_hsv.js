@@ -1,11 +1,11 @@
 // Three.js Transpiler
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_hsv.glsl
 
-import { int, float, vec3, If, tslFn } from '../../shadernode/ShaderNode.js';
+import { int, float, vec3, If, Fn } from '../../shadernode/ShaderNode.js';
 import { add, sub, mul } from '../../math/OperatorNode.js';
 import { floor, trunc, max, min } from '../../math/MathNode.js';
 
-export const mx_hsvtorgb = /*#__PURE__*/ tslFn( ( [ hsv_immutable ] ) => {
+export const mx_hsvtorgb = /*#__PURE__*/ Fn( ( [ hsv_immutable ] ) => {
 
 	const hsv = vec3( hsv_immutable ).toVar();
 	const h = float( hsv.x ).toVar();
@@ -59,7 +59,7 @@ export const mx_hsvtorgb = /*#__PURE__*/ tslFn( ( [ hsv_immutable ] ) => {
 	]
 } );
 
-export const mx_rgbtohsv = /*#__PURE__*/ tslFn( ( [ c_immutable ] ) => {
+export const mx_rgbtohsv = /*#__PURE__*/ Fn( ( [ c_immutable ] ) => {
 
 	const c = vec3( c_immutable ).toVar();
 	const r = float( c.x ).toVar();

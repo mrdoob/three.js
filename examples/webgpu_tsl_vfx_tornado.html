@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { luminance, cos, float, min, timerLocal, atan2, uniform, pass, bloom, PI, PI2, color, positionLocal, sin, texture, tslFn, uv, vec2, vec3, vec4 } from 'three/tsl';
+			import { luminance, cos, float, min, timerLocal, atan2, uniform, pass, bloom, PI, PI2, color, positionLocal, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -52,7 +52,7 @@
 
 				// TSL functions
 
-				const toRadialUv = tslFn( ( [ uv, multiplier, rotation, offset ] ) => {
+				const toRadialUv = Fn( ( [ uv, multiplier, rotation, offset ] ) => {
 
 					const centeredUv = uv.sub( 0.5 ).toVar();
 					const distanceToCenter = centeredUv.length();
@@ -66,7 +66,7 @@
 
 				} );
 
-				const toSkewedUv = tslFn( ( [ uv, skew ] ) => {
+				const toSkewedUv = Fn( ( [ uv, skew ] ) => {
 
 					return vec2(
 						uv.x.add( uv.y.mul( skew.x ) ),
@@ -75,7 +75,7 @@
 
 				} );
 
-				const twistedCylinder = tslFn( ( [ position, parabolStrength, parabolOffset, parabolAmplitude, time ] ) => {
+				const twistedCylinder = Fn( ( [ position, parabolStrength, parabolOffset, parabolAmplitude, time ] ) => {
 
 					const angle = atan2( position.z, position.x ).toVar();
 					const elevation = position.y;
@@ -108,7 +108,7 @@
 
 				const floorMaterial = new THREE.MeshBasicNodeMaterial( { transparent: true, wireframe: false } );
 
-				floorMaterial.outputNode = tslFn( () => {
+				floorMaterial.outputNode = Fn( () => {
 
 					const time = timerLocal().mul( timeScale );
 
@@ -173,7 +173,7 @@
 
 				emissiveMaterial.positionNode = twistedCylinder( positionLocal, parabolStrength, parabolOffset, parabolAmplitude.sub( 0.05 ), timerLocal().mul( timeScale ) );
 
-				emissiveMaterial.outputNode = tslFn( () => {
+				emissiveMaterial.outputNode = Fn( () => {
 
 					const time = timerLocal().mul( timeScale );
 
@@ -224,7 +224,7 @@
 
 				darkMaterial.positionNode = twistedCylinder( positionLocal, parabolStrength, parabolOffset, parabolAmplitude, timerLocal().mul( timeScale ) );
 
-				darkMaterial.outputNode = tslFn( () => {
+				darkMaterial.outputNode = Fn( () => {
 
 					const time = timerLocal().mul( timeScale ).add( 123.4 );
 

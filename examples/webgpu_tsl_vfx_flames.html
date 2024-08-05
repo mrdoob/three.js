@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { PI2, spherizeUV, sin, step, texture, timerLocal, tslFn, uv, vec2, vec3, vec4, mix, billboarding } from 'three/tsl';
+			import { PI2, spherizeUV, sin, step, texture, timerLocal, Fn, uv, vec2, vec3, vec4, mix, billboarding } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -94,7 +94,7 @@
 
 				const flame1Material = new THREE.SpriteNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
 
-				flame1Material.colorNode = tslFn( () => {
+				flame1Material.colorNode = Fn( () => {
 
 					const time = timerLocal();
 
@@ -132,7 +132,7 @@
 
 				const flame2Material = new THREE.SpriteNodeMaterial( { transparent: true, side: THREE.DoubleSide } );
 
-				flame2Material.colorNode = tslFn( () => {
+				flame2Material.colorNode = Fn( () => {
 
 					const time = timerLocal();
 

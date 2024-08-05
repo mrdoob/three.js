@@ -164,7 +164,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	} else if ( type === 'shader' ) {
 
-		return tslFn( obj );
+		return Fn( obj );
 
 	}
 
@@ -492,7 +492,7 @@ export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, al
 export const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
 export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
 
-export const tslFn = ( jsFunc ) => {
+export const Fn = ( jsFunc ) => {
 
 	const shaderNode = new ShaderNode( jsFunc );
 
@@ -526,6 +526,13 @@ export const tslFn = ( jsFunc ) => {
 	};
 
 	return fn;
+
+};
+
+export const tslFn = ( ...params ) => { // @deprecated, r168
+
+	console.warn( 'TSL.tslFn: tslFn() has been renamed to Fn().' );
+	return Fn( ...params );
 
 };
 

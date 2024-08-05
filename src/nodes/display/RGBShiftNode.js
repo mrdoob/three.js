@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { nodeObject, addNodeElement, tslFn, vec2, vec4 } from '../shadernode/ShaderNode.js';
+import { nodeObject, addNodeElement, Fn, vec2, vec4 } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { sin, cos } from '../math/MathNode.js';
@@ -24,7 +24,7 @@ class RGBShiftNode extends TempNode {
 
 		const sampleTexture = ( uv ) => textureNode.uv( uv );
 
-		const rgbShift = tslFn( () => {
+		const rgbShift = Fn( () => {
 
 			const offset = vec2( cos( this.angle ), sin( this.angle ) ).mul( this.amount );
 			const cr = sampleTexture( uvNode.add( offset ) );

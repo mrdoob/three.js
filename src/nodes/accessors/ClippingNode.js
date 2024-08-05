@@ -3,7 +3,7 @@ import Node from '../core/Node.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 import { positionView } from './PositionNode.js';
 import { diffuseColor, property } from '../core/PropertyNode.js';
-import { tslFn } from '../shadernode/ShaderNode.js';
+import { Fn } from '../shadernode/ShaderNode.js';
 import { Loop } from '../utils/LoopNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { uniformArray } from './UniformArrayNode.js';
@@ -42,7 +42,7 @@ class ClippingNode extends Node {
 
 	setupAlphaToCoverage( planes, numClippingPlanes, numUnionClippingPlanes ) {
 
-		return tslFn( () => {
+		return Fn( () => {
 
 			const clippingPlanes = uniformArray( planes );
 
@@ -99,7 +99,7 @@ class ClippingNode extends Node {
 
 	setupDefault( planes, numClippingPlanes, numUnionClippingPlanes ) {
 
-		return tslFn( () => {
+		return Fn( () => {
 
 			const clippingPlanes = uniformArray( planes );
 

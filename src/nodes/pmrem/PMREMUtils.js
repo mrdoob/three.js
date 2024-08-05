@@ -1,4 +1,4 @@
-import { tslFn, int, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNode.js';
+import { Fn, int, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNode.js';
 import { cos, sin, abs, max, exp2, log2, clamp, fract, mix, floor, normalize, cross, all } from '../math/MathNode.js';
 import { mul } from '../math/OperatorNode.js';
 import { cond } from '../math/CondNode.js';
@@ -24,7 +24,7 @@ const cubeUV_minTileSize = float( 16.0 );
 // a cubemap, the 0-5 integer index of a cube face, and the direction vector for
 // sampling a textureCube (not generally normalized ).
 
-const getFace = tslFn( ( [ direction ] ) => {
+const getFace = Fn( ( [ direction ] ) => {
 
 	const absDirection = vec3( abs( direction ) ).toVar();
 	const face = float( - 1.0 ).toVar();
@@ -66,7 +66,7 @@ const getFace = tslFn( ( [ direction ] ) => {
 } );
 
 // RH coordinate system; PMREM face-indexing convention
-const getUV = tslFn( ( [ direction, face ] ) => {
+const getUV = Fn( ( [ direction, face ] ) => {
 
 	const uv = vec2().toVar();
 
@@ -107,7 +107,7 @@ const getUV = tslFn( ( [ direction, face ] ) => {
 	]
 } );
 
-const roughnessToMip = tslFn( ( [ roughness ] ) => {
+const roughnessToMip = Fn( ( [ roughness ] ) => {
 
 	const mip = float( 0.0 ).toVar();
 
@@ -144,7 +144,7 @@ const roughnessToMip = tslFn( ( [ roughness ] ) => {
 } );
 
 // RH coordinate system; PMREM face-indexing convention
-export const getDirection = tslFn( ( [ uv_immutable, face ] ) => {
+export const getDirection = Fn( ( [ uv_immutable, face ] ) => {
 
 	const uv = uv_immutable.toVar();
 	uv.assign( mul( 2.0, uv ).sub( 1.0 ) );
@@ -192,7 +192,7 @@ export const getDirection = tslFn( ( [ uv_immutable, face ] ) => {
 
 //
 
-export const textureCubeUV = tslFn( ( [ envMap, sampleDir_immutable, roughness_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
+export const textureCubeUV = Fn( ( [ envMap, sampleDir_immutable, roughness_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
 
 	const roughness = float( roughness_immutable );
 	const sampleDir = vec3( sampleDir_immutable );
@@ -214,7 +214,7 @@ export const textureCubeUV = tslFn( ( [ envMap, sampleDir_immutable, roughness_i
 
 } );
 
-const bilinearCubeUV = tslFn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
+const bilinearCubeUV = Fn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
 
 	const mipInt = float( mipInt_immutable ).toVar();
 	const direction = vec3( direction_immutable );
@@ -241,7 +241,7 @@ const bilinearCubeUV = tslFn( ( [ envMap, direction_immutable, mipInt_immutable,
 
 } );
 
-const getSample = tslFn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+const getSample = Fn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
 
 	const cosTheta = cos( theta );
 
@@ -254,7 +254,7 @@ const getSample = tslFn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEU
 
 } );
 
-export const blur = tslFn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+export const blur = Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
 
 	const axis = vec3( cond( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
 

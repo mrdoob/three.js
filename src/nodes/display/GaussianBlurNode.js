@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { nodeObject, addNodeElement, tslFn, float, vec2, vec4 } from '../shadernode/ShaderNode.js';
+import { nodeObject, addNodeElement, Fn, float, vec2, vec4 } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { mul } from '../math/OperatorNode.js';
 import { uv } from '../accessors/UVNode.js';
@@ -129,7 +129,7 @@ class GaussianBlurNode extends TempNode {
 
 		const sampleTexture = ( uv ) => textureNode.uv( uv );
 
-		const blur = tslFn( () => {
+		const blur = Fn( () => {
 
 			const kernelSize = 3 + ( 2 * this.sigma );
 			const gaussianCoefficients = this._getCoefficients( kernelSize );

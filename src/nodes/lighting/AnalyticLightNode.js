@@ -11,16 +11,16 @@ import { mix, fract } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
 import { Color } from '../../math/Color.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { tslFn } from '../shadernode/ShaderNode.js';
+import { Fn } from '../shadernode/ShaderNode.js';
 import { LessCompare, WebGPUCoordinateSystem } from '../../constants.js';
 
-const BasicShadowMap = tslFn( ( { depthTexture, shadowCoord } ) => {
+const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
 
 	return texture( depthTexture, shadowCoord.xy ).compare( shadowCoord.z );
 
 } );
 
-const PCFShadowMap = tslFn( ( { depthTexture, shadowCoord, shadow } ) => {
+const PCFShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 
@@ -59,7 +59,7 @@ const PCFShadowMap = tslFn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 } );
 
-const PCFSoftShadowMap = tslFn( ( { depthTexture, shadowCoord, shadow } ) => {
+const PCFSoftShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 

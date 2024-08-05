@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { nodeObject, addNodeElement, tslFn, float, vec4 } from '../shadernode/ShaderNode.js';
+import { nodeObject, addNodeElement, Fn, float, vec4 } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uv } from '../accessors/UVNode.js';
 import { texture } from '../accessors/TextureNode.js';
@@ -98,7 +98,7 @@ class AfterImageNode extends TempNode {
 
 		const sampleTexture = ( uv ) => textureNode.uv( uv );
 
-		const when_gt = tslFn( ( [ x_immutable, y_immutable ] ) => {
+		const when_gt = Fn( ( [ x_immutable, y_immutable ] ) => {
 
 			const y = float( y_immutable ).toVar();
 			const x = vec4( x_immutable ).toVar();
@@ -107,7 +107,7 @@ class AfterImageNode extends TempNode {
 
 		} );
 
-		const afterImg = tslFn( () => {
+		const afterImg = Fn( () => {
 
 			const texelOld = vec4( textureNodeOld );
 			const texelNew = vec4( sampleTexture( uvNode ) );

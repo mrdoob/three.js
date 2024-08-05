@@ -1,9 +1,9 @@
 import TempNode from '../core/TempNode.js';
 import { /*mix, step,*/ EPSILON } from '../math/MathNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, tslFn, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
 
-export const BurnNode = tslFn( ( { base, blend } ) => {
+export const BurnNode = Fn( ( { base, blend } ) => {
 
 	const fn = ( c ) => blend[ c ].lessThan( EPSILON ).cond( blend[ c ], base[ c ].oneMinus().div( blend[ c ] ).oneMinus().max( 0 ) );
 
@@ -18,7 +18,7 @@ export const BurnNode = tslFn( ( { base, blend } ) => {
 	]
 } );
 
-export const DodgeNode = tslFn( ( { base, blend } ) => {
+export const DodgeNode = Fn( ( { base, blend } ) => {
 
 	const fn = ( c ) => blend[ c ].equal( 1.0 ).cond( blend[ c ], base[ c ].div( blend[ c ].oneMinus() ).max( 0 ) );
 
@@ -33,7 +33,7 @@ export const DodgeNode = tslFn( ( { base, blend } ) => {
 	]
 } );
 
-export const ScreenNode = tslFn( ( { base, blend } ) => {
+export const ScreenNode = Fn( ( { base, blend } ) => {
 
 	const fn = ( c ) => base[ c ].oneMinus().mul( blend[ c ].oneMinus() ).oneMinus();
 
@@ -48,7 +48,7 @@ export const ScreenNode = tslFn( ( { base, blend } ) => {
 	]
 } );
 
-export const OverlayNode = tslFn( ( { base, blend } ) => {
+export const OverlayNode = Fn( ( { base, blend } ) => {
 
 	const fn = ( c ) => base[ c ].lessThan( 0.5 ).cond( base[ c ].mul( blend[ c ], 2.0 ), base[ c ].oneMinus().mul( blend[ c ].oneMinus() ).oneMinus() );
 	//const fn = ( c ) => mix( base[ c ].oneMinus().mul( blend[ c ].oneMinus() ).oneMinus(), base[ c ].mul( blend[ c ], 2.0 ), step( base[ c ], 0.5 ) );

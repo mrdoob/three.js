@@ -8,7 +8,7 @@ import { materialColor, materialLineScale, materialLineDashSize, materialLineGap
 import { modelViewMatrix } from '../accessors/ModelNode.js';
 import { positionGeometry } from '../accessors/PositionNode.js';
 import { mix, smoothstep } from '../math/MathNode.js';
-import { tslFn, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNode.js';
+import { Fn, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { viewport } from '../display/ViewportNode.js';
 import { dashSize, gapSize } from '../core/PropertyNode.js';
@@ -62,7 +62,7 @@ class Line2NodeMaterial extends NodeMaterial {
 		const useDash = this.dashed;
 		const useWorldUnits = this.worldUnits;
 
-		const trimSegment = tslFn( ( { start, end } ) => {
+		const trimSegment = Fn( ( { start, end } ) => {
 
 			const a = cameraProjectionMatrix.element( 2 ).element( 2 ); // 3nd entry in 3th column
 			const b = cameraProjectionMatrix.element( 3 ).element( 2 ); // 3nd entry in 4th column
@@ -74,7 +74,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		} );
 
-		this.vertexNode = tslFn( () => {
+		this.vertexNode = Fn( () => {
 
 			varyingProperty( 'vec2', 'vUv' ).assign( uv() );
 
@@ -226,7 +226,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		} )();
 
-		const closestLineToLine = tslFn( ( { p1, p2, p3, p4 } ) => {
+		const closestLineToLine = Fn( ( { p1, p2, p3, p4 } ) => {
 
 			const p13 = p1.sub( p3 );
 			const p43 = p4.sub( p3 );
@@ -249,7 +249,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		} );
 
-		this.fragmentNode = tslFn( () => {
+		this.fragmentNode = Fn( () => {
 
 			const vUv = varyingProperty( 'vec2', 'vUv' );
 

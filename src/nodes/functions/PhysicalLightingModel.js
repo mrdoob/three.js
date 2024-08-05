@@ -10,7 +10,7 @@ import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, specularColor, specularF90, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
 import { positionViewDirection, positionView, positionWorld } from '../accessors/PositionNode.js';
-import { tslFn, float, vec2, vec3, vec4, mat3, If } from '../shadernode/ShaderNode.js';
+import { Fn, float, vec2, vec3, vec4, mat3, If } from '../shadernode/ShaderNode.js';
 import { cond } from '../math/CondNode.js';
 import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
 import { div } from '../math/OperatorNode.js';
@@ -24,7 +24,7 @@ import { Loop } from '../utils/LoopNode.js';
 // Transmission
 //
 
-const getVolumeTransmissionRay = tslFn( ( [ n, v, thickness, ior, modelMatrix ] ) => {
+const getVolumeTransmissionRay = Fn( ( [ n, v, thickness, ior, modelMatrix ] ) => {
 
 	// Direction of refracted light.
 	const refractionVector = vec3( refract( v.negate(), normalize( n ), div( 1.0, ior ) ) );
@@ -51,7 +51,7 @@ const getVolumeTransmissionRay = tslFn( ( [ n, v, thickness, ior, modelMatrix ] 
 	]
 } );
 
-const applyIorToRoughness = tslFn( ( [ roughness, ior ] ) => {
+const applyIorToRoughness = Fn( ( [ roughness, ior ] ) => {
 
 	// Scale roughness with IOR so that an IOR of 1.0 results in no microfacet refraction and
 	// an IOR of 1.5 results in the default amount of microfacet refraction.
@@ -68,7 +68,7 @@ const applyIorToRoughness = tslFn( ( [ roughness, ior ] ) => {
 
 const singleViewportMipTexture = viewportMipTexture();
 
-const getTransmissionSample = tslFn( ( [ fragCoord, roughness, ior ] ) => {
+const getTransmissionSample = Fn( ( [ fragCoord, roughness, ior ] ) => {
 
 	const transmissionSample = singleViewportMipTexture.uv( fragCoord );
 	//const transmissionSample = viewportMipTexture( fragCoord );
@@ -79,7 +79,7 @@ const getTransmissionSample = tslFn( ( [ fragCoord, roughness, ior ] ) => {
 
 } );
 
-const volumeAttenuation = tslFn( ( [ transmissionDistance, attenuationColor, attenuationDistance ] ) => {
+const volumeAttenuation = Fn( ( [ transmissionDistance, attenuationColor, attenuationDistance ] ) => {
 
 	If( attenuationDistance.notEqual( 0 ), () => {
 
@@ -104,7 +104,7 @@ const volumeAttenuation = tslFn( ( [ transmissionDistance, attenuationColor, att
 	]
 } );
 
-const getIBLVolumeRefraction = tslFn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion ] ) => {
+const getIBLVolumeRefraction = Fn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion ] ) => {
 
 	let transmittedLight, transmittance;
 
@@ -227,7 +227,7 @@ const evalSensitivity = ( OPD, shift ) => {
 
 };
 
-const evalIridescence = tslFn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0 } ) => {
+const evalIridescence = Fn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0 } ) => {
 
 	// Force iridescenceIOR -> outsideIOR when thinFilmThickness -> 0.0
 	const iridescenceIOR = mix( outsideIOR, eta2, smoothstep( 0.0, 0.03, thinFilmThickness ) );
@@ -307,7 +307,7 @@ const evalIridescence = tslFn( ( { outsideIOR, eta2, cosTheta1, thinFilmThicknes
 // This is a curve-fit approxmation to the "Charlie sheen" BRDF integrated over the hemisphere from
 // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
 // in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
-const IBLSheenBRDF = tslFn( ( { normal, viewDir, roughness } ) => {
+const IBLSheenBRDF = Fn( ( { normal, viewDir, roughness } ) => {
 
 	const dotNV = normal.dot( viewDir ).saturate();
 

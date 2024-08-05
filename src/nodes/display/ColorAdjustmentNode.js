@@ -2,17 +2,17 @@ import TempNode from '../core/TempNode.js';
 import { dot, mix } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, tslFn, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { Vector3 } from '../../math/Vector3.js';
 
-const saturationNode = tslFn( ( { color, adjustment } ) => {
+const saturationNode = Fn( ( { color, adjustment } ) => {
 
 	return adjustment.mix( luminance( color.rgb ), color.rgb );
 
 } );
 
-const vibranceNode = tslFn( ( { color, adjustment } ) => {
+const vibranceNode = Fn( ( { color, adjustment } ) => {
 
 	const average = add( color.r, color.g, color.b ).div( 3.0 );
 
@@ -23,7 +23,7 @@ const vibranceNode = tslFn( ( { color, adjustment } ) => {
 
 } );
 
-const hueNode = tslFn( ( { color, adjustment } ) => {
+const hueNode = Fn( ( { color, adjustment } ) => {
 
 	const k = vec3( 0.57735, 0.57735, 0.57735 );
 

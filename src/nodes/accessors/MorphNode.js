@@ -1,6 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { float, nodeProxy, tslFn } from '../shadernode/ShaderNode.js';
+import { float, nodeProxy, Fn } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { reference } from './ReferenceNode.js';
 import { positionLocal } from './PositionNode.js';
@@ -18,7 +18,7 @@ import { FloatType } from '../../constants.js';
 const _morphTextures = new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
 
-const getMorph = tslFn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
+const getMorph = Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
 
 	const texelIndex = int( vertexIndex ).mul( stride ).add( offset );
 

@@ -1,8 +1,8 @@
 import TextureNode from './TextureNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { nodeProxy, vec3, tslFn, If } from '../shadernode/ShaderNode.js';
+import { nodeProxy, vec3, Fn, If } from '../shadernode/ShaderNode.js';
 
-const normal = tslFn( ( { texture, uv } ) => {
+const normal = Fn( ( { texture, uv } ) => {
 
 	const epsilon = 0.0001;
 
