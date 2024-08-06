@@ -4,12 +4,12 @@ import { uv } from '../accessors/UVNode.js';
 import { normalView } from '../accessors/NormalNode.js';
 import { positionView } from '../accessors/PositionNode.js';
 import { faceDirection } from './FrontFacingNode.js';
-import { addNodeElement, tslFn, nodeProxy, float, vec2 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeProxy, float, vec2 } from '../shadernode/ShaderNode.js';
 
 // Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 // https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
 
-const dHdxy_fwd = tslFn( ( { textureNode, bumpScale } ) => {
+const dHdxy_fwd = Fn( ( { textureNode, bumpScale } ) => {
 
 	// It's used to preserve the same TextureNode instance
 	const sampleTexture = ( callback ) => textureNode.cache().context( { getUV: ( texNode ) => callback( texNode.uvNode || uv() ), forceUVContext: true } );
@@ -25,7 +25,7 @@ const dHdxy_fwd = tslFn( ( { textureNode, bumpScale } ) => {
 
 // Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
 
-const perturbNormalArb = tslFn( ( inputs ) => {
+const perturbNormalArb = Fn( ( inputs ) => {
 
 	const { surf_pos, surf_norm, dHdxy } = inputs;
 

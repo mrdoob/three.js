@@ -10,21 +10,21 @@ import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, specularColor, specularF90, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion } from '../core/PropertyNode.js';
 import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
 import { positionViewDirection, positionView, positionWorld } from '../accessors/PositionNode.js';
-import { tslFn, float, vec2, vec3, vec4, mat3, If } from '../shadernode/ShaderNode.js';
-import { cond } from '../math/CondNode.js';
+import { Fn, float, vec2, vec3, vec4, mat3, If } from '../shadernode/ShaderNode.js';
+import { select } from '../math/CondNode.js';
 import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
 import { div } from '../math/OperatorNode.js';
 import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/CameraNode.js';
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
 import { viewportResolution } from '../display/ViewportNode.js';
 import { viewportMipTexture } from '../display/ViewportTextureNode.js';
-import { loop } from '../utils/LoopNode.js';
+import { Loop } from '../utils/LoopNode.js';
 
 //
 // Transmission
 //
 
-const getVolumeTransmissionRay = tslFn( ( [ n, v, thickness, ior, modelMatrix ] ) => {
+const getVolumeTransmissionRay = Fn( ( [ n, v, thickness, ior, modelMatrix ] ) => {
 
 	// Direction of refracted light.
 	const refractionVector = vec3( refract( v.negate(), normalize( n ), div( 1.0, ior ) ) );
@@ -51,7 +51,7 @@ const getVolumeTransmissionRay = tslFn( ( [ n, v, thickness, ior, modelMatrix ] 
 	]
 } );
 
-const applyIorToRoughness = tslFn( ( [ roughness, ior ] ) => {
+const applyIorToRoughness = Fn( ( [ roughness, ior ] ) => {
 
 	// Scale roughness with IOR so that an IOR of 1.0 results in no microfacet refraction and
 	// an IOR of 1.5 results in the default amount of microfacet refraction.
@@ -68,7 +68,7 @@ const applyIorToRoughness = tslFn( ( [ roughness, ior ] ) => {
 
 const singleViewportMipTexture = viewportMipTexture();
 
-const getTransmissionSample = tslFn( ( [ fragCoord, roughness, ior ] ) => {
+const getTransmissionSample = Fn( ( [ fragCoord, roughness, ior ] ) => {
 
 	const transmissionSample = singleViewportMipTexture.uv( fragCoord );
 	//const transmissionSample = viewportMipTexture( fragCoord );
@@ -79,7 +79,7 @@ const getTransmissionSample = tslFn( ( [ fragCoord, roughness, ior ] ) => {
 
 } );
 
-const volumeAttenuation = tslFn( ( [ transmissionDistance, attenuationColor, attenuationDistance ] ) => {
+const volumeAttenuation = Fn( ( [ transmissionDistance, attenuationColor, attenuationDistance ] ) => {
 
 	If( attenuationDistance.notEqual( 0 ), () => {
 
@@ -104,7 +104,7 @@ const volumeAttenuation = tslFn( ( [ transmissionDistance, attenuationColor, att
 	]
 } );
 
-const getIBLVolumeRefraction = tslFn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion ] ) => {
+const getIBLVolumeRefraction = Fn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion ] ) => {
 
 	let transmittedLight, transmittance;
 
@@ -116,7 +116,7 @@ const getIBLVolumeRefraction = tslFn( ( [ n, v, roughness, diffuseColor, specula
 		const halfSpread = ior.sub( 1.0 ).mul( dispersion.mul( 0.025 ) );
 		const iors = vec3( ior.sub( halfSpread ), ior, ior.add( halfSpread ) );
 
-		loop( { start: 0, end: 3 }, ( { i } ) => {
+		Loop( { start: 0, end: 3 }, ( { i } ) => {
 
 			const ior = iors.element( i );
 
@@ -227,7 +227,7 @@ const evalSensitivity = ( OPD, shift ) => {
 
 };
 
-const evalIridescence = tslFn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0 } ) => {
+const evalIridescence = Fn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0 } ) => {
 
 	// Force iridescenceIOR -> outsideIOR when thinFilmThickness -> 0.0
 	const iridescenceIOR = mix( outsideIOR, eta2, smoothstep( 0.0, 0.03, thinFilmThickness ) );
@@ -249,7 +249,7 @@ const evalIridescence = tslFn( ( { outsideIOR, eta2, cosTheta1, thinFilmThicknes
 	const R12 = F_Schlick( { f0: R0, f90: 1.0, dotVH: cosTheta1 } );
 	//const R21 = R12;
 	const T121 = R12.oneMinus();
-	const phi12 = iridescenceIOR.lessThan( outsideIOR ).cond( Math.PI, 0.0 );
+	const phi12 = iridescenceIOR.lessThan( outsideIOR ).select( Math.PI, 0.0 );
 	const phi21 = float( Math.PI ).sub( phi12 );
 
 	// Second interface
@@ -257,9 +257,9 @@ const evalIridescence = tslFn( ( { outsideIOR, eta2, cosTheta1, thinFilmThicknes
 	const R1 = IorToFresnel0( baseIOR, iridescenceIOR.toVec3() );
 	const R23 = F_Schlick( { f0: R1, f90: 1.0, dotVH: cosTheta2 } );
 	const phi23 = vec3(
-		baseIOR.x.lessThan( iridescenceIOR ).cond( Math.PI, 0.0 ),
-		baseIOR.y.lessThan( iridescenceIOR ).cond( Math.PI, 0.0 ),
-		baseIOR.z.lessThan( iridescenceIOR ).cond( Math.PI, 0.0 )
+		baseIOR.x.lessThan( iridescenceIOR ).select( Math.PI, 0.0 ),
+		baseIOR.y.lessThan( iridescenceIOR ).select( Math.PI, 0.0 ),
+		baseIOR.z.lessThan( iridescenceIOR ).select( Math.PI, 0.0 )
 	);
 
 	// Phase shift
@@ -307,25 +307,25 @@ const evalIridescence = tslFn( ( { outsideIOR, eta2, cosTheta1, thinFilmThicknes
 // This is a curve-fit approxmation to the "Charlie sheen" BRDF integrated over the hemisphere from
 // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
 // in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
-const IBLSheenBRDF = tslFn( ( { normal, viewDir, roughness } ) => {
+const IBLSheenBRDF = Fn( ( { normal, viewDir, roughness } ) => {
 
 	const dotNV = normal.dot( viewDir ).saturate();
 
 	const r2 = roughness.pow2();
 
-	const a = cond(
+	const a = select(
 		roughness.lessThan( 0.25 ),
 		float( - 339.2 ).mul( r2 ).add( float( 161.4 ).mul( roughness ) ).sub( 25.9 ),
 		float( - 8.48 ).mul( r2 ).add( float( 14.3 ).mul( roughness ) ).sub( 9.95 )
 	);
 
-	const b = cond(
+	const b = select(
 		roughness.lessThan( 0.25 ),
 		float( 44.0 ).mul( r2 ).sub( float( 23.7 ).mul( roughness ) ).add( 3.26 ),
 		float( 1.97 ).mul( r2 ).sub( float( 3.27 ).mul( roughness ) ).add( 0.72 )
 	);
 
-	const DG = cond( roughness.lessThan( 0.25 ), 0.0, float( 0.1 ).mul( roughness ).sub( 0.025 ) ).add( a.mul( dotNV ).add( b ).exp() );
+	const DG = select( roughness.lessThan( 0.25 ), 0.0, float( 0.1 ).mul( roughness ).sub( 0.025 ) ).add( a.mul( dotNV ).add( b ).exp() );
 
 	return DG.mul( 1.0 / Math.PI ).saturate();
 

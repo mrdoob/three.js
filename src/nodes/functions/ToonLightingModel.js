@@ -2,11 +2,11 @@ import LightingModel from '../core/LightingModel.js';
 import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
 import { diffuseColor } from '../core/PropertyNode.js';
 import { normalGeometry } from '../accessors/NormalNode.js';
-import { tslFn, float, vec2, vec3 } from '../shadernode/ShaderNode.js';
+import { Fn, float, vec2, vec3 } from '../shadernode/ShaderNode.js';
 import { mix, smoothstep } from '../math/MathNode.js';
 import { materialReference } from '../accessors/MaterialReferenceNode.js';
 
-const getGradientIrradiance = tslFn( ( { normal, lightDirection, builder } ) => {
+const getGradientIrradiance = Fn( ( { normal, lightDirection, builder } ) => {
 
 	// dotNL will be from -1.0 to 1.0
 	const dotNL = normal.dot( lightDirection );

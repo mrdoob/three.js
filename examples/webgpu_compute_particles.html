@@ -37,7 +37,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, uniform, texture, instanceIndex, float, vec3, storage, If } from 'three/tsl';
+			import { Fn, uniform, texture, instanceIndex, float, vec3, storage, If } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -85,7 +85,7 @@
 
 				// compute
 
-				const computeInit = tslFn( () => {
+				const computeInit = Fn( () => {
 
 					const position = positionBuffer.element( instanceIndex );
 					const color = colorBuffer.element( instanceIndex );
@@ -104,7 +104,7 @@
 
 				//
 
-				const computeUpdate = tslFn( () => {
+				const computeUpdate = Fn( () => {
 
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );
@@ -182,7 +182,7 @@
 
 				// click event
 
-				const computeHit = tslFn( () => {
+				const computeHit = Fn( () => {
 
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );

@@ -1,7 +1,7 @@
-import { addNodeElement, tslFn, vec3 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, vec3 } from '../shadernode/ShaderNode.js';
 import { dot } from '../math/MathNode.js';
 
-export const sepia = /*@__PURE__*/ tslFn( ( [ color ] ) => {
+export const sepia = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	const c = vec3( color );
 

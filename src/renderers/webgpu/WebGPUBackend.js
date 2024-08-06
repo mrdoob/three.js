@@ -193,22 +193,16 @@ class WebGPUBackend extends Backend {
 
 		let descriptors = renderTargetData.descriptors;
 
-		if ( descriptors === undefined ) {
-
-			descriptors = [];
-
-			renderTargetData.descriptors = descriptors;
-
-		}
-
-		if ( renderTargetData.width !== renderTarget.width ||
+		if ( descriptors === undefined ||
+			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
 			renderTargetData.activeMipmapLevel !== renderTarget.activeMipmapLevel ||
-			renderTargetData.samples !== renderTarget.samples ||
-			descriptors.length !== renderTarget.textures.length
+			renderTargetData.samples !== renderTarget.samples
 		) {
 
-			descriptors.length = 0;
+			descriptors = {};
+
+			renderTargetData.descriptors = descriptors;
 
 			// dispose
 
@@ -224,7 +218,9 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		let descriptor = descriptors[ renderContext.activeCubeFace ];
+		const cacheKey = renderContext.getCacheKey();
+
+		let descriptor = descriptors[ cacheKey ];
 
 		if ( descriptor === undefined ) {
 
@@ -276,7 +272,7 @@ class WebGPUBackend extends Backend {
 				depthStencilAttachment
 			};
 
-			descriptors[ renderContext.activeCubeFace ] = descriptor;
+			descriptors[ cacheKey ] = descriptor;
 
 			renderTargetData.width = renderTarget.width;
 			renderTargetData.height = renderTarget.height;

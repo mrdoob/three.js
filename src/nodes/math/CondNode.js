@@ -121,8 +121,19 @@ class CondNode extends Node {
 
 export default CondNode;
 
-export const cond = nodeProxy( CondNode );
+export const select = nodeProxy( CondNode );
 
-addNodeElement( 'cond', cond );
+addNodeElement( 'select', select );
 
 addNodeClass( 'CondNode', CondNode );
+
+//
+
+export const cond = ( ...params ) => { // @deprecated, r168
+
+	console.warn( 'TSL.CondNode: cond() has been renamed to select().' );
+	return select( ...params );
+
+};
+
+addNodeElement( 'cond', cond );

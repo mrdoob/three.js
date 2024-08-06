@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mx_fractal_noise_vec3, positionWorld, vec4, tslFn, color, vertexIndex } from 'three/tsl';
+			import { mx_fractal_noise_vec3, positionWorld, vec4, Fn, color, vertexIndex } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -95,7 +95,7 @@
 			
 				const discardNode = vertexIndex.hash().greaterThan( 0.5 );
 
-				materialCustomShadow.colorNode = tslFn( () => {
+				materialCustomShadow.colorNode = Fn( () => {
 
 					discardNode.discard();
 
@@ -104,7 +104,7 @@
 				} )();
 
 
-				materialCustomShadow.shadowNode = tslFn( () => {
+				materialCustomShadow.shadowNode = Fn( () => {
 
 					discardNode.discard();
 
@@ -144,7 +144,7 @@
 					specular: 0x111111
 				} );
 
-				planeMaterial.shadowPositionNode = tslFn( () => {
+				planeMaterial.shadowPositionNode = Fn( () => {
 
 					const pos = positionWorld.toVar();
 					pos.xz.addAssign( mx_fractal_noise_vec3( positionWorld.mul( 2 ) ).saturate().xz );
@@ -153,7 +153,7 @@
 				} )();
 
 
-				planeMaterial.colorNode = tslFn( () => {
+				planeMaterial.colorNode = Fn( () => {
 
 					const pos = positionWorld.toVar();
 					pos.xz.addAssign( mx_fractal_noise_vec3( positionWorld.mul( 2 ) ).saturate().xz );

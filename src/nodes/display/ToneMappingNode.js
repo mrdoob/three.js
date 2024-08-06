@@ -1,22 +1,22 @@
 import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, tslFn, nodeObject, float, mat3, vec3, If } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeObject, float, mat3, vec3, If } from '../shadernode/ShaderNode.js';
 import { rendererReference } from '../accessors/RendererReferenceNode.js';
-import { cond } from '../math/CondNode.js';
+import { select } from '../math/CondNode.js';
 import { clamp, log2, max, min, pow, mix } from '../math/MathNode.js';
 import { mul, sub, div } from '../math/OperatorNode.js';
 
 import { NoToneMapping, LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping } from '../../constants.js';
 
 // exposure only
-const LinearToneMappingNode = tslFn( ( { color, exposure } ) => {
+const LinearToneMappingNode = Fn( ( { color, exposure } ) => {
 
 	return color.mul( exposure ).clamp();
 
 } );
 
 // source: https://www.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf
-const ReinhardToneMappingNode = tslFn( ( { color, exposure } ) => {
+const ReinhardToneMappingNode = Fn( ( { color, exposure } ) => {
 
 	color = color.mul( exposure );
 
@@ -25,7 +25,7 @@ const ReinhardToneMappingNode = tslFn( ( { color, exposure } ) => {
 } );
 
 // source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
-const OptimizedCineonToneMappingNode = tslFn( ( { color, exposure } ) => {
+const OptimizedCineonToneMappingNode = Fn( ( { color, exposure } ) => {
 
 	// optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
 	color = color.mul( exposure );
@@ -39,7 +39,7 @@ const OptimizedCineonToneMappingNode = tslFn( ( { color, exposure } ) => {
 } );
 
 // source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
-const RRTAndODTFit = tslFn( ( { color } ) => {
+const RRTAndODTFit = Fn( ( { color } ) => {
 
 	const a = color.mul( color.add( 0.0245786 ) ).sub( 0.000090537 );
 	const b = color.mul( color.add( 0.4329510 ).mul( 0.983729 ) ).add( 0.238081 );
@@ -49,7 +49,7 @@ const RRTAndODTFit = tslFn( ( { color } ) => {
 } );
 
 // source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
-const ACESFilmicToneMappingNode = tslFn( ( { color, exposure } ) => {
+const ACESFilmicToneMappingNode = Fn( ( { color, exposure } ) => {
 
 	// sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT
 	const ACESInputMat = mat3(
@@ -84,7 +84,7 @@ const ACESFilmicToneMappingNode = tslFn( ( { color, exposure } ) => {
 const LINEAR_REC2020_TO_LINEAR_SRGB = mat3( vec3( 1.6605, - 0.1246, - 0.0182 ), vec3( - 0.5876, 1.1329, - 0.1006 ), vec3( - 0.0728, - 0.0083, 1.1187 ) );
 const LINEAR_SRGB_TO_LINEAR_REC2020 = mat3( vec3( 0.6274, 0.0691, 0.0164 ), vec3( 0.3293, 0.9195, 0.0880 ), vec3( 0.0433, 0.0113, 0.8956 ) );
 
-const agxDefaultContrastApprox = tslFn( ( [ x_immutable ] ) => {
+const agxDefaultContrastApprox = Fn( ( [ x_immutable ] ) => {
 
 	const x = vec3( x_immutable ).toVar();
 	const x2 = vec3( x.mul( x ) ).toVar();
@@ -94,7 +94,7 @@ const agxDefaultContrastApprox = tslFn( ( [ x_immutable ] ) => {
 
 } );
 
-const AGXToneMappingNode = tslFn( ( { color, exposure } ) => {
+const AGXToneMappingNode = Fn( ( { color, exposure } ) => {
 
 	const colortone = vec3( color ).toVar();
 	const AgXInsetMatrix = mat3( vec3( 0.856627153315983, 0.137318972929847, 0.11189821299995 ), vec3( 0.0951212405381588, 0.761241990602591, 0.0767994186031903 ), vec3( 0.0482516061458583, 0.101439036467562, 0.811302368396859 ) );
@@ -120,7 +120,7 @@ const AGXToneMappingNode = tslFn( ( { color, exposure } ) => {
 
 // https://modelviewer.dev/examples/tone-mapping
 
-const NeutralToneMappingNode = tslFn( ( { color, exposure } ) => {
+const NeutralToneMappingNode = Fn( ( { color, exposure } ) => {
 
 	const StartCompression = float( 0.8 - 0.04 );
 	const Desaturation = float( 0.15 );
@@ -128,7 +128,7 @@ const NeutralToneMappingNode = tslFn( ( { color, exposure } ) => {
 	color = color.mul( exposure );
 
 	const x = min( color.r, min( color.g, color.b ) );
-	const offset = cond( x.lessThan( 0.08 ), x.sub( mul( 6.25, x.mul( x ) ) ), 0.04 );
+	const offset = select( x.lessThan( 0.08 ), x.sub( mul( 6.25, x.mul( x ) ) ), 0.04 );
 
 	color.subAssign( offset );
 

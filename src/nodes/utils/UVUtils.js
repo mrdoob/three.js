@@ -1,12 +1,12 @@
-import { addNodeElement, tslFn, vec2 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, vec2 } from '../shadernode/ShaderNode.js';
 
-export const rotateUV = tslFn( ( [ uv, rotation, center = vec2( 0.5 ) ] ) => {
+export const rotateUV = Fn( ( [ uv, rotation, center = vec2( 0.5 ) ] ) => {
 
 	return uv.sub( center ).rotate( rotation ).add( center );
 
 } );
 
-export const spherizeUV = tslFn( ( [ uv, strength, center = vec2( 0.5 ) ] ) => {
+export const spherizeUV = Fn( ( [ uv, strength, center = vec2( 0.5 ) ] ) => {
 
 	const delta = uv.sub( center );
 	const delta2 = delta.dot( delta );
