@@ -180,6 +180,7 @@ export { default as LightsNode, lights, lightsNode, addLightNode } from './light
 export { default as LightingNode /* @TODO: lighting (abstract), light */ } from './lighting/LightingNode.js';
 export { default as LightingContextNode, lightingContext } from './lighting/LightingContextNode.js';
 export { default as HemisphereLightNode } from './lighting/HemisphereLightNode.js';
+export { default as LightProbeNode } from './lighting/LightProbeNode.js';
 export { default as EnvironmentNode } from './lighting/EnvironmentNode.js';
 export { default as BasicEnvironmentNode } from './lighting/BasicEnvironmentNode.js';
 export { default as IrradianceNode } from './lighting/IrradianceNode.js';
