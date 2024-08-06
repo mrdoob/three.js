@@ -50,19 +50,11 @@ class PassMultipleTextureNode extends PassTextureNode {
 		this.textureName = textureName;
 		this.previousTexture = previousTexture;
 
-		this.updateType = NodeUpdateType.RENDER;
-
 	}
 
 	updateTexture() {
 
 		this.value = this.previousTexture ? this.passNode.getPreviousTexture( this.textureName ) : this.passNode.getTexture( this.textureName );
-
-	}
-
-	update() {
-
-		this.updateTexture();
 
 	}
 
@@ -203,6 +195,9 @@ class PassNode extends TempNode {
 
 			this._textures[ name ] = prevTexture;
 			this._previousTextures[ name ] = texture;
+
+			this._textureNodes[ name ].updateTexture();
+			this._previousTextureNodes[ name ].updateTexture();
 
 		}
 
