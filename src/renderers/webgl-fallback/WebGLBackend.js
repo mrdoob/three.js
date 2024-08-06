@@ -255,11 +255,12 @@ class WebGLBackend extends Backend {
 			const renderTargetContextData = this.get( renderContext.renderTarget );
 
 			const { samples } = renderContext.renderTarget;
-			const fb = renderTargetContextData.framebuffer;
-
-			const mask = gl.COLOR_BUFFER_BIT;
 
 			if ( samples > 0 ) {
+
+				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
+
+				const mask = gl.COLOR_BUFFER_BIT;
 
 				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
 
@@ -1333,7 +1334,6 @@ class WebGLBackend extends Backend {
 					const textures = renderContext.textures;
 
 					for ( let i = 0; i < textures.length; i ++ ) {
-
 
 						msaaRenderbuffers[ i ] = gl.createRenderbuffer();
 
