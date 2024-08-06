@@ -10,8 +10,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../src/Three.WebGPU.js",
-					"three/tsl": "../src/Three.WebGPU.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -20,9 +20,8 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, pass, normalWorld, output, ndcPosition, /*velocity,*/ motionBlur, mrt, uniform } from 'three/tsl';
+			import { color, pass, normalWorld, output, ndcPosition, motionBlur, mrt, uniform } from 'three/tsl';
 
-			//import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Timer } from 'three/addons/misc/Timer.js';
 
@@ -31,7 +30,6 @@
 			let camera, renderer, postProcessing;
 			let scenePassColor;
 			let timer, mesh;
-			//let mixer;
 
 			init();
 
@@ -53,20 +51,6 @@
 				scene.backgroundNode = normalWorld.y.mix( color( 0x0487e2 ), color( 0x0066ff ) );
 
 				timer = new Timer();
-
-				/*const loader = new GLTFLoader();
-				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
-
-					const object = gltf.scene;
-
-					mixer = new THREE.AnimationMixer( object );
-
-					const action = mixer.clipAction( gltf.animations[ 0 ] );
-					action.play();
-
-					scene.add( object );
-
-				} );*/
 
 				const texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
 				texture.colorSpace = THREE.SRGBColorSpace;
@@ -101,7 +85,6 @@
 				const ndcPositionPrevious = scenePass.getPreviousTextureNode( 'ndcPosition' );
 
 				postProcessing.outputNode = motionBlur( scenePassColor, ndcPositionCurrent, ndcPositionPrevious, intensityNode );
-				//postProcessing.outputNode = velocity( ndcPositionCurrent, ndcPositionPrevious );
 
 				//
 
