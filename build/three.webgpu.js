@@ -38059,7 +38059,7 @@ const defaultBuildStages = [ 'setup', 'analyze', 'generate' ];
 const shaderStages = [ ...defaultShaderStages, 'compute' ];
 const vectorComponents = [ 'x', 'y', 'z', 'w' ];
 
-function getCacheKey( object, force = false ) {
+function getCacheKey$1( object, force = false ) {
 
 	let cacheKey = '{';
 
@@ -38272,7 +38272,7 @@ var NodeUtils = /*#__PURE__*/Object.freeze({
 	__proto__: null,
 	arrayBufferToBase64: arrayBufferToBase64,
 	base64ToArrayBuffer: base64ToArrayBuffer,
-	getCacheKey: getCacheKey,
+	getCacheKey: getCacheKey$1,
 	getNodeChildren: getNodeChildren,
 	getValueFromType: getValueFromType,
 	getValueType: getValueType
@@ -38414,7 +38414,7 @@ class Node extends EventDispatcher {
 
 		if ( force === true || this._cacheKey === null ) {
 
-			this._cacheKey = getCacheKey( this, force );
+			this._cacheKey = getCacheKey$1( this, force );
 			this._cacheKeyVersion = this.version;
 
 		}
@@ -39613,7 +39613,7 @@ class ShaderCallNodeInternal extends Node {
 		}
 
 		const jsFunc = shaderNode.jsFunc;
-		const outputNode = inputNodes !== null ? jsFunc( inputNodes, builder.stack, builder ) : jsFunc( builder.stack, builder );
+		const outputNode = inputNodes !== null ? jsFunc( inputNodes, builder ) : jsFunc( builder );
 
 		return nodeObject( outputNode );
 
@@ -43990,7 +43990,7 @@ const instance = nodeProxy( InstanceNode );
 
 addNodeClass( 'InstanceNode', InstanceNode );
 
-const tangentGeometry = /*#__PURE__*/ Fn( ( stack, builder ) => {
+const tangentGeometry = /*#__PURE__*/ Fn( ( builder ) => {
 
 	if ( builder.geometry.hasAttribute( 'tangent' ) === false ) {
 
@@ -45834,7 +45834,7 @@ class NodeMaterial extends Material {
 
 	customProgramCacheKey() {
 
-		return this.type + getCacheKey( this );
+		return this.type + getCacheKey$1( this );
 
 	}
 
@@ -51515,7 +51515,8 @@ const GPUFeatureName = {
 	BGRA8UNormStorage: 'bgra8unorm-storage',
 	Float32Filterable: 'float32-filterable',
 	ClipDistances: 'clip-distances',
-	DualSourceBlending: 'dual-source-blending'
+	DualSourceBlending: 'dual-source-blending',
+	Subgroups: 'subgroups'
 };
 
 class StorageBufferNode extends BufferNode {
@@ -52540,17 +52541,24 @@ class PassTextureNode extends TextureNode {
 
 class PassMultipleTextureNode extends PassTextureNode {
 
-	constructor( passNode, textureName ) {
+	constructor( passNode, textureName, previousTexture = false ) {
 
 		super( passNode, null );
 
 		this.textureName = textureName;
+		this.previousTexture = previousTexture;
+
+	}
+
+	updateTexture() {
+
+		this.value = this.previousTexture ? this.passNode.getPreviousTexture( this.textureName ) : this.passNode.getTexture( this.textureName );
 
 	}
 
 	setup( builder ) {
 
-		this.value = this.passNode.getTexture( this.textureName );
+		this.updateTexture();
 
 		return super.setup( builder );
 
@@ -52558,7 +52566,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 
 	clone() {
 
-		return new this.constructor( this.passNode, this.textureName );
+		return new this.constructor( this.passNode, this.textureName, this.previousTexture );
 
 	}
 
@@ -52600,6 +52608,9 @@ class PassNode extends TempNode {
 		this._textureNodes = {};
 		this._linearDepthNodes = {};
 		this._viewZNodes = {};
+
+		this._previousTextures = {};
+		this._previousTextureNodes = {};
 
 		this._cameraNear = uniform( 0 );
 		this._cameraFar = uniform( 0 );
@@ -52652,6 +52663,44 @@ class PassNode extends TempNode {
 
 	}
 
+	getPreviousTexture( name ) {
+
+		let texture = this._previousTextures[ name ];
+
+		if ( texture === undefined ) {
+
+			texture = this.getTexture( name ).clone();
+			texture.isRenderTargetTexture = true;
+
+			this._previousTextures[ name ] = texture;
+
+		}
+
+		return texture;
+
+	}
+
+	toggleTexture( name ) {
+
+		const prevTexture = this._previousTextures[ name ];
+
+		if ( prevTexture !== undefined ) {
+
+			const texture = this._textures[ name ];
+
+			const index = this.renderTarget.textures.indexOf( texture );
+			this.renderTarget.textures[ index ] = prevTexture;
+
+			this._textures[ name ] = prevTexture;
+			this._previousTextures[ name ] = texture;
+
+			this._textureNodes[ name ].updateTexture();
+			this._previousTextureNodes[ name ].updateTexture();
+
+		}
+
+	}
+
 	getTextureNode( name = 'output' ) {
 
 		let textureNode = this._textureNodes[ name ];
@@ -52659,6 +52708,20 @@ class PassNode extends TempNode {
 		if ( textureNode === undefined ) {
 
 			this._textureNodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
+
+		}
+
+		return textureNode;
+
+	}
+
+	getPreviousTextureNode( name = 'output' ) {
+
+		let textureNode = this._previousTextureNodes[ name ];
+
+		if ( textureNode === undefined ) {
+
+			this._previousTextureNodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name, true ) );
 
 		}
 
@@ -52736,6 +52799,12 @@ class PassNode extends TempNode {
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
+
+		for ( const name in this._previousTextures ) {
+
+			this.toggleTexture( name );
+
+		}
 
 		renderer.setRenderTarget( this.renderTarget );
 		renderer.setMRT( this._mrt );
@@ -61962,6 +62031,30 @@ class RenderContext {
 
 	}
 
+	getCacheKey() {
+
+		return getCacheKey( this );
+
+	}
+
+}
+
+function getCacheKey( renderContext ) {
+
+	const { textures, activeCubeFace } = renderContext;
+
+	let key = '';
+
+	for ( const texture of textures ) {
+
+		key += texture.id + ',';
+
+	}
+
+	key += activeCubeFace;
+
+	return key;
+
 }
 
 class RenderContexts {
@@ -68235,7 +68328,6 @@ class WebGLTextureUtils {
 
 	deallocateRenderBuffers( renderTarget ) {
 
-
 		const { gl, backend } = this;
 
 		// remove framebuffer reference
@@ -68245,31 +68337,36 @@ class WebGLTextureUtils {
 
 			renderContextData.renderBufferStorageSetup = undefined;
 
-			if ( renderContextData.framebuffer ) {
+			if ( renderContextData.framebuffers ) {
 
-				gl.deleteFramebuffer( renderContextData.framebuffer );
-				renderContextData.framebuffer = undefined;
+				for ( const cacheKey in renderContextData.framebuffers ) {
+
+					gl.deleteFramebuffer( renderContextData.framebuffers[ cacheKey ] );
+
+				}
+
+				delete renderContextData.framebuffers;
 
 			}
 
 			if ( renderContextData.depthRenderbuffer ) {
 
 				gl.deleteRenderbuffer( renderContextData.depthRenderbuffer );
-				renderContextData.depthRenderbuffer = undefined;
+				delete renderContextData.depthRenderbuffer;
 
 			}
 
 			if ( renderContextData.stencilRenderbuffer ) {
 
 				gl.deleteRenderbuffer( renderContextData.stencilRenderbuffer );
-				renderContextData.stencilRenderbuffer = undefined;
+				delete renderContextData.stencilRenderbuffer;
 
 			}
 
 			if ( renderContextData.msaaFrameBuffer ) {
 
 				gl.deleteFramebuffer( renderContextData.msaaFrameBuffer );
-				renderContextData.msaaFrameBuffer = undefined;
+				delete renderContextData.msaaFrameBuffer;
 
 			}
 
@@ -68281,7 +68378,7 @@ class WebGLTextureUtils {
 
 				}
 
-				renderContextData.msaaRenderbuffers = undefined;
+				delete renderContextData.msaaRenderbuffers;
 
 			}
 
@@ -69046,11 +69143,12 @@ class WebGLBackend extends Backend {
 			const renderTargetContextData = this.get( renderContext.renderTarget );
 
 			const { samples } = renderContext.renderTarget;
-			const fb = renderTargetContextData.framebuffer;
-
-			const mask = gl.COLOR_BUFFER_BIT;
 
 			if ( samples > 0 ) {
+
+				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
+
+				const mask = gl.COLOR_BUFFER_BIT;
 
 				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
 
@@ -70027,38 +70125,38 @@ class WebGLBackend extends Backend {
 
 	}
 
-	_setFramebuffer( renderContext ) {
+	_setFramebuffer( descriptor ) {
 
 		const { gl, state } = this;
 
 		let currentFrameBuffer = null;
 
-		if ( renderContext.textures !== null ) {
+		if ( descriptor.textures !== null ) {
 
-			const renderTarget = renderContext.renderTarget;
+			const renderTarget = descriptor.renderTarget;
 			const renderTargetContextData = this.get( renderTarget );
 			const { samples, depthBuffer, stencilBuffer } = renderTarget;
-			const cubeFace = this.renderer._activeCubeFace;
+
 			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
 
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
 
+			const cacheKey = getCacheKey( descriptor );
+
 			let fb;
 
 			if ( isCube ) {
 
-				if ( renderTargetContextData.cubeFramebuffers === undefined ) {
+				renderTargetContextData.cubeFramebuffers || ( renderTargetContextData.cubeFramebuffers = {} );
 
-					renderTargetContextData.cubeFramebuffers = [];
-
-				}
-
-				fb = renderTargetContextData.cubeFramebuffers[ cubeFace ];
+				fb = renderTargetContextData.cubeFramebuffers[ cacheKey ];
 
 			} else {
 
-				fb = renderTargetContextData.framebuffer;
+				renderTargetContextData.framebuffers || ( renderTargetContextData.framebuffers = {} );
+
+				fb = renderTargetContextData.framebuffers[ cacheKey ];
 
 			}
 
@@ -70068,22 +70166,27 @@ class WebGLBackend extends Backend {
 
 				state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
-				const textures = renderContext.textures;
+				const textures = descriptor.textures;
 
 				if ( isCube ) {
 
-					renderTargetContextData.cubeFramebuffers[ cubeFace ] = fb;
+					renderTargetContextData.cubeFramebuffers[ cacheKey ] = fb;
+
 					const { textureGPU } = this.get( textures[ 0 ] );
+
+					const cubeFace = this.renderer._activeCubeFace;
 
 					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, 0 );
 
 				} else {
 
+					renderTargetContextData.framebuffers[ cacheKey ] = fb;
+
 					for ( let i = 0; i < textures.length; i ++ ) {
 
 						const texture = textures[ i ];
 						const textureData = this.get( texture );
-						textureData.renderTarget = renderContext.renderTarget;
+						textureData.renderTarget = descriptor.renderTarget;
 
 						const attachment = gl.COLOR_ATTACHMENT0 + i;
 
@@ -70091,15 +70194,13 @@ class WebGLBackend extends Backend {
 
 					}
 
-					renderTargetContextData.framebuffer = fb;
-
-					state.drawBuffers( renderContext, fb );
+					state.drawBuffers( descriptor, fb );
 
 				}
 
-				if ( renderContext.depthTexture !== null ) {
+				if ( descriptor.depthTexture !== null ) {
 
-					const textureData = this.get( renderContext.depthTexture );
+					const textureData = this.get( descriptor.depthTexture );
 					const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 
 					gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
@@ -70120,10 +70221,9 @@ class WebGLBackend extends Backend {
 
 					const msaaRenderbuffers = [];
 
-					const textures = renderContext.textures;
+					const textures = descriptor.textures;
 
 					for ( let i = 0; i < textures.length; i ++ ) {
-
 
 						msaaRenderbuffers[ i ] = gl.createRenderbuffer();
 
@@ -70138,10 +70238,10 @@ class WebGLBackend extends Backend {
 
 						}
 
-						const texture = renderContext.textures[ i ];
+						const texture = descriptor.textures[ i ];
 						const textureData = this.get( texture );
 
-						gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, textureData.glInternalFormat, renderContext.width, renderContext.height );
+						gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, textureData.glInternalFormat, descriptor.width, descriptor.height );
 						gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
 
 
@@ -70153,7 +70253,7 @@ class WebGLBackend extends Backend {
 					if ( depthRenderbuffer === undefined ) {
 
 						depthRenderbuffer = gl.createRenderbuffer();
-						this.textureUtils.setupRenderBufferStorage( depthRenderbuffer, renderContext );
+						this.textureUtils.setupRenderBufferStorage( depthRenderbuffer, descriptor );
 
 						renderTargetContextData.depthRenderbuffer = depthRenderbuffer;
 
@@ -72675,6 +72775,22 @@ ${ flowData.code }
 
 	}
 
+	getSubgroupSize() {
+
+		this.enableSubGroups();
+
+		return this.getBuiltin( 'subgroup_size', 'subgroupSize', 'u32', 'attribute' );
+
+	}
+
+	getSubgroupIndex() {
+
+		this.enableSubGroups();
+
+		return this.getBuiltin( 'subgroup_invocation_id', 'subgroupIndex', 'u32', 'attribute' );
+
+	}
+
 	getDrawIndex() {
 
 		return null;
@@ -72707,8 +72823,8 @@ ${ flowData.code }
 
 	enableDirective( name, shaderStage = this.shaderStage ) {
 
-		const stage = this.directives[ shaderStage ] || ( this.directives[ shaderStage ] = [] );
-		stage.push( name );
+		const stage = this.directives[ shaderStage ] || ( this.directives[ shaderStage ] = new Set() );
+		stage.add( name );
 
 	}
 
@@ -72728,6 +72844,18 @@ ${ flowData.code }
 		}
 
 		return snippets.join( '\n' );
+
+	}
+
+	enableSubGroups() {
+
+		this.enableDirective( 'subgroups' );
+
+	}
+
+	enableSubgroupsF16() {
+
+		this.enableDirective( 'subgroups-f16' );
 
 	}
 
@@ -74837,22 +74965,16 @@ class WebGPUBackend extends Backend {
 
 		let descriptors = renderTargetData.descriptors;
 
-		if ( descriptors === undefined ) {
-
-			descriptors = [];
-
-			renderTargetData.descriptors = descriptors;
-
-		}
-
-		if ( renderTargetData.width !== renderTarget.width ||
+		if ( descriptors === undefined ||
+			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
 			renderTargetData.activeMipmapLevel !== renderTarget.activeMipmapLevel ||
-			renderTargetData.samples !== renderTarget.samples ||
-			descriptors.length !== renderTarget.textures.length
+			renderTargetData.samples !== renderTarget.samples
 		) {
 
-			descriptors.length = 0;
+			descriptors = {};
+
+			renderTargetData.descriptors = descriptors;
 
 			// dispose
 
@@ -74868,7 +74990,9 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		let descriptor = descriptors[ renderContext.activeCubeFace ];
+		const cacheKey = renderContext.getCacheKey();
+
+		let descriptor = descriptors[ cacheKey ];
 
 		if ( descriptor === undefined ) {
 
@@ -74920,7 +75044,7 @@ class WebGPUBackend extends Backend {
 				depthStencilAttachment
 			};
 
-			descriptors[ renderContext.activeCubeFace ] = descriptor;
+			descriptors[ cacheKey ] = descriptor;
 
 			renderTargetData.width = renderTarget.width;
 			renderTargetData.height = renderTarget.height;
