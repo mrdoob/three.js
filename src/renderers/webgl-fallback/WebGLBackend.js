@@ -1,5 +1,6 @@
 import GLSLNodeBuilder from './nodes/GLSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
+import { getCacheKey } from '../common/RenderContext.js';
 
 import WebGLAttributeUtils from './utils/WebGLAttributeUtils.js';
 import WebGLState from './utils/WebGLState.js';
@@ -1237,24 +1238,24 @@ class WebGLBackend extends Backend {
 
 	}
 
-	_setFramebuffer( renderContext ) {
+	_setFramebuffer( descriptor ) {
 
 		const { gl, state } = this;
 
 		let currentFrameBuffer = null;
 
-		if ( renderContext.textures !== null ) {
+		if ( descriptor.textures !== null ) {
 
-			const renderTarget = renderContext.renderTarget;
+			const renderTarget = descriptor.renderTarget;
 			const renderTargetContextData = this.get( renderTarget );
 			const { samples, depthBuffer, stencilBuffer } = renderTarget;
-			const cubeFace = this.renderer._activeCubeFace;
+
 			const isCube = renderTarget.isWebGLCubeRenderTarget === true;
 
 			let msaaFb = renderTargetContextData.msaaFrameBuffer;
 			let depthRenderbuffer = renderTargetContextData.depthRenderbuffer;
 
-			const cacheKey = renderContext.getCacheKey();
+			const cacheKey = getCacheKey( descriptor );
 
 			let fb;
 
@@ -1262,7 +1263,7 @@ class WebGLBackend extends Backend {
 
 				renderTargetContextData.cubeFramebuffers || ( renderTargetContextData.cubeFramebuffers = {} );
 
-				fb = renderTargetContextData.cubeFramebuffers[ cubeFace ];
+				fb = renderTargetContextData.cubeFramebuffers[ cacheKey ];
 
 			} else {
 
@@ -1278,13 +1279,15 @@ class WebGLBackend extends Backend {
 
 				state.bindFramebuffer( gl.FRAMEBUFFER, fb );
 
-				const textures = renderContext.textures;
+				const textures = descriptor.textures;
 
 				if ( isCube ) {
 
 					renderTargetContextData.cubeFramebuffers[ cacheKey ] = fb;
 
 					const { textureGPU } = this.get( textures[ 0 ] );
+
+					const cubeFace = this.renderer._activeCubeFace;
 
 					gl.framebufferTexture2D( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_CUBE_MAP_POSITIVE_X + cubeFace, textureGPU, 0 );
 
@@ -1296,7 +1299,7 @@ class WebGLBackend extends Backend {
 
 						const texture = textures[ i ];
 						const textureData = this.get( texture );
-						textureData.renderTarget = renderContext.renderTarget;
+						textureData.renderTarget = descriptor.renderTarget;
 
 						const attachment = gl.COLOR_ATTACHMENT0 + i;
 
@@ -1304,13 +1307,13 @@ class WebGLBackend extends Backend {
 
 					}
 
-					state.drawBuffers( renderContext, fb );
+					state.drawBuffers( descriptor, fb );
 
 				}
 
-				if ( renderContext.depthTexture !== null ) {
+				if ( descriptor.depthTexture !== null ) {
 
-					const textureData = this.get( renderContext.depthTexture );
+					const textureData = this.get( descriptor.depthTexture );
 					const depthStyle = stencilBuffer ? gl.DEPTH_STENCIL_ATTACHMENT : gl.DEPTH_ATTACHMENT;
 
 					gl.framebufferTexture2D( gl.FRAMEBUFFER, depthStyle, gl.TEXTURE_2D, textureData.textureGPU, 0 );
@@ -1331,7 +1334,7 @@ class WebGLBackend extends Backend {
 
 					const msaaRenderbuffers = [];
 
-					const textures = renderContext.textures;
+					const textures = descriptor.textures;
 
 					for ( let i = 0; i < textures.length; i ++ ) {
 
@@ -1348,10 +1351,10 @@ class WebGLBackend extends Backend {
 
 						}
 
-						const texture = renderContext.textures[ i ];
+						const texture = descriptor.textures[ i ];
 						const textureData = this.get( texture );
 
-						gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, textureData.glInternalFormat, renderContext.width, renderContext.height );
+						gl.renderbufferStorageMultisample( gl.RENDERBUFFER, samples, textureData.glInternalFormat, descriptor.width, descriptor.height );
 						gl.framebufferRenderbuffer( gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0 + i, gl.RENDERBUFFER, msaaRenderbuffers[ i ] );
 
 
@@ -1363,7 +1366,7 @@ class WebGLBackend extends Backend {
 					if ( depthRenderbuffer === undefined ) {
 
 						depthRenderbuffer = gl.createRenderbuffer();
-						this.textureUtils.setupRenderBufferStorage( depthRenderbuffer, renderContext );
+						this.textureUtils.setupRenderBufferStorage( depthRenderbuffer, descriptor );
 
 						renderTargetContextData.depthRenderbuffer = depthRenderbuffer;
 
