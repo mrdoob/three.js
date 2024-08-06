@@ -648,6 +648,7 @@ ${ flowData.code }
 	getSubgroupSize() {
 
 		this.enableSubGroups();
+
 		return this.getBuiltin( 'subgroup_size', 'subgroupSize', 'u32', 'attribute' );
 
 	}
@@ -655,6 +656,7 @@ ${ flowData.code }
 	getSubgroupIndex() {
 
 		this.enableSubGroups();
+
 		return this.getBuiltin( 'subgroup_invocation_id', 'subgroupIndex', 'u32', 'attribute' );
 
 	}
