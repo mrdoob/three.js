@@ -623,6 +623,22 @@ ${ flowData.code }
 
 	}
 
+	getSubgroupSize() {
+
+		this.enableSubGroups();
+
+		return this.getBuiltin( 'subgroup_size', 'subgroupSize', 'u32', 'attribute' );
+
+	}
+
+	getSubgroupIndex() {
+
+		this.enableSubGroups();
+
+		return this.getBuiltin( 'subgroup_invocation_id', 'subgroupIndex', 'u32', 'attribute' );
+
+	}
+
 	getDrawIndex() {
 
 		return null;
@@ -655,8 +671,8 @@ ${ flowData.code }
 
 	enableDirective( name, shaderStage = this.shaderStage ) {
 
-		const stage = this.directives[ shaderStage ] || ( this.directives[ shaderStage ] = [] );
-		stage.push( name );
+		const stage = this.directives[ shaderStage ] || ( this.directives[ shaderStage ] = new Set() );
+		stage.add( name );
 
 	}
 
@@ -676,6 +692,18 @@ ${ flowData.code }
 		}
 
 		return snippets.join( '\n' );
+
+	}
+
+	enableSubGroups() {
+
+		this.enableDirective( 'subgroups' );
+
+	}
+
+	enableSubgroupsF16() {
+
+		this.enableDirective( 'subgroups-f16' );
 
 	}
 
