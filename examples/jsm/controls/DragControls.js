@@ -1,7 +1,6 @@
 import {
 	EventDispatcher,
 	Matrix4,
-	MOUSE,
 	Plane,
 	Raycaster,
 	Vector2,
@@ -22,9 +21,6 @@ const _inverseMatrix = new Matrix4();
 const _up = new Vector3();
 const _right = new Vector3();
 
-const _mouseButtons = [ MOUSE.LEFT, MOUSE.RIGHT, MOUSE.MIDDLE ];
-const _mouseMoveButtons = [ 0, 1, 2, 4 ];
-
 class DragControls extends EventDispatcher {
 
 	constructor( _objects, _camera, _domElement ) {
@@ -41,7 +37,7 @@ class DragControls extends EventDispatcher {
 
 		this.rotateSpeed = 1;
 
-		//
+		this.mouseButtons = { LEFT: true, MIDDLE: true, RIGHT: true };
 
 		const scope = this;
 
@@ -93,7 +89,44 @@ class DragControls extends EventDispatcher {
 
 			if ( scope.enabled === false ) return;
 
-			if ( event.pointerType === 'mouse' && _mouseMoveButtons.includes( event.buttons ) === false ) return;
+			if ( event.pointerType === 'mouse' ) {
+
+				switch ( event.buttons ) {
+
+					case 1:
+
+						if ( scope.mouseButtons.LEFT !== true ) {
+
+							return;
+
+						}
+
+						break;
+					case 2:
+
+						if ( scope.mouseButtons.RIGHT !== true ) {
+
+							return;
+
+						}
+
+						break;
+					case 4:
+
+						if ( scope.mouseButtons.MIDDLE !== true ) {
+
+							return;
+
+						}
+
+						break;
+					default:
+
+						break;
+
+				}
+
+			}
 
 			updatePointer( event );
 
@@ -181,7 +214,44 @@ class DragControls extends EventDispatcher {
 
 			if ( scope.enabled === false ) return;
 
-			if ( event.pointerType === 'mouse' && _mouseButtons.includes( event.button ) === false ) return;
+			if ( event.pointerType === 'mouse' ) {
+
+				switch ( event.button ) {
+
+					case 0:
+
+						if ( scope.mouseButtons.LEFT !== true ) {
+
+							return;
+
+						}
+
+						break;
+					case 1:
+
+						if ( scope.mouseButtons.MIDDLE !== true ) {
+
+							return;
+
+						}
+
+						break;
+					case 2:
+
+						if ( scope.mouseButtons.RIGHT !== true ) {
+
+							return;
+
+						}
+
+						break;
+					default:
+
+						break;
+
+				}
+
+			}
 
 			updatePointer( event );
 
@@ -282,28 +352,6 @@ class DragControls extends EventDispatcher {
 		this.getObjects = getObjects;
 		this.getRaycaster = getRaycaster;
 		this.setObjects = setObjects;
-
-	}
-
-	get mouseButtons() {
-
-		return _mouseButtons;
-
-	}
-
-	set mouseButtons( arr ) {
-
-		_mouseButtons.length = 0;
-		arr.forEach( item => _mouseButtons.push( item ) );
-
-		_mouseMoveButtons.length = 0;
-		_mouseMoveButtons.push( 0 );
-
-		if ( _mouseButtons.includes( MOUSE.LEFT ) ) _mouseMoveButtons.push( 1 );
-
-		if ( _mouseButtons.includes( MOUSE.RIGHT ) ) _mouseMoveButtons.push( 2 );
-
-		if ( _mouseButtons.includes( MOUSE.MIDDLE ) ) _mouseMoveButtons.push( 4 );
 
 	}
 

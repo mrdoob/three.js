@@ -97,16 +97,26 @@
 
 		<h2>属性</h2>
 
-		<h3>[property:Array mouseButtons]</h3>
-		<p>
-			鼠标事件中允许响应的按键值数组。 
-			<br>
-			默认值为 [ THREE.MOUSE.LEFT, THREE.MOUSE.RIGHT, THREE.MOUSE.MIDDLE ]。
-		</p>
-
 		<h3>[property:Boolean enabled]</h3>
 		<p>
 			是否启用控制器。
+		</p>
+
+		<h3>[property:Object mouseButtons]</h3>
+		<p>
+			鼠标事件中允许响应的按键。 
+			<code>
+				controls.mouseButtons = {
+					LEFT: true,
+					MIDDLE: true,
+					RIGHT: true
+				}
+			</code>
+		</p>
+
+		<h3>[property:Boolean recursive]</h3>
+		<p>
+			可拖动对象的子对象是否可以独立于其父对象进行拖动。默认值为 `true`。
 		</p>
 
 		<h3>[property:Boolean transformGroup]</h3>
