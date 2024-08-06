@@ -20,7 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, pass, normalWorld, output, velocity, motionBlur, vec2, mrt, uniform } from 'three/tsl';
+			import { color, pass, normalWorld, output, ndcPosition, motionBlur, mrt, uniform } from 'three/tsl';
 
 			// import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -87,11 +87,6 @@
 
 				const intensityNode = uniform( 1 );
 
-				material.mrtNode = mrt( {
-					output: output,
-					velocity: velocity.mul( intensityNode )
-				} );
-
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
@@ -101,21 +96,22 @@
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				// postprocessing
+				// post processing
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
 				const scenePass = pass( scene, camera );
 				scenePass.setMRT( mrt( {
-					output: output,
-					velocity: vec2( 0.0 )
+					output,
+					ndcPosition
 				} ) );
-				scenePassColor = scenePass.getTextureNode( 'output' );
-				const scenePassVelocity = scenePass.getTextureNode( 'velocity' );
 
-				motionBlurPass = motionBlur( scenePassColor, scenePassVelocity );
+				scenePassColor = scenePass.getTextureNode();
 
-				postProcessing.outputNode = motionBlurPass;
+				const ndcPositionCurrent = scenePass.getTextureNode( 'ndcPosition' );
+				const ndcPositionPrevious = scenePass.getPreviousTextureNode( 'ndcPosition' );
+
+				postProcessing.outputNode = motionBlur( scenePassColor, ndcPositionCurrent, ndcPositionPrevious, intensityNode );
 
 				//
 
@@ -129,21 +125,6 @@
 
 				const gui = new GUI();
 				gui.title( 'Motion Blur Settings' );
-				gui.add( params, 'enabled' ).onChange( ( value ) => {
-			
-					if ( value === true ) {
-
-						postProcessing.outputNode = motionBlurPass;
-
-					} else {
-
-						postProcessing.outputNode = scenePassColor;
-
-					}
-
-					postProcessing.needsUpdate = true;
-
-				} );
 				gui.add( params, 'intensity' ).min( 0 ).max( 3 ).onChange( ( value ) => intensityNode.value = value );
 				gui.add( params, 'animated' );
 

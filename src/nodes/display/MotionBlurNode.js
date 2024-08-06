@@ -1,57 +1,29 @@
-import TempNode from '../core/TempNode.js';
-import { nodeObject, addNodeElement, tslFn, float, int } from '../shadernode/ShaderNode.js';
-import { loop } from '../utils/LoopNode.js';
+import { float, int, Fn } from '../shadernode/ShaderNode.js';
+import { Loop } from '../utils/LoopNode.js';
 import { uv } from '../accessors/UVNode.js';
+import { velocity } from '../accessors/VelocityNode.js';
 
-class MotionBlurNode extends TempNode {
+export const motionBlur = Fn( ( [ inputNode, ndcPositionCurrent, ndcPositionPrevious, intensity = 1 ] ) => {
 
-	constructor( inputNode, velocityNode ) {
+	const sampleColor = ( uv ) => inputNode.uv( uv );
+	const sampleVelocity = ( uv ) => velocity( ndcPositionCurrent.uv( uv ), ndcPositionPrevious.uv( uv ) ).mul( intensity ).rg;
 
-		super( 'vec4' );
+	const NUM_SAMPLES = int( 30 );
 
-		this.inputNode = inputNode;
-		this.velocityNode = velocityNode;
+	const uvs = uv();
 
-	}
+	const colorResult = sampleColor( uvs ).toVar();
+	const velocityResult = sampleVelocity( uvs ).toVar();
 
-	setup() {
+	Loop( { start: int( 1 ), end: NUM_SAMPLES, type: 'int', condition: '<=' }, ( { i } ) => {
 
-		const sampleColor = ( uv ) => this.inputNode.uv( uv );
-		const sampleVelocity = ( uv ) => this.velocityNode.uv( uv ).rg;
+		const offset = velocityResult.mul( float( i.sub( 1 ) ).div( float( NUM_SAMPLES ) ).sub( 0.5 ) );
+		colorResult.addAssign( sampleColor( uvs.add( offset ) ) );
 
-		const NUM_SAMPLES = int( 30 );
+	} );
 
-		const motionBlur = tslFn( () => {
+	colorResult.divAssign( float( NUM_SAMPLES ).add( 1 ) );
 
-			const uvs = uv();
+	return colorResult;
 
-			const color = sampleColor( uvs ).toVar();
-			const velocity = sampleVelocity( uvs ).toVar();
-
-			loop( { start: int( 1 ), end: NUM_SAMPLES, type: 'int', condition: '<=' }, ( { i } ) => {
-
-				const offset = velocity.mul( float( i.sub( 1 ) ).div( float( NUM_SAMPLES ) ).sub( 0.5 ) );
-				color.addAssign( sampleColor( uvs.add( offset ) ) );
-
-			} );
-
-			color.divAssign( float( NUM_SAMPLES ).add( 1 ) );
-
-			return color;
-
-		} );
-
-		const outputNode = motionBlur();
-
-		return outputNode;
-
-	}
-
-}
-
-export const motionBlur = ( node, velocity ) => nodeObject( new MotionBlurNode( nodeObject( node ), nodeObject( velocity ) ) );
-
-addNodeElement( 'motionBlur', motionBlur );
-
-export default MotionBlurNode;
-
+} );
