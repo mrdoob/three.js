@@ -347,6 +347,7 @@
 		"webgpu_materials",
 		"webgpu_materials_basic",
 		"webgpu_materials_displacementmap",
+		"webgpu_materials_envmaps",
 		"webgpu_materials_lightmap",
 		"webgpu_materials_matcap",
 		"webgpu_materials_sss",
