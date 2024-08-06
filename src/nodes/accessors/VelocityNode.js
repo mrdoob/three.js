@@ -3,7 +3,7 @@ import { sub } from '../math/OperatorNode.js';
 import { modelViewMatrix, modelWorldMatrix } from './ModelNode.js';
 import { positionLocal } from './PositionNode.js';
 
-export const velocity = Fn( ( [ clipPositionCurrent, clipPositionPrevious ] ) => {
+export const velocity = /*#__PURE__*/ Fn( ( [ clipPositionCurrent, clipPositionPrevious ] ) => {
 
 	const ndcPositionCurrent = clipPositionCurrent.xy.div( clipPositionCurrent.w );
 	const ndcPositionPrevious = clipPositionPrevious.xy.div( clipPositionPrevious.w );
@@ -12,4 +12,4 @@ export const velocity = Fn( ( [ clipPositionCurrent, clipPositionPrevious ] ) =>
 
 } );
 
-export const ndcPosition = modelViewMatrix.mul( modelWorldMatrix ).mul( positionLocal ).toVar();
+export const ndcPosition = /*#__PURE__*/ modelViewMatrix.mul( modelWorldMatrix ).mul( positionLocal ).varying();

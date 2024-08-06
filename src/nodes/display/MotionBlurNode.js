@@ -3,7 +3,7 @@ import { Loop } from '../utils/LoopNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { velocity } from '../accessors/VelocityNode.js';
 
-export const motionBlur = Fn( ( [ inputNode, ndcPositionCurrent, ndcPositionPrevious, intensity = 1 ] ) => {
+export const motionBlur = /*#__PURE__*/ Fn( ( [ inputNode, ndcPositionCurrent, ndcPositionPrevious, intensity = 1 ] ) => {
 
 	const sampleColor = ( uv ) => inputNode.uv( uv );
 	const sampleVelocity = ( uv ) => velocity( ndcPositionCurrent.uv( uv ), ndcPositionPrevious.uv( uv ) ).mul( intensity ).rg;

@@ -10,8 +10,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three": "../src/Three.WebGPU.js",
+					"three/tsl": "../src/Three.WebGPU.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -20,24 +20,18 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, pass, normalWorld, output, ndcPosition, motionBlur, mrt, uniform } from 'three/tsl';
+			import { color, pass, normalWorld, output, ndcPosition, /*velocity,*/ motionBlur, mrt, uniform } from 'three/tsl';
 
-			// import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			//import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Timer } from 'three/addons/misc/Timer.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			const params = {
-				enabled: true,
-				intensity: 1,
-				animated: true
-			};
-
 			let camera, renderer, postProcessing;
-			let scenePassColor, motionBlurPass;
+			let scenePassColor;
 			let timer, mesh;
-			// let mixer;
+			//let mixer;
 
 			init();
 
@@ -60,24 +54,19 @@
 
 				timer = new Timer();
 
-				// const loader = new GLTFLoader();
-				// loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
+				/*const loader = new GLTFLoader();
+				loader.load( 'models/gltf/Michelle.glb', function ( gltf ) {
 
-				// 	const object = gltf.scene;
-				// 	mixer = new THREE.AnimationMixer( object );
+					const object = gltf.scene;
 
-				// 	const material = object.children[ 0 ].children[ 0 ].material;
-				// 	material.mrtNode = mrt( {
-				// 		output: output,
-				// 		velocity: velocity
-				// 	} );
+					mixer = new THREE.AnimationMixer( object );
 
-				// 	const action = mixer.clipAction( gltf.animations[ 0 ] );
-				// 	action.play();
+					const action = mixer.clipAction( gltf.animations[ 0 ] );
+					action.play();
 
-				// 	scene.add( object );
+					scene.add( object );
 
-				// } );
+				} );*/
 
 				const texture = new THREE.TextureLoader().load( 'textures/crate.gif' );
 				texture.colorSpace = THREE.SRGBColorSpace;
@@ -112,6 +101,7 @@
 				const ndcPositionPrevious = scenePass.getPreviousTextureNode( 'ndcPosition' );
 
 				postProcessing.outputNode = motionBlur( scenePassColor, ndcPositionCurrent, ndcPositionPrevious, intensityNode );
+				//postProcessing.outputNode = velocity( ndcPositionCurrent, ndcPositionPrevious );
 
 				//
 
@@ -125,8 +115,7 @@
 
 				const gui = new GUI();
 				gui.title( 'Motion Blur Settings' );
-				gui.add( params, 'intensity' ).min( 0 ).max( 3 ).onChange( ( value ) => intensityNode.value = value );
-				gui.add( params, 'animated' );
+				gui.add( intensityNode, 'value', 0, 3 ).name( 'intensity' );
 
 			}
 
@@ -143,13 +132,9 @@
 
 				timer.update();
 
-				if ( params.animated ) {
+				mesh.rotation.y = timer.getElapsed() * 2;
 
-					mesh.rotation.y = timer.getElapsed() * 2;
-
-					//if ( mixer ) mixer.update( timer.getDelta() );
-
-				}
+				//if ( mixer ) mixer.update( timer.getDelta() );
 
 				postProcessing.render();
 
