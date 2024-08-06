@@ -4,7 +4,7 @@ import { cameraViewMatrix } from './CameraNode.js';
 import { modelViewMatrix } from './ModelNode.js';
 import { Fn, vec4 } from '../shadernode/ShaderNode.js';
 
-export const tangentGeometry = /*#__PURE__*/ Fn( ( stack, builder ) => {
+export const tangentGeometry = /*#__PURE__*/ Fn( ( builder ) => {
 
 	if ( builder.geometry.hasAttribute( 'tangent' ) === false ) {
 

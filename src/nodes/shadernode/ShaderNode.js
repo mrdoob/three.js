@@ -300,7 +300,7 @@ class ShaderCallNodeInternal extends Node {
 		}
 
 		const jsFunc = shaderNode.jsFunc;
-		const outputNode = inputNodes !== null ? jsFunc( inputNodes, builder.stack, builder ) : jsFunc( builder.stack, builder );
+		const outputNode = inputNodes !== null ? jsFunc( inputNodes, builder ) : jsFunc( builder );
 
 		return nodeObject( outputNode );
 
