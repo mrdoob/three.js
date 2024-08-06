@@ -80,7 +80,7 @@
 				const currentTexture = scenePass.getTextureNode();
 				const previousTexture = scenePass.getPreviousTextureNode();
 
-				const frameDiff = previousTexture.sub( currentTexture );
+				const frameDiff = previousTexture.sub( currentTexture ).abs();
 
 				const saturationAmount = luminance( frameDiff ).mul( 1000 ).clamp( 0, 3 );
 
