@@ -292,7 +292,7 @@ class DragControls extends EventDispatcher {
 		function onPointerCancel() {
 
 			if ( scope.enabled === false ) return;
-			
+
 			state = STATE.NONE;
 
 			if ( _selected ) {
