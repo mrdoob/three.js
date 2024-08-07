@@ -6,17 +6,17 @@ import { transformedNormalView } from '../accessors/NormalNode.js';
 import { materialSpecularStrength } from '../accessors/MaterialNode.js';
 import { shininess, specularColor } from '../core/PropertyNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
-import { tslFn, float } from '../shadernode/ShaderNode.js';
+import { Fn, float } from '../shadernode/ShaderNode.js';
 
 const G_BlinnPhong_Implicit = () => float( 0.25 );
 
-const D_BlinnPhong = tslFn( ( { dotNH } ) => {
+const D_BlinnPhong = Fn( ( { dotNH } ) => {
 
 	return shininess.mul( float( 0.5 ) ).add( 1.0 ).mul( float( 1 / Math.PI ) ).mul( dotNH.pow( shininess ) );
 
 } );
 
-const BRDF_BlinnPhong = tslFn( ( { lightDirection } ) => {
+const BRDF_BlinnPhong = Fn( ( { lightDirection } ) => {
 
 	const halfDir = lightDirection.add( positionViewDirection ).normalize();
 

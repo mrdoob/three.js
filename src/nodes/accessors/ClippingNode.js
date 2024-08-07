@@ -3,8 +3,8 @@ import Node from '../core/Node.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 import { positionView } from './PositionNode.js';
 import { diffuseColor, property } from '../core/PropertyNode.js';
-import { tslFn } from '../shadernode/ShaderNode.js';
-import { loop } from '../utils/LoopNode.js';
+import { Fn } from '../shadernode/ShaderNode.js';
+import { Loop } from '../utils/LoopNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { uniformArray } from './UniformArrayNode.js';
 
@@ -42,7 +42,7 @@ class ClippingNode extends Node {
 
 	setupAlphaToCoverage( planes, numClippingPlanes, numUnionClippingPlanes ) {
 
-		return tslFn( () => {
+		return Fn( () => {
 
 			const clippingPlanes = uniformArray( planes );
 
@@ -55,7 +55,7 @@ class ClippingNode extends Node {
 
 			let plane;
 
-			loop( numUnionClippingPlanes, ( { i } ) => {
+			Loop( numUnionClippingPlanes, ( { i } ) => {
 
 				plane = clippingPlanes.element( i );
 
@@ -74,7 +74,7 @@ class ClippingNode extends Node {
 
 				unionClipOpacity.assign( 1 );
 
-				loop( { start: numUnionClippingPlanes, end: numClippingPlanes }, ( { i } ) => {
+				Loop( { start: numUnionClippingPlanes, end: numClippingPlanes }, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 
@@ -99,13 +99,13 @@ class ClippingNode extends Node {
 
 	setupDefault( planes, numClippingPlanes, numUnionClippingPlanes ) {
 
-		return tslFn( () => {
+		return Fn( () => {
 
 			const clippingPlanes = uniformArray( planes );
 
 			let plane;
 
-			loop( numUnionClippingPlanes, ( { i } ) => {
+			Loop( numUnionClippingPlanes, ( { i } ) => {
 
 				plane = clippingPlanes.element( i );
 				positionView.dot( plane.xyz ).greaterThan( plane.w ).discard();
@@ -118,7 +118,7 @@ class ClippingNode extends Node {
 
 				clipped.assign( true );
 
-				loop( { start: numUnionClippingPlanes, end: numClippingPlanes }, ( { i } ) => {
+				Loop( { start: numUnionClippingPlanes, end: numClippingPlanes }, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 					clipped.assign( positionView.dot( plane.xyz ).greaterThan( plane.w ).and( clipped ) );

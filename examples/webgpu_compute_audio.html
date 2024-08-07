@@ -29,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, uniform, storage, storageObject, instanceIndex, float, texture, viewportTopLeft, color } from 'three/tsl';
+			import { Fn, uniform, storage, storageObject, instanceIndex, float, texture, viewportTopLeft, color } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -112,7 +112,7 @@
 
 				// compute (shader-node)
 
-				const computeShaderFn = tslFn( () => {
+				const computeShaderFn = Fn( () => {
 
 					const index = float( instanceIndex );
 

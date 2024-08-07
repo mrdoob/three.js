@@ -322,9 +322,9 @@ class TSLEncoder {
 		const leftStr = this.emitExpression( node.left );
 		const rightStr = this.emitExpression( node.right );
 
-		this.addImport( 'cond' );
+		this.addImport( 'select' );
 
-		return `cond( ${ condStr }, ${ leftStr }, ${ rightStr } )`;
+		return `select( ${ condStr }, ${ leftStr }, ${ rightStr } )`;
 
 	}
 
@@ -349,7 +349,7 @@ ${ this.tab }} )`;
 
 				const elseCondStr = this.emitExpression( current.elseConditional.cond );
 
-				ifStr += `.elseif( ${ elseCondStr }, () => {
+				ifStr += `.ElseIf( ${ elseCondStr }, () => {
 
 ${ elseBodyStr }
 
@@ -357,7 +357,7 @@ ${ this.tab }} )`;
 
 			} else {
 
-				ifStr += `.else( () => {
+				ifStr += `.Else( () => {
 
 ${ elseBodyStr }
 
@@ -391,13 +391,13 @@ ${ this.tab }} )`;
 		const conditionParam = condition !== '<' ? `, condition: '${ condition }'` : '';
 		const updateParam = update !== '++' ? `, update: '${ update }'` : '';
 
-		let loopStr = `loop( { start: ${ start }, end: ${ end + nameParam + typeParam + conditionParam + updateParam } }, ( { ${ name } } ) => {\n\n`;
+		let loopStr = `Loop( { start: ${ start }, end: ${ end + nameParam + typeParam + conditionParam + updateParam } }, ( { ${ name } } ) => {\n\n`;
 
 		loopStr += this.emitBody( node.body ) + '\n\n';
 
 		loopStr += this.tab + '} )';
 
-		this.imports.add( 'loop' );
+		this.imports.add( 'Loop' );
 
 		return loopStr;
 
@@ -586,7 +586,7 @@ ${ this.tab }} )`;
 
 		const prefix = this.iife === false ? 'export ' : '';
 
-		let funcStr = `${ prefix }const ${ fnName } = /*#__PURE__*/ tslFn( (${ paramsStr }) => {
+		let funcStr = `${ prefix }const ${ fnName } = /*#__PURE__*/ Fn( (${ paramsStr }) => {
 
 ${ bodyStr }
 
@@ -608,7 +608,7 @@ ${ this.tab }} )`;
 
 		funcStr += ';\n';
 
-		this.imports.add( 'tslFn' );
+		this.imports.add( 'Fn' );
 
 		this.global.add( node.name );
 

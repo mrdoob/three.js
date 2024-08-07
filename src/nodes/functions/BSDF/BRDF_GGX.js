@@ -6,10 +6,10 @@ import D_GGX_Anisotropic from './D_GGX_Anisotropic.js';
 import { transformedNormalView } from '../../accessors/NormalNode.js';
 import { positionViewDirection } from '../../accessors/PositionNode.js';
 import { iridescence, alphaT, anisotropyT, anisotropyB } from '../../core/PropertyNode.js';
-import { tslFn, defined } from '../../shadernode/ShaderNode.js';
+import { Fn, defined } from '../../shadernode/ShaderNode.js';
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-const BRDF_GGX = tslFn( ( inputs ) => {
+const BRDF_GGX = Fn( ( inputs ) => {
 
 	const { lightDirection, f0, f90, roughness, f, USE_IRIDESCENCE, USE_ANISOTROPY } = inputs;
 

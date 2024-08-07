@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, tslFn, nodeObject, float, int, vec4, If } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeObject, float, int, vec4, If } from '../shadernode/ShaderNode.js';
 import { clamp, mix } from '../math/MathNode.js';
 import { sub } from '../math/OperatorNode.js';
 
@@ -35,7 +35,7 @@ class TransitionNode extends TempNode {
 
 		};
 
-		const transition = tslFn( () => {
+		const transition = Fn( () => {
 
 			const texelOne = sampleTexture( textureNodeA );
 			const texelTwo = sampleTexture( textureNodeB );
@@ -50,7 +50,7 @@ class TransitionNode extends TempNode {
 
 				color.assign( mix( texelOne, texelTwo, mixf ) );
 
-			} ).else( () => {
+			} ).Else( () => {
 
 				color.assign( mix( texelTwo, texelOne, mixRatioNode ) );
 
