@@ -94,7 +94,7 @@ class DragControls extends EventDispatcher {
 
 		}
 
-		function isNullish() {
+		function isStateInvalid() {
 
 			return ( state === STATE.DRAG || state === STATE.ROTATE ) === false;
 
@@ -103,7 +103,6 @@ class DragControls extends EventDispatcher {
 		function onPointerMove( event ) {
 
 			if ( scope.enabled === false ) return;
-			if ( isNullish() ) return;
 
 			updatePointer( event );
 
@@ -238,7 +237,7 @@ class DragControls extends EventDispatcher {
 
 			}
 
-			if ( isNullish() ) return;
+			if ( isStateInvalid() ) return;
 
 			updatePointer( event );
 
@@ -293,6 +292,8 @@ class DragControls extends EventDispatcher {
 		function onPointerCancel() {
 
 			if ( scope.enabled === false ) return;
+			
+			state = STATE.NONE;
 
 			if ( _selected ) {
 
