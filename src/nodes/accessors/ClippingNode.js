@@ -53,11 +53,11 @@ class ClippingNode extends Node {
 
 			if ( numUnionPlanes > 0 ) {
 
-				const clippingPlanes = uniforms( unionPlanes );
+				const clippingPlanes = uniformArray( unionPlanes );
 
 				let plane;
 
-				loop( numUnionPlanes, ( { i } ) => {
+				Loop( numUnionPlanes, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 
@@ -76,14 +76,14 @@ class ClippingNode extends Node {
 
 			if ( numIntersectionPlanes > 0 ) {
 
-				const clippingPlanes = uniforms( intersectionPlanes );
+				const clippingPlanes = uniformArray( intersectionPlanes );
 				const unionClipOpacity = property( 'float', 'unionclipOpacity' );
 
 				let plane;
 
 				unionClipOpacity.assign( 1 );
 
-				loop( numIntersectionPlanes, ( { i } ) => {
+				Loop( numIntersectionPlanes, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 
@@ -114,11 +114,11 @@ class ClippingNode extends Node {
 
 			if ( numUnionPlanes > 0 ) {
 
-				const clippingPlanes = uniforms( unionPlanes );
+				const clippingPlanes = uniformArray( unionPlanes );
 
 				let plane;
 
-				loop( numUnionPlanes, ( { i } ) => {
+				Loop( numUnionPlanes, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 					positionView.dot( plane.xyz ).greaterThan( plane.w ).discard();
@@ -131,14 +131,14 @@ class ClippingNode extends Node {
 
 			if ( numIntersectionPlanes > 0 ) {
 
-				const clippingPlanes = uniforms( intersectionPlanes );
+				const clippingPlanes = uniformArray( intersectionPlanes );
 				const clipped = property( 'bool', 'clipped' );
 
 				let plane;
 
 				clipped.assign( true );
 
-				loop( numIntersectionPlanes, ( { i } ) => {
+				Loop( numIntersectionPlanes, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 					clipped.assign( positionView.dot( plane.xyz ).greaterThan( plane.w ).and( clipped ) );
