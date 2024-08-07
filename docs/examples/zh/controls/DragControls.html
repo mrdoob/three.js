@@ -104,12 +104,12 @@
 
 		<h3>[property:Object mouseButtons]</h3>
 		<p>
-			鼠标事件中允许响应的按键。 
+			该对象包含由控件所使用的鼠标操作的引用。 
 			<code>
 				controls.mouseButtons = {
-					LEFT: true,
-					MIDDLE: true,
-					RIGHT: true
+					LEFT: THREE.MOUSE.DRAG,
+					MIDDLE: null,
+					RIGHT: THREE.MOUSE.ROTATE
 				}
 			</code>
 		</p>
@@ -126,7 +126,12 @@
 
 		<h3>[property:String mode]</h3>
 		<p>
-			当前的变换模式，该值可以是 `translate` 或 `rotate`。 默认值为 `translate`。
+			在 `pen` 或 `touch` 事件中当前的变换模式，该值可以是 `translate` 或 `rotate`。 默认值为 `translate`。
+		</p>
+
+		<h3>[property:Float rotateSpeed]</h3>
+		<p>
+			执行 `rotate` 时的旋转速度。该值越大旋转速度越快。 默认值为 `1`。
 		</p>
 
 		<h2>方法</h2>

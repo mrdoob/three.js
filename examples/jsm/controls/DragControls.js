@@ -1,6 +1,7 @@
 import {
 	EventDispatcher,
 	Matrix4,
+	MOUSE,
 	Plane,
 	Raycaster,
 	Vector2,
@@ -37,7 +38,15 @@ class DragControls extends EventDispatcher {
 
 		this.rotateSpeed = 1;
 
-		this.mouseButtons = { LEFT: true, MIDDLE: true, RIGHT: true };
+		this.mouseButtons = { LEFT: MOUSE.DRAG, MIDDLE: null, RIGHT: MOUSE.ROTATE };
+
+		const STATE = {
+			NONE: null,
+			DRAG: MOUSE.DRAG,
+			ROTATE: MOUSE.ROTATE,
+		};
+
+		let state = STATE.NONE;
 
 		const scope = this;
 
@@ -85,48 +94,16 @@ class DragControls extends EventDispatcher {
 
 		}
 
+		function isNonelike() {
+
+			return ( state === STATE.DRAG || state === STATE.ROTATE ) === false;
+
+		}
+
 		function onPointerMove( event ) {
 
 			if ( scope.enabled === false ) return;
-
-			if ( event.pointerType === 'mouse' ) {
-
-				switch ( event.buttons ) {
-
-					case 1:
-
-						if ( scope.mouseButtons.LEFT !== true ) {
-
-							return;
-
-						}
-
-						break;
-					case 2:
-
-						if ( scope.mouseButtons.RIGHT !== true ) {
-
-							return;
-
-						}
-
-						break;
-					case 4:
-
-						if ( scope.mouseButtons.MIDDLE !== true ) {
-
-							return;
-
-						}
-
-						break;
-					default:
-
-						break;
-
-				}
-
-			}
+			if ( isNonelike() ) return;
 
 			updatePointer( event );
 
@@ -134,7 +111,7 @@ class DragControls extends EventDispatcher {
 
 			if ( _selected ) {
 
-				if ( scope.mode === 'translate' ) {
+				if ( state === STATE.DRAG ) {
 
 					if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
@@ -142,7 +119,7 @@ class DragControls extends EventDispatcher {
 
 					}
 
-				} else if ( scope.mode === 'rotate' ) {
+				} else if ( state === STATE.ROTATE ) {
 
 					_diff.subVectors( _pointer, _previousPointer ).multiplyScalar( scope.rotateSpeed );
 					_selected.rotateOnWorldAxis( _up, _diff.x );
@@ -220,38 +197,48 @@ class DragControls extends EventDispatcher {
 
 					case 0:
 
-						if ( scope.mouseButtons.LEFT !== true ) {
-
-							return;
-
-						}
-
+						state = scope.mouseButtons.LEFT;
 						break;
+
 					case 1:
 
-						if ( scope.mouseButtons.MIDDLE !== true ) {
-
-							return;
-
-						}
-
+						state = scope.mouseButtons.MIDDLE;
 						break;
+
 					case 2:
 
-						if ( scope.mouseButtons.RIGHT !== true ) {
-
-							return;
-
-						}
-
+						state = scope.mouseButtons.RIGHT;
 						break;
+
 					default:
 
+						state = STATE.NONE;
+
+				}
+
+			} else {
+
+				switch ( scope.mode ) {
+
+					case 'translate':
+
+						state = STATE.DRAG;
 						break;
+
+					case 'rotate':
+
+						state = STATE.ROTATE;
+						break;
+
+					default:
+
+						state = STATE.NONE;
 
 				}
 
 			}
+
+			if ( isNonelike() ) return;
 
 			updatePointer( event );
 
@@ -278,12 +265,12 @@ class DragControls extends EventDispatcher {
 
 				if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-					if ( scope.mode === 'translate' ) {
+					if ( state === STATE.DRAG ) {
 
 						_inverseMatrix.copy( _selected.parent.matrixWorld ).invert();
 						_offset.copy( _intersection ).sub( _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
-					} else if ( scope.mode === 'rotate' ) {
+					} else if ( state === STATE.ROTATE ) {
 
 						// the controls only support Y+ up
 						_up.set( 0, 1, 0 ).applyQuaternion( _camera.quaternion ).normalize();

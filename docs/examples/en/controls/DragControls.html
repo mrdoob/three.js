@@ -102,12 +102,12 @@
 
 		<h3>[property:Object mouseButtons]</h3>
 		<p>
-			This object contains references to the mouse button used by the controls. 
+			This object contains references to the mouse actions used by the controls.
 			<code>
 				controls.mouseButtons = {
-					LEFT: true,
-					MIDDLE: true,
-					RIGHT: true
+					LEFT: THREE.MOUSE.DRAG,
+					MIDDLE: null,
+					RIGHT: THREE.MOUSE.ROTATE
 				}
 			</code>
 		</p>
@@ -125,7 +125,7 @@
 
 		<h3>[property:String mode]</h3>
 		<p>
-			The current transformation mode. Possible values are `translate`, and `rotate`. Default is `translate`.
+			The current transformation mode for pen and touch events. Possible values are `translate`, and `rotate`. Default is `translate`.
 		</p>
 
 		<h3>[property:Float rotateSpeed]</h3>
