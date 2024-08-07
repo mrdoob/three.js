@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - gpgpu - flocking</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #fff;
+				color: #444;
+			}
+			a {
+				color:#08f;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl gpgpu birds<br/>
+			Move mouse to disturb birds.
+		</div>
+
+		<script type="x-shader/x-vertex" id="birdVS">
+
+			attribute vec2 reference;
+			attribute float birdVertex;
+
+			attribute vec3 birdColor;
+
+			uniform sampler2D texturePosition;
+			uniform sampler2D textureVelocity;
+
+			varying vec4 vColor;
+			varying float z;
+
+			uniform float time;
+
+			void main() {
+
+				vec4 tmpPos = texture2D( texturePosition, reference );
+				vec3 pos = tmpPos.xyz;
+				vec3 velocity = normalize(texture2D( textureVelocity, reference ).xyz);
+
+				vec3 newPosition = position;
+
+				if ( birdVertex == 4.0 || birdVertex == 7.0 ) {
+					// flap wings
+					newPosition.y = sin( tmpPos.w ) * 5.;
+				}
+
+				newPosition = mat3( modelMatrix ) * newPosition;
+
+
+				velocity.z *= -1.;
+				float xz = length( velocity.xz );
+				float xyz = 1.;
+				float x = sqrt( 1. - velocity.y * velocity.y );
+
+				float cosry = velocity.x / xz;
+				float sinry = velocity.z / xz;
+
+				float cosrz = x / xyz;
+				float sinrz = velocity.y / xyz;
+
+				mat3 maty =  mat3(
+					cosry, 0, -sinry,
+					0    , 1, 0     ,
+					sinry, 0, cosry
+
+				);
+
+				mat3 matz =  mat3(
+					cosrz , sinrz, 0,
+					-sinrz, cosrz, 0,
+					0     , 0    , 1
+				);
+
+				newPosition =  maty * matz * newPosition;
+				newPosition += pos;
+
+				z = newPosition.z;
+
+				vColor = vec4( birdColor, 1.0 );
+				gl_Position = projectionMatrix *  viewMatrix  * vec4( newPosition, 1.0 );
+			}
+
+		</script>
+
+		<!-- bird geometry shader -->
+		<script type="x-shader/x-fragment" id="birdFS">
+
+			varying vec4 vColor;
+			varying float z;
+
+			uniform vec3 color;
+
+			void main() {
+				// Fake colors for now
+				float z2 = 0.2 + ( 1000. - z ) / 1000. * vColor.x;
+				gl_FragColor = vec4( z2, z2, z2, 1. );
+
+			}
+
+		</script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { uniform, vec2, vec3, vec4, float, storage, Fn, If, cos, Loop, Continue, normalize, instanceIndex } from 'three/tsl';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
+			const BIRDS = 1024;
+
+			const SPEED_LIMIT = 9.0;
+			const UPPER_BOUNDS = BOUNDS;
+			const LOWER_BOUNDS = - UPPER_BOUNDS;
+
+			// Custom Geometry - using 3 triangles each. No UVs, no normals currently.
+			class BirdGeometry extends THREE.BufferGeometry {
+
+				constructor() {
+
+					super();
+
+					const trianglesPerBird = 3;
+					const triangles = BIRDS * trianglesPerBird;
+					const points = triangles * 3;
+
+					const vertices = new THREE.StorageBufferAttribute( new Float32Array( points * 3 ), 3 );
+					const birdColors = new THREE.StorageBufferAttribute( new Float32Array( points * 3 ), 3 );
+					const references = new THREE.StorageBufferAttribute( new Float32Array( points ), 1 );
+					const birdVertex = new THREE.StorageBufferAttribute( new Float32Array( points ), 1 );
+
+					this.setAttribute( 'position', vertices );
+					this.setAttribute( 'birdColor', birdColors );
+					this.setAttribute( 'reference', references );
+					this.setAttribute( 'birdVertex', birdVertex );
+
+					let v = 0;
+
+					function verts_push() {
+
+						for ( let i = 0; i < arguments.length; i ++ ) {
+
+							vertices.array[ v ++ ] = arguments[ i ];
+
+						}
+
+					}
+
+					const wingsSpan = 20;
+
+					for ( let f = 0; f < BIRDS; f ++ ) {
+
+						// Body
+						verts_push(
+							0, - 0, - 20,
+							0, 4, - 20,
+							0, 0, 30
+						);
+
+						// Wings
+						verts_push(
+							0, 0, - 15,
+							- wingsSpan, 0, 0,
+							0, 0, 15
+						);
+
+						verts_push(
+							0, 0, 15,
+							wingsSpan, 0, 0,
+							0, 0, - 15
+						);
+
+					}
+
+					for ( let v = 0; v < triangles * 3; v ++ ) {
+
+						const triangleIndex = ~ ~ ( v / 3 );
+						const birdIndex = ~ ~ ( triangleIndex / trianglesPerBird );
+
+						const c = new THREE.Color(
+							0x666666 +
+							~ ~ ( v / 9 ) / BIRDS * 0x666666
+						);
+
+						birdColors.array[ v * 3 + 0 ] = c.r;
+						birdColors.array[ v * 3 + 1 ] = c.g;
+						birdColors.array[ v * 3 + 2 ] = c.b;
+
+						references.array[ v ] = birdIndex;
+
+						birdVertex.array[ v ] = v % 9;
+
+					}
+
+					this.scale( 0.2, 0.2, 0.2 );
+
+				}
+
+			}
+
+			//
+
+			let container, stats;
+			let camera, scene, renderer;
+			let mouseX = 0, mouseY = 0;
+
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
+
+			const BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
+
+			let last = performance.now();
+
+			let computeVelocity;
+			let computePosition;
+			let effectController;
+
+			init();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
+				camera.position.z = 350;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
+				scene.fog = new THREE.Fog( 0xffffff, 100, 1000 );
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				container.appendChild( renderer.domElement );
+
+				const positionArray = new Float32Array( BIRDS * 3 );
+				const velocityArray = new Float32Array( BIRDS * 3 );
+
+				for ( let i = 0; i < BIRDS; i ++ ) {
+
+					const posX = Math.random() * BOUNDS - BOUNDS_HALF;
+					const posY = Math.random() * BOUNDS - BOUNDS_HALF;
+					const posZ = Math.random() * BOUNDS - BOUNDS_HALF;
+
+					const velX = Math.random() - 0.5;
+					const velY = Math.random() - 0.5;
+					const velZ = Math.random() - 0.5;
+
+					positionArray[ i + 0 ] = posX;
+					positionArray[ i + 1 ] = posY;
+					positionArray[ i + 2 ] = posZ;
+
+					velocityArray[ i + 0 ] = velX;
+					velocityArray[ i + 1 ] = velY;
+					velocityArray[ i + 2 ] = velZ;
+
+				}
+
+				// Create compute buffer attributes
+				const positionBufferAttribute = new THREE.StorageBufferAttribute( positionArray, 'vec3' );
+				const velocityBufferAttribute = new THREE.StorageBufferAttribute( velocityArray, 'vec3' );
+
+				// Create compute storage buffers
+				const positionStorage = storage( positionBufferAttribute, 'vec3', BIRDS );
+				const velocityStorage = storage( velocityBufferAttribute, 'vec3', BIRDS );
+
+				// Uniforms
+				effectController = {
+					separation: uniform( 20.0 ),
+					alignment: uniform( 20.0 ),
+					cohesion: uniform( 20.0 ),
+					freedom: uniform( 0.75 ),
+					now: uniform( 0.0 ),
+					deltaTime: uniform( 0.0 ),
+					predator: uniform( new THREE.Vector3() )
+				};
+
+
+				// TODO: Change to InstancedMesh
+				const birdGeometry = new BirdGeometry();
+				const birdMaterial = new THREE.MeshBasicNodeMaterial();
+				birdMaterial.fragmentNode = vec4( 1.0, 0, 1.0, 1.0 );
+				//. side =THREE.DOUBLESIDE
+				const birdMesh = new THREE.Mesh( birdGeometry, birdMaterial );
+				birdMesh.rotation.y = Math.PI / 2;
+				birdMesh.matrixAutoUpdate = false;
+				birdMesh.updateMatrix();
+
+				// Define GPU Compute shaders
+				// Shaders are identical to their GLSL counterparts outside of texture destructuring.
+
+				computeVelocity = Fn( () => {
+			
+					// Define consts
+					const PI = float( 3.141592653589793 );
+					const PI_2 = PI.mul( 2.0 );
+					const limit = float( SPEED_LIMIT );
+
+					// Destructure uniforms
+					const { alignment, separation, cohesion, predator, now, deltaTime } = effectController;
+
+					const zoneRadius = separation.add( alignment ).add( cohesion );
+					const separationThresh = separation.div( zoneRadius );
+					const alignmentThresh = ( separation.add( alignment ) ).div( zoneRadius );
+					const zoneRadiusSq = zoneRadius.mul( zoneRadius );
+
+					const position = positionStorage.element( instanceIndex );
+					const velocity = velocityStorage.element( instanceIndex );
+
+					const dirToPredator = predator.mul( UPPER_BOUNDS ).sub( position );
+					dirToPredator.z.assign( 0.0 );
+					const distToPredator = length( dirToPredator );
+					const distToPreadatorSq = distToPredator.mul( distToPredator );
+
+					const preyRadius = float( 150.0 );
+					const preyRadiusSq = preyRadius.mul( preyRadius );
+
+					// Move birds away from predator if they are within the predator's kill zone
+					If( distToPredator.lessThan( preyRadius ), () => {
+			
+						// Scale bird velocity inversely with distance from prey radius center
+						const distanceCalc = distToPreadatorSq.div( preyRadiusSq ).oneMinus();
+						const velocityAdjust = distanceCalc.mul( deltaTime ).mul( 100.0 );
+						velocity.addAssign( normalize( dirToPredator ).mul( velocityAdjust ) );
+						limit.addAssign( 5.0 );
+
+					} );
+
+					// Attract flocks to center
+					const dirToCenter = position.sub( vec3( 0, 0, 0 ) );
+					const distToCenter = length( dirToCenter );
+
+					// Increase strength of attraction force in the y direction
+					dirToCenter.y.mulAssign( 2.5 );
+
+					// Apply velocity change
+					velocity.subAssign( normalize( distToCenter ).mul( deltaTime ).mul( 5.0 ) );
+
+					// TODO: Find a more sensible way to parallelize this calculation
+					Loop( { start: 0, end: BIRDS, name: 'birdIndex', condition: '<' }, ( { i } ) => {
+
+						const birdPosition = positionStorage.element( i );
+						const dirToBird = birdPosition.sub( position );
+						const distToBird = length( dirToBird );
+
+						// Don't apply any changes to velocity if the distance to this bird is negligable
+						If( distToBird.lessThan( 0.0001 ), () => {
+
+							Continue();
+
+						} );
+
+						const distToBirdSquared = distToBird.mul( distToBird );
+
+						// Don't apply any velocity changes if outside of the zone
+						If( distToBirdSquared.greaterThan( zoneRadiusSq ), () => {
+
+							Continue();
+
+						} );
+
+						const percent = distToBirdSquared.div( zoneRadiusSq );
+
+						If( percent.lessThan( separationThresh ), () => {
+
+							const velocityScale = ( separationThresh.div( percent ).oneMinus() ).mul( deltaTime );
+							velocity.subAssign( normalize( dirToBird ).mul( velocityScale ) );
+
+
+						} ).ElseIf( percent.lessThan( alignmentThresh ), () => {
+
+							// Alignment - fly the same direction
+							const threshDelta = alignmentThresh.sub( separationThresh );
+							const adjustedPercent = ( percent.sub( separationThresh ) ).div( threshDelta );
+
+							const birdVelocity = velocityStorage.element( i );
+							const velocityScale = ( float( 0.5 ).sub( cos( adjustedPercent.mul( PI_2 ).mul( 0.5 ).add( 0.5 ) ) ) ).mul( deltaTime );
+							velocity.addAssign( normalize( birdVelocity ).mul( velocityScale ) );
+
+						} ).Else( () => {
+
+							const threshDelta = alignmentThresh.oneMinus();
+							const property = property( 'float', 'adjustedPercent' );
+							const adjustedPercent = threshDelta.equal( 0.0 ).cond( 1.0, ( percent.sub( alignmentThresh ) ).div( threshDelta ) );
+
+							const velocityScale = ( float( 0.5 ).sub( cos( adjustedPercent.mul( PI_2 ).mul( 0.5 ).add( 0.5 ) ) ) ).mul( deltaTime );
+							velocity.addAssign( normalize( dirToBird ).mul( velocityScale ) );
+
+						} );
+			
+					} );
+
+					If( length( velocity ).greaterThan( limit ), () => {
+
+						velocity.assign( normalize( velocity ).mul( limit ) );
+			
+					} );
+			
+
+				} )().compute( BIRDS );
+
+				computePosition = Fn( () => {
+
+					const { deltaTime } = effectController;
+					positionStorage.element( instanceIndex ).add( velocityStorage.element( instanceIndex ).mul( deltaTime ).mul( 15.0 ) );
+
+				} )().compute( BIRDS );
+
+				scene.add( birdMesh );
+			
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				container.style.touchAction = 'none';
+				container.addEventListener( 'pointermove', onPointerMove );
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				const gui = new GUI();
+
+
+				gui.add( effectController.separation, 'value', 0.0, 100.0, 1.0 ).name( 'Separation' );
+				gui.add( effectController.alignment, 'value', 0.0, 100, 0.001 ).name( 'Alignment ' );
+				gui.add( effectController.cohesion, 'value', 0.0, 100, 0.025 ).name( 'Cohesion' );
+				gui.close();
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onPointerMove( event ) {
+
+				if ( event.isPrimary === false ) return;
+
+				mouseX = event.clientX - windowHalfX;
+				mouseY = event.clientY - windowHalfY;
+
+			}
+
+			//
+
+			function animate() {
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				const now = performance.now();
+				const deltaTime = ( now - last ) / 1000;
+
+				if ( deltaTime > 1 ) deltaTime = 1; // safety cap on large deltas
+				last = now;
+
+				effectController.now.value = now;
+				effectController.deltaTime.value = deltaTime;
+				effectController.predator.value.set( 0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY, 0 );
+
+				mouseX = 10000;
+				mouseY = 10000;
+
+				renderer.compute( computeVelocity );
+				renderer.compute( computePosition );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
