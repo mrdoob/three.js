@@ -208,6 +208,18 @@ class DragControls extends Controls {
 
 	}
 
+	set mode( value ) {
+
+		console.warn( 'THREE.DragControls: The .mode property has been removed. Define the type of transformation via the .mouseButtons or .touches properties.' ); // @deprecated r169
+
+	}
+
+	get mode() {
+
+		console.warn( 'THREE.DragControls: The .mode property has been removed. Define the type of transformation via the .mouseButtons or .touches properties.' ); // @deprecated r169
+
+	}
+
 }
 
 function onPointerMove( event ) {
