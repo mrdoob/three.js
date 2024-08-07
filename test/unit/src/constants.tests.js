@@ -6,7 +6,7 @@ export default QUnit.module( 'Constants', () => {
 
 	QUnit.test( 'default values', ( assert ) => {
 
-		assert.propEqual( Constants.MOUSE, { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 }, 'MOUSE equal { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 }' );
+		assert.propEqual( Constants.MOUSE, { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2, DRAG: 3 }, 'MOUSE equal { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2, DRAG: 3 }' );
 		assert.propEqual( Constants.TOUCH, { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 }, 'TOUCH equal { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 }' );
 
 		assert.equal( Constants.CullFaceNone, 0, 'CullFaceNone equal 0' );
