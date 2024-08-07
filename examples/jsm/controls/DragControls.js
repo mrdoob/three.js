@@ -33,7 +33,7 @@ const STATE = {
 
 class DragControls extends Controls {
 
-	constructor( objects, camera, domElement ) {
+	constructor( objects, camera, domElement = null ) {
 
 		super( camera, domElement );
 
@@ -59,7 +59,11 @@ class DragControls extends Controls {
 
 		//
 
-		this.connect();
+		if ( domElement !== null ) {
+
+			this.connect();
+
+		}
 
 	}
 
