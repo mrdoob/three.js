@@ -98,7 +98,7 @@ class DragControls extends Controls {
 
 	}
 
-	updatePointer( event ) {
+	_updatePointer( event ) {
 
 		const rect = this.domElement.getBoundingClientRect();
 
@@ -107,7 +107,7 @@ class DragControls extends Controls {
 
 	}
 
-	updateState( event ) {
+	_updateState( event ) {
 
 		// determine action
 
@@ -230,7 +230,7 @@ function onPointerMove( event ) {
 
 	if ( this.enabled === false ) return;
 
-	this.updatePointer( event );
+	this._updatePointer( event );
 
 	raycaster.setFromCamera( _pointer, camera );
 
@@ -320,8 +320,8 @@ function onPointerDown( event ) {
 
 	if ( this.enabled === false ) return;
 
-	this.updatePointer( event );
-	this.updateState( event );
+	this._updatePointer( event );
+	this._updateState( event );
 
 	_intersections.length = 0;
 
