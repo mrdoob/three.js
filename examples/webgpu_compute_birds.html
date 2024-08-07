@@ -118,13 +118,27 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, vec2, vec3, vec4, float, storage, Fn, If, cos, Loop, Continue, normalize, instanceIndex } from 'three/tsl';
+			import { uniform, vec2, vec3, vec4, uint, property, float, storage, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			const BIRDS = 1024;
+			let container, stats;
+			let camera, scene, renderer;
+			let mouseX = 0, mouseY = 0;
 
+			let windowHalfX = window.innerWidth / 2;
+			let windowHalfY = window.innerHeight / 2;
+
+			const BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
+
+			let last = performance.now();
+
+			let computeVelocity;
+			let computePosition;
+			let effectController;
+
+			const BIRDS = 1024;
 			const SPEED_LIMIT = 9.0;
 			const UPPER_BOUNDS = BOUNDS;
 			const LOWER_BOUNDS = - UPPER_BOUNDS;
@@ -214,25 +228,6 @@
 
 			}
 
-			//
-
-			let container, stats;
-			let camera, scene, renderer;
-			let mouseX = 0, mouseY = 0;
-
-			let windowHalfX = window.innerWidth / 2;
-			let windowHalfY = window.innerHeight / 2;
-
-			const BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
-
-			let last = performance.now();
-
-			let computeVelocity;
-			let computePosition;
-			let effectController;
-
-			init();
-
 			function init() {
 
 				container = document.createElement( 'div' );
@@ -264,23 +259,23 @@
 					const velY = Math.random() - 0.5;
 					const velZ = Math.random() - 0.5;
 
-					positionArray[ i + 0 ] = posX;
-					positionArray[ i + 1 ] = posY;
-					positionArray[ i + 2 ] = posZ;
+					positionArray[ i * 3 + 0 ] = posX;
+					positionArray[ i * 3 + 1 ] = posY;
+					positionArray[ i * 3 + 2 ] = posZ;
 
-					velocityArray[ i + 0 ] = velX;
-					velocityArray[ i + 1 ] = velY;
-					velocityArray[ i + 2 ] = velZ;
+					velocityArray[ i * 3 + 0 ] = velX;
+					velocityArray[ i * 3 + 1 ] = velY;
+					velocityArray[ i * 3 + 2 ] = velZ;
 
 				}
 
 				// Create compute buffer attributes
-				const positionBufferAttribute = new THREE.StorageBufferAttribute( positionArray, 'vec3' );
-				const velocityBufferAttribute = new THREE.StorageBufferAttribute( velocityArray, 'vec3' );
+				const positionBufferAttribute = new THREE.StorageBufferAttribute( positionArray, 3 );
+				const velocityBufferAttribute = new THREE.StorageBufferAttribute( velocityArray, 3 );
 
 				// Create compute storage buffers
-				const positionStorage = storage( positionBufferAttribute, 'vec3', BIRDS );
-				const velocityStorage = storage( velocityBufferAttribute, 'vec3', BIRDS );
+				const positionStorage = storage( positionBufferAttribute, 'vec3', positionBufferAttribute.count );
+				const velocityStorage = storage( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count );
 
 				// Uniforms
 				effectController = {
@@ -312,10 +307,10 @@
 					// Define consts
 					const PI = float( 3.141592653589793 );
 					const PI_2 = PI.mul( 2.0 );
-					const limit = float( SPEED_LIMIT );
+					const limit = property( 'float', 'limit' ).assign( SPEED_LIMIT );
 
 					// Destructure uniforms
-					const { alignment, separation, cohesion, predator, now, deltaTime } = effectController;
+					const { alignment, separation, cohesion, predator, deltaTime } = effectController;
 
 					const zoneRadius = separation.add( alignment ).add( cohesion );
 					const separationThresh = separation.div( zoneRadius );
@@ -346,16 +341,15 @@
 
 					// Attract flocks to center
 					const dirToCenter = position.sub( vec3( 0, 0, 0 ) );
-					const distToCenter = length( dirToCenter );
 
 					// Increase strength of attraction force in the y direction
 					dirToCenter.y.mulAssign( 2.5 );
 
 					// Apply velocity change
-					velocity.subAssign( normalize( distToCenter ).mul( deltaTime ).mul( 5.0 ) );
+					velocity.subAssign( normalize( dirToCenter ).mul( deltaTime ).mul( 5.0 ) );
 
 					// TODO: Find a more sensible way to parallelize this calculation
-					Loop( { start: 0, end: BIRDS, name: 'birdIndex', condition: '<' }, ( { i } ) => {
+					Loop( { start: 0, end: BIRDS, type: 'uint', condition: '<' }, ( { i } ) => {
 
 						const birdPosition = positionStorage.element( i );
 						const dirToBird = birdPosition.sub( position );
@@ -398,8 +392,7 @@
 						} ).Else( () => {
 
 							const threshDelta = alignmentThresh.oneMinus();
-							const property = property( 'float', 'adjustedPercent' );
-							const adjustedPercent = threshDelta.equal( 0.0 ).cond( 1.0, ( percent.sub( alignmentThresh ) ).div( threshDelta ) );
+							const adjustedPercent = threshDelta.equal( 0.0 ).select( 1.0, ( percent.sub( alignmentThresh ) ).div( threshDelta ) );
 
 							const velocityScale = ( float( 0.5 ).sub( cos( adjustedPercent.mul( PI_2 ).mul( 0.5 ).add( 0.5 ) ) ) ).mul( deltaTime );
 							velocity.addAssign( normalize( dirToBird ).mul( velocityScale ) );
@@ -495,6 +488,8 @@
 				renderer.render( scene, camera );
 
 			}
+
+			init();
 
 		</script>
 	</body>
