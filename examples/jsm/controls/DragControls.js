@@ -94,7 +94,7 @@ class DragControls extends EventDispatcher {
 
 		}
 
-		function isNonelike() {
+		function isNullish() {
 
 			return ( state === STATE.DRAG || state === STATE.ROTATE ) === false;
 
@@ -103,7 +103,7 @@ class DragControls extends EventDispatcher {
 		function onPointerMove( event ) {
 
 			if ( scope.enabled === false ) return;
-			if ( isNonelike() ) return;
+			if ( isNullish() ) return;
 
 			updatePointer( event );
 
@@ -238,7 +238,7 @@ class DragControls extends EventDispatcher {
 
 			}
 
-			if ( isNonelike() ) return;
+			if ( isNullish() ) return;
 
 			updatePointer( event );
 
