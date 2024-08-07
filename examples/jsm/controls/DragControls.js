@@ -59,8 +59,6 @@ class DragControls extends Controls {
 
 		//
 
-		domElement.style.touchAction = 'none'; // disable touch scroll
-
 		this.connect();
 
 	}
@@ -73,6 +71,8 @@ class DragControls extends Controls {
 		this.domElement.addEventListener( 'pointerleave', this._onPointerCancel );
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
 
+		this.domElement.style.touchAction = 'none'; // disable touch scroll
+
 	}
 
 	disconnect() {
@@ -83,6 +83,7 @@ class DragControls extends Controls {
 		this.domElement.removeEventListener( 'pointerleave', this._onPointerCancel );
 		this.domElement.removeEventListener( 'contextmenu', this._onContextMenu );
 
+		this.domElement.style.touchAction = 'auto';
 		this.domElement.style.cursor = '';
 
 	}
