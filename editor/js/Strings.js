@@ -409,7 +409,7 @@ function Strings( config ) {
 		fr: {
 
 			'prompt/file/open': 'Toutes les données non enregistrées seront perdues Êtes-vous sûr ?',
-			'prompt/file/failedToOpenProject': 'Échec de l\'ouverture du projet !',
+			'prompt/file/failedToOpenProject': 'Échec de l\'ouverture du projet !',
 			'prompt/file/export/noMeshSelected': 'Aucun maillage sélectionné !',
 			'prompt/file/export/noObjectSelected': 'Aucun objet sélectionné !',
 			'prompt/script/remove': 'Es-tu sûr?',

@@ -126,7 +126,7 @@ class DenoiseNode extends TempNode {
 				denoised.addAssign( result.xyz );
 				totalWeight.addAssign( result.w );
 
-			} );
+			} );
 
 			If( totalWeight.greaterThan( float( 0 ) ), () => {
 
