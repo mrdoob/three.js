@@ -94,7 +94,7 @@ const agxDefaultContrastApprox = Fn( ( [ x_immutable ] ) => {
 
 } );
 
-const AGXToneMappingNode = Fn( ( { color, exposure } ) => {
+const AgXToneMappingNode = Fn( ( { color, exposure } ) => {
 
 	const colortone = vec3( color ).toVar();
 	const AgXInsetMatrix = mat3( vec3( 0.856627153315983, 0.137318972929847, 0.11189821299995 ), vec3( 0.0951212405381588, 0.761241990602591, 0.0767994186031903 ), vec3( 0.0482516061458583, 0.101439036467562, 0.811302368396859 ) );
@@ -161,7 +161,7 @@ const toneMappingLib = {
 	[ ReinhardToneMapping ]: ReinhardToneMappingNode,
 	[ CineonToneMapping ]: OptimizedCineonToneMappingNode,
 	[ ACESFilmicToneMapping ]: ACESFilmicToneMappingNode,
-	[ AgXToneMapping ]: AGXToneMappingNode,
+	[ AgXToneMapping ]: AgXToneMappingNode,
 	[ NeutralToneMapping ]: NeutralToneMappingNode
 };
 
