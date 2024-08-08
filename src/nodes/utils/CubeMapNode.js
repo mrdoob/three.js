@@ -4,7 +4,7 @@ import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../shadernode/ShaderNode.js';
 import { CubeTexture } from '../../textures/CubeTexture.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
-import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
+import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants';
 
 const _cache = new WeakMap();

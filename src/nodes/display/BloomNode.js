@@ -194,7 +194,7 @@ class BloomNode extends TempNode {
 
 		} );
 
-		this._highPassFilterMaterial = this._highPassFilterMaterial || builder.createNodeMaterial();
+		this._highPassFilterMaterial = this._highPassFilterMaterial || builder.createNodeMaterial();
 		this._highPassFilterMaterial.fragmentNode = luminosityHighPass().context( builder.getSharedContext() );
 		this._highPassFilterMaterial.needsUpdate = true;
 
@@ -242,7 +242,7 @@ class BloomNode extends TempNode {
 
 		} );
 
-		this._compositeMaterial = this._compositeMaterial || builder.createNodeMaterial();
+		this._compositeMaterial = this._compositeMaterial || builder.createNodeMaterial();
 		this._compositeMaterial.fragmentNode = compositePass().context( builder.getSharedContext() );
 		this._compositeMaterial.needsUpdate = true;
 
