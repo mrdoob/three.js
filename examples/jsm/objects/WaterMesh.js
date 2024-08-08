@@ -4,7 +4,7 @@ import {
 	NodeMaterial,
 	Vector3
 } from 'three';
-import { add, cameraPosition, div, normalize, positionWorld, sub, timerLocal, tslFn, texture, vec2, vec3, vec4, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
+import { add, cameraPosition, div, normalize, positionWorld, sub, timerLocal, Fn, texture, vec2, vec3, vec4, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * Work based on :
@@ -39,7 +39,7 @@ class WaterMesh extends Mesh {
 
 		const timeNode = timerLocal();
 
-		const getNoise = tslFn( ( [ uv ] ) => {
+		const getNoise = Fn( ( [ uv ] ) => {
 
 			const uv0 = add( div( uv, 103 ), vec2( div( timeNode, 17 ), div( timeNode, 29 ) ) ).toVar();
 			const uv1 = div( uv, 107 ).sub( vec2( div( timeNode, - 19 ), div( timeNode, 31 ) ) ).toVar();
@@ -57,7 +57,7 @@ class WaterMesh extends Mesh {
 
 		} );
 
-		const fragmentNode = tslFn( () => {
+		const fragmentNode = Fn( () => {
 
 			const noise = getNoise( positionWorld.xz.mul( this.size ) );
 			const surfaceNormal = normalize( noise.xzy.mul( 1.5, 1.0, 1.5 ) );
