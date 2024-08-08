@@ -233,7 +233,7 @@ class FXAANode extends TempNode {
 
 					iterationsUsedN.assign( i );
 
-				} );
+				} );
 
 				If( doneP.equal( 0 ), () => {
 
@@ -252,7 +252,7 @@ class FXAANode extends TempNode {
 
 					iterationsUsedP.assign( i );
 
-				} );
+				} );
 
 				If( doneN.equal( 1 ).or( doneP.equal( 1 ) ), () => {
 

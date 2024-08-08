@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, Fn, nodeObject, float, mat3, vec3, If } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeObject, float, mat3, vec3, vec4, If } from '../shadernode/ShaderNode.js';
 import { rendererReference } from '../accessors/RendererReferenceNode.js';
 import { select } from '../math/CondNode.js';
 import { clamp, log2, max, min, pow, mix } from '../math/MathNode.js';
@@ -194,14 +194,14 @@ class ToneMappingNode extends TempNode {
 
 		if ( toneMapping === NoToneMapping ) return colorNode;
 
-		const toneMappingParams = { exposure: this.exposureNode, color: colorNode };
+		const toneMappingParams = { exposure: this.exposureNode, color: colorNode.rgb };
 		const toneMappingNode = toneMappingLib[ toneMapping ];
 
 		let outputNode = null;
 
 		if ( toneMappingNode ) {
 
-			outputNode = toneMappingNode( toneMappingParams );
+			outputNode = vec4( toneMappingNode( toneMappingParams ), colorNode.a );
 
 		} else {
 

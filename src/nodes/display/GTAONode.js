@@ -206,7 +206,7 @@ class GTAONode extends TempNode {
 				const occlusion = nx.mul( nxb ).add( ny.mul( nyb ) );
 				ao.addAssign( occlusion );
 
-			} );
+			} );
 
 			ao.assign( clamp( ao.div( DIRECTIONS ), 0, 1 ) );
 			ao.assign( pow( ao, this.scale ) );
