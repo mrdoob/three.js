@@ -118,28 +118,25 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, vec2, vec3, vec4, uint, property, float, storage, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
+			import { uniform, vec2, vec3, vec4, mat3, mat4, modelViewMatrix, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, positionWorld, varying, sqrt, positionView, uint, attribute, property, float, storage, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let container, stats;
-			let camera, scene, renderer;
+			let camera, scene, renderer, controls;
 			let mouseX = 0, mouseY = 0;
 
-			let windowHalfX = window.innerWidth / 2;
-			let windowHalfY = window.innerHeight / 2;
-
-			const BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
+			let windowHalfX = window.innerWidth / 2, windowHalfY = window.innerHeight / 2;
 
 			let last = performance.now();
 
-			let computeVelocity;
-			let computePosition;
-			let effectController;
+			let computeVelocity, computePosition, effectController;
 
 			const BIRDS = 1024;
 			const SPEED_LIMIT = 9.0;
+			const BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 			const UPPER_BOUNDS = BOUNDS;
 			const LOWER_BOUNDS = - UPPER_BOUNDS;
 
@@ -275,6 +272,7 @@
 
 				// Create compute storage buffers
 				const positionStorage = storage( positionBufferAttribute, 'vec3', positionBufferAttribute.count );
+				const positionRead = storage( positionBufferAttribute, 'vec3', positionBufferAttribute.count ).toReadOnly();
 				const velocityStorage = storage( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count );
 
 				// Uniforms
@@ -289,11 +287,14 @@
 				};
 
 
-				// TODO: Change to InstancedMesh
+				// TODO: Attempt change to InstancedMesh
 				const birdGeometry = new BirdGeometry();
 				const birdMaterial = new THREE.MeshBasicNodeMaterial();
-				birdMaterial.fragmentNode = vec4( 1.0, 0, 1.0, 1.0 );
-				//. side =THREE.DOUBLESIDE
+				const reference = attribute( 'reference' );
+				const positionMod = modelWorldMatrix.mul( positionLocal ).add( positionRead.element( reference ) );
+				birdMaterial.vertexNode = cameraProjectionMatrix.mul( cameraViewMatrix ).mul( positionMod );
+				birdMaterial.colorNode = vec4( 1.0, 0, 1.0, 1.0 );
+				birdMaterial.side = THREE.DoubleSide;
 				const birdMesh = new THREE.Mesh( birdGeometry, birdMaterial );
 				birdMesh.rotation.y = Math.PI / 2;
 				birdMesh.matrixAutoUpdate = false;
@@ -320,7 +321,9 @@
 					const position = positionStorage.element( instanceIndex );
 					const velocity = velocityStorage.element( instanceIndex );
 
+					// Add influence of mouse position to velocity.
 					const dirToPredator = predator.mul( UPPER_BOUNDS ).sub( position );
+					// Remove z component from consideration.
 					dirToPredator.z.assign( 0.0 );
 					const distToPredator = length( dirToPredator );
 					const distToPreadatorSq = distToPredator.mul( distToPredator );
@@ -332,8 +335,7 @@
 					If( distToPredator.lessThan( preyRadius ), () => {
 			
 						// Scale bird velocity inversely with distance from prey radius center
-						const distanceCalc = distToPreadatorSq.div( preyRadiusSq ).oneMinus();
-						const velocityAdjust = distanceCalc.mul( deltaTime ).mul( 100.0 );
+						const velocityAdjust = ( distToPreadatorSq.div( preyRadiusSq ).sub( 1.0 ) ).mul( deltaTime ).mul( 100.0 );
 						velocity.addAssign( normalize( dirToPredator ).mul( velocityAdjust ) );
 						limit.addAssign( 5.0 );
 
@@ -341,10 +343,8 @@
 
 					// Attract flocks to center
 					const dirToCenter = position.sub( vec3( 0, 0, 0 ) );
-
 					// Increase strength of attraction force in the y direction
 					dirToCenter.y.mulAssign( 2.5 );
-
 					// Apply velocity change
 					velocity.subAssign( normalize( dirToCenter ).mul( deltaTime ).mul( 5.0 ) );
 
@@ -362,21 +362,24 @@
 
 						} );
 
-						const distToBirdSquared = distToBird.mul( distToBird );
+						const distToBirdSq = distToBird.mul( distToBird );
 
 						// Don't apply any velocity changes if outside of the zone
-						If( distToBirdSquared.greaterThan( zoneRadiusSq ), () => {
+						If( distToBirdSq.greaterThan( zoneRadiusSq ), () => {
 
 							Continue();
 
 						} );
 
-						const percent = distToBirdSquared.div( zoneRadiusSq );
+						// Determine which threshold the bird is flying within and adjust its velocity accordingly
+
+						const percent = distToBirdSq.div( zoneRadiusSq );
 
 						If( percent.lessThan( separationThresh ), () => {
-
-							const velocityScale = ( separationThresh.div( percent ).oneMinus() ).mul( deltaTime );
-							velocity.subAssign( normalize( dirToBird ).mul( velocityScale ) );
+			
+							// Separation - Move apart for comfort
+							const velocityAdjust = ( separationThresh.div( percent ).sub( 1.0 ) ).mul( deltaTime );
+							velocity.subAssign( normalize( dirToBird ).mul( velocityAdjust ) );
 
 
 						} ).ElseIf( percent.lessThan( alignmentThresh ), () => {
@@ -384,18 +387,24 @@
 							// Alignment - fly the same direction
 							const threshDelta = alignmentThresh.sub( separationThresh );
 							const adjustedPercent = ( percent.sub( separationThresh ) ).div( threshDelta );
-
 							const birdVelocity = velocityStorage.element( i );
-							const velocityScale = ( float( 0.5 ).sub( cos( adjustedPercent.mul( PI_2 ).mul( 0.5 ).add( 0.5 ) ) ) ).mul( deltaTime );
-							velocity.addAssign( normalize( birdVelocity ).mul( velocityScale ) );
+
+							// Range of [ 1.5, 0.5 ]
+							const range = cos( adjustedPercent.mul( PI_2 ) ).mul( 0.5 );
+							const velocityAdjust = ( float( 0.5 ).sub( range ).add( 0.5 ) ).mul( deltaTime );
+							velocity.addAssign( normalize( birdVelocity ).mul( velocityAdjust ) );
 
 						} ).Else( () => {
 
+							// Attraction / Cohesion - move closer
 							const threshDelta = alignmentThresh.oneMinus();
 							const adjustedPercent = threshDelta.equal( 0.0 ).select( 1.0, ( percent.sub( alignmentThresh ) ).div( threshDelta ) );
 
-							const velocityScale = ( float( 0.5 ).sub( cos( adjustedPercent.mul( PI_2 ).mul( 0.5 ).add( 0.5 ) ) ) ).mul( deltaTime );
-							velocity.addAssign( normalize( dirToBird ).mul( velocityScale ) );
+							// Range of [ 0.5, 1.5 ]
+							// TODO: Adjust this to more closely match the original
+							const range = cos( adjustedPercent.mul( PI_2 ) ).mul( - 0.5 );
+							const velocityAdjust = ( float( 0.5 ).sub( range ).add( 0.5 ) ).mul( deltaTime );
+							velocity.addAssign( normalize( dirToBird ).mul( velocityAdjust ) );
 
 						} );
 			
@@ -413,7 +422,7 @@
 				computePosition = Fn( () => {
 
 					const { deltaTime } = effectController;
-					positionStorage.element( instanceIndex ).add( velocityStorage.element( instanceIndex ).mul( deltaTime ).mul( 15.0 ) );
+					positionStorage.element( instanceIndex ).addAssign( velocityStorage.element( instanceIndex ).mul( deltaTime ).mul( 15.0 ) );
 
 				} )().compute( BIRDS );
 
@@ -422,13 +431,14 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
+				controls = new OrbitControls( camera, renderer.domElement );
+
 				container.style.touchAction = 'none';
 				container.addEventListener( 'pointermove', onPointerMove );
 
 				window.addEventListener( 'resize', onWindowResize );
 
 				const gui = new GUI();
-
 
 				gui.add( effectController.separation, 'value', 0.0, 100.0, 1.0 ).name( 'Separation' );
 				gui.add( effectController.alignment, 'value', 0.0, 100, 0.001 ).name( 'Alignment ' );
@@ -462,6 +472,7 @@
 
 			function animate() {
 
+				controls.update();
 				render();
 				stats.update();
 
@@ -470,7 +481,7 @@
 			function render() {
 
 				const now = performance.now();
-				const deltaTime = ( now - last ) / 1000;
+				let deltaTime = ( now - last ) / 1000;
 
 				if ( deltaTime > 1 ) deltaTime = 1; // safety cap on large deltas
 				last = now;

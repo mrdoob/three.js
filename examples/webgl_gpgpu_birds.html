@@ -390,7 +390,6 @@
 						const birdIndex = ~ ~ ( triangleIndex / trianglesPerBird );
 						const x = ( birdIndex % WIDTH ) / WIDTH;
 						const y = ~ ~ ( birdIndex / WIDTH ) / WIDTH;
-						console.log( x, y, birdIndex );
 
 						const c = new THREE.Color(
 							0x666666 +
@@ -575,7 +574,6 @@
 			function fillPositionTexture( texture ) {
 
 				const theArray = texture.image.data;
-				console.log( theArray.length );
 
 				for ( let k = 0, kl = theArray.length; k < kl; k += 4 ) {
 
