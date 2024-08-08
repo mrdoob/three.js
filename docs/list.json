@@ -331,6 +331,7 @@
 
 			"Controls": {
 				"ArcballControls": "examples/en/controls/ArcballControls",
+				"Controls": "examples/en/controls/Controls",
 				"DragControls": "examples/en/controls/DragControls",
 				"FirstPersonControls": "examples/en/controls/FirstPersonControls",
 				"FlyControls": "examples/en/controls/FlyControls",
