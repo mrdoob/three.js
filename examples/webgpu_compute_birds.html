@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - gpgpu - flocking</title>
+		<title>three.js webgpu - compute - flocking</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -18,26 +18,9 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl gpgpu birds<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgpu compute birds<br/>
 			Move mouse to disturb birds.
 		</div>
-
-		<!-- bird geometry shader -->
-		<script type="x-shader/x-fragment" id="birdFS">
-
-			varying vec4 vColor;
-			varying float z;
-
-			uniform vec3 color;
-
-			void main() {
-				// Fake colors for now
-				float z2 = 0.2 + ( 1000. - z ) / 1000. * vColor.x;
-				gl_FragColor = vec4( z2, z2, z2, 1. );
-
-			}
-
-		</script>
 
 		<script type="importmap">
 			{
@@ -52,14 +35,13 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, vec2, varyingProperty, vec3, vec4, max, sin, mat3, negate, mat4, remainder, modelViewMatrix, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, positionWorld, varying, sqrt, positionView, uint, attribute, property, float, storage, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { uniform, varyingProperty, vec3, vec4, max, sin, mat3, negate, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, storage, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let container, stats;
-			let camera, scene, renderer, controls;
+			let camera, scene, renderer;
 			let mouseX = 0, mouseY = 0;
 
 			let windowHalfX = window.innerWidth / 2, windowHalfY = window.innerHeight / 2;
@@ -68,11 +50,10 @@
 
 			let computeVelocity, computePosition, effectController;
 
-			const BIRDS = 1024;
+			const BIRDS = 2048;
 			const SPEED_LIMIT = 9.0;
 			const BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 			const UPPER_BOUNDS = BOUNDS;
-			const LOWER_BOUNDS = - UPPER_BOUNDS;
 
 			// Custom Geometry - using 3 triangles each. No UVs, no normals currently.
 			class BirdGeometry extends THREE.BufferGeometry {
@@ -85,10 +66,10 @@
 					const triangles = BIRDS * trianglesPerBird;
 					const points = triangles * 3;
 
-					const vertices = new THREE.StorageBufferAttribute( new Float32Array( points * 3 ), 3 );
-					const birdColors = new THREE.StorageBufferAttribute( new Float32Array( points * 3 ), 3 );
-					const references = new THREE.StorageBufferAttribute( new Float32Array( points ), 1 );
-					const birdVertex = new THREE.StorageBufferAttribute( new Float32Array( points ), 1 );
+					const vertices = new THREE.BufferAttribute( new Float32Array( points * 3 ), 3 );
+					const birdColors = new THREE.BufferAttribute( new Float32Array( points * 3 ), 3 );
+					const references = new THREE.BufferAttribute( new Uint32Array( points ), 1 );
+					const birdVertex = new THREE.BufferAttribute( new Uint32Array( points ), 1 );
 
 					this.setAttribute( 'position', vertices );
 					this.setAttribute( 'birdColor', birdColors );
@@ -204,20 +185,26 @@
 
 				}
 
-				// Create compute buffer attributes
+				// Create storage buffer attributes.
+			
 				const positionBufferAttribute = new THREE.StorageBufferAttribute( positionArray, 3 );
 				const velocityBufferAttribute = new THREE.StorageBufferAttribute( velocityArray, 3 );
 				const phaseBufferAttribute = new THREE.StorageBufferAttribute( phaseArray, 1 );
 
-				// Create compute storage buffers
+				// Access storage buffer attribute data from within shaders with a StorageNode.
+			
 				const positionStorage = storage( positionBufferAttribute, 'vec3', positionBufferAttribute.count );
-				const positionRead = storage( positionBufferAttribute, 'vec3', positionBufferAttribute.count ).toReadOnly();
 				const velocityStorage = storage( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count );
-				const velocityRead = storage( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count ).toReadOnly();
 				const phaseStorage = storage( phaseBufferAttribute, 'float', phaseBufferAttribute.count );
+			
+				// Create read-only storage nodes. Storage nodes can only be accessed outside of compute shaders in a read-only state.
+			
+				const positionRead = storage( positionBufferAttribute, 'vec3', positionBufferAttribute.count ).toReadOnly();
+				const velocityRead = storage( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count ).toReadOnly();
 				const phaseRead = storage( phaseBufferAttribute, 'float', phaseBufferAttribute.count ).toReadOnly();
 
-				// Uniforms
+				// Define Uniforms. Uniforms only need to be defined once rather than per shader.
+			
 				effectController = {
 					separation: uniform( 20.0 ),
 					alignment: uniform( 20.0 ),
@@ -225,20 +212,25 @@
 					freedom: uniform( 0.75 ),
 					now: uniform( 0.0 ),
 					deltaTime: uniform( 0.0 ),
-					predator: uniform( new THREE.Vector3() )
+					predator: uniform( new THREE.Vector3() ),
+					lightX: - 1,
+					lightY: 21,
+					lightZ: 3.8
 				};
 
 
-				// TODO: Attempt change to InstancedMesh
+				// Create geometry
+			
 				const birdGeometry = new BirdGeometry();
-				const birdMaterial = new THREE.MeshBasicNodeMaterial();
+				const birdMaterial = new THREE.MeshStandardNodeMaterial();
 
 				// Declare varyings
 
 				const vColor = varyingProperty( 'vec4', 'vColor' );
 				const vZ = varyingProperty( 'float', 'vZ' );
 			
-				// Animate bird mesh within shader, then apply position offset to vertices.
+				// Animate bird mesh within vertex shader, then apply position offset to vertices.
+			
 				const birdVertexTSL = Fn( () => {
 
 					const reference = attribute( 'reference' );
@@ -251,6 +243,7 @@
 			
 					If( birdVertex.equal( 4 ).or( birdVertex.equal( 7 ) ), () => {
 
+						// flap wings
 						position.y = sin( newPhase ).mul( 5.0 );
 			
 					} );
@@ -268,7 +261,7 @@
 					const cosrz = x.div( xyz );
 					const sinrz = newVelocity.y.div( xyz ).toVar();
 			
-					// Once a node variable has been declared, it can only be negated with negate() and not the '-' sign.
+					// Nodes must be negated with negate(). Using '-', their values will resolve to NaN.
 					const maty = mat3(
 						cosry, 0, negate( sinry ),
 						0, 1, 0,
@@ -282,7 +275,6 @@
 					);
 
 					const finalVert = maty.mul( matz ).mul( newPosition );
-
 					finalVert.addAssign( positionRead.element( reference ) );
 
 					vZ.assign( finalVert.z );
@@ -292,23 +284,16 @@
 
 				} );
 
-				const birdColorTSL = Fn( () => {
-
-					const z2 = ( float( 1000.0 ).sub( vZ ) ).div( 1000.0 ).mul( vColor.x ).add( 0.2 );
-					return vec4( z2, z2, z2, 1 );
-
-			
-				} );
 				birdMaterial.vertexNode = birdVertexTSL();
-				birdMaterial.colorNode = birdColorTSL();
+				birdMaterial.colorNode = vColor;
 				birdMaterial.side = THREE.DoubleSide;
 				const birdMesh = new THREE.Mesh( birdGeometry, birdMaterial );
 				birdMesh.rotation.y = Math.PI / 2;
 				birdMesh.matrixAutoUpdate = false;
 				birdMesh.updateMatrix();
 
-				// Define GPU Compute shaders
-				// Shaders are identical to their GLSL counterparts outside of texture destructuring.
+				// Define GPU Compute shaders.
+				// Shaders are computationally identical to their GLSL counterparts outside of texture destructuring.
 
 				computeVelocity = Fn( () => {
 			
@@ -330,7 +315,6 @@
 
 					// Add influence of mouse position to velocity.
 					const dirToPredator = predator.mul( UPPER_BOUNDS ).sub( position );
-					// Remove z component from consideration.
 					dirToPredator.z.assign( 0.0 );
 					const distToPredator = length( dirToPredator );
 					const distToPreadatorSq = distToPredator.mul( distToPredator );
@@ -338,10 +322,10 @@
 					const preyRadius = float( 150.0 );
 					const preyRadiusSq = preyRadius.mul( preyRadius );
 
-					// Move birds away from predator if they are within the predator's kill zone
+					// Move birds away from predator if they are within the predator's area.
 					If( distToPredator.lessThan( preyRadius ), () => {
 			
-						// Scale bird velocity inversely with distance from prey radius center
+						// Scale bird velocity inversely with distance from prey radius center.
 						const velocityAdjust = ( distToPreadatorSq.div( preyRadiusSq ).sub( 1.0 ) ).mul( deltaTime ).mul( 100.0 );
 						velocity.addAssign( normalize( dirToPredator ).mul( velocityAdjust ) );
 						limit.addAssign( 5.0 );
@@ -350,19 +334,16 @@
 
 					// Attract flocks to center
 					const dirToCenter = position.sub( vec3( 0, 0, 0 ) );
-					// Increase strength of attraction force in the y direction
 					dirToCenter.y.mulAssign( 2.5 );
-					// Apply velocity change
 					velocity.subAssign( normalize( dirToCenter ).mul( deltaTime ).mul( 5.0 ) );
 
-					// TODO: Find a more sensible way to parallelize this calculation
 					Loop( { start: 0, end: BIRDS, type: 'uint', condition: '<' }, ( { i } ) => {
 
 						const birdPosition = positionStorage.element( i );
 						const dirToBird = birdPosition.sub( position );
 						const distToBird = length( dirToBird );
 
-						// Don't apply any changes to velocity if the distance to this bird is negligable
+						// Don't apply any changes to velocity if the distance to this bird is negligable.
 						If( distToBird.lessThan( 0.0001 ), () => {
 
 							Continue();
@@ -371,7 +352,7 @@
 
 						const distToBirdSq = distToBird.mul( distToBird );
 
-						// Don't apply any velocity changes if outside of the zone
+						// Don't apply any changes to velocity if changes if the bird is outsize the zone's radius.
 						If( distToBirdSq.greaterThan( zoneRadiusSq ), () => {
 
 							Continue();
@@ -396,7 +377,6 @@
 							const adjustedPercent = ( percent.sub( separationThresh ) ).div( threshDelta );
 							const birdVelocity = velocityStorage.element( i );
 
-							// Range of [ 1.5, 0.5 ]
 							const range = cos( adjustedPercent.mul( PI_2 ) ).mul( 0.5 );
 							const velocityAdjust = ( float( 0.5 ).sub( range ).add( 0.5 ) ).mul( deltaTime );
 							velocity.addAssign( normalize( birdVelocity ).mul( velocityAdjust ) );
@@ -407,9 +387,7 @@
 							const threshDelta = alignmentThresh.oneMinus();
 							const adjustedPercent = threshDelta.equal( 0.0 ).select( 1.0, ( percent.sub( alignmentThresh ) ).div( threshDelta ) );
 
-							// Range of [ -0.5, 0.5 ]
-							// TODO: Adjust this to more closely match the original
-							const range = cos( adjustedPercent.mul( PI_2 ) ).mul( 0.5 ).add( 0.5 );
+							const range = cos( adjustedPercent.mul( PI_2 ) ).mul( - 0.5 ).add( 0.5 );
 							const velocityAdjust = ( float( 0.5 ).sub( range ) ).mul( deltaTime );
 							velocity.addAssign( normalize( dirToBird ).mul( velocityAdjust ) );
 
@@ -417,6 +395,7 @@
 			
 					} );
 
+					// Speed Limits
 					If( length( velocity ).greaterThan( limit ), () => {
 
 						velocity.assign( normalize( velocity ).mul( limit ) );
@@ -441,11 +420,23 @@
 				} )().compute( BIRDS );
 
 				scene.add( birdMesh );
-			
+
+				// LIGHTS
+
+				const topLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				topLight.color.setHSL( 0.1, 1, 0.95 );
+				topLight.position.set( - 1, 21, 3.8 );
+				topLight.position.multiplyScalar( 30 );
+				scene.add( topLight );
+
+				const bottomLight = new THREE.DirectionalLight( 0xffffff, 0.7 );
+				bottomLight.color.setHSL( 0.1, 1, 0.95 );
+				bottomLight.position.set( - 1, - 21, 3.8 );
+				bottomLight.position.multiplyScalar( 30 );
+				scene.add( bottomLight );
+
 				stats = new Stats();
 				container.appendChild( stats.dom );
-
-				controls = new OrbitControls( camera, renderer.domElement );
 
 				container.style.touchAction = 'none';
 				container.addEventListener( 'pointermove', onPointerMove );
@@ -457,6 +448,9 @@
 				gui.add( effectController.separation, 'value', 0.0, 100.0, 1.0 ).name( 'Separation' );
 				gui.add( effectController.alignment, 'value', 0.0, 100, 0.001 ).name( 'Alignment ' );
 				gui.add( effectController.cohesion, 'value', 0.0, 100, 0.025 ).name( 'Cohesion' );
+				gui.add( effectController, 'lightX', - 100.0, 100.0, 0.1 );
+				gui.add( effectController, 'lightY', - 100.0, 100.0, 0.1 );
+				gui.add( effectController, 'lightZ', - 100.0, 100.0, 0.1 );
 				gui.close();
 
 			}
@@ -482,11 +476,8 @@
 
 			}
 
-			//
-
 			function animate() {
 
-				controls.update();
 				render();
 				stats.update();
 
