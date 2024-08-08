@@ -50,7 +50,7 @@
 
 			let computeVelocity, computePosition, effectController;
 
-			const BIRDS = 2048;
+			const BIRDS = 1024;
 			const SPEED_LIMIT = 9.0;
 			const BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 			const UPPER_BOUNDS = BOUNDS;
@@ -213,9 +213,6 @@
 					now: uniform( 0.0 ),
 					deltaTime: uniform( 0.0 ),
 					predator: uniform( new THREE.Vector3() ),
-					lightX: - 1,
-					lightY: 21,
-					lightZ: 3.8
 				};
 
 
@@ -361,7 +358,8 @@
 
 						// Determine which threshold the bird is flying within and adjust its velocity accordingly
 
-						const percent = distToBirdSq.div( zoneRadiusSq );
+						const percent = property( 'float', 'percent' );
+						percent.assign( distToBirdSq.div( zoneRadiusSq ) );
 
 						If( percent.lessThan( separationThresh ), () => {
 			
@@ -377,8 +375,9 @@
 							const adjustedPercent = ( percent.sub( separationThresh ) ).div( threshDelta );
 							const birdVelocity = velocityStorage.element( i );
 
-							const range = cos( adjustedPercent.mul( PI_2 ) ).mul( 0.5 );
-							const velocityAdjust = ( float( 0.5 ).sub( range ).add( 0.5 ) ).mul( deltaTime );
+							const cosRange = cos( adjustedPercent.mul( PI_2 ) );
+							const cosRangeAdjust = float( 0.5 ).sub( cosRange.mul( 0.5 ) ).add( 0.5 );
+							const velocityAdjust = cosRangeAdjust.mul( deltaTime );
 							velocity.addAssign( normalize( birdVelocity ).mul( velocityAdjust ) );
 
 						} ).Else( () => {
@@ -387,15 +386,18 @@
 							const threshDelta = alignmentThresh.oneMinus();
 							const adjustedPercent = threshDelta.equal( 0.0 ).select( 1.0, ( percent.sub( alignmentThresh ) ).div( threshDelta ) );
 
-							const range = cos( adjustedPercent.mul( PI_2 ) ).mul( - 0.5 ).add( 0.5 );
-							const velocityAdjust = ( float( 0.5 ).sub( range ) ).mul( deltaTime );
+							const cosRange = cos( adjustedPercent.mul( PI_2 ) );
+							const adj1 = cosRange.mul( - 0.5 );
+							const adj2 = adj1.add( 0.5 );
+							const adj3 = float( 0.5 ).sub( adj2 );
+
+							const velocityAdjust = adj3.mul( deltaTime );
 							velocity.addAssign( normalize( dirToBird ).mul( velocityAdjust ) );
 
 						} );
 			
 					} );
 
-					// Speed Limits
 					If( length( velocity ).greaterThan( limit ), () => {
 
 						velocity.assign( normalize( velocity ).mul( limit ) );
@@ -448,9 +450,6 @@
 				gui.add( effectController.separation, 'value', 0.0, 100.0, 1.0 ).name( 'Separation' );
 				gui.add( effectController.alignment, 'value', 0.0, 100, 0.001 ).name( 'Alignment ' );
 				gui.add( effectController.cohesion, 'value', 0.0, 100, 0.025 ).name( 'Cohesion' );
-				gui.add( effectController, 'lightX', - 100.0, 100.0, 0.1 );
-				gui.add( effectController, 'lightY', - 100.0, 100.0, 0.1 );
-				gui.add( effectController, 'lightZ', - 100.0, 100.0, 0.1 );
 				gui.close();
 
 			}
