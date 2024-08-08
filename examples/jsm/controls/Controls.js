@@ -29,4 +29,4 @@ class Controls extends EventDispatcher {
 
 }
 
-export { Controls };
+export { Controls };
