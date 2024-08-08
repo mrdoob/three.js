@@ -169,17 +169,17 @@
 					const posY = Math.random() * BOUNDS - BOUNDS_HALF;
 					const posZ = Math.random() * BOUNDS - BOUNDS_HALF;
 
-					const velX = Math.random() - 0.5;
-					const velY = Math.random() - 0.5;
-					const velZ = Math.random() - 0.5;
-
 					positionArray[ i * 3 + 0 ] = posX;
 					positionArray[ i * 3 + 1 ] = posY;
 					positionArray[ i * 3 + 2 ] = posZ;
 
-					velocityArray[ i * 3 + 0 ] = velX;
-					velocityArray[ i * 3 + 1 ] = velY;
-					velocityArray[ i * 3 + 2 ] = velZ;
+					const velX = Math.random() - 0.5;
+					const velY = Math.random() - 0.5;
+					const velZ = Math.random() - 0.5;
+
+					velocityArray[ i * 3 + 0 ] = velX * 10;
+					velocityArray[ i * 3 + 1 ] = velY * 10;
+					velocityArray[ i * 3 + 2 ] = velZ * 10;
 
 					phaseArray[ i ] = 1;
 
