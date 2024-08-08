@@ -64,7 +64,7 @@ class PointerLockControls extends Controls {
 
 	}
 
-	getObject() { // retaining this method for backward compatibility
+	getObject() {
 
 		console.warn( 'THREE.PointerLockControls: getObject() has been deprecated. Use controls.object instead.' ); // @deprecated r169
 
