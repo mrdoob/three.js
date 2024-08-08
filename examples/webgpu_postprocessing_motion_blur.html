@@ -164,7 +164,7 @@
 				controls.minDistance = 1;
 				controls.maxDistance = 10;
 				controls.maxPolarAngle = Math.PI / 2;
-				//controls.autoRotate = true;
+				controls.autoRotate = true;
 				controls.autoRotateSpeed = 1;
 				controls.target.set( 0, 1, 0 );
 				controls.enableDamping = true;
@@ -173,7 +173,7 @@
 
 				// post-processing
 
-				const blurAmount = uniform( 2 );
+				const blurAmount = uniform( 1.5 );
 				const showVelocity = uniform( 0 );
 
 				const scenePass = pass( scene, camera );
@@ -204,20 +204,7 @@
 				gui.add( controls, 'autoRotate' );
 				gui.add( blurAmount, 'value', 0, 4 ).name( 'blur amount' );
 				gui.add( params, 'speed', 0, 2 );
-
-				const uiVelocity = gui.add( showVelocity, 'value', 0, 1 ).name( 'show velocity' );
-
-				function guiAnimation() {
-
-					showVelocity.value = 1 - Math.max( Math.min( ( performance.now() / 1000 ) - 1, 1 ), 0 );
-
-					uiVelocity.updateDisplay();
-
-					if ( showVelocity.value > 0 ) requestAnimationFrame( guiAnimation );
-
-				}
-
-				requestAnimationFrame( guiAnimation );
+				gui.add( showVelocity, 'value', 0, 1 ).name( 'show velocity' );
 
 				//
 

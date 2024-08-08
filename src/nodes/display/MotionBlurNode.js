@@ -6,7 +6,7 @@ export const motionBlur = /*#__PURE__*/ Fn( ( [ inputNode, velocity ] ) => {
 
 	const sampleColor = ( uv ) => inputNode.uv( uv );
 
-	const NUM_SAMPLES = int( 30 );
+	const NUM_SAMPLES = int( 16 );
 
 	const uvs = uv();
 
