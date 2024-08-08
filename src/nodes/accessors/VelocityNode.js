@@ -1,8 +1,8 @@
 import { addNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { modelViewMatrix } from './ModelNode.js';
-import { positionLocal } from './PositionNode.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { positionLocal, positionPrevious } from './PositionNode.js';
+import { nodeImmutable } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { uniform } from '../core/UniformNode.js';
@@ -13,14 +13,12 @@ const _matrixCache = new WeakMap();
 
 class VelocityNode extends TempNode {
 
-	constructor( previousPositionNode ) {
+	constructor() {
 
 		super( 'vec2' );
 
 		this.updateType = NodeUpdateType.OBJECT;
 		this.updateAfterType = NodeUpdateType.OBJECT;
-
-		this.previousPositionNode = previousPositionNode;
 
 		this.previousProjectionMatrix = uniform( new Matrix4() );
 		this.previousModelViewMatrix = uniform( new Matrix4() );
@@ -49,11 +47,8 @@ class VelocityNode extends TempNode {
 
 	setup( /*builder*/ ) {
 
-		const positionLocalPrevious = this.previousPositionNode;
-
 		const clipPositionCurrent = cameraProjectionMatrix.mul( modelViewMatrix ).mul( positionLocal );
-		const clipPositionPrevious = cameraProjectionMatrix.mul( modelViewMatrix ).mul( positionLocalPrevious );
-		//const clipPositionPrevious = this.previousProjectionMatrix.mul( this.previousModelViewMatrix ).mul( positionLocalPrevious );
+		const clipPositionPrevious = this.previousProjectionMatrix.mul( this.previousModelViewMatrix ).mul( positionPrevious );
 
 		const ndcPositionCurrent = clipPositionCurrent.xy.div( clipPositionCurrent.w );
 		const ndcPositionPrevious = clipPositionPrevious.xy.div( clipPositionPrevious.w );
@@ -83,6 +78,6 @@ function getPreviousMatrix( object ) {
 
 export default VelocityNode;
 
-export const velocity = nodeProxy( VelocityNode );
+export const velocity = nodeImmutable( VelocityNode );
 
 addNodeClass( 'VelocityNode', VelocityNode );

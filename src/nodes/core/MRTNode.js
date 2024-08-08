@@ -30,7 +30,13 @@ class MRTNode extends OutputStructNode {
 
 	}
 
-	getNode( name ) {
+	has( name ) {
+
+		return this.outputNodes[ name ] !== undefined;
+
+	}
+
+	get( name ) {
 
 		return this.outputNodes[ name ];
 
