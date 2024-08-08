@@ -35,7 +35,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, varyingProperty, vec3, vec4, max, sin, mat3, negate, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, storage, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
+			import { uniform, varyingProperty, vec4, max, sin, mat3, negate, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, storage, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -158,7 +158,7 @@
 				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
-				// Initialize position, velociy, and phase values
+				// Initialize position, velocity, and phase values
 				const positionArray = new Float32Array( BIRDS * 3 );
 				const velocityArray = new Float32Array( BIRDS * 3 );
 				const phaseArray = new Float32Array( BIRDS );
@@ -191,11 +191,14 @@
 				const velocityBufferAttribute = new THREE.StorageBufferAttribute( velocityArray, 3 );
 				const phaseBufferAttribute = new THREE.StorageBufferAttribute( phaseArray, 1 );
 
+				// Labels applied to storage nodes and uniform nodes are reflected within the shader output,
+				// and are useful for debugging purposes.
+
 				// Access storage buffer attribute data from within shaders with a StorageNode.
 			
-				const positionStorage = storage( positionBufferAttribute, 'vec3', positionBufferAttribute.count );
-				const velocityStorage = storage( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count );
-				const phaseStorage = storage( phaseBufferAttribute, 'float', phaseBufferAttribute.count );
+				const positionStorage = storage( positionBufferAttribute, 'vec3', positionBufferAttribute.count ).label( 'positionStorage' );
+				const velocityStorage = storage( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count ).label( 'velocityStorage' );
+				const phaseStorage = storage( phaseBufferAttribute, 'float', phaseBufferAttribute.count ).label( 'phaseStorage' );
 			
 				// Create read-only storage nodes. Storage nodes can only be accessed outside of compute shaders in a read-only state.
 			
@@ -206,13 +209,13 @@
 				// Define Uniforms. Uniforms only need to be defined once rather than per shader.
 			
 				effectController = {
-					separation: uniform( 20.0 ).setName( 'separation' ),
-					alignment: uniform( 20.0 ),
-					cohesion: uniform( 20.0 ),
-					freedom: uniform( 0.75 ),
+					separation: uniform( 20.0 ).label( 'separation' ),
+					alignment: uniform( 20.0 ).label( 'alignment' ),
+					cohesion: uniform( 20.0 ).label( 'cohesion' ),
+					freedom: uniform( 0.75 ).label( 'freedom' ),
 					now: uniform( 0.0 ),
-					deltaTime: uniform( 0.0 ),
-					predator: uniform( new THREE.Vector3() ),
+					deltaTime: uniform( 0.0 ).label( 'deltaTime' ),
+					predator: uniform( new THREE.Vector3() ).label( 'predator' ),
 				};
 
 
@@ -330,7 +333,7 @@
 					} );
 
 					// Attract flocks to center
-					const dirToCenter = position.sub( vec3( 0, 0, 0 ) );
+					const dirToCenter = position.toVar();
 					dirToCenter.y.mulAssign( 2.5 );
 					velocity.subAssign( normalize( dirToCenter ).mul( deltaTime ).mul( 5.0 ) );
 
@@ -358,8 +361,7 @@
 
 						// Determine which threshold the bird is flying within and adjust its velocity accordingly
 
-						const percent = property( 'float', 'percent' );
-						percent.assign( distToBirdSq.div( zoneRadiusSq ) );
+						const percent = distToBirdSq.div( zoneRadiusSq );
 
 						If( percent.lessThan( separationThresh ), () => {
 			
