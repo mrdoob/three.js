@@ -34,6 +34,8 @@ class QuadMesh extends Mesh {
 
 		this.camera = _camera;
 
+		this.isQuadMesh = true;
+
 	}
 
 	renderAsync( renderer ) {

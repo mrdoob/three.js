@@ -27,7 +27,7 @@ class PassTextureNode extends TextureNode {
 
 	setup( builder ) {
 
-		this.passNode.build( builder );
+		if ( builder.object.isQuadMesh ) this.passNode.build( builder );
 
 		return super.setup( builder );
 
@@ -210,6 +210,7 @@ class PassNode extends TempNode {
 		if ( textureNode === undefined ) {
 
 			this._textureNodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
+			this._textureNodes[ name ].updateTexture();
 
 		}
 
@@ -223,7 +224,10 @@ class PassNode extends TempNode {
 
 		if ( textureNode === undefined ) {
 
+			if ( this._textureNodes[ name ] === undefined ) this.getTextureNode( name );
+
 			this._previousTextureNodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name, true ) );
+			this._previousTextureNodes[ name ].updateTexture();
 
 		}
 
