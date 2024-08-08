@@ -50,7 +50,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.25, 30 );
-				camera.position.set( 0, 2.5, 4 );
+				camera.position.set( 0, 1.5, 4.5 );
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x0487e2, 7, 25 );
@@ -142,11 +142,11 @@
 				const material = new THREE.MeshBasicMaterial( { map } );
 
 				boxRight = new THREE.Mesh( geometry, material );
-				boxRight.position.set( 3, 1.5, - 4 );
+				boxRight.position.set( 3.5, 1.5, - 4 );
 				scene.add( boxRight );
 
 				boxLeft = new THREE.Mesh( geometry, material );
-				boxLeft.position.set( - 3, 1.5, - 4 );
+				boxLeft.position.set( - 3.5, 1.5, - 4 );
 				scene.add( boxLeft );
 
 				// renderer
