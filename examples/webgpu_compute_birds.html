@@ -22,72 +22,6 @@
 			Move mouse to disturb birds.
 		</div>
 
-		<script type="x-shader/x-vertex" id="birdVS">
-
-			attribute vec2 reference;
-			attribute float birdVertex;
-
-			attribute vec3 birdColor;
-
-			uniform sampler2D texturePosition;
-			uniform sampler2D textureVelocity;
-
-			varying vec4 vColor;
-			varying float z;
-
-			uniform float time;
-
-			void main() {
-
-				vec4 tmpPos = texture2D( texturePosition, reference );
-				vec3 pos = tmpPos.xyz;
-				vec3 velocity = normalize(texture2D( textureVelocity, reference ).xyz);
-
-				vec3 newPosition = position;
-
-				if ( birdVertex == 4.0 || birdVertex == 7.0 ) {
-					// flap wings
-					newPosition.y = sin( tmpPos.w ) * 5.;
-				}
-
-				newPosition = mat3( modelMatrix ) * newPosition;
-
-
-				velocity.z *= -1.;
-				float xz = length( velocity.xz );
-				float xyz = 1.;
-				float x = sqrt( 1. - velocity.y * velocity.y );
-
-				float cosry = velocity.x / xz;
-				float sinry = velocity.z / xz;
-
-				float cosrz = x / xyz;
-				float sinrz = velocity.y / xyz;
-
-				mat3 maty =  mat3(
-					cosry, 0, -sinry,
-					0    , 1, 0     ,
-					sinry, 0, cosry
-
-				);
-
-				mat3 matz =  mat3(
-					cosrz , sinrz, 0,
-					-sinrz, cosrz, 0,
-					0     , 0    , 1
-				);
-
-				newPosition =  maty * matz * newPosition;
-				newPosition += pos;
-
-				z = newPosition.z;
-
-				vColor = vec4( birdColor, 1.0 );
-				gl_Position = projectionMatrix *  viewMatrix  * vec4( newPosition, 1.0 );
-			}
-
-		</script>
-
 		<!-- bird geometry shader -->
 		<script type="x-shader/x-fragment" id="birdFS">
 
@@ -118,7 +52,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, vec2, vec3, vec4, mat3, mat4, modelViewMatrix, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, positionWorld, varying, sqrt, positionView, uint, attribute, property, float, storage, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
+			import { uniform, vec2, varyingProperty, vec3, vec4, max, sin, mat3, negate, mat4, remainder, modelViewMatrix, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, positionWorld, varying, sqrt, positionView, uint, attribute, property, float, storage, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -243,8 +177,10 @@
 				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
+				// Initialize position, velociy, and phase values
 				const positionArray = new Float32Array( BIRDS * 3 );
 				const velocityArray = new Float32Array( BIRDS * 3 );
+				const phaseArray = new Float32Array( BIRDS );
 
 				for ( let i = 0; i < BIRDS; i ++ ) {
 
@@ -264,16 +200,22 @@
 					velocityArray[ i * 3 + 1 ] = velY;
 					velocityArray[ i * 3 + 2 ] = velZ;
 
+					phaseArray[ i ] = 1;
+
 				}
 
 				// Create compute buffer attributes
 				const positionBufferAttribute = new THREE.StorageBufferAttribute( positionArray, 3 );
 				const velocityBufferAttribute = new THREE.StorageBufferAttribute( velocityArray, 3 );
+				const phaseBufferAttribute = new THREE.StorageBufferAttribute( phaseArray, 1 );
 
 				// Create compute storage buffers
 				const positionStorage = storage( positionBufferAttribute, 'vec3', positionBufferAttribute.count );
 				const positionRead = storage( positionBufferAttribute, 'vec3', positionBufferAttribute.count ).toReadOnly();
 				const velocityStorage = storage( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count );
+				const velocityRead = storage( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count ).toReadOnly();
+				const phaseStorage = storage( phaseBufferAttribute, 'float', phaseBufferAttribute.count );
+				const phaseRead = storage( phaseBufferAttribute, 'float', phaseBufferAttribute.count ).toReadOnly();
 
 				// Uniforms
 				effectController = {
@@ -290,10 +232,75 @@
 				// TODO: Attempt change to InstancedMesh
 				const birdGeometry = new BirdGeometry();
 				const birdMaterial = new THREE.MeshBasicNodeMaterial();
-				const reference = attribute( 'reference' );
-				const positionMod = modelWorldMatrix.mul( positionLocal ).add( positionRead.element( reference ) );
-				birdMaterial.vertexNode = cameraProjectionMatrix.mul( cameraViewMatrix ).mul( positionMod );
-				birdMaterial.colorNode = vec4( 1.0, 0, 1.0, 1.0 );
+
+				// Declare varyings
+
+				const vColor = varyingProperty( 'vec4', 'vColor' );
+				const vZ = varyingProperty( 'float', 'vZ' );
+			
+				// Animate bird mesh within shader, then apply position offset to vertices.
+				const birdVertexTSL = Fn( () => {
+
+					const reference = attribute( 'reference' );
+					const birdVertex = attribute( 'birdVertex' );
+					const birdColor = attribute( 'birdColor' );
+
+					const position = positionLocal.toVar();
+					const newPhase = phaseRead.element( reference ).toVar();
+					const newVelocity = normalize( velocityRead.element( reference ) ).toVar();
+			
+					If( birdVertex.equal( 4 ).or( birdVertex.equal( 7 ) ), () => {
+
+						position.y = sin( newPhase ).mul( 5.0 );
+			
+					} );
+
+					const newPosition = modelWorldMatrix.mul( position );
+
+					newVelocity.z.mulAssign( - 1.0 );
+					const xz = length( newVelocity.xz );
+					const xyz = float( 1.0 );
+					const x = sqrt( ( newVelocity.y.mul( newVelocity.y ) ).oneMinus() );
+
+					const cosry = newVelocity.x.div( xz ).toVar();
+					const sinry = newVelocity.z.div( xz ).toVar();
+
+					const cosrz = x.div( xyz );
+					const sinrz = newVelocity.y.div( xyz ).toVar();
+			
+					// Once a node variable has been declared, it can only be negated with negate() and not the '-' sign.
+					const maty = mat3(
+						cosry, 0, negate( sinry ),
+						0, 1, 0,
+						sinry, 0, cosry
+					);
+
+					const matz = mat3(
+						cosrz, sinrz, 0,
+						negate( sinrz ), cosrz, 0,
+						0, 0, 1
+					);
+
+					const finalVert = maty.mul( matz ).mul( newPosition );
+
+					finalVert.addAssign( positionRead.element( reference ) );
+
+					vZ.assign( finalVert.z );
+					vColor.assign( vec4( birdColor, 1.0 ) );
+
+					return cameraProjectionMatrix.mul( cameraViewMatrix ).mul( finalVert );
+
+				} );
+
+				const birdColorTSL = Fn( () => {
+
+					const z2 = ( float( 1000.0 ).sub( vZ ) ).div( 1000.0 ).mul( vColor.x ).add( 0.2 );
+					return vec4( z2, z2, z2, 1 );
+
+			
+				} );
+				birdMaterial.vertexNode = birdVertexTSL();
+				birdMaterial.colorNode = birdColorTSL();
 				birdMaterial.side = THREE.DoubleSide;
 				const birdMesh = new THREE.Mesh( birdGeometry, birdMaterial );
 				birdMesh.rotation.y = Math.PI / 2;
@@ -400,10 +407,10 @@
 							const threshDelta = alignmentThresh.oneMinus();
 							const adjustedPercent = threshDelta.equal( 0.0 ).select( 1.0, ( percent.sub( alignmentThresh ) ).div( threshDelta ) );
 
-							// Range of [ 0.5, 1.5 ]
+							// Range of [ -0.5, 0.5 ]
 							// TODO: Adjust this to more closely match the original
-							const range = cos( adjustedPercent.mul( PI_2 ) ).mul( - 0.5 );
-							const velocityAdjust = ( float( 0.5 ).sub( range ).add( 0.5 ) ).mul( deltaTime );
+							const range = cos( adjustedPercent.mul( PI_2 ) ).mul( 0.5 ).add( 0.5 );
+							const velocityAdjust = ( float( 0.5 ).sub( range ) ).mul( deltaTime );
 							velocity.addAssign( normalize( dirToBird ).mul( velocityAdjust ) );
 
 						} );
@@ -423,6 +430,13 @@
 
 					const { deltaTime } = effectController;
 					positionStorage.element( instanceIndex ).addAssign( velocityStorage.element( instanceIndex ).mul( deltaTime ).mul( 15.0 ) );
+
+
+					const velocity = velocityStorage.element( instanceIndex );
+					const phase = phaseStorage.element( instanceIndex );
+
+					const modValue = phase.add( deltaTime ).add( length( velocity.xz ).mul( deltaTime ).mul( 3.0 ) ).add( max( velocity.y, 0.0 ).mul( deltaTime ).mul( 6.0 ) );
+					phaseStorage.element( instanceIndex ).assign( modValue.remainder( 62.83 ) );
 
 				} )().compute( BIRDS );
 
@@ -495,7 +509,6 @@
 
 				renderer.compute( computeVelocity );
 				renderer.compute( computePosition );
-
 				renderer.render( scene, camera );
 
 			}
