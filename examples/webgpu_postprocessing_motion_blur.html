@@ -173,7 +173,7 @@
 
 				// post-processing
 
-				const blurAmount = uniform( 1.5 );
+				const blurAmount = uniform( 1 );
 				const showVelocity = uniform( 0 );
 
 				const scenePass = pass( scene, camera );
@@ -198,7 +198,7 @@
 				const gui = new GUI();
 				gui.title( 'Motion Blur Settings' );
 				gui.add( controls, 'autoRotate' );
-				gui.add( blurAmount, 'value', 0, 4 ).name( 'blur amount' );
+				gui.add( blurAmount, 'value', 0, 3 ).name( 'blur amount' );
 				gui.add( params, 'speed', 0, 2 );
 				gui.add( showVelocity, 'value', 0, 1 ).name( 'show velocity' );
 
