@@ -5,7 +5,7 @@ import {
 	Vector2,
 	Vector3
 } from 'three';
-import { vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, texture, uniform, TempNode, NodeUpdateType, vec4, tslFn, cameraPosition, positionWorld, uv, mix, vec3, normalize, max, dot, viewportTopLeft } from 'three/tsl';
+import { vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, texture, uniform, TempNode, NodeUpdateType, vec4, Fn, cameraPosition, positionWorld, uv, mix, vec3, normalize, max, dot, viewportTopLeft } from 'three/tsl';
 
 /**
  * References:
@@ -91,7 +91,7 @@ class WaterNode extends TempNode {
 
 	setup() {
 
-		const outputNode = tslFn( () => {
+		const outputNode = Fn( () => {
 
 			const flowMapOffset0 = this.flowConfig.x;
 			const flowMapOffset1 = this.flowConfig.y;
