@@ -54,7 +54,13 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 		if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
 
 		const camera = new CubeCamera( 1, 10, this );
+
+		const currentMRT = renderer.getMRT();
+		renderer.setMRT( null );
+
 		camera.update( renderer, scene );
+
+		renderer.setMRT( currentMRT );
 
 		texture.minFilter = currentMinFilter;
 		texture.currentGenerateMipmaps = currentGenerateMipmaps;
