@@ -21,7 +21,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
 
 class SSAARenderPass extends Pass {
 
-	constructor( scene, camera, clearColor, clearAlpha, stencilBufferEnabled ) {
+	constructor( scene, camera, clearColor, clearAlpha ) {
 
 		super();
 
@@ -31,7 +31,7 @@ class SSAARenderPass extends Pass {
 		this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
 		this.unbiased = true;
 
-		this.stencilBufferEnabled = stencilBufferEnabled;
+		this.stencilBuffer = false;
 
 		// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
 		this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
@@ -81,7 +81,7 @@ class SSAARenderPass extends Pass {
 
 		if ( ! this.sampleRenderTarget ) {
 
-			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType, stencilBuffer: this.stencilBufferEnabled } );
+			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType, stencilBuffer: this.stencilBuffer } );
 			this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
 
 		}
