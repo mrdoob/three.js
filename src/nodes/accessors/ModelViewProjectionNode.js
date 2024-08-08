@@ -18,7 +18,7 @@ class ModelViewProjectionNode extends TempNode {
 
 	setup( builder ) {
 
-		if ( this.positionNode === null && builder.shaderStage === 'fragment' ) {
+		if ( builder.shaderStage === 'fragment' ) {
 
 			return varying( builder.context.mvp );
 
