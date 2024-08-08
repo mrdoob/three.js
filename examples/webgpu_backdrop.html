@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { float, vec3, color, viewportSharedTexture, viewportTopLeft, checker, uv, timerLocal, oscSine, output } from 'three/tsl';
+			import { float, vec3, color, viewportSharedTexture, viewportSafeUV, viewportTopLeft, checker, uv, timerLocal, oscSine, output } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -111,13 +111,13 @@
 				addBackdropSphere( viewportSharedTexture().rgb.saturation( 0 ) );
 				addBackdropSphere( viewportSharedTexture().rgb.saturation( 10 ), oscSine() );
 				addBackdropSphere( viewportSharedTexture().rgb.overlay( checker( uv().mul( 10 ) ) ) );
-				addBackdropSphere( viewportSharedTexture( viewportTopLeft.mul( 40 ).floor().div( 40 ) ) );
-				addBackdropSphere( viewportSharedTexture( viewportTopLeft.mul( 80 ).floor().div( 80 ) ).add( color( 0x0033ff ) ) );
+				addBackdropSphere( viewportSharedTexture( viewportSafeUV( viewportTopLeft.mul( 40 ).floor().div( 40 ) ) ) );
+				addBackdropSphere( viewportSharedTexture( viewportSafeUV( viewportTopLeft.mul( 80 ).floor().div( 80 ) ) ).add( color( 0x0033ff ) ) );
 				addBackdropSphere( vec3( 0, 0, viewportSharedTexture().b ) );
 
 				//renderer
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

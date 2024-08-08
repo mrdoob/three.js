@@ -1,6 +1,6 @@
-import { tslFn } from '../shadernode/ShaderNode.js';
+import { Fn } from '../shadernode/ShaderNode.js';
 
-export const getDistanceAttenuation = tslFn( ( inputs ) => {
+export const getDistanceAttenuation = Fn( ( inputs ) => {
 
 	const { lightDistance, cutoffDistance, decayExponent } = inputs;
 
@@ -9,7 +9,7 @@ export const getDistanceAttenuation = tslFn( ( inputs ) => {
 	// https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
 	const distanceFalloff = lightDistance.pow( decayExponent ).max( 0.01 ).reciprocal();
 
-	return cutoffDistance.greaterThan( 0 ).cond(
+	return cutoffDistance.greaterThan( 0 ).select(
 		distanceFalloff.mul( lightDistance.div( cutoffDistance ).pow4().oneMinus().clamp().pow2() ),
 		distanceFalloff
 	);

@@ -1,6 +1,6 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { float, nodeProxy, tslFn } from '../shadernode/ShaderNode.js';
+import { float, nodeProxy, Fn } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { reference } from './ReferenceNode.js';
 import { positionLocal } from './PositionNode.js';
@@ -8,7 +8,7 @@ import { normalLocal } from './NormalNode.js';
 import { textureLoad } from './TextureNode.js';
 import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
 import { ivec2, int } from '../shadernode/ShaderNode.js';
-import { loop } from '../utils/LoopNode.js';
+import { Loop } from '../utils/LoopNode.js';
 
 import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -18,7 +18,7 @@ import { FloatType } from '../../constants.js';
 const _morphTextures = new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
 
-const getMorph = tslFn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
+const getMorph = Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
 
 	const texelIndex = int( vertexIndex ).mul( stride ).add( offset );
 
@@ -190,7 +190,7 @@ class MorphNode extends Node {
 
 		const width = int( size.width );
 
-		loop( morphTargetsCount, ( { i } ) => {
+		Loop( morphTargetsCount, ( { i } ) => {
 
 			const influence = float( 0 ).toVar();
 

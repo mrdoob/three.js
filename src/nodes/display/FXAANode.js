@@ -1,11 +1,11 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, tslFn, nodeObject, float, vec2, vec4, int, If } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeObject, float, vec2, vec4, int, If } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { abs, max, min, mix, pow } from '../math/MathNode.js';
 import { sub } from '../math/OperatorNode.js';
-import { loop, Break } from '../utils/LoopNode.js';
+import { Loop, Break } from '../utils/LoopNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 
@@ -77,7 +77,7 @@ class FXAANode extends TempNode {
 
 		const NUM_SAMPLES = int( 5 );
 
-		const contrast = tslFn( ( [ a_immutable, b_immutable ] ) => {
+		const contrast = Fn( ( [ a_immutable, b_immutable ] ) => {
 
 			// assumes colors have premultipliedAlpha, so that the calculated color contrast is scaled by alpha
 
@@ -91,7 +91,7 @@ class FXAANode extends TempNode {
 
 		// FXAA3 QUALITY - PC
 
-		const FxaaPixelShader = tslFn( ( [ uv, fxaaQualityRcpFrame, fxaaQualityEdgeThreshold, fxaaQualityinvEdgeThreshold ] ) => {
+		const FxaaPixelShader = Fn( ( [ uv, fxaaQualityRcpFrame, fxaaQualityEdgeThreshold, fxaaQualityinvEdgeThreshold ] ) => {
 
 			const rgbaM = FxaaTexTop( uv ).toVar();
 			const rgbaS = FxaaTexOff( uv, vec2( 0.0, - 1.0 ), fxaaQualityRcpFrame.xy ).toVar();
@@ -130,8 +130,8 @@ class FXAANode extends TempNode {
 
 				// locate the edge
 
-				const x = contrastE.greaterThan( contrastW ).cond( 1, - 1 ).toVar();
-				const y = contrastS.greaterThan( contrastN ).cond( 1, - 1 ).toVar();
+				const x = contrastE.greaterThan( contrastW ).select( 1, - 1 ).toVar();
+				const y = contrastS.greaterThan( contrastN ).select( 1, - 1 ).toVar();
 
 				const dirToEdge = vec2( x, y ).toVar();
 				// . 2 .      . 1 .
@@ -184,7 +184,7 @@ class FXAANode extends TempNode {
 				offNP.x.assign( 0 );
 				offNP.y.assign( fxaaQualityRcpFrame.y );
 
-			 } ).else( () => {
+			 } ).Else( () => {
 
 				offNP.x.assign( fxaaQualityRcpFrame.x );
 				offNP.y.assign( 0 );
@@ -212,7 +212,7 @@ class FXAANode extends TempNode {
 			const iterationsUsedN = int( 0 ).toVar();
 			const iterationsUsedP = int( 0 ).toVar();
 
-			loop( NUM_SAMPLES, ( { i } ) => {
+			Loop( NUM_SAMPLES, ( { i } ) => {
 
 				const increment = i.add( 1 ).toVar();
 
@@ -233,7 +233,7 @@ class FXAANode extends TempNode {
 
 					iterationsUsedN.assign( i );
 
-				} );
+				} );
 
 				If( doneP.equal( 0 ), () => {
 
@@ -252,7 +252,7 @@ class FXAANode extends TempNode {
 
 					iterationsUsedP.assign( i );
 
-				} );
+				} );
 
 				If( doneN.equal( 1 ).or( doneP.equal( 1 ) ), () => {
 
@@ -303,7 +303,7 @@ class FXAANode extends TempNode {
 			]
 		} );
 
-		const fxaa = tslFn( () => {
+		const fxaa = Fn( () => {
 
 			const edgeDetectionQuality = float( 0.2 );
 			const invEdgeDetectionQuality = float( 1 ).div( edgeDetectionQuality );

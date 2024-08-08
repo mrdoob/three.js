@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, nodeObject, tslFn, mat3, vec2, vec3, vec4, float, int, If } from '../shadernode/ShaderNode.js';
+import { addNodeElement, nodeObject, Fn, mat3, vec2, vec3, vec4, float, int, If } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { DataTexture } from '../../textures/DataTexture.js';
@@ -10,7 +10,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { PI, cos, sin, pow, clamp, abs, max, mix, sqrt, acos, dot, normalize, cross } from '../math/MathNode.js';
 import { div, mul, add, sub } from '../math/OperatorNode.js';
-import { loop } from '../utils/LoopNode.js';
+import { Loop } from '../utils/LoopNode.js';
 import { passTexture } from './PassNode.js';
 import { RepeatWrapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
@@ -106,7 +106,7 @@ class GTAONode extends TempNode {
 		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
 		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
 
-		const getSceneUvAndDepth = tslFn( ( [ sampleViewPos ] )=> {
+		const getSceneUvAndDepth = Fn( ( [ sampleViewPos ] )=> {
 
 			const sampleClipPos = this.cameraProjectionMatrix.mul( vec4( sampleViewPos, 1.0 ) );
 			let sampleUv = sampleClipPos.xy.div( sampleClipPos.w ).mul( 0.5 ).add( 0.5 ).toVar();
@@ -116,7 +116,7 @@ class GTAONode extends TempNode {
 
 		} );
 
-		const getViewPosition = tslFn( ( [ screenPosition, depth ] ) => {
+		const getViewPosition = Fn( ( [ screenPosition, depth ] ) => {
 
 			screenPosition = vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 );
 
@@ -127,7 +127,7 @@ class GTAONode extends TempNode {
 
 		} );
 
-		const ao = tslFn( () => {
+		const ao = Fn( () => {
 
 			const depth = sampleDepth( uvNode );
 
@@ -147,12 +147,12 @@ class GTAONode extends TempNode {
 			const bitangent = vec3( tangent.y.mul( - 1.0 ), tangent.x, 0.0 );
 			const kernelMatrix = mat3( tangent, bitangent, vec3( 0.0, 0.0, 1.0 ) );
 
-			const DIRECTIONS = this.SAMPLES.lessThan( 30 ).cond( 3, 5 );
+			const DIRECTIONS = this.SAMPLES.lessThan( 30 ).select( 3, 5 );
 			const STEPS = add( this.SAMPLES, DIRECTIONS.sub( 1 ) ).div( DIRECTIONS );
 
 			const ao = float( 0 ).toVar();
 
-			loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
+			Loop( { start: int( 0 ), end: DIRECTIONS, type: 'int', condition: '<' }, ( { i } ) => {
 
 				const angle = float( i ).div( float( DIRECTIONS ) ).mul( PI );
 				const sampleDir = vec4( cos( angle ), sin( angle ), 0., add( 0.5, mul( 0.5, noiseTexel.w ) ) );
@@ -166,7 +166,7 @@ class GTAONode extends TempNode {
 				const tangentToNormalInSlice = cross( normalInSlice, sliceBitangent );
 				const cosHorizons = vec2( dot( viewDir, tangentToNormalInSlice ), dot( viewDir, tangentToNormalInSlice.negate() ) ).toVar();
 
-				loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
+				Loop( { end: STEPS, type: 'int', name: 'j', condition: '<' }, ( { j } ) => {
 
 					const sampleViewOffset = sampleDir.xyz.mul( radiusToUse ).mul( sampleDir.w ).mul( pow( div( float( j ).add( 1.0 ), float( STEPS ) ), this.distanceExponent ) );
 
@@ -206,7 +206,7 @@ class GTAONode extends TempNode {
 				const occlusion = nx.mul( nxb ).add( ny.mul( nyb ) );
 				ao.addAssign( occlusion );
 
-			} );
+			} );
 
 			ao.assign( clamp( ao.div( DIRECTIONS ), 0, 1 ) );
 			ao.assign( pow( ao, this.scale ) );

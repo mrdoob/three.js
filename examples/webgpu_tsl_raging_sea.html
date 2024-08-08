@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { float, mx_noise_float, loop, color, positionLocal, sin, vec2, vec3, mul, timerLocal, uniform, tslFn, modelNormalMatrix } from 'three/tsl';
+			import { float, mx_noise_float, Loop, color, positionLocal, sin, vec2, vec3, mul, timerLocal, uniform, Fn, modelNormalMatrix } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -68,7 +68,7 @@
 
 				// TSL functions
 
-				const wavesElevation = tslFn( ( [ position ] ) => {
+				const wavesElevation = Fn( ( [ position ] ) => {
 
 					const time = timerLocal();
 
@@ -80,7 +80,7 @@
 						largeWavesMultiplier
 					).toVar();
 
-					loop( { start: float( 1 ), end: smallWavesIterations.add( 1 ) }, ( { i } ) => {
+					Loop( { start: float( 1 ), end: smallWavesIterations.add( 1 ) }, ( { i } ) => {
 
 						const noiseInput = vec3(
 							position.xz

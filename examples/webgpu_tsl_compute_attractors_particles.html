@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { float, If, PI, color, cos, instanceIndex, loop, mix, mod, sin, storage, tslFn, uint, uniform, uniformArray, vec3, vec4 } from 'three/tsl';
+			import { float, If, PI, color, cos, instanceIndex, Loop, mix, mod, sin, storage, Fn, uint, uniform, uniformArray, vec3, vec4 } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -157,7 +157,7 @@
 				const positionBuffer = storage( new THREE.StorageInstancedBufferAttribute( count, 3 ), 'vec3', count );
 				const velocityBuffer = storage( new THREE.StorageInstancedBufferAttribute( count, 3 ), 'vec3', count );
 
-				const sphericalToVec3 = tslFn( ( [ phi, theta ] ) => {
+				const sphericalToVec3 = Fn( ( [ phi, theta ] ) => {
 
 					const sinPhiRadius = sin( phi );
 
@@ -171,7 +171,7 @@
 
 				// init compute
 
-				const init = tslFn( () => {
+				const init = Fn( () => {
 
 					const position = positionBuffer.element( instanceIndex );
 					const velocity = velocityBuffer.element( instanceIndex );
@@ -205,7 +205,7 @@
 				const particleMassMultiplier = instanceIndex.add( uint( Math.random() * 0xffffff ) ).hash().remap( 0.25, 1 ).toVar();
 				const particleMass = particleMassMultiplier.mul( particleGlobalMass ).toVar();
 
-				const update = tslFn( () => {
+				const update = Fn( () => {
 
 					// const delta = timerDelta().mul( timeScale ).min( 1 / 30 ).toVar();
 					const delta = float( 1 / 60 ).mul( timeScale ).toVar(); // uses fixed delta to consistant result
@@ -216,7 +216,7 @@
 
 					const force = vec3( 0 ).toVar();
 
-					loop( attractorsLength, ( { i } ) => {
+					Loop( attractorsLength, ( { i } ) => {
 
 						const attractorPosition = attractorsPositions.element( i );
 						const attractorRotationAxis = attractorsRotationAxes.element( i );
@@ -263,7 +263,7 @@
 
 				material.positionNode = positionBuffer.toAttribute();
 
-				material.colorNode = tslFn( () => {
+				material.colorNode = Fn( () => {
 
 					const velocity = velocityBuffer.toAttribute();
 					const speed = velocity.length();

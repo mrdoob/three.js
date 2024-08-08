@@ -1,4 +1,4 @@
-import { tslFn, If, mat3, vec2, vec3 } from '../../shadernode/ShaderNode.js';
+import { Fn, If, mat3, vec2, vec3 } from '../../shadernode/ShaderNode.js';
 import { max } from '../../math/MathNode.js';
 
 // Rect Area Light
@@ -7,7 +7,7 @@ import { max } from '../../math/MathNode.js';
 // by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
 // code: https://github.com/selfshadow/ltc_code/
 
-const LTC_Uv = tslFn( ( { N, V, roughness } ) => {
+const LTC_Uv = Fn( ( { N, V, roughness } ) => {
 
 	const LUT_SIZE = 64.0;
 	const LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;
@@ -32,7 +32,7 @@ const LTC_Uv = tslFn( ( { N, V, roughness } ) => {
 	]
 } );
 
-const LTC_ClippedSphereFormFactor = tslFn( ( { f } ) => {
+const LTC_ClippedSphereFormFactor = Fn( ( { f } ) => {
 
 	// Real-Time Area Lighting: a Journey from Research to Production (p.102)
 	// An approximation of the form factor of a horizon-clipped rectangle.
@@ -49,7 +49,7 @@ const LTC_ClippedSphereFormFactor = tslFn( ( { f } ) => {
 	]
 } );
 
-const LTC_EdgeVectorFormFactor = tslFn( ( { v1, v2 } ) => {
+const LTC_EdgeVectorFormFactor = Fn( ( { v1, v2 } ) => {
 
 	const x = v1.dot( v2 );
 	const y = x.abs().toVar();
@@ -59,7 +59,7 @@ const LTC_EdgeVectorFormFactor = tslFn( ( { v1, v2 } ) => {
 	const b = y.add( 4.1616724 ).mul( y ).add( 3.4175940 ).toVar();
 	const v = a.div( b );
 
-	const theta_sintheta = x.greaterThan( 0.0 ).cond( v, max( x.mul( x ).oneMinus(), 1e-7 ).inverseSqrt().mul( 0.5 ).sub( v ) );
+	const theta_sintheta = x.greaterThan( 0.0 ).select( v, max( x.mul( x ).oneMinus(), 1e-7 ).inverseSqrt().mul( 0.5 ).sub( v ) );
 
 	return v1.cross( v2 ).mul( theta_sintheta );
 
@@ -72,7 +72,7 @@ const LTC_EdgeVectorFormFactor = tslFn( ( { v1, v2 } ) => {
 	]
 } );
 
-const LTC_Evaluate = tslFn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => {
+const LTC_Evaluate = Fn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => {
 
 	// bail if point is on back side of plane of light
 	// assumes ccw winding order of light vertices

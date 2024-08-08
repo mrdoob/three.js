@@ -2,9 +2,9 @@ import { attribute } from '../core/AttributeNode.js';
 import { varying } from '../core/VaryingNode.js';
 import { cameraViewMatrix } from './CameraNode.js';
 import { modelViewMatrix } from './ModelNode.js';
-import { tslFn, vec4 } from '../shadernode/ShaderNode.js';
+import { Fn, vec4 } from '../shadernode/ShaderNode.js';
 
-export const tangentGeometry = /*#__PURE__*/ tslFn( ( stack, builder ) => {
+export const tangentGeometry = /*#__PURE__*/ Fn( ( builder ) => {
 
 	if ( builder.geometry.hasAttribute( 'tangent' ) === false ) {
 

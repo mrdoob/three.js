@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { vec3, cos, sin, mat3, storage, tslFn, instanceIndex, timerLocal } from 'three/tsl';
+			import { vec3, cos, sin, mat3, storage, Fn, instanceIndex, timerLocal } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -66,7 +66,7 @@
 
 					// compute shader
 
-					const computeFn = tslFn( () => {
+					const computeFn = Fn( () => {
 
 						const positionAttribute = storage( positionBaseAttribute, 'vec3', positionBaseAttribute.count ).toReadOnly();
 						const normalAttribute = storage( normalBaseAttribute, 'vec3', normalBaseAttribute.count ).toReadOnly();

@@ -328,5 +328,6 @@ export const GPUFeatureName = {
 	BGRA8UNormStorage: 'bgra8unorm-storage',
 	Float32Filterable: 'float32-filterable',
 	ClipDistances: 'clip-distances',
-	DualSourceBlending: 'dual-source-blending'
+	DualSourceBlending: 'dual-source-blending',
+	Subgroups: 'subgroups'
 };
