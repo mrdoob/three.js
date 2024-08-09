@@ -345,7 +345,7 @@ class WebGPUBackend extends Backend {
 
 				if ( renderContext.clearColor ) {
 
-					colorAttachment.clearValue = renderContext.clearColorValue;
+					colorAttachment.clearValue = i === 0 ? renderContext.clearColorValue : { r: 0, g: 0, b: 0, a: 1 };
 					colorAttachment.loadOp = GPULoadOp.Clear;
 					colorAttachment.storeOp = GPUStoreOp.Store;
 

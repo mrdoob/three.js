@@ -25,9 +25,9 @@ const ReinhardToneMappingNode = Fn( ( { color, exposure } ) => {
 } );
 
 // source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
-const OptimizedCineonToneMappingNode = Fn( ( { color, exposure } ) => {
+const CineonToneMappingNode = Fn( ( { color, exposure } ) => {
 
-	// optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
+	// filmic operator by Jim Hejl and Richard Burgess-Dawson
 	color = color.mul( exposure );
 	color = color.sub( 0.004 ).max( 0.0 );
 
@@ -94,7 +94,7 @@ const agxDefaultContrastApprox = Fn( ( [ x_immutable ] ) => {
 
 } );
 
-const AGXToneMappingNode = Fn( ( { color, exposure } ) => {
+const AgXToneMappingNode = Fn( ( { color, exposure } ) => {
 
 	const colortone = vec3( color ).toVar();
 	const AgXInsetMatrix = mat3( vec3( 0.856627153315983, 0.137318972929847, 0.11189821299995 ), vec3( 0.0951212405381588, 0.761241990602591, 0.0767994186031903 ), vec3( 0.0482516061458583, 0.101439036467562, 0.811302368396859 ) );
@@ -159,9 +159,9 @@ const NeutralToneMappingNode = Fn( ( { color, exposure } ) => {
 const toneMappingLib = {
 	[ LinearToneMapping ]: LinearToneMappingNode,
 	[ ReinhardToneMapping ]: ReinhardToneMappingNode,
-	[ CineonToneMapping ]: OptimizedCineonToneMappingNode,
+	[ CineonToneMapping ]: CineonToneMappingNode,
 	[ ACESFilmicToneMapping ]: ACESFilmicToneMappingNode,
-	[ AgXToneMapping ]: AGXToneMappingNode,
+	[ AgXToneMapping ]: AgXToneMappingNode,
 	[ NeutralToneMapping ]: NeutralToneMappingNode
 };
 

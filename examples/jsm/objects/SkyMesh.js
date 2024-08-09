@@ -5,7 +5,7 @@ import {
 	NodeMaterial,
 	Vector3
 } from 'three';
-import { float, tslFn, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varying, varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
+import { float, Fn, vec3, acos, add, mul, clamp, cos, dot, exp, max, mix, modelViewProjection, normalize, positionWorld, pow, smoothstep, sub, varying, varyingProperty, vec4, uniform, cameraPosition } from 'three/tsl';
 
 /**
  * Based on "A Practical Analytic Model for Daylight"
@@ -38,7 +38,7 @@ class SkyMesh extends Mesh {
 
 		this.isSky = true;
 
-		const vertexNode = /*@__PURE__*/ tslFn( () => {
+		const vertexNode = /*@__PURE__*/ Fn( () => {
 
 			// constants for atmospheric scattering
 			const e = float( 2.71828182845904523536028747135266249775724709369995957 );
@@ -104,7 +104,7 @@ class SkyMesh extends Mesh {
 
 		} )();
 
-		const fragmentNode = /*@__PURE__*/ tslFn( () => {
+		const fragmentNode = /*@__PURE__*/ Fn( () => {
 
 			const vSunDirection = varying( vec3(), 'vSunDirection' );
 			const vSunE = varying( float(), 'vSunE' );

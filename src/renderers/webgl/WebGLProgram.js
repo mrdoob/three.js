@@ -114,7 +114,7 @@ function getToneMappingFunction( functionName, toneMapping ) {
 			break;
 
 		case CineonToneMapping:
-			toneMappingName = 'OptimizedCineon';
+			toneMappingName = 'Cineon';
 			break;
 
 		case ACESFilmicToneMapping:

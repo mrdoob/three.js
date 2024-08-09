@@ -1,6 +1,7 @@
 import DataMap from '../DataMap.js';
 import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
+import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
 import { NodeFrame, objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, viewportBottomLeft, normalWorld, pmremTexture, viewportTopLeft } from '../../../nodes/Nodes.js';
 
 import { EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
@@ -264,13 +265,35 @@ class Nodes extends DataMap {
 
 		if ( background ) {
 
-			if ( sceneData.background !== background ) {
+			const forceUpdate = ( scene.backgroundBlurriness === 0 && sceneData.backgroundBlurriness > 0 ) || ( scene.backgroundBlurriness > 0 && sceneData.backgroundBlurriness === 0 );
+
+			if ( sceneData.background !== background || forceUpdate ) {
 
 				let backgroundNode = null;
 
 				if ( background.isCubeTexture === true || ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) ) {
 
-					backgroundNode = pmremTexture( background, normalWorld );
+					if ( scene.backgroundBlurriness > 0 ) {
+
+						backgroundNode = pmremTexture( background, normalWorld );
+
+					} else {
+
+						let envMap;
+
+						if ( background.isCubeTexture === true ) {
+
+							envMap = cubeTexture( background );
+
+						} else {
+
+							envMap = texture( background );
+
+						}
+
+						backgroundNode = cubeMapNode( envMap );
+
+					}
 
 				} else if ( background.isTexture === true ) {
 
@@ -284,6 +307,7 @@ class Nodes extends DataMap {
 
 				sceneData.backgroundNode = backgroundNode;
 				sceneData.background = background;
+				sceneData.backgroundBlurriness = scene.backgroundBlurriness;
 
 			}
 
