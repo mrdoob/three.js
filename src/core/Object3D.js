@@ -28,6 +28,59 @@ const _removedEvent = { type: 'removed' };
 const _childaddedEvent = { type: 'childadded', child: null };
 const _childremovedEvent = { type: 'childremoved', child: null };
 
+function listenToProperties( object, properties, onReadCallback, onWriteCallback ) {
+
+	for ( let i = 0; i < properties.length; i ++ ) {
+
+		const property = properties[ i ];
+		let _value = object[ property ];
+
+		Object.defineProperty( object, property, {
+
+			get() {
+
+				if ( onReadCallback ) onReadCallback();
+
+				return _value;
+
+			},
+			set( value ) {
+
+				_value = value;
+
+				if ( onWriteCallback ) onWriteCallback();
+
+			}
+
+		} );
+
+	}
+
+}
+
+function listenToMethods( object, onChangeCallback ) {
+
+	const properties = Object.getOwnPropertyNames( object.constructor.prototype );
+
+	for ( let i = 0; i < properties.length; i ++ ) {
+
+		const property = properties[ i ];
+		const value = object[ property ];
+
+		if ( property === 'constructor' || typeof value !== 'function' ) continue;
+
+		object[ property ] = function () {
+
+			onChangeCallback();
+
+			return value.apply( this, arguments );
+
+		};
+
+	}
+
+}
+
 class Object3D extends EventDispatcher {
 
 	constructor() {
@@ -53,20 +106,68 @@ class Object3D extends EventDispatcher {
 		const quaternion = new Quaternion();
 		const scale = new Vector3( 1, 1, 1 );
 
-		function onRotationChange() {
+		const matrix = new Matrix4();
+		const matrixWorld = new Matrix4();
 
-			quaternion.setFromEuler( rotation, false );
+		const self = this;
+		let rotationNeedsUpdate = false;
+		let quaternionNeedsUpdate = false;
+
+		function onWrite() {
+
+			self.matrixNeedsUpdate = true;
 
 		}
 
-		function onQuaternionChange() {
+		function onRotationWrite() {
 
-			rotation.setFromQuaternion( quaternion, undefined, false );
+			self.matrixNeedsUpdate = true;
+			rotationNeedsUpdate = true;
 
 		}
 
-		rotation._onChange( onRotationChange );
-		quaternion._onChange( onQuaternionChange );
+		function onRotationRead() {
+
+			if ( quaternionNeedsUpdate === true ) {
+
+				quaternionNeedsUpdate = false;
+				rotation.setFromQuaternion( quaternion, undefined );
+				rotationNeedsUpdate = false;
+
+			}
+
+		}
+
+		function onQuaternionWrite() {
+
+			self.matrixNeedsUpdate = true;
+			quaternionNeedsUpdate = true;
+
+		}
+
+		function onQuaternionRead() {
+
+			if ( rotationNeedsUpdate === true ) {
+
+				rotationNeedsUpdate = false;
+				quaternion.setFromEuler( rotation );
+				quaternionNeedsUpdate = false;
+
+			}
+
+		}
+
+		function onMatrixChange() {
+
+			self.matrixWorldNeedsUpdate = true;
+
+		}
+
+		listenToProperties( position, [ 'x', 'y', 'z' ], undefined, onWrite );
+		listenToProperties( rotation, [ 'x', 'y', 'z', 'order' ], onRotationRead, onRotationWrite );
+		listenToProperties( quaternion, [ 'x', 'y', 'z', 'w' ], onQuaternionRead, onQuaternionWrite );
+		listenToProperties( scale, [ 'x', 'y', 'z' ], undefined, onWrite );
+		listenToMethods( matrix, onMatrixChange );
 
 		Object.defineProperties( this, {
 			position: {
@@ -97,12 +198,13 @@ class Object3D extends EventDispatcher {
 			}
 		} );
 
-		this.matrix = new Matrix4();
-		this.matrixWorld = new Matrix4();
+		this.matrix = matrix;
+		this.matrixWorld = matrixWorld;
 
 		this.matrixAutoUpdate = Object3D.DEFAULT_MATRIX_AUTO_UPDATE;
 
 		this.matrixWorldAutoUpdate = Object3D.DEFAULT_MATRIX_WORLD_AUTO_UPDATE; // checked by the renderer
+		this.matrixNeedsUpdate = false;
 		this.matrixWorldNeedsUpdate = false;
 
 		this.layers = new Layers();
@@ -577,9 +679,13 @@ class Object3D extends EventDispatcher {
 
 	updateMatrix() {
 
-		this.matrix.compose( this.position, this.quaternion, this.scale );
+		if ( this.matrixNeedsUpdate === true ) {
 
-		this.matrixWorldNeedsUpdate = true;
+			this.matrix.compose( this.position, this.quaternion, this.scale );
+			this.matrixNeedsUpdate = false;
+			this.matrixWorldNeedsUpdate = true;
+
+		}
 
 	}
 
@@ -985,6 +1091,7 @@ class Object3D extends EventDispatcher {
 		this.matrixAutoUpdate = source.matrixAutoUpdate;
 
 		this.matrixWorldAutoUpdate = source.matrixWorldAutoUpdate;
+		this.matrixNeedsUpdate = source.matrixNeedsUpdate;
 		this.matrixWorldNeedsUpdate = source.matrixWorldNeedsUpdate;
 
 		this.layers.mask = source.layers.mask;
