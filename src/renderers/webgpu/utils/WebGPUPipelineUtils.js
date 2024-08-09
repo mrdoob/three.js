@@ -284,7 +284,7 @@ class WebGPUPipelineUtils {
 						break;
 
 					case AdditiveBlending:
-						setBlend( GPUBlendFactor.SrcAlpha, GPUBlendFactor.One, GPUBlendFactor.One, GPUBlendFactor.One );
+						setBlend( GPUBlendFactor.One, GPUBlendFactor.One, GPUBlendFactor.One, GPUBlendFactor.One );
 						break;
 
 					case SubtractiveBlending:
