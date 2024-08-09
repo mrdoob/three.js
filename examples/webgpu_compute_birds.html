@@ -152,13 +152,14 @@
 				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 100, 1000 );
 
-				renderer = new THREE.WebGPURenderer( { forceWebGL: true } );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
 				container.appendChild( renderer.domElement );
 
 				// Initialize position, velocity, and phase values
+			
 				const positionArray = new Float32Array( BIRDS * 3 );
 				const velocityArray = new Float32Array( BIRDS * 3 );
 				const phaseArray = new Float32Array( BIRDS );
@@ -218,7 +219,6 @@
 					predator: uniform( new THREE.Vector3() ).label( 'predator' ),
 				};
 
-
 				// Create geometry
 			
 				const birdGeometry = new BirdGeometry();
@@ -227,7 +227,6 @@
 				// Declare varyings
 
 				const vColor = varyingProperty( 'vec4', 'vColor' );
-				const vZ = varyingProperty( 'float', 'vZ' );
 			
 				// Animate bird mesh within vertex shader, then apply position offset to vertices.
 			
@@ -276,8 +275,7 @@
 
 					const finalVert = maty.mul( matz ).mul( newPosition );
 					finalVert.addAssign( positionRead.element( reference ) );
-
-					vZ.assign( finalVert.z );
+			
 					vColor.assign( vec4( birdColor, 1.0 ) );
 
 					return cameraProjectionMatrix.mul( cameraViewMatrix ).mul( finalVert );
@@ -369,7 +367,6 @@
 							const velocityAdjust = ( separationThresh.div( percent ).sub( 1.0 ) ).mul( deltaTime );
 							velocity.subAssign( normalize( dirToBird ).mul( velocityAdjust ) );
 
-
 						} ).ElseIf( percent.lessThan( alignmentThresh ), () => {
 
 							// Alignment - fly the same direction
@@ -406,14 +403,12 @@
 			
 					} );
 			
-
 				} )().compute( BIRDS );
 
 				computePosition = Fn( () => {
 
 					const { deltaTime } = effectController;
 					positionStorage.element( instanceIndex ).addAssign( velocityStorage.element( instanceIndex ).mul( deltaTime ).mul( 15.0 ) );
-
 
 					const velocity = velocityStorage.element( instanceIndex );
 					const phase = phaseStorage.element( instanceIndex );
