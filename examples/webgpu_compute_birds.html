@@ -152,7 +152,7 @@
 				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 100, 1000 );
 
-				renderer = new THREE.WebGPURenderer( { forceWebGL: true } );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -337,7 +337,7 @@
 					dirToCenter.y.mulAssign( 2.5 );
 					velocity.subAssign( normalize( dirToCenter ).mul( deltaTime ).mul( 5.0 ) );
 
-					Loop( { start: 0, end: BIRDS, type: 'uint', condition: '<' }, ( { i } ) => {
+					Loop( { start: uint( 0 ), end: uint( BIRDS ), type: 'uint', condition: '<' }, ( { i } ) => {
 
 						const birdPosition = positionStorage.element( i );
 						const dirToBird = birdPosition.sub( position );
@@ -420,9 +420,6 @@
 
 					const modValue = phase.add( deltaTime ).add( length( velocity.xz ).mul( deltaTime ).mul( 3.0 ) ).add( max( velocity.y, 0.0 ).mul( deltaTime ).mul( 6.0 ) );
 					phaseStorage.element( instanceIndex ).assign( modValue.mod( 62.83 ) );
-
-					const s = property( 'uint', 's' );
-					s.assign( uint( 4 ).remainder( 8 ) );
 
 				} )().compute( BIRDS );
 
