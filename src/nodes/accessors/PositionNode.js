@@ -3,7 +3,8 @@ import { varying } from '../core/VaryingNode.js';
 import { modelWorldMatrix, modelViewMatrix } from './ModelNode.js';
 
 export const positionGeometry = /*#__PURE__*/ attribute( 'position', 'vec3' );
-export const positionLocal = /*#__PURE__*/ positionGeometry.toVar( 'positionLocal' );
+export const positionLocal = /*#__PURE__*/ positionGeometry.varying( 'positionLocal' );
+export const positionPrevious = /*#__PURE__*/ positionGeometry.varying( 'positionPrevious' );
 export const positionWorld = /*#__PURE__*/ varying( modelWorldMatrix.mul( positionLocal ).xyz, 'v_positionWorld' );
 export const positionWorldDirection = /*#__PURE__*/ varying( positionLocal.transformDirection( modelWorldMatrix ), 'v_positionWorldDirection' ).normalize().toVar( 'positionWorldDirection' );
 export const positionView = /*#__PURE__*/ varying( modelViewMatrix.mul( positionLocal ).xyz, 'v_positionView' );
