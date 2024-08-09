@@ -65,7 +65,7 @@ class MathNode extends TempNode {
 
 			return builder.changeComponentType( this.aNode.getNodeType( builder ), 'bool' );
 
-		} else if ( method === MathNode.MOD_FLOAT ) {
+		} else if ( method === MathNode.MOD ) {
 
 			return this.aNode.getNodeType( builder );
 
@@ -132,7 +132,7 @@ class MathNode extends TempNode {
 
 			const params = [];
 
-			if ( method === MathNode.CROSS || method === MathNode.MOD_FLOAT ) {
+			if ( method === MathNode.CROSS || method === MathNode.MOD ) {
 
 				params.push(
 					a.build( builder, type ),
@@ -146,7 +146,7 @@ class MathNode extends TempNode {
 					b.build( builder, inputType )
 				);
 
-			} else if ( ( isWebGL && ( method === MathNode.MIN || method === MathNode.MAX ) ) || method === MathNode.MOD_FLOAT ) {
+			} else if ( ( isWebGL && ( method === MathNode.MIN || method === MathNode.MAX ) ) || method === MathNode.MOD ) {
 
 				params.push(
 					a.build( builder, inputType ),
@@ -244,7 +244,7 @@ MathNode.TRANSPOSE = 'transpose';
 MathNode.ATAN2 = 'atan2';
 MathNode.MIN = 'min';
 MathNode.MAX = 'max';
-MathNode.MOD_FLOAT = 'modFloat';
+MathNode.MOD = 'mod';
 MathNode.STEP = 'step';
 MathNode.REFLECT = 'reflect';
 MathNode.DISTANCE = 'distance';
@@ -308,7 +308,7 @@ export const transpose = nodeProxy( MathNode, MathNode.TRANSPOSE );
 export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
 export const min = nodeProxy( MathNode, MathNode.MIN );
 export const max = nodeProxy( MathNode, MathNode.MAX );
-export const modFloat = nodeProxy( MathNode, MathNode.MOD_FLOAT );
+export const modFloat = nodeProxy( MathNode, MathNode.MOD );
 export const step = nodeProxy( MathNode, MathNode.STEP );
 export const reflect = nodeProxy( MathNode, MathNode.REFLECT );
 export const distance = nodeProxy( MathNode, MathNode.DISTANCE );
