@@ -20,9 +20,9 @@ class SpriteSheetUVNode extends Node {
 
 		const { width, height } = countNode;
 
-		const frameNum = frameNode.mod( width.mul( height ) ).floor();
+		const frameNum = frameNode.modFloat( width.mul( height ) ).floor();
 
-		const column = frameNum.mod( width );
+		const column = frameNum.modFloat( width );
 		const row = height.sub( frameNum.add( 1 ).div( width ).ceil() );
 
 		const scale = countNode.reciprocal();

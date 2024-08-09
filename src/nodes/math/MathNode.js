@@ -65,7 +65,7 @@ class MathNode extends TempNode {
 
 			return builder.changeComponentType( this.aNode.getNodeType( builder ), 'bool' );
 
-		} else if ( method === MathNode.MOD ) {
+		} else if ( method === MathNode.MOD_FLOAT ) {
 
 			return this.aNode.getNodeType( builder );
 
@@ -132,7 +132,7 @@ class MathNode extends TempNode {
 
 			const params = [];
 
-			if ( method === MathNode.CROSS || method === MathNode.MOD ) {
+			if ( method === MathNode.CROSS || method === MathNode.MOD_FLOAT ) {
 
 				params.push(
 					a.build( builder, type ),
@@ -146,7 +146,7 @@ class MathNode extends TempNode {
 					b.build( builder, inputType )
 				);
 
-			} else if ( ( isWebGL && ( method === MathNode.MIN || method === MathNode.MAX ) ) || method === MathNode.MOD ) {
+			} else if ( ( isWebGL && ( method === MathNode.MIN || method === MathNode.MAX ) ) || method === MathNode.MOD_FLOAT ) {
 
 				params.push(
 					a.build( builder, inputType ),
@@ -244,7 +244,7 @@ MathNode.TRANSPOSE = 'transpose';
 MathNode.ATAN2 = 'atan2';
 MathNode.MIN = 'min';
 MathNode.MAX = 'max';
-MathNode.MOD = 'mod';
+MathNode.MOD_FLOAT = 'modFloat';
 MathNode.STEP = 'step';
 MathNode.REFLECT = 'reflect';
 MathNode.DISTANCE = 'distance';
@@ -308,7 +308,7 @@ export const transpose = nodeProxy( MathNode, MathNode.TRANSPOSE );
 export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
 export const min = nodeProxy( MathNode, MathNode.MIN );
 export const max = nodeProxy( MathNode, MathNode.MAX );
-export const mod = nodeProxy( MathNode, MathNode.MOD );
+export const modFloat = nodeProxy( MathNode, MathNode.MOD_FLOAT );
 export const step = nodeProxy( MathNode, MathNode.STEP );
 export const reflect = nodeProxy( MathNode, MathNode.REFLECT );
 export const distance = nodeProxy( MathNode, MathNode.DISTANCE );
@@ -333,7 +333,7 @@ export const faceForward = nodeProxy( MathNode, MathNode.FACEFORWARD );
 export const rand = Fn( ( [ uv ] ) => {
 
 	const a = 12.9898, b = 78.233, c = 43758.5453;
-	const dt = dot( uv.xy, vec2( a, b ) ), sn = mod( dt, PI );
+	const dt = dot( uv.xy, vec2( a, b ) ), sn = modFloat( dt, PI );
 
 	return fract( sin( sn ).mul( c ) );
 
@@ -379,7 +379,7 @@ addNodeElement( 'fwidth', fwidth );
 addNodeElement( 'atan2', atan2 );
 addNodeElement( 'min', min );
 addNodeElement( 'max', max );
-addNodeElement( 'mod', mod );
+addNodeElement( 'modFloat', modFloat );
 addNodeElement( 'step', step );
 addNodeElement( 'reflect', reflect );
 addNodeElement( 'distance', distance );
@@ -400,5 +400,14 @@ addNodeElement( 'saturate', saturate );
 addNodeElement( 'cbrt', cbrt );
 addNodeElement( 'transpose', transpose );
 addNodeElement( 'rand', rand );
+
+export const mod = ( ...params ) => {
+
+	console.warn( 'TSL.MathNode: .mod() has been renamed to .modFloat().' );
+	return modFloat( ...params );
+
+};
+
+addNodeElement( 'mod', mod );
 
 addNodeClass( 'MathNode', MathNode );

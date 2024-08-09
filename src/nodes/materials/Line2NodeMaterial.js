@@ -272,7 +272,7 @@ class Line2NodeMaterial extends NodeMaterial {
 				const vLineDistanceOffset = offsetNode ? vLineDistance.add( offsetNode ) : vLineDistance;
 
 				vUv.y.lessThan( - 1.0 ).or( vUv.y.greaterThan( 1.0 ) ).discard(); // discard endcaps
-				vLineDistanceOffset.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard(); // todo - FIX
+				vLineDistanceOffset.modFloat( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard(); // todo - FIX
 
 			}
 

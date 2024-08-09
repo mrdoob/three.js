@@ -43,7 +43,7 @@ class BatchNode extends Node {
 		const getIndirectIndex = Fn( ( [ id ] ) => {
 
 			const size = textureSize( textureLoad( this.batchMesh._indirectTexture ), 0 );
-			const x = int( id ).remainder( int( size ) );
+			const x = int( id ).modInt( int( size ) );
 			const y = int( id ).div( int( size ) );
 			return textureLoad( this.batchMesh._indirectTexture, ivec2( x, y ) ).x;
 
@@ -60,7 +60,7 @@ class BatchNode extends Node {
 		const size = textureSize( textureLoad( matriceTexture ), 0 );
 		const j = float( getIndirectIndex( int( this.batchingIdNode ) ) ).mul( 4 ).toVar();
 
-		const x = int( j.mod( size ) );
+		const x = int( j.modFloat( size ) );
 		const y = int( j ).div( int( size ) );
 		const batchingMatrix = mat4(
 			textureLoad( matriceTexture, ivec2( x, y ) ),

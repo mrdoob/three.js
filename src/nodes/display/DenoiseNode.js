@@ -106,8 +106,8 @@ class DenoiseNode extends TempNode {
 			noiseUv = noiseUv.mul( this._resolution.div( noiseResolution ) );
 			const noiseTexel = sampleNoise( noiseUv );
 
-			const x = sin( noiseTexel.element( this.index.mod( 4 ).mul( 2 ).mul( PI ) ) );
-			const y = cos( noiseTexel.element( this.index.mod( 4 ).mul( 2 ).mul( PI ) ) );
+			const x = sin( noiseTexel.element( this.index.modFloat( 4 ).mul( 2 ).mul( PI ) ) );
+			const y = cos( noiseTexel.element( this.index.modFloat( 4 ).mul( 2 ).mul( PI ) ) );
 
 			const noiseVec = vec2( x, y );
 			const rotationMatrix = mat2( noiseVec.x, noiseVec.y.negate(), noiseVec.x, noiseVec.y );

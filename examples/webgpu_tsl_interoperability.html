@@ -220,7 +220,7 @@
 
 					let color = texture( planetTexture, samplePoint );
 
-					const ind = floor( subCoord.x ).mod( 3 );
+					const ind = floor( subCoord.x ).modFloat( 3 );
 
 					let maskColor = vec3(
 						ind.equal( 0.0 ),

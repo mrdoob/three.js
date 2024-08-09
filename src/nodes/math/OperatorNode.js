@@ -275,7 +275,7 @@ export const add = nodeProxy( OperatorNode, '+' );
 export const sub = nodeProxy( OperatorNode, '-' );
 export const mul = nodeProxy( OperatorNode, '*' );
 export const div = nodeProxy( OperatorNode, '/' );
-export const remainder = nodeProxy( OperatorNode, '%' );
+export const modInt = nodeProxy( OperatorNode, '%' );
 export const equal = nodeProxy( OperatorNode, '==' );
 export const notEqual = nodeProxy( OperatorNode, '!=' );
 export const lessThan = nodeProxy( OperatorNode, '<' );
@@ -293,11 +293,14 @@ export const bitXor = nodeProxy( OperatorNode, '^' );
 export const shiftLeft = nodeProxy( OperatorNode, '<<' );
 export const shiftRight = nodeProxy( OperatorNode, '>>' );
 
+
+nodeProxy( OperatorNode, '%' );
+
 addNodeElement( 'add', add );
 addNodeElement( 'sub', sub );
 addNodeElement( 'mul', mul );
 addNodeElement( 'div', div );
-addNodeElement( 'remainder', remainder );
+addNodeElement( 'modInt', modInt );
 addNodeElement( 'equal', equal );
 addNodeElement( 'notEqual', notEqual );
 addNodeElement( 'lessThan', lessThan );
@@ -314,5 +317,15 @@ addNodeElement( 'bitOr', bitOr );
 addNodeElement( 'bitXor', bitXor );
 addNodeElement( 'shiftLeft', shiftLeft );
 addNodeElement( 'shiftRight', shiftRight );
+
+
+export const remainder = ( ...params ) => {
+
+	console.warn( 'TSL.OperatorNode: .remainder() has been renamed to .modInt().' );
+	return modInt( ...params );
+
+};
+
+addNodeElement( 'remainder', remainder );
 
 addNodeClass( 'OperatorNode', OperatorNode );

@@ -9,7 +9,7 @@ const checkerShaderNode = Fn( ( inputs ) => {
 
 	const cx = uv.x.floor();
 	const cy = uv.y.floor();
-	const result = cx.add( cy ).mod( 2.0 );
+	const result = cx.add( cy ).modFloat( 2.0 );
 
 	return result.sign();
 

@@ -44,7 +44,7 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		const vLineDistance = varying( attribute( 'lineDistance' ).mul( dashScaleNode ) );
 		const vLineDistanceOffset = offsetNode ? vLineDistance.add( offsetNode ) : vLineDistance;
 
-		vLineDistanceOffset.mod( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard();
+		vLineDistanceOffset.modFloat( dashSize.add( gapSize ) ).greaterThan( dashSize ).discard();
 
 	}
 
