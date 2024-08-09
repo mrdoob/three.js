@@ -213,6 +213,18 @@ class OperatorNode extends TempNode {
 
 				return builder.format( `(${op}${a})`, typeA, output );
 
+			} else if ( op === '%' ) {
+
+				if ( builder.renderer.backend.isWebGLBackend ) {
+
+					builder.format( `mod( ${a}, ${b} )`, type, output );
+
+				} else {
+
+					builder.format( `${ a } ${ op } ${ b }`, type, output );
+
+				}
+
 			} else if ( fnOpSnippet ) {
 
 				return builder.format( `${ fnOpSnippet }( ${ a }, ${ b } )`, type, output );
