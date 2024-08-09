@@ -281,9 +281,6 @@ export const bitXor = nodeProxy( OperatorNode, '^' );
 export const shiftLeft = nodeProxy( OperatorNode, '<<' );
 export const shiftRight = nodeProxy( OperatorNode, '>>' );
 
-
-nodeProxy( OperatorNode, '%' );
-
 addNodeElement( 'add', add );
 addNodeElement( 'sub', sub );
 addNodeElement( 'mul', mul );
