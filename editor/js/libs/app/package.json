@@ -1,0 +1,14 @@
+{
+	"name": "three-app",
+	"version": "1.0.0",
+	"private": true,
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"three": "github:mrdoob/three.js#dev",
+		"vite": "^5.2.13"
+	}
+  }
