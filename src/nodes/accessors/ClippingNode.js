@@ -23,28 +23,24 @@ class ClippingNode extends Node {
 		super.setup( builder );
 
 		const clippingContext = builder.clippingContext;
-		const { localClipIntersection, localClippingCount, globalClippingCount } = clippingContext;
+		const { intersectionPlanes, unionPlanes } = clippingContext;
 
-		const numClippingPlanes = globalClippingCount + localClippingCount;
-		const numUnionClippingPlanes = localClipIntersection ? numClippingPlanes - localClippingCount : numClippingPlanes;
 
 		if ( this.scope === ClippingNode.ALPHA_TO_COVERAGE ) {
 
-			return this.setupAlphaToCoverage( clippingContext.planes, numClippingPlanes, numUnionClippingPlanes );
+			return this.setupAlphaToCoverage( intersectionPlanes, unionPlanes );
 
 		} else {
 
-			return this.setupDefault( clippingContext.planes, numClippingPlanes, numUnionClippingPlanes );
+			return this.setupDefault( intersectionPlanes, unionPlanes );
 
 		}
 
 	}
 
-	setupAlphaToCoverage( planes, numClippingPlanes, numUnionClippingPlanes ) {
+	setupAlphaToCoverage( intersectionPlanes, unionPlanes ) {
 
 		return Fn( () => {
-
-			const clippingPlanes = uniformArray( planes );
 
 			const distanceToPlane = property( 'float', 'distanceToPlane' );
 			const distanceGradient = property( 'float', 'distanceToGradient' );
@@ -53,28 +49,41 @@ class ClippingNode extends Node {
 
 			clipOpacity.assign( 1 );
 
-			let plane;
+			const numUnionPlanes = unionPlanes.length;
 
-			Loop( numUnionClippingPlanes, ( { i } ) => {
+			if ( numUnionPlanes > 0 ) {
 
-				plane = clippingPlanes.element( i );
+				const clippingPlanes = uniformArray( unionPlanes );
 
-				distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
-				distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
+				let plane;
 
-				clipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ) );
+				Loop( numUnionPlanes, ( { i } ) => {
 
-				clipOpacity.equal( 0.0 ).discard();
+					plane = clippingPlanes.element( i );
 
-			} );
+					distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
+					distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
 
-			if ( numUnionClippingPlanes < numClippingPlanes ) {
+					clipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ) );
 
+					clipOpacity.equal( 0.0 ).discard();
+
+				} );
+
+			}
+
+			const numIntersectionPlanes = intersectionPlanes.length;
+
+			if ( numIntersectionPlanes > 0 ) {
+
+				const clippingPlanes = uniformArray( intersectionPlanes );
 				const unionClipOpacity = property( 'float', 'unionclipOpacity' );
+
+				let plane;
 
 				unionClipOpacity.assign( 1 );
 
-				Loop( { start: numUnionClippingPlanes, end: numClippingPlanes }, ( { i } ) => {
+				Loop( numIntersectionPlanes, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 
@@ -97,28 +106,39 @@ class ClippingNode extends Node {
 
 	}
 
-	setupDefault( planes, numClippingPlanes, numUnionClippingPlanes ) {
+	setupDefault( intersectionPlanes, unionPlanes ) {
 
 		return Fn( () => {
 
-			const clippingPlanes = uniformArray( planes );
+			const numUnionPlanes = unionPlanes.length;
 
-			let plane;
+			if ( numUnionPlanes > 0 ) {
 
-			Loop( numUnionClippingPlanes, ( { i } ) => {
+				const clippingPlanes = uniformArray( unionPlanes );
 
-				plane = clippingPlanes.element( i );
-				positionView.dot( plane.xyz ).greaterThan( plane.w ).discard();
+				let plane;
 
-			} );
+				Loop( numUnionPlanes, ( { i } ) => {
 
-			if ( numUnionClippingPlanes < numClippingPlanes ) {
+					plane = clippingPlanes.element( i );
+					positionView.dot( plane.xyz ).greaterThan( plane.w ).discard();
 
+				} );
+
+			}
+
+			const numIntersectionPlanes = intersectionPlanes.length;
+
+			if ( numIntersectionPlanes > 0 ) {
+
+				const clippingPlanes = uniformArray( intersectionPlanes );
 				const clipped = property( 'bool', 'clipped' );
+
+				let plane;
 
 				clipped.assign( true );
 
-				Loop( { start: numUnionClippingPlanes, end: numClippingPlanes }, ( { i } ) => {
+				Loop( numIntersectionPlanes, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 					clipped.assign( positionView.dot( plane.xyz ).greaterThan( plane.w ).and( clipped ) );

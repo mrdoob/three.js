@@ -82,7 +82,7 @@ class RenderList {
 
 	}
 
-	getNextRenderItem( object, geometry, material, groupOrder, z, group ) {
+	getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext ) {
 
 		let renderItem = this.renderItems[ this.renderItemsIndex ];
 
@@ -96,7 +96,8 @@ class RenderList {
 				groupOrder: groupOrder,
 				renderOrder: object.renderOrder,
 				z: z,
-				group: group
+				group: group,
+				clippingContext: clippingContext
 			};
 
 			this.renderItems[ this.renderItemsIndex ] = renderItem;
@@ -111,6 +112,7 @@ class RenderList {
 			renderItem.renderOrder = object.renderOrder;
 			renderItem.z = z;
 			renderItem.group = group;
+			renderItem.clippingContext = clippingContext;
 
 		}
 
@@ -120,9 +122,9 @@ class RenderList {
 
 	}
 
-	push( object, geometry, material, groupOrder, z, group ) {
+	push( object, geometry, material, groupOrder, z, group, clippingContext ) {
 
-		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group );
+		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
 		if ( object.occlusionTest === true ) this.occlusionQueryCount ++;
 
@@ -130,9 +132,9 @@ class RenderList {
 
 	}
 
-	unshift( object, geometry, material, groupOrder, z, group ) {
+	unshift( object, geometry, material, groupOrder, z, group, clippingContext ) {
 
-		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group );
+		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
 		( material.transparent === true ? this.transparent : this.opaque ).unshift( renderItem );
 
@@ -185,6 +187,7 @@ class RenderList {
 			renderItem.renderOrder = null;
 			renderItem.z = null;
 			renderItem.group = null;
+			renderItem.clippingContext = null;
 
 		}
 
