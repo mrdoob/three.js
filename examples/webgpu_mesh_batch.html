@@ -17,17 +17,12 @@
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - batch mesh
 	</div>
 
-	<div id="backend" style="position: absolute; top: 200px; left: 0; color: #fff; background-color: rgba(0,0,0,0.75); padding: 5px;">
-		Active Backend: WebGPU
-	</div>
-
 	<script type="importmap">
 		{
 			"imports": {
 				"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
-				"three/addons/": "./jsm/",
-				"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.7/dist/main.js"
+				"three/tsl": "../build/three.webgpu.js",
+				"three/addons/": "./jsm/"
 			}
 		}
 	</script>
@@ -36,7 +31,7 @@
 
 		import * as THREE from 'three';
 
-		import Stats from 'stats-gl';
+		import Stats from 'three/addons/libs/stats.module.js';
 
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -201,7 +196,6 @@
 
 			}
 
-			document.getElementById( 'backend' ).innerText = 'Active Backend: ' + ( forceWebGL ? 'WebGL' : 'WebGPU' );
 			// camera
 
 			const aspect = window.innerWidth / window.innerHeight;
@@ -248,13 +242,8 @@
 
 			// stats
 
-			stats = new Stats( {
-				precision: 3,
-				horizontal: false
-			} );
-			stats.init( renderer );
+			stats = new Stats();
 			document.body.appendChild( stats.dom );
-			stats.dom.style.position = 'absolute';
 
 			// gui
 

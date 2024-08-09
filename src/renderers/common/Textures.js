@@ -4,7 +4,7 @@ import { Vector3 } from '../../math/Vector3.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, LinearFilter, NearestFilter, EquirectangularReflectionMapping, EquirectangularRefractionMapping, CubeReflectionMapping, CubeRefractionMapping, UnsignedByteType } from '../../constants.js';
 
-const _size = new Vector3();
+const _size = /*@__PURE__*/ new Vector3();
 
 class Textures extends DataMap {
 
@@ -118,6 +118,8 @@ class Textures extends DataMap {
 				}
 
 				this._destroyTexture( depthTexture );
+
+				this.delete( renderTarget );
 
 			};
 

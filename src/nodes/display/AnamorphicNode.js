@@ -1,17 +1,17 @@
 import TempNode from '../core/TempNode.js';
-import { nodeObject, addNodeElement, tslFn, float, vec2, vec3 } from '../shadernode/ShaderNode.js';
-import { loop } from '../utils/LoopNode.js';
+import { nodeObject, addNodeElement, Fn, float, vec2, vec3 } from '../shadernode/ShaderNode.js';
+import { Loop } from '../utils/LoopNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { threshold } from './ColorAdjustmentNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { texturePass } from './PassNode.js';
+import { passTexture } from './PassNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 
-const quadMesh = new QuadMesh();
+const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 class AnamorphicNode extends TempNode {
 
@@ -31,7 +31,7 @@ class AnamorphicNode extends TempNode {
 
 		this._invSize = uniform( new Vector2() );
 
-		this._textureNode = texturePass( this, this._renderTarget.texture );
+		this._textureNode = passTexture( this, this._renderTarget.texture );
 
 		this.updateBeforeType = NodeUpdateType.RENDER;
 
@@ -66,7 +66,7 @@ class AnamorphicNode extends TempNode {
 		const currentRenderTarget = renderer.getRenderTarget();
 		const currentTexture = textureNode.value;
 
-		quadMesh.material = this._material;
+		_quadMesh.material = this._material;
 
 		this.setSize( map.image.width, map.image.height );
 
@@ -74,7 +74,7 @@ class AnamorphicNode extends TempNode {
 
 		renderer.setRenderTarget( this._renderTarget );
 
-		quadMesh.render( renderer );
+		_quadMesh.render( renderer );
 
 		// restore
 
@@ -90,14 +90,14 @@ class AnamorphicNode extends TempNode {
 
 		const sampleTexture = ( uv ) => textureNode.uv( uv );
 
-		const anamorph = tslFn( () => {
+		const anamorph = Fn( () => {
 
 			const samples = this.samples;
 			const halfSamples = Math.floor( samples / 2 );
 
 			const total = vec3( 0 ).toVar();
 
-			loop( { start: - halfSamples, end: halfSamples }, ( { i } ) => {
+			Loop( { start: - halfSamples, end: halfSamples }, ( { i } ) => {
 
 				const softness = float( i ).abs().div( halfSamples ).oneMinus();
 
@@ -126,6 +126,12 @@ class AnamorphicNode extends TempNode {
 		//
 
 		return this._textureNode;
+
+	}
+
+	dispose() {
+
+		this._renderTarget.dispose();
 
 	}
 

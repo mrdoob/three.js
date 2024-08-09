@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, texture, vec3, pass, color, uint, viewportTopLeft, positionWorld, positionLocal, timerLocal, vec2, instanceIndex, storage, If } from 'three/tsl';
+			import { Fn, texture, vec3, pass, color, uint, viewportTopLeft, positionWorld, positionLocal, timerLocal, vec2, instanceIndex, storage, If } from 'three/tsl';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
@@ -105,7 +105,7 @@
 
 				const randUint = () => uint( Math.random() * 0xFFFFFF );
 
-				const computeInit = tslFn( () => {
+				const computeInit = Fn( () => {
 
 					const position = positionBuffer.element( instanceIndex );
 					const scale = scaleBuffer.element( instanceIndex );
@@ -136,7 +136,7 @@
 				const surfaceOffset = .2;
 				const speed = .4;
 
-				const computeUpdate = tslFn( () => {
+				const computeUpdate = Fn( () => {
 
 					const getCoord = ( pos ) => pos.add( 50 ).div( 100 );
 
@@ -157,7 +157,7 @@
 
 						position.y = position.y.add( velocity );
 
-					} ).else( () => {
+					} ).Else( () => {
 
 						staticPositionBuffer.element( instanceIndex ).assign( position );
 

@@ -26,13 +26,14 @@ export { default as NodeUniform } from './core/NodeUniform.js';
 export { default as NodeVar } from './core/NodeVar.js';
 export { default as NodeVarying } from './core/NodeVarying.js';
 export { default as ParameterNode, parameter } from './core/ParameterNode.js';
-export { default as PropertyNode, property, varyingProperty, output, diffuseColor, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, shininess, dashSize, gapSize, pointWidth, alphaT, anisotropy, anisotropyB, anisotropyT } from './core/PropertyNode.js';
+export { default as PropertyNode, property, varyingProperty, output, diffuseColor, emissive, roughness, metalness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, shininess, dashSize, gapSize, pointWidth, alphaT, anisotropy, anisotropyB, anisotropyT } from './core/PropertyNode.js';
 export { default as StackNode, stack } from './core/StackNode.js';
 export { default as TempNode } from './core/TempNode.js';
 export { default as UniformGroupNode, uniformGroup, objectGroup, renderGroup, frameGroup } from './core/UniformGroupNode.js';
 export { default as UniformNode, uniform } from './core/UniformNode.js';
 export { default as VaryingNode, varying } from './core/VaryingNode.js';
 export { default as OutputStructNode, outputStruct } from './core/OutputStructNode.js';
+export { default as MRTNode, mrt } from './core/MRTNode.js';
 
 import * as NodeUtils from './core/NodeUtils.js';
 export { NodeUtils };
@@ -41,7 +42,7 @@ export { NodeUtils };
 export { default as MathNode, PI, PI2, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, lengthSq, negate, oneMinus, dFdx, dFdy, round, reciprocal, trunc, fwidth, bitcast, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward, cbrt, transpose, all, any, equals, rand } from './math/MathNode.js';
 
 export { default as OperatorNode, add, sub, mul, div, remainder, equal, lessThan, greaterThan, lessThanEqual, greaterThanEqual, and, or, not, xor, bitAnd, bitNot, bitOr, bitXor, shiftLeft, shiftRight } from './math/OperatorNode.js';
-export { default as CondNode, cond } from './math/CondNode.js';
+export { default as CondNode, select, cond } from './math/CondNode.js';
 export { default as HashNode, hash } from './math/HashNode.js';
 
 // math utils
@@ -55,13 +56,15 @@ export { default as DiscardNode, discard, Return } from './utils/DiscardNode.js'
 export { default as EquirectUVNode, equirectUV } from './utils/EquirectUVNode.js';
 export { default as FunctionOverloadingNode, overloadingFn } from './utils/FunctionOverloadingNode.js';
 export { default as JoinNode } from './utils/JoinNode.js';
-export { default as LoopNode, loop, Continue, Break } from './utils/LoopNode.js';
+export { default as LoopNode, Loop, Continue, Break } from './utils/LoopNode.js';
 export { default as MatcapUVNode, matcapUV } from './utils/MatcapUVNode.js';
 export { default as MaxMipLevelNode, maxMipLevel } from './utils/MaxMipLevelNode.js';
 export { default as OscNode, oscSine, oscSquare, oscTriangle, oscSawtooth } from './utils/OscNode.js';
 export { default as PackingNode, directionToColor, colorToDirection } from './utils/PackingNode.js';
 export { default as RemapNode, remap, remapClamp } from './utils/RemapNode.js';
-export { default as RotateUVNode, rotateUV } from './utils/RotateUVNode.js';
+export * from './utils/UVUtils.js';
+export * from './utils/SpriteUtils.js';
+export * from './utils/ViewportUtils.js';
 export { default as RotateNode, rotate } from './utils/RotateNode.js';
 export { default as SetNode } from './utils/SetNode.js';
 export { default as SplitNode } from './utils/SplitNode.js';
@@ -77,7 +80,7 @@ export * from './shadernode/ShaderNode.js';
 
 // accessors
 export { TBNViewMatrix, parallaxDirection, parallaxUV, transformedBentNormalView } from './accessors/AccessorsUtils.js';
-export { default as UniformsNode, uniforms } from './accessors/UniformsNode.js';
+export { default as UniformArrayNode, uniformArray } from './accessors/UniformArrayNode.js';
 export * from './accessors/BitangentNode.js';
 export { default as BufferAttributeNode, bufferAttribute, dynamicBufferAttribute, instancedBufferAttribute, instancedDynamicBufferAttribute } from './accessors/BufferAttributeNode.js';
 export { default as BufferNode, buffer } from './accessors/BufferNode.js';
@@ -87,6 +90,7 @@ export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTexture
 export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
 export { default as BatchNode, batch } from './accessors/BatchNode.js';
 export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecular, materialSpecularStrength, materialReflectivity, materialRoughness, materialMetalness, materialNormal, materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialRotation, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineWidth, materialLineDashOffset, materialPointWidth, materialAnisotropy, materialAnisotropyVector, materialDispersion, materialLightMap, materialAOMap } from './accessors/MaterialNode.js';
+export * from './accessors/MaterialProperties.js';
 export { default as MaterialReferenceNode, materialReference } from './accessors/MaterialReferenceNode.js';
 export { default as RendererReferenceNode, rendererReference } from './accessors/RendererReferenceNode.js';
 export { default as MorphNode, morphReference } from './accessors/MorphNode.js';
@@ -113,7 +117,7 @@ export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
 // display
 export { default as BlendModeNode, burn, dodge, overlay, screen } from './display/BlendModeNode.js';
 export { default as BumpMapNode, bumpMap } from './display/BumpMapNode.js';
-export { default as ColorAdjustmentNode, saturation, vibrance, hue, lumaCoeffs, luminance, threshold } from './display/ColorAdjustmentNode.js';
+export { default as ColorAdjustmentNode, saturation, vibrance, hue, luminance, threshold } from './display/ColorAdjustmentNode.js';
 export { default as ColorSpaceNode, linearToColorSpace, colorSpaceToLinear, linearTosRGB, sRGBToLinear } from './display/ColorSpaceNode.js';
 export { default as FrontFacingNode, frontFacing, faceDirection } from './display/FrontFacingNode.js';
 export { default as NormalMapNode, normalMap } from './display/NormalMapNode.js';
@@ -133,9 +137,17 @@ export { default as DotScreenNode, dotScreen } from './display/DotScreenNode.js'
 export { default as RGBShiftNode, rgbShift } from './display/RGBShiftNode.js';
 export { default as FilmNode, film } from './display/FilmNode.js';
 export { default as Lut3DNode, lut3D } from './display/Lut3DNode.js';
+export { default as GTAONode, ao } from './display/GTAONode.js';
+export { default as DenoiseNode, denoise } from './display/DenoiseNode.js';
+export { default as FXAANode, fxaa } from './display/FXAANode.js';
+export { default as BloomNode, bloom } from './display/BloomNode.js';
+export { default as TransitionNode, transition } from './display/TransitionNode.js';
 export { default as RenderOutputNode, renderOutput } from './display/RenderOutputNode.js';
+export { default as PixelationPassNode, pixelationPass } from './display/PixelationPassNode.js';
+export { bleach } from './display/BleachBypassNode.js';
+export { sepia } from './display/SepiaNode.js';
 
-export { default as PassNode, pass, texturePass, depthPass } from './display/PassNode.js';
+export { default as PassNode, pass, passTexture, depthPass } from './display/PassNode.js';
 
 // code
 export { default as ExpressionNode, expression } from './code/ExpressionNode.js';
@@ -168,6 +180,7 @@ export { default as LightsNode, lights, lightsNode, addLightNode } from './light
 export { default as LightingNode /* @TODO: lighting (abstract), light */ } from './lighting/LightingNode.js';
 export { default as LightingContextNode, lightingContext } from './lighting/LightingContextNode.js';
 export { default as HemisphereLightNode } from './lighting/HemisphereLightNode.js';
+export { default as LightProbeNode } from './lighting/LightProbeNode.js';
 export { default as EnvironmentNode } from './lighting/EnvironmentNode.js';
 export { default as BasicEnvironmentNode } from './lighting/BasicEnvironmentNode.js';
 export { default as IrradianceNode } from './lighting/IrradianceNode.js';

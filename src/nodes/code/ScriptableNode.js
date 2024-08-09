@@ -437,6 +437,20 @@ class ScriptableNode extends Node {
 
 	}
 
+	getCacheKey( force ) {
+
+		const cacheKey = [ this.source, this.getDefaultOutputNode().getCacheKey( force ) ];
+
+		for ( const param in this.parameters ) {
+
+			cacheKey.push( this.parameters[ param ].getCacheKey( force ) );
+
+		}
+
+		return cacheKey.join( ',' );
+
+	}
+
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.dispose();

@@ -36,6 +36,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
@@ -50,22 +51,26 @@
 
 				const clock = new THREE.Clock();
 
-				const container = document.createElement( 'div' );
-				document.body.appendChild( container );
 
 				const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
 				camera.position.set( - 1.8, 0.8, 3 );
 
 				const scene = new THREE.Scene();
-				scene.add( new THREE.HemisphereLight( 0xFFFFFF, 0x443333, 2 ) );
 
 				const renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				document.body.appendChild( renderer.domElement );
 
-				container.appendChild( renderer.domElement );
+				await renderer.init();
+
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene.background = new THREE.Color( 0x666666 );
+				scene.environment = pmremGenerator.fromScene( environment ).texture;
 
 				const ktx2Loader = await new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
@@ -88,11 +93,6 @@
 
 						const head = mesh.getObjectByName( 'mesh_2' );
 						const influences = head.morphTargetInfluences;
-
-						//head.morphTargetInfluences = null;
-
-						// WebGPURenderer: Unsupported texture format. 33776
-						head.material.map = null;
 
 						const gui = new GUI();
 						gui.close();
@@ -119,7 +119,7 @@
 				controls.target.set( 0, 0.15, - 0.2 );
 
 				const stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 
 

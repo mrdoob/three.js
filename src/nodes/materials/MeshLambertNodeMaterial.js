@@ -4,7 +4,7 @@ import PhongLightingModel from '../functions/PhongLightingModel.js';
 
 import { MeshLambertMaterial } from '../../materials/MeshLambertMaterial.js';
 
-const defaultValues = new MeshLambertMaterial();
+const _defaultValues = /*@__PURE__*/ new MeshLambertMaterial();
 
 class MeshLambertNodeMaterial extends NodeMaterial {
 
@@ -16,7 +16,7 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 
 		this.lights = true;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
 

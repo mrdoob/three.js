@@ -6,7 +6,7 @@ import { Mesh } from '../../objects/Mesh.js';
 import { SphereGeometry } from '../../geometries/SphereGeometry.js';
 import { BackSide, LinearSRGBColorSpace } from '../../constants.js';
 
-const _clearColor = new Color4();
+const _clearColor = /*@__PURE__*/ new Color4();
 
 class Background extends DataMap {
 
@@ -63,16 +63,19 @@ class Background extends DataMap {
 				viewProj = viewProj.setZ( viewProj.w );
 
 				const nodeMaterial = new NodeMaterial();
+				nodeMaterial.name = 'Background.material';
 				nodeMaterial.side = BackSide;
 				nodeMaterial.depthTest = false;
 				nodeMaterial.depthWrite = false;
 				nodeMaterial.fog = false;
+				nodeMaterial.lights = false;
 				nodeMaterial.vertexNode = viewProj;
-				nodeMaterial.fragmentNode = backgroundMeshNode;
+				nodeMaterial.colorNode = backgroundMeshNode;
 
 				sceneData.backgroundMeshNode = backgroundMeshNode;
 				sceneData.backgroundMesh = backgroundMesh = new Mesh( new SphereGeometry( 1, 32, 32 ), nodeMaterial );
 				backgroundMesh.frustumCulled = false;
+				backgroundMesh.name = 'Background.mesh';
 
 				backgroundMesh.onBeforeRender = function ( renderer, scene, camera ) {
 
@@ -87,6 +90,7 @@ class Background extends DataMap {
 			if ( sceneData.backgroundCacheKey !== backgroundCacheKey ) {
 
 				sceneData.backgroundMeshNode.node = vec4( backgroundNode ).mul( backgroundIntensity );
+				sceneData.backgroundMeshNode.needsUpdate = true;
 
 				backgroundMesh.material.needsUpdate = true;
 

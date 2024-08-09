@@ -527,7 +527,6 @@ class WebGLTextureUtils {
 
 	deallocateRenderBuffers( renderTarget ) {
 
-
 		const { gl, backend } = this;
 
 		// remove framebuffer reference
@@ -537,31 +536,36 @@ class WebGLTextureUtils {
 
 			renderContextData.renderBufferStorageSetup = undefined;
 
-			if ( renderContextData.framebuffer ) {
+			if ( renderContextData.framebuffers ) {
 
-				gl.deleteFramebuffer( renderContextData.framebuffer );
-				renderContextData.framebuffer = undefined;
+				for ( const cacheKey in renderContextData.framebuffers ) {
+
+					gl.deleteFramebuffer( renderContextData.framebuffers[ cacheKey ] );
+
+				}
+
+				delete renderContextData.framebuffers;
 
 			}
 
 			if ( renderContextData.depthRenderbuffer ) {
 
 				gl.deleteRenderbuffer( renderContextData.depthRenderbuffer );
-				renderContextData.depthRenderbuffer = undefined;
+				delete renderContextData.depthRenderbuffer;
 
 			}
 
 			if ( renderContextData.stencilRenderbuffer ) {
 
 				gl.deleteRenderbuffer( renderContextData.stencilRenderbuffer );
-				renderContextData.stencilRenderbuffer = undefined;
+				delete renderContextData.stencilRenderbuffer;
 
 			}
 
 			if ( renderContextData.msaaFrameBuffer ) {
 
 				gl.deleteFramebuffer( renderContextData.msaaFrameBuffer );
-				renderContextData.msaaFrameBuffer = undefined;
+				delete renderContextData.msaaFrameBuffer;
 
 			}
 
@@ -573,7 +577,7 @@ class WebGLTextureUtils {
 
 				}
 
-				renderContextData.msaaRenderbuffers = undefined;
+				delete renderContextData.msaaRenderbuffers;
 
 			}
 

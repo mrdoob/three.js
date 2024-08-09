@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { addNodeElement, tslFn, nodeObject, vec3, vec4, float } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeObject, vec3, vec4, float } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { mix } from '../math/MathNode.js';
 
@@ -22,7 +22,7 @@ class Lut3DNode extends TempNode {
 
 		const sampleLut = ( uv ) => lutNode.uv( uv );
 
-		const lut3D = tslFn( () => {
+		const lut3D = Fn( () => {
 
 			const base = inputNode;
 

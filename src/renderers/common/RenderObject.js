@@ -1,6 +1,6 @@
 import ClippingContext from './ClippingContext.js';
 
-let id = 0;
+let _id = 0;
 
 function getKeys( obj ) {
 
@@ -43,7 +43,7 @@ export default class RenderObject {
 		this._nodes = nodes;
 		this._geometries = geometries;
 
-		this.id = id ++;
+		this.id = _id ++;
 
 		this.renderer = renderer;
 		this.object = object;
@@ -66,7 +66,7 @@ export default class RenderObject {
 
 		this.clippingContextVersion = this.clippingContext.version;
 
-		this.initialNodesCacheKey = this.getNodesCacheKey();
+		this.initialNodesCacheKey = this.getDynamicCacheKey();
 		this.initialCacheKey = this.getCacheKey();
 
 		this._nodeBuilderState = null;
@@ -199,10 +199,15 @@ export default class RenderObject {
 
 			if ( value !== null ) {
 
+				// some material values require a formatting
+
 				const type = typeof value;
 
-				if ( type === 'number' ) valueKey = value !== 0 ? '1' : '0'; // Convert to on/off, important for clearcoat, transmission, etc
-				else if ( type === 'object' ) {
+				if ( type === 'number' ) {
+
+					valueKey = value !== 0 ? '1' : '0'; // Convert to on/off, important for clearcoat, transmission, etc
+
+				} else if ( type === 'object' ) {
 
 					valueKey = '{';
 
@@ -213,6 +218,10 @@ export default class RenderObject {
 					}
 
 					valueKey += '}';
+
+				} else {
+
+					valueKey = String( value );
 
 				}
 
@@ -254,7 +263,7 @@ export default class RenderObject {
 
 		if ( object.count > 1 ) {
 
-			cacheKey += object.count + ',';
+			cacheKey += object.count + ',' + object.uuid + ',';
 
 		}
 
@@ -264,21 +273,21 @@ export default class RenderObject {
 
 	get needsUpdate() {
 
-		return this.initialNodesCacheKey !== this.getNodesCacheKey() || this.clippingNeedsUpdate;
+		return this.initialNodesCacheKey !== this.getDynamicCacheKey() || this.clippingNeedsUpdate;
 
 	}
 
-	getNodesCacheKey() {
+	getDynamicCacheKey() {
 
 		// Environment Nodes Cache Key
 
-		return this._nodes.getCacheKey( this.scene, this.lightsNode );
+		return this.object.receiveShadow + ',' + this._nodes.getCacheKey( this.scene, this.lightsNode );
 
 	}
 
 	getCacheKey() {
 
-		return this.getMaterialCacheKey() + ',' + this.getNodesCacheKey();
+		return this.getMaterialCacheKey() + ',' + this.getDynamicCacheKey();
 
 	}
 

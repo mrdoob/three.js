@@ -1,9 +1,13 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
+import { materialLightMap } from '../accessors/MaterialNode.js';
 import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import BasicEnvironmentNode from '../lighting/BasicEnvironmentNode.js';
+import BasicLightMapNode from '../lighting/BasicLightMapNode.js';
 import BasicLightingModel from '../functions/BasicLightingModel.js';
+import { transformedNormalView, normalView } from '../accessors/NormalNode.js';
+import { diffuseColor } from '../core/PropertyNode.js';
 
-const defaultValues = new MeshBasicMaterial();
+const _defaultValues = /*@__PURE__*/ new MeshBasicMaterial();
 
 class MeshBasicNodeMaterial extends NodeMaterial {
 
@@ -16,9 +20,15 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 		this.lights = true;
 		//this.normals = false; @TODO: normals usage by context
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
+
+	}
+
+	setupNormal() {
+
+		transformedNormalView.assign( normalView ); // see #28839
 
 	}
 
@@ -27,6 +37,26 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 		const envNode = super.setupEnvironment( builder );
 
 		return envNode ? new BasicEnvironmentNode( envNode ) : null;
+
+	}
+
+	setupLightMap( builder ) {
+
+		let node = null;
+
+		if ( builder.material.lightMap ) {
+
+			node = new BasicLightMapNode( materialLightMap );
+
+		}
+
+		return node;
+
+	}
+
+	setupOutgoingLight() {
+
+		return diffuseColor.rgb;
 
 	}
 

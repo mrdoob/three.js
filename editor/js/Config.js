@@ -4,7 +4,7 @@ function Config() {
 
 	const userLanguage = navigator.language.split( '-' )[ 0 ];
 
-	const suggestedLanguage = [ 'fr', 'ja', 'zh' ].includes( userLanguage ) ? userLanguage : 'en';
+	const suggestedLanguage = [ 'fr', 'ja', 'zh', 'ko' ].includes( userLanguage ) ? userLanguage : 'en';
 
 	const storage = {
 		'language': suggestedLanguage,

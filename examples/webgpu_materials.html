@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, wgslFn, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, loop } from 'three/tsl';
+			import { Fn, wgslFn, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, Loop, cameraProjectionMatrix } from 'three/tsl';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
@@ -117,6 +117,12 @@
 				material.alphaTestNode = 0.5;
 				materials.push( material );
 
+				// camera
+				material = new THREE.MeshBasicNodeMaterial();
+				material.colorNode = cameraProjectionMatrix.mul( positionLocal );
+				materials.push( material );
+
+
 				// Normal
 				material = new THREE.MeshNormalMaterial();
 				material.opacity = .5;
@@ -129,7 +135,7 @@
 
 				// Custom ShaderNode ( desaturate filter )
 
-				const desaturateShaderNode = tslFn( ( input ) => {
+				const desaturateShaderNode = Fn( ( input ) => {
 
 					return vec3( 0.299, 0.587, 0.114 ).dot( input.color.xyz );
 
@@ -141,7 +147,7 @@
 
 				// Custom ShaderNode(no inputs) > Approach 2
 
-				const desaturateNoInputsShaderNode = tslFn( () => {
+				const desaturateNoInputsShaderNode = Fn( () => {
 
 					return vec3( 0.299, 0.587, 0.114 ).dot( texture( uvTexture ).xyz );
 
@@ -209,7 +215,7 @@
 				materials.push( material );
 
 				const loopCount = 10;
-				material.colorNode = loop( loopCount, ( { i } ) => {
+				material.colorNode = Loop( loopCount, ( { i } ) => {
 
 					const output = vec4().temp();
 					const scale = oscSine().mul( .09 ); // just a value to test

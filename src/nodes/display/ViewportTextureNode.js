@@ -8,7 +8,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
 import { LinearMipmapLinearFilter } from '../../constants.js';
 
-const _size = new Vector2();
+const _size = /*@__PURE__*/ new Vector2();
 
 class ViewportTextureNode extends TextureNode {
 

@@ -14,6 +14,8 @@ class MaterialReferenceNode extends ReferenceNode {
 
 		//this.updateType = NodeUpdateType.RENDER;
 
+		this.isMaterialReferenceNode = true;
+
 	}
 
 	/*setNodeType( node ) {

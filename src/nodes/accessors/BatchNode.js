@@ -1,7 +1,7 @@
 import Node, { addNodeClass } from '../core/Node.js';
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
-import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, tslFn } from '../shadernode/ShaderNode.js';
+import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, Fn } from '../shadernode/ShaderNode.js';
 import { textureLoad } from './TextureNode.js';
 import { textureSize } from './TextureSizeNode.js';
 import { tangentLocal } from './TangentNode.js';
@@ -40,7 +40,7 @@ class BatchNode extends Node {
 
 		}
 
-		const getIndirectIndex = tslFn( ( [ id ] ) => {
+		const getIndirectIndex = Fn( ( [ id ] ) => {
 
 			const size = textureSize( textureLoad( this.batchMesh._indirectTexture ), 0 );
 			const x = int( id ).remainder( int( size ) );
@@ -69,11 +69,7 @@ class BatchNode extends Node {
 			textureLoad( matriceTexture, ivec2( x.add( 3 ), y ) )
 		);
 
-		const bm = mat3(
-			batchingMatrix[ 0 ].xyz,
-			batchingMatrix[ 1 ].xyz,
-			batchingMatrix[ 2 ].xyz
-		 );
+		const bm = mat3( batchingMatrix );
 
 		positionLocal.assign( batchingMatrix.mul( positionLocal ) );
 

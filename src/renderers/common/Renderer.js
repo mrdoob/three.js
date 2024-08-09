@@ -24,14 +24,14 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat } from '../../constants.js';
+import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
 
-const _scene = new Scene();
-const _drawingBufferSize = new Vector2();
-const _screen = new Vector4();
-const _frustum = new Frustum();
-const _projScreenMatrix = new Matrix4();
-const _vector3 = new Vector3();
+const _scene = /*@__PURE__*/ new Scene();
+const _drawingBufferSize = /*@__PURE__*/ new Vector2();
+const _screen = /*@__PURE__*/ new Vector4();
+const _frustum = /*@__PURE__*/ new Frustum();
+const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
+const _vector3 = /*@__PURE__*/ new Vector3();
 
 class Renderer {
 
@@ -120,6 +120,8 @@ class Renderer {
 		this._activeCubeFace = 0;
 		this._activeMipmapLevel = 0;
 
+		this._mrt = null;
+
 		this._renderObjectFunction = null;
 		this._currentRenderObjectFunction = null;
 		this._currentRenderBundle = null;
@@ -131,11 +133,12 @@ class Renderer {
 
 		this._compilationPromises = null;
 
-		// backwards compatibility
+		this.transparent = true;
+		this.opaque = true;
 
 		this.shadowMap = {
 			enabled: false,
-			type: null
+			type: PCFShadowMap
 		};
 
 		this.xr = {
@@ -144,7 +147,23 @@ class Renderer {
 
 		this.debug = {
 			checkShaderErrors: true,
-			onShaderError: null
+			onShaderError: null,
+			getShaderAsync: async ( scene, camera, object ) => {
+
+				await this.compileAsync( scene, camera );
+
+				const renderList = this._renderLists.get( scene, camera );
+				const renderContext = this._renderContexts.get( scene, camera, this._renderTarget );
+
+				const material = scene.overrideMaterial || object.material;
+
+				const renderObject = this._objects.get( object, material, scene, camera, renderList.lightsNode, renderContext );
+
+				const { fragmentShader, vertexShader } = renderObject.getNodeBuilderState();
+
+				return { fragmentShader, vertexShader };
+
+			}
 		};
 
 	}
@@ -315,8 +334,8 @@ class Renderer {
 		const transparentObjects = renderList.transparent;
 		const lightsNode = renderList.lightsNode;
 
-		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
-		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
 
 		// restore render tree
 
@@ -341,6 +360,20 @@ class Renderer {
 		const renderContext = this._renderScene( scene, camera );
 
 		await this.backend.resolveTimestampAsync( renderContext, 'render' );
+
+	}
+
+	setMRT( mrt ) {
+
+		this._mrt = mrt;
+
+		return this;
+
+	}
+
+	getMRT() {
+
+		return this._mrt;
 
 	}
 
@@ -440,7 +473,7 @@ class Renderer {
 		const { currentColorSpace } = this;
 
 		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping );
-		const useColorSpace = currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace;
+		const useColorSpace = this._renderTarget === null && ( currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace );
 
 		if ( useToneMapping === false && useColorSpace === false ) return null;
 
@@ -663,8 +696,8 @@ class Renderer {
 		const lightsNode = renderList.lightsNode;
 
 		if ( bundles.length > 0 ) this._renderBundles( bundles, sceneRef, lightsNode );
-		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
-		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
 
 		// finish render pass
 

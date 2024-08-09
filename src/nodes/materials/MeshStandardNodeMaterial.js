@@ -9,7 +9,7 @@ import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
 
 import { MeshStandardMaterial } from '../../materials/MeshStandardMaterial.js';
 
-const defaultValues = new MeshStandardMaterial();
+const _defaultValues = /*@__PURE__*/ new MeshStandardMaterial();
 
 class MeshStandardNodeMaterial extends NodeMaterial {
 
@@ -19,12 +19,14 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		this.isMeshStandardNodeMaterial = true;
 
+		this.lights = true;
+
 		this.emissiveNode = null;
 
 		this.metalnessNode = null;
 		this.roughnessNode = null;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
 
@@ -32,7 +34,13 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 	setupEnvironment( builder ) {
 
-		const envNode = super.setupEnvironment( builder );
+		let envNode = super.setupEnvironment( builder );
+
+		if ( envNode === null && builder.environmentNode ) {
+
+			envNode = builder.environmentNode;
+
+		}
 
 		return envNode ? new EnvironmentNode( envNode ) : null;
 

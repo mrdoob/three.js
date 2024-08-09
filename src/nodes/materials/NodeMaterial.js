@@ -3,7 +3,7 @@ import { NormalBlending } from '../../constants.js';
 
 import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
 import { attribute } from '../core/AttributeNode.js';
-import { output, diffuseColor, varyingProperty } from '../core/PropertyNode.js';
+import { output, diffuseColor, emissive, varyingProperty } from '../core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAOMap } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
 import { transformedNormalView, normalLocal } from '../accessors/NormalNode.js';
@@ -13,8 +13,6 @@ import { materialReference } from '../accessors/MaterialReferenceNode.js';
 import { positionLocal, positionView } from '../accessors/PositionNode.js';
 import { skinningReference } from '../accessors/SkinningNode.js';
 import { morphReference } from '../accessors/MorphNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import { lightsNode } from '../lighting/LightsNode.js';
 import { mix } from '../math/MathNode.js';
 import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
@@ -41,7 +39,7 @@ class NodeMaterial extends Material {
 		this.forceSinglePass = false;
 
 		this.fog = true;
-		this.lights = true;
+		this.lights = false;
 		this.normals = true;
 
 		this.lightsNode = null;
@@ -62,6 +60,7 @@ class NodeMaterial extends Material {
 		this.shadowPositionNode = null;
 
 		this.outputNode = null;
+		this.mrtNode = null;
 
 		this.fragmentNode = null;
 		this.vertexNode = null;
@@ -124,6 +123,33 @@ class NodeMaterial extends Material {
 			//
 
 			if ( this.outputNode !== null ) resultNode = this.outputNode;
+
+			// MRT
+
+			const renderTarget = builder.renderer.getRenderTarget();
+
+			if ( renderTarget !== null ) {
+
+				const mrt = builder.renderer.getMRT();
+				const materialMRT = this.mrtNode;
+
+				if ( mrt !== null ) {
+
+					resultNode = mrt;
+
+					if ( materialMRT !== null ) {
+
+						resultNode = mrt.merge( materialMRT );
+
+					}
+
+				} else if ( materialMRT !== null ) {
+
+					resultNode = materialMRT;
+
+				}
+
+			}
 
 		} else {
 
@@ -309,6 +335,13 @@ class NodeMaterial extends Material {
 
 	}
 
+
+	setupOutgoingLight() {
+
+		return ( this.lights === true ) ? vec3( 0 ) : diffuseColor.rgb;
+
+	}
+
 	setupNormal() {
 
 		// NORMAL VIEW
@@ -329,7 +362,7 @@ class NodeMaterial extends Material {
 
 	}
 
-	setupEnvironment( builder ) {
+	setupEnvironment( /*builder*/ ) {
 
 		let node = null;
 
@@ -339,11 +372,21 @@ class NodeMaterial extends Material {
 
 		} else if ( this.envMap ) {
 
-			node = this.envMap.isCubeTexture ? cubeTexture( this.envMap ) : texture( this.envMap );
+			node = this.envMap.isCubeTexture ? materialReference( 'envMap', 'cubeTexture' ) : materialReference( 'envMap', 'texture' );
 
-		} else if ( builder.environmentNode ) {
+		}
 
-			node = builder.environmentNode;
+		return node;
+
+	}
+
+	setupLightMap( builder ) {
+
+		let node = null;
+
+		if ( builder.material.lightMap ) {
+
+			node = new IrradianceNode( materialLightMap );
 
 		}
 
@@ -365,9 +408,11 @@ class NodeMaterial extends Material {
 
 		}
 
-		if ( builder.material.lightMap ) {
+		const lightMapNode = this.setupLightMap( builder );
 
-			materialLightsNode.push( new IrradianceNode( materialLightMap ) );
+		if ( lightMapNode && lightMapNode.isLightingNode ) {
+
+			materialLightsNode.push( lightMapNode );
 
 		}
 
@@ -408,7 +453,7 @@ class NodeMaterial extends Material {
 
 		const lightsNode = lights ? this.setupLights( builder ) : null;
 
-		let outgoingLightNode = diffuseColor.rgb;
+		let outgoingLightNode = this.setupOutgoingLight( builder );
 
 		if ( lightsNode && lightsNode.hasLight !== false ) {
 
@@ -426,7 +471,9 @@ class NodeMaterial extends Material {
 
 		if ( ( emissiveNode && emissiveNode.isNode === true ) || ( material.emissive && material.emissive.isColor === true ) ) {
 
-			outgoingLightNode = outgoingLightNode.add( vec3( emissiveNode ? emissiveNode : materialEmissive ) );
+			emissive.assign( vec3( emissiveNode ? emissiveNode : materialEmissive ) );
+
+			outgoingLightNode = outgoingLightNode.add( emissive );
 
 		}
 
@@ -562,6 +609,7 @@ class NodeMaterial extends Material {
 		this.shadowPositionNode = source.shadowPositionNode;
 
 		this.outputNode = source.outputNode;
+		this.mrtNode = source.mrtNode;
 
 		this.fragmentNode = source.fragmentNode;
 		this.vertexNode = source.vertexNode;

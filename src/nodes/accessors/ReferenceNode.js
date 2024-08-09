@@ -2,9 +2,10 @@ import Node, { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { texture } from './TextureNode.js';
+import { cubeTexture } from './CubeTextureNode.js';
 import { buffer } from './BufferNode.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
-import { uniforms } from './UniformsNode.js';
+import { uniformArray } from './UniformArrayNode.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 
 class ReferenceElementNode extends ArrayElementNode {
@@ -49,7 +50,7 @@ class ReferenceNode extends Node {
 		this.count = count;
 
 		this.properties = property.split( '.' );
-		this.reference = null;
+		this.reference = object;
 		this.node = null;
 
 		this.updateType = NodeUpdateType.OBJECT;
@@ -72,11 +73,15 @@ class ReferenceNode extends Node {
 
 		} else if ( Array.isArray( this.getValueFromReference() ) ) {
 
-			node = uniforms( null, uniformType );
+			node = uniformArray( null, uniformType );
 
 		} else if ( uniformType === 'texture' ) {
 
 			node = texture( null );
+
+		} else if ( uniformType === 'cubeTexture' ) {
+
+			node = cubeTexture( null );
 
 		} else {
 

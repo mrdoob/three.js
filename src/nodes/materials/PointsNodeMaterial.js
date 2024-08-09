@@ -2,7 +2,7 @@ import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 
 import { PointsMaterial } from '../../materials/PointsMaterial.js';
 
-const defaultValues = new PointsMaterial();
+const _defaultValues = /*@__PURE__*/ new PointsMaterial();
 
 class PointsNodeMaterial extends NodeMaterial {
 
@@ -18,7 +18,7 @@ class PointsNodeMaterial extends NodeMaterial {
 
 		this.sizeNode = null;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
 

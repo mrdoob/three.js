@@ -11,7 +11,7 @@ import { reference } from '../accessors/ReferenceNode.js';
 import { transformedBentNormalView } from '../accessors/AccessorsUtils.js';
 import { pmremTexture } from '../pmrem/PMREMNode.js';
 
-const envNodeCache = new WeakMap();
+const _envNodeCache = new WeakMap();
 
 class EnvironmentNode extends LightingNode {
 
@@ -25,17 +25,21 @@ class EnvironmentNode extends LightingNode {
 
 	setup( builder ) {
 
+		const { material } = builder;
+
 		let envNode = this.envNode;
 
-		if ( envNode.isTextureNode ) {
+		if ( envNode.isTextureNode || envNode.isMaterialReferenceNode ) {
 
-			let cacheEnvNode = envNodeCache.get( envNode.value );
+			const value = ( envNode.isTextureNode ) ? envNode.value : material[ envNode.property ];
+
+			let cacheEnvNode = _envNodeCache.get( value );
 
 			if ( cacheEnvNode === undefined ) {
 
-				cacheEnvNode = pmremTexture( envNode.value );
+				cacheEnvNode = pmremTexture( value );
 
-				envNodeCache.set( envNode.value, cacheEnvNode );
+				_envNodeCache.set( value, cacheEnvNode );
 
 			}
 
@@ -44,8 +48,6 @@ class EnvironmentNode extends LightingNode {
 		}
 
 		//
-
-		const { material } = builder;
 
 		const envMap = material.envMap;
 		const intensity = envMap ? reference( 'envMapIntensity', 'float', builder.material ) : reference( 'environmentIntensity', 'float', builder.scene ); // @TODO: Add materialEnvIntensity in MaterialNode

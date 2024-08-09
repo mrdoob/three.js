@@ -11,7 +11,7 @@ import { mix, pow2, min } from '../math/MathNode.js';
 
 import { MeshPhysicalMaterial } from '../../materials/MeshPhysicalMaterial.js';
 
-const defaultValues = new MeshPhysicalMaterial();
+const _defaultValues = /*@__PURE__*/ new MeshPhysicalMaterial();
 
 class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
@@ -44,7 +44,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		this.anisotropyNode = null;
 
-		this.setDefaultValues( defaultValues );
+		this.setDefaultValues( _defaultValues );
 
 		this.setValues( parameters );
 
@@ -156,7 +156,7 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 				anisotropyV.assign( vec2( 1.0, 0.0 ) );
 
-			} ).else( () => {
+			} ).Else( () => {
 
 				anisotropyV.divAssign( vec2( anisotropy ) );
 				anisotropy.assign( anisotropy.saturate() );

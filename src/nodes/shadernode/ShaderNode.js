@@ -164,7 +164,7 @@ const ShaderNodeObject = function ( obj, altType = null ) {
 
 	} else if ( type === 'shader' ) {
 
-		return tslFn( obj );
+		return Fn( obj );
 
 	}
 
@@ -300,7 +300,7 @@ class ShaderCallNodeInternal extends Node {
 		}
 
 		const jsFunc = shaderNode.jsFunc;
-		const outputNode = inputNodes !== null ? jsFunc( inputNodes, builder.stack, builder ) : jsFunc( builder.stack, builder );
+		const outputNode = inputNodes !== null ? jsFunc( inputNodes, builder ) : jsFunc( builder );
 
 		return nodeObject( outputNode );
 
@@ -472,7 +472,7 @@ const ConvertType = function ( type, cacheMap = null ) {
 
 // exports
 
-export const defined = ( value ) => value && value.value;
+export const defined = ( v ) => typeof v === 'object' && v !== null ? v.value : v; // TODO: remove boolean conversion and defined function
 
 // utils
 
@@ -492,7 +492,7 @@ export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, al
 export const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
 export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
 
-export const tslFn = ( jsFunc ) => {
+export const Fn = ( jsFunc ) => {
 
 	const shaderNode = new ShaderNode( jsFunc );
 
@@ -529,6 +529,13 @@ export const tslFn = ( jsFunc ) => {
 
 };
 
+export const tslFn = ( ...params ) => { // @deprecated, r168
+
+	console.warn( 'TSL.tslFn: tslFn() has been renamed to Fn().' );
+	return Fn( ...params );
+
+};
+
 addNodeClass( 'ShaderNode', ShaderNode );
 
 //
@@ -557,7 +564,7 @@ export const setCurrentStack = ( stack ) => {
 
 export const getCurrentStack = () => currentStack;
 
-export const If = ( ...params ) => currentStack.if( ...params );
+export const If = ( ...params ) => currentStack.If( ...params );
 
 export function append( node ) {
 

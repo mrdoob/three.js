@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, tslFn, nodeObject, vec2, vec4 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeObject, vec2, vec4 } from '../shadernode/ShaderNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { clamp } from '../math/MathNode.js';
@@ -39,7 +39,7 @@ class DepthOfFieldNode extends TempNode {
 
 		const sampleTexture = ( uv ) => textureNode.uv( uv );
 
-		const dof = tslFn( () => {
+		const dof = Fn( () => {
 
 			const aspectcorrect = vec2( 1.0, this._aspect );
 

@@ -120,6 +120,7 @@ export { Sphere } from './math/Sphere.js';
 export { Ray } from './math/Ray.js';
 export { Matrix4 } from './math/Matrix4.js';
 export { Matrix3 } from './math/Matrix3.js';
+export { Matrix2 } from './math/Matrix2.js';
 export { Box3 } from './math/Box3.js';
 export { Box2 } from './math/Box2.js';
 export { Line3 } from './math/Line3.js';

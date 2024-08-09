@@ -222,14 +222,6 @@ class Node extends EventDispatcher {
 
 	}
 
-	construct( builder ) { // @deprecated, r157
-
-		console.warn( 'THREE.Node: construct() is deprecated. Use setup() instead.' );
-
-		return this.setup( builder );
-
-	}
-
 	increaseUsage( builder ) {
 
 		const nodeData = builder.getDataFromNode( this );

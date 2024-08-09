@@ -11,7 +11,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 
-const _size = new Vector2();
+const _size = /*@__PURE__*/ new Vector2();
 
 class PassTextureNode extends TextureNode {
 
@@ -41,6 +41,39 @@ class PassTextureNode extends TextureNode {
 
 }
 
+class PassMultipleTextureNode extends PassTextureNode {
+
+	constructor( passNode, textureName, previousTexture = false ) {
+
+		super( passNode, null );
+
+		this.textureName = textureName;
+		this.previousTexture = previousTexture;
+
+	}
+
+	updateTexture() {
+
+		this.value = this.previousTexture ? this.passNode.getPreviousTexture( this.textureName ) : this.passNode.getTexture( this.textureName );
+
+	}
+
+	setup( builder ) {
+
+		this.updateTexture();
+
+		return super.setup( builder );
+
+	}
+
+	clone() {
+
+		return new this.constructor( this.passNode, this.textureName, this.previousTexture );
+
+	}
+
+}
+
 class PassNode extends TempNode {
 
 	constructor( scope, scene, camera, options = {} ) {
@@ -59,25 +92,48 @@ class PassNode extends TempNode {
 		const depthTexture = new DepthTexture();
 		depthTexture.isRenderTargetTexture = true;
 		//depthTexture.type = FloatType;
-		depthTexture.name = 'PostProcessingDepth';
+		depthTexture.name = 'depth';
 
-		const renderTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType, ...options } );
-		renderTarget.texture.name = 'PostProcessing';
+		const renderTarget = new RenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio, { type: HalfFloatType, ...options, } );
+		renderTarget.texture.name = 'output';
 		renderTarget.depthTexture = depthTexture;
 
 		this.renderTarget = renderTarget;
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
-		this._textureNode = nodeObject( new PassTextureNode( this, renderTarget.texture ) );
-		this._depthTextureNode = nodeObject( new PassTextureNode( this, depthTexture ) );
+		this._textures = {
+			output: renderTarget.texture,
+			depth: depthTexture
+		};
 
-		this._linearDepthNode = null;
-		this._viewZNode = null;
+		this._textureNodes = {};
+		this._linearDepthNodes = {};
+		this._viewZNodes = {};
+
+		this._previousTextures = {};
+		this._previousTextureNodes = {};
+
 		this._cameraNear = uniform( 0 );
 		this._cameraFar = uniform( 0 );
 
+		this._mrt = null;
+
 		this.isPassNode = true;
+
+	}
+
+	setMRT( mrt ) {
+
+		this._mrt = mrt;
+
+		return this;
+
+	}
+
+	getMRT() {
+
+		return this._mrt;
 
 	}
 
@@ -87,47 +143,128 @@ class PassNode extends TempNode {
 
 	}
 
-	getTextureNode() {
+	getTexture( name ) {
 
-		return this._textureNode;
+		let texture = this._textures[ name ];
 
-	}
+		if ( texture === undefined ) {
 
-	getTextureDepthNode() {
+			const refTexture = this.renderTarget.texture;
 
-		return this._depthTextureNode;
+			texture = refTexture.clone();
+			texture.isRenderTargetTexture = true;
+			texture.name = name;
 
-	}
+			this._textures[ name ] = texture;
 
-	getViewZNode() {
-
-		if ( this._viewZNode === null ) {
-
-			const cameraNear = this._cameraNear;
-			const cameraFar = this._cameraFar;
-
-			this._viewZNode = perspectiveDepthToViewZ( this._depthTextureNode, cameraNear, cameraFar );
+			this.renderTarget.textures.push( texture );
 
 		}
 
-		return this._viewZNode;
+		return texture;
 
 	}
 
-	getLinearDepthNode() {
+	getPreviousTexture( name ) {
 
-		if ( this._linearDepthNode === null ) {
+		let texture = this._previousTextures[ name ];
+
+		if ( texture === undefined ) {
+
+			texture = this.getTexture( name ).clone();
+			texture.isRenderTargetTexture = true;
+
+			this._previousTextures[ name ] = texture;
+
+		}
+
+		return texture;
+
+	}
+
+	toggleTexture( name ) {
+
+		const prevTexture = this._previousTextures[ name ];
+
+		if ( prevTexture !== undefined ) {
+
+			const texture = this._textures[ name ];
+
+			const index = this.renderTarget.textures.indexOf( texture );
+			this.renderTarget.textures[ index ] = prevTexture;
+
+			this._textures[ name ] = prevTexture;
+			this._previousTextures[ name ] = texture;
+
+			this._textureNodes[ name ].updateTexture();
+			this._previousTextureNodes[ name ].updateTexture();
+
+		}
+
+	}
+
+	getTextureNode( name = 'output' ) {
+
+		let textureNode = this._textureNodes[ name ];
+
+		if ( textureNode === undefined ) {
+
+			this._textureNodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
+
+		}
+
+		return textureNode;
+
+	}
+
+	getPreviousTextureNode( name = 'output' ) {
+
+		let textureNode = this._previousTextureNodes[ name ];
+
+		if ( textureNode === undefined ) {
+
+			this._previousTextureNodes[ name ] = textureNode = nodeObject( new PassMultipleTextureNode( this, name, true ) );
+
+		}
+
+		return textureNode;
+
+	}
+
+	getViewZNode( name = 'depth' ) {
+
+		let viewZNode = this._viewZNodes[ name ];
+
+		if ( viewZNode === undefined ) {
 
 			const cameraNear = this._cameraNear;
 			const cameraFar = this._cameraFar;
+
+			this._viewZNodes[ name ] = viewZNode = perspectiveDepthToViewZ( this.getTextureNode( name ), cameraNear, cameraFar );
+
+		}
+
+		return viewZNode;
+
+	}
+
+	getLinearDepthNode( name = 'depth' ) {
+
+		let linearDepthNode = this._linearDepthNodes[ name ];
+
+		if ( linearDepthNode === undefined ) {
+
+			const cameraNear = this._cameraNear;
+			const cameraFar = this._cameraFar;
+			const viewZNode = this.getViewZNode( name );
 
 			// TODO: just if ( builder.camera.isPerspectiveCamera )
 
-			this._linearDepthNode = viewZToOrthographicDepth( this.getViewZNode(), cameraNear, cameraFar );
+			this._linearDepthNodes[ name ] = linearDepthNode = viewZToOrthographicDepth( viewZNode, cameraNear, cameraFar );
 
 		}
 
-		return this._linearDepthNode;
+		return linearDepthNode;
 
 	}
 
@@ -160,15 +297,24 @@ class PassNode extends TempNode {
 		this.setSize( size.width, size.height );
 
 		const currentRenderTarget = renderer.getRenderTarget();
+		const currentMRT = renderer.getMRT();
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
 
+		for ( const name in this._previousTextures ) {
+
+			this.toggleTexture( name );
+
+		}
+
 		renderer.setRenderTarget( this.renderTarget );
+		renderer.setMRT( this._mrt );
 
 		renderer.render( scene, camera );
 
 		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setMRT( currentMRT );
 
 	}
 
@@ -207,7 +353,7 @@ PassNode.DEPTH = 'depth';
 export default PassNode;
 
 export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
-export const texturePass = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
+export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
 export const depthPass = ( scene, camera ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera ) );
 
 addNodeClass( 'PassNode', PassNode );

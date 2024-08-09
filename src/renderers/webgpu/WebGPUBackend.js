@@ -193,25 +193,34 @@ class WebGPUBackend extends Backend {
 
 		let descriptors = renderTargetData.descriptors;
 
-		if ( descriptors === undefined ) {
-
-			descriptors = [];
-
-			renderTargetData.descriptors = descriptors;
-
-		}
-
-		if ( renderTargetData.width !== renderTarget.width ||
+		if ( descriptors === undefined ||
+			renderTargetData.width !== renderTarget.width ||
 			renderTargetData.height !== renderTarget.height ||
 			renderTargetData.activeMipmapLevel !== renderTarget.activeMipmapLevel ||
 			renderTargetData.samples !== renderTarget.samples
 		) {
 
-			descriptors.length = 0;
+			descriptors = {};
+
+			renderTargetData.descriptors = descriptors;
+
+			// dispose
+
+			const onDispose = () => {
+
+				renderTarget.removeEventListener( 'dispose', onDispose );
+
+				this.delete( renderTarget );
+
+			};
+
+			renderTarget.addEventListener( 'dispose', onDispose );
 
 		}
 
-		let descriptor = descriptors[ renderContext.activeCubeFace ];
+		const cacheKey = renderContext.getCacheKey();
+
+		let descriptor = descriptors[ cacheKey ];
 
 		if ( descriptor === undefined ) {
 
@@ -263,7 +272,7 @@ class WebGPUBackend extends Backend {
 				depthStencilAttachment
 			};
 
-			descriptors[ renderContext.activeCubeFace ] = descriptor;
+			descriptors[ cacheKey ] = descriptor;
 
 			renderTargetData.width = renderTarget.width;
 			renderTargetData.height = renderTarget.height;
@@ -763,7 +772,30 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		passEncoderGPU.dispatchWorkgroups( computeNode.dispatchCount );
+		const maxComputeWorkgroupsPerDimension = this.device.limits.maxComputeWorkgroupsPerDimension;
+
+		const computeNodeData = this.get( computeNode );
+
+		if ( computeNodeData.dispatchSize === undefined ) computeNodeData.dispatchSize = { x: 0, y: 1, z: 1 };
+
+		const { dispatchSize } = computeNodeData;
+
+		if ( computeNode.dispatchCount > maxComputeWorkgroupsPerDimension ) {
+
+			dispatchSize.x = Math.min( computeNode.dispatchCount, maxComputeWorkgroupsPerDimension );
+			dispatchSize.y = Math.ceil( computeNode.dispatchCount / maxComputeWorkgroupsPerDimension );
+
+		} else {
+
+			dispatchSize.x = computeNode.dispatchCount;
+
+		}
+
+		passEncoderGPU.dispatchWorkgroups(
+			dispatchSize.x,
+			dispatchSize.y,
+			dispatchSize.z
+		);
 
 	}
 
@@ -822,7 +854,7 @@ class WebGPUBackend extends Backend {
 			const bindGroup = bindings[ i ];
 			const bindingsData = this.get( bindGroup );
 
-			passEncoderGPU.setBindGroup( i, bindingsData.group );
+			passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
 
 		}
 
@@ -1418,7 +1450,12 @@ class WebGPUBackend extends Backend {
 
 		if ( texture.generateMipmaps ) this.textureUtils.generateMipmaps( texture );
 
-		descriptor.colorAttachments[ 0 ].loadOp = GPULoadOp.Load;
+		for ( let i = 0; i < descriptor.colorAttachments.length; i ++ ) {
+
+			descriptor.colorAttachments[ i ].loadOp = GPULoadOp.Load;
+
+		}
+
 		if ( renderContext.depth ) descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
 		if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 

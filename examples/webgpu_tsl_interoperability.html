@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, attribute, varyingProperty, timerLocal, uniform, wgslFn, texture, sampler, uv, clamp, float, vec2, vec3, fract, floor, positionGeometry, sin } from 'three/tsl';
+			import { Fn, attribute, varyingProperty, timerLocal, uniform, wgslFn, texture, sampler, uv, clamp, float, vec2, vec3, fract, floor, positionGeometry, sin } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -191,14 +191,14 @@
 
 				//
 
-				const tslVertexShader = tslFn( () => {
+				const tslVertexShader = Fn( () => {
 
 					vUv.assign( uv() );
 					return positionGeometry;
 
 				} );
 
-				const tslFragmentShader = tslFn( () => {
+				const tslFragmentShader = Fn( () => {
 
 					const dimensions = vec2( crtWidthUniform, crtHeightUniform );
 					const translatedUV = vUv.mul( 0.5 ).add( 0.5 );
