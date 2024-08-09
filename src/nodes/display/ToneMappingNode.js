@@ -167,7 +167,7 @@ const toneMappingLib = {
 
 class ToneMappingNode extends TempNode {
 
-	constructor( toneMapping = NoToneMapping, exposureNode = toneMappingExposure, colorNode = null ) {
+	constructor( toneMapping, exposureNode = toneMappingExposure, colorNode = null ) {
 
 		super( 'vec3' );
 
