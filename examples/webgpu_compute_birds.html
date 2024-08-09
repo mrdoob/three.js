@@ -35,7 +35,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, varyingProperty, vec4, max, sin, mat3, uint, negate, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, storage, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
+			import { uniform, varyingProperty, vec4, max, sin, mat3, uint, negate, cameraProjectionMatrix, cameraViewMatrix, positionLocal, modelWorldMatrix, sqrt, attribute, property, float, storage, storageObject, Fn, If, cos, Loop, Continue, normalize, instanceIndex, length } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -152,7 +152,7 @@
 				scene.background = new THREE.Color( 0xffffff );
 				scene.fog = new THREE.Fog( 0xffffff, 100, 1000 );
 
-				renderer = new THREE.WebGPURenderer();
+				renderer = new THREE.WebGPURenderer( { forceWebGL: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -202,9 +202,9 @@
 			
 				// Create read-only storage nodes. Storage nodes can only be accessed outside of compute shaders in a read-only state.
 			
-				const positionRead = storage( positionBufferAttribute, 'vec3', positionBufferAttribute.count ).toReadOnly();
-				const velocityRead = storage( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count ).toReadOnly();
-				const phaseRead = storage( phaseBufferAttribute, 'float', phaseBufferAttribute.count ).toReadOnly();
+				const positionRead = storageObject( positionBufferAttribute, 'vec3', positionBufferAttribute.count ).toReadOnly();
+				const velocityRead = storageObject( velocityBufferAttribute, 'vec3', velocityBufferAttribute.count ).toReadOnly();
+				const phaseRead = storageObject( phaseBufferAttribute, 'float', phaseBufferAttribute.count ).toReadOnly();
 
 				// Define Uniforms. Uniforms only need to be defined once rather than per shader.
 			
