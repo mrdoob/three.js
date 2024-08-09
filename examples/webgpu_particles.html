@@ -57,7 +57,7 @@
 
 				const timer = timerLocal( .2, 1/*100000*/ ); // @TODO: need to work with 64-bit precision
 
-				const lifeTime = timer.mul( lifeRange ).modFloat( 1 );
+				const lifeTime = timer.mul( lifeRange ).mod( 1 );
 				const scaleRange = range( .3, 2 );
 				const rotateRange = range( .1, 4 );
 

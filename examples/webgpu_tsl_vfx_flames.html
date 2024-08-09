@@ -110,7 +110,7 @@
 					mainUv.x.addAssign( gradient1.mul( gradient2 ).mul( 0.2 ) );
 
 					// cellular noise
-					const cellularUv = mainUv.mul( 0.5 ).add( vec2( 0, time.negate().mul( 0.5 ) ) ).modFloat( 1 );
+					const cellularUv = mainUv.mul( 0.5 ).add( vec2( 0, time.negate().mul( 0.5 ) ) ).mod( 1 );
 					const cellularNoise = texture( cellularTexture, cellularUv, 0 ).r.oneMinus().smoothstep( 0, 0.5 ).oneMinus();
 					cellularNoise.mulAssign( gradient2 );
 
@@ -143,7 +143,7 @@
 					mainUv.assign( mainUv.mul( 2, 1 ).sub( vec2( 0.5, 0 ) ) ); // scale
 
 					// perlin noise
-					const perlinUv = mainUv.add( vec2( 0, time.negate().mul( 1 ) ) ).modFloat( 1 );
+					const perlinUv = mainUv.add( vec2( 0, time.negate().mul( 1 ) ) ).mod( 1 );
 					const perlinNoise = texture( perlinTexture, perlinUv, 0 ).sub( 0.5 ).mul( 1 );
 					mainUv.x.addAssign( perlinNoise.x.mul( 0.5 ) );
 
@@ -154,14 +154,14 @@
 					mainUv.x.addAssign( gradient1.mul( gradient2 ).mul( 0.2 ) );
 
 					// displaced perlin noise
-					const displacementPerlinUv = mainUv.mul( 0.5 ).add( vec2( 0, time.negate().mul( 0.25 ) ) ).modFloat( 1 );
+					const displacementPerlinUv = mainUv.mul( 0.5 ).add( vec2( 0, time.negate().mul( 0.25 ) ) ).mod( 1 );
 					const displacementPerlinNoise = texture( perlinTexture, displacementPerlinUv, 0 ).sub( 0.5 ).mul( 1 );
-					const displacedPerlinUv = mainUv.add( vec2( 0, time.negate().mul( 0.5 ) ) ).add( displacementPerlinNoise ).modFloat( 1 );
+					const displacedPerlinUv = mainUv.add( vec2( 0, time.negate().mul( 0.5 ) ) ).add( displacementPerlinNoise ).mod( 1 );
 					const displacedPerlinNoise = texture( perlinTexture, displacedPerlinUv, 0 ).sub( 0.5 ).mul( 1 );
 					mainUv.x.addAssign( displacedPerlinNoise.mul( 0.5 ) );
 
 					// cellular noise
-					const cellularUv = mainUv.add( vec2( 0, time.negate().mul( 1.5 ) ) ).modFloat( 1 );
+					const cellularUv = mainUv.add( vec2( 0, time.negate().mul( 1.5 ) ) ).mod( 1 );
 					const cellularNoise = texture( cellularTexture, cellularUv, 0 ).r.oneMinus().smoothstep( 0.25, 1 );
 
 					// shape

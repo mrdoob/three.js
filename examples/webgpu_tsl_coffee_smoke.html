@@ -85,15 +85,15 @@
 
 					// twist
 
-					const twistNoiseUv = vec2( 0.5, uv().y.mul( 0.2 ).sub( time.mul( 0.005 ) ).modFloat( 1 ) );
+					const twistNoiseUv = vec2( 0.5, uv().y.mul( 0.2 ).sub( time.mul( 0.005 ) ).mod( 1 ) );
 					const twist = texture( noiseTexture, twistNoiseUv ).r.mul( 10 );
 					positionLocal.xz.assign( positionLocal.xz.rotateUV( twist, vec2( 0 ) ) );
 
 					// wind
 
 					const windOffset = vec2(
-						texture( noiseTexture, vec2( 0.25, time.mul( 0.01 ) ).modFloat( 1 ) ).r.sub( 0.5 ),
-						texture( noiseTexture, vec2( 0.75, time.mul( 0.01 ) ).modFloat( 1 ) ).r.sub( 0.5 ),
+						texture( noiseTexture, vec2( 0.25, time.mul( 0.01 ) ).mod( 1 ) ).r.sub( 0.5 ),
+						texture( noiseTexture, vec2( 0.75, time.mul( 0.01 ) ).mod( 1 ) ).r.sub( 0.5 ),
 					).mul( uv().y.pow( 2 ).mul( 10 ) );
 					positionLocal.addAssign( windOffset );
 

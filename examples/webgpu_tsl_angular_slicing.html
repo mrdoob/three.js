@@ -79,7 +79,7 @@
 			
 				const inAngle = Fn( ( [ position, angleStart, angleArc ] ) => {
 
-					const angle = atan2( position.y, position.x ).sub( angleStart ).modFloat( PI2 ).toVar();
+					const angle = atan2( position.y, position.x ).sub( angleStart ).mod( PI2 ).toVar();
 					return angle.greaterThan( 0 ).and( angle.lessThan( angleArc ) );
 
 				} );
