@@ -280,7 +280,7 @@ class WebGPUPipelineUtils {
 				switch ( blending ) {
 
 					case NormalBlending:
-						setBlend( GPUBlendFactor.SrcAlpha, GPUBlendFactor.OneMinusSrcAlpha, GPUBlendFactor.One, GPUBlendFactor.OneMinusSrcAlpha );
+						setBlend( GPUBlendFactor.One, GPUBlendFactor.OneMinusSrcAlpha, GPUBlendFactor.One, GPUBlendFactor.OneMinusSrcAlpha );
 						break;
 
 					case AdditiveBlending:
