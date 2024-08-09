@@ -307,7 +307,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.uvNode = nodeObject( uvNode );
-		textureNode.referenceNode = this;
+		textureNode.referenceNode = this.getSelf();
 
 		return nodeObject( textureNode );
 
@@ -317,7 +317,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.biasNode = nodeObject( amountNode ).mul( maxMipLevel( textureNode ) );
-		textureNode.referenceNode = this;
+		textureNode.referenceNode = this.getSelf();
 
 		return nodeObject( textureNode );
 
@@ -327,7 +327,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.levelNode = nodeObject( levelNode );
-		textureNode.referenceNode = this;
+		textureNode.referenceNode = this.getSelf();
 
 		return nodeObject( textureNode );
 
@@ -343,7 +343,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.biasNode = nodeObject( biasNode );
-		textureNode.referenceNode = this;
+		textureNode.referenceNode = this.getSelf();
 
 		return nodeObject( textureNode );
 
@@ -353,7 +353,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.compareNode = nodeObject( compareNode );
-		textureNode.referenceNode = this;
+		textureNode.referenceNode = this.getSelf();
 
 		return nodeObject( textureNode );
 
@@ -363,8 +363,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.gradNode = [ nodeObject( gradNodeX ), nodeObject( gradNodeY ) ];
-
-		textureNode.referenceNode = this;
+		textureNode.referenceNode = this.getSelf();
 
 		return nodeObject( textureNode );
 
@@ -374,7 +373,7 @@ class TextureNode extends UniformNode {
 
 		const textureNode = this.clone();
 		textureNode.depthNode = nodeObject( depthNode );
-		textureNode.referenceNode = this;
+		textureNode.referenceNode = this.getSelf();
 
 		return nodeObject( textureNode );
 

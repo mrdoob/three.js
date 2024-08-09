@@ -89,7 +89,7 @@ class ReferenceNode extends Node {
 
 		}
 
-		this.node = node;
+		this.node = node.getSelf();
 
 	}
 
