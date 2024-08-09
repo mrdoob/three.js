@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgpu - postprocessing</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgpu postprocessing example<br/>
+			<a href="https://casual-effects.com/data/" target="_blank" rel="noopener">Lee Perry-Smith</a> head
+		</div>
+
+		<div id="container"></div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { bloom, film, pass, depthPass, renderOutput } from 'three/tsl'; //sepia, vignette, colorify, bleachBypass, mask, gammaCorrect, horizontalBlur,
+
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+			let container, stats;
+
+			let postScene, post1, post2, post3, post4;
+
+			let cameraOrtho, cameraPerspective, sceneModel, sceneBG, renderer, mesh, directionalLight;
+
+			const width = window.innerWidth || 2;
+			const height = window.innerHeight || 2;
+
+			let halfWidth = width / 2;
+			let halfHeight = height / 2;
+
+			let quadBG, quadMask, renderScene;
+
+			const delta = 0.01;
+
+			init();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				cameraOrtho = new THREE.OrthographicCamera( - halfWidth, halfWidth, halfHeight, - halfHeight, - 10000, 10000 );
+				cameraOrtho.position.z = 100;
+
+				cameraPerspective = new THREE.PerspectiveCamera( 50, width / height, 1, 10000 );
+				cameraPerspective.position.z = 900;
+
+				sceneModel = new THREE.Scene();
+				sceneBG = new THREE.Scene();
+
+				directionalLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				directionalLight.position.set( 0, - 0.1, 1 ).normalize();
+				sceneModel.add( directionalLight );
+
+				const loader = new GLTFLoader();
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
+
+					createMesh( gltf.scene.children[ 0 ].geometry, sceneModel, 100 );
+
+				} );
+
+				const diffuseMap = new THREE.TextureLoader().load( 'textures/cube/SwedishRoyalCastle/pz.jpg' );
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
+
+				const materialColor = new THREE.MeshBasicMaterial( {
+					map: diffuseMap,
+					depthTest: false
+				} );
+
+				quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), materialColor );
+				quadBG.position.z = - 500;
+				quadBG.scale.set( width, height, 1 );
+				sceneBG.add( quadBG );
+
+				//
+
+				const sceneMask = new THREE.Scene();
+
+				quadMask = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
+				quadMask.position.z = - 300;
+				quadMask.scale.set( width / 2, height / 2, 1 );
+				sceneMask.add( quadMask );
+
+				//
+
+				renderer = new THREE.WebGPURenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( width, height );
+				renderer.setAnimationLoop( animate );
+				renderer.autoClear = false;
+
+				//
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				//
+
+				const rtParameters = {
+					stencilBuffer: true
+				};
+
+				const rtWidth = width / 2;
+				const rtHeight = height / 2;
+
+				//
+
+
+				postScene = new THREE.PostProcessing( renderer );
+				post1 = new THREE.PostProcessing( renderer );
+				post2 = new THREE.PostProcessing( renderer );
+				post3 = new THREE.PostProcessing( renderer );
+				post4 = new THREE.PostProcessing( renderer );
+				const backgroundPass = pass( sceneBG, cameraOrtho );
+				//const modelPass = depthPass( sceneModel, cameraPerspective );
+				//renderScene = new TexturePass( composerScene.renderTarget2.texture );
+				postScene.outputNode = backgroundPass;
+				post1.outputNode = backgroundPass;
+				post2.outputNode = backgroundPass;
+				post3.outputNode = backgroundPass;
+				post4.outputNode = backgroundPass;
+
+				window.addEventListener( 'resize', onWindowResize );
+
+			}
+
+			function onWindowResize() {
+
+				halfWidth = window.innerWidth / 2;
+				halfHeight = window.innerHeight / 2;
+
+				cameraPerspective.aspect = window.innerWidth / window.innerHeight;
+				cameraPerspective.updateProjectionMatrix();
+
+				cameraOrtho.left = - halfWidth;
+				cameraOrtho.right = halfWidth;
+				cameraOrtho.top = halfHeight;
+				cameraOrtho.bottom = - halfHeight;
+
+				cameraOrtho.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				quadBG.scale.set( window.innerWidth, window.innerHeight, 1 );
+				quadMask.scale.set( window.innerWidth / 2, window.innerHeight / 2, 1 );
+
+			}
+
+			function createMesh( geometry, scene, scale ) {
+
+				const diffuseMap = new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Map-COL.jpg' );
+				diffuseMap.colorSpace = THREE.SRGBColorSpace;
+
+				const mat2 = new THREE.MeshPhongMaterial( {
+
+					color: 0xcbcbcb,
+					specular: 0x080808,
+					shininess: 20,
+					map: diffuseMap,
+					normalMap: new THREE.TextureLoader().load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' ),
+					normalScale: new THREE.Vector2( 0.75, 0.75 )
+
+				} );
+
+				mesh = new THREE.Mesh( geometry, mat2 );
+				mesh.position.set( 0, - 50, 0 );
+				mesh.scale.set( scale, scale, scale );
+
+				scene.add( mesh );
+
+			}
+
+			//
+
+			function animate() {
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			function render() {
+
+				const time = Date.now() * 0.0004;
+
+				if ( mesh ) mesh.rotation.y = - time;
+
+				renderer.setViewport( 0, 0, halfWidth, halfHeight );
+				postScene.render();
+
+				renderer.setViewport( 0, 0, halfWidth, halfHeight );
+				post1.render();
+
+				renderer.setViewport( halfWidth, 0, halfWidth, halfHeight );
+				post2.render();
+
+				renderer.setViewport( 0, halfHeight, halfWidth, halfHeight );
+				post3.render();
+
+				renderer.setViewport( halfWidth, halfHeight, halfWidth - 1, halfHeight - 1 );
+				post4.render();
+
+			}
+
+		</script>
+	</body>
+</html>
