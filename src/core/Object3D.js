@@ -83,8 +83,8 @@ class Object3D extends EventDispatcher {
 		const quaternion = new Quaternion();
 		const scale = new Vector3( 1, 1, 1 );
 
-		let rotationNeedsUpdate = false;
-		let quaternionNeedsUpdate = false;
+		let rotationNeedsUpdate = true;
+		let quaternionNeedsUpdate = true;
 
 		function onRotationWrite() {
 
