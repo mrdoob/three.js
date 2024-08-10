@@ -628,9 +628,9 @@ class Vector3 {
 
 	setFromEuler( e ) {
 
-		this.x = e._x;
-		this.y = e._y;
-		this.z = e._z;
+		this.x = e.x;
+		this.y = e.y;
+		this.z = e.z;
 
 		return this;
 
