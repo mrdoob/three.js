@@ -16,7 +16,7 @@ export const motionBlur = /*#__PURE__*/ Fn( ( [ inputNode, velocity, numSamples 
 		const offset = velocity.mul( float( i ).div( fSamples.sub( 1 ) ).sub( 0.5 ) );
 		colorResult.addAssign( sampleColor( uvs.add( offset ) ) );
 
-	} );
+	} );
 
 	colorResult.divAssign( fSamples );
 

@@ -441,6 +441,12 @@ class WebGLBackend extends Backend {
 
 			const clearColor = descriptor.clearColorValue || this.getClearColor();
 
+			// premultiply alpha
+
+			clearColor.r *= clearColor.a;
+			clearColor.g *= clearColor.a;
+			clearColor.b *= clearColor.a;
+
 			if ( depth ) this.state.setDepthMask( true );
 
 			if ( descriptor.textures === null ) {

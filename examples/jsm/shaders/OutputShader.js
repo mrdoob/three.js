@@ -54,7 +54,7 @@ const OutputShader = {
 
 			#elif defined( CINEON_TONE_MAPPING )
 
-				gl_FragColor.rgb = OptimizedCineonToneMapping( gl_FragColor.rgb );
+				gl_FragColor.rgb = CineonToneMapping( gl_FragColor.rgb );
 
 			#elif defined( ACES_FILMIC_TONE_MAPPING )
 

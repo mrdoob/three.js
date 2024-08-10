@@ -25,9 +25,9 @@ const ReinhardToneMappingNode = Fn( ( { color, exposure } ) => {
 } );
 
 // source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
-const OptimizedCineonToneMappingNode = Fn( ( { color, exposure } ) => {
+const CineonToneMappingNode = Fn( ( { color, exposure } ) => {
 
-	// optimized filmic operator by Jim Hejl and Richard Burgess-Dawson
+	// filmic operator by Jim Hejl and Richard Burgess-Dawson
 	color = color.mul( exposure );
 	color = color.sub( 0.004 ).max( 0.0 );
 
@@ -159,7 +159,7 @@ const NeutralToneMappingNode = Fn( ( { color, exposure } ) => {
 const toneMappingLib = {
 	[ LinearToneMapping ]: LinearToneMappingNode,
 	[ ReinhardToneMapping ]: ReinhardToneMappingNode,
-	[ CineonToneMapping ]: OptimizedCineonToneMappingNode,
+	[ CineonToneMapping ]: CineonToneMappingNode,
 	[ ACESFilmicToneMapping ]: ACESFilmicToneMappingNode,
 	[ AgXToneMapping ]: AgXToneMappingNode,
 	[ NeutralToneMapping ]: NeutralToneMappingNode
@@ -167,7 +167,7 @@ const toneMappingLib = {
 
 class ToneMappingNode extends TempNode {
 
-	constructor( toneMapping = NoToneMapping, exposureNode = toneMappingExposure, colorNode = null ) {
+	constructor( toneMapping, exposureNode = toneMappingExposure, colorNode = null ) {
 
 		super( 'vec3' );
 

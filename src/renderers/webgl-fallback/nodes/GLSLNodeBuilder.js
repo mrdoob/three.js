@@ -665,7 +665,7 @@ ${ flowData.code }
 
 			if ( isBatchedMesh && ext.has( 'WEBGL_multi_draw' ) ) {
 
-				this.enableExtension( 'GL_ANGLE_multi_draw', 'require' );
+				this.enableExtension( 'GL_ANGLE_multi_draw', 'require', shaderStage );
 
 			}
 
