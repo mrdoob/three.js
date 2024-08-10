@@ -267,6 +267,10 @@ class AnalyticLightNode extends LightingNode {
 		const { shadowMap, light } = this;
 		const { renderer, scene, camera } = frame;
 
+
+		const depthVersion = shadowMap.depthTexture.version;
+		this._depthVersionCached = depthVersion;
+
 		const currentOverrideMaterial = scene.overrideMaterial;
 
 		scene.overrideMaterial = overrideMaterial;
@@ -315,7 +319,21 @@ class AnalyticLightNode extends LightingNode {
 
 	updateBefore( frame ) {
 
-		this.updateShadow( frame );
+		const shadow = this.light.shadow;
+
+		const needsUpdate = shadow.needsUpdate || shadow.autoUpdate;
+
+		if ( needsUpdate ) {
+
+			this.updateShadow( frame );
+
+			if ( this.shadowMap.depthTexture.version === this._depthVersionCached ) {
+
+				shadow.needsUpdate = false;
+
+			}
+
+		}
 
 	}
 
