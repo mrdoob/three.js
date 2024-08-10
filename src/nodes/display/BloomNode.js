@@ -305,7 +305,7 @@ class BloomNode extends TempNode {
 				diffuseSum.addAssign( add( sample1, sample2 ).mul( w ) );
 				weightSum.addAssign( float( 2.0 ).mul( w ) );
 
-			} );
+			} );
 
 			return vec4( diffuseSum.div( weightSum ), 1.0 );
 
