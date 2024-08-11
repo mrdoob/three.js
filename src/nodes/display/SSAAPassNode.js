@@ -68,7 +68,7 @@ class SSAAPassNode extends PassNode {
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
 
-		renderer.setMRT( null ); // TODO: Add MRT support
+		renderer.setMRT( this.getMRT() );
 		renderer.autoClear = false;
 
 		const jitterOffsets = _JitterVectors[ Math.max( 0, Math.min( this.sampleLevel, 5 ) ) ];
@@ -183,7 +183,7 @@ class SSAAPassNode extends PassNode {
 		this.sampleTexture = texture( this.sampleRenderTarget.texture );
 
 		this._quadMesh.material = builder.createNodeMaterial();
-		this._quadMesh.material.fragmentNode = this.sampleTexture.mul( this.sampleWeight );
+		this._quadMesh.material.colorNode = this.sampleTexture.mul( this.sampleWeight );
 		this._quadMesh.material.transparent = true;
 		this._quadMesh.material.depthTest = false;
 		this._quadMesh.material.depthWrite = false;
