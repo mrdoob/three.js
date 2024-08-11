@@ -92,7 +92,7 @@ class AnimationClipCreator {
 	static CreateMaterialColorAnimation( duration, colors ) {
 
 		const times = [], values = [],
-			timeStep = duration / colors.length;
+			timeStep = duration / ( colors.length - 1 );
 
 		for ( let i = 0; i < colors.length; i ++ ) {
 
