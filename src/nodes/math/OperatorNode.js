@@ -304,7 +304,7 @@ addNodeElement( 'shiftLeft', shiftLeft );
 addNodeElement( 'shiftRight', shiftRight );
 
 
-export const remainder = ( ...params ) => {
+export const remainder = ( ...params ) => { // @deprecated, r168
 
 	console.warn( 'TSL.OperatorNode: .remainder() has been renamed to .modInt().' );
 	return modInt( ...params );
