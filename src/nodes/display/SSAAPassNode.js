@@ -142,9 +142,9 @@ class SSAAPassNode extends PassNode {
 
 			this._quadMesh.render( renderer );
 
-			renderer.copyTextureToTexture( this.sampleRenderTarget.depthTexture, this.renderTarget.depthTexture );
-
 		}
+
+		renderer.copyTextureToTexture( this.sampleRenderTarget.depthTexture, this.renderTarget.depthTexture );
 
 		// restore
 
