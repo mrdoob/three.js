@@ -6,6 +6,7 @@ import { AdditiveBlending } from '../../constants.js';
 import { uniform } from '../core/UniformNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { texture } from '../accessors/TextureNode.js';
+import { mrt, getTextureIndex } from '../core/MRTNode.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -37,7 +38,6 @@ class SSAAPassNode extends PassNode {
 		this.sampleWeight = uniform( 1 );
 
 		this.sampleRenderTarget = null;
-		this.sampleTexture = null;
 
 		this._quadMesh = new QuadMesh();
 
@@ -180,10 +180,36 @@ class SSAAPassNode extends PassNode {
 
 		}
 
-		this.sampleTexture = texture( this.sampleRenderTarget.texture );
+		let sampleTexture;
+
+		const passMRT = this.getMRT();
+
+		if ( passMRT !== null ) {
+
+			const outputs = {};
+
+			for ( const name in passMRT.outputNodes ) {
+
+				const index = getTextureIndex( this.sampleRenderTarget.textures, name );
+
+				if ( index >= 0 ) {
+
+					outputs[ name ] = texture( this.sampleRenderTarget.textures[ index ] ).mul( this.sampleWeight );
+
+				}
+
+			}
+
+			sampleTexture = mrt( outputs );
+
+		} else {
+
+			sampleTexture = texture( this.sampleRenderTarget.texture ).mul( this.sampleWeight );
+
+		}
 
 		this._quadMesh.material = builder.createNodeMaterial();
-		this._quadMesh.material.colorNode = this.sampleTexture.mul( this.sampleWeight );
+		this._quadMesh.material.fragmentNode = sampleTexture;
 		this._quadMesh.material.transparent = true;
 		this._quadMesh.material.depthTest = false;
 		this._quadMesh.material.depthWrite = false;
