@@ -27,7 +27,7 @@ class SSAAPassNode extends PassNode {
 
 		this.isSSAAPassNode = true;
 
-		this.samples = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
+		this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
 		this.unbiased = true;
 		this.clearColor = new Color( 0x000000 );
 		this.clearAlpha = 0;
@@ -189,6 +189,7 @@ class SSAAPassNode extends PassNode {
 		this._quadMesh.material.depthWrite = false;
 		this._quadMesh.material.premultipliedAlpha = true;
 		this._quadMesh.material.blending = AdditiveBlending;
+		this._quadMesh.material.normals = false;
 
 		return super.setup( builder );
 
