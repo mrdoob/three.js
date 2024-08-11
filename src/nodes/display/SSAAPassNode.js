@@ -2,8 +2,7 @@ import { nodeObject } from '../shadernode/ShaderNode.js';
 import PassNode from './PassNode.js';
 import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
-import { RenderTarget } from '../../core/RenderTarget.js';
-import { AdditiveBlending, HalfFloatType } from '../../constants.js';
+import { AdditiveBlending } from '../../constants.js';
 import { uniform } from '../core/UniformNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { texture } from '../accessors/TextureNode.js';
@@ -33,13 +32,12 @@ class SSAAPassNode extends PassNode {
 		this.clearColor = new Color( 0x000000 );
 		this.clearAlpha = 0;
 
-		this.sampleRenderTarget = new RenderTarget( 1, 1, { type: HalfFloatType } );
-		this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
-
 		this._currentClearColor = new Color();
 
 		this.sampleWeight = uniform( 1 );
-		this.sampleTexture = texture( this.sampleRenderTarget.texture );
+
+		this.sampleRenderTarget = null;
+		this.sampleTexture = null;
 
 		this._quadMesh = new QuadMesh();
 
@@ -175,6 +173,14 @@ class SSAAPassNode extends PassNode {
 	}
 
 	setup( builder ) {
+
+		if ( this.sampleRenderTarget === null ) {
+
+			this.sampleRenderTarget = this.renderTarget.clone();
+
+		}
+
+		this.sampleTexture = texture( this.sampleRenderTarget.texture );
 
 		this._quadMesh.material = builder.createNodeMaterial();
 		this._quadMesh.material.fragmentNode = this.sampleTexture.mul( this.sampleWeight );
