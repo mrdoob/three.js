@@ -43,7 +43,7 @@ class BatchNode extends Node {
 		const getIndirectIndex = Fn( ( [ id ] ) => {
 
 			const size = textureSize( textureLoad( this.batchMesh._indirectTexture ), 0 );
-			const x = int( id ).remainder( int( size ) );
+			const x = int( id ).modInt( int( size ) );
 			const y = int( id ).div( int( size ) );
 			return textureLoad( this.batchMesh._indirectTexture, ivec2( x, y ) ).x;
 
