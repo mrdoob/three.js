@@ -41,6 +41,14 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 	}
 
+	setup( builder ) {
+
+		this.setupShaders();
+
+		super.setup( builder );
+
+	}
+
 	setupShaders() {
 
 		const useAlphaToCoverage = this.alphaToCoverage;
@@ -149,7 +157,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 		if ( this.useAlphaToCoverage !== value ) {
 
 			this.useAlphaToCoverage = value;
-			this.setupShaders();
+			this.needsUpdate = true;
 
 		}
 
