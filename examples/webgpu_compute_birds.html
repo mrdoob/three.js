@@ -222,7 +222,8 @@
 				// Create geometry
 			
 				const birdGeometry = new BirdGeometry();
-				const birdMaterial = new THREE.MeshStandardNodeMaterial();
+				const birdMaterial = new THREE.NodeMaterial();
+				birdMaterial.normals = false;
 
 				// Declare varyings
 
@@ -419,20 +420,6 @@
 				} )().compute( BIRDS );
 
 				scene.add( birdMesh );
-
-				// LIGHTS
-
-				const topLight = new THREE.DirectionalLight( 0xffffff, 3 );
-				topLight.color.setHSL( 0.1, 1, 0.95 );
-				topLight.position.set( - 1, 21, 3.8 );
-				topLight.position.multiplyScalar( 30 );
-				scene.add( topLight );
-
-				const bottomLight = new THREE.DirectionalLight( 0xffffff, 0.7 );
-				bottomLight.color.setHSL( 0.1, 1, 0.95 );
-				bottomLight.position.set( - 1, - 21, 3.8 );
-				bottomLight.position.multiplyScalar( 30 );
-				scene.add( bottomLight );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
