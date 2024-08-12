@@ -206,11 +206,21 @@ class NodeMaterial extends Material {
 
 		let depthNode = this.depthNode;
 
-		if ( depthNode === null && renderer.logarithmicDepthBuffer === true ) {
+		if ( depthNode === null ) {
 
-			const fragDepth = modelViewProjection().w.add( 1 );
+			const mrt = renderer.getMRT();
 
-			depthNode = fragDepth.log2().mul( cameraLogDepth ).mul( 0.5 );
+			if ( mrt && mrt.has( 'depth' ) ) {
+
+				depthNode = mrt.get( 'depth' );
+
+			} else if ( renderer.logarithmicDepthBuffer === true ) {
+
+				const fragDepth = modelViewProjection().w.add( 1 );
+
+				depthNode = fragDepth.log2().mul( cameraLogDepth ).mul( 0.5 );
+
+			}
 
 		}
 
