@@ -795,7 +795,7 @@ ${ flowData.code }
 
 		const builtins = this.getBuiltins( 'output' );
 
-		if ( builtins ) snippets.push( builtins );
+		if ( builtins ) snippets.push( '\t' + builtins );
 
 		return snippets.join( ',\n' );
 
