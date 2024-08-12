@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeObject } from '../shadernode/ShaderNode.js';
 
-import { SRGBColorSpace, NoToneMapping } from '../../constants.js';
+import { LinearSRGBColorSpace, SRGBColorSpace, NoToneMapping } from '../../constants.js';
 
 class RenderOutputNode extends TempNode {
 
@@ -24,8 +24,8 @@ class RenderOutputNode extends TempNode {
 
 		// tone mapping
 
-		const toneMapping = this.toneMapping !== null ? this.toneMapping : context.toneMapping;
-		const outputColorSpace = this.outputColorSpace !== null ? this.outputColorSpace : context.outputColorSpace;
+		const toneMapping = ( this.toneMapping !== null ? this.toneMapping : context.toneMapping ) || NoToneMapping;
+		const outputColorSpace = ( this.outputColorSpace !== null ? this.outputColorSpace : context.outputColorSpace ) || LinearSRGBColorSpace;
 
 		if ( toneMapping !== NoToneMapping ) {
 
