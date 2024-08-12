@@ -223,6 +223,18 @@ class SSAAPassNode extends PassNode {
 
 	}
 
+	dispose() {
+
+		super.dispose();
+
+		if ( this.sampleRenderTarget !== null ) {
+
+			this.sampleRenderTarget.dispose();
+
+		}
+
+	}
+
 }
 
 // These jitter vectors are specified in integers because it is easier.
