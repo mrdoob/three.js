@@ -388,6 +388,7 @@
 		"webgpu_postprocessing_masking",
 		"webgpu_postprocessing_motion_blur",
 		"webgpu_postprocessing_sobel",
+		"webgpu_postprocessing_ssaa",
 		"webgpu_postprocessing_transition",
 		"webgpu_postprocessing",
 		"webgpu_procedural_texture",

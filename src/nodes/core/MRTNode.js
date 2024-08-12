@@ -2,7 +2,7 @@ import { addNodeClass } from './Node.js';
 import OutputStructNode from './OutputStructNode.js';
 import { nodeProxy, vec4 } from '../shadernode/ShaderNode.js';
 
-function getTextureIndex( textures, name ) {
+export function getTextureIndex( textures, name ) {
 
 	for ( let i = 0; i < textures.length; i ++ ) {
 
