@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:EventDispatcher] &rarr;
+		[page:Controls] &rarr;
 
 		<h1>指针锁定控制器（[name]）</h1>
 
@@ -85,11 +85,7 @@
 
 		<h2>属性</h2>
 
-		<h3>[property:HTMLDOMElement domElement]</h3>
-		<p>
-			该 HTMLDOMElement 用于监听鼠标/触摸事件，该属性必须在构造函数中传入。在此处改变它将不会设置新的事件监听。
-		</p>
-
+		<p>共有属性请参见其基类[page:Controls]。</p>
 
 		<h3>[property:Boolean isLocked]</h3>
 		<p>
@@ -106,19 +102,9 @@
 			摄像机的俯仰角下限限制。范围为0到Math.PI弧度之间。默认值为0。
 		</p>
 
-		<h2>Methods</h2>
+		<h2>方法</h2>
 
-		<p>共有方法请参见其基类[page:EventDispatcher]。</p>
-
-		<h3>[method:undefined connect] ()</h3>
-		<p>
-			添加控制器的事件监听。
-		</p>
-
-		<h3>[method:undefined disconnect] ()</h3>
-		<p>
-			移除控制器的事件监听。
-		</p>
+		<p>共有方法请参见其基类[page:Controls]。</p>
 
 		<h3>[method:Vector3 getDirection] ( [param:Vector3 target] )</h3>
 		<p>
