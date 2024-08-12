@@ -1084,6 +1084,7 @@
 
 			"控制": {
 				"ArcballControls": "examples/zh/controls/ArcballControls",
+				"Controls": "examples/zh/controls/Controls",
 				"DragControls": "examples/zh/controls/DragControls",
 				"FirstPersonControls": "examples/zh/controls/FirstPersonControls",
 				"FlyControls": "examples/zh/controls/FlyControls",

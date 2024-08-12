@@ -604,7 +604,19 @@ class WebGPUBackend extends Backend {
 
 			const clearColor = this.getClearColor();
 
-			clearValue = { r: clearColor.r, g: clearColor.g, b: clearColor.b, a: clearColor.a };
+			if ( this.renderer.alpha === true ) {
+
+				// premultiply alpha
+
+				const a = clearColor.a;
+
+				clearValue = { r: clearColor.r * a, g: clearColor.g * a, b: clearColor.b * a, a: a };
+
+			} else {
+
+				clearValue = { r: clearColor.r, g: clearColor.g, b: clearColor.b, a: clearColor.a };
+
+			}
 
 		}
 

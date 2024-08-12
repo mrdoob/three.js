@@ -25,7 +25,7 @@ class Controls extends EventDispatcher {
 
 	dispose() {}
 
-	update() {}
+	update( /* delta */ ) {}
 
 }
 
