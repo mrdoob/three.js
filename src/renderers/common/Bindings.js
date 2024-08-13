@@ -200,7 +200,7 @@ class Bindings extends DataMap {
 
 	}
 
-	delete ( renderObject ) {
+	delete( renderObject ) {
 
 		const bindings = renderObject.getBindings();
 

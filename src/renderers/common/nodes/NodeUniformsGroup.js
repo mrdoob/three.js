@@ -58,7 +58,7 @@ class NodeUniformsGroup extends UniformsGroup {
 
 		if ( this._buffer === null ) {
 
-			if (  ! this.allocateCommon() ) {
+			if ( ! this.allocateCommon() ) {
 
 				return super.buffer;
 

@@ -34,7 +34,7 @@ class WebGPUBindingUtils {
 
 		}
 
-		return bufferGPU
+		return bufferGPU;
 
 	}
 
@@ -190,6 +190,7 @@ class WebGPUBindingUtils {
 
 			const bufferGPU = backend.get( binding ).buffer;
 			device.queue.writeBuffer( bufferGPU, 0, binding.buffer, 0 );
+
 		}
 
 	}

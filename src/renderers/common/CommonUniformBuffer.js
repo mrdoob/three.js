@@ -28,12 +28,19 @@ class CommonUniformBuffer {
 		Object.defineProperties( this.info, {
 			'freeLists': {
 				get: () => {
+
 					const a = [];
-					for ( let i = 1, l = this.freeLists.length; i < l ; i ++ ) {
+
+					for ( let i = 1, l = this.freeLists.length; i < l; i ++ ) {
+
 						if ( this.freeLists[ i ] !== undefined ) a[ i ] = this.freeLists[ i ].length;
+
 					}
+
 					return a;
+
 				}
+
 			},
 			unused: {
 				get: () => buffer.byteLength - this.startFree
@@ -61,9 +68,7 @@ class CommonUniformBuffer {
 
 			for ( let i = blockCount, l = freeLists.length; i < l; i ++ ) {
 
-				if ( freeLists[ i ] !== undefined && freeLists[ i ].length > 0) {
-
-//					console.log( 'allocate from free list size', i * aligment );
+				if ( freeLists[ i ] !== undefined && freeLists[ i ].length > 0 ) {
 
 					start = freeLists[ i ].shift();
 					this.info.reused ++;
@@ -103,7 +108,7 @@ class CommonUniformBuffer {
 		}
 
 		const bpe = this.buffer.BYTES_PER_ELEMENT;
-		const buffer = this.buffer.subarray( start / bpe , ( start + byteLength ) / bpe );
+		const buffer = this.buffer.subarray( start / bpe, ( start + byteLength ) / bpe );
 
 		this.info.alloc ++;
 
