@@ -227,9 +227,32 @@ class TrackballControls extends Controls {
 
 		} else {
 
-			console.warn( 'THREE.TrackballControls: Unsupported camera type' );
+			console.warn( 'THREE.TrackballControls: Unsupported camera type.' );
 
 		}
+
+	}
+
+	reset() {
+
+		this.state = _STATE.NONE;
+		this.keyState = _STATE.NONE;
+
+		this.target.copy( this._target0 );
+		this.object.position.copy( this._position0 );
+		this.object.up.copy( this._up0 );
+		this.object.zoom = this._zoom0;
+
+		this.object.updateProjectionMatrix();
+
+		this._eye.subVectors( this.object.position, this.target );
+
+		this.object.lookAt( this.target );
+
+		this.dispatchEvent( _changeEvent );
+
+		this._lastPosition.copy( this.object.position );
+		this._lastZoom = this.object.zoom;
 
 	}
 
@@ -472,29 +495,6 @@ class TrackballControls extends Controls {
 			}
 
 		}
-
-	}
-
-	reset() {
-
-		this.state = _STATE.NONE;
-		this.keyState = _STATE.NONE;
-
-		this.target.copy( this._target0 );
-		this.object.position.copy( this._position0 );
-		this.object.up.copy( this._up0 );
-		this.object.zoom = this._zoom0;
-
-		this.object.updateProjectionMatrix();
-
-		this._eye.subVectors( this.object.position, this.target );
-
-		this.object.lookAt( this.target );
-
-		this.dispatchEvent( _changeEvent );
-
-		this._lastPosition.copy( this.object.position );
-		this._lastZoom = this.object.zoom;
 
 	}
 
