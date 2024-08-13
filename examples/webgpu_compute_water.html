@@ -28,7 +28,7 @@
 
 		computeHeight = Fn(() => {
 
-				const { viscosity } = effectController
+				const { viscosity } = effectController.viscosity
 
 				const height = heightStorage.element( instanceIndex );
 				const prevHeight = heightStorage.element( instanceIndex );
@@ -40,6 +40,7 @@
 				newHeight.mulAssign( viscosity );
 
 				// Mouse influence
+				const mousePhase = clamp(  vec2( mousePos.x, mousePos.y ), 0.0, PI)
 				float mousePhase = clamp( length( ( uv - vec2( 0.5 ) ) * BOUNDS - vec2( mousePos.x, - mousePos.y ) ) * PI / mouseSize, 0.0, PI );
 				newHeight += ( cos( mousePhase ) + 1.0 ) * 0.28;
 
