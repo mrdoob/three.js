@@ -48,6 +48,7 @@ class WebGLState {
 		this.maxTextures = this.gl.getParameter( this.gl.MAX_TEXTURE_IMAGE_UNITS );
 		this.currentTextureSlot = null;
 		this.currentBoundTextures = {};
+		this.currentBoundBufferBases = {};
 
 		if ( initialized === false ) {
 
@@ -715,6 +716,26 @@ class WebGLState {
 
 
 	}
+
+	bindBufferBase( target, index, buffer ) {
+
+		const { gl } = this;
+
+		const key = `${target}-${index}`;
+
+		if ( this.currentBoundBufferBases[ key ] !== buffer ) {
+
+			gl.bindBufferBase( target, index, buffer );
+			this.currentBoundBufferBases[ key ] = buffer;
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
 
 	unbindTexture() {
 

@@ -490,16 +490,16 @@ class WebGLBackend extends Backend {
 
 	beginCompute( computeGroup ) {
 
-		const gl = this.gl;
+		const { state, gl } = this;
 
-		gl.bindFramebuffer( gl.FRAMEBUFFER, null );
+		state.bindFramebuffer( gl.FRAMEBUFFER, null );
 		this.initTimestampQuery( computeGroup );
 
 	}
 
 	compute( computeGroup, computeNode, bindings, pipeline ) {
 
-		const gl = this.gl;
+		const { state, gl } = this;
 
 		if ( ! this.discard ) {
 
@@ -525,7 +525,7 @@ class WebGLBackend extends Backend {
 
 		}
 
-		gl.useProgram( programGPU );
+		state.useProgram( programGPU );
 
 		this._bindUniforms( bindings );
 
@@ -595,7 +595,7 @@ class WebGLBackend extends Backend {
 
 		state.setMaterial( material, frontFaceCW );
 
-		gl.useProgram( programGPU );
+		state.useProgram( programGPU );
 
 		//
 
@@ -974,7 +974,7 @@ class WebGLBackend extends Backend {
 
 	_completeCompile( renderObject, pipeline ) {
 
-		const gl = this.gl;
+		const { state, gl } = this;
 		const pipelineData = this.get( pipeline );
 		const { programGPU, fragmentShader, vertexShader } = pipelineData;
 
@@ -984,7 +984,7 @@ class WebGLBackend extends Backend {
 
 		}
 
-		gl.useProgram( programGPU );
+		state.useProgram( programGPU );
 
 		// Bindings
 
@@ -1002,7 +1002,7 @@ class WebGLBackend extends Backend {
 
 	createComputePipeline( computePipeline, bindings ) {
 
-		const gl = this.gl;
+		const { state, gl } = this;
 
 		// Program
 
@@ -1052,7 +1052,7 @@ class WebGLBackend extends Backend {
 
 		}
 
-		gl.useProgram( programGPU );
+		state.useProgram( programGPU );
 
 		// Bindings
 
@@ -1104,7 +1104,7 @@ class WebGLBackend extends Backend {
 
 	updateBindings( bindGroup, bindings ) {
 
-		const { gl } = this;
+		const { state, gl } = this;
 
 		let groupIndex = 0;
 		let textureIndex = 0;
@@ -1120,7 +1120,7 @@ class WebGLBackend extends Backend {
 
 					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
 					gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
-					gl.bindBufferBase( gl.UNIFORM_BUFFER, groupIndex, bufferGPU );
+					state.bindBufferBase( gl.UNIFORM_BUFFER, groupIndex, bufferGPU );
 
 					this.set( binding, {
 						index: groupIndex ++,
@@ -1519,7 +1519,7 @@ class WebGLBackend extends Backend {
 
 		}
 
-		const gl = this.gl;
+		const { gl } = this;
 
 		transformFeedbackGPU = gl.createTransformFeedback();
 
@@ -1584,7 +1584,8 @@ class WebGLBackend extends Backend {
 
 				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
 
-					gl.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
+					// TODO USE bindBufferRange to group multiple uniform buffers
+					state.bindBufferBase( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU );
 
 				} else if ( binding.isSampledTexture ) {
 
