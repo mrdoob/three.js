@@ -201,9 +201,26 @@ async function main() {
 
 	/* Find files */
 
-	const isMakeScreenshot = process.argv[ 2 ] === '--make';
+	let isMakeScreenshot = false;
+	let isWebGPU = false;
 
-	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
+	let argvIndex = 2;
+
+	if ( process.argv[ argvIndex ] === '--webgpu' ) {
+
+		isWebGPU = true;
+		argvIndex ++;
+
+	}
+
+	if ( process.argv[ argvIndex ] === '--make' ) {
+
+		isMakeScreenshot = true;
+		argvIndex ++;
+
+	}
+
+	const exactList = process.argv.slice( argvIndex )
 		.map( f => f.replace( '.html', '' ) );
 
 	const isExactList = exactList.length !== 0;
@@ -226,6 +243,8 @@ async function main() {
 		}
 
 	}
+
+	if ( isWebGPU ) files = files.filter( f => f.includes( 'webgpu_' ) );
 
 	/* CI parallelism */
 
