@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import * as Nodes from 'three/nodes';
+import * as Nodes from 'three/tsl';
 import { Canvas, CircleMenu, ButtonInput, StringInput, ContextMenu, Tips, Search, Loader, Node, TreeViewNode, TreeViewInput, Element } from 'flow';
 import { FileEditor } from './editors/FileEditor.js';
 import { exportJSON } from './NodeEditorUtils.js';
@@ -58,6 +58,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 		this._initExamplesContext();
 		this._initShortcuts();
 		this._initParams();
+
 	}
 
 	setSize( width, height ) {
@@ -282,7 +283,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 			this.splitscreen = ! this.splitscreen;
 			splitscreenButton.setIcon( this.splitscreen ? 'ti ti-layout-sidebar-right-collapse' : 'ti ti-layout-sidebar-right-expand' );
 
-		});
+		} );
 
 		menuButton.onClick( () => this.nodesContext.open() );
 		examplesButton.onClick( () => this.examplesContext.open() );

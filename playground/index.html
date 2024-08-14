@@ -105,9 +105,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "../examples/jsm/",
-					"three/nodes": "../examples/jsm/nodes/Nodes.js",
 					"flow": "./libs/flow.module.js"
 				}
 			}
@@ -116,8 +116,6 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -144,7 +142,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setAnimationLoop( animate );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.toneMapping = THREE.LinearToneMapping;

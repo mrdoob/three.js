@@ -1,5 +1,6 @@
 import { StringInput, NumberInput, ColorInput, Element, LabelElement } from 'flow';
-import { string, float, vec2, vec3, vec4, color } from 'three/nodes';
+import { string, float, vec2, vec3, vec4, color } from 'three/tsl';
+import { Color } from 'three';
 import { setInputAestheticsFromType, setOutputAestheticsFromType } from './DataTypeLib.js';
 
 export function exportJSON( object, name ) {
@@ -38,6 +39,25 @@ export function disposeScene( scene ) {
 		}
 
 	} );
+
+}
+
+export function resetScene( scene ) {
+
+	if ( scene.environment !== null ) {
+
+		scene.environment.dispose();
+		scene.environment = null;
+
+	}
+
+	if ( scene.background !== null ) {
+
+		if ( scene.background.isTexture ) scene.background.dispose();
+
+	}
+
+	scene.background = new Color( 0x333333 );
 
 }
 

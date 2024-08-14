@@ -1,6 +1,6 @@
 import { JavaScriptEditor } from './JavaScriptEditor.js';
 import { ScriptableEditor } from './ScriptableEditor.js';
-import { scriptable } from 'three/nodes';
+import { scriptable } from 'three/tsl';
 
 const defaultCode = `// Addition Node Example
 // Enjoy! :)
