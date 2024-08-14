@@ -23,7 +23,7 @@ export const normalLocal = /*#__PURE__*/ ( Fn( ( builder ) => {
 
 }, 'vec3' ).once() )().toVar( 'normalLocal' );
 
-export const normalFlat = /*#__PURE__*/ positionView.dFdx().cross( positionView.dFdy() ).normalize();
+export const normalFlat = /*#__PURE__*/ positionView.dFdx().cross( positionView.dFdy() ).normalize().toVar( 'normalFlat' );
 
 let normalViewVarying = null;
 
