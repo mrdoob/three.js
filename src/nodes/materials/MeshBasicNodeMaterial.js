@@ -27,7 +27,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 	setupNormal() {
 
-		return normalView;
+		return normalView; // see #28839
 
 	}
 
