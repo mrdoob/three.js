@@ -25,7 +25,7 @@ export const normalLocal = /*#__PURE__*/ ( Fn( ( builder ) => {
 
 export const normalFlat = /*#__PURE__*/ positionView.dFdx().cross( positionView.dFdy() ).normalize();
 
-let normalViewVaryng = null;
+let normalViewVarying = null;
 
 export const normalView = /*#__PURE__*/ ( Fn( ( builder ) => {
 
@@ -37,7 +37,7 @@ export const normalView = /*#__PURE__*/ ( Fn( ( builder ) => {
 
 	} else {
 
-		node = normalViewVaryng || ( normalViewVaryng = varying( modelNormalMatrix.mul( normalLocal ), 'v_normalView' ) );
+		node = normalViewVarying || ( normalViewVarying = varying( modelNormalMatrix.mul( normalLocal ), 'v_normalView' ) );
 
 	}
 
