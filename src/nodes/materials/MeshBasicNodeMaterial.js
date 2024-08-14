@@ -4,7 +4,7 @@ import { MeshBasicMaterial } from '../../materials/MeshBasicMaterial.js';
 import BasicEnvironmentNode from '../lighting/BasicEnvironmentNode.js';
 import BasicLightMapNode from '../lighting/BasicLightMapNode.js';
 import BasicLightingModel from '../functions/BasicLightingModel.js';
-import { transformedNormalView, normalView } from '../accessors/NormalNode.js';
+import { normalView } from '../accessors/NormalNode.js';
 import { diffuseColor } from '../core/PropertyNode.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshBasicMaterial();
@@ -18,7 +18,6 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 		this.isMeshBasicNodeMaterial = true;
 
 		this.lights = true;
-		//this.normals = false; @TODO: normals usage by context
 
 		this.setDefaultValues( _defaultValues );
 
@@ -28,7 +27,7 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 	setupNormal() {
 
-		transformedNormalView.assign( normalView ); // see #28839
+		return normalView; // see #28839
 
 	}
 

@@ -23,7 +23,6 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		super();
 
-		this.normals = false;
 		this.lights = false;
 
 		this.setDefaultValues( _defaultValues );

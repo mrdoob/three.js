@@ -106,7 +106,6 @@ class TextureNode extends UniformNode {
 
 		return this._matrixUniform.mul( vec3( uvNode, 1 ) ).xy;
 
-
 	}
 
 	setUpdateMatrix( value ) {
