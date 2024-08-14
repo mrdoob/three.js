@@ -1571,26 +1571,6 @@ class WebGLBackend extends Backend {
 
 	}
 
-
-	_bindBufferRange( binding, offset, size ) {
-
-		const { gl } = this;
-		const bindingData = this.get( binding );
-		const index = bindingData.index;
-
-		if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
-
-			gl.bindBufferRange( gl.UNIFORM_BUFFER, index, bindingData.bufferGPU, offset, size );
-
-		} else {
-
-			console.warn( 'bindBufferRange is only applicable for uniform buffers' );
-
-		}
-
-	}
-
-
 	_bindUniforms( bindings ) {
 
 		const { gl, state } = this;
