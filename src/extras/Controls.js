@@ -1,4 +1,4 @@
-import { EventDispatcher } from 'three';
+import { EventDispatcher } from '../core/EventDispatcher.js';
 
 class Controls extends EventDispatcher {
 

@@ -1,4 +1,5 @@
 import {
+	Controls,
 	Matrix4,
 	Plane,
 	Raycaster,
@@ -7,7 +8,6 @@ import {
 	MOUSE,
 	TOUCH
 } from 'three';
-import { Controls } from './Controls.js';
 
 const _plane = new Plane();
 

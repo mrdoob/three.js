@@ -1,8 +1,8 @@
 import {
+	Controls,
 	Quaternion,
 	Vector3
 } from 'three';
-import { Controls } from './Controls.js';
 
 const _changeEvent = { type: 'change' };
 
