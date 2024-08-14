@@ -132,14 +132,21 @@ class SkinningNode extends Node {
 		}
 
 		const skinPosition = this.getSkinnedPosition();
-		const skinNormal = this.getSkinnedNormal();
+
 
 		positionLocal.assign( skinPosition );
-		normalLocal.assign( skinNormal );
 
-		if ( builder.hasGeometryAttribute( 'tangent' ) ) {
+		if ( builder.hasGeometryAttribute( 'normal' ) ) {
 
-			tangentLocal.assign( skinNormal );
+			const skinNormal = this.getSkinnedNormal();
+
+			normalLocal.assign( skinNormal );
+
+			if ( builder.hasGeometryAttribute( 'tangent' ) ) {
+
+				tangentLocal.assign( skinNormal );
+
+			}
 
 		}
 
