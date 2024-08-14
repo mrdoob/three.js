@@ -1,4 +1,5 @@
 import {
+	Controls,
 	GridHelper,
 	EllipseCurve,
 	BufferGeometry,
@@ -14,7 +15,6 @@ import {
 	Matrix4,
 	MathUtils
 } from 'three';
-import { Controls } from './Controls.js';
 
 //trackball state
 const STATE = {
