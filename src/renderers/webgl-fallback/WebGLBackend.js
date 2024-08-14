@@ -1519,7 +1519,7 @@ class WebGLBackend extends Backend {
 
 		}
 
-		const { state, gl } = this;
+		const { gl } = this;
 
 		transformFeedbackGPU = gl.createTransformFeedback();
 
@@ -1529,7 +1529,7 @@ class WebGLBackend extends Backend {
 
 			const attributeData = transformBuffers[ i ];
 
-			state.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, attributeData.transformBuffer );
+			gl.bindBufferBase( gl.TRANSFORM_FEEDBACK_BUFFER, i, attributeData.transformBuffer );
 
 		}
 
