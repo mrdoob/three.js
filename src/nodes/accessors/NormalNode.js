@@ -25,6 +25,8 @@ export const normalLocal = /*#__PURE__*/ ( Fn( ( builder ) => {
 
 export const normalFlat = /*#__PURE__*/ positionView.dFdx().cross( positionView.dFdy() ).normalize();
 
+let normalViewVaryng = null;
+
 export const normalView = /*#__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
@@ -35,7 +37,7 @@ export const normalView = /*#__PURE__*/ ( Fn( ( builder ) => {
 
 	} else {
 
-		node = varying( modelNormalMatrix.mul( normalLocal ), 'v_normalView' ).normalize();
+		node = normalViewVaryng || ( normalViewVaryng = varying( modelNormalMatrix.mul( normalLocal ), 'v_normalView' ) );
 
 	}
 
@@ -52,11 +54,7 @@ export const transformedNormalView = /*#__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedNormalView' );
 
 
-export const transformedNormalWorld = /*#__PURE__*/ ( Fn( () => {
-
-	return transformedNormalView.transformDirection( cameraViewMatrix ).normalize();
-
-}, 'vec3' ).once() )().toVar( 'transformedNormalWorld' );
+export const transformedNormalWorld = /*#__PURE__*/ transformedNormalView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedNormalWorld' );
 
 export const transformedClearcoatNormalView = /*#__PURE__*/ ( Fn( ( builder ) => {
 
