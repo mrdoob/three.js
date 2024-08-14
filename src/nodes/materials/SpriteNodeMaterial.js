@@ -19,7 +19,6 @@ class SpriteNodeMaterial extends NodeMaterial {
 		this.isSpriteNodeMaterial = true;
 
 		this.lights = false;
-		this.normals = false;
 
 		this.positionNode = null;
 		this.rotationNode = null;

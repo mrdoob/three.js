@@ -18,7 +18,6 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		this.isLineDashedNodeMaterial = true;
 
 		this.lights = false;
-		this.normals = false;
 
 		this.setDefaultValues( _defaultValues );
 

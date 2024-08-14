@@ -197,15 +197,17 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
-	setupNormal( builder ) {
+	setupClearcoatNormal() {
 
-		super.setupNormal( builder );
+		return this.clearcoatNormalNode ? vec3( this.clearcoatNormalNode ) : materialClearcoatNormal;
 
-		// CLEARCOAT NORMAL
+	}
 
-		const clearcoatNormalNode = this.clearcoatNormalNode ? vec3( this.clearcoatNormalNode ) : materialClearcoatNormal;
+	setup( builder ) {
 
-		transformedClearcoatNormalView.assign( clearcoatNormalNode );
+		builder.context.setupClearcoatNormal = () => this.setupClearcoatNormal( builder );
+
+		super.setup( builder );
 
 	}
 
