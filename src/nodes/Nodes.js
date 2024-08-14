@@ -21,7 +21,6 @@ export { default as NodeCache } from './core/NodeCache.js';
 export { default as NodeCode } from './core/NodeCode.js';
 export { default as NodeFrame } from './core/NodeFrame.js';
 export { default as NodeFunctionInput } from './core/NodeFunctionInput.js';
-export { default as NodeKeywords } from './core/NodeKeywords.js';
 export { default as NodeUniform } from './core/NodeUniform.js';
 export { default as NodeVar } from './core/NodeVar.js';
 export { default as NodeVarying } from './core/NodeVarying.js';
@@ -146,6 +145,7 @@ export { default as BloomNode, bloom } from './display/BloomNode.js';
 export { default as TransitionNode, transition } from './display/TransitionNode.js';
 export { default as RenderOutputNode, renderOutput } from './display/RenderOutputNode.js';
 export { default as PixelationPassNode, pixelationPass } from './display/PixelationPassNode.js';
+export { default as SSAAPassNode, ssaaPass } from './display/SSAAPassNode.js';
 export { bleach } from './display/BleachBypassNode.js';
 export { sepia } from './display/SepiaNode.js';
 

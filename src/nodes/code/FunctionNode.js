@@ -8,8 +8,6 @@ class FunctionNode extends CodeNode {
 
 		super( code, includes, language );
 
-		this.keywords = {};
-
 	}
 
 	getNodeType( builder ) {
@@ -63,23 +61,7 @@ class FunctionNode extends CodeNode {
 
 		const propertyName = builder.getPropertyName( nodeCode );
 
-		let code = this.getNodeFunction( builder ).getCode( propertyName );
-
-		const keywords = this.keywords;
-		const keywordsProperties = Object.keys( keywords );
-
-		if ( keywordsProperties.length > 0 ) {
-
-			for ( const property of keywordsProperties ) {
-
-				const propertyRegExp = new RegExp( `\\b${property}\\b`, 'g' );
-				const nodeProperty = keywords[ property ].build( builder, 'property' );
-
-				code = code.replace( propertyRegExp, nodeProperty );
-
-			}
-
-		}
+		const code = this.getNodeFunction( builder ).getCode( propertyName );
 
 		nodeCode.code = code + '\n';
 

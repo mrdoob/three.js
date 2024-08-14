@@ -1,16 +1,13 @@
 import {
 	LinearFilter,
 	Matrix3,
-	Mesh,
 	NearestFilter,
-	OrthographicCamera,
-	PlaneGeometry,
 	RGBAFormat,
-	Scene,
 	ShaderMaterial,
 	StereoCamera,
 	WebGLRenderTarget
 } from 'three';
+import { FullScreenQuad } from '../postprocessing/Pass.js';
 
 class AnaglyphEffect {
 
@@ -29,10 +26,6 @@ class AnaglyphEffect {
 			- 0.0879388, 0.73364, - 0.112961,
 			- 0.00155529, - 0.0184503, 1.2264
 		] );
-
-		const _camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-		const _scene = new Scene();
 
 		const _stereo = new StereoCamera();
 
@@ -99,8 +92,7 @@ class AnaglyphEffect {
 
 		} );
 
-		const _mesh = new Mesh( new PlaneGeometry( 2, 2 ), _material );
-		_scene.add( _mesh );
+		const _quad = new FullScreenQuad( _material );
 
 		this.setSize = function ( width, height ) {
 
@@ -132,7 +124,7 @@ class AnaglyphEffect {
 			renderer.render( scene, _stereo.cameraR );
 
 			renderer.setRenderTarget( null );
-			renderer.render( _scene, _camera );
+			_quad.render( renderer );
 
 			renderer.setRenderTarget( currentRenderTarget );
 
@@ -142,8 +134,9 @@ class AnaglyphEffect {
 
 			_renderTargetL.dispose();
 			_renderTargetR.dispose();
-			_mesh.geometry.dispose();
-			_mesh.material.dispose();
+
+			_material.dispose();
+			_quad.dispose();
 
 		};
 

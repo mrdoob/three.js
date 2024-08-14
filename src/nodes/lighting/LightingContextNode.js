@@ -12,7 +12,7 @@ class LightingContextNode extends ContextNode {
 		this.backdropNode = backdropNode;
 		this.backdropAlphaNode = backdropAlphaNode;
 
-		this._context = null;
+		this._value = null;
 
 	}
 
@@ -48,8 +48,8 @@ class LightingContextNode extends ContextNode {
 
 	setup( builder ) {
 
-		this.context = this._context || ( this._context = this.getContext() );
-		this.context.lightingModel = this.lightingModel || builder.context.lightingModel;
+		this.value = this._value || ( this._value = this.getContext() );
+		this.value.lightingModel = this.lightingModel || builder.context.lightingModel;
 
 		return super.setup( builder );
 

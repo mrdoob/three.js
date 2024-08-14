@@ -3,14 +3,14 @@ import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
 
 class ContextNode extends Node {
 
-	constructor( node, context = {} ) {
+	constructor( node, value = {} ) {
 
 		super();
 
 		this.isContextNode = true;
 
 		this.node = node;
-		this.context = context;
+		this.value = value;
 
 	}
 
@@ -30,7 +30,7 @@ class ContextNode extends Node {
 
 		const previousContext = builder.getContext();
 
-		builder.setContext( { ...builder.context, ...this.context } );
+		builder.setContext( { ...builder.context, ...this.value } );
 
 		const node = this.node.build( builder );
 
@@ -44,7 +44,7 @@ class ContextNode extends Node {
 
 		const previousContext = builder.getContext();
 
-		builder.setContext( { ...builder.context, ...this.context } );
+		builder.setContext( { ...builder.context, ...this.value } );
 
 		const snippet = this.node.build( builder, output );
 
