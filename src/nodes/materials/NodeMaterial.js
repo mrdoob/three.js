@@ -6,7 +6,7 @@ import { attribute } from '../core/AttributeNode.js';
 import { output, diffuseColor, emissive, varyingProperty } from '../core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAOMap } from '../accessors/MaterialNode.js';
 import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
-import { transformedNormalView, normalLocal, normalView } from '../accessors/NormalNode.js';
+import { normalLocal } from '../accessors/NormalNode.js';
 import { instance } from '../accessors/InstanceNode.js';
 import { batch } from '../accessors/BatchNode.js';
 import { materialReference } from '../accessors/MaterialReferenceNode.js';
