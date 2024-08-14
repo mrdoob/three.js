@@ -251,21 +251,20 @@ class ShaderCallNodeInternal extends Node {
 
 	getNodeType( builder ) {
 
-		const properties = builder.getNodeProperties( this );
-
-		if ( properties.outputNode === null ) {
-
-			properties.outputNode = this.setupOutput( builder );
-
-		}
-
-		return properties.outputNode.getNodeType( builder );
+		return this.shaderNode.nodeType || this.getOutputNode( builder ).getNodeType( builder );
 
 	}
 
 	call( builder ) {
 
 		const { shaderNode, inputNodes } = this;
+
+		const properties = builder.getNodeProperties( shaderNode );
+		if ( properties.onceOutput ) return properties.onceOutput;
+
+		//
+
+		let result = null;
 
 		if ( shaderNode.layout ) {
 
@@ -295,22 +294,44 @@ class ShaderCallNodeInternal extends Node {
 
 			}
 
-			return nodeObject( functionNode.call( inputNodes ) );
+			result = nodeObject( functionNode.call( inputNodes ) );
+
+		} else {
+
+			const jsFunc = shaderNode.jsFunc;
+			const outputNode = inputNodes !== null ? jsFunc( inputNodes, builder ) : jsFunc( builder );
+
+			result = nodeObject( outputNode );
 
 		}
 
-		const jsFunc = shaderNode.jsFunc;
-		const outputNode = inputNodes !== null ? jsFunc( inputNodes, builder ) : jsFunc( builder );
+		if ( shaderNode.once ) {
 
-		return nodeObject( outputNode );
+			properties.onceOutput = result;
+
+		}
+
+		return result;
+
+	}
+
+	getOutputNode( builder ) {
+
+		const properties = builder.getNodeProperties( this );
+
+		if ( properties.outputNode === null ) {
+
+			properties.outputNode = this.setupOutput( builder );
+
+		}
+
+		return properties.outputNode;
 
 	}
 
 	setup( builder ) {
 
-		const { outputNode } = builder.getNodeProperties( this );
-
-		return outputNode || this.setupOutput( builder );
+		return this.getOutputNode( builder );
 
 	}
 
@@ -326,17 +347,9 @@ class ShaderCallNodeInternal extends Node {
 
 	generate( builder, output ) {
 
-		const { outputNode } = builder.getNodeProperties( this );
+		const outputNode = this.getOutputNode( builder );
 
-		if ( outputNode === null ) {
-
-			// TSL: It's recommended to use `tslFn` in setup() pass.
-
-			return this.call( builder ).build( builder, output );
-
-		}
-
-		return super.generate( builder, output );
+		return outputNode.build( builder, output );
 
 	}
 
@@ -344,14 +357,16 @@ class ShaderCallNodeInternal extends Node {
 
 class ShaderNodeInternal extends Node {
 
-	constructor( jsFunc ) {
+	constructor( jsFunc, nodeType ) {
 
-		super();
+		super( nodeType );
 
 		this.jsFunc = jsFunc;
 		this.layout = null;
 
 		this.global = true;
+
+		this.once = false;
 
 	}
 
@@ -480,9 +495,9 @@ export const getConstNodeType = ( value ) => ( value !== undefined && value !== 
 
 // shader node base
 
-export function ShaderNode( jsFunc ) {
+export function ShaderNode( jsFunc, nodeType ) {
 
-	return new Proxy( new ShaderNodeInternal( jsFunc ), shaderNodeHandler );
+	return new Proxy( new ShaderNodeInternal( jsFunc, nodeType ), shaderNodeHandler );
 
 }
 
@@ -492,9 +507,9 @@ export const nodeArray = ( val, altType = null ) => new ShaderNodeArray( val, al
 export const nodeProxy = ( ...params ) => new ShaderNodeProxy( ...params );
 export const nodeImmutable = ( ...params ) => new ShaderNodeImmutable( ...params );
 
-export const Fn = ( jsFunc ) => {
+export const Fn = ( jsFunc, nodeType ) => {
 
-	const shaderNode = new ShaderNode( jsFunc );
+	const shaderNode = new ShaderNode( jsFunc, nodeType );
 
 	const fn = ( ...params ) => {
 
@@ -517,9 +532,18 @@ export const Fn = ( jsFunc ) => {
 	};
 
 	fn.shaderNode = shaderNode;
+
 	fn.setLayout = ( layout ) => {
 
 		shaderNode.setLayout( layout );
+
+		return fn;
+
+	};
+
+	fn.once = () => {
+
+		shaderNode.once = true;
 
 		return fn;
 
@@ -531,7 +555,7 @@ export const Fn = ( jsFunc ) => {
 
 export const tslFn = ( ...params ) => { // @deprecated, r168
 
-	console.warn( 'TSL.tslFn: tslFn() has been renamed to Fn().' );
+	console.warn( 'TSL.ShaderNode: tslFn() has been renamed to Fn().' );
 	return Fn( ...params );
 
 };
