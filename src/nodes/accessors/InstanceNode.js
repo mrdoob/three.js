@@ -31,7 +31,7 @@ class InstanceNode extends Node {
 
 	}
 
-	setup( /*builder*/ ) {
+	setup( builder ) {
 
 		let instanceMatrixNode = this.instanceMatrixNode;
 		let instanceColorNode = this.instanceColorNode;
@@ -91,19 +91,23 @@ class InstanceNode extends Node {
 		// POSITION
 
 		const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
+		positionLocal.assign( instancePosition );
 
 		// NORMAL
 
-		const m = mat3( instanceMatrixNode );
+		if ( builder.hasGeometryAttribute( 'normal' ) ) {
 
-		const transformedNormal = normalLocal.div( vec3( m[ 0 ].dot( m[ 0 ] ), m[ 1 ].dot( m[ 1 ] ), m[ 2 ].dot( m[ 2 ] ) ) );
+			const m = mat3( instanceMatrixNode );
 
-		const instanceNormal = m.mul( transformedNormal ).xyz;
+			const transformedNormal = normalLocal.div( vec3( m[ 0 ].dot( m[ 0 ] ), m[ 1 ].dot( m[ 1 ] ), m[ 2 ].dot( m[ 2 ] ) ) );
 
-		// ASSIGNS
+			const instanceNormal = m.mul( transformedNormal ).xyz;
 
-		positionLocal.assign( instancePosition );
-		normalLocal.assign( instanceNormal );
+			// ASSIGNS
+
+			normalLocal.assign( instanceNormal );
+
+		}
 
 		// COLOR
 
