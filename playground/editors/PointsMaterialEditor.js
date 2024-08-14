@@ -1,6 +1,6 @@
 import { ColorInput, ToggleInput, SliderInput, LabelElement } from 'flow';
 import { MaterialEditor } from './MaterialEditor.js';
-import { PointsNodeMaterial } from 'three/nodes';
+import { PointsNodeMaterial } from 'three/tsl';
 import * as THREE from 'three';
 import { setInputAestheticsFromType } from '../DataTypeLib.js';
 

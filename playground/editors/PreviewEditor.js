@@ -2,9 +2,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { ViewHelper } from 'three/addons/helpers/ViewHelper.js';
 import { Element, LabelElement, SelectInput } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { MeshBasicNodeMaterial, vec4 } from 'three/nodes';
-import { PerspectiveCamera, Scene, Mesh, DoubleSide, SphereGeometry, BoxGeometry, PlaneGeometry, TorusKnotGeometry } from 'three';
-import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+import { MeshBasicNodeMaterial, vec4 } from 'three/tsl';
+import { PerspectiveCamera, Scene, Mesh, DoubleSide, SphereGeometry, BoxGeometry, PlaneGeometry, TorusKnotGeometry, WebGPURenderer } from 'three';
 import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
 const sceneDict = {};
