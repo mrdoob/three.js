@@ -3,7 +3,6 @@ import NodeAttribute from './NodeAttribute.js';
 import NodeVarying from './NodeVarying.js';
 import NodeVar from './NodeVar.js';
 import NodeCode from './NodeCode.js';
-import NodeKeywords from './NodeKeywords.js';
 import NodeCache from './NodeCache.js';
 import ParameterNode from './ParameterNode.js';
 import FunctionNode from '../code/FunctionNode.js';
@@ -113,7 +112,6 @@ class NodeBuilder {
 		this.currentFunctionNode = null;
 
 		this.context = {
-			keywords: new NodeKeywords(),
 			material: this.material
 		};
 
@@ -402,7 +400,6 @@ class NodeBuilder {
 
 		const context = { ...this.context };
 
-		delete context.keywords;
 		delete context.material;
 
 		return this.context;
