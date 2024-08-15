@@ -955,7 +955,7 @@ class WebGPUBackend extends Backend {
 			const drawCount = object._multiDrawCount;
 			const drawInstances = object._multiDrawInstances;
 
-			const bytesPerElement = index.bytesPerElement || 1;
+			const bytesPerElement = hasIndex ? index.bytesPerElement : 1;
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 
