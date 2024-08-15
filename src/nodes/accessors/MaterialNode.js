@@ -2,7 +2,7 @@ import Node, { addNodeClass } from '../core/Node.js';
 import { reference } from './ReferenceNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
 import { normalView } from './NormalNode.js';
-import { nodeImmutable, float, vec2, mat2 } from '../shadernode/ShaderNode.js';
+import { nodeImmutable, float, vec2, vec3, mat2 } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
@@ -62,7 +62,7 @@ class MaterialNode extends Node {
 
 		if ( scope === MaterialNode.COLOR ) {
 
-			const colorNode = this.getColor( scope );
+			const colorNode = material.color !== undefined ? this.getColor( scope ) : vec3();
 
 			if ( material.map && material.map.isTexture === true ) {
 
@@ -396,10 +396,10 @@ export const materialSpecularStrength = nodeImmutable( MaterialNode, MaterialNod
 export const materialReflectivity = nodeImmutable( MaterialNode, MaterialNode.REFLECTIVITY );
 export const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
 export const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
-export const materialNormal = nodeImmutable( MaterialNode, MaterialNode.NORMAL );
+export const materialNormal = nodeImmutable( MaterialNode, MaterialNode.NORMAL ).context( { getUV: null } );
 export const materialClearcoat = nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT );
 export const materialClearcoatRoughness = nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT_ROUGHNESS );
-export const materialClearcoatNormal = nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT_NORMAL );
+export const materialClearcoatNormal = nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT_NORMAL ).context( { getUV: null } );
 export const materialRotation = nodeImmutable( MaterialNode, MaterialNode.ROTATION );
 export const materialSheen = nodeImmutable( MaterialNode, MaterialNode.SHEEN );
 export const materialSheenRoughness = nodeImmutable( MaterialNode, MaterialNode.SHEEN_ROUGHNESS );

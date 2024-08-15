@@ -1,5 +1,4 @@
 import { addNodeMaterial } from './NodeMaterial.js';
-import { transformedClearcoatNormalView } from '../accessors/NormalNode.js';
 import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor, dispersion } from '../core/PropertyNode.js';
 import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion } from '../accessors/MaterialNode.js';
 import { float, vec2, vec3, If } from '../shadernode/ShaderNode.js';
@@ -197,15 +196,17 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	}
 
-	setupNormal( builder ) {
+	setupClearcoatNormal() {
 
-		super.setupNormal( builder );
+		return this.clearcoatNormalNode ? vec3( this.clearcoatNormalNode ) : materialClearcoatNormal;
 
-		// CLEARCOAT NORMAL
+	}
 
-		const clearcoatNormalNode = this.clearcoatNormalNode ? vec3( this.clearcoatNormalNode ) : materialClearcoatNormal;
+	setup( builder ) {
 
-		transformedClearcoatNormalView.assign( clearcoatNormalNode );
+		builder.context.setupClearcoatNormal = () => this.setupClearcoatNormal( builder );
+
+		super.setup( builder );
 
 	}
 

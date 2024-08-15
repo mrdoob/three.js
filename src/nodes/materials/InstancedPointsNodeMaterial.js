@@ -21,8 +21,6 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		super();
 
-		this.normals = false;
-
 		this.lights = false;
 
 		this.useAlphaToCoverage = true;

@@ -16,7 +16,6 @@ class VolumeNodeMaterial extends NodeMaterial {
 
 		super();
 
-		this.normals = false;
 		this.lights = false;
 		this.isVolumeNodeMaterial = true;
 		this.testNode = null;

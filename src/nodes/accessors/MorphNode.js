@@ -176,7 +176,7 @@ class MorphNode extends Node {
 		const { geometry } = builder;
 
 		const hasMorphPosition = geometry.morphAttributes.position !== undefined;
-		const hasMorphNormals = geometry.morphAttributes.normal !== undefined;
+		const hasMorphNormals = geometry.hasAttribute( 'normal' ) && geometry.morphAttributes.normal !== undefined;
 
 		const morphAttribute = geometry.morphAttributes.position || geometry.morphAttributes.normal || geometry.morphAttributes.color;
 		const morphTargetsCount = ( morphAttribute !== undefined ) ? morphAttribute.length : 0;
