@@ -1187,7 +1187,7 @@ function onPointerUp( event ) {
 			const position = this._pointerPositions[ pointerId ];
 
 			// minimal placeholder event - allows state correction on pointer-up
-			onTouchStart( { pointerId: pointerId, pageX: position.x, pageY: position.y } );
+			this._onTouchStart( { pointerId: pointerId, pageX: position.x, pageY: position.y } );
 
 			break;
 
