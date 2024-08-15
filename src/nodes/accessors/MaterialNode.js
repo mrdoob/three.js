@@ -2,7 +2,7 @@ import Node, { addNodeClass } from '../core/Node.js';
 import { reference } from './ReferenceNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
 import { normalView } from './NormalNode.js';
-import { nodeImmutable, float, vec2, mat2 } from '../shadernode/ShaderNode.js';
+import { nodeImmutable, float, vec2, vec3, mat2 } from '../shadernode/ShaderNode.js';
 import { uniform } from '../core/UniformNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
@@ -62,7 +62,7 @@ class MaterialNode extends Node {
 
 		if ( scope === MaterialNode.COLOR ) {
 
-			const colorNode = this.getColor( scope );
+			const colorNode = material.color !== undefined ? this.getColor( scope ) : vec3();
 
 			if ( material.map && material.map.isTexture === true ) {
 
