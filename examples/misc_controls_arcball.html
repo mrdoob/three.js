@@ -31,7 +31,7 @@
 			import { ArcballControls } from 'three/addons/controls/ArcballControls.js';
 
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			const cameras = [ 'Orthographic', 'Perspective' ];
 			const cameraType = { type: 'Perspective' };
@@ -148,9 +148,9 @@
 						scene.add( group );
 						render();
 
-						new RGBELoader()
+						new UltraHDRLoader()
 							.setPath( 'textures/equirectangular/' )
-							.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
+							.load( 'venice_sunset_1k.hdr.jpg', function ( hdrEquirect ) {
 
 								hdrEquirect.mapping = THREE.EquirectangularReflectionMapping;
 

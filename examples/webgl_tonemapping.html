@@ -31,14 +31,14 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			let mesh, renderer, scene, camera, controls;
 			let gui, guiExposure = null;
 
 			const params = {
 				exposure: 1.0,
-				toneMapping: 'AgX',
+				toneMapping: 'Neutral',
 				blurriness: 0.3,
 				intensity: 1.0,
 			};
@@ -97,18 +97,17 @@
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop
-				controls.enableZoom = false;
 				controls.enablePan = false;
-				controls.target.set( 0, 0, - 0.2 );
+				controls.target.set( 0, - 0.1, - 0.2 );
 				controls.update();
 
-				const rgbeLoader = new RGBELoader()
+				const uhdrLoader = new UltraHDRLoader()
 					.setPath( 'textures/equirectangular/' );
 
 				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 
 				const [ texture, gltf ] = await Promise.all( [
-					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
+					uhdrLoader.loadAsync( 'venice_sunset_1k.hdr.jpg' ),
 					gltfLoader.loadAsync( 'DamagedHelmet.gltf' ),
 				] );
 

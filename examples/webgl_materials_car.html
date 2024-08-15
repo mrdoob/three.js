@@ -51,7 +51,7 @@
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			let camera, scene, renderer;
 			let stats;
@@ -69,8 +69,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 0.85;
+				renderer.toneMapping = THREE.NeutralToneMapping;
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize );
@@ -91,7 +90,7 @@
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x333333 );
-				scene.environment = new RGBELoader().load( 'textures/equirectangular/venice_sunset_1k.hdr' );
+				scene.environment = new UltraHDRLoader().load( 'textures/equirectangular/venice_sunset_1k.hdr.jpg' );
 				scene.environment.mapping = THREE.EquirectangularReflectionMapping;
 				scene.fog = new THREE.Fog( 0x333333, 10, 15 );
 

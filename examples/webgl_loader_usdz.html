@@ -34,8 +34,8 @@
 			import * as THREE from 'three';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 			import { USDZLoader } from 'three/addons/loaders/USDZLoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			let camera, scene, renderer;
 
@@ -48,14 +48,14 @@
 
 				scene = new THREE.Scene();
 
-				const rgbeLoader = new RGBELoader()
+				const uhdrLoader = new UltraHDRLoader()
 					.setPath( 'textures/equirectangular/' );
 
 				const usdzLoader = new USDZLoader()
 					.setPath( 'models/usdz/' );
 
 				const [ texture, model ] = await Promise.all( [
-					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
+					uhdrLoader.loadAsync( 'venice_sunset_1k.hdr.jpg' ),
 					usdzLoader.loadAsync( 'saeukkang.usdz' ),
 				] );
 

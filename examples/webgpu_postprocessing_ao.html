@@ -22,10 +22,11 @@
 			import * as THREE from 'three';
 			import { pass, mrt, output, transformedNormalView, texture, ao, denoise } from 'three/tsl';
 
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
+
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -40,7 +41,7 @@
 				distanceFallOff: 1,
 				radius: 0.25,
 				scale: 1,
-				thickness: 1,
+				thickness: 2,
 				denoised: true,
 				enabled: true,
 				denoiseRadius: 5,
@@ -57,19 +58,22 @@
 				camera.position.set( 5, 2, 8 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xbfe3dd );
 
 				clock = new THREE.Clock();
 
-				const hdrloader = new RGBELoader();
-				const envMap = await hdrloader.loadAsync( 'textures/equirectangular/quarry_01_1k.hdr' );
+				const envMap = await new UltraHDRLoader().loadAsync( 'textures/equirectangular/venice_sunset_1k.hdr.jpg' );
 				envMap.mapping = THREE.EquirectangularReflectionMapping;
+
+				scene.background = envMap;
+				scene.backgroundBlurriness = 1.0;
 
 				scene.environment = envMap;
 
-				renderer = new THREE.WebGPURenderer();
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 2.0;
 				document.body.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );

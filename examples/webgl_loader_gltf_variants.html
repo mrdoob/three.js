@@ -29,9 +29,9 @@
 			import * as THREE from 'three';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			let camera, scene, renderer;
 			let gui;
@@ -51,13 +51,15 @@
 
 				scene = new THREE.Scene();
 
-				new RGBELoader()
+				new UltraHDRLoader()
 					.setPath( 'textures/equirectangular/' )
-					.load( 'quarry_01_1k.hdr', function ( texture ) {
+					.load( 'quarry_01_1k.hdr.jpg', function ( texture ) {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 
 						scene.background = texture;
+						scene.backgroundBlurriness = 0.1;
+						
 						scene.environment = texture;
 
 						render();

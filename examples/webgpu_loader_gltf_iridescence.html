@@ -11,7 +11,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - glTF + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_iridescence" target="_blank" rel="noopener">KHR_materials_iridescence</a><br />
 			Iridescence Lamp from <a href="https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/IridescenceLamp" target="_blank" rel="noopener">glTF-Sample-Models</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=venice_sunset" target="_blank" rel="noopener">Venice Sunset</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			<a href="https://polyhaven.com/a/spruit_sunrise" target="_blank" rel="noopener">Spruit Sunrise</a> from <a href="https://polyhaven.com/" target="_blank" rel="noopener">Poly Haven</a>
 		</div>
 
 		<script type="importmap">
@@ -30,7 +30,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			let renderer, scene, camera, controls;
 
@@ -50,25 +50,28 @@
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
+				scene.backgroundBlurriness = 0.1;
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.05, 20 );
-				camera.position.set( 0.35, 0.05, 0.35 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.05, 20 );
+				camera.position.set( 0, 0.12, 1.2 );
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.autoRotate = true;
-				controls.autoRotateSpeed = - 0.5;
+				controls.autoRotateSpeed = 0.5;
 				controls.target.set( 0, 0.2, 0 );
 				controls.update();
 
-				const rgbeLoader = new RGBELoader()
+				const uhdrLoader = new UltraHDRLoader()
 					.setPath( 'textures/equirectangular/' );
 
 				const gltfLoader = new GLTFLoader().setPath( 'models/gltf/' );
 
 				const [ texture, gltf ] = await Promise.all( [
-					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
+					uhdrLoader.loadAsync( 'spruit_sunrise_2k.hdr.jpg' ),
 					gltfLoader.loadAsync( 'IridescenceLamp.glb' ),
 				] );
+
+				scene.add( gltf.scene );
 
 				// environment
 
@@ -77,9 +80,18 @@
 				scene.background = texture;
 				scene.environment = texture;
 
-				// model
+				// stand
 
-				scene.add( gltf.scene );
+				const geometry = new THREE.CylinderGeometry( 0.2, 0.2, 0.02, 64 );
+				const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
+				const mesh = new THREE.Mesh( geometry, material );
+				mesh.position.y = - 0.01;
+				scene.add( mesh );
+
+				const geometry2 = new THREE.CylinderGeometry( 0.21, 0.21, 0.04, 64 );
+				const mesh2 = new THREE.Mesh( geometry2, material );
+				mesh2.position.y = - 0.04;
+				scene.add( mesh2 );
 
 				render();
 

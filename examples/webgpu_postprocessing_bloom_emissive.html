@@ -27,10 +27,9 @@
 			import * as THREE from 'three';
 			import { pass, mrt, output, emissive } from 'three/tsl';
 
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-
-			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -51,9 +50,9 @@
 
 				scene = new THREE.Scene();
 
-				new RGBELoader()
+				new UltraHDRLoader()
 					.setPath( 'textures/equirectangular/' )
-					.load( 'moonless_golf_1k.hdr', function ( texture ) {
+					.load( 'moonless_golf_2k.hdr.jpg', function ( texture ) {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 
@@ -73,7 +72,7 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer();
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
@@ -103,6 +102,7 @@
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
 				controls.target.set( 0, 0, - 0.2 );
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize );
 
