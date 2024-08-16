@@ -30,7 +30,7 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { color, instanceIndex, uint, property, length, clamp, vec2, cos, negate, vec3, vertexIndex, Fn, uniform, storage, storageObject, min, max, positionLocal } from 'three/tsl';
+			import { color, instanceIndex, varyingProperty, uint, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, storage, storageObject, min, max, positionLocal, modelNormalMatrix } from 'three/tsl';
 
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 
@@ -39,7 +39,7 @@
 
 			// Water size in system units
 			const BOUNDS = 512;
-			const BOUNDS_HALF = BOUNDS * 0.5;
+			//const BOUNDS_HALF = BOUNDS * 0.5;
 
 			const waterMaxHeight = 10;
 
@@ -54,10 +54,9 @@
 			let meshRay;
 			let computeHeight;
 			let computeSmooth;
-			let smoothShader;
-			const waterNormal = new THREE.Vector3();
+			let computeSphere;
 
-			const NUM_SPHERES = 5;
+			const NUM_SPHERES = 20;
 			const spheres = [];
 
 			const simplex = new SimplexNoise();
@@ -106,7 +105,7 @@
 					viscosity: uniform( 0.98 ),
 					heightCompensation: uniform( 0 ),
 					point1: uniform( new THREE.Vector2() ),
-					spheresEnabled: false
+					spheresEnabled: true
 				};
 
 				// Initialize height storage buffers
@@ -114,7 +113,6 @@
 				const prevHeightArray = new Float32Array( WIDTH * WIDTH );
 
 				let p = 0;
-
 				for ( let j = 0; j < WIDTH; j ++ ) {
 
 					for ( let i = 0; i < WIDTH; i ++ ) {
@@ -122,8 +120,10 @@
 						const x = i * 128 / WIDTH;
 						const y = j * 128 / WIDTH;
 
-						heightArray[ p ] = noise( x, y );
-						prevHeightArray[ p ] = heightArray[ p ];
+						const height = noise( x, y );
+
+						heightArray[ p ] = height;
+						prevHeightArray[ p ] = height;
 
 						p ++;
 
@@ -138,29 +138,27 @@
 				const prevHeightStorage = storage( prevHeightBufferAttribute, 'float', prevHeightBufferAttribute.count );
 
 				const heightRead = storageObject( heightBufferAttribute, 'float', heightBufferAttribute.count ).toReadOnly();
-				const prevHeightRead = storageObject( prevHeightBufferAttribute, 'float', prevHeightBufferAttribute.count ).toReadOnly();
 
-				// Initialize water normal (orientation) storage buffers
-				const waterNormalArray = new Float32Array( NUM_SPHERES * 2 );
-				waterNormalArray.fill( 0.0 );
-				const waterNormalBufferAttribute = new THREE.StorageBufferAttribute( waterNormalArray, 2 );
-				const waterNormal = storage( waterNormalBufferAttribute, 'vec2', waterNormalBufferAttribute.count );
-				const waterNormalRead = storageObject( waterNormalBufferAttribute, 'vec2', waterNormalBufferAttribute.count ).toReadOnly();
-
+				// Append TSL to function to indicate their intended use.
 				const getNeighborIndicesTSL = ( instanceIndex ) => {
 
 					const width = uint( WIDTH );
 
-					// Get 2-D compute coordinate from one-dimensional instanceIndex.
-					const x = property( 'uint', 'indexX' ).assign( instanceIndex.modInt( width ) );
-					const y = property( 'uint', 'indexY' ).assign( instanceIndex.div( width ) );
+					// Get 2-D compute coordinate from one-dimensional instanceIndex. The calculation will
+					// still work even if you dispatch your compute shader 2-dimensionally. Within a compute
+					// context, instanceIndex is a 1-dimensional value derived from the workgroup dimensions.
+					const x = instanceIndex.modInt( width );
+					const y = instanceIndex.div( width );
 
-					// Emulate Clamp to Edge Wrapping of data texture access
-					const leftX = property( 'uint', 'leftX' ).assign( max( 0, x.sub( 1 ) ) );
-					const rightX = property( 'uint', 'rightX' ).assign( min( x.add( 1 ), width.sub( 1 ) ) );
+					// The original shader accesses height via texture uvs. However, unlike with textures, we can't
+					// access areas that are out of bounds. Accordingly, we use this function to emulate the Clamp to Edge Wrapping
+					// behavior of accessing a DataTexture with out of bounds uvs.
 
-					const bottomY = property( 'uint', 'bottomY' ).assign( max( 0, y.sub( 1 ) ) );
-					const topY = property( 'uint', 'topY' ).assign( min( y.add( 1 ), width.sub( 1 ) ) );
+					const leftX = max( 0, x.sub( 1 ) );
+					const rightX = min( x.add( 1 ), width.sub( 1 ) );
+
+					const bottomY = max( 0, y.sub( 1 ) );
+					const topY = min( y.add( 1 ), width.sub( 1 ) );
 
 					const westIndex = y.mul( width ).add( leftX );
 					const eastIndex = y.mul( width ).add( rightX );
@@ -173,6 +171,35 @@
 			
 				};
 
+				const getNeighborValuesTSL = ( index, store ) => {
+
+					const { northIndex, southIndex, eastIndex, westIndex } = getNeighborIndicesTSL( index );
+
+					const north = store.element( northIndex );
+					const south = store.element( southIndex );
+					const east = store.element( eastIndex );
+					const west = store.element( westIndex );
+
+					return { north, south, east, west };
+
+				};
+
+				const getNormalsFromHeightTSL = ( index, store ) => {
+
+					const { northIndex, southIndex, eastIndex, westIndex } = getNeighborIndicesTSL( index );
+			
+					const north = store.element( northIndex );
+					const south = store.element( southIndex );
+					const east = store.element( eastIndex );
+					const west = store.element( westIndex );
+
+					const normalX = ( west.sub( east ) ).mul( WIDTH / BOUNDS );
+					const normalY = ( south.sub( north ) ).mul( WIDTH / BOUNDS );
+
+					return { normalX, normalY };
+
+				};
+
 				computeHeight = Fn( () => {
 
 					const { viscosity, mousePos, mouseSize } = effectController;
@@ -180,28 +207,17 @@
 					const height = heightStorage.element( instanceIndex );
 					const prevHeight = prevHeightStorage.element( instanceIndex );
 
-					// Get neighbor indices
-					const { northIndex, southIndex, eastIndex, westIndex } = getNeighborIndicesTSL( instanceIndex );
-
-					const north = property( 'float', 'north' );
-					north.assign( heightStorage.element( northIndex ) );
-					const south = property( 'float', 'south' );
-					south.assign( heightStorage.element( southIndex ) );
-					const east = property( 'float', 'east' );
-					east.assign( heightStorage.element( eastIndex ) );
-					const west = property( 'float', 'west' ).assign( heightStorage.element( westIndex ) );
+					const { north, south, east, west } = getNeighborValuesTSL( instanceIndex, heightStorage );
 
 					const newHeight = ( ( north.add( south ).add( east ).add( west ) ).mul( 0.5 ).sub( prevHeight ) ).mul( viscosity );
 
 					// Get 2-D compute coordinate from one-dimensional instanceIndex.
-					const x = instanceIndex.modInt( WIDTH );
-					const y = instanceIndex.div( WIDTH );
-
-					x.mulAssign( 1 / WIDTH );
-					y.mulAssign( 1 / WIDTH );
+					const x = float( instanceIndex.modInt( WIDTH ) ).mul( 1 / WIDTH );
+					const y = float( instanceIndex.div( WIDTH ) ).mul( 1 / WIDTH );
 
 					// Mouse influence
-					const mousePhase = clamp( length( ( vec2( x, y ).sub( vec2( 0.5 ) ) ).mul( BOUNDS ).sub( vec2( mousePos.x, negate( mousePos.y ) ) ) ).mul( Math.PI ).div( mouseSize ), 0.0, Math.PI );
+					const centerVec = vec2( 0.5 );
+					const mousePhase = clamp( length( ( vec2( x, y ).sub( centerVec ) ).mul( BOUNDS ).sub( mousePos ) ).mul( Math.PI ).div( mouseSize ), 0.0, Math.PI );
 					newHeight.addAssign( cos( mousePhase ).add( 1.0 ) ).mul( 0.28 );
 
 					prevHeight.assign( height );
@@ -244,15 +260,9 @@
 					// A Mesh Phong Material uses the geometry's normals to calculate its lighting.
 					// Therefore, to correct the lighting, we have to reassing the normals per vertex
 					// in the position shader.
-					const { northIndex, southIndex, eastIndex, westIndex } = getNeighborIndicesTSL( vertexIndex );
-			
-					const north = heightRead.element( northIndex );
-					const south = heightRead.element( southIndex );
-					const east = heightRead.element( eastIndex );
-					const west = heightRead.element( westIndex );
+					const { normalX, normalY } = getNormalsFromHeightTSL( vertexIndex, heightRead );
 
-					const x = ( west.sub( east ) ).mul( WIDTH / BOUNDS );
-					const y = ( south.sub( north ) ).mul( WIDTH / BOUNDS );
+					varyingProperty( 'vec3', 'v_normalView' ).assign( modelNormalMatrix.mul( vec3( normalX, normalY, 1.0 ) ) );
 
 					return vec3( positionLocal.x, positionLocal.y, heightRead.element( vertexIndex ) );
 
@@ -274,6 +284,68 @@
 				meshRay.updateMatrix();
 				scene.add( meshRay );
 
+				// Create sphere THREE.InstancedMesh
+				const sphereGeometry = new THREE.SphereGeometry( 4, 24, 12 );
+				const sphereMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFF00 } );
+			
+				const spherePositionArray = new Float32Array( NUM_SPHERES * 3 );
+
+				for ( let i = 0; i < NUM_SPHERES; i ++ ) {
+
+					spherePositionArray[ i * 3 + 0 ] = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
+					spherePositionArray[ i * 3 + 1 ] = 0;
+					spherePositionArray[ i * 3 + 2 ] = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
+
+				}
+
+				const sphereInstancePositionAttribute = new THREE.StorageInstancedBufferAttribute( spherePositionArray, 3 );
+				const sphereInstancePositionStorage = storage( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count );
+
+				const sphereInstancePositionRead = storage( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count ).toReadOnly();
+
+				computeSphere = Fn( () => {
+
+					const instancePosition = sphereInstancePositionStorage.element( instanceIndex );
+
+					// Bring position from range of [ -BOUNDS/2, BOUNDS/2 ] to [ 0, BOUNDS ]
+					const tempX = instancePosition.x.add( BOUNDS / 2 );
+					const tempZ = instancePosition.z.add( BOUNDS / 2 );
+
+					// Bring position from range [ 0, BOUNDS ] to [ 0, WIDTH ]
+					// ( i.e bring geometry range into 'heightmap' range )
+					// WIDTH = 128, BOUNDS = 512... same as dividing by 4
+					tempX.mulAssign( WIDTH / BOUNDS );
+					tempZ.mulAssign( WIDTH / BOUNDS );
+
+					// Can only access storage buffers with uints
+					const xCoord = uint( floor( tempX ) );
+					const zCoord = uint( floor( tempZ ) );
+
+					// Get one dimensional index
+					const heightInstanceIndex = zCoord.mul( WIDTH ).add( xCoord );
+
+					// Set to read-only to be safe, even if it's not strictly necessary for compute access.
+					const height = heightRead.element( heightInstanceIndex );
+
+					// Calculate normal of the water mesh at this location
+					const { normalX, normalY } = getNormalsFromHeightTSL( heightInstanceIndex, heightRead );
+			
+					instancePosition.y.assign( height );
+
+				} )().compute( NUM_SPHERES );
+
+				sphereMaterial.positionNode = Fn( () => {
+
+					const instancePosition = sphereInstancePositionRead.element( instanceIndex );
+
+					const newPosition = positionLocal.add( instancePosition );
+
+					return newPosition;
+			
+				} )();
+
+				const sphereMesh = new THREE.InstancedMesh( sphereGeometry, sphereMaterial, NUM_SPHERES );
+				scene.add( sphereMesh );
 
 				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -301,11 +373,19 @@
 
 				window.addEventListener( 'resize', onWindowResize );
 
-
 				const gui = new GUI();
+				gui.add( effectController.mouseSize, 'value', 1.0, 100.0, 1.0 ).name( 'Mouse Size' );
+				gui.add( effectController.viscosity, 'value', 0.9, 0.999, 0.001 ).name( 'viscosity' );
+				const buttonCompute = {
+					smoothWater: function () {
 
-				/*const enableSpheres = () => {
+						renderer.compute( computeSmooth );
 
+					}
+				};
+				gui.add( buttonCompute, 'smoothWater' );
+				gui.add( effectController, 'spheresEnabled' ).onChange( () => {
+			
 					for ( let i = 0; i < NUM_SPHERES; i ++ ) {
 
 						if ( spheres[ i ] ) {
@@ -315,108 +395,10 @@
 						}
 
 					}
-
-				}; */
-
-				gui.add( effectController.mouseSize, 'value', 1.0, 100.0, 1.0 ).name( 'Mouse Size' );
-				gui.add( effectController.viscosity, 'value', 0.9, 0.999, 0.001 ).name( 'viscosity' );
-
-
-				//createSpheres();
+			
+				} );
 
 			}
-
-
-			/*function createSpheres() {
-
-				const sphereTemplate = new THREE.Mesh( new THREE.SphereGeometry( 4, 24, 12 ), new THREE.MeshPhongMaterial( { color: 0xFFFF00 } ) );
-
-				for ( let i = 0; i < NUM_SPHERES; i ++ ) {
-
-					let sphere = sphereTemplate;
-					if ( i < NUM_SPHERES - 1 ) {
-
-						sphere = sphereTemplate.clone();
-
-					}
-
-					sphere.position.x = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
-					sphere.position.z = ( Math.random() - 0.5 ) * BOUNDS * 0.7;
-
-					sphere.userData.velocity = new THREE.Vector3();
-
-					scene.add( sphere );
-
-					spheres[ i ] = sphere;
-
-				}
-
-			} */
-
-			/*function sphereDynamics() {
-
-				const currentRenderTarget = gpuCompute.getCurrentRenderTarget( heightmapVariable );
-
-				readWaterLevelShader.uniforms[ 'levelTexture' ].value = currentRenderTarget.texture;
-
-				for ( let i = 0; i < NUM_SPHERES; i ++ ) {
-
-					const sphere = spheres[ i ];
-
-					if ( sphere ) {
-
-						// Read water level and orientation
-						const u = 0.5 * sphere.position.x / BOUNDS_HALF + 0.5;
-						const v = 1 - ( 0.5 * sphere.position.z / BOUNDS_HALF + 0.5 );
-						readWaterLevelShader.uniforms[ 'point1' ].value.set( u, v );
-						gpuCompute.doRenderTarget( readWaterLevelShader, readWaterLevelRenderTarget );
-
-						renderer.readRenderTargetPixels( readWaterLevelRenderTarget, 0, 0, 4, 1, readWaterLevelImage );
-						const pixels = new Float32Array( readWaterLevelImage.buffer );
-
-						// Get orientation
-						waterNormal.set( pixels[ 1 ], 0, - pixels[ 2 ] );
-
-						const pos = sphere.position;
-
-						// Set height
-						pos.y = pixels[ 0 ];
-
-						// Move sphere
-						waterNormal.multiplyScalar( 0.1 );
-						sphere.userData.velocity.add( waterNormal );
-						sphere.userData.velocity.multiplyScalar( 0.998 );
-						pos.add( sphere.userData.velocity );
-
-						if ( pos.x < - BOUNDS_HALF ) {
-
-							pos.x = - BOUNDS_HALF + 0.001;
-							sphere.userData.velocity.x *= - 0.3;
-
-						} else if ( pos.x > BOUNDS_HALF ) {
-
-							pos.x = BOUNDS_HALF - 0.001;
-							sphere.userData.velocity.x *= - 0.3;
-
-						}
-
-						if ( pos.z < - BOUNDS_HALF ) {
-
-							pos.z = - BOUNDS_HALF + 0.001;
-							sphere.userData.velocity.z *= - 0.3;
-
-						} else if ( pos.z > BOUNDS_HALF ) {
-
-							pos.z = BOUNDS_HALF - 0.001;
-							sphere.userData.velocity.z *= - 0.3;
-
-						}
-
-					}
-
-				}
-
-			} */
 
 			function onWindowResize() {
 
@@ -481,7 +463,7 @@
 
 				if ( effectController.spheresEnabled ) {
 
-					//sphereDynamics();
+					renderer.compute( computeSphere );
 
 				}
 
