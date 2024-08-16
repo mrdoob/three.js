@@ -2,7 +2,7 @@
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_hsv.glsl
 
 import { int, float, vec3, If, Fn } from '../../shadernode/ShaderNode.js';
-import { add, sub } from '../../math/OperatorNode.js';
+import { add } from '../../math/OperatorNode.js';
 import { floor, trunc, max, min } from '../../math/MathNode.js';
 
 export const mx_hsvtorgb = /*#__PURE__*/ Fn( ( [ hsv ] ) => {
