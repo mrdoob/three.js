@@ -30,16 +30,16 @@
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-			import { color, instanceIndex, varyingProperty, uint, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, storage, storageObject, min, max, positionLocal, modelNormalMatrix } from 'three/tsl';
+			import { color, instanceIndex, If, varyingProperty, uint, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, storage, storageObject, min, max, positionLocal, modelNormalMatrix } from 'three/tsl';
 
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 
-			// Texture width for simulation
+			// Dimensions of simulation grid.
 			const WIDTH = 128;
 
-			// Water size in system units
+			// Water size in system units.
 			const BOUNDS = 512;
-			//const BOUNDS_HALF = BOUNDS * 0.5;
+			const BOUNDS_HALF = BOUNDS * 0.5;
 
 			const waterMaxHeight = 10;
 
@@ -50,14 +50,10 @@
 			const raycaster = new THREE.Raycaster();
 			let effectController;
 
-			let waterMesh;
-			let meshRay;
-			let computeHeight;
-			let computeSmooth;
-			let computeSphere;
+			let waterMesh, meshRay;
+			let computeHeight, computeSmooth, computeSphere;
 
 			const NUM_SPHERES = 20;
-			const spheres = [];
 
 			const simplex = new SimplexNoise();
 
@@ -257,9 +253,7 @@
 				waterMaterial.shininess = Math.max( 50, 1e-4 );
 				waterMaterial.positionNode = Fn( () => {
 
-					// A Mesh Phong Material uses the geometry's normals to calculate its lighting.
-					// Therefore, to correct the lighting, we have to reassing the normals per vertex
-					// in the position shader.
+					// To correct the lighting as our mesh undulates, we have to reassign the normals in the position shader.
 					const { normalX, normalY } = getNormalsFromHeightTSL( vertexIndex, heightRead );
 
 					varyingProperty( 'vec3', 'v_normalView' ).assign( modelNormalMatrix.mul( vec3( normalX, normalY, 1.0 ) ) );
@@ -268,7 +262,6 @@
 
 				} )();
 
-				// WIDTH, HEIGHT, AND BOUNDS .toFixed(1)
 				waterMesh = new THREE.Mesh( waterGeometry, waterMaterial );
 				waterMesh.rotation.x = - Math.PI / 2;
 				waterMesh.matrixAutoUpdate = false;
@@ -288,7 +281,12 @@
 				const sphereGeometry = new THREE.SphereGeometry( 4, 24, 12 );
 				const sphereMaterial = new THREE.MeshPhongMaterial( { color: 0xFFFF00 } );
 			
+				// Initialize sphere mesh instance position and velocity.
 				const spherePositionArray = new Float32Array( NUM_SPHERES * 3 );
+			
+				// Only hold velocity in x and z directions.
+				// The sphere is wedded to the surface of the water, and will only move vertically with the water.
+				const sphereVelocityArray = new Float32Array( NUM_SPHERES * 2 );
 
 				for ( let i = 0; i < NUM_SPHERES; i ++ ) {
 
@@ -298,18 +296,24 @@
 
 				}
 
+				sphereVelocityArray.fill( 0.0 );
+
+				// Sphere Instance Storage
 				const sphereInstancePositionAttribute = new THREE.StorageInstancedBufferAttribute( spherePositionArray, 3 );
 				const sphereInstancePositionStorage = storage( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count );
-
 				const sphereInstancePositionRead = storage( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count ).toReadOnly();
+
+				const sphereVelocityAttribute = new THREE.StorageInstancedBufferAttribute( sphereVelocityArray, 2 );
+				const sphereVelocityStorge = storage( sphereVelocityAttribute, 'vec2', sphereVelocityAttribute.count );
 
 				computeSphere = Fn( () => {
 
 					const instancePosition = sphereInstancePositionStorage.element( instanceIndex );
+					const velocity = sphereVelocityStorge.element( instanceIndex );
 
 					// Bring position from range of [ -BOUNDS/2, BOUNDS/2 ] to [ 0, BOUNDS ]
-					const tempX = instancePosition.x.add( BOUNDS / 2 );
-					const tempZ = instancePosition.z.add( BOUNDS / 2 );
+					const tempX = instancePosition.x.add( BOUNDS_HALF );
+					const tempZ = instancePosition.z.add( BOUNDS_HALF );
 
 					// Bring position from range [ 0, BOUNDS ] to [ 0, WIDTH ]
 					// ( i.e bring geometry range into 'heightmap' range )
@@ -327,10 +331,48 @@
 					// Set to read-only to be safe, even if it's not strictly necessary for compute access.
 					const height = heightRead.element( heightInstanceIndex );
 
-					// Calculate normal of the water mesh at this location
-					const { normalX, normalY } = getNormalsFromHeightTSL( heightInstanceIndex, heightRead );
-			
 					instancePosition.y.assign( height );
+
+					// Calculate normal of the water mesh at this location.
+					const { normalX, normalY } = getNormalsFromHeightTSL( heightInstanceIndex, heightRead );
+
+					normalX.mulAssign( 0.1 );
+					normalY.mulAssign( 0.1 );
+
+					const waterNormal = vec3( normalX, 0.0, normalY );
+
+			
+					const newVelocity = vec3( velocity.x, 0.0, velocity.y ).add( waterNormal );
+					newVelocity.mulAssign( 0.998 );
+
+					const newPosition = instancePosition.add( newVelocity ).toVar();
+
+					If( newPosition.x.lessThan( - BOUNDS_HALF ), () => {
+
+						newPosition.x = float( - BOUNDS_HALF ).add( 0.001 );
+						newVelocity.x.mulAssign( - 0.3 );
+			
+					} ).ElseIf( newPosition.x.greaterThan( BOUNDS_HALF ), () => {
+
+						newPosition.x = float( BOUNDS_HALF ).sub( 0.001 );
+						newVelocity.x.mulAssign( - 0.3 );
+			
+					} );
+
+					If( newPosition.z.lessThan( - BOUNDS_HALF ), () => {
+
+						newPosition.z = float( - BOUNDS_HALF ).add( 0.001 );
+						newVelocity.z.mulAssign( - 0.3 );
+			
+					} ).ElseIf( newPosition.z.greaterThan( BOUNDS_HALF ), () => {
+
+						newPosition.z = float( BOUNDS_HALF ).sub( 0.001 );
+						newVelocity.z.mulAssign( - 0.3 );
+			
+					} );
+
+					instancePosition.assign( newPosition );
+					velocity.assign( newVelocity.x, newVelocity.z );
 
 				} )().compute( NUM_SPHERES );
 
@@ -386,15 +428,7 @@
 				gui.add( buttonCompute, 'smoothWater' );
 				gui.add( effectController, 'spheresEnabled' ).onChange( () => {
 			
-					for ( let i = 0; i < NUM_SPHERES; i ++ ) {
-
-						if ( spheres[ i ] ) {
-
-							spheres[ i ].visible = effectController.spheresEnabled;
-
-						}
-
-					}
+					sphereMesh.visible = effectController.spheresEnabled;
 			
 				} );
 
@@ -457,8 +491,7 @@
 					effectController.mousePos.value.set( 10000, 10000 );
 
 				}
-
-				// Do the gpu computation
+			
 				renderer.compute( computeHeight );
 
 				if ( effectController.spheresEnabled ) {
