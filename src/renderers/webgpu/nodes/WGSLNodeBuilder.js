@@ -598,12 +598,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		//
 
-		const code = `fn ${ layout.name }( ${ parameters.join( ', ' ) } ) -> ${ this.getType( layout.type ) } {
+		let code = `fn ${ layout.name }( ${ parameters.join( ', ' ) } ) -> ${ this.getType( layout.type ) } {
 ${ flowData.vars }
 ${ flowData.code }
-	return ${ flowData.result };
+`;
 
-}`;
+		if ( flowData.result ) {
+
+			code += `\treturn ${ flowData.result };\n`;
+
+		}
+
+		code += '\n}\n';
 
 		//
 
