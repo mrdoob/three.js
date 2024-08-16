@@ -28,7 +28,7 @@
 
 			import * as THREE from 'three';
 
-			import { color, instanceIndex, If, varyingProperty, uint, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, storage, storageObject, min, max, positionLocal, modelNormalMatrix } from 'three/tsl';
+			import { color, instanceIndex, If, varyingProperty, uint, negate, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, storage, storageObject, min, max, positionLocal, modelNormalMatrix } from 'three/tsl';
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -52,7 +52,7 @@
 			let waterMesh, meshRay;
 			let computeHeight, computeSmooth, computeSphere;
 
-			const NUM_SPHERES = 20;
+			const NUM_SPHERES = 100;
 
 			const simplex = new SimplexNoise();
 
@@ -95,11 +95,9 @@
 				scene.add( sun2 );
 
 				effectController = {
-					mousePos: uniform( new THREE.Vector2( 10000, 10000 ) ),
-					mouseSize: uniform( 20.0 ),
-					viscosity: uniform( 0.98 ),
-					heightCompensation: uniform( 0 ),
-					point1: uniform( new THREE.Vector2() ),
+					mousePos: uniform( new THREE.Vector2( 10000, 10000 ) ).label( 'mousePos' ),
+					mouseSize: uniform( 20.0 ).label( 'mouseSize' ),
+					viscosity: uniform( 0.98 ).label( 'viscosity' ),
 					spheresEnabled: true
 				};
 
@@ -129,10 +127,10 @@
 				const heightBufferAttribute = new THREE.StorageBufferAttribute( heightArray, 1 );
 				const prevHeightBufferAttribute = new THREE.StorageBufferAttribute( prevHeightArray, 1 );
 
-				const heightStorage = storage( heightBufferAttribute, 'float', heightBufferAttribute.count );
-				const prevHeightStorage = storage( prevHeightBufferAttribute, 'float', prevHeightBufferAttribute.count );
+				const heightStorage = storage( heightBufferAttribute, 'float', heightBufferAttribute.count ).label( 'Height' );
+				const prevHeightStorage = storage( prevHeightBufferAttribute, 'float', prevHeightBufferAttribute.count ).label( 'PrevHeight' );
 
-				const heightRead = storageObject( heightBufferAttribute, 'float', heightBufferAttribute.count ).toReadOnly();
+				const heightRead = storageObject( heightBufferAttribute, 'float', heightBufferAttribute.count ).toReadOnly().label( 'HeightRead' );
 
 				// Get Indices of Neighbor Values of an Index in the Simulation Grid
 				const getNeighborIndicesTSL = ( instanceIndex ) => {
@@ -251,7 +249,7 @@
 					// To correct the lighting as our mesh undulates, we have to reassign the normals in the position shader.
 					const { normalX, normalY } = getNormalsFromHeightTSL( vertexIndex, heightRead );
 
-					varyingProperty( 'vec3', 'v_normalView' ).assign( modelNormalMatrix.mul( vec3( normalX, normalY, 1.0 ) ) );
+					varyingProperty( 'vec3', 'v_normalView' ).assign( modelNormalMatrix.mul( vec3( normalX, negate( normalY ), 1.0 ) ) );
 
 					return vec3( positionLocal.x, positionLocal.y, heightRead.element( vertexIndex ) );
 
@@ -295,16 +293,16 @@
 
 				// Sphere Instance Storage
 				const sphereInstancePositionAttribute = new THREE.StorageInstancedBufferAttribute( spherePositionArray, 3 );
-				const sphereInstancePositionStorage = storage( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count );
+				const sphereInstancePositionStorage = storage( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count ).label( 'SpherePosition' );
 				const sphereInstancePositionRead = storage( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count ).toReadOnly();
 
 				const sphereVelocityAttribute = new THREE.StorageInstancedBufferAttribute( sphereVelocityArray, 2 );
-				const sphereVelocityStorge = storage( sphereVelocityAttribute, 'vec2', sphereVelocityAttribute.count );
+				const sphereVelocityStorage = storage( sphereVelocityAttribute, 'vec2', sphereVelocityAttribute.count ).label( 'SphereVelocity' );
 
 				computeSphere = Fn( () => {
 
 					const instancePosition = sphereInstancePositionStorage.element( instanceIndex );
-					const velocity = sphereVelocityStorge.element( instanceIndex );
+					const velocity = sphereVelocityStorage.element( instanceIndex );
 
 					// Bring position from range of [ -BOUNDS/2, BOUNDS/2 ] to [ 0, BOUNDS ]
 					const tempX = instancePosition.x.add( BOUNDS_HALF );
@@ -326,6 +324,7 @@
 					// Set to read-only to be safe, even if it's not strictly necessary for compute access.
 					const height = heightRead.element( heightInstanceIndex );
 
+					// Assign height to sphere position
 					instancePosition.y.assign( height );
 
 					// Calculate normal of the water mesh at this location.
@@ -334,7 +333,7 @@
 					normalX.mulAssign( 0.1 );
 					normalY.mulAssign( 0.1 );
 
-					const waterNormal = vec3( normalX, 0.0, normalY );
+					const waterNormal = vec3( normalX, 0.0, negate( normalY ) );
 
 					const newVelocity = vec3( velocity.x, 0.0, velocity.y ).add( waterNormal );
 					newVelocity.mulAssign( 0.998 );
@@ -366,7 +365,7 @@
 					} );
 
 					instancePosition.assign( newPosition );
-					velocity.assign( newVelocity.x, newVelocity.z );
+					velocity.assign( vec2( newVelocity.x, newVelocity.z ) );
 
 				} )().compute( NUM_SPHERES );
 
