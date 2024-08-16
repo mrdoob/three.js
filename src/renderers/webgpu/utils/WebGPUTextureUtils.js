@@ -237,7 +237,13 @@ class WebGPUTextureUtils {
 
 		} else {
 
-			this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU );
+			const depth = texture.image.depth || 1;
+
+			for ( let i = 0; i < depth; i ++ ) {
+
+				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i );
+
+			}
 
 		}
 
