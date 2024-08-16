@@ -28,11 +28,10 @@
 
 			import * as THREE from 'three';
 
-			import Stats from 'three/addons/libs/stats.module.js';
-			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { color, instanceIndex, If, varyingProperty, uint, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, storage, storageObject, min, max, positionLocal, modelNormalMatrix } from 'three/tsl';
-
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import Stats from 'three/addons/libs/stats.module.js';
 
 			// Dimensions of simulation grid.
 			const WIDTH = 128;
@@ -135,19 +134,20 @@
 
 				const heightRead = storageObject( heightBufferAttribute, 'float', heightBufferAttribute.count ).toReadOnly();
 
-				// Append TSL to function to indicate their intended use.
+				// Get Indices of Neighbor Values of an Index in the Simulation Grid
 				const getNeighborIndicesTSL = ( instanceIndex ) => {
 
 					const width = uint( WIDTH );
 
 					// Get 2-D compute coordinate from one-dimensional instanceIndex. The calculation will
-					// still work even if you dispatch your compute shader 2-dimensionally. Within a compute
+					// still work even if you dispatch your compute shader 2-dimensionally, since within a compute
 					// context, instanceIndex is a 1-dimensional value derived from the workgroup dimensions.
+			
 					const x = instanceIndex.modInt( width );
 					const y = instanceIndex.div( width );
 
 					// The original shader accesses height via texture uvs. However, unlike with textures, we can't
-					// access areas that are out of bounds. Accordingly, we use this function to emulate the Clamp to Edge Wrapping
+					// access areas that are out of bounds. Accordingly, we emulate the Clamp to Edge Wrapping
 					// behavior of accessing a DataTexture with out of bounds uvs.
 
 					const leftX = max( 0, x.sub( 1 ) );
@@ -164,9 +164,9 @@
 
 					return { northIndex, southIndex, eastIndex, westIndex };
 
-			
 				};
 
+				// Get simulation index neighbor values
 				const getNeighborValuesTSL = ( index, store ) => {
 
 					const { northIndex, southIndex, eastIndex, westIndex } = getNeighborIndicesTSL( index );
@@ -180,14 +180,10 @@
 
 				};
 
+				// Get new normals of simulation area.
 				const getNormalsFromHeightTSL = ( index, store ) => {
 
-					const { northIndex, southIndex, eastIndex, westIndex } = getNeighborIndicesTSL( index );
-			
-					const north = store.element( northIndex );
-					const south = store.element( southIndex );
-					const east = store.element( eastIndex );
-					const west = store.element( westIndex );
+					const { north, south, east, west } = getNeighborValuesTSL( index, store );
 
 					const normalX = ( west.sub( east ) ).mul( WIDTH / BOUNDS );
 					const normalY = ( south.sub( north ) ).mul( WIDTH / BOUNDS );
@@ -213,13 +209,13 @@
 
 					// Mouse influence
 					const centerVec = vec2( 0.5 );
+					// Get length of position in range [ -BOUNDS / 2, BOUNDS / 2 ], offset by mousePos, then scale.
 					const mousePhase = clamp( length( ( vec2( x, y ).sub( centerVec ) ).mul( BOUNDS ).sub( mousePos ) ).mul( Math.PI ).div( mouseSize ), 0.0, Math.PI );
 					newHeight.addAssign( cos( mousePhase ).add( 1.0 ) ).mul( 0.28 );
 
 					prevHeight.assign( height );
 					height.assign( newHeight );
 
-			
 				} )().compute( WIDTH * WIDTH );
 
 				computeSmooth = Fn( () => {
@@ -227,10 +223,10 @@
 					const height = heightStorage.element( instanceIndex ).toVar();
 					const prevHeight = prevHeightStorage.element( instanceIndex ).toVar();
 
-					// Get neighboring height values
+					// Get neighboring height values.
 					const { northH, southH, eastH, westH } = getNeighborValuesTSL( instanceIndex, heightStorage );
 			
-					// Get neighboring prev height values
+					// Get neighboring prev height values.
 					const { northP, southP, eastP, westP } = getNeighborValuesTSL( instanceIndex, prevHeightStorage );
 
 					height.addAssign( northH.add( southH ).add( eastH ).add( westH ) );
@@ -240,7 +236,6 @@
 					prevHeightStorage.element( instanceIndex ).assign( height.div( 5 ) );
 
 				} )().compute( WIDTH * WIDTH );
-
 
 				// Water Geometry corresponds with buffered compute grid.
 				const waterGeometry = new THREE.PlaneGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
@@ -341,7 +336,6 @@
 
 					const waterNormal = vec3( normalX, 0.0, normalY );
 
-			
 					const newVelocity = vec3( velocity.x, 0.0, velocity.y ).add( waterNormal );
 					newVelocity.mulAssign( 0.998 );
 
@@ -500,7 +494,6 @@
 
 				}
 
-				// Render
 				renderer.render( scene, camera );
 
 			}
