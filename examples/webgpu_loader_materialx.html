@@ -106,11 +106,11 @@
 
 						prefab = ( await new GLTFLoader().loadAsync( './models/gltf/ShaderBall.glb' ) ).scene;
 
-						for ( const sample of samples ) {
+						//for ( const sample of samples ) {
 
-							addSample( sample );
+							addSample( 'time_frame' );
 
-						}
+						//}
 
 					} );
 
@@ -153,8 +153,8 @@
 				//
 
 				const material = await new MaterialXLoader()
-					.setPath( SAMPLE_PATH )
-					.loadAsync( sample )
+					//.setPath( SAMPLE_PATH )
+					.loadAsync( 'https://raw.githubusercontent.com/AcademySoftwareFoundation/MaterialX/main/resources/Materials/TestSuite/stdlib/application/time_frame.mtlx' )
 					.then( ( { materials } ) => Object.values( materials ).pop() );
 
 				const calibrationMesh = model.getObjectByName( 'Calibration_Mesh' );
