@@ -127,8 +127,8 @@
 				const heightBufferAttribute = new THREE.StorageBufferAttribute( heightArray, 1 );
 				const prevHeightBufferAttribute = new THREE.StorageBufferAttribute( prevHeightArray, 1 );
 
-				const heightStorage = storage( heightBufferAttribute, 'float', heightBufferAttribute.count ).label( 'Height' );
-				const prevHeightStorage = storage( prevHeightBufferAttribute, 'float', prevHeightBufferAttribute.count ).label( 'PrevHeight' );
+				const heightStorage = storageObject( heightBufferAttribute, 'float', heightBufferAttribute.count ).label( 'Height' );
+				const prevHeightStorage = storageObject( prevHeightBufferAttribute, 'float', prevHeightBufferAttribute.count ).label( 'PrevHeight' );
 
 				const heightRead = storageObject( heightBufferAttribute, 'float', heightBufferAttribute.count ).toReadOnly().label( 'HeightRead' );
 
@@ -194,8 +194,8 @@
 
 					const { viscosity, mousePos, mouseSize } = effectController;
 
-					const height = heightStorage.element( instanceIndex );
-					const prevHeight = prevHeightStorage.element( instanceIndex );
+					const height = heightStorage.element( instanceIndex ).toVar();
+					const prevHeight = prevHeightStorage.element( instanceIndex ).toVar();
 
 					const { north, south, east, west } = getNeighborValuesTSL( instanceIndex, heightStorage );
 
@@ -216,12 +216,12 @@
 
 					newHeight.addAssign( cos( mousePhase ).add( 1.0 ).mul( 0.28 ) );
 
-					prevHeight.assign( height );
-					height.assign( newHeight );
+					prevHeightStorage.element( instanceIndex ).assign( height );
+					heightStorage.element( instanceIndex ).assign( newHeight );
 
 				} )().compute( WIDTH * WIDTH );
 
-				/*computeSmooth = Fn( () => {
+				computeSmooth = Fn( () => {
 
 					const height = heightStorage.element( instanceIndex ).toVar();
 					const prevHeight = prevHeightStorage.element( instanceIndex ).toVar();
@@ -238,7 +238,7 @@
 					heightStorage.element( instanceIndex ).assign( height.div( 5 ) );
 					prevHeightStorage.element( instanceIndex ).assign( height.div( 5 ) );
 
-				} )().compute( WIDTH * WIDTH ); */
+				} )().compute( WIDTH * WIDTH );
 
 				// Water Geometry corresponds with buffered compute grid.
 				const waterGeometry = new THREE.PlaneGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
@@ -298,11 +298,11 @@
 
 				// Sphere Instance Storage
 				const sphereInstancePositionAttribute = new THREE.StorageInstancedBufferAttribute( spherePositionArray, 3 );
-				const sphereInstancePositionStorage = storage( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count ).label( 'SpherePosition' );
-				const sphereInstancePositionRead = storage( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count ).toReadOnly();
+				const sphereInstancePositionStorage = storageObject( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count ).label( 'SpherePosition' );
+				const sphereInstancePositionRead = storageObject( sphereInstancePositionAttribute, 'vec3', sphereInstancePositionAttribute.count ).toReadOnly();
 
 				const sphereVelocityAttribute = new THREE.StorageInstancedBufferAttribute( sphereVelocityArray, 2 );
-				const sphereVelocityStorage = storage( sphereVelocityAttribute, 'vec2', sphereVelocityAttribute.count ).label( 'SphereVelocity' );
+				const sphereVelocityStorage = storageObject( sphereVelocityAttribute, 'vec2', sphereVelocityAttribute.count ).label( 'SphereVelocity' );
 
 				computeSphere = Fn( () => {
 
@@ -387,7 +387,7 @@
 				const sphereMesh = new THREE.InstancedMesh( sphereGeometry, sphereMaterial, NUM_SPHERES );
 				scene.add( sphereMesh );
 
-				renderer = new THREE.WebGPURenderer( { forceWebGL: true } );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -494,9 +494,7 @@
 
 				if ( effectController.spheresEnabled ) {
 
-					console.log( 'test' );
-
-					//renderer.compute( computeSphere );
+					renderer.compute( computeSphere );
 
 				}
 
