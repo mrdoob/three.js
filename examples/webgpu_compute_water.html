@@ -213,23 +213,24 @@
 					const centerVec = vec2( 0.5 );
 					// Get length of position in range [ -BOUNDS / 2, BOUNDS / 2 ], offset by mousePos, then scale.
 					const mousePhase = clamp( length( ( vec2( x, y ).sub( centerVec ) ).mul( BOUNDS ).sub( mousePos ) ).mul( Math.PI ).div( mouseSize ), 0.0, Math.PI );
-					newHeight.addAssign( cos( mousePhase ).add( 1.0 ) ).mul( 0.28 );
+
+					newHeight.addAssign( cos( mousePhase ).add( 1.0 ).mul( 0.28 ) );
 
 					prevHeight.assign( height );
 					height.assign( newHeight );
 
 				} )().compute( WIDTH * WIDTH );
 
-				computeSmooth = Fn( () => {
+				/*computeSmooth = Fn( () => {
 
 					const height = heightStorage.element( instanceIndex ).toVar();
 					const prevHeight = prevHeightStorage.element( instanceIndex ).toVar();
 
 					// Get neighboring height values.
-					const { northH, southH, eastH, westH } = getNeighborValuesTSL( instanceIndex, heightStorage );
+					const { north: northH, south: southH, east: eastH, west: westH } = getNeighborValuesTSL( instanceIndex, heightStorage );
 			
 					// Get neighboring prev height values.
-					const { northP, southP, eastP, westP } = getNeighborValuesTSL( instanceIndex, prevHeightStorage );
+					const { north: northP, south: southP, east: eastP, west: westP } = getNeighborValuesTSL( instanceIndex, prevHeightStorage );
 
 					height.addAssign( northH.add( southH ).add( eastH ).add( westH ) );
 					prevHeight.addAssign( northP.add( southP ).add( eastP ).add( westP ) );
@@ -237,7 +238,7 @@
 					heightStorage.element( instanceIndex ).assign( height.div( 5 ) );
 					prevHeightStorage.element( instanceIndex ).assign( height.div( 5 ) );
 
-				} )().compute( WIDTH * WIDTH );
+				} )().compute( WIDTH * WIDTH ); */
 
 				// Water Geometry corresponds with buffered compute grid.
 				const waterGeometry = new THREE.PlaneGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
@@ -386,7 +387,7 @@
 				const sphereMesh = new THREE.InstancedMesh( sphereGeometry, sphereMaterial, NUM_SPHERES );
 				scene.add( sphereMesh );
 
-				renderer = new THREE.WebGPURenderer();
+				renderer = new THREE.WebGPURenderer( { forceWebGL: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -493,7 +494,9 @@
 
 				if ( effectController.spheresEnabled ) {
 
-					renderer.compute( computeSphere );
+					console.log( 'test' );
+
+					//renderer.compute( computeSphere );
 
 				}
 
