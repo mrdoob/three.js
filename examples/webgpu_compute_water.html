@@ -97,7 +97,7 @@
 				effectController = {
 					mousePos: uniform( new THREE.Vector2( 10000, 10000 ) ).label( 'mousePos' ),
 					mouseSize: uniform( 20.0 ).label( 'mouseSize' ),
-					viscosity: uniform( 0.98 ).label( 'viscosity' ),
+					viscosity: uniform( 0.9 ).label( 'viscosity' ),
 					spheresEnabled: true
 				};
 
@@ -199,7 +199,11 @@
 
 					const { north, south, east, west } = getNeighborValuesTSL( instanceIndex, heightStorage );
 
-					const newHeight = ( ( north.add( south ).add( east ).add( west ) ).mul( 0.5 ).sub( prevHeight ) ).mul( viscosity );
+					const neighborHeight = north.add( south ).add( east ).add( west );
+					neighborHeight.mulAssign( 0.5 );
+					neighborHeight.subAssign( prevHeight );
+
+					const newHeight = neighborHeight.mul( viscosity );
 
 					// Get 2-D compute coordinate from one-dimensional instanceIndex.
 					const x = float( instanceIndex.modInt( WIDTH ) ).mul( 1 / WIDTH );
