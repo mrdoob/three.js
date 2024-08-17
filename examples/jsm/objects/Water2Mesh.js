@@ -24,7 +24,6 @@ class WaterMesh extends Mesh {
 
 		this.isWater = true;
 
-		material.normals = false;
 		material.fragmentNode = new WaterNode( options, this );
 
 	}

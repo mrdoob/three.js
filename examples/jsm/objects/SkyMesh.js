@@ -175,7 +175,6 @@ class SkyMesh extends Mesh {
 
 		} )();
 
-		material.normals = false;
 		material.side = BackSide;
 		material.depthWrite = false;
 
