@@ -44,8 +44,8 @@
 			},
 	
 			// onProgress callback
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			function ( event ) {
+				console.log( (event.loaded / event.total * 100) + '% loaded' );
 			},
 	
 			// onError callback

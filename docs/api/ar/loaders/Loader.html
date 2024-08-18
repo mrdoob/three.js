@@ -30,7 +30,7 @@
 	 
 		<h3>[property:Boolean withCredentials]</h3>
 		<p>
-		ما إذا كان XMLHttpRequest يستخدم بيانات الاعتماد. انظر
+		ما إذا كان Request يستخدم بيانات الاعتماد. انظر
 		[page:.setWithCredentials]. الافتراضي هو `false`.
 		</p>
 	 
@@ -74,7 +74,7 @@
 		[page:String url] — سلسلة تحتوي على مسار / عنوان URL للملف المراد
 		تحميله.<br />
 		[page:Function onProgress] (اختياري) — وظيفة يتم استدعاؤها أثناء
-		التحميل قيد التقدم. ستكون الوسيطة هي مثيل ProgressEvent ،
+		التحميل قيد التقدم. ستكون الوسيطة هي مثيل [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent ProgressEvent] ،
 		الذي يحتوي على .[page:Boolean lengthComputable] ، .[page:Integer total] و
 		.[page:Integer loaded]. إذا لم يقم الخادم بتعيين رأس Content-Length ؛
 		.[page:Integer total] ستكون 0.<br />
@@ -104,9 +104,9 @@
 	 
 		<h3>[method:this setWithCredentials]( [param:Boolean value] )</h3>
 		<p>
-		ما إذا كان XMLHttpRequest يستخدم بيانات اعتماد مثل ملفات تعريف الارتباط ، ورؤوس التفويض
+		ما إذا كان Request يستخدم بيانات اعتماد مثل ملفات تعريف الارتباط ، ورؤوس التفويض
 		أو شهادات عميل TLS. انظر
-		[link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials Request.credentials].<br />
 		لاحظ أن هذا لا يؤثر إذا كنت تقوم بتحميل الملفات محليًا أو من
 		نفس المجال.
 		</p>

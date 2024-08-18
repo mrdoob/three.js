@@ -33,8 +33,8 @@
 			},
 	
 			// onProgress callback
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			function ( event ) {
+				console.log( (event.loaded / event.total * 100) + '% loaded' );
 			},
 	
 			// onError callback
@@ -89,7 +89,7 @@
 		[page:Function onLoad] (اختياري) - سيتم استدعاؤه عند اكتمال التحميل.
 		الوسيطة ستكون الاستجابة المحملة.<br />
 		[page:Function onProgress] (اختياري) - سيتم استدعاؤه أثناء تقدم التحميل.
-		الوسيطة ستكون مثيل ProgressEvent ، والذي
+		الوسيطة ستكون مثيل [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent ProgressEvent] ، والذي
 		يحتوي على .[page:Boolean lengthComputable]، .[page:Integer total] و
 		.[page:Integer loaded]. إذا لم يضع الخادم رأس Content-Length
 		؛ .[page:Integer total] ستكون 0.<br />

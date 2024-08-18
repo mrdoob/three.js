@@ -35,8 +35,8 @@
 			},
 	
 			// onProgress callback
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			function ( event ) {
+				console.log( (event.loaded / event.total * 100) + '% loaded' );
 			},
 	
 			// onError callback
@@ -70,7 +70,7 @@
 		[page:Function onLoad] — سيتم استدعاؤه عند اكتمال التحميل. الحجة
 		ستكون المحمَّلة [page:BufferGeometry].<br />
 		[page:Function onProgress] (اختياري) — سيتم استدعاؤه أثناء التقدم في التحميل
-		يتقدم. الحجة ستكون نسخة ProgressEvent، والتي
+		يتقدم. الحجة ستكون نسخة [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent ProgressEvent]، والتي
 		يحتوي على .[page:Boolean lengthComputable]، .[page:Integer total] و
 		.[page:Integer loaded]. إذا لم يضبط الخادم رأس Content-Length
 		.[page:Integer total] سيكون 0.<br />

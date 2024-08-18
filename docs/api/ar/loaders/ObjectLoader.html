@@ -34,8 +34,8 @@
 			},
 	
 			// onProgress callback
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			function ( event ) {
+				console.log( (event.loaded / event.total * 100) + '% loaded' );
 			},
 	
 			// onError callback
@@ -78,7 +78,7 @@
 		[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 		[page:Function onLoad] — سيتم استدعاؤه عند اكتمال التحميل. الحجة
 		سيكون ال [page:Object3D object] المحمّل.<br />
-		[page:Function onProgress] (اختياري) — سيتم استدعاؤه أثناء تقدم التحميل. الحجة ستكون مثيل ProgressEvent، والذي
+		[page:Function onProgress] (اختياري) — سيتم استدعاؤه أثناء تقدم التحميل. الحجة ستكون مثيل [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent ProgressEvent]، والذي
 		يحتوي على .[page:Boolean lengthComputable]، .[page:Integer total] و
 		.[page:Integer loaded]. إذا لم يضبط الخادم رأس Content-Length
 		؛ سيكون .[page:Integer total] 0.<br />

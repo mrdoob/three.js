@@ -33,8 +33,8 @@
 			},
 
 			// onProgress callback
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			function ( event ) {
+				console.log( (event.loaded / event.total * 100) + '% loaded' );
 			},
 
 			// onError callback
@@ -80,7 +80,7 @@
 			[page:String url] — Il path o URL del file. Questo può anche essere un
 				[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 			[page:Function onLoad] (opzionale) — Verrà chiamato quando il caricamento sarà completato. L'argomento sarà la risposta caricata.<br />
-			[page:Function onProgress] (opzionale) — Verrà chiamato durante il caricamento. L'argomento sarà l'istanza ProgressEvent, che contiene
+			[page:Function onProgress] (opzionale) — Verrà chiamato durante il caricamento. L'argomento sarà l'istanza [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent ProgressEvent], che contiene
       .[page:Boolean lengthComputable], .[page:Integer total] e .[page:Integer loaded]. Se il server non imposta l'header Content-Length; .[page:Integer total] sarà 0.<br />
 			[page:Function onError] (opzionale) — Verrà chiamato in caso di errori di caricamento.<br /><br />
 

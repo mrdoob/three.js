@@ -33,8 +33,8 @@
 			},
 
 			// onProgress callback
-			function ( xhr ) {
-				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			function ( event ) {
+				console.log( (event.loaded / event.total * 100) + '% loaded' );
 			},
 
 			// onError callback
@@ -72,11 +72,7 @@
 			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 			[page:Function onLoad] — Will be called when load completes. The argument
 			will be the loaded [page:Material].<br />
-			[page:Function onProgress] (optional) — Will be called while load
-			progresses. The argument will be the ProgressEvent instance, which
-			contains .[page:Boolean lengthComputable], .[page:Integer total] and
-			.[page:Integer loaded]. If the server does not set the Content-Length
-			header; .[page:Integer total] will be 0.<br />
+			[page:Function onProgress] (optional) — Will be called while load progresses. The argument will be a [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent ProgressEvent] instance, which contains .[page:Boolean lengthComputable] if the length is known, .[page:Integer total] in bytes, and .[page:Integer loaded] in bytes. If the server does not set the "Content-Length" header, .[page:Integer total] will be 0.<br />
 			[page:Function onError] (optional) — Will be called when load errors.<br /><br />
 
 			Begin loading from url.

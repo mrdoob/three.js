@@ -34,7 +34,7 @@
 
 		<h3>[property:Boolean withCredentials]</h3>
 		<p>
-      Indica se XMLHttpRequest utilizza le credenziali. Vedi [page:.setWithCredentials].
+      Indica se Request utilizza le credenziali. Vedi [page:.setWithCredentials].
       Il valore predefinito è `false`.
 		</p>
 
@@ -71,7 +71,7 @@
 		<h3>[method:Promise loadAsync]( [param:String url], [param:Function onProgress] )</h3>
 		<p>
 		[page:String url] — Una stringa contenente il percorso/URL del file che deve essere caricato.<br />
-		[page:Function onProgress] (opzionale) — Una funzione da chiamare mentre il caricamento è in corso.  L'argomento sarà l'istanza ProgressEvent, la quale contiene
+		[page:Function onProgress] (opzionale) — Una funzione da chiamare mentre il caricamento è in corso.  L'argomento sarà l'istanza [link:https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent ProgressEvent], la quale contiene
     .[page:Boolean lengthComputable], .[page:Integer total] e .[page:Integer loaded]. Se il server non imposta l'header Content-Length; .[page:Integer total] sarà 0.<br />
 		</p>
 		<p>
@@ -94,8 +94,8 @@
 
 		<h3>[method:this setWithCredentials]( [param:Boolean value] )</h3>
 		<p>
-      Indica se XMLHttpRequest utilizza le credenziali come cookie, header di autorizzazione o
-      certificati client TLS. Vedi [link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />
+      Indica se Request utilizza le credenziali come cookie, header di autorizzazione o
+      certificati client TLS. Vedi [link:https://developer.mozilla.org/en-US/docs/Web/API/Request/credentials Request.credentials].<br />
       Si noti che non ha effetti se stai caricando file localmente o dallo stesso dominio.
 		</p>
 
