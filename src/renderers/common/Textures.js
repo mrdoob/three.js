@@ -25,10 +25,9 @@ class Textures extends DataMap {
 		const sampleCount = renderTarget.samples === 0 ? 1 : renderTarget.samples;
 		const depthTextureMips = renderTargetData.depthTextureMips || ( renderTargetData.depthTextureMips = {} );
 
-		const texture = renderTarget.texture;
 		const textures = renderTarget.textures;
 
-		const size = this.getSize( texture );
+		const size = this.getSize( textures[ 0 ] );
 
 		const mipWidth = size.width >> activeMipmapLevel;
 		const mipHeight = size.height >> activeMipmapLevel;
@@ -103,17 +102,9 @@ class Textures extends DataMap {
 
 				renderTarget.removeEventListener( 'dispose', onDispose );
 
-				if ( textures !== undefined ) {
+				for ( let i = 0; i < textures.length; i ++ ) {
 
-					for ( let i = 0; i < textures.length; i ++ ) {
-
-						this._destroyTexture( textures[ i ] );
-
-					}
-
-				} else {
-
-					this._destroyTexture( texture );
+					this._destroyTexture( textures[ i ] );
 
 				}
 
