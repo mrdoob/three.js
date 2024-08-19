@@ -141,12 +141,12 @@ class WebGPUBindingUtils {
 
 		// setup (static) binding layout and (dynamic) binding group
 
-		let bindLayoutGPU = bindGroupLayoutCache.get( bindGroup.cacheKey );
+		let bindLayoutGPU = bindGroupLayoutCache.get( bindGroup.bindingsReference );
 
 		if ( bindLayoutGPU === undefined ) {
 
 			bindLayoutGPU = this.createBindingsLayout( bindGroup );
-			bindGroupLayoutCache.set( bindGroup.cacheKey, bindLayoutGPU );
+			bindGroupLayoutCache.set( bindGroup.bindingsReference, bindLayoutGPU );
 
 		}
 
