@@ -267,7 +267,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	isUnfilterable( texture ) {
 
-		return this.getComponentTypeFromTexture( texture ) !== 'float' || ( texture.isDataTexture === true && texture.type === FloatType ) || texture.isMultisampleRenderTargetTexture === true;
+		return this.getComponentTypeFromTexture( texture ) !== 'float' || ( ! this.isAvailable( 'float32Filterable' ) && texture.isDataTexture === true && texture.type === FloatType ) || texture.isMultisampleRenderTargetTexture === true;
 
 	}
 

@@ -95,9 +95,15 @@ class WebGPUBindingUtils {
 
 					} else if ( type === FloatType ) {
 
-						// @TODO: Add support for this soon: backend.hasFeature( 'float32-filterable' )
+						if ( this.backend.hasFeature( 'float32-filterable' ) ) {
 
-						texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+							texture.sampleType = GPUTextureSampleType.Float;
+
+						} else {
+
+							texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+
+						}
 
 					}
 
