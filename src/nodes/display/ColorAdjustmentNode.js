@@ -1,18 +1,16 @@
-import TempNode from '../core/TempNode.js';
 import { dot, mix } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, Fn, nodeProxy, float, vec3 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, float, vec3 } from '../shadernode/ShaderNode.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { Vector3 } from '../../math/Vector3.js';
 
-const saturationNode = Fn( ( { color, adjustment } ) => {
+export const saturation = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	return adjustment.mix( luminance( color.rgb ), color.rgb );
 
 } );
 
-const vibranceNode = Fn( ( { color, adjustment } ) => {
+export const vibrance = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	const average = add( color.r, color.g, color.b ).div( 3.0 );
 
@@ -23,7 +21,7 @@ const vibranceNode = Fn( ( { color, adjustment } ) => {
 
 } );
 
-const hueNode = Fn( ( { color, adjustment } ) => {
+export const hue = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	const k = vec3( 0.57735, 0.57735, 0.57735 );
 
@@ -32,61 +30,6 @@ const hueNode = Fn( ( { color, adjustment } ) => {
 	return vec3( color.rgb.mul( cosAngle ).add( k.cross( color.rgb ).mul( adjustment.sin() ).add( k.mul( dot( k, color.rgb ).mul( cosAngle.oneMinus() ) ) ) ) );
 
 } );
-
-class ColorAdjustmentNode extends TempNode {
-
-	constructor( method, colorNode, adjustmentNode = float( 1 ) ) {
-
-		super( 'vec3' );
-
-		this.method = method;
-
-		this.colorNode = colorNode;
-		this.adjustmentNode = adjustmentNode;
-
-	}
-
-	setup() {
-
-		const { method, colorNode, adjustmentNode } = this;
-
-		const callParams = { color: colorNode, adjustment: adjustmentNode };
-
-		let outputNode = null;
-
-		if ( method === ColorAdjustmentNode.SATURATION ) {
-
-			outputNode = saturationNode( callParams );
-
-		} else if ( method === ColorAdjustmentNode.VIBRANCE ) {
-
-			outputNode = vibranceNode( callParams );
-
-		} else if ( method === ColorAdjustmentNode.HUE ) {
-
-			outputNode = hueNode( callParams );
-
-		} else {
-
-			console.error( `${ this.type }: Method "${ this.method }" not supported!` );
-
-		}
-
-		return outputNode;
-
-	}
-
-}
-
-ColorAdjustmentNode.SATURATION = 'saturation';
-ColorAdjustmentNode.VIBRANCE = 'vibrance';
-ColorAdjustmentNode.HUE = 'hue';
-
-export default ColorAdjustmentNode;
-
-export const saturation = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.SATURATION );
-export const vibrance = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.VIBRANCE );
-export const hue = nodeProxy( ColorAdjustmentNode, ColorAdjustmentNode.HUE );
 
 const _luminanceCoefficients = /*#__PURE__*/ new Vector3();
 export const luminance = (
@@ -100,5 +43,3 @@ addNodeElement( 'saturation', saturation );
 addNodeElement( 'vibrance', vibrance );
 addNodeElement( 'hue', hue );
 addNodeElement( 'threshold', threshold );
-
-addNodeClass( 'ColorAdjustmentNode', ColorAdjustmentNode );
