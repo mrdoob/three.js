@@ -53,6 +53,11 @@ class WebGLBackend extends Backend {
 		this.trackTimestamp = ( parameters.trackTimestamp === true );
 
 		this.extensions.get( 'EXT_color_buffer_float' );
+		this.extensions.get( 'WEBGL_clip_cull_distance' );
+		this.extensions.get( 'OES_texture_float_linear' );
+		this.extensions.get( 'EXT_color_buffer_half_float' );
+		this.extensions.get( 'WEBGL_multisampled_render_to_texture' );
+		this.extensions.get( 'WEBGL_render_shared_exponent' );
 		this.extensions.get( 'WEBGL_multi_draw' );
 
 		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
