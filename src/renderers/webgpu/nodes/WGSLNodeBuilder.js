@@ -6,7 +6,7 @@ import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeStorageBuffer from '../../common/nodes/NodeStorageBuffer.js';
 
-import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
+import { NodeBuilder, CodeNode, buffer } from '../../../nodes/Nodes.js';
 
 import { getFormat } from '../utils/WebGPUTextureUtils.js';
 
@@ -170,6 +170,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 		this.builtins = {};
 
 		this.directives = {};
+
+		this.scopedArrays = new Map();
 
 	}
 
@@ -766,6 +768,45 @@ ${ flowData.code }
 
 	}
 
+	getScopedArray( name, scope, bufferType, bufferCount ) {
+
+		if ( this.scopedArrays.has( name ) === false ) {
+
+			this.scopedArrays.set( name, {
+				name,
+				scope,
+				bufferType,
+				bufferCount
+			} );
+
+		}
+
+		return name;
+
+	}
+
+	getScopedArrays( shaderStage ) {
+
+		if ( shaderStage !== 'compute' ) {
+
+			return;
+
+		}
+
+		const snippets = [];
+
+		for ( const { name, scope, bufferType, bufferCount } of this.scopedArrays.values() ) {
+
+			const type = this.getType( bufferType );
+
+			snippets.push( `@var<${scope}> ${name}: array< ${type} : ${bufferCount};` );
+
+		}
+
+		return snippets.join( ',\n\t' );
+
+	}
+
 	getAttributes( shaderStage ) {
 
 		const snippets = [];
@@ -1065,6 +1106,7 @@ ${ flowData.code }
 			stageData.vars = this.getVars( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.directives = this.getDirectives( shaderStage );
+			stageData.scopedArrays = this.getScopedArrays( shaderStage );
 
 			//
 
@@ -1290,6 +1332,9 @@ ${shaderData.directives}
 
 // system
 var<private> instanceIndex : u32;
+
+// locals
+${shaderData.scopedArrays}
 
 // uniforms
 ${shaderData.uniforms}
