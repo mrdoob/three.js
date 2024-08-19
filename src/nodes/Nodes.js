@@ -146,6 +146,7 @@ export { default as TransitionNode, transition } from './display/TransitionNode.
 export { default as RenderOutputNode, renderOutput } from './display/RenderOutputNode.js';
 export { default as PixelationPassNode, pixelationPass } from './display/PixelationPassNode.js';
 export { default as SSAAPassNode, ssaaPass } from './display/SSAAPassNode.js';
+export { default as StereoPassNode, stereoPass } from './display/StereoPassNode.js';
 export { bleach } from './display/BleachBypassNode.js';
 export { sepia } from './display/SepiaNode.js';
 
