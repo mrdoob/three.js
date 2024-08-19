@@ -1,4 +1,4 @@
-import { addNodeElement, Fn, vec3 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn } from '../shadernode/ShaderNode.js';
 import { mix, min, step } from '../math/MathNode.js';
 
 export const burn = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
