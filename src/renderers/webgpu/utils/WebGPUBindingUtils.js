@@ -9,6 +9,7 @@ class WebGPUBindingUtils {
 	constructor( backend ) {
 
 		this.backend = backend;
+		this.bindGroupLayoutCache = new WeakMap();
 
 	}
 
@@ -135,12 +136,20 @@ class WebGPUBindingUtils {
 
 	createBindings( bindGroup ) {
 
-		const backend = this.backend;
+		const { backend, bindGroupLayoutCache } = this;
 		const bindingsData = backend.get( bindGroup );
 
 		// setup (static) binding layout and (dynamic) binding group
 
-		const bindLayoutGPU = this.createBindingsLayout( bindGroup );
+		let bindLayoutGPU = bindGroupLayoutCache.get( bindGroup.bindingsReference );
+
+		if ( bindLayoutGPU === undefined ) {
+
+			bindLayoutGPU = this.createBindingsLayout( bindGroup );
+			bindGroupLayoutCache.set( bindGroup.bindingsReference, bindLayoutGPU );
+
+		}
+
 		const bindGroupGPU = this.createBindGroup( bindGroup, bindLayoutGPU );
 
 		bindingsData.layout = bindLayoutGPU;
