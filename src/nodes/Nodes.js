@@ -115,7 +115,7 @@ export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
 export * from './accessors/VelocityNode.js';
 
 // display
-export { default as BlendModeNode, burn, dodge, overlay, screen } from './display/BlendModeNode.js';
+export * from './display/BlendModeNode.js';
 export { default as BumpMapNode, bumpMap } from './display/BumpMapNode.js';
 export * from './display/ColorAdjustmentNode.js';
 export { default as ColorSpaceNode, linearToColorSpace, colorSpaceToLinear, linearTosRGB, sRGBToLinear } from './display/ColorSpaceNode.js';

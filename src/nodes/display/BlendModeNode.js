@@ -1,16 +1,12 @@
-import TempNode from '../core/TempNode.js';
-import { /*mix, step,*/ EPSILON } from '../math/MathNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, Fn, nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, vec3 } from '../shadernode/ShaderNode.js';
+import { mix, min, step } from '../math/MathNode.js';
 
-export const BurnNode = Fn( ( { base, blend } ) => {
+export const burn = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
 
-	const fn = ( c ) => blend[ c ].lessThan( EPSILON ).select( blend[ c ], base[ c ].oneMinus().div( blend[ c ] ).oneMinus().max( 0 ) );
-
-	return vec3( fn( 'x' ), fn( 'y' ), fn( 'z' ) );
+	return min( 1.0, base.oneMinus().div( blend ) ).oneMinus();
 
 } ).setLayout( {
-	name: 'burnColor',
+	name: 'burnBlend',
 	type: 'vec3',
 	inputs: [
 		{ name: 'base', type: 'vec3' },
@@ -18,14 +14,12 @@ export const BurnNode = Fn( ( { base, blend } ) => {
 	]
 } );
 
-export const DodgeNode = Fn( ( { base, blend } ) => {
+export const dodge = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
 
-	const fn = ( c ) => blend[ c ].equal( 1.0 ).select( blend[ c ], base[ c ].div( blend[ c ].oneMinus() ).max( 0 ) );
-
-	return vec3( fn( 'x' ), fn( 'y' ), fn( 'z' ) );
+	return min( base.div( blend.oneMinus() ), 1.0 );
 
 } ).setLayout( {
-	name: 'dodgeColor',
+	name: 'dodgeBlend',
 	type: 'vec3',
 	inputs: [
 		{ name: 'base', type: 'vec3' },
@@ -33,14 +27,12 @@ export const DodgeNode = Fn( ( { base, blend } ) => {
 	]
 } );
 
-export const ScreenNode = Fn( ( { base, blend } ) => {
+export const screen = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
 
-	const fn = ( c ) => base[ c ].oneMinus().mul( blend[ c ].oneMinus() ).oneMinus();
-
-	return vec3( fn( 'x' ), fn( 'y' ), fn( 'z' ) );
+	return base.oneMinus().mul( blend.oneMinus() ).oneMinus();
 
 } ).setLayout( {
-	name: 'screenColor',
+	name: 'screenBlend',
 	type: 'vec3',
 	inputs: [
 		{ name: 'base', type: 'vec3' },
@@ -48,15 +40,12 @@ export const ScreenNode = Fn( ( { base, blend } ) => {
 	]
 } );
 
-export const OverlayNode = Fn( ( { base, blend } ) => {
+export const overlay = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
 
-	const fn = ( c ) => base[ c ].lessThan( 0.5 ).select( base[ c ].mul( blend[ c ], 2.0 ), base[ c ].oneMinus().mul( blend[ c ].oneMinus() ).oneMinus() );
-	//const fn = ( c ) => mix( base[ c ].oneMinus().mul( blend[ c ].oneMinus() ).oneMinus(), base[ c ].mul( blend[ c ], 2.0 ), step( base[ c ], 0.5 ) );
-
-	return vec3( fn( 'x' ), fn( 'y' ), fn( 'z' ) );
+	return mix( base.mul( 2.0 ).mul( blend ), base.oneMinus().mul( 2.0 ).mul( blend.oneMinus() ).oneMinus(), step( 0.5, base ) );
 
 } ).setLayout( {
-	name: 'overlayColor',
+	name: 'overlayBlend',
 	type: 'vec3',
 	inputs: [
 		{ name: 'base', type: 'vec3' },
@@ -64,65 +53,8 @@ export const OverlayNode = Fn( ( { base, blend } ) => {
 	]
 } );
 
-class BlendModeNode extends TempNode {
-
-	constructor( blendMode, baseNode, blendNode ) {
-
-		super();
-
-		this.blendMode = blendMode;
-
-		this.baseNode = baseNode;
-		this.blendNode = blendNode;
-
-	}
-
-	setup() {
-
-		const { blendMode, baseNode, blendNode } = this;
-		const params = { base: baseNode, blend: blendNode };
-
-		let outputNode = null;
-
-		if ( blendMode === BlendModeNode.BURN ) {
-
-			outputNode = BurnNode( params );
-
-		} else if ( blendMode === BlendModeNode.DODGE ) {
-
-			outputNode = DodgeNode( params );
-
-		} else if ( blendMode === BlendModeNode.SCREEN ) {
-
-			outputNode = ScreenNode( params );
-
-		} else if ( blendMode === BlendModeNode.OVERLAY ) {
-
-			outputNode = OverlayNode( params );
-
-		}
-
-		return outputNode;
-
-	}
-
-}
-
-BlendModeNode.BURN = 'burn';
-BlendModeNode.DODGE = 'dodge';
-BlendModeNode.SCREEN = 'screen';
-BlendModeNode.OVERLAY = 'overlay';
-
-export default BlendModeNode;
-
-export const burn = nodeProxy( BlendModeNode, BlendModeNode.BURN );
-export const dodge = nodeProxy( BlendModeNode, BlendModeNode.DODGE );
-export const overlay = nodeProxy( BlendModeNode, BlendModeNode.OVERLAY );
-export const screen = nodeProxy( BlendModeNode, BlendModeNode.SCREEN );
 
 addNodeElement( 'burn', burn );
 addNodeElement( 'dodge', dodge );
 addNodeElement( 'overlay', overlay );
 addNodeElement( 'screen', screen );
-
-addNodeClass( 'BlendModeNode', BlendModeNode );
