@@ -138,7 +138,7 @@ class MathNode extends TempNode {
 					b.build( builder, type )
 				);
 
-			} else if ( method === MathNode.STEP ) {
+			} else if ( isWebGL && method === MathNode.STEP ) {
 
 				params.push(
 					a.build( builder, builder.getTypeLength( a.getNodeType( builder ) ) === 1 ? 'float' : inputType ),

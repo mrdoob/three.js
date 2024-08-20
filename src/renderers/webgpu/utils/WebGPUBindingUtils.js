@@ -9,6 +9,7 @@ class WebGPUBindingUtils {
 	constructor( backend ) {
 
 		this.backend = backend;
+		this.bindGroupLayoutCache = new WeakMap();
 
 	}
 
@@ -95,9 +96,15 @@ class WebGPUBindingUtils {
 
 					} else if ( type === FloatType ) {
 
-						// @TODO: Add support for this soon: backend.hasFeature( 'float32-filterable' )
+						if ( this.backend.hasFeature( 'float32-filterable' ) ) {
 
-						texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+							texture.sampleType = GPUTextureSampleType.Float;
+
+						} else {
+
+							texture.sampleType = GPUTextureSampleType.UnfilterableFloat;
+
+						}
 
 					}
 
@@ -135,12 +142,20 @@ class WebGPUBindingUtils {
 
 	createBindings( bindGroup ) {
 
-		const backend = this.backend;
+		const { backend, bindGroupLayoutCache } = this;
 		const bindingsData = backend.get( bindGroup );
 
 		// setup (static) binding layout and (dynamic) binding group
 
-		const bindLayoutGPU = this.createBindingsLayout( bindGroup );
+		let bindLayoutGPU = bindGroupLayoutCache.get( bindGroup.bindingsReference );
+
+		if ( bindLayoutGPU === undefined ) {
+
+			bindLayoutGPU = this.createBindingsLayout( bindGroup );
+			bindGroupLayoutCache.set( bindGroup.bindingsReference, bindLayoutGPU );
+
+		}
+
 		const bindGroupGPU = this.createBindGroup( bindGroup, bindLayoutGPU );
 
 		bindingsData.layout = bindLayoutGPU;

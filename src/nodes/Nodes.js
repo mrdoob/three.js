@@ -114,9 +114,9 @@ export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
 export * from './accessors/VelocityNode.js';
 
 // display
-export { default as BlendModeNode, burn, dodge, overlay, screen } from './display/BlendModeNode.js';
+export * from './display/BlendModeNode.js';
 export { default as BumpMapNode, bumpMap } from './display/BumpMapNode.js';
-export { default as ColorAdjustmentNode, saturation, vibrance, hue, luminance, threshold } from './display/ColorAdjustmentNode.js';
+export * from './display/ColorAdjustmentNode.js';
 export { default as ColorSpaceNode, linearToColorSpace, colorSpaceToLinear } from './display/ColorSpaceNode.js';
 export { default as FrontFacingNode, frontFacing, faceDirection } from './display/FrontFacingNode.js';
 export { default as NormalMapNode, normalMap } from './display/NormalMapNode.js';
@@ -145,6 +145,7 @@ export { default as TransitionNode, transition } from './display/TransitionNode.
 export { default as RenderOutputNode, renderOutput } from './display/RenderOutputNode.js';
 export { default as PixelationPassNode, pixelationPass } from './display/PixelationPassNode.js';
 export { default as SSAAPassNode, ssaaPass } from './display/SSAAPassNode.js';
+export { default as StereoPassNode, stereoPass } from './display/StereoPassNode.js';
 export { bleach } from './display/BleachBypassNode.js';
 export { sepia } from './display/SepiaNode.js';
 
