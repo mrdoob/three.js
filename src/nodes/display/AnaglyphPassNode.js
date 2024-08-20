@@ -124,6 +124,8 @@ class AnaglyphPassNode extends PassNode {
 
 	dispose() {
 
+		super.dispose();
+
 		this._renderTargetL.dispose();
 		this._renderTargetR.dispose();
 
