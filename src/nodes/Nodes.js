@@ -59,7 +59,7 @@ export { default as LoopNode, Loop, Continue, Break } from './utils/LoopNode.js'
 export { default as MatcapUVNode, matcapUV } from './utils/MatcapUVNode.js';
 export { default as MaxMipLevelNode, maxMipLevel } from './utils/MaxMipLevelNode.js';
 export { default as OscNode, oscSine, oscSquare, oscTriangle, oscSawtooth } from './utils/OscNode.js';
-export { default as PackingNode, directionToColor, colorToDirection } from './utils/PackingNode.js';
+export * from './utils/PackingNode.js';
 export { default as RemapNode, remap, remapClamp } from './utils/RemapNode.js';
 export * from './utils/UVUtils.js';
 export * from './utils/SpriteUtils.js';
