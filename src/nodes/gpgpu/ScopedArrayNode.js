@@ -1,5 +1,5 @@
 import ArrayElementNode from '../utils/ArrayElementNode.js';
-import { nodeObject, addNodeElement } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../shadernode/ShaderNode.js';
 import Node, { addNodeClass } from '../core/Node.js';
 
 class ScopedArrayElementNode extends ArrayElementNode {
