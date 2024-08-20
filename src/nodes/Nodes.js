@@ -42,7 +42,7 @@ export { default as MathNode, PI, PI2, EPSILON, INFINITY, radians, degrees, exp,
 
 export { default as OperatorNode, add, sub, mul, div, modInt, equal, lessThan, greaterThan, lessThanEqual, greaterThanEqual, and, or, not, xor, bitAnd, bitNot, bitOr, bitXor, shiftLeft, shiftRight, remainder } from './math/OperatorNode.js';
 export { default as CondNode, select, cond } from './math/CondNode.js';
-export { default as HashNode, hash } from './math/HashNode.js';
+export * from './math/HashNode.js';
 
 // math utils
 export { parabola, gain, pcurve, sinc } from './math/MathUtils.js';
