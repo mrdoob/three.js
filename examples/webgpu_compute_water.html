@@ -346,6 +346,7 @@
 
 					const newPosition = instancePosition.add( newVelocity ).toVar();
 
+					// Reverse velocity and reset position when exceeding bounds.
 					If( newPosition.x.lessThan( - BOUNDS_HALF ), () => {
 
 						newPosition.x = float( - BOUNDS_HALF ).add( 0.001 );
