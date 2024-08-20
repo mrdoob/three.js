@@ -1,28 +1,15 @@
-import CondNode from '../math/CondNode.js';
+import { select } from '../math/CondNode.js';
 import { expression } from '../code/ExpressionNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addNodeElement } from '../shadernode/ShaderNode.js';
 
-let discardExpression;
-
-class DiscardNode extends CondNode {
-
-	constructor( condNode ) {
-
-		discardExpression = discardExpression || expression( 'discard' );
-
-		super( condNode, discardExpression );
-
-	}
-
-}
-
-export default DiscardNode;
-
-export const inlineDiscard = nodeProxy( DiscardNode );
-export const discard = ( condNode ) => inlineDiscard( condNode ).append();
+export const Discard = ( conditional ) => conditional ? select( conditional, expression( 'discard' ).append() ) : expression( 'discard' ).append();
 export const Return = () => expression( 'return' ).append();
 
-addNodeElement( 'discard', discard ); // @TODO: Check... this cause a little confusing using in chaining
+export const discard = ( ...params ) => { // @deprecated, r168
 
-addNodeClass( 'DiscardNode', DiscardNode );
+	console.warn( 'TSL.DiscardNode: discard() has been renamed to Discard().' );
+	return Discard( ...params );
+
+};
+
+addNodeElement( 'discard', Discard );
