@@ -272,6 +272,25 @@ class Quaternion {
 
 	}
 
+	toAxisAngle( axisTarget ) {
+
+		// https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
+
+		const qx = this.x;
+		const qy = this.y;
+		const qz = this.z;
+		const qw = this.w;
+
+		const angle = 2 * Math.acos( qw );
+		const x = qx / Math.sqrt( 1 - qw * qw );
+		const y = qy / Math.sqrt( 1 - qw * qw );
+		const z = qz / Math.sqrt( 1 - qw * qw );
+
+		axisTarget.set( x, y, z );
+		return angle;
+
+	}
+
 	setFromAxisAngle( axis, angle ) {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
