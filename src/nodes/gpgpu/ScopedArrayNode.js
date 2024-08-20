@@ -1,4 +1,6 @@
 import ArrayElementNode from '../utils/ArrayElementNode.js';
+import { nodeObject, addNodeElement } from '../shadernode/ShaderNode.js';
+import Node, { addNodeClass } from '../core/Node.js';
 
 class ScopedArrayElementNode extends ArrayElementNode {
 
@@ -36,17 +38,16 @@ class ScopedArrayElementNode extends ArrayElementNode {
 
 class ScopedArrayNode extends Node {
 
-	constructor( value, bufferType, bufferCount = 0 ) {
+	constructor( scope, bufferType, bufferCount = 0 ) {
 
-		super( value, bufferType );
+		super( bufferType );
 
 		this.bufferType = bufferType;
 		this.bufferCount = bufferCount;
 
-		this.isWorkgroupArrayNode = true;
+		this.isScopedArrayNode = true;
 
-		this.scope = 'workgroup';
-
+		this.scope = scope;
 
 	}
 
@@ -80,16 +81,22 @@ class ScopedArrayNode extends Node {
 
 	element( indexNode ) {
 
-		return new ScopedArrayElementNode( this, indexNode );
+		return nodeObject( new ScopedArrayElementNode( this, indexNode ) );
 
 	}
 
 	generate( builder ) {
 
-		return builder.getScopedArray( this.name || `${this.scope}Array${this.id}`, this.scope, this.bufferType, this.bufferCount );
+		return builder.getScopedArray( this.name || `${this.scope}Array_${this.id}`, this.scope.toLowerCase(), this.bufferType, this.bufferCount );
 
 	}
 
 }
 
 export default ScopedArrayNode;
+
+export const workgroupArray = ( type, count ) => nodeObject( new ScopedArrayNode( 'Workgroup', type, count ) );
+export const privateArray = ( type, count ) => nodeObject( new ScopedArrayNode( 'Private', type, count ) );
+
+addNodeClass( 'ScopedArrayNode', ScopedArrayNode );
+

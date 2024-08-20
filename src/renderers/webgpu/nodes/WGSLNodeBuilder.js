@@ -799,11 +799,11 @@ ${ flowData.code }
 
 			const type = this.getType( bufferType );
 
-			snippets.push( `@var<${scope}> ${name}: array< ${type} : ${bufferCount};` );
+			snippets.push( `var<${scope}> ${name}: array< ${type}, ${bufferCount} >;` );
 
 		}
 
-		return snippets.join( ',\n\t' );
+		return snippets.join( '\n' );
 
 	}
 
@@ -1185,6 +1185,7 @@ ${ flowData.code }
 		} else {
 
 			this.computeShader = this._getWGSLComputeCode( shadersData.compute, ( this.object.workgroupSize || [ 64 ] ).join( ', ' ) );
+			console.log( this.computeShader );
 
 		}
 
