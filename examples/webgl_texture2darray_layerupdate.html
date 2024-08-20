@@ -141,9 +141,9 @@
 				};
 
 				const gui = new GUI();
-				gui.add(formData, 'srcLayer', 0, spiritedaway.image.depth - 1, 1);
-				gui.add(formData, 'destLayer', 0, textureArray.image.depth - 1, 1);
-				gui.add(formData, 'transfer');
+				gui.add( formData, 'srcLayer', 0, spiritedaway.image.depth - 1, 1 );
+				gui.add( formData, 'destLayer', 0, textureArray.image.depth - 1, 1 );
+				gui.add( formData, 'transfer' );
 
 				/// Setup the scene.
 
@@ -172,6 +172,15 @@
 				scene.add( mesh );
 
 				window.addEventListener( 'resize', onWindowResize );
+
+				// Initialize the texture array by first rendering the spirited away
+				// frames in order.
+
+				textureArray.mipmaps[ 0 ].data.set(
+					spiritedaway.mipmaps[ 0 ].data.subarray( 0, textureArray.mipmaps[ 0 ].data.length )
+				);
+				textureArray.needsUpdate = true;
+				renderer.render( scene, camera );
 
 			}
 
