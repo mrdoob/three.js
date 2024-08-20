@@ -4,8 +4,6 @@ import { getNodeChildren, getCacheKey } from './NodeUtils.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
 
-const NodeClasses = new Map();
-
 let _nodeId = 0;
 
 class Node extends EventDispatcher {
