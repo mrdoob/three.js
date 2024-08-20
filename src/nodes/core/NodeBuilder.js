@@ -6,7 +6,7 @@ import NodeCode from './NodeCode.js';
 import NodeCache from './NodeCache.js';
 import ParameterNode from './ParameterNode.js';
 import FunctionNode from '../code/FunctionNode.js';
-import { createNodeMaterialFromType, default as NodeMaterial } from '../materials/NodeMaterial.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import { NodeUpdateType, defaultBuildStages, shaderStages } from './constants.js';
 
 import {
@@ -15,7 +15,7 @@ import {
 } from '../../renderers/common/nodes/NodeUniform.js';
 
 import { stack } from './StackNode.js';
-import { getCurrentStack, setCurrentStack } from '../shadernode/ShaderNode.js';
+import { getCurrentStack, setCurrentStack } from '../tsl/TSLBase.js';
 
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
 import ChainMap from '../../renderers/common/ChainMap.js';
@@ -1224,12 +1224,21 @@ class NodeBuilder {
 
 	build() {
 
-		const { object, material } = this;
-
+		const { object, material, renderer } = this;
 
 		if ( material !== null ) {
 
-			NodeMaterial.fromMaterial( material ).build( this );
+			let nodeMaterial = renderer.nodes.library.fromMaterial( material );
+
+			if ( nodeMaterial === null ) {
+
+				console.error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
+
+				nodeMaterial = new NodeMaterial();
+
+			}
+
+			nodeMaterial.build( this );
 
 		} else {
 

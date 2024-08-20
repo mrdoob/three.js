@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, Fn, nodeObject, float, vec2, vec4, int, If } from '../shadernode/ShaderNode.js';
+import { Fn, nodeObject, float, vec2, vec4, int, If } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { abs, max, min, mix, pow } from '../math/MathNode.js';
@@ -321,7 +321,5 @@ class FXAANode extends TempNode {
 }
 
 export const fxaa = ( node ) => nodeObject( new FXAANode( nodeObject( node ).toTexture() ) );
-
-addNodeElement( 'fxaa', fxaa );
 
 export default FXAANode;

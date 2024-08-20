@@ -1,19 +1,17 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { temp } from '../core/VarNode.js';
-import { varying } from '../core/VaryingNode.js';
-import { property, varyingProperty } from '../core/PropertyNode.js';
-import { attribute } from '../core/AttributeNode.js';
-import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
-import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../accessors/MaterialNode.js';
-import { modelViewMatrix } from '../accessors/ModelNode.js';
-import { positionGeometry } from '../accessors/PositionNode.js';
-import { mix, smoothstep } from '../math/MathNode.js';
-import { Fn, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNode.js';
-import { uv } from '../accessors/UVNode.js';
-import { viewport } from '../display/ViewportNode.js';
-import { dashSize, gapSize } from '../core/PropertyNode.js';
+import NodeMaterial from './NodeMaterial.js';
+import { property, varyingProperty } from '../../nodes/core/PropertyNode.js';
+import { attribute } from '../../nodes/core/AttributeNode.js';
+import { cameraProjectionMatrix } from '../../nodes/accessors/CameraNode.js';
+import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../../nodes/accessors/MaterialNode.js';
+import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
+import { positionGeometry } from '../../nodes/accessors/PositionNode.js';
+import { mix, smoothstep } from '../../nodes/math/MathNode.js';
+import { Fn, varying, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
+import { uv } from '../../nodes/accessors/UVNode.js';
+import { viewport } from '../../nodes/display/ViewportNode.js';
+import { dashSize, gapSize } from '../../nodes/core/PropertyNode.js';
 
-import { LineDashedMaterial } from '../../materials/LineDashedMaterial.js';
+import { LineDashedMaterial } from '../LineDashedMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
@@ -127,13 +125,13 @@ class Line2NodeMaterial extends NodeMaterial {
 			const ndcEnd = clipEnd.xyz.div( clipEnd.w );
 
 			// direction
-			const dir = ndcEnd.xy.sub( ndcStart.xy ).temp();
+			const dir = ndcEnd.xy.sub( ndcStart.xy ).toVar();
 
 			// account for clip-space aspect ratio
 			dir.x.assign( dir.x.mul( aspect ) );
 			dir.assign( dir.normalize() );
 
-			const clip = temp( vec4() );
+			const clip = vec4().toVar();
 
 			if ( useWorldUnits ) {
 
@@ -176,7 +174,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				// shift the depth of the projected points so the line
 				// segments overlap neatly
-				const clipPose = temp( vec3() );
+				const clipPose = vec3().toVar();
 
 				clipPose.assign( positionGeometry.y.lessThan( 0.5 ).select( ndcStart, ndcEnd ) );
 				clip.z.assign( clipPose.z.mul( clip.w ) );
@@ -435,5 +433,3 @@ class Line2NodeMaterial extends NodeMaterial {
 }
 
 export default Line2NodeMaterial;
-
-addNodeMaterial( 'Line2NodeMaterial', Line2NodeMaterial );

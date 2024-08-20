@@ -1,29 +1,27 @@
-import { Material } from '../../materials/Material.js';
+import { Material } from '../Material.js';
 import { NormalBlending } from '../../constants.js';
 
-import { getNodeChildren, getCacheKey } from '../core/NodeUtils.js';
-import { attribute } from '../core/AttributeNode.js';
-import { output, diffuseColor, emissive, varyingProperty } from '../core/PropertyNode.js';
-import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAOMap } from '../accessors/MaterialNode.js';
-import { modelViewProjection } from '../accessors/ModelViewProjectionNode.js';
-import { normalLocal } from '../accessors/NormalNode.js';
-import { instance } from '../accessors/InstanceNode.js';
-import { batch } from '../accessors/BatchNode.js';
-import { materialReference } from '../accessors/MaterialReferenceNode.js';
-import { positionLocal } from '../accessors/PositionNode.js';
-import { skinningReference } from '../accessors/SkinningNode.js';
-import { morphReference } from '../accessors/MorphNode.js';
-import { lightsNode } from '../lighting/LightsNode.js';
-import { mix } from '../math/MathNode.js';
-import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
-import AONode from '../lighting/AONode.js';
-import { lightingContext } from '../lighting/LightingContextNode.js';
-import IrradianceNode from '../lighting/IrradianceNode.js';
-import { depth } from '../display/ViewportDepthNode.js';
-import { cameraLogDepth } from '../accessors/CameraNode.js';
-import { clipping, clippingAlpha } from '../accessors/ClippingNode.js';
-
-const NodeMaterials = new Map();
+import { getNodeChildren, getCacheKey } from '../../nodes/core/NodeUtils.js';
+import { attribute } from '../../nodes/core/AttributeNode.js';
+import { output, diffuseColor, emissive, varyingProperty } from '../../nodes/core/PropertyNode.js';
+import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAOMap } from '../../nodes/accessors/MaterialNode.js';
+import { modelViewProjection } from '../../nodes/accessors/ModelViewProjectionNode.js';
+import { normalLocal } from '../../nodes/accessors/NormalNode.js';
+import { instance } from '../../nodes/accessors/InstanceNode.js';
+import { batch } from '../../nodes/accessors/BatchNode.js';
+import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
+import { positionLocal } from '../../nodes/accessors/PositionNode.js';
+import { skinningReference } from '../../nodes/accessors/SkinningNode.js';
+import { morphReference } from '../../nodes/accessors/MorphNode.js';
+import { lights } from '../../nodes/lighting/LightsNode.js';
+import { mix } from '../../nodes/math/MathNode.js';
+import { float, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import AONode from '../../nodes/lighting/AONode.js';
+import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
+import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
+import { depth } from '../../nodes/display/ViewportDepthNode.js';
+import { cameraLogDepth } from '../../nodes/accessors/CameraNode.js';
+import { clipping, clippingAlpha } from '../../nodes/accessors/ClippingNode.js';
 
 class NodeMaterial extends Material {
 
@@ -421,7 +419,7 @@ class NodeMaterial extends Material {
 
 		if ( materialLightsNode.length > 0 ) {
 
-			lightsN = lightsNode( [ ...lightsN.lightNodes, ...materialLightsNode ] );
+			lightsN = lights( [ ...lightsN.getLights(), ...materialLightsNode ] );
 
 		}
 
@@ -448,7 +446,7 @@ class NodeMaterial extends Material {
 
 		let outgoingLightNode = this.setupOutgoingLight( builder );
 
-		if ( lightsNode && lightsNode.hasLight !== false ) {
+		if ( lightsNode && lightsNode.getLights().length > 0 ) {
 
 			const lightingModel = this.setupLightingModel( builder );
 
@@ -611,63 +609,6 @@ class NodeMaterial extends Material {
 
 	}
 
-	static fromMaterial( material ) {
-
-		if ( material.isNodeMaterial === true ) { // is already a node material
-
-			return material;
-
-		}
-
-		const type = material.type.replace( 'Material', 'NodeMaterial' );
-
-		const nodeMaterial = createNodeMaterialFromType( type );
-
-		if ( nodeMaterial === undefined ) {
-
-			throw new Error( `NodeMaterial: Material "${ material.type }" is not compatible.` );
-
-		}
-
-		for ( const key in material ) {
-
-			nodeMaterial[ key ] = material[ key ];
-
-		}
-
-		return nodeMaterial;
-
-	}
-
 }
 
 export default NodeMaterial;
-
-export function addNodeMaterial( type, nodeMaterial ) {
-
-	if ( typeof nodeMaterial !== 'function' || ! type ) throw new Error( `Node material ${ type } is not a class` );
-	if ( NodeMaterials.has( type ) ) {
-
-		console.warn( `Redefinition of node material ${ type }` );
-		return;
-
-	}
-
-	NodeMaterials.set( type, nodeMaterial );
-	nodeMaterial.type = type;
-
-}
-
-export function createNodeMaterialFromType( type ) {
-
-	const Material = NodeMaterials.get( type );
-
-	if ( Material !== undefined ) {
-
-		return new Material();
-
-	}
-
-}
-
-addNodeMaterial( 'NodeMaterial', NodeMaterial );

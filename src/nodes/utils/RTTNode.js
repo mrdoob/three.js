@@ -1,9 +1,8 @@
-import { nodeObject, addNodeElement } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../tsl/TSLCore.js';
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { addNodeClass } from '../core/Node.js';
-import NodeMaterial from '../materials/NodeMaterial.js';
 import { uv } from '../accessors/UVNode.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 import { RenderTarget } from '../../core/RenderTarget.js';
@@ -124,7 +123,4 @@ class RTTNode extends TextureNode {
 export default RTTNode;
 
 export const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( node ), ...params ) );
-
-addNodeElement( 'toTexture', ( node, ...params ) => node.isTextureNode ? node : rtt( node, ...params ) );
-
-addNodeClass( 'RTTNode', RTTNode );
+export const convertToTexture = ( node, ...params ) => node.isTextureNode ? node : rtt( node, ...params );

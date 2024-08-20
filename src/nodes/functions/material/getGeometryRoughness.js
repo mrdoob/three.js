@@ -1,5 +1,5 @@
 import { normalView } from '../../accessors/NormalNode.js';
-import { Fn } from '../../shadernode/ShaderNode.js';
+import { Fn } from '../../tsl/TSLBase.js';
 
 const getGeometryRoughness = Fn( () => {
 

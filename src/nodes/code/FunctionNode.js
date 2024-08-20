@@ -1,6 +1,5 @@
 import CodeNode from './CodeNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 
 class FunctionNode extends CodeNode {
 
@@ -108,5 +107,3 @@ const nativeFn = ( code, includes = [], language = '' ) => {
 
 export const glslFn = ( code, includes ) => nativeFn( code, includes, 'glsl' );
 export const wgslFn = ( code, includes ) => nativeFn( code, includes, 'wgsl' );
-
-addNodeClass( 'FunctionNode', FunctionNode );

@@ -1,8 +1,7 @@
-import { addNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { modelViewMatrix } from './ModelNode.js';
 import { positionLocal, positionPrevious } from './PositionNode.js';
-import { nodeImmutable } from '../shadernode/ShaderNode.js';
+import { nodeImmutable } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { uniform } from '../core/UniformNode.js';
@@ -79,5 +78,3 @@ function getPreviousMatrix( object ) {
 export default VelocityNode;
 
 export const velocity = nodeImmutable( VelocityNode );
-
-addNodeClass( 'VelocityNode', VelocityNode );

@@ -1,8 +1,7 @@
 import LightingNode from './LightingNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { float, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { float, vec2, vec3, vec4 } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/PositionNode.js';
@@ -11,7 +10,7 @@ import { mix, fract } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
 import { Color } from '../../math/Color.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { Fn } from '../shadernode/ShaderNode.js';
+import { Fn } from '../tsl/TSLBase.js';
 import { LessCompare, WebGPUCoordinateSystem } from '../../constants.js';
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
@@ -348,5 +347,3 @@ class AnalyticLightNode extends LightingNode {
 }
 
 export default AnalyticLightNode;
-
-addNodeClass( 'AnalyticLightNode', AnalyticLightNode );

@@ -1,5 +1,4 @@
 import Node from './Node.js';
-import { addNodeClass } from './Node.js';
 
 class UniformGroupNode extends Node {
 
@@ -52,5 +51,3 @@ export const renderGroup = sharedUniformGroup( 'render' );
 export const objectGroup = uniformGroup( 'object' );
 
 export default UniformGroupNode;
-
-addNodeClass( 'UniformGroupNode', UniformGroupNode );

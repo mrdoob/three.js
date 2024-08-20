@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, nodeObject, Fn, mat3, vec2, vec3, vec4, float, int, If } from '../shadernode/ShaderNode.js';
+import { nodeObject, Fn, mat3, vec2, vec3, vec4, float, int, If } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { DataTexture } from '../../textures/DataTexture.js';
@@ -318,7 +318,5 @@ function generateMagicSquare( size ) {
 }
 
 export const ao = ( depthNode, normalNode, camera ) => nodeObject( new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
-
-addNodeElement( 'ao', ao );
 
 export default GTAONode;

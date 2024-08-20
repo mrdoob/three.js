@@ -1,7 +1,6 @@
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 import { viewportTopLeft } from './ViewportNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
@@ -74,8 +73,3 @@ export default ViewportTextureNode;
 
 export const viewportTexture = nodeProxy( ViewportTextureNode );
 export const viewportMipTexture = nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );
-
-addNodeElement( 'viewportTexture', viewportTexture );
-addNodeElement( 'viewportMipTexture', viewportMipTexture );
-
-addNodeClass( 'ViewportTextureNode', ViewportTextureNode );

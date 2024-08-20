@@ -1,6 +1,6 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 import { attribute } from '../core/AttributeNode.js';
 import { reference, referenceBuffer } from './ReferenceNode.js';
 import { add } from '../math/OperatorNode.js';
@@ -183,5 +183,3 @@ export default SkinningNode;
 
 export const skinning = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh ) );
 export const skinningReference = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh, true ) );
-
-addNodeClass( 'SkinningNode', SkinningNode );

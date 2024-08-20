@@ -1,7 +1,7 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
-import { nodeImmutable, vec2 } from '../shadernode/ShaderNode.js';
+import { nodeImmutable, vec2 } from '../tsl/TSLBase.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -133,5 +133,3 @@ export const viewportTopLeft = nodeImmutable( ViewportNode, ViewportNode.TOP_LEF
 export const viewportBottomLeft = nodeImmutable( ViewportNode, ViewportNode.BOTTOM_LEFT );
 export const viewportTopRight = nodeImmutable( ViewportNode, ViewportNode.TOP_RIGHT );
 export const viewportBottomRight = nodeImmutable( ViewportNode, ViewportNode.BOTTOM_RIGHT );
-
-addNodeClass( 'ViewportNode', ViewportNode );

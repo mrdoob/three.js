@@ -1,6 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class OperatorNode extends TempNode {
 
@@ -281,27 +280,27 @@ export const bitXor = nodeProxy( OperatorNode, '^' );
 export const shiftLeft = nodeProxy( OperatorNode, '<<' );
 export const shiftRight = nodeProxy( OperatorNode, '>>' );
 
-addNodeElement( 'add', add );
-addNodeElement( 'sub', sub );
-addNodeElement( 'mul', mul );
-addNodeElement( 'div', div );
-addNodeElement( 'modInt', modInt );
-addNodeElement( 'equal', equal );
-addNodeElement( 'notEqual', notEqual );
-addNodeElement( 'lessThan', lessThan );
-addNodeElement( 'greaterThan', greaterThan );
-addNodeElement( 'lessThanEqual', lessThanEqual );
-addNodeElement( 'greaterThanEqual', greaterThanEqual );
-addNodeElement( 'and', and );
-addNodeElement( 'or', or );
-addNodeElement( 'not', not );
-addNodeElement( 'xor', xor );
-addNodeElement( 'bitAnd', bitAnd );
-addNodeElement( 'bitNot', bitNot );
-addNodeElement( 'bitOr', bitOr );
-addNodeElement( 'bitXor', bitXor );
-addNodeElement( 'shiftLeft', shiftLeft );
-addNodeElement( 'shiftRight', shiftRight );
+addMethodChaining( 'add', add );
+addMethodChaining( 'sub', sub );
+addMethodChaining( 'mul', mul );
+addMethodChaining( 'div', div );
+addMethodChaining( 'modInt', modInt );
+addMethodChaining( 'equal', equal );
+addMethodChaining( 'notEqual', notEqual );
+addMethodChaining( 'lessThan', lessThan );
+addMethodChaining( 'greaterThan', greaterThan );
+addMethodChaining( 'lessThanEqual', lessThanEqual );
+addMethodChaining( 'greaterThanEqual', greaterThanEqual );
+addMethodChaining( 'and', and );
+addMethodChaining( 'or', or );
+addMethodChaining( 'not', not );
+addMethodChaining( 'xor', xor );
+addMethodChaining( 'bitAnd', bitAnd );
+addMethodChaining( 'bitNot', bitNot );
+addMethodChaining( 'bitOr', bitOr );
+addMethodChaining( 'bitXor', bitXor );
+addMethodChaining( 'shiftLeft', shiftLeft );
+addMethodChaining( 'shiftRight', shiftRight );
 
 
 export const remainder = ( ...params ) => { // @deprecated, r168
@@ -311,6 +310,4 @@ export const remainder = ( ...params ) => { // @deprecated, r168
 
 };
 
-addNodeElement( 'remainder', remainder );
-
-addNodeClass( 'OperatorNode', OperatorNode );
+addMethodChaining( 'remainder', remainder );

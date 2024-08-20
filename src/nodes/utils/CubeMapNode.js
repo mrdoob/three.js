@@ -1,7 +1,6 @@
 import TempNode from '../core/TempNode.js';
-import { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 import { CubeTexture } from '../../textures/CubeTexture.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
@@ -151,7 +150,5 @@ function mapTextureMapping( texture, mapping ) {
 }
 
 export const cubeMapNode = nodeProxy( CubeMapNode );
-
-addNodeClass( 'CubeMapNode', CubeMapNode );
 
 export default CubeMapNode;

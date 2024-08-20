@@ -1,8 +1,7 @@
-import ReferenceNode from './ReferenceNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import ReferenceBaseNode from './ReferenceBaseNode.js';
+import { nodeObject } from '../tsl/TSLCore.js';
 
-class RendererReferenceNode extends ReferenceNode {
+class RendererReferenceNode extends ReferenceBaseNode {
 
 	constructor( property, inputType, renderer = null ) {
 
@@ -25,5 +24,3 @@ class RendererReferenceNode extends ReferenceNode {
 export default RendererReferenceNode;
 
 export const rendererReference = ( name, type, renderer ) => nodeObject( new RendererReferenceNode( name, type, renderer ) );
-
-addNodeClass( 'RendererReferenceNode', RendererReferenceNode );

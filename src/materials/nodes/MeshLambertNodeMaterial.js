@@ -1,8 +1,8 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import BasicEnvironmentNode from '../lighting/BasicEnvironmentNode.js';
-import PhongLightingModel from '../functions/PhongLightingModel.js';
+import NodeMaterial from './NodeMaterial.js';
+import BasicEnvironmentNode from '../../nodes/lighting/BasicEnvironmentNode.js';
+import PhongLightingModel from '../../nodes/functions/PhongLightingModel.js';
 
-import { MeshLambertMaterial } from '../../materials/MeshLambertMaterial.js';
+import { MeshLambertMaterial } from '../MeshLambertMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshLambertMaterial();
 
@@ -39,5 +39,3 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 }
 
 export default MeshLambertNodeMaterial;
-
-addNodeMaterial( 'MeshLambertNodeMaterial', MeshLambertNodeMaterial );

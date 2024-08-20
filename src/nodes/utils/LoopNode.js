@@ -1,6 +1,6 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { expression } from '../code/ExpressionNode.js';
-import { nodeObject, nodeArray } from '../shadernode/ShaderNode.js';
+import { nodeObject, nodeArray } from '../tsl/TSLBase.js';
 
 class LoopNode extends Node {
 
@@ -203,5 +203,3 @@ export const loop = ( ...params ) => { // @deprecated, r168
 	return Loop( ...params );
 
 };
-
-addNodeClass( 'LoopNode', LoopNode );

@@ -1,13 +1,13 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { diffuseColor, metalness, roughness, specularColor, specularF90 } from '../core/PropertyNode.js';
-import { mix } from '../math/MathNode.js';
-import { materialRoughness, materialMetalness } from '../accessors/MaterialNode.js';
-import getRoughness from '../functions/material/getRoughness.js';
-import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
-import EnvironmentNode from '../lighting/EnvironmentNode.js';
-import { float, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import NodeMaterial from './NodeMaterial.js';
+import { diffuseColor, metalness, roughness, specularColor, specularF90 } from '../../nodes/core/PropertyNode.js';
+import { mix } from '../../nodes/math/MathNode.js';
+import { materialRoughness, materialMetalness } from '../../nodes/accessors/MaterialNode.js';
+import getRoughness from '../../nodes/functions/material/getRoughness.js';
+import PhysicalLightingModel from '../../nodes/functions/PhysicalLightingModel.js';
+import EnvironmentNode from '../../nodes/lighting/EnvironmentNode.js';
+import { float, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 
-import { MeshStandardMaterial } from '../../materials/MeshStandardMaterial.js';
+import { MeshStandardMaterial } from '../MeshStandardMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshStandardMaterial();
 
@@ -100,5 +100,3 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 }
 
 export default MeshStandardNodeMaterial;
-
-addNodeMaterial( 'MeshStandardNodeMaterial', MeshStandardNodeMaterial );

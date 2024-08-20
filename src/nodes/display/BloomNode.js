@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { addNodeElement, Fn, nodeObject, float, vec4, int } from '../shadernode/ShaderNode.js';
+import { Fn, nodeObject, float, vec4, int } from '../tsl/TSLBase.js';
 import { mix, smoothstep } from '../math/MathNode.js';
 import { luminance } from './ColorAdjustmentNode.js';
 import { uniform } from '../core/UniformNode.js';
@@ -327,7 +327,5 @@ class BloomNode extends TempNode {
 }
 
 export const bloom = ( node, strength, radius, threshold ) => nodeObject( new BloomNode( nodeObject( node ), strength, radius, threshold ) );
-
-addNodeElement( 'bloom', bloom );
 
 export default BloomNode;

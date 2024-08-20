@@ -1,6 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeObject } from '../shadernode/ShaderNode.js';
+import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
 import { LinearSRGBColorSpace, SRGBColorSpace, NoToneMapping } from '../../constants.js';
 
@@ -51,6 +50,4 @@ export default RenderOutputNode;
 
 export const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => nodeObject( new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace ) );
 
-addNodeElement( 'renderOutput', renderOutput );
-
-addNodeClass( 'RenderOutputNode', RenderOutputNode );
+addMethodChaining( 'renderOutput', renderOutput );

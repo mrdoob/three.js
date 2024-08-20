@@ -1,6 +1,5 @@
 import ReferenceNode from './ReferenceNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 
 class UserDataNode extends ReferenceNode {
 
@@ -25,5 +24,3 @@ class UserDataNode extends ReferenceNode {
 export default UserDataNode;
 
 export const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );
-
-addNodeClass( 'UserDataNode', UserDataNode );

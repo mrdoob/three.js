@@ -1,7 +1,7 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import UniformNode from '../core/UniformNode.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 
 import { Vector3 } from '../../math/Vector3.js';
 
@@ -146,5 +146,3 @@ export const objectWorldMatrix = nodeProxy( Object3DNode, Object3DNode.WORLD_MAT
 export const objectPosition = nodeProxy( Object3DNode, Object3DNode.POSITION );
 export const objectScale = nodeProxy( Object3DNode, Object3DNode.SCALE );
 export const objectViewPosition = nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
-
-addNodeClass( 'Object3DNode', Object3DNode );

@@ -1,11 +1,11 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { materialReference } from '../accessors/MaterialReferenceNode.js';
-import { diffuseColor } from '../core/PropertyNode.js';
-import { vec3 } from '../shadernode/ShaderNode.js';
-import { mix } from '../math/MathNode.js';
-import { matcapUV } from '../utils/MatcapUVNode.js';
+import NodeMaterial from './NodeMaterial.js';
+import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
+import { diffuseColor } from '../../nodes/core/PropertyNode.js';
+import { vec3 } from '../../nodes/tsl/TSLBase.js';
+import { mix } from '../../nodes/math/MathNode.js';
+import { matcapUV } from '../../nodes/utils/MatcapUVNode.js';
 
-import { MeshMatcapMaterial } from '../../materials/MeshMatcapMaterial.js';
+import { MeshMatcapMaterial } from '../MeshMatcapMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshMatcapMaterial();
 
@@ -49,5 +49,3 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 
 
 export default MeshMatcapNodeMaterial;
-
-addNodeMaterial( 'MeshMatcapNodeMaterial', MeshMatcapNodeMaterial );

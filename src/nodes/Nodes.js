@@ -10,11 +10,11 @@ export { default as AttributeNode, attribute } from './core/AttributeNode.js';
 export { default as BypassNode, bypass } from './core/BypassNode.js';
 export { default as CacheNode, cache } from './core/CacheNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
-export { default as ContextNode, context, label } from './core/ContextNode.js';
+export { default as ContextNode } from './core/ContextNode.js';
 export { default as IndexNode, vertexIndex, instanceIndex, drawIndex } from './core/IndexNode.js';
 export { default as LightingModel } from './core/LightingModel.js';
-export { default as Node, addNodeClass, createNodeFromType } from './core/Node.js';
-export { default as VarNode, temp } from './core/VarNode.js';
+export { default as Node } from './core/Node.js';
+export { default as VarNode } from './core/VarNode.js';
 export { default as NodeAttribute } from './core/NodeAttribute.js';
 export { default as NodeBuilder } from './core/NodeBuilder.js';
 export { default as NodeCache } from './core/NodeCache.js';
@@ -38,11 +38,10 @@ import * as NodeUtils from './core/NodeUtils.js';
 export { NodeUtils };
 
 // math
-export { default as MathNode, PI, PI2, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, lengthSq, negate, oneMinus, dFdx, dFdy, round, reciprocal, trunc, fwidth, bitcast, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward, cbrt, transpose, all, any, equals, rand } from './math/MathNode.js';
-
 export { default as OperatorNode, add, sub, mul, div, modInt, equal, lessThan, greaterThan, lessThanEqual, greaterThanEqual, and, or, not, xor, bitAnd, bitNot, bitOr, bitXor, shiftLeft, shiftRight, remainder } from './math/OperatorNode.js';
-export { default as CondNode, select, cond } from './math/CondNode.js';
-export { default as HashNode, hash } from './math/HashNode.js';
+export { default as MathNode, PI, PI2, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, lengthSq, negate, oneMinus, dFdx, dFdy, round, reciprocal, trunc, fwidth, bitcast, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward, cbrt, transpose, all, any, equals, rand } from './math/MathNode.js';
+export { default as ConditionalNode, select, cond } from './math/ConditionalNode.js';
+export * from './math/HashNode.js';
 
 // math utils
 export { parabola, gain, pcurve, sinc } from './math/MathUtils.js';
@@ -59,7 +58,7 @@ export { default as LoopNode, Loop, Continue, Break } from './utils/LoopNode.js'
 export { default as MatcapUVNode, matcapUV } from './utils/MatcapUVNode.js';
 export { default as MaxMipLevelNode, maxMipLevel } from './utils/MaxMipLevelNode.js';
 export { default as OscNode, oscSine, oscSquare, oscTriangle, oscSawtooth } from './utils/OscNode.js';
-export { default as PackingNode, directionToColor, colorToDirection } from './utils/PackingNode.js';
+export * from './utils/PackingNode.js';
 export { default as RemapNode, remap, remapClamp } from './utils/RemapNode.js';
 export * from './utils/UVUtils.js';
 export * from './utils/SpriteUtils.js';
@@ -74,8 +73,8 @@ export { default as TriplanarTexturesNode, triplanarTextures, triplanarTexture }
 export { default as ReflectorNode, reflector } from './utils/ReflectorNode.js';
 export { default as RTTNode, rtt } from './utils/RTTNode.js';
 
-// shadernode
-export * from './shadernode/ShaderNode.js';
+// three.js shading language
+export * from './tsl/TSLBase.js';
 
 // accessors
 export { TBNViewMatrix, parallaxDirection, parallaxUV, transformedBentNormalView } from './accessors/AccessorsUtils.js';
@@ -118,7 +117,7 @@ export * from './accessors/VelocityNode.js';
 export { default as BlendModeNode, burn, dodge, overlay, screen } from './display/BlendModeNode.js';
 export { default as BumpMapNode, bumpMap } from './display/BumpMapNode.js';
 export { default as ColorAdjustmentNode, saturation, vibrance, hue, luminance, threshold } from './display/ColorAdjustmentNode.js';
-export { default as ColorSpaceNode, linearToColorSpace, colorSpaceToLinear, linearTosRGB, sRGBToLinear } from './display/ColorSpaceNode.js';
+export { default as ColorSpaceNode, linearToColorSpace, colorSpaceToLinear } from './display/ColorSpaceNode.js';
 export { default as FrontFacingNode, frontFacing, faceDirection } from './display/FrontFacingNode.js';
 export { default as NormalMapNode, normalMap } from './display/NormalMapNode.js';
 export { default as PosterizeNode, posterize } from './display/PosterizeNode.js';
@@ -151,6 +150,12 @@ export { sepia } from './display/SepiaNode.js';
 
 export { default as PassNode, pass, passTexture, depthPass } from './display/PassNode.js';
 
+import * as ColorSpaceFunctions from './display/ColorSpaceFunctions.js';
+export { ColorSpaceFunctions };
+
+import * as ToneMappingFunctions from './display/ToneMappingFunctions.js';
+export { ToneMappingFunctions };
+
 // code
 export { default as ExpressionNode, expression } from './code/ExpressionNode.js';
 export { default as CodeNode, code, js, wgsl, glsl } from './code/CodeNode.js';
@@ -178,7 +183,7 @@ export { default as RectAreaLightNode } from './lighting/RectAreaLightNode.js';
 export { default as SpotLightNode } from './lighting/SpotLightNode.js';
 export { default as IESSpotLightNode } from './lighting/IESSpotLightNode.js';
 export { default as AmbientLightNode } from './lighting/AmbientLightNode.js';
-export { default as LightsNode, lights, lightsNode, addLightNode } from './lighting/LightsNode.js';
+export { default as LightsNode, lights } from './lighting/LightsNode.js';
 export { default as LightingNode /* @TODO: lighting (abstract), light */ } from './lighting/LightingNode.js';
 export { default as LightingContextNode, lightingContext } from './lighting/LightingContextNode.js';
 export { default as HemisphereLightNode } from './lighting/HemisphereLightNode.js';
@@ -196,16 +201,8 @@ export * from './pmrem/PMREMUtils.js';
 // procedural
 export { default as CheckerNode, checker } from './procedural/CheckerNode.js';
 
-// loaders
-export { default as NodeLoader } from './loaders/NodeLoader.js';
-export { default as NodeObjectLoader } from './loaders/NodeObjectLoader.js';
-export { default as NodeMaterialLoader } from './loaders/NodeMaterialLoader.js';
-
 // parsers
 export { default as GLSLNodeParser } from './parsers/GLSLNodeParser.js'; // @TODO: Move to jsm/renderers/webgl.
-
-// materials
-export * from './materials/Materials.js';
 
 // materialX
 export * from './materialx/MaterialXNodes.js';

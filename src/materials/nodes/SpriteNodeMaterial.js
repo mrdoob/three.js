@@ -1,12 +1,12 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { uniform } from '../core/UniformNode.js';
-import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
-import { materialRotation } from '../accessors/MaterialNode.js';
-import { modelViewMatrix, modelWorldMatrix } from '../accessors/ModelNode.js';
-import { positionLocal } from '../accessors/PositionNode.js';
-import { float, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import NodeMaterial from './NodeMaterial.js';
+import { uniform } from '../../nodes/core/UniformNode.js';
+import { cameraProjectionMatrix } from '../../nodes/accessors/CameraNode.js';
+import { materialRotation } from '../../nodes/accessors/MaterialNode.js';
+import { modelViewMatrix, modelWorldMatrix } from '../../nodes/accessors/ModelNode.js';
+import { positionLocal } from '../../nodes/accessors/PositionNode.js';
+import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 
-import { SpriteMaterial } from '../../materials/SpriteMaterial.js';
+import { SpriteMaterial } from '../SpriteMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new SpriteMaterial();
 
@@ -85,5 +85,3 @@ class SpriteNodeMaterial extends NodeMaterial {
 }
 
 export default SpriteNodeMaterial;
-
-addNodeMaterial( 'SpriteNodeMaterial', SpriteNodeMaterial );

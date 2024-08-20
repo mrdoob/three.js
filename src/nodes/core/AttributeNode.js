@@ -1,6 +1,5 @@
-import Node, { addNodeClass } from './Node.js';
-import { varying } from './VaryingNode.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import Node from './Node.js';
+import { nodeObject, varying } from '../tsl/TSLBase.js';
 
 class AttributeNode extends Node {
 
@@ -118,5 +117,3 @@ class AttributeNode extends Node {
 export default AttributeNode;
 
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
-
-addNodeClass( 'AttributeNode', AttributeNode );

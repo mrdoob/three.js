@@ -1,7 +1,6 @@
 import InputNode from '../core/InputNode.js';
-import { addNodeClass } from '../core/Node.js';
+import { nodeObject, addMethodChaining } from '../tsl/TSLCore.js';
 import { varying } from '../core/VaryingNode.js';
-import { nodeObject, addNodeElement } from '../shadernode/ShaderNode.js';
 
 import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribute.js';
 import { InterleavedBuffer } from '../../core/InterleavedBuffer.js';
@@ -157,6 +156,4 @@ export const dynamicBufferAttribute = ( array, type, stride, offset ) => bufferA
 export const instancedBufferAttribute = ( array, type, stride, offset ) => bufferAttribute( array, type, stride, offset ).setInstanced( true );
 export const instancedDynamicBufferAttribute = ( array, type, stride, offset ) => dynamicBufferAttribute( array, type, stride, offset ).setInstanced( true );
 
-addNodeElement( 'toAttribute', ( bufferNode ) => bufferAttribute( bufferNode.value ) );
-
-addNodeClass( 'BufferAttributeNode', BufferAttributeNode );
+addMethodChaining( 'toAttribute', ( bufferNode ) => bufferAttribute( bufferNode.value ) );

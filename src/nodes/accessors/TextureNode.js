@@ -3,9 +3,8 @@ import { uv } from './UVNode.js';
 import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToLinear } from '../display/ColorSpaceNode.js';
 import { expression } from '../code/ExpressionNode.js';
-import { addNodeClass } from '../core/Node.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
-import { addNodeElement, nodeProxy, vec3, nodeObject } from '../shadernode/ShaderNode.js';
+import { nodeProxy, vec3, nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 
 import { IntType, UnsignedIntType } from '../../constants.js';
@@ -436,8 +435,3 @@ export const textureLoad = ( ...params ) => texture( ...params ).setSampler( fal
 //export const textureLevel = ( value, uv, level ) => texture( value, uv ).level( level );
 
 export const sampler = ( aTexture ) => ( aTexture.isNode === true ? aTexture : texture( aTexture ) ).convert( 'sampler' );
-
-addNodeElement( 'texture', texture );
-//addNodeElement( 'textureLevel', textureLevel );
-
-addNodeClass( 'TextureNode', TextureNode );

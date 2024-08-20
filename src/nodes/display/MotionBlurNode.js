@@ -1,4 +1,4 @@
-import { float, int, Fn } from '../shadernode/ShaderNode.js';
+import { float, int, Fn } from '../tsl/TSLBase.js';
 import { Loop } from '../utils/LoopNode.js';
 import { uv } from '../accessors/UVNode.js';
 

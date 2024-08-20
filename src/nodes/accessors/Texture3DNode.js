@@ -1,6 +1,5 @@
 import TextureNode from './TextureNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { nodeProxy, vec3, Fn, If } from '../shadernode/ShaderNode.js';
+import { nodeProxy, vec3, Fn, If } from '../tsl/TSLBase.js';
 
 const normal = Fn( ( { texture, uv } ) => {
 
@@ -96,5 +95,3 @@ class Texture3DNode extends TextureNode {
 export default Texture3DNode;
 
 export const texture3D = nodeProxy( Texture3DNode );
-
-addNodeClass( 'Texture3DNode', Texture3DNode );

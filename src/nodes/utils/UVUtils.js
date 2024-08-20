@@ -1,4 +1,4 @@
-import { addNodeElement, Fn, vec2 } from '../shadernode/ShaderNode.js';
+import { Fn, vec2 } from '../tsl/TSLBase.js';
 
 export const rotateUV = Fn( ( [ uv, rotation, center = vec2( 0.5 ) ] ) => {
 
@@ -16,6 +16,3 @@ export const spherizeUV = Fn( ( [ uv, strength, center = vec2( 0.5 ) ] ) => {
 	return uv.add( delta.mul( deltaOffset ) );
 
 } );
-
-addNodeElement( 'rotateUV', rotateUV );
-addNodeElement( 'spherizeUV', spherizeUV );

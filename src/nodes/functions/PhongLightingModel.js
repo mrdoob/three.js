@@ -6,7 +6,7 @@ import { transformedNormalView } from '../accessors/NormalNode.js';
 import { materialSpecularStrength } from '../accessors/MaterialNode.js';
 import { shininess, specularColor } from '../core/PropertyNode.js';
 import { positionViewDirection } from '../accessors/PositionNode.js';
-import { Fn, float } from '../shadernode/ShaderNode.js';
+import { Fn, float } from '../tsl/TSLBase.js';
 
 const G_BlinnPhong_Implicit = () => float( 0.25 );
 

@@ -1,14 +1,13 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { varying } from '../core/VaryingNode.js';
-import { property } from '../core/PropertyNode.js';
-import { materialReference } from '../accessors/MaterialReferenceNode.js';
-import { modelWorldMatrixInverse } from '../accessors/ModelNode.js';
-import { cameraPosition } from '../accessors/CameraNode.js';
-import { positionGeometry } from '../accessors/PositionNode.js';
-import { Fn, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
-import { min, max } from '../math/MathNode.js';
-import { Loop, Break } from '../utils/LoopNode.js';
-import { texture3D } from '../accessors/Texture3DNode.js';
+import NodeMaterial from './NodeMaterial.js';
+import { property } from '../../nodes/core/PropertyNode.js';
+import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
+import { modelWorldMatrixInverse } from '../../nodes/accessors/ModelNode.js';
+import { cameraPosition } from '../../nodes/accessors/CameraNode.js';
+import { positionGeometry } from '../../nodes/accessors/PositionNode.js';
+import { Fn, varying, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { min, max } from '../../nodes/math/MathNode.js';
+import { Loop, Break } from '../../nodes/utils/LoopNode.js';
+import { texture3D } from '../../nodes/accessors/Texture3DNode.js';
 
 class VolumeNodeMaterial extends NodeMaterial {
 
@@ -101,5 +100,3 @@ class VolumeNodeMaterial extends NodeMaterial {
 }
 
 export default VolumeNodeMaterial;
-
-addNodeMaterial( 'VolumeNodeMaterial', VolumeNodeMaterial );

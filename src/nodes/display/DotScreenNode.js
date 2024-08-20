@@ -1,5 +1,5 @@
 import TempNode from '../core/TempNode.js';
-import { nodeObject, addNodeElement, Fn, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { nodeObject, Fn, vec2, vec3, vec4 } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uv } from '../accessors/UVNode.js';
@@ -69,7 +69,4 @@ class DotScreenNode extends TempNode {
 
 export const dotScreen = ( node, center, angle, scale ) => nodeObject( new DotScreenNode( nodeObject( node ), center, angle, scale ) );
 
-addNodeElement( 'dotScreen', dotScreen );
-
 export default DotScreenNode;
-

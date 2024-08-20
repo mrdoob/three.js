@@ -1,6 +1,6 @@
 import WebGPU from '../../../examples/jsm/capabilities/WebGPU.js';
 
-import Renderer from '../common/Renderer.js';
+import StandardRenderer from '../common/StandardRenderer.js';
 import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
 /*
@@ -17,7 +17,7 @@ const debugHandler = {
 
 };
 */
-class WebGPURenderer extends Renderer {
+class WebGPURenderer extends StandardRenderer {
 
 	constructor( parameters = {} ) {
 

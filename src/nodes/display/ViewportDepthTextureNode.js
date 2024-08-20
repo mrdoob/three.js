@@ -1,6 +1,5 @@
 import ViewportTextureNode from './ViewportTextureNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 import { viewportTopLeft } from './ViewportNode.js';
 
 import { DepthTexture } from '../../textures/DepthTexture.js';
@@ -26,7 +25,3 @@ class ViewportDepthTextureNode extends ViewportTextureNode {
 export default ViewportDepthTextureNode;
 
 export const viewportDepthTexture = nodeProxy( ViewportDepthTextureNode );
-
-addNodeElement( 'viewportDepthTexture', viewportDepthTexture );
-
-addNodeClass( 'ViewportDepthTextureNode', ViewportDepthTextureNode );

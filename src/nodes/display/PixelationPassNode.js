@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, Fn, nodeObject, vec2, vec3, float, If } from '../shadernode/ShaderNode.js';
+import { Fn, nodeObject, vec2, vec3, float, If } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { dot, clamp, smoothstep, sign, step, floor } from '../math/MathNode.js';
@@ -151,8 +151,6 @@ class PixelationNode extends TempNode {
 }
 
 const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
-
-addNodeElement( 'pixelation', pixelation );
 
 class PixelationPassNode extends PassNode {
 

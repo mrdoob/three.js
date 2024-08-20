@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import Node from '../core/Node.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
 import { cameraViewMatrix } from '../accessors/CameraNode.js';
 
@@ -53,5 +53,3 @@ LightNode.TARGET_DIRECTION = 'targetDirection';
 export default LightNode;
 
 export const lightTargetDirection = nodeProxy( LightNode, LightNode.TARGET_DIRECTION );
-
-addNodeClass( 'LightNode', LightNode );

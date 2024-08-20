@@ -1,11 +1,10 @@
-import CondNode from '../math/CondNode.js';
+import ConditionalNode from '../math/ConditionalNode.js';
 import { expression } from '../code/ExpressionNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 let discardExpression;
 
-class DiscardNode extends CondNode {
+class DiscardNode extends ConditionalNode {
 
 	constructor( condNode ) {
 
@@ -23,6 +22,4 @@ export const inlineDiscard = nodeProxy( DiscardNode );
 export const discard = ( condNode ) => inlineDiscard( condNode ).append();
 export const Return = () => expression( 'return' ).append();
 
-addNodeElement( 'discard', discard ); // @TODO: Check... this cause a little confusing using in chaining
-
-addNodeClass( 'DiscardNode', DiscardNode );
+addMethodChaining( 'discard', discard ); // @TODO: Check... this cause a little confusing using in chaining

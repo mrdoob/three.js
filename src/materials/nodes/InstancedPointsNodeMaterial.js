@@ -1,17 +1,16 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { varying } from '../core/VaryingNode.js';
-import { property } from '../core/PropertyNode.js';
-import { attribute } from '../core/AttributeNode.js';
-import { cameraProjectionMatrix } from '../accessors/CameraNode.js';
-import { materialColor, materialPointWidth } from '../accessors/MaterialNode.js'; // or should this be a property, instead?
-import { modelViewMatrix } from '../accessors/ModelNode.js';
-import { positionGeometry } from '../accessors/PositionNode.js';
-import { smoothstep } from '../math/MathNode.js';
-import { Fn, vec2, vec4 } from '../shadernode/ShaderNode.js';
-import { uv } from '../accessors/UVNode.js';
-import { viewport } from '../display/ViewportNode.js';
+import NodeMaterial from './NodeMaterial.js';
+import { property } from '../../nodes/core/PropertyNode.js';
+import { attribute } from '../../nodes/core/AttributeNode.js';
+import { cameraProjectionMatrix } from '../../nodes/accessors/CameraNode.js';
+import { materialColor, materialPointWidth } from '../../nodes/accessors/MaterialNode.js'; // or should this be a property, instead?
+import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
+import { positionGeometry } from '../../nodes/accessors/PositionNode.js';
+import { smoothstep } from '../../nodes/math/MathNode.js';
+import { Fn, varying, vec2, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { uv } from '../../nodes/accessors/UVNode.js';
+import { viewport } from '../../nodes/display/ViewportNode.js';
 
-import { PointsMaterial } from '../../materials/PointsMaterial.js';
+import { PointsMaterial } from '../PointsMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new PointsMaterial();
 
@@ -164,5 +163,3 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 }
 
 export default InstancedPointsNodeMaterial;
-
-addNodeMaterial( 'InstancedPointsNodeMaterial', InstancedPointsNodeMaterial );

@@ -1,6 +1,6 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { scriptableValue } from './ScriptableValueNode.js';
-import { addNodeElement, nodeProxy, float } from '../shadernode/ShaderNode.js';
+import { nodeProxy, float } from '../tsl/TSLBase.js';
 
 class Resources extends Map {
 
@@ -496,7 +496,3 @@ class ScriptableNode extends Node {
 export default ScriptableNode;
 
 export const scriptable = nodeProxy( ScriptableNode );
-
-addNodeElement( 'scriptable', scriptable );
-
-addNodeClass( 'ScriptableNode', ScriptableNode );

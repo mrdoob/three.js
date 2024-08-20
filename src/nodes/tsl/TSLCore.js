@@ -1,4 +1,4 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
@@ -11,13 +11,13 @@ import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
 let currentStack = null;
 
-const NodeElements = new Map(); // @TODO: Currently only a few nodes are added, probably also add others
+const NodeElements = new Map();
 
-export function addNodeElement( name, nodeElement ) {
+export function addMethodChaining( name, nodeElement ) {
 
 	if ( NodeElements.has( name ) ) {
 
-		console.warn( `Redefinition of node element ${ name }` );
+		console.warn( `Redefinition of method chaining ${ name }` );
 		return;
 
 	}
@@ -560,11 +560,9 @@ export const tslFn = ( ...params ) => { // @deprecated, r168
 
 };
 
-addNodeClass( 'ShaderNode', ShaderNode );
-
 //
 
-addNodeElement( 'toGlobal', ( node ) => {
+addMethodChaining( 'toGlobal', ( node ) => {
 
 	node.global = true;
 
@@ -598,10 +596,9 @@ export function append( node ) {
 
 }
 
-addNodeElement( 'append', append );
+addMethodChaining( 'append', append );
 
 // types
-// @TODO: Maybe export from ConstNode.js?
 
 export const color = new ConvertType( 'color' );
 
@@ -626,58 +623,38 @@ export const uvec4 = new ConvertType( 'uvec4' );
 export const bvec4 = new ConvertType( 'bvec4' );
 
 export const mat2 = new ConvertType( 'mat2' );
-export const imat2 = new ConvertType( 'imat2' );
-export const umat2 = new ConvertType( 'umat2' );
-export const bmat2 = new ConvertType( 'bmat2' );
-
 export const mat3 = new ConvertType( 'mat3' );
-export const imat3 = new ConvertType( 'imat3' );
-export const umat3 = new ConvertType( 'umat3' );
-export const bmat3 = new ConvertType( 'bmat3' );
-
 export const mat4 = new ConvertType( 'mat4' );
-export const imat4 = new ConvertType( 'imat4' );
-export const umat4 = new ConvertType( 'umat4' );
-export const bmat4 = new ConvertType( 'bmat4' );
 
 export const string = ( value = '' ) => nodeObject( new ConstNode( value, 'string' ) );
 export const arrayBuffer = ( value ) => nodeObject( new ConstNode( value, 'ArrayBuffer' ) );
 
-addNodeElement( 'toColor', color );
-addNodeElement( 'toFloat', float );
-addNodeElement( 'toInt', int );
-addNodeElement( 'toUint', uint );
-addNodeElement( 'toBool', bool );
-addNodeElement( 'toVec2', vec2 );
-addNodeElement( 'toIvec2', ivec2 );
-addNodeElement( 'toUvec2', uvec2 );
-addNodeElement( 'toBvec2', bvec2 );
-addNodeElement( 'toVec3', vec3 );
-addNodeElement( 'toIvec3', ivec3 );
-addNodeElement( 'toUvec3', uvec3 );
-addNodeElement( 'toBvec3', bvec3 );
-addNodeElement( 'toVec4', vec4 );
-addNodeElement( 'toIvec4', ivec4 );
-addNodeElement( 'toUvec4', uvec4 );
-addNodeElement( 'toBvec4', bvec4 );
-addNodeElement( 'toMat2', mat2 );
-addNodeElement( 'toImat2', imat2 );
-addNodeElement( 'toUmat2', umat2 );
-addNodeElement( 'toBmat2', bmat2 );
-addNodeElement( 'toMat3', mat3 );
-addNodeElement( 'toImat3', imat3 );
-addNodeElement( 'toUmat3', umat3 );
-addNodeElement( 'toBmat3', bmat3 );
-addNodeElement( 'toMat4', mat4 );
-addNodeElement( 'toImat4', imat4 );
-addNodeElement( 'toUmat4', umat4 );
-addNodeElement( 'toBmat4', bmat4 );
+addMethodChaining( 'toColor', color );
+addMethodChaining( 'toFloat', float );
+addMethodChaining( 'toInt', int );
+addMethodChaining( 'toUint', uint );
+addMethodChaining( 'toBool', bool );
+addMethodChaining( 'toVec2', vec2 );
+addMethodChaining( 'toIVec2', ivec2 );
+addMethodChaining( 'toUVec2', uvec2 );
+addMethodChaining( 'toBVec2', bvec2 );
+addMethodChaining( 'toVec3', vec3 );
+addMethodChaining( 'toIVec3', ivec3 );
+addMethodChaining( 'toUVec3', uvec3 );
+addMethodChaining( 'toBVec3', bvec3 );
+addMethodChaining( 'toVec4', vec4 );
+addMethodChaining( 'toIVec4', ivec4 );
+addMethodChaining( 'toUVec4', uvec4 );
+addMethodChaining( 'toBVec4', bvec4 );
+addMethodChaining( 'toMat2', mat2 );
+addMethodChaining( 'toMat3', mat3 );
+addMethodChaining( 'toMat4', mat4 );
 
 // basic nodes
-// HACK - we cannot export them from the corresponding files because of the cyclic dependency
+
 export const element = nodeProxy( ArrayElementNode );
 export const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
 export const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node ), channels ) );
 
-addNodeElement( 'element', element );
-addNodeElement( 'convert', convert );
+addMethodChaining( 'element', element );
+addMethodChaining( 'convert', convert );

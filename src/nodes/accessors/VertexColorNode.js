@@ -1,6 +1,5 @@
-import { addNodeClass } from '../core/Node.js';
 import AttributeNode from '../core/AttributeNode.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 
 import { Vector4 } from '../../math/Vector4.js';
 
@@ -67,5 +66,3 @@ class VertexColorNode extends AttributeNode {
 export default VertexColorNode;
 
 export const vertexColor = ( ...params ) => nodeObject( new VertexColorNode( ...params ) );
-
-addNodeClass( 'VertexColorNode', VertexColorNode );

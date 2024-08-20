@@ -1,11 +1,10 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import { attribute } from '../core/AttributeNode.js';
-import { varying } from '../core/VaryingNode.js';
-import { materialLineDashSize, materialLineGapSize, materialLineScale } from '../accessors/MaterialNode.js';
-import { dashSize, gapSize } from '../core/PropertyNode.js';
-import { float } from '../shadernode/ShaderNode.js';
+import NodeMaterial from './NodeMaterial.js';
+import { attribute } from '../../nodes/core/AttributeNode.js';
+import { materialLineDashSize, materialLineGapSize, materialLineScale } from '../../nodes/accessors/MaterialNode.js';
+import { dashSize, gapSize } from '../../nodes/core/PropertyNode.js';
+import { varying, float } from '../../nodes/tsl/TSLBase.js';
 
-import { LineDashedMaterial } from '../../materials/LineDashedMaterial.js';
+import { LineDashedMaterial } from '../LineDashedMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
@@ -50,5 +49,3 @@ class LineDashedNodeMaterial extends NodeMaterial {
 }
 
 export default LineDashedNodeMaterial;
-
-addNodeMaterial( 'LineDashedNodeMaterial', LineDashedNodeMaterial );

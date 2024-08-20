@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { nodeImmutable, nodeProxy } from '../shadernode/ShaderNode.js';
+import Node from '../core/Node.js';
+import { nodeImmutable, nodeProxy } from '../tsl/TSLBase.js';
 import { cameraNear, cameraFar } from '../accessors/CameraNode.js';
 import { positionView } from '../accessors/PositionNode.js';
 import { viewportDepthTexture } from './ViewportDepthTextureNode.js';
@@ -117,5 +117,3 @@ export const linearDepth = nodeProxy( ViewportDepthNode, ViewportDepthNode.LINEA
 export const viewportLinearDepth = linearDepth( viewportDepthTexture() );
 
 depth.assign = ( value ) => depthBase( value );
-
-addNodeClass( 'ViewportDepthNode', ViewportDepthNode );

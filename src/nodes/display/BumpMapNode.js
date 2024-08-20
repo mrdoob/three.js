@@ -1,10 +1,9 @@
 import TempNode from '../core/TempNode.js';
-import { addNodeClass } from '../core/Node.js';
 import { uv } from '../accessors/UVNode.js';
 import { normalView } from '../accessors/NormalNode.js';
 import { positionView } from '../accessors/PositionNode.js';
 import { faceDirection } from './FrontFacingNode.js';
-import { addNodeElement, Fn, nodeProxy, float, vec2 } from '../shadernode/ShaderNode.js';
+import { Fn, nodeProxy, float, vec2 } from '../tsl/TSLBase.js';
 
 // Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 // https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
@@ -74,7 +73,3 @@ class BumpMapNode extends TempNode {
 export default BumpMapNode;
 
 export const bumpMap = nodeProxy( BumpMapNode );
-
-addNodeElement( 'bumpMap', bumpMap );
-
-addNodeClass( 'BumpMapNode', BumpMapNode );

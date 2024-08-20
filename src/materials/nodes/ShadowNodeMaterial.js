@@ -1,7 +1,7 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import ShadowMaskModel from '../functions/ShadowMaskModel.js';
+import NodeMaterial from './NodeMaterial.js';
+import ShadowMaskModel from '../../nodes/functions/ShadowMaskModel.js';
 
-import { ShadowMaterial } from '../../materials/ShadowMaterial.js';
+import { ShadowMaterial } from '../ShadowMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new ShadowMaterial();
 
@@ -30,5 +30,3 @@ class ShadowNodeMaterial extends NodeMaterial {
 }
 
 export default ShadowNodeMaterial;
-
-addNodeMaterial( 'ShadowNodeMaterial', ShadowNodeMaterial );

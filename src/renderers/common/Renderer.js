@@ -14,8 +14,9 @@ import Color4 from './Color4.js';
 import ClippingContext from './ClippingContext.js';
 import QuadMesh from './QuadMesh.js';
 import RenderBundles from './RenderBundles.js';
+import NodeLibrary from './nodes/NodeLibrary.js';
 
-import { NodeMaterial } from '../../nodes/Nodes.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Scene } from '../../scenes/Scene.js';
 import { Frustum } from '../../math/Frustum.js';
@@ -77,6 +78,10 @@ class Renderer {
 		this.clippingPlanes = [];
 
 		this.info = new Info();
+
+		this.nodes = {
+			library: new NodeLibrary()
+		};
 
 		// internals
 

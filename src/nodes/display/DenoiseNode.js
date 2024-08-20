@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, Fn, nodeObject, float, int, vec2, vec3, vec4, mat2, If } from '../shadernode/ShaderNode.js';
+import { Fn, nodeObject, float, int, vec2, vec3, vec4, mat2, If } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { uniformArray } from '../accessors/UniformArrayNode.js';
@@ -192,7 +192,5 @@ function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 }
 
 export const denoise = ( node, depthNode, normalNode, noiseNode, camera ) => nodeObject( new DenoiseNode( nodeObject( node ).toTexture(), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( noiseNode ), camera ) );
-
-addNodeElement( 'denoise', denoise );
 
 export default DenoiseNode;

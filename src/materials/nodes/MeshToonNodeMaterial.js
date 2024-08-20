@@ -1,7 +1,7 @@
-import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
-import ToonLightingModel from '../functions/ToonLightingModel.js';
+import NodeMaterial from './NodeMaterial.js';
+import ToonLightingModel from '../../nodes/functions/ToonLightingModel.js';
 
-import { MeshToonMaterial } from '../../materials/MeshToonMaterial.js';
+import { MeshToonMaterial } from '../MeshToonMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshToonMaterial();
 
@@ -30,5 +30,3 @@ class MeshToonNodeMaterial extends NodeMaterial {
 }
 
 export default MeshToonNodeMaterial;
-
-addNodeMaterial( 'MeshToonNodeMaterial', MeshToonNodeMaterial );

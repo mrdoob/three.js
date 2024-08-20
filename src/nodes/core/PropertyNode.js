@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from './Node.js';
-import { nodeImmutable, nodeObject } from '../shadernode/ShaderNode.js';
+import Node from './Node.js';
+import { nodeImmutable, nodeObject } from '../tsl/TSLCore.js';
 
 class PropertyNode extends Node {
 
@@ -80,5 +80,3 @@ export const thickness = nodeImmutable( PropertyNode, 'float', 'Thickness' );
 export const attenuationDistance = nodeImmutable( PropertyNode, 'float', 'AttenuationDistance' );
 export const attenuationColor = nodeImmutable( PropertyNode, 'color', 'AttenuationColor' );
 export const dispersion = nodeImmutable( PropertyNode, 'float', 'Dispersion' );
-
-addNodeClass( 'PropertyNode', PropertyNode );

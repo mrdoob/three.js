@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from './Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import Node from './Node.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class ContextNode extends Node {
 
@@ -61,7 +61,5 @@ export default ContextNode;
 export const context = nodeProxy( ContextNode );
 export const label = ( node, name ) => context( node, { label: name } );
 
-addNodeElement( 'context', context );
-addNodeElement( 'label', label );
-
-addNodeClass( 'ContextNode', ContextNode );
+addMethodChaining( 'context', context );
+addMethodChaining( 'label', label );

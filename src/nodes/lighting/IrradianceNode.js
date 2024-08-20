@@ -1,5 +1,4 @@
 import LightingNode from './LightingNode.js';
-import { addNodeClass } from '../core/Node.js';
 
 class IrradianceNode extends LightingNode {
 
@@ -20,5 +19,3 @@ class IrradianceNode extends LightingNode {
 }
 
 export default IrradianceNode;
-
-addNodeClass( 'IrradianceNode', IrradianceNode );

@@ -1,22 +1,4 @@
-import { createNodeMaterialFromType } from '../materials/Materials.js';
-
 import { MaterialLoader } from '../../loaders/MaterialLoader.js';
-
-const superFromTypeFunction = MaterialLoader.createMaterialFromType;
-
-MaterialLoader.createMaterialFromType = function ( type ) {
-
-	const material = createNodeMaterialFromType( type );
-
-	if ( material !== undefined ) {
-
-		return material;
-
-	}
-
-	return superFromTypeFunction.call( this, type );
-
-};
 
 class NodeMaterialLoader extends MaterialLoader {
 

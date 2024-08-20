@@ -1,8 +1,8 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { property } from '../core/PropertyNode.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-class CondNode extends Node {
+class ConditionalNode extends Node {
 
 	constructor( condNode, ifNode, elseNode = null ) {
 
@@ -119,21 +119,19 @@ class CondNode extends Node {
 
 }
 
-export default CondNode;
+export default ConditionalNode;
 
-export const select = nodeProxy( CondNode );
+export const select = nodeProxy( ConditionalNode );
 
-addNodeElement( 'select', select );
-
-addNodeClass( 'CondNode', CondNode );
+addMethodChaining( 'select', select );
 
 //
 
 export const cond = ( ...params ) => { // @deprecated, r168
 
-	console.warn( 'TSL.CondNode: cond() has been renamed to select().' );
+	console.warn( 'TSL.ConditionalNode: cond() has been renamed to select().' );
 	return select( ...params );
 
 };
 
-addNodeElement( 'cond', cond );
+addMethodChaining( 'cond', cond );

@@ -1,14 +1,13 @@
-import { addNodeMaterial } from './NodeMaterial.js';
-import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor, dispersion } from '../core/PropertyNode.js';
-import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion } from '../accessors/MaterialNode.js';
-import { float, vec2, vec3, If } from '../shadernode/ShaderNode.js';
-import getRoughness from '../functions/material/getRoughness.js';
-import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
-import PhysicalLightingModel from '../functions/PhysicalLightingModel.js';
+import { clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, specularColor, specularF90, diffuseColor, metalness, roughness, anisotropy, alphaT, anisotropyT, anisotropyB, ior, transmission, thickness, attenuationDistance, attenuationColor, dispersion } from '../../nodes/core/PropertyNode.js';
+import { materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialSpecularIntensity, materialSpecularColor, materialAnisotropy, materialIOR, materialTransmission, materialThickness, materialAttenuationDistance, materialAttenuationColor, materialDispersion } from '../../nodes/accessors/MaterialNode.js';
+import { float, vec2, vec3, If } from '../../nodes/tsl/TSLBase.js';
+import getRoughness from '../../nodes/functions/material/getRoughness.js';
+import { TBNViewMatrix } from '../../nodes/accessors/AccessorsUtils.js';
+import PhysicalLightingModel from '../../nodes/functions/PhysicalLightingModel.js';
 import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
-import { mix, pow2, min } from '../math/MathNode.js';
+import { mix, pow2, min } from '../../nodes/math/MathNode.js';
 
-import { MeshPhysicalMaterial } from '../../materials/MeshPhysicalMaterial.js';
+import { MeshPhysicalMaterial } from '../MeshPhysicalMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshPhysicalMaterial();
 
@@ -241,5 +240,3 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 }
 
 export default MeshPhysicalNodeMaterial;
-
-addNodeMaterial( 'MeshPhysicalNodeMaterial', MeshPhysicalNodeMaterial );

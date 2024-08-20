@@ -2,7 +2,7 @@ import LightingModel from '../core/LightingModel.js';
 import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
 import { diffuseColor } from '../core/PropertyNode.js';
 import { normalGeometry } from '../accessors/NormalNode.js';
-import { Fn, float, vec2, vec3 } from '../shadernode/ShaderNode.js';
+import { Fn, float, vec2, vec3 } from '../tsl/TSLBase.js';
 import { mix, smoothstep } from '../math/MathNode.js';
 import { materialReference } from '../accessors/MaterialReferenceNode.js';
 

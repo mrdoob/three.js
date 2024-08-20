@@ -1,5 +1,5 @@
 import TextureNode from '../accessors/TextureNode.js';
-import { nodeObject, vec2 } from '../shadernode/ShaderNode.js';
+import { nodeObject, vec2 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { viewportTopLeft } from '../display/ViewportNode.js';
 

@@ -1,4 +1,4 @@
-import { addNodeElement, float, Fn, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { float, Fn, vec3, vec4 } from '../tsl/TSLBase.js';
 import { min, max, mix } from '../math/MathNode.js';
 import { luminance } from './ColorAdjustmentNode.js';
 
@@ -24,5 +24,3 @@ export const bleach = /*@__PURE__*/ Fn( ( [ color, opacity = 1 ] ) => {
 	return vec4( mixRGB, base.a );
 
 } );
-
-addNodeElement( 'bleach', bleach );

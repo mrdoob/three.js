@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { nodeImmutable, float } from '../shadernode/ShaderNode.js';
+import Node from '../core/Node.js';
+import { nodeImmutable, float } from '../tsl/TSLBase.js';
 
 import { BackSide, WebGLCoordinateSystem } from '../../constants.js';
 
@@ -37,5 +37,3 @@ export default FrontFacingNode;
 
 export const frontFacing = nodeImmutable( FrontFacingNode );
 export const faceDirection = float( frontFacing ).mul( 2.0 ).sub( 1.0 );
-
-addNodeClass( 'FrontFacingNode', FrontFacingNode );

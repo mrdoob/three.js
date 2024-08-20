@@ -1,7 +1,6 @@
 import InputNode from './InputNode.js';
 import { objectGroup } from './UniformGroupNode.js';
-import { addNodeClass } from './Node.js';
-import { nodeObject, getConstNodeType } from '../shadernode/ShaderNode.js';
+import { nodeObject, getConstNodeType } from '../tsl/TSLCore.js';
 
 class UniformNode extends InputNode {
 
@@ -105,5 +104,3 @@ export const uniform = ( arg1, arg2 ) => {
 	return nodeObject( new UniformNode( value, nodeType ) );
 
 };
-
-addNodeClass( 'UniformNode', UniformNode );

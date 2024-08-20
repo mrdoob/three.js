@@ -1,4 +1,4 @@
-import { addNodeElement, Fn, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { Fn, vec3, vec4 } from '../tsl/TSLBase.js';
 import { dot } from '../math/MathNode.js';
 
 export const sepia = /*@__PURE__*/ Fn( ( [ color ] ) => {
@@ -15,5 +15,3 @@ export const sepia = /*@__PURE__*/ Fn( ( [ color ] ) => {
 	);
 
 } );
-
-addNodeElement( 'sepia', sepia );

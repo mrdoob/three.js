@@ -1,7 +1,7 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { normalLocal } from './NormalNode.js';
 import { positionLocal } from './PositionNode.js';
-import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, Fn } from '../shadernode/ShaderNode.js';
+import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, Fn } from '../tsl/TSLBase.js';
 import { textureLoad } from './TextureNode.js';
 import { textureSize } from './TextureSizeNode.js';
 import { tangentLocal } from './TangentNode.js';
@@ -92,5 +92,3 @@ class BatchNode extends Node {
 export default BatchNode;
 
 export const batch = nodeProxy( BatchNode );
-
-addNodeClass( 'batch', BatchNode );
