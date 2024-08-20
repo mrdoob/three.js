@@ -28,7 +28,7 @@
 
 			import * as THREE from 'three';
 
-			import { color, instanceIndex, If, varyingProperty, uint, negate, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, storage, storageObject, min, max, positionLocal, modelNormalMatrix } from 'three/tsl';
+			import { color, instanceIndex, If, varyingProperty, uint, int, negate, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, storageObject, min, max, positionLocal, modelNormalMatrix } from 'three/tsl';
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -133,7 +133,7 @@
 				const heightRead = storageObject( heightBufferAttribute, 'float', heightBufferAttribute.count ).toReadOnly().label( 'HeightRead' );
 
 				// Get Indices of Neighbor Values of an Index in the Simulation Grid
-				const getNeighborIndicesTSL = ( instanceIndex ) => {
+				const getNeighborIndicesTSL = ( index ) => {
 
 					const width = uint( WIDTH );
 
@@ -141,8 +141,9 @@
 					// still work even if you dispatch your compute shader 2-dimensionally, since within a compute
 					// context, instanceIndex is a 1-dimensional value derived from the workgroup dimensions.
 			
-					const x = instanceIndex.modInt( width );
-					const y = instanceIndex.div( width );
+					// Cast to int to prevent unintended index overflow upon subtraction.
+					const x = int( index.modInt( WIDTH ) );
+					const y = int( index.div( WIDTH ) );
 
 					// The original shader accesses height via texture uvs. However, unlike with textures, we can't
 					// access areas that are out of bounds. Accordingly, we emulate the Clamp to Edge Wrapping
@@ -238,7 +239,7 @@
 					heightStorage.element( instanceIndex ).assign( height.div( 5 ) );
 					prevHeightStorage.element( instanceIndex ).assign( height.div( 5 ) );
 
-				} )().compute( WIDTH * WIDTH );
+				} )().compute( WIDTH * WIDTH, [ 8, 8 ] );
 
 				// Water Geometry corresponds with buffered compute grid.
 				const waterGeometry = new THREE.PlaneGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
@@ -421,7 +422,7 @@
 
 						renderer.compute( computeSmooth );
 
-					}
+					},
 				};
 				gui.add( buttonCompute, 'smoothWater' );
 				gui.add( effectController, 'spheresEnabled' ).onChange( () => {
