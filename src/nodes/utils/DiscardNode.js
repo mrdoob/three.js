@@ -1,4 +1,4 @@
-import { select } from '../math/CondNode.js';
+import { select } from '../math/ConditionalNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { addMethodChaining } from '../tsl/TSLCore.js';
 
