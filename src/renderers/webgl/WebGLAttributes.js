@@ -91,7 +91,7 @@ function WebGLAttributes( gl ) {
 		if ( updateRanges.length !== 0 ) {
 
 			// Before applying update ranges, we merge any adjacent / overlapping
-			// ranges to reduce load on `gl.bufferSubData`. Empirically, this has lead
+			// ranges to reduce load on `gl.bufferSubData`. Empirically, this has led
 			// to performance improvements for applications which make heavy use of
 			// update ranges. Likely due to GPU command overhead.
 			//
