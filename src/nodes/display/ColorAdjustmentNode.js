@@ -4,6 +4,12 @@ import { Fn, float, vec3 } from '../tsl/TSLBase.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { Vector3 } from '../../math/Vector3.js';
 
+export const grayscale = /*#__PURE__*/ Fn( ( [ color ] ) => {
+
+	return luminance( color.rgb );
+
+} );
+
 export const saturation = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	return adjustment.mix( luminance( color.rgb ), color.rgb );
