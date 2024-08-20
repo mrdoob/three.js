@@ -41,7 +41,7 @@ class TransformControls extends Controls {
 
 	constructor( camera, domElement = null ) {
 
-		super( camera, domElement );
+		super( undefined, domElement );
 
 		const root = new TransformControlsRoot( this );
 		this._root = root;
