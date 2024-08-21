@@ -13,8 +13,7 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 // WebGPU: The use of a single QuadMesh for both gaussian blur passes results in a single RenderObject with a SampledTexture binding that
 // alternates between source textures and triggers creation of new BindGroups and BindGroupLayouts every frame.
 
-const _quadMesh1 = /*@__PURE__*/ new QuadMesh();
-const _quadMesh2 = /*@__PURE__*/ new QuadMesh();
+const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 class GaussianBlurNode extends TempNode {
 
@@ -33,6 +32,8 @@ class GaussianBlurNode extends TempNode {
 		this._horizontalRT.texture.name = 'GaussianBlurNode.horizontal';
 		this._verticalRT = new RenderTarget();
 		this._verticalRT.texture.name = 'GaussianBlurNode.vertical';
+
+		this._verticalRT.isolate = true;
 
 		this._textureNode = passTexture( this, this._verticalRT.texture );
 
@@ -65,8 +66,7 @@ class GaussianBlurNode extends TempNode {
 
 		const currentTexture = textureNode.value;
 
-		_quadMesh1.material = this._material;
-		_quadMesh2.material = this._material;
+		_quadMesh.material = this._material;
 
 		this.setSize( map.image.width, map.image.height );
 
@@ -85,7 +85,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 1, 0 );
 
-		_quadMesh1.render( renderer );
+		_quadMesh.render( renderer );
 
 		// vertical
 
@@ -94,7 +94,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._passDirection.value.set( 0, 1 );
 
-		_quadMesh2.render( renderer );
+		_quadMesh.render( renderer );
 
 		// restore
 

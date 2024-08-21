@@ -27,6 +27,7 @@ class AfterImageNode extends TempNode {
 
 		this._compRT = new RenderTarget();
 		this._compRT.texture.name = 'AfterImageNode.comp';
+		this._compRT.isolate = true;
 
 		this._oldRT = new RenderTarget();
 		this._oldRT.texture.name = 'AfterImageNode.old';

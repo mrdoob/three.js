@@ -26,6 +26,8 @@ class RenderContexts {
 
 			attachmentState = `${ count }:${ format }:${ renderTarget.samples }:${ renderTarget.depthBuffer }:${ renderTarget.stencilBuffer }`;
 
+			if ( renderTarget.isolate === true ) attachmentState += `:${ renderTarget.id }`;
+
 		}
 
 		const chainMap = this.getChainMap( attachmentState );

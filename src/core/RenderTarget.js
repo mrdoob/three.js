@@ -4,6 +4,8 @@ import { LinearFilter } from '../constants.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Source } from '../textures/Source.js';
 
+let _RenderTargetId = 0;
+
 /*
  In options, we can specify:
  * Texture parameters for an auto-generated target texture
@@ -25,6 +27,8 @@ class RenderTarget extends EventDispatcher {
 		this.scissorTest = false;
 
 		this.viewport = new Vector4( 0, 0, width, height );
+
+		Object.defineProperty( this, 'id', { value: _RenderTargetId ++ } );
 
 		const image = { width: width, height: height, depth: 1 };
 
@@ -66,6 +70,8 @@ class RenderTarget extends EventDispatcher {
 		this.depthTexture = options.depthTexture;
 
 		this.samples = options.samples;
+
+		this.isolate = false;
 
 	}
 
