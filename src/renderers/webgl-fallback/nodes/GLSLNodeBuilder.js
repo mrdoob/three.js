@@ -607,6 +607,16 @@ ${ flowData.code }
 
 	}
 
+	getLocalInstanceIndex() {
+
+		const workgroupSize = this.object.workgroupSize;
+
+		const size = workgroupSize.reduce( ( acc, curr ) => acc * curr, 1 );
+
+		return `uint( gl_InstanceID ) % ${size}u`;
+
+	}
+
 	getDrawIndex() {
 
 		const extensions = this.renderer.backend.extensions;
@@ -905,6 +915,7 @@ void main() {
 		} else {
 
 			this.computeShader = this._getGLSLVertexCode( shadersData.compute );
+			console.log( this.computeShader );
 
 		}
 
