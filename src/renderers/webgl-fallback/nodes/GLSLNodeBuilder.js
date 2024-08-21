@@ -915,7 +915,6 @@ void main() {
 		} else {
 
 			this.computeShader = this._getGLSLVertexCode( shadersData.compute );
-			console.log( this.computeShader );
 
 		}
 
