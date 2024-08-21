@@ -33,6 +33,10 @@ class IndexNode extends Node {
 
 			propertyName = builder.getDrawIndex();
 
+		} else if ( scope === IndexNode.LOCAL ) {
+
+			propertyName = builder.getLocalInstanceIndex();
+
 		} else {
 
 			throw new Error( 'THREE.IndexNode: Unknown scope: ' + scope );
@@ -62,11 +66,13 @@ class IndexNode extends Node {
 IndexNode.VERTEX = 'vertex';
 IndexNode.INSTANCE = 'instance';
 IndexNode.DRAW = 'draw';
+IndexNode.LOCAL = 'local';
 
 export default IndexNode;
 
 export const vertexIndex = nodeImmutable( IndexNode, IndexNode.VERTEX );
 export const instanceIndex = nodeImmutable( IndexNode, IndexNode.INSTANCE );
+export const localInstanceIndex = nodeImmutable( IndexNode, IndexNode.LOCAL );
 export const drawIndex = nodeImmutable( IndexNode, IndexNode.DRAW );
 
 addNodeClass( 'IndexNode', IndexNode );
