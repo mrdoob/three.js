@@ -692,6 +692,7 @@ function _createRenderTarget( width, height, params ) {
 	cubeUVRenderTarget.texture.name = 'PMREM.cubeUv';
 	cubeUVRenderTarget.texture.isPMREMTexture = true;
 	cubeUVRenderTarget.scissorTest = true;
+	cubeUVRenderTarget.isolate = true;
 	return cubeUVRenderTarget;
 
 }
