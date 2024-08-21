@@ -1,4 +1,4 @@
-import { addNodeElement, Fn, If, nodeObject, vec4 } from '../shadernode/ShaderNode.js';
+import { Fn, If, nodeObject, vec4 } from '../shadernode/ShaderNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { mod } from '../math/MathNode.js';
 import { viewportCoordinate } from './ViewportNode.js';
@@ -50,7 +50,5 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 export default ParallaxBarrierPassNode;
 
 export const parallaxBarrierPass = ( scene, camera, eyeSep ) => nodeObject( new ParallaxBarrierPassNode( scene, camera, eyeSep ) );
-
-addNodeElement( 'parallaxBarrierPass', parallaxBarrierPass );
 
 addNodeClass( 'ParallaxBarrierPassNode', ParallaxBarrierPassNode );

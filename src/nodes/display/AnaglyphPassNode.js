@@ -1,4 +1,4 @@
-import { addNodeElement, Fn, nodeObject, vec4 } from '../shadernode/ShaderNode.js';
+import { Fn, nodeObject, vec4 } from '../shadernode/ShaderNode.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 import { uniform } from '../core/UniformNode.js';
 import { uv } from '../accessors/UVNode.js';
