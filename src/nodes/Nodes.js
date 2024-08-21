@@ -147,6 +147,8 @@ export { default as RenderOutputNode, renderOutput } from './display/RenderOutpu
 export { default as PixelationPassNode, pixelationPass } from './display/PixelationPassNode.js';
 export { default as SSAAPassNode, ssaaPass } from './display/SSAAPassNode.js';
 export { default as StereoPassNode, stereoPass } from './display/StereoPassNode.js';
+export { default as AnaglyphPassNode, anaglyphPass } from './display/AnaglyphPassNode.js';
+export { default as ParallaxBarrierPassNode, parallaxBarrierPass } from './display/ParallaxBarrierPassNode.js';
 export { bleach } from './display/BleachBypassNode.js';
 export { sepia } from './display/SepiaNode.js';
 

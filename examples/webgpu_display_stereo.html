@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - stereo</title>
+		<title>three.js webgpu - stereo effects</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - stereo. skybox by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - stereo effects. skybox by <a href="http://www.zfight.com/" target="_blank" rel="noopener">Jochum Skoglund</a>
 		</div>
 
 		<script type="importmap">
@@ -26,18 +26,24 @@
 
 			import * as THREE from 'three';
 
-			import { stereoPass } from 'three/tsl';
+			import { stereoPass, anaglyphPass, parallaxBarrierPass } from 'three/tsl';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { Timer } from 'three/addons/misc/Timer.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer, postProcessing;
 
-			let mesh, dummy;
+			let stereo, anaglyph, parallaxBarrier;
 
-			let mouseX = 0, mouseY = 0;
-
-			let windowHalfX = window.innerWidth / 2;
-			let windowHalfY = window.innerHeight / 2;
+			let mesh, dummy, timer;
 
 			const position = new THREE.Vector3();
+
+			const params = {
+				effect: 'stereo'
+			};
+
+			const effects = { Stereo: 'stereo', Anaglyph: 'anaglyph', ParallaxBarrier: 'parallaxBarrier' };
 
 			init();
 
@@ -51,14 +57,15 @@
 					.setPath( 'textures/cube/Park3Med/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 
+				timer = new Timer();
+
 				const geometry = new THREE.SphereGeometry( 0.1, 32, 16 );
 
 				const textureCube = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/Park3Med/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-				textureCube.mapping = THREE.CubeRefractionMapping;
 
-				const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
+				const material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 
 				mesh = new THREE.InstancedMesh( geometry, material, 500 );
 				mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
@@ -89,31 +96,53 @@
 				document.body.appendChild( renderer.domElement );
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				const pass = stereoPass( scene, camera );
-				postProcessing.outputNode = pass;
+				stereo = stereoPass( scene, camera );
+				anaglyph = anaglyphPass( scene, camera );
+				parallaxBarrier = parallaxBarrierPass( scene, camera );
+
+				postProcessing.outputNode = stereo;
+
+				//
+
+				const gui = new GUI();
+				gui.add( params, 'effect', effects ).onChange( update );
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove );
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 25;
+
+			}
+
+			function update( value ) {
+
+				if ( value === 'stereo' ) {
+
+					postProcessing.outputNode = stereo;
+
+				} else if ( value === 'anaglyph' ) {
+
+					postProcessing.outputNode = anaglyph;
+
+				} else if ( value === 'parallaxBarrier' ) {
+
+					postProcessing.outputNode = parallaxBarrier;
+
+				}
+
+				postProcessing.needsUpdate = true;
 
 			}
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX ) * 0.01;
-				mouseY = ( event.clientY - windowHalfY ) * 0.01;
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -129,11 +158,9 @@
 
 			function animate() {
 
-				const timer = 0.0001 * Date.now();
+				timer.update();
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-				camera.lookAt( scene.position );
+				const elapsedTime = timer.getElapsed() * 0.1;
 
 				for ( let i = 0; i < mesh.count; i ++ ) {
 
@@ -141,8 +168,8 @@
 
 					extractPosition( dummy.matrix, position );
 
-					position.x = 5 * Math.cos( timer + i );
-					position.y = 5 * Math.sin( timer + i * 1.1 );
+					position.x = 5 * Math.cos( elapsedTime + i );
+					position.y = 5 * Math.sin( elapsedTime + i * 1.1 );
 
 					dummy.matrix.setPosition( position );
 
