@@ -6,7 +6,6 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 import { texture } from '../accessors/TextureNode.js';
 import { Vector2 } from '../../math/Vector2.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
-import { uniform } from '../core/UniformNode.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -20,7 +19,7 @@ class StereoCompositePassNode extends PassNode {
 		this.isStereoCompositePassNode = true;
 
 		this.stereo = new StereoCamera();
-		this.eyeSep = uniform( eyeSep );
+		this.eyeSep = eyeSep;
 		const _params = { minFilter: LinearFilter, magFilter: NearestFilter, type: HalfFloatType };
 
 		this._renderTargetL = new RenderTarget( 1, 1, _params );
@@ -37,7 +36,7 @@ class StereoCompositePassNode extends PassNode {
 
 		this.stereo.cameraL.coordinateSystem = coordinateSystem;
 		this.stereo.cameraR.coordinateSystem = coordinateSystem;
-		this.stereo.eyeSep = this.eyeSep.value;
+		this.stereo.eyeSep = this.eyeSep;
 		this.stereo.update( this.camera );
 
 	}

@@ -107,10 +107,12 @@
 
 				const gui = new GUI();
 				gui.add( params, 'effect', effects ).onChange( update );
-				gui.add( params, 'eyeSep', 0.001, 0.09, 0.001 ).onChange( function ( value ) {
+				gui.add( params, 'eyeSep', 0.001, 0.15, 0.001 ).onChange( function ( value ) {
 
-					anaglyph.eyeSep.value = value;
-					parallaxBarrier.eyeSep.value = value;
+					stereo.eyeSep = value;
+
+					anaglyph.eyeSep = value;
+					parallaxBarrier.eyeSep = value;
 
 				} );
 
