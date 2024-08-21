@@ -50,6 +50,9 @@ class ViewportNode extends Node {
 
 			renderer.getViewport( viewportResult );
 
+			const ratio = renderer.getPixelRatio();
+			viewportResult.multiplyScalar( ratio );
+
 		} else {
 
 			renderer.getDrawingBufferSize( resolution );
