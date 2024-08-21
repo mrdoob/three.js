@@ -6,9 +6,9 @@ import StereoCompositePassNode from './StereoCompositePassNode.js';
 
 class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
-	constructor( scene, camera ) {
+	constructor( scene, camera, eyeSep ) {
 
-		super( scene, camera );
+		super( scene, camera, eyeSep );
 
 		this.isParallaxBarrierPassNode = true;
 

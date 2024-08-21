@@ -7,9 +7,9 @@ import StereoCompositePassNode from './StereoCompositePassNode.js';
 
 class AnaglyphPassNode extends StereoCompositePassNode {
 
-	constructor( scene, camera ) {
+	constructor( scene, camera, eyeSep ) {
 
-		super( scene, camera );
+		super( scene, camera, eyeSep );
 
 		this.isAnaglyphPassNode = true;
 
