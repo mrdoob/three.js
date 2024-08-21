@@ -629,6 +629,12 @@ ${ flowData.code }
 
 	}
 
+	getLocalInstanceIndex() {
+
+		return this.getBuiltin( 'local_invocation_index', 'localInstanceIndex', 'u32', 'attribute' );
+
+	}
+
 	getSubgroupSize() {
 
 		this.enableSubGroups();
