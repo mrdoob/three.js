@@ -40,7 +40,8 @@
 			const position = new THREE.Vector3();
 
 			const params = {
-				effect: 'stereo'
+				effect: 'stereo',
+				eyeSep: 0.064,
 			};
 
 			const effects = { Stereo: 'stereo', Anaglyph: 'anaglyph', ParallaxBarrier: 'parallaxBarrier' };
@@ -106,6 +107,12 @@
 
 				const gui = new GUI();
 				gui.add( params, 'effect', effects ).onChange( update );
+				gui.add( params, 'eyeSep', 0.001, 0.09, 0.001 ).onChange( function ( value ) {
+
+					anaglyph.eyeSep.value = value;
+					parallaxBarrier.eyeSep.value = value;
+
+				} );
 
 				//
 
