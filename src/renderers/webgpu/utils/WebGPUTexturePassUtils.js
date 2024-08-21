@@ -1,8 +1,11 @@
+import DataMap from '../../common/DataMap.js';
 import { GPUTextureViewDimension, GPUIndexFormat, GPUFilterMode, GPUPrimitiveTopology, GPULoadOp, GPUStoreOp } from './WebGPUConstants.js';
 
-class WebGPUTexturePassUtils {
+class WebGPUTexturePassUtils extends DataMap {
 
 	constructor( device ) {
+
+		super();
 
 		this.device = device;
 
@@ -226,9 +229,39 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer = 0 ) {
 
-		const pipeline = this.getTransferPipeline( textureGPUDescriptor.format );
+		const textureData = this.get( textureGPU );
+
+		if ( textureData.useCount === undefined ) {
+			textureData.useCount = 0;
+			textureData.layers = [];
+		}
 
 		const commandEncoder = this.device.createCommandEncoder( {} );
+
+		if ( textureData.layers[ baseArrayLayer ] === undefined ) {
+
+			const passes = this._runOrBundle( commandEncoder, textureGPU, textureGPUDescriptor, baseArrayLayer, true );
+
+			if ( passes.length > 0 ) textureData.layers[ baseArrayLayer ] = passes;
+
+		}
+
+		if ( textureData.layers[ baseArrayLayer ] !== undefined ) {
+
+			this._runBundles( commandEncoder, textureData.layers[ baseArrayLayer ] );
+
+		}
+
+		this.device.queue.submit( [ commandEncoder.finish() ] );
+
+		textureData.useCount ++;
+
+	}
+
+	_runOrBundle( commandEncoder, textureGPU, textureGPUDescriptor, baseArrayLayer, bundle = false ) {
+
+		const pipeline = this.getTransferPipeline( textureGPUDescriptor.format );
+
 		const bindGroupLayout = pipeline.getBindGroupLayout( 0 ); // @TODO: Consider making this static.
 
 		let srcView = textureGPU.createView( {
@@ -237,6 +270,8 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 			dimension: GPUTextureViewDimension.TwoD,
 			baseArrayLayer
 		} );
+
+		const passes = [];
 
 		for ( let i = 1; i < textureGPUDescriptor.mipLevelCount; i ++ ) {
 
@@ -258,25 +293,69 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 				baseArrayLayer
 			} );
 
-			const passEncoder = commandEncoder.beginRenderPass( {
+			let passEncoder;
+
+			const passDescriptor = {
 				colorAttachments: [ {
 					view: dstView,
 					loadOp: GPULoadOp.Clear,
 					storeOp: GPUStoreOp.Store,
 					clearValue: [ 0, 0, 0, 0 ]
 				} ]
-			} );
+			};
+
+			if ( bundle ) {
+
+				passEncoder = this.device.createRenderBundleEncoder( {
+					colorFormats: [ textureGPUDescriptor.format ]
+				} );
+
+			} else {
+
+				passEncoder = commandEncoder.beginRenderPass( passDescriptor );
+
+			}
 
 			passEncoder.setPipeline( pipeline );
 			passEncoder.setBindGroup( 0, bindGroup );
 			passEncoder.draw( 4, 1, 0, 0 );
-			passEncoder.end();
+
+			if ( bundle ) {
+
+				passes.push( {
+					renderBundles: [ passEncoder.finish() ],
+					passDescriptor
+				} );
+
+			} else {
+
+				passEncoder.end();
+
+			}
 
 			srcView = dstView;
 
 		}
 
-		this.device.queue.submit( [ commandEncoder.finish() ] );
+		return passes;
+
+	}
+
+	_runBundles( commandEncoder, passes ) {
+
+		const levels = passes.length;
+
+		for ( let i = 0; i < levels; i ++ ) {
+
+			const pass = passes[ i ];
+
+			const passEncoder = commandEncoder.beginRenderPass( pass.passDescriptor );
+
+			passEncoder.executeBundles( pass.renderBundles );
+
+			passEncoder.end();
+
+		}
 
 	}
 
