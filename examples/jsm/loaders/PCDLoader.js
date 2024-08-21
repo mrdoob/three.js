@@ -127,14 +127,14 @@ class PCDLoader extends Loader {
 
 			// parse
 
-			PCDheader.version = /^VERSION (.*)/mi.exec( PCDheader.str );
+			PCDheader.version = /^VERSION (.*)/im.exec( PCDheader.str );
 			PCDheader.fields = /^FIELDS (.*)/im.exec( PCDheader.str );
-			PCDheader.size = /^SIZE (.*)/i.emxec( PCDheader.str );
-			PCDheader.type = /^TYPE (.*)/i.emxec( PCDheader.str );
-			PCDheader.count = /^COUNT (.*)/i.mexec( PCDheader.str );
-			PCDheader.width = /^WIDTH (.*)/i.mexec( PCDheader.str );
+			PCDheader.size = /^SIZE (.*)/im.exec( PCDheader.str );
+			PCDheader.type = /^TYPE (.*)/im.exec( PCDheader.str );
+			PCDheader.count = /^COUNT (.*)/im.exec( PCDheader.str );
+			PCDheader.width = /^WIDTH (.*)/im.exec( PCDheader.str );
 			PCDheader.height = /^HEIGHT (.*)/im.exec( PCDheader.str );
-			PCDheader.viewpoint = /^VIEWPOINT (.*m)/i.exec( PCDheader.str );
+			PCDheader.viewpoint = /^VIEWPOINT (.*)/im.exec( PCDheader.str );
 			PCDheader.points = /^POINTS (.*)/im.exec( PCDheader.str );
 
 			// evaluate
