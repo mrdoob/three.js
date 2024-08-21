@@ -232,8 +232,10 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 		const textureData = this.get( textureGPU );
 
 		if ( textureData.useCount === undefined ) {
+
 			textureData.useCount = 0;
 			textureData.layers = [];
+
 		}
 
 		const commandEncoder = this.device.createCommandEncoder( {} );
