@@ -1,9 +1,10 @@
-import { Fn, nodeObject, vec4 } from '../shadernode/ShaderNode.js';
+import { addNodeElement, Fn, nodeObject, vec4 } from '../shadernode/ShaderNode.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 import { uniform } from '../core/UniformNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { clamp, max } from '../math/MathNode.js';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
+import { addNodeClass } from '../core/Node.js';
 
 class AnaglyphPassNode extends StereoCompositePassNode {
 
@@ -54,6 +55,8 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 
 }
 
+export default AnaglyphPassNode;
+
 export const anaglyphPass = ( scene, camera, eyeSep ) => nodeObject( new AnaglyphPassNode( scene, camera, eyeSep ) );
 
-export default AnaglyphPassNode;
+addNodeClass( 'AnaglyphPassNode', AnaglyphPassNode );
