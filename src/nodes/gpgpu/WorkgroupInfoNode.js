@@ -2,11 +2,11 @@ import ArrayElementNode from '../utils/ArrayElementNode.js';
 import { nodeObject } from '../shadernode/ShaderNode.js';
 import Node, { addNodeClass } from '../core/Node.js';
 
-class ScopedArrayElementNode extends ArrayElementNode {
+class WorkgroupInfoElementNode extends ArrayElementNode {
 
-	constructor( scopedArrayNode, indexNode ) {
+	constructor( workgroupInfoNode, indexNode ) {
 
-		super( scopedArrayNode, indexNode );
+		super( workgroupInfoNode, indexNode );
 
 		this.isScopedArrayElementNode = true;
 
@@ -36,7 +36,7 @@ class ScopedArrayElementNode extends ArrayElementNode {
 }
 
 
-class ScopedArrayNode extends Node {
+class WorkgroupInfoNode extends Node {
 
 	constructor( scope, bufferType, bufferCount = 0 ) {
 
@@ -45,7 +45,7 @@ class ScopedArrayNode extends Node {
 		this.bufferType = bufferType;
 		this.bufferCount = bufferCount;
 
-		this.isScopedArrayNode = true;
+		this.isWorkgroupInfoNode = true;
 
 		this.scope = scope;
 
@@ -59,7 +59,7 @@ class ScopedArrayNode extends Node {
 
 	}
 
-	getHash( builder ) {
+	getHash() {
 
 		return this.uuid;
 
@@ -81,7 +81,7 @@ class ScopedArrayNode extends Node {
 
 	element( indexNode ) {
 
-		return nodeObject( new ScopedArrayElementNode( this, indexNode ) );
+		return nodeObject( new WorkgroupInfoElementNode( this, indexNode ) );
 
 	}
 
@@ -93,10 +93,9 @@ class ScopedArrayNode extends Node {
 
 }
 
-export default ScopedArrayNode;
+export default WorkgroupInfoNode;
 
-export const workgroupArray = ( type, count ) => nodeObject( new ScopedArrayNode( 'Workgroup', type, count ) );
-export const privateArray = ( type, count ) => nodeObject( new ScopedArrayNode( 'Private', type, count ) );
+export const workgroupArray = ( type, count ) => nodeObject( new WorkgroupInfoNode( 'Workgroup', type, count ) );
 
-addNodeClass( 'ScopedArrayNode', ScopedArrayNode );
+addNodeClass( 'WorkgroupInfoNode', WorkgroupInfoNode );
 

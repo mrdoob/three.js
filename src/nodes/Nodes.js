@@ -136,7 +136,7 @@ export { default as RangeNode } from './geometry/RangeNode.js';
 export { default as ComputeNode } from './gpgpu/ComputeNode.js';
 =======
 export { default as ComputeNode, compute } from './gpgpu/ComputeNode.js';
-export { default as ScopedArrayNode, workgroupArray, privateArray } from './gpgpu/ScopedArrayNode.js';
+export { default as WorkgroupInfoNode, workgroupArray } from './gpgpu/WorkgroupInfoNode.js';
 export { workgroupBarrier, textureBarrier, storageBarrier } from './gpgpu/BarrierNode.js';
 >>>>>>> 2880e0fe5b (barrier, private array, workgroup array support)
 
