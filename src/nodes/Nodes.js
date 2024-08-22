@@ -42,7 +42,7 @@ export { default as MathNode, PI, PI2, EPSILON, INFINITY, radians, degrees, exp,
 
 export { default as OperatorNode, add, sub, mul, div, modInt, equal, lessThan, greaterThan, lessThanEqual, greaterThanEqual, and, or, not, xor, bitAnd, bitNot, bitOr, bitXor, shiftLeft, shiftRight, remainder } from './math/OperatorNode.js';
 export { default as CondNode, select, cond } from './math/CondNode.js';
-export * from './math/HashNode.js';
+export * from './math/Hash.js';
 
 // math utils
 export { parabola, gain, pcurve, sinc } from './math/MathUtils.js';
@@ -51,7 +51,7 @@ export { triNoise3D } from './math/TriNoise3D.js';
 // utils
 export { default as ArrayElementNode } from './utils/ArrayElementNode.js';
 export { default as ConvertNode } from './utils/ConvertNode.js';
-export * from './utils/DiscardNode.js';
+export * from './utils/Discard.js';
 export { default as EquirectUVNode, equirectUV } from './utils/EquirectUVNode.js';
 export { default as FunctionOverloadingNode, overloadingFn } from './utils/FunctionOverloadingNode.js';
 export { default as JoinNode } from './utils/JoinNode.js';
@@ -59,7 +59,7 @@ export { default as LoopNode, Loop, Continue, Break } from './utils/LoopNode.js'
 export { default as MatcapUVNode, matcapUV } from './utils/MatcapUVNode.js';
 export { default as MaxMipLevelNode, maxMipLevel } from './utils/MaxMipLevelNode.js';
 export { default as OscNode, oscSine, oscSquare, oscTriangle, oscSawtooth } from './utils/OscNode.js';
-export * from './utils/PackingNode.js';
+export * from './utils/Packing.js';
 export { default as RemapNode, remap, remapClamp } from './utils/RemapNode.js';
 export * from './utils/UVUtils.js';
 export * from './utils/SpriteUtils.js';
