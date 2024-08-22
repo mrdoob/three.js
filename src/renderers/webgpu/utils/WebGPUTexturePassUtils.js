@@ -240,29 +240,21 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 		}
 
+		const passes = textureData.layers[ baseArrayLayer ] || this._mipmapCreateBundles( textureGPU, textureGPUDescriptor, baseArrayLayer );
+
 		const commandEncoder = this.device.createCommandEncoder( {} );
 
-		if ( textureData.layers[ baseArrayLayer ] === undefined ) {
-
-			const passes = this._runOrBundle( commandEncoder, textureGPU, textureGPUDescriptor, baseArrayLayer, true );
-
-			if ( passes.length > 0 ) textureData.layers[ baseArrayLayer ] = passes;
-
-		}
-
-		if ( textureData.layers[ baseArrayLayer ] !== undefined ) {
-
-			this._runBundles( commandEncoder, textureData.layers[ baseArrayLayer ] );
-
-		}
+		this._mipmapRunBundles( commandEncoder, passes );
 
 		this.device.queue.submit( [ commandEncoder.finish() ] );
+
+		if ( textureData.useCount !== 0 ) textureData.layers[ baseArrayLayer ] = passes;
 
 		textureData.useCount ++;
 
 	}
 
-	_runOrBundle( commandEncoder, textureGPU, textureGPUDescriptor, baseArrayLayer, bundle = false ) {
+	_mipmapCreateBundles( textureGPU, textureGPUDescriptor, baseArrayLayer ) {
 
 		const pipeline = this.getTransferPipeline( textureGPUDescriptor.format );
 
@@ -297,8 +289,6 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 				baseArrayLayer
 			} );
 
-			let passEncoder;
-
 			const passDescriptor = {
 				colorAttachments: [ {
 					view: dstView,
@@ -308,34 +298,18 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 				} ]
 			};
 
-			if ( bundle ) {
-
-				passEncoder = this.device.createRenderBundleEncoder( {
-					colorFormats: [ textureGPUDescriptor.format ]
-				} );
-
-			} else {
-
-				passEncoder = commandEncoder.beginRenderPass( passDescriptor );
-
-			}
+			const passEncoder = this.device.createRenderBundleEncoder( {
+				colorFormats: [ textureGPUDescriptor.format ]
+			} );
 
 			passEncoder.setPipeline( pipeline );
 			passEncoder.setBindGroup( 0, bindGroup );
 			passEncoder.draw( 4, 1, 0, 0 );
 
-			if ( bundle ) {
-
-				passes.push( {
-					renderBundles: [ passEncoder.finish() ],
-					passDescriptor
-				} );
-
-			} else {
-
-				passEncoder.end();
-
-			}
+			passes.push( {
+				renderBundles: [ passEncoder.finish() ],
+				passDescriptor
+			} );
 
 			srcView = dstView;
 
@@ -345,7 +319,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	}
 
-	_runBundles( commandEncoder, passes ) {
+	_mipmapRunBundles( commandEncoder, passes ) {
 
 		const levels = passes.length;
 
