@@ -8,7 +8,7 @@ class WorkgroupInfoElementNode extends ArrayElementNode {
 
 		super( workgroupInfoNode, indexNode );
 
-		this.isScopedArrayElementNode = true;
+		this.isWorkgroupInfoElementNode = true;
 
 	}
 
