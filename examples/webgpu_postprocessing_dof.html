@@ -111,6 +111,7 @@
 				// post processing
 
 				postProcessing = new THREE.PostProcessing( renderer );
+				postProcessing.outputColorTransform = false;
 
 				const scenePass = pass( scene, camera );
 
@@ -119,7 +120,7 @@
 
 				const dofPass = scenePassColor.dof( scenePassViewZ, effectController.focus, effectController.aperture.mul( 0.00001 ), effectController.maxblur );
 
-				postProcessing.outputNode = dofPass;
+				postProcessing.outputNode = dofPass.renderOutput();
 
 				// controls
 
