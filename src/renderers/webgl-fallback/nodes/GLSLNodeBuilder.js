@@ -629,7 +629,7 @@ ${ flowData.code }
 
 	getFragCoord() {
 
-		return 'gl_FragCoord';
+		return 'gl_FragCoord.xy';
 
 	}
 

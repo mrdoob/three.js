@@ -2,7 +2,7 @@ import DataMap from '../DataMap.js';
 import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
 import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
-import { NodeFrame, objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, viewportBottomLeft, normalWorld, pmremTexture, viewportTopLeft } from '../../../nodes/Nodes.js';
+import { NodeFrame, objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, normalWorld, pmremTexture, viewportUV } from '../../../nodes/Nodes.js';
 
 import { EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
 
@@ -297,7 +297,7 @@ class Nodes extends DataMap {
 
 				} else if ( background.isTexture === true ) {
 
-					backgroundNode = texture( background, viewportBottomLeft ).setUpdateMatrix( true );
+					backgroundNode = texture( background, viewportUV.flipY() ).setUpdateMatrix( true );
 
 				} else if ( background.isColor !== true ) {
 
@@ -438,7 +438,7 @@ class Nodes extends DataMap {
 		const renderer = this.renderer;
 		const cacheKey = this.getOutputCacheKey();
 
-		const output = texture( outputTexture, viewportTopLeft ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+		const output = texture( outputTexture, viewportUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
 
 		outputNodeMap.set( outputTexture, cacheKey );
 
