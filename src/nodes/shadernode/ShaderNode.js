@@ -376,12 +376,6 @@ class ShaderNodeInternal extends Node {
 
 	}
 
-	get isArrayInput() {
-
-		return /^\((\s+)?\[/.test( this.jsFunc.toString() );
-
-	}
-
 	setLayout( layout ) {
 
 		this.layout = layout;

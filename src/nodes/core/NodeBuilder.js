@@ -995,27 +995,24 @@ class NodeBuilder {
 
 		const layout = shaderNode.layout;
 
-		let inputs;
+		const inputs = {
+			[ Symbol.iterator ]() {
 
-		if ( shaderNode.isArrayInput ) {
-
-			inputs = [];
-
-			for ( const input of layout.inputs ) {
-
-				inputs.push( new ParameterNode( input.type, input.name ) );
-
-			}
-
-		} else {
-
-			inputs = {};
-
-			for ( const input of layout.inputs ) {
-
-				inputs[ input.name ] = new ParameterNode( input.type, input.name );
+				let index = 0;
+				const values = Object.values( this );
+				return {
+					next: () => ( {
+						value: values[ index ],
+						done: index ++ >= values.length
+					} )
+				};
 
 			}
+		};
+
+		for ( const input of layout.inputs ) {
+
+			inputs[ input.name ] = new ParameterNode( input.type, input.name );
 
 		}
 
