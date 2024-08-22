@@ -70,21 +70,21 @@ class Bindings extends DataMap {
 
 	updateForCompute( computeNode ) {
 
-		this._updateBindings( computeNode, this.getForCompute( computeNode ) );
+		this._updateBindings( this.getForCompute( computeNode ) );
 
 	}
 
 	updateForRender( renderObject ) {
 
-		this._updateBindings( renderObject, this.getForRender( renderObject ) );
+		this._updateBindings( this.getForRender( renderObject ) );
 
 	}
 
-	_updateBindings( object, bindings ) {
+	_updateBindings( bindings ) {
 
 		for ( const bindGroup of bindings ) {
 
-			this._update( object, bindGroup, bindings );
+			this._update( bindGroup, bindings );
 
 		}
 
@@ -110,7 +110,7 @@ class Bindings extends DataMap {
 
 	}
 
-	_update( object, bindGroup, bindings ) {
+	_update( bindGroup, bindings ) {
 
 		const { backend } = this;
 
@@ -144,26 +144,26 @@ class Bindings extends DataMap {
 
 			} else if ( binding.isSampledTexture ) {
 
-				const texture = binding.texture;
-
-				if ( binding.needsBindingsUpdate ) needsBindingsUpdate = true;
+				if ( binding.needsBindingsUpdate( this.textures.get( binding.texture ).generation ) ) needsBindingsUpdate = true;
 
 				const updated = binding.update();
 
+				const texture = binding.texture;
+
 				if ( updated ) {
 
-					this.textures.updateTexture( binding.texture );
+					this.textures.updateTexture( texture );
 
 				}
 
-				const textureData = backend.get( binding.texture );
+				const textureData = backend.get( texture );
 
 				if ( backend.isWebGPUBackend === true && textureData.texture === undefined && textureData.externalTexture === undefined ) {
 
 					// TODO: Remove this once we found why updated === false isn't bound to a texture in the WebGPU backend
-					console.error( 'Bindings._update: binding should be available:', binding, updated, binding.texture, binding.textureNode.value );
+					console.error( 'Bindings._update: binding should be available:', binding, updated, texture, binding.textureNode.value, needsBindingsUpdate );
 
-					this.textures.updateTexture( binding.texture );
+					this.textures.updateTexture( texture );
 					needsBindingsUpdate = true;
 
 				}
@@ -192,9 +192,7 @@ class Bindings extends DataMap {
 
 		if ( needsBindingsUpdate === true ) {
 
-			const pipeline = this.pipelines.getForRender( object );
-
-			this.backend.updateBindings( bindGroup, bindings, pipeline );
+			this.backend.updateBindings( bindGroup, bindings );
 
 		}
 

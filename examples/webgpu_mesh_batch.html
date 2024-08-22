@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>three.js webgpu - batch mesh</title>
+	<title>three.js webgpu - mesh - batch</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="main.css">
@@ -14,7 +14,7 @@
 <body>
 
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - batch mesh
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - mesh - batch
 	</div>
 
 	<script type="importmap">
@@ -37,6 +37,8 @@
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { radixSort } from 'three/addons/utils/SortUtils.js';
+
+		import { transformedNormalView, directionToColor, diffuseColor } from 'three/tsl';
 
 		let camera, scene, renderer;
 		let controls, stats;
@@ -114,9 +116,10 @@
 
 			if ( ! material ) {
 
-				material = new THREE.MeshNormalNodeMaterial();
-
-			}
+				material = new THREE.MeshBasicNodeMaterial();
+				material.outputNode = diffuseColor.mul( directionToColor( transformedNormalView ).y.add( 0.5 ) );
+		
+	}
 
 			return material;
 
@@ -170,6 +173,7 @@
 
 				const id = mesh.addInstance( geometryIds[ i % geometryIds.length ] );
 				mesh.setMatrixAt( id, randomizeMatrix( matrix ) );
+				mesh.setColorAt( id, new THREE.Color( Math.random() * 0xffffff ) );
 
 				const rotationMatrix = new THREE.Matrix4();
 				rotationMatrix.makeRotationFromEuler( randomizeRotationSpeed( euler ) );
@@ -201,7 +205,7 @@
 			const aspect = window.innerWidth / window.innerHeight;
 
 			camera = new THREE.PerspectiveCamera( 70, aspect, 1, 100 );
-			camera.position.z = 50;
+			camera.position.z = 30;
 
 			// renderer
 
@@ -214,18 +218,7 @@
 			// scene
 
 			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xffffff );
-
-
-			if ( forceWebGL ) {
-
-				scene.background = new THREE.Color( 0xf10000 );
-
-			} else {
-
-				scene.background = new THREE.Color( 0x0000f1 );
-
-			}
+			scene.background = forceWebGL ? new THREE.Color( 0xffc1c1 ) : new THREE.Color( 0xc1c1ff );
 
 			document.body.appendChild( renderer.domElement );
 

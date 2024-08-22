@@ -13,9 +13,9 @@ class NodeSampledTexture extends SampledTexture {
 
 	}
 
-	get needsBindingsUpdate() {
+	needsBindingsUpdate( generation ) {
 
-		return this.textureNode.value !== this.texture || super.needsBindingsUpdate;
+		return this.textureNode.value !== this.texture || super.needsBindingsUpdate( generation );
 
 	}
 

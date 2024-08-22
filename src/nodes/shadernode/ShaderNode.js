@@ -4,6 +4,7 @@ import ConvertNode from '../utils/ConvertNode.js';
 import JoinNode from '../utils/JoinNode.js';
 import SplitNode from '../utils/SplitNode.js';
 import SetNode from '../utils/SetNode.js';
+import FlipNode from '../utils/FlipNode.js';
 import ConstNode from '../core/ConstNode.js';
 import { getValueFromType, getValueType } from '../core/NodeUtils.js';
 
@@ -29,6 +30,7 @@ export function addNodeElement( name, nodeElement ) {
 }
 
 const parseSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 'y' ).replace( /b|p/g, 'z' ).replace( /a|q/g, 'w' );
+const parseSwizzleAndSort = ( props ) => parseSwizzle( props ).split( '' ).sort().join( '' );
 
 const shaderNodeHandler = {
 
@@ -80,15 +82,19 @@ const shaderNodeHandler = {
 
 			} else if ( /^set[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
 
-				// set properties ( swizzle )
+				// set properties ( swizzle ) and sort to xyzw sequence
 
-				prop = parseSwizzle( prop.slice( 3 ).toLowerCase() );
-
-				// sort to xyzw sequence
-
-				prop = prop.split( '' ).sort().join( '' );
+				prop = parseSwizzleAndSort( prop.slice( 3 ).toLowerCase() );
 
 				return ( value ) => nodeObject( new SetNode( node, prop, value ) );
+
+			} else if ( /^flip[XYZWRGBASTPQ]{1,4}$/.test( prop ) === true ) {
+
+				// set properties ( swizzle ) and sort to xyzw sequence
+
+				prop = parseSwizzleAndSort( prop.slice( 4 ).toLowerCase() );
+
+				return () => nodeObject( new FlipNode( nodeObject( node ), prop ) );
 
 			} else if ( prop === 'width' || prop === 'height' || prop === 'depth' ) {
 
@@ -367,12 +373,6 @@ class ShaderNodeInternal extends Node {
 		this.global = true;
 
 		this.once = false;
-
-	}
-
-	get isArrayInput() {
-
-		return /^\((\s+)?\[/.test( this.jsFunc.toString() );
 
 	}
 

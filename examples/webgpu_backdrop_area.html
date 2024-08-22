@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, linearDepth, viewportLinearDepth, viewportSharedTexture, viewportMipTexture, viewportTopLeft, checker, uv, modelScale } from 'three/tsl';
+			import { color, linearDepth, viewportLinearDepth, viewportSharedTexture, viewportMipTexture, viewportUV, checker, uv, modelScale } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -106,7 +106,7 @@
 				bicubicMaterial.side = THREE.DoubleSide;
 
 				const pixelMaterial = new THREE.MeshBasicNodeMaterial();
-				pixelMaterial.backdropNode = viewportSharedTexture( viewportTopLeft.mul( 100 ).floor().div( 100 ) );
+				pixelMaterial.backdropNode = viewportSharedTexture( viewportUV.mul( 100 ).floor().div( 100 ) );
 				pixelMaterial.transparent = true;
 
 				// box / floor
