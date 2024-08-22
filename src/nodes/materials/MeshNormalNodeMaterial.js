@@ -1,6 +1,6 @@
 import NodeMaterial, { addNodeMaterial } from './NodeMaterial.js';
 import { diffuseColor } from '../core/PropertyNode.js';
-import { directionToColor } from '../utils/PackingNode.js';
+import { directionToColor } from '../utils/Packing.js';
 import { materialOpacity } from '../accessors/MaterialNode.js';
 import { transformedNormalView } from '../accessors/NormalNode.js';
 import { float, vec4 } from '../shadernode/ShaderNode.js';
