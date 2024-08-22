@@ -8,9 +8,9 @@ import { addNodeClass } from '../core/Node.js';
 
 class AnaglyphPassNode extends StereoCompositePassNode {
 
-	constructor( scene, camera, eyeSep ) {
+	constructor( scene, camera ) {
 
-		super( scene, camera, eyeSep );
+		super( scene, camera );
 
 		this.isAnaglyphPassNode = true;
 
@@ -57,6 +57,6 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 
 export default AnaglyphPassNode;
 
-export const anaglyphPass = ( scene, camera, eyeSep ) => nodeObject( new AnaglyphPassNode( scene, camera, eyeSep ) );
+export const anaglyphPass = ( scene, camera ) => nodeObject( new AnaglyphPassNode( scene, camera ) );
 
 addNodeClass( 'AnaglyphPassNode', AnaglyphPassNode );

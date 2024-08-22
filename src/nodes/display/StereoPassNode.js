@@ -7,14 +7,13 @@ const _size = /*@__PURE__*/ new Vector2();
 
 class StereoPassNode extends PassNode {
 
-	constructor( scene, camera, eyeSep = 0.064 ) {
+	constructor( scene, camera ) {
 
 		super( PassNode.COLOR, scene, camera );
 
 		this.isStereoPassNode = true;
 
 		this.stereo = new StereoCamera();
-		this.eyeSep = eyeSep;
 		this.stereo.aspect = 0.5;
 
 	}
@@ -22,13 +21,12 @@ class StereoPassNode extends PassNode {
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
-		const { scene, camera, stereo, eyeSep, renderTarget } = this;
+		const { scene, camera, stereo, renderTarget } = this;
 
 		this._pixelRatio = renderer.getPixelRatio();
 
 		stereo.cameraL.coordinateSystem = renderer.coordinateSystem;
 		stereo.cameraR.coordinateSystem = renderer.coordinateSystem;
-		stereo.eyeSep = eyeSep;
 		stereo.update( camera );
 
 		const size = renderer.getSize( _size );

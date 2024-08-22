@@ -7,9 +7,9 @@ import { addNodeClass } from '../core/Node.js';
 
 class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
-	constructor( scene, camera, eyeSep ) {
+	constructor( scene, camera ) {
 
-		super( scene, camera, eyeSep );
+		super( scene, camera );
 
 		this.isParallaxBarrierPassNode = true;
 
@@ -49,6 +49,6 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 export default ParallaxBarrierPassNode;
 
-export const parallaxBarrierPass = ( scene, camera, eyeSep ) => nodeObject( new ParallaxBarrierPassNode( scene, camera, eyeSep ) );
+export const parallaxBarrierPass = ( scene, camera ) => nodeObject( new ParallaxBarrierPassNode( scene, camera ) );
 
 addNodeClass( 'ParallaxBarrierPassNode', ParallaxBarrierPassNode );

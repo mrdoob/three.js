@@ -12,14 +12,13 @@ const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 class StereoCompositePassNode extends PassNode {
 
-	constructor( scene, camera, eyeSep = 0.064 ) {
+	constructor( scene, camera ) {
 
 		super( PassNode.COLOR, scene, camera );
 
 		this.isStereoCompositePassNode = true;
 
 		this.stereo = new StereoCamera();
-		this.eyeSep = eyeSep;
 		const _params = { minFilter: LinearFilter, magFilter: NearestFilter, type: HalfFloatType };
 
 		this._renderTargetL = new RenderTarget( 1, 1, _params );
@@ -36,7 +35,6 @@ class StereoCompositePassNode extends PassNode {
 
 		this.stereo.cameraL.coordinateSystem = coordinateSystem;
 		this.stereo.cameraR.coordinateSystem = coordinateSystem;
-		this.stereo.eyeSep = this.eyeSep;
 		this.stereo.update( this.camera );
 
 	}

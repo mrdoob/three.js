@@ -103,20 +103,16 @@
 
 				postProcessing.outputNode = stereo;
 
-				//
-
 				const gui = new GUI();
 				gui.add( params, 'effect', effects ).onChange( update );
 				gui.add( params, 'eyeSep', 0.001, 0.15, 0.001 ).onChange( function ( value ) {
 
-					stereo.eyeSep = value;
+					stereo.stereo.eyeSep = value;
 
-					anaglyph.eyeSep = value;
-					parallaxBarrier.eyeSep = value;
+					anaglyph.stereo.eyeSep = value;
+					parallaxBarrier.stereo.eyeSep = value;
 
 				} );
-
-				//
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -162,8 +158,6 @@
 				position.z = matrix.elements[ 14 ];
 
 			}
-
-			//
 
 			function animate() {
 
