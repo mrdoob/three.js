@@ -1,7 +1,7 @@
 import ViewportTextureNode from './ViewportTextureNode.js';
 import { addNodeClass } from '../core/Node.js';
 import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
-import { viewportTopLeft } from './ViewportNode.js';
+import { viewportUV } from './ViewportNode.js';
 
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
 
@@ -9,7 +9,7 @@ let _sharedFramebuffer = null;
 
 class ViewportSharedTextureNode extends ViewportTextureNode {
 
-	constructor( uvNode = viewportTopLeft, levelNode = null ) {
+	constructor( uvNode = viewportUV, levelNode = null ) {
 
 		if ( _sharedFramebuffer === null ) {
 
