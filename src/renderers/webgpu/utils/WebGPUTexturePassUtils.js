@@ -102,6 +102,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 		if ( pipeline === undefined ) {
 
 			pipeline = this.device.createRenderPipeline( {
+				label: `mipmap-${ format }`,
 				vertex: {
 					module: this.mipmapVertexShaderModule,
 					entryPoint: 'main'
@@ -133,6 +134,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 		if ( pipeline === undefined ) {
 
 			pipeline = this.device.createRenderPipeline( {
+				label: `flipY-${ format }`,
 				vertex: {
 					module: this.mipmapVertexShaderModule,
 					entryPoint: 'main'
