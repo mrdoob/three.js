@@ -207,11 +207,11 @@ class OutlinePass extends Pass {
 	changeVisibilityOfNonSelectedObjects( bVisible ) {
 
 		const cache = this._visibilityCache;
-		const selectedMeshes = [];
+		const selectedMeshes = new Set();
 
 		function gatherSelectedMeshesCallBack( object ) {
 
-			if ( object.isMesh ) selectedMeshes.push( object );
+			if ( object.isMesh ) selectedMeshes.add( object.id );
 
 		}
 
@@ -228,22 +228,7 @@ class OutlinePass extends Pass {
 
 				// only meshes and sprites are supported by OutlinePass
 
-				let bFound = false;
-
-				for ( let i = 0; i < selectedMeshes.length; i ++ ) {
-
-					const selectedObjectId = selectedMeshes[ i ].id;
-
-					if ( selectedObjectId === object.id ) {
-
-						bFound = true;
-						break;
-
-					}
-
-				}
-
-				if ( bFound === false ) {
+				if ( !selectedMeshes.has(object.id) ) {
 
 					const visibility = object.visible;
 
@@ -462,7 +447,7 @@ class OutlinePass extends Pass {
 						worldPosition = instanceMatrix * worldPosition;
 
 					#endif
-					
+
 					worldPosition = modelMatrix * worldPosition;
 
 					projTexCoord = textureMatrix * worldPosition;
