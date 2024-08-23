@@ -108,6 +108,8 @@ class WebGPUBackend extends Backend {
 
 		const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
 
+		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
+
 		this.context.configure( {
 			device: this.device,
 			format: this.utils.getPreferredCanvasFormat(),
@@ -1129,7 +1131,7 @@ class WebGPUBackend extends Backend {
 
 	initTimestampQuery( renderContext, descriptor ) {
 
-		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
+		if ( ! this.trackTimestamp ) return;
 
 		const renderContextData = this.get( renderContext );
 
@@ -1159,9 +1161,10 @@ class WebGPUBackend extends Backend {
 
 	prepareTimestampBuffer( renderContext, encoder ) {
 
-		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
+		if ( ! this.trackTimestamp ) return;
 
 		const renderContextData = this.get( renderContext );
+
 
 		const size = 2 * BigInt64Array.BYTES_PER_ELEMENT;
 
@@ -1194,7 +1197,7 @@ class WebGPUBackend extends Backend {
 
 	async resolveTimestampAsync( renderContext, type = 'render' ) {
 
-		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
+		if ( ! this.trackTimestamp ) return;
 
 		const renderContextData = this.get( renderContext );
 
