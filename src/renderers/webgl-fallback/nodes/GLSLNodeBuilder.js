@@ -607,7 +607,7 @@ ${ flowData.code }
 
 	}
 
-	getLocalInstanceIndex() {
+	getInstanceLocalIndex() {
 
 		const workgroupSize = this.object.workgroupSize;
 

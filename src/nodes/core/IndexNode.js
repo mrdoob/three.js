@@ -35,7 +35,7 @@ class IndexNode extends Node {
 
 		} else if ( scope === IndexNode.LOCAL ) {
 
-			propertyName = builder.getLocalInstanceIndex();
+			propertyName = builder.getInstanceLocalIndex();
 
 		} else {
 
@@ -72,7 +72,7 @@ export default IndexNode;
 
 export const vertexIndex = nodeImmutable( IndexNode, IndexNode.VERTEX );
 export const instanceIndex = nodeImmutable( IndexNode, IndexNode.INSTANCE );
-export const localInstanceIndex = nodeImmutable( IndexNode, IndexNode.LOCAL );
+export const instanceLocalIndex = nodeImmutable( IndexNode, IndexNode.LOCAL );
 export const drawIndex = nodeImmutable( IndexNode, IndexNode.DRAW );
 
 addNodeClass( 'IndexNode', IndexNode );

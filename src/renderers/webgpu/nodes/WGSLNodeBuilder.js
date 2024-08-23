@@ -629,9 +629,9 @@ ${ flowData.code }
 
 	}
 
-	getLocalInstanceIndex() {
+	getInstanceLocalIndex() {
 
-		return this.getBuiltin( 'local_invocation_index', 'localInstanceIndex', 'u32', 'attribute' );
+		return this.getBuiltin( 'local_invocation_index', 'instanceLocalIndex', 'u32', 'attribute' );
 
 	}
 
