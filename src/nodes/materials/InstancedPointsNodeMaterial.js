@@ -140,8 +140,6 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		} )();
 
-		this.needsUpdate = true;
-
 	}
 
 	get alphaToCoverage() {
