@@ -228,7 +228,7 @@ class OutlinePass extends Pass {
 
 				// only meshes and sprites are supported by OutlinePass
 
-				if ( !selectedMeshes.has(object.id) ) {
+				if ( selectedMeshes.has( object.id ) === false ) {
 
 					const visibility = object.visible;
 
