@@ -33,9 +33,9 @@ class IndexNode extends Node {
 
 			propertyName = builder.getDrawIndex();
 
-		} else if ( scope === IndexNode.LOCAL ) {
+		} else if ( scope === IndexNode.INVOCATION_LOCAL ) {
 
-			propertyName = builder.getInstanceLocalIndex();
+			propertyName = builder.getInvocationLocalIndex();
 
 		} else {
 
@@ -65,14 +65,14 @@ class IndexNode extends Node {
 
 IndexNode.VERTEX = 'vertex';
 IndexNode.INSTANCE = 'instance';
+IndexNode.INVOCATION_LOCAL = 'invocationLocal';
 IndexNode.DRAW = 'draw';
-IndexNode.LOCAL = 'local';
 
 export default IndexNode;
 
 export const vertexIndex = nodeImmutable( IndexNode, IndexNode.VERTEX );
 export const instanceIndex = nodeImmutable( IndexNode, IndexNode.INSTANCE );
-export const instanceLocalIndex = nodeImmutable( IndexNode, IndexNode.LOCAL );
+export const invocationLocalIndex = nodeImmutable( IndexNode, IndexNode.INVOCATION_LOCAL );
 export const drawIndex = nodeImmutable( IndexNode, IndexNode.DRAW );
 
 addNodeClass( 'IndexNode', IndexNode );
