@@ -9,17 +9,23 @@ export function getCacheKey( object, force = false ) {
 
 	let cacheKey = '{';
 
+	const snippets = [];
+
 	if ( object.isNode === true ) {
 
-		cacheKey += object.id;
+		snippets.push( `${object.id}` );
 
 	}
 
 	for ( const { property, childNode } of getNodeChildren( object ) ) {
 
-		cacheKey += ',' + property.slice( 0, - 4 ) + ':' + childNode.getCacheKey( force );
+		const prop = property.slice( 0, - 4 ) || 'node';
+
+		snippets.push( prop + ':' + childNode.getCacheKey( force ) );
 
 	}
+
+	cacheKey += snippets.join( ',' );
 
 	cacheKey += '}';
 
