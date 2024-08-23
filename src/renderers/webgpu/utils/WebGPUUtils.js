@@ -47,7 +47,7 @@ class WebGPUUtils {
 
 		} else {
 
-			format = GPUTextureFormat.BGRA8Unorm; // default context format
+			format = navigator.gpu.getPreferredCanvasFormat(); // default context format
 
 		}
 
