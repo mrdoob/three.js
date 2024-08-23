@@ -47,6 +47,7 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 
 		const material = this._material || ( this._material = builder.createNodeMaterial() );
 		material.fragmentNode = anaglyph().context( builder.getSharedContext() );
+		material.name = 'Anaglyph';
 		material.needsUpdate = true;
 
 		return super.setup( builder );

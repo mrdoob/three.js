@@ -217,6 +217,7 @@ class GTAONode extends TempNode {
 
 		const material = this._material || ( this._material = builder.createNodeMaterial() );
 		material.fragmentNode = ao().context( builder.getSharedContext() );
+		material.name = 'GTAO';
 		material.needsUpdate = true;
 
 		//

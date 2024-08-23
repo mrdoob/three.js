@@ -102,6 +102,7 @@ class Renderer {
 		this._background = null;
 
 		this._quad = new QuadMesh( new NodeMaterial() );
+		this._quad.material.type = 'Renderer_output';
 
 		this._currentRenderContext = null;
 
