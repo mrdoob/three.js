@@ -196,7 +196,7 @@ class BloomNode extends TempNode {
 
 		this._highPassFilterMaterial = this._highPassFilterMaterial || builder.createNodeMaterial();
 		this._highPassFilterMaterial.fragmentNode = luminosityHighPass().context( builder.getSharedContext() );
-		this._highPassFilterMaterial.name = 'Bloom_hp';
+		this._highPassFilterMaterial.name = 'Bloom_highPass';
 		this._highPassFilterMaterial.needsUpdate = true;
 
 		// gaussian blur materials

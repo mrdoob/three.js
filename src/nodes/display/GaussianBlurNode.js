@@ -163,7 +163,7 @@ class GaussianBlurNode extends TempNode {
 
 		const material = this._material || ( this._material = builder.createNodeMaterial() );
 		material.fragmentNode = blur().context( builder.getSharedContext() );
-		material.name = 'Guassian_blur';
+		material.name = 'Gaussian_blur';
 		material.needsUpdate = true;
 
 		//
