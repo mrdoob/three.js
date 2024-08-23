@@ -6,6 +6,7 @@ import { GPUFeatureName, GPUTextureFormat, GPULoadOp, GPUStoreOp, GPUIndexFormat
 
 import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
+import CommonUniformBuffer from '../common/CommonUniformBuffer.js';
 
 import WebGPUUtils from './utils/WebGPUUtils.js';
 import WebGPUAttributeUtils from './utils/WebGPUAttributeUtils.js';
@@ -43,6 +44,7 @@ class WebGPUBackend extends Backend {
 		this.pipelineUtils = new WebGPUPipelineUtils( this );
 		this.textureUtils = new WebGPUTextureUtils( this );
 		this.occludedResolveCache = new Map();
+		this.commonUniformBuffer = null;
 
 	}
 
@@ -507,8 +509,9 @@ class WebGPUBackend extends Backend {
 
 		this.prepareTimestampBuffer( renderContext, renderContextData.encoder );
 
-		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
+		this.bindingUtils.endPass();
 
+		this.device.queue.submit( [ renderContextData.encoder.finish() ] );
 
 		//
 
@@ -818,6 +821,7 @@ class WebGPUBackend extends Backend {
 		groupData.passEncoderGPU.end();
 
 		this.prepareTimestampBuffer( computeGroup, groupData.cmdEncoderGPU );
+		this.bindingUtils.endPass();
 
 		this.device.queue.submit( [ groupData.cmdEncoderGPU.finish() ] );
 
@@ -1229,7 +1233,15 @@ class WebGPUBackend extends Backend {
 
 	createNodeBuilder( object, renderer ) {
 
-		return new WGSLNodeBuilder( object, renderer );
+		const size = renderer.commonBufferSize;
+
+		if ( size > 0 && this.commonUniformBuffer === null ) {
+
+			this.commonUniformBuffer = new CommonUniformBuffer( 256 * size, this.device.limits.minUniformBufferOffsetAlignment, renderer.info );
+
+		}
+
+		return new WGSLNodeBuilder( object, renderer, this.commonUniformBuffer );
 
 	}
 

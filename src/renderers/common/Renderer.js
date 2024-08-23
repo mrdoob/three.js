@@ -78,6 +78,8 @@ class Renderer {
 
 		this.info = new Info();
 
+		this.commonBufferSize = 0;
+
 		// internals
 
 		this._pixelRatio = 1;

@@ -11,6 +11,32 @@ class WebGPUBindingUtils {
 		this.backend = backend;
 		this.bindGroupLayoutCache = new WeakMap();
 
+		this.lowwaterMark = Infinity;
+		this.highwaterMark = 0;
+
+		this.commonBufferGPU = null;
+
+	}
+
+	getCommonBuffer( commonUniformBuffer ) {
+
+		let bufferGPU = this.commonBufferGPU;
+
+		if ( bufferGPU === null ) {
+
+			bufferGPU = this.backend.device.createBuffer( {
+				label: 'bindingBuffer_common',
+				size: commonUniformBuffer.byteLength,
+				usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+			} );
+
+			this.commonBufferGPU = bufferGPU;
+			this.commonUniformBuffer = commonUniformBuffer;
+
+		}
+
+		return bufferGPU;
+
 	}
 
 	createBindingsLayout( bindGroup ) {
@@ -168,10 +194,19 @@ class WebGPUBindingUtils {
 		const backend = this.backend;
 		const device = backend.device;
 
-		const buffer = binding.buffer;
-		const bufferGPU = backend.get( binding ).buffer;
+		if ( binding.isNodeUniformsGroup && binding.allocateCommon() ) {
 
-		device.queue.writeBuffer( bufferGPU, 0, buffer, 0 );
+			const buffer = binding.buffer;
+
+			this.lowwaterMark = Math.min( this.lowwaterMark, buffer.byteOffset );
+			this.highwaterMark = Math.max( this.highwaterMark, buffer.byteOffset + buffer.byteLength );
+
+		} else {
+
+			const bufferGPU = backend.get( binding ).buffer;
+			device.queue.writeBuffer( bufferGPU, 0, binding.buffer, 0 );
+
+		}
 
 	}
 
@@ -189,23 +224,42 @@ class WebGPUBindingUtils {
 
 				const bindingData = backend.get( binding );
 
-				if ( bindingData.buffer === undefined ) {
+				let resource;
 
-					const byteLength = binding.byteLength;
+				if ( binding.isNodeUniformsGroup && binding.allocateCommon() ) {
 
-					const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
+					const buffer = binding.buffer;
 
-					const bufferGPU = device.createBuffer( {
-						label: 'bindingBuffer_' + binding.name,
-						size: byteLength,
-						usage: usage
-					} );
+					resource = {
+						label: 'bindingBufferCommon_' + binding.name,
+						buffer: this.getCommonBuffer( binding.commonUniformBuffer ),
+						offset: buffer.byteOffset,
+						size: buffer.byteLength
+					};
 
-					bindingData.buffer = bufferGPU;
+				} else {
+
+					if ( bindingData.buffer === undefined ) {
+
+						const byteLength = binding.byteLength;
+
+						const usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;
+
+						const bufferGPU = device.createBuffer( {
+							label: 'bindingBuffer_' + binding.name,
+							size: byteLength,
+							usage: usage
+						} );
+
+						bindingData.buffer = bufferGPU;
+
+					}
+
+					resource = { buffer: bindingData.buffer };
 
 				}
 
-				entriesGPU.push( { binding: bindingPoint, resource: { buffer: bindingData.buffer } } );
+				entriesGPU.push( { binding: bindingPoint, resource } );
 
 			} else if ( binding.isStorageBuffer ) {
 
@@ -281,6 +335,19 @@ class WebGPUBindingUtils {
 			layout: layoutGPU,
 			entries: entriesGPU
 		} );
+
+	}
+
+	endPass() {
+
+		if ( this.commonBufferGPU === null || this.lowwaterMark === Infinity ) return;
+
+		const device = this.backend.device;
+
+		device.queue.writeBuffer( this.commonBufferGPU, this.lowwaterMark, this.commonUniformBuffer.arrayBuffer, this.lowwaterMark, this.highwaterMark - this.lowwaterMark );
+
+		this.lowwaterMark = Infinity;
+		this.highwaterMark = 0;
 
 	}
 
