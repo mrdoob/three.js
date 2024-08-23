@@ -5,7 +5,6 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
 const _material = /*@__PURE__*/ new NodeMaterial();
 const _quadMesh = /*@__PURE__*/ new QuadMesh( _material );
 
-
 class PostProcessing {
 
 	constructor( renderer, outputNode = vec4( 0, 0, 1, 1 ) ) {
