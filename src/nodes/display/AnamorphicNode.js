@@ -116,6 +116,7 @@ class AnamorphicNode extends TempNode {
 		//
 
 		const material = this._material || ( this._material = builder.createNodeMaterial() );
+		material.name = 'Anamorphic';
 		material.fragmentNode = anamorph();
 
 		//

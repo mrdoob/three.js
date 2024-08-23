@@ -196,6 +196,7 @@ class BloomNode extends TempNode {
 
 		this._highPassFilterMaterial = this._highPassFilterMaterial || builder.createNodeMaterial();
 		this._highPassFilterMaterial.fragmentNode = luminosityHighPass().context( builder.getSharedContext() );
+		this._highPassFilterMaterial.name = 'Bloom_highPass';
 		this._highPassFilterMaterial.needsUpdate = true;
 
 		// gaussian blur materials
@@ -244,6 +245,7 @@ class BloomNode extends TempNode {
 
 		this._compositeMaterial = this._compositeMaterial || builder.createNodeMaterial();
 		this._compositeMaterial.fragmentNode = compositePass().context( builder.getSharedContext() );
+		this._compositeMaterial.name = 'Bloom_comp';
 		this._compositeMaterial.needsUpdate = true;
 
 		//
@@ -313,6 +315,7 @@ class BloomNode extends TempNode {
 
 		const seperableBlurMaterial = builder.createNodeMaterial();
 		seperableBlurMaterial.fragmentNode = seperableBlurPass().context( builder.getSharedContext() );
+		seperableBlurMaterial.name = 'Bloom_seperable';
 		seperableBlurMaterial.needsUpdate = true;
 
 		// uniforms

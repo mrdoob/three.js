@@ -47,6 +47,7 @@ class RTTNode extends TextureNode {
 	setup( builder ) {
 
 		this._rttNode = this.node.context( builder.getSharedContext() );
+		this._quadMesh.material.name = 'RTT';
 		this._quadMesh.material.needsUpdate = true;
 
 		return super.setup( builder );
