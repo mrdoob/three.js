@@ -3,6 +3,7 @@ import {
 } from './WebGPUConstants.js';
 
 import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
+import WebGPUUtils from './WebGPUUtils.js';
 
 import {
 	ByteType, ShortType,
@@ -264,7 +265,7 @@ class WebGPUTextureUtils {
 				depthOrArrayLayers: 1
 			},
 			sampleCount: backend.utils.getSampleCount( backend.renderer.samples ),
-			format: navigator.gpu.getPreferredCanvasFormat(),
+			format: WebGPUUtils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
 		} );
 
