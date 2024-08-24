@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, wgslFn, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportBottomLeft, js, string, global, Loop, cameraProjectionMatrix } from 'three/tsl';
+			import { Fn, wgslFn, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportUV, js, string, global, Loop, cameraProjectionMatrix } from 'three/tsl';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
@@ -206,7 +206,7 @@
 
 				// Screen Projection Texture
 				material = new THREE.MeshBasicNodeMaterial();
-				material.colorNode = texture( uvTexture, viewportBottomLeft );
+				material.colorNode = texture( uvTexture, viewportUV.flipY() );
 				materials.push( material );
 
 				// Loop
