@@ -47,7 +47,7 @@ class WebGPUUtils {
 
 		} else {
 
-			format = WebGPUUtils.getPreferredCanvasFormat(); // default context format
+			format = this.getPreferredCanvasFormat(); // default context format
 
 		}
 
@@ -109,7 +109,7 @@ class WebGPUUtils {
 
 	}
 
-	static getPreferredCanvasFormat() {
+	getPreferredCanvasFormat() {
 
 		if ( navigator.userAgent.includes( 'Quest' ) ) {
 
