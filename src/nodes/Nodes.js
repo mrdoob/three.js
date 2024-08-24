@@ -10,8 +10,8 @@ export { default as AttributeNode, attribute } from './core/AttributeNode.js';
 export { default as BypassNode, bypass } from './core/BypassNode.js';
 export { default as CacheNode, cache } from './core/CacheNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
-export { default as ContextNode } from './core/ContextNode.js';
-export { default as IndexNode, vertexIndex, instanceIndex, drawIndex } from './core/IndexNode.js';
+export { default as ContextNode, context, label } from './core/ContextNode.js';
+export { default as IndexNode, vertexIndex, instanceIndex, invocationLocalIndex, drawIndex } from './core/IndexNode.js';
 export { default as LightingModel } from './core/LightingModel.js';
 export { default as Node } from './core/Node.js';
 export { default as VarNode } from './core/VarNode.js';
@@ -39,9 +39,8 @@ export { NodeUtils };
 
 // math
 export { default as OperatorNode, add, sub, mul, div, modInt, equal, lessThan, greaterThan, lessThanEqual, greaterThanEqual, and, or, not, xor, bitAnd, bitNot, bitOr, bitXor, shiftLeft, shiftRight, remainder } from './math/OperatorNode.js';
-export { default as MathNode, PI, PI2, EPSILON, INFINITY, radians, degrees, exp, exp2, log, log2, sqrt, inverseSqrt, floor, ceil, normalize, fract, sin, cos, tan, asin, acos, atan, abs, sign, length, lengthSq, negate, oneMinus, dFdx, dFdy, round, reciprocal, trunc, fwidth, bitcast, atan2, min, max, mod, step, reflect, distance, difference, dot, cross, pow, pow2, pow3, pow4, transformDirection, mix, clamp, saturate, refract, smoothstep, faceForward, cbrt, transpose, all, any, equals, rand } from './math/MathNode.js';
-export { default as ConditionalNode, select, cond } from './math/ConditionalNode.js';
-export * from './math/HashNode.js';
+export { default as CondNode, select, cond } from './math/CondNode.js';
+export * from './math/Hash.js';
 
 // math utils
 export { parabola, gain, pcurve, sinc } from './math/MathUtils.js';
@@ -50,7 +49,6 @@ export { triNoise3D } from './math/TriNoise3D.js';
 // utils
 export { default as ArrayElementNode } from './utils/ArrayElementNode.js';
 export { default as ConvertNode } from './utils/ConvertNode.js';
-export * from './utils/DiscardNode.js';
 export { default as EquirectUVNode, equirectUV } from './utils/EquirectUVNode.js';
 export { default as FunctionOverloadingNode, overloadingFn } from './utils/FunctionOverloadingNode.js';
 export { default as JoinNode } from './utils/JoinNode.js';
@@ -58,7 +56,7 @@ export { default as LoopNode, Loop, Continue, Break } from './utils/LoopNode.js'
 export { default as MatcapUVNode, matcapUV } from './utils/MatcapUVNode.js';
 export { default as MaxMipLevelNode, maxMipLevel } from './utils/MaxMipLevelNode.js';
 export { default as OscNode, oscSine, oscSquare, oscTriangle, oscSawtooth } from './utils/OscNode.js';
-export * from './utils/PackingNode.js';
+export * from './utils/Packing.js';
 export { default as RemapNode, remap, remapClamp } from './utils/RemapNode.js';
 export * from './utils/UVUtils.js';
 export * from './utils/SpriteUtils.js';
@@ -122,7 +120,7 @@ export { default as FrontFacingNode, frontFacing, faceDirection } from './displa
 export { default as NormalMapNode, normalMap } from './display/NormalMapNode.js';
 export { default as PosterizeNode, posterize } from './display/PosterizeNode.js';
 export { default as ToneMappingNode, toneMapping } from './display/ToneMappingNode.js';
-export { default as ViewportNode, viewport, viewportCoordinate, viewportResolution, viewportTopLeft, viewportBottomLeft, viewportTopRight, viewportBottomRight } from './display/ViewportNode.js';
+export { default as ViewportNode, viewport, viewportCoordinate, viewportResolution, viewportUV, viewportTopLeft, viewportBottomLeft } from './display/ViewportNode.js';
 export { default as ViewportTextureNode, viewportTexture, viewportMipTexture } from './display/ViewportTextureNode.js';
 export { default as ViewportSharedTextureNode, viewportSharedTexture } from './display/ViewportSharedTextureNode.js';
 export { default as ViewportDepthTextureNode, viewportDepthTexture } from './display/ViewportDepthTextureNode.js';
@@ -146,6 +144,8 @@ export { default as RenderOutputNode, renderOutput } from './display/RenderOutpu
 export { default as PixelationPassNode, pixelationPass } from './display/PixelationPassNode.js';
 export { default as SSAAPassNode, ssaaPass } from './display/SSAAPassNode.js';
 export { default as StereoPassNode, stereoPass } from './display/StereoPassNode.js';
+export { default as AnaglyphPassNode, anaglyphPass } from './display/AnaglyphPassNode.js';
+export { default as ParallaxBarrierPassNode, parallaxBarrierPass } from './display/ParallaxBarrierPassNode.js';
 export { bleach } from './display/BleachBypassNode.js';
 export { sepia } from './display/SepiaNode.js';
 

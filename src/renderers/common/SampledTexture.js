@@ -13,16 +13,25 @@ class SampledTexture extends Binding {
 		this.texture = texture;
 		this.version = texture ? texture.version : 0;
 		this.store = false;
+		this.generation = null;
 
 		this.isSampledTexture = true;
 
 	}
 
-	get needsBindingsUpdate() {
+	needsBindingsUpdate( generation ) {
 
-		const { texture, version } = this;
+		const { texture } = this;
 
-		return texture.isVideoTexture ? true : version !== texture.version; // @TODO: version === 0 && texture.version > 0 ( add it just to External Textures like PNG,JPG )
+		if ( generation !== this.generation ) {
+
+			this.generation = generation;
+
+			return true;
+
+		}
+
+		return texture.isVideoTexture;
 
 	}
 

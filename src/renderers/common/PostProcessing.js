@@ -17,6 +17,8 @@ class PostProcessing {
 
 		this.needsUpdate = true;
 
+		_material.name = 'PostProcessing';
+
 	}
 
 	render() {

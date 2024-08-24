@@ -46,7 +46,8 @@ class Renderer {
 			logarithmicDepthBuffer = false,
 			alpha = true,
 			antialias = false,
-			samples = 0
+			samples = 0,
+			getFallback = null
 		} = parameters;
 
 		// public
@@ -85,6 +86,8 @@ class Renderer {
 
 		// internals
 
+		this._getFallback = getFallback;
+
 		this._pixelRatio = 1;
 		this._width = this.domElement.width;
 		this._height = this.domElement.height;
@@ -107,6 +110,7 @@ class Renderer {
 		this._background = null;
 
 		this._quad = new QuadMesh( new NodeMaterial() );
+		this._quad.material.type = 'Renderer_output';
 
 		this._currentRenderContext = null;
 
@@ -189,7 +193,7 @@ class Renderer {
 
 		this._initPromise = new Promise( async ( resolve, reject ) => {
 
-			const backend = this.backend;
+			let backend = this.backend;
 
 			try {
 
@@ -197,8 +201,28 @@ class Renderer {
 
 			} catch ( error ) {
 
-				reject( error );
-				return;
+				if ( this._getFallback !== null ) {
+
+					// try the fallback
+
+					try {
+
+						this.backend = backend = this._getFallback( error );
+						await backend.init( this );
+
+					} catch ( error ) {
+
+						reject( error );
+						return;
+
+					}
+
+				} else {
+
+					reject( error );
+					return;
+
+				}
 
 			}
 

@@ -629,6 +629,12 @@ ${ flowData.code }
 
 	}
 
+	getInvocationLocalIndex() {
+
+		return this.getBuiltin( 'local_invocation_index', 'invocationLocalIndex', 'u32', 'attribute' );
+
+	}
+
 	getSubgroupSize() {
 
 		this.enableSubGroups();
@@ -659,7 +665,7 @@ ${ flowData.code }
 
 	getFragCoord() {
 
-		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' ) + '.xyz';
+		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' ) + '.xy';
 
 	}
 

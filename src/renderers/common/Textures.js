@@ -173,6 +173,8 @@ class Textures extends DataMap {
 			backend.createSampler( texture );
 			backend.createTexture( texture, options );
 
+			textureData.generation = texture.version;
+
 		} else {
 
 			const needsCreate = textureData.initialized !== true;
@@ -216,6 +218,7 @@ class Textures extends DataMap {
 						backend.createTexture( texture, options );
 
 						textureData.isDefaultTexture = false;
+						textureData.generation = texture.version;
 
 					}
 
@@ -232,6 +235,7 @@ class Textures extends DataMap {
 				backend.createDefaultTexture( texture );
 
 				textureData.isDefaultTexture = true;
+				textureData.generation = texture.version;
 
 			}
 
@@ -242,6 +246,7 @@ class Textures extends DataMap {
 		if ( textureData.initialized !== true ) {
 
 			textureData.initialized = true;
+			textureData.generation = texture.version;
 
 			//
 

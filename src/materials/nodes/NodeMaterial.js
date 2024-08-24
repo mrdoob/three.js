@@ -308,6 +308,15 @@ class NodeMaterial extends Material {
 
 		}
 
+		if ( object.isBatchedMesh && object._colorsTexture ) {
+
+			const batchColor = varyingProperty( 'vec3', 'vBatchColor' );
+
+			colorNode = batchColor.mul( colorNode );
+
+		}
+
+
 		// COLOR
 
 		diffuseColor.assign( colorNode );

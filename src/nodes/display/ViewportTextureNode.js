@@ -1,7 +1,7 @@
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeProxy } from '../tsl/TSLBase.js';
-import { viewportTopLeft } from './ViewportNode.js';
+import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { viewportUV } from './ViewportNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
@@ -11,7 +11,7 @@ const _size = /*@__PURE__*/ new Vector2();
 
 class ViewportTextureNode extends TextureNode {
 
-	constructor( uvNode = viewportTopLeft, levelNode = null, framebufferTexture = null ) {
+	constructor( uvNode = viewportUV, levelNode = null, framebufferTexture = null ) {
 
 		if ( framebufferTexture === null ) {
 

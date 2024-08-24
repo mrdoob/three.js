@@ -1,5 +1,3 @@
-import WebGPU from '../../../examples/jsm/capabilities/WebGPU.js';
-
 import StandardRenderer from '../common/StandardRenderer.js';
 import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
@@ -27,15 +25,17 @@ class WebGPURenderer extends StandardRenderer {
 
 			BackendClass = WebGLBackend;
 
-		} else if ( WebGPU.isAvailable() ) {
+		} else {
 
 			BackendClass = WebGPUBackend;
 
-		} else {
+			parameters.getFallback = () => {
 
-			BackendClass = WebGLBackend;
+				console.warn( 'THREE.WebGPURenderer: WebGPU is not available, running under WebGL2 backend.' );
 
-			console.warn( 'THREE.WebGPURenderer: WebGPU is not available, running under WebGL2 backend.' );
+				return new WebGLBackend( parameters );
+
+			};
 
 		}
 

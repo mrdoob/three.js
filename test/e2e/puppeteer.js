@@ -141,7 +141,6 @@ const exceptionList = [
 	'webgpu_portal',
 	'webgpu_custom_fog',
 	'webgpu_instancing_morph',
-	'webgpu_mesh_batch',
 	'webgpu_texturegrad',
 	'webgpu_performance_renderbundle',
 	'webgpu_lights_rectarealight',

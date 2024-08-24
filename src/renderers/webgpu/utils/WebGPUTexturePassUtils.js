@@ -1,8 +1,11 @@
+import DataMap from '../../common/DataMap.js';
 import { GPUTextureViewDimension, GPUIndexFormat, GPUFilterMode, GPUPrimitiveTopology, GPULoadOp, GPUStoreOp } from './WebGPUConstants.js';
 
-class WebGPUTexturePassUtils {
+class WebGPUTexturePassUtils extends DataMap {
 
 	constructor( device ) {
+
+		super();
 
 		this.device = device;
 
@@ -99,6 +102,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 		if ( pipeline === undefined ) {
 
 			pipeline = this.device.createRenderPipeline( {
+				label: `mipmap-${ format }`,
 				vertex: {
 					module: this.mipmapVertexShaderModule,
 					entryPoint: 'main'
@@ -130,6 +134,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 		if ( pipeline === undefined ) {
 
 			pipeline = this.device.createRenderPipeline( {
+				label: `flipY-${ format }`,
 				vertex: {
 					module: this.mipmapVertexShaderModule,
 					entryPoint: 'main'
@@ -226,9 +231,33 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 	generateMipmaps( textureGPU, textureGPUDescriptor, baseArrayLayer = 0 ) {
 
-		const pipeline = this.getTransferPipeline( textureGPUDescriptor.format );
+		const textureData = this.get( textureGPU );
+
+		if ( textureData.useCount === undefined ) {
+
+			textureData.useCount = 0;
+			textureData.layers = [];
+
+		}
+
+		const passes = textureData.layers[ baseArrayLayer ] || this._mipmapCreateBundles( textureGPU, textureGPUDescriptor, baseArrayLayer );
 
 		const commandEncoder = this.device.createCommandEncoder( {} );
+
+		this._mipmapRunBundles( commandEncoder, passes );
+
+		this.device.queue.submit( [ commandEncoder.finish() ] );
+
+		if ( textureData.useCount !== 0 ) textureData.layers[ baseArrayLayer ] = passes;
+
+		textureData.useCount ++;
+
+	}
+
+	_mipmapCreateBundles( textureGPU, textureGPUDescriptor, baseArrayLayer ) {
+
+		const pipeline = this.getTransferPipeline( textureGPUDescriptor.format );
+
 		const bindGroupLayout = pipeline.getBindGroupLayout( 0 ); // @TODO: Consider making this static.
 
 		let srcView = textureGPU.createView( {
@@ -237,6 +266,8 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 			dimension: GPUTextureViewDimension.TwoD,
 			baseArrayLayer
 		} );
+
+		const passes = [];
 
 		for ( let i = 1; i < textureGPUDescriptor.mipLevelCount; i ++ ) {
 
@@ -258,25 +289,51 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 				baseArrayLayer
 			} );
 
-			const passEncoder = commandEncoder.beginRenderPass( {
+			const passDescriptor = {
 				colorAttachments: [ {
 					view: dstView,
 					loadOp: GPULoadOp.Clear,
 					storeOp: GPUStoreOp.Store,
 					clearValue: [ 0, 0, 0, 0 ]
 				} ]
+			};
+
+			const passEncoder = this.device.createRenderBundleEncoder( {
+				colorFormats: [ textureGPUDescriptor.format ]
 			} );
 
 			passEncoder.setPipeline( pipeline );
 			passEncoder.setBindGroup( 0, bindGroup );
 			passEncoder.draw( 4, 1, 0, 0 );
-			passEncoder.end();
+
+			passes.push( {
+				renderBundles: [ passEncoder.finish() ],
+				passDescriptor
+			} );
 
 			srcView = dstView;
 
 		}
 
-		this.device.queue.submit( [ commandEncoder.finish() ] );
+		return passes;
+
+	}
+
+	_mipmapRunBundles( commandEncoder, passes ) {
+
+		const levels = passes.length;
+
+		for ( let i = 0; i < levels; i ++ ) {
+
+			const pass = passes[ i ];
+
+			const passEncoder = commandEncoder.beginRenderPass( pass.passDescriptor );
+
+			passEncoder.executeBundles( pass.renderBundles );
+
+			passEncoder.end();
+
+		}
 
 	}
 

@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
-import { nodeImmutable, vec2 } from '../tsl/TSLBase.js';
+import { Fn, nodeImmutable, vec2 } from '../shadernode/ShaderNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -23,7 +23,6 @@ class ViewportNode extends Node {
 	getNodeType() {
 
 		if ( this.scope === ViewportNode.VIEWPORT ) return 'vec4';
-		else if ( this.scope === ViewportNode.COORDINATE ) return 'vec3';
 		else return 'vec2';
 
 	}
@@ -74,15 +73,7 @@ class ViewportNode extends Node {
 
 		} else {
 
-			output = viewportCoordinate.div( viewportResolution );
-
-			let outX = output.x;
-			let outY = output.y;
-
-			if ( /bottom/i.test( scope ) ) outY = outY.oneMinus();
-			if ( /right/i.test( scope ) ) outX = outX.oneMinus();
-
-			output = vec2( outX, outY );
+			output = vec2( viewportCoordinate.div( viewportResolution ) );
 
 		}
 
@@ -102,7 +93,7 @@ class ViewportNode extends Node {
 
 				const resolution = builder.getNodeProperties( viewportResolution ).outputNode.build( builder );
 
-				coord = `${ builder.getType( 'vec3' ) }( ${ coord }.x, ${ resolution }.y - ${ coord }.y, ${ coord }.z )`;
+				coord = `${ builder.getType( 'vec2' ) }( ${ coord }.x, ${ resolution }.y - ${ coord }.y )`;
 
 			}
 
@@ -129,7 +120,20 @@ export default ViewportNode;
 export const viewportCoordinate = nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
 export const viewportResolution = nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
 export const viewport = nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
-export const viewportTopLeft = nodeImmutable( ViewportNode, ViewportNode.TOP_LEFT );
-export const viewportBottomLeft = nodeImmutable( ViewportNode, ViewportNode.BOTTOM_LEFT );
-export const viewportTopRight = nodeImmutable( ViewportNode, ViewportNode.TOP_RIGHT );
-export const viewportBottomRight = nodeImmutable( ViewportNode, ViewportNode.BOTTOM_RIGHT );
+export const viewportUV = nodeImmutable( ViewportNode, ViewportNode.TOP_LEFT );
+
+export const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
+
+	console.warn( 'TSL.ViewportNode: "viewportTopLeft" is deprecated. Use "viewportUV" instead.' );
+
+	return viewportUV;
+
+}, 'vec2' ).once() )();
+
+export const viewportBottomLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
+
+	console.warn( 'TSL.ViewportNode: "viewportBottomLeft" is deprecated. Use "viewportUV.flipY()" instead.' );
+
+	return viewportUV.flipY();
+
+}, 'vec2' ).once() )();

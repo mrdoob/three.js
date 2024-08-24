@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { float, vec3, color, viewportSharedTexture, hue, overlay, posterize, grayscale, saturation, viewportSafeUV, viewportTopLeft, checker, uv, timerLocal, oscSine, output } from 'three/tsl';
+			import { float, vec3, color, viewportSharedTexture, hue, overlay, posterize, grayscale, saturation, viewportSafeUV, viewportUV, checker, uv, timerLocal, oscSine, output } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -43,12 +43,12 @@
 				camera.position.set( 1, 2, 3 );
 
 				scene = new THREE.Scene();
-				scene.backgroundNode = viewportTopLeft.y.mix( color( 0x66bbff ), color( 0x4466ff ) );
+				scene.backgroundNode = viewportUV.y.mix( color( 0x66bbff ), color( 0x4466ff ) );
 				camera.lookAt( 0, 1, 0 );
 
 				clock = new THREE.Clock();
 
-				//lights
+				// lights
 
 				const light = new THREE.SpotLight( 0xffffff, 1 );
 				light.power = 2000;
@@ -107,11 +107,11 @@
 				addBackdropSphere( grayscale( viewportSharedTexture().rgb ) );
 				addBackdropSphere( saturation( viewportSharedTexture().rgb, 10 ), oscSine() );
 				addBackdropSphere( overlay( viewportSharedTexture().rgb, checker( uv().mul( 10 ) ) ) );
-				addBackdropSphere( viewportSharedTexture( viewportSafeUV( viewportTopLeft.mul( 40 ).floor().div( 40 ) ) ) );
-				addBackdropSphere( viewportSharedTexture( viewportSafeUV( viewportTopLeft.mul( 80 ).floor().div( 80 ) ) ).add( color( 0x0033ff ) ) );
+				addBackdropSphere( viewportSharedTexture( viewportSafeUV( viewportUV.mul( 40 ).floor().div( 40 ) ) ) );
+				addBackdropSphere( viewportSharedTexture( viewportSafeUV( viewportUV.mul( 80 ).floor().div( 80 ) ) ).add( color( 0x0033ff ) ) );
 				addBackdropSphere( vec3( 0, 0, viewportSharedTexture().b ) );
 
-				//renderer
+				// renderer
 
 				renderer = new THREE.WebGPURenderer( { antialias: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );

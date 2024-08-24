@@ -705,12 +705,13 @@ function _setViewport( target, x, y, width, height ) {
 
 }
 
-function _getMaterial() {
+function _getMaterial( type ) {
 
 	const material = new NodeMaterial();
 	material.depthTest = false;
 	material.depthWrite = false;
 	material.blending = NoBlending;
+	material.name = `PMREM_${ type }`;
 
 	return material;
 
@@ -745,7 +746,7 @@ function _getBlurShader( lodMax, width, height ) {
 		CUBEUV_MAX_MIP
 	};
 
-	const material = _getMaterial();
+	const material = _getMaterial( 'blur' );
 	material.uniforms = materialUniforms; // TODO: Move to outside of the material
 	material.fragmentNode = blur( { ...materialUniforms, latitudinal: latitudinal.equal( 1 ) } );
 
@@ -755,7 +756,7 @@ function _getBlurShader( lodMax, width, height ) {
 
 function _getCubemapMaterial( envTexture ) {
 
-	const material = _getMaterial();
+	const material = _getMaterial( 'cubemap' );
 	material.fragmentNode = cubeTexture( envTexture, outputDirection );
 
 	return material;
@@ -764,7 +765,7 @@ function _getCubemapMaterial( envTexture ) {
 
 function _getEquirectMaterial( envTexture ) {
 
-	const material = _getMaterial();
+	const material = _getMaterial( 'equirect' );
 	material.fragmentNode = texture( envTexture, equirectUV( outputDirection ), 0 );
 
 	return material;
