@@ -14,6 +14,8 @@ import { Loop } from '../utils/LoopNode.js';
 import { passTexture } from './PassNode.js';
 import { RepeatWrapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
+
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Color } from '../../math/Color.js';
 
@@ -215,7 +217,7 @@ class GTAONode extends TempNode {
 
 		} );
 
-		const material = this._material || ( this._material = builder.createNodeMaterial() );
+		const material = this._material || ( this._material = new NodeMaterial() );
 		material.fragmentNode = ao().context( builder.getSharedContext() );
 		material.name = 'GTAO';
 		material.needsUpdate = true;

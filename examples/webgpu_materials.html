@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, wgslFn, positionLocal, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportUV, js, string, global, Loop, cameraProjectionMatrix } from 'three/tsl';
+			import { Fn, wgslFn, positionLocal, scriptable, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportUV, js, string, global, Loop, cameraProjectionMatrix } from 'three/tsl';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
@@ -241,7 +241,7 @@
 				global.set( 'THREE', THREE );
 				global.set( 'TSL', THREE );
 
-				const asyncNode = js( `
+				const asyncNode = scriptable( js( `
 
 					layout = {
 						outputType: 'node'
@@ -273,9 +273,9 @@
 
 					}
 
-				` ).scriptable();
+				` ) );
 
-				const scriptableNode = js( `
+				const scriptableNode = scriptable( js( `
 
 					layout = {
 						outputType: 'node',
@@ -325,7 +325,7 @@
 
 					output = { helloWorld };
 
-				` ).scriptable();
+				` ) );
 
 				scriptableNode.setParameter( 'source', texture( uvTexture ).xyz );
 				scriptableNode.setParameter( 'contrast', asyncNode );

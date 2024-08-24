@@ -9,6 +9,8 @@ import { output, property } from '../core/PropertyNode.js';
 import PassNode from './PassNode.js';
 import { mrt } from '../core/MRTNode.js';
 import { normalView } from '../accessors/NormalNode.js';
+import { convertToTexture } from '../utils/RTTNode.js';
+
 import { NearestFilter } from '../../constants.js';
 
 class PixelationNode extends TempNode {
@@ -150,7 +152,7 @@ class PixelationNode extends TempNode {
 
 }
 
-const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
+const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( convertToTexture( node ), convertToTexture( depthNode ), convertToTexture( normalNode ), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
 
 class PixelationPassNode extends PassNode {
 

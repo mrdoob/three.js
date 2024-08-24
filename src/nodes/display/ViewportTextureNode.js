@@ -1,6 +1,6 @@
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 import { viewportUV } from './ViewportNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';

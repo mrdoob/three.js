@@ -29,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { step, normalWorld, output, texture, vec3, vec4, normalize, positionWorld, cameraPosition, color, uniform, mix, uv, max } from 'three/tsl';
+			import { step, normalWorld, output, texture, vec3, vec4, normalize, positionWorld, bumpMap, cameraPosition, color, uniform, mix, uv, max } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -117,7 +117,7 @@
 					texture( bumpRoughnessCloudsTexture ).r,
 					cloudsStrength
 				);
-				globeMaterial.normalNode = bumpElevation.bumpMap();
+				globeMaterial.normalNode = bumpMap( bumpElevation );
 
 				const sphereGeometry = new THREE.SphereGeometry( 1, 64, 64 );
 				globe = new THREE.Mesh( sphereGeometry, globeMaterial );

@@ -6,6 +6,7 @@ import { uniform } from '../core/UniformNode.js';
 import { abs, max, min, mix, pow } from '../math/MathNode.js';
 import { sub } from '../math/OperatorNode.js';
 import { Loop, Break } from '../utils/LoopNode.js';
+import { convertToTexture } from '../utils/RTTNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 
@@ -320,6 +321,6 @@ class FXAANode extends TempNode {
 
 }
 
-export const fxaa = ( node ) => nodeObject( new FXAANode( nodeObject( node ).toTexture() ) );
+export const fxaa = ( node ) => nodeObject( new FXAANode( convertToTexture( node ) ) );
 
 export default FXAANode;

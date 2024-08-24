@@ -8,6 +8,8 @@ import { abs, dot, sin, cos, PI, pow, max } from '../math/MathNode.js';
 import { Loop } from '../utils/LoopNode.js';
 import { luminance } from './ColorAdjustmentNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
+import { convertToTexture } from '../utils/RTTNode.js';
+
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 
@@ -191,6 +193,6 @@ function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 
 }
 
-export const denoise = ( node, depthNode, normalNode, noiseNode, camera ) => nodeObject( new DenoiseNode( nodeObject( node ).toTexture(), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( noiseNode ), camera ) );
+export const denoise = ( node, depthNode, normalNode, noiseNode, camera ) => nodeObject( new DenoiseNode( convertToTexture( node ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( noiseNode ), camera ) );
 
 export default DenoiseNode;

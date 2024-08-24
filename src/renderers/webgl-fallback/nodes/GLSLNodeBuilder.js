@@ -1,4 +1,4 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents } from '../../../nodes/Nodes.js';
+import { GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents } from '../../../nodes/Nodes.js';
 
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
@@ -9,7 +9,7 @@ import { ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat, RedIntegerFor
 import { DataTexture } from '../../../textures/DataTexture.js';
 
 const glslMethods = {
-	[ MathNode.ATAN2 ]: 'atan',
+	atan2: 'atan',
 	textureDimensions: 'textureSize',
 	equals: 'equal'
 };

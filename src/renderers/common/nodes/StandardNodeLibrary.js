@@ -71,8 +71,8 @@ class StandardNodeLibrary extends NodeLibrary {
 		this.addMaterial( MeshToonNodeMaterial, MeshToonMaterial );
 		this.addMaterial( MeshBasicNodeMaterial, MeshBasicMaterial );
 		this.addMaterial( MeshLambertNodeMaterial, MeshLambertMaterial );
-		this.addMaterial( MeshNormalMaterial, MeshNormalNodeMaterial );
-		this.addMaterial( MeshMatcapMaterial, MeshMatcapNodeMaterial );
+		this.addMaterial( MeshNormalNodeMaterial, MeshNormalMaterial );
+		this.addMaterial( MeshMatcapNodeMaterial, MeshMatcapMaterial );
 		this.addMaterial( LineBasicNodeMaterial, LineBasicMaterial );
 		this.addMaterial( LineDashedNodeMaterial, LineDashedMaterial );
 		this.addMaterial( PointsNodeMaterial, PointsMaterial );

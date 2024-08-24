@@ -6,7 +6,9 @@ import { NodeUpdateType } from '../core/constants.js';
 import { threshold } from './ColorAdjustmentNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { passTexture } from './PassNode.js';
+import { convertToTexture } from '../utils/RTTNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
@@ -115,7 +117,7 @@ class AnamorphicNode extends TempNode {
 
 		//
 
-		const material = this._material || ( this._material = builder.createNodeMaterial() );
+		const material = this._material || ( this._material = new NodeMaterial() );
 		material.name = 'Anamorphic';
 		material.fragmentNode = anamorph();
 
@@ -138,6 +140,6 @@ class AnamorphicNode extends TempNode {
 
 }
 
-export const anamorphic = ( node, threshold = .9, scale = 3, samples = 32 ) => nodeObject( new AnamorphicNode( nodeObject( node ).toTexture(), nodeObject( threshold ), nodeObject( scale ), samples ) );
+export const anamorphic = ( node, threshold = .9, scale = 3, samples = 32 ) => nodeObject( new AnamorphicNode( convertToTexture( node ), nodeObject( threshold ), nodeObject( scale ), samples ) );
 
 export default AnamorphicNode;

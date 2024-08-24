@@ -16,6 +16,7 @@ import { add } from '../math/OperatorNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { texture } from '../accessors/TextureNode.js';
 import { Vector3 } from '../../math/Vector3.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
@@ -194,7 +195,7 @@ class BloomNode extends TempNode {
 
 		} );
 
-		this._highPassFilterMaterial = this._highPassFilterMaterial || builder.createNodeMaterial();
+		this._highPassFilterMaterial = this._highPassFilterMaterial || new NodeMaterial();
 		this._highPassFilterMaterial.fragmentNode = luminosityHighPass().context( builder.getSharedContext() );
 		this._highPassFilterMaterial.name = 'Bloom_highPass';
 		this._highPassFilterMaterial.needsUpdate = true;
@@ -243,7 +244,7 @@ class BloomNode extends TempNode {
 
 		} );
 
-		this._compositeMaterial = this._compositeMaterial || builder.createNodeMaterial();
+		this._compositeMaterial = this._compositeMaterial || new NodeMaterial();
 		this._compositeMaterial.fragmentNode = compositePass().context( builder.getSharedContext() );
 		this._compositeMaterial.name = 'Bloom_comp';
 		this._compositeMaterial.needsUpdate = true;
@@ -313,7 +314,7 @@ class BloomNode extends TempNode {
 
 		} );
 
-		const seperableBlurMaterial = builder.createNodeMaterial();
+		const seperableBlurMaterial = new NodeMaterial();
 		seperableBlurMaterial.fragmentNode = seperableBlurPass().context( builder.getSharedContext() );
 		seperableBlurMaterial.name = 'Bloom_seperable';
 		seperableBlurMaterial.needsUpdate = true;

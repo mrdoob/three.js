@@ -7,6 +7,7 @@ import { uniform } from '../core/UniformNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { texture } from '../accessors/TextureNode.js';
 import { mrt, getTextureIndex } from '../core/MRTNode.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -210,7 +211,7 @@ class SSAAPassNode extends PassNode {
 
 		}
 
-		this._quadMesh.material = builder.createNodeMaterial();
+		this._quadMesh.material = new NodeMaterial();
 		this._quadMesh.material.fragmentNode = sampleTexture;
 		this._quadMesh.material.transparent = true;
 		this._quadMesh.material.depthTest = false;

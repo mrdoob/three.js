@@ -1,10 +1,10 @@
-import { Fn, nodeObject, vec4 } from '../shadernode/ShaderNode.js';
+import { Fn, nodeObject, vec4 } from '../tsl/TSLBase.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 import { uniform } from '../core/UniformNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { clamp, max } from '../math/MathNode.js';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
-import { addNodeClass } from '../core/Node.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 class AnaglyphPassNode extends StereoCompositePassNode {
 
@@ -45,7 +45,7 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 
 		} );
 
-		const material = this._material || ( this._material = builder.createNodeMaterial() );
+		const material = this._material || ( this._material = new NodeMaterial() );
 		material.fragmentNode = anaglyph().context( builder.getSharedContext() );
 		material.name = 'Anaglyph';
 		material.needsUpdate = true;
@@ -59,5 +59,3 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 export default AnaglyphPassNode;
 
 export const anaglyphPass = ( scene, camera ) => nodeObject( new AnaglyphPassNode( scene, camera ) );
-
-addNodeClass( 'AnaglyphPassNode', AnaglyphPassNode );

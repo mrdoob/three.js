@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, vec2, pass, linearDepth, normalWorld, triplanarTexture, texture, objectPosition, viewportUV, viewportLinearDepth, viewportDepthTexture, viewportSharedTexture, mx_worley_noise_float, positionWorld, timerLocal } from 'three/tsl';
+			import { color, vec2, pass, linearDepth, normalWorld, gaussianBlur, triplanarTexture, texture, objectPosition, viewportUV, viewportLinearDepth, viewportDepthTexture, viewportSharedTexture, mx_worley_noise_float, positionWorld, timerLocal } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -223,7 +223,7 @@
 
 				const waterMask = objectPosition( camera ).y.greaterThan( 0 );
 
-				const scenePassColorBlurred = scenePassColor.gaussianBlur();
+				const scenePassColorBlurred = gaussianBlur( scenePassColor );
 				scenePassColorBlurred.directionNode = waterMask.select( scenePassDepth, scenePass.getLinearDepthNode().mul( 5 ) );
 
 				const vignet = viewportUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus();

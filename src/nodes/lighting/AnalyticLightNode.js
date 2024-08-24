@@ -12,6 +12,7 @@ import { Color } from '../../math/Color.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
 import { Fn } from '../tsl/TSLBase.js';
 import { LessCompare, WebGPUCoordinateSystem } from '../../constants.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
 
@@ -165,7 +166,7 @@ class AnalyticLightNode extends LightingNode {
 
 			if ( overrideMaterial === null ) {
 
-				overrideMaterial = builder.createNodeMaterial();
+				overrideMaterial = new NodeMaterial();
 				overrideMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
 				overrideMaterial.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.fragmentNode unintentionally when using material.shadowNode
 				overrideMaterial.name = 'ShadowMaterial';

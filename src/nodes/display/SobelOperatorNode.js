@@ -5,6 +5,7 @@ import { Fn, nodeObject, vec2, vec3, vec4, mat3 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { add } from '../math/OperatorNode.js';
+import { convertToTexture } from '../utils/RTTNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 
@@ -114,6 +115,6 @@ class SobelOperatorNode extends TempNode {
 
 }
 
-export const sobel = ( node ) => nodeObject( new SobelOperatorNode( nodeObject( node ).toTexture() ) );
+export const sobel = ( node ) => nodeObject( new SobelOperatorNode( convertToTexture( node ) ) );
 
 export default SobelOperatorNode;

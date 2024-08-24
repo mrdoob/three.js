@@ -38,13 +38,9 @@ import * as NodeUtils from './core/NodeUtils.js';
 export { NodeUtils };
 
 // math
-export { default as OperatorNode, add, sub, mul, div, modInt, equal, lessThan, greaterThan, lessThanEqual, greaterThanEqual, and, or, not, xor, bitAnd, bitNot, bitOr, bitXor, shiftLeft, shiftRight, remainder } from './math/OperatorNode.js';
-export { default as CondNode, select, cond } from './math/CondNode.js';
 export * from './math/Hash.js';
-
-// math utils
-export { parabola, gain, pcurve, sinc } from './math/MathUtils.js';
-export { triNoise3D } from './math/TriNoise3D.js';
+export * from './math/MathUtils.js';
+export * from './math/TriNoise3D.js';
 
 // utils
 export { default as ArrayElementNode } from './utils/ArrayElementNode.js';
@@ -69,7 +65,7 @@ export { default as StorageArrayElementNode } from './utils/StorageArrayElementN
 export { default as TimerNode, timerLocal, timerGlobal, timerDelta, frameId } from './utils/TimerNode.js';
 export { default as TriplanarTexturesNode, triplanarTextures, triplanarTexture } from './utils/TriplanarTexturesNode.js';
 export { default as ReflectorNode, reflector } from './utils/ReflectorNode.js';
-export { default as RTTNode, rtt } from './utils/RTTNode.js';
+export { default as RTTNode, rtt, convertToTexture } from './utils/RTTNode.js';
 
 // three.js shading language
 export * from './tsl/TSLBase.js';

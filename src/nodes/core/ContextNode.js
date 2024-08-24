@@ -14,6 +14,12 @@ class ContextNode extends Node {
 
 	}
 
+	getScope() {
+
+		return this.node.getScope();
+
+	}
+
 	getNodeType( builder ) {
 
 		return this.node.getNodeType( builder );

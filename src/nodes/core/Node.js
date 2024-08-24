@@ -147,6 +147,12 @@ class Node extends EventDispatcher {
 
 	}
 
+	getScope() {
+
+		return this;
+
+	}
+
 	getHash( /*builder*/ ) {
 
 		return this.uuid;

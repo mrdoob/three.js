@@ -221,7 +221,7 @@ class MaterialNode extends Node {
 
 			if ( material.clearcoatNormalMap ) {
 
-				node = this.getTexture( scope ).normalMap( this.getCache( scope + 'Scale', 'vec2' ) );
+				node = normalMap( this.getTexture( scope ), this.getCache( scope + 'Scale', 'vec2' ) );
 
 			} else {
 

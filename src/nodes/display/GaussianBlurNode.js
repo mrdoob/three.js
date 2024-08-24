@@ -5,10 +5,12 @@ import { mul } from '../math/OperatorNode.js';
 import { uv } from '../accessors/UVNode.js';
 import { passTexture } from './PassNode.js';
 import { uniform } from '../core/UniformNode.js';
+import { convertToTexture } from '../utils/RTTNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 // WebGPU: The use of a single QuadMesh for both gaussian blur passes results in a single RenderObject with a SampledTexture binding that
 // alternates between source textures and triggers creation of new BindGroups and BindGroupLayouts every frame.
@@ -161,7 +163,7 @@ class GaussianBlurNode extends TempNode {
 
 		//
 
-		const material = this._material || ( this._material = builder.createNodeMaterial() );
+		const material = this._material || ( this._material = new NodeMaterial() );
 		material.fragmentNode = blur().context( builder.getSharedContext() );
 		material.name = 'Gaussian_blur';
 		material.needsUpdate = true;
@@ -200,6 +202,6 @@ class GaussianBlurNode extends TempNode {
 
 }
 
-export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( nodeObject( node ).toTexture(), directionNode, sigma ) );
+export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ) );
 
 export default GaussianBlurNode;

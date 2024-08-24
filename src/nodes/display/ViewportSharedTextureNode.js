@@ -1,5 +1,5 @@
 import ViewportTextureNode from './ViewportTextureNode.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 import { viewportUV } from './ViewportNode.js';
 
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';

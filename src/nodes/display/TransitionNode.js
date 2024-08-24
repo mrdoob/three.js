@@ -3,6 +3,7 @@ import { uv } from '../accessors/UVNode.js';
 import { Fn, nodeObject, float, int, vec4, If } from '../tsl/TSLBase.js';
 import { clamp, mix } from '../math/MathNode.js';
 import { sub } from '../math/OperatorNode.js';
+import { convertToTexture } from '../utils/RTTNode.js';
 
 class TransitionNode extends TempNode {
 
@@ -68,6 +69,6 @@ class TransitionNode extends TempNode {
 
 }
 
-export const transition = ( nodeA, nodeB, mixTexture, mixRatio = 0.0, threshold = 0.1, useTexture = 0 ) => nodeObject( new TransitionNode( nodeObject( nodeA ).toTexture(), nodeObject( nodeB ).toTexture(), nodeObject( mixTexture ).toTexture(), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) ) );
+export const transition = ( nodeA, nodeB, mixTexture, mixRatio = 0.0, threshold = 0.1, useTexture = 0 ) => nodeObject( new TransitionNode( convertToTexture( nodeA ), convertToTexture( nodeB ), convertToTexture( mixTexture ), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) ) );
 
 export default TransitionNode;

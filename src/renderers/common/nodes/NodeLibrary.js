@@ -3,7 +3,7 @@ class NodeLibrary {
 	constructor() {
 
 		this.lightNodes = new WeakMap();
-		this.materialNodes = new WeakMap();
+		this.materialNodes = new Map();
 		this.toneMappingNodes = new Map();
 		this.colorSpaceNodes = new Map();
 
@@ -15,7 +15,7 @@ class NodeLibrary {
 
 		let nodeMaterial = null;
 
-		const nodeMaterialClass = this.getMaterialNodeClass( material.constructor );
+		const nodeMaterialClass = this.getMaterialNodeClass( material.type );
 
 		if ( nodeMaterialClass !== null ) {
 
@@ -57,15 +57,15 @@ class NodeLibrary {
 
 	}
 
-	getMaterialNodeClass( material ) {
+	getMaterialNodeClass( materialType ) {
 
-		return this.materialNodes.get( material ) || null;
+		return this.materialNodes.get( materialType ) || null;
 
 	}
 
 	addMaterial( materialNodeClass, materialClass ) {
 
-		this.addClass( materialNodeClass, materialClass, this.materialNodes );
+		this.addType( materialNodeClass, materialClass.name, this.materialNodes );
 
 	}
 

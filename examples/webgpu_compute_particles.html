@@ -37,7 +37,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, uniform, texture, instanceIndex, float, vec3, storage, If } from 'three/tsl';
+			import { Fn, uniform, texture, instanceIndex, float, hash, vec3, storage, If } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -90,9 +90,9 @@
 					const position = positionBuffer.element( instanceIndex );
 					const color = colorBuffer.element( instanceIndex );
 
-					const randX = instanceIndex.hash();
-					const randY = instanceIndex.add( 2 ).hash();
-					const randZ = instanceIndex.add( 3 ).hash();
+					const randX = hash( instanceIndex );
+					const randY = hash( instanceIndex.add( 2 ) );
+					const randZ = hash( instanceIndex.add( 3 ) );
 
 					position.x = randX.mul( 100 ).add( - 50 );
 					position.y = 0; // randY.mul( 10 );
@@ -192,7 +192,7 @@
 					const distArea = float( 6 ).sub( dist ).max( 0 );
 
 					const power = distArea.mul( .01 );
-					const relativePower = power.mul( instanceIndex.hash().mul( .5 ).add( .5 ) );
+					const relativePower = power.mul( hash( instanceIndex ).mul( .5 ).add( .5 ) );
 
 					velocity.assign( velocity.add( direction.mul( relativePower ) ) );
 

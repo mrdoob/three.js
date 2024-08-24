@@ -4,6 +4,7 @@ import { Fn, nodeObject, vec2, vec4 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { clamp } from '../math/MathNode.js';
+import { convertToTexture } from '../utils/RTTNode.js';
 
 class DepthOfFieldNode extends TempNode {
 
@@ -112,6 +113,6 @@ class DepthOfFieldNode extends TempNode {
 
 }
 
-export const dof = ( node, viewZNode, focus = 1, aperture = 0.025, maxblur = 1 ) => nodeObject( new DepthOfFieldNode( nodeObject( node ).toTexture(), nodeObject( viewZNode ), nodeObject( focus ), nodeObject( aperture ), nodeObject( maxblur ) ) );
+export const dof = ( node, viewZNode, focus = 1, aperture = 0.025, maxblur = 1 ) => nodeObject( new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focus ), nodeObject( aperture ), nodeObject( maxblur ) ) );
 
 export default DepthOfFieldNode;

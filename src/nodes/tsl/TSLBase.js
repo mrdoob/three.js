@@ -20,7 +20,7 @@ export * from '../core/CacheNode.js'; // .cache()
 export * from '../core/BypassNode.js'; // .bypass()
 export * from '../utils/RemapNode.js'; // .remap(), .remapClamp()
 export * from '../code/ExpressionNode.js'; // expression()
-export * from '../utils/DiscardNode.js'; // Discard(), Return()
+export * from '../utils/Discard.js'; // Discard(), Return()
 export * from '../display/RenderOutputNode.js'; // .renderOutput()
 
 export function addNodeElement( name/*, nodeElement*/ ) {

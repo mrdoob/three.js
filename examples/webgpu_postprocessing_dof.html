@@ -20,7 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { cubeTexture, positionWorld, oscSine, timerGlobal, pass, uniform } from 'three/tsl';
+			import { cubeTexture, positionWorld, oscSine, timerGlobal, pass, dof, uniform } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -117,7 +117,7 @@
 				const scenePassColor = scenePass.getTextureNode();
 				const scenePassViewZ = scenePass.getViewZNode();
 
-				const dofPass = scenePassColor.dof( scenePassViewZ, effectController.focus, effectController.aperture.mul( 0.00001 ), effectController.maxblur );
+				const dofPass = dof( scenePassColor, scenePassViewZ, effectController.focus, effectController.aperture.mul( 0.00001 ), effectController.maxblur );
 
 				postProcessing.outputNode = dofPass;
 
@@ -169,7 +169,7 @@
 			function animate() {
 
 				render();
-				stats.update();
+				//stats.update();
 
 			}
 

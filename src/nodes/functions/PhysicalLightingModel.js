@@ -18,6 +18,7 @@ import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../acc
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
 import { viewportResolution } from '../display/ViewportNode.js';
 import { viewportMipTexture } from '../display/ViewportTextureNode.js';
+import { textureBicubic } from '../accessors/TextureBicubicNode.js';
 import { Loop } from '../utils/LoopNode.js';
 
 //
@@ -75,7 +76,7 @@ const getTransmissionSample = Fn( ( [ fragCoord, roughness, ior ] ) => {
 
 	const lod = log2( float( viewportResolution.x ) ).mul( applyIorToRoughness( roughness, ior ) );
 
-	return transmissionSample.bicubic( lod );
+	return textureBicubic( transmissionSample, lod );
 
 } );
 

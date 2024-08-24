@@ -4,6 +4,7 @@ import { cameraProjectionMatrix } from '../../nodes/accessors/CameraNode.js';
 import { materialRotation } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionLocal } from '../../nodes/accessors/PositionNode.js';
+import { rotate } from '../../nodes/utils/RotateNode.js';
 import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 
 import { SpriteMaterial } from '../SpriteMaterial.js';
@@ -60,7 +61,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const rotation = float( rotationNode || materialRotation );
 
-		const rotatedPosition = alignedPosition.rotate( rotation );
+		const rotatedPosition = rotate( alignedPosition, rotation );
 
 		mvPosition = vec4( mvPosition.xy.add( rotatedPosition ), mvPosition.zw );
 
