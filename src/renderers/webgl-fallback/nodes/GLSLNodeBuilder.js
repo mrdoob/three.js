@@ -201,7 +201,7 @@ ${ flowData.code }
 		const nodeUniform = this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
 		const textureName = this.getPropertyName( nodeUniform );
 
-		indexNode.increaseUsage( this ); // force cache generate to be used as index in x,y
+		this.increaseUsage( indexNode ); // force cache generate to be used as index in x,y
 		const indexSnippet = indexNode.build( this, 'uint' );
 
 		const elementNodeData = this.getDataFromNode( storageArrayElementNode );

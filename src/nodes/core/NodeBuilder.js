@@ -469,6 +469,15 @@ class NodeBuilder {
 
 	}
 
+	increaseUsage( node ) {
+
+		const nodeData = this.getDataFromNode( node );
+		nodeData.usageCount = nodeData.usageCount === undefined ? 1 : nodeData.usageCount + 1;
+
+		return nodeData.usageCount;
+
+	}
+
 	generateTexture( /* texture, textureProperty, uvSnippet */ ) {
 
 		console.warn( 'Abstract function.' );

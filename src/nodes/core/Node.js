@@ -226,18 +226,9 @@ class Node extends EventDispatcher {
 
 	}
 
-	increaseUsage( builder ) {
-
-		const nodeData = builder.getDataFromNode( this );
-		nodeData.usageCount = nodeData.usageCount === undefined ? 1 : nodeData.usageCount + 1;
-
-		return nodeData.usageCount;
-
-	}
-
 	analyze( builder ) {
 
-		const usageCount = this.increaseUsage( builder );
+		const usageCount = builder.increaseUsage( this );
 
 		if ( usageCount === 1 ) {
 
