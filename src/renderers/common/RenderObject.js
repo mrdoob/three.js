@@ -62,7 +62,7 @@ export default class RenderObject {
 		this.vertexBuffers = null;
 
 		this.clippingContext = clippingContext;
-		this.clippingContextVersion = clippingContext !== null ? clippingContext.version : 0;
+		this.clippingContextCacheKey = clippingContext !== null ? clippingContext.cacheKey : '';
 
 		this.initialNodesCacheKey = this.getDynamicCacheKey();
 		this.initialCacheKey = this.getCacheKey();
@@ -92,9 +92,9 @@ export default class RenderObject {
 
 	get clippingNeedsUpdate() {
 
-		if ( this.clippingContext === null || this.clippingContext.version === this.clippingContextVersion ) return false;
+		if ( this.clippingContext === null || this.clippingContext.cacheKey === this.clippingContextCacheKey ) return false;
 
-		this.clippingContextVersion = this.clippingContext.version;
+		this.clippingContextCacheKey = this.clippingContext.cacheKey;
 
 		return true;
 
@@ -214,7 +214,7 @@ export default class RenderObject {
 
 		}
 
-		cacheKey += this.clippingContextVersion + ',';
+		cacheKey += this.clippingContextCacheKey + ',';
 
 		if ( object.skeleton ) {
 

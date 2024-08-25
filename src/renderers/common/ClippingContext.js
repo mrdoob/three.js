@@ -4,15 +4,14 @@ import { Vector4 } from '../../math/Vector4.js';
 
 const _plane = /*@__PURE__*/ new Plane();
 
-let _clippingContextVersion = 0;
-
 class ClippingContext {
 
 	constructor( parentContext = null ) {
 
-		this.version = ++ _clippingContextVersion;
+		this.version = 0;
 
 		this.clipIntersection = null;
+		this.cacheKey = '';
 
 
 		if ( parentContext === null ) {
@@ -36,7 +35,7 @@ class ClippingContext {
 
 		}
 
-		this.parentVersion = 0;
+		this.parentVersion = null;
 
 	}
 
@@ -131,7 +130,12 @@ class ClippingContext {
 
 		this.projectPlanes( srcClippingPlanes, dstClippingPlanes, offset );
 
-		if ( update ) this.version = _clippingContextVersion ++;
+		if ( update ) {
+
+			this.version ++;
+			this.cacheKey = `${ this.intersectionPlanes.length }:${ this.unionPlanes.length }`;
+
+		}
 
 	}
 
