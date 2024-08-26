@@ -174,7 +174,7 @@ class OutlinePass extends Pass {
 	}
 
 	get selectedMeshes() {
-        
+
 		const meshes = this._selectedMeshes
 
 		function gatherSelectedMeshesCallBack( object ) {
@@ -198,7 +198,7 @@ class OutlinePass extends Pass {
 		}
 
 		return meshes
-        
+
 	}
 
 	changeVisibilityOfSelectedObjects( bVisible ) {
@@ -297,7 +297,7 @@ class OutlinePass extends Pass {
 			renderer.setClearColor( 0xffffff, 1 );
 
 			// set the selected meshes flag to recalculate selected meshes in case the selectedObjects array changed since last frame
-			this._selectedMeshesDirty = true
+			this._selectedMeshesDirty = true;
 			// Make selected objects invisible
 			this.changeVisibilityOfSelectedObjects( false );
 
