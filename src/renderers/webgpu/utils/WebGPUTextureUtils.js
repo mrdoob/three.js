@@ -264,7 +264,7 @@ class WebGPUTextureUtils {
 				depthOrArrayLayers: 1
 			},
 			sampleCount: backend.utils.getSampleCount( backend.renderer.samples ),
-			format: GPUTextureFormat.BGRA8Unorm,
+			format: backend.utils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
 		} );
 

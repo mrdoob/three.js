@@ -11,7 +11,7 @@ export { default as BypassNode, bypass } from './core/BypassNode.js';
 export { default as CacheNode, cache } from './core/CacheNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
 export { default as ContextNode, context, label } from './core/ContextNode.js';
-export { default as IndexNode, vertexIndex, instanceIndex, drawIndex } from './core/IndexNode.js';
+export { default as IndexNode, vertexIndex, instanceIndex, invocationLocalIndex, drawIndex } from './core/IndexNode.js';
 export { default as LightingModel } from './core/LightingModel.js';
 export { default as Node, addNodeClass, createNodeFromType } from './core/Node.js';
 export { default as VarNode, temp } from './core/VarNode.js';
@@ -123,7 +123,7 @@ export { default as FrontFacingNode, frontFacing, faceDirection } from './displa
 export { default as NormalMapNode, normalMap } from './display/NormalMapNode.js';
 export { default as PosterizeNode, posterize } from './display/PosterizeNode.js';
 export { default as ToneMappingNode, toneMapping } from './display/ToneMappingNode.js';
-export { default as ViewportNode, viewport, viewportCoordinate, viewportResolution, viewportUV, viewportTopLeft } from './display/ViewportNode.js';
+export { default as ViewportNode, viewport, viewportCoordinate, viewportResolution, viewportUV, viewportTopLeft, viewportBottomLeft } from './display/ViewportNode.js';
 export { default as ViewportTextureNode, viewportTexture, viewportMipTexture } from './display/ViewportTextureNode.js';
 export { default as ViewportSharedTextureNode, viewportSharedTexture } from './display/ViewportSharedTextureNode.js';
 export { default as ViewportDepthTextureNode, viewportDepthTexture } from './display/ViewportDepthTextureNode.js';
