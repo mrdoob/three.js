@@ -955,7 +955,7 @@ ${ flowData.code }
 
 					textureType = 'texture_cube<f32>';
 
-				} else if ( texture.isDataArrayTexture === true ) {
+				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
 					textureType = 'texture_2d_array<f32>';
 

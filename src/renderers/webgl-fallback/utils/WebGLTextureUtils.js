@@ -79,11 +79,11 @@ class WebGLTextureUtils {
 
 			glTextureType = gl.TEXTURE_CUBE_MAP;
 
-		} else if ( texture.isDataArrayTexture === true ) {
+		} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
 			glTextureType = gl.TEXTURE_2D_ARRAY;
 
-		} else if ( texture.isData3DTexture === true ) {
+		} else if ( texture.isData3DTexture === true ) { // TODO: isCompressed3DTexture, wait for #26642
 
 			glTextureType = gl.TEXTURE_3D;
 
@@ -340,7 +340,7 @@ class WebGLTextureUtils {
 
 		this.setTextureParameters( glTextureType, texture );
 
-		if ( texture.isDataArrayTexture ) {
+		if ( texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
 
 			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
 
@@ -429,21 +429,32 @@ class WebGLTextureUtils {
 		if ( texture.isCompressedTexture ) {
 
 			const mipmaps = texture.mipmaps;
+			const image = options.image;
 
-			for ( let i = 0; i < mipmaps.length; i ++ ) {
+			if ( texture.isCompressedArrayTexture ) {
 
-				const mipmap = mipmaps[ i ];
+				for ( let i = 0; i < mipmaps.length; i ++ ) {
 
-				if ( texture.isCompressedArrayTexture ) {
-
-					const image = options.image;
+					const mipmap = mipmaps[ i ];
 
 					if ( texture.format !== gl.RGBA ) {
 
 						if ( glFormat !== null ) {
 
-							gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
-
+							gl.compressedTexSubImage3D(
+								gl.TEXTURE_2D_ARRAY,
+								i,
+								0,
+								0,
+								0,
+								mipmap.width,
+								mipmap.height,
+								image.depth,
+								glFormat,
+								mipmap.data,
+								0,
+								0
+							);
 
 						} else {
 
@@ -453,19 +464,63 @@ class WebGLTextureUtils {
 
 					} else {
 
-						gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, glType, mipmap.data );
+						gl.texSubImage3D(
+							gl.TEXTURE_2D_ARRAY,
+							i,
+							0,
+							0,
+							0,
+							mipmap.width,
+							mipmap.height,
+							image.depth,
+							glFormat,
+							glType,
+							mipmap.data
+						);
 
 					}
 
-				} else {
+				}
 
-					if ( glFormat !== null ) {
+			} else {
 
-						gl.compressedTexSubImage2D( gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+				for ( let i = 0; i < mipmaps.length; i ++ ) {
+
+					const mipmap = mipmaps[ i ];
+
+					if ( texture.isCompressedArrayTexture ) {
+
+
+						if ( texture.format !== gl.RGBA ) {
+
+							if ( glFormat !== null ) {
+
+								gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
+
+
+							} else {
+
+								console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .uploadTexture()' );
+
+							}
+
+						} else {
+
+							gl.texSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, glType, mipmap.data );
+
+						}
 
 					} else {
 
-						console.warn( 'Unsupported compressed texture format' );
+						if ( glFormat !== null ) {
+
+							gl.compressedTexSubImage2D( gl.TEXTURE_2D, i, 0, 0, mipmap.width, mipmap.height, glFormat, mipmap.data );
+
+						} else {
+
+							console.warn( 'Unsupported compressed texture format' );
+
+						}
 
 					}
 

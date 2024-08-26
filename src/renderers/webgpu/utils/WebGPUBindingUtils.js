@@ -82,7 +82,7 @@ class WebGPUBindingUtils {
 
 					texture.sampleType = GPUTextureSampleType.Depth;
 
-				} else if ( binding.texture.isDataTexture || binding.texture.isDataArrayTexture || binding.texture.isData3DTexture ) {
+				} else if ( binding.texture.isDataTexture || binding.texture.isDataArrayTexture || binding.texture.isData3DTexture || binding.texture.isCompressedArrayTexture ) {
 
 					const type = binding.texture.type;
 
@@ -114,7 +114,7 @@ class WebGPUBindingUtils {
 
 					texture.viewDimension = GPUTextureViewDimension.Cube;
 
-				} else if ( binding.texture.isDataArrayTexture ) {
+				} else if ( binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
 
 					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
 
@@ -244,7 +244,7 @@ class WebGPUBindingUtils {
 
 					dimensionViewGPU = GPUTextureViewDimension.ThreeD;
 
-				} else if ( binding.texture.isDataArrayTexture ) {
+				} else if ( binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
 
 					dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
 
