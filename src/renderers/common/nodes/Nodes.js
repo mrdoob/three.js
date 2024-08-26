@@ -448,12 +448,13 @@ class Nodes extends DataMap {
 
 	updateBefore( renderObject ) {
 
-		const nodeFrame = this.getNodeFrameForRender( renderObject );
 		const nodeBuilder = renderObject.getNodeBuilderState();
 
 		for ( const node of nodeBuilder.updateBeforeNodes ) {
 
-			nodeFrame.updateBeforeNode( node );
+			// update frame state for each node
+
+			this.getNodeFrameForRender( renderObject ).updateBeforeNode( node );
 
 		}
 
@@ -461,12 +462,13 @@ class Nodes extends DataMap {
 
 	updateAfter( renderObject ) {
 
-		const nodeFrame = this.getNodeFrameForRender( renderObject );
 		const nodeBuilder = renderObject.getNodeBuilderState();
 
 		for ( const node of nodeBuilder.updateAfterNodes ) {
 
-			nodeFrame.updateAfterNode( node );
+			// update frame state for each node
+
+			this.getNodeFrameForRender( renderObject ).updateAfterNode( node );
 
 		}
 
