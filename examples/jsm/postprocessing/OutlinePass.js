@@ -287,7 +287,7 @@ class OutlinePass extends Pass {
 
 			renderer.setClearColor( 0xffffff, 1 );
 
-			this.updateSelectionSet()
+			this.updateSelectionSet();
 			// Make selected objects invisible
 			this.changeVisibilityOfSelectedObjects( false );
 
