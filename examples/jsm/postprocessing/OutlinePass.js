@@ -16,6 +16,8 @@ import {
 import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
+const _selectedMeshes = new Set();
+
 class OutlinePass extends Pass {
 
 	constructor( resolution, scene, camera, selectedObjects ) {
@@ -196,11 +198,11 @@ class OutlinePass extends Pass {
 
 		const cache = this._visibilityCache;
 
-		for(let mesh of _selectedMeshes) {
+		for ( const mesh of _selectedMeshes ) {
 
 			if ( bVisible === true ) {
 
-				mesh.visible = cache.get( mesh);
+				mesh.visible = cache.get( mesh );
 
 			} else {
 
@@ -224,7 +226,7 @@ class OutlinePass extends Pass {
 
 				// only meshes and sprites are supported by OutlinePass
 
-				if ( !selectedMeshes.has(object) ) {
+				if ( ! selectedMeshes.has( object ) ) {
 
 					const visibility = object.visible;
 
@@ -630,8 +632,6 @@ class OutlinePass extends Pass {
 	}
 
 }
-
-const _selectedMeshes = new Set();
 
 OutlinePass.BlurDirectionX = new Vector2( 1.0, 0.0 );
 OutlinePass.BlurDirectionY = new Vector2( 0.0, 1.0 );
