@@ -1,3 +1,4 @@
+import { createNodeFromType } from '../../nodes/core/Node.js';
 import { nodeObject } from '../../nodes/tsl/TSLBase.js';
 
 import { Loader } from '../Loader.js';
@@ -55,7 +56,7 @@ class NodeLoader extends Loader {
 
 				const { uuid, type } = nodeJSON;
 
-				nodes[ uuid ] = nodeObject( createNodeFromType( type ) ); // @TODO: Maybe nodeObjectify the node in createNodeFromType?
+				nodes[ uuid ] = nodeObject( createNodeFromType( type ) );
 				nodes[ uuid ].uuid = uuid;
 
 			}
