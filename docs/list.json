@@ -1099,6 +1099,7 @@
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/zh/geometries/ParametricGeometry",
+				"TeapotGeometry": "examples/zh/geometries/TeapotGeometry",
 				"TextGeometry": "examples/zh/geometries/TextGeometry",
 				"SDFGeometryGenerator": "examples/zh/geometries/SDFGeometryGenerator"
 			},

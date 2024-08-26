@@ -47,7 +47,7 @@ class WebGPUUtils {
 
 		} else {
 
-			format = GPUTextureFormat.BGRA8Unorm; // default context format
+			format = this.getPreferredCanvasFormat(); // default context format
 
 		}
 
@@ -106,6 +106,20 @@ class WebGPUUtils {
 		}
 
 		return this.getSampleCount( this.backend.renderer.samples );
+
+	}
+
+	getPreferredCanvasFormat() {
+
+		if ( navigator.userAgent.includes( 'Quest' ) ) {
+
+			return GPUTextureFormat.BGRA8Unorm;
+
+		} else {
+
+			return navigator.gpu.getPreferredCanvasFormat();
+
+		}
 
 	}
 

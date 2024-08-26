@@ -130,4 +130,12 @@ export const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
 }, 'vec2' ).once() )();
 
+export const viewportBottomLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
+
+	console.warn( 'TSL.ViewportNode: "viewportBottomLeft" is deprecated. Use "viewportUV.flipY()" instead.' );
+
+	return viewportUV.flipY();
+
+}, 'vec2' ).once() )();
+
 addNodeClass( 'ViewportNode', ViewportNode );

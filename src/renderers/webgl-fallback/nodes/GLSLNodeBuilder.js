@@ -607,6 +607,16 @@ ${ flowData.code }
 
 	}
 
+	getInvocationLocalIndex() {
+
+		const workgroupSize = this.object.workgroupSize;
+
+		const size = workgroupSize.reduce( ( acc, curr ) => acc * curr, 1 );
+
+		return `uint( gl_InstanceID ) % ${size}u`;
+
+	}
+
 	getDrawIndex() {
 
 		const extensions = this.renderer.backend.extensions;
