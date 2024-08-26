@@ -95,7 +95,7 @@ class ClippingContext {
 		if ( update ) {
 
 			this.version ++;
-			this.cacheKey = `${ this.globalClippingCount }:${ this.localClippingEnabled === undefined ? false : this.localClippingEnabled }:`
+			this.cacheKey = `${ this.globalClippingCount }:${ this.localClippingEnabled === undefined ? false : this.localClippingEnabled }:`;
 
 		}
 
