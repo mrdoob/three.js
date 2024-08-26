@@ -16,8 +16,6 @@ import {
 import { Pass, FullScreenQuad } from './Pass.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
-const _selectedMeshes = new Set();
-
 class OutlinePass extends Pass {
 
 	constructor( resolution, scene, camera, selectedObjects ) {
@@ -37,6 +35,7 @@ class OutlinePass extends Pass {
 		this.pulsePeriod = 0;
 
 		this._visibilityCache = new Map();
+		this._selectionCache = new Set();
 
 		this.resolution = ( resolution !== undefined ) ? new Vector2( resolution.x, resolution.y ) : new Vector2( 256, 256 );
 
@@ -173,17 +172,17 @@ class OutlinePass extends Pass {
 
 	}
 
-	updateSelectionSet() {
+	updateSelectionCache() {
 
-		const meshes = _selectedMeshes;
+		const cache = this._selectionCache;
 
 		function gatherSelectedMeshesCallBack( object ) {
 
-			if ( object.isMesh ) meshes.add( object );
+			if ( object.isMesh ) cache.add( object );
 
 		}
 
-		meshes.clear();
+		cache.clear();
 
 		for ( let i = 0; i < this.selectedObjects.length; i ++ ) {
 
@@ -198,7 +197,7 @@ class OutlinePass extends Pass {
 
 		const cache = this._visibilityCache;
 
-		for ( const mesh of _selectedMeshes ) {
+		for ( const mesh of this._selectionCache ) {
 
 			if ( bVisible === true ) {
 
@@ -217,8 +216,8 @@ class OutlinePass extends Pass {
 
 	changeVisibilityOfNonSelectedObjects( bVisible ) {
 
-		const cache = this._visibilityCache;
-		const selectedMeshes = _selectedMeshes;
+		const visibilityCache = this._visibilityCache;
+		const selectionCache = this._selectionCache;
 
 		function VisibilityChangeCallBack( object ) {
 
@@ -226,17 +225,17 @@ class OutlinePass extends Pass {
 
 				// only meshes and sprites are supported by OutlinePass
 
-				if ( ! selectedMeshes.has( object ) ) {
+				if ( ! selectionCache.has( object ) ) {
 
 					const visibility = object.visible;
 
-					if ( bVisible === false || cache.get( object ) === true ) {
+					if ( bVisible === false || visibilityCache.get( object ) === true ) {
 
 						object.visible = bVisible;
 
 					}
 
-					cache.set( object, visibility );
+					visibilityCache.set( object, visibility );
 
 				}
 
@@ -247,11 +246,11 @@ class OutlinePass extends Pass {
 
 				if ( bVisible === true ) {
 
-					object.visible = cache.get( object ); // restore
+					object.visible = visibilityCache.get( object ); // restore
 
 				} else {
 
-					cache.set( object, object.visible );
+					visibilityCache.set( object, object.visible );
 					object.visible = bVisible;
 
 				}
@@ -289,7 +288,8 @@ class OutlinePass extends Pass {
 
 			renderer.setClearColor( 0xffffff, 1 );
 
-			this.updateSelectionSet();
+			this.updateSelectionCache();
+
 			// Make selected objects invisible
 			this.changeVisibilityOfSelectedObjects( false );
 
@@ -321,7 +321,7 @@ class OutlinePass extends Pass {
 			this.renderScene.overrideMaterial = null;
 			this.changeVisibilityOfNonSelectedObjects( true );
 			this._visibilityCache.clear();
-			_selectedMeshes.clear();
+			this._selectionCache.clear();
 
 			this.renderScene.background = currentBackground;
 
