@@ -52,7 +52,7 @@ const bicubic = ( textureNode, texelSize, lod ) => {
 
 };
 
-const textureBicubicMethod = ( textureNode, lodNode ) => {
+export const textureBicubic = ( textureNode, lodNode = float( 3 ) ) => {
 
 	const fLodSize = vec2( textureNode.size( int( lodNode ) ) );
 	const cLodSize = vec2( textureNode.size( int( lodNode.add( 1.0 ) ) ) );
@@ -64,26 +64,3 @@ const textureBicubicMethod = ( textureNode, lodNode ) => {
 	return fract( lodNode ).mix( fSample, cSample );
 
 };
-
-class TextureBicubicNode extends TempNode {
-
-	constructor( textureNode, blurNode = float( 3 ) ) {
-
-		super( 'vec4' );
-
-		this.textureNode = textureNode;
-		this.blurNode = blurNode;
-
-	}
-
-	setup() {
-
-		return textureBicubicMethod( this.textureNode, this.blurNode );
-
-	}
-
-}
-
-export default TextureBicubicNode;
-
-export const textureBicubic = nodeProxy( TextureBicubicNode );

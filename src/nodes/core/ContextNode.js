@@ -1,4 +1,4 @@
-import Node from './Node.js';
+import Node, { registerNodeClass } from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class ContextNode extends Node {
@@ -63,6 +63,8 @@ class ContextNode extends Node {
 }
 
 export default ContextNode;
+
+registerNodeClass( 'Context', ContextNode );
 
 export const context = nodeProxy( ContextNode );
 export const label = ( node, name ) => context( node, { label: name } );

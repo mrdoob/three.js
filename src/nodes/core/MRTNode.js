@@ -1,3 +1,4 @@
+import { registerNodeClass } from './Node.js';
 import OutputStructNode from './OutputStructNode.js';
 import { nodeProxy, vec4 } from '../tsl/TSLBase.js';
 
@@ -75,5 +76,7 @@ class MRTNode extends OutputStructNode {
 }
 
 export default MRTNode;
+
+registerNodeClass( 'MRT', MRTNode );
 
 export const mrt = nodeProxy( MRTNode );

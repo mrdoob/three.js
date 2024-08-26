@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { float, addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class RemapNode extends Node {
@@ -32,6 +32,8 @@ class RemapNode extends Node {
 }
 
 export default RemapNode;
+
+registerNodeClass( 'Remap', RemapNode );
 
 export const remap = nodeProxy( RemapNode, null, null, { doClamp: false } );
 export const remapClamp = nodeProxy( RemapNode );

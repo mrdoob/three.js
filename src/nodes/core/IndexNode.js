@@ -1,4 +1,4 @@
-import Node from './Node.js';
+import Node, { registerNodeClass } from './Node.js';
 import { nodeImmutable, varying } from '../tsl/TSLBase.js';
 
 class IndexNode extends Node {
@@ -68,6 +68,8 @@ IndexNode.INVOCATION_LOCAL = 'invocationLocal';
 IndexNode.DRAW = 'draw';
 
 export default IndexNode;
+
+registerNodeClass( 'Index', IndexNode );
 
 export const vertexIndex = nodeImmutable( IndexNode, IndexNode.VERTEX );
 export const instanceIndex = nodeImmutable( IndexNode, IndexNode.INSTANCE );

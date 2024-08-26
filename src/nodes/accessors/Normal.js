@@ -1,8 +1,8 @@
 import { attribute } from '../core/AttributeNode.js';
-import { cameraViewMatrix } from './CameraNode.js';
+import { cameraViewMatrix } from './Camera.js';
 import { modelNormalMatrix } from './ModelNode.js';
 import { vec3 } from '../tsl/TSLBase.js';
-import { positionView } from './PositionNode.js';
+import { positionView } from './Position.js';
 import { Fn, varying } from '../tsl/TSLBase.js';
 import { faceDirection } from '../display/FrontFacingNode.js';
 

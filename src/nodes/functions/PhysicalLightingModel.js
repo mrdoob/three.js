@@ -8,17 +8,17 @@ import BRDF_Sheen from './BSDF/BRDF_Sheen.js';
 import { LTC_Evaluate, LTC_Uv } from './BSDF/LTC.js';
 import LightingModel from '../core/LightingModel.js';
 import { diffuseColor, specularColor, specularF90, roughness, clearcoat, clearcoatRoughness, sheen, sheenRoughness, iridescence, iridescenceIOR, iridescenceThickness, ior, thickness, transmission, attenuationDistance, attenuationColor, dispersion } from '../core/PropertyNode.js';
-import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
-import { positionViewDirection, positionView, positionWorld } from '../accessors/PositionNode.js';
+import { transformedNormalView, transformedClearcoatNormalView, transformedNormalWorld } from '../accessors/Normal.js';
+import { positionViewDirection, positionView, positionWorld } from '../accessors/Position.js';
 import { Fn, float, vec2, vec3, vec4, mat3, If } from '../tsl/TSLBase.js';
 import { select } from '../math/ConditionalNode.js';
 import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } from '../math/MathNode.js';
 import { div } from '../math/OperatorNode.js';
-import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/CameraNode.js';
+import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/Camera.js';
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
 import { viewportResolution } from '../display/ViewportNode.js';
 import { viewportMipTexture } from '../display/ViewportTextureNode.js';
-import { textureBicubic } from '../accessors/TextureBicubicNode.js';
+import { textureBicubic } from '../accessors/TextureBicubic.js';
 import { Loop } from '../utils/LoopNode.js';
 
 //

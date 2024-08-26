@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import UniformNode from '../core/UniformNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
@@ -138,6 +138,8 @@ Object3DNode.VIEW_POSITION = 'viewPosition';
 Object3DNode.DIRECTION = 'direction';
 
 export default Object3DNode;
+
+registerNodeClass( 'Object3D', Object3DNode );
 
 export const objectDirection = nodeProxy( Object3DNode, Object3DNode.DIRECTION );
 export const objectViewMatrix = nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );

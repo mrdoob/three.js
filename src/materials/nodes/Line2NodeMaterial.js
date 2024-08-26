@@ -1,13 +1,13 @@
 import NodeMaterial from './NodeMaterial.js';
 import { property, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
-import { cameraProjectionMatrix } from '../../nodes/accessors/CameraNode.js';
+import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
-import { positionGeometry } from '../../nodes/accessors/PositionNode.js';
+import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { Fn, varying, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
-import { uv } from '../../nodes/accessors/UVNode.js';
+import { uv } from '../../nodes/accessors/UV.js';
 import { viewport } from '../../nodes/display/ViewportNode.js';
 import { dashSize, gapSize } from '../../nodes/core/PropertyNode.js';
 

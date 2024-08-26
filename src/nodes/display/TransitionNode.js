@@ -1,5 +1,6 @@
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { uv } from '../accessors/UVNode.js';
+import { uv } from '../accessors/UV.js';
 import { Fn, nodeObject, float, int, vec4, If } from '../tsl/TSLBase.js';
 import { clamp, mix } from '../math/MathNode.js';
 import { sub } from '../math/OperatorNode.js';
@@ -69,6 +70,8 @@ class TransitionNode extends TempNode {
 
 }
 
-export const transition = ( nodeA, nodeB, mixTexture, mixRatio = 0.0, threshold = 0.1, useTexture = 0 ) => nodeObject( new TransitionNode( convertToTexture( nodeA ), convertToTexture( nodeB ), convertToTexture( mixTexture ), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) ) );
-
 export default TransitionNode;
+
+registerNodeClass( 'Transition', TransitionNode );
+
+export const transition = ( nodeA, nodeB, mixTexture, mixRatio = 0.0, threshold = 0.1, useTexture = 0 ) => nodeObject( new TransitionNode( convertToTexture( nodeA ), convertToTexture( nodeB ), convertToTexture( mixTexture ), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) ) );

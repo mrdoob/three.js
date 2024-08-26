@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import ReferenceNode from './ReferenceNode.js';
 //import { renderGroup } from '../core/UniformGroupNode.js';
 //import { NodeUpdateType } from '../core/constants.js';
@@ -36,5 +37,7 @@ class MaterialReferenceNode extends ReferenceNode {
 }
 
 export default MaterialReferenceNode;
+
+registerNodeClass( 'MaterialReference', MaterialReferenceNode );
 
 export const materialReference = ( name, type, material ) => nodeObject( new MaterialReferenceNode( name, type, material ) );

@@ -1,4 +1,4 @@
-import Node from './Node.js';
+import Node, { registerNodeClass } from './Node.js';
 import { getValueType, getValueFromType, arrayBufferToBase64 } from './NodeUtils.js';
 
 class InputNode extends Node {
@@ -79,3 +79,5 @@ class InputNode extends Node {
 }
 
 export default InputNode;
+
+registerNodeClass( 'Input', InputNode );

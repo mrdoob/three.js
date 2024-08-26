@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { nodeImmutable } from '../tsl/TSLBase.js';
 import { reference } from './ReferenceNode.js';
 
@@ -44,6 +44,8 @@ SceneNode.BACKGROUND_BLURRINESS = 'backgroundBlurriness';
 SceneNode.BACKGROUND_INTENSITY = 'backgroundIntensity';
 
 export default SceneNode;
+
+registerNodeClass( 'Scene', SceneNode );
 
 export const backgroundBlurriness = nodeImmutable( SceneNode, SceneNode.BACKGROUND_BLURRINESS );
 export const backgroundIntensity = nodeImmutable( SceneNode, SceneNode.BACKGROUND_INTENSITY );

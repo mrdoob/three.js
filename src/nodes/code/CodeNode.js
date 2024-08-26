@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
 class CodeNode extends Node {
@@ -74,6 +74,8 @@ class CodeNode extends Node {
 }
 
 export default CodeNode;
+
+registerNodeClass( 'Code', CodeNode );
 
 export const code = nodeProxy( CodeNode );
 

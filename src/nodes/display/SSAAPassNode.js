@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import PassNode from './PassNode.js';
 import { Color } from '../../math/Color.js';
@@ -239,6 +240,10 @@ class SSAAPassNode extends PassNode {
 
 }
 
+export default SSAAPassNode;
+
+registerNodeClass( 'SSAAPass', SSAAPassNode );
+
 // These jitter vectors are specified in integers because it is easier.
 // I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
 // before being used, thus these integers need to be scaled by 1/16.
@@ -277,5 +282,3 @@ const _JitterVectors = [
 ];
 
 export const ssaaPass = ( scene, camera ) => nodeObject( new SSAAPassNode( scene, camera ) );
-
-export default SSAAPassNode;

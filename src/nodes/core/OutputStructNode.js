@@ -1,4 +1,4 @@
-import Node from './Node.js';
+import Node, { registerNodeClass } from './Node.js';
 import StructTypeNode from './StructTypeNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
@@ -53,5 +53,7 @@ class OutputStructNode extends Node {
 }
 
 export default OutputStructNode;
+
+registerNodeClass( 'OutputStruct', OutputStructNode );
 
 export const outputStruct = nodeProxy( OutputStructNode );

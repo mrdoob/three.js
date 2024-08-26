@@ -1,7 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { nodeObject, Fn, float, vec4 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { uv } from '../accessors/UVNode.js';
+import { uv } from '../accessors/UV.js';
 import { texture } from '../accessors/TextureNode.js';
 import { passTexture } from './PassNode.js';
 import { uniform } from '../core/UniformNode.js';

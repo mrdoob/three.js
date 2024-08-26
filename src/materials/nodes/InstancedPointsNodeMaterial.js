@@ -1,13 +1,13 @@
 import NodeMaterial from './NodeMaterial.js';
 import { property } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
-import { cameraProjectionMatrix } from '../../nodes/accessors/CameraNode.js';
+import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { materialColor, materialPointWidth } from '../../nodes/accessors/MaterialNode.js'; // or should this be a property, instead?
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
-import { positionGeometry } from '../../nodes/accessors/PositionNode.js';
+import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { smoothstep } from '../../nodes/math/MathNode.js';
 import { Fn, varying, vec2, vec4 } from '../../nodes/tsl/TSLBase.js';
-import { uv } from '../../nodes/accessors/UVNode.js';
+import { uv } from '../../nodes/accessors/UV.js';
 import { viewport } from '../../nodes/display/ViewportNode.js';
 
 import { PointsMaterial } from '../PointsMaterial.js';

@@ -1,6 +1,6 @@
 import { float, Fn, vec3, vec4 } from '../tsl/TSLBase.js';
 import { min, max, mix } from '../math/MathNode.js';
-import { luminance } from './ColorAdjustmentNode.js';
+import { luminance } from './ColorAdjustment.js';
 
 export const bleach = /*@__PURE__*/ Fn( ( [ color, opacity = 1 ] ) => {
 

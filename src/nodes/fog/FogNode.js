@@ -1,5 +1,5 @@
-import Node from '../core/Node.js';
-import { positionView } from '../accessors/PositionNode.js';
+import Node, { registerNodeClass } from '../core/Node.js';
+import { positionView } from '../accessors/Position.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
 class FogNode extends Node {
@@ -40,5 +40,7 @@ class FogNode extends Node {
 }
 
 export default FogNode;
+
+registerNodeClass( 'Fog', FogNode );
 
 export const fog = nodeProxy( FogNode );

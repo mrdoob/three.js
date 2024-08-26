@@ -1,9 +1,9 @@
 import NodeMaterial from './NodeMaterial.js';
 import { uniform } from '../../nodes/core/UniformNode.js';
-import { cameraProjectionMatrix } from '../../nodes/accessors/CameraNode.js';
+import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { materialRotation } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../../nodes/accessors/ModelNode.js';
-import { positionLocal } from '../../nodes/accessors/PositionNode.js';
+import { positionLocal } from '../../nodes/accessors/Position.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
 import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 

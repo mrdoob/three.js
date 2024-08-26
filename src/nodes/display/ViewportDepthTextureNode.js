@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import ViewportTextureNode from './ViewportTextureNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 import { viewportUV } from './ViewportNode.js';
@@ -23,5 +24,7 @@ class ViewportDepthTextureNode extends ViewportTextureNode {
 }
 
 export default ViewportDepthTextureNode;
+
+registerNodeClass( 'ViewportDepthTexture', ViewportDepthTextureNode );
 
 export const viewportDepthTexture = nodeProxy( ViewportDepthTextureNode );

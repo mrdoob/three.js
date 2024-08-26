@@ -1,4 +1,4 @@
-import Node from './Node.js';
+import Node, { registerNodeClass } from './Node.js';
 
 class TempNode extends Node {
 
@@ -54,3 +54,5 @@ class TempNode extends Node {
 }
 
 export default TempNode;
+
+registerNodeClass( 'Temp', TempNode );

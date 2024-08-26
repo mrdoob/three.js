@@ -1,6 +1,6 @@
-import { cameraViewMatrix } from './CameraNode.js';
-import { transformedNormalView } from './NormalNode.js';
-import { positionViewDirection } from './PositionNode.js';
+import { cameraViewMatrix } from './Camera.js';
+import { transformedNormalView } from './Normal.js';
+import { positionViewDirection } from './Position.js';
 import { materialRefractionRatio } from './MaterialProperties.js';
 
 export const reflectView = /*#__PURE__*/ positionViewDirection.negate().reflect( transformedNormalView );

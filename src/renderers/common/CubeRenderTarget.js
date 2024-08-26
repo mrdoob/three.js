@@ -1,6 +1,6 @@
 import { equirectUV } from '../../nodes/utils/EquirectUVNode.js';
 import { texture as TSL_Texture } from '../../nodes/accessors/TextureNode.js';
-import { positionWorldDirection } from '../../nodes/accessors/PositionNode.js';
+import { positionWorldDirection } from '../../nodes/accessors/Position.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { WebGLCubeRenderTarget } from '../../renderers/WebGLCubeRenderTarget.js';

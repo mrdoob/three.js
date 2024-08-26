@@ -1,11 +1,12 @@
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { add } from '../math/OperatorNode.js';
 
 import { modelNormalMatrix } from '../accessors/ModelNode.js';
-import { normalView } from '../accessors/NormalNode.js';
-import { positionView } from '../accessors/PositionNode.js';
+import { normalView } from '../accessors/Normal.js';
+import { positionView } from '../accessors/Position.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
-import { uv } from '../accessors/UVNode.js';
+import { uv } from '../accessors/UV.js';
 import { faceDirection } from './FrontFacingNode.js';
 import { Fn, nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
@@ -97,5 +98,7 @@ class NormalMapNode extends TempNode {
 }
 
 export default NormalMapNode;
+
+registerNodeClass( 'NormalMap', NormalMapNode );
 
 export const normalMap = nodeProxy( NormalMapNode );

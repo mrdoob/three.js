@@ -1,7 +1,7 @@
 
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { nodeObject } from '../tsl/TSLBase.js';
-import { positionView } from './PositionNode.js';
+import { positionView } from './Position.js';
 import { diffuseColor, property } from '../core/PropertyNode.js';
 import { Fn } from '../tsl/TSLBase.js';
 import { Loop } from '../utils/LoopNode.js';
@@ -139,6 +139,8 @@ ClippingNode.ALPHA_TO_COVERAGE = 'alphaToCoverage';
 ClippingNode.DEFAULT = 'default';
 
 export default ClippingNode;
+
+registerNodeClass( 'Clipping', ClippingNode );
 
 export const clipping = () => nodeObject( new ClippingNode() );
 

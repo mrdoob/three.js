@@ -1,9 +1,10 @@
+import { registerNodeClass } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
 import { cache } from '../core/CacheNode.js';
 import { roughness, clearcoatRoughness } from '../core/PropertyNode.js';
-import { cameraViewMatrix } from '../accessors/CameraNode.js';
-import { transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld } from '../accessors/NormalNode.js';
-import { positionViewDirection } from '../accessors/PositionNode.js';
+import { cameraViewMatrix } from '../accessors/Camera.js';
+import { transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld } from '../accessors/Normal.js';
+import { positionViewDirection } from '../accessors/Position.js';
 import { float } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { transformedBentNormalView } from '../accessors/AccessorsUtils.js';
@@ -82,6 +83,10 @@ class EnvironmentNode extends LightingNode {
 
 }
 
+export default EnvironmentNode;
+
+registerNodeClass( 'Environment', EnvironmentNode );
+
 const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 
 	let reflectVec = null;
@@ -128,5 +133,3 @@ const createIrradianceContext = ( normalWorldNode ) => {
 	};
 
 };
-
-export default EnvironmentNode;

@@ -1,8 +1,8 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
-import { normalLocal } from './NormalNode.js';
-import { positionLocal } from './PositionNode.js';
+import { normalLocal } from './Normal.js';
+import { positionLocal } from './Position.js';
 import { nodeProxy, vec3, mat3, mat4 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { buffer } from '../accessors/BufferNode.js';
@@ -138,5 +138,7 @@ class InstanceNode extends Node {
 }
 
 export default InstanceNode;
+
+registerNodeClass( 'Instance', InstanceNode );
 
 export const instance = nodeProxy( InstanceNode );

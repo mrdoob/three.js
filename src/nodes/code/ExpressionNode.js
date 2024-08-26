@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
 class ExpressionNode extends Node {
@@ -31,5 +31,7 @@ class ExpressionNode extends Node {
 }
 
 export default ExpressionNode;
+
+registerNodeClass( 'Expression', ExpressionNode );
 
 export const expression = nodeProxy( ExpressionNode );

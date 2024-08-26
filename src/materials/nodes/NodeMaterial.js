@@ -6,11 +6,11 @@ import { attribute } from '../../nodes/core/AttributeNode.js';
 import { output, diffuseColor, emissive, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { materialAlphaTest, materialColor, materialOpacity, materialEmissive, materialNormal, materialLightMap, materialAOMap } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewProjection } from '../../nodes/accessors/ModelViewProjectionNode.js';
-import { normalLocal } from '../../nodes/accessors/NormalNode.js';
+import { normalLocal } from '../../nodes/accessors/Normal.js';
 import { instance } from '../../nodes/accessors/InstanceNode.js';
 import { batch } from '../../nodes/accessors/BatchNode.js';
 import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
-import { positionLocal } from '../../nodes/accessors/PositionNode.js';
+import { positionLocal } from '../../nodes/accessors/Position.js';
 import { skinningReference } from '../../nodes/accessors/SkinningNode.js';
 import { morphReference } from '../../nodes/accessors/MorphNode.js';
 import { lights } from '../../nodes/lighting/LightsNode.js';
@@ -20,7 +20,7 @@ import AONode from '../../nodes/lighting/AONode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
 import { depth } from '../../nodes/display/ViewportDepthNode.js';
-import { cameraLogDepth } from '../../nodes/accessors/CameraNode.js';
+import { cameraLogDepth } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha } from '../../nodes/accessors/ClippingNode.js';
 
 class NodeMaterial extends Material {

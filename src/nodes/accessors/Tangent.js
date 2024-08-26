@@ -1,5 +1,5 @@
 import { attribute } from '../core/AttributeNode.js';
-import { cameraViewMatrix } from './CameraNode.js';
+import { cameraViewMatrix } from './Camera.js';
 import { modelViewMatrix } from './ModelNode.js';
 import { Fn, vec4 } from '../tsl/TSLBase.js';
 

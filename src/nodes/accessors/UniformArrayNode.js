@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { getValueType } from '../core/NodeUtils.js';
@@ -139,6 +140,8 @@ class UniformArrayNode extends BufferNode {
 }
 
 export default UniformArrayNode;
+
+registerNodeClass( 'UniformArray', UniformArrayNode );
 
 export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
 

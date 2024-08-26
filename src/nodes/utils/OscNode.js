@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { timerLocal } from './TimerNode.js';
 import { nodeObject, nodeProxy } from '../tsl/TSLBase.js';
 
@@ -72,6 +72,8 @@ OscNode.TRIANGLE = 'triangle';
 OscNode.SAWTOOTH = 'sawtooth';
 
 export default OscNode;
+
+registerNodeClass( 'Osc', OscNode );
 
 export const oscSine = nodeProxy( OscNode, OscNode.SINE );
 export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );

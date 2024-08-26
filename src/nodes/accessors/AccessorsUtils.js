@@ -1,10 +1,10 @@
-import { bitangentView } from './BitangentNode.js';
-import { normalView, transformedNormalView } from './NormalNode.js';
-import { tangentView } from './TangentNode.js';
+import { bitangentView } from './Bitangent.js';
+import { normalView, transformedNormalView } from './Normal.js';
+import { tangentView } from './Tangent.js';
 import { mat3 } from '../tsl/TSLBase.js';
 import { mix } from '../math/MathNode.js';
 import { anisotropy, anisotropyB, roughness } from '../core/PropertyNode.js';
-import { positionViewDirection } from './PositionNode.js';
+import { positionViewDirection } from './Position.js';
 
 export const TBNViewMatrix = mat3( tangentView, bitangentView, normalView );
 

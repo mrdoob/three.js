@@ -6,7 +6,7 @@ import { uniformArray } from '../../../nodes/accessors/UniformArrayNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
 import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
 import { float, vec3 } from '../../../nodes/tsl/TSLBase.js';
-import { uv } from '../../../nodes/accessors/UVNode.js';
+import { uv } from '../../../nodes/accessors/UV.js';
 import { attribute } from '../../../nodes/core/AttributeNode.js';
 
 import { OrthographicCamera } from '../../../cameras/OrthographicCamera.js';

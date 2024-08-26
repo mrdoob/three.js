@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import BufferNode from './BufferNode.js';
 import { bufferAttribute } from './BufferAttributeNode.js';
 import { nodeObject, varying } from '../tsl/TSLBase.js';
@@ -120,6 +121,8 @@ class StorageBufferNode extends BufferNode {
 }
 
 export default StorageBufferNode;
+
+registerNodeClass( 'StorageBuffer', StorageBufferNode );
 
 // Read-Write Storage
 export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );

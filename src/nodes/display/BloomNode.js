@@ -1,10 +1,10 @@
 import TempNode from '../core/TempNode.js';
 import { Fn, nodeObject, float, vec4, int } from '../tsl/TSLBase.js';
 import { mix, smoothstep } from '../math/MathNode.js';
-import { luminance } from './ColorAdjustmentNode.js';
+import { luminance } from './ColorAdjustment.js';
 import { uniform } from '../core/UniformNode.js';
 import { uniformArray } from '../accessors/UniformArrayNode.js';
-import { uv } from '../accessors/UVNode.js';
+import { uv } from '../accessors/UV.js';
 import { Color } from '../../math/Color.js';
 import { passTexture } from './PassNode.js';
 import { RenderTarget } from '../../core/RenderTarget.js';

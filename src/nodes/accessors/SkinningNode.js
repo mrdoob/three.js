@@ -1,12 +1,12 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { attribute } from '../core/AttributeNode.js';
 import { reference, referenceBuffer } from './ReferenceNode.js';
 import { add } from '../math/OperatorNode.js';
-import { normalLocal } from './NormalNode.js';
-import { positionLocal, positionPrevious } from './PositionNode.js';
-import { tangentLocal } from './TangentNode.js';
+import { normalLocal } from './Normal.js';
+import { positionLocal, positionPrevious } from './Position.js';
+import { tangentLocal } from './Tangent.js';
 import { uniform } from '../core/UniformNode.js';
 import { buffer } from './BufferNode.js';
 
@@ -180,6 +180,8 @@ class SkinningNode extends Node {
 }
 
 export default SkinningNode;
+
+registerNodeClass( 'Skinning', SkinningNode );
 
 export const skinning = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh ) );
 export const skinningReference = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh, true ) );

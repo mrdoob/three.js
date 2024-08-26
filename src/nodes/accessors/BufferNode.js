@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import UniformNode from '../core/UniformNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
@@ -29,5 +30,7 @@ class BufferNode extends UniformNode {
 }
 
 export default BufferNode;
+
+registerNodeClass( 'Buffer', BufferNode );
 
 export const buffer = ( value, type, count ) => nodeObject( new BufferNode( value, type, count ) );

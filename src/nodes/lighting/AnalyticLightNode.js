@@ -1,11 +1,12 @@
+import { registerNodeClass } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { float, vec2, vec3, vec4 } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { positionWorld } from '../accessors/PositionNode.js';
-import { normalWorld } from '../accessors/NormalNode.js';
+import { positionWorld } from '../accessors/Position.js';
+import { normalWorld } from '../accessors/Normal.js';
 import { mix, fract } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
 import { Color } from '../../math/Color.js';
@@ -349,3 +350,5 @@ class AnalyticLightNode extends LightingNode {
 }
 
 export default AnalyticLightNode;
+
+registerNodeClass( 'AnalyticLight', AnalyticLightNode );

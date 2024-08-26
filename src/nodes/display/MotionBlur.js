@@ -1,6 +1,6 @@
 import { float, int, Fn } from '../tsl/TSLBase.js';
 import { Loop } from '../utils/LoopNode.js';
-import { uv } from '../accessors/UVNode.js';
+import { uv } from '../accessors/UV.js';
 
 export const motionBlur = /*#__PURE__*/ Fn( ( [ inputNode, velocity, numSamples = int( 16 ) ] ) => {
 

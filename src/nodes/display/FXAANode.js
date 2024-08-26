@@ -1,5 +1,6 @@
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { uv } from '../accessors/UVNode.js';
+import { uv } from '../accessors/UV.js';
 import { Fn, nodeObject, float, vec2, vec4, int, If } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
@@ -321,6 +322,8 @@ class FXAANode extends TempNode {
 
 }
 
-export const fxaa = ( node ) => nodeObject( new FXAANode( convertToTexture( node ) ) );
-
 export default FXAANode;
+
+registerNodeClass( 'FXAA', FXAANode );
+
+export const fxaa = ( node ) => nodeObject( new FXAANode( convertToTexture( node ) ) );

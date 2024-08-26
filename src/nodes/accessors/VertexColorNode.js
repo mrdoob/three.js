@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import AttributeNode from '../core/AttributeNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
@@ -64,5 +65,7 @@ class VertexColorNode extends AttributeNode {
 }
 
 export default VertexColorNode;
+
+registerNodeClass( 'VertexColor', VertexColorNode );
 
 export const vertexColor = ( ...params ) => nodeObject( new VertexColorNode( ...params ) );

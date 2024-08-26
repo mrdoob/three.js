@@ -13,7 +13,7 @@ export { default as ConstNode } from './core/ConstNode.js';
 export { default as ContextNode, context, label } from './core/ContextNode.js';
 export { default as IndexNode, vertexIndex, instanceIndex, invocationLocalIndex, drawIndex } from './core/IndexNode.js';
 export { default as LightingModel } from './core/LightingModel.js';
-export { default as Node } from './core/Node.js';
+export { default as Node, registerNodeClass, addNodeClass } from './core/Node.js';
 export { default as VarNode } from './core/VarNode.js';
 export { default as NodeAttribute } from './core/NodeAttribute.js';
 export { default as NodeBuilder } from './core/NodeBuilder.js';
@@ -73,10 +73,10 @@ export * from './tsl/TSLBase.js';
 // accessors
 export { TBNViewMatrix, parallaxDirection, parallaxUV, transformedBentNormalView } from './accessors/AccessorsUtils.js';
 export { default as UniformArrayNode, uniformArray } from './accessors/UniformArrayNode.js';
-export * from './accessors/BitangentNode.js';
+export * from './accessors/Bitangent.js';
 export { default as BufferAttributeNode, bufferAttribute, dynamicBufferAttribute, instancedBufferAttribute, instancedDynamicBufferAttribute } from './accessors/BufferAttributeNode.js';
 export { default as BufferNode, buffer } from './accessors/BufferNode.js';
-export * from './accessors/CameraNode.js';
+export * from './accessors/Camera.js';
 export { default as VertexColorNode, vertexColor } from './accessors/VertexColorNode.js';
 export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTextureNode.js';
 export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
@@ -86,31 +86,31 @@ export * from './accessors/MaterialProperties.js';
 export { default as MaterialReferenceNode, materialReference } from './accessors/MaterialReferenceNode.js';
 export { default as RendererReferenceNode, rendererReference } from './accessors/RendererReferenceNode.js';
 export { default as MorphNode, morphReference } from './accessors/MorphNode.js';
-export { default as TextureBicubicNode, textureBicubic } from './accessors/TextureBicubicNode.js';
+export * from './accessors/TextureBicubic.js';
 export { default as ModelNode, modelDirection, modelViewMatrix, modelNormalMatrix, modelWorldMatrix, modelPosition, modelViewPosition, modelScale, modelWorldMatrixInverse } from './accessors/ModelNode.js';
 export { default as ModelViewProjectionNode, modelViewProjection } from './accessors/ModelViewProjectionNode.js';
-export * from './accessors/NormalNode.js';
+export * from './accessors/Normal.js';
 export { default as Object3DNode, objectDirection, objectViewMatrix, objectNormalMatrix, objectWorldMatrix, objectPosition, objectScale, objectViewPosition } from './accessors/Object3DNode.js';
 export { default as PointUVNode, pointUV } from './accessors/PointUVNode.js';
-export * from './accessors/PositionNode.js';
+export * from './accessors/Position.js';
 export { default as ReferenceNode, reference, referenceBuffer } from './accessors/ReferenceNode.js';
-export * from './accessors/ReflectVectorNode.js';
+export * from './accessors/ReflectVector.js';
 export { default as SkinningNode, skinning, skinningReference } from './accessors/SkinningNode.js';
 export { default as SceneNode, backgroundBlurriness, backgroundIntensity } from './accessors/SceneNode.js';
 export { default as StorageBufferNode, storage, storageObject } from './accessors/StorageBufferNode.js';
-export * from './accessors/TangentNode.js';
+export * from './accessors/Tangent.js';
 export { default as TextureNode, texture, textureLoad, /*textureLevel,*/ sampler } from './accessors/TextureNode.js';
 export { default as TextureSizeNode, textureSize } from './accessors/TextureSizeNode.js';
 export { default as StorageTextureNode, storageTexture, textureStore } from './accessors/StorageTextureNode.js';
 export { default as Texture3DNode, texture3D } from './accessors/Texture3DNode.js';
-export * from './accessors/UVNode.js';
+export * from './accessors/UV.js';
 export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
 export * from './accessors/VelocityNode.js';
 
 // display
-export * from './display/BlendModeNode.js';
+export * from './display/BlendMode.js';
 export { default as BumpMapNode, bumpMap } from './display/BumpMapNode.js';
-export * from './display/ColorAdjustmentNode.js';
+export * from './display/ColorAdjustment.js';
 export { default as ColorSpaceNode, linearToColorSpace, colorSpaceToLinear } from './display/ColorSpaceNode.js';
 export { default as FrontFacingNode, frontFacing, faceDirection } from './display/FrontFacingNode.js';
 export { default as NormalMapNode, normalMap } from './display/NormalMapNode.js';
@@ -130,7 +130,7 @@ export { default as DotScreenNode, dotScreen } from './display/DotScreenNode.js'
 export { default as RGBShiftNode, rgbShift } from './display/RGBShiftNode.js';
 export { default as FilmNode, film } from './display/FilmNode.js';
 export { default as Lut3DNode, lut3D } from './display/Lut3DNode.js';
-export * from './display/MotionBlurNode.js';
+export * from './display/MotionBlur.js';
 export { default as GTAONode, ao } from './display/GTAONode.js';
 export { default as DenoiseNode, denoise } from './display/DenoiseNode.js';
 export { default as FXAANode, fxaa } from './display/FXAANode.js';
@@ -142,8 +142,8 @@ export { default as SSAAPassNode, ssaaPass } from './display/SSAAPassNode.js';
 export { default as StereoPassNode, stereoPass } from './display/StereoPassNode.js';
 export { default as AnaglyphPassNode, anaglyphPass } from './display/AnaglyphPassNode.js';
 export { default as ParallaxBarrierPassNode, parallaxBarrierPass } from './display/ParallaxBarrierPassNode.js';
-export { bleach } from './display/BleachBypassNode.js';
-export { sepia } from './display/SepiaNode.js';
+export { bleach } from './display/BleachBypass.js';
+export { sepia } from './display/Sepia.js';
 
 export { default as PassNode, pass, passTexture, depthPass } from './display/PassNode.js';
 
@@ -196,7 +196,7 @@ export { default as PMREMNode, pmremTexture } from './pmrem/PMREMNode.js';
 export * from './pmrem/PMREMUtils.js';
 
 // procedural
-export { default as CheckerNode, checker } from './procedural/CheckerNode.js';
+export * from './procedural/Checker.js';
 
 // parsers
 export { default as GLSLNodeParser } from './parsers/GLSLNodeParser.js'; // @TODO: Move to jsm/renderers/webgl.

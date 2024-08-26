@@ -1,10 +1,10 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { float, nodeProxy, Fn } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 import { reference } from './ReferenceNode.js';
-import { positionLocal } from './PositionNode.js';
-import { normalLocal } from './NormalNode.js';
+import { positionLocal } from './Position.js';
+import { normalLocal } from './Normal.js';
 import { textureLoad } from './TextureNode.js';
 import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
 import { ivec2, int } from '../tsl/TSLBase.js';
@@ -253,5 +253,7 @@ class MorphNode extends Node {
 }
 
 export default MorphNode;
+
+registerNodeClass( 'Morph', MorphNode );
 
 export const morphReference = nodeProxy( MorphNode );

@@ -1,5 +1,6 @@
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { positionWorldDirection } from '../accessors/PositionNode.js';
+import { positionWorldDirection } from '../accessors/Position.js';
 import { nodeProxy, vec2 } from '../tsl/TSLBase.js';
 
 class EquirectUVNode extends TempNode {
@@ -26,5 +27,7 @@ class EquirectUVNode extends TempNode {
 }
 
 export default EquirectUVNode;
+
+registerNodeClass( 'EquirectUV', EquirectUVNode );
 
 export const equirectUV = nodeProxy( EquirectUVNode );

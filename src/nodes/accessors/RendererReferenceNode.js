@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import ReferenceBaseNode from './ReferenceBaseNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 
@@ -22,5 +23,7 @@ class RendererReferenceNode extends ReferenceBaseNode {
 }
 
 export default RendererReferenceNode;
+
+registerNodeClass( 'RendererReference', RendererReferenceNode );
 
 export const rendererReference = ( name, type, renderer ) => nodeObject( new RendererReferenceNode( name, type, renderer ) );

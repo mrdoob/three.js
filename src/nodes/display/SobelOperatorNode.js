@@ -1,6 +1,7 @@
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { uv } from '../accessors/UVNode.js';
-import { luminance } from './ColorAdjustmentNode.js';
+import { uv } from '../accessors/UV.js';
+import { luminance } from './ColorAdjustment.js';
 import { Fn, nodeObject, vec2, vec3, vec4, mat3 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
@@ -115,6 +116,8 @@ class SobelOperatorNode extends TempNode {
 
 }
 
-export const sobel = ( node ) => nodeObject( new SobelOperatorNode( convertToTexture( node ) ) );
-
 export default SobelOperatorNode;
+
+registerNodeClass( 'SobelOperator', SobelOperatorNode );
+
+export const sobel = ( node ) => nodeObject( new SobelOperatorNode( convertToTexture( node ) ) );

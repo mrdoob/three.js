@@ -1,5 +1,6 @@
+import { registerNodeClass } from '../core/Node.js';
 import UniformNode, { uniform } from '../core/UniformNode.js';
-import { uv } from './UVNode.js';
+import { uv } from './UV.js';
 import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToLinear } from '../display/ColorSpaceNode.js';
 import { expression } from '../code/ExpressionNode.js';
@@ -428,6 +429,8 @@ class TextureNode extends UniformNode {
 }
 
 export default TextureNode;
+
+registerNodeClass( 'Texture', TextureNode );
 
 export const texture = nodeProxy( TextureNode );
 export const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );

@@ -1,4 +1,4 @@
-import Node from './Node.js';
+import Node, { registerNodeClass } from './Node.js';
 import { select } from '../math/ConditionalNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack } from '../tsl/TSLBase.js';
 
@@ -99,5 +99,7 @@ class StackNode extends Node {
 }
 
 export default StackNode;
+
+registerNodeClass( 'Stack', StackNode );
 
 export const stack = nodeProxy( StackNode );

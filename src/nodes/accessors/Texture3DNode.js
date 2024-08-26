@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import TextureNode from './TextureNode.js';
 import { nodeProxy, vec3, Fn, If } from '../tsl/TSLBase.js';
 
@@ -93,5 +94,7 @@ class Texture3DNode extends TextureNode {
 }
 
 export default Texture3DNode;
+
+registerNodeClass( 'Texture3D', Texture3DNode );
 
 export const texture3D = nodeProxy( Texture3DNode );

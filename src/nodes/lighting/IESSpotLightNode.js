@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import SpotLightNode from './SpotLightNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { vec2 } from '../tsl/TSLBase.js';
@@ -29,3 +30,5 @@ class IESSpotLightNode extends SpotLightNode {
 }
 
 export default IESSpotLightNode;
+
+registerNodeClass( 'IESSpotLight', IESSpotLightNode );

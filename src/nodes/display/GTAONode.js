@@ -1,7 +1,8 @@
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
-import { uv } from '../accessors/UVNode.js';
+import { uv } from '../accessors/UV.js';
 import { nodeObject, Fn, mat3, vec2, vec3, vec4, float, int, If } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
@@ -236,6 +237,10 @@ class GTAONode extends TempNode {
 
 }
 
+export default GTAONode;
+
+registerNodeClass( 'GTAO', GTAONode );
+
 function generateMagicSquareNoise( size = 5 ) {
 
 	const noiseSize = Math.floor( size ) % 2 === 0 ? Math.floor( size ) + 1 : Math.floor( size );
@@ -321,5 +326,3 @@ function generateMagicSquare( size ) {
 }
 
 export const ao = ( depthNode, normalNode, camera ) => nodeObject( new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
-
-export default GTAONode;

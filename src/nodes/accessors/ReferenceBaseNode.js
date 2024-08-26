@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
@@ -136,6 +136,8 @@ class ReferenceBaseNode extends Node {
 }
 
 export default ReferenceBaseNode;
+
+registerNodeClass( 'ReferenceBase', ReferenceBaseNode );
 
 export const reference = ( name, type, object ) => nodeObject( new ReferenceBaseNode( name, type, object ) );
 export const referenceBuffer = ( name, type, count, object ) => nodeObject( new ReferenceBaseNode( name, type, object, count ) );

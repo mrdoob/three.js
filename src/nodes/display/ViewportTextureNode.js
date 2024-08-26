@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
@@ -70,6 +71,8 @@ class ViewportTextureNode extends TextureNode {
 }
 
 export default ViewportTextureNode;
+
+registerNodeClass( 'ViewportTexture', ViewportTextureNode );
 
 export const viewportTexture = nodeProxy( ViewportTextureNode );
 export const viewportMipTexture = nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );

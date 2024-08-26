@@ -1,3 +1,4 @@
+import { registerNodeClass } from './Node.js';
 import InputNode from './InputNode.js';
 import { objectGroup } from './UniformGroupNode.js';
 import { nodeObject, getConstNodeType } from '../tsl/TSLCore.js';
@@ -93,6 +94,8 @@ class UniformNode extends InputNode {
 }
 
 export default UniformNode;
+
+registerNodeClass( 'Uniform', UniformNode );
 
 export const uniform = ( arg1, arg2 ) => {
 

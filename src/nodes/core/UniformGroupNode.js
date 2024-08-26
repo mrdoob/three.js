@@ -1,4 +1,4 @@
-import Node from './Node.js';
+import Node, { registerNodeClass } from './Node.js';
 
 class UniformGroupNode extends Node {
 
@@ -43,11 +43,13 @@ class UniformGroupNode extends Node {
 
 }
 
+export default UniformGroupNode;
+
+registerNodeClass( 'UniformGroup', UniformGroupNode );
+
 export const uniformGroup = ( name ) => new UniformGroupNode( name );
 export const sharedUniformGroup = ( name ) => new UniformGroupNode( name, true );
 
 export const frameGroup = sharedUniformGroup( 'frame' );
 export const renderGroup = sharedUniformGroup( 'render' );
 export const objectGroup = uniformGroup( 'object' );
-
-export default UniformGroupNode;

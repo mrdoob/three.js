@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
@@ -23,5 +24,7 @@ class PosterizeNode extends TempNode {
 }
 
 export default PosterizeNode;
+
+registerNodeClass( 'Posterize', PosterizeNode );
 
 export const posterize = nodeProxy( PosterizeNode );

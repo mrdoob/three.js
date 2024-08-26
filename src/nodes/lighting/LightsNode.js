@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { nodeObject, nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 const sortLights = ( lights ) => {
@@ -225,5 +225,7 @@ class LightsNode extends Node {
 }
 
 export default LightsNode;
+
+registerNodeClass( 'Lights', LightsNode );
 
 export const lights = nodeProxy( LightsNode );

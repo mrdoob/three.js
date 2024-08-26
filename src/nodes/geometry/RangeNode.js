@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { getValueType } from '../core/NodeUtils.js';
 import { buffer } from '../accessors/BufferNode.js';
 import { instancedBufferAttribute } from '../accessors/BufferAttributeNode.js';
@@ -111,5 +111,7 @@ class RangeNode extends Node {
 }
 
 export default RangeNode;
+
+registerNodeClass( 'Range', RangeNode );
 
 export const range = nodeProxy( RangeNode );

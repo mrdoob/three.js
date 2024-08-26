@@ -1,3 +1,4 @@
+import { registerNodeClass  } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { nodeProxy, vec4, mat2, mat4 } from '../tsl/TSLBase.js';
 import { cos, sin } from '../math/MathNode.js';
@@ -53,5 +54,7 @@ class RotateNode extends TempNode {
 }
 
 export default RotateNode;
+
+registerNodeClass( 'Rotate', RotateNode );
 
 export const rotate = nodeProxy( RotateNode );

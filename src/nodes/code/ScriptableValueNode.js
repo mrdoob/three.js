@@ -1,4 +1,4 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { arrayBufferToBase64, base64ToArrayBuffer } from '../core/NodeUtils.js';
 import { nodeProxy, float } from '../tsl/TSLBase.js';
 
@@ -160,5 +160,7 @@ class ScriptableValueNode extends Node {
 }
 
 export default ScriptableValueNode;
+
+registerNodeClass( 'ScriptableValue', ScriptableValueNode );
 
 export const scriptableValue = nodeProxy( ScriptableValueNode );

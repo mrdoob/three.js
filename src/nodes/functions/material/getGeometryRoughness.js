@@ -1,4 +1,4 @@
-import { normalView } from '../../accessors/NormalNode.js';
+import { normalView } from '../../accessors/Normal.js';
 import { Fn } from '../../tsl/TSLBase.js';
 
 const getGeometryRoughness = Fn( () => {

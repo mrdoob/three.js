@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeObject, nodeImmutable } from '../tsl/TSLBase.js';
@@ -83,6 +84,8 @@ TimerNode.DELTA = 'delta';
 TimerNode.FRAME = 'frame';
 
 export default TimerNode;
+
+registerNodeClass( 'Timer', TimerNode );
 
 // @TODO: add support to use node in timeScale
 export const timerLocal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale, value ) );

@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
@@ -47,6 +48,8 @@ class RenderOutputNode extends TempNode {
 }
 
 export default RenderOutputNode;
+
+registerNodeClass( 'RenderOutput', RenderOutputNode );
 
 export const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => nodeObject( new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace ) );
 

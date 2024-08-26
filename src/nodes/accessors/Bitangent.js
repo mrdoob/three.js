@@ -1,7 +1,7 @@
 import { varying } from '../core/VaryingNode.js';
-import { cameraViewMatrix } from './CameraNode.js';
-import { normalGeometry, normalLocal, normalView, normalWorld, transformedNormalView } from './NormalNode.js';
-import { tangentGeometry, tangentLocal, tangentView, tangentWorld, transformedTangentView } from './TangentNode.js';
+import { cameraViewMatrix } from './Camera.js';
+import { normalGeometry, normalLocal, normalView, normalWorld, transformedNormalView } from './Normal.js';
+import { tangentGeometry, tangentLocal, tangentView, tangentWorld, transformedTangentView } from './Tangent.js';
 
 const getBitangent = ( crossNormalTangent ) => crossNormalTangent.mul( tangentGeometry.w ).xyz;
 

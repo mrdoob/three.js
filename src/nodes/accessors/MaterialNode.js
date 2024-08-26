@@ -1,7 +1,7 @@
-import Node from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { reference } from './ReferenceNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
-import { normalView } from './NormalNode.js';
+import { normalView } from './Normal.js';
 import { nodeImmutable, float, vec2, vec3, mat2 } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 import { normalMap } from '../display/NormalMapNode.js';
@@ -383,6 +383,8 @@ MaterialNode.LIGHT_MAP = 'light';
 MaterialNode.AO_MAP = 'ao';
 
 export default MaterialNode;
+
+registerNodeClass( 'Material', MaterialNode );
 
 export const materialAlphaTest = nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
 export const materialColor = nodeImmutable( MaterialNode, MaterialNode.COLOR );

@@ -2,7 +2,7 @@ import NodeMaterial from './NodeMaterial.js';
 import { diffuseColor } from '../../nodes/core/PropertyNode.js';
 import { directionToColor } from '../../nodes/utils/Packing.js';
 import { materialOpacity } from '../../nodes/accessors/MaterialNode.js';
-import { transformedNormalView } from '../../nodes/accessors/NormalNode.js';
+import { transformedNormalView } from '../../nodes/accessors/Normal.js';
 import { float, vec4 } from '../../nodes/tsl/TSLBase.js';
 
 import { MeshNormalMaterial } from '../MeshNormalMaterial.js';

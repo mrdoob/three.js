@@ -1,3 +1,4 @@
+import { registerNodeClass } from '../core/Node.js';
 import Object3DNode from './Object3DNode.js';
 import { nodeImmutable } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
@@ -23,6 +24,8 @@ class ModelNode extends Object3DNode {
 }
 
 export default ModelNode;
+
+registerNodeClass( 'Model', ModelNode );
 
 export const modelDirection = nodeImmutable( ModelNode, ModelNode.DIRECTION );
 export const modelViewMatrix = nodeImmutable( ModelNode, ModelNode.VIEW_MATRIX ).label( 'modelViewMatrix' ).toVar( 'ModelViewMatrix' );

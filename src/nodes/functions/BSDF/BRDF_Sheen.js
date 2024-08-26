@@ -1,5 +1,5 @@
-import { transformedNormalView } from '../../accessors/NormalNode.js';
-import { positionViewDirection } from '../../accessors/PositionNode.js';
+import { transformedNormalView } from '../../accessors/Normal.js';
+import { positionViewDirection } from '../../accessors/Position.js';
 import { sheen, sheenRoughness } from '../../core/PropertyNode.js';
 import { Fn, float } from '../../tsl/TSLBase.js';
 
