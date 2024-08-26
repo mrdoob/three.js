@@ -35,8 +35,6 @@ class OutlinePass extends Pass {
 		this.pulsePeriod = 0;
 
 		this._visibilityCache = new Map();
-		this._selectedMeshes = new Set();
-		this._selectedMeshesDirty = true;
 
 		this.resolution = ( resolution !== undefined ) ? new Vector2( resolution.x, resolution.y ) : new Vector2( 256, 256 );
 
@@ -173,9 +171,9 @@ class OutlinePass extends Pass {
 
 	}
 
-	get selectedMeshes() {
+	updateSelectionSet() {
 
-		const meshes = this._selectedMeshes
+		const meshes = _selectedMeshes
 
 		function gatherSelectedMeshesCallBack( object ) {
 
@@ -183,21 +181,14 @@ class OutlinePass extends Pass {
 
 		}
 
-		if (this._selectedMeshesDirty) {
+		meshes.clear()
 
-			meshes.clear()
+		for ( let i = 0; i < this.selectedObjects.length; i ++ ) {
 
-			for ( let i = 0; i < this.selectedObjects.length; i ++ ) {
+			const selectedObject = this.selectedObjects[ i ];
+			selectedObject.traverse( gatherSelectedMeshesCallBack );
 
-				const selectedObject = this.selectedObjects[ i ];
-				selectedObject.traverse( gatherSelectedMeshesCallBack );
-
-			}
-
-			this._selectedMeshesDirty = false;
 		}
-
-		return meshes
 
 	}
 
@@ -205,7 +196,7 @@ class OutlinePass extends Pass {
 
 		const cache = this._visibilityCache;
 
-		for(let mesh of this.selectedMeshes) {
+		for(let mesh of _selectedMeshes) {
 
 			if ( bVisible === true ) {
 
@@ -225,7 +216,7 @@ class OutlinePass extends Pass {
 	changeVisibilityOfNonSelectedObjects( bVisible ) {
 
 		const cache = this._visibilityCache;
-		const selectedMeshes = this.selectedMeshes;
+		const selectedMeshes = _selectedMeshes;
 
 		function VisibilityChangeCallBack( object ) {
 
@@ -233,7 +224,7 @@ class OutlinePass extends Pass {
 
 				// only meshes and sprites are supported by OutlinePass
 
-				if ( selectedMeshes.has( object.id ) === false ) {
+				if ( !selectedMeshes.has(object) ) {
 
 					const visibility = object.visible;
 
@@ -296,8 +287,7 @@ class OutlinePass extends Pass {
 
 			renderer.setClearColor( 0xffffff, 1 );
 
-			// set the selected meshes flag to recalculate selected meshes in case the selectedObjects array changed since last frame
-			this._selectedMeshesDirty = true;
+			this.updateSelectionSet()
 			// Make selected objects invisible
 			this.changeVisibilityOfSelectedObjects( false );
 
@@ -329,6 +319,7 @@ class OutlinePass extends Pass {
 			this.renderScene.overrideMaterial = null;
 			this.changeVisibilityOfNonSelectedObjects( true );
 			this._visibilityCache.clear();
+			_selectedMeshes.clear();
 
 			this.renderScene.background = currentBackground;
 
@@ -639,6 +630,8 @@ class OutlinePass extends Pass {
 	}
 
 }
+
+const _selectedMeshes = new Set();
 
 OutlinePass.BlurDirectionX = new Vector2( 1.0, 0.0 );
 OutlinePass.BlurDirectionY = new Vector2( 0.0, 1.0 );
