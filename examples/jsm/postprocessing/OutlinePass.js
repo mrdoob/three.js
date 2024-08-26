@@ -173,7 +173,7 @@ class OutlinePass extends Pass {
 
 	updateSelectionSet() {
 
-		const meshes = _selectedMeshes
+		const meshes = _selectedMeshes;
 
 		function gatherSelectedMeshesCallBack( object ) {
 
@@ -181,7 +181,7 @@ class OutlinePass extends Pass {
 
 		}
 
-		meshes.clear()
+		meshes.clear();
 
 		for ( let i = 0; i < this.selectedObjects.length; i ++ ) {
 
