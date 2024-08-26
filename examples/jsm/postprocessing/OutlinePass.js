@@ -35,7 +35,8 @@ class OutlinePass extends Pass {
 		this.pulsePeriod = 0;
 
 		this._visibilityCache = new Map();
-
+		this._selectedMeshes = new Set();
+		this._selectedMeshesDirty = true;
 
 		this.resolution = ( resolution !== undefined ) ? new Vector2( resolution.x, resolution.y ) : new Vector2( 256, 256 );
 
@@ -172,33 +173,50 @@ class OutlinePass extends Pass {
 
 	}
 
+	get selectedMeshes() {
+        
+		const meshes = this._selectedMeshes
+
+		function gatherSelectedMeshesCallBack( object ) {
+
+			if ( object.isMesh ) meshes.add( object );
+
+		}
+
+		if (this._selectedMeshesDirty) {
+
+			meshes.clear()
+
+			for ( let i = 0; i < this.selectedObjects.length; i ++ ) {
+
+				const selectedObject = this.selectedObjects[ i ];
+				selectedObject.traverse( gatherSelectedMeshesCallBack );
+
+			}
+
+			this._selectedMeshesDirty = false;
+		}
+
+		return meshes
+        
+	}
+
 	changeVisibilityOfSelectedObjects( bVisible ) {
 
 		const cache = this._visibilityCache;
 
-		function gatherSelectedMeshesCallBack( object ) {
+		for(let mesh of this.selectedMeshes) {
 
-			if ( object.isMesh ) {
+			if ( bVisible === true ) {
 
-				if ( bVisible === true ) {
+				mesh.visible = cache.get( mesh);
 
-					object.visible = cache.get( object );
+			} else {
 
-				} else {
-
-					cache.set( object, object.visible );
-					object.visible = bVisible;
-
-				}
+				cache.set( mesh, mesh.visible );
+				mesh.visible = bVisible;
 
 			}
-
-		}
-
-		for ( let i = 0; i < this.selectedObjects.length; i ++ ) {
-
-			const selectedObject = this.selectedObjects[ i ];
-			selectedObject.traverse( gatherSelectedMeshesCallBack );
 
 		}
 
@@ -207,20 +225,7 @@ class OutlinePass extends Pass {
 	changeVisibilityOfNonSelectedObjects( bVisible ) {
 
 		const cache = this._visibilityCache;
-		const selectedMeshes = new Set();
-
-		function gatherSelectedMeshesCallBack( object ) {
-
-			if ( object.isMesh ) selectedMeshes.add( object.id );
-
-		}
-
-		for ( let i = 0; i < this.selectedObjects.length; i ++ ) {
-
-			const selectedObject = this.selectedObjects[ i ];
-			selectedObject.traverse( gatherSelectedMeshesCallBack );
-
-		}
+		const selectedMeshes = this.selectedMeshes;
 
 		function VisibilityChangeCallBack( object ) {
 
@@ -291,6 +296,8 @@ class OutlinePass extends Pass {
 
 			renderer.setClearColor( 0xffffff, 1 );
 
+			// set the selected meshes flag to recalculate selected meshes in case the selectedObjects array changed since last frame
+			this._selectedMeshesDirty = true
 			// Make selected objects invisible
 			this.changeVisibilityOfSelectedObjects( false );
 
