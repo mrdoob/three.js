@@ -82,7 +82,7 @@ class WebGPUBindingUtils {
 
 					texture.sampleType = GPUTextureSampleType.Depth;
 
-				} else if ( binding.texture.isDataTexture || binding.texture.isDataArrayTexture || binding.texture.isData3DTexture || binding.texture.isCompressedArrayTexture ) {
+				} else if ( binding.texture.isDataTexture || binding.texture.isDataArrayTexture || binding.texture.isData3DTexture ) {
 
 					const type = binding.texture.type;
 
