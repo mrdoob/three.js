@@ -30,6 +30,8 @@ class ViewHelper extends ViewHelperBase {
 
 		} );
 
+		this.setLabel( 'x', 'y', 'z' );
+
 		container.add( panel );
 
 	}
