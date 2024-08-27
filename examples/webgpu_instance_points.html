@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color } from 'three/tsl';
+			import { color, storage, Fn, instanceIndex, sin, timerLocal, float, uniform } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -42,10 +42,14 @@
 			let material;
 			let stats;
 			let gui;
+			let effectController;
 
 			// viewport
 			let insetWidth;
 			let insetHeight;
+
+			// compute
+			let computeSize;
 
 			init();
 
@@ -76,6 +80,7 @@
 
 				const positions = [];
 				const colors = [];
+				const sizes = [];
 
 				const points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
@@ -83,6 +88,17 @@
 				const divisions = Math.round( 4 * points.length );
 				const point = new THREE.Vector3();
 				const pointColor = new THREE.Color();
+
+				effectController = {
+
+					pulseSpeed: uniform( 6 ),
+					minWidth: uniform( 5 ),
+					maxWidth: uniform( 20 ),
+					width: 10,
+					instanceSize: true,
+					alphaToCoverage: true,
+
+				};
 
 				for ( let i = 0, l = divisions; i < l; i ++ ) {
 
@@ -94,6 +110,8 @@
 					pointColor.setHSL( t, 1.0, 0.5, THREE.SRGBColorSpace );
 					colors.push( pointColor.r, pointColor.g, pointColor.b );
 
+					sizes.push( 10.0 );
+
 				}
 
 				// Instanced Points
@@ -101,7 +119,27 @@
 				const geometry = new InstancedPointsGeometry();
 				geometry.setPositions( positions );
 				geometry.setColors( colors );
+				geometry.setSizes( sizes );
 
+				// Maybe better to just set all BufferAttributes to StorageBufferAttributes for convenience?
+				const instanceSizeBaseAttribute = geometry.attributes.instanceSize;
+				const instanceSizeBufferAttribute = new THREE.StorageInstancedBufferAttribute( instanceSizeBaseAttribute.array, 1 );
+
+				geometry.setAttribute( 'instanceSize', instanceSizeBufferAttribute );
+				const instanceSizeStorage = storage( instanceSizeBufferAttribute, 'float', instanceSizeBufferAttribute.count );
+
+				computeSize = Fn( () => {
+
+					const { pulseSpeed, minWidth, maxWidth } = effectController;
+
+					const time = timerLocal().add( float( instanceIndex ) );
+
+					const sizeFactor = sin( time.mul( pulseSpeed ) ).add( 1 ).div( 2 );
+
+					instanceSizeStorage.element( instanceIndex ).assign( sizeFactor.mul( maxWidth.sub( minWidth ) ).add( minWidth ) );
+
+				} )().compute( divisions );
+			
 				geometry.instanceCount = positions.length / 3; // this should not be necessary
 
 				material = new THREE.InstancedPointsNodeMaterial( {
@@ -110,6 +148,7 @@
 					pointWidth: 10, // in pixel units
 
 					vertexColors: true,
+					vertexSizes: true,
 					alphaToCoverage: true,
 
 				} );
@@ -118,15 +157,38 @@
 				instancedPoints.scale.set( 1, 1, 1 );
 				scene.add( instancedPoints );
 
-				//
-
 				window.addEventListener( 'resize', onWindowResize );
 				onWindowResize();
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				initGui();
+				gui = new GUI();
+
+				gui.add( effectController, 'instanceSize' ).onChange( function ( val ) {
+
+					material.vertexSizes = val;
+					material.needsUpdate = true;
+
+			
+				} );
+
+				gui.add( effectController, 'alphaToCoverage' ).onChange( function ( val ) {
+
+					material.alphaToCoverage = val;
+					material.needsUpdate = true;
+
+				} );
+
+				gui.add( effectController, 'width', 1, 20, 1 ).onChange( function ( val ) {
+
+					material.pointWidth = val;
+
+				} );
+
+				gui.add( effectController.minWidth, 'value', 1, 20, 1 ).name( 'minWidth' );
+				gui.add( effectController.maxWidth, 'value', 2, 20, 1 ).name( 'maxWidth' );
+				gui.add( effectController.pulseSpeed, 'value', 1, 20, 0.1 ).name( 'pulseSpeed' );
 
 			}
 
@@ -148,6 +210,9 @@
 			function animate() {
 
 				stats.update();
+
+				// compute
+				renderer.compute( computeSize );
 
 				// main scene
 
@@ -188,29 +253,6 @@
 			}
 
 			//
-
-			function initGui() {
-
-				gui = new GUI();
-
-				const param = {
-					'width': 10,
-					'alphaToCoverage': true,
-				};
-
-				gui.add( param, 'width', 1, 20, 1 ).onChange( function ( val ) {
-
-					material.pointWidth = val;
-
-				} );
-
-				gui.add( param, 'alphaToCoverage' ).onChange( function ( val ) {
-
-					material.alphaToCoverage = val;
-
-				} );
-
-			}
 
 		</script>
 

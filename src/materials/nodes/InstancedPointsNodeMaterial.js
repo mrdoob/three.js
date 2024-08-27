@@ -26,6 +26,8 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		this.useColor = params.vertexColors;
 
+		this.vertexSizes = params.vertexSizes;
+
 		this.pointWidth = 1;
 
 		this.pointColorNode = null;
@@ -70,7 +72,18 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			// offset in ndc space
 			const offset = property( 'vec2', 'offset' );
 			offset.assign( positionGeometry.xy );
-			offset.assign( offset.mul( materialPointWidth ) );
+
+			if ( this.vertexSizes ) {
+
+				const instanceSize = attribute( 'instanceSize' );
+				offset.assign( offset.mul( instanceSize ) );
+
+			} else {
+
+				offset.assign( offset.mul( materialPointWidth ) );
+
+			}
+
 			offset.assign( offset.div( viewport.z ) );
 			offset.y.assign( offset.y.mul( aspect ) );
 
