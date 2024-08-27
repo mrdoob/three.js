@@ -1,6 +1,6 @@
 import { registerNodeClass } from '../core/Node.js';
 import Node from '../core/Node.js';
-import { nodeProxy } from '../tsl/TSLBase.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLBase.js';
 
 class TextureSizeNode extends Node {
 
@@ -31,3 +31,5 @@ export default TextureSizeNode;
 registerNodeClass( 'TextureSize', TextureSizeNode );
 
 export const textureSize = nodeProxy( TextureSizeNode );
+
+addMethodChaining( 'textureSize', textureSize );

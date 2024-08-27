@@ -6,3 +6,4 @@ export const Discard = ( conditional ) => ( conditional ? select( conditional, e
 export const Return = () => expression( 'return' ).append();
 
 addMethodChaining( 'discard', Discard );
+addMethodChaining( 'return', Return );

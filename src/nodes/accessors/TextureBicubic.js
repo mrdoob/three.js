@@ -1,6 +1,6 @@
 import { add, mul, div } from '../math/OperatorNode.js';
 import { floor, ceil, fract, pow } from '../math/MathNode.js';
-import { Fn, float, vec2, vec4, int } from '../tsl/TSLBase.js';
+import { Fn, float, vec2, vec4, int, addMethodChaining } from '../tsl/TSLBase.js';
 
 // Mipped Bicubic Texture Filtering by N8
 // https://www.shadertoy.com/view/Dl2SDW
@@ -63,3 +63,5 @@ export const textureBicubic = Fn( ( [ textureNode, lodNode = float( 3 ) ] ) => {
 	return fract( lodNode ).mix( fSample, cSample );
 
 } );
+
+addMethodChaining( 'bicubic', bicubic );

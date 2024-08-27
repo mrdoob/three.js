@@ -1,7 +1,7 @@
 import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UV.js';
-import { Fn, nodeProxy, vec4 } from '../tsl/TSLBase.js';
+import { addMethodChaining, Fn, nodeProxy, vec4 } from '../tsl/TSLBase.js';
 import { mix, fract, clamp, rand } from '../math/MathNode.js';
 import { timerLocal } from '../utils/TimerNode.js';
 
@@ -51,3 +51,5 @@ export default FilmNode;
 registerNodeClass( 'Film', FilmNode );
 
 export const film = nodeProxy( FilmNode );
+
+addMethodChaining( 'film', film );

@@ -3,7 +3,7 @@ import { add } from '../math/OperatorNode.js';
 import { normalLocal } from '../accessors/Normal.js';
 import { positionLocal } from '../accessors/Position.js';
 import { texture } from '../accessors/TextureNode.js';
-import { nodeProxy, float, vec3 } from '../tsl/TSLBase.js';
+import { nodeProxy, float, vec3, addMethodChaining } from '../tsl/TSLBase.js';
 
 class TriplanarTexturesNode extends Node {
 
@@ -58,3 +58,5 @@ registerNodeClass( 'TriplanarTextures', TriplanarTexturesNode );
 
 export const triplanarTextures = nodeProxy( TriplanarTexturesNode );
 export const triplanarTexture = ( ...params ) => triplanarTextures( ...params );
+
+addMethodChaining( 'triplanarTexture', triplanarTexture );

@@ -1,4 +1,4 @@
-import { Fn } from '../tsl/TSLBase.js';
+import { addMethodChaining, Fn } from '../tsl/TSLBase.js';
 
 export const hash = Fn( ( [ seed ] ) => {
 
@@ -11,3 +11,5 @@ export const hash = Fn( ( [ seed ] ) => {
 	return result.toFloat().mul( 1 / 2 ** 32 ); // Convert to range [0, 1)
 
 } );
+
+addMethodChaining( 'hash', hash );

@@ -1,6 +1,6 @@
 import Node, { registerNodeClass } from '../core/Node.js';
 import { timerLocal } from './TimerNode.js';
-import { nodeObject, nodeProxy } from '../tsl/TSLBase.js';
+import { addMethodChaining, nodeObject, nodeProxy } from '../tsl/TSLBase.js';
 
 class OscNode extends Node {
 
@@ -79,3 +79,8 @@ export const oscSine = nodeProxy( OscNode, OscNode.SINE );
 export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );
 export const oscTriangle = nodeProxy( OscNode, OscNode.TRIANGLE );
 export const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
+
+addMethodChaining( 'oscSine', oscSine );
+addMethodChaining( 'oscSquare', oscSquare );
+addMethodChaining( 'oscTriangle', oscTriangle );
+addMethodChaining( 'oscSawtooth', oscSawtooth );

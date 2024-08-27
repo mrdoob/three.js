@@ -8,7 +8,7 @@ import { positionView } from '../accessors/Position.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
 import { uv } from '../accessors/UV.js';
 import { faceDirection } from './FrontFacingNode.js';
-import { Fn, nodeProxy, vec3 } from '../tsl/TSLBase.js';
+import { addMethodChaining, Fn, nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from '../../constants.js';
 
@@ -102,3 +102,5 @@ export default NormalMapNode;
 registerNodeClass( 'NormalMap', NormalMapNode );
 
 export const normalMap = nodeProxy( NormalMapNode );
+
+addMethodChaining( 'normalMap', normalMap );
