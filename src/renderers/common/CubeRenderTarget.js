@@ -1,7 +1,7 @@
 import { equirectUV } from '../../nodes/utils/EquirectUVNode.js';
 import { texture as TSL_Texture } from '../../nodes/accessors/TextureNode.js';
-import { positionWorldDirection } from '../../nodes/accessors/PositionNode.js';
-import { createNodeMaterialFromType } from '../../nodes/materials/NodeMaterial.js';
+import { positionWorldDirection } from '../../nodes/accessors/Position.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { WebGLCubeRenderTarget } from '../../renderers/WebGLCubeRenderTarget.js';
 import { Scene } from '../../scenes/Scene.js';
@@ -40,7 +40,7 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 
 		const uvNode = equirectUV( positionWorldDirection );
 
-		const material = createNodeMaterialFromType( 'MeshBasicNodeMaterial' );
+		const material = new NodeMaterial();
 		material.colorNode = TSL_Texture( texture, uvNode, 0 );
 		material.side = BackSide;
 		material.blending = NoBlending;

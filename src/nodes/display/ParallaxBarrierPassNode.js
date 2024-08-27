@@ -1,9 +1,10 @@
-import { Fn, If, nodeObject, vec4 } from '../shadernode/ShaderNode.js';
-import { uv } from '../accessors/UVNode.js';
+import { registerNodeClass } from '../core/Node.js';
+import { Fn, If, nodeObject, vec4 } from '../tsl/TSLBase.js';
+import { uv } from '../accessors/UV.js';
 import { mod } from '../math/MathNode.js';
 import { viewportCoordinate } from './ViewportNode.js';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
-import { addNodeClass } from '../core/Node.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
@@ -37,7 +38,7 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 		} );
 
-		const material = this._material || ( this._material = builder.createNodeMaterial() );
+		const material = this._material || ( this._material = new NodeMaterial() );
 		material.fragmentNode = parallaxBarrier().context( builder.getSharedContext() );
 		material.needsUpdate = true;
 
@@ -49,6 +50,6 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 export default ParallaxBarrierPassNode;
 
-export const parallaxBarrierPass = ( scene, camera ) => nodeObject( new ParallaxBarrierPassNode( scene, camera ) );
+registerNodeClass( 'ParallaxBarrierPass', ParallaxBarrierPassNode );
 
-addNodeClass( 'ParallaxBarrierPassNode', ParallaxBarrierPassNode );
+export const parallaxBarrierPass = ( scene, camera ) => nodeObject( new ParallaxBarrierPassNode( scene, camera ) );

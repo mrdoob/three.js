@@ -1,4 +1,4 @@
-import { Fn } from '../shadernode/ShaderNode.js';
+import { Fn } from '../tsl/TSLBase.js';
 
 export const getDistanceAttenuation = Fn( ( inputs ) => {
 

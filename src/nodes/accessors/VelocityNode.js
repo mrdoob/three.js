@@ -1,13 +1,13 @@
-import { addNodeClass } from '../core/Node.js';
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { modelViewMatrix } from './ModelNode.js';
-import { positionLocal, positionPrevious } from './PositionNode.js';
-import { nodeImmutable } from '../shadernode/ShaderNode.js';
+import { positionLocal, positionPrevious } from './Position.js';
+import { nodeImmutable } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { uniform } from '../core/UniformNode.js';
 import { sub } from '../math/OperatorNode.js';
-import { cameraProjectionMatrix } from './CameraNode.js';
+import { cameraProjectionMatrix } from './Camera.js';
 
 const _matrixCache = new WeakMap();
 
@@ -78,6 +78,6 @@ function getPreviousMatrix( object ) {
 
 export default VelocityNode;
 
-export const velocity = nodeImmutable( VelocityNode );
+registerNodeClass( 'Velocity', VelocityNode );
 
-addNodeClass( 'VelocityNode', VelocityNode );
+export const velocity = nodeImmutable( VelocityNode );

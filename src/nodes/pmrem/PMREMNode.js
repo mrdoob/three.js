@@ -1,10 +1,10 @@
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { addNodeClass } from '../core/Node.js';
 import { texture } from '../accessors/TextureNode.js';
 import { textureCubeUV } from './PMREMUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeProxy, vec3 } from '../shadernode/ShaderNode.js';
+import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { WebGLCoordinateSystem } from '../../constants.js';
 import { Texture } from '../../textures/Texture.js';
@@ -204,6 +204,10 @@ class PMREMNode extends TempNode {
 
 }
 
+export default PMREMNode;
+
+registerNodeClass( 'PMREM', PMREMNode );
+
 function isCubeMapReady( image ) {
 
 	if ( image === null || image === undefined ) return false;
@@ -231,7 +235,3 @@ function isEquirectangularMapReady( image ) {
 }
 
 export const pmremTexture = nodeProxy( PMREMNode );
-
-addNodeClass( 'PMREMNode', PMREMNode );
-
-export default PMREMNode;

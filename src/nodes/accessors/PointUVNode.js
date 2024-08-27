@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { nodeImmutable } from '../shadernode/ShaderNode.js';
+import Node, { registerNodeClass } from '../core/Node.js';
+import { nodeImmutable } from '../tsl/TSLBase.js';
 
 class PointUVNode extends Node {
 
@@ -21,6 +21,6 @@ class PointUVNode extends Node {
 
 export default PointUVNode;
 
-export const pointUV = nodeImmutable( PointUVNode );
+registerNodeClass( 'PointUV', PointUVNode );
 
-addNodeClass( 'PointUVNode', PointUVNode );
+export const pointUV = nodeImmutable( PointUVNode );

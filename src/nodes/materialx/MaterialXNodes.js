@@ -7,8 +7,8 @@ import {
 import { mx_hsvtorgb, mx_rgbtohsv } from './lib/mx_hsv.js';
 import { mx_srgb_texture_to_lin_rec709 } from './lib/mx_transform_color.js';
 import { mix, smoothstep } from '../math/MathNode.js';
-import { uv } from '../accessors/UVNode.js';
-import { float, vec2, vec4, int } from '../shadernode/ShaderNode.js';
+import { uv } from '../accessors/UV.js';
+import { float, vec2, vec4, int } from '../tsl/TSLBase.js';
 
 export const mx_aastep = ( threshold, value ) => {
 
