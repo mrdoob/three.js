@@ -828,17 +828,14 @@ class WebGPUBackend extends Backend {
 	draw( renderObject, info ) {
 
 		const { object, geometry, context, pipeline } = renderObject;
-
 		const bindings = renderObject.getBindings();
-		const contextData = this.get( context );
+		const renderContextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
-		const currentSets = contextData.currentSets;
+		const currentSets = renderContextData.currentSets;
 
 		const renderObjectData = this.get( renderObject );
 
 		const { bundleEncoder, renderBundle, lastPipelineGPU } = renderObjectData;
-
-		const renderContextData = this.get( context );
 
 		if ( renderContextData.registerBundlesPhase === true && bundleEncoder !== undefined && lastPipelineGPU === pipelineGPU ) {
 
@@ -847,7 +844,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const passEncoderGPU = this.renderer._currentRenderBundle ? this.createBundleEncoder( context, renderObject ) : contextData.currentPass;
+		const passEncoderGPU = this.renderer._currentRenderBundle ? this.createBundleEncoder( context, renderObject ) : renderContextData.currentPass;
 
 		// pipeline
 
@@ -914,27 +911,27 @@ class WebGPUBackend extends Backend {
 
 		// occlusion queries - handle multiple consecutive draw calls for an object
 
-		if ( contextData.occlusionQuerySet !== undefined ) {
+		if ( renderContextData.occlusionQuerySet !== undefined ) {
 
-			const lastObject = contextData.lastOcclusionObject;
+			const lastObject = renderContextData.lastOcclusionObject;
 
 			if ( lastObject !== object ) {
 
 				if ( lastObject !== null && lastObject.occlusionTest === true ) {
 
 					passEncoderGPU.endOcclusionQuery();
-					contextData.occlusionQueryIndex ++;
+					renderContextData.occlusionQueryIndex ++;
 
 				}
 
 				if ( object.occlusionTest === true ) {
 
-					passEncoderGPU.beginOcclusionQuery( contextData.occlusionQueryIndex );
-					contextData.occlusionQueryObjects[ contextData.occlusionQueryIndex ] = object;
+					passEncoderGPU.beginOcclusionQuery( renderContextData.occlusionQueryIndex );
+					renderContextData.occlusionQueryObjects[ renderContextData.occlusionQueryIndex ] = object;
 
 				}
 
-				contextData.lastOcclusionObject = object;
+				renderContextData.lastOcclusionObject = object;
 
 			}
 
