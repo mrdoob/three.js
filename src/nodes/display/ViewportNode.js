@@ -110,10 +110,7 @@ class ViewportNode extends Node {
 ViewportNode.COORDINATE = 'coordinate';
 ViewportNode.RESOLUTION = 'resolution';
 ViewportNode.VIEWPORT = 'viewport';
-ViewportNode.TOP_LEFT = 'topLeft';
-ViewportNode.BOTTOM_LEFT = 'bottomLeft';
-ViewportNode.TOP_RIGHT = 'topRight';
-ViewportNode.BOTTOM_RIGHT = 'bottomRight';
+ViewportNode.UV = 'uv';
 
 export default ViewportNode;
 
@@ -122,7 +119,7 @@ registerNodeClass( 'Viewport', ViewportNode );
 export const viewportCoordinate = nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
 export const viewportResolution = nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
 export const viewport = nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
-export const viewportUV = nodeImmutable( ViewportNode, ViewportNode.TOP_LEFT );
+export const viewportUV = nodeImmutable( ViewportNode, ViewportNode.UV );
 
 export const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
