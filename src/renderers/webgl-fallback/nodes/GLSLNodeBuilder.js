@@ -387,7 +387,7 @@ ${ flowData.code }
 
 					snippet = `sampler2DShadow ${ uniform.name };`;
 
-				} else if ( texture.isDataArrayTexture === true ) {
+				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
 					snippet = `${typePrefix}sampler2DArray ${ uniform.name };`;
 

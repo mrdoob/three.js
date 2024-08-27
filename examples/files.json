@@ -426,7 +426,8 @@
 		"webgpu_volume_cloud",
 		"webgpu_volume_perlin",
 		"webgpu_water",
-		"webgpu_performance"
+		"webgpu_performance",
+		"webgpu_texture2darray_compressed"
 	],
 	"webaudio": [
 		"webaudio_orientation",

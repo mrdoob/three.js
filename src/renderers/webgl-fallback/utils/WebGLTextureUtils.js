@@ -79,11 +79,11 @@ class WebGLTextureUtils {
 
 			glTextureType = gl.TEXTURE_CUBE_MAP;
 
-		} else if ( texture.isDataArrayTexture === true ) {
+		} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
 			glTextureType = gl.TEXTURE_2D_ARRAY;
 
-		} else if ( texture.isData3DTexture === true ) {
+		} else if ( texture.isData3DTexture === true ) { // TODO: isCompressed3DTexture, wait for #26642
 
 			glTextureType = gl.TEXTURE_3D;
 
@@ -340,7 +340,7 @@ class WebGLTextureUtils {
 
 		this.setTextureParameters( glTextureType, texture );
 
-		if ( texture.isDataArrayTexture ) {
+		if ( texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
 
 			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
 
@@ -429,6 +429,7 @@ class WebGLTextureUtils {
 		if ( texture.isCompressedTexture ) {
 
 			const mipmaps = texture.mipmaps;
+			const image = options.image;
 
 			for ( let i = 0; i < mipmaps.length; i ++ ) {
 
@@ -436,7 +437,6 @@ class WebGLTextureUtils {
 
 				if ( texture.isCompressedArrayTexture ) {
 
-					const image = options.image;
 
 					if ( texture.format !== gl.RGBA ) {
 
@@ -472,6 +472,7 @@ class WebGLTextureUtils {
 				}
 
 			}
+
 
 		} else if ( texture.isCubeTexture ) {
 
