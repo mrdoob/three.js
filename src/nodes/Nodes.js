@@ -132,13 +132,8 @@ export { default as FogExp2Node } from './fog/FogExp2Node.js';
 export { default as RangeNode } from './geometry/RangeNode.js';
 
 // gpgpu
-<<<<<<< HEAD
 export { default as ComputeNode } from './gpgpu/ComputeNode.js';
-=======
-export { default as ComputeNode, compute } from './gpgpu/ComputeNode.js';
-export { default as WorkgroupInfoNode, workgroupArray } from './gpgpu/WorkgroupInfoNode.js';
-export { workgroupBarrier, textureBarrier, storageBarrier } from './gpgpu/BarrierNode.js';
->>>>>>> 2880e0fe5b (barrier, private array, workgroup array support)
+export { workgroupBarrier } from './gpgpu/BarrierNode.js';
 
 // lighting
 export { default as LightNode } from './lighting/LightNode.js';
