@@ -235,7 +235,7 @@ export default class RenderObject {
 
 		}
 
-		cacheKey += this.clippingContextVersion + ',';
+		cacheKey += this.clippingContext.cacheKey + ',';
 
 		if ( object.skeleton ) {
 

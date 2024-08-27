@@ -4,13 +4,11 @@ import { Vector4 } from '../../math/Vector4.js';
 
 const _plane = /*@__PURE__*/ new Plane();
 
-let _clippingContextVersion = 0;
-
 class ClippingContext {
 
 	constructor() {
 
-		this.version = ++ _clippingContextVersion;
+		this.version = 0;
 
 		this.globalClippingCount = 0;
 
@@ -22,6 +20,7 @@ class ClippingContext {
 
 		this.parentVersion = 0;
 		this.viewNormalMatrix = new Matrix3();
+		this.cacheKey = '';
 
 	}
 
@@ -93,7 +92,12 @@ class ClippingContext {
 
 		}
 
-		if ( update ) this.version = _clippingContextVersion ++;
+		if ( update ) {
+
+			this.version ++;
+			this.cacheKey = `${ this.globalClippingCount }:${ this.localClippingEnabled === undefined ? false : this.localClippingEnabled }:`;
+
+		}
 
 	}
 
@@ -158,7 +162,12 @@ class ClippingContext {
 
 		}
 
-		if ( update ) this.version = _clippingContextVersion ++;
+		if ( update ) {
+
+			this.version += parent.version;
+			this.cacheKey = parent.cacheKey + `:${ this.localClippingCount }:${ this.localClipIntersection === undefined ? false : this.localClipIntersection }`;
+
+		}
 
 	}
 
