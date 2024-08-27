@@ -2,6 +2,7 @@ import {
 	Box3,
 	Float32BufferAttribute,
 	InstancedBufferGeometry,
+	StorageInstancedBufferAttribute,
 	InstancedBufferAttribute,
 	Sphere,
 	Vector3
@@ -71,7 +72,7 @@ class InstancedPointsGeometry extends InstancedBufferGeometry {
 
 		}
 
-		this.setAttribute( 'instancePosition', new InstancedBufferAttribute( points, 3 ) ); // xyz
+		this.setAttribute( 'instancePosition', new StorageInstancedBufferAttribute( points, 3 ) ); // xyz
 
 		//
 
