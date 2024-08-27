@@ -58,7 +58,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			//vUv = uv;
 			varying( vec2(), 'vUv' ).assign( uv() ); // @TODO: Analyze other way to do this
 
-			const instancePosition = attribute( 'instancePosition' );
+			const instancePosition = attribute( 'instancePosition' ).xyz;
 
 			// camera space
 			const mvPos = property( 'vec4', 'mvPos' );

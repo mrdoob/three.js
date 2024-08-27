@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, storage, Fn, instanceIndex, sin, timerLocal, float, uniform, normalize, length } from 'three/tsl';
+			import { color, storage, Fn, instanceIndex, sin, cos, vec3, timerLocal, float, uniform, normalize, length } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -55,7 +55,7 @@
 
 			function init() {
 
-				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -92,6 +92,7 @@
 				effectController = {
 
 					pulseSpeed: uniform( 6 ),
+					oscillationSpeed: uniform( 0.01 ),
 					minWidth: uniform( 5 ),
 					maxWidth: uniform( 20 ),
 					width: 10,
@@ -121,17 +122,13 @@
 				geometry.setColors( colors );
 				geometry.setSizes( sizes );
 
-				// Maybe better to just set all BufferAttributes to StorageBufferAttributes for convenience?
 				const instanceSizeBaseAttribute = geometry.attributes.instanceSize;
 				const instanceSizeBufferAttribute = new THREE.StorageInstancedBufferAttribute( instanceSizeBaseAttribute.array, 1 );
 
 				geometry.setAttribute( 'instanceSize', instanceSizeBufferAttribute );
 				const instanceSizeStorage = storage( instanceSizeBufferAttribute, 'float', instanceSizeBufferAttribute.count );
-				const instancePositionStorage = storage( geometry.attributes.instancePosition, 'vec3', geometry.attributes.instancePosition.count );
 
 				computeSize = Fn( () => {
-
-					// Modify size
 
 					const { pulseSpeed, minWidth, maxWidth } = effectController;
 
@@ -140,16 +137,6 @@
 					const sizeFactor = sin( time.mul( pulseSpeed ) ).add( 1 ).div( 2 );
 
 					instanceSizeStorage.element( instanceIndex ).assign( sizeFactor.mul( maxWidth.sub( minWidth ) ).add( minWidth ) );
-
-					// Modify position
-			
-					const currentPosition = instancePositionStorage.element( instanceIndex );
-					const nextPosition = instancePositionStorage.element( instanceIndex.add( 1 ).modInt( divisions ) );
-
-					const direction = normalize( nextPosition.sub( currentPosition ) );
-
-					instancePositionStorage.element( instance );
-			
 
 				} )().compute( divisions );
 			
