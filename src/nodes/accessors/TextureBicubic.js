@@ -1,7 +1,6 @@
-import TempNode from '../core/TempNode.js';
 import { add, mul, div } from '../math/OperatorNode.js';
 import { floor, ceil, fract, pow } from '../math/MathNode.js';
-import { nodeProxy, float, vec2, vec4, int } from '../tsl/TSLBase.js';
+import { Fn, float, vec2, vec4, int } from '../tsl/TSLBase.js';
 
 // Mipped Bicubic Texture Filtering by N8
 // https://www.shadertoy.com/view/Dl2SDW
@@ -52,7 +51,7 @@ const bicubic = ( textureNode, texelSize, lod ) => {
 
 };
 
-export const textureBicubic = ( textureNode, lodNode = float( 3 ) ) => {
+export const textureBicubic = Fn( ( [ textureNode, lodNode = float( 3 ) ] ) => {
 
 	const fLodSize = vec2( textureNode.size( int( lodNode ) ) );
 	const cLodSize = vec2( textureNode.size( int( lodNode.add( 1.0 ) ) ) );
@@ -63,4 +62,4 @@ export const textureBicubic = ( textureNode, lodNode = float( 3 ) ) => {
 
 	return fract( lodNode ).mix( fSample, cSample );
 
-};
+} );
