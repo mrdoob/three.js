@@ -148,7 +148,7 @@
 					pointWidth: 10, // in pixel units
 
 					vertexColors: true,
-					vertexSizes: true,
+					useInstanceSize: true,
 					alphaToCoverage: true,
 
 				} );
@@ -167,16 +167,13 @@
 
 				gui.add( effectController, 'instanceSize' ).onChange( function ( val ) {
 
-					material.vertexSizes = val;
-					material.needsUpdate = true;
+					material.useInstanceSize = val;
 
-			
 				} );
 
 				gui.add( effectController, 'alphaToCoverage' ).onChange( function ( val ) {
 
 					material.alphaToCoverage = val;
-					material.needsUpdate = true;
 
 				} );
 

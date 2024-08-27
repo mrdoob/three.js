@@ -26,7 +26,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		this.useColor = params.vertexColors;
 
-		this.vertexSizes = params.vertexSizes;
+		this.vertexSizes = params.useInstanceSize;
 
 		this.pointWidth = 1;
 
@@ -157,6 +157,23 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 	get alphaToCoverage() {
 
 		return this.useAlphaToCoverage;
+
+	}
+
+	get useInstanceSize() {
+
+		return this.vertexSizes;
+
+	}
+
+	set useInstanceSize( value ) {
+
+		if ( this.vertexSizes !== value ) {
+
+			this.vertexSizes = value;
+			this.needsUpdate = true;
+
+		}
 
 	}
 
