@@ -25,6 +25,8 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import * as TSL from 'three/tsl';
+
 			import { Fn, wgslFn, positionLocal, scriptable, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportUV, js, string, global, Loop, cameraProjectionMatrix } from 'three/tsl';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
@@ -239,7 +241,7 @@
 				// Scriptable
 
 				global.set( 'THREE', THREE );
-				global.set( 'TSL', THREE );
+				global.set( 'TSL', TSL );
 
 				const asyncNode = scriptable( js( `
 
