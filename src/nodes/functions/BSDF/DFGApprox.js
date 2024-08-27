@@ -1,4 +1,4 @@
-import { Fn, vec2, vec4 } from '../../shadernode/ShaderNode.js';
+import { Fn, vec2, vec4 } from '../../tsl/TSLBase.js';
 
 // Analytical approximation of the DFG LUT, one half of the
 // split-sum approximation used in indirect specular lighting.

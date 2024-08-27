@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import Node, { registerNodeClass } from '../core/Node.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 
 class CodeNode extends Node {
 
@@ -75,10 +75,10 @@ class CodeNode extends Node {
 
 export default CodeNode;
 
+registerNodeClass( 'Code', CodeNode );
+
 export const code = nodeProxy( CodeNode );
 
 export const js = ( src, includes ) => code( src, includes, 'js' );
 export const wgsl = ( src, includes ) => code( src, includes, 'wgsl' );
 export const glsl = ( src, includes ) => code( src, includes, 'glsl' );
-
-addNodeClass( 'CodeNode', CodeNode );

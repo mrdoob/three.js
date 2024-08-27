@@ -1,9 +1,11 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { reference } from './ReferenceNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
-import { normalView } from './NormalNode.js';
-import { nodeImmutable, float, vec2, vec3, mat2 } from '../shadernode/ShaderNode.js';
+import { normalView } from './Normal.js';
+import { nodeImmutable, float, vec2, vec3, mat2 } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
+import { normalMap } from '../display/NormalMapNode.js';
+import { bumpMap } from '../display/BumpMapNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 
@@ -175,11 +177,11 @@ class MaterialNode extends Node {
 
 			if ( material.normalMap ) {
 
-				node = this.getTexture( 'normal' ).normalMap( this.getCache( 'normalScale', 'vec2' ) );
+				node = normalMap( this.getTexture( 'normal' ), this.getCache( 'normalScale', 'vec2' ) );
 
 			} else if ( material.bumpMap ) {
 
-				node = this.getTexture( 'bump' ).r.bumpMap( this.getFloat( 'bumpScale' ) );
+				node = bumpMap( this.getTexture( 'bump' ).r, this.getFloat( 'bumpScale' ) );
 
 			} else {
 
@@ -219,7 +221,7 @@ class MaterialNode extends Node {
 
 			if ( material.clearcoatNormalMap ) {
 
-				node = this.getTexture( scope ).normalMap( this.getCache( scope + 'Scale', 'vec2' ) );
+				node = normalMap( this.getTexture( scope ), this.getCache( scope + 'Scale', 'vec2' ) );
 
 			} else {
 
@@ -382,6 +384,8 @@ MaterialNode.AO_MAP = 'ao';
 
 export default MaterialNode;
 
+registerNodeClass( 'Material', MaterialNode );
+
 export const materialAlphaTest = nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
 export const materialColor = nodeImmutable( MaterialNode, MaterialNode.COLOR );
 export const materialShininess = nodeImmutable( MaterialNode, MaterialNode.SHININESS );
@@ -431,5 +435,3 @@ export const materialAnisotropyVector = uniform( new Vector2() ).onReference( fu
 	this.value.set( material.anisotropy * Math.cos( material.anisotropyRotation ), material.anisotropy * Math.sin( material.anisotropyRotation ) );
 
 } );
-
-addNodeClass( 'MaterialNode', MaterialNode );

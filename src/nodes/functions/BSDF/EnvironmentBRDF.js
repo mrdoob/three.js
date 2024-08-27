@@ -1,5 +1,5 @@
 import DFGApprox from './DFGApprox.js';
-import { Fn } from '../../shadernode/ShaderNode.js';
+import { Fn } from '../../tsl/TSLBase.js';
 
 const EnvironmentBRDF = Fn( ( inputs ) => {
 

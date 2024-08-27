@@ -1,5 +1,5 @@
+import { registerNodeClass } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
-import { addNodeClass } from '../core/Node.js';
 
 class AONode extends LightingNode {
 
@@ -21,4 +21,4 @@ class AONode extends LightingNode {
 
 export default AONode;
 
-addNodeClass( 'AONode', AONode );
+registerNodeClass( 'AO', AONode );

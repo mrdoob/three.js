@@ -1,12 +1,14 @@
 import TempNode from '../core/TempNode.js';
-import { nodeObject, addNodeElement, Fn, float, vec4 } from '../shadernode/ShaderNode.js';
+import { nodeObject, Fn, float, vec4 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { uv } from '../accessors/UVNode.js';
+import { uv } from '../accessors/UV.js';
 import { texture } from '../accessors/TextureNode.js';
 import { passTexture } from './PassNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { sign, max } from '../math/MathNode.js';
+import { convertToTexture } from '../utils/RTTNode.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
@@ -119,7 +121,7 @@ class AfterImageNode extends TempNode {
 
 		//
 
-		const materialComposed = this._materialComposed || ( this._materialComposed = builder.createNodeMaterial() );
+		const materialComposed = this._materialComposed || ( this._materialComposed = new NodeMaterial() );
 		materialComposed.name = 'AfterImage';
 		materialComposed.fragmentNode = afterImg();
 
@@ -145,9 +147,6 @@ class AfterImageNode extends TempNode {
 
 }
 
-export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( nodeObject( node ).toTexture(), damp ) );
-
-addNodeElement( 'afterImage', afterImage );
+export const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( convertToTexture( node ), damp ) );
 
 export default AfterImageNode;
-

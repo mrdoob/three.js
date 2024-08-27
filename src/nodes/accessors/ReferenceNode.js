@@ -1,10 +1,10 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { texture } from './TextureNode.js';
 import { cubeTexture } from './CubeTextureNode.js';
 import { buffer } from './BufferNode.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 import { uniformArray } from './UniformArrayNode.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 
@@ -38,6 +38,7 @@ class ReferenceElementNode extends ArrayElementNode {
 
 }
 
+// TODO: Extends this from ReferenceBaseNode
 class ReferenceNode extends Node {
 
 	constructor( property, uniformType, object = null, count = null ) {
@@ -165,7 +166,7 @@ class ReferenceNode extends Node {
 
 export default ReferenceNode;
 
+registerNodeClass( 'Reference', ReferenceNode );
+
 export const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
 export const referenceBuffer = ( name, type, count, object ) => nodeObject( new ReferenceNode( name, type, object, count ) );
-
-addNodeClass( 'ReferenceNode', ReferenceNode );

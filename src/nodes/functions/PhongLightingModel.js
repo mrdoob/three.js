@@ -2,11 +2,11 @@ import BasicLightingModel from './BasicLightingModel.js';
 import F_Schlick from './BSDF/F_Schlick.js';
 import BRDF_Lambert from './BSDF/BRDF_Lambert.js';
 import { diffuseColor } from '../core/PropertyNode.js';
-import { transformedNormalView } from '../accessors/NormalNode.js';
+import { transformedNormalView } from '../accessors/Normal.js';
 import { materialSpecularStrength } from '../accessors/MaterialNode.js';
 import { shininess, specularColor } from '../core/PropertyNode.js';
-import { positionViewDirection } from '../accessors/PositionNode.js';
-import { Fn, float } from '../shadernode/ShaderNode.js';
+import { positionViewDirection } from '../accessors/Position.js';
+import { Fn, float } from '../tsl/TSLBase.js';
 
 const G_BlinnPhong_Implicit = () => float( 0.25 );
 

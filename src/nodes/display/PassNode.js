@@ -1,8 +1,8 @@
-import { addNodeClass } from '../core/Node.js';
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { default as TextureNode/*, texture*/ } from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 import { viewZToOrthographicDepth, perspectiveDepthToViewZ } from './ViewportDepthNode.js';
 
@@ -41,6 +41,8 @@ class PassTextureNode extends TextureNode {
 
 }
 
+registerNodeClass( 'PassTexture', PassTextureNode );
+
 class PassMultipleTextureNode extends PassTextureNode {
 
 	constructor( passNode, textureName, previousTexture = false ) {
@@ -73,6 +75,8 @@ class PassMultipleTextureNode extends PassTextureNode {
 	}
 
 }
+
+registerNodeClass( 'PassMultipleTexture', PassMultipleTextureNode );
 
 class PassNode extends TempNode {
 
@@ -356,8 +360,8 @@ PassNode.DEPTH = 'depth';
 
 export default PassNode;
 
+registerNodeClass( 'Pass', PassNode );
+
 export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
 export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
 export const depthPass = ( scene, camera ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera ) );
-
-addNodeClass( 'PassNode', PassNode );

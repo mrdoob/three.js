@@ -149,6 +149,12 @@ class Node extends EventDispatcher {
 
 	}
 
+	getScope() {
+
+		return this;
+
+	}
+
 	getHash( /*builder*/ ) {
 
 		return this.uuid;
@@ -222,18 +228,9 @@ class Node extends EventDispatcher {
 
 	}
 
-	increaseUsage( builder ) {
-
-		const nodeData = builder.getDataFromNode( this );
-		nodeData.usageCount = nodeData.usageCount === undefined ? 1 : nodeData.usageCount + 1;
-
-		return nodeData.usageCount;
-
-	}
-
 	analyze( builder ) {
 
-		const usageCount = this.increaseUsage( builder );
+		const usageCount = builder.increaseUsage( this );
 
 		if ( usageCount === 1 ) {
 
@@ -322,7 +319,8 @@ class Node extends EventDispatcher {
 
 				if ( properties.outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
 
-					properties.outputNode = builder.stack;
+					// !! no outputNode !!
+					//properties.outputNode = builder.stack;
 
 				}
 
@@ -543,18 +541,28 @@ class Node extends EventDispatcher {
 
 export default Node;
 
-export function addNodeClass( type, nodeClass ) {
+export function registerNodeClass( type, nodeClass ) {
 
-	if ( typeof nodeClass !== 'function' || ! type ) throw new Error( `Node class ${ type } is not a class` );
-	if ( NodeClasses.has( type ) ) {
+	const nodeType = type + 'Node';
 
-		console.warn( `Redefinition of node class ${ type }` );
+	if ( typeof nodeClass !== 'function' || ! type ) throw new Error( `TSL.Node: Node class ${ type } is not a class` );
+
+	if ( NodeClasses.has( nodeType ) ) {
+
+		console.warn( `TSL.Node: Redefinition of node class ${ nodeType }` );
 		return;
 
 	}
 
-	NodeClasses.set( type, nodeClass );
-	nodeClass.type = type;
+	if ( type.slice( - 4 ) === 'Node' ) {
+
+		console.warn( `TSL.Node: Node class ${ nodeType } should not have 'Node' suffix.` );
+		return;
+
+	}
+
+	NodeClasses.set( nodeType, nodeClass );
+	nodeClass.type = nodeType;
 
 }
 
@@ -567,5 +575,12 @@ export function createNodeFromType( type ) {
 		return new Class();
 
 	}
+
+}
+
+export function addNodeClass( type, nodeClass ) {
+
+	console.warn( 'TSL.Node: Function addNodeClass() is deprecated. Use registerNodeClass() instead.' );
+	registerNodeClass( type.slice( 0, - 4 ), nodeClass );
 
 }

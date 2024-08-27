@@ -29,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, texture3D, uniform, renderOutput } from 'three/tsl';
+			import { pass, texture3D, uniform, lut3D, renderOutput } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -145,7 +145,7 @@
 				const outputPass = renderOutput( scenePass );
 
 				const lut = lutMap[ params.lut ];
-				lutPass = outputPass.lut3D( texture3D( lut.texture3D ), lut.texture3D.image.width, uniform( 1 ) );
+				lutPass = lut3D( outputPass, texture3D( lut.texture3D ), lut.texture3D.image.width, uniform( 1 ) );
 
 				postProcessing.outputNode = lutPass;
 

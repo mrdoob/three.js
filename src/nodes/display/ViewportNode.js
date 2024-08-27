@@ -1,7 +1,7 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
-import { Fn, nodeImmutable, vec2 } from '../shadernode/ShaderNode.js';
+import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -117,6 +117,8 @@ ViewportNode.BOTTOM_RIGHT = 'bottomRight';
 
 export default ViewportNode;
 
+registerNodeClass( 'Viewport', ViewportNode );
+
 export const viewportCoordinate = nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
 export const viewportResolution = nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
 export const viewport = nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
@@ -137,5 +139,3 @@ export const viewportBottomLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r1
 	return viewportUV.flipY();
 
 }, 'vec2' ).once() )();
-
-addNodeClass( 'ViewportNode', ViewportNode );
