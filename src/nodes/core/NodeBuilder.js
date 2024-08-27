@@ -1316,11 +1316,9 @@ class NodeBuilder {
 
 	}
 
-	createNodeMaterial( type = 'NodeMaterial' ) {
+	createNodeMaterial( type = 'NodeMaterial' ) { // @deprecated, r168
 
-		// TODO: Move Materials.js to outside of the Nodes.js in order to remove this function and improve tree-shaking support
-
-		return createNodeMaterialFromType( type );
+		throw new Error( `THREE.NodeBuilder: createNodeMaterial() was deprecated. Use new ${ type }() instead.` );
 
 	}
 

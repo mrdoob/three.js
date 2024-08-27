@@ -1,4 +1,4 @@
-import Node, { registerNodeClass} from './Node.js';
+import Node, { registerNodeClass } from './Node.js';
 import { nodeObject, varying } from '../tsl/TSLBase.js';
 
 class AttributeNode extends Node {

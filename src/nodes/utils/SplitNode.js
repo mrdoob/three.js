@@ -1,4 +1,4 @@
-import Node, { registerNodeClass} from '../core/Node.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 import { vectorComponents } from '../core/constants.js';
 
 const stringVectorComponents = vectorComponents.join( '' );
