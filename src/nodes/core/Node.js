@@ -319,7 +319,7 @@ class Node extends EventDispatcher {
 
 				if ( properties.outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
 
-					console.log( '!! no outputNode !!', this, builder.stack );
+					// !! no outputNode !!
 					//properties.outputNode = builder.stack;
 
 				}
