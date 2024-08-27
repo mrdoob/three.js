@@ -423,7 +423,8 @@ class WebGPUBackend extends Backend {
 		renderContextData.descriptor = descriptor;
 		renderContextData.encoder = encoder;
 		renderContextData.currentPass = currentPass;
-		renderContextData.currentSets = { attributes: {} };
+		renderContextData.currentSets = { attributes: {}, pipeline: null, index: null };
+		renderContextData.renderBundles = [];
 
 		//
 
@@ -448,9 +449,8 @@ class WebGPUBackend extends Backend {
 		const renderContextData = this.get( renderContext );
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
-		if ( renderContextData.renderBundles !== undefined && renderContextData.renderBundles.length > 0 ) {
+		if ( renderContextData.renderBundles.length > 0 ) {
 
-			renderContextData.registerBundlesPhase = false;
 			renderContextData.currentPass.executeBundles( renderContextData.renderBundles );
 
 		}
@@ -832,19 +832,7 @@ class WebGPUBackend extends Backend {
 		const renderContextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
 		const currentSets = renderContextData.currentSets;
-
-		const renderObjectData = this.get( renderObject );
-
-		const { bundleEncoder, renderBundle, lastPipelineGPU } = renderObjectData;
-
-		if ( renderContextData.registerBundlesPhase === true && bundleEncoder !== undefined && lastPipelineGPU === pipelineGPU ) {
-
-			renderContextData.renderBundles.push( renderBundle );
-			return;
-
-		}
-
-		const passEncoderGPU = this.renderer._currentRenderBundle ? this.createBundleEncoder( context, renderObject ) : renderContextData.currentPass;
+		const passEncoderGPU = renderContextData.currentPass;
 
 		// pipeline
 
@@ -982,15 +970,6 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( this.renderer._currentRenderBundle ) {
-
-			const renderBundle = passEncoderGPU.finish();
-			renderObjectData.lastPipelineGPU = pipelineGPU;
-			renderObjectData.renderBundle = renderBundle;
-			renderObjectData.bundleEncoder = passEncoderGPU;
-
-		}
-
 	}
 
 	// cache key
@@ -1075,6 +1054,7 @@ class WebGPUBackend extends Backend {
 		].join();
 
 	}
+
 
 	// textures
 
@@ -1263,9 +1243,39 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	createBundleEncoder( renderContext, renderObject ) {
+	beginBundle( renderContext ) {
 
-		return this.pipelineUtils.createBundleEncoder( renderContext, renderObject );
+		const renderContextData = this.get( renderContext );
+
+		renderContextData._currentPass = renderContextData.currentPass;
+		renderContextData._currentSets = renderContextData.currentSets;
+
+		renderContextData.currentSets = { attributes: {}, pipeline: null, index: null };
+		renderContextData.currentPass = this.pipelineUtils.createBundleEncoder( renderContext );
+
+	}
+
+	finishBundle( renderContext, bundle ) {
+
+		const renderContextData = this.get( renderContext );
+
+		const bundleEncoder = renderContextData.currentPass;
+		const bundleGPU = bundleEncoder.finish();
+
+		this.get( bundle ).bundleGPU = bundleGPU;
+
+		// restore render pass state
+
+		renderContextData.currentSets = renderContextData._currentSets;
+		renderContextData.currentPass = renderContextData._currentPass;
+
+	}
+
+	addBundle( renderContext, bundle ) {
+
+		const renderContextData = this.get( renderContext );
+
+		renderContextData.renderBundles.push( this.get( bundle ).bundleGPU );
 
 	}
 
@@ -1469,7 +1479,7 @@ class WebGPUBackend extends Backend {
 		if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
 		renderContextData.currentPass = encoder.beginRenderPass( descriptor );
-		renderContextData.currentSets = { attributes: {} };
+		renderContextData.currentSets = { attributes: {}, pipeline: null, index: null };
 
 	}
 
