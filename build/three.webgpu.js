@@ -15619,12 +15619,11 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		const geometryCount = this._geometryCount;
 		const boundingBox = this.boundingBox;
 		const drawInfo = this._drawInfo;
 
 		boundingBox.makeEmpty();
-		for ( let i = 0; i < geometryCount; i ++ ) {
+		for ( let i = 0, l = drawInfo.length; i < l; i ++ ) {
 
 			if ( drawInfo[ i ].active === false ) continue;
 
@@ -31942,17 +31941,14 @@ class ViewportNode extends Node {
 ViewportNode.COORDINATE = 'coordinate';
 ViewportNode.RESOLUTION = 'resolution';
 ViewportNode.VIEWPORT = 'viewport';
-ViewportNode.TOP_LEFT = 'topLeft';
-ViewportNode.BOTTOM_LEFT = 'bottomLeft';
-ViewportNode.TOP_RIGHT = 'topRight';
-ViewportNode.BOTTOM_RIGHT = 'bottomRight';
+ViewportNode.UV = 'uv';
 
 registerNodeClass( 'Viewport', ViewportNode );
 
 const viewportCoordinate = nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
 const viewportResolution = nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
 const viewport = nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
-const viewportUV = nodeImmutable( ViewportNode, ViewportNode.TOP_LEFT );
+const viewportUV = nodeImmutable( ViewportNode, ViewportNode.UV );
 
 const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
@@ -74518,6 +74514,9 @@ class WebGPUUtils {
 
 	getPreferredCanvasFormat() {
 
+		// TODO: Remove this check when Quest 34.5 is out
+		// https://github.com/mrdoob/three.js/pull/29221/files#r1731833949
+
 		if ( navigator.userAgent.includes( 'Quest' ) ) {
 
 			return GPUTextureFormat.BGRA8Unorm;
@@ -76572,17 +76571,14 @@ class WebGPUBackend extends Backend {
 	draw( renderObject, info ) {
 
 		const { object, geometry, context, pipeline } = renderObject;
-
 		const bindings = renderObject.getBindings();
-		const contextData = this.get( context );
+		const renderContextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
-		const currentSets = contextData.currentSets;
+		const currentSets = renderContextData.currentSets;
 
 		const renderObjectData = this.get( renderObject );
 
 		const { bundleEncoder, renderBundle, lastPipelineGPU } = renderObjectData;
-
-		const renderContextData = this.get( context );
 
 		if ( renderContextData.registerBundlesPhase === true && bundleEncoder !== undefined && lastPipelineGPU === pipelineGPU ) {
 
@@ -76591,7 +76587,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const passEncoderGPU = this.renderer._currentRenderBundle ? this.createBundleEncoder( context, renderObject ) : contextData.currentPass;
+		const passEncoderGPU = this.renderer._currentRenderBundle ? this.createBundleEncoder( context, renderObject ) : renderContextData.currentPass;
 
 		// pipeline
 
@@ -76658,27 +76654,27 @@ class WebGPUBackend extends Backend {
 
 		// occlusion queries - handle multiple consecutive draw calls for an object
 
-		if ( contextData.occlusionQuerySet !== undefined ) {
+		if ( renderContextData.occlusionQuerySet !== undefined ) {
 
-			const lastObject = contextData.lastOcclusionObject;
+			const lastObject = renderContextData.lastOcclusionObject;
 
 			if ( lastObject !== object ) {
 
 				if ( lastObject !== null && lastObject.occlusionTest === true ) {
 
 					passEncoderGPU.endOcclusionQuery();
-					contextData.occlusionQueryIndex ++;
+					renderContextData.occlusionQueryIndex ++;
 
 				}
 
 				if ( object.occlusionTest === true ) {
 
-					passEncoderGPU.beginOcclusionQuery( contextData.occlusionQueryIndex );
-					contextData.occlusionQueryObjects[ contextData.occlusionQueryIndex ] = object;
+					passEncoderGPU.beginOcclusionQuery( renderContextData.occlusionQueryIndex );
+					renderContextData.occlusionQueryObjects[ renderContextData.occlusionQueryIndex ] = object;
 
 				}
 
-				contextData.lastOcclusionObject = object;
+				renderContextData.lastOcclusionObject = object;
 
 			}
 
