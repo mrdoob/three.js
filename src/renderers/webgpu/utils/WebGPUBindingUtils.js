@@ -234,37 +234,46 @@ class WebGPUBindingUtils {
 
 				const textureData = backend.get( binding.texture );
 
-				let dimensionViewGPU;
+				const mipLevelCount = binding.store ? 1 : textureData.mipLevelCount;
 
-				if ( binding.isSampledCubeTexture ) {
+				// todo lebel count
+				const propertyName = `view-${ mipLevelCount }`;
 
-					dimensionViewGPU = GPUTextureViewDimension.Cube;
+				let resourceGPU = textureData[ propertyName ];
 
-				} else if ( binding.isSampledTexture3D ) {
+				if ( resourceGPU === undefined ) {
 
-					dimensionViewGPU = GPUTextureViewDimension.ThreeD;
+					let dimensionViewGPU;
 
-				} else if ( binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
+					if ( binding.isSampledCubeTexture ) {
 
-					dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
+						dimensionViewGPU = GPUTextureViewDimension.Cube;
 
-				} else {
+					} else if ( binding.isSampledTexture3D ) {
 
-					dimensionViewGPU = GPUTextureViewDimension.TwoD;
+						dimensionViewGPU = GPUTextureViewDimension.ThreeD;
 
-				}
+					} else if ( binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
 
-				let resourceGPU;
+						dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
 
-				if ( textureData.externalTexture !== undefined ) {
+					} else {
 
-					resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
+						dimensionViewGPU = GPUTextureViewDimension.TwoD;
 
-				} else {
+					}
 
-					const aspectGPU = GPUTextureAspect.All;
+					if ( textureData.externalTexture !== undefined ) {
 
-					resourceGPU = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount: binding.store ? 1 : textureData.mipLevelCount } );
+						resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
+
+					} else {
+
+						const aspectGPU = GPUTextureAspect.All;
+
+						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount } );
+
+					}
 
 				}
 
