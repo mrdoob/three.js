@@ -163,7 +163,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	needsColorSpaceToLinear( texture ) {
+	needsColorSpaceToLinearSRGB( texture ) {
 
 		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
 

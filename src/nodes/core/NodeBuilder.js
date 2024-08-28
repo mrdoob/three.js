@@ -605,7 +605,7 @@ class NodeBuilder {
 
 	}
 
-	needsColorSpaceToLinear( /*texture*/ ) {
+	needsColorSpaceToLinearSRGB( /*texture*/ ) {
 
 		return false;
 

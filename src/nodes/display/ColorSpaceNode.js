@@ -78,8 +78,8 @@ export default ColorSpaceNode;
 
 registerNodeClass( 'ColorSpace', ColorSpaceNode );
 
-export const linearToColorSpace = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), colorSpace, LinearSRGBColorSpace ) );
-export const colorSpaceToLinear = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), LinearSRGBColorSpace, colorSpace ) );
+export const linearSRGBToColorSpace = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), colorSpace, LinearSRGBColorSpace ) );
+export const colorSpaceToLinearSRGB = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), LinearSRGBColorSpace, colorSpace ) );
 
-addMethodChaining( 'linearToColorSpace', linearToColorSpace );
-addMethodChaining( 'colorSpaceToLinear', colorSpaceToLinear );
+addMethodChaining( 'linearSRGBToColorSpace', linearSRGBToColorSpace );
+addMethodChaining( 'colorSpaceToLinearSRGB', colorSpaceToLinearSRGB );
