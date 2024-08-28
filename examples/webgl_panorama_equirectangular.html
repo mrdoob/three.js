@@ -68,46 +68,6 @@
 
 				document.addEventListener( 'wheel', onDocumentMouseWheel );
 
-				//
-
-				document.addEventListener( 'dragover', function ( event ) {
-
-					event.preventDefault();
-					event.dataTransfer.dropEffect = 'copy';
-
-				} );
-
-				document.addEventListener( 'dragenter', function () {
-
-					document.body.style.opacity = 0.5;
-
-				} );
-
-				document.addEventListener( 'dragleave', function () {
-
-					document.body.style.opacity = 1;
-
-				} );
-
-				document.addEventListener( 'drop', function ( event ) {
-
-					event.preventDefault();
-
-					const reader = new FileReader();
-					reader.addEventListener( 'load', function ( event ) {
-
-						material.map.image.src = event.target.result;
-						material.map.needsUpdate = true;
-
-					} );
-					reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
-
-					document.body.style.opacity = 1;
-
-				} );
-
-				//
-
 				window.addEventListener( 'resize', onWindowResize );
 
 			}
