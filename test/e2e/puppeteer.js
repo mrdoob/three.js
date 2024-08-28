@@ -140,6 +140,7 @@ const exceptionList = [
 	'webgpu_tsl_interoperability',
 	'webgpu_portal',
 	'webgpu_custom_fog',
+	'webgpu_instance_points',
 	'webgpu_instancing_morph',
 	'webgpu_texturegrad',
 	'webgpu_performance_renderbundle',
