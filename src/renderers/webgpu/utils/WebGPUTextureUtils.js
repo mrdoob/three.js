@@ -136,7 +136,7 @@ class WebGPUTextureUtils {
 
 		}
 
-		if ( texture.isCompressedTexture !== true ) {
+		if ( texture.isCompressedTexture !== true && texture.isCompressedArrayTexture !== true ) {
 
 			usage |= GPUTextureUsage.RENDER_ATTACHMENT;
 
@@ -237,7 +237,13 @@ class WebGPUTextureUtils {
 
 		} else {
 
-			this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU );
+			const depth = texture.image.depth || 1;
+
+			for ( let i = 0; i < depth; i ++ ) {
+
+				this._generateMipmaps( textureData.texture, textureData.textureDescriptorGPU, i );
+
+			}
 
 		}
 
@@ -258,7 +264,7 @@ class WebGPUTextureUtils {
 				depthOrArrayLayers: 1
 			},
 			sampleCount: backend.utils.getSampleCount( backend.renderer.samples ),
-			format: GPUTextureFormat.BGRA8Unorm,
+			format: backend.utils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC
 		} );
 
@@ -335,7 +341,7 @@ class WebGPUTextureUtils {
 
 			}
 
-		} else if ( texture.isCompressedTexture ) {
+		} else if ( texture.isCompressedTexture || texture.isCompressedArrayTexture ) {
 
 			this._copyCompressedBufferToTexture( texture.mipmaps, textureData.texture, textureDescriptorGPU );
 
@@ -599,6 +605,7 @@ class WebGPUTextureUtils {
 		const device = this.backend.device;
 
 		const blockData = this._getBlockData( textureDescriptorGPU.format );
+		const isTextureArray = textureDescriptorGPU.size.depthOrArrayLayers > 1;
 
 		for ( let i = 0; i < mipmaps.length; i ++ ) {
 
@@ -606,25 +613,33 @@ class WebGPUTextureUtils {
 
 			const width = mipmap.width;
 			const height = mipmap.height;
+			const depth = isTextureArray ? textureDescriptorGPU.size.depthOrArrayLayers : 1;
 
 			const bytesPerRow = Math.ceil( width / blockData.width ) * blockData.byteLength;
+			const bytesPerImage = bytesPerRow * Math.ceil( height / blockData.height );
 
-			device.queue.writeTexture(
-				{
-					texture: textureGPU,
-					mipLevel: i
-				},
-				mipmap.data,
-				{
-					offset: 0,
-					bytesPerRow
-				},
-				{
-					width: Math.ceil( width / blockData.width ) * blockData.width,
-					height: Math.ceil( height / blockData.width ) * blockData.width,
-					depthOrArrayLayers: 1
-				}
-			);
+			for ( let j = 0; j < depth; j ++ ) {
+
+				device.queue.writeTexture(
+					{
+						texture: textureGPU,
+						mipLevel: i,
+						origin: { x: 0, y: 0, z: j }
+					},
+					mipmap.data,
+					{
+						offset: j * bytesPerImage,
+						bytesPerRow,
+						rowsPerImage: Math.ceil( height / blockData.height )
+					},
+					{
+						width: Math.ceil( width / blockData.width ) * blockData.width,
+						height: Math.ceil( height / blockData.height ) * blockData.height,
+						depthOrArrayLayers: 1
+					}
+				);
+
+			}
 
 		}
 
@@ -837,7 +852,7 @@ export function getFormat( texture, device = null ) {
 
 		formatGPU = GPUTextureFormat.BGRA8Unorm;
 
-	} else if ( texture.isCompressedTexture === true ) {
+	} else if ( texture.isCompressedTexture === true || texture.isCompressedArrayTexture === true ) {
 
 		switch ( format ) {
 

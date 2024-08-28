@@ -93,7 +93,6 @@ class WaterMesh extends Mesh {
 
 		} )();
 
-		material.normals = false;
 		material.fragmentNode = fragmentNode;
 
 	}

@@ -141,7 +141,6 @@ const exceptionList = [
 	'webgpu_portal',
 	'webgpu_custom_fog',
 	'webgpu_instancing_morph',
-	'webgpu_mesh_batch',
 	'webgpu_texturegrad',
 	'webgpu_performance_renderbundle',
 	'webgpu_lights_rectarealight',
@@ -149,6 +148,7 @@ const exceptionList = [
 	'webgpu_tsl_vfx_flames',
 	'webgpu_tsl_halftone',
 	'webgpu_tsl_vfx_tornado',
+	'webgpu_textures_anisotropy',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',

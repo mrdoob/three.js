@@ -1,4 +1,4 @@
-import { Fn, float, vec3 } from '../../shadernode/ShaderNode.js';
+import { Fn, float, vec3 } from '../../tsl/TSLBase.js';
 
 const RECIPROCAL_PI = float( 1 / Math.PI );
 

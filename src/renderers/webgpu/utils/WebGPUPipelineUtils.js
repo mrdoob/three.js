@@ -123,7 +123,7 @@ class WebGPUPipelineUtils {
 		const sampleCount = this._getSampleCount( renderObject.context );
 
 		const pipelineDescriptor = {
-			label: 'renderPipeline',
+			label: `renderPipeline_${ material.name || material.type }_${ material.id }`,
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
 			fragment: Object.assign( {}, fragmentModule, { targets } ),
 			primitive: primitiveState,

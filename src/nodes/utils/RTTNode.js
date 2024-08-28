@@ -1,9 +1,9 @@
-import { nodeObject, addNodeElement } from '../shadernode/ShaderNode.js';
+import { registerNodeClass } from '../core/Node.js';
+import { nodeObject } from '../tsl/TSLCore.js';
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { addNodeClass } from '../core/Node.js';
-import NodeMaterial from '../materials/NodeMaterial.js';
-import { uv } from '../accessors/UVNode.js';
+import { uv } from '../accessors/UV.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 
 import { RenderTarget } from '../../core/RenderTarget.js';
@@ -47,6 +47,7 @@ class RTTNode extends TextureNode {
 	setup( builder ) {
 
 		this._rttNode = this.node.context( builder.getSharedContext() );
+		this._quadMesh.material.name = 'RTT';
 		this._quadMesh.material.needsUpdate = true;
 
 		return super.setup( builder );
@@ -123,8 +124,7 @@ class RTTNode extends TextureNode {
 
 export default RTTNode;
 
+registerNodeClass( 'RTT', RTTNode );
+
 export const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( node ), ...params ) );
-
-addNodeElement( 'toTexture', ( node, ...params ) => node.isTextureNode ? node : rtt( node, ...params ) );
-
-addNodeClass( 'RTTNode', RTTNode );
+export const convertToTexture = ( node, ...params ) => node.isTextureNode ? node : rtt( node, ...params );

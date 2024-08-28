@@ -267,7 +267,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	isUnfilterable( texture ) {
 
-		return this.getComponentTypeFromTexture( texture ) !== 'float' || ( texture.isDataTexture === true && texture.type === FloatType ) || texture.isMultisampleRenderTargetTexture === true;
+		return this.getComponentTypeFromTexture( texture ) !== 'float' || ( ! this.isAvailable( 'float32Filterable' ) && texture.isDataTexture === true && texture.type === FloatType ) || texture.isMultisampleRenderTargetTexture === true;
 
 	}
 
@@ -598,12 +598,18 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		//
 
-		const code = `fn ${ layout.name }( ${ parameters.join( ', ' ) } ) -> ${ this.getType( layout.type ) } {
+		let code = `fn ${ layout.name }( ${ parameters.join( ', ' ) } ) -> ${ this.getType( layout.type ) } {
 ${ flowData.vars }
 ${ flowData.code }
-	return ${ flowData.result };
+`;
 
-}`;
+		if ( flowData.result ) {
+
+			code += `\treturn ${ flowData.result };\n`;
+
+		}
+
+		code += '\n}\n';
 
 		//
 
@@ -620,6 +626,12 @@ ${ flowData.code }
 		}
 
 		return 'instanceIndex';
+
+	}
+
+	getInvocationLocalIndex() {
+
+		return this.getBuiltin( 'local_invocation_index', 'invocationLocalIndex', 'u32', 'attribute' );
 
 	}
 
@@ -653,7 +665,7 @@ ${ flowData.code }
 
 	getFragCoord() {
 
-		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' ) + '.xyz';
+		return this.getBuiltin( 'position', 'fragCoord', 'vec4<f32>' ) + '.xy';
 
 	}
 
@@ -949,7 +961,7 @@ ${ flowData.code }
 
 					textureType = 'texture_cube<f32>';
 
-				} else if ( texture.isDataArrayTexture === true ) {
+				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
 					textureType = 'texture_2d_array<f32>';
 

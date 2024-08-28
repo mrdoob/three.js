@@ -1,8 +1,8 @@
 // Three.js Transpiler
 // https://raw.githubusercontent.com/AcademySoftwareFoundation/MaterialX/main/libraries/stdlib/genglsl/lib/mx_noise.glsl
 
-import { int, uint, float, vec3, bool, uvec3, vec2, vec4, If, Fn } from '../../shadernode/ShaderNode.js';
-import { select } from '../../math/CondNode.js';
+import { int, uint, float, vec3, bool, uvec3, vec2, vec4, If, Fn } from '../../tsl/TSLBase.js';
+import { select } from '../../math/ConditionalNode.js';
 import { sub, mul } from '../../math/OperatorNode.js';
 import { floor, abs, max, dot, min, sqrt } from '../../math/MathNode.js';
 import { overloadingFn } from '../../utils/FunctionOverloadingNode.js';

@@ -43,9 +43,9 @@ class Backend {
 
 	// bindings
 
-	createBindings( /*renderObject*/ ) { }
+	createBindings( /*bingGroup, bindings*/ ) { }
 
-	updateBindings( /*renderObject*/ ) { }
+	updateBindings( /*bingGroup, bindings*/ ) { }
 
 	// pipeline
 

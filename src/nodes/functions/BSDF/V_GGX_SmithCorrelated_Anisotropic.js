@@ -1,5 +1,5 @@
 import { div } from '../../math/OperatorNode.js';
-import { Fn, vec3 } from '../../shadernode/ShaderNode.js';
+import { Fn, vec3 } from '../../tsl/TSLBase.js';
 
 // https://google.github.io/filament/Filament.md.html#materialsystem/anisotropicmodel/anisotropicspecularbrdf
 

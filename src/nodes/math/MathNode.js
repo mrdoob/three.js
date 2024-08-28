@@ -1,7 +1,7 @@
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { sub, mul, div } from './OperatorNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../shadernode/ShaderNode.js';
+import { addMethodChaining, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 
 class MathNode extends TempNode {
 
@@ -139,7 +139,7 @@ class MathNode extends TempNode {
 					b.build( builder, type )
 				);
 
-			} else if ( method === MathNode.STEP ) {
+			} else if ( isWebGL && method === MathNode.STEP ) {
 
 				params.push(
 					a.build( builder, builder.getTypeLength( a.getNodeType( builder ) ) === 1 ? 'float' : inputType ),
@@ -264,6 +264,8 @@ MathNode.FACEFORWARD = 'faceforward';
 
 export default MathNode;
 
+registerNodeClass( 'Math', MathNode );
+
 export const EPSILON = float( 1e-6 );
 export const INFINITY = float( 1e6 );
 export const PI = float( Math.PI );
@@ -342,63 +344,61 @@ export const rand = Fn( ( [ uv ] ) => {
 export const mixElement = ( t, e1, e2 ) => mix( e1, e2, t );
 export const smoothstepElement = ( x, low, high ) => smoothstep( low, high, x );
 
-addNodeElement( 'all', all );
-addNodeElement( 'any', any );
-addNodeElement( 'equals', equals );
+addMethodChaining( 'all', all );
+addMethodChaining( 'any', any );
+addMethodChaining( 'equals', equals );
 
-addNodeElement( 'radians', radians );
-addNodeElement( 'degrees', degrees );
-addNodeElement( 'exp', exp );
-addNodeElement( 'exp2', exp2 );
-addNodeElement( 'log', log );
-addNodeElement( 'log2', log2 );
-addNodeElement( 'sqrt', sqrt );
-addNodeElement( 'inverseSqrt', inverseSqrt );
-addNodeElement( 'floor', floor );
-addNodeElement( 'ceil', ceil );
-addNodeElement( 'normalize', normalize );
-addNodeElement( 'fract', fract );
-addNodeElement( 'sin', sin );
-addNodeElement( 'cos', cos );
-addNodeElement( 'tan', tan );
-addNodeElement( 'asin', asin );
-addNodeElement( 'acos', acos );
-addNodeElement( 'atan', atan );
-addNodeElement( 'abs', abs );
-addNodeElement( 'sign', sign );
-addNodeElement( 'length', length );
-addNodeElement( 'lengthSq', lengthSq );
-addNodeElement( 'negate', negate );
-addNodeElement( 'oneMinus', oneMinus );
-addNodeElement( 'dFdx', dFdx );
-addNodeElement( 'dFdy', dFdy );
-addNodeElement( 'round', round );
-addNodeElement( 'reciprocal', reciprocal );
-addNodeElement( 'trunc', trunc );
-addNodeElement( 'fwidth', fwidth );
-addNodeElement( 'atan2', atan2 );
-addNodeElement( 'min', min );
-addNodeElement( 'max', max );
-addNodeElement( 'mod', mod );
-addNodeElement( 'step', step );
-addNodeElement( 'reflect', reflect );
-addNodeElement( 'distance', distance );
-addNodeElement( 'dot', dot );
-addNodeElement( 'cross', cross );
-addNodeElement( 'pow', pow );
-addNodeElement( 'pow2', pow2 );
-addNodeElement( 'pow3', pow3 );
-addNodeElement( 'pow4', pow4 );
-addNodeElement( 'transformDirection', transformDirection );
-addNodeElement( 'mix', mixElement );
-addNodeElement( 'clamp', clamp );
-addNodeElement( 'refract', refract );
-addNodeElement( 'smoothstep', smoothstepElement );
-addNodeElement( 'faceForward', faceForward );
-addNodeElement( 'difference', difference );
-addNodeElement( 'saturate', saturate );
-addNodeElement( 'cbrt', cbrt );
-addNodeElement( 'transpose', transpose );
-addNodeElement( 'rand', rand );
-
-addNodeClass( 'MathNode', MathNode );
+addMethodChaining( 'radians', radians );
+addMethodChaining( 'degrees', degrees );
+addMethodChaining( 'exp', exp );
+addMethodChaining( 'exp2', exp2 );
+addMethodChaining( 'log', log );
+addMethodChaining( 'log2', log2 );
+addMethodChaining( 'sqrt', sqrt );
+addMethodChaining( 'inverseSqrt', inverseSqrt );
+addMethodChaining( 'floor', floor );
+addMethodChaining( 'ceil', ceil );
+addMethodChaining( 'normalize', normalize );
+addMethodChaining( 'fract', fract );
+addMethodChaining( 'sin', sin );
+addMethodChaining( 'cos', cos );
+addMethodChaining( 'tan', tan );
+addMethodChaining( 'asin', asin );
+addMethodChaining( 'acos', acos );
+addMethodChaining( 'atan', atan );
+addMethodChaining( 'abs', abs );
+addMethodChaining( 'sign', sign );
+addMethodChaining( 'length', length );
+addMethodChaining( 'lengthSq', lengthSq );
+addMethodChaining( 'negate', negate );
+addMethodChaining( 'oneMinus', oneMinus );
+addMethodChaining( 'dFdx', dFdx );
+addMethodChaining( 'dFdy', dFdy );
+addMethodChaining( 'round', round );
+addMethodChaining( 'reciprocal', reciprocal );
+addMethodChaining( 'trunc', trunc );
+addMethodChaining( 'fwidth', fwidth );
+addMethodChaining( 'atan2', atan2 );
+addMethodChaining( 'min', min );
+addMethodChaining( 'max', max );
+addMethodChaining( 'mod', mod );
+addMethodChaining( 'step', step );
+addMethodChaining( 'reflect', reflect );
+addMethodChaining( 'distance', distance );
+addMethodChaining( 'dot', dot );
+addMethodChaining( 'cross', cross );
+addMethodChaining( 'pow', pow );
+addMethodChaining( 'pow2', pow2 );
+addMethodChaining( 'pow3', pow3 );
+addMethodChaining( 'pow4', pow4 );
+addMethodChaining( 'transformDirection', transformDirection );
+addMethodChaining( 'mix', mixElement );
+addMethodChaining( 'clamp', clamp );
+addMethodChaining( 'refract', refract );
+addMethodChaining( 'smoothstep', smoothstepElement );
+addMethodChaining( 'faceForward', faceForward );
+addMethodChaining( 'difference', difference );
+addMethodChaining( 'saturate', saturate );
+addMethodChaining( 'cbrt', cbrt );
+addMethodChaining( 'transpose', transpose );
+addMethodChaining( 'rand', rand );

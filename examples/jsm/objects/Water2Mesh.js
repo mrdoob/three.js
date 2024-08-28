@@ -5,7 +5,7 @@ import {
 	Vector2,
 	Vector3
 } from 'three';
-import { vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, texture, uniform, TempNode, NodeUpdateType, vec4, Fn, cameraPosition, positionWorld, uv, mix, vec3, normalize, max, dot, viewportTopLeft } from 'three/tsl';
+import { vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, texture, uniform, TempNode, NodeUpdateType, vec4, Fn, cameraPosition, positionWorld, uv, mix, vec3, normalize, max, dot, viewportUV } from 'three/tsl';
 
 /**
  * References:
@@ -24,7 +24,6 @@ class WaterMesh extends Mesh {
 
 		this.isWater = true;
 
-		material.normals = false;
 		material.fragmentNode = new WaterNode( options, this );
 
 	}
@@ -142,7 +141,7 @@ class WaterNode extends TempNode {
 			this.waterBody.add( reflectionSampler.target );
 			reflectionSampler.uvNode = reflectionSampler.uvNode.add( offset );
 
-			const refractorUV = viewportTopLeft.add( offset );
+			const refractorUV = viewportUV.add( offset );
 			const refractionSampler = viewportSharedTexture( viewportSafeUV( refractorUV ) );
 
 			// calculate final uv coords

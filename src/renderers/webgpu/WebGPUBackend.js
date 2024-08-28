@@ -2,7 +2,7 @@
 import 'https://greggman.github.io/webgpu-avoid-redundant-state-setting/webgpu-check-redundant-state-setting.js';
 //*/
 
-import { GPUFeatureName, GPUTextureFormat, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension } from './utils/WebGPUConstants.js';
+import { GPUFeatureName, GPULoadOp, GPUStoreOp, GPUIndexFormat, GPUTextureViewDimension } from './utils/WebGPUConstants.js';
 
 import WGSLNodeBuilder from './nodes/WGSLNodeBuilder.js';
 import Backend from '../common/Backend.js';
@@ -110,7 +110,7 @@ class WebGPUBackend extends Backend {
 
 		this.context.configure( {
 			device: this.device,
-			format: GPUTextureFormat.BGRA8Unorm,
+			format: this.utils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
 			alphaMode: alphaMode
 		} );
@@ -828,17 +828,14 @@ class WebGPUBackend extends Backend {
 	draw( renderObject, info ) {
 
 		const { object, geometry, context, pipeline } = renderObject;
-
 		const bindings = renderObject.getBindings();
-		const contextData = this.get( context );
+		const renderContextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
-		const currentSets = contextData.currentSets;
+		const currentSets = renderContextData.currentSets;
 
 		const renderObjectData = this.get( renderObject );
 
 		const { bundleEncoder, renderBundle, lastPipelineGPU } = renderObjectData;
-
-		const renderContextData = this.get( context );
 
 		if ( renderContextData.registerBundlesPhase === true && bundleEncoder !== undefined && lastPipelineGPU === pipelineGPU ) {
 
@@ -847,7 +844,7 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		const passEncoderGPU = this.renderer._currentRenderBundle ? this.createBundleEncoder( context, renderObject ) : contextData.currentPass;
+		const passEncoderGPU = this.renderer._currentRenderBundle ? this.createBundleEncoder( context, renderObject ) : renderContextData.currentPass;
 
 		// pipeline
 
@@ -914,27 +911,27 @@ class WebGPUBackend extends Backend {
 
 		// occlusion queries - handle multiple consecutive draw calls for an object
 
-		if ( contextData.occlusionQuerySet !== undefined ) {
+		if ( renderContextData.occlusionQuerySet !== undefined ) {
 
-			const lastObject = contextData.lastOcclusionObject;
+			const lastObject = renderContextData.lastOcclusionObject;
 
 			if ( lastObject !== object ) {
 
 				if ( lastObject !== null && lastObject.occlusionTest === true ) {
 
 					passEncoderGPU.endOcclusionQuery();
-					contextData.occlusionQueryIndex ++;
+					renderContextData.occlusionQueryIndex ++;
 
 				}
 
 				if ( object.occlusionTest === true ) {
 
-					passEncoderGPU.beginOcclusionQuery( contextData.occlusionQueryIndex );
-					contextData.occlusionQueryObjects[ contextData.occlusionQueryIndex ] = object;
+					passEncoderGPU.beginOcclusionQuery( renderContextData.occlusionQueryIndex );
+					renderContextData.occlusionQueryObjects[ renderContextData.occlusionQueryIndex ] = object;
 
 				}
 
-				contextData.lastOcclusionObject = object;
+				renderContextData.lastOcclusionObject = object;
 
 			}
 
@@ -955,14 +952,14 @@ class WebGPUBackend extends Backend {
 			const drawCount = object._multiDrawCount;
 			const drawInstances = object._multiDrawInstances;
 
-			const bytesPerElement = index.bytesPerElement || 1;
+			const bytesPerElement = hasIndex ? index.array.BYTES_PER_ELEMENT : 1;
 
 			for ( let i = 0; i < drawCount; i ++ ) {
 
 				const count = drawInstances ? drawInstances[ i ] : 1;
 				const firstInstance = count > 1 ? 0 : i;
 
-				passEncoderGPU.drawIndexed( counts[ i ] / bytesPerElement, count, starts[ i ] / 4, 0, firstInstance );
+				passEncoderGPU.drawIndexed( counts[ i ], count, starts[ i ] / bytesPerElement, 0, firstInstance );
 
 			}
 
@@ -1026,7 +1023,7 @@ class WebGPUBackend extends Backend {
 			data.sampleCount !== sampleCount || data.colorSpace !== colorSpace ||
 			data.colorFormat !== colorFormat || data.depthStencilFormat !== depthStencilFormat ||
 			data.primitiveTopology !== primitiveTopology ||
-			data.clippingContextVersion !== renderObject.clippingContextVersion
+			data.clippingContextCacheKey !== renderObject.clippingContext.cacheKey
 		) {
 
 			data.material = material; data.materialVersion = material.version;
@@ -1044,7 +1041,7 @@ class WebGPUBackend extends Backend {
 			data.colorFormat = colorFormat;
 			data.depthStencilFormat = depthStencilFormat;
 			data.primitiveTopology = primitiveTopology;
-			data.clippingContextVersion = renderObject.clippingContextVersion;
+			data.clippingContextCacheKey = renderObject.clippingContext.cacheKey;
 
 			needsUpdate = true;
 
@@ -1074,7 +1071,7 @@ class WebGPUBackend extends Backend {
 			utils.getSampleCountRenderContext( renderContext ),
 			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
 			utils.getPrimitiveTopology( object, material ),
-			renderObject.clippingContextVersion
+			renderObject.clippingContext.cacheKey
 		].join();
 
 	}

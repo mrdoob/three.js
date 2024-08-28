@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { range, texture, mix, uv, color, positionLocal, timerLocal } from 'three/tsl';
+			import { range, texture, mix, uv, color, rotateUV, positionLocal, timerLocal } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -65,7 +65,7 @@
 
 				const fakeLightEffect = positionLocal.y.oneMinus().max( 0.2 );
 
-				const textureNode = texture( map, uv().rotateUV( timer.mul( rotateRange ) ) );
+				const textureNode = texture( map, rotateUV( uv(), timer.mul( rotateRange ) ) );
 
 				const opacityNode = textureNode.a.mul( life.oneMinus() );
 

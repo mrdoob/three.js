@@ -1,4 +1,4 @@
-import { Fn } from '../../shadernode/ShaderNode.js';
+import { Fn } from '../../tsl/TSLBase.js';
 
 const F_Schlick = Fn( ( { f0, f90, dotVH } ) => {
 

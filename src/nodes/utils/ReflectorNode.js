@@ -1,7 +1,8 @@
+import { registerNodeClass } from '../core/Node.js';
 import TextureNode from '../accessors/TextureNode.js';
-import { nodeObject, vec2 } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { viewportTopLeft } from '../display/ViewportNode.js';
+import { viewportUV } from '../display/ViewportNode.js';
 
 import { HalfFloatType, LinearMipMapLinearFilter } from '../../constants.js';
 import { Plane } from '../../math/Plane.js';
@@ -27,7 +28,7 @@ const _q = new Vector4();
 const _size = new Vector2();
 
 const _defaultRT = new RenderTarget();
-const _defaultUV = vec2( viewportTopLeft.x.oneMinus(), viewportTopLeft.y );
+const _defaultUV = viewportUV.flipX();
 
 let _inReflector = false;
 
@@ -236,3 +237,4 @@ export const reflector = ( parameters ) => nodeObject( new ReflectorNode( parame
 
 export default ReflectorNode;
 
+registerNodeClass( 'Reflector', ReflectorNode );

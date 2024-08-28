@@ -1,11 +1,12 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { normalLocal } from './NormalNode.js';
-import { positionLocal } from './PositionNode.js';
-import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, Fn } from '../shadernode/ShaderNode.js';
+import Node, { registerNodeClass } from '../core/Node.js';
+import { normalLocal } from './Normal.js';
+import { positionLocal } from './Position.js';
+import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, Fn } from '../tsl/TSLBase.js';
 import { textureLoad } from './TextureNode.js';
 import { textureSize } from './TextureSizeNode.js';
-import { tangentLocal } from './TangentNode.js';
+import { tangentLocal } from './Tangent.js';
 import { instanceIndex, drawIndex } from '../core/IndexNode.js';
+import { varyingProperty } from '../core/PropertyNode.js';
 
 class BatchNode extends Node {
 
@@ -15,8 +16,6 @@ class BatchNode extends Node {
 
 		this.batchMesh = batchMesh;
 
-
-		this.instanceColorNode = null;
 
 		this.batchingIdNode = null;
 
@@ -55,19 +54,48 @@ class BatchNode extends Node {
 			]
 		} );
 
-		const matriceTexture = this.batchMesh._matricesTexture;
+		const indirectId = getIndirectIndex( int( this.batchingIdNode ) );
 
-		const size = textureSize( textureLoad( matriceTexture ), 0 );
-		const j = float( getIndirectIndex( int( this.batchingIdNode ) ) ).mul( 4 ).toVar();
+		const matricesTexture = this.batchMesh._matricesTexture;
 
-		const x = int( j.mod( size ) );
-		const y = int( j ).div( int( size ) );
+		const size = textureSize( textureLoad( matricesTexture ), 0 );
+		const j = float( indirectId ).mul( 4 ).toInt().toVar();
+
+		const x = j.modInt( size );
+		const y = j.div( int( size ) );
 		const batchingMatrix = mat4(
-			textureLoad( matriceTexture, ivec2( x, y ) ),
-			textureLoad( matriceTexture, ivec2( x.add( 1 ), y ) ),
-			textureLoad( matriceTexture, ivec2( x.add( 2 ), y ) ),
-			textureLoad( matriceTexture, ivec2( x.add( 3 ), y ) )
+			textureLoad( matricesTexture, ivec2( x, y ) ),
+			textureLoad( matricesTexture, ivec2( x.add( 1 ), y ) ),
+			textureLoad( matricesTexture, ivec2( x.add( 2 ), y ) ),
+			textureLoad( matricesTexture, ivec2( x.add( 3 ), y ) )
 		);
+
+
+		const colorsTexture = this.batchMesh._colorsTexture;
+
+		if ( colorsTexture !== null ) {
+
+			const getBatchingColor = Fn( ( [ id ] ) => {
+
+				const size = textureSize( textureLoad( colorsTexture ), 0 ).x;
+				const j = id;
+				const x = j.modInt( size );
+				const y = j.div( size );
+				return textureLoad( colorsTexture, ivec2( x, y ) ).rgb;
+
+			} ).setLayout( {
+				name: 'getBatchingColor',
+				type: 'vec3',
+				inputs: [
+					{ name: 'id', type: 'int' }
+				]
+			} );
+
+			const color = getBatchingColor( indirectId );
+
+			varyingProperty( 'vec3', 'vBatchColor' ).assign( color );
+
+		}
 
 		const bm = mat3( batchingMatrix );
 
@@ -91,6 +119,6 @@ class BatchNode extends Node {
 
 export default BatchNode;
 
-export const batch = nodeProxy( BatchNode );
+registerNodeClass( 'Batch', BatchNode );
 
-addNodeClass( 'batch', BatchNode );
+export const batch = nodeProxy( BatchNode );

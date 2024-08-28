@@ -3,10 +3,10 @@ import V_GGX_SmithCorrelated from './V_GGX_SmithCorrelated.js';
 import V_GGX_SmithCorrelated_Anisotropic from './V_GGX_SmithCorrelated_Anisotropic.js';
 import D_GGX from './D_GGX.js';
 import D_GGX_Anisotropic from './D_GGX_Anisotropic.js';
-import { transformedNormalView } from '../../accessors/NormalNode.js';
-import { positionViewDirection } from '../../accessors/PositionNode.js';
+import { transformedNormalView } from '../../accessors/Normal.js';
+import { positionViewDirection } from '../../accessors/Position.js';
 import { iridescence, alphaT, anisotropyT, anisotropyB } from '../../core/PropertyNode.js';
-import { Fn, defined } from '../../shadernode/ShaderNode.js';
+import { Fn, defined } from '../../tsl/TSLBase.js';
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
 const BRDF_GGX = Fn( ( inputs ) => {

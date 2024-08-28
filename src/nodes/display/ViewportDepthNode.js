@@ -1,7 +1,7 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { nodeImmutable, nodeProxy } from '../shadernode/ShaderNode.js';
-import { cameraNear, cameraFar } from '../accessors/CameraNode.js';
-import { positionView } from '../accessors/PositionNode.js';
+import Node, { registerNodeClass } from '../core/Node.js';
+import { nodeImmutable, nodeProxy } from '../tsl/TSLBase.js';
+import { cameraNear, cameraFar } from '../accessors/Camera.js';
+import { positionView } from '../accessors/Position.js';
 import { viewportDepthTexture } from './ViewportDepthTextureNode.js';
 
 class ViewportDepthNode extends Node {
@@ -88,6 +88,14 @@ class ViewportDepthNode extends Node {
 
 }
 
+ViewportDepthNode.DEPTH_BASE = 'depthBase';
+ViewportDepthNode.DEPTH = 'depth';
+ViewportDepthNode.LINEAR_DEPTH = 'linearDepth';
+
+export default ViewportDepthNode;
+
+registerNodeClass( 'ViewportDepth', ViewportDepthNode );
+
 // NOTE: viewZ, the z-coordinate in camera space, is negative for points in front of the camera
 
 // -near maps to 0; -far maps to 1
@@ -104,12 +112,6 @@ export const viewZToPerspectiveDepth = ( viewZ, near, far ) => near.add( viewZ )
 // maps perspective depth in [ 0, 1 ] to viewZ
 export const perspectiveDepthToViewZ = ( depth, near, far ) => near.mul( far ).div( far.sub( near ).mul( depth ).sub( far ) );
 
-ViewportDepthNode.DEPTH_BASE = 'depthBase';
-ViewportDepthNode.DEPTH = 'depth';
-ViewportDepthNode.LINEAR_DEPTH = 'linearDepth';
-
-export default ViewportDepthNode;
-
 const depthBase = nodeProxy( ViewportDepthNode, ViewportDepthNode.DEPTH_BASE );
 
 export const depth = nodeImmutable( ViewportDepthNode, ViewportDepthNode.DEPTH );
@@ -117,5 +119,3 @@ export const linearDepth = nodeProxy( ViewportDepthNode, ViewportDepthNode.LINEA
 export const viewportLinearDepth = linearDepth( viewportDepthTexture() );
 
 depth.assign = ( value ) => depthBase( value );
-
-addNodeClass( 'ViewportDepthNode', ViewportDepthNode );

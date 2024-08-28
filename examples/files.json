@@ -121,7 +121,6 @@
 		"webgl_loader_texture_hdr",
 		"webgl_loader_texture_ktx",
 		"webgl_loader_texture_ktx2",
-		"webgl_loader_texture_logluv",
 		"webgl_loader_texture_lottie",
 		"webgl_loader_texture_pvrtc",
 		"webgl_loader_texture_rgbm",
@@ -146,7 +145,6 @@
 		"webgl_materials_cubemap_refraction",
 		"webgl_materials_cubemap_mipmaps",
 		"webgl_materials_cubemap_render_to_mipmaps",
-		"webgl_materials_curvature",
 		"webgl_materials_displacementmap",
 		"webgl_materials_envmaps",
 		"webgl_materials_envmaps_exr",
@@ -325,6 +323,7 @@
 		"webgpu_custom_fog",
 		"webgpu_custom_fog_background",
 		"webgpu_depth_texture",
+		"webgpu_display_stereo",
 		"webgpu_equirectangular",
 		"webgpu_instance_mesh",
 		"webgpu_instance_points",
@@ -426,7 +425,8 @@
 		"webgpu_volume_cloud",
 		"webgpu_volume_perlin",
 		"webgpu_water",
-		"webgpu_performance"
+		"webgpu_performance",
+		"webgpu_texture2darray_compressed"
 	],
 	"webaudio": [
 		"webaudio_orientation",

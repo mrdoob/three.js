@@ -1,5 +1,5 @@
-import { addNodeClass } from './Node.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { registerNodeClass } from './Node.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 import PropertyNode from './PropertyNode.js';
 
 class ParameterNode extends PropertyNode {
@@ -28,6 +28,6 @@ class ParameterNode extends PropertyNode {
 
 export default ParameterNode;
 
-export const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );
+registerNodeClass( 'Parameter', ParameterNode );
 
-addNodeClass( 'ParameterNode', ParameterNode );
+export const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );

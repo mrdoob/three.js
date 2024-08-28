@@ -1,8 +1,9 @@
+import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
-import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, nodeObject, Fn, mat3, vec2, vec3, vec4, float, int, If } from '../shadernode/ShaderNode.js';
+import { uv } from '../accessors/UV.js';
+import { nodeObject, Fn, mat3, vec2, vec3, vec4, float, int, If } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { DataTexture } from '../../textures/DataTexture.js';
@@ -14,6 +15,8 @@ import { Loop } from '../utils/LoopNode.js';
 import { passTexture } from './PassNode.js';
 import { RepeatWrapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
+
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { Color } from '../../math/Color.js';
 
@@ -215,8 +218,9 @@ class GTAONode extends TempNode {
 
 		} );
 
-		const material = this._material || ( this._material = builder.createNodeMaterial() );
+		const material = this._material || ( this._material = new NodeMaterial() );
 		material.fragmentNode = ao().context( builder.getSharedContext() );
+		material.name = 'GTAO';
 		material.needsUpdate = true;
 
 		//
@@ -232,6 +236,10 @@ class GTAONode extends TempNode {
 	}
 
 }
+
+export default GTAONode;
+
+registerNodeClass( 'GTAO', GTAONode );
 
 function generateMagicSquareNoise( size = 5 ) {
 
@@ -318,7 +326,3 @@ function generateMagicSquare( size ) {
 }
 
 export const ao = ( depthNode, normalNode, camera ) => nodeObject( new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
-
-addNodeElement( 'ao', ao );
-
-export default GTAONode;

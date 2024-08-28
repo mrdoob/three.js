@@ -53,6 +53,11 @@ class WebGLBackend extends Backend {
 		this.trackTimestamp = ( parameters.trackTimestamp === true );
 
 		this.extensions.get( 'EXT_color_buffer_float' );
+		this.extensions.get( 'WEBGL_clip_cull_distance' );
+		this.extensions.get( 'OES_texture_float_linear' );
+		this.extensions.get( 'EXT_color_buffer_half_float' );
+		this.extensions.get( 'WEBGL_multisampled_render_to_texture' );
+		this.extensions.get( 'WEBGL_render_shared_exponent' );
 		this.extensions.get( 'WEBGL_multi_draw' );
 
 		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
@@ -230,6 +235,20 @@ class WebGLBackend extends Backend {
 		const renderContextData = this.get( renderContext );
 		const previousContext = renderContextData.previousContext;
 
+		const occlusionQueryCount = renderContext.occlusionQueryCount;
+
+		if ( occlusionQueryCount > 0 ) {
+
+			if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
+
+				gl.endQuery( gl.ANY_SAMPLES_PASSED );
+
+			}
+
+			this.resolveOccludedAsync( renderContext );
+
+		}
+
 		const textures = renderContext.textures;
 
 		if ( textures !== null ) {
@@ -249,7 +268,6 @@ class WebGLBackend extends Backend {
 		}
 
 		this._currentContext = previousContext;
-
 
 		if ( renderContext.textures !== null && renderContext.renderTarget ) {
 
@@ -274,9 +292,19 @@ class WebGLBackend extends Backend {
 
 					// TODO Add support for MRT
 
-					gl.blitFramebuffer( 0, 0, renderContext.width, renderContext.height, 0, 0, renderContext.width, renderContext.height, mask, gl.NEAREST );
+					if ( renderContext.scissor ) {
 
-					gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
+						const { x, y, width, height } = renderContext.scissorValue;
+
+						gl.blitFramebuffer( x, y, x + width, y + height, x, y, x + width, y + height, mask, gl.NEAREST );
+						gl.invalidateSubFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray, x, y, width, height );
+
+					} else {
+
+						gl.blitFramebuffer( 0, 0, renderContext.width, renderContext.height, 0, 0, renderContext.width, renderContext.height, mask, gl.NEAREST );
+						gl.invalidateFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray );
+
+					}
 
 				}
 
@@ -295,29 +323,9 @@ class WebGLBackend extends Backend {
 
 			} else {
 
-				const gl = this.gl;
-
 				gl.viewport( 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight );
 
 			}
-
-		}
-
-		const occlusionQueryCount = renderContext.occlusionQueryCount;
-
-		if ( occlusionQueryCount > 0 ) {
-
-			const renderContextData = this.get( renderContext );
-
-			if ( occlusionQueryCount > renderContextData.occlusionQueryIndex ) {
-
-				const { gl } = this;
-
-				gl.endQuery( gl.ANY_SAMPLES_PASSED );
-
-			}
-
-			this.resolveOccludedAsync( renderContext );
 
 		}
 

@@ -35,7 +35,7 @@ class OutlinePass extends Pass {
 		this.pulsePeriod = 0;
 
 		this._visibilityCache = new Map();
-
+		this._selectionCache = new Set();
 
 		this.resolution = ( resolution !== undefined ) ? new Vector2( resolution.x, resolution.y ) : new Vector2( 256, 256 );
 
@@ -172,28 +172,17 @@ class OutlinePass extends Pass {
 
 	}
 
-	changeVisibilityOfSelectedObjects( bVisible ) {
+	updateSelectionCache() {
 
-		const cache = this._visibilityCache;
+		const cache = this._selectionCache;
 
 		function gatherSelectedMeshesCallBack( object ) {
 
-			if ( object.isMesh ) {
-
-				if ( bVisible === true ) {
-
-					object.visible = cache.get( object );
-
-				} else {
-
-					cache.set( object, object.visible );
-					object.visible = bVisible;
-
-				}
-
-			}
+			if ( object.isMesh ) cache.add( object );
 
 		}
+
+		cache.clear();
 
 		for ( let i = 0; i < this.selectedObjects.length; i ++ ) {
 
@@ -204,23 +193,31 @@ class OutlinePass extends Pass {
 
 	}
 
-	changeVisibilityOfNonSelectedObjects( bVisible ) {
+	changeVisibilityOfSelectedObjects( bVisible ) {
 
 		const cache = this._visibilityCache;
-		const selectedMeshes = [];
 
-		function gatherSelectedMeshesCallBack( object ) {
+		for ( const mesh of this._selectionCache ) {
 
-			if ( object.isMesh ) selectedMeshes.push( object );
+			if ( bVisible === true ) {
+
+				mesh.visible = cache.get( mesh );
+
+			} else {
+
+				cache.set( mesh, mesh.visible );
+				mesh.visible = bVisible;
+
+			}
 
 		}
 
-		for ( let i = 0; i < this.selectedObjects.length; i ++ ) {
+	}
 
-			const selectedObject = this.selectedObjects[ i ];
-			selectedObject.traverse( gatherSelectedMeshesCallBack );
+	changeVisibilityOfNonSelectedObjects( bVisible ) {
 
-		}
+		const visibilityCache = this._visibilityCache;
+		const selectionCache = this._selectionCache;
 
 		function VisibilityChangeCallBack( object ) {
 
@@ -228,32 +225,17 @@ class OutlinePass extends Pass {
 
 				// only meshes and sprites are supported by OutlinePass
 
-				let bFound = false;
-
-				for ( let i = 0; i < selectedMeshes.length; i ++ ) {
-
-					const selectedObjectId = selectedMeshes[ i ].id;
-
-					if ( selectedObjectId === object.id ) {
-
-						bFound = true;
-						break;
-
-					}
-
-				}
-
-				if ( bFound === false ) {
+				if ( ! selectionCache.has( object ) ) {
 
 					const visibility = object.visible;
 
-					if ( bVisible === false || cache.get( object ) === true ) {
+					if ( bVisible === false || visibilityCache.get( object ) === true ) {
 
 						object.visible = bVisible;
 
 					}
 
-					cache.set( object, visibility );
+					visibilityCache.set( object, visibility );
 
 				}
 
@@ -264,11 +246,11 @@ class OutlinePass extends Pass {
 
 				if ( bVisible === true ) {
 
-					object.visible = cache.get( object ); // restore
+					object.visible = visibilityCache.get( object ); // restore
 
 				} else {
 
-					cache.set( object, object.visible );
+					visibilityCache.set( object, object.visible );
 					object.visible = bVisible;
 
 				}
@@ -306,6 +288,8 @@ class OutlinePass extends Pass {
 
 			renderer.setClearColor( 0xffffff, 1 );
 
+			this.updateSelectionCache();
+
 			// Make selected objects invisible
 			this.changeVisibilityOfSelectedObjects( false );
 
@@ -337,6 +321,7 @@ class OutlinePass extends Pass {
 			this.renderScene.overrideMaterial = null;
 			this.changeVisibilityOfNonSelectedObjects( true );
 			this._visibilityCache.clear();
+			this._selectionCache.clear();
 
 			this.renderScene.background = currentBackground;
 
@@ -462,7 +447,7 @@ class OutlinePass extends Pass {
 						worldPosition = instanceMatrix * worldPosition;
 
 					#endif
-					
+
 					worldPosition = modelMatrix * worldPosition;
 
 					projTexCoord = textureMatrix * worldPosition;
