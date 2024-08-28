@@ -411,13 +411,12 @@ class Renderer {
 		const { object, camera, renderList } = bundle;
 
 		const renderContext = this._currentRenderContext;
-		const renderContextData = this.backend.get( renderContext );
 
 		//
 
 		const renderBundle = this._bundles.get( object, camera );
-
 		const renderBundleData = this.backend.get( renderBundle );
+
 		if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = new Set();
 
 		//
@@ -428,17 +427,11 @@ class Renderer {
 
 		if ( renderBundleNeedsUpdate ) {
 
-			if ( renderContextData.renderObjects === undefined || object.needsUpdate === true ) {
+			this.backend.beginBundle( renderContext );
 
-				const nodeFrame = this._nodes.nodeFrame;
+			if ( renderBundleData.renderObjects === undefined || object.needsUpdate === true ) {
 
-				renderContextData.renderObjects = [];
-				renderContextData.renderBundles = [];
-				renderContextData.scene = sceneRef;
-				renderContextData.camera = camera;
-				renderContextData.renderId = nodeFrame.renderId;
-
-				renderContextData.registerBundlesPhase = true;
+				renderBundleData.renderObjects = [];
 
 			}
 
@@ -452,16 +445,17 @@ class Renderer {
 
 			//
 
+			this.backend.finishBundle( renderContext, renderBundle );
+
 			object.needsUpdate = false;
 
 		} else {
 
-			const renderContext = this._currentRenderContext;
-			const renderContextData = this.backend.get( renderContext );
+			const renderObjects = renderBundleData.renderObjects;
 
-			for ( let i = 0, l = renderContextData.renderObjects.length; i < l; i ++ ) {
+			for ( let i = 0, l = renderObjects.length; i < l; i ++ ) {
 
-				const renderObject = renderContextData.renderObjects[ i ];
+				const renderObject = renderObjects[ i ];
 
 				this._nodes.updateBefore( renderObject );
 
@@ -473,13 +467,13 @@ class Renderer {
 				this._nodes.updateForRender( renderObject );
 				this._bindings.updateForRender( renderObject );
 
-				this.backend.draw( renderObject, this.info );
-
 				this._nodes.updateAfter( renderObject );
 
 			}
 
 		}
+
+		this.backend.addBundle( renderContext, renderBundle );
 
 	}
 
@@ -1371,7 +1365,7 @@ class Renderer {
 
 		}
 
-		if ( object.static === true ) {
+		if ( object.static === true && this.backend.beginBundle !== undefined ) {
 
 			const baseRenderList = renderList;
 
@@ -1601,24 +1595,15 @@ class Renderer {
 
 		//
 
-		if ( this._currentRenderBundle !== null && this._currentRenderBundle.needsUpdate === true ) {
+		if ( this._currentRenderBundle !== null ) {
 
-			const renderObjectData = this.backend.get( renderObject );
+			const renderBundleData = this.backend.get( this._currentRenderBundle );
 
-			renderObjectData.bundleEncoder = undefined;
-			renderObjectData.lastPipelineGPU = undefined;
+			renderBundleData.renderObjects.push( renderObject );
 
 		}
 
 		this.backend.draw( renderObject, this.info );
-
-		if ( this._currentRenderBundle !== null ) {
-
-			const renderContextData = this.backend.get( this._currentRenderContext );
-
-			renderContextData.renderObjects.push( renderObject );
-
-		}
 
 		this._nodes.updateAfter( renderObject );
 
