@@ -26,7 +26,7 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { EXRExporter, ZIP_COMPRESSION, ZIPS_COMPRESSION, NO_COMPRESSION } from 'three/addons/exporters/EXRExporter.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let scene, camera, renderer, exporter, mesh, controls, renderTarget, dataTexture;
@@ -56,14 +56,14 @@
 				scene = new THREE.Scene();
 
 				exporter = new EXRExporter();
-				const rgbeloader = new RGBELoader();
+				const uhdrloader = new UltraHDRLoader();
 
 				//
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
-				rgbeloader.load( 'textures/equirectangular/san_giuseppe_bridge_2k.hdr', function ( texture ) {
+				uhdrloader.load( 'textures/equirectangular/san_giuseppe_bridge_2k.hdr.jpg', function ( texture ) {
 
 					texture.mapping = THREE.EquirectangularReflectionMapping;
 

@@ -33,8 +33,8 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 
 			import { MaterialXLoader } from './jsm/loaders/MaterialXLoader.js';
 
@@ -95,9 +95,9 @@
 
 				//
 
-				new RGBELoader()
+				new UltraHDRLoader()
 					.setPath( 'textures/equirectangular/' )
-					.load( 'san_giuseppe_bridge_2k.hdr', async ( texture ) => {
+					.load( 'san_giuseppe_bridge_2k.hdr.jpg', async ( texture ) => {
 
 						texture.mapping = THREE.EquirectangularReflectionMapping;
 
