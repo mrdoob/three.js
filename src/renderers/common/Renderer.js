@@ -493,10 +493,10 @@ class Renderer {
 
 	_getFrameBufferTarget() {
 
-		const { currentColorSpace } = this;
+		const { currentToneMapping, currentColorSpace } = this;
 
-		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping );
-		const useColorSpace = this._renderTarget === null && ( currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace );
+		const useToneMapping = currentToneMapping !== NoToneMapping;
+		const useColorSpace = currentColorSpace !== LinearSRGBColorSpace;
 
 		if ( useToneMapping === false && useColorSpace === false ) return null;
 
@@ -1088,19 +1088,15 @@ class Renderer {
 
 	}
 
+	get currentToneMapping() {
+
+		return this._renderTarget !== null ? NoToneMapping : this.toneMapping;
+
+	}
+
 	get currentColorSpace() {
 
-		const renderTarget = this._renderTarget;
-
-		if ( renderTarget !== null ) {
-
-			const texture = renderTarget.texture;
-
-			return ( Array.isArray( texture ) ? texture[ 0 ] : texture ).colorSpace;
-
-		}
-
-		return this.outputColorSpace;
+		return this._renderTarget !== null ? LinearSRGBColorSpace : this.outputColorSpace;
 
 	}
 
