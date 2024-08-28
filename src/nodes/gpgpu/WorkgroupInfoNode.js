@@ -1,6 +1,6 @@
 import ArrayElementNode from '../utils/ArrayElementNode.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
-import Node, { addNodeClass } from '../core/Node.js';
+import { nodeObject } from '../tsl/TSLCore.js';
+import Node, { registerNodeClass } from '../core/Node.js';
 
 class WorkgroupInfoElementNode extends ArrayElementNode {
 
@@ -36,7 +36,7 @@ class WorkgroupInfoElementNode extends ArrayElementNode {
 }
 
 
-class WorkgroupInfoNode extends Node {
+class WorkgroupInfo extends Node {
 
 	constructor( scope, bufferType, bufferCount = 0 ) {
 
@@ -93,9 +93,10 @@ class WorkgroupInfoNode extends Node {
 
 }
 
-export default WorkgroupInfoNode;
+export default WorkgroupInfo;
 
-export const workgroupArray = ( type, count ) => nodeObject( new WorkgroupInfoNode( 'Workgroup', type, count ) );
+registerNodeClass( 'WorkgroupInfo', WorkgroupInfo );
 
-addNodeClass( 'WorkgroupInfoNode', WorkgroupInfoNode );
+export const workgroupArray = ( type, count ) => nodeObject( new WorkgroupInfo( 'Workgroup', type, count ) );
+
 

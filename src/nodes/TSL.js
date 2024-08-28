@@ -141,7 +141,14 @@ export * from './fog/FogExp2Node.js';
 export * from './geometry/RangeNode.js';
 
 // gpgpu
+<<<<<<< HEAD
 export * from './gpgpu/ComputeNode.js';
+=======
+export * from './gpgpu/BarrierNode.js';
+export * from './gpgpu/WorkgroupInfoNode.js';
+export { default as BarrierNode, workgroupBarrier, textureBarrier, storageBarrier } from './gpgpu/BarrierNode.js';
+export { default as WorkgroupInfoNode, workgroupArray } from './gpgpu/WorkgroupInfoNode.js';
+>>>>>>> fb0d991a07 (add bitonic sort example)
 
 // lighting
 export * from './lighting/LightNode.js';
