@@ -50,6 +50,7 @@ class NodeMaterial extends Material {
 		this.alphaTestNode = null;
 
 		this.positionNode = null;
+		this.mvpNode = null;
 
 		this.depthNode = null;
 		this.shadowNode = null;
@@ -277,7 +278,7 @@ class NodeMaterial extends Material {
 
 		}
 
-		const mvp = modelViewProjection();
+		const mvp = this.mvpNode !== null ? this.mvpNode : modelViewProjection();
 
 		builder.context.vertex = builder.removeStack();
 		builder.context.mvp = mvp;
@@ -603,6 +604,7 @@ class NodeMaterial extends Material {
 		this.alphaTestNode = source.alphaTestNode;
 
 		this.positionNode = source.positionNode;
+		this.mvpNode = source.mvpNode;
 
 		this.depthNode = source.depthNode;
 		this.shadowNode = source.shadowNode;

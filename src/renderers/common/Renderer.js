@@ -1463,6 +1463,7 @@ class Renderer {
 	renderObject( object, scene, camera, geometry, material, group, lightsNode ) {
 
 		let overridePositionNode;
+		let overrideMvpNode;
 		let overrideFragmentNode;
 		let overrideDepthNode;
 
@@ -1482,6 +1483,14 @@ class Renderer {
 				overrideMaterial.positionNode = material.positionNode;
 
 			}
+
+			if ( material.mvpNode && material.mvpNode.isNode ) {
+
+				overrideMvpNode = overrideMaterial.mvpNode;
+				overrideMaterial.mvpNode = material.mvpNode;
+
+			}
+
 
 			if ( overrideMaterial.isShadowNodeMaterial ) {
 
@@ -1557,6 +1566,12 @@ class Renderer {
 		if ( overridePositionNode !== undefined ) {
 
 			scene.overrideMaterial.positionNode = overridePositionNode;
+
+		}
+
+		if ( overrideMvpNode !== undefined ) {
+
+			scene.overrideMaterial.mvpNode = overrideMvpNode;
 
 		}
 
