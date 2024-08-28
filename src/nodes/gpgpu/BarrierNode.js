@@ -34,7 +34,9 @@ export default BarrierNode;
 
 registerNodeClass( 'Barrier', BarrierNode );
 
-export const barrier = nodeProxy( BarrierNode );
+const barrier = nodeProxy( BarrierNode );
 
 export const workgroupBarrier = () => barrier( 'workgroup' ).append();
+export const storageBarrier = () => barrier( 'storage' ).append();
+export const textureBarrier = () => barrier( 'texture' ).append();
 

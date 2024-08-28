@@ -133,7 +133,7 @@ export { default as RangeNode } from './geometry/RangeNode.js';
 
 // gpgpu
 export { default as ComputeNode } from './gpgpu/ComputeNode.js';
-export { workgroupBarrier } from './gpgpu/BarrierNode.js';
+export { default as BarrierNode, workgroupBarrier, textureBarrier, storageBarrier } from './gpgpu/BarrierNode.js';
 
 // lighting
 export { default as LightNode } from './lighting/LightNode.js';
