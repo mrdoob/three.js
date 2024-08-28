@@ -773,6 +773,8 @@ ${vars}
 
 		return `#version 300 es
 
+${ this.getSignature() }
+
 // extensions 
 ${shaderData.extensions}
 
