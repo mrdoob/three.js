@@ -85,7 +85,7 @@ export * from './accessors/VelocityNode.js';
 export * from './display/BlendMode.js';
 export { default as BumpMapNode, bumpMap } from './display/BumpMapNode.js';
 export * from './display/ColorAdjustment.js';
-export { default as ColorSpaceNode, linearToColorSpace, colorSpaceToLinear } from './display/ColorSpaceNode.js';
+export { default as ColorSpaceNode, linearSRGBToColorSpace, colorSpaceToLinearSRGB } from './display/ColorSpaceNode.js';
 export { default as FrontFacingNode, frontFacing, faceDirection } from './display/FrontFacingNode.js';
 export { default as NormalMapNode, normalMap } from './display/NormalMapNode.js';
 export { default as PosterizeNode, posterize } from './display/PosterizeNode.js';
