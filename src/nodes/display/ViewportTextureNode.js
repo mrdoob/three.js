@@ -72,7 +72,7 @@ class ViewportTextureNode extends TextureNode {
 
 export default ViewportTextureNode;
 
-ViewportTextureNode.type = /*#__PURE__*/ registerNode( 'ViewportTexture', ViewportTextureNode );
+ViewportTextureNode.type = /*@__PURE__*/ registerNode( 'ViewportTexture', ViewportTextureNode );
 
-export const viewportTexture = nodeProxy( ViewportTextureNode );
-export const viewportMipTexture = nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );
+export const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode );
+export const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );

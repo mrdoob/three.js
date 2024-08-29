@@ -97,8 +97,8 @@ class VaryingNode extends Node {
 
 export default VaryingNode;
 
-VaryingNode.type = /*#__PURE__*/ registerNode( 'Varying', VaryingNode );
+VaryingNode.type = /*@__PURE__*/ registerNode( 'Varying', VaryingNode );
 
-export const varying = nodeProxy( VaryingNode );
+export const varying = /*@__PURE__*/ nodeProxy( VaryingNode );
 
 addMethodChaining( 'varying', varying );

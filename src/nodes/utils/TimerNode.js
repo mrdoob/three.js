@@ -85,10 +85,10 @@ TimerNode.FRAME = 'frame';
 
 export default TimerNode;
 
-TimerNode.type = /*#__PURE__*/ registerNode( 'Timer', TimerNode );
+TimerNode.type = /*@__PURE__*/ registerNode( 'Timer', TimerNode );
 
 // @TODO: add support to use node in timeScale
 export const timerLocal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale, value ) );
 export const timerGlobal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale, value ) );
 export const timerDelta = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale, value ) );
-export const frameId = nodeImmutable( TimerNode, TimerNode.FRAME ).toUint();
+export const frameId = /*@__PURE__*/ nodeImmutable( TimerNode, TimerNode.FRAME ).toUint();

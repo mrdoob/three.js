@@ -89,9 +89,9 @@ class StorageTextureNode extends TextureNode {
 
 export default StorageTextureNode;
 
-StorageTextureNode.type = /*#__PURE__*/ registerNode( 'StorageTexture', StorageTextureNode );
+StorageTextureNode.type = /*@__PURE__*/ registerNode( 'StorageTexture', StorageTextureNode );
 
-export const storageTexture = nodeProxy( StorageTextureNode );
+export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode );
 
 export const textureStore = ( value, uvNode, storeNode ) => {
 

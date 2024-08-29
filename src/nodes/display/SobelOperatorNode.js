@@ -118,6 +118,6 @@ class SobelOperatorNode extends TempNode {
 
 export default SobelOperatorNode;
 
-SobelOperatorNode.type = /*#__PURE__*/ registerNode( 'SobelOperator', SobelOperatorNode );
+SobelOperatorNode.type = /*@__PURE__*/ registerNode( 'SobelOperator', SobelOperatorNode );
 
 export const sobel = ( node ) => nodeObject( new SobelOperatorNode( convertToTexture( node ) ) );

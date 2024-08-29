@@ -20,4 +20,4 @@ class LightingNode extends Node {
 
 export default LightingNode;
 
-LightingNode.type = /*#__PURE__*/ registerNode( 'Lighting', LightingNode );
+LightingNode.type = /*@__PURE__*/ registerNode( 'Lighting', LightingNode );

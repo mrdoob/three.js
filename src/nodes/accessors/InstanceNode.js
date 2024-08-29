@@ -139,6 +139,6 @@ class InstanceNode extends Node {
 
 export default InstanceNode;
 
-InstanceNode.type = /*#__PURE__*/ registerNode( 'Instance', InstanceNode );
+InstanceNode.type = /*@__PURE__*/ registerNode( 'Instance', InstanceNode );
 
-export const instance = nodeProxy( InstanceNode );
+export const instance = /*@__PURE__*/ nodeProxy( InstanceNode );

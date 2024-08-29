@@ -48,6 +48,6 @@ class FilmNode extends TempNode {
 
 export default FilmNode;
 
-FilmNode.type = /*#__PURE__*/ registerNode( 'Film', FilmNode );
+FilmNode.type = /*@__PURE__*/ registerNode( 'Film', FilmNode );
 
-export const film = nodeProxy( FilmNode );
+export const film = /*@__PURE__*/ nodeProxy( FilmNode );

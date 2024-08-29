@@ -109,4 +109,4 @@ class SplitNode extends Node {
 
 export default SplitNode;
 
-SplitNode.type = /*#__PURE__*/ registerNode( 'Split', SplitNode );
+SplitNode.type = /*@__PURE__*/ registerNode( 'Split', SplitNode );

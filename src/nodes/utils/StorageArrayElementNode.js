@@ -84,6 +84,6 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 export default StorageArrayElementNode;
 
-StorageArrayElementNode.type = /*#__PURE__*/ registerNode( 'StorageArrayElement', StorageArrayElementNode );
+StorageArrayElementNode.type = /*@__PURE__*/ registerNode( 'StorageArrayElement', StorageArrayElementNode );
 
-export const storageElement = nodeProxy( StorageArrayElementNode );
+export const storageElement = /*@__PURE__*/ nodeProxy( StorageArrayElementNode );

@@ -119,6 +119,6 @@ class BatchNode extends Node {
 
 export default BatchNode;
 
-BatchNode.type = /*#__PURE__*/ registerNode( 'Batch', BatchNode );
+BatchNode.type = /*@__PURE__*/ registerNode( 'Batch', BatchNode );
 
-export const batch = nodeProxy( BatchNode );
+export const batch = /*@__PURE__*/ nodeProxy( BatchNode );

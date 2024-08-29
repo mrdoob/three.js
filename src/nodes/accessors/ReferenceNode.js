@@ -166,7 +166,7 @@ class ReferenceNode extends Node {
 
 export default ReferenceNode;
 
-ReferenceNode.type = /*#__PURE__*/ registerNode( 'Reference', ReferenceNode );
+ReferenceNode.type = /*@__PURE__*/ registerNode( 'Reference', ReferenceNode );
 
 export const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
 export const referenceBuffer = ( name, type, count, object ) => nodeObject( new ReferenceNode( name, type, object, count ) );

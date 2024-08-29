@@ -140,7 +140,7 @@ ClippingNode.DEFAULT = 'default';
 
 export default ClippingNode;
 
-ClippingNode.type = /*#__PURE__*/ registerNode( 'Clipping', ClippingNode );
+ClippingNode.type = /*@__PURE__*/ registerNode( 'Clipping', ClippingNode );
 
 export const clipping = () => nodeObject( new ClippingNode() );
 

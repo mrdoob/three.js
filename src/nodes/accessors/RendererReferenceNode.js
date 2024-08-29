@@ -24,6 +24,6 @@ class RendererReferenceNode extends ReferenceBaseNode {
 
 export default RendererReferenceNode;
 
-RendererReferenceNode.type = /*#__PURE__*/ registerNode( 'RendererReference', RendererReferenceNode );
+RendererReferenceNode.type = /*@__PURE__*/ registerNode( 'RendererReference', RendererReferenceNode );
 
 export const rendererReference = ( name, type, renderer ) => nodeObject( new RendererReferenceNode( name, type, renderer ) );

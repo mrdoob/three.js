@@ -16,6 +16,6 @@ InstancedPointsMaterialNode.POINT_WIDTH = 'pointWidth';
 
 export default InstancedPointsMaterialNode;
 
-InstancedPointsMaterialNode.type = /*#__PURE__*/ registerNode( 'InstancedPointsMaterial', InstancedPointsMaterialNode );
+InstancedPointsMaterialNode.type = /*@__PURE__*/ registerNode( 'InstancedPointsMaterial', InstancedPointsMaterialNode );
 
-export const materialPointWidth = nodeImmutable( InstancedPointsMaterialNode, InstancedPointsMaterialNode.POINT_WIDTH );
+export const materialPointWidth = /*@__PURE__*/ nodeImmutable( InstancedPointsMaterialNode, InstancedPointsMaterialNode.POINT_WIDTH );

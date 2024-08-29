@@ -50,6 +50,6 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 export default ParallaxBarrierPassNode;
 
-ParallaxBarrierPassNode.type = /*#__PURE__*/ registerNode( 'ParallaxBarrierPass', ParallaxBarrierPassNode );
+ParallaxBarrierPassNode.type = /*@__PURE__*/ registerNode( 'ParallaxBarrierPass', ParallaxBarrierPassNode );
 
 export const parallaxBarrierPass = ( scene, camera ) => nodeObject( new ParallaxBarrierPassNode( scene, camera ) );

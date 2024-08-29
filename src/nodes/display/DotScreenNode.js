@@ -58,6 +58,6 @@ class DotScreenNode extends TempNode {
 
 export default DotScreenNode;
 
-DotScreenNode.type = /*#__PURE__*/ registerNode( 'DotScreen', DotScreenNode );
+DotScreenNode.type = /*@__PURE__*/ registerNode( 'DotScreen', DotScreenNode );
 
 export const dotScreen = ( node, center, angle, scale ) => nodeObject( new DotScreenNode( nodeObject( node ), center, angle, scale ) );

@@ -26,4 +26,4 @@ class BasicLightMapNode extends LightingNode {
 
 export default BasicLightMapNode;
 
-BasicLightMapNode.type = /*#__PURE__*/ registerNode( 'BasicLightMap', BasicLightMapNode );
+BasicLightMapNode.type = /*@__PURE__*/ registerNode( 'BasicLightMap', BasicLightMapNode );

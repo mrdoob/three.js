@@ -60,4 +60,4 @@ class PointLightNode extends AnalyticLightNode {
 
 export default PointLightNode;
 
-PointLightNode.type = /*#__PURE__*/ registerNode( 'PointLight', PointLightNode );
+PointLightNode.type = /*@__PURE__*/ registerNode( 'PointLight', PointLightNode );

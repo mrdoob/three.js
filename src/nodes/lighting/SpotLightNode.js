@@ -81,4 +81,4 @@ class SpotLightNode extends AnalyticLightNode {
 
 export default SpotLightNode;
 
-SpotLightNode.type = /*#__PURE__*/ registerNode( 'SpotLight', SpotLightNode );
+SpotLightNode.type = /*@__PURE__*/ registerNode( 'SpotLight', SpotLightNode );

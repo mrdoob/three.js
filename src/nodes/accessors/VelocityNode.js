@@ -78,6 +78,6 @@ function getPreviousMatrix( object ) {
 
 export default VelocityNode;
 
-VelocityNode.type = /*#__PURE__*/ registerNode( 'Velocity', VelocityNode );
+VelocityNode.type = /*@__PURE__*/ registerNode( 'Velocity', VelocityNode );
 
-export const velocity = nodeImmutable( VelocityNode );
+export const velocity = /*@__PURE__*/ nodeImmutable( VelocityNode );

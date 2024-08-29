@@ -29,4 +29,4 @@ class ConstNode extends InputNode {
 
 export default ConstNode;
 
-ConstNode.type = /*#__PURE__*/ registerNode( 'Const', ConstNode );
+ConstNode.type = /*@__PURE__*/ registerNode( 'Const', ConstNode );

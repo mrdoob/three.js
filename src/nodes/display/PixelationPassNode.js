@@ -153,7 +153,7 @@ class PixelationNode extends TempNode {
 
 }
 
-PixelationNode.type = /*#__PURE__*/ registerNode( 'Pixelation', PixelationNode );
+PixelationNode.type = /*@__PURE__*/ registerNode( 'Pixelation', PixelationNode );
 
 const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( convertToTexture( node ), convertToTexture( depthNode ), convertToTexture( normalNode ), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
 
@@ -203,4 +203,4 @@ export const pixelationPass = ( scene, camera, pixelSize, normalEdgeStrength, de
 
 export default PixelationPassNode;
 
-PixelationPassNode.type = /*#__PURE__*/ registerNode( 'PixelationPass', PixelationPassNode );
+PixelationPassNode.type = /*@__PURE__*/ registerNode( 'PixelationPass', PixelationPassNode );

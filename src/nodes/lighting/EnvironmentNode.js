@@ -85,7 +85,7 @@ class EnvironmentNode extends LightingNode {
 
 export default EnvironmentNode;
 
-EnvironmentNode.type = /*#__PURE__*/ registerNode( 'Environment', EnvironmentNode );
+EnvironmentNode.type = /*@__PURE__*/ registerNode( 'Environment', EnvironmentNode );
 
 const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 

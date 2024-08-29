@@ -24,6 +24,6 @@ class UserDataNode extends ReferenceNode {
 
 export default UserDataNode;
 
-UserDataNode.type = /*#__PURE__*/ registerNode( 'UserData', UserDataNode );
+UserDataNode.type = /*@__PURE__*/ registerNode( 'UserData', UserDataNode );
 
 export const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );

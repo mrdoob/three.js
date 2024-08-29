@@ -28,6 +28,6 @@ class FogRangeNode extends FogNode {
 
 export default FogRangeNode;
 
-FogRangeNode.type = /*#__PURE__*/ registerNode( 'FogRange', FogRangeNode );
+FogRangeNode.type = /*@__PURE__*/ registerNode( 'FogRange', FogRangeNode );
 
-export const rangeFog = nodeProxy( FogRangeNode );
+export const rangeFog = /*@__PURE__*/ nodeProxy( FogRangeNode );

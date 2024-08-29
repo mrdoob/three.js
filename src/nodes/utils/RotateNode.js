@@ -55,6 +55,6 @@ class RotateNode extends TempNode {
 
 export default RotateNode;
 
-RotateNode.type = /*#__PURE__*/ registerNode( 'Rotate', RotateNode );
+RotateNode.type = /*@__PURE__*/ registerNode( 'Rotate', RotateNode );
 
-export const rotate = nodeProxy( RotateNode );
+export const rotate = /*@__PURE__*/ nodeProxy( RotateNode );

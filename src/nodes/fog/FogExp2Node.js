@@ -27,6 +27,6 @@ class FogExp2Node extends FogNode {
 
 export default FogExp2Node;
 
-FogExp2Node.type = /*#__PURE__*/ registerNode( 'FogExp2', FogExp2Node );
+FogExp2Node.type = /*@__PURE__*/ registerNode( 'FogExp2', FogExp2Node );
 
-export const densityFog = nodeProxy( FogExp2Node );
+export const densityFog = /*@__PURE__*/ nodeProxy( FogExp2Node );

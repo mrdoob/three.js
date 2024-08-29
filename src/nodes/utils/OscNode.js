@@ -73,9 +73,9 @@ OscNode.SAWTOOTH = 'sawtooth';
 
 export default OscNode;
 
-OscNode.type = /*#__PURE__*/ registerNode( 'Osc', OscNode );
+OscNode.type = /*@__PURE__*/ registerNode( 'Osc', OscNode );
 
-export const oscSine = nodeProxy( OscNode, OscNode.SINE );
-export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );
-export const oscTriangle = nodeProxy( OscNode, OscNode.TRIANGLE );
-export const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
+export const oscSine = /*@__PURE__*/ nodeProxy( OscNode, OscNode.SINE );
+export const oscSquare = /*@__PURE__*/ nodeProxy( OscNode, OscNode.SQUARE );
+export const oscTriangle = /*@__PURE__*/ nodeProxy( OscNode, OscNode.TRIANGLE );
+export const oscSawtooth = /*@__PURE__*/ nodeProxy( OscNode, OscNode.SAWTOOTH );

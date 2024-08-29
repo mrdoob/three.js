@@ -121,8 +121,8 @@ class AssignNode extends TempNode {
 
 export default AssignNode;
 
-AssignNode.type = /*#__PURE__*/ registerNode( 'Assign', AssignNode );
+AssignNode.type = /*@__PURE__*/ registerNode( 'Assign', AssignNode );
 
-export const assign = nodeProxy( AssignNode );
+export const assign = /*@__PURE__*/ nodeProxy( AssignNode );
 
 addMethodChaining( 'assign', assign );

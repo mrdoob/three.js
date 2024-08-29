@@ -59,4 +59,4 @@ class SetNode extends TempNode {
 
 export default SetNode;
 
-SetNode.type = /*#__PURE__*/ registerNode( 'Set', SetNode );
+SetNode.type = /*@__PURE__*/ registerNode( 'Set', SetNode );

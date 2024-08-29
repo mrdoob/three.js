@@ -81,7 +81,7 @@ class FunctionNode extends CodeNode {
 
 export default FunctionNode;
 
-FunctionNode.type = /*#__PURE__*/ registerNode( 'Function', FunctionNode );
+FunctionNode.type = /*@__PURE__*/ registerNode( 'Function', FunctionNode );
 
 const nativeFn = ( code, includes = [], language = '' ) => {
 

@@ -62,4 +62,4 @@ class ConvertNode extends Node {
 
 export default ConvertNode;
 
-ConvertNode.type = /*#__PURE__*/ registerNode( 'Convert', ConvertNode );
+ConvertNode.type = /*@__PURE__*/ registerNode( 'Convert', ConvertNode );

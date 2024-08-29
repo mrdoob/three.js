@@ -39,7 +39,7 @@ class CacheNode extends Node {
 
 export default CacheNode;
 
-CacheNode.type = /*#__PURE__*/ registerNode( 'Cache', CacheNode );
+CacheNode.type = /*@__PURE__*/ registerNode( 'Cache', CacheNode );
 
 export const cache = ( node, ...params ) => nodeObject( new CacheNode( nodeObject( node ), ...params ) );
 

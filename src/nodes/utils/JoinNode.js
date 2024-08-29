@@ -58,4 +58,4 @@ class JoinNode extends TempNode {
 
 export default JoinNode;
 
-JoinNode.type = /*#__PURE__*/ registerNode( 'Join', JoinNode );
+JoinNode.type = /*@__PURE__*/ registerNode( 'Join', JoinNode );

@@ -121,9 +121,9 @@ class ConditionalNode extends Node {
 
 export default ConditionalNode;
 
-ConditionalNode.type = /*#__PURE__*/ registerNode( 'Conditional', ConditionalNode );
+ConditionalNode.type = /*@__PURE__*/ registerNode( 'Conditional', ConditionalNode );
 
-export const select = nodeProxy( ConditionalNode );
+export const select = /*@__PURE__*/ nodeProxy( ConditionalNode );
 
 addMethodChaining( 'select', select );
 

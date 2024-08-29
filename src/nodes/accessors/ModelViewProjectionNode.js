@@ -33,6 +33,6 @@ class ModelViewProjectionNode extends TempNode {
 
 export default ModelViewProjectionNode;
 
-ModelViewProjectionNode.type = /*#__PURE__*/ registerNode( 'ModelViewProjection', ModelViewProjectionNode );
+ModelViewProjectionNode.type = /*@__PURE__*/ registerNode( 'ModelViewProjection', ModelViewProjectionNode );
 
-export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
+export const modelViewProjection = /*@__PURE__*/ nodeProxy( ModelViewProjectionNode );

@@ -124,7 +124,7 @@ class RTTNode extends TextureNode {
 
 export default RTTNode;
 
-RTTNode.type = /*#__PURE__*/ registerNode( 'RTT', RTTNode );
+RTTNode.type = /*@__PURE__*/ registerNode( 'RTT', RTTNode );
 
 export const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( node ), ...params ) );
 export const convertToTexture = ( node, ...params ) => node.isTextureNode ? node : rtt( node, ...params );

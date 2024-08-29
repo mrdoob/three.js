@@ -24,4 +24,4 @@ class BasicEnvironmentNode extends LightingNode {
 
 export default BasicEnvironmentNode;
 
-BasicEnvironmentNode.type = /*#__PURE__*/ registerNode( 'BasicEnvironment', BasicEnvironmentNode );
+BasicEnvironmentNode.type = /*@__PURE__*/ registerNode( 'BasicEnvironment', BasicEnvironmentNode );

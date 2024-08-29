@@ -90,8 +90,8 @@ class FunctionOverloadingNode extends Node {
 
 export default FunctionOverloadingNode;
 
-FunctionOverloadingNode.type = /*#__PURE__*/ registerNode( 'FunctionOverloading', FunctionOverloadingNode );
+FunctionOverloadingNode.type = /*@__PURE__*/ registerNode( 'FunctionOverloading', FunctionOverloadingNode );
 
-const overloadingBaseFn = nodeProxy( FunctionOverloadingNode );
+const overloadingBaseFn = /*@__PURE__*/ nodeProxy( FunctionOverloadingNode );
 
 export const overloadingFn = ( functionNodes ) => ( ...params ) => overloadingBaseFn( functionNodes, ...params );

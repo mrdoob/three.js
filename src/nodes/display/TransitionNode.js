@@ -72,6 +72,6 @@ class TransitionNode extends TempNode {
 
 export default TransitionNode;
 
-TransitionNode.type = /*#__PURE__*/ registerNode( 'Transition', TransitionNode );
+TransitionNode.type = /*@__PURE__*/ registerNode( 'Transition', TransitionNode );
 
 export const transition = ( nodeA, nodeB, mixTexture, mixRatio = 0.0, threshold = 0.1, useTexture = 0 ) => nodeObject( new TransitionNode( convertToTexture( nodeA ), convertToTexture( nodeB ), convertToTexture( mixTexture ), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) ) );

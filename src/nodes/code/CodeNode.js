@@ -75,9 +75,9 @@ class CodeNode extends Node {
 
 export default CodeNode;
 
-CodeNode.type = /*#__PURE__*/ registerNode( 'Code', CodeNode );
+CodeNode.type = /*@__PURE__*/ registerNode( 'Code', CodeNode );
 
-export const code = nodeProxy( CodeNode );
+export const code = /*@__PURE__*/ nodeProxy( CodeNode );
 
 export const js = ( src, includes ) => code( src, includes, 'js' );
 export const wgsl = ( src, includes ) => code( src, includes, 'wgsl' );

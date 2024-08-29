@@ -163,7 +163,7 @@ class DenoiseNode extends TempNode {
 
 export default DenoiseNode;
 
-DenoiseNode.type = /*#__PURE__*/ registerNode( 'Denoise', DenoiseNode );
+DenoiseNode.type = /*@__PURE__*/ registerNode( 'Denoise', DenoiseNode );
 
 function generatePdSamplePointInitializer( samples, rings, radiusExponent ) {
 

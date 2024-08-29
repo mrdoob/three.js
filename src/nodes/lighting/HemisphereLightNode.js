@@ -49,4 +49,4 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 export default HemisphereLightNode;
 
-HemisphereLightNode.type = /*#__PURE__*/ registerNode( 'HemisphereLight', HemisphereLightNode );
+HemisphereLightNode.type = /*@__PURE__*/ registerNode( 'HemisphereLight', HemisphereLightNode );

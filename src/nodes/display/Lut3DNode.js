@@ -49,6 +49,6 @@ class Lut3DNode extends TempNode {
 
 export default Lut3DNode;
 
-Lut3DNode.type = /*#__PURE__*/ registerNode( 'Lut3D', Lut3DNode );
+Lut3DNode.type = /*@__PURE__*/ registerNode( 'Lut3D', Lut3DNode );
 
 export const lut3D = ( node, lut, size, intensity ) => nodeObject( new Lut3DNode( nodeObject( node ), nodeObject( lut ), size, nodeObject( intensity ) ) );

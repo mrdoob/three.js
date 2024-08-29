@@ -104,4 +104,4 @@ class StereoCompositePassNode extends PassNode {
 
 export default StereoCompositePassNode;
 
-StereoCompositePassNode.type = /*#__PURE__*/ registerNode( 'StereoCompositePass', StereoCompositePassNode );
+StereoCompositePassNode.type = /*@__PURE__*/ registerNode( 'StereoCompositePass', StereoCompositePassNode );

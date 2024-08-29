@@ -141,7 +141,7 @@ class UniformArrayNode extends BufferNode {
 
 export default UniformArrayNode;
 
-UniformArrayNode.type = /*#__PURE__*/ registerNode( 'UniformArray', UniformArrayNode );
+UniformArrayNode.type = /*@__PURE__*/ registerNode( 'UniformArray', UniformArrayNode );
 
 export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
 

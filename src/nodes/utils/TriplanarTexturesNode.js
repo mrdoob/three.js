@@ -54,7 +54,7 @@ class TriplanarTexturesNode extends Node {
 
 export default TriplanarTexturesNode;
 
-TriplanarTexturesNode.type = /*#__PURE__*/ registerNode( 'TriplanarTextures', TriplanarTexturesNode );
+TriplanarTexturesNode.type = /*@__PURE__*/ registerNode( 'TriplanarTextures', TriplanarTexturesNode );
 
-export const triplanarTextures = nodeProxy( TriplanarTexturesNode );
+export const triplanarTextures = /*@__PURE__*/ nodeProxy( TriplanarTexturesNode );
 export const triplanarTexture = ( ...params ) => triplanarTextures( ...params );

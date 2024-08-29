@@ -25,6 +25,6 @@ class MatcapUVNode extends TempNode {
 
 export default MatcapUVNode;
 
-MatcapUVNode.type = /*#__PURE__*/ registerNode( 'MatcapUV', MatcapUVNode );
+MatcapUVNode.type = /*@__PURE__*/ registerNode( 'MatcapUV', MatcapUVNode );
 
-export const matcapUV = nodeImmutable( MatcapUVNode );
+export const matcapUV = /*@__PURE__*/ nodeImmutable( MatcapUVNode );

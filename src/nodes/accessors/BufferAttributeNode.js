@@ -151,7 +151,7 @@ class BufferAttributeNode extends InputNode {
 
 export default BufferAttributeNode;
 
-BufferAttributeNode.type = /*#__PURE__*/ registerNode( 'BufferAttribute', BufferAttributeNode );
+BufferAttributeNode.type = /*@__PURE__*/ registerNode( 'BufferAttribute', BufferAttributeNode );
 
 export const bufferAttribute = ( array, type, stride, offset ) => nodeObject( new BufferAttributeNode( array, type, stride, offset ) );
 export const dynamicBufferAttribute = ( array, type, stride, offset ) => bufferAttribute( array, type, stride, offset ).setUsage( DynamicDrawUsage );

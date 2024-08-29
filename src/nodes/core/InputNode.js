@@ -80,4 +80,4 @@ class InputNode extends Node {
 
 export default InputNode;
 
-InputNode.type = /*#__PURE__*/ registerNode( 'Input', InputNode );
+InputNode.type = /*@__PURE__*/ registerNode( 'Input', InputNode );

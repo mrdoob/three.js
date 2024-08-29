@@ -95,7 +95,7 @@ class UniformNode extends InputNode {
 
 export default UniformNode;
 
-UniformNode.type = /*#__PURE__*/ registerNode( 'Uniform', UniformNode );
+UniformNode.type = /*@__PURE__*/ registerNode( 'Uniform', UniformNode );
 
 export const uniform = ( arg1, arg2 ) => {
 

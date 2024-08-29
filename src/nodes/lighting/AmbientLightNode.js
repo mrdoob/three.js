@@ -19,4 +19,4 @@ class AmbientLightNode extends AnalyticLightNode {
 
 export default AmbientLightNode;
 
-AmbientLightNode.type = /*#__PURE__*/ registerNode( 'AmbientLight', AmbientLightNode );
+AmbientLightNode.type = /*@__PURE__*/ registerNode( 'AmbientLight', AmbientLightNode );

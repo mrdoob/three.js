@@ -59,6 +59,6 @@ class LightingContextNode extends ContextNode {
 
 export default LightingContextNode;
 
-LightingContextNode.type = /*#__PURE__*/ registerNode( 'LightingContext', LightingContextNode );
+LightingContextNode.type = /*@__PURE__*/ registerNode( 'LightingContext', LightingContextNode );
 
-export const lightingContext = nodeProxy( LightingContextNode );
+export const lightingContext = /*@__PURE__*/ nodeProxy( LightingContextNode );

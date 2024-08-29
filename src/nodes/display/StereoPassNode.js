@@ -75,6 +75,6 @@ class StereoPassNode extends PassNode {
 
 export default StereoPassNode;
 
-StereoPassNode.type = /*#__PURE__*/ registerNode( 'StereoPass', StereoPassNode );
+StereoPassNode.type = /*@__PURE__*/ registerNode( 'StereoPass', StereoPassNode );
 
 export const stereoPass = ( scene, camera ) => nodeObject( new StereoPassNode( scene, camera ) );

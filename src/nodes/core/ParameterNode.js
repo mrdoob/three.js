@@ -28,6 +28,6 @@ class ParameterNode extends PropertyNode {
 
 export default ParameterNode;
 
-ParameterNode.type = /*#__PURE__*/ registerNode( 'Parameter', ParameterNode );
+ParameterNode.type = /*@__PURE__*/ registerNode( 'Parameter', ParameterNode );
 
 export const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );

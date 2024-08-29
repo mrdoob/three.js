@@ -226,6 +226,6 @@ class LightsNode extends Node {
 
 export default LightsNode;
 
-LightsNode.type = /*#__PURE__*/ registerNode( 'Lights', LightsNode );
+LightsNode.type = /*@__PURE__*/ registerNode( 'Lights', LightsNode );
 
-export const lights = nodeProxy( LightsNode );
+export const lights = /*@__PURE__*/ nodeProxy( LightsNode );

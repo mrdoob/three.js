@@ -434,4 +434,4 @@ class Line2NodeMaterial extends NodeMaterial {
 
 export default Line2NodeMaterial;
 
-Line2NodeMaterial.type = /*#__PURE__*/ registerNodeMaterial( 'Line2', Line2NodeMaterial );
+Line2NodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Line2', Line2NodeMaterial );

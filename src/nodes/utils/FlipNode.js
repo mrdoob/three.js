@@ -62,4 +62,4 @@ class FlipNode extends TempNode {
 
 export default FlipNode;
 
-FlipNode.type = /*#__PURE__*/ registerNode( 'Flip', FlipNode );
+FlipNode.type = /*@__PURE__*/ registerNode( 'Flip', FlipNode );

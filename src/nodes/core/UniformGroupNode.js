@@ -45,7 +45,7 @@ class UniformGroupNode extends Node {
 
 export default UniformGroupNode;
 
-UniformGroupNode.type = /*#__PURE__*/ registerNode( 'UniformGroup', UniformGroupNode );
+UniformGroupNode.type = /*@__PURE__*/ registerNode( 'UniformGroup', UniformGroupNode );
 
 export const uniformGroup = ( name ) => new UniformGroupNode( name );
 export const sharedUniformGroup = ( name ) => new UniformGroupNode( name, true );

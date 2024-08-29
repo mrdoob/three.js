@@ -35,7 +35,7 @@ class FrontFacingNode extends Node {
 
 export default FrontFacingNode;
 
-FrontFacingNode.type = /*#__PURE__*/ registerNode( 'FrontFacing', FrontFacingNode );
+FrontFacingNode.type = /*@__PURE__*/ registerNode( 'FrontFacing', FrontFacingNode );
 
-export const frontFacing = nodeImmutable( FrontFacingNode );
+export const frontFacing = /*@__PURE__*/ nodeImmutable( FrontFacingNode );
 export const faceDirection = float( frontFacing ).mul( 2.0 ).sub( 1.0 );

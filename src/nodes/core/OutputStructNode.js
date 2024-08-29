@@ -54,6 +54,6 @@ class OutputStructNode extends Node {
 
 export default OutputStructNode;
 
-OutputStructNode.type = /*#__PURE__*/ registerNode( 'OutputStruct', OutputStructNode );
+OutputStructNode.type = /*@__PURE__*/ registerNode( 'OutputStruct', OutputStructNode );
 
-export const outputStruct = nodeProxy( OutputStructNode );
+export const outputStruct = /*@__PURE__*/ nodeProxy( OutputStructNode );

@@ -21,4 +21,4 @@ class AONode extends LightingNode {
 
 export default AONode;
 
-AONode.type = /*#__PURE__*/ registerNode( 'AO', AONode );
+AONode.type = /*@__PURE__*/ registerNode( 'AO', AONode );

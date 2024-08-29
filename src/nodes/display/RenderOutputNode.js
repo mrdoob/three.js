@@ -49,7 +49,7 @@ class RenderOutputNode extends TempNode {
 
 export default RenderOutputNode;
 
-RenderOutputNode.type = /*#__PURE__*/ registerNode( 'RenderOutput', RenderOutputNode );
+RenderOutputNode.type = /*@__PURE__*/ registerNode( 'RenderOutput', RenderOutputNode );
 
 export const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => nodeObject( new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace ) );
 

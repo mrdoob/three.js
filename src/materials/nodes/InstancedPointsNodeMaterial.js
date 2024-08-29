@@ -162,4 +162,4 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 export default InstancedPointsNodeMaterial;
 
-InstancedPointsNodeMaterial.type = /*#__PURE__*/ registerNodeMaterial( 'InstancedPoints', InstancedPointsNodeMaterial );
+InstancedPointsNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'InstancedPoints', InstancedPointsNodeMaterial );

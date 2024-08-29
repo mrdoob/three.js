@@ -83,7 +83,7 @@ class FunctionCallNode extends TempNode {
 
 export default FunctionCallNode;
 
-FunctionCallNode.type = /*#__PURE__*/ registerNode( 'FunctionCall', FunctionCallNode );
+FunctionCallNode.type = /*@__PURE__*/ registerNode( 'FunctionCall', FunctionCallNode );
 
 export const call = ( func, ...params ) => {
 

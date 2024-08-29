@@ -58,7 +58,7 @@ class ToneMappingNode extends TempNode {
 
 export default ToneMappingNode;
 
-ToneMappingNode.type = /*#__PURE__*/ registerNode( 'ToneMapping', ToneMappingNode );
+ToneMappingNode.type = /*@__PURE__*/ registerNode( 'ToneMapping', ToneMappingNode );
 
 export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) ) );
 export const toneMappingExposure = /*@__PURE__*/ rendererReference( 'toneMappingExposure', 'float' );

@@ -116,6 +116,6 @@ class DepthOfFieldNode extends TempNode {
 
 export default DepthOfFieldNode;
 
-DepthOfFieldNode.type = /*#__PURE__*/ registerNode( 'DepthOfField', DepthOfFieldNode );
+DepthOfFieldNode.type = /*@__PURE__*/ registerNode( 'DepthOfField', DepthOfFieldNode );
 
 export const dof = ( node, viewZNode, focus = 1, aperture = 0.025, maxblur = 1 ) => nodeObject( new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focus ), nodeObject( aperture ), nodeObject( maxblur ) ) );

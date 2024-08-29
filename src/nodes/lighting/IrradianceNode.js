@@ -21,4 +21,4 @@ class IrradianceNode extends LightingNode {
 
 export default IrradianceNode;
 
-IrradianceNode.type = /*#__PURE__*/ registerNode( 'Irradiance', IrradianceNode );
+IrradianceNode.type = /*@__PURE__*/ registerNode( 'Irradiance', IrradianceNode );

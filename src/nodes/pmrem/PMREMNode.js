@@ -206,7 +206,7 @@ class PMREMNode extends TempNode {
 
 export default PMREMNode;
 
-PMREMNode.type = /*#__PURE__*/ registerNode( 'PMREM', PMREMNode );
+PMREMNode.type = /*@__PURE__*/ registerNode( 'PMREM', PMREMNode );
 
 function isCubeMapReady( image ) {
 
@@ -234,4 +234,4 @@ function isEquirectangularMapReady( image ) {
 
 }
 
-export const pmremTexture = nodeProxy( PMREMNode );
+export const pmremTexture = /*@__PURE__*/ nodeProxy( PMREMNode );

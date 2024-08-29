@@ -495,6 +495,6 @@ class ScriptableNode extends Node {
 
 export default ScriptableNode;
 
-ScriptableNode.type = /*#__PURE__*/ registerNode( 'Scriptable', ScriptableNode );
+ScriptableNode.type = /*@__PURE__*/ registerNode( 'Scriptable', ScriptableNode );
 
-export const scriptable = nodeProxy( ScriptableNode );
+export const scriptable = /*@__PURE__*/ nodeProxy( ScriptableNode );

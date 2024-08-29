@@ -38,6 +38,6 @@ class MaterialReferenceNode extends ReferenceNode {
 
 export default MaterialReferenceNode;
 
-MaterialReferenceNode.type = /*#__PURE__*/ registerNode( 'MaterialReference', MaterialReferenceNode );
+MaterialReferenceNode.type = /*@__PURE__*/ registerNode( 'MaterialReference', MaterialReferenceNode );
 
 export const materialReference = ( name, type, material ) => nodeObject( new MaterialReferenceNode( name, type, material ) );

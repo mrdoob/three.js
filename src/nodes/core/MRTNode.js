@@ -77,6 +77,6 @@ class MRTNode extends OutputStructNode {
 
 export default MRTNode;
 
-MRTNode.type = /*#__PURE__*/ registerNode( 'MRT', MRTNode );
+MRTNode.type = /*@__PURE__*/ registerNode( 'MRT', MRTNode );
 
-export const mrt = nodeProxy( MRTNode );
+export const mrt = /*@__PURE__*/ nodeProxy( MRTNode );

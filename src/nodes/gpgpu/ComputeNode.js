@@ -78,7 +78,7 @@ class ComputeNode extends Node {
 
 export default ComputeNode;
 
-ComputeNode.type = /*#__PURE__*/ registerNode( 'Compute', ComputeNode );
+ComputeNode.type = /*@__PURE__*/ registerNode( 'Compute', ComputeNode );
 
 export const compute = ( node, count, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
 

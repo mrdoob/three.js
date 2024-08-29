@@ -112,7 +112,7 @@ class CubeMapNode extends TempNode {
 
 export default CubeMapNode;
 
-CubeMapNode.type = /*#__PURE__*/ registerNode( 'CubeMap', CubeMapNode );
+CubeMapNode.type = /*@__PURE__*/ registerNode( 'CubeMap', CubeMapNode );
 
 function isEquirectangularMapReady( image ) {
 
@@ -154,4 +154,4 @@ function mapTextureMapping( texture, mapping ) {
 
 }
 
-export const cubeMapNode = nodeProxy( CubeMapNode );
+export const cubeMapNode = /*@__PURE__*/ nodeProxy( CubeMapNode );

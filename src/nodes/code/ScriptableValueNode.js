@@ -161,6 +161,6 @@ class ScriptableValueNode extends Node {
 
 export default ScriptableValueNode;
 
-ScriptableValueNode.type = /*#__PURE__*/ registerNode( 'ScriptableValue', ScriptableValueNode );
+ScriptableValueNode.type = /*@__PURE__*/ registerNode( 'ScriptableValue', ScriptableValueNode );
 
-export const scriptableValue = nodeProxy( ScriptableValueNode );
+export const scriptableValue = /*@__PURE__*/ nodeProxy( ScriptableValueNode );

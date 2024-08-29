@@ -90,4 +90,4 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 export default RectAreaLightNode;
 
-RectAreaLightNode.type = /*#__PURE__*/ registerNode( 'RectAreaLight', RectAreaLightNode );
+RectAreaLightNode.type = /*@__PURE__*/ registerNode( 'RectAreaLight', RectAreaLightNode );

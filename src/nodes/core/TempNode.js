@@ -55,4 +55,4 @@ class TempNode extends Node {
 
 export default TempNode;
 
-TempNode.type = /*#__PURE__*/ registerNode( 'Temp', TempNode );
+TempNode.type = /*@__PURE__*/ registerNode( 'Temp', TempNode );

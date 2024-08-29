@@ -95,6 +95,6 @@ class Texture3DNode extends TextureNode {
 
 export default Texture3DNode;
 
-Texture3DNode.type = /*#__PURE__*/ registerNode( 'Texture3D', Texture3DNode );
+Texture3DNode.type = /*@__PURE__*/ registerNode( 'Texture3D', Texture3DNode );
 
-export const texture3D = nodeProxy( Texture3DNode );
+export const texture3D = /*@__PURE__*/ nodeProxy( Texture3DNode );

@@ -31,6 +31,6 @@ class ViewportSharedTextureNode extends ViewportTextureNode {
 
 export default ViewportSharedTextureNode;
 
-ViewportSharedTextureNode.type = /*#__PURE__*/ registerNode( 'ViewportSharedTexture', ViewportSharedTextureNode );
+ViewportSharedTextureNode.type = /*@__PURE__*/ registerNode( 'ViewportSharedTexture', ViewportSharedTextureNode );
 
-export const viewportSharedTexture = nodeProxy( ViewportSharedTextureNode );
+export const viewportSharedTexture = /*@__PURE__*/ nodeProxy( ViewportSharedTextureNode );

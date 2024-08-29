@@ -116,6 +116,6 @@ class AttributeNode extends Node {
 
 export default AttributeNode;
 
-AttributeNode.type = /*#__PURE__*/ registerNode( 'Attribute', AttributeNode );
+AttributeNode.type = /*@__PURE__*/ registerNode( 'Attribute', AttributeNode );
 
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );

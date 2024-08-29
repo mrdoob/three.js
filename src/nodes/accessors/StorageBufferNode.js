@@ -122,7 +122,7 @@ class StorageBufferNode extends BufferNode {
 
 export default StorageBufferNode;
 
-StorageBufferNode.type = /*#__PURE__*/ registerNode( 'StorageBuffer', StorageBufferNode );
+StorageBufferNode.type = /*@__PURE__*/ registerNode( 'StorageBuffer', StorageBufferNode );
 
 // Read-Write Storage
 export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );

@@ -41,6 +41,6 @@ class FogNode extends Node {
 
 export default FogNode;
 
-FogNode.type = /*#__PURE__*/ registerNode( 'Fog', FogNode );
+FogNode.type = /*@__PURE__*/ registerNode( 'Fog', FogNode );
 
-export const fog = nodeProxy( FogNode );
+export const fog = /*@__PURE__*/ nodeProxy( FogNode );

@@ -32,4 +32,4 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 export default ArrayElementNode;
 
-ArrayElementNode.type = /*#__PURE__*/ registerNode( 'ArrayElement', ArrayElementNode );
+ArrayElementNode.type = /*@__PURE__*/ registerNode( 'ArrayElement', ArrayElementNode );

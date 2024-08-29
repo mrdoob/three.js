@@ -99,6 +99,6 @@ class NormalMapNode extends TempNode {
 
 export default NormalMapNode;
 
-NormalMapNode.type = /*#__PURE__*/ registerNode( 'NormalMap', NormalMapNode );
+NormalMapNode.type = /*@__PURE__*/ registerNode( 'NormalMap', NormalMapNode );
 
-export const normalMap = nodeProxy( NormalMapNode );
+export const normalMap = /*@__PURE__*/ nodeProxy( NormalMapNode );

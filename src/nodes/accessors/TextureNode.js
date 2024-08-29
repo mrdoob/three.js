@@ -430,9 +430,9 @@ class TextureNode extends UniformNode {
 
 export default TextureNode;
 
-TextureNode.type = /*#__PURE__*/ registerNode( 'Texture', TextureNode );
+TextureNode.type = /*@__PURE__*/ registerNode( 'Texture', TextureNode );
 
-export const texture = nodeProxy( TextureNode );
+export const texture = /*@__PURE__*/ nodeProxy( TextureNode );
 export const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );
 
 //export const textureLevel = ( value, uv, level ) => texture( value, uv ).level( level );

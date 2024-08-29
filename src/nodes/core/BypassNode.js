@@ -38,8 +38,8 @@ class BypassNode extends Node {
 
 export default BypassNode;
 
-BypassNode.type = /*#__PURE__*/ registerNode( 'Bypass', BypassNode );
+BypassNode.type = /*@__PURE__*/ registerNode( 'Bypass', BypassNode );
 
-export const bypass = nodeProxy( BypassNode );
+export const bypass = /*@__PURE__*/ nodeProxy( BypassNode );
 
 addMethodChaining( 'bypass', bypass );

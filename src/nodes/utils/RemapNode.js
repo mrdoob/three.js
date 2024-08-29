@@ -33,10 +33,10 @@ class RemapNode extends Node {
 
 export default RemapNode;
 
-RemapNode.type = /*#__PURE__*/ registerNode( 'Remap', RemapNode );
+RemapNode.type = /*@__PURE__*/ registerNode( 'Remap', RemapNode );
 
-export const remap = nodeProxy( RemapNode, null, null, { doClamp: false } );
-export const remapClamp = nodeProxy( RemapNode );
+export const remap = /*@__PURE__*/ nodeProxy( RemapNode, null, null, { doClamp: false } );
+export const remapClamp = /*@__PURE__*/ nodeProxy( RemapNode );
 
 addMethodChaining( 'remap', remap );
 addMethodChaining( 'remapClamp', remapClamp );

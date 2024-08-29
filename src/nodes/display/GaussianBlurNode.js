@@ -205,6 +205,6 @@ class GaussianBlurNode extends TempNode {
 
 export default GaussianBlurNode;
 
-GaussianBlurNode.type = /*#__PURE__*/ registerNode( 'GaussianBlur', GaussianBlurNode );
+GaussianBlurNode.type = /*@__PURE__*/ registerNode( 'GaussianBlur', GaussianBlurNode );
 
 export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ) );

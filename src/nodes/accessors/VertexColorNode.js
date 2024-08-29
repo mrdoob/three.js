@@ -66,6 +66,6 @@ class VertexColorNode extends AttributeNode {
 
 export default VertexColorNode;
 
-VertexColorNode.type = /*#__PURE__*/ registerNode( 'VertexColor', VertexColorNode );
+VertexColorNode.type = /*@__PURE__*/ registerNode( 'VertexColor', VertexColorNode );
 
 export const vertexColor = ( ...params ) => nodeObject( new VertexColorNode( ...params ) );

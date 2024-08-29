@@ -21,4 +21,4 @@ class StructTypeNode extends Node {
 
 export default StructTypeNode;
 
-StructTypeNode.type = /*#__PURE__*/ registerNode( 'StructType', StructTypeNode );
+StructTypeNode.type = /*@__PURE__*/ registerNode( 'StructType', StructTypeNode );

@@ -52,6 +52,6 @@ LightNode.TARGET_DIRECTION = 'targetDirection';
 
 export default LightNode;
 
-LightNode.type = /*#__PURE__*/ registerNode( 'Light', LightNode );
+LightNode.type = /*@__PURE__*/ registerNode( 'Light', LightNode );
 
-export const lightTargetDirection = nodeProxy( LightNode, LightNode.TARGET_DIRECTION );
+export const lightTargetDirection = /*@__PURE__*/ nodeProxy( LightNode, LightNode.TARGET_DIRECTION );

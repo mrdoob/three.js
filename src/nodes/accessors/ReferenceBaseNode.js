@@ -137,7 +137,7 @@ class ReferenceBaseNode extends Node {
 
 export default ReferenceBaseNode;
 
-ReferenceBaseNode.type = /*#__PURE__*/ registerNode( 'ReferenceBase', ReferenceBaseNode );
+ReferenceBaseNode.type = /*@__PURE__*/ registerNode( 'ReferenceBase', ReferenceBaseNode );
 
 export const reference = ( name, type, object ) => nodeObject( new ReferenceBaseNode( name, type, object ) );
 export const referenceBuffer = ( name, type, count, object ) => nodeObject( new ReferenceBaseNode( name, type, object, count ) );

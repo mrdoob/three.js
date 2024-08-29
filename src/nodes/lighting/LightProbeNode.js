@@ -48,7 +48,7 @@ class LightProbeNode extends AnalyticLightNode {
 
 export default LightProbeNode;
 
-LightProbeNode.type = /*#__PURE__*/ registerNode( 'LightProbe', LightProbeNode );
+LightProbeNode.type = /*@__PURE__*/ registerNode( 'LightProbe', LightProbeNode );
 
 const shGetIrradianceAt = Fn( ( [ normal, shCoefficients ] ) => {
 

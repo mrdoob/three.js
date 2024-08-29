@@ -31,4 +31,4 @@ class IESSpotLightNode extends SpotLightNode {
 
 export default IESSpotLightNode;
 
-IESSpotLightNode.type = /*#__PURE__*/ registerNode( 'IESSpotLight', IESSpotLightNode );
+IESSpotLightNode.type = /*@__PURE__*/ registerNode( 'IESSpotLight', IESSpotLightNode );

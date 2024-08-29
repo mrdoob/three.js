@@ -351,4 +351,4 @@ class AnalyticLightNode extends LightingNode {
 
 export default AnalyticLightNode;
 
-AnalyticLightNode.type = /*#__PURE__*/ registerNode( 'AnalyticLight', AnalyticLightNode );
+AnalyticLightNode.type = /*@__PURE__*/ registerNode( 'AnalyticLight', AnalyticLightNode );

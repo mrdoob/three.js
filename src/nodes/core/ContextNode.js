@@ -64,9 +64,9 @@ class ContextNode extends Node {
 
 export default ContextNode;
 
-ContextNode.type = /*#__PURE__*/ registerNode( 'Context', ContextNode );
+ContextNode.type = /*@__PURE__*/ registerNode( 'Context', ContextNode );
 
-export const context = nodeProxy( ContextNode );
+export const context = /*@__PURE__*/ nodeProxy( ContextNode );
 export const label = ( node, name ) => context( node, { label: name } );
 
 addMethodChaining( 'context', context );

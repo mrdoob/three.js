@@ -31,6 +31,6 @@ class BufferNode extends UniformNode {
 
 export default BufferNode;
 
-BufferNode.type = /*#__PURE__*/ registerNode( 'Buffer', BufferNode );
+BufferNode.type = /*@__PURE__*/ registerNode( 'Buffer', BufferNode );
 
 export const buffer = ( value, type, count ) => nodeObject( new BufferNode( value, type, count ) );

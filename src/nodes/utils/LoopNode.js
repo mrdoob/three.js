@@ -191,7 +191,7 @@ class LoopNode extends Node {
 
 export default LoopNode;
 
-LoopNode.type = /*#__PURE__*/ registerNode( 'Loop', LoopNode );
+LoopNode.type = /*@__PURE__*/ registerNode( 'Loop', LoopNode );
 
 export const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();
 export const Continue = () => expression( 'continue' ).append();

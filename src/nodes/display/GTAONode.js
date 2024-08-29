@@ -239,7 +239,7 @@ class GTAONode extends TempNode {
 
 export default GTAONode;
 
-GTAONode.type = /*#__PURE__*/ registerNode( 'GTAO', GTAONode );
+GTAONode.type = /*@__PURE__*/ registerNode( 'GTAO', GTAONode );
 
 function generateMagicSquareNoise( size = 5 ) {
 

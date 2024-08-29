@@ -324,6 +324,6 @@ class FXAANode extends TempNode {
 
 export default FXAANode;
 
-FXAANode.type = /*#__PURE__*/ registerNode( 'FXAA', FXAANode );
+FXAANode.type = /*@__PURE__*/ registerNode( 'FXAA', FXAANode );
 
 export const fxaa = ( node ) => nodeObject( new FXAANode( convertToTexture( node ) ) );

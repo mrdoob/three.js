@@ -100,6 +100,6 @@ class StackNode extends Node {
 
 export default StackNode;
 
-StackNode.type = /*#__PURE__*/ registerNode( 'Stack', StackNode );
+StackNode.type = /*@__PURE__*/ registerNode( 'Stack', StackNode );
 
-export const stack = nodeProxy( StackNode );
+export const stack = /*@__PURE__*/ nodeProxy( StackNode );

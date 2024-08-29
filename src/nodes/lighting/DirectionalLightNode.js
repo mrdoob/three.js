@@ -32,4 +32,4 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 export default DirectionalLightNode;
 
-DirectionalLightNode.type = /*#__PURE__*/ registerNode( 'DirectionalLight', DirectionalLightNode );
+DirectionalLightNode.type = /*@__PURE__*/ registerNode( 'DirectionalLight', DirectionalLightNode );

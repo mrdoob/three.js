@@ -237,4 +237,4 @@ export const reflector = ( parameters ) => nodeObject( new ReflectorNode( parame
 
 export default ReflectorNode;
 
-ReflectorNode.type = /*#__PURE__*/ registerNode( 'Reflector', ReflectorNode );
+ReflectorNode.type = /*@__PURE__*/ registerNode( 'Reflector', ReflectorNode );

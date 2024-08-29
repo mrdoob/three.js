@@ -112,6 +112,6 @@ class RangeNode extends Node {
 
 export default RangeNode;
 
-RangeNode.type = /*#__PURE__*/ registerNode( 'Range', RangeNode );
+RangeNode.type = /*@__PURE__*/ registerNode( 'Range', RangeNode );
 
-export const range = nodeProxy( RangeNode );
+export const range = /*@__PURE__*/ nodeProxy( RangeNode );

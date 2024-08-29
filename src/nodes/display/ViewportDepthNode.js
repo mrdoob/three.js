@@ -94,7 +94,7 @@ ViewportDepthNode.LINEAR_DEPTH = 'linearDepth';
 
 export default ViewportDepthNode;
 
-ViewportDepthNode.type = /*#__PURE__*/ registerNode( 'ViewportDepth', ViewportDepthNode );
+ViewportDepthNode.type = /*@__PURE__*/ registerNode( 'ViewportDepth', ViewportDepthNode );
 
 // NOTE: viewZ, the z-coordinate in camera space, is negative for points in front of the camera
 
@@ -112,10 +112,10 @@ export const viewZToPerspectiveDepth = ( viewZ, near, far ) => near.add( viewZ )
 // maps perspective depth in [ 0, 1 ] to viewZ
 export const perspectiveDepthToViewZ = ( depth, near, far ) => near.mul( far ).div( far.sub( near ).mul( depth ).sub( far ) );
 
-const depthBase = nodeProxy( ViewportDepthNode, ViewportDepthNode.DEPTH_BASE );
+const depthBase = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.DEPTH_BASE );
 
-export const depth = nodeImmutable( ViewportDepthNode, ViewportDepthNode.DEPTH );
-export const linearDepth = nodeProxy( ViewportDepthNode, ViewportDepthNode.LINEAR_DEPTH );
+export const depth = /*@__PURE__*/ nodeImmutable( ViewportDepthNode, ViewportDepthNode.DEPTH );
+export const linearDepth = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.LINEAR_DEPTH );
 export const viewportLinearDepth = linearDepth( viewportDepthTexture() );
 
 depth.assign = ( value ) => depthBase( value );
