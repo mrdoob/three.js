@@ -243,7 +243,7 @@ class WebGPUBindingUtils {
 				} else {
 
 					const mipLevelCount = binding.store ? 1 : textureData.texture.mipLevelCount;
-					const propertyName = `view-${ mipLevelCount }`;
+					const propertyName = `view-${ textureData.texture.width }-${ textureData.texture.height }-${ mipLevelCount }`;
 
 					resourceGPU = textureData[ propertyName ];
 
