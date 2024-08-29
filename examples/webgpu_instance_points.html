@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, storage, Fn, instanceIndex, sin, timerLocal, float, uniform, attribute, vec3 } from 'three/tsl';
+			import { color, storage, Fn, instanceIndex, sin, timerLocal, float, uniform, attribute, mix, vec3 } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -76,19 +76,16 @@
 
 				backgroundNode = color( 0x222222 );
 
-				// Position and THREE.Color Data
-
 				effectController = {
 
 					pulseSpeed: uniform( 6 ),
-					oscillationSpeed: uniform( 0.01 ),
 					minWidth: uniform( 5 ),
 					maxWidth: uniform( 20 ),
-					width: 10,
-					instanceSize: true,
 					alphaToCoverage: true,
 
 				};
+
+				// Position and THREE.Color Data
 
 				const points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
@@ -147,8 +144,10 @@
 					alphaToCoverage: true,
 
 				} );
-
+			
 				material.pointSizeNode = attribute( 'instanceSize' );
+				const attributeRange = attribute( 'instanceSize' ).sub( 1 );
+				material.pointColorNode = mix( vec3( 0.0 ), attribute( 'instanceColor' ), attributeRange.div( float( effectController.maxWidth.sub( 1 ) ) ) );
 
 				const instancedPoints = new InstancedPoints( geometry, material );
 				instancedPoints.scale.set( 1, 1, 1 );
