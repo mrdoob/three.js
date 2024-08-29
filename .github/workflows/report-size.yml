@@ -190,16 +190,16 @@ jobs:
 
             _Full ESM build, minified and gzipped._
 
-            | Filesize `${{ github.ref_name }}` | Filesize PR | Diff |
-            |----------|---------|------|
-            | ${{ steps.format.outputs.WEBGL_FILESIZE_BASE }} (${{ steps.format.outputs.WEBGL_FILESIZE_BASE_GZIP }}) | ${{ steps.format.outputs.WEBGL_FILESIZE }} (${{ steps.format.outputs.WEBGL_FILESIZE_GZIP }}) | ${{ steps.format.outputs.WEBGL_FILESIZE_DIFF }} |
-            | ${{ steps.format.outputs.WEBGPU_FILESIZE_BASE }} (${{ steps.format.outputs.WEBGPU_FILESIZE_BASE_GZIP }}) | ${{ steps.format.outputs.WEBGPU_FILESIZE }} (${{ steps.format.outputs.WEBGPU_FILESIZE_GZIP }}) | ${{ steps.format.outputs.WEBGPU_FILESIZE_DIFF }} |
+            || Filesize `${{ github.ref_name }}` | Filesize PR | Diff |
+            |---|---|---|---|
+            | WebGLRenderer | ${{ steps.format.outputs.WEBGL_FILESIZE_BASE }} (${{ steps.format.outputs.WEBGL_FILESIZE_BASE_GZIP }}) | ${{ steps.format.outputs.WEBGL_FILESIZE }} (${{ steps.format.outputs.WEBGL_FILESIZE_GZIP }}) | ${{ steps.format.outputs.WEBGL_FILESIZE_DIFF }} |
+            | WebGPURenderer | ${{ steps.format.outputs.WEBGPU_FILESIZE_BASE }} (${{ steps.format.outputs.WEBGPU_FILESIZE_BASE_GZIP }}) | ${{ steps.format.outputs.WEBGPU_FILESIZE }} (${{ steps.format.outputs.WEBGPU_FILESIZE_GZIP }}) | ${{ steps.format.outputs.WEBGPU_FILESIZE_DIFF }} |
 
             ### 🌳 Bundle size after tree-shaking
 
             _Minimal build including a renderer, camera, empty scene, and dependencies._
 
-            | Filesize `${{ github.ref_name }}` | Filesize PR | Diff |
-            |----------|---------|------|
-            | ${{ steps.format.outputs.WEBGL_TREESHAKEN_BASE }} (${{ steps.format.outputs.WEBGL_TREESHAKEN_BASE_GZIP }}) | ${{ steps.format.outputs.WEBGL_TREESHAKEN }} (${{ steps.format.outputs.WEBGL_TREESHAKEN_GZIP }}) | ${{ steps.format.outputs.WEBGL_TREESHAKEN_DIFF }} |
-            | ${{ steps.format.outputs.WEBGPU_TREESHAKEN_BASE }} (${{ steps.format.outputs.WEBGPU_TREESHAKEN_BASE_GZIP }}) | ${{ steps.format.outputs.WEBGPU_TREESHAKEN }} (${{ steps.format.outputs.WEBGPU_TREESHAKEN_GZIP }}) | ${{ steps.format.outputs.WEBGPU_TREESHAKEN_DIFF }} |
+            || Filesize `${{ github.ref_name }}` | Filesize PR | Diff |
+            |---|---|---|---|
+            | WebGLRenderer | ${{ steps.format.outputs.WEBGL_TREESHAKEN_BASE }} (${{ steps.format.outputs.WEBGL_TREESHAKEN_BASE_GZIP }}) | ${{ steps.format.outputs.WEBGL_TREESHAKEN }} (${{ steps.format.outputs.WEBGL_TREESHAKEN_GZIP }}) | ${{ steps.format.outputs.WEBGL_TREESHAKEN_DIFF }} |
+            | WebGPURenderer | ${{ steps.format.outputs.WEBGPU_TREESHAKEN_BASE }} (${{ steps.format.outputs.WEBGPU_TREESHAKEN_BASE_GZIP }}) | ${{ steps.format.outputs.WEBGPU_TREESHAKEN }} (${{ steps.format.outputs.WEBGPU_TREESHAKEN_GZIP }}) | ${{ steps.format.outputs.WEBGPU_TREESHAKEN_DIFF }} |
