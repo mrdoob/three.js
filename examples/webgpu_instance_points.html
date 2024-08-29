@@ -79,8 +79,8 @@
 				effectController = {
 
 					pulseSpeed: uniform( 6 ),
-					minWidth: uniform( 5 ),
-					maxWidth: uniform( 20 ),
+					minWidth: uniform( 6 ),
+					maxWidth: uniform( 12 ),
 					alphaToCoverage: true,
 
 				};
@@ -144,9 +144,10 @@
 					alphaToCoverage: true,
 
 				} );
-			
-				material.pointSizeNode = attribute( 'instanceSize' );
+
 				const attributeRange = attribute( 'instanceSize' ).sub( 1 );
+
+				material.pointWidthNode = attribute( 'instanceSize' );
 				material.pointColorNode = mix( vec3( 0.0 ), attribute( 'instanceColor' ), attributeRange.div( float( effectController.maxWidth.sub( 1 ) ) ) );
 
 				const instancedPoints = new InstancedPoints( geometry, material );

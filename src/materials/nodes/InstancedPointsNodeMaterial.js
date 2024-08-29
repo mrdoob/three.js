@@ -30,7 +30,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		this.pointColorNode = null;
 
-		this.pointSizeNode = null;
+		this.pointWidthNode = null;
 
 		this.setDefaultValues( _defaultValues );
 
@@ -73,7 +73,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			const offset = property( 'vec2', 'offset' );
 			offset.assign( positionGeometry.xy );
 
-			offset.mulAssign( this.pointSizeNode ? this.pointSizeNode : materialPointWidth );
+			offset.mulAssign( this.pointWidthNode ? this.pointWidthNode : materialPointWidth );
 
 			offset.assign( offset.div( viewport.z ) );
 			offset.y.assign( offset.y.mul( aspect ) );
