@@ -1260,7 +1260,7 @@ class WebGPUBackend extends Backend {
 		renderContextData._currentPass = renderContextData.currentPass;
 		renderContextData._currentSets = renderContextData.currentSets;
 
-		renderContextData.currentSets = { attributes: {},  bindingGroups: [], pipeline: null, index: null };
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 		renderContextData.currentPass = this.pipelineUtils.createBundleEncoder( renderContext );
 
 	}
