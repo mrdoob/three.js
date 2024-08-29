@@ -24276,6 +24276,7 @@ function getCacheKey$1( object, force = false ) {
 	if ( object.isNode === true ) {
 
 		cacheKey += object.id;
+		object = object.getSelf();
 
 	}
 
@@ -24517,7 +24518,7 @@ const defaultBuildStages = [ 'setup', 'analyze', 'generate' ];
 const shaderStages = [ ...defaultShaderStages, 'compute' ];
 const vectorComponents = [ 'x', 'y', 'z', 'w' ];
 
-const NodeClasses = new Map();
+const Nodes$1 = new Map();
 
 let _nodeId = 0;
 
@@ -25047,34 +25048,39 @@ class Node extends EventDispatcher {
 
 }
 
-function registerNodeClass( type, nodeClass ) {
+Node.type = /*@__PURE__*/ registerNode( '', Node );
 
-	const nodeType = type + 'Node';
+function registerNode( type, nodeClass ) {
 
-	if ( typeof nodeClass !== 'function' || ! type ) throw new Error( `TSL.Node: Node class ${ type } is not a class` );
+	const suffix = 'Node';
+	const nodeType = type + suffix;
 
-	if ( NodeClasses.has( nodeType ) ) {
+	if ( typeof nodeClass !== 'function' ) throw new Error( `TSL.Node: Node class ${ type } is not a class` );
+
+	if ( Nodes$1.has( nodeType ) ) {
 
 		console.warn( `TSL.Node: Redefinition of node class ${ nodeType }` );
 		return;
 
 	}
 
-	if ( type.slice( - 4 ) === 'Node' ) {
+	if ( type.slice( - suffix.length ) === suffix ) {
 
-		console.warn( `TSL.Node: Node class ${ nodeType } should not have 'Node' suffix.` );
+		console.warn( `TSL.Node: Node class ${ nodeType } should not have '${ suffix }' suffix.` );
 		return;
 
 	}
 
-	NodeClasses.set( nodeType, nodeClass );
+	Nodes$1.set( nodeType, nodeClass );
 	nodeClass.type = nodeType;
+
+	return nodeType;
 
 }
 
 function createNodeFromType( type ) {
 
-	const Class = NodeClasses.get( type );
+	const Class = Nodes$1.get( type );
 
 	if ( Class !== undefined ) {
 
@@ -25114,7 +25120,7 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 }
 
-registerNodeClass( 'ArrayElement', ArrayElementNode );
+ArrayElementNode.type = /*@__PURE__*/ registerNode( 'ArrayElement', ArrayElementNode );
 
 class ConvertNode extends Node {
 
@@ -25176,7 +25182,7 @@ class ConvertNode extends Node {
 
 }
 
-registerNodeClass( 'Convert', ConvertNode );
+ConvertNode.type = /*@__PURE__*/ registerNode( 'Convert', ConvertNode );
 
 class TempNode extends Node {
 
@@ -25231,7 +25237,7 @@ class TempNode extends Node {
 
 }
 
-registerNodeClass( 'Temp', TempNode );
+TempNode.type = /*@__PURE__*/ registerNode( 'Temp', TempNode );
 
 class JoinNode extends TempNode {
 
@@ -25288,7 +25294,7 @@ class JoinNode extends TempNode {
 
 }
 
-registerNodeClass( 'Join', JoinNode );
+JoinNode.type = /*@__PURE__*/ registerNode( 'Join', JoinNode );
 
 const stringVectorComponents = vectorComponents.join( '' );
 
@@ -25396,7 +25402,7 @@ class SplitNode extends Node {
 
 }
 
-registerNodeClass( 'Split', SplitNode );
+SplitNode.type = /*@__PURE__*/ registerNode( 'Split', SplitNode );
 
 class SetNode extends TempNode {
 
@@ -25453,7 +25459,7 @@ class SetNode extends TempNode {
 
 }
 
-registerNodeClass( 'Set', SetNode );
+SetNode.type = /*@__PURE__*/ registerNode( 'Set', SetNode );
 
 class FlipNode extends TempNode {
 
@@ -25513,7 +25519,7 @@ class FlipNode extends TempNode {
 
 }
 
-registerNodeClass( 'Flip', FlipNode );
+FlipNode.type = /*@__PURE__*/ registerNode( 'Flip', FlipNode );
 
 class InputNode extends Node {
 
@@ -25592,7 +25598,7 @@ class InputNode extends Node {
 
 }
 
-registerNodeClass( 'Input', InputNode );
+InputNode.type = /*@__PURE__*/ registerNode( 'Input', InputNode );
 
 class ConstNode extends InputNode {
 
@@ -25620,7 +25626,7 @@ class ConstNode extends InputNode {
 
 }
 
-registerNodeClass( 'Const', ConstNode );
+ConstNode.type = /*@__PURE__*/ registerNode( 'Const', ConstNode );
 
 //
 
@@ -26260,7 +26266,7 @@ addMethodChaining( 'toMat4', mat4 );
 
 // basic nodes
 
-const element = nodeProxy( ArrayElementNode );
+const element = /*@__PURE__*/ nodeProxy( ArrayElementNode );
 const convert = ( node, types ) => nodeObject( new ConvertNode( nodeObject( node ), types ) );
 const split = ( node, channels ) => nodeObject( new SplitNode( nodeObject( node ), channels ) );
 
@@ -26310,14 +26316,14 @@ class UniformGroupNode extends Node {
 
 }
 
-registerNodeClass( 'UniformGroup', UniformGroupNode );
+UniformGroupNode.type = /*@__PURE__*/ registerNode( 'UniformGroup', UniformGroupNode );
 
 const uniformGroup = ( name ) => new UniformGroupNode( name );
 const sharedUniformGroup = ( name ) => new UniformGroupNode( name, true );
 
-const frameGroup = sharedUniformGroup( 'frame' );
-const renderGroup = sharedUniformGroup( 'render' );
-const objectGroup = uniformGroup( 'object' );
+const frameGroup = /*@__PURE__*/ sharedUniformGroup( 'frame' );
+const renderGroup = /*@__PURE__*/ sharedUniformGroup( 'render' );
+const objectGroup = /*@__PURE__*/ uniformGroup( 'object' );
 
 class UniformNode extends InputNode {
 
@@ -26409,7 +26415,7 @@ class UniformNode extends InputNode {
 
 }
 
-registerNodeClass( 'Uniform', UniformNode );
+UniformNode.type = /*@__PURE__*/ registerNode( 'Uniform', UniformNode );
 
 const uniform = ( arg1, arg2 ) => {
 
@@ -26468,39 +26474,39 @@ class PropertyNode extends Node {
 
 }
 
-registerNodeClass( 'Property', PropertyNode );
+PropertyNode.type = /*@__PURE__*/ registerNode( 'Property', PropertyNode );
 
 const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
 const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( type, name, true ) );
 
-const diffuseColor = nodeImmutable( PropertyNode, 'vec4', 'DiffuseColor' );
-const emissive = nodeImmutable( PropertyNode, 'vec3', 'EmissiveColor' );
-const roughness = nodeImmutable( PropertyNode, 'float', 'Roughness' );
-const metalness = nodeImmutable( PropertyNode, 'float', 'Metalness' );
-const clearcoat = nodeImmutable( PropertyNode, 'float', 'Clearcoat' );
-const clearcoatRoughness = nodeImmutable( PropertyNode, 'float', 'ClearcoatRoughness' );
-const sheen = nodeImmutable( PropertyNode, 'vec3', 'Sheen' );
-const sheenRoughness = nodeImmutable( PropertyNode, 'float', 'SheenRoughness' );
-const iridescence = nodeImmutable( PropertyNode, 'float', 'Iridescence' );
-const iridescenceIOR = nodeImmutable( PropertyNode, 'float', 'IridescenceIOR' );
-const iridescenceThickness = nodeImmutable( PropertyNode, 'float', 'IridescenceThickness' );
-const alphaT = nodeImmutable( PropertyNode, 'float', 'AlphaT' );
-const anisotropy = nodeImmutable( PropertyNode, 'float', 'Anisotropy' );
-const anisotropyT = nodeImmutable( PropertyNode, 'vec3', 'AnisotropyT' );
-const anisotropyB = nodeImmutable( PropertyNode, 'vec3', 'AnisotropyB' );
-const specularColor = nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
-const specularF90 = nodeImmutable( PropertyNode, 'float', 'SpecularF90' );
-const shininess = nodeImmutable( PropertyNode, 'float', 'Shininess' );
-const output = nodeImmutable( PropertyNode, 'vec4', 'Output' );
-const dashSize = nodeImmutable( PropertyNode, 'float', 'dashSize' );
-const gapSize = nodeImmutable( PropertyNode, 'float', 'gapSize' );
-const pointWidth = nodeImmutable( PropertyNode, 'float', 'pointWidth' );
-const ior = nodeImmutable( PropertyNode, 'float', 'IOR' );
-const transmission = nodeImmutable( PropertyNode, 'float', 'Transmission' );
-const thickness = nodeImmutable( PropertyNode, 'float', 'Thickness' );
-const attenuationDistance = nodeImmutable( PropertyNode, 'float', 'AttenuationDistance' );
-const attenuationColor = nodeImmutable( PropertyNode, 'color', 'AttenuationColor' );
-const dispersion = nodeImmutable( PropertyNode, 'float', 'Dispersion' );
+const diffuseColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'DiffuseColor' );
+const emissive = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'EmissiveColor' );
+const roughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Roughness' );
+const metalness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Metalness' );
+const clearcoat = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Clearcoat' );
+const clearcoatRoughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'ClearcoatRoughness' );
+const sheen = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'Sheen' );
+const sheenRoughness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'SheenRoughness' );
+const iridescence = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Iridescence' );
+const iridescenceIOR = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'IridescenceIOR' );
+const iridescenceThickness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'IridescenceThickness' );
+const alphaT = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'AlphaT' );
+const anisotropy = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Anisotropy' );
+const anisotropyT = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'AnisotropyT' );
+const anisotropyB = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec3', 'AnisotropyB' );
+const specularColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'SpecularColor' );
+const specularF90 = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'SpecularF90' );
+const shininess = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Shininess' );
+const output = /*@__PURE__*/ nodeImmutable( PropertyNode, 'vec4', 'Output' );
+const dashSize = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'dashSize' );
+const gapSize = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'gapSize' );
+const pointWidth = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'pointWidth' );
+const ior = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'IOR' );
+const transmission = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Transmission' );
+const thickness = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Thickness' );
+const attenuationDistance = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'AttenuationDistance' );
+const attenuationColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'AttenuationColor' );
+const dispersion = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Dispersion' );
 
 class AssignNode extends TempNode {
 
@@ -26618,9 +26624,9 @@ class AssignNode extends TempNode {
 
 }
 
-registerNodeClass( 'Assign', AssignNode );
+AssignNode.type = /*@__PURE__*/ registerNode( 'Assign', AssignNode );
 
-const assign = nodeProxy( AssignNode );
+const assign = /*@__PURE__*/ nodeProxy( AssignNode );
 
 addMethodChaining( 'assign', assign );
 
@@ -26703,7 +26709,7 @@ class FunctionCallNode extends TempNode {
 
 }
 
-registerNodeClass( 'FunctionCall', FunctionCallNode );
+FunctionCallNode.type = /*@__PURE__*/ registerNode( 'FunctionCall', FunctionCallNode );
 
 const call = ( func, ...params ) => {
 
@@ -26970,29 +26976,29 @@ class OperatorNode extends TempNode {
 
 }
 
-registerNodeClass( 'Operator', OperatorNode );
+OperatorNode.type = /*@__PURE__*/ registerNode( 'Operator', OperatorNode );
 
-const add = nodeProxy( OperatorNode, '+' );
-const sub = nodeProxy( OperatorNode, '-' );
-const mul = nodeProxy( OperatorNode, '*' );
-const div = nodeProxy( OperatorNode, '/' );
-const modInt = nodeProxy( OperatorNode, '%' );
-const equal = nodeProxy( OperatorNode, '==' );
-const notEqual = nodeProxy( OperatorNode, '!=' );
-const lessThan = nodeProxy( OperatorNode, '<' );
-const greaterThan = nodeProxy( OperatorNode, '>' );
-const lessThanEqual = nodeProxy( OperatorNode, '<=' );
-const greaterThanEqual = nodeProxy( OperatorNode, '>=' );
-const and = nodeProxy( OperatorNode, '&&' );
-const or = nodeProxy( OperatorNode, '||' );
-const not = nodeProxy( OperatorNode, '!' );
-const xor = nodeProxy( OperatorNode, '^^' );
-const bitAnd = nodeProxy( OperatorNode, '&' );
-const bitNot = nodeProxy( OperatorNode, '~' );
-const bitOr = nodeProxy( OperatorNode, '|' );
-const bitXor = nodeProxy( OperatorNode, '^' );
-const shiftLeft = nodeProxy( OperatorNode, '<<' );
-const shiftRight = nodeProxy( OperatorNode, '>>' );
+const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' );
+const sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' );
+const mul = /*@__PURE__*/ nodeProxy( OperatorNode, '*' );
+const div = /*@__PURE__*/ nodeProxy( OperatorNode, '/' );
+const modInt = /*@__PURE__*/ nodeProxy( OperatorNode, '%' );
+const equal = /*@__PURE__*/ nodeProxy( OperatorNode, '==' );
+const notEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '!=' );
+const lessThan = /*@__PURE__*/ nodeProxy( OperatorNode, '<' );
+const greaterThan = /*@__PURE__*/ nodeProxy( OperatorNode, '>' );
+const lessThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '<=' );
+const greaterThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '>=' );
+const and = /*@__PURE__*/ nodeProxy( OperatorNode, '&&' );
+const or = /*@__PURE__*/ nodeProxy( OperatorNode, '||' );
+const not = /*@__PURE__*/ nodeProxy( OperatorNode, '!' );
+const xor = /*@__PURE__*/ nodeProxy( OperatorNode, '^^' );
+const bitAnd = /*@__PURE__*/ nodeProxy( OperatorNode, '&' );
+const bitNot = /*@__PURE__*/ nodeProxy( OperatorNode, '~' );
+const bitOr = /*@__PURE__*/ nodeProxy( OperatorNode, '|' );
+const bitXor = /*@__PURE__*/ nodeProxy( OperatorNode, '^' );
+const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' );
+const shiftRight = /*@__PURE__*/ nodeProxy( OperatorNode, '>>' );
 
 addMethodChaining( 'add', add );
 addMethodChaining( 'sub', sub );
@@ -27285,75 +27291,75 @@ MathNode.REFRACT = 'refract';
 MathNode.SMOOTHSTEP = 'smoothstep';
 MathNode.FACEFORWARD = 'faceforward';
 
-registerNodeClass( 'Math', MathNode );
+MathNode.type = /*@__PURE__*/ registerNode( 'Math', MathNode );
 
-const EPSILON = float( 1e-6 );
-const INFINITY = float( 1e6 );
-const PI = float( Math.PI );
-const PI2 = float( Math.PI * 2 );
+const EPSILON = /*@__PURE__*/ float( 1e-6 );
+const INFINITY = /*@__PURE__*/ float( 1e6 );
+const PI = /*@__PURE__*/ float( Math.PI );
+const PI2 = /*@__PURE__*/ float( Math.PI * 2 );
 
-const all = nodeProxy( MathNode, MathNode.ALL );
-const any = nodeProxy( MathNode, MathNode.ANY );
-const equals = nodeProxy( MathNode, MathNode.EQUALS );
+const all = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ALL );
+const any = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ANY );
+const equals = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EQUALS );
 
-const radians = nodeProxy( MathNode, MathNode.RADIANS );
-const degrees = nodeProxy( MathNode, MathNode.DEGREES );
-const exp = nodeProxy( MathNode, MathNode.EXP );
-const exp2 = nodeProxy( MathNode, MathNode.EXP2 );
-const log = nodeProxy( MathNode, MathNode.LOG );
-const log2 = nodeProxy( MathNode, MathNode.LOG2 );
-const sqrt = nodeProxy( MathNode, MathNode.SQRT );
-const inverseSqrt = nodeProxy( MathNode, MathNode.INVERSE_SQRT );
-const floor = nodeProxy( MathNode, MathNode.FLOOR );
-const ceil = nodeProxy( MathNode, MathNode.CEIL );
-const normalize = nodeProxy( MathNode, MathNode.NORMALIZE );
-const fract = nodeProxy( MathNode, MathNode.FRACT );
-const sin = nodeProxy( MathNode, MathNode.SIN );
-const cos = nodeProxy( MathNode, MathNode.COS );
-const tan = nodeProxy( MathNode, MathNode.TAN );
-const asin = nodeProxy( MathNode, MathNode.ASIN );
-const acos = nodeProxy( MathNode, MathNode.ACOS );
-const atan = nodeProxy( MathNode, MathNode.ATAN );
-const abs = nodeProxy( MathNode, MathNode.ABS );
-const sign = nodeProxy( MathNode, MathNode.SIGN );
-const length = nodeProxy( MathNode, MathNode.LENGTH );
-const negate = nodeProxy( MathNode, MathNode.NEGATE );
-const oneMinus = nodeProxy( MathNode, MathNode.ONE_MINUS );
-const dFdx = nodeProxy( MathNode, MathNode.DFDX );
-const dFdy = nodeProxy( MathNode, MathNode.DFDY );
-const round = nodeProxy( MathNode, MathNode.ROUND );
-const reciprocal = nodeProxy( MathNode, MathNode.RECIPROCAL );
-const trunc = nodeProxy( MathNode, MathNode.TRUNC );
-const fwidth = nodeProxy( MathNode, MathNode.FWIDTH );
-const bitcast = nodeProxy( MathNode, MathNode.BITCAST );
-const transpose = nodeProxy( MathNode, MathNode.TRANSPOSE );
+const radians = /*@__PURE__*/ nodeProxy( MathNode, MathNode.RADIANS );
+const degrees = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DEGREES );
+const exp = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EXP );
+const exp2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EXP2 );
+const log = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LOG );
+const log2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LOG2 );
+const sqrt = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SQRT );
+const inverseSqrt = /*@__PURE__*/ nodeProxy( MathNode, MathNode.INVERSE_SQRT );
+const floor = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FLOOR );
+const ceil = /*@__PURE__*/ nodeProxy( MathNode, MathNode.CEIL );
+const normalize = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NORMALIZE );
+const fract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FRACT );
+const sin = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SIN );
+const cos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.COS );
+const tan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TAN );
+const asin = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ASIN );
+const acos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ACOS );
+const atan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ATAN );
+const abs = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ABS );
+const sign = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SIGN );
+const length = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LENGTH );
+const negate = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NEGATE );
+const oneMinus = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ONE_MINUS );
+const dFdx = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DFDX );
+const dFdy = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DFDY );
+const round = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ROUND );
+const reciprocal = /*@__PURE__*/ nodeProxy( MathNode, MathNode.RECIPROCAL );
+const trunc = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRUNC );
+const fwidth = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FWIDTH );
+const bitcast = /*@__PURE__*/ nodeProxy( MathNode, MathNode.BITCAST );
+const transpose = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRANSPOSE );
 
-const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
-const min$1 = nodeProxy( MathNode, MathNode.MIN );
-const max$1 = nodeProxy( MathNode, MathNode.MAX );
-const mod = nodeProxy( MathNode, MathNode.MOD );
-const step = nodeProxy( MathNode, MathNode.STEP );
-const reflect = nodeProxy( MathNode, MathNode.REFLECT );
-const distance = nodeProxy( MathNode, MathNode.DISTANCE );
-const difference = nodeProxy( MathNode, MathNode.DIFFERENCE );
-const dot = nodeProxy( MathNode, MathNode.DOT );
-const cross = nodeProxy( MathNode, MathNode.CROSS );
-const pow = nodeProxy( MathNode, MathNode.POW );
-const pow2 = nodeProxy( MathNode, MathNode.POW, 2 );
-const pow3 = nodeProxy( MathNode, MathNode.POW, 3 );
-const pow4 = nodeProxy( MathNode, MathNode.POW, 4 );
-const transformDirection = nodeProxy( MathNode, MathNode.TRANSFORM_DIRECTION );
+const atan2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ATAN2 );
+const min$1 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIN );
+const max$1 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MAX );
+const mod = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MOD );
+const step = /*@__PURE__*/ nodeProxy( MathNode, MathNode.STEP );
+const reflect = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFLECT );
+const distance = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DISTANCE );
+const difference = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DIFFERENCE );
+const dot = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DOT );
+const cross = /*@__PURE__*/ nodeProxy( MathNode, MathNode.CROSS );
+const pow = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW );
+const pow2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 2 );
+const pow3 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 3 );
+const pow4 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 4 );
+const transformDirection = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRANSFORM_DIRECTION );
 
 const cbrt = ( a ) => mul( sign( a ), pow( abs( a ), 1.0 / 3.0 ) );
 const lengthSq = ( a ) => dot( a, a );
-const mix = nodeProxy( MathNode, MathNode.MIX );
+const mix = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIX );
 const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) ) );
 const saturate = ( value ) => clamp( value );
-const refract = nodeProxy( MathNode, MathNode.REFRACT );
-const smoothstep = nodeProxy( MathNode, MathNode.SMOOTHSTEP );
-const faceForward = nodeProxy( MathNode, MathNode.FACEFORWARD );
+const refract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFRACT );
+const smoothstep = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SMOOTHSTEP );
+const faceForward = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FACEFORWARD );
 
-const rand = Fn( ( [ uv ] ) => {
+const rand = /*@__PURE__*/ Fn( ( [ uv ] ) => {
 
 	const a = 12.9898, b = 78.233, c = 43758.5453;
 	const dt = dot( uv.xy, vec2( a, b ) ), sn = mod( dt, PI );
@@ -27541,9 +27547,9 @@ class ConditionalNode extends Node {
 
 }
 
-registerNodeClass( 'Conditional', ConditionalNode );
+ConditionalNode.type = /*@__PURE__*/ registerNode( 'Conditional', ConditionalNode );
 
-const select = nodeProxy( ConditionalNode );
+const select = /*@__PURE__*/ nodeProxy( ConditionalNode );
 
 addMethodChaining( 'select', select );
 
@@ -27619,9 +27625,9 @@ class ContextNode extends Node {
 
 }
 
-registerNodeClass( 'Context', ContextNode );
+ContextNode.type = /*@__PURE__*/ registerNode( 'Context', ContextNode );
 
-const context = nodeProxy( ContextNode );
+const context = /*@__PURE__*/ nodeProxy( ContextNode );
 const label = ( node, name ) => context( node, { label: name } );
 
 addMethodChaining( 'context', context );
@@ -27672,9 +27678,9 @@ class VarNode extends Node {
 
 }
 
-registerNodeClass( 'Var', VarNode );
+VarNode.type = /*@__PURE__*/ registerNode( 'Var', VarNode );
 
-const temp = nodeProxy( VarNode );
+const temp = /*@__PURE__*/ nodeProxy( VarNode );
 
 addMethodChaining( 'temp', temp ); // @TODO: Will be removed in the future
 addMethodChaining( 'toVar', ( ...params ) => temp( ...params ).append() );
@@ -27772,9 +27778,9 @@ class VaryingNode extends Node {
 
 }
 
-registerNodeClass( 'Varying', VaryingNode );
+VaryingNode.type = /*@__PURE__*/ registerNode( 'Varying', VaryingNode );
 
-const varying = nodeProxy( VaryingNode );
+const varying = /*@__PURE__*/ nodeProxy( VaryingNode );
 
 addMethodChaining( 'varying', varying );
 
@@ -27804,28 +27810,31 @@ const getColorSpaceMethod = ( source, target ) => {
 
 class ColorSpaceNode extends TempNode {
 
-	constructor( colorSpace, colorNode ) {
+	constructor( colorNode, target = null, source = null ) {
 
 		super( 'vec4' );
 
-		this.colorSpace = colorSpace;
 		this.colorNode = colorNode;
+		this.target = target;
+		this.source = source;
 
 	}
 
 	setup( builder ) {
 
-		const { colorSpace, colorNode } = this;
+		const { renderer, context } = builder;
 
-		if ( colorSpace === ColorSpaceNode.LINEAR_TO_LINEAR ) {
+		const source = this.source || context.outputColorSpace || renderer.outputColorSpace;
+		const target = this.target || context.outputColorSpace || renderer.outputColorSpace;
+		const colorNode = this.colorNode;
 
-			return colorNode;
+		if ( source === target ) return colorNode;
 
-		}
+		const colorSpace = getColorSpaceMethod( source, target );
 
 		let outputNode = null;
 
-		const colorSpaceFn = builder.renderer.nodes.library.getColorSpaceFunction( colorSpace );
+		const colorSpaceFn = renderer.nodes.library.getColorSpaceFunction( colorSpace );
 
 		if ( colorSpaceFn !== null ) {
 
@@ -27845,15 +27854,13 @@ class ColorSpaceNode extends TempNode {
 
 }
 
-ColorSpaceNode.LINEAR_TO_LINEAR = 'LinearToLinear';
+ColorSpaceNode.type = /*@__PURE__*/ registerNode( 'ColorSpace', ColorSpaceNode );
 
-registerNodeClass( 'ColorSpace', ColorSpaceNode );
+const linearSRGBToColorSpace = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), colorSpace, LinearSRGBColorSpace ) );
+const colorSpaceToLinearSRGB = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), LinearSRGBColorSpace, colorSpace ) );
 
-const linearToColorSpace = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( getColorSpaceMethod( LinearSRGBColorSpace, colorSpace ), nodeObject( node ) ) );
-const colorSpaceToLinear = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( getColorSpaceMethod( colorSpace, LinearSRGBColorSpace ), nodeObject( node ) ) );
-
-addMethodChaining( 'linearToColorSpace', linearToColorSpace );
-addMethodChaining( 'colorSpaceToLinear', colorSpaceToLinear );
+addMethodChaining( 'linearSRGBToColorSpace', linearSRGBToColorSpace );
+addMethodChaining( 'colorSpaceToLinearSRGB', colorSpaceToLinearSRGB );
 
 let ReferenceElementNode$1 = class ReferenceElementNode extends ArrayElementNode {
 
@@ -27986,7 +27993,7 @@ class ReferenceBaseNode extends Node {
 
 }
 
-registerNodeClass( 'ReferenceBase', ReferenceBaseNode );
+ReferenceBaseNode.type = /*@__PURE__*/ registerNode( 'ReferenceBase', ReferenceBaseNode );
 
 class RendererReferenceNode extends ReferenceBaseNode {
 
@@ -28008,7 +28015,7 @@ class RendererReferenceNode extends ReferenceBaseNode {
 
 }
 
-registerNodeClass( 'RendererReference', RendererReferenceNode );
+RendererReferenceNode.type = /*@__PURE__*/ registerNode( 'RendererReference', RendererReferenceNode );
 
 const rendererReference = ( name, type, renderer ) => nodeObject( new RendererReferenceNode( name, type, renderer ) );
 
@@ -28063,7 +28070,7 @@ class ToneMappingNode extends TempNode {
 
 }
 
-registerNodeClass( 'ToneMapping', ToneMappingNode );
+ToneMappingNode.type = /*@__PURE__*/ registerNode( 'ToneMapping', ToneMappingNode );
 
 const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) ) );
 const toneMappingExposure = /*@__PURE__*/ rendererReference( 'toneMappingExposure', 'float' );
@@ -28212,7 +28219,7 @@ class BufferAttributeNode extends InputNode {
 
 }
 
-registerNodeClass( 'BufferAttribute', BufferAttributeNode );
+BufferAttributeNode.type = /*@__PURE__*/ registerNode( 'BufferAttribute', BufferAttributeNode );
 
 const bufferAttribute = ( array, type, stride, offset ) => nodeObject( new BufferAttributeNode( array, type, stride, offset ) );
 const dynamicBufferAttribute = ( array, type, stride, offset ) => bufferAttribute( array, type, stride, offset ).setUsage( DynamicDrawUsage );
@@ -28296,7 +28303,7 @@ class ComputeNode extends Node {
 
 }
 
-registerNodeClass( 'Compute', ComputeNode );
+ComputeNode.type = /*@__PURE__*/ registerNode( 'Compute', ComputeNode );
 
 const compute = ( node, count, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
 
@@ -28338,7 +28345,7 @@ class CacheNode extends Node {
 
 }
 
-registerNodeClass( 'Cache', CacheNode );
+CacheNode.type = /*@__PURE__*/ registerNode( 'Cache', CacheNode );
 
 const cache = ( node, ...params ) => nodeObject( new CacheNode( nodeObject( node ), ...params ) );
 
@@ -28379,9 +28386,9 @@ class BypassNode extends Node {
 
 }
 
-registerNodeClass( 'Bypass', BypassNode );
+BypassNode.type = /*@__PURE__*/ registerNode( 'Bypass', BypassNode );
 
-const bypass = nodeProxy( BypassNode );
+const bypass = /*@__PURE__*/ nodeProxy( BypassNode );
 
 addMethodChaining( 'bypass', bypass );
 
@@ -28415,10 +28422,10 @@ class RemapNode extends Node {
 
 }
 
-registerNodeClass( 'Remap', RemapNode );
+RemapNode.type = /*@__PURE__*/ registerNode( 'Remap', RemapNode );
 
-const remap = nodeProxy( RemapNode, null, null, { doClamp: false } );
-const remapClamp = nodeProxy( RemapNode );
+const remap = /*@__PURE__*/ nodeProxy( RemapNode, null, null, { doClamp: false } );
+const remapClamp = /*@__PURE__*/ nodeProxy( RemapNode );
 
 addMethodChaining( 'remap', remap );
 addMethodChaining( 'remapClamp', remapClamp );
@@ -28452,9 +28459,9 @@ class ExpressionNode extends Node {
 
 }
 
-registerNodeClass( 'Expression', ExpressionNode );
+ExpressionNode.type = /*@__PURE__*/ registerNode( 'Expression', ExpressionNode );
 
-const expression = nodeProxy( ExpressionNode );
+const expression = /*@__PURE__*/ nodeProxy( ExpressionNode );
 
 const Discard = ( conditional ) => ( conditional ? select( conditional, expression( 'discard' ) ) : expression( 'discard' ) ).append();
 const Return = () => expression( 'return' ).append();
@@ -28494,7 +28501,7 @@ class RenderOutputNode extends TempNode {
 
 		if ( outputColorSpace === SRGBColorSpace ) {
 
-			outputNode = outputNode.linearToColorSpace( outputColorSpace );
+			outputNode = outputNode.linearSRGBToColorSpace( outputColorSpace );
 
 		}
 
@@ -28504,7 +28511,7 @@ class RenderOutputNode extends TempNode {
 
 }
 
-registerNodeClass( 'RenderOutput', RenderOutputNode );
+RenderOutputNode.type = /*@__PURE__*/ registerNode( 'RenderOutput', RenderOutputNode );
 
 const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => nodeObject( new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace ) );
 
@@ -28633,7 +28640,7 @@ class AttributeNode extends Node {
 
 }
 
-registerNodeClass( 'Attribute', AttributeNode );
+AttributeNode.type = /*@__PURE__*/ registerNode( 'Attribute', AttributeNode );
 
 const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
 
@@ -28663,9 +28670,9 @@ class TextureSizeNode extends Node {
 
 }
 
-registerNodeClass( 'TextureSize', TextureSizeNode );
+TextureSizeNode.type = /*@__PURE__*/ registerNode( 'TextureSize', TextureSizeNode );
 
-const textureSize = nodeProxy( TextureSizeNode );
+const textureSize = /*@__PURE__*/ nodeProxy( TextureSizeNode );
 
 class MaxMipLevelNode extends UniformNode {
 
@@ -28709,9 +28716,9 @@ class MaxMipLevelNode extends UniformNode {
 
 }
 
-registerNodeClass( 'MaxMipLevel', MaxMipLevelNode );
+MaxMipLevelNode.type = /*@__PURE__*/ registerNode( 'MaxMipLevel', MaxMipLevelNode );
 
-const maxMipLevel = nodeProxy( MaxMipLevelNode );
+const maxMipLevel = /*@__PURE__*/ nodeProxy( MaxMipLevelNode );
 
 class TextureNode extends UniformNode {
 
@@ -28977,9 +28984,9 @@ class TextureNode extends UniformNode {
 			let snippet = propertyName;
 			const nodeType = this.getNodeType( builder );
 
-			if ( builder.needsColorSpaceToLinear( texture ) ) {
+			if ( builder.needsColorSpaceToLinearSRGB( texture ) ) {
 
-				snippet = colorSpaceToLinear( expression( snippet, nodeType ), texture.colorSpace ).setup( builder ).build( builder, nodeType );
+				snippet = colorSpaceToLinearSRGB( expression( snippet, nodeType ), texture.colorSpace ).setup( builder ).build( builder, nodeType );
 
 			}
 
@@ -29131,30 +29138,30 @@ class TextureNode extends UniformNode {
 
 }
 
-registerNodeClass( 'Texture', TextureNode );
+TextureNode.type = /*@__PURE__*/ registerNode( 'Texture', TextureNode );
 
-const texture = nodeProxy( TextureNode );
+const texture = /*@__PURE__*/ nodeProxy( TextureNode );
 const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );
 
 //export const textureLevel = ( value, uv, level ) => texture( value, uv ).level( level );
 
 const sampler = ( aTexture ) => ( aTexture.isNode === true ? aTexture : texture( aTexture ) ).convert( 'sampler' );
 
-const cameraGroup = /*#__PURE__*/ sharedUniformGroup( 'camera' ).onRenderUpdate( () => {
+const cameraGroup = /*@__PURE__*/ sharedUniformGroup( 'camera' ).onRenderUpdate( () => {
 
 	cameraGroup.needsUpdate = true;
 
 } );
 
-const cameraNear = /*#__PURE__*/ uniform( 'float' ).label( 'cameraNear' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.near );
-const cameraFar = /*#__PURE__*/ uniform( 'float' ).label( 'cameraFar' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.far );
-const cameraLogDepth = /*#__PURE__*/ uniform( 'float' ).label( 'cameraLogDepth' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => 2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
-const cameraProjectionMatrix = /*#__PURE__*/ uniform( 'mat4' ).label( 'cameraProjectionMatrix' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrix );
-const cameraProjectionMatrixInverse = /*#__PURE__*/ uniform( 'mat4' ).label( 'cameraProjectionMatrixInverse' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrixInverse );
-const cameraViewMatrix = /*#__PURE__*/ uniform( 'mat4' ).label( 'cameraViewMatrix' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.matrixWorldInverse );
-const cameraWorldMatrix = /*#__PURE__*/ uniform( 'mat4' ).label( 'cameraWorldMatrix' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.matrixWorld );
-const cameraNormalMatrix = /*#__PURE__*/ uniform( 'mat3' ).label( 'cameraNormalMatrix' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.normalMatrix );
-const cameraPosition = /*#__PURE__*/ uniform( new Vector3() ).label( 'cameraPosition' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera }, self ) => self.value.setFromMatrixPosition( camera.matrixWorld ) );
+const cameraNear = /*@__PURE__*/ uniform( 'float' ).label( 'cameraNear' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.near );
+const cameraFar = /*@__PURE__*/ uniform( 'float' ).label( 'cameraFar' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.far );
+const cameraLogDepth = /*@__PURE__*/ uniform( 'float' ).label( 'cameraLogDepth' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => 2.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 ) );
+const cameraProjectionMatrix = /*@__PURE__*/ uniform( 'mat4' ).label( 'cameraProjectionMatrix' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrix );
+const cameraProjectionMatrixInverse = /*@__PURE__*/ uniform( 'mat4' ).label( 'cameraProjectionMatrixInverse' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrixInverse );
+const cameraViewMatrix = /*@__PURE__*/ uniform( 'mat4' ).label( 'cameraViewMatrix' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.matrixWorldInverse );
+const cameraWorldMatrix = /*@__PURE__*/ uniform( 'mat4' ).label( 'cameraWorldMatrix' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.matrixWorld );
+const cameraNormalMatrix = /*@__PURE__*/ uniform( 'mat3' ).label( 'cameraNormalMatrix' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera } ) => camera.normalMatrix );
+const cameraPosition = /*@__PURE__*/ uniform( new Vector3() ).label( 'cameraPosition' ).setGroup( cameraGroup ).onRenderUpdate( ( { camera }, self ) => self.value.setFromMatrixPosition( camera.matrixWorld ) );
 
 class Object3DNode extends Node {
 
@@ -29288,15 +29295,15 @@ Object3DNode.SCALE = 'scale';
 Object3DNode.VIEW_POSITION = 'viewPosition';
 Object3DNode.DIRECTION = 'direction';
 
-registerNodeClass( 'Object3D', Object3DNode );
+Object3DNode.type = /*@__PURE__*/ registerNode( 'Object3D', Object3DNode );
 
-const objectDirection = nodeProxy( Object3DNode, Object3DNode.DIRECTION );
-const objectViewMatrix = nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
-const objectNormalMatrix = nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
-const objectWorldMatrix = nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
-const objectPosition = nodeProxy( Object3DNode, Object3DNode.POSITION );
-const objectScale = nodeProxy( Object3DNode, Object3DNode.SCALE );
-const objectViewPosition = nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
+const objectDirection = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.DIRECTION );
+const objectViewMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
+const objectNormalMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
+const objectWorldMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
+const objectPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.POSITION );
+const objectScale = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.SCALE );
+const objectViewPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
 
 class ModelNode extends Object3DNode {
 
@@ -29316,24 +29323,24 @@ class ModelNode extends Object3DNode {
 
 }
 
-registerNodeClass( 'Model', ModelNode );
+ModelNode.type = /*@__PURE__*/ registerNode( 'Model', ModelNode );
 
-const modelDirection = nodeImmutable( ModelNode, ModelNode.DIRECTION );
-const modelViewMatrix = nodeImmutable( ModelNode, ModelNode.VIEW_MATRIX ).label( 'modelViewMatrix' ).toVar( 'ModelViewMatrix' );
-const modelNormalMatrix = nodeImmutable( ModelNode, ModelNode.NORMAL_MATRIX );
-const modelWorldMatrix = nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
-const modelPosition = nodeImmutable( ModelNode, ModelNode.POSITION );
-const modelScale = nodeImmutable( ModelNode, ModelNode.SCALE );
-const modelViewPosition = nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
-const modelWorldMatrixInverse = uniform( new Matrix4() ).onObjectUpdate( ( { object }, self ) => self.value.copy( object.matrixWorld ).invert() );
+const modelDirection = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.DIRECTION );
+const modelViewMatrix = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.VIEW_MATRIX ).label( 'modelViewMatrix' ).toVar( 'ModelViewMatrix' );
+const modelNormalMatrix = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.NORMAL_MATRIX );
+const modelWorldMatrix = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
+const modelPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.POSITION );
+const modelScale = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.SCALE );
+const modelViewPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
+const modelWorldMatrixInverse = /*@__PURE__*/ uniform( new Matrix4() ).onObjectUpdate( ( { object }, self ) => self.value.copy( object.matrixWorld ).invert() );
 
-const positionGeometry = /*#__PURE__*/ attribute( 'position', 'vec3' );
-const positionLocal = /*#__PURE__*/ positionGeometry.varying( 'positionLocal' );
-const positionPrevious = /*#__PURE__*/ positionGeometry.varying( 'positionPrevious' );
-const positionWorld = /*#__PURE__*/ modelWorldMatrix.mul( positionLocal ).xyz.varying( 'v_positionWorld' );
-const positionWorldDirection = /*#__PURE__*/ positionLocal.transformDirection( modelWorldMatrix ).varying( 'v_positionWorldDirection' ).normalize().toVar( 'positionWorldDirection' );
-const positionView = /*#__PURE__*/ modelViewMatrix.mul( positionLocal ).xyz.varying( 'v_positionView' );
-const positionViewDirection = /*#__PURE__*/ positionView.negate().varying( 'v_positionViewDirection' ).normalize().toVar( 'positionViewDirection' );
+const positionGeometry = /*@__PURE__*/ attribute( 'position', 'vec3' );
+const positionLocal = /*@__PURE__*/ positionGeometry.varying( 'positionLocal' );
+const positionPrevious = /*@__PURE__*/ positionGeometry.varying( 'positionPrevious' );
+const positionWorld = /*@__PURE__*/ modelWorldMatrix.mul( positionLocal ).xyz.varying( 'v_positionWorld' );
+const positionWorldDirection = /*@__PURE__*/ positionLocal.transformDirection( modelWorldMatrix ).varying( 'v_positionWorldDirection' ).normalize().toVar( 'positionWorldDirection' );
+const positionView = /*@__PURE__*/ modelViewMatrix.mul( positionLocal ).xyz.varying( 'v_positionView' );
+const positionViewDirection = /*@__PURE__*/ positionView.negate().varying( 'v_positionViewDirection' ).normalize().toVar( 'positionViewDirection' );
 
 class FrontFacingNode extends Node {
 
@@ -29365,14 +29372,14 @@ class FrontFacingNode extends Node {
 
 }
 
-registerNodeClass( 'FrontFacing', FrontFacingNode );
+FrontFacingNode.type = /*@__PURE__*/ registerNode( 'FrontFacing', FrontFacingNode );
 
-const frontFacing = nodeImmutable( FrontFacingNode );
-const faceDirection = float( frontFacing ).mul( 2.0 ).sub( 1.0 );
+const frontFacing = /*@__PURE__*/ nodeImmutable( FrontFacingNode );
+const faceDirection = /*@__PURE__*/ float( frontFacing ).mul( 2.0 ).sub( 1.0 );
 
-const normalGeometry = /*#__PURE__*/ attribute( 'normal', 'vec3' );
+const normalGeometry = /*@__PURE__*/ attribute( 'normal', 'vec3' );
 
-const normalLocal = /*#__PURE__*/ ( Fn( ( builder ) => {
+const normalLocal = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	if ( builder.geometry.hasAttribute( 'normal' ) === false ) {
 
@@ -29386,11 +29393,11 @@ const normalLocal = /*#__PURE__*/ ( Fn( ( builder ) => {
 
 }, 'vec3' ).once() )().toVar( 'normalLocal' );
 
-const normalFlat = /*#__PURE__*/ positionView.dFdx().cross( positionView.dFdy() ).normalize().toVar( 'normalFlat' );
+const normalFlat = /*@__PURE__*/ positionView.dFdx().cross( positionView.dFdy() ).normalize().toVar( 'normalFlat' );
 
 let normalViewVarying = null;
 
-const normalView = /*#__PURE__*/ ( Fn( ( builder ) => {
+const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
 
@@ -29408,18 +29415,18 @@ const normalView = /*#__PURE__*/ ( Fn( ( builder ) => {
 
 }, 'vec3' ).once() )().toVar( 'normalView' );
 
-const normalWorld = /*#__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
+const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
 
-const transformedNormalView = /*#__PURE__*/ ( Fn( ( builder ) => {
+const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	return builder.context.setupNormal();
 
 }, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedNormalView' );
 
 
-const transformedNormalWorld = /*#__PURE__*/ transformedNormalView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedNormalWorld' );
+const transformedNormalWorld = /*@__PURE__*/ transformedNormalView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedNormalWorld' );
 
-const transformedClearcoatNormalView = /*#__PURE__*/ ( Fn( ( builder ) => {
+const transformedClearcoatNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	return builder.context.setupClearcoatNormal();
 
@@ -29427,11 +29434,11 @@ const transformedClearcoatNormalView = /*#__PURE__*/ ( Fn( ( builder ) => {
 
 const materialRefractionRatio = /*@__PURE__*/ uniform( 0 ).onReference( ( { material } ) => material ).onRenderUpdate( ( { material } ) => material.refractionRatio );
 
-const reflectView = /*#__PURE__*/ positionViewDirection.negate().reflect( transformedNormalView );
-const refractView = /*#__PURE__*/ positionViewDirection.negate().refract( transformedNormalView, materialRefractionRatio );
+const reflectView = /*@__PURE__*/ positionViewDirection.negate().reflect( transformedNormalView );
+const refractView = /*@__PURE__*/ positionViewDirection.negate().refract( transformedNormalView, materialRefractionRatio );
 
-const reflectVector = /*#__PURE__*/ reflectView.transformDirection( cameraViewMatrix ).toVar( 'reflectVector' );
-const refractVector = /*#__PURE__*/ refractView.transformDirection( cameraViewMatrix ).toVar( 'reflectVector' );
+const reflectVector = /*@__PURE__*/ reflectView.transformDirection( cameraViewMatrix ).toVar( 'reflectVector' );
+const refractVector = /*@__PURE__*/ refractView.transformDirection( cameraViewMatrix ).toVar( 'reflectVector' );
 
 class CubeTextureNode extends TextureNode {
 
@@ -29497,9 +29504,9 @@ class CubeTextureNode extends TextureNode {
 
 }
 
-registerNodeClass( 'CubeTexture', CubeTextureNode );
+CubeTextureNode.type = /*@__PURE__*/ registerNode( 'CubeTexture', CubeTextureNode );
 
-const cubeTexture = nodeProxy( CubeTextureNode );
+const cubeTexture = /*@__PURE__*/ nodeProxy( CubeTextureNode );
 
 class BufferNode extends UniformNode {
 
@@ -29528,7 +29535,7 @@ class BufferNode extends UniformNode {
 
 }
 
-registerNodeClass( 'Buffer', BufferNode );
+BufferNode.type = /*@__PURE__*/ registerNode( 'Buffer', BufferNode );
 
 const buffer = ( value, type, count ) => nodeObject( new BufferNode( value, type, count ) );
 
@@ -29666,7 +29673,7 @@ class UniformArrayNode extends BufferNode {
 
 }
 
-registerNodeClass( 'UniformArray', UniformArrayNode );
+UniformArrayNode.type = /*@__PURE__*/ registerNode( 'UniformArray', UniformArrayNode );
 
 const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
 
@@ -29826,7 +29833,7 @@ class ReferenceNode extends Node {
 
 }
 
-registerNodeClass( 'Reference', ReferenceNode );
+ReferenceNode.type = /*@__PURE__*/ registerNode( 'Reference', ReferenceNode );
 
 const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
 const referenceBuffer = ( name, type, count, object ) => nodeObject( new ReferenceNode( name, type, object, count ) );
@@ -29863,11 +29870,11 @@ class MaterialReferenceNode extends ReferenceNode {
 
 }
 
-registerNodeClass( 'MaterialReference', MaterialReferenceNode );
+MaterialReferenceNode.type = /*@__PURE__*/ registerNode( 'MaterialReference', MaterialReferenceNode );
 
 const materialReference = ( name, type, material ) => nodeObject( new MaterialReferenceNode( name, type, material ) );
 
-const tangentGeometry = /*#__PURE__*/ Fn( ( builder ) => {
+const tangentGeometry = /*@__PURE__*/ Fn( ( builder ) => {
 
 	if ( builder.geometry.hasAttribute( 'tangent' ) === false ) {
 
@@ -29879,27 +29886,27 @@ const tangentGeometry = /*#__PURE__*/ Fn( ( builder ) => {
 
 } )();
 
-const tangentLocal = /*#__PURE__*/ tangentGeometry.xyz.toVar( 'tangentLocal' );
-const tangentView = /*#__PURE__*/ modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz.varying( 'v_tangentView' ).normalize().toVar( 'tangentView' );
-const tangentWorld = /*#__PURE__*/ tangentView.transformDirection( cameraViewMatrix ).varying( 'v_tangentWorld' ).normalize().toVar( 'tangentWorld' );
-const transformedTangentView = /*#__PURE__*/ tangentView.toVar( 'transformedTangentView' );
-const transformedTangentWorld = /*#__PURE__*/ transformedTangentView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedTangentWorld' );
+const tangentLocal = /*@__PURE__*/ tangentGeometry.xyz.toVar( 'tangentLocal' );
+const tangentView = /*@__PURE__*/ modelViewMatrix.mul( vec4( tangentLocal, 0 ) ).xyz.varying( 'v_tangentView' ).normalize().toVar( 'tangentView' );
+const tangentWorld = /*@__PURE__*/ tangentView.transformDirection( cameraViewMatrix ).varying( 'v_tangentWorld' ).normalize().toVar( 'tangentWorld' );
+const transformedTangentView = /*@__PURE__*/ tangentView.toVar( 'transformedTangentView' );
+const transformedTangentWorld = /*@__PURE__*/ transformedTangentView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedTangentWorld' );
 
 const getBitangent = ( crossNormalTangent ) => crossNormalTangent.mul( tangentGeometry.w ).xyz;
 
-const bitangentGeometry = /*#__PURE__*/ varying( getBitangent( normalGeometry.cross( tangentGeometry ) ), 'v_bitangentGeometry' ).normalize().toVar( 'bitangentGeometry' );
-const bitangentLocal = /*#__PURE__*/ varying( getBitangent( normalLocal.cross( tangentLocal ) ), 'v_bitangentLocal' ).normalize().toVar( 'bitangentLocal' );
-const bitangentView = /*#__PURE__*/ varying( getBitangent( normalView.cross( tangentView ) ), 'v_bitangentView' ).normalize().toVar( 'bitangentView' );
-const bitangentWorld = /*#__PURE__*/ varying( getBitangent( normalWorld.cross( tangentWorld ) ), 'v_bitangentWorld' ).normalize().toVar( 'bitangentWorld' );
-const transformedBitangentView = /*#__PURE__*/ getBitangent( transformedNormalView.cross( transformedTangentView ) ).normalize().toVar( 'transformedBitangentView' );
-const transformedBitangentWorld = /*#__PURE__*/ transformedBitangentView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedBitangentWorld' );
+const bitangentGeometry = /*@__PURE__*/ varying( getBitangent( normalGeometry.cross( tangentGeometry ) ), 'v_bitangentGeometry' ).normalize().toVar( 'bitangentGeometry' );
+const bitangentLocal = /*@__PURE__*/ varying( getBitangent( normalLocal.cross( tangentLocal ) ), 'v_bitangentLocal' ).normalize().toVar( 'bitangentLocal' );
+const bitangentView = /*@__PURE__*/ varying( getBitangent( normalView.cross( tangentView ) ), 'v_bitangentView' ).normalize().toVar( 'bitangentView' );
+const bitangentWorld = /*@__PURE__*/ varying( getBitangent( normalWorld.cross( tangentWorld ) ), 'v_bitangentWorld' ).normalize().toVar( 'bitangentWorld' );
+const transformedBitangentView = /*@__PURE__*/ getBitangent( transformedNormalView.cross( transformedTangentView ) ).normalize().toVar( 'transformedBitangentView' );
+const transformedBitangentWorld = /*@__PURE__*/ transformedBitangentView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedBitangentWorld' );
 
-const TBNViewMatrix = mat3( tangentView, bitangentView, normalView );
+const TBNViewMatrix = /*@__PURE__*/ mat3( tangentView, bitangentView, normalView );
 
-const parallaxDirection = positionViewDirection.mul( TBNViewMatrix )/*.normalize()*/;
+const parallaxDirection = /*@__PURE__*/ positionViewDirection.mul( TBNViewMatrix )/*.normalize()*/;
 const parallaxUV = ( uv, scale ) => uv.sub( parallaxDirection.mul( scale ) );
 
-const transformedBentNormalView = ( () => {
+const transformedBentNormalView = /*@__PURE__*/ ( () => {
 
 	// https://google.github.io/filament/Filament.md.html#lighting/imagebasedlights/anisotropy
 
@@ -29915,7 +29922,7 @@ const transformedBentNormalView = ( () => {
 // Normal Mapping Without Precomputed Tangents
 // http://www.thetenthplanet.de/archives/1180
 
-const perturbNormal2Arb = Fn( ( inputs ) => {
+const perturbNormal2Arb = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { eye_pos, surf_norm, mapN, uv } = inputs;
 
@@ -29997,9 +30004,9 @@ class NormalMapNode extends TempNode {
 
 }
 
-registerNodeClass( 'NormalMap', NormalMapNode );
+NormalMapNode.type = /*@__PURE__*/ registerNode( 'NormalMap', NormalMapNode );
 
-const normalMap = nodeProxy( NormalMapNode );
+const normalMap = /*@__PURE__*/ nodeProxy( NormalMapNode );
 
 // Bump Mapping Unparametrized Surfaces on the GPU by Morten S. Mikkelsen
 // https://mmikk.github.io/papers3d/mm_sfgrad_bump.pdf
@@ -30066,7 +30073,7 @@ class BumpMapNode extends TempNode {
 
 }
 
-const bumpMap = nodeProxy( BumpMapNode );
+const bumpMap = /*@__PURE__*/ nodeProxy( BumpMapNode );
 
 const _propertyCache = new Map();
 
@@ -30441,49 +30448,49 @@ MaterialNode.DISPERSION = 'dispersion';
 MaterialNode.LIGHT_MAP = 'light';
 MaterialNode.AO_MAP = 'ao';
 
-registerNodeClass( 'Material', MaterialNode );
+MaterialNode.type = /*@__PURE__*/ registerNode( 'Material', MaterialNode );
 
-const materialAlphaTest = nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
-const materialColor = nodeImmutable( MaterialNode, MaterialNode.COLOR );
-const materialShininess = nodeImmutable( MaterialNode, MaterialNode.SHININESS );
-const materialEmissive = nodeImmutable( MaterialNode, MaterialNode.EMISSIVE );
-const materialOpacity = nodeImmutable( MaterialNode, MaterialNode.OPACITY );
-const materialSpecular = nodeImmutable( MaterialNode, MaterialNode.SPECULAR );
+const materialAlphaTest = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
+const materialColor = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.COLOR );
+const materialShininess = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.SHININESS );
+const materialEmissive = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.EMISSIVE );
+const materialOpacity = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.OPACITY );
+const materialSpecular = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.SPECULAR );
 
-const materialSpecularIntensity = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_INTENSITY );
-const materialSpecularColor = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR );
+const materialSpecularIntensity = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.SPECULAR_INTENSITY );
+const materialSpecularColor = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.SPECULAR_COLOR );
 
-const materialSpecularStrength = nodeImmutable( MaterialNode, MaterialNode.SPECULAR_STRENGTH );
-const materialReflectivity = nodeImmutable( MaterialNode, MaterialNode.REFLECTIVITY );
-const materialRoughness = nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
-const materialMetalness = nodeImmutable( MaterialNode, MaterialNode.METALNESS );
-const materialNormal = nodeImmutable( MaterialNode, MaterialNode.NORMAL ).context( { getUV: null } );
-const materialClearcoat = nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT );
-const materialClearcoatRoughness = nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT_ROUGHNESS );
-const materialClearcoatNormal = nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT_NORMAL ).context( { getUV: null } );
-const materialRotation = nodeImmutable( MaterialNode, MaterialNode.ROTATION );
-const materialSheen = nodeImmutable( MaterialNode, MaterialNode.SHEEN );
-const materialSheenRoughness = nodeImmutable( MaterialNode, MaterialNode.SHEEN_ROUGHNESS );
-const materialAnisotropy = nodeImmutable( MaterialNode, MaterialNode.ANISOTROPY );
-const materialIridescence = nodeImmutable( MaterialNode, MaterialNode.IRIDESCENCE );
-const materialIridescenceIOR = nodeImmutable( MaterialNode, MaterialNode.IRIDESCENCE_IOR );
-const materialIridescenceThickness = nodeImmutable( MaterialNode, MaterialNode.IRIDESCENCE_THICKNESS );
-const materialTransmission = nodeImmutable( MaterialNode, MaterialNode.TRANSMISSION );
-const materialThickness = nodeImmutable( MaterialNode, MaterialNode.THICKNESS );
-const materialIOR = nodeImmutable( MaterialNode, MaterialNode.IOR );
-const materialAttenuationDistance = nodeImmutable( MaterialNode, MaterialNode.ATTENUATION_DISTANCE );
-const materialAttenuationColor = nodeImmutable( MaterialNode, MaterialNode.ATTENUATION_COLOR );
-const materialLineScale = nodeImmutable( MaterialNode, MaterialNode.LINE_SCALE );
-const materialLineDashSize = nodeImmutable( MaterialNode, MaterialNode.LINE_DASH_SIZE );
-const materialLineGapSize = nodeImmutable( MaterialNode, MaterialNode.LINE_GAP_SIZE );
-const materialLineWidth = nodeImmutable( MaterialNode, MaterialNode.LINE_WIDTH );
-const materialLineDashOffset = nodeImmutable( MaterialNode, MaterialNode.LINE_DASH_OFFSET );
-const materialPointWidth = nodeImmutable( MaterialNode, MaterialNode.POINT_WIDTH );
-const materialDispersion = nodeImmutable( MaterialNode, MaterialNode.DISPERSION );
-const materialLightMap = nodeImmutable( MaterialNode, MaterialNode.LIGHT_MAP );
-const materialAOMap = nodeImmutable( MaterialNode, MaterialNode.AO_MAP );
-nodeImmutable( MaterialNode, MaterialNode.REFRACTION_RATIO );
-const materialAnisotropyVector = uniform( new Vector2() ).onReference( function ( frame ) {
+const materialSpecularStrength = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.SPECULAR_STRENGTH );
+const materialReflectivity = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.REFLECTIVITY );
+const materialRoughness = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.ROUGHNESS );
+const materialMetalness = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.METALNESS );
+const materialNormal = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.NORMAL ).context( { getUV: null } );
+const materialClearcoat = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT );
+const materialClearcoatRoughness = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT_ROUGHNESS );
+const materialClearcoatNormal = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.CLEARCOAT_NORMAL ).context( { getUV: null } );
+const materialRotation = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.ROTATION );
+const materialSheen = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.SHEEN );
+const materialSheenRoughness = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.SHEEN_ROUGHNESS );
+const materialAnisotropy = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.ANISOTROPY );
+const materialIridescence = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.IRIDESCENCE );
+const materialIridescenceIOR = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.IRIDESCENCE_IOR );
+const materialIridescenceThickness = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.IRIDESCENCE_THICKNESS );
+const materialTransmission = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.TRANSMISSION );
+const materialThickness = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.THICKNESS );
+const materialIOR = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.IOR );
+const materialAttenuationDistance = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.ATTENUATION_DISTANCE );
+const materialAttenuationColor = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.ATTENUATION_COLOR );
+const materialLineScale = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.LINE_SCALE );
+const materialLineDashSize = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.LINE_DASH_SIZE );
+const materialLineGapSize = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.LINE_GAP_SIZE );
+const materialLineWidth = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.LINE_WIDTH );
+const materialLineDashOffset = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.LINE_DASH_OFFSET );
+const materialPointWidth = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.POINT_WIDTH );
+const materialDispersion = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.DISPERSION );
+const materialLightMap = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.LIGHT_MAP );
+const materialAOMap = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.AO_MAP );
+/*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.REFRACTION_RATIO );
+const materialAnisotropyVector = /*@__PURE__*/ uniform( new Vector2() ).onReference( function ( frame ) {
 
 	return frame.material;
 
@@ -30519,9 +30526,9 @@ class ModelViewProjectionNode extends TempNode {
 
 }
 
-registerNodeClass( 'ModelViewProjection', ModelViewProjectionNode );
+ModelViewProjectionNode.type = /*@__PURE__*/ registerNode( 'ModelViewProjection', ModelViewProjectionNode );
 
-const modelViewProjection = nodeProxy( ModelViewProjectionNode );
+const modelViewProjection = /*@__PURE__*/ nodeProxy( ModelViewProjectionNode );
 
 class IndexNode extends Node {
 
@@ -30589,12 +30596,12 @@ IndexNode.INSTANCE = 'instance';
 IndexNode.INVOCATION_LOCAL = 'invocationLocal';
 IndexNode.DRAW = 'draw';
 
-registerNodeClass( 'Index', IndexNode );
+IndexNode.type = /*@__PURE__*/ registerNode( 'Index', IndexNode );
 
-const vertexIndex = nodeImmutable( IndexNode, IndexNode.VERTEX );
-const instanceIndex = nodeImmutable( IndexNode, IndexNode.INSTANCE );
-const invocationLocalIndex = nodeImmutable( IndexNode, IndexNode.INVOCATION_LOCAL );
-const drawIndex = nodeImmutable( IndexNode, IndexNode.DRAW );
+const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VERTEX );
+const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INSTANCE );
+const invocationLocalIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INVOCATION_LOCAL );
+const drawIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.DRAW );
 
 class InstancedInterleavedBuffer extends InterleavedBuffer {
 
@@ -30766,9 +30773,9 @@ class InstanceNode extends Node {
 
 }
 
-registerNodeClass( 'Instance', InstanceNode );
+InstanceNode.type = /*@__PURE__*/ registerNode( 'Instance', InstanceNode );
 
-const instance = nodeProxy( InstanceNode );
+const instance = /*@__PURE__*/ nodeProxy( InstanceNode );
 
 class BatchNode extends Node {
 
@@ -30879,9 +30886,9 @@ class BatchNode extends Node {
 
 }
 
-registerNodeClass( 'Batch', BatchNode );
+BatchNode.type = /*@__PURE__*/ registerNode( 'Batch', BatchNode );
 
-const batch = nodeProxy( BatchNode );
+const batch = /*@__PURE__*/ nodeProxy( BatchNode );
 
 const _frameId = new WeakMap();
 
@@ -31052,7 +31059,7 @@ class SkinningNode extends Node {
 
 }
 
-registerNodeClass( 'Skinning', SkinningNode );
+SkinningNode.type = /*@__PURE__*/ registerNode( 'Skinning', SkinningNode );
 
 const skinning = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh ) );
 const skinningReference = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh, true ) );
@@ -31244,16 +31251,16 @@ class LoopNode extends Node {
 
 }
 
-registerNodeClass( 'Loop', LoopNode );
+LoopNode.type = /*@__PURE__*/ registerNode( 'Loop', LoopNode );
 
 const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();
 const Continue = () => expression( 'continue' ).append();
 const Break = () => expression( 'break' ).append();
 
-const _morphTextures = new WeakMap();
+const _morphTextures = /*@__PURE__*/ new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
 
-const getMorph = Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
+const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
 
 	const texelIndex = int( vertexIndex ).mul( stride ).add( offset );
 
@@ -31487,9 +31494,9 @@ class MorphNode extends Node {
 
 }
 
-registerNodeClass( 'Morph', MorphNode );
+MorphNode.type = /*@__PURE__*/ registerNode( 'Morph', MorphNode );
 
-const morphReference = nodeProxy( MorphNode );
+const morphReference = /*@__PURE__*/ nodeProxy( MorphNode );
 
 const sortLights = ( lights ) => {
 
@@ -31714,9 +31721,9 @@ class LightsNode extends Node {
 
 }
 
-registerNodeClass( 'Lights', LightsNode );
+LightsNode.type = /*@__PURE__*/ registerNode( 'Lights', LightsNode );
 
-const lights = nodeProxy( LightsNode );
+const lights = /*@__PURE__*/ nodeProxy( LightsNode );
 
 class LightingNode extends Node {
 
@@ -31736,7 +31743,7 @@ class LightingNode extends Node {
 
 }
 
-registerNodeClass( 'Lighting', LightingNode );
+LightingNode.type = /*@__PURE__*/ registerNode( 'Lighting', LightingNode );
 
 class AONode extends LightingNode {
 
@@ -31756,7 +31763,7 @@ class AONode extends LightingNode {
 
 }
 
-registerNodeClass( 'AO', AONode );
+AONode.type = /*@__PURE__*/ registerNode( 'AO', AONode );
 
 class LightingContextNode extends ContextNode {
 
@@ -31813,9 +31820,9 @@ class LightingContextNode extends ContextNode {
 
 }
 
-registerNodeClass( 'LightingContext', LightingContextNode );
+LightingContextNode.type = /*@__PURE__*/ registerNode( 'LightingContext', LightingContextNode );
 
-const lightingContext = nodeProxy( LightingContextNode );
+const lightingContext = /*@__PURE__*/ nodeProxy( LightingContextNode );
 
 class IrradianceNode extends LightingNode {
 
@@ -31835,7 +31842,7 @@ class IrradianceNode extends LightingNode {
 
 }
 
-registerNodeClass( 'Irradiance', IrradianceNode );
+IrradianceNode.type = /*@__PURE__*/ registerNode( 'Irradiance', IrradianceNode );
 
 let resolution, viewportResult;
 
@@ -31943,12 +31950,12 @@ ViewportNode.RESOLUTION = 'resolution';
 ViewportNode.VIEWPORT = 'viewport';
 ViewportNode.UV = 'uv';
 
-registerNodeClass( 'Viewport', ViewportNode );
+ViewportNode.type = /*@__PURE__*/ registerNode( 'Viewport', ViewportNode );
 
-const viewportCoordinate = nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
-const viewportResolution = nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
-const viewport = nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
-const viewportUV = nodeImmutable( ViewportNode, ViewportNode.UV );
+const viewportCoordinate = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
+const viewportResolution = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
+const viewport = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
+const viewportUV = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.UV );
 
 const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
@@ -32028,10 +32035,10 @@ class ViewportTextureNode extends TextureNode {
 
 }
 
-registerNodeClass( 'ViewportTexture', ViewportTextureNode );
+ViewportTextureNode.type = /*@__PURE__*/ registerNode( 'ViewportTexture', ViewportTextureNode );
 
-const viewportTexture = nodeProxy( ViewportTextureNode );
-const viewportMipTexture = nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );
+const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode );
+const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );
 
 let sharedDepthbuffer = null;
 
@@ -32051,9 +32058,9 @@ class ViewportDepthTextureNode extends ViewportTextureNode {
 
 }
 
-registerNodeClass( 'ViewportDepthTexture', ViewportDepthTextureNode );
+ViewportDepthTextureNode.type = /*@__PURE__*/ registerNode( 'ViewportDepthTexture', ViewportDepthTextureNode );
 
-const viewportDepthTexture = nodeProxy( ViewportDepthTextureNode );
+const viewportDepthTexture = /*@__PURE__*/ nodeProxy( ViewportDepthTextureNode );
 
 class ViewportDepthNode extends Node {
 
@@ -32143,7 +32150,7 @@ ViewportDepthNode.DEPTH_BASE = 'depthBase';
 ViewportDepthNode.DEPTH = 'depth';
 ViewportDepthNode.LINEAR_DEPTH = 'linearDepth';
 
-registerNodeClass( 'ViewportDepth', ViewportDepthNode );
+ViewportDepthNode.type = /*@__PURE__*/ registerNode( 'ViewportDepth', ViewportDepthNode );
 
 // NOTE: viewZ, the z-coordinate in camera space, is negative for points in front of the camera
 
@@ -32161,11 +32168,11 @@ const viewZToPerspectiveDepth = ( viewZ, near, far ) => near.add( viewZ ).mul( f
 // maps perspective depth in [ 0, 1 ] to viewZ
 const perspectiveDepthToViewZ = ( depth, near, far ) => near.mul( far ).div( far.sub( near ).mul( depth ).sub( far ) );
 
-const depthBase = nodeProxy( ViewportDepthNode, ViewportDepthNode.DEPTH_BASE );
+const depthBase = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.DEPTH_BASE );
 
-const depth = nodeImmutable( ViewportDepthNode, ViewportDepthNode.DEPTH );
-const linearDepth = nodeProxy( ViewportDepthNode, ViewportDepthNode.LINEAR_DEPTH );
-const viewportLinearDepth = linearDepth( viewportDepthTexture() );
+const depth = /*@__PURE__*/ nodeImmutable( ViewportDepthNode, ViewportDepthNode.DEPTH );
+const linearDepth = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.LINEAR_DEPTH );
+const viewportLinearDepth = /*@__PURE__*/ linearDepth( viewportDepthTexture() );
 
 depth.assign = ( value ) => depthBase( value );
 
@@ -32299,11 +32306,13 @@ class ClippingNode extends Node {
 ClippingNode.ALPHA_TO_COVERAGE = 'alphaToCoverage';
 ClippingNode.DEFAULT = 'default';
 
-registerNodeClass( 'Clipping', ClippingNode );
+ClippingNode.type = /*@__PURE__*/ registerNode( 'Clipping', ClippingNode );
 
 const clipping = () => nodeObject( new ClippingNode() );
 
 const clippingAlpha = () => nodeObject( new ClippingNode( ClippingNode.ALPHA_TO_COVERAGE ) );
+
+const NodeMaterials = new Map();
 
 class NodeMaterial extends Material {
 
@@ -32902,6 +32911,48 @@ class NodeMaterial extends Material {
 
 }
 
+NodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( '', NodeMaterial );
+
+function registerNodeMaterial( type, nodeMaterialClass ) {
+
+	const suffix = 'NodeMaterial';
+	const nodeMaterialType = type + suffix;
+
+	if ( typeof nodeMaterialClass !== 'function' ) throw new Error( `THREE.Node: NodeMaterial class "${ type }" is not a class.` );
+
+	if ( NodeMaterials.has( nodeMaterialType ) ) {
+
+		console.warn( `THREE.Node: Redefinition of NodeMaterial class "${ nodeMaterialType }".` );
+		return;
+
+	}
+
+	if ( type.slice( - suffix.length ) === suffix ) {
+
+		console.warn( `THREE.NodeMaterial: NodeMaterial class ${ nodeMaterialType } should not have '${ suffix }' suffix.` );
+		return;
+
+	}
+
+	NodeMaterials.set( nodeMaterialType, nodeMaterialClass );
+	nodeMaterialClass.type = nodeMaterialType;
+
+	return nodeMaterialType;
+
+}
+
+function createNodeMaterialFromType( type ) {
+
+	const Material = NodeMaterials.get( type );
+
+	if ( Material !== undefined ) {
+
+		return new Material();
+
+	}
+
+}
+
 const _defaultValues$e = /*@__PURE__*/ new PointsMaterial();
 
 class InstancedPointsNodeMaterial extends NodeMaterial {
@@ -32919,6 +32970,8 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 		this.pointWidth = 1;
 
 		this.pointColorNode = null;
+
+		this.pointWidthNode = null;
 
 		this.setDefaultValues( _defaultValues$e );
 
@@ -32946,7 +32999,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			//vUv = uv;
 			varying( vec2(), 'vUv' ).assign( uv() ); // @TODO: Analyze other way to do this
 
-			const instancePosition = attribute( 'instancePosition' );
+			const instancePosition = attribute( 'instancePosition' ).xyz;
 
 			// camera space
 			const mvPos = property( 'vec4', 'mvPos' );
@@ -32960,7 +33013,9 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			// offset in ndc space
 			const offset = property( 'vec2', 'offset' );
 			offset.assign( positionGeometry.xy );
-			offset.assign( offset.mul( materialPointWidth ) );
+
+			offset.mulAssign( this.pointWidthNode ? this.pointWidthNode : materialPointWidth );
+
 			offset.assign( offset.div( viewport.z ) );
 			offset.y.assign( offset.y.mul( aspect ) );
 
@@ -33050,6 +33105,8 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 }
 
+InstancedPointsNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'InstancedPoints', InstancedPointsNodeMaterial );
+
 const _defaultValues$d = /*@__PURE__*/ new LineBasicMaterial();
 
 class LineBasicNodeMaterial extends NodeMaterial {
@@ -33069,6 +33126,8 @@ class LineBasicNodeMaterial extends NodeMaterial {
 	}
 
 }
+
+LineBasicNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'LineBasic', LineBasicNodeMaterial );
 
 const _defaultValues$c = /*@__PURE__*/ new LineDashedMaterial();
 
@@ -33111,6 +33170,8 @@ class LineDashedNodeMaterial extends NodeMaterial {
 	}
 
 }
+
+LineDashedNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'LineDashed', LineDashedNodeMaterial );
 
 const _defaultValues$b = /*@__PURE__*/ new LineDashedMaterial();
 
@@ -33531,6 +33592,8 @@ class Line2NodeMaterial extends NodeMaterial {
 
 }
 
+Line2NodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Line2', Line2NodeMaterial );
+
 const directionToColor = ( node ) => nodeObject( node ).mul( 0.5 ).add( 0.5 );
 const colorToDirection = ( node ) => nodeObject( node ).mul( 2.0 ).sub( 1 );
 
@@ -33562,6 +33625,8 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 }
 
+MeshNormalNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshNormal', MeshNormalNodeMaterial );
+
 class EquirectUVNode extends TempNode {
 
 	constructor( dirNode = positionWorldDirection ) {
@@ -33585,9 +33650,9 @@ class EquirectUVNode extends TempNode {
 
 }
 
-registerNodeClass( 'EquirectUV', EquirectUVNode );
+EquirectUVNode.type = /*@__PURE__*/ registerNode( 'EquirectUV', EquirectUVNode );
 
-const equirectUV = nodeProxy( EquirectUVNode );
+const equirectUV = /*@__PURE__*/ nodeProxy( EquirectUVNode );
 
 // @TODO: Consider rename WebGLCubeRenderTarget to just CubeRenderTarget
 
@@ -33756,7 +33821,7 @@ class CubeMapNode extends TempNode {
 
 }
 
-registerNodeClass( 'CubeMap', CubeMapNode );
+CubeMapNode.type = /*@__PURE__*/ registerNode( 'CubeMap', CubeMapNode );
 
 function isEquirectangularMapReady$1( image ) {
 
@@ -33798,7 +33863,7 @@ function mapTextureMapping( texture, mapping ) {
 
 }
 
-const cubeMapNode = nodeProxy( CubeMapNode );
+const cubeMapNode = /*@__PURE__*/ nodeProxy( CubeMapNode );
 
 class BasicEnvironmentNode extends LightingNode {
 
@@ -33820,7 +33885,7 @@ class BasicEnvironmentNode extends LightingNode {
 
 }
 
-registerNodeClass( 'BasicEnvironment', BasicEnvironmentNode );
+BasicEnvironmentNode.type = /*@__PURE__*/ registerNode( 'BasicEnvironment', BasicEnvironmentNode );
 
 class BasicLightMapNode extends LightingNode {
 
@@ -33844,7 +33909,7 @@ class BasicLightMapNode extends LightingNode {
 
 }
 
-registerNodeClass( 'BasicLightMap', BasicLightMapNode );
+BasicLightMapNode.type = /*@__PURE__*/ registerNode( 'BasicLightMap', BasicLightMapNode );
 
 class LightingModel {
 
@@ -33992,7 +34057,9 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 
 }
 
-const F_Schlick = Fn( ( { f0, f90, dotVH } ) => {
+MeshBasicNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshBasic', MeshBasicNodeMaterial );
+
+const F_Schlick = /*@__PURE__*/ Fn( ( { f0, f90, dotVH } ) => {
 
 	// Original approximation by Christophe Schlick '94
 	// float fresnel = pow( 1.0 - dotVH, 5.0 );
@@ -34005,7 +34072,7 @@ const F_Schlick = Fn( ( { f0, f90, dotVH } ) => {
 
 } ); // validated
 
-const BRDF_Lambert = Fn( ( inputs ) => {
+const BRDF_Lambert = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	return inputs.diffuseColor.mul( 1 / Math.PI ); // punctual light
 
@@ -34013,13 +34080,13 @@ const BRDF_Lambert = Fn( ( inputs ) => {
 
 const G_BlinnPhong_Implicit = () => float( 0.25 );
 
-const D_BlinnPhong = Fn( ( { dotNH } ) => {
+const D_BlinnPhong = /*@__PURE__*/ Fn( ( { dotNH } ) => {
 
 	return shininess.mul( float( 0.5 ) ).add( 1.0 ).mul( float( 1 / Math.PI ) ).mul( dotNH.pow( shininess ) );
 
 } );
 
-const BRDF_BlinnPhong = Fn( ( { lightDirection } ) => {
+const BRDF_BlinnPhong = /*@__PURE__*/ Fn( ( { lightDirection } ) => {
 
 	const halfDir = lightDirection.add( positionViewDirection ).normalize();
 
@@ -34103,6 +34170,8 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 
 }
 
+MeshLambertNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshLambert', MeshLambertNodeMaterial );
+
 const _defaultValues$7 = /*@__PURE__*/ new MeshPhongMaterial();
 
 class MeshPhongNodeMaterial extends NodeMaterial {
@@ -34165,7 +34234,9 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 }
 
-const getGeometryRoughness = Fn( () => {
+MeshPhongNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshPhong', MeshPhongNodeMaterial );
+
+const getGeometryRoughness = /*@__PURE__*/ Fn( () => {
 
 	const dxy = normalView.dFdx().abs().max( normalView.dFdy().abs() );
 	const geometryRoughness = dxy.x.max( dxy.y ).max( dxy.z );
@@ -34174,7 +34245,7 @@ const getGeometryRoughness = Fn( () => {
 
 } );
 
-const getRoughness = Fn( ( inputs ) => {
+const getRoughness = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { roughness } = inputs;
 
@@ -34190,7 +34261,7 @@ const getRoughness = Fn( ( inputs ) => {
 
 // Moving Frostbite to Physically Based Rendering 3.0 - page 12, listing 2
 // https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-const V_GGX_SmithCorrelated = Fn( ( { alpha, dotNL, dotNV } ) => {
+const V_GGX_SmithCorrelated = /*@__PURE__*/ Fn( ( { alpha, dotNL, dotNV } ) => {
 
 	const a2 = alpha.pow2();
 
@@ -34211,7 +34282,7 @@ const V_GGX_SmithCorrelated = Fn( ( { alpha, dotNL, dotNV } ) => {
 
 // https://google.github.io/filament/Filament.md.html#materialsystem/anisotropicmodel/anisotropicspecularbrdf
 
-const V_GGX_SmithCorrelated_Anisotropic = Fn( ( { alphaT, alphaB, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL } ) => {
+const V_GGX_SmithCorrelated_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, dotTV, dotBV, dotTL, dotBL, dotNV, dotNL } ) => {
 
 	const gv = dotNL.mul( vec3( alphaT.mul( dotTV ), alphaB.mul( dotBV ), dotNV ).length() );
 	const gl = dotNV.mul( vec3( alphaT.mul( dotTL ), alphaB.mul( dotBL ), dotNL ).length() );
@@ -34237,7 +34308,7 @@ const V_GGX_SmithCorrelated_Anisotropic = Fn( ( { alphaT, alphaB, dotTV, dotBV, 
 // Microfacet Models for Refraction through Rough Surfaces - equation (33)
 // http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
 // alpha is "roughness squared" in Disney’s reparameterization
-const D_GGX = Fn( ( { alpha, dotNH } ) => {
+const D_GGX = /*@__PURE__*/ Fn( ( { alpha, dotNH } ) => {
 
 	const a2 = alpha.pow2();
 
@@ -34254,11 +34325,11 @@ const D_GGX = Fn( ( { alpha, dotNH } ) => {
 	]
 } ); // validated
 
-const RECIPROCAL_PI = float( 1 / Math.PI );
+const RECIPROCAL_PI = /*@__PURE__*/ float( 1 / Math.PI );
 
 // https://google.github.io/filament/Filament.md.html#materialsystem/anisotropicmodel/anisotropicspecularbrdf
 
-const D_GGX_Anisotropic = Fn( ( { alphaT, alphaB, dotNH, dotTH, dotBH } ) => {
+const D_GGX_Anisotropic = /*@__PURE__*/ Fn( ( { alphaT, alphaB, dotNH, dotTH, dotBH } ) => {
 
 	const a2 = alphaT.mul( alphaB );
 	const v = vec3( alphaB.mul( dotTH ), alphaT.mul( dotBH ), a2.mul( dotNH ) );
@@ -34280,7 +34351,7 @@ const D_GGX_Anisotropic = Fn( ( { alphaT, alphaB, dotNH, dotTH, dotBH } ) => {
 } );
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-const BRDF_GGX = Fn( ( inputs ) => {
+const BRDF_GGX = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { lightDirection, f0, f90, roughness, f, USE_IRIDESCENCE, USE_ANISOTROPY } = inputs;
 
@@ -34331,7 +34402,7 @@ const BRDF_GGX = Fn( ( inputs ) => {
 // split-sum approximation used in indirect specular lighting.
 // via 'environmentBRDF' from "Physically Based Shading on Mobile"
 // https://www.unrealengine.com/blog/physically-based-shading-on-mobile
-const DFGApprox = Fn( ( { roughness, dotNV } ) => {
+const DFGApprox = /*@__PURE__*/ Fn( ( { roughness, dotNV } ) => {
 
 	const c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );
 
@@ -34354,7 +34425,7 @@ const DFGApprox = Fn( ( { roughness, dotNV } ) => {
 	]
 } );
 
-const EnvironmentBRDF = Fn( ( inputs ) => {
+const EnvironmentBRDF = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { dotNV, specularColor, specularF90, roughness } = inputs;
 
@@ -34363,7 +34434,7 @@ const EnvironmentBRDF = Fn( ( inputs ) => {
 
 } );
 
-const Schlick_to_F0 = Fn( ( { f, f90, dotVH } ) => {
+const Schlick_to_F0 = /*@__PURE__*/ Fn( ( { f, f90, dotVH } ) => {
 
 	const x = dotVH.oneMinus().saturate();
 	const x2 = x.mul( x );
@@ -34382,7 +34453,7 @@ const Schlick_to_F0 = Fn( ( { f, f90, dotVH } ) => {
 } );
 
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs
-const D_Charlie = Fn( ( { roughness, dotNH } ) => {
+const D_Charlie = /*@__PURE__*/ Fn( ( { roughness, dotNH } ) => {
 
 	const alpha = roughness.pow2();
 
@@ -34403,7 +34474,7 @@ const D_Charlie = Fn( ( { roughness, dotNH } ) => {
 } );
 
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs
-const V_Neubelt = Fn( ( { dotNV, dotNL } ) => {
+const V_Neubelt = /*@__PURE__*/ Fn( ( { dotNV, dotNL } ) => {
 
 	// Neubelt and Pettineo 2013, "Crafting a Next-gen Material Pipeline for The Order: 1886"
 	return float( 1.0 ).div( float( 4.0 ).mul( dotNL.add( dotNV ).sub( dotNL.mul( dotNV ) ) ) );
@@ -34417,7 +34488,7 @@ const V_Neubelt = Fn( ( { dotNV, dotNL } ) => {
 	]
 } );
 
-const BRDF_Sheen = Fn( ( { lightDirection } ) => {
+const BRDF_Sheen = /*@__PURE__*/ Fn( ( { lightDirection } ) => {
 
 	const halfDir = lightDirection.add( positionViewDirection ).normalize();
 
@@ -34438,7 +34509,7 @@ const BRDF_Sheen = Fn( ( { lightDirection } ) => {
 // by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
 // code: https://github.com/selfshadow/ltc_code/
 
-const LTC_Uv = Fn( ( { N, V, roughness } ) => {
+const LTC_Uv = /*@__PURE__*/ Fn( ( { N, V, roughness } ) => {
 
 	const LUT_SIZE = 64.0;
 	const LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;
@@ -34463,7 +34534,7 @@ const LTC_Uv = Fn( ( { N, V, roughness } ) => {
 	]
 } );
 
-const LTC_ClippedSphereFormFactor = Fn( ( { f } ) => {
+const LTC_ClippedSphereFormFactor = /*@__PURE__*/ Fn( ( { f } ) => {
 
 	// Real-Time Area Lighting: a Journey from Research to Production (p.102)
 	// An approximation of the form factor of a horizon-clipped rectangle.
@@ -34480,7 +34551,7 @@ const LTC_ClippedSphereFormFactor = Fn( ( { f } ) => {
 	]
 } );
 
-const LTC_EdgeVectorFormFactor = Fn( ( { v1, v2 } ) => {
+const LTC_EdgeVectorFormFactor = /*@__PURE__*/ Fn( ( { v1, v2 } ) => {
 
 	const x = v1.dot( v2 );
 	const y = x.abs().toVar();
@@ -34503,7 +34574,7 @@ const LTC_EdgeVectorFormFactor = Fn( ( { v1, v2 } ) => {
 	]
 } );
 
-const LTC_Evaluate = Fn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => {
+const LTC_Evaluate = /*@__PURE__*/ Fn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => {
 
 	// bail if point is on back side of plane of light
 	// assumes ccw winding order of light vertices
@@ -34607,7 +34678,7 @@ const bicubic = ( textureNode, texelSize, lod ) => {
 
 };
 
-const textureBicubic = Fn( ( [ textureNode, lodNode = float( 3 ) ] ) => {
+const textureBicubic = /*@__PURE__*/ Fn( ( [ textureNode, lodNode = float( 3 ) ] ) => {
 
 	const fLodSize = vec2( textureNode.size( int( lodNode ) ) );
 	const cLodSize = vec2( textureNode.size( int( lodNode.add( 1.0 ) ) ) );
@@ -34624,7 +34695,7 @@ const textureBicubic = Fn( ( [ textureNode, lodNode = float( 3 ) ] ) => {
 // Transmission
 //
 
-const getVolumeTransmissionRay = Fn( ( [ n, v, thickness, ior, modelMatrix ] ) => {
+const getVolumeTransmissionRay = /*@__PURE__*/ Fn( ( [ n, v, thickness, ior, modelMatrix ] ) => {
 
 	// Direction of refracted light.
 	const refractionVector = vec3( refract( v.negate(), normalize( n ), div( 1.0, ior ) ) );
@@ -34651,7 +34722,7 @@ const getVolumeTransmissionRay = Fn( ( [ n, v, thickness, ior, modelMatrix ] ) =
 	]
 } );
 
-const applyIorToRoughness = Fn( ( [ roughness, ior ] ) => {
+const applyIorToRoughness = /*@__PURE__*/ Fn( ( [ roughness, ior ] ) => {
 
 	// Scale roughness with IOR so that an IOR of 1.0 results in no microfacet refraction and
 	// an IOR of 1.5 results in the default amount of microfacet refraction.
@@ -34666,9 +34737,9 @@ const applyIorToRoughness = Fn( ( [ roughness, ior ] ) => {
 	]
 } );
 
-const singleViewportMipTexture = viewportMipTexture();
+const singleViewportMipTexture = /*@__PURE__*/ viewportMipTexture();
 
-const getTransmissionSample = Fn( ( [ fragCoord, roughness, ior ] ) => {
+const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ] ) => {
 
 	const transmissionSample = singleViewportMipTexture.uv( fragCoord );
 	//const transmissionSample = viewportMipTexture( fragCoord );
@@ -34679,7 +34750,7 @@ const getTransmissionSample = Fn( ( [ fragCoord, roughness, ior ] ) => {
 
 } );
 
-const volumeAttenuation = Fn( ( [ transmissionDistance, attenuationColor, attenuationDistance ] ) => {
+const volumeAttenuation = /*@__PURE__*/ Fn( ( [ transmissionDistance, attenuationColor, attenuationDistance ] ) => {
 
 	If( attenuationDistance.notEqual( 0 ), () => {
 
@@ -34704,7 +34775,7 @@ const volumeAttenuation = Fn( ( [ transmissionDistance, attenuationColor, attenu
 	]
 } );
 
-const getIBLVolumeRefraction = Fn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion ] ) => {
+const getIBLVolumeRefraction = /*@__PURE__*/ Fn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion ] ) => {
 
 	let transmittedLight, transmittance;
 
@@ -34784,7 +34855,7 @@ const getIBLVolumeRefraction = Fn( ( [ n, v, roughness, diffuseColor, specularCo
 //
 
 // XYZ to linear-sRGB color space
-const XYZ_TO_REC709 = mat3(
+const XYZ_TO_REC709 = /*@__PURE__*/ mat3(
 	3.2404542, - 0.9692660, 0.0556434,
 	- 1.5371385, 1.8760108, - 0.2040259,
 	- 0.4985314, 0.0415560, 1.0572252
@@ -34827,7 +34898,7 @@ const evalSensitivity = ( OPD, shift ) => {
 
 };
 
-const evalIridescence = Fn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0 } ) => {
+const evalIridescence = /*@__PURE__*/ Fn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0 } ) => {
 
 	// Force iridescenceIOR -> outsideIOR when thinFilmThickness -> 0.0
 	const iridescenceIOR = mix( outsideIOR, eta2, smoothstep( 0.0, 0.03, thinFilmThickness ) );
@@ -34907,7 +34978,7 @@ const evalIridescence = Fn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, 
 // This is a curve-fit approxmation to the "Charlie sheen" BRDF integrated over the hemisphere from
 // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
 // in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
-const IBLSheenBRDF = Fn( ( { normal, viewDir, roughness } ) => {
+const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 
 	const dotNV = normal.dot( viewDir ).saturate();
 
@@ -35231,25 +35302,25 @@ class PhysicalLightingModel extends LightingModel {
 
 // These defines must match with PMREMGenerator
 
-const cubeUV_r0 = float( 1.0 );
-const cubeUV_m0 = float( - 2.0 );
-const cubeUV_r1 = float( 0.8 );
-const cubeUV_m1 = float( - 1.0 );
-const cubeUV_r4 = float( 0.4 );
-const cubeUV_m4 = float( 2.0 );
-const cubeUV_r5 = float( 0.305 );
-const cubeUV_m5 = float( 3.0 );
-const cubeUV_r6 = float( 0.21 );
-const cubeUV_m6 = float( 4.0 );
+const cubeUV_r0 = /*@__PURE__*/ float( 1.0 );
+const cubeUV_m0 = /*@__PURE__*/ float( - 2.0 );
+const cubeUV_r1 = /*@__PURE__*/ float( 0.8 );
+const cubeUV_m1 = /*@__PURE__*/ float( - 1.0 );
+const cubeUV_r4 = /*@__PURE__*/ float( 0.4 );
+const cubeUV_m4 = /*@__PURE__*/ float( 2.0 );
+const cubeUV_r5 = /*@__PURE__*/ float( 0.305 );
+const cubeUV_m5 = /*@__PURE__*/ float( 3.0 );
+const cubeUV_r6 = /*@__PURE__*/ float( 0.21 );
+const cubeUV_m6 = /*@__PURE__*/ float( 4.0 );
 
-const cubeUV_minMipLevel = float( 4.0 );
-const cubeUV_minTileSize = float( 16.0 );
+const cubeUV_minMipLevel = /*@__PURE__*/ float( 4.0 );
+const cubeUV_minTileSize = /*@__PURE__*/ float( 16.0 );
 
 // These shader functions convert between the UV coordinates of a single face of
 // a cubemap, the 0-5 integer index of a cube face, and the direction vector for
 // sampling a textureCube (not generally normalized ).
 
-const getFace = Fn( ( [ direction ] ) => {
+const getFace = /*@__PURE__*/ Fn( ( [ direction ] ) => {
 
 	const absDirection = vec3( abs( direction ) ).toVar();
 	const face = float( - 1.0 ).toVar();
@@ -35291,7 +35362,7 @@ const getFace = Fn( ( [ direction ] ) => {
 } );
 
 // RH coordinate system; PMREM face-indexing convention
-const getUV = Fn( ( [ direction, face ] ) => {
+const getUV = /*@__PURE__*/ Fn( ( [ direction, face ] ) => {
 
 	const uv = vec2().toVar();
 
@@ -35332,7 +35403,7 @@ const getUV = Fn( ( [ direction, face ] ) => {
 	]
 } );
 
-const roughnessToMip = Fn( ( [ roughness ] ) => {
+const roughnessToMip = /*@__PURE__*/ Fn( ( [ roughness ] ) => {
 
 	const mip = float( 0.0 ).toVar();
 
@@ -35369,7 +35440,7 @@ const roughnessToMip = Fn( ( [ roughness ] ) => {
 } );
 
 // RH coordinate system; PMREM face-indexing convention
-const getDirection = Fn( ( [ uv_immutable, face ] ) => {
+const getDirection = /*@__PURE__*/ Fn( ( [ uv_immutable, face ] ) => {
 
 	const uv = uv_immutable.toVar();
 	uv.assign( mul( 2.0, uv ).sub( 1.0 ) );
@@ -35417,7 +35488,7 @@ const getDirection = Fn( ( [ uv_immutable, face ] ) => {
 
 //
 
-const textureCubeUV = Fn( ( [ envMap, sampleDir_immutable, roughness_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
+const textureCubeUV = /*@__PURE__*/ Fn( ( [ envMap, sampleDir_immutable, roughness_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
 
 	const roughness = float( roughness_immutable );
 	const sampleDir = vec3( sampleDir_immutable );
@@ -35439,7 +35510,7 @@ const textureCubeUV = Fn( ( [ envMap, sampleDir_immutable, roughness_immutable, 
 
 } );
 
-const bilinearCubeUV = Fn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
+const bilinearCubeUV = /*@__PURE__*/ Fn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
 
 	const mipInt = float( mipInt_immutable ).toVar();
 	const direction = vec3( direction_immutable );
@@ -35466,7 +35537,7 @@ const bilinearCubeUV = Fn( ( [ envMap, direction_immutable, mipInt_immutable, CU
 
 } );
 
-const getSample = Fn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+const getSample = /*@__PURE__*/ Fn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
 
 	const cosTheta = cos( theta );
 
@@ -35479,7 +35550,7 @@ const getSample = Fn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_T
 
 } );
 
-const blur = Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
 
 	const axis = vec3( select( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
 
@@ -35707,7 +35778,7 @@ class PMREMNode extends TempNode {
 
 }
 
-registerNodeClass( 'PMREM', PMREMNode );
+PMREMNode.type = /*@__PURE__*/ registerNode( 'PMREM', PMREMNode );
 
 function isCubeMapReady( image ) {
 
@@ -35735,7 +35806,7 @@ function isEquirectangularMapReady( image ) {
 
 }
 
-const pmremTexture = nodeProxy( PMREMNode );
+const pmremTexture = /*@__PURE__*/ nodeProxy( PMREMNode );
 
 const _envNodeCache = new WeakMap();
 
@@ -35810,7 +35881,7 @@ class EnvironmentNode extends LightingNode {
 
 }
 
-registerNodeClass( 'Environment', EnvironmentNode );
+EnvironmentNode.type = /*@__PURE__*/ registerNode( 'Environment', EnvironmentNode );
 
 const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 
@@ -35948,6 +36019,8 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 	}
 
 }
+
+MeshStandardNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshStandard', MeshStandardNodeMaterial );
 
 const _defaultValues$5 = /*@__PURE__*/ new MeshPhysicalMaterial();
 
@@ -36179,6 +36252,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 }
 
+MeshPhysicalNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshPhysical', MeshPhysicalNodeMaterial );
+
 class SSSLightingModel extends PhysicalLightingModel {
 
 	constructor( useClearcoat, useSheen, useIridescence, useSSS ) {
@@ -36253,7 +36328,9 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 
 }
 
-const getGradientIrradiance = Fn( ( { normal, lightDirection, builder } ) => {
+MeshSSSNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshSSS', MeshSSSNodeMaterial );
+
+const getGradientIrradiance = /*@__PURE__*/ Fn( ( { normal, lightDirection, builder } ) => {
 
 	// dotNL will be from -1.0 to 1.0
 	const dotNL = normal.dot( lightDirection );
@@ -36321,6 +36398,8 @@ class MeshToonNodeMaterial extends NodeMaterial {
 
 }
 
+MeshToonNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshToon', MeshToonNodeMaterial );
+
 class MatcapUVNode extends TempNode {
 
 	constructor() {
@@ -36340,9 +36419,9 @@ class MatcapUVNode extends TempNode {
 
 }
 
-registerNodeClass( 'MatcapUV', MatcapUVNode );
+MatcapUVNode.type = /*@__PURE__*/ registerNode( 'MatcapUV', MatcapUVNode );
 
-const matcapUV = nodeImmutable( MatcapUVNode );
+const matcapUV = /*@__PURE__*/ nodeImmutable( MatcapUVNode );
 
 const _defaultValues$3 = /*@__PURE__*/ new MeshMatcapMaterial();
 
@@ -36384,6 +36463,8 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 
 }
 
+MeshMatcapNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshMatcap', MeshMatcapNodeMaterial );
+
 const _defaultValues$2 = /*@__PURE__*/ new PointsMaterial();
 
 class PointsNodeMaterial extends NodeMaterial {
@@ -36414,6 +36495,8 @@ class PointsNodeMaterial extends NodeMaterial {
 	}
 
 }
+
+PointsNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Points', PointsNodeMaterial );
 
 class RotateNode extends TempNode {
 
@@ -36465,9 +36548,9 @@ class RotateNode extends TempNode {
 
 }
 
-registerNodeClass( 'Rotate', RotateNode );
+RotateNode.type = /*@__PURE__*/ registerNode( 'Rotate', RotateNode );
 
-const rotate = nodeProxy( RotateNode );
+const rotate = /*@__PURE__*/ nodeProxy( RotateNode );
 
 const _defaultValues$1 = /*@__PURE__*/ new SpriteMaterial();
 
@@ -36545,6 +36628,8 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 }
 
+SpriteNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Sprite', SpriteNodeMaterial );
+
 class ShadowMaskModel extends LightingModel {
 
 	constructor() {
@@ -36596,6 +36681,8 @@ class ShadowNodeMaterial extends NodeMaterial {
 	}
 
 }
+
+ShadowNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Shadow', ShadowNodeMaterial );
 
 const normal = Fn( ( { texture, uv } ) => {
 
@@ -36688,9 +36775,9 @@ class Texture3DNode extends TextureNode {
 
 }
 
-registerNodeClass( 'Texture3D', Texture3DNode );
+Texture3DNode.type = /*@__PURE__*/ registerNode( 'Texture3D', Texture3DNode );
 
-const texture3D = nodeProxy( Texture3DNode );
+const texture3D = /*@__PURE__*/ nodeProxy( Texture3DNode );
 
 class VolumeNodeMaterial extends NodeMaterial {
 
@@ -36781,6 +36868,8 @@ class VolumeNodeMaterial extends NodeMaterial {
 	}
 
 }
+
+VolumeNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Volume', VolumeNodeMaterial );
 
 // converts an array to a specific type
 function convertArray( array, type, forceClone ) {
@@ -50630,7 +50719,7 @@ class ParameterNode extends PropertyNode {
 
 }
 
-registerNodeClass( 'Parameter', ParameterNode );
+ParameterNode.type = /*@__PURE__*/ registerNode( 'Parameter', ParameterNode );
 
 const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );
 
@@ -50706,9 +50795,9 @@ class CodeNode extends Node {
 
 }
 
-registerNodeClass( 'Code', CodeNode );
+CodeNode.type = /*@__PURE__*/ registerNode( 'Code', CodeNode );
 
-const code = nodeProxy( CodeNode );
+const code = /*@__PURE__*/ nodeProxy( CodeNode );
 
 const js = ( src, includes ) => code( src, includes, 'js' );
 const wgsl = ( src, includes ) => code( src, includes, 'wgsl' );
@@ -50791,7 +50880,7 @@ class FunctionNode extends CodeNode {
 
 }
 
-registerNodeClass( 'Function', FunctionNode );
+FunctionNode.type = /*@__PURE__*/ registerNode( 'Function', FunctionNode );
 
 const nativeFn = ( code, includes = [], language = '' ) => {
 
@@ -51176,9 +51265,9 @@ class StackNode extends Node {
 
 }
 
-registerNodeClass( 'Stack', StackNode );
+StackNode.type = /*@__PURE__*/ registerNode( 'Stack', StackNode );
 
-const stack = nodeProxy( StackNode );
+const stack = /*@__PURE__*/ nodeProxy( StackNode );
 
 const LOD_MIN = 4;
 
@@ -51847,10 +51936,8 @@ function _createRenderTarget( width, height, params ) {
 
 function _setViewport( target, x, y, width, height ) {
 
-	const viewY = target.height - height - y;
-
-	target.viewport.set( x, viewY, width, height );
-	target.scissor.set( x, viewY, width, height );
+	target.viewport.set( x, y, width, height );
+	target.scissor.set( x, y, width, height );
 
 }
 
@@ -52508,7 +52595,7 @@ class NodeBuilder {
 
 	}
 
-	needsColorSpaceToLinear( /*texture*/ ) {
+	needsColorSpaceToLinearSRGB( /*texture*/ ) {
 
 		return false;
 
@@ -53530,7 +53617,7 @@ class StructTypeNode extends Node {
 
 }
 
-registerNodeClass( 'StructType', StructTypeNode );
+StructTypeNode.type = /*@__PURE__*/ registerNode( 'StructType', StructTypeNode );
 
 class OutputStructNode extends Node {
 
@@ -53582,9 +53669,9 @@ class OutputStructNode extends Node {
 
 }
 
-registerNodeClass( 'OutputStruct', OutputStructNode );
+OutputStructNode.type = /*@__PURE__*/ registerNode( 'OutputStruct', OutputStructNode );
 
-const outputStruct = nodeProxy( OutputStructNode );
+const outputStruct = /*@__PURE__*/ nodeProxy( OutputStructNode );
 
 function getTextureIndex( textures, name ) {
 
@@ -53659,9 +53746,9 @@ class MRTNode extends OutputStructNode {
 
 }
 
-registerNodeClass( 'MRT', MRTNode );
+MRTNode.type = /*@__PURE__*/ registerNode( 'MRT', MRTNode );
 
-const mrt = nodeProxy( MRTNode );
+const mrt = /*@__PURE__*/ nodeProxy( MRTNode );
 
 class FunctionOverloadingNode extends Node {
 
@@ -53750,9 +53837,9 @@ class FunctionOverloadingNode extends Node {
 
 }
 
-registerNodeClass( 'FunctionOverloading', FunctionOverloadingNode );
+FunctionOverloadingNode.type = /*@__PURE__*/ registerNode( 'FunctionOverloading', FunctionOverloadingNode );
 
-const overloadingBaseFn = nodeProxy( FunctionOverloadingNode );
+const overloadingBaseFn = /*@__PURE__*/ nodeProxy( FunctionOverloadingNode );
 
 const overloadingFn = ( functionNodes ) => ( ...params ) => overloadingBaseFn( functionNodes, ...params );
 
@@ -53836,13 +53923,13 @@ TimerNode.GLOBAL = 'global';
 TimerNode.DELTA = 'delta';
 TimerNode.FRAME = 'frame';
 
-registerNodeClass( 'Timer', TimerNode );
+TimerNode.type = /*@__PURE__*/ registerNode( 'Timer', TimerNode );
 
 // @TODO: add support to use node in timeScale
 const timerLocal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale, value ) );
 const timerGlobal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale, value ) );
 const timerDelta = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.DELTA, timeScale, value ) );
-const frameId = nodeImmutable( TimerNode, TimerNode.FRAME ).toUint();
+const frameId = /*@__PURE__*/ nodeImmutable( TimerNode, TimerNode.FRAME ).toUint();
 
 class OscNode extends Node {
 
@@ -53913,12 +54000,12 @@ OscNode.SQUARE = 'square';
 OscNode.TRIANGLE = 'triangle';
 OscNode.SAWTOOTH = 'sawtooth';
 
-registerNodeClass( 'Osc', OscNode );
+OscNode.type = /*@__PURE__*/ registerNode( 'Osc', OscNode );
 
-const oscSine = nodeProxy( OscNode, OscNode.SINE );
-const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );
-const oscTriangle = nodeProxy( OscNode, OscNode.TRIANGLE );
-const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
+const oscSine = /*@__PURE__*/ nodeProxy( OscNode, OscNode.SINE );
+const oscSquare = /*@__PURE__*/ nodeProxy( OscNode, OscNode.SQUARE );
+const oscTriangle = /*@__PURE__*/ nodeProxy( OscNode, OscNode.TRIANGLE );
+const oscSawtooth = /*@__PURE__*/ nodeProxy( OscNode, OscNode.SAWTOOTH );
 
 class SpriteSheetUVNode extends Node {
 
@@ -53952,9 +54039,9 @@ class SpriteSheetUVNode extends Node {
 
 }
 
-registerNodeClass( 'SpriteSheetUV', SpriteSheetUVNode );
+SpriteSheetUVNode.type = /*@__PURE__*/ registerNode( 'SpriteSheetUV', SpriteSheetUVNode );
 
-const spritesheetUV = nodeProxy( SpriteSheetUVNode );
+const spritesheetUV = /*@__PURE__*/ nodeProxy( SpriteSheetUVNode );
 
 class StorageArrayElementNode extends ArrayElementNode {
 
@@ -54036,9 +54123,9 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 }
 
-registerNodeClass( 'StorageArrayElement', StorageArrayElementNode );
+StorageArrayElementNode.type = /*@__PURE__*/ registerNode( 'StorageArrayElement', StorageArrayElementNode );
 
-const storageElement = nodeProxy( StorageArrayElementNode );
+const storageElement = /*@__PURE__*/ nodeProxy( StorageArrayElementNode );
 
 class TriplanarTexturesNode extends Node {
 
@@ -54087,9 +54174,9 @@ class TriplanarTexturesNode extends Node {
 
 }
 
-registerNodeClass( 'TriplanarTextures', TriplanarTexturesNode );
+TriplanarTexturesNode.type = /*@__PURE__*/ registerNode( 'TriplanarTextures', TriplanarTexturesNode );
 
-const triplanarTextures = nodeProxy( TriplanarTexturesNode );
+const triplanarTextures = /*@__PURE__*/ nodeProxy( TriplanarTexturesNode );
 const triplanarTexture = ( ...params ) => triplanarTextures( ...params );
 
 const _reflectorPlane = new Plane();
@@ -54314,7 +54401,7 @@ class ReflectorNode extends TextureNode {
 
 const reflector = ( parameters ) => nodeObject( new ReflectorNode( parameters ) );
 
-registerNodeClass( 'Reflector', ReflectorNode );
+ReflectorNode.type = /*@__PURE__*/ registerNode( 'Reflector', ReflectorNode );
 
 // Helper for passes that need to fill the viewport with a single quad.
 
@@ -54477,7 +54564,7 @@ class RTTNode extends TextureNode {
 
 }
 
-registerNodeClass( 'RTT', RTTNode );
+RTTNode.type = /*@__PURE__*/ registerNode( 'RTT', RTTNode );
 
 const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( node ), ...params ) );
 const convertToTexture = ( node, ...params ) => node.isTextureNode ? node : rtt( node, ...params );
@@ -54542,7 +54629,7 @@ class VertexColorNode extends AttributeNode {
 
 }
 
-registerNodeClass( 'VertexColor', VertexColorNode );
+VertexColorNode.type = /*@__PURE__*/ registerNode( 'VertexColor', VertexColorNode );
 
 const vertexColor = ( ...params ) => nodeObject( new VertexColorNode( ...params ) );
 
@@ -54564,9 +54651,9 @@ class PointUVNode extends Node {
 
 }
 
-registerNodeClass( 'PointUV', PointUVNode );
+PointUVNode.type = /*@__PURE__*/ registerNode( 'PointUV', PointUVNode );
 
-const pointUV = nodeImmutable( PointUVNode );
+const pointUV = /*@__PURE__*/ nodeImmutable( PointUVNode );
 
 class SceneNode extends Node {
 
@@ -54609,10 +54696,10 @@ class SceneNode extends Node {
 SceneNode.BACKGROUND_BLURRINESS = 'backgroundBlurriness';
 SceneNode.BACKGROUND_INTENSITY = 'backgroundIntensity';
 
-registerNodeClass( 'Scene', SceneNode );
+SceneNode.type = /*@__PURE__*/ registerNode( 'Scene', SceneNode );
 
-const backgroundBlurriness = nodeImmutable( SceneNode, SceneNode.BACKGROUND_BLURRINESS );
-const backgroundIntensity = nodeImmutable( SceneNode, SceneNode.BACKGROUND_INTENSITY );
+const backgroundBlurriness = /*@__PURE__*/ nodeImmutable( SceneNode, SceneNode.BACKGROUND_BLURRINESS );
+const backgroundIntensity = /*@__PURE__*/ nodeImmutable( SceneNode, SceneNode.BACKGROUND_INTENSITY );
 
 const GPUPrimitiveTopology = {
 	PointList: 'point-list',
@@ -55024,7 +55111,7 @@ class StorageBufferNode extends BufferNode {
 
 }
 
-registerNodeClass( 'StorageBuffer', StorageBufferNode );
+StorageBufferNode.type = /*@__PURE__*/ registerNode( 'StorageBuffer', StorageBufferNode );
 
 // Read-Write Storage
 const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
@@ -55114,9 +55201,9 @@ class StorageTextureNode extends TextureNode {
 
 }
 
-registerNodeClass( 'StorageTexture', StorageTextureNode );
+StorageTextureNode.type = /*@__PURE__*/ registerNode( 'StorageTexture', StorageTextureNode );
 
-const storageTexture = nodeProxy( StorageTextureNode );
+const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode );
 
 const textureStore = ( value, uvNode, storeNode ) => {
 
@@ -55148,7 +55235,7 @@ class UserDataNode extends ReferenceNode {
 
 }
 
-registerNodeClass( 'UserData', UserDataNode );
+UserDataNode.type = /*@__PURE__*/ registerNode( 'UserData', UserDataNode );
 
 const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );
 
@@ -55173,9 +55260,9 @@ class PosterizeNode extends TempNode {
 
 }
 
-registerNodeClass( 'Posterize', PosterizeNode );
+PosterizeNode.type = /*@__PURE__*/ registerNode( 'Posterize', PosterizeNode );
 
-const posterize = nodeProxy( PosterizeNode );
+const posterize = /*@__PURE__*/ nodeProxy( PosterizeNode );
 
 let _sharedFramebuffer = null;
 
@@ -55201,9 +55288,9 @@ class ViewportSharedTextureNode extends ViewportTextureNode {
 
 }
 
-registerNodeClass( 'ViewportSharedTexture', ViewportSharedTextureNode );
+ViewportSharedTextureNode.type = /*@__PURE__*/ registerNode( 'ViewportSharedTexture', ViewportSharedTextureNode );
 
-const viewportSharedTexture = nodeProxy( ViewportSharedTextureNode );
+const viewportSharedTexture = /*@__PURE__*/ nodeProxy( ViewportSharedTextureNode );
 
 const _size$7 = /*@__PURE__*/ new Vector2();
 
@@ -55235,7 +55322,7 @@ class PassTextureNode extends TextureNode {
 
 }
 
-registerNodeClass( 'PassTexture', PassTextureNode );
+PassTextureNode.type = /*@__PURE__*/ registerNode( 'PassTexture', PassTextureNode );
 
 class PassMultipleTextureNode extends PassTextureNode {
 
@@ -55270,7 +55357,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 
 }
 
-registerNodeClass( 'PassMultipleTexture', PassMultipleTextureNode );
+PassMultipleTextureNode.type = /*@__PURE__*/ registerNode( 'PassMultipleTexture', PassMultipleTextureNode );
 
 class PassNode extends TempNode {
 
@@ -55552,7 +55639,7 @@ class PassNode extends TempNode {
 PassNode.COLOR = 'color';
 PassNode.DEPTH = 'depth';
 
-registerNodeClass( 'Pass', PassNode );
+PassNode.type = /*@__PURE__*/ registerNode( 'Pass', PassNode );
 
 const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
 const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
@@ -55748,7 +55835,7 @@ class GaussianBlurNode extends TempNode {
 
 }
 
-registerNodeClass( 'GaussianBlur', GaussianBlurNode );
+GaussianBlurNode.type = /*@__PURE__*/ registerNode( 'GaussianBlur', GaussianBlurNode );
 
 const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ) );
 
@@ -55888,19 +55975,19 @@ class AfterImageNode extends TempNode {
 
 const afterImage = ( node, damp ) => nodeObject( new AfterImageNode( convertToTexture( node ), damp ) );
 
-const grayscale = /*#__PURE__*/ Fn( ( [ color ] ) => {
+const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	return luminance( color.rgb );
 
 } );
 
-const saturation = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
+const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	return adjustment.mix( luminance( color.rgb ), color.rgb );
 
 } );
 
-const vibrance = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
+const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	const average = add( color.r, color.g, color.b ).div( 3.0 );
 
@@ -55911,7 +55998,7 @@ const vibrance = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 } );
 
-const hue = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
+const hue = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	const k = vec3( 0.57735, 0.57735, 0.57735 );
 
@@ -55921,7 +56008,7 @@ const hue = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 } );
 
-const _luminanceCoefficients = /*#__PURE__*/ new Vector3();
+const _luminanceCoefficients = /*@__PURE__*/ new Vector3();
 const luminance = (
 	color,
 	luminanceCoefficients = vec3( ... ColorManagement.getLuminanceCoefficients( _luminanceCoefficients ) )
@@ -56164,7 +56251,7 @@ class SobelOperatorNode extends TempNode {
 
 }
 
-registerNodeClass( 'SobelOperator', SobelOperatorNode );
+SobelOperatorNode.type = /*@__PURE__*/ registerNode( 'SobelOperator', SobelOperatorNode );
 
 const sobel = ( node ) => nodeObject( new SobelOperatorNode( convertToTexture( node ) ) );
 
@@ -56275,7 +56362,7 @@ class DepthOfFieldNode extends TempNode {
 
 }
 
-registerNodeClass( 'DepthOfField', DepthOfFieldNode );
+DepthOfFieldNode.type = /*@__PURE__*/ registerNode( 'DepthOfField', DepthOfFieldNode );
 
 const dof = ( node, viewZNode, focus = 1, aperture = 0.025, maxblur = 1 ) => nodeObject( new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focus ), nodeObject( aperture ), nodeObject( maxblur ) ) );
 
@@ -56326,7 +56413,7 @@ class DotScreenNode extends TempNode {
 
 }
 
-registerNodeClass( 'DotScreen', DotScreenNode );
+DotScreenNode.type = /*@__PURE__*/ registerNode( 'DotScreen', DotScreenNode );
 
 const dotScreen = ( node, center, angle, scale ) => nodeObject( new DotScreenNode( nodeObject( node ), center, angle, scale ) );
 
@@ -56367,7 +56454,7 @@ class RGBShiftNode extends TempNode {
 
 }
 
-registerNodeClass( 'RGBShift', RGBShiftNode );
+RGBShiftNode.type = /*@__PURE__*/ registerNode( 'RGBShift', RGBShiftNode );
 
 const rgbShift = ( node, amount, angle ) => nodeObject( new RGBShiftNode( convertToTexture( node ), amount, angle ) );
 
@@ -56412,9 +56499,9 @@ class FilmNode extends TempNode {
 
 }
 
-registerNodeClass( 'Film', FilmNode );
+FilmNode.type = /*@__PURE__*/ registerNode( 'Film', FilmNode );
 
-const film = nodeProxy( FilmNode );
+const film = /*@__PURE__*/ nodeProxy( FilmNode );
 
 class Lut3DNode extends TempNode {
 
@@ -56459,7 +56546,7 @@ class Lut3DNode extends TempNode {
 
 }
 
-registerNodeClass( 'Lut3D', Lut3DNode );
+Lut3DNode.type = /*@__PURE__*/ registerNode( 'Lut3D', Lut3DNode );
 
 const lut3D = ( node, lut, size, intensity ) => nodeObject( new Lut3DNode( nodeObject( node ), nodeObject( lut ), size, nodeObject( intensity ) ) );
 
@@ -56680,7 +56767,7 @@ class GTAONode extends TempNode {
 
 }
 
-registerNodeClass( 'GTAO', GTAONode );
+GTAONode.type = /*@__PURE__*/ registerNode( 'GTAO', GTAONode );
 
 function generateMagicSquareNoise( size = 5 ) {
 
@@ -56915,7 +57002,7 @@ class DenoiseNode extends TempNode {
 
 }
 
-registerNodeClass( 'Denoise', DenoiseNode );
+DenoiseNode.type = /*@__PURE__*/ registerNode( 'Denoise', DenoiseNode );
 
 function generatePdSamplePointInitializer( samples, rings, radiusExponent ) {
 
@@ -57263,7 +57350,7 @@ class FXAANode extends TempNode {
 
 }
 
-registerNodeClass( 'FXAA', FXAANode );
+FXAANode.type = /*@__PURE__*/ registerNode( 'FXAA', FXAANode );
 
 const fxaa = ( node ) => nodeObject( new FXAANode( convertToTexture( node ) ) );
 
@@ -57645,7 +57732,7 @@ class TransitionNode extends TempNode {
 
 }
 
-registerNodeClass( 'Transition', TransitionNode );
+TransitionNode.type = /*@__PURE__*/ registerNode( 'Transition', TransitionNode );
 
 const transition = ( nodeA, nodeB, mixTexture, mixRatio = 0.0, threshold = 0.1, useTexture = 0 ) => nodeObject( new TransitionNode( convertToTexture( nodeA ), convertToTexture( nodeB ), convertToTexture( mixTexture ), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) ) );
 
@@ -57788,7 +57875,7 @@ class PixelationNode extends TempNode {
 
 }
 
-registerNodeClass( 'Pixelation', PixelationNode );
+PixelationNode.type = /*@__PURE__*/ registerNode( 'Pixelation', PixelationNode );
 
 const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( convertToTexture( node ), convertToTexture( depthNode ), convertToTexture( normalNode ), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
 
@@ -57836,7 +57923,7 @@ class PixelationPassNode extends PassNode {
 
 const pixelationPass = ( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) => nodeObject( new PixelationPassNode( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) );
 
-registerNodeClass( 'PixelationPass', PixelationPassNode );
+PixelationPassNode.type = /*@__PURE__*/ registerNode( 'PixelationPass', PixelationPassNode );
 
 const _size$3 = /*@__PURE__*/ new Vector2();
 
@@ -58068,7 +58155,7 @@ class SSAAPassNode extends PassNode {
 
 }
 
-registerNodeClass( 'SSAAPass', SSAAPassNode );
+SSAAPassNode.type = /*@__PURE__*/ registerNode( 'SSAAPass', SSAAPassNode );
 
 // These jitter vectors are specified in integers because it is easier.
 // I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
@@ -58178,7 +58265,7 @@ class StereoPassNode extends PassNode {
 
 }
 
-registerNodeClass( 'StereoPass', StereoPassNode );
+StereoPassNode.type = /*@__PURE__*/ registerNode( 'StereoPass', StereoPassNode );
 
 const stereoPass = ( scene, camera ) => nodeObject( new StereoPassNode( scene, camera ) );
 
@@ -58276,7 +58363,7 @@ class StereoCompositePassNode extends PassNode {
 
 }
 
-registerNodeClass( 'StereoCompositePass', StereoCompositePassNode );
+StereoCompositePassNode.type = /*@__PURE__*/ registerNode( 'StereoCompositePass', StereoCompositePassNode );
 
 class AnaglyphPassNode extends StereoCompositePassNode {
 
@@ -58372,7 +58459,7 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 }
 
-registerNodeClass( 'ParallaxBarrierPass', ParallaxBarrierPassNode );
+ParallaxBarrierPassNode.type = /*@__PURE__*/ registerNode( 'ParallaxBarrierPass', ParallaxBarrierPassNode );
 
 const parallaxBarrierPass = ( scene, camera ) => nodeObject( new ParallaxBarrierPassNode( scene, camera ) );
 
@@ -58531,9 +58618,9 @@ class ScriptableValueNode extends Node {
 
 }
 
-registerNodeClass( 'ScriptableValue', ScriptableValueNode );
+ScriptableValueNode.type = /*@__PURE__*/ registerNode( 'ScriptableValue', ScriptableValueNode );
 
-const scriptableValue = nodeProxy( ScriptableValueNode );
+const scriptableValue = /*@__PURE__*/ nodeProxy( ScriptableValueNode );
 
 class Resources extends Map {
 
@@ -59026,9 +59113,9 @@ class ScriptableNode extends Node {
 
 }
 
-registerNodeClass( 'Scriptable', ScriptableNode );
+ScriptableNode.type = /*@__PURE__*/ registerNode( 'Scriptable', ScriptableNode );
 
-const scriptable = nodeProxy( ScriptableNode );
+const scriptable = /*@__PURE__*/ nodeProxy( ScriptableNode );
 
 class FogNode extends Node {
 
@@ -59067,9 +59154,9 @@ class FogNode extends Node {
 
 }
 
-registerNodeClass( 'Fog', FogNode );
+FogNode.type = /*@__PURE__*/ registerNode( 'Fog', FogNode );
 
-const fog = nodeProxy( FogNode );
+const fog = /*@__PURE__*/ nodeProxy( FogNode );
 
 class FogRangeNode extends FogNode {
 
@@ -59094,9 +59181,9 @@ class FogRangeNode extends FogNode {
 
 }
 
-registerNodeClass( 'FogRange', FogRangeNode );
+FogRangeNode.type = /*@__PURE__*/ registerNode( 'FogRange', FogRangeNode );
 
-const rangeFog = nodeProxy( FogRangeNode );
+const rangeFog = /*@__PURE__*/ nodeProxy( FogRangeNode );
 
 class FogExp2Node extends FogNode {
 
@@ -59121,9 +59208,9 @@ class FogExp2Node extends FogNode {
 
 }
 
-registerNodeClass( 'FogExp2', FogExp2Node );
+FogExp2Node.type = /*@__PURE__*/ registerNode( 'FogExp2', FogExp2Node );
 
-const densityFog = nodeProxy( FogExp2Node );
+const densityFog = /*@__PURE__*/ nodeProxy( FogExp2Node );
 
 let min = null;
 let max = null;
@@ -59226,9 +59313,9 @@ class RangeNode extends Node {
 
 }
 
-registerNodeClass( 'Range', RangeNode );
+RangeNode.type = /*@__PURE__*/ registerNode( 'Range', RangeNode );
 
-const range = nodeProxy( RangeNode );
+const range = /*@__PURE__*/ nodeProxy( RangeNode );
 
 class LightNode extends Node {
 
@@ -59277,9 +59364,9 @@ class LightNode extends Node {
 
 LightNode.TARGET_DIRECTION = 'targetDirection';
 
-registerNodeClass( 'Light', LightNode );
+LightNode.type = /*@__PURE__*/ registerNode( 'Light', LightNode );
 
-const lightTargetDirection = nodeProxy( LightNode, LightNode.TARGET_DIRECTION );
+const lightTargetDirection = /*@__PURE__*/ nodeProxy( LightNode, LightNode.TARGET_DIRECTION );
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
 
@@ -59615,9 +59702,9 @@ class AnalyticLightNode extends LightingNode {
 
 }
 
-registerNodeClass( 'AnalyticLight', AnalyticLightNode );
+AnalyticLightNode.type = /*@__PURE__*/ registerNode( 'AnalyticLight', AnalyticLightNode );
 
-const getDistanceAttenuation = Fn( ( inputs ) => {
+const getDistanceAttenuation = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { lightDistance, cutoffDistance, decayExponent } = inputs;
 
@@ -59686,7 +59773,7 @@ class PointLightNode extends AnalyticLightNode {
 
 }
 
-registerNodeClass( 'PointLight', PointLightNode );
+PointLightNode.type = /*@__PURE__*/ registerNode( 'PointLight', PointLightNode );
 
 class DirectionalLightNode extends AnalyticLightNode {
 
@@ -59716,7 +59803,7 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 }
 
-registerNodeClass( 'DirectionalLight', DirectionalLightNode );
+DirectionalLightNode.type = /*@__PURE__*/ registerNode( 'DirectionalLight', DirectionalLightNode );
 
 const _matrix41 = /*@__PURE__*/ new Matrix4();
 const _matrix42 = /*@__PURE__*/ new Matrix4();
@@ -59799,7 +59886,7 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 }
 
-registerNodeClass( 'RectAreaLight', RectAreaLightNode );
+RectAreaLightNode.type = /*@__PURE__*/ registerNode( 'RectAreaLight', RectAreaLightNode );
 
 class SpotLightNode extends AnalyticLightNode {
 
@@ -59873,7 +59960,7 @@ class SpotLightNode extends AnalyticLightNode {
 
 }
 
-registerNodeClass( 'SpotLight', SpotLightNode );
+SpotLightNode.type = /*@__PURE__*/ registerNode( 'SpotLight', SpotLightNode );
 
 class IESSpotLightNode extends SpotLightNode {
 
@@ -59901,7 +59988,7 @@ class IESSpotLightNode extends SpotLightNode {
 
 }
 
-registerNodeClass( 'IESSpotLight', IESSpotLightNode );
+IESSpotLightNode.type = /*@__PURE__*/ registerNode( 'IESSpotLight', IESSpotLightNode );
 
 class AmbientLightNode extends AnalyticLightNode {
 
@@ -59919,7 +60006,7 @@ class AmbientLightNode extends AnalyticLightNode {
 
 }
 
-registerNodeClass( 'AmbientLight', AmbientLightNode );
+AmbientLightNode.type = /*@__PURE__*/ registerNode( 'AmbientLight', AmbientLightNode );
 
 class HemisphereLightNode extends AnalyticLightNode {
 
@@ -59961,7 +60048,7 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 }
 
-registerNodeClass( 'HemisphereLight', HemisphereLightNode );
+HemisphereLightNode.type = /*@__PURE__*/ registerNode( 'HemisphereLight', HemisphereLightNode );
 
 class LightProbeNode extends AnalyticLightNode {
 
@@ -60003,9 +60090,9 @@ class LightProbeNode extends AnalyticLightNode {
 
 }
 
-registerNodeClass( 'LightProbe', LightProbeNode );
+LightProbeNode.type = /*@__PURE__*/ registerNode( 'LightProbe', LightProbeNode );
 
-const shGetIrradianceAt = Fn( ( [ normal, shCoefficients ] ) => {
+const shGetIrradianceAt = /*@__PURE__*/ Fn( ( [ normal, shCoefficients ] ) => {
 
 	// normal is assumed to have unit length
 
@@ -60939,7 +61026,7 @@ class Color4 extends Color {
 
 }
 
-const hash = Fn( ( [ seed ] ) => {
+const hash = /*@__PURE__*/ Fn( ( [ seed ] ) => {
 
 	// Taken from https://www.shadertoy.com/view/XlGcRh, originally from pcg-random.org
 
@@ -60960,7 +61047,7 @@ const sinc = ( x, k ) => sin( PI.mul( k.mul( x ).sub( 1.0 ) ) ).div( PI.mul( k.m
 // https://github.com/cabbibo/glsl-tri-noise-3d
 
 
-const tri = Fn( ( [ x ] ) => {
+const tri = /*@__PURE__*/ Fn( ( [ x ] ) => {
 
 	return x.fract().sub( .5 ).abs();
 
@@ -60972,7 +61059,7 @@ const tri = Fn( ( [ x ] ) => {
 	]
 } );
 
-const tri3 = Fn( ( [ p ] ) => {
+const tri3 = /*@__PURE__*/ Fn( ( [ p ] ) => {
 
 	return vec3( tri( p.z.add( tri( p.y.mul( 1. ) ) ) ), tri( p.z.add( tri( p.x.mul( 1. ) ) ) ), tri( p.y.add( tri( p.x.mul( 1. ) ) ) ) );
 
@@ -60984,7 +61071,7 @@ const tri3 = Fn( ( [ p ] ) => {
 	]
 } );
 
-const triNoise3D = Fn( ( [ p_immutable, spd, time ] ) => {
+const triNoise3D = /*@__PURE__*/ Fn( ( [ p_immutable, spd, time ] ) => {
 
 	const p = vec3( p_immutable ).toVar();
 	const z = float( 1.4 ).toVar();
@@ -61017,13 +61104,13 @@ const triNoise3D = Fn( ( [ p_immutable, spd, time ] ) => {
 	]
 } );
 
-const rotateUV = Fn( ( [ uv, rotation, center = vec2( 0.5 ) ] ) => {
+const rotateUV = /*@__PURE__*/ Fn( ( [ uv, rotation, center = vec2( 0.5 ) ] ) => {
 
 	return rotate( uv.sub( center ), rotation ).add( center );
 
 } );
 
-const spherizeUV = Fn( ( [ uv, strength, center = vec2( 0.5 ) ] ) => {
+const spherizeUV = /*@__PURE__*/ Fn( ( [ uv, strength, center = vec2( 0.5 ) ] ) => {
 
 	const delta = uv.sub( center );
 	const delta2 = delta.dot( delta );
@@ -61034,7 +61121,7 @@ const spherizeUV = Fn( ( [ uv, strength, center = vec2( 0.5 ) ] ) => {
 
 } );
 
-const billboarding = Fn( ( { position = null, horizontal = true, vertical = false } ) => {
+const billboarding = /*@__PURE__*/ Fn( ( { position = null, horizontal = true, vertical = false } ) => {
 
 	let worldMatrix;
 
@@ -61077,7 +61164,7 @@ const billboarding = Fn( ( { position = null, horizontal = true, vertical = fals
 
 } );
 
-const viewportSafeUV = Fn( ( [ uv = null ] ) => {
+const viewportSafeUV = /*@__PURE__*/ Fn( ( [ uv = null ] ) => {
 
 	const depth = linearDepth();
 	const depthDiff = linearDepth( viewportDepthTexture( uv ) ).sub( depth );
@@ -61154,11 +61241,11 @@ function getPreviousMatrix( object ) {
 
 }
 
-registerNodeClass( 'Velocity', VelocityNode );
+VelocityNode.type = /*@__PURE__*/ registerNode( 'Velocity', VelocityNode );
 
-const velocity = nodeImmutable( VelocityNode );
+const velocity = /*@__PURE__*/ nodeImmutable( VelocityNode );
 
-const burn = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
+const burn = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return min$1( 1.0, base.oneMinus().div( blend ) ).oneMinus();
 
@@ -61171,7 +61258,7 @@ const burn = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
 	]
 } );
 
-const dodge = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
+const dodge = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return min$1( base.div( blend.oneMinus() ), 1.0 );
 
@@ -61184,7 +61271,7 @@ const dodge = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
 	]
 } );
 
-const screen = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
+const screen = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return base.oneMinus().mul( blend.oneMinus() ).oneMinus();
 
@@ -61197,7 +61284,7 @@ const screen = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
 	]
 } );
 
-const overlay = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
+const overlay = /*@__PURE__*/ Fn( ( [ base, blend ] ) => {
 
 	return mix( base.mul( 2.0 ).mul( blend ), base.oneMinus().mul( 2.0 ).mul( blend.oneMinus() ).oneMinus(), step( 0.5, base ) );
 
@@ -61210,7 +61297,7 @@ const overlay = /*#__PURE__*/ Fn( ( [ base, blend ] ) => {
 	]
 } );
 
-const motionBlur = /*#__PURE__*/ Fn( ( [ inputNode, velocity, numSamples = int( 16 ) ] ) => {
+const motionBlur = /*@__PURE__*/ Fn( ( [ inputNode, velocity, numSamples = int( 16 ) ] ) => {
 
 	const sampleColor = ( uv ) => inputNode.uv( uv );
 
@@ -61270,7 +61357,7 @@ const sepia = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 } );
 
-const sRGBToLinearShader = Fn( ( [ color ] ) => {
+const sRGBToLinear = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	const a = color.mul( 0.9478672986 ).add( 0.0521327014 ).pow( 2.4 );
 	const b = color.mul( 0.0773993808 );
@@ -61281,14 +61368,14 @@ const sRGBToLinearShader = Fn( ( [ color ] ) => {
 	return rgbResult;
 
 } ).setLayout( {
-	name: 'sRGBToLinearShader',
+	name: 'sRGBToLinear',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' }
 	]
 } );
 
-const LinearTosRGBShader = Fn( ( [ color ] ) => {
+const LinearTosRGB = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	const a = color.pow( 0.41666 ).mul( 1.055 ).sub( 0.055 );
 	const b = color.mul( 12.92 );
@@ -61299,7 +61386,7 @@ const LinearTosRGBShader = Fn( ( [ color ] ) => {
 	return rgbResult;
 
 } ).setLayout( {
-	name: 'LinearTosRGBShader',
+	name: 'LinearTosRGB',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' }
@@ -61308,8 +61395,8 @@ const LinearTosRGBShader = Fn( ( [ color ] ) => {
 
 var ColorSpaceFunctions = /*#__PURE__*/Object.freeze({
 	__proto__: null,
-	LinearTosRGBShader: LinearTosRGBShader,
-	sRGBToLinearShader: sRGBToLinearShader
+	LinearTosRGB: LinearTosRGB,
+	sRGBToLinear: sRGBToLinear
 });
 
 // exposure only
@@ -61508,7 +61595,7 @@ var ToneMappingFunctions = /*#__PURE__*/Object.freeze({
 	ReinhardToneMapping: ReinhardToneMapping
 });
 
-const checker = Fn( ( [ coord = uv() ] ) => {
+const checker = /*@__PURE__*/ Fn( ( [ coord = uv() ] ) => {
 
 	const uv = coord.mul( 2.0 );
 
@@ -61525,7 +61612,7 @@ const checker = Fn( ( [ coord = uv() ] ) => {
 
 
 
-const mx_select = /*#__PURE__*/ Fn( ( [ b_immutable, t_immutable, f_immutable ] ) => {
+const mx_select = /*@__PURE__*/ Fn( ( [ b_immutable, t_immutable, f_immutable ] ) => {
 
 	const f = float( f_immutable ).toVar();
 	const t = float( t_immutable ).toVar();
@@ -61543,7 +61630,7 @@ const mx_select = /*#__PURE__*/ Fn( ( [ b_immutable, t_immutable, f_immutable ] 
 	]
 } );
 
-const mx_negate_if = /*#__PURE__*/ Fn( ( [ val_immutable, b_immutable ] ) => {
+const mx_negate_if = /*@__PURE__*/ Fn( ( [ val_immutable, b_immutable ] ) => {
 
 	const b = bool( b_immutable ).toVar();
 	const val = float( val_immutable ).toVar();
@@ -61559,7 +61646,7 @@ const mx_negate_if = /*#__PURE__*/ Fn( ( [ val_immutable, b_immutable ] ) => {
 	]
 } );
 
-const mx_floor = /*#__PURE__*/ Fn( ( [ x_immutable ] ) => {
+const mx_floor = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 
 	const x = float( x_immutable ).toVar();
 
@@ -61573,7 +61660,7 @@ const mx_floor = /*#__PURE__*/ Fn( ( [ x_immutable ] ) => {
 	]
 } );
 
-const mx_floorfrac = /*#__PURE__*/ Fn( ( [ x_immutable, i ] ) => {
+const mx_floorfrac = /*@__PURE__*/ Fn( ( [ x_immutable, i ] ) => {
 
 	const x = float( x_immutable ).toVar();
 	i.assign( mx_floor( x ) );
@@ -61582,7 +61669,7 @@ const mx_floorfrac = /*#__PURE__*/ Fn( ( [ x_immutable, i ] ) => {
 
 } );
 
-const mx_bilerp_0 = /*#__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, s_immutable, t_immutable ] ) => {
+const mx_bilerp_0 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, s_immutable, t_immutable ] ) => {
 
 	const t = float( t_immutable ).toVar();
 	const s = float( s_immutable ).toVar();
@@ -61607,7 +61694,7 @@ const mx_bilerp_0 = /*#__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutab
 	]
 } );
 
-const mx_bilerp_1 = /*#__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, s_immutable, t_immutable ] ) => {
+const mx_bilerp_1 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, s_immutable, t_immutable ] ) => {
 
 	const t = float( t_immutable ).toVar();
 	const s = float( s_immutable ).toVar();
@@ -61632,9 +61719,9 @@ const mx_bilerp_1 = /*#__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutab
 	]
 } );
 
-const mx_bilerp = /*#__PURE__*/ overloadingFn( [ mx_bilerp_0, mx_bilerp_1 ] );
+const mx_bilerp = /*@__PURE__*/ overloadingFn( [ mx_bilerp_0, mx_bilerp_1 ] );
 
-const mx_trilerp_0 = /*#__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, v4_immutable, v5_immutable, v6_immutable, v7_immutable, s_immutable, t_immutable, r_immutable ] ) => {
+const mx_trilerp_0 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, v4_immutable, v5_immutable, v6_immutable, v7_immutable, s_immutable, t_immutable, r_immutable ] ) => {
 
 	const r = float( r_immutable ).toVar();
 	const t = float( t_immutable ).toVar();
@@ -61671,7 +61758,7 @@ const mx_trilerp_0 = /*#__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immuta
 	]
 } );
 
-const mx_trilerp_1 = /*#__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, v4_immutable, v5_immutable, v6_immutable, v7_immutable, s_immutable, t_immutable, r_immutable ] ) => {
+const mx_trilerp_1 = /*@__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immutable, v3_immutable, v4_immutable, v5_immutable, v6_immutable, v7_immutable, s_immutable, t_immutable, r_immutable ] ) => {
 
 	const r = float( r_immutable ).toVar();
 	const t = float( t_immutable ).toVar();
@@ -61708,9 +61795,9 @@ const mx_trilerp_1 = /*#__PURE__*/ Fn( ( [ v0_immutable, v1_immutable, v2_immuta
 	]
 } );
 
-const mx_trilerp = /*#__PURE__*/ overloadingFn( [ mx_trilerp_0, mx_trilerp_1 ] );
+const mx_trilerp = /*@__PURE__*/ overloadingFn( [ mx_trilerp_0, mx_trilerp_1 ] );
 
-const mx_gradient_float_0 = /*#__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y_immutable ] ) => {
+const mx_gradient_float_0 = /*@__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y_immutable ] ) => {
 
 	const y = float( y_immutable ).toVar();
 	const x = float( x_immutable ).toVar();
@@ -61731,7 +61818,7 @@ const mx_gradient_float_0 = /*#__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y
 	]
 } );
 
-const mx_gradient_float_1 = /*#__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y_immutable, z_immutable ] ) => {
+const mx_gradient_float_1 = /*@__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y_immutable, z_immutable ] ) => {
 
 	const z = float( z_immutable ).toVar();
 	const y = float( y_immutable ).toVar();
@@ -61754,9 +61841,9 @@ const mx_gradient_float_1 = /*#__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y
 	]
 } );
 
-const mx_gradient_float = /*#__PURE__*/ overloadingFn( [ mx_gradient_float_0, mx_gradient_float_1 ] );
+const mx_gradient_float = /*@__PURE__*/ overloadingFn( [ mx_gradient_float_0, mx_gradient_float_1 ] );
 
-const mx_gradient_vec3_0 = /*#__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y_immutable ] ) => {
+const mx_gradient_vec3_0 = /*@__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y_immutable ] ) => {
 
 	const y = float( y_immutable ).toVar();
 	const x = float( x_immutable ).toVar();
@@ -61774,7 +61861,7 @@ const mx_gradient_vec3_0 = /*#__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y_
 	]
 } );
 
-const mx_gradient_vec3_1 = /*#__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y_immutable, z_immutable ] ) => {
+const mx_gradient_vec3_1 = /*@__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y_immutable, z_immutable ] ) => {
 
 	const z = float( z_immutable ).toVar();
 	const y = float( y_immutable ).toVar();
@@ -61794,9 +61881,9 @@ const mx_gradient_vec3_1 = /*#__PURE__*/ Fn( ( [ hash_immutable, x_immutable, y_
 	]
 } );
 
-const mx_gradient_vec3 = /*#__PURE__*/ overloadingFn( [ mx_gradient_vec3_0, mx_gradient_vec3_1 ] );
+const mx_gradient_vec3 = /*@__PURE__*/ overloadingFn( [ mx_gradient_vec3_0, mx_gradient_vec3_1 ] );
 
-const mx_gradient_scale2d_0 = /*#__PURE__*/ Fn( ( [ v_immutable ] ) => {
+const mx_gradient_scale2d_0 = /*@__PURE__*/ Fn( ( [ v_immutable ] ) => {
 
 	const v = float( v_immutable ).toVar();
 
@@ -61810,7 +61897,7 @@ const mx_gradient_scale2d_0 = /*#__PURE__*/ Fn( ( [ v_immutable ] ) => {
 	]
 } );
 
-const mx_gradient_scale3d_0 = /*#__PURE__*/ Fn( ( [ v_immutable ] ) => {
+const mx_gradient_scale3d_0 = /*@__PURE__*/ Fn( ( [ v_immutable ] ) => {
 
 	const v = float( v_immutable ).toVar();
 
@@ -61824,7 +61911,7 @@ const mx_gradient_scale3d_0 = /*#__PURE__*/ Fn( ( [ v_immutable ] ) => {
 	]
 } );
 
-const mx_gradient_scale2d_1 = /*#__PURE__*/ Fn( ( [ v_immutable ] ) => {
+const mx_gradient_scale2d_1 = /*@__PURE__*/ Fn( ( [ v_immutable ] ) => {
 
 	const v = vec3( v_immutable ).toVar();
 
@@ -61838,9 +61925,9 @@ const mx_gradient_scale2d_1 = /*#__PURE__*/ Fn( ( [ v_immutable ] ) => {
 	]
 } );
 
-const mx_gradient_scale2d = /*#__PURE__*/ overloadingFn( [ mx_gradient_scale2d_0, mx_gradient_scale2d_1 ] );
+const mx_gradient_scale2d = /*@__PURE__*/ overloadingFn( [ mx_gradient_scale2d_0, mx_gradient_scale2d_1 ] );
 
-const mx_gradient_scale3d_1 = /*#__PURE__*/ Fn( ( [ v_immutable ] ) => {
+const mx_gradient_scale3d_1 = /*@__PURE__*/ Fn( ( [ v_immutable ] ) => {
 
 	const v = vec3( v_immutable ).toVar();
 
@@ -61854,9 +61941,9 @@ const mx_gradient_scale3d_1 = /*#__PURE__*/ Fn( ( [ v_immutable ] ) => {
 	]
 } );
 
-const mx_gradient_scale3d = /*#__PURE__*/ overloadingFn( [ mx_gradient_scale3d_0, mx_gradient_scale3d_1 ] );
+const mx_gradient_scale3d = /*@__PURE__*/ overloadingFn( [ mx_gradient_scale3d_0, mx_gradient_scale3d_1 ] );
 
-const mx_rotl32 = /*#__PURE__*/ Fn( ( [ x_immutable, k_immutable ] ) => {
+const mx_rotl32 = /*@__PURE__*/ Fn( ( [ x_immutable, k_immutable ] ) => {
 
 	const k = int( k_immutable ).toVar();
 	const x = uint( x_immutable ).toVar();
@@ -61872,7 +61959,7 @@ const mx_rotl32 = /*#__PURE__*/ Fn( ( [ x_immutable, k_immutable ] ) => {
 	]
 } );
 
-const mx_bjmix = /*#__PURE__*/ Fn( ( [ a, b, c ] ) => {
+const mx_bjmix = /*@__PURE__*/ Fn( ( [ a, b, c ] ) => {
 
 	a.subAssign( c );
 	a.bitXorAssign( mx_rotl32( c, int( 4 ) ) );
@@ -61895,7 +61982,7 @@ const mx_bjmix = /*#__PURE__*/ Fn( ( [ a, b, c ] ) => {
 
 } );
 
-const mx_bjfinal = /*#__PURE__*/ Fn( ( [ a_immutable, b_immutable, c_immutable ] ) => {
+const mx_bjfinal = /*@__PURE__*/ Fn( ( [ a_immutable, b_immutable, c_immutable ] ) => {
 
 	const c = uint( c_immutable ).toVar();
 	const b = uint( b_immutable ).toVar();
@@ -61927,7 +62014,7 @@ const mx_bjfinal = /*#__PURE__*/ Fn( ( [ a_immutable, b_immutable, c_immutable ]
 	]
 } );
 
-const mx_bits_to_01 = /*#__PURE__*/ Fn( ( [ bits_immutable ] ) => {
+const mx_bits_to_01 = /*@__PURE__*/ Fn( ( [ bits_immutable ] ) => {
 
 	const bits = uint( bits_immutable ).toVar();
 
@@ -61941,7 +62028,7 @@ const mx_bits_to_01 = /*#__PURE__*/ Fn( ( [ bits_immutable ] ) => {
 	]
 } );
 
-const mx_fade = /*#__PURE__*/ Fn( ( [ t_immutable ] ) => {
+const mx_fade = /*@__PURE__*/ Fn( ( [ t_immutable ] ) => {
 
 	const t = float( t_immutable ).toVar();
 
@@ -61955,7 +62042,7 @@ const mx_fade = /*#__PURE__*/ Fn( ( [ t_immutable ] ) => {
 	]
 } );
 
-const mx_hash_int_0 = /*#__PURE__*/ Fn( ( [ x_immutable ] ) => {
+const mx_hash_int_0 = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 1 ) ).toVar();
@@ -61971,7 +62058,7 @@ const mx_hash_int_0 = /*#__PURE__*/ Fn( ( [ x_immutable ] ) => {
 	]
 } );
 
-const mx_hash_int_1 = /*#__PURE__*/ Fn( ( [ x_immutable, y_immutable ] ) => {
+const mx_hash_int_1 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable ] ) => {
 
 	const y = int( y_immutable ).toVar();
 	const x = int( x_immutable ).toVar();
@@ -61992,7 +62079,7 @@ const mx_hash_int_1 = /*#__PURE__*/ Fn( ( [ x_immutable, y_immutable ] ) => {
 	]
 } );
 
-const mx_hash_int_2 = /*#__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutable ] ) => {
+const mx_hash_int_2 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutable ] ) => {
 
 	const z = int( z_immutable ).toVar();
 	const y = int( y_immutable ).toVar();
@@ -62016,7 +62103,7 @@ const mx_hash_int_2 = /*#__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutabl
 	]
 } );
 
-const mx_hash_int_3 = /*#__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutable, xx_immutable ] ) => {
+const mx_hash_int_3 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutable, xx_immutable ] ) => {
 
 	const xx = int( xx_immutable ).toVar();
 	const z = int( z_immutable ).toVar();
@@ -62044,7 +62131,7 @@ const mx_hash_int_3 = /*#__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutabl
 	]
 } );
 
-const mx_hash_int_4 = /*#__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutable, xx_immutable, yy_immutable ] ) => {
+const mx_hash_int_4 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutable, xx_immutable, yy_immutable ] ) => {
 
 	const yy = int( yy_immutable ).toVar();
 	const xx = int( xx_immutable ).toVar();
@@ -62075,9 +62162,9 @@ const mx_hash_int_4 = /*#__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutabl
 	]
 } );
 
-const mx_hash_int = /*#__PURE__*/ overloadingFn( [ mx_hash_int_0, mx_hash_int_1, mx_hash_int_2, mx_hash_int_3, mx_hash_int_4 ] );
+const mx_hash_int = /*@__PURE__*/ overloadingFn( [ mx_hash_int_0, mx_hash_int_1, mx_hash_int_2, mx_hash_int_3, mx_hash_int_4 ] );
 
-const mx_hash_vec3_0 = /*#__PURE__*/ Fn( ( [ x_immutable, y_immutable ] ) => {
+const mx_hash_vec3_0 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable ] ) => {
 
 	const y = int( y_immutable ).toVar();
 	const x = int( x_immutable ).toVar();
@@ -62098,7 +62185,7 @@ const mx_hash_vec3_0 = /*#__PURE__*/ Fn( ( [ x_immutable, y_immutable ] ) => {
 	]
 } );
 
-const mx_hash_vec3_1 = /*#__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutable ] ) => {
+const mx_hash_vec3_1 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutable ] ) => {
 
 	const z = int( z_immutable ).toVar();
 	const y = int( y_immutable ).toVar();
@@ -62121,9 +62208,9 @@ const mx_hash_vec3_1 = /*#__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_immutab
 	]
 } );
 
-const mx_hash_vec3 = /*#__PURE__*/ overloadingFn( [ mx_hash_vec3_0, mx_hash_vec3_1 ] );
+const mx_hash_vec3 = /*@__PURE__*/ overloadingFn( [ mx_hash_vec3_0, mx_hash_vec3_1 ] );
 
-const mx_perlin_noise_float_0 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_perlin_noise_float_0 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	const p = vec2( p_immutable ).toVar();
 	const X = int().toVar(), Y = int().toVar();
@@ -62143,7 +62230,7 @@ const mx_perlin_noise_float_0 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_perlin_noise_float_1 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_perlin_noise_float_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	const p = vec3( p_immutable ).toVar();
 	const X = int().toVar(), Y = int().toVar(), Z = int().toVar();
@@ -62165,9 +62252,9 @@ const mx_perlin_noise_float_1 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_perlin_noise_float = /*#__PURE__*/ overloadingFn( [ mx_perlin_noise_float_0, mx_perlin_noise_float_1 ] );
+const mx_perlin_noise_float = /*@__PURE__*/ overloadingFn( [ mx_perlin_noise_float_0, mx_perlin_noise_float_1 ] );
 
-const mx_perlin_noise_vec3_0 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_perlin_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	const p = vec2( p_immutable ).toVar();
 	const X = int().toVar(), Y = int().toVar();
@@ -62187,7 +62274,7 @@ const mx_perlin_noise_vec3_0 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_perlin_noise_vec3_1 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_perlin_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	const p = vec3( p_immutable ).toVar();
 	const X = int().toVar(), Y = int().toVar(), Z = int().toVar();
@@ -62209,9 +62296,9 @@ const mx_perlin_noise_vec3_1 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_perlin_noise_vec3 = /*#__PURE__*/ overloadingFn( [ mx_perlin_noise_vec3_0, mx_perlin_noise_vec3_1 ] );
+const mx_perlin_noise_vec3 = /*@__PURE__*/ overloadingFn( [ mx_perlin_noise_vec3_0, mx_perlin_noise_vec3_1 ] );
 
-const mx_cell_noise_float_0 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_cell_noise_float_0 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	const p = float( p_immutable ).toVar();
 	const ix = int( mx_floor( p ) ).toVar();
@@ -62226,7 +62313,7 @@ const mx_cell_noise_float_0 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_cell_noise_float_1 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_cell_noise_float_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	const p = vec2( p_immutable ).toVar();
 	const ix = int( mx_floor( p.x ) ).toVar();
@@ -62242,7 +62329,7 @@ const mx_cell_noise_float_1 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_cell_noise_float_2 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_cell_noise_float_2 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	const p = vec3( p_immutable ).toVar();
 	const ix = int( mx_floor( p.x ) ).toVar();
@@ -62259,7 +62346,7 @@ const mx_cell_noise_float_2 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_cell_noise_float_3 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_cell_noise_float_3 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	const p = vec4( p_immutable ).toVar();
 	const ix = int( mx_floor( p.x ) ).toVar();
@@ -62277,9 +62364,9 @@ const mx_cell_noise_float_3 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_cell_noise_float$1 = /*#__PURE__*/ overloadingFn( [ mx_cell_noise_float_0, mx_cell_noise_float_1, mx_cell_noise_float_2, mx_cell_noise_float_3 ] );
+const mx_cell_noise_float$1 = /*@__PURE__*/ overloadingFn( [ mx_cell_noise_float_0, mx_cell_noise_float_1, mx_cell_noise_float_2, mx_cell_noise_float_3 ] );
 
-const mx_cell_noise_vec3_0 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_cell_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	const p = float( p_immutable ).toVar();
 	const ix = int( mx_floor( p ) ).toVar();
@@ -62294,7 +62381,7 @@ const mx_cell_noise_vec3_0 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_cell_noise_vec3_1 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_cell_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	const p = vec2( p_immutable ).toVar();
 	const ix = int( mx_floor( p.x ) ).toVar();
@@ -62310,7 +62397,7 @@ const mx_cell_noise_vec3_1 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_cell_noise_vec3_2 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_cell_noise_vec3_2 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	const p = vec3( p_immutable ).toVar();
 	const ix = int( mx_floor( p.x ) ).toVar();
@@ -62327,7 +62414,7 @@ const mx_cell_noise_vec3_2 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_cell_noise_vec3_3 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
+const mx_cell_noise_vec3_3 = /*@__PURE__*/ Fn( ( [ p_immutable ] ) => {
 
 	const p = vec4( p_immutable ).toVar();
 	const ix = int( mx_floor( p.x ) ).toVar();
@@ -62345,9 +62432,9 @@ const mx_cell_noise_vec3_3 = /*#__PURE__*/ Fn( ( [ p_immutable ] ) => {
 	]
 } );
 
-const mx_cell_noise_vec3 = /*#__PURE__*/ overloadingFn( [ mx_cell_noise_vec3_0, mx_cell_noise_vec3_1, mx_cell_noise_vec3_2, mx_cell_noise_vec3_3 ] );
+const mx_cell_noise_vec3 = /*@__PURE__*/ overloadingFn( [ mx_cell_noise_vec3_0, mx_cell_noise_vec3_1, mx_cell_noise_vec3_2, mx_cell_noise_vec3_3 ] );
 
-const mx_fractal_noise_float$1 = /*#__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
+const mx_fractal_noise_float$1 = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
 
 	const diminish = float( diminish_immutable ).toVar();
 	const lacunarity = float( lacunarity_immutable ).toVar();
@@ -62377,7 +62464,7 @@ const mx_fractal_noise_float$1 = /*#__PURE__*/ Fn( ( [ p_immutable, octaves_immu
 	]
 } );
 
-const mx_fractal_noise_vec3$1 = /*#__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
+const mx_fractal_noise_vec3$1 = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
 
 	const diminish = float( diminish_immutable ).toVar();
 	const lacunarity = float( lacunarity_immutable ).toVar();
@@ -62407,7 +62494,7 @@ const mx_fractal_noise_vec3$1 = /*#__PURE__*/ Fn( ( [ p_immutable, octaves_immut
 	]
 } );
 
-const mx_fractal_noise_vec2$1 = /*#__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
+const mx_fractal_noise_vec2$1 = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
 
 	const diminish = float( diminish_immutable ).toVar();
 	const lacunarity = float( lacunarity_immutable ).toVar();
@@ -62427,7 +62514,7 @@ const mx_fractal_noise_vec2$1 = /*#__PURE__*/ Fn( ( [ p_immutable, octaves_immut
 	]
 } );
 
-const mx_fractal_noise_vec4$1 = /*#__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
+const mx_fractal_noise_vec4$1 = /*@__PURE__*/ Fn( ( [ p_immutable, octaves_immutable, lacunarity_immutable, diminish_immutable ] ) => {
 
 	const diminish = float( diminish_immutable ).toVar();
 	const lacunarity = float( lacunarity_immutable ).toVar();
@@ -62449,7 +62536,7 @@ const mx_fractal_noise_vec4$1 = /*#__PURE__*/ Fn( ( [ p_immutable, octaves_immut
 	]
 } );
 
-const mx_worley_distance_0 = /*#__PURE__*/ Fn( ( [ p_immutable, x_immutable, y_immutable, xoff_immutable, yoff_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_distance_0 = /*@__PURE__*/ Fn( ( [ p_immutable, x_immutable, y_immutable, xoff_immutable, yoff_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -62494,7 +62581,7 @@ const mx_worley_distance_0 = /*#__PURE__*/ Fn( ( [ p_immutable, x_immutable, y_i
 	]
 } );
 
-const mx_worley_distance_1 = /*#__PURE__*/ Fn( ( [ p_immutable, x_immutable, y_immutable, z_immutable, xoff_immutable, yoff_immutable, zoff_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_distance_1 = /*@__PURE__*/ Fn( ( [ p_immutable, x_immutable, y_immutable, z_immutable, xoff_immutable, yoff_immutable, zoff_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -62542,9 +62629,9 @@ const mx_worley_distance_1 = /*#__PURE__*/ Fn( ( [ p_immutable, x_immutable, y_i
 	]
 } );
 
-const mx_worley_distance = /*#__PURE__*/ overloadingFn( [ mx_worley_distance_0, mx_worley_distance_1 ] );
+const mx_worley_distance = /*@__PURE__*/ overloadingFn( [ mx_worley_distance_0, mx_worley_distance_1 ] );
 
-const mx_worley_noise_float_0 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_noise_float_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -62582,7 +62669,7 @@ const mx_worley_noise_float_0 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_immuta
 	]
 } );
 
-const mx_worley_noise_vec2_0 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_noise_vec2_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -62630,7 +62717,7 @@ const mx_worley_noise_vec2_0 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_immutab
 	]
 } );
 
-const mx_worley_noise_vec3_0 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -62684,7 +62771,7 @@ const mx_worley_noise_vec3_0 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_immutab
 	]
 } );
 
-const mx_worley_noise_float_1 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_noise_float_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -62726,9 +62813,9 @@ const mx_worley_noise_float_1 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_immuta
 	]
 } );
 
-const mx_worley_noise_float$1 = /*#__PURE__*/ overloadingFn( [ mx_worley_noise_float_0, mx_worley_noise_float_1 ] );
+const mx_worley_noise_float$1 = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_float_0, mx_worley_noise_float_1 ] );
 
-const mx_worley_noise_vec2_1 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_noise_vec2_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -62780,9 +62867,9 @@ const mx_worley_noise_vec2_1 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_immutab
 	]
 } );
 
-const mx_worley_noise_vec2$1 = /*#__PURE__*/ overloadingFn( [ mx_worley_noise_vec2_0, mx_worley_noise_vec2_1 ] );
+const mx_worley_noise_vec2$1 = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_vec2_0, mx_worley_noise_vec2_1 ] );
 
-const mx_worley_noise_vec3_1 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
+const mx_worley_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_immutable, metric_immutable ] ) => {
 
 	const metric = int( metric_immutable ).toVar();
 	const jitter = float( jitter_immutable ).toVar();
@@ -62840,13 +62927,13 @@ const mx_worley_noise_vec3_1 = /*#__PURE__*/ Fn( ( [ p_immutable, jitter_immutab
 	]
 } );
 
-const mx_worley_noise_vec3$1 = /*#__PURE__*/ overloadingFn( [ mx_worley_noise_vec3_0, mx_worley_noise_vec3_1 ] );
+const mx_worley_noise_vec3$1 = /*@__PURE__*/ overloadingFn( [ mx_worley_noise_vec3_0, mx_worley_noise_vec3_1 ] );
 
 // Three.js Transpiler
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_hsv.glsl
 
 
-const mx_hsvtorgb = /*#__PURE__*/ Fn( ( [ hsv ] ) => {
+const mx_hsvtorgb = /*@__PURE__*/ Fn( ( [ hsv ] ) => {
 
 	const s = hsv.y;
 	const v = hsv.z;
@@ -62905,7 +62992,7 @@ const mx_hsvtorgb = /*#__PURE__*/ Fn( ( [ hsv ] ) => {
 	]
 } );
 
-const mx_rgbtohsv = /*#__PURE__*/ Fn( ( [ c_immutable ] ) => {
+const mx_rgbtohsv = /*@__PURE__*/ Fn( ( [ c_immutable ] ) => {
 
 	const c = vec3( c_immutable ).toVar();
 	const r = float( c.x ).toVar();
@@ -62971,7 +63058,7 @@ const mx_rgbtohsv = /*#__PURE__*/ Fn( ( [ c_immutable ] ) => {
 // https://github.com/AcademySoftwareFoundation/MaterialX/blob/main/libraries/stdlib/genglsl/lib/mx_transform_color.glsl
 
 
-const mx_srgb_texture_to_lin_rec709 = /*#__PURE__*/ Fn( ( [ color_immutable ] ) => {
+const mx_srgb_texture_to_lin_rec709 = /*@__PURE__*/ Fn( ( [ color_immutable ] ) => {
 
 	const color = vec3( color_immutable ).toVar();
 	const isAbove = bvec3( greaterThan( color, vec3( 0.04045 ) ) ).toVar();
@@ -64287,13 +64374,12 @@ class Renderer {
 		const { object, camera, renderList } = bundle;
 
 		const renderContext = this._currentRenderContext;
-		const renderContextData = this.backend.get( renderContext );
 
 		//
 
 		const renderBundle = this._bundles.get( object, camera );
-
 		const renderBundleData = this.backend.get( renderBundle );
+
 		if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = new Set();
 
 		//
@@ -64304,17 +64390,11 @@ class Renderer {
 
 		if ( renderBundleNeedsUpdate ) {
 
-			if ( renderContextData.renderObjects === undefined || object.needsUpdate === true ) {
+			this.backend.beginBundle( renderContext );
 
-				const nodeFrame = this._nodes.nodeFrame;
+			if ( renderBundleData.renderObjects === undefined || object.needsUpdate === true ) {
 
-				renderContextData.renderObjects = [];
-				renderContextData.renderBundles = [];
-				renderContextData.scene = sceneRef;
-				renderContextData.camera = camera;
-				renderContextData.renderId = nodeFrame.renderId;
-
-				renderContextData.registerBundlesPhase = true;
+				renderBundleData.renderObjects = [];
 
 			}
 
@@ -64328,16 +64408,17 @@ class Renderer {
 
 			//
 
+			this.backend.finishBundle( renderContext, renderBundle );
+
 			object.needsUpdate = false;
 
 		} else {
 
-			const renderContext = this._currentRenderContext;
-			const renderContextData = this.backend.get( renderContext );
+			const renderObjects = renderBundleData.renderObjects;
 
-			for ( let i = 0, l = renderContextData.renderObjects.length; i < l; i ++ ) {
+			for ( let i = 0, l = renderObjects.length; i < l; i ++ ) {
 
-				const renderObject = renderContextData.renderObjects[ i ];
+				const renderObject = renderObjects[ i ];
 
 				this._nodes.updateBefore( renderObject );
 
@@ -64349,13 +64430,13 @@ class Renderer {
 				this._nodes.updateForRender( renderObject );
 				this._bindings.updateForRender( renderObject );
 
-				this.backend.draw( renderObject, this.info );
-
 				this._nodes.updateAfter( renderObject );
 
 			}
 
 		}
+
+		this.backend.addBundle( renderContext, renderBundle );
 
 	}
 
@@ -64375,10 +64456,10 @@ class Renderer {
 
 	_getFrameBufferTarget() {
 
-		const { currentColorSpace } = this;
+		const { currentToneMapping, currentColorSpace } = this;
 
-		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping );
-		const useColorSpace = this._renderTarget === null && ( currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace );
+		const useToneMapping = currentToneMapping !== NoToneMapping;
+		const useColorSpace = currentColorSpace !== LinearSRGBColorSpace;
 
 		if ( useToneMapping === false && useColorSpace === false ) return null;
 
@@ -64970,19 +65051,15 @@ class Renderer {
 
 	}
 
+	get currentToneMapping() {
+
+		return this._renderTarget !== null ? NoToneMapping : this.toneMapping;
+
+	}
+
 	get currentColorSpace() {
 
-		const renderTarget = this._renderTarget;
-
-		if ( renderTarget !== null ) {
-
-			const texture = renderTarget.texture;
-
-			return ( Array.isArray( texture ) ? texture[ 0 ] : texture ).colorSpace;
-
-		}
-
-		return this.outputColorSpace;
+		return this._renderTarget !== null ? LinearSRGBColorSpace : this.outputColorSpace;
 
 	}
 
@@ -65247,7 +65324,7 @@ class Renderer {
 
 		}
 
-		if ( object.static === true ) {
+		if ( object.static === true && this.backend.beginBundle !== undefined ) {
 
 			const baseRenderList = renderList;
 
@@ -65477,24 +65554,15 @@ class Renderer {
 
 		//
 
-		if ( this._currentRenderBundle !== null && this._currentRenderBundle.needsUpdate === true ) {
+		if ( this._currentRenderBundle !== null ) {
 
-			const renderObjectData = this.backend.get( renderObject );
+			const renderBundleData = this.backend.get( this._currentRenderBundle );
 
-			renderObjectData.bundleEncoder = undefined;
-			renderObjectData.lastPipelineGPU = undefined;
+			renderBundleData.renderObjects.push( renderObject );
 
 		}
 
 		this.backend.draw( renderObject, this.info );
-
-		if ( this._currentRenderBundle !== null ) {
-
-			const renderContextData = this.backend.get( this._currentRenderContext );
-
-			renderContextData.renderObjects.push( renderObject );
-
-		}
 
 		this._nodes.updateAfter( renderObject );
 
@@ -65592,8 +65660,8 @@ class StandardNodeLibrary extends NodeLibrary {
 		this.addToneMapping( AgXToneMapping, AgXToneMapping$1 );
 		this.addToneMapping( NeutralToneMapping, NeutralToneMapping$1 );
 
-		this.addColorSpace( LinearTosRGBShader, getColorSpaceMethod( LinearSRGBColorSpace, SRGBColorSpace ) );
-		this.addColorSpace( sRGBToLinearShader, getColorSpaceMethod( SRGBColorSpace, LinearSRGBColorSpace ) );
+		this.addColorSpace( LinearTosRGB, getColorSpaceMethod( LinearSRGBColorSpace, SRGBColorSpace ) );
+		this.addColorSpace( sRGBToLinear, getColorSpaceMethod( SRGBColorSpace, LinearSRGBColorSpace ) );
 
 	}
 
@@ -66960,6 +67028,8 @@ ${vars}
 	_getGLSLVertexCode( shaderData ) {
 
 		return `#version 300 es
+
+${ this.getSignature() }
 
 // extensions 
 ${shaderData.extensions}
@@ -69935,7 +70005,7 @@ class WebGLBackend extends Backend {
 
 			const { x, y, width, height } = renderContext.scissorValue;
 
-			gl.scissor( x, y, width, height );
+			gl.scissor( x, renderContext.height - height - y, width, height );
 
 		}
 
@@ -70024,8 +70094,10 @@ class WebGLBackend extends Backend {
 
 						const { x, y, width, height } = renderContext.scissorValue;
 
-						gl.blitFramebuffer( x, y, x + width, y + height, x, y, x + width, y + height, mask, gl.NEAREST );
-						gl.invalidateSubFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray, x, y, width, height );
+						const viewY = renderContext.height - height - y;
+
+						gl.blitFramebuffer( x, viewY, x + width, viewY + height, x, viewY, x + width, viewY + height, mask, gl.NEAREST );
+						gl.invalidateSubFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray, x, viewY, width, height );
 
 					} else {
 
@@ -70132,7 +70204,7 @@ class WebGLBackend extends Backend {
 		const gl = this.gl;
 		const { x, y, width, height } = renderContext.viewportValue;
 
-		gl.viewport( x, y, width, height );
+		gl.viewport( x, renderContext.height - height - y, width, height );
 
 	}
 
@@ -73242,7 +73314,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	needsColorSpaceToLinear( texture ) {
+	needsColorSpaceToLinearSRGB( texture ) {
 
 		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
 
@@ -75283,17 +75355,14 @@ class WebGPUPipelineUtils {
 
 	}
 
-	createBundleEncoder( renderContext, renderObject ) {
+	createBundleEncoder( renderContext ) {
 
 		const backend = this.backend;
 		const { utils, device } = backend;
 
-		const renderContextData = backend.get( renderContext );
-		const renderObjectData = backend.get( renderObject );
-
 		const depthStencilFormat = utils.getCurrentDepthStencilFormat( renderContext );
 		const colorFormat = utils.getCurrentColorFormat( renderContext );
-		const sampleCount = this._getSampleCount( renderObject.context );
+		const sampleCount = this._getSampleCount( renderContext );
 
 		const descriptor = {
 			label: 'renderBundleEncoder',
@@ -75302,13 +75371,7 @@ class WebGPUPipelineUtils {
 			sampleCount
 		};
 
-		const bundleEncoder = device.createRenderBundleEncoder( descriptor );
-
-		renderObjectData.bundleEncoder = bundleEncoder;
-		renderContextData.currentSets = { attributes: {} };
-		renderContextData._renderBundleViewport = renderContext.width + '_' + renderContext.height;
-
-		return bundleEncoder;
+		return device.createRenderBundleEncoder( descriptor );
 
 	}
 
@@ -75851,6 +75914,8 @@ class WebGPUBackend extends Backend {
 
 		const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
 
+		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
+
 		this.context.configure( {
 			device: this.device,
 			format: this.utils.getPreferredCanvasFormat(),
@@ -76166,7 +76231,8 @@ class WebGPUBackend extends Backend {
 		renderContextData.descriptor = descriptor;
 		renderContextData.encoder = encoder;
 		renderContextData.currentPass = currentPass;
-		renderContextData.currentSets = { attributes: {} };
+		renderContextData.currentSets = { attributes: {}, pipeline: null, index: null };
+		renderContextData.renderBundles = [];
 
 		//
 
@@ -76180,7 +76246,7 @@ class WebGPUBackend extends Backend {
 
 			const { x, y, width, height } = renderContext.scissorValue;
 
-			currentPass.setScissorRect( x, renderContext.height - height - y, width, height );
+			currentPass.setScissorRect( x, y, width, height );
 
 		}
 
@@ -76191,9 +76257,8 @@ class WebGPUBackend extends Backend {
 		const renderContextData = this.get( renderContext );
 		const occlusionQueryCount = renderContext.occlusionQueryCount;
 
-		if ( renderContextData.renderBundles !== undefined && renderContextData.renderBundles.length > 0 ) {
+		if ( renderContextData.renderBundles.length > 0 ) {
 
-			renderContextData.registerBundlesPhase = false;
 			renderContextData.currentPass.executeBundles( renderContextData.renderBundles );
 
 		}
@@ -76326,7 +76391,7 @@ class WebGPUBackend extends Backend {
 		const { currentPass } = this.get( renderContext );
 		const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
 
-		currentPass.setViewport( x, renderContext.height - height - y, width, height, minDepth, maxDepth );
+		currentPass.setViewport( x, y, width, height, minDepth, maxDepth );
 
 	}
 
@@ -76575,19 +76640,7 @@ class WebGPUBackend extends Backend {
 		const renderContextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
 		const currentSets = renderContextData.currentSets;
-
-		const renderObjectData = this.get( renderObject );
-
-		const { bundleEncoder, renderBundle, lastPipelineGPU } = renderObjectData;
-
-		if ( renderContextData.registerBundlesPhase === true && bundleEncoder !== undefined && lastPipelineGPU === pipelineGPU ) {
-
-			renderContextData.renderBundles.push( renderBundle );
-			return;
-
-		}
-
-		const passEncoderGPU = this.renderer._currentRenderBundle ? this.createBundleEncoder( context, renderObject ) : renderContextData.currentPass;
+		const passEncoderGPU = renderContextData.currentPass;
 
 		// pipeline
 
@@ -76725,15 +76778,6 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		if ( this.renderer._currentRenderBundle ) {
-
-			const renderBundle = passEncoderGPU.finish();
-			renderObjectData.lastPipelineGPU = pipelineGPU;
-			renderObjectData.renderBundle = renderBundle;
-			renderObjectData.bundleEncoder = passEncoderGPU;
-
-		}
-
 	}
 
 	// cache key
@@ -76819,6 +76863,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
+
 	// textures
 
 	createSampler( texture ) {
@@ -76872,7 +76917,7 @@ class WebGPUBackend extends Backend {
 
 	initTimestampQuery( renderContext, descriptor ) {
 
-		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
+		if ( ! this.trackTimestamp ) return;
 
 		const renderContextData = this.get( renderContext );
 
@@ -76902,9 +76947,10 @@ class WebGPUBackend extends Backend {
 
 	prepareTimestampBuffer( renderContext, encoder ) {
 
-		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
+		if ( ! this.trackTimestamp ) return;
 
 		const renderContextData = this.get( renderContext );
+
 
 		const size = 2 * BigInt64Array.BYTES_PER_ELEMENT;
 
@@ -76937,7 +76983,7 @@ class WebGPUBackend extends Backend {
 
 	async resolveTimestampAsync( renderContext, type = 'render' ) {
 
-		if ( ! this.hasFeature( GPUFeatureName.TimestampQuery ) || ! this.trackTimestamp ) return;
+		if ( ! this.trackTimestamp ) return;
 
 		const renderContextData = this.get( renderContext );
 
@@ -77006,9 +77052,39 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	createBundleEncoder( renderContext, renderObject ) {
+	beginBundle( renderContext ) {
 
-		return this.pipelineUtils.createBundleEncoder( renderContext, renderObject );
+		const renderContextData = this.get( renderContext );
+
+		renderContextData._currentPass = renderContextData.currentPass;
+		renderContextData._currentSets = renderContextData.currentSets;
+
+		renderContextData.currentSets = { attributes: {}, pipeline: null, index: null };
+		renderContextData.currentPass = this.pipelineUtils.createBundleEncoder( renderContext );
+
+	}
+
+	finishBundle( renderContext, bundle ) {
+
+		const renderContextData = this.get( renderContext );
+
+		const bundleEncoder = renderContextData.currentPass;
+		const bundleGPU = bundleEncoder.finish();
+
+		this.get( bundle ).bundleGPU = bundleGPU;
+
+		// restore render pass state
+
+		renderContextData.currentSets = renderContextData._currentSets;
+		renderContextData.currentPass = renderContextData._currentPass;
+
+	}
+
+	addBundle( renderContext, bundle ) {
+
+		const renderContextData = this.get( renderContext );
+
+		renderContextData.renderBundles.push( this.get( bundle ).bundleGPU );
 
 	}
 
@@ -77212,7 +77288,7 @@ class WebGPUBackend extends Backend {
 		if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
 		renderContextData.currentPass = encoder.beginRenderPass( descriptor );
-		renderContextData.currentSets = { attributes: {} };
+		renderContextData.currentSets = { attributes: {}, pipeline: null, index: null };
 
 	}
 
@@ -77499,6 +77575,22 @@ class NodeLoader extends Loader {
 
 }
 
+const superFromTypeFunction = MaterialLoader.createMaterialFromType;
+
+MaterialLoader.createMaterialFromType = function ( type ) {
+
+	const material = createNodeMaterialFromType( type );
+
+	if ( material !== undefined ) {
+
+		return material;
+
+	}
+
+	return superFromTypeFunction.call( this, type );
+
+};
+
 class NodeMaterialLoader extends MaterialLoader {
 
 	constructor( manager ) {
@@ -77625,4 +77717,4 @@ if ( typeof window !== 'undefined' ) {
 
 }
 
-export { ACESFilmicToneMapping$1 as ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AfterImageNode, AgXToneMapping$1 as AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnaglyphPassNode, AnalyticLightNode, AnamorphicNode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrayElementNode, ArrowHelper, AssignNode, AttachedBindMode, AttributeNode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BRDF_GGX, BRDF_Lambert, BackSide, BasicDepthPacking, BasicEnvironmentNode, BasicShadowMap$1 as BasicShadowMap, BatchNode, BatchedMesh, BloomNode, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, Break, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferGeometryLoader, BufferNode, BumpMapNode, BypassNode, ByteType, Cache, CacheNode, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping$1 as CineonToneMapping, CircleGeometry, ClampToEdgeWrapping, Clock, CodeNode, Color, ColorKeyframeTrack, ColorManagement, ColorSpaceFunctions, ColorSpaceNode, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ComputeNode, ConeGeometry, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, Continue, Controls, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeTextureNode, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry, Cylindrical, DFGApprox, D_GGX, Data3DTexture, DataArrayTexture, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DenoiseNode, DepthFormat, DepthOfFieldNode, DepthStencilFormat, DepthTexture, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DirectionalLightNode, Discard, DiscreteInterpolant, DisplayP3ColorSpace, DodecahedronGeometry, DotScreenNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EPSILON, EdgesGeometry, EllipseCurve, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, ExtrudeGeometry, FXAANode, F_Schlick, FileLoader, FilmNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, Fn, Fog, FogExp2, FogExp2Node, FogNode, FogRangeNode, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLBufferAttribute, GLSL1, GLSL3, GLSLNodeParser, GTAONode, GaussianBlurNode, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightNode, IESSpotLight, IESSpotLightNode, INFINITY, IcosahedronGeometry, If, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, InstanceNode, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, InstancedPointsNodeMaterial, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightNode, LightProbe, LightProbeNode, LightingContextNode, LightingModel, LightingNode, LightsNode, Line, Line2NodeMaterial, Line3, LineBasicMaterial, LineBasicNodeMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineDashedNodeMaterial, LineLoop, LineSegments, LinearDisplayP3ColorSpace, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping$1 as LinearToneMapping, LinearTransfer, Loader, LoaderUtils, LoadingManager, Loop, LoopNode, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, Lut3DNode, MOUSE, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, ModelViewProjectionNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping$1 as NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalAnimationBlendMode, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OscNode, OutputStructNode, P3Primaries, PCFShadowMap$1 as PCFShadowMap, PCFSoftShadowMap$1 as PCFSoftShadowMap, PI, PI2, PMREMGenerator, PMREMNode, ParallaxBarrierPassNode, ParameterNode, PassNode, Path, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, PixelationPassNode, Plane, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, PointLightNode, PointUVNode, Points, PointsMaterial, PointsNodeMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PostProcessing, PosterizeNode, PropertyBinding, PropertyMixer, PropertyNode, QuadMesh, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDepthPacking, RGBFormat, RGBIntegerFormat, RGBShiftNode, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGDepthPacking, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RawShaderMaterial, Ray, Raycaster, Rec709Primaries, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping$1 as ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RepeatWrapping, ReplaceStencilOp, Return, ReverseSubtractEquation, RingGeometry, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, SSAAPassNode, Scene, SceneNode, Schlick_to_F0, ScriptableNode, ScriptableValueNode, SetNode, ShaderMaterial, ShaderNode, ShadowMaterial, ShadowNodeMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SkinningNode, SobelOperatorNode, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SplitNode, SpotLight, SpotLightHelper, SpotLightNode, Sprite, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StereoPassNode, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TBNViewMatrix, TOUCH, TangentSpaceNormalMap, TempNode, TetrahedronGeometry, Texture, Texture3DNode, TextureLoader, TextureNode, TextureSizeNode, TimerNode, ToneMappingFunctions, ToneMappingNode, TorusGeometry, TorusKnotGeometry, TransitionNode, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TriplanarTexturesNode, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform$1 as Uniform, UniformArrayNode, UniformGroupNode, UniformNode, UniformsGroup$1 as UniformsGroup, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, V_GGX_SmithCorrelated, VarNode, VaryingNode, Vector2, Vector3, Vector4, VectorKeyframeTrack, VertexColorNode, VideoTexture, ViewportDepthNode, ViewportDepthTextureNode, ViewportNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, abs, acos, add, addMethodChaining, addNodeElement, afterImage, all, alphaT, anaglyphPass, anamorphic, and, anisotropy, anisotropyB, anisotropyT, any, ao, append, arrayBuffer, asin, assign, atan, atan2, attenuationColor, attenuationDistance, attribute, backgroundBlurriness, backgroundIntensity, batch, billboarding, bitAnd, bitNot, bitOr, bitXor, bitangentGeometry, bitangentLocal, bitangentView, bitangentWorld, bitcast, bleach, bloom, blur, bool, buffer, bufferAttribute, bumpMap, burn, bvec2, bvec3, bvec4, bypass, cache, call, cameraFar, cameraLogDepth, cameraNear, cameraNormalMatrix, cameraPosition, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraWorldMatrix, cbrt, ceil, checker, clamp, clearcoat, clearcoatRoughness, code, color, colorSpaceToLinear, colorToDirection, compute, cond, context, convert, convertToTexture, cos, createCanvasElement, cross, cubeTexture, dFdx, dFdy, dashSize, defaultBuildStages, defaultShaderStages, defined, degrees, denoise, densityFog, depth, depthPass, difference, diffuseColor, directionToColor, dispersion, distance, div, dodge, dof, dot, dotScreen, drawIndex, dynamicBufferAttribute, element, emissive, equal, equals, equirectUV, exp, exp2, expression, faceDirection, faceForward, film, float, floor, fog, fract, frameGroup, frameId, frontFacing, fwidth, fxaa, gain, gapSize, gaussianBlur, getColorSpaceMethod, getConstNodeType, getCurrentStack, getDirection, getDistanceAttenuation, getGeometryRoughness, getRoughness, getTextureIndex, global, glsl, glslFn, grayscale, greaterThan, greaterThanEqual, hash, hue, instance, instanceIndex, instancedBufferAttribute, instancedDynamicBufferAttribute, int, inverseSqrt, invocationLocalIndex, ior, iridescence, iridescenceIOR, iridescenceThickness, ivec2, ivec3, ivec4, js, label, length, lengthSq, lessThan, lessThanEqual, lightTargetDirection, lightingContext, lights, linearDepth, linearToColorSpace, log, log2, luminance, lut3D, mat2, mat3, mat4, matcapUV, materialAOMap, materialAlphaTest, materialAnisotropy, materialAnisotropyVector, materialClearcoat, materialClearcoatNormal, materialClearcoatRoughness, materialColor, materialDispersion, materialEmissive, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLightMap, materialLineDashOffset, materialLineDashSize, materialLineGapSize, materialLineScale, materialLineWidth, materialMetalness, materialNormal, materialOpacity, materialPointWidth, materialReference, materialReflectivity, materialRefractionRatio, materialRotation, materialRoughness, materialSheen, materialSheenRoughness, materialShininess, materialSpecular, materialSpecularStrength, max$1 as max, maxMipLevel, metalness, min$1 as min, mix, mixElement, mod, modInt, modelDirection, modelNormalMatrix, modelPosition, modelScale, modelViewMatrix, modelViewPosition, modelViewProjection, modelWorldMatrix, modelWorldMatrixInverse, morphReference, motionBlur, mrt, mul, mx_aastep, mx_cell_noise_float, mx_contrast, mx_fractal_noise_float, mx_fractal_noise_vec2, mx_fractal_noise_vec3, mx_fractal_noise_vec4, mx_hsvtorgb, mx_noise_float, mx_noise_vec3, mx_noise_vec4, mx_ramplr, mx_ramptb, mx_rgbtohsv, mx_safepower, mx_splitlr, mx_splittb, mx_srgb_texture_to_lin_rec709, mx_transform_uv, mx_worley_noise_float, mx_worley_noise_vec2, mx_worley_noise_vec3, negate, nodeArray, nodeImmutable, nodeObject, nodeObjects, nodeProxy, normalFlat, normalGeometry, normalLocal, normalMap, normalView, normalWorld, normalize, not, notEqual, objectDirection, objectGroup, objectNormalMatrix, objectPosition, objectScale, objectViewMatrix, objectViewPosition, objectWorldMatrix, oneMinus, or, orthographicDepthToViewZ, oscSawtooth, oscSine, oscSquare, oscTriangle, output, outputStruct, overlay, overloadingFn, parabola, parallaxBarrierPass, parallaxDirection, parallaxUV, parameter, pass, passTexture, pcurve, perspectiveDepthToViewZ, pixelationPass, pmremTexture, pointUV, pointWidth, positionGeometry, positionLocal, positionPrevious, positionView, positionViewDirection, positionWorld, positionWorldDirection, posterize, pow, pow2, pow3, pow4, property, radians, rand, range, rangeFog, reciprocal, reference, referenceBuffer, reflect, reflectVector, reflectView, reflector, refract, refractVector, refractView, remainder, remap, remapClamp, renderGroup, renderOutput, rendererReference, rgbShift, rotate, rotateUV, roughness, round, rtt, sampler, saturate, saturation, screen, scriptable, scriptableValue, select, sepia, setCurrentStack, shaderStages, sharedUniformGroup, sheen, sheenRoughness, shiftLeft, shiftRight, shininess, sign, sin, sinc, skinning, skinningReference, smoothstep, smoothstepElement, sobel, specularColor, specularF90, spherizeUV, split, spritesheetUV, sqrt, ssaaPass, stack, step, stereoPass, storage, storageObject, storageTexture, string, sub, tan, tangentGeometry, tangentLocal, tangentView, tangentWorld, temp, texture, texture3D, textureBicubic, textureCubeUV, textureLoad, textureSize, textureStore, thickness, threshold, timerDelta, timerGlobal, timerLocal, toneMapping, toneMappingExposure, transformDirection, transformedBentNormalView, transformedBitangentView, transformedBitangentWorld, transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld, transformedTangentView, transformedTangentWorld, transition, transmission, transpose, tri, tri3, triNoise3D, triplanarTexture, triplanarTextures, trunc, tslFn, uint, uniform, uniformArray, uniformGroup, userData, uv, uvec2, uvec3, uvec4, varying, varyingProperty, vec2, vec3, vec4, vectorComponents, velocity, vertexColor, vertexIndex, vibrance, viewZToOrthographicDepth, viewZToPerspectiveDepth, viewport, viewportBottomLeft, viewportCoordinate, viewportDepthTexture, viewportLinearDepth, viewportMipTexture, viewportResolution, viewportSafeUV, viewportSharedTexture, viewportTexture, viewportTopLeft, viewportUV, wgsl, wgslFn, xor };
+export { ACESFilmicToneMapping$1 as ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AfterImageNode, AgXToneMapping$1 as AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnaglyphPassNode, AnalyticLightNode, AnamorphicNode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrayElementNode, ArrowHelper, AssignNode, AttachedBindMode, AttributeNode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BRDF_GGX, BRDF_Lambert, BackSide, BasicDepthPacking, BasicEnvironmentNode, BasicShadowMap$1 as BasicShadowMap, BatchNode, BatchedMesh, BloomNode, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, Break, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferGeometryLoader, BufferNode, BumpMapNode, BypassNode, ByteType, Cache, CacheNode, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping$1 as CineonToneMapping, CircleGeometry, ClampToEdgeWrapping, Clock, CodeNode, Color, ColorKeyframeTrack, ColorManagement, ColorSpaceFunctions, ColorSpaceNode, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ComputeNode, ConeGeometry, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, Continue, Controls, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeTextureNode, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry, Cylindrical, DFGApprox, D_GGX, Data3DTexture, DataArrayTexture, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DenoiseNode, DepthFormat, DepthOfFieldNode, DepthStencilFormat, DepthTexture, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DirectionalLightNode, Discard, DiscreteInterpolant, DisplayP3ColorSpace, DodecahedronGeometry, DotScreenNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EPSILON, EdgesGeometry, EllipseCurve, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, ExtrudeGeometry, FXAANode, F_Schlick, FileLoader, FilmNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, Fn, Fog, FogExp2, FogExp2Node, FogNode, FogRangeNode, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLBufferAttribute, GLSL1, GLSL3, GLSLNodeParser, GTAONode, GaussianBlurNode, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightNode, IESSpotLight, IESSpotLightNode, INFINITY, IcosahedronGeometry, If, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, InstanceNode, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, InstancedPointsNodeMaterial, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightNode, LightProbe, LightProbeNode, LightingContextNode, LightingModel, LightingNode, LightsNode, Line, Line2NodeMaterial, Line3, LineBasicMaterial, LineBasicNodeMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineDashedNodeMaterial, LineLoop, LineSegments, LinearDisplayP3ColorSpace, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping$1 as LinearToneMapping, LinearTransfer, Loader, LoaderUtils, LoadingManager, Loop, LoopNode, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, Lut3DNode, MOUSE, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, ModelViewProjectionNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping$1 as NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalAnimationBlendMode, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OscNode, OutputStructNode, P3Primaries, PCFShadowMap$1 as PCFShadowMap, PCFSoftShadowMap$1 as PCFSoftShadowMap, PI, PI2, PMREMGenerator, PMREMNode, ParallaxBarrierPassNode, ParameterNode, PassNode, Path, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, PixelationPassNode, Plane, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, PointLightNode, PointUVNode, Points, PointsMaterial, PointsNodeMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PostProcessing, PosterizeNode, PropertyBinding, PropertyMixer, PropertyNode, QuadMesh, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDepthPacking, RGBFormat, RGBIntegerFormat, RGBShiftNode, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGDepthPacking, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RawShaderMaterial, Ray, Raycaster, Rec709Primaries, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping$1 as ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RepeatWrapping, ReplaceStencilOp, Return, ReverseSubtractEquation, RingGeometry, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, SSAAPassNode, Scene, SceneNode, Schlick_to_F0, ScriptableNode, ScriptableValueNode, SetNode, ShaderMaterial, ShaderNode, ShadowMaterial, ShadowNodeMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SkinningNode, SobelOperatorNode, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SplitNode, SpotLight, SpotLightHelper, SpotLightNode, Sprite, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StereoPassNode, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TBNViewMatrix, TOUCH, TangentSpaceNormalMap, TempNode, TetrahedronGeometry, Texture, Texture3DNode, TextureLoader, TextureNode, TextureSizeNode, TimerNode, ToneMappingFunctions, ToneMappingNode, TorusGeometry, TorusKnotGeometry, TransitionNode, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TriplanarTexturesNode, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform$1 as Uniform, UniformArrayNode, UniformGroupNode, UniformNode, UniformsGroup$1 as UniformsGroup, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, V_GGX_SmithCorrelated, VarNode, VaryingNode, Vector2, Vector3, Vector4, VectorKeyframeTrack, VertexColorNode, VideoTexture, ViewportDepthNode, ViewportDepthTextureNode, ViewportNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, abs, acos, add, addMethodChaining, addNodeElement, afterImage, all, alphaT, anaglyphPass, anamorphic, and, anisotropy, anisotropyB, anisotropyT, any, ao, append, arrayBuffer, asin, assign, atan, atan2, attenuationColor, attenuationDistance, attribute, backgroundBlurriness, backgroundIntensity, batch, billboarding, bitAnd, bitNot, bitOr, bitXor, bitangentGeometry, bitangentLocal, bitangentView, bitangentWorld, bitcast, bleach, bloom, blur, bool, buffer, bufferAttribute, bumpMap, burn, bvec2, bvec3, bvec4, bypass, cache, call, cameraFar, cameraLogDepth, cameraNear, cameraNormalMatrix, cameraPosition, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraWorldMatrix, cbrt, ceil, checker, clamp, clearcoat, clearcoatRoughness, code, color, colorSpaceToLinearSRGB, colorToDirection, compute, cond, context, convert, convertToTexture, cos, createCanvasElement, cross, cubeTexture, dFdx, dFdy, dashSize, defaultBuildStages, defaultShaderStages, defined, degrees, denoise, densityFog, depth, depthPass, difference, diffuseColor, directionToColor, dispersion, distance, div, dodge, dof, dot, dotScreen, drawIndex, dynamicBufferAttribute, element, emissive, equal, equals, equirectUV, exp, exp2, expression, faceDirection, faceForward, film, float, floor, fog, fract, frameGroup, frameId, frontFacing, fwidth, fxaa, gain, gapSize, gaussianBlur, getColorSpaceMethod, getConstNodeType, getCurrentStack, getDirection, getDistanceAttenuation, getGeometryRoughness, getRoughness, getTextureIndex, global, glsl, glslFn, grayscale, greaterThan, greaterThanEqual, hash, hue, instance, instanceIndex, instancedBufferAttribute, instancedDynamicBufferAttribute, int, inverseSqrt, invocationLocalIndex, ior, iridescence, iridescenceIOR, iridescenceThickness, ivec2, ivec3, ivec4, js, label, length, lengthSq, lessThan, lessThanEqual, lightTargetDirection, lightingContext, lights, linearDepth, linearSRGBToColorSpace, log, log2, luminance, lut3D, mat2, mat3, mat4, matcapUV, materialAOMap, materialAlphaTest, materialAnisotropy, materialAnisotropyVector, materialClearcoat, materialClearcoatNormal, materialClearcoatRoughness, materialColor, materialDispersion, materialEmissive, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLightMap, materialLineDashOffset, materialLineDashSize, materialLineGapSize, materialLineScale, materialLineWidth, materialMetalness, materialNormal, materialOpacity, materialPointWidth, materialReference, materialReflectivity, materialRefractionRatio, materialRotation, materialRoughness, materialSheen, materialSheenRoughness, materialShininess, materialSpecular, materialSpecularStrength, max$1 as max, maxMipLevel, metalness, min$1 as min, mix, mixElement, mod, modInt, modelDirection, modelNormalMatrix, modelPosition, modelScale, modelViewMatrix, modelViewPosition, modelViewProjection, modelWorldMatrix, modelWorldMatrixInverse, morphReference, motionBlur, mrt, mul, mx_aastep, mx_cell_noise_float, mx_contrast, mx_fractal_noise_float, mx_fractal_noise_vec2, mx_fractal_noise_vec3, mx_fractal_noise_vec4, mx_hsvtorgb, mx_noise_float, mx_noise_vec3, mx_noise_vec4, mx_ramplr, mx_ramptb, mx_rgbtohsv, mx_safepower, mx_splitlr, mx_splittb, mx_srgb_texture_to_lin_rec709, mx_transform_uv, mx_worley_noise_float, mx_worley_noise_vec2, mx_worley_noise_vec3, negate, nodeArray, nodeImmutable, nodeObject, nodeObjects, nodeProxy, normalFlat, normalGeometry, normalLocal, normalMap, normalView, normalWorld, normalize, not, notEqual, objectDirection, objectGroup, objectNormalMatrix, objectPosition, objectScale, objectViewMatrix, objectViewPosition, objectWorldMatrix, oneMinus, or, orthographicDepthToViewZ, oscSawtooth, oscSine, oscSquare, oscTriangle, output, outputStruct, overlay, overloadingFn, parabola, parallaxBarrierPass, parallaxDirection, parallaxUV, parameter, pass, passTexture, pcurve, perspectiveDepthToViewZ, pixelationPass, pmremTexture, pointUV, pointWidth, positionGeometry, positionLocal, positionPrevious, positionView, positionViewDirection, positionWorld, positionWorldDirection, posterize, pow, pow2, pow3, pow4, property, radians, rand, range, rangeFog, reciprocal, reference, referenceBuffer, reflect, reflectVector, reflectView, reflector, refract, refractVector, refractView, registerNode, remainder, remap, remapClamp, renderGroup, renderOutput, rendererReference, rgbShift, rotate, rotateUV, roughness, round, rtt, sampler, saturate, saturation, screen, scriptable, scriptableValue, select, sepia, setCurrentStack, shaderStages, sharedUniformGroup, sheen, sheenRoughness, shiftLeft, shiftRight, shininess, sign, sin, sinc, skinning, skinningReference, smoothstep, smoothstepElement, sobel, specularColor, specularF90, spherizeUV, split, spritesheetUV, sqrt, ssaaPass, stack, step, stereoPass, storage, storageObject, storageTexture, string, sub, tan, tangentGeometry, tangentLocal, tangentView, tangentWorld, temp, texture, texture3D, textureBicubic, textureCubeUV, textureLoad, textureSize, textureStore, thickness, threshold, timerDelta, timerGlobal, timerLocal, toneMapping, toneMappingExposure, transformDirection, transformedBentNormalView, transformedBitangentView, transformedBitangentWorld, transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld, transformedTangentView, transformedTangentWorld, transition, transmission, transpose, tri, tri3, triNoise3D, triplanarTexture, triplanarTextures, trunc, tslFn, uint, uniform, uniformArray, uniformGroup, userData, uv, uvec2, uvec3, uvec4, varying, varyingProperty, vec2, vec3, vec4, vectorComponents, velocity, vertexColor, vertexIndex, vibrance, viewZToOrthographicDepth, viewZToPerspectiveDepth, viewport, viewportBottomLeft, viewportCoordinate, viewportDepthTexture, viewportLinearDepth, viewportMipTexture, viewportResolution, viewportSafeUV, viewportSharedTexture, viewportTexture, viewportTopLeft, viewportUV, wgsl, wgslFn, xor };
