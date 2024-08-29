@@ -234,42 +234,42 @@ class WebGPUBindingUtils {
 
 				const textureData = backend.get( binding.texture );
 
-				const mipLevelCount = binding.store ? 1 : textureData.mipLevelCount;
+				let resourceGPU;
 
-				// todo lebel count
-				const propertyName = `view-${ mipLevelCount }`;
+				if ( textureData.externalTexture !== undefined ) {
 
-				let resourceGPU = textureData[ propertyName ];
+					resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
 
-				if ( resourceGPU === undefined ) {
+				} else {
 
-					let dimensionViewGPU;
+					const mipLevelCount = binding.store ? 1 : textureData.mipLevelCount;
+					const propertyName = `view-${ mipLevelCount }`;
 
-					if ( binding.isSampledCubeTexture ) {
+					resourceGPU = textureData[ propertyName ];
 
-						dimensionViewGPU = GPUTextureViewDimension.Cube;
-
-					} else if ( binding.isSampledTexture3D ) {
-
-						dimensionViewGPU = GPUTextureViewDimension.ThreeD;
-
-					} else if ( binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
-
-						dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
-
-					} else {
-
-						dimensionViewGPU = GPUTextureViewDimension.TwoD;
-
-					}
-
-					if ( textureData.externalTexture !== undefined ) {
-
-						resourceGPU = device.importExternalTexture( { source: textureData.externalTexture } );
-
-					} else {
+					if ( resourceGPU === undefined ) {
 
 						const aspectGPU = GPUTextureAspect.All;
+
+						let dimensionViewGPU;
+
+						if ( binding.isSampledCubeTexture ) {
+
+							dimensionViewGPU = GPUTextureViewDimension.Cube;
+
+						} else if ( binding.isSampledTexture3D ) {
+
+							dimensionViewGPU = GPUTextureViewDimension.ThreeD;
+
+						} else if ( binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
+
+							dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
+
+						} else {
+
+							dimensionViewGPU = GPUTextureViewDimension.TwoD;
+
+						}
 
 						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount } );
 
