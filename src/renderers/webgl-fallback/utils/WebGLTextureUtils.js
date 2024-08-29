@@ -426,6 +426,11 @@ class WebGLTextureUtils {
 
 		this.backend.state.bindTexture( glTextureType, textureGPU );
 
+		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
+
 		if ( texture.isCompressedTexture ) {
 
 			const mipmaps = texture.mipmaps;
