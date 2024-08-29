@@ -119,6 +119,14 @@ jobs:
           WEBGL_TREESHAKEN_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).treeshakenGzip }}
           WEBGL_TREESHAKEN_BASE: ${{ steps.read-size.outputs.WEBGL_TREESHAKEN_BASE }}
           WEBGL_TREESHAKEN_BASE_GZIP: ${{ steps.read-size.outputs.WEBGL_TREESHAKEN_BASE_GZIP }}
+          WEBGPU_FILESIZE: ${{ fromJSON(steps.download-artifact.outputs.result).filesize2 }}
+          WEBGPU_FILESIZE_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).gzip2 }}
+          WEBGPU_FILESIZE_BASE: ${{ steps.read-size.outputs.WEBGPU_FILESIZE_BASE }}
+          WEBGPU_FILESIZE_BASE_GZIP: ${{ steps.read-size.outputs.WEBGPU_FILESIZE_BASE_GZIP }}
+          WEBGPU_TREESHAKEN: ${{ fromJSON(steps.download-artifact.outputs.result).treeshaken2 }}
+          WEBGPU_TREESHAKEN_GZIP: ${{ fromJSON(steps.download-artifact.outputs.result).treeshakenGzip2 }}
+          WEBGPU_TREESHAKEN_BASE: ${{ steps.read-size.outputs.WEBGPU_TREESHAKEN_BASE }}
+          WEBGPU_TREESHAKEN_BASE_GZIP: ${{ steps.read-size.outputs.WEBGPU_TREESHAKEN_BASE_GZIP }}
         run: |
           WEBGL_FILESIZE_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGL_FILESIZE")
           WEBGL_FILESIZE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGL_FILESIZE_GZIP")
