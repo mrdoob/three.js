@@ -4,19 +4,19 @@ import { Fn, float, vec3 } from '../tsl/TSLBase.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 import { Vector3 } from '../../math/Vector3.js';
 
-export const grayscale = /*#__PURE__*/ Fn( ( [ color ] ) => {
+export const grayscale = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	return luminance( color.rgb );
 
 } );
 
-export const saturation = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
+export const saturation = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	return adjustment.mix( luminance( color.rgb ), color.rgb );
 
 } );
 
-export const vibrance = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
+export const vibrance = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	const average = add( color.r, color.g, color.b ).div( 3.0 );
 
@@ -27,7 +27,7 @@ export const vibrance = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] )
 
 } );
 
-export const hue = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
+export const hue = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 	const k = vec3( 0.57735, 0.57735, 0.57735 );
 
@@ -37,7 +37,7 @@ export const hue = /*#__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 } );
 
-const _luminanceCoefficients = /*#__PURE__*/ new Vector3();
+const _luminanceCoefficients = /*@__PURE__*/ new Vector3();
 export const luminance = (
 	color,
 	luminanceCoefficients = vec3( ... ColorManagement.getLuminanceCoefficients( _luminanceCoefficients ) )

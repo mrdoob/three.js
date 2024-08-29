@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { default as TextureNode/*, texture*/ } from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
@@ -41,7 +41,7 @@ class PassTextureNode extends TextureNode {
 
 }
 
-registerNodeClass( 'PassTexture', PassTextureNode );
+PassTextureNode.type = /*@__PURE__*/ registerNode( 'PassTexture', PassTextureNode );
 
 class PassMultipleTextureNode extends PassTextureNode {
 
@@ -76,7 +76,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 
 }
 
-registerNodeClass( 'PassMultipleTexture', PassMultipleTextureNode );
+PassMultipleTextureNode.type = /*@__PURE__*/ registerNode( 'PassMultipleTexture', PassMultipleTextureNode );
 
 class PassNode extends TempNode {
 
@@ -360,7 +360,7 @@ PassNode.DEPTH = 'depth';
 
 export default PassNode;
 
-registerNodeClass( 'Pass', PassNode );
+PassNode.type = /*@__PURE__*/ registerNode( 'Pass', PassNode );
 
 export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
 export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );

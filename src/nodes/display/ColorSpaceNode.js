@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
 
@@ -76,7 +76,7 @@ class ColorSpaceNode extends TempNode {
 
 export default ColorSpaceNode;
 
-registerNodeClass( 'ColorSpace', ColorSpaceNode );
+ColorSpaceNode.type = /*@__PURE__*/ registerNode( 'ColorSpace', ColorSpaceNode );
 
 export const linearSRGBToColorSpace = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), colorSpace, LinearSRGBColorSpace ) );
 export const colorSpaceToLinearSRGB = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), LinearSRGBColorSpace, colorSpace ) );

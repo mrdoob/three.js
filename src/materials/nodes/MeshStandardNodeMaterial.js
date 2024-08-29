@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 import { diffuseColor, metalness, roughness, specularColor, specularF90 } from '../../nodes/core/PropertyNode.js';
 import { mix } from '../../nodes/math/MathNode.js';
 import { materialRoughness, materialMetalness } from '../../nodes/accessors/MaterialNode.js';
@@ -100,3 +100,5 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 }
 
 export default MeshStandardNodeMaterial;
+
+MeshStandardNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshStandard', MeshStandardNodeMaterial );

@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import InputNode from '../core/InputNode.js';
 import { nodeObject, addMethodChaining } from '../tsl/TSLCore.js';
 import { varying } from '../core/VaryingNode.js';
@@ -151,7 +151,7 @@ class BufferAttributeNode extends InputNode {
 
 export default BufferAttributeNode;
 
-registerNodeClass( 'BufferAttribute', BufferAttributeNode );
+BufferAttributeNode.type = /*@__PURE__*/ registerNode( 'BufferAttribute', BufferAttributeNode );
 
 export const bufferAttribute = ( array, type, stride, offset ) => nodeObject( new BufferAttributeNode( array, type, stride, offset ) );
 export const dynamicBufferAttribute = ( array, type, stride, offset ) => bufferAttribute( array, type, stride, offset ).setUsage( DynamicDrawUsage );

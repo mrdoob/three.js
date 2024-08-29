@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UV.js';
 import { Fn, nodeObject, vec2, vec3, float, If } from '../tsl/TSLBase.js';
@@ -153,7 +153,7 @@ class PixelationNode extends TempNode {
 
 }
 
-registerNodeClass( 'Pixelation', PixelationNode );
+PixelationNode.type = /*@__PURE__*/ registerNode( 'Pixelation', PixelationNode );
 
 const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( convertToTexture( node ), convertToTexture( depthNode ), convertToTexture( normalNode ), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
 
@@ -203,4 +203,4 @@ export const pixelationPass = ( scene, camera, pixelSize, normalEdgeStrength, de
 
 export default PixelationPassNode;
 
-registerNodeClass( 'PixelationPass', PixelationPassNode );
+PixelationPassNode.type = /*@__PURE__*/ registerNode( 'PixelationPass', PixelationPassNode );

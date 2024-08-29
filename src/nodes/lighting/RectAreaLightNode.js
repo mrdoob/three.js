@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { uniform } from '../core/UniformNode.js';
@@ -90,4 +90,4 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 export default RectAreaLightNode;
 
-registerNodeClass( 'RectAreaLight', RectAreaLightNode );
+RectAreaLightNode.type = /*@__PURE__*/ registerNode( 'RectAreaLight', RectAreaLightNode );

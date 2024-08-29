@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { nodeObject, Fn, float, vec2, vec4 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
@@ -205,6 +205,6 @@ class GaussianBlurNode extends TempNode {
 
 export default GaussianBlurNode;
 
-registerNodeClass( 'GaussianBlur', GaussianBlurNode );
+GaussianBlurNode.type = /*@__PURE__*/ registerNode( 'GaussianBlur', GaussianBlurNode );
 
 export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ) );

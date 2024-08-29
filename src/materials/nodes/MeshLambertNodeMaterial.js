@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 import BasicEnvironmentNode from '../../nodes/lighting/BasicEnvironmentNode.js';
 import PhongLightingModel from '../../nodes/functions/PhongLightingModel.js';
 
@@ -39,3 +39,5 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 }
 
 export default MeshLambertNodeMaterial;
+
+MeshLambertNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshLambert', MeshLambertNodeMaterial );

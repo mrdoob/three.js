@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { uv } from '../accessors/UV.js';
 import { nodeProxy, float, vec2 } from '../tsl/TSLBase.js';
 
@@ -36,6 +36,6 @@ class SpriteSheetUVNode extends Node {
 
 export default SpriteSheetUVNode;
 
-registerNodeClass( 'SpriteSheetUV', SpriteSheetUVNode );
+SpriteSheetUVNode.type = /*@__PURE__*/ registerNode( 'SpriteSheetUV', SpriteSheetUVNode );
 
-export const spritesheetUV = nodeProxy( SpriteSheetUVNode );
+export const spritesheetUV = /*@__PURE__*/ nodeProxy( SpriteSheetUVNode );

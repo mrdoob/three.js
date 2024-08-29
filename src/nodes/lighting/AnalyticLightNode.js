@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
@@ -351,4 +351,4 @@ class AnalyticLightNode extends LightingNode {
 
 export default AnalyticLightNode;
 
-registerNodeClass( 'AnalyticLight', AnalyticLightNode );
+AnalyticLightNode.type = /*@__PURE__*/ registerNode( 'AnalyticLight', AnalyticLightNode );

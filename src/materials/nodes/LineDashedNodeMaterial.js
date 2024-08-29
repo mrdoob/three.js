@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
 import { materialLineDashSize, materialLineGapSize, materialLineScale } from '../../nodes/accessors/MaterialNode.js';
 import { dashSize, gapSize } from '../../nodes/core/PropertyNode.js';
@@ -49,3 +49,5 @@ class LineDashedNodeMaterial extends NodeMaterial {
 }
 
 export default LineDashedNodeMaterial;
+
+LineDashedNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'LineDashed', LineDashedNodeMaterial );

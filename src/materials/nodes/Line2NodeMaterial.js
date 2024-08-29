@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 import { property, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
@@ -433,3 +433,5 @@ class Line2NodeMaterial extends NodeMaterial {
 }
 
 export default Line2NodeMaterial;
+
+Line2NodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Line2', Line2NodeMaterial );

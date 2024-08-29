@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from './Node.js';
+import Node, { registerNode } from './Node.js';
 import { nodeObject, varying } from '../tsl/TSLBase.js';
 
 class AttributeNode extends Node {
@@ -116,6 +116,6 @@ class AttributeNode extends Node {
 
 export default AttributeNode;
 
-registerNodeClass( 'Attribute', AttributeNode );
+AttributeNode.type = /*@__PURE__*/ registerNode( 'Attribute', AttributeNode );
 
 export const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );

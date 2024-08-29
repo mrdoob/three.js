@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { normalLocal } from './Normal.js';
 import { positionLocal } from './Position.js';
 import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, Fn } from '../tsl/TSLBase.js';
@@ -119,6 +119,6 @@ class BatchNode extends Node {
 
 export default BatchNode;
 
-registerNodeClass( 'Batch', BatchNode );
+BatchNode.type = /*@__PURE__*/ registerNode( 'Batch', BatchNode );
 
-export const batch = nodeProxy( BatchNode );
+export const batch = /*@__PURE__*/ nodeProxy( BatchNode );

@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { float, nodeProxy, Fn } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
@@ -15,10 +15,10 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { FloatType } from '../../constants.js';
 
-const _morphTextures = new WeakMap();
+const _morphTextures = /*@__PURE__*/ new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
 
-const getMorph = Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
+const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
 
 	const texelIndex = int( vertexIndex ).mul( stride ).add( offset );
 
@@ -254,6 +254,6 @@ class MorphNode extends Node {
 
 export default MorphNode;
 
-registerNodeClass( 'Morph', MorphNode );
+MorphNode.type = /*@__PURE__*/ registerNode( 'Morph', MorphNode );
 
-export const morphReference = nodeProxy( MorphNode );
+export const morphReference = /*@__PURE__*/ nodeProxy( MorphNode );

@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UV.js';
 import { Fn, nodeProxy, vec4 } from '../tsl/TSLBase.js';
@@ -48,6 +48,6 @@ class FilmNode extends TempNode {
 
 export default FilmNode;
 
-registerNodeClass( 'Film', FilmNode );
+FilmNode.type = /*@__PURE__*/ registerNode( 'Film', FilmNode );
 
-export const film = nodeProxy( FilmNode );
+export const film = /*@__PURE__*/ nodeProxy( FilmNode );

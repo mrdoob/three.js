@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from './Node.js';
+import Node, { registerNode } from './Node.js';
 import { nodeImmutable, varying } from '../tsl/TSLBase.js';
 
 class IndexNode extends Node {
@@ -69,9 +69,9 @@ IndexNode.DRAW = 'draw';
 
 export default IndexNode;
 
-registerNodeClass( 'Index', IndexNode );
+IndexNode.type = /*@__PURE__*/ registerNode( 'Index', IndexNode );
 
-export const vertexIndex = nodeImmutable( IndexNode, IndexNode.VERTEX );
-export const instanceIndex = nodeImmutable( IndexNode, IndexNode.INSTANCE );
-export const invocationLocalIndex = nodeImmutable( IndexNode, IndexNode.INVOCATION_LOCAL );
-export const drawIndex = nodeImmutable( IndexNode, IndexNode.DRAW );
+export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VERTEX );
+export const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INSTANCE );
+export const invocationLocalIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INVOCATION_LOCAL );
+export const drawIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.DRAW );

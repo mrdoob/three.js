@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
 import { diffuseColor } from '../../nodes/core/PropertyNode.js';
 import { vec3 } from '../../nodes/tsl/TSLBase.js';
@@ -49,3 +49,5 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 
 
 export default MeshMatcapNodeMaterial;
+
+MeshMatcapNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshMatcap', MeshMatcapNodeMaterial );

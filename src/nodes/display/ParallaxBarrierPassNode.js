@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import { Fn, If, nodeObject, vec4 } from '../tsl/TSLBase.js';
 import { uv } from '../accessors/UV.js';
 import { mod } from '../math/MathNode.js';
@@ -50,6 +50,6 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 export default ParallaxBarrierPassNode;
 
-registerNodeClass( 'ParallaxBarrierPass', ParallaxBarrierPassNode );
+ParallaxBarrierPassNode.type = /*@__PURE__*/ registerNode( 'ParallaxBarrierPass', ParallaxBarrierPassNode );
 
 export const parallaxBarrierPass = ( scene, camera ) => nodeObject( new ParallaxBarrierPassNode( scene, camera ) );

@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 
 import { PointsMaterial } from '../PointsMaterial.js';
 
@@ -34,3 +34,5 @@ class PointsNodeMaterial extends NodeMaterial {
 }
 
 export default PointsNodeMaterial;
+
+PointsNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Points', PointsNodeMaterial );

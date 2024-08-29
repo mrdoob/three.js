@@ -95,8 +95,8 @@ class StandardNodeLibrary extends NodeLibrary {
 		this.addToneMapping( TMF.AgXToneMapping, AgXToneMapping );
 		this.addToneMapping( TMF.NeutralToneMapping, NeutralToneMapping );
 
-		this.addColorSpace( CSF.LinearTosRGBShader, getColorSpaceMethod( LinearSRGBColorSpace, SRGBColorSpace ) );
-		this.addColorSpace( CSF.sRGBToLinearShader, getColorSpaceMethod( SRGBColorSpace, LinearSRGBColorSpace ) );
+		this.addColorSpace( CSF.LinearTosRGB, getColorSpaceMethod( LinearSRGBColorSpace, SRGBColorSpace ) );
+		this.addColorSpace( CSF.sRGBToLinear, getColorSpaceMethod( SRGBColorSpace, LinearSRGBColorSpace ) );
 
 	}
 

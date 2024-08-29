@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
 import { cubeMapNode } from '../utils/CubeMapNode.js';
 
@@ -24,4 +24,4 @@ class BasicEnvironmentNode extends LightingNode {
 
 export default BasicEnvironmentNode;
 
-registerNodeClass( 'BasicEnvironment', BasicEnvironmentNode );
+BasicEnvironmentNode.type = /*@__PURE__*/ registerNode( 'BasicEnvironment', BasicEnvironmentNode );

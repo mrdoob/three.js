@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TextureNode from './TextureNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 import { GPUStorageTextureAccess } from '../../renderers/webgpu/utils/WebGPUConstants.js';
@@ -89,9 +89,9 @@ class StorageTextureNode extends TextureNode {
 
 export default StorageTextureNode;
 
-registerNodeClass( 'StorageTexture', StorageTextureNode );
+StorageTextureNode.type = /*@__PURE__*/ registerNode( 'StorageTexture', StorageTextureNode );
 
-export const storageTexture = nodeProxy( StorageTextureNode );
+export const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode );
 
 export const textureStore = ( value, uvNode, storeNode ) => {
 

@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { normalWorld } from '../accessors/Normal.js';
 import { uniformArray } from '../accessors/UniformArrayNode.js';
@@ -48,9 +48,9 @@ class LightProbeNode extends AnalyticLightNode {
 
 export default LightProbeNode;
 
-registerNodeClass( 'LightProbe', LightProbeNode );
+LightProbeNode.type = /*@__PURE__*/ registerNode( 'LightProbe', LightProbeNode );
 
-const shGetIrradianceAt = Fn( ( [ normal, shCoefficients ] ) => {
+const shGetIrradianceAt = /*@__PURE__*/ Fn( ( [ normal, shCoefficients ] ) => {
 
 	// normal is assumed to have unit length
 

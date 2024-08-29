@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
@@ -114,12 +114,12 @@ ViewportNode.UV = 'uv';
 
 export default ViewportNode;
 
-registerNodeClass( 'Viewport', ViewportNode );
+ViewportNode.type = /*@__PURE__*/ registerNode( 'Viewport', ViewportNode );
 
-export const viewportCoordinate = nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
-export const viewportResolution = nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
-export const viewport = nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
-export const viewportUV = nodeImmutable( ViewportNode, ViewportNode.UV );
+export const viewportCoordinate = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
+export const viewportResolution = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
+export const viewport = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
+export const viewportUV = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.UV );
 
 export const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 

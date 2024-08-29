@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { mix } from '../math/MathNode.js';
@@ -49,4 +49,4 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 export default HemisphereLightNode;
 
-registerNodeClass( 'HemisphereLight', HemisphereLightNode );
+HemisphereLightNode.type = /*@__PURE__*/ registerNode( 'HemisphereLight', HemisphereLightNode );

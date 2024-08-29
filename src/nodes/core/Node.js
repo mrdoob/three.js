@@ -4,7 +4,7 @@ import { getNodeChildren, getCacheKey } from './NodeUtils.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
 
-const NodeClasses = new Map();
+const Nodes = new Map();
 
 let _nodeId = 0;
 
@@ -541,34 +541,39 @@ class Node extends EventDispatcher {
 
 export default Node;
 
-export function registerNodeClass( type, nodeClass ) {
+Node.type = /*@__PURE__*/ registerNode( '', Node );
 
-	const nodeType = type + 'Node';
+export function registerNode( type, nodeClass ) {
 
-	if ( typeof nodeClass !== 'function' || ! type ) throw new Error( `TSL.Node: Node class ${ type } is not a class` );
+	const suffix = 'Node';
+	const nodeType = type + suffix;
 
-	if ( NodeClasses.has( nodeType ) ) {
+	if ( typeof nodeClass !== 'function' ) throw new Error( `TSL.Node: Node class ${ type } is not a class` );
+
+	if ( Nodes.has( nodeType ) ) {
 
 		console.warn( `TSL.Node: Redefinition of node class ${ nodeType }` );
 		return;
 
 	}
 
-	if ( type.slice( - 4 ) === 'Node' ) {
+	if ( type.slice( - suffix.length ) === suffix ) {
 
-		console.warn( `TSL.Node: Node class ${ nodeType } should not have 'Node' suffix.` );
+		console.warn( `TSL.Node: Node class ${ nodeType } should not have '${ suffix }' suffix.` );
 		return;
 
 	}
 
-	NodeClasses.set( nodeType, nodeClass );
+	Nodes.set( nodeType, nodeClass );
 	nodeClass.type = nodeType;
+
+	return nodeType;
 
 }
 
 export function createNodeFromType( type ) {
 
-	const Class = NodeClasses.get( type );
+	const Class = Nodes.get( type );
 
 	if ( Class !== undefined ) {
 
@@ -580,7 +585,7 @@ export function createNodeFromType( type ) {
 
 export function addNodeClass( type, nodeClass ) {
 
-	console.warn( 'TSL.Node: Function addNodeClass() is deprecated. Use registerNodeClass() instead.' );
-	registerNodeClass( type.slice( 0, - 4 ), nodeClass );
+	console.warn( 'TSL.Node: Function addNodeClass() is deprecated. Use /*@__PURE__*/ registerNode() instead.' );
+	/*@__PURE__*/ registerNode( type.slice( 0, - 4 ), nodeClass );
 
 }

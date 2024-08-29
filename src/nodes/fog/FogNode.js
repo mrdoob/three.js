@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { positionView } from '../accessors/Position.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
@@ -41,6 +41,6 @@ class FogNode extends Node {
 
 export default FogNode;
 
-registerNodeClass( 'Fog', FogNode );
+FogNode.type = /*@__PURE__*/ registerNode( 'Fog', FogNode );
 
-export const fog = nodeProxy( FogNode );
+export const fog = /*@__PURE__*/ nodeProxy( FogNode );

@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import PassNode from './PassNode.js';
 import { Color } from '../../math/Color.js';
@@ -242,7 +242,7 @@ class SSAAPassNode extends PassNode {
 
 export default SSAAPassNode;
 
-registerNodeClass( 'SSAAPass', SSAAPassNode );
+SSAAPassNode.type = /*@__PURE__*/ registerNode( 'SSAAPass', SSAAPassNode );
 
 // These jitter vectors are specified in integers because it is easier.
 // I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
