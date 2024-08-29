@@ -66318,6 +66318,12 @@ class GLSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	needsColorSpaceToLinearSRGB( texture ) {
+
+		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
+
+	}
+
 	getMethod( method ) {
 
 		return glslMethods[ method ] || method;
@@ -68957,6 +68963,12 @@ class WebGLTextureUtils {
 
 		const { gl, extensions, backend } = this;
 
+
+		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
+
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_S, wrappingToGL[ texture.wrapS ] );
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_T, wrappingToGL[ texture.wrapT ] );
 
@@ -69045,11 +69057,6 @@ class WebGLTextureUtils {
 
 		backend.state.bindTexture( glTextureType, textureGPU );
 
-		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
-
 		this.setTextureParameters( glTextureType, texture );
 
 		if ( texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
@@ -69137,6 +69144,8 @@ class WebGLTextureUtils {
 		};
 
 		this.backend.state.bindTexture( glTextureType, textureGPU );
+
+		this.setTextureParameters( glTextureType, texture );
 
 		if ( texture.isCompressedTexture ) {
 
