@@ -37,7 +37,7 @@ class RenderOutputNode extends TempNode {
 
 		if ( outputColorSpace === SRGBColorSpace ) {
 
-			outputNode = outputNode.linearSRGBToColorSpace( outputColorSpace );
+			outputNode = outputNode.toOutputColorSpace( outputColorSpace );
 
 		}
 

@@ -2,7 +2,7 @@ import { registerNode } from '../core/Node.js';
 import UniformNode, { uniform } from '../core/UniformNode.js';
 import { uv } from './UV.js';
 import { textureSize } from './TextureSizeNode.js';
-import { colorSpaceToLinearSRGB } from '../display/ColorSpaceNode.js';
+import { toWorkingColorSpace } from '../display/ColorSpaceNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
 import { nodeProxy, vec3, nodeObject } from '../tsl/TSLBase.js';
@@ -274,9 +274,9 @@ class TextureNode extends UniformNode {
 			let snippet = propertyName;
 			const nodeType = this.getNodeType( builder );
 
-			if ( builder.needsColorSpaceToLinearSRGB( texture ) ) {
+			if ( builder.needsToWorkingColorSpace( texture ) ) {
 
-				snippet = colorSpaceToLinearSRGB( expression( snippet, nodeType ), texture.colorSpace ).setup( builder ).build( builder, nodeType );
+				snippet = toWorkingColorSpace( expression( snippet, nodeType ), texture.colorSpace ).setup( builder ).build( builder, nodeType );
 
 			}
 
