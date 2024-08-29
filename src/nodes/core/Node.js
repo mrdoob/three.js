@@ -541,9 +541,10 @@ class Node extends EventDispatcher {
 
 export default Node;
 
-export function /*#__PURE__*/ registerNode( type, nodeClass ) {
+export function registerNode( type, nodeClass ) {
 
-	const nodeType = type + 'Node';
+	const suffix = 'Node';
+	const nodeType = type + suffix;
 
 	if ( typeof nodeClass !== 'function' || ! type ) throw new Error( `TSL.Node: Node class ${ type } is not a class` );
 
@@ -554,9 +555,9 @@ export function /*#__PURE__*/ registerNode( type, nodeClass ) {
 
 	}
 
-	if ( type.slice( - 4 ) === 'Node' ) {
+	if ( type.slice( - suffix.length ) === suffix ) {
 
-		console.warn( `TSL.Node: Node class ${ nodeType } should not have 'Node' suffix.` );
+		console.warn( `TSL.Node: Node class ${ nodeType } should not have '${ suffix }' suffix.` );
 		return;
 
 	}
