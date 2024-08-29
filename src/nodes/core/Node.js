@@ -4,7 +4,7 @@ import { getNodeChildren, getCacheKey } from './NodeUtils.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
 
-const NodeClasses = new Map();
+const Nodes = new Map();
 
 let _nodeId = 0;
 
@@ -550,7 +550,7 @@ export function registerNode( type, nodeClass ) {
 
 	if ( typeof nodeClass !== 'function' ) throw new Error( `TSL.Node: Node class ${ type } is not a class` );
 
-	if ( NodeClasses.has( nodeType ) ) {
+	if ( Nodes.has( nodeType ) ) {
 
 		console.warn( `TSL.Node: Redefinition of node class ${ nodeType }` );
 		return;
@@ -564,7 +564,7 @@ export function registerNode( type, nodeClass ) {
 
 	}
 
-	NodeClasses.set( nodeType, nodeClass );
+	Nodes.set( nodeType, nodeClass );
 	nodeClass.type = nodeType;
 
 	return nodeType;
@@ -573,7 +573,7 @@ export function registerNode( type, nodeClass ) {
 
 export function createNodeFromType( type ) {
 
-	const Class = NodeClasses.get( type );
+	const Class = Nodes.get( type );
 
 	if ( Class !== undefined ) {
 
