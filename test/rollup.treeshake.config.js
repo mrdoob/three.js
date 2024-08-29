@@ -69,4 +69,32 @@ export default [
 			}
 		]
 	},
+	{
+		input: 'test/treeshake/index.webgpu.js',
+		plugins: [
+			resolve(),
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'test/treeshake/index.webgpu.bundle.js'
+			}
+		]
+	},
+	{
+		input: 'test/treeshake/index.webgpu.js',
+		plugins: [
+			resolve(),
+			terser(),
+			filesize( {
+				showMinifiedSize: false,
+			} ),
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'test/treeshake/index.webgpu.bundle.min.js'
+			}
+		]
+	},
 ];
