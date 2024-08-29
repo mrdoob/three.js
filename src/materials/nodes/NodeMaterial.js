@@ -624,12 +624,14 @@ class NodeMaterial extends Material {
 
 export default NodeMaterial;
 
+NodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( '', NodeMaterial );
+
 export function registerNodeMaterial( type, nodeMaterialClass ) {
 
 	const suffix = 'NodeMaterial';
 	const nodeMaterialType = type + suffix;
 
-	if ( typeof nodeMaterialClass !== 'function' || ! type ) throw new Error( `THREE.Node: NodeMaterial class "${ type }" is not a class.` );
+	if ( typeof nodeMaterialClass !== 'function' ) throw new Error( `THREE.Node: NodeMaterial class "${ type }" is not a class.` );
 
 	if ( NodeMaterialClasses.has( nodeMaterialType ) ) {
 
