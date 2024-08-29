@@ -23,6 +23,8 @@ import { depth } from '../../nodes/display/ViewportDepthNode.js';
 import { cameraLogDepth } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha } from '../../nodes/accessors/ClippingNode.js';
 
+const NodeMaterialClasses = new Map();
+
 class NodeMaterial extends Material {
 
 	constructor() {
@@ -621,3 +623,31 @@ class NodeMaterial extends Material {
 }
 
 export default NodeMaterial;
+
+export function registerNodeMaterial( type, nodeMaterialClass ) {
+
+	const suffix = 'NodeMaterial';
+	const nodeMaterialType = type + suffix;
+
+	if ( typeof nodeMaterialClass !== 'function' || ! type ) throw new Error( `THREE.Node: NodeMaterial class "${ type }" is not a class.` );
+
+	if ( NodeMaterialClasses.has( nodeMaterialType ) ) {
+
+		console.warn( `THREE.Node: Redefinition of NodeMaterial class "${ nodeMaterialType }".` );
+		return;
+
+	}
+
+	if ( type.slice( - suffix.length ) === suffix ) {
+
+		console.warn( `THREE.NodeMaterial: NodeMaterial class ${ nodeMaterialType } should not have '${ suffix }' suffix.` );
+		return;
+
+	}
+
+	NodeMaterialClasses.set( nodeMaterialType, nodeMaterialClass );
+	nodeMaterialClass.type = nodeMaterialType;
+
+	return nodeMaterialType;
+
+}

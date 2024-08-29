@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 import { shininess, specularColor } from '../../nodes/core/PropertyNode.js';
 import { materialShininess, materialSpecular } from '../../nodes/accessors/MaterialNode.js';
 import { float } from '../../nodes/tsl/TSLBase.js';
@@ -70,3 +70,5 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 }
 
 export default MeshPhongNodeMaterial;
+
+MeshPhongNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshPhong', MeshPhongNodeMaterial );

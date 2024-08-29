@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 import { property } from '../../nodes/core/PropertyNode.js';
 import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
 import { modelWorldMatrixInverse } from '../../nodes/accessors/ModelNode.js';
@@ -100,3 +100,5 @@ class VolumeNodeMaterial extends NodeMaterial {
 }
 
 export default VolumeNodeMaterial;
+
+VolumeNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Volume', VolumeNodeMaterial );

@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 import ToonLightingModel from '../../nodes/functions/ToonLightingModel.js';
 
 import { MeshToonMaterial } from '../MeshToonMaterial.js';
@@ -30,3 +30,5 @@ class MeshToonNodeMaterial extends NodeMaterial {
 }
 
 export default MeshToonNodeMaterial;
+
+MeshToonNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshToon', MeshToonNodeMaterial );

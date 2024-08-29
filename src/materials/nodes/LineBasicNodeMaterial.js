@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 
 import { LineBasicMaterial } from '../LineBasicMaterial.js';
 
@@ -23,3 +23,5 @@ class LineBasicNodeMaterial extends NodeMaterial {
 }
 
 export default LineBasicNodeMaterial;
+
+LineBasicNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'LineBasic', LineBasicNodeMaterial );

@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 import ShadowMaskModel from '../../nodes/functions/ShadowMaskModel.js';
 
 import { ShadowMaterial } from '../ShadowMaterial.js';
@@ -30,3 +30,5 @@ class ShadowNodeMaterial extends NodeMaterial {
 }
 
 export default ShadowNodeMaterial;
+
+ShadowNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Shadow', ShadowNodeMaterial );

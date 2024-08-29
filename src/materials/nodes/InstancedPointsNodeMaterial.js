@@ -1,4 +1,4 @@
-import NodeMaterial from './NodeMaterial.js';
+import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 import { property } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
@@ -161,3 +161,5 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 }
 
 export default InstancedPointsNodeMaterial;
+
+InstancedPointsNodeMaterial.type = /*#__PURE__*/ registerNodeMaterial( 'InstancedPoints', InstancedPointsNodeMaterial );
