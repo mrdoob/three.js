@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, storage, Fn, instanceIndex, sin, timerLocal, float, uniform } from 'three/tsl';
+			import { color, storage, Fn, instanceIndex, sin, timerLocal, float, uniform, attribute, vec3 } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -78,17 +78,6 @@
 
 				// Position and THREE.Color Data
 
-				const positions = [];
-				const colors = [];
-				const sizes = [];
-
-				const points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
-
-				const spline = new THREE.CatmullRomCurve3( points );
-				const divisions = Math.round( 4 * points.length );
-				const point = new THREE.Vector3();
-				const pointColor = new THREE.Color();
-
 				effectController = {
 
 					pulseSpeed: uniform( 6 ),
@@ -101,6 +90,17 @@
 
 				};
 
+				const points = GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+
+				const spline = new THREE.CatmullRomCurve3( points );
+				const divisions = Math.round( 4 * points.length );
+				const point = new THREE.Vector3();
+				const pointColor = new THREE.Color();
+
+				const positions = [];
+				const colors = [];
+				const sizes = new Float32Array( divisions );
+
 				for ( let i = 0, l = divisions; i < l; i ++ ) {
 
 					const t = i / l;
@@ -111,7 +111,7 @@
 					pointColor.setHSL( t, 1.0, 0.5, THREE.SRGBColorSpace );
 					colors.push( pointColor.r, pointColor.g, pointColor.b );
 
-					sizes.push( 10.0 );
+					sizes[ i ] = 10.0;
 
 				}
 
@@ -120,11 +120,8 @@
 				const geometry = new InstancedPointsGeometry();
 				geometry.setPositions( positions );
 				geometry.setColors( colors );
-				geometry.setSizes( sizes );
 
-				const instanceSizeBaseAttribute = geometry.attributes.instanceSize;
-				const instanceSizeBufferAttribute = new THREE.StorageInstancedBufferAttribute( instanceSizeBaseAttribute.array, 1 );
-
+				const instanceSizeBufferAttribute = new THREE.StorageInstancedBufferAttribute( sizes, 1 );
 				geometry.setAttribute( 'instanceSize', instanceSizeBufferAttribute );
 				const instanceSizeStorage = storage( instanceSizeBufferAttribute, 'float', instanceSizeBufferAttribute.count );
 
@@ -146,12 +143,12 @@
 
 					color: 0xffffff,
 					pointWidth: 10, // in pixel units
-
 					vertexColors: true,
-					useInstanceSize: true,
 					alphaToCoverage: true,
 
 				} );
+
+				material.pointSizeNode = attribute( 'instanceSize' );
 
 				const instancedPoints = new InstancedPoints( geometry, material );
 				instancedPoints.scale.set( 1, 1, 1 );
@@ -165,21 +162,9 @@
 
 				gui = new GUI();
 
-				gui.add( effectController, 'instanceSize' ).onChange( function ( val ) {
-
-					material.useInstanceSize = val;
-
-				} );
-
 				gui.add( effectController, 'alphaToCoverage' ).onChange( function ( val ) {
 
 					material.alphaToCoverage = val;
-
-				} );
-
-				gui.add( effectController, 'width', 1, 20, 1 ).onChange( function ( val ) {
-
-					material.pointWidth = val;
 
 				} );
 

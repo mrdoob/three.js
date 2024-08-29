@@ -26,11 +26,11 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		this.useColor = params.vertexColors;
 
-		this.vertexSizes = params.useInstanceSize;
-
 		this.pointWidth = 1;
 
 		this.pointColorNode = null;
+
+		this.pointSizeNode = null;
 
 		this.setDefaultValues( _defaultValues );
 
@@ -73,16 +73,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			const offset = property( 'vec2', 'offset' );
 			offset.assign( positionGeometry.xy );
 
-			if ( this.vertexSizes ) {
-
-				const instanceSize = attribute( 'instanceSize' );
-				offset.assign( offset.mul( instanceSize ) );
-
-			} else {
-
-				offset.assign( offset.mul( materialPointWidth ) );
-
-			}
+			offset.mulAssign( this.pointSizeNode ? this.pointSizeNode : materialPointWidth );
 
 			offset.assign( offset.div( viewport.z ) );
 			offset.y.assign( offset.y.mul( aspect ) );
@@ -157,23 +148,6 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 	get alphaToCoverage() {
 
 		return this.useAlphaToCoverage;
-
-	}
-
-	get useInstanceSize() {
-
-		return this.vertexSizes;
-
-	}
-
-	set useInstanceSize( value ) {
-
-		if ( this.vertexSizes !== value ) {
-
-			this.vertexSizes = value;
-			this.needsUpdate = true;
-
-		}
 
 	}
 

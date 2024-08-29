@@ -82,26 +82,6 @@ class InstancedPointsGeometry extends InstancedBufferGeometry {
 
 	}
 
-	setSizes( array ) {
-
-		let sizes;
-
-		if ( array instanceof Float32Array ) {
-
-			sizes = array;
-
-		} else if ( Array.isArray( array ) ) {
-
-			sizes = new Float32Array( array );
-
-		}
-
-		this.setAttribute( 'instanceSize', new InstancedBufferAttribute( sizes, 1 ) );
-
-		return this;
-
-	}
-
 	setColors( array ) {
 
 		let colors;
