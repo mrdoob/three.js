@@ -15,7 +15,7 @@ import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from '../../constants.js'
 // Normal Mapping Without Precomputed Tangents
 // http://www.thetenthplanet.de/archives/1180
 
-const perturbNormal2Arb = Fn( ( inputs ) => {
+const perturbNormal2Arb = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { eye_pos, surf_norm, mapN, uv } = inputs;
 

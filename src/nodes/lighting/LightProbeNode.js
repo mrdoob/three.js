@@ -50,7 +50,7 @@ export default LightProbeNode;
 
 LightProbeNode.type = /*@__PURE__*/ registerNode( 'LightProbe', LightProbeNode );
 
-const shGetIrradianceAt = Fn( ( [ normal, shCoefficients ] ) => {
+const shGetIrradianceAt = /*@__PURE__*/ Fn( ( [ normal, shCoefficients ] ) => {
 
 	// normal is assumed to have unit length
 

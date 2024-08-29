@@ -1,7 +1,7 @@
 import { mix } from '../math/MathNode.js';
 import { Fn } from '../tsl/TSLBase.js';
 
-export const sRGBToLinearShader = Fn( ( [ color ] ) => {
+export const sRGBToLinear = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	const a = color.mul( 0.9478672986 ).add( 0.0521327014 ).pow( 2.4 );
 	const b = color.mul( 0.0773993808 );
@@ -12,14 +12,14 @@ export const sRGBToLinearShader = Fn( ( [ color ] ) => {
 	return rgbResult;
 
 } ).setLayout( {
-	name: 'sRGBToLinearShader',
+	name: 'sRGBToLinear',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' }
 	]
 } );
 
-export const LinearTosRGBShader = Fn( ( [ color ] ) => {
+export const LinearTosRGB = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	const a = color.pow( 0.41666 ).mul( 1.055 ).sub( 0.055 );
 	const b = color.mul( 12.92 );
@@ -30,7 +30,7 @@ export const LinearTosRGBShader = Fn( ( [ color ] ) => {
 	return rgbResult;
 
 } ).setLayout( {
-	name: 'LinearTosRGBShader',
+	name: 'LinearTosRGB',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' }

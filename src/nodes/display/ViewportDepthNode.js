@@ -116,6 +116,6 @@ const depthBase = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.
 
 export const depth = /*@__PURE__*/ nodeImmutable( ViewportDepthNode, ViewportDepthNode.DEPTH );
 export const linearDepth = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.LINEAR_DEPTH );
-export const viewportLinearDepth = linearDepth( viewportDepthTexture() );
+export const viewportLinearDepth = /*@__PURE__*/ linearDepth( viewportDepthTexture() );
 
 depth.assign = ( value ) => depthBase( value );

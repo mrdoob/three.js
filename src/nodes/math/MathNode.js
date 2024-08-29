@@ -266,10 +266,10 @@ export default MathNode;
 
 MathNode.type = /*@__PURE__*/ registerNode( 'Math', MathNode );
 
-export const EPSILON = float( 1e-6 );
-export const INFINITY = float( 1e6 );
-export const PI = float( Math.PI );
-export const PI2 = float( Math.PI * 2 );
+export const EPSILON = /*@__PURE__*/ float( 1e-6 );
+export const INFINITY = /*@__PURE__*/ float( 1e6 );
+export const PI = /*@__PURE__*/ float( Math.PI );
+export const PI2 = /*@__PURE__*/ float( Math.PI * 2 );
 
 export const all = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ALL );
 export const any = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ANY );
@@ -332,7 +332,7 @@ export const refract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFRACT );
 export const smoothstep = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SMOOTHSTEP );
 export const faceForward = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FACEFORWARD );
 
-export const rand = Fn( ( [ uv ] ) => {
+export const rand = /*@__PURE__*/ Fn( ( [ uv ] ) => {
 
 	const a = 12.9898, b = 78.233, c = 43758.5453;
 	const dt = dot( uv.xy, vec2( a, b ) ), sn = mod( dt, PI );

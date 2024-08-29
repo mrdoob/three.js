@@ -50,6 +50,6 @@ UniformGroupNode.type = /*@__PURE__*/ registerNode( 'UniformGroup', UniformGroup
 export const uniformGroup = ( name ) => new UniformGroupNode( name );
 export const sharedUniformGroup = ( name ) => new UniformGroupNode( name, true );
 
-export const frameGroup = sharedUniformGroup( 'frame' );
-export const renderGroup = sharedUniformGroup( 'render' );
-export const objectGroup = uniformGroup( 'object' );
+export const frameGroup = /*@__PURE__*/ sharedUniformGroup( 'frame' );
+export const renderGroup = /*@__PURE__*/ sharedUniformGroup( 'render' );
+export const objectGroup = /*@__PURE__*/ uniformGroup( 'object' );
