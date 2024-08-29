@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { cameraProjectionMatrix } from './Camera.js';
 import { modelViewMatrix } from './ModelNode.js';
@@ -33,6 +33,6 @@ class ModelViewProjectionNode extends TempNode {
 
 export default ModelViewProjectionNode;
 
-registerNodeClass( 'ModelViewProjection', ModelViewProjectionNode );
+ModelViewProjectionNode.type = /*#__PURE__*/ registerNode( 'ModelViewProjection', ModelViewProjectionNode );
 
 export const modelViewProjection = nodeProxy( ModelViewProjectionNode );

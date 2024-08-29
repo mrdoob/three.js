@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { vectorComponents } from '../core/constants.js';
 
@@ -59,4 +59,4 @@ class SetNode extends TempNode {
 
 export default SetNode;
 
-registerNodeClass( 'Set', SetNode );
+SetNode.type = /*#__PURE__*/ registerNode( 'Set', SetNode );

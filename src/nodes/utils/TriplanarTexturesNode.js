@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { add } from '../math/OperatorNode.js';
 import { normalLocal } from '../accessors/Normal.js';
 import { positionLocal } from '../accessors/Position.js';
@@ -54,7 +54,7 @@ class TriplanarTexturesNode extends Node {
 
 export default TriplanarTexturesNode;
 
-registerNodeClass( 'TriplanarTextures', TriplanarTexturesNode );
+TriplanarTexturesNode.type = /*#__PURE__*/ registerNode( 'TriplanarTextures', TriplanarTexturesNode );
 
 export const triplanarTextures = nodeProxy( TriplanarTexturesNode );
 export const triplanarTexture = ( ...params ) => triplanarTextures( ...params );

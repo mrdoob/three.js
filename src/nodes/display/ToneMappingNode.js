@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
 import { rendererReference } from '../accessors/RendererReferenceNode.js';
@@ -58,7 +58,7 @@ class ToneMappingNode extends TempNode {
 
 export default ToneMappingNode;
 
-registerNodeClass( 'ToneMapping', ToneMappingNode );
+ToneMappingNode.type = /*#__PURE__*/ registerNode( 'ToneMapping', ToneMappingNode );
 
 export const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) ) );
 export const toneMappingExposure = /*@__PURE__*/ rendererReference( 'toneMappingExposure', 'float' );

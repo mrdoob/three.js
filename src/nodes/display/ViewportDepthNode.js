@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { nodeImmutable, nodeProxy } from '../tsl/TSLBase.js';
 import { cameraNear, cameraFar } from '../accessors/Camera.js';
 import { positionView } from '../accessors/Position.js';
@@ -94,7 +94,7 @@ ViewportDepthNode.LINEAR_DEPTH = 'linearDepth';
 
 export default ViewportDepthNode;
 
-registerNodeClass( 'ViewportDepth', ViewportDepthNode );
+ViewportDepthNode.type = /*#__PURE__*/ registerNode( 'ViewportDepth', ViewportDepthNode );
 
 // NOTE: viewZ, the z-coordinate in camera space, is negative for points in front of the camera
 

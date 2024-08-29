@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { sub, mul, div } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
@@ -264,7 +264,7 @@ MathNode.FACEFORWARD = 'faceforward';
 
 export default MathNode;
 
-registerNodeClass( 'Math', MathNode );
+MathNode.type = /*#__PURE__*/ registerNode( 'Math', MathNode );
 
 export const EPSILON = float( 1e-6 );
 export const INFINITY = float( 1e6 );

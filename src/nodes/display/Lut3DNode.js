@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { Fn, nodeObject, vec3, vec4, float } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
@@ -49,6 +49,6 @@ class Lut3DNode extends TempNode {
 
 export default Lut3DNode;
 
-registerNodeClass( 'Lut3D', Lut3DNode );
+Lut3DNode.type = /*#__PURE__*/ registerNode( 'Lut3D', Lut3DNode );
 
 export const lut3D = ( node, lut, size, intensity ) => nodeObject( new Lut3DNode( nodeObject( node ), nodeObject( lut ), size, nodeObject( intensity ) ) );

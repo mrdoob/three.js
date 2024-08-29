@@ -1,5 +1,5 @@
 
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import PassNode from './PassNode.js';
 import { StereoCamera } from '../../cameras/StereoCamera.js';
 import { HalfFloatType, LinearFilter, NearestFilter } from '../../constants.js';
@@ -104,4 +104,4 @@ class StereoCompositePassNode extends PassNode {
 
 export default StereoCompositePassNode;
 
-registerNodeClass( 'StereoCompositePass', StereoCompositePassNode );
+StereoCompositePassNode.type = /*#__PURE__*/ registerNode( 'StereoCompositePass', StereoCompositePassNode );

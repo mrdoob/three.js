@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import FogNode from './FogNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
@@ -27,6 +27,6 @@ class FogExp2Node extends FogNode {
 
 export default FogExp2Node;
 
-registerNodeClass( 'FogExp2', FogExp2Node );
+FogExp2Node.type = /*#__PURE__*/ registerNode( 'FogExp2', FogExp2Node );
 
 export const densityFog = nodeProxy( FogExp2Node );

@@ -1,4 +1,4 @@
-import { registerNodeClass } from './Node.js';
+import { registerNode } from './Node.js';
 import InputNode from './InputNode.js';
 
 class ConstNode extends InputNode {
@@ -29,4 +29,4 @@ class ConstNode extends InputNode {
 
 export default ConstNode;
 
-registerNodeClass( 'Const', ConstNode );
+ConstNode.type = /*#__PURE__*/ registerNode( 'Const', ConstNode );

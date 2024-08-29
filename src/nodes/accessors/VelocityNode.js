@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { modelViewMatrix } from './ModelNode.js';
 import { positionLocal, positionPrevious } from './Position.js';
@@ -78,6 +78,6 @@ function getPreviousMatrix( object ) {
 
 export default VelocityNode;
 
-registerNodeClass( 'Velocity', VelocityNode );
+VelocityNode.type = /*#__PURE__*/ registerNode( 'Velocity', VelocityNode );
 
 export const velocity = nodeImmutable( VelocityNode );

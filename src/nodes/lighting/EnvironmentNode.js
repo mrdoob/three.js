@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
 import { cache } from '../core/CacheNode.js';
 import { roughness, clearcoatRoughness } from '../core/PropertyNode.js';
@@ -85,7 +85,7 @@ class EnvironmentNode extends LightingNode {
 
 export default EnvironmentNode;
 
-registerNodeClass( 'Environment', EnvironmentNode );
+EnvironmentNode.type = /*#__PURE__*/ registerNode( 'Environment', EnvironmentNode );
 
 const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 

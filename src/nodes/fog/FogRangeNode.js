@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import FogNode from './FogNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
@@ -28,6 +28,6 @@ class FogRangeNode extends FogNode {
 
 export default FogRangeNode;
 
-registerNodeClass( 'FogRange', FogRangeNode );
+FogRangeNode.type = /*#__PURE__*/ registerNode( 'FogRange', FogRangeNode );
 
 export const rangeFog = nodeProxy( FogRangeNode );

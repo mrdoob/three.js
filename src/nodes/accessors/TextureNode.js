@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import UniformNode, { uniform } from '../core/UniformNode.js';
 import { uv } from './UV.js';
 import { textureSize } from './TextureSizeNode.js';
@@ -430,7 +430,7 @@ class TextureNode extends UniformNode {
 
 export default TextureNode;
 
-registerNodeClass( 'Texture', TextureNode );
+TextureNode.type = /*#__PURE__*/ registerNode( 'Texture', TextureNode );
 
 export const texture = nodeProxy( TextureNode );
 export const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );

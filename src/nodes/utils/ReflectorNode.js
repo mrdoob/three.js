@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TextureNode from '../accessors/TextureNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
@@ -237,4 +237,4 @@ export const reflector = ( parameters ) => nodeObject( new ReflectorNode( parame
 
 export default ReflectorNode;
 
-registerNodeClass( 'Reflector', ReflectorNode );
+ReflectorNode.type = /*#__PURE__*/ registerNode( 'Reflector', ReflectorNode );

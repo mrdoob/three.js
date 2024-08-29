@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
@@ -78,7 +78,7 @@ class ComputeNode extends Node {
 
 export default ComputeNode;
 
-registerNodeClass( 'Compute', ComputeNode );
+ComputeNode.type = /*#__PURE__*/ registerNode( 'Compute', ComputeNode );
 
 export const compute = ( node, count, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
 

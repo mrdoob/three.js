@@ -541,7 +541,7 @@ class Node extends EventDispatcher {
 
 export default Node;
 
-export function registerNodeClass( type, nodeClass ) {
+export function /*#__PURE__*/ registerNode( type, nodeClass ) {
 
 	const nodeType = type + 'Node';
 
@@ -564,6 +564,8 @@ export function registerNodeClass( type, nodeClass ) {
 	NodeClasses.set( nodeType, nodeClass );
 	nodeClass.type = nodeType;
 
+	return nodeType;
+
 }
 
 export function createNodeFromType( type ) {
@@ -580,7 +582,7 @@ export function createNodeFromType( type ) {
 
 export function addNodeClass( type, nodeClass ) {
 
-	console.warn( 'TSL.Node: Function addNodeClass() is deprecated. Use registerNodeClass() instead.' );
-	registerNodeClass( type.slice( 0, - 4 ), nodeClass );
+	console.warn( 'TSL.Node: Function addNodeClass() is deprecated. Use /*#__PURE__*/ registerNode() instead.' );
+	/*#__PURE__*/ registerNode( type.slice( 0, - 4 ), nodeClass );
 
 }

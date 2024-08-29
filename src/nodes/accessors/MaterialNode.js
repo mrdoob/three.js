@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { reference } from './ReferenceNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
 import { normalView } from './Normal.js';
@@ -384,7 +384,7 @@ MaterialNode.AO_MAP = 'ao';
 
 export default MaterialNode;
 
-registerNodeClass( 'Material', MaterialNode );
+MaterialNode.type = /*#__PURE__*/ registerNode( 'Material', MaterialNode );
 
 export const materialAlphaTest = nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
 export const materialColor = nodeImmutable( MaterialNode, MaterialNode.COLOR );

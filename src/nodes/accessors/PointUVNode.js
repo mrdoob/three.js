@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { nodeImmutable } from '../tsl/TSLBase.js';
 
 class PointUVNode extends Node {
@@ -21,6 +21,6 @@ class PointUVNode extends Node {
 
 export default PointUVNode;
 
-registerNodeClass( 'PointUV', PointUVNode );
+PointUVNode.type = /*#__PURE__*/ registerNode( 'PointUV', PointUVNode );
 
 export const pointUV = nodeImmutable( PointUVNode );

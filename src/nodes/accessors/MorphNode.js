@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { float, nodeProxy, Fn } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
@@ -254,6 +254,6 @@ class MorphNode extends Node {
 
 export default MorphNode;
 
-registerNodeClass( 'Morph', MorphNode );
+MorphNode.type = /*#__PURE__*/ registerNode( 'Morph', MorphNode );
 
 export const morphReference = nodeProxy( MorphNode );

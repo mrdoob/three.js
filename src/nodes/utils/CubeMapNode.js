@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
@@ -112,7 +112,7 @@ class CubeMapNode extends TempNode {
 
 export default CubeMapNode;
 
-registerNodeClass( 'CubeMap', CubeMapNode );
+CubeMapNode.type = /*#__PURE__*/ registerNode( 'CubeMap', CubeMapNode );
 
 function isEquirectangularMapReady( image ) {
 

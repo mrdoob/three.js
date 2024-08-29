@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { vectorComponents } from '../core/constants.js';
@@ -121,7 +121,7 @@ class AssignNode extends TempNode {
 
 export default AssignNode;
 
-registerNodeClass( 'Assign', AssignNode );
+AssignNode.type = /*#__PURE__*/ registerNode( 'Assign', AssignNode );
 
 export const assign = nodeProxy( AssignNode );
 

@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import ReferenceNode from './ReferenceNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
@@ -24,6 +24,6 @@ class UserDataNode extends ReferenceNode {
 
 export default UserDataNode;
 
-registerNodeClass( 'UserData', UserDataNode );
+UserDataNode.type = /*#__PURE__*/ registerNode( 'UserData', UserDataNode );
 
 export const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );

@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import CodeNode from './CodeNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
@@ -81,7 +81,7 @@ class FunctionNode extends CodeNode {
 
 export default FunctionNode;
 
-registerNodeClass( 'Function', FunctionNode );
+FunctionNode.type = /*#__PURE__*/ registerNode( 'Function', FunctionNode );
 
 const nativeFn = ( code, includes = [], language = '' ) => {
 

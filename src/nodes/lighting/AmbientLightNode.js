@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 
 class AmbientLightNode extends AnalyticLightNode {
@@ -19,4 +19,4 @@ class AmbientLightNode extends AnalyticLightNode {
 
 export default AmbientLightNode;
 
-registerNodeClass( 'AmbientLight', AmbientLightNode );
+AmbientLightNode.type = /*#__PURE__*/ registerNode( 'AmbientLight', AmbientLightNode );

@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TextureNode from './TextureNode.js';
 import { reflectVector, refractVector } from './ReflectVector.js';
 import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
@@ -71,6 +71,6 @@ class CubeTextureNode extends TextureNode {
 
 export default CubeTextureNode;
 
-registerNodeClass( 'CubeTexture', CubeTextureNode );
+CubeTextureNode.type = /*#__PURE__*/ registerNode( 'CubeTexture', CubeTextureNode );
 
 export const cubeTexture = nodeProxy( CubeTextureNode );

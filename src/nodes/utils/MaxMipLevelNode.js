@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
@@ -47,6 +47,6 @@ class MaxMipLevelNode extends UniformNode {
 
 export default MaxMipLevelNode;
 
-registerNodeClass( 'MaxMipLevel', MaxMipLevelNode );
+MaxMipLevelNode.type = /*#__PURE__*/ registerNode( 'MaxMipLevel', MaxMipLevelNode );
 
 export const maxMipLevel = nodeProxy( MaxMipLevelNode );

@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { lightTargetDirection } from './LightNode.js';
 import { getDistanceAttenuation } from './LightUtils.js';
@@ -81,4 +81,4 @@ class SpotLightNode extends AnalyticLightNode {
 
 export default SpotLightNode;
 
-registerNodeClass( 'SpotLight', SpotLightNode );
+SpotLightNode.type = /*#__PURE__*/ registerNode( 'SpotLight', SpotLightNode );

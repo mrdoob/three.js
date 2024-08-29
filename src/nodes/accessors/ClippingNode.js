@@ -1,5 +1,5 @@
 
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
 import { diffuseColor, property } from '../core/PropertyNode.js';
@@ -140,7 +140,7 @@ ClippingNode.DEFAULT = 'default';
 
 export default ClippingNode;
 
-registerNodeClass( 'Clipping', ClippingNode );
+ClippingNode.type = /*#__PURE__*/ registerNode( 'Clipping', ClippingNode );
 
 export const clipping = () => nodeObject( new ClippingNode() );
 

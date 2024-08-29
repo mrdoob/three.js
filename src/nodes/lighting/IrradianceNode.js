@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
 
 class IrradianceNode extends LightingNode {
@@ -21,4 +21,4 @@ class IrradianceNode extends LightingNode {
 
 export default IrradianceNode;
 
-registerNodeClass( 'Irradiance', IrradianceNode );
+IrradianceNode.type = /*#__PURE__*/ registerNode( 'Irradiance', IrradianceNode );

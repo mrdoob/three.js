@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { nodeObject, Fn, vec2, vec3, vec4 } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
@@ -58,6 +58,6 @@ class DotScreenNode extends TempNode {
 
 export default DotScreenNode;
 
-registerNodeClass( 'DotScreen', DotScreenNode );
+DotScreenNode.type = /*#__PURE__*/ registerNode( 'DotScreen', DotScreenNode );
 
 export const dotScreen = ( node, center, angle, scale ) => nodeObject( new DotScreenNode( nodeObject( node ), center, angle, scale ) );

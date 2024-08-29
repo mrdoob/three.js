@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { transformedNormalView } from '../accessors/Normal.js';
 import { positionViewDirection } from '../accessors/Position.js';
@@ -25,6 +25,6 @@ class MatcapUVNode extends TempNode {
 
 export default MatcapUVNode;
 
-registerNodeClass( 'MatcapUV', MatcapUVNode );
+MatcapUVNode.type = /*#__PURE__*/ registerNode( 'MatcapUV', MatcapUVNode );
 
 export const matcapUV = nodeImmutable( MatcapUVNode );

@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { add } from '../math/OperatorNode.js';
 
@@ -99,6 +99,6 @@ class NormalMapNode extends TempNode {
 
 export default NormalMapNode;
 
-registerNodeClass( 'NormalMap', NormalMapNode );
+NormalMapNode.type = /*#__PURE__*/ registerNode( 'NormalMap', NormalMapNode );
 
 export const normalMap = nodeProxy( NormalMapNode );

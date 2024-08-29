@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { property } from '../core/PropertyNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
@@ -121,7 +121,7 @@ class ConditionalNode extends Node {
 
 export default ConditionalNode;
 
-registerNodeClass( 'Conditional', ConditionalNode );
+ConditionalNode.type = /*#__PURE__*/ registerNode( 'Conditional', ConditionalNode );
 
 export const select = nodeProxy( ConditionalNode );
 

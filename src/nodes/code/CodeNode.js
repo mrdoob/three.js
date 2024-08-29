@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
 class CodeNode extends Node {
@@ -75,7 +75,7 @@ class CodeNode extends Node {
 
 export default CodeNode;
 
-registerNodeClass( 'Code', CodeNode );
+CodeNode.type = /*#__PURE__*/ registerNode( 'Code', CodeNode );
 
 export const code = nodeProxy( CodeNode );
 

@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from './Node.js';
+import Node, { registerNode } from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class VarNode extends Node {
@@ -48,7 +48,7 @@ class VarNode extends Node {
 
 export default VarNode;
 
-registerNodeClass( 'Var', VarNode );
+VarNode.type = /*#__PURE__*/ registerNode( 'Var', VarNode );
 
 export const temp = nodeProxy( VarNode );
 

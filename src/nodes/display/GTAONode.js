@@ -1,4 +1,4 @@
-import { registerNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
@@ -239,7 +239,7 @@ class GTAONode extends TempNode {
 
 export default GTAONode;
 
-registerNodeClass( 'GTAO', GTAONode );
+GTAONode.type = /*#__PURE__*/ registerNode( 'GTAO', GTAONode );
 
 function generateMagicSquareNoise( size = 5 ) {
 
