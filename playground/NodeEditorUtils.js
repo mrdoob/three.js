@@ -205,36 +205,36 @@ export const createVector4Input = ( node, element ) => {
 
 export const createInputLib = {
 	// gpu
-	string: createStringInput,
-	float: createFloatInput,
-	vec2: createVector2Input,
-	vec3: createVector3Input,
-	vec4: createVector4Input,
-	color: createColorInput,
+	'string': createStringInput,
+	'float': createFloatInput,
+	'vec2': createVector2Input,
+	'vec3': createVector3Input,
+	'vec4': createVector4Input,
+	'color': createColorInput,
 	// cpu
-	Number: createFloatInput,
-	String: createStringInput,
-	Vector2: createVector2Input,
-	Vector3: createVector3Input,
-	Vector4: createVector4Input,
-	Color: createColorInput
+	'Number': createFloatInput,
+	'String': createStringInput,
+	'Vector2': createVector2Input,
+	'Vector3': createVector3Input,
+	'Vector4': createVector4Input,
+	'Color': createColorInput
 };
 
 export const inputNodeLib = {
 	// gpu
-	string,
-	float,
-	vec2,
-	vec3,
-	vec4,
-	color,
+	'string': string,
+	'float': float,
+	'vec2': vec2,
+	'vec3': vec3,
+	'vec4': vec4,
+	'color': color,
 	// cpu
-	Number: float,
-	String: string,
-	Vector2: vec2,
-	Vector3: vec3,
-	Vector4: vec4,
-	Color: color
+	'Number': float,
+	'String': string,
+	'Vector2': vec2,
+	'Vector3': vec3,
+	'Vector4': vec4,
+	'Color': color
 };
 
 export function createElementFromJSON( json ) {

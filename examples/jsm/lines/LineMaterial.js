@@ -6,7 +6,7 @@ import {
 	Vector2,
 } from 'three';
 
-UniformsLib.line = {
+UniformsLib[ 'line' ] = {
 
 	worldUnits: { value: 1 },
 	linewidth: { value: 1 },
@@ -21,9 +21,9 @@ UniformsLib.line = {
 ShaderLib[ 'line' ] = {
 
 	uniforms: UniformsUtils.merge( [
-		UniformsLib.common,
-		UniformsLib.fog,
-		UniformsLib.line
+		UniformsLib[ 'common' ],
+		UniformsLib[ 'fog' ],
+		UniformsLib[ 'line' ]
 	] ),
 
 	vertexShader:

@@ -245,8 +245,8 @@ export class CSM {
 
 	injectInclude() {
 
-		ShaderChunk.lights_fragment_begin = CSMShader.lights_fragment_begin;
-		ShaderChunk.lights_pars_begin = CSMShader.lights_pars_begin;
+		ShaderChunk[ 'lights_fragment_begin' ] = CSMShader.lights_fragment_begin;
+		ShaderChunk[ 'lights_pars_begin' ] = CSMShader.lights_pars_begin;
 
 	}
 

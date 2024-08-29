@@ -289,7 +289,7 @@ uniform vec2 CSM_cascades[CSM_CASCADES];
 uniform float cameraNear;
 uniform float shadowFar;
 #endif
-	` + ShaderChunk.lights_pars_begin
+	` + ShaderChunk[ 'lights_pars_begin' ]
 };
 
 export { CSMShader };

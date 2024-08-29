@@ -21,7 +21,7 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 		this.type = 'PackedPhongMaterial';
 		this.uniforms = UniformsUtils.merge( [
 
-			ShaderLib.phong.uniforms,
+			ShaderLib[ 'phong' ].uniforms,
 
 			{
 				quantizeMatPos: { value: null },
@@ -35,18 +35,18 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 
 			'varying vec3 vViewPosition;',
 
-			ShaderChunk.common,
-			ShaderChunk.uv_pars_vertex,
-			ShaderChunk.displacementmap_pars_vertex,
-			ShaderChunk.envmap_pars_vertex,
-			ShaderChunk.color_pars_vertex,
-			ShaderChunk.fog_pars_vertex,
-			ShaderChunk.normal_pars_vertex,
-			ShaderChunk.morphtarget_pars_vertex,
-			ShaderChunk.skinning_pars_vertex,
-			ShaderChunk.shadowmap_pars_vertex,
-			ShaderChunk.logdepthbuf_pars_vertex,
-			ShaderChunk.clipping_planes_pars_vertex,
+			ShaderChunk[ 'common' ],
+			ShaderChunk[ 'uv_pars_vertex' ],
+			ShaderChunk[ 'displacementmap_pars_vertex' ],
+			ShaderChunk[ 'envmap_pars_vertex' ],
+			ShaderChunk[ 'color_pars_vertex' ],
+			ShaderChunk[ 'fog_pars_vertex' ],
+			ShaderChunk[ 'normal_pars_vertex' ],
+			ShaderChunk[ 'morphtarget_pars_vertex' ],
+			ShaderChunk[ 'skinning_pars_vertex' ],
+			ShaderChunk[ 'shadowmap_pars_vertex' ],
+			ShaderChunk[ 'logdepthbuf_pars_vertex' ],
+			ShaderChunk[ 'clipping_planes_pars_vertex' ],
 
 			`#ifdef USE_PACKED_NORMAL
 					#if USE_PACKED_NORMAL == 0
@@ -113,7 +113,7 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 
 			'void main() {',
 
-			ShaderChunk.uv_vertex,
+			ShaderChunk[ 'uv_vertex' ],
 
 			`#ifdef USE_MAP
 					#ifdef USE_PACKED_UV
@@ -121,10 +121,10 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 					#endif
 				#endif`,
 
-			ShaderChunk.color_vertex,
-			ShaderChunk.morphcolor_vertex,
+			ShaderChunk[ 'color_vertex' ],
+			ShaderChunk[ 'morphcolor_vertex' ],
 
-			ShaderChunk.beginnormal_vertex,
+			ShaderChunk[ 'beginnormal_vertex' ],
 
 			`#ifdef USE_PACKED_NORMAL
 					objectNormal = decodeNormal(objectNormal);
@@ -135,13 +135,13 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 				#endif
 				`,
 
-			ShaderChunk.morphnormal_vertex,
-			ShaderChunk.skinbase_vertex,
-			ShaderChunk.skinnormal_vertex,
-			ShaderChunk.defaultnormal_vertex,
-			ShaderChunk.normal_vertex,
+			ShaderChunk[ 'morphnormal_vertex' ],
+			ShaderChunk[ 'skinbase_vertex' ],
+			ShaderChunk[ 'skinnormal_vertex' ],
+			ShaderChunk[ 'defaultnormal_vertex' ],
+			ShaderChunk[ 'normal_vertex' ],
 
-			ShaderChunk.begin_vertex,
+			ShaderChunk[ 'begin_vertex' ],
 
 			`#ifdef USE_PACKED_POSITION
 					#if USE_PACKED_POSITION == 0
@@ -149,19 +149,19 @@ class PackedPhongMaterial extends MeshPhongMaterial {
 					#endif
 				#endif`,
 
-			ShaderChunk.morphtarget_vertex,
-			ShaderChunk.skinning_vertex,
-			ShaderChunk.displacementmap_vertex,
-			ShaderChunk.project_vertex,
-			ShaderChunk.logdepthbuf_vertex,
-			ShaderChunk.clipping_planes_vertex,
+			ShaderChunk[ 'morphtarget_vertex' ],
+			ShaderChunk[ 'skinning_vertex' ],
+			ShaderChunk[ 'displacementmap_vertex' ],
+			ShaderChunk[ 'project_vertex' ],
+			ShaderChunk[ 'logdepthbuf_vertex' ],
+			ShaderChunk[ 'clipping_planes_vertex' ],
 
 			'vViewPosition = - mvPosition.xyz;',
 
-			ShaderChunk.worldpos_vertex,
-			ShaderChunk.envmap_vertex,
-			ShaderChunk.shadowmap_vertex,
-			ShaderChunk.fog_vertex,
+			ShaderChunk[ 'worldpos_vertex' ],
+			ShaderChunk[ 'envmap_vertex' ],
+			ShaderChunk[ 'shadowmap_vertex' ],
+			ShaderChunk[ 'fog_vertex' ],
 
 			'}',
 		].join( '\n' );

@@ -21,26 +21,26 @@ import { FileEditor } from './editors/FileEditor.js';
 import { CustomNodeEditor } from './editors/CustomNodeEditor.js';
 
 export const ClassLib = {
-	BasicMaterialEditor,
-	StandardMaterialEditor,
-	PointsMaterialEditor,
-	FloatEditor,
-	Vector2Editor,
-	Vector3Editor,
-	Vector4Editor,
-	SliderEditor,
-	ColorEditor,
-	TextureEditor,
-	UVEditor,
-	TimerEditor,
-	SplitEditor,
-	SwizzleEditor,
-	JoinEditor,
-	StringEditor,
-	FileEditor,
-	ScriptableEditor,
-	PreviewEditor,
-	NodePrototypeEditor
+	'BasicMaterialEditor': BasicMaterialEditor,
+	'StandardMaterialEditor': StandardMaterialEditor,
+	'PointsMaterialEditor': PointsMaterialEditor,
+	'FloatEditor': FloatEditor,
+	'Vector2Editor': Vector2Editor,
+	'Vector3Editor': Vector3Editor,
+	'Vector4Editor': Vector4Editor,
+	'SliderEditor': SliderEditor,
+	'ColorEditor': ColorEditor,
+	'TextureEditor': TextureEditor,
+	'UVEditor': UVEditor,
+	'TimerEditor': TimerEditor,
+	'SplitEditor': SplitEditor,
+	'SwizzleEditor': SwizzleEditor,
+	'JoinEditor': JoinEditor,
+	'StringEditor': StringEditor,
+	'FileEditor': FileEditor,
+	'ScriptableEditor': ScriptableEditor,
+	'PreviewEditor': PreviewEditor,
+	'NodePrototypeEditor': NodePrototypeEditor
 };
 
 let nodeList = null;

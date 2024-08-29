@@ -19,21 +19,21 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	let precision = capabilities.precision;
 
 	const shaderIDs = {
-		MeshDepthMaterial: 'depth',
-		MeshDistanceMaterial: 'distanceRGBA',
-		MeshNormalMaterial: 'normal',
-		MeshBasicMaterial: 'basic',
-		MeshLambertMaterial: 'lambert',
-		MeshPhongMaterial: 'phong',
-		MeshToonMaterial: 'toon',
-		MeshStandardMaterial: 'physical',
-		MeshPhysicalMaterial: 'physical',
-		MeshMatcapMaterial: 'matcap',
-		LineBasicMaterial: 'basic',
-		LineDashedMaterial: 'dashed',
-		PointsMaterial: 'points',
-		ShadowMaterial: 'shadow',
-		SpriteMaterial: 'sprite'
+		'MeshDepthMaterial': 'depth',
+		'MeshDistanceMaterial': 'distanceRGBA',
+		'MeshNormalMaterial': 'normal',
+		'MeshBasicMaterial': 'basic',
+		'MeshLambertMaterial': 'lambert',
+		'MeshPhongMaterial': 'phong',
+		'MeshToonMaterial': 'toon',
+		'MeshStandardMaterial': 'physical',
+		'MeshPhysicalMaterial': 'physical',
+		'MeshMatcapMaterial': 'matcap',
+		'LineBasicMaterial': 'basic',
+		'LineDashedMaterial': 'dashed',
+		'PointsMaterial': 'points',
+		'ShadowMaterial': 'shadow',
+		'SpriteMaterial': 'sprite'
 	};
 
 	function getChannel( value ) {

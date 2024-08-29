@@ -18,7 +18,7 @@ import {
 } from 'three/tsl';
 
 const colorSpaceLib = {
-	mx_srgb_texture_to_lin_rec709
+	'mx_srgb_texture_to_lin_rec709': mx_srgb_texture_to_lin_rec709
 };
 
 class MXElement {

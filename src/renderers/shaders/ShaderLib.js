@@ -8,60 +8,60 @@ import { Matrix3 } from '../../math/Matrix3.js';
 
 const ShaderLib = {
 
-	basic: {
+	'basic': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.common,
-			UniformsLib.specularmap,
-			UniformsLib.envmap,
-			UniformsLib.aomap,
-			UniformsLib.lightmap,
-			UniformsLib.fog
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'specularmap' ],
+			UniformsLib[ 'envmap' ],
+			UniformsLib[ 'aomap' ],
+			UniformsLib[ 'lightmap' ],
+			UniformsLib[ 'fog' ]
 		] ),
 
-		vertexShader: ShaderChunk.meshbasic_vert,
-		fragmentShader: ShaderChunk.meshbasic_frag
+		vertexShader: ShaderChunk[ 'meshbasic_vert' ],
+		fragmentShader: ShaderChunk[ 'meshbasic_frag' ]
 
 	},
 
-	lambert: {
+	'lambert': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.common,
-			UniformsLib.specularmap,
-			UniformsLib.envmap,
-			UniformsLib.aomap,
-			UniformsLib.lightmap,
-			UniformsLib.emissivemap,
-			UniformsLib.bumpmap,
-			UniformsLib.normalmap,
-			UniformsLib.displacementmap,
-			UniformsLib.fog,
-			UniformsLib.lights,
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'specularmap' ],
+			UniformsLib[ 'envmap' ],
+			UniformsLib[ 'aomap' ],
+			UniformsLib[ 'lightmap' ],
+			UniformsLib[ 'emissivemap' ],
+			UniformsLib[ 'bumpmap' ],
+			UniformsLib[ 'normalmap' ],
+			UniformsLib[ 'displacementmap' ],
+			UniformsLib[ 'fog' ],
+			UniformsLib[ 'lights' ],
 			{
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
 			}
 		] ),
 
-		vertexShader: ShaderChunk.meshlambert_vert,
-		fragmentShader: ShaderChunk.meshlambert_frag
+		vertexShader: ShaderChunk[ 'meshlambert_vert' ],
+		fragmentShader: ShaderChunk[ 'meshlambert_frag' ]
 
 	},
 
-	phong: {
+	'phong': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.common,
-			UniformsLib.specularmap,
-			UniformsLib.envmap,
-			UniformsLib.aomap,
-			UniformsLib.lightmap,
-			UniformsLib.emissivemap,
-			UniformsLib.bumpmap,
-			UniformsLib.normalmap,
-			UniformsLib.displacementmap,
-			UniformsLib.fog,
-			UniformsLib.lights,
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'specularmap' ],
+			UniformsLib[ 'envmap' ],
+			UniformsLib[ 'aomap' ],
+			UniformsLib[ 'lightmap' ],
+			UniformsLib[ 'emissivemap' ],
+			UniformsLib[ 'bumpmap' ],
+			UniformsLib[ 'normalmap' ],
+			UniformsLib[ 'displacementmap' ],
+			UniformsLib[ 'fog' ],
+			UniformsLib[ 'lights' ],
 			{
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 				specular: { value: /*@__PURE__*/ new Color( 0x111111 ) },
@@ -69,26 +69,26 @@ const ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.meshphong_vert,
-		fragmentShader: ShaderChunk.meshphong_frag
+		vertexShader: ShaderChunk[ 'meshphong_vert' ],
+		fragmentShader: ShaderChunk[ 'meshphong_frag' ]
 
 	},
 
-	standard: {
+	'standard': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.common,
-			UniformsLib.envmap,
-			UniformsLib.aomap,
-			UniformsLib.lightmap,
-			UniformsLib.emissivemap,
-			UniformsLib.bumpmap,
-			UniformsLib.normalmap,
-			UniformsLib.displacementmap,
-			UniformsLib.roughnessmap,
-			UniformsLib.metalnessmap,
-			UniformsLib.fog,
-			UniformsLib.lights,
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'envmap' ],
+			UniformsLib[ 'aomap' ],
+			UniformsLib[ 'lightmap' ],
+			UniformsLib[ 'emissivemap' ],
+			UniformsLib[ 'bumpmap' ],
+			UniformsLib[ 'normalmap' ],
+			UniformsLib[ 'displacementmap' ],
+			UniformsLib[ 'roughnessmap' ],
+			UniformsLib[ 'metalnessmap' ],
+			UniformsLib[ 'fog' ],
+			UniformsLib[ 'lights' ],
 			{
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) },
 				roughness: { value: 1.0 },
@@ -97,69 +97,69 @@ const ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.meshphysical_vert,
-		fragmentShader: ShaderChunk.meshphysical_frag
+		vertexShader: ShaderChunk[ 'meshphysical_vert' ],
+		fragmentShader: ShaderChunk[ 'meshphysical_frag' ]
 
 	},
 
-	toon: {
+	'toon': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.common,
-			UniformsLib.aomap,
-			UniformsLib.lightmap,
-			UniformsLib.emissivemap,
-			UniformsLib.bumpmap,
-			UniformsLib.normalmap,
-			UniformsLib.displacementmap,
-			UniformsLib.gradientmap,
-			UniformsLib.fog,
-			UniformsLib.lights,
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'aomap' ],
+			UniformsLib[ 'lightmap' ],
+			UniformsLib[ 'emissivemap' ],
+			UniformsLib[ 'bumpmap' ],
+			UniformsLib[ 'normalmap' ],
+			UniformsLib[ 'displacementmap' ],
+			UniformsLib[ 'gradientmap' ],
+			UniformsLib[ 'fog' ],
+			UniformsLib[ 'lights' ],
 			{
 				emissive: { value: /*@__PURE__*/ new Color( 0x000000 ) }
 			}
 		] ),
 
-		vertexShader: ShaderChunk.meshtoon_vert,
-		fragmentShader: ShaderChunk.meshtoon_frag
+		vertexShader: ShaderChunk[ 'meshtoon_vert' ],
+		fragmentShader: ShaderChunk[ 'meshtoon_frag' ]
 
 	},
 
-	matcap: {
+	'matcap': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.common,
-			UniformsLib.bumpmap,
-			UniformsLib.normalmap,
-			UniformsLib.displacementmap,
-			UniformsLib.fog,
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'bumpmap' ],
+			UniformsLib[ 'normalmap' ],
+			UniformsLib[ 'displacementmap' ],
+			UniformsLib[ 'fog' ],
 			{
 				matcap: { value: null }
 			}
 		] ),
 
-		vertexShader: ShaderChunk.meshmatcap_vert,
-		fragmentShader: ShaderChunk.meshmatcap_frag
+		vertexShader: ShaderChunk[ 'meshmatcap_vert' ],
+		fragmentShader: ShaderChunk[ 'meshmatcap_frag' ]
 
 	},
 
-	points: {
+	'points': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.points,
-			UniformsLib.fog
+			UniformsLib[ 'points' ],
+			UniformsLib[ 'fog' ]
 		] ),
 
-		vertexShader: ShaderChunk.points_vert,
-		fragmentShader: ShaderChunk.points_frag
+		vertexShader: ShaderChunk[ 'points_vert' ],
+		fragmentShader: ShaderChunk[ 'points_frag' ]
 
 	},
 
-	dashed: {
+	'dashed': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.common,
-			UniformsLib.fog,
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'fog' ],
 			{
 				scale: { value: 1 },
 				dashSize: { value: 1 },
@@ -167,53 +167,53 @@ const ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.linedashed_vert,
-		fragmentShader: ShaderChunk.linedashed_frag
+		vertexShader: ShaderChunk[ 'linedashed_vert' ],
+		fragmentShader: ShaderChunk[ 'linedashed_frag' ]
 
 	},
 
-	depth: {
+	'depth': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.common,
-			UniformsLib.displacementmap
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'displacementmap' ]
 		] ),
 
-		vertexShader: ShaderChunk.depth_vert,
-		fragmentShader: ShaderChunk.depth_frag
+		vertexShader: ShaderChunk[ 'depth_vert' ],
+		fragmentShader: ShaderChunk[ 'depth_frag' ]
 
 	},
 
-	normal: {
+	'normal': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.common,
-			UniformsLib.bumpmap,
-			UniformsLib.normalmap,
-			UniformsLib.displacementmap,
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'bumpmap' ],
+			UniformsLib[ 'normalmap' ],
+			UniformsLib[ 'displacementmap' ],
 			{
 				opacity: { value: 1.0 }
 			}
 		] ),
 
-		vertexShader: ShaderChunk.meshnormal_vert,
-		fragmentShader: ShaderChunk.meshnormal_frag
+		vertexShader: ShaderChunk[ 'meshnormal_vert' ],
+		fragmentShader: ShaderChunk[ 'meshnormal_frag' ]
 
 	},
 
-	sprite: {
+	'sprite': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.sprite,
-			UniformsLib.fog
+			UniformsLib[ 'sprite' ],
+			UniformsLib[ 'fog' ]
 		] ),
 
-		vertexShader: ShaderChunk.sprite_vert,
-		fragmentShader: ShaderChunk.sprite_frag
+		vertexShader: ShaderChunk[ 'sprite_vert' ],
+		fragmentShader: ShaderChunk[ 'sprite_frag' ]
 
 	},
 
-	background: {
+	'background': {
 
 		uniforms: {
 			uvTransform: { value: /*@__PURE__*/ new Matrix3() },
@@ -221,12 +221,12 @@ const ShaderLib = {
 			backgroundIntensity: { value: 1 }
 		},
 
-		vertexShader: ShaderChunk.background_vert,
-		fragmentShader: ShaderChunk.background_frag
+		vertexShader: ShaderChunk[ 'background_vert' ],
+		fragmentShader: ShaderChunk[ 'background_frag' ]
 
 	},
 
-	backgroundCube: {
+	'backgroundCube': {
 
 		uniforms: {
 			envMap: { value: null },
@@ -236,12 +236,12 @@ const ShaderLib = {
 			backgroundRotation: { value: /*@__PURE__*/ new Matrix3() }
 		},
 
-		vertexShader: ShaderChunk.backgroundCube_vert,
-		fragmentShader: ShaderChunk.backgroundCube_frag
+		vertexShader: ShaderChunk[ 'backgroundCube_vert' ],
+		fragmentShader: ShaderChunk[ 'backgroundCube_frag' ]
 
 	},
 
-	cube: {
+	'cube': {
 
 		uniforms: {
 			tCube: { value: null },
@@ -249,27 +249,27 @@ const ShaderLib = {
 			opacity: { value: 1.0 }
 		},
 
-		vertexShader: ShaderChunk.cube_vert,
-		fragmentShader: ShaderChunk.cube_frag
+		vertexShader: ShaderChunk[ 'cube_vert' ],
+		fragmentShader: ShaderChunk[ 'cube_frag' ]
 
 	},
 
-	equirect: {
+	'equirect': {
 
 		uniforms: {
 			tEquirect: { value: null },
 		},
 
-		vertexShader: ShaderChunk.equirect_vert,
-		fragmentShader: ShaderChunk.equirect_frag
+		vertexShader: ShaderChunk[ 'equirect_vert' ],
+		fragmentShader: ShaderChunk[ 'equirect_frag' ]
 
 	},
 
-	distanceRGBA: {
+	'distanceRGBA': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.common,
-			UniformsLib.displacementmap,
+			UniformsLib[ 'common' ],
+			UniformsLib[ 'displacementmap' ],
 			{
 				referencePosition: { value: /*@__PURE__*/ new Vector3() },
 				nearDistance: { value: 1 },
@@ -277,33 +277,33 @@ const ShaderLib = {
 			}
 		] ),
 
-		vertexShader: ShaderChunk.distanceRGBA_vert,
-		fragmentShader: ShaderChunk.distanceRGBA_frag
+		vertexShader: ShaderChunk[ 'distanceRGBA_vert' ],
+		fragmentShader: ShaderChunk[ 'distanceRGBA_frag' ]
 
 	},
 
-	shadow: {
+	'shadow': {
 
 		uniforms: /*@__PURE__*/ mergeUniforms( [
-			UniformsLib.lights,
-			UniformsLib.fog,
+			UniformsLib[ 'lights' ],
+			UniformsLib[ 'fog' ],
 			{
 				color: { value: /*@__PURE__*/ new Color( 0x00000 ) },
 				opacity: { value: 1.0 }
 			},
 		] ),
 
-		vertexShader: ShaderChunk.shadow_vert,
-		fragmentShader: ShaderChunk.shadow_frag
+		vertexShader: ShaderChunk[ 'shadow_vert' ],
+		fragmentShader: ShaderChunk[ 'shadow_frag' ]
 
 	}
 
 };
 
-ShaderLib.physical = {
+ShaderLib[ 'physical' ] = {
 
 	uniforms: /*@__PURE__*/ mergeUniforms( [
-		ShaderLib.standard.uniforms,
+		ShaderLib[ 'standard' ].uniforms,
 		{
 			clearcoat: { value: 0 },
 			clearcoatMap: { value: null },
@@ -352,8 +352,8 @@ ShaderLib.physical = {
 		}
 	] ),
 
-	vertexShader: ShaderChunk.meshphysical_vert,
-	fragmentShader: ShaderChunk.meshphysical_frag
+	vertexShader: ShaderChunk[ 'meshphysical_vert' ],
+	fragmentShader: ShaderChunk[ 'meshphysical_frag' ]
 
 };
 

@@ -13,8 +13,8 @@ const VelocityShader = {
 	name: 'VelocityShader',
 
 	uniforms: UniformsUtils.merge( [
-		UniformsLib.common,
-		UniformsLib.displacementmap,
+		UniformsLib[ 'common' ],
+		UniformsLib[ 'displacementmap' ],
 		{
 			modelMatrixPrev: { value: new Matrix4() },
 			currentProjectionViewMatrix: { value: new Matrix4() },

@@ -12,14 +12,14 @@ const GouraudShader = {
 	name: 'GouraudShader',
 
 	uniforms: UniformsUtils.merge( [
-		UniformsLib.common,
-		UniformsLib.specularmap,
-		UniformsLib.envmap,
-		UniformsLib.aomap,
-		UniformsLib.lightmap,
-		UniformsLib.emissivemap,
-		UniformsLib.fog,
-		UniformsLib.lights,
+		UniformsLib[ 'common' ],
+		UniformsLib[ 'specularmap' ],
+		UniformsLib[ 'envmap' ],
+		UniformsLib[ 'aomap' ],
+		UniformsLib[ 'lightmap' ],
+		UniformsLib[ 'emissivemap' ],
+		UniformsLib[ 'fog' ],
+		UniformsLib[ 'lights' ],
 		{
 			emissive: { value: new Color( 0x000000 ) }
 		}

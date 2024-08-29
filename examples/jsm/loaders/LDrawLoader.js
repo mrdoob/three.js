@@ -52,7 +52,7 @@ class LDrawConditionalLineMaterial extends ShaderMaterial {
 		super( {
 
 			uniforms: UniformsUtils.merge( [
-				UniformsLib.fog,
+				UniformsLib[ 'fog' ],
 				{
 					diffuse: {
 						value: new Color()

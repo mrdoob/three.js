@@ -80,13 +80,13 @@ const MMDToonShader = {
 	},
 
 	uniforms: UniformsUtils.merge( [
-		ShaderLib.toon.uniforms,
-		ShaderLib.phong.uniforms,
-		ShaderLib.matcap.uniforms,
+		ShaderLib[ 'toon' ].uniforms,
+		ShaderLib[ 'phong' ].uniforms,
+		ShaderLib[ 'matcap' ].uniforms,
 	] ),
 
 	vertexShader:
-		ShaderLib.phong.vertexShader
+		ShaderLib[ 'phong' ].vertexShader
 			.replace(
 				'#include <envmap_pars_vertex>',
 				''
@@ -97,7 +97,7 @@ const MMDToonShader = {
 			),
 
 	fragmentShader:
-		ShaderLib.phong.fragmentShader
+		ShaderLib[ 'phong' ].fragmentShader
 			.replace(
 				'#include <common>',
 				`

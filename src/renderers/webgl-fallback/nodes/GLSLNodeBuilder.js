@@ -15,9 +15,9 @@ const glslMethods = {
 };
 
 const precisionLib = {
-	low: 'lowp',
-	medium: 'mediump',
-	high: 'highp'
+	'low': 'lowp',
+	'medium': 'mediump',
+	'high': 'highp'
 };
 
 const supports = {

@@ -73,7 +73,7 @@
 				// Set CustomToneMapping to Uncharted2
 				// source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
 
-				THREE.ShaderChunk.tonemapping_pars_fragment = THREE.ShaderChunk.tonemapping_pars_fragment.replace(
+				THREE.ShaderChunk['tonemapping_pars_fragment'] = THREE.ShaderChunk['tonemapping_pars_fragment'].replace(
 
 					'vec3 CustomToneMapping( vec3 color ) { return color; }',
 

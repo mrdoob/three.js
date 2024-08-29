@@ -225,7 +225,7 @@
 
 				// overwrite shadowmap code
 
-				let shader = THREE.ShaderChunk.shadowmap_pars_fragment;
+				let shader = THREE.ShaderChunk['shadowmap_pars_fragment'];
 
 				shader = shader.replace(
 					'#ifdef USE_SHADOWMAP',
@@ -239,7 +239,7 @@
 					'#if defined( SHADOWMAP_TYPE_PCF )'
 				);
 
-				THREE.ShaderChunk.shadowmap_pars_fragment = shader;
+				THREE.ShaderChunk['shadowmap_pars_fragment'] = shader;
 
 				// renderer
 
