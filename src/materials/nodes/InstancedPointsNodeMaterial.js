@@ -2,7 +2,7 @@ import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
 import { property } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
-import { materialColor, materialPointWidth } from '../../nodes/accessors/MaterialNode.js'; // or should this be a property, instead?
+import { materialColor, materialOpacity, materialPointWidth } from '../../nodes/accessors/MaterialNode.js'; // or should this be a property, instead?
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { smoothstep } from '../../nodes/math/MathNode.js';
@@ -138,6 +138,8 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 				}
 
 			}
+
+			alpha.mulAssign( materialOpacity );
 
 			return vec4( pointColorNode, alpha );
 
