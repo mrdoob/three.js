@@ -154,8 +154,7 @@
 
 		function initRegularMesh( count ) {
 
-			group = new THREE.Group();
-			group.static = api.renderBundle;
+			group = api.renderBundle ?  new THREE.BundleGroup() : new THREE.Group();
 
 			for ( let i = 0; i < count; i ++ ) {
 
