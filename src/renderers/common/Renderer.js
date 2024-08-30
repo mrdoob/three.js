@@ -22,7 +22,6 @@ import { Scene } from '../../scenes/Scene.js';
 import { Frustum } from '../../math/Frustum.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
-import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
@@ -32,7 +31,7 @@ const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
 const _frustum = /*@__PURE__*/ new Frustum();
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
-const _vector3 = /*@__PURE__*/ new Vector3();
+const _vector4 = /*@__PURE__*/ new Vector4();
 
 class Renderer {
 
@@ -1295,7 +1294,7 @@ class Renderer {
 
 					if ( this.sortObjects === true ) {
 
-						_vector3.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
+						_vector4.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
 
 					}
 
@@ -1304,7 +1303,7 @@ class Renderer {
 
 					if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null );
 
 					}
 
@@ -1325,7 +1324,7 @@ class Renderer {
 
 						if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-						_vector3
+						_vector4
 							.copy( geometry.boundingSphere.center )
 							.applyMatrix4( object.matrixWorld )
 							.applyMatrix4( _projScreenMatrix );
@@ -1343,7 +1342,7 @@ class Renderer {
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								renderList.push( object, geometry, groupMaterial, groupOrder, _vector3.z, group );
+								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group );
 
 							}
 
@@ -1351,7 +1350,7 @@ class Renderer {
 
 					} else if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null );
 
 					}
 
