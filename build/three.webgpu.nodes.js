@@ -77257,25 +77257,11 @@ class IESSpotLight extends SpotLight {
 
 }
 
-class StandardNodeLibrary extends NodeLibrary {
+class BasicNodeLibrary extends NodeLibrary {
 
 	constructor() {
 
 		super();
-
-		this.addMaterial( MeshPhongNodeMaterial, MeshPhongMaterial );
-		this.addMaterial( MeshStandardNodeMaterial, MeshStandardMaterial );
-		this.addMaterial( MeshPhysicalNodeMaterial, MeshPhysicalMaterial );
-		this.addMaterial( MeshToonNodeMaterial, MeshToonMaterial );
-		this.addMaterial( MeshBasicNodeMaterial, MeshBasicMaterial );
-		this.addMaterial( MeshLambertNodeMaterial, MeshLambertMaterial );
-		this.addMaterial( MeshNormalNodeMaterial, MeshNormalMaterial );
-		this.addMaterial( MeshMatcapNodeMaterial, MeshMatcapMaterial );
-		this.addMaterial( LineBasicNodeMaterial, LineBasicMaterial );
-		this.addMaterial( LineDashedNodeMaterial, LineDashedMaterial );
-		this.addMaterial( PointsNodeMaterial, PointsMaterial );
-		this.addMaterial( SpriteNodeMaterial, SpriteMaterial );
-		this.addMaterial( ShadowNodeMaterial, ShadowMaterial );
 
 		this.addLight( PointLightNode, PointLight );
 		this.addLight( DirectionalLightNode, DirectionalLight );
@@ -77300,20 +77286,6 @@ class StandardNodeLibrary extends NodeLibrary {
 
 }
 
-/*
-const debugHandler = {
-
-	get: function ( target, name ) {
-
-		// Add |update
-		if ( /^(create|destroy)/.test( name ) ) console.log( 'WebGPUBackend.' + name );
-
-		return target[ name ];
-
-	}
-
-};
-*/
 class WebGPURenderer extends Renderer {
 
 	constructor( parameters = {} ) {
@@ -77340,10 +77312,9 @@ class WebGPURenderer extends Renderer {
 
 		const backend = new BackendClass( parameters );
 
-		//super( new Proxy( backend, debugHandler ) );
 		super( backend, parameters );
 
-		this.nodes.library = new StandardNodeLibrary();
+		this.nodes.library = new BasicNodeLibrary();
 
 		this.isWebGPURenderer = true;
 
