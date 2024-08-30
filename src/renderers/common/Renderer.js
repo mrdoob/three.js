@@ -407,20 +407,20 @@ class Renderer {
 
 	_renderBundle( bundle, sceneRef, lightsNode ) {
 
-		const { object, camera, renderList } = bundle;
+		const { bundleGroup, camera, renderList } = bundle;
 
 		const renderContext = this._currentRenderContext;
 
 		//
 
-		const renderBundle = this._bundles.get( object, camera );
+		const renderBundle = this._bundles.get( bundleGroup, camera );
 		const renderBundleData = this.backend.get( renderBundle );
 
 		if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = new Set();
 
 		//
 
-		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || object.needsUpdate === true;
+		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || bundleGroup.needsUpdate === true;
 
 		renderBundleData.renderContexts.add( renderContext );
 
@@ -428,7 +428,7 @@ class Renderer {
 
 			this.backend.beginBundle( renderContext );
 
-			if ( renderBundleData.renderObjects === undefined || object.needsUpdate === true ) {
+			if ( renderBundleData.renderObjects === undefined || bundleGroup.needsUpdate === true ) {
 
 				renderBundleData.renderObjects = [];
 
@@ -446,7 +446,7 @@ class Renderer {
 
 			this.backend.finishBundle( renderContext, renderBundle );
 
-			object.needsUpdate = false;
+			bundleGroup.needsUpdate = false;
 
 		} else {
 
@@ -1360,7 +1360,7 @@ class Renderer {
 
 		}
 
-		if ( object.static === true && this.backend.beginBundle !== undefined ) {
+		if ( object.isBundleGroup === true && this.backend.beginBundle !== undefined ) {
 
 			const baseRenderList = renderList;
 
@@ -1370,7 +1370,7 @@ class Renderer {
 			renderList.begin();
 
 			baseRenderList.pushBundle( {
-				object,
+				bundleGroup: object,
 				camera,
 				renderList,
 			} );
