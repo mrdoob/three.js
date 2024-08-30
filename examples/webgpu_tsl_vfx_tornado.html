@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { luminance, cos, float, min, timerLocal, atan2, uniform, pass, bloom, PI, PI2, color, positionLocal, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
+			import { luminance, cos, float, min, timerLocal, atan2, uniform, pass, bloom, PI, PI2, color, positionLocal, oneMinus, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -143,7 +143,7 @@
 					// outer fade
 					const distanceToCenter = uv().sub( 0.5 ).toVar();
 					const outerFade = min(
-						distanceToCenter.length().smoothstep( 0.5, 0.1 ),
+						oneMinus( distanceToCenter.length() ).smoothstep( 0.5, 0.9 ),
 						distanceToCenter.length().smoothstep( 0, 0.2 )
 					);
 
@@ -198,7 +198,7 @@
 					// outer fade
 					const outerFade = min(
 						uv().y.smoothstep( 0, 0.1 ),
-						uv().y.smoothstep( 1, 0.6 )
+						oneMinus( uv().y ).smoothstep( 0, 0.4 )
 					);
 
 					// effect
@@ -249,7 +249,7 @@
 					// outer fade
 					const outerFade = min(
 						uv().y.smoothstep( 0, 0.2 ),
-						uv().y.smoothstep( 1, 0.6 )
+						oneMinus( uv().y ).smoothstep( 0, 0.4 )
 					);
 
 					// effect
@@ -322,7 +322,7 @@
 			}
 
 			async function animate() {
-			
+
 				controls.update();
 
 				postProcessing.render();
