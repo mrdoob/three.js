@@ -1,4 +1,4 @@
-import Node, { addNodeClass } from './Node.js';
+import Node, { registerNode } from './Node.js';
 
 class StructTypeNode extends Node {
 
@@ -21,4 +21,4 @@ class StructTypeNode extends Node {
 
 export default StructTypeNode;
 
-addNodeClass( 'StructTypeNode', StructTypeNode );
+StructTypeNode.type = /*@__PURE__*/ registerNode( 'StructType', StructTypeNode );

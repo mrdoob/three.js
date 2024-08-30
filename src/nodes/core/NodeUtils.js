@@ -12,6 +12,7 @@ export function getCacheKey( object, force = false ) {
 	if ( object.isNode === true ) {
 
 		cacheKey += object.id;
+		object = object.getSelf();
 
 	}
 

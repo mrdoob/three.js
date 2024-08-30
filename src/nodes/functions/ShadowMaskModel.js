@@ -1,6 +1,6 @@
 import LightingModel from '../core/LightingModel.js';
 import { diffuseColor } from '../core/PropertyNode.js';
-import { float } from '../shadernode/ShaderNode.js';
+import { float } from '../tsl/TSLBase.js';
 
 class ShadowMaskModel extends LightingModel {
 

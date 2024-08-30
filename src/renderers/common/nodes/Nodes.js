@@ -2,7 +2,8 @@ import DataMap from '../DataMap.js';
 import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
 import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
-import { NodeFrame, objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, normalWorld, pmremTexture, viewportUV } from '../../../nodes/Nodes.js';
+import { NodeFrame } from '../../../nodes/Nodes.js';
+import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, normalWorld, pmremTexture, viewportUV } from '../../../nodes/TSL.js';
 
 import { EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
 
@@ -448,12 +449,13 @@ class Nodes extends DataMap {
 
 	updateBefore( renderObject ) {
 
-		const nodeFrame = this.getNodeFrameForRender( renderObject );
 		const nodeBuilder = renderObject.getNodeBuilderState();
 
 		for ( const node of nodeBuilder.updateBeforeNodes ) {
 
-			nodeFrame.updateBeforeNode( node );
+			// update frame state for each node
+
+			this.getNodeFrameForRender( renderObject ).updateBeforeNode( node );
 
 		}
 
@@ -461,12 +463,13 @@ class Nodes extends DataMap {
 
 	updateAfter( renderObject ) {
 
-		const nodeFrame = this.getNodeFrameForRender( renderObject );
 		const nodeBuilder = renderObject.getNodeBuilderState();
 
 		for ( const node of nodeBuilder.updateAfterNodes ) {
 
-			nodeFrame.updateAfterNode( node );
+			// update frame state for each node
+
+			this.getNodeFrameForRender( renderObject ).updateAfterNode( node );
 
 		}
 

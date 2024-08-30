@@ -1,30 +1,30 @@
-import { Fn, int, float, vec2, vec3, vec4, If } from '../shadernode/ShaderNode.js';
+import { Fn, int, float, vec2, vec3, vec4, If } from '../tsl/TSLBase.js';
 import { cos, sin, abs, max, exp2, log2, clamp, fract, mix, floor, normalize, cross, all } from '../math/MathNode.js';
 import { mul } from '../math/OperatorNode.js';
-import { select } from '../math/CondNode.js';
+import { select } from '../math/ConditionalNode.js';
 import { Loop, Break } from '../utils/LoopNode.js';
 
 // These defines must match with PMREMGenerator
 
-const cubeUV_r0 = float( 1.0 );
-const cubeUV_m0 = float( - 2.0 );
-const cubeUV_r1 = float( 0.8 );
-const cubeUV_m1 = float( - 1.0 );
-const cubeUV_r4 = float( 0.4 );
-const cubeUV_m4 = float( 2.0 );
-const cubeUV_r5 = float( 0.305 );
-const cubeUV_m5 = float( 3.0 );
-const cubeUV_r6 = float( 0.21 );
-const cubeUV_m6 = float( 4.0 );
+const cubeUV_r0 = /*@__PURE__*/ float( 1.0 );
+const cubeUV_m0 = /*@__PURE__*/ float( - 2.0 );
+const cubeUV_r1 = /*@__PURE__*/ float( 0.8 );
+const cubeUV_m1 = /*@__PURE__*/ float( - 1.0 );
+const cubeUV_r4 = /*@__PURE__*/ float( 0.4 );
+const cubeUV_m4 = /*@__PURE__*/ float( 2.0 );
+const cubeUV_r5 = /*@__PURE__*/ float( 0.305 );
+const cubeUV_m5 = /*@__PURE__*/ float( 3.0 );
+const cubeUV_r6 = /*@__PURE__*/ float( 0.21 );
+const cubeUV_m6 = /*@__PURE__*/ float( 4.0 );
 
-const cubeUV_minMipLevel = float( 4.0 );
-const cubeUV_minTileSize = float( 16.0 );
+const cubeUV_minMipLevel = /*@__PURE__*/ float( 4.0 );
+const cubeUV_minTileSize = /*@__PURE__*/ float( 16.0 );
 
 // These shader functions convert between the UV coordinates of a single face of
 // a cubemap, the 0-5 integer index of a cube face, and the direction vector for
 // sampling a textureCube (not generally normalized ).
 
-const getFace = Fn( ( [ direction ] ) => {
+const getFace = /*@__PURE__*/ Fn( ( [ direction ] ) => {
 
 	const absDirection = vec3( abs( direction ) ).toVar();
 	const face = float( - 1.0 ).toVar();
@@ -66,7 +66,7 @@ const getFace = Fn( ( [ direction ] ) => {
 } );
 
 // RH coordinate system; PMREM face-indexing convention
-const getUV = Fn( ( [ direction, face ] ) => {
+const getUV = /*@__PURE__*/ Fn( ( [ direction, face ] ) => {
 
 	const uv = vec2().toVar();
 
@@ -107,7 +107,7 @@ const getUV = Fn( ( [ direction, face ] ) => {
 	]
 } );
 
-const roughnessToMip = Fn( ( [ roughness ] ) => {
+const roughnessToMip = /*@__PURE__*/ Fn( ( [ roughness ] ) => {
 
 	const mip = float( 0.0 ).toVar();
 
@@ -144,7 +144,7 @@ const roughnessToMip = Fn( ( [ roughness ] ) => {
 } );
 
 // RH coordinate system; PMREM face-indexing convention
-export const getDirection = Fn( ( [ uv_immutable, face ] ) => {
+export const getDirection = /*@__PURE__*/ Fn( ( [ uv_immutable, face ] ) => {
 
 	const uv = uv_immutable.toVar();
 	uv.assign( mul( 2.0, uv ).sub( 1.0 ) );
@@ -192,7 +192,7 @@ export const getDirection = Fn( ( [ uv_immutable, face ] ) => {
 
 //
 
-export const textureCubeUV = Fn( ( [ envMap, sampleDir_immutable, roughness_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
+export const textureCubeUV = /*@__PURE__*/ Fn( ( [ envMap, sampleDir_immutable, roughness_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
 
 	const roughness = float( roughness_immutable );
 	const sampleDir = vec3( sampleDir_immutable );
@@ -214,7 +214,7 @@ export const textureCubeUV = Fn( ( [ envMap, sampleDir_immutable, roughness_immu
 
 } );
 
-const bilinearCubeUV = Fn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
+const bilinearCubeUV = /*@__PURE__*/ Fn( ( [ envMap, direction_immutable, mipInt_immutable, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP ] ) => {
 
 	const mipInt = float( mipInt_immutable ).toVar();
 	const direction = vec3( direction_immutable );
@@ -241,7 +241,7 @@ const bilinearCubeUV = Fn( ( [ envMap, direction_immutable, mipInt_immutable, CU
 
 } );
 
-const getSample = Fn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+const getSample = /*@__PURE__*/ Fn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
 
 	const cosTheta = cos( theta );
 
@@ -254,7 +254,7 @@ const getSample = Fn( ( { envMap, mipInt, outputDirection, theta, axis, CUBEUV_T
 
 } );
 
-export const blur = Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
+export const blur = /*@__PURE__*/ Fn( ( { n, latitudinal, poleAxis, outputDirection, weights, samples, dTheta, mipInt, envMap, CUBEUV_TEXEL_WIDTH, CUBEUV_TEXEL_HEIGHT, CUBEUV_MAX_MIP } ) => {
 
 	const axis = vec3( select( latitudinal, poleAxis, cross( poleAxis, outputDirection ) ) ).toVar();
 

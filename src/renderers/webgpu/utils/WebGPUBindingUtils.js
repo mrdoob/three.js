@@ -114,7 +114,7 @@ class WebGPUBindingUtils {
 
 					texture.viewDimension = GPUTextureViewDimension.Cube;
 
-				} else if ( binding.texture.isDataArrayTexture ) {
+				} else if ( binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
 
 					texture.viewDimension = GPUTextureViewDimension.TwoDArray;
 
@@ -234,26 +234,6 @@ class WebGPUBindingUtils {
 
 				const textureData = backend.get( binding.texture );
 
-				let dimensionViewGPU;
-
-				if ( binding.isSampledCubeTexture ) {
-
-					dimensionViewGPU = GPUTextureViewDimension.Cube;
-
-				} else if ( binding.isSampledTexture3D ) {
-
-					dimensionViewGPU = GPUTextureViewDimension.ThreeD;
-
-				} else if ( binding.texture.isDataArrayTexture ) {
-
-					dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
-
-				} else {
-
-					dimensionViewGPU = GPUTextureViewDimension.TwoD;
-
-				}
-
 				let resourceGPU;
 
 				if ( textureData.externalTexture !== undefined ) {
@@ -262,9 +242,38 @@ class WebGPUBindingUtils {
 
 				} else {
 
-					const aspectGPU = GPUTextureAspect.All;
+					const mipLevelCount = binding.store ? 1 : textureData.texture.mipLevelCount;
+					const propertyName = `view-${ textureData.texture.width }-${ textureData.texture.height }-${ mipLevelCount }`;
 
-					resourceGPU = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount: binding.store ? 1 : textureData.mipLevelCount } );
+					resourceGPU = textureData[ propertyName ];
+
+					if ( resourceGPU === undefined ) {
+
+						const aspectGPU = GPUTextureAspect.All;
+
+						let dimensionViewGPU;
+
+						if ( binding.isSampledCubeTexture ) {
+
+							dimensionViewGPU = GPUTextureViewDimension.Cube;
+
+						} else if ( binding.isSampledTexture3D ) {
+
+							dimensionViewGPU = GPUTextureViewDimension.ThreeD;
+
+						} else if ( binding.texture.isDataArrayTexture || binding.texture.isCompressedArrayTexture ) {
+
+							dimensionViewGPU = GPUTextureViewDimension.TwoDArray;
+
+						} else {
+
+							dimensionViewGPU = GPUTextureViewDimension.TwoD;
+
+						}
+
+						resourceGPU = textureData[ propertyName ] = textureData.texture.createView( { aspect: aspectGPU, dimension: dimensionViewGPU, mipLevelCount } );
+
+					}
 
 				}
 

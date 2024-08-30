@@ -1,9 +1,6 @@
+import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { lightTargetDirection } from './LightNode.js';
-import { addLightNode } from './LightsNode.js';
-import { addNodeClass } from '../core/Node.js';
-
-import { DirectionalLight } from '../../lights/DirectionalLight.js';
 
 class DirectionalLightNode extends AnalyticLightNode {
 
@@ -35,6 +32,4 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 export default DirectionalLightNode;
 
-addNodeClass( 'DirectionalLightNode', DirectionalLightNode );
-
-addLightNode( DirectionalLight, DirectionalLightNode );
+DirectionalLightNode.type = /*@__PURE__*/ registerNode( 'DirectionalLight', DirectionalLightNode );

@@ -1,14 +1,11 @@
+import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { lightTargetDirection } from './LightNode.js';
-import { addLightNode } from './LightsNode.js';
 import { getDistanceAttenuation } from './LightUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { objectViewPosition } from '../accessors/Object3DNode.js';
-import { positionView } from '../accessors/PositionNode.js';
-import { addNodeClass } from '../core/Node.js';
-
-import { SpotLight } from '../../lights/SpotLight.js';
+import { positionView } from '../accessors/Position.js';
 
 class SpotLightNode extends AnalyticLightNode {
 
@@ -84,6 +81,4 @@ class SpotLightNode extends AnalyticLightNode {
 
 export default SpotLightNode;
 
-addNodeClass( 'SpotLightNode', SpotLightNode );
-
-addLightNode( SpotLight, SpotLightNode );
+SpotLightNode.type = /*@__PURE__*/ registerNode( 'SpotLight', SpotLightNode );

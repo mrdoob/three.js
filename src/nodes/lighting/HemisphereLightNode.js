@@ -1,13 +1,11 @@
+import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
-import { addLightNode } from './LightsNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { mix } from '../math/MathNode.js';
-import { normalView } from '../accessors/NormalNode.js';
+import { normalView } from '../accessors/Normal.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
-import { addNodeClass } from '../core/Node.js';
 
 import { Color } from '../../math/Color.js';
-import { HemisphereLight } from '../../lights/HemisphereLight.js';
 
 class HemisphereLightNode extends AnalyticLightNode {
 
@@ -51,6 +49,4 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 export default HemisphereLightNode;
 
-addNodeClass( 'HemisphereLightNode', HemisphereLightNode );
-
-addLightNode( HemisphereLight, HemisphereLightNode );
+HemisphereLightNode.type = /*@__PURE__*/ registerNode( 'HemisphereLight', HemisphereLightNode );

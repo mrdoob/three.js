@@ -1,4 +1,4 @@
-import { addNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 
 class JoinNode extends TempNode {
@@ -58,4 +58,4 @@ class JoinNode extends TempNode {
 
 export default JoinNode;
 
-addNodeClass( 'JoinNode', JoinNode );
+JoinNode.type = /*@__PURE__*/ registerNode( 'Join', JoinNode );

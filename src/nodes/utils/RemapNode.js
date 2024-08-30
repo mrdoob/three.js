@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { float, addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import Node, { registerNode } from '../core/Node.js';
+import { float, addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class RemapNode extends Node {
 
@@ -33,10 +33,10 @@ class RemapNode extends Node {
 
 export default RemapNode;
 
-export const remap = nodeProxy( RemapNode, null, null, { doClamp: false } );
-export const remapClamp = nodeProxy( RemapNode );
+RemapNode.type = /*@__PURE__*/ registerNode( 'Remap', RemapNode );
 
-addNodeElement( 'remap', remap );
-addNodeElement( 'remapClamp', remapClamp );
+export const remap = /*@__PURE__*/ nodeProxy( RemapNode, null, null, { doClamp: false } );
+export const remapClamp = /*@__PURE__*/ nodeProxy( RemapNode );
 
-addNodeClass( 'RemapNode', RemapNode );
+addMethodChaining( 'remap', remap );
+addMethodChaining( 'remapClamp', remapClamp );

@@ -1,6 +1,6 @@
-import { addNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { vectorComponents } from '../core/constants.js';
 
 class AssignNode extends TempNode {
@@ -121,8 +121,8 @@ class AssignNode extends TempNode {
 
 export default AssignNode;
 
-export const assign = nodeProxy( AssignNode );
+AssignNode.type = /*@__PURE__*/ registerNode( 'Assign', AssignNode );
 
-addNodeClass( 'AssignNode', AssignNode );
+export const assign = /*@__PURE__*/ nodeProxy( AssignNode );
 
-addNodeElement( 'assign', assign );
+addMethodChaining( 'assign', assign );

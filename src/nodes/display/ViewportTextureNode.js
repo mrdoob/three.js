@@ -1,7 +1,7 @@
+import { registerNode } from '../core/Node.js';
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 import { viewportUV } from './ViewportNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
@@ -72,10 +72,7 @@ class ViewportTextureNode extends TextureNode {
 
 export default ViewportTextureNode;
 
-export const viewportTexture = nodeProxy( ViewportTextureNode );
-export const viewportMipTexture = nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );
+ViewportTextureNode.type = /*@__PURE__*/ registerNode( 'ViewportTexture', ViewportTextureNode );
 
-addNodeElement( 'viewportTexture', viewportTexture );
-addNodeElement( 'viewportMipTexture', viewportMipTexture );
-
-addNodeClass( 'ViewportTextureNode', ViewportTextureNode );
+export const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode );
+export const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );

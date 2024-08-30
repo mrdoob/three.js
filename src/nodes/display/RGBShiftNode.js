@@ -1,8 +1,10 @@
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { nodeObject, addNodeElement, Fn, vec2, vec4 } from '../shadernode/ShaderNode.js';
+import { nodeObject, Fn, vec2, vec4 } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
-import { uv } from '../accessors/UVNode.js';
+import { uv } from '../accessors/UV.js';
 import { sin, cos } from '../math/MathNode.js';
+import { convertToTexture } from '../utils/RTTNode.js';
 
 class RGBShiftNode extends TempNode {
 
@@ -41,9 +43,8 @@ class RGBShiftNode extends TempNode {
 
 }
 
-export const rgbShift = ( node, amount, angle ) => nodeObject( new RGBShiftNode( nodeObject( node ).toTexture(), amount, angle ) );
-
-addNodeElement( 'rgbShift', rgbShift );
-
 export default RGBShiftNode;
 
+RGBShiftNode.type = /*@__PURE__*/ registerNode( 'RGBShift', RGBShiftNode );
+
+export const rgbShift = ( node, amount, angle ) => nodeObject( new RGBShiftNode( convertToTexture( node ), amount, angle ) );

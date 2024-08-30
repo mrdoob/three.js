@@ -14,8 +14,9 @@ import Color4 from './Color4.js';
 import ClippingContext from './ClippingContext.js';
 import QuadMesh from './QuadMesh.js';
 import RenderBundles from './RenderBundles.js';
+import NodeLibrary from './nodes/NodeLibrary.js';
 
-import { NodeMaterial } from '../../nodes/Nodes.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Scene } from '../../scenes/Scene.js';
 import { Frustum } from '../../math/Frustum.js';
@@ -24,7 +25,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
+import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
 
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
@@ -78,6 +79,10 @@ class Renderer {
 		this.clippingPlanes = [];
 
 		this.info = new Info();
+
+		this.nodes = {
+			library: new NodeLibrary()
+		};
 
 		// internals
 
@@ -406,13 +411,12 @@ class Renderer {
 		const { object, camera, renderList } = bundle;
 
 		const renderContext = this._currentRenderContext;
-		const renderContextData = this.backend.get( renderContext );
 
 		//
 
 		const renderBundle = this._bundles.get( object, camera );
-
 		const renderBundleData = this.backend.get( renderBundle );
+
 		if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = new Set();
 
 		//
@@ -423,17 +427,11 @@ class Renderer {
 
 		if ( renderBundleNeedsUpdate ) {
 
-			if ( renderContextData.renderObjects === undefined || object.needsUpdate === true ) {
+			this.backend.beginBundle( renderContext );
 
-				const nodeFrame = this._nodes.nodeFrame;
+			if ( renderBundleData.renderObjects === undefined || object.needsUpdate === true ) {
 
-				renderContextData.renderObjects = [];
-				renderContextData.renderBundles = [];
-				renderContextData.scene = sceneRef;
-				renderContextData.camera = camera;
-				renderContextData.renderId = nodeFrame.renderId;
-
-				renderContextData.registerBundlesPhase = true;
+				renderBundleData.renderObjects = [];
 
 			}
 
@@ -447,16 +445,17 @@ class Renderer {
 
 			//
 
+			this.backend.finishBundle( renderContext, renderBundle );
+
 			object.needsUpdate = false;
 
 		} else {
 
-			const renderContext = this._currentRenderContext;
-			const renderContextData = this.backend.get( renderContext );
+			const renderObjects = renderBundleData.renderObjects;
 
-			for ( let i = 0, l = renderContextData.renderObjects.length; i < l; i ++ ) {
+			for ( let i = 0, l = renderObjects.length; i < l; i ++ ) {
 
-				const renderObject = renderContextData.renderObjects[ i ];
+				const renderObject = renderObjects[ i ];
 
 				this._nodes.updateBefore( renderObject );
 
@@ -468,13 +467,13 @@ class Renderer {
 				this._nodes.updateForRender( renderObject );
 				this._bindings.updateForRender( renderObject );
 
-				this.backend.draw( renderObject, this.info );
-
 				this._nodes.updateAfter( renderObject );
 
 			}
 
 		}
+
+		this.backend.addBundle( renderContext, renderBundle );
 
 	}
 
@@ -494,10 +493,10 @@ class Renderer {
 
 	_getFrameBufferTarget() {
 
-		const { currentColorSpace } = this;
+		const { currentToneMapping, currentColorSpace } = this;
 
-		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping );
-		const useColorSpace = this._renderTarget === null && ( currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace );
+		const useToneMapping = currentToneMapping !== NoToneMapping;
+		const useColorSpace = currentColorSpace !== LinearSRGBColorSpace;
 
 		if ( useToneMapping === false && useColorSpace === false ) return null;
 
@@ -1089,19 +1088,15 @@ class Renderer {
 
 	}
 
+	get currentToneMapping() {
+
+		return this._renderTarget !== null ? NoToneMapping : this.toneMapping;
+
+	}
+
 	get currentColorSpace() {
 
-		const renderTarget = this._renderTarget;
-
-		if ( renderTarget !== null ) {
-
-			const texture = renderTarget.texture;
-
-			return ( Array.isArray( texture ) ? texture[ 0 ] : texture ).colorSpace;
-
-		}
-
-		return this.outputColorSpace;
+		return this._renderTarget !== null ? LinearSRGBColorSpace : this.outputColorSpace;
 
 	}
 
@@ -1366,7 +1361,7 @@ class Renderer {
 
 		}
 
-		if ( object.static === true ) {
+		if ( object.static === true && this.backend.beginBundle !== undefined ) {
 
 			const baseRenderList = renderList;
 
@@ -1596,24 +1591,15 @@ class Renderer {
 
 		//
 
-		if ( this._currentRenderBundle !== null && this._currentRenderBundle.needsUpdate === true ) {
+		if ( this._currentRenderBundle !== null ) {
 
-			const renderObjectData = this.backend.get( renderObject );
+			const renderBundleData = this.backend.get( this._currentRenderBundle );
 
-			renderObjectData.bundleEncoder = undefined;
-			renderObjectData.lastPipelineGPU = undefined;
+			renderBundleData.renderObjects.push( renderObject );
 
 		}
 
 		this.backend.draw( renderObject, this.info );
-
-		if ( this._currentRenderBundle !== null ) {
-
-			const renderContextData = this.backend.get( this._currentRenderContext );
-
-			renderContextData.renderObjects.push( renderObject );
-
-		}
 
 		this._nodes.updateAfter( renderObject );
 

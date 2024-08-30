@@ -1,6 +1,6 @@
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeArray, nodeObject, nodeObjects } from '../shadernode/ShaderNode.js';
+import { addMethodChaining, nodeArray, nodeObject, nodeObjects } from '../tsl/TSLCore.js';
 
 class FunctionCallNode extends TempNode {
 
@@ -83,6 +83,8 @@ class FunctionCallNode extends TempNode {
 
 export default FunctionCallNode;
 
+FunctionCallNode.type = /*@__PURE__*/ registerNode( 'FunctionCall', FunctionCallNode );
+
 export const call = ( func, ...params ) => {
 
 	params = params.length > 1 || ( params[ 0 ] && params[ 0 ].isNode === true ) ? nodeArray( params ) : nodeObjects( params[ 0 ] );
@@ -91,6 +93,4 @@ export const call = ( func, ...params ) => {
 
 };
 
-addNodeElement( 'call', call );
-
-addNodeClass( 'FunctionCallNode', FunctionCallNode );
+addMethodChaining( 'call', call );

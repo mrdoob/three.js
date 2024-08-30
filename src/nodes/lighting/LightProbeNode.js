@@ -1,10 +1,8 @@
+import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
-import { addLightNode } from './LightsNode.js';
-import { normalWorld } from '../accessors/NormalNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { LightProbe } from '../../lights/LightProbe.js';
+import { normalWorld } from '../accessors/Normal.js';
 import { uniformArray } from '../accessors/UniformArrayNode.js';
-import { Fn } from '../shadernode/ShaderNode.js';
+import { Fn } from '../tsl/TSLBase.js';
 import { mul } from '../math/OperatorNode.js';
 import { Vector3 } from '../../math/Vector3.js';
 
@@ -48,7 +46,11 @@ class LightProbeNode extends AnalyticLightNode {
 
 }
 
-const shGetIrradianceAt = Fn( ( [ normal, shCoefficients ] ) => {
+export default LightProbeNode;
+
+LightProbeNode.type = /*@__PURE__*/ registerNode( 'LightProbe', LightProbeNode );
+
+const shGetIrradianceAt = /*@__PURE__*/ Fn( ( [ normal, shCoefficients ] ) => {
 
 	// normal is assumed to have unit length
 
@@ -72,9 +74,3 @@ const shGetIrradianceAt = Fn( ( [ normal, shCoefficients ] ) => {
 	return result;
 
 } );
-
-export default LightProbeNode;
-
-addNodeClass( 'LightProbeNode', LightProbeNode );
-
-addLightNode( LightProbe, LightProbeNode );

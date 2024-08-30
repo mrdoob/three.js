@@ -4,7 +4,7 @@ import { getNodeChildren, getCacheKey } from './NodeUtils.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
 
-const NodeClasses = new Map();
+const Nodes = new Map();
 
 let _nodeId = 0;
 
@@ -149,6 +149,12 @@ class Node extends EventDispatcher {
 
 	}
 
+	getScope() {
+
+		return this;
+
+	}
+
 	getHash( /*builder*/ ) {
 
 		return this.uuid;
@@ -222,18 +228,9 @@ class Node extends EventDispatcher {
 
 	}
 
-	increaseUsage( builder ) {
-
-		const nodeData = builder.getDataFromNode( this );
-		nodeData.usageCount = nodeData.usageCount === undefined ? 1 : nodeData.usageCount + 1;
-
-		return nodeData.usageCount;
-
-	}
-
 	analyze( builder ) {
 
-		const usageCount = this.increaseUsage( builder );
+		const usageCount = builder.increaseUsage( this );
 
 		if ( usageCount === 1 ) {
 
@@ -322,7 +319,8 @@ class Node extends EventDispatcher {
 
 				if ( properties.outputNode !== null && builder.stack.nodes.length !== stackNodesBeforeSetup ) {
 
-					properties.outputNode = builder.stack;
+					// !! no outputNode !!
+					//properties.outputNode = builder.stack;
 
 				}
 
@@ -543,29 +541,51 @@ class Node extends EventDispatcher {
 
 export default Node;
 
-export function addNodeClass( type, nodeClass ) {
+Node.type = /*@__PURE__*/ registerNode( '', Node );
 
-	if ( typeof nodeClass !== 'function' || ! type ) throw new Error( `Node class ${ type } is not a class` );
-	if ( NodeClasses.has( type ) ) {
+export function registerNode( type, nodeClass ) {
 
-		console.warn( `Redefinition of node class ${ type }` );
+	const suffix = 'Node';
+	const nodeType = type + suffix;
+
+	if ( typeof nodeClass !== 'function' ) throw new Error( `TSL.Node: Node class ${ type } is not a class` );
+
+	if ( Nodes.has( nodeType ) ) {
+
+		console.warn( `TSL.Node: Redefinition of node class ${ nodeType }` );
 		return;
 
 	}
 
-	NodeClasses.set( type, nodeClass );
-	nodeClass.type = type;
+	if ( type.slice( - suffix.length ) === suffix ) {
+
+		console.warn( `TSL.Node: Node class ${ nodeType } should not have '${ suffix }' suffix.` );
+		return;
+
+	}
+
+	Nodes.set( nodeType, nodeClass );
+	nodeClass.type = nodeType;
+
+	return nodeType;
 
 }
 
 export function createNodeFromType( type ) {
 
-	const Class = NodeClasses.get( type );
+	const Class = Nodes.get( type );
 
 	if ( Class !== undefined ) {
 
 		return new Class();
 
 	}
+
+}
+
+export function addNodeClass( type, nodeClass ) {
+
+	console.warn( 'TSL.Node: Function addNodeClass() is deprecated. Use /*@__PURE__*/ registerNode() instead.' );
+	/*@__PURE__*/ registerNode( type.slice( 0, - 4 ), nodeClass );
 
 }

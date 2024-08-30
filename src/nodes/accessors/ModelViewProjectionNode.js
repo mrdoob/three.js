@@ -1,10 +1,9 @@
-import { addNodeClass } from '../core/Node.js';
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { cameraProjectionMatrix } from './CameraNode.js';
+import { cameraProjectionMatrix } from './Camera.js';
 import { modelViewMatrix } from './ModelNode.js';
-import { positionLocal } from './PositionNode.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
-import { varying } from '../core/VaryingNode.js';
+import { positionLocal } from './Position.js';
+import { nodeProxy, varying } from '../tsl/TSLBase.js';
 
 class ModelViewProjectionNode extends TempNode {
 
@@ -34,6 +33,6 @@ class ModelViewProjectionNode extends TempNode {
 
 export default ModelViewProjectionNode;
 
-export const modelViewProjection = nodeProxy( ModelViewProjectionNode );
+ModelViewProjectionNode.type = /*@__PURE__*/ registerNode( 'ModelViewProjection', ModelViewProjectionNode );
 
-addNodeClass( 'ModelViewProjectionNode', ModelViewProjectionNode );
+export const modelViewProjection = /*@__PURE__*/ nodeProxy( ModelViewProjectionNode );

@@ -1,7 +1,7 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
-import { Fn, nodeImmutable, vec2 } from '../shadernode/ShaderNode.js';
+import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -110,17 +110,16 @@ class ViewportNode extends Node {
 ViewportNode.COORDINATE = 'coordinate';
 ViewportNode.RESOLUTION = 'resolution';
 ViewportNode.VIEWPORT = 'viewport';
-ViewportNode.TOP_LEFT = 'topLeft';
-ViewportNode.BOTTOM_LEFT = 'bottomLeft';
-ViewportNode.TOP_RIGHT = 'topRight';
-ViewportNode.BOTTOM_RIGHT = 'bottomRight';
+ViewportNode.UV = 'uv';
 
 export default ViewportNode;
 
-export const viewportCoordinate = nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
-export const viewportResolution = nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
-export const viewport = nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
-export const viewportUV = nodeImmutable( ViewportNode, ViewportNode.TOP_LEFT );
+ViewportNode.type = /*@__PURE__*/ registerNode( 'Viewport', ViewportNode );
+
+export const viewportCoordinate = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
+export const viewportResolution = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
+export const viewport = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
+export const viewportUV = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.UV );
 
 export const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
@@ -137,5 +136,3 @@ export const viewportBottomLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r1
 	return viewportUV.flipY();
 
 }, 'vec2' ).once() )();
-
-addNodeClass( 'ViewportNode', ViewportNode );

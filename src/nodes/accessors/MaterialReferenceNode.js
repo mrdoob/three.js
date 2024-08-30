@@ -1,8 +1,8 @@
+import { registerNode } from '../core/Node.js';
 import ReferenceNode from './ReferenceNode.js';
 //import { renderGroup } from '../core/UniformGroupNode.js';
 //import { NodeUpdateType } from '../core/constants.js';
-import { addNodeClass } from '../core/Node.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 
 class MaterialReferenceNode extends ReferenceNode {
 
@@ -38,6 +38,6 @@ class MaterialReferenceNode extends ReferenceNode {
 
 export default MaterialReferenceNode;
 
-export const materialReference = ( name, type, material ) => nodeObject( new MaterialReferenceNode( name, type, material ) );
+MaterialReferenceNode.type = /*@__PURE__*/ registerNode( 'MaterialReference', MaterialReferenceNode );
 
-addNodeClass( 'MaterialReferenceNode', MaterialReferenceNode );
+export const materialReference = ( name, type, material ) => nodeObject( new MaterialReferenceNode( name, type, material ) );

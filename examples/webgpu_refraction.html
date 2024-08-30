@@ -44,7 +44,7 @@
 
 				// camera
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
-				camera.position.set( 0, 75, 160 );
+				camera.position.set( 0, 50, 160 );
 
 				//
 
@@ -135,7 +135,7 @@
 				// controls
 
 				cameraControls = new OrbitControls( camera, renderer.domElement );
-				cameraControls.target.set( 0, 40, 0 );
+				cameraControls.target.set( 0, 50, 0 );
 				cameraControls.maxDistance = 400;
 				cameraControls.minDistance = 10;
 				cameraControls.update();

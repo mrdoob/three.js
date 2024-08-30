@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from './Node.js';
-import { addNodeElement, nodeObject } from '../shadernode/ShaderNode.js';
+import Node, { registerNode } from './Node.js';
+import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
 class CacheNode extends Node {
 
@@ -39,8 +39,8 @@ class CacheNode extends Node {
 
 export default CacheNode;
 
+CacheNode.type = /*@__PURE__*/ registerNode( 'Cache', CacheNode );
+
 export const cache = ( node, ...params ) => nodeObject( new CacheNode( nodeObject( node ), ...params ) );
 
-addNodeElement( 'cache', cache );
-
-addNodeClass( 'CacheNode', CacheNode );
+addMethodChaining( 'cache', cache );

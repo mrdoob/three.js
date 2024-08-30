@@ -1,6 +1,6 @@
+import { registerNode } from '../core/Node.js';
 import Object3DNode from './Object3DNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { nodeImmutable } from '../shadernode/ShaderNode.js';
+import { nodeImmutable } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 
 import { Matrix4 } from '../../math/Matrix4.js';
@@ -25,13 +25,13 @@ class ModelNode extends Object3DNode {
 
 export default ModelNode;
 
-export const modelDirection = nodeImmutable( ModelNode, ModelNode.DIRECTION );
-export const modelViewMatrix = nodeImmutable( ModelNode, ModelNode.VIEW_MATRIX ).label( 'modelViewMatrix' ).temp( 'ModelViewMatrix' );
-export const modelNormalMatrix = nodeImmutable( ModelNode, ModelNode.NORMAL_MATRIX );
-export const modelWorldMatrix = nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
-export const modelPosition = nodeImmutable( ModelNode, ModelNode.POSITION );
-export const modelScale = nodeImmutable( ModelNode, ModelNode.SCALE );
-export const modelViewPosition = nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
-export const modelWorldMatrixInverse = uniform( new Matrix4() ).onObjectUpdate( ( { object }, self ) => self.value.copy( object.matrixWorld ).invert() );
+ModelNode.type = /*@__PURE__*/ registerNode( 'Model', ModelNode );
 
-addNodeClass( 'ModelNode', ModelNode );
+export const modelDirection = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.DIRECTION );
+export const modelViewMatrix = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.VIEW_MATRIX ).label( 'modelViewMatrix' ).toVar( 'ModelViewMatrix' );
+export const modelNormalMatrix = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.NORMAL_MATRIX );
+export const modelWorldMatrix = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
+export const modelPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.POSITION );
+export const modelScale = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.SCALE );
+export const modelViewPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
+export const modelWorldMatrixInverse = /*@__PURE__*/ uniform( new Matrix4() ).onObjectUpdate( ( { object }, self ) => self.value.copy( object.matrixWorld ).invert() );

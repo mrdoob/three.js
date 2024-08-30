@@ -1,6 +1,6 @@
-import { Fn } from '../shadernode/ShaderNode.js';
+import { Fn } from '../tsl/TSLBase.js';
 
-export const getDistanceAttenuation = Fn( ( inputs ) => {
+export const getDistanceAttenuation = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { lightDistance, cutoffDistance, decayExponent } = inputs;
 

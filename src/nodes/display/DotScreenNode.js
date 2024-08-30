@@ -1,7 +1,8 @@
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { nodeObject, addNodeElement, Fn, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { nodeObject, Fn, vec2, vec3, vec4 } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
-import { uv } from '../accessors/UVNode.js';
+import { uv } from '../accessors/UV.js';
 import { sin, cos } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
 import { viewportResolution } from '../display/ViewportNode.js';
@@ -55,9 +56,8 @@ class DotScreenNode extends TempNode {
 
 }
 
-export const dotScreen = ( node, center, angle, scale ) => nodeObject( new DotScreenNode( nodeObject( node ), center, angle, scale ) );
-
-addNodeElement( 'dotScreen', dotScreen );
-
 export default DotScreenNode;
 
+DotScreenNode.type = /*@__PURE__*/ registerNode( 'DotScreen', DotScreenNode );
+
+export const dotScreen = ( node, center, angle, scale ) => nodeObject( new DotScreenNode( nodeObject( node ), center, angle, scale ) );

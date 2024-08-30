@@ -1,9 +1,9 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { getValueType } from '../core/NodeUtils.js';
 import { buffer } from '../accessors/BufferNode.js';
 import { instancedBufferAttribute } from '../accessors/BufferAttributeNode.js';
 import { instanceIndex } from '../core/IndexNode.js';
-import { nodeProxy, float } from '../shadernode/ShaderNode.js';
+import { nodeProxy, float } from '../tsl/TSLBase.js';
 
 import { Vector4 } from '../../math/Vector4.js';
 import { MathUtils } from '../../math/MathUtils.js';
@@ -112,6 +112,6 @@ class RangeNode extends Node {
 
 export default RangeNode;
 
-export const range = nodeProxy( RangeNode );
+RangeNode.type = /*@__PURE__*/ registerNode( 'Range', RangeNode );
 
-addNodeClass( 'RangeNode', RangeNode );
+export const range = /*@__PURE__*/ nodeProxy( RangeNode );

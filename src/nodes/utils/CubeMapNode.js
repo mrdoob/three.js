@@ -1,7 +1,7 @@
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { addNodeClass } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 import { CubeTexture } from '../../textures/CubeTexture.js';
 import { cubeTexture } from '../accessors/CubeTextureNode.js';
 import CubeRenderTarget from '../../renderers/common/CubeRenderTarget.js';
@@ -110,6 +110,10 @@ class CubeMapNode extends TempNode {
 
 }
 
+export default CubeMapNode;
+
+CubeMapNode.type = /*@__PURE__*/ registerNode( 'CubeMap', CubeMapNode );
+
 function isEquirectangularMapReady( image ) {
 
 	if ( image === null || image === undefined ) return false;
@@ -150,8 +154,4 @@ function mapTextureMapping( texture, mapping ) {
 
 }
 
-export const cubeMapNode = nodeProxy( CubeMapNode );
-
-addNodeClass( 'CubeMapNode', CubeMapNode );
-
-export default CubeMapNode;
+export const cubeMapNode = /*@__PURE__*/ nodeProxy( CubeMapNode );

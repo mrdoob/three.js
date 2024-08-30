@@ -1,9 +1,9 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
-import { normalLocal } from './NormalNode.js';
-import { positionLocal } from './PositionNode.js';
-import { nodeProxy, vec3, mat3, mat4 } from '../shadernode/ShaderNode.js';
+import { normalLocal } from './Normal.js';
+import { positionLocal } from './Position.js';
+import { nodeProxy, vec3, mat3, mat4 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { buffer } from '../accessors/BufferNode.js';
 import { instanceIndex } from '../core/IndexNode.js';
@@ -139,6 +139,6 @@ class InstanceNode extends Node {
 
 export default InstanceNode;
 
-export const instance = nodeProxy( InstanceNode );
+InstanceNode.type = /*@__PURE__*/ registerNode( 'Instance', InstanceNode );
 
-addNodeClass( 'InstanceNode', InstanceNode );
+export const instance = /*@__PURE__*/ nodeProxy( InstanceNode );
