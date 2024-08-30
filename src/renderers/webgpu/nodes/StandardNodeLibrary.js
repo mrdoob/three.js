@@ -1,4 +1,4 @@
-import NodeLibrary from './NodeLibrary.js';
+import NodeLibrary from '../../common/nodes/NodeLibrary.js';
 
 // Materials
 import { MeshPhongMaterial } from '../../../materials/MeshPhongMaterial.js';

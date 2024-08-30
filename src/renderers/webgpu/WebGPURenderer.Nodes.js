@@ -1,21 +1,8 @@
 import Renderer from '../common/Renderer.js';
 import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
-import StandardNodeLibrary from './nodes/StandardNodeLibrary.js';
-/*
-const debugHandler = {
+import BasicNodeLibrary from './nodes/BasicNodeLibrary.js';
 
-	get: function ( target, name ) {
-
-		// Add |update
-		if ( /^(create|destroy)/.test( name ) ) console.log( 'WebGPUBackend.' + name );
-
-		return target[ name ];
-
-	}
-
-};
-*/
 class WebGPURenderer extends Renderer {
 
 	constructor( parameters = {} ) {
@@ -42,10 +29,9 @@ class WebGPURenderer extends Renderer {
 
 		const backend = new BackendClass( parameters );
 
-		//super( new Proxy( backend, debugHandler ) );
 		super( backend, parameters );
 
-		this.nodes.library = new StandardNodeLibrary();
+		this.nodes.library = new BasicNodeLibrary();
 
 		this.isWebGPURenderer = true;
 

@@ -106,7 +106,7 @@ class LightsNode extends Node {
 
 					const lightNodeClass = nodeLibrary.getLightNodeClass( light.constructor );
 
-					if ( lightNodeClass === undefined ) {
+					if ( lightNodeClass === null ) {
 
 						console.warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
 						continue;
