@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, linearDepth, viewportLinearDepth, viewportSharedTexture, viewportMipTexture, viewportTopLeft, checker, uv, modelScale } from 'three/tsl';
+			import { color, linearDepth, viewportLinearDepth, viewportSharedTexture, textureBicubic, viewportMipTexture, viewportUV, checker, uv, modelScale } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -79,7 +79,7 @@
 				const depthDistance = viewportLinearDepth.distance( linearDepth() );
 
 				const depthAlphaNode = depthDistance.oneMinus().smoothstep( .90, 2 ).mul( 10 ).saturate();
-				const depthBlurred = viewportMipTexture().bicubic( depthDistance.smoothstep( 0, .6 ).mul( 40 * 5 ).clamp( 0, 5 ) );
+				const depthBlurred = textureBicubic( viewportMipTexture(), depthDistance.smoothstep( 0, .6 ).mul( 40 * 5 ).clamp( 0, 5 ) );
 
 				const blurredBlur = new THREE.MeshBasicNodeMaterial();
 				blurredBlur.backdropNode = depthBlurred.add( depthAlphaNode.mix( color( 0x0066ff ), 0 ) );
@@ -99,14 +99,14 @@
 				depthMaterial.side = THREE.DoubleSide;
 
 				const bicubicMaterial = new THREE.MeshBasicNodeMaterial();
-				bicubicMaterial.backdropNode = viewportMipTexture().bicubic( 5 ); // @TODO: Move to alpha value [ 0, 1 ]
+				bicubicMaterial.backdropNode = textureBicubic( viewportMipTexture(), 5 ); // @TODO: Move to alpha value [ 0, 1 ]
 				bicubicMaterial.backdropAlphaNode = checker( uv().mul( 3 ).mul( modelScale.xy ) );
 				bicubicMaterial.opacityNode = bicubicMaterial.backdropAlphaNode;
 				bicubicMaterial.transparent = true;
 				bicubicMaterial.side = THREE.DoubleSide;
 
 				const pixelMaterial = new THREE.MeshBasicNodeMaterial();
-				pixelMaterial.backdropNode = viewportSharedTexture( viewportTopLeft.mul( 100 ).floor().div( 100 ) );
+				pixelMaterial.backdropNode = viewportSharedTexture( viewportUV.mul( 100 ).floor().div( 100 ) );
 				pixelMaterial.transparent = true;
 
 				// box / floor

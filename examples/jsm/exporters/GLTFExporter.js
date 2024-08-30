@@ -2837,7 +2837,12 @@ class GLTFMaterialsVolumeExtension {
 
 		}
 
-		extensionDef.attenuationDistance = material.attenuationDistance;
+		if ( material.attenuationDistance !== Infinity ) {
+
+			extensionDef.attenuationDistance = material.attenuationDistance;
+
+		}
+
 		extensionDef.attenuationColor = material.attenuationColor.toArray();
 
 		materialDef.extensions = materialDef.extensions || {};

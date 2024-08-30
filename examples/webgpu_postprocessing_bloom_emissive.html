@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, mrt, output, emissive } from 'three/tsl';
+			import { pass, mrt, output, bloom, emissive } from 'three/tsl';
 
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
@@ -91,11 +91,10 @@
 				const outputPass = scenePass.getTextureNode();
 				const emissivePass = scenePass.getTextureNode( 'emissive' );
 
-				const bloomPass = emissivePass.bloom( 2.5, .5 );
+				const bloomPass = bloom( emissivePass, 2.5, .5 );
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputColorTransform = false;
-				postProcessing.outputNode = outputPass.add( bloomPass ).renderOutput();
+				postProcessing.outputNode = outputPass.add( bloomPass );
 
 				//
 

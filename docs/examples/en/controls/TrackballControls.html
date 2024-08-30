@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:EventDispatcher] &rarr;
+		[page:Controls] &rarr;
 
 		<h1>[name]</h1>
 
@@ -41,7 +41,7 @@
 				[page:Camera camera]: The camera of the rendered scene.
 			</p>
 			<p>
-				[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+				[page:HTMLDOMElement domElement]: The HTML element used for event listeners. (optional)
 			</p>
 			<p>
 				Creates a new instance of [name].
@@ -67,20 +67,11 @@
 
 		<h2>Properties</h2>
 
-		<h3>[property:HTMLDOMElement domElement]</h3>
-		<p>
-			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
-			not set up new event listeners.
-		</p>
+		<p>See the base [page:Controls] class for common properties.</p>
 
 		<h3>[property:Number dynamicDampingFactor]</h3>
 		<p>
 			Defines the intensity of damping. Only considered if [page:.staticMoving staticMoving] is set to `false`. Default is `0.2`.
-		</p>
-
-		<h3>[property:Boolean enabled]</h3>
-		<p>
-			Whether or not the controls are enabled.
 		</p>
 
 		<h3>[property:Array keys]</h3>
@@ -140,11 +131,6 @@
 			Whether or not zooming is disabled. Default is `false`.
 		</p>
 
-		<h3>[property:Camera object]</h3>
-		<p>
-			The camera being controlled.
-		</p>
-
 		<h3>[property:Number panSpeed]</h3>
 		<p>
 			The pan speed. Default is `0.3`.
@@ -183,44 +169,16 @@
 
 		<h2>Methods</h2>
 
-		<h3>[method:undefined checkDistances] ()</h3>
-		<p>
-			Ensures the controls stay in the range [minDistance, maxDistance]. Called by [page:.update update]().
-		</p>
-
-		<h3>[method:undefined dispose] ()</h3>
-		<p>
-			Should be called if the controls is no longer required.
-		</p>
+		<p>See the base [page:Controls] class for common methods.</p>
 
 		<h3>[method:undefined handleResize] ()</h3>
 		<p>
 			Should be called if the application window is resized.
 		</p>
 
-		<h3>[method:undefined panCamera] ()</h3>
-		<p>
-			Performs panning if necessary. Called by [page:.update update]().
-		</p>
-
 		<h3>[method:undefined reset] ()</h3>
 		<p>
 			Resets the controls to its initial state.
-		</p>
-
-		<h3>[method:undefined rotateCamera] ()</h3>
-		<p>
-			Rotates the camera if necessary. Called by [page:.update update]().
-		</p>
-
-		<h3>[method:undefined update] ()</h3>
-		<p>
-			Updates the controls. Usually called in the animation loop.
-		</p>
-
-		<h3>[method:undefined zoomCamera] ()</h3>
-		<p>
-			Performs zooming if necessary. Called by [page:.update update]().
 		</p>
 
 		<h2>Source</h2>

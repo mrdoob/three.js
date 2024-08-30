@@ -14,7 +14,7 @@ import {
 
 class RoomEnvironment extends Scene {
 
-	constructor( renderer = null ) {
+	constructor() {
 
 		super();
 

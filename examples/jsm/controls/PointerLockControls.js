@@ -1,6 +1,6 @@
 import {
+	Controls,
 	Euler,
-	EventDispatcher,
 	Vector3
 } from 'three';
 
@@ -13,14 +13,11 @@ const _unlockEvent = { type: 'unlock' };
 
 const _PI_2 = Math.PI / 2;
 
-class PointerLockControls extends EventDispatcher {
+class PointerLockControls extends Controls {
 
-	constructor( camera, domElement ) {
+	constructor( camera, domElement = null ) {
 
-		super();
-
-		this.camera = camera;
-		this.domElement = domElement;
+		super( camera, domElement );
 
 		this.isLocked = false;
 
@@ -31,11 +28,17 @@ class PointerLockControls extends EventDispatcher {
 
 		this.pointerSpeed = 1.0;
 
+		// event listeners
+
 		this._onMouseMove = onMouseMove.bind( this );
 		this._onPointerlockChange = onPointerlockChange.bind( this );
 		this._onPointerlockError = onPointerlockError.bind( this );
 
-		this.connect();
+		if ( this.domElement !== null ) {
+
+			this.connect();
+
+		}
 
 	}
 
@@ -61,24 +64,28 @@ class PointerLockControls extends EventDispatcher {
 
 	}
 
-	getObject() { // retaining this method for backward compatibility
+	getObject() {
 
-		return this.camera;
+		console.warn( 'THREE.PointerLockControls: getObject() has been deprecated. Use controls.object instead.' ); // @deprecated r169
+
+		return this.object;
 
 	}
 
 	getDirection( v ) {
 
-		return v.set( 0, 0, - 1 ).applyQuaternion( this.camera.quaternion );
+		return v.set( 0, 0, - 1 ).applyQuaternion( this.object.quaternion );
 
 	}
 
 	moveForward( distance ) {
 
+		if ( this.enabled === false ) return;
+
 		// move forward parallel to the xz-plane
 		// assumes camera.up is y-up
 
-		const camera = this.camera;
+		const camera = this.object;
 
 		_vector.setFromMatrixColumn( camera.matrix, 0 );
 
@@ -90,7 +97,9 @@ class PointerLockControls extends EventDispatcher {
 
 	moveRight( distance ) {
 
-		const camera = this.camera;
+		if ( this.enabled === false ) return;
+
+		const camera = this.object;
 
 		_vector.setFromMatrixColumn( camera.matrix, 0 );
 
@@ -116,12 +125,12 @@ class PointerLockControls extends EventDispatcher {
 
 function onMouseMove( event ) {
 
-	if ( this.isLocked === false ) return;
+	if ( this.enabled === false || this.isLocked === false ) return;
 
 	const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 	const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-	const camera = this.camera;
+	const camera = this.object;
 	_euler.setFromQuaternion( camera.quaternion );
 
 	_euler.y -= movementX * 0.002 * this.pointerSpeed;

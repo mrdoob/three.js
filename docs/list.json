@@ -99,6 +99,7 @@
 			},
 
 			"Extras": {
+				"Controls": "api/en/extras/Controls",
 				"DataUtils": "api/en/extras/DataUtils",
 				"Earcut": "api/en/extras/Earcut",
 				"ImageUtils": "api/en/extras/ImageUtils",
@@ -853,6 +854,7 @@
 			},
 
 			"附件": {
+				"Controls": "api/zh/extras/Controls",
 				"DataUtils": "api/zh/extras/DataUtils",
 				"Earcut": "api/zh/extras/Earcut",
 				"ImageUtils": "api/zh/extras/ImageUtils",
@@ -1097,6 +1099,7 @@
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/zh/geometries/ParametricGeometry",
+				"TeapotGeometry": "examples/zh/geometries/TeapotGeometry",
 				"TextGeometry": "examples/zh/geometries/TextGeometry",
 				"SDFGeometryGenerator": "examples/zh/geometries/SDFGeometryGenerator"
 			},

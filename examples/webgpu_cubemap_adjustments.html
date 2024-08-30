@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { uniform, mix, pmremTexture, reference, positionLocal, positionWorld, normalWorld, positionWorldDirection, reflectVector } from 'three/tsl';
+			import { uniform, mix, pmremTexture, reference, positionLocal, hue, saturation, positionWorld, normalWorld, positionWorldDirection, reflectVector } from 'three/tsl';
 
 			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
 
@@ -99,8 +99,8 @@
 					const proceduralEnv = mix( mixCubeMaps, normalWorld, proceduralNode );
 
 					const intensityFilter = proceduralEnv.mul( intensityNode );
-					const hueFilter = intensityFilter.hue( hueNode );
-					return hueFilter.saturation( saturationNode );
+					const hueFilter = hue( intensityFilter, hueNode );
+					return saturation( hueFilter, saturationNode );
 
 				};
 

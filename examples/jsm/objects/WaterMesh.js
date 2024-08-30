@@ -1,0 +1,102 @@
+import {
+	Color,
+	Mesh,
+	NodeMaterial,
+	Vector3
+} from 'three';
+import { add, cameraPosition, div, normalize, positionWorld, sub, timerLocal, Fn, texture, vec2, vec3, vec4, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
+
+/**
+ * Work based on :
+ * https://github.com/Slayvin: Flat mirror for three.js
+ * https://home.adelphi.edu/~stemkoski/ : An implementation of water shader based on the flat mirror
+ * http://29a.ch/ && http://29a.ch/slides/2012/webglwater/ : Water shader explanations in WebGL
+ */
+
+class WaterMesh extends Mesh {
+
+	constructor( geometry, options ) {
+
+		const material = new NodeMaterial();
+
+		super( geometry, material );
+
+		this.isWater = true;
+
+		this.resolution = options.resolution !== undefined ? options.resolution : 0.5;
+
+		// uniforms
+
+		this.waterNormals = texture( options.waterNormals );
+		this.alpha = uniform( options.alpha !== undefined ? options.alpha : 1.0 );
+		this.size = uniform( options.size !== undefined ? options.size : 1.0 );
+		this.sunColor = uniform( new Color( options.sunColor !== undefined ? options.sunColor : 0xffffff ) );
+		this.sunDirection = uniform( options.sunDirection !== undefined ? options.sunDirection : new Vector3( 0.70707, 0.70707, 0.0 ) );
+		this.waterColor = uniform( new Color( options.waterColor !== undefined ? options.waterColor : 0x7f7f7f ) );
+		this.distortionScale = uniform( options.distortionScale !== undefined ? options.distortionScale : 20.0 );
+
+		// TSL
+
+		const timeNode = timerLocal();
+
+		const getNoise = Fn( ( [ uv ] ) => {
+
+			const uv0 = add( div( uv, 103 ), vec2( div( timeNode, 17 ), div( timeNode, 29 ) ) ).toVar();
+			const uv1 = div( uv, 107 ).sub( vec2( div( timeNode, - 19 ), div( timeNode, 31 ) ) ).toVar();
+			const uv2 = add( div( uv, vec2( 8907.0, 9803.0 ) ), vec2( div( timeNode, 101 ), div( timeNode, 97 ) ) ).toVar();
+			const uv3 = sub( div( uv, vec2( 1091.0, 1027.0 ) ), vec2( div( timeNode, 109 ), div( timeNode, - 113 ) ) ).toVar();
+
+			const sample0 = this.waterNormals.uv( uv0 );
+			const sample1 = this.waterNormals.uv( uv1 );
+			const sample2 = this.waterNormals.uv( uv2 );
+			const sample3 = this.waterNormals.uv( uv3 );
+
+			const noise = sample0.add( sample1 ).add( sample2 ).add( sample3 );
+
+			return noise.mul( 0.5 ).sub( 1 );
+
+		} );
+
+		const fragmentNode = Fn( () => {
+
+			const noise = getNoise( positionWorld.xz.mul( this.size ) );
+			const surfaceNormal = normalize( noise.xzy.mul( 1.5, 1.0, 1.5 ) );
+
+			const diffuseLight = vec3( 0 ).toVar();
+			const specularLight = vec3( 0 ).toVar();
+
+			const worldToEye = cameraPosition.sub( positionWorld );
+			const eyeDirection = normalize( worldToEye );
+
+			const reflection = normalize( reflect( this.sunDirection.negate(), surfaceNormal ) );
+			const direction = max( 0.0, dot( eyeDirection, reflection ) );
+			specularLight.addAssign( pow( direction, 100 ).mul( this.sunColor ).mul( 2.0 ) );
+			diffuseLight.addAssign( max( dot( this.sunDirection, surfaceNormal ), 0.0 ).mul( this.sunColor ).mul( 0.5 ) );
+
+			const distance = length( worldToEye );
+
+			const distortion = surfaceNormal.xy.mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
+
+			const mirrorSampler = reflector();
+			mirrorSampler.uvNode = mirrorSampler.uvNode.add( distortion );
+			mirrorSampler.resolution = this.resolution;
+
+			this.add( mirrorSampler.target );
+
+			const theta = max( dot( eyeDirection, surfaceNormal ), 0.0 );
+			const rf0 = float( 0.3 );
+			const reflectance = mul( pow( float( 1.0 ).sub( theta ), 5.0 ), float( 1.0 ).sub( rf0 ) ).add( rf0 );
+			const scatter = max( 0.0, dot( surfaceNormal, eyeDirection ) ).mul( this.waterColor );
+			const albedo = mix( this.sunColor.mul( diffuseLight ).mul( 0.3 ).add( scatter ), mirrorSampler.rgb.mul( specularLight ).add( mirrorSampler.rgb.mul( 0.9 ) ).add( vec3( 0.1 ) ), reflectance );
+
+			return vec4( albedo, this.alpha );
+
+		} )();
+
+		material.fragmentNode = fragmentNode;
+
+	}
+
+}
+
+export { WaterMesh };
