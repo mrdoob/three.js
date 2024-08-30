@@ -150,9 +150,9 @@ const VSMPassVertical = Fn( ( { samples, radius, resolution, shadowPass } ) => {
 	const uvStride = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( 2 ).div( samples.sub( 1 ) ) );
 	const uvStart = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( - 1 ) );
 
-	Loop( { start: int( 0 ), end: int( samples ), type: 'float', condition: '<' }, ( { i } ) => {
+	Loop( { start: int( 0 ), end: int( samples ), type: 'int', condition: '<' }, ( { i } ) => {
 
-		const uvOffset = uvStart.add( i.mul( uvStride ) );
+		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
 		const depth = shadowPass.uv( add( viewportCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( resolution ) ).x;
 		mean.addAssign( depth );
@@ -176,9 +176,9 @@ const VSMPassHorizontal = Fn( ( { samples, radius, resolution, shadowPass } ) =>
 	const uvStride = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( 2 ).div( samples.sub( 1 ) ) );
 	const uvStart = samples.lessThanEqual( float( 1 ) ).select( float( 0 ), float( - 1 ) );
 
-	Loop( { start: int( 0 ), end: int( samples ), type: 'float', condition: '<' }, ( { i } ) => {
+	Loop( { start: int( 0 ), end: int( samples ), type: 'int', condition: '<' }, ( { i } ) => {
 
-		const uvOffset = uvStart.add( i.mul( uvStride ) );
+		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
 		const distribution = shadowPass.uv( add( viewportCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( resolution ) );
 		mean.addAssign( distribution.x );
