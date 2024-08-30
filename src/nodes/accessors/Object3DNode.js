@@ -1,7 +1,7 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import UniformNode from '../core/UniformNode.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 
 import { Vector3 } from '../../math/Vector3.js';
 
@@ -139,12 +139,12 @@ Object3DNode.DIRECTION = 'direction';
 
 export default Object3DNode;
 
-export const objectDirection = nodeProxy( Object3DNode, Object3DNode.DIRECTION );
-export const objectViewMatrix = nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
-export const objectNormalMatrix = nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
-export const objectWorldMatrix = nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
-export const objectPosition = nodeProxy( Object3DNode, Object3DNode.POSITION );
-export const objectScale = nodeProxy( Object3DNode, Object3DNode.SCALE );
-export const objectViewPosition = nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );
+Object3DNode.type = /*@__PURE__*/ registerNode( 'Object3D', Object3DNode );
 
-addNodeClass( 'Object3DNode', Object3DNode );
+export const objectDirection = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.DIRECTION );
+export const objectViewMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
+export const objectNormalMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
+export const objectWorldMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
+export const objectPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.POSITION );
+export const objectScale = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.SCALE );
+export const objectViewPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.VIEW_POSITION );

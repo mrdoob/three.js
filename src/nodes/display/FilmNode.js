@@ -1,6 +1,7 @@
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, Fn, nodeProxy, vec4 } from '../shadernode/ShaderNode.js';
+import { uv } from '../accessors/UV.js';
+import { Fn, nodeProxy, vec4 } from '../tsl/TSLBase.js';
 import { mix, fract, clamp, rand } from '../math/MathNode.js';
 import { timerLocal } from '../utils/TimerNode.js';
 
@@ -45,8 +46,8 @@ class FilmNode extends TempNode {
 
 }
 
-export const film = nodeProxy( FilmNode );
-
-addNodeElement( 'film', film );
-
 export default FilmNode;
+
+FilmNode.type = /*@__PURE__*/ registerNode( 'Film', FilmNode );
+
+export const film = /*@__PURE__*/ nodeProxy( FilmNode );

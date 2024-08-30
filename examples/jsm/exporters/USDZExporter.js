@@ -1,6 +1,7 @@
 import {
 	NoColorSpace,
 	DoubleSide,
+	Color,
 } from 'three';
 
 import {
@@ -584,7 +585,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 		inputs.push( `${ pad }color3f inputs:emissiveColor.connect = </Materials/Material_${ material.id }/Texture_${ material.emissiveMap.id }_emissive.outputs:rgb>` );
 
-		samplers.push( buildTexture( material.emissiveMap, 'emissive' ) );
+		samplers.push( buildTexture( material.emissiveMap, 'emissive', new Color( material.emissive.r * material.emissiveIntensity, material.emissive.g * material.emissiveIntensity, material.emissive.b * material.emissiveIntensity ) ) );
 
 	} else if ( material.emissive.getHex() > 0 ) {
 
@@ -604,15 +605,15 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 		inputs.push( `${ pad }float inputs:occlusion.connect = </Materials/Material_${ material.id }/Texture_${ material.aoMap.id }_occlusion.outputs:r>` );
 
-		samplers.push( buildTexture( material.aoMap, 'occlusion' ) );
+		samplers.push( buildTexture( material.aoMap, 'occlusion', new Color( material.aoMapIntensity, material.aoMapIntensity, material.aoMapIntensity ) ) );
 
 	}
 
-	if ( material.roughnessMap !== null && material.roughness === 1 ) {
+	if ( material.roughnessMap !== null ) {
 
 		inputs.push( `${ pad }float inputs:roughness.connect = </Materials/Material_${ material.id }/Texture_${ material.roughnessMap.id }_roughness.outputs:g>` );
 
-		samplers.push( buildTexture( material.roughnessMap, 'roughness' ) );
+		samplers.push( buildTexture( material.roughnessMap, 'roughness', new Color( material.roughness, material.roughness, material.roughness ) ) );
 
 	} else {
 
@@ -620,11 +621,11 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	}
 
-	if ( material.metalnessMap !== null && material.metalness === 1 ) {
+	if ( material.metalnessMap !== null ) {
 
 		inputs.push( `${ pad }float inputs:metallic.connect = </Materials/Material_${ material.id }/Texture_${ material.metalnessMap.id }_metallic.outputs:b>` );
 
-		samplers.push( buildTexture( material.metalnessMap, 'metallic' ) );
+		samplers.push( buildTexture( material.metalnessMap, 'metallic', new Color( material.metalness, material.metalness, material.metalness ) ) );
 
 	} else {
 
@@ -647,8 +648,28 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 
 	if ( material.isMeshPhysicalMaterial ) {
 
-		inputs.push( `${ pad }float inputs:clearcoat = ${ material.clearcoat }` );
-		inputs.push( `${ pad }float inputs:clearcoatRoughness = ${ material.clearcoatRoughness }` );
+		if ( material.clearcoatMap !== null ) {
+
+			inputs.push( `${pad}float inputs:clearcoat.connect = </Materials/Material_${material.id}/Texture_${material.clearcoatMap.id}_clearcoat.outputs:r>` );
+			samplers.push( buildTexture( material.clearcoatMap, 'clearcoat', new Color( material.clearcoat, material.clearcoat, material.clearcoat ) ) );
+
+		} else {
+
+			inputs.push( `${pad}float inputs:clearcoat = ${material.clearcoat}` );
+
+		}
+
+		if ( material.clearcoatRoughnessMap !== null ) {
+
+			inputs.push( `${pad}float inputs:clearcoatRoughness.connect = </Materials/Material_${material.id}/Texture_${material.clearcoatRoughnessMap.id}_clearcoatRoughness.outputs:g>` );
+			samplers.push( buildTexture( material.clearcoatRoughnessMap, 'clearcoatRoughness', new Color( material.clearcoatRoughness, material.clearcoatRoughness, material.clearcoatRoughness ) ) );
+
+		} else {
+
+			inputs.push( `${pad}float inputs:clearcoatRoughness = ${material.clearcoatRoughness}` );
+
+		}
+
 		inputs.push( `${ pad }float inputs:ior = ${ material.ior }` );
 
 	}

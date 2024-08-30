@@ -79,11 +79,11 @@ class WebGLTextureUtils {
 
 			glTextureType = gl.TEXTURE_CUBE_MAP;
 
-		} else if ( texture.isDataArrayTexture === true ) {
+		} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
 			glTextureType = gl.TEXTURE_2D_ARRAY;
 
-		} else if ( texture.isData3DTexture === true ) {
+		} else if ( texture.isData3DTexture === true ) { // TODO: isCompressed3DTexture, wait for #26642
 
 			glTextureType = gl.TEXTURE_3D;
 
@@ -245,6 +245,12 @@ class WebGLTextureUtils {
 
 		const { gl, extensions, backend } = this;
 
+
+		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
+
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_S, wrappingToGL[ texture.wrapS ] );
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_T, wrappingToGL[ texture.wrapT ] );
 
@@ -333,14 +339,9 @@ class WebGLTextureUtils {
 
 		backend.state.bindTexture( glTextureType, textureGPU );
 
-		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
-
 		this.setTextureParameters( glTextureType, texture );
 
-		if ( texture.isDataArrayTexture ) {
+		if ( texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
 
 			gl.texStorage3D( gl.TEXTURE_2D_ARRAY, levels, glInternalFormat, width, height, depth );
 
@@ -426,9 +427,12 @@ class WebGLTextureUtils {
 
 		this.backend.state.bindTexture( glTextureType, textureGPU );
 
+		this.setTextureParameters( glTextureType, texture );
+
 		if ( texture.isCompressedTexture ) {
 
 			const mipmaps = texture.mipmaps;
+			const image = options.image;
 
 			for ( let i = 0; i < mipmaps.length; i ++ ) {
 
@@ -436,7 +440,6 @@ class WebGLTextureUtils {
 
 				if ( texture.isCompressedArrayTexture ) {
 
-					const image = options.image;
 
 					if ( texture.format !== gl.RGBA ) {
 
@@ -472,6 +475,7 @@ class WebGLTextureUtils {
 				}
 
 			}
+
 
 		} else if ( texture.isCubeTexture ) {
 

@@ -167,7 +167,7 @@ class RenderList {
 
 		// update lights
 
-		this.lightsNode.fromLights( this.lightsArray );
+		this.lightsNode.setLights( this.lightsArray );
 
 		// Clear references from inactive renderItems in the list
 

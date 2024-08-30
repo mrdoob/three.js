@@ -1,6 +1,6 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { arrayBufferToBase64, base64ToArrayBuffer } from '../core/NodeUtils.js';
-import { addNodeElement, nodeProxy, float } from '../shadernode/ShaderNode.js';
+import { nodeProxy, float } from '../tsl/TSLBase.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 
@@ -161,8 +161,6 @@ class ScriptableValueNode extends Node {
 
 export default ScriptableValueNode;
 
-export const scriptableValue = nodeProxy( ScriptableValueNode );
+ScriptableValueNode.type = /*@__PURE__*/ registerNode( 'ScriptableValue', ScriptableValueNode );
 
-addNodeElement( 'scriptableValue', scriptableValue );
-
-addNodeClass( 'ScriptableValueNode', ScriptableValueNode );
+export const scriptableValue = /*@__PURE__*/ nodeProxy( ScriptableValueNode );

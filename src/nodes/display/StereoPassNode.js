@@ -1,4 +1,5 @@
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { registerNode } from '../core/Node.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 import PassNode from './PassNode.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { StereoCamera } from '../../cameras/StereoCamera.js';
@@ -72,6 +73,8 @@ class StereoPassNode extends PassNode {
 
 }
 
-export const stereoPass = ( scene, camera ) => nodeObject( new StereoPassNode( scene, camera ) );
-
 export default StereoPassNode;
+
+StereoPassNode.type = /*@__PURE__*/ registerNode( 'StereoPass', StereoPassNode );
+
+export const stereoPass = ( scene, camera ) => nodeObject( new StereoPassNode( scene, camera ) );

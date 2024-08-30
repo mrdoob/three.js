@@ -29,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, mul, positionLocal, smoothstep, texture, timerLocal, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
+			import { mix, mul, oneMinus, positionLocal, smoothstep, texture, timerLocal, rotateUV, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -87,7 +87,7 @@
 
 					const twistNoiseUv = vec2( 0.5, uv().y.mul( 0.2 ).sub( time.mul( 0.005 ) ).mod( 1 ) );
 					const twist = texture( noiseTexture, twistNoiseUv ).r.mul( 10 );
-					positionLocal.xz.assign( positionLocal.xz.rotateUV( twist, vec2( 0 ) ) );
+					positionLocal.xz.assign( rotateUV( positionLocal.xz, twist, vec2( 0 ) ) );
 
 					// wind
 
@@ -115,9 +115,9 @@
 
 						// edges fade
 						smoothstep( 0, 0.1, uv().x ),
-						smoothstep( 1, 0.9, uv().x ),
+						smoothstep( 0, 0.1, oneMinus( uv().x ) ),
 						smoothstep( 0, 0.1, uv().y ),
-						smoothstep( 1, 0.9, uv().y )
+						smoothstep( 0, 0.1, oneMinus( uv().y ) )
 
 					);
 

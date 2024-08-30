@@ -1,6 +1,6 @@
+import { registerNode } from '../core/Node.js';
 import UniformNode from '../core/UniformNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 
 class BufferNode extends UniformNode {
 
@@ -31,6 +31,6 @@ class BufferNode extends UniformNode {
 
 export default BufferNode;
 
-export const buffer = ( value, type, count ) => nodeObject( new BufferNode( value, type, count ) );
+BufferNode.type = /*@__PURE__*/ registerNode( 'Buffer', BufferNode );
 
-addNodeClass( 'BufferNode', BufferNode );
+export const buffer = ( value, type, count ) => nodeObject( new BufferNode( value, type, count ) );

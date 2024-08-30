@@ -1,9 +1,9 @@
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
-import { cameraViewMatrix, cameraProjectionMatrix } from '../accessors/CameraNode.js';
-import { positionLocal } from '../accessors/PositionNode.js';
-import { Fn, defined } from '../shadernode/ShaderNode.js';
+import { cameraViewMatrix, cameraProjectionMatrix } from '../accessors/Camera.js';
+import { positionLocal } from '../accessors/Position.js';
+import { Fn, defined } from '../tsl/TSLBase.js';
 
-export const billboarding = Fn( ( { position = null, horizontal = true, vertical = false } ) => {
+export const billboarding = /*@__PURE__*/ Fn( ( { position = null, horizontal = true, vertical = false } ) => {
 
 	let worldMatrix;
 

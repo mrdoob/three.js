@@ -1,7 +1,7 @@
+import { registerNode } from '../core/Node.js';
 import InputNode from '../core/InputNode.js';
-import { addNodeClass } from '../core/Node.js';
+import { nodeObject, addMethodChaining } from '../tsl/TSLCore.js';
 import { varying } from '../core/VaryingNode.js';
-import { nodeObject, addNodeElement } from '../shadernode/ShaderNode.js';
 
 import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribute.js';
 import { InterleavedBuffer } from '../../core/InterleavedBuffer.js';
@@ -151,12 +151,12 @@ class BufferAttributeNode extends InputNode {
 
 export default BufferAttributeNode;
 
+BufferAttributeNode.type = /*@__PURE__*/ registerNode( 'BufferAttribute', BufferAttributeNode );
+
 export const bufferAttribute = ( array, type, stride, offset ) => nodeObject( new BufferAttributeNode( array, type, stride, offset ) );
 export const dynamicBufferAttribute = ( array, type, stride, offset ) => bufferAttribute( array, type, stride, offset ).setUsage( DynamicDrawUsage );
 
 export const instancedBufferAttribute = ( array, type, stride, offset ) => bufferAttribute( array, type, stride, offset ).setInstanced( true );
 export const instancedDynamicBufferAttribute = ( array, type, stride, offset ) => dynamicBufferAttribute( array, type, stride, offset ).setInstanced( true );
 
-addNodeElement( 'toAttribute', ( bufferNode ) => bufferAttribute( bufferNode.value ) );
-
-addNodeClass( 'BufferAttributeNode', BufferAttributeNode );
+addMethodChaining( 'toAttribute', ( bufferNode ) => bufferAttribute( bufferNode.value ) );

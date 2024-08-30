@@ -10,6 +10,8 @@ npm-debug.log
 test/unit/build
 test/treeshake/index.bundle.js
 test/treeshake/index.bundle.min.js
+test/treeshake/index.webgpu.bundle.js
+test/treeshake/index.webgpu.bundle.min.js
 test/treeshake/index-src.bundle.min.js
 test/treeshake/stats.html
 test/e2e/chromium

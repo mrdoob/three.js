@@ -1,6 +1,6 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { addNodeElement, nodeObject } from '../shadernode/ShaderNode.js';
+import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
 class ComputeNode extends Node {
 
@@ -78,8 +78,8 @@ class ComputeNode extends Node {
 
 export default ComputeNode;
 
+ComputeNode.type = /*@__PURE__*/ registerNode( 'Compute', ComputeNode );
+
 export const compute = ( node, count, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
 
-addNodeElement( 'compute', compute );
-
-addNodeClass( 'ComputeNode', ComputeNode );
+addMethodChaining( 'compute', compute );

@@ -1,15 +1,15 @@
-import { MathNode, GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents } from '../../../nodes/Nodes.js';
+import { GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents } from '../../../nodes/Nodes.js';
 
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from '../../common/nodes/NodeSampledTexture.js';
 
-import { ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat, RedIntegerFormat, RGIntegerFormat, UnsignedByteType, UnsignedIntType, UnsignedShortType, RedFormat, RGFormat, IntType, RGBFormat, RGBAFormat, FloatType } from '../../../constants.js';
+import { NoColorSpace, ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat, RedIntegerFormat, RGIntegerFormat, UnsignedByteType, UnsignedIntType, UnsignedShortType, RedFormat, RGFormat, IntType, RGBFormat, RGBAFormat, FloatType } from '../../../constants.js';
 import { DataTexture } from '../../../textures/DataTexture.js';
 
 const glslMethods = {
-	[ MathNode.ATAN2 ]: 'atan',
+	atan2: 'atan',
 	textureDimensions: 'textureSize',
 	equals: 'equal'
 };
@@ -59,6 +59,12 @@ class GLSLNodeBuilder extends NodeBuilder {
 		this.instanceBindGroups = false;
 
 		this.useComparisonMethod = true;
+
+	}
+
+	needsColorSpaceToLinearSRGB( texture ) {
+
+		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
 
 	}
 
@@ -201,7 +207,7 @@ ${ flowData.code }
 		const nodeUniform = this.getUniformFromNode( attribute.pboNode, 'texture', this.shaderStage, this.context.label );
 		const textureName = this.getPropertyName( nodeUniform );
 
-		indexNode.increaseUsage( this ); // force cache generate to be used as index in x,y
+		this.increaseUsage( indexNode ); // force cache generate to be used as index in x,y
 		const indexSnippet = indexNode.build( this, 'uint' );
 
 		const elementNodeData = this.getDataFromNode( storageArrayElementNode );
@@ -387,7 +393,7 @@ ${ flowData.code }
 
 					snippet = `sampler2DShadow ${ uniform.name };`;
 
-				} else if ( texture.isDataArrayTexture === true ) {
+				} else if ( texture.isDataArrayTexture === true || texture.isCompressedArrayTexture === true ) {
 
 					snippet = `${typePrefix}sampler2DArray ${ uniform.name };`;
 
@@ -772,6 +778,8 @@ ${vars}
 	_getGLSLVertexCode( shaderData ) {
 
 		return `#version 300 es
+
+${ this.getSignature() }
 
 // extensions 
 ${shaderData.extensions}

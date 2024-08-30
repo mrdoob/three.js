@@ -1,6 +1,6 @@
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 
 class PosterizeNode extends TempNode {
 
@@ -25,8 +25,6 @@ class PosterizeNode extends TempNode {
 
 export default PosterizeNode;
 
-export const posterize = nodeProxy( PosterizeNode );
+PosterizeNode.type = /*@__PURE__*/ registerNode( 'Posterize', PosterizeNode );
 
-addNodeElement( 'posterize', posterize );
-
-addNodeClass( 'PosterizeNode', PosterizeNode );
+export const posterize = /*@__PURE__*/ nodeProxy( PosterizeNode );

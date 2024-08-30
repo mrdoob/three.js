@@ -1,13 +1,13 @@
-import Node, { addNodeClass } from '../core/Node.js';
+import Node, { registerNode } from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { float, nodeProxy, Fn } from '../shadernode/ShaderNode.js';
+import { float, nodeProxy, Fn } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 import { reference } from './ReferenceNode.js';
-import { positionLocal } from './PositionNode.js';
-import { normalLocal } from './NormalNode.js';
+import { positionLocal } from './Position.js';
+import { normalLocal } from './Normal.js';
 import { textureLoad } from './TextureNode.js';
 import { instanceIndex, vertexIndex } from '../core/IndexNode.js';
-import { ivec2, int } from '../shadernode/ShaderNode.js';
+import { ivec2, int } from '../tsl/TSLBase.js';
 import { Loop } from '../utils/LoopNode.js';
 
 import { DataArrayTexture } from '../../textures/DataArrayTexture.js';
@@ -15,10 +15,10 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { FloatType } from '../../constants.js';
 
-const _morphTextures = new WeakMap();
+const _morphTextures = /*@__PURE__*/ new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
 
-const getMorph = Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
+const getMorph = /*@__PURE__*/ Fn( ( { bufferMap, influence, stride, width, depth, offset } ) => {
 
 	const texelIndex = int( vertexIndex ).mul( stride ).add( offset );
 
@@ -254,6 +254,6 @@ class MorphNode extends Node {
 
 export default MorphNode;
 
-export const morphReference = nodeProxy( MorphNode );
+MorphNode.type = /*@__PURE__*/ registerNode( 'Morph', MorphNode );
 
-addNodeClass( 'MorphNode', MorphNode );
+export const morphReference = /*@__PURE__*/ nodeProxy( MorphNode );

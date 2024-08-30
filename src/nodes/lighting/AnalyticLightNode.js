@@ -1,17 +1,17 @@
+import { registerNode } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
-import { addNodeClass } from '../core/Node.js';
-import { float, If, int, vec2, vec3, vec4 } from '../shadernode/ShaderNode.js';
+import { float, vec2, vec3, vec4, If, int, Fn } from '../tsl/TSLBase.js';
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
-import { positionWorld } from '../accessors/PositionNode.js';
-import { normalWorld } from '../accessors/NormalNode.js';
+import { positionWorld } from '../accessors/Position.js';
+import { normalWorld } from '../accessors/Normal.js';
 import { mix, fract, step, max, clamp, sqrt } from '../math/MathNode.js';
 import { add, sub } from '../math/OperatorNode.js';
 import { Color } from '../../math/Color.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { Fn } from '../shadernode/ShaderNode.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
 import { viewportCoordinate } from '../display/ViewportNode.js';
@@ -198,7 +198,7 @@ const _shadowFilterLib = [ BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMSh
 
 //
 
-let _overrideMaterial = null;
+const _overrideMaterial = null;
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 class AnalyticLightNode extends LightingNode {
@@ -252,7 +252,7 @@ class AnalyticLightNode extends LightingNode {
 
 			if ( _overrideMaterial === null ) {
 
-				_overrideMaterial = builder.createNodeMaterial();
+				_overrideMaterial = new NodeMaterial();
 				_overrideMaterial.fragmentNode = vec4( 0, 0, 0, 1 );
 				_overrideMaterial.isShadowNodeMaterial = true; // Use to avoid other overrideMaterial override material.fragmentNode unintentionally when using material.shadowNode
 				_overrideMaterial.name = 'ShadowMaterial';
@@ -511,4 +511,4 @@ class AnalyticLightNode extends LightingNode {
 
 export default AnalyticLightNode;
 
-addNodeClass( 'AnalyticLightNode', AnalyticLightNode );
+AnalyticLightNode.type = /*@__PURE__*/ registerNode( 'AnalyticLight', AnalyticLightNode );

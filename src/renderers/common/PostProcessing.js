@@ -1,4 +1,5 @@
-import { vec4, renderOutput, NodeMaterial } from '../../nodes/Nodes.js';
+import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
+import { vec4, renderOutput } from '../../nodes/TSL.js';
 import { LinearSRGBColorSpace, NoToneMapping } from '../../constants.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 

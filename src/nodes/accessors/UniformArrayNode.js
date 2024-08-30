@@ -1,5 +1,5 @@
-import { addNodeClass } from '../core/Node.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { registerNode } from '../core/Node.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { getValueType } from '../core/NodeUtils.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
@@ -141,9 +141,9 @@ class UniformArrayNode extends BufferNode {
 
 export default UniformArrayNode;
 
-export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
+UniformArrayNode.type = /*@__PURE__*/ registerNode( 'UniformArray', UniformArrayNode );
 
-addNodeClass( 'UniformArrayNode', UniformArrayNode );
+export const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
 
 //
 

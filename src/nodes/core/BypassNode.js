@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from './Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import Node, { registerNode } from './Node.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class BypassNode extends Node {
 
@@ -38,8 +38,8 @@ class BypassNode extends Node {
 
 export default BypassNode;
 
-export const bypass = nodeProxy( BypassNode );
+BypassNode.type = /*@__PURE__*/ registerNode( 'Bypass', BypassNode );
 
-addNodeElement( 'bypass', bypass );
+export const bypass = /*@__PURE__*/ nodeProxy( BypassNode );
 
-addNodeClass( 'BypassNode', BypassNode );
+addMethodChaining( 'bypass', bypass );

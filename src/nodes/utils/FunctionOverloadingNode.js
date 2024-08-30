@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from '../core/Node.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import Node, { registerNode } from '../core/Node.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 
 class FunctionOverloadingNode extends Node {
 
@@ -90,8 +90,8 @@ class FunctionOverloadingNode extends Node {
 
 export default FunctionOverloadingNode;
 
-const overloadingBaseFn = nodeProxy( FunctionOverloadingNode );
+FunctionOverloadingNode.type = /*@__PURE__*/ registerNode( 'FunctionOverloading', FunctionOverloadingNode );
+
+const overloadingBaseFn = /*@__PURE__*/ nodeProxy( FunctionOverloadingNode );
 
 export const overloadingFn = ( functionNodes ) => ( ...params ) => overloadingBaseFn( functionNodes, ...params );
-
-addNodeClass( 'FunctionOverloadingNode', FunctionOverloadingNode );

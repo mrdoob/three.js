@@ -1,5 +1,6 @@
+import { registerNode } from '../core/Node.js';
 import TextureNode from '../accessors/TextureNode.js';
-import { nodeObject } from '../shadernode/ShaderNode.js';
+import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { viewportUV } from '../display/ViewportNode.js';
 
@@ -236,3 +237,4 @@ export const reflector = ( parameters ) => nodeObject( new ReflectorNode( parame
 
 export default ReflectorNode;
 
+ReflectorNode.type = /*@__PURE__*/ registerNode( 'Reflector', ReflectorNode );

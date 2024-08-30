@@ -1,6 +1,6 @@
-import Node, { addNodeClass } from './Node.js';
+import Node, { registerNode } from './Node.js';
 import StructTypeNode from './StructTypeNode.js';
-import { nodeProxy } from '../shadernode/ShaderNode.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 
 class OutputStructNode extends Node {
 
@@ -54,6 +54,6 @@ class OutputStructNode extends Node {
 
 export default OutputStructNode;
 
-export const outputStruct = nodeProxy( OutputStructNode );
+OutputStructNode.type = /*@__PURE__*/ registerNode( 'OutputStruct', OutputStructNode );
 
-addNodeClass( 'OutputStructNode', OutputStructNode );
+export const outputStruct = /*@__PURE__*/ nodeProxy( OutputStructNode );

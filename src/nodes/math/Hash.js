@@ -1,6 +1,6 @@
-import { Fn, addNodeElement } from '../shadernode/ShaderNode.js';
+import { Fn } from '../tsl/TSLBase.js';
 
-export const hash = Fn( ( [ seed ] ) => {
+export const hash = /*@__PURE__*/ Fn( ( [ seed ] ) => {
 
 	// Taken from https://www.shadertoy.com/view/XlGcRh, originally from pcg-random.org
 
@@ -11,5 +11,3 @@ export const hash = Fn( ( [ seed ] ) => {
 	return result.toFloat().mul( 1 / 2 ** 32 ); // Convert to range [0, 1)
 
 } );
-
-addNodeElement( 'hash', hash );

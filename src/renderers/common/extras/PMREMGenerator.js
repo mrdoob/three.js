@@ -1,12 +1,12 @@
-import NodeMaterial from '../../../nodes/materials/NodeMaterial.js';
+import NodeMaterial from '../../../materials/nodes/NodeMaterial.js';
 import { getDirection, blur } from '../../../nodes/pmrem/PMREMUtils.js';
 import { equirectUV } from '../../../nodes/utils/EquirectUVNode.js';
 import { uniform } from '../../../nodes/core/UniformNode.js';
 import { uniformArray } from '../../../nodes/accessors/UniformArrayNode.js';
 import { texture } from '../../../nodes/accessors/TextureNode.js';
 import { cubeTexture } from '../../../nodes/accessors/CubeTextureNode.js';
-import { float, vec3 } from '../../../nodes/shadernode/ShaderNode.js';
-import { uv } from '../../../nodes/accessors/UVNode.js';
+import { float, vec3 } from '../../../nodes/tsl/TSLBase.js';
+import { uv } from '../../../nodes/accessors/UV.js';
 import { attribute } from '../../../nodes/core/AttributeNode.js';
 
 import { OrthographicCamera } from '../../../cameras/OrthographicCamera.js';
@@ -698,10 +698,8 @@ function _createRenderTarget( width, height, params ) {
 
 function _setViewport( target, x, y, width, height ) {
 
-	const viewY = target.height - height - y;
-
-	target.viewport.set( x, viewY, width, height );
-	target.scissor.set( x, viewY, width, height );
+	target.viewport.set( x, y, width, height );
+	target.scissor.set( x, y, width, height );
 
 }
 

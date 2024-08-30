@@ -1,5 +1,5 @@
-import Node, { addNodeClass } from './Node.js';
-import { addNodeElement, nodeProxy } from '../shadernode/ShaderNode.js';
+import Node, { registerNode } from './Node.js';
+import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class VarNode extends Node {
 
@@ -48,9 +48,9 @@ class VarNode extends Node {
 
 export default VarNode;
 
-export const temp = nodeProxy( VarNode );
+VarNode.type = /*@__PURE__*/ registerNode( 'Var', VarNode );
 
-addNodeElement( 'temp', temp ); // @TODO: Will be removed in the future
-addNodeElement( 'toVar', ( ...params ) => temp( ...params ).append() );
+export const temp = /*@__PURE__*/ nodeProxy( VarNode );
 
-addNodeClass( 'VarNode', VarNode );
+addMethodChaining( 'temp', temp ); // @TODO: Will be removed in the future
+addMethodChaining( 'toVar', ( ...params ) => temp( ...params ).append() );

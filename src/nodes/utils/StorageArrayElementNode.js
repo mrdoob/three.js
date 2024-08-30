@@ -1,5 +1,5 @@
-import { addNodeClass } from '../core/Node.js';
-import { nodeProxy, addNodeElement } from '../shadernode/ShaderNode.js';
+import { registerNode } from '../core/Node.js';
+import { nodeProxy } from '../tsl/TSLBase.js';
 import ArrayElementNode from './ArrayElementNode.js';
 
 class StorageArrayElementNode extends ArrayElementNode {
@@ -84,8 +84,6 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 export default StorageArrayElementNode;
 
-export const storageElement = nodeProxy( StorageArrayElementNode );
+StorageArrayElementNode.type = /*@__PURE__*/ registerNode( 'StorageArrayElement', StorageArrayElementNode );
 
-addNodeElement( 'storageElement', storageElement );
-
-addNodeClass( 'StorageArrayElementNode', StorageArrayElementNode );
+export const storageElement = /*@__PURE__*/ nodeProxy( StorageArrayElementNode );

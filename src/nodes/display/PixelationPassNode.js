@@ -1,6 +1,7 @@
+import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
-import { uv } from '../accessors/UVNode.js';
-import { addNodeElement, Fn, nodeObject, vec2, vec3, float, If } from '../shadernode/ShaderNode.js';
+import { uv } from '../accessors/UV.js';
+import { Fn, nodeObject, vec2, vec3, float, If } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { dot, clamp, smoothstep, sign, step, floor } from '../math/MathNode.js';
@@ -8,7 +9,9 @@ import { Vector4 } from '../../math/Vector4.js';
 import { output, property } from '../core/PropertyNode.js';
 import PassNode from './PassNode.js';
 import { mrt } from '../core/MRTNode.js';
-import { normalView } from '../accessors/NormalNode.js';
+import { normalView } from '../accessors/Normal.js';
+import { convertToTexture } from '../utils/RTTNode.js';
+
 import { NearestFilter } from '../../constants.js';
 
 class PixelationNode extends TempNode {
@@ -150,9 +153,9 @@ class PixelationNode extends TempNode {
 
 }
 
-const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( nodeObject( node ).toTexture(), nodeObject( depthNode ).toTexture(), nodeObject( normalNode ).toTexture(), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
+PixelationNode.type = /*@__PURE__*/ registerNode( 'Pixelation', PixelationNode );
 
-addNodeElement( 'pixelation', pixelation );
+const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( convertToTexture( node ), convertToTexture( depthNode ), convertToTexture( normalNode ), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
 
 class PixelationPassNode extends PassNode {
 
@@ -199,3 +202,5 @@ class PixelationPassNode extends PassNode {
 export const pixelationPass = ( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) => nodeObject( new PixelationPassNode( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) );
 
 export default PixelationPassNode;
+
+PixelationPassNode.type = /*@__PURE__*/ registerNode( 'PixelationPass', PixelationPassNode );

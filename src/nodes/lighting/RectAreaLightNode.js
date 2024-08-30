@@ -1,11 +1,9 @@
+import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
-import { addLightNode } from './LightsNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { objectViewPosition } from '../accessors/Object3DNode.js';
-import { addNodeClass } from '../core/Node.js';
 
-import { RectAreaLight } from '../../lights/RectAreaLight.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector3 } from '../../math/Vector3.js';
 
@@ -92,6 +90,4 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 export default RectAreaLightNode;
 
-addNodeClass( 'RectAreaLightNode', RectAreaLightNode );
-
-addLightNode( RectAreaLight, RectAreaLightNode );
+RectAreaLightNode.type = /*@__PURE__*/ registerNode( 'RectAreaLight', RectAreaLightNode );
