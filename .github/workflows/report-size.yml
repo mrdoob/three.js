@@ -205,7 +205,7 @@ jobs:
             || Filesize `${{ github.ref_name }}` | Filesize PR | Diff |
             |---|:-:|:-:|:-:|
             | three.module | ${{ steps.format.outputs.WEBGL_FILESIZE_BASE }} <br> **${{ steps.format.outputs.WEBGL_FILESIZE_BASE_GZIP }}** | ${{ steps.format.outputs.WEBGL_FILESIZE }} <br> **${{ steps.format.outputs.WEBGL_FILESIZE_GZIP }}** | ${{ steps.format.outputs.WEBGL_FILESIZE_DIFF }} <br> **${{ steps.format.outputs.WEBGL_FILESIZE_DIFF_GZIP }}** |
-            | WebGPURenderer | ${{ steps.format.outputs.WEBGPU_FILESIZE_BASE }} <br> **${{ steps.format.outputs.WEBGPU_FILESIZE_BASE_GZIP }}** | ${{ steps.format.outputs.WEBGPU_FILESIZE }} <br> **${{ steps.format.outputs.WEBGPU_FILESIZE_GZIP }}** | ${{ steps.format.outputs.WEBGPU_FILESIZE_DIFF }} <br> **${{ steps.format.outputs.WEBGPU_FILESIZE_DIFF_GZIP }}** |
+            | three.webgpu | ${{ steps.format.outputs.WEBGPU_FILESIZE_BASE }} <br> **${{ steps.format.outputs.WEBGPU_FILESIZE_BASE_GZIP }}** | ${{ steps.format.outputs.WEBGPU_FILESIZE }} <br> **${{ steps.format.outputs.WEBGPU_FILESIZE_GZIP }}** | ${{ steps.format.outputs.WEBGPU_FILESIZE_DIFF }} <br> **${{ steps.format.outputs.WEBGPU_FILESIZE_DIFF_GZIP }}** |
 
             ### 🌳 Bundle size after tree-shaking
 
