@@ -198,7 +198,7 @@ const _shadowFilterLib = [ BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMSh
 
 //
 
-const _overrideMaterial = null;
+let _overrideMaterial = null;
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 class AnalyticLightNode extends LightingNode {
@@ -286,11 +286,11 @@ class AnalyticLightNode extends LightingNode {
 				const radius = reference( 'radius', 'float', shadow );
 				const resolution = reference( 'mapSize', 'vec2', shadow );
 
-				let material = this.vsmMaterialVertical || ( this.vsmMaterialVertical = builder.createNodeMaterial() );
+				let material = this.vsmMaterialVertical || ( this.vsmMaterialVertical = new NodeMaterial() );
 				material.fragmentNode = VSMPassVertical( { samples, radius, resolution, shadowPass: shadowPassVertical } ).context( builder.getSharedContext() );
 				material.name = 'VSMVertical';
 
-				material = this.vsmMaterialHorizontal || ( this.vsmMaterialHorizontal = builder.createNodeMaterial() );
+				material = this.vsmMaterialHorizontal || ( this.vsmMaterialHorizontal = new NodeMaterial() );
 				material.fragmentNode = VSMPassHorizontal( { samples, radius, resolution, shadowPass: shadowPassHorizontal } ).context( builder.getSharedContext() );
 				material.name = 'VSMHorizontal';
 
