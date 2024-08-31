@@ -127,7 +127,6 @@ const exceptionList = [
 	// WebGPURenderer: Unknown problem
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_clipping',
-	'webgpu_lights_custom', // could this be because of jpg compression?
 	'webgpu_loader_materialx',
 	'webgpu_materials_video',
 	'webgpu_materialx_noise',
