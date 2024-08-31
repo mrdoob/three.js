@@ -345,6 +345,7 @@
 		"webgpu_loader_gltf_transmission",
 		"webgpu_loader_materialx",
 		"webgpu_materials",
+		"webgpu_materials_arrays",
 		"webgpu_materials_basic",
 		"webgpu_materials_displacementmap",
 		"webgpu_materials_envmaps",
@@ -426,8 +427,7 @@
 		"webgpu_video_panorama",
 		"webgpu_volume_cloud",
 		"webgpu_volume_perlin",
-		"webgpu_water",
-		"webgpu_material_arrays"
+		"webgpu_water"
 	],
 	"webaudio": [
 		"webaudio_orientation",
