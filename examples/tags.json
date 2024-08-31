@@ -144,5 +144,6 @@
 	"webgpu_rtt": [ "renderTarget", "texture" ],
 	"webgpu_sky": [ "sun" ],
 	"webgpu_tsl_compute_attractors_particles": [ "gpgpu" ],
-	"webgpu_ocean": [ "water" ]
+	"webgpu_ocean": [ "water" ],
+	"webgpu_material_arrays": [ "webgpu",  "materials", "material", "geometry", "array" ]
 }
