@@ -36,7 +36,7 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	} else {
 
-		node = normalViewVarying || ( normalViewVarying = varying( modelNormalMatrix.mul( normalLocal ), 'v_normalView' ).normalize() );
+		node = normalViewVarying || ( normalViewVarying = varying( modelNormalMatrix.mul( normalLocal ).normalize(), 'v_normalView' ).normalize() );
 
 	}
 
@@ -44,7 +44,7 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 }, 'vec3' ).once() )().toVar( 'normalView' );
 
-export const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
+export const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ).normalize(), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
 
 export const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
