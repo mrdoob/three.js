@@ -346,7 +346,6 @@
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/en/geometries/ParametricGeometry",
-				"SDFGeometryGenerator": "examples/en/geometries/SDFGeometryGenerator",
 				"TeapotGeometry": "examples/en/geometries/TeapotGeometry",
 				"TextGeometry": "examples/en/geometries/TextGeometry"
 			},
@@ -1100,8 +1099,7 @@
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/zh/geometries/ParametricGeometry",
 				"TeapotGeometry": "examples/zh/geometries/TeapotGeometry",
-				"TextGeometry": "examples/zh/geometries/TextGeometry",
-				"SDFGeometryGenerator": "examples/zh/geometries/SDFGeometryGenerator"
+				"TextGeometry": "examples/zh/geometries/TextGeometry"
 			},
 
 			"辅助对象": {
