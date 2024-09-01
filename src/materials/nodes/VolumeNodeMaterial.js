@@ -1,4 +1,4 @@
-import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
+import NodeMaterial from './NodeMaterial.js';
 import { property } from '../../nodes/core/PropertyNode.js';
 import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
 import { modelWorldMatrixInverse } from '../../nodes/accessors/ModelNode.js';
@@ -10,6 +10,12 @@ import { Loop, Break } from '../../nodes/utils/LoopNode.js';
 import { texture3D } from '../../nodes/accessors/Texture3DNode.js';
 
 class VolumeNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'VolumeNodeMaterial';
+
+	}
 
 	constructor( params = {} ) {
 
@@ -100,5 +106,3 @@ class VolumeNodeMaterial extends NodeMaterial {
 }
 
 export default VolumeNodeMaterial;
-
-VolumeNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Volume', VolumeNodeMaterial );

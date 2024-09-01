@@ -10,6 +10,7 @@ class NodeObjectLoader extends ObjectLoader {
 		super( manager );
 
 		this.nodes = {};
+		this.nodeMaterials = {};
 
 		this._nodesJSON = null;
 
@@ -18,6 +19,13 @@ class NodeObjectLoader extends ObjectLoader {
 	setNodes( value ) {
 
 		this.nodes = value;
+		return this;
+
+	}
+
+	setNodeMaterials( value ) {
+
+		this.nodeMaterials = value;
 		return this;
 
 	}
@@ -61,6 +69,7 @@ class NodeObjectLoader extends ObjectLoader {
 			const loader = new NodeMaterialLoader();
 			loader.setTextures( textures );
 			loader.setNodes( nodes );
+			loader.setNodeMaterials( this.nodeMaterials );
 
 			for ( let i = 0, l = json.length; i < l; i ++ ) {
 

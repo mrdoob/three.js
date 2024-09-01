@@ -3,7 +3,6 @@ import PhysicalLightingModel from '../../nodes/functions/PhysicalLightingModel.j
 import { transformedNormalView } from '../../nodes/accessors/Normal.js';
 import { positionViewDirection } from '../../nodes/accessors/Position.js';
 import { float, vec3 } from '../../nodes/tsl/TSLBase.js';
-import { registerNodeMaterial } from './NodeMaterial.js';
 
 class SSSLightingModel extends PhysicalLightingModel {
 
@@ -38,6 +37,12 @@ class SSSLightingModel extends PhysicalLightingModel {
 }
 
 class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
+
+	static get type() {
+
+		return 'MeshSSSNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -80,5 +85,3 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 }
 
 export default MeshSSSNodeMaterial;
-
-MeshSSSNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshSSS', MeshSSSNodeMaterial );
