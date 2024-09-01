@@ -100,3 +100,5 @@ class VolumeNodeMaterial extends NodeMaterial {
 }
 
 export default VolumeNodeMaterial;
+
+VolumeNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Volume', VolumeNodeMaterial );
