@@ -41399,7 +41399,7 @@ const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	} else {
 
-		node = normalViewVarying || ( normalViewVarying = varying( modelNormalMatrix.mul( normalLocal ), 'v_normalView' ).normalize() );
+		node = normalViewVarying || ( normalViewVarying = varying( modelNormalMatrix.mul( normalLocal ).normalize(), 'v_normalView' ).normalize() );
 
 	}
 
@@ -41407,7 +41407,7 @@ const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 }, 'vec3' ).once() )().toVar( 'normalView' );
 
-const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
+const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ).normalize(), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
 
 const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
@@ -64373,20 +64373,20 @@ class Renderer {
 
 	_renderBundle( bundle, sceneRef, lightsNode ) {
 
-		const { object, camera, renderList } = bundle;
+		const { bundleGroup, camera, renderList } = bundle;
 
 		const renderContext = this._currentRenderContext;
 
 		//
 
-		const renderBundle = this._bundles.get( object, camera );
+		const renderBundle = this._bundles.get( bundleGroup, camera );
 		const renderBundleData = this.backend.get( renderBundle );
 
 		if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = new Set();
 
 		//
 
-		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || object.needsUpdate === true;
+		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || bundleGroup.needsUpdate === true;
 
 		renderBundleData.renderContexts.add( renderContext );
 
@@ -64394,7 +64394,7 @@ class Renderer {
 
 			this.backend.beginBundle( renderContext );
 
-			if ( renderBundleData.renderObjects === undefined || object.needsUpdate === true ) {
+			if ( renderBundleData.renderObjects === undefined || bundleGroup.needsUpdate === true ) {
 
 				renderBundleData.renderObjects = [];
 
@@ -64412,7 +64412,7 @@ class Renderer {
 
 			this.backend.finishBundle( renderContext, renderBundle );
 
-			object.needsUpdate = false;
+			bundleGroup.needsUpdate = false;
 
 		} else {
 
@@ -65326,7 +65326,7 @@ class Renderer {
 
 		}
 
-		if ( object.static === true && this.backend.beginBundle !== undefined ) {
+		if ( object.isBundleGroup === true && this.backend.beginBundle !== undefined ) {
 
 			const baseRenderList = renderList;
 
@@ -65336,7 +65336,7 @@ class Renderer {
 			renderList.begin();
 
 			baseRenderList.pushBundle( {
-				object,
+				bundleGroup: object,
 				camera,
 				renderList,
 			} );
@@ -65536,7 +65536,8 @@ class Renderer {
 	_renderObjectDirect( object, material, scene, camera, lightsNode, group, passId ) {
 
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
-		renderObject.drawRange = group || object.geometry.drawRange;
+		renderObject.drawRange = object.geometry.drawRange;
+		renderObject.group = group;
 
 		//
 
@@ -70367,7 +70368,6 @@ class WebGLBackend extends Backend {
 
 		const geometry = renderObject.geometry;
 		const drawRange = renderObject.drawRange;
-		const firstVertex = drawRange.start;
 
 		//
 
@@ -70399,6 +70399,7 @@ class WebGLBackend extends Backend {
 		}
 
 		//
+		let rangeFactor = 1;
 
 		const renderer = this.bufferRenderer;
 
@@ -70413,6 +70414,8 @@ class WebGLBackend extends Backend {
 				state.setLineWidth( material.wireframeLinewidth * this.renderer.getPixelRatio() );
 				renderer.mode = gl.LINES;
 
+				rangeFactor = 2;
+
 			} else {
 
 				renderer.mode = gl.TRIANGLES;
@@ -70423,28 +70426,51 @@ class WebGLBackend extends Backend {
 
 		//
 
+		const group = renderObject.group;
 
-		let count;
 
 		renderer.object = object;
+
+
+		let firstVertex = drawRange.start * rangeFactor;
+		let lastVertex = ( drawRange.start + drawRange.count ) * rangeFactor;
+
+		if ( group !== null ) {
+
+			firstVertex = Math.max( firstVertex, group.start * rangeFactor );
+			lastVertex = Math.min( lastVertex, ( group.start + group.count ) * rangeFactor );
+
+		}
 
 		if ( index !== null ) {
 
 			const indexData = this.get( index );
-			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
+			const indexCount = index.count;
 
 			renderer.index = index.count;
 			renderer.type = indexData.type;
 
-			count = indexCount;
+			firstVertex = Math.max( firstVertex, 0 );
+			lastVertex = Math.min( lastVertex, indexCount );
 
 		} else {
 
 			renderer.index = 0;
 
-			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : geometry.attributes.position.count;
+			const vertexCount = geometry.attributes.position.count;
 
-			count = vertexCount;
+			firstVertex = Math.max( firstVertex, 0 );
+			lastVertex = Math.min( lastVertex, vertexCount );
+
+		}
+
+		const count = lastVertex - firstVertex;
+
+		if ( count < 0 || count === Infinity ) return;
+
+		if ( index !== null ) {
+
+			firstVertex *= index.array.BYTES_PER_ELEMENT;
 
 		}
 
@@ -76576,7 +76602,7 @@ class WebGPUBackend extends Backend {
 
 	draw( renderObject, info ) {
 
-		const { object, geometry, context, pipeline } = renderObject;
+		const { object, material, geometry, context, pipeline, group } = renderObject;
 		const bindings = renderObject.getBindings();
 		const renderContextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
@@ -76677,7 +76703,26 @@ class WebGPUBackend extends Backend {
 		// draw
 
 		const drawRange = renderObject.drawRange;
-		const firstVertex = drawRange.start;
+
+		let rangeFactor = 1;
+
+		if ( material.wireframe === true && ! object.isPoints && ! object.isLineSegments && ! object.isLine && ! object.isLineLoop ) {
+
+			rangeFactor = 2;
+
+		}
+
+		let firstVertex = drawRange.start * rangeFactor;
+		let lastVertex = ( drawRange.start + drawRange.count ) * rangeFactor;
+
+		if ( group !== null ) {
+
+			firstVertex = Math.max( firstVertex, group.start * rangeFactor );
+			lastVertex = Math.min( lastVertex, ( group.start + group.count ) * rangeFactor );
+
+		}
+
+
 
 		const instanceCount = this.getInstanceCount( renderObject );
 		if ( instanceCount === 0 ) return;
@@ -76702,18 +76747,32 @@ class WebGPUBackend extends Backend {
 
 		} else if ( hasIndex === true ) {
 
-			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
+			const indexCount = index.count;
 
-			passEncoderGPU.drawIndexed( indexCount, instanceCount, firstVertex, 0, 0 );
+			firstVertex = Math.max( firstVertex, 0 );
+			lastVertex = Math.min( lastVertex, indexCount );
+
+			const count = lastVertex - firstVertex;
+
+			if ( count < 0 || count === Infinity ) return;
+
+			passEncoderGPU.drawIndexed( count, instanceCount, firstVertex, 0, 0 );
 
 			info.update( object, indexCount, instanceCount );
 
 		} else {
 
 			const positionAttribute = geometry.attributes.position;
-			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
+			const vertexCount = positionAttribute.count;
 
-			passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+			firstVertex = Math.max( firstVertex, 0 );
+			lastVertex = Math.min( lastVertex, vertexCount );
+
+			const count = lastVertex - firstVertex;
+
+			if ( count < 0 || count === Infinity ) return;
+
+			passEncoderGPU.draw( count, instanceCount, firstVertex, 0 );
 
 			info.update( object, vertexCount, instanceCount );
 

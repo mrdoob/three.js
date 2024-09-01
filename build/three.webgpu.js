@@ -41399,7 +41399,7 @@ const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	} else {
 
-		node = normalViewVarying || ( normalViewVarying = varying( modelNormalMatrix.mul( normalLocal ), 'v_normalView' ).normalize() );
+		node = normalViewVarying || ( normalViewVarying = varying( modelNormalMatrix.mul( normalLocal ).normalize(), 'v_normalView' ).normalize() );
 
 	}
 
@@ -41407,7 +41407,7 @@ const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 }, 'vec3' ).once() )().toVar( 'normalView' );
 
-const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
+const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ).normalize(), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
 
 const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
@@ -64373,20 +64373,20 @@ class Renderer {
 
 	_renderBundle( bundle, sceneRef, lightsNode ) {
 
-		const { object, camera, renderList } = bundle;
+		const { bundleGroup, camera, renderList } = bundle;
 
 		const renderContext = this._currentRenderContext;
 
 		//
 
-		const renderBundle = this._bundles.get( object, camera );
+		const renderBundle = this._bundles.get( bundleGroup, camera );
 		const renderBundleData = this.backend.get( renderBundle );
 
 		if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = new Set();
 
 		//
 
-		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || object.needsUpdate === true;
+		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || bundleGroup.needsUpdate === true;
 
 		renderBundleData.renderContexts.add( renderContext );
 
@@ -64394,7 +64394,7 @@ class Renderer {
 
 			this.backend.beginBundle( renderContext );
 
-			if ( renderBundleData.renderObjects === undefined || object.needsUpdate === true ) {
+			if ( renderBundleData.renderObjects === undefined || bundleGroup.needsUpdate === true ) {
 
 				renderBundleData.renderObjects = [];
 
@@ -64412,7 +64412,7 @@ class Renderer {
 
 			this.backend.finishBundle( renderContext, renderBundle );
 
-			object.needsUpdate = false;
+			bundleGroup.needsUpdate = false;
 
 		} else {
 
@@ -65326,7 +65326,7 @@ class Renderer {
 
 		}
 
-		if ( object.static === true && this.backend.beginBundle !== undefined ) {
+		if ( object.isBundleGroup === true && this.backend.beginBundle !== undefined ) {
 
 			const baseRenderList = renderList;
 
@@ -65336,7 +65336,7 @@ class Renderer {
 			renderList.begin();
 
 			baseRenderList.pushBundle( {
-				object,
+				bundleGroup: object,
 				camera,
 				renderList,
 			} );
@@ -65536,7 +65536,8 @@ class Renderer {
 	_renderObjectDirect( object, material, scene, camera, lightsNode, group, passId ) {
 
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
-		renderObject.drawRange = group || object.geometry.drawRange;
+		renderObject.drawRange = object.geometry.drawRange;
+		renderObject.group = group;
 
 		//
 
@@ -70367,7 +70368,6 @@ class WebGLBackend extends Backend {
 
 		const geometry = renderObject.geometry;
 		const drawRange = renderObject.drawRange;
-		const firstVertex = drawRange.start;
 
 		//
 
@@ -70399,6 +70399,7 @@ class WebGLBackend extends Backend {
 		}
 
 		//
+		let rangeFactor = 1;
 
 		const renderer = this.bufferRenderer;
 
@@ -70413,6 +70414,8 @@ class WebGLBackend extends Backend {
 				state.setLineWidth( material.wireframeLinewidth * this.renderer.getPixelRatio() );
 				renderer.mode = gl.LINES;
 
+				rangeFactor = 2;
+
 			} else {
 
 				renderer.mode = gl.TRIANGLES;
@@ -70423,28 +70426,51 @@ class WebGLBackend extends Backend {
 
 		//
 
+		const group = renderObject.group;
 
-		let count;
 
 		renderer.object = object;
+
+
+		let firstVertex = drawRange.start * rangeFactor;
+		let lastVertex = ( drawRange.start + drawRange.count ) * rangeFactor;
+
+		if ( group !== null ) {
+
+			firstVertex = Math.max( firstVertex, group.start * rangeFactor );
+			lastVertex = Math.min( lastVertex, ( group.start + group.count ) * rangeFactor );
+
+		}
 
 		if ( index !== null ) {
 
 			const indexData = this.get( index );
-			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
+			const indexCount = index.count;
 
 			renderer.index = index.count;
 			renderer.type = indexData.type;
 
-			count = indexCount;
+			firstVertex = Math.max( firstVertex, 0 );
+			lastVertex = Math.min( lastVertex, indexCount );
 
 		} else {
 
 			renderer.index = 0;
 
-			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : geometry.attributes.position.count;
+			const vertexCount = geometry.attributes.position.count;
 
-			count = vertexCount;
+			firstVertex = Math.max( firstVertex, 0 );
+			lastVertex = Math.min( lastVertex, vertexCount );
+
+		}
+
+		const count = lastVertex - firstVertex;
+
+		if ( count < 0 || count === Infinity ) return;
+
+		if ( index !== null ) {
+
+			firstVertex *= index.array.BYTES_PER_ELEMENT;
 
 		}
 
@@ -76576,7 +76602,7 @@ class WebGPUBackend extends Backend {
 
 	draw( renderObject, info ) {
 
-		const { object, geometry, context, pipeline } = renderObject;
+		const { object, material, geometry, context, pipeline, group } = renderObject;
 		const bindings = renderObject.getBindings();
 		const renderContextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
@@ -76677,7 +76703,26 @@ class WebGPUBackend extends Backend {
 		// draw
 
 		const drawRange = renderObject.drawRange;
-		const firstVertex = drawRange.start;
+
+		let rangeFactor = 1;
+
+		if ( material.wireframe === true && ! object.isPoints && ! object.isLineSegments && ! object.isLine && ! object.isLineLoop ) {
+
+			rangeFactor = 2;
+
+		}
+
+		let firstVertex = drawRange.start * rangeFactor;
+		let lastVertex = ( drawRange.start + drawRange.count ) * rangeFactor;
+
+		if ( group !== null ) {
+
+			firstVertex = Math.max( firstVertex, group.start * rangeFactor );
+			lastVertex = Math.min( lastVertex, ( group.start + group.count ) * rangeFactor );
+
+		}
+
+
 
 		const instanceCount = this.getInstanceCount( renderObject );
 		if ( instanceCount === 0 ) return;
@@ -76702,18 +76747,32 @@ class WebGPUBackend extends Backend {
 
 		} else if ( hasIndex === true ) {
 
-			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
+			const indexCount = index.count;
 
-			passEncoderGPU.drawIndexed( indexCount, instanceCount, firstVertex, 0, 0 );
+			firstVertex = Math.max( firstVertex, 0 );
+			lastVertex = Math.min( lastVertex, indexCount );
+
+			const count = lastVertex - firstVertex;
+
+			if ( count < 0 || count === Infinity ) return;
+
+			passEncoderGPU.drawIndexed( count, instanceCount, firstVertex, 0, 0 );
 
 			info.update( object, indexCount, instanceCount );
 
 		} else {
 
 			const positionAttribute = geometry.attributes.position;
-			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
+			const vertexCount = positionAttribute.count;
 
-			passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+			firstVertex = Math.max( firstVertex, 0 );
+			lastVertex = Math.min( lastVertex, vertexCount );
+
+			const count = lastVertex - firstVertex;
+
+			if ( count < 0 || count === Infinity ) return;
+
+			passEncoderGPU.draw( count, instanceCount, firstVertex, 0 );
 
 			info.update( object, vertexCount, instanceCount );
 
@@ -77351,6 +77410,20 @@ class WebGPURenderer extends Renderer {
 
 }
 
+class BundleGroup extends Group {
+
+	constructor() {
+
+		super();
+
+		this.isBundleGroup = true;
+
+		this.type = 'BundleGroup';
+
+	}
+
+}
+
 const _material = /*@__PURE__*/ new NodeMaterial();
 const _quadMesh = /*@__PURE__*/ new QuadMesh( _material );
 
@@ -77725,4 +77798,4 @@ if ( typeof window !== 'undefined' ) {
 
 }
 
-export { ACESFilmicToneMapping$1 as ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AfterImageNode, AgXToneMapping$1 as AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnaglyphPassNode, AnalyticLightNode, AnamorphicNode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrayElementNode, ArrowHelper, AssignNode, AttachedBindMode, AttributeNode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BRDF_GGX, BRDF_Lambert, BackSide, BasicDepthPacking, BasicEnvironmentNode, BasicShadowMap$1 as BasicShadowMap, BatchNode, BatchedMesh, BloomNode, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, Break, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferGeometryLoader, BufferNode, BumpMapNode, BypassNode, ByteType, Cache, CacheNode, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping$1 as CineonToneMapping, CircleGeometry, ClampToEdgeWrapping, Clock, CodeNode, Color, ColorKeyframeTrack, ColorManagement, ColorSpaceFunctions, ColorSpaceNode, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ComputeNode, ConeGeometry, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, Continue, Controls, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeTextureNode, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry, Cylindrical, DFGApprox, D_GGX, Data3DTexture, DataArrayTexture, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DenoiseNode, DepthFormat, DepthOfFieldNode, DepthStencilFormat, DepthTexture, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DirectionalLightNode, Discard, DiscreteInterpolant, DisplayP3ColorSpace, DodecahedronGeometry, DotScreenNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EPSILON, EdgesGeometry, EllipseCurve, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, ExtrudeGeometry, FXAANode, F_Schlick, FileLoader, FilmNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, Fn, Fog, FogExp2, FogExp2Node, FogNode, FogRangeNode, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLBufferAttribute, GLSL1, GLSL3, GLSLNodeParser, GTAONode, GaussianBlurNode, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightNode, IESSpotLight, IESSpotLightNode, INFINITY, IcosahedronGeometry, If, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, InstanceNode, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, InstancedPointsNodeMaterial, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightNode, LightProbe, LightProbeNode, LightingContextNode, LightingModel, LightingNode, LightsNode, Line, Line2NodeMaterial, Line3, LineBasicMaterial, LineBasicNodeMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineDashedNodeMaterial, LineLoop, LineSegments, LinearDisplayP3ColorSpace, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping$1 as LinearToneMapping, LinearTransfer, Loader, LoaderUtils, LoadingManager, Loop, LoopNode, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, Lut3DNode, MOUSE, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, ModelViewProjectionNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping$1 as NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalAnimationBlendMode, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OscNode, OutputStructNode, P3Primaries, PCFShadowMap$1 as PCFShadowMap, PCFSoftShadowMap$1 as PCFSoftShadowMap, PI, PI2, PMREMGenerator, PMREMNode, ParallaxBarrierPassNode, ParameterNode, PassNode, Path, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, PixelationPassNode, Plane, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, PointLightNode, PointUVNode, Points, PointsMaterial, PointsNodeMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PostProcessing, PosterizeNode, PropertyBinding, PropertyMixer, PropertyNode, QuadMesh, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDepthPacking, RGBFormat, RGBIntegerFormat, RGBShiftNode, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGDepthPacking, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RawShaderMaterial, Ray, Raycaster, Rec709Primaries, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping$1 as ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RepeatWrapping, ReplaceStencilOp, Return, ReverseSubtractEquation, RingGeometry, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, SSAAPassNode, Scene, SceneNode, Schlick_to_F0, ScriptableNode, ScriptableValueNode, SetNode, ShaderMaterial, ShaderNode, ShadowMaterial, ShadowNodeMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SkinningNode, SobelOperatorNode, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SplitNode, SpotLight, SpotLightHelper, SpotLightNode, Sprite, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StereoPassNode, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TBNViewMatrix, TOUCH, TangentSpaceNormalMap, TempNode, TetrahedronGeometry, Texture, Texture3DNode, TextureLoader, TextureNode, TextureSizeNode, TimerNode, ToneMappingFunctions, ToneMappingNode, TorusGeometry, TorusKnotGeometry, TransitionNode, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TriplanarTexturesNode, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform$1 as Uniform, UniformArrayNode, UniformGroupNode, UniformNode, UniformsGroup$1 as UniformsGroup, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, V_GGX_SmithCorrelated, VarNode, VaryingNode, Vector2, Vector3, Vector4, VectorKeyframeTrack, VertexColorNode, VideoTexture, ViewportDepthNode, ViewportDepthTextureNode, ViewportNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, abs, acos, add, addMethodChaining, addNodeElement, afterImage, all, alphaT, anaglyphPass, anamorphic, and, anisotropy, anisotropyB, anisotropyT, any, ao, append, arrayBuffer, asin, assign, atan, atan2, attenuationColor, attenuationDistance, attribute, backgroundBlurriness, backgroundIntensity, batch, billboarding, bitAnd, bitNot, bitOr, bitXor, bitangentGeometry, bitangentLocal, bitangentView, bitangentWorld, bitcast, bleach, bloom, blur, bool, buffer, bufferAttribute, bumpMap, burn, bvec2, bvec3, bvec4, bypass, cache, call, cameraFar, cameraLogDepth, cameraNear, cameraNormalMatrix, cameraPosition, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraWorldMatrix, cbrt, ceil, checker, clamp, clearcoat, clearcoatRoughness, code, color, colorToDirection, compute, cond, context, convert, convertToTexture, cos, createCanvasElement, cross, cubeTexture, dFdx, dFdy, dashSize, defaultBuildStages, defaultShaderStages, defined, degrees, denoise, densityFog, depth, depthPass, difference, diffuseColor, directionToColor, dispersion, distance, div, dodge, dof, dot, dotScreen, drawIndex, dynamicBufferAttribute, element, emissive, equal, equals, equirectUV, exp, exp2, expression, faceDirection, faceForward, film, float, floor, fog, fract, frameGroup, frameId, frontFacing, fwidth, fxaa, gain, gapSize, gaussianBlur, getColorSpaceMethod, getConstNodeType, getCurrentStack, getDirection, getDistanceAttenuation, getGeometryRoughness, getRoughness, getTextureIndex, global, glsl, glslFn, grayscale, greaterThan, greaterThanEqual, hash, hue, instance, instanceIndex, instancedBufferAttribute, instancedDynamicBufferAttribute, int, inverseSqrt, invocationLocalIndex, ior, iridescence, iridescenceIOR, iridescenceThickness, ivec2, ivec3, ivec4, js, label, length, lengthSq, lessThan, lessThanEqual, lightTargetDirection, lightingContext, lights, linearDepth, log, log2, luminance, lut3D, mat2, mat3, mat4, matcapUV, materialAOMap, materialAlphaTest, materialAnisotropy, materialAnisotropyVector, materialClearcoat, materialClearcoatNormal, materialClearcoatRoughness, materialColor, materialDispersion, materialEmissive, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLightMap, materialLineDashOffset, materialLineDashSize, materialLineGapSize, materialLineScale, materialLineWidth, materialMetalness, materialNormal, materialOpacity, materialPointWidth, materialReference, materialReflectivity, materialRefractionRatio, materialRotation, materialRoughness, materialSheen, materialSheenRoughness, materialShininess, materialSpecular, materialSpecularStrength, max$1 as max, maxMipLevel, metalness, min$1 as min, mix, mixElement, mod, modInt, modelDirection, modelNormalMatrix, modelPosition, modelScale, modelViewMatrix, modelViewPosition, modelViewProjection, modelWorldMatrix, modelWorldMatrixInverse, morphReference, motionBlur, mrt, mul, mx_aastep, mx_cell_noise_float, mx_contrast, mx_fractal_noise_float, mx_fractal_noise_vec2, mx_fractal_noise_vec3, mx_fractal_noise_vec4, mx_hsvtorgb, mx_noise_float, mx_noise_vec3, mx_noise_vec4, mx_ramplr, mx_ramptb, mx_rgbtohsv, mx_safepower, mx_splitlr, mx_splittb, mx_srgb_texture_to_lin_rec709, mx_transform_uv, mx_worley_noise_float, mx_worley_noise_vec2, mx_worley_noise_vec3, negate, nodeArray, nodeImmutable, nodeObject, nodeObjects, nodeProxy, normalFlat, normalGeometry, normalLocal, normalMap, normalView, normalWorld, normalize, not, notEqual, objectDirection, objectGroup, objectNormalMatrix, objectPosition, objectScale, objectViewMatrix, objectViewPosition, objectWorldMatrix, oneMinus, or, orthographicDepthToViewZ, oscSawtooth, oscSine, oscSquare, oscTriangle, output, outputStruct, overlay, overloadingFn, parabola, parallaxBarrierPass, parallaxDirection, parallaxUV, parameter, pass, passTexture, pcurve, perspectiveDepthToViewZ, pixelationPass, pmremTexture, pointUV, pointWidth, positionGeometry, positionLocal, positionPrevious, positionView, positionViewDirection, positionWorld, positionWorldDirection, posterize, pow, pow2, pow3, pow4, property, radians, rand, range, rangeFog, reciprocal, reference, referenceBuffer, reflect, reflectVector, reflectView, reflector, refract, refractVector, refractView, registerNode, remainder, remap, remapClamp, renderGroup, renderOutput, rendererReference, rgbShift, rotate, rotateUV, roughness, round, rtt, sampler, saturate, saturation, screen, scriptable, scriptableValue, select, sepia, setCurrentStack, shaderStages, sharedUniformGroup, sheen, sheenRoughness, shiftLeft, shiftRight, shininess, sign, sin, sinc, skinning, skinningReference, smoothstep, smoothstepElement, sobel, specularColor, specularF90, spherizeUV, split, spritesheetUV, sqrt, ssaaPass, stack, step, stereoPass, storage, storageObject, storageTexture, string, sub, tan, tangentGeometry, tangentLocal, tangentView, tangentWorld, temp, texture, texture3D, textureBicubic, textureCubeUV, textureLoad, textureSize, textureStore, thickness, threshold, timerDelta, timerGlobal, timerLocal, toOutputColorSpace, toWorkingColorSpace, toneMapping, toneMappingExposure, transformDirection, transformedBentNormalView, transformedBitangentView, transformedBitangentWorld, transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld, transformedTangentView, transformedTangentWorld, transition, transmission, transpose, tri, tri3, triNoise3D, triplanarTexture, triplanarTextures, trunc, tslFn, uint, uniform, uniformArray, uniformGroup, userData, uv, uvec2, uvec3, uvec4, varying, varyingProperty, vec2, vec3, vec4, vectorComponents, velocity, vertexColor, vertexIndex, vibrance, viewZToOrthographicDepth, viewZToPerspectiveDepth, viewport, viewportBottomLeft, viewportCoordinate, viewportDepthTexture, viewportLinearDepth, viewportMipTexture, viewportResolution, viewportSafeUV, viewportSharedTexture, viewportTexture, viewportTopLeft, viewportUV, wgsl, wgslFn, xor };
+export { ACESFilmicToneMapping$1 as ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AfterImageNode, AgXToneMapping$1 as AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnaglyphPassNode, AnalyticLightNode, AnamorphicNode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrayElementNode, ArrowHelper, AssignNode, AttachedBindMode, AttributeNode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BRDF_GGX, BRDF_Lambert, BackSide, BasicDepthPacking, BasicEnvironmentNode, BasicShadowMap$1 as BasicShadowMap, BatchNode, BatchedMesh, BloomNode, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, Break, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferGeometryLoader, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, Cache, CacheNode, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping$1 as CineonToneMapping, CircleGeometry, ClampToEdgeWrapping, Clock, CodeNode, Color, ColorKeyframeTrack, ColorManagement, ColorSpaceFunctions, ColorSpaceNode, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ComputeNode, ConeGeometry, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, Continue, Controls, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeTextureNode, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry, Cylindrical, DFGApprox, D_GGX, Data3DTexture, DataArrayTexture, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DenoiseNode, DepthFormat, DepthOfFieldNode, DepthStencilFormat, DepthTexture, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DirectionalLightNode, Discard, DiscreteInterpolant, DisplayP3ColorSpace, DodecahedronGeometry, DotScreenNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EPSILON, EdgesGeometry, EllipseCurve, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, ExtrudeGeometry, FXAANode, F_Schlick, FileLoader, FilmNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, Fn, Fog, FogExp2, FogExp2Node, FogNode, FogRangeNode, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLBufferAttribute, GLSL1, GLSL3, GLSLNodeParser, GTAONode, GaussianBlurNode, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightNode, IESSpotLight, IESSpotLightNode, INFINITY, IcosahedronGeometry, If, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, InstanceNode, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, InstancedPointsNodeMaterial, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightNode, LightProbe, LightProbeNode, LightingContextNode, LightingModel, LightingNode, LightsNode, Line, Line2NodeMaterial, Line3, LineBasicMaterial, LineBasicNodeMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineDashedNodeMaterial, LineLoop, LineSegments, LinearDisplayP3ColorSpace, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping$1 as LinearToneMapping, LinearTransfer, Loader, LoaderUtils, LoadingManager, Loop, LoopNode, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, Lut3DNode, MOUSE, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, ModelViewProjectionNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping$1 as NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalAnimationBlendMode, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OscNode, OutputStructNode, P3Primaries, PCFShadowMap$1 as PCFShadowMap, PCFSoftShadowMap$1 as PCFSoftShadowMap, PI, PI2, PMREMGenerator, PMREMNode, ParallaxBarrierPassNode, ParameterNode, PassNode, Path, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, PixelationPassNode, Plane, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, PointLightNode, PointUVNode, Points, PointsMaterial, PointsNodeMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PostProcessing, PosterizeNode, PropertyBinding, PropertyMixer, PropertyNode, QuadMesh, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDepthPacking, RGBFormat, RGBIntegerFormat, RGBShiftNode, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGDepthPacking, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RawShaderMaterial, Ray, Raycaster, Rec709Primaries, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping$1 as ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RepeatWrapping, ReplaceStencilOp, Return, ReverseSubtractEquation, RingGeometry, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, SSAAPassNode, Scene, SceneNode, Schlick_to_F0, ScriptableNode, ScriptableValueNode, SetNode, ShaderMaterial, ShaderNode, ShadowMaterial, ShadowNodeMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SkinningNode, SobelOperatorNode, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SplitNode, SpotLight, SpotLightHelper, SpotLightNode, Sprite, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StereoPassNode, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TBNViewMatrix, TOUCH, TangentSpaceNormalMap, TempNode, TetrahedronGeometry, Texture, Texture3DNode, TextureLoader, TextureNode, TextureSizeNode, TimerNode, ToneMappingFunctions, ToneMappingNode, TorusGeometry, TorusKnotGeometry, TransitionNode, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TriplanarTexturesNode, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform$1 as Uniform, UniformArrayNode, UniformGroupNode, UniformNode, UniformsGroup$1 as UniformsGroup, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, V_GGX_SmithCorrelated, VarNode, VaryingNode, Vector2, Vector3, Vector4, VectorKeyframeTrack, VertexColorNode, VideoTexture, ViewportDepthNode, ViewportDepthTextureNode, ViewportNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, abs, acos, add, addMethodChaining, addNodeElement, afterImage, all, alphaT, anaglyphPass, anamorphic, and, anisotropy, anisotropyB, anisotropyT, any, ao, append, arrayBuffer, asin, assign, atan, atan2, attenuationColor, attenuationDistance, attribute, backgroundBlurriness, backgroundIntensity, batch, billboarding, bitAnd, bitNot, bitOr, bitXor, bitangentGeometry, bitangentLocal, bitangentView, bitangentWorld, bitcast, bleach, bloom, blur, bool, buffer, bufferAttribute, bumpMap, burn, bvec2, bvec3, bvec4, bypass, cache, call, cameraFar, cameraLogDepth, cameraNear, cameraNormalMatrix, cameraPosition, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraWorldMatrix, cbrt, ceil, checker, clamp, clearcoat, clearcoatRoughness, code, color, colorToDirection, compute, cond, context, convert, convertToTexture, cos, createCanvasElement, cross, cubeTexture, dFdx, dFdy, dashSize, defaultBuildStages, defaultShaderStages, defined, degrees, denoise, densityFog, depth, depthPass, difference, diffuseColor, directionToColor, dispersion, distance, div, dodge, dof, dot, dotScreen, drawIndex, dynamicBufferAttribute, element, emissive, equal, equals, equirectUV, exp, exp2, expression, faceDirection, faceForward, film, float, floor, fog, fract, frameGroup, frameId, frontFacing, fwidth, fxaa, gain, gapSize, gaussianBlur, getColorSpaceMethod, getConstNodeType, getCurrentStack, getDirection, getDistanceAttenuation, getGeometryRoughness, getRoughness, getTextureIndex, global, glsl, glslFn, grayscale, greaterThan, greaterThanEqual, hash, hue, instance, instanceIndex, instancedBufferAttribute, instancedDynamicBufferAttribute, int, inverseSqrt, invocationLocalIndex, ior, iridescence, iridescenceIOR, iridescenceThickness, ivec2, ivec3, ivec4, js, label, length, lengthSq, lessThan, lessThanEqual, lightTargetDirection, lightingContext, lights, linearDepth, log, log2, luminance, lut3D, mat2, mat3, mat4, matcapUV, materialAOMap, materialAlphaTest, materialAnisotropy, materialAnisotropyVector, materialClearcoat, materialClearcoatNormal, materialClearcoatRoughness, materialColor, materialDispersion, materialEmissive, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLightMap, materialLineDashOffset, materialLineDashSize, materialLineGapSize, materialLineScale, materialLineWidth, materialMetalness, materialNormal, materialOpacity, materialPointWidth, materialReference, materialReflectivity, materialRefractionRatio, materialRotation, materialRoughness, materialSheen, materialSheenRoughness, materialShininess, materialSpecular, materialSpecularStrength, max$1 as max, maxMipLevel, metalness, min$1 as min, mix, mixElement, mod, modInt, modelDirection, modelNormalMatrix, modelPosition, modelScale, modelViewMatrix, modelViewPosition, modelViewProjection, modelWorldMatrix, modelWorldMatrixInverse, morphReference, motionBlur, mrt, mul, mx_aastep, mx_cell_noise_float, mx_contrast, mx_fractal_noise_float, mx_fractal_noise_vec2, mx_fractal_noise_vec3, mx_fractal_noise_vec4, mx_hsvtorgb, mx_noise_float, mx_noise_vec3, mx_noise_vec4, mx_ramplr, mx_ramptb, mx_rgbtohsv, mx_safepower, mx_splitlr, mx_splittb, mx_srgb_texture_to_lin_rec709, mx_transform_uv, mx_worley_noise_float, mx_worley_noise_vec2, mx_worley_noise_vec3, negate, nodeArray, nodeImmutable, nodeObject, nodeObjects, nodeProxy, normalFlat, normalGeometry, normalLocal, normalMap, normalView, normalWorld, normalize, not, notEqual, objectDirection, objectGroup, objectNormalMatrix, objectPosition, objectScale, objectViewMatrix, objectViewPosition, objectWorldMatrix, oneMinus, or, orthographicDepthToViewZ, oscSawtooth, oscSine, oscSquare, oscTriangle, output, outputStruct, overlay, overloadingFn, parabola, parallaxBarrierPass, parallaxDirection, parallaxUV, parameter, pass, passTexture, pcurve, perspectiveDepthToViewZ, pixelationPass, pmremTexture, pointUV, pointWidth, positionGeometry, positionLocal, positionPrevious, positionView, positionViewDirection, positionWorld, positionWorldDirection, posterize, pow, pow2, pow3, pow4, property, radians, rand, range, rangeFog, reciprocal, reference, referenceBuffer, reflect, reflectVector, reflectView, reflector, refract, refractVector, refractView, registerNode, remainder, remap, remapClamp, renderGroup, renderOutput, rendererReference, rgbShift, rotate, rotateUV, roughness, round, rtt, sampler, saturate, saturation, screen, scriptable, scriptableValue, select, sepia, setCurrentStack, shaderStages, sharedUniformGroup, sheen, sheenRoughness, shiftLeft, shiftRight, shininess, sign, sin, sinc, skinning, skinningReference, smoothstep, smoothstepElement, sobel, specularColor, specularF90, spherizeUV, split, spritesheetUV, sqrt, ssaaPass, stack, step, stereoPass, storage, storageObject, storageTexture, string, sub, tan, tangentGeometry, tangentLocal, tangentView, tangentWorld, temp, texture, texture3D, textureBicubic, textureCubeUV, textureLoad, textureSize, textureStore, thickness, threshold, timerDelta, timerGlobal, timerLocal, toOutputColorSpace, toWorkingColorSpace, toneMapping, toneMappingExposure, transformDirection, transformedBentNormalView, transformedBitangentView, transformedBitangentWorld, transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld, transformedTangentView, transformedTangentWorld, transition, transmission, transpose, tri, tri3, triNoise3D, triplanarTexture, triplanarTextures, trunc, tslFn, uint, uniform, uniformArray, uniformGroup, userData, uv, uvec2, uvec3, uvec4, varying, varyingProperty, vec2, vec3, vec4, vectorComponents, velocity, vertexColor, vertexIndex, vibrance, viewZToOrthographicDepth, viewZToPerspectiveDepth, viewport, viewportBottomLeft, viewportCoordinate, viewportDepthTexture, viewportLinearDepth, viewportMipTexture, viewportResolution, viewportSafeUV, viewportSharedTexture, viewportTexture, viewportTopLeft, viewportUV, wgsl, wgslFn, xor };
