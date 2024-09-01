@@ -1,7 +1,12 @@
-import { registerNode } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
 
 class AONode extends LightingNode {
+
+	static get type() {
+
+		return 'AONode';
+
+	}
 
 	constructor( aoNode = null ) {
 
@@ -20,5 +25,3 @@ class AONode extends LightingNode {
 }
 
 export default AONode;
-
-AONode.type = /*@__PURE__*/ registerNode( 'AO', AONode );

@@ -1,5 +1,4 @@
-import { createNodeFromType } from '../../nodes/core/Node.js';
-import { nodeObject } from '../../nodes/tsl/TSLBase.js';
+import { nodeObject, float } from '../../nodes/tsl/TSLBase.js';
 
 import { Loader } from '../Loader.js';
 import { FileLoader } from '../../loaders/FileLoader.js';
@@ -11,6 +10,7 @@ class NodeLoader extends Loader {
 		super( manager );
 
 		this.textures = {};
+		this.nodes = {};
 
 	}
 
@@ -56,7 +56,7 @@ class NodeLoader extends Loader {
 
 				const { uuid, type } = nodeJSON;
 
-				nodes[ uuid ] = nodeObject( createNodeFromType( type ) );
+				nodes[ uuid ] = this.createNodeFromType( type );
 				nodes[ uuid ].uuid = uuid;
 
 			}
@@ -82,7 +82,7 @@ class NodeLoader extends Loader {
 
 	parse( json ) {
 
-		const node = nodeObject( createNodeFromType( json.type ) );
+		const node = this.createNodeFromType( json.type );
 		node.uuid = json.uuid;
 
 		const nodes = this.parseNodes( json.nodes );
@@ -102,6 +102,26 @@ class NodeLoader extends Loader {
 
 		this.textures = value;
 		return this;
+
+	}
+
+	setNodes( value ) {
+
+		this.nodes = value;
+		return this;
+
+	}
+
+	createNodeFromType( type ) {
+
+		if ( this.nodes[ type ] === undefined ) {
+
+			console.error( 'THREE.NodeLoader: Node type not found:', type );
+			return float();
+
+		}
+
+		return nodeObject( new this.nodes[ type ]() );
 
 	}
 

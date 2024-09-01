@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { nodeObject, Fn, float, vec2, vec4 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
@@ -20,6 +19,12 @@ const _quadMesh1 = /*@__PURE__*/ new QuadMesh();
 const _quadMesh2 = /*@__PURE__*/ new QuadMesh();
 
 class GaussianBlurNode extends TempNode {
+
+	static get type() {
+
+		return 'GaussianBlurNode';
+
+	}
 
 	constructor( textureNode, directionNode = null, sigma = 2 ) {
 
@@ -204,7 +209,5 @@ class GaussianBlurNode extends TempNode {
 }
 
 export default GaussianBlurNode;
-
-GaussianBlurNode.type = /*@__PURE__*/ registerNode( 'GaussianBlur', GaussianBlurNode );
 
 export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ) );

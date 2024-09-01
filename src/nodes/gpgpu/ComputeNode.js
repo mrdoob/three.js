@@ -1,8 +1,14 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
 class ComputeNode extends Node {
+
+	static get type() {
+
+		return 'ComputeNode';
+
+	}
 
 	constructor( computeNode, count, workgroupSize = [ 64 ] ) {
 
@@ -77,8 +83,6 @@ class ComputeNode extends Node {
 }
 
 export default ComputeNode;
-
-ComputeNode.type = /*@__PURE__*/ registerNode( 'Compute', ComputeNode );
 
 export const compute = ( node, count, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
 

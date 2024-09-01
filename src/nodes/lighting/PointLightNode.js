@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { getDistanceAttenuation } from './LightUtils.js';
 import { uniform } from '../core/UniformNode.js';
@@ -6,6 +5,12 @@ import { objectViewPosition } from '../accessors/Object3DNode.js';
 import { positionView } from '../accessors/Position.js';
 
 class PointLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'PointLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -59,5 +64,3 @@ class PointLightNode extends AnalyticLightNode {
 }
 
 export default PointLightNode;
-
-PointLightNode.type = /*@__PURE__*/ registerNode( 'PointLight', PointLightNode );

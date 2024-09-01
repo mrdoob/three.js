@@ -1,4 +1,4 @@
-import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
+import NodeMaterial from './NodeMaterial.js';
 import { materialLightMap } from '../../nodes/accessors/MaterialNode.js';
 import BasicEnvironmentNode from '../../nodes/lighting/BasicEnvironmentNode.js';
 import BasicLightMapNode from '../../nodes/lighting/BasicLightMapNode.js';
@@ -11,6 +11,12 @@ import { MeshBasicMaterial } from '../MeshBasicMaterial.js';
 const _defaultValues = /*@__PURE__*/ new MeshBasicMaterial();
 
 class MeshBasicNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'MeshBasicNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -69,5 +75,3 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 }
 
 export default MeshBasicNodeMaterial;
-
-MeshBasicNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshBasic', MeshBasicNodeMaterial );

@@ -1,4 +1,4 @@
-import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
+import NodeMaterial from './NodeMaterial.js';
 import { diffuseColor } from '../../nodes/core/PropertyNode.js';
 import { directionToColor } from '../../nodes/utils/Packing.js';
 import { materialOpacity } from '../../nodes/accessors/MaterialNode.js';
@@ -10,6 +10,12 @@ import { MeshNormalMaterial } from '../MeshNormalMaterial.js';
 const _defaultValues = /*@__PURE__*/ new MeshNormalMaterial();
 
 class MeshNormalNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'MeshNormalNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -36,5 +42,3 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 }
 
 export default MeshNormalNodeMaterial;
-
-MeshNormalNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshNormal', MeshNormalNodeMaterial );

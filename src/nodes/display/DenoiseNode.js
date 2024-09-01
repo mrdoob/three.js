@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UV.js';
 import { Fn, nodeObject, float, int, vec2, vec3, vec4, mat2, If } from '../tsl/TSLBase.js';
@@ -15,6 +14,12 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 
 class DenoiseNode extends TempNode {
+
+	static get type() {
+
+		return 'DenoiseNode';
+
+	}
 
 	constructor( textureNode, depthNode, normalNode, noiseNode, camera ) {
 
@@ -162,8 +167,6 @@ class DenoiseNode extends TempNode {
 }
 
 export default DenoiseNode;
-
-DenoiseNode.type = /*@__PURE__*/ registerNode( 'Denoise', DenoiseNode );
 
 function generatePdSamplePointInitializer( samples, rings, radiusExponent ) {
 

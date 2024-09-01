@@ -1,4 +1,4 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import UniformNode from '../core/UniformNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
@@ -6,6 +6,12 @@ import { nodeProxy } from '../tsl/TSLBase.js';
 import { Vector3 } from '../../math/Vector3.js';
 
 class Object3DNode extends Node {
+
+	static get type() {
+
+		return 'Object3DNode';
+
+	}
 
 	constructor( scope = Object3DNode.VIEW_MATRIX, object3d = null ) {
 
@@ -138,8 +144,6 @@ Object3DNode.VIEW_POSITION = 'viewPosition';
 Object3DNode.DIRECTION = 'direction';
 
 export default Object3DNode;
-
-Object3DNode.type = /*@__PURE__*/ registerNode( 'Object3D', Object3DNode );
 
 export const objectDirection = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.DIRECTION );
 export const objectViewMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );

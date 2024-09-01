@@ -1,7 +1,13 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
 class FunctionOverloadingNode extends Node {
+
+	static get type() {
+
+		return 'FunctionOverloadingNode';
+
+	}
 
 	constructor( functionNodes = [], ...parametersNodes ) {
 
@@ -89,8 +95,6 @@ class FunctionOverloadingNode extends Node {
 }
 
 export default FunctionOverloadingNode;
-
-FunctionOverloadingNode.type = /*@__PURE__*/ registerNode( 'FunctionOverloading', FunctionOverloadingNode );
 
 const overloadingBaseFn = /*@__PURE__*/ nodeProxy( FunctionOverloadingNode );
 

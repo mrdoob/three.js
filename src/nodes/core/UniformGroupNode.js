@@ -1,6 +1,12 @@
-import Node, { registerNode } from './Node.js';
+import Node from './Node.js';
 
 class UniformGroupNode extends Node {
+
+	static get type() {
+
+		return 'UniformGroupNode';
+
+	}
 
 	constructor( name, shared = false ) {
 
@@ -44,8 +50,6 @@ class UniformGroupNode extends Node {
 }
 
 export default UniformGroupNode;
-
-UniformGroupNode.type = /*@__PURE__*/ registerNode( 'UniformGroup', UniformGroupNode );
 
 export const uniformGroup = ( name ) => new UniformGroupNode( name );
 export const sharedUniformGroup = ( name ) => new UniformGroupNode( name, true );

@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { add } from '../math/OperatorNode.js';
 
@@ -40,6 +39,12 @@ const perturbNormal2Arb = /*@__PURE__*/ Fn( ( inputs ) => {
 } );
 
 class NormalMapNode extends TempNode {
+
+	static get type() {
+
+		return 'NormalMapNode';
+
+	}
 
 	constructor( node, scaleNode = null ) {
 
@@ -98,7 +103,5 @@ class NormalMapNode extends TempNode {
 }
 
 export default NormalMapNode;
-
-NormalMapNode.type = /*@__PURE__*/ registerNode( 'NormalMap', NormalMapNode );
 
 export const normalMap = /*@__PURE__*/ nodeProxy( NormalMapNode );

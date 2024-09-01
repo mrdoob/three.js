@@ -1,8 +1,13 @@
-import { registerNode } from '../core/Node.js';
 import MaterialNode from './MaterialNode.js';
 import { nodeImmutable } from '../tsl/TSLBase.js';
 
 class InstancedPointsMaterialNode extends MaterialNode {
+
+	static get type() {
+
+		return 'InstancedPointsMaterialNode';
+
+	}
 
 	setup( /*builder*/ ) {
 
@@ -15,7 +20,5 @@ class InstancedPointsMaterialNode extends MaterialNode {
 InstancedPointsMaterialNode.POINT_WIDTH = 'pointWidth';
 
 export default InstancedPointsMaterialNode;
-
-InstancedPointsMaterialNode.type = /*@__PURE__*/ registerNode( 'InstancedPointsMaterial', InstancedPointsMaterialNode );
 
 export const materialPointWidth = /*@__PURE__*/ nodeImmutable( InstancedPointsMaterialNode, InstancedPointsMaterialNode.POINT_WIDTH );

@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TextureNode from './TextureNode.js';
 import { reflectVector, refractVector } from './ReflectVector.js';
 import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
@@ -6,6 +5,12 @@ import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 import { CubeReflectionMapping, CubeRefractionMapping, WebGPUCoordinateSystem } from '../../constants.js';
 
 class CubeTextureNode extends TextureNode {
+
+	static get type() {
+
+		return 'CubeTextureNode';
+
+	}
 
 	constructor( value, uvNode = null, levelNode = null, biasNode = null ) {
 
@@ -70,7 +75,5 @@ class CubeTextureNode extends TextureNode {
 }
 
 export default CubeTextureNode;
-
-CubeTextureNode.type = /*@__PURE__*/ registerNode( 'CubeTexture', CubeTextureNode );
 
 export const cubeTexture = /*@__PURE__*/ nodeProxy( CubeTextureNode );

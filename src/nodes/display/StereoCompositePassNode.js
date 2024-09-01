@@ -1,5 +1,4 @@
 
-import { registerNode } from '../core/Node.js';
 import PassNode from './PassNode.js';
 import { StereoCamera } from '../../cameras/StereoCamera.js';
 import { HalfFloatType, LinearFilter, NearestFilter } from '../../constants.js';
@@ -12,6 +11,12 @@ const _size = /*@__PURE__*/ new Vector2();
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 class StereoCompositePassNode extends PassNode {
+
+	static get type() {
+
+		return 'StereoCompositePassNode';
+
+	}
 
 	constructor( scene, camera ) {
 
@@ -103,5 +108,3 @@ class StereoCompositePassNode extends PassNode {
 }
 
 export default StereoCompositePassNode;
-
-StereoCompositePassNode.type = /*@__PURE__*/ registerNode( 'StereoCompositePass', StereoCompositePassNode );

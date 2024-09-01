@@ -1,8 +1,13 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class OperatorNode extends TempNode {
+
+	static get type() {
+
+		return 'OperatorNode';
+
+	}
 
 	constructor( op, aNode, bNode, ...params ) {
 
@@ -258,8 +263,6 @@ class OperatorNode extends TempNode {
 }
 
 export default OperatorNode;
-
-OperatorNode.type = /*@__PURE__*/ registerNode( 'Operator', OperatorNode );
 
 export const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' );
 export const sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' );

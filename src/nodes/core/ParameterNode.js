@@ -1,8 +1,13 @@
-import { registerNode } from './Node.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import PropertyNode from './PropertyNode.js';
 
 class ParameterNode extends PropertyNode {
+
+	static get type() {
+
+		return 'ParameterNode';
+
+	}
 
 	constructor( nodeType, name = null ) {
 
@@ -27,7 +32,5 @@ class ParameterNode extends PropertyNode {
 }
 
 export default ParameterNode;
-
-ParameterNode.type = /*@__PURE__*/ registerNode( 'Parameter', ParameterNode );
 
 export const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );

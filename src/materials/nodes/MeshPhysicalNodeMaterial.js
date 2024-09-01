@@ -8,11 +8,16 @@ import MeshStandardNodeMaterial from './MeshStandardNodeMaterial.js';
 import { mix, pow2, min } from '../../nodes/math/MathNode.js';
 
 import { MeshPhysicalMaterial } from '../MeshPhysicalMaterial.js';
-import { registerNodeMaterial } from './NodeMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshPhysicalMaterial();
 
 class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
+
+	static get type() {
+
+		return 'MeshPhysicalNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -241,5 +246,3 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 }
 
 export default MeshPhysicalNodeMaterial;
-
-MeshPhysicalNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshPhysical', MeshPhysicalNodeMaterial );

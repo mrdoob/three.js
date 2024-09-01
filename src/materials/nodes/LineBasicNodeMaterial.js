@@ -1,10 +1,16 @@
-import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
+import NodeMaterial from './NodeMaterial.js';
 
 import { LineBasicMaterial } from '../LineBasicMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new LineBasicMaterial();
 
 class LineBasicNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'LineBasicNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -23,5 +29,3 @@ class LineBasicNodeMaterial extends NodeMaterial {
 }
 
 export default LineBasicNodeMaterial;
-
-LineBasicNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'LineBasic', LineBasicNodeMaterial );

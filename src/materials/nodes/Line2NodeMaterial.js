@@ -1,4 +1,4 @@
-import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
+import NodeMaterial from './NodeMaterial.js';
 import { property, varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
@@ -16,6 +16,12 @@ import { LineDashedMaterial } from '../LineDashedMaterial.js';
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
 class Line2NodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'Line2NodeMaterial';
+
+	}
 
 	constructor( params = {} ) {
 
@@ -433,5 +439,3 @@ class Line2NodeMaterial extends NodeMaterial {
 }
 
 export default Line2NodeMaterial;
-
-Line2NodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Line2', Line2NodeMaterial );

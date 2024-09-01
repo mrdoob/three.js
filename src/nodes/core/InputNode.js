@@ -1,7 +1,13 @@
-import Node, { registerNode } from './Node.js';
+import Node from './Node.js';
 import { getValueType, getValueFromType, arrayBufferToBase64 } from './NodeUtils.js';
 
 class InputNode extends Node {
+
+	static get type() {
+
+		return 'InputNode';
+
+	}
 
 	constructor( value, nodeType = null ) {
 
@@ -79,5 +85,3 @@ class InputNode extends Node {
 }
 
 export default InputNode;
-
-InputNode.type = /*@__PURE__*/ registerNode( 'Input', InputNode );

@@ -1,7 +1,13 @@
-import Node, { registerNode } from './Node.js';
+import Node from './Node.js';
 import { nodeImmutable, nodeObject } from '../tsl/TSLCore.js';
 
 class PropertyNode extends Node {
+
+	static get type() {
+
+		return 'PropertyNode';
+
+	}
 
 	constructor( nodeType, name = null, varying = false ) {
 
@@ -48,8 +54,6 @@ class PropertyNode extends Node {
 }
 
 export default PropertyNode;
-
-PropertyNode.type = /*@__PURE__*/ registerNode( 'Property', PropertyNode );
 
 export const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
 export const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( type, name, true ) );
