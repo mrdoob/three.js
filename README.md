@@ -1,4 +1,4 @@
-# three.js
+# 3editor Popsicle Stick 3D Editor
 
 [![NPM Package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
@@ -6,22 +6,13 @@
 [![DeepScan][deepscan]][deepscan-url]
 [![Discord][discord]][discord-url]
 
-#### JavaScript 3D library
+#### 3D Popsicle Stick Project Editor based on Three.js
 
-The aim of the project is to create an easy-to-use, lightweight, cross-browser, general-purpose 3D library. The current builds only include a WebGL renderer but WebGPU (experimental), SVG and CSS3D renderers are also available as addons.
-
-[Examples](https://threejs.org/examples/) &mdash;
-[Docs](https://threejs.org/docs/) &mdash;
-[Manual](https://threejs.org/manual/) &mdash;
-[Wiki](https://github.com/mrdoob/three.js/wiki) &mdash;
-[Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
-[Questions](https://stackoverflow.com/questions/tagged/three.js) &mdash;
-[Forum](https://discourse.threejs.org/) &mdash;
-[Discord](https://discord.gg/56GBJwAnUS)
+The aim of this project is to create an easy-to-use, lightweight, cross-browser 3D editor specifically for popsicle stick crafts and models. It's built on top of the Three.js library, utilizing its WebGL renderer for high-performance 3D graphics.
 
 ### Usage
 
-This code creates a scene, a camera, and a geometric cube, and it adds the cube to the scene. It then creates a `WebGL` renderer for the scene and camera, and it adds that viewport to the `document.body` element. Finally, it animates the cube within the scene for the camera.
+This code creates a scene with a 3D popsicle stick model. It sets up a camera, adds the popsicle stick model to the scene, and renders it using WebGL. The model can be rotated for a full 3D view.
 
 ```javascript
 import * as THREE from 'three';
@@ -58,29 +49,18 @@ function animate( time ) {
 }
 ```
 
-If everything goes well, you should see [this](https://jsfiddle.net/v98k6oze/).
 
 ### Cloning this repository
 
 Cloning the repo with all its history results in a ~2 GB download. If you don't need the whole history you can use the `depth` parameter to significantly reduce download size.
 
 ```sh
-git clone --depth=1 https://github.com/mrdoob/three.js.git
+git clone --depth=1 https://github.com/stiisk/3editor.git
 ```
 
 ### Change log
 
-[Releases](https://github.com/mrdoob/three.js/releases)
+[Releases](https://github.com/stiisk/3editor/releases)
 
 
-[npm]: https://img.shields.io/npm/v/three
-[npm-url]: https://www.npmjs.com/package/three
-[build-size]: https://badgen.net/bundlephobia/minzip/three
-[build-size-url]: https://bundlephobia.com/result?p=three
-[npm-downloads]: https://img.shields.io/npm/dw/three
-[npmtrends-url]: https://www.npmtrends.com/three
-[deepscan]: https://deepscan.io/api/teams/16600/projects/19901/branches/525701/badge/grade.svg
-[deepscan-url]: https://deepscan.io/dashboard#view=project&tid=16600&pid=19901&bid=525701
-[discord]: https://img.shields.io/discord/685241246557667386
-[discord-url]: https://discord.gg/56GBJwAnUS
 

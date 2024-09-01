@@ -1,7 +1,7 @@
 {
   "name": "three",
   "version": "0.168.0",
-  "description": "JavaScript 3D library",
+  "description": "Editor for Posicle Sticks Project",
   "type": "module",
   "main": "./build/three.cjs",
   "module": "./build/three.module.js",
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mrdoob/three.js"
+    "url": "https://github.com/stiisk/3editor"
   },
   "sideEffects": [ "./src/nodes/**/*" ],
   "files": [
@@ -86,9 +86,9 @@
   "author": "mrdoob",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mrdoob/three.js/issues"
+    "url": "https://github.com/stiisk/3editor/issues"
   },
-  "homepage": "https://threejs.org/",
+  "homepage": "https://stiisk.com/",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-terser": "^0.4.0",
