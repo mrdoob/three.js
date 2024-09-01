@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { textureCubeUV } from './PMREMUtils.js';
@@ -73,6 +72,12 @@ function _getPMREMFromTexture( texture ) {
 }
 
 class PMREMNode extends TempNode {
+
+	static get type() {
+
+		return 'PMREMNode';
+
+	}
 
 	constructor( value, uvNode = null, levelNode = null ) {
 
@@ -205,8 +210,6 @@ class PMREMNode extends TempNode {
 }
 
 export default PMREMNode;
-
-PMREMNode.type = /*@__PURE__*/ registerNode( 'PMREM', PMREMNode );
 
 function isCubeMapReady( image ) {
 

@@ -1,7 +1,13 @@
-import Node, { registerNode } from './Node.js';
+import Node from './Node.js';
 import { nodeImmutable, varying } from '../tsl/TSLBase.js';
 
 class IndexNode extends Node {
+
+	static get type() {
+
+		return 'IndexNode';
+
+	}
 
 	constructor( scope ) {
 
@@ -68,8 +74,6 @@ IndexNode.INVOCATION_LOCAL = 'invocationLocal';
 IndexNode.DRAW = 'draw';
 
 export default IndexNode;
-
-IndexNode.type = /*@__PURE__*/ registerNode( 'Index', IndexNode );
 
 export const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VERTEX );
 export const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INSTANCE );

@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import InputNode from '../core/InputNode.js';
 import { nodeObject, addMethodChaining } from '../tsl/TSLCore.js';
 import { varying } from '../core/VaryingNode.js';
@@ -8,6 +7,12 @@ import { InterleavedBuffer } from '../../core/InterleavedBuffer.js';
 import { StaticDrawUsage, DynamicDrawUsage } from '../../constants.js';
 
 class BufferAttributeNode extends InputNode {
+
+	static get type() {
+
+		return 'BufferAttributeNode';
+
+	}
 
 	constructor( value, bufferType = null, bufferStride = 0, bufferOffset = 0 ) {
 
@@ -150,8 +155,6 @@ class BufferAttributeNode extends InputNode {
 }
 
 export default BufferAttributeNode;
-
-BufferAttributeNode.type = /*@__PURE__*/ registerNode( 'BufferAttribute', BufferAttributeNode );
 
 export const bufferAttribute = ( array, type, stride, offset ) => nodeObject( new BufferAttributeNode( array, type, stride, offset ) );
 export const dynamicBufferAttribute = ( array, type, stride, offset ) => bufferAttribute( array, type, stride, offset ).setUsage( DynamicDrawUsage );

@@ -4,11 +4,15 @@ import { getNodeChildren, getCacheKey } from './NodeUtils.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { MathUtils } from '../../math/MathUtils.js';
 
-const Nodes = new Map();
-
 let _nodeId = 0;
 
 class Node extends EventDispatcher {
+
+	static get type() {
+
+		return 'Node';
+
+	}
 
 	constructor( nodeType = null ) {
 
@@ -540,52 +544,3 @@ class Node extends EventDispatcher {
 }
 
 export default Node;
-
-Node.type = /*@__PURE__*/ registerNode( '', Node );
-
-export function registerNode( type, nodeClass ) {
-
-	const suffix = 'Node';
-	const nodeType = type + suffix;
-
-	if ( typeof nodeClass !== 'function' ) throw new Error( `TSL.Node: Node class ${ type } is not a class` );
-
-	if ( Nodes.has( nodeType ) ) {
-
-		console.warn( `TSL.Node: Redefinition of node class ${ nodeType }` );
-		return;
-
-	}
-
-	if ( type.slice( - suffix.length ) === suffix ) {
-
-		console.warn( `TSL.Node: Node class ${ nodeType } should not have '${ suffix }' suffix.` );
-		return;
-
-	}
-
-	Nodes.set( nodeType, nodeClass );
-	nodeClass.type = nodeType;
-
-	return nodeType;
-
-}
-
-export function createNodeFromType( type ) {
-
-	const Class = Nodes.get( type );
-
-	if ( Class !== undefined ) {
-
-		return new Class();
-
-	}
-
-}
-
-export function addNodeClass( type, nodeClass ) {
-
-	console.warn( 'TSL.Node: Function addNodeClass() is deprecated. Use /*@__PURE__*/ registerNode() instead.' );
-	/*@__PURE__*/ registerNode( type.slice( 0, - 4 ), nodeClass );
-
-}

@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
@@ -13,6 +12,12 @@ import { HalfFloatType } from '../../constants.js';
 const _size = /*@__PURE__*/ new Vector2();
 
 class RTTNode extends TextureNode {
+
+	static get type() {
+
+		return 'RTTNode';
+
+	}
 
 	constructor( node, width = null, height = null, options = { type: HalfFloatType } ) {
 
@@ -123,8 +128,6 @@ class RTTNode extends TextureNode {
 }
 
 export default RTTNode;
-
-RTTNode.type = /*@__PURE__*/ registerNode( 'RTT', RTTNode );
 
 export const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( node ), ...params ) );
 export const convertToTexture = ( node, ...params ) => node.isTextureNode ? node : rtt( node, ...params );

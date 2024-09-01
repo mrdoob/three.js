@@ -1,9 +1,15 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { vectorComponents } from '../core/constants.js';
 
 const stringVectorComponents = vectorComponents.join( '' );
 
 class SplitNode extends Node {
+
+	static get type() {
+
+		return 'SplitNode';
+
+	}
 
 	constructor( node, components = 'x' ) {
 
@@ -108,5 +114,3 @@ class SplitNode extends Node {
 }
 
 export default SplitNode;
-
-SplitNode.type = /*@__PURE__*/ registerNode( 'Split', SplitNode );

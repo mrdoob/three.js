@@ -1,8 +1,13 @@
-import { registerNode } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
 import { float } from '../tsl/TSLBase.js';
 
 class BasicLightMapNode extends LightingNode {
+
+	static get type() {
+
+		return 'BasicLightMapNode';
+
+	}
 
 	constructor( lightMapNode = null ) {
 
@@ -25,5 +30,3 @@ class BasicLightMapNode extends LightingNode {
 }
 
 export default BasicLightMapNode;
-
-BasicLightMapNode.type = /*@__PURE__*/ registerNode( 'BasicLightMap', BasicLightMapNode );

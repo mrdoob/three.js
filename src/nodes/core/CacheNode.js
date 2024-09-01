@@ -1,7 +1,13 @@
-import Node, { registerNode } from './Node.js';
+import Node from './Node.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
 class CacheNode extends Node {
+
+	static get type() {
+
+		return 'CacheNode';
+
+	}
 
 	constructor( node, parent = true ) {
 
@@ -38,8 +44,6 @@ class CacheNode extends Node {
 }
 
 export default CacheNode;
-
-CacheNode.type = /*@__PURE__*/ registerNode( 'Cache', CacheNode );
 
 export const cache = ( node, ...params ) => nodeObject( new CacheNode( nodeObject( node ), ...params ) );
 

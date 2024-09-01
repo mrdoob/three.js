@@ -1,7 +1,13 @@
-import Node, { registerNode } from './Node.js';
+import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class ContextNode extends Node {
+
+	static get type() {
+
+		return 'ContextNode';
+
+	}
 
 	constructor( node, value = {} ) {
 
@@ -63,8 +69,6 @@ class ContextNode extends Node {
 }
 
 export default ContextNode;
-
-ContextNode.type = /*@__PURE__*/ registerNode( 'Context', ContextNode );
 
 export const context = /*@__PURE__*/ nodeProxy( ContextNode );
 export const label = ( node, name ) => context( node, { label: name } );

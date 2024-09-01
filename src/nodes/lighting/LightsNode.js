@@ -1,4 +1,4 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { nodeObject, nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 const sortLights = ( lights ) => {
@@ -24,6 +24,12 @@ const getLightNodeById = ( id, lightNodes ) => {
 };
 
 class LightsNode extends Node {
+
+	static get type() {
+
+		return 'LightsNode';
+
+	}
 
 	constructor( lights = [] ) {
 
@@ -225,7 +231,5 @@ class LightsNode extends Node {
 }
 
 export default LightsNode;
-
-LightsNode.type = /*@__PURE__*/ registerNode( 'Lights', LightsNode );
 
 export const lights = /*@__PURE__*/ nodeProxy( LightsNode );

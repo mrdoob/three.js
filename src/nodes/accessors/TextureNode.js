@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import UniformNode, { uniform } from '../core/UniformNode.js';
 import { uv } from './UV.js';
 import { textureSize } from './TextureSizeNode.js';
@@ -11,6 +10,12 @@ import { NodeUpdateType } from '../core/constants.js';
 import { IntType, UnsignedIntType } from '../../constants.js';
 
 class TextureNode extends UniformNode {
+
+	static get type() {
+
+		return 'TextureNode';
+
+	}
 
 	constructor( value, uvNode = null, levelNode = null, biasNode = null ) {
 
@@ -429,8 +434,6 @@ class TextureNode extends UniformNode {
 }
 
 export default TextureNode;
-
-TextureNode.type = /*@__PURE__*/ registerNode( 'Texture', TextureNode );
 
 export const texture = /*@__PURE__*/ nodeProxy( TextureNode );
 export const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );

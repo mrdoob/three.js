@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { uniform } from '../core/UniformNode.js';
@@ -13,6 +12,12 @@ const _matrix42 = /*@__PURE__*/ new Matrix4();
 let ltcLib = null;
 
 class RectAreaLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'RectAreaLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -89,5 +94,3 @@ class RectAreaLightNode extends AnalyticLightNode {
 }
 
 export default RectAreaLightNode;
-
-RectAreaLightNode.type = /*@__PURE__*/ registerNode( 'RectAreaLight', RectAreaLightNode );

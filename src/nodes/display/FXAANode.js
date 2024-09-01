@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UV.js';
 import { Fn, nodeObject, float, vec2, vec4, int, If } from '../tsl/TSLBase.js';
@@ -12,6 +11,12 @@ import { convertToTexture } from '../utils/RTTNode.js';
 import { Vector2 } from '../../math/Vector2.js';
 
 class FXAANode extends TempNode {
+
+	static get type() {
+
+		return 'FXAANode';
+
+	}
 
 	constructor( textureNode ) {
 
@@ -323,7 +328,5 @@ class FXAANode extends TempNode {
 }
 
 export default FXAANode;
-
-FXAANode.type = /*@__PURE__*/ registerNode( 'FXAA', FXAANode );
 
 export const fxaa = ( node ) => nodeObject( new FXAANode( convertToTexture( node ) ) );

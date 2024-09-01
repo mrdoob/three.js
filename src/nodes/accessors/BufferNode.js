@@ -1,8 +1,13 @@
-import { registerNode } from '../core/Node.js';
 import UniformNode from '../core/UniformNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
 class BufferNode extends UniformNode {
+
+	static get type() {
+
+		return 'BufferNode';
+
+	}
 
 	constructor( value, bufferType, bufferCount = 0 ) {
 
@@ -30,7 +35,5 @@ class BufferNode extends UniformNode {
 }
 
 export default BufferNode;
-
-BufferNode.type = /*@__PURE__*/ registerNode( 'Buffer', BufferNode );
 
 export const buffer = ( value, type, count ) => nodeObject( new BufferNode( value, type, count ) );

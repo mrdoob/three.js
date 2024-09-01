@@ -1,9 +1,14 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { sub, mul, div } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 
 class MathNode extends TempNode {
+
+	static get type() {
+
+		return 'MathNode';
+
+	}
 
 	constructor( method, aNode, bNode = null, cNode = null ) {
 
@@ -263,8 +268,6 @@ MathNode.SMOOTHSTEP = 'smoothstep';
 MathNode.FACEFORWARD = 'faceforward';
 
 export default MathNode;
-
-MathNode.type = /*@__PURE__*/ registerNode( 'Math', MathNode );
 
 export const EPSILON = /*@__PURE__*/ float( 1e-6 );
 export const INFINITY = /*@__PURE__*/ float( 1e6 );

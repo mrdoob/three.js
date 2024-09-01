@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { nodeObject, Fn, vec2, vec3, vec4 } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
@@ -10,6 +9,12 @@ import { viewportResolution } from '../display/ViewportNode.js';
 import { Vector2 } from '../../math/Vector2.js';
 
 class DotScreenNode extends TempNode {
+
+	static get type() {
+
+		return 'DotScreenNode';
+
+	}
 
 	constructor( inputNode, center = new Vector2( 0.5, 0.5 ), angle = 1.57, scale = 1 ) {
 
@@ -57,7 +62,5 @@ class DotScreenNode extends TempNode {
 }
 
 export default DotScreenNode;
-
-DotScreenNode.type = /*@__PURE__*/ registerNode( 'DotScreen', DotScreenNode );
 
 export const dotScreen = ( node, center, angle, scale ) => nodeObject( new DotScreenNode( nodeObject( node ), center, angle, scale ) );

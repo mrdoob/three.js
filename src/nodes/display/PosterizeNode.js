@@ -1,8 +1,13 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
 class PosterizeNode extends TempNode {
+
+	static get type() {
+
+		return 'PosterizeNode';
+
+	}
 
 	constructor( sourceNode, stepsNode ) {
 
@@ -24,7 +29,5 @@ class PosterizeNode extends TempNode {
 }
 
 export default PosterizeNode;
-
-PosterizeNode.type = /*@__PURE__*/ registerNode( 'Posterize', PosterizeNode );
 
 export const posterize = /*@__PURE__*/ nodeProxy( PosterizeNode );

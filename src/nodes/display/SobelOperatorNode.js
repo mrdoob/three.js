@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UV.js';
 import { luminance } from './ColorAdjustment.js';
@@ -11,6 +10,12 @@ import { convertToTexture } from '../utils/RTTNode.js';
 import { Vector2 } from '../../math/Vector2.js';
 
 class SobelOperatorNode extends TempNode {
+
+	static get type() {
+
+		return 'SobelOperatorNode';
+
+	}
 
 	constructor( textureNode ) {
 
@@ -117,7 +122,5 @@ class SobelOperatorNode extends TempNode {
 }
 
 export default SobelOperatorNode;
-
-SobelOperatorNode.type = /*@__PURE__*/ registerNode( 'SobelOperator', SobelOperatorNode );
 
 export const sobel = ( node ) => nodeObject( new SobelOperatorNode( convertToTexture( node ) ) );

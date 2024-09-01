@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { modelViewMatrix } from './ModelNode.js';
 import { positionLocal, positionPrevious } from './Position.js';
@@ -12,6 +11,12 @@ import { cameraProjectionMatrix } from './Camera.js';
 const _matrixCache = new WeakMap();
 
 class VelocityNode extends TempNode {
+
+	static get type() {
+
+		return 'VelocityNode';
+
+	}
 
 	constructor() {
 
@@ -77,7 +82,5 @@ function getPreviousMatrix( object ) {
 }
 
 export default VelocityNode;
-
-VelocityNode.type = /*@__PURE__*/ registerNode( 'Velocity', VelocityNode );
 
 export const velocity = /*@__PURE__*/ nodeImmutable( VelocityNode );

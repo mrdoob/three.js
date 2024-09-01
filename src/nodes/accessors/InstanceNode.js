@@ -1,4 +1,4 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
 import { normalLocal } from './Normal.js';
@@ -13,6 +13,12 @@ import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js
 import { DynamicDrawUsage } from '../../constants.js';
 
 class InstanceNode extends Node {
+
+	static get type() {
+
+		return 'InstanceNode';
+
+	}
 
 	constructor( instanceMesh ) {
 
@@ -138,7 +144,5 @@ class InstanceNode extends Node {
 }
 
 export default InstanceNode;
-
-InstanceNode.type = /*@__PURE__*/ registerNode( 'Instance', InstanceNode );
 
 export const instance = /*@__PURE__*/ nodeProxy( InstanceNode );

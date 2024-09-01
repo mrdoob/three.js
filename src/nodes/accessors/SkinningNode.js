@@ -1,4 +1,4 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { attribute } from '../core/AttributeNode.js';
@@ -13,6 +13,12 @@ import { buffer } from './BufferNode.js';
 const _frameId = new WeakMap();
 
 class SkinningNode extends Node {
+
+	static get type() {
+
+		return 'SkinningNode';
+
+	}
 
 	constructor( skinnedMesh, useReference = false ) {
 
@@ -180,8 +186,6 @@ class SkinningNode extends Node {
 }
 
 export default SkinningNode;
-
-SkinningNode.type = /*@__PURE__*/ registerNode( 'Skinning', SkinningNode );
 
 export const skinning = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh ) );
 export const skinningReference = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh, true ) );

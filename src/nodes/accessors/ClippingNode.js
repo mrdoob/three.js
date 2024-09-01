@@ -1,5 +1,5 @@
 
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
 import { diffuseColor, property } from '../core/PropertyNode.js';
@@ -9,6 +9,12 @@ import { smoothstep } from '../math/MathNode.js';
 import { uniformArray } from './UniformArrayNode.js';
 
 class ClippingNode extends Node {
+
+	static get type() {
+
+		return 'ClippingNode';
+
+	}
 
 	constructor( scope = ClippingNode.DEFAULT ) {
 
@@ -139,8 +145,6 @@ ClippingNode.ALPHA_TO_COVERAGE = 'alphaToCoverage';
 ClippingNode.DEFAULT = 'default';
 
 export default ClippingNode;
-
-ClippingNode.type = /*@__PURE__*/ registerNode( 'Clipping', ClippingNode );
 
 export const clipping = () => nodeObject( new ClippingNode() );
 

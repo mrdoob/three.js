@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { mix } from '../math/MathNode.js';
@@ -8,6 +7,12 @@ import { objectPosition } from '../accessors/Object3DNode.js';
 import { Color } from '../../math/Color.js';
 
 class HemisphereLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'HemisphereLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -48,5 +53,3 @@ class HemisphereLightNode extends AnalyticLightNode {
 }
 
 export default HemisphereLightNode;
-
-HemisphereLightNode.type = /*@__PURE__*/ registerNode( 'HemisphereLight', HemisphereLightNode );
