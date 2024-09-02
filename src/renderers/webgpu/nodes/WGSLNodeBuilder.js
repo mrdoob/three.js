@@ -1043,6 +1043,8 @@ ${ flowData.code }
 
 		const shadersData = this.material !== null ? { fragment: {}, vertex: {} } : { compute: {} };
 
+		this.sortBindingGroups();
+
 		for ( const shaderStage in shadersData ) {
 
 			const stageData = shadersData[ shaderStage ];

@@ -425,7 +425,7 @@ class WebGPUBackend extends Backend {
 		renderContextData.descriptor = descriptor;
 		renderContextData.encoder = encoder;
 		renderContextData.currentPass = currentPass;
-		renderContextData.currentSets = { attributes: {}, pipeline: null, index: null };
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 		renderContextData.renderBundles = [];
 
 		//
@@ -848,12 +848,19 @@ class WebGPUBackend extends Backend {
 
 		// bind groups
 
+		const currentBindingGroups = currentSets.bindingGroups;
+
 		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
 
 			const bindGroup = bindings[ i ];
 			const bindingsData = this.get( bindGroup );
 
-			passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
+			if ( currentBindingGroups[ bindGroup.index ] !== bindGroup.id ) {
+
+				passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
+				currentBindingGroups[ bindGroup.index ] = bindGroup.id;
+
+			}
 
 		}
 
@@ -1286,7 +1293,7 @@ class WebGPUBackend extends Backend {
 		renderContextData._currentPass = renderContextData.currentPass;
 		renderContextData._currentSets = renderContextData.currentSets;
 
-		renderContextData.currentSets = { attributes: {}, pipeline: null, index: null };
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 		renderContextData.currentPass = this.pipelineUtils.createBundleEncoder( renderContext );
 
 	}
@@ -1515,7 +1522,7 @@ class WebGPUBackend extends Backend {
 		if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
 		renderContextData.currentPass = encoder.beginRenderPass( descriptor );
-		renderContextData.currentSets = { attributes: {}, pipeline: null, index: null };
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 
 	}
 
