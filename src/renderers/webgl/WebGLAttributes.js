@@ -76,19 +76,16 @@ function WebGLAttributes( gl ) {
 	function updateBuffer( buffer, attribute, bufferType ) {
 
 		const array = attribute.array;
-		const updateRange = attribute._updateRange; // @deprecated, r159
 		const updateRanges = attribute.updateRanges;
 
 		gl.bindBuffer( bufferType, buffer );
 
-		if ( updateRange.count === - 1 && updateRanges.length === 0 ) {
+		if ( updateRanges.length === 0 ) {
 
 			// Not using update ranges
 			gl.bufferSubData( bufferType, 0, array );
 
-		}
-
-		if ( updateRanges.length !== 0 ) {
+		} else {
 
 			// Before applying update ranges, we merge any adjacent / overlapping
 			// ranges to reduce load on `gl.bufferSubData`. Empirically, this has led
@@ -144,16 +141,6 @@ function WebGLAttributes( gl ) {
 			}
 
 			attribute.clearUpdateRanges();
-
-		}
-
-		// @deprecated, r159
-		if ( updateRange.count !== - 1 ) {
-
-			gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-				array, updateRange.offset, updateRange.count );
-
-			updateRange.count = - 1; // reset range
 
 		}
 
