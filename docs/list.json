@@ -1362,6 +1362,7 @@
 				"DragControls": "examples/ko/controls/DragControls",
 				"FirstPersonControls": "examples/ko/controls/FirstPersonControls",
 				"FlyControls": "examples/ko/controls/FlyControls",
+				"MapControls": "examples/ko/controls/MapControls",
 				"OrbitControls": "examples/ko/controls/OrbitControls",
 				"PointerLockControls": "examples/ko/controls/PointerLockControls",
 				"TrackballControls": "examples/ko/controls/TrackballControls",
