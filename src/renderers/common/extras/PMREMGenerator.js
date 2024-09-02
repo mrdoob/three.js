@@ -176,12 +176,12 @@ class PMREMGenerator {
 	 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
 	 * your texture's network fetch for increased concurrency.
 	 */
-	compileCubemapShader() {
+	async compileCubemapShader() {
 
 		if ( this._cubemapMaterial === null ) {
 
 			this._cubemapMaterial = _getCubemapMaterial();
-			this._compileMaterial( this._cubemapMaterial );
+			await this._compileMaterial( this._cubemapMaterial );
 
 		}
 
@@ -191,12 +191,12 @@ class PMREMGenerator {
 	 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
 	 * your texture's network fetch for increased concurrency.
 	 */
-	compileEquirectangularShader() {
+	async compileEquirectangularShader() {
 
 		if ( this._equirectMaterial === null ) {
 
 			this._equirectMaterial = _getEquirectMaterial();
-			this._compileMaterial( this._equirectMaterial );
+			await this._compileMaterial( this._equirectMaterial );
 
 		}
 
@@ -316,12 +316,10 @@ class PMREMGenerator {
 
 	}
 
-	_compileMaterial( material ) {
+	async _compileMaterial( material ) {
 
-		const tmpMesh = this._lodMeshes[ 0 ];
-		tmpMesh.material = material;
-
-		this._renderer.compile( tmpMesh, _flatCamera );
+		const tmpMesh = new Mesh( this._lodPlanes[ 0 ], material );
+		await this._renderer.compile( tmpMesh, _flatCamera );
 
 	}
 
