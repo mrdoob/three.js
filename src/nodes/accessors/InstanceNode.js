@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 import { instancedBufferAttribute, instancedDynamicBufferAttribute } from './BufferAttributeNode.js';
-import { normalLocal, transformNormalToView } from './Normal.js';
+import { normalLocal, transformNormal } from './Normal.js';
 import { positionLocal } from './Position.js';
 import { nodeProxy, vec3, mat4 } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
@@ -103,7 +103,7 @@ class InstanceNode extends Node {
 
 		if ( builder.hasGeometryAttribute( 'normal' ) ) {
 
-			const instanceNormal = transformNormalToView( normalLocal, instanceMatrixNode );
+			const instanceNormal = transformNormal( normalLocal, instanceMatrixNode );
 
 			// ASSIGNS
 
