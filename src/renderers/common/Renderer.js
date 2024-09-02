@@ -458,8 +458,6 @@ class Renderer {
 
 				this._nodes.updateBefore( renderObject );
 
-				//
-
 				this._nodes.updateForRender( renderObject );
 				this._bindings.updateForRender( renderObject );
 
@@ -1574,8 +1572,6 @@ class Renderer {
 
 		this._nodes.updateBefore( renderObject );
 
-		//
-
 		this._nodes.updateForRender( renderObject );
 		this._geometries.updateForRender( renderObject );
 		this._bindings.updateForRender( renderObject );
@@ -1604,8 +1600,6 @@ class Renderer {
 		//
 
 		this._nodes.updateBefore( renderObject );
-
-		//
 
 		this._nodes.updateForRender( renderObject );
 		this._geometries.updateForRender( renderObject );
