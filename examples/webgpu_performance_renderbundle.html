@@ -29,7 +29,7 @@
 		{
 			"imports": {
 				"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+				"three/tsl": "../build/three.webgpu.js",
 				"three/addons/": "./jsm/",
 				"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.7/dist/main.js"
 			}
@@ -68,6 +68,7 @@
 			renderBundle: true,
 			count: MAX_GEOMETRY_COUNT,
 			opacity: 1,
+			dynamic: false
 		};
 
 
@@ -154,7 +155,7 @@
 
 		function initRegularMesh( count ) {
 
-			group = api.renderBundle ?  new THREE.BundleGroup() : new THREE.Group();
+			group = api.renderBundle ? new THREE.BundleGroup() : new THREE.Group();
 
 			for ( let i = 0; i < count; i ++ ) {
 
@@ -295,7 +296,6 @@
 
 				const loopNum = Math.min( count, countDynamic );
 
-
 				for ( let i = 0; i < loopNum; i ++ ) {
 
 					const child = group.children[ i ];
@@ -311,7 +311,8 @@
 
 			}
 
-}
+		}
+
 	</script>
 
 </body>
