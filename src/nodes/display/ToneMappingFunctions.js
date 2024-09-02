@@ -5,12 +5,12 @@ import { mul, sub, div } from '../math/OperatorNode.js';
 
 // exposure only
 
-export const LinearToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
+export const linearToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	return color.mul( exposure ).clamp();
 
 } ).setLayout( {
-	name: 'LinearToneMapping',
+	name: 'linearToneMapping',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' },
@@ -20,14 +20,14 @@ export const LinearToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 // source: https://www.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf
 
-export const ReinhardToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
+export const reinhardToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	color = color.mul( exposure );
 
 	return color.div( color.add( 1.0 ) ).clamp();
 
 } ).setLayout( {
-	name: 'ReinhardToneMapping',
+	name: 'reinhardToneMapping',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' },
@@ -37,7 +37,7 @@ export const ReinhardToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => 
 
 // source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
 
-export const CineonToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
+export const cineonToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	// filmic operator by Jim Hejl and Richard Burgess-Dawson
 	color = color.mul( exposure );
@@ -49,7 +49,7 @@ export const CineonToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 	return a.div( b ).pow( 2.2 );
 
 } ).setLayout( {
-	name: 'CineonToneMapping',
+	name: 'cineonToneMapping',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' },
@@ -70,7 +70,7 @@ const RRTAndODTFit = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 // source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
 
-export const ACESFilmicToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
+export const acesFilmicToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	// sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT
 	const ACESInputMat = mat3(
@@ -99,7 +99,7 @@ export const ACESFilmicToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) =
 	return color.clamp();
 
 } ).setLayout( {
-	name: 'ACESFilmicToneMapping',
+	name: 'acesFilmicToneMapping',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' },
@@ -120,7 +120,7 @@ const agxDefaultContrastApprox = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 
 } );
 
-export const AgXToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
+export const agxToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	const colortone = vec3( color ).toVar();
 	const AgXInsetMatrix = mat3( vec3( 0.856627153315983, 0.137318972929847, 0.11189821299995 ), vec3( 0.0951212405381588, 0.761241990602591, 0.0767994186031903 ), vec3( 0.0482516061458583, 0.101439036467562, 0.811302368396859 ) );
@@ -143,7 +143,7 @@ export const AgXToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 	return colortone;
 
 } ).setLayout( {
-	name: 'AgXToneMapping',
+	name: 'agxToneMapping',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' },
@@ -153,7 +153,7 @@ export const AgXToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 // https://modelviewer.dev/examples/tone-mapping
 
-export const NeutralToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
+export const neutralToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	const StartCompression = float( 0.8 - 0.04 );
 	const Desaturation = float( 0.15 );
@@ -181,7 +181,7 @@ export const NeutralToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 	return mix( color, vec3( newPeak ), g );
 
 } ).setLayout( {
-	name: 'NeutralToneMapping',
+	name: 'neutralToneMapping',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' },
