@@ -44,7 +44,7 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 }, 'vec3' ).once() )().toVar( 'normalView' );
 
-export const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ).normalize(), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
+export const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
 
 export const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
@@ -53,7 +53,7 @@ export const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedNormalView' );
 
 
-export const transformedNormalWorld = /*@__PURE__*/ transformedNormalView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedNormalWorld' );
+export const transformedNormalWorld = /*@__PURE__*/ transformedNormalView.transformDirection( cameraViewMatrix ).toVar( 'transformedNormalWorld' );
 
 export const transformedClearcoatNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
