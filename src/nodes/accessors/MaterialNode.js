@@ -184,6 +184,7 @@ class MaterialNode extends Node {
 			if ( material.normalMap ) {
 
 				node = normalMap( this.getTexture( 'normal' ), this.getCache( 'normalScale', 'vec2' ) );
+				node.normalMapType = material.normalMapType;
 
 			} else if ( material.bumpMap ) {
 

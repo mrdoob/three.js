@@ -460,9 +460,6 @@ class Renderer {
 
 				//
 
-				renderObject.object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, renderObject.object.matrixWorld );
-				renderObject.object.normalMatrix.getNormalMatrix( renderObject.object.modelViewMatrix );
-
 				this._nodes.updateForRender( renderObject );
 				this._bindings.updateForRender( renderObject );
 
@@ -1576,11 +1573,6 @@ class Renderer {
 		//
 
 		this._nodes.updateBefore( renderObject );
-
-		//
-
-		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 		//
 
