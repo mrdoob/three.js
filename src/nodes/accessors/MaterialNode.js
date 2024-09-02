@@ -429,7 +429,6 @@ export const materialPointWidth = /*@__PURE__*/ nodeImmutable( MaterialNode, Mat
 export const materialDispersion = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.DISPERSION );
 export const materialLightMap = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.LIGHT_MAP );
 export const materialAOMap = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.AO_MAP );
-export const materialRefractionRatio = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.REFRACTION_RATIO );
 export const materialAnisotropyVector = /*@__PURE__*/ uniform( new Vector2() ).onReference( function ( frame ) {
 
 	return frame.material;
