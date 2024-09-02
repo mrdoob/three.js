@@ -1410,7 +1410,7 @@ class GLTFTextureBasisUExtension {
 		let extension;
 		if ( ! textureDef.extensions || ! textureDef.extensions[ this.name ] ) {
 
-			if (textureDef.source == undefined){
+			if (textureDef.source == undefined || json.extensionsRequired != EXTENSIONS.KHR_MATERIALS_UNLIT){
 				return null;
 			}
 			
