@@ -1,6 +1,6 @@
 import { attribute } from '../core/AttributeNode.js';
 import { cameraViewMatrix } from './Camera.js';
-import { modelViewMatrix } from './ModelNode.js';
+import { modelNormalViewMatrix } from './ModelNode.js';
 import { vec3 } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
 import { Fn, varying } from '../tsl/TSLBase.js';
@@ -36,7 +36,7 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	} else {
 
-		node = normalViewVarying || ( normalViewVarying = varying( modelViewMatrix.transformDirection( normalLocal ), 'v_normalView' ).normalize() );
+		node = normalViewVarying || ( normalViewVarying = varying( modelNormalViewMatrix.transformDirection( normalLocal ), 'v_normalView' ).normalize() );
 
 	}
 
@@ -53,7 +53,7 @@ export const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedNormalView' );
 
 
-export const transformedNormalWorld = /*@__PURE__*/ transformedNormalView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedNormalWorld' );
+export const transformedNormalWorld = /*@__PURE__*/ transformedNormalView.transformDirection( cameraViewMatrix ).toVar( 'transformedNormalWorld' );
 
 export const transformedClearcoatNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
