@@ -126,9 +126,6 @@
 
 		}
 
-
-
-
 		function cleanup() {
 
 			if ( group ) {
@@ -252,6 +249,8 @@
 
 			} );
 
+			gui.add( api, 'dynamic' );
+
 			// listeners
 
 			window.addEventListener( 'resize', onWindowResize );
@@ -292,9 +291,7 @@
 			function animateMeshes() {
 
 				const count = api.count / ( api.webgpu ? 1 : 10 );
-				const countDynamic = api.dynamic / ( api.webgpu ? 1 : 10 );
-
-				const loopNum = Math.min( count, countDynamic );
+				const loopNum = api.dynamic ? count : 0;
 
 				for ( let i = 0; i < loopNum; i ++ ) {
 
