@@ -1407,13 +1407,19 @@ class GLTFTextureBasisUExtension {
 
 		const textureDef = json.textures[ textureIndex ];
 
+		let extension;
 		if ( ! textureDef.extensions || ! textureDef.extensions[ this.name ] ) {
 
-			return null;
-
+			if (textureDef.source == undefined){
+				return null;
+			}
+			
+			extension = textureDef;
+		}else{
+			extension = textureDef.extensions[ this.name ];
 		}
 
-		const extension = textureDef.extensions[ this.name ];
+		// const extension = textureDef.extensions[ this.name ];
 		const loader = parser.options.ktx2Loader;
 
 		if ( ! loader ) {
