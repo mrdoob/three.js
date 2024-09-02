@@ -224,22 +224,12 @@ class WebGPUAttributeUtils {
 		const bufferGPU = data.buffer;
 		const size = bufferGPU.size;
 
-		let readBufferGPU = data.readBuffer;
-		let needsUnmap = true;
+		const readBufferGPU = device.createBuffer( {
+			label: attribute.name,
+			size,
+			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+		} );
 
-		if ( readBufferGPU === undefined ) {
-
-			readBufferGPU = device.createBuffer( {
-				label: attribute.name,
-				size,
-				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-			} );
-
-			needsUnmap = false;
-
-			data.readBuffer = readBufferGPU;
-
-		}
 
 		const cmdEncoder = device.createCommandEncoder( {} );
 
@@ -251,7 +241,7 @@ class WebGPUAttributeUtils {
 			size
 		);
 
-		if ( needsUnmap ) readBufferGPU.unmap();
+		readBufferGPU.unmap();
 
 		const gpuCommands = cmdEncoder.finish();
 		device.queue.submit( [ gpuCommands ] );
