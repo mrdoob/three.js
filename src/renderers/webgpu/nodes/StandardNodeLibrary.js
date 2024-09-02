@@ -52,12 +52,12 @@ import { IESSpotLightNode } from '../../../nodes/Nodes.js';
 
 // Tone Mapping
 import { LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping } from '../../../constants.js';
-import * as TMF from '../../../nodes/display/ToneMappingFunctions.js';
+import { linearToneMapping, reinhardToneMapping, cineonToneMapping, acesFilmicToneMapping, agxToneMapping, neutralToneMapping } from '../../../nodes/display/ToneMappingFunctions.js';
 
 // Color Space
 import { LinearSRGBColorSpace, SRGBColorSpace } from '../../../constants.js';
+import { linearSRGBTosRGB, sRGBToLinearSRGB } from '../../../nodes/display/ColorSpaceFunctions.js';
 import { getColorSpaceMethod } from '../../../nodes/display/ColorSpaceNode.js';
-import * as CSF from '../../../nodes/display/ColorSpaceFunctions.js';
 
 class StandardNodeLibrary extends NodeLibrary {
 
@@ -88,15 +88,15 @@ class StandardNodeLibrary extends NodeLibrary {
 		this.addLight( LightProbeNode, LightProbe );
 		this.addLight( IESSpotLightNode, IESSpotLight );
 
-		this.addToneMapping( TMF.LinearToneMapping, LinearToneMapping );
-		this.addToneMapping( TMF.ReinhardToneMapping, ReinhardToneMapping );
-		this.addToneMapping( TMF.CineonToneMapping, CineonToneMapping );
-		this.addToneMapping( TMF.ACESFilmicToneMapping, ACESFilmicToneMapping );
-		this.addToneMapping( TMF.AgXToneMapping, AgXToneMapping );
-		this.addToneMapping( TMF.NeutralToneMapping, NeutralToneMapping );
+		this.addToneMapping( linearToneMapping, LinearToneMapping );
+		this.addToneMapping( reinhardToneMapping, ReinhardToneMapping );
+		this.addToneMapping( cineonToneMapping, CineonToneMapping );
+		this.addToneMapping( acesFilmicToneMapping, ACESFilmicToneMapping );
+		this.addToneMapping( agxToneMapping, AgXToneMapping );
+		this.addToneMapping( neutralToneMapping, NeutralToneMapping );
 
-		this.addColorSpace( CSF.LinearTosRGB, getColorSpaceMethod( LinearSRGBColorSpace, SRGBColorSpace ) );
-		this.addColorSpace( CSF.sRGBToLinear, getColorSpaceMethod( SRGBColorSpace, LinearSRGBColorSpace ) );
+		this.addColorSpace( linearSRGBTosRGB, getColorSpaceMethod( LinearSRGBColorSpace, SRGBColorSpace ) );
+		this.addColorSpace( sRGBToLinearSRGB, getColorSpaceMethod( SRGBColorSpace, LinearSRGBColorSpace ) );
 
 	}
 
