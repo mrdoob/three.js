@@ -318,9 +318,7 @@ class PMREMGenerator {
 
 	_compileMaterial( material ) {
 
-		const tmpMesh = this._lodMeshes[ 0 ];
-		tmpMesh.material = material;
-
+		const tmpMesh = new Mesh( this._lodPlanes[ 0 ], material );
 		this._renderer.compile( tmpMesh, _flatCamera );
 
 	}

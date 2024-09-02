@@ -5,7 +5,7 @@ import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
 import { NodeFrame } from '../../../nodes/Nodes.js';
 import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, normalWorld, pmremTexture, viewportUV } from '../../../nodes/TSL.js';
 
-import { EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
+import { CubeUVReflectionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
 
 const outputNodeMap = new WeakMap();
 
@@ -272,9 +272,9 @@ class Nodes extends DataMap {
 
 				let backgroundNode = null;
 
-				if ( background.isCubeTexture === true || ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) ) {
+				if ( background.isCubeTexture === true || ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping || background.mapping === CubeUVReflectionMapping ) ) {
 
-					if ( scene.backgroundBlurriness > 0 ) {
+					if ( scene.backgroundBlurriness > 0 || background.mapping === CubeUVReflectionMapping ) {
 
 						backgroundNode = pmremTexture( background, normalWorld );
 
