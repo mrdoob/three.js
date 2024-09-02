@@ -229,7 +229,6 @@ class MaterialNode extends Node {
 			if ( material.clearcoatNormalMap ) {
 
 				node = normalMap( this.getTexture( scope ), this.getCache( scope + 'Scale', 'vec2' ) );
-				node.normalMapType = material.clearcoatNormalMapType;
 
 			} else {
 
