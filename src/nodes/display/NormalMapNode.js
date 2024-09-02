@@ -1,8 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { add } from '../math/OperatorNode.js';
 
-import { modelNormalViewMatrix } from '../accessors/ModelNode.js';
-import { normalView } from '../accessors/Normal.js';
+import { normalView, transformNormalToView } from '../accessors/Normal.js';
 import { positionView } from '../accessors/Position.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
 import { uv } from '../accessors/UV.js';
@@ -73,7 +72,7 @@ class NormalMapNode extends TempNode {
 
 		if ( normalMapType === ObjectSpaceNormalMap ) {
 
-			outputNode = modelNormalViewMatrix.transformDirection( normalMap );
+			outputNode = transformNormalToView( normalMap );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 

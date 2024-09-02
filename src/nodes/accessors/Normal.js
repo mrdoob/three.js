@@ -1,7 +1,7 @@
 import { attribute } from '../core/AttributeNode.js';
 import { cameraViewMatrix } from './Camera.js';
-import { modelNormalViewMatrix } from './ModelNode.js';
-import { vec3 } from '../tsl/TSLBase.js';
+import { modelWorldMatrix } from './ModelNode.js';
+import { mat3, vec3 } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
 import { Fn, varying } from '../tsl/TSLBase.js';
 import { faceDirection } from '../display/FrontFacingNode.js';
@@ -36,7 +36,7 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	} else {
 
-		node = normalViewVarying || ( normalViewVarying = varying( modelNormalViewMatrix.transformDirection( normalLocal ), 'v_normalView' ).normalize() );
+		node = normalViewVarying || ( normalViewVarying = varying( transformNormalToView( normalLocal ), 'v_normalView' ).normalize() );
 
 	}
 
@@ -60,3 +60,19 @@ export const transformedClearcoatNormalView = /*@__PURE__*/ ( Fn( ( builder ) =>
 	return builder.context.setupClearcoatNormal();
 
 }, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedClearcoatNormalView' );
+
+export const transformNormal = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorldMatrix ] ) => {
+
+	const m = mat3( matrix );
+
+	const transformedNormal = normal.div( vec3( m[ 0 ].dot( m[ 0 ] ), m[ 1 ].dot( m[ 1 ] ), m[ 2 ].dot( m[ 2 ] ) ) );
+
+	return m.mul( transformedNormal ).xyz;
+
+} );
+
+export const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorldMatrix ] ) => {
+
+	return cameraViewMatrix.transformDirection( transformNormal( normal, matrix ) );
+
+} );
