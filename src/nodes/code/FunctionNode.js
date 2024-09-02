@@ -1,8 +1,13 @@
-import { registerNodeClass } from '../core/Node.js';
 import CodeNode from './CodeNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
 class FunctionNode extends CodeNode {
+
+	static get type() {
+
+		return 'FunctionNode';
+
+	}
 
 	constructor( code = '', includes = [], language = '' ) {
 
@@ -80,8 +85,6 @@ class FunctionNode extends CodeNode {
 }
 
 export default FunctionNode;
-
-registerNodeClass( 'Function', FunctionNode );
 
 const nativeFn = ( code, includes = [], language = '' ) => {
 

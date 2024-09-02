@@ -126,6 +126,7 @@
 	"webgpu_materials_lightmap": [ "shadow" ],
 	"webgpu_materials_sss": [ "subsurface scattering", "derivatives", "translucency" ],
 	"webgpu_materials_transmission": [ "alpha" ],
+	"webgpu_materials_arrays": [ "webgpu", "geometry", "groups", "array" ],
 	"webgpu_mirror": [ "reflection" ],
 	"webgpu_multiple_rendertargets": [ "mrt" ],
 	"webgpu_multiple_rendertargets_readback": [ "mrt" ],

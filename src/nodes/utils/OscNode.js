@@ -1,8 +1,14 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { timerLocal } from './TimerNode.js';
 import { nodeObject, nodeProxy } from '../tsl/TSLBase.js';
 
 class OscNode extends Node {
+
+	static get type() {
+
+		return 'OscNode';
+
+	}
 
 	constructor( method = OscNode.SINE, timeNode = timerLocal() ) {
 
@@ -73,9 +79,7 @@ OscNode.SAWTOOTH = 'sawtooth';
 
 export default OscNode;
 
-registerNodeClass( 'Osc', OscNode );
-
-export const oscSine = nodeProxy( OscNode, OscNode.SINE );
-export const oscSquare = nodeProxy( OscNode, OscNode.SQUARE );
-export const oscTriangle = nodeProxy( OscNode, OscNode.TRIANGLE );
-export const oscSawtooth = nodeProxy( OscNode, OscNode.SAWTOOTH );
+export const oscSine = /*@__PURE__*/ nodeProxy( OscNode, OscNode.SINE );
+export const oscSquare = /*@__PURE__*/ nodeProxy( OscNode, OscNode.SQUARE );
+export const oscTriangle = /*@__PURE__*/ nodeProxy( OscNode, OscNode.TRIANGLE );
+export const oscSawtooth = /*@__PURE__*/ nodeProxy( OscNode, OscNode.SAWTOOTH );

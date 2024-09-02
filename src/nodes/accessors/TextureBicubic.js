@@ -51,7 +51,7 @@ const bicubic = ( textureNode, texelSize, lod ) => {
 
 };
 
-export const textureBicubic = Fn( ( [ textureNode, lodNode = float( 3 ) ] ) => {
+export const textureBicubic = /*@__PURE__*/ Fn( ( [ textureNode, lodNode = float( 3 ) ] ) => {
 
 	const fLodSize = vec2( textureNode.size( int( lodNode ) ) );
 	const cLodSize = vec2( textureNode.size( int( lodNode.add( 1.0 ) ) ) );

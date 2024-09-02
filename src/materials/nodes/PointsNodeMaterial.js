@@ -6,6 +6,12 @@ const _defaultValues = /*@__PURE__*/ new PointsMaterial();
 
 class PointsNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'PointsNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();

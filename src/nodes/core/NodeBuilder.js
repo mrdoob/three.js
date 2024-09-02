@@ -622,7 +622,7 @@ class NodeBuilder {
 
 	}
 
-	needsColorSpaceToLinear( /*texture*/ ) {
+	needsToWorkingColorSpace( /*texture*/ ) {
 
 		return false;
 

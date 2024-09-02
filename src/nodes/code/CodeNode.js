@@ -1,7 +1,13 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
 class CodeNode extends Node {
+
+	static get type() {
+
+		return 'CodeNode';
+
+	}
 
 	constructor( code = '', includes = [], language = '' ) {
 
@@ -75,9 +81,7 @@ class CodeNode extends Node {
 
 export default CodeNode;
 
-registerNodeClass( 'Code', CodeNode );
-
-export const code = nodeProxy( CodeNode );
+export const code = /*@__PURE__*/ nodeProxy( CodeNode );
 
 export const js = ( src, includes ) => code( src, includes, 'js' );
 export const wgsl = ( src, includes ) => code( src, includes, 'wgsl' );

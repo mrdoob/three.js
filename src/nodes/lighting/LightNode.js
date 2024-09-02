@@ -1,9 +1,15 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 import { objectPosition } from '../accessors/Object3DNode.js';
 import { cameraViewMatrix } from '../accessors/Camera.js';
 
 class LightNode extends Node {
+
+	static get type() {
+
+		return 'LightNode';
+
+	}
 
 	constructor( scope = LightNode.TARGET_DIRECTION, light = null ) {
 
@@ -52,6 +58,4 @@ LightNode.TARGET_DIRECTION = 'targetDirection';
 
 export default LightNode;
 
-registerNodeClass( 'Light', LightNode );
-
-export const lightTargetDirection = nodeProxy( LightNode, LightNode.TARGET_DIRECTION );
+export const lightTargetDirection = /*@__PURE__*/ nodeProxy( LightNode, LightNode.TARGET_DIRECTION );

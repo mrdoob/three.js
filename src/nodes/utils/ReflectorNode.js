@@ -1,4 +1,3 @@
-import { registerNodeClass } from '../core/Node.js';
 import TextureNode from '../accessors/TextureNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
@@ -33,6 +32,12 @@ const _defaultUV = viewportUV.flipX();
 let _inReflector = false;
 
 class ReflectorNode extends TextureNode {
+
+	static get type() {
+
+		return 'ReflectorNode';
+
+	}
 
 	constructor( parameters = {} ) {
 
@@ -236,5 +241,3 @@ class ReflectorNode extends TextureNode {
 export const reflector = ( parameters ) => nodeObject( new ReflectorNode( parameters ) );
 
 export default ReflectorNode;
-
-registerNodeClass( 'Reflector', ReflectorNode );

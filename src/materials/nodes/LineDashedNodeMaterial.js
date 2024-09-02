@@ -10,6 +10,12 @@ const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
 class LineDashedNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'LineDashedNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();

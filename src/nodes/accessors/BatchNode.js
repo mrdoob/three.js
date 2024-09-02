@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { normalLocal } from './Normal.js';
 import { positionLocal } from './Position.js';
 import { nodeProxy, vec3, mat3, mat4, int, ivec2, float, Fn } from '../tsl/TSLBase.js';
@@ -9,6 +9,12 @@ import { instanceIndex, drawIndex } from '../core/IndexNode.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 
 class BatchNode extends Node {
+
+	static get type() {
+
+		return 'BatchNode';
+
+	}
 
 	constructor( batchMesh ) {
 
@@ -119,6 +125,4 @@ class BatchNode extends Node {
 
 export default BatchNode;
 
-registerNodeClass( 'Batch', BatchNode );
-
-export const batch = nodeProxy( BatchNode );
+export const batch = /*@__PURE__*/ nodeProxy( BatchNode );

@@ -22,17 +22,16 @@ import { Scene } from '../../scenes/Scene.js';
 import { Frustum } from '../../math/Frustum.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
-import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
-import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
+import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
 
 const _scene = /*@__PURE__*/ new Scene();
 const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
 const _frustum = /*@__PURE__*/ new Frustum();
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
-const _vector3 = /*@__PURE__*/ new Vector3();
+const _vector4 = /*@__PURE__*/ new Vector4();
 
 class Renderer {
 
@@ -408,20 +407,20 @@ class Renderer {
 
 	_renderBundle( bundle, sceneRef, lightsNode ) {
 
-		const { object, camera, renderList } = bundle;
+		const { bundleGroup, camera, renderList } = bundle;
 
 		const renderContext = this._currentRenderContext;
 
 		//
 
-		const renderBundle = this._bundles.get( object, camera );
+		const renderBundle = this._bundles.get( bundleGroup, camera );
 		const renderBundleData = this.backend.get( renderBundle );
 
 		if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = new Set();
 
 		//
 
-		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || object.needsUpdate === true;
+		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || bundleGroup.needsUpdate === true;
 
 		renderBundleData.renderContexts.add( renderContext );
 
@@ -429,7 +428,7 @@ class Renderer {
 
 			this.backend.beginBundle( renderContext );
 
-			if ( renderBundleData.renderObjects === undefined || object.needsUpdate === true ) {
+			if ( renderBundleData.renderObjects === undefined || bundleGroup.needsUpdate === true ) {
 
 				renderBundleData.renderObjects = [];
 
@@ -447,7 +446,7 @@ class Renderer {
 
 			this.backend.finishBundle( renderContext, renderBundle );
 
-			object.needsUpdate = false;
+			bundleGroup.needsUpdate = false;
 
 		} else {
 
@@ -493,10 +492,10 @@ class Renderer {
 
 	_getFrameBufferTarget() {
 
-		const { currentColorSpace } = this;
+		const { currentToneMapping, currentColorSpace } = this;
 
-		const useToneMapping = this._renderTarget === null && ( this.toneMapping !== NoToneMapping );
-		const useColorSpace = this._renderTarget === null && ( currentColorSpace !== LinearSRGBColorSpace && currentColorSpace !== NoColorSpace );
+		const useToneMapping = currentToneMapping !== NoToneMapping;
+		const useColorSpace = currentColorSpace !== LinearSRGBColorSpace;
 
 		if ( useToneMapping === false && useColorSpace === false ) return null;
 
@@ -1088,19 +1087,15 @@ class Renderer {
 
 	}
 
+	get currentToneMapping() {
+
+		return this._renderTarget !== null ? NoToneMapping : this.toneMapping;
+
+	}
+
 	get currentColorSpace() {
 
-		const renderTarget = this._renderTarget;
-
-		if ( renderTarget !== null ) {
-
-			const texture = renderTarget.texture;
-
-			return ( Array.isArray( texture ) ? texture[ 0 ] : texture ).colorSpace;
-
-		}
-
-		return this.outputColorSpace;
+		return this._renderTarget !== null ? LinearSRGBColorSpace : this.outputColorSpace;
 
 	}
 
@@ -1299,7 +1294,7 @@ class Renderer {
 
 					if ( this.sortObjects === true ) {
 
-						_vector3.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
+						_vector4.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
 
 					}
 
@@ -1308,7 +1303,7 @@ class Renderer {
 
 					if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null );
 
 					}
 
@@ -1329,7 +1324,7 @@ class Renderer {
 
 						if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-						_vector3
+						_vector4
 							.copy( geometry.boundingSphere.center )
 							.applyMatrix4( object.matrixWorld )
 							.applyMatrix4( _projScreenMatrix );
@@ -1347,7 +1342,7 @@ class Renderer {
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								renderList.push( object, geometry, groupMaterial, groupOrder, _vector3.z, group );
+								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group );
 
 							}
 
@@ -1355,7 +1350,7 @@ class Renderer {
 
 					} else if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null );
 
 					}
 
@@ -1365,7 +1360,7 @@ class Renderer {
 
 		}
 
-		if ( object.static === true && this.backend.beginBundle !== undefined ) {
+		if ( object.isBundleGroup === true && this.backend.beginBundle !== undefined ) {
 
 			const baseRenderList = renderList;
 
@@ -1375,7 +1370,7 @@ class Renderer {
 			renderList.begin();
 
 			baseRenderList.pushBundle( {
-				object,
+				bundleGroup: object,
 				camera,
 				renderList,
 			} );
@@ -1575,7 +1570,8 @@ class Renderer {
 	_renderObjectDirect( object, material, scene, camera, lightsNode, group, passId ) {
 
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
-		renderObject.drawRange = group || object.geometry.drawRange;
+		renderObject.drawRange = object.geometry.drawRange;
+		renderObject.group = group;
 
 		//
 

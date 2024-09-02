@@ -6,6 +6,12 @@ const _defaultValues = /*@__PURE__*/ new LineBasicMaterial();
 
 class LineBasicNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'LineBasicNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();

@@ -5,7 +5,7 @@ import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
 
 import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from '../../common/nodes/NodeSampledTexture.js';
 
-import { ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat, RedIntegerFormat, RGIntegerFormat, UnsignedByteType, UnsignedIntType, UnsignedShortType, RedFormat, RGFormat, IntType, RGBFormat, RGBAFormat, FloatType } from '../../../constants.js';
+import { NoColorSpace, ByteType, ShortType, RGBAIntegerFormat, RGBIntegerFormat, RedIntegerFormat, RGIntegerFormat, UnsignedByteType, UnsignedIntType, UnsignedShortType, RedFormat, RGFormat, IntType, RGBFormat, RGBAFormat, FloatType } from '../../../constants.js';
 import { DataTexture } from '../../../textures/DataTexture.js';
 
 const glslMethods = {
@@ -59,6 +59,12 @@ class GLSLNodeBuilder extends NodeBuilder {
 		this.instanceBindGroups = false;
 
 		this.useComparisonMethod = true;
+
+	}
+
+	needsColorSpaceToLinearSRGB( texture ) {
+
+		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
 
 	}
 

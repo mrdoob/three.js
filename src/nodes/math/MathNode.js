@@ -1,9 +1,14 @@
-import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { sub, mul, div } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 
 class MathNode extends TempNode {
+
+	static get type() {
+
+		return 'MathNode';
+
+	}
 
 	constructor( method, aNode, bNode = null, cNode = null ) {
 
@@ -264,75 +269,73 @@ MathNode.FACEFORWARD = 'faceforward';
 
 export default MathNode;
 
-registerNodeClass( 'Math', MathNode );
+export const EPSILON = /*@__PURE__*/ float( 1e-6 );
+export const INFINITY = /*@__PURE__*/ float( 1e6 );
+export const PI = /*@__PURE__*/ float( Math.PI );
+export const PI2 = /*@__PURE__*/ float( Math.PI * 2 );
 
-export const EPSILON = float( 1e-6 );
-export const INFINITY = float( 1e6 );
-export const PI = float( Math.PI );
-export const PI2 = float( Math.PI * 2 );
+export const all = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ALL );
+export const any = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ANY );
+export const equals = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EQUALS );
 
-export const all = nodeProxy( MathNode, MathNode.ALL );
-export const any = nodeProxy( MathNode, MathNode.ANY );
-export const equals = nodeProxy( MathNode, MathNode.EQUALS );
+export const radians = /*@__PURE__*/ nodeProxy( MathNode, MathNode.RADIANS );
+export const degrees = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DEGREES );
+export const exp = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EXP );
+export const exp2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.EXP2 );
+export const log = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LOG );
+export const log2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LOG2 );
+export const sqrt = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SQRT );
+export const inverseSqrt = /*@__PURE__*/ nodeProxy( MathNode, MathNode.INVERSE_SQRT );
+export const floor = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FLOOR );
+export const ceil = /*@__PURE__*/ nodeProxy( MathNode, MathNode.CEIL );
+export const normalize = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NORMALIZE );
+export const fract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FRACT );
+export const sin = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SIN );
+export const cos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.COS );
+export const tan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TAN );
+export const asin = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ASIN );
+export const acos = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ACOS );
+export const atan = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ATAN );
+export const abs = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ABS );
+export const sign = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SIGN );
+export const length = /*@__PURE__*/ nodeProxy( MathNode, MathNode.LENGTH );
+export const negate = /*@__PURE__*/ nodeProxy( MathNode, MathNode.NEGATE );
+export const oneMinus = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ONE_MINUS );
+export const dFdx = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DFDX );
+export const dFdy = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DFDY );
+export const round = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ROUND );
+export const reciprocal = /*@__PURE__*/ nodeProxy( MathNode, MathNode.RECIPROCAL );
+export const trunc = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRUNC );
+export const fwidth = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FWIDTH );
+export const bitcast = /*@__PURE__*/ nodeProxy( MathNode, MathNode.BITCAST );
+export const transpose = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRANSPOSE );
 
-export const radians = nodeProxy( MathNode, MathNode.RADIANS );
-export const degrees = nodeProxy( MathNode, MathNode.DEGREES );
-export const exp = nodeProxy( MathNode, MathNode.EXP );
-export const exp2 = nodeProxy( MathNode, MathNode.EXP2 );
-export const log = nodeProxy( MathNode, MathNode.LOG );
-export const log2 = nodeProxy( MathNode, MathNode.LOG2 );
-export const sqrt = nodeProxy( MathNode, MathNode.SQRT );
-export const inverseSqrt = nodeProxy( MathNode, MathNode.INVERSE_SQRT );
-export const floor = nodeProxy( MathNode, MathNode.FLOOR );
-export const ceil = nodeProxy( MathNode, MathNode.CEIL );
-export const normalize = nodeProxy( MathNode, MathNode.NORMALIZE );
-export const fract = nodeProxy( MathNode, MathNode.FRACT );
-export const sin = nodeProxy( MathNode, MathNode.SIN );
-export const cos = nodeProxy( MathNode, MathNode.COS );
-export const tan = nodeProxy( MathNode, MathNode.TAN );
-export const asin = nodeProxy( MathNode, MathNode.ASIN );
-export const acos = nodeProxy( MathNode, MathNode.ACOS );
-export const atan = nodeProxy( MathNode, MathNode.ATAN );
-export const abs = nodeProxy( MathNode, MathNode.ABS );
-export const sign = nodeProxy( MathNode, MathNode.SIGN );
-export const length = nodeProxy( MathNode, MathNode.LENGTH );
-export const negate = nodeProxy( MathNode, MathNode.NEGATE );
-export const oneMinus = nodeProxy( MathNode, MathNode.ONE_MINUS );
-export const dFdx = nodeProxy( MathNode, MathNode.DFDX );
-export const dFdy = nodeProxy( MathNode, MathNode.DFDY );
-export const round = nodeProxy( MathNode, MathNode.ROUND );
-export const reciprocal = nodeProxy( MathNode, MathNode.RECIPROCAL );
-export const trunc = nodeProxy( MathNode, MathNode.TRUNC );
-export const fwidth = nodeProxy( MathNode, MathNode.FWIDTH );
-export const bitcast = nodeProxy( MathNode, MathNode.BITCAST );
-export const transpose = nodeProxy( MathNode, MathNode.TRANSPOSE );
-
-export const atan2 = nodeProxy( MathNode, MathNode.ATAN2 );
-export const min = nodeProxy( MathNode, MathNode.MIN );
-export const max = nodeProxy( MathNode, MathNode.MAX );
-export const mod = nodeProxy( MathNode, MathNode.MOD );
-export const step = nodeProxy( MathNode, MathNode.STEP );
-export const reflect = nodeProxy( MathNode, MathNode.REFLECT );
-export const distance = nodeProxy( MathNode, MathNode.DISTANCE );
-export const difference = nodeProxy( MathNode, MathNode.DIFFERENCE );
-export const dot = nodeProxy( MathNode, MathNode.DOT );
-export const cross = nodeProxy( MathNode, MathNode.CROSS );
-export const pow = nodeProxy( MathNode, MathNode.POW );
-export const pow2 = nodeProxy( MathNode, MathNode.POW, 2 );
-export const pow3 = nodeProxy( MathNode, MathNode.POW, 3 );
-export const pow4 = nodeProxy( MathNode, MathNode.POW, 4 );
-export const transformDirection = nodeProxy( MathNode, MathNode.TRANSFORM_DIRECTION );
+export const atan2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.ATAN2 );
+export const min = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIN );
+export const max = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MAX );
+export const mod = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MOD );
+export const step = /*@__PURE__*/ nodeProxy( MathNode, MathNode.STEP );
+export const reflect = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFLECT );
+export const distance = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DISTANCE );
+export const difference = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DIFFERENCE );
+export const dot = /*@__PURE__*/ nodeProxy( MathNode, MathNode.DOT );
+export const cross = /*@__PURE__*/ nodeProxy( MathNode, MathNode.CROSS );
+export const pow = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW );
+export const pow2 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 2 );
+export const pow3 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 3 );
+export const pow4 = /*@__PURE__*/ nodeProxy( MathNode, MathNode.POW, 4 );
+export const transformDirection = /*@__PURE__*/ nodeProxy( MathNode, MathNode.TRANSFORM_DIRECTION );
 
 export const cbrt = ( a ) => mul( sign( a ), pow( abs( a ), 1.0 / 3.0 ) );
 export const lengthSq = ( a ) => dot( a, a );
-export const mix = nodeProxy( MathNode, MathNode.MIX );
+export const mix = /*@__PURE__*/ nodeProxy( MathNode, MathNode.MIX );
 export const clamp = ( value, low = 0, high = 1 ) => nodeObject( new MathNode( MathNode.CLAMP, nodeObject( value ), nodeObject( low ), nodeObject( high ) ) );
 export const saturate = ( value ) => clamp( value );
-export const refract = nodeProxy( MathNode, MathNode.REFRACT );
-export const smoothstep = nodeProxy( MathNode, MathNode.SMOOTHSTEP );
-export const faceForward = nodeProxy( MathNode, MathNode.FACEFORWARD );
+export const refract = /*@__PURE__*/ nodeProxy( MathNode, MathNode.REFRACT );
+export const smoothstep = /*@__PURE__*/ nodeProxy( MathNode, MathNode.SMOOTHSTEP );
+export const faceForward = /*@__PURE__*/ nodeProxy( MathNode, MathNode.FACEFORWARD );
 
-export const rand = Fn( ( [ uv ] ) => {
+export const rand = /*@__PURE__*/ Fn( ( [ uv ] ) => {
 
 	const a = 12.9898, b = 78.233, c = 43758.5453;
 	const dt = dot( uv.xy, vec2( a, b ) ), sn = mod( dt, PI );

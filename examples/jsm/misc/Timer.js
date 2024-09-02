@@ -115,7 +115,7 @@ class FixedTimer extends Timer {
 
 function now() {
 
-	return ( typeof performance === 'undefined' ? Date : performance ).now();
+	return performance.now();
 
 }
 

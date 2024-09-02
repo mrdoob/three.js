@@ -8,6 +8,12 @@ const _defaultValues = /*@__PURE__*/ new MeshLambertMaterial();
 
 class MeshLambertNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'MeshLambertNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();

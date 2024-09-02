@@ -9,7 +9,7 @@ import { iridescence, alphaT, anisotropyT, anisotropyB } from '../../core/Proper
 import { Fn, defined } from '../../tsl/TSLBase.js';
 
 // GGX Distribution, Schlick Fresnel, GGX_SmithCorrelated Visibility
-const BRDF_GGX = Fn( ( inputs ) => {
+const BRDF_GGX = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { lightDirection, f0, f90, roughness, f, USE_IRIDESCENCE, USE_ANISOTROPY } = inputs;
 

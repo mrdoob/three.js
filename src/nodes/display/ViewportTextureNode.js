@@ -1,4 +1,3 @@
-import { registerNodeClass } from '../core/Node.js';
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
@@ -11,6 +10,12 @@ import { LinearMipmapLinearFilter } from '../../constants.js';
 const _size = /*@__PURE__*/ new Vector2();
 
 class ViewportTextureNode extends TextureNode {
+
+	static get type() {
+
+		return 'ViewportTextureNode';
+
+	}
 
 	constructor( uvNode = viewportUV, levelNode = null, framebufferTexture = null ) {
 
@@ -72,7 +77,5 @@ class ViewportTextureNode extends TextureNode {
 
 export default ViewportTextureNode;
 
-registerNodeClass( 'ViewportTexture', ViewportTextureNode );
-
-export const viewportTexture = nodeProxy( ViewportTextureNode );
-export const viewportMipTexture = nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );
+export const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode );
+export const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );

@@ -17,6 +17,12 @@ const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
 class Line2NodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'Line2NodeMaterial';
+
+	}
+
 	constructor( params = {} ) {
 
 		super();

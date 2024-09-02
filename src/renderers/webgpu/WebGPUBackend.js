@@ -440,7 +440,7 @@ class WebGPUBackend extends Backend {
 
 			const { x, y, width, height } = renderContext.scissorValue;
 
-			currentPass.setScissorRect( x, renderContext.height - height - y, width, height );
+			currentPass.setScissorRect( x, y, width, height );
 
 		}
 
@@ -585,7 +585,7 @@ class WebGPUBackend extends Backend {
 		const { currentPass } = this.get( renderContext );
 		const { x, y, width, height, minDepth, maxDepth } = renderContext.viewportValue;
 
-		currentPass.setViewport( x, renderContext.height - height - y, width, height, minDepth, maxDepth );
+		currentPass.setViewport( x, y, width, height, minDepth, maxDepth );
 
 	}
 
@@ -829,7 +829,7 @@ class WebGPUBackend extends Backend {
 
 	draw( renderObject, info ) {
 
-		const { object, geometry, context, pipeline } = renderObject;
+		const { object, material, geometry, context, pipeline, group } = renderObject;
 		const bindings = renderObject.getBindings();
 		const renderContextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
@@ -937,7 +937,26 @@ class WebGPUBackend extends Backend {
 		// draw
 
 		const drawRange = renderObject.drawRange;
-		const firstVertex = drawRange.start;
+
+		let rangeFactor = 1;
+
+		if ( material.wireframe === true && ! object.isPoints && ! object.isLineSegments && ! object.isLine && ! object.isLineLoop ) {
+
+			rangeFactor = 2;
+
+		}
+
+		let firstVertex = drawRange.start * rangeFactor;
+		let lastVertex = ( drawRange.start + drawRange.count ) * rangeFactor;
+
+		if ( group !== null ) {
+
+			firstVertex = Math.max( firstVertex, group.start * rangeFactor );
+			lastVertex = Math.min( lastVertex, ( group.start + group.count ) * rangeFactor );
+
+		}
+
+
 
 		const instanceCount = this.getInstanceCount( renderObject );
 		if ( instanceCount === 0 ) return;
@@ -962,18 +981,32 @@ class WebGPUBackend extends Backend {
 
 		} else if ( hasIndex === true ) {
 
-			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
+			const indexCount = index.count;
 
-			passEncoderGPU.drawIndexed( indexCount, instanceCount, firstVertex, 0, 0 );
+			firstVertex = Math.max( firstVertex, 0 );
+			lastVertex = Math.min( lastVertex, indexCount );
+
+			const count = lastVertex - firstVertex;
+
+			if ( count < 0 || count === Infinity ) return;
+
+			passEncoderGPU.drawIndexed( count, instanceCount, firstVertex, 0, 0 );
 
 			info.update( object, indexCount, instanceCount );
 
 		} else {
 
 			const positionAttribute = geometry.attributes.position;
-			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
+			const vertexCount = positionAttribute.count;
 
-			passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+			firstVertex = Math.max( firstVertex, 0 );
+			lastVertex = Math.min( lastVertex, vertexCount );
+
+			const count = lastVertex - firstVertex;
+
+			if ( count < 0 || count === Infinity ) return;
+
+			passEncoderGPU.draw( count, instanceCount, firstVertex, 0 );
 
 			info.update( object, vertexCount, instanceCount );
 

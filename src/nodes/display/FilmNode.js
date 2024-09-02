@@ -1,4 +1,3 @@
-import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UV.js';
 import { Fn, nodeProxy, vec4 } from '../tsl/TSLBase.js';
@@ -6,6 +5,12 @@ import { mix, fract, clamp, rand } from '../math/MathNode.js';
 import { timerLocal } from '../utils/TimerNode.js';
 
 class FilmNode extends TempNode {
+
+	static get type() {
+
+		return 'FilmNode';
+
+	}
 
 	constructor( inputNode, intensityNode = null, uvNode = null ) {
 
@@ -48,6 +53,4 @@ class FilmNode extends TempNode {
 
 export default FilmNode;
 
-registerNodeClass( 'Film', FilmNode );
-
-export const film = nodeProxy( FilmNode );
+export const film = /*@__PURE__*/ nodeProxy( FilmNode );

@@ -1,7 +1,13 @@
-import Node, { registerNodeClass } from './Node.js';
+import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class VarNode extends Node {
+
+	static get type() {
+
+		return 'VarNode';
+
+	}
 
 	constructor( node, name = null ) {
 
@@ -48,9 +54,7 @@ class VarNode extends Node {
 
 export default VarNode;
 
-registerNodeClass( 'Var', VarNode );
-
-export const temp = nodeProxy( VarNode );
+export const temp = /*@__PURE__*/ nodeProxy( VarNode );
 
 addMethodChaining( 'temp', temp ); // @TODO: Will be removed in the future
 addMethodChaining( 'toVar', ( ...params ) => temp( ...params ).append() );

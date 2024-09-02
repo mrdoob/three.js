@@ -5,7 +5,7 @@ import { bvec3, vec3, Fn } from '../../tsl/TSLBase.js';
 import { greaterThan } from '../../math/OperatorNode.js';
 import { max, pow, mix } from '../../math/MathNode.js';
 
-export const mx_srgb_texture_to_lin_rec709 = /*#__PURE__*/ Fn( ( [ color_immutable ] ) => {
+export const mx_srgb_texture_to_lin_rec709 = /*@__PURE__*/ Fn( ( [ color_immutable ] ) => {
 
 	const color = vec3( color_immutable ).toVar();
 	const isAbove = bvec3( greaterThan( color, vec3( 0.04045 ) ) ).toVar();

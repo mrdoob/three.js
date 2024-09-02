@@ -1,4 +1,4 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { nodeObject, nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 const sortLights = ( lights ) => {
@@ -24,6 +24,12 @@ const getLightNodeById = ( id, lightNodes ) => {
 };
 
 class LightsNode extends Node {
+
+	static get type() {
+
+		return 'LightsNode';
+
+	}
 
 	constructor( lights = [] ) {
 
@@ -106,7 +112,7 @@ class LightsNode extends Node {
 
 					const lightNodeClass = nodeLibrary.getLightNodeClass( light.constructor );
 
-					if ( lightNodeClass === undefined ) {
+					if ( lightNodeClass === null ) {
 
 						console.warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
 						continue;
@@ -226,6 +232,4 @@ class LightsNode extends Node {
 
 export default LightsNode;
 
-registerNodeClass( 'Lights', LightsNode );
-
-export const lights = nodeProxy( LightsNode );
+export const lights = /*@__PURE__*/ nodeProxy( LightsNode );

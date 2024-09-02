@@ -25,6 +25,12 @@ import { clipping, clippingAlpha } from '../../nodes/accessors/ClippingNode.js';
 
 class NodeMaterial extends Material {
 
+	static get type() {
+
+		return 'NodeMaterial';
+
+	}
+
 	constructor() {
 
 		super();

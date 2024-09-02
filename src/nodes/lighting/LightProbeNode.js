@@ -1,4 +1,3 @@
-import { registerNodeClass } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { normalWorld } from '../accessors/Normal.js';
 import { uniformArray } from '../accessors/UniformArrayNode.js';
@@ -7,6 +6,12 @@ import { mul } from '../math/OperatorNode.js';
 import { Vector3 } from '../../math/Vector3.js';
 
 class LightProbeNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'LightProbeNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -48,9 +53,7 @@ class LightProbeNode extends AnalyticLightNode {
 
 export default LightProbeNode;
 
-registerNodeClass( 'LightProbe', LightProbeNode );
-
-const shGetIrradianceAt = Fn( ( [ normal, shCoefficients ] ) => {
+const shGetIrradianceAt = /*@__PURE__*/ Fn( ( [ normal, shCoefficients ] ) => {
 
 	// normal is assumed to have unit length
 

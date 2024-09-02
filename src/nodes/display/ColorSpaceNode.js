@@ -1,4 +1,3 @@
-import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
 
@@ -30,28 +29,37 @@ export const getColorSpaceMethod = ( source, target ) => {
 
 class ColorSpaceNode extends TempNode {
 
-	constructor( colorSpace, colorNode ) {
+	static get type() {
+
+		return 'ColorSpaceNode';
+
+	}
+
+	constructor( colorNode, target = null, source = null ) {
 
 		super( 'vec4' );
 
-		this.colorSpace = colorSpace;
 		this.colorNode = colorNode;
+		this.target = target;
+		this.source = source;
 
 	}
 
 	setup( builder ) {
 
-		const { colorSpace, colorNode } = this;
+		const { renderer, context } = builder;
 
-		if ( colorSpace === ColorSpaceNode.LINEAR_TO_LINEAR ) {
+		const source = this.source || context.outputColorSpace || renderer.outputColorSpace;
+		const target = this.target || context.outputColorSpace || renderer.outputColorSpace;
+		const colorNode = this.colorNode;
 
-			return colorNode;
+		if ( source === target ) return colorNode;
 
-		}
+		const colorSpace = getColorSpaceMethod( source, target );
 
 		let outputNode = null;
 
-		const colorSpaceFn = builder.renderer.nodes.library.getColorSpaceFunction( colorSpace );
+		const colorSpaceFn = renderer.nodes.library.getColorSpaceFunction( colorSpace );
 
 		if ( colorSpaceFn !== null ) {
 
@@ -71,14 +79,10 @@ class ColorSpaceNode extends TempNode {
 
 }
 
-ColorSpaceNode.LINEAR_TO_LINEAR = 'LinearToLinear';
-
 export default ColorSpaceNode;
 
-registerNodeClass( 'ColorSpace', ColorSpaceNode );
+export const toOutputColorSpace = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), colorSpace, LinearSRGBColorSpace ) );
+export const toWorkingColorSpace = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), LinearSRGBColorSpace, colorSpace ) );
 
-export const linearToColorSpace = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( getColorSpaceMethod( LinearSRGBColorSpace, colorSpace ), nodeObject( node ) ) );
-export const colorSpaceToLinear = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( getColorSpaceMethod( colorSpace, LinearSRGBColorSpace ), nodeObject( node ) ) );
-
-addMethodChaining( 'linearToColorSpace', linearToColorSpace );
-addMethodChaining( 'colorSpaceToLinear', colorSpaceToLinear );
+addMethodChaining( 'toOutputColorSpace', toOutputColorSpace );
+addMethodChaining( 'toWorkingColorSpace', toWorkingColorSpace );

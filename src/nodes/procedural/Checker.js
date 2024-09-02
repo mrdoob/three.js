@@ -1,7 +1,7 @@
 import { uv } from '../accessors/UV.js';
 import { Fn } from '../tsl/TSLBase.js';
 
-export const checker = Fn( ( [ coord = uv() ] ) => {
+export const checker = /*@__PURE__*/ Fn( ( [ coord = uv() ] ) => {
 
 	const uv = coord.mul( 2.0 );
 

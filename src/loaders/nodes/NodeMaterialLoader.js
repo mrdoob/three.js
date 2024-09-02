@@ -7,6 +7,7 @@ class NodeMaterialLoader extends MaterialLoader {
 		super( manager );
 
 		this.nodes = {};
+		this.nodeMaterials = {};
 
 	}
 
@@ -32,8 +33,28 @@ class NodeMaterialLoader extends MaterialLoader {
 	setNodes( value ) {
 
 		this.nodes = value;
-
 		return this;
+
+	}
+
+	setNodeMaterials( value ) {
+
+		this.nodeMaterials = value;
+		return this;
+
+	}
+
+	createMaterialFromType( type ) {
+
+		const materialClass = this.nodeMaterials[ type ];
+
+		if ( materialClass !== undefined ) {
+
+			return new materialClass();
+
+		}
+
+		return super.createMaterialFromType( type );
 
 	}
 

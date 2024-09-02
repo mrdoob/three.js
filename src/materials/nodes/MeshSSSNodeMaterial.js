@@ -38,6 +38,12 @@ class SSSLightingModel extends PhysicalLightingModel {
 
 class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 
+	static get type() {
+
+		return 'MeshSSSNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super( parameters );

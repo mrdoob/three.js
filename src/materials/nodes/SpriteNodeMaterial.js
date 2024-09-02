@@ -13,6 +13,12 @@ const _defaultValues = /*@__PURE__*/ new SpriteMaterial();
 
 class SpriteNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'SpriteNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();

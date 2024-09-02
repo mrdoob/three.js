@@ -2,7 +2,7 @@ import NodeMaterial from './NodeMaterial.js';
 import { property } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
-import { materialColor, materialPointWidth } from '../../nodes/accessors/MaterialNode.js'; // or should this be a property, instead?
+import { materialColor, materialOpacity, materialPointWidth } from '../../nodes/accessors/MaterialNode.js'; // or should this be a property, instead?
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { smoothstep } from '../../nodes/math/MathNode.js';
@@ -15,6 +15,12 @@ import { PointsMaterial } from '../PointsMaterial.js';
 const _defaultValues = /*@__PURE__*/ new PointsMaterial();
 
 class InstancedPointsNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'InstancedPointsNodeMaterial';
+
+	}
 
 	constructor( params = {} ) {
 
@@ -29,6 +35,8 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 		this.pointWidth = 1;
 
 		this.pointColorNode = null;
+
+		this.pointWidthNode = null;
 
 		this.setDefaultValues( _defaultValues );
 
@@ -56,7 +64,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			//vUv = uv;
 			varying( vec2(), 'vUv' ).assign( uv() ); // @TODO: Analyze other way to do this
 
-			const instancePosition = attribute( 'instancePosition' );
+			const instancePosition = attribute( 'instancePosition' ).xyz;
 
 			// camera space
 			const mvPos = property( 'vec4', 'mvPos' );
@@ -70,7 +78,9 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			// offset in ndc space
 			const offset = property( 'vec2', 'offset' );
 			offset.assign( positionGeometry.xy );
-			offset.assign( offset.mul( materialPointWidth ) );
+
+			offset.mulAssign( this.pointWidthNode ? this.pointWidthNode : materialPointWidth );
+
 			offset.assign( offset.div( viewport.z ) );
 			offset.y.assign( offset.y.mul( aspect ) );
 
@@ -134,6 +144,8 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 				}
 
 			}
+
+			alpha.mulAssign( materialOpacity );
 
 			return vec4( pointColorNode, alpha );
 

@@ -1,4 +1,3 @@
-import { registerNodeClass } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
@@ -123,6 +122,12 @@ const shadowFilterLib = [ BasicShadowMap, PCFShadowMap, PCFSoftShadowMap ];
 let overrideMaterial = null;
 
 class AnalyticLightNode extends LightingNode {
+
+	static get type() {
+
+		return 'AnalyticLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -350,5 +355,3 @@ class AnalyticLightNode extends LightingNode {
 }
 
 export default AnalyticLightNode;
-
-registerNodeClass( 'AnalyticLight', AnalyticLightNode );

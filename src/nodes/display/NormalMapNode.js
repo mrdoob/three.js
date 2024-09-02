@@ -1,4 +1,3 @@
-import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { add } from '../math/OperatorNode.js';
 
@@ -15,7 +14,7 @@ import { TangentSpaceNormalMap, ObjectSpaceNormalMap } from '../../constants.js'
 // Normal Mapping Without Precomputed Tangents
 // http://www.thetenthplanet.de/archives/1180
 
-const perturbNormal2Arb = Fn( ( inputs ) => {
+const perturbNormal2Arb = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { eye_pos, surf_norm, mapN, uv } = inputs;
 
@@ -40,6 +39,12 @@ const perturbNormal2Arb = Fn( ( inputs ) => {
 } );
 
 class NormalMapNode extends TempNode {
+
+	static get type() {
+
+		return 'NormalMapNode';
+
+	}
 
 	constructor( node, scaleNode = null ) {
 
@@ -99,6 +104,4 @@ class NormalMapNode extends TempNode {
 
 export default NormalMapNode;
 
-registerNodeClass( 'NormalMap', NormalMapNode );
-
-export const normalMap = nodeProxy( NormalMapNode );
+export const normalMap = /*@__PURE__*/ nodeProxy( NormalMapNode );

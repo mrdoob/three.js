@@ -698,10 +698,8 @@ function _createRenderTarget( width, height, params ) {
 
 function _setViewport( target, x, y, width, height ) {
 
-	const viewY = target.height - height - y;
-
-	target.viewport.set( x, viewY, width, height );
-	target.scissor.set( x, viewY, width, height );
+	target.viewport.set( x, y, width, height );
+	target.scissor.set( x, y, width, height );
 
 }
 

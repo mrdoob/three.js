@@ -1,6 +1,12 @@
-import Node, { registerNodeClass } from './Node.js';
+import Node from './Node.js';
 
 class TempNode extends Node {
+
+	static get type() {
+
+		return 'TempNode';
+
+	}
 
 	constructor( type ) {
 
@@ -54,5 +60,3 @@ class TempNode extends Node {
 }
 
 export default TempNode;
-
-registerNodeClass( 'Temp', TempNode );

@@ -46,6 +46,12 @@ const perturbNormalArb = Fn( ( inputs ) => {
 
 class BumpMapNode extends TempNode {
 
+	static get type() {
+
+		return 'BumpMapNode';
+
+	}
+
 	constructor( textureNode, scaleNode = null ) {
 
 		super( 'vec3' );
@@ -72,4 +78,4 @@ class BumpMapNode extends TempNode {
 
 export default BumpMapNode;
 
-export const bumpMap = nodeProxy( BumpMapNode );
+export const bumpMap = /*@__PURE__*/ nodeProxy( BumpMapNode );
