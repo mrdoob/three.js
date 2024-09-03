@@ -56,13 +56,13 @@ const MultiplyOperation = 0;
 const MixOperation = 1;
 const AddOperation = 2;
 const NoToneMapping = 0;
-const LinearToneMapping$1 = 1;
-const ReinhardToneMapping$1 = 2;
-const CineonToneMapping$1 = 3;
-const ACESFilmicToneMapping$1 = 4;
+const LinearToneMapping = 1;
+const ReinhardToneMapping = 2;
+const CineonToneMapping = 3;
+const ACESFilmicToneMapping = 4;
 const CustomToneMapping = 5;
-const AgXToneMapping$1 = 6;
-const NeutralToneMapping$1 = 7;
+const AgXToneMapping = 6;
+const NeutralToneMapping = 7;
 const AttachedBindMode = 'attached';
 const DetachedBindMode = 'detached';
 
@@ -9867,7 +9867,6 @@ class BufferAttribute {
 		this.normalized = normalized;
 
 		this.usage = StaticDrawUsage;
-		this._updateRange = { offset: 0, count: - 1 };
 		this.updateRanges = [];
 		this.gpuType = FloatType;
 
@@ -9880,13 +9879,6 @@ class BufferAttribute {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
-
-	}
-
-	get updateRange() {
-
-		warnOnce( 'THREE.BufferAttribute: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
-		return this._updateRange;
 
 	}
 
@@ -13177,7 +13169,6 @@ class InterleavedBuffer {
 		this.count = array !== undefined ? array.length / stride : 0;
 
 		this.usage = StaticDrawUsage;
-		this._updateRange = { offset: 0, count: - 1 };
 		this.updateRanges = [];
 
 		this.version = 0;
@@ -13191,13 +13182,6 @@ class InterleavedBuffer {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
-
-	}
-
-	get updateRange() {
-
-		warnOnce( 'THREE.InterleavedBuffer: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
-		return this._updateRange;
 
 	}
 
@@ -28167,7 +28151,7 @@ class MaterialLoader extends Loader {
 
 		}
 
-		const material = MaterialLoader.createMaterialFromType( json.type );
+		const material = this.createMaterialFromType( json.type );
 
 		if ( json.uuid !== undefined ) material.uuid = json.uuid;
 		if ( json.name !== undefined ) material.name = json.name;
@@ -28420,6 +28404,12 @@ class MaterialLoader extends Loader {
 
 		this.textures = value;
 		return this;
+
+	}
+
+	createMaterialFromType( type ) {
+
+		return MaterialLoader.createMaterialFromType( type );
 
 	}
 
@@ -36510,11 +36500,15 @@ const defaultBuildStages = [ 'setup', 'analyze', 'generate' ];
 const shaderStages = [ ...defaultShaderStages, 'compute' ];
 const vectorComponents = [ 'x', 'y', 'z', 'w' ];
 
-const Nodes$1 = new Map();
-
 let _nodeId = 0;
 
 class Node extends EventDispatcher {
+
+	static get type() {
+
+		return 'Node';
+
+	}
 
 	constructor( nodeType = null ) {
 
@@ -37040,49 +37034,13 @@ class Node extends EventDispatcher {
 
 }
 
-Node.type = /*@__PURE__*/ registerNode( '', Node );
+class ArrayElementNode extends Node {
 
-function registerNode( type, nodeClass ) {
+	static get type() {
 
-	const suffix = 'Node';
-	const nodeType = type + suffix;
+		return 'ArrayElementNode';
 
-	if ( typeof nodeClass !== 'function' ) throw new Error( `TSL.Node: Node class ${ type } is not a class` );
-
-	if ( Nodes$1.has( nodeType ) ) {
-
-		console.warn( `TSL.Node: Redefinition of node class ${ nodeType }` );
-		return;
-
-	}
-
-	if ( type.slice( - suffix.length ) === suffix ) {
-
-		console.warn( `TSL.Node: Node class ${ nodeType } should not have '${ suffix }' suffix.` );
-		return;
-
-	}
-
-	Nodes$1.set( nodeType, nodeClass );
-	nodeClass.type = nodeType;
-
-	return nodeType;
-
-}
-
-function createNodeFromType( type ) {
-
-	const Class = Nodes$1.get( type );
-
-	if ( Class !== undefined ) {
-
-		return new Class();
-
-	}
-
-}
-
-class ArrayElementNode extends Node { // @TODO: If extending from TempNode it breaks webgpu_compute
+	} // @TODO: If extending from TempNode it breaks webgpu_compute
 
 	constructor( node, indexNode ) {
 
@@ -37112,9 +37070,13 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 
 }
 
-ArrayElementNode.type = /*@__PURE__*/ registerNode( 'ArrayElement', ArrayElementNode );
-
 class ConvertNode extends Node {
+
+	static get type() {
+
+		return 'ConvertNode';
+
+	}
 
 	constructor( node, convertTo ) {
 
@@ -37174,9 +37136,13 @@ class ConvertNode extends Node {
 
 }
 
-ConvertNode.type = /*@__PURE__*/ registerNode( 'Convert', ConvertNode );
-
 class TempNode extends Node {
+
+	static get type() {
+
+		return 'TempNode';
+
+	}
 
 	constructor( type ) {
 
@@ -37229,9 +37195,13 @@ class TempNode extends Node {
 
 }
 
-TempNode.type = /*@__PURE__*/ registerNode( 'Temp', TempNode );
-
 class JoinNode extends TempNode {
+
+	static get type() {
+
+		return 'JoinNode';
+
+	}
 
 	constructor( nodes = [], nodeType = null ) {
 
@@ -37286,11 +37256,15 @@ class JoinNode extends TempNode {
 
 }
 
-JoinNode.type = /*@__PURE__*/ registerNode( 'Join', JoinNode );
-
 const stringVectorComponents = vectorComponents.join( '' );
 
 class SplitNode extends Node {
+
+	static get type() {
+
+		return 'SplitNode';
+
+	}
 
 	constructor( node, components = 'x' ) {
 
@@ -37394,9 +37368,13 @@ class SplitNode extends Node {
 
 }
 
-SplitNode.type = /*@__PURE__*/ registerNode( 'Split', SplitNode );
-
 class SetNode extends TempNode {
+
+	static get type() {
+
+		return 'SetNode';
+
+	}
 
 	constructor( sourceNode, components, targetNode ) {
 
@@ -37451,9 +37429,13 @@ class SetNode extends TempNode {
 
 }
 
-SetNode.type = /*@__PURE__*/ registerNode( 'Set', SetNode );
-
 class FlipNode extends TempNode {
+
+	static get type() {
+
+		return 'FlipNode';
+
+	}
 
 	constructor( sourceNode, components ) {
 
@@ -37511,9 +37493,13 @@ class FlipNode extends TempNode {
 
 }
 
-FlipNode.type = /*@__PURE__*/ registerNode( 'Flip', FlipNode );
-
 class InputNode extends Node {
+
+	static get type() {
+
+		return 'InputNode';
+
+	}
 
 	constructor( value, nodeType = null ) {
 
@@ -37590,9 +37576,13 @@ class InputNode extends Node {
 
 }
 
-InputNode.type = /*@__PURE__*/ registerNode( 'Input', InputNode );
-
 class ConstNode extends InputNode {
+
+	static get type() {
+
+		return 'ConstNode';
+
+	}
 
 	constructor( value, nodeType = null ) {
 
@@ -37617,8 +37607,6 @@ class ConstNode extends InputNode {
 	}
 
 }
-
-ConstNode.type = /*@__PURE__*/ registerNode( 'Const', ConstNode );
 
 //
 
@@ -38267,7 +38255,13 @@ addMethodChaining( 'convert', convert );
 
 class UniformGroupNode extends Node {
 
-	constructor( name, shared = false ) {
+	static get type() {
+
+		return 'UniformGroupNode';
+
+	}
+
+	constructor( name, shared = false, order = 1 ) {
 
 		super( 'string' );
 
@@ -38275,7 +38269,7 @@ class UniformGroupNode extends Node {
 		this.version = 0;
 
 		this.shared = shared;
-
+		this.order = order;
 		this.isUniformGroup = true;
 
 	}
@@ -38308,16 +38302,20 @@ class UniformGroupNode extends Node {
 
 }
 
-UniformGroupNode.type = /*@__PURE__*/ registerNode( 'UniformGroup', UniformGroupNode );
-
 const uniformGroup = ( name ) => new UniformGroupNode( name );
-const sharedUniformGroup = ( name ) => new UniformGroupNode( name, true );
+const sharedUniformGroup = ( name, order = 0 ) => new UniformGroupNode( name, true, order );
 
 const frameGroup = /*@__PURE__*/ sharedUniformGroup( 'frame' );
 const renderGroup = /*@__PURE__*/ sharedUniformGroup( 'render' );
 const objectGroup = /*@__PURE__*/ uniformGroup( 'object' );
 
 class UniformNode extends InputNode {
+
+	static get type() {
+
+		return 'UniformNode';
+
+	}
 
 	constructor( value, nodeType = null ) {
 
@@ -38407,8 +38405,6 @@ class UniformNode extends InputNode {
 
 }
 
-UniformNode.type = /*@__PURE__*/ registerNode( 'Uniform', UniformNode );
-
 const uniform = ( arg1, arg2 ) => {
 
 	const nodeType = getConstNodeType( arg2 || arg1 );
@@ -38421,6 +38417,12 @@ const uniform = ( arg1, arg2 ) => {
 };
 
 class PropertyNode extends Node {
+
+	static get type() {
+
+		return 'PropertyNode';
+
+	}
 
 	constructor( nodeType, name = null, varying = false ) {
 
@@ -38466,8 +38468,6 @@ class PropertyNode extends Node {
 
 }
 
-PropertyNode.type = /*@__PURE__*/ registerNode( 'Property', PropertyNode );
-
 const property = ( type, name ) => nodeObject( new PropertyNode( type, name ) );
 const varyingProperty = ( type, name ) => nodeObject( new PropertyNode( type, name, true ) );
 
@@ -38501,6 +38501,12 @@ const attenuationColor = /*@__PURE__*/ nodeImmutable( PropertyNode, 'color', 'At
 const dispersion = /*@__PURE__*/ nodeImmutable( PropertyNode, 'float', 'Dispersion' );
 
 class AssignNode extends TempNode {
+
+	static get type() {
+
+		return 'AssignNode';
+
+	}
 
 	constructor( targetNode, sourceNode ) {
 
@@ -38616,13 +38622,17 @@ class AssignNode extends TempNode {
 
 }
 
-AssignNode.type = /*@__PURE__*/ registerNode( 'Assign', AssignNode );
-
 const assign = /*@__PURE__*/ nodeProxy( AssignNode );
 
 addMethodChaining( 'assign', assign );
 
 class FunctionCallNode extends TempNode {
+
+	static get type() {
+
+		return 'FunctionCallNode';
+
+	}
 
 	constructor( functionNode = null, parameters = {} ) {
 
@@ -38701,8 +38711,6 @@ class FunctionCallNode extends TempNode {
 
 }
 
-FunctionCallNode.type = /*@__PURE__*/ registerNode( 'FunctionCall', FunctionCallNode );
-
 const call = ( func, ...params ) => {
 
 	params = params.length > 1 || ( params[ 0 ] && params[ 0 ].isNode === true ) ? nodeArray( params ) : nodeObjects( params[ 0 ] );
@@ -38714,6 +38722,12 @@ const call = ( func, ...params ) => {
 addMethodChaining( 'call', call );
 
 class OperatorNode extends TempNode {
+
+	static get type() {
+
+		return 'OperatorNode';
+
+	}
 
 	constructor( op, aNode, bNode, ...params ) {
 
@@ -38968,8 +38982,6 @@ class OperatorNode extends TempNode {
 
 }
 
-OperatorNode.type = /*@__PURE__*/ registerNode( 'Operator', OperatorNode );
-
 const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' );
 const sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' );
 const mul = /*@__PURE__*/ nodeProxy( OperatorNode, '*' );
@@ -39025,6 +39037,12 @@ const remainder = ( ...params ) => { // @deprecated, r168
 addMethodChaining( 'remainder', remainder );
 
 class MathNode extends TempNode {
+
+	static get type() {
+
+		return 'MathNode';
+
+	}
 
 	constructor( method, aNode, bNode = null, cNode = null ) {
 
@@ -39283,8 +39301,6 @@ MathNode.REFRACT = 'refract';
 MathNode.SMOOTHSTEP = 'smoothstep';
 MathNode.FACEFORWARD = 'faceforward';
 
-MathNode.type = /*@__PURE__*/ registerNode( 'Math', MathNode );
-
 const EPSILON = /*@__PURE__*/ float( 1e-6 );
 const INFINITY = /*@__PURE__*/ float( 1e6 );
 const PI = /*@__PURE__*/ float( Math.PI );
@@ -39424,6 +39440,12 @@ addMethodChaining( 'rand', rand );
 
 class ConditionalNode extends Node {
 
+	static get type() {
+
+		return 'ConditionalNode';
+
+	}
+
 	constructor( condNode, ifNode, elseNode = null ) {
 
 		super();
@@ -39539,8 +39561,6 @@ class ConditionalNode extends Node {
 
 }
 
-ConditionalNode.type = /*@__PURE__*/ registerNode( 'Conditional', ConditionalNode );
-
 const select = /*@__PURE__*/ nodeProxy( ConditionalNode );
 
 addMethodChaining( 'select', select );
@@ -39557,6 +39577,12 @@ const cond = ( ...params ) => { // @deprecated, r168
 addMethodChaining( 'cond', cond );
 
 class ContextNode extends Node {
+
+	static get type() {
+
+		return 'ContextNode';
+
+	}
 
 	constructor( node, value = {} ) {
 
@@ -39617,8 +39643,6 @@ class ContextNode extends Node {
 
 }
 
-ContextNode.type = /*@__PURE__*/ registerNode( 'Context', ContextNode );
-
 const context = /*@__PURE__*/ nodeProxy( ContextNode );
 const label = ( node, name ) => context( node, { label: name } );
 
@@ -39626,6 +39650,12 @@ addMethodChaining( 'context', context );
 addMethodChaining( 'label', label );
 
 class VarNode extends Node {
+
+	static get type() {
+
+		return 'VarNode';
+
+	}
 
 	constructor( node, name = null ) {
 
@@ -39670,14 +39700,18 @@ class VarNode extends Node {
 
 }
 
-VarNode.type = /*@__PURE__*/ registerNode( 'Var', VarNode );
-
 const temp = /*@__PURE__*/ nodeProxy( VarNode );
 
 addMethodChaining( 'temp', temp ); // @TODO: Will be removed in the future
 addMethodChaining( 'toVar', ( ...params ) => temp( ...params ).append() );
 
 class VaryingNode extends Node {
+
+	static get type() {
+
+		return 'VaryingNode';
+
+	}
 
 	constructor( node, name = null ) {
 
@@ -39770,8 +39804,6 @@ class VaryingNode extends Node {
 
 }
 
-VaryingNode.type = /*@__PURE__*/ registerNode( 'Varying', VaryingNode );
-
 const varying = /*@__PURE__*/ nodeProxy( VaryingNode );
 
 addMethodChaining( 'varying', varying );
@@ -39801,6 +39833,12 @@ const getColorSpaceMethod = ( source, target ) => {
 };
 
 class ColorSpaceNode extends TempNode {
+
+	static get type() {
+
+		return 'ColorSpaceNode';
+
+	}
 
 	constructor( colorNode, target = null, source = null ) {
 
@@ -39846,8 +39884,6 @@ class ColorSpaceNode extends TempNode {
 
 }
 
-ColorSpaceNode.type = /*@__PURE__*/ registerNode( 'ColorSpace', ColorSpaceNode );
-
 const toOutputColorSpace = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), colorSpace, LinearSRGBColorSpace ) );
 const toWorkingColorSpace = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), LinearSRGBColorSpace, colorSpace ) );
 
@@ -39855,6 +39891,12 @@ addMethodChaining( 'toOutputColorSpace', toOutputColorSpace );
 addMethodChaining( 'toWorkingColorSpace', toWorkingColorSpace );
 
 let ReferenceElementNode$1 = class ReferenceElementNode extends ArrayElementNode {
+
+	static get type() {
+
+		return 'ReferenceElementNode';
+
+	}
 
 	constructor( referenceNode, indexNode ) {
 
@@ -39885,6 +39927,12 @@ let ReferenceElementNode$1 = class ReferenceElementNode extends ArrayElementNode
 };
 
 class ReferenceBaseNode extends Node {
+
+	static get type() {
+
+		return 'ReferenceBaseNode';
+
+	}
 
 	constructor( property, uniformType, object = null, count = null ) {
 
@@ -39985,9 +40033,13 @@ class ReferenceBaseNode extends Node {
 
 }
 
-ReferenceBaseNode.type = /*@__PURE__*/ registerNode( 'ReferenceBase', ReferenceBaseNode );
-
 class RendererReferenceNode extends ReferenceBaseNode {
+
+	static get type() {
+
+		return 'RendererReferenceNode';
+
+	}
 
 	constructor( property, inputType, renderer = null ) {
 
@@ -40007,11 +40059,15 @@ class RendererReferenceNode extends ReferenceBaseNode {
 
 }
 
-RendererReferenceNode.type = /*@__PURE__*/ registerNode( 'RendererReference', RendererReferenceNode );
-
 const rendererReference = ( name, type, renderer ) => nodeObject( new RendererReferenceNode( name, type, renderer ) );
 
 class ToneMappingNode extends TempNode {
+
+	static get type() {
+
+		return 'ToneMappingNode';
+
+	}
 
 	constructor( toneMapping, exposureNode = toneMappingExposure, colorNode = null ) {
 
@@ -40062,14 +40118,18 @@ class ToneMappingNode extends TempNode {
 
 }
 
-ToneMappingNode.type = /*@__PURE__*/ registerNode( 'ToneMapping', ToneMappingNode );
-
 const toneMapping = ( mapping, exposure, color ) => nodeObject( new ToneMappingNode( mapping, nodeObject( exposure ), nodeObject( color ) ) );
 const toneMappingExposure = /*@__PURE__*/ rendererReference( 'toneMappingExposure', 'float' );
 
 addMethodChaining( 'toneMapping', ( color, mapping, exposure ) => toneMapping( mapping, exposure, color ) );
 
 class BufferAttributeNode extends InputNode {
+
+	static get type() {
+
+		return 'BufferAttributeNode';
+
+	}
 
 	constructor( value, bufferType = null, bufferStride = 0, bufferOffset = 0 ) {
 
@@ -40211,8 +40271,6 @@ class BufferAttributeNode extends InputNode {
 
 }
 
-BufferAttributeNode.type = /*@__PURE__*/ registerNode( 'BufferAttribute', BufferAttributeNode );
-
 const bufferAttribute = ( array, type, stride, offset ) => nodeObject( new BufferAttributeNode( array, type, stride, offset ) );
 const dynamicBufferAttribute = ( array, type, stride, offset ) => bufferAttribute( array, type, stride, offset ).setUsage( DynamicDrawUsage );
 
@@ -40222,6 +40280,12 @@ const instancedDynamicBufferAttribute = ( array, type, stride, offset ) => dynam
 addMethodChaining( 'toAttribute', ( bufferNode ) => bufferAttribute( bufferNode.value ) );
 
 class ComputeNode extends Node {
+
+	static get type() {
+
+		return 'ComputeNode';
+
+	}
 
 	constructor( computeNode, count, workgroupSize = [ 64 ] ) {
 
@@ -40295,13 +40359,17 @@ class ComputeNode extends Node {
 
 }
 
-ComputeNode.type = /*@__PURE__*/ registerNode( 'Compute', ComputeNode );
-
 const compute = ( node, count, workgroupSize ) => nodeObject( new ComputeNode( nodeObject( node ), count, workgroupSize ) );
 
 addMethodChaining( 'compute', compute );
 
 class CacheNode extends Node {
+
+	static get type() {
+
+		return 'CacheNode';
+
+	}
 
 	constructor( node, parent = true ) {
 
@@ -40337,13 +40405,17 @@ class CacheNode extends Node {
 
 }
 
-CacheNode.type = /*@__PURE__*/ registerNode( 'Cache', CacheNode );
-
 const cache = ( node, ...params ) => nodeObject( new CacheNode( nodeObject( node ), ...params ) );
 
 addMethodChaining( 'cache', cache );
 
 class BypassNode extends Node {
+
+	static get type() {
+
+		return 'BypassNode';
+
+	}
 
 	constructor( returnNode, callNode ) {
 
@@ -40378,13 +40450,17 @@ class BypassNode extends Node {
 
 }
 
-BypassNode.type = /*@__PURE__*/ registerNode( 'Bypass', BypassNode );
-
 const bypass = /*@__PURE__*/ nodeProxy( BypassNode );
 
 addMethodChaining( 'bypass', bypass );
 
 class RemapNode extends Node {
+
+	static get type() {
+
+		return 'RemapNode';
+
+	}
 
 	constructor( node, inLowNode, inHighNode, outLowNode = float( 0 ), outHighNode = float( 1 ) ) {
 
@@ -40414,8 +40490,6 @@ class RemapNode extends Node {
 
 }
 
-RemapNode.type = /*@__PURE__*/ registerNode( 'Remap', RemapNode );
-
 const remap = /*@__PURE__*/ nodeProxy( RemapNode, null, null, { doClamp: false } );
 const remapClamp = /*@__PURE__*/ nodeProxy( RemapNode );
 
@@ -40423,6 +40497,12 @@ addMethodChaining( 'remap', remap );
 addMethodChaining( 'remapClamp', remapClamp );
 
 class ExpressionNode extends Node {
+
+	static get type() {
+
+		return 'ExpressionNode';
+
+	}
 
 	constructor( snippet = '', nodeType = 'void' ) {
 
@@ -40451,8 +40531,6 @@ class ExpressionNode extends Node {
 
 }
 
-ExpressionNode.type = /*@__PURE__*/ registerNode( 'Expression', ExpressionNode );
-
 const expression = /*@__PURE__*/ nodeProxy( ExpressionNode );
 
 const Discard = ( conditional ) => ( conditional ? select( conditional, expression( 'discard' ) ) : expression( 'discard' ) ).append();
@@ -40461,6 +40539,12 @@ const Return = () => expression( 'return' ).append();
 addMethodChaining( 'discard', Discard );
 
 class RenderOutputNode extends TempNode {
+
+	static get type() {
+
+		return 'RenderOutputNode';
+
+	}
 
 	constructor( colorNode, toneMapping, outputColorSpace ) {
 
@@ -40503,8 +40587,6 @@ class RenderOutputNode extends TempNode {
 
 }
 
-RenderOutputNode.type = /*@__PURE__*/ registerNode( 'RenderOutput', RenderOutputNode );
-
 const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => nodeObject( new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace ) );
 
 addMethodChaining( 'renderOutput', renderOutput );
@@ -40520,6 +40602,12 @@ function addNodeElement( name/*, nodeElement*/ ) {
 }
 
 class AttributeNode extends Node {
+
+	static get type() {
+
+		return 'AttributeNode';
+
+	}
 
 	constructor( attributeName, nodeType = null ) {
 
@@ -40632,13 +40720,17 @@ class AttributeNode extends Node {
 
 }
 
-AttributeNode.type = /*@__PURE__*/ registerNode( 'Attribute', AttributeNode );
-
 const attribute = ( name, nodeType ) => nodeObject( new AttributeNode( name, nodeType ) );
 
 const uv = ( index ) => attribute( 'uv' + ( index > 0 ? index : '' ), 'vec2' );
 
 class TextureSizeNode extends Node {
+
+	static get type() {
+
+		return 'TextureSizeNode';
+
+	}
 
 	constructor( textureNode, levelNode = null ) {
 
@@ -40662,11 +40754,15 @@ class TextureSizeNode extends Node {
 
 }
 
-TextureSizeNode.type = /*@__PURE__*/ registerNode( 'TextureSize', TextureSizeNode );
-
 const textureSize = /*@__PURE__*/ nodeProxy( TextureSizeNode );
 
 class MaxMipLevelNode extends UniformNode {
+
+	static get type() {
+
+		return 'MaxMipLevelNode';
+
+	}
 
 	constructor( textureNode ) {
 
@@ -40708,11 +40804,15 @@ class MaxMipLevelNode extends UniformNode {
 
 }
 
-MaxMipLevelNode.type = /*@__PURE__*/ registerNode( 'MaxMipLevel', MaxMipLevelNode );
-
 const maxMipLevel = /*@__PURE__*/ nodeProxy( MaxMipLevelNode );
 
 class TextureNode extends UniformNode {
+
+	static get type() {
+
+		return 'TextureNode';
+
+	}
 
 	constructor( value, uvNode = null, levelNode = null, biasNode = null ) {
 
@@ -41130,8 +41230,6 @@ class TextureNode extends UniformNode {
 
 }
 
-TextureNode.type = /*@__PURE__*/ registerNode( 'Texture', TextureNode );
-
 const texture = /*@__PURE__*/ nodeProxy( TextureNode );
 const textureLoad = ( ...params ) => texture( ...params ).setSampler( false );
 
@@ -41157,7 +41255,13 @@ const cameraPosition = /*@__PURE__*/ uniform( new Vector3() ).label( 'cameraPosi
 
 class Object3DNode extends Node {
 
-	constructor( scope = Object3DNode.VIEW_MATRIX, object3d = null ) {
+	static get type() {
+
+		return 'Object3DNode';
+
+	}
+
+	constructor( scope, object3d = null ) {
 
 		super();
 
@@ -41174,13 +41278,9 @@ class Object3DNode extends Node {
 
 		const scope = this.scope;
 
-		if ( scope === Object3DNode.WORLD_MATRIX || scope === Object3DNode.VIEW_MATRIX ) {
+		if ( scope === Object3DNode.WORLD_MATRIX ) {
 
 			return 'mat4';
-
-		} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
-
-			return 'mat3';
 
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION || scope === Object3DNode.SCALE ) {
 
@@ -41196,15 +41296,7 @@ class Object3DNode extends Node {
 		const uniformNode = this._uniformNode;
 		const scope = this.scope;
 
-		if ( scope === Object3DNode.VIEW_MATRIX ) {
-
-			uniformNode.value = object.modelViewMatrix;
-
-		} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
-
-			uniformNode.value = object.normalMatrix;
-
-		} else if ( scope === Object3DNode.WORLD_MATRIX ) {
+		if ( scope === Object3DNode.WORLD_MATRIX ) {
 
 			uniformNode.value = object.matrixWorld;
 
@@ -41243,13 +41335,9 @@ class Object3DNode extends Node {
 
 		const scope = this.scope;
 
-		if ( scope === Object3DNode.WORLD_MATRIX || scope === Object3DNode.VIEW_MATRIX ) {
+		if ( scope === Object3DNode.WORLD_MATRIX ) {
 
 			this._uniformNode.nodeType = 'mat4';
-
-		} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
-
-			this._uniformNode.nodeType = 'mat3';
 
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION || scope === Object3DNode.SCALE ) {
 
@@ -41279,19 +41367,13 @@ class Object3DNode extends Node {
 
 }
 
-Object3DNode.VIEW_MATRIX = 'viewMatrix';
-Object3DNode.NORMAL_MATRIX = 'normalMatrix';
 Object3DNode.WORLD_MATRIX = 'worldMatrix';
 Object3DNode.POSITION = 'position';
 Object3DNode.SCALE = 'scale';
 Object3DNode.VIEW_POSITION = 'viewPosition';
 Object3DNode.DIRECTION = 'direction';
 
-Object3DNode.type = /*@__PURE__*/ registerNode( 'Object3D', Object3DNode );
-
 const objectDirection = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.DIRECTION );
-const objectViewMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
-const objectNormalMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
 const objectWorldMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
 const objectPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.POSITION );
 const objectScale = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.SCALE );
@@ -41299,7 +41381,13 @@ const objectViewPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.V
 
 class ModelNode extends Object3DNode {
 
-	constructor( scope = ModelNode.VIEW_MATRIX ) {
+	static get type() {
+
+		return 'ModelNode';
+
+	}
+
+	constructor( scope ) {
 
 		super( scope );
 
@@ -41315,16 +41403,43 @@ class ModelNode extends Object3DNode {
 
 }
 
-ModelNode.type = /*@__PURE__*/ registerNode( 'Model', ModelNode );
-
 const modelDirection = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.DIRECTION );
-const modelViewMatrix = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.VIEW_MATRIX ).label( 'modelViewMatrix' ).toVar( 'ModelViewMatrix' );
-const modelNormalMatrix = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.NORMAL_MATRIX );
 const modelWorldMatrix = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.WORLD_MATRIX );
 const modelPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.POSITION );
 const modelScale = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.SCALE );
 const modelViewPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
 const modelWorldMatrixInverse = /*@__PURE__*/ uniform( new Matrix4() ).onObjectUpdate( ( { object }, self ) => self.value.copy( object.matrixWorld ).invert() );
+const modelViewMatrix = /*@__PURE__*/ cameraViewMatrix.mul( modelWorldMatrix ).toVar( 'modelViewMatrix' );
+
+const highPrecisionModelViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	builder.context.isHighPrecisionModelViewMatrix = true;
+
+	return uniform( 'mat4' ).onObjectUpdate( ( { object, camera } ) => {
+
+		return object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+
+	} );
+
+} ).once() )().toVar( 'highPrecisionModelViewMatrix' );
+
+const highPrecisionModelNormalMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
+
+	const isHighPrecisionModelViewMatrix = builder.context.isHighPrecisionModelViewMatrix;
+
+	return uniform( 'mat3' ).onObjectUpdate( ( { object, camera } ) => {
+
+		if ( isHighPrecisionModelViewMatrix !== true ) {
+
+			object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+
+		}
+
+		return object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
+
+	} );
+
+} ).once() )().toVar( 'highPrecisionModelNormalMatrix' );
 
 const positionGeometry = /*@__PURE__*/ attribute( 'position', 'vec3' );
 const positionLocal = /*@__PURE__*/ positionGeometry.varying( 'positionLocal' );
@@ -41335,6 +41450,12 @@ const positionView = /*@__PURE__*/ modelViewMatrix.mul( positionLocal ).xyz.vary
 const positionViewDirection = /*@__PURE__*/ positionView.negate().varying( 'v_positionViewDirection' ).normalize().toVar( 'positionViewDirection' );
 
 class FrontFacingNode extends Node {
+
+	static get type() {
+
+		return 'FrontFacingNode';
+
+	}
 
 	constructor() {
 
@@ -41364,8 +41485,6 @@ class FrontFacingNode extends Node {
 
 }
 
-FrontFacingNode.type = /*@__PURE__*/ registerNode( 'FrontFacing', FrontFacingNode );
-
 const frontFacing = /*@__PURE__*/ nodeImmutable( FrontFacingNode );
 const faceDirection = /*@__PURE__*/ float( frontFacing ).mul( 2.0 ).sub( 1.0 );
 
@@ -41387,8 +41506,6 @@ const normalLocal = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 const normalFlat = /*@__PURE__*/ positionView.dFdx().cross( positionView.dFdy() ).normalize().toVar( 'normalFlat' );
 
-let normalViewVarying = null;
-
 const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
@@ -41399,7 +41516,7 @@ const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	} else {
 
-		node = normalViewVarying || ( normalViewVarying = varying( modelNormalMatrix.mul( normalLocal ).normalize(), 'v_normalView' ).normalize() );
+		node = varying( transformNormalToView( normalLocal ), 'v_normalView' ).normalize();
 
 	}
 
@@ -41407,7 +41524,7 @@ const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 }, 'vec3' ).once() )().toVar( 'normalView' );
 
-const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ).normalize(), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
+const normalWorld = /*@__PURE__*/ varying( normalView.transformDirection( cameraViewMatrix ), 'v_normalWorld' ).normalize().toVar( 'normalWorld' );
 
 const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
@@ -41416,13 +41533,37 @@ const transformedNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 }, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedNormalView' );
 
 
-const transformedNormalWorld = /*@__PURE__*/ transformedNormalView.transformDirection( cameraViewMatrix ).normalize().toVar( 'transformedNormalWorld' );
+const transformedNormalWorld = /*@__PURE__*/ transformedNormalView.transformDirection( cameraViewMatrix ).toVar( 'transformedNormalWorld' );
 
 const transformedClearcoatNormalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	return builder.context.setupClearcoatNormal();
 
 }, 'vec3' ).once() )().mul( faceDirection ).toVar( 'transformedClearcoatNormalView' );
+
+const transformNormal = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorldMatrix ] ) => {
+
+	const m = mat3( matrix );
+
+	const transformedNormal = normal.div( vec3( m[ 0 ].dot( m[ 0 ] ), m[ 1 ].dot( m[ 1 ] ), m[ 2 ].dot( m[ 2 ] ) ) );
+
+	return m.mul( transformedNormal ).xyz;
+
+} );
+
+const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorldMatrix ], builder ) => {
+
+	const modelNormalMatrix = builder.renderer.nodes.modelNormalMatrix;
+
+	if ( modelNormalMatrix !== null ) {
+
+		return modelNormalMatrix.transformDirection( normal );
+
+	}
+
+	return cameraViewMatrix.transformDirection( transformNormal( normal, matrix ) );
+
+} );
 
 const materialRefractionRatio = /*@__PURE__*/ uniform( 0 ).onReference( ( { material } ) => material ).onRenderUpdate( ( { material } ) => material.refractionRatio );
 
@@ -41433,6 +41574,12 @@ const reflectVector = /*@__PURE__*/ reflectView.transformDirection( cameraViewMa
 const refractVector = /*@__PURE__*/ refractView.transformDirection( cameraViewMatrix ).toVar( 'reflectVector' );
 
 class CubeTextureNode extends TextureNode {
+
+	static get type() {
+
+		return 'CubeTextureNode';
+
+	}
 
 	constructor( value, uvNode = null, levelNode = null, biasNode = null ) {
 
@@ -41496,11 +41643,15 @@ class CubeTextureNode extends TextureNode {
 
 }
 
-CubeTextureNode.type = /*@__PURE__*/ registerNode( 'CubeTexture', CubeTextureNode );
-
 const cubeTexture = /*@__PURE__*/ nodeProxy( CubeTextureNode );
 
 class BufferNode extends UniformNode {
+
+	static get type() {
+
+		return 'BufferNode';
+
+	}
 
 	constructor( value, bufferType, bufferCount = 0 ) {
 
@@ -41527,11 +41678,15 @@ class BufferNode extends UniformNode {
 
 }
 
-BufferNode.type = /*@__PURE__*/ registerNode( 'Buffer', BufferNode );
-
 const buffer = ( value, type, count ) => nodeObject( new BufferNode( value, type, count ) );
 
 class UniformArrayElementNode extends ArrayElementNode {
+
+	static get type() {
+
+		return 'UniformArrayElementNode';
+
+	}
 
 	constructor( arrayBuffer, indexNode ) {
 
@@ -41559,6 +41714,12 @@ class UniformArrayElementNode extends ArrayElementNode {
 }
 
 class UniformArrayNode extends BufferNode {
+
+	static get type() {
+
+		return 'UniformArrayNode';
+
+	}
 
 	constructor( value, elementType = null ) {
 
@@ -41665,11 +41826,24 @@ class UniformArrayNode extends BufferNode {
 
 }
 
-UniformArrayNode.type = /*@__PURE__*/ registerNode( 'UniformArray', UniformArrayNode );
-
 const uniformArray = ( values, nodeType ) => nodeObject( new UniformArrayNode( values, nodeType ) );
 
+//
+
+const uniforms = ( values, nodeType ) => { // @deprecated, r168
+
+	console.warn( 'TSL.UniformArrayNode: uniforms() has been renamed to uniformArray().' );
+	return nodeObject( new UniformArrayNode( values, nodeType ) );
+
+};
+
 class ReferenceElementNode extends ArrayElementNode {
+
+	static get type() {
+
+		return 'ReferenceElementNode';
+
+	}
 
 	constructor( referenceNode, indexNode ) {
 
@@ -41701,6 +41875,12 @@ class ReferenceElementNode extends ArrayElementNode {
 
 // TODO: Extends this from ReferenceBaseNode
 class ReferenceNode extends Node {
+
+	static get type() {
+
+		return 'ReferenceNode';
+
+	}
 
 	constructor( property, uniformType, object = null, count = null ) {
 
@@ -41825,12 +42005,16 @@ class ReferenceNode extends Node {
 
 }
 
-ReferenceNode.type = /*@__PURE__*/ registerNode( 'Reference', ReferenceNode );
-
 const reference = ( name, type, object ) => nodeObject( new ReferenceNode( name, type, object ) );
 const referenceBuffer = ( name, type, count, object ) => nodeObject( new ReferenceNode( name, type, object, count ) );
 
 class MaterialReferenceNode extends ReferenceNode {
+
+	static get type() {
+
+		return 'MaterialReferenceNode';
+
+	}
 
 	constructor( property, inputType, material = null ) {
 
@@ -41861,8 +42045,6 @@ class MaterialReferenceNode extends ReferenceNode {
 	}
 
 }
-
-MaterialReferenceNode.type = /*@__PURE__*/ registerNode( 'MaterialReference', MaterialReferenceNode );
 
 const materialReference = ( name, type, material ) => nodeObject( new MaterialReferenceNode( name, type, material ) );
 
@@ -41940,6 +42122,12 @@ const perturbNormal2Arb = /*@__PURE__*/ Fn( ( inputs ) => {
 
 class NormalMapNode extends TempNode {
 
+	static get type() {
+
+		return 'NormalMapNode';
+
+	}
+
 	constructor( node, scaleNode = null ) {
 
 		super( 'vec3' );
@@ -41967,7 +42155,7 @@ class NormalMapNode extends TempNode {
 
 		if ( normalMapType === ObjectSpaceNormalMap ) {
 
-			outputNode = modelNormalMatrix.mul( normalMap ).normalize();
+			outputNode = transformNormalToView( normalMap );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
@@ -41995,8 +42183,6 @@ class NormalMapNode extends TempNode {
 	}
 
 }
-
-NormalMapNode.type = /*@__PURE__*/ registerNode( 'NormalMap', NormalMapNode );
 
 const normalMap = /*@__PURE__*/ nodeProxy( NormalMapNode );
 
@@ -42041,6 +42227,12 @@ const perturbNormalArb = Fn( ( inputs ) => {
 
 class BumpMapNode extends TempNode {
 
+	static get type() {
+
+		return 'BumpMapNode';
+
+	}
+
 	constructor( textureNode, scaleNode = null ) {
 
 		super( 'vec3' );
@@ -42070,6 +42262,12 @@ const bumpMap = /*@__PURE__*/ nodeProxy( BumpMapNode );
 const _propertyCache = new Map();
 
 class MaterialNode extends Node {
+
+	static get type() {
+
+		return 'MaterialNode';
+
+	}
 
 	constructor( scope ) {
 
@@ -42236,6 +42434,7 @@ class MaterialNode extends Node {
 			if ( material.normalMap ) {
 
 				node = normalMap( this.getTexture( 'normal' ), this.getCache( 'normalScale', 'vec2' ) );
+				node.normalMapType = material.normalMapType;
 
 			} else if ( material.bumpMap ) {
 
@@ -42440,8 +42639,6 @@ MaterialNode.DISPERSION = 'dispersion';
 MaterialNode.LIGHT_MAP = 'light';
 MaterialNode.AO_MAP = 'ao';
 
-MaterialNode.type = /*@__PURE__*/ registerNode( 'Material', MaterialNode );
-
 const materialAlphaTest = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
 const materialColor = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.COLOR );
 const materialShininess = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.SHININESS );
@@ -42481,7 +42678,6 @@ const materialPointWidth = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNo
 const materialDispersion = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.DISPERSION );
 const materialLightMap = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.LIGHT_MAP );
 const materialAOMap = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.AO_MAP );
-/*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.REFRACTION_RATIO );
 const materialAnisotropyVector = /*@__PURE__*/ uniform( new Vector2() ).onReference( function ( frame ) {
 
 	return frame.material;
@@ -42493,6 +42689,12 @@ const materialAnisotropyVector = /*@__PURE__*/ uniform( new Vector2() ).onRefere
 } );
 
 class ModelViewProjectionNode extends TempNode {
+
+	static get type() {
+
+		return 'ModelViewProjectionNode';
+
+	}
 
 	constructor( positionNode = null ) {
 
@@ -42511,18 +42713,23 @@ class ModelViewProjectionNode extends TempNode {
 		}
 
 		const position = this.positionNode || positionLocal;
+		const viewMatrix = builder.renderer.nodes.modelViewMatrix || modelViewMatrix;
 
-		return cameraProjectionMatrix.mul( modelViewMatrix ).mul( position );
+		return cameraProjectionMatrix.mul( viewMatrix ).mul( position );
 
 	}
 
 }
 
-ModelViewProjectionNode.type = /*@__PURE__*/ registerNode( 'ModelViewProjection', ModelViewProjectionNode );
-
 const modelViewProjection = /*@__PURE__*/ nodeProxy( ModelViewProjectionNode );
 
 class IndexNode extends Node {
+
+	static get type() {
+
+		return 'IndexNode';
+
+	}
 
 	constructor( scope ) {
 
@@ -42588,14 +42795,18 @@ IndexNode.INSTANCE = 'instance';
 IndexNode.INVOCATION_LOCAL = 'invocationLocal';
 IndexNode.DRAW = 'draw';
 
-IndexNode.type = /*@__PURE__*/ registerNode( 'Index', IndexNode );
-
 const vertexIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.VERTEX );
 const instanceIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INSTANCE );
 const invocationLocalIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.INVOCATION_LOCAL );
 const drawIndex = /*@__PURE__*/ nodeImmutable( IndexNode, IndexNode.DRAW );
 
 class InstanceNode extends Node {
+
+	static get type() {
+
+		return 'InstanceNode';
+
+	}
 
 	constructor( instanceMesh ) {
 
@@ -42680,11 +42891,7 @@ class InstanceNode extends Node {
 
 		if ( builder.hasGeometryAttribute( 'normal' ) ) {
 
-			const m = mat3( instanceMatrixNode );
-
-			const transformedNormal = normalLocal.div( vec3( m[ 0 ].dot( m[ 0 ] ), m[ 1 ].dot( m[ 1 ] ), m[ 2 ].dot( m[ 2 ] ) ) );
-
-			const instanceNormal = m.mul( transformedNormal ).xyz;
+			const instanceNormal = transformNormal( normalLocal, instanceMatrixNode );
 
 			// ASSIGNS
 
@@ -42720,11 +42927,15 @@ class InstanceNode extends Node {
 
 }
 
-InstanceNode.type = /*@__PURE__*/ registerNode( 'Instance', InstanceNode );
-
 const instance = /*@__PURE__*/ nodeProxy( InstanceNode );
 
 class BatchNode extends Node {
+
+	static get type() {
+
+		return 'BatchNode';
+
+	}
 
 	constructor( batchMesh ) {
 
@@ -42833,13 +43044,17 @@ class BatchNode extends Node {
 
 }
 
-BatchNode.type = /*@__PURE__*/ registerNode( 'Batch', BatchNode );
-
 const batch = /*@__PURE__*/ nodeProxy( BatchNode );
 
 const _frameId = new WeakMap();
 
 class SkinningNode extends Node {
+
+	static get type() {
+
+		return 'SkinningNode';
+
+	}
 
 	constructor( skinnedMesh, useReference = false ) {
 
@@ -43006,12 +43221,16 @@ class SkinningNode extends Node {
 
 }
 
-SkinningNode.type = /*@__PURE__*/ registerNode( 'Skinning', SkinningNode );
-
 const skinning = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh ) );
 const skinningReference = ( skinnedMesh ) => nodeObject( new SkinningNode( skinnedMesh, true ) );
 
 class LoopNode extends Node {
+
+	static get type() {
+
+		return 'LoopNode';
+
+	}
 
 	constructor( params = [] ) {
 
@@ -43198,11 +43417,18 @@ class LoopNode extends Node {
 
 }
 
-LoopNode.type = /*@__PURE__*/ registerNode( 'Loop', LoopNode );
-
 const Loop = ( ...params ) => nodeObject( new LoopNode( nodeArray( params, 'int' ) ) ).append();
 const Continue = () => expression( 'continue' ).append();
 const Break = () => expression( 'break' ).append();
+
+//
+
+const loop = ( ...params ) => { // @deprecated, r168
+
+	console.warn( 'TSL.LoopNode: loop() has been renamed to Loop().' );
+	return Loop( ...params );
+
+};
 
 const _morphTextures = /*@__PURE__*/ new WeakMap();
 const _morphVec4 = /*@__PURE__*/ new Vector4();
@@ -43349,6 +43575,12 @@ function getEntry( geometry ) {
 
 class MorphNode extends Node {
 
+	static get type() {
+
+		return 'MorphNode';
+
+	}
+
 	constructor( mesh ) {
 
 		super( 'void' );
@@ -43441,8 +43673,6 @@ class MorphNode extends Node {
 
 }
 
-MorphNode.type = /*@__PURE__*/ registerNode( 'Morph', MorphNode );
-
 const morphReference = /*@__PURE__*/ nodeProxy( MorphNode );
 
 const sortLights = ( lights ) => {
@@ -43468,6 +43698,12 @@ const getLightNodeById = ( id, lightNodes ) => {
 };
 
 class LightsNode extends Node {
+
+	static get type() {
+
+		return 'LightsNode';
+
+	}
 
 	constructor( lights = [] ) {
 
@@ -43668,11 +43904,15 @@ class LightsNode extends Node {
 
 }
 
-LightsNode.type = /*@__PURE__*/ registerNode( 'Lights', LightsNode );
-
 const lights = /*@__PURE__*/ nodeProxy( LightsNode );
 
 class LightingNode extends Node {
+
+	static get type() {
+
+		return 'LightingNode';
+
+	}
 
 	constructor() {
 
@@ -43690,9 +43930,13 @@ class LightingNode extends Node {
 
 }
 
-LightingNode.type = /*@__PURE__*/ registerNode( 'Lighting', LightingNode );
-
 class AONode extends LightingNode {
+
+	static get type() {
+
+		return 'AONode';
+
+	}
 
 	constructor( aoNode = null ) {
 
@@ -43710,9 +43954,13 @@ class AONode extends LightingNode {
 
 }
 
-AONode.type = /*@__PURE__*/ registerNode( 'AO', AONode );
-
 class LightingContextNode extends ContextNode {
+
+	static get type() {
+
+		return 'LightingContextNode';
+
+	}
 
 	constructor( node, lightingModel = null, backdropNode = null, backdropAlphaNode = null ) {
 
@@ -43767,11 +44015,15 @@ class LightingContextNode extends ContextNode {
 
 }
 
-LightingContextNode.type = /*@__PURE__*/ registerNode( 'LightingContext', LightingContextNode );
-
 const lightingContext = /*@__PURE__*/ nodeProxy( LightingContextNode );
 
 class IrradianceNode extends LightingNode {
+
+	static get type() {
+
+		return 'IrradianceNode';
+
+	}
 
 	constructor( node ) {
 
@@ -43789,11 +44041,15 @@ class IrradianceNode extends LightingNode {
 
 }
 
-IrradianceNode.type = /*@__PURE__*/ registerNode( 'Irradiance', IrradianceNode );
-
 let resolution, viewportResult;
 
 class ViewportNode extends Node {
+
+	static get type() {
+
+		return 'ViewportNode';
+
+	}
 
 	constructor( scope ) {
 
@@ -43897,8 +44153,6 @@ ViewportNode.RESOLUTION = 'resolution';
 ViewportNode.VIEWPORT = 'viewport';
 ViewportNode.UV = 'uv';
 
-ViewportNode.type = /*@__PURE__*/ registerNode( 'Viewport', ViewportNode );
-
 const viewportCoordinate = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
 const viewportResolution = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
 const viewport = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
@@ -43923,6 +44177,12 @@ const viewportBottomLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 const _size$a = /*@__PURE__*/ new Vector2();
 
 class ViewportTextureNode extends TextureNode {
+
+	static get type() {
+
+		return 'ViewportTextureNode';
+
+	}
 
 	constructor( uvNode = viewportUV, levelNode = null, framebufferTexture = null ) {
 
@@ -43982,14 +44242,18 @@ class ViewportTextureNode extends TextureNode {
 
 }
 
-ViewportTextureNode.type = /*@__PURE__*/ registerNode( 'ViewportTexture', ViewportTextureNode );
-
 const viewportTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode );
 const viewportMipTexture = /*@__PURE__*/ nodeProxy( ViewportTextureNode, null, null, { generateMipmaps: true } );
 
 let sharedDepthbuffer = null;
 
 class ViewportDepthTextureNode extends ViewportTextureNode {
+
+	static get type() {
+
+		return 'ViewportDepthTextureNode';
+
+	}
 
 	constructor( uvNode = viewportUV, levelNode = null ) {
 
@@ -44005,11 +44269,15 @@ class ViewportDepthTextureNode extends ViewportTextureNode {
 
 }
 
-ViewportDepthTextureNode.type = /*@__PURE__*/ registerNode( 'ViewportDepthTexture', ViewportDepthTextureNode );
-
 const viewportDepthTexture = /*@__PURE__*/ nodeProxy( ViewportDepthTextureNode );
 
 class ViewportDepthNode extends Node {
+
+	static get type() {
+
+		return 'ViewportDepthNode';
+
+	}
 
 	constructor( scope, valueNode = null ) {
 
@@ -44097,8 +44365,6 @@ ViewportDepthNode.DEPTH_BASE = 'depthBase';
 ViewportDepthNode.DEPTH = 'depth';
 ViewportDepthNode.LINEAR_DEPTH = 'linearDepth';
 
-ViewportDepthNode.type = /*@__PURE__*/ registerNode( 'ViewportDepth', ViewportDepthNode );
-
 // NOTE: viewZ, the z-coordinate in camera space, is negative for points in front of the camera
 
 // -near maps to 0; -far maps to 1
@@ -44124,6 +44390,12 @@ const viewportLinearDepth = /*@__PURE__*/ linearDepth( viewportDepthTexture() );
 depth.assign = ( value ) => depthBase( value );
 
 class ClippingNode extends Node {
+
+	static get type() {
+
+		return 'ClippingNode';
+
+	}
 
 	constructor( scope = ClippingNode.DEFAULT ) {
 
@@ -44253,15 +44525,17 @@ class ClippingNode extends Node {
 ClippingNode.ALPHA_TO_COVERAGE = 'alphaToCoverage';
 ClippingNode.DEFAULT = 'default';
 
-ClippingNode.type = /*@__PURE__*/ registerNode( 'Clipping', ClippingNode );
-
 const clipping = () => nodeObject( new ClippingNode() );
 
 const clippingAlpha = () => nodeObject( new ClippingNode( ClippingNode.ALPHA_TO_COVERAGE ) );
 
-const NodeMaterials = new Map();
-
 class NodeMaterial extends Material {
+
+	static get type() {
+
+		return 'NodeMaterial';
+
+	}
 
 	constructor() {
 
@@ -44858,51 +45132,15 @@ class NodeMaterial extends Material {
 
 }
 
-NodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( '', NodeMaterial );
-
-function registerNodeMaterial( type, nodeMaterialClass ) {
-
-	const suffix = 'NodeMaterial';
-	const nodeMaterialType = type + suffix;
-
-	if ( typeof nodeMaterialClass !== 'function' ) throw new Error( `THREE.Node: NodeMaterial class "${ type }" is not a class.` );
-
-	if ( NodeMaterials.has( nodeMaterialType ) ) {
-
-		console.warn( `THREE.Node: Redefinition of NodeMaterial class "${ nodeMaterialType }".` );
-		return;
-
-	}
-
-	if ( type.slice( - suffix.length ) === suffix ) {
-
-		console.warn( `THREE.NodeMaterial: NodeMaterial class ${ nodeMaterialType } should not have '${ suffix }' suffix.` );
-		return;
-
-	}
-
-	NodeMaterials.set( nodeMaterialType, nodeMaterialClass );
-	nodeMaterialClass.type = nodeMaterialType;
-
-	return nodeMaterialType;
-
-}
-
-function createNodeMaterialFromType( type ) {
-
-	const Material = NodeMaterials.get( type );
-
-	if ( Material !== undefined ) {
-
-		return new Material();
-
-	}
-
-}
-
 const _defaultValues$e = /*@__PURE__*/ new PointsMaterial();
 
 class InstancedPointsNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'InstancedPointsNodeMaterial';
+
+	}
 
 	constructor( params = {} ) {
 
@@ -45054,11 +45292,15 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 }
 
-InstancedPointsNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'InstancedPoints', InstancedPointsNodeMaterial );
-
 const _defaultValues$d = /*@__PURE__*/ new LineBasicMaterial();
 
 class LineBasicNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'LineBasicNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -45076,11 +45318,15 @@ class LineBasicNodeMaterial extends NodeMaterial {
 
 }
 
-LineBasicNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'LineBasic', LineBasicNodeMaterial );
-
 const _defaultValues$c = /*@__PURE__*/ new LineDashedMaterial();
 
 class LineDashedNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'LineDashedNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -45120,11 +45366,15 @@ class LineDashedNodeMaterial extends NodeMaterial {
 
 }
 
-LineDashedNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'LineDashed', LineDashedNodeMaterial );
-
 const _defaultValues$b = /*@__PURE__*/ new LineDashedMaterial();
 
 class Line2NodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'Line2NodeMaterial';
+
+	}
 
 	constructor( params = {} ) {
 
@@ -45541,14 +45791,18 @@ class Line2NodeMaterial extends NodeMaterial {
 
 }
 
-Line2NodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Line2', Line2NodeMaterial );
-
 const directionToColor = ( node ) => nodeObject( node ).mul( 0.5 ).add( 0.5 );
 const colorToDirection = ( node ) => nodeObject( node ).mul( 2.0 ).sub( 1 );
 
 const _defaultValues$a = /*@__PURE__*/ new MeshNormalMaterial();
 
 class MeshNormalNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'MeshNormalNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -45574,9 +45828,13 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 }
 
-MeshNormalNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshNormal', MeshNormalNodeMaterial );
-
 class EquirectUVNode extends TempNode {
+
+	static get type() {
+
+		return 'EquirectUVNode';
+
+	}
 
 	constructor( dirNode = positionWorldDirection ) {
 
@@ -45598,8 +45856,6 @@ class EquirectUVNode extends TempNode {
 	}
 
 }
-
-EquirectUVNode.type = /*@__PURE__*/ registerNode( 'EquirectUV', EquirectUVNode );
 
 const equirectUV = /*@__PURE__*/ nodeProxy( EquirectUVNode );
 
@@ -45670,6 +45926,12 @@ class CubeRenderTarget extends WebGLCubeRenderTarget {
 const _cache$1 = new WeakMap();
 
 class CubeMapNode extends TempNode {
+
+	static get type() {
+
+		return 'CubeMapNode';
+
+	}
 
 	constructor( envNode ) {
 
@@ -45770,8 +46032,6 @@ class CubeMapNode extends TempNode {
 
 }
 
-CubeMapNode.type = /*@__PURE__*/ registerNode( 'CubeMap', CubeMapNode );
-
 function isEquirectangularMapReady$1( image ) {
 
 	if ( image === null || image === undefined ) return false;
@@ -45816,6 +46076,12 @@ const cubeMapNode = /*@__PURE__*/ nodeProxy( CubeMapNode );
 
 class BasicEnvironmentNode extends LightingNode {
 
+	static get type() {
+
+		return 'BasicEnvironmentNode';
+
+	}
+
 	constructor( envNode = null ) {
 
 		super();
@@ -45834,9 +46100,13 @@ class BasicEnvironmentNode extends LightingNode {
 
 }
 
-BasicEnvironmentNode.type = /*@__PURE__*/ registerNode( 'BasicEnvironment', BasicEnvironmentNode );
-
 class BasicLightMapNode extends LightingNode {
+
+	static get type() {
+
+		return 'BasicLightMapNode';
+
+	}
 
 	constructor( lightMapNode = null ) {
 
@@ -45857,8 +46127,6 @@ class BasicLightMapNode extends LightingNode {
 	}
 
 }
-
-BasicLightMapNode.type = /*@__PURE__*/ registerNode( 'BasicLightMap', BasicLightMapNode );
 
 class LightingModel {
 
@@ -45950,6 +46218,12 @@ const _defaultValues$9 = /*@__PURE__*/ new MeshBasicMaterial();
 
 class MeshBasicNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'MeshBasicNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
@@ -46005,8 +46279,6 @@ class MeshBasicNodeMaterial extends NodeMaterial {
 	}
 
 }
-
-MeshBasicNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshBasic', MeshBasicNodeMaterial );
 
 const F_Schlick = /*@__PURE__*/ Fn( ( { f0, f90, dotVH } ) => {
 
@@ -46089,6 +46361,12 @@ const _defaultValues$8 = /*@__PURE__*/ new MeshLambertMaterial();
 
 class MeshLambertNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'MeshLambertNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
@@ -46119,11 +46397,15 @@ class MeshLambertNodeMaterial extends NodeMaterial {
 
 }
 
-MeshLambertNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshLambert', MeshLambertNodeMaterial );
-
 const _defaultValues$7 = /*@__PURE__*/ new MeshPhongMaterial();
 
 class MeshPhongNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'MeshPhongNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -46182,8 +46464,6 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 	}
 
 }
-
-MeshPhongNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshPhong', MeshPhongNodeMaterial );
 
 const getGeometryRoughness = /*@__PURE__*/ Fn( () => {
 
@@ -47597,6 +47877,12 @@ function _getPMREMFromTexture( texture ) {
 
 class PMREMNode extends TempNode {
 
+	static get type() {
+
+		return 'PMREMNode';
+
+	}
+
 	constructor( value, uvNode = null, levelNode = null ) {
 
 		super( 'vec3' );
@@ -47727,8 +48013,6 @@ class PMREMNode extends TempNode {
 
 }
 
-PMREMNode.type = /*@__PURE__*/ registerNode( 'PMREM', PMREMNode );
-
 function isCubeMapReady( image ) {
 
 	if ( image === null || image === undefined ) return false;
@@ -47760,6 +48044,12 @@ const pmremTexture = /*@__PURE__*/ nodeProxy( PMREMNode );
 const _envNodeCache = new WeakMap();
 
 class EnvironmentNode extends LightingNode {
+
+	static get type() {
+
+		return 'EnvironmentNode';
+
+	}
 
 	constructor( envNode = null ) {
 
@@ -47830,8 +48120,6 @@ class EnvironmentNode extends LightingNode {
 
 }
 
-EnvironmentNode.type = /*@__PURE__*/ registerNode( 'Environment', EnvironmentNode );
-
 const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 
 	let reflectVec = null;
@@ -47882,6 +48170,12 @@ const createIrradianceContext = ( normalWorldNode ) => {
 const _defaultValues$6 = /*@__PURE__*/ new MeshStandardMaterial();
 
 class MeshStandardNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'MeshStandardNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -47969,11 +48263,15 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 }
 
-MeshStandardNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshStandard', MeshStandardNodeMaterial );
-
 const _defaultValues$5 = /*@__PURE__*/ new MeshPhysicalMaterial();
 
 class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
+
+	static get type() {
+
+		return 'MeshPhysicalNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -48201,8 +48499,6 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 }
 
-MeshPhysicalNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshPhysical', MeshPhysicalNodeMaterial );
-
 class SSSLightingModel extends PhysicalLightingModel {
 
 	constructor( useClearcoat, useSheen, useIridescence, useSSS ) {
@@ -48236,6 +48532,12 @@ class SSSLightingModel extends PhysicalLightingModel {
 }
 
 class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
+
+	static get type() {
+
+		return 'MeshSSSNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -48276,8 +48578,6 @@ class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 	}
 
 }
-
-MeshSSSNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshSSS', MeshSSSNodeMaterial );
 
 const getGradientIrradiance = /*@__PURE__*/ Fn( ( { normal, lightDirection, builder } ) => {
 
@@ -48325,6 +48625,12 @@ const _defaultValues$4 = /*@__PURE__*/ new MeshToonMaterial();
 
 class MeshToonNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'MeshToonNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
@@ -48347,9 +48653,13 @@ class MeshToonNodeMaterial extends NodeMaterial {
 
 }
 
-MeshToonNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshToon', MeshToonNodeMaterial );
-
 class MatcapUVNode extends TempNode {
+
+	static get type() {
+
+		return 'MatcapUVNode';
+
+	}
 
 	constructor() {
 
@@ -48368,13 +48678,17 @@ class MatcapUVNode extends TempNode {
 
 }
 
-MatcapUVNode.type = /*@__PURE__*/ registerNode( 'MatcapUV', MatcapUVNode );
-
 const matcapUV = /*@__PURE__*/ nodeImmutable( MatcapUVNode );
 
 const _defaultValues$3 = /*@__PURE__*/ new MeshMatcapMaterial();
 
 class MeshMatcapNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'MeshMatcapNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -48412,11 +48726,15 @@ class MeshMatcapNodeMaterial extends NodeMaterial {
 
 }
 
-MeshMatcapNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'MeshMatcap', MeshMatcapNodeMaterial );
-
 const _defaultValues$2 = /*@__PURE__*/ new PointsMaterial();
 
 class PointsNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'PointsNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -48445,9 +48763,13 @@ class PointsNodeMaterial extends NodeMaterial {
 
 }
 
-PointsNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Points', PointsNodeMaterial );
-
 class RotateNode extends TempNode {
+
+	static get type() {
+
+		return 'RotateNode';
+
+	}
 
 	constructor( positionNode, rotationNode ) {
 
@@ -48497,13 +48819,17 @@ class RotateNode extends TempNode {
 
 }
 
-RotateNode.type = /*@__PURE__*/ registerNode( 'Rotate', RotateNode );
-
 const rotate = /*@__PURE__*/ nodeProxy( RotateNode );
 
 const _defaultValues$1 = /*@__PURE__*/ new SpriteMaterial();
 
 class SpriteNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'SpriteNodeMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -48577,8 +48903,6 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 }
 
-SpriteNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Sprite', SpriteNodeMaterial );
-
 class ShadowMaskModel extends LightingModel {
 
 	constructor() {
@@ -48609,6 +48933,12 @@ const _defaultValues = /*@__PURE__*/ new ShadowMaterial();
 
 class ShadowNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'ShadowNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
@@ -48630,8 +48960,6 @@ class ShadowNodeMaterial extends NodeMaterial {
 	}
 
 }
-
-ShadowNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Shadow', ShadowNodeMaterial );
 
 const normal = Fn( ( { texture, uv } ) => {
 
@@ -48682,6 +49010,12 @@ const normal = Fn( ( { texture, uv } ) => {
 
 class Texture3DNode extends TextureNode {
 
+	static get type() {
+
+		return 'Texture3DNode';
+
+	}
+
 	constructor( value, uvNode = null, levelNode = null ) {
 
 		super( value, uvNode, levelNode );
@@ -48724,11 +49058,15 @@ class Texture3DNode extends TextureNode {
 
 }
 
-Texture3DNode.type = /*@__PURE__*/ registerNode( 'Texture3D', Texture3DNode );
-
 const texture3D = /*@__PURE__*/ nodeProxy( Texture3DNode );
 
 class VolumeNodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'VolumeNodeMaterial';
+
+	}
 
 	constructor( params = {} ) {
 
@@ -48817,8 +49155,6 @@ class VolumeNodeMaterial extends NodeMaterial {
 	}
 
 }
-
-VolumeNodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Volume', VolumeNodeMaterial );
 
 class Animation {
 
@@ -50699,6 +51035,12 @@ class NodeCache {
 
 class ParameterNode extends PropertyNode {
 
+	static get type() {
+
+		return 'ParameterNode';
+
+	}
+
 	constructor( nodeType, name = null ) {
 
 		super( nodeType, name );
@@ -50721,11 +51063,15 @@ class ParameterNode extends PropertyNode {
 
 }
 
-ParameterNode.type = /*@__PURE__*/ registerNode( 'Parameter', ParameterNode );
-
 const parameter = ( type, name ) => nodeObject( new ParameterNode( type, name ) );
 
 class CodeNode extends Node {
+
+	static get type() {
+
+		return 'CodeNode';
+
+	}
 
 	constructor( code = '', includes = [], language = '' ) {
 
@@ -50797,8 +51143,6 @@ class CodeNode extends Node {
 
 }
 
-CodeNode.type = /*@__PURE__*/ registerNode( 'Code', CodeNode );
-
 const code = /*@__PURE__*/ nodeProxy( CodeNode );
 
 const js = ( src, includes ) => code( src, includes, 'js' );
@@ -50806,6 +51150,12 @@ const wgsl = ( src, includes ) => code( src, includes, 'wgsl' );
 const glsl = ( src, includes ) => code( src, includes, 'glsl' );
 
 class FunctionNode extends CodeNode {
+
+	static get type() {
+
+		return 'FunctionNode';
+
+	}
 
 	constructor( code = '', includes = [], language = '' ) {
 
@@ -50881,8 +51231,6 @@ class FunctionNode extends CodeNode {
 	}
 
 }
-
-FunctionNode.type = /*@__PURE__*/ registerNode( 'Function', FunctionNode );
 
 const nativeFn = ( code, includes = [], language = '' ) => {
 
@@ -51173,6 +51521,12 @@ class Matrix4NodeUniform extends Matrix4Uniform {
 
 class StackNode extends Node {
 
+	static get type() {
+
+		return 'StackNode';
+
+	}
+
 	constructor( parent = null ) {
 
 		super();
@@ -51266,8 +51620,6 @@ class StackNode extends Node {
 	}
 
 }
-
-StackNode.type = /*@__PURE__*/ registerNode( 'Stack', StackNode );
 
 const stack = /*@__PURE__*/ nodeProxy( StackNode );
 
@@ -51416,12 +51768,12 @@ class PMREMGenerator {
 	 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
 	 * your texture's network fetch for increased concurrency.
 	 */
-	compileCubemapShader() {
+	async compileCubemapShader() {
 
 		if ( this._cubemapMaterial === null ) {
 
 			this._cubemapMaterial = _getCubemapMaterial();
-			this._compileMaterial( this._cubemapMaterial );
+			await this._compileMaterial( this._cubemapMaterial );
 
 		}
 
@@ -51431,12 +51783,12 @@ class PMREMGenerator {
 	 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
 	 * your texture's network fetch for increased concurrency.
 	 */
-	compileEquirectangularShader() {
+	async compileEquirectangularShader() {
 
 		if ( this._equirectMaterial === null ) {
 
 			this._equirectMaterial = _getEquirectMaterial();
-			this._compileMaterial( this._equirectMaterial );
+			await this._compileMaterial( this._equirectMaterial );
 
 		}
 
@@ -51556,12 +51908,10 @@ class PMREMGenerator {
 
 	}
 
-	_compileMaterial( material ) {
+	async _compileMaterial( material ) {
 
-		const tmpMesh = this._lodMeshes[ 0 ];
-		tmpMesh.material = material;
-
-		this._renderer.compile( tmpMesh, _flatCamera );
+		const tmpMesh = new Mesh( this._lodPlanes[ 0 ], material );
+		await this._renderer.compile( tmpMesh, _flatCamera );
 
 	}
 
@@ -52268,6 +52618,23 @@ class NodeBuilder {
 		}
 
 		return bindingsGroups;
+
+	}
+
+	sortBindingGroups() {
+
+		const bindingsGroups = this.getBindings();
+
+		bindingsGroups.sort( ( a, b ) => ( a.bindings[ 0 ].groupNode.order - b.bindings[ 0 ].groupNode.order ) );
+
+		for ( let i = 0; i < bindingsGroups.length; i ++ ) {
+
+			const bindingGroup = bindingsGroups[ i ];
+			this.bindingsIndexes[ bindingGroup.name ].group = i;
+
+			bindingGroup.index = i;
+
+		}
 
 	}
 
@@ -53602,6 +53969,12 @@ NodeFunctionInput.isNodeFunctionInput = true;
 
 class StructTypeNode extends Node {
 
+	static get type() {
+
+		return 'StructTypeNode';
+
+	}
+
 	constructor( types ) {
 
 		super();
@@ -53619,9 +53992,13 @@ class StructTypeNode extends Node {
 
 }
 
-StructTypeNode.type = /*@__PURE__*/ registerNode( 'StructType', StructTypeNode );
-
 class OutputStructNode extends Node {
+
+	static get type() {
+
+		return 'OutputStructNode';
+
+	}
 
 	constructor( ...members ) {
 
@@ -53671,8 +54048,6 @@ class OutputStructNode extends Node {
 
 }
 
-OutputStructNode.type = /*@__PURE__*/ registerNode( 'OutputStruct', OutputStructNode );
-
 const outputStruct = /*@__PURE__*/ nodeProxy( OutputStructNode );
 
 function getTextureIndex( textures, name ) {
@@ -53692,6 +54067,12 @@ function getTextureIndex( textures, name ) {
 }
 
 class MRTNode extends OutputStructNode {
+
+	static get type() {
+
+		return 'MRTNode';
+
+	}
 
 	constructor( outputNodes ) {
 
@@ -53748,11 +54129,15 @@ class MRTNode extends OutputStructNode {
 
 }
 
-MRTNode.type = /*@__PURE__*/ registerNode( 'MRT', MRTNode );
-
 const mrt = /*@__PURE__*/ nodeProxy( MRTNode );
 
 class FunctionOverloadingNode extends Node {
+
+	static get type() {
+
+		return 'FunctionOverloadingNode';
+
+	}
 
 	constructor( functionNodes = [], ...parametersNodes ) {
 
@@ -53839,13 +54224,17 @@ class FunctionOverloadingNode extends Node {
 
 }
 
-FunctionOverloadingNode.type = /*@__PURE__*/ registerNode( 'FunctionOverloading', FunctionOverloadingNode );
-
 const overloadingBaseFn = /*@__PURE__*/ nodeProxy( FunctionOverloadingNode );
 
 const overloadingFn = ( functionNodes ) => ( ...params ) => overloadingBaseFn( functionNodes, ...params );
 
 class TimerNode extends UniformNode {
+
+	static get type() {
+
+		return 'TimerNode';
+
+	}
 
 	constructor( scope = TimerNode.LOCAL, scale = 1, value = 0 ) {
 
@@ -53925,8 +54314,6 @@ TimerNode.GLOBAL = 'global';
 TimerNode.DELTA = 'delta';
 TimerNode.FRAME = 'frame';
 
-TimerNode.type = /*@__PURE__*/ registerNode( 'Timer', TimerNode );
-
 // @TODO: add support to use node in timeScale
 const timerLocal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale, value ) );
 const timerGlobal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.GLOBAL, timeScale, value ) );
@@ -53934,6 +54321,12 @@ const timerDelta = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerN
 const frameId = /*@__PURE__*/ nodeImmutable( TimerNode, TimerNode.FRAME ).toUint();
 
 class OscNode extends Node {
+
+	static get type() {
+
+		return 'OscNode';
+
+	}
 
 	constructor( method = OscNode.SINE, timeNode = timerLocal() ) {
 
@@ -54002,14 +54395,18 @@ OscNode.SQUARE = 'square';
 OscNode.TRIANGLE = 'triangle';
 OscNode.SAWTOOTH = 'sawtooth';
 
-OscNode.type = /*@__PURE__*/ registerNode( 'Osc', OscNode );
-
 const oscSine = /*@__PURE__*/ nodeProxy( OscNode, OscNode.SINE );
 const oscSquare = /*@__PURE__*/ nodeProxy( OscNode, OscNode.SQUARE );
 const oscTriangle = /*@__PURE__*/ nodeProxy( OscNode, OscNode.TRIANGLE );
 const oscSawtooth = /*@__PURE__*/ nodeProxy( OscNode, OscNode.SAWTOOTH );
 
 class SpriteSheetUVNode extends Node {
+
+	static get type() {
+
+		return 'SpriteSheetUVNode';
+
+	}
 
 	constructor( countNode, uvNode = uv(), frameNode = float( 0 ) ) {
 
@@ -54041,11 +54438,15 @@ class SpriteSheetUVNode extends Node {
 
 }
 
-SpriteSheetUVNode.type = /*@__PURE__*/ registerNode( 'SpriteSheetUV', SpriteSheetUVNode );
-
 const spritesheetUV = /*@__PURE__*/ nodeProxy( SpriteSheetUVNode );
 
 class StorageArrayElementNode extends ArrayElementNode {
+
+	static get type() {
+
+		return 'StorageArrayElementNode';
+
+	}
 
 	constructor( storageBufferNode, indexNode ) {
 
@@ -54125,11 +54526,15 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 }
 
-StorageArrayElementNode.type = /*@__PURE__*/ registerNode( 'StorageArrayElement', StorageArrayElementNode );
-
 const storageElement = /*@__PURE__*/ nodeProxy( StorageArrayElementNode );
 
 class TriplanarTexturesNode extends Node {
+
+	static get type() {
+
+		return 'TriplanarTexturesNode';
+
+	}
 
 	constructor( textureXNode, textureYNode = null, textureZNode = null, scaleNode = float( 1 ), positionNode = positionLocal, normalNode = normalLocal ) {
 
@@ -54176,8 +54581,6 @@ class TriplanarTexturesNode extends Node {
 
 }
 
-TriplanarTexturesNode.type = /*@__PURE__*/ registerNode( 'TriplanarTextures', TriplanarTexturesNode );
-
 const triplanarTextures = /*@__PURE__*/ nodeProxy( TriplanarTexturesNode );
 const triplanarTexture = ( ...params ) => triplanarTextures( ...params );
 
@@ -54201,6 +54604,12 @@ const _defaultUV = viewportUV.flipX();
 let _inReflector = false;
 
 class ReflectorNode extends TextureNode {
+
+	static get type() {
+
+		return 'ReflectorNode';
+
+	}
 
 	constructor( parameters = {} ) {
 
@@ -54403,8 +54812,6 @@ class ReflectorNode extends TextureNode {
 
 const reflector = ( parameters ) => nodeObject( new ReflectorNode( parameters ) );
 
-ReflectorNode.type = /*@__PURE__*/ registerNode( 'Reflector', ReflectorNode );
-
 // Helper for passes that need to fill the viewport with a single quad.
 
 const _camera = /*@__PURE__*/ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
@@ -54457,6 +54864,12 @@ class QuadMesh extends Mesh {
 const _size$8 = /*@__PURE__*/ new Vector2();
 
 class RTTNode extends TextureNode {
+
+	static get type() {
+
+		return 'RTTNode';
+
+	}
 
 	constructor( node, width = null, height = null, options = { type: HalfFloatType } ) {
 
@@ -54566,12 +54979,16 @@ class RTTNode extends TextureNode {
 
 }
 
-RTTNode.type = /*@__PURE__*/ registerNode( 'RTT', RTTNode );
-
 const rtt = ( node, ...params ) => nodeObject( new RTTNode( nodeObject( node ), ...params ) );
 const convertToTexture = ( node, ...params ) => node.isTextureNode ? node : rtt( node, ...params );
 
 class VertexColorNode extends AttributeNode {
+
+	static get type() {
+
+		return 'VertexColorNode';
+
+	}
 
 	constructor( index = 0 ) {
 
@@ -54631,11 +55048,15 @@ class VertexColorNode extends AttributeNode {
 
 }
 
-VertexColorNode.type = /*@__PURE__*/ registerNode( 'VertexColor', VertexColorNode );
-
 const vertexColor = ( ...params ) => nodeObject( new VertexColorNode( ...params ) );
 
 class PointUVNode extends Node {
+
+	static get type() {
+
+		return 'PointUVNode';
+
+	}
 
 	constructor() {
 
@@ -54653,11 +55074,15 @@ class PointUVNode extends Node {
 
 }
 
-PointUVNode.type = /*@__PURE__*/ registerNode( 'PointUV', PointUVNode );
-
 const pointUV = /*@__PURE__*/ nodeImmutable( PointUVNode );
 
 class SceneNode extends Node {
+
+	static get type() {
+
+		return 'SceneNode';
+
+	}
 
 	constructor( scope = SceneNode.BACKGROUND_BLURRINESS, scene = null ) {
 
@@ -54697,8 +55122,6 @@ class SceneNode extends Node {
 
 SceneNode.BACKGROUND_BLURRINESS = 'backgroundBlurriness';
 SceneNode.BACKGROUND_INTENSITY = 'backgroundIntensity';
-
-SceneNode.type = /*@__PURE__*/ registerNode( 'Scene', SceneNode );
 
 const backgroundBlurriness = /*@__PURE__*/ nodeImmutable( SceneNode, SceneNode.BACKGROUND_BLURRINESS );
 const backgroundIntensity = /*@__PURE__*/ nodeImmutable( SceneNode, SceneNode.BACKGROUND_INTENSITY );
@@ -55000,6 +55423,12 @@ const GPUFeatureName = {
 
 class StorageBufferNode extends BufferNode {
 
+	static get type() {
+
+		return 'StorageBufferNode';
+
+	}
+
 	constructor( value, bufferType, bufferCount = 0 ) {
 
 		super( value, bufferType, bufferCount );
@@ -55113,13 +55542,17 @@ class StorageBufferNode extends BufferNode {
 
 }
 
-StorageBufferNode.type = /*@__PURE__*/ registerNode( 'StorageBuffer', StorageBufferNode );
-
 // Read-Write Storage
 const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );
 const storageObject = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ).setBufferObject( true ) );
 
 class StorageTextureNode extends TextureNode {
+
+	static get type() {
+
+		return 'StorageTextureNode';
+
+	}
 
 	constructor( value, uvNode, storeNode = null ) {
 
@@ -55203,8 +55636,6 @@ class StorageTextureNode extends TextureNode {
 
 }
 
-StorageTextureNode.type = /*@__PURE__*/ registerNode( 'StorageTexture', StorageTextureNode );
-
 const storageTexture = /*@__PURE__*/ nodeProxy( StorageTextureNode );
 
 const textureStore = ( value, uvNode, storeNode ) => {
@@ -55218,6 +55649,12 @@ const textureStore = ( value, uvNode, storeNode ) => {
 };
 
 class UserDataNode extends ReferenceNode {
+
+	static get type() {
+
+		return 'UserDataNode';
+
+	}
 
 	constructor( property, inputType, userData = null ) {
 
@@ -55237,11 +55674,15 @@ class UserDataNode extends ReferenceNode {
 
 }
 
-UserDataNode.type = /*@__PURE__*/ registerNode( 'UserData', UserDataNode );
-
 const userData = ( name, inputType, userData ) => nodeObject( new UserDataNode( name, inputType, userData ) );
 
 class PosterizeNode extends TempNode {
+
+	static get type() {
+
+		return 'PosterizeNode';
+
+	}
 
 	constructor( sourceNode, stepsNode ) {
 
@@ -55262,13 +55703,17 @@ class PosterizeNode extends TempNode {
 
 }
 
-PosterizeNode.type = /*@__PURE__*/ registerNode( 'Posterize', PosterizeNode );
-
 const posterize = /*@__PURE__*/ nodeProxy( PosterizeNode );
 
 let _sharedFramebuffer = null;
 
 class ViewportSharedTextureNode extends ViewportTextureNode {
+
+	static get type() {
+
+		return 'ViewportSharedTextureNode';
+
+	}
 
 	constructor( uvNode = viewportUV, levelNode = null ) {
 
@@ -55290,13 +55735,17 @@ class ViewportSharedTextureNode extends ViewportTextureNode {
 
 }
 
-ViewportSharedTextureNode.type = /*@__PURE__*/ registerNode( 'ViewportSharedTexture', ViewportSharedTextureNode );
-
 const viewportSharedTexture = /*@__PURE__*/ nodeProxy( ViewportSharedTextureNode );
 
 const _size$7 = /*@__PURE__*/ new Vector2();
 
 class PassTextureNode extends TextureNode {
+
+	static get type() {
+
+		return 'PassTextureNode';
+
+	}
 
 	constructor( passNode, texture ) {
 
@@ -55324,9 +55773,13 @@ class PassTextureNode extends TextureNode {
 
 }
 
-PassTextureNode.type = /*@__PURE__*/ registerNode( 'PassTexture', PassTextureNode );
-
 class PassMultipleTextureNode extends PassTextureNode {
+
+	static get type() {
+
+		return 'PassMultipleTextureNode';
+
+	}
 
 	constructor( passNode, textureName, previousTexture = false ) {
 
@@ -55359,9 +55812,13 @@ class PassMultipleTextureNode extends PassTextureNode {
 
 }
 
-PassMultipleTextureNode.type = /*@__PURE__*/ registerNode( 'PassMultipleTexture', PassMultipleTextureNode );
-
 class PassNode extends TempNode {
+
+	static get type() {
+
+		return 'PassNode';
+
+	}
 
 	constructor( scope, scene, camera, options = {} ) {
 
@@ -55641,8 +56098,6 @@ class PassNode extends TempNode {
 PassNode.COLOR = 'color';
 PassNode.DEPTH = 'depth';
 
-PassNode.type = /*@__PURE__*/ registerNode( 'Pass', PassNode );
-
 const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
 const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
 const depthPass = ( scene, camera ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera ) );
@@ -55654,6 +56109,12 @@ const _quadMesh1 = /*@__PURE__*/ new QuadMesh();
 const _quadMesh2 = /*@__PURE__*/ new QuadMesh();
 
 class GaussianBlurNode extends TempNode {
+
+	static get type() {
+
+		return 'GaussianBlurNode';
+
+	}
 
 	constructor( textureNode, directionNode = null, sigma = 2 ) {
 
@@ -55837,8 +56298,6 @@ class GaussianBlurNode extends TempNode {
 
 }
 
-GaussianBlurNode.type = /*@__PURE__*/ registerNode( 'GaussianBlur', GaussianBlurNode );
-
 const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ) );
 
 const _size$6 = /*@__PURE__*/ new Vector2();
@@ -55846,6 +56305,12 @@ const _size$6 = /*@__PURE__*/ new Vector2();
 const _quadMeshComp = /*@__PURE__*/ new QuadMesh();
 
 class AfterImageNode extends TempNode {
+
+	static get type() {
+
+		return 'AfterImageNode';
+
+	}
 
 	constructor( textureNode, damp = 0.96 ) {
 
@@ -56022,6 +56487,12 @@ const _quadMesh$4 = /*@__PURE__*/ new QuadMesh();
 
 class AnamorphicNode extends TempNode {
 
+	static get type() {
+
+		return 'AnamorphicNode';
+
+	}
+
 	constructor( textureNode, tresholdNode, scaleNode, samples ) {
 
 		super( 'vec4' );
@@ -56149,6 +56620,12 @@ const anamorphic = ( node, threshold = .9, scale = 3, samples = 32 ) => nodeObje
 
 class SobelOperatorNode extends TempNode {
 
+	static get type() {
+
+		return 'SobelOperatorNode';
+
+	}
+
 	constructor( textureNode ) {
 
 		super();
@@ -56253,11 +56730,15 @@ class SobelOperatorNode extends TempNode {
 
 }
 
-SobelOperatorNode.type = /*@__PURE__*/ registerNode( 'SobelOperator', SobelOperatorNode );
-
 const sobel = ( node ) => nodeObject( new SobelOperatorNode( convertToTexture( node ) ) );
 
 class DepthOfFieldNode extends TempNode {
+
+	static get type() {
+
+		return 'DepthOfFieldNode';
+
+	}
 
 	constructor( textureNode, viewZNode, focusNode, apertureNode, maxblurNode ) {
 
@@ -56364,11 +56845,15 @@ class DepthOfFieldNode extends TempNode {
 
 }
 
-DepthOfFieldNode.type = /*@__PURE__*/ registerNode( 'DepthOfField', DepthOfFieldNode );
-
 const dof = ( node, viewZNode, focus = 1, aperture = 0.025, maxblur = 1 ) => nodeObject( new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focus ), nodeObject( aperture ), nodeObject( maxblur ) ) );
 
 class DotScreenNode extends TempNode {
+
+	static get type() {
+
+		return 'DotScreenNode';
+
+	}
 
 	constructor( inputNode, center = new Vector2( 0.5, 0.5 ), angle = 1.57, scale = 1 ) {
 
@@ -56415,11 +56900,15 @@ class DotScreenNode extends TempNode {
 
 }
 
-DotScreenNode.type = /*@__PURE__*/ registerNode( 'DotScreen', DotScreenNode );
-
 const dotScreen = ( node, center, angle, scale ) => nodeObject( new DotScreenNode( nodeObject( node ), center, angle, scale ) );
 
 class RGBShiftNode extends TempNode {
+
+	static get type() {
+
+		return 'RGBShiftNode';
+
+	}
 
 	constructor( textureNode, amount = 0.005, angle = 0 ) {
 
@@ -56456,11 +56945,15 @@ class RGBShiftNode extends TempNode {
 
 }
 
-RGBShiftNode.type = /*@__PURE__*/ registerNode( 'RGBShift', RGBShiftNode );
-
 const rgbShift = ( node, amount, angle ) => nodeObject( new RGBShiftNode( convertToTexture( node ), amount, angle ) );
 
 class FilmNode extends TempNode {
+
+	static get type() {
+
+		return 'FilmNode';
+
+	}
 
 	constructor( inputNode, intensityNode = null, uvNode = null ) {
 
@@ -56501,11 +56994,15 @@ class FilmNode extends TempNode {
 
 }
 
-FilmNode.type = /*@__PURE__*/ registerNode( 'Film', FilmNode );
-
 const film = /*@__PURE__*/ nodeProxy( FilmNode );
 
 class Lut3DNode extends TempNode {
+
+	static get type() {
+
+		return 'Lut3DNode';
+
+	}
 
 	constructor( inputNode, lutNode, size, intensityNode ) {
 
@@ -56548,8 +57045,6 @@ class Lut3DNode extends TempNode {
 
 }
 
-Lut3DNode.type = /*@__PURE__*/ registerNode( 'Lut3D', Lut3DNode );
-
 const lut3D = ( node, lut, size, intensity ) => nodeObject( new Lut3DNode( nodeObject( node ), nodeObject( lut ), size, nodeObject( intensity ) ) );
 
 const _quadMesh$3 = /*@__PURE__*/ new QuadMesh();
@@ -56557,6 +57052,12 @@ const _currentClearColor$1 = /*@__PURE__*/ new Color();
 const _size$5 = /*@__PURE__*/ new Vector2();
 
 class GTAONode extends TempNode {
+
+	static get type() {
+
+		return 'GTAONode';
+
+	}
 
 	constructor( depthNode, normalNode, camera ) {
 
@@ -56769,8 +57270,6 @@ class GTAONode extends TempNode {
 
 }
 
-GTAONode.type = /*@__PURE__*/ registerNode( 'GTAO', GTAONode );
-
 function generateMagicSquareNoise( size = 5 ) {
 
 	const noiseSize = Math.floor( size ) % 2 === 0 ? Math.floor( size ) + 1 : Math.floor( size );
@@ -56858,6 +57357,12 @@ function generateMagicSquare( size ) {
 const ao = ( depthNode, normalNode, camera ) => nodeObject( new GTAONode( nodeObject( depthNode ), nodeObject( normalNode ), camera ) );
 
 class DenoiseNode extends TempNode {
+
+	static get type() {
+
+		return 'DenoiseNode';
+
+	}
 
 	constructor( textureNode, depthNode, normalNode, noiseNode, camera ) {
 
@@ -57004,8 +57509,6 @@ class DenoiseNode extends TempNode {
 
 }
 
-DenoiseNode.type = /*@__PURE__*/ registerNode( 'Denoise', DenoiseNode );
-
 function generatePdSamplePointInitializer( samples, rings, radiusExponent ) {
 
 	const poissonDisk = generateDenoiseSamples( samples, rings, radiusExponent );
@@ -57042,6 +57545,12 @@ function generateDenoiseSamples( numSamples, numRings, radiusExponent ) {
 const denoise = ( node, depthNode, normalNode, noiseNode, camera ) => nodeObject( new DenoiseNode( convertToTexture( node ), nodeObject( depthNode ), nodeObject( normalNode ), nodeObject( noiseNode ), camera ) );
 
 class FXAANode extends TempNode {
+
+	static get type() {
+
+		return 'FXAANode';
+
+	}
 
 	constructor( textureNode ) {
 
@@ -57352,8 +57861,6 @@ class FXAANode extends TempNode {
 
 }
 
-FXAANode.type = /*@__PURE__*/ registerNode( 'FXAA', FXAANode );
-
 const fxaa = ( node ) => nodeObject( new FXAANode( convertToTexture( node ) ) );
 
 const _quadMesh$2 = /*@__PURE__*/ new QuadMesh();
@@ -57366,6 +57873,12 @@ const _BlurDirectionX = /*@__PURE__*/ new Vector2( 1.0, 0.0 );
 const _BlurDirectionY = /*@__PURE__*/ new Vector2( 0.0, 1.0 );
 
 class BloomNode extends TempNode {
+
+	static get type() {
+
+		return 'BloomNode';
+
+	}
 
 	constructor( inputNode, strength = 1, radius = 0, threshold = 0 ) {
 
@@ -57672,6 +58185,12 @@ const bloom = ( node, strength, radius, threshold ) => nodeObject( new BloomNode
 
 class TransitionNode extends TempNode {
 
+	static get type() {
+
+		return 'TransitionNode';
+
+	}
+
 	constructor( textureNodeA, textureNodeB, mixTextureNode, mixRatioNode, thresholdNode, useTextureNode ) {
 
 		super();
@@ -57734,11 +58253,15 @@ class TransitionNode extends TempNode {
 
 }
 
-TransitionNode.type = /*@__PURE__*/ registerNode( 'Transition', TransitionNode );
-
 const transition = ( nodeA, nodeB, mixTexture, mixRatio = 0.0, threshold = 0.1, useTexture = 0 ) => nodeObject( new TransitionNode( convertToTexture( nodeA ), convertToTexture( nodeB ), convertToTexture( mixTexture ), nodeObject( mixRatio ), nodeObject( threshold ), nodeObject( useTexture ) ) );
 
 class PixelationNode extends TempNode {
+
+	static get type() {
+
+		return 'PixelationNode';
+
+	}
 
 	constructor( textureNode, depthNode, normalNode, pixelSize, normalEdgeStrength, depthEdgeStrength ) {
 
@@ -57877,11 +58400,15 @@ class PixelationNode extends TempNode {
 
 }
 
-PixelationNode.type = /*@__PURE__*/ registerNode( 'Pixelation', PixelationNode );
-
 const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( convertToTexture( node ), convertToTexture( depthNode ), convertToTexture( normalNode ), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
 
 class PixelationPassNode extends PassNode {
+
+	static get type() {
+
+		return 'PixelationPassNode';
+
+	}
 
 	constructor( scene, camera, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) {
 
@@ -57925,8 +58452,6 @@ class PixelationPassNode extends PassNode {
 
 const pixelationPass = ( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) => nodeObject( new PixelationPassNode( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) );
 
-PixelationPassNode.type = /*@__PURE__*/ registerNode( 'PixelationPass', PixelationPassNode );
-
 const _size$3 = /*@__PURE__*/ new Vector2();
 
 /**
@@ -57940,6 +58465,12 @@ const _size$3 = /*@__PURE__*/ new Vector2();
 */
 
 class SSAAPassNode extends PassNode {
+
+	static get type() {
+
+		return 'SSAAPassNode';
+
+	}
 
 	constructor( scene, camera ) {
 
@@ -58157,8 +58688,6 @@ class SSAAPassNode extends PassNode {
 
 }
 
-SSAAPassNode.type = /*@__PURE__*/ registerNode( 'SSAAPass', SSAAPassNode );
-
 // These jitter vectors are specified in integers because it is easier.
 // I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
 // before being used, thus these integers need to be scaled by 1/16.
@@ -58201,6 +58730,12 @@ const ssaaPass = ( scene, camera ) => nodeObject( new SSAAPassNode( scene, camer
 const _size$2 = /*@__PURE__*/ new Vector2();
 
 class StereoPassNode extends PassNode {
+
+	static get type() {
+
+		return 'StereoPassNode';
+
+	}
 
 	constructor( scene, camera ) {
 
@@ -58267,14 +58802,18 @@ class StereoPassNode extends PassNode {
 
 }
 
-StereoPassNode.type = /*@__PURE__*/ registerNode( 'StereoPass', StereoPassNode );
-
 const stereoPass = ( scene, camera ) => nodeObject( new StereoPassNode( scene, camera ) );
 
 const _size$1 = /*@__PURE__*/ new Vector2();
 const _quadMesh$1 = /*@__PURE__*/ new QuadMesh();
 
 class StereoCompositePassNode extends PassNode {
+
+	static get type() {
+
+		return 'StereoCompositePassNode';
+
+	}
 
 	constructor( scene, camera ) {
 
@@ -58365,9 +58904,13 @@ class StereoCompositePassNode extends PassNode {
 
 }
 
-StereoCompositePassNode.type = /*@__PURE__*/ registerNode( 'StereoCompositePass', StereoCompositePassNode );
-
 class AnaglyphPassNode extends StereoCompositePassNode {
+
+	static get type() {
+
+		return 'AnaglyphPassNode';
+
+	}
 
 	constructor( scene, camera ) {
 
@@ -58421,6 +58964,12 @@ const anaglyphPass = ( scene, camera ) => nodeObject( new AnaglyphPassNode( scen
 
 class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
+	static get type() {
+
+		return 'ParallaxBarrierPassNode';
+
+	}
+
 	constructor( scene, camera ) {
 
 		super( scene, camera );
@@ -58461,11 +59010,15 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 }
 
-ParallaxBarrierPassNode.type = /*@__PURE__*/ registerNode( 'ParallaxBarrierPass', ParallaxBarrierPassNode );
-
 const parallaxBarrierPass = ( scene, camera ) => nodeObject( new ParallaxBarrierPassNode( scene, camera ) );
 
 class ScriptableValueNode extends Node {
+
+	static get type() {
+
+		return 'ScriptableValueNode';
+
+	}
 
 	constructor( value = null ) {
 
@@ -58620,8 +59173,6 @@ class ScriptableValueNode extends Node {
 
 }
 
-ScriptableValueNode.type = /*@__PURE__*/ registerNode( 'ScriptableValue', ScriptableValueNode );
-
 const scriptableValue = /*@__PURE__*/ nodeProxy( ScriptableValueNode );
 
 class Resources extends Map {
@@ -58682,6 +59233,12 @@ class Parameters {
 const global = new Resources();
 
 class ScriptableNode extends Node {
+
+	static get type() {
+
+		return 'ScriptableNode';
+
+	}
 
 	constructor( codeNode = null, parameters = {} ) {
 
@@ -59115,11 +59672,15 @@ class ScriptableNode extends Node {
 
 }
 
-ScriptableNode.type = /*@__PURE__*/ registerNode( 'Scriptable', ScriptableNode );
-
 const scriptable = /*@__PURE__*/ nodeProxy( ScriptableNode );
 
 class FogNode extends Node {
+
+	static get type() {
+
+		return 'FogNode';
+
+	}
 
 	constructor( colorNode, factorNode ) {
 
@@ -59156,11 +59717,15 @@ class FogNode extends Node {
 
 }
 
-FogNode.type = /*@__PURE__*/ registerNode( 'Fog', FogNode );
-
 const fog = /*@__PURE__*/ nodeProxy( FogNode );
 
 class FogRangeNode extends FogNode {
+
+	static get type() {
+
+		return 'FogRangeNode';
+
+	}
 
 	constructor( colorNode, nearNode, farNode ) {
 
@@ -59183,11 +59748,15 @@ class FogRangeNode extends FogNode {
 
 }
 
-FogRangeNode.type = /*@__PURE__*/ registerNode( 'FogRange', FogRangeNode );
-
 const rangeFog = /*@__PURE__*/ nodeProxy( FogRangeNode );
 
 class FogExp2Node extends FogNode {
+
+	static get type() {
+
+		return 'FogExp2Node';
+
+	}
 
 	constructor( colorNode, densityNode ) {
 
@@ -59210,14 +59779,18 @@ class FogExp2Node extends FogNode {
 
 }
 
-FogExp2Node.type = /*@__PURE__*/ registerNode( 'FogExp2', FogExp2Node );
-
 const densityFog = /*@__PURE__*/ nodeProxy( FogExp2Node );
 
 let min = null;
 let max = null;
 
 class RangeNode extends Node {
+
+	static get type() {
+
+		return 'RangeNode';
+
+	}
 
 	constructor( minNode = float(), maxNode = float() ) {
 
@@ -59315,11 +59888,15 @@ class RangeNode extends Node {
 
 }
 
-RangeNode.type = /*@__PURE__*/ registerNode( 'Range', RangeNode );
-
 const range = /*@__PURE__*/ nodeProxy( RangeNode );
 
 class LightNode extends Node {
+
+	static get type() {
+
+		return 'LightNode';
+
+	}
 
 	constructor( scope = LightNode.TARGET_DIRECTION, light = null ) {
 
@@ -59365,8 +59942,6 @@ class LightNode extends Node {
 }
 
 LightNode.TARGET_DIRECTION = 'targetDirection';
-
-LightNode.type = /*@__PURE__*/ registerNode( 'Light', LightNode );
 
 const lightTargetDirection = /*@__PURE__*/ nodeProxy( LightNode, LightNode.TARGET_DIRECTION );
 
@@ -59478,6 +60053,12 @@ const shadowFilterLib = [ BasicShadowMap, PCFShadowMap, PCFSoftShadowMap ];
 let overrideMaterial = null;
 
 class AnalyticLightNode extends LightingNode {
+
+	static get type() {
+
+		return 'AnalyticLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -59704,8 +60285,6 @@ class AnalyticLightNode extends LightingNode {
 
 }
 
-AnalyticLightNode.type = /*@__PURE__*/ registerNode( 'AnalyticLight', AnalyticLightNode );
-
 const getDistanceAttenuation = /*@__PURE__*/ Fn( ( inputs ) => {
 
 	const { lightDistance, cutoffDistance, decayExponent } = inputs;
@@ -59723,6 +60302,12 @@ const getDistanceAttenuation = /*@__PURE__*/ Fn( ( inputs ) => {
 } ); // validated
 
 class PointLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'PointLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -59775,9 +60360,13 @@ class PointLightNode extends AnalyticLightNode {
 
 }
 
-PointLightNode.type = /*@__PURE__*/ registerNode( 'PointLight', PointLightNode );
-
 class DirectionalLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'DirectionalLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -59805,14 +60394,18 @@ class DirectionalLightNode extends AnalyticLightNode {
 
 }
 
-DirectionalLightNode.type = /*@__PURE__*/ registerNode( 'DirectionalLight', DirectionalLightNode );
-
 const _matrix41 = /*@__PURE__*/ new Matrix4();
 const _matrix42 = /*@__PURE__*/ new Matrix4();
 
 let ltcLib = null;
 
 class RectAreaLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'RectAreaLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -59888,9 +60481,13 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 }
 
-RectAreaLightNode.type = /*@__PURE__*/ registerNode( 'RectAreaLight', RectAreaLightNode );
-
 class SpotLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'SpotLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -59962,9 +60559,13 @@ class SpotLightNode extends AnalyticLightNode {
 
 }
 
-SpotLightNode.type = /*@__PURE__*/ registerNode( 'SpotLight', SpotLightNode );
-
 class IESSpotLightNode extends SpotLightNode {
+
+	static get type() {
+
+		return 'IESSpotLightNode';
+
+	}
 
 	getSpotAttenuation( angleCosine ) {
 
@@ -59990,9 +60591,13 @@ class IESSpotLightNode extends SpotLightNode {
 
 }
 
-IESSpotLightNode.type = /*@__PURE__*/ registerNode( 'IESSpotLight', IESSpotLightNode );
-
 class AmbientLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'AmbientLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -60008,9 +60613,13 @@ class AmbientLightNode extends AnalyticLightNode {
 
 }
 
-AmbientLightNode.type = /*@__PURE__*/ registerNode( 'AmbientLight', AmbientLightNode );
-
 class HemisphereLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'HemisphereLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -60050,9 +60659,38 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 }
 
-HemisphereLightNode.type = /*@__PURE__*/ registerNode( 'HemisphereLight', HemisphereLightNode );
+const getShIrradianceAt = /*@__PURE__*/ Fn( ( [ normal, shCoefficients ] ) => {
+
+	// normal is assumed to have unit length
+
+	const x = normal.x, y = normal.y, z = normal.z;
+
+	// band 0
+	let result = shCoefficients.element( 0 ).mul( 0.886227 );
+
+	// band 1
+	result = result.add( shCoefficients.element( 1 ).mul( 2.0 * 0.511664 ).mul( y ) );
+	result = result.add( shCoefficients.element( 2 ).mul( 2.0 * 0.511664 ).mul( z ) );
+	result = result.add( shCoefficients.element( 3 ).mul( 2.0 * 0.511664 ).mul( x ) );
+
+	// band 2
+	result = result.add( shCoefficients.element( 4 ).mul( 2.0 * 0.429043 ).mul( x ).mul( y ) );
+	result = result.add( shCoefficients.element( 5 ).mul( 2.0 * 0.429043 ).mul( y ).mul( z ) );
+	result = result.add( shCoefficients.element( 6 ).mul( z.mul( z ).mul( 0.743125 ).sub( 0.247708 ) ) );
+	result = result.add( shCoefficients.element( 7 ).mul( 2.0 * 0.429043 ).mul( x ).mul( z ) );
+	result = result.add( shCoefficients.element( 8 ).mul( 0.429043 ).mul( mul( x, x ).sub( mul( y, y ) ) ) );
+
+	return result;
+
+} );
 
 class LightProbeNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'LightProbeNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -60084,40 +60722,13 @@ class LightProbeNode extends AnalyticLightNode {
 
 	setup( builder ) {
 
-		const irradiance = shGetIrradianceAt( normalWorld, this.lightProbe );
+		const irradiance = getShIrradianceAt( normalWorld, this.lightProbe );
 
 		builder.context.irradiance.addAssign( irradiance );
 
 	}
 
 }
-
-LightProbeNode.type = /*@__PURE__*/ registerNode( 'LightProbe', LightProbeNode );
-
-const shGetIrradianceAt = /*@__PURE__*/ Fn( ( [ normal, shCoefficients ] ) => {
-
-	// normal is assumed to have unit length
-
-	const x = normal.x, y = normal.y, z = normal.z;
-
-	// band 0
-	const result = shCoefficients.element( 0 ).mul( 0.886227 );
-
-	// band 1
-	result.addAssign( shCoefficients.element( 1 ).mul( 2.0 * 0.511664 ).mul( y ) );
-	result.addAssign( shCoefficients.element( 2 ).mul( 2.0 * 0.511664 ).mul( z ) );
-	result.addAssign( shCoefficients.element( 3 ).mul( 2.0 * 0.511664 ).mul( x ) );
-
-	// band 2
-	result.addAssign( shCoefficients.element( 4 ).mul( 2.0 * 0.429043 ).mul( x ).mul( y ) );
-	result.addAssign( shCoefficients.element( 5 ).mul( 2.0 * 0.429043 ).mul( y ).mul( z ) );
-	result.addAssign( shCoefficients.element( 6 ).mul( z.mul( z ).mul( 0.743125 ).sub( 0.247708 ) ) );
-	result.addAssign( shCoefficients.element( 7 ).mul( 2.0 * 0.429043 ).mul( x ).mul( z ) );
-	result.addAssign( shCoefficients.element( 8 ).mul( 0.429043 ).mul( mul( x, x ).sub( mul( y, y ) ) ) );
-
-	return result;
-
-} );
 
 class NodeParser {
 
@@ -61176,9 +61787,15 @@ const viewportSafeUV = /*@__PURE__*/ Fn( ( [ uv = null ] ) => {
 
 } );
 
-const _matrixCache = new WeakMap();
+const _objectData = new WeakMap();
 
 class VelocityNode extends TempNode {
+
+	static get type() {
+
+		return 'VelocityNode';
+
+	}
 
 	constructor() {
 
@@ -61187,35 +61804,66 @@ class VelocityNode extends TempNode {
 		this.updateType = NodeUpdateType.OBJECT;
 		this.updateAfterType = NodeUpdateType.OBJECT;
 
+		this.previousModelWorldMatrix = uniform( new Matrix4() );
 		this.previousProjectionMatrix = uniform( new Matrix4() );
-		this.previousModelViewMatrix = uniform( new Matrix4() );
+		this.previousCameraViewMatrix = uniform( new Matrix4() );
 
 	}
 
-	update( { camera, object } ) {
+	update( { frameId, camera, object } ) {
 
 		const previousModelMatrix = getPreviousMatrix( object );
-		const previousCameraMatrix = getPreviousMatrix( camera );
 
-		this.previousModelViewMatrix.value.copy( previousModelMatrix );
-		this.previousProjectionMatrix.value.copy( previousCameraMatrix );
+		this.previousModelWorldMatrix.value.copy( previousModelMatrix );
+
+		//
+
+		const cameraData = getData( camera );
+
+		if ( cameraData.frameId !== frameId ) {
+
+			cameraData.frameId = frameId;
+
+			if ( cameraData.previousProjectionMatrix === undefined ) {
+
+				cameraData.previousProjectionMatrix = new Matrix4();
+				cameraData.previousCameraViewMatrix = new Matrix4();
+
+				cameraData.currentProjectionMatrix = new Matrix4();
+				cameraData.currentCameraViewMatrix = new Matrix4();
+
+				cameraData.previousProjectionMatrix.copy( camera.projectionMatrix );
+				cameraData.previousCameraViewMatrix.copy( camera.matrixWorldInverse );
+
+			} else {
+
+				cameraData.previousProjectionMatrix.copy( cameraData.currentProjectionMatrix );
+				cameraData.previousCameraViewMatrix.copy( cameraData.currentCameraViewMatrix );
+
+			}
+
+			cameraData.currentProjectionMatrix.copy( camera.projectionMatrix );
+			cameraData.currentCameraViewMatrix.copy( camera.matrixWorldInverse );
+
+			this.previousProjectionMatrix.value.copy( cameraData.previousProjectionMatrix );
+			this.previousCameraViewMatrix.value.copy( cameraData.previousCameraViewMatrix );
+
+		}
 
 	}
 
-	updateAfter( { camera, object } ) {
+	updateAfter( { object } ) {
 
-		const previousModelMatrix = getPreviousMatrix( object );
-		const previousCameraMatrix = getPreviousMatrix( camera );
-
-		previousModelMatrix.copy( object.modelViewMatrix );
-		previousCameraMatrix.copy( camera.projectionMatrix );
+		getPreviousMatrix( object ).copy( object.matrixWorld );
 
 	}
 
 	setup( /*builder*/ ) {
 
+		const previousModelViewMatrix = this.previousCameraViewMatrix.mul( this.previousModelWorldMatrix );
+
 		const clipPositionCurrent = cameraProjectionMatrix.mul( modelViewMatrix ).mul( positionLocal );
-		const clipPositionPrevious = this.previousProjectionMatrix.mul( this.previousModelViewMatrix ).mul( positionPrevious );
+		const clipPositionPrevious = this.previousProjectionMatrix.mul( previousModelViewMatrix ).mul( positionPrevious );
 
 		const ndcPositionCurrent = clipPositionCurrent.xy.div( clipPositionCurrent.w );
 		const ndcPositionPrevious = clipPositionPrevious.xy.div( clipPositionPrevious.w );
@@ -61228,22 +61876,36 @@ class VelocityNode extends TempNode {
 
 }
 
-function getPreviousMatrix( object ) {
+function getData( object ) {
 
-	let previousMatrix = _matrixCache.get( object );
+	let objectData = _objectData.get( object );
 
-	if ( previousMatrix === undefined ) {
+	if ( objectData === undefined ) {
 
-		previousMatrix = new Matrix4();
-		_matrixCache.set( object, previousMatrix );
+		objectData = {};
+		_objectData.set( object, objectData );
 
 	}
 
-	return previousMatrix;
+	return objectData;
 
 }
 
-VelocityNode.type = /*@__PURE__*/ registerNode( 'Velocity', VelocityNode );
+function getPreviousMatrix( object, index = 0 ) {
+
+	const objectData = getData( object );
+
+	let matrix = objectData[ index ];
+
+	if ( matrix === undefined ) {
+
+		objectData[ index ] = matrix = new Matrix4();
+
+	}
+
+	return matrix;
+
+}
 
 const velocity = /*@__PURE__*/ nodeImmutable( VelocityNode );
 
@@ -61359,7 +62021,7 @@ const sepia = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 } );
 
-const sRGBToLinear = /*@__PURE__*/ Fn( ( [ color ] ) => {
+const sRGBToLinearSRGB = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	const a = color.mul( 0.9478672986 ).add( 0.0521327014 ).pow( 2.4 );
 	const b = color.mul( 0.0773993808 );
@@ -61370,14 +62032,14 @@ const sRGBToLinear = /*@__PURE__*/ Fn( ( [ color ] ) => {
 	return rgbResult;
 
 } ).setLayout( {
-	name: 'sRGBToLinear',
+	name: 'sRGBToLinearSRGB',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' }
 	]
 } );
 
-const LinearTosRGB = /*@__PURE__*/ Fn( ( [ color ] ) => {
+const linearSRGBTosRGB = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 	const a = color.pow( 0.41666 ).mul( 1.055 ).sub( 0.055 );
 	const b = color.mul( 12.92 );
@@ -61388,27 +62050,21 @@ const LinearTosRGB = /*@__PURE__*/ Fn( ( [ color ] ) => {
 	return rgbResult;
 
 } ).setLayout( {
-	name: 'LinearTosRGB',
+	name: 'linearSRGBTosRGB',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' }
 	]
 } );
 
-var ColorSpaceFunctions = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	LinearTosRGB: LinearTosRGB,
-	sRGBToLinear: sRGBToLinear
-});
-
 // exposure only
 
-const LinearToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
+const linearToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	return color.mul( exposure ).clamp();
 
 } ).setLayout( {
-	name: 'LinearToneMapping',
+	name: 'linearToneMapping',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' },
@@ -61418,14 +62074,14 @@ const LinearToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 // source: https://www.cs.utah.edu/docs/techreports/2002/pdf/UUCS-02-001.pdf
 
-const ReinhardToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
+const reinhardToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	color = color.mul( exposure );
 
 	return color.div( color.add( 1.0 ) ).clamp();
 
 } ).setLayout( {
-	name: 'ReinhardToneMapping',
+	name: 'reinhardToneMapping',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' },
@@ -61435,7 +62091,7 @@ const ReinhardToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 // source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
 
-const CineonToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
+const cineonToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	// filmic operator by Jim Hejl and Richard Burgess-Dawson
 	color = color.mul( exposure );
@@ -61447,7 +62103,7 @@ const CineonToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 	return a.div( b ).pow( 2.2 );
 
 } ).setLayout( {
-	name: 'CineonToneMapping',
+	name: 'cineonToneMapping',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' },
@@ -61468,7 +62124,7 @@ const RRTAndODTFit = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
 // source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
 
-const ACESFilmicToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
+const acesFilmicToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	// sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT
 	const ACESInputMat = mat3(
@@ -61497,7 +62153,7 @@ const ACESFilmicToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 	return color.clamp();
 
 } ).setLayout( {
-	name: 'ACESFilmicToneMapping',
+	name: 'acesFilmicToneMapping',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' },
@@ -61518,7 +62174,7 @@ const agxDefaultContrastApprox = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 
 } );
 
-const AgXToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
+const agxToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	const colortone = vec3( color ).toVar();
 	const AgXInsetMatrix = mat3( vec3( 0.856627153315983, 0.137318972929847, 0.11189821299995 ), vec3( 0.0951212405381588, 0.761241990602591, 0.0767994186031903 ), vec3( 0.0482516061458583, 0.101439036467562, 0.811302368396859 ) );
@@ -61541,7 +62197,7 @@ const AgXToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 	return colortone;
 
 } ).setLayout( {
-	name: 'AgXToneMapping',
+	name: 'agxToneMapping',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' },
@@ -61551,7 +62207,7 @@ const AgXToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 // https://modelviewer.dev/examples/tone-mapping
 
-const NeutralToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
+const neutralToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 
 	const StartCompression = float( 0.8 - 0.04 );
 	const Desaturation = float( 0.15 );
@@ -61579,23 +62235,13 @@ const NeutralToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 	return mix( color, vec3( newPeak ), g );
 
 } ).setLayout( {
-	name: 'NeutralToneMapping',
+	name: 'neutralToneMapping',
 	type: 'vec3',
 	inputs: [
 		{ name: 'color', type: 'vec3' },
 		{ name: 'exposure', type: 'float' }
 	]
 } );
-
-var ToneMappingFunctions = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	ACESFilmicToneMapping: ACESFilmicToneMapping,
-	AgXToneMapping: AgXToneMapping,
-	CineonToneMapping: CineonToneMapping,
-	LinearToneMapping: LinearToneMapping,
-	NeutralToneMapping: NeutralToneMapping,
-	ReinhardToneMapping: ReinhardToneMapping
-});
 
 const checker = /*@__PURE__*/ Fn( ( [ coord = uv() ] ) => {
 
@@ -63584,9 +64230,9 @@ class Nodes extends DataMap {
 
 				let backgroundNode = null;
 
-				if ( background.isCubeTexture === true || ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) ) {
+				if ( background.isCubeTexture === true || ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping || background.mapping === CubeUVReflectionMapping ) ) {
 
-					if ( scene.backgroundBlurriness > 0 ) {
+					if ( scene.backgroundBlurriness > 0 || background.mapping === CubeUVReflectionMapping ) {
 
 						backgroundNode = pmremTexture( background, normalWorld );
 
@@ -64046,7 +64692,9 @@ class Renderer {
 		this.info = new Info();
 
 		this.nodes = {
-			library: new NodeLibrary()
+			library: new NodeLibrary(),
+			modelViewMatrix: null,
+			modelNormalMatrix: null
 		};
 
 		// internals
@@ -64423,11 +65071,6 @@ class Renderer {
 				const renderObject = renderObjects[ i ];
 
 				this._nodes.updateBefore( renderObject );
-
-				//
-
-				renderObject.object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, renderObject.object.matrixWorld );
-				renderObject.object.normalMatrix.getNormalMatrix( renderObject.object.modelViewMatrix );
 
 				this._nodes.updateForRender( renderObject );
 				this._bindings.updateForRender( renderObject );
@@ -65543,13 +66186,6 @@ class Renderer {
 
 		this._nodes.updateBefore( renderObject );
 
-		//
-
-		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
-
-		//
-
 		this._nodes.updateForRender( renderObject );
 		this._geometries.updateForRender( renderObject );
 		this._bindings.updateForRender( renderObject );
@@ -65578,8 +66214,6 @@ class Renderer {
 		//
 
 		this._nodes.updateBefore( renderObject );
-
-		//
 
 		this._nodes.updateForRender( renderObject );
 		this._geometries.updateForRender( renderObject );
@@ -67606,9 +68240,15 @@ class WebGLAttributeUtils {
 
 		const dstBuffer = new attribute.array.constructor( array.length );
 
+		// Ensure the buffer is bound before reading
+		gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
+
 		gl.getBufferSubData( gl.COPY_WRITE_BUFFER, 0, dstBuffer );
 
 		gl.deleteBuffer( writeBuffer );
+
+		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
+		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
 
 		return dstBuffer.buffer;
 
@@ -74152,6 +74792,8 @@ ${ flowData.code }
 
 		const shadersData = this.material !== null ? { fragment: {}, vertex: {} } : { compute: {} };
 
+		this.sortBindingGroups();
+
 		for ( const shaderStage in shadersData ) {
 
 			const stageData = shadersData[ shaderStage ];
@@ -74783,22 +75425,12 @@ class WebGPUAttributeUtils {
 		const bufferGPU = data.buffer;
 		const size = bufferGPU.size;
 
-		let readBufferGPU = data.readBuffer;
-		let needsUnmap = true;
+		const readBufferGPU = device.createBuffer( {
+			label: attribute.name,
+			size,
+			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+		} );
 
-		if ( readBufferGPU === undefined ) {
-
-			readBufferGPU = device.createBuffer( {
-				label: attribute.name,
-				size,
-				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-			} );
-
-			needsUnmap = false;
-
-			data.readBuffer = readBufferGPU;
-
-		}
 
 		const cmdEncoder = device.createCommandEncoder( {} );
 
@@ -74810,7 +75442,7 @@ class WebGPUAttributeUtils {
 			size
 		);
 
-		if ( needsUnmap ) readBufferGPU.unmap();
+		readBufferGPU.unmap();
 
 		const gpuCommands = cmdEncoder.finish();
 		device.queue.submit( [ gpuCommands ] );
@@ -76198,7 +76830,7 @@ class WebGPUBackend extends Backend {
 		renderContextData.descriptor = descriptor;
 		renderContextData.encoder = encoder;
 		renderContextData.currentPass = currentPass;
-		renderContextData.currentSets = { attributes: {}, pipeline: null, index: null };
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 		renderContextData.renderBundles = [];
 
 		//
@@ -76621,12 +77253,19 @@ class WebGPUBackend extends Backend {
 
 		// bind groups
 
+		const currentBindingGroups = currentSets.bindingGroups;
+
 		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
 
 			const bindGroup = bindings[ i ];
 			const bindingsData = this.get( bindGroup );
 
-			passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
+			if ( currentBindingGroups[ bindGroup.index ] !== bindGroup.id ) {
+
+				passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
+				currentBindingGroups[ bindGroup.index ] = bindGroup.id;
+
+			}
 
 		}
 
@@ -77059,7 +77698,7 @@ class WebGPUBackend extends Backend {
 		renderContextData._currentPass = renderContextData.currentPass;
 		renderContextData._currentSets = renderContextData.currentSets;
 
-		renderContextData.currentSets = { attributes: {}, pipeline: null, index: null };
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 		renderContextData.currentPass = this.pipelineUtils.createBundleEncoder( renderContext );
 
 	}
@@ -77288,7 +77927,7 @@ class WebGPUBackend extends Backend {
 		if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
 
 		renderContextData.currentPass = encoder.beginRenderPass( descriptor );
-		renderContextData.currentSets = { attributes: {}, pipeline: null, index: null };
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 
 	}
 
@@ -77345,15 +77984,15 @@ class StandardNodeLibrary extends NodeLibrary {
 		this.addLight( LightProbeNode, LightProbe );
 		this.addLight( IESSpotLightNode, IESSpotLight );
 
-		this.addToneMapping( LinearToneMapping, LinearToneMapping$1 );
-		this.addToneMapping( ReinhardToneMapping, ReinhardToneMapping$1 );
-		this.addToneMapping( CineonToneMapping, CineonToneMapping$1 );
-		this.addToneMapping( ACESFilmicToneMapping, ACESFilmicToneMapping$1 );
-		this.addToneMapping( AgXToneMapping, AgXToneMapping$1 );
-		this.addToneMapping( NeutralToneMapping, NeutralToneMapping$1 );
+		this.addToneMapping( linearToneMapping, LinearToneMapping );
+		this.addToneMapping( reinhardToneMapping, ReinhardToneMapping );
+		this.addToneMapping( cineonToneMapping, CineonToneMapping );
+		this.addToneMapping( acesFilmicToneMapping, ACESFilmicToneMapping );
+		this.addToneMapping( agxToneMapping, AgXToneMapping );
+		this.addToneMapping( neutralToneMapping, NeutralToneMapping );
 
-		this.addColorSpace( LinearTosRGB, getColorSpaceMethod( LinearSRGBColorSpace, SRGBColorSpace ) );
-		this.addColorSpace( sRGBToLinear, getColorSpaceMethod( SRGBColorSpace, LinearSRGBColorSpace ) );
+		this.addColorSpace( linearSRGBTosRGB, getColorSpaceMethod( LinearSRGBColorSpace, SRGBColorSpace ) );
+		this.addColorSpace( sRGBToLinearSRGB, getColorSpaceMethod( SRGBColorSpace, LinearSRGBColorSpace ) );
 
 	}
 
@@ -77560,6 +78199,7 @@ class NodeLoader extends Loader {
 		super( manager );
 
 		this.textures = {};
+		this.nodes = {};
 
 	}
 
@@ -77605,7 +78245,7 @@ class NodeLoader extends Loader {
 
 				const { uuid, type } = nodeJSON;
 
-				nodes[ uuid ] = nodeObject( createNodeFromType( type ) );
+				nodes[ uuid ] = this.createNodeFromType( type );
 				nodes[ uuid ].uuid = uuid;
 
 			}
@@ -77631,7 +78271,7 @@ class NodeLoader extends Loader {
 
 	parse( json ) {
 
-		const node = nodeObject( createNodeFromType( json.type ) );
+		const node = this.createNodeFromType( json.type );
 		node.uuid = json.uuid;
 
 		const nodes = this.parseNodes( json.nodes );
@@ -77654,23 +78294,27 @@ class NodeLoader extends Loader {
 
 	}
 
-}
+	setNodes( value ) {
 
-const superFromTypeFunction = MaterialLoader.createMaterialFromType;
-
-MaterialLoader.createMaterialFromType = function ( type ) {
-
-	const material = createNodeMaterialFromType( type );
-
-	if ( material !== undefined ) {
-
-		return material;
+		this.nodes = value;
+		return this;
 
 	}
 
-	return superFromTypeFunction.call( this, type );
+	createNodeFromType( type ) {
 
-};
+		if ( this.nodes[ type ] === undefined ) {
+
+			console.error( 'THREE.NodeLoader: Node type not found:', type );
+			return float();
+
+		}
+
+		return nodeObject( new this.nodes[ type ]() );
+
+	}
+
+}
 
 class NodeMaterialLoader extends MaterialLoader {
 
@@ -77679,6 +78323,7 @@ class NodeMaterialLoader extends MaterialLoader {
 		super( manager );
 
 		this.nodes = {};
+		this.nodeMaterials = {};
 
 	}
 
@@ -77704,8 +78349,28 @@ class NodeMaterialLoader extends MaterialLoader {
 	setNodes( value ) {
 
 		this.nodes = value;
-
 		return this;
+
+	}
+
+	setNodeMaterials( value ) {
+
+		this.nodeMaterials = value;
+		return this;
+
+	}
+
+	createMaterialFromType( type ) {
+
+		const materialClass = this.nodeMaterials[ type ];
+
+		if ( materialClass !== undefined ) {
+
+			return new materialClass();
+
+		}
+
+		return super.createMaterialFromType( type );
 
 	}
 
@@ -77717,7 +78382,24 @@ class NodeObjectLoader extends ObjectLoader {
 
 		super( manager );
 
+		this.nodes = {};
+		this.nodeMaterials = {};
+
 		this._nodesJSON = null;
+
+	}
+
+	setNodes( value ) {
+
+		this.nodes = value;
+		return this;
+
+	}
+
+	setNodeMaterials( value ) {
+
+		this.nodeMaterials = value;
+		return this;
 
 	}
 
@@ -77738,6 +78420,7 @@ class NodeObjectLoader extends ObjectLoader {
 		if ( json !== undefined ) {
 
 			const loader = new NodeLoader();
+			loader.setNodes( this.nodes );
 			loader.setTextures( textures );
 
 			return loader.parseNodes( json );
@@ -77759,6 +78442,7 @@ class NodeObjectLoader extends ObjectLoader {
 			const loader = new NodeMaterialLoader();
 			loader.setTextures( textures );
 			loader.setNodes( nodes );
+			loader.setNodeMaterials( this.nodeMaterials );
 
 			for ( let i = 0, l = json.length; i < l; i ++ ) {
 
@@ -77798,4 +78482,4 @@ if ( typeof window !== 'undefined' ) {
 
 }
 
-export { ACESFilmicToneMapping$1 as ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AfterImageNode, AgXToneMapping$1 as AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnaglyphPassNode, AnalyticLightNode, AnamorphicNode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrayElementNode, ArrowHelper, AssignNode, AttachedBindMode, AttributeNode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BRDF_GGX, BRDF_Lambert, BackSide, BasicDepthPacking, BasicEnvironmentNode, BasicShadowMap$1 as BasicShadowMap, BatchNode, BatchedMesh, BloomNode, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, Break, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferGeometryLoader, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, Cache, CacheNode, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping$1 as CineonToneMapping, CircleGeometry, ClampToEdgeWrapping, Clock, CodeNode, Color, ColorKeyframeTrack, ColorManagement, ColorSpaceFunctions, ColorSpaceNode, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ComputeNode, ConeGeometry, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, Continue, Controls, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeTextureNode, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry, Cylindrical, DFGApprox, D_GGX, Data3DTexture, DataArrayTexture, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DenoiseNode, DepthFormat, DepthOfFieldNode, DepthStencilFormat, DepthTexture, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DirectionalLightNode, Discard, DiscreteInterpolant, DisplayP3ColorSpace, DodecahedronGeometry, DotScreenNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EPSILON, EdgesGeometry, EllipseCurve, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, ExtrudeGeometry, FXAANode, F_Schlick, FileLoader, FilmNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, Fn, Fog, FogExp2, FogExp2Node, FogNode, FogRangeNode, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLBufferAttribute, GLSL1, GLSL3, GLSLNodeParser, GTAONode, GaussianBlurNode, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightNode, IESSpotLight, IESSpotLightNode, INFINITY, IcosahedronGeometry, If, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, InstanceNode, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, InstancedPointsNodeMaterial, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightNode, LightProbe, LightProbeNode, LightingContextNode, LightingModel, LightingNode, LightsNode, Line, Line2NodeMaterial, Line3, LineBasicMaterial, LineBasicNodeMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineDashedNodeMaterial, LineLoop, LineSegments, LinearDisplayP3ColorSpace, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping$1 as LinearToneMapping, LinearTransfer, Loader, LoaderUtils, LoadingManager, Loop, LoopNode, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, Lut3DNode, MOUSE, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, ModelViewProjectionNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping$1 as NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalAnimationBlendMode, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OscNode, OutputStructNode, P3Primaries, PCFShadowMap$1 as PCFShadowMap, PCFSoftShadowMap$1 as PCFSoftShadowMap, PI, PI2, PMREMGenerator, PMREMNode, ParallaxBarrierPassNode, ParameterNode, PassNode, Path, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, PixelationPassNode, Plane, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, PointLightNode, PointUVNode, Points, PointsMaterial, PointsNodeMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PostProcessing, PosterizeNode, PropertyBinding, PropertyMixer, PropertyNode, QuadMesh, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDepthPacking, RGBFormat, RGBIntegerFormat, RGBShiftNode, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGDepthPacking, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RawShaderMaterial, Ray, Raycaster, Rec709Primaries, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping$1 as ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RepeatWrapping, ReplaceStencilOp, Return, ReverseSubtractEquation, RingGeometry, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, SSAAPassNode, Scene, SceneNode, Schlick_to_F0, ScriptableNode, ScriptableValueNode, SetNode, ShaderMaterial, ShaderNode, ShadowMaterial, ShadowNodeMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SkinningNode, SobelOperatorNode, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SplitNode, SpotLight, SpotLightHelper, SpotLightNode, Sprite, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StereoPassNode, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TBNViewMatrix, TOUCH, TangentSpaceNormalMap, TempNode, TetrahedronGeometry, Texture, Texture3DNode, TextureLoader, TextureNode, TextureSizeNode, TimerNode, ToneMappingFunctions, ToneMappingNode, TorusGeometry, TorusKnotGeometry, TransitionNode, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TriplanarTexturesNode, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform$1 as Uniform, UniformArrayNode, UniformGroupNode, UniformNode, UniformsGroup$1 as UniformsGroup, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, V_GGX_SmithCorrelated, VarNode, VaryingNode, Vector2, Vector3, Vector4, VectorKeyframeTrack, VertexColorNode, VideoTexture, ViewportDepthNode, ViewportDepthTextureNode, ViewportNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, abs, acos, add, addMethodChaining, addNodeElement, afterImage, all, alphaT, anaglyphPass, anamorphic, and, anisotropy, anisotropyB, anisotropyT, any, ao, append, arrayBuffer, asin, assign, atan, atan2, attenuationColor, attenuationDistance, attribute, backgroundBlurriness, backgroundIntensity, batch, billboarding, bitAnd, bitNot, bitOr, bitXor, bitangentGeometry, bitangentLocal, bitangentView, bitangentWorld, bitcast, bleach, bloom, blur, bool, buffer, bufferAttribute, bumpMap, burn, bvec2, bvec3, bvec4, bypass, cache, call, cameraFar, cameraLogDepth, cameraNear, cameraNormalMatrix, cameraPosition, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraWorldMatrix, cbrt, ceil, checker, clamp, clearcoat, clearcoatRoughness, code, color, colorToDirection, compute, cond, context, convert, convertToTexture, cos, createCanvasElement, cross, cubeTexture, dFdx, dFdy, dashSize, defaultBuildStages, defaultShaderStages, defined, degrees, denoise, densityFog, depth, depthPass, difference, diffuseColor, directionToColor, dispersion, distance, div, dodge, dof, dot, dotScreen, drawIndex, dynamicBufferAttribute, element, emissive, equal, equals, equirectUV, exp, exp2, expression, faceDirection, faceForward, film, float, floor, fog, fract, frameGroup, frameId, frontFacing, fwidth, fxaa, gain, gapSize, gaussianBlur, getColorSpaceMethod, getConstNodeType, getCurrentStack, getDirection, getDistanceAttenuation, getGeometryRoughness, getRoughness, getTextureIndex, global, glsl, glslFn, grayscale, greaterThan, greaterThanEqual, hash, hue, instance, instanceIndex, instancedBufferAttribute, instancedDynamicBufferAttribute, int, inverseSqrt, invocationLocalIndex, ior, iridescence, iridescenceIOR, iridescenceThickness, ivec2, ivec3, ivec4, js, label, length, lengthSq, lessThan, lessThanEqual, lightTargetDirection, lightingContext, lights, linearDepth, log, log2, luminance, lut3D, mat2, mat3, mat4, matcapUV, materialAOMap, materialAlphaTest, materialAnisotropy, materialAnisotropyVector, materialClearcoat, materialClearcoatNormal, materialClearcoatRoughness, materialColor, materialDispersion, materialEmissive, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLightMap, materialLineDashOffset, materialLineDashSize, materialLineGapSize, materialLineScale, materialLineWidth, materialMetalness, materialNormal, materialOpacity, materialPointWidth, materialReference, materialReflectivity, materialRefractionRatio, materialRotation, materialRoughness, materialSheen, materialSheenRoughness, materialShininess, materialSpecular, materialSpecularStrength, max$1 as max, maxMipLevel, metalness, min$1 as min, mix, mixElement, mod, modInt, modelDirection, modelNormalMatrix, modelPosition, modelScale, modelViewMatrix, modelViewPosition, modelViewProjection, modelWorldMatrix, modelWorldMatrixInverse, morphReference, motionBlur, mrt, mul, mx_aastep, mx_cell_noise_float, mx_contrast, mx_fractal_noise_float, mx_fractal_noise_vec2, mx_fractal_noise_vec3, mx_fractal_noise_vec4, mx_hsvtorgb, mx_noise_float, mx_noise_vec3, mx_noise_vec4, mx_ramplr, mx_ramptb, mx_rgbtohsv, mx_safepower, mx_splitlr, mx_splittb, mx_srgb_texture_to_lin_rec709, mx_transform_uv, mx_worley_noise_float, mx_worley_noise_vec2, mx_worley_noise_vec3, negate, nodeArray, nodeImmutable, nodeObject, nodeObjects, nodeProxy, normalFlat, normalGeometry, normalLocal, normalMap, normalView, normalWorld, normalize, not, notEqual, objectDirection, objectGroup, objectNormalMatrix, objectPosition, objectScale, objectViewMatrix, objectViewPosition, objectWorldMatrix, oneMinus, or, orthographicDepthToViewZ, oscSawtooth, oscSine, oscSquare, oscTriangle, output, outputStruct, overlay, overloadingFn, parabola, parallaxBarrierPass, parallaxDirection, parallaxUV, parameter, pass, passTexture, pcurve, perspectiveDepthToViewZ, pixelationPass, pmremTexture, pointUV, pointWidth, positionGeometry, positionLocal, positionPrevious, positionView, positionViewDirection, positionWorld, positionWorldDirection, posterize, pow, pow2, pow3, pow4, property, radians, rand, range, rangeFog, reciprocal, reference, referenceBuffer, reflect, reflectVector, reflectView, reflector, refract, refractVector, refractView, registerNode, remainder, remap, remapClamp, renderGroup, renderOutput, rendererReference, rgbShift, rotate, rotateUV, roughness, round, rtt, sampler, saturate, saturation, screen, scriptable, scriptableValue, select, sepia, setCurrentStack, shaderStages, sharedUniformGroup, sheen, sheenRoughness, shiftLeft, shiftRight, shininess, sign, sin, sinc, skinning, skinningReference, smoothstep, smoothstepElement, sobel, specularColor, specularF90, spherizeUV, split, spritesheetUV, sqrt, ssaaPass, stack, step, stereoPass, storage, storageObject, storageTexture, string, sub, tan, tangentGeometry, tangentLocal, tangentView, tangentWorld, temp, texture, texture3D, textureBicubic, textureCubeUV, textureLoad, textureSize, textureStore, thickness, threshold, timerDelta, timerGlobal, timerLocal, toOutputColorSpace, toWorkingColorSpace, toneMapping, toneMappingExposure, transformDirection, transformedBentNormalView, transformedBitangentView, transformedBitangentWorld, transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld, transformedTangentView, transformedTangentWorld, transition, transmission, transpose, tri, tri3, triNoise3D, triplanarTexture, triplanarTextures, trunc, tslFn, uint, uniform, uniformArray, uniformGroup, userData, uv, uvec2, uvec3, uvec4, varying, varyingProperty, vec2, vec3, vec4, vectorComponents, velocity, vertexColor, vertexIndex, vibrance, viewZToOrthographicDepth, viewZToPerspectiveDepth, viewport, viewportBottomLeft, viewportCoordinate, viewportDepthTexture, viewportLinearDepth, viewportMipTexture, viewportResolution, viewportSafeUV, viewportSharedTexture, viewportTexture, viewportTopLeft, viewportUV, wgsl, wgslFn, xor };
+export { ACESFilmicToneMapping, AONode, AddEquation, AddOperation, AdditiveAnimationBlendMode, AdditiveBlending, AfterImageNode, AgXToneMapping, AlphaFormat, AlwaysCompare, AlwaysDepth, AlwaysStencilFunc, AmbientLight, AmbientLightNode, AnaglyphPassNode, AnalyticLightNode, AnamorphicNode, AnimationAction, AnimationClip, AnimationLoader, AnimationMixer, AnimationObjectGroup, AnimationUtils, ArcCurve, ArrayCamera, ArrayElementNode, ArrowHelper, AssignNode, AttachedBindMode, AttributeNode, Audio, AudioAnalyser, AudioContext, AudioListener, AudioLoader, AxesHelper, BRDF_GGX, BRDF_Lambert, BackSide, BasicDepthPacking, BasicEnvironmentNode, BasicShadowMap$1 as BasicShadowMap, BatchNode, BatchedMesh, BloomNode, Bone, BooleanKeyframeTrack, Box2, Box3, Box3Helper, BoxGeometry, BoxHelper, Break, BufferAttribute, BufferAttributeNode, BufferGeometry, BufferGeometryLoader, BufferNode, BumpMapNode, BundleGroup, BypassNode, ByteType, Cache, CacheNode, Camera, CameraHelper, CanvasTexture, CapsuleGeometry, CatmullRomCurve3, CineonToneMapping, CircleGeometry, ClampToEdgeWrapping, Clock, CodeNode, Color, ColorKeyframeTrack, ColorManagement, ColorSpaceNode, CompressedArrayTexture, CompressedCubeTexture, CompressedTexture, CompressedTextureLoader, ComputeNode, ConeGeometry, ConstNode, ConstantAlphaFactor, ConstantColorFactor, ContextNode, Continue, Controls, ConvertNode, CubeCamera, CubeReflectionMapping, CubeRefractionMapping, CubeTexture, CubeTextureLoader, CubeTextureNode, CubeUVReflectionMapping, CubicBezierCurve, CubicBezierCurve3, CubicInterpolant, CullFaceBack, CullFaceFront, CullFaceFrontBack, CullFaceNone, Curve, CurvePath, CustomBlending, CustomToneMapping, CylinderGeometry, Cylindrical, DFGApprox, D_GGX, Data3DTexture, DataArrayTexture, DataTexture, DataTextureLoader, DataUtils, DecrementStencilOp, DecrementWrapStencilOp, DefaultLoadingManager, DenoiseNode, DepthFormat, DepthOfFieldNode, DepthStencilFormat, DepthTexture, DetachedBindMode, DirectionalLight, DirectionalLightHelper, DirectionalLightNode, Discard, DiscreteInterpolant, DisplayP3ColorSpace, DodecahedronGeometry, DotScreenNode, DoubleSide, DstAlphaFactor, DstColorFactor, DynamicCopyUsage, DynamicDrawUsage, DynamicReadUsage, EPSILON, EdgesGeometry, EllipseCurve, EnvironmentNode, EqualCompare, EqualDepth, EqualStencilFunc, EquirectUVNode, EquirectangularReflectionMapping, EquirectangularRefractionMapping, Euler, EventDispatcher, ExpressionNode, ExtrudeGeometry, FXAANode, F_Schlick, FileLoader, FilmNode, Float16BufferAttribute, Float32BufferAttribute, FloatType, Fn, Fog, FogExp2, FogExp2Node, FogNode, FogRangeNode, FramebufferTexture, FrontFacingNode, FrontSide, Frustum, FunctionCallNode, FunctionNode, FunctionOverloadingNode, GLBufferAttribute, GLSL1, GLSL3, GLSLNodeParser, GTAONode, GaussianBlurNode, GreaterCompare, GreaterDepth, GreaterEqualCompare, GreaterEqualDepth, GreaterEqualStencilFunc, GreaterStencilFunc, GridHelper, Group, HalfFloatType, HemisphereLight, HemisphereLightHelper, HemisphereLightNode, IESSpotLight, IESSpotLightNode, INFINITY, IcosahedronGeometry, If, ImageBitmapLoader, ImageLoader, ImageUtils, IncrementStencilOp, IncrementWrapStencilOp, IndexNode, InstanceNode, InstancedBufferAttribute, InstancedBufferGeometry, InstancedInterleavedBuffer, InstancedMesh, InstancedPointsNodeMaterial, Int16BufferAttribute, Int32BufferAttribute, Int8BufferAttribute, IntType, InterleavedBuffer, InterleavedBufferAttribute, Interpolant, InterpolateDiscrete, InterpolateLinear, InterpolateSmooth, InvertStencilOp, IrradianceNode, JoinNode, KeepStencilOp, KeyframeTrack, LOD, LatheGeometry, Layers, LessCompare, LessDepth, LessEqualCompare, LessEqualDepth, LessEqualStencilFunc, LessStencilFunc, Light, LightNode, LightProbe, LightProbeNode, LightingContextNode, LightingModel, LightingNode, LightsNode, Line, Line2NodeMaterial, Line3, LineBasicMaterial, LineBasicNodeMaterial, LineCurve, LineCurve3, LineDashedMaterial, LineDashedNodeMaterial, LineLoop, LineSegments, LinearDisplayP3ColorSpace, LinearFilter, LinearInterpolant, LinearMipMapLinearFilter, LinearMipMapNearestFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, LinearSRGBColorSpace, LinearToneMapping, LinearTransfer, Loader, LoaderUtils, LoadingManager, Loop, LoopNode, LoopOnce, LoopPingPong, LoopRepeat, LuminanceAlphaFormat, LuminanceFormat, Lut3DNode, MOUSE, MRTNode, MatcapUVNode, Material, MaterialLoader, MaterialNode, MaterialReferenceNode, MathUtils, Matrix2, Matrix3, Matrix4, MaxEquation, MaxMipLevelNode, Mesh, MeshBasicMaterial, MeshBasicNodeMaterial, MeshDepthMaterial, MeshDistanceMaterial, MeshLambertMaterial, MeshLambertNodeMaterial, MeshMatcapMaterial, MeshMatcapNodeMaterial, MeshNormalMaterial, MeshNormalNodeMaterial, MeshPhongMaterial, MeshPhongNodeMaterial, MeshPhysicalMaterial, MeshPhysicalNodeMaterial, MeshSSSNodeMaterial, MeshStandardMaterial, MeshStandardNodeMaterial, MeshToonMaterial, MeshToonNodeMaterial, MinEquation, MirroredRepeatWrapping, MixOperation, ModelNode, ModelViewProjectionNode, MorphNode, MultiplyBlending, MultiplyOperation, NearestFilter, NearestMipMapLinearFilter, NearestMipMapNearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, NeutralToneMapping, NeverCompare, NeverDepth, NeverStencilFunc, NoBlending, NoColorSpace, NoToneMapping, Node, NodeAttribute, NodeBuilder, NodeCache, NodeCode, NodeFrame, NodeFunctionInput, NodeLoader, NodeMaterial, NodeMaterialLoader, NodeObjectLoader, NodeShaderStage, NodeType, NodeUniform, NodeUpdateType, NodeUtils, NodeVar, NodeVarying, NormalAnimationBlendMode, NormalBlending, NormalMapNode, NotEqualCompare, NotEqualDepth, NotEqualStencilFunc, NumberKeyframeTrack, Object3D, Object3DNode, ObjectLoader, ObjectSpaceNormalMap, OctahedronGeometry, OneFactor, OneMinusConstantAlphaFactor, OneMinusConstantColorFactor, OneMinusDstAlphaFactor, OneMinusDstColorFactor, OneMinusSrcAlphaFactor, OneMinusSrcColorFactor, OrthographicCamera, OscNode, OutputStructNode, P3Primaries, PCFShadowMap$1 as PCFShadowMap, PCFSoftShadowMap$1 as PCFSoftShadowMap, PI, PI2, PMREMGenerator, PMREMNode, ParallaxBarrierPassNode, ParameterNode, PassNode, Path, PerspectiveCamera, PhongLightingModel, PhysicalLightingModel, PixelationPassNode, Plane, PlaneGeometry, PlaneHelper, PointLight, PointLightHelper, PointLightNode, PointUVNode, Points, PointsMaterial, PointsNodeMaterial, PolarGridHelper, PolyhedronGeometry, PositionalAudio, PostProcessing, PosterizeNode, PropertyBinding, PropertyMixer, PropertyNode, QuadMesh, QuadraticBezierCurve, QuadraticBezierCurve3, Quaternion, QuaternionKeyframeTrack, QuaternionLinearInterpolant, RED_GREEN_RGTC2_Format, RED_RGTC1_Format, REVISION, RGBADepthPacking, RGBAFormat, RGBAIntegerFormat, RGBA_ASTC_10x10_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_BPTC_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, RGBDepthPacking, RGBFormat, RGBIntegerFormat, RGBShiftNode, RGB_BPTC_SIGNED_Format, RGB_BPTC_UNSIGNED_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGB_S3TC_DXT1_Format, RGDepthPacking, RGFormat, RGIntegerFormat, RTTNode, RangeNode, RawShaderMaterial, Ray, Raycaster, Rec709Primaries, RectAreaLight, RectAreaLightNode, RedFormat, RedIntegerFormat, ReferenceNode, ReflectorNode, ReinhardToneMapping, RemapNode, RenderOutputNode, RenderTarget, RendererReferenceNode, RepeatWrapping, ReplaceStencilOp, Return, ReverseSubtractEquation, RingGeometry, RotateNode, SIGNED_RED_GREEN_RGTC2_Format, SIGNED_RED_RGTC1_Format, SRGBColorSpace, SRGBTransfer, SSAAPassNode, Scene, SceneNode, Schlick_to_F0, ScriptableNode, ScriptableValueNode, SetNode, ShaderMaterial, ShaderNode, ShadowMaterial, ShadowNodeMaterial, Shape, ShapeGeometry, ShapePath, ShapeUtils, ShortType, Skeleton, SkeletonHelper, SkinnedMesh, SkinningNode, SobelOperatorNode, Source, Sphere, SphereGeometry, Spherical, SphericalHarmonics3, SplineCurve, SplitNode, SpotLight, SpotLightHelper, SpotLightNode, Sprite, SpriteMaterial, SpriteNodeMaterial, SpriteSheetUVNode, SrcAlphaFactor, SrcAlphaSaturateFactor, SrcColorFactor, StackNode, StaticCopyUsage, StaticDrawUsage, StaticReadUsage, StereoCamera, StereoPassNode, StorageArrayElementNode, StorageBufferAttribute, StorageBufferNode, StorageInstancedBufferAttribute, StorageTexture, StorageTextureNode, StreamCopyUsage, StreamDrawUsage, StreamReadUsage, StringKeyframeTrack, SubtractEquation, SubtractiveBlending, TBNViewMatrix, TOUCH, TangentSpaceNormalMap, TempNode, TetrahedronGeometry, Texture, Texture3DNode, TextureLoader, TextureNode, TextureSizeNode, TimerNode, ToneMappingNode, TorusGeometry, TorusKnotGeometry, TransitionNode, Triangle, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, TriplanarTexturesNode, TubeGeometry, UVMapping, Uint16BufferAttribute, Uint32BufferAttribute, Uint8BufferAttribute, Uint8ClampedBufferAttribute, Uniform$1 as Uniform, UniformArrayNode, UniformGroupNode, UniformNode, UniformsGroup$1 as UniformsGroup, UnsignedByteType, UnsignedInt248Type, UnsignedInt5999Type, UnsignedIntType, UnsignedShort4444Type, UnsignedShort5551Type, UnsignedShortType, UserDataNode, VSMShadowMap, V_GGX_SmithCorrelated, VarNode, VaryingNode, Vector2, Vector3, Vector4, VectorKeyframeTrack, VertexColorNode, VideoTexture, ViewportDepthNode, ViewportDepthTextureNode, ViewportNode, ViewportSharedTextureNode, ViewportTextureNode, VolumeNodeMaterial, WebGL3DRenderTarget, WebGLArrayRenderTarget, WebGLCoordinateSystem, WebGLCubeRenderTarget, WebGLMultipleRenderTargets, WebGLRenderTarget, WebGPUCoordinateSystem, WebGPURenderer, WireframeGeometry, WrapAroundEnding, ZeroCurvatureEnding, ZeroFactor, ZeroSlopeEnding, ZeroStencilOp, abs, acesFilmicToneMapping, acos, add, addMethodChaining, addNodeElement, afterImage, agxToneMapping, all, alphaT, anaglyphPass, anamorphic, and, anisotropy, anisotropyB, anisotropyT, any, ao, append, arrayBuffer, asin, assign, atan, atan2, attenuationColor, attenuationDistance, attribute, backgroundBlurriness, backgroundIntensity, batch, billboarding, bitAnd, bitNot, bitOr, bitXor, bitangentGeometry, bitangentLocal, bitangentView, bitangentWorld, bitcast, bleach, bloom, blur, bool, buffer, bufferAttribute, bumpMap, burn, bvec2, bvec3, bvec4, bypass, cache, call, cameraFar, cameraLogDepth, cameraNear, cameraNormalMatrix, cameraPosition, cameraProjectionMatrix, cameraProjectionMatrixInverse, cameraViewMatrix, cameraWorldMatrix, cbrt, ceil, checker, cineonToneMapping, clamp, clearcoat, clearcoatRoughness, code, color, colorToDirection, compute, cond, context, convert, convertToTexture, cos, createCanvasElement, cross, cubeTexture, dFdx, dFdy, dashSize, defaultBuildStages, defaultShaderStages, defined, degrees, denoise, densityFog, depth, depthPass, difference, diffuseColor, directionToColor, dispersion, distance, div, dodge, dof, dot, dotScreen, drawIndex, dynamicBufferAttribute, element, emissive, equal, equals, equirectUV, exp, exp2, expression, faceDirection, faceForward, film, float, floor, fog, fract, frameGroup, frameId, frontFacing, fwidth, fxaa, gain, gapSize, gaussianBlur, getColorSpaceMethod, getConstNodeType, getCurrentStack, getDirection, getDistanceAttenuation, getGeometryRoughness, getRoughness, getShIrradianceAt, getTextureIndex, global, glsl, glslFn, grayscale, greaterThan, greaterThanEqual, hash, highPrecisionModelNormalMatrix, highPrecisionModelViewMatrix, hue, instance, instanceIndex, instancedBufferAttribute, instancedDynamicBufferAttribute, int, inverseSqrt, invocationLocalIndex, ior, iridescence, iridescenceIOR, iridescenceThickness, ivec2, ivec3, ivec4, js, label, length, lengthSq, lessThan, lessThanEqual, lightTargetDirection, lightingContext, lights, linearDepth, linearSRGBTosRGB, linearToneMapping, log, log2, loop, luminance, lut3D, mat2, mat3, mat4, matcapUV, materialAOMap, materialAlphaTest, materialAnisotropy, materialAnisotropyVector, materialAttenuationColor, materialAttenuationDistance, materialClearcoat, materialClearcoatNormal, materialClearcoatRoughness, materialColor, materialDispersion, materialEmissive, materialIOR, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLightMap, materialLineDashOffset, materialLineDashSize, materialLineGapSize, materialLineScale, materialLineWidth, materialMetalness, materialNormal, materialOpacity, materialPointWidth, materialReference, materialReflectivity, materialRefractionRatio, materialRotation, materialRoughness, materialSheen, materialSheenRoughness, materialShininess, materialSpecular, materialSpecularColor, materialSpecularIntensity, materialSpecularStrength, materialThickness, materialTransmission, max$1 as max, maxMipLevel, metalness, min$1 as min, mix, mixElement, mod, modInt, modelDirection, modelPosition, modelScale, modelViewMatrix, modelViewPosition, modelViewProjection, modelWorldMatrix, modelWorldMatrixInverse, morphReference, motionBlur, mrt, mul, mx_aastep, mx_cell_noise_float, mx_contrast, mx_fractal_noise_float, mx_fractal_noise_vec2, mx_fractal_noise_vec3, mx_fractal_noise_vec4, mx_hsvtorgb, mx_noise_float, mx_noise_vec3, mx_noise_vec4, mx_ramplr, mx_ramptb, mx_rgbtohsv, mx_safepower, mx_splitlr, mx_splittb, mx_srgb_texture_to_lin_rec709, mx_transform_uv, mx_worley_noise_float, mx_worley_noise_vec2, mx_worley_noise_vec3, negate, neutralToneMapping, nodeArray, nodeImmutable, nodeObject, nodeObjects, nodeProxy, normalFlat, normalGeometry, normalLocal, normalMap, normalView, normalWorld, normalize, not, notEqual, objectDirection, objectGroup, objectPosition, objectScale, objectViewPosition, objectWorldMatrix, oneMinus, or, orthographicDepthToViewZ, oscSawtooth, oscSine, oscSquare, oscTriangle, output, outputStruct, overlay, overloadingFn, parabola, parallaxBarrierPass, parallaxDirection, parallaxUV, parameter, pass, passTexture, pcurve, perspectiveDepthToViewZ, pixelationPass, pmremTexture, pointUV, pointWidth, positionGeometry, positionLocal, positionPrevious, positionView, positionViewDirection, positionWorld, positionWorldDirection, posterize, pow, pow2, pow3, pow4, property, radians, rand, range, rangeFog, reciprocal, reference, referenceBuffer, reflect, reflectVector, reflectView, reflector, refract, refractVector, refractView, reinhardToneMapping, remainder, remap, remapClamp, renderGroup, renderOutput, rendererReference, rgbShift, rotate, rotateUV, roughness, round, rtt, sRGBToLinearSRGB, sampler, saturate, saturation, screen, scriptable, scriptableValue, select, sepia, setCurrentStack, shaderStages, sharedUniformGroup, sheen, sheenRoughness, shiftLeft, shiftRight, shininess, sign, sin, sinc, skinning, skinningReference, smoothstep, smoothstepElement, sobel, specularColor, specularF90, spherizeUV, split, spritesheetUV, sqrt, ssaaPass, stack, step, stereoPass, storage, storageObject, storageTexture, string, sub, tan, tangentGeometry, tangentLocal, tangentView, tangentWorld, temp, texture, texture3D, textureBicubic, textureCubeUV, textureLoad, textureSize, textureStore, thickness, threshold, timerDelta, timerGlobal, timerLocal, toOutputColorSpace, toWorkingColorSpace, toneMapping, toneMappingExposure, transformDirection, transformNormal, transformNormalToView, transformedBentNormalView, transformedBitangentView, transformedBitangentWorld, transformedClearcoatNormalView, transformedNormalView, transformedNormalWorld, transformedTangentView, transformedTangentWorld, transition, transmission, transpose, tri, tri3, triNoise3D, triplanarTexture, triplanarTextures, trunc, tslFn, uint, uniform, uniformArray, uniformGroup, uniforms, userData, uv, uvec2, uvec3, uvec4, varying, varyingProperty, vec2, vec3, vec4, vectorComponents, velocity, vertexColor, vertexIndex, vibrance, viewZToOrthographicDepth, viewZToPerspectiveDepth, viewport, viewportBottomLeft, viewportCoordinate, viewportDepthTexture, viewportLinearDepth, viewportMipTexture, viewportResolution, viewportSafeUV, viewportSharedTexture, viewportTexture, viewportTopLeft, viewportUV, wgsl, wgslFn, xor };
