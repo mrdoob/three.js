@@ -818,7 +818,7 @@ class WebGLTextureUtils {
 		gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureGPU, 0 );
 
 		const typedArrayType = this._getTypedArrayType( glType );
-		const bytesPerTexel = this._getBytesPerTexel( glFormat );
+		const bytesPerTexel = this._getBytesPerTexel( glType, glFormat );
 
 		const elementCount = width * height;
 		const byteLength = elementCount * bytesPerTexel;
@@ -856,19 +856,33 @@ class WebGLTextureUtils {
 		if ( glType === gl.UNSIGNED_SHORT ) return Uint16Array;
 		if ( glType === gl.UNSIGNED_INT ) return Uint32Array;
 
+		if ( glType === gl.HALF_FLOAT ) return Uint16Array;
 		if ( glType === gl.FLOAT ) return Float32Array;
 
 		throw new Error( `Unsupported WebGL type: ${glType}` );
 
 	}
 
-	_getBytesPerTexel( glFormat ) {
+	_getBytesPerTexel( glType, glFormat ) {
 
 		const { gl } = this;
 
-		if ( glFormat === gl.RGBA ) return 4;
-		if ( glFormat === gl.RGB ) return 3;
-		if ( glFormat === gl.ALPHA ) return 1;
+		let bytesPerComponent = 0;
+
+		if ( glType === gl.UNSIGNED_BYTE ) bytesPerComponent = 1;
+
+		if ( glType === gl.UNSIGNED_SHORT_4_4_4_4 ||
+			glType === gl.UNSIGNED_SHORT_5_5_5_1 ||
+			glType === gl.UNSIGNED_SHORT_5_6_5 ||
+			glType === gl.UNSIGNED_SHORT ||
+			glType === gl.HALF_FLOAT ) bytesPerComponent = 2;
+
+		if ( glType === gl.UNSIGNED_INT ||
+			glType === gl.FLOAT ) bytesPerComponent = 4;
+
+		if ( glFormat === gl.RGBA ) return bytesPerComponent * 4;
+		if ( glFormat === gl.RGB ) return bytesPerComponent * 3;
+		if ( glFormat === gl.ALPHA ) return bytesPerComponent;
 
 	}
 
