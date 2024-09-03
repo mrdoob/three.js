@@ -39,7 +39,7 @@
 
 			};
 
-			const size = 64;
+			const size = 256;
 			const gridDim = Math.sqrt( size );
 
 			const getNumSteps = () => {
@@ -73,13 +73,13 @@
 				const scene = new THREE.Scene();
 
 				const nextAlgoBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( StepType.FLIP_LOCAL ), 1 );
-				const nextAlgoStorage = storageObject( nextAlgoBuffer, 'uint', nextAlgoBuffer.count );
+				const nextAlgoStorage = storageObject( nextAlgoBuffer, 'uint', nextAlgoBuffer.count ).label( 'NextAlgo' );
 
 				const nextBlockHeightBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( 2 ), 1 );
-				const nextBlockHeightStorage = storageObject( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count );
+				const nextBlockHeightStorage = storageObject( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).label( 'NextBlockHeight' );
 
 				const highestBlockHeightBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( 2 ), 1 );
-				const highestBlockHeightStorage = storageObject( highestBlockHeightBuffer, 'uint', highestBlockHeightBuffer.count );
+				const highestBlockHeightStorage = storageObject( highestBlockHeightBuffer, 'uint', highestBlockHeightBuffer.count ).label( 'HighestBlockHeight' );
 
 				const array = new Uint32Array( Array.from( { length: size }, ( _, i ) => {
 
@@ -107,7 +107,7 @@
 				randomizeDataArray();
 
 				const currentElementsBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
-				const currentElementsStorage = storageObject( currentElementsBuffer, 'uint', size );
+				const currentElementsStorage = storageObject( currentElementsBuffer, 'uint', size ).label( 'Elements' );
 				const randomizedElementsBuffer = new THREE.StorageInstancedBufferAttribute( size, 1 );
 				const randomizedElementsStorage = storageObject( randomizedElementsBuffer, 'uint', size );
 
@@ -116,7 +116,10 @@
 
 					const blockOffset = ( index.mul( 2 ).div( blockHeight ) ).mul( blockHeight );
 					const halfHeight = blockHeight.div( 2 );
-					const idx = uvec2( index.modInt( halfHeight ), blockHeight.sub( index.modInt( halfHeight ) ).sub( 1 ) );
+					const idx = uvec2(
+						index.modInt( halfHeight ),
+						blockHeight.sub( index.modInt( halfHeight ) ).sub( 1 )
+					);
 					idx.x.addAssign( blockOffset );
 					idx.y.addAssign( blockOffset );
 
@@ -210,46 +213,57 @@
 
 					const localStorage = workgroupArray( 'uint', 64 * 2 );
 
-					const { nextBlockHeight, nextAlgo } = effectController;
+					const nextBlockHeight = nextBlockHeightStorage.element( 0 ).toVar();
+					nextBlockHeight.name = 'nextBlockHeight';
+					const nextAlgo = nextAlgoStorage.element( 0 ).toVar();
+					nextAlgo.name = 'nextAlgo';
 
 					// Get ids of indices needed to populate workgroup local buffer.
 					// Use .toVar() to prevent recalculation of values when the global buffer gets repopulated.
 					const workgroupId = instanceIndex.div( WORKGROUP_SIZE[ 0 ] ).toVar();
+					workgroupId.name = 'WorkgroupID';
 					const localOffset = uint( WORKGROUP_SIZE[ 0 ] ).mul( 2 ).mul( workgroupId ).toVar();
-					const localId1 = invocationLocalIndex.mul( 2 ).toVar();
-					const localId2 = localId1.add( 1 ).toVar();
-
-					//currentElementsStorage.element( localOffset.add( localId1 ) ).assign( currentStep );//).add( localId1 ) );
-					//currentElementsStorage.element( localOffset.add( localId2 ) ).assign( currentStep );
+					localOffset.name = 'localOffset';
 
 					// If we will perform a local swap, then populate the local data
-					If( nextAlgo.lessThanEqual( StepType.DISPERSE_LOCAL ), () => {
+					If( nextAlgo.lessThanEqual( uint( StepType.DISPERSE_LOCAL ) ), () => {
 
-						localStorage.element( localId1 ).assign( currentElementsStorage.element( localOffset.add( localId1 ) ) );
-						localStorage.element( localId2 ).assign( currentElementsStorage.element( localOffset.add( localId2 ) ) );
+						localStorage.element( invocationLocalIndex.mul( 2 ) ).assign( currentElementsStorage.element( localOffset.add( invocationLocalIndex.mul( 2 ) ) ) );
+						localStorage.element( invocationLocalIndex.mul( 2 ).add( 1 ) ).assign( currentElementsStorage.element( localOffset.add( invocationLocalIndex.mul( 2 ).add( 1 ) ) ) );
 
 					} );
 
 					workgroupBarrier();
 
+					const idx = uvec2( 0 ).toVar();
+
+					// Get indices based on step
 					If( nextAlgo.equal( uint( StepType.FLIP_LOCAL ) ), () => {
 
-						const idx = getFlipIndices( invocationLocalIndex, nextBlockHeight );
-						compareAndSwap( localStorage, idx.x, idx.y );
+						idx.assign( getFlipIndices( invocationLocalIndex, nextBlockHeight ) );
 
 					} ).ElseIf( nextAlgo.equal( uint( StepType.DISPERSE_LOCAL ) ), () => {
 
-						const idx = getDisperseIndices( invocationLocalIndex, nextBlockHeight );
-						compareAndSwap( localStorage, idx.x, idx.y );
+						idx.assign( getDisperseIndices( invocationLocalIndex, nextBlockHeight ) );
 
 					} ).ElseIf( nextAlgo.equal( uint( StepType.FLIP_GLOBAL ) ), () => {
 
-						const idx = getFlipIndices( instanceIndex, nextBlockHeight );
-						compareAndSwap( currentElementsStorage, idx.x, idx.y );
+						idx.assign( getFlipIndices( instanceIndex, nextBlockHeight ) );
 
 					} ).ElseIf( nextAlgo.equal( uint( StepType.DISPERSE_GLOBAL ) ), () => {
 
-						const idx = getFlipIndices( instanceIndex, nextBlockHeight );
+						idx.assign( getFlipIndices( instanceIndex, nextBlockHeight ) );
+
+					} );
+
+					// Swap elements
+					If( nextAlgo.lessThanEqual( uint( StepType.DISPERSE_LOCAL ) ), () => {
+
+						// NOTE: Global swap works as intended just fine, all issues seem to be with coordinating values with var<workgroup>
+						compareAndSwap( localStorage, idx.x, idx.y );
+
+					} ).Else( () => {
+
 						compareAndSwap( currentElementsStorage, idx.x, idx.y );
 
 					} );
@@ -258,10 +272,10 @@
 					workgroupBarrier();
 
 					// Populate output data with the results from our swaps
-					If( nextAlgo.lessThanEqual( StepType.DISPERSE_LOCAL ), () => {
+					If( nextAlgo.lessThanEqual( uint( StepType.DISPERSE_LOCAL ) ), () => {
 
-						currentElementsStorage.element( localOffset.add( localId1 ) ).assign( localStorage.element( localId1 ) );
-						currentElementsStorage.element( localOffset.add( localId2 ) ).assign( localStorage.element( localId2 ) );
+						currentElementsStorage.element( localOffset.add( invocationLocalIndex.mul( 2 ) ) ).assign( localStorage.element( invocationLocalIndex.mul( 2 ) ) );
+						currentElementsStorage.element( localOffset.add( invocationLocalIndex.mul( 2 ).add( 1 ) ) ).assign( localStorage.element( invocationLocalIndex.mul( 2 ).add( 1 ) ) );
 
 					} );
 
@@ -385,7 +399,7 @@
 			
 					await renderer.renderAsync( scene, camera );
 
-					setTimeout( stepAnimation, 1000 );
+					setTimeout( stepAnimation, 200 );
 
 				};
 
