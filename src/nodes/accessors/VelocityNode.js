@@ -8,7 +8,7 @@ import { uniform } from '../core/UniformNode.js';
 import { sub } from '../math/OperatorNode.js';
 import { cameraProjectionMatrix } from './Camera.js';
 
-const _matrixCache = new WeakMap();
+const _objectData = new WeakMap();
 
 class VelocityNode extends TempNode {
 
@@ -25,35 +25,66 @@ class VelocityNode extends TempNode {
 		this.updateType = NodeUpdateType.OBJECT;
 		this.updateAfterType = NodeUpdateType.OBJECT;
 
+		this.previousModelWorldMatrix = uniform( new Matrix4() );
 		this.previousProjectionMatrix = uniform( new Matrix4() );
-		this.previousModelViewMatrix = uniform( new Matrix4() );
+		this.previousCameraViewMatrix = uniform( new Matrix4() );
 
 	}
 
-	update( { camera, object } ) {
+	update( { frameId, camera, object } ) {
 
 		const previousModelMatrix = getPreviousMatrix( object );
-		const previousCameraMatrix = getPreviousMatrix( camera );
 
-		this.previousModelViewMatrix.value.copy( previousModelMatrix );
-		this.previousProjectionMatrix.value.copy( previousCameraMatrix );
+		this.previousModelWorldMatrix.value.copy( previousModelMatrix );
+
+		//
+
+		const cameraData = getData( camera );
+
+		if ( cameraData.frameId !== frameId ) {
+
+			cameraData.frameId = frameId;
+
+			if ( cameraData.previousProjectionMatrix === undefined ) {
+
+				cameraData.previousProjectionMatrix = new Matrix4();
+				cameraData.previousCameraViewMatrix = new Matrix4();
+
+				cameraData.currentProjectionMatrix = new Matrix4();
+				cameraData.currentCameraViewMatrix = new Matrix4();
+
+				cameraData.previousProjectionMatrix.copy( camera.projectionMatrix );
+				cameraData.previousCameraViewMatrix.copy( camera.matrixWorldInverse );
+
+			} else {
+
+				cameraData.previousProjectionMatrix.copy( cameraData.currentProjectionMatrix );
+				cameraData.previousCameraViewMatrix.copy( cameraData.currentCameraViewMatrix );
+
+			}
+
+			cameraData.currentProjectionMatrix.copy( camera.projectionMatrix );
+			cameraData.currentCameraViewMatrix.copy( camera.matrixWorldInverse );
+
+			this.previousProjectionMatrix.value.copy( cameraData.previousProjectionMatrix );
+			this.previousCameraViewMatrix.value.copy( cameraData.previousCameraViewMatrix );
+
+		}
 
 	}
 
-	updateAfter( { camera, object } ) {
+	updateAfter( { object } ) {
 
-		const previousModelMatrix = getPreviousMatrix( object );
-		const previousCameraMatrix = getPreviousMatrix( camera );
-
-		previousModelMatrix.copy( object.modelViewMatrix );
-		previousCameraMatrix.copy( camera.projectionMatrix );
+		getPreviousMatrix( object ).copy( object.matrixWorld );
 
 	}
 
 	setup( /*builder*/ ) {
 
+		const previousModelViewMatrix = this.previousCameraViewMatrix.mul( this.previousModelWorldMatrix );
+
 		const clipPositionCurrent = cameraProjectionMatrix.mul( modelViewMatrix ).mul( positionLocal );
-		const clipPositionPrevious = this.previousProjectionMatrix.mul( this.previousModelViewMatrix ).mul( positionPrevious );
+		const clipPositionPrevious = this.previousProjectionMatrix.mul( previousModelViewMatrix ).mul( positionPrevious );
 
 		const ndcPositionCurrent = clipPositionCurrent.xy.div( clipPositionCurrent.w );
 		const ndcPositionPrevious = clipPositionPrevious.xy.div( clipPositionPrevious.w );
@@ -66,18 +97,34 @@ class VelocityNode extends TempNode {
 
 }
 
-function getPreviousMatrix( object ) {
+function getData( object ) {
 
-	let previousMatrix = _matrixCache.get( object );
+	let objectData = _objectData.get( object );
 
-	if ( previousMatrix === undefined ) {
+	if ( objectData === undefined ) {
 
-		previousMatrix = new Matrix4();
-		_matrixCache.set( object, previousMatrix );
+		objectData = {};
+		_objectData.set( object, objectData );
 
 	}
 
-	return previousMatrix;
+	return objectData;
+
+}
+
+function getPreviousMatrix( object, index = 0 ) {
+
+	const objectData = getData( object );
+
+	let matrix = objectData[ index ];
+
+	if ( matrix === undefined ) {
+
+		objectData[ index ] = matrix = new Matrix4();
+
+	}
+
+	return matrix;
 
 }
 
