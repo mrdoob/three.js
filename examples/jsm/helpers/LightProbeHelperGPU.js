@@ -56,7 +56,7 @@ class LightProbeHelper extends Mesh {
 		this.scale.set( 1, 1, 1 ).multiplyScalar( this.size );
 
 		this._intensity.value = this.lightProbe.intensity;
-		this._sh.value = this.lightProbe.sh.coefficients;
+		this._sh.array = this.lightProbe.sh.coefficients;
 
 	}
 
