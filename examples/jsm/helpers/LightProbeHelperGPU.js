@@ -35,8 +35,6 @@ class LightProbeHelper extends Mesh {
 		this.size = size;
 		this.type = 'LightProbeHelper';
 
-		this._intensity = intensity;
-
 		this.onBeforeRender();
 
 	}
