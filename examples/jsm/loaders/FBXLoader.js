@@ -30,6 +30,8 @@ import {
 	Quaternion,
 	QuaternionKeyframeTrack,
 	RepeatWrapping,
+	SRGBColorSpace,
+	ShapeUtils,
 	Skeleton,
 	SkinnedMesh,
 	SpotLight,
@@ -39,10 +41,9 @@ import {
 	Vector2,
 	Vector3,
 	Vector4,
-	VectorKeyframeTrack,
-	SRGBColorSpace,
-	ShapeUtils
+	VectorKeyframeTrack
 } from 'three';
+
 import * as fflate from '../libs/fflate.module.js';
 import { NURBSCurve } from '../curves/NURBSCurve.js';
 
@@ -1329,7 +1330,7 @@ class FBXTreeParser {
 		if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
 
 		if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = getEulerOrder( modelNode.RotationOrder.value );
-		else transformData.eulerOrder = 'ZYX';
+		else transformData.eulerOrder = getEulerOrder(0);
 
 		if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
 
@@ -2809,10 +2810,13 @@ class AnimationParser {
 
 		}
 
+		// For Maya models using "Joint Orient", Euler order only applies to rotation, not pre/post-rotations
+		const defaultEulerOrder = getEulerOrder(0);
+
 		if ( preRotation !== undefined ) {
 
 			preRotation = preRotation.map( MathUtils.degToRad );
-			preRotation.push( eulerOrder );
+			preRotation.push( defaultEulerOrder );
 
 			preRotation = new Euler().fromArray( preRotation );
 			preRotation = new Quaternion().setFromEuler( preRotation );
@@ -2822,7 +2826,7 @@ class AnimationParser {
 		if ( postRotation !== undefined ) {
 
 			postRotation = postRotation.map( MathUtils.degToRad );
-			postRotation.push( eulerOrder );
+			postRotation.push( defaultEulerOrder );
 
 			postRotation = new Euler().fromArray( postRotation );
 			postRotation = new Quaternion().setFromEuler( postRotation ).invert();
@@ -4134,10 +4138,13 @@ function generateTransform( transformData ) {
 
 	if ( transformData.translation ) lTranslationM.setPosition( tempVec.fromArray( transformData.translation ) );
 
+	// For Maya models using "Joint Orient", Euler order only applies to rotation, not pre/post-rotations
+	const defaultEulerOrder = getEulerOrder(0);
+
 	if ( transformData.preRotation ) {
 
 		const array = transformData.preRotation.map( MathUtils.degToRad );
-		array.push( transformData.eulerOrder || Euler.DEFAULT_ORDER );
+		array.push( defaultEulerOrder );
 		lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 	}
@@ -4145,7 +4152,7 @@ function generateTransform( transformData ) {
 	if ( transformData.rotation ) {
 
 		const array = transformData.rotation.map( MathUtils.degToRad );
-		array.push( transformData.eulerOrder || Euler.DEFAULT_ORDER );
+		array.push( transformData.eulerOrder || defaultEulerOrder );
 		lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
 	}
@@ -4153,7 +4160,7 @@ function generateTransform( transformData ) {
 	if ( transformData.postRotation ) {
 
 		const array = transformData.postRotation.map( MathUtils.degToRad );
-		array.push( transformData.eulerOrder || Euler.DEFAULT_ORDER );
+		array.push( defaultEulerOrder );
 		lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 		lPostRotationM.invert();
 
