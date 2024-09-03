@@ -16,8 +16,6 @@ import QuadMesh from './QuadMesh.js';
 import RenderBundles from './RenderBundles.js';
 import NodeLibrary from './nodes/NodeLibrary.js';
 
-import { modelViewMatrix } from '../../nodes/TSL.js';
-
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Scene } from '../../scenes/Scene.js';
@@ -83,7 +81,8 @@ class Renderer {
 
 		this.nodes = {
 			library: new NodeLibrary(),
-			modelViewMatrix
+			modelViewMatrix: null,
+			modelNormalMatrix: null
 		};
 
 		// internals

@@ -24,8 +24,6 @@ export const normalLocal = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 export const normalFlat = /*@__PURE__*/ positionView.dFdx().cross( positionView.dFdy() ).normalize().toVar( 'normalFlat' );
 
-let normalViewVarying = null;
-
 export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	let node;
@@ -36,7 +34,7 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	} else {
 
-		node = normalViewVarying || ( normalViewVarying = varying( transformNormalToView( normalLocal ), 'v_normalView' ).normalize() );
+		node = varying( transformNormalToView( normalLocal ), 'v_normalView' ).normalize();
 
 	}
 
@@ -71,7 +69,15 @@ export const transformNormal = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorld
 
 } );
 
-export const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorldMatrix ] ) => {
+export const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorldMatrix ], builder ) => {
+
+	const modelNormalMatrix = builder.renderer.nodes.modelNormalMatrix;
+
+	if ( modelNormalMatrix !== null ) {
+
+		return modelNormalMatrix.transformDirection( normal );
+
+	}
 
 	return cameraViewMatrix.transformDirection( transformNormal( normal, matrix ) );
 
