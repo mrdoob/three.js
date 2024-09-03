@@ -80,7 +80,9 @@ class Renderer {
 		this.info = new Info();
 
 		this.nodes = {
-			library: new NodeLibrary()
+			library: new NodeLibrary(),
+			modelViewMatrix: null,
+			modelNormalMatrix: null
 		};
 
 		// internals
@@ -457,11 +459,6 @@ class Renderer {
 				const renderObject = renderObjects[ i ];
 
 				this._nodes.updateBefore( renderObject );
-
-				//
-
-				renderObject.object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, renderObject.object.matrixWorld );
-				renderObject.object.normalMatrix.getNormalMatrix( renderObject.object.modelViewMatrix );
 
 				this._nodes.updateForRender( renderObject );
 				this._bindings.updateForRender( renderObject );
@@ -1577,13 +1574,6 @@ class Renderer {
 
 		this._nodes.updateBefore( renderObject );
 
-		//
-
-		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
-
-		//
-
 		this._nodes.updateForRender( renderObject );
 		this._geometries.updateForRender( renderObject );
 		this._bindings.updateForRender( renderObject );
@@ -1612,8 +1602,6 @@ class Renderer {
 		//
 
 		this._nodes.updateBefore( renderObject );
-
-		//
 
 		this._nodes.updateForRender( renderObject );
 		this._geometries.updateForRender( renderObject );
