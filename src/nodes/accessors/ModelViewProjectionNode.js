@@ -1,6 +1,5 @@
 import TempNode from '../core/TempNode.js';
 import { cameraProjectionMatrix } from './Camera.js';
-import { modelViewMatrix } from './ModelNode.js';
 import { positionLocal } from './Position.js';
 import { nodeProxy, varying } from '../tsl/TSLBase.js';
 
@@ -29,6 +28,7 @@ class ModelViewProjectionNode extends TempNode {
 		}
 
 		const position = this.positionNode || positionLocal;
+		const modelViewMatrix = builder.renderer.nodes.modelViewMatrix;
 
 		return cameraProjectionMatrix.mul( modelViewMatrix ).mul( position );
 

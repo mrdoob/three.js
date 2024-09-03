@@ -1,5 +1,5 @@
 import Object3DNode from './Object3DNode.js';
-import { nodeImmutable } from '../tsl/TSLBase.js';
+import { Fn, nodeImmutable } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
 
 import { Matrix4 } from '../../math/Matrix4.js';
@@ -38,3 +38,13 @@ export const modelScale = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.SCAL
 export const modelViewPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
 export const modelWorldMatrixInverse = /*@__PURE__*/ uniform( new Matrix4() ).onObjectUpdate( ( { object }, self ) => self.value.copy( object.matrixWorld ).invert() );
 export const modelViewMatrix = /*@__PURE__*/ cameraViewMatrix.mul( modelWorldMatrix ).toVar( 'modelViewMatrix' );
+
+export const highPrecisionModelViewMatrix = /*@__PURE__*/ ( Fn( () => {
+
+	return uniform( 'mat4' ).onObjectUpdate( ( { object, camera } ) => {
+
+		return object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+
+	} );
+
+} ).once() )().toVar( 'highPrecisionModelViewMatrix' );
