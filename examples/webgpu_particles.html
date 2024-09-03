@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>three.js - WebGPU - Particles</title>
+		<title>three.js webgpu - Particles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -8,15 +8,15 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGPU - Particles
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - particles
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -24,14 +24,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { range, texture, mix, uv, color, positionLocal, timerLocal, SpriteNodeMaterial } from 'three/nodes';
+			import { range, texture, mix, uv, color, rotateUV, positionLocal, timerLocal } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -41,14 +36,6 @@
 			init();
 
 			function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
 
 				const { innerWidth, innerHeight } = window;
 
@@ -78,7 +65,7 @@
 
 				const fakeLightEffect = positionLocal.y.oneMinus().max( 0.2 );
 
-				const textureNode = texture( map, uv().rotateUV( timer.mul( rotateRange ) ) );
+				const textureNode = texture( map, rotateUV( uv(), timer.mul( rotateRange ) ) );
 
 				const opacityNode = textureNode.a.mul( life.oneMinus() );
 
@@ -86,7 +73,7 @@
 
 				// create particles
 
-				const smokeNodeMaterial = new SpriteNodeMaterial();
+				const smokeNodeMaterial = new THREE.SpriteNodeMaterial();
 				smokeNodeMaterial.colorNode = mix( color( 0xf27d0c ), smokeColor, life.mul( 2.5 ).min( 1 ) ).mul( fakeLightEffect );
 				smokeNodeMaterial.opacityNode = opacityNode;
 				smokeNodeMaterial.positionNode = offsetRange.mul( lifeTime );
@@ -101,7 +88,7 @@
 
 				//
 
-				const fireNodeMaterial = new SpriteNodeMaterial();
+				const fireNodeMaterial = new THREE.SpriteNodeMaterial();
 				fireNodeMaterial.colorNode = mix( color( 0xb72f17 ), color( 0xb72f17 ), life );
 				fireNodeMaterial.positionNode = range( new THREE.Vector3( - 1, 1, - 1 ), new THREE.Vector3( 1, 2, 1 ) ).mul( lifeTime );
 				fireNodeMaterial.scaleNode = smokeNodeMaterial.scaleNode;
@@ -125,7 +112,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );

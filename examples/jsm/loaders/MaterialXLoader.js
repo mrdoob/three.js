@@ -1,12 +1,6 @@
-import {
-	FileLoader,
-	Loader,
-	TextureLoader,
-	RepeatWrapping
-} from 'three';
+import { FileLoader, Loader, TextureLoader, MeshBasicNodeMaterial, MeshPhysicalNodeMaterial, RepeatWrapping } from 'three';
 
 import {
-	MeshBasicNodeMaterial, MeshPhysicalNodeMaterial,
 	float, bool, int, vec2, vec3, vec4, color, texture,
 	positionLocal, positionWorld, uv, vertexColor,
 	normalLocal, normalWorld, tangentLocal, tangentWorld,
@@ -19,8 +13,9 @@ import {
 	mx_transform_uv,
 	mx_safepower, mx_contrast,
 	mx_srgb_texture_to_lin_rec709,
-	saturation
-} from '../nodes/Nodes.js';
+	saturation,
+	timerLocal, frameId
+} from 'three/tsl';
 
 const colorSpaceLib = {
 	mx_srgb_texture_to_lin_rec709
@@ -28,7 +23,7 @@ const colorSpaceLib = {
 
 class MXElement {
 
-	constructor( name, nodeFunc, params = null ) {
+	constructor( name, nodeFunc, params = [] ) {
 
 		this.name = name;
 		this.nodeFunc = nodeFunc;
@@ -47,6 +42,8 @@ const mx_divide = ( in1, in2 = float( 1 ) ) => div( in1, in2 );
 const mx_modulo = ( in1, in2 = float( 1 ) ) => mod( in1, in2 );
 const mx_power = ( in1, in2 = float( 1 ) ) => pow( in1, in2 );
 const mx_atan2 = ( in1 = float( 0 ), in2 = float( 1 ) ) => atan2( in1, in2 );
+const mx_timer = () => timerLocal();
+const mx_frame = () => frameId;
 
 const MXElements = [
 
@@ -134,6 +131,9 @@ const MXElements = [
 	//new MtlXElement( 'separate2', ... ),
 	//new MtlXElement( 'separate3', ... ),
 	//new MtlXElement( 'separate4', ... )
+
+	new MXElement( 'time', mx_timer ),
+	new MXElement( 'frame', mx_frame )
 
 ];
 

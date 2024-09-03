@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - morph targets - face</title>
+		<title>three.js webgpu - morph face targets</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -14,14 +14,15 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - morph targets - face<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - morph face targets<br/>
 			model by <a href="https://www.bannaflak.com/face-cap" target="_blank" rel="noopener">Face Cap</a>
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -31,15 +32,11 @@
 
 			import * as THREE from 'three';
 
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
@@ -50,34 +47,30 @@
 
 			async function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
-
 				let mixer;
 
 				const clock = new THREE.Clock();
 
-				const container = document.createElement( 'div' );
-				document.body.appendChild( container );
 
 				const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
 				camera.position.set( - 1.8, 0.8, 3 );
 
 				const scene = new THREE.Scene();
-				scene.add( new THREE.HemisphereLight( 0xFFFFFF, 0x443333, 2 ) );
 
-				const renderer = new WebGPURenderer( { antialias: true } );
+				const renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				document.body.appendChild( renderer.domElement );
 
-				container.appendChild( renderer.domElement );
+				await renderer.init();
+
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene.background = new THREE.Color( 0x666666 );
+				scene.environment = pmremGenerator.fromScene( environment ).texture;
 
 				const ktx2Loader = await new KTX2Loader()
 					.setTranscoderPath( 'jsm/libs/basis/' )
@@ -100,11 +93,6 @@
 
 						const head = mesh.getObjectByName( 'mesh_2' );
 						const influences = head.morphTargetInfluences;
-
-						//head.morphTargetInfluences = null;
-
-						// WebGPURenderer: Unsupported texture format. 33776
-						head.material.map = null;
 
 						const gui = new GUI();
 						gui.close();
@@ -131,7 +119,7 @@
 				controls.target.set( 0, 0.15, - 0.2 );
 
 				const stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 
 

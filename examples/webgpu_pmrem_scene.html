@@ -11,9 +11,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -21,12 +21,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-
-			import { normalWorld, uniform, pmremTexture, MeshBasicNodeMaterial } from 'three/nodes';
-
-			import PMREMGenerator from 'three/addons/renderers/common/extras/PMREMGenerator.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import { normalWorld, uniform, pmremTexture } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -48,7 +43,7 @@
 
 				const forceWebGL = false;
 
-				renderer = new WebGPURenderer( { antialias: true, forceWebGL } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -93,7 +88,7 @@
 
 				//while ( scene.children.length > 0 ) scene.remove( scene.children[ 0 ] );
 
-				const sceneRT = new PMREMGenerator( renderer ).fromScene( scene );
+				const sceneRT = new THREE.PMREMGenerator( renderer ).fromScene( scene );
 
 				scene.background = null;
 				scene.backgroundNode = null;
@@ -103,7 +98,7 @@
 				const pmremRoughness = uniform( .5 );
 				const pmremNode = pmremTexture( sceneRT.texture, normalWorld, pmremRoughness );
 
-				scene.add( new THREE.Mesh( new THREE.SphereGeometry( .5, 64, 64 ), new MeshBasicNodeMaterial( { colorNode: pmremNode } ) ) );
+				scene.add( new THREE.Mesh( new THREE.SphereGeometry( .5, 64, 64 ), new THREE.MeshBasicNodeMaterial( { colorNode: pmremNode } ) ) );
 
 				// gui
 

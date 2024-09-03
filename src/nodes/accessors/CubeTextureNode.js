@@ -1,0 +1,79 @@
+import TextureNode from './TextureNode.js';
+import { reflectVector, refractVector } from './ReflectVector.js';
+import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
+
+import { CubeReflectionMapping, CubeRefractionMapping, WebGPUCoordinateSystem } from '../../constants.js';
+
+class CubeTextureNode extends TextureNode {
+
+	static get type() {
+
+		return 'CubeTextureNode';
+
+	}
+
+	constructor( value, uvNode = null, levelNode = null, biasNode = null ) {
+
+		super( value, uvNode, levelNode, biasNode );
+
+		this.isCubeTextureNode = true;
+
+	}
+
+	getInputType( /*builder*/ ) {
+
+		return 'cubeTexture';
+
+	}
+
+	getDefaultUV() {
+
+		const texture = this.value;
+
+		if ( texture.mapping === CubeReflectionMapping ) {
+
+			return reflectVector;
+
+		} else if ( texture.mapping === CubeRefractionMapping ) {
+
+			return refractVector;
+
+		} else {
+
+			console.error( 'THREE.CubeTextureNode: Mapping "%s" not supported.', texture.mapping );
+
+			return vec3( 0, 0, 0 );
+
+		}
+
+	}
+
+	setUpdateMatrix( /*updateMatrix*/ ) { } // Ignore .updateMatrix for CubeTextureNode
+
+	setupUV( builder, uvNode ) {
+
+		const texture = this.value;
+
+		if ( builder.renderer.coordinateSystem === WebGPUCoordinateSystem || ! texture.isRenderTargetTexture ) {
+
+			return vec3( uvNode.x.negate(), uvNode.yz );
+
+		} else {
+
+			return uvNode;
+
+		}
+
+	}
+
+	generateUV( builder, cubeUV ) {
+
+		return cubeUV.build( builder, 'vec3' );
+
+	}
+
+}
+
+export default CubeTextureNode;
+
+export const cubeTexture = /*@__PURE__*/ nodeProxy( CubeTextureNode );

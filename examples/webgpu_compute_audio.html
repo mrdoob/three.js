@@ -19,9 +19,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -29,12 +29,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, uniform, storage, storageObject, instanceIndex, float, texture, viewportTopLeft, color } from 'three/nodes';
+			import { Fn, uniform, storage, storageObject, instanceIndex, float, texture, viewportUV, color } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import StorageInstancedBufferAttribute from 'three/addons/renderers/common/StorageInstancedBufferAttribute.js';
 
 			let camera, scene, renderer;
 			let computeNode;
@@ -81,16 +78,6 @@
 
 			async function init() {
 
-				// if ( WebGPU.isAvailable() === false ) {
-
-				// 	document.body.appendChild( WebGPU.getErrorMessage() );
-
-				// 	throw new Error( 'No WebGPU support' );
-
-				// }
-
-			
-
 				// audio buffer
 
 				const soundBuffer = await fetch( 'sounds/webgpu-audio-processing.mp3' ).then( res => res.arrayBuffer() );
@@ -108,15 +95,13 @@
 
 				// create webgpu buffers
 
-				waveGPUBuffer = new StorageInstancedBufferAttribute( waveBuffer, 1 );
+				waveGPUBuffer = new THREE.StorageInstancedBufferAttribute( waveBuffer, 1 );
 
 				const waveStorageNode = storage( waveGPUBuffer, 'float', waveBuffer.length );
 
-
 				// read-only buffer
 
-				const waveNode = storageObject( new StorageInstancedBufferAttribute( waveBuffer, 1 ), 'float', waveBuffer.length );
-
+				const waveNode = storageObject( new THREE.StorageInstancedBufferAttribute( waveBuffer, 1 ), 'float', waveBuffer.length ).toReadOnly();
 
 				// params
 
@@ -127,7 +112,7 @@
 
 				// compute (shader-node)
 
-				const computeShaderFn = tslFn( () => {
+				const computeShaderFn = Fn( () => {
 
 					const index = float( instanceIndex );
 
@@ -185,7 +170,7 @@
 
 				analyserTexture = new THREE.DataTexture( analyserBuffer, analyserBuffer.length, 1, THREE.RedFormat );
 
-				const spectrum = texture( analyserTexture, viewportTopLeft.x ).x.mul( viewportTopLeft.y );
+				const spectrum = texture( analyserTexture, viewportUV.x ).x.mul( viewportUV.y );
 				const backgroundNode = color( 0x0000FF ).mul( spectrum );
 
 
@@ -196,7 +181,7 @@
 
 				// renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );

@@ -75,6 +75,30 @@ const builds = [
 		]
 	},
 	{
+		input: 'src/Three.WebGPU.js',
+		plugins: [
+			header()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.webgpu.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.WebGPU.Nodes.js',
+		plugins: [
+			header()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.webgpu.nodes.js'
+			}
+		]
+	},
+	{
 		input: 'src/Three.js',
 		plugins: [
 			glsl(),
@@ -85,6 +109,32 @@ const builds = [
 			{
 				format: 'esm',
 				file: 'build/three.module.min.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.WebGPU.js',
+		plugins: [
+			header(),
+			terser()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.webgpu.min.js'
+			}
+		]
+	},
+	{
+		input: 'src/Three.WebGPU.Nodes.js',
+		plugins: [
+			header(),
+			terser()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'build/three.webgpu.nodes.min.js'
 			}
 		]
 	},
@@ -105,4 +155,4 @@ const builds = [
 	}
 ];
 
-export default ( args ) => args.configOnlyModule ? builds[ 0 ] : builds;
+export default ( args ) => args.configOnlyModule ? builds.slice( 0, 3 ) : builds;

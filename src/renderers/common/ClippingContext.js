@@ -1,0 +1,176 @@
+import { Matrix3 } from '../../math/Matrix3.js';
+import { Plane } from '../../math/Plane.js';
+import { Vector4 } from '../../math/Vector4.js';
+
+const _plane = /*@__PURE__*/ new Plane();
+
+class ClippingContext {
+
+	constructor() {
+
+		this.version = 0;
+
+		this.globalClippingCount = 0;
+
+		this.localClippingCount = 0;
+		this.localClippingEnabled = false;
+		this.localClipIntersection = false;
+
+		this.planes = [];
+
+		this.parentVersion = 0;
+		this.viewNormalMatrix = new Matrix3();
+		this.cacheKey = '';
+
+	}
+
+	projectPlanes( source, offset ) {
+
+		const l = source.length;
+		const planes = this.planes;
+
+		for ( let i = 0; i < l; i ++ ) {
+
+			_plane.copy( source[ i ] ).applyMatrix4( this.viewMatrix, this.viewNormalMatrix );
+
+			const v = planes[ offset + i ];
+			const normal = _plane.normal;
+
+			v.x = - normal.x;
+			v.y = - normal.y;
+			v.z = - normal.z;
+			v.w = _plane.constant;
+
+		}
+
+	}
+
+	updateGlobal( renderer, camera ) {
+
+		const rendererClippingPlanes = renderer.clippingPlanes;
+		this.viewMatrix = camera.matrixWorldInverse;
+
+		this.viewNormalMatrix.getNormalMatrix( this.viewMatrix );
+
+		let update = false;
+
+		if ( Array.isArray( rendererClippingPlanes ) && rendererClippingPlanes.length !== 0 ) {
+
+			const l = rendererClippingPlanes.length;
+
+			if ( l !== this.globalClippingCount ) {
+
+				const planes = [];
+
+				for ( let i = 0; i < l; i ++ ) {
+
+					planes.push( new Vector4() );
+
+				}
+
+				this.globalClippingCount = l;
+				this.planes = planes;
+
+				update = true;
+
+			}
+
+			this.projectPlanes( rendererClippingPlanes, 0 );
+
+		} else if ( this.globalClippingCount !== 0 ) {
+
+			this.globalClippingCount = 0;
+			this.planes = [];
+			update = true;
+
+		}
+
+		if ( renderer.localClippingEnabled !== this.localClippingEnabled ) {
+
+			this.localClippingEnabled = renderer.localClippingEnabled;
+			update = true;
+
+		}
+
+		if ( update ) {
+
+			this.version ++;
+			this.cacheKey = `${ this.globalClippingCount }:${ this.localClippingEnabled === undefined ? false : this.localClippingEnabled }:`;
+
+		}
+
+	}
+
+	update( parent, material ) {
+
+		let update = false;
+
+		if ( this !== parent && parent.version !== this.parentVersion ) {
+
+			this.globalClippingCount = material.isShadowNodeMaterial ? 0 : parent.globalClippingCount;
+			this.localClippingEnabled = parent.localClippingEnabled;
+			this.planes = Array.from( parent.planes );
+			this.parentVersion = parent.version;
+			this.viewMatrix = parent.viewMatrix;
+			this.viewNormalMatrix = parent.viewNormalMatrix;
+
+			update = true;
+
+		}
+
+		if ( this.localClippingEnabled ) {
+
+			const localClippingPlanes = material.clippingPlanes;
+
+			if ( ( Array.isArray( localClippingPlanes ) && localClippingPlanes.length !== 0 ) ) {
+
+				const l = localClippingPlanes.length;
+				const planes = this.planes;
+				const offset = this.globalClippingCount;
+
+				if ( update || l !== this.localClippingCount ) {
+
+					planes.length = offset + l;
+
+					for ( let i = 0; i < l; i ++ ) {
+
+						planes[ offset + i ] = new Vector4();
+
+					}
+
+					this.localClippingCount = l;
+					update = true;
+
+				}
+
+				this.projectPlanes( localClippingPlanes, offset );
+
+
+			} else if ( this.localClippingCount !== 0 ) {
+
+				this.localClippingCount = 0;
+				update = true;
+
+			}
+
+			if ( this.localClipIntersection !== material.clipIntersection ) {
+
+				this.localClipIntersection = material.clipIntersection;
+				update = true;
+
+			}
+
+		}
+
+		if ( update ) {
+
+			this.version += parent.version;
+			this.cacheKey = parent.cacheKey + `:${ this.localClippingCount }:${ this.localClipIntersection === undefined ? false : this.localClipIntersection }`;
+
+		}
+
+	}
+
+}
+
+export default ClippingContext;

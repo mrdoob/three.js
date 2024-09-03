@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - texture - webgpu partial update</title>
+		<title>three.js webgl - webgpu partial texture update</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,16 +9,16 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - partial webgpu texture update <br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - partial webgpu texture update<br/>
 			replace parts of an existing texture with all data of another texture
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -26,7 +26,6 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let camera, scene, renderer, clock, dataTexture, diffuseMap;
 
@@ -67,7 +66,7 @@
 
 				//
 
-				renderer = new WebGPURenderer( { antialias: true, forceWebGL: false } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: false } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

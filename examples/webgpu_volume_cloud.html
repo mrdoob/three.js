@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - volume - cloud</title>
+		<title>three.js webgpu - volumetric cloud</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,29 +9,28 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - volume - cloud
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - volumetric cloud
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
 		<script type="module">
+
 			import * as THREE from 'three';
-			import { MeshBasicNodeMaterial, VolumeNodeMaterial, vec3, materialReference, smoothstep, If, Break, tslFn } from 'three/nodes';
+			import { vec3, materialReference, smoothstep, If, Break, Fn } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let renderer, scene, camera;
 			let mesh;
@@ -40,7 +39,7 @@
 
 			function init() {
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -72,7 +71,7 @@
 
 				const sky = new THREE.Mesh(
 					new THREE.SphereGeometry( 10 ),
-					new MeshBasicNodeMaterial( { map: skyMap, side: THREE.BackSide } )
+					new THREE.MeshBasicNodeMaterial( { map: skyMap, side: THREE.BackSide } )
 				);
 				scene.add( sky );
 
@@ -112,7 +111,7 @@
 
 				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 
-				const material = new VolumeNodeMaterial( {
+				const material = new THREE.VolumeNodeMaterial( {
 					side: THREE.BackSide,
 					transparent: true
 				} );
@@ -128,7 +127,7 @@
 				const threshold = materialReference( 'threshold', 'float' );
 				const opacity = materialReference( 'opacity', 'float' );
 
-				material.testNode = tslFn( ( { map, mapValue, probe, finalColor } ) => {
+				material.testNode = Fn( ( { map, mapValue, probe, finalColor } ) => {
 
 					mapValue.assign( smoothstep( threshold.sub( range ), threshold.add( range ), mapValue ).mul( opacity ) );
 
@@ -140,7 +139,7 @@
 
 					finalColor.a.addAssign( finalColor.a.oneMinus().mul( mapValue ) );
 
-					If( finalColor.a.greaterThanEqual(  0.95 ), () => {
+					If( finalColor.a.greaterThanEqual( 0.95 ), () => {
 
 						Break();
 

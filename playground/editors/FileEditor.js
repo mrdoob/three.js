@@ -1,6 +1,6 @@
 import { StringInput, Element } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { arrayBuffer, NodeUtils } from 'three/nodes';
+import { arrayBuffer, NodeUtils } from 'three/tsl';
 
 export class FileEditor extends BaseNodeEditor {
 

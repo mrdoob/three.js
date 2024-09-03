@@ -99,6 +99,7 @@
 			},
 
 			"Extras": {
+				"Controls": "api/en/extras/Controls",
 				"DataUtils": "api/en/extras/DataUtils",
 				"Earcut": "api/en/extras/Earcut",
 				"ImageUtils": "api/en/extras/ImageUtils",
@@ -241,6 +242,7 @@
 				"Interpolant": "api/en/math/Interpolant",
 				"Line3": "api/en/math/Line3",
 				"MathUtils": "api/en/math/MathUtils",
+				"Matrix2": "api/en/math/Matrix2",
 				"Matrix3": "api/en/math/Matrix3",
 				"Matrix4": "api/en/math/Matrix4",
 				"Plane": "api/en/math/Plane",
@@ -344,7 +346,6 @@
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/en/geometries/ParametricGeometry",
-				"SDFGeometryGenerator": "examples/en/geometries/SDFGeometryGenerator",
 				"TeapotGeometry": "examples/en/geometries/TeapotGeometry",
 				"TextGeometry": "examples/en/geometries/TextGeometry"
 			},
@@ -852,6 +853,7 @@
 			},
 
 			"附件": {
+				"Controls": "api/zh/extras/Controls",
 				"DataUtils": "api/zh/extras/DataUtils",
 				"Earcut": "api/zh/extras/Earcut",
 				"ImageUtils": "api/zh/extras/ImageUtils",
@@ -1096,8 +1098,8 @@
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/zh/geometries/ParametricGeometry",
-				"TextGeometry": "examples/zh/geometries/TextGeometry",
-				"SDFGeometryGenerator": "examples/zh/geometries/SDFGeometryGenerator"
+				"TeapotGeometry": "examples/zh/geometries/TeapotGeometry",
+				"TextGeometry": "examples/zh/geometries/TextGeometry"
 			},
 
 			"辅助对象": {
@@ -1358,6 +1360,7 @@
 				"DragControls": "examples/ko/controls/DragControls",
 				"FirstPersonControls": "examples/ko/controls/FirstPersonControls",
 				"FlyControls": "examples/ko/controls/FlyControls",
+				"MapControls": "examples/ko/controls/MapControls",
 				"OrbitControls": "examples/ko/controls/OrbitControls",
 				"PointerLockControls": "examples/ko/controls/PointerLockControls",
 				"TrackballControls": "examples/ko/controls/TrackballControls",

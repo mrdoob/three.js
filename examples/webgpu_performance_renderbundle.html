@@ -28,22 +28,23 @@
 	<script type="importmap">
 		{
 			"imports": {
-				"three": "../build/three.module.js",
+				"three": "../build/three.webgpu.js",
+				"three/tsl": "../build/three.webgpu.js",
 				"three/addons/": "./jsm/",
-				"three/nodes": "./jsm/nodes/Nodes.js",
 				"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.7/dist/main.js"
 			}
 		}
 	</script>
 
 	<script type="module">
+
 		import * as THREE from 'three';
 
 		import Stats from 'stats-gl';
+
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-		import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-		import { MeshToonNodeMaterial } from 'three/nodes';
 
 		let camera, scene, renderer;
 		let controls, stats;
@@ -67,6 +68,7 @@
 			renderBundle: true,
 			count: MAX_GEOMETRY_COUNT,
 			opacity: 1,
+			dynamic: false
 		};
 
 
@@ -124,9 +126,6 @@
 
 		}
 
-
-
-
 		function cleanup() {
 
 			if ( group ) {
@@ -153,12 +152,11 @@
 
 		function initRegularMesh( count ) {
 
-			group = new THREE.Group();
-			group.static = api.renderBundle;
+			group = api.renderBundle ? new THREE.BundleGroup() : new THREE.Group();
 
 			for ( let i = 0; i < count; i ++ ) {
 
-				const material = new MeshToonNodeMaterial( {
+				const material = new THREE.MeshToonNodeMaterial( {
 					color: new THREE.Color( Math.random() * 0xffffff ),
 					side: THREE.DoubleSide,
 				} );
@@ -200,7 +198,7 @@
 
 			// renderer
 
-			renderer = new WebGPURenderer( { antialias: true, forceWebGL } );
+			renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -251,6 +249,8 @@
 
 			} );
 
+			gui.add( api, 'dynamic' );
+
 			// listeners
 
 			window.addEventListener( 'resize', onWindowResize );
@@ -291,10 +291,7 @@
 			function animateMeshes() {
 
 				const count = api.count / ( api.webgpu ? 1 : 10 );
-				const countDynamic = api.dynamic / ( api.webgpu ? 1 : 10 );
-
-				const loopNum = Math.min( count, countDynamic );
-
+				const loopNum = api.dynamic ? count : 0;
 
 				for ( let i = 0; i < loopNum; i ++ ) {
 
@@ -311,7 +308,8 @@
 
 			}
 
-}
+		}
+
 	</script>
 
 </body>

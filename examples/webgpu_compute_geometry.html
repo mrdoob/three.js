@@ -15,9 +15,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -25,15 +25,11 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { vec3, cos, sin, mat3, storage, tslFn, instanceIndex, timerLocal } from 'three/nodes';
+			import { vec3, cos, sin, mat3, storage, Fn, instanceIndex, timerLocal } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-
-			import StorageBufferAttribute from 'three/addons/renderers/common/StorageBufferAttribute.js';
 
 			let camera, scene, renderer;
 			let computeUpdate;
@@ -62,18 +58,18 @@
 
 					// replace geometry attributes for storage buffer attributes
 
-					const positionStorageBufferAttribute = new StorageBufferAttribute( positionBaseAttribute.count, 4 );
-					const normalStorageBufferAttribute = new StorageBufferAttribute( normalBaseAttribute.count, 4 );
+					const positionStorageBufferAttribute = new THREE.StorageBufferAttribute( positionBaseAttribute.count, 4 );
+					const normalStorageBufferAttribute = new THREE.StorageBufferAttribute( normalBaseAttribute.count, 4 );
 
 					mesh.geometry.setAttribute( 'position', positionStorageBufferAttribute );
 					mesh.geometry.setAttribute( 'normal', normalStorageBufferAttribute );
 
 					// compute shader
 
-					const computeFn = tslFn( () => {
+					const computeFn = Fn( () => {
 
-						const positionAttribute = storage( positionBaseAttribute, 'vec3', positionBaseAttribute.count );
-						const normalAttribute = storage( normalBaseAttribute, 'vec3', normalBaseAttribute.count );
+						const positionAttribute = storage( positionBaseAttribute, 'vec3', positionBaseAttribute.count ).toReadOnly();
+						const normalAttribute = storage( normalBaseAttribute, 'vec3', normalBaseAttribute.count ).toReadOnly();
 
 						const positionStorageAttribute = storage( positionStorageBufferAttribute, 'vec4', positionStorageBufferAttribute.count );
 						const normalStorageAttribute = storage( normalStorageBufferAttribute, 'vec4', normalStorageBufferAttribute.count );
@@ -111,7 +107,7 @@
 
 				// renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

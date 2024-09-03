@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - GLTFloader + Dispersion</title>
+		<title>three.js webgpu - glTF + dispersion</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,14 +9,15 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - GLTFLoader + <a href="https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_dispersion" target="_blank" rel="noopener">KHR_materials_dispersion</a><br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - glTF + <a href="https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_dispersion" target="_blank" rel="noopener">KHR_materials_dispersion</a><br />
 			HDR by <a href="https://polyhaven.com/a/studio_small_08" target="_blank" rel="noopener">Poly Haven</a> 
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -26,15 +27,13 @@
 
 			import * as THREE from 'three';
 
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 			let camera, scene, renderer;
 
-			init().then( render );
+			init();
 
 			async function init() {
 
@@ -46,7 +45,7 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - materials - anisotropic texture filtering</title>
+		<title>three.js webgpu - anisotropic texture filtering</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -57,7 +57,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -68,8 +69,6 @@
 			import * as THREE from 'three';
 
 			import Stats from 'three/addons/libs/stats.module.js';
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-
 
 			let container, stats;
 
@@ -87,7 +86,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				renderer = new WebGPURenderer( { antialias: true, forceWebGL: false } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL: false } );
 
 				// RENDERER
 
@@ -229,7 +228,7 @@
 				renderer.setScissor( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene2, camera );
 
-				// renderer.setScissorTest( false );
+				renderer.setScissorTest( false );
 
 			}
 

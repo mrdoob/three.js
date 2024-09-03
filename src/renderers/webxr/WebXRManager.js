@@ -497,18 +497,31 @@ class WebXRManager extends EventDispatcher {
 			camera.matrixWorld.compose( camera.position, camera.quaternion, camera.scale );
 			camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
 
-			// Find the union of the frustum values of the cameras and scale
-			// the values so that the near plane's position does not change in world space,
-			// although must now be relative to the new union camera.
-			const near2 = near + zOffset;
-			const far2 = far + zOffset;
-			const left2 = left - xOffset;
-			const right2 = right + ( ipd - xOffset );
-			const top2 = topFov * far / far2 * near2;
-			const bottom2 = bottomFov * far / far2 * near2;
+			// Check if the projection uses an infinite far plane.
+			if ( projL[ 10 ] === - 1.0 ) {
 
-			camera.projectionMatrix.makePerspective( left2, right2, top2, bottom2, near2, far2 );
-			camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+				// Use the projection matrix from the left eye.
+				// The camera offset is sufficient to include the view volumes
+				// of both eyes (assuming symmetric projections).
+				camera.projectionMatrix.copy( cameraL.projectionMatrix );
+				camera.projectionMatrixInverse.copy( cameraL.projectionMatrixInverse );
+
+			} else {
+
+				// Find the union of the frustum values of the cameras and scale
+				// the values so that the near plane's position does not change in world space,
+				// although must now be relative to the new union camera.
+				const near2 = near + zOffset;
+				const far2 = far + zOffset;
+				const left2 = left - xOffset;
+				const right2 = right + ( ipd - xOffset );
+				const top2 = topFov * far / far2 * near2;
+				const bottom2 = bottomFov * far / far2 * near2;
+
+				camera.projectionMatrix.makePerspective( left2, right2, top2, bottom2, near2, far2 );
+				camera.projectionMatrixInverse.copy( camera.projectionMatrix ).invert();
+
+			}
 
 		}
 
@@ -532,15 +545,18 @@ class WebXRManager extends EventDispatcher {
 
 			if ( session === null ) return;
 
+			let depthNear = camera.near;
+			let depthFar = camera.far;
+
 			if ( depthSensing.texture !== null ) {
 
-				camera.near = depthSensing.depthNear;
-				camera.far = depthSensing.depthFar;
+				if ( depthSensing.depthNear > 0 ) depthNear = depthSensing.depthNear;
+				if ( depthSensing.depthFar > 0 ) depthFar = depthSensing.depthFar;
 
 			}
 
-			cameraXR.near = cameraR.near = cameraL.near = camera.near;
-			cameraXR.far = cameraR.far = cameraL.far = camera.far;
+			cameraXR.near = cameraR.near = cameraL.near = depthNear;
+			cameraXR.far = cameraR.far = cameraL.far = depthFar;
 
 			if ( _currentDepthNear !== cameraXR.near || _currentDepthFar !== cameraXR.far ) {
 
@@ -553,15 +569,6 @@ class WebXRManager extends EventDispatcher {
 
 				_currentDepthNear = cameraXR.near;
 				_currentDepthFar = cameraXR.far;
-
-				cameraL.near = _currentDepthNear;
-				cameraL.far = _currentDepthFar;
-				cameraR.near = _currentDepthNear;
-				cameraR.far = _currentDepthFar;
-
-				cameraL.updateProjectionMatrix();
-				cameraR.updateProjectionMatrix();
-				camera.updateProjectionMatrix();
 
 			}
 

@@ -14,9 +14,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -24,15 +24,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { tslFn, uniform, storage, attribute, float, vec2, vec3, color, instanceIndex, PointsNodeMaterial } from 'three/nodes';
+			import { Fn, uniform, storage, attribute, float, vec2, vec3, color, instanceIndex } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import StorageInstancedBufferAttribute from 'three/addons/renderers/common/StorageInstancedBufferAttribute.js';
 
 			let camera, scene, renderer;
 			let computeNode;
@@ -43,14 +37,6 @@
 			init();
 
 			function init() {
-
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU or WebGL2 support' );
-
-				}
 
 				camera = new THREE.OrthographicCamera( - 1.0, 1.0, 1.0, - 1.0, 0, 1 );
 				camera.position.z = 1;
@@ -64,15 +50,15 @@
 
 				// create buffers
 
-				const particleBuffer = new StorageInstancedBufferAttribute( particleNum, particleSize );
-				const velocityBuffer = new StorageInstancedBufferAttribute( particleNum, particleSize );
+				const particleBuffer = new THREE.StorageInstancedBufferAttribute( particleNum, particleSize );
+				const velocityBuffer = new THREE.StorageInstancedBufferAttribute( particleNum, particleSize );
 
 				const particleBufferNode = storage( particleBuffer, 'vec2', particleNum );
 				const velocityBufferNode = storage( velocityBuffer, 'vec2', particleNum );
 
 				// create function
 
-				const computeShaderFn = tslFn( () => {
+				const computeShaderFn = Fn( () => {
 
 					const particle = particleBufferNode.element( instanceIndex );
 					const velocity = velocityBufferNode.element( instanceIndex );
@@ -82,15 +68,15 @@
 
 					const position = particle.add( velocity ).temp();
 
-					velocity.x = position.x.abs().greaterThanEqual( limit.x ).cond( velocity.x.negate(), velocity.x );
-					velocity.y = position.y.abs().greaterThanEqual( limit.y ).cond( velocity.y.negate(), velocity.y );
+					velocity.x = position.x.abs().greaterThanEqual( limit.x ).select( velocity.x.negate(), velocity.x );
+					velocity.y = position.y.abs().greaterThanEqual( limit.y ).select( velocity.y.negate(), velocity.y );
 
 					position.assign( position.min( limit ).max( limit.negate() ) );
 
 					const pointerSize = 0.1;
 					const distanceFromPointer = pointer.sub( position ).length();
 
-					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).cond( vec3(), position ) );
+					particle.assign( distanceFromPointer.lessThanEqual( pointerSize ).select( vec3(), position ) );
 
 				} );
 
@@ -99,7 +85,7 @@
 				computeNode = computeShaderFn().compute( particleNum );
 				computeNode.onInit = ( { renderer } ) => {
 
-					const precomputeShaderNode = tslFn( () => {
+					const precomputeShaderNode = Fn( () => {
 
 						const particleIndex = float( instanceIndex );
 
@@ -128,7 +114,7 @@
 				pointsGeometry.setAttribute( 'particle', particleBuffer ); // dummy the position points as instances
 				pointsGeometry.drawRange.count = 1; // force render points as instances ( not triangle )
 
-				const pointsMaterial = new PointsNodeMaterial();
+				const pointsMaterial = new THREE.PointsNodeMaterial();
 				pointsMaterial.colorNode = particleNode.add( color( 0xFFFFFF ) );
 				pointsMaterial.positionNode = particleNode;
 
@@ -136,7 +122,7 @@
 				mesh.count = particleNum;
 				scene.add( mesh );
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - instancing - Morph Target Animations</title>
+		<title>three.js webgpu - instancing morph target animations</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -10,9 +10,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -24,9 +24,6 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import { MeshStandardNodeMaterial } from 'three/nodes';
 
 			let camera, scene, renderer, stats, mesh, mixer, dummy;
 
@@ -101,7 +98,7 @@
 
 					dummy = glb.scene.children[ 0 ];
 
-					mesh = new THREE.InstancedMesh( dummy.geometry, new MeshStandardNodeMaterial( {
+					mesh = new THREE.InstancedMesh( dummy.geometry, new THREE.MeshStandardNodeMaterial( {
 						flatShading: true,
 					} ), 1024 );
 
@@ -139,8 +136,7 @@
 
 				// renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
-
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setAnimationLoop( animate );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

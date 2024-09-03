@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - volume - perlin</title>
+		<title>three.js webgpu - volumetric perlin</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,29 +9,27 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - volume - perlin
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - volumetric perlin
 		</div>
 
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
 
 		<script type="module">
 			import * as THREE from 'three';
-			import { Break, If, VolumeNodeMaterial, vec3, materialReference, tslFn } from 'three/nodes';
+			import { Break, If, vec3, materialReference, Fn } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
 
 			let renderer, scene, camera;
 			let mesh;
@@ -40,7 +38,7 @@
 
 			function init() {
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -90,7 +88,7 @@
 				// Material
 
 				const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-				const material = new VolumeNodeMaterial( {
+				const material = new THREE.VolumeNodeMaterial( {
 					side: THREE.BackSide,
 				} );
 
@@ -101,7 +99,7 @@
 
 				const threshold = materialReference( 'threshold', 'float' );
 
-				material.testNode = tslFn( ( { map, mapValue, probe, finalColor } ) => {
+				material.testNode = Fn( ( { map, mapValue, probe, finalColor } ) => {
 
 					If( mapValue.greaterThan( threshold ), () => {
 

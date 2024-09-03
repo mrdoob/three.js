@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - postprocessing - afterimage</title>
+		<title>three.js webgpu - postprocessing afterimage</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -10,9 +10,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -20,12 +20,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { pass, afterImage } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import PostProcessing from 'three/addons/renderers/common/PostProcessing.js';
-			import { pass } from 'three/nodes';
 
 			let camera, scene, renderer;
 			let mesh, postProcessing, combinedPass;
@@ -41,7 +38,7 @@
 
 			function init() {
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -60,13 +57,13 @@
 
 				// postprocessing
 
-				postProcessing = new PostProcessing( renderer );
+				postProcessing = new THREE.PostProcessing( renderer );
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode();
 
 				combinedPass = scenePassColor;
-				combinedPass = combinedPass.afterImage( params.damp );
+				combinedPass = afterImage( combinedPass, params.damp );
 
 				postProcessing.outputNode = combinedPass;
 

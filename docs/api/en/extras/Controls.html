@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:EventDispatcher] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Abstract base class for controls.
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Object3D object], [param:HTMLDOMElement domElement] )</h3>
+		
+		<p>
+		[page:Object3D object] - The object the controls should manage (usually the camera).
+		</p>
+		<p>
+		[page:HTMLDOMElement domElement]: The HTML element used for event listeners. (optional)
+		</p>
+		<p>
+			Creates a new instance of [name].
+		</p>
+		
+		<h2>Properties</h2>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			The HTML element used for event listeners. If not provided via the constructor, [page:.connect]() must be called after `domElement` has been set.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			When set to `false`, the controls will not respond to user input. Default is `true`.
+		</p>
+
+		<h3>[property:Object keys]</h3>
+		<p>
+			This object defines the keyboard input of the controls.
+			Default is `{}`.
+		</p>
+
+		<h3>[property:Object mouseButtons]</h3>
+		<p>
+			This object defines what type of actions are assigned to the available mouse buttons.
+			It depends on the control implementation what kind of mouse buttons and actions are supported.
+			Default is `{ LEFT: null, MIDDLE: null, RIGHT: null }`.
+		</p>
+		<p>
+			Possible buttons are: `LEFT`, `MIDDLE`, `RIGHT`.
+		</p>
+		<p>
+			Possible actions are defined in the [page:Core Constants] page.
+		</p>
+
+		<h3>[property:Object3D object]</h3>
+		<p>
+			The 3D object that is managed by the controls.
+		</p>
+
+		<h3>[property:Integer state]</h3>
+		<p>
+			The internal state of the controls. Default is `-1` (`NONE`).
+		</p>
+
+		<h3>[property:Object touches]</h3>
+		<p>
+			This object defines what type of actions are assigned to what kind of touch interaction.
+			It depends on the control implementation what kind of touch interaction and actions are supported.
+			Default is `{ ONE: null, TWO: null }`.
+		</p>
+		<p>
+			Possible buttons are: `ONE`, `TWO`.
+		</p>
+		<p>
+			Possible actions are defined in the [page:Core Constants] page.
+		</p>
+
+		<h2>Methods</h2>
+
+		<p>See the base [page:EventDispatcher] class for common methods.</p>
+
+		<h3>[method:undefined connect] ()</h3>
+		<p>
+			Connects the controls to the DOM. This method has so called "side effects" since it adds the module's event listeners to the DOM.
+		</p>
+
+		<h3>[method:undefined disconnect] ()</h3>
+		<p>
+			Disconnects the controls from the DOM. 
+		</p>
+
+		<h3>[method:undefined dispose] ()</h3>
+		<p>
+			Call this method if you no longer want use to the controls. It frees all internal resources and removes all event listeners.
+		</p>
+
+		<h3>[method:undefined update] ( [param:Number delta] )</h3>
+		<p>
+			Controls should implement this method if they have to update their internal state per simulation step.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

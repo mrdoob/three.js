@@ -17,9 +17,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -27,9 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { MeshStandardNodeMaterial, texture, parallaxUV, uv } from 'three/nodes';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+			import { texture, parallaxUV, overlay, uv } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -91,11 +89,11 @@
 				const parallaxUVOffset = parallaxUV( uv(), offsetUV );
 				const parallaxResult = texture( bottomTexture, parallaxUVOffset );
 
-				const iceNode = texture( topTexture ).overlay( parallaxResult );
+				const iceNode = overlay( texture( topTexture ), parallaxResult );
 
 				// material
 
-				const material = new MeshStandardNodeMaterial();
+				const material = new THREE.MeshStandardNodeMaterial();
 				material.colorNode = iceNode.mul( 5 ); // increase the color intensity to 5 ( contrast )
 				material.roughnessNode = texture( roughnessTexture );
 				material.normalMap = normalTexture;
@@ -109,7 +107,7 @@
 
 				// renderer
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

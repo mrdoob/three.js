@@ -1,6 +1,6 @@
 import { LabelElement } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
-import { JoinNode, UniformNode, float } from 'three/nodes';
+import { JoinNode, UniformNode, float } from 'three/tsl';
 import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
 const NULL_VALUE = new UniformNode( 0 );

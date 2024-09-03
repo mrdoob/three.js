@@ -1,6 +1,6 @@
 <html lang="en">
 	<head>
-		<title>three.js - shadertoy</title>
+		<title>three.js - wgsl/tsl node interoperability</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -8,7 +8,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - WGSL/TSL Node Interoperability
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - wgsl/tsl node interoperability
 			<br />CRT Shader adapted from <a href="https://mini.gmshaders.com/p/gm-shaders-mini-crt" target="_blank" rel="noopener"> Xor</a>.
 		</div>
 		<div id="container">
@@ -18,9 +18,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -28,11 +28,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
-			import WebGL from 'three/addons/capabilities/WebGL.js';
+			import { Fn, attribute, varyingProperty, timerLocal, uniform, wgslFn, texture, sampler, uv, clamp, float, vec2, vec3, fract, floor, positionGeometry, sin } from 'three/tsl';
 
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import { tslFn, sampler, attribute, varyingProperty, timerLocal, uniform, wgslFn, texture, uv, clamp, float, vec2, vec3, fract, floor, MeshBasicNodeMaterial, positionGeometry, sin } from 'three/nodes';
+			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -58,11 +56,11 @@
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false && WebGL.isWebGL2Available() === false ) {
+				if ( WebGPU.isAvailable() === false ) {
 
 					document.body.appendChild( WebGPU.getErrorMessage() );
 
-					throw new Error( 'No WebGPU or WebGL2 support' );
+					throw new Error( 'No WebGPU support' );
 
 				}
 
@@ -167,7 +165,7 @@
 
 				//
 
-				const wgslShaderMaterial = new MeshBasicNodeMaterial();
+				const wgslShaderMaterial = new THREE.MeshBasicNodeMaterial();
 
 				// Accessed attributes correspond to a Mesh or BufferGeometry's setAttribute() calls.
 				wgslShaderMaterial.positionNode = wgslVertexShader( {
@@ -193,14 +191,14 @@
 
 				//
 
-				const tslVertexShader = tslFn( () => {
+				const tslVertexShader = Fn( () => {
 
 					vUv.assign( uv() );
 					return positionGeometry;
 
 				} );
 
-				const tslFragmentShader = tslFn( () => {
+				const tslFragmentShader = Fn( () => {
 
 					const dimensions = vec2( crtWidthUniform, crtHeightUniform );
 					const translatedUV = vUv.mul( 0.5 ).add( 0.5 );
@@ -254,7 +252,7 @@
 
 				} );
 
-				const tslShaderMaterial = new MeshBasicNodeMaterial();
+				const tslShaderMaterial = new THREE.MeshBasicNodeMaterial();
 				tslShaderMaterial.positionNode = tslVertexShader();
 				tslShaderMaterial.colorNode = tslFragmentShader();
 
@@ -271,7 +269,7 @@
 				tslQuad.position.y -= 0.5;
 				scene.add( tslQuad );
 
-				renderer = new WebGPURenderer( { antialias: true, canvas: canvas } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, canvas: canvas } );
 				renderer.setPixelRatio( dpr );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

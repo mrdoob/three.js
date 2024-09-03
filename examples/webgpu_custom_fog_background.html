@@ -16,7 +16,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgpu custom fog background<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - custom fog background<br />
 			Battle Damaged Sci-fi Helmet by
 			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
 			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
@@ -25,9 +25,9 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
-					"three/addons/": "./jsm/",
-					"three/nodes": "./jsm/nodes/Nodes.js"
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
+					"three/addons/": "./jsm/"
 				}
 			}
 		</script>
@@ -35,11 +35,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-
-			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-			import PostProcessing from 'three/addons/renderers/common/PostProcessing.js';
-
-			import { pass, color, rangeFog } from 'three/nodes';
+			import { pass, color, rangeFog } from 'three/tsl';
 
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
@@ -61,7 +57,7 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				//renderer.toneMapping = THREE.ACESFilmicToneMapping; // apply tone mapping in post processing
@@ -86,7 +82,7 @@
 				// mix fog from fog factor and background color
 				const compose = fogFactor.mix( scenePassTM, backgroundColor );
 
-				postProcessing = new PostProcessing( renderer );
+				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputNode = compose;
 
 				//
