@@ -80,13 +80,13 @@ class Bindings extends DataMap {
 
 	}
 
-	_updateBindings( object, bindings, group = null ) {
+	_updateBindings( bindings, group = null ) {
 
 		for ( const bindGroup of bindings ) {
 
 			if ( group && bindGroup.bindings[ 0 ].groupNode !== group ) continue;
 
-			this._update( object, bindGroup, bindings );
+			this._update( bindGroup, bindings );
 
 		}
 
