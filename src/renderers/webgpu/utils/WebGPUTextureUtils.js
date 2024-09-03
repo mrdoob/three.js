@@ -792,9 +792,9 @@ class WebGPUTextureUtils {
 		if ( format === GPUTextureFormat.RG16Sint ) return Int16Array;
 		if ( format === GPUTextureFormat.RGBA16Uint ) return Uint16Array;
 		if ( format === GPUTextureFormat.RGBA16Sint ) return Int16Array;
-		if ( format === GPUTextureFormat.R16Float ) return Float32Array;
-		if ( format === GPUTextureFormat.RG16Float ) return Float32Array;
-		if ( format === GPUTextureFormat.RGBA16Float ) return Float32Array;
+		if ( format === GPUTextureFormat.R16Float ) return Uint16Array;
+		if ( format === GPUTextureFormat.RG16Float ) return Uint16Array;
+		if ( format === GPUTextureFormat.RGBA16Float ) return Uint16Array;
 
 
 		if ( format === GPUTextureFormat.R32Uint ) return Uint32Array;
