@@ -27,7 +27,7 @@ class EXRExporter {
 
 			throw Error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer or DataTexture.' );
 
-		} else if ( arg1.isWebGLRenderer || arg1.isWebGPURenderer ) {
+		} else if ( arg1.isWebGLRenderer || arg1.isWebGPURenderer ) {
 
 			const renderer = arg1, renderTarget = arg2, options = arg3;
 
