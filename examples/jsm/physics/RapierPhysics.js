@@ -58,7 +58,7 @@ async function RapierPhysics() {
 
 	if ( RAPIER === null ) {
 
-		RAPIER = await import( RAPIER_PATH );
+		RAPIER = await import( `${RAPIER_PATH}` );
 		await RAPIER.init();
 
 	}
