@@ -205,7 +205,7 @@ async function getPixelData( renderer, rtt, info ) {
 
 		}
 
-		renderer.readRenderTargetPixels( rtt, 0, 0, info.width, info.height, dataBuffer );
+		await renderer.readRenderTargetPixelsAsync( rtt, 0, 0, info.width, info.height, dataBuffer );
 
 	} else {
 

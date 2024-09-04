@@ -261,7 +261,7 @@ async function toDataTexture( renderer, rtt ) {
 
 		}
 
-		renderer.readRenderTargetPixels( rtt, 0, 0, rtt.width, rtt.height, view );
+		await renderer.readRenderTargetPixelsAsync( rtt, 0, 0, rtt.width, rtt.height, view );
 
 	} else {
 
