@@ -1,4 +1,4 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
 class BarrierNode extends Node {
@@ -31,8 +31,6 @@ class BarrierNode extends Node {
 }
 
 export default BarrierNode;
-
-BarrierNode.type = /*@__PURE__*/ registerNode( 'Barrier', BarrierNode );
 
 const barrier = nodeProxy( BarrierNode );
 

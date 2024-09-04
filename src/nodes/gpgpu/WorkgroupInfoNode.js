@@ -1,6 +1,6 @@
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 
 class WorkgroupInfoElementNode extends ArrayElementNode {
 
@@ -94,8 +94,6 @@ class WorkgroupInfoNode extends Node {
 }
 
 export default WorkgroupInfoNode;
-
-WorkgroupInfoNode.type = /*@__PURE__*/ registerNode( 'WorkgroupInfo', WorkgroupInfoNode );
 
 export const workgroupArray = ( type, count ) => nodeObject( new WorkgroupInfoNode( 'Workgroup', type, count ) );
 
