@@ -4,6 +4,7 @@ import { uniform } from '../core/UniformNode.js';
 
 import { Matrix4 } from '../../math/Matrix4.js';
 import { cameraViewMatrix } from './Camera.js';
+import { Matrix3 } from '../../math/Matrix3.js';
 
 class ModelNode extends Object3DNode {
 
@@ -36,6 +37,7 @@ export const modelWorldMatrix = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNod
 export const modelPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.POSITION );
 export const modelScale = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.SCALE );
 export const modelViewPosition = /*@__PURE__*/ nodeImmutable( ModelNode, ModelNode.VIEW_POSITION );
+export const modelNormalMatrix = /*@__PURE__*/ uniform( new Matrix3() ).onObjectUpdate( ( { object }, self ) => self.value.getNormalMatrix( object.matrixWorld ) );
 export const modelWorldMatrixInverse = /*@__PURE__*/ uniform( new Matrix4() ).onObjectUpdate( ( { object }, self ) => self.value.copy( object.matrixWorld ).invert() );
 export const modelViewMatrix = /*@__PURE__*/ cameraViewMatrix.mul( modelWorldMatrix ).toVar( 'modelViewMatrix' );
 
@@ -51,7 +53,7 @@ export const highPrecisionModelViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 } ).once() )().toVar( 'highPrecisionModelViewMatrix' );
 
-export const highPrecisionModelNormalMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
+export const highPrecisionModelNormalViewMatrix = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	const isHighPrecisionModelViewMatrix = builder.context.isHighPrecisionModelViewMatrix;
 
