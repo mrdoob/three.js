@@ -9,8 +9,9 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<br />This example demonstrates fetching an external element from a StorageBuffer.
-			<br /> The left canvas uses the WebGPU Backend, while the right uses the WebGL Backend.
+			<br />This example demonstrates running a bitonic sort on the compute shaders.
+			<br /> The left canvas uses the workgroup local arrays on valid sorts within a local scope.
+			<br /> The right canvas sorts all values within a global scope.
 			<div id="local_swap" style="
 				position: absolute;
 				top: 60px;
@@ -64,7 +65,12 @@
 
 			};
 
-			const size = 4096;
+			const timestamps = {
+				local_swap: document.getElementById( 'local_swap' ),
+				global_swap: document.getElementById( 'global_swap' )
+			};
+
+			const size = 16384;
 			const gridDim = Math.sqrt( size );
 
 			const getNumSteps = () => {
@@ -90,13 +96,14 @@
 			init();
 
 			// Global Swaps Only
-			//init( true );
+			init( true );
 
 
 			// When forceGlobalSwap is true, force all local swaps to be global swaps
 			async function init( forceGlobalSwap = false ) {
 
 				let currentStep = 0;
+				let nextStepGlobal = false;
 
 				const aspect = window.innerWidth / window.innerHeight;
 				const camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
@@ -140,9 +147,10 @@
 
 				const currentElementsBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
 				const currentElementsStorage = storageObject( currentElementsBuffer, 'uint', size ).label( 'Elements' );
+				const tempBuffer = new THREE.StorageInstancedBufferAttribute( array, 1 );
+				const tempStorage = storageObject( tempBuffer, 'uint', size ).label( 'Temp' );
 				const randomizedElementsBuffer = new THREE.StorageInstancedBufferAttribute( size, 1 );
-				const randomizedElementsStorage = storageObject( randomizedElementsBuffer, 'uint', size );
-
+				const randomizedElementsStorage = storageObject( randomizedElementsBuffer, 'uint', size ).label( 'RandomizedElements' );
 
 				const getFlipIndices = ( index, blockHeight ) => {
 
@@ -175,13 +183,35 @@
 
 				};
 
-				const compareAndSwap = ( swapBuffer, idxBefore, idxAfter ) => {
+				const localStorage = workgroupArray( 'uint', 64 * 2 );
 
-					If( swapBuffer.element( idxAfter ).lessThan( swapBuffer.element( idxBefore ) ), () => {
+				// Swap the elements in local storage
+				const localCompareAndSwap = ( idxBefore, idxAfter ) => {
 
-						const temp = swapBuffer.element( idxBefore ).toVar();
-						swapBuffer.element( idxBefore ).assign( swapBuffer.element( idxAfter ) );
-						swapBuffer.element( idxAfter ).assign( temp );
+					If( localStorage.element( idxAfter ).lessThan( localStorage.element( idxBefore ) ), () => {
+
+						const temp = localStorage.element( idxBefore ).toVar();
+						localStorage.element( idxBefore ).assign( localStorage.element( idxAfter ) );
+						localStorage.element( idxAfter ).assign( temp );
+
+					} );
+
+				};
+
+				const globalCompareAndSwap = ( idxBefore, idxAfter ) => {
+
+					// If the later element is less than the current element
+					If( currentElementsStorage.element( idxAfter ).lessThan( currentElementsStorage.element( idxBefore ) ), () => {
+
+						// Apply the swapped values to temporary storage.
+						tempStorage.element( idxBefore ).assign( currentElementsStorage.element( idxAfter ) );
+						tempStorage.element( idxAfter ).assign( currentElementsStorage.element( idxBefore ) );
+
+					} ).Else( () => {
+
+						// Otherwise apply the existing values to temporary storage.
+						tempStorage.element( idxBefore ).assign( currentElementsStorage.element( idxBefore ) );
+						tempStorage.element( idxAfter ).assign( currentElementsStorage.element( idxAfter ) );
 
 					} );
 
@@ -195,19 +225,13 @@
 
 				const computeBitonicStepFn = Fn( () => {
 
-					const localStorage = workgroupArray( 'uint', 64 * 2 );
-
 					const nextBlockHeight = nextBlockHeightStorage.element( 0 ).toVar();
-					nextBlockHeight.name = 'nextBlockHeight';
 					const nextAlgo = nextAlgoStorage.element( 0 ).toVar();
-					nextAlgo.name = 'nextAlgo';
 
 					// Get ids of indices needed to populate workgroup local buffer.
 					// Use .toVar() to prevent recalculation of values when the global buffer gets repopulated.
 					const workgroupId = instanceIndex.div( WORKGROUP_SIZE[ 0 ] ).toVar();
-					workgroupId.name = 'WorkgroupID';
 					const localOffset = uint( WORKGROUP_SIZE[ 0 ] ).mul( 2 ).mul( workgroupId ).toVar();
-					localOffset.name = 'localOffset';
 
 					// If we will perform a local swap, then populate the local data
 					If( nextAlgo.lessThanEqual( uint( StepType.DISPERSE_LOCAL ) ), () => {
@@ -225,30 +249,22 @@
 					If( nextAlgo.equal( uint( StepType.FLIP_LOCAL ) ), () => {
 
 						idx.assign( getFlipIndices( invocationLocalIndex, nextBlockHeight ) );
+						localCompareAndSwap( idx.x, idx.y );
 
 					} ).ElseIf( nextAlgo.equal( uint( StepType.DISPERSE_LOCAL ) ), () => {
 
 						idx.assign( getDisperseIndices( invocationLocalIndex, nextBlockHeight ) );
+						localCompareAndSwap( idx.x, idx.y );
 
 					} ).ElseIf( nextAlgo.equal( uint( StepType.FLIP_GLOBAL ) ), () => {
 
 						idx.assign( getFlipIndices( instanceIndex, nextBlockHeight ) );
+						globalCompareAndSwap( idx.x, idx.y );
 
 					} ).ElseIf( nextAlgo.equal( uint( StepType.DISPERSE_GLOBAL ) ), () => {
 
-						idx.assign( getFlipIndices( instanceIndex, nextBlockHeight ) );
-
-					} );
-
-					// Swap elements
-					If( nextAlgo.lessThanEqual( uint( StepType.DISPERSE_LOCAL ) ), () => {
-
-						// NOTE: Global swap works as intended just fine, all issues seem to be with coordinating values with var<workgroup>
-						compareAndSwap( localStorage, idx.x, idx.y );
-
-					} ).Else( () => {
-
-						compareAndSwap( currentElementsStorage, idx.x, idx.y );
+						idx.assign( getDisperseIndices( instanceIndex, nextBlockHeight ) );
+						globalCompareAndSwap( idx.x, idx.y );
 
 					} );
 
@@ -263,6 +279,8 @@
 
 					} );
 
+					// If the previous algorithm was global, we'll have to execute an additional compute step to sync the current buffer with the output buffer.
+					// This step can also potentially be done on the CPU...
 
 				} );
 
@@ -315,6 +333,12 @@
 
 				} );
 
+				const computeAlignCurrentFn = Fn( () => {
+
+					currentElementsStorage.element( instanceIndex ).assign( tempStorage.element( instanceIndex ) );
+
+				} );
+
 				const computeResetBuffersFn = Fn( () => {
 
 					currentElementsStorage.element( instanceIndex ).assign( randomizedElementsStorage.element( instanceIndex ) );
@@ -331,9 +355,15 @@
 			
 				// compute
 
+				// Initialize each value in the elements buffer.
 				const computeInit = computeInitFn().compute( size );
+				// Swap a pair of elements in the elements buffer.
 				const computeBitonicStep = computeBitonicStepFn().compute( size / 2 );
+				// Set the conditions for the next swap.
 				const computeSetAlgo = computeSetAlgoFn().compute( 1 );
+				// Align the current buffer with the temp buffer if the previous sort was executed in a global scope.
+				const computeAlignCurrent = computeAlignCurrentFn().compute( size );
+				// Reset the buffers and algorithm information after a full bitonic sort has been completed.
 				const computeResetBuffers = computeResetBuffersFn().compute( size );
 				const computeResetAlgo = computeResetAlgoFn().compute( 1 );
 
@@ -369,6 +399,14 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				const animate = () => {
+
+					renderer.render( scene, camera );
+
+				};
+
+				renderer.setAnimationLoop( animate );
+
 				document.body.appendChild( renderer.domElement );
 				renderer.domElement.style.position = 'absolute';
 				renderer.domElement.style.top = '0';
@@ -390,15 +428,24 @@
 
 				await renderer.computeAsync( computeInit );
 
-				//renderer.info.autoReset = false;
+				renderer.info.autoReset = false;
 
-				 const stepAnimation = function () {
+				 const stepAnimation = async function () {
 
-					console.log( currentStep );
+					renderer.info.reset();
 
 					if ( currentStep !== MAX_STEPS ) {
 
 						renderer.compute( computeBitonicStep );
+
+						if ( nextStepGlobal ) {
+
+							console.log( 'align buffers' );
+
+							renderer.compute( computeAlignCurrent );
+			
+						}
+			
 						renderer.compute( computeSetAlgo );
 
 						currentStep ++;
@@ -412,12 +459,19 @@
 			
 					}
 
+					const algo = new Uint32Array( await renderer.getArrayBufferAsync( nextAlgoBuffer ) );
+					algo > StepType.DISPERSE_LOCAL ? ( nextStepGlobal = true ) : ( nextStepGlobal = false );
 			
 					renderer.render( scene, camera );
 
+					timestamps[ forceGlobalSwap ? 'global_swap' : 'local_swap' ].innerHTML = `
+
+							Compute ${forceGlobalSwap ? 'Global' : 'Local'}: ${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>`;
+			
+
 					if ( currentStep === MAX_STEPS ) {
 
-						setTimeout( stepAnimation, 2000 );
+						setTimeout( stepAnimation, 1000 );
 
 			
 					} else {
