@@ -61,7 +61,7 @@ async function JoltPhysics() {
 
 	if ( Jolt === null ) {
 
-		const { default: initJolt } = await import( JOLT_PATH );
+		const { default: initJolt } = await import( `${JOLT_PATH}` );
 		Jolt = await initJolt();
 
 	}
