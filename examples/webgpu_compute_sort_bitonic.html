@@ -9,9 +9,10 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<br />This example demonstrates running a bitonic sort on the compute shaders.
-			<br /> The left canvas uses the workgroup local arrays on valid sorts within a local scope.
-			<br /> The right canvas sorts all values within a global scope.
+			<br /> This example demonstrates a bitonic sort running step by step in a compute shader.
+			<br /> The left canvas swaps values within workgroup local arrays. The right swaps values within storage buffers.
+			<br /> Reference implementation by <a href="https://poniesandlight.co.uk/reflect/bitonic_merge_sort/">Tim Gfrerer</a>
+			<br /> 
 			<div id="local_swap" style="
 				position: absolute;
 				top: 60px;
@@ -55,11 +56,15 @@
 			import * as THREE from 'three';
 			import { storageObject, If, vec3, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier } from 'three/tsl';
 
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+
 			const StepType = {
 
 				NONE: 0,
+				// Swap values within workgroup local buffer.
 				FLIP_LOCAL: 1,
 				DISPERSE_LOCAL: 2,
+				// Swap values within global data buffer.
 				FLIP_GLOBAL: 3,
 				DISPERSE_GLOBAL: 4,
 
@@ -70,6 +75,7 @@
 				global_swap: document.getElementById( 'global_swap' )
 			};
 
+			// Total number of elements and the dimensions of the display grid.
 			const size = 16384;
 			const gridDim = Math.sqrt( size );
 
@@ -80,42 +86,61 @@
 
 			};
 
+			// Total number of steps in a bitonic sort with 'size' elements.
 			const MAX_STEPS = getNumSteps();
-
 			const WORKGROUP_SIZE = [ 64 ];
 
 			const effectController = {
 				// Sqr root of 16834
 				gridWidth: uniform( gridDim ),
 				gridHeight: uniform( gridDim ),
-				nextBlockHeight: uniform( uint( 2 ) ),
-				nextAlgo: uniform( uint( StepType.FLIP_LOCAL ) )
+				highlight: uniform( 1 ),
+				'Display Mode': 'Swap Zone Highlight'
 			};
 
-			// Workgroup Var Backend
+			const gui = new GUI();
+			gui.add( effectController, 'Display Mode', [ 'Elements', 'Swap Zone Highlight' ] ).onChange( () => {
+
+				if ( effectController[ 'Display Mode' ] === 'Elements' ) {
+
+					effectController.highlight.value = 0;
+
+			
+				} else {
+
+					effectController.highlight.value = 1;
+			
+				}
+
+			
+			} );
+
+			// Allow Workgroup Array Swaps
 			init();
 
 			// Global Swaps Only
 			init( true );
 
 
-			// When forceGlobalSwap is true, force all local swaps to be global swaps
+			// When forceGlobalSwap is true, force all valid local swaps to be global swaps.
 			async function init( forceGlobalSwap = false ) {
 
 				let currentStep = 0;
 				let nextStepGlobal = false;
 
-				const aspect = window.innerWidth / window.innerHeight;
+				const aspect = ( window.innerWidth / 2 ) / window.innerHeight;
 				const camera = new THREE.OrthographicCamera( - aspect, aspect, 1, - 1, 0, 2 );
 				camera.position.z = 1;
 
 				const scene = new THREE.Scene();
 
-				const nextAlgoBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( forceGlobalSwap ? StepType.FLIP_LOCAL : StepType.FLIP_GLOBAL ), 1 );
+				const nextAlgoBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( forceGlobalSwap ? StepType.FLIP_GLOBAL : StepType.FLIP_LOCAL ), 1 );
+				console.log( forceGlobalSwap );
 				const nextAlgoStorage = storageObject( nextAlgoBuffer, 'uint', nextAlgoBuffer.count ).label( 'NextAlgo' );
 
 				const nextBlockHeightBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( 2 ), 1 );
 				const nextBlockHeightStorage = storageObject( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).label( 'NextBlockHeight' );
+				const nextBlockHeightRead = storageObject( nextBlockHeightBuffer, 'uint', nextBlockHeightBuffer.count ).label( 'NextBlockHeight' ).toReadOnly();
 
 				const highestBlockHeightBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( 2 ), 1 );
 				const highestBlockHeightStorage = storageObject( highestBlockHeightBuffer, 'uint', highestBlockHeightBuffer.count ).label( 'HighestBlockHeight' );
@@ -229,41 +254,42 @@
 					const nextAlgo = nextAlgoStorage.element( 0 ).toVar();
 
 					// Get ids of indices needed to populate workgroup local buffer.
-					// Use .toVar() to prevent recalculation of values when the global buffer gets repopulated.
+					// Use .toVar() to prevent these values from being recalculated multiple times.
 					const workgroupId = instanceIndex.div( WORKGROUP_SIZE[ 0 ] ).toVar();
 					const localOffset = uint( WORKGROUP_SIZE[ 0 ] ).mul( 2 ).mul( workgroupId ).toVar();
+			
+					const localID1 = invocationLocalIndex.mul( 2 );
+					const localID2 = invocationLocalIndex.mul( 2 ).add( 1 );
 
 					// If we will perform a local swap, then populate the local data
 					If( nextAlgo.lessThanEqual( uint( StepType.DISPERSE_LOCAL ) ), () => {
 
-						localStorage.element( invocationLocalIndex.mul( 2 ) ).assign( currentElementsStorage.element( localOffset.add( invocationLocalIndex.mul( 2 ) ) ) );
-						localStorage.element( invocationLocalIndex.mul( 2 ).add( 1 ) ).assign( currentElementsStorage.element( localOffset.add( invocationLocalIndex.mul( 2 ).add( 1 ) ) ) );
+						localStorage.element( localID1 ).assign( currentElementsStorage.element( localOffset.add( localID1 ) ) );
+						localStorage.element( localID2 ).assign( currentElementsStorage.element( localOffset.add( localID2 ) ) );
 
 					} );
 
 					workgroupBarrier();
 
-					const idx = uvec2( 0 ).toVar();
-
-					// Get indices based on step
+					// TODO: Convert to switch block.
 					If( nextAlgo.equal( uint( StepType.FLIP_LOCAL ) ), () => {
 
-						idx.assign( getFlipIndices( invocationLocalIndex, nextBlockHeight ) );
+						const idx = getFlipIndices( invocationLocalIndex, nextBlockHeight );
 						localCompareAndSwap( idx.x, idx.y );
 
 					} ).ElseIf( nextAlgo.equal( uint( StepType.DISPERSE_LOCAL ) ), () => {
 
-						idx.assign( getDisperseIndices( invocationLocalIndex, nextBlockHeight ) );
+						const idx = getDisperseIndices( invocationLocalIndex, nextBlockHeight );
 						localCompareAndSwap( idx.x, idx.y );
 
 					} ).ElseIf( nextAlgo.equal( uint( StepType.FLIP_GLOBAL ) ), () => {
 
-						idx.assign( getFlipIndices( instanceIndex, nextBlockHeight ) );
+						const idx = getFlipIndices( instanceIndex, nextBlockHeight );
 						globalCompareAndSwap( idx.x, idx.y );
 
 					} ).ElseIf( nextAlgo.equal( uint( StepType.DISPERSE_GLOBAL ) ), () => {
 
-						idx.assign( getDisperseIndices( instanceIndex, nextBlockHeight ) );
+						const idx = getDisperseIndices( instanceIndex, nextBlockHeight );
 						globalCompareAndSwap( idx.x, idx.y );
 
 					} );
@@ -274,20 +300,19 @@
 					// Populate output data with the results from our swaps
 					If( nextAlgo.lessThanEqual( uint( StepType.DISPERSE_LOCAL ) ), () => {
 
-						currentElementsStorage.element( localOffset.add( invocationLocalIndex.mul( 2 ) ) ).assign( localStorage.element( invocationLocalIndex.mul( 2 ) ) );
-						currentElementsStorage.element( localOffset.add( invocationLocalIndex.mul( 2 ).add( 1 ) ) ).assign( localStorage.element( invocationLocalIndex.mul( 2 ).add( 1 ) ) );
+						currentElementsStorage.element( localOffset.add( localID1 ) ).assign( localStorage.element( localID1 ) );
+						currentElementsStorage.element( localOffset.add( localID2 ) ).assign( localStorage.element( localID2 ) );
 
 					} );
 
-					// If the previous algorithm was global, we'll have to execute an additional compute step to sync the current buffer with the output buffer.
-					// This step can also potentially be done on the CPU...
+					// If the previous algorithm was global, we execute an additional compute step to sync the current buffer with the output buffer.
 
 				} );
 
 				const computeSetAlgoFn = Fn( () => {
 
 					const nextBlockHeight = nextBlockHeightStorage.element( 0 ).toVar();
-					const nextAlgo = nextAlgoStorage.element( 0 ).toVar();
+					const nextAlgo = nextAlgoStorage.element( 0 );
 					const highestBlockHeight = highestBlockHeightStorage.element( 0 ).toVar();
 
 					nextBlockHeight.divAssign( 2 );
@@ -296,22 +321,40 @@
 
 						highestBlockHeight.mulAssign( 2 );
 
-						If( highestBlockHeight.equal( size * 2 ), () => {
+						if ( forceGlobalSwap ) {
+
+							If( highestBlockHeight.equal( size * 2 ), () => {
 			
-							nextAlgo.assign( StepType.NONE );
-							nextBlockHeight.assign( 0 );
+								nextAlgo.assign( StepType.NONE );
+								nextBlockHeight.assign( 0 );
 
-						} ).ElseIf( highestBlockHeight.greaterThan( WORKGROUP_SIZE[ 0 ] * 2 ), () => {
+							} ).Else( () => {
 
-							nextAlgo.assign( StepType.FLIP_GLOBAL );
-							nextBlockHeight.assign( highestBlockHeight );
+								nextAlgo.assign( StepType.FLIP_GLOBAL );
+								nextBlockHeight.assign( highestBlockHeight );
 
-						} ).Else( () => {
+							} );
 
-							nextAlgo.assign( forceGlobalSwap ? StepType.FLIP_GLOBAL : StepType.FLIP_LOCAL );
-							nextBlockHeight.assign( highestBlockHeight );
+						} else {
 
-						} );
+							If( highestBlockHeight.equal( size * 2 ), () => {
+			
+								nextAlgo.assign( StepType.NONE );
+								nextBlockHeight.assign( 0 );
+
+							} ).ElseIf( highestBlockHeight.greaterThan( WORKGROUP_SIZE[ 0 ] * 2 ), () => {
+
+								nextAlgo.assign( StepType.FLIP_GLOBAL );
+								nextBlockHeight.assign( highestBlockHeight );
+
+							} ).Else( () => {
+
+								nextAlgo.assign( forceGlobalSwap ? StepType.FLIP_GLOBAL : StepType.FLIP_LOCAL );
+								nextBlockHeight.assign( highestBlockHeight );
+
+							} );
+
+						}
 
 					} ).Else( () => {
 
@@ -327,7 +370,6 @@
 
 					} );
 
-					nextAlgoStorage.element( 0 ).assign( nextAlgo );
 					nextBlockHeightStorage.element( 0 ).assign( nextBlockHeight );
 					highestBlockHeightStorage.element( 0 ).assign( highestBlockHeight );
 
@@ -352,8 +394,6 @@
 					highestBlockHeightStorage.element( 0 ).assign( 2 );
 
 				} );
-			
-				// compute
 
 				// Initialize each value in the elements buffer.
 				const computeInit = computeInitFn().compute( size );
@@ -371,7 +411,7 @@
 
 				const display = Fn( () => {
 
-					const { gridWidth, gridHeight } = effectController;
+					const { gridWidth, gridHeight, highlight } = effectController;
 
 					const newUV = uv().mul( vec2( gridWidth, gridHeight ) );
 
@@ -383,7 +423,19 @@
 
 					const subtracter = float( colorChanger ).div( gridWidth.mul( gridHeight ) );
 
-					const color = vec3( subtracter.oneMinus() );
+					const color = vec3( 0.0 ).toVar();
+
+					If( highlight.equal( 1 ), () => {
+
+						const boolCheck = elementIndex.modInt( nextBlockHeightRead.element( 0 ) ).lessThan( nextBlockHeightRead.element( 0 ).div( 2 ) );
+
+						color.assign( boolCheck.select( vec3( subtracter.oneMinus(), 0.0, 0.0 ), vec3( 0.0, subtracter.oneMinus(), 0.0 ) ) );
+
+					} ).Else( () => {
+
+						color.assign( vec3( subtracter.oneMinus() ) );
+			
+					} );
 
 					return color;
 
@@ -397,7 +449,7 @@
 
 				const renderer = new THREE.WebGPURenderer( { antialias: false, trackTimestamp: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( window.innerWidth / 2, window.innerHeight );
 
 				const animate = () => {
 
@@ -439,8 +491,6 @@
 						renderer.compute( computeBitonicStep );
 
 						if ( nextStepGlobal ) {
-
-							console.log( 'align buffers' );
 
 							renderer.compute( computeAlignCurrent );
 			
