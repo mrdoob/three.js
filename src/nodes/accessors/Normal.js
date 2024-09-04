@@ -1,6 +1,6 @@
 import { attribute } from '../core/AttributeNode.js';
 import { cameraViewMatrix } from './Camera.js';
-import { modelWorldMatrix } from './ModelNode.js';
+import { modelNormalMatrix, modelWorldMatrix } from './ModelNode.js';
 import { mat3, vec3 } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
 import { Fn, varying } from '../tsl/TSLBase.js';
@@ -69,16 +69,20 @@ export const transformNormal = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorld
 
 } );
 
-export const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal, matrix = modelWorldMatrix ], builder ) => {
+export const transformNormalToView = /*@__PURE__*/ Fn( ( [ normal ], builder ) => {
 
-	const modelNormalMatrix = builder.renderer.nodes.modelNormalMatrix;
+	const modelNormalViewMatrix = builder.renderer.nodes.modelNormalViewMatrix;
 
-	if ( modelNormalMatrix !== null ) {
+	if ( modelNormalViewMatrix !== null ) {
 
-		return modelNormalMatrix.transformDirection( normal );
+		return modelNormalViewMatrix.transformDirection( normal );
 
 	}
 
-	return cameraViewMatrix.transformDirection( transformNormal( normal, matrix ) );
+	//
+
+	const transformedNormal = modelNormalMatrix.mul( normal );
+
+	return cameraViewMatrix.transformDirection( transformedNormal );
 
 } );

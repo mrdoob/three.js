@@ -82,7 +82,7 @@ class Renderer {
 		this.nodes = {
 			library: new NodeLibrary(),
 			modelViewMatrix: null,
-			modelNormalMatrix: null
+			modelNormalViewMatrix: null
 		};
 
 		// internals
