@@ -2465,7 +2465,7 @@ class WebGLRenderer {
 				// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
 				if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-					// initialize the read of the the frame buffer
+					// set the active frame buffer to the one we want to read
 					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
 					const glBuffer = _gl.createBuffer();
@@ -2490,9 +2490,11 @@ class WebGLRenderer {
 
 					return buffer;
 
-				}
+				} else {
 
-				return buffer;
+					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: requested read bounds are out of range.' );
+
+				}
 
 			}
 
