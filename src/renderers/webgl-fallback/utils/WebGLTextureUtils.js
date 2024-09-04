@@ -806,7 +806,7 @@ class WebGLTextureUtils {
 
 	}
 
-	async copyTextureToBuffer( texture, x, y, width, height ) {
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		const { backend, gl } = this;
 
@@ -815,7 +815,10 @@ class WebGLTextureUtils {
 		const fb = gl.createFramebuffer();
 
 		gl.bindFramebuffer( gl.READ_FRAMEBUFFER, fb );
-		gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureGPU, 0 );
+
+		const target = texture.isCubeTexture ? gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex : gl.TEXTURE_2D;
+
+		gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, target, textureGPU, 0 );
 
 		const typedArrayType = this._getTypedArrayType( glType );
 		const bytesPerTexel = this._getBytesPerTexel( glType, glFormat );
