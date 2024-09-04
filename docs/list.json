@@ -1365,8 +1365,11 @@
 				"PointerLockControls": "examples/ko/controls/PointerLockControls",
 				"TrackballControls": "examples/ko/controls/TrackballControls",
 				"TransformControls": "examples/ko/controls/TransformControls"
+			},
+			
+			"WebXR": {
+				"XREstimatedLight": "examples/ko/webxr/XREstimatedLight"
 			}
-
 		}
 
 	},
