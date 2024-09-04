@@ -1,13 +1,12 @@
 import {
 	DoubleSide,
-	LinearFilter,
+	CanvasTexture,
 	Mesh,
 	MeshBasicMaterial,
 	OrthographicCamera,
 	PlaneGeometry,
 	Scene,
 	ShaderMaterial,
-	Texture,
 	UniformsUtils
 } from 'three';
 import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js';
@@ -93,13 +92,9 @@ class ShadowMapViewer {
 			context.fillStyle = 'rgba( 255, 0, 0, 1 )';
 			context.fillText( light.name, 0, 20 );
 
-			const labelTexture = new Texture( labelCanvas );
-			labelTexture.magFilter = LinearFilter;
-			labelTexture.minFilter = LinearFilter;
-			labelTexture.needsUpdate = true;
+			const labelTexture = new CanvasTexture( labelCanvas );
 
-			const labelMaterial = new MeshBasicMaterial( { map: labelTexture, side: DoubleSide } );
-			labelMaterial.transparent = true;
+			const labelMaterial = new MeshBasicMaterial( { map: labelTexture, side: DoubleSide, transparent: true } );
 
 			const labelPlane = new PlaneGeometry( labelCanvas.width, labelCanvas.height );
 			labelMesh = new Mesh( labelPlane, labelMaterial );
