@@ -369,7 +369,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	async copyTextureToBuffer( texture, x, y, width, height ) {
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		const device = this.backend.device;
 
@@ -393,7 +393,7 @@ class WebGPUTextureUtils {
 		encoder.copyTextureToBuffer(
 			{
 				texture: textureGPU,
-				origin: { x, y },
+				origin: { x, y, z: faceIndex },
 			},
 			{
 				buffer: readBuffer,
