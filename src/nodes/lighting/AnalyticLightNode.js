@@ -346,6 +346,7 @@ class AnalyticLightNode extends LightingNode {
 			const shadowNode = frustumTest.select( filterFn( { depthTexture: ( shadowMapType === VSMShadowMap ) ? this.vsmShadowMapHorizontal.texture : depthTexture, shadowCoord, shadow } ), float( 1 ) );
 
 			this.shadowMap = shadowMap;
+			this.light.shadow.map = shadowMap;
 
 			this.shadowNode = shadowNode;
 			this.shadowColorNode = shadowColorNode = this.colorNode.mul( mix( 1, shadowNode.rgb.mix( shadowColor, 1 ), shadowIntensity.mul( shadowColor.a ) ) );
