@@ -58,6 +58,7 @@ export * from './geometries/TeapotGeometry.js';
 export * from './geometries/TextGeometry.js';
 
 export * from './helpers/LightProbeHelper.js';
+export { LightProbeHelper as LightProbeHelperGPU } from './helpers/LightProbeHelperGPU.js';
 export * from './helpers/OctreeHelper.js';
 export * from './helpers/PositionalAudioHelper.js';
 export * from './helpers/RectAreaLightHelper.js';
@@ -277,6 +278,7 @@ export * from './utils/LDrawUtils.js';
 export * from './utils/PackedPhongMaterial.js';
 export * as SceneUtils from './utils/SceneUtils.js';
 export * from './utils/ShadowMapViewer.js';
+export { ShadowMapViewer as ShadowMapViewerGPU } from './utils/ShadowMapViewerGPU.js';
 export * as SkeletonUtils from './utils/SkeletonUtils.js';
 export * as SortUtils from './utils/SortUtils.js';
 export * from './utils/TextureUtils.js';
