@@ -3,7 +3,7 @@
  * Copyright 2010-2024 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '168';
+const REVISION = '169dev';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -44097,7 +44097,18 @@ class ViewportNode extends Node {
 
 		} else {
 
-			renderer.getDrawingBufferSize( resolution );
+			const renderTarget = renderer.getRenderTarget();
+
+			if ( renderTarget !== null ) {
+
+				resolution.width = renderTarget.width;
+				resolution.height = renderTarget.height;
+
+			} else {
+
+				renderer.getDrawingBufferSize( resolution );
+
+			}
 
 		}
 
@@ -45186,14 +45197,10 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		this.vertexNode = Fn( () => {
 
-			//vUv = uv;
-			varying( vec2(), 'vUv' ).assign( uv() ); // @TODO: Analyze other way to do this
-
 			const instancePosition = attribute( 'instancePosition' ).xyz;
 
 			// camera space
-			const mvPos = property( 'vec4', 'mvPos' );
-			mvPos.assign( modelViewMatrix.mul( vec4( instancePosition, 1.0 ) ) );
+			const mvPos = vec4( modelViewMatrix.mul( vec4( instancePosition, 1.0 ) ) );
 
 			const aspect = viewport.z.div( viewport.w );
 
@@ -45201,8 +45208,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			const clipPos = cameraProjectionMatrix.mul( mvPos );
 
 			// offset in ndc space
-			const offset = property( 'vec2', 'offset' );
-			offset.assign( positionGeometry.xy );
+			const offset = positionGeometry.xy.toVar();
 
 			offset.mulAssign( this.pointWidthNode ? this.pointWidthNode : materialPointWidth );
 
@@ -45213,32 +45219,21 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			offset.assign( offset.mul( clipPos.w ) );
 
 			//clipPos.xy += offset;
-			clipPos.assign( clipPos.add( vec4( offset, 0, 0 ) ) );
+			clipPos.addAssign( vec4( offset, 0, 0 ) );
 
 			return clipPos;
-
-			//vec4 mvPosition = mvPos; // this was used for somethihng...
 
 		} )();
 
 		this.fragmentNode = Fn( () => {
 
-			const vUv = varying( vec2(), 'vUv' );
+			const alpha = float( 1 ).toVar();
 
-			// force assignment into correct place in flow
-			const alpha = property( 'float', 'alpha' );
-			alpha.assign( 1 );
-
-			const a = vUv.x;
-			const b = vUv.y;
-
-			const len2 = a.mul( a ).add( b.mul( b ) );
+			const len2 = lengthSq( uv() );
 
 			if ( useAlphaToCoverage ) {
 
-				// force assignment out of following 'if' statement - to avoid uniform control flow errors
-				const dlen = property( 'float', 'dlen' );
-				dlen.assign( len2.fwidth() );
+				const dlen = float( len2.fwidth() ).toVar();
 
 				alpha.assign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
 
@@ -45433,22 +45428,24 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			return vec4( mix( start.xyz, end.xyz, alpha ), end.w );
 
+		} ).setLayout( {
+			name: 'trimSegment',
+			type: 'vec4',
+			inputs: [
+				{ name: 'start', type: 'vec4' },
+				{ name: 'end', type: 'vec4' }
+			]
 		} );
 
 		this.vertexNode = Fn( () => {
-
-			varyingProperty( 'vec2', 'vUv' ).assign( uv() );
 
 			const instanceStart = attribute( 'instanceStart' );
 			const instanceEnd = attribute( 'instanceEnd' );
 
 			// camera space
 
-			const start = property( 'vec4', 'start' );
-			const end = property( 'vec4', 'end' );
-
-			start.assign( modelViewMatrix.mul( vec4( instanceStart, 1.0 ) ) ); // force assignment into correct place in flow
-			end.assign( modelViewMatrix.mul( vec4( instanceEnd, 1.0 ) ) );
+			const start = vec4( modelViewMatrix.mul( vec4( instanceStart, 1.0 ) ) ).toVar( 'start' );
+			const end = vec4( modelViewMatrix.mul( vec4( instanceEnd, 1.0 ) ) ).toVar( 'end' );
 
 			if ( useWorldUnits ) {
 
@@ -45545,9 +45542,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			} else {
 
-				const offset = property( 'vec2', 'offset' );
-
-				offset.assign( vec2( dir.y, dir.x.negate() ) );
+				const offset = vec2( dir.y, dir.x.negate() ).toVar( 'offset' );
 
 				// undo aspect ratio adjustment
 				dir.x.assign( dir.x.div( aspect ) );
@@ -45612,7 +45607,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		this.fragmentNode = Fn( () => {
 
-			const vUv = varyingProperty( 'vec2', 'vUv' );
+			const vUv = uv();
 
 			if ( useDash ) {
 
@@ -45637,9 +45632,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			}
 
-			 // force assignment into correct place in flow
-			const alpha = property( 'float', 'alpha' );
-			alpha.assign( 1 );
+			const alpha = float( 1 ).toVar( 'alpha' );
 
 			if ( useWorldUnits ) {
 
@@ -45683,9 +45676,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 					const len2 = a.mul( a ).add( b.mul( b ) );
 
-					// force assignment out of following 'if' statement - to avoid uniform control flow errors
-					const dlen = property( 'float', 'dlen' );
-					dlen.assign( len2.fwidth() );
+					const dlen = float( len2.fwidth() ).toVar( 'dlen' );
 
 					If( vUv.y.abs().greaterThan( 1.0 ), () => {
 
@@ -65876,9 +65867,9 @@ class Renderer {
 	}
 
 
-	readRenderTargetPixelsAsync( renderTarget, x, y, width, height, index = 0 ) {
+	readRenderTargetPixelsAsync( renderTarget, x, y, width, height, index = 0, faceIndex = 0 ) {
 
-		return this.backend.copyTextureToBuffer( renderTarget.textures[ index ], x, y, width, height );
+		return this.backend.copyTextureToBuffer( renderTarget.textures[ index ], x, y, width, height, faceIndex );
 
 	}
 
@@ -70093,7 +70084,7 @@ class WebGLTextureUtils {
 
 	}
 
-	async copyTextureToBuffer( texture, x, y, width, height ) {
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		const { backend, gl } = this;
 
@@ -70102,7 +70093,10 @@ class WebGLTextureUtils {
 		const fb = gl.createFramebuffer();
 
 		gl.bindFramebuffer( gl.READ_FRAMEBUFFER, fb );
-		gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureGPU, 0 );
+
+		const target = texture.isCubeTexture ? gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex : gl.TEXTURE_2D;
+
+		gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, target, textureGPU, 0 );
 
 		const typedArrayType = this._getTypedArrayType( glType );
 		const bytesPerTexel = this._getBytesPerTexel( glType, glFormat );
@@ -71211,9 +71205,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	copyTextureToBuffer( texture, x, y, width, height ) {
+	copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
-		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height );
+		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex );
 
 	}
 
@@ -72785,7 +72779,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	async copyTextureToBuffer( texture, x, y, width, height ) {
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		const device = this.backend.device;
 
@@ -72809,7 +72803,7 @@ class WebGPUTextureUtils {
 		encoder.copyTextureToBuffer(
 			{
 				texture: textureGPU,
-				origin: { x, y },
+				origin: { x, y, z: faceIndex },
 			},
 			{
 				buffer: readBuffer,
@@ -77576,9 +77570,9 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	copyTextureToBuffer( texture, x, y, width, height ) {
+	copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
-		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height );
+		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex );
 
 	}
 
