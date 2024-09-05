@@ -7,7 +7,8 @@ import {
 	SRGBColorSpace,
 	NoColorSpace,
 	HalfFloatType,
-	DataUtils
+	DataUtils,
+	WebGPUCoordinateSystem
 } from 'three';
 
 class LightProbeGenerator {
@@ -134,7 +135,8 @@ class LightProbeGenerator {
 		if ( renderer.isWebGPURenderer ) {
 
 			useAsync = true;
-			if ( renderer.backend.isWebGPUBackend ) flip = -1;
+
+			if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) flip = -1;
 
 		}
 
