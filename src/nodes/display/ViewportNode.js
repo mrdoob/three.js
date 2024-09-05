@@ -51,7 +51,18 @@ class ViewportNode extends Node {
 
 		} else {
 
-			renderer.getDrawingBufferSize( resolution );
+			const renderTarget = renderer.getRenderTarget();
+
+			if ( renderTarget !== null ) {
+
+				resolution.width = renderTarget.width;
+				resolution.height = renderTarget.height;
+
+			} else {
+
+				renderer.getDrawingBufferSize( resolution );
+
+			}
 
 		}
 
