@@ -271,7 +271,6 @@ export * from './textures/FlakesTexture.js';
 
 export * as BufferGeometryUtils from './utils/BufferGeometryUtils.js';
 export * as CameraUtils from './utils/CameraUtils.js';
-export * from './utils/GPUStatsPanel.js';
 export * as GeometryCompressionUtils from './utils/GeometryCompressionUtils.js';
 export * as GeometryUtils from './utils/GeometryUtils.js';
 export * from './utils/LDrawUtils.js';
