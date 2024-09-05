@@ -3153,6 +3153,9 @@ class GLTFParser {
 
 				}
 
+				// Ignore normalized since we copy from sparse
+				bufferAttribute.normalized = false;
+
 				for ( let i = 0, il = sparseIndices.length; i < il; i ++ ) {
 
 					const index = sparseIndices[ i ];
@@ -3164,6 +3167,8 @@ class GLTFParser {
 					if ( itemSize >= 5 ) throw new Error( 'THREE.GLTFLoader: Unsupported itemSize in sparse BufferAttribute.' );
 
 				}
+
+				bufferAttribute.normalized = normalized;
 
 			}
 
