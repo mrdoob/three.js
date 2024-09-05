@@ -1,7 +1,12 @@
-import { registerNode } from '../core/Node.js';
 import AnalyticLightNode from './AnalyticLightNode.js';
 
 class AmbientLightNode extends AnalyticLightNode {
+
+	static get type() {
+
+		return 'AmbientLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -18,5 +23,3 @@ class AmbientLightNode extends AnalyticLightNode {
 }
 
 export default AmbientLightNode;
-
-AmbientLightNode.type = /*@__PURE__*/ registerNode( 'AmbientLight', AmbientLightNode );

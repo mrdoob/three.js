@@ -1,10 +1,16 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { arrayBufferToBase64, base64ToArrayBuffer } from '../core/NodeUtils.js';
 import { nodeProxy, float } from '../tsl/TSLBase.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 
 class ScriptableValueNode extends Node {
+
+	static get type() {
+
+		return 'ScriptableValueNode';
+
+	}
 
 	constructor( value = null ) {
 
@@ -160,7 +166,5 @@ class ScriptableValueNode extends Node {
 }
 
 export default ScriptableValueNode;
-
-ScriptableValueNode.type = /*@__PURE__*/ registerNode( 'ScriptableValue', ScriptableValueNode );
 
 export const scriptableValue = /*@__PURE__*/ nodeProxy( ScriptableValueNode );

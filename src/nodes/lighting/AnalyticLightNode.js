@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
@@ -202,6 +201,12 @@ let _overrideMaterial = null;
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 class AnalyticLightNode extends LightingNode {
+
+	static get type() {
+
+		return 'AnalyticLightNode';
+
+	}
 
 	constructor( light = null ) {
 
@@ -510,5 +515,3 @@ class AnalyticLightNode extends LightingNode {
 }
 
 export default AnalyticLightNode;
-
-AnalyticLightNode.type = /*@__PURE__*/ registerNode( 'AnalyticLight', AnalyticLightNode );

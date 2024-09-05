@@ -1,9 +1,14 @@
-import { registerNode } from '../core/Node.js';
 import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
 class MaxMipLevelNode extends UniformNode {
+
+	static get type() {
+
+		return 'MaxMipLevelNode';
+
+	}
 
 	constructor( textureNode ) {
 
@@ -46,7 +51,5 @@ class MaxMipLevelNode extends UniformNode {
 }
 
 export default MaxMipLevelNode;
-
-MaxMipLevelNode.type = /*@__PURE__*/ registerNode( 'MaxMipLevel', MaxMipLevelNode );
 
 export const maxMipLevel = /*@__PURE__*/ nodeProxy( MaxMipLevelNode );

@@ -1,4 +1,4 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { scriptableValue } from './ScriptableValueNode.js';
 import { nodeProxy, float } from '../tsl/TSLBase.js';
 
@@ -60,6 +60,12 @@ class Parameters {
 export const global = new Resources();
 
 class ScriptableNode extends Node {
+
+	static get type() {
+
+		return 'ScriptableNode';
+
+	}
 
 	constructor( codeNode = null, parameters = {} ) {
 
@@ -494,7 +500,5 @@ class ScriptableNode extends Node {
 }
 
 export default ScriptableNode;
-
-ScriptableNode.type = /*@__PURE__*/ registerNode( 'Scriptable', ScriptableNode );
 
 export const scriptable = /*@__PURE__*/ nodeProxy( ScriptableNode );

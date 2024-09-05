@@ -1,8 +1,14 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { uv } from '../accessors/UV.js';
 import { nodeProxy, float, vec2 } from '../tsl/TSLBase.js';
 
 class SpriteSheetUVNode extends Node {
+
+	static get type() {
+
+		return 'SpriteSheetUVNode';
+
+	}
 
 	constructor( countNode, uvNode = uv(), frameNode = float( 0 ) ) {
 
@@ -35,7 +41,5 @@ class SpriteSheetUVNode extends Node {
 }
 
 export default SpriteSheetUVNode;
-
-SpriteSheetUVNode.type = /*@__PURE__*/ registerNode( 'SpriteSheetUV', SpriteSheetUVNode );
 
 export const spritesheetUV = /*@__PURE__*/ nodeProxy( SpriteSheetUVNode );

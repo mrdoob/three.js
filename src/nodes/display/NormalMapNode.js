@@ -1,9 +1,7 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { add } from '../math/OperatorNode.js';
 
-import { modelNormalMatrix } from '../accessors/ModelNode.js';
-import { normalView } from '../accessors/Normal.js';
+import { normalView, transformNormalToView } from '../accessors/Normal.js';
 import { positionView } from '../accessors/Position.js';
 import { TBNViewMatrix } from '../accessors/AccessorsUtils.js';
 import { uv } from '../accessors/UV.js';
@@ -41,6 +39,12 @@ const perturbNormal2Arb = /*@__PURE__*/ Fn( ( inputs ) => {
 
 class NormalMapNode extends TempNode {
 
+	static get type() {
+
+		return 'NormalMapNode';
+
+	}
+
 	constructor( node, scaleNode = null ) {
 
 		super( 'vec3' );
@@ -68,7 +72,7 @@ class NormalMapNode extends TempNode {
 
 		if ( normalMapType === ObjectSpaceNormalMap ) {
 
-			outputNode = modelNormalMatrix.mul( normalMap ).normalize();
+			outputNode = transformNormalToView( normalMap );
 
 		} else if ( normalMapType === TangentSpaceNormalMap ) {
 
@@ -98,7 +102,5 @@ class NormalMapNode extends TempNode {
 }
 
 export default NormalMapNode;
-
-NormalMapNode.type = /*@__PURE__*/ registerNode( 'NormalMap', NormalMapNode );
 
 export const normalMap = /*@__PURE__*/ nodeProxy( NormalMapNode );

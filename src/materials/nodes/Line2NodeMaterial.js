@@ -1,5 +1,5 @@
-import NodeMaterial, { registerNodeMaterial } from './NodeMaterial.js';
-import { property, varyingProperty } from '../../nodes/core/PropertyNode.js';
+import NodeMaterial from './NodeMaterial.js';
+import { varyingProperty } from '../../nodes/core/PropertyNode.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { materialColor, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineDashOffset, materialLineWidth } from '../../nodes/accessors/MaterialNode.js';
@@ -16,6 +16,12 @@ import { LineDashedMaterial } from '../LineDashedMaterial.js';
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
 class Line2NodeMaterial extends NodeMaterial {
+
+	static get type() {
+
+		return 'Line2NodeMaterial';
+
+	}
 
 	constructor( params = {} ) {
 
@@ -69,22 +75,24 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			return vec4( mix( start.xyz, end.xyz, alpha ), end.w );
 
+		} ).setLayout( {
+			name: 'trimSegment',
+			type: 'vec4',
+			inputs: [
+				{ name: 'start', type: 'vec4' },
+				{ name: 'end', type: 'vec4' }
+			]
 		} );
 
 		this.vertexNode = Fn( () => {
-
-			varyingProperty( 'vec2', 'vUv' ).assign( uv() );
 
 			const instanceStart = attribute( 'instanceStart' );
 			const instanceEnd = attribute( 'instanceEnd' );
 
 			// camera space
 
-			const start = property( 'vec4', 'start' );
-			const end = property( 'vec4', 'end' );
-
-			start.assign( modelViewMatrix.mul( vec4( instanceStart, 1.0 ) ) ); // force assignment into correct place in flow
-			end.assign( modelViewMatrix.mul( vec4( instanceEnd, 1.0 ) ) );
+			const start = vec4( modelViewMatrix.mul( vec4( instanceStart, 1.0 ) ) ).toVar( 'start' );
+			const end = vec4( modelViewMatrix.mul( vec4( instanceEnd, 1.0 ) ) ).toVar( 'end' );
 
 			if ( useWorldUnits ) {
 
@@ -181,9 +189,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			} else {
 
-				const offset = property( 'vec2', 'offset' );
-
-				offset.assign( vec2( dir.y, dir.x.negate() ) );
+				const offset = vec2( dir.y, dir.x.negate() ).toVar( 'offset' );
 
 				// undo aspect ratio adjustment
 				dir.x.assign( dir.x.div( aspect ) );
@@ -248,7 +254,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 		this.fragmentNode = Fn( () => {
 
-			const vUv = varyingProperty( 'vec2', 'vUv' );
+			const vUv = uv();
 
 			if ( useDash ) {
 
@@ -273,9 +279,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			}
 
-			 // force assignment into correct place in flow
-			const alpha = property( 'float', 'alpha' );
-			alpha.assign( 1 );
+			const alpha = float( 1 ).toVar( 'alpha' );
 
 			if ( useWorldUnits ) {
 
@@ -319,9 +323,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 					const len2 = a.mul( a ).add( b.mul( b ) );
 
-					// force assignment out of following 'if' statement - to avoid uniform control flow errors
-					const dlen = property( 'float', 'dlen' );
-					dlen.assign( len2.fwidth() );
+					const dlen = float( len2.fwidth() ).toVar( 'dlen' );
 
 					If( vUv.y.abs().greaterThan( 1.0 ), () => {
 
@@ -433,5 +435,3 @@ class Line2NodeMaterial extends NodeMaterial {
 }
 
 export default Line2NodeMaterial;
-
-Line2NodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( 'Line2', Line2NodeMaterial );

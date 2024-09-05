@@ -1,4 +1,4 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { reference } from './ReferenceNode.js';
 import { materialReference } from './MaterialReferenceNode.js';
 import { normalView } from './Normal.js';
@@ -12,6 +12,12 @@ import { Vector2 } from '../../math/Vector2.js';
 const _propertyCache = new Map();
 
 class MaterialNode extends Node {
+
+	static get type() {
+
+		return 'MaterialNode';
+
+	}
 
 	constructor( scope ) {
 
@@ -178,6 +184,7 @@ class MaterialNode extends Node {
 			if ( material.normalMap ) {
 
 				node = normalMap( this.getTexture( 'normal' ), this.getCache( 'normalScale', 'vec2' ) );
+				node.normalMapType = material.normalMapType;
 
 			} else if ( material.bumpMap ) {
 
@@ -384,8 +391,6 @@ MaterialNode.AO_MAP = 'ao';
 
 export default MaterialNode;
 
-MaterialNode.type = /*@__PURE__*/ registerNode( 'Material', MaterialNode );
-
 export const materialAlphaTest = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.ALPHA_TEST );
 export const materialColor = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.COLOR );
 export const materialShininess = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.SHININESS );
@@ -425,7 +430,6 @@ export const materialPointWidth = /*@__PURE__*/ nodeImmutable( MaterialNode, Mat
 export const materialDispersion = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.DISPERSION );
 export const materialLightMap = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.LIGHT_MAP );
 export const materialAOMap = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.AO_MAP );
-export const materialRefractionRatio = /*@__PURE__*/ nodeImmutable( MaterialNode, MaterialNode.REFRACTION_RATIO );
 export const materialAnisotropyVector = /*@__PURE__*/ uniform( new Vector2() ).onReference( function ( frame ) {
 
 	return frame.material;

@@ -1,9 +1,14 @@
-import { registerNode } from '../core/Node.js';
 import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeObject, nodeImmutable } from '../tsl/TSLBase.js';
 
 class TimerNode extends UniformNode {
+
+	static get type() {
+
+		return 'TimerNode';
+
+	}
 
 	constructor( scope = TimerNode.LOCAL, scale = 1, value = 0 ) {
 
@@ -84,8 +89,6 @@ TimerNode.DELTA = 'delta';
 TimerNode.FRAME = 'frame';
 
 export default TimerNode;
-
-TimerNode.type = /*@__PURE__*/ registerNode( 'Timer', TimerNode );
 
 // @TODO: add support to use node in timeScale
 export const timerLocal = ( timeScale, value = 0 ) => nodeObject( new TimerNode( TimerNode.LOCAL, timeScale, value ) );

@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UV.js';
 import { Fn, nodeObject, vec2, vec3, float, If } from '../tsl/TSLBase.js';
@@ -15,6 +14,12 @@ import { convertToTexture } from '../utils/RTTNode.js';
 import { NearestFilter } from '../../constants.js';
 
 class PixelationNode extends TempNode {
+
+	static get type() {
+
+		return 'PixelationNode';
+
+	}
 
 	constructor( textureNode, depthNode, normalNode, pixelSize, normalEdgeStrength, depthEdgeStrength ) {
 
@@ -153,11 +158,15 @@ class PixelationNode extends TempNode {
 
 }
 
-PixelationNode.type = /*@__PURE__*/ registerNode( 'Pixelation', PixelationNode );
-
 const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( convertToTexture( node ), convertToTexture( depthNode ), convertToTexture( normalNode ), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
 
 class PixelationPassNode extends PassNode {
+
+	static get type() {
+
+		return 'PixelationPassNode';
+
+	}
 
 	constructor( scene, camera, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) {
 
@@ -202,5 +211,3 @@ class PixelationPassNode extends PassNode {
 export const pixelationPass = ( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) => nodeObject( new PixelationPassNode( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) );
 
 export default PixelationPassNode;
-
-PixelationPassNode.type = /*@__PURE__*/ registerNode( 'PixelationPass', PixelationPassNode );

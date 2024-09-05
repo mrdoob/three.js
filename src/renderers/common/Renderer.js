@@ -22,7 +22,6 @@ import { Scene } from '../../scenes/Scene.js';
 import { Frustum } from '../../math/Frustum.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
-import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
 import { DoubleSide, BackSide, FrontSide, SRGBColorSpace, NoToneMapping, LinearFilter, LinearSRGBColorSpace, HalfFloatType, RGBAFormat, PCFShadowMap } from '../../constants.js';
@@ -32,7 +31,7 @@ const _drawingBufferSize = /*@__PURE__*/ new Vector2();
 const _screen = /*@__PURE__*/ new Vector4();
 const _frustum = /*@__PURE__*/ new Frustum();
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
-const _vector3 = /*@__PURE__*/ new Vector3();
+const _vector4 = /*@__PURE__*/ new Vector4();
 
 class Renderer {
 
@@ -81,7 +80,9 @@ class Renderer {
 		this.info = new Info();
 
 		this.nodes = {
-			library: new NodeLibrary()
+			library: new NodeLibrary(),
+			modelViewMatrix: null,
+			modelNormalViewMatrix: null
 		};
 
 		// internals
@@ -408,20 +409,20 @@ class Renderer {
 
 	_renderBundle( bundle, sceneRef, lightsNode ) {
 
-		const { object, camera, renderList } = bundle;
+		const { bundleGroup, camera, renderList } = bundle;
 
 		const renderContext = this._currentRenderContext;
 
 		//
 
-		const renderBundle = this._bundles.get( object, camera );
+		const renderBundle = this._bundles.get( bundleGroup, camera );
 		const renderBundleData = this.backend.get( renderBundle );
 
 		if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = new Set();
 
 		//
 
-		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || object.needsUpdate === true;
+		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || bundleGroup.needsUpdate === true;
 
 		renderBundleData.renderContexts.add( renderContext );
 
@@ -429,7 +430,7 @@ class Renderer {
 
 			this.backend.beginBundle( renderContext );
 
-			if ( renderBundleData.renderObjects === undefined || object.needsUpdate === true ) {
+			if ( renderBundleData.renderObjects === undefined || bundleGroup.needsUpdate === true ) {
 
 				renderBundleData.renderObjects = [];
 
@@ -447,7 +448,7 @@ class Renderer {
 
 			this.backend.finishBundle( renderContext, renderBundle );
 
-			object.needsUpdate = false;
+			bundleGroup.needsUpdate = false;
 
 		} else {
 
@@ -458,11 +459,6 @@ class Renderer {
 				const renderObject = renderObjects[ i ];
 
 				this._nodes.updateBefore( renderObject );
-
-				//
-
-				renderObject.object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, renderObject.object.matrixWorld );
-				renderObject.object.normalMatrix.getNormalMatrix( renderObject.object.modelViewMatrix );
 
 				this._nodes.updateForRender( renderObject );
 				this._bindings.updateForRender( renderObject );
@@ -1263,9 +1259,9 @@ class Renderer {
 	}
 
 
-	readRenderTargetPixelsAsync( renderTarget, x, y, width, height, index = 0 ) {
+	readRenderTargetPixelsAsync( renderTarget, x, y, width, height, index = 0, faceIndex = 0 ) {
 
-		return this.backend.copyTextureToBuffer( renderTarget.textures[ index ], x, y, width, height );
+		return this.backend.copyTextureToBuffer( renderTarget.textures[ index ], x, y, width, height, faceIndex );
 
 	}
 
@@ -1295,7 +1291,7 @@ class Renderer {
 
 					if ( this.sortObjects === true ) {
 
-						_vector3.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
+						_vector4.setFromMatrixPosition( object.matrixWorld ).applyMatrix4( _projScreenMatrix );
 
 					}
 
@@ -1304,7 +1300,7 @@ class Renderer {
 
 					if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null );
 
 					}
 
@@ -1325,7 +1321,7 @@ class Renderer {
 
 						if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-						_vector3
+						_vector4
 							.copy( geometry.boundingSphere.center )
 							.applyMatrix4( object.matrixWorld )
 							.applyMatrix4( _projScreenMatrix );
@@ -1343,7 +1339,7 @@ class Renderer {
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								renderList.push( object, geometry, groupMaterial, groupOrder, _vector3.z, group );
+								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group );
 
 							}
 
@@ -1351,7 +1347,7 @@ class Renderer {
 
 					} else if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null );
 
 					}
 
@@ -1361,7 +1357,7 @@ class Renderer {
 
 		}
 
-		if ( object.static === true && this.backend.beginBundle !== undefined ) {
+		if ( object.isBundleGroup === true && this.backend.beginBundle !== undefined ) {
 
 			const baseRenderList = renderList;
 
@@ -1371,7 +1367,7 @@ class Renderer {
 			renderList.begin();
 
 			baseRenderList.pushBundle( {
-				object,
+				bundleGroup: object,
 				camera,
 				renderList,
 			} );
@@ -1571,18 +1567,12 @@ class Renderer {
 	_renderObjectDirect( object, material, scene, camera, lightsNode, group, passId ) {
 
 		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
-		renderObject.drawRange = group || object.geometry.drawRange;
+		renderObject.drawRange = object.geometry.drawRange;
+		renderObject.group = group;
 
 		//
 
 		this._nodes.updateBefore( renderObject );
-
-		//
-
-		object.modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-		object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
-
-		//
 
 		this._nodes.updateForRender( renderObject );
 		this._geometries.updateForRender( renderObject );
@@ -1612,8 +1602,6 @@ class Renderer {
 		//
 
 		this._nodes.updateBefore( renderObject );
-
-		//
 
 		this._nodes.updateForRender( renderObject );
 		this._geometries.updateForRender( renderObject );

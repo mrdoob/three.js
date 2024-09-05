@@ -637,7 +637,6 @@ class WebGLBackend extends Backend {
 
 		const geometry = renderObject.geometry;
 		const drawRange = renderObject.drawRange;
-		const firstVertex = drawRange.start;
 
 		//
 
@@ -669,6 +668,7 @@ class WebGLBackend extends Backend {
 		}
 
 		//
+		let rangeFactor = 1;
 
 		const renderer = this.bufferRenderer;
 
@@ -683,6 +683,8 @@ class WebGLBackend extends Backend {
 				state.setLineWidth( material.wireframeLinewidth * this.renderer.getPixelRatio() );
 				renderer.mode = gl.LINES;
 
+				rangeFactor = 2;
+
 			} else {
 
 				renderer.mode = gl.TRIANGLES;
@@ -693,28 +695,51 @@ class WebGLBackend extends Backend {
 
 		//
 
+		const group = renderObject.group;
 
-		let count;
 
 		renderer.object = object;
+
+
+		let firstVertex = drawRange.start * rangeFactor;
+		let lastVertex = ( drawRange.start + drawRange.count ) * rangeFactor;
+
+		if ( group !== null ) {
+
+			firstVertex = Math.max( firstVertex, group.start * rangeFactor );
+			lastVertex = Math.min( lastVertex, ( group.start + group.count ) * rangeFactor );
+
+		}
 
 		if ( index !== null ) {
 
 			const indexData = this.get( index );
-			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
+			const indexCount = index.count;
 
 			renderer.index = index.count;
 			renderer.type = indexData.type;
 
-			count = indexCount;
+			firstVertex = Math.max( firstVertex, 0 );
+			lastVertex = Math.min( lastVertex, indexCount );
 
 		} else {
 
 			renderer.index = 0;
 
-			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : geometry.attributes.position.count;
+			const vertexCount = geometry.attributes.position.count;
 
-			count = vertexCount;
+			firstVertex = Math.max( firstVertex, 0 );
+			lastVertex = Math.min( lastVertex, vertexCount );
+
+		}
+
+		const count = lastVertex - firstVertex;
+
+		if ( count < 0 || count === Infinity ) return;
+
+		if ( index !== null ) {
+
+			firstVertex *= index.array.BYTES_PER_ELEMENT;
 
 		}
 
@@ -796,9 +821,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	copyTextureToBuffer( texture, x, y, width, height ) {
+	copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
-		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height );
+		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex );
 
 	}
 

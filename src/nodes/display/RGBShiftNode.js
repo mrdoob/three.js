@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { nodeObject, Fn, vec2, vec4 } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
@@ -7,6 +6,12 @@ import { sin, cos } from '../math/MathNode.js';
 import { convertToTexture } from '../utils/RTTNode.js';
 
 class RGBShiftNode extends TempNode {
+
+	static get type() {
+
+		return 'RGBShiftNode';
+
+	}
 
 	constructor( textureNode, amount = 0.005, angle = 0 ) {
 
@@ -44,7 +49,5 @@ class RGBShiftNode extends TempNode {
 }
 
 export default RGBShiftNode;
-
-RGBShiftNode.type = /*@__PURE__*/ registerNode( 'RGBShift', RGBShiftNode );
 
 export const rgbShift = ( node, amount, angle ) => nodeObject( new RGBShiftNode( convertToTexture( node ), amount, angle ) );

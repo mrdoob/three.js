@@ -1,4 +1,4 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import UniformNode from '../core/UniformNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
@@ -7,7 +7,13 @@ import { Vector3 } from '../../math/Vector3.js';
 
 class Object3DNode extends Node {
 
-	constructor( scope = Object3DNode.VIEW_MATRIX, object3d = null ) {
+	static get type() {
+
+		return 'Object3DNode';
+
+	}
+
+	constructor( scope, object3d = null ) {
 
 		super();
 
@@ -24,13 +30,9 @@ class Object3DNode extends Node {
 
 		const scope = this.scope;
 
-		if ( scope === Object3DNode.WORLD_MATRIX || scope === Object3DNode.VIEW_MATRIX ) {
+		if ( scope === Object3DNode.WORLD_MATRIX ) {
 
 			return 'mat4';
-
-		} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
-
-			return 'mat3';
 
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION || scope === Object3DNode.SCALE ) {
 
@@ -46,15 +48,7 @@ class Object3DNode extends Node {
 		const uniformNode = this._uniformNode;
 		const scope = this.scope;
 
-		if ( scope === Object3DNode.VIEW_MATRIX ) {
-
-			uniformNode.value = object.modelViewMatrix;
-
-		} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
-
-			uniformNode.value = object.normalMatrix;
-
-		} else if ( scope === Object3DNode.WORLD_MATRIX ) {
+		if ( scope === Object3DNode.WORLD_MATRIX ) {
 
 			uniformNode.value = object.matrixWorld;
 
@@ -93,13 +87,9 @@ class Object3DNode extends Node {
 
 		const scope = this.scope;
 
-		if ( scope === Object3DNode.WORLD_MATRIX || scope === Object3DNode.VIEW_MATRIX ) {
+		if ( scope === Object3DNode.WORLD_MATRIX ) {
 
 			this._uniformNode.nodeType = 'mat4';
-
-		} else if ( scope === Object3DNode.NORMAL_MATRIX ) {
-
-			this._uniformNode.nodeType = 'mat3';
 
 		} else if ( scope === Object3DNode.POSITION || scope === Object3DNode.VIEW_POSITION || scope === Object3DNode.DIRECTION || scope === Object3DNode.SCALE ) {
 
@@ -129,8 +119,6 @@ class Object3DNode extends Node {
 
 }
 
-Object3DNode.VIEW_MATRIX = 'viewMatrix';
-Object3DNode.NORMAL_MATRIX = 'normalMatrix';
 Object3DNode.WORLD_MATRIX = 'worldMatrix';
 Object3DNode.POSITION = 'position';
 Object3DNode.SCALE = 'scale';
@@ -139,11 +127,7 @@ Object3DNode.DIRECTION = 'direction';
 
 export default Object3DNode;
 
-Object3DNode.type = /*@__PURE__*/ registerNode( 'Object3D', Object3DNode );
-
 export const objectDirection = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.DIRECTION );
-export const objectViewMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.VIEW_MATRIX );
-export const objectNormalMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.NORMAL_MATRIX );
 export const objectWorldMatrix = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.WORLD_MATRIX );
 export const objectPosition = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.POSITION );
 export const objectScale = /*@__PURE__*/ nodeProxy( Object3DNode, Object3DNode.SCALE );

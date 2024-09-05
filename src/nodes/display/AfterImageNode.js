@@ -19,6 +19,12 @@ const _quadMeshComp = /*@__PURE__*/ new QuadMesh();
 
 class AfterImageNode extends TempNode {
 
+	static get type() {
+
+		return 'AfterImageNode';
+
+	}
+
 	constructor( textureNode, damp = 0.96 ) {
 
 		super( textureNode );

@@ -1,8 +1,14 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { nodeImmutable } from '../tsl/TSLBase.js';
 import { reference } from './ReferenceNode.js';
 
 class SceneNode extends Node {
+
+	static get type() {
+
+		return 'SceneNode';
+
+	}
 
 	constructor( scope = SceneNode.BACKGROUND_BLURRINESS, scene = null ) {
 
@@ -44,8 +50,6 @@ SceneNode.BACKGROUND_BLURRINESS = 'backgroundBlurriness';
 SceneNode.BACKGROUND_INTENSITY = 'backgroundIntensity';
 
 export default SceneNode;
-
-SceneNode.type = /*@__PURE__*/ registerNode( 'Scene', SceneNode );
 
 export const backgroundBlurriness = /*@__PURE__*/ nodeImmutable( SceneNode, SceneNode.BACKGROUND_BLURRINESS );
 export const backgroundIntensity = /*@__PURE__*/ nodeImmutable( SceneNode, SceneNode.BACKGROUND_INTENSITY );

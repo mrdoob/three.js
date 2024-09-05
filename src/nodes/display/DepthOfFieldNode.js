@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { uv } from '../accessors/UV.js';
 import { Fn, nodeObject, vec2, vec4 } from '../tsl/TSLBase.js';
@@ -8,6 +7,12 @@ import { clamp } from '../math/MathNode.js';
 import { convertToTexture } from '../utils/RTTNode.js';
 
 class DepthOfFieldNode extends TempNode {
+
+	static get type() {
+
+		return 'DepthOfFieldNode';
+
+	}
 
 	constructor( textureNode, viewZNode, focusNode, apertureNode, maxblurNode ) {
 
@@ -115,7 +120,5 @@ class DepthOfFieldNode extends TempNode {
 }
 
 export default DepthOfFieldNode;
-
-DepthOfFieldNode.type = /*@__PURE__*/ registerNode( 'DepthOfField', DepthOfFieldNode );
 
 export const dof = ( node, viewZNode, focus = 1, aperture = 0.025, maxblur = 1 ) => nodeObject( new DepthOfFieldNode( convertToTexture( node ), nodeObject( viewZNode ), nodeObject( focus ), nodeObject( aperture ), nodeObject( maxblur ) ) );

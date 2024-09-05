@@ -1,4 +1,4 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
@@ -9,6 +9,12 @@ import { Vector4 } from '../../math/Vector4.js';
 let resolution, viewportResult;
 
 class ViewportNode extends Node {
+
+	static get type() {
+
+		return 'ViewportNode';
+
+	}
 
 	constructor( scope ) {
 
@@ -124,8 +130,6 @@ ViewportNode.VIEWPORT = 'viewport';
 ViewportNode.UV = 'uv';
 
 export default ViewportNode;
-
-ViewportNode.type = /*@__PURE__*/ registerNode( 'Viewport', ViewportNode );
 
 export const viewportCoordinate = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
 export const viewportResolution = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );

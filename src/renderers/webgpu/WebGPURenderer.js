@@ -1,6 +1,7 @@
-import StandardRenderer from '../common/StandardRenderer.js';
+import Renderer from '../common/Renderer.js';
 import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
+import StandardNodeLibrary from './nodes/StandardNodeLibrary.js';
 /*
 const debugHandler = {
 
@@ -15,7 +16,7 @@ const debugHandler = {
 
 };
 */
-class WebGPURenderer extends StandardRenderer {
+class WebGPURenderer extends Renderer {
 
 	constructor( parameters = {} ) {
 
@@ -43,6 +44,8 @@ class WebGPURenderer extends StandardRenderer {
 
 		//super( new Proxy( backend, debugHandler ) );
 		super( backend, parameters );
+
+		this.nodes.library = new StandardNodeLibrary();
 
 		this.isWebGPURenderer = true;
 

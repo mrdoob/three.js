@@ -23,9 +23,13 @@ import { depth } from '../../nodes/display/ViewportDepthNode.js';
 import { cameraLogDepth } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha } from '../../nodes/accessors/ClippingNode.js';
 
-const NodeMaterials = new Map();
-
 class NodeMaterial extends Material {
+
+	static get type() {
+
+		return 'NodeMaterial';
+
+	}
 
 	constructor() {
 
@@ -623,45 +627,3 @@ class NodeMaterial extends Material {
 }
 
 export default NodeMaterial;
-
-NodeMaterial.type = /*@__PURE__*/ registerNodeMaterial( '', NodeMaterial );
-
-export function registerNodeMaterial( type, nodeMaterialClass ) {
-
-	const suffix = 'NodeMaterial';
-	const nodeMaterialType = type + suffix;
-
-	if ( typeof nodeMaterialClass !== 'function' ) throw new Error( `THREE.Node: NodeMaterial class "${ type }" is not a class.` );
-
-	if ( NodeMaterials.has( nodeMaterialType ) ) {
-
-		console.warn( `THREE.Node: Redefinition of NodeMaterial class "${ nodeMaterialType }".` );
-		return;
-
-	}
-
-	if ( type.slice( - suffix.length ) === suffix ) {
-
-		console.warn( `THREE.NodeMaterial: NodeMaterial class ${ nodeMaterialType } should not have '${ suffix }' suffix.` );
-		return;
-
-	}
-
-	NodeMaterials.set( nodeMaterialType, nodeMaterialClass );
-	nodeMaterialClass.type = nodeMaterialType;
-
-	return nodeMaterialType;
-
-}
-
-export function createNodeMaterialFromType( type ) {
-
-	const Material = NodeMaterials.get( type );
-
-	if ( Material !== undefined ) {
-
-		return new Material();
-
-	}
-
-}

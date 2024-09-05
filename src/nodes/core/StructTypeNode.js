@@ -1,6 +1,12 @@
-import Node, { registerNode } from './Node.js';
+import Node from './Node.js';
 
 class StructTypeNode extends Node {
+
+	static get type() {
+
+		return 'StructTypeNode';
+
+	}
 
 	constructor( types ) {
 
@@ -20,5 +26,3 @@ class StructTypeNode extends Node {
 }
 
 export default StructTypeNode;
-
-StructTypeNode.type = /*@__PURE__*/ registerNode( 'StructType', StructTypeNode );

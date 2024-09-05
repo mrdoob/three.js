@@ -1,8 +1,14 @@
-import Node, { registerNode } from './Node.js';
+import Node from './Node.js';
 import { NodeShaderStage } from './constants.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class VaryingNode extends Node {
+
+	static get type() {
+
+		return 'VaryingNode';
+
+	}
 
 	constructor( node, name = null ) {
 
@@ -96,8 +102,6 @@ class VaryingNode extends Node {
 }
 
 export default VaryingNode;
-
-VaryingNode.type = /*@__PURE__*/ registerNode( 'Varying', VaryingNode );
 
 export const varying = /*@__PURE__*/ nodeProxy( VaryingNode );
 

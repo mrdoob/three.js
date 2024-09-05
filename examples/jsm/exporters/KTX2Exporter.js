@@ -111,7 +111,7 @@ const ERROR_COLOR_SPACE = 'THREE.KTX2Exporter: Supported color spaces are SRGBCo
 
 export class KTX2Exporter {
 
-	parse( arg1, arg2 ) {
+	async parse( arg1, arg2 ) {
 
 		let texture;
 
@@ -119,9 +119,9 @@ export class KTX2Exporter {
 
 			texture = arg1;
 
-		} else if ( arg1.isWebGLRenderer && arg2.isWebGLRenderTarget ) {
+		} else if ( ( arg1.isWebGLRenderer || arg1.isWebGPURenderer ) && arg2.isRenderTarget ) {
 
-			texture = toDataTexture( arg1, arg2 );
+			texture = await toDataTexture( arg1, arg2 );
 
 		} else {
 
@@ -235,31 +235,39 @@ export class KTX2Exporter {
 
 }
 
-function toDataTexture( renderer, rtt ) {
+async function toDataTexture( renderer, rtt ) {
 
 	const channelCount = getChannelCount( rtt.texture );
 
 	let view;
 
-	if ( rtt.texture.type === FloatType ) {
+	if ( renderer.isWebGLRenderer ) {
 
-		view = new Float32Array( rtt.width * rtt.height * channelCount );
+		if ( rtt.texture.type === FloatType ) {
 
-	} else if ( rtt.texture.type === HalfFloatType ) {
+			view = new Float32Array( rtt.width * rtt.height * channelCount );
 
-		view = new Uint16Array( rtt.width * rtt.height * channelCount );
+		} else if ( rtt.texture.type === HalfFloatType ) {
 
-	} else if ( rtt.texture.type === UnsignedByteType ) {
+			view = new Uint16Array( rtt.width * rtt.height * channelCount );
 
-		view = new Uint8Array( rtt.width * rtt.height * channelCount );
+		} else if ( rtt.texture.type === UnsignedByteType ) {
+
+			view = new Uint8Array( rtt.width * rtt.height * channelCount );
+
+		} else {
+
+			throw new Error( ERROR_TYPE );
+
+		}
+
+		await renderer.readRenderTargetPixelsAsync( rtt, 0, 0, rtt.width, rtt.height, view );
 
 	} else {
 
-		throw new Error( ERROR_TYPE );
+		view = await renderer.readRenderTargetPixelsAsync( rtt, 0, 0, rtt.width, rtt.height );
 
 	}
-
-	renderer.readRenderTargetPixels( rtt, 0, 0, rtt.width, rtt.height, view );
 
 	return new DataTexture( view, rtt.width, rtt.height, rtt.texture.format, rtt.texture.type );
 

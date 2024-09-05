@@ -1,4 +1,4 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { float, nodeProxy, Fn } from '../tsl/TSLBase.js';
 import { uniform } from '../core/UniformNode.js';
@@ -160,6 +160,12 @@ function getEntry( geometry ) {
 
 class MorphNode extends Node {
 
+	static get type() {
+
+		return 'MorphNode';
+
+	}
+
 	constructor( mesh ) {
 
 		super( 'void' );
@@ -253,7 +259,5 @@ class MorphNode extends Node {
 }
 
 export default MorphNode;
-
-MorphNode.type = /*@__PURE__*/ registerNode( 'Morph', MorphNode );
 
 export const morphReference = /*@__PURE__*/ nodeProxy( MorphNode );

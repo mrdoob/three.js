@@ -1,7 +1,12 @@
-import { registerNode } from './Node.js';
 import InputNode from './InputNode.js';
 
 class ConstNode extends InputNode {
+
+	static get type() {
+
+		return 'ConstNode';
+
+	}
 
 	constructor( value, nodeType = null ) {
 
@@ -28,5 +33,3 @@ class ConstNode extends InputNode {
 }
 
 export default ConstNode;
-
-ConstNode.type = /*@__PURE__*/ registerNode( 'Const', ConstNode );

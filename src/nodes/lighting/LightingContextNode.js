@@ -1,8 +1,13 @@
-import { registerNode } from '../core/Node.js';
 import ContextNode from '../core/ContextNode.js';
 import { nodeProxy, float, vec3 } from '../tsl/TSLBase.js';
 
 class LightingContextNode extends ContextNode {
+
+	static get type() {
+
+		return 'LightingContextNode';
+
+	}
 
 	constructor( node, lightingModel = null, backdropNode = null, backdropAlphaNode = null ) {
 
@@ -58,7 +63,5 @@ class LightingContextNode extends ContextNode {
 }
 
 export default LightingContextNode;
-
-LightingContextNode.type = /*@__PURE__*/ registerNode( 'LightingContext', LightingContextNode );
 
 export const lightingContext = /*@__PURE__*/ nodeProxy( LightingContextNode );

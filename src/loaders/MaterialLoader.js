@@ -86,7 +86,7 @@ class MaterialLoader extends Loader {
 
 		}
 
-		const material = MaterialLoader.createMaterialFromType( json.type );
+		const material = this.createMaterialFromType( json.type );
 
 		if ( json.uuid !== undefined ) material.uuid = json.uuid;
 		if ( json.name !== undefined ) material.name = json.name;
@@ -339,6 +339,12 @@ class MaterialLoader extends Loader {
 
 		this.textures = value;
 		return this;
+
+	}
+
+	createMaterialFromType( type ) {
+
+		return MaterialLoader.createMaterialFromType( type );
 
 	}
 

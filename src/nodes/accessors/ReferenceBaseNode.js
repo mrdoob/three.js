@@ -1,10 +1,16 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { uniform } from '../core/UniformNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 
 class ReferenceElementNode extends ArrayElementNode {
+
+	static get type() {
+
+		return 'ReferenceElementNode';
+
+	}
 
 	constructor( referenceNode, indexNode ) {
 
@@ -35,6 +41,12 @@ class ReferenceElementNode extends ArrayElementNode {
 }
 
 class ReferenceBaseNode extends Node {
+
+	static get type() {
+
+		return 'ReferenceBaseNode';
+
+	}
 
 	constructor( property, uniformType, object = null, count = null ) {
 
@@ -136,8 +148,6 @@ class ReferenceBaseNode extends Node {
 }
 
 export default ReferenceBaseNode;
-
-ReferenceBaseNode.type = /*@__PURE__*/ registerNode( 'ReferenceBase', ReferenceBaseNode );
 
 export const reference = ( name, type, object ) => nodeObject( new ReferenceBaseNode( name, type, object ) );
 export const referenceBuffer = ( name, type, count, object ) => nodeObject( new ReferenceBaseNode( name, type, object, count ) );

@@ -29,6 +29,12 @@ const _BlurDirectionY = /*@__PURE__*/ new Vector2( 0.0, 1.0 );
 
 class BloomNode extends TempNode {
 
+	static get type() {
+
+		return 'BloomNode';
+
+	}
+
 	constructor( inputNode, strength = 1, radius = 0, threshold = 0 ) {
 
 		super();

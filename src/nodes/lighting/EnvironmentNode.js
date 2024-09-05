@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import LightingNode from './LightingNode.js';
 import { cache } from '../core/CacheNode.js';
 import { roughness, clearcoatRoughness } from '../core/PropertyNode.js';
@@ -13,6 +12,12 @@ import { pmremTexture } from '../pmrem/PMREMNode.js';
 const _envNodeCache = new WeakMap();
 
 class EnvironmentNode extends LightingNode {
+
+	static get type() {
+
+		return 'EnvironmentNode';
+
+	}
 
 	constructor( envNode = null ) {
 
@@ -84,8 +89,6 @@ class EnvironmentNode extends LightingNode {
 }
 
 export default EnvironmentNode;
-
-EnvironmentNode.type = /*@__PURE__*/ registerNode( 'Environment', EnvironmentNode );
 
 const createRadianceContext = ( roughnessNode, normalViewNode ) => {
 

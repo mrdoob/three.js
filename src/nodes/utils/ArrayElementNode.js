@@ -1,6 +1,12 @@
-import Node, { registerNode } from '../core/Node.js';
+import Node from '../core/Node.js';
 
-class ArrayElementNode extends Node { // @TODO: If extending from TempNode it breaks webgpu_compute
+class ArrayElementNode extends Node {
+
+	static get type() {
+
+		return 'ArrayElementNode';
+
+	} // @TODO: If extending from TempNode it breaks webgpu_compute
 
 	constructor( node, indexNode ) {
 
@@ -31,5 +37,3 @@ class ArrayElementNode extends Node { // @TODO: If extending from TempNode it br
 }
 
 export default ArrayElementNode;
-
-ArrayElementNode.type = /*@__PURE__*/ registerNode( 'ArrayElement', ArrayElementNode );

@@ -1,4 +1,3 @@
-import { registerNode } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { textureSize } from '../accessors/TextureSizeNode.js';
@@ -25,6 +24,12 @@ const _currentClearColor = /*@__PURE__*/ new Color();
 const _size = /*@__PURE__*/ new Vector2();
 
 class GTAONode extends TempNode {
+
+	static get type() {
+
+		return 'GTAONode';
+
+	}
 
 	constructor( depthNode, normalNode, camera ) {
 
@@ -238,8 +243,6 @@ class GTAONode extends TempNode {
 }
 
 export default GTAONode;
-
-GTAONode.type = /*@__PURE__*/ registerNode( 'GTAO', GTAONode );
 
 function generateMagicSquareNoise( size = 5 ) {
 

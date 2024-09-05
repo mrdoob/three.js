@@ -233,9 +233,15 @@ class WebGLAttributeUtils {
 
 		const dstBuffer = new attribute.array.constructor( array.length );
 
+		// Ensure the buffer is bound before reading
+		gl.bindBuffer( gl.COPY_WRITE_BUFFER, writeBuffer );
+
 		gl.getBufferSubData( gl.COPY_WRITE_BUFFER, 0, dstBuffer );
 
 		gl.deleteBuffer( writeBuffer );
+
+		gl.bindBuffer( gl.COPY_READ_BUFFER, null );
+		gl.bindBuffer( gl.COPY_WRITE_BUFFER, null );
 
 		return dstBuffer.buffer;
 
