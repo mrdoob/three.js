@@ -126,7 +126,17 @@ class LightProbeGenerator {
 
 	}
 
-	static fromCubeRenderTarget( renderer, cubeRenderTarget ) {
+	static async fromCubeRenderTarget( renderer, cubeRenderTarget ) {
+
+		let useAsync = false;
+		let flip = 1;
+
+		if ( renderer.isWebGPURenderer ) {
+
+			useAsync = true;
+			if ( renderer.backend.isWebGPUBackend ) flip = -1;
+
+		}
 
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		let totalWeight = 0;
@@ -150,19 +160,28 @@ class LightProbeGenerator {
 
 			let data;
 
-			if ( dataType === HalfFloatType ) {
+			if ( useAsync ) {
 
-				data = new Uint16Array( imageWidth * imageWidth * 4 );
+				data = await renderer.readRenderTargetPixelsAsync( cubeRenderTarget, 0, 0, imageWidth, imageWidth, 0, faceIndex );
 
 			} else {
 
-				// assuming UnsignedByteType
 
-				data = new Uint8Array( imageWidth * imageWidth * 4 );
+				if ( dataType === HalfFloatType ) {
+
+					data = new Uint16Array( imageWidth * imageWidth * 4 );
+
+				} else {
+
+					// assuming UnsignedByteType
+
+					data = new Uint8Array( imageWidth * imageWidth * 4 );
+
+				}
+
+				renderer.readRenderTargetPixels( cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
 
 			}
-
-			renderer.readRenderTargetPixels( cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
 
 			const pixelSize = 2 / imageWidth;
 
@@ -194,15 +213,15 @@ class LightProbeGenerator {
 
 				const pixelIndex = i / 4;
 
-				const col = - 1 + ( pixelIndex % imageWidth + 0.5 ) * pixelSize;
+				const col = ( - 1 + ( pixelIndex % imageWidth + 0.5 ) * pixelSize ) * flip;
 
 				const row = 1 - ( Math.floor( pixelIndex / imageWidth ) + 0.5 ) * pixelSize;
 
 				switch ( faceIndex ) {
 
-					case 0: coord.set( 1, row, - col ); break;
+					case 0: coord.set( 1 * flip, row, - col * flip ); break;
 
-					case 1: coord.set( - 1, row, col ); break;
+					case 1: coord.set( - 1 * flip, row, col * flip ); break;
 
 					case 2: coord.set( col, 1, - row ); break;
 
