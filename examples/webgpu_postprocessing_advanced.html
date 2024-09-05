@@ -28,7 +28,9 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { bloom, film, pass, depthPass, renderOutput } from 'three/tsl'; //sepia, vignette, colorify, bleachBypass, mask, gammaCorrect, horizontalBlur,
+			import { bloom, film, pass, sepia, color, bleach, viewportUV, uv, texture, float, dot, vec3, mix, saturation, gaussianBlur, luminance, vec2, uniform, depthPass, renderOutput, dotScreen } from 'three/tsl'; //sepia, vignette, colorify, bleachBypass, mask, gammaCorrect, horizontalBlur,
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -49,6 +51,21 @@
 			let quadBG, quadMask, renderScene;
 
 			const delta = 0.01;
+
+			const effectController = {
+				// Multiple screens
+				vignetteOffset: uniform( 0.95 ),
+				vignetteDarkness: uniform( 1.6 ),
+				filmIntensity: uniform( 0.9 ),
+				// Screen 2
+				dotScreenAngle: uniform( 0.5 ),
+				dotScreenScale: uniform( 0.8 ),
+				backgroundColor: uniform( color( 0xffcccc ) ),
+				modelColor: uniform( color( 0xffbf7f ) ),
+				// Screen 4
+				bloomIntensity: uniform( 0.5 )
+			
+			};
 
 			init();
 
@@ -104,7 +121,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				renderer.setAnimationLoop( animate );
-				renderer.autoClear = false;
 
 				//
 
@@ -114,34 +130,44 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
-
+			
 				//
 
-				//
-
-				const rtParameters = {
-					stencilBuffer: true
-				};
-
-				const rtWidth = width / 2;
-				const rtHeight = height / 2;
-
-				//
-
-
+				// Scene where background and model are combined
 				postScene = new THREE.PostProcessing( renderer );
+				// Four quadrants rendering our mixed scene, each with unique postprocessing.
 				post1 = new THREE.PostProcessing( renderer );
 				post2 = new THREE.PostProcessing( renderer );
 				post3 = new THREE.PostProcessing( renderer );
 				post4 = new THREE.PostProcessing( renderer );
+
+				// Scene Pass
 				const backgroundPass = pass( sceneBG, cameraOrtho );
-				//const modelPass = depthPass( sceneModel, cameraPerspective );
-				//renderScene = new TexturePass( composerScene.renderTarget2.texture );
-				postScene.outputNode = backgroundPass;
-				post1.outputNode = backgroundPass;
-				post2.outputNode = backgroundPass;
-				post3.outputNode = backgroundPass;
+				const modelPass = pass( sceneModel, cameraPerspective );
+				const combinePass = gaussianBlur( modelPass.a.mix( backgroundPass, modelPass ), vec2( 2 / ( width / 2 ), 2 / ( height / 2 ) ) ).getTextureNode();
+				postScene.outputNode = combinePass;
+
+				// Calculations for all passes
+				const vignetteOffset = uv().sub( 0.5 ).mul( effectController.vignetteOffset );
+
+				const applyVignette = ( color ) =>mix( color, vec3( effectController.vignetteDarkness.oneMinus() ), dot( vignetteOffset, vignetteOffset ) );
+
+				// Pass 1
+				post1.outputNode = applyVignette( film( saturation( postScene.outputNode, 0.0 ), effectController.filmIntensity ) );
+
+				// Pass 2
+				post2.outputNode = dotScreen( luminance( postScene.outputNode ).mul( color( 1.0, 0.8, 0.8 ) ) );
+				post3.outputNode = applyVignette( film( sepia( postScene.outputNode ), effectController.filmIntensity ) );
 				post4.outputNode = backgroundPass;
+
+
+				const gui = new GUI();
+				gui.add( effectController.vignetteDarkness, 'value', 1.0, 2.0, 0.1 ).name( 'vignetteDarkness' );
+				gui.add( effectController.vignetteOffset, 'value', 0.0, 1.0, 0.1 ).name( 'vignetteOffset' );
+				gui.add( effectController.filmIntensity, 'value', 0.0, 2.0, 0.01 ).name( 'filmIntensity' );
+				const compose2Folder = gui.addFolder( 'Window 2' );
+				compose2Folder.add( effectController.dotScreenAngle, 'value', 0.0, 2.0, 0.01 ).name( 'dotScreenAngle' );
+				compose2Folder.add( effectController.dotScreenScale, 'value', 0.0, 2.0, 0.01 ).name( 'dotScreenScale' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -212,17 +238,21 @@
 				renderer.setViewport( 0, 0, halfWidth, halfHeight );
 				postScene.render();
 
-				renderer.setViewport( 0, 0, halfWidth, halfHeight );
-				post1.render();
-
-				renderer.setViewport( halfWidth, 0, halfWidth, halfHeight );
-				post2.render();
+				renderer.autoClear = false;
 
 				renderer.setViewport( 0, halfHeight, halfWidth, halfHeight );
+				post1.render();
+
+				renderer.setViewport( halfWidth, halfHeight, halfWidth, halfHeight );
+				post2.render();
+
+				renderer.setViewport( 0, 0, halfWidth, halfHeight );
 				post3.render();
 
-				renderer.setViewport( halfWidth, halfHeight, halfWidth - 1, halfHeight - 1 );
+				renderer.setViewport( halfWidth, 0, halfWidth, halfHeight );
 				post4.render();
+
+				renderer.autoClear = true;
 
 			}
 
