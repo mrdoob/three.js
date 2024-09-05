@@ -50,15 +50,13 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
-			const { node } = this;
-
 			if ( this.node.bufferObject === true && isAssignContext !== true ) {
 
 				snippet = builder.generatePBO( this );
 
 			} else {
 
-				snippet = node.build( builder );
+				snippet = this.node.build( builder );
 
 			}
 
