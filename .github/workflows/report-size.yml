@@ -185,14 +185,14 @@ jobs:
           WEBGPU_NODES_FILESIZE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_FILESIZE_GZIP")
           WEBGPU_NODES_FILESIZE_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_FILESIZE_BASE")
           WEBGPU_NODES_FILESIZE_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_FILESIZE_BASE_GZIP")
-          WEBGPU_NODES_FILESIZE_DIFF=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_FILESIZE" "$WEBGPU_NODES_FILESIZE_BASE")
-          WEBGPU_NODES_FILESIZE_DIFF_GZIP=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_FILESIZE_GZIP" "$WEBGPU_NODES_FILESIZE_BASE_GZIP")
+          WEBGPU_NODES_FILESIZE_DIFF=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_NODES_FILESIZE" "$WEBGPU_NODES_FILESIZE_BASE")
+          WEBGPU_NODES_FILESIZE_DIFF_GZIP=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_NODES_FILESIZE_GZIP" "$WEBGPU_NODES_FILESIZE_BASE_GZIP")
 
           WEBGPU_NODES_TREESHAKEN_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_TREESHAKEN")
           WEBGPU_NODES_TREESHAKEN_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_TREESHAKEN_GZIP")
           WEBGPU_NODES_TREESHAKEN_BASE_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_TREESHAKEN_BASE")
           WEBGPU_NODES_TREESHAKEN_BASE_GZIP_FORM=$(node ./test/treeshake/utils/format-size.js "$WEBGPU_NODES_TREESHAKEN_BASE_GZIP")
-          WEBGPU_NODES_TREESHAKEN_DIFF=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_NODES_TREESHAKEN" "$WEBGPU_TREESHAKEN_BASE")
+          WEBGPU_NODES_TREESHAKEN_DIFF=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_NODES_TREESHAKEN" "$WEBGPU_NODES_TREESHAKEN_BASE")
           WEBGPU_NODES_TREESHAKEN_DIFF_GZIP=$(node ./test/treeshake/utils/format-diff.js "$WEBGPU_NODES_TREESHAKEN_GZIP" "$WEBGPU_NODES_TREESHAKEN_BASE_GZIP")
 
           echo "WEBGL_FILESIZE=$WEBGL_FILESIZE_FORM" >> $GITHUB_OUTPUT
