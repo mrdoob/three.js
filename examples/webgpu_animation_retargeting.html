@@ -72,7 +72,7 @@
 			dirLight.position.set( 2, 5, 2 );
 			scene.add( dirLight );
 
-			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, .25, 50 );
 			camera.position.set( - 3, 2, 5 );
 
 			// add models to scene
@@ -120,6 +120,8 @@
 			document.body.appendChild( renderer.domElement );
 
 			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.minDistance = 3;
+			controls.maxDistance = 12;
 			controls.target.set( 0, 1, 0 );
 			controls.maxPolarAngle = Math.PI / 2;
 
