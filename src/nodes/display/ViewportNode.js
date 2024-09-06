@@ -131,23 +131,24 @@ ViewportNode.UV = 'uv';
 
 export default ViewportNode;
 
+export const screenUV = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.UV );
+
 export const viewportCoordinate = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
 export const viewportResolution = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
 export const viewport = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
-export const viewportUV = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.UV );
 
 export const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
-	console.warn( 'TSL.ViewportNode: "viewportTopLeft" is deprecated. Use "viewportUV" instead.' );
+	console.warn( 'TSL.ViewportNode: "viewportTopLeft" is deprecated. Use "screenUV" instead.' );
 
-	return viewportUV;
+	return screenUV;
 
 }, 'vec2' ).once() )();
 
 export const viewportBottomLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
-	console.warn( 'TSL.ViewportNode: "viewportBottomLeft" is deprecated. Use "viewportUV.flipY()" instead.' );
+	console.warn( 'TSL.ViewportNode: "viewportBottomLeft" is deprecated. Use "screenUV.flipY()" instead.' );
 
-	return viewportUV.flipY();
+	return screenUV.flipY();
 
 }, 'vec2' ).once() )();
