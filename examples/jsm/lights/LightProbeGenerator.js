@@ -130,13 +130,13 @@ class LightProbeGenerator {
 	static async fromCubeRenderTarget( renderer, cubeRenderTarget ) {
 
 		let useAsync = false;
-		let flip = 1;
+		let flip = - 1;
 
 		if ( renderer.isWebGPURenderer ) {
 
 			useAsync = true;
 
-			if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) flip = -1;
+			if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) flip = 1;
 
 		}
 
@@ -155,12 +155,27 @@ class LightProbeGenerator {
 		const shCoefficients = sh.coefficients;
 
 		const dataType = cubeRenderTarget.texture.type;
+		const imageWidth = cubeRenderTarget.width; // assumed to be square
+
+		let data;
+
+		if ( ! useAsync ) {
+
+			if ( dataType === HalfFloatType ) {
+
+				data = new Uint16Array( imageWidth * imageWidth * 4 );
+
+			} else {
+
+				// assuming UnsignedByteType
+
+				data = new Uint8Array( imageWidth * imageWidth * 4 );
+
+			}
+
+		}
 
 		for ( let faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
-
-			const imageWidth = cubeRenderTarget.width; // assumed to be square
-
-			let data;
 
 			if ( useAsync ) {
 
@@ -168,20 +183,7 @@ class LightProbeGenerator {
 
 			} else {
 
-
-				if ( dataType === HalfFloatType ) {
-
-					data = new Uint16Array( imageWidth * imageWidth * 4 );
-
-				} else {
-
-					// assuming UnsignedByteType
-
-					data = new Uint8Array( imageWidth * imageWidth * 4 );
-
-				}
-
-				renderer.readRenderTargetPixels( cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
+				await renderer.readRenderTargetPixelsAsync( cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
 
 			}
 
@@ -215,15 +217,15 @@ class LightProbeGenerator {
 
 				const pixelIndex = i / 4;
 
-				const col = ( - 1 + ( pixelIndex % imageWidth + 0.5 ) * pixelSize ) * flip;
+				const col = ( 1 - ( pixelIndex % imageWidth + 0.5 ) * pixelSize ) * flip;
 
 				const row = 1 - ( Math.floor( pixelIndex / imageWidth ) + 0.5 ) * pixelSize;
 
 				switch ( faceIndex ) {
 
-					case 0: coord.set( 1 * flip, row, - col * flip ); break;
+					case 0: coord.set( - 1 * flip, row, col * flip ); break;
 
-					case 1: coord.set( - 1 * flip, row, col * flip ); break;
+					case 1: coord.set( 1 * flip, row, - col * flip ); break;
 
 					case 2: coord.set( col, 1, - row ); break;
 
