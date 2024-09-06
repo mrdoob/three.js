@@ -109,7 +109,7 @@ function retarget( target, source, options = {} ) {
 
 			if ( target.isObject3D ) {
 
-				if ( options.offsets && boneTo ) {
+				if ( options.offsets ) {
 
 					if ( options.offsets[ bone.name ] ) {
 
