@@ -13,7 +13,7 @@ import { DepthTexture } from '../../textures/DepthTexture.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
-import { viewportCoordinate } from '../display/ViewportNode.js';
+import { screenCoordinate } from '../display/ViewportNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
@@ -153,7 +153,7 @@ const VSMPassVertical = Fn( ( { samples, radius, resolution, shadowPass } ) => {
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		const depth = shadowPass.uv( add( viewportCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( resolution ) ).x;
+		const depth = shadowPass.uv( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( resolution ) ).x;
 		mean.addAssign( depth );
 		squaredMean.addAssign( depth.mul( depth ) );
 
@@ -179,7 +179,7 @@ const VSMPassHorizontal = Fn( ( { samples, radius, resolution, shadowPass } ) =>
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		const distribution = shadowPass.uv( add( viewportCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( resolution ) );
+		const distribution = shadowPass.uv( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( resolution ) );
 		mean.addAssign( distribution.x );
 		squaredMean.addAssign( add( distribution.y.mul( distribution.y ), distribution.x.mul( distribution.x ) ) );
 

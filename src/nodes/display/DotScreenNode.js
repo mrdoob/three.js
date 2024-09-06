@@ -4,7 +4,7 @@ import { uniform } from '../core/UniformNode.js';
 import { uv } from '../accessors/UV.js';
 import { sin, cos } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
-import { screenSize } from '../display/ViewportNode.js';
+import { screenSize } from './ViewportNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 

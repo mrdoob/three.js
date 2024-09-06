@@ -9,7 +9,7 @@ class ShaderToyDecoder extends GLSLDecoder {
 
 		this.addPolyfill( 'iTime', 'float iTime = timerGlobal();' );
 		this.addPolyfill( 'iResolution', 'vec2 iResolution = screenSize;' );
-		this.addPolyfill( 'fragCoord', 'vec3 fragCoord = vec3( viewportCoordinate.x, screenSize.y - viewportCoordinate.y, viewportCoordinate.z );' );
+		this.addPolyfill( 'fragCoord', 'vec3 fragCoord = vec3( screenCoordinate.x, screenSize.y - screenCoordinate.y, screenCoordinate.z );' );
 
 	}
 

@@ -90,7 +90,7 @@ class ViewportNode extends Node {
 
 		} else {
 
-			output = vec2( viewportCoordinate.div( screenSize ) );
+			output = vec2( screenCoordinate.div( screenSize ) );
 
 		}
 
@@ -133,8 +133,8 @@ export default ViewportNode;
 
 export const screenUV = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.UV );
 export const screenSize = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.SIZE );
+export const screenCoordinate = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
 
-export const viewportCoordinate = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
 export const viewport = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
 
 export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
