@@ -51,13 +51,23 @@ class ScreenNode extends Node {
 
 	update( { renderer } ) {
 
+		const renderTarget = renderer.getRenderTarget();
+
 		if ( this.scope === ScreenNode.VIEWPORT ) {
 
-			renderer.getViewport( viewportResult );
+			if ( renderTarget !== null ) {
+
+				viewportResult.copy( renderTarget.viewport );
+
+			} else {
+
+				renderer.getViewport( viewportResult );
+
+				viewportResult.multiplyScalar( renderer.getPixelRatio() );
+
+			}
 
 		} else {
-
-			const renderTarget = renderer.getRenderTarget();
 
 			if ( renderTarget !== null ) {
 
