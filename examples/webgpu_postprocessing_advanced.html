@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { bloom, film, pass, sepia, color, bleach, viewportUV, uv, texture, float, dot, vec3, mix, saturation, gaussianBlur, luminance, vec2, uniform, depthPass, renderOutput, dotScreen } from 'three/tsl'; //sepia, vignette, colorify, bleachBypass, mask, gammaCorrect, horizontalBlur,
+			import { bloom, film, pass, sepia, color, bleach, hue, vibrance, viewportUV, uv, texture, float, dot, vec3, mix, saturation, gaussianBlur, luminance, vec2, uniform, depthPass, renderOutput, dotScreen } from 'three/tsl'; //sepia, vignette, colorify, bleachBypass, mask, gammaCorrect, horizontalBlur,
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -48,20 +48,19 @@
 			let halfWidth = width / 2;
 			let halfHeight = height / 2;
 
-			let quadBG, quadMask, renderScene;
-
-			const delta = 0.01;
+			let quadBG, quadMask;
 
 			const effectController = {
 				// Multiple screens
 				vignetteOffset: uniform( 0.95 ),
 				vignetteDarkness: uniform( 1.6 ),
-				filmIntensity: uniform( 0.9 ),
+				filmIntensity: uniform( 0.35 ),
 				// Screen 2
-				dotScreenAngle: uniform( 0.5 ),
-				dotScreenScale: uniform( 0.8 ),
-				backgroundColor: uniform( color( 0xffcccc ) ),
-				modelColor: uniform( color( 0xffbf7f ) ),
+				dotScreenAngle: 0.5,
+				dotScreenScale: 0.25,
+				modelColor: uniform( color( 0xffcccc ) ),
+				backgroundColor: uniform( color( 0xffbf7f ) ),
+				luminance: uniform( 1.0 ),
 				// Screen 4
 				bloomIntensity: uniform( 0.5 )
 			
@@ -149,16 +148,24 @@
 
 				// Calculations for all passes
 				const vignetteOffset = uv().sub( 0.5 ).mul( effectController.vignetteOffset );
-
-				const applyVignette = ( color ) =>mix( color, vec3( effectController.vignetteDarkness.oneMinus() ), dot( vignetteOffset, vignetteOffset ) );
+				const applyVignette = ( color ) => mix( color, vec3( effectController.vignetteDarkness.oneMinus() ), dot( vignetteOffset, vignetteOffset ) );
 
 				// Pass 1
 				post1.outputNode = applyVignette( film( saturation( postScene.outputNode, 0.0 ), effectController.filmIntensity ) );
 
 				// Pass 2
-				post2.outputNode = dotScreen( luminance( postScene.outputNode ).mul( color( 1.0, 0.8, 0.8 ) ) );
+				const dotScreenPass = dotScreen( postScene.outputNode, new THREE.Vector2( 0.5, 0.5 ), effectController.dotScreenAngle, effectController.dotScreenScale );
+				const maskModelPass = modelPass.a.mix( dotScreenPass, 0.0 );
+				const maskBackgroundPass = modelPass.a.mix( 0.0, dotScreenPass );
+				const post2BG = vibrance( luminance( maskModelPass, effectController.luminance ).mul( effectController.backgroundColor ), 0.15 );
+				const post2Model = vibrance( luminance( maskBackgroundPass, effectController.luminance ).mul( effectController.modelColor ), 0.3 );
+				const post2Combine = modelPass.a.mix( post2BG, post2Model );
+				post2.outputNode = post2Combine;
+
+				// Pass 3
 				post3.outputNode = applyVignette( film( sepia( postScene.outputNode ), effectController.filmIntensity ) );
-				post4.outputNode = backgroundPass;
+				// Pass 4
+				post4.outputNode = applyVignette( bleach( film( bloom( postScene.outputNode ), effectController.filmIntensity ) ) );
 
 
 				const gui = new GUI();
@@ -166,8 +173,19 @@
 				gui.add( effectController.vignetteOffset, 'value', 0.0, 1.0, 0.1 ).name( 'vignetteOffset' );
 				gui.add( effectController.filmIntensity, 'value', 0.0, 2.0, 0.01 ).name( 'filmIntensity' );
 				const compose2Folder = gui.addFolder( 'Window 2' );
-				compose2Folder.add( effectController.dotScreenAngle, 'value', 0.0, 2.0, 0.01 ).name( 'dotScreenAngle' );
-				compose2Folder.add( effectController.dotScreenScale, 'value', 0.0, 2.0, 0.01 ).name( 'dotScreenScale' );
+				compose2Folder.add( effectController, 'dotScreenAngle', 0.0, 2.0, 0.01 ).onChange( () => {
+
+					dotScreenPass.angle.value = effectController.dotScreenAngle;
+
+			
+				} );
+				compose2Folder.add( effectController, 'dotScreenScale', 0.0, 2.0, 0.01 ).onChange( () => {
+
+					dotScreenPass.scale.value = effectController.dotScreenScale;
+
+			
+				} );
+				compose2Folder.add( effectController.luminance, 'value', 0.0, 2.0, 0.01 ).name( 'luminance' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
