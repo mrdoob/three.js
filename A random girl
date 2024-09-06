@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Cartoon Girl</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Set up the scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Create a simple head (sphere)
+        const headGeometry = new THREE.SphereGeometry(1, 32, 32);
+        const headMaterial = new THREE.MeshBasicMaterial({ color: 0xffcc99 }); // Light skin color
+        const head = new THREE.Mesh(headGeometry, headMaterial);
+        head.position.y = 1.5;
+        scene.add(head);
+
+        // Create eyes (spheres)
+        const eyeGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+        const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff }); // White color
+        const eyeLeft = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        const eyeRight = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        eyeLeft.position.set(-0.4, 1.8, 1);
+        eyeRight.position.set(0.4, 1.8, 1);
+        scene.add(eyeLeft);
+        scene.add(eyeRight);
+
+        // Create hair (black cylinder)
+        const hairGeometry = new THREE.CylinderGeometry(1.2, 1.2, 0.5, 32);
+        const hairMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 }); // Black color
+        const hair = new THREE.Mesh(hairGeometry, hairMaterial);
+        hair.position.y = 2;
+        hair.rotation.x = Math.PI / 2;
+        scene.add(hair);
+
+        // Create body (cylinder)
+        const bodyGeometry = new THREE.CylinderGeometry(0.8, 0.8, 2, 32);
+        const bodyMaterial = new THREE.MeshBasicMaterial({ color: 0xFF69B4 }); // Simple color
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.position.y = 0;
+        scene.add(body);
+
+        // Set camera position
+        camera.position.z = 5;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
