@@ -37,7 +37,7 @@ class ViewportNode extends Node {
 
 		let updateType = NodeUpdateType.NONE;
 
-		if ( this.scope === ViewportNode.RESOLUTION || this.scope === ViewportNode.VIEWPORT ) {
+		if ( this.scope === ViewportNode.SIZE || this.scope === ViewportNode.VIEWPORT ) {
 
 			updateType = NodeUpdateType.RENDER;
 
@@ -80,7 +80,7 @@ class ViewportNode extends Node {
 
 		let output = null;
 
-		if ( scope === ViewportNode.RESOLUTION ) {
+		if ( scope === ViewportNode.SIZE ) {
 
 			output = uniform( resolution || ( resolution = new Vector2() ) );
 
@@ -90,7 +90,7 @@ class ViewportNode extends Node {
 
 		} else {
 
-			output = vec2( viewportCoordinate.div( viewportResolution ) );
+			output = vec2( viewportCoordinate.div( screenSize ) );
 
 		}
 
@@ -108,7 +108,7 @@ class ViewportNode extends Node {
 
 				// follow webgpu standards
 
-				const resolution = builder.getNodeProperties( viewportResolution ).outputNode.build( builder );
+				const resolution = builder.getNodeProperties( screenSize ).outputNode.build( builder );
 
 				coord = `${ builder.getType( 'vec2' ) }( ${ coord }.x, ${ resolution }.y - ${ coord }.y )`;
 
@@ -125,17 +125,25 @@ class ViewportNode extends Node {
 }
 
 ViewportNode.COORDINATE = 'coordinate';
-ViewportNode.RESOLUTION = 'resolution';
 ViewportNode.VIEWPORT = 'viewport';
+ViewportNode.SIZE = 'resolution';
 ViewportNode.UV = 'uv';
 
 export default ViewportNode;
 
 export const screenUV = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.UV );
+export const screenSize = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.SIZE );
 
 export const viewportCoordinate = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
-export const viewportResolution = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.RESOLUTION );
 export const viewport = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
+
+export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
+
+	console.warn( 'TSL.ViewportNode: "viewportResolution" is deprecated. Use "screenSize" instead.' );
+
+	return screenSize;
+
+}, 'vec2' ).once() )();
 
 export const viewportTopLeft = /*@__PURE__*/ ( Fn( () => { // @deprecated, r168
 
