@@ -157,8 +157,8 @@
 				const dotScreenPass = dotScreen( postScene.outputNode, new THREE.Vector2( 0.5, 0.5 ), effectController.dotScreenAngle, effectController.dotScreenScale );
 				const maskModelPass = modelPass.a.mix( dotScreenPass, 0.0 );
 				const maskBackgroundPass = modelPass.a.mix( 0.0, dotScreenPass );
-				const post2BG = vibrance( luminance( maskModelPass, effectController.luminance ).mul( effectController.backgroundColor ), 0.15 );
-				const post2Model = vibrance( luminance( maskBackgroundPass, effectController.luminance ).mul( effectController.modelColor ), 0.3 );
+				const post2BG = luminance( maskModelPass, effectController.luminance ).mul( effectController.backgroundColor );
+				const post2Model = luminance( maskBackgroundPass, effectController.luminance ).mul( effectController.modelColor );
 				const post2Combine = modelPass.a.mix( post2BG, post2Model );
 				post2.outputNode = post2Combine;
 
