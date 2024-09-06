@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, viewportUV } from 'three/tsl';
+			import { color, viewportUV, gaussianBlur, positionWorld, reflector } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -88,7 +88,7 @@
 			targetModel.scene.position.x += 1;
 
 			// hip offset
-			targetModel.scene.position.y -= 1;
+			targetModel.scene.position.y -= .6;
 
 			// remove pete's helmet, shield, and sword
 			targetModel.scene.remove( targetModel.scene.children[ 1 ] );
@@ -98,6 +98,22 @@
 			// retarget
 			const source = getSource( sourceModel );
 			const mixer = retargetModel( source, targetModel );
+
+			// floor
+			const reflection = reflector();
+			reflection.target.rotateX( - Math.PI / 2 );
+			scene.add( reflection.target );
+
+			const floorMaterial = new THREE.NodeMaterial();
+			floorMaterial.colorNode = reflection;
+			floorMaterial.opacity = .2;
+			floorMaterial.transparent = true;
+
+			const floor = new THREE.Mesh( new THREE.BoxGeometry( 50, .001, 50 ), floorMaterial );
+			floor.receiveShadow = true;
+
+			floor.position.set( 0, 0, 0 );
+			scene.add( floor );
 
 			// renderer
 			const renderer = new THREE.WebGPURenderer( { antialias: true } );
@@ -109,9 +125,7 @@
 
 			const controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 1, 0 );
-			controls.update();
-			controls.enablePan = true;
-			controls.enableDamping = true;
+			controls.maxPolarAngle = Math.PI / 2;
 
 			const gui = new GUI();
 			gui.add( helpers, 'visible' ).name( 'helpers' );
