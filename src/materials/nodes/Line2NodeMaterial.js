@@ -8,7 +8,7 @@ import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { mix, smoothstep } from '../../nodes/math/MathNode.js';
 import { Fn, varying, float, vec2, vec3, vec4, If } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
-import { viewport } from '../../nodes/display/ViewportNode.js';
+import { viewport } from '../../nodes/display/ScreenNode.js';
 import { dashSize, gapSize } from '../../nodes/core/PropertyNode.js';
 
 import { LineDashedMaterial } from '../LineDashedMaterial.js';

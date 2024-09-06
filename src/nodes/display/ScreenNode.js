@@ -151,6 +151,8 @@ export const screenCoordinate = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenN
 
 export const viewport = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.VIEWPORT );
 
+// Deprecated
+
 export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
 
 	console.warn( 'TSL.ViewportNode: "viewportResolution" is deprecated. Use "screenSize" instead.' );
