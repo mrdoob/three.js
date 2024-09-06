@@ -15,7 +15,7 @@
 			<br /> 
 			<div id="local_swap" style="
 				position: absolute;
-				top: 60px;
+				top: 150px;
 				left: 0;
 				padding: 10px;
 				background: rgba( 0, 0, 0, 0.5 );
@@ -28,7 +28,7 @@
 			"></div>
 			<div id="global_swap" style="
 			position: absolute;
-			top: 60px;
+			top: 150px;
 			right: 0;
 			padding: 10px;
 			background: rgba( 0, 0, 0, 0.5 );
@@ -54,7 +54,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { storageObject, If, vec3, uniform, uv, uint, float, Fn, vec2, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier } from 'three/tsl';
+			import { storageObject, If, vec3, not, uniform, uv, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -74,6 +74,10 @@
 				local_swap: document.getElementById( 'local_swap' ),
 				global_swap: document.getElementById( 'global_swap' )
 			};
+
+
+			const localColors = [ 'rgb(203, 64, 203)', 'rgb(0, 215, 215)' ];
+			const globalColors = [ 'rgb(1, 150, 1)', 'red' ];
 
 			// Total number of elements and the dimensions of the display grid.
 			const size = 16384;
@@ -423,22 +427,18 @@
 
 					const subtracter = float( colorChanger ).div( gridWidth.mul( gridHeight ) );
 
-					const color = vec3( 0.0 ).toVar();
+					const color = vec3( subtracter.oneMinus() ).toVar();
 
-					If( highlight.equal( 1 ), () => {
+					If( highlight.equal( 1 ).and( not( nextAlgoStorage.element( 0 ).equal( StepType.NONE ) ) ), () => {
 
-						const boolCheck = elementIndex.modInt( nextBlockHeightRead.element( 0 ) ).lessThan( nextBlockHeightRead.element( 0 ).div( 2 ) );
+						const boolCheck = int( elementIndex.modInt( nextBlockHeightRead.element( 0 ) ).lessThan( nextBlockHeightRead.element( 0 ).div( 2 ) ) );
+						color.z.assign( nextAlgoStorage.element( 0 ).lessThanEqual( StepType.DISPERSE_LOCAL ) );
+						color.x.mulAssign( boolCheck );
+						color.y.mulAssign( abs( boolCheck.sub( 1 ) ) );
 
-						color.assign( boolCheck.select( vec3( subtracter.oneMinus(), 0.0, 0.0 ), vec3( 0.0, subtracter.oneMinus(), 0.0 ) ) );
-
-					} ).Else( () => {
-
-						color.assign( vec3( subtracter.oneMinus() ) );
-			
 					} );
 
 					return color;
-
 
 				} );
 
@@ -516,7 +516,13 @@
 
 					timestamps[ forceGlobalSwap ? 'global_swap' : 'local_swap' ].innerHTML = `
 
-							Compute ${forceGlobalSwap ? 'Global' : 'Local'}: ${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>`;
+							Compute ${forceGlobalSwap ? 'Global' : 'Local'}: ${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
+								<div style="display: flex; flex-direction:row; justify-content: center; align-items: center;">
+									${forceGlobalSwap ? 'Global Swaps' : 'Local Swaps'} Compare Region&nbsp;
+									<div style="background-color: ${ forceGlobalSwap ? globalColors[ 0 ] : localColors[ 0 ]}; width:12.5px; height: 1em; border-radius: 20%;"></div>
+									&nbsp;to Region&nbsp;
+									<div style="background-color: ${ forceGlobalSwap ? globalColors[ 1 ] : localColors[ 1 ]}; width:12.5px; height: 1em; border-radius: 20%;"></div>
+								</div>`;
 			
 
 					if ( currentStep === MAX_STEPS ) {
