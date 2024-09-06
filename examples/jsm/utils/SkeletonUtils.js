@@ -12,17 +12,17 @@ import {
 
 function retarget( target, source, options = {} ) {
 
-	const pos = new Vector3(),
-		quat = new Quaternion(),
+	const quat = new Quaternion(),
 		scale = new Vector3(),
 		relativeMatrix = new Matrix4(),
 		globalMatrix = new Matrix4();
 
-	options.preserveMatrix = options.preserveMatrix !== undefined ? options.preserveMatrix : true;
-	options.preservePosition = options.preservePosition !== undefined ? options.preservePosition : true;
+	options.preserveBoneMatrix = options.preserveBoneMatrix !== undefined ? options.preserveBoneMatrix : true;
+	options.preserveBonePositions = options.preserveBonePositions !== undefined ? options.preserveBonePositions : true;
 	options.preserveHipPosition = options.preserveHipPosition !== undefined ? options.preserveHipPosition : false;
 	options.useTargetMatrix = options.useTargetMatrix !== undefined ? options.useTargetMatrix : false;
 	options.hip = options.hip !== undefined ? options.hip : 'hip';
+	options.scale = options.scale !== undefined ? options.scale : 1;
 	options.names = options.names || {};
 
 	const sourceBones = source.isObject3D ? source.skeleton.bones : getBones( source ),
@@ -40,11 +40,11 @@ function retarget( target, source, options = {} ) {
 	} else {
 
 		options.useTargetMatrix = true;
-		options.preserveMatrix = false;
+		options.preserveBoneMatrix = false;
 
 	}
 
-	if ( options.preservePosition ) {
+	if ( options.preserveBonePositions ) {
 
 		bonesPosition = [];
 
@@ -56,7 +56,7 @@ function retarget( target, source, options = {} ) {
 
 	}
 
-	if ( options.preserveMatrix ) {
+	if ( options.preserveBoneMatrix ) {
 
 		// reset matrix
 
@@ -109,11 +109,11 @@ function retarget( target, source, options = {} ) {
 
 			if ( target.isObject3D ) {
 
-				if ( options.offsets ) {
+				if ( options.localOffsets ) {
 
-					if ( options.offsets[ bone.name ] ) {
+					if ( options.localOffsets[ bone.name ] ) {
 
-						globalMatrix.multiply( options.offsets[ bone.name ] );
+						globalMatrix.multiply( options.localOffsets[ bone.name ] );
 
 					}
 
@@ -122,6 +122,20 @@ function retarget( target, source, options = {} ) {
 			}
 
 			globalMatrix.copyPosition( relativeMatrix );
+
+		}
+
+		if ( name === options.hip ) {
+
+			globalMatrix.elements[ 12 ] *= options.scale;
+			globalMatrix.elements[ 13 ] *= options.scale;
+			globalMatrix.elements[ 14 ] *= options.scale;
+
+			if ( options.preserveHipPosition ) {
+
+				globalMatrix.elements[ 12 ] = globalMatrix.elements[ 14 ] = 0;
+
+			}
 
 		}
 
@@ -136,19 +150,13 @@ function retarget( target, source, options = {} ) {
 
 		}
 
-		if ( options.preserveHipPosition && name === options.hip ) {
-
-			bone.matrix.setPosition( pos.set( 0, bone.position.y, 0 ) );
-
-		}
-
 		bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
 
 		bone.updateMatrixWorld();
 
 	}
 
-	if ( options.preservePosition ) {
+	if ( options.preserveBonePositions ) {
 
 		for ( let i = 0; i < bones.length; ++ i ) {
 
@@ -165,7 +173,7 @@ function retarget( target, source, options = {} ) {
 
 	}
 
-	if ( options.preserveMatrix ) {
+	if ( options.preserveBoneMatrix ) {
 
 		// restore matrix
 
