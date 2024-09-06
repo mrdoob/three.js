@@ -1,4 +1,5 @@
-import { Vector3, Vector4 } from './Vector3.js';
+import { Vector3 } from './Vector3.js';
+import { Vector4 } from './Vector4.js';
 
 const _v0 = /*@__PURE__*/ new Vector3();
 const _v1 = /*@__PURE__*/ new Vector3();
