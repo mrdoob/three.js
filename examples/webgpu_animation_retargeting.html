@@ -132,8 +132,6 @@
 
 				const clip = sourceModel.animations[ 0 ]
 
-				const sourceSkin = sourceModel.scene.children[ 0 ].children[ 0 ];
-
 				const helper = new THREE.SkeletonHelper( sourceModel.scene );
 				helpers.add( helper );
 
@@ -142,7 +140,7 @@
 				const mixer = new THREE.AnimationMixer( sourceModel.scene );
 				mixer.clipAction( sourceModel.animations[ 0 ] ).play();
 
-				return { clip, helper, skeleton, mixer };
+				return { clip, skeleton, mixer };
 
 			}
 
