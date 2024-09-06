@@ -1,6 +1,6 @@
 import ViewportTextureNode from './ViewportTextureNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
-import { screenUV } from './ViewportNode.js';
+import { screenUV } from './ScreenNode.js';
 
 import { DepthTexture } from '../../textures/DepthTexture.js';
 

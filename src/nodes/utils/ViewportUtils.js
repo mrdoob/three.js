@@ -1,5 +1,5 @@
 import { Fn } from '../tsl/TSLBase.js';
-import { screenUV } from '../display/ViewportNode.js';
+import { screenUV } from '../display/ScreenNode.js';
 import { viewportDepthTexture } from '../display/ViewportDepthTextureNode.js';
 import { linearDepth } from '../display/ViewportDepthNode.js';
 

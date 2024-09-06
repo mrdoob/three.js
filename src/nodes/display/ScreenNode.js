@@ -8,11 +8,11 @@ import { Vector4 } from '../../math/Vector4.js';
 
 let resolution, viewportResult;
 
-class ViewportNode extends Node {
+class ScreenNode extends Node {
 
 	static get type() {
 
-		return 'ViewportNode';
+		return 'ScreenNode';
 
 	}
 
@@ -28,7 +28,7 @@ class ViewportNode extends Node {
 
 	getNodeType() {
 
-		if ( this.scope === ViewportNode.VIEWPORT ) return 'vec4';
+		if ( this.scope === ScreenNode.VIEWPORT ) return 'vec4';
 		else return 'vec2';
 
 	}
@@ -37,7 +37,7 @@ class ViewportNode extends Node {
 
 		let updateType = NodeUpdateType.NONE;
 
-		if ( this.scope === ViewportNode.SIZE || this.scope === ViewportNode.VIEWPORT ) {
+		if ( this.scope === ScreenNode.SIZE || this.scope === ScreenNode.VIEWPORT ) {
 
 			updateType = NodeUpdateType.RENDER;
 
@@ -51,7 +51,7 @@ class ViewportNode extends Node {
 
 	update( { renderer } ) {
 
-		if ( this.scope === ViewportNode.VIEWPORT ) {
+		if ( this.scope === ScreenNode.VIEWPORT ) {
 
 			renderer.getViewport( viewportResult );
 
@@ -80,11 +80,11 @@ class ViewportNode extends Node {
 
 		let output = null;
 
-		if ( scope === ViewportNode.SIZE ) {
+		if ( scope === ScreenNode.SIZE ) {
 
 			output = uniform( resolution || ( resolution = new Vector2() ) );
 
-		} else if ( scope === ViewportNode.VIEWPORT ) {
+		} else if ( scope === ScreenNode.VIEWPORT ) {
 
 			output = uniform( viewportResult || ( viewportResult = new Vector4() ) );
 
@@ -100,7 +100,7 @@ class ViewportNode extends Node {
 
 	generate( builder ) {
 
-		if ( this.scope === ViewportNode.COORDINATE ) {
+		if ( this.scope === ScreenNode.COORDINATE ) {
 
 			let coord = builder.getFragCoord();
 
@@ -124,18 +124,22 @@ class ViewportNode extends Node {
 
 }
 
-ViewportNode.COORDINATE = 'coordinate';
-ViewportNode.VIEWPORT = 'viewport';
-ViewportNode.SIZE = 'resolution';
-ViewportNode.UV = 'uv';
+ScreenNode.COORDINATE = 'coordinate';
+ScreenNode.VIEWPORT = 'viewport';
+ScreenNode.SIZE = 'resolution';
+ScreenNode.UV = 'uv';
 
-export default ViewportNode;
+export default ScreenNode;
 
-export const screenUV = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.UV );
-export const screenSize = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.SIZE );
-export const screenCoordinate = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.COORDINATE );
+// Screen
 
-export const viewport = /*@__PURE__*/ nodeImmutable( ViewportNode, ViewportNode.VIEWPORT );
+export const screenUV = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.UV );
+export const screenSize = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.SIZE );
+export const screenCoordinate = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.COORDINATE );
+
+// Viewport
+
+export const viewport = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.VIEWPORT );
 
 export const viewportResolution = /*@__PURE__*/ ( Fn( () => { // @deprecated, r169
 

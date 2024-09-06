@@ -1,7 +1,7 @@
 import { Fn, If, nodeObject, vec4 } from '../tsl/TSLBase.js';
 import { uv } from '../accessors/UV.js';
 import { mod } from '../math/MathNode.js';
-import { screenCoordinate } from './ViewportNode.js';
+import { screenCoordinate } from './ScreenNode.js';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 

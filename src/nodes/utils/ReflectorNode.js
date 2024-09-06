@@ -1,7 +1,7 @@
 import TextureNode from '../accessors/TextureNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { screenUV } from '../display/ViewportNode.js';
+import { screenUV } from '../display/ScreenNode.js';
 
 import { HalfFloatType, LinearMipMapLinearFilter } from '../../constants.js';
 import { Plane } from '../../math/Plane.js';

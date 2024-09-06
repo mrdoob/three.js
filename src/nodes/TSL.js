@@ -90,7 +90,7 @@ export * from './display/FrontFacingNode.js';
 export * from './display/NormalMapNode.js';
 export * from './display/PosterizeNode.js';
 export * from './display/ToneMappingNode.js';
-export * from './display/ViewportNode.js';
+export * from './display/ScreenNode.js';
 export * from './display/ViewportTextureNode.js';
 export * from './display/ViewportSharedTextureNode.js';
 export * from './display/ViewportDepthTextureNode.js';

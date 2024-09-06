@@ -13,7 +13,7 @@ import { DepthTexture } from '../../textures/DepthTexture.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
-import { screenCoordinate } from '../display/ViewportNode.js';
+import { screenCoordinate } from '../display/ScreenNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {

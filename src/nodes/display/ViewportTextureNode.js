@@ -1,7 +1,7 @@
 import TextureNode from '../accessors/TextureNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
-import { screenUV } from './ViewportNode.js';
+import { screenUV } from './ScreenNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
