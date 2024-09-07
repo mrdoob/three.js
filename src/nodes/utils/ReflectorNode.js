@@ -1,7 +1,7 @@
 import TextureNode from '../accessors/TextureNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
-import { viewportUV } from '../display/ViewportNode.js';
+import { screenUV } from '../display/ScreenNode.js';
 
 import { HalfFloatType, LinearMipMapLinearFilter } from '../../constants.js';
 import { Plane } from '../../math/Plane.js';
@@ -27,7 +27,7 @@ const _q = new Vector4();
 const _size = new Vector2();
 
 const _defaultRT = new RenderTarget();
-const _defaultUV = viewportUV.flipX();
+const _defaultUV = screenUV.flipX();
 
 let _inReflector = false;
 

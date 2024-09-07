@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, cubeTexture, viewportUV, grayscale, uniform, anamorphic } from 'three/tsl';
+			import { pass, cubeTexture, screenUV, grayscale, uniform, anamorphic } from 'three/tsl';
 
 			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
 
@@ -58,7 +58,7 @@
 					.loadCubemapAsync( rgbmUrls );
 
 				scene.environment = cube1Texture;
-				scene.backgroundNode = grayscale( cubeTexture( cube1Texture ).mul( viewportUV.distance( .5 ).oneMinus().remapClamp( .1, 4 ) ) );
+				scene.backgroundNode = grayscale( cubeTexture( cube1Texture ).mul( screenUV.distance( .5 ).oneMinus().remapClamp( .1, 4 ) ) );
 
 				const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 				loader.load( 'DamagedHelmet.gltf', function ( gltf ) {

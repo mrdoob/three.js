@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, viewportUV, reflector } from 'three/tsl';
+			import { color, screenUV, hue, timerLocal, reflector } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -59,7 +59,7 @@
 
 			// scene
 			const scene = new THREE.Scene();
-			scene.backgroundNode = viewportUV.distance( .5 ).mix( color( 0x0175ad ), color( 0x02274f ) );
+			scene.backgroundNode = screenUV.distance( .5 ).mix( hue( color( 0x0175ad ), timerLocal( .1 ) ), hue( color( 0x02274f ), timerLocal( .5 ) ) );
 
 			const helpers = new THREE.Group();
 			helpers.visible = false;

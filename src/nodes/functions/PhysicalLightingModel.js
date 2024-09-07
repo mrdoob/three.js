@@ -16,7 +16,7 @@ import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } fr
 import { div } from '../math/OperatorNode.js';
 import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/Camera.js';
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
-import { viewportResolution } from '../display/ViewportNode.js';
+import { screenSize } from '../display/ScreenNode.js';
 import { viewportMipTexture } from '../display/ViewportTextureNode.js';
 import { textureBicubic } from '../accessors/TextureBicubic.js';
 import { Loop } from '../utils/LoopNode.js';
@@ -74,7 +74,7 @@ const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ] 
 	const transmissionSample = singleViewportMipTexture.uv( fragCoord );
 	//const transmissionSample = viewportMipTexture( fragCoord );
 
-	const lod = log2( float( viewportResolution.x ) ).mul( applyIorToRoughness( roughness, ior ) );
+	const lod = log2( float( screenSize.x ) ).mul( applyIorToRoughness( roughness, ior ) );
 
 	return textureBicubic( transmissionSample, lod );
 

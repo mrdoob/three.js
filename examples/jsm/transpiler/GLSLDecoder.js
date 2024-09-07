@@ -226,7 +226,7 @@ class GLSLDecoder {
 
 		this._currentFunction = null;
 
-		this.addPolyfill( 'gl_FragCoord', 'vec3 gl_FragCoord = vec3( viewportCoordinate.x, viewportCoordinate.y.oneMinus(), viewportCoordinate.z );' );
+		this.addPolyfill( 'gl_FragCoord', 'vec3 gl_FragCoord = vec3( screenCoordinate.x, screenCoordinate.y.oneMinus(), screenCoordinate.z );' );
 
 	}
 

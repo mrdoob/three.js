@@ -1,7 +1,7 @@
 import { Fn, If, nodeObject, vec4 } from '../tsl/TSLBase.js';
 import { uv } from '../accessors/UV.js';
 import { mod } from '../math/MathNode.js';
-import { viewportCoordinate } from './ViewportNode.js';
+import { screenCoordinate } from './ScreenNode.js';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
@@ -29,7 +29,7 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 			const color = vec4().toVar();
 
-			If( mod( viewportCoordinate.y, 2 ).greaterThan( 1 ), () => {
+			If( mod( screenCoordinate.y, 2 ).greaterThan( 1 ), () => {
 
 				color.assign( this._mapLeft.uv( uvNode ) );
 
