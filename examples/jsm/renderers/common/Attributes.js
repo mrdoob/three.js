@@ -50,7 +50,7 @@ class Attributes extends DataMap {
 
 			const bufferAttribute = this._getBufferAttribute( attribute );
 
-			if ( data.version < bufferAttribute.version || bufferAttribute.usage === DynamicDrawUsage ) {
+			if ( data.version <= bufferAttribute.version || bufferAttribute.usage === DynamicDrawUsage ) {
 
 				this.backend.updateAttribute( attribute );
 

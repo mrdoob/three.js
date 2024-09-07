@@ -7186,6 +7186,7 @@ class Object3D extends EventDispatcher {
 		this.animations = [];
 
 		this.userData = {};
+		this.position = null;
 
 	}
 
