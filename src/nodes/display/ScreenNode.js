@@ -6,7 +6,7 @@ import { Fn, nodeImmutable, vec2 } from '../tsl/TSLBase.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 
-let resolution, viewportResult;
+let screenSizeVec, viewportVec;
 
 class ScreenNode extends Node {
 
@@ -57,13 +57,13 @@ class ScreenNode extends Node {
 
 			if ( renderTarget !== null ) {
 
-				viewportResult.copy( renderTarget.viewport );
+				viewportVec.copy( renderTarget.viewport );
 
 			} else {
 
-				renderer.getViewport( viewportResult );
+				renderer.getViewport( viewportVec );
 
-				viewportResult.multiplyScalar( renderer.getPixelRatio() );
+				viewportVec.multiplyScalar( renderer.getPixelRatio() );
 
 			}
 
@@ -71,12 +71,12 @@ class ScreenNode extends Node {
 
 			if ( renderTarget !== null ) {
 
-				resolution.width = renderTarget.width;
-				resolution.height = renderTarget.height;
+				screenSizeVec.width = renderTarget.width;
+				screenSizeVec.height = renderTarget.height;
 
 			} else {
 
-				renderer.getDrawingBufferSize( resolution );
+				renderer.getDrawingBufferSize( screenSizeVec );
 
 			}
 
@@ -92,11 +92,11 @@ class ScreenNode extends Node {
 
 		if ( scope === ScreenNode.SIZE ) {
 
-			output = uniform( resolution || ( resolution = new Vector2() ) );
+			output = uniform( screenSizeVec || ( screenSizeVec = new Vector2() ) );
 
 		} else if ( scope === ScreenNode.VIEWPORT ) {
 
-			output = uniform( viewportResult || ( viewportResult = new Vector4() ) );
+			output = uniform( viewportVec || ( viewportVec = new Vector4() ) );
 
 		} else {
 
