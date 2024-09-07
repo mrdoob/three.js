@@ -118,9 +118,9 @@ class ScreenNode extends Node {
 
 				// follow webgpu standards
 
-				const resolution = builder.getNodeProperties( screenSize ).outputNode.build( builder );
+				const size = builder.getNodeProperties( screenSize ).outputNode.build( builder );
 
-				coord = `${ builder.getType( 'vec2' ) }( ${ coord }.x, ${ resolution }.y - ${ coord }.y )`;
+				coord = `${ builder.getType( 'vec2' ) }( ${ coord }.x, ${ size }.y - ${ coord }.y )`;
 
 			}
 

@@ -141,7 +141,7 @@ const VSMShadowMapNode = Fn( ( { depthTexture, shadowCoord } ) => {
 
 } );
 
-const VSMPassVertical = Fn( ( { samples, radius, resolution, shadowPass } ) => {
+const VSMPassVertical = Fn( ( { samples, radius, size, shadowPass } ) => {
 
 	const mean = float( 0 ).toVar();
 	const squaredMean = float( 0 ).toVar();
@@ -153,7 +153,7 @@ const VSMPassVertical = Fn( ( { samples, radius, resolution, shadowPass } ) => {
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		const depth = shadowPass.uv( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( resolution ) ).x;
+		const depth = shadowPass.uv( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) ).x;
 		mean.addAssign( depth );
 		squaredMean.addAssign( depth.mul( depth ) );
 
@@ -167,7 +167,7 @@ const VSMPassVertical = Fn( ( { samples, radius, resolution, shadowPass } ) => {
 
 } );
 
-const VSMPassHorizontal = Fn( ( { samples, radius, resolution, shadowPass } ) => {
+const VSMPassHorizontal = Fn( ( { samples, radius, size, shadowPass } ) => {
 
 	const mean = float( 0 ).toVar();
 	const squaredMean = float( 0 ).toVar();
@@ -179,7 +179,7 @@ const VSMPassHorizontal = Fn( ( { samples, radius, resolution, shadowPass } ) =>
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		const distribution = shadowPass.uv( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( resolution ) );
+		const distribution = shadowPass.uv( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
 		mean.addAssign( distribution.x );
 		squaredMean.addAssign( add( distribution.y.mul( distribution.y ), distribution.x.mul( distribution.x ) ) );
 
@@ -289,14 +289,14 @@ class AnalyticLightNode extends LightingNode {
 
 				const samples = reference( 'blurSamples', 'float', shadow );
 				const radius = reference( 'radius', 'float', shadow );
-				const resolution = reference( 'mapSize', 'vec2', shadow );
+				const size = reference( 'mapSize', 'vec2', shadow );
 
 				let material = this.vsmMaterialVertical || ( this.vsmMaterialVertical = new NodeMaterial() );
-				material.fragmentNode = VSMPassVertical( { samples, radius, resolution, shadowPass: shadowPassVertical } ).context( builder.getSharedContext() );
+				material.fragmentNode = VSMPassVertical( { samples, radius, size, shadowPass: shadowPassVertical } ).context( builder.getSharedContext() );
 				material.name = 'VSMVertical';
 
 				material = this.vsmMaterialHorizontal || ( this.vsmMaterialHorizontal = new NodeMaterial() );
-				material.fragmentNode = VSMPassHorizontal( { samples, radius, resolution, shadowPass: shadowPassHorizontal } ).context( builder.getSharedContext() );
+				material.fragmentNode = VSMPassHorizontal( { samples, radius, size, shadowPass: shadowPassHorizontal } ).context( builder.getSharedContext() );
 				material.name = 'VSMHorizontal';
 
 			}
