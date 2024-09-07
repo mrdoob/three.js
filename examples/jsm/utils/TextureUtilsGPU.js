@@ -13,7 +13,7 @@ export async function decompress( blitTexture, maxTextureSize = Infinity, render
 
 	if ( renderer === null ) {
 
-		renderer = _renderer = new WebGPURenderer( { antialias: false } );
+		renderer = _renderer = new WebGPURenderer();
 		await renderer.init();
 
 	}
