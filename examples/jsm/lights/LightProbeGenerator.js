@@ -8,7 +8,7 @@ import {
 	NoColorSpace,
 	HalfFloatType,
 	DataUtils,
-	WebGPUCoordinateSystem
+	WebGLCoordinateSystem
 } from 'three';
 
 class LightProbeGenerator {
@@ -129,16 +129,7 @@ class LightProbeGenerator {
 
 	static async fromCubeRenderTarget( renderer, cubeRenderTarget ) {
 
-		let useAsync = false;
-		let flip = - 1;
-
-		if ( renderer.isWebGPURenderer ) {
-
-			useAsync = true;
-
-			if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) flip = 1;
-
-		}
+		const flip = renderer.coordinateSystem === WebGLCoordinateSystem ? -1 : 1;
 
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		let totalWeight = 0;
@@ -159,7 +150,7 @@ class LightProbeGenerator {
 
 		let data;
 
-		if ( ! useAsync ) {
+		if ( renderer.isWebGLRenderer ) {
 
 			if ( dataType === HalfFloatType ) {
 
@@ -177,13 +168,13 @@ class LightProbeGenerator {
 
 		for ( let faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
 
-			if ( useAsync ) {
+			if ( renderer.isWebGLRenderer ) {
 
-				data = await renderer.readRenderTargetPixelsAsync( cubeRenderTarget, 0, 0, imageWidth, imageWidth, 0, faceIndex );
+				await renderer.readRenderTargetPixelsAsync( cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
 
 			} else {
 
-				await renderer.readRenderTargetPixelsAsync( cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
+				data = await renderer.readRenderTargetPixelsAsync( cubeRenderTarget, 0, 0, imageWidth, imageWidth, 0, faceIndex );
 
 			}
 
