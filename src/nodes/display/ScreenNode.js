@@ -136,7 +136,7 @@ class ScreenNode extends Node {
 
 ScreenNode.COORDINATE = 'coordinate';
 ScreenNode.VIEWPORT = 'viewport';
-ScreenNode.SIZE = 'resolution';
+ScreenNode.SIZE = 'size';
 ScreenNode.UV = 'uv';
 
 export default ScreenNode;
@@ -150,7 +150,7 @@ export const screenCoordinate = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenN
 // Viewport
 
 export const viewport = /*@__PURE__*/ nodeImmutable( ScreenNode, ScreenNode.VIEWPORT );
-export const viewportSize = /*@__PURE__*/ viewport.zw;
+export const viewportSize = viewport.zw;
 export const viewportCoordinate = /*@__PURE__*/ screenCoordinate.sub( viewport.xy );
 export const viewportUV = /*@__PURE__*/ viewportCoordinate.div( viewportSize );
 
