@@ -203,6 +203,8 @@ export default class RenderObject {
 
 		drawParams.instanceCount = instanceCount;
 
+		if ( object.isBatchedMesh === true ) return drawParams;
+
 		let rangeFactor = 1;
 
 		if ( material.wireframe === true && ! object.isPoints && ! object.isLineSegments && ! object.isLine && ! object.isLineLoop ) {
@@ -221,18 +223,14 @@ export default class RenderObject {
 
 		}
 
-
-		firstVertex = Math.max( firstVertex, 0 );
-
-		if ( object.isBatchedMesh === true ) return drawParams;
-
 		const itemCount = hasIndex === true ? index.count : geometry.attributes.position.count;
 
+		firstVertex = Math.max( firstVertex, 0 );
 		lastVertex = Math.min( lastVertex, itemCount );
 
 		const count = lastVertex - firstVertex;
 
-		if ( count < 0 || count === Infinity ) null;
+		if ( count < 0 || count === Infinity ) return null;
 
 		drawParams.vertexCount = count;
 		drawParams.firstVertex = firstVertex;
