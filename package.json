@@ -65,7 +65,8 @@
     "test-e2e-webgpu": "node test/e2e/puppeteer.js --webgpu",
     "test-treeshake": "rollup -c test/rollup.treeshake.config.js",
     "test-circular-deps": "dpdm --no-warning --no-tree --exit-code circular:1 src/nodes/Nodes.js",
-    "make-screenshot": "node test/e2e/puppeteer.js --make"
+    "make-screenshot": "node test/e2e/puppeteer.js --make",
+    "build-types": "tsc"
   },
   "keywords": [
     "three",
@@ -109,7 +110,8 @@
     "rollup": "^4.6.0",
     "rollup-plugin-filesize": "^10.0.0",
     "rollup-plugin-visualizer": "^5.9.0",
-    "servez": "^2.0.0"
+    "servez": "^2.0.0",
+    "typescript": "~5.5.4"
   },
   "overrides": {
     "jpeg-js": "^0.4.4"
