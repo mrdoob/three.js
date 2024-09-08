@@ -418,6 +418,7 @@ class Renderer {
 		const renderBundle = this._bundles.get( bundleGroup, camera );
 		const renderBundleData = this.backend.get( renderBundle );
 
+
 		if ( renderBundleData.renderContexts === undefined ) renderBundleData.renderContexts = new Set();
 
 		//
@@ -428,7 +429,11 @@ class Renderer {
 
 		if ( renderBundleNeedsUpdate ) {
 
-			this.backend.beginBundle( renderContext );
+			const opaqueObjects = renderList.opaque;
+
+			renderBundle.size = opaqueObjects.length;
+
+			this.backend.beginBundle( renderContext, renderBundle );
 
 			if ( renderBundleData.renderObjects === undefined || bundleGroup.needsUpdate === true ) {
 
@@ -438,9 +443,7 @@ class Renderer {
 
 			this._currentRenderBundle = renderBundle;
 
-			const opaqueObjects = renderList.opaque;
-
-			if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+			if ( renderBundle.size > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 
 			this._currentRenderBundle = null;
 
@@ -457,6 +460,8 @@ class Renderer {
 			for ( let i = 0, l = renderObjects.length; i < l; i ++ ) {
 
 				const renderObject = renderObjects[ i ];
+
+				this.backend.updateIndirect( renderObject, renderBundle, i );
 
 				this._nodes.updateBefore( renderObject );
 
@@ -1586,10 +1591,14 @@ class Renderer {
 			const renderBundleData = this.backend.get( this._currentRenderBundle );
 
 			renderBundleData.renderObjects.push( renderObject );
+			this.backend.drawIndirect( renderObject, renderBundleData.renderObjects.length - 1 );
+
+		} else {
+
+			this.backend.draw( renderObject, this.info );
 
 		}
 
-		this.backend.draw( renderObject, this.info );
 
 		this._nodes.updateAfter( renderObject );
 

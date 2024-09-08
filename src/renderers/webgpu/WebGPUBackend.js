@@ -825,8 +825,6 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	// render object
-
 	draw( renderObject, info ) {
 
 		const { object, context, pipeline } = renderObject;
@@ -835,6 +833,7 @@ class WebGPUBackend extends Backend {
 		const pipelineGPU = this.get( pipeline ).pipeline;
 		const currentSets = renderContextData.currentSets;
 		const passEncoderGPU = renderContextData.currentPass;
+		const indirectBuffer = currentSets.indirectBuffer;
 
 		const drawParms = renderObject.getDrawParameters();
 
@@ -975,6 +974,186 @@ class WebGPUBackend extends Backend {
 			info.update( object, vertexCount, instanceCount );
 
 		}
+
+	}
+
+	drawIndirect( renderObject, offset ) {
+
+		const { object, context, pipeline } = renderObject;
+		const bindings = renderObject.getBindings();
+		const renderContextData = this.get( context );
+		const pipelineGPU = this.get( pipeline ).pipeline;
+		const currentSets = renderContextData.currentSets;
+		const passEncoderGPU = renderContextData.currentPass;
+		const indirectBuffer = currentSets.indirectBuffer;
+		const indirectOffset = offset * 4 * 5;
+
+		// pipeline
+
+		if ( currentSets.pipeline !== pipelineGPU ) {
+
+			passEncoderGPU.setPipeline( pipelineGPU );
+
+			currentSets.pipeline = pipelineGPU;
+
+		}
+
+		// bind groups
+
+		const currentBindingGroups = currentSets.bindingGroups;
+
+		for ( let i = 0, l = bindings.length; i < l; i ++ ) {
+
+			const bindGroup = bindings[ i ];
+			const bindingsData = this.get( bindGroup );
+
+			if ( currentBindingGroups[ bindGroup.index ] !== bindGroup.id ) {
+
+				passEncoderGPU.setBindGroup( bindGroup.index, bindingsData.group );
+				currentBindingGroups[ bindGroup.index ] = bindGroup.id;
+
+			}
+
+		}
+
+		// attributes
+
+		const index = renderObject.getIndex();
+
+		const hasIndex = ( index !== null );
+
+		// index
+
+		if ( hasIndex === true ) {
+
+			if ( currentSets.index !== index ) {
+
+				const buffer = this.get( index ).buffer;
+				const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
+
+				passEncoderGPU.setIndexBuffer( buffer, indexFormat );
+
+				currentSets.index = index;
+
+			}
+
+		}
+
+		// vertex buffers
+
+		const vertexBuffers = renderObject.getVertexBuffers();
+
+		for ( let i = 0, l = vertexBuffers.length; i < l; i ++ ) {
+
+			const vertexBuffer = vertexBuffers[ i ];
+
+			if ( currentSets.attributes[ i ] !== vertexBuffer ) {
+
+				const buffer = this.get( vertexBuffer ).buffer;
+				passEncoderGPU.setVertexBuffer( i, buffer );
+
+				currentSets.attributes[ i ] = vertexBuffer;
+
+			}
+
+		}
+
+		// occlusion queries - handle multiple consecutive draw calls for an object
+
+		if ( renderContextData.occlusionQuerySet !== undefined ) {
+
+			const lastObject = renderContextData.lastOcclusionObject;
+
+			if ( lastObject !== object ) {
+
+				if ( lastObject !== null && lastObject.occlusionTest === true ) {
+
+					passEncoderGPU.endOcclusionQuery();
+					renderContextData.occlusionQueryIndex ++;
+
+				}
+
+				if ( object.occlusionTest === true ) {
+
+					passEncoderGPU.beginOcclusionQuery( renderContextData.occlusionQueryIndex );
+					renderContextData.occlusionQueryObjects[ renderContextData.occlusionQueryIndex ] = object;
+
+				}
+
+				renderContextData.lastOcclusionObject = object;
+
+			}
+
+		}
+
+		// draw
+
+		if ( object.isBatchedMesh === true ) {
+
+			const drawCount = object._multiDrawCount;
+
+			for ( let i = 0; i < drawCount; i ++ ) {
+				// FIXME offset
+				passEncoderGPU.drawIndexedIndirect( indirectBuffer, indirectOffset );
+
+			}
+
+		} else if ( hasIndex === true ) {
+
+			passEncoderGPU.drawIndexedIndirect( indirectBuffer, indirectOffset );
+
+		} else {
+
+			passEncoderGPU.drawIndirect( indirectBuffer, indirectOffset );
+
+		}
+
+	}
+
+	updateIndirect( renderObject, bundle, offset ) {
+
+		const { object } = renderObject;
+		const buffer = this.get( bundle ).buffer.subarray( offset * 5, offset * 5 + 5 );
+
+
+		const drawParms = renderObject.getDrawParameters();
+
+		if ( drawParms === null ) return;
+
+
+		if ( object.isBatchedMesh === true ) {
+
+			const starts = object._multiDrawStarts;
+			const counts = object._multiDrawCounts;
+			const drawCount = object._multiDrawCount;
+			const drawInstances = object._multiDrawInstances;
+
+			const bytesPerElement = hasIndex ? index.array.BYTES_PER_ELEMENT : 1;
+
+			for ( let i = 0; i < drawCount; i ++ ) {
+
+				const count = drawInstances ? drawInstances[ i ] : 1;
+				const firstInstance = count > 1 ? 0 : i;
+
+				buffer[ 0 ] = counts[ i ];
+				buffer[ 1 ] = count;
+				buffer[ 2 ] = starts[ i ] / bytesPerElement;
+				buffer[ 3 ] = 0;
+				buffer[ 4 ] = firstInstance;
+
+			}
+
+			return;
+
+		}
+
+		const { vertexCount, firstVertex, instanceCount } = drawParms;
+
+		buffer[ 0 ] = vertexCount;
+		buffer[ 1 ] = instanceCount;
+		buffer[ 2 ] = firstVertex;
+		buffer[ 3 ] = 0;
+		// buffer[ 4 ] = 0;
 
 	}
 
@@ -1250,14 +1429,22 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	beginBundle( renderContext ) {
+	beginBundle( renderContext, bundle ) {
 
 		const renderContextData = this.get( renderContext );
 
 		renderContextData._currentPass = renderContextData.currentPass;
 		renderContextData._currentSets = renderContextData.currentSets;
 
-		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+		const indirectBuffer = this.device.createBuffer( {
+			size: bundle.size * 20,
+			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.INDIRECT
+		} );
+
+		this.get( bundle ).indirectBuffer = indirectBuffer;
+		this.get( bundle ).buffer = new Float32Array( bundle.size * 5 );
+
+		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null, indirectBuffer };
 		renderContextData.currentPass = this.pipelineUtils.createBundleEncoder( renderContext );
 
 	}
@@ -1267,6 +1454,7 @@ class WebGPUBackend extends Backend {
 		const renderContextData = this.get( renderContext );
 
 		const bundleEncoder = renderContextData.currentPass;
+
 		const bundleGPU = bundleEncoder.finish();
 
 		this.get( bundle ).bundleGPU = bundleGPU;
@@ -1282,7 +1470,10 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
-		renderContextData.renderBundles.push( this.get( bundle ).bundleGPU );
+		const bundleData = this.get( bundle );
+		renderContextData.renderBundles.push( bundleData.bundleGPU );
+console.log( bundleData.indirectBuffer, bundleData.buffer );
+		this.device.queue.writeBuffer( bundleData.indirectBuffer, 0, bundleData.buffer );
 
 	}
 
