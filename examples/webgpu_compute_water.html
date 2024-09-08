@@ -28,7 +28,7 @@
 
 			import * as THREE from 'three';
 
-			import { color, instanceIndex, If, varyingProperty, uint, int, negate, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, storageObject, min, max, positionLocal, modelNormalMatrix } from 'three/tsl';
+			import { color, instanceIndex, If, varyingProperty, uint, int, negate, floor, float, length, clamp, vec2, cos, vec3, vertexIndex, Fn, uniform, storageObject, min, max, positionLocal, transformNormalToView } from 'three/tsl';
 			import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -241,7 +241,7 @@
 					heightStorage.element( instanceIndex ).assign( height.div( 5 ) );
 					prevHeightStorage.element( instanceIndex ).assign( height.div( 5 ) );
 
-				} )().compute( WIDTH * WIDTH, [ 8, 8 ] );
+				} )().compute( WIDTH * WIDTH/*, [ 8, 8 ]*/ );
 
 				// Water Geometry corresponds with buffered compute grid.
 				const waterGeometry = new THREE.PlaneGeometry( BOUNDS, BOUNDS, WIDTH - 1, WIDTH - 1 );
@@ -257,7 +257,7 @@
 					// To correct the lighting as our mesh undulates, we have to reassign the normals in the position shader.
 					const { normalX, normalY } = getNormalsFromHeightTSL( vertexIndex, heightRead );
 
-					varyingProperty( 'vec3', 'v_normalView' ).assign( modelNormalMatrix.mul( vec3( normalX, negate( normalY ), 1.0 ) ) );
+					varyingProperty( 'vec3', 'v_normalView' ).assign( transformNormalToView( vec3( normalX, negate( normalY ), 1.0 ) ) );
 
 					return vec3( positionLocal.x, positionLocal.y, heightRead.element( vertexIndex ) );
 
@@ -391,7 +391,7 @@
 				const sphereMesh = new THREE.InstancedMesh( sphereGeometry, sphereMaterial, NUM_SPHERES );
 				scene.add( sphereMesh );
 
-				renderer = new THREE.WebGPURenderer();
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -425,7 +425,7 @@
 
 						renderer.compute( computeSmooth );
 
-					},
+					}
 				};
 				gui.add( buttonCompute, 'smoothWater' );
 				gui.add( effectController, 'spheresEnabled' ).onChange( () => {
