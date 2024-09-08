@@ -144,6 +144,7 @@
 	"webgpu_refraction": [ "water" ],
 	"webgpu_rtt": [ "renderTarget", "texture" ],
 	"webgpu_sky": [ "sun" ],
+	"webgpu_tonemapping": [ "gltf" ],
 	"webgpu_tsl_compute_attractors_particles": [ "gpgpu" ],
 	"webgpu_ocean": [ "water" ]
 }

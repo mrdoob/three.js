@@ -413,6 +413,7 @@
 		"webgpu_textures_2d-array_compressed",
 		"webgpu_textures_anisotropy",
 		"webgpu_textures_partialupdate",
+		"webgpu_tonemapping",
 		"webgpu_tsl_angular_slicing",
 		"webgpu_tsl_coffee_smoke",
 		"webgpu_tsl_compute_attractors_particles",
