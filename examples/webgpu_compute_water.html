@@ -10,8 +10,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="waterSize"></span> webgpu compute water<br/>
-			Move mouse to disturb water.<br>
-			'W' key toggles wireframe.
+			Move mouse to disturb water.
 		</div>
 
 		<script type="importmap">
@@ -100,7 +99,8 @@
 					mousePos: uniform( new THREE.Vector2( 10000, 10000 ) ).label( 'mousePos' ),
 					mouseSize: uniform( 30.0 ).label( 'mouseSize' ),
 					viscosity: uniform( 0.95 ).label( 'viscosity' ),
-					spheresEnabled: true
+					spheresEnabled: true,
+					wireframe: false
 				};
 
 				// Initialize height storage buffers
@@ -403,18 +403,6 @@
 				container.style.touchAction = 'none';
 				container.addEventListener( 'pointermove', onPointerMove );
 
-				document.addEventListener( 'keydown', function ( event ) {
-
-					// W Pressed: Toggle wireframe
-					if ( event.keyCode === 87 ) {
-
-						waterMesh.material.wireframe = ! waterMesh.material.wireframe;
-						waterMesh.material.needsUpdate = true;
-
-					}
-
-				} );
-
 				window.addEventListener( 'resize', onWindowResize );
 
 				const gui = new GUI();
@@ -431,6 +419,12 @@
 				gui.add( effectController, 'spheresEnabled' ).onChange( () => {
 			
 					sphereMesh.visible = effectController.spheresEnabled;
+			
+				} );
+				gui.add( effectController, 'wireframe' ).onChange( () => {
+			
+					waterMesh.material.wireframe = ! waterMesh.material.wireframe;
+					waterMesh.material.needsUpdate = true;
 			
 				} );
 
