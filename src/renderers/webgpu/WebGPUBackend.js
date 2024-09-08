@@ -829,12 +829,16 @@ class WebGPUBackend extends Backend {
 
 	draw( renderObject, info ) {
 
-		const { object, material, geometry, context, pipeline, group } = renderObject;
+		const { object, context, pipeline } = renderObject;
 		const bindings = renderObject.getBindings();
 		const renderContextData = this.get( context );
 		const pipelineGPU = this.get( pipeline ).pipeline;
 		const currentSets = renderContextData.currentSets;
 		const passEncoderGPU = renderContextData.currentPass;
+
+		const drawParms = renderObject.getDrawParameters();
+
+		if ( drawParms === null ) return;
 
 		// pipeline
 
@@ -936,31 +940,6 @@ class WebGPUBackend extends Backend {
 
 		// draw
 
-		const drawRange = renderObject.drawRange;
-
-		let rangeFactor = 1;
-
-		if ( material.wireframe === true && ! object.isPoints && ! object.isLineSegments && ! object.isLine && ! object.isLineLoop ) {
-
-			rangeFactor = 2;
-
-		}
-
-		let firstVertex = drawRange.start * rangeFactor;
-		let lastVertex = ( drawRange.start + drawRange.count ) * rangeFactor;
-
-		if ( group !== null ) {
-
-			firstVertex = Math.max( firstVertex, group.start * rangeFactor );
-			lastVertex = Math.min( lastVertex, ( group.start + group.count ) * rangeFactor );
-
-		}
-
-
-
-		const instanceCount = this.getInstanceCount( renderObject );
-		if ( instanceCount === 0 ) return;
-
 		if ( object.isBatchedMesh === true ) {
 
 			const starts = object._multiDrawStarts;
@@ -981,32 +960,17 @@ class WebGPUBackend extends Backend {
 
 		} else if ( hasIndex === true ) {
 
-			const indexCount = index.count;
+			const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParms;
 
-			firstVertex = Math.max( firstVertex, 0 );
-			lastVertex = Math.min( lastVertex, indexCount );
-
-			const count = lastVertex - firstVertex;
-
-			if ( count < 0 || count === Infinity ) return;
-
-			passEncoderGPU.drawIndexed( count, instanceCount, firstVertex, 0, 0 );
+			passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
 
 			info.update( object, indexCount, instanceCount );
 
 		} else {
 
-			const positionAttribute = geometry.attributes.position;
-			const vertexCount = positionAttribute.count;
+			const { vertexCount, instanceCount, firstVertex } = drawParms;
 
-			firstVertex = Math.max( firstVertex, 0 );
-			lastVertex = Math.min( lastVertex, vertexCount );
-
-			const count = lastVertex - firstVertex;
-
-			if ( count < 0 || count === Infinity ) return;
-
-			passEncoderGPU.draw( count, instanceCount, firstVertex, 0 );
+			passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
 
 			info.update( object, vertexCount, instanceCount );
 
