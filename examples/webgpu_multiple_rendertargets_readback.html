@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, step, texture, viewportUV, mrt, output, transformedNormalWorld, uv, vec2 } from 'three/tsl';
+			import { mix, step, texture, screenUV, mrt, output, transformedNormalWorld, uv, vec2 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -111,7 +111,7 @@
 				// Output
 
 				material = new THREE.NodeMaterial();
-				material.colorNode = mix( texture( renderTarget.textures[ 0 ] ), texture( renderTarget.textures[ 1 ] ), step( 0.5, viewportUV.x ) );
+				material.colorNode = mix( texture( renderTarget.textures[ 0 ] ), texture( renderTarget.textures[ 1 ] ), step( 0.5, screenUV.x ) );
 
 				quadMesh = new THREE.QuadMesh( material );
 

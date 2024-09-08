@@ -979,6 +979,12 @@ class WebGLRenderer {
 
 			scene.traverse( function ( object ) {
 
+				if ( ! ( object.isMesh || object.isPoints || object.isLine || object.isSprite ) ) {
+
+					return;
+
+				}
+
 				const material = object.material;
 
 				if ( material ) {
@@ -2472,7 +2478,6 @@ class WebGLRenderer {
 					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
 					_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
 					_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
-					_gl.flush();
 
 					// reset the frame buffer to the currently set buffer before waiting
 					const currFramebuffer = _currentRenderTarget !== null ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
@@ -2480,6 +2485,9 @@ class WebGLRenderer {
 
 					// check if the commands have finished every 8 ms
 					const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
+
+					_gl.flush();
+
 					await probeAsync( _gl, sync, 4 );
 
 					// read the data and delete the buffer

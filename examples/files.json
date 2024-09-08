@@ -301,6 +301,7 @@
 		"webgl_performance"
 	],
 	"webgpu (wip)": [
+		"webgpu_animation_retargeting",
 		"webgpu_backdrop",
 		"webgpu_backdrop_area",
 		"webgpu_backdrop_water",

@@ -4,7 +4,7 @@ import { uniform } from '../core/UniformNode.js';
 import { uv } from '../accessors/UV.js';
 import { sin, cos } from '../math/MathNode.js';
 import { add } from '../math/OperatorNode.js';
-import { viewportResolution } from '../display/ViewportNode.js';
+import { screenSize } from './ScreenNode.js';
 
 import { Vector2 } from '../../math/Vector2.js';
 
@@ -36,7 +36,7 @@ class DotScreenNode extends TempNode {
 			const s = sin( this.angle );
 			const c = cos( this.angle );
 
-			const tex = uv().mul( viewportResolution ).sub( this.center );
+			const tex = uv().mul( screenSize ).sub( this.center );
 			const point = vec2( c.mul( tex.x ).sub( s.mul( tex.y ) ), s.mul( tex.x ).add( c.mul( tex.y ) ) ).mul( this.scale );
 
 			return sin( point.x ).mul( sin( point.y ) ).mul( 4 );

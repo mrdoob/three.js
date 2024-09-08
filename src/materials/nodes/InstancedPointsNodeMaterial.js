@@ -7,7 +7,7 @@ import { positionGeometry } from '../../nodes/accessors/Position.js';
 import { smoothstep, lengthSq } from '../../nodes/math/MathNode.js';
 import { Fn, vec4, float } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
-import { viewport } from '../../nodes/display/ViewportNode.js';
+import { viewport } from '../../nodes/display/ScreenNode.js';
 
 import { PointsMaterial } from '../PointsMaterial.js';
 
