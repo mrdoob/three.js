@@ -1447,7 +1447,7 @@ class WebGPUBackend extends Backend {
 			[
 				srcWidth,
 				srcHeight,
-				1	
+				1
 			]
 		);
 
