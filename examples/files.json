@@ -422,6 +422,7 @@
 		"webgpu_tsl_raging_sea",
 		"webgpu_tsl_transpiler",
 		"webgpu_tsl_vfx_flames",
+		"webgpu_tsl_vfx_linkedparticles",
 		"webgpu_tsl_vfx_tornado",
 		"webgpu_video_panorama",
 		"webgpu_volume_cloud",
