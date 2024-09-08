@@ -597,6 +597,10 @@ class WebGLBackend extends Backend {
 
 		const contextData = this.get( context );
 
+		const drawParms = renderObject.getDrawParameters();
+
+		if ( drawParms === null ) return;
+
 		//
 
 		this._bindUniforms( renderObject.getBindings() );
@@ -635,9 +639,6 @@ class WebGLBackend extends Backend {
 
 		const index = renderObject.getIndex();
 
-		const geometry = renderObject.geometry;
-		const drawRange = renderObject.drawRange;
-
 		//
 
 		const lastObject = contextData.lastOcclusionObject;
@@ -668,8 +669,6 @@ class WebGLBackend extends Backend {
 		}
 
 		//
-		let rangeFactor = 1;
-
 		const renderer = this.bufferRenderer;
 
 		if ( object.isPoints ) renderer.mode = gl.POINTS;
@@ -683,8 +682,6 @@ class WebGLBackend extends Backend {
 				state.setLineWidth( material.wireframeLinewidth * this.renderer.getPixelRatio() );
 				renderer.mode = gl.LINES;
 
-				rangeFactor = 2;
-
 			} else {
 
 				renderer.mode = gl.TRIANGLES;
@@ -695,55 +692,25 @@ class WebGLBackend extends Backend {
 
 		//
 
-		const group = renderObject.group;
-
+		const { vertexCount, instanceCount } = drawParms;
+		let { firstVertex } = drawParms;
 
 		renderer.object = object;
-
-
-		let firstVertex = drawRange.start * rangeFactor;
-		let lastVertex = ( drawRange.start + drawRange.count ) * rangeFactor;
-
-		if ( group !== null ) {
-
-			firstVertex = Math.max( firstVertex, group.start * rangeFactor );
-			lastVertex = Math.min( lastVertex, ( group.start + group.count ) * rangeFactor );
-
-		}
-
-		if ( index !== null ) {
-
-			const indexData = this.get( index );
-			const indexCount = index.count;
-
-			renderer.index = index.count;
-			renderer.type = indexData.type;
-
-			firstVertex = Math.max( firstVertex, 0 );
-			lastVertex = Math.min( lastVertex, indexCount );
-
-		} else {
-
-			renderer.index = 0;
-
-			const vertexCount = geometry.attributes.position.count;
-
-			firstVertex = Math.max( firstVertex, 0 );
-			lastVertex = Math.min( lastVertex, vertexCount );
-
-		}
-
-		const count = lastVertex - firstVertex;
-
-		if ( count < 0 || count === Infinity ) return;
 
 		if ( index !== null ) {
 
 			firstVertex *= index.array.BYTES_PER_ELEMENT;
 
-		}
+			const indexData = this.get( index );
 
-		const instanceCount = this.getInstanceCount( renderObject );
+			renderer.index = index.count;
+			renderer.type = indexData.type;
+
+		} else {
+
+			renderer.index = 0;
+
+		}
 
 		if ( object.isBatchedMesh ) {
 
@@ -763,11 +730,11 @@ class WebGLBackend extends Backend {
 
 		} else if ( instanceCount > 1 ) {
 
-			renderer.renderInstances( firstVertex, count, instanceCount );
+			renderer.renderInstances( firstVertex, vertexCount, instanceCount );
 
 		} else {
 
-			renderer.render( firstVertex, count );
+			renderer.render( firstVertex, vertexCount );
 
 		}
 		//
