@@ -9,7 +9,7 @@ on:
 # This workflow needs to be run with "pull-requests: write" permissions to
 # be able to comment on the pull request. We can't checkout the PR code
 # in this workflow.
-# Reference:
+# Reference:
 # https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
 permissions:
   pull-requests: write
