@@ -317,6 +317,7 @@
 		"webgpu_compute_points",
 		"webgpu_compute_texture",
 		"webgpu_compute_texture_pingpong",
+		"webgpu_compute_water",
 		"webgpu_cubemap_adjustments",
 		"webgpu_cubemap_dynamic",
 		"webgpu_cubemap_mix",
