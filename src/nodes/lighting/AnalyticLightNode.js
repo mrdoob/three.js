@@ -157,7 +157,7 @@ const VSMPassVertical = Fn( ( { samples, radius, size, shadowPass } ) => {
 		mean.addAssign( depth );
 		squaredMean.addAssign( depth.mul( depth ) );
 
-	} );
+	} );
 
 	mean.divAssign( samples );
 	squaredMean.divAssign( samples );
@@ -183,7 +183,7 @@ const VSMPassHorizontal = Fn( ( { samples, radius, size, shadowPass } ) => {
 		mean.addAssign( distribution.x );
 		squaredMean.addAssign( add( distribution.y.mul( distribution.y ), distribution.x.mul( distribution.x ) ) );
 
-	} );
+	} );
 
 	mean.divAssign( samples );
 	squaredMean.divAssign( samples );
@@ -407,7 +407,7 @@ class AnalyticLightNode extends LightingNode {
 
 		renderer.setRenderObjectFunction( ( object, ...params ) => {
 
-			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
+			if ( object.castShadow === true || ( object.receiveShadow && shadowType === VSMShadowMap ) ) {
 
 				renderer.renderObject( object, ...params );
 
