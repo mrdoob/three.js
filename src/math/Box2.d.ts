@@ -9,7 +9,17 @@ export class Box2 {
      */
     constructor(min?: Vector2, max?: Vector2);
     isBox2: boolean;
+    /**
+     * {@link Vector2} representing the lower (x, y) boundary of the box.
+     * Default is ( + Infinity, + Infinity ).
+     * @type {Vector2}
+     */
     min: Vector2;
+    /**
+     * {@link Vector2} representing the lower upper (x, y) boundary of the box.
+     * Default is ( - Infinity, - Infinity ).
+     * @type {Vector2}
+     */
     max: Vector2;
     /**
      * Sets the lower and upper (x, y) boundaries of this box.

@@ -16,7 +16,18 @@ class Box2 {
 
 		this.isBox2 = true;
 
+		/**
+		 * {@link Vector2} representing the lower (x, y) boundary of the box.
+		 * Default is ( + Infinity, + Infinity ).
+		 * @type {Vector2}
+		 */
 		this.min = min;
+
+		/**
+		 * {@link Vector2} representing the lower upper (x, y) boundary of the box.
+		 * Default is ( - Infinity, - Infinity ).
+		 * @type {Vector2}
+		 */
 		this.max = max;
 
 	}
