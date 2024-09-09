@@ -68,9 +68,6 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			positionLocal.assign( positionGeometry.add( instancePosition ) );
 
 			const viewPosition = modelViewMatrix.mul( vec4( instancePosition, 1.0 ) );
-
-			viewPosition.z.mulAssign( 2 );
-
 			positionView.assign( viewPosition );
 
 			const clipPos = cameraProjectionMatrix.mul( viewPosition );
@@ -81,7 +78,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			if ( useSizeAttenuation ) {
 
 				// Convert size (diameter) to radius and apply perspective scaling
-			  	size = size.div( clipPos.w.div( viewport.w ) ).div( 2 );
+				size = size.div( clipPos.w.div( viewport.w ) ).div( 2 );
 
 			}
 
