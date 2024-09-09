@@ -4,7 +4,7 @@ import {
 	WebGPURenderer,
 	CanvasTexture
 } from 'three';
-import { texture } from 'three/tsl';
+import { texture, uv } from 'three/tsl';
 
 let _renderer;
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -19,7 +19,7 @@ export async function decompress( blitTexture, maxTextureSize = Infinity, render
 	}
 
 	const material = new NodeMaterial();
-	material.fragmentNode = texture( blitTexture );
+	material.fragmentNode = texture( blitTexture ).uv( uv().flipY() );
 
 	const width = Math.min( blitTexture.image.width, maxTextureSize );
 	const height = Math.min( blitTexture.image.height, maxTextureSize );
@@ -48,7 +48,6 @@ export async function decompress( blitTexture, maxTextureSize = Infinity, render
 	readableTexture.magFilter = blitTexture.magFilter;
 	readableTexture.wrapS = blitTexture.wrapS;
 	readableTexture.wrapT = blitTexture.wrapT;
-	readableTexture.flipY = blitTexture.flipY;
 	readableTexture.colorSpace = blitTexture.colorSpace;
 	readableTexture.name = blitTexture.name;
 
