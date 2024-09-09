@@ -1586,19 +1586,20 @@ class Renderer {
 
 		//
 
+		let offset = null;
+
 		if ( this._currentRenderBundle !== null ) {
 
 			const renderBundleData = this.backend.get( this._currentRenderBundle );
+			offset = renderBundleData.renderObjects.length;
 
 			renderBundleData.renderObjects.push( renderObject );
-			this.backend.drawIndirect( renderObject, renderBundleData.renderObjects.length - 1 );
 
-		} else {
-
-			this.backend.draw( renderObject, this.info );
+			this.backend.updateIndirect( renderObject, this._currentRenderBundle, offset );
 
 		}
 
+		this.backend.draw( renderObject, this.info, offset );
 
 		this._nodes.updateAfter( renderObject );
 

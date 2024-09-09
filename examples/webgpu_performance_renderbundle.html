@@ -61,14 +61,15 @@
 
 		//
 
-		const MAX_GEOMETRY_COUNT = 1;
+		const MAX_GEOMETRY_COUNT = 4000;
 
 		const api = {
 			webgpu: true,
 			renderBundle: true,
 			count: MAX_GEOMETRY_COUNT,
 			opacity: 1,
-			dynamic: false
+			dynamic: false,
+			visible: true
 		};
 
 
@@ -123,6 +124,22 @@
 				new THREE.TorusGeometry( 1.0, 0.5, 3, 3 ),
 				new THREE.TorusKnotGeometry( 1.0, 0.5, 20, 3, 1, 1 ),
 			];
+
+		}
+
+		function setVisibility( visible ) {
+
+			group.traverse( object => {
+
+				const geometry = object.geometry;
+
+				if ( geometry !== undefined && geometry.type === 'BoxGeometry' ) {
+
+					object.visible = visible;
+
+				}
+
+			} );
 
 		}
 
@@ -250,6 +267,12 @@
 			} );
 
 			gui.add( api, 'dynamic' );
+
+			gui.add( api, 'visible' ).onChange( ( v ) => {
+
+				setVisibility( v );
+
+			} );
 
 			// listeners
 
