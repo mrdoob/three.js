@@ -69,7 +69,8 @@
 			count: MAX_GEOMETRY_COUNT,
 			opacity: 1,
 			dynamic: false,
-			visible: true
+			visible: true,
+			layer1: true,
 		};
 
 
@@ -183,6 +184,10 @@
 				child.matrix.decompose( child.position, child.quaternion, child.scale );
 				child.userData.rotationSpeed = randomizeRotationSpeed( new THREE.Euler() );
 				child.frustumCulled = false;
+
+				// split across two layers
+				child.layers.set( i % 2 );
+
 				group.add( child );
 
 			}
@@ -212,7 +217,7 @@
 
 			camera = new THREE.PerspectiveCamera( 70, aspect, 1, 100 );
 			camera.position.z = 50;
-
+			camera.layers.enable( 1 );
 			// renderer
 
 			renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
@@ -271,6 +276,20 @@
 			gui.add( api, 'visible' ).onChange( ( v ) => {
 
 				setVisibility( v );
+
+			} );
+
+			gui.add( api, 'layer1' ).onChange( ( v ) => {
+
+				if ( v ) {
+
+					camera.layers.enable( 1 );
+
+				} else {
+
+					camera.layers.disable( 1 );
+
+				}
 
 			} );
 

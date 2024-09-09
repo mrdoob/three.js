@@ -996,12 +996,14 @@ class WebGPUBackend extends Backend {
 
 	updateIndirect( renderObject, bundle, offset ) {
 
-		const { object } = renderObject;
+		const { object, camera } = renderObject;
 		const buffer = this.get( bundle ).buffer;
 
 		offset *= 5;
 
-		if ( ! object.visible ) {
+		const visible = object.visible && object.layers.test( camera.layers );
+
+		if ( ! visible ) {
 
 			// set instanceCount to 0
 			buffer[ offset + 1 ] = 0;
