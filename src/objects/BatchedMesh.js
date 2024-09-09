@@ -842,6 +842,14 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		// check if the provided geometryId is within the valid range
+		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
+
+			console.warn( 'BatchedMesh: Invalid geometryId.' );
+			return null;
+
+		}
+
 		drawInfo[ instanceId ].geometryIndex = geometryId;
 
 		return this;
@@ -851,7 +859,7 @@ class BatchedMesh extends Mesh {
 	getGeometryIdAt( instanceId ) {
 
 		const drawInfo = this._drawInfo;
-		if ( instanceId >= drawInfo.length ) {
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
 			return - 1;
 
