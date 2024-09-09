@@ -15,8 +15,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../src/Three.WebGPU.js",
-					"three/tsl": "../src/Three.WebGPU.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -80,9 +80,7 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer( {
-					antialias: true
-				} );
+				renderer = new THREE.WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
@@ -97,11 +95,7 @@
 
 				const gui = new GUI();
 
-				gui.add( material, 'sizeAttenuation' ).onChange( function () {
-
-					material.needsUpdate = true;
-
-				} );
+				gui.add( material, 'sizeAttenuation' );
 
 				gui.open();
 
