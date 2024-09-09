@@ -1003,7 +1003,7 @@ class WebGPUBackend extends Backend {
 
 		if ( ! object.visible ) {
 
-			// set instanceCount to 0 
+			// set instanceCount to 0
 			buffer[ offset + 1 ] = 0;
 			return;
 
@@ -1016,6 +1016,8 @@ class WebGPUBackend extends Backend {
 		if ( object.isBatchedMesh === true ) {
 
 			// @TODO indirect support
+			const index = renderObject.getIndex();
+			const hasIndex = ( index !== null );
 
 			const starts = object._multiDrawStarts;
 			const counts = object._multiDrawCounts;
@@ -1365,10 +1367,10 @@ class WebGPUBackend extends Backend {
 	addBundle( renderContext, bundle ) {
 
 		const renderContextData = this.get( renderContext );
-
 		const bundleData = this.get( bundle );
+
 		renderContextData.renderBundles.push( bundleData.bundleGPU );
-//console.log( bundleData.indirectBuffer, bundleData.buffer );
+
 		this.device.queue.writeBuffer( bundleData.indirectBuffer, 0, bundleData.buffer );
 
 	}
