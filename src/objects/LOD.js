@@ -77,15 +77,16 @@ class LOD extends Object3D {
 	removeLevel( distance ) {
 
 		const levels = this.levels;
-		levels.map( ( _level, index ) => {
+		for ( let i = 0; i < levels.length; i ++ ) {
 
-			if ( _level.distance === distance ) {
+			if ( levels[ i ].distance === distance ) {
 
-				levels.splice( index, 1 );
+				levels.splice( i, 1 );
+				i --;
 
 			}
 
-		} );
+		}
 
 		return this;
 
