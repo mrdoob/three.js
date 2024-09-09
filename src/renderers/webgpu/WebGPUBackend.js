@@ -1003,6 +1003,7 @@ class WebGPUBackend extends Backend {
 
 		if ( ! object.visible ) {
 
+			// set instanceCount to 0 
 			buffer[ offset + 1 ] = 0;
 			return;
 
