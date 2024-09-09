@@ -18,9 +18,8 @@ class InstancedPointsGeometry extends InstancedBufferGeometry {
 		this.isInstancedPointsGeometry = true;
 
 		this.type = 'InstancedPointsGeometry';
-
 		const positions = [ - 1, 1, 0, 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ];
-		const uvs = [ - 1, 1, 1, 1, - 1, - 1, 1, - 1 ];
+		const uvs = [ 0, 1, 1, 1, 0, 0, 1, 0 ];
 		const index = [ 0, 2, 1, 2, 3, 1 ];
 
 		this.setIndex( index );

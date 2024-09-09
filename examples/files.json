@@ -326,6 +326,7 @@
 		"webgpu_equirectangular",
 		"webgpu_instance_mesh",
 		"webgpu_instance_points",
+		"webgpu_instance_points_billboards",
 		"webgpu_instance_uniform",
 		"webgpu_instancing_morph",
 		"webgpu_lightprobe",

@@ -1,11 +1,11 @@
 import NodeMaterial from './NodeMaterial.js';
 import { attribute } from '../../nodes/core/AttributeNode.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
-import { materialColor, materialOpacity, materialPointWidth } from '../../nodes/accessors/MaterialNode.js'; // or should this be a property, instead?
+import { materialAlphaTest, materialColor, materialOpacity, materialPointWidth } from '../../nodes/accessors/MaterialNode.js'; // or should this be a property, instead?
 import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
-import { positionGeometry } from '../../nodes/accessors/Position.js';
-import { smoothstep, lengthSq } from '../../nodes/math/MathNode.js';
-import { Fn, vec4, float } from '../../nodes/tsl/TSLBase.js';
+import { positionGeometry, positionLocal, positionView } from '../../nodes/accessors/Position.js';
+import { lengthSq, smoothstep } from '../../nodes/math/MathNode.js';
+import { float, Fn, If, vec4 } from '../../nodes/tsl/TSLBase.js';
 import { uv } from '../../nodes/accessors/UV.js';
 import { viewport } from '../../nodes/display/ViewportNode.js';
 
@@ -27,6 +27,10 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		this.lights = false;
 
+		this.sizeAttenuation = true;
+
+		this.useSizeAttenuation = true;
+
 		this.useAlphaToCoverage = true;
 
 		this.useColor = params.vertexColors;
@@ -39,78 +43,87 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		this.setDefaultValues( _defaultValues );
 
-		this.setupShaders();
-
 		this.setValues( params );
 
 	}
 
 	setup( builder ) {
 
-		this.setupShaders();
+		this.setupShaders( builder );
 
 		super.setup( builder );
 
 	}
 
-	setupShaders() {
+	setupShaders( { renderer } ) {
 
 		const useAlphaToCoverage = this.alphaToCoverage;
+		const useSizeAttenuation = this.sizeAttenuation;
 		const useColor = this.useColor;
 
 		this.vertexNode = Fn( () => {
 
 			const instancePosition = attribute( 'instancePosition' ).xyz;
 
-			// camera space
-			const mvPos = vec4( modelViewMatrix.mul( vec4( instancePosition, 1.0 ) ) );
+			positionLocal.assign( positionGeometry.add( instancePosition ) );
 
-			const aspect = viewport.z.div( viewport.w );
+			const viewPosition = modelViewMatrix.mul( vec4( instancePosition, 1.0 ) );
 
-			// clip space
-			const clipPos = cameraProjectionMatrix.mul( mvPos );
+			viewPosition.z.mulAssign( 2 );
 
-			// offset in ndc space
-			const offset = positionGeometry.xy.toVar();
+			positionView.assign( viewPosition );
 
-			offset.mulAssign( this.pointWidthNode ? this.pointWidthNode : materialPointWidth );
+			const clipPos = cameraProjectionMatrix.mul( viewPosition );
+			const offset = positionGeometry.xy;
 
-			offset.assign( offset.div( viewport.z ) );
-			offset.y.assign( offset.y.mul( aspect ) );
+			let size = this.pointWidthNode || materialPointWidth;
 
-			// back to clip space
-			offset.assign( offset.mul( clipPos.w ) );
+			if ( useSizeAttenuation ) {
 
-			//clipPos.xy += offset;
-			clipPos.addAssign( vec4( offset, 0, 0 ) );
+				// Convert size (diameter) to radius and apply perspective scaling
+			  	size = size.div( clipPos.w.div( viewport.w ) ).div( 2 );
 
-			return clipPos;
+			}
+
+			const adjustedOffset = offset.mul( size )
+				.div( viewport.zw )
+				.mul( clipPos.w );
+
+			return clipPos.add( vec4( adjustedOffset, 0, 0 ) );
 
 		} )();
 
 		this.fragmentNode = Fn( () => {
 
+			// force assignment into correct place in flow
 			const alpha = float( 1 ).toVar();
 
-			const len2 = lengthSq( uv() );
+			If( materialAlphaTest.equal( 0.0 ), () => {
 
-			if ( useAlphaToCoverage ) {
+				const len2 = lengthSq( uv().mul( 2 ).sub( 1 ) );
 
-				const dlen = float( len2.fwidth() ).toVar();
 
-				alpha.assign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
+				if ( useAlphaToCoverage && renderer.samples > 1 ) {
 
-			} else {
+					const dlen = float( len2.fwidth() ).toVar();
 
-				len2.greaterThan( 1.0 ).discard();
+					alpha.assign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
 
-			}
+				} else {
 
-			let pointColorNode;
+					len2.greaterThan( 1.0 ).discard();
+
+				}
+
+			} );
+
+
+
+			const output = vec4( 1 ).toVar();
 
 			if ( this.pointColorNode ) {
 
-				pointColorNode = this.pointColorNode;
+				output.assign( this.pointColorNode );
 
 			} else {
 
@@ -118,19 +131,29 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 					const instanceColor = attribute( 'instanceColor' );
 
-					pointColorNode = instanceColor.mul( materialColor );
+					output.assign( instanceColor.mul( materialColor ) );
 
 				} else {
 
-					pointColorNode = materialColor;
+					output.assign( materialColor );
 
 				}
 
 			}
 
-			alpha.mulAssign( materialOpacity );
+			output.a.mulAssign( alpha );
+			output.a.mulAssign( materialOpacity );
 
-			return vec4( pointColorNode, alpha );
+
+			If( materialAlphaTest.greaterThan( 0.0 ), () => {
+
+				output.a.lessThanEqual( materialAlphaTest ).discard();
+
+			} );
+
+
+
+			return output;
 
 		} )();
 
@@ -147,6 +170,23 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 		if ( this.useAlphaToCoverage !== value ) {
 
 			this.useAlphaToCoverage = value;
+			this.needsUpdate = true;
+
+		}
+
+	}
+
+	get sizeAttenuation() {
+
+		return this.useSizeAttenuation;
+
+	}
+
+	set sizeAttenuation( value ) {
+
+		if ( this.useSizeAttenuation !== value ) {
+
+			this.useSizeAttenuation = value;
 			this.needsUpdate = true;
 
 		}
