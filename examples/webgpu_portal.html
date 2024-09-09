@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, color, mx_worley_noise_float, timerLocal, viewportUV, vec2, uv, normalWorld, mx_fractal_noise_vec3 } from 'three/tsl';
+			import { pass, color, mx_worley_noise_float, timerLocal, screenUV, vec2, uv, normalWorld, mx_fractal_noise_vec3 } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -128,7 +128,7 @@
 				const geometry = new THREE.PlaneGeometry( 1.7, 2 );
 
 				const material = new THREE.MeshBasicNodeMaterial();
-				material.colorNode = pass( scenePortal, camera ).context( { getUV: () => viewportUV } );
+				material.colorNode = pass( scenePortal, camera ).context( { getUV: () => screenUV } );
 				material.opacityNode = uv().distance( .5 ).remapClamp( .3, .5 ).oneMinus();
 				material.side = THREE.DoubleSide;
 				material.transparent = true;

@@ -3,7 +3,7 @@
 import { Loop } from '../utils/LoopNode.js';
 import { float, vec3, Fn } from '../tsl/TSLBase.js';
 
-export const tri = Fn( ( [ x ] ) => {
+export const tri = /*@__PURE__*/ Fn( ( [ x ] ) => {
 
 	return x.fract().sub( .5 ).abs();
 
@@ -15,7 +15,7 @@ export const tri = Fn( ( [ x ] ) => {
 	]
 } );
 
-export const tri3 = Fn( ( [ p ] ) => {
+export const tri3 = /*@__PURE__*/ Fn( ( [ p ] ) => {
 
 	return vec3( tri( p.z.add( tri( p.y.mul( 1. ) ) ) ), tri( p.z.add( tri( p.x.mul( 1. ) ) ) ), tri( p.y.add( tri( p.x.mul( 1. ) ) ) ) );
 
@@ -27,7 +27,7 @@ export const tri3 = Fn( ( [ p ] ) => {
 	]
 } );
 
-export const triNoise3D = Fn( ( [ p_immutable, spd, time ] ) => {
+export const triNoise3D = /*@__PURE__*/ Fn( ( [ p_immutable, spd, time ] ) => {
 
 	const p = vec3( p_immutable ).toVar();
 	const z = float( 1.4 ).toVar();

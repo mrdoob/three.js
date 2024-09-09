@@ -207,7 +207,7 @@ class WebGLBackend extends Backend {
 
 			const { x, y, width, height } = renderContext.scissorValue;
 
-			gl.scissor( x, y, width, height );
+			gl.scissor( x, renderContext.height - height - y, width, height );
 
 		}
 
@@ -296,8 +296,10 @@ class WebGLBackend extends Backend {
 
 						const { x, y, width, height } = renderContext.scissorValue;
 
-						gl.blitFramebuffer( x, y, x + width, y + height, x, y, x + width, y + height, mask, gl.NEAREST );
-						gl.invalidateSubFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray, x, y, width, height );
+						const viewY = renderContext.height - height - y;
+
+						gl.blitFramebuffer( x, viewY, x + width, viewY + height, x, viewY, x + width, viewY + height, mask, gl.NEAREST );
+						gl.invalidateSubFramebuffer( gl.READ_FRAMEBUFFER, renderTargetContextData.invalidationArray, x, viewY, width, height );
 
 					} else {
 
@@ -404,7 +406,7 @@ class WebGLBackend extends Backend {
 		const gl = this.gl;
 		const { x, y, width, height } = renderContext.viewportValue;
 
-		gl.viewport( x, y, width, height );
+		gl.viewport( x, renderContext.height - height - y, width, height );
 
 	}
 
@@ -595,6 +597,10 @@ class WebGLBackend extends Backend {
 
 		const contextData = this.get( context );
 
+		const drawParms = renderObject.getDrawParameters();
+
+		if ( drawParms === null ) return;
+
 		//
 
 		this._bindUniforms( renderObject.getBindings() );
@@ -633,10 +639,6 @@ class WebGLBackend extends Backend {
 
 		const index = renderObject.getIndex();
 
-		const geometry = renderObject.geometry;
-		const drawRange = renderObject.drawRange;
-		const firstVertex = drawRange.start;
-
 		//
 
 		const lastObject = contextData.lastOcclusionObject;
@@ -667,7 +669,6 @@ class WebGLBackend extends Backend {
 		}
 
 		//
-
 		const renderer = this.bufferRenderer;
 
 		if ( object.isPoints ) renderer.mode = gl.POINTS;
@@ -691,32 +692,25 @@ class WebGLBackend extends Backend {
 
 		//
 
-
-		let count;
+		const { vertexCount, instanceCount } = drawParms;
+		let { firstVertex } = drawParms;
 
 		renderer.object = object;
 
 		if ( index !== null ) {
 
+			firstVertex *= index.array.BYTES_PER_ELEMENT;
+
 			const indexData = this.get( index );
-			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
 
 			renderer.index = index.count;
 			renderer.type = indexData.type;
-
-			count = indexCount;
 
 		} else {
 
 			renderer.index = 0;
 
-			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : geometry.attributes.position.count;
-
-			count = vertexCount;
-
 		}
-
-		const instanceCount = this.getInstanceCount( renderObject );
 
 		if ( object.isBatchedMesh ) {
 
@@ -736,11 +730,11 @@ class WebGLBackend extends Backend {
 
 		} else if ( instanceCount > 1 ) {
 
-			renderer.renderInstances( firstVertex, count, instanceCount );
+			renderer.renderInstances( firstVertex, vertexCount, instanceCount );
 
 		} else {
 
-			renderer.render( firstVertex, count );
+			renderer.render( firstVertex, vertexCount );
 
 		}
 		//
@@ -794,9 +788,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	copyTextureToBuffer( texture, x, y, width, height ) {
+	copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
-		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height );
+		return this.textureUtils.copyTextureToBuffer( texture, x, y, width, height, faceIndex );
 
 	}
 

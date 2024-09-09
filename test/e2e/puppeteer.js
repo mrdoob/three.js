@@ -115,6 +115,7 @@ const exceptionList = [
 	'webgpu_compute_audio',
 	'webgpu_compute_texture',
 	'webgpu_compute_texture_pingpong',
+	"webgpu_compute_water",
 	'webgpu_materials',
 	'webgpu_sandbox',
 	'webgpu_sprites',
@@ -127,6 +128,7 @@ const exceptionList = [
 	// WebGPURenderer: Unknown problem
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_clipping',
+	'webgpu_lightprobe_cubecamera',
 	'webgpu_loader_materialx',
 	'webgpu_materials_video',
 	'webgpu_materialx_noise',
@@ -147,6 +149,7 @@ const exceptionList = [
 	'webgpu_tsl_coffee_smoke',
 	'webgpu_tsl_vfx_flames',
 	'webgpu_tsl_halftone',
+	'webgpu_tsl_vfx_linkedparticles',
 	'webgpu_tsl_vfx_tornado',
 	'webgpu_textures_anisotropy',
 

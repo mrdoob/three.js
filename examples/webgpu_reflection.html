@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, pass, reflector, normalWorld, texture, uv, viewportUV, gaussianBlur } from 'three/tsl';
+			import { color, pass, reflector, normalWorld, texture, uv, screenUV, gaussianBlur } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -151,7 +151,7 @@
 				const scenePassColorBlurred = gaussianBlur( scenePassColor );
 				scenePassColorBlurred.directionNode = scenePassDepth;
 
-				const vignet = viewportUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
+				const vignet = screenUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
 
 				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputNode = scenePassColorBlurred.mul( vignet );

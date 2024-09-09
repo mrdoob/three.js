@@ -1,6 +1,12 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 
 class ConvertNode extends Node {
+
+	static get type() {
+
+		return 'ConvertNode';
+
+	}
 
 	constructor( node, convertTo ) {
 
@@ -61,5 +67,3 @@ class ConvertNode extends Node {
 }
 
 export default ConvertNode;
-
-registerNodeClass( 'Convert', ConvertNode );

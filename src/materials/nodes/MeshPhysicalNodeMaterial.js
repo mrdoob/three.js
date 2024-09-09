@@ -13,6 +13,12 @@ const _defaultValues = /*@__PURE__*/ new MeshPhysicalMaterial();
 
 class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
+	static get type() {
+
+		return 'MeshPhysicalNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();

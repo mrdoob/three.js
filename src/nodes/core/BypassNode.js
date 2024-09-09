@@ -1,7 +1,13 @@
-import Node, { registerNodeClass } from './Node.js';
+import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class BypassNode extends Node {
+
+	static get type() {
+
+		return 'BypassNode';
+
+	}
 
 	constructor( returnNode, callNode ) {
 
@@ -38,8 +44,6 @@ class BypassNode extends Node {
 
 export default BypassNode;
 
-registerNodeClass( 'Bypass', BypassNode );
-
-export const bypass = nodeProxy( BypassNode );
+export const bypass = /*@__PURE__*/ nodeProxy( BypassNode );
 
 addMethodChaining( 'bypass', bypass );

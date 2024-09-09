@@ -6,7 +6,7 @@ import {
 
 class LightProbeHelper extends Mesh {
 
-	constructor( lightProbe, size ) {
+	constructor( lightProbe, size = 1 ) {
 
 		const material = new ShaderMaterial( {
 

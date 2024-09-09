@@ -1,8 +1,13 @@
-import { registerNodeClass } from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 import ArrayElementNode from './ArrayElementNode.js';
 
 class StorageArrayElementNode extends ArrayElementNode {
+
+	static get type() {
+
+		return 'StorageArrayElementNode';
+
+	}
 
 	constructor( storageBufferNode, indexNode ) {
 
@@ -28,7 +33,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
-			if ( ! this.node.instanceIndex && this.node.bufferObject === true ) {
+			if ( this.node.bufferObject === true ) {
 
 				builder.setupPBO( this.node );
 
@@ -50,15 +55,13 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
 
-			const { node } = this;
-
-			if ( ! node.instanceIndex && this.node.bufferObject === true && isAssignContext !== true ) {
+			if ( this.node.bufferObject === true && isAssignContext !== true ) {
 
 				snippet = builder.generatePBO( this );
 
 			} else {
 
-				snippet = node.build( builder );
+				snippet = this.node.build( builder );
 
 			}
 
@@ -84,6 +87,4 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 export default StorageArrayElementNode;
 
-registerNodeClass( 'StorageArrayElement', StorageArrayElementNode );
-
-export const storageElement = nodeProxy( StorageArrayElementNode );
+export const storageElement = /*@__PURE__*/ nodeProxy( StorageArrayElementNode );

@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, texture, vec3, pass, color, uint, viewportUV, positionWorld, positionLocal, timerLocal, vec2, hash, gaussianBlur, instanceIndex, storage, If } from 'three/tsl';
+			import { Fn, texture, vec3, pass, color, uint, screenUV, positionWorld, positionLocal, timerLocal, vec2, hash, gaussianBlur, instanceIndex, storage, If } from 'three/tsl';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
@@ -261,7 +261,7 @@
 
 				//
 
-				scene.backgroundNode = viewportUV.distance( .5 ).mul( 2 ).mix( color( 0x0f4140 ), color( 0x060a0d ) );
+				scene.backgroundNode = screenUV.distance( .5 ).mul( 2 ).mix( color( 0x0f4140 ), color( 0x060a0d ) );
 
 				//
 
@@ -295,7 +295,7 @@
 
 				const scenePass = pass( scene, camera );
 				const scenePassColor = scenePass.getTextureNode();
-				const vignet = viewportUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
+				const vignet = screenUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
 
 				const teapotTreePass = pass( teapotTree, camera ).getTextureNode();
 				const teapotTreePassBlurred = gaussianBlur( teapotTreePass, vec2( 1 ), 3 );

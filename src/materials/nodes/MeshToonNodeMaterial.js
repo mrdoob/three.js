@@ -7,6 +7,12 @@ const _defaultValues = /*@__PURE__*/ new MeshToonMaterial();
 
 class MeshToonNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'MeshToonNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();

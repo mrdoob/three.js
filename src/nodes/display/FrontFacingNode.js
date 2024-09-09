@@ -1,9 +1,15 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { nodeImmutable, float } from '../tsl/TSLBase.js';
 
 import { BackSide, WebGLCoordinateSystem } from '../../constants.js';
 
 class FrontFacingNode extends Node {
+
+	static get type() {
+
+		return 'FrontFacingNode';
+
+	}
 
 	constructor() {
 
@@ -35,7 +41,5 @@ class FrontFacingNode extends Node {
 
 export default FrontFacingNode;
 
-registerNodeClass( 'FrontFacing', FrontFacingNode );
-
-export const frontFacing = nodeImmutable( FrontFacingNode );
-export const faceDirection = float( frontFacing ).mul( 2.0 ).sub( 1.0 );
+export const frontFacing = /*@__PURE__*/ nodeImmutable( FrontFacingNode );
+export const faceDirection = /*@__PURE__*/ float( frontFacing ).mul( 2.0 ).sub( 1.0 );

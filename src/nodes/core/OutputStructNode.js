@@ -1,8 +1,14 @@
-import Node, { registerNodeClass } from './Node.js';
+import Node from './Node.js';
 import StructTypeNode from './StructTypeNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
 class OutputStructNode extends Node {
+
+	static get type() {
+
+		return 'OutputStructNode';
+
+	}
 
 	constructor( ...members ) {
 
@@ -54,6 +60,4 @@ class OutputStructNode extends Node {
 
 export default OutputStructNode;
 
-registerNodeClass( 'OutputStruct', OutputStructNode );
-
-export const outputStruct = nodeProxy( OutputStructNode );
+export const outputStruct = /*@__PURE__*/ nodeProxy( OutputStructNode );

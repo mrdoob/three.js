@@ -17,6 +17,12 @@ const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 class AnamorphicNode extends TempNode {
 
+	static get type() {
+
+		return 'AnamorphicNode';
+
+	}
+
 	constructor( textureNode, tresholdNode, scaleNode, samples ) {
 
 		super( 'vec4' );

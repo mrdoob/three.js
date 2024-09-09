@@ -1,8 +1,13 @@
-import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { vectorComponents } from '../core/constants.js';
 
 class SetNode extends TempNode {
+
+	static get type() {
+
+		return 'SetNode';
+
+	}
 
 	constructor( sourceNode, components, targetNode ) {
 
@@ -58,5 +63,3 @@ class SetNode extends TempNode {
 }
 
 export default SetNode;
-
-registerNodeClass( 'Set', SetNode );

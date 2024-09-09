@@ -16,7 +16,7 @@ import { mix, normalize, refract, length, clamp, log2, log, exp, smoothstep } fr
 import { div } from '../math/OperatorNode.js';
 import { cameraPosition, cameraProjectionMatrix, cameraViewMatrix } from '../accessors/Camera.js';
 import { modelWorldMatrix } from '../accessors/ModelNode.js';
-import { viewportResolution } from '../display/ViewportNode.js';
+import { screenSize } from '../display/ScreenNode.js';
 import { viewportMipTexture } from '../display/ViewportTextureNode.js';
 import { textureBicubic } from '../accessors/TextureBicubic.js';
 import { Loop } from '../utils/LoopNode.js';
@@ -25,7 +25,7 @@ import { Loop } from '../utils/LoopNode.js';
 // Transmission
 //
 
-const getVolumeTransmissionRay = Fn( ( [ n, v, thickness, ior, modelMatrix ] ) => {
+const getVolumeTransmissionRay = /*@__PURE__*/ Fn( ( [ n, v, thickness, ior, modelMatrix ] ) => {
 
 	// Direction of refracted light.
 	const refractionVector = vec3( refract( v.negate(), normalize( n ), div( 1.0, ior ) ) );
@@ -52,7 +52,7 @@ const getVolumeTransmissionRay = Fn( ( [ n, v, thickness, ior, modelMatrix ] ) =
 	]
 } );
 
-const applyIorToRoughness = Fn( ( [ roughness, ior ] ) => {
+const applyIorToRoughness = /*@__PURE__*/ Fn( ( [ roughness, ior ] ) => {
 
 	// Scale roughness with IOR so that an IOR of 1.0 results in no microfacet refraction and
 	// an IOR of 1.5 results in the default amount of microfacet refraction.
@@ -67,20 +67,20 @@ const applyIorToRoughness = Fn( ( [ roughness, ior ] ) => {
 	]
 } );
 
-const singleViewportMipTexture = viewportMipTexture();
+const singleViewportMipTexture = /*@__PURE__*/ viewportMipTexture();
 
-const getTransmissionSample = Fn( ( [ fragCoord, roughness, ior ] ) => {
+const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ] ) => {
 
 	const transmissionSample = singleViewportMipTexture.uv( fragCoord );
 	//const transmissionSample = viewportMipTexture( fragCoord );
 
-	const lod = log2( float( viewportResolution.x ) ).mul( applyIorToRoughness( roughness, ior ) );
+	const lod = log2( float( screenSize.x ) ).mul( applyIorToRoughness( roughness, ior ) );
 
 	return textureBicubic( transmissionSample, lod );
 
 } );
 
-const volumeAttenuation = Fn( ( [ transmissionDistance, attenuationColor, attenuationDistance ] ) => {
+const volumeAttenuation = /*@__PURE__*/ Fn( ( [ transmissionDistance, attenuationColor, attenuationDistance ] ) => {
 
 	If( attenuationDistance.notEqual( 0 ), () => {
 
@@ -105,7 +105,7 @@ const volumeAttenuation = Fn( ( [ transmissionDistance, attenuationColor, attenu
 	]
 } );
 
-const getIBLVolumeRefraction = Fn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion ] ) => {
+const getIBLVolumeRefraction = /*@__PURE__*/ Fn( ( [ n, v, roughness, diffuseColor, specularColor, specularF90, position, modelMatrix, viewMatrix, projMatrix, ior, thickness, attenuationColor, attenuationDistance, dispersion ] ) => {
 
 	let transmittedLight, transmittance;
 
@@ -185,7 +185,7 @@ const getIBLVolumeRefraction = Fn( ( [ n, v, roughness, diffuseColor, specularCo
 //
 
 // XYZ to linear-sRGB color space
-const XYZ_TO_REC709 = mat3(
+const XYZ_TO_REC709 = /*@__PURE__*/ mat3(
 	3.2404542, - 0.9692660, 0.0556434,
 	- 1.5371385, 1.8760108, - 0.2040259,
 	- 0.4985314, 0.0415560, 1.0572252
@@ -228,7 +228,7 @@ const evalSensitivity = ( OPD, shift ) => {
 
 };
 
-const evalIridescence = Fn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0 } ) => {
+const evalIridescence = /*@__PURE__*/ Fn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, baseF0 } ) => {
 
 	// Force iridescenceIOR -> outsideIOR when thinFilmThickness -> 0.0
 	const iridescenceIOR = mix( outsideIOR, eta2, smoothstep( 0.0, 0.03, thinFilmThickness ) );
@@ -308,7 +308,7 @@ const evalIridescence = Fn( ( { outsideIOR, eta2, cosTheta1, thinFilmThickness, 
 // This is a curve-fit approxmation to the "Charlie sheen" BRDF integrated over the hemisphere from
 // Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF". The analysis can be found
 // in the Sheen section of https://drive.google.com/file/d/1T0D1VSyR4AllqIJTQAraEIzjlb5h4FKH/view?usp=sharing
-const IBLSheenBRDF = Fn( ( { normal, viewDir, roughness } ) => {
+const IBLSheenBRDF = /*@__PURE__*/ Fn( ( { normal, viewDir, roughness } ) => {
 
 	const dotNV = normal.dot( viewDir ).saturate();
 

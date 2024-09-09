@@ -1,8 +1,13 @@
-import { registerNodeClass } from '../core/Node.js';
 import FogNode from './FogNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
 class FogExp2Node extends FogNode {
+
+	static get type() {
+
+		return 'FogExp2Node';
+
+	}
 
 	constructor( colorNode, densityNode ) {
 
@@ -27,6 +32,4 @@ class FogExp2Node extends FogNode {
 
 export default FogExp2Node;
 
-registerNodeClass( 'FogExp2', FogExp2Node );
-
-export const densityFog = nodeProxy( FogExp2Node );
+export const densityFog = /*@__PURE__*/ nodeProxy( FogExp2Node );

@@ -149,6 +149,16 @@ if ( /Windows/g.test( navigator.userAgent ) ) {
 
 //
 
+let diagnostics = '';
+
+if ( /Firefox/g.test( navigator.userAgent ) !== true ) {
+
+	diagnostics += 'diagnostic( off, derivative_uniformity );\n';
+
+}
+
+//
+
 class WGSLNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer ) {
@@ -163,7 +173,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
-	needsColorSpaceToLinear( texture ) {
+	needsToWorkingColorSpace( texture ) {
 
 		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
 
@@ -1043,6 +1053,8 @@ ${ flowData.code }
 
 		const shadersData = this.material !== null ? { fragment: {}, vertex: {} } : { compute: {} };
 
+		this.sortBindingGroups();
+
 		for ( const shaderStage in shadersData ) {
 
 			const stageData = shadersData[ shaderStage ];
@@ -1244,8 +1256,8 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 	_getWGSLFragmentCode( shaderData ) {
 
 		return `${ this.getSignature() }
-
-diagnostic( off, derivative_uniformity );
+// global
+${ diagnostics }
 
 // uniforms
 ${shaderData.uniforms}

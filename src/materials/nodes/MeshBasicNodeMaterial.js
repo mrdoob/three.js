@@ -12,6 +12,12 @@ const _defaultValues = /*@__PURE__*/ new MeshBasicMaterial();
 
 class MeshBasicNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'MeshBasicNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();

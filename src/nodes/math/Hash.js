@@ -1,6 +1,6 @@
 import { Fn } from '../tsl/TSLBase.js';
 
-export const hash = Fn( ( [ seed ] ) => {
+export const hash = /*@__PURE__*/ Fn( ( [ seed ] ) => {
 
 	// Taken from https://www.shadertoy.com/view/XlGcRh, originally from pcg-random.org
 

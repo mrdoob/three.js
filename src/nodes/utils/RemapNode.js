@@ -1,7 +1,13 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { float, addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class RemapNode extends Node {
+
+	static get type() {
+
+		return 'RemapNode';
+
+	}
 
 	constructor( node, inLowNode, inHighNode, outLowNode = float( 0 ), outHighNode = float( 1 ) ) {
 
@@ -33,10 +39,8 @@ class RemapNode extends Node {
 
 export default RemapNode;
 
-registerNodeClass( 'Remap', RemapNode );
-
-export const remap = nodeProxy( RemapNode, null, null, { doClamp: false } );
-export const remapClamp = nodeProxy( RemapNode );
+export const remap = /*@__PURE__*/ nodeProxy( RemapNode, null, null, { doClamp: false } );
+export const remapClamp = /*@__PURE__*/ nodeProxy( RemapNode );
 
 addMethodChaining( 'remap', remap );
 addMethodChaining( 'remapClamp', remapClamp );

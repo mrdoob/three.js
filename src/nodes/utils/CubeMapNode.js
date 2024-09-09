@@ -1,4 +1,3 @@
-import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
@@ -10,6 +9,12 @@ import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflection
 const _cache = new WeakMap();
 
 class CubeMapNode extends TempNode {
+
+	static get type() {
+
+		return 'CubeMapNode';
+
+	}
 
 	constructor( envNode ) {
 
@@ -112,8 +117,6 @@ class CubeMapNode extends TempNode {
 
 export default CubeMapNode;
 
-registerNodeClass( 'CubeMap', CubeMapNode );
-
 function isEquirectangularMapReady( image ) {
 
 	if ( image === null || image === undefined ) return false;
@@ -154,4 +157,4 @@ function mapTextureMapping( texture, mapping ) {
 
 }
 
-export const cubeMapNode = nodeProxy( CubeMapNode );
+export const cubeMapNode = /*@__PURE__*/ nodeProxy( CubeMapNode );

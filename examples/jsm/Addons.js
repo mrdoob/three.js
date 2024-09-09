@@ -104,7 +104,6 @@ export * from './loaders/LDrawLoader.js';
 export * from './loaders/LUT3dlLoader.js';
 export * from './loaders/LUTCubeLoader.js';
 export * from './loaders/LWOLoader.js';
-export * from './loaders/LogLuvLoader.js';
 export * from './loaders/LottieLoader.js';
 export * from './loaders/MD2Loader.js';
 export * from './loaders/MDDLoader.js';
@@ -173,9 +172,6 @@ export * from './objects/ShadowMesh.js';
 export * from './objects/Sky.js';
 export * from './objects/Water.js';
 export { Water as Water2 } from './objects/Water2.js';
-export * from './objects/SkyMesh.js';
-export * from './objects/WaterMesh.js';
-export { WaterMesh as Water2Mesh } from './objects/Water2Mesh.js';
 
 export * from './physics/AmmoPhysics.js';
 export * from './physics/RapierPhysics.js';
@@ -272,7 +268,6 @@ export * from './textures/FlakesTexture.js';
 
 export * as BufferGeometryUtils from './utils/BufferGeometryUtils.js';
 export * as CameraUtils from './utils/CameraUtils.js';
-export * from './utils/GPUStatsPanel.js';
 export * as GeometryCompressionUtils from './utils/GeometryCompressionUtils.js';
 export * as GeometryUtils from './utils/GeometryUtils.js';
 export * from './utils/LDrawUtils.js';

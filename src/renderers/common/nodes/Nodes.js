@@ -3,9 +3,9 @@ import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
 import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
 import { NodeFrame } from '../../../nodes/Nodes.js';
-import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, normalWorld, pmremTexture, viewportUV } from '../../../nodes/TSL.js';
+import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, normalWorld, pmremTexture, screenUV } from '../../../nodes/TSL.js';
 
-import { EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
+import { CubeUVReflectionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
 
 const outputNodeMap = new WeakMap();
 
@@ -272,9 +272,9 @@ class Nodes extends DataMap {
 
 				let backgroundNode = null;
 
-				if ( background.isCubeTexture === true || ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping ) ) {
+				if ( background.isCubeTexture === true || ( background.mapping === EquirectangularReflectionMapping || background.mapping === EquirectangularRefractionMapping || background.mapping === CubeUVReflectionMapping ) ) {
 
-					if ( scene.backgroundBlurriness > 0 ) {
+					if ( scene.backgroundBlurriness > 0 || background.mapping === CubeUVReflectionMapping ) {
 
 						backgroundNode = pmremTexture( background, normalWorld );
 
@@ -298,7 +298,7 @@ class Nodes extends DataMap {
 
 				} else if ( background.isTexture === true ) {
 
-					backgroundNode = texture( background, viewportUV.flipY() ).setUpdateMatrix( true );
+					backgroundNode = texture( background, screenUV.flipY() ).setUpdateMatrix( true );
 
 				} else if ( background.isColor !== true ) {
 
@@ -439,7 +439,7 @@ class Nodes extends DataMap {
 		const renderer = this.renderer;
 		const cacheKey = this.getOutputCacheKey();
 
-		const output = texture( outputTexture, viewportUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
+		const output = texture( outputTexture, screenUV ).renderOutput( renderer.toneMapping, renderer.currentColorSpace );
 
 		outputNodeMap.set( outputTexture, cacheKey );
 

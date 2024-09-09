@@ -1,15 +1,20 @@
 import ViewportTextureNode from './ViewportTextureNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
-import { viewportUV } from './ViewportNode.js';
+import { screenUV } from './ScreenNode.js';
 
 import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
-import { registerNodeClass } from '../core/Node.js';
 
 let _sharedFramebuffer = null;
 
 class ViewportSharedTextureNode extends ViewportTextureNode {
 
-	constructor( uvNode = viewportUV, levelNode = null ) {
+	static get type() {
+
+		return 'ViewportSharedTextureNode';
+
+	}
+
+	constructor( uvNode = screenUV, levelNode = null ) {
 
 		if ( _sharedFramebuffer === null ) {
 
@@ -31,6 +36,4 @@ class ViewportSharedTextureNode extends ViewportTextureNode {
 
 export default ViewportSharedTextureNode;
 
-registerNodeClass( 'ViewportSharedTexture', ViewportSharedTextureNode );
-
-export const viewportSharedTexture = nodeProxy( ViewportSharedTextureNode );
+export const viewportSharedTexture = /*@__PURE__*/ nodeProxy( ViewportSharedTextureNode );

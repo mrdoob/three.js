@@ -8,6 +8,12 @@ import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 class AnaglyphPassNode extends StereoCompositePassNode {
 
+	static get type() {
+
+		return 'AnaglyphPassNode';
+
+	}
+
 	constructor( scene, camera ) {
 
 		super( scene, camera );

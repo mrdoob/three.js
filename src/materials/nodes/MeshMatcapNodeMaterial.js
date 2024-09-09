@@ -11,6 +11,12 @@ const _defaultValues = /*@__PURE__*/ new MeshMatcapMaterial();
 
 class MeshMatcapNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'MeshMatcapNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();

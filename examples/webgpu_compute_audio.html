@@ -29,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, uniform, storage, storageObject, instanceIndex, float, texture, viewportUV, color } from 'three/tsl';
+			import { Fn, uniform, storage, storageObject, instanceIndex, float, texture, screenUV, color } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -170,7 +170,7 @@
 
 				analyserTexture = new THREE.DataTexture( analyserBuffer, analyserBuffer.length, 1, THREE.RedFormat );
 
-				const spectrum = texture( analyserTexture, viewportUV.x ).x.mul( viewportUV.y );
+				const spectrum = texture( analyserTexture, screenUV.x ).x.mul( screenUV.y );
 				const backgroundNode = color( 0x0000FF ).mul( spectrum );
 
 

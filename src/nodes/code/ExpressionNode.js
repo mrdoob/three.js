@@ -1,7 +1,13 @@
-import Node, { registerNodeClass } from '../core/Node.js';
+import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
 class ExpressionNode extends Node {
+
+	static get type() {
+
+		return 'ExpressionNode';
+
+	}
 
 	constructor( snippet = '', nodeType = 'void' ) {
 
@@ -32,6 +38,4 @@ class ExpressionNode extends Node {
 
 export default ExpressionNode;
 
-registerNodeClass( 'Expression', ExpressionNode );
-
-export const expression = nodeProxy( ExpressionNode );
+export const expression = /*@__PURE__*/ nodeProxy( ExpressionNode );

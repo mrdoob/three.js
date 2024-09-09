@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.167.0",
+  "version": "0.168.0",
   "description": "JavaScript 3D library",
   "type": "module",
   "main": "./build/three.cjs",
@@ -93,7 +93,7 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-terser": "^0.4.0",
     "chalk": "^5.2.0",
-    "concurrently": "^8.0.1",
+    "concurrently": "^9.0.0",
     "dpdm": "^3.14.0",
     "eslint": "^8.37.0",
     "eslint-config-mdcs": "^5.0.0",

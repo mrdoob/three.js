@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { PI2, spherizeUV, sin, step, texture, timerLocal, Fn, uv, vec2, vec3, vec4, mix, billboarding } from 'three/tsl';
+			import { PI2, oneMinus, spherizeUV, sin, step, texture, timerLocal, Fn, uv, vec2, vec3, vec4, mix, billboarding } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -78,14 +78,14 @@
 						const progress = i / ( gradient.colors.length - 1 );
 						const color = gradient.colors[ i ];
 						fillGradient.addColorStop( progress, color );
-			
+
 					}
 
 					gradient.context.fillStyle = fillGradient;
 					gradient.context.fillRect( 0, 0, gradient.element.width, gradient.element.height );
-			
+
 					gradient.texture.needsUpdate = true;
-			
+
 				};
 
 				gradient.update();
@@ -125,7 +125,7 @@
 					const color = mix( gradientColor, vec3( 1 ), shape.step( 0.8 ).oneMinus() );
 					const alpha = shape.smoothstep( 0, 0.3 );
 					return vec4( color.rgb, alpha );
-			
+
 				} )();
 
 				// flame 2 material
@@ -150,7 +150,7 @@
 					// gradients
 					const gradient1 = sin( time.mul( 10 ).sub( mainUv.y.mul( PI2 ).mul( 2 ) ) );
 					const gradient2 = mainUv.y.smoothstep( 0, 1 );
-					const gradient3 = mainUv.y.smoothstep( 1, 0.7 );
+					const gradient3 = oneMinus( mainUv.y ).smoothstep( 0, 0.3 );
 					mainUv.x.addAssign( gradient1.mul( gradient2 ).mul( 0.2 ) );
 
 					// displaced perlin noise
@@ -172,7 +172,7 @@
 
 					// output
 					return vec4( vec3( 1 ), shape );
-			
+
 				} )();
 
 				// billboarding - follow the camera rotation only horizontally

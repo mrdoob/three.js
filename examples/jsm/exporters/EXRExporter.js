@@ -21,20 +21,20 @@ const ZIP_COMPRESSION = 3;
 
 class EXRExporter {
 
-	parse( arg1, arg2, arg3 ) {
+	async parse( arg1, arg2, arg3 ) {
 
-		if ( ! arg1 || ! ( arg1.isWebGLRenderer || arg1.isDataTexture ) ) {
+		if ( ! arg1 || ! ( arg1.isWebGLRenderer || arg1.isWebGPURenderer || arg1.isDataTexture ) ) {
 
 			throw Error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer or DataTexture.' );
 
-		} else if ( arg1.isWebGLRenderer ) {
+		} else if ( arg1.isWebGLRenderer || arg1.isWebGPURenderer ) {
 
 			const renderer = arg1, renderTarget = arg2, options = arg3;
 
 			supportedRTT( renderTarget );
 
 			const info = buildInfoRTT( renderTarget, options ),
-				dataBuffer = getPixelData( renderer, renderTarget, info ),
+				dataBuffer = await getPixelData( renderer, renderTarget, info ),
 				rawContentBuffer = reorganizeDataBuffer( dataBuffer, info ),
 				chunks = compressData( rawContentBuffer, info );
 
@@ -61,7 +61,7 @@ class EXRExporter {
 
 function supportedRTT( renderTarget ) {
 
-	if ( ! renderTarget || ! renderTarget.isWebGLRenderTarget ) {
+	if ( ! renderTarget || ! renderTarget.isRenderTarget ) {
 
 		throw Error( 'EXRExporter.parse: Unsupported second parameter, expected instance of WebGLRenderTarget.' );
 
@@ -189,21 +189,29 @@ function buildInfoDT( texture, options = {} ) {
 
 }
 
-function getPixelData( renderer, rtt, info ) {
+async function getPixelData( renderer, rtt, info ) {
 
 	let dataBuffer;
 
-	if ( info.type === FloatType ) {
+	if ( renderer.isWebGLRenderer ) {
 
-		dataBuffer = new Float32Array( info.width * info.height * info.numInputChannels );
+		if ( info.type === FloatType ) {
+
+			dataBuffer = new Float32Array( info.width * info.height * info.numInputChannels );
+
+		} else {
+
+			dataBuffer = new Uint16Array( info.width * info.height * info.numInputChannels );
+
+		}
+
+		await renderer.readRenderTargetPixelsAsync( rtt, 0, 0, info.width, info.height, dataBuffer );
 
 	} else {
 
-		dataBuffer = new Uint16Array( info.width * info.height * info.numInputChannels );
+		dataBuffer = await renderer.readRenderTargetPixelsAsync( rtt, 0, 0, info.width, info.height );
 
 	}
-
-	renderer.readRenderTargetPixels( rtt, 0, 0, info.width, info.height, dataBuffer );
 
 	return dataBuffer;
 

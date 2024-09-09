@@ -62,7 +62,7 @@ const MAX_POINTS = 500;
 const geometry = new THREE.BufferGeometry();
 
 // attributes
-const positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+const positions = new Float32Array( MAX_POINTS * 3 ); // 3 floats (x, y and z) per point
 geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 // draw range

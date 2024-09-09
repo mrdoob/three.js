@@ -1,8 +1,14 @@
-import Node, { registerNodeClass } from './Node.js';
+import Node from './Node.js';
 
 class UniformGroupNode extends Node {
 
-	constructor( name, shared = false ) {
+	static get type() {
+
+		return 'UniformGroupNode';
+
+	}
+
+	constructor( name, shared = false, order = 1 ) {
 
 		super( 'string' );
 
@@ -10,7 +16,7 @@ class UniformGroupNode extends Node {
 		this.version = 0;
 
 		this.shared = shared;
-
+		this.order = order;
 		this.isUniformGroup = true;
 
 	}
@@ -45,11 +51,9 @@ class UniformGroupNode extends Node {
 
 export default UniformGroupNode;
 
-registerNodeClass( 'UniformGroup', UniformGroupNode );
-
 export const uniformGroup = ( name ) => new UniformGroupNode( name );
-export const sharedUniformGroup = ( name ) => new UniformGroupNode( name, true );
+export const sharedUniformGroup = ( name, order = 0 ) => new UniformGroupNode( name, true, order );
 
-export const frameGroup = sharedUniformGroup( 'frame' );
-export const renderGroup = sharedUniformGroup( 'render' );
-export const objectGroup = uniformGroup( 'object' );
+export const frameGroup = /*@__PURE__*/ sharedUniformGroup( 'frame' );
+export const renderGroup = /*@__PURE__*/ sharedUniformGroup( 'render' );
+export const objectGroup = /*@__PURE__*/ uniformGroup( 'object' );

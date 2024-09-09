@@ -3,7 +3,7 @@
  * Copyright 2010-2024 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '168dev';
+const REVISION = '169dev';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -9896,7 +9896,6 @@ class BufferAttribute {
 		this.normalized = normalized;
 
 		this.usage = StaticDrawUsage;
-		this._updateRange = { offset: 0, count: - 1 };
 		this.updateRanges = [];
 		this.gpuType = FloatType;
 
@@ -9909,13 +9908,6 @@ class BufferAttribute {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
-
-	}
-
-	get updateRange() {
-
-		warnOnce( 'THREE.BufferAttribute: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
-		return this._updateRange;
 
 	}
 
@@ -13603,19 +13595,60 @@ function WebGLAttributes( gl ) {
 	function updateBuffer( buffer, attribute, bufferType ) {
 
 		const array = attribute.array;
-		const updateRange = attribute._updateRange; // @deprecated, r159
 		const updateRanges = attribute.updateRanges;
 
 		gl.bindBuffer( bufferType, buffer );
 
-		if ( updateRange.count === - 1 && updateRanges.length === 0 ) {
+		if ( updateRanges.length === 0 ) {
 
 			// Not using update ranges
 			gl.bufferSubData( bufferType, 0, array );
 
-		}
+		} else {
 
-		if ( updateRanges.length !== 0 ) {
+			// Before applying update ranges, we merge any adjacent / overlapping
+			// ranges to reduce load on `gl.bufferSubData`. Empirically, this has led
+			// to performance improvements for applications which make heavy use of
+			// update ranges. Likely due to GPU command overhead.
+			//
+			// Note that to reduce garbage collection between frames, we merge the
+			// update ranges in-place. This is safe because this method will clear the
+			// update ranges once updated.
+
+			updateRanges.sort( ( a, b ) => a.start - b.start );
+
+			// To merge the update ranges in-place, we work from left to right in the
+			// existing updateRanges array, merging ranges. This may result in a final
+			// array which is smaller than the original. This index tracks the last
+			// index representing a merged range, any data after this index can be
+			// trimmed once the merge algorithm is completed.
+			let mergeIndex = 0;
+
+			for ( let i = 1; i < updateRanges.length; i ++ ) {
+
+				const previousRange = updateRanges[ mergeIndex ];
+				const range = updateRanges[ i ];
+
+				// We add one here to merge adjacent ranges. This is safe because ranges
+				// operate over positive integers.
+				if ( range.start <= previousRange.start + previousRange.count + 1 ) {
+
+					previousRange.count = Math.max(
+						previousRange.count,
+						range.start + range.count - previousRange.start
+					);
+
+				} else {
+
+					++ mergeIndex;
+					updateRanges[ mergeIndex ] = range;
+
+				}
+
+			}
+
+			// Trim the array to only contain the merged ranges.
+			updateRanges.length = mergeIndex + 1;
 
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
@@ -13627,16 +13660,6 @@ function WebGLAttributes( gl ) {
 			}
 
 			attribute.clearUpdateRanges();
-
-		}
-
-		// @deprecated, r159
-		if ( updateRange.count !== - 1 ) {
-
-			gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-				array, updateRange.offset, updateRange.count );
-
-			updateRange.count = - 1; // reset range
 
 		}
 
@@ -29578,6 +29601,12 @@ class WebGLRenderer {
 
 			scene.traverse( function ( object ) {
 
+				if ( ! ( object.isMesh || object.isPoints || object.isLine || object.isSprite ) ) {
+
+					return;
+
+				}
+
 				const material = object.material;
 
 				if ( material ) {
@@ -31045,61 +31074,55 @@ class WebGLRenderer {
 
 			if ( framebuffer ) {
 
-				state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+				const texture = renderTarget.texture;
+				const textureFormat = texture.format;
+				const textureType = texture.type;
 
-				try {
+				if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
 
-					const texture = renderTarget.texture;
-					const textureFormat = texture.format;
-					const textureType = texture.type;
+					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA or implementation defined format.' );
 
-					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
+				}
 
-						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA or implementation defined format.' );
+				if ( ! capabilities.textureTypeReadable( textureType ) ) {
 
-					}
+					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.' );
 
-					if ( ! capabilities.textureTypeReadable( textureType ) ) {
+				}
 
-						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.' );
+				// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
+				if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-					}
-
-					// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
-					if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
-
-						const glBuffer = _gl.createBuffer();
-						_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
-						_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
-						_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
-						_gl.flush();
-
-						// check if the commands have finished every 8 ms
-						const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
-						await probeAsync( _gl, sync, 4 );
-
-						try {
-
-							_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
-							_gl.getBufferSubData( _gl.PIXEL_PACK_BUFFER, 0, buffer );
-
-						} finally {
-
-							_gl.deleteBuffer( glBuffer );
-							_gl.deleteSync( sync );
-
-						}
-
-						return buffer;
-
-					}
-
-				} finally {
-
-					// restore framebuffer of current render target if necessary
-
-					const framebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+					// set the active frame buffer to the one we want to read
 					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+
+					const glBuffer = _gl.createBuffer();
+					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+					_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
+					_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
+
+					// reset the frame buffer to the currently set buffer before waiting
+					const currFramebuffer = _currentRenderTarget !== null ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+					state.bindFramebuffer( _gl.FRAMEBUFFER, currFramebuffer );
+
+					// check if the commands have finished every 8 ms
+					const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
+
+					_gl.flush();
+
+					await probeAsync( _gl, sync, 4 );
+
+					// read the data and delete the buffer
+					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+					_gl.getBufferSubData( _gl.PIXEL_PACK_BUFFER, 0, buffer );
+					_gl.deleteBuffer( glBuffer );
+					_gl.deleteSync( sync );
+
+					return buffer;
+
+				} else {
+
+					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: requested read bounds are out of range.' );
 
 				}
 
@@ -31585,7 +31608,6 @@ class InterleavedBuffer {
 		this.count = array !== undefined ? array.length / stride : 0;
 
 		this.usage = StaticDrawUsage;
-		this._updateRange = { offset: 0, count: - 1 };
 		this.updateRanges = [];
 
 		this.version = 0;
@@ -31599,13 +31621,6 @@ class InterleavedBuffer {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
-
-	}
-
-	get updateRange() {
-
-		warnOnce( 'THREE.InterleavedBuffer: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
-		return this._updateRange;
 
 	}
 
@@ -33647,12 +33662,11 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		const geometryCount = this._geometryCount;
 		const boundingBox = this.boundingBox;
 		const drawInfo = this._drawInfo;
 
 		boundingBox.makeEmpty();
-		for ( let i = 0; i < geometryCount; i ++ ) {
+		for ( let i = 0, l = drawInfo.length; i < l; i ++ ) {
 
 			if ( drawInfo[ i ].active === false ) continue;
 
@@ -45813,7 +45827,7 @@ class MaterialLoader extends Loader {
 
 		}
 
-		const material = MaterialLoader.createMaterialFromType( json.type );
+		const material = this.createMaterialFromType( json.type );
 
 		if ( json.uuid !== undefined ) material.uuid = json.uuid;
 		if ( json.name !== undefined ) material.name = json.name;
@@ -46066,6 +46080,12 @@ class MaterialLoader extends Loader {
 
 		this.textures = value;
 		return this;
+
+	}
+
+	createMaterialFromType( type ) {
+
+		return MaterialLoader.createMaterialFromType( type );
 
 	}
 
@@ -47899,7 +47919,7 @@ class Clock {
 
 function now() {
 
-	return ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
+	return performance.now();
 
 }
 

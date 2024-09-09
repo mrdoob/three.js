@@ -7,6 +7,12 @@ const _defaultValues = /*@__PURE__*/ new ShadowMaterial();
 
 class ShadowNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'ShadowNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();

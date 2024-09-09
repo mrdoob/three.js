@@ -11,6 +11,12 @@ import { texture3D } from '../../nodes/accessors/Texture3DNode.js';
 
 class VolumeNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'VolumeNodeMaterial';
+
+	}
+
 	constructor( params = {} ) {
 
 		super();

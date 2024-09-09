@@ -1,4 +1,3 @@
-import { registerNodeClass } from '../core/Node.js';
 import BufferNode from './BufferNode.js';
 import { bufferAttribute } from './BufferAttributeNode.js';
 import { nodeObject, varying } from '../tsl/TSLBase.js';
@@ -6,6 +5,12 @@ import { storageElement } from '../utils/StorageArrayElementNode.js';
 import { GPUBufferBindingType } from '../../renderers/webgpu/utils/WebGPUConstants.js';
 
 class StorageBufferNode extends BufferNode {
+
+	static get type() {
+
+		return 'StorageBufferNode';
+
+	}
 
 	constructor( value, bufferType, bufferCount = 0 ) {
 
@@ -121,8 +126,6 @@ class StorageBufferNode extends BufferNode {
 }
 
 export default StorageBufferNode;
-
-registerNodeClass( 'StorageBuffer', StorageBufferNode );
 
 // Read-Write Storage
 export const storage = ( value, type, count ) => nodeObject( new StorageBufferNode( value, type, count ) );

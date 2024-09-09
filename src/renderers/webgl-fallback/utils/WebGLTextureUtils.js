@@ -245,6 +245,12 @@ class WebGLTextureUtils {
 
 		const { gl, extensions, backend } = this;
 
+
+		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
+		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
+
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_S, wrappingToGL[ texture.wrapS ] );
 		gl.texParameteri( textureType, gl.TEXTURE_WRAP_T, wrappingToGL[ texture.wrapT ] );
 
@@ -333,11 +339,6 @@ class WebGLTextureUtils {
 
 		backend.state.bindTexture( glTextureType, textureGPU );
 
-		gl.pixelStorei( gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-		gl.pixelStorei( gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-		gl.pixelStorei( gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
-		gl.pixelStorei( gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE );
-
 		this.setTextureParameters( glTextureType, texture );
 
 		if ( texture.isDataArrayTexture || texture.isCompressedArrayTexture ) {
@@ -425,6 +426,8 @@ class WebGLTextureUtils {
 		};
 
 		this.backend.state.bindTexture( glTextureType, textureGPU );
+
+		this.setTextureParameters( glTextureType, texture );
 
 		if ( texture.isCompressedTexture ) {
 
@@ -803,7 +806,7 @@ class WebGLTextureUtils {
 
 	}
 
-	async copyTextureToBuffer( texture, x, y, width, height ) {
+	async copyTextureToBuffer( texture, x, y, width, height, faceIndex ) {
 
 		const { backend, gl } = this;
 
@@ -812,10 +815,13 @@ class WebGLTextureUtils {
 		const fb = gl.createFramebuffer();
 
 		gl.bindFramebuffer( gl.READ_FRAMEBUFFER, fb );
-		gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureGPU, 0 );
+
+		const target = texture.isCubeTexture ? gl.TEXTURE_CUBE_MAP_POSITIVE_X + faceIndex : gl.TEXTURE_2D;
+
+		gl.framebufferTexture2D( gl.READ_FRAMEBUFFER, gl.COLOR_ATTACHMENT0, target, textureGPU, 0 );
 
 		const typedArrayType = this._getTypedArrayType( glType );
-		const bytesPerTexel = this._getBytesPerTexel( glFormat );
+		const bytesPerTexel = this._getBytesPerTexel( glType, glFormat );
 
 		const elementCount = width * height;
 		const byteLength = elementCount * bytesPerTexel;
@@ -853,19 +859,33 @@ class WebGLTextureUtils {
 		if ( glType === gl.UNSIGNED_SHORT ) return Uint16Array;
 		if ( glType === gl.UNSIGNED_INT ) return Uint32Array;
 
+		if ( glType === gl.HALF_FLOAT ) return Uint16Array;
 		if ( glType === gl.FLOAT ) return Float32Array;
 
 		throw new Error( `Unsupported WebGL type: ${glType}` );
 
 	}
 
-	_getBytesPerTexel( glFormat ) {
+	_getBytesPerTexel( glType, glFormat ) {
 
 		const { gl } = this;
 
-		if ( glFormat === gl.RGBA ) return 4;
-		if ( glFormat === gl.RGB ) return 3;
-		if ( glFormat === gl.ALPHA ) return 1;
+		let bytesPerComponent = 0;
+
+		if ( glType === gl.UNSIGNED_BYTE ) bytesPerComponent = 1;
+
+		if ( glType === gl.UNSIGNED_SHORT_4_4_4_4 ||
+			glType === gl.UNSIGNED_SHORT_5_5_5_1 ||
+			glType === gl.UNSIGNED_SHORT_5_6_5 ||
+			glType === gl.UNSIGNED_SHORT ||
+			glType === gl.HALF_FLOAT ) bytesPerComponent = 2;
+
+		if ( glType === gl.UNSIGNED_INT ||
+			glType === gl.FLOAT ) bytesPerComponent = 4;
+
+		if ( glFormat === gl.RGBA ) return bytesPerComponent * 4;
+		if ( glFormat === gl.RGB ) return bytesPerComponent * 3;
+		if ( glFormat === gl.ALPHA ) return bytesPerComponent;
 
 	}
 

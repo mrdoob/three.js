@@ -11,6 +11,12 @@ const _defaultValues = /*@__PURE__*/ new MeshPhongMaterial();
 
 class MeshPhongNodeMaterial extends NodeMaterial {
 
+	static get type() {
+
+		return 'MeshPhongNodeMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();

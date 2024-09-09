@@ -1,10 +1,15 @@
-import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
 import { LinearSRGBColorSpace, SRGBColorSpace, NoToneMapping } from '../../constants.js';
 
 class RenderOutputNode extends TempNode {
+
+	static get type() {
+
+		return 'RenderOutputNode';
+
+	}
 
 	constructor( colorNode, toneMapping, outputColorSpace ) {
 
@@ -37,7 +42,7 @@ class RenderOutputNode extends TempNode {
 
 		if ( outputColorSpace === SRGBColorSpace ) {
 
-			outputNode = outputNode.linearToColorSpace( outputColorSpace );
+			outputNode = outputNode.toOutputColorSpace( outputColorSpace );
 
 		}
 
@@ -48,8 +53,6 @@ class RenderOutputNode extends TempNode {
 }
 
 export default RenderOutputNode;
-
-registerNodeClass( 'RenderOutput', RenderOutputNode );
 
 export const renderOutput = ( color, toneMapping = null, outputColorSpace = null ) => nodeObject( new RenderOutputNode( nodeObject( color ), toneMapping, outputColorSpace ) );
 

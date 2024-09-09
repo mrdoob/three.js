@@ -1,8 +1,13 @@
-import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
 class OperatorNode extends TempNode {
+
+	static get type() {
+
+		return 'OperatorNode';
+
+	}
 
 	constructor( op, aNode, bNode, ...params ) {
 
@@ -259,29 +264,27 @@ class OperatorNode extends TempNode {
 
 export default OperatorNode;
 
-registerNodeClass( 'Operator', OperatorNode );
-
-export const add = nodeProxy( OperatorNode, '+' );
-export const sub = nodeProxy( OperatorNode, '-' );
-export const mul = nodeProxy( OperatorNode, '*' );
-export const div = nodeProxy( OperatorNode, '/' );
-export const modInt = nodeProxy( OperatorNode, '%' );
-export const equal = nodeProxy( OperatorNode, '==' );
-export const notEqual = nodeProxy( OperatorNode, '!=' );
-export const lessThan = nodeProxy( OperatorNode, '<' );
-export const greaterThan = nodeProxy( OperatorNode, '>' );
-export const lessThanEqual = nodeProxy( OperatorNode, '<=' );
-export const greaterThanEqual = nodeProxy( OperatorNode, '>=' );
-export const and = nodeProxy( OperatorNode, '&&' );
-export const or = nodeProxy( OperatorNode, '||' );
-export const not = nodeProxy( OperatorNode, '!' );
-export const xor = nodeProxy( OperatorNode, '^^' );
-export const bitAnd = nodeProxy( OperatorNode, '&' );
-export const bitNot = nodeProxy( OperatorNode, '~' );
-export const bitOr = nodeProxy( OperatorNode, '|' );
-export const bitXor = nodeProxy( OperatorNode, '^' );
-export const shiftLeft = nodeProxy( OperatorNode, '<<' );
-export const shiftRight = nodeProxy( OperatorNode, '>>' );
+export const add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' );
+export const sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' );
+export const mul = /*@__PURE__*/ nodeProxy( OperatorNode, '*' );
+export const div = /*@__PURE__*/ nodeProxy( OperatorNode, '/' );
+export const modInt = /*@__PURE__*/ nodeProxy( OperatorNode, '%' );
+export const equal = /*@__PURE__*/ nodeProxy( OperatorNode, '==' );
+export const notEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '!=' );
+export const lessThan = /*@__PURE__*/ nodeProxy( OperatorNode, '<' );
+export const greaterThan = /*@__PURE__*/ nodeProxy( OperatorNode, '>' );
+export const lessThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '<=' );
+export const greaterThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '>=' );
+export const and = /*@__PURE__*/ nodeProxy( OperatorNode, '&&' );
+export const or = /*@__PURE__*/ nodeProxy( OperatorNode, '||' );
+export const not = /*@__PURE__*/ nodeProxy( OperatorNode, '!' );
+export const xor = /*@__PURE__*/ nodeProxy( OperatorNode, '^^' );
+export const bitAnd = /*@__PURE__*/ nodeProxy( OperatorNode, '&' );
+export const bitNot = /*@__PURE__*/ nodeProxy( OperatorNode, '~' );
+export const bitOr = /*@__PURE__*/ nodeProxy( OperatorNode, '|' );
+export const bitXor = /*@__PURE__*/ nodeProxy( OperatorNode, '^' );
+export const shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' );
+export const shiftRight = /*@__PURE__*/ nodeProxy( OperatorNode, '>>' );
 
 addMethodChaining( 'add', add );
 addMethodChaining( 'sub', sub );

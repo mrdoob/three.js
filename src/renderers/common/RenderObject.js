@@ -60,6 +60,7 @@ export default class RenderObject {
 		this.attributes = null;
 		this.pipeline = null;
 		this.vertexBuffers = null;
+		this.drawParams = null;
 
 		this.clippingContext = clippingContext;
 		this.clippingContextCacheKey = clippingContext !== null ? clippingContext.cacheKey : '';
@@ -159,6 +160,61 @@ export default class RenderObject {
 		if ( this.vertexBuffers === null ) this.getAttributes();
 
 		return this.vertexBuffers;
+
+	}
+
+	getDrawParameters() {
+
+		const { object, material, geometry, group, drawRange } = this;
+
+		const drawParams = this.drawParams || ( this.drawParams = {
+			vertexCount: 0,
+			firstVertex: 0,
+			instanceCount: 0,
+			firstInstance: 0
+		} );
+
+		const index = this.getIndex();
+		const hasIndex = ( index !== null );
+		const instanceCount = geometry.isInstancedBufferGeometry ? geometry.instanceCount : ( object.count > 1 ? object.count : 1 );
+
+		if ( instanceCount === 0 ) return null;
+
+		drawParams.instanceCount = instanceCount;
+
+		if ( object.isBatchedMesh === true ) return drawParams;
+
+		let rangeFactor = 1;
+
+		if ( material.wireframe === true && ! object.isPoints && ! object.isLineSegments && ! object.isLine && ! object.isLineLoop ) {
+
+			rangeFactor = 2;
+
+		}
+
+		let firstVertex = drawRange.start * rangeFactor;
+		let lastVertex = ( drawRange.start + drawRange.count ) * rangeFactor;
+
+		if ( group !== null ) {
+
+			firstVertex = Math.max( firstVertex, group.start * rangeFactor );
+			lastVertex = Math.min( lastVertex, ( group.start + group.count ) * rangeFactor );
+
+		}
+
+		const itemCount = hasIndex === true ? index.count : geometry.attributes.position.count;
+
+		firstVertex = Math.max( firstVertex, 0 );
+		lastVertex = Math.min( lastVertex, itemCount );
+
+		const count = lastVertex - firstVertex;
+
+		if ( count < 0 || count === Infinity ) return null;
+
+		drawParams.vertexCount = count;
+		drawParams.firstVertex = firstVertex;
+
+		return drawParams;
 
 	}
 

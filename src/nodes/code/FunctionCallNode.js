@@ -1,8 +1,13 @@
-import { registerNodeClass } from '../core/Node.js';
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeArray, nodeObject, nodeObjects } from '../tsl/TSLCore.js';
 
 class FunctionCallNode extends TempNode {
+
+	static get type() {
+
+		return 'FunctionCallNode';
+
+	}
 
 	constructor( functionNode = null, parameters = {} ) {
 
@@ -82,8 +87,6 @@ class FunctionCallNode extends TempNode {
 }
 
 export default FunctionCallNode;
-
-registerNodeClass( 'FunctionCall', FunctionCallNode );
 
 export const call = ( func, ...params ) => {
 

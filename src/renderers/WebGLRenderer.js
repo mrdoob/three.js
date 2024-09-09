@@ -979,6 +979,12 @@ class WebGLRenderer {
 
 			scene.traverse( function ( object ) {
 
+				if ( ! ( object.isMesh || object.isPoints || object.isLine || object.isSprite ) ) {
+
+					return;
+
+				}
+
 				const material = object.material;
 
 				if ( material ) {
@@ -2446,61 +2452,55 @@ class WebGLRenderer {
 
 			if ( framebuffer ) {
 
-				state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+				const texture = renderTarget.texture;
+				const textureFormat = texture.format;
+				const textureType = texture.type;
 
-				try {
+				if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
 
-					const texture = renderTarget.texture;
-					const textureFormat = texture.format;
-					const textureType = texture.type;
+					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA or implementation defined format.' );
 
-					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
+				}
 
-						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA or implementation defined format.' );
+				if ( ! capabilities.textureTypeReadable( textureType ) ) {
 
-					}
+					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.' );
 
-					if ( ! capabilities.textureTypeReadable( textureType ) ) {
+				}
 
-						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.' );
+				// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
+				if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-					}
-
-					// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
-					if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
-
-						const glBuffer = _gl.createBuffer();
-						_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
-						_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
-						_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
-						_gl.flush();
-
-						// check if the commands have finished every 8 ms
-						const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
-						await probeAsync( _gl, sync, 4 );
-
-						try {
-
-							_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
-							_gl.getBufferSubData( _gl.PIXEL_PACK_BUFFER, 0, buffer );
-
-						} finally {
-
-							_gl.deleteBuffer( glBuffer );
-							_gl.deleteSync( sync );
-
-						}
-
-						return buffer;
-
-					}
-
-				} finally {
-
-					// restore framebuffer of current render target if necessary
-
-					const framebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+					// set the active frame buffer to the one we want to read
 					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+
+					const glBuffer = _gl.createBuffer();
+					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+					_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
+					_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
+
+					// reset the frame buffer to the currently set buffer before waiting
+					const currFramebuffer = _currentRenderTarget !== null ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+					state.bindFramebuffer( _gl.FRAMEBUFFER, currFramebuffer );
+
+					// check if the commands have finished every 8 ms
+					const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
+
+					_gl.flush();
+
+					await probeAsync( _gl, sync, 4 );
+
+					// read the data and delete the buffer
+					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+					_gl.getBufferSubData( _gl.PIXEL_PACK_BUFFER, 0, buffer );
+					_gl.deleteBuffer( glBuffer );
+					_gl.deleteSync( sync );
+
+					return buffer;
+
+				} else {
+
+					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: requested read bounds are out of range.' );
 
 				}
 

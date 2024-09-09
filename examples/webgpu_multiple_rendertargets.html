@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, vec2, step, texture, uv, viewportUV, normalWorld, output, mrt } from 'three/tsl';
+			import { mix, vec2, step, texture, uv, screenUV, normalWorld, output, mrt } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -86,7 +86,7 @@
 				// Post Processing
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = mix( texture( renderTarget.textures[ 0 ] ), texture( renderTarget.textures[ 1 ] ), step( 0.5, viewportUV.x ) );
+				postProcessing.outputNode = mix( texture( renderTarget.textures[ 0 ] ), texture( renderTarget.textures[ 1 ] ), step( 0.5, screenUV.x ) );
 
 				// Controls
 

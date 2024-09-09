@@ -1,10 +1,10 @@
 <!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8">
-    <title>Primitives de </title>
+    <title>Primitives</title>
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@threejs">
-    <meta name="twitter:title" content="Three.js – Primitives de ">
+    <meta name="twitter:title" content="Three.js – Primitives">
     <meta property="og:image" content="https://threejs.org/files/share.png">
     <link rel="shortcut icon" href="../../files/favicon_white.ico" media="(prefers-color-scheme: dark)">
     <link rel="shortcut icon" href="../../files/favicon.ico" media="(prefers-color-scheme: light)">
@@ -22,7 +22,7 @@
   <body>
     <div class="container">
       <div class="lesson-title">
-        <h1>Primitives de </h1>
+        <h1>Primitives</h1>
       </div>
       <div class="lesson">
         <div class="lesson-main">
@@ -57,7 +57,7 @@ utiliser en fonction de vos besoins.</p>
 <div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">Un Octaèdre (8 côtés)</div>
 <div id="Diagram-ParametricGeometry" data-primitive="ParametricGeometry">Une surface générée en fournissant à la fonction un point 2D d'une grille et retourne le point 3D correspondant.</div>
 <div id="Diagram-PlaneGeometry" data-primitive="PlaneGeometry">Un plan 2D</div>
-<div id="Diagram-PolyhedronGeometry" data-primitive="PolyhedronGeometry">Prend un ensemble de triangles centrés autour d'un point et les projette sur une sphère</div>
+<div id="Diagram-PolyhedronGeometry" data-primitive="PolyhedronGeometry">Prend un ensemble de triangles centrés autour d'un point et les projettes sur une sphère</div>
 <div id="Diagram-RingGeometry" data-primitive="RingGeometry">Un disque 2D avec un trou au centre</div>
 <div id="Diagram-ShapeGeometry" data-primitive="ShapeGeometry">Un tracé 2D qui se triangule</div>
 <div id="Diagram-SphereGeometry" data-primitive="SphereGeometry">une sphère</div>
@@ -75,7 +75,7 @@ ci-dessous et vous verrez les arêtes en dessous de ce seuil disparatre.</div>
 <div id="Diagram-WireframeGeometry" data-primitive="WireframeGeometry">Génère une géométrie qui
 contient un segment de droite (2 points) par arête dans la géométrie donnée. Sans cela, il vous
 manquerait souvent des arêtes ou vous obtiendriez des arêtes supplémentaires puisque WebGL exige
-généralement 2 points par segment de ligne. Par exemple, si vous n'aviez d'un seul triangle, il
+généralement 2 points par segment de ligne. Par exemple, si vous n'aviez qu'un seul triangle, il
 n'y aurait que 3 points. Si vous essayez de le dessiner en utilisant un matériau avec
 <code class="notranslate" translate="no">wireframe: true</code> vous n'obtiendrez qu'une seule ligne. Si vous passez cette géométrie
 triangulaire à un <a href="/docs/#api/en/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a> vous obtenez une nouvelle géométrie qui comporte
@@ -119,11 +119,11 @@ Nous utiliserons une fonction de <a href="/docs/#api/en/math/Color"><code class=
 une couleur en fonction de la teinte, de la saturation et de la luminosité.</p>
 <p>La <code class="notranslate" translate="no">hue</code> (teinte) va de 0 à 1 autour de la roue des couleurs avec
 le rouge à 0, le vert à 0,33 et le bleu à 0,66. La <code class="notranslate" translate="no">saturation</code>
-va de 0 à 1,0 n'ayant pat de couleur et 1 étant saturé. La <code class="notranslate" translate="no">luminance</code>
+va de 0 à 1, 0 n'ayant pas de couleur et 1 étant saturé. La <code class="notranslate" translate="no">luminance</code>
 (luminosité) va de 0 à 1, 0 étant le noir, 1 le blanc et 0,5 la
-quantité maximale de la couleur En d'autres termes, lorsque la
-<code class="notranslate" translate="no">luminance</code> va de 0,0 à 0,5, la couleur passe du noir à la <code class="notranslate" translate="no">hue</code>.
-De 0,5 à 1,0 la couleur passe de la <code class="notranslate" translate="no">hue</code> au blanc.</p>
+quantité maximale de la couleur. En d'autres termes, lorsque la
+<code class="notranslate" translate="no">luminance</code> va de 0,0 à 0,5, la couleur passe du noir à <code class="notranslate" translate="no">hue</code> (la teinte).
+De 0,5 à 1,0 la couleur passe de <code class="notranslate" translate="no">hue</code> au blanc.</p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function createMaterial () {
   const material = new THREE.MeshPhongMaterial({
     side: THREE.DoubleSide,
@@ -145,7 +145,7 @@ côtés arrières des triangles car ils sont tous tournés ver l'intérieur
 de la forme. Dans notre cas, cependant, nous dessinons des objets
 comme la <a href="/docs/#api/en/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a> ou la <a href="/docs/#api/en/geometries/ShapeGeometry"><code class="notranslate" translate="no">ShapeGeometry</code></a>
 qui sont bidimensionnnels et n'ont donc pas d'intérieur.
-Sans le paramètre <code class="notranslate" translate="no">side: THREE.DoubleSide</code> elle disparaîtraient
+Sans le paramètre <code class="notranslate" translate="no">side: THREE.DoubleSide</code> ils disparaîtraient
 quand on regarderait leur dos.</p>
 <p>Notons qu'il est plus rapide de dessiner quand on ne met <strong>pas</strong>
 <code class="notranslate" translate="no">side: THREE.DoubleSide</code>, donc l'idéal serait de ne le mettre que sur
