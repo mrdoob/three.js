@@ -2,7 +2,7 @@ import { EventDispatcher } from '../core/EventDispatcher.js';
 
 class Controls extends EventDispatcher {
 
-	constructor( object, domElement ) {
+	constructor( object, domElement = null ) {
 
 		super();
 
