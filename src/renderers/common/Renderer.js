@@ -1247,13 +1247,13 @@ class Renderer {
 
 	}
 
-	copyFramebufferToTexture( framebufferTexture ) {
+	copyFramebufferToTexture( framebufferTexture, position = null ) {
 
 		const renderContext = this._currentRenderContext;
 
 		this._textures.updateTexture( framebufferTexture );
 
-		this.backend.copyFramebufferToTexture( framebufferTexture, renderContext );
+		this.backend.copyFramebufferToTexture( framebufferTexture, renderContext, position );
 
 	}
 

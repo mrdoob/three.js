@@ -692,20 +692,25 @@ class WebGLTextureUtils {
 
 	}
 
-	copyFramebufferToTexture( texture, renderContext ) {
+	copyFramebufferToTexture( texture, renderContext, position ) {
 
 		const { gl } = this;
 		const { state } = this.backend;
 
 		const { textureGPU } = this.backend.get( texture );
 
-		const width = texture.image.width;
-		const height = texture.image.height;
+		const { width, height } = texture.image;
+
+		const x = position !== null ? position.x : 0;
+		const y = position !== null ? position.y : 0;
 
 		const requireDrawFrameBuffer = texture.isDepthTexture === true || ( renderContext.renderTarget && renderContext.renderTarget.samples > 0 );
 
+		const srcHeight = renderContext.renderTarget ? renderContext.renderTarget.height : this.backend.gerDrawingBufferSize().y;
+
 		if ( requireDrawFrameBuffer ) {
 
+			const partial = ( x !== 0 || y !== 0 );
 			let mask;
 			let attachment;
 
@@ -727,19 +732,45 @@ class WebGLTextureUtils {
 
 			}
 
-			const fb = gl.createFramebuffer();
-			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+			if ( partial ) {
 
-			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureGPU, 0 );
+				const renderTargetContextData = this.backend.get( renderContext.renderTarget );
 
-			gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, gl.NEAREST );
+				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
+				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
 
-			gl.deleteFramebuffer( fb );
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+				state.bindFramebuffer( gl.READ_FRAMEBUFFER, msaaFrameBuffer );
+
+				const flippedY = srcHeight - y - height;
+
+				gl.blitFramebuffer( x, flippedY, x + width, flippedY + height, x, flippedY, x + width, flippedY + height, mask, gl.NEAREST );
+
+				state.bindFramebuffer( gl.READ_FRAMEBUFFER, fb );
+
+				state.bindTexture( gl.TEXTURE_2D, textureGPU );
+
+				gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, x, flippedY, width, height );
+
+				state.unbindTexture();
+
+			} else {
+
+				const fb = gl.createFramebuffer();
+
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+
+				gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureGPU, 0 );
+				gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, gl.NEAREST );
+
+				gl.deleteFramebuffer( fb );
+
+			}
 
 		} else {
 
 			state.bindTexture( gl.TEXTURE_2D, textureGPU );
-			gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, 0, 0, width, height );
+			gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, x, srcHeight - height - y, width, height );
 
 			state.unbindTexture();
 

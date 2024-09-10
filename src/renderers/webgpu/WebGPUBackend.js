@@ -1419,7 +1419,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	copyFramebufferToTexture( texture, renderContext ) {
+	copyFramebufferToTexture( texture, renderContext, position ) {
 
 		const renderContextData = this.get( renderContext );
 
@@ -1463,12 +1463,15 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		const x = position !== null ? position.x : 0;
+		const y = position !== null ? position.y : 0;
+
 		renderContextData.currentPass.end();
 
 		encoder.copyTextureToTexture(
 			{
 				texture: sourceGPU,
-				origin: { x: 0, y: 0, z: 0 }
+				origin: { x, y, z: 0 }
 			},
 			{
 				texture: destinationGPU
