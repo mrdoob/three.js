@@ -171,6 +171,8 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 		this.directives = {};
 
+		this.scopedArrays = new Map();
+
 	}
 
 	needsToWorkingColorSpace( texture ) {
@@ -766,6 +768,45 @@ ${ flowData.code }
 
 	}
 
+	getScopedArray( name, scope, bufferType, bufferCount ) {
+
+		if ( this.scopedArrays.has( name ) === false ) {
+
+			this.scopedArrays.set( name, {
+				name,
+				scope,
+				bufferType,
+				bufferCount
+			} );
+
+		}
+
+		return name;
+
+	}
+
+	getScopedArrays( shaderStage ) {
+
+		if ( shaderStage !== 'compute' ) {
+
+			return;
+
+		}
+
+		const snippets = [];
+
+		for ( const { name, scope, bufferType, bufferCount } of this.scopedArrays.values() ) {
+
+			const type = this.getType( bufferType );
+
+			snippets.push( `var<${scope}> ${name}: array< ${type}, ${bufferCount} >;` );
+
+		}
+
+		return snippets.join( '\n' );
+
+	}
+
 	getAttributes( shaderStage ) {
 
 		const snippets = [];
@@ -1065,6 +1106,7 @@ ${ flowData.code }
 			stageData.vars = this.getVars( shaderStage );
 			stageData.codes = this.getCodes( shaderStage );
 			stageData.directives = this.getDirectives( shaderStage );
+			stageData.scopedArrays = this.getScopedArrays( shaderStage );
 
 			//
 
@@ -1290,6 +1332,9 @@ ${shaderData.directives}
 
 // system
 var<private> instanceIndex : u32;
+
+// locals
+${shaderData.scopedArrays}
 
 // uniforms
 ${shaderData.uniforms}
