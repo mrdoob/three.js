@@ -144,6 +144,7 @@ export * from './geometry/RangeNode.js';
 export * from './gpgpu/ComputeNode.js';
 export * from './gpgpu/BarrierNode.js';
 export * from './gpgpu/WorkgroupInfoNode.js';
+export * from './gpgpu/AtomicFunctionNode.js';
 
 // lighting
 export * from './lighting/LightNode.js';
