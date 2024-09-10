@@ -331,6 +331,7 @@
 		"webgpu_instance_uniform",
 		"webgpu_instancing_morph",
 		"webgpu_lightprobe",
+		"webgpu_lightprobe_cubecamera",
 		"webgpu_lights_custom",
 		"webgpu_lights_ies_spotlight",
 		"webgpu_lights_phong",
