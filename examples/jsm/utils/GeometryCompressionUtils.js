@@ -11,27 +11,19 @@ import {
 	Matrix4,
 	Vector3
 } from 'three';
-import { PackedPhongMaterial } from './PackedPhongMaterial.js';
 
 
 
 /**
- * Make the input mesh.geometry's normal attribute encoded and compressed by 3 different methods.
- * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the normal data.
+ * Make the input geometry's normal attribute encoded and compressed by 3 different methods.
  *
- * @param {THREE.Mesh} mesh
+ * @param {THREE.BufferGeometry} geometry
  * @param {String} encodeMethod		"DEFAULT" || "OCT1Byte" || "OCT2Byte" || "ANGLES"
  *
  */
-function compressNormals( mesh, encodeMethod ) {
+function compressNormals( geometry, encodeMethod ) {
 
-	if ( ! mesh.geometry ) {
-
-		console.error( 'Mesh must contain geometry. ' );
-
-	}
-
-	const normal = mesh.geometry.attributes.normal;
+	const normal = geometry.attributes.normal;
 
 	if ( ! normal ) {
 
@@ -66,8 +58,8 @@ function compressNormals( mesh, encodeMethod ) {
 
 		}
 
-		mesh.geometry.setAttribute( 'normal', new BufferAttribute( result, 3, true ) );
-		mesh.geometry.attributes.normal.bytes = result.length * 1;
+		geometry.setAttribute( 'normal', new BufferAttribute( result, 3, true ) );
+		geometry.attributes.normal.bytes = result.length * 1;
 
 	} else if ( encodeMethod == 'OCT1Byte' ) {
 
@@ -88,8 +80,8 @@ function compressNormals( mesh, encodeMethod ) {
 
 		}
 
-		mesh.geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
-		mesh.geometry.attributes.normal.bytes = result.length * 1;
+		geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
+		geometry.attributes.normal.bytes = result.length * 1;
 
 	} else if ( encodeMethod == 'OCT2Byte' ) {
 
@@ -104,8 +96,8 @@ function compressNormals( mesh, encodeMethod ) {
 
 		}
 
-		mesh.geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
-		mesh.geometry.attributes.normal.bytes = result.length * 2;
+		geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
+		geometry.attributes.normal.bytes = result.length * 2;
 
 	} else if ( encodeMethod == 'ANGLES' ) {
 
@@ -120,8 +112,8 @@ function compressNormals( mesh, encodeMethod ) {
 
 		}
 
-		mesh.geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
-		mesh.geometry.attributes.normal.bytes = result.length * 2;
+		geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
+		geometry.attributes.normal.bytes = result.length * 2;
 
 	} else {
 
@@ -129,60 +121,22 @@ function compressNormals( mesh, encodeMethod ) {
 
 	}
 
-	mesh.geometry.attributes.normal.needsUpdate = true;
-	mesh.geometry.attributes.normal.isPacked = true;
-	mesh.geometry.attributes.normal.packingMethod = encodeMethod;
-
-	// modify material
-	if ( ! ( mesh.material instanceof PackedPhongMaterial ) ) {
-
-		mesh.material = new PackedPhongMaterial().copy( mesh.material );
-
-	}
-
-	if ( encodeMethod == 'ANGLES' ) {
-
-		mesh.material.defines.USE_PACKED_NORMAL = 0;
-
-	}
-
-	if ( encodeMethod == 'OCT1Byte' ) {
-
-		mesh.material.defines.USE_PACKED_NORMAL = 1;
-
-	}
-
-	if ( encodeMethod == 'OCT2Byte' ) {
-
-		mesh.material.defines.USE_PACKED_NORMAL = 1;
-
-	}
-
-	if ( encodeMethod == 'DEFAULT' ) {
-
-		mesh.material.defines.USE_PACKED_NORMAL = 2;
-
-	}
+	geometry.attributes.normal.needsUpdate = true;
+	geometry.attributes.normal.isPacked = true;
+	geometry.attributes.normal.packingMethod = encodeMethod;
 
 }
 
 
 /**
-	 * Make the input mesh.geometry's position attribute encoded and compressed.
-	 * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the position data.
+	 * Make the input geometry's position attribute encoded and compressed.
 	 *
-	 * @param {THREE.Mesh} mesh
+	 * @param {THREE.BufferGeometry} geometry
 	 *
 	 */
-function compressPositions( mesh ) {
+function compressPositions( geometry ) {
 
-	if ( ! mesh.geometry ) {
-
-		console.error( 'Mesh must contain geometry. ' );
-
-	}
-
-	const position = mesh.geometry.attributes.position;
+	const position = geometry.attributes.position;
 
 	if ( ! position ) {
 
@@ -204,47 +158,27 @@ function compressPositions( mesh ) {
 	const result = quantizedEncode( array, encodingBytes );
 
 	const quantized = result.quantized;
-	const decodeMat = result.decodeMat;
 
 	// IMPORTANT: calculate original geometry bounding info first, before updating packed positions
-	if ( mesh.geometry.boundingBox == null ) mesh.geometry.computeBoundingBox();
-	if ( mesh.geometry.boundingSphere == null ) mesh.geometry.computeBoundingSphere();
+	if ( geometry.boundingBox == null ) geometry.computeBoundingBox();
+	if ( geometry.boundingSphere == null ) geometry.computeBoundingSphere();
 
-	mesh.geometry.setAttribute( 'position', new BufferAttribute( quantized, 3 ) );
-	mesh.geometry.attributes.position.isPacked = true;
-	mesh.geometry.attributes.position.needsUpdate = true;
-	mesh.geometry.attributes.position.bytes = quantized.length * encodingBytes;
-
-	// modify material
-	if ( ! ( mesh.material instanceof PackedPhongMaterial ) ) {
-
-		mesh.material = new PackedPhongMaterial().copy( mesh.material );
-
-	}
-
-	mesh.material.defines.USE_PACKED_POSITION = 0;
-
-	mesh.material.uniforms.quantizeMatPos.value = decodeMat;
-	mesh.material.uniforms.quantizeMatPos.needsUpdate = true;
+	geometry.setAttribute( 'position', new BufferAttribute( quantized, 3 ) );
+	geometry.attributes.position.isPacked = true;
+	geometry.attributes.position.needsUpdate = true;
+	geometry.attributes.position.bytes = quantized.length * encodingBytes;
 
 }
 
 /**
- * Make the input mesh.geometry's uv attribute encoded and compressed.
- * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the uv data.
+ * Make the input geometry's uv attribute encoded and compressed.
  *
- * @param {THREE.Mesh} mesh
+ * @param {THREE.BufferGeometry} geometry
  *
  */
-function compressUvs( mesh ) {
+function compressUvs( geometry ) {
 
-	if ( ! mesh.geometry ) {
-
-		console.error( 'Mesh must contain geometry property. ' );
-
-	}
-
-	const uvs = mesh.geometry.attributes.uv;
+	const uvs = geometry.attributes.uv;
 
 	if ( ! uvs ) {
 
@@ -281,39 +215,20 @@ function compressUvs( mesh ) {
 
 		}
 
-		mesh.geometry.setAttribute( 'uv', new BufferAttribute( result, 2, true ) );
-		mesh.geometry.attributes.uv.isPacked = true;
-		mesh.geometry.attributes.uv.needsUpdate = true;
-		mesh.geometry.attributes.uv.bytes = result.length * 2;
-
-		if ( ! ( mesh.material instanceof PackedPhongMaterial ) ) {
-
-			mesh.material = new PackedPhongMaterial().copy( mesh.material );
-
-		}
-
-		mesh.material.defines.USE_PACKED_UV = 0;
+		geometry.setAttribute( 'uv', new BufferAttribute( result, 2, true ) );
+		geometry.attributes.uv.isPacked = true;
+		geometry.attributes.uv.needsUpdate = true;
+		geometry.attributes.uv.bytes = result.length * 2;
 
 	} else {
 
 		// use quantized encoding method
 		result = quantizedEncodeUV( array, 2 );
 
-		mesh.geometry.setAttribute( 'uv', new BufferAttribute( result.quantized, 2 ) );
-		mesh.geometry.attributes.uv.isPacked = true;
-		mesh.geometry.attributes.uv.needsUpdate = true;
-		mesh.geometry.attributes.uv.bytes = result.quantized.length * 2;
-
-		if ( ! ( mesh.material instanceof PackedPhongMaterial ) ) {
-
-			mesh.material = new PackedPhongMaterial().copy( mesh.material );
-
-		}
-
-		mesh.material.defines.USE_PACKED_UV = 1;
-
-		mesh.material.uniforms.quantizeMatUV.value = result.decodeMat;
-		mesh.material.uniforms.quantizeMatUV.needsUpdate = true;
+		geometry.setAttribute( 'uv', new BufferAttribute( result.quantized, 2 ) );
+		geometry.attributes.uv.isPacked = true;
+		geometry.attributes.uv.needsUpdate = true;
+		geometry.attributes.uv.bytes = result.quantized.length * 2;
 
 	}
 
