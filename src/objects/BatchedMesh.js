@@ -845,7 +845,6 @@ class BatchedMesh extends Mesh {
 		// check if the provided geometryId is within the valid range
 		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
 
-			console.warn( 'BatchedMesh: Invalid geometryId.' );
 			return null;
 
 		}
