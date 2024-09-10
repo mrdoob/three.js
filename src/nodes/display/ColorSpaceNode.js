@@ -3,7 +3,10 @@ import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
 
 import { LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
 
-const getColorSpaceName = ( colorSpace ) => {
+const WORKING_COLOR_SPACE = 'WorkingColorSpace';
+const OUTPUT_COLOR_SPACE = 'OutputColorSpace';
+
+function getColorSpaceName( colorSpace ) {
 
 	let method = null;
 
@@ -19,13 +22,31 @@ const getColorSpaceName = ( colorSpace ) => {
 
 	return method;
 
-};
+}
 
-export const getColorSpaceMethod = ( source, target ) => {
+export function getColorSpaceMethod( source, target ) {
 
 	return getColorSpaceName( source ) + 'To' + getColorSpaceName( target );
 
-};
+}
+
+export function isWorkingColorSpace( colorSpace ) {
+
+	return colorSpace.endsWith( '-linear' );
+
+}
+
+export function getWorkingColorSpaceMethod( colorSpace ) {
+
+	return isWorkingColorSpace( colorSpace ) ? colorSpace : colorSpace + '-linear';
+
+}
+
+export function getOutputColorSpaceMethod( colorSpace ) {
+
+	return isWorkingColorSpace( colorSpace ) ? colorSpace.slice( 0, - 7 ) : colorSpace;
+
+}
 
 class ColorSpaceNode extends TempNode {
 
@@ -35,23 +56,39 @@ class ColorSpaceNode extends TempNode {
 
 	}
 
-	constructor( colorNode, target = null, source = null ) {
+	constructor( colorNode, source, target ) {
 
 		super( 'vec4' );
 
 		this.colorNode = colorNode;
-		this.target = target;
 		this.source = source;
+		this.target = target;
+
+	}
+
+	getColorSpace( builder, colorSpace ) {
+
+		if ( colorSpace === WORKING_COLOR_SPACE ) {
+
+			return getWorkingColorSpaceMethod( builder.context.outputColorSpace || builder.renderer.outputColorSpace );
+
+		} else if ( colorSpace === OUTPUT_COLOR_SPACE ) {
+
+			return getOutputColorSpaceMethod( builder.context.outputColorSpace || builder.renderer.outputColorSpace );
+
+		}
+
+		return colorSpace;
 
 	}
 
 	setup( builder ) {
 
-		const { renderer, context } = builder;
+		const { renderer } = builder;
+		const { colorNode } = this;
 
-		const source = this.source || context.outputColorSpace || renderer.outputColorSpace;
-		const target = this.target || context.outputColorSpace || renderer.outputColorSpace;
-		const colorNode = this.colorNode;
+		const source = this.getColorSpace( builder, this.source );
+		const target = this.getColorSpace( builder, this.target );
 
 		if ( source === target ) return colorNode;
 
@@ -81,8 +118,14 @@ class ColorSpaceNode extends TempNode {
 
 export default ColorSpaceNode;
 
-export const toOutputColorSpace = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), colorSpace, LinearSRGBColorSpace ) );
-export const toWorkingColorSpace = ( node, colorSpace = null ) => nodeObject( new ColorSpaceNode( nodeObject( node ), LinearSRGBColorSpace, colorSpace ) );
+export const toOutputColorSpace = ( node ) => nodeObject( new ColorSpaceNode( nodeObject( node ), WORKING_COLOR_SPACE, OUTPUT_COLOR_SPACE ) );
+export const toWorkingColorSpace = ( node ) => nodeObject( new ColorSpaceNode( nodeObject( node ), OUTPUT_COLOR_SPACE, WORKING_COLOR_SPACE ) );
+
+export const workingToColorSpace = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), WORKING_COLOR_SPACE, colorSpace ) );
+export const colorSpaceToWorking = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), colorSpace, WORKING_COLOR_SPACE ) );
 
 addMethodChaining( 'toOutputColorSpace', toOutputColorSpace );
 addMethodChaining( 'toWorkingColorSpace', toWorkingColorSpace );
+
+addMethodChaining( 'workingToColorSpace', workingToColorSpace );
+addMethodChaining( 'colorSpaceToWorking', colorSpaceToWorking );

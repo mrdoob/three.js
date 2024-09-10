@@ -1,7 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
-import { LinearSRGBColorSpace, SRGBColorSpace, NoToneMapping } from '../../constants.js';
+import { LinearSRGBColorSpace, NoToneMapping } from '../../constants.js';
 
 class RenderOutputNode extends TempNode {
 
@@ -40,7 +40,7 @@ class RenderOutputNode extends TempNode {
 
 		// output color space
 
-		if ( outputColorSpace === SRGBColorSpace ) {
+		if ( outputColorSpace !== LinearSRGBColorSpace ) {
 
 			outputNode = outputNode.toOutputColorSpace( outputColorSpace );
 
