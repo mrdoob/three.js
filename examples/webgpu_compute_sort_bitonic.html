@@ -139,7 +139,7 @@
 				const scene = new THREE.Scene();
 
 				const nextAlgoBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( forceGlobalSwap ? StepType.FLIP_GLOBAL : StepType.FLIP_LOCAL ), 1 );
-				console.log( forceGlobalSwap );
+
 				const nextAlgoStorage = storageObject( nextAlgoBuffer, 'uint', nextAlgoBuffer.count ).label( 'NextAlgo' );
 
 				const nextBlockHeightBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( 2 ), 1 );
