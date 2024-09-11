@@ -171,7 +171,7 @@ class Audio extends Object3D {
 
 		if ( this.source !== null ) {
 
-			this.source.stop( this.context.currentTime + this.offset + delay );
+			this.source.stop( this.context.currentTime + delay );
 			this.source.onended = null;
 
 		}
