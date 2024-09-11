@@ -1,9 +1,9 @@
 import { uniform } from '../core/UniformNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { Vector3 } from '../../math/Vector3.js';
+import { cameraViewMatrix } from './Camera.js';
 
 let uniformsLib;
-let vec3;
 
 function getLightData( light ) {
 
@@ -41,3 +41,4 @@ export function lightViewPosition( light ) {
 
 }
 
+export const lightTargetDirection = ( light ) => cameraViewMatrix.transformDirection( lightPosition( light ).sub( lightPosition( light.target ) ) );

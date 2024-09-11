@@ -1,11 +1,10 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
-import { lightTargetDirection } from './LightNode.js';
 import { getDistanceAttenuation } from './LightUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { positionView } from '../accessors/Position.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { lightViewPosition } from '../accessors/Lights.js';
+import { lightViewPosition, lightTargetDirection } from '../accessors/Lights.js';
 
 class SpotLightNode extends AnalyticLightNode {
 

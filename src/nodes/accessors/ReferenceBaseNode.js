@@ -60,8 +60,17 @@ class ReferenceBaseNode extends Node {
 		this.properties = property.split( '.' );
 		this.reference = object;
 		this.node = null;
+		this.group = null;
 
 		this.updateType = NodeUpdateType.OBJECT;
+
+	}
+
+	setGroup( group ) {
+
+		this.group = group;
+
+		return this;
 
 	}
 
@@ -73,7 +82,15 @@ class ReferenceBaseNode extends Node {
 
 	setNodeType( uniformType ) {
 
-		this.node = uniform( null, uniformType ).getSelf();
+		const node = uniform( null, uniformType ).getSelf();
+
+		if ( this.group !== null ) {
+
+			node.setGroup( this.group );
+
+		}
+
+		this.node = node;
 
 	}
 

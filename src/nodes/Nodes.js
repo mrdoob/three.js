@@ -135,7 +135,6 @@ export { default as RangeNode } from './geometry/RangeNode.js';
 export { default as ComputeNode } from './gpgpu/ComputeNode.js';
 
 // lighting
-export { default as LightNode } from './lighting/LightNode.js';
 export { default as PointLightNode } from './lighting/PointLightNode.js';
 export { default as DirectionalLightNode } from './lighting/DirectionalLightNode.js';
 export { default as RectAreaLightNode } from './lighting/RectAreaLightNode.js';

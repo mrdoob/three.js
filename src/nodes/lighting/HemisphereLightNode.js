@@ -2,7 +2,7 @@ import AnalyticLightNode from './AnalyticLightNode.js';
 import { uniform } from '../core/UniformNode.js';
 import { mix } from '../math/MathNode.js';
 import { normalView } from '../accessors/Normal.js';
-import { lightViewPosition } from '../accessors/Lights.js';
+import { lightPosition } from '../accessors/Lights.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 
 import { Color } from '../../math/Color.js';
@@ -19,7 +19,7 @@ class HemisphereLightNode extends AnalyticLightNode {
 
 		super( light );
 
-		this.lightPositionNode = lightViewPosition( light );
+		this.lightPositionNode = lightPosition( light );
 		this.lightDirectionNode = this.lightPositionNode.normalize();
 
 		this.groundColorNode = uniform( new Color() ).setGroup( renderGroup );

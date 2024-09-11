@@ -1,5 +1,6 @@
 import ReferenceBaseNode from './ReferenceBaseNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
+import { renderGroup } from '../core/UniformGroupNode.js';
 
 class RendererReferenceNode extends ReferenceBaseNode {
 
@@ -14,6 +15,8 @@ class RendererReferenceNode extends ReferenceBaseNode {
 		super( property, inputType, renderer );
 
 		this.renderer = renderer;
+
+		this.setGroup( renderGroup );
 
 	}
 
