@@ -143,6 +143,8 @@ export * from './geometry/RangeNode.js';
 
 // gpgpu
 export * from './gpgpu/ComputeNode.js';
+export * from './gpgpu/BarrierNode.js';
+export * from './gpgpu/WorkgroupInfoNode.js';
 
 // lighting
 export * from './lighting/LightNode.js';

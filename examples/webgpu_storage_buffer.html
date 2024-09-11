@@ -9,8 +9,8 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
-			<br />This example demonstrate the fetch of external element from a StorageBuffer.
-			<br /> Left canvas is using WebGPU Backend, right canvas is WebGL Backend.
+			<br />This example demonstrates fetching an external element from a StorageBuffer.
+			<br />The left canvas uses the WebGPU Backend, while the right uses the WebGL Backend.
 			<div id="timestamps" style="
 				position: absolute;
 				top: 60px;
@@ -52,7 +52,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { storageObject, If, vec3, uv, uint, float, Fn, instanceIndex } from 'three/tsl';
+			import { storageObject, If, vec3, uv, uint, float, Fn, instanceIndex, workgroupBarrier } from 'three/tsl';
 
 			const timestamps = {
 				webgpu: document.getElementById( 'timestamps' ),
@@ -107,7 +107,8 @@
 
 					for ( let i = 0; i < type.length; i ++ ) {
 
-						const invertIndex = arrayBufferNodes[ i ].element( uint( size - 1 ).sub( instanceIndex ) );
+						const invertIndex = arrayBufferNodes[ i ].element( uint( size - 1 ).sub( instanceIndex ) ).toVar();
+						workgroupBarrier();
 						arrayBufferNodes[ i ].element( instanceIndex ).assign( invertIndex );
 
 					}

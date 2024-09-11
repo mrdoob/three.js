@@ -454,7 +454,7 @@ class Renderer {
 
 		} else {
 
-			const renderObjects = renderBundleData.renderObjects;
+			const { renderObjects } = renderBundleData;
 
 			for ( let i = 0, l = renderObjects.length; i < l; i ++ ) {
 
@@ -715,10 +715,12 @@ class Renderer {
 
 		// process render lists
 
-		const opaqueObjects = renderList.opaque;
-		const transparentObjects = renderList.transparent;
-		const bundles = renderList.bundles;
-		const lightsNode = renderList.lightsNode;
+		const {
+			bundles,
+			lightsNode,
+			transparent: transparentObjects,
+			opaque: opaqueObjects
+		} = renderList;
 
 		if ( bundles.length > 0 ) this._renderBundles( bundles, sceneRef, lightsNode );
 		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
@@ -1301,8 +1303,7 @@ class Renderer {
 
 					}
 
-					const geometry = object.geometry;
-					const material = object.material;
+					const { geometry, material } = object;
 
 					if ( material.visible ) {
 
@@ -1320,8 +1321,7 @@ class Renderer {
 
 				if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 
-					const geometry = object.geometry;
-					const material = object.material;
+					const { geometry, material } = object;
 
 					if ( this.sortObjects === true ) {
 
