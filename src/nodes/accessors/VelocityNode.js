@@ -7,6 +7,7 @@ import { Matrix4 } from '../../math/Matrix4.js';
 import { uniform } from '../core/UniformNode.js';
 import { sub } from '../math/OperatorNode.js';
 import { cameraProjectionMatrix } from './Camera.js';
+import { renderGroup } from '../core/UniformGroupNode.js';
 
 const _objectData = new WeakMap();
 
@@ -26,7 +27,7 @@ class VelocityNode extends TempNode {
 		this.updateAfterType = NodeUpdateType.OBJECT;
 
 		this.previousModelWorldMatrix = uniform( new Matrix4() );
-		this.previousProjectionMatrix = uniform( new Matrix4() );
+		this.previousProjectionMatrix = uniform( new Matrix4() ).setGroup( renderGroup );
 		this.previousCameraViewMatrix = uniform( new Matrix4() );
 
 	}
