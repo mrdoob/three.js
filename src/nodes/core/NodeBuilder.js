@@ -79,6 +79,8 @@ class NodeBuilder {
 		this.updateAfterNodes = [];
 		this.hashNodes = {};
 
+		this.monitor = null;
+
 		this.lightsNode = null;
 		this.environmentNode = null;
 		this.fogNode = null;

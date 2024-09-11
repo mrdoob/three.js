@@ -190,6 +190,7 @@ class Nodes extends DataMap {
 			nodeBuilder.updateNodes,
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
+			nodeBuilder.monitor,
 			nodeBuilder.instanceBindGroups,
 			nodeBuilder.transforms
 		);
@@ -498,6 +499,15 @@ class Nodes extends DataMap {
 			nodeFrame.updateNode( node );
 
 		}
+
+	}
+
+	needsRefresh( renderObject ) {
+
+		const nodeFrame = this.getNodeFrameForRender( renderObject );
+		const monitor = renderObject.getMonitor();
+
+		return monitor.needsRefresh( renderObject, nodeFrame );
 
 	}
 

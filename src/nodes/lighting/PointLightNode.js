@@ -1,8 +1,9 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { getDistanceAttenuation } from './LightUtils.js';
 import { uniform } from '../core/UniformNode.js';
-import { objectViewPosition } from '../accessors/Object3DNode.js';
+import { lightViewPosition } from '../accessors/Lights.js';
 import { positionView } from '../accessors/Position.js';
+import { renderGroup } from '../TSL.js';
 
 class PointLightNode extends AnalyticLightNode {
 
@@ -16,8 +17,8 @@ class PointLightNode extends AnalyticLightNode {
 
 		super( light );
 
-		this.cutoffDistanceNode = uniform( 0 );
-		this.decayExponentNode = uniform( 0 );
+		this.cutoffDistanceNode = uniform( 0 ).setGroup( renderGroup );
+		this.decayExponentNode = uniform( 0 ).setGroup( renderGroup );
 
 	}
 
@@ -38,7 +39,7 @@ class PointLightNode extends AnalyticLightNode {
 
 		const lightingModel = builder.context.lightingModel;
 
-		const lVector = objectViewPosition( light ).sub( positionView ); // @TODO: Add it into LightNode
+		const lVector = lightViewPosition( light ).sub( positionView ); // @TODO: Add it into LightNode
 
 		const lightDirection = lVector.normalize();
 		const lightDistance = lVector.length();

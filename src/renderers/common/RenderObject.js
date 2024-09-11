@@ -63,6 +63,8 @@ export default class RenderObject {
 		this.vertexBuffers = null;
 		this.drawParams = null;
 
+		this.bundle = null;
+
 		this.updateClipping( renderContext.clippingContext );
 
 		this.clippingContextVersion = this.clippingContext.version;
@@ -72,6 +74,7 @@ export default class RenderObject {
 
 		this._nodeBuilderState = null;
 		this._bindings = null;
+		this._monitor = null;
 
 		this.onDispose = null;
 
@@ -125,6 +128,12 @@ export default class RenderObject {
 	getNodeBuilderState() {
 
 		return this._nodeBuilderState || ( this._nodeBuilderState = this._nodes.getForRender( this ) );
+
+	}
+
+	getMonitor() {
+
+		return this._monitor || ( this._monitor = this.getNodeBuilderState().monitor );
 
 	}
 

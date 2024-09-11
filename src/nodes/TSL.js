@@ -65,6 +65,7 @@ export * from './accessors/ModelNode.js';
 export * from './accessors/ModelViewProjectionNode.js';
 export * from './accessors/Normal.js';
 export * from './accessors/Object3DNode.js';
+export * from './accessors/Lights.js';
 export * from './accessors/PointUVNode.js';
 export * from './accessors/Position.js';
 export * from './accessors/ReferenceNode.js';
