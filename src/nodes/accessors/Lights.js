@@ -21,10 +21,17 @@ export function lightPosition( light ) {
 
 	const data = getLightData( light );
 
-	return data.position || ( data.position = uniform( 'vec3' ).setGroup( renderGroup ).onRenderUpdate( () => light.position ) );
+	return data.position || ( data.position = uniform( new Vector3() ).setGroup( renderGroup ).onRenderUpdate( ( _, self ) => self.value.setFromMatrixPosition( light.matrixWorld ) ) );
 
 }
 
+export function lightTargetPosition( light ) {
+
+	const data = getLightData( light );
+
+	return data.targetPosition || ( data.targetPosition = uniform( new Vector3() ).setGroup( renderGroup ).onRenderUpdate( ( _, self ) => self.value.setFromMatrixPosition( light.target.matrixWorld ) ) );
+
+}
 
 export function lightViewPosition( light ) {
 
@@ -41,4 +48,4 @@ export function lightViewPosition( light ) {
 
 }
 
-export const lightTargetDirection = ( light ) => cameraViewMatrix.transformDirection( lightPosition( light ).sub( lightPosition( light.target ) ) );
+export const lightTargetDirection = ( light ) => cameraViewMatrix.transformDirection( lightPosition( light ).sub( lightTargetPosition( light ) ) );
