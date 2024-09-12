@@ -192,7 +192,7 @@ class TransformControls extends Controls {
 
 	}
 
-	getGizmo() {
+	getHelper() {
 
 		return this._root;
 
