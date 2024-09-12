@@ -38,9 +38,9 @@ class RenderOutputNode extends TempNode {
 
 		}
 
-		// output color space
+		// working to output color space if it is not linear
 
-		if ( outputColorSpace !== NoColorSpace ) {
+		if ( outputColorSpace && outputColorSpace.endsWith( '-linear' ) === false ) {
 
 			outputNode = outputNode.toOutputColorSpace( outputColorSpace );
 
