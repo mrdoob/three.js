@@ -50,7 +50,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const vertex = positionLocal;
 
-		let mvPosition = modelViewMatrix.mul( vec4( vec3( positionNode || 0 ), 1 ) );
+		let mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
 
 		const scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() ).toVar();
 
