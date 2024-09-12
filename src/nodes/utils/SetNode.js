@@ -30,7 +30,7 @@ class SetNode extends TempNode {
 		const { sourceNode, components, targetNode } = this;
 
 		const sourceType = this.getNodeType( builder );
-		const targetType = builder.getTypeFromLength( components.length );
+		const targetType = builder.getTypeFromLength( components.length, targetNode.getNodeType( builder ) );
 
 		const targetSnippet = targetNode.build( builder, targetType );
 		const sourceSnippet = sourceNode.build( builder, sourceType );
