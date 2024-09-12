@@ -22,7 +22,7 @@ import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
 import { depth } from '../../nodes/display/ViewportDepthNode.js';
 import { cameraLogDepth } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha } from '../../nodes/accessors/ClippingNode.js';
-import NodeMaterialMonitor from './NodeMaterialMonitor.js';
+import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
 
 class NodeMaterial extends Material {
 
@@ -82,9 +82,9 @@ class NodeMaterial extends Material {
 
 	}
 
-	setupMonitor( builder ) {
+	setupObserver( builder ) {
 
-		return new NodeMaterialMonitor( builder );
+		return new NodeMaterialObserver( builder );
 
 	}
 
@@ -180,7 +180,7 @@ class NodeMaterial extends Material {
 
 		// < MONITOR >
 
-		builder.monitor = this.setupMonitor( builder );
+		builder.monitor = this.setupObserver( builder );
 
 	}
 

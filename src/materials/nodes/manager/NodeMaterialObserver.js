@@ -51,7 +51,7 @@ const refreshUniforms = [
 	'transmissionMap'
 ];
 
-class NodeMaterialMonitor {
+class NodeMaterialObserver {
 
 	constructor( builder ) {
 
@@ -231,4 +231,4 @@ class NodeMaterialMonitor {
 
 }
 
-export default NodeMaterialMonitor;
+export default NodeMaterialObserver;
