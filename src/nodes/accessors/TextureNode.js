@@ -134,7 +134,7 @@ class TextureNode extends UniformNode {
 
 			} else {
 
-				uvNode = uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1) );
+				uvNode = uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) );
 
 			}
 
