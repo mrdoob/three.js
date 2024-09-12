@@ -2,6 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
 import { NoColorSpace, NoToneMapping } from '../../constants.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 
 class RenderOutputNode extends TempNode {
 
@@ -38,11 +39,11 @@ class RenderOutputNode extends TempNode {
 
 		}
 
-		// working to output color space if it is not linear
+		// working to output color space
 
-		if ( outputColorSpace && outputColorSpace.endsWith( '-linear' ) === false ) {
+		if ( outputColorSpace !== NoColorSpace && outputColorSpace !== ColorManagement.workingColorSpace ) {
 
-			outputNode = outputNode.toOutputColorSpace( outputColorSpace );
+			outputNode = outputNode.workingToColorSpace( outputColorSpace );
 
 		}
 

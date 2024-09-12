@@ -2,6 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
 
 import { LinearSRGBColorSpace, SRGBColorSpace } from '../../constants.js';
+import { ColorManagement } from '../../math/ColorManagement.js';
 
 const WORKING_COLOR_SPACE = 'WorkingColorSpace';
 const OUTPUT_COLOR_SPACE = 'OutputColorSpace';
@@ -36,18 +37,6 @@ export function isWorkingColorSpace( colorSpace ) {
 
 }
 
-export function getWorkingColorSpaceMethod( colorSpace ) {
-
-	return isWorkingColorSpace( colorSpace ) ? colorSpace : colorSpace + '-linear';
-
-}
-
-export function getOutputColorSpaceMethod( colorSpace ) {
-
-	return isWorkingColorSpace( colorSpace ) ? colorSpace.slice( 0, - 7 ) : colorSpace;
-
-}
-
 class ColorSpaceNode extends TempNode {
 
 	static get type() {
@@ -70,11 +59,11 @@ class ColorSpaceNode extends TempNode {
 
 		if ( colorSpace === WORKING_COLOR_SPACE ) {
 
-			return getWorkingColorSpaceMethod( builder.context.outputColorSpace || builder.renderer.outputColorSpace );
+			return ColorManagement.workingColorSpace;
 
 		} else if ( colorSpace === OUTPUT_COLOR_SPACE ) {
 
-			return getOutputColorSpaceMethod( builder.context.outputColorSpace || builder.renderer.outputColorSpace );
+			return builder.context.outputColorSpace || builder.renderer.outputColorSpace;
 
 		}
 
