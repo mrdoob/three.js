@@ -92,7 +92,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 			const alpha = float( 1 ).toVar();
 
-			const len2 = lengthSq( uv() );
+			const len2 = lengthSq( uv().mul( 2 ).sub( 1 ) );
 
 			if ( useAlphaToCoverage ) {
 
