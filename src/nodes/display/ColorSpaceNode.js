@@ -31,12 +31,6 @@ export function getColorSpaceMethod( source, target ) {
 
 }
 
-export function isWorkingColorSpace( colorSpace ) {
-
-	return colorSpace.endsWith( '-linear' );
-
-}
-
 class ColorSpaceNode extends TempNode {
 
 	static get type() {
