@@ -68,7 +68,9 @@
 			renderBundle: true,
 			count: MAX_GEOMETRY_COUNT,
 			opacity: 1,
-			dynamic: false
+			dynamic: false,
+			visible: true,
+			layer1: true,
 		};
 
 
@@ -126,6 +128,22 @@
 
 		}
 
+		function setVisibility( visible ) {
+
+			group.traverse( object => {
+
+				const geometry = object.geometry;
+
+				if ( geometry !== undefined && geometry.type === 'BoxGeometry' ) {
+
+					object.visible = visible;
+
+				}
+
+			} );
+
+		}
+
 		function cleanup() {
 
 			if ( group ) {
@@ -166,6 +184,10 @@
 				child.matrix.decompose( child.position, child.quaternion, child.scale );
 				child.userData.rotationSpeed = randomizeRotationSpeed( new THREE.Euler() );
 				child.frustumCulled = false;
+
+				// split across two layers
+				child.layers.set( i % 2 );
+
 				group.add( child );
 
 			}
@@ -195,7 +217,7 @@
 
 			camera = new THREE.PerspectiveCamera( 70, aspect, 1, 100 );
 			camera.position.z = 50;
-
+			camera.layers.enable( 1 );
 			// renderer
 
 			renderer = new THREE.WebGPURenderer( { antialias: true, forceWebGL } );
@@ -250,6 +272,26 @@
 			} );
 
 			gui.add( api, 'dynamic' );
+
+			gui.add( api, 'visible' ).onChange( ( v ) => {
+
+				setVisibility( v );
+
+			} );
+
+			gui.add( api, 'layer1' ).onChange( ( v ) => {
+
+				if ( v ) {
+
+					camera.layers.enable( 1 );
+
+				} else {
+
+					camera.layers.disable( 1 );
+
+				}
+
+			} );
 
 			// listeners
 
