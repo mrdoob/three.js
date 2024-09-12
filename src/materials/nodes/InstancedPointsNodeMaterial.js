@@ -39,21 +39,19 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 		this.setDefaultValues( _defaultValues );
 
-		this.setupShaders();
-
 		this.setValues( params );
 
 	}
 
 	setup( builder ) {
 
-		this.setupShaders();
+		this.setupShaders( builder );
 
 		super.setup( builder );
 
 	}
 
-	setupShaders() {
+	setupShaders( { renderer } ) {
 
 		const useAlphaToCoverage = this.alphaToCoverage;
 		const useColor = this.useColor;
@@ -94,7 +92,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 			const len2 = lengthSq( uv() );
 
-			if ( useAlphaToCoverage ) {
+			if ( useAlphaToCoverage && renderer.samples > 1 ) {
 
 				const dlen = float( len2.fwidth() ).toVar();
 
