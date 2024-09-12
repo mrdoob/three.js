@@ -5,7 +5,7 @@ import { materialRotation } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionLocal } from '../../nodes/accessors/Position.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
-import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { float, If, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 
 import { SpriteMaterial } from '../SpriteMaterial.js';
 
@@ -27,6 +27,9 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		this.lights = false;
 
+		this.sizeAttenuation = true;
+		this.useSizeAttenuation = true;
+
 		this.positionNode = null;
 		this.rotationNode = null;
 		this.scaleNode = null;
@@ -39,21 +42,37 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	setupPosition( { object, context } ) {
 
+		const useSizeAttenuation = this.sizeAttenuation;
+
 		// < VERTEX STAGE >
 
 		const { positionNode, rotationNode, scaleNode } = this;
 
 		const vertex = positionLocal;
 
-		let mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
+		let mvPosition = modelViewMatrix.mul( vec4( vec3( positionNode || 0 ), 1 ) );
 
-		let scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() );
+		const scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() ).toVar();
 
 		if ( scaleNode !== null ) {
 
-			scale = scale.mul( scaleNode );
+			scale.mulAssign( scaleNode );
 
 		}
+
+
+		if ( ! useSizeAttenuation ) {
+
+			const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( - 1.0 );
+
+			If( perspective, () => {
+
+				scale.assign( scale.mul( mvPosition.z.negate() ) );
+
+			} );
+
+		}
+
 
 		let alignedPosition = vertex.xy;
 
@@ -86,6 +105,23 @@ class SpriteNodeMaterial extends NodeMaterial {
 		this.scaleNode = source.scaleNode;
 
 		return super.copy( source );
+
+	}
+
+	get sizeAttenuation() {
+
+		return this.useSizeAttenuation;
+
+	}
+
+	set sizeAttenuation( value ) {
+
+		if ( this.useSizeAttenuation !== value ) {
+
+			this.useSizeAttenuation = value;
+			this.needsUpdate = true;
+
+		}
 
 	}
 
