@@ -330,13 +330,13 @@ class NodeBuilder {
 
 			if ( updateBeforeType !== NodeUpdateType.NONE ) {
 
-				this.updateBeforeNodes.push( node );
+				this.updateBeforeNodes.push( node.getSelf() );
 
 			}
 
 			if ( updateAfterType !== NodeUpdateType.NONE ) {
 
-				this.updateAfterNodes.push( node );
+				this.updateAfterNodes.push( node.getSelf() );
 
 			}
 

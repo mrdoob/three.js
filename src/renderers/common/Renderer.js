@@ -460,16 +460,16 @@ class Renderer {
 
 				const renderObject = renderObjects[ i ];
 
-				this._nodes.updateBefore( renderObject );
-
 				if ( this._nodes.needsRefresh( renderObject ) ) {
+
+					this._nodes.updateBefore( renderObject );
 
 					this._nodes.updateForRender( renderObject );
 					this._bindings.updateForRender( renderObject );
 
-				}
+					this._nodes.updateAfter( renderObject );
 
-				this._nodes.updateAfter( renderObject );
+				}
 
 			}
 
@@ -1578,11 +1578,13 @@ class Renderer {
 
 		//
 
-		this._nodes.updateBefore( renderObject );
+		const needsRefresh = this._nodes.needsRefresh( renderObject );
 
-		this._geometries.updateForRender( renderObject );
+		if ( needsRefresh ) {
 
-		if ( this._nodes.needsRefresh( renderObject ) ) {
+			this._nodes.updateBefore( renderObject );
+
+			this._geometries.updateForRender( renderObject );
 
 			this._nodes.updateForRender( renderObject );
 			this._bindings.updateForRender( renderObject );
@@ -1605,7 +1607,7 @@ class Renderer {
 
 		this.backend.draw( renderObject, this.info );
 
-		this._nodes.updateAfter( renderObject );
+		if ( needsRefresh ) this._nodes.updateAfter( renderObject );
 
 	}
 

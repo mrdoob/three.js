@@ -1,6 +1,8 @@
 import ChainMap from './ChainMap.js';
 import RenderObject from './RenderObject.js';
 
+const chainArray = [];
+
 class RenderObjects {
 
 	constructor( renderer, nodes, geometries, pipelines, bindings, info ) {
@@ -19,7 +21,12 @@ class RenderObjects {
 	get( object, material, scene, camera, lightsNode, renderContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
-		const chainArray = [ object, material, renderContext, lightsNode ];
+
+		// reuse chainArray
+		chainArray[ 0 ] = object;
+		chainArray[ 1 ] = material;
+		chainArray[ 2 ] = renderContext;
+		chainArray[ 3 ] = lightsNode;
 
 		let renderObject = chainMap.get( chainArray );
 

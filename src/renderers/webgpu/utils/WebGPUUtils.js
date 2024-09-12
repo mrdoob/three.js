@@ -32,7 +32,7 @@ class WebGPUUtils {
 
 	getTextureFormatGPU( texture ) {
 
-		return this.backend.get( texture ).texture.format;
+		return this.backend.get( texture ).format;
 
 	}
 
