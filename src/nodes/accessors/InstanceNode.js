@@ -52,7 +52,7 @@ class InstanceNode extends Node {
 
 			if ( instanceMesh.count <= 1000 ) {
 
-				instanceMatrixNode = buffer( instanceAttribute.array, 'mat4', instanceMesh.count ).element( instanceIndex );
+				instanceMatrixNode = buffer( instanceAttribute.array, 'mat4', Math.max( instanceMesh.count, 1 ) ).element( instanceIndex );
 
 			} else {
 
