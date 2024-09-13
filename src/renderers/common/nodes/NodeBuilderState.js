@@ -2,7 +2,7 @@ import BindGroup from '../BindGroup.js';
 
 class NodeBuilderState {
 
-	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, monitor, instanceBindGroups = true, transforms = [] ) {
+	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, monitor, transforms = [] ) {
 
 		this.vertexShader = vertexShader;
 		this.fragmentShader = fragmentShader;
@@ -18,8 +18,6 @@ class NodeBuilderState {
 
 		this.monitor = monitor;
 
-		this.instanceBindGroups = instanceBindGroups;
-
 		this.usedTimes = 0;
 
 	}
@@ -30,7 +28,7 @@ class NodeBuilderState {
 
 		for ( const instanceGroup of this.bindings ) {
 
-			const shared = this.instanceBindGroups && instanceGroup.bindings[ 0 ].groupNode.shared;
+			const shared = instanceGroup.bindings[ 0 ].groupNode.shared;
 
 			if ( shared !== true ) {
 

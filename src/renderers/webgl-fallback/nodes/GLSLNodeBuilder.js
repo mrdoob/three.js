@@ -56,8 +56,6 @@ class GLSLNodeBuilder extends NodeBuilder {
 		this.transforms = [];
 		this.extensions = {};
 
-		this.instanceBindGroups = false;
-
 		this.useComparisonMethod = true;
 
 	}
@@ -853,6 +851,8 @@ void main() {
 	buildCode() {
 
 		const shadersData = this.material !== null ? { fragment: {}, vertex: {} } : { compute: {} };
+
+		this.sortBindingGroups();
 
 		for ( const shaderStage in shadersData ) {
 

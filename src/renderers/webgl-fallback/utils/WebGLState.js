@@ -649,7 +649,6 @@ class WebGLState {
 
 		}
 
-
 	}
 
 
@@ -711,9 +710,7 @@ class WebGLState {
 			boundTexture.type = webglType;
 			boundTexture.texture = webglTexture;
 
-
 		}
-
 
 	}
 
