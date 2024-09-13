@@ -62,7 +62,10 @@ function header() {
 
 const builds = [
 	{
-		input: 'src/Three.js',
+		input: {
+			'three.module.js': 'src/Three.WebGL.js',
+			'three.webgpu.js': 'src/Three.WebGPU.js',
+		},
 		plugins: [
 			glsl(),
 			header()
@@ -70,36 +73,18 @@ const builds = [
 		output: [
 			{
 				format: 'esm',
-				file: 'build/three.module.js'
+				dir: 'build',
+				minifyInternalExports: false,
+				entryFileNames: '[name]',
+				chunkFileNames: 'three.core.js'
 			}
 		]
 	},
 	{
-		input: 'src/Three.WebGPU.js',
-		plugins: [
-			header()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'build/three.webgpu.js'
-			}
-		]
-	},
-	{
-		input: 'src/Three.WebGPU.Nodes.js',
-		plugins: [
-			header()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'build/three.webgpu.nodes.js'
-			}
-		]
-	},
-	{
-		input: 'src/Three.js',
+		input: {
+			'three.module.min.js': 'src/Three.WebGL.js',
+			'three.webgpu.min.js': 'src/Three.WebGPU.js',
+		},
 		plugins: [
 			glsl(),
 			header(),
@@ -108,38 +93,14 @@ const builds = [
 		output: [
 			{
 				format: 'esm',
-				file: 'build/three.module.min.js'
+				dir: 'build',
+				entryFileNames: '[name]',
+				chunkFileNames: 'three.core.min.js'
 			}
 		]
 	},
 	{
-		input: 'src/Three.WebGPU.js',
-		plugins: [
-			header(),
-			terser()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'build/three.webgpu.min.js'
-			}
-		]
-	},
-	{
-		input: 'src/Three.WebGPU.Nodes.js',
-		plugins: [
-			header(),
-			terser()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'build/three.webgpu.nodes.min.js'
-			}
-		]
-	},
-	{
-		input: 'src/Three.js',
+		input: 'src/Three.WebGL.js',
 		plugins: [
 			glsl(),
 			header()
@@ -152,7 +113,7 @@ const builds = [
 				indent: '\t'
 			}
 		]
-	}
+	},
 ];
 
 export default ( args ) => args.configOnlyModule ? builds.slice( 0, 3 ) : builds;
