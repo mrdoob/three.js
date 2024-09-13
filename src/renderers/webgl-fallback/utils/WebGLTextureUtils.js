@@ -692,17 +692,14 @@ class WebGLTextureUtils {
 
 	}
 
-	copyFramebufferToTexture( texture, renderContext, position ) {
+	copyFramebufferToTexture( texture, renderContext, rectangle ) {
 
 		const { gl } = this;
 		const { state } = this.backend;
 
 		const { textureGPU } = this.backend.get( texture );
 
-		const { width, height } = texture.image;
-
-		const x = position !== null ? position.x : 0;
-		const y = position !== null ? position.y : 0;
+		const { x, y, z: width, w: height } = rectangle;
 
 		const requireDrawFrameBuffer = texture.isDepthTexture === true || ( renderContext.renderTarget && renderContext.renderTarget.samples > 0 );
 
