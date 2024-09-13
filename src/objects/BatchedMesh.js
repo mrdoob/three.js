@@ -832,6 +832,42 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	setGeometryIdAt( instanceId, geometryId ) {
+
+		// return early if the geometry is out of range or not active
+		const drawInfo = this._drawInfo;
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+
+			return null;
+
+		}
+
+		// check if the provided geometryId is within the valid range
+		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
+
+			return null;
+
+		}
+
+		drawInfo[ instanceId ].geometryIndex = geometryId;
+
+		return this;
+
+	}
+
+	getGeometryIdAt( instanceId ) {
+
+		const drawInfo = this._drawInfo;
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+
+			return - 1;
+
+		}
+
+		return drawInfo[ instanceId ].geometryIndex;
+
+	}
+
 	raycast( raycaster, intersects ) {
 
 		const drawInfo = this._drawInfo;
