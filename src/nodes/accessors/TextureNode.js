@@ -130,7 +130,7 @@ class TextureNode extends UniformNode {
 
 			if ( this.sampler ) {
 
-				uvNode = uvNode.setY( uvNode.flipY() );
+				uvNode = uvNode.flipY();
 
 			} else {
 
