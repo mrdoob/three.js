@@ -63,7 +63,7 @@ function header() {
 const builds = [
 	{
 		input: {
-			'three.module.js': 'src/Three.WebGL.js',
+			'three.module.js': 'src/Three.js',
 			'three.webgpu.js': 'src/Three.WebGPU.js',
 		},
 		plugins: [
@@ -82,7 +82,7 @@ const builds = [
 	},
 	{
 		input: {
-			'three.module.min.js': 'src/Three.WebGL.js',
+			'three.module.min.js': 'src/Three.js',
 			'three.webgpu.min.js': 'src/Three.WebGPU.js',
 		},
 		plugins: [
@@ -100,7 +100,7 @@ const builds = [
 		]
 	},
 	{
-		input: 'src/Three.WebGL.js',
+		input: 'src/Three.js',
 		plugins: [
 			glsl(),
 			header()
