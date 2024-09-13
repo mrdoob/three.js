@@ -65,6 +65,7 @@ const builds = [
 		input: {
 			'three.module.js': 'src/Three.js',
 			'three.webgpu.js': 'src/Three.WebGPU.js',
+			'three.webgpu.nodes.js': 'src/Three.WebGPU.js',
 		},
 		plugins: [
 			glsl(),
@@ -84,6 +85,7 @@ const builds = [
 		input: {
 			'three.module.min.js': 'src/Three.js',
 			'three.webgpu.min.js': 'src/Three.WebGPU.js',
+			'three.webgpu.nodes.min.js': 'src/Three.WebGPU.js',
 		},
 		plugins: [
 			glsl(),

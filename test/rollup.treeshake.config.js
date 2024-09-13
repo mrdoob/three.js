@@ -96,5 +96,33 @@ export default [
 				file: 'test/treeshake/index.webgpu.bundle.min.js'
 			}
 		]
+	},
+	{
+		input: 'test/treeshake/index.webgpu.nodes.js',
+		plugins: [
+			resolve()
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'test/treeshake/index.webgpu.nodes.bundle.js'
+			}
+		]
+	},
+	{
+		input: 'test/treeshake/index.webgpu.nodes.js',
+		plugins: [
+			resolve(),
+			terser(),
+			filesize( {
+				showMinifiedSize: false,
+			} )
+		],
+		output: [
+			{
+				format: 'esm',
+				file: 'test/treeshake/index.webgpu.nodes.bundle.min.js'
+			}
+		]
 	}
 ];
