@@ -424,7 +424,8 @@ class Renderer {
 
 		//
 
-		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || bundleGroup.needsUpdate === true;
+		const needsUpdate = bundleGroup.version !== renderBundleData.version;
+		const renderBundleNeedsUpdate = renderBundleData.renderContexts.has( renderContext ) === false || needsUpdate;
 
 		renderBundleData.renderContexts.add( renderContext );
 
@@ -432,7 +433,7 @@ class Renderer {
 
 			this.backend.beginBundle( renderContext );
 
-			if ( renderBundleData.renderObjects === undefined || bundleGroup.needsUpdate === true ) {
+			if ( renderBundleData.renderObjects === undefined || needsUpdate ) {
 
 				renderBundleData.renderObjects = [];
 
@@ -450,7 +451,7 @@ class Renderer {
 
 			this.backend.finishBundle( renderContext, renderBundle );
 
-			bundleGroup.needsUpdate = false;
+			renderBundleData.version = bundleGroup.version;
 
 		} else {
 
