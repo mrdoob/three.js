@@ -703,7 +703,7 @@ Editor.prototype = {
 				toneMapping: this.config.getKey( 'project/renderer/toneMapping' ),
 				toneMappingExposure: this.config.getKey( 'project/renderer/toneMappingExposure' )
 			},
-			camera: this.viewportCamera.toJSON(),
+			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts,
 			history: this.history.toJSON(),
