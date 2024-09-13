@@ -15,6 +15,7 @@ import QuadMesh from '../../renderers/common/QuadMesh.js';
 import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
+import { renderGroup } from '../core/UniformGroupNode.js';
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
 
@@ -26,8 +27,8 @@ const PCFShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 
-	const mapSize = reference( 'mapSize', 'vec2', shadow );
-	const radius = reference( 'radius', 'float', shadow );
+	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
+	const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
 
 	const texelSize = vec2( 1 ).div( mapSize );
 	const dx0 = texelSize.x.negate().mul( radius );
@@ -65,7 +66,7 @@ const PCFSoftShadowMap = Fn( ( { depthTexture, shadowCoord, shadow } ) => {
 
 	const depthCompare = ( uv, compare ) => texture( depthTexture, uv ).compare( compare );
 
-	const mapSize = reference( 'mapSize', 'vec2', shadow );
+	const mapSize = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
 	const texelSize = vec2( 1 ).div( mapSize );
 	const dx = texelSize.x;
@@ -217,7 +218,7 @@ class AnalyticLightNode extends LightingNode {
 		this.light = light;
 
 		this.color = new Color();
-		this.colorNode = uniform( this.color );
+		this.colorNode = uniform( this.color ).setGroup( renderGroup );
 
 		this.baseColorNode = null;
 
@@ -287,9 +288,9 @@ class AnalyticLightNode extends LightingNode {
 				const shadowPassVertical = texture( depthTexture );
 				const shadowPassHorizontal = texture( this.vsmShadowMapVertical.texture );
 
-				const samples = reference( 'blurSamples', 'float', shadow );
-				const radius = reference( 'radius', 'float', shadow );
-				const size = reference( 'mapSize', 'vec2', shadow );
+				const samples = reference( 'blurSamples', 'float', shadow ).setGroup( renderGroup );
+				const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
+				const size = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
 				let material = this.vsmMaterialVertical || ( this.vsmMaterialVertical = new NodeMaterial() );
 				material.fragmentNode = VSMPassVertical( { samples, radius, size, shadowPass: shadowPassVertical } ).context( builder.getSharedContext() );
@@ -303,13 +304,13 @@ class AnalyticLightNode extends LightingNode {
 
 			//
 
-			const shadowIntensity = reference( 'intensity', 'float', shadow );
-			const bias = reference( 'bias', 'float', shadow );
-			const normalBias = reference( 'normalBias', 'float', shadow );
+			const shadowIntensity = reference( 'intensity', 'float', shadow ).setGroup( renderGroup );
+			const bias = reference( 'bias', 'float', shadow ).setGroup( renderGroup );
+			const normalBias = reference( 'normalBias', 'float', shadow ).setGroup( renderGroup );
 
 			const position = object.material.shadowPositionNode || positionWorld;
 
-			let shadowCoord = uniform( shadow.matrix ).mul( position.add( normalWorld.mul( normalBias ) ) );
+			let shadowCoord = uniform( shadow.matrix ).setGroup( renderGroup ).mul( position.add( normalWorld.mul( normalBias ) ) );
 			shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
 
 			let coordZ = shadowCoord.z.add( bias );

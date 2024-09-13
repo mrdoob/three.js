@@ -1,5 +1,7 @@
 // @TODO: We can simplify "export { default as SomeNode, other, exports } from '...'" to just "export * from '...'" if we will use only named exports
 
+export { default as NodeMaterialObserver } from './manager/NodeMaterialObserver.js';
+
 export { default as NodeMaterial } from './NodeMaterial.js';
 export { default as InstancedPointsNodeMaterial } from './InstancedPointsNodeMaterial.js';
 export { default as LineBasicNodeMaterial } from './LineBasicNodeMaterial.js';

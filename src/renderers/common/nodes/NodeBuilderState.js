@@ -2,7 +2,7 @@ import BindGroup from '../BindGroup.js';
 
 class NodeBuilderState {
 
-	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, instanceBindGroups = true, transforms = [] ) {
+	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, monitor, instanceBindGroups = true, transforms = [] ) {
 
 		this.vertexShader = vertexShader;
 		this.fragmentShader = fragmentShader;
@@ -15,6 +15,8 @@ class NodeBuilderState {
 		this.updateNodes = updateNodes;
 		this.updateBeforeNodes = updateBeforeNodes;
 		this.updateAfterNodes = updateAfterNodes;
+
+		this.monitor = monitor;
 
 		this.instanceBindGroups = instanceBindGroups;
 

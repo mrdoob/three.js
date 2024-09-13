@@ -146,7 +146,7 @@ export * from './gpgpu/BarrierNode.js';
 export * from './gpgpu/WorkgroupInfoNode.js';
 
 // lighting
-export * from './lighting/LightNode.js';
+export * from './accessors/Lights.js';
 export * from './lighting/LightsNode.js';
 export * from './lighting/LightingContextNode.js';
 

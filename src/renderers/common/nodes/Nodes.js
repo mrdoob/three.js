@@ -190,6 +190,7 @@ class Nodes extends DataMap {
 			nodeBuilder.updateNodes,
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
+			nodeBuilder.monitor,
 			nodeBuilder.instanceBindGroups,
 			nodeBuilder.transforms
 		);
@@ -334,11 +335,18 @@ class Nodes extends DataMap {
 
 				if ( fog.isFogExp2 ) {
 
-					fogNode = densityFog( reference( 'color', 'color', fog ), reference( 'density', 'float', fog ) );
+					const color = reference( 'color', 'color', fog ).setGroup( renderGroup );
+					const density = reference( 'density', 'float', fog ).setGroup( renderGroup );
+
+					fogNode = densityFog( color, density );
 
 				} else if ( fog.isFog ) {
 
-					fogNode = rangeFog( reference( 'color', 'color', fog ), reference( 'near', 'float', fog ), reference( 'far', 'float', fog ) );
+					const color = reference( 'color', 'color', fog ).setGroup( renderGroup );
+					const near = reference( 'near', 'float', fog ).setGroup( renderGroup );
+					const far = reference( 'far', 'float', fog ).setGroup( renderGroup );
+
+					fogNode = rangeFog( color, near, far );
 
 				} else {
 
@@ -498,6 +506,15 @@ class Nodes extends DataMap {
 			nodeFrame.updateNode( node );
 
 		}
+
+	}
+
+	needsRefresh( renderObject ) {
+
+		const nodeFrame = this.getNodeFrameForRender( renderObject );
+		const monitor = renderObject.getMonitor();
+
+		return monitor.needsRefresh( renderObject, nodeFrame );
 
 	}
 

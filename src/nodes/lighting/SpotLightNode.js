@@ -1,10 +1,10 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
-import { lightTargetDirection } from './LightNode.js';
 import { getDistanceAttenuation } from './LightUtils.js';
 import { uniform } from '../core/UniformNode.js';
 import { smoothstep } from '../math/MathNode.js';
-import { objectViewPosition } from '../accessors/Object3DNode.js';
 import { positionView } from '../accessors/Position.js';
+import { renderGroup } from '../core/UniformGroupNode.js';
+import { lightViewPosition, lightTargetDirection } from '../accessors/Lights.js';
 
 class SpotLightNode extends AnalyticLightNode {
 
@@ -18,11 +18,11 @@ class SpotLightNode extends AnalyticLightNode {
 
 		super( light );
 
-		this.coneCosNode = uniform( 0 );
-		this.penumbraCosNode = uniform( 0 );
+		this.coneCosNode = uniform( 0 ).setGroup( renderGroup );
+		this.penumbraCosNode = uniform( 0 ).setGroup( renderGroup );
 
-		this.cutoffDistanceNode = uniform( 0 );
-		this.decayExponentNode = uniform( 0 );
+		this.cutoffDistanceNode = uniform( 0 ).setGroup( renderGroup );
+		this.decayExponentNode = uniform( 0 ).setGroup( renderGroup );
 
 	}
 
@@ -56,7 +56,7 @@ class SpotLightNode extends AnalyticLightNode {
 
 		const { colorNode, cutoffDistanceNode, decayExponentNode, light } = this;
 
-		const lVector = objectViewPosition( light ).sub( positionView ); // @TODO: Add it into LightNode
+		const lVector = lightViewPosition( light ).sub( positionView ); // @TODO: Add it into LightNode
 
 		const lightDirection = lVector.normalize();
 		const angleCos = lightDirection.dot( lightTargetDirection( light ) );

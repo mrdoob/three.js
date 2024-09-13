@@ -10,6 +10,15 @@ class BundleGroup extends Group {
 
 		this.type = 'BundleGroup';
 
+		this.static = true;
+		this.version = 0;
+
+	}
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) this.version ++;
+
 	}
 
 }

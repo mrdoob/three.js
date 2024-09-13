@@ -65,6 +65,7 @@ class ReferenceNode extends Node {
 		this.properties = property.split( '.' );
 		this.reference = object;
 		this.node = null;
+		this.group = null;
 
 		this.updateType = NodeUpdateType.OBJECT;
 
@@ -73,6 +74,14 @@ class ReferenceNode extends Node {
 	element( indexNode ) {
 
 		return nodeObject( new ReferenceElementNode( this, nodeObject( indexNode ) ) );
+
+	}
+
+	setGroup( group ) {
+
+		this.group = group;
+
+		return this;
 
 	}
 
@@ -99,6 +108,12 @@ class ReferenceNode extends Node {
 		} else {
 
 			node = uniform( null, uniformType );
+
+		}
+
+		if ( this.group !== null ) {
+
+			node.setGroup( this.group );
 
 		}
 

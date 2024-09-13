@@ -122,6 +122,8 @@ class WebGPUTextureUtils {
 		const dimension = this._getDimension( texture );
 		const format = texture.internalFormat || options.format || getFormat( texture, backend.device );
 
+		textureData.format = format;
+
 		let sampleCount = options.sampleCount !== undefined ? options.sampleCount : 1;
 
 		sampleCount = backend.utils.getSampleCount( sampleCount );
