@@ -5,7 +5,7 @@ import { materialRotation } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionLocal } from '../../nodes/accessors/Position.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
-import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { float, If, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 
 import { SpriteMaterial } from '../SpriteMaterial.js';
 
@@ -26,6 +26,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 		this.isSpriteNodeMaterial = true;
 
 		this.lights = false;
+		this.useSizeAttenuation = true;
 
 		this.positionNode = null;
 		this.rotationNode = null;
@@ -38,6 +39,8 @@ class SpriteNodeMaterial extends NodeMaterial {
 	}
 
 	setupPosition( { object, context } ) {
+
+		const useSizeAttenuation = this.sizeAttenuation;
 
 		// < VERTEX STAGE >
 
@@ -52,6 +55,19 @@ class SpriteNodeMaterial extends NodeMaterial {
 		if ( scaleNode !== null ) {
 
 			scale = scale.mul( scaleNode );
+
+		}
+
+
+		if ( ! useSizeAttenuation ) {
+
+			const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( - 1.0 );
+
+			If( perspective, () => {
+
+				scale.assign( scale.mul( mvPosition.z.negate() ) );
+
+			} );
 
 		}
 
@@ -86,6 +102,23 @@ class SpriteNodeMaterial extends NodeMaterial {
 		this.scaleNode = source.scaleNode;
 
 		return super.copy( source );
+
+	}
+
+	get sizeAttenuation() {
+
+		return this.useSizeAttenuation;
+
+	}
+
+	set sizeAttenuation( value ) {
+
+		if ( this.useSizeAttenuation !== value ) {
+
+			this.useSizeAttenuation = value;
+			this.needsUpdate = true;
+
+		}
 
 	}
 
