@@ -50,7 +50,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const vertex = positionLocal;
 
-		const mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
+		let mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
 
 		let scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() );
 
@@ -87,7 +87,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const rotatedPosition = rotate( alignedPosition, rotation );
 
-		mvPosition.assign( vec4( mvPosition.xy.add( rotatedPosition ), mvPosition.zw ) );
+		mvPosition = vec4( mvPosition.xy.add( rotatedPosition ), mvPosition.zw );
 
 		const modelViewProjection = cameraProjectionMatrix.mul( mvPosition );
 
