@@ -27,7 +27,6 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		this.lights = false;
 
-		this.sizeAttenuation = true;
 		this.useSizeAttenuation = true;
 
 		this.positionNode = null;

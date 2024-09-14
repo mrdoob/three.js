@@ -317,11 +317,11 @@ export default class RenderObject {
 
 		}
 
-		if ( object.center ) {
+		// if ( object.center ) {
 
-			cacheKey += object.center.x + ',' + object.center.y + ',';
+		// 	cacheKey += object.center.x + ',' + object.center.y + ',';
 
-		}
+		// }
 
 		if ( object.count > 1 ) {
 
