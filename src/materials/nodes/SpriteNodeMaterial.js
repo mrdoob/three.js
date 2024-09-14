@@ -5,7 +5,7 @@ import { materialRotation } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionLocal } from '../../nodes/accessors/Position.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
-import { float, If, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 
 import { SpriteMaterial } from '../SpriteMaterial.js';
 
@@ -42,7 +42,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	setupPosition( { object, context } ) {
 
-		const useSizeAttenuation = this.sizeAttenuation;
+		// const useSizeAttenuation = this.sizeAttenuation;
 
 		// < VERTEX STAGE >
 
@@ -50,45 +50,44 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const vertex = positionLocal;
 
-		let mvPosition = modelViewMatrix.mul( vec4( vec3( positionNode || 0 ), 1 ) );
+		const mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
 
-		const scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() ).toVar();
+		let scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() );
 
 		if ( scaleNode !== null ) {
 
-			scale.assign( scale.mul( scaleNode ) );
+			scale = scale.mul( scaleNode );
 
 		}
 
 
-		if ( ! useSizeAttenuation ) {
+		// if ( ! useSizeAttenuation ) {
 
-			const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( - 1.0 );
+		// 	const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( - 1.0 );
 
-			If( perspective, () => {
+		// 	If( perspective, () => {
 
-				scale.assign( scale.mul( mvPosition.z.negate() ) );
+		// 		scale.assign( scale.mul( mvPosition.z.negate() ) );
 
-			} );
+		// 	} );
 
-		}
+		// }
 
-
-		let alignedPosition = vertex.xy;
+		const alignedPosition = vertex.xy.toVar();
 
 		if ( object.center && object.center.isVector2 === true ) {
 
-			alignedPosition = alignedPosition.sub( uniform( object.center ).sub( 0.5 ) );
+			alignedPosition.assign( alignedPosition.sub( uniform( object.center ).sub( 0.5 ) ) );
 
 		}
 
-		alignedPosition = alignedPosition.mul( scale );
+		alignedPosition.assign( alignedPosition.mul( scale ) );
 
 		const rotation = float( rotationNode || materialRotation );
 
 		const rotatedPosition = rotate( alignedPosition, rotation );
 
-		mvPosition = vec4( mvPosition.xy.add( rotatedPosition ), mvPosition.zw );
+		mvPosition.assign( vec4( mvPosition.xy.add( rotatedPosition ), mvPosition.zw ) );
 
 		const modelViewProjection = cameraProjectionMatrix.mul( mvPosition );
 
@@ -108,22 +107,22 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	}
 
-	get sizeAttenuation() {
+	// get sizeAttenuation() {
 
-		return this.useSizeAttenuation;
+	// 	return this.useSizeAttenuation;
 
-	}
+	// }
 
-	set sizeAttenuation( value ) {
+	// set sizeAttenuation( value ) {
 
-		if ( this.useSizeAttenuation !== value ) {
+	// 	if ( this.useSizeAttenuation !== value ) {
 
-			this.useSizeAttenuation = value;
-			this.needsUpdate = true;
+	// 		this.useSizeAttenuation = value;
+	// 		this.needsUpdate = true;
 
-		}
+	// 	}
 
-	}
+	// }
 
 }
 
