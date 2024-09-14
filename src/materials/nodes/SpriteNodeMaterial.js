@@ -54,7 +54,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		if ( scaleNode !== null ) {
 
-			scale.assign( vec2( scaleNode ) );
+			scale.assign( scale.mul( scaleNode ) );
 
 		}
 
