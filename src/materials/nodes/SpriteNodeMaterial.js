@@ -27,8 +27,6 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		this.lights = false;
 
-		this.useSizeAttenuation = true;
-
 		this.positionNode = null;
 		this.rotationNode = null;
 		this.scaleNode = null;
@@ -40,8 +38,6 @@ class SpriteNodeMaterial extends NodeMaterial {
 	}
 
 	setupPosition( { object, context } ) {
-
-		// const useSizeAttenuation = this.sizeAttenuation;
 
 		// < VERTEX STAGE >
 
@@ -59,28 +55,15 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		}
 
-
-		// if ( ! useSizeAttenuation ) {
-
-		// 	const perspective = cameraProjectionMatrix.element( 2 ).element( 3 ).equal( - 1.0 );
-
-		// 	If( perspective, () => {
-
-		// 		scale.assign( scale.mul( mvPosition.z.negate() ) );
-
-		// 	} );
-
-		// }
-
-		const alignedPosition = vertex.xy.toVar();
+		let alignedPosition = vertex.xy;
 
 		if ( object.center && object.center.isVector2 === true ) {
 
-			alignedPosition.assign( alignedPosition.sub( uniform( object.center ).sub( 0.5 ) ) );
+			alignedPosition = alignedPosition.sub( uniform( object.center ).sub( 0.5 ) );
 
 		}
 
-		alignedPosition.assign( alignedPosition.mul( scale ) );
+		alignedPosition = alignedPosition.mul( scale );
 
 		const rotation = float( rotationNode || materialRotation );
 
@@ -105,23 +88,6 @@ class SpriteNodeMaterial extends NodeMaterial {
 		return super.copy( source );
 
 	}
-
-	// get sizeAttenuation() {
-
-	// 	return this.useSizeAttenuation;
-
-	// }
-
-	// set sizeAttenuation( value ) {
-
-	// 	if ( this.useSizeAttenuation !== value ) {
-
-	// 		this.useSizeAttenuation = value;
-	// 		this.needsUpdate = true;
-
-	// 	}
-
-	// }
 
 }
 
