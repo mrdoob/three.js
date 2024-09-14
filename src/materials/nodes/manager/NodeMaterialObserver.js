@@ -135,6 +135,9 @@ class NodeMaterialObserver {
 
 				data[ property ] = value.clone();
 
+				// clone increments the new texture's version, thus update
+				if ( value.isTexture ) data[ property ].version --;
+
 			} else {
 
 				data[ property ] = value;
@@ -177,6 +180,8 @@ class NodeMaterialObserver {
 				if ( value.equals( mtlValue ) === false ) {
 
 					value.copy( mtlValue );
+
+					if ( value.isTexture ) value.version = mtlValue.version;
 
 					return false;
 

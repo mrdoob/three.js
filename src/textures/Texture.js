@@ -98,6 +98,12 @@ class Texture extends EventDispatcher {
 
 	}
 
+	equals( other ) {
+
+		return this.version === other.version && this.uuid === other.uuid;
+
+	}
+
 	copy( source ) {
 
 		this.name = source.name;
