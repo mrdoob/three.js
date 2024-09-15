@@ -98,7 +98,7 @@ export default [
 		]
 	},
 	{
-		input: 'test/treeshake/index.webgpu.js',
+		input: 'test/treeshake/index.webgpu.nodes.js',
 		plugins: [
 			resolve()
 		],
@@ -110,7 +110,7 @@ export default [
 		]
 	},
 	{
-		input: 'test/treeshake/index.webgpu.js',
+		input: 'test/treeshake/index.webgpu.nodes.js',
 		plugins: [
 			resolve(),
 			terser(),
