@@ -878,6 +878,7 @@ class BatchedMesh extends Mesh {
 
 		const drawRange = this._drawRanges[ geometryId ];
 		return { ...drawRange }; // cloned to avoid external changes
+
 	}
 
 	raycast( raycaster, intersects ) {
