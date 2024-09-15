@@ -50,7 +50,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		let mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
 
-		let scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() ).toVar();
+		let scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() );
 
 		if ( scaleNode !== null ) {
 
@@ -61,7 +61,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		if ( ! useSizeAttenuation && camera.isPerspectiveCamera ) {
 
-			scale.assign( scale.mul( mvPosition.z.negate() ) );
+			scale = scale.mul( mvPosition.z.negate() );
 
 		}
 
