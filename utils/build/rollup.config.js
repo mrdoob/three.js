@@ -63,6 +63,7 @@ function header() {
 const builds = [
 	{
 		input: {
+			'three.core.js': 'src/Three.core.js',
 			'three.module.js': 'src/Three.js',
 			'three.webgpu.js': 'src/Three.WebGPU.js',
 			'three.webgpu.nodes.js': 'src/Three.WebGPU.Nodes.js',
@@ -71,18 +72,19 @@ const builds = [
 			glsl(),
 			header()
 		],
+		preserveEntrySignatures: 'allow-extension',
 		output: [
 			{
 				format: 'esm',
 				dir: 'build',
 				minifyInternalExports: false,
 				entryFileNames: '[name]',
-				chunkFileNames: 'three.core.js'
 			}
 		]
 	},
 	{
 		input: {
+			'three.core.min.js': 'src/Three.core.js',
 			'three.module.min.js': 'src/Three.js',
 			'three.webgpu.min.js': 'src/Three.WebGPU.js',
 			'three.webgpu.nodes.min.js': 'src/Three.WebGPU.Nodes.js',
@@ -92,12 +94,12 @@ const builds = [
 			header(),
 			terser()
 		],
+		preserveEntrySignatures: 'allow-extension',
 		output: [
 			{
 				format: 'esm',
 				dir: 'build',
 				entryFileNames: '[name]',
-				chunkFileNames: 'three.core.min.js'
 			}
 		]
 	},
