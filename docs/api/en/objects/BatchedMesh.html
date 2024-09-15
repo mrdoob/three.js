@@ -167,8 +167,19 @@
 		<p>
 			[page:Integer instanceId]: The id of an instance to get the visibility state of.
 		</p>
-		<p>Get whether the given instance is marked as "visible" or not.</p>
+		<p>Get whether the given instance is marked as "visible" or not.</p>		
+
+		<h3>
+			[method:Object getGeometryRangeAt]( [param:Integer geometryId] )
+		</h3>
+		<p>
+			[page:Integer geometryId]: The id of the geometry to retrieve the geometry range.
+		</p>
 		
+		<p>Get range of the specified geometry or `null` if invalid.</p>
+		<p>Return an object of the form:</p>
+		<code>{ start: Integer, count: Integer }</code>
+	
 		<h3>
 			[method:Integer getGeometryIdAt]( [param:Integer instanceId] )
 		</h3>
@@ -176,7 +187,7 @@
 			[page:Integer instanceId]: The id of an instance to get the geometryIndex of.
 		</p>
 		<p>Get the geometryIndex of the defined instance.</p>
-	
+
 		<h3>
 			[method:undefined setColorAt]( [param:Integer instanceId], [param:Color color] )
 		</h3>
