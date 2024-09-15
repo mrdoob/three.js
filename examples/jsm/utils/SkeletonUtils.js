@@ -9,6 +9,17 @@ import {
 	VectorKeyframeTrack
 } from 'three';
 
+function getBoneName( bone, options ) {
+
+	if ( options.getBoneName !== undefined ) {
+
+		return options.getBoneName( bone );
+
+	}
+
+	return options.names[ bone.name ] || bone.name;
+
+}
 
 function retarget( target, source, options = {} ) {
 
@@ -77,7 +88,7 @@ function retarget( target, source, options = {} ) {
 	for ( let i = 0; i < bones.length; ++ i ) {
 
 		bone = bones[ i ];
-		name = options.names[ bone.name ];
+		name = getBoneName( bone, options );
 
 		boneTo = getBoneByName( name, sourceBones );
 
@@ -161,7 +172,7 @@ function retarget( target, source, options = {} ) {
 		for ( let i = 0; i < bones.length; ++ i ) {
 
 			bone = bones[ i ];
-			name = options.names[ bone.name ] || bone.name;
+			name = getBoneName( bone, options );
 
 			if ( name !== options.hip ) {
 
@@ -203,6 +214,7 @@ function retargetClip( target, source, clip, options = {} ) {
 		mixer = new AnimationMixer( source ),
 		bones = getBones( target.skeleton ),
 		boneDatas = [];
+
 	let positionOffset,
 		bone, boneTo, boneData,
 		name;
@@ -220,8 +232,7 @@ function retargetClip( target, source, clip, options = {} ) {
 
 		for ( let j = 0; j < bones.length; ++ j ) {
 
-			name = options.names[ bones[ j ].name ] || bones[ j ].name;
-
+			name = getBoneName( bones[ j ], options );
 			boneTo = getBoneByName( name, source.skeleton );
 
 			if ( boneTo ) {
