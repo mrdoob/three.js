@@ -17,7 +17,7 @@ function getBoneName( bone, options ) {
 
 	}
 
-	return options.names[ bone.name ] || bone.name;
+	return options.names[ bone.name ];
 
 }
 
@@ -172,7 +172,7 @@ function retarget( target, source, options = {} ) {
 		for ( let i = 0; i < bones.length; ++ i ) {
 
 			bone = bones[ i ];
-			name = getBoneName( bone, options );
+			name = getBoneName( bone, options ) || bone.name;
 
 			if ( name !== options.hip ) {
 
@@ -232,12 +232,12 @@ function retargetClip( target, source, clip, options = {} ) {
 
 		for ( let j = 0; j < bones.length; ++ j ) {
 
-			name = getBoneName( bones[ j ], options );
+			bone = bones[ j ];
+			name = getBoneName( bone, options ) || bone.name;
 			boneTo = getBoneByName( name, source.skeleton );
 
 			if ( boneTo ) {
 
-				bone = bones[ j ];
 				boneData = boneDatas[ j ] = boneDatas[ j ] || { bone: bone };
 
 				if ( options.hip === name ) {
