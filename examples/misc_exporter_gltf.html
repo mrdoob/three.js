@@ -370,7 +370,7 @@
 				// ---------------------------------------------------------------------
 
 				const frustumSize = 2000;
-				const aspect = window.innerWidth / window.innerWidth;
+				const aspect = window.innerWidth / window.innerHeight;
 
 				const cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 0, 2000 );
 				cameraOrtho.position.set( 600, 400, 0 );
