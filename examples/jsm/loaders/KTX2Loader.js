@@ -9,6 +9,7 @@
  * References:
  * - KTX: http://github.khronos.org/KTX-Specification/
  * - DFD: https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor
+ * - BasisU HDR: https://github.com/BinomialLLC/basis_universal/wiki/UASTC-HDR-Texture-Specification-v1.0
  */
 
 import {
@@ -63,6 +64,7 @@ import {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
+	VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT,
 	VK_FORMAT_ASTC_6x6_SRGB_BLOCK,
 	VK_FORMAT_ASTC_6x6_UNORM_BLOCK,
 	KHR_DF_PRIMARIES_UNSPECIFIED,
@@ -251,7 +253,7 @@ class KTX2Loader extends Loader {
 
 		loader.load( url, ( buffer ) => {
 
-			this.parse( buffer, onLoad, onError);
+			this.parse( buffer, onLoad, onError );
 
 		}, onProgress, onError );
 
@@ -269,15 +271,15 @@ class KTX2Loader extends Loader {
 		// again from this thread.
 		if ( _taskCache.has( buffer ) ) {
 
-				const cachedTask = _taskCache.get( buffer );
+			const cachedTask = _taskCache.get( buffer );
 
-				return cachedTask.promise.then( onLoad ).catch( onError );
+			return cachedTask.promise.then( onLoad ).catch( onError );
 
 		}
 
 		this._createTexture( buffer )
-				.then( ( texture ) => onLoad ? onLoad( texture ) : null )
-				.catch( onError );
+			.then( ( texture ) => onLoad ? onLoad( texture ) : null )
+			.catch( onError );
 
 	}
 
@@ -730,8 +732,7 @@ KTX2Loader.BasisWorker = function () {
 
 };
 
-//
-// Parsing for non-Basis textures. These textures are may have supercompression
+// Parsing for non-Basis textures. These textures may have supercompression
 // like Zstd, but they do not require transcoding.
 
 const UNCOMPRESSED_FORMATS = new Set( [ RGBAFormat, RGFormat, RedFormat ] );
@@ -753,6 +754,7 @@ const FORMAT_MAP = {
 	[ VK_FORMAT_R8_SRGB ]: RedFormat,
 	[ VK_FORMAT_R8_UNORM ]: RedFormat,
 
+	[ VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT ]: RGBA_ASTC_4x4_Format,
 	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: RGBA_ASTC_6x6_Format,
 	[ VK_FORMAT_ASTC_6x6_UNORM_BLOCK ]: RGBA_ASTC_6x6_Format,
 
@@ -775,6 +777,7 @@ const TYPE_MAP = {
 	[ VK_FORMAT_R8_SRGB ]: UnsignedByteType,
 	[ VK_FORMAT_R8_UNORM ]: UnsignedByteType,
 
+	[ VK_FORMAT_ASTC_4x4_SFLOAT_BLOCK_EXT ]: HalfFloatType,
 	[ VK_FORMAT_ASTC_6x6_SRGB_BLOCK ]: UnsignedByteType,
 	[ VK_FORMAT_ASTC_6x6_UNORM_BLOCK ]: UnsignedByteType,
 
