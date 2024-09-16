@@ -369,10 +369,10 @@
 				// Ortho camera
 				// ---------------------------------------------------------------------
 
-				const frustumSize = 2000;
+				const height = 1000; // frustum height
 				const aspect = window.innerWidth / window.innerHeight;
 
-				const cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 0, 2000 );
+				const cameraOrtho = new THREE.OrthographicCamera( - height * aspect, height * aspect, height, - height, 0, 2000 );
 				cameraOrtho.position.set( 600, 400, 0 );
 				cameraOrtho.lookAt( 0, 0, 0 );
 				scene1.add( cameraOrtho );
