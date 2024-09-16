@@ -30,9 +30,9 @@ function retarget( target, source, options = {} ) {
 
 	options.preserveBoneMatrix = options.preserveBoneMatrix !== undefined ? options.preserveBoneMatrix : true;
 	options.preserveBonePositions = options.preserveBonePositions !== undefined ? options.preserveBonePositions : true;
-	options.preserveHipPosition = options.preserveHipPosition !== undefined ? options.preserveHipPosition : false;
 	options.useTargetMatrix = options.useTargetMatrix !== undefined ? options.useTargetMatrix : false;
 	options.hip = options.hip !== undefined ? options.hip : 'hip';
+	options.hipInfluence = options.hipInfluence !== undefined ? options.hipInfluence : new Vector3( 1, 1, 1 );
 	options.scale = options.scale !== undefined ? options.scale : 1;
 	options.names = options.names || {};
 
@@ -138,13 +138,15 @@ function retarget( target, source, options = {} ) {
 
 		if ( name === options.hip ) {
 
-			globalMatrix.elements[ 12 ] *= options.scale;
-			globalMatrix.elements[ 13 ] *= options.scale;
-			globalMatrix.elements[ 14 ] *= options.scale;
+			globalMatrix.elements[ 12 ] *= options.scale * options.hipInfluence.x;
+			globalMatrix.elements[ 13 ] *= options.scale * options.hipInfluence.y;
+			globalMatrix.elements[ 14 ] *= options.scale * options.hipInfluence.z;
 
-			if ( options.preserveHipPosition ) {
+			if ( options.hipPosition !== undefined ) {
 
-				globalMatrix.elements[ 12 ] = globalMatrix.elements[ 14 ] = 0;
+				globalMatrix.elements[ 12 ] += options.hipPosition.x * options.scale;
+				globalMatrix.elements[ 13 ] += options.hipPosition.y * options.scale;
+				globalMatrix.elements[ 14 ] += options.hipPosition.z * options.scale;
 
 			}
 
