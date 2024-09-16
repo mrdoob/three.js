@@ -977,8 +977,8 @@ ${ flowData.code }
 
 		for ( const uniform of uniforms ) {
 
-			const groundName = uniform.groupNode.name;
-			const uniformIndexes = this.bindingsIndexes[ groundName ];
+			const groupName = uniform.groupNode.name;
+			const uniformIndexes = this.bindingsIndexes[ groupName ];
 
 			if ( uniform.type === 'texture' || uniform.type === 'cubeTexture' || uniform.type === 'storageTexture' || uniform.type === 'texture3D' ) {
 
