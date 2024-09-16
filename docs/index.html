@@ -530,10 +530,11 @@
 			iframe = oldIframe.cloneNode();
       
       iframe.style.display = 'none';
-      iframe.onload = function(){ iframe.style.display = 'unset'; };
-      iframe.onerror = function(){ iframe.style.display = 'unset'; };
       
 			if ( hash && titles[ splitHash[ 0 ] ] ) {
+        
+        iframe.onload = function(){ iframe.style.display = 'unset'; };
+        iframe.onerror = function(){ iframe.style.display = 'unset'; };
         
 				iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
 				subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';
