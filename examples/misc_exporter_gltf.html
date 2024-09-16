@@ -368,7 +368,13 @@
 				// ---------------------------------------------------------------------
 				// Ortho camera
 				// ---------------------------------------------------------------------
-				const cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 0.1, 10 );
+
+				const frustumSize = 2000;
+				const aspect = window.innerWidth / window.innerWidth;
+
+				const cameraOrtho = new THREE.OrthographicCamera( 0.5 * frustumSize * aspect / - 2, 0.5 * frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 0, 2000 );
+				cameraOrtho.position.set( 600, 400, 0 );
+				cameraOrtho.lookAt( 0, 0, 0 );
 				scene1.add( cameraOrtho );
 				cameraOrtho.name = 'OrthographicCamera';
 
