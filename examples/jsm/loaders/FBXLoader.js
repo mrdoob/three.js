@@ -1095,6 +1095,7 @@ class FBXTreeParser {
 
 				case 1: // Orthographic
 					console.warn( 'THREE.FBXLoader: Orthographic cameras not supported yet.' );
+					model = new Object3D();
 					break;
 
 				default:
