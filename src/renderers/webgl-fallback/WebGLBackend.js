@@ -62,6 +62,7 @@ class WebGLBackend extends Backend {
 
 		this.disjoint = this.extensions.get( 'EXT_disjoint_timer_query_webgl2' );
 		this.parallel = this.extensions.get( 'KHR_parallel_shader_compile' );
+
 		this._currentContext = null;
 
 	}
@@ -1106,40 +1107,52 @@ class WebGLBackend extends Backend {
 
 	updateBindings( bindGroup, bindings ) {
 
-		const { state, gl } = this;
+		if ( ! bindGroup ) return;
 
-		let groupIndex = 0;
-		let textureIndex = 0;
+		const { gl } = this;
 
-		for ( const bindGroup of bindings ) {
+		const bindingsData = this.get( bindings );
+		const bindGroupData = this.get( bindGroup );
 
-			for ( const binding of bindGroup.bindings ) {
+		if ( bindingsData.textureIndex === undefined ) bindingsData.textureIndex = 0;
 
-				if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+		if ( bindGroupData.textureIndex === undefined ) {
 
-					const bufferGPU = gl.createBuffer();
-					const data = binding.buffer;
+			bindGroupData.textureIndex = bindingsData.textureIndex;
 
-					gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
-					gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
-					state.bindBufferBase( gl.UNIFORM_BUFFER, groupIndex, bufferGPU );
+		} else {
 
-					this.set( binding, {
-						index: groupIndex ++,
-						bufferGPU
-					} );
+			// reset textureIndex to match previous mappimgs when rebuilt
+			bindingsData.textureIndex = bindGroupData.textureIndex;
 
-				} else if ( binding.isSampledTexture ) {
+		}
 
-					const { textureGPU, glTextureType } = this.get( binding.texture );
+		let i = 0;
 
-					this.set( binding, {
-						index: textureIndex ++,
-						textureGPU,
-						glTextureType
-					} );
+		for ( const binding of bindGroup.bindings ) {
 
-				}
+			if ( binding.isUniformsGroup || binding.isUniformBuffer ) {
+
+				const data = binding.buffer;
+				const bufferGPU = gl.createBuffer();
+
+				gl.bindBuffer( gl.UNIFORM_BUFFER, bufferGPU );
+				gl.bufferData( gl.UNIFORM_BUFFER, data, gl.DYNAMIC_DRAW );
+
+				this.set( binding, {
+					index: bindGroup.index * 2 + i ++,
+					bufferGPU
+				} );
+
+			} else if ( binding.isSampledTexture ) {
+
+				const { textureGPU, glTextureType } = this.get( binding.texture );
+
+				this.set( binding, {
+					index: bindingsData.textureIndex ++,
+					textureGPU,
+					glTextureType
+				} );
 
 			}
 
