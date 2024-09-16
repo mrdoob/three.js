@@ -23,7 +23,6 @@ import {
 	MeshPhongMaterial,
 	NumberKeyframeTrack,
 	Object3D,
-	OrthographicCamera,
 	PerspectiveCamera,
 	PointLight,
 	PropertyBinding,
@@ -1095,7 +1094,7 @@ class FBXTreeParser {
 					break;
 
 				case 1: // Orthographic
-					model = new OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
+					console.warn( 'THREE.FBXLoader: Orthographic cameras not supported yet.' );
 					break;
 
 				default:
@@ -1330,7 +1329,7 @@ class FBXTreeParser {
 		if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
 
 		if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = getEulerOrder( modelNode.RotationOrder.value );
-		else transformData.eulerOrder = getEulerOrder(0);
+		else transformData.eulerOrder = getEulerOrder( 0 );
 
 		if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
 
@@ -2811,7 +2810,7 @@ class AnimationParser {
 		}
 
 		// For Maya models using "Joint Orient", Euler order only applies to rotation, not pre/post-rotations
-		const defaultEulerOrder = getEulerOrder(0);
+		const defaultEulerOrder = getEulerOrder( 0 );
 
 		if ( preRotation !== undefined ) {
 
@@ -4139,7 +4138,7 @@ function generateTransform( transformData ) {
 	if ( transformData.translation ) lTranslationM.setPosition( tempVec.fromArray( transformData.translation ) );
 
 	// For Maya models using "Joint Orient", Euler order only applies to rotation, not pre/post-rotations
-	const defaultEulerOrder = getEulerOrder(0);
+	const defaultEulerOrder = getEulerOrder( 0 );
 
 	if ( transformData.preRotation ) {
 
