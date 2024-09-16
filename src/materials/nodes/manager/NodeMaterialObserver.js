@@ -135,7 +135,7 @@ class NodeMaterialObserver {
 
 				data[ property ] = value.clone();
 
-				// clone increments the new texture's version, thus update
+//				// clone increments the new texture's version, thus update
 				if ( value.isTexture ) data[ property ].version --;
 
 			} else {
@@ -181,7 +181,22 @@ class NodeMaterialObserver {
 
 					value.copy( mtlValue );
 
-					if ( value.isTexture ) value.version = mtlValue.version;
+					return false;
+
+				}
+
+			} else if ( value.isTexture === true ) {
+
+				if ( value.uuid !== mtlValue.uuid ) {
+
+					materialData[ property ] = value.clone();
+					materialData[ property ].version --;
+
+					return false;
+
+				} else if ( value.version !== mtlValue.version ) {
+
+					value.version = mtlValue.version;
 
 					return false;
 
@@ -190,6 +205,8 @@ class NodeMaterialObserver {
 			} else if ( value !== mtlValue ) {
 
 				materialData[ property ] = mtlValue;
+
+				return false;
 
 			}
 
