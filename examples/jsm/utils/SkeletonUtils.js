@@ -222,13 +222,31 @@ function retargetClip( target, source, clip, options = {} ) {
 		name;
 
 	mixer.clipAction( clip ).play();
-	mixer.update( 0 );
+
+	// trim
+
+	let start = 0, end = numFrames;
+
+	if ( options.trim !== undefined ) {
+
+		start = Math.round( options.trim[ 0 ] * options.fps );
+		end = Math.min( Math.round( options.trim[ 1 ] * options.fps ), numFrames ) - start;
+
+		mixer.update( options.trim[ 0 ] );
+
+	} else {
+
+		mixer.update( 0 );
+
+	}
 
 	source.updateMatrixWorld();
 
-	for ( let i = 0; i < numFrames; ++ i ) {
+	//
 
-		const time = i * delta;
+	for ( let frame = 0; frame < end; ++ frame ) {
+
+		const time = frame * delta;
 
 		retarget( target, source, options );
 
@@ -247,15 +265,15 @@ function retargetClip( target, source, clip, options = {} ) {
 					if ( ! boneData.pos ) {
 
 						boneData.pos = {
-							times: new Float32Array( numFrames ),
-							values: new Float32Array( numFrames * 3 )
+							times: new Float32Array( end ),
+							values: new Float32Array( end * 3 )
 						};
 
 					}
 
 					if ( options.useFirstFramePosition ) {
 
-						if ( i === 0 ) {
+						if ( frame === 0 ) {
 
 							positionOffset = bone.position.clone();
 
@@ -265,30 +283,30 @@ function retargetClip( target, source, clip, options = {} ) {
 
 					}
 
-					boneData.pos.times[ i ] = time;
+					boneData.pos.times[ frame ] = time;
 
-					bone.position.toArray( boneData.pos.values, i * 3 );
+					bone.position.toArray( boneData.pos.values, frame * 3 );
 
 				}
 
 				if ( ! boneData.quat ) {
 
 					boneData.quat = {
-						times: new Float32Array( numFrames ),
-						values: new Float32Array( numFrames * 4 )
+						times: new Float32Array( end ),
+						values: new Float32Array( end * 4 )
 					};
 
 				}
 
-				boneData.quat.times[ i ] = time;
+				boneData.quat.times[ frame ] = time;
 
-				bone.quaternion.toArray( boneData.quat.values, i * 4 );
+				bone.quaternion.toArray( boneData.quat.values, frame * 4 );
 
 			}
 
 		}
 
-		if ( i === numFrames - 2 ) {
+		if ( frame === end - 2 ) {
 
 			// last mixer update before final loop iteration
 			// make sure we do not go over or equal to clip duration
