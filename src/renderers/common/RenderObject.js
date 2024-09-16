@@ -302,6 +302,12 @@ export default class RenderObject {
 
 		cacheKey += this.clippingContext.cacheKey + ',';
 
+		if ( object.geometry ) {
+
+			cacheKey += object.geometry.id + ',';
+
+		}
+
 		if ( object.skeleton ) {
 
 			cacheKey += object.skeleton.bones.length + ',';
@@ -328,7 +334,9 @@ export default class RenderObject {
 
 		if ( object.count > 1 ) {
 
-			cacheKey += object.count + ',' + object.uuid + ',';
+			// TODO: https://github.com/mrdoob/three.js/pull/29066#issuecomment-2269400850
+
+			cacheKey += object.uuid + ',';
 
 		}
 
