@@ -49,7 +49,6 @@ class AtomicFunctionNode extends TempNode {
 		params.push( b.build( builder, inputType ) );
 
 		const methodSnippet = `${ builder.getMethod( method, type ) }( ${params.join( ', ' )} )`;
-		console.log( this.storeNode );
 
 		if ( this.storeNode !== null ) {
 
