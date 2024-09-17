@@ -54,7 +54,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { storageObject, If, vec3, not, uniform, uv, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier } from 'three/tsl';
+			import { storageObject, If, vec3, not, uniform, uv, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -149,6 +149,9 @@
 				const highestBlockHeightBuffer = new THREE.StorageInstancedBufferAttribute( new Uint32Array( 1 ).fill( 2 ), 1 );
 				const highestBlockHeightStorage = storageObject( highestBlockHeightBuffer, 'uint', highestBlockHeightBuffer.count ).label( 'HighestBlockHeight' );
 
+				const counterBuffer = new THREE.StorageBufferAttribute( 1, 1 );
+				const counterStorage = storageObject( counterBuffer, 'uint', counterBuffer.count ).toAtomic().label( 'Counter' );
+
 				const array = new Uint32Array( Array.from( { length: size }, ( _, i ) => {
 
 					return i;
@@ -219,6 +222,7 @@
 
 					If( localStorage.element( idxAfter ).lessThan( localStorage.element( idxBefore ) ), () => {
 
+						atomicAdd( counterStorage.element( 0 ), 1 );
 						const temp = localStorage.element( idxBefore ).toVar();
 						localStorage.element( idxBefore ).assign( localStorage.element( idxAfter ) );
 						localStorage.element( idxAfter ).assign( temp );
@@ -233,6 +237,7 @@
 					If( currentElementsStorage.element( idxAfter ).lessThan( currentElementsStorage.element( idxBefore ) ), () => {
 
 						// Apply the swapped values to temporary storage.
+						atomicAdd( counterStorage.element( 0 ), 1 );
 						tempStorage.element( idxBefore ).assign( currentElementsStorage.element( idxAfter ) );
 						tempStorage.element( idxAfter ).assign( currentElementsStorage.element( idxBefore ) );
 
@@ -396,6 +401,7 @@
 					nextAlgoStorage.element( 0 ).assign( forceGlobalSwap ? StepType.FLIP_GLOBAL : StepType.FLIP_LOCAL );
 					nextBlockHeightStorage.element( 0 ).assign( 2 );
 					highestBlockHeightStorage.element( 0 ).assign( 2 );
+					atomicStore( counterStorage.element( 0 ), 0 );
 
 				} );
 
@@ -511,12 +517,14 @@
 
 					const algo = new Uint32Array( await renderer.getArrayBufferAsync( nextAlgoBuffer ) );
 					algo > StepType.DISPERSE_LOCAL ? ( nextStepGlobal = true ) : ( nextStepGlobal = false );
+					const totalSwaps = new Uint32Array( await renderer.getArrayBufferAsync( counterBuffer ) );
 			
 					renderer.render( scene, camera );
 
 					timestamps[ forceGlobalSwap ? 'global_swap' : 'local_swap' ].innerHTML = `
 
 							Compute ${forceGlobalSwap ? 'Global' : 'Local'}: ${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
+							Total Swaps: ${totalSwaps}<br>
 								<div style="display: flex; flex-direction:row; justify-content: center; align-items: center;">
 									${forceGlobalSwap ? 'Global Swaps' : 'Local Swaps'} Compare Region&nbsp;
 									<div style="background-color: ${ forceGlobalSwap ? globalColors[ 0 ] : localColors[ 0 ]}; width:12.5px; height: 1em; border-radius: 20%;"></div>

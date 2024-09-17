@@ -19,6 +19,7 @@ class StorageBufferNode extends BufferNode {
 		this.isStorageBufferNode = true;
 
 		this.access = GPUBufferBindingType.Storage;
+		this.isAtomic = false;
 
 		this.bufferObject = false;
 		this.bufferCount = bufferCount;
@@ -94,6 +95,20 @@ class StorageBufferNode extends BufferNode {
 	toReadOnly() {
 
 		return this.setAccess( GPUBufferBindingType.ReadOnlyStorage );
+
+	}
+
+	setAtomic( value ) {
+
+		this.isAtomic = value;
+
+		return this;
+
+	}
+
+	toAtomic() {
+
+		return this.setAtomic( true );
 
 	}
 
