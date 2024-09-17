@@ -1253,9 +1253,9 @@ class WebGLBackend extends Backend {
 
 	}
 
-	copyFramebufferToTexture( texture, renderContext ) {
+	copyFramebufferToTexture( texture, renderContext, rectangle ) {
 
-		this.textureUtils.copyFramebufferToTexture( texture, renderContext );
+		this.textureUtils.copyFramebufferToTexture( texture, renderContext, rectangle );
 
 	}
 

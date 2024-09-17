@@ -1248,13 +1248,15 @@ class Renderer {
 
 	}
 
-	copyFramebufferToTexture( framebufferTexture ) {
+	copyFramebufferToTexture( framebufferTexture, rectangle = null ) {
 
 		const renderContext = this._currentRenderContext;
 
 		this._textures.updateTexture( framebufferTexture );
 
-		this.backend.copyFramebufferToTexture( framebufferTexture, renderContext );
+		rectangle = rectangle === null ? _vector4.set( 0, 0, framebufferTexture.image.width, framebufferTexture.image.height ) : rectangle;
+
+		this.backend.copyFramebufferToTexture( framebufferTexture, renderContext, rectangle );
 
 	}
 
