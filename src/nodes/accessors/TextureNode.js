@@ -4,7 +4,7 @@ import { textureSize } from './TextureSizeNode.js';
 import { colorSpaceToWorking } from '../display/ColorSpaceNode.js';
 import { expression } from '../code/ExpressionNode.js';
 import { maxMipLevel } from '../utils/MaxMipLevelNode.js';
-import { nodeProxy, vec3, nodeObject } from '../tsl/TSLBase.js';
+import { nodeProxy, vec3, nodeObject, int } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 
 import { IntType, UnsignedIntType } from '../../constants.js';
@@ -128,7 +128,15 @@ class TextureNode extends UniformNode {
 
 		if ( builder.isFlipY() && ( texture.isRenderTargetTexture === true || texture.isFramebufferTexture === true || texture.isDepthTexture === true ) ) {
 
-			uvNode = uvNode.setY( uvNode.y.oneMinus() );
+			if ( this.sampler ) {
+
+				uvNode = uvNode.flipY();
+
+			} else {
+
+				uvNode = uvNode.setY( int( textureSize( this, this.levelNode ).y ).sub( uvNode.y ).sub( 1 ) );
+
+			}
 
 		}
 
