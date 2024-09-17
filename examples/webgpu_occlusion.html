@@ -10,7 +10,7 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgpu - occlusion<br />
-			The plane changes color if the sphere behind it is rendered
+			The plane is green when the sphere is completely occluded.
 		</div>
 
 		<script type="importmap">
@@ -88,7 +88,7 @@
 				const planeGeometry = new THREE.PlaneGeometry( 2, 2 );
 				const sphereGeometry = new THREE.SphereGeometry( 0.5 );
 
-				const plane = new THREE.Mesh( planeGeometry, new THREE.MeshPhongNodeMaterial( { color: 0x00ff00 } ) );
+				const plane = new THREE.Mesh( planeGeometry, new THREE.MeshPhongNodeMaterial( { color: 0x00ff00, side: THREE.DoubleSide } ) );
 				const sphere = new THREE.Mesh( sphereGeometry, new THREE.MeshPhongNodeMaterial( { color: 0xffff00 } ) );
 
 				const instanceUniform = nodeObject( new OcclusionNode( sphere, new THREE.Color( 0x00ff00 ), new THREE.Color( 0x0000ff ) ) );
