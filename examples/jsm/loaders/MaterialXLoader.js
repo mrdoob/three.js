@@ -1,4 +1,4 @@
-import { FileLoader, Loader, TextureLoader, MeshBasicNodeMaterial, MeshPhysicalNodeMaterial, RepeatWrapping } from 'three';
+import { Color, FileLoader, Loader, TextureLoader, MeshBasicNodeMaterial, MeshPhysicalNodeMaterial, RepeatWrapping, Vector2, Vector3, Vector4 } from 'three';
 
 import {
 	float, bool, int, vec2, vec3, vec4, color, texture,
@@ -44,6 +44,37 @@ const mx_power = ( in1, in2 = float( 1 ) ) => pow( in1, in2 );
 const mx_atan2 = ( in1 = float( 0 ), in2 = float( 1 ) ) => atan2( in1, in2 );
 const mx_timer = () => timerLocal();
 const mx_frame = () => frameId;
+const mx_invert = ( in1, amount = null ) => {
+
+	if ( amount === null ) {
+
+		if ( typeof in1.value === 'number' ) {
+
+			amount = 1.0;
+
+		} else if ( in1.value.isVector2 ) {
+
+			amount = new Vector2( 1, 1 );
+
+		} else if ( in1.value.isVector3 ) {
+
+			amount = new Vector3( 1, 1, 1 );
+
+		} else if ( in1.value.isVector4 ) {
+
+			amount = new Vector4( 1, 1, 1, 1 );
+
+		} else if ( in1.value.isColor ) {
+
+			amount = new Color( 1, 1, 1 );
+
+		}
+
+	}
+
+	return sub( amount, in1 );
+
+};
 
 const MXElements = [
 
@@ -131,6 +162,7 @@ const MXElements = [
 	//new MtlXElement( 'separate2', ... ),
 	//new MtlXElement( 'separate3', ... ),
 	//new MtlXElement( 'separate4', ... )
+	new MXElement( 'invert', mx_invert, [ 'in', 'amount' ] ),
 
 	new MXElement( 'time', mx_timer ),
 	new MXElement( 'frame', mx_frame )
