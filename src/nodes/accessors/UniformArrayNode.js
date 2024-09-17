@@ -20,12 +20,6 @@ class UniformArrayElementNode extends ArrayElementNode {
 
 	}
 
-	getNodeType( builder ) {
-
-		return this.node.getElementType( builder );
-
-	}
-
 	generate( builder ) {
 
 		const snippet = super.generate( builder );
