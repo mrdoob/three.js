@@ -66,6 +66,7 @@ class ReferenceNode extends Node {
 		this.reference = object;
 		this.node = null;
 		this.group = null;
+		this.name = null;
 
 		this.updateType = NodeUpdateType.OBJECT;
 
@@ -80,6 +81,14 @@ class ReferenceNode extends Node {
 	setGroup( group ) {
 
 		this.group = group;
+
+		return this;
+
+	}
+
+	label( name ) {
+
+		this.name = name;
 
 		return this;
 
@@ -116,6 +125,8 @@ class ReferenceNode extends Node {
 			node.setGroup( this.group );
 
 		}
+
+		if ( this.name !== null ) node.label( this.name );
 
 		this.node = node.getSelf();
 
