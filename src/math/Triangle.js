@@ -111,7 +111,7 @@ class Triangle {
 
 	}
 
-	static getAttributeInterpolationFromBarycoord( attr, i1, i2, i3, barycoord, target ) {
+	static getInterpolatedAttribute( attr, i1, i2, i3, barycoord, target ) {
 
 		_v40.setScalar( 0 );
 		_v41.setScalar( 0 );
