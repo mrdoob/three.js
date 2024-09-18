@@ -21,14 +21,6 @@ const _vC = /*@__PURE__*/ new Vector3();
 const _tempA = /*@__PURE__*/ new Vector3();
 const _morphA = /*@__PURE__*/ new Vector3();
 
-const _uvA = /*@__PURE__*/ new Vector2();
-const _uvB = /*@__PURE__*/ new Vector2();
-const _uvC = /*@__PURE__*/ new Vector2();
-
-const _normalA = /*@__PURE__*/ new Vector3();
-const _normalB = /*@__PURE__*/ new Vector3();
-const _normalC = /*@__PURE__*/ new Vector3();
-
 const _intersectionPoint = /*@__PURE__*/ new Vector3();
 const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
 
