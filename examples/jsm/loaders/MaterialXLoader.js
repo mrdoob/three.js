@@ -375,7 +375,7 @@ class MaterialXNode {
 
 		let node = this.node;
 
-		if ( node !== null ) {
+		if ( node !== null && out === null ) {
 
 			return node;
 
@@ -392,6 +392,12 @@ class MaterialXNode {
 			node = nodeClass( ...this.getVector() );
 
 		} else if ( this.hasReference ) {
+
+			if ( this.element === 'output' && this.output && out === null  ) {
+
+				out = this.output;
+
+			}
 
 			node = this.materialX.getMaterialXNode( this.referencePath ).getNode( out );
 
