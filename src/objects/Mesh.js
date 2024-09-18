@@ -368,19 +368,19 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
 
 		if ( uv ) {
 
-			intersection.uv = Triangle.getAttributeInterpolationFromBarycoord( uv, a, b, c, barycoord, new Vector2() );
+			intersection.uv = Triangle.getInterpolatedAttribute( uv, a, b, c, barycoord, new Vector2() );
 
 		}
 
 		if ( uv1 ) {
 
-			intersection.uv1 = Triangle.getAttributeInterpolationFromBarycoord( uv1, a, b, c, barycoord, new Vector2() );
+			intersection.uv1 = Triangle.getInterpolatedAttribute( uv1, a, b, c, barycoord, new Vector2() );
 
 		}
 
 		if ( normal ) {
 
-			intersection.normal = Triangle.getAttributeInterpolationFromBarycoord( normal, a, b, c, barycoord, new Vector3() );
+			intersection.normal = Triangle.getInterpolatedAttribute( normal, a, b, c, barycoord, new Vector3() );
 
 			if ( intersection.normal.dot( ray.direction ) > 0 ) {
 
