@@ -54,60 +54,8 @@ import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
-import { createCanvasElement, probeAsync, warnOnce } from '../utils.js';
+import { createCanvasElement, probeAsync, toNormalizedProjectionMatrix, toReversedProjectionMatrix, warnOnce } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
-
-function toReversedProjectionMatrix( projectionMatrix ) {
-
-	const m = projectionMatrix.elements;
-	const isPerspectiveMatrix = m[ 11 ] === - 1;
-
-	// Convert [-1, 1] to [0, 1] projection matrix
-	m[ 2 ] = 0.5 * m[ 2 ] + 0.5 * m[ 3 ];
-	m[ 6 ] = 0.5 * m[ 6 ] + 0.5 * m[ 7 ];
-	m[ 10 ] = 0.5 * m[ 10 ] + 0.5 * m[ 11 ];
-	m[ 14 ] = 0.5 * m[ 14 ] + 0.5 * m[ 15 ];
-
-	// Reverse [0, 1] projection matrix
-	if ( isPerspectiveMatrix ) {
-
-		m[ 10 ] = - m[ 10 ] - 1;
-		m[ 14 ] = - m[ 14 ];
-
-	} else {
-
-		m[ 10 ] = - m[ 10 ];
-		m[ 14 ] = - m[ 14 ] + 1;
-
-	}
-
-}
-
-function toForwardProjectionMatrix( projectionMatrix ) {
-
-	const m = projectionMatrix.elements;
-	const isPerspectiveMatrix = m[ 11 ] === - 1;
-
-	// Undo reversed [0, 1] projection matrix
-	if ( isPerspectiveMatrix ) {
-
-		m[ 10 ] = - ( m[ 10 ] + 1 );
-		m[ 14 ] = - m[ 14 ];
-
-	} else {
-
-		m[ 10 ] = - m[ 10 ];
-		m[ 14 ] = - ( m[ 14 ] - 1 );
-
-	}
-
-	// Remap from [0, 1] back to [-1, 1]
-	m[ 2 ] = 2 * m[ 2 ] - m[ 3 ];
-	m[ 6 ] = 2 * m[ 6 ] - m[ 7 ];
-	m[ 10 ] = 2 * m[ 10 ] - m[ 11 ];
-	m[ 14 ] = 2 * m[ 14 ] - m[ 15 ];
-
-}
 
 class WebGLRenderer {
 
@@ -248,6 +196,7 @@ class WebGLRenderer {
 
 		// camera matrices cache
 
+		const _currentProjectionMatrix = new Matrix4();
 		const _projScreenMatrix = new Matrix4();
 
 		const _vector3 = new Vector3();
@@ -2033,15 +1982,16 @@ class WebGLRenderer {
 
 				if ( capabilities.reverseDepthBuffer ) {
 
-					toReversedProjectionMatrix( camera.projectionMatrix );
+					_currentProjectionMatrix.copy( camera.projectionMatrix );
 
-				}
+					toNormalizedProjectionMatrix( _currentProjectionMatrix );
+					toReversedProjectionMatrix( _currentProjectionMatrix );
 
-				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+					p_uniforms.setValue( _gl, 'projectionMatrix', _currentProjectionMatrix );
 
-				if ( capabilities.reverseDepthBuffer ) {
+				} else {
 
-					toForwardProjectionMatrix( camera.projectionMatrix );
+					p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
 
 				}
 
