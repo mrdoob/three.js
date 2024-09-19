@@ -122,9 +122,8 @@ summary {
 	margin-bottom: 16px;
 }
 
-
 summary:hover {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 p {
