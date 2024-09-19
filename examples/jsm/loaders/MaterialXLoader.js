@@ -47,7 +47,7 @@ const mx_timer = () => timerLocal();
 const mx_frame = () => frameId;
 
 const separate = ( in1, channel ) => split( in1, channel.at( - 1 ) );
-const extract = ( in1, index ) => split( in1, vectorComponents[ index.value ] );
+const extract = ( in1, index = int( 0 ) ) => split( in1, vectorComponents[ index.value ] );
 
 const MXElements = [
 
