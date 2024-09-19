@@ -4,7 +4,8 @@ import {
 	Color,
 	FileLoader,
 	Float32BufferAttribute,
-	Loader
+	Loader,
+	SRGBColorSpace
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
@@ -211,7 +212,7 @@ class VTKLoader extends Loader {
 							const g = parseFloat( result[ 2 ] );
 							const b = parseFloat( result[ 3 ] );
 
-							color.set( r, g, b ).convertSRGBToLinear();
+							color.setRGB( r, g, b, SRGBColorSpace );
 
 							colors.push( color.r, color.g, color.b );
 
@@ -325,7 +326,7 @@ class VTKLoader extends Loader {
 						const g = colors[ 3 * i + 1 ];
 						const b = colors[ 3 * i + 2 ];
 
-						color.set( r, g, b ).convertSRGBToLinear();
+						color.setRGB( r, g, b, SRGBColorSpace );
 
 						newColors.push( color.r, color.g, color.b );
 						newColors.push( color.r, color.g, color.b );
