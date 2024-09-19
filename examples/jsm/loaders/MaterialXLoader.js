@@ -46,6 +46,7 @@ const mx_timer = () => timerLocal();
 const mx_frame = () => frameId;
 
 const separate = ( in1, channel ) => split( in1, channel.at( - 1 ) );
+const extract = ( in1, index ) => in1.element( index );
 
 const MXElements = [
 
@@ -129,7 +130,7 @@ const MXElements = [
 	new MXElement( 'contrast', mx_contrast, [ 'in', 'amount', 'pivot' ] ),
 	//new MtlXElement( 'hsvadjust', ... ),
 	new MXElement( 'saturate', saturation, [ 'in', 'amount' ] ),
-	//new MtlXElement( 'extract', ... ),
+	new MXElement( 'extract', extract, [ 'in', 'index' ] ),
 	new MXElement( 'separate2', separate, [ 'in' ] ),
 	new MXElement( 'separate3', separate, [ 'in' ] ),
 	new MXElement( 'separate4', separate, [ 'in' ] ),
