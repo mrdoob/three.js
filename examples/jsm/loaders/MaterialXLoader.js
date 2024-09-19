@@ -44,6 +44,7 @@ const mx_power = ( in1, in2 = float( 1 ) ) => pow( in1, in2 );
 const mx_atan2 = ( in1 = float( 0 ), in2 = float( 1 ) ) => atan2( in1, in2 );
 const mx_timer = () => timerLocal();
 const mx_frame = () => frameId;
+const mx_invert = ( in1, amount = float( 1 ) ) => sub( amount, in1 );
 
 const separate = ( in1, channel ) => split( in1, channel.at( - 1 ) );
 
@@ -77,6 +78,7 @@ const MXElements = [
 	new MXElement( 'magnitude', length, [ 'in1', 'in2' ] ),
 	new MXElement( 'dotproduct', dot, [ 'in1', 'in2' ] ),
 	new MXElement( 'crossproduct', cross, [ 'in' ] ),
+	new MXElement( 'invert', mx_invert, [ 'in', 'amount' ] ),
 	//new MtlXElement( 'transformpoint', ... ),
 	//new MtlXElement( 'transformvector', ... ),
 	//new MtlXElement( 'transformnormal', ... ),
