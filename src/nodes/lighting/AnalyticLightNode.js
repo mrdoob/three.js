@@ -16,6 +16,7 @@ import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
+import { orthographicDepthToLogarithmicDepth, perspectiveDepthToOrthographicDepth } from '../display/ViewportDepthNode.js';
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
 
@@ -318,6 +319,24 @@ class AnalyticLightNode extends LightingNode {
 			if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) {
 
 				coordZ = coordZ.mul( 2 ).sub( 1 ); // WebGPU: Convertion [ 0, 1 ] to [ - 1, 1 ]
+
+			}
+
+			if ( renderer.logarithmicDepthBuffer === true ) {
+
+				// the normally available cameraNear, cameraFar, and cameraLogDepth nodes cannot be used here because they do
+				// not get updated to use the shadow camera, so we have to declare our own "local" nodes here.
+				// TODO: can we fix the cameraNear/cameraFar/cameraLogDepth nodes in src/nodes/accessors/Camera.js so we don't have to declare local ones here?
+				if ( shadow.camera.isPerspectiveCamera ) {
+
+					const cameraNearLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.near );
+					const cameraFarLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.far );
+					coordZ = perspectiveDepthToOrthographicDepth( coordZ, cameraNearLocal, cameraFarLocal );
+
+				}
+
+				const cameraLogDepthLocal = uniform( 'float' ).onRenderUpdate( () => 2.0 / ( Math.log( shadow.camera.far + 1.0 ) / Math.LN2 ) );
+				coordZ = orthographicDepthToLogarithmicDepth( coordZ, cameraLogDepthLocal );
 
 			}
 

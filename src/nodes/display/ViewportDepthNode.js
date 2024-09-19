@@ -116,6 +116,9 @@ export const viewZToPerspectiveDepth = ( viewZ, near, far ) => near.add( viewZ )
 // maps perspective depth in [ 0, 1 ] to viewZ
 export const perspectiveDepthToViewZ = ( depth, near, far ) => near.mul( far ).div( far.sub( near ).mul( depth ).sub( far ) );
 
+export const perspectiveDepthToOrthographicDepth = ( depth, near, far ) => viewZToOrthographicDepth( perspectiveDepthToViewZ( depth, near, far ), near, far );
+export const orthographicDepthToLogarithmicDepth = ( depth, logDepthBufFC ) => depth.log2().mul( logDepthBufFC ).mul( 0.25 ).add( 1 );
+
 const depthBase = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.DEPTH_BASE );
 
 export const depth = /*@__PURE__*/ nodeImmutable( ViewportDepthNode, ViewportDepthNode.DEPTH );

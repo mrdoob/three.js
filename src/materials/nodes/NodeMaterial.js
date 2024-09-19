@@ -10,7 +10,7 @@ import { normalLocal } from '../../nodes/accessors/Normal.js';
 import { instance } from '../../nodes/accessors/InstanceNode.js';
 import { batch } from '../../nodes/accessors/BatchNode.js';
 import { materialReference } from '../../nodes/accessors/MaterialReferenceNode.js';
-import { positionLocal } from '../../nodes/accessors/Position.js';
+import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { skinningReference } from '../../nodes/accessors/SkinningNode.js';
 import { morphReference } from '../../nodes/accessors/MorphNode.js';
 import { lights } from '../../nodes/lighting/LightsNode.js';
@@ -19,8 +19,8 @@ import { float, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 import AONode from '../../nodes/lighting/AONode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
-import { depth } from '../../nodes/display/ViewportDepthNode.js';
-import { cameraLogDepth } from '../../nodes/accessors/Camera.js';
+import { depth, orthographicDepthToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
+import { cameraFar, cameraLogDepth, cameraNear } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha } from '../../nodes/accessors/ClippingNode.js';
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
 
@@ -231,9 +231,9 @@ class NodeMaterial extends Material {
 
 			} else if ( renderer.logarithmicDepthBuffer === true ) {
 
-				const fragDepth = modelViewProjection().w.add( 1 );
+				const fragDepth = viewZToOrthographicDepth( positionView.z, cameraNear, cameraFar );
 
-				depthNode = fragDepth.log2().mul( cameraLogDepth ).mul( 0.5 );
+				depthNode = orthographicDepthToLogarithmicDepth( fragDepth, cameraLogDepth );
 
 			}
 
