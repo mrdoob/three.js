@@ -57,6 +57,58 @@ import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
 import { createCanvasElement, probeAsync, warnOnce } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
 
+function toReversedProjectionMatrix( projectionMatrix ) {
+
+	const m = projectionMatrix.elements;
+	const isPerspectiveMatrix = m[ 11 ] === - 1;
+
+	// Convert [-1, 1] to [0, 1] projection matrix
+	m[ 2 ] = 0.5 * m[ 2 ] + 0.5 * m[ 3 ];
+	m[ 6 ] = 0.5 * m[ 6 ] + 0.5 * m[ 7 ];
+	m[ 10 ] = 0.5 * m[ 10 ] + 0.5 * m[ 11 ];
+	m[ 14 ] = 0.5 * m[ 14 ] + 0.5 * m[ 15 ];
+
+	// Reverse [0, 1] projection matrix
+	if ( isPerspectiveMatrix ) {
+
+		m[ 10 ] = - m[ 10 ] - 1;
+		m[ 14 ] = - m[ 14 ];
+
+	} else {
+
+		m[ 10 ] = - m[ 10 ];
+		m[ 14 ] = - m[ 14 ] + 1;
+
+	}
+
+}
+
+function toForwardProjectionMatrix( projectionMatrix ) {
+
+	const m = projectionMatrix.elements;
+	const isPerspectiveMatrix = m[ 11 ] === - 1;
+
+	// Undo reversed [0, 1] projection matrix
+	if ( isPerspectiveMatrix ) {
+
+		m[ 10 ] = - ( m[ 10 ] + 1 );
+		m[ 14 ] = - m[ 14 ];
+
+	} else {
+
+		m[ 10 ] = - m[ 10 ];
+		m[ 14 ] = - ( m[ 14 ] - 1 );
+
+	}
+
+	// Remap from [0, 1] back to [-1, 1]
+	m[ 2 ] = 2 * m[ 2 ] - m[ 3 ];
+	m[ 6 ] = 2 * m[ 6 ] - m[ 7 ];
+	m[ 10 ] = 2 * m[ 10 ] - m[ 11 ];
+	m[ 14 ] = 2 * m[ 14 ] - m[ 15 ];
+
+}
+
 class WebGLRenderer {
 
 	constructor( parameters = {} ) {
@@ -290,6 +342,8 @@ class WebGLRenderer {
 			capabilities = new WebGLCapabilities( _gl, extensions, parameters, utils );
 
 			state = new WebGLState( _gl );
+
+			if ( capabilities.reverseDepthBuffer ) state.buffers.depth.setReversed( true );
 
 			info = new WebGLInfo( _gl );
 			properties = new WebGLProperties();
@@ -590,7 +644,13 @@ class WebGLRenderer {
 
 			}
 
-			if ( depth ) bits |= _gl.DEPTH_BUFFER_BIT;
+			if ( depth ) {
+
+				bits |= _gl.DEPTH_BUFFER_BIT;
+				_gl.clearDepth( this.capabilities.reverseDepthBuffer ? 0 : 1 );
+
+			}
+
 			if ( stencil ) {
 
 				bits |= _gl.STENCIL_BUFFER_BIT;
@@ -1971,7 +2031,20 @@ class WebGLRenderer {
 
 				// common camera uniforms
 
+				if ( capabilities.reverseDepthBuffer ) {
+
+					toReversedProjectionMatrix( camera.projectionMatrix );
+
+				}
+
 				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+
+				if ( capabilities.reverseDepthBuffer ) {
+
+					toForwardProjectionMatrix( camera.projectionMatrix );
+
+				}
+
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
 				const uCamPos = p_uniforms.map.cameraPosition;
