@@ -8187,6 +8187,10 @@ const _vap = /*@__PURE__*/ new Vector3();
 const _vbp = /*@__PURE__*/ new Vector3();
 const _vcp = /*@__PURE__*/ new Vector3();
 
+const _v40 = /*@__PURE__*/ new Vector4();
+const _v41 = /*@__PURE__*/ new Vector4();
+const _v42 = /*@__PURE__*/ new Vector4();
+
 class Triangle {
 
 	constructor( a = new Vector3(), b = new Vector3(), c = new Vector3() ) {
@@ -8276,6 +8280,25 @@ class Triangle {
 		target.addScaledVector( v1, _v3$2.x );
 		target.addScaledVector( v2, _v3$2.y );
 		target.addScaledVector( v3, _v3$2.z );
+
+		return target;
+
+	}
+
+	static getInterpolatedAttribute( attr, i1, i2, i3, barycoord, target ) {
+
+		_v40.setScalar( 0 );
+		_v41.setScalar( 0 );
+		_v42.setScalar( 0 );
+
+		_v40.fromBufferAttribute( attr, i1 );
+		_v41.fromBufferAttribute( attr, i2 );
+		_v42.fromBufferAttribute( attr, i3 );
+
+		target.setScalar( 0 );
+		target.addScaledVector( _v40, barycoord.x );
+		target.addScaledVector( _v41, barycoord.y );
+		target.addScaledVector( _v42, barycoord.z );
 
 		return target;
 
@@ -11555,14 +11578,6 @@ const _vC$1 = /*@__PURE__*/ new Vector3();
 const _tempA = /*@__PURE__*/ new Vector3();
 const _morphA = /*@__PURE__*/ new Vector3();
 
-const _uvA$1 = /*@__PURE__*/ new Vector2();
-const _uvB$1 = /*@__PURE__*/ new Vector2();
-const _uvC$1 = /*@__PURE__*/ new Vector2();
-
-const _normalA = /*@__PURE__*/ new Vector3();
-const _normalB = /*@__PURE__*/ new Vector3();
-const _normalC = /*@__PURE__*/ new Vector3();
-
 const _intersectionPoint = /*@__PURE__*/ new Vector3();
 const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
 
@@ -11905,33 +11920,24 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
 
 	if ( intersection ) {
 
+		const barycoord = new Vector3();
+		Triangle.getBarycoord( _intersectionPoint, _vA$1, _vB$1, _vC$1, barycoord );
+
 		if ( uv ) {
 
-			_uvA$1.fromBufferAttribute( uv, a );
-			_uvB$1.fromBufferAttribute( uv, b );
-			_uvC$1.fromBufferAttribute( uv, c );
-
-			intersection.uv = Triangle.getInterpolation( _intersectionPoint, _vA$1, _vB$1, _vC$1, _uvA$1, _uvB$1, _uvC$1, new Vector2() );
+			intersection.uv = Triangle.getInterpolatedAttribute( uv, a, b, c, barycoord, new Vector2() );
 
 		}
 
 		if ( uv1 ) {
 
-			_uvA$1.fromBufferAttribute( uv1, a );
-			_uvB$1.fromBufferAttribute( uv1, b );
-			_uvC$1.fromBufferAttribute( uv1, c );
-
-			intersection.uv1 = Triangle.getInterpolation( _intersectionPoint, _vA$1, _vB$1, _vC$1, _uvA$1, _uvB$1, _uvC$1, new Vector2() );
+			intersection.uv1 = Triangle.getInterpolatedAttribute( uv1, a, b, c, barycoord, new Vector2() );
 
 		}
 
 		if ( normal ) {
 
-			_normalA.fromBufferAttribute( normal, a );
-			_normalB.fromBufferAttribute( normal, b );
-			_normalC.fromBufferAttribute( normal, c );
-
-			intersection.normal = Triangle.getInterpolation( _intersectionPoint, _vA$1, _vB$1, _vC$1, _normalA, _normalB, _normalC, new Vector3() );
+			intersection.normal = Triangle.getInterpolatedAttribute( normal, a, b, c, barycoord, new Vector3() );
 
 			if ( intersection.normal.dot( ray.direction ) > 0 ) {
 
@@ -11952,6 +11958,7 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
 		Triangle.getNormal( _vA$1, _vB$1, _vC$1, face.normal );
 
 		intersection.face = face;
+		intersection.barycoord = barycoord;
 
 	}
 
@@ -14120,7 +14127,7 @@ const vertex$2 = "#include <common>\n#include <batching_pars_vertex>\n#include <
 
 const fragment$2 = "uniform vec3 color;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <logdepthbuf_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\nvoid main() {\n\t#include <logdepthbuf_fragment>\n\tgl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n}";
 
-const vertex$1 = "uniform float rotation;\nuniform vec2 center;\n#include <common>\n#include <uv_pars_vertex>\n#include <fog_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\tvec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );\n\tvec2 scale;\n\tscale.x = length( vec3( modelMatrix[ 0 ].x, modelMatrix[ 0 ].y, modelMatrix[ 0 ].z ) );\n\tscale.y = length( vec3( modelMatrix[ 1 ].x, modelMatrix[ 1 ].y, modelMatrix[ 1 ].z ) );\n\t#ifndef USE_SIZEATTENUATION\n\t\tbool isPerspective = isPerspectiveMatrix( projectionMatrix );\n\t\tif ( isPerspective ) scale *= - mvPosition.z;\n\t#endif\n\tvec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * scale;\n\tvec2 rotatedPosition;\n\trotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;\n\trotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;\n\tmvPosition.xy += rotatedPosition;\n\tgl_Position = projectionMatrix * mvPosition;\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n}";
+const vertex$1 = "uniform float rotation;\nuniform vec2 center;\n#include <common>\n#include <uv_pars_vertex>\n#include <fog_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\tvec4 mvPosition = modelViewMatrix[ 3 ];\n\tvec2 scale = vec2( length( modelMatrix[ 0 ].xyz ), length( modelMatrix[ 1 ].xyz ) );\n\t#ifndef USE_SIZEATTENUATION\n\t\tbool isPerspective = isPerspectiveMatrix( projectionMatrix );\n\t\tif ( isPerspective ) scale *= - mvPosition.z;\n\t#endif\n\tvec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * scale;\n\tvec2 rotatedPosition;\n\trotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;\n\trotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;\n\tmvPosition.xy += rotatedPosition;\n\tgl_Position = projectionMatrix * mvPosition;\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n}";
 
 const fragment$1 = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <clipping_planes_fragment>\n\tvec3 outgoingLight = vec3( 0.0 );\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n}";
 
@@ -34824,6 +34831,7 @@ function checkIntersection( object, raycaster, ray, thresholdSq, a, b ) {
 		index: a,
 		face: null,
 		faceIndex: null,
+		barycoord: null,
 		object: object
 
 	};
@@ -35089,6 +35097,8 @@ function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, inte
 			point: intersectPoint,
 			index: index,
 			face: null,
+			faceIndex: null,
+			barycoord: null,
 			object: object
 
 		} );
