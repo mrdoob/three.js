@@ -3,7 +3,8 @@ import {
 	Color,
 	FileLoader,
 	Float32BufferAttribute,
-	Loader
+	Loader,
+	SRGBColorSpace
 } from 'three';
 
 class XYZLoader extends Loader {
@@ -80,7 +81,7 @@ class XYZLoader extends Loader {
 				const g = parseFloat( lineValues[ 4 ] ) / 255;
 				const b = parseFloat( lineValues[ 5 ] ) / 255;
 
-				color.set( r, g, b ).convertSRGBToLinear();
+				color.setRGB( r, g, b, SRGBColorSpace );
 
 				colors.push( color.r, color.g, color.b );
 
