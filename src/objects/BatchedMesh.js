@@ -144,7 +144,9 @@ class BatchedMesh extends Mesh {
 
 		// stores visible, active, and geometry id per object
 		this._drawInfo = [];
-		this._fragInfo = [];
+
+		// instance ids that have been set as inactive, and are available to be overwritten
+		this._availableInstanceIds = [];
 
 		// geometry information
 		this._drawRanges = [];
@@ -348,7 +350,7 @@ class BatchedMesh extends Mesh {
 		const atCapacity = this._drawInfo.length >= this.maxInstanceCount;
 
 		// ensure we're not over geometry
-		if ( atCapacity && this._fragInfo.length === 0 ) {
+		if ( atCapacity && this._availableInstanceIds.length === 0 ) {
 
 			throw new Error( 'BatchedMesh: Maximum item count reached.' );
 
@@ -362,10 +364,10 @@ class BatchedMesh extends Mesh {
 
 		let drawId = null;
 
-		// If at capacity, rewrite over an inactive block
-		if ( atCapacity ) {
+		// Prioritize using previously freed instance ids
+		if ( this._availableInstanceIds.length > 0 ) {
 
-			drawId = this._fragInfo.pop();
+			drawId = this._availableInstanceIds.pop();
 			this._drawInfo[ drawId ] = instanceDrawInfo;
 
 		} else {
@@ -633,7 +635,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		drawInfo[ instanceId ].active = false;
-		this._fragInfo.push( instanceId );
+		this._availableInstanceIds.push( instanceId );
 		this._visibilityChanged = true;
 
 		return this;
