@@ -135,7 +135,7 @@ export function modifyShader( material, uniforms ) {
 
 		const rowOffset = mt.floor().toVar();
 
-		mt.mulAssign( 1024 );
+		mt.mulAssign( TEXTURE_WIDTH );
 
 		const spinePos = textureLoad( spineTexture, ivec2( mt, rowOffset.add( 0 ) ) ).xyz;
 
