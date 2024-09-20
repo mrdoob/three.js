@@ -1,28 +1,16 @@
-import { SRGBColorSpace, LinearSRGBColorSpace, DisplayP3ColorSpace, LinearDisplayP3ColorSpace, Rec709Primaries, P3Primaries, SRGBTransfer, LinearTransfer, NoColorSpace, } from '../constants.js';
+import { SRGBColorSpace, LinearSRGBColorSpace, Rec709Primaries, SRGBTransfer, LinearTransfer, NoColorSpace, } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
 
-/**
- * Matrices converting P3 <-> Rec. 709 primaries, without gamut mapping
- * or clipping. Based on W3C specifications for sRGB and Display P3,
- * and ICC specifications for the D50 connection space. Values in/out
- * are _linear_ sRGB and _linear_ Display P3.
- *
- * Note that both sRGB and Display P3 use the sRGB transfer functions.
- *
- * Reference:
- * - http://www.russellcottrell.com/photo/matrixCalculator.htm
- */
-
-const LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 = /*@__PURE__*/ new Matrix3().set(
-	0.8224621, 0.177538, 0.0,
-	0.0331941, 0.9668058, 0.0,
-	0.0170827, 0.0723974, 0.9105199,
+const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
+	0.4123908, 0.3575843, 0.1804808,
+	0.2126390, 0.7151687, 0.0721923,
+	0.0193308, 0.1191948, 0.9505322
 );
 
-const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = /*@__PURE__*/ new Matrix3().set(
-	1.2249401, - 0.2249404, 0.0,
-	- 0.0420569, 1.0420571, 0.0,
-	- 0.0196376, - 0.0786361, 1.0982735
+const XYZ_TO_LINEAR_REC709 = /*@__PURE__*/ new Matrix3().set(
+	3.2409699, - 1.5373832, - 0.4986108,
+	- 0.9692436, 1.8759675, 0.0415551,
+	0.0556301, - 0.2039770, 1.0569715
 );
 
 /**
@@ -33,58 +21,24 @@ const COLOR_SPACES = {
 	[ LinearSRGBColorSpace ]: {
 		transfer: LinearTransfer,
 		primaries: Rec709Primaries,
+		toReference: LINEAR_REC709_TO_XYZ,
+		fromReference: XYZ_TO_LINEAR_REC709,
 		luminanceCoefficients: [ 0.2126, 0.7152, 0.0722 ],
-		toReference: ( color ) => color,
-		fromReference: ( color ) => color,
 	},
 	[ SRGBColorSpace ]: {
 		transfer: SRGBTransfer,
 		primaries: Rec709Primaries,
+		toReference: LINEAR_REC709_TO_XYZ,
+		fromReference: XYZ_TO_LINEAR_REC709,
 		luminanceCoefficients: [ 0.2126, 0.7152, 0.0722 ],
-		toReference: ( color ) => color.convertSRGBToLinear(),
-		fromReference: ( color ) => color.convertLinearToSRGB(),
-	},
-	[ LinearDisplayP3ColorSpace ]: {
-		transfer: LinearTransfer,
-		primaries: P3Primaries,
-		luminanceCoefficients: [ 0.2289, 0.6917, 0.0793 ],
-		toReference: ( color ) => color.applyMatrix3( LINEAR_DISPLAY_P3_TO_LINEAR_SRGB ),
-		fromReference: ( color ) => color.applyMatrix3( LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 ),
-	},
-	[ DisplayP3ColorSpace ]: {
-		transfer: SRGBTransfer,
-		primaries: P3Primaries,
-		luminanceCoefficients: [ 0.2289, 0.6917, 0.0793 ],
-		toReference: ( color ) => color.convertSRGBToLinear().applyMatrix3( LINEAR_DISPLAY_P3_TO_LINEAR_SRGB ),
-		fromReference: ( color ) => color.applyMatrix3( LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 ).convertLinearToSRGB(),
 	},
 };
-
-const SUPPORTED_WORKING_COLOR_SPACES = new Set( [ LinearSRGBColorSpace, LinearDisplayP3ColorSpace ] );
 
 export const ColorManagement = {
 
 	enabled: true,
 
-	_workingColorSpace: LinearSRGBColorSpace,
-
-	get workingColorSpace() {
-
-		return this._workingColorSpace;
-
-	},
-
-	set workingColorSpace( colorSpace ) {
-
-		if ( ! SUPPORTED_WORKING_COLOR_SPACES.has( colorSpace ) ) {
-
-			throw new Error( `Unsupported working color space, "${ colorSpace }".` );
-
-		}
-
-		this._workingColorSpace = colorSpace;
-
-	},
+	workingColorSpace: LinearSRGBColorSpace,
 
 	convert: function ( color, sourceColorSpace, targetColorSpace ) {
 
@@ -94,22 +48,39 @@ export const ColorManagement = {
 
 		}
 
+		const sourceTransfer = COLOR_SPACES[ sourceColorSpace ].transfer;
 		const sourceToReference = COLOR_SPACES[ sourceColorSpace ].toReference;
+		const targetTransfer = COLOR_SPACES[ targetColorSpace ].transfer;
 		const targetFromReference = COLOR_SPACES[ targetColorSpace ].fromReference;
 
-		return targetFromReference( sourceToReference( color ) );
+		if ( sourceTransfer === SRGBTransfer ) {
+
+			SRGBToLinear( color );
+
+		}
+
+		color.applyMatrix3( sourceToReference );
+		color.applyMatrix3( targetFromReference );
+
+		if ( targetTransfer === SRGBTransfer ) {
+
+			LinearToSRGB( color );
+
+		}
+
+		return color;
 
 	},
 
 	fromWorkingColorSpace: function ( color, targetColorSpace ) {
 
-		return this.convert( color, this._workingColorSpace, targetColorSpace );
+		return this.convert( color, this.workingColorSpace, targetColorSpace );
 
 	},
 
 	toWorkingColorSpace: function ( color, sourceColorSpace ) {
 
-		return this.convert( color, sourceColorSpace, this._workingColorSpace );
+		return this.convert( color, sourceColorSpace, this.workingColorSpace );
 
 	},
 
@@ -127,9 +98,23 @@ export const ColorManagement = {
 
 	},
 
-	getLuminanceCoefficients: function ( target, colorSpace = this._workingColorSpace ) {
+	getLuminanceCoefficients: function ( target, colorSpace = this.workingColorSpace ) {
 
 		return target.fromArray( COLOR_SPACES[ colorSpace ].luminanceCoefficients );
+
+	},
+
+	getMatrix: function ( sourceColorSpace, targetColorSpace, targetMatrix ) {
+
+		return targetMatrix
+			.copy( COLOR_SPACES[ sourceColorSpace ].toReference )
+			.multiply( COLOR_SPACES[ targetColorSpace ].fromReference );
+
+	},
+
+	define: function ( colorSpaces ) {
+
+		Object.assign( COLOR_SPACES, colorSpaces );
 
 	},
 

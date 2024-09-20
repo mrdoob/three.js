@@ -163,14 +163,13 @@ export const ObjectSpaceNormalMap = 1;
 export const NoColorSpace = '';
 export const SRGBColorSpace = 'srgb';
 export const LinearSRGBColorSpace = 'srgb-linear';
-export const DisplayP3ColorSpace = 'display-p3';
-export const LinearDisplayP3ColorSpace = 'display-p3-linear';
 
 export const LinearTransfer = 'linear';
 export const SRGBTransfer = 'srgb';
 
 export const Rec709Primaries = 'rec709';
 export const P3Primaries = 'p3';
+export const Rec2020Primaries = 'rec2020';
 
 export const ZeroStencilOp = 0;
 export const KeepStencilOp = 7680;

@@ -17,9 +17,7 @@ import {
 	UnsignedInt248Type,
 	UnsignedShort4444Type,
 	UnsignedShort5551Type,
-	WebGLCoordinateSystem,
-	DisplayP3ColorSpace,
-	LinearDisplayP3ColorSpace
+	WebGLCoordinateSystem
 } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Frustum } from '../math/Frustum.js';
@@ -2827,9 +2825,12 @@ class WebGLRenderer {
 
 		this._outputColorSpace = colorSpace;
 
+		// TODO: Generalize this!
 		const gl = this.getContext();
-		gl.drawingBufferColorSpace = colorSpace === DisplayP3ColorSpace ? 'display-p3' : 'srgb';
-		gl.unpackColorSpace = ColorManagement.workingColorSpace === LinearDisplayP3ColorSpace ? 'display-p3' : 'srgb';
+		gl.drawingBufferColorspace = colorSpace; // TODO: handle linear
+		gl.unpackColorSpace = colorSpace; // TODO: handle linear
+		// gl.drawingBufferColorSpace = colorSpace === DisplayP3ColorSpace ? 'display-p3' : 'srgb';
+		// gl.unpackColorSpace = ColorManagement.workingColorSpace === LinearDisplayP3ColorSpace ? 'display-p3' : 'srgb';
 
 	}
 
