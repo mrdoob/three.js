@@ -124,7 +124,7 @@ class LensflareMesh extends Mesh {
 			vVisibility.mulAssign( visibility.g.div( 9.0 ).oneMinus() );
 			vVisibility.mulAssign( visibility.b.div( 9.0 ) );
 
-			return vec4( ( pos.mul( scale ).add( screenPosition.xy ).xy ), 1.0, 1.0 );
+			return vec4( ( pos.mul( scale ).add( screenPosition.xy ).xy ), screenPosition.z, 1.0 );
 
 		} )();
 
