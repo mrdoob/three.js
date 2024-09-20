@@ -31,7 +31,7 @@
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			import { FlyControls } from 'three/addons/controls/FlyControls.js';
-			import { Lensflare, LensflareElement } from 'three/addons/objects/LensflareGPU.js';
+			import { LensflareMesh, LensflareElement } from 'three/addons/objects/LensflareMesh.js';
 
 			let container, stats;
 
@@ -112,7 +112,7 @@
 					light.position.set( x, y, z );
 					scene.add( light );
 
-					const lensflare = new Lensflare();
+					const lensflare = new LensflareMesh();
 					lensflare.addElement( new LensflareElement( textureFlare0, 700, 0, light.color ) );
 					lensflare.addElement( new LensflareElement( textureFlare3, 60, 0.6 ) );
 					lensflare.addElement( new LensflareElement( textureFlare3, 70, 0.7 ) );

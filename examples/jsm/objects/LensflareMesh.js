@@ -16,15 +16,15 @@ import {
 
 import { texture, textureLoad, uv, ivec2, vec2, vec4, positionGeometry, reference, varyingProperty, materialReference, Fn, Node } from 'three/tsl';
 
-class Lensflare extends Mesh {
+class LensflareMesh extends Mesh {
 
 	constructor() {
 
-		super( Lensflare.Geometry, new MeshBasicNodeMaterial( { opacity: 0, transparent: true } ) );
+		super( LensflareMesh.Geometry, new MeshBasicNodeMaterial( { opacity: 0, transparent: true } ) );
 
 		this.isLensflare = true;
 
-		this.type = 'Lensflare';
+		this.type = 'LensflareMesh';
 		this.frustumCulled = false;
 		this.renderOrder = Infinity;
 
@@ -39,7 +39,7 @@ class Lensflare extends Mesh {
 
 		let currentType = UnsignedByteType;
 
-		const geometry = Lensflare.Geometry;
+		const geometry = LensflareMesh.Geometry;
 
 		// values for shared material uniforms
 
@@ -124,7 +124,7 @@ class Lensflare extends Mesh {
 			vVisibility.mulAssign( visibility.g.div( 9.0 ).oneMinus() );
 			vVisibility.mulAssign( visibility.b.div( 9.0 ) );
 
-			return vec4( ( pos.mul( scale ).add( screenPosition.xy ).xy ), 1.0, 1.0 );
+			return vec4( ( pos.mul( scale ).add( screenPosition.xy ).xy ), 0, 1.0 );
 
 		} )();
 
@@ -297,7 +297,7 @@ class LensflareElement {
 
 }
 
-Lensflare.Geometry = ( function () {
+LensflareMesh.Geometry = ( function () {
 
 	const geometry = new BufferGeometry();
 
@@ -318,4 +318,4 @@ Lensflare.Geometry = ( function () {
 
 } )();
 
-export { Lensflare, LensflareElement };
+export { LensflareMesh, LensflareElement };
