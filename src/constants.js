@@ -167,10 +167,6 @@ export const LinearSRGBColorSpace = 'srgb-linear';
 export const LinearTransfer = 'linear';
 export const SRGBTransfer = 'srgb';
 
-export const Rec709Primaries = 'rec709';
-export const P3Primaries = 'p3';
-export const Rec2020Primaries = 'rec2020';
-
 export const ZeroStencilOp = 0;
 export const KeepStencilOp = 7680;
 export const ReplaceStencilOp = 7681;

@@ -1,7 +1,7 @@
-import { SRGBColorSpace, LinearSRGBColorSpace, Rec709Primaries, SRGBTransfer, LinearTransfer, NoColorSpace, } from '../constants.js';
+import { SRGBColorSpace, LinearSRGBColorSpace, SRGBTransfer, LinearTransfer, NoColorSpace } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
 
-// Reference: https://www.russellcottrell.com/photo/matrixCalculator.htm
+const REC709_PRIMARIES = [ 0.640, 0.330,	0.300,	0.600,	0.150,	0.060 ];
 
 const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
 	0.4123908, 0.3575843, 0.1804808,
@@ -16,20 +16,24 @@ const XYZ_TO_LINEAR_REC709 = /*@__PURE__*/ new Matrix3().set(
 );
 
 /**
- * Defines supported color spaces by transfer function and primaries,
- * and provides conversions to/from the XYZ reference space.
+ * Defines supported color spaces by transfer function (predefined),
+ * primaries (RGB chromaticity coordinates xw yw), RGB/XYZ matrices,
+ * and luminance coefficients.
+ *
+ * Reference:
+ * - https://www.russellcottrell.com/photo/matrixCalculator.htm
  */
 const COLOR_SPACES = {
 	[ LinearSRGBColorSpace ]: {
 		transfer: LinearTransfer,
-		primaries: Rec709Primaries,
+		primaries: REC709_PRIMARIES,
 		toReference: LINEAR_REC709_TO_XYZ,
 		fromReference: XYZ_TO_LINEAR_REC709,
 		luminanceCoefficients: [ 0.2126, 0.7152, 0.0722 ],
 	},
 	[ SRGBColorSpace ]: {
 		transfer: SRGBTransfer,
-		primaries: Rec709Primaries,
+		primaries: REC709_PRIMARIES,
 		toReference: LINEAR_REC709_TO_XYZ,
 		fromReference: XYZ_TO_LINEAR_REC709,
 		luminanceCoefficients: [ 0.2126, 0.7152, 0.0722 ],
