@@ -4,13 +4,20 @@ import { Color } from '../../../../src/math/Color.js';
 import { ColorManagement } from '../../../../src/math/ColorManagement.js';
 import { eps } from '../../utils/math-constants.js';
 import { CONSOLE_LEVEL } from '../../utils/console-wrapper.js';
-import { DisplayP3ColorSpace, SRGBColorSpace } from '../../../../src/constants.js';
+import { SRGBColorSpace } from '../../../../src/constants.js';
+import { DisplayP3ColorSpace, DisplayP3ColorSpaceImpl } from '../../../../examples/jsm/math/ColorSpaces.js';
 
 export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Color', () => {
 
 		const colorManagementEnabled = ColorManagement.enabled;
+
+		ColorManagement.define( {
+
+			[ DisplayP3ColorSpace ]: DisplayP3ColorSpaceImpl
+
+		} );
 
 		QUnit.testDone( () => {
 

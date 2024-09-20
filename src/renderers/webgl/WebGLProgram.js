@@ -86,9 +86,7 @@ function getTexelEncodingFunction( functionName, colorSpace ) {
 
 		`vec4 ${functionName}( vec4 value ) {`,
 
-		`	value = ${components[ 1 ]}( value );`,
-
-		`	return vec4( value.rgb * ${components[ 0 ]}, value.a );`,
+		`	return ${components[ 1 ]}( vec4( value.rgb * ${components[ 0 ]}, value.a ) );`,
 
 		'}',
 
