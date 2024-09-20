@@ -98,7 +98,7 @@ function setTextureValue( texture, index, x, y, z, o ) {
  */
 export function getUniforms( splineTexture ) {
 
-	return  {
+	return {
 		spineTexture: splineTexture,
 		pathOffset: 0, // time of path curve
 		pathSegment: 1, // fractional length of path
@@ -138,9 +138,10 @@ export function modifyShader( material, uniforms ) {
 		mt.mulAssign( 1024 );
 
 		const spinePos = textureLoad( spineTexture, ivec2( mt, rowOffset.add( 0 ) ) ).xyz;
-		const a =        textureLoad( spineTexture, ivec2( mt, rowOffset.add( 1 ) ) ).xyz;
-		const b =        textureLoad( spineTexture, ivec2( mt, rowOffset.add( 2 ) ) ).xyz;
-		const c =        textureLoad( spineTexture, ivec2( mt, rowOffset.add( 3 ) ) ).xyz;
+
+		const a = textureLoad( spineTexture, ivec2( mt, rowOffset.add( 1 ) ) ).xyz;
+		const b = textureLoad( spineTexture, ivec2( mt, rowOffset.add( 2 ) ) ).xyz;
+		const c = textureLoad( spineTexture, ivec2( mt, rowOffset.add( 3 ) ) ).xyz;
 
 		const basis = mat3( a, b, c ).toVar();
 
@@ -152,7 +153,7 @@ export function modifyShader( material, uniforms ) {
 
 	material.normalNode = varyingProperty( 'vec3', 'curveNormal' );
 
-};
+}
 
 /**
  * A helper class for making meshes bend aroudn curves
