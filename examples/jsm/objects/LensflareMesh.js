@@ -91,7 +91,7 @@ class LensflareMesh extends Mesh {
 		material2.transparent = true;
 		material2.blending = AdditiveBlending;
 		material2.depthWrite = false;
-		material2.dpethTest = false;
+		material2.depthTest = false;
 		material2.fog = false;
 		material2.type = 'Lensflare-2';
 
@@ -124,7 +124,7 @@ class LensflareMesh extends Mesh {
 			vVisibility.mulAssign( visibility.g.div( 9.0 ).oneMinus() );
 			vVisibility.mulAssign( visibility.b.div( 9.0 ) );
 
-			return vec4( ( pos.mul( scale ).add( screenPosition.xy ).xy ), 0, 1.0 );
+			return vec4( ( pos.mul( scale ).add( screenPosition.xy ).xy ), 1.0, 1.0 );
 
 		} )();
 
