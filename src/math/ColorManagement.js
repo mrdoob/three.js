@@ -1,6 +1,8 @@
 import { SRGBColorSpace, LinearSRGBColorSpace, Rec709Primaries, SRGBTransfer, LinearTransfer, NoColorSpace, } from '../constants.js';
 import { Matrix3 } from './Matrix3.js';
 
+// Reference: https://www.russellcottrell.com/photo/matrixCalculator.htm
+
 const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
 	0.4123908, 0.3575843, 0.1804808,
 	0.2126390, 0.7151687, 0.0721923,
@@ -15,7 +17,7 @@ const XYZ_TO_LINEAR_REC709 = /*@__PURE__*/ new Matrix3().set(
 
 /**
  * Defines supported color spaces by transfer function and primaries,
- * and provides conversions to/from the Linear-sRGB reference space.
+ * and provides conversions to/from the XYZ reference space.
  */
 const COLOR_SPACES = {
 	[ LinearSRGBColorSpace ]: {
@@ -48,21 +50,16 @@ export const ColorManagement = {
 
 		}
 
-		const sourceTransfer = COLOR_SPACES[ sourceColorSpace ].transfer;
-		const sourceToReference = COLOR_SPACES[ sourceColorSpace ].toReference;
-		const targetTransfer = COLOR_SPACES[ targetColorSpace ].transfer;
-		const targetFromReference = COLOR_SPACES[ targetColorSpace ].fromReference;
-
-		if ( sourceTransfer === SRGBTransfer ) {
+		if ( COLOR_SPACES[ sourceColorSpace ].transfer === SRGBTransfer ) {
 
 			SRGBToLinear( color );
 
 		}
 
-		color.applyMatrix3( sourceToReference );
-		color.applyMatrix3( targetFromReference );
+		color.applyMatrix3( COLOR_SPACES[ sourceColorSpace ].toReference );
+		color.applyMatrix3( COLOR_SPACES[ targetColorSpace ].fromReference );
 
-		if ( targetTransfer === SRGBTransfer ) {
+		if ( COLOR_SPACES[ targetColorSpace ].transfer === SRGBTransfer ) {
 
 			LinearToSRGB( color );
 
