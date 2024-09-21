@@ -83,7 +83,7 @@ class DecalGeometry extends BufferGeometry {
 				for ( let i = 0; i < index.count; i ++ ) {
 
 					vertex.fromBufferAttribute( positionAttribute, index.getX( i ) );
-					normal.fromBufferAttribute( normalAttribute, index.getX( i ) );
+					if (normalAttribute) normal.fromBufferAttribute( normalAttribute, index.getX( i ) );
 
 					pushDecalVertex( decalVertices, vertex, normal );
 
@@ -96,7 +96,7 @@ class DecalGeometry extends BufferGeometry {
 				for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 					vertex.fromBufferAttribute( positionAttribute, i );
-					normal.fromBufferAttribute( normalAttribute, i );
+					if (normalAttribute) normal.fromBufferAttribute( normalAttribute, i );
 
 					pushDecalVertex( decalVertices, vertex, normal );
 
