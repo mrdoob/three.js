@@ -248,6 +248,7 @@ class LensflareMesh extends Mesh {
 
 					material2.screenPosition.x = positionScreen.x + vecX * element.distance;
 					material2.screenPosition.y = positionScreen.y - vecY * element.distance;
+					material2.screenPosition.z = positionScreen.z;
 
 					const size = element.size / viewport.w;
 
