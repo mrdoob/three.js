@@ -2,6 +2,18 @@ import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDe
 import { Color } from '../../math/Color.js';
 import { Vector4 } from '../../math/Vector4.js';
 
+const reversedFuncs = {
+	[ NeverDepth ]: AlwaysDepth,
+	[ LessDepth ]: GreaterDepth,
+	[ EqualDepth ]: NotEqualDepth,
+	[ LessEqualDepth ]: GreaterEqualDepth,
+
+	[ AlwaysDepth ]: NeverDepth,
+	[ GreaterDepth ]: LessDepth,
+	[ NotEqualDepth ]: EqualDepth,
+	[ GreaterEqualDepth ]: LessEqualDepth,
+};
+
 function WebGLState( gl ) {
 
 	function ColorBuffer() {
@@ -66,12 +78,19 @@ function WebGLState( gl ) {
 	function DepthBuffer() {
 
 		let locked = false;
+		let reversed = false;
 
 		let currentDepthMask = null;
 		let currentDepthFunc = null;
 		let currentDepthClear = null;
 
 		return {
+
+			setReversed: function ( value ) {
+
+				reversed = value;
+
+			},
 
 			setTest: function ( depthTest ) {
 
@@ -99,6 +118,8 @@ function WebGLState( gl ) {
 			},
 
 			setFunc: function ( depthFunc ) {
+
+				if ( reversed ) depthFunc = reversedFuncs[ depthFunc ];
 
 				if ( currentDepthFunc !== depthFunc ) {
 
