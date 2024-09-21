@@ -1,5 +1,5 @@
 import Node from '../core/Node.js';
-import { nodeImmutable, nodeProxy } from '../tsl/TSLBase.js';
+import { log2, nodeImmutable, nodeProxy } from '../tsl/TSLBase.js';
 import { cameraNear, cameraFar } from '../accessors/Camera.js';
 import { positionView } from '../accessors/Position.js';
 import { viewportDepthTexture } from './ViewportDepthTextureNode.js';
@@ -117,7 +117,19 @@ export const viewZToPerspectiveDepth = ( viewZ, near, far ) => near.add( viewZ )
 export const perspectiveDepthToViewZ = ( depth, near, far ) => near.mul( far ).div( far.sub( near ).mul( depth ).sub( far ) );
 
 export const perspectiveDepthToOrthographicDepth = ( depth, near, far ) => viewZToOrthographicDepth( perspectiveDepthToViewZ( depth, near, far ), near, far );
-export const orthographicDepthToLogarithmicDepth = ( depth, logDepthBufFC ) => depth.log2().mul( logDepthBufFC ).mul( 0.25 ).add( 1 );
+export const perspectiveDepthToLogarithmicDepth = ( perspectiveW, far, C = 10 ) => {
+
+	// Final equation is adapted from Outerra.
+	// See https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html
+	// C is a constant that determines the resolution near the camera.
+	// A value of C = 1 means no adjustment. A value of C = 10 removes the z-fighting visible on the
+	// "micrososcopic" scale text in the "webgpu_camera_logarithmicdepthbuffer" example on threejs.org.
+	// See https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html for description of the C constant.
+	const numerator = log2( perspectiveW.mul( C ).add( 1 ).max( 1e-6 ) );
+	const denominator = log2( far.mul( C ).add( 1 ) );
+	return numerator.div( denominator );
+
+};
 
 const depthBase = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.DEPTH_BASE );
 

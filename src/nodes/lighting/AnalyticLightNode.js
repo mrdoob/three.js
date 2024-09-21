@@ -16,7 +16,7 @@ import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { orthographicDepthToLogarithmicDepth, perspectiveDepthToOrthographicDepth } from '../display/ViewportDepthNode.js';
+import { perspectiveDepthToLogarithmicDepth } from '../display/ViewportDepthNode.js';
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
 
@@ -312,38 +312,34 @@ class AnalyticLightNode extends LightingNode {
 			const position = object.material.shadowPositionNode || positionWorld;
 
 			let shadowCoord = uniform( shadow.matrix ).setGroup( renderGroup ).mul( position.add( normalWorld.mul( normalBias ) ) );
-			shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
 
-			let coordZ = shadowCoord.z.add( bias );
+			let coordZ;
 
-			if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) {
+			if ( shadow.camera.isOrthographicCamera || renderer.logarithmicDepthBuffer !== true ) {
 
-				coordZ = coordZ.mul( 2 ).sub( 1 ); // WebGPU: Convertion [ 0, 1 ] to [ - 1, 1 ]
+				shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
+				if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) {
 
-			}
-
-			if ( renderer.logarithmicDepthBuffer === true ) {
-
-				// the normally available cameraNear, cameraFar, and cameraLogDepth nodes cannot be used here because they do
-				// not get updated to use the shadow camera, so we have to declare our own "local" nodes here.
-				// TODO: can we fix the cameraNear/cameraFar/cameraLogDepth nodes in src/nodes/accessors/Camera.js so we don't have to declare local ones here?
-				if ( shadow.camera.isPerspectiveCamera ) {
-
-					const cameraNearLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.near );
-					const cameraFarLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.far );
-					coordZ = perspectiveDepthToOrthographicDepth( coordZ, cameraNearLocal, cameraFarLocal );
+					coordZ = shadowCoord.z.mul( 2 ).sub( 1 ); // WebGPU: Conversion [ 0, 1 ] to [ - 1, 1 ]
 
 				}
 
-				const cameraLogDepthLocal = uniform( 'float' ).onRenderUpdate( () => 2.0 / ( Math.log( shadow.camera.far + 1.0 ) / Math.LN2 ) );
-				coordZ = orthographicDepthToLogarithmicDepth( coordZ, cameraLogDepthLocal );
+			} else {
+
+				const w = shadowCoord.w;
+				shadowCoord = shadowCoord.xy.div( w ); // <-- Only divide X/Y coords since we don't need Z
+				// The normally available "cameraFar" node cannot be used here because it does not get
+				// updated to use the shadow camera. So, we have to declare our own "local" one here.
+				// TODO: Can we fix cameraNear/cameraFar in src/nodes/accessors/Camera.js so we don't have to declare new ones here?
+				const cameraFarLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.far );
+				coordZ = perspectiveDepthToLogarithmicDepth( w, cameraFarLocal );
 
 			}
 
 			shadowCoord = vec3(
 				shadowCoord.x,
 				shadowCoord.y.oneMinus(), // follow webgpu standards
-				coordZ
+				coordZ.add( bias )
 			);
 
 			const frustumTest = shadowCoord.x.greaterThanEqual( 0 )
