@@ -30,7 +30,7 @@
 			import * as THREE from 'three';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import Stats from 'three/addons/libs/stats.module.js';
-			import { attribute, positionLocal, tslFn, cameraProjectionMatrix, modelViewMatrix, clipDistances, sin, timerLocal } from 'three/tsl';
+			import { attribute, positionLocal, Fn, cameraProjectionMatrix, modelViewMatrix, clipDistances, sin, timerLocal } from 'three/tsl';
 
 			let camera, controls, scene, renderer, stats;
 
@@ -81,7 +81,7 @@
 				geometry.setAttribute( 'color', colorAttribute );
 
 				const material = new THREE.MeshBasicNodeMaterial();
-				material.vertexNode = tslFn( () => {
+				material.vertexNode = Fn( () => {
 
 					const clip = clipDistances( 1 );
 					const time = sin( timerLocal() );

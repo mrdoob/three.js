@@ -56,7 +56,6 @@ export { default as ReflectorNode } from './utils/ReflectorNode.js';
 export { default as RTTNode } from './utils/RTTNode.js';
 
 // accessors
-<<<<<<< HEAD
 export { default as UniformArrayNode } from './accessors/UniformArrayNode.js';
 export { default as BufferAttributeNode } from './accessors/BufferAttributeNode.js';
 export { default as BufferNode } from './accessors/BufferNode.js';
@@ -81,45 +80,6 @@ export { default as TextureSizeNode } from './accessors/TextureSizeNode.js';
 export { default as StorageTextureNode } from './accessors/StorageTextureNode.js';
 export { default as Texture3DNode } from './accessors/Texture3DNode.js';
 export { default as UserDataNode } from './accessors/UserDataNode.js';
-=======
-export { TBNViewMatrix, parallaxDirection, parallaxUV, transformedBentNormalView } from './accessors/AccessorsUtils.js';
-export { default as UniformArrayNode, uniformArray } from './accessors/UniformArrayNode.js';
-export * from './accessors/BitangentNode.js';
-export { default as BufferAttributeNode, bufferAttribute, dynamicBufferAttribute, instancedBufferAttribute, instancedDynamicBufferAttribute } from './accessors/BufferAttributeNode.js';
-export { default as BufferNode, buffer } from './accessors/BufferNode.js';
-export * from './accessors/CameraNode.js';
-export { default as VertexColorNode, vertexColor } from './accessors/VertexColorNode.js';
-export { default as CubeTextureNode, cubeTexture } from './accessors/CubeTextureNode.js';
-export { default as InstanceNode, instance } from './accessors/InstanceNode.js';
-export { default as BatchNode, batch } from './accessors/BatchNode.js';
-export { default as MaterialNode, materialAlphaTest, materialColor, materialShininess, materialEmissive, materialOpacity, materialSpecular, materialSpecularStrength, materialReflectivity, materialRoughness, materialMetalness, materialNormal, materialClearcoat, materialClearcoatRoughness, materialClearcoatNormal, materialRotation, materialSheen, materialSheenRoughness, materialIridescence, materialIridescenceIOR, materialIridescenceThickness, materialLineScale, materialLineDashSize, materialLineGapSize, materialLineWidth, materialLineDashOffset, materialPointWidth, materialAnisotropy, materialAnisotropyVector, materialDispersion, materialLightMap, materialAOMap } from './accessors/MaterialNode.js';
-export { default as MaterialReferenceNode, materialReference } from './accessors/MaterialReferenceNode.js';
-export { default as RendererReferenceNode, rendererReference } from './accessors/RendererReferenceNode.js';
-export { default as MorphNode, morphReference } from './accessors/MorphNode.js';
-export { default as TextureBicubicNode, textureBicubic } from './accessors/TextureBicubicNode.js';
-export { default as ModelNode, modelDirection, modelViewMatrix, modelNormalMatrix, modelWorldMatrix, modelPosition, modelViewPosition, modelScale, modelWorldMatrixInverse } from './accessors/ModelNode.js';
-export { default as ModelViewProjectionNode, modelViewProjection } from './accessors/ModelViewProjectionNode.js';
-export * from './accessors/NormalNode.js';
-export { default as Object3DNode, objectDirection, objectViewMatrix, objectNormalMatrix, objectWorldMatrix, objectPosition, objectScale, objectViewPosition } from './accessors/Object3DNode.js';
-export { default as PointUVNode, pointUV } from './accessors/PointUVNode.js';
-export * from './accessors/PositionNode.js';
-export { default as ReferenceNode, reference, referenceBuffer } from './accessors/ReferenceNode.js';
-export * from './accessors/ReflectVectorNode.js';
-export { default as SkinningNode, skinning, skinningReference } from './accessors/SkinningNode.js';
-export { default as SceneNode, backgroundBlurriness, backgroundIntensity } from './accessors/SceneNode.js';
-export { default as StorageBufferNode, storage, storageObject } from './accessors/StorageBufferNode.js';
-export * from './accessors/TangentNode.js';
-export { default as TextureNode, texture, textureLoad, /*textureLevel,*/ sampler } from './accessors/TextureNode.js';
-export { default as TextureSizeNode, textureSize } from './accessors/TextureSizeNode.js';
-export { default as StorageTextureNode, storageTexture, textureStore } from './accessors/StorageTextureNode.js';
-export { default as Texture3DNode, texture3D } from './accessors/Texture3DNode.js';
-export * from './accessors/UVNode.js';
-export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
-<<<<<<< HEAD
-export { clipDistances } from './accessors/ClippingNode.js';
->>>>>>> 93b66d8a45 (Modify node builder to work with latest version of Chrome ( there was no conditional extension support in GLSLNodeBuilder and clip_distances are no longer an enable feature as of Chrome 127, so we'll need to think of a way to support older systems that still need it enabled if that is what we want)
-=======
->>>>>>> def683882c (manual rebase)
 
 // display
 export { default as BumpMapNode } from './display/BumpMapNode.js';

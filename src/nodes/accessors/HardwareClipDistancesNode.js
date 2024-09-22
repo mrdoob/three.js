@@ -1,3 +1,8 @@
+import Node from '../core/Node.js';
+import { nodeObject } from '../tsl/TSLCore.js';
+import ArrayElementNode from '../utils/ArrayElementNode.js';
+
+
 class HardwareClipDistancesElementNode extends ArrayElementNode {
 
 	constructor( node, indexNode ) {

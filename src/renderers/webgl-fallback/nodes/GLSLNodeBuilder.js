@@ -611,7 +611,7 @@ ${ flowData.code }
 
 	}
 
-<<<<<<< HEAD
+
 	getInvocationLocalIndex() {
 
 		const workgroupSize = this.object.workgroupSize;
@@ -619,19 +619,45 @@ ${ flowData.code }
 		const size = workgroupSize.reduce( ( acc, curr ) => acc * curr, 1 );
 
 		return `uint( gl_InstanceID ) % ${size}u`;
-=======
-	getClipDistances() {
+
+	}
+
+	enableClipDistances( numClippingPlanes ) {
 
 		const extensions = this.renderer.backend.extensions;
 
 		if ( extensions.has( 'WEBGL_clip_cull_distance' ) ) {
+
+			const ext = extensions.get( 'WEBGL_clip_cull_distance' );
+
+			this.enableExtension( 'GL_ANGLE_clip_cull_distance', 'enable' );
+
+			const gl = this.renderer.backend.getContext();
+
+			for ( let i = 0; i < numClippingPlanes; i ++ ) {
+
+				gl.enable( ext[ `CLIP_DISTANCE${i}_WEBGL` ] );
+
+			}
+
+		}
+
+	}
+
+	getClipDistances( numClippingPlanes ) {
+
+		const extensions = this.renderer.backend.extensions;
+
+		if ( extensions.has( 'WEBGL_clip_cull_distance' ) ) {
+
+			this.enableClipDistances( numClippingPlanes );
 
 			return 'gl_ClipDistance';
 
 		}
 
 		return null;
->>>>>>> 115fd968ac (sketch)
+
 
 	}
 
