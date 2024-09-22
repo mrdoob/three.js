@@ -583,6 +583,12 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 	}
 
+	hasBuiltin( name, shaderStage = this.shaderStage ) {
+
+		return ( this.builtins[ shaderStage ] !== undefined && this.builtins[ shaderStage ].has( name ) );
+
+	}
+
 	getVertexIndex() {
 
 		if ( this.shaderStage === 'vertex' ) {
@@ -655,11 +661,27 @@ ${ flowData.code }
 
 	}
 
+	getSubgroupSize() {
+
+		this.enableSubGroups();
+
+		return this.getBuiltin( 'subgroup_id', 'subgroupID', );
+
+	}
+
+	getInvocationSubgroupIndex() {
+
+		this.enableSubGroups();
+
+		return this.getBuiltin( 'subgroup_invocation_id', 'invocationSubgroupIndex', 'u32', 'attribute' );
+
+	}
+
 	getSubgroupIndex() {
 
 		this.enableSubGroups();
 
-		return this.getBuiltin( 'subgroup_invocation_id', 'subgroupIndex', 'u32', 'attribute' );
+		return this.getBuiltin( 'subgroup_id', 'subgroupIndex', 'u32', 'attribute' );
 
 	}
 
@@ -817,6 +839,13 @@ ${ flowData.code }
 			this.getBuiltin( 'workgroup_id', 'workgroupId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'local_invocation_id', 'localId', 'vec3<u32>', 'attribute' );
 			this.getBuiltin( 'num_workgroups', 'numWorkgroups', 'vec3<u32>', 'attribute' );
+
+			if ( this.renderer.hasFeature( 'subgroups' ) ) {
+
+				this.enableDirective( 'subgroups', shaderStage );
+				this.getBuiltin( 'subgroup_size', 'subgroupSize', 'u32', 'attribute' );
+
+			}
 
 		}
 
