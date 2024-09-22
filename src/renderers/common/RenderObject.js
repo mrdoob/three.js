@@ -248,6 +248,35 @@ export default class RenderObject {
 
 	}
 
+	getGeometryCacheKey() {
+
+		const { geometry } = this;
+
+		let cacheKey = '';
+
+		for ( const name of Object.keys( geometry.attributes ).sort() ) {
+
+			const attribute = geometry.attributes[ name ];
+
+			cacheKey += name + ',';
+
+			if ( attribute.data ) cacheKey += attribute.data.stride + ',';
+			if ( attribute.offset ) cacheKey += attribute.offset + ',';
+			if ( attribute.itemSize ) cacheKey += attribute.itemSize + ',';
+			if ( attribute.normalized ) cacheKey += 'n,';
+
+		}
+
+		if ( geometry.index ) {
+
+			cacheKey += 'index,';
+
+		}
+
+		return cacheKey;
+
+	}
+
 	getMaterialCacheKey() {
 
 		const { object, material } = this;
@@ -304,7 +333,7 @@ export default class RenderObject {
 
 		if ( object.geometry ) {
 
-			cacheKey += object.geometry.id + ',';
+			cacheKey += this.getGeometryCacheKey();
 
 		}
 
