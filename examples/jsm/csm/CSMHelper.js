@@ -78,6 +78,8 @@ class CSMHelper extends Group {
 		const cascadePlanes = this.cascadePlanes;
 		const shadowLines = this.shadowLines;
 
+		if ( camera === null ) return;
+
 		this.position.copy( camera.position );
 		this.quaternion.copy( camera.quaternion );
 		this.scale.copy( camera.scale );
