@@ -642,6 +642,7 @@ ${ flowData.code }
 	}
 
 	getInvocationLocalIndex() {
+<<<<<<< HEAD
 
 		return this.getBuiltin( 'local_invocation_index', 'invocationLocalIndex', 'u32', 'attribute' );
 
@@ -664,10 +665,26 @@ ${ flowData.code }
 	}
 
 	getClipDistances( numPlanes ) {
+=======
+>>>>>>> def683882c (manual rebase)
 
-		this.enableClipDistances();
+		return this.getBuiltin( 'local_invocation_index', 'invocationLocalIndex', 'u32', 'attribute' );
 
-		return 'varyings.' + this.getBuiltin( 'clip_distances', 'clipDistances', `array<f32, ${numPlanes}>`, 'vertex' );
+	}
+
+	getSubgroupSize() {
+
+		this.enableSubGroups();
+
+		return this.getBuiltin( 'subgroup_size', 'subgroupSize', 'u32', 'attribute' );
+
+	}
+
+	getSubgroupIndex() {
+
+		this.enableSubGroups();
+
+		return this.getBuiltin( 'subgroup_invocation_id', 'subgroupIndex', 'u32', 'attribute' );
 
 	}
 
@@ -1189,7 +1206,6 @@ ${ flowData.code }
 		if ( this.material !== null ) {
 
 			this.vertexShader = this._getWGSLVertexCode( shadersData.vertex );
-			console.log( this.vertexShader );
 			this.fragmentShader = this._getWGSLFragmentCode( shadersData.fragment );
 
 		} else {

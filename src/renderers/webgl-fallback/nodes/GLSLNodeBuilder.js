@@ -57,6 +57,9 @@ class GLSLNodeBuilder extends NodeBuilder {
 		this.extensions = {};
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> def683882c (manual rebase)
 		this.useComparisonMethod = true;
 
 	}
@@ -64,10 +67,13 @@ class GLSLNodeBuilder extends NodeBuilder {
 	needsColorSpaceToLinearSRGB( texture ) {
 
 		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
+<<<<<<< HEAD
 =======
 		this.instanceBindGroups = false;
 		this.extensions = {};
 >>>>>>> 93b66d8a45 (Modify node builder to work with latest version of Chrome ( there was no conditional extension support in GLSLNodeBuilder and clip_distances are no longer an enable feature as of Chrome 127, so we'll need to think of a way to support older systems that still need it enabled if that is what we want)
+=======
+>>>>>>> def683882c (manual rebase)
 
 	}
 
@@ -617,6 +623,7 @@ ${ flowData.code }
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	getInvocationLocalIndex() {
 
 		const workgroupSize = this.object.workgroupSize;
@@ -632,47 +639,15 @@ ${ flowData.code }
 =======
 	enableClipDistanceIndex( index ) {
 >>>>>>> aa81eb1654 (working webgl implementation)
+=======
+	getInvocationLocalIndex() {
+>>>>>>> def683882c (manual rebase)
 
-		const extensions = this.renderer.backend.extensions;
+		const workgroupSize = this.object.workgroupSize;
 
-	}
+		const size = workgroupSize.reduce( ( acc, curr ) => acc * curr, 1 );
 
-	enableClipDistances( numClippingPlanes ) {
-
-		const extensions = this.renderer.backend.extensions;
-
-		if ( extensions.has( 'WEBGL_clip_cull_distance' ) ) {
-
-			const ext = extensions.get( 'WEBGL_clip_cull_distance' );
-
-			this.enableExtension( 'GL_ANGLE_clip_cull_distance', 'enable' );
-
-			const gl = this.renderer.backend.getContext();
-
-			// Discretely enable each of a maximum of eight clipping planes
-			for ( let i = 0; i < numClippingPlanes; i ++ ) {
-
-				gl.enable( ext[ `CLIP_DISTANCE${i}_WEBGL` ] );
-
-			}
-
-		}
-
-	}
-
-	getClipDistances( numClippingPlanes ) {
-
-		const extensions = this.renderer.backend.extensions;
-
-		if ( extensions.has( 'WEBGL_clip_cull_distance' ) ) {
-
-			this.enableClipDistances( numClippingPlanes );
-
-			return 'gl_ClipDistance';
-
-		}
-
-		return null;
+		return `uint( gl_InstanceID ) % ${size}u`;
 
 	}
 
@@ -973,7 +948,6 @@ void main() {
 		if ( this.material !== null ) {
 
 			this.vertexShader = this._getGLSLVertexCode( shadersData.vertex );
-			console.log( this.vertexShader );
 			this.fragmentShader = this._getGLSLFragmentCode( shadersData.fragment );
 
 		} else {

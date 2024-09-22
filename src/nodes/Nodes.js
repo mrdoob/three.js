@@ -115,8 +115,11 @@ export { default as StorageTextureNode, storageTexture, textureStore } from './a
 export { default as Texture3DNode, texture3D } from './accessors/Texture3DNode.js';
 export * from './accessors/UVNode.js';
 export { default as UserDataNode, userData } from './accessors/UserDataNode.js';
+<<<<<<< HEAD
 export { clipDistances } from './accessors/ClippingNode.js';
 >>>>>>> 93b66d8a45 (Modify node builder to work with latest version of Chrome ( there was no conditional extension support in GLSLNodeBuilder and clip_distances are no longer an enable feature as of Chrome 127, so we'll need to think of a way to support older systems that still need it enabled if that is what we want)
+=======
+>>>>>>> def683882c (manual rebase)
 
 // display
 export { default as BumpMapNode } from './display/BumpMapNode.js';
