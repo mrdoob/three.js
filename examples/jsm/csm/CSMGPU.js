@@ -3,15 +3,16 @@ import {
 	Vector3,
 	DirectionalLight,
 	MathUtils,
-	ShaderChunk,
 	Matrix4,
 	Box3
 } from 'three';
+
 import { CSMFrustum } from './CSMFrustum.js';
-import { CSMShader } from './CSMShader.js';
+import { CSMLightingModel } from './CSMLightingModel.js';
+import { CSMFadeLightingModel } from './CSMFadeLightingModel.js';
 
 const _cameraToLightMatrix = new Matrix4();
-const _lightSpaceFrustum = new CSMFrustum( { webGL: true } );
+const _lightSpaceFrustum = new CSMFrustum();
 const _center = new Vector3();
 const _bbox = new Box3();
 const _uniformArray = [];
@@ -30,7 +31,7 @@ export class CSM {
 		this.maxFar = data.maxFar || 100000;
 		this.mode = data.mode || 'practical';
 		this.shadowMapSize = data.shadowMapSize || 2048;
-		this.shadowBias = data.shadowBias || 0.000001;
+		this.shadowBias = data.shadowBias || - 0.00002;
 		this.lightDirection = data.lightDirection || new Vector3( 1, - 1, 1 ).normalize();
 		this.lightIntensity = data.lightIntensity || 3;
 		this.lightNear = data.lightNear || 1;
@@ -38,24 +39,26 @@ export class CSM {
 		this.lightMargin = data.lightMargin || 200;
 		this.customSplitsCallback = data.customSplitsCallback;
 		this.fade = false;
-		this.mainFrustum = new CSMFrustum( { webGL: true } );
+		this.enabled = true;
+		this.mainFrustum = new CSMFrustum();
 		this.frustums = [];
 		this.breaks = [];
 
 		this.lights = [];
-		this.shaders = new Map();
 
 		this.createLights();
 		this.updateFrustums();
-		this.injectInclude();
 
 	}
 
 	createLights() {
 
+		this._currentFade = this.fade;
+
 		for ( let i = 0; i < this.cascades; i ++ ) {
 
-			const light = new DirectionalLight( 0xffffff, this.lightIntensity );
+			const light = new DirectionalLight( 0xFFFFFF, this.lightIntensity );
+
 			light.castShadow = true;
 			light.shadow.mapSize.width = this.shadowMapSize;
 			light.shadow.mapSize.height = this.shadowMapSize;
@@ -63,6 +66,13 @@ export class CSM {
 			light.shadow.camera.near = this.lightNear;
 			light.shadow.camera.far = this.lightFar;
 			light.shadow.bias = this.shadowBias;
+
+			light.lightingModel = this.fade === true ? new CSMFadeLightingModel() : new CSMLightingModel();
+
+			light.userData.csmIndex = i;
+			light.userData.csmLastCascade = this.cascades - 1;
+			light.userData.csmCascade = new Vector2();
+			light.userData.csm = this;
 
 			this.parent.add( light );
 			this.parent.add( light.target );
@@ -72,10 +82,35 @@ export class CSM {
 
 	}
 
+	updateLights( enable = true ) {
+
+		if ( this.fade !== this._currentFade || this.enabled !== enable ) {
+
+			const lightingModel = enable ? ( this.fade === true ? new CSMFadeLightingModel() : new CSMLightingModel() ) : null;
+
+			const lights = this.lights;
+
+			for ( let i = 0; i < lights.length; i ++ ) {
+
+				const light = lights[ i ];
+
+				light.lightingModel = lightingModel;
+				light.visible = enable || i === 0;
+
+			}
+
+			this._currentFade = this.fade;
+			this.enabled = enable;
+
+		}
+
+	}
+
 	initCascades() {
 
 		const camera = this.camera;
 		camera.updateProjectionMatrix();
+
 		this.mainFrustum.setFromProjectionMatrix( camera.projectionMatrix, this.maxFar );
 		this.mainFrustum.split( this.breaks, this.frustums );
 
@@ -84,6 +119,7 @@ export class CSM {
 	updateShadowBounds() {
 
 		const frustums = this.frustums;
+
 		for ( let i = 0; i < frustums.length; i ++ ) {
 
 			const light = this.lights[ i ];
@@ -96,7 +132,9 @@ export class CSM {
 			const nearVerts = frustum.vertices.near;
 			const farVerts = frustum.vertices.far;
 			const point1 = farVerts[ 0 ];
+
 			let point2;
+
 			if ( point1.distanceTo( farVerts[ 2 ] ) > point1.distanceTo( nearVerts[ 2 ] ) ) {
 
 				point2 = farVerts[ 2 ];
@@ -108,6 +146,7 @@ export class CSM {
 			}
 
 			let squaredBBWidth = point1.distanceTo( point2 );
+
 			if ( this.fade ) {
 
 				// expand the shadow extents by the fade margin if fade is enabled.
@@ -134,6 +173,7 @@ export class CSM {
 
 		const camera = this.camera;
 		const far = Math.min( camera.far, this.maxFar );
+
 		this.breaks.length = 0;
 
 		switch ( this.mode ) {
@@ -141,12 +181,15 @@ export class CSM {
 			case 'uniform':
 				uniformSplit( this.cascades, camera.near, far, this.breaks );
 				break;
+
 			case 'logarithmic':
 				logarithmicSplit( this.cascades, camera.near, far, this.breaks );
 				break;
+
 			case 'practical':
 				practicalSplit( this.cascades, camera.near, far, 0.5, this.breaks );
 				break;
+
 			case 'custom':
 				if ( this.customSplitsCallback === undefined ) console.error( 'CSM: Custom split scheme callback not defined.' );
 				this.customSplitsCallback( this.cascades, camera.near, far, this.breaks );
@@ -213,12 +256,15 @@ export class CSM {
 			const shadowCam = light.shadow.camera;
 			const texelWidth = ( shadowCam.right - shadowCam.left ) / this.shadowMapSize;
 			const texelHeight = ( shadowCam.top - shadowCam.bottom ) / this.shadowMapSize;
+
 			_cameraToLightMatrix.multiplyMatrices( _lightOrientationMatrixInverse, camera.matrixWorld );
 			frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 
 			const nearVerts = _lightSpaceFrustum.vertices.near;
 			const farVerts = _lightSpaceFrustum.vertices.far;
+
 			_bbox.makeEmpty();
+
 			for ( let j = 0; j < 4; j ++ ) {
 
 				_bbox.expandByPoint( nearVerts[ j ] );
@@ -243,94 +289,23 @@ export class CSM {
 
 	}
 
-	injectInclude() {
-
-		ShaderChunk.lights_fragment_begin = CSMShader.lights_fragment_begin;
-		ShaderChunk.lights_pars_begin = CSMShader.lights_pars_begin;
-
-	}
-
-	setupMaterial( material ) {
-
-		material.defines = material.defines || {};
-		material.defines.USE_CSM = 1;
-		material.defines.CSM_CASCADES = this.cascades;
-
-		if ( this.fade ) {
-
-			material.defines.CSM_FADE = '';
-
-		}
-
-		const breaksVec2 = [];
-		const scope = this;
-		const shaders = this.shaders;
-
-		material.onBeforeCompile = function ( shader ) {
-
-			const far = Math.min( scope.camera.far, scope.maxFar );
-			scope.getExtendedBreaks( breaksVec2 );
-
-			shader.uniforms.CSM_cascades = { value: breaksVec2 };
-			shader.uniforms.cameraNear = { value: scope.camera.near };
-			shader.uniforms.shadowFar = { value: far };
-
-			shaders.set( material, shader );
-
-		};
-
-		shaders.set( material, null );
-
-	}
-
 	updateUniforms() {
 
-		const far = Math.min( this.camera.far, this.maxFar );
-		const shaders = this.shaders;
-
-		shaders.forEach( function ( shader, material ) {
-
-			if ( shader !== null ) {
-
-				const uniforms = shader.uniforms;
-				this.getExtendedBreaks( uniforms.CSM_cascades.value );
-				uniforms.cameraNear.value = this.camera.near;
-				uniforms.shadowFar.value = far;
-
-			}
-
-			if ( ! this.fade && 'CSM_FADE' in material.defines ) {
-
-				delete material.defines.CSM_FADE;
-				material.needsUpdate = true;
-
-			} else if ( this.fade && ! ( 'CSM_FADE' in material.defines ) ) {
-
-				material.defines.CSM_FADE = '';
-				material.needsUpdate = true;
-
-			}
-
-		}, this );
+		this.setLightBreaks();
+		this.shadowFar = Math.min( this.camera.far, this.maxFar );
 
 	}
 
-	getExtendedBreaks( target ) {
-
-		while ( target.length < this.breaks.length ) {
-
-			target.push( new Vector2() );
-
-		}
-
-		target.length = this.breaks.length;
+	setLightBreaks() {
 
 		for ( let i = 0; i < this.cascades; i ++ ) {
 
+			const light = this.lights[ i ];
+
 			const amount = this.breaks[ i ];
 			const prev = this.breaks[ i - 1 ] || 0;
-			target[ i ].x = prev;
-			target[ i ].y = amount;
+
+			light.userData.csmCascade.set( prev, amount );
 
 		}
 
@@ -342,6 +317,7 @@ export class CSM {
 		this.initCascades();
 		this.updateShadowBounds();
 		this.updateUniforms();
+		this.updateLights( this.enabled );
 
 	}
 
@@ -357,27 +333,6 @@ export class CSM {
 	}
 
 	dispose() {
-
-		const shaders = this.shaders;
-		shaders.forEach( function ( shader, material ) {
-
-			delete material.onBeforeCompile;
-			delete material.defines.USE_CSM;
-			delete material.defines.CSM_CASCADES;
-			delete material.defines.CSM_FADE;
-
-			if ( shader !== null ) {
-
-				delete shader.uniforms.CSM_cascades;
-				delete shader.uniforms.cameraNear;
-				delete shader.uniforms.shadowFar;
-
-			}
-
-			material.needsUpdate = true;
-
-		} );
-		shaders.clear();
 
 	}
 

@@ -313,7 +313,10 @@ class AnalyticLightNode extends LightingNode {
 
 			const position = object.material.shadowPositionNode || positionWorld;
 
-			let shadowCoord = uniform( shadow.matrix ).setGroup( renderGroup ).mul( position.add( normalWorld.mul( normalBias ) ) );
+			// @TODO - remove need for hack to ensure normalWorld updated outside if () clause.
+			const normalWorld2 = normalWorld.toVar( 'normalWorld2' );
+
+			let shadowCoord = uniform( shadow.matrix ).setGroup( renderGroup ).mul( position.add( normalWorld2.mul( normalBias ) ) );
 			shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
 
 			let coordZ = shadowCoord.z.add( bias );
