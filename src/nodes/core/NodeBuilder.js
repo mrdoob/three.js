@@ -109,8 +109,6 @@ class NodeBuilder {
 		this.stacks = [];
 		this.tab = '\t';
 
-		this.instanceBindGroups = true;
-
 		this.currentFunctionNode = null;
 
 		this.context = {

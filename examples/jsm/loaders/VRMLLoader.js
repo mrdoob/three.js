@@ -5,6 +5,7 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
+	ColorManagement,
 	ConeGeometry,
 	CylinderGeometry,
 	DataTexture,
@@ -918,8 +919,7 @@ class VRMLLoader extends Loader {
 
 				} else {
 
-					skyMaterial.color.setRGB( skyColor[ 0 ], skyColor[ 1 ], skyColor[ 2 ] );
-					skyMaterial.color.convertSRGBToLinear();
+					skyMaterial.color.setRGB( skyColor[ 0 ], skyColor[ 1 ], skyColor[ 2 ], SRGBColorSpace );
 
 				}
 
@@ -1240,13 +1240,11 @@ class VRMLLoader extends Loader {
 						break;
 
 					case 'diffuseColor':
-						materialData.diffuseColor = new Color( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
-						materialData.diffuseColor.convertSRGBToLinear();
+						materialData.diffuseColor = new Color().setRGB( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ], SRGBColorSpace );
 						break;
 
 					case 'emissiveColor':
-						materialData.emissiveColor = new Color( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
-						materialData.emissiveColor.convertSRGBToLinear();
+						materialData.emissiveColor = new Color().setRGB( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ], SRGBColorSpace );
 						break;
 
 					case 'shininess':
@@ -1254,8 +1252,7 @@ class VRMLLoader extends Loader {
 						break;
 
 					case 'specularColor':
-						materialData.specularColor = new Color( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
-						materialData.specularColor.convertSRGBToLinear();
+						materialData.specularColor = new Color().setRGB( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ], SRGBColorSpace );
 						break;
 
 					case 'transparency':
@@ -3111,7 +3108,8 @@ class VRMLLoader extends Loader {
 			for ( let i = 0; i < attribute.count; i ++ ) {
 
 				color.fromBufferAttribute( attribute, i );
-				color.convertSRGBToLinear();
+
+				ColorManagement.toWorkingColorSpace( color, SRGBColorSpace );
 
 				attribute.setXYZ( i, color.r, color.g, color.b );
 
@@ -3216,7 +3214,9 @@ class VRMLLoader extends Loader {
 				const colorA = colors[ thresholdIndexA ];
 				const colorB = colors[ thresholdIndexB ];
 
-				color.copy( colorA ).lerp( colorB, t ).convertSRGBToLinear();
+				color.copy( colorA ).lerp( colorB, t );
+
+				ColorManagement.toWorkingColorSpace( color, SRGBColorSpace );
 
 				colorAttribute.setXYZ( index, color.r, color.g, color.b );
 

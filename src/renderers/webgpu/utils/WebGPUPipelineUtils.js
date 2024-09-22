@@ -138,7 +138,7 @@ class WebGPUPipelineUtils {
 			},
 			multisample: {
 				count: sampleCount,
-				alphaToCoverageEnabled: material.alphaToCoverage
+				alphaToCoverageEnabled: material.alphaToCoverage && sampleCount > 1
 			},
 			layout: device.createPipelineLayout( {
 				bindGroupLayouts

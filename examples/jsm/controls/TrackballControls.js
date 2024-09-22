@@ -618,23 +618,43 @@ function onKeyDown( event ) {
 
 function onMouseDown( event ) {
 
-	if ( this.state === _STATE.NONE ) {
+	let mouseAction;
 
-		switch ( event.button ) {
+	switch ( event.button ) {
 
-			case this.mouseButtons.LEFT:
-				this.state = _STATE.ROTATE;
-				break;
+		case 0:
+			mouseAction = this.mouseButtons.LEFT;
+			break;
 
-			case this.mouseButtons.MIDDLE:
-				this.state = _STATE.ZOOM;
-				break;
+		case 1:
+			mouseAction = this.mouseButtons.MIDDLE;
+			break;
 
-			case this.mouseButtons.RIGHT:
-				this.state = _STATE.PAN;
-				break;
+		case 2:
+			mouseAction = this.mouseButtons.RIGHT;
+			break;
 
-		}
+		default:
+			mouseAction = - 1;
+
+	}
+
+	switch ( mouseAction ) {
+
+		case MOUSE.DOLLY:
+			this.state = _STATE.ZOOM;
+			break;
+
+		case MOUSE.ROTATE:
+			this.state = _STATE.ROTATE;
+			break;
+
+		case MOUSE.PAN:
+			this.state = _STATE.PAN;
+			break;
+
+		default:
+			this.state = _STATE.NONE;
 
 	}
 

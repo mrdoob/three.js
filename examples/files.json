@@ -301,6 +301,7 @@
 	],
 	"webgpu (wip)": [
 		"webgpu_animation_retargeting",
+		"webgpu_animation_retargeting_readyplayer",
 		"webgpu_backdrop",
 		"webgpu_backdrop_area",
 		"webgpu_backdrop_water",
@@ -330,6 +331,7 @@
 		"webgpu_instance_points",
 		"webgpu_instance_uniform",
 		"webgpu_instancing_morph",
+		"webgpu_lensflares",
 		"webgpu_lightprobe",
 		"webgpu_lightprobe_cubecamera",
 		"webgpu_lights_custom",

@@ -133,7 +133,15 @@ class NodeMaterialObserver {
 
 			if ( typeof value === 'object' && value.clone !== undefined ) {
 
-				data[ property ] = value.clone();
+				if ( value.isTexture === true ) {
+
+					data[ property ] = { id: value.id, version: value.version };
+
+				} else {
+
+					data[ property ] = value.clone();
+
+				}
 
 			} else {
 
@@ -182,9 +190,22 @@ class NodeMaterialObserver {
 
 				}
 
+			} else if ( mtlValue.isTexture === true ) {
+
+				if ( value.id !== mtlValue.id || value.version !== mtlValue.version ) {
+
+					value.id = mtlValue.id;
+					value.version = mtlValue.version;
+
+					return false;
+
+				}
+
 			} else if ( value !== mtlValue ) {
 
 				materialData[ property ] = mtlValue;
+
+				return false;
 
 			}
 

@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		[page:Object3D] &rarr;
+		[page:Controls] &rarr;
 
 		<h1>变换控制器（[name]）</h1>
 
@@ -41,7 +41,7 @@
 				[page:Camera camera]: 被控制的摄像机。
 			</p>
 			<p>
-				[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。
+				[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。(可选)
 			</p>
 			<p>
 				创建一个新的 [name] 实例。
@@ -73,7 +73,7 @@
 
 		<h2>属性</h2>
 
-		<p>共有属性请参见其基类[page:Object3D]。</p>
+		<p>共有属性请参见其基类[page:Controls]。</p>
 
 		<h3>[property:String axis]</h3>
 		<p>
@@ -85,29 +85,14 @@
 			渲染场景的摄像机。
 		</p>
 
-		<h3>[property:HTMLDOMElement domElement]</h3>
-		<p>
-			该 HTMLDOMElement 用于监听鼠标/触摸事件，该属性必须在构造函数中传入。在此处改变它将不会设置新的事件监听。
-		</p>
-
 		<h3>[property:Boolean dragging]</h3>
 		<p>
 			当前是否正在拖动。只读属性。
 		</p>
 
-		<h3>[property:Boolean enabled]</h3>
-		<p>
-			是否启用控制器。默认为*true*。
-		</p>
-
 		<h3>[property:String mode]</h3>
 		<p>
 			当前的变换模式。可能的值包括"translate"、"rotate" 和 "scale"。默认为*translate*。
-		</p>
-
-		<h3>[property:Object3D object]</h3>
-		<p>
-			正在被控制的3D对象。
 		</p>
 
 		<h3>[property:Number rotationSnap]</h3>
@@ -149,7 +134,7 @@
 
 		<h2>方法</h2>
 
-		<p>共有方法请参见其基类[page:Object3D]。</p>
+		<p>共有方法请参见其基类[page:Controls]。</p>
 
 		<h3>[method:TransformControls attach] ( [param:Object3D object] )</h3>
 		<p>
@@ -166,9 +151,9 @@
 			从控制器中移除当前3D对象，并确保控制器UI是不可见的。
 		</p>
 
-		<h3>[method:undefined dispose] ()</h3>
+		<h3>[method:Object3D getHelper] ()</h3>
 		<p>
-			若不再需要该控制器，则应当调用此函数。
+			返回控件的视觉表示。将辅助对象添加到场景中，以直观地变换附着的3D对象。
 		</p>
 
 		<h3>[method:Raycaster getRaycaster] ()</h3>
@@ -181,6 +166,11 @@
 		<h3>[method:String getMode] ()</h3>
 		<p>
 			返回变换模式。
+		</p>
+		
+		<h3>[method:undefined reset] ()</h3>
+		<p>
+			将对象的位置、旋转和缩放重置为当前变换开始时的状态。
 		</p>
 
 		<h3>[method:undefined setMode] ( [param:String mode] )</h3>

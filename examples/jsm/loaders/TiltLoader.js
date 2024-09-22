@@ -2,6 +2,7 @@ import {
 	BufferAttribute,
 	BufferGeometry,
 	Color,
+	ColorManagement,
 	DoubleSide,
 	FileLoader,
 	Group,
@@ -9,6 +10,7 @@ import {
 	Mesh,
 	MeshBasicMaterial,
 	RawShaderMaterial,
+	SRGBColorSpace,
 	TextureLoader,
 	Quaternion,
 	Vector3
@@ -196,7 +198,7 @@ class StrokeGeometry extends BufferGeometry {
 			const rgba = stroke[ 3 ];
 			const alpha = stroke[ 3 ][ 3 ];
 
-			color.fromArray( rgba ).convertSRGBToLinear();
+			ColorManagement.toWorkingColorSpace( color.fromArray( rgba ), SRGBColorSpace );
 
 			prevPosition.fromArray( positions, 0 );
 			prevQuaternion.fromArray( quaternions, 0 );

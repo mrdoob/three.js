@@ -512,7 +512,7 @@ class WebGLState {
 
 		this.setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
-		material.alphaToCoverage === true
+		material.alphaToCoverage === true && this.backend.renderer.samples > 1
 			? this.enable( gl.SAMPLE_ALPHA_TO_COVERAGE )
 			: this.disable( gl.SAMPLE_ALPHA_TO_COVERAGE );
 
@@ -649,7 +649,6 @@ class WebGLState {
 
 		}
 
-
 	}
 
 
@@ -711,9 +710,7 @@ class WebGLState {
 			boundTexture.type = webglType;
 			boundTexture.texture = webglTexture;
 
-
 		}
-
 
 	}
 

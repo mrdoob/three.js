@@ -7,7 +7,7 @@ import {
 	add, sub, mul, div, mod, abs, sign, floor, ceil, round, pow, sin, cos, tan,
 	asin, acos, atan2, sqrt, exp, clamp, min, max, normalize, length, dot, cross, normalMap,
 	remap, smoothstep, luminance, mx_rgbtohsv, mx_hsvtorgb,
-	mix,
+	mix, split,
 	mx_ramplr, mx_ramptb, mx_splitlr, mx_splittb,
 	mx_fractal_noise_float, mx_noise_float, mx_cell_noise_float, mx_worley_noise_float,
 	mx_transform_uv,
@@ -44,6 +44,10 @@ const mx_power = ( in1, in2 = float( 1 ) ) => pow( in1, in2 );
 const mx_atan2 = ( in1 = float( 0 ), in2 = float( 1 ) ) => atan2( in1, in2 );
 const mx_timer = () => timerLocal();
 const mx_frame = () => frameId;
+const mx_invert = ( in1, amount = float( 1 ) ) => sub( amount, in1 );
+
+const separate = ( in1, channel ) => split( in1, channel.at( - 1 ) );
+const extract = ( in1, index ) => in1.element( index );
 
 const MXElements = [
 
@@ -75,6 +79,7 @@ const MXElements = [
 	new MXElement( 'magnitude', length, [ 'in1', 'in2' ] ),
 	new MXElement( 'dotproduct', dot, [ 'in1', 'in2' ] ),
 	new MXElement( 'crossproduct', cross, [ 'in' ] ),
+	new MXElement( 'invert', mx_invert, [ 'in', 'amount' ] ),
 	//new MtlXElement( 'transformpoint', ... ),
 	//new MtlXElement( 'transformvector', ... ),
 	//new MtlXElement( 'transformnormal', ... ),
@@ -127,10 +132,10 @@ const MXElements = [
 	new MXElement( 'contrast', mx_contrast, [ 'in', 'amount', 'pivot' ] ),
 	//new MtlXElement( 'hsvadjust', ... ),
 	new MXElement( 'saturate', saturation, [ 'in', 'amount' ] ),
-	//new MtlXElement( 'extract', ... ),
-	//new MtlXElement( 'separate2', ... ),
-	//new MtlXElement( 'separate3', ... ),
-	//new MtlXElement( 'separate4', ... )
+	new MXElement( 'extract', extract, [ 'in', 'index' ] ),
+	new MXElement( 'separate2', separate, [ 'in' ] ),
+	new MXElement( 'separate3', separate, [ 'in' ] ),
+	new MXElement( 'separate4', separate, [ 'in' ] ),
 
 	new MXElement( 'time', mx_timer ),
 	new MXElement( 'frame', mx_frame )
@@ -369,11 +374,11 @@ class MaterialXNode {
 
 	}
 
-	getNode() {
+	getNode( out = null ) {
 
 		let node = this.node;
 
-		if ( node !== null ) {
+		if ( node !== null && out === null ) {
 
 			return node;
 
@@ -391,7 +396,13 @@ class MaterialXNode {
 
 		} else if ( this.hasReference ) {
 
-			node = this.materialX.getMaterialXNode( this.referencePath ).getNode();
+			if ( this.element === 'output' && this.output && out === null  ) {
+
+				out = this.output;
+
+			}
+
+			node = this.materialX.getMaterialXNode( this.referencePath ).getNode( out );
 
 		} else {
 
@@ -474,7 +485,15 @@ class MaterialXNode {
 
 				const nodeElement = MtlXLibrary[ element ];
 
-				node = nodeElement.nodeFunc( ...this.getNodesByNames( ...nodeElement.params ) );
+				if ( out !== null ) {
+
+					node = nodeElement.nodeFunc( ...this.getNodesByNames( ...nodeElement.params ), out );
+
+				} else {
+
+					node = nodeElement.nodeFunc( ...this.getNodesByNames( ...nodeElement.params ) );
+
+				}
 
 			}
 
@@ -542,7 +561,7 @@ class MaterialXNode {
 
 		const child = this.getChildByName( name );
 
-		return child ? child.getNode() : undefined;
+		return child ? child.getNode( child.output ) : undefined;
 
 	}
 

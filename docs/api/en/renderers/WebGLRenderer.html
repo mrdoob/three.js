@@ -75,6 +75,9 @@
 			[link:https://www.khronos.org/opengl/wiki/Early_Fragment_Test Early Fragment Test] 
 			optimization and can cause a decrease in performance.
 			Default is `false`. See the [example:webgl_camera_logarithmicdepthbuffer camera / logarithmicdepthbuffer] example.
+
+			[page:Boolean reverseDepthBuffer] - whether to use a reverse depth buffer. Requires the `EXT_clip_control` extension.
+			This is a more faster and accurate version than logarithmic depth buffer. Default is `false`. 
 		</p>
 
 		<h2>Properties</h2>
@@ -119,9 +122,7 @@
 			- [page:Boolean isWebGL2]: `true` if the context in use is a
 			WebGL2RenderingContext object.<br />
 			- [page:Boolean logarithmicDepthBuffer]: `true` if the [page:parameter logarithmicDepthBuffer] 
-			was set to true in the constructor and the context
-			supports the
-			[link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth] extension.<br />
+			was set to true in the constructor.<br />
 			- [page:Integer maxAttributes]: The value of `gl.MAX_VERTEX_ATTRIBS`.<br />
 			- [page:Integer maxCubemapSize]: The value of
 			`gl.MAX_CUBE_MAP_TEXTURE_SIZE`. Maximum height * width of cube map
@@ -145,6 +146,9 @@
 			be used in a vertex shader.<br />
 			- [page:String precision]: The shader precision currently being used by
 			the renderer.<br />
+			- [page:Boolean reverseDepthBuffer]: `true` if the [page:parameter reverseDepthBuffer] 
+			was set to `true` in the constructor and the context
+			supports the [link:https://registry.khronos.org/webgl/extensions/EXT_clip_control/ EXT_clip_control] extension.<br />
 			- [page:Boolean vertexTextures]: `true` if [property:Integer maxVertexTextures] 
 			is greater than 0 (i.e. vertex textures can be used).<br />
 		</p>
