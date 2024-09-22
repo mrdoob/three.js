@@ -56,10 +56,6 @@ class GLSLNodeBuilder extends NodeBuilder {
 		this.transforms = [];
 		this.extensions = {};
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> def683882c (manual rebase)
 		this.useComparisonMethod = true;
 
 	}
@@ -67,13 +63,6 @@ class GLSLNodeBuilder extends NodeBuilder {
 	needsColorSpaceToLinearSRGB( texture ) {
 
 		return texture.isVideoTexture === true && texture.colorSpace !== NoColorSpace;
-<<<<<<< HEAD
-=======
-		this.instanceBindGroups = false;
-		this.extensions = {};
->>>>>>> 93b66d8a45 (Modify node builder to work with latest version of Chrome ( there was no conditional extension support in GLSLNodeBuilder and clip_distances are no longer an enable feature as of Chrome 127, so we'll need to think of a way to support older systems that still need it enabled if that is what we want)
-=======
->>>>>>> def683882c (manual rebase)
 
 	}
 
@@ -623,7 +612,6 @@ ${ flowData.code }
 	}
 
 <<<<<<< HEAD
-<<<<<<< HEAD
 	getInvocationLocalIndex() {
 
 		const workgroupSize = this.object.workgroupSize;
@@ -631,23 +619,19 @@ ${ flowData.code }
 		const size = workgroupSize.reduce( ( acc, curr ) => acc * curr, 1 );
 
 		return `uint( gl_InstanceID ) % ${size}u`;
-
-	}
-
-	
-	enableClipDistances() {
 =======
-	enableClipDistanceIndex( index ) {
->>>>>>> aa81eb1654 (working webgl implementation)
-=======
-	getInvocationLocalIndex() {
->>>>>>> def683882c (manual rebase)
+	getClipDistances() {
 
-		const workgroupSize = this.object.workgroupSize;
+		const extensions = this.renderer.backend.extensions;
 
-		const size = workgroupSize.reduce( ( acc, curr ) => acc * curr, 1 );
+		if ( extensions.has( 'WEBGL_clip_cull_distance' ) ) {
 
-		return `uint( gl_InstanceID ) % ${size}u`;
+			return 'gl_ClipDistance';
+
+		}
+
+		return null;
+>>>>>>> 115fd968ac (sketch)
 
 	}
 
