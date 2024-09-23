@@ -94,17 +94,19 @@ export const ColorManagement = {
 
 	},
 
-	getMatrix: function ( sourceColorSpace, targetColorSpace, targetMatrix ) {
+	define: function ( colorSpaces ) {
+
+		Object.assign( this.spaces, colorSpaces );
+
+	},
+
+	// Internal APIs
+
+	_getMatrix: function ( targetMatrix, sourceColorSpace, targetColorSpace ) {
 
 		return targetMatrix
 			.copy( this.spaces[ sourceColorSpace ].toReference )
 			.multiply( this.spaces[ targetColorSpace ].fromReference );
-
-	},
-
-	define: function ( colorSpaces ) {
-
-		Object.assign( this.spaces, colorSpaces );
 
 	},
 

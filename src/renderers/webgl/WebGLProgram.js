@@ -34,7 +34,7 @@ const _m0 = /*@__PURE__*/ new Matrix3();
 
 function getEncodingComponents( colorSpace ) {
 
-	ColorManagement.getMatrix( ColorManagement.workingColorSpace, colorSpace, _m0 );
+	ColorManagement._getMatrix( _m0, ColorManagement.workingColorSpace, colorSpace );
 
 	const encodingMatrix = `mat3( ${ _m0.elements.map( ( v ) => v.toFixed( 4 ) ) } )`;
 
