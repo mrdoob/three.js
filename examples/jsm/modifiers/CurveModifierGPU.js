@@ -14,7 +14,7 @@ import {
 	LinearFilter
 } from 'three';
 
-import { modelWorldMatrix, normalLocal, ivec2, vec3, vec4, mat3, varyingProperty, textureLoad, reference, Fn, select, positionLocal } from 'three/tsl';
+import { modelWorldMatrix, normalLocal, vec2, vec3, vec4, mat3, varyingProperty, texture, reference, Fn, select, positionLocal } from 'three/tsl';
 
 /**
  * Make a new DataTexture to store the descriptions of the curves.
@@ -109,7 +109,7 @@ export function getUniforms( splineTexture ) {
 
 }
 
-export function modifyShader( material, uniforms ) {
+export function modifyShader( material, uniforms, numberOfCurves ) {
 
 	const spineTexture = uniforms.spineTexture;
 
@@ -122,6 +122,7 @@ export function modifyShader( material, uniforms ) {
 	material.positionNode = Fn( () => {
 
 		const textureStacks = TEXTURE_HEIGHT / 4;
+		const textureScale = TEXTURE_HEIGHT * numberOfCurves;
 
 		const worldPos = modelWorldMatrix.mul( vec4( positionLocal, 1 ) ).toVar();
 
@@ -135,13 +136,11 @@ export function modifyShader( material, uniforms ) {
 
 		const rowOffset = mt.floor().toVar();
 
-		mt.mulAssign( TEXTURE_WIDTH );
+		const spinePos = texture( spineTexture, vec2( mt, rowOffset.add( 0.5 ).div( textureScale ) ) ).xyz;
 
-		const spinePos = textureLoad( spineTexture, ivec2( mt, rowOffset.add( 0 ) ) ).xyz;
-
-		const a = textureLoad( spineTexture, ivec2( mt, rowOffset.add( 1 ) ) ).xyz;
-		const b = textureLoad( spineTexture, ivec2( mt, rowOffset.add( 2 ) ) ).xyz;
-		const c = textureLoad( spineTexture, ivec2( mt, rowOffset.add( 3 ) ) ).xyz;
+		const a = texture( spineTexture, vec2( mt, rowOffset.add( 1.5 ).div( textureScale ) ) ).xyz;
+		const b = texture( spineTexture, vec2( mt, rowOffset.add( 2.5 ).div( textureScale ) ) ).xyz;
+		const c = texture( spineTexture, vec2( mt, rowOffset.add( 3.5 ).div( textureScale ) ) ).xyz;
 
 		const basis = mat3( a, b, c ).toVar();
 
@@ -184,7 +183,7 @@ export class Flow {
 					for ( const material of child.material ) {
 
 						const newMaterial = material.clone();
-						modifyShader( newMaterial, uniforms );
+						modifyShader( newMaterial, uniforms, numberOfCurves );
 						materials.push( newMaterial );
 
 					}
@@ -194,7 +193,7 @@ export class Flow {
 				} else {
 
 					child.material = child.material.clone();
-					modifyShader( child.material, uniforms );
+					modifyShader( child.material, uniforms, numberOfCurves );
 
 				}
 
