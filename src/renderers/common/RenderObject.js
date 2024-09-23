@@ -317,12 +317,6 @@ export default class RenderObject {
 
 		}
 
-		if ( object.center ) {
-
-			cacheKey += object.center.x + ',' + object.center.y + ',';
-
-		}
-
 		if ( object.count > 1 ) {
 
 			cacheKey += object.count + ',' + object.uuid + ',';
