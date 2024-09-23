@@ -73,18 +73,3 @@ export const LinearRec2020ColorSpaceImpl = {
 	fromReference: XYZ_TO_LINEAR_REC2020,
 	luminanceCoefficients: REC2020_LUMINANCE_COEFFICIENTS,
 };
-
-/******************************************************************************
- * Rec. 2100 Display (HDR) definitions
- */
-
-export const LinearRec2100DisplayColorSpace = 'rec2100-display-linear';
-
-export const LinearRec2100DisplayColorSpaceImpl = {
-	primaries: REC2020_PRIMARIES,
-	whitePoint: D65,
-	transfer: LinearTransfer,
-	toReference: LINEAR_REC2020_TO_XYZ,
-	fromReference: XYZ_TO_LINEAR_REC2020,
-	luminanceCoefficients: REC2020_LUMINANCE_COEFFICIENTS,
-};
