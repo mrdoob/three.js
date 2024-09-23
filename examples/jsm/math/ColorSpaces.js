@@ -34,6 +34,7 @@ export const DisplayP3ColorSpaceImpl = {
 	toReference: LINEAR_DISPLAY_P3_TO_XYZ,
 	fromReference: XYZ_TO_LINEAR_DISPLAY_P3,
 	luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS,
+	outputColorSpaceConfig: { drawingBufferColorSpace: DisplayP3ColorSpace }
 };
 
 export const LinearDisplayP3ColorSpaceImpl = {
@@ -43,6 +44,7 @@ export const LinearDisplayP3ColorSpaceImpl = {
 	toReference: LINEAR_DISPLAY_P3_TO_XYZ,
 	fromReference: XYZ_TO_LINEAR_DISPLAY_P3,
 	luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS,
+	workingColorSpaceConfig: { unpackColorSpace: DisplayP3ColorSpace }
 };
 
 /******************************************************************************

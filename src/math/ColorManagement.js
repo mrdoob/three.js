@@ -34,6 +34,10 @@ export const ColorManagement = {
 	 *	- fromReference: Matrix3 XYZ to RGB transform
 	 *	- luminanceCoefficients: RGB luminance coefficients
 	 *
+	 * Optional:
+	 *  - outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace }
+	 *  - workingColorSpaceConfig: { unpackColorSpace: ColorSpace }
+	 *
 	 * Reference:
 	 * - https://www.russellcottrell.com/photo/matrixCalculator.htm
 	 */
@@ -120,6 +124,20 @@ export const ColorManagement = {
 
 	},
 
+	/** @internal */
+	_getDrawingBufferColorSpace: function ( colorSpace ) {
+
+		return this.spaces[ colorSpace ].outputColorSpaceConfig.drawingBufferColorSpace;
+
+	},
+
+	/** @internal */
+	_getUnpackColorSpace: function ( colorSpace = this.workingColorSpace ) {
+
+		return this.spaces[ colorSpace ].workingColorSpaceConfig.unpackColorSpace;
+
+	}
+
 };
 
 
@@ -144,6 +162,7 @@ ColorManagement.define( {
 		toReference: LINEAR_REC709_TO_XYZ,
 		fromReference: XYZ_TO_LINEAR_REC709,
 		luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
+		workingColorSpaceConfig: { unpackColorSpace: SRGBColorSpace }
 	},
 
 	[ SRGBColorSpace ]: {
@@ -153,6 +172,7 @@ ColorManagement.define( {
 		toReference: LINEAR_REC709_TO_XYZ,
 		fromReference: XYZ_TO_LINEAR_REC709,
 		luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
+		outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace }
 	},
 
 } );

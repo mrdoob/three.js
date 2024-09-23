@@ -2825,12 +2825,9 @@ class WebGLRenderer {
 
 		this._outputColorSpace = colorSpace;
 
-		// TODO: Generalize this!
 		const gl = this.getContext();
-		gl.drawingBufferColorspace = colorSpace; // TODO: handle linear
-		gl.unpackColorSpace = colorSpace; // TODO: handle linear
-		// gl.drawingBufferColorSpace = colorSpace === DisplayP3ColorSpace ? 'display-p3' : 'srgb';
-		// gl.unpackColorSpace = ColorManagement.workingColorSpace === LinearDisplayP3ColorSpace ? 'display-p3' : 'srgb';
+		gl.drawingBufferColorspace = ColorManagement._getDrawingBufferColorSpace( colorSpace );
+		gl.unpackColorSpace = ColorManagement._getUnpackColorSpace();
 
 	}
 
