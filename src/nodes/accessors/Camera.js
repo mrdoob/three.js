@@ -2,8 +2,6 @@ import { uniform } from '../core/UniformNode.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { Vector3 } from '../../math/Vector3.js';
 
-export const cameraIsPerspective = /*@__PURE__*/ uniform( 'float' ).label( 'cameraIsPerspective' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.isPerspectiveCamera === true ? 1 : 0 );
-export const cameraIsOrthographic = /*@__PURE__*/ uniform( 'float' ).label( 'cameraIsOrthographic' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.isOrthographicCamera === true ? 1 : 0 );
 export const cameraNear = /*@__PURE__*/ uniform( 'float' ).label( 'cameraNear' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.near );
 export const cameraFar = /*@__PURE__*/ uniform( 'float' ).label( 'cameraFar' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.far );
 export const cameraProjectionMatrix = /*@__PURE__*/ uniform( 'mat4' ).label( 'cameraProjectionMatrix' ).setGroup( renderGroup ).onRenderUpdate( ( { camera } ) => camera.projectionMatrix );

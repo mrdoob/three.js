@@ -328,11 +328,12 @@ class AnalyticLightNode extends LightingNode {
 
 				const w = shadowCoord.w;
 				shadowCoord = shadowCoord.xy.div( w ); // <-- Only divide X/Y coords since we don't need Z
-				// The normally available "cameraFar" node cannot be used here because it does not get
-				// updated to use the shadow camera. So, we have to declare our own "local" one here.
-				// TODO: Can we fix cameraNear/cameraFar in src/nodes/accessors/Camera.js so we don't have to declare new ones here?
+				// The normally available "cameraNear" and "cameraFar" nodes cannot be used here because they do not get
+				// updated to use the shadow camera. So, we have to declare our own "local" ones here.
+				// TODO: Can we fix cameraNear/cameraFar in src/nodes/accessors/Camera.js so we don't have to declare local ones here?
+				const cameraNearLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.near );
 				const cameraFarLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.far );
-				coordZ = perspectiveDepthToLogarithmicDepth( w, cameraFarLocal );
+				coordZ = perspectiveDepthToLogarithmicDepth( w, cameraNearLocal, cameraFarLocal );
 
 			}
 

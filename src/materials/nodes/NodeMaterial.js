@@ -20,7 +20,7 @@ import AONode from '../../nodes/lighting/AONode.js';
 import { lightingContext } from '../../nodes/lighting/LightingContextNode.js';
 import IrradianceNode from '../../nodes/lighting/IrradianceNode.js';
 import { depth, perspectiveDepthToLogarithmicDepth, viewZToOrthographicDepth } from '../../nodes/display/ViewportDepthNode.js';
-import { cameraFar, cameraIsPerspective, cameraNear } from '../../nodes/accessors/Camera.js';
+import { cameraFar, cameraNear } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha } from '../../nodes/accessors/ClippingNode.js';
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
 
@@ -215,7 +215,7 @@ class NodeMaterial extends Material {
 
 	setupDepth( builder ) {
 
-		const { renderer } = builder;
+		const { renderer, camera } = builder;
 
 		// Depth
 
@@ -231,11 +231,21 @@ class NodeMaterial extends Material {
 
 			} else if ( renderer.logarithmicDepthBuffer === true ) {
 
-				// Note: if you manually provide a "C" constant here for the logarithmic depth calculation, remember
-				// to also include it in the shadow depth correction in AnalyticLightNode.setupShadow()!
-				const logarithmicDepth = perspectiveDepthToLogarithmicDepth( modelViewProjection().w, cameraFar );
-				const orthographicDepth = viewZToOrthographicDepth( positionView.z, cameraNear, cameraFar );
-				depthNode = cameraIsPerspective.equal( 1 ).select( logarithmicDepth, orthographicDepth );
+				if ( camera.isPerspectiveCamera ) {
+
+					// Note: normally we could use "float( camera.near )" and "float( camera.far )" for the near/far arguments, but
+					// there is currently a bug with TSL/Three Shading Language whereby a "float()" expression using a huge value
+					// in scientific notation like "float( 1e27 )" will output "1e+27.0" to the shader code, which is causing problems.
+					// Since it's possible that camera.near/camera.far values may be using huge values like this ( such as the logarithmic
+					// depth buffer examples on threejs.org use huge values like those), we must use the cameraNear/cameraFar nodes for now.
+					// TODO: can the float() node be fixed to allow for expressions like "float( 1e27 )"?
+					depthNode = perspectiveDepthToLogarithmicDepth( modelViewProjection().w, cameraNear, cameraFar );
+
+				} else {
+
+					depthNode = viewZToOrthographicDepth( positionView.z, cameraNear, cameraFar );
+
+				}
 
 			}
 
