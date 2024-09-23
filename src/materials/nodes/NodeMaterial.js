@@ -236,8 +236,8 @@ class NodeMaterial extends Material {
 					// Note: normally we could use "float( camera.near )" and "float( camera.far )" for the near/far arguments, but
 					// there is currently a bug with TSL/Three Shading Language whereby a "float()" expression using a huge value
 					// in scientific notation like "float( 1e27 )" will output "1e+27.0" to the shader code, which is causing problems.
-					// Since it's possible that camera.near/camera.far values may be using huge values like this ( such as the logarithmic
-					// depth buffer examples on threejs.org use huge values like those), we must use the cameraNear/cameraFar nodes for now.
+					// Since it's possible that camera.near/camera.far values may be using huge values like this (such as the logarithmic
+					// depth buffer examples on threejs.org), we must use the cameraNear/cameraFar nodes for now.
 					// TODO: can the float() node be fixed to allow for expressions like "float( 1e27 )"?
 					depthNode = perspectiveDepthToLogarithmicDepth( modelViewProjection().w, cameraNear, cameraFar );
 

@@ -322,6 +322,10 @@ class AnalyticLightNode extends LightingNode {
 
 					coordZ = shadowCoord.z.mul( 2 ).sub( 1 ); // WebGPU: Conversion [ 0, 1 ] to [ - 1, 1 ]
 
+				} else {
+
+				    coordZ = shadowCoord.z;
+
 				}
 
 			} else {
