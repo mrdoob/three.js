@@ -1061,7 +1061,6 @@ class WebGPUBackend extends Backend {
 
 	}
 
-
 	// textures
 
 	createSampler( texture ) {
