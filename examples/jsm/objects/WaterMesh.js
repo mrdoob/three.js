@@ -1,10 +1,9 @@
 import {
 	Color,
 	Mesh,
-	NodeMaterial,
 	Vector3
 } from 'three';
-import { add, cameraPosition, div, normalize, positionWorld, sub, timerLocal, Fn, texture, vec2, vec3, vec4, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
+import { Fn, NodeMaterial, add, cameraPosition, div, normalize, positionWorld, sub, timerLocal, texture, vec2, vec3, vec4, max, dot, reflect, pow, length, float, uniform, reflector, mul, mix } from 'three/tsl';
 
 /**
  * Work based on :
