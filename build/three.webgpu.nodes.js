@@ -19599,12 +19599,19 @@ class CylinderGeometry extends BufferGeometry {
 
 					// faces
 
-					indices.push( a, b, d );
-					indices.push( b, c, d );
+					if ( radiusTop > 0 ) {
 
-					// update group counter
+						indices.push( a, b, d );
+						groupCount += 3;
 
-					groupCount += 6;
+					}
+
+					if ( radiusBottom > 0 ) {
+
+						indices.push( b, c, d );
+						groupCount += 3;
+
+					}
 
 				}
 
@@ -36390,6 +36397,7 @@ class NodeMaterialObserver {
 
 		this.renderObjects = new WeakMap();
 		this.hasNode = this.containsNode( builder );
+		this.hasAnimation = builder.object.isSkinnedMesh === true;
 		this.refreshUniforms = refreshUniforms;
 		this.renderId = 0;
 
@@ -36421,6 +36429,12 @@ class NodeMaterialObserver {
 				material: this.getMaterialData( renderObject.material ),
 				worldMatrix: renderObject.object.matrixWorld.clone()
 			};
+
+			if ( renderObject.object.morphTargetInfluences ) {
+
+				data.morphTargetInfluences = renderObject.object.morphTargetInfluences.slice();
+
+			}
 
 			if ( renderObject.bundle !== null ) {
 
@@ -36491,13 +36505,15 @@ class NodeMaterialObserver {
 
 	equals( renderObject ) {
 
+		const { object, material } = renderObject;
+
 		const renderObjectData = this.getRenderObjectData( renderObject );
 
 		// world matrix
 
-		if ( renderObjectData.worldMatrix.equals( renderObject.object.matrixWorld ) !== true ) {
+		if ( renderObjectData.worldMatrix.equals( object.matrixWorld ) !== true ) {
 
-			renderObjectData.worldMatrix.copy( renderObject.object.matrixWorld );
+			renderObjectData.worldMatrix.copy( object.matrixWorld );
 
 			return false;
 
@@ -36506,7 +36522,6 @@ class NodeMaterialObserver {
 		// material
 
 		const materialData = renderObjectData.material;
-		const material = renderObject.material;
 
 		for ( const property in materialData ) {
 
@@ -36544,6 +36559,26 @@ class NodeMaterialObserver {
 
 		}
 
+		// morph targets
+
+		if ( renderObjectData.morphTargetInfluences ) {
+
+			let morphChanged = false;
+
+			for ( let i = 0; i < renderObjectData.morphTargetInfluences.length; i ++ ) {
+
+				if ( renderObjectData.morphTargetInfluences[ i ] !== object.morphTargetInfluences[ i ] ) {
+
+					morphChanged = true;
+
+				}
+
+			}
+
+			if ( morphChanged ) return true;
+
+		}
+
 		// bundle
 
 		if ( renderObject.bundle !== null ) {
@@ -36558,7 +36593,7 @@ class NodeMaterialObserver {
 
 	needsRefresh( renderObject, nodeFrame ) {
 
-		if ( this.hasNode || this.firstInitialization( renderObject ) )
+		if ( this.hasNode || this.hasAnimation || this.firstInitialization( renderObject ) )
 			return true;
 
 		const { renderId } = nodeFrame;
@@ -50118,6 +50153,35 @@ class RenderObject {
 
 	}
 
+	getGeometryCacheKey() {
+
+		const { geometry } = this;
+
+		let cacheKey = '';
+
+		for ( const name of Object.keys( geometry.attributes ).sort() ) {
+
+			const attribute = geometry.attributes[ name ];
+
+			cacheKey += name + ',';
+
+			if ( attribute.data ) cacheKey += attribute.data.stride + ',';
+			if ( attribute.offset ) cacheKey += attribute.offset + ',';
+			if ( attribute.itemSize ) cacheKey += attribute.itemSize + ',';
+			if ( attribute.normalized ) cacheKey += 'n,';
+
+		}
+
+		if ( geometry.index ) {
+
+			cacheKey += 'index,';
+
+		}
+
+		return cacheKey;
+
+	}
+
 	getMaterialCacheKey() {
 
 		const { object, material } = this;
@@ -50174,7 +50238,7 @@ class RenderObject {
 
 		if ( object.geometry ) {
 
-			cacheKey += object.geometry.id + ',';
+			cacheKey += this.getGeometryCacheKey();
 
 		}
 
@@ -78482,7 +78546,6 @@ class WebGPUBackend extends Backend {
 		].join();
 
 	}
-
 
 	// textures
 
