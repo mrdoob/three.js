@@ -9,7 +9,7 @@ const REC2020_LUMINANCE_COEFFICIENTS = [ 0.2627, 0.6780, 0.0593 ];
 const D65 = [ 0.3127, 0.3290 ];
 
 /******************************************************************************
- * Display P3
+ * Display P3 definitions
  */
 
 const LINEAR_DISPLAY_P3_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
@@ -48,7 +48,7 @@ export const LinearDisplayP3ColorSpaceImpl = {
 };
 
 /******************************************************************************
- * Rec. 2020
+ * Rec. 2020 definitions
  */
 
 const LINEAR_REC2020_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
@@ -75,7 +75,7 @@ export const LinearRec2020ColorSpaceImpl = {
 };
 
 /******************************************************************************
- * Rec. 2100 Display (HDR)
+ * Rec. 2100 Display (HDR) definitions
  */
 
 export const LinearRec2100DisplayColorSpace = 'rec2100-display-linear';
