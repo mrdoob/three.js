@@ -2,6 +2,12 @@ import { LinearTransfer, Matrix3, SRGBTransfer } from 'three';
 
 // Reference: http://www.russellcottrell.com/photo/matrixCalculator.htm
 
+const P3_PRIMARIES = [ 0.680, 0.320, 0.265, 0.690, 0.150, 0.060 ];
+const P3_LUMINANCE_COEFFICIENTS = [ 0.2289, 0.6917, 0.0793 ];
+const REC2020_PRIMARIES = [ 0.708, 0.292, 0.170, 0.797, 0.131, 0.046 ];
+const REC2020_LUMINANCE_COEFFICIENTS = [ 0.2627, 0.6780, 0.0593 ];
+const D65 = [ 0.3127, 0.3290 ];
+
 /******************************************************************************
  * Display P3
  */
@@ -18,25 +24,25 @@ const XYZ_TO_LINEAR_DISPLAY_P3 = /*@__PURE__*/ new Matrix3().set(
 	0.0358458, - 0.0761724, 0.9568845
 );
 
-const P3_PRIMARIES = [ 0.680,	0.320,	0.265,	0.690,	0.150,	0.060 ];
-
 export const DisplayP3ColorSpace = 'display-p3';
 export const LinearDisplayP3ColorSpace = 'display-p3-linear';
 
 export const DisplayP3ColorSpaceImpl = {
-	transfer: SRGBTransfer,
 	primaries: P3_PRIMARIES,
+	whitePoint: D65,
+	transfer: SRGBTransfer,
 	toReference: LINEAR_DISPLAY_P3_TO_XYZ,
 	fromReference: XYZ_TO_LINEAR_DISPLAY_P3,
-	luminanceCoefficients: [ 0.2289, 0.6917, 0.0793 ],
+	luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS,
 };
 
 export const LinearDisplayP3ColorSpaceImpl = {
-	transfer: LinearTransfer,
 	primaries: P3_PRIMARIES,
+	whitePoint: D65,
+	transfer: LinearTransfer,
 	toReference: LINEAR_DISPLAY_P3_TO_XYZ,
 	fromReference: XYZ_TO_LINEAR_DISPLAY_P3,
-	luminanceCoefficients: [ 0.2289, 0.6917, 0.0793 ],
+	luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS,
 };
 
 /******************************************************************************
@@ -55,16 +61,15 @@ const XYZ_TO_LINEAR_REC2020 = /*@__PURE__*/ new Matrix3().set(
 	0.0176399, - 0.0427706, 0.9421031
 );
 
-const REC2020_PRIMARIES = [ 0.708,	0.292,	0.170,	0.797,	0.131,	0.046 ];
-
 export const LinearRec2020ColorSpace = 'rec2020-linear';
 
 export const LinearRec2020ColorSpaceImpl = {
-	transfer: LinearTransfer,
 	primaries: REC2020_PRIMARIES,
+	whitePoint: D65,
+	transfer: LinearTransfer,
 	toReference: LINEAR_REC2020_TO_XYZ,
 	fromReference: XYZ_TO_LINEAR_REC2020,
-	luminanceCoefficients: [ 0.2627, 0.6780, 0.0593 ],
+	luminanceCoefficients: REC2020_LUMINANCE_COEFFICIENTS,
 };
 
 /******************************************************************************
@@ -74,9 +79,10 @@ export const LinearRec2020ColorSpaceImpl = {
 export const LinearRec2100DisplayColorSpace = 'rec2100-display-linear';
 
 export const LinearRec2100DisplayColorSpaceImpl = {
-	transfer: LinearTransfer,
 	primaries: REC2020_PRIMARIES,
+	whitePoint: D65,
+	transfer: LinearTransfer,
 	toReference: LINEAR_REC2020_TO_XYZ,
 	fromReference: XYZ_TO_LINEAR_REC2020,
-	luminanceCoefficients: [ 0.2627, 0.6780, 0.0593 ],
+	luminanceCoefficients: REC2020_LUMINANCE_COEFFICIENTS,
 };
