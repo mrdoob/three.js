@@ -661,14 +661,6 @@ ${ flowData.code }
 
 	}
 
-	getSubgroupSize() {
-
-		this.enableSubGroups();
-
-		return this.getBuiltin( 'subgroup_id', 'subgroupID', );
-
-	}
-
 	getInvocationSubgroupIndex() {
 
 		this.enableSubGroups();
