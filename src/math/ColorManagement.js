@@ -49,7 +49,9 @@ export const ColorManagement = {
 
 		if ( this.spaces[ sourceColorSpace ].transfer === SRGBTransfer ) {
 
-			SRGBToLinear( color );
+			color.r = SRGBToLinear( color.r );
+			color.g = SRGBToLinear( color.g );
+			color.b = SRGBToLinear( color.b );
 
 		}
 
@@ -62,7 +64,9 @@ export const ColorManagement = {
 
 		if ( this.spaces[ targetColorSpace ].transfer === SRGBTransfer ) {
 
-			LinearToSRGB( color );
+			color.r = LinearToSRGB( color.r );
+			color.g = LinearToSRGB( color.g );
+			color.b = LinearToSRGB( color.b );
 
 		}
 
