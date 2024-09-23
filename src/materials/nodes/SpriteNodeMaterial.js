@@ -1,5 +1,4 @@
 import NodeMaterial from './NodeMaterial.js';
-import { uniform } from '../../nodes/core/UniformNode.js';
 import { cameraProjectionMatrix } from '../../nodes/accessors/Camera.js';
 import { materialRotation } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../../nodes/accessors/ModelNode.js';
@@ -8,6 +7,7 @@ import { rotate } from '../../nodes/utils/RotateNode.js';
 import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
 
 import { SpriteMaterial } from '../SpriteMaterial.js';
+import { reference } from '../../nodes/accessors/ReferenceBaseNode.js';
 
 const _defaultValues = /*@__PURE__*/ new SpriteMaterial();
 
@@ -40,7 +40,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 	setupPosition( { object, camera, context } ) {
 
-		const useSizeAttenuation = this.sizeAttenuation;
+		const sizeAttenuation = this.sizeAttenuation;
 
 		// < VERTEX STAGE >
 
@@ -59,7 +59,7 @@ class SpriteNodeMaterial extends NodeMaterial {
 		}
 
 
-		if ( ! useSizeAttenuation && camera.isPerspectiveCamera ) {
+		if ( ! sizeAttenuation && camera.isPerspectiveCamera ) {
 
 			scale = scale.mul( mvPosition.z.negate() );
 
@@ -69,7 +69,9 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		if ( object.center && object.center.isVector2 === true ) {
 
-			alignedPosition = alignedPosition.sub( uniform( object.center ).sub( 0.5 ) );
+			const center = reference( 'center', 'vec2', object );
+
+			alignedPosition = alignedPosition.sub( center.sub( 0.5 ) );
 
 		}
 
