@@ -23,6 +23,8 @@ const getLightNodeById = ( id, lightNodes ) => {
 
 };
 
+const _lightsNodeRef = /*@__PURE__*/ new WeakMap();
+
 class LightsNode extends Node {
 
 	static get type() {
@@ -119,7 +121,20 @@ class LightsNode extends Node {
 
 					}
 
-					lightNodes.push( nodeObject( new lightNodeClass( light ) ) );
+					let lightNode = null;
+
+					if ( ! _lightsNodeRef.has( light ) ) {
+
+						lightNode = new lightNodeClass( light );
+						_lightsNodeRef.set( light, lightNode );
+
+					} else {
+
+						lightNode = _lightsNodeRef.get( light );
+
+					}
+
+					lightNodes.push( lightNode );
 
 				}
 
