@@ -20,7 +20,7 @@ class ClippingContext {
 
 		this.parentVersion = 0;
 		this.viewNormalMatrix = new Matrix3();
-		this.cacheKey = '';
+		this.cacheKey = 0;
 
 	}
 
@@ -95,7 +95,7 @@ class ClippingContext {
 		if ( update ) {
 
 			this.version ++;
-			this.cacheKey = `${ this.globalClippingCount }:${ this.localClippingEnabled === undefined ? false : this.localClippingEnabled }:`;
+			this.cacheKey = this.globalClippingCount << ( this.localClippingEnabled === undefined && this.localClippingEnabled ? 0 : 16 );
 
 		}
 
@@ -165,7 +165,7 @@ class ClippingContext {
 		if ( update ) {
 
 			this.version += parent.version;
-			this.cacheKey = parent.cacheKey + `:${ this.localClippingCount }:${ this.localClipIntersection === undefined ? false : this.localClipIntersection }`;
+			this.cacheKey = parent.cacheKey + ( this.localClippingCount << ( this.localClipIntersection === undefined && this.localClipIntersection ? 0 : 16 ) );
 
 		}
 

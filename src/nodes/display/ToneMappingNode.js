@@ -25,10 +25,7 @@ class ToneMappingNode extends TempNode {
 
 	getCacheKey() {
 
-		let cacheKey = super.getCacheKey();
-		cacheKey = '{toneMapping:' + this.toneMapping + ',nodes:' + cacheKey + '}';
-
-		return cacheKey;
+		return super.getCacheKey() + this.toneMapping;
 
 	}
 

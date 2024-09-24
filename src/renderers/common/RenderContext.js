@@ -50,17 +50,15 @@ export function getCacheKey( renderContext ) {
 
 	const { textures, activeCubeFace } = renderContext;
 
-	let key = '';
+	let key = 0;
 
 	for ( const texture of textures ) {
 
-		key += texture.id + ',';
+		key = Math.imul( key, texture.id << 4 );
 
 	}
 
-	key += activeCubeFace;
-
-	return key;
+	return key + ( activeCubeFace << 16 );
 
 }
 

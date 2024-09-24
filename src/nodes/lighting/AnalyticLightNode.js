@@ -238,7 +238,7 @@ class AnalyticLightNode extends LightingNode {
 
 	getCacheKey() {
 
-		return super.getCacheKey() + '-' + ( this.light.id + '-' + ( this.light.castShadow ? '1' : '0' ) );
+		return super.getCacheKey() + this.light.id + ( ( this.light.castShadow ? 1 : 0 ) << 16 );
 
 	}
 
