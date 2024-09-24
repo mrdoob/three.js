@@ -1,4 +1,4 @@
-import { cyrb53 } from '../../nodes/core/NodeUtils.js';
+import { hashString } from '../../nodes/core/NodeUtils.js';
 import ClippingContext from './ClippingContext.js';
 
 let _id = 0;
@@ -370,7 +370,7 @@ export default class RenderObject {
 
 		}
 
-		return cyrb53( cacheKey );
+		return hashString( cacheKey );
 
 	}
 

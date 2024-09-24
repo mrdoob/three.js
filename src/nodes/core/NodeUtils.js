@@ -10,7 +10,7 @@ import { Vector4 } from '../../math/Vector4.js';
 // Largely inspired by MurmurHash2/3, but with a focus on speed/simplicity.
 // See https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript/52171480#52171480
 // https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
-export function cyrb53( str, seed = 0 ) {
+export function hashString( str, seed = 0 ) {
 
 	let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
 
@@ -31,24 +31,48 @@ export function cyrb53( str, seed = 0 ) {
 
 }
 
+export function hashArray( array ) {
+
+	const len = array.length;
+
+	let h1 = 0xdeadbeef ^ len, h2 = 0x41c6ce57 ^ len;
+
+	for ( let i = 0; i < len; i ++ ) {
+
+		const value = array[ i ];
+
+		h1 = Math.imul( h1 ^ value, 2654435761 );
+		h2 = Math.imul( h2 ^ value, 1597334677 );
+
+	}
+
+	h1 = Math.imul( h1 ^ ( h1 >>> 16 ), 2246822507 );
+	h1 ^= Math.imul( h2 ^ ( h2 >>> 13 ), 3266489909 );
+	h2 = Math.imul( h2 ^ ( h2 >>> 16 ), 2246822507 );
+	h2 ^= Math.imul( h1 ^ ( h1 >>> 13 ), 3266489909 );
+
+	return 4294967296 * ( 2097151 & h2 ) + ( h1 >>> 0 );
+
+}
+
 export function getCacheKey( object, force = false ) {
 
-	let cacheKey = 0;
+	const values = [];
 
 	if ( object.isNode === true ) {
 
-		cacheKey += object.id;
+		values.push( object.id );
 		object = object.getSelf();
 
 	}
 
 	for ( const { property, childNode } of getNodeChildren( object ) ) {
 
-		cacheKey = Math.imul( cacheKey, cyrb53( property.slice( 0, - 4 ) ) ) + childNode.getCacheKey( force );
+		values.push( values, hashString( property.slice( 0, - 4 ) ), childNode.getCacheKey( force ) );
 
 	}
 
-	return cacheKey;
+	return hashArray( values );
 
 }
 

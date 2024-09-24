@@ -1,6 +1,7 @@
 import { Matrix3 } from '../../math/Matrix3.js';
 import { Plane } from '../../math/Plane.js';
 import { Vector4 } from '../../math/Vector4.js';
+import { hashArray } from '../../nodes/core/NodeUtils.js';
 
 const _plane = /*@__PURE__*/ new Plane();
 
@@ -95,7 +96,7 @@ class ClippingContext {
 		if ( update ) {
 
 			this.version ++;
-			this.cacheKey = this.globalClippingCount << ( this.localClippingEnabled === true ? 16 : 0 );
+			this.cacheKey = hashArray( [ this.globalClippingCount, this.localClippingEnabled === true ? 1 : 0 ] );
 
 		}
 
@@ -165,7 +166,7 @@ class ClippingContext {
 		if ( update ) {
 
 			this.version += parent.version;
-			this.cacheKey = parent.cacheKey + ( this.localClippingCount << ( this.localClipIntersection === true ? 16 : 0 ) );
+			this.cacheKey = hashArray( [ parent.cacheKey, this.localClippingCount, this.localClipIntersection === true ? 1 : 0 ] );
 
 		}
 

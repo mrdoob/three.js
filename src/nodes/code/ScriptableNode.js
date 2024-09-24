@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { scriptableValue } from './ScriptableValueNode.js';
 import { nodeProxy, float } from '../tsl/TSLBase.js';
-import { cyrb53 } from '../core/NodeUtils.js';
+import { hashArray, hashString } from '../core/NodeUtils.js';
 
 class Resources extends Map {
 
@@ -446,15 +446,15 @@ class ScriptableNode extends Node {
 
 	getCacheKey( force ) {
 
-		let cacheKey = cyrb53( this.source ) + this.getDefaultOutputNode().getCacheKey( force );
+		const values = [ hashString( this.source ), this.getDefaultOutputNode().getCacheKey( force ) ];
 
 		for ( const param in this.parameters ) {
 
-			cacheKey += this.parameters[ param ].getCacheKey( force );
+			values.push( this.parameters[ param ].getCacheKey( force ) );
 
 		}
 
-		return cacheKey;
+		return hashArray( values );
 
 	}
 
