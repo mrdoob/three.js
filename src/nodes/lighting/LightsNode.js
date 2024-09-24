@@ -47,6 +47,8 @@ class LightsNode extends Node {
 		this._lightNodes = null;
 		this._lightNodesHash = null;
 
+		this.global = true;
+
 	}
 
 	getHash( builder ) {
