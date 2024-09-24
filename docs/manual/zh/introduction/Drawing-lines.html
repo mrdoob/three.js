@@ -61,6 +61,50 @@ renderer.render( scene, camera );
 			</code>
 
 			<p>你现在应当已经看到了一个由两条蓝线组成的、指向上的箭头。</p>
+
+			完整示例
+			<code>
+			import * as THREE from 'three';
+
+			// 创建场景
+			const scene = new THREE.Scene();
+			
+			// 创建透视相机
+			const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			camera.position.set( 0, 0, 100 );
+			camera.lookAt( 0, 0, 0 );
+			
+			// 创建渲染器
+			const renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+			
+			// 创建材质
+			const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+			
+			// 创建几何体
+			const points = [];
+			points.push( new THREE.Vector3( -10, 0, 0 ) );
+			points.push( new THREE.Vector3( 0, 10, 0 ) );
+			points.push( new THREE.Vector3( 10, 0, 0 ) );
+			
+			const geometry = new THREE.BufferGeometry().setFromPoints( points );
+			
+			// 创建线条并添加到场景
+			const line = new THREE.Line( geometry, material );
+			scene.add( line );
+			
+			// 动画函数
+			function animate() {
+			    requestAnimationFrame( animate );
+			
+			    // 渲染场景和相机
+			    renderer.render( scene, camera );
+			}
+			
+			// 开始动画
+			animate();
+			</code>
 		</div>
 	</body>
 </html>
