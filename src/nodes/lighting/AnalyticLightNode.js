@@ -239,7 +239,7 @@ class AnalyticLightNode extends LightingNode {
 
 	getCacheKey() {
 
-		return hashArray( super.getCacheKey(), this.light.id, this.light.castShadow ? 1 : 0 );
+		return hashArray( [ super.getCacheKey(), this.light.id, this.light.castShadow ? 1 : 0 ] );
 
 	}
 
