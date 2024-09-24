@@ -868,7 +868,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	getGeometryRangeAt( geometryId ) {
+	getGeometryRangeAt( geometryId, target = {} ) {
 
 		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
 
@@ -877,7 +877,11 @@ class BatchedMesh extends Mesh {
 		}
 
 		const drawRange = this._drawRanges[ geometryId ];
-		return { ...drawRange }; // cloned to avoid external changes
+
+		target.start = drawRange.start;
+		target.count = drawRange.count;
+
+		return target;
 
 	}
 

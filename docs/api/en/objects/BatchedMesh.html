@@ -170,12 +170,14 @@
 		<p>Get whether the given instance is marked as "visible" or not.</p>		
 
 		<h3>
-			[method:Object getGeometryRangeAt]( [param:Integer geometryId] )
+			[method:Object getGeometryRangeAt]( [param:Integer geometryId], [param:Object target] )
 		</h3>
 		<p>
 			[page:Integer geometryId]: The id of the geometry to get the range of.
 		</p>
-		
+		<p>
+			[page:Object target]: Optional target object to copy the range in to.
+		</p>
 		<p>Get the range representing the subset of triangles related to the attached geometry, indicating the starting offset and count, or `null` if invalid.</p>
 		<p>Return an object of the form:</p>
 		<code>{ start: Integer, count: Integer }</code>
