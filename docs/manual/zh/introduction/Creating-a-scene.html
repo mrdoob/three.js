@@ -125,30 +125,41 @@
 		<code>
 		import * as THREE from 'three';
 
+		// 创建场景
 		const scene = new THREE.Scene();
+		
+		// 创建透视相机
 		const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
+		
+		// 创建渲染器
 		const renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
-
+		
+		// 创建立方体的几何体和材质
 		const geometry = new THREE.BoxGeometry( 1, 1, 1 );
 		const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		const cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
-
+		
+		// 设置相机位置
 		camera.position.z = 5;
-
+		
+		// 动画函数
 		function animate() {
-			requestAnimationFrame( animate );
-
-			cube.rotation.x += 0.01;
-			cube.rotation.y += 0.01;
-
-			renderer.render( scene, camera );
+		    requestAnimationFrame( animate );
+		
+		    // 旋转立方体
+		    cube.rotation.x += 0.01;
+		    cube.rotation.y += 0.01;
+		
+		    // 渲染场景和相机
+		    renderer.render( scene, camera );
 		}
-
+		
+		// 开始动画
 		animate();
+
 		</code>
 	</body>
 </html>
