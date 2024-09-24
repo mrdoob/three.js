@@ -44,7 +44,7 @@ export function getCacheKey( object, force = false ) {
 
 	for ( const { property, childNode } of getNodeChildren( object ) ) {
 
-		cacheKey = Math.imul( cacheKey, cyrb53( property.slice( 0, - 4 ) + ':' + childNode.getCacheKey( force ) ) );
+		cacheKey = Math.imul( cacheKey, cyrb53( property.slice( 0, - 4 ) ) ) + childNode.getCacheKey( force );
 
 	}
 
