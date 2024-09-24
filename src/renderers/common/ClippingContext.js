@@ -95,7 +95,7 @@ class ClippingContext {
 		if ( update ) {
 
 			this.version ++;
-			this.cacheKey = this.globalClippingCount << ( this.localClippingEnabled === undefined && this.localClippingEnabled ? 0 : 16 );
+			this.cacheKey = this.globalClippingCount << ( this.localClippingEnabled === true ? 16 : 0 );
 
 		}
 
@@ -165,7 +165,7 @@ class ClippingContext {
 		if ( update ) {
 
 			this.version += parent.version;
-			this.cacheKey = parent.cacheKey + ( this.localClippingCount << ( this.localClipIntersection === undefined && this.localClipIntersection ? 0 : 16 ) );
+			this.cacheKey = parent.cacheKey + ( this.localClippingCount << ( this.localClipIntersection === true ? 16 : 0 ) );
 
 		}
 

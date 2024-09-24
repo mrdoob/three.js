@@ -6,7 +6,6 @@ import { NodeFrame } from '../../../nodes/Nodes.js';
 import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, normalWorld, pmremTexture, screenUV } from '../../../nodes/TSL.js';
 
 import { CubeUVReflectionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
-import { cyrb53 } from '../../../nodes/core/NodeUtils.js';
 
 const outputNodeMap = new WeakMap();
 
