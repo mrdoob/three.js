@@ -55,6 +55,8 @@ export function hashArray( array ) {
 
 }
 
+export const hash = ( ...params ) => hashArray( params );
+
 export function getCacheKey( object, force = false ) {
 
 	const values = [];

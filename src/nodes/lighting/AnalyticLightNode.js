@@ -16,7 +16,7 @@ import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
-import { hashArray } from '../core/NodeUtils.js';
+import { hash } from '../core/NodeUtils.js';
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
 
@@ -239,7 +239,7 @@ class AnalyticLightNode extends LightingNode {
 
 	getCacheKey() {
 
-		return hashArray( [ super.getCacheKey(), this.light.id, this.light.castShadow ? 1 : 0 ] );
+		return hash( super.getCacheKey(), this.light.id, this.light.castShadow ? 1 : 0 );
 
 	}
 
