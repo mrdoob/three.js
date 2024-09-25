@@ -90,14 +90,6 @@ class ToonOutlinePassNode extends PassNode {
 
 	_getOutlineMaterial( originalMaterial ) {
 
-		const outlineMaterial = this._getOutlineMaterialFromCache( originalMaterial );
-
-		return outlineMaterial;
-
-	}
-
-	_getOutlineMaterialFromCache( originalMaterial ) {
-
 		let outlineMaterial = this._materialCache.get( originalMaterial );
 
 		if ( outlineMaterial === undefined ) {
