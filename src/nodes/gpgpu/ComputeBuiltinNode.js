@@ -39,8 +39,6 @@ class ComputeBuiltinNode extends Node {
 
 	getBuiltinName( /*builder*/ ) {
 
-		console.log( this._builtinName );
-
 		return this._builtinName;
 
 	}
