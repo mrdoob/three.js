@@ -114,6 +114,7 @@ export { default as StereoPassNode } from './display/StereoPassNode.js';
 export { default as AnaglyphPassNode } from './display/AnaglyphPassNode.js';
 export { default as ParallaxBarrierPassNode } from './display/ParallaxBarrierPassNode.js';
 export { default as PassNode } from './display/PassNode.js';
+export { default as ToonOutlinePassNode } from './display/ToonOutlinePassNode.js';
 
 // code
 export { default as ExpressionNode } from './code/ExpressionNode.js';
