@@ -233,7 +233,7 @@ class Nodes extends DataMap {
 			if ( environmentNode ) values.push( environmentNode.getCacheKey() );
 			if ( fogNode ) values.push( fogNode.getCacheKey() );
 
-			values.push( this.renderer.shadowMap.enabled );
+			values.push( this.renderer.shadowMap.enabled ? 1 : 0 );
 
 			cacheKeyData = {
 				callId,
