@@ -1,6 +1,7 @@
 import { Matrix3 } from '../../math/Matrix3.js';
 import { Plane } from '../../math/Plane.js';
 import { Vector4 } from '../../math/Vector4.js';
+import { hash } from '../../nodes/core/NodeUtils.js';
 
 const _plane = /*@__PURE__*/ new Plane();
 
@@ -20,7 +21,7 @@ class ClippingContext {
 
 		this.parentVersion = 0;
 		this.viewNormalMatrix = new Matrix3();
-		this.cacheKey = '';
+		this.cacheKey = 0;
 
 	}
 
@@ -95,7 +96,7 @@ class ClippingContext {
 		if ( update ) {
 
 			this.version ++;
-			this.cacheKey = `${ this.globalClippingCount }:${ this.localClippingEnabled === undefined ? false : this.localClippingEnabled }:`;
+			this.cacheKey = hash( this.globalClippingCount, this.localClippingEnabled === true ? 1 : 0 );
 
 		}
 
@@ -165,7 +166,7 @@ class ClippingContext {
 		if ( update ) {
 
 			this.version += parent.version;
-			this.cacheKey = parent.cacheKey + `:${ this.localClippingCount }:${ this.localClipIntersection === undefined ? false : this.localClipIntersection }`;
+			this.cacheKey = hash( parent.cacheKey, this.localClippingCount, this.localClipIntersection === true ? 1 : 0 );
 
 		}
 

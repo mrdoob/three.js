@@ -1,3 +1,4 @@
+import { hashString } from '../../nodes/core/NodeUtils.js';
 import ClippingContext from './ClippingContext.js';
 
 let _id = 0;
@@ -369,7 +370,7 @@ export default class RenderObject {
 
 		}
 
-		return cacheKey;
+		return hashString( cacheKey );
 
 	}
 
@@ -383,13 +384,21 @@ export default class RenderObject {
 
 		// Environment Nodes Cache Key
 
-		return this.object.receiveShadow + ',' + this._nodes.getCacheKey( this.scene, this.lightsNode );
+		let cacheKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
+
+		if ( this.object.receiveShadow ) {
+
+			cacheKey += 1;
+
+		}
+
+		return cacheKey;
 
 	}
 
 	getCacheKey() {
 
-		return this.getMaterialCacheKey() + ',' + this.getDynamicCacheKey();
+		return this.getMaterialCacheKey() + this.getDynamicCacheKey();
 
 	}
 
