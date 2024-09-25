@@ -48,7 +48,7 @@ class OutputStructNode extends Node {
 
 			const snippet = members[ i ].build( builder, output );
 
-			builder.addLineFlowCode( `${ structPrefix }m${ i } = ${ snippet }` );
+			builder.addLineFlowCode( `${ structPrefix }m${ i } = ${ snippet }`, this );
 
 		}
 

@@ -941,9 +941,58 @@ class NodeBuilder {
 
 	}
 
-	addLineFlowCode( code ) {
+	addFlowCodeHierarchy( node, nodeBlock ) {
+
+		const { flowCodes, flowCodeBlock } = this.getDataFromNode( node );
+
+		let needsFlowCode = true;
+		let nodeBlockHierarchy = nodeBlock;
+
+		while ( nodeBlockHierarchy ) {
+
+			if ( flowCodeBlock.get( nodeBlockHierarchy ) === true ) {
+
+				needsFlowCode = false;
+				break;
+
+			}
+
+			nodeBlockHierarchy = this.getDataFromNode( nodeBlockHierarchy ).parentNodeBlock;
+
+		}
+
+		if ( needsFlowCode ) {
+
+			for ( const flowCode of flowCodes ) {
+
+				this.addLineFlowCode( flowCode );
+
+			}
+
+		}
+
+	}
+
+	addLineFlowCodeBlock( node, code, nodeBlock ) {
+
+		const nodeData = this.getDataFromNode( node );
+		const flowCodes = nodeData.flowCodes || ( nodeData.flowCodes = [] );
+		const codeBlock = nodeData.flowCodeBlock || ( nodeData.flowCodeBlock = new WeakMap() );
+
+		flowCodes.push( code );
+		codeBlock.set( nodeBlock, true );
+
+	}
+
+	addLineFlowCode( code, node = null ) {
 
 		if ( code === '' ) return this;
+
+		if ( node !== null && this.context.nodeBlock ) {
+
+			this.addLineFlowCodeBlock( node, code, this.context.nodeBlock );
+
+		}
 
 		code = this.tab + code;
 
