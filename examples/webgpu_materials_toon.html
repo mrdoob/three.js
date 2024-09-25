@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, toonOutline } from 'three/tsl';
+			import { toonOutlinePass } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -59,7 +59,7 @@
 
 				//
 
-				renderer = new THREE.WebGPURenderer( { antialias: false } );
+				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
@@ -69,8 +69,7 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				postProcessing.outputNode = toonOutline( scenePass );
+				postProcessing.outputNode = toonOutlinePass( scene, camera );
 
 
 				// Materials

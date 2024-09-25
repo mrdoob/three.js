@@ -118,7 +118,7 @@ export * from './display/AnaglyphPassNode.js';
 export * from './display/ParallaxBarrierPassNode.js';
 export * from './display/BleachBypass.js';
 export * from './display/Sepia.js';
-export * from './display/ToonOutlineNode.js';
+export * from './display/ToonOutlinePassNode.js';
 
 export * from './display/PassNode.js';
 
