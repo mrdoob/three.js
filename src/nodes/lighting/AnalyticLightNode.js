@@ -253,6 +253,8 @@ class AnalyticLightNode extends LightingNode {
 
 		const { object, renderer } = builder;
 
+		if ( renderer.shadowMap.enabled === false ) return;
+
 		let shadowColorNode = this.shadowColorNode;
 
 		if ( shadowColorNode === null ) {
