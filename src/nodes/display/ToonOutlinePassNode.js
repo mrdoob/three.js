@@ -40,7 +40,7 @@ class ToonOutlinePassNode extends PassNode {
 
 			if ( material.isMeshToonMaterial || material.isMeshToonNodeMaterial ) {
 
-				if ( material.wireframe === false || material.depthTest === false ) {
+				if ( material.wireframe === false ) {
 
 					const outlineMaterial = this._getOutlineMaterial( material );
 					renderer.renderObject( object, scene, camera, geometry, outlineMaterial, group, lightsNode );
