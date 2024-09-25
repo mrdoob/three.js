@@ -98,6 +98,7 @@ class ReferenceBaseNode extends Node {
 
 		if ( this.node === null ) {
 
+			this.updateReference( builder );
 			this.updateValue();
 
 		}
