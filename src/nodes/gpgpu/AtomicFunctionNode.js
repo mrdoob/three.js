@@ -54,11 +54,11 @@ class AtomicFunctionNode extends TempNode {
 
 			const varSnippet = this.storeNode.build( builder, inputType );
 
-			builder.addLineFlowCode( `${varSnippet} = ${methodSnippet}` );
+			builder.addLineFlowCode( `${varSnippet} = ${methodSnippet}`, this );
 
 		} else {
 
-			builder.addLineFlowCode( methodSnippet );
+			builder.addLineFlowCode( methodSnippet, this );
 
 		}
 
