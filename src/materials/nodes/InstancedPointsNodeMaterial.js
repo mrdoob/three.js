@@ -77,12 +77,17 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 			offset.mulAssign( this.pointWidthNode ? this.pointWidthNode : materialPointWidth );
 
 
-			let scale = 1.0 * renderer.getPixelRatio();
+			const pixelRatio = renderer.getPixelRatio();
+			const scale = float( 1.0 ).toVar();
 
 			if ( sizeAttenuation && camera.isPerspectiveCamera ) {
 
 				const fovAdjustment = cameraProjectionMatrix[ 1 ][ 1 ];
-				scale = viewport.w.mul( 0.5 ).div( mvPosition.z.negate() ).div( fovAdjustment );
+				scale.assign( viewport.w.mul( 0.5 ).mul( pixelRatio ).div( mvPosition.z.negate() ).div( fovAdjustment.mul( pixelRatio ) ) );
+
+			} else {
+
+				scale.assign( pixelRatio );
 
 			}
 
