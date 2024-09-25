@@ -40,8 +40,12 @@ class ToonOutlinePassNode extends PassNode {
 
 			if ( material.isMeshToonMaterial || material.isMeshToonNodeMaterial ) {
 
-				const outlineMaterial = this._getOutlineMaterial( material );
-				renderer.renderObject( object, scene, camera, geometry, outlineMaterial, group, lightsNode );
+				if ( material.wireframe === false || material.depthTest === false ) {
+
+					const outlineMaterial = this._getOutlineMaterial( material );
+					renderer.renderObject( object, scene, camera, geometry, outlineMaterial, group, lightsNode );
+
+				}
 
 			}
 
@@ -76,9 +80,9 @@ class ToonOutlinePassNode extends PassNode {
 
 		material.vertexNode = pos.add( norm.mul( this.thicknessNode ).mul( pos.w ).mul( ratio ) );
 
-		// fragment node
+		// color node
 
-		material.fragmentNode = vec4( this.colorNode, this.alphaNode );
+		material.colorNode = vec4( this.colorNode, this.alphaNode );
 
 		return material;
 
@@ -87,8 +91,6 @@ class ToonOutlinePassNode extends PassNode {
 	_getOutlineMaterial( originalMaterial ) {
 
 		const outlineMaterial = this._getOutlineMaterialFromCache( originalMaterial );
-
-		this._updateOutlineMaterial( outlineMaterial, originalMaterial );
 
 		return outlineMaterial;
 
@@ -107,14 +109,6 @@ class ToonOutlinePassNode extends PassNode {
 		}
 
 		return outlineMaterial;
-
-	}
-
-	_updateOutlineMaterial( material, originalMaterial ) {
-
-		material.visible = originalMaterial.visible;
-
-		// TODO: Support more material properties
 
 	}
 
