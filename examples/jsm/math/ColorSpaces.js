@@ -31,8 +31,8 @@ export const DisplayP3ColorSpaceImpl = {
 	primaries: P3_PRIMARIES,
 	whitePoint: D65,
 	transfer: SRGBTransfer,
-	toReference: LINEAR_DISPLAY_P3_TO_XYZ,
-	fromReference: XYZ_TO_LINEAR_DISPLAY_P3,
+	toXYZ: LINEAR_DISPLAY_P3_TO_XYZ,
+	fromXYZ: XYZ_TO_LINEAR_DISPLAY_P3,
 	luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS,
 	outputColorSpaceConfig: { drawingBufferColorSpace: DisplayP3ColorSpace }
 };
@@ -41,8 +41,8 @@ export const LinearDisplayP3ColorSpaceImpl = {
 	primaries: P3_PRIMARIES,
 	whitePoint: D65,
 	transfer: LinearTransfer,
-	toReference: LINEAR_DISPLAY_P3_TO_XYZ,
-	fromReference: XYZ_TO_LINEAR_DISPLAY_P3,
+	toXYZ: LINEAR_DISPLAY_P3_TO_XYZ,
+	fromXYZ: XYZ_TO_LINEAR_DISPLAY_P3,
 	luminanceCoefficients: P3_LUMINANCE_COEFFICIENTS,
 	workingColorSpaceConfig: { unpackColorSpace: DisplayP3ColorSpace }
 };
@@ -69,7 +69,7 @@ export const LinearRec2020ColorSpaceImpl = {
 	primaries: REC2020_PRIMARIES,
 	whitePoint: D65,
 	transfer: LinearTransfer,
-	toReference: LINEAR_REC2020_TO_XYZ,
-	fromReference: XYZ_TO_LINEAR_REC2020,
+	toXYZ: LINEAR_REC2020_TO_XYZ,
+	fromXYZ: XYZ_TO_LINEAR_REC2020,
 	luminanceCoefficients: REC2020_LUMINANCE_COEFFICIENTS,
 };

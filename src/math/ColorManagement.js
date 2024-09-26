@@ -14,8 +14,8 @@ export const ColorManagement = {
 	 *	- primaries: chromaticity coordinates [ rx ry gx gy bx by ]
 	 *	- whitePoint: reference white [ x y ]
 	 *	- transfer: transfer function (pre-defined)
-	 *	- toReference: Matrix3 RGB to XYZ transform
-	 *	- fromReference: Matrix3 XYZ to RGB transform
+	 *	- toXYZ: Matrix3 RGB to XYZ transform
+	 *	- fromXYZ: Matrix3 XYZ to RGB transform
 	 *	- luminanceCoefficients: RGB luminance coefficients
 	 *
 	 * Optional:
@@ -45,8 +45,8 @@ export const ColorManagement = {
 
 		if ( this.spaces[ sourceColorSpace ].primaries !== this.spaces[ targetColorSpace ].primaries ) {
 
-			color.applyMatrix3( this.spaces[ sourceColorSpace ].toReference );
-			color.applyMatrix3( this.spaces[ targetColorSpace ].fromReference );
+			color.applyMatrix3( this.spaces[ sourceColorSpace ].toXYZ );
+			color.applyMatrix3( this.spaces[ targetColorSpace ].fromXYZ );
 
 		}
 
@@ -105,8 +105,8 @@ export const ColorManagement = {
 	_getMatrix: function ( targetMatrix, sourceColorSpace, targetColorSpace ) {
 
 		return targetMatrix
-			.copy( this.spaces[ sourceColorSpace ].toReference )
-			.multiply( this.spaces[ targetColorSpace ].fromReference );
+			.copy( this.spaces[ sourceColorSpace ].toXYZ )
+			.multiply( this.spaces[ targetColorSpace ].fromXYZ );
 
 	},
 
@@ -163,8 +163,8 @@ ColorManagement.define( {
 		primaries: REC709_PRIMARIES,
 		whitePoint: D65,
 		transfer: LinearTransfer,
-		toReference: LINEAR_REC709_TO_XYZ,
-		fromReference: XYZ_TO_LINEAR_REC709,
+		toXYZ: LINEAR_REC709_TO_XYZ,
+		fromXYZ: XYZ_TO_LINEAR_REC709,
 		luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
 		workingColorSpaceConfig: { unpackColorSpace: SRGBColorSpace }
 	},
@@ -173,8 +173,8 @@ ColorManagement.define( {
 		primaries: REC709_PRIMARIES,
 		whitePoint: D65,
 		transfer: SRGBTransfer,
-		toReference: LINEAR_REC709_TO_XYZ,
-		fromReference: XYZ_TO_LINEAR_REC709,
+		toXYZ: LINEAR_REC709_TO_XYZ,
+		fromXYZ: XYZ_TO_LINEAR_REC709,
 		luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
 		outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace }
 	},
