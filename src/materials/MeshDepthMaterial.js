@@ -15,8 +15,6 @@ class MeshDepthMaterial extends Material {
 
 		this.isMeshDepthMaterial = true;
 
-		this.type = 'MeshDepthMaterial';
-
 		this.depthPacking = BasicDepthPacking;
 
 		this.map = null;
