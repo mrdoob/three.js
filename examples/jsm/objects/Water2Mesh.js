@@ -1,11 +1,10 @@
 import {
 	Color,
 	Mesh,
-	NodeMaterial,
 	Vector2,
 	Vector3
 } from 'three';
-import { vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, texture, uniform, TempNode, NodeUpdateType, vec4, Fn, cameraPosition, positionWorld, uv, mix, vec3, normalize, max, dot, viewportUV } from 'three/tsl';
+import { Fn, NodeMaterial, NodeUpdateType, TempNode, vec2, viewportSafeUV, viewportSharedTexture, reflector, pow, float, abs, texture, uniform, vec4, cameraPosition, positionWorld, uv, mix, vec3, normalize, max, dot, screenUV } from 'three/tsl';
 
 /**
  * References:
@@ -141,7 +140,7 @@ class WaterNode extends TempNode {
 			this.waterBody.add( reflectionSampler.target );
 			reflectionSampler.uvNode = reflectionSampler.uvNode.add( offset );
 
-			const refractorUV = viewportUV.add( offset );
+			const refractorUV = screenUV.add( offset );
 			const refractionSampler = viewportSharedTexture( viewportSafeUV( refractorUV ) );
 
 			// calculate final uv coords

@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '168';
+const REVISION = '169';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -1591,6 +1591,38 @@ function probeAsync( gl, sync, interval ) {
 		setTimeout( probe, interval );
 
 	} );
+
+}
+
+function toNormalizedProjectionMatrix( projectionMatrix ) {
+
+	const m = projectionMatrix.elements;
+
+	// Convert [-1, 1] to [0, 1] projection matrix
+	m[ 2 ] = 0.5 * m[ 2 ] + 0.5 * m[ 3 ];
+	m[ 6 ] = 0.5 * m[ 6 ] + 0.5 * m[ 7 ];
+	m[ 10 ] = 0.5 * m[ 10 ] + 0.5 * m[ 11 ];
+	m[ 14 ] = 0.5 * m[ 14 ] + 0.5 * m[ 15 ];
+
+}
+
+function toReversedProjectionMatrix( projectionMatrix ) {
+
+	const m = projectionMatrix.elements;
+	const isPerspectiveMatrix = m[ 11 ] === - 1;
+
+	// Reverse [0, 1] projection matrix
+	if ( isPerspectiveMatrix ) {
+
+		m[ 10 ] = - m[ 10 ] - 1;
+		m[ 14 ] = - m[ 14 ];
+
+	} else {
+
+		m[ 10 ] = - m[ 10 ];
+		m[ 14 ] = - m[ 14 ] + 1;
+
+	}
 
 }
 
@@ -8189,6 +8221,10 @@ const _vap = /*@__PURE__*/ new Vector3();
 const _vbp = /*@__PURE__*/ new Vector3();
 const _vcp = /*@__PURE__*/ new Vector3();
 
+const _v40 = /*@__PURE__*/ new Vector4();
+const _v41 = /*@__PURE__*/ new Vector4();
+const _v42 = /*@__PURE__*/ new Vector4();
+
 class Triangle {
 
 	constructor( a = new Vector3(), b = new Vector3(), c = new Vector3() ) {
@@ -8278,6 +8314,25 @@ class Triangle {
 		target.addScaledVector( v1, _v3$2.x );
 		target.addScaledVector( v2, _v3$2.y );
 		target.addScaledVector( v3, _v3$2.z );
+
+		return target;
+
+	}
+
+	static getInterpolatedAttribute( attr, i1, i2, i3, barycoord, target ) {
+
+		_v40.setScalar( 0 );
+		_v41.setScalar( 0 );
+		_v42.setScalar( 0 );
+
+		_v40.fromBufferAttribute( attr, i1 );
+		_v41.fromBufferAttribute( attr, i2 );
+		_v42.fromBufferAttribute( attr, i3 );
+
+		target.setScalar( 0 );
+		target.addScaledVector( _v40, barycoord.x );
+		target.addScaledVector( _v41, barycoord.y );
+		target.addScaledVector( _v42, barycoord.z );
 
 		return target;
 
@@ -9898,7 +9953,6 @@ class BufferAttribute {
 		this.normalized = normalized;
 
 		this.usage = StaticDrawUsage;
-		this._updateRange = { offset: 0, count: - 1 };
 		this.updateRanges = [];
 		this.gpuType = FloatType;
 
@@ -9911,13 +9965,6 @@ class BufferAttribute {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
-
-	}
-
-	get updateRange() {
-
-		warnOnce( 'THREE.BufferAttribute: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
-		return this._updateRange;
 
 	}
 
@@ -11565,14 +11612,6 @@ const _vC$1 = /*@__PURE__*/ new Vector3();
 const _tempA = /*@__PURE__*/ new Vector3();
 const _morphA = /*@__PURE__*/ new Vector3();
 
-const _uvA$1 = /*@__PURE__*/ new Vector2();
-const _uvB$1 = /*@__PURE__*/ new Vector2();
-const _uvC$1 = /*@__PURE__*/ new Vector2();
-
-const _normalA = /*@__PURE__*/ new Vector3();
-const _normalB = /*@__PURE__*/ new Vector3();
-const _normalC = /*@__PURE__*/ new Vector3();
-
 const _intersectionPoint = /*@__PURE__*/ new Vector3();
 const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
 
@@ -11915,33 +11954,24 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
 
 	if ( intersection ) {
 
+		const barycoord = new Vector3();
+		Triangle.getBarycoord( _intersectionPoint, _vA$1, _vB$1, _vC$1, barycoord );
+
 		if ( uv ) {
 
-			_uvA$1.fromBufferAttribute( uv, a );
-			_uvB$1.fromBufferAttribute( uv, b );
-			_uvC$1.fromBufferAttribute( uv, c );
-
-			intersection.uv = Triangle.getInterpolation( _intersectionPoint, _vA$1, _vB$1, _vC$1, _uvA$1, _uvB$1, _uvC$1, new Vector2() );
+			intersection.uv = Triangle.getInterpolatedAttribute( uv, a, b, c, barycoord, new Vector2() );
 
 		}
 
 		if ( uv1 ) {
 
-			_uvA$1.fromBufferAttribute( uv1, a );
-			_uvB$1.fromBufferAttribute( uv1, b );
-			_uvC$1.fromBufferAttribute( uv1, c );
-
-			intersection.uv1 = Triangle.getInterpolation( _intersectionPoint, _vA$1, _vB$1, _vC$1, _uvA$1, _uvB$1, _uvC$1, new Vector2() );
+			intersection.uv1 = Triangle.getInterpolatedAttribute( uv1, a, b, c, barycoord, new Vector2() );
 
 		}
 
 		if ( normal ) {
 
-			_normalA.fromBufferAttribute( normal, a );
-			_normalB.fromBufferAttribute( normal, b );
-			_normalC.fromBufferAttribute( normal, c );
-
-			intersection.normal = Triangle.getInterpolation( _intersectionPoint, _vA$1, _vB$1, _vC$1, _normalA, _normalB, _normalC, new Vector3() );
+			intersection.normal = Triangle.getInterpolatedAttribute( normal, a, b, c, barycoord, new Vector3() );
 
 			if ( intersection.normal.dot( ray.direction ) > 0 ) {
 
@@ -11962,6 +11992,7 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
 		Triangle.getNormal( _vA$1, _vB$1, _vC$1, face.normal );
 
 		intersection.face = face;
+		intersection.barycoord = barycoord;
 
 	}
 
@@ -13605,19 +13636,60 @@ function WebGLAttributes( gl ) {
 	function updateBuffer( buffer, attribute, bufferType ) {
 
 		const array = attribute.array;
-		const updateRange = attribute._updateRange; // @deprecated, r159
 		const updateRanges = attribute.updateRanges;
 
 		gl.bindBuffer( bufferType, buffer );
 
-		if ( updateRange.count === - 1 && updateRanges.length === 0 ) {
+		if ( updateRanges.length === 0 ) {
 
 			// Not using update ranges
 			gl.bufferSubData( bufferType, 0, array );
 
-		}
+		} else {
 
-		if ( updateRanges.length !== 0 ) {
+			// Before applying update ranges, we merge any adjacent / overlapping
+			// ranges to reduce load on `gl.bufferSubData`. Empirically, this has led
+			// to performance improvements for applications which make heavy use of
+			// update ranges. Likely due to GPU command overhead.
+			//
+			// Note that to reduce garbage collection between frames, we merge the
+			// update ranges in-place. This is safe because this method will clear the
+			// update ranges once updated.
+
+			updateRanges.sort( ( a, b ) => a.start - b.start );
+
+			// To merge the update ranges in-place, we work from left to right in the
+			// existing updateRanges array, merging ranges. This may result in a final
+			// array which is smaller than the original. This index tracks the last
+			// index representing a merged range, any data after this index can be
+			// trimmed once the merge algorithm is completed.
+			let mergeIndex = 0;
+
+			for ( let i = 1; i < updateRanges.length; i ++ ) {
+
+				const previousRange = updateRanges[ mergeIndex ];
+				const range = updateRanges[ i ];
+
+				// We add one here to merge adjacent ranges. This is safe because ranges
+				// operate over positive integers.
+				if ( range.start <= previousRange.start + previousRange.count + 1 ) {
+
+					previousRange.count = Math.max(
+						previousRange.count,
+						range.start + range.count - previousRange.start
+					);
+
+				} else {
+
+					++ mergeIndex;
+					updateRanges[ mergeIndex ] = range;
+
+				}
+
+			}
+
+			// Trim the array to only contain the merged ranges.
+			updateRanges.length = mergeIndex + 1;
 
 			for ( let i = 0, l = updateRanges.length; i < l; i ++ ) {
 
@@ -13629,16 +13701,6 @@ function WebGLAttributes( gl ) {
 			}
 
 			attribute.clearUpdateRanges();
-
-		}
-
-		// @deprecated, r159
-		if ( updateRange.count !== - 1 ) {
-
-			gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-				array, updateRange.offset, updateRange.count );
-
-			updateRange.count = - 1; // reset range
 
 		}
 
@@ -14099,7 +14161,7 @@ const vertex$2 = "#include <common>\n#include <batching_pars_vertex>\n#include <
 
 const fragment$2 = "uniform vec3 color;\nuniform float opacity;\n#include <common>\n#include <packing>\n#include <fog_pars_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <logdepthbuf_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\nvoid main() {\n\t#include <logdepthbuf_fragment>\n\tgl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n}";
 
-const vertex$1 = "uniform float rotation;\nuniform vec2 center;\n#include <common>\n#include <uv_pars_vertex>\n#include <fog_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\tvec4 mvPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );\n\tvec2 scale;\n\tscale.x = length( vec3( modelMatrix[ 0 ].x, modelMatrix[ 0 ].y, modelMatrix[ 0 ].z ) );\n\tscale.y = length( vec3( modelMatrix[ 1 ].x, modelMatrix[ 1 ].y, modelMatrix[ 1 ].z ) );\n\t#ifndef USE_SIZEATTENUATION\n\t\tbool isPerspective = isPerspectiveMatrix( projectionMatrix );\n\t\tif ( isPerspective ) scale *= - mvPosition.z;\n\t#endif\n\tvec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * scale;\n\tvec2 rotatedPosition;\n\trotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;\n\trotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;\n\tmvPosition.xy += rotatedPosition;\n\tgl_Position = projectionMatrix * mvPosition;\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n}";
+const vertex$1 = "uniform float rotation;\nuniform vec2 center;\n#include <common>\n#include <uv_pars_vertex>\n#include <fog_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\tvec4 mvPosition = modelViewMatrix[ 3 ];\n\tvec2 scale = vec2( length( modelMatrix[ 0 ].xyz ), length( modelMatrix[ 1 ].xyz ) );\n\t#ifndef USE_SIZEATTENUATION\n\t\tbool isPerspective = isPerspectiveMatrix( projectionMatrix );\n\t\tif ( isPerspective ) scale *= - mvPosition.z;\n\t#endif\n\tvec2 alignedPosition = ( position.xy - ( center - vec2( 0.5 ) ) ) * scale;\n\tvec2 rotatedPosition;\n\trotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;\n\trotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;\n\tmvPosition.xy += rotatedPosition;\n\tgl_Position = projectionMatrix * mvPosition;\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <fog_vertex>\n}";
 
 const fragment$1 = "uniform vec3 diffuse;\nuniform float opacity;\n#include <common>\n#include <uv_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <alphatest_pars_fragment>\n#include <alphahash_pars_fragment>\n#include <fog_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\t#include <clipping_planes_fragment>\n\tvec3 outgoingLight = vec3( 0.0 );\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <alphahash_fragment>\n\toutgoingLight = diffuseColor.rgb;\n\t#include <opaque_fragment>\n\t#include <tonemapping_fragment>\n\t#include <colorspace_fragment>\n\t#include <fog_fragment>\n}";
 
@@ -15865,6 +15927,14 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 	}
 
 	const logarithmicDepthBuffer = parameters.logarithmicDepthBuffer === true;
+	const reverseDepthBuffer = parameters.reverseDepthBuffer === true && extensions.has( 'EXT_clip_control' );
+
+	if ( reverseDepthBuffer === true ) {
+
+		const ext = extensions.get( 'EXT_clip_control' );
+		ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.ZERO_TO_ONE_EXT );
+
+	}
 
 	const maxTextures = gl.getParameter( gl.MAX_TEXTURE_IMAGE_UNITS );
 	const maxVertexTextures = gl.getParameter( gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
@@ -15892,6 +15962,7 @@ function WebGLCapabilities( gl, extensions, parameters, utils ) {
 
 		precision: precision,
 		logarithmicDepthBuffer: logarithmicDepthBuffer,
+		reverseDepthBuffer: reverseDepthBuffer,
 
 		maxTextures: maxTextures,
 		maxVertexTextures: maxVertexTextures,
@@ -19909,6 +19980,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.numLightProbes > 0 ? '#define USE_LIGHT_PROBES' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
+			parameters.reverseDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
 
 			'uniform mat4 modelMatrix;',
 			'uniform mat4 modelViewMatrix;',
@@ -20074,6 +20146,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 			parameters.decodeVideoTexture ? '#define DECODE_VIDEO_TEXTURE' : '',
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
+			parameters.reverseDepthBuffer ? '#define USE_REVERSEDEPTHBUF' : '',
 
 			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',
@@ -20466,6 +20539,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 	const programs = [];
 
 	const logarithmicDepthBuffer = capabilities.logarithmicDepthBuffer;
+	const reverseDepthBuffer = capabilities.reverseDepthBuffer;
 	const SUPPORTS_VERTEX_TEXTURES = capabilities.vertexTextures;
 
 	let precision = capabilities.precision;
@@ -20757,6 +20831,7 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 
 			sizeAttenuation: material.sizeAttenuation === true,
 			logarithmicDepthBuffer: logarithmicDepthBuffer,
+			reverseDepthBuffer: reverseDepthBuffer,
 
 			skinning: object.isSkinnedMesh === true,
 
@@ -20976,38 +21051,40 @@ function WebGLPrograms( renderer, cubemaps, cubeuvmaps, extensions, capabilities
 			_programLayers.enable( 2 );
 		if ( parameters.logarithmicDepthBuffer )
 			_programLayers.enable( 3 );
-		if ( parameters.skinning )
+		if ( parameters.reverseDepthBuffer )
 			_programLayers.enable( 4 );
-		if ( parameters.morphTargets )
+		if ( parameters.skinning )
 			_programLayers.enable( 5 );
-		if ( parameters.morphNormals )
+		if ( parameters.morphTargets )
 			_programLayers.enable( 6 );
-		if ( parameters.morphColors )
+		if ( parameters.morphNormals )
 			_programLayers.enable( 7 );
-		if ( parameters.premultipliedAlpha )
+		if ( parameters.morphColors )
 			_programLayers.enable( 8 );
-		if ( parameters.shadowMapEnabled )
+		if ( parameters.premultipliedAlpha )
 			_programLayers.enable( 9 );
-		if ( parameters.doubleSided )
+		if ( parameters.shadowMapEnabled )
 			_programLayers.enable( 10 );
-		if ( parameters.flipSided )
+		if ( parameters.doubleSided )
 			_programLayers.enable( 11 );
-		if ( parameters.useDepthPacking )
+		if ( parameters.flipSided )
 			_programLayers.enable( 12 );
-		if ( parameters.dithering )
+		if ( parameters.useDepthPacking )
 			_programLayers.enable( 13 );
-		if ( parameters.transmission )
+		if ( parameters.dithering )
 			_programLayers.enable( 14 );
-		if ( parameters.sheen )
+		if ( parameters.transmission )
 			_programLayers.enable( 15 );
-		if ( parameters.opaque )
+		if ( parameters.sheen )
 			_programLayers.enable( 16 );
-		if ( parameters.pointsUvs )
+		if ( parameters.opaque )
 			_programLayers.enable( 17 );
-		if ( parameters.decodeVideoTexture )
+		if ( parameters.pointsUvs )
 			_programLayers.enable( 18 );
-		if ( parameters.alphaToCoverage )
+		if ( parameters.decodeVideoTexture )
 			_programLayers.enable( 19 );
+		if ( parameters.alphaToCoverage )
+			_programLayers.enable( 20 );
 
 		array.push( _programLayers.mask );
 
@@ -22565,6 +22642,18 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 }
 
+const reversedFuncs = {
+	[ NeverDepth ]: AlwaysDepth,
+	[ LessDepth ]: GreaterDepth,
+	[ EqualDepth ]: NotEqualDepth,
+	[ LessEqualDepth ]: GreaterEqualDepth,
+
+	[ AlwaysDepth ]: NeverDepth,
+	[ GreaterDepth ]: LessDepth,
+	[ NotEqualDepth ]: EqualDepth,
+	[ GreaterEqualDepth ]: LessEqualDepth,
+};
+
 function WebGLState( gl ) {
 
 	function ColorBuffer() {
@@ -22629,12 +22718,19 @@ function WebGLState( gl ) {
 	function DepthBuffer() {
 
 		let locked = false;
+		let reversed = false;
 
 		let currentDepthMask = null;
 		let currentDepthFunc = null;
 		let currentDepthClear = null;
 
 		return {
+
+			setReversed: function ( value ) {
+
+				reversed = value;
+
+			},
 
 			setTest: function ( depthTest ) {
 
@@ -22662,6 +22758,8 @@ function WebGLState( gl ) {
 			},
 
 			setFunc: function ( depthFunc ) {
+
+				if ( reversed ) depthFunc = reversedFuncs[ depthFunc ];
 
 				if ( currentDepthFunc !== depthFunc ) {
 
@@ -24201,6 +24299,28 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			if ( glType === _gl.BYTE ) internalFormat = _gl.RG8I;
 			if ( glType === _gl.SHORT ) internalFormat = _gl.RG16I;
 			if ( glType === _gl.INT ) internalFormat = _gl.RG32I;
+
+		}
+
+		if ( glFormat === _gl.RGB_INTEGER ) {
+
+			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.RGB8UI;
+			if ( glType === _gl.UNSIGNED_SHORT ) internalFormat = _gl.RGB16UI;
+			if ( glType === _gl.UNSIGNED_INT ) internalFormat = _gl.RGB32UI;
+			if ( glType === _gl.BYTE ) internalFormat = _gl.RGB8I;
+			if ( glType === _gl.SHORT ) internalFormat = _gl.RGB16I;
+			if ( glType === _gl.INT ) internalFormat = _gl.RGB32I;
+
+		}
+
+		if ( glFormat === _gl.RGBA_INTEGER ) {
+
+			if ( glType === _gl.UNSIGNED_BYTE ) internalFormat = _gl.RGBA8UI;
+			if ( glType === _gl.UNSIGNED_SHORT ) internalFormat = _gl.RGBA16UI;
+			if ( glType === _gl.UNSIGNED_INT ) internalFormat = _gl.RGBA32UI;
+			if ( glType === _gl.BYTE ) internalFormat = _gl.RGBA8I;
+			if ( glType === _gl.SHORT ) internalFormat = _gl.RGBA16I;
+			if ( glType === _gl.INT ) internalFormat = _gl.RGBA32I;
 
 		}
 
@@ -28797,6 +28917,7 @@ class WebGLRenderer {
 
 		// camera matrices cache
 
+		const _currentProjectionMatrix = new Matrix4();
 		const _projScreenMatrix = new Matrix4();
 
 		const _vector3 = new Vector3();
@@ -28891,6 +29012,8 @@ class WebGLRenderer {
 			capabilities = new WebGLCapabilities( _gl, extensions, parameters, utils );
 
 			state = new WebGLState( _gl );
+
+			if ( capabilities.reverseDepthBuffer ) state.buffers.depth.setReversed( true );
 
 			info = new WebGLInfo( _gl );
 			properties = new WebGLProperties();
@@ -29191,7 +29314,13 @@ class WebGLRenderer {
 
 			}
 
-			if ( depth ) bits |= _gl.DEPTH_BUFFER_BIT;
+			if ( depth ) {
+
+				bits |= _gl.DEPTH_BUFFER_BIT;
+				_gl.clearDepth( this.capabilities.reverseDepthBuffer ? 0 : 1 );
+
+			}
+
 			if ( stencil ) {
 
 				bits |= _gl.STENCIL_BUFFER_BIT;
@@ -29579,6 +29708,12 @@ class WebGLRenderer {
 			const materials = new Set();
 
 			scene.traverse( function ( object ) {
+
+				if ( ! ( object.isMesh || object.isPoints || object.isLine || object.isSprite ) ) {
+
+					return;
+
+				}
 
 				const material = object.material;
 
@@ -30566,7 +30701,21 @@ class WebGLRenderer {
 
 				// common camera uniforms
 
-				p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+				if ( capabilities.reverseDepthBuffer ) {
+
+					_currentProjectionMatrix.copy( camera.projectionMatrix );
+
+					toNormalizedProjectionMatrix( _currentProjectionMatrix );
+					toReversedProjectionMatrix( _currentProjectionMatrix );
+
+					p_uniforms.setValue( _gl, 'projectionMatrix', _currentProjectionMatrix );
+
+				} else {
+
+					p_uniforms.setValue( _gl, 'projectionMatrix', camera.projectionMatrix );
+
+				}
+
 				p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
 
 				const uCamPos = p_uniforms.map.cameraPosition;
@@ -31047,61 +31196,55 @@ class WebGLRenderer {
 
 			if ( framebuffer ) {
 
-				state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+				const texture = renderTarget.texture;
+				const textureFormat = texture.format;
+				const textureType = texture.type;
 
-				try {
+				if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
 
-					const texture = renderTarget.texture;
-					const textureFormat = texture.format;
-					const textureType = texture.type;
+					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA or implementation defined format.' );
 
-					if ( ! capabilities.textureFormatReadable( textureFormat ) ) {
+				}
 
-						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in RGBA or implementation defined format.' );
+				if ( ! capabilities.textureTypeReadable( textureType ) ) {
 
-					}
+					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.' );
 
-					if ( ! capabilities.textureTypeReadable( textureType ) ) {
+				}
 
-						throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: renderTarget is not in UnsignedByteType or implementation defined type.' );
+				// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
+				if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
 
-					}
-
-					// the following if statement ensures valid read requests (no out-of-bounds pixels, see #8604)
-					if ( ( x >= 0 && x <= ( renderTarget.width - width ) ) && ( y >= 0 && y <= ( renderTarget.height - height ) ) ) {
-
-						const glBuffer = _gl.createBuffer();
-						_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
-						_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
-						_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
-						_gl.flush();
-
-						// check if the commands have finished every 8 ms
-						const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
-						await probeAsync( _gl, sync, 4 );
-
-						try {
-
-							_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
-							_gl.getBufferSubData( _gl.PIXEL_PACK_BUFFER, 0, buffer );
-
-						} finally {
-
-							_gl.deleteBuffer( glBuffer );
-							_gl.deleteSync( sync );
-
-						}
-
-						return buffer;
-
-					}
-
-				} finally {
-
-					// restore framebuffer of current render target if necessary
-
-					const framebuffer = ( _currentRenderTarget !== null ) ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+					// set the active frame buffer to the one we want to read
 					state.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
+
+					const glBuffer = _gl.createBuffer();
+					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+					_gl.bufferData( _gl.PIXEL_PACK_BUFFER, buffer.byteLength, _gl.STREAM_READ );
+					_gl.readPixels( x, y, width, height, utils.convert( textureFormat ), utils.convert( textureType ), 0 );
+
+					// reset the frame buffer to the currently set buffer before waiting
+					const currFramebuffer = _currentRenderTarget !== null ? properties.get( _currentRenderTarget ).__webglFramebuffer : null;
+					state.bindFramebuffer( _gl.FRAMEBUFFER, currFramebuffer );
+
+					// check if the commands have finished every 8 ms
+					const sync = _gl.fenceSync( _gl.SYNC_GPU_COMMANDS_COMPLETE, 0 );
+
+					_gl.flush();
+
+					await probeAsync( _gl, sync, 4 );
+
+					// read the data and delete the buffer
+					_gl.bindBuffer( _gl.PIXEL_PACK_BUFFER, glBuffer );
+					_gl.getBufferSubData( _gl.PIXEL_PACK_BUFFER, 0, buffer );
+					_gl.deleteBuffer( glBuffer );
+					_gl.deleteSync( sync );
+
+					return buffer;
+
+				} else {
+
+					throw new Error( 'THREE.WebGLRenderer.readRenderTargetPixelsAsync: requested read bounds are out of range.' );
 
 				}
 
@@ -31587,7 +31730,6 @@ class InterleavedBuffer {
 		this.count = array !== undefined ? array.length / stride : 0;
 
 		this.usage = StaticDrawUsage;
-		this._updateRange = { offset: 0, count: - 1 };
 		this.updateRanges = [];
 
 		this.version = 0;
@@ -31601,13 +31743,6 @@ class InterleavedBuffer {
 	set needsUpdate( value ) {
 
 		if ( value === true ) this.version ++;
-
-	}
-
-	get updateRange() {
-
-		warnOnce( 'THREE.InterleavedBuffer: updateRange() is deprecated and will be removed in r169. Use addUpdateRange() instead.' ); // @deprecated, r159
-		return this._updateRange;
 
 	}
 
@@ -32372,6 +32507,27 @@ class LOD extends Object3D {
 		this.add( object );
 
 		return this;
+
+	}
+
+	removeLevel( distance ) {
+
+		const levels = this.levels;
+
+		for ( let i = 0; i < levels.length; i ++ ) {
+
+			if ( levels[ i ].distance === distance ) {
+
+				const removedElements = levels.splice( i, 1 );
+				this.remove( removedElements[ 0 ].object );
+
+				return true;
+
+			}
+
+		}
+
+		return false;
 
 	}
 
@@ -33494,6 +33650,9 @@ class BatchedMesh extends Mesh {
 		// stores visible, active, and geometry id per object
 		this._drawInfo = [];
 
+		// instance ids that have been set as inactive, and are available to be overwritten
+		this._availableInstanceIds = [];
+
 		// geometry information
 		this._drawRanges = [];
 		this._reservedRanges = [];
@@ -33693,23 +33852,36 @@ class BatchedMesh extends Mesh {
 
 	addInstance( geometryId ) {
 
+		const atCapacity = this._drawInfo.length >= this.maxInstanceCount;
+
 		// ensure we're not over geometry
-		if ( this._drawInfo.length >= this._maxInstanceCount ) {
+		if ( atCapacity && this._availableInstanceIds.length === 0 ) {
 
 			throw new Error( 'BatchedMesh: Maximum item count reached.' );
 
 		}
 
-		this._drawInfo.push( {
-
+		const instanceDrawInfo = {
 			visible: true,
 			active: true,
 			geometryIndex: geometryId,
+		};
 
-		} );
+		let drawId = null;
 
-		// initialize the matrix
-		const drawId = this._drawInfo.length - 1;
+		// Prioritize using previously freed instance ids
+		if ( this._availableInstanceIds.length > 0 ) {
+
+			drawId = this._availableInstanceIds.pop();
+			this._drawInfo[ drawId ] = instanceDrawInfo;
+
+		} else {
+
+			drawId = this._drawInfo.length;
+			this._drawInfo.push( instanceDrawInfo );
+
+		}
+
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = matricesTexture.image.data;
 		_identityMatrix.toArray( matricesArray, drawId * 16 );
@@ -33958,10 +34130,7 @@ class BatchedMesh extends Mesh {
 	}
 	*/
 
-	/*
 	deleteInstance( instanceId ) {
-
-		// Note: User needs to call optimize() afterward to pack the data.
 
 		const drawInfo = this._drawInfo;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
@@ -33971,12 +34140,12 @@ class BatchedMesh extends Mesh {
 		}
 
 		drawInfo[ instanceId ].active = false;
+		this._availableInstanceIds.push( instanceId );
 		this._visibilityChanged = true;
 
 		return this;
 
 	}
-	*/
 
 	// get bounding box and compute it if it doesn't exist
 	getBoundingBoxAt( geometryId, target ) {
@@ -34178,6 +34347,59 @@ class BatchedMesh extends Mesh {
 		}
 
 		return drawInfo[ instanceId ].visible;
+
+	}
+
+	setGeometryIdAt( instanceId, geometryId ) {
+
+		// return early if the geometry is out of range or not active
+		const drawInfo = this._drawInfo;
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+
+			return null;
+
+		}
+
+		// check if the provided geometryId is within the valid range
+		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
+
+			return null;
+
+		}
+
+		drawInfo[ instanceId ].geometryIndex = geometryId;
+
+		return this;
+
+	}
+
+	getGeometryIdAt( instanceId ) {
+
+		const drawInfo = this._drawInfo;
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+
+			return - 1;
+
+		}
+
+		return drawInfo[ instanceId ].geometryIndex;
+
+	}
+
+	getGeometryRangeAt( geometryId, target = {} ) {
+
+		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
+
+			return null;
+
+		}
+
+		const drawRange = this._drawRanges[ geometryId ];
+
+		target.start = drawRange.start;
+		target.count = drawRange.count;
+
+		return target;
 
 	}
 
@@ -34732,6 +34954,7 @@ function checkIntersection( object, raycaster, ray, thresholdSq, a, b ) {
 		index: a,
 		face: null,
 		faceIndex: null,
+		barycoord: null,
 		object: object
 
 	};
@@ -34997,6 +35220,8 @@ function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, inte
 			point: intersectPoint,
 			index: index,
 			face: null,
+			faceIndex: null,
+			barycoord: null,
 			object: object
 
 		} );
@@ -37499,12 +37724,19 @@ class CylinderGeometry extends BufferGeometry {
 
 					// faces
 
-					indices.push( a, b, d );
-					indices.push( b, c, d );
+					if ( radiusTop > 0 ) {
 
-					// update group counter
+						indices.push( a, b, d );
+						groupCount += 3;
 
-					groupCount += 6;
+					}
+
+					if ( radiusBottom > 0 ) {
+
+						indices.push( b, c, d );
+						groupCount += 3;
+
+					}
 
 				}
 
@@ -45814,7 +46046,7 @@ class MaterialLoader extends Loader {
 
 		}
 
-		const material = MaterialLoader.createMaterialFromType( json.type );
+		const material = this.createMaterialFromType( json.type );
 
 		if ( json.uuid !== undefined ) material.uuid = json.uuid;
 		if ( json.name !== undefined ) material.name = json.name;
@@ -46067,6 +46299,12 @@ class MaterialLoader extends Loader {
 
 		this.textures = value;
 		return this;
+
+	}
+
+	createMaterialFromType( type ) {
+
+		return MaterialLoader.createMaterialFromType( type );
 
 	}
 
@@ -47900,7 +48138,7 @@ class Clock {
 
 function now() {
 
-	return ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
+	return performance.now();
 
 }
 
@@ -48192,7 +48430,7 @@ class Audio extends Object3D {
 
 	}
 
-	stop() {
+	stop( delay = 0 ) {
 
 		if ( this.hasPlaybackControl === false ) {
 
@@ -48205,7 +48443,7 @@ class Audio extends Object3D {
 
 		if ( this.source !== null ) {
 
-			this.source.stop();
+			this.source.stop( this.context.currentTime + delay );
 			this.source.onended = null;
 
 		}
@@ -53847,7 +54085,7 @@ class ShapePath {
 
 class Controls extends EventDispatcher {
 
-	constructor( object, domElement ) {
+	constructor( object, domElement = null ) {
 
 		super();
 

@@ -7,7 +7,8 @@ import {
 	SRGBColorSpace,
 	NoColorSpace,
 	HalfFloatType,
-	DataUtils
+	DataUtils,
+	WebGLCoordinateSystem
 } from 'three';
 
 class LightProbeGenerator {
@@ -126,7 +127,9 @@ class LightProbeGenerator {
 
 	}
 
-	static fromCubeRenderTarget( renderer, cubeRenderTarget ) {
+	static async fromCubeRenderTarget( renderer, cubeRenderTarget ) {
+
+		const flip = renderer.coordinateSystem === WebGLCoordinateSystem ? -1 : 1;
 
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		let totalWeight = 0;
@@ -143,12 +146,11 @@ class LightProbeGenerator {
 		const shCoefficients = sh.coefficients;
 
 		const dataType = cubeRenderTarget.texture.type;
+		const imageWidth = cubeRenderTarget.width; // assumed to be square
 
-		for ( let faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
+		let data;
 
-			const imageWidth = cubeRenderTarget.width; // assumed to be square
-
-			let data;
+		if ( renderer.isWebGLRenderer ) {
 
 			if ( dataType === HalfFloatType ) {
 
@@ -162,7 +164,19 @@ class LightProbeGenerator {
 
 			}
 
-			renderer.readRenderTargetPixels( cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
+		}
+
+		for ( let faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
+
+			if ( renderer.isWebGLRenderer ) {
+
+				await renderer.readRenderTargetPixelsAsync( cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
+
+			} else {
+
+				data = await renderer.readRenderTargetPixelsAsync( cubeRenderTarget, 0, 0, imageWidth, imageWidth, 0, faceIndex );
+
+			}
 
 			const pixelSize = 2 / imageWidth;
 
@@ -194,15 +208,15 @@ class LightProbeGenerator {
 
 				const pixelIndex = i / 4;
 
-				const col = - 1 + ( pixelIndex % imageWidth + 0.5 ) * pixelSize;
+				const col = ( 1 - ( pixelIndex % imageWidth + 0.5 ) * pixelSize ) * flip;
 
 				const row = 1 - ( Math.floor( pixelIndex / imageWidth ) + 0.5 ) * pixelSize;
 
 				switch ( faceIndex ) {
 
-					case 0: coord.set( 1, row, - col ); break;
+					case 0: coord.set( - 1 * flip, row, col * flip ); break;
 
-					case 1: coord.set( - 1, row, col ); break;
+					case 1: coord.set( 1 * flip, row, - col * flip ); break;
 
 					case 2: coord.set( col, 1, - row ); break;
 

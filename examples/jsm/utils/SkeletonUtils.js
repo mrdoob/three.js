@@ -9,28 +9,37 @@ import {
 	VectorKeyframeTrack
 } from 'three';
 
+function getBoneName( bone, options ) {
+
+	if ( options.getBoneName !== undefined ) {
+
+		return options.getBoneName( bone );
+
+	}
+
+	return options.names[ bone.name ];
+
+}
 
 function retarget( target, source, options = {} ) {
 
-	const pos = new Vector3(),
-		quat = new Quaternion(),
+	const quat = new Quaternion(),
 		scale = new Vector3(),
-		bindBoneMatrix = new Matrix4(),
 		relativeMatrix = new Matrix4(),
 		globalMatrix = new Matrix4();
 
-	options.preserveMatrix = options.preserveMatrix !== undefined ? options.preserveMatrix : true;
-	options.preservePosition = options.preservePosition !== undefined ? options.preservePosition : true;
-	options.preserveHipPosition = options.preserveHipPosition !== undefined ? options.preserveHipPosition : false;
+	options.preserveBoneMatrix = options.preserveBoneMatrix !== undefined ? options.preserveBoneMatrix : true;
+	options.preserveBonePositions = options.preserveBonePositions !== undefined ? options.preserveBonePositions : true;
 	options.useTargetMatrix = options.useTargetMatrix !== undefined ? options.useTargetMatrix : false;
 	options.hip = options.hip !== undefined ? options.hip : 'hip';
+	options.hipInfluence = options.hipInfluence !== undefined ? options.hipInfluence : new Vector3( 1, 1, 1 );
+	options.scale = options.scale !== undefined ? options.scale : 1;
 	options.names = options.names || {};
 
 	const sourceBones = source.isObject3D ? source.skeleton.bones : getBones( source ),
 		bones = target.isObject3D ? target.skeleton.bones : getBones( target );
 
-	let bindBones,
-		bone, name, boneTo,
+	let bone, name, boneTo,
 		bonesPosition;
 
 	// reset bones
@@ -42,11 +51,11 @@ function retarget( target, source, options = {} ) {
 	} else {
 
 		options.useTargetMatrix = true;
-		options.preserveMatrix = false;
+		options.preserveBoneMatrix = false;
 
 	}
 
-	if ( options.preservePosition ) {
+	if ( options.preserveBonePositions ) {
 
 		bonesPosition = [];
 
@@ -58,7 +67,7 @@ function retarget( target, source, options = {} ) {
 
 	}
 
-	if ( options.preserveMatrix ) {
+	if ( options.preserveBoneMatrix ) {
 
 		// reset matrix
 
@@ -76,35 +85,10 @@ function retarget( target, source, options = {} ) {
 
 	}
 
-	if ( options.offsets ) {
-
-		bindBones = [];
-
-		for ( let i = 0; i < bones.length; ++ i ) {
-
-			bone = bones[ i ];
-			name = options.names[ bone.name ] || bone.name;
-
-			if ( options.offsets[ name ] ) {
-
-				bone.matrix.multiply( options.offsets[ name ] );
-
-				bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
-
-				bone.updateMatrixWorld();
-
-			}
-
-			bindBones.push( bone.matrixWorld.clone() );
-
-		}
-
-	}
-
 	for ( let i = 0; i < bones.length; ++ i ) {
 
 		bone = bones[ i ];
-		name = options.names[ bone.name ] || bone.name;
+		name = getBoneName( bone, options );
 
 		boneTo = getBoneByName( name, sourceBones );
 
@@ -136,10 +120,15 @@ function retarget( target, source, options = {} ) {
 
 			if ( target.isObject3D ) {
 
-				const boneIndex = bones.indexOf( bone ),
-					wBindMatrix = bindBones ? bindBones[ boneIndex ] : bindBoneMatrix.copy( target.skeleton.boneInverses[ boneIndex ] ).invert();
+				if ( options.localOffsets ) {
 
-				globalMatrix.multiply( wBindMatrix );
+					if ( options.localOffsets[ bone.name ] ) {
+
+						globalMatrix.multiply( options.localOffsets[ bone.name ] );
+
+					}
+
+				}
 
 			}
 
@@ -147,7 +136,23 @@ function retarget( target, source, options = {} ) {
 
 		}
 
-		if ( bone.parent && bone.parent.isBone ) {
+		if ( name === options.hip ) {
+
+			globalMatrix.elements[ 12 ] *= options.scale * options.hipInfluence.x;
+			globalMatrix.elements[ 13 ] *= options.scale * options.hipInfluence.y;
+			globalMatrix.elements[ 14 ] *= options.scale * options.hipInfluence.z;
+
+			if ( options.hipPosition !== undefined ) {
+
+				globalMatrix.elements[ 12 ] += options.hipPosition.x * options.scale;
+				globalMatrix.elements[ 13 ] += options.hipPosition.y * options.scale;
+				globalMatrix.elements[ 14 ] += options.hipPosition.z * options.scale;
+
+			}
+
+		}
+
+		if ( bone.parent ) {
 
 			bone.matrix.copy( bone.parent.matrixWorld ).invert();
 			bone.matrix.multiply( globalMatrix );
@@ -158,24 +163,18 @@ function retarget( target, source, options = {} ) {
 
 		}
 
-		if ( options.preserveHipPosition && name === options.hip ) {
-
-			bone.matrix.setPosition( pos.set( 0, bone.position.y, 0 ) );
-
-		}
-
 		bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
 
 		bone.updateMatrixWorld();
 
 	}
 
-	if ( options.preservePosition ) {
+	if ( options.preserveBonePositions ) {
 
 		for ( let i = 0; i < bones.length; ++ i ) {
 
 			bone = bones[ i ];
-			name = options.names[ bone.name ] || bone.name;
+			name = getBoneName( bone, options ) || bone.name;
 
 			if ( name !== options.hip ) {
 
@@ -187,7 +186,7 @@ function retarget( target, source, options = {} ) {
 
 	}
 
-	if ( options.preserveMatrix ) {
+	if ( options.preserveBoneMatrix ) {
 
 		// restore matrix
 
@@ -200,6 +199,7 @@ function retarget( target, source, options = {} ) {
 function retargetClip( target, source, clip, options = {} ) {
 
 	options.useFirstFramePosition = options.useFirstFramePosition !== undefined ? options.useFirstFramePosition : false;
+
 	// Calculate the fps from the source clip based on the track with the most frames, unless fps is already provided.
 	options.fps = options.fps !== undefined ? options.fps : ( Math.max( ...clip.tracks.map( track => track.times.length ) ) / clip.duration );
 	options.names = options.names || [];
@@ -216,30 +216,48 @@ function retargetClip( target, source, clip, options = {} ) {
 		mixer = new AnimationMixer( source ),
 		bones = getBones( target.skeleton ),
 		boneDatas = [];
+
 	let positionOffset,
 		bone, boneTo, boneData,
 		name;
 
 	mixer.clipAction( clip ).play();
-	mixer.update( 0 );
+
+	// trim
+
+	let start = 0, end = numFrames;
+
+	if ( options.trim !== undefined ) {
+
+		start = Math.round( options.trim[ 0 ] * options.fps );
+		end = Math.min( Math.round( options.trim[ 1 ] * options.fps ), numFrames ) - start;
+
+		mixer.update( options.trim[ 0 ] );
+
+	} else {
+
+		mixer.update( 0 );
+
+	}
 
 	source.updateMatrixWorld();
 
-	for ( let i = 0; i < numFrames; ++ i ) {
+	//
 
-		const time = i * delta;
+	for ( let frame = 0; frame < end; ++ frame ) {
+
+		const time = frame * delta;
 
 		retarget( target, source, options );
 
 		for ( let j = 0; j < bones.length; ++ j ) {
 
-			name = options.names[ bones[ j ].name ] || bones[ j ].name;
-
+			bone = bones[ j ];
+			name = getBoneName( bone, options ) || bone.name;
 			boneTo = getBoneByName( name, source.skeleton );
 
 			if ( boneTo ) {
 
-				bone = bones[ j ];
 				boneData = boneDatas[ j ] = boneDatas[ j ] || { bone: bone };
 
 				if ( options.hip === name ) {
@@ -247,15 +265,15 @@ function retargetClip( target, source, clip, options = {} ) {
 					if ( ! boneData.pos ) {
 
 						boneData.pos = {
-							times: new Float32Array( numFrames ),
-							values: new Float32Array( numFrames * 3 )
+							times: new Float32Array( end ),
+							values: new Float32Array( end * 3 )
 						};
 
 					}
 
 					if ( options.useFirstFramePosition ) {
 
-						if ( i === 0 ) {
+						if ( frame === 0 ) {
 
 							positionOffset = bone.position.clone();
 
@@ -265,30 +283,30 @@ function retargetClip( target, source, clip, options = {} ) {
 
 					}
 
-					boneData.pos.times[ i ] = time;
+					boneData.pos.times[ frame ] = time;
 
-					bone.position.toArray( boneData.pos.values, i * 3 );
+					bone.position.toArray( boneData.pos.values, frame * 3 );
 
 				}
 
 				if ( ! boneData.quat ) {
 
 					boneData.quat = {
-						times: new Float32Array( numFrames ),
-						values: new Float32Array( numFrames * 4 )
+						times: new Float32Array( end ),
+						values: new Float32Array( end * 4 )
 					};
 
 				}
 
-				boneData.quat.times[ i ] = time;
+				boneData.quat.times[ frame ] = time;
 
-				bone.quaternion.toArray( boneData.quat.values, i * 4 );
+				bone.quaternion.toArray( boneData.quat.values, frame * 4 );
 
 			}
 
 		}
 
-		if ( i === numFrames - 2 ) {
+		if ( frame === end - 2 ) {
 
 			// last mixer update before final loop iteration
 			// make sure we do not go over or equal to clip duration

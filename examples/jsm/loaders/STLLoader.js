@@ -5,7 +5,8 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	Vector3
+	Vector3,
+	SRGBColorSpace
 } from 'three';
 
 /**
@@ -242,7 +243,7 @@ class STLLoader extends Loader {
 
 					if ( hasColors ) {
 
-						color.set( r, g, b ).convertSRGBToLinear();
+						color.setRGB( r, g, b, SRGBColorSpace );
 
 						colors[ componentIdx ] = color.r;
 						colors[ componentIdx + 1 ] = color.g;

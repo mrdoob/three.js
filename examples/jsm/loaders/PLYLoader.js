@@ -3,7 +3,8 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	Color
+	Color,
+	SRGBColorSpace
 } from 'three';
 
 /**
@@ -468,8 +469,9 @@ class PLYLoader extends Loader {
 					_color.setRGB(
 						element[ cacheEntry.attrR ] / 255.0,
 						element[ cacheEntry.attrG ] / 255.0,
-						element[ cacheEntry.attrB ] / 255.0
-					).convertSRGBToLinear();
+						element[ cacheEntry.attrB ] / 255.0,
+						SRGBColorSpace
+					);
 
 					buffer.colors.push( _color.r, _color.g, _color.b );
 
@@ -516,8 +518,9 @@ class PLYLoader extends Loader {
 					_color.setRGB(
 						element[ cacheEntry.attrR ] / 255.0,
 						element[ cacheEntry.attrG ] / 255.0,
-						element[ cacheEntry.attrB ] / 255.0
-					).convertSRGBToLinear();
+						element[ cacheEntry.attrB ] / 255.0,
+						SRGBColorSpace
+					);
 					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
 					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );
 					buffer.faceVertexColors.push( _color.r, _color.g, _color.b );

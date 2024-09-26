@@ -29,7 +29,7 @@
 		{
 			"imports": {
 				"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+				"three/tsl": "../build/three.webgpu.js",
 				"three/addons/": "./jsm/",
 				"stats-gl": "https://cdn.jsdelivr.net/npm/stats-gl@2.2.7/dist/main.js"
 			}
@@ -68,6 +68,7 @@
 			renderBundle: true,
 			count: MAX_GEOMETRY_COUNT,
 			opacity: 1,
+			dynamic: false
 		};
 
 
@@ -125,9 +126,6 @@
 
 		}
 
-
-
-
 		function cleanup() {
 
 			if ( group ) {
@@ -154,8 +152,7 @@
 
 		function initRegularMesh( count ) {
 
-			group = new THREE.Group();
-			group.static = api.renderBundle;
+			group = api.renderBundle ? new THREE.BundleGroup() : new THREE.Group();
 
 			for ( let i = 0; i < count; i ++ ) {
 
@@ -252,6 +249,13 @@
 
 			} );
 
+			gui.add( api, 'dynamic' ).onChange( () => {
+
+				group.static = ! group.static;
+
+			} );
+
+
 			// listeners
 
 			window.addEventListener( 'resize', onWindowResize );
@@ -292,10 +296,7 @@
 			function animateMeshes() {
 
 				const count = api.count / ( api.webgpu ? 1 : 10 );
-				const countDynamic = api.dynamic / ( api.webgpu ? 1 : 10 );
-
-				const loopNum = Math.min( count, countDynamic );
-
+				const loopNum = api.dynamic ? count : 0;
 
 				for ( let i = 0; i < loopNum; i ++ ) {
 
@@ -312,7 +313,8 @@
 
 			}
 
-}
+		}
+
 	</script>
 
 </body>

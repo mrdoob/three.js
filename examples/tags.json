@@ -119,6 +119,7 @@
 	"webgpu_compute_particles_rain": [ "gpgpu" ],
 	"webgpu_compute_particles_snow_external": [ "gpgpu" ],
 	"webgpu_compute_points": [ "gpgpu" ],
+	"webgpu_compute_sort_bitonic": [ "gpgpu" ],
 	"webgpu_compute_texture": [ "gpgpu" ],
 	"webgpu_compute_texture_pingpong": [ "gpgpu" ],
 	"webgpu_depth_texture": [ "renderTarget" ],
@@ -126,6 +127,7 @@
 	"webgpu_materials_lightmap": [ "shadow" ],
 	"webgpu_materials_sss": [ "subsurface scattering", "derivatives", "translucency" ],
 	"webgpu_materials_transmission": [ "alpha" ],
+	"webgpu_materials_arrays": [ "webgpu", "geometry", "groups", "array" ],
 	"webgpu_mirror": [ "reflection" ],
 	"webgpu_multiple_rendertargets": [ "mrt" ],
 	"webgpu_multiple_rendertargets_readback": [ "mrt" ],
@@ -143,6 +145,7 @@
 	"webgpu_refraction": [ "water" ],
 	"webgpu_rtt": [ "renderTarget", "texture" ],
 	"webgpu_sky": [ "sun" ],
+	"webgpu_tonemapping": [ "gltf" ],
 	"webgpu_tsl_compute_attractors_particles": [ "gpgpu" ],
 	"webgpu_ocean": [ "water" ]
 }

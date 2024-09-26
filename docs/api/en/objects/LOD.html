@@ -85,6 +85,15 @@
 			Adds a mesh that will display at a certain distance and greater. Typically
 			the further away the distance, the lower the detail on the mesh.
 		</p>
+		<h3>
+			[method:Boolean removeLevel]( [param:Float distance])
+		</h3>
+		<p>
+			distance - Distance of the level to delete.<br /><br />
+
+			Removes an existing level, based on the distance from the camera.
+			Returns `true` when the level has been removed. Otherwise `false`.
+		</p>
 
 		<h3>[method:Integer getCurrentLevel]()</h3>
 		<p>Get the currently active LOD level. As index of the levels array.</p>

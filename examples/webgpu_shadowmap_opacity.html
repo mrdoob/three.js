@@ -48,6 +48,7 @@
 				renderer.setAnimationLoop( render );
 				renderer.toneMapping = THREE.AgXToneMapping;
 				renderer.toneMappingExposure = 1.5;
+				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();

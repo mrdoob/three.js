@@ -83,6 +83,7 @@ export function decompress( texture, maxTextureSize = Infinity, renderer = null 
 	readableTexture.magFilter = texture.magFilter;
 	readableTexture.wrapS = texture.wrapS;
 	readableTexture.wrapT = texture.wrapT;
+	readableTexture.colorSpace = texture.colorSpace;
 	readableTexture.name = texture.name;
 
 	if ( _renderer ) {

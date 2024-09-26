@@ -27,7 +27,7 @@
 			import * as THREE from 'three';
 			import * as TSL from 'three/tsl';
 
-			import { Fn, wgslFn, positionLocal, scriptable, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, viewportUV, js, string, global, Loop, cameraProjectionMatrix } from 'three/tsl';
+			import { Fn, wgslFn, positionLocal, scriptable, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, screenUV, js, string, global, Loop, cameraProjectionMatrix } from 'three/tsl';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
@@ -208,7 +208,7 @@
 
 				// Screen Projection Texture
 				material = new THREE.MeshBasicNodeMaterial();
-				material.colorNode = texture( uvTexture, viewportUV.flipY() );
+				material.colorNode = texture( uvTexture, screenUV.flipY() );
 				materials.push( material );
 
 				// Loop
@@ -398,10 +398,28 @@
 
 			}
 
+			function moduleToLib( module ) {
+
+				const lib = {};
+
+				for ( const nodeElement of Object.values( module ) ) {
+
+					if ( typeof nodeElement === 'function' && nodeElement.type !== undefined ) {
+
+						lib[ nodeElement.type ] = nodeElement;
+
+					}
+
+				}
+
+				return lib;
+
+			}
+
 			function testSerialization( mesh ) {
 
 				const json = mesh.toJSON();
-				const loader = new THREE.NodeObjectLoader();
+				const loader = new THREE.NodeObjectLoader().setNodes( moduleToLib( TSL ) ).setNodeMaterials( moduleToLib( THREE ) );
 				const serializedMesh = loader.parse( json );
 
 				serializedMesh.position.x = ( objects.length % 4 ) * 200 - 400;

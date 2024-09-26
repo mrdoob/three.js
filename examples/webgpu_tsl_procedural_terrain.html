@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mx_noise_float, color, cross, dot, float, modelNormalMatrix, positionLocal, sign, step, Fn, uniform, varying, vec2, vec3, Loop } from 'three/tsl';
+			import { mx_noise_float, color, cross, dot, float, transformNormalToView, positionLocal, sign, step, Fn, uniform, varying, vec2, vec3, Loop } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -150,7 +150,7 @@
 			
 				} )();
 
-				material.normalNode = modelNormalMatrix.mul( vNormal );
+				material.normalNode = transformNormalToView( vNormal );
 
 				material.colorNode = Fn( () => {
 
@@ -226,6 +226,7 @@
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.shadowMap.enabled = true;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

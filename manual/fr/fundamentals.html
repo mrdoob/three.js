@@ -103,7 +103,7 @@ une image sur la surface d'une géométrie.</p>
 soit <a href="canvas-textures.html">générées par le biais d'un canevas</a> ou
 <a href="rendertargets.html">résultant du rendu d'une autre scène</a>.</p>
 </li>
-<li><p>Les objets <a href="/docs/#api/en/lights/Light"><code class="notranslate" translate="no">Light</code></a> représentent <a href="lights.html">différentes sortent de lumière</a>.</p>
+<li><p>Les objets <a href="/docs/#api/en/lights/Light"><code class="notranslate" translate="no">Light</code></a> représentent <a href="lights.html">différentes sortes de lumière</a>.</p>
 </li>
 </ul>
 <p>Maintenant que tout cela a été défini, nous allons présenter un exemple de type <em>"Hello Cube"</em> utilisant un
@@ -158,9 +158,9 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 Dans ce cas, 75 degrés d'ouverture verticale. Il est à noter que
 la plupart des angles dans Three.js sont exprimés en radians à l'exception
 de la caméra perspective.</p>
-<p><code class="notranslate" translate="no">aspect</code> est l'aspect de l'affichage dans le canevas. Cela sera détaillé
+<p><code class="notranslate" translate="no">aspect</code> est le ratio d'affichage dans le canevas. Cela sera détaillé
 <a href="responsive.html">dans un autre article</a>. Toutefois, par défaut,
-un canevas est de taille 300x150 pixels ce qui lui confère l'aspect 300/150 ou 2.</p>
+un canevas est de taille 300x150 pixels ce qui lui confère un ratio de 300/150 ou 2.</p>
 <p><code class="notranslate" translate="no">near</code> et <code class="notranslate" translate="no">far</code> délimitent la portion de l'espace devant la caméra dont
 le rendu est effectué. Tout ce qui est avant ou après est découpé (<em>clipped</em>),
 donc non dessiné.</p>
@@ -168,8 +168,8 @@ donc non dessiné.</p>
 En d'autres termes, il s'agit d'une autre forme 3D à l'instar des sphères,
 cubes et prismes.</p>
 <p><img src="../resources/frustum-3d.svg" width="500" class="threejs_center"></p>
-<p>L'espacement entre les plans <em>near</em> et <em>far</em> est déterminé
-par le champ de vision. La largeur est fixée par le champ de vision et l'aspect.</p>
+<p>La hauteur des plans <em>near</em> et <em>far</em> est déterminée
+par le champ de vision. La largeur de ces plans est déterminée par le champ de vision et le ratio.</p>
 <p>Tout ce qui est dans le <em>frustum</em> est dessiné. Ce qui est à l'extérieur ne l'est pas.</p>
 <p>La caméra regarde par défaut suivant l'axe -Z, +Y pointant le haut.
 Nous mettons notre cube à l'origine donc nous devons déplacer la caméra de l'origine légèrement vers son arrière
@@ -181,9 +181,9 @@ pour voir quelque chose.</p>
 <p>Dans le schéma ci-dessus, nous pouvons voir que notre caméra est placée
 en <code class="notranslate" translate="no">z = 2</code>. Elle regarde le long de la direction -Z.
 Notre <em>frustum</em> démarre à 0.1 unités de la caméra et s'étend jusqu'à 5 unités devant elle.
-Comme le schéma est vu du haut, le champ de vue est affecté par l'aspect.
-Notre canvas est deux fois plus large que haut donc le champ de vue horizontal
-est plus grand que les 75 degrés spécifié pour le champ vertical.</p>
+Comme le schéma est vu du haut, le champ de vision est affecté par le ratio du canvas.
+Celui-ci est deux fois plus large que haut donc le champ de vision horizontal
+est plus grand que les 75 degrés spécifiés pour le champ de vision vertical.</p>
 <p>Ensuite, nous créons une <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>. Dans Three.js, une <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> est la racine
 du graphe de scène. Tout ce que nous voulons que Three.js dessine doit être ajouté
 à la scène. Cela sera davantage détaillé dans <a href="scenegraph.html">un futur article sur le fonctionnement des scènes</a>.</p>

@@ -346,7 +346,6 @@
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/en/geometries/ParametricGeometry",
-				"SDFGeometryGenerator": "examples/en/geometries/SDFGeometryGenerator",
 				"TeapotGeometry": "examples/en/geometries/TeapotGeometry",
 				"TextGeometry": "examples/en/geometries/TextGeometry"
 			},
@@ -361,6 +360,14 @@
 
 			"Lights": {
 				"LightProbeGenerator": "examples/en/lights/LightProbeGenerator"
+			},
+
+			"Lines": {
+				"Line2": "examples/en/lines/Line2",
+				"LineGeometry": "examples/en/lines/LineGeometry",
+				"LineMaterial": "examples/en/lines/LineMaterial",
+				"LineSegments2": "examples/en/lines/LineSegments2",
+				"LineSegmentsGeometry": "examples/en/lines/LineSegmentsGeometry"
 			},
 
 			"Loaders": {
@@ -434,7 +441,7 @@
 				"SceneUtils": "examples/en/utils/SceneUtils",
 				"SkeletonUtils": "examples/en/utils/SkeletonUtils"
 			},
-			
+
 			"WebXR": {
 				"XREstimatedLight": "examples/en/webxr/XREstimatedLight"
 			}
@@ -859,7 +866,8 @@
 				"Earcut": "api/zh/extras/Earcut",
 				"ImageUtils": "api/zh/extras/ImageUtils",
 				"PMREMGenerator": "api/zh/extras/PMREMGenerator",
-				"ShapeUtils": "api/zh/extras/ShapeUtils"
+				"ShapeUtils": "api/zh/extras/ShapeUtils",
+				"TextureUtils": "api/zh/extras/TextureUtils"
 			},
 
 			"附件 / 核心": {
@@ -1100,8 +1108,7 @@
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry",
 				"ParametricGeometry": "examples/zh/geometries/ParametricGeometry",
 				"TeapotGeometry": "examples/zh/geometries/TeapotGeometry",
-				"TextGeometry": "examples/zh/geometries/TextGeometry",
-				"SDFGeometryGenerator": "examples/zh/geometries/SDFGeometryGenerator"
+				"TextGeometry": "examples/zh/geometries/TextGeometry"
 			},
 
 			"辅助对象": {
@@ -1362,12 +1369,16 @@
 				"DragControls": "examples/ko/controls/DragControls",
 				"FirstPersonControls": "examples/ko/controls/FirstPersonControls",
 				"FlyControls": "examples/ko/controls/FlyControls",
+				"MapControls": "examples/ko/controls/MapControls",
 				"OrbitControls": "examples/ko/controls/OrbitControls",
 				"PointerLockControls": "examples/ko/controls/PointerLockControls",
 				"TrackballControls": "examples/ko/controls/TrackballControls",
 				"TransformControls": "examples/ko/controls/TransformControls"
-			}
+			},
 
+			"WebXR": {
+				"XREstimatedLight": "examples/ko/webxr/XREstimatedLight"
+			}
 		}
 
 	},

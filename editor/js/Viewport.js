@@ -142,7 +142,7 @@ function Viewport( editor ) {
 
 	} );
 
-	sceneHelpers.add( transformControls );
+	sceneHelpers.add( transformControls.getHelper() );
 
 	//
 

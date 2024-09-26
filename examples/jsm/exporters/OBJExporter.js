@@ -1,6 +1,8 @@
 import {
 	Color,
+	ColorManagement,
 	Matrix3,
+	SRGBColorSpace,
 	Vector2,
 	Vector3
 } from 'three';
@@ -226,7 +228,9 @@ class OBJExporter {
 
 					if ( colors !== undefined ) {
 
-						color.fromBufferAttribute( colors, i ).convertLinearToSRGB();
+						color.fromBufferAttribute( colors, i );
+
+						ColorManagement.fromWorkingColorSpace( color, SRGBColorSpace );
 
 						output += ' ' + color.r + ' ' + color.g + ' ' + color.b;
 

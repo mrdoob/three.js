@@ -68,6 +68,15 @@
 			perObjectFrustumCulled: true,
 			opacity: 1,
 			useCustomSort: true,
+			randomizeGeometry: ()=>{
+
+				for ( let i = 0; i < api.count; i ++ ) {
+
+					mesh.setGeometryIdAt( i, Math.floor( Math.random() * geometries.length ) );
+		
+				}
+		
+			}
 		};
 
 
@@ -187,8 +196,6 @@
 
 		}
 
-
-
 		function init( forceWebGL = false ) {
 
 			if ( renderer ) {
@@ -270,14 +277,12 @@
 			gui.add( api, 'sortObjects' );
 			gui.add( api, 'perObjectFrustumCulled' );
 			gui.add( api, 'useCustomSort' );
+			gui.add( api, 'randomizeGeometry' );
 
 
 			// listeners
 
 			window.addEventListener( 'resize', onWindowResize );
-
-
-
 
 			function onWindowResize() {
 
