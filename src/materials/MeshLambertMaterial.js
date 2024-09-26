@@ -6,13 +6,17 @@ import { Euler } from '../math/Euler.js';
 
 class MeshLambertMaterial extends Material {
 
+	static get type() {
+
+		return 'MeshLambertMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshLambertMaterial = true;
-
-		this.type = 'MeshLambertMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
 

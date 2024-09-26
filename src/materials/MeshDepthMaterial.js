@@ -3,6 +3,12 @@ import { BasicDepthPacking } from '../constants.js';
 
 class MeshDepthMaterial extends Material {
 
+	static get name() {
+
+		return 'MeshDepthMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
