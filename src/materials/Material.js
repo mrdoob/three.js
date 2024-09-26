@@ -19,11 +19,7 @@ class Material extends EventDispatcher {
 
 	}
 
-	set type( value ) {
-
-		console.warn( `THREE.Material: .type is now read-only. Use the syntax "static get type() return '${value}'" instead.` );
-
-	}
+	set type( _value ) { /* */ }
 
 	constructor() {
 
