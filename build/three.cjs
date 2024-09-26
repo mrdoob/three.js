@@ -34386,6 +34386,23 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	getGeometryRangeAt( geometryId, target = {} ) {
+
+		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
+
+			return null;
+
+		}
+
+		const drawRange = this._drawRanges[ geometryId ];
+
+		target.start = drawRange.start;
+		target.count = drawRange.count;
+
+		return target;
+
+	}
+
 	raycast( raycaster, intersects ) {
 
 		const drawInfo = this._drawInfo;

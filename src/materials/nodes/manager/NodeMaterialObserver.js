@@ -90,6 +90,12 @@ class NodeMaterialObserver {
 				worldMatrix: renderObject.object.matrixWorld.clone()
 			};
 
+			if ( renderObject.object.center ) {
+
+				data.center = renderObject.object.center.clone();
+
+			}
+
 			if ( renderObject.object.morphTargetInfluences ) {
 
 				data.morphTargetInfluences = renderObject.object.morphTargetInfluences.slice();
@@ -159,7 +165,6 @@ class NodeMaterialObserver {
 		}
 
 		return data;
-
 
 	}
 
@@ -236,6 +241,20 @@ class NodeMaterialObserver {
 			}
 
 			if ( morphChanged ) return true;
+
+		}
+
+		// center
+
+		if ( renderObjectData.center ) {
+
+			if ( renderObjectData.center.equals( object.center ) === false ) {
+
+				renderObjectData.center.copy( object.center );
+
+				return true;
+
+			}
 
 		}
 

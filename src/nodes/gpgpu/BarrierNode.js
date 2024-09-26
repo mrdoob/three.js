@@ -22,7 +22,7 @@ class BarrierNode extends Node {
 
 		} else {
 
-			builder.addLineFlowCode( `${scope}Barrier()` );
+			builder.addLineFlowCode( `${scope}Barrier()`, this );
 
 		}
 
