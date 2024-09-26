@@ -24,6 +24,12 @@ let _id = 0;
 
 class Serializer extends EventTarget {
 
+	static get type() {
+
+		return 'Serializer';
+
+	}
+
 	constructor() {
 
 		super();
@@ -74,7 +80,7 @@ class Serializer extends EventTarget {
 
 	get className() {
 
-		return this.constructor.name;
+		return this.constructor.type || this.constructor.name;
 
 	}
 
@@ -445,6 +451,12 @@ Link.InputDirection = 'left';
 let selected = null;
 
 class Element extends Serializer {
+
+	static get type() {
+
+		return 'Element';
+
+	}
 
 	constructor( draggable = false ) {
 
@@ -1230,6 +1242,12 @@ Element.icons = { unlink: '' };
 
 class Input extends Serializer {
 
+	static get type() {
+
+		return 'Input';
+
+	}
+
 	constructor( dom ) {
 
 		super();
@@ -1387,6 +1405,12 @@ class Input extends Serializer {
 Input.prototype.isInput = true;
 
 class Node extends Serializer {
+
+	static get type() {
+
+		return 'Node';
+
+	}
 
 	constructor() {
 
@@ -1774,6 +1798,12 @@ Node.prototype.isNode = true;
 
 class DraggableElement extends Element {
 
+	static get type() {
+
+		return 'DraggableElement';
+
+	}
+
 	constructor( draggable = true ) {
 
 		super( true );
@@ -1802,6 +1832,12 @@ class DraggableElement extends Element {
 }
 
 class TitleElement extends DraggableElement {
+
+	static get type() {
+
+		return 'TitleElement';
+
+	}
 
 	constructor( title, draggable = true ) {
 
@@ -1953,6 +1989,12 @@ const colors = [
 const dropNode = new Node().add( new TitleElement( 'File' ) ).setWidth( 250 );
 
 class Canvas extends Serializer {
+
+	static get type() {
+
+		return 'Canvas';
+
+	}
 
 	constructor() {
 
@@ -2424,7 +2466,10 @@ class Canvas extends Serializer {
 
 	get useTransform() {
 
-		return navigator.userAgent.match( /firefox/i ) !== null;
+		const userAgent = navigator.userAgent;
+		const isSafari = /Safari/.test( userAgent ) && ! /Chrome/.test( userAgent );
+
+		return ! isSafari;
 
 	}
 
@@ -3643,6 +3688,12 @@ class Search extends Menu {
 
 class LabelElement extends Element {
 
+	static get type() {
+
+		return 'LabelElement';
+
+	}
+
 	constructor( label = '', align = '' ) {
 
 		super();
@@ -3746,6 +3797,12 @@ class LabelElement extends Element {
 
 class ButtonInput extends Input {
 
+	static get type() {
+
+		return 'ButtonInput';
+
+	}
+
 	constructor( innterText = '' ) {
 
 		const dom = document.createElement( 'button' );
@@ -3814,6 +3871,12 @@ class ButtonInput extends Input {
 
 class ColorInput extends Input {
 
+	static get type() {
+
+		return 'ColorInput';
+
+	}
+
 	constructor( value = 0x0099ff ) {
 
 		const dom = document.createElement( 'input' );
@@ -3845,6 +3908,12 @@ class ColorInput extends Input {
 }
 
 class NumberInput extends Input {
+
+	static get type() {
+
+		return 'NumberInput';
+
+	}
 
 	constructor( value = 0, min = - Infinity, max = Infinity, step = .01 ) {
 
@@ -3953,6 +4022,15 @@ class NumberInput extends Input {
 
 	}
 
+	setInterger( bool ) {
+
+		this.integer = bool;
+		this.step = .1;
+
+		return this.setValue( this.getValue() );
+
+	}
+
 	get precision() {
 
 		if ( this.integer === true ) return 0;
@@ -4024,6 +4102,12 @@ class NumberInput extends Input {
 }
 
 class SelectInput extends Input {
+
+	static get type() {
+
+		return 'SelectInput';
+
+	}
 
 	constructor( options = [], value = null ) {
 
@@ -4125,6 +4209,12 @@ const getStep = ( min, max ) => {
 };
 
 class SliderInput extends Input {
+
+	static get type() {
+
+		return 'SliderInput';
+
+	}
 
 	constructor( value = 0, min = 0, max = 100 ) {
 
@@ -4261,6 +4351,12 @@ class SliderInput extends Input {
 }
 
 class StringInput extends Input {
+
+	static get type() {
+
+		return 'StringInput';
+
+	}
 
 	constructor( value = '' ) {
 
@@ -4426,6 +4522,12 @@ class StringInput extends Input {
 
 class TextInput extends Input {
 
+	static get type() {
+
+		return 'TextInput';
+
+	}
+
 	constructor( innerText = '' ) {
 
 		const dom = document.createElement( 'textarea' );
@@ -4466,6 +4568,12 @@ class TextInput extends Input {
 }
 
 class ToggleInput extends Input {
+
+	static get type() {
+
+		return 'ToggleInput';
+
+	}
 
 	constructor( value = false ) {
 
@@ -4648,6 +4756,12 @@ class TreeViewNode {
 
 class TreeViewInput extends Input {
 
+	static get type() {
+
+		return 'TreeViewInput';
+
+	}
+
 	constructor( options = [] ) {
 
 		const dom = document.createElement( 'f-treeview' );
@@ -4727,6 +4841,12 @@ var Flow = /*#__PURE__*/Object.freeze({
 const LoaderLib = {};
 
 class Loader extends EventTarget {
+
+	static get type() {
+
+		return 'Loader';
+
+	}
 
 	constructor( parseType = Loader.DEFAULT ) {
 
