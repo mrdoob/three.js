@@ -4,18 +4,19 @@ import { materialRotation } from '../../nodes/accessors/MaterialNode.js';
 import { modelViewMatrix, modelWorldMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionLocal, positionView } from '../../nodes/accessors/Position.js';
 import { rotate } from '../../nodes/utils/RotateNode.js';
-import { float, vec2, vec3, vec4 } from '../../nodes/tsl/TSLBase.js';
+import { float, vec2, vec4 } from '../../nodes/tsl/TSLBase.js';
 
 import { SpriteMaterial } from '../SpriteMaterial.js';
 import { reference } from '../../nodes/accessors/ReferenceBaseNode.js';
+import { attribute } from '../../nodes/TSL.js';
 
 const _defaultValues = /*@__PURE__*/ new SpriteMaterial();
 
-class SpriteNodeMaterial extends NodeMaterial {
+class InstancedSpritesNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
-		return 'SpriteNodeMaterial';
+		return 'InstancedSpritesNodeMaterial';
 
 	}
 
@@ -24,11 +25,11 @@ class SpriteNodeMaterial extends NodeMaterial {
 		super();
 
 		this.isSpriteNodeMaterial = true;
+		this.isInstancedSpritesNodeMaterial = true;
 
 		this.lights = false;
 		this._useSizeAttenuation = true;
 
-		this.positionNode = null;
 		this.rotationNode = null;
 		this.scaleNode = null;
 
@@ -42,13 +43,16 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		const sizeAttenuation = this.sizeAttenuation;
 
+		const instancePosition = attribute( 'instancePosition' ).xyz;
+
 		// < VERTEX STAGE >
 
-		const { positionNode, rotationNode, scaleNode } = this;
+		const { rotationNode, scaleNode } = this;
 
 		const vertex = positionLocal;
 
-		let mvPosition = modelViewMatrix.mul( vec3( positionNode || 0 ) );
+
+		let mvPosition = modelViewMatrix.mul( instancePosition );
 
 		let scale = vec2( modelWorldMatrix[ 0 ].xyz.length(), modelWorldMatrix[ 1 ].xyz.length() );
 
@@ -123,4 +127,4 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 }
 
-export default SpriteNodeMaterial;
+export default InstancedSpritesNodeMaterial;
