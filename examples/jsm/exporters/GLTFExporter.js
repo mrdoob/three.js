@@ -1979,9 +1979,9 @@ class GLTFWriter {
 
 		if ( ! json.meshes ) json.meshes = [];
 
-		await this._invokeAll( async function ( ext ) {
+		await this._invokeAll( function ( ext ) {
 
-			ext.writeMesh && await ext.writeMesh( mesh, meshDef );
+			ext.writeMesh && ext.writeMesh( mesh, meshDef );
 
 		} );
 
@@ -2350,9 +2350,9 @@ class GLTFWriter {
 
 		}
 
-		await this._invokeAll( async function ( ext ) {
+		await this._invokeAll( function ( ext ) {
 
-			ext.writeNode && await ext.writeNode( object, nodeDef );
+			ext.writeNode && ext.writeNode( object, nodeDef );
 
 		} );
 
