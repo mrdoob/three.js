@@ -96,6 +96,7 @@ export * from './display/ViewportSharedTextureNode.js';
 export * from './display/ViewportDepthTextureNode.js';
 export * from './display/ViewportDepthNode.js';
 export * from './display/RenderOutputNode.js';
+export * from './display/ToonOutlinePassNode.js';
 
 export * from './display/PassNode.js';
 
