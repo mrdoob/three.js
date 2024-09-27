@@ -72,7 +72,7 @@ class CDLNode extends TempNode {
 
 export default CDLNode;
 
-export const cdl = ( node, slope, offset, power, saturation ) => nodeObject(
+export const cdl = ( node, slope = vec3( 1 ), offset = vec3( 0 ), power = vec3( 1 ), saturation = vec3( 1 ) ) => nodeObject(
 	new CDLNode(
 		nodeObject( node ),
 		nodeObject( slope ),
