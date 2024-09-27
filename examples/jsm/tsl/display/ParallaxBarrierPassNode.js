@@ -1,9 +1,5 @@
-import { Fn, If, nodeObject, vec4 } from '../tsl/TSLBase.js';
-import { uv } from '../accessors/UV.js';
-import { mod } from '../math/MathNode.js';
-import { screenCoordinate } from './ScreenNode.js';
+import { nodeObject, Fn, vec4, uv, NodeMaterial, If, mod, screenCoordinate } from 'three/tsl';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
-import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 class ParallaxBarrierPassNode extends StereoCompositePassNode {
 

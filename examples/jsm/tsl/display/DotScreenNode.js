@@ -1,12 +1,5 @@
-import TempNode from '../core/TempNode.js';
-import { nodeObject, Fn, vec2, vec3, vec4 } from '../tsl/TSLBase.js';
-import { uniform } from '../core/UniformNode.js';
-import { uv } from '../accessors/UV.js';
-import { sin, cos } from '../math/MathNode.js';
-import { add } from '../math/OperatorNode.js';
-import { screenSize } from './ScreenNode.js';
-
-import { Vector2 } from '../../math/Vector2.js';
+import { Vector2 } from 'three';
+import { TempNode, nodeObject, Fn, uv, uniform, vec2, vec3, sin, cos, add, vec4, screenSize } from 'three/tsl';
 
 class DotScreenNode extends TempNode {
 

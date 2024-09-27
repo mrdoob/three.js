@@ -1,7 +1,5 @@
-import { nodeObject } from '../tsl/TSLBase.js';
-import PassNode from './PassNode.js';
-import { Vector2 } from '../../math/Vector2.js';
-import { StereoCamera } from '../../cameras/StereoCamera.js';
+import { StereoCamera, Vector2 } from 'three';
+import { PassNode, nodeObject } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 

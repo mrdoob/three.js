@@ -1,5 +1,4 @@
-import { Fn, vec3, vec4 } from '../tsl/TSLBase.js';
-import { dot } from '../math/MathNode.js';
+import { dot, Fn, vec3, vec4 } from 'three/tsl';
 
 export const sepia = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
