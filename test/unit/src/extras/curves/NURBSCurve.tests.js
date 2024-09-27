@@ -8,9 +8,11 @@ export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Curves', () => {
 
-		QUnit.module( 'NURBSCurve', () => {
+		QUnit.module( 'NURBSCurve', ( hooks ) => {
 
-			QUnit.test( 'toJSON', ( assert ) => {
+			let _nurbsCurve = undefined;
+
+			hooks.before( function () {
 
 				const nurbsControlPoints = [];
 				const nurbsKnots = [];
@@ -32,14 +34,32 @@ export default QUnit.module( 'Extras', () => {
 
 				}
 
-				const nurbsCurve = new NURBSCurve( nurbsDegree, nurbsKnots, nurbsControlPoints );
-				const json = nurbsCurve.toJSON();
+				 _nurbsCurve = new NURBSCurve( nurbsDegree, nurbsKnots, nurbsControlPoints );
 
-				assert.equal( json.degree, nurbsCurve.degree, "json.degree ok" );
-				assert.deepEqual( json.knots, nurbsCurve.knots, "json.knots ok" );
-				assert.deepEqual( json.controlPoints, nurbsCurve.controlPoints.map( p => p.toArray() ), "json.controlPoints ok" );
-				assert.equal( json.startKnot, nurbsCurve.startKnot, "json.startKnot ok" );
-				assert.equal( json.endKnot, nurbsCurve.endKnot, "json.endKnot ok" );
+			} );
+
+			QUnit.test( 'toJSON', ( assert ) => {
+
+				const json = _nurbsCurve.toJSON();
+
+				assert.equal( json.degree, _nurbsCurve.degree, "json.degree ok" );
+				assert.deepEqual( json.knots, _nurbsCurve.knots, "json.knots ok" );
+				assert.deepEqual( json.controlPoints, _nurbsCurve.controlPoints.map( p => p.toArray() ), "json.controlPoints ok" );
+				assert.equal( json.startKnot, _nurbsCurve.startKnot, "json.startKnot ok" );
+				assert.equal( json.endKnot, _nurbsCurve.endKnot, "json.endKnot ok" );
+
+			} );
+
+			QUnit.test( 'fromJSON', ( assert ) => {
+
+				const json = _nurbsCurve.toJSON();
+				const fromJson = new NURBSCurve().fromJSON( json );
+
+				assert.equal( fromJson.degree, _nurbsCurve.degree, "json.degree ok" );
+				assert.deepEqual( fromJson.knots, _nurbsCurve.knots, "json.knots ok" );
+				assert.deepEqual( fromJson.controlPoints, _nurbsCurve.controlPoints, "json.controlPoints ok" );
+				assert.equal( fromJson.startKnot, _nurbsCurve.startKnot, "json.startKnot ok" );
+				assert.equal( fromJson.endKnot, _nurbsCurve.endKnot, "json.endKnot ok" );
 
 			} );
 
