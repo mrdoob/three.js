@@ -3,13 +3,17 @@ import { Color } from '../math/Color.js';
 
 class ShadowMaterial extends Material {
 
+	static get type() {
+
+		return 'ShadowMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isShadowMaterial = true;
-
-		this.type = 'ShadowMaterial';
 
 		this.color = new Color( 0x000000 );
 		this.transparent = true;

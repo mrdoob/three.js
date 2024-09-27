@@ -3,13 +3,17 @@ import { Color } from '../math/Color.js';
 
 class LineBasicMaterial extends Material {
 
+	static get type() {
+
+		return 'LineBasicMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isLineBasicMaterial = true;
-
-		this.type = 'LineBasicMaterial';
 
 		this.color = new Color( 0xffffff );
 

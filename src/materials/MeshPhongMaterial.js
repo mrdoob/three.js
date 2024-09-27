@@ -6,13 +6,17 @@ import { Euler } from '../math/Euler.js';
 
 class MeshPhongMaterial extends Material {
 
+	static get type() {
+
+		return 'MeshPhongMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshPhongMaterial = true;
-
-		this.type = 'MeshPhongMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
 		this.specular = new Color( 0x111111 );

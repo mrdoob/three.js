@@ -65,7 +65,7 @@ class NodeLibrary {
 
 	addMaterial( materialNodeClass, materialClass ) {
 
-		this.addType( materialNodeClass, materialClass.name, this.materialNodes );
+		this.addType( materialNodeClass, materialClass.type, this.materialNodes );
 
 	}
 

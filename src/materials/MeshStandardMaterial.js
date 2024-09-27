@@ -6,6 +6,12 @@ import { Euler } from '../math/Euler.js';
 
 class MeshStandardMaterial extends Material {
 
+	static get type() {
+
+		return 'MeshStandardMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
@@ -13,8 +19,6 @@ class MeshStandardMaterial extends Material {
 		this.isMeshStandardMaterial = true;
 
 		this.defines = { 'STANDARD': '' };
-
-		this.type = 'MeshStandardMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
 		this.roughness = 1.0;
