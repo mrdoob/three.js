@@ -1,10 +1,6 @@
-import { Fn, nodeObject, vec4 } from '../tsl/TSLBase.js';
-import { Matrix3 } from '../../math/Matrix3.js';
-import { uniform } from '../core/UniformNode.js';
-import { uv } from '../accessors/UV.js';
-import { clamp, max } from '../math/MathNode.js';
+import { Matrix3 } from 'three';
+import { clamp, nodeObject, Fn, vec4, uv, uniform, max, NodeMaterial } from 'three/tsl';
 import StereoCompositePassNode from './StereoCompositePassNode.js';
-import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 class AnaglyphPassNode extends StereoCompositePassNode {
 

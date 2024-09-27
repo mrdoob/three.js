@@ -1,17 +1,5 @@
-import TempNode from '../core/TempNode.js';
-import { uv } from '../accessors/UV.js';
-import { Fn, nodeObject, float, int, vec2, vec3, vec4, mat2, If } from '../tsl/TSLBase.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
-import { uniformArray } from '../accessors/UniformArrayNode.js';
-import { abs, dot, sin, cos, PI, pow, max } from '../math/MathNode.js';
-import { Loop } from '../utils/LoopNode.js';
-import { luminance } from './ColorAdjustment.js';
-import { textureSize } from '../accessors/TextureSizeNode.js';
-import { convertToTexture } from '../utils/RTTNode.js';
-
-import { Vector2 } from '../../math/Vector2.js';
-import { Vector3 } from '../../math/Vector3.js';
+import { Vector2, Vector3 } from 'three';
+import { convertToTexture, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI } from 'three/tsl';
 
 class DenoiseNode extends TempNode {
 

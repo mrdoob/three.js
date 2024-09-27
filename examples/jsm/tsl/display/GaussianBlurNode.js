@@ -1,16 +1,5 @@
-import TempNode from '../core/TempNode.js';
-import { nodeObject, Fn, float, vec2, vec4 } from '../tsl/TSLBase.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { mul } from '../math/OperatorNode.js';
-import { uv } from '../accessors/UV.js';
-import { passTexture } from './PassNode.js';
-import { uniform } from '../core/UniformNode.js';
-import { convertToTexture } from '../utils/RTTNode.js';
-import QuadMesh from '../../renderers/common/QuadMesh.js';
-
-import { Vector2 } from '../../math/Vector2.js';
-import { RenderTarget } from '../../core/RenderTarget.js';
-import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
+import { RenderTarget, Vector2 } from 'three';
+import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, QuadMesh, passTexture, mul, NodeMaterial } from 'three/tsl';
 
 // WebGPU: The use of a single QuadMesh for both gaussian blur passes results in a single RenderObject with a SampledTexture binding that
 // alternates between source textures and triggers creation of new BindGroups and BindGroupLayouts every frame.

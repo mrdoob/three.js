@@ -1,13 +1,5 @@
-import { nodeObject } from '../tsl/TSLBase.js';
-import PassNode from './PassNode.js';
-import { Color } from '../../math/Color.js';
-import { Vector2 } from '../../math/Vector2.js';
-import { AdditiveBlending } from '../../constants.js';
-import { uniform } from '../core/UniformNode.js';
-import QuadMesh from '../../renderers/common/QuadMesh.js';
-import { texture } from '../accessors/TextureNode.js';
-import { mrt, getTextureIndex } from '../core/MRTNode.js';
-import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
+import { AdditiveBlending, Color, Vector2 } from 'three';
+import { nodeObject, uniform, mrt, PassNode, QuadMesh, texture, NodeMaterial, getTextureIndex } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 

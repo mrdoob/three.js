@@ -27,7 +27,6 @@ import {
 	REVISION
 } from 'three';
 
-
 /**
  * The KHR_mesh_quantization extension allows these extra attribute component types
  *

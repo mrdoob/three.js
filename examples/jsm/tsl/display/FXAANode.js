@@ -1,14 +1,5 @@
-import TempNode from '../core/TempNode.js';
-import { uv } from '../accessors/UV.js';
-import { Fn, nodeObject, float, vec2, vec4, int, If } from '../tsl/TSLBase.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
-import { abs, max, min, mix, pow } from '../math/MathNode.js';
-import { sub } from '../math/OperatorNode.js';
-import { Loop, Break } from '../utils/LoopNode.js';
-import { convertToTexture } from '../utils/RTTNode.js';
-
-import { Vector2 } from '../../math/Vector2.js';
+import { Vector2 } from 'three';
+import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, If, Loop, int, max, min, pow, mix, Break, abs, sub } from 'three/tsl';
 
 class FXAANode extends TempNode {
 

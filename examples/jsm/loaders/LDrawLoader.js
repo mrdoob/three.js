@@ -47,6 +47,12 @@ const _tempVec1 = new Vector3();
 
 class LDrawConditionalLineMaterial extends ShaderMaterial {
 
+	static get type() {
+
+		return 'LDrawConditionalLineMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super( {

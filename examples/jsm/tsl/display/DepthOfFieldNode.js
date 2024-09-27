@@ -1,10 +1,4 @@
-import TempNode from '../core/TempNode.js';
-import { uv } from '../accessors/UV.js';
-import { Fn, nodeObject, vec2, vec4 } from '../tsl/TSLBase.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
-import { clamp } from '../math/MathNode.js';
-import { convertToTexture } from '../utils/RTTNode.js';
+import { convertToTexture, TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, vec2, vec4, clamp } from 'three/tsl';
 
 class DepthOfFieldNode extends TempNode {
 

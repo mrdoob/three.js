@@ -1,11 +1,5 @@
-
-import PassNode from './PassNode.js';
-import { StereoCamera } from '../../cameras/StereoCamera.js';
-import { HalfFloatType, LinearFilter, NearestFilter } from '../../constants.js';
-import { RenderTarget } from '../../core/RenderTarget.js';
-import { texture } from '../accessors/TextureNode.js';
-import { Vector2 } from '../../math/Vector2.js';
-import QuadMesh from '../../renderers/common/QuadMesh.js';
+import { RenderTarget, StereoCamera, HalfFloatType, LinearFilter, NearestFilter, Vector2 } from 'three';
+import { PassNode, QuadMesh, texture } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 const _quadMesh = /*@__PURE__*/ new QuadMesh();

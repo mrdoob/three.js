@@ -1,8 +1,4 @@
-import TempNode from '../core/TempNode.js';
-import { uv } from '../accessors/UV.js';
-import { Fn, nodeProxy, vec4 } from '../tsl/TSLBase.js';
-import { mix, fract, clamp, rand } from '../math/MathNode.js';
-import { timerLocal } from '../utils/TimerNode.js';
+import { TempNode, rand, Fn, fract, timerLocal, uv, clamp, mix, vec4, nodeProxy } from 'three/tsl';
 
 class FilmNode extends TempNode {
 

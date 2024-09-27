@@ -1,23 +1,5 @@
-import TempNode from '../core/TempNode.js';
-import { texture } from '../accessors/TextureNode.js';
-import { textureSize } from '../accessors/TextureSizeNode.js';
-import { uv } from '../accessors/UV.js';
-import { nodeObject, Fn, mat3, vec2, vec3, vec4, float, int, If } from '../tsl/TSLBase.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
-import { DataTexture } from '../../textures/DataTexture.js';
-import { Vector2 } from '../../math/Vector2.js';
-import { Vector3 } from '../../math/Vector3.js';
-import { PI, cos, sin, pow, clamp, abs, max, mix, sqrt, acos, dot, normalize, cross } from '../math/MathNode.js';
-import { div, mul, add, sub } from '../math/OperatorNode.js';
-import { Loop } from '../utils/LoopNode.js';
-import { passTexture } from './PassNode.js';
-import { RepeatWrapping } from '../../constants.js';
-import QuadMesh from '../../renderers/common/QuadMesh.js';
-import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-
-import { RenderTarget } from '../../core/RenderTarget.js';
-import { Color } from '../../math/Color.js';
+import { Color, DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3 } from 'three';
+import { QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _currentClearColor = /*@__PURE__*/ new Color();
