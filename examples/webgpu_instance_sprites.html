@@ -27,13 +27,10 @@
 			import * as THREE from 'three';
 
 			import Stats from 'three/addons/libs/stats.module.js';
-
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { uniform, timerGlobal, instanceIndex } from 'three/tsl';
+			import { uniform, timerGlobal, instanceIndex, instancedBufferAttribute } from 'three/tsl';
 
-			import InstancedSprites from 'three/addons/objects/InstancedSprites.js';
-			import InstancedSpritesGeometry from 'three/addons/geometries/InstancedSpritesGeometry.js';
 
 			let camera, scene, renderer, stats, material;
 			let mouseX = 0, mouseY = 0;
@@ -52,30 +49,31 @@
 				scene.fog = new THREE.FogExp2( 0x000000, 0.001 );
 
 
+				const count = 10000;
 				const sprite = new THREE.TextureLoader().load( 'textures/sprites/snowflake1.png' );
 				sprite.colorSpace = THREE.SRGBColorSpace;
 
 
-				const geometry = new InstancedSpritesGeometry();
-
 				const positions = [];
 
-				for ( let i = 0; i < 10000; i ++ ) {
+				for ( let i = 0; i < count; i ++ ) {
 
 					positions.push( 2000 * Math.random() - 1000, 2000 * Math.random() - 1000, 2000 * Math.random() - 1000 );
 
 				}
 
-				geometry.setPositions( positions );
 
-				material = new THREE.InstancedSpritesNodeMaterial( { sizeAttenuation: true, map: sprite, alphaMap: sprite, alphaTest: 0.1, transparent: true } );
+				material = new THREE.SpriteNodeMaterial( { sizeAttenuation: true, map: sprite, alphaMap: sprite, alphaTest: 0.1, transparent: true } );
 				material.color.setHSL( 1.0, 0.3, 0.7, THREE.SRGBColorSpace );
+				material.positionNode = instancedBufferAttribute( new THREE.InstancedBufferAttribute( new Float32Array( positions ), 3 ) );
 
 				material.scaleNode = uniform( 15 );
 
 				const timer = timerGlobal();
 				material.rotationNode = timer.add( instanceIndex ).sin();
-				const particles = new InstancedSprites( geometry, material );
+				const particles = new THREE.Sprite( material );
+				particles.count = count;
+
 				scene.add( particles );
 
 				//
