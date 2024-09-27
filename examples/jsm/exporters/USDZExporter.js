@@ -9,9 +9,19 @@ import {
 	zipSync,
 } from '../libs/fflate.module.js';
 
-import { decompress } from './../utils/TextureUtils.js';
-
 class USDZExporter {
+
+	constructor() {
+
+		this.textureUtils = null;
+
+	}
+
+	setTextureUtils( utils ) {
+
+		this.textureUtils = utils;
+
+	}
 
 	parse( scene, onDone, onError, options ) {
 
@@ -98,7 +108,15 @@ class USDZExporter {
 
 			if ( texture.isCompressedTexture === true ) {
 
-				texture = decompress( texture );
+				if ( this.textureUtils === null ) {
+
+					throw new Error( 'THREE.USDZExporter: setTextureUtils() must be called to process compressed textures.' );
+
+				} else {
+
+					texture = await this.textureUtils.decompress( texture );
+
+				}
 
 			}
 

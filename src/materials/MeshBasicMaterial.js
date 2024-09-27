@@ -5,13 +5,17 @@ import { Euler } from '../math/Euler.js';
 
 class MeshBasicMaterial extends Material {
 
+	static get type() {
+
+		return 'MeshBasicMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshBasicMaterial = true;
-
-		this.type = 'MeshBasicMaterial';
 
 		this.color = new Color( 0xffffff ); // emissive
 

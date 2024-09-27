@@ -806,7 +806,7 @@ class TransformControlsRoot extends Object3D {
 
 	}
 
-	dispose() {
+	dispose() {
 
 		this.traverse( function ( child ) {
 

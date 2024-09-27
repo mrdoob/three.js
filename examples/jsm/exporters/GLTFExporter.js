@@ -26,7 +26,7 @@ import {
 	Quaternion,
 	REVISION
 } from 'three';
-import { decompress } from './../utils/TextureUtils.js';
+import { decompress } from './../utils/WebGLTextureUtils.js';
 
 
 /**
