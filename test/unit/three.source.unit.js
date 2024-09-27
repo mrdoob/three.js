@@ -86,6 +86,7 @@ import './src/extras/curves/LineCurve3.tests.js';
 import './src/extras/curves/QuadraticBezierCurve.tests.js';
 import './src/extras/curves/QuadraticBezierCurve3.tests.js';
 import './src/extras/curves/SplineCurve.tests.js';
+import './src/extras/curves/NURBSCurve.tests.js';
 
 //src/geometries
 import './src/geometries/BoxGeometry.tests.js';
