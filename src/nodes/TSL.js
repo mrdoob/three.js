@@ -84,6 +84,7 @@ export * from './accessors/VelocityNode.js';
 // display
 export * from './display/BlendMode.js';
 export * from './display/BumpMapNode.js';
+export * from './display/CDLNode.js';
 export * from './display/ColorAdjustment.js';
 export * from './display/ColorSpaceNode.js';
 export * from './display/FrontFacingNode.js';
