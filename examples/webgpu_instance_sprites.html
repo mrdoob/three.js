@@ -71,7 +71,7 @@
 				material = new THREE.InstancedSpritesNodeMaterial( { sizeAttenuation: true, map: sprite, alphaMap: sprite, alphaTest: 0.1, transparent: true } );
 				material.color.setHSL( 1.0, 0.3, 0.7, THREE.SRGBColorSpace );
 
-				material.scaleNode = uniform( 10 );
+				material.scaleNode = uniform( 15 );
 
 				const timer = timerGlobal();
 				material.rotationNode = timer.add( instanceIndex ).sin();
@@ -98,7 +98,7 @@
 				gui.add( material, 'sizeAttenuation' ).onChange( function () {
 
 					material.needsUpdate = true;
-					material.scaleNode.value = material.sizeAttenuation ? 10 : 0.02;
+					material.scaleNode.value = material.sizeAttenuation ? 15 : 0.03;
 			
 				} );
 
