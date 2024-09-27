@@ -1,7 +1,4 @@
-import TempNode from '../core/TempNode.js';
-import { Fn, nodeObject, vec3, vec4, float } from '../tsl/TSLBase.js';
-import { uniform } from '../core/UniformNode.js';
-import { mix } from '../math/MathNode.js';
+import { TempNode, nodeObject, Fn, float, uniform, vec3, vec4, mix } from 'three/tsl';
 
 class Lut3DNode extends TempNode {
 

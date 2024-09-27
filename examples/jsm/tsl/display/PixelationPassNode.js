@@ -1,17 +1,5 @@
-import TempNode from '../core/TempNode.js';
-import { uv } from '../accessors/UV.js';
-import { Fn, nodeObject, vec2, vec3, float, If } from '../tsl/TSLBase.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { uniform } from '../core/UniformNode.js';
-import { dot, clamp, smoothstep, sign, step, floor } from '../math/MathNode.js';
-import { Vector4 } from '../../math/Vector4.js';
-import { output, property } from '../core/PropertyNode.js';
-import PassNode from './PassNode.js';
-import { mrt } from '../core/MRTNode.js';
-import { normalView } from '../accessors/Normal.js';
-import { convertToTexture } from '../utils/RTTNode.js';
-
-import { NearestFilter } from '../../constants.js';
+import { NearestFilter, Vector4 } from 'three';
+import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, PassNode, property } from 'three/tsl';
 
 class PixelationNode extends TempNode {
 

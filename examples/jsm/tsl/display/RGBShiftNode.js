@@ -1,9 +1,4 @@
-import TempNode from '../core/TempNode.js';
-import { nodeObject, Fn, vec2, vec4 } from '../tsl/TSLBase.js';
-import { uniform } from '../core/UniformNode.js';
-import { uv } from '../accessors/UV.js';
-import { sin, cos } from '../math/MathNode.js';
-import { convertToTexture } from '../utils/RTTNode.js';
+import { TempNode, nodeObject, Fn, uv, uniform, vec2, sin, cos, vec4, convertToTexture } from 'three/tsl';
 
 class RGBShiftNode extends TempNode {
 

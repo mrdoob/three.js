@@ -1,17 +1,5 @@
-import TempNode from '../core/TempNode.js';
-import { nodeObject, Fn, float, vec2, vec3 } from '../tsl/TSLBase.js';
-import { Loop } from '../utils/LoopNode.js';
-import { uniform } from '../core/UniformNode.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { threshold } from './ColorAdjustment.js';
-import { uv } from '../accessors/UV.js';
-import { passTexture } from './PassNode.js';
-import { convertToTexture } from '../utils/RTTNode.js';
-import QuadMesh from '../../renderers/common/QuadMesh.js';
-import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
-
-import { Vector2 } from '../../math/Vector2.js';
-import { RenderTarget } from '../../core/RenderTarget.js';
+import { RenderTarget, Vector2 } from 'three';
+import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, convertToTexture, QuadMesh, NodeMaterial, vec2, vec3, Loop, threshold } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 

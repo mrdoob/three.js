@@ -1,22 +1,5 @@
-import TempNode from '../core/TempNode.js';
-import { Fn, nodeObject, float, vec4, int } from '../tsl/TSLBase.js';
-import { mix, smoothstep } from '../math/MathNode.js';
-import { luminance } from './ColorAdjustment.js';
-import { uniform } from '../core/UniformNode.js';
-import { uniformArray } from '../accessors/UniformArrayNode.js';
-import { uv } from '../accessors/UV.js';
-import { Color } from '../../math/Color.js';
-import { passTexture } from './PassNode.js';
-import { RenderTarget } from '../../core/RenderTarget.js';
-import { HalfFloatType } from '../../constants.js';
-import { NodeUpdateType } from '../core/constants.js';
-import { Vector2 } from '../../math/Vector2.js';
-import { Loop } from '../utils/LoopNode.js';
-import { add } from '../math/OperatorNode.js';
-import QuadMesh from '../../renderers/common/QuadMesh.js';
-import { texture } from '../accessors/TextureNode.js';
-import { Vector3 } from '../../math/Vector3.js';
-import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
+import { Color, HalfFloatType, RenderTarget, Vector2, Vector3 } from 'three';
+import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, QuadMesh, NodeMaterial, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 

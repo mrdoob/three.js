@@ -1,9 +1,4 @@
-import TempNode from '../core/TempNode.js';
-import { uv } from '../accessors/UV.js';
-import { Fn, nodeObject, float, int, vec4, If } from '../tsl/TSLBase.js';
-import { clamp, mix } from '../math/MathNode.js';
-import { sub } from '../math/OperatorNode.js';
-import { convertToTexture } from '../utils/RTTNode.js';
+import { TempNode, nodeObject, Fn, float, uv, convertToTexture, vec4, If, int, clamp, sub, mix } from 'three/tsl';
 
 class TransitionNode extends TempNode {
 
