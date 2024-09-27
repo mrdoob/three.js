@@ -75,6 +75,20 @@ class NURBSCurve extends Curve {
 
 	}
 
+	toJSON() {
+
+		const data = super.toJSON();
+
+		data.degree = this.degree;
+		data.knots = [ ...this.knots ];
+		data.controlPoints = this.controlPoints.map(p => p.toArray());
+		data.startKnot = this.startKnot;
+		data.endKnot = this.endKnot;
+
+		return data;
+
+	}
+
 }
 
 export { NURBSCurve };
