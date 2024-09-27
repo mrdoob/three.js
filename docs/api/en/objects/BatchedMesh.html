@@ -167,8 +167,21 @@
 		<p>
 			[page:Integer instanceId]: The id of an instance to get the visibility state of.
 		</p>
-		<p>Get whether the given instance is marked as "visible" or not.</p>
-		
+		<p>Get whether the given instance is marked as "visible" or not.</p>		
+
+		<h3>
+			[method:Object getGeometryRangeAt]( [param:Integer geometryId], [param:Object target] )
+		</h3>
+		<p>
+			[page:Integer geometryId]: The id of the geometry to get the range of.
+		</p>
+		<p>
+			[page:Object target]: Optional target object to copy the range in to.
+		</p>
+		<p>Get the range representing the subset of triangles related to the attached geometry, indicating the starting offset and count, or `null` if invalid.</p>
+		<p>Return an object of the form:</p>
+		<code>{ start: Integer, count: Integer }</code>
+	
 		<h3>
 			[method:Integer getGeometryIdAt]( [param:Integer instanceId] )
 		</h3>
@@ -176,7 +189,7 @@
 			[page:Integer instanceId]: The id of an instance to get the geometryIndex of.
 		</p>
 		<p>Get the geometryIndex of the defined instance.</p>
-	
+
 		<h3>
 			[method:undefined setColorAt]( [param:Integer instanceId], [param:Color color] )
 		</h3>
@@ -257,6 +270,15 @@
 		<p>
 			Adds a new instance to the [name] using the geometry of the given geometryId and returns a new id referring to the new instance to be used
 			by other functions.
+		</p>
+		<h3>
+			[method:Integer deleteInstance]( [param:Integer instanceId] )
+		</h3>
+		<p>
+			[page:Integer instanceId]: The id of an instance to remove from the [name] that was previously added via "addInstance".
+		</p>
+		<p>
+			Removes an existing instance from the [name] using the given instanceId.
 		</p>
 
 		<h3>

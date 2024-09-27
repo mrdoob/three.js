@@ -1,4 +1,5 @@
 import { Vector4 } from '../../math/Vector4.js';
+import { hashArray } from '../../nodes/core/NodeUtils.js';
 
 let id = 0;
 
@@ -50,17 +51,15 @@ export function getCacheKey( renderContext ) {
 
 	const { textures, activeCubeFace } = renderContext;
 
-	let key = '';
+	const values = [ activeCubeFace ];
 
 	for ( const texture of textures ) {
 
-		key += texture.id + ',';
+		values.push( texture.id );
 
 	}
 
-	key += activeCubeFace;
-
-	return key;
+	return hashArray( values );
 
 }
 

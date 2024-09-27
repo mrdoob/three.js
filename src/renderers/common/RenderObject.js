@@ -1,3 +1,4 @@
+import { hashString } from '../../nodes/core/NodeUtils.js';
 import ClippingContext from './ClippingContext.js';
 
 let _id = 0;
@@ -248,6 +249,35 @@ export default class RenderObject {
 
 	}
 
+	getGeometryCacheKey() {
+
+		const { geometry } = this;
+
+		let cacheKey = '';
+
+		for ( const name of Object.keys( geometry.attributes ).sort() ) {
+
+			const attribute = geometry.attributes[ name ];
+
+			cacheKey += name + ',';
+
+			if ( attribute.data ) cacheKey += attribute.data.stride + ',';
+			if ( attribute.offset ) cacheKey += attribute.offset + ',';
+			if ( attribute.itemSize ) cacheKey += attribute.itemSize + ',';
+			if ( attribute.normalized ) cacheKey += 'n,';
+
+		}
+
+		if ( geometry.index ) {
+
+			cacheKey += 'index,';
+
+		}
+
+		return cacheKey;
+
+	}
+
 	getMaterialCacheKey() {
 
 		const { object, material } = this;
@@ -304,7 +334,7 @@ export default class RenderObject {
 
 		if ( object.geometry ) {
 
-			cacheKey += object.geometry.id + ',';
+			cacheKey += this.getGeometryCacheKey();
 
 		}
 
@@ -340,7 +370,7 @@ export default class RenderObject {
 
 		}
 
-		return cacheKey;
+		return hashString( cacheKey );
 
 	}
 
@@ -354,13 +384,21 @@ export default class RenderObject {
 
 		// Environment Nodes Cache Key
 
-		return this.object.receiveShadow + ',' + this._nodes.getCacheKey( this.scene, this.lightsNode );
+		let cacheKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
+
+		if ( this.object.receiveShadow ) {
+
+			cacheKey += 1;
+
+		}
+
+		return cacheKey;
 
 	}
 
 	getCacheKey() {
 
-		return this.getMaterialCacheKey() + ',' + this.getDynamicCacheKey();
+		return this.getMaterialCacheKey() + this.getDynamicCacheKey();
 
 	}
 

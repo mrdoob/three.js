@@ -93,27 +93,9 @@ export { default as ViewportTextureNode } from './display/ViewportTextureNode.js
 export { default as ViewportSharedTextureNode } from './display/ViewportSharedTextureNode.js';
 export { default as ViewportDepthTextureNode } from './display/ViewportDepthTextureNode.js';
 export { default as ViewportDepthNode } from './display/ViewportDepthNode.js';
-export { default as GaussianBlurNode } from './display/GaussianBlurNode.js';
-export { default as AfterImageNode } from './display/AfterImageNode.js';
-export { default as AnamorphicNode } from './display/AnamorphicNode.js';
-export { default as SobelOperatorNode } from './display/SobelOperatorNode.js';
-export { default as DepthOfFieldNode } from './display/DepthOfFieldNode.js';
-export { default as DotScreenNode } from './display/DotScreenNode.js';
-export { default as RGBShiftNode } from './display/RGBShiftNode.js';
-export { default as FilmNode } from './display/FilmNode.js';
-export { default as Lut3DNode } from './display/Lut3DNode.js';
-export { default as GTAONode } from './display/GTAONode.js';
-export { default as DenoiseNode } from './display/DenoiseNode.js';
-export { default as FXAANode } from './display/FXAANode.js';
-export { default as BloomNode } from './display/BloomNode.js';
-export { default as TransitionNode } from './display/TransitionNode.js';
 export { default as RenderOutputNode } from './display/RenderOutputNode.js';
-export { default as PixelationPassNode } from './display/PixelationPassNode.js';
-export { default as SSAAPassNode } from './display/SSAAPassNode.js';
-export { default as StereoPassNode } from './display/StereoPassNode.js';
-export { default as AnaglyphPassNode } from './display/AnaglyphPassNode.js';
-export { default as ParallaxBarrierPassNode } from './display/ParallaxBarrierPassNode.js';
 export { default as PassNode } from './display/PassNode.js';
+export { default as ToonOutlinePassNode } from './display/ToonOutlinePassNode.js';
 
 // code
 export { default as ExpressionNode } from './code/ExpressionNode.js';

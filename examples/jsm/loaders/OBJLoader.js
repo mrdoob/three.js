@@ -12,7 +12,8 @@ import {
 	Points,
 	PointsMaterial,
 	Vector3,
-	Color
+	Color,
+	SRGBColorSpace
 } from 'three';
 
 // o object_name | g group_name
@@ -534,8 +535,9 @@ class OBJLoader extends Loader {
 							_color.setRGB(
 								parseFloat( data[ 4 ] ),
 								parseFloat( data[ 5 ] ),
-								parseFloat( data[ 6 ] )
-							).convertSRGBToLinear();
+								parseFloat( data[ 6 ] ),
+								SRGBColorSpace
+							);
 
 							state.colors.push( _color.r, _color.g, _color.b );
 

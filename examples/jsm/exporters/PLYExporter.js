@@ -1,7 +1,9 @@
 import {
 	Matrix3,
 	Vector3,
-	Color
+	Color,
+	ColorManagement,
+	SRGBColorSpace
 } from 'three';
 
 /**
@@ -302,9 +304,9 @@ class PLYExporter {
 
 						if ( colors != null ) {
 
-							tempColor
-								.fromBufferAttribute( colors, i )
-								.convertLinearToSRGB();
+							tempColor.fromBufferAttribute( colors, i );
+
+							ColorManagement.fromWorkingColorSpace( tempColor, SRGBColorSpace );
 
 							output.setUint8( vOffset, Math.floor( tempColor.r * 255 ) );
 							vOffset += 1;
@@ -461,9 +463,9 @@ class PLYExporter {
 
 						if ( colors != null ) {
 
-							tempColor
-								.fromBufferAttribute( colors, i )
-								.convertLinearToSRGB();
+							tempColor.fromBufferAttribute( colors, i );
+
+							ColorManagement.fromWorkingColorSpace( tempColor, SRGBColorSpace );
 
 							line += ' ' +
 								Math.floor( tempColor.r * 255 ) + ' ' +

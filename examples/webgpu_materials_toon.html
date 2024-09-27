@@ -24,6 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { toonOutlinePass } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -33,7 +34,7 @@
 
 			let container, stats;
 
-			let camera, scene, renderer;
+			let camera, scene, renderer, postProcessing;
 			let particleLight;
 
 			const loader = new FontLoader();
@@ -63,6 +64,13 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
 				container.appendChild( renderer.domElement );
+
+				//
+
+				postProcessing = new THREE.PostProcessing( renderer );
+
+				postProcessing.outputNode = toonOutlinePass( scene, camera );
+
 
 				// Materials
 
@@ -184,7 +192,7 @@
 
 				stats.begin();
 
-				renderer.render( scene, camera );
+				postProcessing.render();
 
 				stats.end();
 
