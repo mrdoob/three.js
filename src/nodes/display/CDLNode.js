@@ -21,7 +21,7 @@ class CDLNode extends TempNode {
 
 	}
 
-	constructor( inputNode, slopeNode, offsetNode, powerNode, saturationNode ) {
+	constructor( inputNode, slopeNode = vec3( 1 ), offsetNode = vec3( 0 ), powerNode = vec3( 1 ), saturationNode = vec3( 1 ) ) {
 
 		super();
 
