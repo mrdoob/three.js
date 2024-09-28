@@ -1319,13 +1319,10 @@ fn main( ${shaderData.attributes} ) -> VaryingsStruct {
 	}
 
 	_getWGSLFragmentCode( shaderData ) {
-		const diagnostic = typeof Deno === 'object' ? '' : 'diagnostic( off, derivative_uniformity );';
 
 		return `${ this.getSignature() }
 // global
 ${ diagnostics }
-
-${diagnostic}
 
 // uniforms
 ${shaderData.uniforms}
