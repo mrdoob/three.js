@@ -260,7 +260,13 @@
 		<p>
 			Adds the given geometry to the [name] and returns the associated geometry id referring to it to be used in other functions.
 		</p>
-
+		<h3>
+			[method:Integer deleteGeometry]( [param:Integer geometryId] )
+		</h3>
+		<p>
+			[page:Integer geometryId]: The id of a geometry to remove from the [name] that was previously added via "addGeometry". Any instances referencing
+			this geometry will also be removed as a side effect.
+		</p>
 		<h3>
 			[method:Integer addInstance]( [param:Integer geometryId] )
 		</h3>

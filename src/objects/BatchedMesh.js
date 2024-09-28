@@ -479,7 +479,7 @@ class BatchedMesh extends Mesh {
 		const drawRange = {
 			start: hasIndex ? reservedRange.indexStart : reservedRange.vertexStart,
 			count: - 1,
-			active: false,
+			active: true,
 		};
 
 		const boundsInfo = {
