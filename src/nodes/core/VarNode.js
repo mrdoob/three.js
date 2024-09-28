@@ -54,7 +54,19 @@ class VarNode extends Node {
 
 export default VarNode;
 
-export const temp = /*@__PURE__*/ nodeProxy( VarNode );
+export const createVar = /*@__PURE__*/ nodeProxy( VarNode );
 
-addMethodChaining( 'temp', temp ); // @TODO: Will be removed in the future
 addMethodChaining( 'toVar', ( ...params ) => temp( ...params ).append() );
+
+// Deprecated
+
+export const temp = ( node ) => { // @deprecated, r170
+
+	console.warn( 'TSL: "temp" is deprecated. Use ".toVar()" or "createVar()" instead.' );
+
+	return createVar( node );
+
+};
+
+addMethodChaining( 'temp', temp );
+
