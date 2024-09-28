@@ -54,7 +54,7 @@ class VarNode extends Node {
 
 export default VarNode;
 
-export const createVar = /*@__PURE__*/ nodeProxy( VarNode );
+const createVar = /*@__PURE__*/ nodeProxy( VarNode );
 
 addMethodChaining( 'toVar', ( ...params ) => temp( ...params ).append() );
 
