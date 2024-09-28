@@ -78,6 +78,8 @@ class InstancedPointsGeometry extends InstancedBufferGeometry {
 		this.computeBoundingBox();
 		this.computeBoundingSphere();
 
+		this.instanceCount = points.length / 3;
+
 		return this;
 
 	}
