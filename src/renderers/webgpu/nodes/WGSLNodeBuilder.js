@@ -152,7 +152,7 @@ if ( /Windows/g.test( navigator.userAgent ) ) {
 
 let diagnostics = '';
 
-if ( /Firefox/g.test( navigator.userAgent ) !== true ) {
+if ( /Firefox|Deno/g.test( navigator.userAgent ) !== true ) {
 
 	diagnostics += 'diagnostic( off, derivative_uniformity );\n';
 
