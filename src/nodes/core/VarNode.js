@@ -56,7 +56,7 @@ export default VarNode;
 
 const createVar = /*@__PURE__*/ nodeProxy( VarNode );
 
-addMethodChaining( 'toVar', ( ...params ) => temp( ...params ).append() );
+addMethodChaining( 'toVar', ( ...params ) => createVar( ...params ).append() );
 
 // Deprecated
 
