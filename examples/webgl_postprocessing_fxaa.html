@@ -51,8 +51,9 @@
 			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
-			let camera, scene, renderer, clock, group, container;
+			let camera, scene, renderer, controls, container;
 
 			let composer1, composer2, fxaaPass;
 
@@ -67,8 +68,6 @@
 
 				scene = new THREE.Scene();
 
-				clock = new THREE.Clock();
-
 				//
 
 				const hemiLight = new THREE.HemisphereLight( 0xffffff, 0x8d8d8d );
@@ -80,8 +79,6 @@
 				scene.add( dirLight );
 
 				//
-
-				group = new THREE.Group();
 
 				const geometry = new THREE.TetrahedronGeometry( 10 );
 				const material = new THREE.MeshStandardMaterial( { color: 0xf73232, flatShading: true } );
@@ -100,11 +97,9 @@
 					mesh.rotation.y = Math.random() * Math.PI;
 					mesh.rotation.z = Math.random() * Math.PI;
 
-					group.add( mesh );
+					scene.add( mesh );
 
 				}
-
-				scene.add( group );
 
 				//
 
@@ -113,6 +108,8 @@
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
 				renderer.setAnimationLoop( animate );
 				renderer.autoClear = false;
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.autoRotate = true;
 				container.appendChild( renderer.domElement );
 
 				//
@@ -171,7 +168,7 @@
 
 				const halfWidth = container.offsetWidth / 2;
 
-				group.rotation.y += clock.getDelta() * 0.1;
+				controls.update();
 
 				renderer.setScissorTest( true );
 
