@@ -278,12 +278,9 @@ const FXAAShader = {
 
 		void main() {
 
-			vec2 uv = vUv;
-			vec2 texSize = resolution.xy;
-			gl_FragColor = ApplyFXAA( tDiffuse, texSize, uv );
+			gl_FragColor = ApplyFXAA( tDiffuse, resolution.xy, vUv );
 			
-		}
-	`
+		}`
 
 };
 
