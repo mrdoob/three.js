@@ -930,6 +930,51 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	setInstanceCount( maxInstanceCount ) {
+
+		// shrink the available instances as much as possible
+		const availableInstanceIds = this._availableInstanceIds;
+		const drawInfo = this._drawInfo;
+		availableInstanceIds.sort( ( a, b ) => a - b );
+		while ( availableInstanceIds[ availableInstanceIds.length - 1 ] === drawInfo.length ) {
+
+			drawInfo.pop();
+			availableInstanceIds.pop();
+
+		}
+
+		// throw an error if it can't be shrunk to the desired size
+		if ( maxInstanceCount < drawInfo.length ) {
+
+			throw new Error();
+
+		}
+
+		// copy the multi draw counts
+		const multiDrawCounts = new Int32Array( maxInstanceCount );
+		const multiDrawStarts = new Int32Array( maxInstanceCount );
+		multiDrawCounts.set( this._multiDrawCounts );
+		multiDrawStarts.set( this._multiDrawStarts );
+
+		this._multiDrawCounts = multiDrawCounts;
+		this._multiDrawStarts = multiDrawStarts;
+		this._maxInstanceCount = maxInstanceCount;
+
+		// update texture data for instance sampling
+		const indirectTexture = this._indirectTexture;
+		const matricesTexture = this._matricesTexture;
+		const colorsTexture = this._colorsTexture;
+
+		this._initIndirectTexture();
+		this._initMatricesTexture();
+		this._initColorsTexture();
+
+		this._indirectTexture.image.data.set( indirectTexture.image.data );
+		this._matricesTexture.image.data.set( matricesTexture.image.data );
+		this._colorsTexture.image.data.set( colorsTexture.image.data );
+
+	}
+
 	raycast( raycaster, intersects ) {
 
 		const drawInfo = this._drawInfo;
