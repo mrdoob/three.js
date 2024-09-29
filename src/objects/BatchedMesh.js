@@ -705,7 +705,7 @@ class BatchedMesh extends Mesh {
 				// shift the index pointers based on how the vertex data will shift
 				// adjusting the index must happen first so the original vertex start value is available
 				const elementDelta = nextVertexStart - reservedRange.vertexStart;
-				for ( let j = 0; j < drawRange.count; j ++ ) {
+				for ( let j = indexStart; j < indexStart + indexCount; j ++ ) {
 
 					array[ j ] = array[ j ] + elementDelta;
 
