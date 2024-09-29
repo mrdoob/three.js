@@ -742,6 +742,8 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		return this;
+
 	}
 
 	// get bounding box and compute it if it doesn't exist
