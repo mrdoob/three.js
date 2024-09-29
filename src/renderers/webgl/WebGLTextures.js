@@ -767,8 +767,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			let mipmap;
 			const mipmaps = texture.mipmaps;
-
-			const useTexStorage = ( texture.isVideoTexture !== true );
+			const useTexStorage = ( texture.isGPU !== true );
 			const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
 			const dataReady = source.dataReady;
 			const levels = getMipLevels( texture, image );
@@ -1212,7 +1211,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				glType = utils.convert( texture.type ),
 				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType, texture.colorSpace );
 
-			const useTexStorage = ( texture.isVideoTexture !== true );
+			const useTexStorage = ( texture.isGPU !== true );
 			const allocateMemory = ( sourceProperties.__version === undefined ) || ( forceUpload === true );
 			const dataReady = source.dataReady;
 			let levels = getMipLevels( texture, image );
