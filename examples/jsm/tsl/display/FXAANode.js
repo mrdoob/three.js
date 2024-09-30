@@ -1,5 +1,5 @@
 import { Vector2 } from 'three';
-import { TempNode, nodeObject, Fn, select, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, vec4, If, Loop, max, min, Break, abs } from 'three/tsl';
+import { TempNode, nodeObject, Fn, uniformArray, select, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, vec4, If, Loop, max, min, Break, abs } from 'three/tsl';
 
 class FXAANode extends TempNode {
 
@@ -36,8 +36,7 @@ class FXAANode extends TempNode {
 
 		const EDGE_STEP_COUNT = float( 10 );
 		const EDGE_GUESS = float( 8.0 );
-		// TODO: Keep this or GetEdgeStep
-		// const EDGE_STEPS = [1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 4.0];
+		const EDGE_STEPS = uniformArray( [ 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 4.0 ] );
 
 		const _ContrastThreshold = float( 0.0312 );
 		const _RelativeThreshold = float( 0.063 );
@@ -147,7 +146,7 @@ class FXAANode extends TempNode {
 			const edgeLuminance = lm.add( oppositeLuminance ).mul( 0.5 );
 			const gradientThreshold = gradient.mul( 0.25 );
 
-			const puv = uvEdge.add( edgeStep.mul( GetEdgeStep( 0 ) ) ).toVar();
+			const puv = uvEdge.add( edgeStep.mul( EDGE_STEPS.element( 0 ) ) ).toVar();
 			const pLuminanceDelta = SampleLuminance( puv ).sub( edgeLuminance ).toVar();
 			const pAtEnd = abs( pLuminanceDelta ).greaterThanEqual( gradientThreshold ).toVar();
 
@@ -155,7 +154,7 @@ class FXAANode extends TempNode {
 
 				If( pAtEnd, () => { Break(); } );
 
-				puv.addAssign( edgeStep.mul( GetEdgeStep( i ) ) );
+				puv.addAssign( edgeStep.mul( EDGE_STEPS.element( i ) ) );
 				pLuminanceDelta.assign( SampleLuminance( puv ).sub( edgeLuminance ) );
 				pAtEnd.assign( abs( pLuminanceDelta ).greaterThanEqual( gradientThreshold ) );
 				
@@ -168,7 +167,7 @@ class FXAANode extends TempNode {
 
 			} );
 
-			const nuv = uvEdge.sub( edgeStep.mul( GetEdgeStep( 0 ) ) ).toVar();
+			const nuv = uvEdge.sub( edgeStep.mul( EDGE_STEPS.element( 0 ) ) ).toVar();
 			const nLuminanceDelta = SampleLuminance( nuv ).sub( edgeLuminance ).toVar();
 			const nAtEnd = abs( nLuminanceDelta ).greaterThanEqual( gradientThreshold ).toVar();
 
@@ -176,7 +175,7 @@ class FXAANode extends TempNode {
 
 				If( nAtEnd, () => { Break(); } );
 
-				nuv.subAssign( edgeStep.mul( GetEdgeStep( i ) ) );
+				nuv.subAssign( edgeStep.mul( EDGE_STEPS.element( i ) ) );
 				nLuminanceDelta.assign( SampleLuminance( nuv ).sub( edgeLuminance ) );
 				nAtEnd.assign( abs( nLuminanceDelta ).greaterThanEqual( gradientThreshold ) );
 
@@ -231,22 +230,6 @@ class FXAANode extends TempNode {
 			} );
 
 			return blendFactor;
-		} );
-
-		const GetEdgeStep = Fn( ( [ index ] ) => {
-
-			// TODO: How to do array indexing?
-			// 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 4.0
-
-			const step = float().toVar();
-
-			If ( index.greaterThanEqual( 9 ), () => { step.assign( 4.0 ); } )
-			.ElseIf ( index.greaterThanEqual( 2 ), () => { step.assign( 2.0 ); } )
-			.ElseIf ( index.greaterThanEqual( 1 ), () => { step.assign( 1.5 ); } )
-			.Else( () => { step.assign( 1.0 ); } );
-
-			return step;
-			
 		} );
 
 		const ApplyFXAA = Fn( ( [ uv, texSize ] ) => {
