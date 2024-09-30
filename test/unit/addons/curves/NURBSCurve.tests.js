@@ -1,15 +1,15 @@
 /* global QUnit */
 
-import { NURBSCurve } from '../../../../../examples/jsm/curves/NURBSCurve.js';
-import { MathUtils } from '../../../../../src/math/MathUtils.js';
-import { Vector4 } from '../../../../../src/math/Vector4.js';
+import { NURBSCurve } from '../../../../examples/jsm/curves/NURBSCurve.js';
+import { MathUtils } from '../../../../src/math/MathUtils.js';
+import { Vector4 } from '../../../../src/math/Vector4.js';
 
 export default QUnit.module( 'Extras', () => {
 
 	QUnit.module( 'Curves', () => {
 
 		QUnit.module( 'NURBSCurve', ( hooks ) => {
-
+			
 			let _nurbsCurve = undefined;
 
 			hooks.before( function () {
