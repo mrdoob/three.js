@@ -956,7 +956,7 @@ class BatchedMesh extends Mesh {
 		// throw an error if it can't be shrunk to the desired size
 		if ( maxInstanceCount < drawInfo.length ) {
 
-			throw new Error();
+			throw new Error( `BatchedMesh: Instance ids outside the range ${ maxInstanceCount } are being used. Cannot shrink instance count.` );
 
 		}
 
@@ -987,14 +987,40 @@ class BatchedMesh extends Mesh {
 
 	setGeometrySize( maxVertexCount, maxIndexCount = maxVertexCount * 2 ) {
 
+		// Check if we can shrink to the requested vertex attribute size
+		const validRanges = [ ...this._reservedRanges ].filter( ( range, i ) => this._drawRanges[ i ].active );
+		const requiredVertexLength = Math.max( ...validRanges.map( range => range.vertexStart + range.vertexCount ) );
+		if ( requiredVertexLength > maxVertexCount ) {
+
+			throw new Error( `BatchedMesh: Geometry Index values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
+
+		}
+
+		// Check if we can shrink to the requested index attribute size
+		if ( this.geometry.index ) {
+
+			const requiredIndexLength = Math.max( ...validRanges.map( range => range.indexStart + range.indexCount ) );
+			if ( requiredIndexLength > maxIndexCount ) {
+
+				throw new Error( `BatchedMesh: Geometry Index values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
+
+			}
+
+		}
+
+		//
+
+		// dispose of the previous geometry
 		const oldGeometry = this.geometry;
 		oldGeometry.dispose();
 
+		// recreate the geometry needed based on the previous variant
 		this._maxVertexCount = maxVertexCount;
 		this._maxIndexCount = maxIndexCount;
 		this._geometryInitialized = false;
-		this._initializeGeometry();
+		this._initializeGeometry( oldGeometry );
 
+		// copy data from the previous geometry
 		const geometry = this.geometry;
 		if ( oldGeometry.index ) {
 
