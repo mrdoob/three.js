@@ -170,14 +170,9 @@ const ObjectSpaceNormalMap = 1;
 const NoColorSpace = '';
 const SRGBColorSpace = 'srgb';
 const LinearSRGBColorSpace = 'srgb-linear';
-const DisplayP3ColorSpace = 'display-p3';
-const LinearDisplayP3ColorSpace = 'display-p3-linear';
 
 const LinearTransfer = 'linear';
 const SRGBTransfer = 'srgb';
-
-const Rec709Primaries = 'rec709';
-const P3Primaries = 'p3';
 
 const ZeroStencilOp = 0;
 const KeepStencilOp = 7680;
@@ -1626,90 +1621,31 @@ function toReversedProjectionMatrix( projectionMatrix ) {
 
 }
 
-/**
- * Matrices converting P3 <-> Rec. 709 primaries, without gamut mapping
- * or clipping. Based on W3C specifications for sRGB and Display P3,
- * and ICC specifications for the D50 connection space. Values in/out
- * are _linear_ sRGB and _linear_ Display P3.
- *
- * Note that both sRGB and Display P3 use the sRGB transfer functions.
- *
- * Reference:
- * - http://www.russellcottrell.com/photo/matrixCalculator.htm
- */
-
-const LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 = /*@__PURE__*/ new Matrix3().set(
-	0.8224621, 0.177538, 0.0,
-	0.0331941, 0.9668058, 0.0,
-	0.0170827, 0.0723974, 0.9105199,
-);
-
-const LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = /*@__PURE__*/ new Matrix3().set(
-	1.2249401, - 0.2249404, 0.0,
-	- 0.0420569, 1.0420571, 0.0,
-	- 0.0196376, - 0.0786361, 1.0982735
-);
-
-/**
- * Defines supported color spaces by transfer function and primaries,
- * and provides conversions to/from the Linear-sRGB reference space.
- */
-const COLOR_SPACES = {
-	[ LinearSRGBColorSpace ]: {
-		transfer: LinearTransfer,
-		primaries: Rec709Primaries,
-		luminanceCoefficients: [ 0.2126, 0.7152, 0.0722 ],
-		toReference: ( color ) => color,
-		fromReference: ( color ) => color,
-	},
-	[ SRGBColorSpace ]: {
-		transfer: SRGBTransfer,
-		primaries: Rec709Primaries,
-		luminanceCoefficients: [ 0.2126, 0.7152, 0.0722 ],
-		toReference: ( color ) => color.convertSRGBToLinear(),
-		fromReference: ( color ) => color.convertLinearToSRGB(),
-	},
-	[ LinearDisplayP3ColorSpace ]: {
-		transfer: LinearTransfer,
-		primaries: P3Primaries,
-		luminanceCoefficients: [ 0.2289, 0.6917, 0.0793 ],
-		toReference: ( color ) => color.applyMatrix3( LINEAR_DISPLAY_P3_TO_LINEAR_SRGB ),
-		fromReference: ( color ) => color.applyMatrix3( LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 ),
-	},
-	[ DisplayP3ColorSpace ]: {
-		transfer: SRGBTransfer,
-		primaries: P3Primaries,
-		luminanceCoefficients: [ 0.2289, 0.6917, 0.0793 ],
-		toReference: ( color ) => color.convertSRGBToLinear().applyMatrix3( LINEAR_DISPLAY_P3_TO_LINEAR_SRGB ),
-		fromReference: ( color ) => color.applyMatrix3( LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 ).convertLinearToSRGB(),
-	},
-};
-
-const SUPPORTED_WORKING_COLOR_SPACES = new Set( [ LinearSRGBColorSpace, LinearDisplayP3ColorSpace ] );
-
 const ColorManagement = {
 
 	enabled: true,
 
-	_workingColorSpace: LinearSRGBColorSpace,
+	workingColorSpace: LinearSRGBColorSpace,
 
-	get workingColorSpace() {
-
-		return this._workingColorSpace;
-
-	},
-
-	set workingColorSpace( colorSpace ) {
-
-		if ( ! SUPPORTED_WORKING_COLOR_SPACES.has( colorSpace ) ) {
-
-			throw new Error( `Unsupported working color space, "${ colorSpace }".` );
-
-		}
-
-		this._workingColorSpace = colorSpace;
-
-	},
+	/**
+	 * Implementations of supported color spaces.
+	 *
+	 * Required:
+	 *	- primaries: chromaticity coordinates [ rx ry gx gy bx by ]
+	 *	- whitePoint: reference white [ x y ]
+	 *	- transfer: transfer function (pre-defined)
+	 *	- toXYZ: Matrix3 RGB to XYZ transform
+	 *	- fromXYZ: Matrix3 XYZ to RGB transform
+	 *	- luminanceCoefficients: RGB luminance coefficients
+	 *
+	 * Optional:
+	 *  - outputColorSpaceConfig: { drawingBufferColorSpace: ColorSpace }
+	 *  - workingColorSpaceConfig: { unpackColorSpace: ColorSpace }
+	 *
+	 * Reference:
+	 * - https://www.russellcottrell.com/photo/matrixCalculator.htm
+	 */
+	spaces: {},
 
 	convert: function ( color, sourceColorSpace, targetColorSpace ) {
 
@@ -1719,28 +1655,48 @@ const ColorManagement = {
 
 		}
 
-		const sourceToReference = COLOR_SPACES[ sourceColorSpace ].toReference;
-		const targetFromReference = COLOR_SPACES[ targetColorSpace ].fromReference;
+		if ( this.spaces[ sourceColorSpace ].transfer === SRGBTransfer ) {
 
-		return targetFromReference( sourceToReference( color ) );
+			color.r = SRGBToLinear( color.r );
+			color.g = SRGBToLinear( color.g );
+			color.b = SRGBToLinear( color.b );
+
+		}
+
+		if ( this.spaces[ sourceColorSpace ].primaries !== this.spaces[ targetColorSpace ].primaries ) {
+
+			color.applyMatrix3( this.spaces[ sourceColorSpace ].toXYZ );
+			color.applyMatrix3( this.spaces[ targetColorSpace ].fromXYZ );
+
+		}
+
+		if ( this.spaces[ targetColorSpace ].transfer === SRGBTransfer ) {
+
+			color.r = LinearToSRGB( color.r );
+			color.g = LinearToSRGB( color.g );
+			color.b = LinearToSRGB( color.b );
+
+		}
+
+		return color;
 
 	},
 
 	fromWorkingColorSpace: function ( color, targetColorSpace ) {
 
-		return this.convert( color, this._workingColorSpace, targetColorSpace );
+		return this.convert( color, this.workingColorSpace, targetColorSpace );
 
 	},
 
 	toWorkingColorSpace: function ( color, sourceColorSpace ) {
 
-		return this.convert( color, sourceColorSpace, this._workingColorSpace );
+		return this.convert( color, sourceColorSpace, this.workingColorSpace );
 
 	},
 
 	getPrimaries: function ( colorSpace ) {
 
-		return COLOR_SPACES[ colorSpace ].primaries;
+		return this.spaces[ colorSpace ].primaries;
 
 	},
 
@@ -1748,15 +1704,43 @@ const ColorManagement = {
 
 		if ( colorSpace === NoColorSpace ) return LinearTransfer;
 
-		return COLOR_SPACES[ colorSpace ].transfer;
+		return this.spaces[ colorSpace ].transfer;
 
 	},
 
-	getLuminanceCoefficients: function ( target, colorSpace = this._workingColorSpace ) {
+	getLuminanceCoefficients: function ( target, colorSpace = this.workingColorSpace ) {
 
-		return target.fromArray( COLOR_SPACES[ colorSpace ].luminanceCoefficients );
+		return target.fromArray( this.spaces[ colorSpace ].luminanceCoefficients );
 
 	},
+
+	define: function ( colorSpaces ) {
+
+		Object.assign( this.spaces, colorSpaces );
+
+	},
+
+	// Internal APIs
+
+	_getMatrix: function ( targetMatrix, sourceColorSpace, targetColorSpace ) {
+
+		return targetMatrix
+			.copy( this.spaces[ sourceColorSpace ].toXYZ )
+			.multiply( this.spaces[ targetColorSpace ].fromXYZ );
+
+	},
+
+	_getDrawingBufferColorSpace: function ( colorSpace ) {
+
+		return this.spaces[ colorSpace ].outputColorSpaceConfig.drawingBufferColorSpace;
+
+	},
+
+	_getUnpackColorSpace: function ( colorSpace = this.workingColorSpace ) {
+
+		return this.spaces[ colorSpace ].workingColorSpaceConfig.unpackColorSpace;
+
+	}
 
 };
 
@@ -1772,6 +1756,50 @@ function LinearToSRGB( c ) {
 	return ( c < 0.0031308 ) ? c * 12.92 : 1.055 * ( Math.pow( c, 0.41666 ) ) - 0.055;
 
 }
+
+/******************************************************************************
+ * sRGB definitions
+ */
+
+const REC709_PRIMARIES = [ 0.640, 0.330, 0.300, 0.600, 0.150, 0.060 ];
+const REC709_LUMINANCE_COEFFICIENTS = [ 0.2126, 0.7152, 0.0722 ];
+const D65 = [ 0.3127, 0.3290 ];
+
+const LINEAR_REC709_TO_XYZ = /*@__PURE__*/ new Matrix3().set(
+	0.4123908, 0.3575843, 0.1804808,
+	0.2126390, 0.7151687, 0.0721923,
+	0.0193308, 0.1191948, 0.9505322
+);
+
+const XYZ_TO_LINEAR_REC709 = /*@__PURE__*/ new Matrix3().set(
+	3.2409699, - 1.5373832, - 0.4986108,
+	- 0.9692436, 1.8759675, 0.0415551,
+	0.0556301, - 0.2039770, 1.0569715
+);
+
+ColorManagement.define( {
+
+	[ LinearSRGBColorSpace ]: {
+		primaries: REC709_PRIMARIES,
+		whitePoint: D65,
+		transfer: LinearTransfer,
+		toXYZ: LINEAR_REC709_TO_XYZ,
+		fromXYZ: XYZ_TO_LINEAR_REC709,
+		luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
+		workingColorSpaceConfig: { unpackColorSpace: SRGBColorSpace }
+	},
+
+	[ SRGBColorSpace ]: {
+		primaries: REC709_PRIMARIES,
+		whitePoint: D65,
+		transfer: SRGBTransfer,
+		toXYZ: LINEAR_REC709_TO_XYZ,
+		fromXYZ: XYZ_TO_LINEAR_REC709,
+		luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
+		outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace }
+	},
+
+} );
 
 let _canvas;
 
@@ -9162,6 +9190,20 @@ let _materialId = 0;
 
 class Material extends EventDispatcher {
 
+	static get type() {
+
+		return 'Material';
+
+	}
+
+	get type() {
+
+		return this.constructor.type;
+
+	}
+
+	set type( _value ) { /* */ }
+
 	constructor() {
 
 		super();
@@ -9173,7 +9215,6 @@ class Material extends EventDispatcher {
 		this.uuid = generateUUID();
 
 		this.name = '';
-		this.type = 'Material';
 
 		this.blending = NormalBlending;
 		this.side = FrontSide;
@@ -9685,13 +9726,17 @@ class Material extends EventDispatcher {
 
 class MeshBasicMaterial extends Material {
 
+	static get type() {
+
+		return 'MeshBasicMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshBasicMaterial = true;
-
-		this.type = 'MeshBasicMaterial';
 
 		this.color = new Color( 0xffffff ); // emissive
 
@@ -12291,13 +12336,17 @@ var default_fragment = "void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0
 
 class ShaderMaterial extends Material {
 
+	static get type() {
+
+		return 'ShaderMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isShaderMaterial = true;
-
-		this.type = 'ShaderMaterial';
 
 		this.defines = {};
 		this.uniforms = {};
@@ -13945,7 +13994,7 @@ var emissivemap_pars_fragment = "#ifdef USE_EMISSIVEMAP\n\tuniform sampler2D emi
 
 var colorspace_fragment = "gl_FragColor = linearToOutputTexel( gl_FragColor );";
 
-var colorspace_pars_fragment = "\nconst mat3 LINEAR_SRGB_TO_LINEAR_DISPLAY_P3 = mat3(\n\tvec3( 0.8224621, 0.177538, 0.0 ),\n\tvec3( 0.0331941, 0.9668058, 0.0 ),\n\tvec3( 0.0170827, 0.0723974, 0.9105199 )\n);\nconst mat3 LINEAR_DISPLAY_P3_TO_LINEAR_SRGB = mat3(\n\tvec3( 1.2249401, - 0.2249404, 0.0 ),\n\tvec3( - 0.0420569, 1.0420571, 0.0 ),\n\tvec3( - 0.0196376, - 0.0786361, 1.0982735 )\n);\nvec4 LinearSRGBToLinearDisplayP3( in vec4 value ) {\n\treturn vec4( value.rgb * LINEAR_SRGB_TO_LINEAR_DISPLAY_P3, value.a );\n}\nvec4 LinearDisplayP3ToLinearSRGB( in vec4 value ) {\n\treturn vec4( value.rgb * LINEAR_DISPLAY_P3_TO_LINEAR_SRGB, value.a );\n}\nvec4 LinearTransferOETF( in vec4 value ) {\n\treturn value;\n}\nvec4 sRGBTransferOETF( in vec4 value ) {\n\treturn vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );\n}";
+var colorspace_pars_fragment = "vec4 LinearTransferOETF( in vec4 value ) {\n\treturn value;\n}\nvec4 sRGBTransferOETF( in vec4 value ) {\n\treturn vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );\n}";
 
 var envmap_fragment = "#ifdef USE_ENVMAP\n\t#ifdef ENV_WORLDPOS\n\t\tvec3 cameraToFrag;\n\t\tif ( isOrthographic ) {\n\t\t\tcameraToFrag = normalize( vec3( - viewMatrix[ 0 ][ 2 ], - viewMatrix[ 1 ][ 2 ], - viewMatrix[ 2 ][ 2 ] ) );\n\t\t} else {\n\t\t\tcameraToFrag = normalize( vWorldPosition - cameraPosition );\n\t\t}\n\t\tvec3 worldNormal = inverseTransformDirection( normal, viewMatrix );\n\t\t#ifdef ENVMAP_MODE_REFLECTION\n\t\t\tvec3 reflectVec = reflect( cameraToFrag, worldNormal );\n\t\t#else\n\t\t\tvec3 reflectVec = refract( cameraToFrag, worldNormal, refractionRatio );\n\t\t#endif\n\t#else\n\t\tvec3 reflectVec = vReflect;\n\t#endif\n\t#ifdef ENVMAP_TYPE_CUBE\n\t\tvec4 envColor = textureCube( envMap, envMapRotation * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );\n\t#else\n\t\tvec4 envColor = vec4( 0.0 );\n\t#endif\n\t#ifdef ENVMAP_BLENDING_MULTIPLY\n\t\toutgoingLight = mix( outgoingLight, outgoingLight * envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_MIX )\n\t\toutgoingLight = mix( outgoingLight, envColor.xyz, specularStrength * reflectivity );\n\t#elif defined( ENVMAP_BLENDING_ADD )\n\t\toutgoingLight += envColor.xyz * specularStrength * reflectivity;\n\t#endif\n#endif";
 
@@ -19352,40 +19401,25 @@ function handleSource( string, errorLine ) {
 
 }
 
+const _m0 = /*@__PURE__*/ new Matrix3();
+
 function getEncodingComponents( colorSpace ) {
 
-	const workingPrimaries = ColorManagement.getPrimaries( ColorManagement.workingColorSpace );
-	const encodingPrimaries = ColorManagement.getPrimaries( colorSpace );
+	ColorManagement._getMatrix( _m0, ColorManagement.workingColorSpace, colorSpace );
 
-	let gamutMapping;
+	const encodingMatrix = `mat3( ${ _m0.elements.map( ( v ) => v.toFixed( 4 ) ) } )`;
 
-	if ( workingPrimaries === encodingPrimaries ) {
+	switch ( ColorManagement.getTransfer( colorSpace ) ) {
 
-		gamutMapping = '';
+		case LinearTransfer:
+			return [ encodingMatrix, 'LinearTransferOETF' ];
 
-	} else if ( workingPrimaries === P3Primaries && encodingPrimaries === Rec709Primaries ) {
-
-		gamutMapping = 'LinearDisplayP3ToLinearSRGB';
-
-	} else if ( workingPrimaries === Rec709Primaries && encodingPrimaries === P3Primaries ) {
-
-		gamutMapping = 'LinearSRGBToLinearDisplayP3';
-
-	}
-
-	switch ( colorSpace ) {
-
-		case LinearSRGBColorSpace:
-		case LinearDisplayP3ColorSpace:
-			return [ gamutMapping, 'LinearTransferOETF' ];
-
-		case SRGBColorSpace:
-		case DisplayP3ColorSpace:
-			return [ gamutMapping, 'sRGBTransferOETF' ];
+		case SRGBTransfer:
+			return [ encodingMatrix, 'sRGBTransferOETF' ];
 
 		default:
-			console.warn( 'THREE.WebGLProgram: Unsupported color space:', colorSpace );
-			return [ gamutMapping, 'LinearTransferOETF' ];
+			console.warn( 'THREE.WebGLProgram: Unsupported color space: ', colorSpace );
+			return [ encodingMatrix, 'LinearTransferOETF' ];
 
 	}
 
@@ -19418,7 +19452,16 @@ function getShaderErrors( gl, shader, type ) {
 function getTexelEncodingFunction( functionName, colorSpace ) {
 
 	const components = getEncodingComponents( colorSpace );
-	return `vec4 ${functionName}( vec4 value ) { return ${components[ 0 ]}( ${components[ 1 ]}( value ) ); }`;
+
+	return [
+
+		`vec4 ${functionName}( vec4 value ) {`,
+
+		`	return ${components[ 1 ]}( vec4( value.rgb * ${components[ 0 ]}, value.a ) );`,
+
+		'}',
+
+	].join( '\n' );
 
 }
 
@@ -22142,13 +22185,17 @@ function WebGLRenderStates( extensions ) {
 
 class MeshDepthMaterial extends Material {
 
+	static get type() {
+
+		return 'MeshDepthMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshDepthMaterial = true;
-
-		this.type = 'MeshDepthMaterial';
 
 		this.depthPacking = BasicDepthPacking;
 
@@ -22192,13 +22239,17 @@ class MeshDepthMaterial extends Material {
 
 class MeshDistanceMaterial extends Material {
 
+	static get type() {
+
+		return 'MeshDistanceMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshDistanceMaterial = true;
-
-		this.type = 'MeshDistanceMaterial';
 
 		this.map = null;
 
@@ -31572,8 +31623,8 @@ class WebGLRenderer {
 		this._outputColorSpace = colorSpace;
 
 		const gl = this.getContext();
-		gl.drawingBufferColorSpace = colorSpace === DisplayP3ColorSpace ? 'display-p3' : 'srgb';
-		gl.unpackColorSpace = ColorManagement.workingColorSpace === LinearDisplayP3ColorSpace ? 'display-p3' : 'srgb';
+		gl.drawingBufferColorspace = ColorManagement._getDrawingBufferColorSpace( colorSpace );
+		gl.unpackColorSpace = ColorManagement._getUnpackColorSpace();
 
 	}
 
@@ -32219,13 +32270,17 @@ class InterleavedBufferAttribute {
 
 class SpriteMaterial extends Material {
 
+	static get type() {
+
+		return 'SpriteMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isSpriteMaterial = true;
-
-		this.type = 'SpriteMaterial';
 
 		this.color = new Color( 0xffffff );
 
@@ -33650,8 +33705,9 @@ class BatchedMesh extends Mesh {
 		// stores visible, active, and geometry id per object
 		this._drawInfo = [];
 
-		// instance ids that have been set as inactive, and are available to be overwritten
+		// instance, geometry ids that have been set as inactive, and are available to be overwritten
 		this._availableInstanceIds = [];
+		this._availableGeometryIds = [];
 
 		// geometry information
 		this._drawRanges = [];
@@ -33905,13 +33961,6 @@ class BatchedMesh extends Mesh {
 
 		this._validateGeometry( geometry );
 
-		// ensure we're not over geometry
-		if ( this._drawInfo.length >= this._maxInstanceCount ) {
-
-			throw new Error( 'BatchedMesh: Maximum item count reached.' );
-
-		}
-
 		// get the necessary range fo the geometry
 		const reservedRange = {
 			vertexStart: - 1,
@@ -33986,23 +34035,40 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		// update id
-		const geometryId = this._geometryCount;
-		this._geometryCount ++;
-
 		// add the reserved range and draw range objects
-		reservedRanges.push( reservedRange );
-		drawRanges.push( {
+		const drawRange = {
 			start: hasIndex ? reservedRange.indexStart : reservedRange.vertexStart,
-			count: - 1
-		} );
-		bounds.push( {
+			count: - 1,
+			active: true,
+		};
+
+		const boundsInfo = {
 			boxInitialized: false,
 			box: new Box3(),
 
 			sphereInitialized: false,
 			sphere: new Sphere()
-		} );
+		};
+
+		// update id
+		let geometryId;
+		if ( this._availableGeometryIds.length > 0 ) {
+
+			geometryId = this._availableGeometryIds.pop();
+			reservedRanges[ geometryId ] = reservedRange;
+			drawRanges[ geometryId ] = drawRange;
+			bounds[ geometryId ] = boundsInfo;
+
+
+		} else {
+
+			geometryId = this._geometryCount;
+			this._geometryCount ++;
+			reservedRanges.push( reservedRange );
+			drawRanges.push( drawRange );
+			bounds.push( boundsInfo );
+
+		}
 
 		// update the geometry
 		this.setGeometryAt( geometryId, geometry );
@@ -34122,13 +34188,34 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	/*
 	deleteGeometry( geometryId ) {
 
-		// TODO: delete geometry and associated instances
+		const drawRanges = this._drawRanges;
+		if ( geometryId >= drawRanges.length || drawRanges[ geometryId ].active === false ) {
+
+			return this;
+
+		}
+
+		// delete any instances associated with this geometry
+		const drawInfo = this._drawInfo;
+		for ( let i = 0, l = drawInfo.length; i < l; i ++ ) {
+
+			if ( drawInfo[ i ].geometryIndex === geometryId ) {
+
+				this.deleteInstance( i );
+
+			}
+
+		}
+
+		drawRanges[ geometryId ].active = false;
+		this._availableGeometryIds.push( geometryId );
+		this._visibilityChanged = true;
+
+		return this;
 
 	}
-	*/
 
 	deleteInstance( instanceId ) {
 
@@ -34142,6 +34229,78 @@ class BatchedMesh extends Mesh {
 		drawInfo[ instanceId ].active = false;
 		this._availableInstanceIds.push( instanceId );
 		this._visibilityChanged = true;
+
+		return this;
+
+	}
+
+	optimize() {
+
+		// track the next indices to copy data to
+		let nextVertexStart = 0;
+		let nextIndexStart = 0;
+
+		// iterate over all geometry ranges
+		const drawRanges = this._drawRanges;
+		const reservedRanges = this._reservedRanges;
+		const geometry = this.geometry;
+		for ( let i = 0, l = drawRanges.length; i < l; i ++ ) {
+
+			// if a geometry range is inactive then don't copy anything
+			const drawRange = drawRanges[ i ];
+			const reservedRange = reservedRanges[ i ];
+			if ( drawRange.active === false ) {
+
+				continue;
+
+			}
+
+			// if a geometry contains an index buffer then shift it, as well
+			if ( geometry.index !== null && reservedRange.indexStart !== nextIndexStart ) {
+
+				const { indexStart, indexCount } = reservedRange;
+				const index = geometry.index;
+				const array = index.array;
+
+				// shift the index pointers based on how the vertex data will shift
+				// adjusting the index must happen first so the original vertex start value is available
+				const elementDelta = nextVertexStart - reservedRange.vertexStart;
+				for ( let j = indexStart; j < indexStart + indexCount; j ++ ) {
+
+					array[ j ] = array[ j ] + elementDelta;
+
+				}
+
+				index.array.copyWithin( nextIndexStart, indexStart, indexStart + indexCount );
+				index.addUpdateRange( nextIndexStart, indexCount );
+
+				reservedRange.indexStart = nextIndexStart;
+				nextIndexStart += reservedRange.indexCount;
+
+			}
+
+			// if a geometry needs to be moved then copy attribute data to overwrite unused space
+			if ( reservedRange.vertexStart !== nextVertexStart ) {
+
+				const { vertexStart, vertexCount } = reservedRange;
+				const attributes = geometry.attributes;
+				for ( const key in attributes ) {
+
+					const attribute = attributes[ key ];
+					const { array, itemSize } = attribute;
+					array.copyWithin( nextVertexStart * itemSize, vertexStart * itemSize, ( vertexStart + vertexCount ) * itemSize );
+					attribute.addUpdateRange( nextVertexStart * itemSize, vertexCount * itemSize );
+
+				}
+
+				reservedRange.vertexStart = nextVertexStart;
+				nextVertexStart += reservedRange.vertexCount;
+
+			}
+
+			drawRange.start = geometry.index ? reservedRange.indexStart : reservedRange.vertexStart;
+
+		}
 
 		return this;
 
@@ -34682,13 +34841,17 @@ class BatchedMesh extends Mesh {
 
 class LineBasicMaterial extends Material {
 
+	static get type() {
+
+		return 'LineBasicMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isLineBasicMaterial = true;
-
-		this.type = 'LineBasicMaterial';
 
 		this.color = new Color( 0xffffff );
 
@@ -35027,13 +35190,17 @@ class LineLoop extends Line {
 
 class PointsMaterial extends Material {
 
+	static get type() {
+
+		return 'PointsMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isPointsMaterial = true;
-
-		this.type = 'PointsMaterial';
 
 		this.color = new Color( 0xffffff );
 
@@ -41391,13 +41558,17 @@ var Geometries = /*#__PURE__*/Object.freeze({
 
 class ShadowMaterial extends Material {
 
+	static get type() {
+
+		return 'ShadowMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isShadowMaterial = true;
-
-		this.type = 'ShadowMaterial';
 
 		this.color = new Color( 0x000000 );
 		this.transparent = true;
@@ -41424,19 +41595,29 @@ class ShadowMaterial extends Material {
 
 class RawShaderMaterial extends ShaderMaterial {
 
+	static get type() {
+
+		return 'RawShaderMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super( parameters );
 
 		this.isRawShaderMaterial = true;
 
-		this.type = 'RawShaderMaterial';
-
 	}
 
 }
 
 class MeshStandardMaterial extends Material {
+
+	static get type() {
+
+		return 'MeshStandardMaterial';
+
+	}
 
 	constructor( parameters ) {
 
@@ -41445,8 +41626,6 @@ class MeshStandardMaterial extends Material {
 		this.isMeshStandardMaterial = true;
 
 		this.defines = { 'STANDARD': '' };
-
-		this.type = 'MeshStandardMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
 		this.roughness = 1.0;
@@ -41558,6 +41737,12 @@ class MeshStandardMaterial extends Material {
 
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
+	static get type() {
+
+		return 'MeshPhysicalMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
@@ -41570,8 +41755,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 			'PHYSICAL': ''
 
 		};
-
-		this.type = 'MeshPhysicalMaterial';
 
 		this.anisotropyRotation = 0;
 		this.anisotropyMap = null;
@@ -41796,13 +41979,17 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 class MeshPhongMaterial extends Material {
 
+	static get type() {
+
+		return 'MeshPhongMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshPhongMaterial = true;
-
-		this.type = 'MeshPhongMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
 		this.specular = new Color( 0x111111 );
@@ -41912,6 +42099,12 @@ class MeshPhongMaterial extends Material {
 
 class MeshToonMaterial extends Material {
 
+	static get type() {
+
+		return 'MeshToonMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
@@ -41919,8 +42112,6 @@ class MeshToonMaterial extends Material {
 		this.isMeshToonMaterial = true;
 
 		this.defines = { 'TOON': '' };
-
-		this.type = 'MeshToonMaterial';
 
 		this.color = new Color( 0xffffff );
 
@@ -42008,13 +42199,17 @@ class MeshToonMaterial extends Material {
 
 class MeshNormalMaterial extends Material {
 
+	static get type() {
+
+		return 'MeshNormalMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshNormalMaterial = true;
-
-		this.type = 'MeshNormalMaterial';
 
 		this.bumpMap = null;
 		this.bumpScale = 1;
@@ -42064,13 +42259,17 @@ class MeshNormalMaterial extends Material {
 
 class MeshLambertMaterial extends Material {
 
+	static get type() {
+
+		return 'MeshLambertMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshLambertMaterial = true;
-
-		this.type = 'MeshLambertMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
 
@@ -42176,6 +42375,12 @@ class MeshLambertMaterial extends Material {
 
 class MeshMatcapMaterial extends Material {
 
+	static get type() {
+
+		return 'MeshMatcapMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
@@ -42183,8 +42388,6 @@ class MeshMatcapMaterial extends Material {
 		this.isMeshMatcapMaterial = true;
 
 		this.defines = { 'MATCAP': '' };
-
-		this.type = 'MeshMatcapMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
 
@@ -42251,13 +42454,17 @@ class MeshMatcapMaterial extends Material {
 
 class LineDashedMaterial extends LineBasicMaterial {
 
+	static get type() {
+
+		return 'LineDashedMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isLineDashedMaterial = true;
-
-		this.type = 'LineDashedMaterial';
 
 		this.scale = 1;
 		this.dashSize = 3;
@@ -54251,7 +54458,6 @@ exports.DetachedBindMode = DetachedBindMode;
 exports.DirectionalLight = DirectionalLight;
 exports.DirectionalLightHelper = DirectionalLightHelper;
 exports.DiscreteInterpolant = DiscreteInterpolant;
-exports.DisplayP3ColorSpace = DisplayP3ColorSpace;
 exports.DodecahedronGeometry = DodecahedronGeometry;
 exports.DoubleSide = DoubleSide;
 exports.DstAlphaFactor = DstAlphaFactor;
@@ -54334,7 +54540,6 @@ exports.LineCurve3 = LineCurve3;
 exports.LineDashedMaterial = LineDashedMaterial;
 exports.LineLoop = LineLoop;
 exports.LineSegments = LineSegments;
-exports.LinearDisplayP3ColorSpace = LinearDisplayP3ColorSpace;
 exports.LinearFilter = LinearFilter;
 exports.LinearInterpolant = LinearInterpolant;
 exports.LinearMipMapLinearFilter = LinearMipMapLinearFilter;
@@ -54406,7 +54611,6 @@ exports.OneMinusDstColorFactor = OneMinusDstColorFactor;
 exports.OneMinusSrcAlphaFactor = OneMinusSrcAlphaFactor;
 exports.OneMinusSrcColorFactor = OneMinusSrcColorFactor;
 exports.OrthographicCamera = OrthographicCamera;
-exports.P3Primaries = P3Primaries;
 exports.PCFShadowMap = PCFShadowMap;
 exports.PCFSoftShadowMap = PCFSoftShadowMap;
 exports.PMREMGenerator = PMREMGenerator;
@@ -54472,7 +54676,6 @@ exports.RGIntegerFormat = RGIntegerFormat;
 exports.RawShaderMaterial = RawShaderMaterial;
 exports.Ray = Ray;
 exports.Raycaster = Raycaster;
-exports.Rec709Primaries = Rec709Primaries;
 exports.RectAreaLight = RectAreaLight;
 exports.RedFormat = RedFormat;
 exports.RedIntegerFormat = RedIntegerFormat;
