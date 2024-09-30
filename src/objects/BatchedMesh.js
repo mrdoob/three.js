@@ -12,6 +12,12 @@ import { Frustum } from '../math/Frustum.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
 
+function ascIdSort( a, b ) {
+
+	return a - b;
+
+}
+
 function sortOpaque( a, b ) {
 
 	return a.z - b.z;
@@ -368,7 +374,9 @@ class BatchedMesh extends Mesh {
 		// Prioritize using previously freed instance ids
 		if ( this._availableInstanceIds.length > 0 ) {
 
-			drawId = this._availableInstanceIds.pop();
+			this._availableInstanceIds.sort( ascIdSort );
+
+			drawId = this._availableInstanceIds.shift();
 			this._drawInfo[ drawId ] = instanceDrawInfo;
 
 		} else {
@@ -494,7 +502,9 @@ class BatchedMesh extends Mesh {
 		let geometryId;
 		if ( this._availableGeometryIds.length > 0 ) {
 
-			geometryId = this._availableGeometryIds.pop();
+			this._availableGeometryIds.sort( ascIdSort );
+
+			geometryId = this._availableGeometryIds.shift();
 			reservedRanges[ geometryId ] = reservedRange;
 			drawRanges[ geometryId ] = drawRange;
 			bounds[ geometryId ] = boundsInfo;
@@ -935,7 +945,7 @@ class BatchedMesh extends Mesh {
 		// shrink the available instances as much as possible
 		const availableInstanceIds = this._availableInstanceIds;
 		const drawInfo = this._drawInfo;
-		availableInstanceIds.sort( ( a, b ) => a - b );
+		availableInstanceIds.sort( ascIdSort );
 		while ( availableInstanceIds[ availableInstanceIds.length - 1 ] === drawInfo.length ) {
 
 			drawInfo.pop();
