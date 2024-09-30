@@ -1,5 +1,5 @@
 import { Vector2 } from 'three';
-import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, vec4, If, Loop, max, min, Break, abs } from 'three/tsl';
+import { TempNode, nodeObject, Fn, select, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, vec4, If, Loop, max, min, Break, abs } from 'three/tsl';
 
 class FXAANode extends TempNode {
 
@@ -51,7 +51,7 @@ class FXAANode extends TempNode {
 		
 		const SampleLuminance = Fn( ( [ uv ] ) => {
 
-			return dot( Sample( uv ).rgb, vec3( 0.3, 0.59, 0.11 ) ).toVar();
+			return dot( Sample( uv ).rgb, vec3( 0.3, 0.59, 0.11 ) );
 
 		} );
 
@@ -100,21 +100,12 @@ class FXAANode extends TempNode {
 
 			const isHorizontal = horizontal.greaterThanEqual( vertical );
 
-			// TODO: How to do ternary operators?
-			// float pLuminance = e.isHorizontal ? l.n : l.e;
-			const pLuminance = float( le ).toVar();
-			If( isHorizontal, () => { pLuminance.assign( ln ); } );
-			// TODO: How to do ternary operators?
-			// float nLuminance = e.isHorizontal ? l.s : l.w;
-			const nLuminance = float( lw ).toVar();
-			If( isHorizontal, () => { nLuminance.assign( ls ); } );
+			const pLuminance = select( isHorizontal, ln, le );
+			const nLuminance = select( isHorizontal, ls, lw );
 			const pGradient = abs( pLuminance.sub( lm ) );
 			const nGradient = abs( nLuminance.sub( lm ) );
 
-			// TODO: How to do ternary operators?
-			// e.pixelStep = e.isHorizontal ? texSize.y : texSize.x;
-			const pixelStep = float( texSize.x ).toVar();
-			If( isHorizontal, () => { pixelStep.assign( texSize.y.negate() ); } );
+			const pixelStep = select( isHorizontal, texSize.y.negate(), texSize.x ).toVar();
 			const oppositeLuminance = float().toVar();
 			const gradient = float().toVar();
 
@@ -284,23 +275,23 @@ class FXAANode extends TempNode {
 
 			// TODO: How to pass structs as parameters?
 			const pixelBlend = DeterminePixelBlendFactor( lm, ln, le, ls, lw, lne, lnw, lse, lsw, contrast );
-			const e = DetermineEdge( texSize, lm, ln, le, ls, lw, lne, lnw, lse, lsw );
-			const edgeBlend = DetermineEdgeBlendFactor( texSize, lm, e.x, e.y, e.z, e.w, uv );
+			const edge = DetermineEdge( texSize, lm, ln, le, ls, lw, lne, lnw, lse, lsw );
+			const edgeBlend = DetermineEdgeBlendFactor( texSize, lm, edge.x, edge.y, edge.z, edge.w, uv );
 
 			const finalBlend = max( pixelBlend, edgeBlend );
-			const newUv = uv.toVar();
+			const fxaaUv = uv.toVar();
 
-			If ( e.x, () => {
+			If ( edge.x, () => {
 				
-				newUv.y.addAssign( e.y.mul( finalBlend ) );
+				fxaaUv.y.addAssign( edge.y.mul( finalBlend ) );
 
 			} ).Else( () => {
 
-				newUv.x.addAssign( e.y.mul( finalBlend ) );
+				fxaaUv.x.addAssign( edge.y.mul( finalBlend ) );
 
 			} );
 
-			return Sample( newUv );
+			return Sample( fxaaUv );
 
 		} ).setLayout( {
 			name: 'FxaaPixelShader',
