@@ -674,6 +674,78 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	optimize() {
+
+		// track the next indices to copy data to
+		let nextVertexStart = 0;
+		let nextIndexStart = 0;
+
+		// iterate over all geometry ranges
+		const drawRanges = this._drawRanges;
+		const reservedRanges = this._reservedRanges;
+		const geometry = this.geometry;
+		for ( let i = 0, l = drawRanges.length; i < l; i ++ ) {
+
+			// if a geometry range is inactive then don't copy anything
+			const drawRange = drawRanges[ i ];
+			const reservedRange = reservedRanges[ i ];
+			if ( drawRange.active === false ) {
+
+				continue;
+
+			}
+
+			// if a geometry contains an index buffer then shift it, as well
+			if ( geometry.index !== null && reservedRange.indexStart !== nextIndexStart ) {
+
+				const { indexStart, indexCount } = reservedRange;
+				const index = geometry.index;
+				const array = index.array;
+
+				// shift the index pointers based on how the vertex data will shift
+				// adjusting the index must happen first so the original vertex start value is available
+				const elementDelta = nextVertexStart - reservedRange.vertexStart;
+				for ( let j = indexStart; j < indexStart + indexCount; j ++ ) {
+
+					array[ j ] = array[ j ] + elementDelta;
+
+				}
+
+				index.array.copyWithin( nextIndexStart, indexStart, indexStart + indexCount );
+				index.addUpdateRange( nextIndexStart, indexCount );
+
+				reservedRange.indexStart = nextIndexStart;
+				nextIndexStart += reservedRange.indexCount;
+
+			}
+
+			// if a geometry needs to be moved then copy attribute data to overwrite unused space
+			if ( reservedRange.vertexStart !== nextVertexStart ) {
+
+				const { vertexStart, vertexCount } = reservedRange;
+				const attributes = geometry.attributes;
+				for ( const key in attributes ) {
+
+					const attribute = attributes[ key ];
+					const { array, itemSize } = attribute;
+					array.copyWithin( nextVertexStart * itemSize, vertexStart * itemSize, ( vertexStart + vertexCount ) * itemSize );
+					attribute.addUpdateRange( nextVertexStart * itemSize, vertexCount * itemSize );
+
+				}
+
+				reservedRange.vertexStart = nextVertexStart;
+				nextVertexStart += reservedRange.vertexCount;
+
+			}
+
+			drawRange.start = geometry.index ? reservedRange.indexStart : reservedRange.vertexStart;
+
+		}
+
+		return this;
+
+	}
+
 	// get bounding box and compute it if it doesn't exist
 	getBoundingBoxAt( geometryId, target ) {
 
