@@ -59,9 +59,18 @@ class SpriteNodeMaterial extends NodeMaterial {
 		}
 
 
-		if ( ! sizeAttenuation && camera.isPerspectiveCamera ) {
+		if ( ! sizeAttenuation ) {
 
-			scale = scale.mul( mvPosition.z.negate() );
+			if ( camera.isPerspectiveCamera ) {
+
+				scale = scale.mul( mvPosition.z.negate() );
+
+			} else {
+
+				const orthoScale = float( 2.0 ).div( cameraProjectionMatrix.element( 1 ).element( 1 ) );
+				scale = scale.mul( orthoScale.mul( 2 ) );
+
+			}
 
 		}
 
