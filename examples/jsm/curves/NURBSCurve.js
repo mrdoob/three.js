@@ -26,14 +26,17 @@ class NURBSCurve extends Curve {
 
 		super();
 
+		const knotsLength = knots ? knots.length - 1 : 0;
+		const pointsLength = controlPoints ? controlPoints.length : 0;
+
 		this.degree = degree;
 		this.knots = knots;
 		this.controlPoints = [];
 		// Used by periodic NURBS to remove hidden spans
 		this.startKnot = startKnot || 0;
-		this.endKnot = endKnot || ( this.knots.length - 1 );
+		this.endKnot = endKnot || knotsLength;
 
-		for ( let i = 0; i < controlPoints.length; ++ i ) {
+		for ( let i = 0; i < pointsLength; ++ i ) {
 
 			// ensure Vector4 for control points
 			const point = controlPoints[ i ];
@@ -72,6 +75,34 @@ class NURBSCurve extends Curve {
 		tangent.copy( ders[ 1 ] ).normalize();
 
 		return tangent;
+
+	}
+
+	toJSON() {
+
+		const data = super.toJSON();
+
+		data.degree = this.degree;
+		data.knots = [ ...this.knots ];
+		data.controlPoints = this.controlPoints.map( p => p.toArray() );
+		data.startKnot = this.startKnot;
+		data.endKnot = this.endKnot;
+
+		return data;
+
+	}
+
+	fromJSON( json ) {
+
+		super.fromJSON( json );
+
+		this.degree = json.degree;
+		this.knots = [ ...json.knots ];
+		this.controlPoints = json.controlPoints.map( p => new Vector4( p[ 0 ], p[ 1 ], p[ 2 ], p[ 3 ] ) );
+		this.startKnot = json.startKnot;
+		this.endKnot = json.endKnot;
+
+		return this;
 
 	}
 
