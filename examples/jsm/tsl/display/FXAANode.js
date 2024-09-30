@@ -114,7 +114,7 @@ class FXAANode extends TempNode {
 			// TODO: How to do ternary operators?
 			// e.pixelStep = e.isHorizontal ? texSize.y : texSize.x;
 			const pixelStep = float( texSize.x ).toVar();
-			If( isHorizontal, () => { pixelStep.assign( texSize.y ); } );
+			If( isHorizontal, () => { pixelStep.assign( texSize.y.negate() ); } );
 			const oppositeLuminance = float().toVar();
 			const gradient = float().toVar();
 
@@ -262,15 +262,15 @@ class FXAANode extends TempNode {
 
 			const lm = SampleLuminance( uv );
 
-			const ln = SampleLuminanceOffset( texSize, uv, 0.0, 1.0 );
+			const ln = SampleLuminanceOffset( texSize, uv, 0.0, -1.0 );
 			const le = SampleLuminanceOffset( texSize, uv, 1.0, 0.0 );
-			const ls = SampleLuminanceOffset( texSize, uv, 0.0, -1.0 );
+			const ls = SampleLuminanceOffset( texSize, uv, 0.0, 1.0 );
 			const lw = SampleLuminanceOffset( texSize, uv, -1.0, 0.0 );
 
-			const lne = SampleLuminanceOffset( texSize, uv, 1.0, 1.0 );
-			const lnw = SampleLuminanceOffset( texSize, uv, -1.0, 1.0 );
-			const lse = SampleLuminanceOffset( texSize, uv, 1.0, -1.0 );
-			const lsw = SampleLuminanceOffset( texSize, uv, -1.0, -1.0 );
+			const lne = SampleLuminanceOffset( texSize, uv, 1.0, -1.0 );
+			const lnw = SampleLuminanceOffset( texSize, uv, -1.0, -1.0 );
+			const lse = SampleLuminanceOffset( texSize, uv, 1.0, 1.0 );
+			const lsw = SampleLuminanceOffset( texSize, uv, -1.0, 1.0 );
 
 			const highest = max( max( max( max( ln, le ), ls ), lw ), lm );
 			const lowest = min( min( min( min( ln, le ), ls ), lw ), lm );
