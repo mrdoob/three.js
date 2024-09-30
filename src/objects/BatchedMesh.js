@@ -975,6 +975,31 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	setGeometrySize( maxVertexCount, maxIndexCount = maxVertexCount * 2 ) {
+
+		const oldGeometry = this.geometry;
+		oldGeometry.dispose();
+
+		this._maxVertexCount = maxVertexCount;
+		this._maxIndexCount = maxIndexCount;
+		this._geometryInitialized = false;
+		this._initializeGeometry();
+
+		const geometry = this.geometry;
+		if ( oldGeometry.index ) {
+
+			geometry.index.array.set( oldGeometry.index.array );
+
+		}
+
+		for ( const key in oldGeometry.attributes ) {
+
+			geometry.attributes[ key ].array.set( oldGeometry.attributes[ key ].array );
+
+		}
+
+	}
+
 	raycast( raycaster, intersects ) {
 
 		const drawInfo = this._drawInfo;
