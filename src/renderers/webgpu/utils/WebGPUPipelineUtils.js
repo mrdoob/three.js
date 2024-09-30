@@ -138,10 +138,12 @@ class WebGPUPipelineUtils {
 
 
 		const depthStencil = {};
+		const renderDepth = renderObject.context.depth;
+		const renderStencil = renderObject.context.stencil;
 
-		if ( renderObject.context.depth === true || renderObject.context.stencil === true ) {
+		if ( renderDepth === true || renderStencil === true ) {
 
-			if ( renderObject.context.depth === true ) {
+			if ( renderDepth === true ) {
 
 				depthStencil.format = depthStencilFormat;
 				depthStencil.depthWriteEnabled = material.depthWrite;
@@ -149,10 +151,10 @@ class WebGPUPipelineUtils {
 
 			}
 
-			if ( renderObject.context.stencil === true ) {
+			if ( renderStencil === true ) {
 
 				depthStencil.stencilFront = stencilFront;
-				depthStencil.stencilBack = {};
+				depthStencil.stencilBack = {}; // three.js does not provide an API to configure the back function (gl.stencilFuncSeparate() was never used)
 				depthStencil.stencilReadMask = material.stencilFuncMask;
 				depthStencil.stencilWriteMask = material.stencilWriteMask;
 
