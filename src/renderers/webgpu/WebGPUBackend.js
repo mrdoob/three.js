@@ -151,10 +151,15 @@ class WebGPUBackend extends Backend {
 				colorAttachments: [ {
 					view: null
 				} ],
-				depthStencilAttachment: {
-					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
-				}
 			};
+
+			if ( this.renderer.depth === true || this.renderer.stencil === true ) {
+
+				descriptor.depthStencilAttachment = {
+					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
+				};
+
+			}
 
 			const colorAttachment = descriptor.colorAttachments[ 0 ];
 
@@ -263,16 +268,21 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			const depthTextureData = this.get( renderContext.depthTexture );
-
-			const depthStencilAttachment = {
-				view: depthTextureData.texture.createView()
-			};
 
 			descriptor = {
 				colorAttachments,
-				depthStencilAttachment
 			};
+
+			if ( renderContext.depth ) {
+
+				const depthTextureData = this.get( renderContext.depthTexture );
+
+				const depthStencilAttachment = {
+					view: depthTextureData.texture.createView()
+				};
+				descriptor.depthStencilAttachment = depthStencilAttachment;
+
+			}
 
 			descriptors[ cacheKey ] = descriptor;
 

@@ -127,15 +127,6 @@ class WebGPUPipelineUtils {
 			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
 			fragment: Object.assign( {}, fragmentModule, { targets } ),
 			primitive: primitiveState,
-			depthStencil: {
-				format: depthStencilFormat,
-				depthWriteEnabled: material.depthWrite,
-				depthCompare: depthCompare,
-				stencilFront: stencilFront,
-				stencilBack: {}, // three.js does not provide an API to configure the back function (gl.stencilFuncSeparate() was never used)
-				stencilReadMask: material.stencilFuncMask,
-				stencilWriteMask: material.stencilWriteMask
-			},
 			multisample: {
 				count: sampleCount,
 				alphaToCoverageEnabled: material.alphaToCoverage && sampleCount > 1
@@ -144,6 +135,33 @@ class WebGPUPipelineUtils {
 				bindGroupLayouts
 			} )
 		};
+
+
+		const depthStencil = {};
+
+		if ( renderObject.context.depth === true || renderObject.context.stencil === true ) {
+
+			if ( renderObject.context.depth === true ) {
+
+				depthStencil.format = depthStencilFormat;
+				depthStencil.depthWriteEnabled = material.depthWrite;
+				depthStencil.depthCompare = depthCompare;
+
+			}
+
+			if ( renderObject.context.stencil === true ) {
+
+				depthStencil.stencilFront = stencilFront;
+				depthStencil.stencilBack = {};
+				depthStencil.stencilReadMask = material.stencilFuncMask;
+				depthStencil.stencilWriteMask = material.stencilWriteMask;
+
+			}
+
+			pipelineDescriptor.depthStencil = depthStencil;
+
+		}
+
 
 		if ( promises === null ) {
 
