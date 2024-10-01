@@ -79,8 +79,8 @@ ShaderLib[ 'line' ] = {
 			float b = projectionMatrix[ 3 ][ 2 ]; // 3nd entry in 4th column
 
 			#ifdef USE_REVERSEDEPTHBUF
-				// ( - far * near ) / ( far - near )
-				float nearEstimate = b;
+				// - 0.5 * ( - far * near ) / ( far - near )
+				float nearEstimate = - 0.5 * b;
 			#else
 				// - 0.5 * ( ( - 2 * far * near ) / ( far - near ) ) / ( - ( far + near ) / ( far - near ) )
 				// ( - far * near ) / ( far + near )
