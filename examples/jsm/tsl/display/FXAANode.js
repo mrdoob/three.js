@@ -34,9 +34,9 @@ class FXAANode extends TempNode {
 		const textureNode = this.textureNode.bias( - 100 );
 		const uvNode = textureNode.uvNode || uv();
 
-		const EDGE_STEP_COUNT = float( 10 );
+		const EDGE_STEP_COUNT = float( 6 );
 		const EDGE_GUESS = float( 8.0 );
-		const EDGE_STEPS = uniformArray( [ 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 4.0 ] );
+		const EDGE_STEPS = uniformArray( [ 1.0, 1.5, 2.0, 2.0, 2.0, 4.0 ] );
 
 		const _ContrastThreshold = float( 0.0312 );
 		const _RelativeThreshold = float( 0.063 );
@@ -121,8 +121,6 @@ class FXAANode extends TempNode {
 
 			} );
 
-			// TODO: How to return an object with multiple return values?
-			// isHorizontal should be bool, not float
 			return vec4( isHorizontal, pixelStep, oppositeLuminance, gradient );
 
 		} );
@@ -256,7 +254,6 @@ class FXAANode extends TempNode {
 
 			} );
 
-			// TODO: How to pass structs as parameters?
 			const pixelBlend = DeterminePixelBlendFactor( lm, ln, le, ls, lw, lne, lnw, lse, lsw, contrast );
 			const edge = DetermineEdge( texSize, lm, ln, le, ls, lw, lne, lnw, lse, lsw );
 			const edgeBlend = DetermineEdgeBlendFactor( texSize, lm, edge.x, edge.y, edge.z, edge.w, uv );

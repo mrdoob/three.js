@@ -26,17 +26,17 @@ const FXAAShader = {
 
 	fragmentShader: /* glsl */`
 
-		// FXAA algorithm from NVIDIA, Implemented by Jasper Flick, GLSL port by Dave Hoskins
-		// https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
+		// FXAA algorithm from NVIDIA, C# implementation by Jasper Flick, GLSL port by Dave Hoskins
 		// http://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
+		// https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
 
 		uniform sampler2D tDiffuse;
 		uniform vec2 resolution;
 		varying vec2 vUv;
 
-		#define EDGE_STEP_COUNT 10
+		#define EDGE_STEP_COUNT 6
 		#define EDGE_GUESS 8.0
-		#define EDGE_STEPS 1.0, 1.5, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 4.0
+		#define EDGE_STEPS 1.0, 1.5, 2.0, 2.0, 2.0, 4.0
 		const float edgeSteps[EDGE_STEP_COUNT] = float[EDGE_STEP_COUNT]( EDGE_STEPS );
 
 		float _ContrastThreshold = 0.0312;
