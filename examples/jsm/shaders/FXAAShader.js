@@ -250,25 +250,25 @@ const FXAAShader = {
 
 		vec4 ApplyFXAA( sampler2D  tex2D, vec2 texSize, vec2 uv ) {
 
-			LuminanceData l = SampleLuminanceNeighborhood( tex2D, texSize, uv );
-			if ( ShouldSkipPixel( l ) ) {
+			LuminanceData luminance = SampleLuminanceNeighborhood( tex2D, texSize, uv );
+			if ( ShouldSkipPixel( luminance ) ) {
 
 				return Sample( tex2D, uv );
 
 			}
 
-			float pixelBlend = DeterminePixelBlendFactor( l );
-			EdgeData e = DetermineEdge( texSize, l );
-			float edgeBlend = DetermineEdgeBlendFactor( tex2D, texSize, l, e, uv );
+			float pixelBlend = DeterminePixelBlendFactor( luminance );
+			EdgeData edge = DetermineEdge( texSize, luminance );
+			float edgeBlend = DetermineEdgeBlendFactor( tex2D, texSize, luminance, edge, uv );
 			float finalBlend = max( pixelBlend, edgeBlend );
 
-			if (e.isHorizontal) {
+			if (edge.isHorizontal) {
 
-				uv.y += e.pixelStep * finalBlend;
+				uv.y += edge.pixelStep * finalBlend;
 
 			} else {
 
-				uv.x += e.pixelStep * finalBlend;
+				uv.x += edge.pixelStep * finalBlend;
 
 			}
 

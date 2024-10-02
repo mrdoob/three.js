@@ -61,48 +61,70 @@ class FXAANode extends TempNode {
 
 		} );
 
-		const ShouldSkipPixel = Fn( ( [ highest, contrast ] ) => {
+		const ShouldSkipPixel = ( l ) => {
 
-			const threshold = max( _ContrastThreshold, _RelativeThreshold.mul( highest ) );
-			return contrast.lessThan( threshold );
+			const threshold = max( _ContrastThreshold, _RelativeThreshold.mul( l.highest ) );
+			return l.contrast.lessThan( threshold );
 
-		} );
+		};
 
-		const DeterminePixelBlendFactor = Fn( ( [ lm, ln, le, ls, lw, lne, lnw, lse, lsw, contrast ] ) => {
+		const SampleLuminanceNeighborhood = ( texSize, uv ) => {
 
-			let f = float( 2.0 ).mul( ln.add( le ).add( ls ).add( lw ) );
-			f = f.add( lne.add( lnw ).add( lse ).add( lsw ) );
+			const m = SampleLuminance( uv );
+
+			const n = SampleLuminanceOffset( texSize, uv, 0.0, 1.0 );
+			const e = SampleLuminanceOffset( texSize, uv, 1.0, 0.0 );
+			const s = SampleLuminanceOffset( texSize, uv, 0.0, - 1.0 );
+			const w = SampleLuminanceOffset( texSize, uv, - 1.0, 0.0 );
+
+			const ne = SampleLuminanceOffset( texSize, uv, 1.0, 1.0 );
+			const nw = SampleLuminanceOffset( texSize, uv, - 1.0, 1.0 );
+			const se = SampleLuminanceOffset( texSize, uv, 1.0, - 1.0 );
+			const sw = SampleLuminanceOffset( texSize, uv, - 1.0, - 1.0 );
+
+			const highest = max( max( max( max( n, e ), s ), w ), m );
+			const lowest = min( min( min( min( n, e ), s ), w ), m );
+			const contrast = highest.sub( lowest );
+
+			return { m, n, e, s, w, ne, nw, se, sw, highest, lowest, contrast };
+
+		};
+
+		const DeterminePixelBlendFactor = ( l ) => {
+
+			let f = float( 2.0 ).mul( l.n.add( l.e ).add( l.s ).add( l.w ) );
+			f = f.add( l.ne.add( l.nw ).add( l.se ).add( l.sw ) );
 			f = f.mul( 1.0 / 12.0 );
-			f = abs( f.sub( lm ) );
-			f = clamp( f.div( max( contrast, 0 ) ), 0.0, 1.0 );
+			f = abs( f.sub( l.m ) );
+			f = clamp( f.div( max( l.contrast, 0 ) ), 0.0, 1.0 );
 
 			const blendFactor = smoothstep( 0.0, 1.0, f );
 			return blendFactor.mul( blendFactor ).mul( _SubpixelBlending );
 
-		} );
+		};
 
-		const DetermineEdge = ( texSize, lm, ln, le, ls, lw, lne, lnw, lse, lsw ) => {
+		const DetermineEdge = ( texSize, l ) => {
 
 			const horizontal =
-				abs( ln.add( ls ).sub( lm.mul( 2.0 ) ) ).mul( 2.0 ).add(
-					abs( lne.add( lse ).sub( le.mul( 2.0 ) ) ).add(
-						abs( lnw.add( lsw ).sub( lw.mul( 2.0 ) ) )
+				abs( l.n.add( l.s ).sub( l.m.mul( 2.0 ) ) ).mul( 2.0 ).add(
+					abs( l.ne.add( l.se ).sub( l.e.mul( 2.0 ) ) ).add(
+						abs( l.nw.add( l.sw ).sub( l.w.mul( 2.0 ) ) )
 					)
 				);
 
 			const vertical =
-				abs( le.add( lw ).sub( lm.mul( 2.0 ) ) ).mul( 2.0 ).add(
-					abs( lne.add( lnw ).sub( ln.mul( 2.0 ) ) ).add(
-						abs( lse.add( lsw ).sub( ls.mul( 2.0 ) ) )
+				abs( l.e.add( l.w ).sub( l.m.mul( 2.0 ) ) ).mul( 2.0 ).add(
+					abs( l.ne.add( l.nw ).sub( l.n.mul( 2.0 ) ) ).add(
+						abs( l.se.add( l.sw ).sub( l.s.mul( 2.0 ) ) )
 					)
 				);
 
 			const isHorizontal = horizontal.greaterThanEqual( vertical );
 
-			const pLuminance = select( isHorizontal, ln, le );
-			const nLuminance = select( isHorizontal, ls, lw );
-			const pGradient = abs( pLuminance.sub( lm ) );
-			const nGradient = abs( nLuminance.sub( lm ) );
+			const pLuminance = select( isHorizontal, l.n, l.e );
+			const nLuminance = select( isHorizontal, l.s, l.w );
+			const pGradient = abs( pLuminance.sub( l.m ) );
+			const nGradient = abs( nLuminance.sub( l.m ) );
 
 			const pixelStep = select( isHorizontal, texSize.y, texSize.x ).toVar();
 			const oppositeLuminance = float().toVar();
@@ -125,26 +147,24 @@ class FXAANode extends TempNode {
 
 		};
 
-		const DetermineEdgeBlendFactor = ( texSize, lm, edge, uv ) => {
-
-			const { isHorizontal, pixelStep, oppositeLuminance, gradient } = edge;
+		const DetermineEdgeBlendFactor = ( texSize, l, e, uv ) => {
 
 			const uvEdge = uv.toVar();
 			const edgeStep = vec2().toVar();
-			If( isHorizontal, () => {
+			If( e.isHorizontal, () => {
 
-				uvEdge.y.addAssign( pixelStep.mul( 0.5 ) );
+				uvEdge.y.addAssign( e.pixelStep.mul( 0.5 ) );
 				edgeStep.assign( vec2( texSize.x, 0.0 ) );
 
 			} ).Else( () => {
 
-				uvEdge.x.addAssign( pixelStep.mul( 0.5 ) );
+				uvEdge.x.addAssign( e.pixelStep.mul( 0.5 ) );
 				edgeStep.assign( vec2( 0.0, texSize.y ) );
 
 			} );
 
-			const edgeLuminance = lm.add( oppositeLuminance ).mul( 0.5 );
-			const gradientThreshold = gradient.mul( 0.25 );
+			const edgeLuminance = l.m.add( e.oppositeLuminance ).mul( 0.5 );
+			const gradientThreshold = e.gradient.mul( 0.25 );
 
 			const puv = uvEdge.add( edgeStep.mul( EDGE_STEPS.element( 0 ) ) ).toVar();
 			const pLuminanceDelta = SampleLuminance( puv ).sub( edgeLuminance ).toVar();
@@ -197,7 +217,7 @@ class FXAANode extends TempNode {
 			const pDistance = float().toVar();
 			const nDistance = float().toVar();
 
-			If( isHorizontal, () => {
+			If( e.isHorizontal, () => {
 
 				pDistance.assign( puv.x.sub( uv.x ) );
 				nDistance.assign( uv.x.sub( nuv.x ) );
@@ -226,7 +246,7 @@ class FXAANode extends TempNode {
 
 			const blendFactor = float().toVar();
 
-			If( deltaSign.equal( lm.sub( edgeLuminance ).greaterThanEqual( 0.0 ) ), () => {
+			If( deltaSign.equal( l.m.sub( edgeLuminance ).greaterThanEqual( 0.0 ) ), () => {
 
 				blendFactor.assign( 0.0 );
 
@@ -242,46 +262,31 @@ class FXAANode extends TempNode {
 
 		const ApplyFXAA = Fn( ( [ uv, texSize ] ) => {
 
-			const lm = SampleLuminance( uv );
-
-			const ln = SampleLuminanceOffset( texSize, uv, 0.0, 1.0 );
-			const le = SampleLuminanceOffset( texSize, uv, 1.0, 0.0 );
-			const ls = SampleLuminanceOffset( texSize, uv, 0.0, - 1.0 );
-			const lw = SampleLuminanceOffset( texSize, uv, - 1.0, 0.0 );
-
-			const lne = SampleLuminanceOffset( texSize, uv, 1.0, 1.0 );
-			const lnw = SampleLuminanceOffset( texSize, uv, - 1.0, 1.0 );
-			const lse = SampleLuminanceOffset( texSize, uv, 1.0, - 1.0 );
-			const lsw = SampleLuminanceOffset( texSize, uv, - 1.0, - 1.0 );
-
-			const highest = max( max( max( max( ln, le ), ls ), lw ), lm );
-			const lowest = min( min( min( min( ln, le ), ls ), lw ), lm );
-			const contrast = highest.sub( lowest );
-
-			If( ShouldSkipPixel( highest, contrast ), () => {
+			const luminance = SampleLuminanceNeighborhood( texSize, uv );
+			If( ShouldSkipPixel( luminance ), () => {
 
 				return Sample( uv );
 
 			} );
 
-			const pixelBlend = DeterminePixelBlendFactor( lm, ln, le, ls, lw, lne, lnw, lse, lsw, contrast );
-			const edge = DetermineEdge( texSize, lm, ln, le, ls, lw, lne, lnw, lse, lsw ); // { isHorizontal, pixelStep, oppositeLuminance, gradient };
-			const edgeBlend = DetermineEdgeBlendFactor( texSize, lm, edge, uv );
+			const pixelBlend = DeterminePixelBlendFactor( luminance );
+			const edge = DetermineEdge( texSize, luminance );
+			const edgeBlend = DetermineEdgeBlendFactor( texSize, luminance, edge, uv );
 
 			const finalBlend = max( pixelBlend, edgeBlend );
-			const fxaaUv = uv.toVar();
+			const finalUv = uv.toVar();
 
 			If( edge.isHorizontal, () => {
 
-				fxaaUv.y.addAssign( edge.pixelStep.mul( finalBlend ) );
+				finalUv.y.addAssign( edge.pixelStep.mul( finalBlend ) );
 
 			} ).Else( () => {
 
-				fxaaUv.x.addAssign( edge.pixelStep.mul( finalBlend ) );
+				finalUv.x.addAssign( edge.pixelStep.mul( finalBlend ) );
 
 			} );
 
-			return Sample( fxaaUv );
+			return Sample( finalUv );
 
 		} ).setLayout( {
 			name: 'FxaaPixelShader',
