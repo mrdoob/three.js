@@ -47,7 +47,7 @@ class FXAANode extends TempNode {
 			return textureNode.uv( uv );
 
 		} );
-		
+
 		const SampleLuminance = Fn( ( [ uv ] ) => {
 
 			return dot( Sample( uv ).rgb, vec3( 0.3, 0.59, 0.11 ) );
@@ -78,11 +78,11 @@ class FXAANode extends TempNode {
 
 		const DeterminePixelBlendFactor = Fn( ( [ lm, ln, le, ls, lw, lne, lnw, lse, lsw, contrast ] ) => {
 
-			let f = float(2.0).mul( ln.add( le ).add( ls ).add( lw ) );
+			let f = float( 2.0 ).mul( ln.add( le ).add( ls ).add( lw ) );
 			f.addAssign( lne.add( lnw ).add( lse ).add( lsw ) );
 			f.mulAssign( 1.0 / 12.0 );
 			f = abs( f.sub( lm ) );
-			f = clamp( f.div( max (contrast, 0) ), 0.0, 1.0 );
+			f = clamp( f.div( max( contrast, 0 ) ), 0.0, 1.0 );
 
 			const blendFactor = smoothstep( 0.0, 1.0, f );
 			return blendFactor.mul( blendFactor ).mul( _SubpixelBlending );
@@ -97,7 +97,7 @@ class FXAANode extends TempNode {
 						abs( lnw.add( lsw ).sub( lw.mul( 2.0 ) ) )
 					)
 				);
-			
+
 			const vertical =
 				abs( le.add( lw ).sub( lm.mul( 2.0 ) ) ).mul( 2.0 ).add(
 					abs( lne.add( lnw ).sub( ln.mul( 2.0 ) ) ).add(
@@ -117,7 +117,7 @@ class FXAANode extends TempNode {
 			const gradient = float().toVar();
 
 			If( pGradient.lessThan( nGradient ), () => {
-				
+
 				pixelStep.assign( pixelStep.negate() );
 				oppositeLuminance.assign( nLuminance );
 				gradient.assign( nGradient );
@@ -136,8 +136,8 @@ class FXAANode extends TempNode {
 		const DetermineEdgeBlendFactor = Fn( ( [ texSize, lm, isHorizontal, pixelStep, oppositeLuminance, gradient, uv ] ) => {
 
 			const uvEdge = uv.toVar();
-			uvEdge.y.assign(uvEdge.y.oneMinus());
-			
+			uvEdge.y.assign( uvEdge.y.oneMinus() );
+
 			const edgeStep = vec2().toVar();
 
 			If( isHorizontal, () => {
@@ -148,7 +148,7 @@ class FXAANode extends TempNode {
 			} ).Else( () => {
 
 				uvEdge.x.addAssign( pixelStep.mul( 0.5 ) );
-				edgeStep.assign( vec2 ( 0.0, texSize.y ) );
+				edgeStep.assign( vec2( 0.0, texSize.y ) );
 
 			} );
 
@@ -161,7 +161,11 @@ class FXAANode extends TempNode {
 
 			Loop( { start: 1, end: EDGE_STEP_COUNT }, ( { i } ) => {
 
-				If( pAtEnd, () => { Break(); } );
+				If( pAtEnd, () => {
+
+					Break();
+
+				} );
 
 				puv.addAssign( edgeStep.mul( EDGE_STEPS.element( i ) ) );
 				pLuminanceDelta.assign( SampleLuminanceInverted( puv ).sub( edgeLuminance ) );
@@ -181,7 +185,11 @@ class FXAANode extends TempNode {
 
 			Loop( { start: 1, end: EDGE_STEP_COUNT }, ( { i } ) => {
 
-				If( nAtEnd, () => { Break(); } );
+				If( nAtEnd, () => {
+
+					Break();
+
+				} );
 
 				nuv.subAssign( edgeStep.mul( EDGE_STEPS.element( i ) ) );
 				nLuminanceDelta.assign( SampleLuminanceInverted( nuv ).sub( edgeLuminance ) );
@@ -232,27 +240,28 @@ class FXAANode extends TempNode {
 				blendFactor.assign( 0.0 );
 
 			} ).Else( () => {
-				
-				blendFactor.assign( float(0.5).sub( shortestDistance.div( pDistance.add( nDistance ) ) ) );
+
+				blendFactor.assign( float( 0.5 ).sub( shortestDistance.div( pDistance.add( nDistance ) ) ) );
 
 			} );
 
 			return blendFactor;
+
 		} );
 
 		const ApplyFXAA = Fn( ( [ uv, texSize ] ) => {
 
 			const lm = SampleLuminance( uv );
 
-			const ln = SampleLuminanceOffset( texSize, uv, 0.0, -1.0 );
+			const ln = SampleLuminanceOffset( texSize, uv, 0.0, - 1.0 );
 			const le = SampleLuminanceOffset( texSize, uv, 1.0, 0.0 );
 			const ls = SampleLuminanceOffset( texSize, uv, 0.0, 1.0 );
-			const lw = SampleLuminanceOffset( texSize, uv, -1.0, 0.0 );
+			const lw = SampleLuminanceOffset( texSize, uv, - 1.0, 0.0 );
 
-			const lne = SampleLuminanceOffset( texSize, uv, 1.0, -1.0 );
-			const lnw = SampleLuminanceOffset( texSize, uv, -1.0, -1.0 );
+			const lne = SampleLuminanceOffset( texSize, uv, 1.0, - 1.0 );
+			const lnw = SampleLuminanceOffset( texSize, uv, - 1.0, - 1.0 );
 			const lse = SampleLuminanceOffset( texSize, uv, 1.0, 1.0 );
-			const lsw = SampleLuminanceOffset( texSize, uv, -1.0, 1.0 );
+			const lsw = SampleLuminanceOffset( texSize, uv, - 1.0, 1.0 );
 
 			const highest = max( max( max( max( ln, le ), ls ), lw ), lm );
 			const lowest = min( min( min( min( ln, le ), ls ), lw ), lm );
@@ -271,8 +280,8 @@ class FXAANode extends TempNode {
 			const finalBlend = max( pixelBlend, edgeBlend );
 			const fxaaUv = uv.toVar();
 
-			If ( edge.x, () => {
-				
+			If( edge.x, () => {
+
 				fxaaUv.y.subAssign( edge.y.mul( finalBlend ) );
 
 			} ).Else( () => {
