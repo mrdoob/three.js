@@ -54,6 +54,14 @@ class FXAANode extends TempNode {
 
 		} );
 
+		const SampleLuminanceInverted = Fn( ( [ uv ] ) => {
+
+			const uvInverted = uv.toVar();
+			uvInverted.y.assign( uvInverted.y.oneMinus() );
+			return SampleLuminance( uvInverted );
+
+		} );
+
 		const SampleLuminanceOffset = Fn( ( [ texSize, uv, uOffset, vOffset ] ) => {
 
 			const shiftedUv = uv.add( texSize.mul( vec2( uOffset, vOffset ) ) );
@@ -104,7 +112,7 @@ class FXAANode extends TempNode {
 			const pGradient = abs( pLuminance.sub( lm ) );
 			const nGradient = abs( nLuminance.sub( lm ) );
 
-			const pixelStep = select( isHorizontal, texSize.y.negate(), texSize.x ).toVar();
+			const pixelStep = select( isHorizontal, texSize.y, texSize.x ).toVar();
 			const oppositeLuminance = float().toVar();
 			const gradient = float().toVar();
 
@@ -128,15 +136,18 @@ class FXAANode extends TempNode {
 		const DetermineEdgeBlendFactor = Fn( ( [ texSize, lm, isHorizontal, pixelStep, oppositeLuminance, gradient, uv ] ) => {
 
 			const uvEdge = uv.toVar();
+			uvEdge.y.assign(uvEdge.y.oneMinus());
+			
 			const edgeStep = vec2().toVar();
+
 			If( isHorizontal, () => {
 
-				uvEdge.addAssign( vec2(0, pixelStep.mul( 0.5 ) ) );
+				uvEdge.y.addAssign( pixelStep.mul( 0.5 ) );
 				edgeStep.assign( vec2( texSize.x, 0.0 ) );
 
 			} ).Else( () => {
 
-				uvEdge.addAssign( vec2( pixelStep.mul( 0.5 ), 0) );
+				uvEdge.x.addAssign( pixelStep.mul( 0.5 ) );
 				edgeStep.assign( vec2 ( 0.0, texSize.y ) );
 
 			} );
@@ -145,41 +156,40 @@ class FXAANode extends TempNode {
 			const gradientThreshold = gradient.mul( 0.25 );
 
 			const puv = uvEdge.add( edgeStep.mul( EDGE_STEPS.element( 0 ) ) ).toVar();
-			const pLuminanceDelta = SampleLuminance( puv ).sub( edgeLuminance ).toVar();
+			const pLuminanceDelta = SampleLuminanceInverted( puv ).sub( edgeLuminance ).toVar();
 			const pAtEnd = abs( pLuminanceDelta ).greaterThanEqual( gradientThreshold ).toVar();
 
-			Loop( EDGE_STEP_COUNT, ( { i } ) => {
+			Loop( { start: 1, end: EDGE_STEP_COUNT }, ( { i } ) => {
 
 				If( pAtEnd, () => { Break(); } );
 
 				puv.addAssign( edgeStep.mul( EDGE_STEPS.element( i ) ) );
-				pLuminanceDelta.assign( SampleLuminance( puv ).sub( edgeLuminance ) );
+				pLuminanceDelta.assign( SampleLuminanceInverted( puv ).sub( edgeLuminance ) );
 				pAtEnd.assign( abs( pLuminanceDelta ).greaterThanEqual( gradientThreshold ) );
-				
+
 			} );
 
-
-			If( !pAtEnd, () => {
+			If( pAtEnd.not(), () => {
 
 				puv.addAssign( edgeStep.mul( EDGE_GUESS ) );
 
 			} );
 
 			const nuv = uvEdge.sub( edgeStep.mul( EDGE_STEPS.element( 0 ) ) ).toVar();
-			const nLuminanceDelta = SampleLuminance( nuv ).sub( edgeLuminance ).toVar();
+			const nLuminanceDelta = SampleLuminanceInverted( nuv ).sub( edgeLuminance ).toVar();
 			const nAtEnd = abs( nLuminanceDelta ).greaterThanEqual( gradientThreshold ).toVar();
 
-			Loop( EDGE_STEP_COUNT, ( { i } ) => {
+			Loop( { start: 1, end: EDGE_STEP_COUNT }, ( { i } ) => {
 
 				If( nAtEnd, () => { Break(); } );
 
 				nuv.subAssign( edgeStep.mul( EDGE_STEPS.element( i ) ) );
-				nLuminanceDelta.assign( SampleLuminance( nuv ).sub( edgeLuminance ) );
+				nLuminanceDelta.assign( SampleLuminanceInverted( nuv ).sub( edgeLuminance ) );
 				nAtEnd.assign( abs( nLuminanceDelta ).greaterThanEqual( gradientThreshold ) );
 
 			} );
 
-			If( !nAtEnd, () => {
+			If( nAtEnd.not(), () => {
 
 				nuv.subAssign( edgeStep.mul( EDGE_GUESS ) );
 
@@ -195,8 +205,8 @@ class FXAANode extends TempNode {
 
 			} ).Else( () => {
 
-				pDistance.assign( puv.y.sub( uv.y ) );
-				nDistance.assign( uv.y.sub( nuv.y ) );
+				pDistance.assign( puv.y.sub( uv.y.oneMinus() ) );
+				nDistance.assign( uv.y.oneMinus().sub( nuv.y ) );
 
 			} );
 
@@ -263,7 +273,7 @@ class FXAANode extends TempNode {
 
 			If ( edge.x, () => {
 				
-				fxaaUv.y.addAssign( edge.y.mul( finalBlend ) );
+				fxaaUv.y.subAssign( edge.y.mul( finalBlend ) );
 
 			} ).Else( () => {
 
