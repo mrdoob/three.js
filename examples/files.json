@@ -503,6 +503,7 @@
 		"misc_exporter_stl",
 		"misc_exporter_usdz",
 		"misc_exporter_exr",
+		"misc_exporter_ktx2",
 		"misc_lookat"
 	],
 	"css2d": [
