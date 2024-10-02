@@ -71,8 +71,8 @@ class FXAANode extends TempNode {
 		const DeterminePixelBlendFactor = Fn( ( [ lm, ln, le, ls, lw, lne, lnw, lse, lsw, contrast ] ) => {
 
 			let f = float( 2.0 ).mul( ln.add( le ).add( ls ).add( lw ) );
-			f.addAssign( lne.add( lnw ).add( lse ).add( lsw ) );
-			f.mulAssign( 1.0 / 12.0 );
+			f = f.add( lne.add( lnw ).add( lse ).add( lsw ) );
+			f = f.mul( 1.0 / 12.0 );
 			f = abs( f.sub( lm ) );
 			f = clamp( f.div( max( contrast, 0 ) ), 0.0, 1.0 );
 
