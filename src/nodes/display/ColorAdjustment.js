@@ -39,7 +39,7 @@ export const hue = /*@__PURE__*/ Fn( ( [ color, adjustment = float( 1 ) ] ) => {
 
 export const luminance = (
 	color,
-	luminanceCoefficients = vec3( ... ColorManagement.getLuminanceCoefficients( new Vector3() ) )
+	luminanceCoefficients = vec3( ColorManagement.getLuminanceCoefficients( new Vector3() ) )
 ) => dot( color, luminanceCoefficients );
 
 export const threshold = ( color, threshold ) => mix( vec3( 0.0 ), color, luminance( color ).sub( threshold ).max( 0 ) );
