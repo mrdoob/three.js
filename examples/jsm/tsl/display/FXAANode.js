@@ -81,7 +81,7 @@ class FXAANode extends TempNode {
 
 		} );
 
-		const DetermineEdge = Fn( ( [ texSize, lm, ln, le, ls, lw, lne, lnw, lse, lsw ] ) => {
+		const DetermineEdge = ( texSize, lm, ln, le, ls, lw, lne, lnw, lse, lsw ) => {
 
 			const horizontal =
 				abs( ln.add( ls ).sub( lm.mul( 2.0 ) ) ).mul( 2.0 ).add(
@@ -121,11 +121,13 @@ class FXAANode extends TempNode {
 
 			} );
 
-			return vec4( isHorizontal, pixelStep, oppositeLuminance, gradient );
+			return { isHorizontal, pixelStep, oppositeLuminance, gradient };
 
-		} );
+		};
 
-		const DetermineEdgeBlendFactor = Fn( ( [ texSize, lm, isHorizontal, pixelStep, oppositeLuminance, gradient, uv ] ) => {
+		const DetermineEdgeBlendFactor = ( texSize, lm, edge, uv ) => {
+
+			const { isHorizontal, pixelStep, oppositeLuminance, gradient } = edge;
 
 			const uvEdge = uv.toVar();
 			const edgeStep = vec2().toVar();
@@ -236,7 +238,7 @@ class FXAANode extends TempNode {
 
 			return blendFactor;
 
-		} );
+		};
 
 		const ApplyFXAA = Fn( ( [ uv, texSize ] ) => {
 
@@ -263,19 +265,19 @@ class FXAANode extends TempNode {
 			} );
 
 			const pixelBlend = DeterminePixelBlendFactor( lm, ln, le, ls, lw, lne, lnw, lse, lsw, contrast );
-			const edge = DetermineEdge( texSize, lm, ln, le, ls, lw, lne, lnw, lse, lsw );
-			const edgeBlend = DetermineEdgeBlendFactor( texSize, lm, edge.x, edge.y, edge.z, edge.w, uv );
+			const edge = DetermineEdge( texSize, lm, ln, le, ls, lw, lne, lnw, lse, lsw ); // { isHorizontal, pixelStep, oppositeLuminance, gradient };
+			const edgeBlend = DetermineEdgeBlendFactor( texSize, lm, edge, uv );
 
 			const finalBlend = max( pixelBlend, edgeBlend );
 			const fxaaUv = uv.toVar();
 
-			If( edge.x, () => {
+			If( edge.isHorizontal, () => {
 
-				fxaaUv.y.addAssign( edge.y.mul( finalBlend ) );
+				fxaaUv.y.addAssign( edge.pixelStep.mul( finalBlend ) );
 
 			} ).Else( () => {
 
-				fxaaUv.x.addAssign( edge.y.mul( finalBlend ) );
+				fxaaUv.x.addAssign( edge.pixelStep.mul( finalBlend ) );
 
 			} );
 
