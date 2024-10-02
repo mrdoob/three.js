@@ -166,7 +166,8 @@ ColorManagement.define( {
 		toXYZ: LINEAR_REC709_TO_XYZ,
 		fromXYZ: XYZ_TO_LINEAR_REC709,
 		luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
-		workingColorSpaceConfig: { unpackColorSpace: SRGBColorSpace }
+		workingColorSpaceConfig: { unpackColorSpace: SRGBColorSpace },
+		outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace }
 	},
 
 	[ SRGBColorSpace ]: {
