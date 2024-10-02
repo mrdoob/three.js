@@ -72,18 +72,18 @@ class FXAANode extends TempNode {
 
 			const m = SampleLuminance( uv );
 
-			const n = SampleLuminanceOffset( texSize, uv, 0.0, 1.0 );
+			const n = SampleLuminanceOffset( texSize, uv, 0.0, - 1.0 );
 			const e = SampleLuminanceOffset( texSize, uv, 1.0, 0.0 );
-			const s = SampleLuminanceOffset( texSize, uv, 0.0, - 1.0 );
+			const s = SampleLuminanceOffset( texSize, uv, 0.0, 1.0 );
 			const w = SampleLuminanceOffset( texSize, uv, - 1.0, 0.0 );
 
-			const ne = SampleLuminanceOffset( texSize, uv, 1.0, 1.0 );
-			const nw = SampleLuminanceOffset( texSize, uv, - 1.0, 1.0 );
-			const se = SampleLuminanceOffset( texSize, uv, 1.0, - 1.0 );
-			const sw = SampleLuminanceOffset( texSize, uv, - 1.0, - 1.0 );
+			const ne = SampleLuminanceOffset( texSize, uv, 1.0, - 1.0 );
+			const nw = SampleLuminanceOffset( texSize, uv, - 1.0, - 1.0 );
+			const se = SampleLuminanceOffset( texSize, uv, 1.0, 1.0 );
+			const sw = SampleLuminanceOffset( texSize, uv, - 1.0, 1.0 );
 
-			const highest = max( max( max( max( n, e ), s ), w ), m );
-			const lowest = min( min( min( min( n, e ), s ), w ), m );
+			const highest = max( max( max( max( s, e ), n ), w ), m );
+			const lowest = min( min( min( min( s, e ), n ), w ), m );
 			const contrast = highest.sub( lowest );
 
 			return { m, n, e, s, w, ne, nw, se, sw, highest, lowest, contrast };
@@ -92,8 +92,8 @@ class FXAANode extends TempNode {
 
 		const DeterminePixelBlendFactor = ( l ) => {
 
-			let f = float( 2.0 ).mul( l.n.add( l.e ).add( l.s ).add( l.w ) );
-			f = f.add( l.ne.add( l.nw ).add( l.se ).add( l.sw ) );
+			let f = float( 2.0 ).mul( l.s.add( l.e ).add( l.n ).add( l.w ) );
+			f = f.add( l.se.add( l.sw ).add( l.ne ).add( l.nw ) );
 			f = f.mul( 1.0 / 12.0 );
 			f = abs( f.sub( l.m ) );
 			f = clamp( f.div( max( l.contrast, 0 ) ), 0.0, 1.0 );
@@ -106,23 +106,23 @@ class FXAANode extends TempNode {
 		const DetermineEdge = ( texSize, l ) => {
 
 			const horizontal =
-				abs( l.n.add( l.s ).sub( l.m.mul( 2.0 ) ) ).mul( 2.0 ).add(
-					abs( l.ne.add( l.se ).sub( l.e.mul( 2.0 ) ) ).add(
-						abs( l.nw.add( l.sw ).sub( l.w.mul( 2.0 ) ) )
+				abs( l.s.add( l.n ).sub( l.m.mul( 2.0 ) ) ).mul( 2.0 ).add(
+					abs( l.se.add( l.ne ).sub( l.e.mul( 2.0 ) ) ).add(
+						abs( l.sw.add( l.nw ).sub( l.w.mul( 2.0 ) ) )
 					)
 				);
 
 			const vertical =
 				abs( l.e.add( l.w ).sub( l.m.mul( 2.0 ) ) ).mul( 2.0 ).add(
-					abs( l.ne.add( l.nw ).sub( l.n.mul( 2.0 ) ) ).add(
-						abs( l.se.add( l.sw ).sub( l.s.mul( 2.0 ) ) )
+					abs( l.se.add( l.sw ).sub( l.s.mul( 2.0 ) ) ).add(
+						abs( l.ne.add( l.nw ).sub( l.n.mul( 2.0 ) ) )
 					)
 				);
 
 			const isHorizontal = horizontal.greaterThanEqual( vertical );
 
-			const pLuminance = select( isHorizontal, l.n, l.e );
-			const nLuminance = select( isHorizontal, l.s, l.w );
+			const pLuminance = select( isHorizontal, l.s, l.e );
+			const nLuminance = select( isHorizontal, l.n, l.w );
 			const pGradient = abs( pLuminance.sub( l.m ) );
 			const nGradient = abs( nLuminance.sub( l.m ) );
 
