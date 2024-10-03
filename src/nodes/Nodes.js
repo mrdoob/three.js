@@ -83,7 +83,6 @@ export { default as UserDataNode } from './accessors/UserDataNode.js';
 
 // display
 export { default as BumpMapNode } from './display/BumpMapNode.js';
-export { default as CDLNode } from './display/CDLNode.js';
 export { default as ColorSpaceNode } from './display/ColorSpaceNode.js';
 export { default as FrontFacingNode } from './display/FrontFacingNode.js';
 export { default as NormalMapNode } from './display/NormalMapNode.js';
