@@ -53,13 +53,13 @@ export const threshold = ( color, threshold ) => mix( vec3( 0.0 ), color, lumina
  * saturation. The CDL should be typically be given input in a log space (such as LogC, ACEScc,
  * or AgX Log), and will return output in the same space. Output may require clamping >=0.
  *
- * @param {vec4} color Input (-Infinity, +Infinity)
- * @param {number | vec3} slope [0, +Infinity)
- * @param {number | vec3} offset (-Infinity, +Infinity), and typically [-1, 1]
- * @param {number | vec3} power (0, +Infinity)
- * @param {number} saturation [0, +Infinity), and typically [0, 4]
+ * @param {vec4} color Input (-Infinity < input < +Infinity)
+ * @param {number | vec3} slope Slope (0 ≤ slope < +Infinity)
+ * @param {number | vec3} offset Offset (-Infinity < offset < +Infinity; typically -1 < offset < 1)
+ * @param {number | vec3} power Power (0 < power < +Infinity)
+ * @param {number} saturation Saturation (0 ≤ saturation < +Infinity; typically 0 ≤ saturation < 4)
  * @param {vec3} luminanceCoefficients Luminance coefficients for saturation term, typically Rec. 709
- * @return Output on range (-Infinity, +Infinity)
+ * @return Output, -Infinity < output < +Infinity
  *
  * References:
  * - ASC CDL v1.2
