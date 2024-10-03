@@ -1,5 +1,9 @@
-import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2 } from 'three';
-import { NodeMaterial, TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture } from 'three/tsl';
+import { Color, HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2 } from 'three';
+import { abs, QuadMesh, NodeMaterial, TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture } from 'three/tsl';
+
+const _quadMesh = /*@__PURE__*/ new QuadMesh();
+const _currentClearColor = /*@__PURE__*/ new Color();
+const _size = /*@__PURE__*/ new Vector2();
 
 class SMAANode extends TempNode {
 
@@ -19,15 +23,11 @@ class SMAANode extends TempNode {
 
 		// render targets
 
-		this._renderTargetEdges = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
+		this._renderTargetEdges = new RenderTarget( 1, 1, { type: HalfFloatType } );
 		this._renderTargetEdges.texture.name = 'SMAANode.edges';
 
-		this._renderTargetWeights = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
+		this._renderTargetWeights = new RenderTarget( 1, 1, { type: HalfFloatType } );
 		this._renderTargetWeights.texture.name = 'SMAANode.weights';
-
-		// uniforms
-
-		this._invSize = uniform( new Vector2() );
 
 		// textures
 
@@ -66,6 +66,13 @@ class SMAANode extends TempNode {
 		this._searchTexture.generateMipmaps = false;
 		this._searchTexture.flipY = false;
 
+		// uniforms
+
+		this._invSize = uniform( new Vector2() );
+		this._areaTextureUniform = texture( this._areaTexture );
+		this._searchTextureUniform = texture( this._searchTexture );
+		this._edgesTextureUniform = texture( this._renderTargetEdges.texture );
+
 		// materials
 
 		this._materialEdges = new NodeMaterial();
@@ -77,22 +84,60 @@ class SMAANode extends TempNode {
 		this._materialBlend = new NodeMaterial();
 		this._materialBlend.name = 'SMAANode.blend';
 
+		//
+
+		this._textureNode = passTexture( this, this._renderTargetWeights.texture );
+
+	}
+
+	getTextureNode() {
+
+		return this._textureNode;
+
 	}
 
 	setSize( width, height ) {
 
 		this._invSize.value.set( 1 / width, 1 / height );
 
-		this._edgesRT.setSize( width, height );
-		this._weightsRT.setSize( width, height );
+		this._renderTargetEdges.setSize( width, height );
+		this._renderTargetWeights.setSize( width, height );
 
 	}
 
-	updateBefore() {
+	updateBefore( frame ) {
 
-		const map = this.textureNode.value;
+		const { renderer } = frame;
 
-		this.setSize( map.image.width, map.image.heigh );
+		const size = renderer.getDrawingBufferSize( _size );
+		this.setSize( size.width, size.height );
+
+		const currentRenderTarget = renderer.getRenderTarget();
+		const currentMRT = renderer.getMRT();
+		renderer.getClearColor( _currentClearColor );
+		const currentClearAlpha = renderer.getClearAlpha();
+
+		renderer.setMRT( null );
+
+		// edges
+
+		renderer.setRenderTarget( this._renderTargetEdges );
+
+		_quadMesh.material = this._materialEdges;
+		_quadMesh.render( renderer );
+
+		// weights
+
+		renderer.setRenderTarget( this._renderTargetWeights );
+
+		_quadMesh.material = this._materialWeights;
+		_quadMesh.render( renderer );
+
+		// restore
+
+		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setMRT( currentMRT );
+		renderer.setClearColor( _currentClearColor, currentClearAlpha );
 
 	}
 
@@ -101,18 +146,98 @@ class SMAANode extends TempNode {
 		const textureNode = this.textureNode;
 		const uvNode = textureNode.uvNode || uv();
 
-		const smaaEdges = Fn( () => {
+		const SMAAEdgeDetectionVS = Fn( () => {
 
-			return textureNode.uv( uvNode );
+			const vOffset0 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 1.0, 0.0, 0.0, - 1.0 ) ) );
+			const vOffset1 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( 1.0, 0.0, 0.0, 1.0 ) ) );
+			const vOffset2 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 2.0, 0.0, 0.0, - 2.0 ) ) );
+
+			varyingProperty( 'vec4', 'vOffset0' ).assign( vOffset0 );
+			varyingProperty( 'vec4', 'vOffset1' ).assign( vOffset1 );
+			varyingProperty( 'vec4', 'vOffset2' ).assign( vOffset2 );
+
+			return modelViewProjection();
 
 		} );
 
-		// this._materialEdges.fragmentNode = smaaEdges().context( builder.getSharedContext() );
-		// this._materialEdges.needsUpdate = true;
+		const SMAAColorEdgeDetectionPS = Fn( () => {
 
-		const outputNode = smaaEdges();
+			const SMAA_THRESHOLD = 0.1;
 
-		return outputNode;
+			const vOffset0 = varyingProperty( 'vec4', 'vOffset0' );
+			const vOffset1 = varyingProperty( 'vec4', 'vOffset1' );
+			const vOffset2 = varyingProperty( 'vec4', 'vOffset2' );
+
+			const threshold = vec2( SMAA_THRESHOLD, SMAA_THRESHOLD );
+
+			// Calculate color deltas:
+			const delta = vec4().toVar();
+			const C = this.textureNode.uv( uvNode ).rgb.toVar();
+
+			// Calculate left and top deltas:
+			const Cleft = this.textureNode.uv( vOffset0.xy ).rgb.toVar();
+			let t = abs( C.sub( Cleft ) );
+			delta.x = max( max( t.r, t.g ), t.b );
+
+			const Ctop = this.textureNode.uv( vOffset0.zw ).rgb.toVar();
+			t = abs( C.sub( Ctop ) );
+			delta.y = max( max( t.r, t.g ), t.b );
+
+			// We do the usual threshold:
+			const edges = step( threshold, delta.xy ).toVar();
+
+			// Then discard if there is no edge:
+			dot( edges, vec2( 1.0, 1.0 ) ).equal( 0 ).discard();
+
+			// Calculate right and bottom deltas:
+			const Cright = this.textureNode.uv( vOffset1.xy ).rgb.toVar();
+			t = abs( C.sub( Cright ) );
+			delta.z = max( max( t.r, t.g ), t.b );
+
+			const Cbottom = this.textureNode.uv( vOffset1.zw ).rgb.toVar();
+			t = abs( C.sub( Cbottom ) );
+			delta.w = max( max( t.r, t.g ), t.b );
+
+			// Calculate the maximum delta in the direct neighborhood:
+			let maxDelta = max( max( max( delta.x, delta.y ), delta.z ), delta.w ).toVar();
+
+			// Calculate left-left and top-top deltas:
+			const Cleftleft = this.textureNode.uv( vOffset2.xy ).rgb.toVar();
+			t = abs( C.sub( Cleftleft ) );
+			delta.z = max( max( t.r, t.g ), t.b );
+
+			const Ctoptop = this.textureNode.uv( vOffset2.zw ).rgb.toVar();
+			t = abs( C.sub( Ctoptop ) );
+			delta.w = max( max( t.r, t.g ), t.b );
+
+			// Calculate the final maximum delta:
+			maxDelta = max( max( maxDelta, delta.z ), delta.w );
+
+			// Local contrast adaptation in action:
+			edges.xy.mulAssign( vec2( step( float( 0.5 ).mul( maxDelta ), delta.xy ) ) );
+
+			return vec4( edges, 0, 0 );
+
+		} );
+
+		const SMAAWeightsVS = Fn( () => {
+
+		} );
+
+		const SMAAWeightsPS = Fn( () => {
+
+		} );
+
+
+		this._materialEdges.vertexNode = SMAAEdgeDetectionVS().context( builder.getSharedContext() );
+		this._materialEdges.fragmentNode = SMAAColorEdgeDetectionPS().context( builder.getSharedContext() );
+		this._materialEdges.needsUpdate = true;
+
+		this._materialWeights.vertexNode = SMAAWeightsVS().context( builder.getSharedContext() );
+		this._materialWeights.fragmentNode = SMAAWeightsPS().context( builder.getSharedContext() );
+		this._materialWeights.needsUpdate = true;
+
+		return this._textureNode;
 
 	}
 
