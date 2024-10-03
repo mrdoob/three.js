@@ -72,7 +72,7 @@ export const cdl = /*@__PURE__*/ Fn( ( [
 	offset = vec3( 0 ),
 	power = vec3( 1 ),
 	saturation = float( 1 ),
-	// ASC CDL v1.2 explicitly requires Rec. 709 luminance coefficients, without input conversion to Rec. 709.
+	// ASC CDL v1.2 explicitly requires Rec. 709 luminance coefficients.
 	luminanceCoefficients = vec3( ColorManagement.getLuminanceCoefficients( new Vector3(), LinearSRGBColorSpace ) )
 ] ) => {
 
