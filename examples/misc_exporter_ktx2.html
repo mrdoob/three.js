@@ -159,6 +159,7 @@
 					controls.enabled = true;
 					scene.background = renderTarget.texture;
 					mesh.visible = false;
+					renderer.toneMapping = THREE.AgXToneMapping;
 
 				} else {
 
@@ -166,6 +167,7 @@
 					controls.enabled = false;
 					scene.background = new THREE.Color( 0, 0, 0 );
 					mesh.visible = true;
+					renderer.toneMapping = THREE.NoToneMapping;
 
 				}
 
