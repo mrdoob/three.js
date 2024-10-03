@@ -108,7 +108,7 @@
 				const particleVelocities = storage( new THREE.StorageInstancedBufferAttribute( nbParticles, 4 ), 'vec4', nbParticles );
 
 				// init particles buffers
-				renderer.compute( /*#__PURE__*/ Fn( () => {
+				renderer.computeAsync( /*#__PURE__*/ Fn( () => {
 
 					particlePositions.element( instanceIndex ).xyz.assign( vec3( 10000.0 ) );
 					particlePositions.element( instanceIndex ).w.assign( vec3( - 1.0 ) ); // life is stored in w component; x<0 means dead
