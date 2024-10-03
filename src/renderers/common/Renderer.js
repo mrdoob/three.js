@@ -1210,7 +1210,13 @@ class Renderer {
 
 				//
 
-				computeNode.onInit( { renderer: this } );
+				const onInitFn = computeNode.onInitFunction;
+
+				if ( onInitFn !== null ) {
+
+					onInitFn.call( computeNode, { renderer: this } );
+
+				}
 
 			}
 
