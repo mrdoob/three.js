@@ -411,7 +411,7 @@
 				const buttonCompute = {
 					smoothWater: function () {
 
-						renderer.compute( computeSmooth );
+						renderer.computeAsync( computeSmooth );
 
 					}
 				};
@@ -488,11 +488,11 @@
 
 				}
 			
-				renderer.compute( computeHeight );
+				renderer.computeAsync( computeHeight );
 
 				if ( effectController.spheresEnabled ) {
 
-					renderer.compute( computeSphere );
+					renderer.computeAsync( computeSphere );
 
 				}
 
