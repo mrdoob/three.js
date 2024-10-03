@@ -46,14 +46,6 @@ const color = new THREE.Color().setRGB( 0.5, 0.5, 0.5, SRGBColorSpace );
 		</p>
 
 		<p>
-			Minimum and maximum values of RGB components are context-dependent. For
-			example, components of [page:MeshStandardMaterial.color] represent a
-			diffuse reflectance fraction, and so must be in the range [0, 1].
-			In contrast, “unlit” or “self-lit” colors like [page:MeshBasicMaterial.color]
-			may be in the range [0, Infinity).
-		</p>
-
-		<p>
 			Iterating through a Color instance will yield its components (r, g, b) in
 			the corresponding order.
 		</p>
@@ -133,13 +125,13 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		<p>Read-only flag to check if a given object is of type [name].</p>
 
 		<h3>[property:Float r]</h3>
-		<p>Red channel value, typically between `0` and `1`. Default is `1`.</p>
+		<p>Red channel value between `0.0` and `1.0`. Default is `1`.</p>
 
 		<h3>[property:Float g]</h3>
-		<p>Green channel value, typically between `0` and `1`. Default is `1`.</p>
+		<p>Green channel value between `0.0` and `1.0`. Default is `1`.</p>
 
 		<h3>[property:Float b]</h3>
-		<p>Blue channel value, typically between `0` and `1`. Default is `1`.</p>
+		<p>Blue channel value between `0.0` and `1.0`. Default is `1`.</p>
 
 		<h2>Methods</h2>
 
@@ -377,16 +369,16 @@ const color7 = new THREE.Color( 1, 0, 0 );
 			[method:this setRGB]( [param:Float r], [param:Float g], [param:Float b], [param:string colorSpace] = LinearSRGBColorSpace )
 		</h3>
 		<p>
-			[page:Float r] — Red channel value, typically between `0` and `1`.<br />
-			[page:Float g] — Green channel value, typically between `0` and `1`.<br />
-			[page:Float b] — Blue channel value, typically between `0` and `1`.<br /><br />
+			[page:Float r] — Red channel value between `0.0` and `1.0`.<br />
+			[page:Float g] — Green channel value between `0.0` and `1.0`.<br />
+			[page:Float b] — Blue channel value between `0.0` and `1.0`.<br /><br />
 
 			Sets this color from RGB values.
 		</p>
 
 		<h3>[method:this setScalar]( [param:Float scalar] )</h3>
 		<p>
-			[page:Float scalar] — a value, typically between `0.0` and `1.0`.<br /><br />
+			[page:Float scalar] — a value between `0.0` and `1.0`.<br /><br />
 
 			Sets all three color components to the value [page:Float scalar].
 		</p>
