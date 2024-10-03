@@ -1,4 +1,5 @@
 import {
+	ColorManagement,
 	FloatType,
 	HalfFloatType,
 	UnsignedByteType,
@@ -10,6 +11,7 @@ import {
 	NoColorSpace,
 	LinearSRGBColorSpace,
 	SRGBColorSpace,
+	SRGBTransfer,
 	DataTexture,
 	REVISION,
 } from 'three';
@@ -42,6 +44,13 @@ import {
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
 } from '../libs/ktx-parse.module.js';
+
+/**
+ * References:
+ * - https://github.khronos.org/KTX-Specification/ktxspec.v2.html
+ * - https://registry.khronos.org/DataFormat/specs/1.3/dataformat.1.3.html
+ * - https://github.com/donmccurdy/KTX-Parse
+ */
 
 const VK_FORMAT_MAP = {
 
@@ -95,14 +104,23 @@ const VK_FORMAT_MAP = {
 
 };
 
-const KHR_DF_CHANNEL_MAP = {
+const KHR_DF_CHANNEL_MAP = [
 
-	0: KHR_DF_CHANNEL_RGBSDA_RED,
-	1: KHR_DF_CHANNEL_RGBSDA_GREEN,
-	2: KHR_DF_CHANNEL_RGBSDA_BLUE,
-	3: KHR_DF_CHANNEL_RGBSDA_ALPHA,
+	KHR_DF_CHANNEL_RGBSDA_RED,
+	KHR_DF_CHANNEL_RGBSDA_GREEN,
+	KHR_DF_CHANNEL_RGBSDA_BLUE,
+	KHR_DF_CHANNEL_RGBSDA_ALPHA,
 
-};
+];
+
+// TODO: sampleLower and sampleUpper may change based on color space.
+const KHR_DF_CHANNEL_SAMPLE_LOWER_UPPER = {
+
+	[ FloatType ]: [ 0xbf800000, 0x3f800000 ],
+	[ HalfFloatType ]: [ 0xbf800000, 0x3f800000 ],
+	[ UnsignedByteType ]: [ 0, 255 ],
+
+}
 
 const ERROR_INPUT = 'THREE.KTX2Exporter: Supported inputs are DataTexture, Data3DTexture, or WebGLRenderer and WebGLRenderTarget.';
 const ERROR_FORMAT = 'THREE.KTX2Exporter: Supported formats are RGBAFormat, RGFormat, or RedFormat.';
@@ -172,7 +190,7 @@ export class KTX2Exporter {
 		basicDesc.colorPrimaries = texture.colorSpace === NoColorSpace
 			? KHR_DF_PRIMARIES_UNSPECIFIED
 			: KHR_DF_PRIMARIES_BT709;
-		basicDesc.transferFunction = texture.colorSpace === SRGBColorSpace
+		basicDesc.transferFunction = ColorManagement.getTransfer( texture.colorSpace ) === SRGBTransfer
 			? KHR_DF_TRANSFER_SRGB
 			: KHR_DF_TRANSFER_LINEAR;
 
@@ -188,7 +206,8 @@ export class KTX2Exporter {
 
 			let channelType = KHR_DF_CHANNEL_MAP[ i ];
 
-			if ( texture.colorSpace === LinearSRGBColorSpace || texture.colorSpace === NoColorSpace ) {
+			// Assign KHR_DF_SAMPLE_DATATYPE_LINEAR if the channel is linear _and_ differs from the transfer function.
+			if ( channelType === KHR_DF_CHANNEL_RGBSDA_ALPHA && basicDesc.transferFunction !== KHR_DF_TRANSFER_LINEAR ) {
 
 				channelType |= KHR_DF_SAMPLE_DATATYPE_LINEAR;
 
@@ -204,11 +223,11 @@ export class KTX2Exporter {
 			basicDesc.samples.push( {
 
 				channelType: channelType,
-				bitOffset: i * array.BYTES_PER_ELEMENT,
+				bitOffset: i * array.BYTES_PER_ELEMENT * 8,
 				bitLength: array.BYTES_PER_ELEMENT * 8 - 1,
 				samplePosition: [ 0, 0, 0, 0 ],
-				sampleLower: texture.type === UnsignedByteType ? 0 : - 1,
-				sampleUpper: texture.type === UnsignedByteType ? 255 : 1,
+				sampleLower: KHR_DF_CHANNEL_SAMPLE_LOWER_UPPER[ texture.type ][ 0 ],
+				sampleUpper: KHR_DF_CHANNEL_SAMPLE_LOWER_UPPER[ texture.type ][ 1 ],
 
 			} );
 
@@ -269,7 +288,11 @@ async function toDataTexture( renderer, rtt ) {
 
 	}
 
-	return new DataTexture( view, rtt.width, rtt.height, rtt.texture.format, rtt.texture.type );
+	const texture = new DataTexture( view, rtt.width, rtt.height, rtt.texture.format, rtt.texture.type );
+
+	texture.colorSpace = rtt.texture.colorSpace;
+
+	return texture;
 
 }
 
