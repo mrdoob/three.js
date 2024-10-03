@@ -49,6 +49,18 @@ export const threshold = ( color, threshold ) => mix( vec3( 0.0 ), color, lumina
 /**
  * Color Decision List (CDL) v1.2
  *
+ * Compact representation of color grading information, defined by slope, offset, power, and
+ * saturation. The CDL should be typically be given input in a log space (such as LogC, ACEScc,
+ * or AgX Log), and will return output in the same space. Output may require clamping >=0.
+ *
+ * @param {vec4} color Input (-Infinity, +Infinity)
+ * @param {number | vec3} slope [0, +Infinity)
+ * @param {number | vec3} offset (-Infinity, +Infinity), and typically [-1, 1]
+ * @param {number | vec3} power (0, +Infinity)
+ * @param {number} saturation [0, +Infinity), and typically [0, 4]
+ * @param {vec3} luminanceCoefficients Luminance coefficients for saturation term, typically Rec. 709
+ * @return Output on range (-Infinity, +Infinity)
+ *
  * References:
  * - ASC CDL v1.2
  * - https://blender.stackexchange.com/a/55239/43930
@@ -59,27 +71,25 @@ export const cdl = /*@__PURE__*/ Fn( ( [
 	slope = vec3( 1 ),
 	offset = vec3( 0 ),
 	power = vec3( 1 ),
-	saturation = vec3( 1 ),
+	saturation = float( 1 ),
 	// ASC CDL v1.2 explicitly requires Rec. 709 luminance coefficients, without input conversion to Rec. 709.
 	luminanceCoefficients = vec3( ColorManagement.getLuminanceCoefficients( new Vector3(), LinearSRGBColorSpace ) )
 ] ) => {
 
-	// NOTE: The ASC CDL v1.2 defines a [0, 1] clamp on slope+offset output,
-	// and another on saturation output. As discussed in the ACEScc specification
-	// and Filament implementation, the limits may be omitted to support values >1
-	// if negative inputs to the power expression are avoided. We use `max( in, 0.0 )`
-	// on final output, but the lower limit may not be required in all cases.
+	// NOTE: The ASC CDL v1.2 defines a [0, 1] clamp on the slope+offset term, and another on the
+	// saturation term. Per the ACEScc specification and Filament, limits may be omitted to support
+	// values outside [0, 1], requiring a workaround for negative values in the power expression.
 
 	const luma = color.rgb.dot( vec3( luminanceCoefficients ) );
 
-	const v = max( color.rgb.mul( slope ).add( offset ), 0.0 ).toVar( 'v' );
-	const pv = v.pow( power ).toVar( 'pv' );
+	const v = max( color.rgb.mul( slope ).add( offset ), 0.0 ).toVar();
+	const pv = v.pow( power ).toVar();
 
 	If( v.r.greaterThan( 0.0 ), () => { v.r.assign( pv.r ); } ); // eslint-disable-line
 	If( v.g.greaterThan( 0.0 ), () => { v.g.assign( pv.g ); } ); // eslint-disable-line
 	If( v.b.greaterThan( 0.0 ), () => { v.b.assign( pv.b ); } ); // eslint-disable-line
 
-	v.assign( max( luma.add( saturation.mul( v.sub( luma ) ) ), 0.0 ) );
+	v.assign( luma.add( v.sub( luma ).mul( saturation ) ) );
 
 	return vec4( v.rgb, color.a );
 
