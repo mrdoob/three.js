@@ -47,7 +47,7 @@
 
 			init();
 
-			const jellyNode = Fn( ( { renderer, geometry, object } ) => {
+			const jelly = Fn( ( { renderer, geometry, object } ) => {
 
 				const count = geometry.attributes.position.count;
 
@@ -149,7 +149,7 @@
 					// create jelly effect material
 
 					const material = new THREE.MeshNormalNodeMaterial();
-					material.geometryNode = jellyNode();
+					material.geometryNode = jelly();
 					material.positionNode = attribute( 'storagePosition' );
 
 					// apply the material to the mesh
