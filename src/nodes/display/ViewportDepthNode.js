@@ -118,26 +118,31 @@ export const perspectiveDepthToViewZ = ( depth, near, far ) => near.mul( far ).d
 
 export const perspectiveDepthToLogarithmicDepth = ( perspectiveW, near, far ) => {
 
-	// The final logarithmic depth formula used here is adapted from one described in an article
-	// by Thatcher Ulrich (see http://tulrich.com/geekstuff/log_depth_buffer.txt), which was an
-	// improvement upon an earlier formula one described in an
+	// The final logarithmic depth formula used here is adapted from one described in an
+	// article by Thatcher Ulrich (see http://tulrich.com/geekstuff/log_depth_buffer.txt),
+	// which was an improvement upon an earlier formula one described in an
 	// Outerra article (https://outerra.blogspot.com/2009/08/logarithmic-z-buffer.html).
-	// The Outerra article ignored the camera near plane (it always assumed it was 0) and instead
+	// Ulrich's formula is the following:
+	//     z = K * log( w / cameraNear ) / log( cameraFar / cameraNear )
+	//     where K = 2^k - 1, and k is the number of bits in the depth buffer.
+	// The Outerra variant ignored the camera near plane (it assumed it was 0) and instead
 	// opted for a "C-constant" for resolution adjustment of objects near the camera.
-	// Outerra states this about their own formula: "Notice that the 'C' variant doesn’t use a near
-	// plane distance, it has it set at 0." (quote from https://outerra.blogspot.com/2012/11/maximizing-depth-buffer-range-and.html)
-	// It was debated here whether Outerra's "C-constant" version or Ulrich's "near plane" version should
-	// be used, and ultimately Ulrich's "near plane" version was chosen for simplicity, since no "C-constant"
-	// needs to be worried about.
-	// Outerra eventually made another improvement to their original "C-constant" formula, but it still
-	// does not incorporate the camera near plane (for this version,
+	// Outerra states: "Notice that the 'C' variant doesn’t use a near plane distance, it has it
+	// set at 0" (quote from https://outerra.blogspot.com/2012/11/maximizing-depth-buffer-range-and.html).
+	// Ulrich's variant has the benefit of constant relative precision over the whole near-far range.
+	// It was debated here whether Outerra's "C-constant" or Ulrich's "near plane" variant should
+	// be used, and ultimately Ulrich's "near plane" version was chosen.
+	// Outerra eventually made another improvement to their original "C-constant" variant,
+	// but it still does not incorporate the camera near plane (for this version,
 	// see https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html).
-	near = near.max( 1e-6 ); // <-- clamp so we don't divide by 0
+	// Here we make 3 changes to Ulrich's formula:
+	// 1. Clamp the camera near plane so we don't divide by 0.
+	// 2. Use log2 instead of log to avoid an extra multiply (shaders implement log using log2).
+	// 3. Assume K is 1 (K = maximum value in depth buffer; see Ulrich's formula above).
+	near = near.max( 1e-6 );
 	const numerator = log2( perspectiveW.div( near ) );
 	const denominator = log2( far.div( near ) );
-	// The only modification we make to Ulrich's formula is
-	// adding 1 to the final depth value and dividing by 2.
-	return numerator.div( denominator ).add( 1 ).div( 2 );
+	return numerator.div( denominator );
 
 };
 
