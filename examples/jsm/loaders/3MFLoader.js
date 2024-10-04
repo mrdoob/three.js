@@ -375,6 +375,67 @@ class ThreeMFLoader extends Loader {
 
 		}
 
+		function parseImplicitIONode( implicitIONode, wrap = false ) {
+			const portNodes = implicitIONode.children;
+			const portArguments = {};
+			for ( let i = 0; i < portNodes.length; i ++ ) {
+				portArguments[ portNodes[ i ].getAttribute( 'identifier' ) ] = {
+					type: portNodes[ i ].nodeName.substring( 2 ),
+					identifier: portNodes[ i ].getAttribute( 'identifier' ),
+					displayname: portNodes[ i ].getAttribute( 'displayname' )
+				};
+
+				if ( portNodes[ i ].hasAttribute( 'ref' ) ) {
+					portArguments[ portNodes[ i ].getAttribute( 'identifier' ) ].ref = portNodes[ i ].getAttribute( 'ref' );
+				}
+			}
+			if( wrap ) {
+				let toReturn = {};
+				toReturn[ implicitIONode.nodeName.substring( 2 ) ] = portArguments;
+				return toReturn;
+			} else{
+				return portArguments;
+			}
+		}
+
+		function parseImplicitFunctionNode( implicitFunctionNode ) {
+
+			const implicitFunctionData = {
+				id: implicitFunctionNode.getAttribute( 'id' ), // required
+				displayname: implicitFunctionNode.getAttribute( 'displayname' )
+			};
+
+			const functionNodes = implicitFunctionNode.children;
+
+			const operators = [];
+
+			for ( let i = 0; i < functionNodes.length; i ++ ) {
+
+				/** @type {Node} */
+				const operatorNode = functionNodes[ i ];
+
+				if( operatorNode.nodeName === 'i:in' || operatorNode.nodeName === 'i:out' ) {
+					operators.push( parseImplicitIONode( operatorNode, true) );
+				} else{
+					const inputNodes = operatorNode.children;
+					const portArguments = { "op" : operatorNode.nodeName.substring( 2 ) };
+					for ( let i = 0; i < inputNodes.length; i ++ ) {
+						//portArguments.push(parseImplicitIONode( inputNodes[ i ] ) );
+						portArguments[ inputNodes[ i ].nodeName.substring( 2 )] = parseImplicitIONode( inputNodes[ i ], false );
+					}
+					//let toReturn = {};
+					//toReturn[ operatorNode.nodeName.substring( 2 ) ] = portArguments;
+					operators.push( portArguments );
+				}
+
+			}
+
+			implicitFunctionData[ 'operations' ] = operators;
+
+			return implicitFunctionData;
+
+		}
+
 		function parseMetallicDisplaypropertiesNode( metallicDisplaypropetiesNode ) {
 
 			const metallicDisplaypropertiesData = {
@@ -668,6 +729,19 @@ class ThreeMFLoader extends Loader {
 				const colorGroupNode = colorGroupNodes[ i ];
 				const colorGroupData = parseColorGroupNode( colorGroupNode );
 				resourcesData[ 'colorgroup' ][ colorGroupData[ 'id' ] ] = colorGroupData;
+
+			}
+
+			//
+
+			resourcesData[ 'implicitfunction' ] = {};
+			const implicitFunctionNodes = resourcesNode.querySelectorAll( 'implicitfunction' );
+
+			for ( let i = 0; i < implicitFunctionNodes.length; i ++ ) {
+
+				const implicitFunctionNode = implicitFunctionNodes[ i ];
+				const implicitFunctionData = parseImplicitFunctionNode( implicitFunctionNode );
+				resourcesData[ 'implicitfunction' ][ implicitFunctionData[ 'id' ] ] = implicitFunctionData;
 
 			}
 
@@ -1354,6 +1428,8 @@ class ThreeMFLoader extends Loader {
 				objects[ objectData.id ] = getBuild( meshData, objects, modelData, textureData, objectData, buildGroup );
 
 			} else {
+
+				console.log(modelData);
 
 				const compositeData = objectData[ 'components' ];
 
