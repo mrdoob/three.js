@@ -1,5 +1,5 @@
 import { Color, HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2 } from 'three';
-import { abs, QuadMesh, NodeMaterial, TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture } from 'three/tsl';
+import { abs, QuadMesh, NodeMaterial, TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _currentClearColor = /*@__PURE__*/ new Color();
@@ -143,8 +143,16 @@ class SMAANode extends TempNode {
 
 	setup( builder ) {
 
+		const SMAA_THRESHOLD = 0.1;
+		const SMAA_MAX_SEARCH_STEPS = 8;
+		const SMAA_AREATEX_MAX_DISTANCE = 16;
+		const SMAA_AREATEX_PIXEL_SIZE = vec2( 1 / 160, 1 / 560 );
+		const SMAA_AREATEX_SUBTEX_SIZE = ( 1 / 7 );
+
 		const textureNode = this.textureNode;
 		const uvNode = textureNode.uvNode || uv();
+
+		// edges
 
 		const SMAAEdgeDetectionVS = Fn( () => {
 
@@ -160,9 +168,7 @@ class SMAANode extends TempNode {
 
 		} );
 
-		const SMAAColorEdgeDetectionPS = Fn( () => {
-
-			const SMAA_THRESHOLD = 0.1;
+		const SMAAEdgeDetectionPS = Fn( () => {
 
 			const vOffset0 = varyingProperty( 'vec4', 'vOffset0' );
 			const vOffset1 = varyingProperty( 'vec4', 'vOffset1' );
@@ -220,17 +226,266 @@ class SMAANode extends TempNode {
 
 		} );
 
+		// weights
+
+		const SMAASearchLength = Fn( ( [ searchTex, e, bias, scale ] ) => {
+
+			// Not required if searchTex accesses are set to point:
+			// float2 SEARCH_TEX_PIXEL_SIZE = 1.0 / float2(66.0, 33.0);
+			// e = float2(bias, 0.0) + 0.5 * SEARCH_TEX_PIXEL_SIZE + e * float2(scale, 1.0) * float2(64.0, 32.0) * SEARCH_TEX_PIXEL_SIZE;
+			const coord = vec2( e ).toVar();
+			coord.r = bias.add( coord.r.mul( scale ) );
+			return float( 255 ).mul( searchTex.uv( coord ) ).r;
+
+		} );
+
+		const SMAAArea = Fn( ( [ areaTex, dist, e1, e2, offset ] ) => {
+
+			// Rounding prevents precision errors of bilinear filtering:
+			let texcoord = float( SMAA_AREATEX_MAX_DISTANCE ).mul( float( 4 ).mul( vec2( e1, e2 ) ).round() ).add( dist );
+
+			// We do a scale and bias for mapping to texel space:
+			texcoord = SMAA_AREATEX_PIXEL_SIZE.mul( texcoord ).add( float( 0.5 ).mul( SMAA_AREATEX_PIXEL_SIZE ) );
+
+			// Move to proper place, according to the subpixel offset:
+			texcoord.y.addAssign( float( SMAA_AREATEX_SUBTEX_SIZE ).mul( offset ) );
+
+			return areaTex.uv( texcoord ).rg;
+
+		} );
+
+		const SMAASearchXLeft = Fn( ( [ edgesTex, searchTex, texcoord, end ] ) => {
+
+			/**
+			* @PSEUDO_GATHER4
+			* This texcoord has been offset by (-0.25, -0.125) in the vertex shader to
+			* sample between edge, thus fetching four edges in a row.
+			* Sampling with different offsets in each direction allows to disambiguate
+			* which edges are active from the four fetched ones.
+			*/
+
+			const e = vec2( 0.0, 1.0 ).toVar();
+			const coord = vec2( texcoord ).toVar();
+
+			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
+
+				e.assign( edgesTex.uv( coord ).rg );
+				coord.subAssign( vec2( 2, 0 ).mul( this._invSize ) );
+
+				If( coord.x.lessThanEqual( end ).or( e.g.lessThanEqual( float( 0.8281 ) ).or( e.r.notEqual( float( 0 ) ) ) ), () => {
+
+					Break();
+
+				} );
+
+			} );
+
+			// We correct the previous (-0.25, -0.125) offset we applied:
+			coord.x.addAssign( float( 0.25 ).mul( this._invSize.x ) );
+
+			// The searches are bias by 1, so adjust the coords accordingly:
+			coord.x.addAssign( this._invSize.x );
+
+			// Disambiguate the length added by the last step:
+			coord.x.addAssign( float( 2 ).mul( this._invSize.x ) );
+			coord.x.subAssign( this._invSize.x.mul( SMAASearchLength( searchTex, e, 0, 0.5 ) ) );
+
+			return coord.x;
+
+		} );
+
+		const SMAASearchXRight = Fn( ( [ edgesTex, searchTex, texcoord, end ] ) => {
+
+			const e = vec2( 0.0, 1.0 ).toVar();
+			const coord = vec2( texcoord ).toVar();
+
+			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
+
+				e.assign( edgesTex.uv( coord ).rg );
+				coord.addAssign( vec2( 2, 0 ).mul( this._invSize ) );
+
+				If( coord.x.greaterThanEqual( end ).or( e.g.lessThanEqual( float( 0.8281 ) ).or( e.r.notEqual( float( 0 ) ) ) ), () => {
+
+					Break();
+
+				} );
+
+			} );
+
+			coord.x.subAssign( float( 0.25 ).mul( this._invSize.x ) );
+			coord.x.subAssign( this._invSize.x );
+			coord.x.subAssign( float( 2 ).mul( this._invSize.x ) );
+			coord.x.addAssign( this._invSize.x.mul( SMAASearchLength( searchTex, e, 0.5, 0.5 ) ) );
+
+			return coord.x;
+
+		} );
+
+		const SMAASearchYUp = Fn( ( [ edgesTex, searchTex, texcoord, end ] ) => {
+
+			const e = vec2( 1.0, 0.0 ).toVar();
+			const coord = vec2( texcoord ).toVar();
+
+			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
+
+				e.assign( edgesTex.uv( coord ).rg );
+				coord.addAssign( vec2( 0, - 2 ).mul( this._invSize ) );
+
+				If( coord.y.lessThanEqual( end ).or( e.r.lessThanEqual( float( 0.8281 ) ).or( e.g.notEqual( float( 0 ) ) ) ), () => {
+
+					Break();
+
+				} );
+
+			} );
+
+			coord.y.addAssign( float( 0.25 ).mul( this._invSize.y ) );
+			coord.y.addAssign( this._invSize.y );
+			coord.y.addAssign( float( 2 ).mul( this._invSize.y ) );
+			coord.y.subAssign( this._invSize.y.mul( SMAASearchLength( searchTex, e.gr, 0, 0.5 ) ) );
+
+			return coord.y;
+
+		} );
+
+		const SMAASearchYDown = Fn( ( [ edgesTex, searchTex, texcoord, end ] ) => {
+
+			const e = vec2( 1.0, 0.0 ).toVar();
+			const coord = vec2( texcoord ).toVar();
+
+			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
+
+				e.assign( edgesTex.uv( coord ).rg );
+				coord.subAssign( vec2( 0, - 2 ).mul( this._invSize ) );
+
+				If( coord.y.greaterThanEqual( end ).or( e.r.lessThanEqual( float( 0.8281 ) ).or( e.g.notEqual( float( 0 ) ) ) ), () => {
+
+					Break();
+
+				} );
+
+			} );
+
+			coord.y.subAssign( float( 0.25 ).mul( this._invSize.y ) );
+			coord.y.subAssign( this._invSize.y );
+			coord.y.subAssign( float( 2 ).mul( this._invSize.y ) );
+			coord.y.addAssign( this._invSize.y.mul( SMAASearchLength( searchTex, e.gr, 0.5, 0.5 ) ) );
+
+			return coord.y;
+
+		} );
+
 		const SMAAWeightsVS = Fn( () => {
+
+			const vPixcoord = uvNode.xy.div( this._invSize );
+
+			// We will use these offsets for the searches later on (see @PSEUDO_GATHER4):
+			const vOffset0 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 0.25, - 0.125, 1.25, - 0.125 ) ) ).toVar();
+			const vOffset1 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 0.125, - 0.25, - 0.125, 1.25 ) ) ).toVar();
+
+			// And these for the searches, they indicate the ends of the loops:
+			const vOffset2 = vec4( vOffset0.xz, vOffset1.yw ).add( vec4( - 2.0, 2.0, - 2.0, 2.0 ).mul( vec4( this._invSize.xx, this._invSize.yy ) ).mul( float( SMAA_MAX_SEARCH_STEPS ) ) ).toVar();
+
+			varyingProperty( 'vec2', 'vPixcoord' ).assign( vPixcoord );
+			varyingProperty( 'vec4', 'vOffset0' ).assign( vOffset0 );
+			varyingProperty( 'vec4', 'vOffset1' ).assign( vOffset1 );
+			varyingProperty( 'vec4', 'vOffset2' ).assign( vOffset2 );
+
+			return modelViewProjection();
 
 		} );
 
 		const SMAAWeightsPS = Fn( () => {
 
+			const vPixcoord = varyingProperty( 'vec2', 'vPixcoord' );
+			const vOffset0 = varyingProperty( 'vec4', 'vOffset0' );
+			const vOffset1 = varyingProperty( 'vec4', 'vOffset1' );
+			const vOffset2 = varyingProperty( 'vec4', 'vOffset2' );
+
+			const weights = vec4( 0.0, 0.0, 0.0, 1.0 ).toVar();
+			const subsampleIndices = vec4( 0.0, 0.0, 0.0, 0.0 ).toVar();
+
+			const e = this._edgesTextureUniform.uv( uvNode ).rg.toVar();
+
+			If( e.g.greaterThan( float( 0 ) ), () => { // Edge at north
+
+				let d = vec2().toVar();
+
+				// Find the distance to the left:
+
+				const coordsLeft = vec2().toVar();
+				coordsLeft.x = SMAASearchXLeft( this._edgesTextureUniform, this._searchTextureUniform, vOffset0.xy, vOffset2.x );
+				coordsLeft.y = vOffset1.y; // offset[1].y = texcoord.y - 0.25 * resolution.y (@CROSSING_OFFSET)
+				d.x = coordsLeft.x;
+
+				// Now fetch the left crossing edges, two at a time using bilinear
+				// filtering. Sampling at -0.25 (see @CROSSING_OFFSET) enables to
+				// discern what value each edge has:
+				const e1 = this._edgesTextureUniform.uv( coordsLeft ).r.toVar();
+
+				// Find the distance to the right:
+				const coordsRight = vec2().toVar();
+				coordsRight.x = SMAASearchXRight( this._edgesTextureUniform, this._searchTextureUniform, vOffset0.zw, vOffset2.y );
+				coordsRight.y = vOffset1.y;
+				d.y = coordsRight.x;
+
+				// We want the distances to be in pixel units (doing this here allow to
+				// better interleave arithmetic and memory accesses):
+				d = d.div( this._invSize.x ).sub( vPixcoord.x );
+
+				// SMAAArea below needs a sqrt, as the areas texture is compressed quadratically:
+				const sqrt_d = sqrt( abs( d ) );
+
+				// Fetch the right crossing edges:
+				const e2 = this._edgesTextureUniform.uv( coordsRight.add( vec2( 1, 0 ).mul( this._invSize ) ) ).r.toVar();
+				weights.r = e2;
+
+				// Get the area for this direction:
+				weights.rg = SMAAArea( this._areaTextureUniform, sqrt_d, e1, e2, float( subsampleIndices.y ) );
+
+			} );
+
+			If( e.r.greaterThan( float( 0 ) ), () => { // Edge at west
+
+				let d = vec2().toVar();
+
+				// Find the distance to the top:
+
+				const coordsUp = vec2().toVar();
+				coordsUp.y = SMAASearchYUp( this._edgesTextureUniform, this._searchTextureUniform, vOffset1.xy, vOffset2.z );
+				coordsUp.x = vOffset0.x; // offset[1].x = texcoord.x - 0.25 * resolution.x;
+				d.x = coordsUp.y;
+
+				// Fetch the top crossing edges:
+				const e1 = this._edgesTextureUniform.uv( coordsUp ).g.toVar();
+
+				// Find the distance to the bottom:
+				const coordsDown = vec2().toVar();
+				coordsDown.y = SMAASearchYDown( this._edgesTextureUniform, this._searchTextureUniform, vOffset1.zw, vOffset2.w );
+				coordsDown.x = vOffset0.x;
+				d.y = coordsDown.y;
+
+				// We want the distances to be in pixel units:
+				d = d.div( this._invSize.y ).sub( vPixcoord.y );
+
+				// SMAAArea below needs a sqrt, as the areas texture is compressed quadratically:
+				const sqrt_d = sqrt( abs( d ) );
+
+				// Fetch the bottom crossing edges:
+				const e2 = this._edgesTextureUniform.uv( coordsDown.add( vec2( 0, 1 ).mul( this._invSize ) ) ).g.toVar();
+
+				// Get the area for this direction:
+				weights.ba = SMAAArea( this._areaTextureUniform, sqrt_d, e1, e2, float( subsampleIndices.x ) );
+
+			} );
+
+			return weights;
+
 		} );
 
 
 		this._materialEdges.vertexNode = SMAAEdgeDetectionVS().context( builder.getSharedContext() );
-		this._materialEdges.fragmentNode = SMAAColorEdgeDetectionPS().context( builder.getSharedContext() );
+		this._materialEdges.fragmentNode = SMAAEdgeDetectionPS().context( builder.getSharedContext() );
 		this._materialEdges.needsUpdate = true;
 
 		this._materialWeights.vertexNode = SMAAWeightsVS().context( builder.getSharedContext() );
