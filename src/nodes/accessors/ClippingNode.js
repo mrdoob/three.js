@@ -143,6 +143,7 @@ class ClippingNode extends Node {
 
 ClippingNode.ALPHA_TO_COVERAGE = 'alphaToCoverage';
 ClippingNode.DEFAULT = 'default';
+ClippingNode.HARDWARE = 'hardware';
 
 export default ClippingNode;
 

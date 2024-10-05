@@ -9,5 +9,6 @@ export const GLFeatureName = {
 	'WEBGL_compressed_texture_s3tc': 'texture-compression-bc',
 	'EXT_texture_compression_bptc': 'texture-compression-bptc',
 	'EXT_disjoint_timer_query_webgl2': 'timestamp-query',
+	'WEBGL_clip_cull_distance': 'clip-distances',
 
 };
