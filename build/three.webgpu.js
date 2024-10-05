@@ -45430,6 +45430,7 @@ class NodeMaterial extends Material {
 		this.alphaTestNode = null;
 
 		this.positionNode = null;
+		this.geometryNode = null;
 
 		this.depthNode = null;
 		this.shadowNode = null;
@@ -45470,6 +45471,12 @@ class NodeMaterial extends Material {
 		builder.addStack();
 
 		builder.stack.outputNode = this.vertexNode || this.setupPosition( builder );
+
+		if ( this.geometryNode !== null ) {
+
+			builder.stack.outputNode = builder.stack.outputNode.bypass( this.geometryNode );
+
+		}
 
 		builder.addFlow( 'vertex', builder.removeStack() );
 
@@ -46007,6 +46014,7 @@ class NodeMaterial extends Material {
 		this.alphaTestNode = source.alphaTestNode;
 
 		this.positionNode = source.positionNode;
+		this.geometryNode = source.geometryNode;
 
 		this.depthNode = source.depthNode;
 		this.shadowNode = source.shadowNode;
@@ -69891,6 +69899,12 @@ class WebGLBackend extends Backend {
 		gl.disable( gl.RASTERIZER_DISCARD );
 
 		this.prepareTimestampBuffer( computeGroup );
+
+		if ( this._currentContext ) {
+
+			this._setFramebuffer( this._currentContext );
+
+		}
 
 	}
 
