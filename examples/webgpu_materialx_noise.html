@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { normalWorld, timerLocal, mx_noise_vec3, mx_worley_noise_vec3, mx_cell_noise_float, mx_fractal_noise_vec3 } from 'three/tsl';
+			import { normalWorld, time, mx_noise_vec3, mx_worley_noise_vec3, mx_cell_noise_float, mx_fractal_noise_vec3 } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -60,8 +60,7 @@
 
 							const geometry = new THREE.SphereGeometry( 8, 64, 32 );
 
-							const offsetNode = timerLocal();
-							const customUV = normalWorld.mul( 10 ).add( offsetNode );
+							const customUV = normalWorld.mul( 10 ).add( time );
 
 							// left top
 

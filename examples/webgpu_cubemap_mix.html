@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, oscSine, timerLocal, pmremTexture, float } from 'three/tsl';
+			import { mix, oscSine, time, pmremTexture, float } from 'three/tsl';
 
 			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
 
@@ -65,7 +65,7 @@
 				cube2Texture.generateMipmaps = true;
 				cube2Texture.minFilter = THREE.LinearMipmapLinearFilter;
 
-				scene.environmentNode = mix( pmremTexture( cube2Texture ), pmremTexture( cube1Texture ), oscSine( timerLocal( .1 ) ) );
+				scene.environmentNode = mix( pmremTexture( cube2Texture ), pmremTexture( cube1Texture ), oscSine( time.mul( .1 ) ) );
 
 				scene.backgroundNode = scene.environmentNode.context( {
 					getTextureLevel: () => float( .5 )

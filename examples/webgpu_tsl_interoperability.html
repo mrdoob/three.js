@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, attribute, varyingProperty, timerLocal, uniform, wgslFn, texture, sampler, uv, clamp, float, vec2, vec3, fract, floor, positionGeometry, sin } from 'three/tsl';
+			import { Fn, attribute, varyingProperty, time, uniform, wgslFn, texture, sampler, uv, clamp, float, vec2, vec3, fract, floor, positionGeometry, sin } from 'three/tsl';
 
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -182,7 +182,7 @@
 					cellOffset: cellOffsetUniform,
 					cellSize: cellSizeUniform,
 					borderMask: borderMaskUniform,
-					time: timerLocal(),
+					time: time,
 					speed: wgslShaderSpeedUniform,
 					pulseIntensity: pulseIntensityUniform,
 					pulseWidth: pulseWidthUniform,
@@ -214,8 +214,8 @@
 
 					const maskCoord = floor( coord.add( cellOffset ) ).mul( cellSizeUniform );
 					const samplePoint = maskCoord.div( dimensions );
-					const time = timerLocal().mul( tslShaderSpeedUniform );
-					samplePoint.x = samplePoint.x.add( fract( time.div( 20 ) ) );
+					const scaledTime = time.mul( tslShaderSpeedUniform );
+					samplePoint.x = samplePoint.x.add( fract( scaledTime.div( 20 ) ) );
 					samplePoint.y = samplePoint.y.sub( 1.5 );
 
 					let color = texture( planetTexture, samplePoint );
