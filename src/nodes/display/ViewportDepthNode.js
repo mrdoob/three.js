@@ -139,7 +139,8 @@ export const perspectiveDepthToLogarithmicDepth = ( perspectiveW, near, far ) =>
 	// 1. Clamp the camera near plane so we don't divide by 0.
 	// 2. Use log2 instead of log to avoid an extra multiply (shaders implement log using log2).
 	// 3. Assume K is 1 (K = maximum value in depth buffer; see Ulrich's formula above).
-	near = near.max( 1e-6 );
+	// For visual representation of this depth value curve, see https://www.desmos.com/calculator/ibw0lhgac2
+	near = near.max( 1e-6 ).toVar();
 	const numerator = log2( perspectiveW.div( near ) );
 	const denominator = log2( far.div( near ) );
 	return numerator.div( denominator );
