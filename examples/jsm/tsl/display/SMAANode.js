@@ -1,9 +1,15 @@
 import { Color, HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2 } from 'three';
-import { abs, QuadMesh, NodeMaterial, TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt } from 'three/tsl';
+import { abs, QuadMesh, NodeMaterial, TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _currentClearColor = /*@__PURE__*/ new Color();
 const _size = /*@__PURE__*/ new Vector2();
+
+/**
+ * Port of Subpixel Morphological Antialiasing (SMAA) v2.8
+ * Preset: SMAA 1x Medium (with color edge detection)
+ * https://github.com/iryoku/smaa/releases/tag/v2.8
+ */
 
 class SMAANode extends TempNode {
 
@@ -28,6 +34,9 @@ class SMAANode extends TempNode {
 
 		this._renderTargetWeights = new RenderTarget( 1, 1, { type: HalfFloatType } );
 		this._renderTargetWeights.texture.name = 'SMAANode.weights';
+
+		this._renderTargetBlend = new RenderTarget( 1, 1, { type: HalfFloatType } );
+		this._renderTargetBlend.texture.name = 'SMAANode.blend';
 
 		// textures
 
@@ -72,6 +81,7 @@ class SMAANode extends TempNode {
 		this._areaTextureUniform = texture( this._areaTexture );
 		this._searchTextureUniform = texture( this._searchTexture );
 		this._edgesTextureUniform = texture( this._renderTargetEdges.texture );
+		this._weightsTextureUniform = texture( this._renderTargetWeights.texture );
 
 		// materials
 
@@ -86,7 +96,7 @@ class SMAANode extends TempNode {
 
 		//
 
-		this._textureNode = passTexture( this, this._renderTargetWeights.texture );
+		this._textureNode = passTexture( this, this._renderTargetBlend.texture );
 
 	}
 
@@ -102,6 +112,7 @@ class SMAANode extends TempNode {
 
 		this._renderTargetEdges.setSize( width, height );
 		this._renderTargetWeights.setSize( width, height );
+		this._renderTargetBlend.setSize( width, height );
 
 	}
 
@@ -131,6 +142,13 @@ class SMAANode extends TempNode {
 		renderer.setRenderTarget( this._renderTargetWeights );
 
 		_quadMesh.material = this._materialWeights;
+		_quadMesh.render( renderer );
+
+		// blend
+
+		renderer.setRenderTarget( this._renderTargetBlend );
+
+		_quadMesh.material = this._materialBlend;
 		_quadMesh.render( renderer );
 
 		// restore
@@ -168,7 +186,7 @@ class SMAANode extends TempNode {
 
 		} );
 
-		const SMAAEdgeDetectionPS = Fn( () => {
+		const SMAAEdgeDetectionFS = Fn( () => {
 
 			const vOffset0 = varyingProperty( 'vec4', 'vOffset0' );
 			const vOffset1 = varyingProperty( 'vec4', 'vOffset1' );
@@ -395,14 +413,14 @@ class SMAANode extends TempNode {
 
 		} );
 
-		const SMAAWeightsPS = Fn( () => {
+		const SMAAWeightsFS = Fn( () => {
 
 			const vPixcoord = varyingProperty( 'vec2', 'vPixcoord' );
 			const vOffset0 = varyingProperty( 'vec4', 'vOffset0' );
 			const vOffset1 = varyingProperty( 'vec4', 'vOffset1' );
 			const vOffset2 = varyingProperty( 'vec4', 'vOffset2' );
 
-			const weights = vec4( 0.0, 0.0, 0.0, 1.0 ).toVar();
+			const weights = vec4( 0.0, 0.0, 0.0, 0.0 ).toVar();
 			const subsampleIndices = vec4( 0.0, 0.0, 0.0, 0.0 ).toVar();
 
 			const e = this._edgesTextureUniform.uv( uvNode ).rg.toVar();
@@ -483,14 +501,90 @@ class SMAANode extends TempNode {
 
 		} );
 
+		// blend
+
+		const SMAABlendVS = Fn( () => {
+
+			//const vOffset0 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 1.0, 0.0, 0.0, - 1.0 ) ) );
+			const vOffset1 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( 1.0, 0.0, 0.0, 1.0 ) ) );
+
+			//varyingProperty( 'vec4', 'vOffset0' ).assign( vOffset0 );
+			varyingProperty( 'vec4', 'vOffset1' ).assign( vOffset1 );
+
+			return modelViewProjection();
+
+		} );
+
+		const SMAABlendFS = Fn( () => {
+
+			//const vOffset0 = varyingProperty( 'vec4', 'vOffset0' );
+			const vOffset1 = varyingProperty( 'vec4', 'vOffset1' );
+			const result = vec4().toVar();
+
+			// Fetch the blending weights for current pixel:
+
+			const a = vec4().toVar();
+			a.xz = this._weightsTextureUniform.uv( uvNode ).xz;
+			a.y = this._weightsTextureUniform.uv( vOffset1.zw ).g;
+			a.w = this._weightsTextureUniform.uv( vOffset1.xy ).a;
+
+			// Is there any blending weight with a value greater than 0.0?
+
+			If( dot( a, vec4( 1.0 ) ).lessThan( 1e-5 ), () => { // Edge at north
+
+				result.assign( this.textureNode.uv( uvNode ) );
+
+			} ).Else( () => {
+
+				// Up to 4 lines can be crossing a pixel (one through each edge). We
+				// favor blending by choosing the line with the maximum weight for each
+				// direction:
+
+				const offset = vec2().toVar();
+
+				offset.x = a.a.greaterThan( a.b ).select( a.a, a.b.negate() ); // left vs. right
+				offset.y = a.g.greaterThan( a.r ).select( a.g, a.r.negate() ); // top vs. bottom
+
+				// Then we go in the direction that has the maximum weight:
+
+				If( abs( offset.x ).greaterThan( abs( offset.y ) ), () => { // horizontal vs. vertical
+
+					offset.y.assign( 0 );
+
+				} ).Else( () => {
+
+					offset.x.assign( 0 );
+
+				} );
+
+				// Fetch the opposite color and lerp by hand:
+
+				const C = this.textureNode.uv( uvNode ).toVar();
+				const texcoord = vec2( uvNode ).toVar();
+				texcoord.addAssign( sign( offset ).mul( this._invSize ) );
+				const Cop = this.textureNode.uv( texcoord ).toVar();
+				const s = abs( offset.x ).greaterThan( abs( offset.y ) ).select( abs( offset.x ), abs( offset.y ) ).toVar();
+
+				const mixed = mix( C, Cop, s );
+				result.assign( mixed );
+
+			 } );
+
+			 return result;
+
+		} );
 
 		this._materialEdges.vertexNode = SMAAEdgeDetectionVS().context( builder.getSharedContext() );
-		this._materialEdges.fragmentNode = SMAAEdgeDetectionPS().context( builder.getSharedContext() );
+		this._materialEdges.fragmentNode = SMAAEdgeDetectionFS().context( builder.getSharedContext() );
 		this._materialEdges.needsUpdate = true;
 
 		this._materialWeights.vertexNode = SMAAWeightsVS().context( builder.getSharedContext() );
-		this._materialWeights.fragmentNode = SMAAWeightsPS().context( builder.getSharedContext() );
+		this._materialWeights.fragmentNode = SMAAWeightsFS().context( builder.getSharedContext() );
 		this._materialWeights.needsUpdate = true;
+
+		this._materialBlend.vertexNode = SMAABlendVS().context( builder.getSharedContext() );
+		this._materialBlend.fragmentNode = SMAABlendFS().context( builder.getSharedContext() );
+		this._materialBlend.needsUpdate = true;
 
 		return this._textureNode;
 
@@ -500,6 +594,7 @@ class SMAANode extends TempNode {
 
 		this._renderTargetEdges.dispose();
 		this._renderTargetWeights.dispose();
+		this._renderTargetBlend.dispose();
 
 		this._areaTexture.dispose();
 		this._searchTexture.dispose();

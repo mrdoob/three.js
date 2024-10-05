@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, renderOutput } from 'three/tsl';
+			import { pass } from 'three/tsl';
 			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -78,19 +78,9 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				// ignore default output color transform ( toneMapping and outputColorSpace )
-				// use renderOutput() for control the sequence
-
-				postProcessing.outputColorTransform = false;
-
-				// scene pass
-
 				const scenePass = pass( scene, camera );
-				const outputPass = renderOutput( scenePass );
+				const smaaPass = smaa( scenePass );
 
-				// SMAA must be computed in sRGB color space (so after tone mapping and color space conversion)
-
-				const smaaPass = smaa( outputPass );
 				postProcessing.outputNode = smaaPass;
 
 				//
@@ -108,7 +98,7 @@
 
 					} else {
 
-						postProcessing.outputNode = outputPass;
+						postProcessing.outputNode = scenePass;
 
 					}
 
