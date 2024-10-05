@@ -29,13 +29,13 @@ class SMAANode extends TempNode {
 
 		// render targets
 
-		this._renderTargetEdges = new RenderTarget( 1, 1, { type: HalfFloatType } );
+		this._renderTargetEdges = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._renderTargetEdges.texture.name = 'SMAANode.edges';
 
-		this._renderTargetWeights = new RenderTarget( 1, 1, { type: HalfFloatType } );
+		this._renderTargetWeights = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._renderTargetWeights.texture.name = 'SMAANode.weights';
 
-		this._renderTargetBlend = new RenderTarget( 1, 1, { type: HalfFloatType } );
+		this._renderTargetBlend = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._renderTargetBlend.texture.name = 'SMAANode.blend';
 
 		// textures
