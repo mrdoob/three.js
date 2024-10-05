@@ -92,9 +92,6 @@ class SpriteNodeMaterial extends NodeMaterial {
 
 		mvPosition = vec4( mvPosition.xy.add( rotatedPosition ), mvPosition.zw );
 
-		positionView.assign( mvPosition );
-		positionLocal.assign( rotatedPosition );
-
 		const modelViewProjection = cameraProjectionMatrix.mul( mvPosition );
 
 		context.vertex = vertex;
