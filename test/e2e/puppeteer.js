@@ -153,7 +153,6 @@ const exceptionList = [
 	'webgpu_tsl_vfx_linkedparticles',
 	'webgpu_tsl_vfx_tornado',
 	'webgpu_textures_anisotropy',
-	'webgpu_backdrop_water',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',
