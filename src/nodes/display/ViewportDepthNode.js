@@ -135,7 +135,7 @@ export const perspectiveDepthToLogarithmicDepth = ( perspectiveW, near, far ) =>
 	// Outerra eventually made another improvement to their original "C-constant" variant,
 	// but it still does not incorporate the camera near plane (for this version,
 	// see https://outerra.blogspot.com/2013/07/logarithmic-depth-buffer-optimizations.html).
-	// Here we make 3 changes to Ulrich's formula:
+	// Here we make 4 changes to Ulrich's formula:
 	// 1. Clamp the camera near plane so we don't divide by 0.
 	// 2. Use log2 instead of log to avoid an extra multiply (shaders implement log using log2).
 	// 3. Assume K is 1 (K = maximum value in depth buffer; see Ulrich's formula above).
