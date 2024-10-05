@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { float, vec3, color, viewportSharedTexture, hue, overlay, posterize, grayscale, saturation, viewportSafeUV, screenUV, checker, uv, timerLocal, oscSine, output } from 'three/tsl';
+			import { float, vec3, color, viewportSharedTexture, hue, overlay, posterize, grayscale, saturation, viewportSafeUV, screenUV, checker, uv, time, oscSine, output } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -62,7 +62,7 @@
 					mixer = new THREE.AnimationMixer( object );
 
 					const material = object.children[ 0 ].children[ 0 ].material;
-					material.outputNode = oscSine( timerLocal( .1 ) ).mix( output, posterize( output.add( .1 ), 4 ).mul( 2 ) );
+					material.outputNode = oscSine( time.mul( .1 ) ).mix( output, posterize( output.add( .1 ), 4 ).mul( 2 ) );
 
 					const action = mixer.clipAction( gltf.animations[ 0 ] );
 					action.play();

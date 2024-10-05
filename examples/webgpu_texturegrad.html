@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { If, vec4, float, timerLocal, cos, pow, vec2, uv, texture, Fn } from 'three/tsl';
+			import { If, vec4, float, time, cos, pow, vec2, uv, texture, Fn } from 'three/tsl';
 
 			// WebGPU Backend
 			init();
@@ -50,13 +50,12 @@
 				// load async brick_diffuse
 				const map = await new THREE.TextureLoader().loadAsync( 'textures/uv_grid_opengl.jpg' );
 
-				const elapsedTime = timerLocal();
 				material.colorNode = Fn( () => {
 
 					const color = vec4( 1. ).toVar();
 
 					const vuv = uv().toVar();
-					const blur = pow( float( 0.0625 ).sub( cos( vuv.x.mul( 20.0 ).add( elapsedTime ) ) ).mul( 0.0625 ), 2.0 );
+					const blur = pow( float( 0.0625 ).sub( cos( vuv.x.mul( 20.0 ).add( time ) ) ).mul( 0.0625 ), 2.0 );
 
 					const grad = vec2( blur ).toVar();
 

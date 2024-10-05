@@ -29,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, mul, oneMinus, positionLocal, smoothstep, texture, timerLocal, rotateUV, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
+			import { mix, mul, oneMinus, positionLocal, smoothstep, texture, time, rotateUV, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -77,7 +77,6 @@
 				// material
 
 				const smokeMaterial = new THREE.MeshBasicNodeMaterial( { transparent: true, side: THREE.DoubleSide, depthWrite: false } );
-				const time = timerLocal();
 
 				// position
 
