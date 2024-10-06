@@ -33,7 +33,7 @@ class GaussianBlurNode extends TempNode {
 
 		this._textureNode = passTexture( this, this._verticalRT.texture );
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		this.resolution = new Vector2( 1, 1 );
 

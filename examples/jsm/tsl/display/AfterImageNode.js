@@ -29,7 +29,7 @@ class AfterImageNode extends TempNode {
 
 		this._textureNode = passTexture( this, this._compRT.texture );
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
 
