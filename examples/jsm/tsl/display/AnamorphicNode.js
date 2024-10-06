@@ -22,7 +22,7 @@ class AnamorphicNode extends TempNode {
 		this.samples = samples;
 		this.resolution = new Vector2( 1, 1 );
 
-		this._renderTarget = new RenderTarget();
+		this._renderTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._renderTarget.texture.name = 'anamorphic';
 
 		this._invSize = uniform( new Vector2() );

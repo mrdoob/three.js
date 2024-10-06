@@ -37,20 +37,20 @@ class BloomNode extends TempNode {
 
 		// render targets
 
-		this._renderTargetBright = new RenderTarget( 1, 1, { type: HalfFloatType } );
+		this._renderTargetBright = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._renderTargetBright.texture.name = 'UnrealBloomPass.bright';
 		this._renderTargetBright.texture.generateMipmaps = false;
 
 		for ( let i = 0; i < this._nMips; i ++ ) {
 
-			const renderTargetHorizontal = new RenderTarget( 1, 1, { type: HalfFloatType } );
+			const renderTargetHorizontal = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 
 			renderTargetHorizontal.texture.name = 'UnrealBloomPass.h' + i;
 			renderTargetHorizontal.texture.generateMipmaps = false;
 
 			this._renderTargetsHorizontal.push( renderTargetHorizontal );
 
-			const renderTargetVertical = new RenderTarget( 1, 1, { type: HalfFloatType } );
+			const renderTargetVertical = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 
 			renderTargetVertical.texture.name = 'UnrealBloomPass.v' + i;
 			renderTargetVertical.texture.generateMipmaps = false;
