@@ -49,8 +49,7 @@
 				edgeStrength: 3.0,
 				edgeGlow: 0.0,
 				edgeThickness: 1.0,
-				pulsePeriod: 0,
-				usePatternTexture: false
+				pulsePeriod: 0
 			};
 
 			// Init gui
@@ -78,12 +77,6 @@
 			gui.add( params, 'pulsePeriod', 0.0, 5 ).onChange( function ( value ) {
 
 				outlinePass.pulsePeriod = Number( value );
-
-			} );
-
-			gui.add( params, 'usePatternTexture' ).onChange( function ( value ) {
-
-				outlinePass.usePatternTexture = value;
 
 			} );
 
@@ -239,9 +232,10 @@
 				postProcessing = new THREE.PostProcessing( renderer );
 
 				const scenePass = pass( scene, camera );
+				const scenePassColor = scenePass.getTextureNode( 'output' );
 				outlinePass = outline( scene, camera, scene );
 
-				postProcessing.outputNode = outlinePass;
+				postProcessing.outputNode = outlinePass.getTextureNode().add( scenePassColor );
 
 				window.addEventListener( 'resize', onWindowResize );
 
