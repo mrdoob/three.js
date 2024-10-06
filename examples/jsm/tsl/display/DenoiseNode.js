@@ -28,7 +28,7 @@ class DenoiseNode extends TempNode {
 		this._resolution = uniform( new Vector2() );
 		this._sampleVectors = uniformArray( generatePdSamplePointInitializer( 16, 2, 1 ) );
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
 

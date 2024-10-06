@@ -25,7 +25,7 @@ class SMAANode extends TempNode {
 
 		this.textureNode = textureNode;
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		// render targets
 
