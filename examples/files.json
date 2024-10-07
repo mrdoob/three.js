@@ -339,6 +339,7 @@
 		"webgpu_lights_phong",
 		"webgpu_lights_rectarealight",
 		"webgpu_lights_selective",
+		"webgpu_lines_fat_wireframe",
 		"webgpu_lines_fat",
 		"webgpu_loader_gltf",
 		"webgpu_loader_gltf_anisotropy",
@@ -393,6 +394,8 @@
 		"webgpu_postprocessing_fxaa",
 		"webgpu_postprocessing_masking",
 		"webgpu_postprocessing_motion_blur",
+		"webgpu_postprocessing_outline",
+		"webgpu_postprocessing_smaa",
 		"webgpu_postprocessing_sobel",
 		"webgpu_postprocessing_ssaa",
 		"webgpu_postprocessing_transition",
@@ -502,6 +505,7 @@
 		"misc_exporter_stl",
 		"misc_exporter_usdz",
 		"misc_exporter_exr",
+		"misc_exporter_ktx2",
 		"misc_lookat"
 	],
 	"css2d": [

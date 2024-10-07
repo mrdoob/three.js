@@ -27,7 +27,8 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { atan2, cos, float, max, min, mix, PI, PI2, sin, vec2, vec3, bloom, color, Fn, hash, hue, If, instanceIndex, Loop, mx_fractal_noise_float, mx_fractal_noise_vec3, pass, pcurve, storage, timerDelta, timerGlobal, uv, uniform } from 'three/tsl';
+			import { atan2, cos, float, max, min, mix, PI, PI2, sin, vec2, vec3, color, Fn, hash, hue, If, instanceIndex, Loop, mx_fractal_noise_float, mx_fractal_noise_vec3, pass, pcurve, storage, deltaTime, time, uv, uniform } from 'three/tsl';
+			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -108,7 +109,7 @@
 				const particleVelocities = storage( new THREE.StorageInstancedBufferAttribute( nbParticles, 4 ), 'vec4', nbParticles );
 
 				// init particles buffers
-				renderer.compute( /*#__PURE__*/ Fn( () => {
+				renderer.computeAsync( /*#__PURE__*/ Fn( () => {
 
 					particlePositions.element( instanceIndex ).xyz.assign( vec3( 10000.0 ) );
 					particlePositions.element( instanceIndex ).w.assign( vec3( - 1.0 ) ); // life is stored in w component; x<0 means dead
@@ -132,7 +133,7 @@
 					const life = particlePositions.toAttribute().w;
 					const modLife = pcurve( life.oneMinus(), 8.0, 1.0 );
 					const pulse = pcurve(
-						sin( hash( instanceIndex ).mul( PI2 ).add( timerGlobal( 0.5 ).mul( PI2 ) ) ).mul( 0.5 ).add( 0.5 ),
+						sin( hash( instanceIndex ).mul( PI2 ).add( time.mul( 0.5 ).mul( PI2 ) ) ).mul( 0.5 ).add( 0.5 ),
 						0.25,
 						0.25
 					).mul( 10.0 ).add( 1.0 );
@@ -201,7 +202,7 @@
 					const position = particlePositions.element( instanceIndex ).xyz;
 					const life = particlePositions.element( instanceIndex ).w;
 					const velocity = particleVelocities.element( instanceIndex ).xyz;
-					const dt = timerDelta( 0.1 ).mul( timeScale );
+					const dt = deltaTime.mul( 0.1 ).mul( timeScale );
 
 					If( life.greaterThan( 0.0 ), () => {
 

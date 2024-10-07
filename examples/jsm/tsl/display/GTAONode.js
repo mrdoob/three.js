@@ -33,7 +33,7 @@ class GTAONode extends TempNode {
 
 		this.SAMPLES = uniform( 16 );
 
-		this._aoRenderTarget = new RenderTarget();
+		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
 		this._material = null;

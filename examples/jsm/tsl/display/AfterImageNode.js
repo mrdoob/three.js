@@ -21,15 +21,15 @@ class AfterImageNode extends TempNode {
 		this.textureNodeOld = texture();
 		this.damp = uniform( damp );
 
-		this._compRT = new RenderTarget();
+		this._compRT = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._compRT.texture.name = 'AfterImageNode.comp';
 
-		this._oldRT = new RenderTarget();
+		this._oldRT = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._oldRT.texture.name = 'AfterImageNode.old';
 
 		this._textureNode = passTexture( this, this._compRT.texture );
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
 

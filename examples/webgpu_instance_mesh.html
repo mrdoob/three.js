@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { mix, range, normalWorld, oscSine, timerLocal } from 'three/tsl';
+			import { mix, range, normalWorld, oscSine, time } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -53,7 +53,7 @@
 				// random colors between instances from 0x000000 to 0xFFFFFF
 				const randomColors = range( new THREE.Color( 0x000000 ), new THREE.Color( 0xFFFFFF ) );
 
-				material.colorNode = mix( normalWorld, randomColors, oscSine( timerLocal( .1 ) ) );
+				material.colorNode = mix( normalWorld, randomColors, oscSine( time.mul( .1 ) ) );
 
 				const loader = new THREE.BufferGeometryLoader();
 				loader.load( 'models/json/suzanne_buffergeometry.json', function ( geometry ) {

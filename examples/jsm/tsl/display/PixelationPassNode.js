@@ -29,7 +29,7 @@ class PixelationNode extends TempNode {
 
 		this._resolution = uniform( new Vector4() );
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
 

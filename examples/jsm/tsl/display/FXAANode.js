@@ -1,5 +1,5 @@
 import { Vector2 } from 'three';
-import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, If, Loop, int, max, min, pow, mix, Break, abs, sub } from 'three/tsl';
+import { TempNode, nodeObject, Fn, uniformArray, select, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, If, Loop, max, min, Break, abs } from 'three/tsl';
 
 class FXAANode extends TempNode {
 
@@ -15,7 +15,7 @@ class FXAANode extends TempNode {
 
 		this.textureNode = textureNode;
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		this._invSize = uniform( new Vector2() );
 
@@ -34,279 +34,272 @@ class FXAANode extends TempNode {
 		const textureNode = this.textureNode.bias( - 100 );
 		const uvNode = textureNode.uvNode || uv();
 
-		// FXAA 3.11 implementation by NVIDIA, ported to WebGL by Agost Biro (biro@archilogic.com)
+		const EDGE_STEP_COUNT = float( 6 );
+		const EDGE_GUESS = float( 8.0 );
+		const EDGE_STEPS = uniformArray( [ 1.0, 1.5, 2.0, 2.0, 2.0, 4.0 ] );
 
-		//----------------------------------------------------------------------------------
-		// File:        es3-kepler\FXAA\assets\shaders/FXAA_DefaultES.frag
-		// SDK Version: v3.00
-		// Email:       gameworks@nvidia.com
-		// Site:        http://developer.nvidia.com/
-		//
-		// Copyright (c) 2014-2015, NVIDIA CORPORATION. All rights reserved.
-		//
-		// Redistribution and use in source and binary forms, with or without
-		// modification, are permitted provided that the following conditions
-		// are met:
-		//  * Redistributions of source code must retain the above copyright
-		//    notice, this list of conditions and the following disclaimer.
-		//  * Redistributions in binary form must reproduce the above copyright
-		//    notice, this list of conditions and the following disclaimer in the
-		//    documentation and/or other materials provided with the distribution.
-		//  * Neither the name of NVIDIA CORPORATION nor the names of its
-		//    contributors may be used to endorse or promote products derived
-		//    from this software without specific prior written permission.
-		//
-		// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-		// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-		// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-		// PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-		// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-		// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-		// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-		// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-		// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-		// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-		// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-		//
-		//----------------------------------------------------------------------------------
+		const _ContrastThreshold = float( 0.0312 );
+		const _RelativeThreshold = float( 0.063 );
+		const _SubpixelBlending = float( 1.0 );
 
-		const FxaaTexTop = ( p ) => textureNode.uv( p );
-		const FxaaTexOff = ( p, o, r ) => textureNode.uv( p.add( o.mul( r ) ) );
+		const Sample = Fn( ( [ uv ] ) => {
 
-		const NUM_SAMPLES = int( 5 );
-
-		const contrast = Fn( ( [ a_immutable, b_immutable ] ) => {
-
-			// assumes colors have premultipliedAlpha, so that the calculated color contrast is scaled by alpha
-
-			const b = vec4( b_immutable ).toVar();
-			const a = vec4( a_immutable ).toVar();
-			const diff = vec4( abs( a.sub( b ) ) ).toVar();
-
-			return max( max( max( diff.r, diff.g ), diff.b ), diff.a );
+			return textureNode.uv( uv );
 
 		} );
 
-		// FXAA3 QUALITY - PC
+		const SampleLuminance = Fn( ( [ uv ] ) => {
 
-		const FxaaPixelShader = Fn( ( [ uv, fxaaQualityRcpFrame, fxaaQualityEdgeThreshold, fxaaQualityinvEdgeThreshold ] ) => {
+			return dot( Sample( uv ).rgb, vec3( 0.3, 0.59, 0.11 ) );
 
-			const rgbaM = FxaaTexTop( uv ).toVar();
-			const rgbaS = FxaaTexOff( uv, vec2( 0.0, - 1.0 ), fxaaQualityRcpFrame.xy ).toVar();
-			const rgbaE = FxaaTexOff( uv, vec2( 1.0, 0.0 ), fxaaQualityRcpFrame.xy ).toVar();
-			const rgbaN = FxaaTexOff( uv, vec2( 0.0, 1.0 ), fxaaQualityRcpFrame.xy ).toVar();
-			const rgbaW = FxaaTexOff( uv, vec2( - 1.0, 0.0 ), fxaaQualityRcpFrame.xy ).toVar();
-			// . S .
-			// W M E
-			// . N .
+		} );
 
-			const contrastN = contrast( rgbaM, rgbaN ).toVar();
-			const contrastS = contrast( rgbaM, rgbaS ).toVar();
-			const contrastE = contrast( rgbaM, rgbaE ).toVar();
-			const contrastW = contrast( rgbaM, rgbaW ).toVar();
+		const SampleLuminanceOffset = Fn( ( [ texSize, uv, uOffset, vOffset ] ) => {
 
-			const maxValue = max( contrastN, max( contrastS, max( contrastE, contrastW ) ) ).toVar();
+			const shiftedUv = uv.add( texSize.mul( vec2( uOffset, vOffset ) ) );
+			return SampleLuminance( shiftedUv );
 
-			// . 0 .
-			// 0 0 0
-			// . 0 .
+		} );
 
-			If( maxValue.lessThan( fxaaQualityEdgeThreshold ), () => {
+		const ShouldSkipPixel = ( l ) => {
 
-				return rgbaM; // assuming define FXAA_DISCARD is always 0
+			const threshold = max( _ContrastThreshold, _RelativeThreshold.mul( l.highest ) );
+			return l.contrast.lessThan( threshold );
 
-			} );
+		};
 
-			//
+		const SampleLuminanceNeighborhood = ( texSize, uv ) => {
 
-			const relativeVContrast = sub( contrastN.add( contrastS ), ( contrastE.add( contrastW ) ) ).toVar();
-			relativeVContrast.mulAssign( fxaaQualityinvEdgeThreshold );
+			const m = SampleLuminance( uv );
 
-			// 45 deg edge detection and corners of objects, aka V/H contrast is too similar
+			const n = SampleLuminanceOffset( texSize, uv, 0.0, - 1.0 );
+			const e = SampleLuminanceOffset( texSize, uv, 1.0, 0.0 );
+			const s = SampleLuminanceOffset( texSize, uv, 0.0, 1.0 );
+			const w = SampleLuminanceOffset( texSize, uv, - 1.0, 0.0 );
 
-			If( abs( relativeVContrast ).lessThan( 0.3 ), () => {
+			const ne = SampleLuminanceOffset( texSize, uv, 1.0, - 1.0 );
+			const nw = SampleLuminanceOffset( texSize, uv, - 1.0, - 1.0 );
+			const se = SampleLuminanceOffset( texSize, uv, 1.0, 1.0 );
+			const sw = SampleLuminanceOffset( texSize, uv, - 1.0, 1.0 );
 
-				// locate the edge
+			const highest = max( max( max( max( s, e ), n ), w ), m );
+			const lowest = min( min( min( min( s, e ), n ), w ), m );
+			const contrast = highest.sub( lowest );
 
-				const x = contrastE.greaterThan( contrastW ).select( 1, - 1 ).toVar();
-				const y = contrastS.greaterThan( contrastN ).select( 1, - 1 ).toVar();
+			return { m, n, e, s, w, ne, nw, se, sw, highest, lowest, contrast };
 
-				const dirToEdge = vec2( x, y ).toVar();
-				// . 2 .      . 1 .
-				// 1 0 2  ~=  0 0 1
-				// . 1 .      . 0 .
+		};
 
-				// tap 2 pixels and see which ones are "outside" the edge, to
-				// determine if the edge is vertical or horizontal
+		const DeterminePixelBlendFactor = ( l ) => {
 
-				const rgbaAlongH = FxaaTexOff( uv, vec2( dirToEdge.x, dirToEdge.y ), fxaaQualityRcpFrame.xy );
-				const matchAlongH = contrast( rgbaM, rgbaAlongH ).toVar();
-				// . 1 .
-				// 0 0 1
-				// . 0 H
+			let f = float( 2.0 ).mul( l.s.add( l.e ).add( l.n ).add( l.w ) );
+			f = f.add( l.se.add( l.sw ).add( l.ne ).add( l.nw ) );
+			f = f.mul( 1.0 / 12.0 );
+			f = abs( f.sub( l.m ) );
+			f = clamp( f.div( max( l.contrast, 0 ) ), 0.0, 1.0 );
 
-				const rgbaAlongV = FxaaTexOff( uv, vec2( dirToEdge.x.negate(), dirToEdge.y.negate() ), fxaaQualityRcpFrame.xy );
-				const matchAlongV = contrast( rgbaM, rgbaAlongV ).toVar();
-				// V 1 .
-				// 0 0 1
-				// . 0 .
+			const blendFactor = smoothstep( 0.0, 1.0, f );
+			return blendFactor.mul( blendFactor ).mul( _SubpixelBlending );
 
-				relativeVContrast.assign( matchAlongV.sub( matchAlongH ) );
-				relativeVContrast.mulAssign( fxaaQualityinvEdgeThreshold );
+		};
 
-				If( abs( relativeVContrast ).lessThan( 0.3 ), () => { // 45 deg edge
+		const DetermineEdge = ( texSize, l ) => {
 
-					// 1 1 .
-					// 0 0 1
-					// . 0 1
+			const horizontal =
+				abs( l.s.add( l.n ).sub( l.m.mul( 2.0 ) ) ).mul( 2.0 ).add(
+					abs( l.se.add( l.ne ).sub( l.e.mul( 2.0 ) ) ).add(
+						abs( l.sw.add( l.nw ).sub( l.w.mul( 2.0 ) ) )
+					)
+				);
 
-					// do a simple blur
-					const sum = rgbaN.add( rgbaS ).add( rgbaE ).add( rgbaW );
-					return mix( rgbaM, sum.mul( 0.25 ), 0.4 );
+			const vertical =
+				abs( l.e.add( l.w ).sub( l.m.mul( 2.0 ) ) ).mul( 2.0 ).add(
+					abs( l.se.add( l.sw ).sub( l.s.mul( 2.0 ) ) ).add(
+						abs( l.ne.add( l.nw ).sub( l.n.mul( 2.0 ) ) )
+					)
+				);
 
-				} );
+			const isHorizontal = horizontal.greaterThanEqual( vertical );
 
-			} );
+			const pLuminance = select( isHorizontal, l.s, l.e );
+			const nLuminance = select( isHorizontal, l.n, l.w );
+			const pGradient = abs( pLuminance.sub( l.m ) );
+			const nGradient = abs( nLuminance.sub( l.m ) );
 
-			const offNP = vec2().toVar();
+			const pixelStep = select( isHorizontal, texSize.y, texSize.x ).toVar();
+			const oppositeLuminance = float().toVar();
+			const gradient = float().toVar();
 
-			If( relativeVContrast.lessThanEqual( 0 ), () => {
+			If( pGradient.lessThan( nGradient ), () => {
 
-				rgbaN.assign( rgbaW );
-				rgbaS.assign( rgbaE );
+				pixelStep.assign( pixelStep.negate() );
+				oppositeLuminance.assign( nLuminance );
+				gradient.assign( nGradient );
 
-				// . 0 .      1
-				// 1 0 1  ->  0
-				// . 0 .      1
+			} ).Else( () => {
 
-				offNP.x.assign( 0 );
-				offNP.y.assign( fxaaQualityRcpFrame.y );
-
-			 } ).Else( () => {
-
-				offNP.x.assign( fxaaQualityRcpFrame.x );
-				offNP.y.assign( 0 );
-
-			 } );
-
-			const mn = contrast( rgbaM, rgbaN ).toVar();
-			const ms = contrast( rgbaM, rgbaS ).toVar();
-
-			If( mn.lessThanEqual( ms ), () => {
-
-				rgbaN.assign( rgbaS );
+				oppositeLuminance.assign( pLuminance );
+				gradient.assign( pGradient );
 
 			} );
 
-			const doneN = int( 0 ).toVar();
-			const doneP = int( 0 ).toVar();
+			return { isHorizontal, pixelStep, oppositeLuminance, gradient };
 
-			const nDist = float( 0 ).toVar();
-			const pDist = float( 0 ).toVar();
+		};
 
-			const posN = vec2( uv ).toVar();
-			const posP = vec2( uv ).toVar();
+		const DetermineEdgeBlendFactor = ( texSize, l, e, uv ) => {
 
-			const iterationsUsedN = int( 0 ).toVar();
-			const iterationsUsedP = int( 0 ).toVar();
+			const uvEdge = uv.toVar();
+			const edgeStep = vec2().toVar();
+			If( e.isHorizontal, () => {
 
-			Loop( NUM_SAMPLES, ( { i } ) => {
+				uvEdge.y.addAssign( e.pixelStep.mul( 0.5 ) );
+				edgeStep.assign( vec2( texSize.x, 0.0 ) );
 
-				const increment = i.add( 1 ).toVar();
+			} ).Else( () => {
 
-				If( doneN.equal( 0 ), () => {
+				uvEdge.x.addAssign( e.pixelStep.mul( 0.5 ) );
+				edgeStep.assign( vec2( 0.0, texSize.y ) );
 
-					nDist.addAssign( increment );
-					posN.assign( uv.add( offNP.mul( nDist ) ) );
-					const rgbaEndN = FxaaTexTop( posN.xy );
+			} );
 
-					const nm = contrast( rgbaEndN, rgbaM ).toVar();
-					const nn = contrast( rgbaEndN, rgbaN ).toVar();
+			const edgeLuminance = l.m.add( e.oppositeLuminance ).mul( 0.5 );
+			const gradientThreshold = e.gradient.mul( 0.25 );
 
-					If( nm.greaterThan( nn ), () => {
+			const puv = uvEdge.add( edgeStep.mul( EDGE_STEPS.element( 0 ) ) ).toVar();
+			const pLuminanceDelta = SampleLuminance( puv ).sub( edgeLuminance ).toVar();
+			const pAtEnd = abs( pLuminanceDelta ).greaterThanEqual( gradientThreshold ).toVar();
 
-						doneN.assign( 1 );
+			Loop( { start: 1, end: EDGE_STEP_COUNT }, ( { i } ) => {
 
-					} );
-
-					iterationsUsedN.assign( i );
-
-				} );
-
-				If( doneP.equal( 0 ), () => {
-
-					pDist.addAssign( increment );
-					posP.assign( uv.sub( offNP.mul( pDist ) ) );
-					const rgbaEndP = FxaaTexTop( posP.xy );
-
-					const pm = contrast( rgbaEndP, rgbaM ).toVar();
-					const pn = contrast( rgbaEndP, rgbaN ).toVar();
-
-					If( pm.greaterThan( pn ), () => {
-
-						doneP.assign( 1 );
-
-					} );
-
-					iterationsUsedP.assign( i );
-
-				} );
-
-				If( doneN.equal( 1 ).or( doneP.equal( 1 ) ), () => {
+				If( pAtEnd, () => {
 
 					Break();
 
 				} );
 
-			} );
-
-			If( doneN.equal( 0 ).and( doneP.equal( 0 ) ), () => {
-
-				return rgbaM; // failed to find end of edge
+				puv.addAssign( edgeStep.mul( EDGE_STEPS.element( i ) ) );
+				pLuminanceDelta.assign( SampleLuminance( puv ).sub( edgeLuminance ) );
+				pAtEnd.assign( abs( pLuminanceDelta ).greaterThanEqual( gradientThreshold ) );
 
 			} );
 
-			const distN = float( 1 ).toVar();
-			const distP = float( 1 ).toVar();
+			If( pAtEnd.not(), () => {
 
-			If( doneN.equal( 1 ), () => {
-
-				distN.assign( float( iterationsUsedN ).div( float( NUM_SAMPLES.sub( 1 ) ) ) );
+				puv.addAssign( edgeStep.mul( EDGE_GUESS ) );
 
 			} );
 
-			If( doneP.equal( 1 ), () => {
+			const nuv = uvEdge.sub( edgeStep.mul( EDGE_STEPS.element( 0 ) ) ).toVar();
+			const nLuminanceDelta = SampleLuminance( nuv ).sub( edgeLuminance ).toVar();
+			const nAtEnd = abs( nLuminanceDelta ).greaterThanEqual( gradientThreshold ).toVar();
 
-				distP.assign( float( iterationsUsedP ).div( float( NUM_SAMPLES.sub( 1 ) ) ) );
+			Loop( { start: 1, end: EDGE_STEP_COUNT }, ( { i } ) => {
+
+				If( nAtEnd, () => {
+
+					Break();
+
+				} );
+
+				nuv.subAssign( edgeStep.mul( EDGE_STEPS.element( i ) ) );
+				nLuminanceDelta.assign( SampleLuminance( nuv ).sub( edgeLuminance ) );
+				nAtEnd.assign( abs( nLuminanceDelta ).greaterThanEqual( gradientThreshold ) );
 
 			} );
 
-			const dist = min( distN, distP );
+			If( nAtEnd.not(), () => {
 
-			// hacky way of reduces blurriness of mostly diagonal edges
-			// but reduces AA quality
-			dist.assign( pow( dist, 0.5 ) );
-			dist.assign( float( 1 ).sub( dist ) );
+				nuv.subAssign( edgeStep.mul( EDGE_GUESS ) );
 
-			return mix( rgbaM, rgbaN, dist.mul( 0.5 ) );
+			} );
+
+			const pDistance = float().toVar();
+			const nDistance = float().toVar();
+
+			If( e.isHorizontal, () => {
+
+				pDistance.assign( puv.x.sub( uv.x ) );
+				nDistance.assign( uv.x.sub( nuv.x ) );
+
+			} ).Else( () => {
+
+				pDistance.assign( puv.y.sub( uv.y ) );
+				nDistance.assign( uv.y.sub( nuv.y ) );
+
+			} );
+
+			const shortestDistance = float().toVar();
+			const deltaSign = bool().toVar();
+
+			If( pDistance.lessThanEqual( nDistance ), () => {
+
+				shortestDistance.assign( pDistance );
+				deltaSign.assign( pLuminanceDelta.greaterThanEqual( 0.0 ) );
+
+			} ).Else( () => {
+
+				shortestDistance.assign( nDistance );
+				deltaSign.assign( nLuminanceDelta.greaterThanEqual( 0.0 ) );
+
+			} );
+
+			const blendFactor = float().toVar();
+
+			If( deltaSign.equal( l.m.sub( edgeLuminance ).greaterThanEqual( 0.0 ) ), () => {
+
+				blendFactor.assign( 0.0 );
+
+			} ).Else( () => {
+
+				blendFactor.assign( float( 0.5 ).sub( shortestDistance.div( pDistance.add( nDistance ) ) ) );
+
+			} );
+
+			return blendFactor;
+
+		};
+
+		const ApplyFXAA = Fn( ( [ uv, texSize ] ) => {
+
+			const luminance = SampleLuminanceNeighborhood( texSize, uv );
+			If( ShouldSkipPixel( luminance ), () => {
+
+				return Sample( uv );
+
+			} );
+
+			const pixelBlend = DeterminePixelBlendFactor( luminance );
+			const edge = DetermineEdge( texSize, luminance );
+			const edgeBlend = DetermineEdgeBlendFactor( texSize, luminance, edge, uv );
+
+			const finalBlend = max( pixelBlend, edgeBlend );
+			const finalUv = uv.toVar();
+
+			If( edge.isHorizontal, () => {
+
+				finalUv.y.addAssign( edge.pixelStep.mul( finalBlend ) );
+
+			} ).Else( () => {
+
+				finalUv.x.addAssign( edge.pixelStep.mul( finalBlend ) );
+
+			} );
+
+			return Sample( finalUv );
 
 		} ).setLayout( {
 			name: 'FxaaPixelShader',
 			type: 'vec4',
 			inputs: [
 				{ name: 'uv', type: 'vec2' },
-				{ name: 'fxaaQualityRcpFrame', type: 'vec2' },
-				{ name: 'fxaaQualityEdgeThreshold', type: 'float' },
-				{ name: 'fxaaQualityinvEdgeThreshold', type: 'float' },
+				{ name: 'texSize', type: 'vec2' },
 			]
 		} );
 
 		const fxaa = Fn( () => {
 
-			const edgeDetectionQuality = float( 0.2 );
-			const invEdgeDetectionQuality = float( 1 ).div( edgeDetectionQuality );
-
-			return FxaaPixelShader( uvNode, this._invSize, edgeDetectionQuality, invEdgeDetectionQuality );
+			return ApplyFXAA( uvNode, this._invSize );
 
 		} );
 
