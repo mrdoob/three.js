@@ -5,7 +5,7 @@ import { float, vec2, vec3, vec4, If, int, Fn, nodeObject } from '../tsl/TSLBase
 import { reference } from '../accessors/ReferenceNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { positionWorld } from '../accessors/Position.js';
-import { normalWorld } from '../accessors/Normal.js';
+import { transformedNormalWorld } from '../accessors/Normal.js';
 import { mix, fract, step, max, clamp, sqrt } from '../math/MathNode.js';
 import { add, sub } from '../math/OperatorNode.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
@@ -289,7 +289,7 @@ class ShadowNode extends Node {
 
 		const position = object.material.shadowPositionNode || positionWorld;
 
-		let shadowCoord = uniform( shadow.matrix ).setGroup( renderGroup ).mul( position.add( normalWorld.mul( normalBias ) ) );
+		let shadowCoord = uniform( shadow.matrix ).setGroup( renderGroup ).mul( position.add( transformedNormalWorld.mul( normalBias ) ) );
 
 		let coordZ;
 
