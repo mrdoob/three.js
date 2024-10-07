@@ -234,21 +234,20 @@ export default class RenderObject {
 		}
 
 		const position = geometry.attributes.position;
+		let itemCount = Infinity;
 
 		if ( hasIndex ) {
 
-			const itemCount = index.count;
-			firstVertex = Math.max( firstVertex, 0 );
-			lastVertex = Math.min( lastVertex, itemCount );
+			itemCount = index.count;
 
 		} else if ( position !== undefined && position !== null ) {
 
-			const itemCount = position.count;
-			firstVertex = Math.max( firstVertex, 0 );
-			lastVertex = Math.min( lastVertex, itemCount );
+			itemCount = position.count;
 
 		}
 
+		firstVertex = Math.max( firstVertex, 0 );
+		lastVertex = Math.min( lastVertex, itemCount );
 
 		const count = lastVertex - firstVertex;
 
