@@ -129,6 +129,13 @@ function copyAttributeData( src, target, targetOffset = 0 ) {
 
 }
 
+function copyArrayContents( src, target ) {
+
+	const len = Math.min( src.length, target.length );
+	target.set( new src.constructor( src.buffer, 0, len ) );
+
+}
+
 class BatchedMesh extends Mesh {
 
 	get maxInstanceCount() {
@@ -1035,8 +1042,8 @@ class BatchedMesh extends Mesh {
 		// copy the multi draw counts
 		const multiDrawCounts = new Int32Array( maxInstanceCount );
 		const multiDrawStarts = new Int32Array( maxInstanceCount );
-		multiDrawCounts.set( this._multiDrawCounts );
-		multiDrawStarts.set( this._multiDrawStarts );
+		copyArrayContents( this._multiDrawCounts, multiDrawCounts );
+		copyArrayContents( this._multiDrawStarts, multiDrawStarts );
 
 		this._multiDrawCounts = multiDrawCounts;
 		this._multiDrawStarts = multiDrawStarts;
@@ -1048,12 +1055,17 @@ class BatchedMesh extends Mesh {
 		const colorsTexture = this._colorsTexture;
 
 		this._initIndirectTexture();
-		this._initMatricesTexture();
-		this._initColorsTexture();
+		copyArrayContents( indirectTexture.image.data, this._indirectTexture.image.data );
 
-		this._indirectTexture.image.data.set( indirectTexture.image.data );
-		this._matricesTexture.image.data.set( matricesTexture.image.data );
-		this._colorsTexture.image.data.set( colorsTexture.image.data );
+		this._initMatricesTexture();
+		copyArrayContents( matricesTexture.image.data, this._matricesTexture.image.data );
+
+		if ( colorsTexture ) {
+
+			this._initColorsTexture();
+			copyArrayContents( colorsTexture.image.data, this._colorsTexture.image.data );
+
+		}
 
 	}
 
@@ -1064,7 +1076,7 @@ class BatchedMesh extends Mesh {
 		const requiredVertexLength = Math.max( ...validRanges.map( range => range.vertexStart + range.vertexCount ) );
 		if ( requiredVertexLength > maxVertexCount ) {
 
-			throw new Error( `BatchedMesh: Geometry Index values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
+			throw new Error( `BatchedMesh: Geometry vertex values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
 
 		}
 
@@ -1074,7 +1086,7 @@ class BatchedMesh extends Mesh {
 			const requiredIndexLength = Math.max( ...validRanges.map( range => range.indexStart + range.indexCount ) );
 			if ( requiredIndexLength > maxIndexCount ) {
 
-				throw new Error( `BatchedMesh: Geometry Index values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
+				throw new Error( `BatchedMesh: Geometry index values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
 
 			}
 
@@ -1090,19 +1102,21 @@ class BatchedMesh extends Mesh {
 		this._maxVertexCount = maxVertexCount;
 		this._maxIndexCount = maxIndexCount;
 		this._geometryInitialized = false;
+
+		this.geometry = new BufferGeometry();
 		this._initializeGeometry( oldGeometry );
 
 		// copy data from the previous geometry
 		const geometry = this.geometry;
 		if ( oldGeometry.index ) {
 
-			geometry.index.array.set( oldGeometry.index.array );
+			copyArrayContents( oldGeometry.index.array, geometry.index.array );
 
 		}
 
 		for ( const key in oldGeometry.attributes ) {
 
-			geometry.attributes[ key ].array.set( oldGeometry.attributes[ key ].array );
+			copyArrayContents( oldGeometry.attributes[ key ].array, geometry.attributes[ key ].array );
 
 		}
 
