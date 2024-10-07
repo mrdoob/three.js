@@ -114,7 +114,7 @@ class WebGPUBackend extends Backend {
 
 		this.context.configure( {
 			device: this.device,
-			format: this.utils.getPreferredCanvasFormat( this ),
+			format: this.utils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
 			alphaMode: alphaMode,
 			toneMapping: {
