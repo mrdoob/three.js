@@ -129,6 +129,7 @@ function copyAttributeData( src, target, targetOffset = 0 ) {
 
 }
 
+// safely copies array contents to a potentially smaller array
 function copyArrayContents( src, target ) {
 
 	const len = Math.min( src.length, target.length );
