@@ -291,7 +291,7 @@ class WebGLRenderer {
 
 			state = new WebGLState( _gl, extensions );
 
-			if ( capabilities.reverseDepthBuffer && reverseDepthBuffer ) { 
+			if ( capabilities.reverseDepthBuffer && reverseDepthBuffer ) {
 
 				state.buffers.depth.setReversed( true );
 
@@ -1982,7 +1982,7 @@ class WebGLRenderer {
 
 				// common camera uniforms
 
-				const reverseDepthBuffer = state.depth.getReversed ();
+				const reverseDepthBuffer = state.buffers.depth.getReversed();
 
 				if ( reverseDepthBuffer ) {
 

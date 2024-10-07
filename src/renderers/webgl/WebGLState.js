@@ -234,6 +234,7 @@ function WebGLState( gl, extensions ) {
 				currentDepthFunc = null;
 				currentDepthClear = null;
 				reversed = false;
+
 			}
 
 		};
@@ -1204,7 +1205,7 @@ function WebGLState( gl, extensions ) {
 		gl.depthMask( true );
 		gl.depthFunc( gl.LESS );
 
-		depthBuffer.setReversed ( false );
+		depthBuffer.setReversed( false );
 
 		gl.clearDepth( 1 );
 
