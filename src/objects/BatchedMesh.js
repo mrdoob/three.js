@@ -1070,7 +1070,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	setGeometrySize( maxVertexCount, maxIndexCount = maxVertexCount * 2 ) {
+	setGeometrySize( maxVertexCount, maxIndexCount ) {
 
 		// Check if we can shrink to the requested vertex attribute size
 		const validRanges = [ ...this._reservedRanges ].filter( ( range, i ) => this._drawRanges[ i ].active );
