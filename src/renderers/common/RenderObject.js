@@ -235,7 +235,7 @@ export default class RenderObject {
 
 		const position = geometry.attributes.position;
 
-		if ( index !== null ) {
+		if ( hasIndex ) {
 
 			const itemCount = index.count;
 			firstVertex = Math.max( firstVertex, 0 );
