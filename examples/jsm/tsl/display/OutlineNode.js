@@ -53,7 +53,6 @@ class OutlineNode extends TempNode {
 
 		this._cameraNear = uniform( camera.near );
 		this._cameraFar = uniform( camera.far );
-		this._resolution = uniform( new Vector2() );
 		this._blurDirection = uniform( new Vector2() );
 
 		this._depthTextureUniform = texture( this._renderTargetDepthBuffer.depthTexture );
@@ -123,8 +122,6 @@ class OutlineNode extends TempNode {
 	}
 
 	setSize( width, height ) {
-
-		this._resolution.value.set( width, height );
 
 		this._renderTargetDepthBuffer.setSize( width, height );
 		this._renderTargetMaskBuffer.setSize( width, height );
@@ -312,8 +309,8 @@ class OutlineNode extends TempNode {
 			const c3 = this._maskTextureDownsSampleUniform.uv( uvNode.add( uvOffset.yw ) ).toVar();
 			const c4 = this._maskTextureDownsSampleUniform.uv( uvNode.sub( uvOffset.yw ) ).toVar();
 
-			const diff1 = mul( c1.r.sub( c2.r ), float( 0.5 ) );
-			const diff2 = mul( c3.r.sub( c4.r ), float( 0.5 ) );
+			const diff1 = mul( c1.r.sub( c2.r ), 0.5 );
+			const diff2 = mul( c3.r.sub( c4.r ), 0.5 );
 			const d = vec2( diff1, diff2 ).length();
 			const a1 = min( c1.g, c2.g );
 			const a2 = min( c3.g, c4.g );
@@ -349,7 +346,7 @@ class OutlineNode extends TempNode {
 
 			const uvOffset = delta.toVar();
 
-			Loop( { start: int( 0 ), end: int( MAX_RADIUS ), type: 'int', condition: '<=' }, ( { i } ) => {
+			Loop( { start: int( 1 ), end: int( MAX_RADIUS ), type: 'int', condition: '<=' }, ( { i } ) => {
 
 				const x = kernelRadius.mul( float( i ) ).div( MAX_RADIUS );
 				const w = gaussianPdf( x, sigma );
