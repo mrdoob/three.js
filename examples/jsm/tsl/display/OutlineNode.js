@@ -1,11 +1,12 @@
-import { Color, DepthTexture, FloatType, RenderTarget, Vector2 } from 'three';
+import { Color, DepthTexture, FloatType, RenderTarget, Vector2, PostProcessingUtils } from 'three';
 import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, QuadMesh, screenUV, TempNode, nodeObject, NodeUpdateType, uniform, vec4, NodeMaterial, passTexture, texture, perspectiveDepthToViewZ, positionView } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _currentClearColor = /*@__PURE__*/ new Color();
 const _size = /*@__PURE__*/ new Vector2();
 const _BLUR_DIRECTION_X = /*@__PURE__*/ new Vector2( 1.0, 0.0 );
 const _BLUR_DIRECTION_Y = /*@__PURE__*/ new Vector2( 0.0, 1.0 );
+
+let _rendererState;
 
 class OutlineNode extends TempNode {
 
@@ -151,28 +152,23 @@ class OutlineNode extends TempNode {
 		const { renderer } = frame;
 		const { camera, scene } = this;
 
+		_rendererState = PostProcessingUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
+
+		//
+
 		const size = renderer.getDrawingBufferSize( _size );
 		this.setSize( size.width, size.height );
-
-		renderer.getClearColor( _currentClearColor );
-		const currentClearAlpha = renderer.getClearAlpha();
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentMRT = renderer.getMRT();
-		const currentBackground = scene.background;
-		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 
 		//
 
 		renderer.setClearColor( 0xffffff, 1 );
-		renderer.setMRT( null );
 
 		this._updateSelectionCache();
-
-		scene.background = null;
 
 		// 1. Draw non-selected objects in the depth buffer
 
 		scene.overrideMaterial = this._depthMaterial;
+
 		renderer.setRenderTarget( this._renderTargetDepthBuffer );
 		renderer.setRenderObjectFunction( ( object, ...params ) => {
 
@@ -183,11 +179,13 @@ class OutlineNode extends TempNode {
 			}
 
 		} );
+
 		renderer.render( scene, camera );
 
 		// 2. Draw only the selected objects by comparing the depth buffer of non-selected objects
 
 		scene.overrideMaterial = this._prepareMaskMaterial;
+
 		renderer.setRenderTarget( this._renderTargetMaskBuffer );
 		renderer.setRenderObjectFunction( ( object, ...params ) => {
 
@@ -198,11 +196,12 @@ class OutlineNode extends TempNode {
 			}
 
 		} );
+
 		renderer.render( scene, camera );
 
-		scene.overrideMaterial = null;
-		scene.background = currentBackground;
-		renderer.setRenderObjectFunction( currentRenderObjectFunction );
+		//
+
+		renderer.setRenderObjectFunction( _rendererState.renderObjectFunction );
 
 		this._selectionCache.clear();
 
@@ -256,9 +255,7 @@ class OutlineNode extends TempNode {
 
 		// restore
 
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.setMRT( currentMRT );
-		renderer.setClearColor( _currentClearColor, currentClearAlpha );
+		PostProcessingUtils.setRendererAndSceneState( renderer, scene, _rendererState );
 
 	}
 

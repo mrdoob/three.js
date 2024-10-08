@@ -1,7 +1,9 @@
-import { StereoCamera, Vector2 } from 'three';
+import { StereoCamera, Vector2, PostProcessingUtils } from 'three';
 import { PassNode, nodeObject } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
+
+let _rendererState;
 
 class StereoPassNode extends PassNode {
 
@@ -27,6 +29,10 @@ class StereoPassNode extends PassNode {
 		const { renderer } = frame;
 		const { scene, camera, stereo, renderTarget } = this;
 
+		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+
+		//
+
 		this._pixelRatio = renderer.getPixelRatio();
 
 		stereo.cameraL.coordinateSystem = renderer.coordinateSystem;
@@ -36,11 +42,7 @@ class StereoPassNode extends PassNode {
 		const size = renderer.getSize( _size );
 		this.setSize( size.width, size.height );
 
-		const currentAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
-
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentMRT = renderer.getMRT();
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
@@ -67,10 +69,9 @@ class StereoPassNode extends PassNode {
 
 		renderTarget.scissorTest = false;
 
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.setMRT( currentMRT );
+		// restore
 
-		renderer.autoClear = currentAutoClear;
+		PostProcessingUtils.setRendererState( renderer, _rendererState );
 
 	}
 

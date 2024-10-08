@@ -1,4 +1,4 @@
-import { RenderTarget, Vector2 } from 'three';
+import { RenderTarget, Vector2, PostProcessingUtils } from 'three';
 import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, QuadMesh, passTexture, mul, NodeMaterial } from 'three/tsl';
 
 // WebGPU: The use of a single QuadMesh for both gaussian blur passes results in a single RenderObject with a SampledTexture binding that
@@ -6,6 +6,8 @@ import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, convertTo
 
 const _quadMesh1 = /*@__PURE__*/ new QuadMesh();
 const _quadMesh2 = /*@__PURE__*/ new QuadMesh();
+
+let _rendererState;
 
 class GaussianBlurNode extends TempNode {
 
@@ -54,11 +56,12 @@ class GaussianBlurNode extends TempNode {
 
 		const { renderer } = frame;
 
+		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+
+		//
+
 		const textureNode = this.textureNode;
 		const map = textureNode.value;
-
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentMRT = renderer.getMRT();
 
 		const currentTexture = textureNode.value;
 
@@ -71,10 +74,6 @@ class GaussianBlurNode extends TempNode {
 
 		this._horizontalRT.texture.type = textureType;
 		this._verticalRT.texture.type = textureType;
-
-		// clear
-
-		renderer.setMRT( null );
 
 		// horizontal
 
@@ -95,9 +94,9 @@ class GaussianBlurNode extends TempNode {
 
 		// restore
 
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.setMRT( currentMRT );
 		textureNode.value = currentTexture;
+
+		PostProcessingUtils.setRendererState( renderer, _rendererState );
 
 	}
 
