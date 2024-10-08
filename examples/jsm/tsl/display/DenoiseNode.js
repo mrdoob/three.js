@@ -49,7 +49,6 @@ class DenoiseNode extends TempNode {
 		const sampleNormal = ( uv ) => this.normalNode.uv( uv );
 		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
 
-
 		const denoiseSample = Fn( ( [ center, viewNormal, viewPosition, sampleUv ] ) => {
 
 			const texel = sampleTexture( sampleUv );
