@@ -38,9 +38,9 @@ class StorageBufferNode extends BufferNode {
 				value.isStorageBufferAttribute = true;
 
 			} else if ( value.isInstancedBufferAttribute ) {
-			 
+
 				value.isStorageInstancedBufferAttribute = true;
- 
+
 			} else if ( value.isIndirectBufferAttribute ) {	//todo
 
 				value.isIndirectStorageBufferAttribute = true;
@@ -84,7 +84,7 @@ class StorageBufferNode extends BufferNode {
 		} else {
 
 			return 'storageBuffer';
-		
+
 		}
 
 	}
