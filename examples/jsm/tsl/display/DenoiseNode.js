@@ -51,9 +51,7 @@ class DenoiseNode extends TempNode {
 
 		const getViewPosition = Fn( ( [ screenPosition, depth ] ) => {
 
-			screenPosition = vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 );
-
-			const clipSpacePosition = vec4( vec3( screenPosition, depth ), 1.0 );
+			const clipSpacePosition = vec4( vec3( screenPosition.x, screenPosition.y.oneMinus(), depth ).mul( 2.0 ).sub( 1.0 ), 1.0 );
 			const viewSpacePosition = vec4( this.cameraProjectionMatrixInverse.mul( clipSpacePosition ) );
 
 			return viewSpacePosition.xyz.div( viewSpacePosition.w );

@@ -20,7 +20,7 @@ class GTAONode extends TempNode {
 		this.depthNode = depthNode;
 		this.normalNode = normalNode;
 
-		this.radius = uniform( 0.25 );
+		this.radius = uniform( 0.1 );
 		this.resolution = uniform( new Vector2() );
 		this.thickness = uniform( 1 );
 		this.distanceExponent = uniform( 1 );
@@ -108,9 +108,7 @@ class GTAONode extends TempNode {
 
 		const getViewPosition = Fn( ( [ screenPosition, depth ] ) => {
 
-			screenPosition = vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 );
-
-			const clipSpacePosition = vec4( vec3( screenPosition, depth ), 1.0 );
+			const clipSpacePosition = vec4( vec3( screenPosition.x, screenPosition.y.oneMinus(), depth ).mul( 2.0 ).sub( 1.0 ), 1.0 );
 			const viewSpacePosition = vec4( this.cameraProjectionMatrixInverse.mul( clipSpacePosition ) );
 
 			return viewSpacePosition.xyz.div( viewSpacePosition.w );
