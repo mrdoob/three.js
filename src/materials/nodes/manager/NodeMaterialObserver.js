@@ -148,8 +148,7 @@ class NodeMaterialObserver {
 			const attribute = attributes[ name ];
 
 			data.attributes[ name ] = {
-				version: attribute.version,
-				uuid: attribute.uuid,
+				version: attribute.version
 			};
 
 		}
@@ -159,8 +158,7 @@ class NodeMaterialObserver {
 			const index = geometry.index;
 
 			data.index = {
-				version: index.version,
-				count: index.count
+				version: index.version
 			};
 
 		}
@@ -182,9 +180,7 @@ class NodeMaterialObserver {
 				const attribute = morphArray[ i ];
 
 				data.morphAttributes[ name ][ i ] = {
-					version: attribute.version,
-					count: attribute.count,
-					itemSize: attribute.itemSize
+					version: attribute.version
 				};
 
 			}
@@ -221,9 +217,7 @@ class NodeMaterialObserver {
 			const storedAttribute = storedAttributes[ name ];
 			const currentAttribute = currentAttributes[ name ];
 
-			// Compare version, count, itemSize
-			if ( storedAttribute.version !== currentAttribute.version ||
-				storedAttribute.uuid !== currentAttribute.uuid ) {
+			if ( storedAttribute.version !== currentAttribute.version ) {
 
 				return false;
 
@@ -240,8 +234,7 @@ class NodeMaterialObserver {
 
 		if ( storedData.index && currentData.index ) {
 
-			if ( storedData.index.version !== currentData.index.version ||
-				storedData.index.uuid !== currentData.index.uuid ) {
+			if ( storedData.index.version !== currentData.index.version ) {
 
 				return false;
 
