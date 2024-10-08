@@ -1,5 +1,5 @@
 import { Color, DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3 } from 'three';
-import { getViewPosition, getSceneUV, QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial } from 'three/tsl';
+import { QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _currentClearColor = /*@__PURE__*/ new Color();
@@ -96,13 +96,34 @@ class GTAONode extends TempNode {
 		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
 		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
 
+		const getSceneUvAndDepth = Fn( ( [ sampleViewPos ] )=> {
+
+			const sampleClipPos = this.cameraProjectionMatrix.mul( vec4( sampleViewPos, 1.0 ) );
+			let sampleUv = sampleClipPos.xy.div( sampleClipPos.w ).mul( 0.5 ).add( 0.5 ).toVar();
+			sampleUv = vec2( sampleUv.x, sampleUv.y.oneMinus() );
+			const sampleSceneDepth = sampleDepth( sampleUv );
+			return vec3( sampleUv, sampleSceneDepth );
+
+		} );
+
+		const getViewPosition = Fn( ( [ screenPosition, depth ] ) => {
+
+			screenPosition = vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 );
+
+			const clipSpacePosition = vec4( vec3( screenPosition, depth ), 1.0 );
+			const viewSpacePosition = vec4( this.cameraProjectionMatrixInverse.mul( clipSpacePosition ) );
+
+			return viewSpacePosition.xyz.div( viewSpacePosition.w );
+
+		} );
+
 		const ao = Fn( () => {
 
 			const depth = sampleDepth( uvNode );
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
-			const viewPosition = getViewPosition( uvNode, depth, this.cameraProjectionMatrixInverse );
+			const viewPosition = getViewPosition( uvNode, depth );
 			const viewNormal = this.normalNode.rgb.normalize();
 
 			const radiusToUse = this.radius;
@@ -141,9 +162,8 @@ class GTAONode extends TempNode {
 
 					// x
 
-					const sampleSceneUvX = getSceneUV( viewPosition.add( sampleViewOffset ), this.cameraProjectionMatrix ).toVar();
-					const sampleSceneDepthX = sampleDepth( sampleSceneUvX );
-					const sampleSceneViewPositionX = getViewPosition( sampleSceneUvX, sampleSceneDepthX, this.cameraProjectionMatrixInverse );
+					const sampleSceneUvDepthX = getSceneUvAndDepth( viewPosition.add( sampleViewOffset ) );
+					const sampleSceneViewPositionX = getViewPosition( sampleSceneUvDepthX.xy, sampleSceneUvDepthX.z );
 					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition );
 
 					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
@@ -155,9 +175,8 @@ class GTAONode extends TempNode {
 
 					// y
 
-					const sampleSceneUvY = getSceneUV( viewPosition.sub( sampleViewOffset ), this.cameraProjectionMatrix ).toVar();
-					const sampleSceneDepthY = sampleDepth( sampleSceneUvY );
-					const sampleSceneViewPositionY = getViewPosition( sampleSceneUvY, sampleSceneDepthY, this.cameraProjectionMatrixInverse );
+					const sampleSceneUvDepthY = getSceneUvAndDepth( viewPosition.sub( sampleViewOffset ) );
+					const sampleSceneViewPositionY = getViewPosition( sampleSceneUvDepthY.xy, sampleSceneUvDepthY.z );
 					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition );
 
 					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {
