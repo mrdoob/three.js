@@ -87,8 +87,8 @@ class NodeMaterialObserver {
 
 			data = {
 				material: this.getMaterialData( renderObject.material ),
-				worldMatrix: renderObject.object.matrixWorld.clone(),
-				geometry: this.getGeometryData( renderObject.geometry )
+				geometry: this.getGeometryData( renderObject.geometry ),
+				worldMatrix: renderObject.object.matrixWorld.clone()
 			};
 
 			if ( renderObject.object.center ) {
@@ -132,6 +132,40 @@ class NodeMaterialObserver {
 			return true;
 
 		return false;
+
+	}
+
+	getMaterialData( material ) {
+
+		const data = {};
+
+		for ( const property of this.refreshUniforms ) {
+
+			const value = material[ property ];
+
+			if ( value === null || value === undefined ) continue;
+
+			if ( typeof value === 'object' && value.clone !== undefined ) {
+
+				if ( value.isTexture === true ) {
+
+					data[ property ] = { id: value.id, version: value.version };
+
+				} else {
+
+					data[ property ] = value.clone();
+
+				}
+
+			} else {
+
+				data[ property ] = value;
+
+			}
+
+		}
+
+		return data;
 
 	}
 
@@ -296,41 +330,6 @@ class NodeMaterialObserver {
 		}
 
 		return true;
-
-	}
-
-
-	getMaterialData( material ) {
-
-		const data = {};
-
-		for ( const property of this.refreshUniforms ) {
-
-			const value = material[ property ];
-
-			if ( value === null || value === undefined ) continue;
-
-			if ( typeof value === 'object' && value.clone !== undefined ) {
-
-				if ( value.isTexture === true ) {
-
-					data[ property ] = { id: value.id, version: value.version };
-
-				} else {
-
-					data[ property ] = value.clone();
-
-				}
-
-			} else {
-
-				data[ property ] = value;
-
-			}
-
-		}
-
-		return data;
 
 	}
 
