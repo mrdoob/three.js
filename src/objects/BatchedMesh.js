@@ -650,9 +650,7 @@ class BatchedMesh extends Mesh {
 
 		const drawRanges = this._drawRanges;
 		if ( geometryId >= drawRanges.length || drawRanges[ geometryId ].active === false ) {
-
-			return this;
-
+			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or inactive.` );
 		}
 
 		// delete any instances associated with this geometry
@@ -678,10 +676,8 @@ class BatchedMesh extends Mesh {
 	deleteInstance( instanceId ) {
 
 		const drawInfo = this._drawInfo;
-		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
-
-			return this;
-
+    if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
 		}
 
 		drawInfo[ instanceId ].active = false;
@@ -863,10 +859,8 @@ class BatchedMesh extends Mesh {
 		const drawInfo = this._drawInfo;
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = this._matricesTexture.image.data;
-		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
-
-			return this;
-
+    if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
 		}
 
 		matrix.toArray( matricesArray, instanceId * 16 );
@@ -881,9 +875,7 @@ class BatchedMesh extends Mesh {
 		const drawInfo = this._drawInfo;
 		const matricesArray = this._matricesTexture.image.data;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
-
-			return null;
-
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
 		}
 
 		return matrix.fromArray( matricesArray, instanceId * 16 );
@@ -922,9 +914,7 @@ class BatchedMesh extends Mesh {
 		const colorsArray = this._colorsTexture.image.data;
 		const drawInfo = this._drawInfo;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
-
-			return null;
-
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
 		}
 
 		return color.fromArray( colorsArray, instanceId * 4 );
@@ -933,17 +923,16 @@ class BatchedMesh extends Mesh {
 
 	setVisibleAt( instanceId, value ) {
 
-		// if the geometry is out of range, not active, or visibility state
-		// does not change then return early
 		const drawInfo = this._drawInfo;
 		if (
 			instanceId >= drawInfo.length ||
-			drawInfo[ instanceId ].active === false ||
-			drawInfo[ instanceId ].visible === value
+			drawInfo[ instanceId ].active === false
 		) {
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` )
+		}
 
+		if ( drawInfo[ instanceId ].visible === value ) {
 			return this;
-
 		}
 
 		drawInfo[ instanceId ].visible = value;
@@ -955,11 +944,10 @@ class BatchedMesh extends Mesh {
 
 	getVisibleAt( instanceId ) {
 
-		// return early if the geometry is out of range or not active
 		const drawInfo = this._drawInfo;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
-			return false;
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
 
 		}
 
@@ -969,19 +957,13 @@ class BatchedMesh extends Mesh {
 
 	setGeometryIdAt( instanceId, geometryId ) {
 
-		// return early if the geometry is out of range or not active
 		const drawInfo = this._drawInfo;
-		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
-
-			return null;
-
+    if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
 		}
 
-		// check if the provided geometryId is within the valid range
 		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
-
-			return null;
-
+			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or inactive.` );
 		}
 
 		drawInfo[ instanceId ].geometryIndex = geometryId;
@@ -994,9 +976,7 @@ class BatchedMesh extends Mesh {
 
 		const drawInfo = this._drawInfo;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
-
-			return - 1;
-
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
 		}
 
 		return drawInfo[ instanceId ].geometryIndex;
@@ -1006,9 +986,7 @@ class BatchedMesh extends Mesh {
 	getGeometryRangeAt( geometryId, target = {} ) {
 
 		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
-
-			return null;
-
+			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or inactive.` );
 		}
 
 		const drawRange = this._drawRanges[ geometryId ];
