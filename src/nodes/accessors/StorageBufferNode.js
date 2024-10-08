@@ -185,7 +185,7 @@ class StorageBufferNode extends BufferNode {
 		return output;
 
 	}
-	
+
 }
 
 export default StorageBufferNode;
