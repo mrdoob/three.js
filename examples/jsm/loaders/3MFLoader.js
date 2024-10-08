@@ -17,8 +17,9 @@ import {
 	NearestFilter,
 	RepeatWrapping,
 	TextureLoader,
-	SRGBColorSpace
+	SRGBColorSpace,
 } from 'three';
+import * as ThreeNodes from '../../../build/three.webgpu.nodes.js';
 import * as fflate from '../libs/fflate.module.js';
 
 const COLOR_SPACE_3MF = SRGBColorSpace;
@@ -375,7 +376,137 @@ class ThreeMFLoader extends Loader {
 
 		}
 
-		function parseImplicitIONode( implicitIONode, wrap = false ) {
+		// 3MF Node Types
+		// addition	addition of two values
+		// subtraction	subtraction operation
+		// multiplication	multiplication operation
+		// division	division operation
+		// constant	constant scalar value
+		// constvec	constant vector
+		// constmat	constant matrix
+		// composevector	vector composition operation
+		// vectorfromscalar	vector from scalar operation
+		// decomposevector	vector decomposition operation
+		// composematrix	matrix composition operation
+		// matrixfromcolumns	matrix composition from column vectors
+		// matrixfromrows	matrix composition from row vectors
+		// dot	dot product operation
+		// cross	cross product operation
+		// matvecmultiplication	matrix-vector multiplication operation
+		// transpose	matrix transpose operation
+		// inverse	matrix inverse operation
+		// sin	sine function operation
+		// cos	cosine function operation
+		// tan	tangent function operation
+		// arcsin	arcsine function operation
+		// arccos	arccosine function operation
+		// arctan	arctangent function operation
+		// arctan2	two-argument arctangent function operation
+		// min	minimum value operation
+		// max	maximum value operation
+		// abs	absolute value operation
+		// fmod	Remainder of floating point division
+		// mod	Modulo operation
+		// pow	power function operation
+		// sqrt	square root function operation
+		// exp	exponential function operation
+		// log	natural logarithm function operation
+		// log2	base 2 logarithm function operation
+		// log10	base 10 logarithm function operation
+		// select	selection operation
+		// clamp	clamping operation
+		// cosh	hyperbolic cosine function operation
+		// sinh	hyperbolic sine function operation
+		// tanh	hyperbolic tangent function operation
+		// round	rounding operation
+		// ceil	ceiling operation
+		// floor	floor operation
+		// sign	signum operation
+		// fract	fractional part extraction operation
+		// functioncall	function call operation
+		// mesh	signed distance to mesh operation
+		// unsignedmesh	unsigned distance to mesh operation
+		// length	length operation
+		// constresourceid	constant resource ID
+
+		// Three Node Type
+		// add = /*@__PURE__*/ nodeProxy( OperatorNode, '+' );
+		// sub = /*@__PURE__*/ nodeProxy( OperatorNode, '-' );
+		// mul = /*@__PURE__*/ nodeProxy( OperatorNode, '*' );
+		// div = /*@__PURE__*/ nodeProxy( OperatorNode, '/' );
+		// modInt = /*@__PURE__*/ nodeProxy( OperatorNode, '%' );
+		// equal = /*@__PURE__*/ nodeProxy( OperatorNode, '==' );
+		// notEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '!=' );
+		// lessThan = /*@__PURE__*/ nodeProxy( OperatorNode, '<' );
+		// greaterThan = /*@__PURE__*/ nodeProxy( OperatorNode, '>' );
+		// lessThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '<=' );
+		// greaterThanEqual = /*@__PURE__*/ nodeProxy( OperatorNode, '>=' );
+		// and = /*@__PURE__*/ nodeProxy( OperatorNode, '&&' );
+		// or = /*@__PURE__*/ nodeProxy( OperatorNode, '||' );
+		// not = /*@__PURE__*/ nodeProxy( OperatorNode, '!' );
+		// xor = /*@__PURE__*/ nodeProxy( OperatorNode, '^^' );
+		// bitAnd = /*@__PURE__*/ nodeProxy( OperatorNode, '&' );
+		// bitNot = /*@__PURE__*/ nodeProxy( OperatorNode, '~' );
+		// bitOr = /*@__PURE__*/ nodeProxy( OperatorNode, '|' );
+		// bitXor = /*@__PURE__*/ nodeProxy( OperatorNode, '^' );
+		// shiftLeft = /*@__PURE__*/ nodeProxy( OperatorNode, '<<' );
+		// shiftRight = /*@__PURE__*/ nodeProxy( OperatorNode, '>>' );
+
+		var typeToNodeMap = {
+			"addition": ThreeNodes.add,
+			"subtraction": ThreeNodes.sub,
+			"multiplication": ThreeNodes.mul,
+			"division": ThreeNodes.div,
+			"constant": ThreeNodes.float,
+			"constvec": ThreeNodes.vec3,
+			"constmat": ThreeNodes.mat4,
+			"composevector": ThreeNodes.vec3,
+			"vectorfromscalar": ThreeNodes.vec3,
+			"decomposevector": ThreeNodes.vec3,
+			"composematrix": ThreeNodes.mat4,
+			"matrixfromcolumns": ThreeNodes.mat4,
+			"matrixfromrows": ThreeNodes.mat4,
+			"dot": ThreeNodes.dot,
+			"cross": ThreeNodes.cross,
+			"matvecmultiplication": ThreeNodes.mul,
+			"transpose": ThreeNodes.transpose,
+			//"inverse": ThreeNodes.inverse,
+			"sin": ThreeNodes.sin,
+			"cos": ThreeNodes.cos,
+			"tan": ThreeNodes.tan,
+			"arcsin": ThreeNodes.asin,
+			"arccos": ThreeNodes.acos,
+			"arctan": ThreeNodes.atan,
+			"arctan2": ThreeNodes.atan2,
+			"min": ThreeNodes.min,
+			"max": ThreeNodes.max,
+			"abs": ThreeNodes.abs,
+			"fmod": ThreeNodes.mod,
+			"mod": ThreeNodes.mod,
+			"pow": ThreeNodes.pow,
+			"sqrt": ThreeNodes.sqrt,
+			"exp": ThreeNodes.exp,
+			"log": ThreeNodes.log,
+			"log2": ThreeNodes.log2,
+			//"log10": ThreeNodes.log10,
+			"select": ThreeNodes.mix,
+			"clamp": ThreeNodes.clamp,
+			//"cosh": ThreeNodes.cosh,
+			//"sinh": ThreeNodes.sinh,
+			//"tanh": ThreeNodes.tanh,
+			"round": ThreeNodes.round,
+			"ceil": ThreeNodes.ceil,
+			"floor": ThreeNodes.floor,
+			"sign": ThreeNodes.sign,
+			"fract": ThreeNodes.fract,
+			//"functioncall": ThreeNodes.functioncall, // Figure this out...
+			//"mesh": ThreeNodes.mesh,         // Add with three-mesh-bvh
+			//"unsignedmesh": ThreeNodes.mesh, // Add with three-mesh-bvh
+			"length": ThreeNodes.length,
+			"constresourceid": ThreeNodes.float
+		};
+
+		function parseImplicitIONode( implicitIONode ) {
 			const portNodes = implicitIONode.children;
 			const portArguments = {};
 			for ( let i = 0; i < portNodes.length; i ++ ) {
@@ -389,13 +520,7 @@ class ThreeMFLoader extends Loader {
 					portArguments[ portNodes[ i ].getAttribute( 'identifier' ) ].ref = portNodes[ i ].getAttribute( 'ref' );
 				}
 			}
-			if( wrap ) {
-				let toReturn = {};
-				toReturn[ implicitIONode.nodeName.substring( 2 ) ] = portArguments;
-				return toReturn;
-			} else{
-				return portArguments;
-			}
+			return portArguments;
 		}
 
 		function parseImplicitFunctionNode( implicitFunctionNode ) {
@@ -407,30 +532,69 @@ class ThreeMFLoader extends Loader {
 
 			const functionNodes = implicitFunctionNode.children;
 
-			const operators = [];
+			const operations = {};
+			const tslNodes = {};
+
 
 			for ( let i = 0; i < functionNodes.length; i ++ ) {
 
 				/** @type {Node} */
 				const operatorNode = functionNodes[ i ];
+				let latestNode = null;
+				let isInput = false;
 
 				if( operatorNode.nodeName === 'i:in' || operatorNode.nodeName === 'i:out' ) {
-					operators.push( parseImplicitIONode( operatorNode, true) );
+					latestNode = parseImplicitIONode( operatorNode );
+					operations[ operatorNode.nodeName === 'i:in' ? "inputs" : "outputs" ] = latestNode;
+
+					if( operatorNode.nodeName === 'i:in' ) {
+						isInput = true;
+						// Enumerate Inputs
+						tslNodes["inputs"] = {};
+						for (let key in latestNode) {
+							if(latestNode[key]["type"] === "scalar") {
+								tslNodes["inputs"][key] = ThreeNodes.float();
+							} else if(latestNode[key]["type"] === "vector") {
+								tslNodes["inputs"][key] = ThreeNodes.vec3();
+							} else if(latestNode[key]["type"] === "matrix") {
+								tslNodes["inputs"][key] = ThreeNodes.mat4();
+							}
+						}
+					}
+
 				} else{
 					const inputNodes = operatorNode.children;
 					const portArguments = { "op" : operatorNode.nodeName.substring( 2 ) };
 					for ( let i = 0; i < inputNodes.length; i ++ ) {
-						//portArguments.push(parseImplicitIONode( inputNodes[ i ] ) );
-						portArguments[ inputNodes[ i ].nodeName.substring( 2 )] = parseImplicitIONode( inputNodes[ i ], false );
+						portArguments[ inputNodes[ i ].nodeName.substring( 2 )] = parseImplicitIONode( inputNodes[ i ] );
 					}
-					//let toReturn = {};
-					//toReturn[ operatorNode.nodeName.substring( 2 ) ] = portArguments;
-					operators.push( portArguments );
+					latestNode = portArguments;
+					latestNode.identifier = operatorNode.getAttribute( 'identifier' );
+					operations[ operatorNode.getAttribute( 'identifier' ) ] = latestNode;
+				}
+
+				// Make TSL Nodes from the parsed node structures
+				//tslNodes[ latestNode.identifier ] = new typeToNodeMap[ latestNode.type ]( latestNode );
+				if(!isInput) {
+					//console.log(latestNode);
+					if( latestNode.op in typeToNodeMap ) {
+						let args = [];
+						for(let argName in latestNode.in) {
+							let ref = latestNode.in[ argName ].ref.split(".");
+							if (ref[0] in tslNodes) {
+								console.log(ref, tslNodes[ ref[0] ]);
+								args.push(tslNodes[ ref[0] ]);//[ ref[1] ]);
+							}
+						}
+						tslNodes[ latestNode.identifier ] = typeToNodeMap[ latestNode.op ](...args);
+					}
 				}
 
 			}
 
-			implicitFunctionData[ 'operations' ] = operators;
+			console.log(tslNodes);
+
+			implicitFunctionData[ 'operations' ] = operations;
 
 			return implicitFunctionData;
 
@@ -1429,7 +1593,7 @@ class ThreeMFLoader extends Loader {
 
 			} else {
 
-				console.log(modelData);
+				console.log(modelData.resources.implicitfunction);
 
 				const compositeData = objectData[ 'components' ];
 
