@@ -870,6 +870,14 @@ function SidebarObject( editor ) {
 
 		}
 
+		if ( object.userData[ 'fatherLightUUID' ] ) {
+
+			const fatherLight = editor.objectByUuid( object.userData[ 'fatherLightUUID' ] );
+			fatherLight.helper.update();
+			signals.sceneGraphChanged.dispatch();
+
+		}
+
 		objectVisible.setValue( object.visible );
 		objectFrustumCulled.setValue( object.frustumCulled );
 		objectRenderOrder.setValue( object.renderOrder );
