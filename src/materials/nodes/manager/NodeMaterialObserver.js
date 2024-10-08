@@ -389,7 +389,7 @@ class NodeMaterialObserver {
 
 		}
 
-		    // geometry
+		// geometry
 
 		const geometryData = renderObjectData.geometry;
 		const currentGeometryData = this.getGeometryData( renderObject.geometry );
