@@ -87,7 +87,8 @@ class NodeMaterialObserver {
 
 			data = {
 				material: this.getMaterialData( renderObject.material ),
-				worldMatrix: renderObject.object.matrixWorld.clone()
+				worldMatrix: renderObject.object.matrixWorld.clone(),
+				geometry: this.getGeometryData( renderObject.geometry )
 			};
 
 			if ( renderObject.object.center ) {
@@ -133,6 +134,178 @@ class NodeMaterialObserver {
 		return false;
 
 	}
+
+	getGeometryData( geometry ) {
+
+		const data = {
+			attributes: {}
+		};
+
+		const attributes = geometry.attributes;
+
+		for ( const name in attributes ) {
+
+			const attribute = attributes[ name ];
+
+			data.attributes[ name ] = {
+				version: attribute.version,
+				uuid: attribute.uuid,
+			};
+
+		}
+
+		if ( geometry.index !== null ) {
+
+			const index = geometry.index;
+
+			data.index = {
+				version: index.version,
+				count: index.count
+			};
+
+		}
+
+		data.drawRange = {
+			start: geometry.drawRange.start,
+			count: geometry.drawRange.count
+		};
+
+		data.morphAttributes = {};
+
+		for ( const name in geometry.morphAttributes ) {
+
+			const morphArray = geometry.morphAttributes[ name ];
+			data.morphAttributes[ name ] = [];
+
+			for ( let i = 0; i < morphArray.length; i ++ ) {
+
+				const attribute = morphArray[ i ];
+
+				data.morphAttributes[ name ][ i ] = {
+					version: attribute.version,
+					count: attribute.count,
+					itemSize: attribute.itemSize
+				};
+
+			}
+
+		}
+
+		return data;
+
+	}
+
+	compareGeometryData( storedData, currentData ) {
+
+		// Compare attributes
+		const storedAttributes = storedData.attributes;
+		const currentAttributes = currentData.attributes;
+
+		const storedAttributeNames = Object.keys( storedAttributes );
+		const currentAttributeNames = Object.keys( currentAttributes );
+
+		if ( storedAttributeNames.length !== currentAttributeNames.length ) {
+
+			return false;
+
+		}
+
+		for ( const name of storedAttributeNames ) {
+
+			if ( currentAttributes[ name ] === undefined ) {
+
+				return false;
+
+			}
+
+			const storedAttribute = storedAttributes[ name ];
+			const currentAttribute = currentAttributes[ name ];
+
+			// Compare version, count, itemSize
+			if ( storedAttribute.version !== currentAttribute.version ||
+				storedAttribute.uuid !== currentAttribute.uuid ) {
+
+				return false;
+
+			}
+
+		}
+
+		// Compare index
+		if ( ( storedData.index === undefined ) !== ( currentData.index === undefined ) ) {
+
+			return false;
+
+		}
+
+		if ( storedData.index && currentData.index ) {
+
+			if ( storedData.index.version !== currentData.index.version ||
+				storedData.index.uuid !== currentData.index.uuid ) {
+
+				return false;
+
+			}
+
+		}
+
+		// Compare drawRange
+		if ( storedData.drawRange.start !== currentData.drawRange.start ||
+			storedData.drawRange.count !== currentData.drawRange.count ) {
+
+			return false;
+
+		}
+
+		// Compare morphAttributes
+		const storedMorphAttributes = storedData.morphAttributes;
+		const currentMorphAttributes = currentData.morphAttributes;
+
+		const storedMorphNames = Object.keys( storedMorphAttributes );
+		const currentMorphNames = Object.keys( currentMorphAttributes );
+
+		if ( storedMorphNames.length !== currentMorphNames.length ) {
+
+			return false;
+
+		}
+
+		for ( const name of storedMorphNames ) {
+
+			if ( currentMorphAttributes[ name ] === undefined ) {
+
+				return false;
+
+			}
+
+			const storedMorphArray = storedMorphAttributes[ name ];
+			const currentMorphArray = currentMorphAttributes[ name ];
+
+			if ( storedMorphArray.length !== currentMorphArray.length ) {
+
+				return false;
+
+			}
+
+			for ( let i = 0; i < storedMorphArray.length; i ++ ) {
+
+				const storedAttribute = storedMorphArray[ i ];
+				const currentAttribute = currentMorphArray[ i ];
+
+				if ( storedAttribute.version !== currentAttribute.version ) {
+
+					return false;
+
+				}
+
+			}
+
+		}
+
+		return true;
+
+	}
+
 
 	getMaterialData( material ) {
 
@@ -223,6 +396,21 @@ class NodeMaterialObserver {
 			}
 
 		}
+
+		    // geometry
+
+		const geometryData = renderObjectData.geometry;
+		const currentGeometryData = this.getGeometryData( renderObject.geometry );
+
+		if ( ! this.compareGeometryData( geometryData, currentGeometryData ) ) {
+
+			// Update stored geometry data
+			renderObjectData.geometry = currentGeometryData;
+
+			return false;
+
+		}
+
 
 		// morph targets
 

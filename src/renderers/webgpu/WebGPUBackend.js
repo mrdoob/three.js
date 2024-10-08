@@ -846,9 +846,9 @@ class WebGPUBackend extends Backend {
 		const currentSets = renderContextData.currentSets;
 		const passEncoderGPU = renderContextData.currentPass;
 
-		const drawParms = renderObject.getDrawParameters();
+		const drawParams = renderObject.getDrawParameters();
 
-		if ( drawParms === null ) return;
+		if ( drawParams === null ) return;
 
 		// pipeline
 
@@ -970,7 +970,7 @@ class WebGPUBackend extends Backend {
 
 		} else if ( hasIndex === true ) {
 
-			const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParms;
+			const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
 
 			passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
 
@@ -978,7 +978,7 @@ class WebGPUBackend extends Backend {
 
 		} else {
 
-			const { vertexCount, instanceCount, firstVertex } = drawParms;
+			const { vertexCount, instanceCount, firstVertex } = drawParams;
 
 			passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
 
