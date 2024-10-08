@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass } from 'three/tsl';
+			import { pass, uniform, time, oscSine } from 'three/tsl';
 			import { outline } from 'three/addons/tsl/display/OutlineNode.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -44,62 +44,6 @@
 
 			const obj3d = new THREE.Object3D();
 			const group = new THREE.Group();
-
-			const params = {
-				edgeStrength: 3.0,
-				edgeGlow: 0.0,
-				edgeThickness: 1.0,
-				pulsePeriod: 0
-			};
-
-			// Init gui
-
-			const gui = new GUI( { width: 280 } );
-
-			gui.add( params, 'edgeStrength', 0.01, 10 ).onChange( function ( value ) {
-
-				outlinePass.edgeStrength = Number( value );
-
-			} );
-
-			gui.add( params, 'edgeGlow', 0.0, 1 ).onChange( function ( value ) {
-
-				outlinePass.edgeGlow = Number( value );
-
-			} );
-
-			gui.add( params, 'edgeThickness', 1, 4 ).onChange( function ( value ) {
-
-				outlinePass.edgeThickness = Number( value );
-
-			} );
-
-			gui.add( params, 'pulsePeriod', 0.0, 5 ).onChange( function ( value ) {
-
-				outlinePass.pulsePeriod = Number( value );
-
-			} );
-
-			function Configuration() {
-
-				this.visibleEdgeColor = '#ffffff';
-				this.hiddenEdgeColor = '#190a05';
-
-			}
-
-			const conf = new Configuration();
-
-			gui.addColor( conf, 'visibleEdgeColor' ).onChange( function ( value ) {
-
-				outlinePass.visibleEdgeColor.set( value );
-
-			} );
-
-			gui.addColor( conf, 'hiddenEdgeColor' ).onChange( function ( value ) {
-
-				outlinePass.hiddenEdgeColor.set( value );
-
-			} );
 
 			init();
 
@@ -227,15 +171,47 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
+				// outline pass
+
+				const edgeStrength = uniform( 3.0 );
+				const edgeGlow = uniform( 0.0 );
+				const edgeThickness = uniform( 1.0 );
+				const pulsePeriod = uniform( 0 );
+				const visibleEdgeColor = uniform( new THREE.Color( 0xffffff ) );
+				const hiddenEdgeColor = uniform( new THREE.Color( 0x190a05 ) );
+
+				outlinePass = outline( scene, camera, {
+					selectedObjects,
+					edgeGlow,
+					edgeThickness
+				} );
+
+				const { visibleEdge, hiddenEdge } = outlinePass;
+
+				const period = time.div( pulsePeriod ).mul( 2 );
+				const osc = oscSine( period ).mul( .5 ).add( .5 ); // osc [ 0.5, 1.0 ]
+
+				const outlineColor = visibleEdge.mul( visibleEdgeColor ).add( hiddenEdge.mul( hiddenEdgeColor ) ).mul( edgeStrength );
+				const outlinePulse = pulsePeriod.greaterThan( 0 ).select( outlineColor.mul( osc ), outlineColor );
+
 				// postprocessing
 
-				postProcessing = new THREE.PostProcessing( renderer );
-
 				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode( 'output' );
-				outlinePass = outline( scene, camera, scene );
 
-				postProcessing.outputNode = outlinePass.getTextureNode().add( scenePassColor );
+				postProcessing = new THREE.PostProcessing( renderer );
+				postProcessing.outputNode = outlinePulse.add( scenePass );
+
+				// gui
+
+				const gui = new GUI( { width: 280 } );
+				gui.add( edgeStrength, 'value', 0.01, 10 ).name( 'edgeStrength' );
+				gui.add( edgeGlow, 'value', 0.0, 1 ).name( 'edgeGlow' );
+				gui.add( edgeThickness, 'value', 1, 4 ).name( 'edgeThickness' );
+				gui.add( pulsePeriod, 'value', 0.0, 5 ).name( 'pulsePeriod' );
+				gui.addColor( visibleEdgeColor, 'value' ).name( 'visibleEdgeColor' );
+				gui.addColor( hiddenEdgeColor, 'value' ).name( 'hiddenEdgeColor' );
+
+				//
 
 				window.addEventListener( 'resize', onWindowResize );
 

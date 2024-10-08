@@ -1,5 +1,5 @@
 import { Color, DepthTexture, FloatType, RenderTarget, Vector2 } from 'three';
-import { add, Loop, int, exp, min, float, mul, uv, vec2, Fn, textureSize, orthographicDepthToViewZ, QuadMesh, screenUV, TempNode, nodeObject, NodeUpdateType, uniform, vec4, NodeMaterial, passTexture, texture, perspectiveDepthToViewZ, positionView } from 'three/tsl';
+import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, QuadMesh, screenUV, TempNode, nodeObject, NodeUpdateType, uniform, vec4, NodeMaterial, passTexture, texture, perspectiveDepthToViewZ, positionView } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _currentClearColor = /*@__PURE__*/ new Color();
@@ -15,20 +15,23 @@ class OutlineNode extends TempNode {
 
 	}
 
-	constructor( scene, camera, selectedObjects = [] ) {
+	constructor( scene, camera, params = {} ) {
 
 		super( 'vec4' );
+
+		const {
+			selectedObjects = [],
+			edgeThickness = float( 1 ),
+			edgeGlow = float( 0 ),
+			downSampleRatio = 2
+		} = params;
 
 		this.scene = scene;
 		this.camera = camera;
 		this.selectedObjects = selectedObjects;
-		this.downSampleRatio = 2;
-		this.visibleEdgeColor = new Color( 1, 1, 1 );
-		this.hiddenEdgeColor = new Color( 0.1, 0.04, 0.02 );
-		this.edgeThickness = 1;
-		this.edgeStrength = 3.0;
-		this.edgeGlow = 0;
-		this.pulsePeriod = 0;
+		this.downSampleRatio = downSampleRatio;
+		this.edgeThickness = edgeThickness;
+		this.edgeGlow = edgeGlow;
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
@@ -50,13 +53,7 @@ class OutlineNode extends TempNode {
 
 		this._cameraNear = uniform( camera.near );
 		this._cameraFar = uniform( camera.far );
-		this._resolution = uniform( new Vector2() );
-		this._visibleEdgeColor = uniform( new Color() );
-		this._hiddenEdgeColor = uniform( new Color() );
 		this._blurDirection = uniform( new Vector2() );
-		this._kernelRadius = uniform( 1 );
-		this._edgeGlow = uniform( 0 );
-		this._edgeStrength = uniform( 0 );
 
 		this._depthTextureUniform = texture( this._renderTargetDepthBuffer.depthTexture );
 		this._maskTextureUniform = texture( this._renderTargetMaskBuffer.texture );
@@ -64,6 +61,11 @@ class OutlineNode extends TempNode {
 		this._edge1TextureUniform = texture( this._renderTargetEdgeBuffer1.texture );
 		this._edge2TextureUniform = texture( this._renderTargetEdgeBuffer2.texture );
 		this._blurColorTextureUniform = texture( this._renderTargetEdgeBuffer1.texture );
+
+		// constants
+
+		this._visibleEdgeColor = vec3( 1, 0, 0 );
+		this._hiddenEdgeColor = vec3( 0, 1, 0 );
 
 		// materials
 
@@ -83,6 +85,9 @@ class OutlineNode extends TempNode {
 		this._separableBlurMaterial = new NodeMaterial();
 		this._separableBlurMaterial.name = 'OutlineNode.separableBlur';
 
+		this._separableBlurMaterial2 = new NodeMaterial();
+		this._separableBlurMaterial2.name = 'OutlineNode.separableBlur2';
+
 		this._compositeMaterial = new NodeMaterial();
 		this._compositeMaterial.name = 'OutlineNode.composite';
 
@@ -98,6 +103,18 @@ class OutlineNode extends TempNode {
 
 	}
 
+	get visibleEdge() {
+
+		return this.r;
+
+	}
+
+	get hiddenEdge() {
+
+		return this.g;
+
+	}
+
 	getTextureNode() {
 
 		return this._textureNode;
@@ -105,8 +122,6 @@ class OutlineNode extends TempNode {
 	}
 
 	setSize( width, height ) {
-
-		this._resolution.value.set( width, height );
 
 		this._renderTargetDepthBuffer.setSize( width, height );
 		this._renderTargetMaskBuffer.setSize( width, height );
@@ -199,20 +214,6 @@ class OutlineNode extends TempNode {
 
 		// 4. Perform edge detection (half resolution)
 
-		this._tempPulseColor1.copy( this.visibleEdgeColor );
-		this._tempPulseColor2.copy( this.hiddenEdgeColor );
-
-		if ( this.pulsePeriod > 0 ) {
-
-			const scalar = ( 1 + 0.25 ) / 2 + Math.cos( performance.now() * 0.01 / this.pulsePeriod ) * ( 1.0 - 0.25 ) / 2;
-			this._tempPulseColor1.multiplyScalar( scalar );
-			this._tempPulseColor2.multiplyScalar( scalar );
-
-		}
-
-		this._visibleEdgeColor.value.copy( this._tempPulseColor1 );
-		this._hiddenEdgeColor.value.copy( this._tempPulseColor2 );
-
 		_quadMesh.material = this._edgeDetectionMaterial;
 		renderer.setRenderTarget( this._renderTargetEdgeBuffer1 );
 		_quadMesh.render( renderer );
@@ -221,7 +222,6 @@ class OutlineNode extends TempNode {
 
 		this._blurColorTextureUniform.value = this._renderTargetEdgeBuffer1.texture;
 		this._blurDirection.value.copy( _BLUR_DIRECTION_X );
-		this._kernelRadius.value = this.edgeThickness;
 
 		_quadMesh.material = this._separableBlurMaterial;
 		renderer.setRenderTarget( this._renderTargetBlurBuffer1 );
@@ -237,8 +237,8 @@ class OutlineNode extends TempNode {
 
 		this._blurColorTextureUniform.value = this._renderTargetEdgeBuffer1.texture;
 		this._blurDirection.value.copy( _BLUR_DIRECTION_X );
-		this._kernelRadius.value = this.edgeThickness;
 
+		_quadMesh.material = this._separableBlurMaterial2;
 		renderer.setRenderTarget( this._renderTargetBlurBuffer2 );
 		_quadMesh.render( renderer );
 
@@ -249,9 +249,6 @@ class OutlineNode extends TempNode {
 		_quadMesh.render( renderer );
 
 		// 7. Composite
-
-		this._edgeGlow.value = this.edgeGlow;
-		this._edgeStrength.value = this.edgeStrength;
 
 		_quadMesh.material = this._compositeMaterial;
 		renderer.setRenderTarget( this._renderTargetComposite );
@@ -312,13 +309,13 @@ class OutlineNode extends TempNode {
 			const c3 = this._maskTextureDownsSampleUniform.uv( uvNode.add( uvOffset.yw ) ).toVar();
 			const c4 = this._maskTextureDownsSampleUniform.uv( uvNode.sub( uvOffset.yw ) ).toVar();
 
-			const diff1 = mul( c1.r.sub( c2.r ), float( 0.5 ) );
-			const diff2 = mul( c3.r.sub( c4.r ), float( 0.5 ) );
+			const diff1 = mul( c1.r.sub( c2.r ), 0.5 );
+			const diff2 = mul( c3.r.sub( c4.r ), 0.5 );
 			const d = vec2( diff1, diff2 ).length();
 			const a1 = min( c1.g, c2.g );
 			const a2 = min( c3.g, c4.g );
 			const visibilityFactor = min( a1, a2 );
-			const edgeColor = float( 1.0 ).sub( visibilityFactor ).greaterThan( float( 0.001 ) ).select( this._visibleEdgeColor, this._hiddenEdgeColor );
+			const edgeColor = visibilityFactor.oneMinus().greaterThan( 0.001 ).select( this._visibleEdgeColor, this._hiddenEdgeColor );
 			return vec4( edgeColor, 1 ).mul( d );
 
 		} );
@@ -328,36 +325,36 @@ class OutlineNode extends TempNode {
 
 		// seperable blur material
 
+		const MAX_RADIUS = 4;
+
 		const gaussianPdf = Fn( ( [ x, sigma ] ) => {
 
 			return float( 0.39894 ).mul( exp( float( - 0.5 ).mul( x ).mul( x ).div( sigma.mul( sigma ) ) ).div( sigma ) );
 
 		} );
 
-		const seperableBlur = Fn( () => {
-
-			const MAX_RADIUS = 4;
+		const seperableBlur = Fn( ( [ kernelRadius ] ) => {
 
 			const resolution = textureSize( this._maskTextureDownsSampleUniform );
 			const invSize = vec2( 1 ).div( resolution ).toVar();
 			const uvNode = uv();
 
-			const sigma = this._kernelRadius.div( 2 ).toVar();
+			const sigma = kernelRadius.div( 2 ).toVar();
 			const weightSum = gaussianPdf( 0, sigma ).toVar();
 			const diffuseSum = this._blurColorTextureUniform.uv( uvNode ).mul( weightSum ).toVar();
-			const delta = this._blurDirection.mul( invSize ).mul( this._kernelRadius ).div( MAX_RADIUS ).toVar();
+			const delta = this._blurDirection.mul( invSize ).mul( kernelRadius ).div( MAX_RADIUS ).toVar();
 
 			const uvOffset = delta.toVar();
 
-			Loop( { start: int( 0 ), end: int( MAX_RADIUS ), type: 'int', condition: '<=' }, ( { i } ) => {
+			Loop( { start: int( 1 ), end: int( MAX_RADIUS ), type: 'int', condition: '<=' }, ( { i } ) => {
 
-				const x = this._kernelRadius.mul( float( i ) ).div( MAX_RADIUS );
+				const x = kernelRadius.mul( float( i ) ).div( MAX_RADIUS );
 				const w = gaussianPdf( x, sigma );
 				const sample1 = this._blurColorTextureUniform.uv( uvNode.add( uvOffset ) );
 				const sample2 = this._blurColorTextureUniform.uv( uvNode.sub( uvOffset ) );
 
-				diffuseSum.addAssign( add( sample1, sample2 ).mul( w ) );
-				weightSum.addAssign( float( 2 ).mul( w ) );
+				diffuseSum.addAssign( sample1.add( sample2 ).mul( w ) );
+				weightSum.addAssign( w.mul( 2 ) );
 				uvOffset.addAssign( delta );
 
 			} );
@@ -366,8 +363,11 @@ class OutlineNode extends TempNode {
 
 		} );
 
-		this._separableBlurMaterial.fragmentNode = seperableBlur();
+		this._separableBlurMaterial.fragmentNode = seperableBlur( this.edgeThickness );
 		this._separableBlurMaterial.needsUpdate = true;
+
+		this._separableBlurMaterial2.fragmentNode = seperableBlur( MAX_RADIUS );
+		this._separableBlurMaterial2.needsUpdate = true;
 
 		// composite material
 
@@ -377,8 +377,9 @@ class OutlineNode extends TempNode {
 			const edgeValue2 = this._edge2TextureUniform;
 			const maskColor = this._maskTextureUniform;
 
-			const edgeValue = edgeValue1.add( edgeValue2.mul( this._edgeGlow ) );
-			return this._edgeStrength.mul( maskColor.r ).mul( edgeValue );
+			const edgeValue = edgeValue1.add( edgeValue2.mul( this.edgeGlow ) );
+
+			return maskColor.r.mul( edgeValue );
 
 		} );
 
@@ -407,6 +408,7 @@ class OutlineNode extends TempNode {
 		this._materialCopy.dispose();
 		this._edgeDetectionMaterial.dispose();
 		this._separableBlurMaterial.dispose();
+		this._separableBlurMaterial2.dispose();
 		this._compositeMaterial.dispose();
 
 	}
