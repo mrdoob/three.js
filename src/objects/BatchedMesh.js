@@ -650,7 +650,9 @@ class BatchedMesh extends Mesh {
 
 		const drawRanges = this._drawRanges;
 		if ( geometryId >= drawRanges.length || drawRanges[ geometryId ].active === false ) {
+
 			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or inactive.` );
+
 		}
 
 		// delete any instances associated with this geometry
@@ -676,8 +678,10 @@ class BatchedMesh extends Mesh {
 	deleteInstance( instanceId ) {
 
 		const drawInfo = this._drawInfo;
-    if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+
 			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+
 		}
 
 		drawInfo[ instanceId ].active = false;
@@ -859,8 +863,10 @@ class BatchedMesh extends Mesh {
 		const drawInfo = this._drawInfo;
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = this._matricesTexture.image.data;
-    if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+
 			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+
 		}
 
 		matrix.toArray( matricesArray, instanceId * 16 );
@@ -875,7 +881,9 @@ class BatchedMesh extends Mesh {
 		const drawInfo = this._drawInfo;
 		const matricesArray = this._matricesTexture.image.data;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+
 			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+
 		}
 
 		return matrix.fromArray( matricesArray, instanceId * 16 );
@@ -914,7 +922,9 @@ class BatchedMesh extends Mesh {
 		const colorsArray = this._colorsTexture.image.data;
 		const drawInfo = this._drawInfo;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+
 			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+
 		}
 
 		return color.fromArray( colorsArray, instanceId * 4 );
@@ -928,11 +938,15 @@ class BatchedMesh extends Mesh {
 			instanceId >= drawInfo.length ||
 			drawInfo[ instanceId ].active === false
 		) {
-			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` )
+
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+
 		}
 
 		if ( drawInfo[ instanceId ].visible === value ) {
+
 			return this;
+
 		}
 
 		drawInfo[ instanceId ].visible = value;
@@ -958,12 +972,16 @@ class BatchedMesh extends Mesh {
 	setGeometryIdAt( instanceId, geometryId ) {
 
 		const drawInfo = this._drawInfo;
-    if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+
 			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+
 		}
 
 		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
+
 			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or inactive.` );
+
 		}
 
 		drawInfo[ instanceId ].geometryIndex = geometryId;
@@ -976,7 +994,9 @@ class BatchedMesh extends Mesh {
 
 		const drawInfo = this._drawInfo;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
+
 			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+
 		}
 
 		return drawInfo[ instanceId ].geometryIndex;
@@ -986,7 +1006,9 @@ class BatchedMesh extends Mesh {
 	getGeometryRangeAt( geometryId, target = {} ) {
 
 		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
+
 			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or inactive.` );
+
 		}
 
 		const drawRange = this._drawRanges[ geometryId ];
