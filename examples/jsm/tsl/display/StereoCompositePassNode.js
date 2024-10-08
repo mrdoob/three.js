@@ -1,8 +1,10 @@
-import { RenderTarget, StereoCamera, HalfFloatType, LinearFilter, NearestFilter, Vector2 } from 'three';
+import { RenderTarget, StereoCamera, HalfFloatType, LinearFilter, NearestFilter, Vector2, PostProcessingUtils } from 'three';
 import { PassNode, QuadMesh, texture } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
+
+let _rendererState;
 
 class StereoCompositePassNode extends PassNode {
 
@@ -53,14 +55,16 @@ class StereoCompositePassNode extends PassNode {
 		const { renderer } = frame;
 		const { scene, stereo, renderTarget } = this;
 
+		_rendererState = PostProcessingUtils.getRendererAndSceneState( renderer, scene, _rendererState );
+
+		//
+
 		this._pixelRatio = renderer.getPixelRatio();
 
 		this.updateStereoCamera( renderer.coordinateSystem );
 
 		const size = renderer.getSize( _size );
 		this.setSize( size.width, size.height );
-
-		const currentRenderTarget = renderer.getRenderTarget();
 
 		// left
 
@@ -80,7 +84,7 @@ class StereoCompositePassNode extends PassNode {
 
 		// restore
 
-		renderer.setRenderTarget( currentRenderTarget );
+		PostProcessingUtils.setRendererState( renderer, scene, _rendererState );
 
 	}
 

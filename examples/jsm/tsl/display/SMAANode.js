@@ -1,9 +1,10 @@
-import { Color, HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2 } from 'three';
+import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, PostProcessingUtils } from 'three';
 import { abs, QuadMesh, NodeMaterial, TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _currentClearColor = /*@__PURE__*/ new Color();
 const _size = /*@__PURE__*/ new Vector2();
+
+let _rendererState;
 
 /**
  * Port of Subpixel Morphological Antialiasing (SMAA) v2.8
@@ -120,15 +121,12 @@ class SMAANode extends TempNode {
 
 		const { renderer } = frame;
 
+		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+
+		//
+
 		const size = renderer.getDrawingBufferSize( _size );
 		this.setSize( size.width, size.height );
-
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentMRT = renderer.getMRT();
-		renderer.getClearColor( _currentClearColor );
-		const currentClearAlpha = renderer.getClearAlpha();
-
-		renderer.setMRT( null );
 
 		// edges
 
@@ -153,9 +151,7 @@ class SMAANode extends TempNode {
 
 		// restore
 
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.setMRT( currentMRT );
-		renderer.setClearColor( _currentClearColor, currentClearAlpha );
+		PostProcessingUtils.setRendererState( renderer, _rendererState );
 
 	}
 

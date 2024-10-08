@@ -1,9 +1,10 @@
-import { Color, DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3 } from 'three';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, PostProcessingUtils } from 'three';
 import { getViewPosition, QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _currentClearColor = /*@__PURE__*/ new Color();
 const _size = /*@__PURE__*/ new Vector2();
+
+let _rendererState;
 
 class GTAONode extends TempNode {
 
@@ -60,20 +61,17 @@ class GTAONode extends TempNode {
 
 		const { renderer } = frame;
 
-		const size = renderer.getDrawingBufferSize( _size );
+		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
 
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentMRT = renderer.getMRT();
-		renderer.getClearColor( _currentClearColor );
-		const currentClearAlpha = renderer.getClearAlpha();
+		//
+
+		const size = renderer.getDrawingBufferSize( _size );
+		this.setSize( size.width, size.height );
 
 		_quadMesh.material = this._material;
 
-		this.setSize( size.width, size.height );
-
 		// clear
 
-		renderer.setMRT( null );
 		renderer.setClearColor( 0xffffff, 1 );
 
 		// ao
@@ -83,9 +81,7 @@ class GTAONode extends TempNode {
 
 		// restore
 
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.setMRT( currentMRT );
-		renderer.setClearColor( _currentClearColor, currentClearAlpha );
+		PostProcessingUtils.setRendererState( renderer, _rendererState );
 
 	}
 

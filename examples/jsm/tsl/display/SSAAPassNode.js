@@ -1,7 +1,9 @@
-import { AdditiveBlending, Color, Vector2 } from 'three';
+import { AdditiveBlending, Color, Vector2, PostProcessingUtils } from 'three';
 import { nodeObject, uniform, mrt, PassNode, QuadMesh, texture, NodeMaterial, getTextureIndex } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
+
+let _rendererState;
 
 /**
 *
@@ -32,8 +34,6 @@ class SSAAPassNode extends PassNode {
 		this.clearColor = new Color( 0x000000 );
 		this.clearAlpha = 0;
 
-		this._currentClearColor = new Color();
-
 		this.sampleWeight = uniform( 1 );
 
 		this.sampleRenderTarget = null;
@@ -47,20 +47,16 @@ class SSAAPassNode extends PassNode {
 		const { renderer } = frame;
 		const { scene, camera } = this;
 
+		_rendererState = PostProcessingUtils.getRendererAndSceneState( renderer, scene, _rendererState );
+
+		//
+
 		this._pixelRatio = renderer.getPixelRatio();
 
 		const size = renderer.getSize( _size );
 
 		this.setSize( size.width, size.height );
 		this.sampleRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
-
-		// save current renderer settings
-
-		renderer.getClearColor( this._currentClearColor );
-		const currentClearAlpha = renderer.getClearAlpha();
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentMRT = renderer.getMRT();
-		const currentAutoClear = renderer.autoClear;
 
 		//
 
@@ -165,11 +161,9 @@ class SSAAPassNode extends PassNode {
 
 		}
 
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.setMRT( currentMRT );
+		//
 
-		renderer.autoClear = currentAutoClear;
-		renderer.setClearColor( this._currentClearColor, currentClearAlpha );
+		PostProcessingUtils.setRendererAndSceneState( renderer, scene, _rendererState );
 
 	}
 
