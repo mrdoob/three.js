@@ -1335,6 +1335,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	createIndirectStorageAttribute( attribute ) {
+
+		this.attributeUtils.createAttribute( attribute, GPUBufferUsage.STORAGE | GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST );
+
+	}
+
 	updateAttribute( attribute ) {
 
 		this.attributeUtils.updateAttribute( attribute );

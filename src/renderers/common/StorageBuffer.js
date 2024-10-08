@@ -14,4 +14,18 @@ class StorageBuffer extends Buffer {
 
 }
 
-export default StorageBuffer;
+class IndirectStorageBuffer extends Buffer {
+
+	constructor( name, attribute ) {
+
+		super( name, attribute ? attribute.array : null );
+
+		this.attribute = attribute;
+
+		this.isIndirectStorageBuffer = true;
+
+	}
+
+}
+
+export { StorageBuffer, IndirectStorageBuffer };

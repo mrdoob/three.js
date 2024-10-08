@@ -29,11 +29,11 @@ class WebGPUBindingUtils {
 				visibility: binding.visibility
 			};
 
-			if ( binding.isUniformBuffer || binding.isStorageBuffer ) {
+			if ( binding.isUniformBuffer || binding.isStorageBuffer || binding.isIndirectStorageBuffer ) {
 
 				const buffer = {}; // GPUBufferBindingLayout
 
-				if ( binding.isStorageBuffer ) {
+				if ( binding.isStorageBuffer || binding.isIndirectStorageBuffer ) {
 
 					buffer.type = binding.access;
 
@@ -207,7 +207,7 @@ class WebGPUBindingUtils {
 
 				entriesGPU.push( { binding: bindingPoint, resource: { buffer: bindingData.buffer } } );
 
-			} else if ( binding.isStorageBuffer ) {
+			} else if ( binding.isStorageBuffer || binding.isIndirectStorageBuffer ) {
 
 				const bindingData = backend.get( binding );
 

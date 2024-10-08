@@ -4,7 +4,7 @@ import NodeSampler from '../../common/nodes/NodeSampler.js';
 import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from '../../common/nodes/NodeSampledTexture.js';
 
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
-import NodeStorageBuffer from '../../common/nodes/NodeStorageBuffer.js';
+import { NodeStorageBuffer, IndirectNodeStorageBuffer } from '../../common/nodes/NodeStorageBuffer.js';
 
 import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
 
@@ -386,7 +386,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				return name;
 
-			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
+			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
 
 				return `NodeBuffer_${ node.id }.${name}`;
 
@@ -528,6 +528,16 @@ class WGSLNodeBuilder extends NodeBuilder {
 			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
 
 				const bufferClass = type === 'storageBuffer' ? NodeStorageBuffer : NodeUniformBuffer;
+				const buffer = new bufferClass( node, group );
+				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
+
+				bindings.push( buffer );
+
+				uniformGPU = buffer;
+
+			} else if ( type === 'indirectStorageBuffer' ) {
+
+				const bufferClass = IndirectNodeStorageBuffer;
 				const buffer = new bufferClass( node, group );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
@@ -1067,7 +1077,7 @@ ${ flowData.code }
 
 				bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name } : ${ textureType };` );
 
-			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' ) {
+			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' || uniform.type === 'indirectStorageBuffer' ) {
 
 				const bufferNode = uniform.node;
 				const bufferType = this.getType( bufferNode.bufferType );

@@ -171,6 +171,7 @@ export { default as PostProcessing } from './renderers/common/PostProcessing.js'
 export { default as StorageTexture } from './renderers/common/StorageTexture.js';
 export { default as StorageBufferAttribute } from './renderers/common/StorageBufferAttribute.js';
 export { default as StorageInstancedBufferAttribute } from './renderers/common/StorageInstancedBufferAttribute.js';
+export { default as IndirectStorageBufferAttribute } from './renderers/common/IndirectStorageBufferAttribute.js';
 export { default as IESSpotLight } from './lights/webgpu/IESSpotLight.js';
 export { default as NodeLoader } from './loaders/nodes/NodeLoader.js';
 export { default as NodeObjectLoader } from './loaders/nodes/NodeObjectLoader.js';

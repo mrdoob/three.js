@@ -29,12 +29,23 @@ class StorageBufferNode extends BufferNode {
 
 		this.global = true;
 
-		if ( value.isStorageBufferAttribute !== true && value.isStorageInstancedBufferAttribute !== true ) {
+		if ( value.isStorageBufferAttribute !== true && value.isStorageInstancedBufferAttribute !== true && value.isIndirectStorageBufferAttribute !== true ) {
 
-			// TOOD: Improve it, possibly adding a new property to the BufferAttribute to identify it as a storage buffer read-only attribute in Renderer
+		// TOOD: Improve it, possibly adding a new property to the BufferAttribute to identify it as a storage buffer read-only attribute in Renderer
 
-			if ( value.isInstancedBufferAttribute ) value.isStorageInstancedBufferAttribute = true;
-			else value.isStorageBufferAttribute = true;
+			if ( value.isBufferAttribute ) {
+
+				value.isStorageBufferAttribute = true;
+
+			} else if ( value.isInstancedBufferAttribute ) {
+			 
+				value.isStorageInstancedBufferAttribute = true;
+ 
+			} else if ( value.isIndirectBufferAttribute ) {	//todo
+
+				value.isIndirectStorageBufferAttribute = true;
+
+			}
 
 		}
 
@@ -66,7 +77,15 @@ class StorageBufferNode extends BufferNode {
 
 	getInputType( /*builder*/ ) {
 
-		return 'storageBuffer';
+		if ( this.value.isIndirectStorageBufferAttribute ) {
+
+			return 'indirectStorageBuffer';
+
+		} else {
+
+			return 'storageBuffer';
+		
+		}
 
 	}
 
@@ -130,7 +149,7 @@ class StorageBufferNode extends BufferNode {
 
 	getNodeType( builder ) {
 
-		if ( builder.isAvailable( 'storageBuffer' ) ) {
+		if ( builder.isAvailable( 'storageBuffer' ) || builder.isAvailable( 'indirectStorageBuffer' ) ) {
 
 			return super.getNodeType( builder );
 
@@ -144,20 +163,27 @@ class StorageBufferNode extends BufferNode {
 
 	generate( builder ) {
 
-		if ( builder.isAvailable( 'storageBuffer' ) ) {
+		if ( builder.isAvailable( 'storageBuffer' ) || builder.isAvailable( 'indirectStorageBuffer' ) ) {
 
 			return super.generate( builder );
 
 		}
 
-		const { attribute, varying } = this.getAttributeData();
+		const nodeType = this.getNodeType( builder );
 
-		const output = varying.build( builder );
+		if ( this._attribute === null ) {
 
-		builder.registerTransform( output, attribute );
+			this._attribute = bufferAttribute( this.value );
+			this._varying = varying( this._attribute );
+
+		}
+
+		const output = this._varying.build( builder, nodeType );
+		
+		builder.registerTransform( output, this._attribute );
 
 		return output;
-
+		
 	}
 
 }
