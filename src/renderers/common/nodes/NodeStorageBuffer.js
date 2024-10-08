@@ -1,4 +1,4 @@
-import { StorageBuffer, IndirectStorageBuffer}  from '../StorageBuffer.js';
+import { StorageBuffer, IndirectStorageBuffer } from '../StorageBuffer.js';
 import { GPUBufferBindingType } from '../../webgpu/utils/WebGPUConstants.js';
 
 let _id = 0;
