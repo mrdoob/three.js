@@ -398,6 +398,7 @@
 		"webgpu_postprocessing_smaa",
 		"webgpu_postprocessing_sobel",
 		"webgpu_postprocessing_ssaa",
+		"webgpu_postprocessing_ssr",
 		"webgpu_postprocessing_transition",
 		"webgpu_postprocessing",
 		"webgpu_procedural_texture",
