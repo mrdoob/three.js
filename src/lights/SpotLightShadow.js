@@ -12,6 +12,8 @@ class SpotLightShadow extends LightShadow {
 
 		this.focus = 1;
 
+		this.shadowLimit = 500;
+
 	}
 
 	updateMatrices( light ) {
@@ -20,7 +22,7 @@ class SpotLightShadow extends LightShadow {
 
 		const fov = MathUtils.RAD2DEG * 2 * light.angle * this.focus;
 		const aspect = this.mapSize.width / this.mapSize.height;
-		const far = light.distance || camera.far;
+		const far = light.distance || this.shadowLimit;
 
 		if ( fov !== camera.fov || aspect !== camera.aspect || far !== camera.far ) {
 
