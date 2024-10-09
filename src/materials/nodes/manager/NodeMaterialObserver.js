@@ -85,9 +85,15 @@ class NodeMaterialObserver {
 
 		if ( data === undefined ) {
 
+			const { geometry, material } = renderObject;
+
 			data = {
-				material: this.getMaterialData( renderObject.material ),
-				geometry: this.getGeometryData( renderObject.geometry ),
+				material: this.getMaterialData( material ),
+				geometry: {
+					attributes: this.getAttributesData( geometry.attributes ),
+					indexVersion: geometry.index ? geometry.index.version : null,
+					drawRange: { start: geometry.drawRange.start, count: geometry.drawRange.count }
+				},
 				worldMatrix: renderObject.object.matrixWorld.clone()
 			};
 
@@ -114,6 +120,25 @@ class NodeMaterialObserver {
 		}
 
 		return data;
+
+	}
+
+	getAttributesData( attributes ) {
+
+		const attributesData = {};
+
+		for ( const name in attributes ) {
+
+			const attribute = attributes[ name ];
+
+			attributesData[ name ] = {
+				version: attribute.version,
+				uuid: attribute.uuid
+			};
+
+		}
+
+		return attributesData;
 
 	}
 
@@ -335,7 +360,7 @@ class NodeMaterialObserver {
 
 	equals( renderObject ) {
 
-		const { object, material } = renderObject;
+		const { object, material, geometry } = renderObject;
 
 		const renderObjectData = this.getRenderObjectData( renderObject );
 
@@ -391,18 +416,63 @@ class NodeMaterialObserver {
 
 		// geometry
 
-		const geometryData = renderObjectData.geometry;
-		const currentGeometryData = this.getGeometryData( renderObject.geometry );
+		const storedGeometryData = renderObjectData.geometry;
+		const attributes = geometry.attributes;
+		const storedAttributes = storedGeometryData.attributes;
 
-		if ( ! this.compareGeometryData( geometryData, currentGeometryData ) ) {
+		const storedAttributeNames = Object.keys( storedAttributes );
+		const currentAttributeNames = Object.keys( attributes );
 
-			// Update stored geometry data
-			renderObjectData.geometry = currentGeometryData;
+		if ( storedAttributeNames.length !== currentAttributeNames.length ) {
 
+			renderObjectData.geometry.attributes = this.getAttributesData( attributes );
 			return false;
 
 		}
 
+		// Compare each attribute
+		for ( const name of storedAttributeNames ) {
+
+			const storedAttributeData = storedAttributes[ name ];
+			const attribute = attributes[ name ];
+
+			if ( attribute === undefined ) {
+
+				// Attribute was removed
+				delete storedAttributes[ name ];
+				return false;
+
+			}
+
+			if ( storedAttributeData.version !== attribute.version ) {
+
+				storedAttributeData.version = attribute.version;
+				return false;
+
+			}
+
+		}
+
+		// Check index
+		const index = geometry.index;
+		const storedIndexVersion = storedGeometryData.indexVersion;
+		const currentIndexVersion = index ? index.version : null;
+
+		if ( storedIndexVersion !== currentIndexVersion ) {
+
+			storedGeometryData.indexVersion = currentIndexVersion;
+			return false;
+
+		}
+
+		// Check drawRange
+		if ( storedGeometryData.drawRange.start !== geometry.drawRange.start || storedGeometryData.drawRange.count !== geometry.drawRange.count ) {
+
+			storedGeometryData.drawRange.start = geometry.drawRange.start;
+			storedGeometryData.drawRange.count = geometry.drawRange.count;
+			return false;
+
+		}
 
 		// morph targets
 
