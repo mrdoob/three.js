@@ -110,6 +110,12 @@ class TransformControls extends Controls {
 		defineProperty( 'showX', true );
 		defineProperty( 'showY', true );
 		defineProperty( 'showZ', true );
+		defineProperty( 'minX', - Infinity );
+		defineProperty( 'maxX', Infinity );
+		defineProperty( 'minY', - Infinity );
+		defineProperty( 'maxY', Infinity );
+		defineProperty( 'minZ', - Infinity );
+		defineProperty( 'maxZ', Infinity );
 
 		// Reusable utility variables
 
@@ -371,6 +377,10 @@ class TransformControls extends Controls {
 				}
 
 			}
+
+			object.position.x = Math.max( this.minX, Math.min( this.maxX, object.position.x ) );
+			object.position.y = Math.max( this.minY, Math.min( this.maxY, object.position.y ) );
+			object.position.z = Math.max( this.minZ, Math.min( this.maxZ, object.position.z ) );
 
 		} else if ( mode === 'scale' ) {
 
