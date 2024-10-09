@@ -103,7 +103,7 @@ class SSRNode extends TempNode {
 
 		// restore
 
-		PostProcessingUtils.setRendererState( renderer, _rendererState );
+		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
