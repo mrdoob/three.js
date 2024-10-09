@@ -5,6 +5,10 @@ const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
 
+/**
+ * References:
+ * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
+ */
 class SSRNode extends TempNode {
 
 	static get type() {
@@ -48,7 +52,8 @@ class SSRNode extends TempNode {
 
 		// materials
 
-		this._material = null;
+		this._material = new NodeMaterial();
+		this._material.name = 'SSRNode.SSR';
 
 		//
 
@@ -158,7 +163,7 @@ class SSRNode extends TempNode {
 
 			const metalness = this.metalnessNode.uv( uvNode ).r;
 
-			 // Fragments with no metalness do not reflect their environment
+			 // fragments with no metalness do not reflect their environment
 			metalness.equal( 0.0 ).discard();
 
 			// compute some standard FX entities
@@ -172,24 +177,17 @@ class SSRNode extends TempNode {
 			// compute the direction in which the light is reflected on the surface
 			const viewReflectDir = reflect( viewIncidentDir, viewNormal ).toVar();
 
-			// Adapt maximum distance to the local geometry
+			// adapt maximum distance to the local geometry (see https://www.mathsisfun.com/algebra/vectors-dot-product.html)
 			const maxReflectRayLen = this.maxDistance.div( dot( viewIncidentDir.negate(), viewNormal ) ).toVar();
-			// dot(a,b)==length(a)*length(b)*cos(theta) // https://www.mathsisfun.com/algebra/vectors-dot-product.html
-			// if(a.isNormalized&&b.isNormalized) dot(a,b)==cos(theta)
-			// maxDistance/maxReflectRayLen=cos(theta)
-			// maxDistance/maxReflectRayLen==dot(a,b)
-			// maxReflectRayLen==maxDistance/dot(a,b)
 
 			// compute the maximum point of the reflection ray in view space
 			const d1viewPosition = viewPosition.add( viewReflectDir.mul( maxReflectRayLen ) ).toVar();
 
-			// Check if d1viewPosition lies behind the camera near plane
-
+			// check if d1viewPosition lies behind the camera near plane
 			If( this._isPerspectiveCamera.equal( float( 1 ) ).and( d1viewPosition.z.greaterThan( this._cameraNear.negate() ) ), () => {
 
-				// if so, ensure d1viewPosition is clamped on the near plane
+				// if so, ensure d1viewPosition is clamped on the near plane.
 				// this prevents artifacts during the ray marching process
-
 				const t = sub( this._cameraNear.negate(), viewPosition.z ).div( viewReflectDir.z );
 				d1viewPosition.assign( viewPosition.add( viewReflectDir.mul( t ) ) );
 
@@ -220,13 +218,11 @@ class SSRNode extends TempNode {
 			const output = vec4( 0 ).toVar();
 
 			// the actual ray marching loop
-			// starting from d0, the code gradually travels along the ray and looks for an intersection with the geometry
+			// starting from d0, the code gradually travels along the ray and looks for an intersection with the geometry.
 			// it does not exceed d1 (the maximum ray extend)
-
 			Loop( { start: int( 0 ), end: int( this._maxStep ), type: 'int', condition: '<' }, ( { i } ) => {
 
 				// stop if the maximum number of steps is reached for this specific ray
-
 				If( float( i ).greaterThanEqual( totalStep ), () => {
 
 					Break();
@@ -234,11 +230,9 @@ class SSRNode extends TempNode {
 				} );
 
 				// advance on the ray by computing a new position in screen space
-
 				const xy = vec2( d0.x.add( xSpan.mul( float( i ) ) ), d0.y.add( ySpan.mul( float( i ) ) ) ).toVar();
 
 				// stop processing if the new position lies outside of the screen
-
 				If( xy.x.lessThan( 0 ).or( xy.x.greaterThan( this._resolution.x ) ).or( xy.y.lessThan( 0 ) ).or( xy.y.greaterThan( this._resolution.y ) ), () => {
 
 					Break();
@@ -268,17 +262,14 @@ class SSRNode extends TempNode {
 
 				} );
 
-				// If viewReflectRayZ is lower or equal than the real z-coordinate at this place, it hits the geometry
-
+				// if viewReflectRayZ is less or equal than the real z-coordinate at this place, it potentially intersects the geometry
 				If( viewReflectRayZ.lessThanEqual( vZ ), () => {
 
 					// compute the distance of the new location to the ray in view space
 					// to clarify vP is the fragment's view position which is not an exact point on the ray
-
 					const away = pointToLineDistance( vP, viewPosition, d1viewPosition ).toVar();
 
 					// compute the minimum thickness between the current fragment and its neighbor in the x-direction.
-
 					const xyNeighbor = vec2( xy.x.add( 1 ), xy.y ).toVar(); // move one pixel
 					const uvNeighbor = xyNeighbor.div( this._resolution );
 					const vPNeighbor = getViewPosition( uvNeighbor, d, this._cameraProjectionMatrixInverse ).toVar();
@@ -295,37 +286,31 @@ class SSRNode extends TempNode {
 
 							// the reflected ray is pointing towards the same side as the fragment's normal (current ray position),
 							// which means it wouldn't reflect off the surface. The loop continues to the next step for the next ray sample.
-
 							Continue();
 
 						} );
 
-						// This distance represents the depth of the intersection point between the reflected ray and the scene.
-
+						// this distance represents the depth of the intersection point between the reflected ray and the scene.
 						const distance = pointPlaneDistance( vP, viewPosition, viewNormal ).toVar();
 
 						If( distance.greaterThan( this.maxDistance ), () => {
 
 							// Distance exceeding limit: The reflection is potentially too far away and
-							// might not contribute significantly to the final color.
-
+							// might not contribute significantly to the final color
 							Break();
 
 						} );
 
 						// distance attenuation (the reflection should fade out the farther it is away from the surface)
-
 						const ratio = float( 1 ).sub( distance.div( this.maxDistance ) ).toVar();
 						const attenuation = ratio.mul( ratio );
 						const op = this.opacity.mul( attenuation ).toVar();
 
 						// fresnel (reflect more light on surfaces that are viewed at grazing angles)
-
 						const fresnelCoe = div( dot( viewIncidentDir, viewReflectDir ).add( 1 ), 2 );
 						op.mulAssign( fresnelCoe );
 
 						// output
-
 						const reflectColor = this.colorNode.uv( uvNode );
 						output.assign( vec4( reflectColor.rgb, op ) );
 						Break();
@@ -340,10 +325,8 @@ class SSRNode extends TempNode {
 
 		} );
 
-		const material = this._material || ( this._material = new NodeMaterial() );
-		material.fragmentNode = ssr().context( builder.getSharedContext() );
-		material.name = 'SSRNode.SSR';
-		material.needsUpdate = true;
+		this._material.fragmentNode = ssr().context( builder.getSharedContext() );
+		this._material.needsUpdate = true;
 
 		//
 
