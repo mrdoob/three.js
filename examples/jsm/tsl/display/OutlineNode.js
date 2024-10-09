@@ -255,7 +255,7 @@ class OutlineNode extends TempNode {
 
 		// restore
 
-		PostProcessingUtils.setRendererAndSceneState( renderer, scene, _rendererState );
+		PostProcessingUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
 
 	}
 

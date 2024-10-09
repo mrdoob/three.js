@@ -2,7 +2,7 @@ import { Color } from '../../math/Color.js';
 
 // renderer state
 
-export function getRendererState( renderer, state = {} ) {
+export function saveRendererState( renderer, state = {} ) {
 
 	state.toneMapping = renderer.toneMapping;
 	state.toneMappingExposure = renderer.toneMappingExposure;
@@ -24,7 +24,7 @@ export function getRendererState( renderer, state = {} ) {
 
 export function resetRendererState( renderer, state ) {
 
-	state = getRendererState( renderer, state );
+	state = saveRendererState( renderer, state );
 
 	renderer.setMRT( null );
 	renderer.setRenderObjectFunction( null );
@@ -35,7 +35,7 @@ export function resetRendererState( renderer, state ) {
 
 }
 
-export function setRendererState( renderer, state ) {
+export function restoreRendererState( renderer, state ) {
 
 	renderer.toneMapping = state.toneMapping;
 	renderer.toneMappingExposure = state.toneMappingExposure;
@@ -52,9 +52,9 @@ export function setRendererState( renderer, state ) {
 
 // renderer and scene state
 
-export function getRendererAndSceneState( renderer, scene, state = {} ) {
+export function saveRendererAndSceneState( renderer, scene, state = {} ) {
 
-	state = getRendererState( renderer, state );
+	state = saveRendererState( renderer, state );
 	state.background = scene.background;
 	state.backgroundNode = scene.backgroundNode;
 	state.overrideMaterial = scene.overrideMaterial;
@@ -65,7 +65,7 @@ export function getRendererAndSceneState( renderer, scene, state = {} ) {
 
 export function resetRendererAndSceneState( renderer, scene, state ) {
 
-	state = getRendererAndSceneState( renderer, scene, state );
+	state = saveRendererAndSceneState( renderer, scene, state );
 
 	scene.background = null;
 	scene.backgroundNode = null;
@@ -75,9 +75,9 @@ export function resetRendererAndSceneState( renderer, scene, state ) {
 
 }
 
-export function setRendererAndSceneState( renderer, scene, state ) {
+export function restoreRendererAndSceneState( renderer, scene, state ) {
 
-	setRendererState( renderer, state );
+	restoreRendererState( renderer, state );
 
 	scene.background = state.background;
 	scene.backgroundNode = state.backgroundNode;

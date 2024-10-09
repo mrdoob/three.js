@@ -96,7 +96,7 @@ class GaussianBlurNode extends TempNode {
 
 		textureNode.value = currentTexture;
 
-		PostProcessingUtils.setRendererState( renderer, _rendererState );
+		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 

@@ -56,7 +56,7 @@ class AnamorphicNode extends TempNode {
 
 		const { renderer } = frame;
 
-		_rendererState = PostProcessingUtils.getRendererState( renderer, _rendererState );
+		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -81,7 +81,7 @@ class AnamorphicNode extends TempNode {
 
 		textureNode.value = currentTexture;
 
-		PostProcessingUtils.setRendererState( renderer, _rendererState );
+		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
