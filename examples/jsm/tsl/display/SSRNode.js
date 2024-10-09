@@ -1,5 +1,5 @@
 import { NearestFilter, RenderTarget, Vector2, PostProcessingUtils } from 'three';
-import { getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, QuadMesh, TempNode, nodeObject, Fn, NodeUpdateType, passTexture, NodeMaterial, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
+import { getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, QuadMesh, TempNode, nodeObject, Fn, NodeUpdateType, passTexture, NodeMaterial, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -151,14 +151,6 @@ class SSRNode extends TempNode {
 
 		} );
 
-		const viewPositionToSceneUv = Fn( ( [ sampleViewPos ] )=> {
-
-			const sampleClipPos = this._cameraProjectionMatrix.mul( vec4( sampleViewPos, 1.0 ) );
-			const sampleUv = sampleClipPos.xy.div( sampleClipPos.w ).mul( 0.5 ).add( 0.5 ).toVar();
-			return vec2( sampleUv.x, sampleUv.y.oneMinus() );
-
-		} );
-
 		const ssr = Fn( () => {
 
 			const metalness = this.metalnessNode.uv( uvNode ).r;
@@ -195,7 +187,7 @@ class SSRNode extends TempNode {
 
 			// d0 and d1 are the start and maximum points of the reflection ray in screen space
 			const d0 = screenCoordinate.xy.toVar();
-			const d1 = viewPositionToSceneUv( d1viewPosition ).mul( this._resolution ).toVar();
+			const d1 = getScreenPosition( d1viewPosition, this._cameraProjectionMatrix ).mul( this._resolution ).toVar();
 
 			// below variables are used to control the raymarching process
 
