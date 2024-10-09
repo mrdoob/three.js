@@ -237,7 +237,7 @@ class SSRNode extends TempNode {
 
 					Break();
 
-				} );
+				} );
 
 				// compute new uv, depth, viewZ and viewPosition for the new location on the ray
 				const uvNode = xy.div( this._resolution );
@@ -260,7 +260,7 @@ class SSRNode extends TempNode {
 
 					viewReflectRayZ.assign( viewPosition.z.add( s.mul( d1viewPosition.z.sub( viewPosition.z ) ) ) );
 
-				} );
+				} );
 
 				// if viewReflectRayZ is less or equal than the real z-coordinate at this place, it potentially intersects the geometry
 				If( viewReflectRayZ.lessThanEqual( vZ ), () => {
@@ -288,7 +288,7 @@ class SSRNode extends TempNode {
 							// which means it wouldn't reflect off the surface. The loop continues to the next step for the next ray sample.
 							Continue();
 
-						} );
+						} );
 
 						// this distance represents the depth of the intersection point between the reflected ray and the scene.
 						const distance = pointPlaneDistance( vP, viewPosition, viewNormal ).toVar();
@@ -299,7 +299,7 @@ class SSRNode extends TempNode {
 							// might not contribute significantly to the final color
 							Break();
 
-						} );
+						} );
 
 						// distance attenuation (the reflection should fade out the farther it is away from the surface)
 						const ratio = float( 1 ).sub( distance.div( this.maxDistance ) ).toVar();
@@ -315,7 +315,7 @@ class SSRNode extends TempNode {
 						output.assign( vec4( reflectColor.rgb, op ) );
 						Break();
 
-					} );
+					} );
 
 				} );
 
