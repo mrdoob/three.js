@@ -132,8 +132,7 @@ class NodeMaterialObserver {
 			const attribute = attributes[ name ];
 
 			attributesData[ name ] = {
-				version: attribute.version,
-				uuid: attribute.uuid
+				version: attribute.version
 			};
 
 		}
