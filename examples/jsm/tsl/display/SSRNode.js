@@ -293,10 +293,12 @@ class SSRNode extends TempNode {
 
 						} );
 
+						const op = this.opacity.mul( metalness ).toVar();
+
 						// distance attenuation (the reflection should fade out the farther it is away from the surface)
 						const ratio = float( 1 ).sub( distance.div( this.maxDistance ) ).toVar();
 						const attenuation = ratio.mul( ratio );
-						const op = this.opacity.mul( attenuation ).toVar();
+						op.mulAssign( attenuation );
 
 						// fresnel (reflect more light on surfaces that are viewed at grazing angles)
 						const fresnelCoe = div( dot( viewIncidentDir, viewReflectDir ).add( 1 ), 2 );
