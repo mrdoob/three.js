@@ -338,6 +338,8 @@ class SSRNode extends TempNode {
 
 		this._ssrRenderTarget.dispose();
 
+		this._material.dispose();
+
 	}
 
 }
