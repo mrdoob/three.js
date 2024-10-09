@@ -11,23 +11,62 @@ class GridHelper extends LineSegments {
 		color1 = new Color( color1 );
 		color2 = new Color( color2 );
 
-		const center = divisions / 2;
-		const step = size / divisions;
-		const halfSize = size / 2;
+		let sizeX, sizeZ;
+		if ( Array.isArray( size ) ) {
+
+			sizeX = size[ 0 ];
+			sizeZ = size[ 1 ];
+
+		} else {
+
+			sizeX = size;
+			sizeZ = size;
+
+		}
+
+		let divisionsX, divisionsZ;
+		if ( Array.isArray( divisions ) ) {
+
+			divisionsX = divisions[ 0 ];
+			divisionsZ = divisions[ 1 ];
+
+		} else {
+
+			divisionsX = divisions;
+			divisionsZ = divisions;
+
+		}
+
+		const centerX = divisionsX / 2;
+		const centerZ = divisionsZ / 2;
+
+		const stepX = sizeX / divisionsX;
+		const stepZ = sizeZ / divisionsZ;
+
+		const halfSizeX = sizeX / 2;
+		const halfSizeZ = sizeZ / 2;
 
 		const vertices = [], colors = [];
 
-		for ( let i = 0, j = 0, k = - halfSize; i <= divisions; i ++, k += step ) {
+		for ( let i = 0, k = - halfSizeZ; i <= divisionsZ; i ++, k += stepZ ) {
 
-			vertices.push( - halfSize, 0, k, halfSize, 0, k );
-			vertices.push( k, 0, - halfSize, k, 0, halfSize );
+			vertices.push( - halfSizeX, 0, k, halfSizeX, 0, k );
 
-			const color = i === center ? color1 : color2;
+			const color = ( i === centerZ ) ? color1 : color2;
 
-			color.toArray( colors, j ); j += 3;
-			color.toArray( colors, j ); j += 3;
-			color.toArray( colors, j ); j += 3;
-			color.toArray( colors, j ); j += 3;
+			color.toArray( colors, colors.length );
+			color.toArray( colors, colors.length );
+
+		}
+
+		for ( let i = 0, k = - halfSizeX; i <= divisionsX; i ++, k += stepX ) {
+
+			vertices.push( k, 0, - halfSizeZ, k, 0, halfSizeZ );
+
+			const color = ( i === centerX ) ? color1 : color2;
+
+			color.toArray( colors, colors.length );
+			color.toArray( colors, colors.length );
 
 		}
 
