@@ -71,7 +71,7 @@ class StereoPassNode extends PassNode {
 
 		// restore
 
-		PostProcessingUtils.setRendererState( renderer, _rendererState );
+		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 

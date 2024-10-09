@@ -47,7 +47,7 @@ class SSAAPassNode extends PassNode {
 		const { renderer } = frame;
 		const { scene, camera } = this;
 
-		_rendererState = PostProcessingUtils.getRendererAndSceneState( renderer, scene, _rendererState );
+		_rendererState = PostProcessingUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
 
 		//
 
@@ -163,7 +163,7 @@ class SSAAPassNode extends PassNode {
 
 		//
 
-		PostProcessingUtils.setRendererAndSceneState( renderer, scene, _rendererState );
+		PostProcessingUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
 
 	}
 

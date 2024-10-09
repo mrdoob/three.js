@@ -110,7 +110,7 @@ class BloomNode extends TempNode {
 
 		const { renderer } = frame;
 
-		_rendererState = PostProcessingUtils.getRendererState( renderer, _rendererState );
+		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -156,7 +156,7 @@ class BloomNode extends TempNode {
 
 		// restore
 
-		PostProcessingUtils.setRendererState( renderer, _rendererState );
+		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
