@@ -626,7 +626,7 @@ class BatchedMesh extends Mesh {
 		const geometryInfoList = this._geometryInfo;
 		if ( geometryId >= geometryInfoList.length || geometryInfoList[ geometryId ].active === false ) {
 
-			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or inactive.` );
+			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or has been deleted.` );
 
 		}
 
@@ -655,7 +655,7 @@ class BatchedMesh extends Mesh {
 		const instanceInfo = this._instanceInfo;
 		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
 
-			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -848,7 +848,7 @@ class BatchedMesh extends Mesh {
 		const matricesArray = this._matricesTexture.image.data;
 		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
 
-			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -865,7 +865,7 @@ class BatchedMesh extends Mesh {
 		const matricesArray = this._matricesTexture.image.data;
 		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
 
-			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -903,7 +903,7 @@ class BatchedMesh extends Mesh {
 		const instanceInfo = this._instanceInfo;
 		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
 
-			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -922,7 +922,7 @@ class BatchedMesh extends Mesh {
 			instanceInfo[ instanceId ].visible === value
 		) {
 
-			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -945,7 +945,7 @@ class BatchedMesh extends Mesh {
 		const instanceInfo = this._instanceInfo;
 		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
 
-			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -960,14 +960,14 @@ class BatchedMesh extends Mesh {
 		const geometryInfoList = this._geometryInfo;
 		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
 
-			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
 		// check if the provided geometryId is within the valid range
 		if ( geometryId >= geometryInfoList.length || geometryInfoList[ geometryId ].active === false ) {
 
-			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or inactive.` );
+			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or has been deleted.` );
 
 		}
 
@@ -982,7 +982,7 @@ class BatchedMesh extends Mesh {
 		const instanceInfo = this._instanceInfo;
 		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
 
-			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or inactive.` );
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -994,7 +994,7 @@ class BatchedMesh extends Mesh {
 
 		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
 
-			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or inactive.` );
+			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or has been deleted.` );
 
 		}
 
