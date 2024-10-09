@@ -622,9 +622,9 @@ class WebGLBackend extends Backend {
 
 		const contextData = this.get( context );
 
-		const drawParms = renderObject.getDrawParameters();
+		const drawParams = renderObject.getDrawParameters();
 
-		if ( drawParms === null ) return;
+		if ( drawParams === null ) return;
 
 		//
 
@@ -717,8 +717,8 @@ class WebGLBackend extends Backend {
 
 		//
 
-		const { vertexCount, instanceCount } = drawParms;
-		let { firstVertex } = drawParms;
+		const { vertexCount, instanceCount } = drawParams;
+		let { firstVertex } = drawParams;
 
 		renderer.object = object;
 
