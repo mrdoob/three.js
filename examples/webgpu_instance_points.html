@@ -82,6 +82,7 @@
 					minWidth: uniform( 6 ),
 					maxWidth: uniform( 12 ),
 					alphaToCoverage: true,
+					sizeAttenuation: false,
 
 				};
 
@@ -142,6 +143,7 @@
 					pointWidth: 10, // in pixel units
 					vertexColors: true,
 					alphaToCoverage: true,
+					sizeAttenuation: effectController.sizeAttenuation,
 
 				} );
 
@@ -165,6 +167,12 @@
 				gui.add( effectController, 'alphaToCoverage' ).onChange( function ( val ) {
 
 					material.alphaToCoverage = val;
+
+				} );
+
+				gui.add( effectController, 'sizeAttenuation' ).onChange( function ( val ) {
+
+					material.sizeAttenuation = val;
 
 				} );
 
