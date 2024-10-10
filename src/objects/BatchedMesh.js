@@ -651,7 +651,7 @@ class BatchedMesh extends Mesh {
 		const drawRanges = this._drawRanges;
 		if ( geometryId >= drawRanges.length || drawRanges[ geometryId ].active === false ) {
 
-			return this;
+			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or has been deleted.` );
 
 		}
 
@@ -680,7 +680,7 @@ class BatchedMesh extends Mesh {
 		const drawInfo = this._drawInfo;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
-			return this;
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -865,7 +865,7 @@ class BatchedMesh extends Mesh {
 		const matricesArray = this._matricesTexture.image.data;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
-			return this;
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -882,7 +882,7 @@ class BatchedMesh extends Mesh {
 		const matricesArray = this._matricesTexture.image.data;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
-			return null;
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -923,7 +923,7 @@ class BatchedMesh extends Mesh {
 		const drawInfo = this._drawInfo;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
-			return null;
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -933,14 +933,17 @@ class BatchedMesh extends Mesh {
 
 	setVisibleAt( instanceId, value ) {
 
-		// if the geometry is out of range, not active, or visibility state
-		// does not change then return early
 		const drawInfo = this._drawInfo;
 		if (
 			instanceId >= drawInfo.length ||
-			drawInfo[ instanceId ].active === false ||
-			drawInfo[ instanceId ].visible === value
+			drawInfo[ instanceId ].active === false
 		) {
+
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
+
+		}
+
+		if ( drawInfo[ instanceId ].visible === value ) {
 
 			return this;
 
@@ -955,11 +958,10 @@ class BatchedMesh extends Mesh {
 
 	getVisibleAt( instanceId ) {
 
-		// return early if the geometry is out of range or not active
 		const drawInfo = this._drawInfo;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
-			return false;
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -969,18 +971,16 @@ class BatchedMesh extends Mesh {
 
 	setGeometryIdAt( instanceId, geometryId ) {
 
-		// return early if the geometry is out of range or not active
 		const drawInfo = this._drawInfo;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
-			return null;
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
-		// check if the provided geometryId is within the valid range
 		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
 
-			return null;
+			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or has been deleted.` );
 
 		}
 
@@ -995,7 +995,7 @@ class BatchedMesh extends Mesh {
 		const drawInfo = this._drawInfo;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
-			return - 1;
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
 
 		}
 
@@ -1007,7 +1007,7 @@ class BatchedMesh extends Mesh {
 
 		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
 
-			return null;
+			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or has been deleted.` );
 
 		}
 
