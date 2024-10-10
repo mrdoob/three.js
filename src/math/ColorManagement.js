@@ -11,7 +11,7 @@ export const ColorManagement = {
 	 * Implementations of supported color spaces.
 	 *
 	 * Required:
-	 *	- primaries: chromaticity coordinates [ rx ry gx gy bx by ]
+	 *	- primaries: chromaticity coordinates [ rx ry gx gy bx by ]
 	 *	- whitePoint: reference white [ x y ]
 	 *	- transfer: transfer function (pre-defined)
 	 *	- toXYZ: Matrix3 RGB to XYZ transform
