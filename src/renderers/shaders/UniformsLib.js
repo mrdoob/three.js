@@ -1,6 +1,7 @@
 import { Color } from '../../math/Color.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Matrix3 } from '../../math/Matrix3.js';
+import { Vector4 } from '../../math/Vector4.js';
 
 /**
  * Uniforms library for shared webgl shaders
@@ -19,7 +20,9 @@ const UniformsLib = {
 		alphaMap: { value: null },
 		alphaMapTransform: { value: /*@__PURE__*/ new Matrix3() },
 
-		alphaTest: { value: 0 }
+		alphaTest: { value: 0 },
+
+		lookCDL: { value: /*@__PURE__*/ new Vector4() },
 
 	},
 

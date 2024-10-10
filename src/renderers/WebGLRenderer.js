@@ -143,10 +143,12 @@ class WebGLRenderer {
 
 		this._outputColorSpace = SRGBColorSpace;
 
-		// tone mapping
+		// image formation
 
 		this.toneMapping = NoToneMapping;
 		this.toneMappingExposure = 1.0;
+
+		this._lookCDL = new Vector4( 1, 0, 1, 1 );
 
 		// internal properties
 
@@ -501,6 +503,12 @@ class WebGLRenderer {
 		this.setTransparentSort = function ( method ) {
 
 			_transparentSort = method;
+
+		};
+
+		this.setLookCDL = function ( slope = 1, offset = 0, power = 1, saturation = 1 ) {
+
+			this._lookCDL.set( slope, offset, power, saturation );
 
 		};
 
@@ -1652,6 +1660,7 @@ class WebGLRenderer {
 			materialProperties.fog = scene.fog;
 			materialProperties.envMap = ( material.isMeshStandardMaterial ? cubeuvmaps : cubemaps ).get( material.envMap || materialProperties.environment );
 			materialProperties.envMapRotation = ( materialProperties.environment !== null && material.envMap === null ) ? scene.environmentRotation : material.envMapRotation;
+			materialProperties.lookCDL = _this._lookCDL;
 
 			if ( programs === undefined ) {
 
