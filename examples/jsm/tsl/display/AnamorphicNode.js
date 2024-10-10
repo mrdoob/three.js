@@ -1,7 +1,9 @@
-import { RenderTarget, Vector2 } from 'three';
+import { RenderTarget, Vector2, PostProcessingUtils } from 'three';
 import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, convertToTexture, QuadMesh, NodeMaterial, vec2, vec3, Loop, threshold } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
+
+let _rendererState;
 
 class AnamorphicNode extends TempNode {
 
@@ -54,12 +56,15 @@ class AnamorphicNode extends TempNode {
 
 		const { renderer } = frame;
 
+		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+
+		//
+
 		const textureNode = this.textureNode;
 		const map = textureNode.value;
 
 		this._renderTarget.texture.type = map.type;
 
-		const currentRenderTarget = renderer.getRenderTarget();
 		const currentTexture = textureNode.value;
 
 		_quadMesh.material = this._material;
@@ -74,8 +79,9 @@ class AnamorphicNode extends TempNode {
 
 		// restore
 
-		renderer.setRenderTarget( currentRenderTarget );
 		textureNode.value = currentTexture;
+
+		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 

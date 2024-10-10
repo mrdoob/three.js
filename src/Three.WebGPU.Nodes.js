@@ -167,6 +167,8 @@ export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.Nod
 export { default as QuadMesh } from './renderers/common/QuadMesh.js';
 export { default as PMREMGenerator } from './renderers/common/extras/PMREMGenerator.js';
 export { default as PostProcessing } from './renderers/common/PostProcessing.js';
+import * as PostProcessingUtils from './renderers/common/PostProcessingUtils.js';
+export { PostProcessingUtils };
 export { default as StorageTexture } from './renderers/common/StorageTexture.js';
 export { default as StorageBufferAttribute } from './renderers/common/StorageBufferAttribute.js';
 export { default as StorageInstancedBufferAttribute } from './renderers/common/StorageInstancedBufferAttribute.js';
