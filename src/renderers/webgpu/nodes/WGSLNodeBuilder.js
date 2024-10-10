@@ -527,7 +527,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
 
-				const bufferClass = ( type === 'storageBuffer' || type === 'indirectStorageBuffer' ) ? NodeStorageBuffer : NodeUniformBuffer;
+				const bufferClass = type === 'buffer' ? NodeUniformBuffer : NodeStorageBuffer;
 
 				const buffer = new bufferClass( node, group );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );

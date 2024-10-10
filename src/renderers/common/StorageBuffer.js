@@ -10,8 +10,6 @@ class StorageBuffer extends Buffer {
 
 		this.isStorageBuffer = true;
 
-		this.isIndirect = attribute ? attribute.indirect : false;
-
 	}
 
 }
