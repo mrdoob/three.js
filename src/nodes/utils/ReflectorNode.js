@@ -83,12 +83,6 @@ class ReflectorNode extends TextureNode {
 
 	}
 
-	getTextureNode() {
-
-		return this.textureNode;
-
-	}
-
 	getVirtualCamera( camera ) {
 
 		let virtualCamera = this.virtualCameras.get( camera );
