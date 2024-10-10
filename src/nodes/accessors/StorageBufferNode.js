@@ -66,7 +66,7 @@ class StorageBufferNode extends BufferNode {
 
 	getInputType( /*builder*/ ) {
 
-		return 'storageBuffer';
+		return this.value.isIndirectStorageBufferAttribute ? 'indirectStorageBuffer' : 'storageBuffer';
 
 	}
 
@@ -130,7 +130,7 @@ class StorageBufferNode extends BufferNode {
 
 	getNodeType( builder ) {
 
-		if ( builder.isAvailable( 'storageBuffer' ) ) {
+		if ( builder.isAvailable( 'storageBuffer' ) || builder.isAvailable( 'indirectStorageBuffer' ) ) {
 
 			return super.getNodeType( builder );
 
@@ -144,7 +144,7 @@ class StorageBufferNode extends BufferNode {
 
 	generate( builder ) {
 
-		if ( builder.isAvailable( 'storageBuffer' ) ) {
+		if ( builder.isAvailable( 'storageBuffer' ) || builder.isAvailable( 'indirectStorageBuffer' ) ) {
 
 			return super.generate( builder );
 

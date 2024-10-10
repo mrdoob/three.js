@@ -386,7 +386,7 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				return name;
 
-			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
+			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
 
 				return `NodeBuffer_${ node.id }.${name}`;
 
@@ -525,9 +525,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
+			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
 
-				const bufferClass = type === 'storageBuffer' ? NodeStorageBuffer : NodeUniformBuffer;
+				const bufferClass = type === 'buffer' ? NodeUniformBuffer : NodeStorageBuffer;
+
 				const buffer = new bufferClass( node, group );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
@@ -1067,7 +1068,7 @@ ${ flowData.code }
 
 				bindingSnippets.push( `@binding( ${ uniformIndexes.binding ++ } ) @group( ${ uniformIndexes.group } ) var ${ uniform.name } : ${ textureType };` );
 
-			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' ) {
+			} else if ( uniform.type === 'buffer' || uniform.type === 'storageBuffer' || uniform.type === 'indirectStorageBuffer' ) {
 
 				const bufferNode = uniform.node;
 				const bufferType = this.getType( bufferNode.bufferType );

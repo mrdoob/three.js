@@ -45,6 +45,10 @@ class Attributes extends DataMap {
 
 				this.backend.createStorageAttribute( attribute );
 
+			} else if ( type === AttributeType.INDIRECT ) {
+
+				this.backend.createIndirectStorageAttribute( attribute );
+
 			}
 
 			data.version = this._getBufferAttribute( attribute ).version;
