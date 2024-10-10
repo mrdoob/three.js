@@ -410,11 +410,13 @@ Editor.prototype = {
 
 				} else if ( object.isSkinnedMesh ) {
 
-					helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
+					// Note, axes helper size is not known, depends on object size. TODO: Calculate it automatically.
+					helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ], { axesHelperSize: 0 } );
 
 				} else if ( object.isBone === true && object.parent && object.parent.isBone !== true ) {
 
-					helper = new THREE.SkeletonHelper( object );
+					// Note, axes helper size is not known, depends on object size. TODO: Calculate it automatically.
+					helper = new THREE.SkeletonHelper( object, { axesHelperSize: 0 } );
 
 				} else {
 
