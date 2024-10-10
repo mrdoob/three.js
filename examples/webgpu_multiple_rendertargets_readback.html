@@ -72,7 +72,6 @@
 
 				readbackTarget = new THREE.RenderTarget( size, size, { count: 2 } );
 
-				pixelBuffer = new Uint8Array( size ** 2 * 4 ).fill( 0 );
 				pixelBufferTexture = new THREE.DataTexture( pixelBuffer, size, size );
 				pixelBufferTexture.type = THREE.UnsignedByteType;
 				pixelBufferTexture.format = THREE.RGBAFormat;
@@ -174,6 +173,8 @@
 				const height = readbackTarget.height;
 
 				const selection = options.selection;
+
+				if ( pixelBuffer !== undefined ) renderer.recycleBuffer( pixelBuffer );
 
 				if ( selection === 'diffuse' ) {
 
