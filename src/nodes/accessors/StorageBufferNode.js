@@ -159,22 +159,13 @@ class StorageBufferNode extends BufferNode {
 
 		}
 
-		const nodeType = this.getNodeType( builder );
+		const { attribute, varying } = this.getAttributeData();
 
-		if ( this._attribute === null ) {
+		const output = varying.build( builder );
 
-			this._attribute = bufferAttribute( this.value );
-			this._varying = varying( this._attribute );
-
-		}
-
-		const output = this._varying.build( builder, nodeType );
-
-
-		builder.registerTransform( output, this._attribute );
+		builder.registerTransform( output, attribute );
 
 		return output;
-
 
 	}
 
