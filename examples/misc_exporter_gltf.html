@@ -29,10 +29,11 @@
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import * as TextureUtils from 'three/addons/utils/WebGLTextureUtils.js';
 
 			function exportGLTF( input ) {
 
-				const gltfExporter = new GLTFExporter();
+				const gltfExporter = new GLTFExporter().setTextureUtils( TextureUtils );
 
 				const options = {
 					trs: params.trs,
