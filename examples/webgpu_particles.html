@@ -109,7 +109,7 @@
 				scene.add( fireInstancedSprite );
 
 				// indirect draw ( optional )
-				// each indirect draw call is 5 uint32 values
+				// each indirect draw call is 5 uint32 values for indexes ( different structure for non-indexed draw calls using 4 uint32 values )
 
 				const indexCount = fireGeometry.index.array.length;
 
