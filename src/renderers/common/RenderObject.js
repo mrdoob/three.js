@@ -150,6 +150,12 @@ export default class RenderObject {
 
 	}
 
+	getIndirect() {
+
+		return this._geometries.getIndirect( this );
+
+	}
+
 	getChainArray() {
 
 		return [ this.object, this.material, this.context, this.lightsNode ];
