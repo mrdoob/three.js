@@ -17,8 +17,8 @@ class DirectionalLightHelper extends Object3D {
 
 		this.light = light;
 
-		this.matrix = light.matrixWorld;
-		this.matrixAutoUpdate = false;
+		this.matrixWorld = light.matrixWorld;
+		this.matrixWorldAutoUpdate = false;
 
 		this.color = color;
 
