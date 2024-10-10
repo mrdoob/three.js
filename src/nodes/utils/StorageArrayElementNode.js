@@ -41,17 +41,6 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		}
 
-		//maybe can combinde with step before
-		if ( builder.isAvailable( 'indirectStorageBuffer' ) === false ) {
-
-			if ( this.node.bufferObject === true ) {
-
-				builder.setupPBO( this.node );
-
-			}
-
-		}
-
 		return super.setup( builder );
 
 	}
@@ -65,18 +54,6 @@ class StorageArrayElementNode extends ArrayElementNode {
 		//
 
 		if ( builder.isAvailable( 'storageBuffer' ) === false ) {
-
-			if ( this.node.bufferObject === true && isAssignContext !== true ) {
-
-				snippet = builder.generatePBO( this );
-
-			} else {
-
-				snippet = this.node.build( builder );
-
-			}
-
-		} else if ( builder.isAvailable( 'indirectStorageBuffer' ) === false ) {
 
 			if ( this.node.bufferObject === true && isAssignContext !== true ) {
 

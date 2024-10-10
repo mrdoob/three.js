@@ -66,16 +66,7 @@ class StorageBufferNode extends BufferNode {
 
 	getInputType( /*builder*/ ) {
 
-		if ( this.value.isIndirect ) {
-
-			return 'indirectStorageBuffer';
-
-		} else {
-
-			return 'storageBuffer';
-
-
-		}
+		return this.value.isIndirectStorageBufferAttribute ? 'indirectStorageBuffer' : 'storageBuffer';
 
 	}
 

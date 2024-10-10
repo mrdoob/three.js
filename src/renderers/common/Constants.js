@@ -1,8 +1,8 @@
 export const AttributeType = {
 	VERTEX: 1,
 	INDEX: 2,
-	STORAGE: 4,	//maybe 3 for STORAGE and 4 for INDIRECT ?
-	INDIRECT: 5
+	STORAGE: 3,
+	INDIRECT: 4
 };
 
 // size of a chunk in bytes (STD140 layout)
