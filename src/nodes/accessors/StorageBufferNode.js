@@ -29,23 +29,12 @@ class StorageBufferNode extends BufferNode {
 
 		this.global = true;
 
-		if ( value.isStorageBufferAttribute !== true && value.isStorageInstancedBufferAttribute !== true && value.isIndirectStorageBufferAttribute !== true ) {
+		if ( value.isStorageBufferAttribute !== true && value.isStorageInstancedBufferAttribute !== true ) {
 
-		// TOOD: Improve it, possibly adding a new property to the BufferAttribute to identify it as a storage buffer read-only attribute in Renderer
+			// TOOD: Improve it, possibly adding a new property to the BufferAttribute to identify it as a storage buffer read-only attribute in Renderer
 
-			if ( value.isBufferAttribute ) {
-
-				value.isStorageBufferAttribute = true;
-
-			} else if ( value.isInstancedBufferAttribute ) {
-			 
-				value.isStorageInstancedBufferAttribute = true;
- 
-			} else if ( value.isIndirectBufferAttribute ) {	//todo
-
-				value.isIndirectStorageBufferAttribute = true;
-
-			}
+			if ( value.isInstancedBufferAttribute ) value.isStorageInstancedBufferAttribute = true;
+			else value.isStorageBufferAttribute = true;
 
 		}
 
@@ -77,14 +66,14 @@ class StorageBufferNode extends BufferNode {
 
 	getInputType( /*builder*/ ) {
 
-		if ( this.value.isIndirectStorageBufferAttribute ) {
+		if ( this.value.isIndirect ) {
 
 			return 'indirectStorageBuffer';
 
 		} else {
 
 			return 'storageBuffer';
-		
+
 		}
 
 	}
@@ -179,11 +168,11 @@ class StorageBufferNode extends BufferNode {
 		}
 
 		const output = this._varying.build( builder, nodeType );
-		
+
 		builder.registerTransform( output, this._attribute );
 
 		return output;
-		
+
 	}
 
 }

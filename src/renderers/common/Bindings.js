@@ -104,7 +104,7 @@ class Bindings extends DataMap {
 
 				this.attributes.update( attribute, AttributeType.STORAGE );
 
-			} else if ( binding.isIndirectStorageBuffer ) {
+			} else if ( binding.isStorageBuffer && binding.isIndirect ) {
 
 				const attribute = binding.attribute;
 

@@ -4,7 +4,7 @@ import NodeSampler from '../../common/nodes/NodeSampler.js';
 import { NodeSampledTexture, NodeSampledCubeTexture, NodeSampledTexture3D } from '../../common/nodes/NodeSampledTexture.js';
 
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
-import { NodeStorageBuffer, IndirectNodeStorageBuffer } from '../../common/nodes/NodeStorageBuffer.js';
+import NodeStorageBuffer from '../../common/nodes/NodeStorageBuffer.js';
 
 import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
 
@@ -525,19 +525,10 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 				}
 
-			} else if ( type === 'buffer' || type === 'storageBuffer' ) {
+			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
 
-				const bufferClass = type === 'storageBuffer' ? NodeStorageBuffer : NodeUniformBuffer;
-				const buffer = new bufferClass( node, group );
-				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
+				const bufferClass = ( type === 'storageBuffer' || type === 'indirectStorageBuffer' ) ? NodeStorageBuffer : NodeUniformBuffer;
 
-				bindings.push( buffer );
-
-				uniformGPU = buffer;
-
-			} else if ( type === 'indirectStorageBuffer' ) {
-
-				const bufferClass = IndirectNodeStorageBuffer;
 				const buffer = new bufferClass( node, group );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
