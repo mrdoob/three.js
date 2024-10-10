@@ -110,7 +110,7 @@ class Bindings extends DataMap {
 
 				this.attributes.update( attribute, AttributeType.STORAGE );
 
-			} 
+			}
 
 		}
 
