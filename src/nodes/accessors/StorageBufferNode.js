@@ -74,6 +74,7 @@ class StorageBufferNode extends BufferNode {
 
 			return 'storageBuffer';
 
+
 		}
 
 	}
@@ -169,9 +170,11 @@ class StorageBufferNode extends BufferNode {
 
 		const output = this._varying.build( builder, nodeType );
 
+
 		builder.registerTransform( output, this._attribute );
 
 		return output;
+
 
 	}
 
