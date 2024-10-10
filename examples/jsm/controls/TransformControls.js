@@ -536,12 +536,7 @@ class TransformControls extends Controls {
 
 		this.disconnect();
 
-		this.traverse( function ( child ) {
-
-			if ( child.geometry ) child.geometry.dispose();
-			if ( child.material ) child.material.dispose();
-
-		} );
+		this._root.dispose();
 
 	}
 
@@ -808,6 +803,17 @@ class TransformControlsRoot extends Object3D {
 		}
 
 		super.updateMatrixWorld( force );
+
+	}
+
+	dispose() {
+
+		this.traverse( function ( child ) {
+
+			if ( child.geometry ) child.geometry.dispose();
+			if ( child.material ) child.material.dispose();
+
+		} );
 
 	}
 

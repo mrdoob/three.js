@@ -1,6 +1,7 @@
 import {
 	BufferGeometry,
 	Float32BufferAttribute,
+	Matrix3,
 	Matrix4,
 	Vector3
 } from 'three';
@@ -36,6 +37,8 @@ class DecalGeometry extends BufferGeometry {
 
 		const plane = new Vector3();
 
+		const normalMatrix = new Matrix3().getNormalMatrix( mesh.matrixWorld );
+
 		// this matrix represents the transformation of the decal projector
 
 		const projectorMatrix = new Matrix4();
@@ -52,8 +55,15 @@ class DecalGeometry extends BufferGeometry {
 		// build geometry
 
 		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-		this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 		this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+
+		if ( normals.length > 0 ) {
+
+			this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+
+		}
+
+		//
 
 		function generate() {
 
@@ -83,9 +93,17 @@ class DecalGeometry extends BufferGeometry {
 				for ( let i = 0; i < index.count; i ++ ) {
 
 					vertex.fromBufferAttribute( positionAttribute, index.getX( i ) );
-					normal.fromBufferAttribute( normalAttribute, index.getX( i ) );
 
-					pushDecalVertex( decalVertices, vertex, normal );
+					if ( normalAttribute ) {
+
+						normal.fromBufferAttribute( normalAttribute, index.getX( i ) );
+						pushDecalVertex( decalVertices, vertex, normal );
+
+					} else {
+
+						pushDecalVertex( decalVertices, vertex );
+
+					}
 
 				}
 
@@ -96,9 +114,17 @@ class DecalGeometry extends BufferGeometry {
 				for ( let i = 0; i < positionAttribute.count; i ++ ) {
 
 					vertex.fromBufferAttribute( positionAttribute, i );
-					normal.fromBufferAttribute( normalAttribute, i );
 
-					pushDecalVertex( decalVertices, vertex, normal );
+					if ( normalAttribute ) {
+
+						normal.fromBufferAttribute( normalAttribute, i );
+						pushDecalVertex( decalVertices, vertex, normal );
+
+					} else {
+
+						pushDecalVertex( decalVertices, vertex );
+
+					}
 
 				}
 
@@ -133,22 +159,34 @@ class DecalGeometry extends BufferGeometry {
 				// now create vertex and normal buffer data
 
 				vertices.push( decalVertex.position.x, decalVertex.position.y, decalVertex.position.z );
-				normals.push( decalVertex.normal.x, decalVertex.normal.y, decalVertex.normal.z );
+
+				if ( decalVertex.normal !== null ) {
+
+					normals.push( decalVertex.normal.x, decalVertex.normal.y, decalVertex.normal.z );
+
+				}
 
 			}
 
 		}
 
-		function pushDecalVertex( decalVertices, vertex, normal ) {
+		function pushDecalVertex( decalVertices, vertex, normal = null ) {
 
 			// transform the vertex to world space, then to projector space
 
 			vertex.applyMatrix4( mesh.matrixWorld );
 			vertex.applyMatrix4( projectorMatrixInverse );
 
-			normal.transformDirection( mesh.matrixWorld );
+			if ( normal ) {
 
-			decalVertices.push( new DecalVertex( vertex.clone(), normal.clone() ) );
+				normal.applyNormalMatrix( normalMatrix );
+				decalVertices.push( new DecalVertex( vertex.clone(), normal.clone() ) );
+
+			} else {
+
+				decalVertices.push( new DecalVertex( vertex.clone() ) );
+
+			}
 
 		}
 
@@ -310,18 +348,25 @@ class DecalGeometry extends BufferGeometry {
 
 			const s0 = d0 / ( d0 - d1 );
 
-			const v = new DecalVertex(
-				new Vector3(
-					v0.position.x + s0 * ( v1.position.x - v0.position.x ),
-					v0.position.y + s0 * ( v1.position.y - v0.position.y ),
-					v0.position.z + s0 * ( v1.position.z - v0.position.z )
-				),
-				new Vector3(
+			const position = new Vector3(
+				v0.position.x + s0 * ( v1.position.x - v0.position.x ),
+				v0.position.y + s0 * ( v1.position.y - v0.position.y ),
+				v0.position.z + s0 * ( v1.position.z - v0.position.z )
+			);
+
+			let normal = null;
+
+			if ( v0.normal !== null && v1.normal !== null ) {
+
+				normal = new Vector3(
 					v0.normal.x + s0 * ( v1.normal.x - v0.normal.x ),
 					v0.normal.y + s0 * ( v1.normal.y - v0.normal.y ),
 					v0.normal.z + s0 * ( v1.normal.z - v0.normal.z )
-				)
-			);
+				);
+
+			}
+
+			const v = new DecalVertex( position, normal );
 
 			// need to clip more values (texture coordinates)? do it this way:
 			// intersectpoint.value = a.value + s * ( b.value - a.value );
@@ -338,7 +383,7 @@ class DecalGeometry extends BufferGeometry {
 
 class DecalVertex {
 
-	constructor( position, normal ) {
+	constructor( position, normal = null ) {
 
 		this.position = position;
 		this.normal = normal;
@@ -347,7 +392,10 @@ class DecalVertex {
 
 	clone() {
 
-		return new this.constructor( this.position.clone(), this.normal.clone() );
+		const position = this.position.clone();
+		const normal = ( this.normal !== null ) ? this.normal.clone() : null;
+
+		return new this.constructor( position, normal );
 
 	}
 

@@ -167,8 +167,21 @@
 		<p>
 			[page:Integer instanceId]: The id of an instance to get the visibility state of.
 		</p>
-		<p>Get whether the given instance is marked as "visible" or not.</p>
-		
+		<p>Get whether the given instance is marked as "visible" or not.</p>		
+
+		<h3>
+			[method:Object getGeometryRangeAt]( [param:Integer geometryId], [param:Object target] )
+		</h3>
+		<p>
+			[page:Integer geometryId]: The id of the geometry to get the range of.
+		</p>
+		<p>
+			[page:Object target]: Optional target object to copy the range in to.
+		</p>
+		<p>Get the range representing the subset of triangles related to the attached geometry, indicating the starting offset and count, or `null` if invalid.</p>
+		<p>Return an object of the form:</p>
+		<code>{ start: Integer, count: Integer }</code>
+	
 		<h3>
 			[method:Integer getGeometryIdAt]( [param:Integer instanceId] )
 		</h3>
@@ -176,7 +189,7 @@
 			[page:Integer instanceId]: The id of an instance to get the geometryIndex of.
 		</p>
 		<p>Get the geometryIndex of the defined instance.</p>
-	
+
 		<h3>
 			[method:undefined setColorAt]( [param:Integer instanceId], [param:Color color] )
 		</h3>
@@ -247,7 +260,13 @@
 		<p>
 			Adds the given geometry to the [name] and returns the associated geometry id referring to it to be used in other functions.
 		</p>
-
+		<h3>
+			[method:Integer deleteGeometry]( [param:Integer geometryId] )
+		</h3>
+		<p>
+			[page:Integer geometryId]: The id of a geometry to remove from the [name] that was previously added via "addGeometry". Any instances referencing
+			this geometry will also be removed as a side effect.
+		</p>
 		<h3>
 			[method:Integer addInstance]( [param:Integer geometryId] )
 		</h3>
@@ -280,6 +299,14 @@
 		<p>
 			Replaces the geometry at `geometryId` with the provided geometry. Throws an error if there is not enough space reserved for geometry.
 			Calling this will change all instances that are rendering that geometry.
+		</p>
+
+
+		<h3>
+			[method:this optimize]()
+		</h3>
+		<p>
+			Repacks the sub geometries in [name] to remove any unused space remaining from previously deleted geometry, freeing up space to add new geometry.
 		</p>
 
 		<!--

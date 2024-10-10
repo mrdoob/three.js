@@ -6,6 +6,7 @@ import { NodeFrame } from '../../../nodes/Nodes.js';
 import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, normalWorld, pmremTexture, screenUV } from '../../../nodes/TSL.js';
 
 import { CubeUVReflectionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
+import { hashArray } from '../../../nodes/core/NodeUtils.js';
 
 const outputNodeMap = new WeakMap();
 
@@ -226,15 +227,17 @@ class Nodes extends DataMap {
 			const environmentNode = this.getEnvironmentNode( scene );
 			const fogNode = this.getFogNode( scene );
 
-			const cacheKey = [];
+			const values = [];
 
-			if ( lightsNode ) cacheKey.push( lightsNode.getCacheKey( true ) );
-			if ( environmentNode ) cacheKey.push( environmentNode.getCacheKey() );
-			if ( fogNode ) cacheKey.push( fogNode.getCacheKey() );
+			if ( lightsNode ) values.push( lightsNode.getCacheKey( true ) );
+			if ( environmentNode ) values.push( environmentNode.getCacheKey() );
+			if ( fogNode ) values.push( fogNode.getCacheKey() );
+
+			values.push( this.renderer.shadowMap.enabled ? 1 : 0 );
 
 			cacheKeyData = {
 				callId,
-				cacheKey: cacheKey.join( ',' )
+				cacheKey: hashArray( values )
 			};
 
 			this.callHashCache.set( chain, cacheKeyData );

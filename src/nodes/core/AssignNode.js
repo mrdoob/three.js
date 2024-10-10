@@ -80,7 +80,7 @@ class AssignNode extends TempNode {
 			const sourceVar = builder.getVarFromNode( this, null, targetType );
 			const sourceProperty = builder.getPropertyName( sourceVar );
 
-			builder.addLineFlowCode( `${ sourceProperty } = ${ source }` );
+			builder.addLineFlowCode( `${ sourceProperty } = ${ source }`, this );
 
 			const targetRoot = targetNode.node.context( { assign: true } ).build( builder );
 
@@ -88,7 +88,7 @@ class AssignNode extends TempNode {
 
 				const component = targetNode.components[ i ];
 
-				builder.addLineFlowCode( `${ targetRoot }.${ component } = ${ sourceProperty }[ ${ i } ]` );
+				builder.addLineFlowCode( `${ targetRoot }.${ component } = ${ sourceProperty }[ ${ i } ]`, this );
 
 			}
 
@@ -104,7 +104,7 @@ class AssignNode extends TempNode {
 
 			if ( output === 'void' || sourceType === 'void' ) {
 
-				builder.addLineFlowCode( snippet );
+				builder.addLineFlowCode( snippet, this );
 
 				if ( output !== 'void' ) {
 

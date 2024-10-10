@@ -16,6 +16,8 @@ import { Loop } from '../utils/LoopNode.js';
 import { screenCoordinate } from '../display/ScreenNode.js';
 import { HalfFloatType, LessCompare, RGFormat, VSMShadowMap, WebGPUCoordinateSystem } from '../../constants.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
+import { perspectiveDepthToLogarithmicDepth } from '../display/ViewportDepthNode.js';
+import { hash } from '../core/NodeUtils.js';
 
 const BasicShadowMap = Fn( ( { depthTexture, shadowCoord } ) => {
 
@@ -238,7 +240,7 @@ class AnalyticLightNode extends LightingNode {
 
 	getCacheKey() {
 
-		return super.getCacheKey() + '-' + ( this.light.id + '-' + ( this.light.castShadow ? '1' : '0' ) );
+		return hash( super.getCacheKey(), this.light.id, this.light.castShadow ? 1 : 0 );
 
 	}
 
@@ -251,6 +253,8 @@ class AnalyticLightNode extends LightingNode {
 	setupShadow( builder ) {
 
 		const { object, renderer } = builder;
+
+		if ( renderer.shadowMap.enabled === false ) return;
 
 		let shadowColorNode = this.shadowColorNode;
 
@@ -311,20 +315,40 @@ class AnalyticLightNode extends LightingNode {
 			const position = object.material.shadowPositionNode || positionWorld;
 
 			let shadowCoord = uniform( shadow.matrix ).setGroup( renderGroup ).mul( position.add( normalWorld.mul( normalBias ) ) );
-			shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
 
-			let coordZ = shadowCoord.z.add( bias );
+			let coordZ;
 
-			if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) {
+			if ( shadow.camera.isOrthographicCamera || renderer.logarithmicDepthBuffer !== true ) {
 
-				coordZ = coordZ.mul( 2 ).sub( 1 ); // WebGPU: Convertion [ 0, 1 ] to [ - 1, 1 ]
+				shadowCoord = shadowCoord.xyz.div( shadowCoord.w );
+
+				coordZ = shadowCoord.z;
+
+				if ( renderer.coordinateSystem === WebGPUCoordinateSystem ) {
+
+					coordZ = coordZ.mul( 2 ).sub( 1 ); // WebGPU: Conversion [ 0, 1 ] to [ - 1, 1 ]
+
+				}
+
+			} else {
+
+				const w = shadowCoord.w;
+				shadowCoord = shadowCoord.xy.div( w ); // <-- Only divide X/Y coords since we don't need Z
+
+				// The normally available "cameraNear" and "cameraFar" nodes cannot be used here because they do not get
+				// updated to use the shadow camera. So, we have to declare our own "local" ones here.
+				// TODO: Can we fix cameraNear/cameraFar in src/nodes/accessors/Camera.js so we don't have to declare local ones here?
+				const cameraNearLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.near );
+				const cameraFarLocal = uniform( 'float' ).onRenderUpdate( () => shadow.camera.far );
+
+				coordZ = perspectiveDepthToLogarithmicDepth( w, cameraNearLocal, cameraFarLocal );
 
 			}
 
 			shadowCoord = vec3(
 				shadowCoord.x,
 				shadowCoord.y.oneMinus(), // follow webgpu standards
-				coordZ
+				coordZ.add( bias )
 			);
 
 			const frustumTest = shadowCoord.x.greaterThanEqual( 0 )

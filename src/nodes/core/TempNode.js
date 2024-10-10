@@ -42,7 +42,7 @@ class TempNode extends Node {
 				const nodeVar = builder.getVarFromNode( this, null, type );
 				const propertyName = builder.getPropertyName( nodeVar );
 
-				builder.addLineFlowCode( `${propertyName} = ${snippet}` );
+				builder.addLineFlowCode( `${propertyName} = ${snippet}`, this );
 
 				nodeData.snippet = snippet;
 				nodeData.propertyName = propertyName;

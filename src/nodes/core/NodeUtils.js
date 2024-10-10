@@ -5,26 +5,68 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 
+// cyrb53 (c) 2018 bryc (github.com/bryc). License: Public domain. Attribution appreciated.
+// A fast and simple 64-bit (or 53-bit) string hash function with decent collision resistance.
+// Largely inspired by MurmurHash2/3, but with a focus on speed/simplicity.
+// See https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript/52171480#52171480
+// https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
+function cyrb53( value, seed = 0 ) {
+
+	let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+
+	if ( value instanceof Array ) {
+
+		for ( let i = 0, val; i < value.length; i ++ ) {
+
+			val = value[ i ];
+			h1 = Math.imul( h1 ^ val, 2654435761 );
+			h2 = Math.imul( h2 ^ val, 1597334677 );
+
+		}
+
+	} else {
+
+		for ( let i = 0, ch; i < value.length; i ++ ) {
+
+			ch = value.charCodeAt( i );
+			h1 = Math.imul( h1 ^ ch, 2654435761 );
+			h2 = Math.imul( h2 ^ ch, 1597334677 );
+
+		}
+
+	}
+
+	h1 = Math.imul( h1 ^ ( h1 >>> 16 ), 2246822507 );
+	h1 ^= Math.imul( h2 ^ ( h2 >>> 13 ), 3266489909 );
+	h2 = Math.imul( h2 ^ ( h2 >>> 16 ), 2246822507 );
+	h2 ^= Math.imul( h1 ^ ( h1 >>> 13 ), 3266489909 );
+
+	return 4294967296 * ( 2097151 & h2 ) + ( h1 >>> 0 );
+
+}
+
+export const hashString = ( str ) => cyrb53( str );
+export const hashArray = ( array ) => cyrb53( array );
+export const hash = ( ...params ) => cyrb53( params );
+
 export function getCacheKey( object, force = false ) {
 
-	let cacheKey = '{';
+	const values = [];
 
 	if ( object.isNode === true ) {
 
-		cacheKey += object.id;
+		values.push( object.id );
 		object = object.getSelf();
 
 	}
 
 	for ( const { property, childNode } of getNodeChildren( object ) ) {
 
-		cacheKey += ',' + property.slice( 0, - 4 ) + ':' + childNode.getCacheKey( force );
+		values.push( values, cyrb53( property.slice( 0, - 4 ) ), childNode.getCacheKey( force ) );
 
 	}
 
-	cacheKey += '}';
-
-	return cacheKey;
+	return cyrb53( values );
 
 }
 

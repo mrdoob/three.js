@@ -54,7 +54,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { storageObject, If, vec3, not, uniform, uv, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore } from 'three/tsl';
+			import { storageObject, If, vec3, not, uniform, uv, uint, float, Fn, vec2, abs, int, invocationLocalIndex, workgroupArray, uvec2, floor, instanceIndex, workgroupBarrier, atomicAdd, atomicStore, workgroupId } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -264,8 +264,7 @@
 
 					// Get ids of indices needed to populate workgroup local buffer.
 					// Use .toVar() to prevent these values from being recalculated multiple times.
-					const workgroupId = instanceIndex.div( WORKGROUP_SIZE[ 0 ] ).toVar();
-					const localOffset = uint( WORKGROUP_SIZE[ 0 ] ).mul( 2 ).mul( workgroupId ).toVar();
+					const localOffset = uint( WORKGROUP_SIZE[ 0 ] ).mul( 2 ).mul( workgroupId.x ).toVar();
 			
 					const localID1 = invocationLocalIndex.mul( 2 );
 					const localID2 = invocationLocalIndex.mul( 2 ).add( 1 );

@@ -2128,13 +2128,17 @@ class CubicBezierInterpolation extends Interpolant {
 
 class MMDToonMaterial extends ShaderMaterial {
 
+	static get type() {
+
+		return 'MMDToonMaterial';
+
+	}
+
 	constructor( parameters ) {
 
 		super();
 
 		this.isMMDToonMaterial = true;
-
-		this.type = 'MMDToonMaterial';
 
 		this._matcapCombine = AddOperation;
 		this.emissiveIntensity = 1.0;
