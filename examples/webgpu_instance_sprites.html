@@ -29,7 +29,7 @@
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-			import { uniform, timerGlobal, instanceIndex, instancedBufferAttribute } from 'three/tsl';
+			import { uniform, time, instanceIndex, instancedBufferAttribute } from 'three/tsl';
 
 
 			let camera, scene, renderer, stats, material;
@@ -69,12 +69,10 @@
 
 				// material
 
-				const timer = timerGlobal();
-
 				material = new THREE.SpriteNodeMaterial( { sizeAttenuation: true, map, alphaMap: map, alphaTest: 0.1, transparent: true } );
 				material.color.setHSL( 1.0, 0.3, 0.7, THREE.SRGBColorSpace );
 				material.positionNode = instancedBufferAttribute( positionAttribute );
-				material.rotationNode = timer.add( instanceIndex ).sin();
+				material.rotationNode = time.add( instanceIndex ).sin();
 				material.scaleNode = uniform( 15 );
 
 				// sprites

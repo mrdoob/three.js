@@ -25,6 +25,8 @@ class ComputeNode extends Node {
 		this.version = 1;
 		this.updateBeforeType = NodeUpdateType.OBJECT;
 
+		this.onInitFunction = null;
+
 		this.updateDispatchCount();
 
 	}
@@ -54,7 +56,13 @@ class ComputeNode extends Node {
 
 	}
 
-	onInit() { }
+	onInit( callback ) {
+
+		this.onInitFunction = callback;
+
+		return this;
+
+	}
 
 	updateBefore( { renderer } ) {
 

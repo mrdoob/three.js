@@ -101,6 +101,10 @@ const parse = ( source ) => {
 
 				resolvedType = type.split( '<' )[ 0 ];
 
+			} else if ( resolvedType.startsWith( 'ptr' ) ) {
+
+				resolvedType = 'pointer';
+
 			}
 
 			resolvedType = wgslTypeLib[ resolvedType ] || resolvedType;

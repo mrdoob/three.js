@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { timerLocal, vec2, uv, texture, mix, checker, normalLocal, positionLocal, color, oscSine, attribute } from 'three/tsl';
+			import { time, vec2, uv, texture, mix, checker, normalLocal, positionLocal, color, oscSine, attribute } from 'three/tsl';
 
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 
@@ -75,7 +75,7 @@
 				const materialBox = new THREE.MeshBasicNodeMaterial();
 
 				// birection speed
-				const timerScaleNode = timerLocal().mul( vec2( - 0.5, 0.1 ) );
+				const timerScaleNode = time.mul( vec2( - 0.5, 0.1 ) );
 				const animateUV = uv().add( timerScaleNode );
 
 				const textureNode = texture( uvTexture, animateUV );

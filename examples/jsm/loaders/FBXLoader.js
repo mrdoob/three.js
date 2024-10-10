@@ -571,9 +571,19 @@ class FBXTreeParser {
 
 		}
 
-		if ( materialNode.Opacity ) {
+		// the transparency handling is implemented based on Blender/Unity's approach: https://github.com/sobotka/blender-addons/blob/7d80f2f97161fc8e353a657b179b9aa1f8e5280b/io_scene_fbx/import_fbx.py#L1444-L1459
 
-			parameters.opacity = parseFloat( materialNode.Opacity.value );
+		parameters.opacity = 1 - ( materialNode.TransparencyFactor ? parseFloat( materialNode.TransparencyFactor.value ) : 0 );
+
+		if ( parameters.opacity === 1 || parameters.opacity === 0 ) {
+
+			parameters.opacity = ( materialNode.Opacity ? parseFloat( materialNode.Opacity.value ) : null );
+
+			if ( parameters.opacity === null ) {
+
+				parameters.opacity = 1 - ( materialNode.TransparentColor ? parseFloat( materialNode.TransparentColor.value[ 0 ] ) : 0 );
+
+			}
 
 		}
 

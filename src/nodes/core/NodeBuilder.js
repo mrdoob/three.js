@@ -55,9 +55,17 @@ const typeFromArray = new Map( [
 
 const toFloat = ( value ) => {
 
-	value = Number( value );
+	if ( /e/g.test( value ) ) {
 
-	return value + ( value % 1 ? '' : '.0' );
+		return String( value ).replace( /\+/g, '' );
+
+	} else {
+
+		value = Number( value );
+
+		return value + ( value % 1 ? '' : '.0' );
+
+	}
 
 };
 

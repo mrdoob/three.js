@@ -433,9 +433,17 @@ class WebGLBackend extends Backend {
 
 		if ( descriptor === null ) {
 
+			const clearColor = this.getClearColor();
+
+			// premultiply alpha
+
+			clearColor.r *= clearColor.a;
+			clearColor.g *= clearColor.a;
+			clearColor.b *= clearColor.a;
+
 			descriptor = {
 				textures: null,
-				clearColorValue: this.getClearColor()
+				clearColorValue: clearColor
 			};
 
 		}
@@ -450,13 +458,23 @@ class WebGLBackend extends Backend {
 
 		if ( clear !== 0 ) {
 
-			const clearColor = descriptor.clearColorValue || this.getClearColor();
+			let clearColor;
 
-			// premultiply alpha
+			if ( descriptor.clearColorValue ) {
 
-			clearColor.r *= clearColor.a;
-			clearColor.g *= clearColor.a;
-			clearColor.b *= clearColor.a;
+				clearColor = descriptor.clearColorValue;
+
+			} else {
+
+				clearColor = this.getClearColor();
+
+				// premultiply alpha
+
+				clearColor.r *= clearColor.a;
+				clearColor.g *= clearColor.a;
+				clearColor.b *= clearColor.a;
+
+			}
 
 			if ( depth ) this.state.setDepthMask( true );
 
@@ -587,6 +605,12 @@ class WebGLBackend extends Backend {
 
 		this.prepareTimestampBuffer( computeGroup );
 
+		if ( this._currentContext ) {
+
+			this._setFramebuffer( this._currentContext );
+
+		}
+
 	}
 
 	draw( renderObject/*, info*/ ) {
@@ -598,9 +622,9 @@ class WebGLBackend extends Backend {
 
 		const contextData = this.get( context );
 
-		const drawParms = renderObject.getDrawParameters();
+		const drawParams = renderObject.getDrawParameters();
 
-		if ( drawParms === null ) return;
+		if ( drawParams === null ) return;
 
 		//
 
@@ -693,8 +717,8 @@ class WebGLBackend extends Backend {
 
 		//
 
-		const { vertexCount, instanceCount } = drawParms;
-		let { firstVertex } = drawParms;
+		const { vertexCount, instanceCount } = drawParams;
+		let { firstVertex } = drawParams;
 
 		renderer.object = object;
 

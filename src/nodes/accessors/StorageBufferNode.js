@@ -112,15 +112,7 @@ class StorageBufferNode extends BufferNode {
 
 	}
 
-	generate( builder ) {
-
-		if ( builder.isAvailable( 'storageBuffer' ) ) {
-
-			return super.generate( builder );
-
-		}
-
-		const nodeType = this.getNodeType( builder );
+	getAttributeData() {
 
 		if ( this._attribute === null ) {
 
@@ -129,10 +121,40 @@ class StorageBufferNode extends BufferNode {
 
 		}
 
+		return {
+			attribute: this._attribute,
+			varying: this._varying
+		};
 
-		const output = this._varying.build( builder, nodeType );
+	}
 
-		builder.registerTransform( output, this._attribute );
+	getNodeType( builder ) {
+
+		if ( builder.isAvailable( 'storageBuffer' ) ) {
+
+			return super.getNodeType( builder );
+
+		}
+
+		const { attribute } = this.getAttributeData();
+
+		return attribute.getNodeType( builder );
+
+	}
+
+	generate( builder ) {
+
+		if ( builder.isAvailable( 'storageBuffer' ) ) {
+
+			return super.generate( builder );
+
+		}
+
+		const { attribute, varying } = this.getAttributeData();
+
+		const output = varying.build( builder );
+
+		builder.registerTransform( output, attribute );
 
 		return output;
 

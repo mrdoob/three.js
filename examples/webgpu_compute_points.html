@@ -83,7 +83,7 @@
 				// compute
 
 				computeNode = computeShaderFn().compute( particleNum );
-				computeNode.onInit = ( { renderer } ) => {
+				computeNode.onInit( ( { renderer } ) => {
 
 					const precomputeShaderNode = Fn( () => {
 
@@ -101,9 +101,9 @@
 
 					} );
 
-					renderer.compute( precomputeShaderNode().compute( particleNum ) );
+					renderer.computeAsync( precomputeShaderNode().compute( particleNum ) );
 
-				};
+				} );
 
 				// use a compute shader to animate the point cloud's vertex data.
 

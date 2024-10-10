@@ -258,7 +258,7 @@
 				const geometry = new THREE.PlaneGeometry( 2, 2 );
 
 				const material = new THREE.MeshBasicNodeMaterial();
-				material.colorNode = TSL.oscSine( TSL.timerLocal( .3 ) ).mix( shaderToy1Node, shaderToy2Node );
+				material.colorNode = TSL.oscSine( TSL.time.mul( .3 ) ).mix( shaderToy1Node, shaderToy2Node );
 
 				const quad = new THREE.Mesh( geometry, material );
 				scene.add( quad );

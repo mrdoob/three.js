@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, cos, float, mix, range, sin, timerLocal, uniform, uv, vec3, vec4, PI2 } from 'three/tsl';
+			import { color, cos, float, mix, range, sin, time, uniform, uv, vec3, vec4, PI2 } from 'three/tsl';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -54,8 +54,6 @@
 
 				const size = uniform( 0.08 );
 				material.scaleNode = range( 0, 1 ).mul( size );
-
-				const time = timerLocal();
 
 				const radiusRatio = range( 0, 1 );
 				const radius = radiusRatio.pow( 1.5 ).mul( 5 ).toVar();

@@ -11,7 +11,7 @@ export const ColorManagement = {
 	 * Implementations of supported color spaces.
 	 *
 	 * Required:
-	 *	- primaries: chromaticity coordinates [ rx ry gx gy bx by ]
+	 *	- primaries: chromaticity coordinates [ rx ry gx gy bx by ]
 	 *	- whitePoint: reference white [ x y ]
 	 *	- transfer: transfer function (pre-defined)
 	 *	- toXYZ: Matrix3 RGB to XYZ transform
@@ -166,7 +166,8 @@ ColorManagement.define( {
 		toXYZ: LINEAR_REC709_TO_XYZ,
 		fromXYZ: XYZ_TO_LINEAR_REC709,
 		luminanceCoefficients: REC709_LUMINANCE_COEFFICIENTS,
-		workingColorSpaceConfig: { unpackColorSpace: SRGBColorSpace }
+		workingColorSpaceConfig: { unpackColorSpace: SRGBColorSpace },
+		outputColorSpaceConfig: { drawingBufferColorSpace: SRGBColorSpace }
 	},
 
 	[ SRGBColorSpace ]: {

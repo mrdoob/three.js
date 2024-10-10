@@ -57,6 +57,7 @@ class NodeMaterial extends Material {
 		this.alphaTestNode = null;
 
 		this.positionNode = null;
+		this.geometryNode = null;
 
 		this.depthNode = null;
 		this.shadowNode = null;
@@ -97,6 +98,12 @@ class NodeMaterial extends Material {
 		builder.addStack();
 
 		builder.stack.outputNode = this.vertexNode || this.setupPosition( builder );
+
+		if ( this.geometryNode !== null ) {
+
+			builder.stack.outputNode = builder.stack.outputNode.bypass( this.geometryNode );
+
+		}
 
 		builder.addFlow( 'vertex', builder.removeStack() );
 
@@ -233,12 +240,6 @@ class NodeMaterial extends Material {
 
 				if ( camera.isPerspectiveCamera ) {
 
-					// Note: normally we could use "float( camera.near )" and "float( camera.far )" for the near/far arguments, but
-					// there is currently a bug with TSL/Three Shading Language whereby a "float()" expression using a huge value
-					// in scientific notation like "float( 1e27 )" will output "1e+27.0" to the shader code, which is causing problems.
-					// Since it's possible that camera.near/camera.far values may be using huge values like this (such as the logarithmic
-					// depth buffer examples on threejs.org), we must use the cameraNear/cameraFar nodes for now.
-					// TODO: can the float() node be fixed to allow for expressions like "float( 1e27 )"?
 					depthNode = perspectiveDepthToLogarithmicDepth( modelViewProjection().w, cameraNear, cameraFar );
 
 				} else {
@@ -634,6 +635,7 @@ class NodeMaterial extends Material {
 		this.alphaTestNode = source.alphaTestNode;
 
 		this.positionNode = source.positionNode;
+		this.geometryNode = source.geometryNode;
 
 		this.depthNode = source.depthNode;
 		this.shadowNode = source.shadowNode;

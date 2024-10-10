@@ -21,7 +21,7 @@ class DepthOfFieldNode extends TempNode {
 
 		this._aspect = uniform( 0 );
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
 

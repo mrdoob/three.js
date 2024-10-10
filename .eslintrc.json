@@ -57,6 +57,9 @@
         "destructuring": "any",
         "ignoreReadBeforeAssign": false
       }
+    ],
+    "no-irregular-whitespace": [
+      "error"
     ]
   }
 }

@@ -1,11 +1,39 @@
-import { RenderTarget, Vector2 } from 'three';
-import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, QuadMesh, passTexture, mul, NodeMaterial } from 'three/tsl';
+import { RenderTarget, Vector2, PostProcessingUtils } from 'three';
+import { TempNode, nodeObject, Fn, If, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, QuadMesh, passTexture, mul, NodeMaterial } from 'three/tsl';
 
 // WebGPU: The use of a single QuadMesh for both gaussian blur passes results in a single RenderObject with a SampledTexture binding that
 // alternates between source textures and triggers creation of new BindGroups and BindGroupLayouts every frame.
 
 const _quadMesh1 = /*@__PURE__*/ new QuadMesh();
 const _quadMesh2 = /*@__PURE__*/ new QuadMesh();
+
+let _rendererState;
+
+const premult = /*@__PURE__*/ Fn( ( [ color ] ) => {
+
+	return vec4( color.rgb.mul( color.a ), color.a );
+
+} ).setLayout( {
+	name: 'premult',
+	type: 'vec4',
+	inputs: [
+		{ name: 'color', type: 'vec4' }
+	]
+} );
+
+const unpremult = /*@__PURE__*/ Fn( ( [ color ] ) => {
+
+	If( color.a.equal( 0.0 ), () => vec4( 0.0 ) );
+
+	return vec4( color.rgb.div( color.a ), color.a );
+
+} ).setLayout( {
+	name: 'unpremult',
+	type: 'vec4',
+	inputs: [
+		{ name: 'color', type: 'vec4' }
+	]
+} );
 
 class GaussianBlurNode extends TempNode {
 
@@ -26,16 +54,32 @@ class GaussianBlurNode extends TempNode {
 		this._invSize = uniform( new Vector2() );
 		this._passDirection = uniform( new Vector2() );
 
-		this._horizontalRT = new RenderTarget();
+		this._horizontalRT = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._horizontalRT.texture.name = 'GaussianBlurNode.horizontal';
-		this._verticalRT = new RenderTarget();
+		this._verticalRT = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._verticalRT.texture.name = 'GaussianBlurNode.vertical';
 
 		this._textureNode = passTexture( this, this._verticalRT.texture );
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		this.resolution = new Vector2( 1, 1 );
+
+		this.premultipliedAlpha = false;
+
+	}
+
+	setPremultipliedAlpha( value ) {
+
+		this.premultipliedAlpha = value;
+
+		return this;
+
+	}
+
+	getPremultipliedAlpha() {
+
+		return this.premultipliedAlpha;
 
 	}
 
@@ -54,11 +98,12 @@ class GaussianBlurNode extends TempNode {
 
 		const { renderer } = frame;
 
+		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+
+		//
+
 		const textureNode = this.textureNode;
 		const map = textureNode.value;
-
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentMRT = renderer.getMRT();
 
 		const currentTexture = textureNode.value;
 
@@ -71,10 +116,6 @@ class GaussianBlurNode extends TempNode {
 
 		this._horizontalRT.texture.type = textureType;
 		this._verticalRT.texture.type = textureType;
-
-		// clear
-
-		renderer.setMRT( null );
 
 		// horizontal
 
@@ -95,9 +136,9 @@ class GaussianBlurNode extends TempNode {
 
 		// restore
 
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.setMRT( currentMRT );
 		textureNode.value = currentTexture;
+
+		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
@@ -111,20 +152,26 @@ class GaussianBlurNode extends TempNode {
 
 		const textureNode = this.textureNode;
 
-		if ( textureNode.isTextureNode !== true ) {
-
-			console.error( 'GaussianBlurNode requires a TextureNode.' );
-
-			return vec4();
-
-		}
-
 		//
 
 		const uvNode = textureNode.uvNode || uv();
 		const directionNode = vec2( this.directionNode || 1 );
 
-		const sampleTexture = ( uv ) => textureNode.uv( uv );
+		let sampleTexture, output;
+
+		if ( this.premultipliedAlpha ) {
+
+			// https://lisyarus.github.io/blog/posts/blur-coefficients-generator.html
+
+			sampleTexture = ( uv ) => premult( textureNode.uv( uv ) );
+			output = ( color ) => unpremult( color );
+
+		} else {
+
+			sampleTexture = ( uv ) => textureNode.uv( uv );
+			output = ( color ) => color;
+
+		}
 
 		const blur = Fn( () => {
 
@@ -144,15 +191,15 @@ class GaussianBlurNode extends TempNode {
 
 				const uvOffset = vec2( direction.mul( invSize.mul( x ) ) ).toVar();
 
-				const sample1 = vec4( sampleTexture( uvNode.add( uvOffset ) ) );
-				const sample2 = vec4( sampleTexture( uvNode.sub( uvOffset ) ) );
+				const sample1 = sampleTexture( uvNode.add( uvOffset ) );
+				const sample2 = sampleTexture( uvNode.sub( uvOffset ) );
 
 				diffuseSum.addAssign( sample1.add( sample2 ).mul( w ) );
 				weightSum.addAssign( mul( 2.0, w ) );
 
 			}
 
-			return diffuseSum.div( weightSum );
+			return output( diffuseSum.div( weightSum ) );
 
 		} );
 
@@ -200,3 +247,4 @@ class GaussianBlurNode extends TempNode {
 export default GaussianBlurNode;
 
 export const gaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ) );
+export const premultipliedGaussianBlur = ( node, directionNode, sigma ) => nodeObject( new GaussianBlurNode( convertToTexture( node ), directionNode, sigma ).setPremultipliedAlpha( true ) );
