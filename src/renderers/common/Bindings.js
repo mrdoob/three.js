@@ -98,19 +98,19 @@ class Bindings extends DataMap {
 
 				this.textures.updateTexture( binding.texture );
 
-			} else if ( binding.isStorageBuffer ) {
-
-				const attribute = binding.attribute;
-
-				this.attributes.update( attribute, AttributeType.STORAGE );
-
 			} else if ( binding.isStorageBuffer && binding.isIndirect ) {
 
 				const attribute = binding.attribute;
 
 				this.attributes.update( attribute, AttributeType.INDIRECT );
 
-			}
+			} else if ( binding.isStorageBuffer ) {
+
+				const attribute = binding.attribute;
+
+				this.attributes.update( attribute, AttributeType.STORAGE );
+
+			} 
 
 		}
 
