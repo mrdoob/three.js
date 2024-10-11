@@ -707,7 +707,7 @@ class BatchedMesh extends Mesh {
 			// if a geometry range is inactive then don't copy anything
 			const drawRange = drawRanges[ i ];
 			const reservedRange = reservedRanges[ i ];
-			if ( drawRange.active === false ) {
+			if ( drawRange.active ) {
 
 				continue;
 
