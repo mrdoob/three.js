@@ -1,3 +1,4 @@
+import Node from '../core/Node.js';
 import TextureNode from '../accessors/TextureNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
@@ -30,6 +31,8 @@ const _size = new Vector2();
 const _defaultRT = new RenderTarget();
 const _defaultUV = screenUV.flipX();
 
+_defaultRT.depthTexture = new DepthTexture( 1, 1 );
+
 let _inReflector = false;
 
 class ReflectorNode extends TextureNode {
@@ -42,7 +45,80 @@ class ReflectorNode extends TextureNode {
 
 	constructor( parameters = {} ) {
 
-		super( _defaultRT.texture, _defaultUV );
+		super( parameters.defaultTexture || _defaultRT.texture, _defaultUV );
+
+		this._reflectorBaseNode = parameters.reflector || new ReflectorBaseNode( this, parameters );
+		this._depthNode = null;
+
+		this.setUpdateMatrix( false );
+
+	}
+
+	get reflector() {
+
+		return this._reflectorBaseNode;
+
+	}
+
+	get target() {
+
+		return this._reflectorBaseNode.target;
+
+	}
+
+	getDepthNode() {
+
+		if ( this._depthNode === null ) {
+
+			if ( this._reflectorBaseNode.depth !== true ) {
+
+				throw new Error( 'THREE.ReflectorNode: Depth node can only be requested when the reflector is created with { depth: true }. ' );
+
+			}
+
+			this._depthNode = new ReflectorNode( {
+				defaultTexture: _defaultRT.depthTexture,
+				reflector: this._reflectorBaseNode
+			} );
+
+		}
+
+		return this._depthNode;
+
+	}
+
+	setup( builder ) {
+
+		// ignore if used in post-processing
+		if ( ! builder.object.isQuadMesh ) this._reflectorBaseNode.build( builder );
+
+		return super.setup( builder );
+
+	}
+
+	clone() {
+
+		const texture = new this.constructor( this.reflectorNode );
+		texture._reflectorBaseNode = this._reflectorBaseNode;
+
+		return texture;
+
+	}
+
+}
+
+
+class ReflectorBaseNode extends Node {
+
+	static get type() {
+
+		return 'ReflectorBaseNode';
+
+	}
+
+	constructor( textureNode, parameters = {} ) {
+
+		super();
 
 		const {
 			target = new Object3D(),
@@ -54,6 +130,8 @@ class ReflectorNode extends TextureNode {
 
 		//
 
+		this.textureNode = textureNode;
+
 		this.target = target;
 		this.resolution = resolution;
 		this.generateMipmaps = generateMipmaps;
@@ -64,7 +142,6 @@ class ReflectorNode extends TextureNode {
 
 		this.virtualCameras = new WeakMap();
 		this.renderTargets = new WeakMap();
-		this.depthNodes = new WeakMap();
 
 	}
 
@@ -102,32 +179,6 @@ class ReflectorNode extends TextureNode {
 
 	}
 
-	getDepthNode( camera ) {
-
-		if ( this.depth === true ) {
-
-			const virtualCamera = this.getVirtualCamera( camera );
-			const renderTarget = this.getRenderTarget( virtualCamera );
-
-			let depthNode = this.depthNodes.get( renderTarget );
-
-			if ( depthNode === undefined ) {
-
-				depthNode = new TextureNode( renderTarget.depthTexture );
-				this.depthNodes.set( renderTarget, depthNode );
-
-			}
-
-			return depthNode;
-
-		} else {
-
-			throw new Error( 'THREE.ReflectorNode: Depth node can only be requested when the reflector is created with { depth: true }. ' );
-
-		}
-
-	}
-
 	getRenderTarget( camera ) {
 
 		let renderTarget = this.renderTargets.get( camera );
@@ -159,7 +210,7 @@ class ReflectorNode extends TextureNode {
 
 	updateBefore( frame ) {
 
-		if ( this.bounces === false && _inReflector ) return false;
+		if ( this.bounces === false && _inReflector ) return;
 
 		_inReflector = true;
 
@@ -244,7 +295,13 @@ class ReflectorNode extends TextureNode {
 
 		//
 
-		this.value = renderTarget.texture;
+		this.textureNode.value = renderTarget.texture;
+
+		if ( this.depth === true ) {
+
+			this.textureNode.getDepthNode().value = renderTarget.depthTexture;
+
+		}
 
 		material.visible = false;
 
