@@ -1,3 +1,4 @@
+import Node from '../core/Node.js';
 import TextureNode from '../accessors/TextureNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
@@ -43,6 +44,57 @@ class ReflectorNode extends TextureNode {
 
 		super( _defaultRT.texture, _defaultUV );
 
+		this._reflectorBaseNode = new ReflectorBaseNode( this, parameters );
+
+		this.setUpdateMatrix( false );
+
+	}
+
+	get reflector() {
+
+		return this._reflectorBaseNode;
+
+	}
+
+	get target() {
+
+		return this._reflectorBaseNode.target;
+
+	}
+
+	setup( builder ) {
+
+		// ignore if used in post-processing
+		if ( ! builder.object.isQuadMesh ) this._reflectorBaseNode.build( builder );
+
+		return super.setup( builder );
+
+	}
+
+	clone() {
+
+		const texture = new this.constructor( this.reflectorNode );
+		texture._reflectorBaseNode = this._reflectorBaseNode;
+
+		return texture;
+
+	}
+
+}
+
+
+class ReflectorBaseNode extends Node {
+
+	static get type() {
+
+		return 'ReflectorBaseNode';
+
+	}
+
+	constructor( textureNode, parameters = {} ) {
+
+		super();
+
 		const {
 			target = new Object3D(),
 			resolution = 1,
@@ -51,6 +103,8 @@ class ReflectorNode extends TextureNode {
 		} = parameters;
 
 		//
+
+		this.textureNode = textureNode;
 
 		this.target = target;
 		this.resolution = resolution;
@@ -61,7 +115,6 @@ class ReflectorNode extends TextureNode {
 
 		this.virtualCameras = new WeakMap();
 		this.renderTargets = new WeakMap();
-
 
 	}
 
@@ -124,7 +177,7 @@ class ReflectorNode extends TextureNode {
 
 	updateBefore( frame ) {
 
-		if ( this.bounces === false && _inReflector ) return false;
+		if ( this.bounces === false && _inReflector ) return;
 
 		_inReflector = true;
 
@@ -209,7 +262,7 @@ class ReflectorNode extends TextureNode {
 
 		//
 
-		this.value = renderTarget.texture;
+		this.textureNode.value = renderTarget.texture;
 
 		material.visible = false;
 
