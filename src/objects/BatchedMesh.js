@@ -180,6 +180,9 @@ class BatchedMesh extends Mesh {
 		this._multiDrawInstances = null;
 		this._visibilityChanged = true;
 
+		this._nextIndexPointer = 0;
+		this._nextVertexPointer = 0;
+
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
 		this._indirectTexture = null;
@@ -425,16 +428,9 @@ class BatchedMesh extends Mesh {
 			indexCount: - 1,
 		};
 
-		let lastRange = null;
 		const reservedRanges = this._reservedRanges;
 		const drawRanges = this._drawRanges;
 		const bounds = this._bounds;
-		if ( this._geometryCount !== 0 ) {
-
-			lastRange = reservedRanges[ reservedRanges.length - 1 ];
-
-		}
-
 		if ( vertexCount === - 1 ) {
 
 			reservedRange.vertexCount = geometry.getAttribute( 'position' ).count;
@@ -445,15 +441,8 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		if ( lastRange === null ) {
+		reservedRange.vertexStart = this._nextVertexPointer;
 
-			reservedRange.vertexStart = 0;
-
-		} else {
-
-			reservedRange.vertexStart = lastRange.vertexStart + lastRange.vertexCount;
-
-		}
 
 		const index = geometry.getIndex();
 		const hasIndex = index !== null;
@@ -469,15 +458,7 @@ class BatchedMesh extends Mesh {
 
 			}
 
-			if ( lastRange === null ) {
-
-				reservedRange.indexStart = 0;
-
-			} else {
-
-				reservedRange.indexStart = lastRange.indexStart + lastRange.indexCount;
-
-			}
+			reservedRange.indexStart = this._nextIndexPointer;
 
 		}
 
@@ -530,6 +511,9 @@ class BatchedMesh extends Mesh {
 
 		// update the geometry
 		this.setGeometryAt( geometryId, geometry );
+
+		this._nextIndexPointer = reservedRange.indexStart + reservedRange.indexCount;
+		this._nextVertexPointer = reservedRange.vertexStart + reservedRange.vertexCount;
 
 		return geometryId;
 
@@ -707,32 +691,42 @@ class BatchedMesh extends Mesh {
 			// if a geometry range is inactive then don't copy anything
 			const drawRange = drawRanges[ i ];
 			const reservedRange = reservedRanges[ i ];
-			if ( drawRange.active ) {
+			if ( drawRange.active === false ) {
+
+				reservedRange.vertexCount = 0;
+				reservedRange.vertexStart = 0;
+				reservedRange.indexStart = 0;
+				reservedRange.indexCount = 0;
 
 				continue;
 
 			}
 
 			// if a geometry contains an index buffer then shift it, as well
-			if ( geometry.index !== null && reservedRange.indexStart !== nextIndexStart ) {
+			if ( geometry.index !== null ) {
 
-				const { indexStart, indexCount } = reservedRange;
-				const index = geometry.index;
-				const array = index.array;
+				if ( reservedRange.indexStart !== nextIndexStart ) {
 
-				// shift the index pointers based on how the vertex data will shift
-				// adjusting the index must happen first so the original vertex start value is available
-				const elementDelta = nextVertexStart - reservedRange.vertexStart;
-				for ( let j = indexStart; j < indexStart + indexCount; j ++ ) {
+					const { indexStart, indexCount } = reservedRange;
+					const index = geometry.index;
+					const array = index.array;
 
-					array[ j ] = array[ j ] + elementDelta;
+					// shift the index pointers based on how the vertex data will shift
+					// adjusting the index must happen first so the original vertex start value is available
+					const elementDelta = nextVertexStart - reservedRange.vertexStart;
+					for ( let j = indexStart; j < indexStart + indexCount; j ++ ) {
+
+						array[ j ] = array[ j ] + elementDelta;
+
+					}
+
+					index.array.copyWithin( nextIndexStart, indexStart, indexStart + indexCount );
+					index.addUpdateRange( nextIndexStart, indexCount );
+
+					reservedRange.indexStart = nextIndexStart;
 
 				}
 
-				index.array.copyWithin( nextIndexStart, indexStart, indexStart + indexCount );
-				index.addUpdateRange( nextIndexStart, indexCount );
-
-				reservedRange.indexStart = nextIndexStart;
 				nextIndexStart += reservedRange.indexCount;
 
 			}
@@ -752,11 +746,15 @@ class BatchedMesh extends Mesh {
 				}
 
 				reservedRange.vertexStart = nextVertexStart;
-				nextVertexStart += reservedRange.vertexCount;
 
 			}
 
+			nextVertexStart += reservedRange.vertexCount;
+
 			drawRange.start = geometry.index ? reservedRange.indexStart : reservedRange.vertexStart;
+
+			this._nextIndexPointer = geometry.index ? reservedRange.indexStart + reservedRange.indexCount : 0;
+			this._nextVertexPointer = reservedRange.vertexStart + reservedRange.vertexCount;
 
 		}
 
