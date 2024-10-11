@@ -11,60 +11,33 @@ class GridHelper extends LineSegments {
 		color1 = new Color( color1 );
 		color2 = new Color( color2 );
 
-		let sizeX, sizeZ;
-		if ( Array.isArray( size ) ) {
+		const [ width, depth ] = Array.isArray( size ) ? size : [ size, size ];
+		const [ divisionsX, divisionsZ ] = Array.isArray( divisions ) ? divisions : [ divisions, divisions ];
 
-			sizeX = size[ 0 ];
-			sizeZ = size[ 1 ];
-
-		} else {
-
-			sizeX = size;
-			sizeZ = size;
-
-		}
-
-		let divisionsX, divisionsZ;
-		if ( Array.isArray( divisions ) ) {
-
-			divisionsX = divisions[ 0 ];
-			divisionsZ = divisions[ 1 ];
-
-		} else {
-
-			divisionsX = divisions;
-			divisionsZ = divisions;
-
-		}
-
-		const centerX = divisionsX / 2;
-		const centerZ = divisionsZ / 2;
-
-		const stepX = sizeX / divisionsX;
-		const stepZ = sizeZ / divisionsZ;
-
-		const halfSizeX = sizeX / 2;
-		const halfSizeZ = sizeZ / 2;
+		const stepX = width / divisionsX;
+		const stepZ = depth / divisionsZ;
+		const halfWidth = width / 2;
+		const halfDepth = depth / 2;
 
 		const vertices = [], colors = [];
 
-		for ( let i = 0, k = - halfSizeZ; i <= divisionsZ; i ++, k += stepZ ) {
+		for ( let i = 0; i <= divisionsZ; i ++ ) {
 
-			vertices.push( - halfSizeX, 0, k, halfSizeX, 0, k );
+			const k = - halfDepth + i * stepZ;
+			vertices.push( - halfWidth, 0, k, halfWidth, 0, k );
 
-			const color = ( i === centerZ ) ? color1 : color2;
-
+			const color = ( i === divisionsZ / 2 ) ? color1 : color2;
 			color.toArray( colors, colors.length );
 			color.toArray( colors, colors.length );
 
 		}
 
-		for ( let i = 0, k = - halfSizeX; i <= divisionsX; i ++, k += stepX ) {
+		for ( let i = 0; i <= divisionsX; i ++ ) {
 
-			vertices.push( k, 0, - halfSizeZ, k, 0, halfSizeZ );
+			const k = - halfWidth + i * stepX;
+			vertices.push( k, 0, - halfDepth, k, 0, halfDepth );
 
-			const color = ( i === centerX ) ? color1 : color2;
-
+			const color = ( i === divisionsX / 2 ) ? color1 : color2;
 			color.toArray( colors, colors.length );
 			color.toArray( colors, colors.length );
 
@@ -74,9 +47,7 @@ class GridHelper extends LineSegments {
 		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-		const material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
-
-		super( geometry, material );
+		super( geometry, new LineBasicMaterial( { vertexColors: true, toneMapped: false } ) );
 
 		this.type = 'GridHelper';
 
@@ -90,6 +61,5 @@ class GridHelper extends LineSegments {
 	}
 
 }
-
 
 export { GridHelper };
