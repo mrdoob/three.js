@@ -1158,7 +1158,7 @@ class WebGLBackend extends Backend {
 
 	updateBindings( bindGroup /*, bindings*/ ) {
 
-		if ( ! bindGroup ) return;
+		if ( bindGroup === null ) return;
 
 		const { gl } = this;
 
