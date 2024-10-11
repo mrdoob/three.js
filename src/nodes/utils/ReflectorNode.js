@@ -11,6 +11,7 @@ import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
+import { DepthTexture } from '../../textures/DepthTexture.js';
 
 const _reflectorPlane = new Plane();
 const _normal = new Vector3();
@@ -47,7 +48,8 @@ class ReflectorNode extends TextureNode {
 			target = new Object3D(),
 			resolution = 1,
 			generateMipmaps = false,
-			bounces = true
+			bounces = true,
+			depth = false
 		} = parameters;
 
 		//
@@ -56,12 +58,13 @@ class ReflectorNode extends TextureNode {
 		this.resolution = resolution;
 		this.generateMipmaps = generateMipmaps;
 		this.bounces = bounces;
+		this.depth = depth;
 
 		this.updateBeforeType = bounces ? NodeUpdateType.RENDER : NodeUpdateType.FRAME;
 
 		this.virtualCameras = new WeakMap();
 		this.renderTargets = new WeakMap();
-
+		this.depthNodes = new WeakMap();
 
 	}
 
@@ -99,6 +102,32 @@ class ReflectorNode extends TextureNode {
 
 	}
 
+	getDepthNode( camera ) {
+
+		if ( this.depth === true ) {
+
+			const virtualCamera = this.getVirtualCamera( camera );
+			const renderTarget = this.getRenderTarget( virtualCamera );
+
+			let depthNode = this.depthNodes.get( renderTarget );
+
+			if ( depthNode === undefined ) {
+
+				depthNode = new TextureNode( renderTarget.depthTexture );
+				this.depthNodes.set( renderTarget, depthNode );
+
+			}
+
+			return depthNode;
+
+		} else {
+
+			throw new Error( 'THREE.ReflectorNode: Depth node can only be requested when the reflector is created with { depth: true }. ' );
+
+		}
+
+	}
+
 	getRenderTarget( camera ) {
 
 		let renderTarget = this.renderTargets.get( camera );
@@ -109,8 +138,14 @@ class ReflectorNode extends TextureNode {
 
 			if ( this.generateMipmaps === true ) {
 
-			    renderTarget.texture.minFilter = LinearMipMapLinearFilter;
-			    renderTarget.texture.generateMipmaps = true;
+				renderTarget.texture.minFilter = LinearMipMapLinearFilter;
+				renderTarget.texture.generateMipmaps = true;
+
+			}
+
+			if ( this.depth === true ) {
+
+				renderTarget.depthTexture = new DepthTexture();
 
 			}
 
