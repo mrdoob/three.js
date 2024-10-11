@@ -97,7 +97,6 @@ const _batchIntersects = [];
 // @TODO: geometry.drawRange support?
 // @TODO: geometry.morphAttributes support?
 // @TODO: Support uniform parameter per geometry
-// @TODO: Add an "optimize" function to pack geometry and remove data gaps
 
 // copies data from attribute "src" into "target" starting at "targetOffset"
 function copyAttributeData( src, target, targetOffset = 0 ) {
@@ -877,9 +876,6 @@ class BatchedMesh extends Mesh {
 
 	setMatrixAt( instanceId, matrix ) {
 
-		// @TODO: Map geometryId to index of the arrays because
-		//        optimize() can make geometryId mismatch the index
-
 		const drawInfo = this._drawInfo;
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = this._matricesTexture.image.data;
@@ -917,9 +913,6 @@ class BatchedMesh extends Mesh {
 			this._initColorsTexture();
 
 		}
-
-		// @TODO: Map id to index of the arrays because
-		//        optimize() can make id mismatch the index
 
 		const colorsTexture = this._colorsTexture;
 		const colorsArray = this._colorsTexture.image.data;
