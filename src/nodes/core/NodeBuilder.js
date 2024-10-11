@@ -82,6 +82,7 @@ class NodeBuilder {
 		this.camera = null;
 
 		this.nodes = [];
+		this.sequentialNodes = [];
 		this.updateNodes = [];
 		this.updateBeforeNodes = [];
 		this.updateAfterNodes = [];
@@ -320,19 +321,34 @@ class NodeBuilder {
 
 	}
 
+	addSequentialNode( node ) {
+
+		if ( this.sequentialNodes.includes( node ) === false ) {
+
+			this.sequentialNodes.push( node );
+
+		}
+
+	}
+
 	buildUpdateNodes() {
 
 		for ( const node of this.nodes ) {
 
 			const updateType = node.getUpdateType();
-			const updateBeforeType = node.getUpdateBeforeType();
-			const updateAfterType = node.getUpdateAfterType();
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
 				this.updateNodes.push( node.getSelf() );
 
 			}
+
+		}
+
+		for ( const node of this.sequentialNodes ) {
+
+			const updateBeforeType = node.getUpdateBeforeType();
+			const updateAfterType = node.getUpdateAfterType();
 
 			if ( updateBeforeType !== NodeUpdateType.NONE ) {
 
