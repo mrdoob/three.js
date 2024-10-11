@@ -74,7 +74,7 @@ class WaterMesh extends Mesh {
 
 			const distance = length( worldToEye );
 
-			const distortion = surfaceNormal.xy.mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
+			const distortion = surfaceNormal.xz.mul( float( 0.001 ).add( float( 1.0 ).div( distance ) ) ).mul( this.distortionScale );
 
 			const mirrorSampler = reflector();
 			mirrorSampler.uvNode = mirrorSampler.uvNode.add( distortion );
