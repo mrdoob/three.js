@@ -60,6 +60,7 @@ class GaussianBlurNode extends TempNode {
 		this._verticalRT.texture.name = 'GaussianBlurNode.vertical';
 
 		this._textureNode = passTexture( this, this._verticalRT.texture );
+		this._textureNode.uvNode = textureNode.uvNode;
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
