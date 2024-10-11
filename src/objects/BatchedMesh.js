@@ -685,12 +685,21 @@ class BatchedMesh extends Mesh {
 		// iterate over all geometry ranges
 		const drawRanges = this._drawRanges;
 		const reservedRanges = this._reservedRanges;
+		const indices = drawRanges
+			.map( ( e, i ) => i )
+			.sort( ( a, b ) => {
+
+				return this._reservedRanges[ a ].vertexStart - this._reservedRanges[ b ].vertexStart;
+
+			} );
+
 		const geometry = this.geometry;
 		for ( let i = 0, l = drawRanges.length; i < l; i ++ ) {
 
 			// if a geometry range is inactive then don't copy anything
-			const drawRange = drawRanges[ i ];
-			const reservedRange = reservedRanges[ i ];
+			const index = indices[ i ];
+			const drawRange = drawRanges[ index ];
+			const reservedRange = reservedRanges[ index ];
 			if ( drawRange.active === false ) {
 
 				reservedRange.vertexCount = 0;
