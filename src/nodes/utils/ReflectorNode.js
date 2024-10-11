@@ -12,6 +12,7 @@ import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { RenderTarget } from '../../core/RenderTarget.js';
+import { DepthTexture } from '../../textures/DepthTexture.js';
 
 const _reflectorPlane = new Plane();
 const _normal = new Vector3();
@@ -30,6 +31,8 @@ const _size = new Vector2();
 const _defaultRT = new RenderTarget();
 const _defaultUV = screenUV.flipX();
 
+_defaultRT.depthTexture = new DepthTexture( 1, 1 );
+
 let _inReflector = false;
 
 class ReflectorNode extends TextureNode {
@@ -42,9 +45,10 @@ class ReflectorNode extends TextureNode {
 
 	constructor( parameters = {} ) {
 
-		super( _defaultRT.texture, _defaultUV );
+		super( parameters.defaultTexture || _defaultRT.texture, _defaultUV );
 
-		this._reflectorBaseNode = new ReflectorBaseNode( this, parameters );
+		this._reflectorBaseNode = parameters.reflector || new ReflectorBaseNode( this, parameters );
+		this._depthNode = null;
 
 		this.setUpdateMatrix( false );
 
@@ -59,6 +63,27 @@ class ReflectorNode extends TextureNode {
 	get target() {
 
 		return this._reflectorBaseNode.target;
+
+	}
+
+	getDepthNode() {
+
+		if ( this._depthNode === null ) {
+
+			if ( this._reflectorBaseNode.depth !== true ) {
+
+				throw new Error( 'THREE.ReflectorNode: Depth node can only be requested when the reflector is created with { depth: true }. ' );
+
+			}
+
+			this._depthNode = new ReflectorNode( {
+				defaultTexture: _defaultRT.depthTexture,
+				reflector: this._reflectorBaseNode
+			} );
+
+		}
+
+		return this._depthNode;
 
 	}
 
@@ -99,7 +124,8 @@ class ReflectorBaseNode extends Node {
 			target = new Object3D(),
 			resolution = 1,
 			generateMipmaps = false,
-			bounces = true
+			bounces = true,
+			depth = false
 		} = parameters;
 
 		//
@@ -110,6 +136,7 @@ class ReflectorBaseNode extends Node {
 		this.resolution = resolution;
 		this.generateMipmaps = generateMipmaps;
 		this.bounces = bounces;
+		this.depth = depth;
 
 		this.updateBeforeType = bounces ? NodeUpdateType.RENDER : NodeUpdateType.FRAME;
 
@@ -162,8 +189,14 @@ class ReflectorBaseNode extends Node {
 
 			if ( this.generateMipmaps === true ) {
 
-			    renderTarget.texture.minFilter = LinearMipMapLinearFilter;
-			    renderTarget.texture.generateMipmaps = true;
+				renderTarget.texture.minFilter = LinearMipMapLinearFilter;
+				renderTarget.texture.generateMipmaps = true;
+
+			}
+
+			if ( this.depth === true ) {
+
+				renderTarget.depthTexture = new DepthTexture();
 
 			}
 
@@ -263,6 +296,12 @@ class ReflectorBaseNode extends Node {
 		//
 
 		this.textureNode.value = renderTarget.texture;
+
+		if ( this.depth === true ) {
+
+			this.textureNode.getDepthNode().value = renderTarget.depthTexture;
+
+		}
 
 		material.visible = false;
 
