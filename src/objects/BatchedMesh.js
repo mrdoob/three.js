@@ -132,8 +132,21 @@ function copyAttributeData( src, target, targetOffset = 0 ) {
 // safely copies array contents to a potentially smaller array
 function copyArrayContents( src, target ) {
 
-	const len = Math.min( src.length, target.length );
-	target.set( new src.constructor( src.buffer, 0, len ) );
+	if ( src.constructor !== target.constructor ) {
+
+		const len = Math.min( src.length, target.length );
+		for ( let i = 0; i < len; i ++ ) {
+
+			target[ i ] = src[ i ];
+
+		}
+
+	} else {
+
+		const len = Math.min( src.length, target.length );
+		target.set( new src.constructor( src.buffer, 0, len ) );
+
+	}
 
 }
 
