@@ -1,5 +1,5 @@
 import { Color, Vector2, PostProcessingUtils, NearestFilter, Matrix4 } from 'three';
-import { Fn, min, max, clamp, nodeObject, mix, PassNode, QuadMesh, texture, NodeMaterial, mrt, output, velocity, uniform, uv, vec2 } from 'three/tsl';
+import { float, If, Loop, int, Fn, min, max, clamp, nodeObject, mix, PassNode, QuadMesh, texture, NodeMaterial, mrt, output, velocity, uniform, uv, vec2, vec4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -24,6 +24,7 @@ class TRAAPassNode extends PassNode {
 		this.clearAlpha = 0;
 
 		this._currentJitterIndex = 0;
+		this._firstFrame = true;
 		this._originalProjectionMatrix = new Matrix4();
 
 		this._invSize = uniform( new Vector2() );
@@ -40,6 +41,17 @@ class TRAAPassNode extends PassNode {
 
 	}
 
+	setSize( width, height ) {
+
+		super.setSize( width, height );
+
+		this._sampleRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
+		this._historyRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
+
+		this._invSize.value.set( 1 / this.renderTarget.width, 1 / this.renderTarget.height );
+
+	}
+
 	updateBefore( frame ) {
 
 		const { renderer } = frame;
@@ -53,9 +65,6 @@ class TRAAPassNode extends PassNode {
 		const size = renderer.getSize( _size );
 
 		this.setSize( size.width, size.height );
-		this._sampleRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
-		this._historyRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
-		this._invSize.value.set( 1 / this.renderTarget.width, 1 / this.renderTarget.height );
 
 		//
 
@@ -102,20 +111,38 @@ class TRAAPassNode extends PassNode {
 
 		renderer.setClearColor( this.clearColor, this.clearAlpha );
 		renderer.setRenderTarget( this._sampleRenderTarget );
+		renderer.clear();
 		renderer.render( scene, camera );
 
 		renderer.setMRT( null );
 
-		// resolve
+		if ( this._firstFrame === true ) {
 
-		renderer.setRenderTarget( this.renderTarget );
-		_quadMesh.material = this._resolveMaterial;
-		_quadMesh.render( renderer );
+			// the first frame is an edge case since there are no history data. So we just copy the sample
+			// into the history and final render target (no AA happens at that point).
+
+			renderer.copyTextureToTexture( this._sampleRenderTarget.texture, this._historyRenderTarget.texture );
+			renderer.copyTextureToTexture( this._sampleRenderTarget.texture, this.renderTarget.texture );
+
+			this._firstFrame = false;
+
+		} else {
+
+			// resolve
+
+			renderer.setRenderTarget( this.renderTarget );
+			_quadMesh.material = this._resolveMaterial;
+			_quadMesh.render( renderer );
+
+			// update history
+
+			renderer.copyTextureToTexture( this.renderTarget.texture, this._historyRenderTarget.texture );
+
+		}
+
+		// copy depth
+
 		renderer.copyTextureToTexture( this._sampleRenderTarget.depthTexture, this.renderTarget.depthTexture );
-
-		// update history
-
-		renderer.copyTextureToTexture( this.renderTarget.texture, this._historyRenderTarget.texture );
 
 		// update jitter index
 
@@ -178,24 +205,50 @@ class TRAAPassNode extends PassNode {
 		const historyTexture = texture( this._historyRenderTarget.texture );
 		const sampleTexture = texture( this._sampleRenderTarget.textures[ 0 ] );
 		const velocityTexture = texture( this._sampleRenderTarget.textures[ 1 ] );
+		const depthTexture = texture( this._sampleRenderTarget.depthTexture );
 
 		const resolve = Fn( () => {
 
 			const uvNode = uv();
-			const offset = velocityTexture.xy;
+
+			const minColor = vec4( 10000 ).toVar();
+			const maxColor = vec4( - 10000 ).toVar();
+			const closestDepth = float( 1 ).toVar();
+			const closestDepthPixelPosition = vec2( 0 ).toVar();
+
+			// sample a 3x3 neighborhood to create a box in color space
+			// clamping the history color with the resulting min/max colors mitigates ghosting
+
+			Loop( { start: int( - 1 ), end: int( 1 ), type: 'int', condition: '<=' }, ( { x } ) => {
+
+				Loop( { start: int( - 1 ), end: int( 1 ), type: 'int', condition: '<=' }, ( { y } ) => {
+
+					const uvNeighbor = uvNode.add( vec2( float( x ), float( y ) ).mul( this._invSize ) ).toVar();
+					const colorNeighbor = max( vec4( 0 ), sampleTexture.uv( uvNeighbor ) ).toVar(); // use max() to avoid propagate garbage values
+
+					minColor.assign( min( minColor, colorNeighbor ) );
+					maxColor.assign( max( maxColor, colorNeighbor ) );
+
+					const currentDepth = depthTexture.uv( uvNeighbor ).r.toVar();
+
+					If( currentDepth.lessThan( closestDepth ), () => {
+
+						closestDepth.assign( currentDepth );
+						closestDepthPixelPosition.assign( uvNeighbor );
+
+					} );
+
+				} );
+
+			} );
+
+			const offset = velocityTexture.uv( closestDepthPixelPosition ).xy.mul( vec2( 0.5, - 0.5 ) ); // NDC to uv offset
 
 			const currentColor = sampleTexture.uv( uvNode );
 			const historyColor = historyTexture.uv( uvNode.sub( offset ) );
+			const clampedHistoryColor = clamp( historyColor, minColor, maxColor );
 
-			// const nearColor0 = historyTexture.uv( uvNode.add( vec2( 1, 0 ).mul( this._invSize ) ) );
-			// const nearColor1 = historyTexture.uv( uvNode.add( vec2( 0, 1 ).mul( this._invSize ) ) );
-			// const nearColor2 = historyTexture.uv( uvNode.add( vec2( - 1, 0 ).mul( this._invSize ) ) );
-			// const nearColor3 = historyTexture.uv( uvNode.add( vec2( 0, - 1 ).mul( this._invSize ) ) );
-
-			// const boxMin = min( currentColor, min( nearColor0, min( nearColor1, min( nearColor2, nearColor3 ) ) ) );
-			// const boxMax = max( currentColor, max( nearColor0, max( nearColor1, max( nearColor2, nearColor3 ) ) ) );
-
-			return mix( currentColor, historyColor, 0.9 );
+			return mix( currentColor, clampedHistoryColor, 0.9 ); // blend
 
 		} );
 
