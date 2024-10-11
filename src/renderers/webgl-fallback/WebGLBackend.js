@@ -1127,7 +1127,7 @@ class WebGLBackend extends Backend {
 
 	createBindings( bindGroup, bindings ) {
 
-		if ( ! this._knownBindings.has( bindings ) ) {
+		if ( this._knownBindings.has( bindings ) === false ) {
 
 			this._knownBindings.add( bindings );
 
