@@ -133,6 +133,7 @@ function copyArrayContents( src, target ) {
 
 	if ( src.constructor !== target.constructor ) {
 
+		// if arrays are of a different type (eg due to index size increasing) then data must be per-element copied
 		const len = Math.min( src.length, target.length );
 		for ( let i = 0; i < len; i ++ ) {
 
@@ -142,6 +143,7 @@ function copyArrayContents( src, target ) {
 
 	} else {
 
+		// if the arrays use the same data layout we can use a fast block copy
 		const len = Math.min( src.length, target.length );
 		target.set( new src.constructor( src.buffer, 0, len ) );
 
@@ -192,8 +194,9 @@ class BatchedMesh extends Mesh {
 		this._multiDrawInstances = null;
 		this._visibilityChanged = true;
 
-		this._nextIndexPointer = 0;
-		this._nextVertexPointer = 0;
+		// used to track where the next point is that geometry should be inserted
+		this._nextIndexStart = 0;
+		this._nextVertexStart = 0;
 
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
@@ -443,6 +446,8 @@ class BatchedMesh extends Mesh {
 		const reservedRanges = this._reservedRanges;
 		const drawRanges = this._drawRanges;
 		const bounds = this._bounds;
+
+		reservedRange.vertexStart = this._nextVertexStart;
 		if ( vertexCount === - 1 ) {
 
 			reservedRange.vertexCount = geometry.getAttribute( 'position' ).count;
@@ -453,13 +458,11 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		reservedRange.vertexStart = this._nextVertexPointer;
-
-
 		const index = geometry.getIndex();
 		const hasIndex = index !== null;
 		if ( hasIndex ) {
 
+			reservedRange.indexStart = this._nextIndexStart;
 			if ( indexCount	=== - 1 ) {
 
 				reservedRange.indexCount = index.count;
@@ -469,8 +472,6 @@ class BatchedMesh extends Mesh {
 				reservedRange.indexCount = indexCount;
 
 			}
-
-			reservedRange.indexStart = this._nextIndexPointer;
 
 		}
 
@@ -524,8 +525,9 @@ class BatchedMesh extends Mesh {
 		// update the geometry
 		this.setGeometryAt( geometryId, geometry );
 
-		this._nextIndexPointer = reservedRange.indexStart + reservedRange.indexCount;
-		this._nextVertexPointer = reservedRange.vertexStart + reservedRange.vertexCount;
+		// increment the next geometry position
+		this._nextIndexStart = reservedRange.indexStart + reservedRange.indexCount;
+		this._nextVertexStart = reservedRange.vertexStart + reservedRange.vertexCount;
 
 		return geometryId;
 
@@ -694,14 +696,15 @@ class BatchedMesh extends Mesh {
 		let nextVertexStart = 0;
 		let nextIndexStart = 0;
 
-		// iterate over all geometry ranges
+		// Iterate over all geometry ranges in order sorted from earliest in the geometry buffer to latest
+		// in the geometry buffer. Because draw range objects can be reused there is no guarantee of their order.
 		const drawRanges = this._drawRanges;
 		const reservedRanges = this._reservedRanges;
 		const indices = drawRanges
 			.map( ( e, i ) => i )
 			.sort( ( a, b ) => {
 
-				return this._reservedRanges[ a ].vertexStart - this._reservedRanges[ b ].vertexStart;
+				return reservedRanges[ a ].vertexStart - reservedRanges[ b ].vertexStart;
 
 			} );
 
@@ -713,11 +716,6 @@ class BatchedMesh extends Mesh {
 			const drawRange = drawRanges[ index ];
 			const reservedRange = reservedRanges[ index ];
 			if ( drawRange.active === false ) {
-
-				reservedRange.vertexCount = 0;
-				reservedRange.vertexStart = 0;
-				reservedRange.indexStart = 0;
-				reservedRange.indexCount = 0;
 
 				continue;
 
@@ -771,11 +769,11 @@ class BatchedMesh extends Mesh {
 			}
 
 			nextVertexStart += reservedRange.vertexCount;
-
 			drawRange.start = geometry.index ? reservedRange.indexStart : reservedRange.vertexStart;
 
-			this._nextIndexPointer = geometry.index ? reservedRange.indexStart + reservedRange.indexCount : 0;
-			this._nextVertexPointer = reservedRange.vertexStart + reservedRange.vertexCount;
+			// step the next geometry points to the shifted position
+			this._nextIndexStart = geometry.index ? reservedRange.indexStart + reservedRange.indexCount : 0;
+			this._nextVertexStart = reservedRange.vertexStart + reservedRange.vertexCount;
 
 		}
 
