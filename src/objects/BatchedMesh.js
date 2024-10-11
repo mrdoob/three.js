@@ -1178,7 +1178,7 @@ class BatchedMesh extends Mesh {
 			const drawRange = drawRanges[ geometryId ];
 			_mesh.geometry.setDrawRange( drawRange.start, drawRange.count );
 
-			// ge the intersects
+			// get the intersects
 			this.getMatrixAt( i, _mesh.matrixWorld ).premultiply( matrixWorld );
 			this.getBoundingBoxAt( geometryId, _mesh.geometry.boundingBox );
 			this.getBoundingSphereAt( geometryId, _mesh.geometry.boundingSphere );
