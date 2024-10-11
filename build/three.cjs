@@ -1631,7 +1631,7 @@ const ColorManagement = {
 	 * Implementations of supported color spaces.
 	 *
 	 * Required:
-	 *	- primaries: chromaticity coordinates [ rx ry gx gy bx by ]
+	 *	- primaries: chromaticity coordinates [ rx ry gx gy bx by ]
 	 *	- whitePoint: reference white [ x y ]
 	 *	- transfer: transfer function (pre-defined)
 	 *	- toXYZ: Matrix3 RGB to XYZ transform
@@ -10611,6 +10611,7 @@ class BufferGeometry extends EventDispatcher {
 		this.type = 'BufferGeometry';
 
 		this.index = null;
+		this.indirect = null;
 		this.attributes = {};
 
 		this.morphAttributes = {};
@@ -10646,6 +10647,20 @@ class BufferGeometry extends EventDispatcher {
 		}
 
 		return this;
+
+	}
+
+	setIndirect( indirect ) {
+
+		this.indirect = indirect;
+
+		return this;
+
+	}
+
+	getIndirect() {
+
+		return this.indirect;
 
 	}
 
