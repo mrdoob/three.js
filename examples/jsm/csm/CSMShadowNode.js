@@ -248,7 +248,6 @@ class CSMShadowNode extends Node {
 
 	setupFade() {
 
-		console.log( 'fade' );
 		const cameraNear = reference( 'near', 'float', this.camera ).setGroup( renderGroup ).label( 'cameraNear' );
 		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cacades' );
 
