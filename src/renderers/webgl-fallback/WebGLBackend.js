@@ -1085,8 +1085,6 @@ class WebGLBackend extends Backend {
 
 		// Bindings
 
-		this.createBindings( null, bindings );
-
 		this._setupBindings( bindings, programGPU );
 
 		const attributeNodes = computeProgram.attributes;
@@ -1157,8 +1155,6 @@ class WebGLBackend extends Backend {
 	}
 
 	updateBindings( bindGroup /*, bindings*/ ) {
-
-		if ( bindGroup === null ) return;
 
 		const { gl } = this;
 
