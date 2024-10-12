@@ -4,7 +4,7 @@ import { nodeObject } from '../tsl/TSLBase.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { screenUV } from '../display/ScreenNode.js';
 
-import { HalfFloatType, LinearMipMapLinearFilter } from '../../constants.js';
+import { HalfFloatType, LinearMipMapLinearFilter, WebGPUCoordinateSystem } from '../../constants.js';
 import { Plane } from '../../math/Plane.js';
 import { Object3D } from '../../core/Object3D.js';
 import { Vector2 } from '../../math/Vector2.js';
@@ -290,7 +290,7 @@ class ReflectorBaseNode extends Node {
 		// Replacing the third row of the projection matrix
 		projectionMatrix.elements[ 2 ] = clipPlane.x;
 		projectionMatrix.elements[ 6 ] = clipPlane.y;
-		projectionMatrix.elements[ 10 ] = clipPlane.z - clipBias;
+		projectionMatrix.elements[ 10 ] = ( renderer.coordinateSystem === WebGPUCoordinateSystem ) ? ( clipPlane.z - clipBias ) : ( clipPlane.z + 1.0 - clipBias );
 		projectionMatrix.elements[ 14 ] = clipPlane.w;
 
 		//
