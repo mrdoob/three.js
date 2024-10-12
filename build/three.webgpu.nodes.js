@@ -37754,6 +37754,7 @@ class Node extends EventDispatcher {
 		}
 
 		builder.removeChain( this );
+		builder.addSequentialNode( this );
 
 		return result;
 
@@ -53741,6 +53742,7 @@ class NodeBuilder {
 		this.camera = null;
 
 		this.nodes = [];
+		this.sequentialNodes = [];
 		this.updateNodes = [];
 		this.updateBeforeNodes = [];
 		this.updateAfterNodes = [];
@@ -53979,19 +53981,34 @@ class NodeBuilder {
 
 	}
 
+	addSequentialNode( node ) {
+
+		if ( this.sequentialNodes.includes( node ) === false ) {
+
+			this.sequentialNodes.push( node );
+
+		}
+
+	}
+
 	buildUpdateNodes() {
 
 		for ( const node of this.nodes ) {
 
 			const updateType = node.getUpdateType();
-			const updateBeforeType = node.getUpdateBeforeType();
-			const updateAfterType = node.getUpdateAfterType();
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
 				this.updateNodes.push( node.getSelf() );
 
 			}
+
+		}
+
+		for ( const node of this.sequentialNodes ) {
+
+			const updateBeforeType = node.getUpdateBeforeType();
+			const updateAfterType = node.getUpdateAfterType();
 
 			if ( updateBeforeType !== NodeUpdateType.NONE ) {
 
@@ -55799,6 +55816,8 @@ const _size$3 = new Vector2();
 const _defaultRT = new RenderTarget();
 const _defaultUV = screenUV.flipX();
 
+_defaultRT.depthTexture = new DepthTexture( 1, 1 );
+
 let _inReflector = false;
 
 class ReflectorNode extends TextureNode {
@@ -55811,27 +55830,103 @@ class ReflectorNode extends TextureNode {
 
 	constructor( parameters = {} ) {
 
-		super( _defaultRT.texture, _defaultUV );
+		super( parameters.defaultTexture || _defaultRT.texture, _defaultUV );
+
+		this._reflectorBaseNode = parameters.reflector || new ReflectorBaseNode( this, parameters );
+		this._depthNode = null;
+
+		this.setUpdateMatrix( false );
+
+	}
+
+	get reflector() {
+
+		return this._reflectorBaseNode;
+
+	}
+
+	get target() {
+
+		return this._reflectorBaseNode.target;
+
+	}
+
+	getDepthNode() {
+
+		if ( this._depthNode === null ) {
+
+			if ( this._reflectorBaseNode.depth !== true ) {
+
+				throw new Error( 'THREE.ReflectorNode: Depth node can only be requested when the reflector is created with { depth: true }. ' );
+
+			}
+
+			this._depthNode = nodeObject( new ReflectorNode( {
+				defaultTexture: _defaultRT.depthTexture,
+				reflector: this._reflectorBaseNode
+			} ) );
+
+		}
+
+		return this._depthNode;
+
+	}
+
+	setup( builder ) {
+
+		// ignore if used in post-processing
+		if ( ! builder.object.isQuadMesh ) this._reflectorBaseNode.build( builder );
+
+		return super.setup( builder );
+
+	}
+
+	clone() {
+
+		const texture = new this.constructor( this.reflectorNode );
+		texture._reflectorBaseNode = this._reflectorBaseNode;
+
+		return texture;
+
+	}
+
+}
+
+
+class ReflectorBaseNode extends Node {
+
+	static get type() {
+
+		return 'ReflectorBaseNode';
+
+	}
+
+	constructor( textureNode, parameters = {} ) {
+
+		super();
 
 		const {
 			target = new Object3D(),
 			resolution = 1,
 			generateMipmaps = false,
-			bounces = true
+			bounces = true,
+			depth = false
 		} = parameters;
 
 		//
+
+		this.textureNode = textureNode;
 
 		this.target = target;
 		this.resolution = resolution;
 		this.generateMipmaps = generateMipmaps;
 		this.bounces = bounces;
+		this.depth = depth;
 
 		this.updateBeforeType = bounces ? NodeUpdateType.RENDER : NodeUpdateType.FRAME;
 
 		this.virtualCameras = new WeakMap();
 		this.renderTargets = new WeakMap();
-
 
 	}
 
@@ -55879,8 +55974,14 @@ class ReflectorNode extends TextureNode {
 
 			if ( this.generateMipmaps === true ) {
 
-			    renderTarget.texture.minFilter = LinearMipMapLinearFilter;
-			    renderTarget.texture.generateMipmaps = true;
+				renderTarget.texture.minFilter = LinearMipMapLinearFilter;
+				renderTarget.texture.generateMipmaps = true;
+
+			}
+
+			if ( this.depth === true ) {
+
+				renderTarget.depthTexture = new DepthTexture();
 
 			}
 
@@ -55894,7 +55995,7 @@ class ReflectorNode extends TextureNode {
 
 	updateBefore( frame ) {
 
-		if ( this.bounces === false && _inReflector ) return false;
+		if ( this.bounces === false && _inReflector ) return;
 
 		_inReflector = true;
 
@@ -55979,7 +56080,13 @@ class ReflectorNode extends TextureNode {
 
 		//
 
-		this.value = renderTarget.texture;
+		this.textureNode.value = renderTarget.texture;
+
+		if ( this.depth === true ) {
+
+			this.textureNode.getDepthNode().value = renderTarget.depthTexture;
+
+		}
 
 		material.visible = false;
 
