@@ -972,7 +972,19 @@ class WebGPUBackend extends Backend {
 
 			const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
 
-			passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
+			const indirect = renderObject.getIndirect();
+
+			if ( indirect !== null ) {
+
+				const buffer = this.get( indirect ).buffer;
+
+				passEncoderGPU.drawIndexedIndirect( buffer, 0 );
+
+			} else {
+
+				passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
+
+			}
 
 			info.update( object, indexCount, instanceCount );
 
@@ -980,7 +992,19 @@ class WebGPUBackend extends Backend {
 
 			const { vertexCount, instanceCount, firstVertex } = drawParams;
 
-			passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+			const indirect = renderObject.getIndirect();
+
+			if ( indirect !== null ) {
+
+				const buffer = this.get( indirect ).buffer;
+
+				passEncoderGPU.drawIndirect( buffer, 0 );
+
+			} else {
+
+				passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+
+			}
 
 			info.update( object, vertexCount, instanceCount );
 
@@ -1332,6 +1356,12 @@ class WebGPUBackend extends Backend {
 	createStorageAttribute( attribute ) {
 
 		this.attributeUtils.createAttribute( attribute, GPUBufferUsage.STORAGE | GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST );
+
+	}
+
+	createIndirectStorageAttribute( attribute ) {
+
+		this.attributeUtils.createAttribute( attribute, GPUBufferUsage.STORAGE | GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST );
 
 	}
 

@@ -1,4 +1,4 @@
-import { float, Fn, vec2, sin, rand, degrees, cos, Loop, vec4 } from 'three/tsl';
+import { float, Fn, vec2, uv, sin, rand, degrees, cos, Loop, vec4 } from 'three/tsl';
 
 // https://www.shadertoy.com/view/4lXXWn
 
@@ -6,10 +6,8 @@ export const hashBlur = /*#__PURE__*/ Fn( ( [ textureNode, bluramount = float( 0
 
 	const draw = ( uv ) => textureNode.uv( uv );
 
-	const targetUV = textureNode.uvNode;
+	const targetUV = textureNode.uvNode || uv();
 	const blurred_image = vec4( 0. ).toVar();
-
-	//const map = textureNode.value;
 
 	Loop( { start: 0., end: repeats, type: 'float' }, ( { i } ) => {
 

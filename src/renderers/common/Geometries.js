@@ -144,6 +144,8 @@ class Geometries extends DataMap {
 
 	updateAttributes( renderObject ) {
 
+		// attributes
+
 		const attributes = renderObject.getAttributes();
 
 		for ( const attribute of attributes ) {
@@ -160,11 +162,23 @@ class Geometries extends DataMap {
 
 		}
 
+		// indexes
+
 		const index = this.getIndex( renderObject );
 
 		if ( index !== null ) {
 
 			this.updateAttribute( index, AttributeType.INDEX );
+
+		}
+
+		// indirect
+
+		const indirect = renderObject.geometry.indirect;
+
+		if ( indirect !== null ) {
+
+			this.updateAttribute( indirect, AttributeType.INDIRECT );
 
 		}
 
@@ -203,6 +217,12 @@ class Geometries extends DataMap {
 			}
 
 		}
+
+	}
+
+	getIndirect( renderObject ) {
+
+		return renderObject.geometry.indirect;
 
 	}
 
