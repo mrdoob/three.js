@@ -1,11 +1,19 @@
 import { Color, Vector2, PostProcessingUtils, NearestFilter, Matrix4 } from 'three';
-import { float, If, Loop, int, Fn, min, max, clamp, nodeObject, mix, PassNode, QuadMesh, texture, NodeMaterial, mrt, output, velocity, uniform, uv, vec2, vec4 } from 'three/tsl';
+import { sqrt, abs, add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, PassNode, QuadMesh, texture, NodeMaterial, mrt, output, velocity, uniform, uv, vec2, vec3, vec4, luminance } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
 
+/**
+* Temporal Reprojection Anti-Aliasing (TRAA)
+*
+* References:
+* https://alextardif.com/TAA.html
+* https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/
+*
+*/
 class TRAAPassNode extends PassNode {
 
 	static get type() {
@@ -23,8 +31,7 @@ class TRAAPassNode extends PassNode {
 		this.clearColor = new Color( 0x000000 );
 		this.clearAlpha = 0;
 
-		this._currentJitterIndex = 0;
-		this._firstFrame = true;
+		this._jitterIndex = 0;
 		this._originalProjectionMatrix = new Matrix4();
 
 		this._invSize = uniform( new Vector2() );
@@ -45,10 +52,20 @@ class TRAAPassNode extends PassNode {
 
 		super.setSize( width, height );
 
-		this._sampleRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
-		this._historyRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
+		let needsRestart = false;
 
-		this._invSize.value.set( 1 / this.renderTarget.width, 1 / this.renderTarget.height );
+		if ( this.renderTarget.width !== this._sampleRenderTarget.width || this.renderTarget.height !== this._sampleRenderTarget.height ) {
+
+			this._sampleRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
+			this._historyRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
+
+			this._invSize.value.set( 1 / this.renderTarget.width, 1 / this.renderTarget.height );
+
+			needsRestart = true;
+
+		}
+
+		return needsRestart;
 
 	}
 
@@ -64,7 +81,7 @@ class TRAAPassNode extends PassNode {
 		this._pixelRatio = renderer.getPixelRatio();
 		const size = renderer.getSize( _size );
 
-		this.setSize( size.width, size.height );
+		const needsRestart = this.setSize( size.width, size.height, renderer );
 
 		//
 
@@ -86,7 +103,7 @@ class TRAAPassNode extends PassNode {
 
 		if ( originalViewOffset.enabled ) Object.assign( viewOffset, originalViewOffset );
 
-		const jitterOffset = _JitterVectors[ this._currentJitterIndex ];
+		const jitterOffset = _JitterVectors[ this._jitterIndex ];
 
 		camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( camera.projectionMatrix );
@@ -116,10 +133,17 @@ class TRAAPassNode extends PassNode {
 
 		renderer.setMRT( null );
 
-		if ( this._firstFrame === true ) {
+		// every time when the dimensions change we need fresh history data. Copy the sample
+		// into the history and final render target (no AA happens at that point).
 
-			// the first frame is an edge case since there are no history data. So we just copy the sample
-			// into the history and final render target (no AA happens at that point).
+		if ( needsRestart === true ) {
+
+			// force a clear to fix the reset after a rezise with WebGPU
+			// there are currently warnings in the browser console indicating the texture dimensions do not match during the copy
+			// seems like some sort of timing issue
+
+			renderer.setRenderTarget( this._historyRenderTarget );
+			renderer.clear();
 
 			renderer.copyTextureToTexture( this._sampleRenderTarget.texture, this._historyRenderTarget.texture );
 			renderer.copyTextureToTexture( this._sampleRenderTarget.texture, this.renderTarget.texture );
@@ -146,15 +170,8 @@ class TRAAPassNode extends PassNode {
 
 		// update jitter index
 
-		if ( this._currentJitterIndex === _JitterVectors.length - 1 ) {
-
-			this._currentJitterIndex = 0;
-
-		} else {
-
-			this._currentJitterIndex ++;
-
-		}
+		this._jitterIndex ++;
+		this._jitterIndex = this._jitterIndex % ( _JitterVectors.length - 1 );
 
 		// restore
 
@@ -200,7 +217,7 @@ class TRAAPassNode extends PassNode {
 
 		}
 
-		// resolve material
+		// textures
 
 		const historyTexture = texture( this._historyRenderTarget.texture );
 		const sampleTexture = texture( this._sampleRenderTarget.textures[ 0 ] );
@@ -219,9 +236,9 @@ class TRAAPassNode extends PassNode {
 			// sample a 3x3 neighborhood to create a box in color space
 			// clamping the history color with the resulting min/max colors mitigates ghosting
 
-			Loop( { start: int( - 1 ), end: int( 1 ), type: 'int', condition: '<=' }, ( { x } ) => {
+			Loop( { start: int( - 1 ), end: int( 1 ), type: 'int', condition: '<=', name: 'x' }, ( { x } ) => {
 
-				Loop( { start: int( - 1 ), end: int( 1 ), type: 'int', condition: '<=' }, ( { y } ) => {
+				Loop( { start: int( - 1 ), end: int( 1 ), type: 'int', condition: '<=', name: 'y' }, ( { y } ) => {
 
 					const uvNeighbor = uvNode.add( vec2( float( x ), float( y ) ).mul( this._invSize ) ).toVar();
 					const colorNeighbor = max( vec4( 0 ), sampleTexture.uv( uvNeighbor ) ).toVar(); // use max() to avoid propagate garbage values
@@ -230,6 +247,8 @@ class TRAAPassNode extends PassNode {
 					maxColor.assign( max( maxColor, colorNeighbor ) );
 
 					const currentDepth = depthTexture.uv( uvNeighbor ).r.toVar();
+
+					// find the sample position of the closest depth in the neighborhood (used for velocity)
 
 					If( currentDepth.lessThan( closestDepth ), () => {
 
@@ -242,15 +261,36 @@ class TRAAPassNode extends PassNode {
 
 			} );
 
+			// sampling/reprojection
+
 			const offset = velocityTexture.uv( closestDepthPixelPosition ).xy.mul( vec2( 0.5, - 0.5 ) ); // NDC to uv offset
 
 			const currentColor = sampleTexture.uv( uvNode );
 			const historyColor = historyTexture.uv( uvNode.sub( offset ) );
+
+			// clamping
+
 			const clampedHistoryColor = clamp( historyColor, minColor, maxColor );
 
-			return mix( currentColor, clampedHistoryColor, 0.9 ); // blend
+			// flicker reduction based on luminance weighing
+
+			const currentWeight = float( 0.05 ).toVar();
+			const historyWeight = currentWeight.oneMinus().toVar();
+
+			const compressedCurrent = currentColor.mul( float( 1 ).div( ( max( max( currentColor.r, currentColor.g ), currentColor.b ).add( 1.0 ) ) ) );
+			const compressedHistory = clampedHistoryColor.mul( float( 1 ).div( ( max( max( clampedHistoryColor.r, clampedHistoryColor.g ), clampedHistoryColor.b ).add( 1.0 ) ) ) );
+
+			const luminanceCurrent = luminance( compressedCurrent.rgb );
+			const luminanceHistory = luminance( compressedHistory.rgb );
+
+			currentWeight.mulAssign( float( 1.0 ).div( luminanceCurrent.add( 1 ) ) );
+			historyWeight.mulAssign( float( 1.0 ).div( luminanceHistory.add( 1 ) ) );
+
+			return add( currentColor.mul( currentWeight ), clampedHistoryColor.mul( historyWeight ) ).div( max( currentWeight.add( historyWeight ), 0.00001 ) );
 
 		} );
+
+		// materials
 
 		this._resolveMaterial.fragmentNode = resolve();
 
