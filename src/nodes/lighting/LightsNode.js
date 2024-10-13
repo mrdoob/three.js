@@ -259,4 +259,4 @@ class LightsNode extends Node {
 
 export default LightsNode;
 
-export const lights = ( lights ) => nodeObject( new LightsNode() ).setLights( lights );
+export const lights = ( lights = [] ) => nodeObject( new LightsNode() ).setLights( lights );
