@@ -311,7 +311,7 @@ class TRAAPassNode extends PassNode {
 
 		}
 
-		this._resolveMaterial;
+		this._resolveMaterial.dispose();
 
 	}
 
