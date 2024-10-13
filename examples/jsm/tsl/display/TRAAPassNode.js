@@ -7,7 +7,7 @@ const _size = /*@__PURE__*/ new Vector2();
 let _rendererState;
 
 /**
-* Temporal Reprojection Anti-Aliasing (TRAA)
+* Temporal Reprojection Anti-Aliasing (TRAA).
 *
 * References:
 * https://alextardif.com/TAA.html
@@ -33,6 +33,8 @@ class TRAAPassNode extends PassNode {
 
 		this._jitterIndex = 0;
 		this._originalProjectionMatrix = new Matrix4();
+
+		// uniforms
 
 		this._invSize = uniform( new Vector2() );
 
@@ -138,8 +140,8 @@ class TRAAPassNode extends PassNode {
 
 		if ( needsRestart === true ) {
 
-			// force a clear to fix the reset after a rezise with WebGPU
-			// there are currently warnings in the browser console indicating the texture dimensions do not match during the copy
+			// force a clear to fix the reset after a rezise with WebGPU.
+			// there are currently warnings in the browser console indicating the texture dimensions do not match during the copy.
 			// seems like some sort of timing issue
 
 			renderer.setRenderTarget( this._historyRenderTarget );
