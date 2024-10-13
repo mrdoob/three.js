@@ -11,7 +11,7 @@ class Lighting extends ChainMap {
 
 	}
 
-	createNode() {
+	createNode( lights = [] ) {
 
 		return new LightsNode().setLights( lights );
 
