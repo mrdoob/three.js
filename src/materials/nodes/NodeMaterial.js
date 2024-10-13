@@ -460,7 +460,7 @@ class NodeMaterial extends Material {
 
 		if ( materialLightsNode.length > 0 ) {
 
-			lightsN = lights( [ ...lightsN.getLights(), ...materialLightsNode ] );
+			lightsN = builder.renderer.lighting.createNode( [ ...lightsN.getLights(), ...materialLightsNode ] );
 
 		}
 
@@ -487,7 +487,7 @@ class NodeMaterial extends Material {
 
 		let outgoingLightNode = this.setupOutgoingLight( builder );
 
-		if ( lightsNode && lightsNode.getScope().getLights().length > 0 ) {
+		if ( lightsNode && lightsNode.getScope().hasLights ) {
 
 			const lightingModel = this.setupLightingModel( builder );
 
