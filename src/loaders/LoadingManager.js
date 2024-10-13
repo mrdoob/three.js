@@ -1,5 +1,5 @@
 class LoadingManager {
-
+	abortController = new AbortController();
 	constructor( onLoad, onProgress, onError ) {
 
 		const scope = this;
@@ -134,7 +134,11 @@ class LoadingManager {
 		};
 
 	}
+	// 这个方法仅用于取消 fileLoader的fetch请求 imgLoader的abort()待实现
+	abortAllFileLoad(){
 
+		this.abortController.abort();
+	}
 }
 
 const DefaultLoadingManager = /*@__PURE__*/ new LoadingManager();
