@@ -82,11 +82,11 @@ class Renderer {
 		this.info = new Info();
 
 		this.nodes = {
-			library: new NodeLibrary(),
 			modelViewMatrix: null,
 			modelNormalViewMatrix: null
 		};
 
+		this.library = new NodeLibrary();
 		// internals
 
 		this._getFallback = getFallback;

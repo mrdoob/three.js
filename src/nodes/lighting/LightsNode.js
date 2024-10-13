@@ -92,7 +92,7 @@ class LightsNode extends Node {
 		const previousLightNodes = this._lightNodes;
 
 		const lights = sortLights( this._lights );
-		const nodeLibrary = builder.renderer.nodes.library;
+		const nodeLibrary = builder.renderer.library;
 
 		for ( const light of lights ) {
 
