@@ -9,9 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> - glTF + <a href="https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_anisotropy" target="_blank" rel="noopener">KHR_materials_anisotropy</a><br />
-			Anisotropy Barn Lamp from <a href="https://github.com/KhronosGroup/glTF-Sample-Models/tree/master/2.0/AnisotropyBarnLamp" target="_blank" rel="noopener">glTF-Sample-Models</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> from <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgpu</a> Extended Range (HDR)<br />
 		</div>
 
 		<script type="importmap">
@@ -32,7 +30,8 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
-			let renderer, scene, camera, controls;
+			let renderer, scene, camera, controls, lastContent;
+			const spheres = [];
 
 			init();
 
@@ -42,8 +41,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( render );
+				/*
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1.35;
+				*/
 				document.body.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -71,16 +72,63 @@
 				texture.mapping = THREE.EquirectangularReflectionMapping;
 
 				scene.background = texture;
-				scene.backgroundBlurriness = 0.5;
+				scene.backgroundBlurriness = 0.0;
 				scene.environment = texture;
+				scene.environmentIntensity = 5;
 
 				// model
 
+
 				scene.add( gltf.scene );
+				lastContent = gltf.scene;
 
 				window.addEventListener( 'resize', onWindowResize );
 
+				// drop listener for GLB
+
+				renderer.domElement.addEventListener( 'dragover', event => {
+
+					event.preventDefault();
+
+				} );
+
+				renderer.domElement.addEventListener( 'drop', async event => {
+
+					event.preventDefault();
+					const file = event.dataTransfer.files[ 0 ];
+					if ( file !== undefined && file.name.endsWith( '.glb' ) ) {
+
+						// convert to blob
+						const blob = new Blob( [ await file.arrayBuffer() ], { type: 'application/octet-stream' } );
+						gltfLoader.setPath( '' );
+						const gltf = await gltfLoader.loadAsync( URL.createObjectURL( blob ) );
+
+
+						scene.add( gltf.scene );
+						scene.remove( lastContent );
+						lastContent = gltf.scene;
+
+					}
+
+				} );
+
+				// add random moving glowing spheres
+
+				const sphereGeometry = new THREE.SphereGeometry( 0.02, 32, 32 );
+
+				for ( let i = 0; i < 20; i ++ ) {
+
+					const sphereMaterial = new THREE.MeshPhysicalMaterial( { color: 0x000000, emissive: Math.random() * 0xffffff, emissiveIntensity: 30 } );
+					const sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+					sphere.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize().multiplyScalar( 0.5 );
+					scene.add( sphere );
+
+					spheres.push( sphere );
+
+				}
+
 			}
+
 
 			function onWindowResize() {
 
@@ -95,6 +143,13 @@
 			function render() {
 
 				renderer.renderAsync( scene, camera );
+
+				for ( let i = 0; i < spheres.length; i ++ ) {
+
+					const sphere = spheres[ i ];
+					sphere.position.y = Math.sin( performance.now() * 0.0003 + i ) * 0.5;
+
+				}
 
 			}
 

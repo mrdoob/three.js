@@ -120,6 +120,11 @@ class WebGPUUtils {
 
 		} else {
 
+			// this should probably be cached
+			const hdrMediaQuery = window.matchMedia( '(dynamic-range: high)' );
+			if ( hdrMediaQuery && hdrMediaQuery.matches )
+				return 'rgba16float';
+
 			return navigator.gpu.getPreferredCanvasFormat();
 
 		}

@@ -110,12 +110,21 @@ class WebGPUBackend extends Backend {
 
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
-		this.context.configure( {
+		let useHdr = false; // this should become an option
+		const hdrMediaQuery = window.matchMedia( '(dynamic-range: high)' );
+		if ( hdrMediaQuery && hdrMediaQuery.matches )
+			useHdr = true;
+
+		const options = {
 			device: this.device,
 			format: this.utils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-			alphaMode: alphaMode
-		} );
+			alphaMode: alphaMode,
+			toneMapping: { mode: useHdr ? 'extended' : 'standard' },
+			viewFormats: useHdr ? [ 'rgba16float' ] : [],
+		};
+
+		this.context.configure( options );
 
 		this.updateSize();
 
