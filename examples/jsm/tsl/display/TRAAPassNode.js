@@ -157,8 +157,6 @@ class TRAAPassNode extends PassNode {
 			renderer.copyTextureToTexture( this._sampleRenderTarget.texture, this._historyRenderTarget.texture );
 			renderer.copyTextureToTexture( this._sampleRenderTarget.texture, this.renderTarget.texture );
 
-			this._firstFrame = false;
-
 		} else {
 
 			// resolve
