@@ -123,10 +123,7 @@ class TRAAPassNode extends PassNode {
 		const velocityNode = velocity;
 		velocityNode.setProjectionMatrix( this._originalProjectionMatrix );
 
-		renderer.setMRT( mrt( {
-			output,
-			velocity
-		} ) );
+		renderer.setMRT( this.getMRT() );
 
 		renderer.setClearColor( this.clearColor, this.clearAlpha );
 		renderer.setRenderTarget( this._sampleRenderTarget );

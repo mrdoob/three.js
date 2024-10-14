@@ -24,6 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { mrt, output, velocity } from 'three/tsl';
 			import { traaPass } from 'three/addons/tsl/display/TRAAPassNode.js';
 			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
@@ -54,37 +55,40 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 300;
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.z = 2.5;
 
 				scene = new THREE.Scene();
 
-				const geometry = new THREE.BoxGeometry( 120, 120, 120 );
+				const geometry = new THREE.BoxGeometry();
 				const material1 = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
 				const mesh1 = new THREE.Mesh( geometry, material1 );
-				mesh1.position.x = - 100;
+				mesh1.position.x = - 1;
 				scene.add( mesh1 );
 
 				const texture = new THREE.TextureLoader().load( 'textures/brick_diffuse.jpg' );
 				texture.minFilter = THREE.NearestFilter;
 				texture.magFilter = THREE.NearestFilter;
-				texture.anisotropy = 1;
 				texture.generateMipmaps = false;
 				texture.colorSpace = THREE.SRGBColorSpace;
 
 				const material2 = new THREE.MeshBasicMaterial( { map: texture } );
 
 				const mesh2 = new THREE.Mesh( geometry, material2 );
-				mesh2.position.x = 100;
+				mesh2.position.x = 1;
 				scene.add( mesh2 );
 
 				// postprocessing
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				const traaRenderPass = traaPass( scene, camera );
+				const scenePass = traaPass( scene, camera );
+				scenePass.setMRT( mrt( {
+					output: output,
+					velocity: velocity
+				} ) );
 
-				postProcessing.outputNode = traaRenderPass;
+				postProcessing.outputNode = scenePass;
 
 				//
 
