@@ -1,4 +1,4 @@
-import { Color, Vector2, PostProcessingUtils, NearestFilter, Matrix4, DepthTexture, RenderTarget, HalfFloatType } from 'three';
+import { Color, Vector2, PostProcessingUtils, NearestFilter, Matrix4 } from 'three';
 import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, PassNode, QuadMesh, texture, NodeMaterial, uniform, uv, vec2, vec4, luminance } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
@@ -34,33 +34,19 @@ class TRAAPassNode extends PassNode {
 		this._jitterIndex = 0;
 		this._originalProjectionMatrix = new Matrix4();
 
-		// render targets
-
-		this._sampleRenderTarget = new RenderTarget( 1, 1, { type: HalfFloatType } );
-		this._historyRenderTarget = new RenderTarget( 1, 1, { type: HalfFloatType } );
-		this._resolveRenderTarget = new RenderTarget( 1, 1, { type: HalfFloatType } );
-
-		this._sampleRenderTarget.depthTexture = new DepthTexture();
-		this._sampleRenderTarget.texture.minFiler = NearestFilter;
-		this._sampleRenderTarget.texture.magFilter = NearestFilter;
-
 		// uniforms
 
 		this._invSize = uniform( new Vector2() );
 
-		this._sampleTexture = texture( this._sampleRenderTarget.texture );
-		this._depthTexture = texture( this._sampleRenderTarget.depthTexture );
-		this._historyTexture = texture( this._historyRenderTarget.texture );
-		this._velocityTexture = this.getTextureNode( 'velocity' );
+		// render targets
+
+		this._sampleRenderTarget = null;
+		this._historyRenderTarget = null;
 
 		// materials
 
 		this._resolveMaterial = new NodeMaterial();
 		this._resolveMaterial.name = 'TRAA.Resolve';
-
-		this._prepassMaterial = new NodeMaterial();
-		this._prepassMaterial.name = 'TRAA.Override';
-		this._prepassMaterial.colorNode = vec4( 0, 0, 0, 1 );
 
 	}
 
@@ -74,7 +60,6 @@ class TRAAPassNode extends PassNode {
 
 			this._sampleRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
 			this._historyRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
-			this._resolveRenderTarget.setSize( this.renderTarget.width, this.renderTarget.height );
 
 			this._invSize.value.set( 1 / this.renderTarget.width, 1 / this.renderTarget.height );
 
@@ -100,32 +85,10 @@ class TRAAPassNode extends PassNode {
 
 		const needsRestart = this.setSize( size.width, size.height, renderer );
 
+		//
+
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
-
-		// prepass
-
-		const mrt = this.getMRT();
-		const velocityOutput = mrt.get( 'velocity' );
-
-		if ( velocityOutput === undefined ) {
-
-			throw new Error( 'THREE:TRAAPassNode: Missing velocity output in MRT configuration.' );
-
-		}
-
-		renderer.setMRT( mrt );
-		scene.overrideMaterial = this._prepassMaterial;
-
-		renderer.setClearColor( this.clearColor, this.clearAlpha );
-		renderer.setRenderTarget( this.renderTarget );
-		renderer.clear();
-		renderer.render( scene, camera );
-
-		scene.overrideMaterial = null;
-		renderer.setMRT( null );
-
-		// configure jitter
 
 		const viewOffset = {
 
@@ -144,6 +107,9 @@ class TRAAPassNode extends PassNode {
 
 		const jitterOffset = _JitterVectors[ this._jitterIndex ];
 
+		camera.updateProjectionMatrix();
+		this._originalProjectionMatrix.copy( camera.projectionMatrix );
+
 		camera.setViewOffset(
 
 			viewOffset.fullWidth, viewOffset.fullHeight,
@@ -154,12 +120,27 @@ class TRAAPassNode extends PassNode {
 
 		);
 
-		// render beauty with jitter
+		const mrt = this.getMRT();
+		const velocityOutput = mrt.get( 'velocity' );
+
+		if ( velocityOutput !== undefined ) {
+
+			velocityOutput.setProjectionMatrix( this._originalProjectionMatrix );
+
+		} else {
+
+			throw new Error( 'THREE:TRAAPassNode: Missing velocity output in MRT configuration.' );
+
+		}
+
+		renderer.setMRT( mrt );
 
 		renderer.setClearColor( this.clearColor, this.clearAlpha );
 		renderer.setRenderTarget( this._sampleRenderTarget );
 		renderer.clear();
 		renderer.render( scene, camera );
+
+		renderer.setMRT( null );
 
 		// every time when the dimensions change we need fresh history data. Copy the sample
 		// into the history and final render target (no AA happens at that point).
@@ -170,28 +151,31 @@ class TRAAPassNode extends PassNode {
 			// there are currently warnings in the browser console indicating the texture dimensions do not match during the copy.
 			// seems like some sort of timing issue
 
-			renderer.setRenderTarget( this._historyRenderTarget ); // no resolve
+			renderer.setRenderTarget( this._historyRenderTarget );
 			renderer.clear();
-
-			// update history and output
 
 			renderer.copyTextureToTexture( this._sampleRenderTarget.texture, this._historyRenderTarget.texture );
 			renderer.copyTextureToTexture( this._sampleRenderTarget.texture, this.renderTarget.texture );
+
+			this._firstFrame = false;
 
 		} else {
 
 			// resolve
 
-			renderer.setRenderTarget( this._resolveRenderTarget );
+			renderer.setRenderTarget( this.renderTarget );
 			_quadMesh.material = this._resolveMaterial;
 			_quadMesh.render( renderer );
 
-			// update history and output
+			// update history
 
-			renderer.copyTextureToTexture( this._resolveRenderTarget.texture, this._historyRenderTarget.texture );
-			renderer.copyTextureToTexture( this._resolveRenderTarget.texture, this.renderTarget.texture );
+			renderer.copyTextureToTexture( this.renderTarget.texture, this._historyRenderTarget.texture );
 
 		}
+
+		// copy depth
+
+		renderer.copyTextureToTexture( this._sampleRenderTarget.depthTexture, this.renderTarget.depthTexture );
 
 		// update jitter index
 
@@ -218,11 +202,36 @@ class TRAAPassNode extends PassNode {
 
 		}
 
+		velocityOutput.setProjectionMatrix( null );
+
 		PostProcessingUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
 
 	}
 
 	setup( builder ) {
+
+		if ( this._sampleRenderTarget === null ) {
+
+			this._sampleRenderTarget = this.renderTarget.clone();
+			this._historyRenderTarget = this.renderTarget.clone();
+
+			this._sampleRenderTarget.texture.minFiler = NearestFilter;
+			this._sampleRenderTarget.texture.magFilter = NearestFilter;
+
+			const velocityTarget = this._sampleRenderTarget.texture.clone();
+			velocityTarget.isRenderTargetTexture = true;
+			velocityTarget.name = 'velocity';
+
+			this._sampleRenderTarget.textures.push( velocityTarget );
+
+		}
+
+		// textures
+
+		const historyTexture = texture( this._historyRenderTarget.texture );
+		const sampleTexture = texture( this._sampleRenderTarget.textures[ 0 ] );
+		const velocityTexture = texture( this._sampleRenderTarget.textures[ 1 ] );
+		const depthTexture = texture( this._sampleRenderTarget.depthTexture );
 
 		const resolve = Fn( () => {
 
@@ -241,12 +250,12 @@ class TRAAPassNode extends PassNode {
 				Loop( { start: int( - 1 ), end: int( 1 ), type: 'int', condition: '<=', name: 'y' }, ( { y } ) => {
 
 					const uvNeighbor = uvNode.add( vec2( float( x ), float( y ) ).mul( this._invSize ) ).toVar();
-					const colorNeighbor = max( vec4( 0 ), this._sampleTexture.uv( uvNeighbor ) ).toVar(); // use max() to avoid propagate garbage values
+					const colorNeighbor = max( vec4( 0 ), sampleTexture.uv( uvNeighbor ) ).toVar(); // use max() to avoid propagate garbage values
 
 					minColor.assign( min( minColor, colorNeighbor ) );
 					maxColor.assign( max( maxColor, colorNeighbor ) );
 
-					const currentDepth = this._depthTexture.uv( uvNeighbor ).r.toVar();
+					const currentDepth = depthTexture.uv( uvNeighbor ).r.toVar();
 
 					// find the sample position of the closest depth in the neighborhood (used for velocity)
 
@@ -263,10 +272,10 @@ class TRAAPassNode extends PassNode {
 
 			// sampling/reprojection
 
-			const offset = this._velocityTexture.uv( closestDepthPixelPosition ).xy.mul( vec2( 0.5, - 0.5 ) ); // NDC to uv offset
+			const offset = velocityTexture.uv( closestDepthPixelPosition ).xy.mul( vec2( 0.5, - 0.5 ) ); // NDC to uv offset
 
-			const currentColor = this._sampleTexture.uv( uvNode );
-			const historyColor = this._historyTexture.uv( uvNode.sub( offset ) );
+			const currentColor = sampleTexture.uv( uvNode );
+			const historyColor = historyTexture.uv( uvNode.sub( offset ) );
 
 			// clamping
 
@@ -302,12 +311,14 @@ class TRAAPassNode extends PassNode {
 
 		super.dispose();
 
-		this._sampleRenderTarget.dispose();
-		this._historyRenderTarget.dispose();
-		this._resolveRenderTarget.dispose();
+		if ( this._sampleRenderTarget !== null ) {
+
+			this._sampleRenderTarget.dispose();
+			this._historyRenderTarget.dispose();
+
+		}
 
 		this._resolveMaterial.dispose();
-		this._prepassMaterial.dispose();
 
 	}
 
