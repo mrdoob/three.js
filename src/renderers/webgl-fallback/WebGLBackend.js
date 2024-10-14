@@ -741,11 +741,7 @@ class WebGLBackend extends Backend {
 
 		if ( object.isBatchedMesh ) {
 
-			if ( object._multiDrawInstances !== null ) {
-
-				renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
-
-			} else if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
+			if ( ! this.hasFeature( 'WEBGL_multi_draw' ) ) {
 
 				warnOnce( 'THREE.WebGLRenderer: WEBGL_multi_draw not supported.' );
 
