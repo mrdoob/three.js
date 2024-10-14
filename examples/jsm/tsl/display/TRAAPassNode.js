@@ -1,5 +1,5 @@
 import { Color, Vector2, PostProcessingUtils, NearestFilter, Matrix4 } from 'three';
-import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, PassNode, QuadMesh, texture, NodeMaterial, velocity, uniform, uv, vec2, vec4, luminance } from 'three/tsl';
+import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, PassNode, QuadMesh, texture, NodeMaterial, uniform, uv, vec2, vec4, luminance } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -120,10 +120,20 @@ class TRAAPassNode extends PassNode {
 
 		);
 
-		const velocityNode = velocity;
-		velocityNode.setProjectionMatrix( this._originalProjectionMatrix );
+		const mrt = this.getMRT();
+		const velocityOutput = mrt.get( 'velocity' );
 
-		renderer.setMRT( this.getMRT() );
+		if ( velocityOutput !== undefined ) {
+
+			velocityOutput.setProjectionMatrix( this._originalProjectionMatrix );
+
+		} else {
+
+			throw new Error( 'THREE:TRAAPassNode: Missing velocity output in MRT configuration.' );
+
+		}
+
+		renderer.setMRT( mrt );
 
 		renderer.setClearColor( this.clearColor, this.clearAlpha );
 		renderer.setRenderTarget( this._sampleRenderTarget );
@@ -192,7 +202,7 @@ class TRAAPassNode extends PassNode {
 
 		}
 
-		velocityNode.setProjectionMatrix( null );
+		velocityOutput.setProjectionMatrix( null );
 
 		PostProcessingUtils.restoreRendererAndSceneState( renderer, scene, _rendererState );
 
