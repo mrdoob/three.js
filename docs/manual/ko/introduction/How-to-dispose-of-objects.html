@@ -43,8 +43,8 @@
 	</p>
 
 	<p>
-        If you use an *ImageBitmap* as the texture's data source, you have to call [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap/close ImageBitmap.close]() at the application level to dispose of all CPU-side resources.
-        An automated call of *ImageBitmap.close()* in [page:Texture.dispose]() is not possible, since the image bitmap becomes unusable, and the engine has no way of knowing if the image bitmap is used elsewhere.
+	만약 *ImageBitmap*을 텍스처의 데이터 소스로 사용할 경우, 애플리케이션 레벨에서 [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap/close ImageBitmap.close]()를 호출하여 CPU 측 리소스를 모두 해제해야 합니다.
+	[page:Texture.dispose]()에서 *ImageBitmap.close()*를 자동으로 호출하는 것은 불가능한데, 이는 이미지 비트맵이 사용 불가능하게 되기 때문이며, 엔진은 해당 이미지 비트맵이 다른 곳에서 사용되고 있는지 여부를 알 수 없기 때문입니다.
 	</p>
 
 	<h2>렌더링 대상</h2>
