@@ -1,7 +1,7 @@
-import {
-	Mesh,
-	InstancedPointsNodeMaterial
-} from 'three';
+import { Mesh } from 'three';
+
+import { InstancedPointsNodeMaterial } from 'three/webgpu';
+
 import InstancedPointsGeometry from '../geometries/InstancedPointsGeometry.js';
 
 class InstancedPoints extends Mesh {
