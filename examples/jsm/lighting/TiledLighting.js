@@ -1,7 +1,7 @@
-import * as THREE from 'three';
+import { Lighting } from 'three';
 import { tiledLights } from '../tsl/lighting/TiledLightsNode.js';
 
-export class TiledLighting extends THREE.Lighting {
+export class TiledLighting extends Lighting {
 
 	constructor() {
 

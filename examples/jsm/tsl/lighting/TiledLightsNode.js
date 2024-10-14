@@ -5,21 +5,6 @@ import {
 
 import * as THREE from 'three';
 
-export const intersectAABB = /*@__PURE__*/ Fn( ( [ point, minBounds, maxBounds ] ) => {
-
-	return point.x.greaterThanEqual( minBounds.x ).and( point.x.lessThanEqual( maxBounds.x ) ).and( point.y.greaterThanEqual( minBounds.y ) ).and( point.y.lessThanEqual( maxBounds.y ) );
-
-} ).setLayout( {
-	name: 'intersectAABB',
-	type: 'bool',
-	inputs: [
-		{ name: 'point', type: 'vec2' },
-		{ name: 'minBounds', type: 'vec2' },
-		{ name: 'maxBounds', type: 'vec2' }
-	]
-} );
-
-
 export const circleIntersectsAABB = /*@__PURE__*/ Fn( ( [ circleCenter, radius, minBounds, maxBounds ] ) => {
 
 	// Find the closest point on the AABB to the circle's center using method chaining
