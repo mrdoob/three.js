@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, screenUV, hue, timerLocal, reflector, Fn, vec2, length, atan2, float, sin, cos, vec3, sub, mul, pow, dodge, normalWorld } from 'three/tsl';
+			import { color, screenUV, hue, reflector, time, Fn, vec2, length, atan2, float, sin, cos, vec3, sub, mul, pow, dodge, normalWorld } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -61,7 +61,6 @@
 
 				// forked from https://www.shadertoy.com/view/7ly3D1
 
-				const time = timerLocal( 1 );
 				const suv = vec2( suv_immutable );
 				const uv = vec2( length( suv ), atan2( suv.y, suv.x ) );
 				const offset = float( float( .1 ).mul( sin( uv.y.mul( 10. ).sub( time.mul( .6 ) ) ) ).mul( cos( uv.y.mul( 48. ).add( time.mul( .3 ) ) ) ).mul( cos( uv.y.mul( 3.7 ).add( time ) ) ) );
@@ -83,7 +82,7 @@
 
 			// background
 
-			const coloredVignette = screenUV.distance( .5 ).mix( hue( color( 0x0175ad ), timerLocal( .1 ) ), hue( color( 0x02274f ), timerLocal( .5 ) ) );
+			const coloredVignette = screenUV.distance( .5 ).mix( hue( color( 0x0175ad ), time.mul( .1 ) ), hue( color( 0x02274f ), time.mul( .5 ) ) );
 			const lightSpeedEffect = lightSpeed( normalWorld ).clamp();
 			const lightSpeedSky = normalWorld.y.remapClamp( -.1, 1 ).mix( 0, lightSpeedEffect );
 			const composedBackground = dodge( coloredVignette, lightSpeedSky );

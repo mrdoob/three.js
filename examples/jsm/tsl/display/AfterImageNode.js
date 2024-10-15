@@ -1,9 +1,10 @@
-import { RenderTarget, Vector2 } from 'three';
+import { RenderTarget, Vector2, PostProcessingUtils } from 'three';
 import { TempNode, nodeObject, Fn, float, vec4, NodeUpdateType, uv, texture, passTexture, uniform, sign, max, convertToTexture, QuadMesh, NodeMaterial } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
-
 const _quadMeshComp = /*@__PURE__*/ new QuadMesh();
+
+let _rendererState;
 
 class AfterImageNode extends TempNode {
 
@@ -21,15 +22,15 @@ class AfterImageNode extends TempNode {
 		this.textureNodeOld = texture();
 		this.damp = uniform( damp );
 
-		this._compRT = new RenderTarget();
+		this._compRT = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._compRT.texture.name = 'AfterImageNode.comp';
 
-		this._oldRT = new RenderTarget();
+		this._oldRT = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._oldRT.texture.name = 'AfterImageNode.old';
 
 		this._textureNode = passTexture( this, this._compRT.texture );
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
 
@@ -50,6 +51,10 @@ class AfterImageNode extends TempNode {
 
 		const { renderer } = frame;
 
+		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
+
+		//
+
 		const textureNode = this.textureNode;
 		const map = textureNode.value;
 
@@ -62,22 +67,26 @@ class AfterImageNode extends TempNode {
 
 		this.setSize( _size.x, _size.y );
 
-		const currentRenderTarget = renderer.getRenderTarget();
 		const currentTexture = textureNode.value;
 
 		this.textureNodeOld.value = this._oldRT.texture;
 
 		// comp
+
 		renderer.setRenderTarget( this._compRT );
 		_quadMeshComp.render( renderer );
 
 		// Swap the textures
+
 		const temp = this._oldRT;
 		this._oldRT = this._compRT;
 		this._compRT = temp;
 
-		renderer.setRenderTarget( currentRenderTarget );
+		//
+
 		textureNode.value = currentTexture;
+
+		PostProcessingUtils.setRendererState( renderer, _rendererState );
 
 	}
 

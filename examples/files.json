@@ -394,6 +394,8 @@
 		"webgpu_postprocessing_fxaa",
 		"webgpu_postprocessing_masking",
 		"webgpu_postprocessing_motion_blur",
+		"webgpu_postprocessing_outline",
+		"webgpu_postprocessing_smaa",
 		"webgpu_postprocessing_sobel",
 		"webgpu_postprocessing_ssaa",
 		"webgpu_postprocessing_transition",

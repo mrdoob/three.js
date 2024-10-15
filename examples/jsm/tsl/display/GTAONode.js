@@ -1,9 +1,10 @@
-import { Color, DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3 } from 'three';
-import { QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial } from 'three/tsl';
+import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, PostProcessingUtils } from 'three';
+import { getViewPosition, QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-const _currentClearColor = /*@__PURE__*/ new Color();
 const _size = /*@__PURE__*/ new Vector2();
+
+let _rendererState;
 
 class GTAONode extends TempNode {
 
@@ -33,7 +34,7 @@ class GTAONode extends TempNode {
 
 		this.SAMPLES = uniform( 16 );
 
-		this._aoRenderTarget = new RenderTarget();
+		this._aoRenderTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
 		this._material = null;
@@ -60,20 +61,17 @@ class GTAONode extends TempNode {
 
 		const { renderer } = frame;
 
-		const size = renderer.getDrawingBufferSize( _size );
+		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
 
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentMRT = renderer.getMRT();
-		renderer.getClearColor( _currentClearColor );
-		const currentClearAlpha = renderer.getClearAlpha();
+		//
+
+		const size = renderer.getDrawingBufferSize( _size );
+		this.setSize( size.width, size.height );
 
 		_quadMesh.material = this._material;
 
-		this.setSize( size.width, size.height );
-
 		// clear
 
-		renderer.setMRT( null );
 		renderer.setClearColor( 0xffffff, 1 );
 
 		// ao
@@ -83,9 +81,7 @@ class GTAONode extends TempNode {
 
 		// restore
 
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.setMRT( currentMRT );
-		renderer.setClearColor( _currentClearColor, currentClearAlpha );
+		PostProcessingUtils.setRendererState( renderer, _rendererState );
 
 	}
 
@@ -106,24 +102,13 @@ class GTAONode extends TempNode {
 
 		} );
 
-		const getViewPosition = Fn( ( [ screenPosition, depth ] ) => {
-
-			screenPosition = vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 );
-
-			const clipSpacePosition = vec4( vec3( screenPosition, depth ), 1.0 );
-			const viewSpacePosition = vec4( this.cameraProjectionMatrixInverse.mul( clipSpacePosition ) );
-
-			return viewSpacePosition.xyz.div( viewSpacePosition.w );
-
-		} );
-
 		const ao = Fn( () => {
 
 			const depth = sampleDepth( uvNode );
 
 			depth.greaterThanEqual( 1.0 ).discard();
 
-			const viewPosition = getViewPosition( uvNode, depth );
+			const viewPosition = getViewPosition( uvNode, depth, this.cameraProjectionMatrixInverse );
 			const viewNormal = this.normalNode.rgb.normalize();
 
 			const radiusToUse = this.radius;
@@ -163,7 +148,7 @@ class GTAONode extends TempNode {
 					// x
 
 					const sampleSceneUvDepthX = getSceneUvAndDepth( viewPosition.add( sampleViewOffset ) );
-					const sampleSceneViewPositionX = getViewPosition( sampleSceneUvDepthX.xy, sampleSceneUvDepthX.z );
+					const sampleSceneViewPositionX = getViewPosition( sampleSceneUvDepthX.xy, sampleSceneUvDepthX.z, this.cameraProjectionMatrixInverse );
 					const viewDeltaX = sampleSceneViewPositionX.sub( viewPosition );
 
 					If( abs( viewDeltaX.z ).lessThan( this.thickness ), () => {
@@ -176,7 +161,7 @@ class GTAONode extends TempNode {
 					// y
 
 					const sampleSceneUvDepthY = getSceneUvAndDepth( viewPosition.sub( sampleViewOffset ) );
-					const sampleSceneViewPositionY = getViewPosition( sampleSceneUvDepthY.xy, sampleSceneUvDepthY.z );
+					const sampleSceneViewPositionY = getViewPosition( sampleSceneUvDepthY.xy, sampleSceneUvDepthY.z, this.cameraProjectionMatrixInverse );
 					const viewDeltaY = sampleSceneViewPositionY.sub( viewPosition );
 
 					If( abs( viewDeltaY.z ).lessThan( this.thickness ), () => {

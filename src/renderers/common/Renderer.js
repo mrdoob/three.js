@@ -825,6 +825,8 @@ class Renderer {
 
 	setPixelRatio( value = 1 ) {
 
+		if ( this._pixelRatio === value ) return;
+
 		this._pixelRatio = value;
 
 		this.setSize( this._width, this._height, false );

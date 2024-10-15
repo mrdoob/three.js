@@ -1,5 +1,5 @@
 import { Vector2, Vector3 } from 'three';
-import { convertToTexture, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI } from 'three/tsl';
+import { getViewPosition, convertToTexture, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI } from 'three/tsl';
 
 class DenoiseNode extends TempNode {
 
@@ -28,7 +28,7 @@ class DenoiseNode extends TempNode {
 		this._resolution = uniform( new Vector2() );
 		this._sampleVectors = uniformArray( generatePdSamplePointInitializer( 16, 2, 1 ) );
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 	}
 
@@ -49,24 +49,13 @@ class DenoiseNode extends TempNode {
 		const sampleNormal = ( uv ) => this.normalNode.uv( uv );
 		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
 
-		const getViewPosition = Fn( ( [ screenPosition, depth ] ) => {
-
-			screenPosition = vec2( screenPosition.x, screenPosition.y.oneMinus() ).mul( 2.0 ).sub( 1.0 );
-
-			const clipSpacePosition = vec4( vec3( screenPosition, depth ), 1.0 );
-			const viewSpacePosition = vec4( this.cameraProjectionMatrixInverse.mul( clipSpacePosition ) );
-
-			return viewSpacePosition.xyz.div( viewSpacePosition.w );
-
-		} );
-
 		const denoiseSample = Fn( ( [ center, viewNormal, viewPosition, sampleUv ] ) => {
 
 			const texel = sampleTexture( sampleUv );
 			const depth = sampleDepth( sampleUv );
 			const normal = sampleNormal( sampleUv ).rgb.normalize();
 			const neighborColor = texel.rgb;
-			const viewPos = getViewPosition( sampleUv, depth );
+			const viewPos = getViewPosition( sampleUv, depth, this.cameraProjectionMatrixInverse );
 
 			const normalDiff = dot( viewNormal, normal ).toVar();
 			const normalSimilarity = pow( max( normalDiff, 0 ), this.normalPhi ).toVar();
@@ -95,7 +84,7 @@ class DenoiseNode extends TempNode {
 
 			const center = vec3( texel.rgb );
 
-			const viewPosition = getViewPosition( uvNode, depth );
+			const viewPosition = getViewPosition( uvNode, depth, this.cameraProjectionMatrixInverse );
 
 			const noiseResolution = textureSize( this.noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );

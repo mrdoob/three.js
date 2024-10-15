@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - post processing - Outline Pass</title>
+		<title>three.js webgpu - post processing - Outline Pass</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -14,7 +14,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -23,22 +24,18 @@
 		<script type="module">
 
 			import * as THREE from 'three';
+			import { pass, uniform, time, oscSine } from 'three/tsl';
+			import { outline } from 'three/addons/tsl/display/OutlineNode.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { OutlinePass } from 'three/addons/postprocessing/OutlinePass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 
 			let container, stats;
 			let camera, scene, renderer, controls;
-			let composer, effectFXAA, outlinePass;
+			let postProcessing, outlinePass;
 
 			let selectedObjects = [];
 
@@ -47,72 +44,6 @@
 
 			const obj3d = new THREE.Object3D();
 			const group = new THREE.Group();
-
-			const params = {
-				edgeStrength: 3.0,
-				edgeGlow: 0.0,
-				edgeThickness: 1.0,
-				pulsePeriod: 0,
-				rotate: false,
-				usePatternTexture: false
-			};
-
-			// Init gui
-
-			const gui = new GUI( { width: 280 } );
-
-			gui.add( params, 'edgeStrength', 0.01, 10 ).onChange( function ( value ) {
-
-				outlinePass.edgeStrength = Number( value );
-
-			} );
-
-			gui.add( params, 'edgeGlow', 0.0, 1 ).onChange( function ( value ) {
-
-				outlinePass.edgeGlow = Number( value );
-
-			} );
-
-			gui.add( params, 'edgeThickness', 1, 4 ).onChange( function ( value ) {
-
-				outlinePass.edgeThickness = Number( value );
-
-			} );
-
-			gui.add( params, 'pulsePeriod', 0.0, 5 ).onChange( function ( value ) {
-
-				outlinePass.pulsePeriod = Number( value );
-
-			} );
-
-			gui.add( params, 'rotate' );
-
-			gui.add( params, 'usePatternTexture' ).onChange( function ( value ) {
-
-				outlinePass.usePatternTexture = value;
-
-			} );
-
-			function Configuration() {
-
-				this.visibleEdgeColor = '#ffffff';
-				this.hiddenEdgeColor = '#190a05';
-
-			}
-
-			const conf = new Configuration();
-
-			gui.addColor( conf, 'visibleEdgeColor' ).onChange( function ( value ) {
-
-				outlinePass.visibleEdgeColor.set( value );
-
-			} );
-
-			gui.addColor( conf, 'hiddenEdgeColor' ).onChange( function ( value ) {
-
-				outlinePass.hiddenEdgeColor.set( value );
-
-			} );
 
 			init();
 
@@ -124,9 +55,9 @@
 				const width = window.innerWidth;
 				const height = window.innerHeight;
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGPURenderer();
 				renderer.shadowMap.enabled = true;
-				// todo - support pixelRatio in this demo
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
@@ -150,8 +81,9 @@
 				const light = new THREE.DirectionalLight( 0xddffdd, 2 );
 				light.position.set( 5, 5, 5 );
 				light.castShadow = true;
-				light.shadow.mapSize.width = 1024;
-				light.shadow.mapSize.height = 1024;
+				light.shadow.mapSize.width = 2048;
+				light.shadow.mapSize.height = 2048;
+				light.shadow.bias = - 0.005;
 
 				const d = 10;
 
@@ -239,31 +171,47 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				// postprocessing
+				// outline pass
 
-				composer = new EffectComposer( renderer );
+				const edgeStrength = uniform( 3.0 );
+				const edgeGlow = uniform( 0.0 );
+				const edgeThickness = uniform( 1.0 );
+				const pulsePeriod = uniform( 0 );
+				const visibleEdgeColor = uniform( new THREE.Color( 0xffffff ) );
+				const hiddenEdgeColor = uniform( new THREE.Color( 0x190a05 ) );
 
-				const renderPass = new RenderPass( scene, camera );
-				composer.addPass( renderPass );
-
-				outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
-				composer.addPass( outlinePass );
-
-				const textureLoader = new THREE.TextureLoader();
-				textureLoader.load( 'textures/tri_pattern.jpg', function ( texture ) {
-
-					outlinePass.patternTexture = texture;
-					texture.wrapS = THREE.RepeatWrapping;
-					texture.wrapT = THREE.RepeatWrapping;
-
+				outlinePass = outline( scene, camera, {
+					selectedObjects,
+					edgeGlow,
+					edgeThickness
 				} );
 
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				const { visibleEdge, hiddenEdge } = outlinePass;
 
-				effectFXAA = new ShaderPass( FXAAShader );
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
-				composer.addPass( effectFXAA );
+				const period = time.div( pulsePeriod ).mul( 2 );
+				const osc = oscSine( period ).mul( .5 ).add( .5 ); // osc [ 0.5, 1.0 ]
+
+				const outlineColor = visibleEdge.mul( visibleEdgeColor ).add( hiddenEdge.mul( hiddenEdgeColor ) ).mul( edgeStrength );
+				const outlinePulse = pulsePeriod.greaterThan( 0 ).select( outlineColor.mul( osc ), outlineColor );
+
+				// postprocessing
+
+				const scenePass = pass( scene, camera );
+
+				postProcessing = new THREE.PostProcessing( renderer );
+				postProcessing.outputNode = outlinePulse.add( scenePass );
+
+				// gui
+
+				const gui = new GUI( { width: 280 } );
+				gui.add( edgeStrength, 'value', 0.01, 10 ).name( 'edgeStrength' );
+				gui.add( edgeGlow, 'value', 0.0, 1 ).name( 'edgeGlow' );
+				gui.add( edgeThickness, 'value', 1, 4 ).name( 'edgeThickness' );
+				gui.add( pulsePeriod, 'value', 0.0, 5 ).name( 'pulsePeriod' );
+				gui.addColor( visibleEdgeColor, 'value' ).name( 'visibleEdgeColor' );
+				gui.addColor( hiddenEdgeColor, 'value' ).name( 'hiddenEdgeColor' );
+
+				//
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -319,9 +267,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				composer.setSize( width, height );
-
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
 			}
 
@@ -329,17 +274,9 @@
 
 				stats.begin();
 
-				const timer = performance.now();
-
-				if ( params.rotate ) {
-
-					group.rotation.y = timer * 0.0001;
-
-				}
-
 				controls.update();
 
-				composer.render();
+				postProcessing.render();
 
 				stats.end();
 

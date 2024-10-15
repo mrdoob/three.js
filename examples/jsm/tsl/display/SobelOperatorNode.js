@@ -15,7 +15,7 @@ class SobelOperatorNode extends TempNode {
 
 		this.textureNode = textureNode;
 
-		this.updateBeforeType = NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.FRAME;
 
 		this._invSize = uniform( new Vector2() );
 

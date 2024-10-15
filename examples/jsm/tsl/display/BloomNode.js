@@ -1,14 +1,13 @@
-import { Color, HalfFloatType, RenderTarget, Vector2, Vector3 } from 'three';
+import { HalfFloatType, RenderTarget, Vector2, Vector3, PostProcessingUtils } from 'three';
 import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, QuadMesh, NodeMaterial, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
-
-const _clearColor = /*@__PURE__*/ new Color( 0, 0, 0 );
-const _currentClearColor = /*@__PURE__*/ new Color();
 const _size = /*@__PURE__*/ new Vector2();
 
 const _BlurDirectionX = /*@__PURE__*/ new Vector2( 1.0, 0.0 );
 const _BlurDirectionY = /*@__PURE__*/ new Vector2( 0.0, 1.0 );
+
+let _rendererState;
 
 class BloomNode extends TempNode {
 
@@ -37,20 +36,20 @@ class BloomNode extends TempNode {
 
 		// render targets
 
-		this._renderTargetBright = new RenderTarget( 1, 1, { type: HalfFloatType } );
+		this._renderTargetBright = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 		this._renderTargetBright.texture.name = 'UnrealBloomPass.bright';
 		this._renderTargetBright.texture.generateMipmaps = false;
 
 		for ( let i = 0; i < this._nMips; i ++ ) {
 
-			const renderTargetHorizontal = new RenderTarget( 1, 1, { type: HalfFloatType } );
+			const renderTargetHorizontal = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 
 			renderTargetHorizontal.texture.name = 'UnrealBloomPass.h' + i;
 			renderTargetHorizontal.texture.generateMipmaps = false;
 
 			this._renderTargetsHorizontal.push( renderTargetHorizontal );
 
-			const renderTargetVertical = new RenderTarget( 1, 1, { type: HalfFloatType } );
+			const renderTargetVertical = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 
 			renderTargetVertical.texture.name = 'UnrealBloomPass.v' + i;
 			renderTargetVertical.texture.generateMipmaps = false;
@@ -111,18 +110,12 @@ class BloomNode extends TempNode {
 
 		const { renderer } = frame;
 
+		_rendererState = PostProcessingUtils.getRendererState( renderer, _rendererState );
+
+		//
+
 		const size = renderer.getDrawingBufferSize( _size );
 		this.setSize( size.width, size.height );
-
-		const currentRenderTarget = renderer.getRenderTarget();
-		const currentMRT = renderer.getMRT();
-		renderer.getClearColor( _currentClearColor );
-		const currentClearAlpha = renderer.getClearAlpha();
-
-		this.setSize( size.width, size.height );
-
-		renderer.setMRT( null );
-		renderer.setClearColor( _clearColor, 0 );
 
 		// 1. Extract Bright Areas
 
@@ -163,9 +156,7 @@ class BloomNode extends TempNode {
 
 		// restore
 
-		renderer.setRenderTarget( currentRenderTarget );
-		renderer.setMRT( currentMRT );
-		renderer.setClearColor( _currentClearColor, currentClearAlpha );
+		PostProcessingUtils.setRendererState( renderer, _rendererState );
 
 	}
 

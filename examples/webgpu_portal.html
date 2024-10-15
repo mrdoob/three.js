@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, color, mx_worley_noise_float, timerLocal, screenUV, vec2, uv, normalWorld, mx_fractal_noise_vec3 } from 'three/tsl';
+			import { pass, color, mx_worley_noise_float, time, screenUV, vec2, uv, normalWorld, mx_fractal_noise_vec3 } from 'three/tsl';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
@@ -47,7 +47,7 @@
 				sceneMain.backgroundNode = normalWorld.y.mix( color( 0x0066ff ), color( 0xff0066 ) );
 
 				scenePortal = new THREE.Scene();
-				scenePortal.backgroundNode = mx_worley_noise_float( normalWorld.mul( 20 ).add( vec2( 0, timerLocal().oneMinus() ) ) ).mul( color( 0x0066ff ) );
+				scenePortal.backgroundNode = mx_worley_noise_float( normalWorld.mul( 20 ).add( vec2( 0, time.oneMinus() ) ) ).mul( color( 0x0066ff ) );
 
 				//
 
@@ -111,7 +111,7 @@
 
 					};
 
-					const colorNode = mx_fractal_noise_vec3( uv().mul( 20 ).add( timerLocal() ) );
+					const colorNode = mx_fractal_noise_vec3( uv().mul( 20 ).add( time ) );
 
 					const modelMain = createModel();
 					const modelPortal = createModel( colorNode );

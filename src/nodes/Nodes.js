@@ -43,14 +43,12 @@ export { default as JoinNode } from './utils/JoinNode.js';
 export { default as LoopNode } from './utils/LoopNode.js';
 export { default as MatcapUVNode } from './utils/MatcapUVNode.js';
 export { default as MaxMipLevelNode } from './utils/MaxMipLevelNode.js';
-export { default as OscNode } from './utils/OscNode.js';
 export { default as RemapNode } from './utils/RemapNode.js';
 export { default as RotateNode } from './utils/RotateNode.js';
 export { default as SetNode } from './utils/SetNode.js';
 export { default as SplitNode } from './utils/SplitNode.js';
 export { default as SpriteSheetUVNode } from './utils/SpriteSheetUVNode.js';
 export { default as StorageArrayElementNode } from './utils/StorageArrayElementNode.js';
-export { default as TimerNode } from './utils/TimerNode.js';
 export { default as TriplanarTexturesNode } from './utils/TriplanarTexturesNode.js';
 export { default as ReflectorNode } from './utils/ReflectorNode.js';
 export { default as RTTNode } from './utils/RTTNode.js';
@@ -133,6 +131,7 @@ export { default as BasicEnvironmentNode } from './lighting/BasicEnvironmentNode
 export { default as IrradianceNode } from './lighting/IrradianceNode.js';
 export { default as AONode } from './lighting/AONode.js';
 export { default as AnalyticLightNode } from './lighting/AnalyticLightNode.js';
+export { default as ShadowNode } from './lighting/ShadowNode.js';
 
 // pmrem
 export { default as PMREMNode } from './pmrem/PMREMNode.js';
