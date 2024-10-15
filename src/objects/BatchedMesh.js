@@ -177,6 +177,7 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCounts = new Int32Array( maxInstanceCount );
 		this._multiDrawStarts = new Int32Array( maxInstanceCount );
 		this._multiDrawCount = 0;
+		this._multiDrawInstances = null;
 		this._visibilityChanged = true;
 
 		// Local matrix per geometry by using data texture
