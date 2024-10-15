@@ -59,16 +59,37 @@ export default QUnit.module( 'Geometries', () => {
 
 		} );
 
-		QUnit.todo( 'parameters', ( assert ) => {
+		// PARAMETERS
+		QUnit.test( 'parameters', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			assert.ok(
+				geometries[ 1 ].parameters.radius === 10,
+				geometries[ 2 ].parameters.radius === 10,
+				geometries[ 2 ].parameters.segments === 20,
+				geometries[ 3 ].parameters.radius === 10,
+				geometries[ 3 ].parameters.segments === 20,
+				geometries[ 3 ].parameters.thetaStart === 0.1,
+				geometries[ 4 ].parameters.radius === 10,
+				geometries[ 4 ].parameters.segments === 20,
+				geometries[ 4 ].parameters.thetaStart === 0.1,
+				geometries[ 4 ].parameters.thetaLength === 0.2
+			);
 
 		} );
 
 		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
+		QUnit.test( 'fromJSON', ( assert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			const geometriesJSON = '{"parameters": {"radius": "0", "segment": "0", "thetaStart": "0", "thetaLength": "0"}}';
+			const data = JSON.parse( geometriesJSON );
+			const geometriesObj = CircleGeometry.fromJSON( data );
+
+			assert.ok(
+				geometriesObj.parameters.radius === 1,
+				geometriesObj.parameters.segments === 32,
+				geometriesObj.parameters.thetaStart === 0,
+				Math.round( geometriesObj.parameters.thetaLength ) === 6
+			);
 
 		} );
 
