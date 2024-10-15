@@ -31,7 +31,7 @@ class WebGPURenderer extends Renderer {
 
 		super( backend, parameters );
 
-		this.nodes.library = new BasicNodeLibrary();
+		this.library = new BasicNodeLibrary();
 
 		this.isWebGPURenderer = true;
 

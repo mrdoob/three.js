@@ -339,6 +339,7 @@
 		"webgpu_lights_phong",
 		"webgpu_lights_rectarealight",
 		"webgpu_lights_selective",
+		"webgpu_lights_tiled",
 		"webgpu_lines_fat_wireframe",
 		"webgpu_lines_fat",
 		"webgpu_loader_gltf",

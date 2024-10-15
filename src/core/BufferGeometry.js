@@ -35,6 +35,7 @@ class BufferGeometry extends EventDispatcher {
 		this.type = 'BufferGeometry';
 
 		this.index = null;
+		this.indirect = null;
 		this.attributes = {};
 
 		this.morphAttributes = {};
@@ -70,6 +71,20 @@ class BufferGeometry extends EventDispatcher {
 		}
 
 		return this;
+
+	}
+
+	setIndirect( indirect ) {
+
+		this.indirect = indirect;
+
+		return this;
+
+	}
+
+	getIndirect() {
+
+		return this.indirect;
 
 	}
 
