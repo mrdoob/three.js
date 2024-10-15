@@ -17,7 +17,7 @@ import {
 	NearestFilter,
 	RepeatWrapping,
 	TextureLoader,
-	SRGBColorSpace,
+	SRGBColorSpace
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
@@ -737,8 +737,14 @@ class ThreeMFLoader extends Loader {
 
 			//
 
-			resourcesData[ 'implicitfunction' ] = {};
 			const implicitFunctionNodes = resourcesNode.querySelectorAll( 'implicitfunction' );
+
+			if ( implicitFunctionNodes.length > 0 ) {
+
+				resourcesData[ 'implicitfunction' ] = {};
+
+			}
+
 
 			for ( let i = 0; i < implicitFunctionNodes.length; i ++ ) {
 
@@ -1432,8 +1438,6 @@ class ThreeMFLoader extends Loader {
 
 			} else {
 
-				console.log("Implicit function Tree:", modelData.resources.implicitfunction);
-
 				const compositeData = objectData[ 'components' ];
 
 				objects[ objectData.id ] = getBuild( compositeData, objects, modelData, textureData, objectData, buildComposite );
@@ -1443,6 +1447,12 @@ class ThreeMFLoader extends Loader {
 			if ( objectData.name ) {
 
 				objects[ objectData.id ].name = objectData.name;
+
+			}
+
+			if ( modelData.resources.implicitfunction && modelData.resources.implicitfunction ) {
+
+				console.warn("Implicit Functions are implemented in data-only!", modelData.resources.implicitfunction);
 
 			}
 
