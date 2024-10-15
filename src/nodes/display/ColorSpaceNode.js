@@ -79,7 +79,7 @@ class ColorSpaceNode extends TempNode {
 
 		let outputNode = null;
 
-		const colorSpaceFn = renderer.nodes.library.getColorSpaceFunction( colorSpace );
+		const colorSpaceFn = renderer.library.getColorSpaceFunction( colorSpace );
 
 		if ( colorSpaceFn !== null ) {
 
