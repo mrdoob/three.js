@@ -66,24 +66,6 @@ const builds = [
 			'three.core.js': 'src/Three.core.js',
 			'three.module.js': 'src/Three.js',
 			'three.webgpu.js': 'src/Three.WebGPU.js',
-		},
-		plugins: [
-			glsl(),
-			header()
-		],
-		preserveEntrySignatures: 'allow-extension',
-		output: [
-			{
-				format: 'esm',
-				dir: 'build',
-				minifyInternalExports: false,
-				entryFileNames: '[name]',
-			}
-		]
-	},
-	{
-		input: {
-			'three.core.js': 'src/Three.core.js',
 			'three.webgpu.nodes.js': 'src/Three.WebGPU.Nodes.js',
 		},
 		plugins: [
@@ -105,24 +87,6 @@ const builds = [
 			'three.core.min.js': 'src/Three.core.js',
 			'three.module.min.js': 'src/Three.js',
 			'three.webgpu.min.js': 'src/Three.WebGPU.js',
-		},
-		plugins: [
-			glsl(),
-			header(),
-			terser()
-		],
-		preserveEntrySignatures: 'allow-extension',
-		output: [
-			{
-				format: 'esm',
-				dir: 'build',
-				entryFileNames: '[name]',
-			}
-		]
-	},
-	{
-		input: {
-			'three.core.min.js': 'src/Three.core.js',
 			'three.webgpu.nodes.min.js': 'src/Three.WebGPU.Nodes.js',
 		},
 		plugins: [
@@ -153,7 +117,7 @@ const builds = [
 				indent: '\t'
 			}
 		]
-	},
+	}
 ];
 
 export default ( args ) => args.configOnlyModule ? builds.slice( 0, 3 ) : builds;
