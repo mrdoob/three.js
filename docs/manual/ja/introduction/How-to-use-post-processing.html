@@ -62,8 +62,8 @@
 	<p>
 		composerが準備できたので、post-processingパスのチェーンを設定できるようになりました。
 		これらのパスはアプリケーションの最終的なビジュアルを出力することに責任を持ちます。
-		これらのパスは追加/挿入の順番で処理されます。In our example, the instance of `RenderPass`
-		is executed first, then the instance of `GlitchPass` and finally `OutputPass`。チェーンの中で最後の有効なpassが自動的に画面に描画されます。
+		これらのパスは追加/挿入の順番で処理されます。この例では、まず*RenderPass*のインスタンスが実行され、次に*GlitchPass*のインスタンスが実行され、最後に*OutputPass*が実行されます。
+		チェーンの中で最後の有効なpassが自動的に画面に描画されます。
 		passの設定は以下のように行います。
 	</p>
 
@@ -82,7 +82,7 @@
 		*RenderPass*は普通チェインのはじめにあります。
 		これはレンダリングされたシーンを次のpost-processingの入力とするためです。
 		*GlitchPass*は、これらのイメージをワイルドなglitch effectを適用するために使います。
-		 `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and optional tone mapping.
+		*OutputPass*は通常、連鎖の最後のパスで、sRGB カラースペースの変換とオプションのトーンマッピングを実行します。
 		実際に動いているものを見るために、[link:https://threejs.org/examples/webgl_postprocessing_glitch sample]を見てみましょう。
 	</p>
 
