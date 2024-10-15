@@ -148,9 +148,7 @@ class TRAAPassNode extends PassNode {
 
 		if ( needsRestart === true ) {
 
-			// force a clear to fix the reset after a rezise with WebGPU.
-			// there are currently warnings in the browser console indicating the texture dimensions do not match during the copy.
-			// seems like some sort of timing issue
+			// bind and clear render target to make sure they are initialized after the resize which triggers a dispose()
 
 			renderer.setRenderTarget( this._historyRenderTarget );
 			renderer.clear();
