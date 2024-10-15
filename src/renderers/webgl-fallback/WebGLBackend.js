@@ -741,7 +741,9 @@ class WebGLBackend extends Backend {
 
 		if ( object.isBatchedMesh ) {
 
-			if ( object._multiDrawInstances !== null ) {
+			if ( object._multiDrawInstances !== null ) { // @deprecated, r173
+
+				warnOnce( 'THREE.WebGLBackend: renderMultiDrawInstances has been deprecated and will be removed in r183. Append to renderMultiDraw arguments and use indirection.' );
 
 				renderer.renderMultiDrawInstances( object._multiDrawStarts, object._multiDrawCounts, object._multiDrawCount, object._multiDrawInstances );
 

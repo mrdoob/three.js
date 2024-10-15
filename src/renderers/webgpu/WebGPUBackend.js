@@ -957,6 +957,12 @@ class WebGPUBackend extends Backend {
 			const drawCount = object._multiDrawCount;
 			const drawInstances = object._multiDrawInstances;
 
+			if ( object._multiDrawInstances !== null ) { // @deprecated, r173
+
+				warnOnce( 'THREE.WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r183. Append to renderMultiDraw arguments and use indirection.' );
+
+			}
+
 			const bytesPerElement = hasIndex ? index.array.BYTES_PER_ELEMENT : 1;
 
 			for ( let i = 0; i < drawCount; i ++ ) {
