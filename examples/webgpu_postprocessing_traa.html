@@ -26,7 +26,6 @@
 			import * as THREE from 'three';
 			import { mrt, output, velocity } from 'three/tsl';
 			import { traaPass } from 'three/addons/tsl/display/TRAAPassNode.js';
-			import WebGPU from 'three/addons/capabilities/WebGPU.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -38,15 +37,7 @@
 
 			function init() {
 
-				if ( WebGPU.isAvailable() === false ) {
-
-					document.body.appendChild( WebGPU.getErrorMessage() );
-
-					throw new Error( 'No WebGPU support' );
-
-				}
-
-				renderer = new THREE.WebGPURenderer();
+				renderer = new THREE.WebGPURenderer( { forceWebGL: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );

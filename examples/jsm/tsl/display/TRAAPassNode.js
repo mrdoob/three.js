@@ -140,6 +140,7 @@ class TRAAPassNode extends PassNode {
 		renderer.clear();
 		renderer.render( scene, camera );
 
+		renderer.setRenderTarget( null );
 		renderer.setMRT( null );
 
 		// every time when the dimensions change we need fresh history data. Copy the sample
@@ -154,6 +155,11 @@ class TRAAPassNode extends PassNode {
 			renderer.setRenderTarget( this._historyRenderTarget );
 			renderer.clear();
 
+			renderer.setRenderTarget( this.renderTarget );
+			renderer.clear();
+
+			renderer.setRenderTarget( null );
+
 			renderer.copyTextureToTexture( this._sampleRenderTarget.texture, this._historyRenderTarget.texture );
 			renderer.copyTextureToTexture( this._sampleRenderTarget.texture, this.renderTarget.texture );
 
@@ -164,6 +170,7 @@ class TRAAPassNode extends PassNode {
 			renderer.setRenderTarget( this.renderTarget );
 			_quadMesh.material = this._resolveMaterial;
 			_quadMesh.render( renderer );
+			renderer.setRenderTarget( null );
 
 			// update history
 

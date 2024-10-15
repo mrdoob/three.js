@@ -659,20 +659,46 @@ class WebGLTextureUtils {
 		gl.pixelStorei( gl.UNPACK_SKIP_PIXELS, minX );
 		gl.pixelStorei( gl.UNPACK_SKIP_ROWS, minY );
 
+		if ( srcTexture.isRenderTargetTexture || srcTexture.isDepthTexture ) {
 
-		if ( srcTexture.isDataTexture ) {
+			const srcTextureData = backend.get( srcTexture );
+			const dstTextureData = backend.get( dstTexture );
 
-			gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image.data );
+			const srcRenderContextData = backend.get( srcTextureData.renderTarget );
+			const dstRenderContextData = backend.get( dstTextureData.renderTarget );
+
+			const srcFramebuffer = srcRenderContextData.framebuffers[ srcTextureData.cacheKey ];
+			const dstFramebuffer = dstRenderContextData.framebuffers[ dstTextureData.cacheKey ];
+
+			state.bindFramebuffer( gl.READ_FRAMEBUFFER, srcFramebuffer );
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, dstFramebuffer );
+
+			let mask = gl.COLOR_BUFFER_BIT;
+
+			if ( srcTexture.isDepthTexture ) mask = gl.DEPTH_BUFFER_BIT;
+
+			gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, mask, gl.NEAREST );
+
+			state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
 
 		} else {
 
-			if ( srcTexture.isCompressedTexture ) {
+			if ( srcTexture.isDataTexture ) {
 
-				gl.compressedTexSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, image.width, image.height, glFormat, image.data );
+				gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image.data );
 
 			} else {
 
-				gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
+				if ( srcTexture.isCompressedTexture ) {
+
+					gl.compressedTexSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, image.width, image.height, glFormat, image.data );
+
+				} else {
+
+					gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
+
+				}
 
 			}
 
