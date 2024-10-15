@@ -13,6 +13,7 @@ import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
+import { warnOnce } from '../../utils.js';
 import { WebGPUCoordinateSystem } from '../../constants.js';
 
 //
