@@ -110,6 +110,11 @@
 		<h3>[property:Texture envMap]</h3>
 		<p>环境贴图。默认值为null。</p>
 
+		<h3>[property:Euler envMapRotation]</h3>
+		<p>
+			环境贴图的旋转（以弧度为单位）。默认值为 `(0,0,0)`。
+		</p>
+
 		<h3>[property:Boolean flatShading]</h3>
 		<p> 定义材质是否使用平面着色进行渲染。默认值为false。
 		</p>
@@ -131,9 +136,9 @@
 		</p>
 
 		<h3>[property:Texture normalMap]</h3>
-		<p> 用于创建法线贴图的纹理。RGB值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
-			In case the material has a normal map authored using the left handed convention, the y component of normalScale
-			should be negated to compensate for the different handedness.
+		<p>
+			用于创建法线贴图的纹理。RGB 值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
+			如果材质的法线贴图使用左手惯例编写，则应将 normalScale 的 y 分量取反以补偿不同的手性。
 		</p>
 
 		<h3>[property:Integer normalMapType]</h3>
