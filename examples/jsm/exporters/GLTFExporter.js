@@ -2447,7 +2447,7 @@ class GLTFWriter {
 
 			if ( input[ i ] instanceof Scene ) {
 
-				this.processScene( input[ i ] );
+				await this.processScene( input[ i ] );
 
 			} else {
 
