@@ -1,5 +1,3 @@
-import { LightsNode } from '../../nodes/Nodes.js';
-
 function painterSortStable( a, b ) {
 
 	if ( a.groupOrder !== b.groupOrder ) {
@@ -50,7 +48,7 @@ function reversePainterSortStable( a, b ) {
 
 class RenderList {
 
-	constructor() {
+	constructor( lighting, scene, camera ) {
 
 		this.renderItems = [];
 		this.renderItemsIndex = 0;
@@ -59,8 +57,11 @@ class RenderList {
 		this.transparent = [];
 		this.bundles = [];
 
-		this.lightsNode = new LightsNode( [] );
+		this.lightsNode = lighting.getNode( scene, camera );
 		this.lightsArray = [];
+
+		this.scene = scene;
+		this.camera = camera;
 
 		this.occlusionQueryCount = 0;
 

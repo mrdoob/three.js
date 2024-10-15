@@ -1479,6 +1479,21 @@
 							]
 						},
 						{
+							"name": "Normal Map",
+							"icon": "photo",
+							"description": "Converts a normal map value to a normal vector.",
+							"shaderNode": "normalMap",
+							"nodeType": "node",
+							"properties": [
+								{
+									"name": "node",
+									"nodeType": "vec3",
+									"label": "normal",
+									"description": "Specifies the vector to convert."
+								}
+							]
+						},
+						{
 							"name": "Round",
 							"icon": "math-function",
 							"description": "Round returns a value equal to the nearest integer to x.",

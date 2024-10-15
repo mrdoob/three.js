@@ -65,8 +65,16 @@ class WebGPUTextureUtils {
 			magFilter: this._convertFilterMode( texture.magFilter ),
 			minFilter: this._convertFilterMode( texture.minFilter ),
 			mipmapFilter: this._convertFilterMode( texture.minFilter ),
-			maxAnisotropy: texture.anisotropy
+			maxAnisotropy: 1
 		};
+
+		// anisotropy can only be used when all filter modes are set to linear.
+
+		if ( samplerDescriptorGPU.magFilter === GPUFilterMode.Linear && samplerDescriptorGPU.minFilter === GPUFilterMode.Linear && samplerDescriptorGPU.mipmapFilter === GPUFilterMode.Linear ) {
+
+			samplerDescriptorGPU.maxAnisotropy = texture.anisotropy;
+
+		}
 
 		if ( texture.isDepthTexture && texture.compareFunction !== null ) {
 
