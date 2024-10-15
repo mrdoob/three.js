@@ -37,7 +37,7 @@ class CSS3DObject extends Object3D {
 					object.element.parentNode !== null
 				) {
 
-					object.element.parentNode.removeChild( object.element );
+					object.element.remove();
 
 				}
 
@@ -260,7 +260,7 @@ class CSS3DRenderer {
 
 			for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
-			  hideObject( object.children[ i ] );
+				hideObject( object.children[ i ] );
 
 			}
 

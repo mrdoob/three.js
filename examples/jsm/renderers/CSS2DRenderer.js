@@ -31,7 +31,7 @@ class CSS2DObject extends Object3D {
 					object.element.parentNode !== null
 				) {
 
-					object.element.parentNode.removeChild( object.element );
+					object.element.remove();
 
 				}
 
