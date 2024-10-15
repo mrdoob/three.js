@@ -137,7 +137,6 @@ class TRAAPassNode extends PassNode {
 
 		renderer.setClearColor( this.clearColor, this.clearAlpha );
 		renderer.setRenderTarget( this._sampleRenderTarget );
-		renderer.clear();
 		renderer.render( scene, camera );
 
 		renderer.setRenderTarget( null );
