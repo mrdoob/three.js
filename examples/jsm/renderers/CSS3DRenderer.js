@@ -32,7 +32,10 @@ class CSS3DObject extends Object3D {
 
 			this.traverse( function ( object ) {
 
-				if ( object.element instanceof Element && object.element.parentNode !== null ) {
+				if (
+					object.element instanceof object.element.ownerDocument.defaultView.Element &&
+					object.element.parentNode !== null
+				) {
 
 					object.element.parentNode.removeChild( object.element );
 
@@ -254,7 +257,7 @@ class CSS3DRenderer {
 		function hideObject( object ) {
 
 			if ( object.isCSS3DObject ) object.element.style.display = 'none';
-	  
+
 			for ( let i = 0, l = object.children.length; i < l; i ++ ) {
 
 			  hideObject( object.children[ i ] );
