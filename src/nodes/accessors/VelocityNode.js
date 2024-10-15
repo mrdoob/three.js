@@ -23,12 +23,20 @@ class VelocityNode extends TempNode {
 
 		super( 'vec2' );
 
+		this.projectionMatrix = null;
+
 		this.updateType = NodeUpdateType.OBJECT;
 		this.updateAfterType = NodeUpdateType.OBJECT;
 
 		this.previousModelWorldMatrix = uniform( new Matrix4() );
 		this.previousProjectionMatrix = uniform( new Matrix4() ).setGroup( renderGroup );
 		this.previousCameraViewMatrix = uniform( new Matrix4() );
+
+	}
+
+	setProjectionMatrix( projectionMatrix ) {
+
+		this.projectionMatrix = projectionMatrix;
 
 	}
 
@@ -54,7 +62,7 @@ class VelocityNode extends TempNode {
 				cameraData.currentProjectionMatrix = new Matrix4();
 				cameraData.currentCameraViewMatrix = new Matrix4();
 
-				cameraData.previousProjectionMatrix.copy( camera.projectionMatrix );
+				cameraData.previousProjectionMatrix.copy( this.projectionMatrix || camera.projectionMatrix );
 				cameraData.previousCameraViewMatrix.copy( camera.matrixWorldInverse );
 
 			} else {
@@ -64,7 +72,7 @@ class VelocityNode extends TempNode {
 
 			}
 
-			cameraData.currentProjectionMatrix.copy( camera.projectionMatrix );
+			cameraData.currentProjectionMatrix.copy( this.projectionMatrix || camera.projectionMatrix );
 			cameraData.currentCameraViewMatrix.copy( camera.matrixWorldInverse );
 
 			this.previousProjectionMatrix.value.copy( cameraData.previousProjectionMatrix );
@@ -82,9 +90,11 @@ class VelocityNode extends TempNode {
 
 	setup( /*builder*/ ) {
 
+		const projectionMatrix = ( this.projectionMatrix === null ) ? cameraProjectionMatrix : uniform( this.projectionMatrix );
+
 		const previousModelViewMatrix = this.previousCameraViewMatrix.mul( this.previousModelWorldMatrix );
 
-		const clipPositionCurrent = cameraProjectionMatrix.mul( modelViewMatrix ).mul( positionLocal );
+		const clipPositionCurrent = projectionMatrix.mul( modelViewMatrix ).mul( positionLocal );
 		const clipPositionPrevious = this.previousProjectionMatrix.mul( previousModelViewMatrix ).mul( positionPrevious );
 
 		const ndcPositionCurrent = clipPositionCurrent.xy.div( clipPositionCurrent.w );
