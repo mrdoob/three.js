@@ -60,6 +60,9 @@ function header() {
 
 }
 
+/**
+ * @type {Array<import('rollup').RollupOptions>}
+ */
 const builds = [
 	{
 		input: {
@@ -158,4 +161,4 @@ const builds = [
 	}
 ];
 
-export default ( args ) => args.configOnlyModule ? builds.slice( 0, 3 ) : builds;
+export default ( args ) => args.configOnlyModule ? builds.slice( 0, 4 ) : builds;
