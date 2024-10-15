@@ -83,12 +83,14 @@ export default QUnit.module( 'Geometries', () => {
 			const geometriesJSON = '{"parameters": {"radius": "0", "segment": "0", "thetaStart": "0", "thetaLength": "0"}}';
 			const data = JSON.parse( geometriesJSON );
 			const geometriesObj = CircleGeometry.fromJSON( data );
+			const geometriesThetaLength = geometriesObj.parameters.thetaLength.toPrecision( 6 );
+			const pi = ( Math.PI * 2 ).toPrecision( 6 );
 
 			assert.ok(
 				geometriesObj.parameters.radius === 1,
 				geometriesObj.parameters.segments === 32,
 				geometriesObj.parameters.thetaStart === 0,
-				Math.round( geometriesObj.parameters.thetaLength ) === 6
+				geometriesThetaLength === pi
 			);
 
 		} );
