@@ -97,7 +97,6 @@ const _batchIntersects = [];
 // @TODO: geometry.drawRange support?
 // @TODO: geometry.morphAttributes support?
 // @TODO: Support uniform parameter per geometry
-// @TODO: Add an "optimize" function to pack geometry and remove data gaps
 
 // copies data from attribute "src" into "target" starting at "targetOffset"
 function copyAttributeData( src, target, targetOffset = 0 ) {
@@ -132,8 +131,23 @@ function copyAttributeData( src, target, targetOffset = 0 ) {
 // safely copies array contents to a potentially smaller array
 function copyArrayContents( src, target ) {
 
-	const len = Math.min( src.length, target.length );
-	target.set( new src.constructor( src.buffer, 0, len ) );
+	if ( src.constructor !== target.constructor ) {
+
+		// if arrays are of a different type (eg due to index size increasing) then data must be per-element copied
+		const len = Math.min( src.length, target.length );
+		for ( let i = 0; i < len; i ++ ) {
+
+			target[ i ] = src[ i ];
+
+		}
+
+	} else {
+
+		// if the arrays use the same data layout we can use a fast block copy
+		const len = Math.min( src.length, target.length );
+		target.set( new src.constructor( src.buffer, 0, len ) );
+
+	}
 
 }
 
@@ -179,6 +193,10 @@ class BatchedMesh extends Mesh {
 		this._multiDrawCount = 0;
 		this._multiDrawInstances = null;
 		this._visibilityChanged = true;
+
+		// used to track where the next point is that geometry should be inserted
+		this._nextIndexStart = 0;
+		this._nextVertexStart = 0;
 
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
@@ -425,16 +443,11 @@ class BatchedMesh extends Mesh {
 			indexCount: - 1,
 		};
 
-		let lastRange = null;
 		const reservedRanges = this._reservedRanges;
 		const drawRanges = this._drawRanges;
 		const bounds = this._bounds;
-		if ( this._geometryCount !== 0 ) {
 
-			lastRange = reservedRanges[ reservedRanges.length - 1 ];
-
-		}
-
+		reservedRange.vertexStart = this._nextVertexStart;
 		if ( vertexCount === - 1 ) {
 
 			reservedRange.vertexCount = geometry.getAttribute( 'position' ).count;
@@ -445,20 +458,11 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		if ( lastRange === null ) {
-
-			reservedRange.vertexStart = 0;
-
-		} else {
-
-			reservedRange.vertexStart = lastRange.vertexStart + lastRange.vertexCount;
-
-		}
-
 		const index = geometry.getIndex();
 		const hasIndex = index !== null;
 		if ( hasIndex ) {
 
+			reservedRange.indexStart = this._nextIndexStart;
 			if ( indexCount	=== - 1 ) {
 
 				reservedRange.indexCount = index.count;
@@ -466,16 +470,6 @@ class BatchedMesh extends Mesh {
 			} else {
 
 				reservedRange.indexCount = indexCount;
-
-			}
-
-			if ( lastRange === null ) {
-
-				reservedRange.indexStart = 0;
-
-			} else {
-
-				reservedRange.indexStart = lastRange.indexStart + lastRange.indexCount;
 
 			}
 
@@ -530,6 +524,10 @@ class BatchedMesh extends Mesh {
 
 		// update the geometry
 		this.setGeometryAt( geometryId, geometry );
+
+		// increment the next geometry position
+		this._nextIndexStart = reservedRange.indexStart + reservedRange.indexCount;
+		this._nextVertexStart = reservedRange.vertexStart + reservedRange.vertexCount;
 
 		return geometryId;
 
@@ -698,15 +696,25 @@ class BatchedMesh extends Mesh {
 		let nextVertexStart = 0;
 		let nextIndexStart = 0;
 
-		// iterate over all geometry ranges
+		// Iterate over all geometry ranges in order sorted from earliest in the geometry buffer to latest
+		// in the geometry buffer. Because draw range objects can be reused there is no guarantee of their order.
 		const drawRanges = this._drawRanges;
 		const reservedRanges = this._reservedRanges;
+		const indices = drawRanges
+			.map( ( e, i ) => i )
+			.sort( ( a, b ) => {
+
+				return reservedRanges[ a ].vertexStart - reservedRanges[ b ].vertexStart;
+
+			} );
+
 		const geometry = this.geometry;
 		for ( let i = 0, l = drawRanges.length; i < l; i ++ ) {
 
 			// if a geometry range is inactive then don't copy anything
-			const drawRange = drawRanges[ i ];
-			const reservedRange = reservedRanges[ i ];
+			const index = indices[ i ];
+			const drawRange = drawRanges[ index ];
+			const reservedRange = reservedRanges[ index ];
 			if ( drawRange.active === false ) {
 
 				continue;
@@ -714,25 +722,30 @@ class BatchedMesh extends Mesh {
 			}
 
 			// if a geometry contains an index buffer then shift it, as well
-			if ( geometry.index !== null && reservedRange.indexStart !== nextIndexStart ) {
+			if ( geometry.index !== null ) {
 
-				const { indexStart, indexCount } = reservedRange;
-				const index = geometry.index;
-				const array = index.array;
+				if ( reservedRange.indexStart !== nextIndexStart ) {
 
-				// shift the index pointers based on how the vertex data will shift
-				// adjusting the index must happen first so the original vertex start value is available
-				const elementDelta = nextVertexStart - reservedRange.vertexStart;
-				for ( let j = indexStart; j < indexStart + indexCount; j ++ ) {
+					const { indexStart, indexCount } = reservedRange;
+					const index = geometry.index;
+					const array = index.array;
 
-					array[ j ] = array[ j ] + elementDelta;
+					// shift the index pointers based on how the vertex data will shift
+					// adjusting the index must happen first so the original vertex start value is available
+					const elementDelta = nextVertexStart - reservedRange.vertexStart;
+					for ( let j = indexStart; j < indexStart + indexCount; j ++ ) {
+
+						array[ j ] = array[ j ] + elementDelta;
+
+					}
+
+					index.array.copyWithin( nextIndexStart, indexStart, indexStart + indexCount );
+					index.addUpdateRange( nextIndexStart, indexCount );
+
+					reservedRange.indexStart = nextIndexStart;
 
 				}
 
-				index.array.copyWithin( nextIndexStart, indexStart, indexStart + indexCount );
-				index.addUpdateRange( nextIndexStart, indexCount );
-
-				reservedRange.indexStart = nextIndexStart;
 				nextIndexStart += reservedRange.indexCount;
 
 			}
@@ -752,11 +765,15 @@ class BatchedMesh extends Mesh {
 				}
 
 				reservedRange.vertexStart = nextVertexStart;
-				nextVertexStart += reservedRange.vertexCount;
 
 			}
 
+			nextVertexStart += reservedRange.vertexCount;
 			drawRange.start = geometry.index ? reservedRange.indexStart : reservedRange.vertexStart;
+
+			// step the next geometry points to the shifted position
+			this._nextIndexStart = geometry.index ? reservedRange.indexStart + reservedRange.indexCount : 0;
+			this._nextVertexStart = reservedRange.vertexStart + reservedRange.vertexCount;
 
 		}
 
@@ -857,9 +874,6 @@ class BatchedMesh extends Mesh {
 
 	setMatrixAt( instanceId, matrix ) {
 
-		// @TODO: Map geometryId to index of the arrays because
-		//        optimize() can make geometryId mismatch the index
-
 		const drawInfo = this._drawInfo;
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = this._matricesTexture.image.data;
@@ -897,9 +911,6 @@ class BatchedMesh extends Mesh {
 			this._initColorsTexture();
 
 		}
-
-		// @TODO: Map id to index of the arrays because
-		//        optimize() can make id mismatch the index
 
 		const colorsTexture = this._colorsTexture;
 		const colorsArray = this._colorsTexture.image.data;
@@ -1055,14 +1066,17 @@ class BatchedMesh extends Mesh {
 		const matricesTexture = this._matricesTexture;
 		const colorsTexture = this._colorsTexture;
 
+		indirectTexture.dispose();
 		this._initIndirectTexture();
 		copyArrayContents( indirectTexture.image.data, this._indirectTexture.image.data );
 
+		matricesTexture.dispose();
 		this._initMatricesTexture();
 		copyArrayContents( matricesTexture.image.data, this._matricesTexture.image.data );
 
 		if ( colorsTexture ) {
 
+			colorsTexture.dispose();
 			this._initColorsTexture();
 			copyArrayContents( colorsTexture.image.data, this._colorsTexture.image.data );
 
@@ -1158,7 +1172,7 @@ class BatchedMesh extends Mesh {
 			const drawRange = drawRanges[ geometryId ];
 			_mesh.geometry.setDrawRange( drawRange.start, drawRange.count );
 
-			// ge the intersects
+			// get the intersects
 			this.getMatrixAt( i, _mesh.matrixWorld ).premultiply( matrixWorld );
 			this.getBoundingBoxAt( geometryId, _mesh.geometry.boundingBox );
 			this.getBoundingSphereAt( geometryId, _mesh.geometry.boundingSphere );
