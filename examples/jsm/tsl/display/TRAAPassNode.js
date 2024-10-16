@@ -83,12 +83,19 @@ class TRAAPassNode extends PassNode {
 		this._pixelRatio = renderer.getPixelRatio();
 		const size = renderer.getSize( _size );
 
-		const needsRestart = this.setSize( size.width, size.height, renderer );
+		const needsRestart = this.setSize( size.width, size.height );
 
-		//
+		// save original/unjittered projection matrix for velocity pass
+
+		camera.updateProjectionMatrix();
+		this._originalProjectionMatrix.copy( camera.projectionMatrix );
+
+		// camera configuration
 
 		this._cameraNear.value = camera.near;
 		this._cameraFar.value = camera.far;
+
+		// configure jitter as view offset
 
 		const viewOffset = {
 
@@ -107,9 +114,6 @@ class TRAAPassNode extends PassNode {
 
 		const jitterOffset = _JitterVectors[ this._jitterIndex ];
 
-		camera.updateProjectionMatrix();
-		this._originalProjectionMatrix.copy( camera.projectionMatrix );
-
 		camera.setViewOffset(
 
 			viewOffset.fullWidth, viewOffset.fullHeight,
@@ -119,6 +123,8 @@ class TRAAPassNode extends PassNode {
 			viewOffset.width, viewOffset.height
 
 		);
+
+		// configure velocity
 
 		const mrt = this.getMRT();
 		const velocityOutput = mrt.get( 'velocity' );
@@ -132,6 +138,8 @@ class TRAAPassNode extends PassNode {
 			throw new Error( 'THREE:TRAAPassNode: Missing velocity output in MRT configuration.' );
 
 		}
+
+		// render sample
 
 		renderer.setMRT( mrt );
 
@@ -224,7 +232,7 @@ class TRAAPassNode extends PassNode {
 			velocityTarget.isRenderTargetTexture = true;
 			velocityTarget.name = 'velocity';
 
-			this._sampleRenderTarget.textures.push( velocityTarget );
+			this._sampleRenderTarget.textures.push( velocityTarget ); // for MRT
 
 		}
 
