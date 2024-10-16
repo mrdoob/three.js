@@ -375,6 +375,70 @@ class ThreeMFLoader extends Loader {
 
 		}
 
+		function parseImplicitIONode( implicitIONode ) {
+
+			const portNodes = implicitIONode.children;
+			const portArguments = {};
+			for ( let i = 0; i < portNodes.length; i ++ ) {
+
+				const args = { type: portNodes[ i ].nodeName.substring( 2 ) };
+				for ( let j = 0; j < portNodes[ i ].attributes.length; j ++ ) {
+
+					const attrib = portNodes[ i ].attributes[ j ];
+					if ( attrib.specified ) {
+		 				args[ attrib.name ] = attrib.value; 
+					}
+				}
+
+				portArguments[ portNodes[ i ].getAttribute( 'identifier' ) ] = args;
+
+			}
+
+			return portArguments;
+
+		}
+
+		function parseImplicitFunctionNode( implicitFunctionNode ) {
+
+			const implicitFunctionData = {
+				id: implicitFunctionNode.getAttribute( 'id' ),
+				displayname: implicitFunctionNode.getAttribute( 'displayname' )
+			};
+
+			const functionNodes = implicitFunctionNode.children;
+
+			const operations = {};
+
+			for ( let i = 0; i < functionNodes.length; i ++ ) {
+
+				const operatorNode = functionNodes[ i ];
+
+				if ( operatorNode.nodeName === 'i:in' || operatorNode.nodeName === 'i:out' ) {
+
+					operations[ operatorNode.nodeName === 'i:in' ? "inputs" : "outputs" ] = parseImplicitIONode( operatorNode );
+
+				} else {
+
+					const inputNodes = operatorNode.children;
+					let portArguments = { "op": operatorNode.nodeName.substring( 2 ), "identifier": operatorNode.getAttribute( 'identifier' ) };
+					for ( let i = 0; i < inputNodes.length; i ++ ) {
+
+						portArguments[ inputNodes[ i ].nodeName.substring( 2 ) ] = parseImplicitIONode( inputNodes[ i ] );
+
+					}
+
+					operations[ portArguments[ "identifier" ] ] = portArguments;
+
+				}
+
+			}
+
+			implicitFunctionData[ 'operations' ] = operations;
+
+			return implicitFunctionData;
+
+		}
+
 		function parseMetallicDisplaypropertiesNode( metallicDisplaypropetiesNode ) {
 
 			const metallicDisplaypropertiesData = {
@@ -668,6 +732,25 @@ class ThreeMFLoader extends Loader {
 				const colorGroupNode = colorGroupNodes[ i ];
 				const colorGroupData = parseColorGroupNode( colorGroupNode );
 				resourcesData[ 'colorgroup' ][ colorGroupData[ 'id' ] ] = colorGroupData;
+
+			}
+
+			//
+
+			const implicitFunctionNodes = resourcesNode.querySelectorAll( 'implicitfunction' );
+
+			if ( implicitFunctionNodes.length > 0 ) {
+
+				resourcesData[ 'implicitfunction' ] = {};
+
+			}
+
+
+			for ( let i = 0; i < implicitFunctionNodes.length; i ++ ) {
+
+				const implicitFunctionNode = implicitFunctionNodes[ i ];
+				const implicitFunctionData = parseImplicitFunctionNode( implicitFunctionNode );
+				resourcesData[ 'implicitfunction' ][ implicitFunctionData[ 'id' ] ] = implicitFunctionData;
 
 			}
 
@@ -1364,6 +1447,12 @@ class ThreeMFLoader extends Loader {
 			if ( objectData.name ) {
 
 				objects[ objectData.id ].name = objectData.name;
+
+			}
+
+			if ( modelData.resources.implicitfunction ) {
+
+				console.warn( 'THREE.ThreeMFLoader: Implicit Functions are implemented in data-only.', modelData.resources.implicitfunction );
 
 			}
 
