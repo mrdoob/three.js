@@ -1066,14 +1066,17 @@ class BatchedMesh extends Mesh {
 		const matricesTexture = this._matricesTexture;
 		const colorsTexture = this._colorsTexture;
 
+		indirectTexture.dispose();
 		this._initIndirectTexture();
 		copyArrayContents( indirectTexture.image.data, this._indirectTexture.image.data );
 
+		matricesTexture.dispose();
 		this._initMatricesTexture();
 		copyArrayContents( matricesTexture.image.data, this._matricesTexture.image.data );
 
 		if ( colorsTexture ) {
 
+			colorsTexture.dispose();
 			this._initColorsTexture();
 			copyArrayContents( colorsTexture.image.data, this._colorsTexture.image.data );
 
