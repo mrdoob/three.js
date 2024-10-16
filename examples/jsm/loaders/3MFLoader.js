@@ -1452,7 +1452,7 @@ class ThreeMFLoader extends Loader {
 
 			if ( modelData.resources.implicitfunction ) {
 
-				console.warn( "Implicit Functions are implemented in data-only!", modelData.resources.implicitfunction );
+				console.warn( 'THREE.ThreeMFLoader: Implicit Functions are implemented in data-only.', modelData.resources.implicitfunction );
 
 			}
 
