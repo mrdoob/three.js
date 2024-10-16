@@ -6,7 +6,7 @@ import Color4 from './Color4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { createCanvasElement } from '../../utils.js';
-import { REVISION } from '../../constants.js';
+import { REVISION, WebGPUCoordinateSystem } from '../../constants.js';
 
 class Backend {
 
@@ -147,8 +147,10 @@ class Backend {
 
 			domElement = ( this.parameters.canvas !== undefined ) ? this.parameters.canvas : createCanvasElement();
 
+			const backend = ( this.coordinateSystem === WebGPUCoordinateSystem ) ? 'webgpu' : 'webgl';
+
 			// OffscreenCanvas does not have setAttribute, see #22811
-			if ( 'setAttribute' in domElement ) domElement.setAttribute( 'data-engine', `three.js r${REVISION} webgpu` );
+			if ( 'setAttribute' in domElement ) domElement.setAttribute( 'data-engine', `three.js r${REVISION} WebGPURenderer ${backend}` );
 
 			this.domElement = domElement;
 
