@@ -2779,7 +2779,12 @@ class WebGLRenderer {
 				const dstRenderTargetProperties = properties.get( dstTextureProperties.__renderTarget );
 
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, srcRenderTargetProperties.__webglFramebuffer );
+
+				_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, level, 0 );
+
 				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, dstRenderTargetProperties.__webglFramebuffer );
+
+				_gl.framebufferTextureLayer( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, level, 0 );
 
 				let mask = _gl.COLOR_BUFFER_BIT;
 
