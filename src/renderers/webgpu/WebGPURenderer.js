@@ -1,5 +1,4 @@
 import Renderer from '../common/Renderer.js';
-import Info from '../common/Info.js';
 import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
 import StandardNodeLibrary from './nodes/StandardNodeLibrary.js';
@@ -35,8 +34,6 @@ class WebGPURenderer extends Renderer {
 
 				console.warn( 'THREE.WebGPURenderer: WebGPU is not available, running under WebGL2 backend.' );
 
-				this.info = new Info( 'webgl' );
-
 				return new WebGLBackend( parameters );
 
 			};
@@ -51,8 +48,6 @@ class WebGPURenderer extends Renderer {
 		this.library = new StandardNodeLibrary();
 
 		this.isWebGPURenderer = true;
-
-		this.info = new Info( BackendClass instanceof WebGPUBackend ? 'webgpu' : 'webgl' );
 
 	}
 

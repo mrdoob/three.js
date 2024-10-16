@@ -1,6 +1,6 @@
 class Info {
 
-	constructor( engine ) {
+	constructor() {
 
 		this.autoReset = true;
 
@@ -31,12 +31,6 @@ class Info {
 			geometries: 0,
 			textures: 0
 		};
-
-		if ( engine ) {
-
-			this.engine = engine;
-
-		}
 
 	}
 
