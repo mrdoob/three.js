@@ -20,13 +20,7 @@ export async function decompress( blitTexture, maxTextureSize = Infinity, render
 
 	const material = new NodeMaterial();
 
-	// disable uv transform
-	const currentTextureMatrix = blitTexture.matrix.clone();
-	const currentTextureMatrixAutoUpdate = blitTexture.matrixAutoUpdate;
-	blitTexture.matrix.identity();
-	blitTexture.matrixAutoUpdate = false;
-
-	material.fragmentNode = texture( blitTexture ).uv( uv().flipY() );
+	material.fragmentNode = texture( blitTexture, uv().flipY() );
 
 	const width = Math.min( blitTexture.image.width, maxTextureSize );
 	const height = Math.min( blitTexture.image.height, maxTextureSize );
@@ -64,11 +58,6 @@ export async function decompress( blitTexture, maxTextureSize = Infinity, render
 		_renderer = null;
 
 	}
-
-	// restore
-
-	blitTexture.matrix.copy( currentTextureMatrix );
-	blitTexture.matrixAutoUpdate = currentTextureMatrixAutoUpdate;
 
 	return readableTexture;
 
