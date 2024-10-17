@@ -1763,7 +1763,9 @@ class GLTFWriter {
 
 			}
 
-			// JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT.
+			// Enforce glTF vertex attribute requirements:
+			// - JOINTS_0 must be UNSIGNED_BYTE or UNSIGNED_SHORT
+			// - Only custom attributes may be INT or UNSIGNED_INT
 			modifiedAttribute = null;
 			const array = attribute.array;
 
@@ -1773,6 +1775,11 @@ class GLTFWriter {
 
 				console.warn( 'GLTFExporter: Attribute "skinIndex" converted to type UNSIGNED_SHORT.' );
 				modifiedAttribute = new BufferAttribute( new Uint16Array( array ), attribute.itemSize, attribute.normalized );
+
+			} else if ( ( array instanceof Uint32Array || array instanceof Int32Array ) && ! attributeName.startsWith( '_' ) ) {
+
+				console.warn( `GLTFExporter: Attribute "${ attributeName }" converted to type FLOAT.` );
+				modifiedAttribute = GLTFExporter.Utils.toFloat32BufferAttribute( attribute );
 
 			}
 
@@ -3415,6 +3422,32 @@ GLTFExporter.Utils = {
 		clip.tracks = tracks;
 
 		return clip;
+
+	},
+
+	toFloat32BufferAttribute: function ( srcAttribute ) {
+
+		const dstAttribute = new BufferAttribute( new Float32Array( srcAttribute.count * srcAttribute.itemSize ), srcAttribute.itemSize, false );
+
+		if ( ! srcAttribute.normalized && ! srcAttribute.isInterleavedBufferAttribute ) {
+
+			dstAttribute.array.set( srcAttribute.array );
+
+			return dstAttribute;
+
+		}
+
+		for ( let i = 0, il = srcAttribute.count; i < il; i ++ ) {
+
+			for ( let j = 0; j < srcAttribute.itemSize; j ++ ) {
+
+				dstAttribute.setComponent( i, j, srcAttribute.getComponent( i, j ) );
+
+			}
+
+		}
+
+		return dstAttribute;
 
 	}
 
