@@ -335,9 +335,7 @@ class Textures extends DataMap {
 
 	needsMipmaps( texture ) {
 
-		if ( this.isEnvironmentTexture( texture ) ) return true;
-
-		return ( texture.isCompressedTexture === true ) || ( ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter ) );
+		return this.isEnvironmentTexture( texture ) || texture.isCompressedTexture === true || texture.generateMipmaps;
 
 	}
 
