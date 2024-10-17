@@ -77,6 +77,7 @@ class FileLoader extends Loader {
 		const req = new Request( url, {
 			headers: new Headers( this.requestHeader ),
 			credentials: this.withCredentials ? 'include' : 'same-origin',
+			signal: this.manager.abortController.signal //  Control the abort of fileLoader at the granularity of a manager
 			// An abort controller could be added within a future PR
 		} );
 
