@@ -117,7 +117,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function getTextureType( texture ) {
+	function getTargetType( texture ) {
 
 		if ( texture.isWebGLCubeRenderTarget ) return _gl.TEXTURE_CUBE_MAP;
 		if ( texture.isWebGL3DRenderTarget ) return _gl.TEXTURE_3D;
@@ -1936,11 +1936,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( textureNeedsGenerateMipmaps( texture ) ) {
 
-				const textureType = getTextureType( texture );
+				const targetType = getTargetType( renderTarget );
 				const webglTexture = properties.get( texture ).__webglTexture;
 
-				state.bindTexture( textureType, webglTexture );
-				generateMipmap( textureType );
+				state.bindTexture( targetType, webglTexture );
+				generateMipmap( targetType );
 				state.unbindTexture();
 
 			}
