@@ -100,7 +100,7 @@ class Line extends Object3D {
 		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-    const scaleMax = matrixWorld.getMaxScaleOnAxis();
+		const scaleMax = matrixWorld.getMaxScaleOnAxis();
 		const localThreshold = threshold / scaleMax;
 		const localThresholdSq = localThreshold * localThreshold;
 
