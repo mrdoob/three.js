@@ -117,6 +117,15 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function getTextureType( texture ) {
+
+		if ( texture.isWebGLCubeRenderTarget ) return _gl.TEXTURE_CUBE_MAP;
+		if ( texture.isWebGL3DRenderTarget ) return _gl.TEXTURE_3D;
+		if ( texture.isWebGLArrayRenderTarget || texture.isCompressedArrayTexture ) return _gl.TEXTURE_2D_ARRAY;
+		return _gl.TEXTURE_2D;
+		
+	}
+
 	function getInternalFormat( internalFormatName, glFormat, glType, colorSpace, forceLinearTransfer = false ) {
 
 		if ( internalFormatName !== null ) {
@@ -1927,11 +1936,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( textureNeedsGenerateMipmaps( texture ) ) {
 
-				const target = renderTarget.isWebGLCubeRenderTarget ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
+				const textureType = getTextureType( texture );
 				const webglTexture = properties.get( texture ).__webglTexture;
 
-				state.bindTexture( target, webglTexture );
-				generateMipmap( target );
+				state.bindTexture( textureType, webglTexture );
+				generateMipmap( textureType );
 				state.unbindTexture();
 
 			}
