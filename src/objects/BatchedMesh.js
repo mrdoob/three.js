@@ -92,11 +92,12 @@ const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
 const _mesh = /*@__PURE__*/ new Mesh();
 const _batchIntersects = [];
 
-// @TODO: SkinnedMesh support?
-// @TODO: geometry.groups support?
-// @TODO: geometry.drawRange support?
-// @TODO: geometry.morphAttributes support?
-// @TODO: Support uniform parameter per geometry
+// TODO
+// - add instanceCount
+// - remove bounds, reserved ranges
+// - clean up
+// - rename fields for clarity
+// - remove unused fields
 
 // copies data from attribute "src" into "target" starting at "targetOffset"
 function copyAttributeData( src, target, targetOffset = 0 ) {
@@ -156,6 +157,12 @@ class BatchedMesh extends Mesh {
 	get maxInstanceCount() {
 
 		return this._maxInstanceCount;
+
+	}
+
+	get instanceCount() {
+
+		return this._drawInfo.length - this._availableInstanceIds.length;
 
 	}
 
