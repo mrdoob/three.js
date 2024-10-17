@@ -1467,6 +1467,7 @@ class MaterialBuilder {
 
 				t.magFilter = NearestFilter;
 				t.minFilter = NearestFilter;
+				t.generateMipmaps = false;
 
 			}
 

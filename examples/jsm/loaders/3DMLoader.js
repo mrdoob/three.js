@@ -745,6 +745,7 @@ class Rhino3dmLoader extends Loader {
 
 				const texture = new CanvasTexture( ctx.canvas );
 				texture.minFilter = LinearFilter;
+				texture.generateMipmaps = false;
 				texture.wrapS = ClampToEdgeWrapping;
 				texture.wrapT = ClampToEdgeWrapping;
 
