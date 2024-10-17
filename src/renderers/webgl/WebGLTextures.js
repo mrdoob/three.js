@@ -123,7 +123,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		if ( texture.isWebGL3DRenderTarget ) return _gl.TEXTURE_3D;
 		if ( texture.isWebGLArrayRenderTarget || texture.isCompressedArrayTexture ) return _gl.TEXTURE_2D_ARRAY;
 		return _gl.TEXTURE_2D;
-		
+
 	}
 
 	function getInternalFormat( internalFormatName, glFormat, glType, colorSpace, forceLinearTransfer = false ) {
