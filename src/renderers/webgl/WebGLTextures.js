@@ -107,7 +107,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function textureNeedsGenerateMipmaps( texture ) {
 
-		return texture.generateMipmaps && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter;
+		return texture.generateMipmaps;
 
 	}
 
