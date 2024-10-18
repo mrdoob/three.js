@@ -809,7 +809,7 @@ class BatchedMesh extends Mesh {
 		// compute bounding sphere
 		const geometry = this.geometry;
 		const geometryInfo = this._geometryInfo[ geometryId ];
-		if ( geometryInfo.boundingSphere === false ) {
+		if ( geometryInfo.boundingSphere === null ) {
 
 			const sphere = new Sphere();
 			this.getBoundingBoxAt( geometryId, _box );
@@ -1060,12 +1060,11 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	// TODO: INPROGRESS FROM HERE
 	setGeometrySize( maxVertexCount, maxIndexCount ) {
 
 		// Check if we can shrink to the requested vertex attribute size
-		const validRanges = [ ...this._reservedRanges ].filter( ( range, i ) => this._drawRanges[ i ].active );
-		const requiredVertexLength = Math.max( ...validRanges.map( range => range.vertexStart + range.vertexCount ) );
+		const validRanges = [ ...this._geometryInfo ].filter( info => info.active );
+		const requiredVertexLength = Math.max( ...validRanges.map( range => range.vertexStart + range.reservedVertexCount ) );
 		if ( requiredVertexLength > maxVertexCount ) {
 
 			throw new Error( `BatchedMesh: Geometry vertex values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
@@ -1075,7 +1074,7 @@ class BatchedMesh extends Mesh {
 		// Check if we can shrink to the requested index attribute size
 		if ( this.geometry.index ) {
 
-			const requiredIndexLength = Math.max( ...validRanges.map( range => range.indexStart + range.indexCount ) );
+			const requiredIndexLength = Math.max( ...validRanges.map( range => range.indexStart + range.reservedIndexCount ) );
 			if ( requiredIndexLength > maxIndexCount ) {
 
 				throw new Error( `BatchedMesh: Geometry index values are being used outside the range ${ maxIndexCount }. Cannot shrink further.` );
@@ -1117,7 +1116,7 @@ class BatchedMesh extends Mesh {
 	raycast( raycaster, intersects ) {
 
 		const drawInfo = this._drawInfo;
-		const drawRanges = this._drawRanges;
+		const geometryInfoList = this._geometryInfo;
 		const matrixWorld = this.matrixWorld;
 		const batchGeometry = this.geometry;
 
@@ -1137,6 +1136,7 @@ class BatchedMesh extends Mesh {
 
 		}
 
+		const hasIndex = Boolean( batchGeometry.index );
 		for ( let i = 0, l = drawInfo.length; i < l; i ++ ) {
 
 			if ( ! drawInfo[ i ].visible || ! drawInfo[ i ].active ) {
@@ -1146,8 +1146,10 @@ class BatchedMesh extends Mesh {
 			}
 
 			const geometryId = drawInfo[ i ].geometryIndex;
-			const drawRange = drawRanges[ geometryId ];
-			_mesh.geometry.setDrawRange( drawRange.start, drawRange.count );
+			const geometryInfo = geometryInfoList[ geometryId ];
+			const start = hasIndex ? geometryInfo.indexStart : geometryInfo.vertexStart;
+			const count = hasIndex ? geometryInfo.indexCount : geometryInfo.vertexCount;
+			_mesh.geometry.setDrawRange( start, count );
 
 			// get the intersects
 			this.getMatrixAt( i, _mesh.matrixWorld ).premultiply( matrixWorld );
@@ -1186,17 +1188,13 @@ class BatchedMesh extends Mesh {
 		this.boundingBox = source.boundingBox !== null ? source.boundingBox.clone() : null;
 		this.boundingSphere = source.boundingSphere !== null ? source.boundingSphere.clone() : null;
 
-		this._drawRanges = source._drawRanges.map( range => ( { ...range } ) );
-		this._reservedRanges = source._reservedRanges.map( range => ( { ...range } ) );
+		this._geometryInfo = source._geometryInfo.map( info => ( {
+			...info,
 
-		this._drawInfo = source._drawInfo.map( inf => ( { ...inf } ) );
-		this._bounds = source._bounds.map( bound => ( {
-			boxInitialized: bound.boxInitialized,
-			box: bound.box.clone(),
-
-			sphereInitialized: bound.sphereInitialized,
-			sphere: bound.sphere.clone()
+			boundingBox: info.boundingBox !== null ? info.boundingBox.clone() : null,
+			boundingSphere: info.boundingSphere !== null ? info.boundingSphere.clone() : null,
 		} ) );
+		this._drawInfo = source._drawInfo.map( info => ( { ...info } ) );
 
 		this._maxInstanceCount = source._maxInstanceCount;
 		this._maxVertexCount = source._maxVertexCount;
@@ -1261,7 +1259,7 @@ class BatchedMesh extends Mesh {
 		const drawInfo = this._drawInfo;
 		const multiDrawStarts = this._multiDrawStarts;
 		const multiDrawCounts = this._multiDrawCounts;
-		const drawRanges = this._drawRanges;
+		const geometryInfoList = this._geometryInfo;
 		const perObjectFrustumCulled = this.perObjectFrustumCulled;
 		const indirectTexture = this._indirectTexture;
 		const indirectArray = indirectTexture.image.data;
@@ -1279,7 +1277,7 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		let count = 0;
+		let multiDrawCount = 0;
 		if ( this.sortObjects ) {
 
 			// get the camera position in the local frame
@@ -1309,7 +1307,7 @@ class BatchedMesh extends Mesh {
 
 						// get the distance from camera used for sorting
 						const z = _temp.subVectors( _sphere.center, _vector ).dot( _forward );
-						_renderList.push( drawRanges[ geometryId ], z, i );
+						_renderList.push( geometryInfoList[ geometryId ], z, i );
 
 					}
 
@@ -1333,10 +1331,12 @@ class BatchedMesh extends Mesh {
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 
 				const item = list[ i ];
-				multiDrawStarts[ count ] = item.start * bytesPerElement;
-				multiDrawCounts[ count ] = item.count;
-				indirectArray[ count ] = item.index;
-				count ++;
+				const start = index ? item.indexStart : item.vertexStart;
+				const count = index ? item.indexCount : item.vertexCount;
+				multiDrawStarts[ multiDrawCount ] = start * bytesPerElement;
+				multiDrawCounts[ multiDrawCount ] = count;
+				indirectArray[ multiDrawCount ] = index;
+				multiDrawCount ++;
 
 			}
 
@@ -1363,11 +1363,14 @@ class BatchedMesh extends Mesh {
 
 					if ( ! culled ) {
 
-						const range = drawRanges[ geometryId ];
-						multiDrawStarts[ count ] = range.start * bytesPerElement;
-						multiDrawCounts[ count ] = range.count;
-						indirectArray[ count ] = i;
-						count ++;
+						const geometryInfo = geometryInfoList[ geometryId ];
+						const start = index ? geometryInfo.indexStart : geometryInfo.vertexStart;
+						const count = index ? geometryInfo.indexCount : geometryInfo.vertexCount;
+
+						multiDrawStarts[ multiDrawCount ] = start * bytesPerElement;
+						multiDrawCounts[ multiDrawCount ] = count;
+						indirectArray[ multiDrawCount ] = i;
+						multiDrawCount ++;
 
 					}
 
@@ -1378,7 +1381,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		indirectTexture.needsUpdate = true;
-		this._multiDrawCount = count;
+		this._multiDrawCount = multiDrawCount;
 		this._visibilityChanged = false;
 
 	}
