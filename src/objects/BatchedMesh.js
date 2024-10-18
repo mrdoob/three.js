@@ -185,9 +185,7 @@ class BatchedMesh extends Mesh {
 		this._availableGeometryIds = [];
 
 		// geometry information
-		this._drawRanges = [];
-		this._reservedRanges = [];
-		this._bounds = [];
+		this._geometryInfo = [];
 
 		this._maxInstanceCount = maxInstanceCount;
 		this._maxVertexCount = maxVertexCount;
@@ -443,26 +441,30 @@ class BatchedMesh extends Mesh {
 
 		this._validateGeometry( geometry );
 
-		// get the necessary range fo the geometry
-		const reservedRange = {
+		const geometryInfo = {
 			vertexStart: - 1,
 			vertexCount: - 1,
+			reservedVertexCount: - 1,
+
 			indexStart: - 1,
 			indexCount: - 1,
+			reservedIndexCount: - 1,
+
+			boundingBox: null,
+			boundingSphere: null,
+			active: true,
 		};
 
-		const reservedRanges = this._reservedRanges;
-		const drawRanges = this._drawRanges;
-		const bounds = this._bounds;
-
-		reservedRange.vertexStart = this._nextVertexStart;
+		const geometryInfoList = this._geometryInfo;
+		geometryInfo.vertexStart = this._nextVertexStart;
+		geometryInfo.vertexCount = geometry.getAttribute( 'position' ).count;
 		if ( vertexCount === - 1 ) {
 
-			reservedRange.vertexCount = geometry.getAttribute( 'position' ).count;
+			geometryInfo.reservedVertexCount = geometryInfo.vertexCount;
 
 		} else {
 
-			reservedRange.vertexCount = vertexCount;
+			geometryInfo.reservedVertexCount = vertexCount;
 
 		}
 
@@ -470,43 +472,29 @@ class BatchedMesh extends Mesh {
 		const hasIndex = index !== null;
 		if ( hasIndex ) {
 
-			reservedRange.indexStart = this._nextIndexStart;
+			geometryInfo.indexStart = this._nextIndexStart;
+			geometryInfo.indexCount = index.count;
 			if ( indexCount	=== - 1 ) {
 
-				reservedRange.indexCount = index.count;
+				geometryInfo.reservedIndexCount = geometryInfo.indexCount;
 
 			} else {
 
-				reservedRange.indexCount = indexCount;
+				geometryInfo.reservedIndexCount = indexCount;
 
 			}
 
 		}
 
 		if (
-			reservedRange.indexStart !== - 1 &&
-			reservedRange.indexStart + reservedRange.indexCount > this._maxIndexCount ||
-			reservedRange.vertexStart + reservedRange.vertexCount > this._maxVertexCount
+			geometryInfo.indexStart !== - 1 &&
+			geometryInfo.indexStart + geometryInfo.reservedIndexCount > this._maxIndexCount ||
+			geometryInfo.vertexStart + geometryInfo.reservedIndexCount > this._maxVertexCount
 		) {
 
 			throw new Error( 'BatchedMesh: Reserved space request exceeds the maximum buffer size.' );
 
 		}
-
-		// add the reserved range and draw range objects
-		const drawRange = {
-			start: hasIndex ? reservedRange.indexStart : reservedRange.vertexStart,
-			count: - 1,
-			active: true,
-		};
-
-		const boundsInfo = {
-			boxInitialized: false,
-			box: new Box3(),
-
-			sphereInitialized: false,
-			sphere: new Sphere()
-		};
 
 		// update id
 		let geometryId;
@@ -515,18 +503,14 @@ class BatchedMesh extends Mesh {
 			this._availableGeometryIds.sort( ascIdSort );
 
 			geometryId = this._availableGeometryIds.shift();
-			reservedRanges[ geometryId ] = reservedRange;
-			drawRanges[ geometryId ] = drawRange;
-			bounds[ geometryId ] = boundsInfo;
+			geometryInfoList[ geometryId ] = geometryInfo;
 
 
 		} else {
 
 			geometryId = this._geometryCount;
 			this._geometryCount ++;
-			reservedRanges.push( reservedRange );
-			drawRanges.push( drawRange );
-			bounds.push( boundsInfo );
+			geometryInfoList.push( geometryInfo );
 
 		}
 
@@ -534,8 +518,8 @@ class BatchedMesh extends Mesh {
 		this.setGeometryAt( geometryId, geometry );
 
 		// increment the next geometry position
-		this._nextIndexStart = reservedRange.indexStart + reservedRange.indexCount;
-		this._nextVertexStart = reservedRange.vertexStart + reservedRange.vertexCount;
+		this._nextIndexStart = geometryInfo.indexStart + geometryInfo.reservedIndexCount;
+		this._nextVertexStart = geometryInfo.vertexStart + geometryInfo.reservedVertexCount;
 
 		return geometryId;
 
@@ -555,11 +539,11 @@ class BatchedMesh extends Mesh {
 		const hasIndex = batchGeometry.getIndex() !== null;
 		const dstIndex = batchGeometry.getIndex();
 		const srcIndex = geometry.getIndex();
-		const reservedRange = this._reservedRanges[ geometryId ];
+		const geometryInfo = this._geometryInfo[ geometryId ];
 		if (
 			hasIndex &&
-			srcIndex.count > reservedRange.indexCount ||
-			geometry.attributes.position.count > reservedRange.vertexCount
+			srcIndex.count > geometryInfo.reservedIndexCount ||
+			geometry.attributes.position.count > geometryInfo.reservedVertexCount
 		) {
 
 			throw new Error( 'BatchedMesh: Reserved space not large enough for provided geometry.' );
@@ -567,8 +551,8 @@ class BatchedMesh extends Mesh {
 		}
 
 		// copy geometry over
-		const vertexStart = reservedRange.vertexStart;
-		const vertexCount = reservedRange.vertexCount;
+		const vertexStart = geometryInfo.vertexStart;
+		const vertexCount = geometryInfo.reservedVertexCount;
 		for ( const attributeName in batchGeometry.attributes ) {
 
 			// copy attribute data
@@ -597,7 +581,7 @@ class BatchedMesh extends Mesh {
 		// copy index
 		if ( hasIndex ) {
 
-			const indexStart = reservedRange.indexStart;
+			const indexStart = geometryInfo.indexStart;
 
 			// copy index data over
 			for ( let i = 0; i < srcIndex.count; i ++ ) {
@@ -607,55 +591,41 @@ class BatchedMesh extends Mesh {
 			}
 
 			// fill the rest in with zeroes
-			for ( let i = srcIndex.count, l = reservedRange.indexCount; i < l; i ++ ) {
+			for ( let i = srcIndex.count, l = geometryInfo.reservedIndexCount; i < l; i ++ ) {
 
 				dstIndex.setX( indexStart + i, vertexStart );
 
 			}
 
 			dstIndex.needsUpdate = true;
-			dstIndex.addUpdateRange( indexStart, reservedRange.indexCount );
+			dstIndex.addUpdateRange( indexStart, geometryInfo.reservedIndexCount );
 
 		}
 
 		// store the bounding boxes
-		const bound = this._bounds[ geometryId ];
+		geometryInfo.boundingBox = null;
 		if ( geometry.boundingBox !== null ) {
 
-			bound.box.copy( geometry.boundingBox );
-			bound.boxInitialized = true;
-
-		} else {
-
-			bound.boxInitialized = false;
+			geometryInfo.boundingBox = geometry.boundingBox.clone();
 
 		}
 
+		geometryInfo.boundingSphere = null;
 		if ( geometry.boundingSphere !== null ) {
 
-			bound.sphere.copy( geometry.boundingSphere );
-			bound.sphereInitialized = true;
-
-		} else {
-
-			bound.sphereInitialized = false;
+			geometryInfo.boundingSphere = geometry.boundingSphere.clone();
 
 		}
 
-		// set drawRange count
-		const drawRange = this._drawRanges[ geometryId ];
-		const posAttr = geometry.getAttribute( 'position' );
-		drawRange.count = hasIndex ? srcIndex.count : posAttr.count;
 		this._visibilityChanged = true;
-
 		return geometryId;
 
 	}
 
 	deleteGeometry( geometryId ) {
 
-		const drawRanges = this._drawRanges;
-		if ( geometryId >= drawRanges.length || drawRanges[ geometryId ].active === false ) {
+		const geometryInfoList = this._geometryInfo;
+		if ( geometryId >= geometryInfoList.length || geometryInfoList[ geometryId ].active === false ) {
 
 			return this;
 
@@ -673,7 +643,7 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		drawRanges[ geometryId ].active = false;
+		geometryInfoList[ geometryId ].active = false;
 		this._availableGeometryIds.push( geometryId );
 		this._visibilityChanged = true;
 
@@ -706,24 +676,22 @@ class BatchedMesh extends Mesh {
 
 		// Iterate over all geometry ranges in order sorted from earliest in the geometry buffer to latest
 		// in the geometry buffer. Because draw range objects can be reused there is no guarantee of their order.
-		const drawRanges = this._drawRanges;
-		const reservedRanges = this._reservedRanges;
-		const indices = drawRanges
+		const geometryInfoList = this._geometryInfo;
+		const indices = geometryInfoList
 			.map( ( e, i ) => i )
 			.sort( ( a, b ) => {
 
-				return reservedRanges[ a ].vertexStart - reservedRanges[ b ].vertexStart;
+				return geometryInfoList[ a ].vertexStart - geometryInfoList[ b ].vertexStart;
 
 			} );
 
 		const geometry = this.geometry;
-		for ( let i = 0, l = drawRanges.length; i < l; i ++ ) {
+		for ( let i = 0, l = geometryInfoList.length; i < l; i ++ ) {
 
 			// if a geometry range is inactive then don't copy anything
 			const index = indices[ i ];
-			const drawRange = drawRanges[ index ];
-			const reservedRange = reservedRanges[ index ];
-			if ( drawRange.active === false ) {
+			const geometryInfo = geometryInfoList[ index ];
+			if ( geometryInfo.active === false ) {
 
 				continue;
 
@@ -732,56 +700,55 @@ class BatchedMesh extends Mesh {
 			// if a geometry contains an index buffer then shift it, as well
 			if ( geometry.index !== null ) {
 
-				if ( reservedRange.indexStart !== nextIndexStart ) {
+				if ( geometryInfo.indexStart !== nextIndexStart ) {
 
-					const { indexStart, indexCount } = reservedRange;
+					const { indexStart, vertexStart, reservedIndexCount } = geometryInfo;
 					const index = geometry.index;
 					const array = index.array;
 
 					// shift the index pointers based on how the vertex data will shift
 					// adjusting the index must happen first so the original vertex start value is available
-					const elementDelta = nextVertexStart - reservedRange.vertexStart;
-					for ( let j = indexStart; j < indexStart + indexCount; j ++ ) {
+					const elementDelta = nextVertexStart - vertexStart;
+					for ( let j = indexStart; j < indexStart + reservedIndexCount; j ++ ) {
 
 						array[ j ] = array[ j ] + elementDelta;
 
 					}
 
-					index.array.copyWithin( nextIndexStart, indexStart, indexStart + indexCount );
-					index.addUpdateRange( nextIndexStart, indexCount );
+					index.array.copyWithin( nextIndexStart, indexStart, indexStart + reservedIndexCount );
+					index.addUpdateRange( nextIndexStart, reservedIndexCount );
 
-					reservedRange.indexStart = nextIndexStart;
+					geometryInfo.indexStart = nextIndexStart;
 
 				}
 
-				nextIndexStart += reservedRange.indexCount;
+				nextIndexStart += geometryInfo.indexCount;
 
 			}
 
 			// if a geometry needs to be moved then copy attribute data to overwrite unused space
-			if ( reservedRange.vertexStart !== nextVertexStart ) {
+			if ( geometryInfo.vertexStart !== nextVertexStart ) {
 
-				const { vertexStart, vertexCount } = reservedRange;
+				const { vertexStart, reservedVertexCount } = geometryInfo;
 				const attributes = geometry.attributes;
 				for ( const key in attributes ) {
 
 					const attribute = attributes[ key ];
 					const { array, itemSize } = attribute;
-					array.copyWithin( nextVertexStart * itemSize, vertexStart * itemSize, ( vertexStart + vertexCount ) * itemSize );
-					attribute.addUpdateRange( nextVertexStart * itemSize, vertexCount * itemSize );
+					array.copyWithin( nextVertexStart * itemSize, vertexStart * itemSize, ( vertexStart + reservedVertexCount ) * itemSize );
+					attribute.addUpdateRange( nextVertexStart * itemSize, reservedVertexCount * itemSize );
 
 				}
 
-				reservedRange.vertexStart = nextVertexStart;
+				geometryInfo.vertexStart = nextVertexStart;
 
 			}
 
-			nextVertexStart += reservedRange.vertexCount;
-			drawRange.start = geometry.index ? reservedRange.indexStart : reservedRange.vertexStart;
+			nextVertexStart += geometryInfo.vertexCount;
 
 			// step the next geometry points to the shifted position
-			this._nextIndexStart = geometry.index ? reservedRange.indexStart + reservedRange.indexCount : 0;
-			this._nextVertexStart = reservedRange.vertexStart + reservedRange.vertexCount;
+			this._nextIndexStart = geometry.index ? geometryInfo.indexStart + geometryInfo.reservedIndexCount : 0;
+			this._nextVertexStart = geometryInfo.vertexStart + geometryInfo.reservedVertexCount;
 
 		}
 
@@ -799,17 +766,16 @@ class BatchedMesh extends Mesh {
 		}
 
 		// compute bounding box
-		const bound = this._bounds[ geometryId ];
-		const box = bound.box;
 		const geometry = this.geometry;
-		if ( bound.boxInitialized === false ) {
+		const geometryInfo = this._geometryInfo[ geometryId ];
+		if ( geometryInfo.boundingBox === null ) {
 
-			box.makeEmpty();
-
+			const box = new Box3();
 			const index = geometry.index;
 			const position = geometry.attributes.position;
-			const drawRange = this._drawRanges[ geometryId ];
-			for ( let i = drawRange.start, l = drawRange.start + drawRange.count; i < l; i ++ ) {
+			const start = index ? geometryInfo.indexStart : geometryInfo.vertexStart;
+			const count = index ? geometryInfo.indexCount : geometryInfo.vertexCount;
+			for ( let i = start, l = start + count; i < l; i ++ ) {
 
 				let iv = i;
 				if ( index ) {
@@ -822,11 +788,11 @@ class BatchedMesh extends Mesh {
 
 			}
 
-			bound.boxInitialized = true;
+			geometryInfo.boundingBox = box;
 
 		}
 
-		target.copy( box );
+		target.copy( geometryInfo.boundingBox );
 		return target;
 
 	}
@@ -841,22 +807,21 @@ class BatchedMesh extends Mesh {
 		}
 
 		// compute bounding sphere
-		const bound = this._bounds[ geometryId ];
-		const sphere = bound.sphere;
 		const geometry = this.geometry;
-		if ( bound.sphereInitialized === false ) {
+		const geometryInfo = this._geometryInfo[ geometryId ];
+		if ( geometryInfo.boundingSphere === false ) {
 
-			sphere.makeEmpty();
-
+			const sphere = new Sphere();
 			this.getBoundingBoxAt( geometryId, _box );
 			_box.getCenter( sphere.center );
 
 			const index = geometry.index;
 			const position = geometry.attributes.position;
-			const drawRange = this._drawRanges[ geometryId ];
+			const start = index ? geometryInfo.indexStart : geometryInfo.vertexStart;
+			const count = index ? geometryInfo.indexCount : geometryInfo.vertexCount;
 
 			let maxRadiusSq = 0;
-			for ( let i = drawRange.start, l = drawRange.start + drawRange.count; i < l; i ++ ) {
+			for ( let i = start, l = start + count; i < l; i ++ ) {
 
 				let iv = i;
 				if ( index ) {
@@ -871,11 +836,11 @@ class BatchedMesh extends Mesh {
 			}
 
 			sphere.radius = Math.sqrt( maxRadiusSq );
-			bound.sphereInitialized = true;
+			geometryInfo.boundingSphere = sphere;
 
 		}
 
-		target.copy( sphere );
+		target.copy( geometryInfo.boundingSphere );
 		return target;
 
 	}
@@ -990,6 +955,7 @@ class BatchedMesh extends Mesh {
 
 		// return early if the geometry is out of range or not active
 		const drawInfo = this._drawInfo;
+		const geometryInfoList = this._geometryInfo;
 		if ( instanceId >= drawInfo.length || drawInfo[ instanceId ].active === false ) {
 
 			return null;
@@ -997,7 +963,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		// check if the provided geometryId is within the valid range
-		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
+		if ( geometryId >= geometryInfoList.length || geometryInfoList[ geometryId ].active === false ) {
 
 			return null;
 
@@ -1030,10 +996,12 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		const drawRange = this._drawRanges[ geometryId ];
+		const geometryInfo = this._geometryInfo[ geometryId ];
+		Object.assign( target, geometryInfo );
 
-		target.start = drawRange.start;
-		target.count = drawRange.count;
+		const geometry = this.geometry;
+		target.start = geometry.index ? geometryInfo.indexStart : geometryInfo.vertexStart;
+		target.count = geometry.index ? geometryInfo.indexCount : geometryInfo.vertexCount;
 
 		return target;
 
@@ -1092,6 +1060,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	// TODO: INPROGRESS FROM HERE
 	setGeometrySize( maxVertexCount, maxIndexCount ) {
 
 		// Check if we can shrink to the requested vertex attribute size
