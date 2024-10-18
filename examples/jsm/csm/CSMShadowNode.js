@@ -4,7 +4,8 @@ import {
 	MathUtils,
 	Matrix4,
 	Box3,
-	Object3D
+	Object3D,
+	WebGLCoordinateSystem
 } from 'three';
 
 import { CSMFrustum } from './CSMFrustum.js';
@@ -52,7 +53,7 @@ class CSMShadowNode extends Node {
 		this.breaks = [];
 
 		this._cascades = [];
-		this.mainFrustum = new CSMFrustum();
+		this.mainFrustum = null;
 		this.frustums = [];
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
@@ -62,9 +63,12 @@ class CSMShadowNode extends Node {
 
 	}
 
-	init( { camera } ) {
+	init( { camera, renderer } ) {
 
 		this.camera = camera;
+
+		const data = { webGL: renderer.coordinateSystem === WebGLCoordinateSystem };
+		this.mainFrustum = new CSMFrustum( data );
 
 		const light = this.light;
 		const parent = light.parent;
