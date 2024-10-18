@@ -445,6 +445,7 @@ class BatchedMesh extends Mesh {
 		this._validateGeometry( geometry );
 
 		const geometryInfo = {
+			// geometry information
 			vertexStart: - 1,
 			vertexCount: - 1,
 			reservedVertexCount: - 1,
@@ -453,6 +454,11 @@ class BatchedMesh extends Mesh {
 			indexCount: - 1,
 			reservedIndexCount: - 1,
 
+			// draw range information
+			start: - 1,
+			count: - 1,
+
+			// state
 			boundingBox: null,
 			boundingSphere: null,
 			active: true,
@@ -590,6 +596,10 @@ class BatchedMesh extends Mesh {
 			dstIndex.addUpdateRange( indexStart, geometryInfo.reservedIndexCount );
 
 		}
+
+		// update the draw range
+		geometryInfo.start = hasIndex ? geometryInfo.indexStart : geometryInfo.vertexStart;
+		geometryInfo.count = hasIndex ? geometryInfo.indexCount : geometryInfo.vertexCount;
 
 		// store the bounding boxes
 		geometryInfo.boundingBox = null;
@@ -762,9 +772,7 @@ class BatchedMesh extends Mesh {
 			const box = new Box3();
 			const index = geometry.index;
 			const position = geometry.attributes.position;
-			const start = index ? geometryInfo.indexStart : geometryInfo.vertexStart;
-			const count = index ? geometryInfo.indexCount : geometryInfo.vertexCount;
-			for ( let i = start, l = start + count; i < l; i ++ ) {
+			for ( let i = geometryInfo.start, l = geometryInfo.start + geometryInfo.count; i < l; i ++ ) {
 
 				let iv = i;
 				if ( index ) {
@@ -806,11 +814,9 @@ class BatchedMesh extends Mesh {
 
 			const index = geometry.index;
 			const position = geometry.attributes.position;
-			const start = index ? geometryInfo.indexStart : geometryInfo.vertexStart;
-			const count = index ? geometryInfo.indexCount : geometryInfo.vertexCount;
 
 			let maxRadiusSq = 0;
-			for ( let i = start, l = start + count; i < l; i ++ ) {
+			for ( let i = geometryInfo.start, l = geometryInfo.start + geometryInfo.count; i < l; i ++ ) {
 
 				let iv = i;
 				if ( index ) {
@@ -994,9 +1000,8 @@ class BatchedMesh extends Mesh {
 		target.indexCount = geometryInfo.indexCount;
 		target.reservedIndexCount = geometryInfo.reservedIndexCount;
 
-		const geometry = this.geometry;
-		target.start = geometry.index ? geometryInfo.indexStart : geometryInfo.vertexStart;
-		target.count = geometry.index ? geometryInfo.indexCount : geometryInfo.vertexCount;
+		target.start = geometryInfo.start;
+		target.count = geometryInfo.count;
 
 		return target;
 
@@ -1131,7 +1136,6 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		const hasIndex = Boolean( batchGeometry.index );
 		for ( let i = 0, l = drawInfo.length; i < l; i ++ ) {
 
 			if ( ! drawInfo[ i ].visible || ! drawInfo[ i ].active ) {
@@ -1142,9 +1146,7 @@ class BatchedMesh extends Mesh {
 
 			const geometryId = drawInfo[ i ].geometryIndex;
 			const geometryInfo = geometryInfoList[ geometryId ];
-			const start = hasIndex ? geometryInfo.indexStart : geometryInfo.vertexStart;
-			const count = hasIndex ? geometryInfo.indexCount : geometryInfo.vertexCount;
-			_mesh.geometry.setDrawRange( start, count );
+			_mesh.geometry.setDrawRange( geometryInfo.start, geometryInfo.count );
 
 			// get the intersects
 			this.getMatrixAt( i, _mesh.matrixWorld ).premultiply( matrixWorld );
@@ -1303,9 +1305,7 @@ class BatchedMesh extends Mesh {
 						// get the distance from camera used for sorting
 						const geometryInfo = geometryInfoList[ geometryId ];
 						const z = _temp.subVectors( _sphere.center, _vector ).dot( _forward );
-						const start = index ? geometryInfo.indexStart : geometryInfo.vertexStart;
-						const count = index ? geometryInfo.indexCount : geometryInfo.vertexCount;
-						_renderList.push( start, count, z, i );
+						_renderList.push( geometryInfo.start, geometryInfo.count, z, i );
 
 					}
 
@@ -1360,11 +1360,8 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						const geometryInfo = geometryInfoList[ geometryId ];
-						const start = index ? geometryInfo.indexStart : geometryInfo.vertexStart;
-						const count = index ? geometryInfo.indexCount : geometryInfo.vertexCount;
-
-						multiDrawStarts[ multiDrawCount ] = start * bytesPerElement;
-						multiDrawCounts[ multiDrawCount ] = count;
+						multiDrawStarts[ multiDrawCount ] = geometryInfo.start * bytesPerElement;
+						multiDrawCounts[ multiDrawCount ] = geometryInfo.count;
 						indirectArray[ multiDrawCount ] = i;
 						multiDrawCount ++;
 
