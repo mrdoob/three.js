@@ -395,6 +395,12 @@ class Renderer {
 
 	}
 
+	async syncWithGPU() {
+
+		await this.backend.syncWithGPU();
+
+	}
+
 	setMRT( mrt ) {
 
 		this._mrt = mrt;

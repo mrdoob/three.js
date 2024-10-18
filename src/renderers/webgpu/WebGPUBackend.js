@@ -823,7 +823,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	finishCompute( computeGroup ) {
+	async finishCompute( computeGroup ) {
 
 		const groupData = this.get( computeGroup );
 
@@ -832,6 +832,12 @@ class WebGPUBackend extends Backend {
 		this.prepareTimestampBuffer( computeGroup, groupData.cmdEncoderGPU );
 
 		this.device.queue.submit( [ groupData.cmdEncoderGPU.finish() ] );
+
+	}
+
+	async syncWithGPU() {
+
+		await this.device.queue.onSubmittedWorkDone();
 
 	}
 
