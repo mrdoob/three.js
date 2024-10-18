@@ -823,7 +823,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	async finishCompute( computeGroup ) {
+	finishCompute( computeGroup ) {
 
 		const groupData = this.get( computeGroup );
 
