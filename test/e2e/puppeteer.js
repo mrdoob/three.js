@@ -294,6 +294,7 @@ async function main() {
 	const injection = await fs.readFile( 'test/e2e/deterministic-injection.js', 'utf8' );
 
 	const builds = {
+		'three.core.js': buildInjection( await fs.readFile( 'build/three.core.js', 'utf8' ) ),
 		'three.module.js': buildInjection( await fs.readFile( 'build/three.module.js', 'utf8' ) ),
 		'three.webgpu.js': buildInjection( await fs.readFile( 'build/three.webgpu.js', 'utf8' ) )
 	};
