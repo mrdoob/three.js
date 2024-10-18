@@ -153,24 +153,6 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	get instanceCount() {
-
-		return this._drawInfo.length - this._availableInstanceIds.length;
-
-	}
-
-	get unusedVertexCount() {
-
-		return this._maxVertexCount - this._nextVertexStart;
-
-	}
-
-	get unusedIndexCount() {
-
-		return this._maxIndexCount - this._nextIndexStart;
-
-	}
-
 	constructor( maxInstanceCount, maxVertexCount, maxIndexCount = maxVertexCount * 2, material ) {
 
 		super( new BufferGeometry(), material );
