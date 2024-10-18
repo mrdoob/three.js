@@ -438,7 +438,7 @@ class BatchedMesh extends Mesh {
 
 	}
 
-	addGeometry( geometry, vertexCount = - 1, indexCount = - 1 ) {
+	addGeometry( geometry, reservedVertexCount = - 1, reservedIndexCount = - 1 ) {
 
 		this._initializeGeometry( geometry );
 
@@ -460,32 +460,14 @@ class BatchedMesh extends Mesh {
 
 		const geometryInfoList = this._geometryInfo;
 		geometryInfo.vertexStart = this._nextVertexStart;
-		geometryInfo.vertexCount = geometry.getAttribute( 'position' ).count;
-		if ( vertexCount === - 1 ) {
-
-			geometryInfo.reservedVertexCount = geometryInfo.vertexCount;
-
-		} else {
-
-			geometryInfo.reservedVertexCount = vertexCount;
-
-		}
+		geometryInfo.reservedVertexCount = reservedVertexCount === - 1 ? geometry.getAttribute( 'position' ).count : reservedVertexCount;
 
 		const index = geometry.getIndex();
 		const hasIndex = index !== null;
 		if ( hasIndex ) {
 
 			geometryInfo.indexStart = this._nextIndexStart;
-			geometryInfo.indexCount = index.count;
-			if ( indexCount	=== - 1 ) {
-
-				geometryInfo.reservedIndexCount = geometryInfo.indexCount;
-
-			} else {
-
-				geometryInfo.reservedIndexCount = indexCount;
-
-			}
+			geometryInfo.reservedIndexCount = reservedIndexCount === - 1 ? index.count : reservedIndexCount;
 
 		}
 
@@ -553,9 +535,11 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		// copy geometry over
+		// copy geometry buffer data over
 		const vertexStart = geometryInfo.vertexStart;
-		const vertexCount = geometryInfo.reservedVertexCount;
+		const reservedVertexCount = geometryInfo.reservedVertexCount;
+		geometryInfo.vertexCount = geometry.getAttribute( 'position' ).count;
+
 		for ( const attributeName in batchGeometry.attributes ) {
 
 			// copy attribute data
@@ -565,7 +549,7 @@ class BatchedMesh extends Mesh {
 
 			// fill the rest in with zeroes
 			const itemSize = srcAttribute.itemSize;
-			for ( let i = srcAttribute.count, l = vertexCount; i < l; i ++ ) {
+			for ( let i = srcAttribute.count, l = reservedVertexCount; i < l; i ++ ) {
 
 				const index = vertexStart + i;
 				for ( let c = 0; c < itemSize; c ++ ) {
@@ -577,7 +561,7 @@ class BatchedMesh extends Mesh {
 			}
 
 			dstAttribute.needsUpdate = true;
-			dstAttribute.addUpdateRange( vertexStart * itemSize, vertexCount * itemSize );
+			dstAttribute.addUpdateRange( vertexStart * itemSize, reservedVertexCount * itemSize );
 
 		}
 
@@ -585,6 +569,8 @@ class BatchedMesh extends Mesh {
 		if ( hasIndex ) {
 
 			const indexStart = geometryInfo.indexStart;
+			const reservedIndexCount = geometryInfo.reservedIndexCount;
+			geometryInfo.indexCount = geometry.getIndex().count;
 
 			// copy index data over
 			for ( let i = 0; i < srcIndex.count; i ++ ) {
@@ -594,7 +580,7 @@ class BatchedMesh extends Mesh {
 			}
 
 			// fill the rest in with zeroes
-			for ( let i = srcIndex.count, l = geometryInfo.reservedIndexCount; i < l; i ++ ) {
+			for ( let i = srcIndex.count, l = reservedIndexCount; i < l; i ++ ) {
 
 				dstIndex.setX( indexStart + i, vertexStart );
 
