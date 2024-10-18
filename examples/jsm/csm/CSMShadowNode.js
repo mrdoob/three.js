@@ -259,7 +259,7 @@ class CSMShadowNode extends Node {
 
 		return Fn( () => {
 
-			const ret = vec4( 0, 0, 0, 0 ).toVar( 'shadowValue' );
+			const ret = vec4( 1, 1, 1, 1 ).toVar( 'shadowValue' );
 
 			const cascade = vec2().toVar( 'cascade' );
 			const cascadeCenter = float().toVar( 'cascadeCenter' );
@@ -306,26 +306,11 @@ class CSMShadowNode extends Node {
 						// dont fade at nearest edge
 						ratio = linearDepth.greaterThan( cascadeCenter ).select( ratio, 1 );
 
-					} else if ( isLastCascade ) {
-
-						// dont fade at furthest edge
-						ratio = linearDepth.lessThan( cascadeCenter ).select( ratio, 1 );
-
 					}
 
-					ret.addAssign( this._shadowNodes[ i ].mul( ratio ) );
+					ret.subAssign( this._shadowNodes[ i ].oneMinus().mul( ratio ) );
 
 				} );
-
-				if ( isLastCascade ) {
-
-					If( linearDepth.greaterThan( cascade.y ), () => {
-
-						ret.assign( vec4( 1, 1, 1, 1 ) );
-
-					} );
-
-				}
 
 			}
 
