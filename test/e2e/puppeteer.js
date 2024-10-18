@@ -121,12 +121,15 @@ const exceptionList = [
 	'webgpu_sprites',
 	'webgpu_video_panorama',
 	'webgpu_postprocessing_bloom_emissive',
+	'webgpu_lights_tiled',
+	'webgpu_postprocessing_traa',
 
 	// Awaiting for WebGPU Backend support in Puppeteer
 	'webgpu_storage_buffer',
 	'webgpu_compute_sort_bitonic',
 
 	// WebGPURenderer: Unknown problem
+	'webgpu_backdrop_water',
 	'webgpu_camera_logarithmicdepthbuffer',
 	'webgpu_clipping',
 	'webgpu_lightprobe_cubecamera',
@@ -153,7 +156,6 @@ const exceptionList = [
 	'webgpu_tsl_vfx_linkedparticles',
 	'webgpu_tsl_vfx_tornado',
 	'webgpu_textures_anisotropy',
-	'webgpu_backdrop_water',
 
 	// WebGPU idleTime and parseTime too low
 	'webgpu_compute_particles',

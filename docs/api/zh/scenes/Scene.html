@@ -34,13 +34,33 @@
 
 		<h3>[property:Float backgroundBlurriness]</h3>
 		<p>
-			Sets the blurriness of the background. Only influences environment maps assigned to [page:Scene.background]. Valid input is a float between *0* and *1*. Default is *0*.
+			设置背景的模糊度。仅影响分配给 [page:Scene.background] 的环境贴图。有效输入是介于 *0* 到 *1*。默认值为 *0*。
+		</p>
+
+		<h3>[property:Float backgroundIntensity]</h3>
+		<p>
+			减弱背景色。仅适用于背景纹理。默认值为 `1`。
+		</p>
+
+		<h3>[property:Euler backgroundRotation]</h3>
+		<p>
+			背景的旋转（以弧度为单位）。仅影响分配给 [page:Scene.background]。默认值为 `(0,0,0)`。
 		</p>
 
 		<h3>[property:Texture environment]</h3>
 		<p>
     若该值不为null，则该纹理贴图将会被设为场景中所有物理材质的环境贴图。
     然而，该属性不能够覆盖已存在的、已分配给 [page:MeshStandardMaterial.envMap] 的贴图。默认为null。
+		</p>
+
+		<h3>[property:Float environmentIntensity]</h3>
+		<p>
+			减弱环境色。仅影响指定给 [page:Scene.environment]。默认值为 `1`。
+		</p>
+
+		<h3>[property:Euler environmentRotation]</h3>
+		<p>
+			环境贴图的旋转（以弧度为单位）。仅在使用 [page:.environment] 时影响场景中的物理材质。默认值为 `(0,0,0)`。
 		</p>
 
 		<h3>[property:Fog fog]</h3>
@@ -50,7 +70,7 @@
 
 		<h3>[property:Boolean isScene]</h3>
 		<p>
-			Read-only flag to check if a given object is of type [name].
+			只读标志用于检查给定的对象是否属于 [name] 类型。
 		</p>
 
 		<h3>[property:Material overrideMaterial]</h3>
