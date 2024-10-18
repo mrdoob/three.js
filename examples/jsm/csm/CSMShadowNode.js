@@ -252,7 +252,7 @@ class CSMShadowNode extends Node {
 
 	setupFade() {
 
-		const cameraNear = reference( 'near', 'float', this.camera ).setGroup( renderGroup ).label( 'cameraNear' );
+		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup ).label( 'cameraNear' );
 		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cacades' );
 
 		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
@@ -326,7 +326,7 @@ class CSMShadowNode extends Node {
 
 	setupStandard() {
 
-		const cameraNear = reference( 'near', 'float', this.camera ).setGroup( renderGroup ).label( 'cameraNear' );
+		const cameraNear = reference( 'camera.near', 'float', this ).setGroup( renderGroup ).label( 'cameraNear' );
 		const cascades = reference( '_cascades', 'vec2', this ).setGroup( renderGroup ).label( 'cacades' );
 
 		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
