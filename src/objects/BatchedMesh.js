@@ -1277,7 +1277,7 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		let multiDrawCount = 0;
+		let count = 0;
 		if ( this.sortObjects ) {
 
 			// get the camera position in the local frame
@@ -1332,10 +1332,10 @@ class BatchedMesh extends Mesh {
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 
 				const item = list[ i ];
-				multiDrawStarts[ multiDrawCount ] = item.start * bytesPerElement;
-				multiDrawCounts[ multiDrawCount ] = item.count;
-				indirectArray[ multiDrawCount ] = item.index;
-				multiDrawCount ++;
+				multiDrawStarts[ count ] = item.start * bytesPerElement;
+				multiDrawCounts[ count ] = item.count;
+				indirectArray[ count ] = item.index;
+				count ++;
 
 			}
 
@@ -1363,10 +1363,10 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						const geometryInfo = geometryInfoList[ geometryId ];
-						multiDrawStarts[ multiDrawCount ] = geometryInfo.start * bytesPerElement;
-						multiDrawCounts[ multiDrawCount ] = geometryInfo.count;
-						indirectArray[ multiDrawCount ] = i;
-						multiDrawCount ++;
+						multiDrawStarts[ count ] = geometryInfo.start * bytesPerElement;
+						multiDrawCounts[ count ] = geometryInfo.count;
+						indirectArray[ count ] = i;
+						count ++;
 
 					}
 
@@ -1377,7 +1377,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		indirectTexture.needsUpdate = true;
-		this._multiDrawCount = multiDrawCount;
+		this._multiDrawCount = count;
 		this._visibilityChanged = false;
 
 	}
