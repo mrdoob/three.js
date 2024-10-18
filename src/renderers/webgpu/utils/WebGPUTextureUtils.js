@@ -49,6 +49,9 @@ class WebGPUTextureUtils {
 		this.depthTexture = new DepthTexture();
 		this.depthTexture.name = 'depthBuffer';
 
+		this.bufferCache = new WeakMap();
+		this.readBufferCache = {};
+
 	}
 
 	createSampler( texture ) {
@@ -391,12 +394,28 @@ class WebGPUTextureUtils {
 		let bytesPerRow = width * bytesPerTexel;
 		bytesPerRow = Math.ceil( bytesPerRow / 256 ) * 256; // Align to 256 bytes
 
-		const readBuffer = device.createBuffer(
-			{
-				size: width * height * bytesPerTexel,
-				usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
-			}
-		);
+		const size = width * height * bytesPerTexel;
+
+		const cacheList = this.readBufferCache[ size ];
+
+		let readBuffer;
+
+		if ( cacheList !== undefined ) {
+
+			readBuffer = cacheList.pop();
+
+		}
+
+		if ( readBuffer === undefined ) {
+
+			readBuffer = device.createBuffer(
+				{
+					size,
+					usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+				}
+			);
+
+		}
 
 		const encoder = device.createCommandEncoder();
 
@@ -422,9 +441,34 @@ class WebGPUTextureUtils {
 
 		await readBuffer.mapAsync( GPUMapMode.READ );
 
-		const buffer = readBuffer.getMappedRange();
+		const buffer = new typedArrayType( readBuffer.getMappedRange() );
 
-		return new typedArrayType( buffer );
+		this.bufferCache.set( buffer, readBuffer );
+
+		return buffer;
+
+	}
+
+	recycleBuffer( buffer ) {
+
+		const bufferGPU = this.bufferCache.get( buffer );
+
+		if ( bufferGPU !== undefined ) {
+
+			bufferGPU.unmap();
+
+			const cache = this.readBufferCache;
+			const cacheKey = bufferGPU.size;
+
+			let cacheList = cache[ cacheKey ];
+
+			if ( cacheList === undefined ) cacheList = cache[ cacheKey ] = [];
+
+			cacheList.push( bufferGPU );
+
+			this.bufferCache.delete( buffer );
+
+		}
 
 	}
 

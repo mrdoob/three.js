@@ -20,6 +20,9 @@ class WebGLTextureUtils {
 
 		}
 
+		this.bufferCache = new WeakSet();
+		this.readBufferCache = {};
+
 	}
 
 	_init( gl ) {
@@ -888,7 +891,24 @@ class WebGLTextureUtils {
 
 		await backend.utils._clientWaitAsync();
 
-		const dstBuffer = new typedArrayType( byteLength / typedArrayType.BYTES_PER_ELEMENT );
+		const cacheList = this.readBufferCache[ byteLength ];
+
+		let dstBuffer;
+
+		if ( cacheList !== undefined ) {
+
+			const arrayBuffer = cacheList.pop();
+			if ( arrayBuffer !== undefined ) dstBuffer = new typedArrayType( arrayBuffer );
+
+		}
+
+		if ( dstBuffer === undefined ) {
+
+			dstBuffer = new typedArrayType( byteLength / typedArrayType.BYTES_PER_ELEMENT );
+
+		}
+
+		this.bufferCache.add( dstBuffer );
 
 		gl.bindBuffer( gl.PIXEL_PACK_BUFFER, buffer );
 		gl.getBufferSubData( gl.PIXEL_PACK_BUFFER, 0, dstBuffer );
@@ -897,6 +917,27 @@ class WebGLTextureUtils {
 		gl.deleteFramebuffer( fb );
 
 		return dstBuffer;
+
+	}
+
+	recycleBuffer( buffer ) {
+
+		if ( this.bufferCache.has( buffer ) ) {
+
+			const arrayBuffer = buffer.buffer;
+
+			const cache = this.readBufferCache;
+			const cacheKey = arrayBuffer.byteLength;
+
+			let cacheList = cache[ cacheKey ];
+
+			if ( cacheList === undefined ) cacheList = cache[ cacheKey ] = [];
+
+			cacheList.push( arrayBuffer );
+
+			this.bufferCache.delete( buffer );
+
+		}
 
 	}
 

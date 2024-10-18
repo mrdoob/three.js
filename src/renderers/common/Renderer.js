@@ -1303,6 +1303,12 @@ class Renderer {
 
 	}
 
+	recycleBuffer( buffer ) {
+
+		this.backend.recycleBuffer( buffer );
+
+	}
+
 	_projectObject( object, camera, groupOrder, renderList ) {
 
 		if ( object.visible === false ) return;
