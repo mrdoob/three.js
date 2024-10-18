@@ -78,7 +78,10 @@ class MultiDrawRenderList {
 }
 
 const _matrix = /*@__PURE__*/ new Matrix4();
+const _invMatrixWorld = /*@__PURE__*/ new Matrix4();
+const _identityMatrix = /*@__PURE__*/ new Matrix4();
 const _whiteColor = /*@__PURE__*/ new Color( 1, 1, 1 );
+const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _frustum = /*@__PURE__*/ new Frustum();
 const _box = /*@__PURE__*/ new Box3();
 const _sphere = /*@__PURE__*/ new Sphere();
@@ -422,7 +425,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		const matricesTexture = this._matricesTexture;
-		_matrix.identity().toArray( matricesTexture.image.data, drawId * 16 );
+		_identityMatrix.toArray( matricesTexture.image.data, drawId * 16 );
 		matricesTexture.needsUpdate = true;
 
 		const colorsTexture = this._colorsTexture;
@@ -1264,11 +1267,11 @@ class BatchedMesh extends Mesh {
 		// prepare the frustum in the local frame
 		if ( perObjectFrustumCulled ) {
 
-			_matrix
+			_projScreenMatrix
 				.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
 				.multiply( this.matrixWorld );
 			_frustum.setFromProjectionMatrix(
-				_matrix,
+				_projScreenMatrix,
 				renderer.coordinateSystem
 			);
 
@@ -1278,9 +1281,9 @@ class BatchedMesh extends Mesh {
 		if ( this.sortObjects ) {
 
 			// get the camera position in the local frame
-			_matrix.copy( this.matrixWorld ).invert();
-			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _matrix );
-			_forward.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _matrix );
+			_invMatrixWorld.copy( this.matrixWorld ).invert();
+			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _invMatrixWorld );
+			_forward.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _invMatrixWorld );
 
 			for ( let i = 0, l = drawInfo.length; i < l; i ++ ) {
 
