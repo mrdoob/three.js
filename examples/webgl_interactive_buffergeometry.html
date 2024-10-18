@@ -186,9 +186,9 @@
 				pointer = new THREE.Vector2();
 
 				geometry = new THREE.BufferGeometry();
-				geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 4 * 3 ), 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 3 * 3 ), 3 ) );
 
-				material = new THREE.LineBasicMaterial( { color: 0xffffff, transparent: true } );
+				material = new THREE.MeshBasicMaterial( { wireframe: true } );
 
 				line = new THREE.Line( geometry, material );
 				scene.add( line );
@@ -260,7 +260,6 @@
 					linePosition.copyAt( 0, meshPosition, face.a );
 					linePosition.copyAt( 1, meshPosition, face.b );
 					linePosition.copyAt( 2, meshPosition, face.c );
-					linePosition.copyAt( 3, meshPosition, face.a );
 
 					mesh.updateMatrix();
 
