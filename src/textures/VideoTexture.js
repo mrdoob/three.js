@@ -13,6 +13,7 @@ class VideoTexture extends Texture {
 		this.magFilter = magFilter !== undefined ? magFilter : LinearFilter;
 
 		this.generateMipmaps = false;
+		this.isGPU = true;
 
 		const scope = this;
 
