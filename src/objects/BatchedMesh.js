@@ -78,10 +78,7 @@ class MultiDrawRenderList {
 }
 
 const _matrix = /*@__PURE__*/ new Matrix4();
-const _invMatrixWorld = /*@__PURE__*/ new Matrix4();
-const _identityMatrix = /*@__PURE__*/ new Matrix4();
 const _whiteColor = /*@__PURE__*/ new Color( 1, 1, 1 );
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _frustum = /*@__PURE__*/ new Frustum();
 const _box = /*@__PURE__*/ new Box3();
 const _sphere = /*@__PURE__*/ new Sphere();
@@ -150,6 +147,24 @@ class BatchedMesh extends Mesh {
 	get maxInstanceCount() {
 
 		return this._maxInstanceCount;
+
+	}
+
+	get instanceCount() {
+
+		return this._drawInfo.length - this._availableInstanceIds.length;
+
+	}
+
+	get unusedVertexCount() {
+
+		return this._maxVertexCount - this._nextVertexStart;
+
+	}
+
+	get unusedIndexCount() {
+
+		return this._maxIndexCount - this._nextIndexStart;
 
 	}
 
@@ -407,7 +422,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		const matricesTexture = this._matricesTexture;
-		_identityMatrix.toArray( matricesTexture.image.data, drawId * 16 );
+		_matrix.identity().toArray( matricesTexture.image.data, drawId * 16 );
 		matricesTexture.needsUpdate = true;
 
 		const colorsTexture = this._colorsTexture;
@@ -1249,23 +1264,23 @@ class BatchedMesh extends Mesh {
 		// prepare the frustum in the local frame
 		if ( perObjectFrustumCulled ) {
 
-			_projScreenMatrix
+			_matrix
 				.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
 				.multiply( this.matrixWorld );
 			_frustum.setFromProjectionMatrix(
-				_projScreenMatrix,
+				_matrix,
 				renderer.coordinateSystem
 			);
 
 		}
 
-		let count = 0;
+		let multiDrawCount = 0;
 		if ( this.sortObjects ) {
 
 			// get the camera position in the local frame
-			_invMatrixWorld.copy( this.matrixWorld ).invert();
-			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _invMatrixWorld );
-			_forward.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _invMatrixWorld );
+			_matrix.copy( this.matrixWorld ).invert();
+			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _matrix );
+			_forward.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _matrix );
 
 			for ( let i = 0, l = drawInfo.length; i < l; i ++ ) {
 
@@ -1314,10 +1329,10 @@ class BatchedMesh extends Mesh {
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 
 				const item = list[ i ];
-				multiDrawStarts[ count ] = item.start * bytesPerElement;
-				multiDrawCounts[ count ] = item.count;
-				indirectArray[ count ] = item.index;
-				count ++;
+				multiDrawStarts[ multiDrawCount ] = item.start * bytesPerElement;
+				multiDrawCounts[ multiDrawCount ] = item.count;
+				indirectArray[ multiDrawCount ] = item.index;
+				multiDrawCount ++;
 
 			}
 
@@ -1345,10 +1360,10 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						const geometryInfo = geometryInfoList[ geometryId ];
-						multiDrawStarts[ count ] = geometryInfo.start * bytesPerElement;
-						multiDrawCounts[ count ] = geometryInfo.count;
-						indirectArray[ count ] = i;
-						count ++;
+						multiDrawStarts[ multiDrawCount ] = geometryInfo.start * bytesPerElement;
+						multiDrawCounts[ multiDrawCount ] = geometryInfo.count;
+						indirectArray[ multiDrawCount ] = i;
+						multiDrawCount ++;
 
 					}
 
@@ -1359,7 +1374,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		indirectTexture.needsUpdate = true;
-		this._multiDrawCount = count;
+		this._multiDrawCount = multiDrawCount;
 		this._visibilityChanged = false;
 
 	}
