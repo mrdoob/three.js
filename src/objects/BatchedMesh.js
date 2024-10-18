@@ -40,7 +40,7 @@ class MultiDrawRenderList {
 
 	}
 
-	push( drawRange, z, index ) {
+	push( start, count, z, index ) {
 
 		const pool = this.pool;
 		const list = this.list;
@@ -61,8 +61,8 @@ class MultiDrawRenderList {
 		list.push( item );
 		this.index ++;
 
-		item.start = drawRange.start;
-		item.count = drawRange.count;
+		item.start = start;
+		item.count = count;
 		item.z = z;
 		item.index = index;
 
@@ -1306,8 +1306,11 @@ class BatchedMesh extends Mesh {
 					if ( ! culled ) {
 
 						// get the distance from camera used for sorting
+						const geometryInfo = geometryInfoList[ geometryId ];
 						const z = _temp.subVectors( _sphere.center, _vector ).dot( _forward );
-						_renderList.push( geometryInfoList[ geometryId ], z, i );
+						const start = index ? geometryInfo.indexStart : geometryInfo.vertexStart;
+						const count = index ? geometryInfo.indexCount : geometryInfo.vertexCount;
+						_renderList.push( start, count, z, i );
 
 					}
 
@@ -1331,11 +1334,9 @@ class BatchedMesh extends Mesh {
 			for ( let i = 0, l = list.length; i < l; i ++ ) {
 
 				const item = list[ i ];
-				const start = index ? item.indexStart : item.vertexStart;
-				const count = index ? item.indexCount : item.vertexCount;
-				multiDrawStarts[ multiDrawCount ] = start * bytesPerElement;
-				multiDrawCounts[ multiDrawCount ] = count;
-				indirectArray[ multiDrawCount ] = index;
+				multiDrawStarts[ multiDrawCount ] = item.start * bytesPerElement;
+				multiDrawCounts[ multiDrawCount ] = item.count;
+				indirectArray[ multiDrawCount ] = item.index;
 				multiDrawCount ++;
 
 			}
