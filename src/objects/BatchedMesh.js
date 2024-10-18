@@ -78,10 +78,7 @@ class MultiDrawRenderList {
 }
 
 const _matrix = /*@__PURE__*/ new Matrix4();
-const _invMatrixWorld = /*@__PURE__*/ new Matrix4();
-const _identityMatrix = /*@__PURE__*/ new Matrix4();
 const _whiteColor = /*@__PURE__*/ new Color( 1, 1, 1 );
-const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _frustum = /*@__PURE__*/ new Frustum();
 const _box = /*@__PURE__*/ new Box3();
 const _sphere = /*@__PURE__*/ new Sphere();
@@ -91,13 +88,6 @@ const _temp = /*@__PURE__*/ new Vector3();
 const _renderList = /*@__PURE__*/ new MultiDrawRenderList();
 const _mesh = /*@__PURE__*/ new Mesh();
 const _batchIntersects = [];
-
-// TODO
-// - add instanceCount
-// - remove bounds, reserved ranges
-// - clean up
-// - rename fields for clarity
-// - remove unused fields
 
 // copies data from attribute "src" into "target" starting at "targetOffset"
 function copyAttributeData( src, target, targetOffset = 0 ) {
@@ -166,6 +156,18 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	get unusedVertexCount() {
+
+		return this._maxVertexCount - this._nextVertexStart;
+
+	}
+
+	get unusedIndexCount() {
+
+		return this._maxIndexCount - this._nextIndexStart;
+
+	}
+
 	constructor( maxInstanceCount, maxVertexCount, maxIndexCount = maxVertexCount * 2, material ) {
 
 		super( new BufferGeometry(), material );
@@ -177,31 +179,33 @@ class BatchedMesh extends Mesh {
 		this.boundingSphere = null;
 		this.customSort = null;
 
-		// stores visible, active, and geometry id per object
+		// stores visible, active, and geometry id per instance and reserved buffer ranges for geometries
 		this._drawInfo = [];
+		this._geometryInfo = [];
 
 		// instance, geometry ids that have been set as inactive, and are available to be overwritten
 		this._availableInstanceIds = [];
 		this._availableGeometryIds = [];
 
-		// geometry information
-		this._geometryInfo = [];
+		// used to track where the next point is that geometry should be inserted
+		this._nextIndexStart = 0;
+		this._nextVertexStart = 0;
+		this._geometryCount = 0;
 
+		// flags
+		this._visibilityChanged = true;
+		this._geometryInitialized = false;
+
+		// cached user options
 		this._maxInstanceCount = maxInstanceCount;
 		this._maxVertexCount = maxVertexCount;
 		this._maxIndexCount = maxIndexCount;
 
-		this._geometryInitialized = false;
-		this._geometryCount = 0;
+		// buffers for multi draw
 		this._multiDrawCounts = new Int32Array( maxInstanceCount );
 		this._multiDrawStarts = new Int32Array( maxInstanceCount );
 		this._multiDrawCount = 0;
 		this._multiDrawInstances = null;
-		this._visibilityChanged = true;
-
-		// used to track where the next point is that geometry should be inserted
-		this._nextIndexStart = 0;
-		this._nextVertexStart = 0;
 
 		// Local matrix per geometry by using data texture
 		this._matricesTexture = null;
@@ -418,8 +422,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		const matricesTexture = this._matricesTexture;
-		const matricesArray = matricesTexture.image.data;
-		_identityMatrix.toArray( matricesArray, drawId * 16 );
+		_matrix.identity().toArray( matricesTexture.image.data, drawId * 16 );
 		matricesTexture.needsUpdate = true;
 
 		const colorsTexture = this._colorsTexture;
@@ -997,7 +1000,13 @@ class BatchedMesh extends Mesh {
 		}
 
 		const geometryInfo = this._geometryInfo[ geometryId ];
-		Object.assign( target, geometryInfo );
+		target.vertexStart = geometryInfo.vertexStart;
+		target.vertexCount = geometryInfo.vertexCount;
+		target.reservedVertexCount = geometryInfo.reservedVertexCount;
+
+		target.indexStart = geometryInfo.indexStart;
+		target.indexCount = geometryInfo.indexCount;
+		target.reservedIndexCount = geometryInfo.reservedIndexCount;
 
 		const geometry = this.geometry;
 		target.start = geometry.index ? geometryInfo.indexStart : geometryInfo.vertexStart;
@@ -1267,11 +1276,11 @@ class BatchedMesh extends Mesh {
 		// prepare the frustum in the local frame
 		if ( perObjectFrustumCulled ) {
 
-			_projScreenMatrix
+			_matrix
 				.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse )
 				.multiply( this.matrixWorld );
 			_frustum.setFromProjectionMatrix(
-				_projScreenMatrix,
+				_matrix,
 				renderer.coordinateSystem
 			);
 
@@ -1281,9 +1290,9 @@ class BatchedMesh extends Mesh {
 		if ( this.sortObjects ) {
 
 			// get the camera position in the local frame
-			_invMatrixWorld.copy( this.matrixWorld ).invert();
-			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _invMatrixWorld );
-			_forward.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _invMatrixWorld );
+			_matrix.copy( this.matrixWorld ).invert();
+			_vector.setFromMatrixPosition( camera.matrixWorld ).applyMatrix4( _matrix );
+			_forward.set( 0, 0, - 1 ).transformDirection( camera.matrixWorld ).transformDirection( _matrix );
 
 			for ( let i = 0, l = drawInfo.length; i < l; i ++ ) {
 
