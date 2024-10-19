@@ -385,6 +385,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			renderTarget.depthTexture.dispose();
 
+			properties.remove( renderTarget.depthTexture );
+
 		}
 
 		if ( renderTarget.isWebGLCubeRenderTarget ) {
