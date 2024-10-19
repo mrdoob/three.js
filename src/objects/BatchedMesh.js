@@ -1092,10 +1092,14 @@ class BatchedMesh extends Mesh {
 		// recreate the geometry needed based on the previous variant
 		this._maxVertexCount = maxVertexCount;
 		this._maxIndexCount = maxIndexCount;
-		this._geometryInitialized = false;
 
-		this.geometry = new BufferGeometry();
-		this._initializeGeometry( oldGeometry );
+		if ( this._geometryInitialized ) {
+
+			this._geometryInitialized = false;
+			this.geometry = new BufferGeometry();
+			this._initializeGeometry( oldGeometry );
+
+		}
 
 		// copy data from the previous geometry
 		const geometry = this.geometry;
