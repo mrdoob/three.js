@@ -81,7 +81,7 @@ class WebGLBackend extends Backend {
 
 	}
 
-	async syncWithGPU() {
+	async waitForGPUWorkDone() {
 
 		await this.utils._clientWaitAsync();
 

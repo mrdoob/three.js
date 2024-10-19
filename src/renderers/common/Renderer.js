@@ -395,9 +395,9 @@ class Renderer {
 
 	}
 
-	async syncWithGPU() {
+	async waitForGPUWorkDone() {
 
-		await this.backend.syncWithGPU();
+		await this.backend.waitForGPUWorkDone();
 
 	}
 
