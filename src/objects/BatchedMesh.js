@@ -480,7 +480,7 @@ class BatchedMesh extends Mesh {
 		if (
 			geometryInfo.indexStart !== - 1 &&
 			geometryInfo.indexStart + geometryInfo.reservedIndexCount > this._maxIndexCount ||
-			geometryInfo.vertexStart + geometryInfo.reservedIndexCount > this._maxVertexCount
+			geometryInfo.vertexStart + geometryInfo.reservedVertexCount > this._maxVertexCount
 		) {
 
 			throw new Error( 'BatchedMesh: Reserved space request exceeds the maximum buffer size.' );
