@@ -287,16 +287,33 @@ class BufferGeometry extends EventDispatcher {
 
 	setFromPoints( points ) {
 
-		const position = [];
+		const positionAttribute = this.getAttribute( 'position' );
 
-		for ( let i = 0, l = points.length; i < l; i ++ ) {
+		if ( positionAttribute === undefined ) {
 
-			const point = points[ i ];
-			position.push( point.x, point.y, point.z || 0 );
+			const position = [];
+
+			for ( let i = 0, l = points.length; i < l; i ++ ) {
+
+				const point = points[ i ];
+				position.push( point.x, point.y, point.z || 0 );
+
+			}
+
+			this.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
+
+		} else {
+
+			for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
+
+				const point = points[ i ];
+				positionAttribute.setXYZ( i, point.x, point.y, point.z || 0 );
+
+			}
+
+			positionAttribute.needsUpdate = true;
 
 		}
-
-		this.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 
 		return this;
 
