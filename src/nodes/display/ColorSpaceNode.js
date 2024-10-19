@@ -93,8 +93,12 @@ export const toWorkingColorSpace = ( node ) => nodeObject( new ColorSpaceNode( n
 export const workingToColorSpace = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), WORKING_COLOR_SPACE, colorSpace ) );
 export const colorSpaceToWorking = ( node, colorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), colorSpace, WORKING_COLOR_SPACE ) );
 
+export const convertColorSpace = ( node, sourceColorSpace, targetColorSpace ) => nodeObject( new ColorSpaceNode( nodeObject( node ), sourceColorSpace, targetColorSpace ) );
+
 addMethodChaining( 'toOutputColorSpace', toOutputColorSpace );
 addMethodChaining( 'toWorkingColorSpace', toWorkingColorSpace );
 
 addMethodChaining( 'workingToColorSpace', workingToColorSpace );
 addMethodChaining( 'colorSpaceToWorking', colorSpaceToWorking );
+
+addMethodChaining( 'convertColorSpace', convertColorSpace );
