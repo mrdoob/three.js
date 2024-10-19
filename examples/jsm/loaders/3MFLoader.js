@@ -386,7 +386,7 @@ class ThreeMFLoader extends Loader {
 
 					const attrib = portNodes[ i ].attributes[ j ];
 					if ( attrib.specified ) {
-		 				args[ attrib.name ] = attrib.value; 
+		 				args[ attrib.name ] = attrib.value;
 					}
 				}
 
@@ -929,11 +929,13 @@ class ThreeMFLoader extends Loader {
 					case 'linear':
 						texture.magFilter = LinearFilter;
 						texture.minFilter = LinearFilter;
+						texture.generateMipmaps = false;
 						break;
 
 					case 'nearest':
 						texture.magFilter = NearestFilter;
 						texture.minFilter = NearestFilter;
+						texture.generateMipmaps = false;
 						break;
 
 					default:
