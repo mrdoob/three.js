@@ -1524,7 +1524,7 @@ class GLTFWriter {
 
 		} else {
 
-			materialDef.pbrMetallicRoughness.metallicFactor = 0;
+			materialDef.pbrMetallicRoughness.metallicFactor = 1;
 			materialDef.pbrMetallicRoughness.roughnessFactor = 1;
 
 		}
