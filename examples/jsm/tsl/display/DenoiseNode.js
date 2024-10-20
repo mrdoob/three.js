@@ -1,5 +1,5 @@
 import { Vector2, Vector3 } from 'three';
-import { getViewPosition, convertToTexture, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI } from 'three/tsl';
+import { getNormalFromDepth, getViewPosition, convertToTexture, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI } from 'three/tsl';
 
 class DenoiseNode extends TempNode {
 
@@ -46,16 +46,16 @@ class DenoiseNode extends TempNode {
 
 		const sampleTexture = ( uv ) => this.textureNode.uv( uv );
 		const sampleDepth = ( uv ) => this.depthNode.uv( uv ).x;
-		const sampleNormal = ( uv ) => this.normalNode.uv( uv );
+		const sampleNormal = ( uv ) => ( this.normalNode !== null ) ? this.normalNode.uv( uv ).rgb.normalize() : getNormalFromDepth( uv, this.depthNode.value, this.cameraProjectionMatrixInverse );
 		const sampleNoise = ( uv ) => this.noiseNode.uv( uv );
 
 		const denoiseSample = Fn( ( [ center, viewNormal, viewPosition, sampleUv ] ) => {
 
-			const texel = sampleTexture( sampleUv );
-			const depth = sampleDepth( sampleUv );
-			const normal = sampleNormal( sampleUv ).rgb.normalize();
+			const texel = sampleTexture( sampleUv ).toVar();
+			const depth = sampleDepth( sampleUv ).toVar();
+			const normal = sampleNormal( sampleUv ).toVar();
 			const neighborColor = texel.rgb;
-			const viewPos = getViewPosition( sampleUv, depth, this.cameraProjectionMatrixInverse );
+			const viewPos = getViewPosition( sampleUv, depth, this.cameraProjectionMatrixInverse ).toVar();
 
 			const normalDiff = dot( viewNormal, normal ).toVar();
 			const normalSimilarity = pow( max( normalDiff, 0 ), this.normalPhi ).toVar();
@@ -71,10 +71,10 @@ class DenoiseNode extends TempNode {
 
 		const denoise = Fn( ( [ uvNode ] ) => {
 
-			const depth = sampleDepth( uvNode );
-			const viewNormal = sampleNormal( uvNode ).rgb.normalize();
+			const depth = sampleDepth( uvNode ).toVar();
+			const viewNormal = sampleNormal( uvNode ).toVar();
 
-			const texel = sampleTexture( uvNode );
+			const texel = sampleTexture( uvNode ).toVar();
 
 			If( depth.greaterThanEqual( 1.0 ).or( dot( viewNormal, viewNormal ).equal( 0.0 ) ), () => {
 
@@ -82,20 +82,20 @@ class DenoiseNode extends TempNode {
 
 			} );
 
-			const center = vec3( texel.rgb );
+			const center = vec3( texel.rgb ).toVar();
 
-			const viewPosition = getViewPosition( uvNode, depth, this.cameraProjectionMatrixInverse );
+			const viewPosition = getViewPosition( uvNode, depth, this.cameraProjectionMatrixInverse ).toVar();
 
 			const noiseResolution = textureSize( this.noiseNode, 0 );
 			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
 			noiseUv = noiseUv.mul( this._resolution.div( noiseResolution ) );
-			const noiseTexel = sampleNoise( noiseUv );
+			const noiseTexel = sampleNoise( noiseUv ).toVar();
 
-			const x = sin( noiseTexel.element( this.index.mod( 4 ).mul( 2 ).mul( PI ) ) );
-			const y = cos( noiseTexel.element( this.index.mod( 4 ).mul( 2 ).mul( PI ) ) );
+			const x = sin( noiseTexel.element( this.index.mod( 4 ).mul( 2 ).mul( PI ) ) ).toVar();
+			const y = cos( noiseTexel.element( this.index.mod( 4 ).mul( 2 ).mul( PI ) ) ).toVar();
 
-			const noiseVec = vec2( x, y );
-			const rotationMatrix = mat2( noiseVec.x, noiseVec.y.negate(), noiseVec.x, noiseVec.y );
+			const noiseVec = vec2( x, y ).toVar();
+			const rotationMatrix = mat2( noiseVec.x, noiseVec.y.negate(), noiseVec.x, noiseVec.y ).toVar();
 
 			const totalWeight = float( 1.0 ).toVar();
 			const denoised = vec3( texel.rgb ).toVar();
