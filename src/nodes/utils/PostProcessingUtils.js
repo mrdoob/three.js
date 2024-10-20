@@ -37,7 +37,7 @@ export const getViewPosition = /*@__PURE__*/ Fn( ( [ screenPosition, depth, proj
 *
 * @param {vec3} viewPosition - The fragments position in view space.
 * @param {mat4} projectionMatrix - The camera's projection matrix.
-* @return {vec2} Teh fragment's screen position expressed as uv coordinates.
+* @return {vec2} The fragment's screen position expressed as uv coordinates.
 */
 export const getScreenPosition = /*@__PURE__*/ Fn( ( [ viewPosition, projectionMatrix ] ) => {
 
