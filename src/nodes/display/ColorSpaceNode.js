@@ -100,5 +100,3 @@ addMethodChaining( 'toWorkingColorSpace', toWorkingColorSpace );
 
 addMethodChaining( 'workingToColorSpace', workingToColorSpace );
 addMethodChaining( 'colorSpaceToWorking', colorSpaceToWorking );
-
-addMethodChaining( 'convertColorSpace', convertColorSpace );
