@@ -335,7 +335,12 @@
 		</p>
 
 		<h3>[method:this setFromPoints] ( [param:Array points] )</h3>
-		<p>Sets the attributes for this BufferGeometry from an array of points.</p>
+		<p>
+			Defines a geometry by creating a `position` attribute based on the given array of points. The array can hold 
+			instances of [page:Vector2] or [page:Vector3]. When using two-dimensional data, the `z` coordinate for all vertices is set to `0`.<br />
+			If the method is used with an existing `position` attribute, the vertex data are overwritten with the data from the array. The length of the 
+			array must match the vertex count.
+		</p>
 
 		<h3>[method:this setIndex] ( [param:BufferAttribute index] )</h3>
 		<p>Set the [page:.index] buffer.</p>
