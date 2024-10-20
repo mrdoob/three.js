@@ -398,6 +398,12 @@ class Renderer {
 
 	}
 
+	async waitForGPU() {
+
+		await this.backend.waitForGPU();
+
+	}
+
 	setMRT( mrt ) {
 
 		this._mrt = mrt;

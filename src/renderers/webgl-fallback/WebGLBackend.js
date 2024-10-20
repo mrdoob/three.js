@@ -81,6 +81,11 @@ class WebGLBackend extends Backend {
 
 	}
 
+	async waitForGPU() {
+
+		await this.utils._clientWaitAsync();
+
+	}
 
 	initTimestampQuery( renderContext ) {
 
