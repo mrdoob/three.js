@@ -134,13 +134,11 @@ class BloomNode extends TempNode {
 			this._separableBlurMaterials[ i ].colorTexture.value = inputRenderTarget.texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionX;
 			renderer.setRenderTarget( this._renderTargetsHorizontal[ i ] );
-			renderer.clear();
 			_quadMesh.render( renderer );
 
 			this._separableBlurMaterials[ i ].colorTexture.value = this._renderTargetsHorizontal[ i ].texture;
 			this._separableBlurMaterials[ i ].direction.value = _BlurDirectionY;
 			renderer.setRenderTarget( this._renderTargetsVertical[ i ] );
-			renderer.clear();
 			_quadMesh.render( renderer );
 
 			inputRenderTarget = this._renderTargetsVertical[ i ];
@@ -150,7 +148,6 @@ class BloomNode extends TempNode {
 		// 3. Composite All the mips
 
 		renderer.setRenderTarget( this._renderTargetsHorizontal[ 0 ] );
-		renderer.clear();
 		_quadMesh.material = this._compositeMaterial;
 		_quadMesh.render( renderer );
 
