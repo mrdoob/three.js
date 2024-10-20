@@ -1,5 +1,5 @@
 import { mix } from '../math/MathNode.js';
-import { Fn } from '../tsl/TSLBase.js';
+import { Fn } from '../tsl/TSLCore.js';
 
 export const sRGBTransferEOTF = /*@__PURE__*/ Fn( ( [ color ] ) => {
 
