@@ -2637,11 +2637,15 @@ class WebGLRenderer {
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, srcRenderTargetProperties.__webglFramebuffer );
 				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, dstRenderTargetProperties.__webglFramebuffer );
 
-				let mask = _gl.COLOR_BUFFER_BIT;
+				if ( srcTexture.isDepthTexture ) {
 
-				if ( srcTexture.isDepthTexture ) mask = _gl.DEPTH_BUFFER_BIT;
+					_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.DEPTH_BUFFER_BIT, _gl.NEAREST );
 
-				_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, mask, _gl.NEAREST );
+				} else {
+
+					_gl.copyTexSubImage2D( _gl.TEXTURE_2D, level, dstX, dstY, minX, minY, width, height );
+
+				}
 
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
 				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
@@ -2779,18 +2783,24 @@ class WebGLRenderer {
 				const dstRenderTargetProperties = properties.get( dstTextureProperties.__renderTarget );
 
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, srcRenderTargetProperties.__webglFramebuffer );
-
-				_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, level, 0 );
-
 				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, dstRenderTargetProperties.__webglFramebuffer );
 
-				_gl.framebufferTextureLayer( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, level, 0 );
+				for ( let i = 0; i < depth; i ++ ) {
 
-				let mask = _gl.COLOR_BUFFER_BIT;
+					_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, level, minZ + i );
 
-				if ( srcTexture.isDepthTexture ) mask = _gl.DEPTH_BUFFER_BIT;
+					if ( srcTexture.isDepthTexture ) {
 
-				_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, mask, _gl.NEAREST );
+						_gl.framebufferTextureLayer( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, level, dstZ + i );
+						_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.DEPTH_BUFFER_BIT, _gl.NEAREST );
+
+					} else {
+
+						_gl.copyTexSubImage3D( glTarget, level, dstX, dstY, dstZ + i, minX, minY, width, height );
+
+					}
+
+				}
 
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
 				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
