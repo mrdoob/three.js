@@ -5,7 +5,6 @@ class NodeLibrary {
 		this.lightNodes = new WeakMap();
 		this.materialNodes = new Map();
 		this.toneMappingNodes = new Map();
-		this.colorSpaceNodes = new Map();
 
 	}
 
@@ -30,18 +29,6 @@ class NodeLibrary {
 		}
 
 		return nodeMaterial;
-
-	}
-
-	addColorSpace( colorSpaceNode, colorSpace ) {
-
-		this.addType( colorSpaceNode, colorSpace, this.colorSpaceNodes );
-
-	}
-
-	getColorSpaceFunction( colorSpace ) {
-
-		return this.colorSpaceNodes.get( colorSpace ) || null;
 
 	}
 
