@@ -86,9 +86,9 @@ class DenoiseNode extends TempNode {
 
 			const viewPosition = getViewPosition( uvNode, depth, this.cameraProjectionMatrixInverse ).toVar();
 
-			const noiseResolution = vec2( textureSize( this.noiseNode, 0 ) ).toVar();
-			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() ).toVar();
-			noiseUv = noiseUv.mul( this._resolution.div( noiseResolution ) ).toVar();
+			const noiseResolution = textureSize( this.noiseNode, 0 );
+			let noiseUv = vec2( uvNode.x, uvNode.y.oneMinus() );
+			noiseUv = noiseUv.mul( this._resolution.div( noiseResolution ) );
 			const noiseTexel = sampleNoise( noiseUv ).toVar();
 
 			const x = sin( noiseTexel.element( this.index.mod( 4 ).mul( 2 ).mul( PI ) ) ).toVar();
