@@ -835,7 +835,7 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	async waitForGPUWorkDone() {
+	async waitForGPU() {
 
 		await this.device.queue.onSubmittedWorkDone();
 
