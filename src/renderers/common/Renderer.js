@@ -233,7 +233,7 @@ class Renderer {
 			}
 
 			this._nodes = new Nodes( this, backend );
-			this._animation = new Animation( this._nodes, this.info );
+			this._animation = new Animation();
 			this._attributes = new Attributes( backend );
 			this._background = new Background( this, this._nodes );
 			this._geometries = new Geometries( this._attributes, this.info );
@@ -552,6 +552,12 @@ class Renderer {
 
 	_renderScene( scene, camera, useFrameBufferTarget = true ) {
 
+		if ( this.info.autoReset === true ) this.info.reset();
+
+		this._nodes.nodeFrame.update();
+
+		this.info.frame = this._nodes.nodeFrame.frameId;
+
 		const frameBufferTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : null;
 
 		// preserve render tree
@@ -799,7 +805,9 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
-		this._animation.setAnimationLoop( callback );
+		const animation = this._animation;
+		animation.setAnimationLoop( callback );
+		( callback === null ) ? animation.stop() : animation.start();
 
 	}
 
