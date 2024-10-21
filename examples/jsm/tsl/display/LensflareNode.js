@@ -33,11 +33,11 @@ class LensflareNode extends TempNode {
 			downSampleRatio = 4
 		} = params;
 
-		this.ghostTint = ghostTint;
-		this.threshold = threshold;
-		this.ghostSamples = ghostSamples;
-		this.ghostSpacing = ghostSpacing;
-		this.ghostAttenuationFactor = ghostAttenuationFactor;
+		this.ghostTintNode = nodeObject( ghostTint );
+		this.thresholdNode = nodeObject( threshold );
+		this.ghostSamplesNode = nodeObject( ghostSamples );
+		this.ghostSpacingNode = nodeObject( ghostSpacing );
+		this.ghostAttenuationFactorNode = nodeObject( ghostAttenuationFactor );
 		this.downSampleRatio = downSampleRatio;
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -109,13 +109,13 @@ class LensflareNode extends TempNode {
 
 			// ghosts are positioned along this vector
 
-			const ghostVec = sub( vec2( 0.5 ), texCoord ).mul( this.ghostSpacing ).toVar();
+			const ghostVec = sub( vec2( 0.5 ), texCoord ).mul( this.ghostSpacingNode ).toVar();
 
 			// sample ghosts
 
 			const result = vec4().toVar();
 
-			Loop( { start: int( 0 ), end: int( this.ghostSamples ), type: 'int', condition: '<' }, ( { i } ) => {
+			Loop( { start: int( 0 ), end: int( this.ghostSamplesNode ), type: 'int', condition: '<' }, ( { i } ) => {
 
 				// use fract() to ensure that the texture coordinates wrap around
 
@@ -124,13 +124,13 @@ class LensflareNode extends TempNode {
 				// reduce contributions from samples at the screen edge
 
 				const d = distance( sampleUv, vec2( 0.5 ) );
-				const weight = pow( d.oneMinus(), this.ghostAttenuationFactor );
+				const weight = pow( d.oneMinus(), this.ghostAttenuationFactorNode );
 
 				// accumulate
 
 				let sample = this.textureNode.uv( sampleUv ).rgb;
 
-				sample = max( sample.sub( this.threshold ), vec3( 0 ) ).mul( this.ghostTint );
+				sample = max( sample.sub( this.thresholdNode ), vec3( 0 ) ).mul( this.ghostTintNode );
 
 				result.addAssign( sample.mul( weight ) );
 
