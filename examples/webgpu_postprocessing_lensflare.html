@@ -106,7 +106,7 @@
 
 				const bloomPass = bloom( emissivePass, 1, 1 );
 				const flarePass = lensflare( bloomPass );
-				const blurPass = gaussianBlur( flarePass, 8 );
+				const blurPass = gaussianBlur( flarePass, 8 ); // optional (blurring produces better flare quality but also adds some overhead)
 
 				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputNode = outputPass.add( bloomPass ).add( blurPass );
