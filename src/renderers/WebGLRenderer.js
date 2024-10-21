@@ -2765,8 +2765,8 @@ class WebGLRenderer {
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
 
 			// set up the src texture
-			const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isDataTexture;
-			const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isDataTexture;
+			const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture;
+			const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture;
 			if ( srcTexture.isRenderTargetTexture || srcTexture.isDepthTexture ) {
 
 				const srcTextureProperties = properties.get( srcTexture );
