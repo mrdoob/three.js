@@ -370,7 +370,7 @@ class Renderer {
 		const lightsNode = renderList.lightsNode;
 
 		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
-		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, camera, sceneRef, lightsNode );
 
 		// restore render tree
 
@@ -452,7 +452,7 @@ class Renderer {
 
 			const opaqueObjects = renderList.opaque;
 
-			if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
+			if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
 
 			this._currentRenderBundle = null;
 
@@ -728,13 +728,14 @@ class Renderer {
 		const {
 			bundles,
 			lightsNode,
+			transparentDoublePass: transparentDoublePassObjects,
 			transparent: transparentObjects,
 			opaque: opaqueObjects
 		} = renderList;
 
 		if ( bundles.length > 0 ) this._renderBundles( bundles, sceneRef, lightsNode );
 		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
-		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, sceneRef, lightsNode );
+		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
 
 		// finish render pass
 
@@ -1438,7 +1439,47 @@ class Renderer {
 
 	}
 
-	_renderObjects( renderList, camera, scene, lightsNode ) {
+	_renderTransparents( renderList, doublePassList, camera, scene, lightsNode ) {
+
+		if ( doublePassList.length > 0 ) {
+
+			// render back side
+
+			for ( const { material } of doublePassList ) {
+
+				material.side = BackSide;
+
+			}
+
+			this._renderObjects( doublePassList, camera, scene, lightsNode, 'backSide' );
+
+			// render front side
+
+			for ( const { material } of doublePassList ) {
+
+				material.side = FrontSide;
+
+			}
+
+			this._renderObjects( renderList, camera, scene, lightsNode );
+
+			// restore
+
+			for ( const { material } of doublePassList ) {
+
+				material.side = DoubleSide;
+
+			}
+
+		} else {
+
+			this._renderObjects( renderList, camera, scene, lightsNode );
+
+		}
+
+	}
+
+	_renderObjects( renderList, camera, scene, lightsNode, passId = null ) {
 
 		// process renderable objects
 
@@ -1472,7 +1513,7 @@ class Renderer {
 
 						this.backend.updateViewport( this._currentRenderContext );
 
-						this._currentRenderObjectFunction( object, scene, camera2, geometry, material, group, lightsNode );
+						this._currentRenderObjectFunction( object, scene, camera2, geometry, material, group, lightsNode, passId );
 
 					}
 
@@ -1480,7 +1521,7 @@ class Renderer {
 
 			} else {
 
-				this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode );
+				this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, passId );
 
 			}
 
@@ -1488,7 +1529,7 @@ class Renderer {
 
 	}
 
-	renderObject( object, scene, camera, geometry, material, group, lightsNode ) {
+	renderObject( object, scene, camera, geometry, material, group, lightsNode, passId = null ) {
 
 		let overridePositionNode;
 		let overrideFragmentNode;
@@ -1570,13 +1611,13 @@ class Renderer {
 			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, 'backSide' ); // create backSide pass id
 
 			material.side = FrontSide;
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group ); // use default pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, passId ); // use default pass id
 
 			material.side = DoubleSide;
 
 		} else {
 
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group );
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, passId );
 
 		}
 
