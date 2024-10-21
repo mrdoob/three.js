@@ -177,7 +177,7 @@ code.inline {
 	width: 24px;
 	height: 24px;
 	background-color: transparent;
-	background-image: url('/files/ic_copy_grey_24dp.svg');
+	background-image: url('../files/ic_copy_grey_24dp.svg');
 	background-size: contain;
 	background-position: center;
 	background-repeat: no-repeat;
@@ -192,7 +192,7 @@ code.inline {
 .copy-btn.copied {
 	pointer-events: none;
 	opacity: 1;
-	background-image: url('/files/ic_tick_green_24dp.svg');
+	background-image: url('../files/ic_tick_green_24dp.svg');
 }
 
 table {
