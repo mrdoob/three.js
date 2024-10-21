@@ -2780,7 +2780,7 @@ class WebGLRenderer {
 
 				for ( let i = 0; i < depth; i ++ ) {
 
-					// if the destination is a 3d target then a layer needs to be bound
+					// if the source or destination are a 3d target then a layer needs to be bound
 					if ( isSrc3D ) {
 
 						_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, level, minZ + i );
@@ -2829,6 +2829,7 @@ class WebGLRenderer {
 
 				if ( isDst3D ) {
 
+					// copy data into the 3d texture
 					if ( srcTexture.isDataTexture || srcTexture.isData3DTexture ) {
 
 						_gl.texSubImage3D( glTarget, level, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image.data );
@@ -2849,6 +2850,7 @@ class WebGLRenderer {
 
 				} else {
 
+					// copy data into the 2d texture
 					if ( srcTexture.isDataTexture ) {
 
 						_gl.texSubImage2D( _gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image.data );
