@@ -17,8 +17,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.webgpu.js",
-					"three/tsl": "../build/three.webgpu.js",
+					"three": "../src/Three.WebGPU.js",
+					"three/tsl": "../src/Three.WebGPU.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -88,7 +88,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
+				renderer = new THREE.WebGPURenderer( { antialias: true, hdr: true } );
 				renderer.setClearColor( 0x14171a );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -369,7 +369,7 @@
 				const gui = new GUI();
 
 				gui.add( controls, 'autoRotate' ).name( 'Auto Rotate' );
-				gui.add( controls, 'autoRotateSpeed', - 10.0, 10.0, 0.01 ).name( 'Auto Rotate Speed' );				
+				gui.add( controls, 'autoRotateSpeed', - 10.0, 10.0, 0.01 ).name( 'Auto Rotate Speed' );
 
 				const partFolder = gui.addFolder( 'Particles' );
 				partFolder.add( timeScale, 'value', 0.0, 4.0, 0.01 ).name( 'timeScale' );

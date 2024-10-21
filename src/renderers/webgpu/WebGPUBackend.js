@@ -29,6 +29,7 @@ class WebGPUBackend extends Backend {
 		this.parameters.alpha = ( parameters.alpha === undefined ) ? true : parameters.alpha;
 
 		this.parameters.requiredLimits = ( parameters.requiredLimits === undefined ) ? {} : parameters.requiredLimits;
+		this.parameters.hdr = ( parameters.hdr === true );
 
 		this.trackTimestamp = ( parameters.trackTimestamp === true );
 
@@ -107,6 +108,7 @@ class WebGPUBackend extends Backend {
 		this.context = context;
 
 		const alphaMode = parameters.alpha ? 'premultiplied' : 'opaque';
+		const hdr = parameters.hdr ? 'extended' : 'standard';
 
 		this.trackTimestamp = this.trackTimestamp && this.hasFeature( GPUFeatureName.TimestampQuery );
 
@@ -114,7 +116,10 @@ class WebGPUBackend extends Backend {
 			device: this.device,
 			format: this.utils.getPreferredCanvasFormat(),
 			usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.COPY_SRC,
-			alphaMode: alphaMode
+			alphaMode: alphaMode,
+			toneMapping: {
+				mode: hdr
+			}
 		} );
 
 		this.updateSize();
