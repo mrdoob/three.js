@@ -71,7 +71,7 @@ class RectAreaLightTexturesLib {
 		LTC_HALF_2.needsUpdate = true;
 
 		this.LTC_HALF_1 = LTC_HALF_1;
-		this.LTC_HALF_1 = LTC_HALF_2;
+		this.LTC_HALF_2 = LTC_HALF_2;
 
 		this.LTC_FLOAT_1 = LTC_FLOAT_1;
 		this.LTC_FLOAT_2 = LTC_FLOAT_2;
