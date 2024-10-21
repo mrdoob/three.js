@@ -1445,9 +1445,9 @@ class Renderer {
 
 			// render back side
 
-			for ( const renderItem of doublePassList ) {
+			for ( const { material } of doublePassList ) {
 
-				renderItem.material.side = BackSide;
+				material.side = BackSide;
 
 			}
 
@@ -1455,9 +1455,9 @@ class Renderer {
 
 			// render front side
 
-			for ( const renderItem of doublePassList ) {
+			for ( const { material } of doublePassList ) {
 
-				renderItem.material.side = FrontSide;
+				material.side = FrontSide;
 
 			}
 
@@ -1465,9 +1465,9 @@ class Renderer {
 
 			// restore
 
-			for ( const renderItem of doublePassList ) {
+			for ( const { material } of doublePassList ) {
 
-				renderItem.material.side = DoubleSide;
+				material.side = DoubleSide;
 
 			}
 
