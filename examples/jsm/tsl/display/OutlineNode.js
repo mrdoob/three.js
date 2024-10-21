@@ -354,7 +354,7 @@ class OutlineNode extends TempNode {
 				weightSum.addAssign( w.mul( 2 ) );
 				uvOffset.addAssign( delta );
 
-			} );
+			} );
 
 			return diffuseSum.div( weightSum );
 
