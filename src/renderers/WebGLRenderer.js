@@ -70,6 +70,7 @@ class WebGLRenderer {
 			preserveDrawingBuffer = false,
 			powerPreference = 'default',
 			failIfMajorPerformanceCaveat = false,
+			reverseDepthBuffer = false,
 		} = parameters;
 
 		this.isWebGLRenderer = true;
@@ -288,9 +289,13 @@ class WebGLRenderer {
 
 			capabilities = new WebGLCapabilities( _gl, extensions, parameters, utils );
 
-			state = new WebGLState( _gl );
+			state = new WebGLState( _gl, extensions );
 
-			if ( capabilities.reverseDepthBuffer ) state.buffers.depth.setReversed( true );
+			if ( capabilities.reverseDepthBuffer && reverseDepthBuffer ) {
+
+				state.buffers.depth.setReversed( true );
+
+			}
 
 			info = new WebGLInfo( _gl );
 			properties = new WebGLProperties();
@@ -594,7 +599,6 @@ class WebGLRenderer {
 			if ( depth ) {
 
 				bits |= _gl.DEPTH_BUFFER_BIT;
-				_gl.clearDepth( this.capabilities.reverseDepthBuffer ? 0 : 1 );
 
 			}
 
@@ -1978,7 +1982,9 @@ class WebGLRenderer {
 
 				// common camera uniforms
 
-				if ( capabilities.reverseDepthBuffer ) {
+				const reverseDepthBuffer = state.buffers.depth.getReversed();
+
+				if ( reverseDepthBuffer ) {
 
 					_currentProjectionMatrix.copy( camera.projectionMatrix );
 
