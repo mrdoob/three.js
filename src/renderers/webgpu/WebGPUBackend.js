@@ -1152,6 +1152,11 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	recycleBuffer( buffer ) {
+
+		return this.textureUtils.recycleBuffer( buffer );
+
+	}
 
 	initTimestampQuery( renderContext, descriptor ) {
 
