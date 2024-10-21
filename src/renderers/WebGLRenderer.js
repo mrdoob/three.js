@@ -2701,6 +2701,7 @@ class WebGLRenderer {
 
 			}
 
+			// gather the necessary dimensions to copy
 			let width, height, depth, minX, minY, minZ;
 			let dstX, dstY, dstZ;
 			const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ level ] : srcTexture.image;
@@ -2779,6 +2780,7 @@ class WebGLRenderer {
 
 				for ( let i = 0; i < depth; i ++ ) {
 
+					// if the destination is a 3d target then a layer needs to be bound
 					if ( isSrc3D ) {
 
 						_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, level, minZ + i );
