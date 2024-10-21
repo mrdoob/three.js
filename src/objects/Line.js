@@ -100,7 +100,8 @@ class Line extends Object3D {
 		_inverseMatrix.copy( matrixWorld ).invert();
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-		const localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		const scaleMax = matrixWorld.getMaxScaleOnAxis();
+		const localThreshold = threshold / scaleMax;
 		const localThresholdSq = localThreshold * localThreshold;
 
 		const step = this.isLineSegments ? 2 : 1;
