@@ -1,5 +1,5 @@
-import { Color, RenderTarget, Vector2 } from 'three';
-import { convertToTexture, TempNode, nodeObject, Fn, NodeUpdateType, QuadMesh, PostProcessingUtils, NodeMaterial, passTexture, uniform, uv, vec2, vec3, vec4, max, float, sub, int, Loop, fract, pow, distance } from 'three/tsl';
+import { RenderTarget, Vector2 } from 'three';
+import { convertToTexture, TempNode, nodeObject, Fn, NodeUpdateType, QuadMesh, PostProcessingUtils, NodeMaterial, passTexture, uv, vec2, vec3, vec4, max, float, sub, int, Loop, fract, pow, distance } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -18,14 +18,27 @@ class LensflareNode extends TempNode {
 
 	}
 
-	constructor( textureNode, ghostTintNode ) {
+	constructor( textureNode, params = {} ) {
 
 		super();
 
 		this.textureNode = textureNode;
 
-		this.downSampleRatio = 4;
-		this.ghostTint = ghostTintNode;
+		const {
+			ghostTint = vec3( 1, 1, 1 ),
+			threshold = float( 0.5 ),
+			ghostSamples = float( 4 ),
+			ghostSpacing = float( 0.25 ),
+			ghostAttenuationFactor = float( 25 ),
+			downSampleRatio = 4
+		} = params;
+
+		this.ghostTint = ghostTint;
+		this.threshold = threshold;
+		this.ghostSamples = ghostSamples;
+		this.ghostSpacing = ghostSpacing;
+		this.ghostAttenuationFactor = ghostAttenuationFactor;
+		this.downSampleRatio = downSampleRatio;
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
@@ -33,13 +46,6 @@ class LensflareNode extends TempNode {
 
 		this._renderTarget = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._renderTarget.texture.name = 'LensflareNode';
-
-		// uniforms
-
-		this.threshold = uniform( 0.5 );
-		this.ghostSamples = uniform( 4 );
-		this.ghostSpacing = uniform( 0.25 );
-		this.ghostAttenuationFactor = uniform( 25 );
 
 		// materials
 
@@ -152,4 +158,4 @@ class LensflareNode extends TempNode {
 
 export default LensflareNode;
 
-export const lensflare = ( inputNode, ghostTint = new Color() ) => nodeObject( new LensflareNode( convertToTexture( inputNode ), nodeObject( ghostTint ) ) );
+export const lensflare = ( inputNode, params ) => nodeObject( new LensflareNode( convertToTexture( inputNode ), params ) );

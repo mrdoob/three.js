@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, mrt, output, emissive } from 'three/tsl';
+			import { pass, mrt, output, emissive, uniform } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 			import { lensflare } from 'three/addons/tsl/display/LensflareNode.js';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
@@ -105,7 +105,17 @@
 				const emissivePass = scenePass.getTextureNode( 'emissive' );
 
 				const bloomPass = bloom( emissivePass, 1, 1 );
-				const flarePass = lensflare( bloomPass );
+
+				const threshold = uniform( 0.5 );
+				const ghostAttenuationFactor = uniform( 25 );
+				const ghostSpacing = uniform( 0.25 );
+
+				const flarePass = lensflare( bloomPass, {
+					threshold,
+					ghostAttenuationFactor,
+					ghostSpacing
+				} );
+
 				const blurPass = gaussianBlur( flarePass, 8 ); // optional (blurring produces better flare quality but also adds some overhead)
 
 				postProcessing = new THREE.PostProcessing( renderer );
@@ -137,9 +147,9 @@
 				bloomFolder.add( bloomPass.radius, 'value', 0.0, 1.0 ).name( 'radius' );
 			
 				const lensflareFolder = gui.addFolder( 'lensflare' );
-				lensflareFolder.add( flarePass.threshold, 'value', 0.0, 1.0 ).name( 'threshold' );
-				lensflareFolder.add( flarePass.ghostAttenuationFactor, 'value', 10.0, 50.0 ).name( 'attenuation' );
-				lensflareFolder.add( flarePass.ghostSpacing, 'value', 0.0, 0.3 ).name( 'spacing' );
+				lensflareFolder.add( threshold, 'value', 0.0, 1.0 ).name( 'threshold' );
+				lensflareFolder.add( ghostAttenuationFactor, 'value', 10.0, 50.0 ).name( 'attenuation' );
+				lensflareFolder.add( ghostSpacing, 'value', 0.0, 0.3 ).name( 'spacing' );
 
 				const toneMappingFolder = gui.addFolder( 'tone mapping' );
 				toneMappingFolder.add( renderer, 'toneMappingExposure', 0.1, 2 ).name( 'exposure' );
