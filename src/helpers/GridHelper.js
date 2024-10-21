@@ -11,23 +11,35 @@ class GridHelper extends LineSegments {
 		color1 = new Color( color1 );
 		color2 = new Color( color2 );
 
-		const center = divisions / 2;
-		const step = size / divisions;
-		const halfSize = size / 2;
+		const [ width, depth ] = Array.isArray( size ) ? size : [ size, size ];
+		const [ divisionsX, divisionsZ ] = Array.isArray( divisions ) ? divisions : [ divisions, divisions ];
+
+		const stepX = width / divisionsX;
+		const stepZ = depth / divisionsZ;
+		const halfWidth = width / 2;
+		const halfDepth = depth / 2;
 
 		const vertices = [], colors = [];
 
-		for ( let i = 0, j = 0, k = - halfSize; i <= divisions; i ++, k += step ) {
+		for ( let i = 0; i <= divisionsZ; i ++ ) {
 
-			vertices.push( - halfSize, 0, k, halfSize, 0, k );
-			vertices.push( k, 0, - halfSize, k, 0, halfSize );
+			const k = - halfDepth + i * stepZ;
+			vertices.push( - halfWidth, 0, k, halfWidth, 0, k );
 
-			const color = i === center ? color1 : color2;
+			const color = ( i === divisionsZ / 2 ) ? color1 : color2;
+			color.toArray( colors, colors.length );
+			color.toArray( colors, colors.length );
 
-			color.toArray( colors, j ); j += 3;
-			color.toArray( colors, j ); j += 3;
-			color.toArray( colors, j ); j += 3;
-			color.toArray( colors, j ); j += 3;
+		}
+
+		for ( let i = 0; i <= divisionsX; i ++ ) {
+
+			const k = - halfWidth + i * stepX;
+			vertices.push( k, 0, - halfDepth, k, 0, halfDepth );
+
+			const color = ( i === divisionsX / 2 ) ? color1 : color2;
+			color.toArray( colors, colors.length );
+			color.toArray( colors, colors.length );
 
 		}
 
@@ -35,9 +47,7 @@ class GridHelper extends LineSegments {
 		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-		const material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
-
-		super( geometry, material );
+		super( geometry, new LineBasicMaterial( { vertexColors: true, toneMapped: false } ) );
 
 		this.type = 'GridHelper';
 
@@ -51,6 +61,5 @@ class GridHelper extends LineSegments {
 	}
 
 }
-
 
 export { GridHelper };
