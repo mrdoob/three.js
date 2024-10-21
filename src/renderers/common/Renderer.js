@@ -798,7 +798,9 @@ class Renderer {
 
 		if ( this._initialized === false ) await this.init();
 
-		this._animation.setAnimationLoop( callback );
+		const animation = this._animation;
+		animation.setAnimationLoop( callback );
+		( callback === null ) ? animation.stop() : animation.start();
 
 	}
 
