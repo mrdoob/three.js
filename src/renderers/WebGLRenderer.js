@@ -2657,6 +2657,19 @@ class WebGLRenderer {
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, dstTexture.premultiplyAlpha );
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, dstTexture.unpackAlignment );
 
+			// used for copying data from cpu
+			const currentUnpackRowLen = _gl.getParameter( _gl.UNPACK_ROW_LENGTH );
+			const currentUnpackImageHeight = _gl.getParameter( _gl.UNPACK_IMAGE_HEIGHT );
+			const currentUnpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
+			const currentUnpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
+			const currentUnpackSkipImages = _gl.getParameter( _gl.UNPACK_SKIP_IMAGES );
+
+			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
+			_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, image.height );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, minX );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, minY );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, minZ );
+
 			// set up the src texture
 			const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture;
 			const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture;
@@ -2706,19 +2719,6 @@ class WebGLRenderer {
 
 			} else {
 
-				// used for copying data from cpu
-				const currentUnpackRowLen = _gl.getParameter( _gl.UNPACK_ROW_LENGTH );
-				const currentUnpackImageHeight = _gl.getParameter( _gl.UNPACK_IMAGE_HEIGHT );
-				const currentUnpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
-				const currentUnpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
-				const currentUnpackSkipImages = _gl.getParameter( _gl.UNPACK_SKIP_IMAGES );
-
-				_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
-				_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, image.height );
-				_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, minX );
-				_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, minY );
-				_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, minZ );
-
 				if ( isDst3D ) {
 
 					// copy data into the 3d texture
@@ -2763,13 +2763,14 @@ class WebGLRenderer {
 
 				}
 
-				_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
-				_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, currentUnpackImageHeight );
-				_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
-				_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
-				_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
-
 			}
+
+			// reset values
+			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, currentUnpackRowLen );
+			_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, currentUnpackImageHeight );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, currentUnpackSkipPixels );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, currentUnpackSkipRows );
+			_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
 
 			// Generate mipmaps only when copying level 0
 			if ( level === 0 && dstTexture.generateMipmaps ) {
