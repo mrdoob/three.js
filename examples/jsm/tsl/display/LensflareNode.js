@@ -18,13 +18,14 @@ class LensflareNode extends TempNode {
 
 	}
 
-	constructor( textureNode ) {
+	constructor( textureNode, ghostTintNode ) {
 
 		super();
 
 		this.textureNode = textureNode;
 
 		this.downSampleRatio = 4;
+		this.ghostTint = ghostTintNode;
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
@@ -35,15 +36,10 @@ class LensflareNode extends TempNode {
 
 		// uniforms
 
-		this._threshold = uniform( 0.5 );
-		this._ghostSamples = uniform( 4 );
-		this._ghostSpacing = uniform( 0.25 );
-		this._ghostAttenuationFactor = uniform( 20 );
-		this._ghostTint = uniform( new Color( 1, 1, 1 ) );
-
-
-		this._texScale = uniform( 1 );
-		this._blurScale = uniform( 0.1 );
+		this.threshold = uniform( 0.5 );
+		this.ghostSamples = uniform( 4 );
+		this.ghostSpacing = uniform( 0.25 );
+		this.ghostAttenuationFactor = uniform( 25 );
 
 		// materials
 
@@ -107,13 +103,13 @@ class LensflareNode extends TempNode {
 
 			// ghosts are positioned along this vector
 
-			const ghostVec = sub( vec2( 0.5 ), texCoord ).mul( this._ghostSpacing ).toVar();
+			const ghostVec = sub( vec2( 0.5 ), texCoord ).mul( this.ghostSpacing ).toVar();
 
 			// sample ghosts
 
 			const result = vec4().toVar();
 
-			Loop( { start: int( 0 ), end: int( this._ghostSamples ), type: 'int', condition: '<' }, ( { i } ) => {
+			Loop( { start: int( 0 ), end: int( this.ghostSamples ), type: 'int', condition: '<' }, ( { i } ) => {
 
 				// use fract() to ensure that the texture coordinates wrap around
 
@@ -122,13 +118,13 @@ class LensflareNode extends TempNode {
 				// reduce contributions from samples at the screen edge
 
 				const d = distance( sampleUv, vec2( 0.5 ) );
-				const weight = pow( d.oneMinus(), this._ghostAttenuationFactor );
+				const weight = pow( d.oneMinus(), this.ghostAttenuationFactor );
 
 				// accumulate
 
 				let sample = this.textureNode.uv( sampleUv ).rgb;
 
-				sample = max( sample.sub( this._threshold ), vec3( 0 ) ).mul( this._ghostTint );
+				sample = max( sample.sub( this.threshold ), vec3( 0 ) ).mul( this.ghostTint );
 
 				result.addAssign( sample.mul( weight ) );
 
@@ -156,4 +152,4 @@ class LensflareNode extends TempNode {
 
 export default LensflareNode;
 
-export const lensflare = ( node ) => nodeObject( new LensflareNode( convertToTexture( node ) ) );
+export const lensflare = ( inputNode, ghostTint = new Color() ) => nodeObject( new LensflareNode( convertToTexture( inputNode ), nodeObject( ghostTint ) ) );
