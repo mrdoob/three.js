@@ -30,9 +30,9 @@ class OutlineNode extends TempNode {
 		this.scene = scene;
 		this.camera = camera;
 		this.selectedObjects = selectedObjects;
+		this.edgeThicknessNode = nodeObject( edgeThickness );
+		this.edgeGlowNode = nodeObject( edgeGlow );
 		this.downSampleRatio = downSampleRatio;
-		this.edgeThickness = edgeThickness;
-		this.edgeGlow = edgeGlow;
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
@@ -360,7 +360,7 @@ class OutlineNode extends TempNode {
 
 		} );
 
-		this._separableBlurMaterial.fragmentNode = seperableBlur( this.edgeThickness );
+		this._separableBlurMaterial.fragmentNode = seperableBlur( this.edgeThicknessNode );
 		this._separableBlurMaterial.needsUpdate = true;
 
 		this._separableBlurMaterial2.fragmentNode = seperableBlur( MAX_RADIUS );
@@ -374,7 +374,7 @@ class OutlineNode extends TempNode {
 			const edgeValue2 = this._edge2TextureUniform;
 			const maskColor = this._maskTextureUniform;
 
-			const edgeValue = edgeValue1.add( edgeValue2.mul( this.edgeGlow ) );
+			const edgeValue = edgeValue1.add( edgeValue2.mul( this.edgeGlowNode ) );
 
 			return maskColor.r.mul( edgeValue );
 
