@@ -2573,26 +2573,6 @@ class WebGLRenderer {
 
 			}
 
-			return this.copyTextureToTexture3D( srcTexture, dstTexture, srcRegion, dstPosition, level );
-
-		};
-
-		this.copyTextureToTexture3D = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
-
-			// support previous signature with source box first
-			if ( srcTexture.isTexture !== true ) {
-
-				// @deprecated, r165
-				warnOnce( 'WebGLRenderer: copyTextureToTexture3D function signature has changed.' );
-
-				srcRegion = arguments[ 0 ] || null;
-				dstPosition = arguments[ 1 ] || null;
-				srcTexture = arguments[ 2 ];
-				dstTexture = arguments[ 3 ];
-				level = arguments[ 4 ] || 0;
-
-			}
-
 			// gather the necessary dimensions to copy
 			let width, height, depth, minX, minY, minZ;
 			let dstX, dstY, dstZ;
@@ -2772,6 +2752,29 @@ class WebGLRenderer {
 			}
 
 			state.unbindTexture();
+
+		};
+
+		this.copyTextureToTexture3D = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
+
+			// support previous signature with source box first
+			if ( srcTexture.isTexture !== true ) {
+
+				// @deprecated, r165
+				warnOnce( 'WebGLRenderer: copyTextureToTexture3D function signature has changed.' );
+
+				srcRegion = arguments[ 0 ] || null;
+				dstPosition = arguments[ 1 ] || null;
+				srcTexture = arguments[ 2 ];
+				dstTexture = arguments[ 3 ];
+				level = arguments[ 4 ] || 0;
+
+			}
+
+			// @deprecated, r170
+			warnOnce( 'WebGLRenderer: copyTextureToTexture3D function has been deprecated. Use "copyTextureToTexture" instead.' );
+
+			return this.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, level );
 
 		};
 
