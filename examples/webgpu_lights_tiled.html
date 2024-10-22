@@ -139,12 +139,10 @@
 				lighting = new TiledLighting(); // ( maxLights = 1024, tileSize = 32 )
 
 				renderer = new THREE.WebGPURenderer( { antialias: true } );
-				renderer.lighting = lighting; // set lighting system
-
-				renderer = new THREE.WebGPURenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setAnimationLoop( animate );
+				renderer.lighting = lighting; // set lighting system
 				renderer.toneMapping = THREE.NeutralToneMapping;
 				renderer.toneMappingExposure = 5;
 				document.body.appendChild( renderer.domElement );
