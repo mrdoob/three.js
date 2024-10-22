@@ -30,7 +30,9 @@ export const normalView = /*@__PURE__*/ ( Fn( ( builder ) => {
 
 	if ( builder.material.flatShading === true ) {
 
-		node = normalFlat;
+		// dFdx/dFdy only available in fragment shader
+
+		node = ( builder.shaderStage === 'fragment' ) ? normalFlat : vec3( 0, 0, 0 );
 
 	} else {
 
