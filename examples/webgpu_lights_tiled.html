@@ -79,7 +79,7 @@
 				lights = new THREE.Group();
 				scene.add( lights );
 
-				const addLight = ( hexColor, power = 10000, distance = 3 ) => {
+				const addLight = ( hexColor, power = 10, distance = 3 ) => {
 
 					const light = new THREE.PointLight( hexColor, 1, distance );
 					light.position.set( Math.random() * 300 - 150, 1, Math.random() * 300 - 150 );

@@ -94,9 +94,9 @@ class TiledLightsNode extends THREE.LightsNode {
 			data[ offset + 2 ] = _vector3.z;
 			data[ offset + 3 ] = light.distance;
 
-			data[ lineSize + offset + 0 ] = light.color.r;
-			data[ lineSize + offset + 1 ] = light.color.g;
-			data[ lineSize + offset + 2 ] = light.color.b;
+			data[ lineSize + offset + 0 ] = light.color.r * light.intensity;
+			data[ lineSize + offset + 1 ] = light.color.g * light.intensity;
+			data[ lineSize + offset + 2 ] = light.color.b * light.intensity;
 			data[ lineSize + offset + 3 ] = light.decay;
 
 		}
