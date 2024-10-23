@@ -744,6 +744,7 @@ class BatchedMesh extends Mesh {
 			}
 
 			nextVertexStart += geometryInfo.reservedVertexCount;
+			geometryInfo.start = geometry.index ? geometryInfo.indexStart : geometryInfo.vertexStart;
 
 			// step the next geometry points to the shifted position
 			this._nextIndexStart = geometry.index ? geometryInfo.indexStart + geometryInfo.reservedIndexCount : 0;

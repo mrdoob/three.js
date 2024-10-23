@@ -380,21 +380,13 @@ document.body.appendChild( renderer.domElement );
 		</p>
 
 		<h3>
-			[method:undefined copyTextureToTexture]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Box2 srcRegion], [param:Vector2 dstPosition], [param:Number level] )
-		</h3>
-		<p>
-			Copies the pixels of a texture in the bounds '[page:Box2 srcRegion]' in the destination texture starting from the given position.
-			The `depthTexture` and `texture` property of render targets are supported as well.<br />
-			When using render target textures as `srcTexture` and `dstTexture`, you must make sure both render targets are intitialized e.g. via [page:.initRenderTarget]().
-		</p>
-
-		<h3>
-			[method:undefined copyTextureToTexture3D]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Box3 srcRegion], [param:Vector3 dstPosition], [param:Number level] )
+			[method:undefined copyTextureToTexture]( [param:Texture srcTexture], [param:Texture dstTexture], [param:Box2 srcRegion] | [param:Box3 srcRegion], [param:Vector2 dstPosition] | [param:Vector3 dstPosition], [param:Number dstLevel] )
 		</h3>
 		<p>
 			Copies the pixels of a texture in the bounds '[page:Box3 srcRegion]' in the destination texture starting from the given position.
-			The `depthTexture` and `texture` property of 3D render targets are supported as well.<br />
-			When using render target textures as `srcTexture` and `dstTexture`, you must make sure both render targets are intitialized e.g. via [page:.initRenderTarget]().
+			2D Texture, 3D Textures, or a mix of the two can be used as source and destination texture arguments for copying between layers of 3d textures.</br> 
+			The `depthTexture` and `texture` property of render targets are supported as well.<br />
+			When using render target textures as `srcTexture` and `dstTexture`, you must make sure both render targets are initialized e.g. via [page:.initRenderTarget]().
 		</p>
 
 		<h3>[method:undefined dispose]( )</h3>
