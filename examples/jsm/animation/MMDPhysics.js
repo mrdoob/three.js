@@ -68,7 +68,7 @@ class MMDPhysics {
 
 		this._init( mesh, rigidBodyParams, constraintParams );
 
-		console.warn( 'THREE.MMDPhysics: The module has been deprecated and will be removed with r172. Please migrate to __externalMMD_ instead.' );
+		console.warn( 'THREE.MMDPhysics: The module has been deprecated and will be removed with r172. Please migrate to https://github.com/takahirox/three-mmd-loader instead.' );
 
 	}
 
