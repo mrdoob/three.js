@@ -2,7 +2,7 @@ import DataMap from './DataMap.js';
 
 import { Vector3 } from '../../math/Vector3.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, EquirectangularReflectionMapping, EquirectangularRefractionMapping, CubeReflectionMapping, CubeRefractionMapping } from '../../constants.js';
+import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, EquirectangularReflectionMapping, EquirectangularRefractionMapping, CubeReflectionMapping, CubeRefractionMapping, UnsignedByteType } from '../../constants.js';
 
 const _size = /*@__PURE__*/ new Vector3();
 
@@ -153,6 +153,24 @@ class Textures extends DataMap {
 
 			backend.destroySampler( texture );
 			backend.destroyTexture( texture );
+
+		}
+
+		//
+
+		if ( texture.isFramebufferTexture ) {
+
+			const renderTarget = this.renderer.getRenderTarget();
+
+			if ( renderTarget ) {
+
+				texture.type = renderTarget.texture.type;
+
+			} else {
+
+				texture.type = UnsignedByteType;
+
+			}
 
 		}
 
