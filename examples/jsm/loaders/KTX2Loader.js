@@ -711,12 +711,24 @@ KTX2Loader.BasisWorker = function () {
 			priorityHDR: 1,
 			needsPowerOfTwo: false,
 		},
+
+		// Uncompressed fallbacks.
+
+		{
+			basisFormat: [ BasisFormat.ETC1S, BasisFormat.UASTC ],
+			transcoderFormat: [ TranscoderFormat.RGBA32, TranscoderFormat.RGBA32 ],
+			engineFormat: [ EngineFormat.RGBAFormat, EngineFormat.RGBAFormat ],
+			engineType: [ EngineType.UnsignedByteType, EngineType.UnsignedByteType ],
+			priorityETC1S: 100,
+			priorityUASTC: 100,
+			needsPowerOfTwo: false,
+		},
 		{
 			basisFormat: [ BasisFormat.UASTC_HDR ],
 			transcoderFormat: [ TranscoderFormat.RGBA_HALF ],
 			engineFormat: [ EngineFormat.RGBAFormat ],
 			engineType: [ EngineType.HalfFloatType ],
-			priorityHDR: 2,
+			priorityHDR: 100,
 			needsPowerOfTwo: false,
 		}
 	];
@@ -756,13 +768,7 @@ KTX2Loader.BasisWorker = function () {
 
 		}
 
-		console.warn( 'THREE.KTX2Loader: No suitable compressed texture format found. Decoding to RGBA32.' );
-
-		const transcoderFormat = TranscoderFormat.RGBA32;
-		const engineFormat = EngineFormat.RGBAFormat;
-		const engineType = EngineType.UnsignedByteType;
-
-		return { transcoderFormat, engineFormat, engineType };
+		throw new Error( 'THREE.KTX2Loader: Failed to identify transcoding target.' );
 
 	}
 
