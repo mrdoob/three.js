@@ -735,15 +735,15 @@ KTX2Loader.BasisWorker = function () {
 
 	const OPTIONS = {
 		[ BasisFormat.ETC1S ]: FORMAT_OPTIONS
-			.filter( ( opt ) => opt.priorityETC1S !== undefined )
+			.filter( ( opt ) => opt.basisFormat.includes( BasisFormat.ETC1S ) )
 			.sort( ( a, b ) => a.priorityETC1S - b.priorityETC1S ),
 
 		[ BasisFormat.UASTC ]: FORMAT_OPTIONS
-			.filter( ( opt ) => opt.priorityUASTC !== undefined )
+			.filter( ( opt ) => opt.basisFormat.includes( BasisFormat.UASTC ) )
 			.sort( ( a, b ) => a.priorityUASTC - b.priorityUASTC ),
 
 		[ BasisFormat.UASTC_HDR ]: FORMAT_OPTIONS
-			.filter( ( opt ) => opt.priorityHDR !== undefined )
+			.filter( ( opt ) => opt.basisFormat.includes( BasisFormat.UASTC_HDR ) )
 			.sort( ( a, b ) => a.priorityHDR - b.priorityHDR ),
 	};
 
