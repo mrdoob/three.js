@@ -1,5 +1,3 @@
-import { Vector2 } from '../../../math/Vector2.js';
-
 const refreshUniforms = [
 	'alphaMap',
 	'alphaTest',
@@ -52,8 +50,6 @@ const refreshUniforms = [
 	'transmission',
 	'transmissionMap'
 ];
-
-const _vector2 = /*@__PURE__*/ new Vector2();
 
 class NodeMaterialObserver {
 
@@ -121,10 +117,10 @@ class NodeMaterialObserver {
 
 			if ( data.material.transmission > 0 ) {
 
-				const bufferSize = this._getFrameBufferSize( renderObject );
+				const { width, height } = renderObject.context;
 
-				data.bufferWidth = bufferSize.x;
-				data.bufferHeight = bufferSize.y;
+				data.bufferWidth = width;
+				data.bufferHeight = height;
 
 			}
 
@@ -206,25 +202,6 @@ class NodeMaterialObserver {
 
 	}
 
-	_getFrameBufferSize( renderObject ) {
-
-		const renderer = renderObject.renderer;
-		const renderTarget = renderer.getRenderTarget();
-
-		if ( renderTarget ) {
-
-			_vector2.set( renderTarget.width, renderTarget.height );
-
-		} else {
-
-			renderer.getDrawingBufferSize( _vector2 );
-
-		}
-
-		return _vector2;
-
-	}
-
 	equals( renderObject ) {
 
 		const { object, material, geometry } = renderObject;
@@ -283,12 +260,12 @@ class NodeMaterialObserver {
 
 		if ( materialData.transmission > 0 ) {
 
-			const bufferSize = this._getFrameBufferSize( renderObject );
+			const { width, height } = renderObject.context;
 
-			if ( renderObjectData.bufferWidth !== bufferSize.x || renderObjectData.bufferHeight !== bufferSize.y ) {
+			if ( renderObjectData.bufferWidth !== width || renderObjectData.bufferHeight !== height ) {
 
-				renderObjectData.bufferWidth = bufferSize.x;
-				renderObjectData.bufferHeight = bufferSize.y;
+				renderObjectData.bufferWidth = width;
+				renderObjectData.bufferHeight = height;
 
 				return false;
 
