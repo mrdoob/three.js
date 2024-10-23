@@ -1284,7 +1284,29 @@ class Renderer {
 
 	copyFramebufferToTexture( framebufferTexture, rectangle = null ) {
 
-		rectangle = rectangle === null ? _vector4.set( 0, 0, framebufferTexture.image.width, framebufferTexture.image.height ) : rectangle;
+		if ( rectangle !== null ) {
+
+			if ( rectangle.isVector2 ) {
+
+				rectangle = _vector4.set( rectangle.x, rectangle.y, framebufferTexture.image.width, framebufferTexture.image.height ).floor();
+
+			} else if ( rectangle.isVector4 ) {
+
+				rectangle = _vector4.copy( rectangle ).floor();
+
+			} else {
+
+				console.error( 'THREE.Renderer.copyFramebufferToTexture: Invalid rectangle.' );
+
+				return;
+
+			}
+
+		} else {
+
+			rectangle = _vector4.set( 0, 0, framebufferTexture.image.width, framebufferTexture.image.height );
+
+		}
 
 		//
 
