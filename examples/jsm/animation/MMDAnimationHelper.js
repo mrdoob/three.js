@@ -61,6 +61,8 @@ class MMDAnimationHelper {
 		this.sharedPhysics = false;
 		this.masterPhysics = null;
 
+		console.warn( 'THREE.MMDAnimationHelper: The module has been deprecated and will be removed with r172. Please migrate to https://github.com/takahirox/three-mmd-loader instead.' );
+
 	}
 
 	/**

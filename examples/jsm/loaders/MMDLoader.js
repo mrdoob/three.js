@@ -86,6 +86,8 @@ class MMDLoader extends Loader {
 		this.meshBuilder = new MeshBuilder( this.manager );
 		this.animationBuilder = new AnimationBuilder();
 
+		console.warn( 'THREE.MMDLoader: The module has been deprecated and will be removed with r172. Please migrate to https://github.com/takahirox/three-mmd-loader instead.' );
+
 	}
 
 	/**
