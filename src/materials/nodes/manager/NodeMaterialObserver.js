@@ -1,3 +1,5 @@
+import { Vector2 } from '../../../math/Vector2.js';
+
 const refreshUniforms = [
 	'alphaMap',
 	'alphaTest',
@@ -50,6 +52,8 @@ const refreshUniforms = [
 	'transmission',
 	'transmissionMap'
 ];
+
+const _vector2 = /*@__PURE__*/ new Vector2();
 
 class NodeMaterialObserver {
 
@@ -112,6 +116,15 @@ class NodeMaterialObserver {
 			if ( renderObject.bundle !== null ) {
 
 				data.version = renderObject.bundle.version;
+
+			}
+
+			if ( data.material.transmission > 0 ) {
+
+				const bufferSize = this._getFrameBufferSize( renderObject );
+
+				data.bufferWidth = bufferSize.x;
+				data.bufferHeight = bufferSize.y;
 
 			}
 
@@ -193,6 +206,25 @@ class NodeMaterialObserver {
 
 	}
 
+	_getFrameBufferSize( renderObject ) {
+
+		const renderer = renderObject.renderer;
+		const renderTarget = renderer.getRenderTarget();
+
+		if ( renderTarget ) {
+
+			_vector2.set( renderTarget.width, renderTarget.height );
+
+		} else {
+
+			renderer.getDrawingBufferSize( _vector2 );
+
+		}
+
+		return _vector2;
+
+	}
+
 	equals( renderObject ) {
 
 		const { object, material, geometry } = renderObject;
@@ -242,6 +274,21 @@ class NodeMaterialObserver {
 			} else if ( value !== mtlValue ) {
 
 				materialData[ property ] = mtlValue;
+
+				return false;
+
+			}
+
+		}
+
+		if ( materialData.transmission > 0 ) {
+
+			const bufferSize = this._getFrameBufferSize( renderObject );
+
+			if ( renderObjectData.bufferWidth !== bufferSize.x || renderObjectData.bufferHeight !== bufferSize.y ) {
+
+				renderObjectData.bufferWidth = bufferSize.x;
+				renderObjectData.bufferHeight = bufferSize.y;
 
 				return false;
 
