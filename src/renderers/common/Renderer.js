@@ -1284,11 +1284,34 @@ class Renderer {
 
 	copyFramebufferToTexture( framebufferTexture, rectangle = null ) {
 
-		const renderContext = this._currentRenderContext;
-
-		this._textures.updateTexture( framebufferTexture );
-
 		rectangle = rectangle === null ? _vector4.set( 0, 0, framebufferTexture.image.width, framebufferTexture.image.height ) : rectangle;
+
+		//
+
+		let renderContext = this._currentRenderContext;
+		let renderTarget;
+
+		if ( renderContext !== null ) {
+
+			renderTarget = renderContext.renderTarget;
+
+		} else {
+
+			renderTarget = this._renderTarget || this._getFrameBufferTarget();
+
+			if ( renderTarget !== null ) {
+
+				this._textures.updateRenderTarget( renderTarget );
+
+				renderContext = this._textures.get( renderTarget );
+
+			}
+
+		}
+
+		//
+
+		this._textures.updateTexture( framebufferTexture, { renderTarget } );
 
 		this.backend.copyFramebufferToTexture( framebufferTexture, renderContext, rectangle );
 
@@ -1302,7 +1325,6 @@ class Renderer {
 		this.backend.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, level );
 
 	}
-
 
 	readRenderTargetPixelsAsync( renderTarget, x, y, width, height, index = 0, faceIndex = 0 ) {
 

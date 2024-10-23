@@ -158,25 +158,6 @@ class Textures extends DataMap {
 
 		//
 
-		if ( texture.isFramebufferTexture ) {
-
-			const renderer = this.renderer;
-			const renderTarget = renderer.getRenderTarget();
-
-			if ( renderTarget ) {
-
-				texture.type = renderTarget.texture.type;
-
-			} else {
-
-				texture.type = UnsignedByteType;
-
-			}
-
-		}
-
-		//
-
 		const { width, height, depth } = this.getSize( texture );
 
 		options.width = width;
