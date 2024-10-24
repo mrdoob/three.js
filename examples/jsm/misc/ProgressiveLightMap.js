@@ -315,14 +315,14 @@ class ProgressiveLightMap {
 
 		this.uvMat.dispose();
 
-		if ( this.blurringPlane === null ) {
+		if ( this.blurringPlane !== null ) {
 
 			this.blurringPlane.geometry.dispose();
 			this.blurringPlane.material.dispose();
 
 		}
 
-		if ( this.labelMesh === null ) {
+		if ( this.labelMesh !== null ) {
 
 			this.labelMesh.geometry.dispose();
 			this.labelMesh.material.dispose();
