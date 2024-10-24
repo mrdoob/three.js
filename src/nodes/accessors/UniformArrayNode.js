@@ -125,7 +125,7 @@ class UniformArrayNode extends BufferNode {
 
 		this.bufferCount = ( this._elementType === 'vec4' ) ? length / 4 : length;
 
-		this._elementStride = (this._elementType === 'vec4') ? 1 : 4;
+		this._elementStride = ( this._elementType === 'vec4' ) ? 1 : 4;
 
 		this._elementType = ( this._elementType === 'vec4' ) ? 'float' : this._elementType;
 
