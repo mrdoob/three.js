@@ -24,13 +24,11 @@ class ProgressiveLightMap {
 		this.renderer = renderer;
 		this.res = res;
 		this.lightMapContainers = [];
-		this.compiled = false;
 		this.scene = new THREE.Scene();
-		this.scene.background = null;
-		this.tinyTarget = new THREE.WebGLRenderTarget( 1, 1 );
 		this.buffer1Active = false;
 		this.firstUpdate = true;
-		this.warned = false;
+		this.labelMesh = null;
+		this.blurringPlane = null;
 
 		// Create the Progressive LightMap Texture
 		const format = /(Android|iPad|iPhone|iPod)/g.test( navigator.userAgent ) ? THREE.HalfFloatType : THREE.FloatType;
@@ -71,8 +69,6 @@ class ProgressiveLightMap {
 			// Set the new Shader to this
 			this.uvMat.userData.shader = shader;
 
-			this.compiled = true;
-
 		};
 
 	}
@@ -97,13 +93,13 @@ class ProgressiveLightMap {
 
 			}
 
-			if ( ! object.geometry.hasAttribute( 'uv' ) ) {
+			if ( object.geometry.hasAttribute( 'uv' ) === false ) {
 
-				console.warn( 'All lightmap objects need UVs!' ); continue;
+				console.warn( 'THREE.ProgressiveLightMap: All lightmap objects need uvs.' ); continue;
 
 			}
 
-			if ( this.blurringPlane == null ) {
+			if ( this.blurringPlane === null ) {
 
 				this._initializeBlurPlane( this.res, this.progressiveLightMap1 );
 
@@ -122,8 +118,6 @@ class ProgressiveLightMap {
 								  h: 1 + ( padding * 2 ), index: ob } );
 
 			this.lightMapContainers.push( { basicMat: object.material, object: object } );
-
-			this.compiled = false;
 
 		}
 
@@ -154,7 +148,7 @@ class ProgressiveLightMap {
 	 */
 	update( camera, blendWindow = 100, blurEdges = true ) {
 
-		if ( this.blurringPlane == null ) {
+		if ( this.blurringPlane === null ) {
 
 			return;
 
@@ -175,11 +169,10 @@ class ProgressiveLightMap {
 
 		}
 
-		// Render once normally to initialize everything
-		if ( this.firstUpdate ) {
+		// Initialize everything
+		if ( this.firstUpdate === true ) {
 
-			this.renderer.setRenderTarget( this.tinyTarget ); // Tiny for Speed
-			this.renderer.render( this.scene, camera );
+			this.renderer.compile( this.scene, camera );
 			this.firstUpdate = false;
 
 		}
@@ -228,30 +221,25 @@ class ProgressiveLightMap {
 	*/
 	showDebugLightmap( visible, position = undefined ) {
 
-		if ( this.lightMapContainers.length == 0 ) {
+		if ( this.lightMapContainers.length === 0 ) {
 
-			if ( ! this.warned ) {
-
-				console.warn( 'Call this after adding the objects!' ); this.warned = true;
-
-			}
+			console.warn( 'THREE.ProgressiveLightMap: Call .showDebugLightmap() after adding the objects.' );
 
 			return;
 
 		}
 
-		if ( this.labelMesh == null ) {
+		if ( this.labelMesh === null ) {
 
-			this.labelMaterial = new THREE.MeshBasicMaterial(
-				{ map: this.progressiveLightMap1.texture, side: THREE.DoubleSide } );
-			this.labelPlane = new THREE.PlaneGeometry( 100, 100 );
-			this.labelMesh = new THREE.Mesh( this.labelPlane, this.labelMaterial );
+			const labelMaterial = new THREE.MeshBasicMaterial( { map: this.progressiveLightMap1.texture, side: THREE.DoubleSide } );
+			const labelGeometry = new THREE.PlaneGeometry( 100, 100 );
+			this.labelMesh = new THREE.Mesh( labelGeometry, labelMaterial );
 			this.labelMesh.position.y = 250;
 			this.lightMapContainers[ 0 ].object.parent.add( this.labelMesh );
 
 		}
 
-		if ( position != undefined ) {
+		if ( position !== undefined ) {
 
 			this.labelMesh.position.copy( position );
 
@@ -306,8 +294,6 @@ class ProgressiveLightMap {
 			// Set the new Shader to this
 			blurMaterial.userData.shader = shader;
 
-			this.compiled = true;
-
 		};
 
 		this.blurringPlane = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), blurMaterial );
@@ -316,6 +302,32 @@ class ProgressiveLightMap {
 		this.blurringPlane.renderOrder = 0;
 		this.blurringPlane.material.depthWrite = false;
 		this.scene.add( this.blurringPlane );
+
+	}
+
+	/**
+	 * Frees all internal resources.
+	 */
+	dispose() {
+
+		this.progressiveLightMap1.dispose();
+		this.progressiveLightMap2.dispose();
+
+		this.uvMat.dispose();
+
+		if ( this.blurringPlane !== null ) {
+
+			this.blurringPlane.geometry.dispose();
+			this.blurringPlane.material.dispose();
+
+		}
+
+		if ( this.labelMesh !== null ) {
+
+			this.labelMesh.geometry.dispose();
+			this.labelMesh.material.dispose();
+
+		}
 
 	}
 
