@@ -58,9 +58,7 @@ class Parameters {
 
 }
 
-const localGlobal = new Resources();
-
-export { localGlobal as global };
+export const ScriptableResources = new Resources();
 
 class ScriptableNode extends Node {
 
@@ -301,11 +299,11 @@ class ScriptableNode extends Node {
 
 		const parameters = new Parameters( this );
 
-		const THREE = localGlobal.get( 'THREE' );
-		const TSL = localGlobal.get( 'TSL' );
+		const THREE = ScriptableResources.get( 'THREE' );
+		const TSL = ScriptableResources.get( 'TSL' );
 
 		const method = this.getMethod( this.codeNode );
-		const params = [ parameters, this._local, localGlobal, refresh, setOutput, THREE, TSL ];
+		const params = [ parameters, this._local, ScriptableResources, refresh, setOutput, THREE, TSL ];
 
 		this._object = method( ...params );
 
