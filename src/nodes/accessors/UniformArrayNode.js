@@ -129,7 +129,7 @@ class UniformArrayNode extends BufferNode {
 		this._elementLength = builder.getTypeLength( this._elementType );
 
 		let arrayType = Float32Array;
-		
+
 		if ( this._elementType.charAt( 0 ) === 'i' ) arrayType = Int32Array;
 		else if ( this._elementType.charAt( 0 ) === 'u' ) arrayType = Uint32Array;
 
