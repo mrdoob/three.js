@@ -13,6 +13,7 @@ import WebGPUBindingUtils from './utils/WebGPUBindingUtils.js';
 import WebGPUPipelineUtils from './utils/WebGPUPipelineUtils.js';
 import WebGPUTextureUtils from './utils/WebGPUTextureUtils.js';
 
+import { warnOnce } from '../../utils.js';
 import { WebGPUCoordinateSystem } from '../../constants.js';
 
 //
@@ -962,6 +963,12 @@ class WebGPUBackend extends Backend {
 			const counts = object._multiDrawCounts;
 			const drawCount = object._multiDrawCount;
 			const drawInstances = object._multiDrawInstances;
+
+			if ( object._multiDrawInstances !== null ) { // @deprecated, r170
+
+				warnOnce( 'THREE.WebGPUBackend: renderMultiDrawInstances has been deprecated and will be removed in r180. Append to renderMultiDraw arguments and use indirection.' );
+
+			}
 
 			const bytesPerElement = hasIndex ? index.array.BYTES_PER_ELEMENT : 1;
 
