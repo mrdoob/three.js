@@ -126,6 +126,7 @@ class KTX2Loader extends Loader {
 
 		this.workerConfig = {
 			astcSupported: await renderer.hasFeatureAsync( 'texture-compression-astc' ),
+			astcHDRSupported: false,
 			etc1Supported: await renderer.hasFeatureAsync( 'texture-compression-etc1' ),
 			etc2Supported: await renderer.hasFeatureAsync( 'texture-compression-etc2' ),
 			dxtSupported: await renderer.hasFeatureAsync( 'texture-compression-bc' ),
@@ -143,6 +144,7 @@ class KTX2Loader extends Loader {
 
 			this.workerConfig = {
 				astcSupported: renderer.hasFeature( 'texture-compression-astc' ),
+				astcHDRSupported: false,
 				etc1Supported: renderer.hasFeature( 'texture-compression-etc1' ),
 				etc2Supported: renderer.hasFeature( 'texture-compression-etc2' ),
 				dxtSupported: renderer.hasFeature( 'texture-compression-bc' ),
@@ -154,6 +156,8 @@ class KTX2Loader extends Loader {
 
 			this.workerConfig = {
 				astcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
+				astcHDRSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' )
+					&& renderer.extensions.get( 'WEBGL_compressed_texture_astc' ).getSupportedProfiles().includes( 'hdr' ),
 				etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
 				etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
 				dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
@@ -337,7 +341,7 @@ class KTX2Loader extends Loader {
 
 		// If the device supports ASTC, Basis UASTC HDR requires no transcoder.
 		const needsTranscoder = container.vkFormat === VK_FORMAT_UNDEFINED
-			|| isBasisHDR && ! this.workerConfig.astcSupported;
+			|| isBasisHDR && ! this.workerConfig.astcHDRSupported;
 
 		if ( ! needsTranscoder ) {
 
@@ -636,11 +640,13 @@ KTX2Loader.BasisWorker = function () {
 
 	// Optimal choice of a transcoder target format depends on the Basis format (ETC1S, UASTC, or
 	// UASTC HDR), device capabilities, and texture dimensions. The list below ranks the formats
-	// separately for each format.
+	// separately for each format. Currently, priority is assigned based on:
 	//
-	// In some cases, transcoding UASTC to RGBA32 might be preferred for higher quality (at
-	// significant memory cost) compared to ETC1/2, BC1/3, and PVRTC. The transcoder currently
-	// chooses RGBA32 only as a last resort and does not expose that option to the caller.
+	//   high quality > low quality > uncompressed
+	//
+	// Prioritization may be revisited, or exposed for configuration, in the future.
+	//
+	// Reference: https://github.com/KhronosGroup/3D-Formats-Guidelines/blob/main/KTXDeveloperGuide.md
 	const FORMAT_OPTIONS = [
 		{
 			if: 'astcSupported',
@@ -734,9 +740,13 @@ KTX2Loader.BasisWorker = function () {
 	];
 
 	const OPTIONS = {
+		// TODO: For ETC1S we intentionally sort by _UASTC_ priority, preserving
+		// a historical accident shown to avoid performance pitfalls for Linux with
+		// Firefox & AMD GPU (RadeonSI). Further work needed.
+		// See https://github.com/mrdoob/three.js/pull/29730.
 		[ BasisFormat.ETC1S ]: FORMAT_OPTIONS
 			.filter( ( opt ) => opt.basisFormat.includes( BasisFormat.ETC1S ) )
-			.sort( ( a, b ) => a.priorityETC1S - b.priorityETC1S ),
+			.sort( ( a, b ) => a.priorityUASTC - b.priorityUASTC ),
 
 		[ BasisFormat.UASTC ]: FORMAT_OPTIONS
 			.filter( ( opt ) => opt.basisFormat.includes( BasisFormat.UASTC ) )
