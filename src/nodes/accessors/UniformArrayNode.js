@@ -48,6 +48,7 @@ class UniformArrayNode extends BufferNode {
 
 		this._elementType = null;
 		this._elementLength = 0;
+		this._elementStride = 4;
 
 		this.updateType = NodeUpdateType.RENDER;
 
@@ -78,7 +79,7 @@ class UniformArrayNode extends BufferNode {
 
 			for ( let i = 0; i < array.length; i ++ ) {
 
-				const index = i * 4;
+				const index = i * this._elementStride;
 
 				value[ index ] = array[ i ];
 
@@ -102,7 +103,7 @@ class UniformArrayNode extends BufferNode {
 
 			for ( let i = 0; i < array.length; i ++ ) {
 
-				const index = i * 4;
+				const index = i * this._elementStride;
 				const vector = array[ i ];
 
 				value[ index ] = vector.x;
@@ -123,6 +124,8 @@ class UniformArrayNode extends BufferNode {
 		const length = ( this._elementType === 'vec4' ) ? this.array.length : this.array.length * 4;
 
 		this.bufferCount = ( this._elementType === 'vec4' ) ? length / 4 : length;
+
+		this._elementStride = (this._elementType === 'vec4') ? 1 : 4;
 
 		this._elementType = ( this._elementType === 'vec4' ) ? 'float' : this._elementType;
 
