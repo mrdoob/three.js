@@ -44,7 +44,6 @@ class WebGPUUtils {
 
 			format = this.getTextureFormatGPU( renderContext.textures[ 0 ] );
 
-
 		} else {
 
 			format = this.getPreferredCanvasFormat(); // default context format
