@@ -1,7 +1,7 @@
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { CodeEditorElement } from '../elements/CodeEditorElement.js';
 import { disposeScene, resetScene, createElementFromJSON, isGPUNode, onValidType } from '../NodeEditorUtils.js';
-import { global, scriptable, js, scriptableValue } from 'three/tsl';
+import { ScriptableNodeResources, scriptable, js, scriptableValue } from 'three/tsl';
 import { getColorFromType, setInputAestheticsFromType, setOutputAestheticsFromType } from '../DataTypeLib.js';
 
 const defaultTitle = 'Scriptable';
@@ -189,8 +189,8 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 		if ( editor && editorOutput === editorOutputAdded ) return;
 
-		const scene = global.get( 'scene' );
-		const composer = global.get( 'composer' );
+		const scene = ScriptableNodeResources.get( 'scene' );
+		const composer = ScriptableNodeResources.get( 'composer' );
 
 		if ( editor ) {
 
