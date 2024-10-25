@@ -1,5 +1,5 @@
 import { DoubleSide, FloatType, HalfFloatType, PlaneGeometry, Mesh, RenderTarget, Scene } from 'three';
-import { add, float, Fn, mix, MeshPhongNodeMaterial, NodeMaterial, output, sub, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
+import { add, float, mix, MeshPhongNodeMaterial, NodeMaterial, output, sub, texture, uniform, uv, vec2, vec4 } from 'three/tsl';
 
 import { potpack } from '../libs/potpack.module.js';
 
@@ -17,7 +17,7 @@ import { potpack } from '../libs/potpack.module.js';
  * the texture-space effect you're looking for.
  *
  * @param {WebGPURenderer} renderer An instance of WebGPURenderer.
- * @param {number} res The side-long dimension of you total lightmap.
+ * @param {number} resolution The side-long dimension of you total lightmap.
  */
 class ProgressiveLightMap {
 
@@ -211,12 +211,12 @@ class ProgressiveLightMap {
 
 	}
 
-	/** DEBUG
+	/**
 	 * Draw the lightmap in the main scene.  Call this after adding the objects to it.
-	 * @param {boolean} visible Whether the debug plane should be visible
-	 * @param {Vector3} position Where the debug plane should be drawn
+	 * @param {boolean} visible Whether the debug plane should be visible.
+	 * @param {Vector3} position Where the debug plane should be drawn.
 	*/
-	showDebugLightmap( visible, position = undefined ) {
+	showDebugLightmap( visible, position = null ) {
 
 		if ( this._lightMapContainers.length === 0 ) {
 
@@ -241,7 +241,7 @@ class ProgressiveLightMap {
 
 		}
 
-		if ( position !== undefined ) {
+		if ( position !== null ) {
 
 			this._labelMesh.position.copy( position );
 
@@ -261,9 +261,9 @@ class ProgressiveLightMap {
 		blurMaterial.polygonOffsetFactor = - 1;
 		blurMaterial.polygonOffsetUnits = 3;
 
-		blurMaterial.vertexNode = vec4( uv(), 1, 1 );
+		blurMaterial.vertexNode = vec4( sub( uv(), vec2( 0.5 ) ).mul( 2 ), 1, 1 );
 
-		const uvNode = uv().flipY();
+		const uvNode = uv().flipY().toVar();
 		const pixelOffset = float( 0.5 ).div( float( this.resolution ) ).toVar();
 
 		const color = add(
