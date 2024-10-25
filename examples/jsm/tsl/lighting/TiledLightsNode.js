@@ -3,7 +3,7 @@ import {
 	Fn, If, Return, textureLoad, instanceIndex, screenCoordinate, directPointLight
 } from 'three/tsl';
 
-import * as THREE from 'three';
+import { DataTexture, FloatType, LightsNode, NodeUpdateType, RGBAFormat, StorageBufferAttribute, Vector2, Vector3 } from 'three';
 
 export const circleIntersectsAABB = /*@__PURE__*/ Fn( ( [ circleCenter, radius, minBounds, maxBounds ] ) => {
 
@@ -31,10 +31,10 @@ export const circleIntersectsAABB = /*@__PURE__*/ Fn( ( [ circleCenter, radius, 
 	]
 } );
 
-const _vector3 = /*@__PURE__*/ new THREE.Vector3();
-const _size = /*@__PURE__*/ new THREE.Vector2();
+const _vector3 = /*@__PURE__*/ new Vector3();
+const _size = /*@__PURE__*/ new Vector2();
 
-class TiledLightsNode extends THREE.LightsNode {
+class TiledLightsNode extends LightsNode {
 
 	static get type() {
 
@@ -60,11 +60,11 @@ class TiledLightsNode extends THREE.LightsNode {
 
 		this.lightsCount = uniform( 0, 'int' );
 		this.tileLightCount = 8;
-		this.screenSize = uniform( new THREE.Vector2() );
+		this.screenSize = uniform( new Vector2() );
 		this.cameraProjectionMatrix = uniform( 'mat4' );
 		this.cameraViewMatrix = uniform( 'mat4' );
 
-		this.updateBeforeType = THREE.NodeUpdateType.RENDER;
+		this.updateBeforeType = NodeUpdateType.RENDER;
 
 	}
 
@@ -281,17 +281,17 @@ class TiledLightsNode extends THREE.LightsNode {
 
 		const { tileSize, maxLights } = this;
 
-		const bufferSize = new THREE.Vector2( width, height );
+		const bufferSize = new Vector2( width, height );
 		const lineSize = Math.floor( bufferSize.width / tileSize );
 		const count = Math.floor( ( bufferSize.width * bufferSize.height ) / tileSize );
 
 		// buffers
 
 		const lightsData = new Float32Array( maxLights * 4 * 2 ); // 2048 lights, 4 elements(rgba), 2 components, 1 component per line (position, distance, color, decay)
-		const lightsTexture = new THREE.DataTexture( lightsData, lightsData.length / 8, 2, THREE.RGBAFormat, THREE.FloatType );
+		const lightsTexture = new DataTexture( lightsData, lightsData.length / 8, 2, RGBAFormat, FloatType );
 
 		const lightIndexesArray = new Int32Array( count * 4 * 2 );
-		const lightIndexesAttribute = new THREE.StorageBufferAttribute( lightIndexesArray, 4 );
+		const lightIndexesAttribute = new StorageBufferAttribute( lightIndexesArray, 4 );
 		const lightIndexes = storageObject( lightIndexesAttribute, 'ivec4', lightIndexesAttribute.count ).label( 'lightIndexes' );
 
 		// compute
