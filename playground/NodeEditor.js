@@ -24,14 +24,14 @@ export class NodeEditor extends THREE.EventDispatcher {
 		this.scene = scene;
 		this.renderer = renderer;
 
-		const { ScriptableResources } = Nodes;
+		const { ScriptableNodeResources } = Nodes;
 
-		ScriptableResources.set( 'THREE', THREE );
-		ScriptableResources.set( 'TSL', Nodes );
+		ScriptableNodeResources.set( 'THREE', THREE );
+		ScriptableNodeResources.set( 'TSL', Nodes );
 
-		ScriptableResources.set( 'scene', scene );
-		ScriptableResources.set( 'renderer', renderer );
-		ScriptableResources.set( 'composer', composer );
+		ScriptableNodeResources.set( 'scene', scene );
+		ScriptableNodeResources.set( 'renderer', renderer );
+		ScriptableNodeResources.set( 'composer', composer );
 
 		this.nodeClasses = [];
 
