@@ -99,6 +99,7 @@ const exceptionList = [
 	'webgl_renderer_pathtracer',
 	'webgl_shadowmap',
 	'webgl_shadowmap_progressive',
+	'webgpu_shadowmap_progressive',
 	'webgl_test_memory2',
 	'webgl_tiled_forward',
 	'webgl_points_dynamic',

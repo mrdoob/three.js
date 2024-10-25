@@ -412,6 +412,7 @@
 		"webgpu_shadertoy",
 		"webgpu_shadowmap",
 		"webgpu_shadowmap_opacity",
+		"webgpu_shadowmap_progressive",
 		"webgpu_shadowmap_vsm",
 		"webgpu_skinning",
 		"webgpu_skinning_instancing",
