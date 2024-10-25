@@ -9,7 +9,7 @@ import {
 } from 'three';
 
 import { CSMFrustum } from './CSMFrustum.js';
-import { reference, uniform, int, float, vec4, vec2, If, Fn, min, renderGroup, positionView, Node, NodeUpdateType, shadow } from 'three/tsl';
+import { viewZToOrthographicDepth, reference, uniform, int, float, vec4, vec2, If, Fn, min, renderGroup, positionView, Node, NodeUpdateType, shadow } from 'three/tsl';
 
 const _cameraToLightMatrix = new Matrix4();
 const _lightSpaceFrustum = new CSMFrustum();
@@ -77,6 +77,7 @@ class CSMShadowNode extends Node {
 
 			const lwLight = new LwLight();
 			const lShadow = light.shadow.clone();
+			lShadow.bias = lShadow.bias * ( i + 1 );
 
 			this.lights.push( lwLight );
 
@@ -258,7 +259,7 @@ class CSMShadowNode extends Node {
 		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
 			.onRenderUpdate( () => Math.min( this.maxFar, this.camera.far ) );
 
-		const linearDepth = positionView.z.div( shadowFar.sub( cameraNear ) ).negate().toVar( 'lDepth' );
+		const linearDepth = viewZToOrthographicDepth( positionView.z, cameraNear, shadowFar ).toVar( 'lDepth' );
 		const lastCascade = this.cascades - 1;
 
 		return Fn( () => {
@@ -332,7 +333,7 @@ class CSMShadowNode extends Node {
 		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
 			.onRenderUpdate( () => Math.min( this.maxFar, this.camera.far ) );
 
-		const linearDepth = positionView.z.div( shadowFar.sub( cameraNear ) ).negate().toVar( 'lDepth' );
+		const linearDepth = viewZToOrthographicDepth( positionView.z, cameraNear, shadowFar ).toVar( 'lDepth' );
 		const lastCascade = this.cascades - 1;
 
 		return Fn( () => {
@@ -372,7 +373,7 @@ class CSMShadowNode extends Node {
 		const camera = this.camera;
 		const frustums = this.frustums;
 
-		_lightDirection.subVectors( light.target.position, light.position );
+		_lightDirection.subVectors( light.target.position, light.position ).normalize();
 
 		// for each frustum we need to find its min-max box aligned with the light orientation
 		// the position in _lightOrientationMatrix does not matter, as we transform there and back
