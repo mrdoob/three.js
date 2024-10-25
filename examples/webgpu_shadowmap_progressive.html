@@ -32,7 +32,7 @@
 			import { ProgressiveLightMap } from 'three/addons/misc/ProgressiveLightMapGPU.js';
 
 			// ShadowMap + LightMap Res and Number of Directional Lights
-			const shadowMapRes = 512, lightMapRes = 1024, lightCount = 4;
+			const shadowMapRes = 1024, lightMapRes = 1024, lightCount = 4;
 			let camera, scene, renderer, controls, control, control2,
 				object = new THREE.Mesh(), lightOrigin = null, progressiveSurfacemap;
 			const dirLights = [], lightmapObjects = [];
@@ -94,6 +94,7 @@
 					dirLight.shadow.camera.bottom = - 150;
 					dirLight.shadow.mapSize.width = shadowMapRes;
 					dirLight.shadow.mapSize.height = shadowMapRes;
+					dirLight.shadow.bias = - 0.001;
 					lightmapObjects.push( dirLight );
 					dirLights.push( dirLight );
 
@@ -186,7 +187,7 @@
 				gui.add( params, 'Blend Window', 1, 500 ).step( 1 );
 				gui.add( params, 'Light Radius', 0, 200 ).step( 10 );
 				gui.add( params, 'Ambient Weight', 0, 1 ).step( 0.1 );
-				gui.add( params, 'Debug Lightmap' );
+				gui.add( params, 'Debug Lightmap' ).onChange( ( value ) => progressiveSurfacemap.showDebugLightmap( value ) );
 
 			}
 
@@ -207,12 +208,6 @@
 				if ( params[ 'Enable' ] ) {
 
 					progressiveSurfacemap.update( camera, params[ 'Blend Window' ], params[ 'Blur Edges' ] );
-
-					if ( ! progressiveSurfacemap.firstUpdate ) {
-
-						progressiveSurfacemap.showDebugLightmap( params[ 'Debug Lightmap' ] );
-
-					}
 
 				}
 

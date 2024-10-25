@@ -1,5 +1,5 @@
 import { DoubleSide, FloatType, HalfFloatType, PlaneGeometry, Mesh, RenderTarget, Scene } from 'three';
-import { add, float, Fn, mix, MeshPhongNodeMaterial, NodeMaterial, sub, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
+import { add, float, Fn, mix, MeshPhongNodeMaterial, NodeMaterial, output, sub, texture, uniform, uv, vec2, vec3, vec4 } from 'three/tsl';
 
 import { potpack } from '../libs/potpack.module.js';
 
@@ -29,7 +29,6 @@ class ProgressiveLightMap {
 		this._lightMapContainers = [];
 		this._scene = new Scene();
 		this._buffer1Active = false;
-		this._firstUpdate = true;
 		this._labelMesh = null;
 		this._blurringPlane = null;
 
@@ -47,11 +46,11 @@ class ProgressiveLightMap {
 
 		// materials
 
-		const uvNode = uv( 1 );
+		const uvNode = uv( 1 ).flipY();
 
 		this._uvMat = new MeshPhongNodeMaterial();
 		this._uvMat.vertexNode = vec4( sub( uvNode, vec2( 0.5 ) ).mul( 2 ), 1, 1 );
-		//this._uvMat.colorNode = vec4( mix( this._previousShadowMap.uv( uvNode ).rgb, vec3( 1 ), float( 1 ).div( this._averagingWindow ) ), 1 );
+		this._uvMat.outputNode = vec4( mix( this._previousShadowMap.uv( uv( 1 ) ), output, float( 1 ).div( this._averagingWindow ) ) );
 
 	}
 
@@ -85,7 +84,7 @@ class ProgressiveLightMap {
 
 			if ( this._blurringPlane === null ) {
 
-				this._initializeBlurPlane( this.resolution, this._progressiveLightMap1 );
+				this._initializeBlurPlane();
 
 			}
 
@@ -112,7 +111,7 @@ class ProgressiveLightMap {
 			for ( let i = 0; i < uv1.array.length; i += uv1.itemSize ) {
 
 				uv1.array[ i ] = ( uv1.array[ i ] + box.x + padding ) / dimensions.w;
-				uv1.array[ i + 1 ] = ( uv1.array[ i + 1 ] + box.y + padding ) / dimensions.h;
+				uv1.array[ i + 1 ] = 1 - ( ( uv1.array[ i + 1 ] + box.y + padding ) / dimensions.h );
 
 			}
 
@@ -155,7 +154,7 @@ class ProgressiveLightMap {
 	 * @param {number} blendWindow When >1, samples will accumulate over time.
 	 * @param {boolean} blurEdges  Whether to fix UV Edges via blurring
 	 */
-	async update( camera, blendWindow = 100, blurEdges = true ) {
+	update( camera, blendWindow = 100, blurEdges = true ) {
 
 		if ( this._blurringPlane === null ) {
 
@@ -174,14 +173,6 @@ class ProgressiveLightMap {
 
 			this._lightMapContainers[ l ].object.oldScene = this._lightMapContainers[ l ].object.parent;
 			this._scene.attach( this._lightMapContainers[ l ].object );
-
-		}
-
-		// Initialize everything
-		if ( this._firstUpdate === true ) {
-
-			this.renderer.compile( this._scene, camera );
-			this._firstUpdate = false;
 
 		}
 
@@ -238,7 +229,7 @@ class ProgressiveLightMap {
 		if ( this._labelMesh === null ) {
 
 			const labelMaterial = new NodeMaterial();
-			labelMaterial.colorNode = texture( this._progressiveLightMap1.texture );
+			labelMaterial.colorNode = texture( this._progressiveLightMap1.texture ).uv( uv().flipY() );
 			labelMaterial.side = DoubleSide;
 
 			const labelGeometry = new PlaneGeometry( 100, 100 );
@@ -270,24 +261,23 @@ class ProgressiveLightMap {
 		blurMaterial.polygonOffsetFactor = - 1;
 		blurMaterial.polygonOffsetUnits = 3;
 
-		const uvNode = uv();
+		blurMaterial.vertexNode = vec4( uv(), 1, 1 );
 
-		blurMaterial.vertexNode = vec4( sub( uvNode, vec2( 0.5 ).mul( 2 ), 1, 1 ) );
-
+		const uvNode = uv().flipY();
 		const pixelOffset = float( 0.5 ).div( float( this.resolution ) ).toVar();
 
 		const color = add(
-			this._previousShadowMap.uv( uvNode.add( vec2( pixelOffset, 0 ) ) ).rgb,
-			this._previousShadowMap.uv( uvNode.add( vec2( 0, pixelOffset ) ) ).rgb,
-			this._previousShadowMap.uv( uvNode.add( vec2( 0, pixelOffset.negate() ) ) ).rgb,
-			this._previousShadowMap.uv( uvNode.add( vec2( pixelOffset.negate(), 0 ) ) ).rgb,
-			this._previousShadowMap.uv( uvNode.add( vec2( pixelOffset, pixelOffset ) ) ).rgb,
-			this._previousShadowMap.uv( uvNode.add( vec2( pixelOffset.negate(), pixelOffset ) ) ).rgb,
-			this._previousShadowMap.uv( uvNode.add( vec2( pixelOffset, pixelOffset.negate() ) ) ).rgb,
-			this._previousShadowMap.uv( uvNode.add( vec2( pixelOffset.negate(), pixelOffset.negate() ) ) ).rgb,
-		);
+			this._previousShadowMap.uv( uvNode.add( vec2( pixelOffset, 0 ) ) ),
+			this._previousShadowMap.uv( uvNode.add( vec2( 0, pixelOffset ) ) ),
+			this._previousShadowMap.uv( uvNode.add( vec2( 0, pixelOffset.negate() ) ) ),
+			this._previousShadowMap.uv( uvNode.add( vec2( pixelOffset.negate(), 0 ) ) ),
+			this._previousShadowMap.uv( uvNode.add( vec2( pixelOffset, pixelOffset ) ) ),
+			this._previousShadowMap.uv( uvNode.add( vec2( pixelOffset.negate(), pixelOffset ) ) ),
+			this._previousShadowMap.uv( uvNode.add( vec2( pixelOffset, pixelOffset.negate() ) ) ),
+			this._previousShadowMap.uv( uvNode.add( vec2( pixelOffset.negate(), pixelOffset.negate() ) ) ),
+		).div( 8 );
 
-		blurMaterial.fragmentNode = vec4( color, 1 );
+		blurMaterial.fragmentNode = color;
 
 		this._blurringPlane = new Mesh( new PlaneGeometry( 1, 1 ), blurMaterial );
 		this._blurringPlane.name = 'Blurring Plane';
