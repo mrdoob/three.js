@@ -9,7 +9,7 @@ import {
 } from 'three';
 
 import { CSMFrustum } from './CSMFrustum.js';
-import { viewZToOrthographicDepth, reference, uniform, int, float, vec4, vec2, If, Fn, min, renderGroup, positionView, Node, NodeUpdateType, shadow } from 'three/tsl';
+import { viewZToOrthographicDepth, reference, uniform, float, vec4, vec2, If, Fn, min, renderGroup, positionView, Node, NodeUpdateType, shadow } from 'three/tsl';
 
 const _cameraToLightMatrix = new Matrix4();
 const _lightSpaceFrustum = new CSMFrustum();
