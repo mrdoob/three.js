@@ -39,14 +39,14 @@
 				orthographic: false,
 				fade: false,
 				shadows: true,
-				far: 1000,
+				maxFar: 1000,
 				mode: 'practical',
 				lightX: - 1,
 				lightY: - 1,
 				lightZ: - 1,
 				margin: 100,
-				lightFar: 5000,
-				lightNear: 1,
+				shadowNear: 1,
+				shadowFar: 2000,
 				autoUpdateHelper: true,
 				updateHelper: function () {
 
@@ -105,15 +105,15 @@
 				csmDirectionalLight.castShadow = true;
 				csmDirectionalLight.shadow.mapSize.width = 2048;
 				csmDirectionalLight.shadow.mapSize.height = 2048;
-				csmDirectionalLight.shadow.camera.near = 1;
-				csmDirectionalLight.shadow.camera.far = 1000;
+				csmDirectionalLight.shadow.camera.near = params.shadowNear;
+				csmDirectionalLight.shadow.camera.far = params.shadowFar;
 				csmDirectionalLight.shadow.camera.top = 1000;
 				csmDirectionalLight.shadow.camera.bottom = - 1000;
 				csmDirectionalLight.shadow.camera.left = - 1000;
 				csmDirectionalLight.shadow.camera.right = 1000;
 				csmDirectionalLight.shadow.bias = - 0.001;
 
-				csm = new CSMShadowNode( csmDirectionalLight, { cascades: 4, maxFar: params.far, mode: params.mode } );
+				csm = new CSMShadowNode( csmDirectionalLight, { cascades: 4, maxFar: params.maxFar, mode: params.mode } );
 
 				csmDirectionalLight.position.set( params.lightX, params.lightY, params.lightZ ).normalize().multiplyScalar( - 200 );
 
@@ -166,12 +166,13 @@
 
 				} );
 
-				gui.add( params, 'fade' ).onChange( function ( value ) {
+				// gui.add( params, 'fade' ).onChange( function ( value ) {
 
-					csm.fade = value;
-					csm.updateFrustums();
+				// csm.fade = value;
+				// csm.updateFrustums();
+				// TODO: Changing "fade" requires toggling shadows right now
 
-				} );
+				// } );
 
 				gui.add( params, 'shadows' ).onChange( function ( value ) {
 
@@ -179,7 +180,7 @@
 
 				} );
 
-				gui.add( params, 'far', 1, 5000 ).step( 1 ).name( 'shadow far' ).onChange( function ( value ) {
+				gui.add( params, 'maxFar', 1, 5000 ).step( 1 ).name( 'max shadow far' ).onChange( function ( value ) {
 
 					csm.maxFar = value;
 					csm.updateFrustums();
@@ -193,19 +194,19 @@
 
 				} );
 
-				gui.add( params, 'lightX', - 1, 1 ).name( 'light direction x' ).onChange( function ( value ) {
+				gui.add( params, 'lightX', - 1, 1 ).name( 'light direction x' ).onChange( function () {
 
 					csmDirectionalLight.position.set( params.lightX, params.lightY, params.lightZ ).normalize().multiplyScalar( - 200 );
 
 				} );
 
-				gui.add( params, 'lightY', - 1, 1 ).name( 'light direction y' ).onChange( function ( value ) {
+				gui.add( params, 'lightY', - 1, 1 ).name( 'light direction y' ).onChange( function () {
 
 					csmDirectionalLight.position.set( params.lightX, params.lightY, params.lightZ ).normalize().multiplyScalar( - 200 );
 
 				} );
 
-				gui.add( params, 'lightZ', - 1, 1 ).name( 'light direction z' ).onChange( function ( value ) {
+				gui.add( params, 'lightZ', - 1, 1 ).name( 'light direction z' ).onChange( function () {
 
 					csmDirectionalLight.position.set( params.lightX, params.lightY, params.lightZ ).normalize().multiplyScalar( - 200 );
 
@@ -217,7 +218,7 @@
 
 				} );
 
-				gui.add( params, 'lightNear', 1, 10000 ).name( 'light near' ).onChange( function ( value ) {
+				gui.add( params, 'shadowNear', 1, 10000 ).name( 'shadow near' ).onChange( function ( value ) {
 
 					for ( let i = 0; i < csm.lights.length; i ++ ) {
 
@@ -228,7 +229,7 @@
 
 				} );
 
-				gui.add( params, 'lightFar', 1, 10000 ).name( 'light far' ).onChange( function ( value ) {
+				gui.add( params, 'shadowFar', 1, 10000 ).name( 'shadow far' ).onChange( function ( value ) {
 
 					for ( let i = 0; i < csm.lights.length; i ++ ) {
 

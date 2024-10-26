@@ -259,7 +259,7 @@ class CSMShadowNode extends Node {
 		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
 			.onRenderUpdate( () => Math.min( this.maxFar, this.camera.far ) );
 
-		const linearDepth = viewZToOrthographicDepth( positionView.z, cameraNear, shadowFar ).toVar( 'lDepth' );
+		const linearDepth = viewZToOrthographicDepth( positionView.z, cameraNear, shadowFar ).toVar( 'linearDepth' );
 		const lastCascade = this.cascades - 1;
 
 		return Fn( () => {
@@ -298,11 +298,11 @@ class CSMShadowNode extends Node {
 
 				}
 
-				const inRange = linearDepth.greaterThanEqual( csmX ).and( linearDepth.lessThan( csmY ) );
+				const inRange = linearDepth.greaterThanEqual( csmX ).and( linearDepth.lessThanEqual( csmY ) );
 
 				If( inRange, () => {
 
-					const dist = min( linearDepth.sub( csmX ), csmY.sub( linearDepth ) );
+					const dist = min( linearDepth.sub( csmX ), csmY.sub( linearDepth ) ).toVar();
 
 					let ratio = dist.div( margin ).clamp( 0.0, 1.0 );
 
@@ -333,8 +333,7 @@ class CSMShadowNode extends Node {
 		const shadowFar = uniform( 'float' ).setGroup( renderGroup ).label( 'shadowFar' )
 			.onRenderUpdate( () => Math.min( this.maxFar, this.camera.far ) );
 
-		const linearDepth = viewZToOrthographicDepth( positionView.z, cameraNear, shadowFar ).toVar( 'lDepth' );
-		const lastCascade = this.cascades - 1;
+		const linearDepth = viewZToOrthographicDepth( positionView.z, cameraNear, shadowFar ).toVar( 'linearDepth' );
 
 		return Fn( () => {
 
@@ -345,9 +344,9 @@ class CSMShadowNode extends Node {
 
 				cascade.assign( cascades.element( i ) );
 
-				If( linearDepth.greaterThanEqual( cascade.x ).and( linearDepth.lessThan( cascade.y ).or( int( i ).equal( float( lastCascade ) ) ) ), () => {
+				If( linearDepth.greaterThanEqual( cascade.x ).and( linearDepth.lessThanEqual( cascade.y ) ), () => {
 
-					linearDepth.lessThan( cascade.y ).select( ret.assign( this._shadowNodes[ i ] ) );
+					ret.assign( this._shadowNodes[ i ] );
 
 				} );
 
