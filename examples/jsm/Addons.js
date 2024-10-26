@@ -3,8 +3,6 @@ export * from './animation/CCDIKSolver.js';
 export * from './animation/MMDAnimationHelper.js';
 export * from './animation/MMDPhysics.js';
 
-export * from './cameras/CinematicCamera.js';
-
 export { default as WebGL } from './capabilities/WebGL.js';
 
 export * from './controls/ArcballControls.js';
