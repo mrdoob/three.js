@@ -2264,6 +2264,12 @@ class LDrawLoader extends Loader {
 			edgeMaterial.userData.code = code;
 			edgeMaterial.name = name + ' - Edge';
 
+			if ( this.ConditionalLineMaterial === null ) {
+
+				throw new Error( 'THREE.LDrawLoader: ConditionalLineMaterial type must be specificed via .setConditionalLineMaterial().' );
+
+			}
+
 			// This is the material used for conditional edges
 			const conditionalEdgeMaterial = new this.ConditionalLineMaterial( {
 
