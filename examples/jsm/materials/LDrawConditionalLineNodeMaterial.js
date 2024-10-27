@@ -60,7 +60,7 @@ class LDrawConditionalLineMaterial extends NodeMaterial {
 
 			discardFlag.greaterThan( float( 0.5 ) ).discard();
 
-			return vec4( 0, 0, 0, this._opacityUniform );
+			return vec4( this._diffuseUniform, this._opacityUniform );
 
 		} )();
 
