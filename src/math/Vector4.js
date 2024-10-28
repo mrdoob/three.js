@@ -249,6 +249,17 @@ class Vector4 {
 
 	}
 
+	divide( v ) {
+
+		this.x /= v.x;
+		this.y /= v.y;
+		this.z /= v.z;
+		this.w /= v.w;
+
+		return this;
+
+	}
+
 	divideScalar( scalar ) {
 
 		return this.multiplyScalar( 1 / scalar );
