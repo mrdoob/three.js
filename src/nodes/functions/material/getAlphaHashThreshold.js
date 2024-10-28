@@ -1,4 +1,4 @@
-import { abs, add, ceil, clamp, dFdx, dFdy, exp2, float, floor, Fn, fract, If, length, log2, max, min, mul, sin, sub, vec2, vec3 } from '../../tsl/TSLBase.js';
+import { abs, add, ceil, clamp, dFdx, dFdy, exp2, float, floor, Fn, fract, length, log2, max, min, mul, sin, sub, vec2, vec3 } from '../../tsl/TSLBase.js';
 
 /**
  * See: https://casual-effects.com/research/Wyman2017Hashed/index.html
