@@ -372,7 +372,7 @@ class NodeMaterial extends Material {
 
 		if ( this.alphaHash === true ) {
 
-			diffuseColor.a.lessThanEqual( getAlphaHashThreshold( positionLocal ) ).discard();
+			diffuseColor.a.lessThan( getAlphaHashThreshold( positionLocal ) ).discard();
 
 		}
 
