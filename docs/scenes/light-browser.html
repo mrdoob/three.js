@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Three.js Light Browser</title>
+		<link rel="shortcut icon" href="../../files/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="../../files/main.css">
+		<style>
+			canvas {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+
+			#newWindow {
+				display: block;
+				position: absolute;
+				bottom: 0.3em;
+				left: 0.5em;
+				color: #fff;
+			}
+		</style>
+	</head>
+	<body>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../../build/three.module.js",
+					"three/addons/": "../../examples/jsm/"
+				}
+			}
+		</script>
+
+		<a id='newWindow' href='./light-browser.html' target='_blank'>Open in New Window</a>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+			function generateVertexColors( geometry ) {
+
+				const positionAttribute = geometry.attributes.position;
+
+				const colors = [];
+				const color = new THREE.Color();
+
+				for ( let i = 0, il = positionAttribute.count; i < il; i ++ ) {
+
+					color.setHSL( i / il * Math.random(), 0.5, 0.5 );
+					colors.push( color.r, color.g, color.b );
+
+				}
+
+				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+
+			}
+
+			function handleColorChange( color ) {
+
+				return function ( value ) {
+
+					if ( typeof value === 'string' ) {
+
+						value = value.replace( '#', '0x' );
+
+					}
+
+					color.setHex( value );
+
+				};
+
+			}
+
+			function guiScene( gui, scene ) {
+
+				const folder = gui.addFolder( 'Scene' );
+
+				guiSceneFog( folder, scene );
+
+			}
+
+			function guiSceneFog( folder, scene ) {
+
+				const fogFolder = folder.addFolder( 'scene.fog' );
+
+				const fog = new THREE.Fog( 0x3f7b9d, 0, 60 );
+
+				const data = {
+					fog: {
+						'THREE.Fog()': false,
+						'scene.fog.color': fog.color.getHex()
+					}
+				};
+
+				fogFolder.add( data.fog, 'THREE.Fog()' ).onChange( function ( useFog ) {
+
+					if ( useFog ) {
+
+						scene.fog = fog;
+
+					} else {
+
+						scene.fog = null;
+
+					}
+
+				} );
+
+				fogFolder.addColor( data.fog, 'scene.fog.color' ).onChange( handleColorChange( fog.color ) );
+
+			}
+
+			/**
+                * @param {GUI} gui
+                * @param {THREE.Light} light
+            */
+			function guiLight( gui, light ) {
+
+				const data = { color: light.color.getHex() };
+
+				const folder = gui.addFolder( 'THREE.Light' );
+
+				folder.addColor( data, 'color' ).onChange( handleColorChange( light.color ) );
+				folder.add( light, 'intensity', 0, 10 ).step( 0.1 );
+
+			}
+
+			function chooseFromHash( gui ) {
+
+				const selectedLight = window.location.hash.substring( 1 ) || 'AmbientLight';
+
+				const lights = [];
+
+				switch ( selectedLight ) {
+
+					case 'AmbientLight' :
+
+						const light = new THREE.AmbientLight( 0xffffff, 2 );
+						guiLight( gui, light );
+						// No custom properties for AmbientLight
+
+						lights.push( light );
+
+						break;
+
+				}
+
+				return lights;
+
+			}
+
+			// Scene
+
+			const selectedLight = window.location.hash.substring( 1 );
+
+			if ( THREE[ selectedLight ] !== undefined ) {
+
+				document.getElementById( 'newWindow' ).href += '#' + selectedLight;
+
+			}
+
+			const gui = new GUI();
+
+			const renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.toneMapping = THREE.ReinhardToneMapping;
+			document.body.appendChild( renderer.domElement );
+
+			const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+			const scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0x444444 );
+			scene.environment = pmremGenerator.fromScene( new RoomEnvironment(), 0.04 ).texture;
+
+			const camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 10, 100 );
+			camera.position.z = 55;
+
+			guiScene( gui, scene );
+
+			const geometry = new THREE.TorusKnotGeometry( 10, 3, 200, 32 ).toNonIndexed();
+
+			generateVertexColors( geometry );
+
+			const torus = new THREE.Mesh( geometry );
+			torus.material = new THREE.MeshStandardMaterial( { color: 0x049EF4, roughness: 0.5, metalness: 0.5 } );
+			torus.castShadow = true;
+			torus.receiveShadow = true;
+			scene.add( torus );
+
+			// Used to display shadows later on
+			const floor = new THREE.Mesh(
+				new THREE.PlaneGeometry( 100, 100 ),
+				new THREE.MeshStandardMaterial( { color: 0x96c738, roughness: 0.5, metalness: 0.5 } )
+			);
+			floor.rotation.x = - Math.PI / 2;
+			floor.position.y = - 20;
+			floor.receiveShadow = true;
+			scene.add( floor );
+
+			const lights = chooseFromHash( gui );
+			lights.forEach( light => scene.add( light ) );
+
+			let prevFog = false;
+
+			function render() {
+
+				requestAnimationFrame( render );
+
+				torus.rotation.x += 0.005;
+				torus.rotation.y += 0.005;
+
+				if ( prevFog !== scene.fog ) {
+
+					torus.material.needsUpdate = true;
+					prevFog = scene.fog;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+			window.addEventListener( 'resize', function () {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}, false );
+
+			render();
+
+		</script>
+	</body>
+</html>
