@@ -2601,6 +2601,17 @@ class Vector4 {
 
 	}
 
+	divide( v ) {
+
+		this.x /= v.x;
+		this.y /= v.y;
+		this.z /= v.z;
+		this.w /= v.w;
+
+		return this;
+
+	}
+
 	divideScalar( scalar ) {
 
 		return this.multiplyScalar( 1 / scalar );
@@ -27147,18 +27158,14 @@ class WebXRManager extends EventDispatcher {
 		//
 
 		const cameraL = new PerspectiveCamera();
-		cameraL.layers.enable( 1 );
 		cameraL.viewport = new Vector4();
 
 		const cameraR = new PerspectiveCamera();
-		cameraR.layers.enable( 2 );
 		cameraR.viewport = new Vector4();
 
 		const cameras = [ cameraL, cameraR ];
 
 		const cameraXR = new ArrayCamera();
-		cameraXR.layers.enable( 1 );
-		cameraXR.layers.enable( 2 );
 
 		let _currentDepthNear = null;
 		let _currentDepthFar = null;
@@ -27667,6 +27674,10 @@ class WebXRManager extends EventDispatcher {
 				_currentDepthFar = cameraXR.far;
 
 			}
+
+			cameraL.layers.mask = camera.layers.mask | 0b010;
+			cameraR.layers.mask = camera.layers.mask | 0b100;
+			cameraXR.layers.mask = cameraL.layers.mask | cameraR.layers.mask;
 
 			const parent = camera.parent;
 			const cameras = cameraXR.cameras;
