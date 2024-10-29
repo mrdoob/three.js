@@ -3,7 +3,7 @@ import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
 import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
 import { NodeFrame } from '../../../nodes/Nodes.js';
-import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, normalWorld, pmremTexture, screenUV } from '../../../nodes/TSL.js';
+import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, pmremTexture, screenUV } from '../../../nodes/TSL.js';
 
 import { CubeUVReflectionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
 import { hashArray } from '../../../nodes/core/NodeUtils.js';
@@ -279,7 +279,7 @@ class Nodes extends DataMap {
 
 					if ( scene.backgroundBlurriness > 0 || background.mapping === CubeUVReflectionMapping ) {
 
-						backgroundNode = pmremTexture( background, normalWorld );
+						backgroundNode = pmremTexture( background );
 
 					} else {
 
