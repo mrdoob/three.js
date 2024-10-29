@@ -22,6 +22,7 @@ import { depth, perspectiveDepthToLogarithmicDepth, viewZToOrthographicDepth } f
 import { cameraFar, cameraNear } from '../../nodes/accessors/Camera.js';
 import { clipping, clippingAlpha } from '../../nodes/accessors/ClippingNode.js';
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
+import getAlphaHashThreshold from '../../nodes/functions/material/getAlphaHashThreshold.js';
 
 class NodeMaterial extends Material {
 
@@ -364,6 +365,14 @@ class NodeMaterial extends Material {
 			const alphaTestNode = this.alphaTestNode !== null ? float( this.alphaTestNode ) : materialAlphaTest;
 
 			diffuseColor.a.lessThanEqual( alphaTestNode ).discard();
+
+		}
+
+		// ALPHA HASH
+
+		if ( this.alphaHash === true ) {
+
+			diffuseColor.a.lessThan( getAlphaHashThreshold( positionLocal ) ).discard();
 
 		}
 
