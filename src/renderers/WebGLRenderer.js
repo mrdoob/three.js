@@ -2565,7 +2565,7 @@ class WebGLRenderer {
 
 		const _srcFramebuffer = _gl.createFramebuffer();
 		const _dstFramebuffer = _gl.createFramebuffer();
-		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
+		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = null ) {
 
 			// support previous signature with dstPosition first
 			if ( srcTexture.isTexture !== true ) {
@@ -2578,6 +2578,24 @@ class WebGLRenderer {
 				dstTexture = arguments[ 2 ];
 				dstLevel = arguments[ 3 ] || 0;
 				srcRegion = null;
+
+			}
+
+			// support the previous signature with just a single dst mipmap level
+			if ( dstLevel === null ) {
+
+				if ( srcLevel !== 0 ) {
+
+					// @deprecated, r170
+					warnOnce( 'WebGLRenderer: copyTextureToTexture function signature has changed to support src and dst mipmap levels.' );
+					dstLevel = srcLevel;
+					srcLevel = 0;
+
+				} else {
+
+					dstLevel = 0;
+
+				}
 
 			}
 
