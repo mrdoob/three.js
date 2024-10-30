@@ -2563,7 +2563,7 @@ class WebGLRenderer {
 
 		};
 
-		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, level = 0 ) {
+		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
 
 			// support previous signature with dstPosition first
 			if ( srcTexture.isTexture !== true ) {
@@ -2574,7 +2574,7 @@ class WebGLRenderer {
 				dstPosition = arguments[ 0 ] || null;
 				srcTexture = arguments[ 1 ];
 				dstTexture = arguments[ 2 ];
-				level = arguments[ 3 ] || 0;
+				dstLevel = arguments[ 3 ] || 0;
 				srcRegion = null;
 
 			}
@@ -2582,7 +2582,7 @@ class WebGLRenderer {
 			// gather the necessary dimensions to copy
 			let width, height, depth, minX, minY, minZ;
 			let dstX, dstY, dstZ;
-			const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ level ] : srcTexture.image;
+			const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ dstLevel ] : srcTexture.image;
 			if ( srcRegion !== null ) {
 
 				width = srcRegion.max.x - srcRegion.min.x;
@@ -2674,7 +2674,11 @@ class WebGLRenderer {
 					// if the source or destination are a 3d target then a layer needs to be bound
 					if ( isSrc3D ) {
 
-						_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, level, minZ + i );
+						_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, srcLevel, minZ + i );
+
+					} else {
+
+						_gl.framebufferTexture2D( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, srcLevel );
 
 					}
 
@@ -2682,7 +2686,11 @@ class WebGLRenderer {
 
 						if ( isDst3D ) {
 
-							_gl.framebufferTextureLayer( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, level, dstZ + i );
+							_gl.framebufferTextureLayer( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, dstLevel, dstZ + i );
+
+						} else {
+
+							_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, dstLevel );
 
 						}
 
@@ -2690,11 +2698,11 @@ class WebGLRenderer {
 
 					} else if ( isDst3D ) {
 
-						_gl.copyTexSubImage3D( glTarget, level, dstX, dstY, dstZ + i, minX, minY, width, height );
+						_gl.copyTexSubImage3D( glTarget, dstLevel, dstX, dstY, dstZ + i, minX, minY, width, height );
 
 					} else {
 
-						_gl.copyTexSubImage2D( glTarget, level, dstX, dstY, dstZ + i, minX, minY, width, height );
+						_gl.copyTexSubImage2D( glTarget, dstLevel, dstX, dstY, dstZ + i, minX, minY, width, height );
 
 					}
 
@@ -2703,6 +2711,64 @@ class WebGLRenderer {
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
 				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
 
+			} else if ( srcLevel !== 0 ) {
+
+				// get the appropriate frame buffers
+				const srcTextureProperties = properties.get( srcTexture );
+				const dstTextureProperties = properties.get( dstTexture );
+				let srcFrameBuffer, dstFrameBuffer;
+				if ( srcTextureProperties.__renderTarget ) {
+
+					srcFrameBuffer = properties.get( srcTextureProperties.__renderTarget ).__webglFramebuffer;
+
+				} else {
+
+					srcFrameBuffer = _gl.createFramebuffer();
+
+				}
+
+				if ( dstTextureProperties.__renderTarget ) {
+
+					dstFrameBuffer = properties.get( dstTextureProperties.__renderTarget ).__webglFramebuffer;
+
+				} else {
+
+					dstFrameBuffer = _gl.createFramebuffer();
+
+				}
+
+				// bind the frame buffer targets
+				_gl.bindFramebuffer( _gl.READ_FRAMEBUFFER, srcFrameBuffer );
+				_gl.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, dstFrameBuffer );
+
+				for ( let i = 0; i < depth; i ++ ) {
+
+					// assign the correct layers and mip maps
+					if ( isSrc3D ) {
+
+						_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, srcLevel, minZ + i );
+
+					} else {
+
+						_gl.framebufferTexture2D( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, srcLevel );
+
+					}
+
+					if ( isDst3D ) {
+
+						_gl.framebufferTextureLayer( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, dstLevel, dstZ + i );
+
+					} else {
+
+						_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, dstLevel );
+
+					}
+
+					// blit the data
+					_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.DEPTH_BUFFER_BIT, _gl.NEAREST );
+
+				}
+
 			} else {
 
 				if ( isDst3D ) {
@@ -2710,15 +2776,15 @@ class WebGLRenderer {
 					// copy data into the 3d texture
 					if ( srcTexture.isDataTexture || srcTexture.isData3DTexture ) {
 
-						_gl.texSubImage3D( glTarget, level, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image.data );
+						_gl.texSubImage3D( glTarget, dstLevel, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image.data );
 
 					} else if ( dstTexture.isCompressedArrayTexture ) {
 
-						_gl.compressedTexSubImage3D( glTarget, level, dstX, dstY, dstZ, width, height, depth, glFormat, image.data );
+						_gl.compressedTexSubImage3D( glTarget, dstLevel, dstX, dstY, dstZ, width, height, depth, glFormat, image.data );
 
 					} else {
 
-						_gl.texSubImage3D( glTarget, level, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image );
+						_gl.texSubImage3D( glTarget, dstLevel, dstX, dstY, dstZ, width, height, depth, glFormat, glType, image );
 
 					}
 
@@ -2727,15 +2793,15 @@ class WebGLRenderer {
 					// copy data into the 2d texture
 					if ( srcTexture.isDataTexture ) {
 
-						_gl.texSubImage2D( _gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image.data );
+						_gl.texSubImage2D( _gl.TEXTURE_2D, dstLevel, dstX, dstY, width, height, glFormat, glType, image.data );
 
 					} else if ( srcTexture.isCompressedTexture ) {
 
-						_gl.compressedTexSubImage2D( _gl.TEXTURE_2D, level, dstX, dstY, image.width, image.height, glFormat, image.data );
+						_gl.compressedTexSubImage2D( _gl.TEXTURE_2D, dstLevel, dstX, dstY, image.width, image.height, glFormat, image.data );
 
 					} else {
 
-						_gl.texSubImage2D( _gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
+						_gl.texSubImage2D( _gl.TEXTURE_2D, dstLevel, dstX, dstY, width, height, glFormat, glType, image );
 
 					}
 
@@ -2751,7 +2817,7 @@ class WebGLRenderer {
 			_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, currentUnpackSkipImages );
 
 			// Generate mipmaps only when copying level 0
-			if ( level === 0 && dstTexture.generateMipmaps ) {
+			if ( dstLevel === 0 && dstTexture.generateMipmaps ) {
 
 				_gl.generateMipmap( glTarget );
 
