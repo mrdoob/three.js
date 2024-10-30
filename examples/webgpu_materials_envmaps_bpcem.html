@@ -166,6 +166,8 @@
 				renderer.setAnimationLoop( animate );
 				document.body.appendChild( renderer.domElement );
 
+				window.addEventListener( 'resize', onWindowResize );
+
 				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
@@ -186,6 +188,15 @@
 
 				} );
 				gui.add( roughnessUniform, 'value', 0, 1 ).name( 'roughness' );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
