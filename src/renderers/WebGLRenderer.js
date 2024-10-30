@@ -2568,7 +2568,7 @@ class WebGLRenderer {
 		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = null ) {
 
 			// support previous signature with dstPosition first
-			if ( srcTexture.isTexture !== true ) {
+			if ( srcTexture && srcTexture.isTexture !== true ) {
 
 				// @deprecated, r165
 				warnOnce( 'WebGLRenderer: copyTextureToTexture function signature has changed.' );
@@ -2602,15 +2602,25 @@ class WebGLRenderer {
 			// gather the necessary dimensions to copy
 			let width, height, depth, minX, minY, minZ;
 			let dstX, dstY, dstZ;
-			const image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ dstLevel ] : srcTexture.image;
+			const image = srcTexture ? ( srcTexture.isCompressedTexture ? srcTexture.mipmaps[ dstLevel ] : srcTexture.image ) : null;
 			if ( srcRegion !== null ) {
 
+				console.log(srcRegion.max, srcRegion.min, srcRegion)
 				width = srcRegion.max.x - srcRegion.min.x;
 				height = srcRegion.max.y - srcRegion.min.y;
 				depth = srcRegion.isBox3 ? srcRegion.max.z - srcRegion.min.z : 1;
 				minX = srcRegion.min.x;
 				minY = srcRegion.min.y;
 				minZ = srcRegion.isBox3 ? srcRegion.min.z : 0;
+
+			} else if ( image === null ) {
+
+				width = _width;
+				height = _height;
+				depth = 1;
+				minX = 0;
+				minY = 0;
+				minZ = 0;
 
 			} else {
 
@@ -2670,16 +2680,28 @@ class WebGLRenderer {
 			const currentUnpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
 			const currentUnpackSkipImages = _gl.getParameter( _gl.UNPACK_SKIP_IMAGES );
 
-			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
-			_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, image.height );
+			if ( image ) {
+
+				_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
+				_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, image.height );
+
+			}
+
 			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, minX );
 			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, minY );
 			_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, minZ );
 
 			// set up the src texture
-			const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture;
+			const isSrc3D = srcTexture === null ? false : srcTexture.isDataArrayTexture || srcTexture.isData3DTexture;
 			const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture;
-			if ( srcTexture.isDepthTexture ) {
+			if ( srcTexture === null ) {
+
+				console.log( width, height )
+				textures.setTexture2D( dstTexture, 0 );
+				_gl.copyTexSubImage2D( _gl.TEXTURE_2D, dstLevel, dstX, dstY, minX, minY, width, height );
+				state.unbindTexture();
+
+			} else if ( srcTexture.isDepthTexture ) {
 
 				const srcTextureProperties = properties.get( srcTexture );
 				const dstTextureProperties = properties.get( dstTexture );
@@ -2705,7 +2727,7 @@ class WebGLRenderer {
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
 				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
 
-			} else if ( srcLevel !== 0 || srcTexture.isRenderTargetTexture || properties.has( srcTexture ) ) {
+			} else if ( srcTexture === null || srcLevel !== 0 || srcTexture.isRenderTargetTexture || properties.has( srcTexture ) ) {
 
 				// get the appropriate frame buffers
 				const srcTextureProperties = properties.get( srcTexture );
