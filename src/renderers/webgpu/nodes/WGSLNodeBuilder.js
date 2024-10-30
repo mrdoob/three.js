@@ -1065,7 +1065,19 @@ ${ flowData.code }
 
 				const bufferCountSnippet = bufferCount > 0 && uniform.type === 'buffer' ? ', ' + bufferCount : '';
 				const bufferTypeSnippet = bufferNode.isAtomic ? `atomic<${bufferType}>` : `${bufferType}`;
-				const bufferSnippet = `\t${ uniform.name } : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >\n`;
+
+				let bufferSnippet;
+
+				if ( bufferType === 'mat3x3<f32>' || bufferType === 'mat4x4<f32>' ) {
+
+					bufferSnippet = `\t${ uniform.name } : ${ bufferTypeSnippet }${ bufferCountSnippet } \n`;
+
+				} else {
+
+					bufferSnippet = `\t${ uniform.name } : array< ${ bufferTypeSnippet }${ bufferCountSnippet } >\n`;
+
+				}
+				
 				const bufferAccessMode = bufferNode.isStorageBufferNode ? `storage, ${ this.getStorageAccess( bufferNode ) }` : 'uniform';
 
 				bufferSnippets.push( this._getWGSLStructBinding( 'NodeBuffer_' + bufferNode.id, bufferSnippet, bufferAccessMode, uniformIndexes.binding ++, uniformIndexes.group ) );
