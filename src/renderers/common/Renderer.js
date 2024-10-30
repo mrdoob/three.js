@@ -143,7 +143,7 @@ class Renderer {
 
 		this._handleObjectFunction = this._renderObjectDirect;
 
-		this._isDeviceLost = null;
+		this._isDeviceLost = false;
 		this.onDeviceLost = this._onDeviceLost;
 
 		this._initialized = false;
@@ -267,6 +267,8 @@ class Renderer {
 	}
 
 	async compileAsync( scene, camera, targetScene = null ) {
+
+		if ( this._isDeviceLost === true ) return;
 
 		if ( this._initialized === false ) await this.init();
 
@@ -433,7 +435,7 @@ class Renderer {
 
 		console.error( errorMessage );
 
-		this.isDeviceLost = true;
+		this._isDeviceLost = true;
 
 	}
 
@@ -572,7 +574,7 @@ class Renderer {
 
 	_renderScene( scene, camera, useFrameBufferTarget = true ) {
 
-		if ( this.isDeviceLost === true ) return;
+		if ( this._isDeviceLost === true ) return;
 
 		const frameBufferTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : null;
 
@@ -1142,6 +1144,7 @@ class Renderer {
 	dispose() {
 
 		this.info.dispose();
+		this.backend.dispose();
 
 		this._animation.dispose();
 		this._objects.dispose();

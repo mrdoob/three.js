@@ -48,6 +48,7 @@ class WebGLBackend extends Backend {
 			};
 
 			renderer.onDeviceLost( contextLossInfo );
+			renderer.domElement.removeEventListener( 'webglcontextlost', onContextLost, false );
 
 		}
 
