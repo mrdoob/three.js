@@ -2769,6 +2769,12 @@ class WebGLRenderer {
 
 				}
 
+				// unbind read, draw buffers
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
+				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
+
+				// TODO: delete temporary frame buffers
+
 			} else {
 
 				if ( isDst3D ) {
