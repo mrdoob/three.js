@@ -51,7 +51,7 @@ class WebGLBackend extends Backend {
 
 		}
 
-		this._onContextLost = onContextLost.bind( this );
+		this._onContextLost = onContextLost;
 
 		renderer.domElement.addEventListener( 'webglcontextlost', onContextLost, false );
 
