@@ -2614,9 +2614,23 @@ class WebGLRenderer {
 
 			} else {
 
-				width = image.width;
-				height = image.height;
-				depth = image.depth || 1;
+				const levelScale = Math.pow( 2, - srcLevel );
+				width = Math.floor( image.width * levelScale );
+				height = Math.floor( image.height * levelScale );
+				if ( srcTexture.isDataArrayTexture ) {
+
+					depth = image.depth;
+
+				} else if ( srcTexture.isData3DTexture ) {
+
+					depth = Math.floor( image.depth * levelScale );
+
+				} else {
+
+					depth = 1;
+
+				}
+
 				minX = 0;
 				minY = 0;
 				minZ = 0;
