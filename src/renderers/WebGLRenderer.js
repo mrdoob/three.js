@@ -2709,9 +2709,13 @@ class WebGLRenderer {
 
 			if ( srcTexture === null ) {
 
+				const currentTarget = this.getRenderTarget();
+
+				this.setRenderTarget( null );
 				textures.setTexture2D( dstTexture, 0 );
 				_gl.copyTexSubImage2D( _gl.TEXTURE_2D, dstLevel, dstX, dstY, minX, minY, width, height );
 				state.unbindTexture();
+				this.setRenderTarget( currentTarget );
 
 			} else if ( srcTexture.isDepthTexture ) {
 
