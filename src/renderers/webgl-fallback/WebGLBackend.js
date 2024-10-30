@@ -36,6 +36,23 @@ class WebGLBackend extends Backend {
 
 		const glContext = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgl2' );
 
+		function onContextLost( event ) {
+
+			event.preventDefault();
+
+			const contextLossInfo = {
+				api: 'WebGL',
+				message: event.statusMessage || 'Unknown reason',
+				reason: null,
+				originalEvent: event
+			};
+
+			renderer.onDeviceLost( contextLossInfo );
+
+		}
+
+		renderer.domElement.addEventListener( 'webglcontextlost', onContextLost, false );
+
 		this.gl = glContext;
 
 		this.extensions = new WebGLExtensions( this );

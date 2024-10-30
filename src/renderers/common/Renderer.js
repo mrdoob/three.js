@@ -143,6 +143,9 @@ class Renderer {
 
 		this._handleObjectFunction = this._renderObjectDirect;
 
+		this._isDeviceLost = null;
+		this.onDeviceLost = this._onDeviceLost;
+
 		this._initialized = false;
 		this._initPromise = null;
 
@@ -418,6 +421,23 @@ class Renderer {
 
 	}
 
+	_onDeviceLost( info ) {
+
+		let errorMessage = `THREE.WebGPURenderer: ${info.api} Device Lost:\n\nMessage: ${info.message}`;
+
+		if ( info.reason ) {
+
+			errorMessage += `\nReason: ${info.reason}`;
+
+		}
+
+		console.error( errorMessage );
+
+		this.isDeviceLost = true;
+
+	}
+
+
 	_renderBundle( bundle, sceneRef, lightsNode ) {
 
 		const { bundleGroup, camera, renderList } = bundle;
@@ -551,6 +571,8 @@ class Renderer {
 	}
 
 	_renderScene( scene, camera, useFrameBufferTarget = true ) {
+
+		if ( this.isDeviceLost === true ) return;
 
 		const frameBufferTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : null;
 
@@ -1162,6 +1184,8 @@ class Renderer {
 	}
 
 	compute( computeNodes ) {
+
+		if ( this.isDeviceLost === true ) return;
 
 		if ( this._initialized === false ) {
 
