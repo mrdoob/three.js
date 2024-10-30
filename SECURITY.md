@@ -7,7 +7,7 @@ used before a patch is released.
 
 You may submit the report in the following ways:
 
-- send an email to hello@mrdoob.com;
+- send an email to hello@mrdoob.com.
 
 Please provide the following information in your report:
 
