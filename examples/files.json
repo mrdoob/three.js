@@ -278,7 +278,6 @@
 		"webgl_materials_modified",
 		"webgl_multiple_rendertargets",
 		"webgl_multisampled_renderbuffers",
-		"webgl_raymarching_reflect",
 		"webgl_rendertarget_texture2darray",
 		"webgl_shadowmap_csm",
 		"webgl_shadowmap_pcss",
