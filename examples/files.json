@@ -354,6 +354,7 @@
 		"webgpu_materials_arrays",
 		"webgpu_materials_basic",
 		"webgpu_materials_displacementmap",
+		"webgpu_materials_envmaps_bpcem",
 		"webgpu_materials_envmaps",
 		"webgpu_materials_lightmap",
 		"webgpu_materials_matcap",
