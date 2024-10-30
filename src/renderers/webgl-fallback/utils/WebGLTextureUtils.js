@@ -606,9 +606,9 @@ class WebGLTextureUtils {
 
 		const { textureGPU: dstTextureGPU, glTextureType, glType, glFormat } = backend.get( dstTexture );
 
-
 		let width, height, minX, minY;
 		let dstX, dstY;
+
 		if ( srcRegion !== null ) {
 
 			width = srcRegion.max.x - srcRegion.min.x;
