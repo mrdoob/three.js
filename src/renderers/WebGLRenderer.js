@@ -2743,7 +2743,7 @@ class WebGLRenderer {
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
 				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
 
-			} else if ( srcTexture === null || srcLevel !== 0 || srcTexture.isRenderTargetTexture || properties.has( srcTexture ) ) {
+			} else if ( srcLevel !== 0 || srcTexture.isRenderTargetTexture || properties.has( srcTexture ) ) {
 
 				// get the appropriate frame buffers
 				const srcTextureProperties = properties.get( srcTexture );
