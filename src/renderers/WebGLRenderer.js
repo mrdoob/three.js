@@ -2599,13 +2599,31 @@ class WebGLRenderer {
 
 			}
 
+			// set up the src texture
+			let isSrc3D = false;
+			const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture;
+
 			// gather the necessary dimensions to copy
 			let width, height, depth, minX, minY, minZ;
 			let dstX, dstY, dstZ;
-			const image = srcTexture ? ( srcTexture.isCompressedTexture ? srcTexture.mipmaps[ dstLevel ] : srcTexture.image ) : null;
+			let image, imageWidth, imageHeight;
+			if ( srcTexture !== null ) {
+
+				image = srcTexture.isCompressedTexture ? srcTexture.mipmaps[ dstLevel ] : srcTexture.image;
+				imageWidth = image.width;
+				imageHeight = image.height;
+				isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture;
+
+			} else {
+
+				image = null;
+				imageWidth = _width;
+				imageHeight = _height;
+
+			}
+
 			if ( srcRegion !== null ) {
 
-				console.log(srcRegion.max, srcRegion.min, srcRegion)
 				width = srcRegion.max.x - srcRegion.min.x;
 				height = srcRegion.max.y - srcRegion.min.y;
 				depth = srcRegion.isBox3 ? srcRegion.max.z - srcRegion.min.z : 1;
@@ -2613,25 +2631,16 @@ class WebGLRenderer {
 				minY = srcRegion.min.y;
 				minZ = srcRegion.isBox3 ? srcRegion.min.z : 0;
 
-			} else if ( image === null ) {
-
-				width = _width;
-				height = _height;
-				depth = 1;
-				minX = 0;
-				minY = 0;
-				minZ = 0;
-
 			} else {
 
 				const levelScale = Math.pow( 2, - srcLevel );
-				width = Math.floor( image.width * levelScale );
-				height = Math.floor( image.height * levelScale );
-				if ( srcTexture.isDataArrayTexture ) {
+				width = Math.floor( imageWidth * levelScale );
+				height = Math.floor( imageHeight * levelScale );
+				if ( srcTexture && srcTexture.isDataArrayTexture ) {
 
 					depth = image.depth;
 
-				} else if ( srcTexture.isData3DTexture ) {
+				} else if ( srcTexture && srcTexture.isData3DTexture ) {
 
 					depth = Math.floor( image.depth * levelScale );
 
@@ -2693,24 +2702,14 @@ class WebGLRenderer {
 			const currentUnpackSkipPixels = _gl.getParameter( _gl.UNPACK_SKIP_PIXELS );
 			const currentUnpackSkipRows = _gl.getParameter( _gl.UNPACK_SKIP_ROWS );
 			const currentUnpackSkipImages = _gl.getParameter( _gl.UNPACK_SKIP_IMAGES );
-
-			if ( image ) {
-
-				_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, image.width );
-				_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, image.height );
-
-			}
-
+			_gl.pixelStorei( _gl.UNPACK_ROW_LENGTH, imageWidth );
+			_gl.pixelStorei( _gl.UNPACK_IMAGE_HEIGHT, imageHeight );
 			_gl.pixelStorei( _gl.UNPACK_SKIP_PIXELS, minX );
 			_gl.pixelStorei( _gl.UNPACK_SKIP_ROWS, minY );
 			_gl.pixelStorei( _gl.UNPACK_SKIP_IMAGES, minZ );
 
-			// set up the src texture
-			const isSrc3D = srcTexture === null ? false : srcTexture.isDataArrayTexture || srcTexture.isData3DTexture;
-			const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture;
 			if ( srcTexture === null ) {
 
-				console.log( width, height )
 				textures.setTexture2D( dstTexture, 0 );
 				_gl.copyTexSubImage2D( _gl.TEXTURE_2D, dstLevel, dstX, dstY, minX, minY, width, height );
 				state.unbindTexture();
