@@ -54,6 +54,7 @@ import { WebGLMaterials } from './webgl/WebGLMaterials.js';
 import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
 import { createCanvasElement, probeAsync, toNormalizedProjectionMatrix, toReversedProjectionMatrix, warnOnce } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
+import { Box2 } from '../math/Box2.js';
 
 class WebGLRenderer {
 
@@ -2548,18 +2549,16 @@ class WebGLRenderer {
 
 			}
 
-			const levelScale = Math.pow( 2, - level );
-			const width = Math.floor( texture.image.width * levelScale );
-			const height = Math.floor( texture.image.height * levelScale );
+			// @deprecated, r170
+			warnOnce( 'WebGLRenderer: copyFramebufferToTexture function has been deprecated. Use copyTextureToTexture instead.' );
 
-			const x = position !== null ? position.x : 0;
-			const y = position !== null ? position.y : 0;
+			const box = new Box2();
+			box.min.copy( position );
+			box.max.copy( position );
+			box.max.x += texture.image.width;
+			box.max.y += texture.image.height;
 
-			textures.setTexture2D( texture, 0 );
-
-			_gl.copyTexSubImage2D( _gl.TEXTURE_2D, level, 0, 0, x, y, width, height );
-
-			state.unbindTexture();
+			this.copyTextureToTexture( null, texture, box, undefined, 0, level );
 
 		};
 
