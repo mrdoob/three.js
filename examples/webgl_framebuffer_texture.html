@@ -103,7 +103,8 @@
 
 				//
 
-				texture = new THREE.FramebufferTexture( textureSize, textureSize );
+				texture = new THREE.DataTexture( new Uint8Array( textureSize * textureSize * 4 ), textureSize, textureSize );
+				texture.needsUpdate = true;
 
 				//
 
