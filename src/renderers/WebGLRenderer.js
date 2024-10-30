@@ -2563,6 +2563,8 @@ class WebGLRenderer {
 
 		};
 
+		const _srcFramebuffer = _gl.createFramebuffer();
+		const _dstFramebuffer = _gl.createFramebuffer();
 		this.copyTextureToTexture = function ( srcTexture, dstTexture, srcRegion = null, dstPosition = null, srcLevel = 0, dstLevel = 0 ) {
 
 			// support previous signature with dstPosition first
@@ -2659,13 +2661,12 @@ class WebGLRenderer {
 			// set up the src texture
 			const isSrc3D = srcTexture.isDataArrayTexture || srcTexture.isData3DTexture;
 			const isDst3D = dstTexture.isDataArrayTexture || dstTexture.isData3DTexture;
-			if ( srcTexture.isRenderTargetTexture || srcTexture.isDepthTexture ) {
+			if ( srcTexture.isDepthTexture ) {
 
 				const srcTextureProperties = properties.get( srcTexture );
 				const dstTextureProperties = properties.get( dstTexture );
 				const srcRenderTargetProperties = properties.get( srcTextureProperties.__renderTarget );
 				const dstRenderTargetProperties = properties.get( dstTextureProperties.__renderTarget );
-
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, srcRenderTargetProperties.__webglFramebuffer );
 				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, dstRenderTargetProperties.__webglFramebuffer );
 
@@ -2675,26 +2676,54 @@ class WebGLRenderer {
 					if ( isSrc3D ) {
 
 						_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, srcLevel, minZ + i );
-
-					} else {
-
-						_gl.framebufferTexture2D( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, srcLevel );
+						_gl.framebufferTextureLayer( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, dstLevel, dstZ + i );
 
 					}
 
-					if ( srcTexture.isDepthTexture ) {
+					_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.DEPTH_BUFFER_BIT, _gl.NEAREST );
 
-						if ( isDst3D ) {
+				}
 
-							_gl.framebufferTextureLayer( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, dstLevel, dstZ + i );
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
+				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
 
-						} else {
+			} else if ( srcLevel !== 0 || srcTexture.isRenderTargetTexture || properties.has( srcTexture ) ) {
 
-							_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, dstLevel );
+				// get the appropriate frame buffers
+				const srcTextureProperties = properties.get( srcTexture );
+				const dstTextureProperties = properties.get( dstTexture );
 
-						}
+				// bind the frame buffer targets
+				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, _srcFramebuffer );
+				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, _dstFramebuffer );
 
-						_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.DEPTH_BUFFER_BIT, _gl.NEAREST );
+				for ( let i = 0; i < depth; i ++ ) {
+
+					// assign the correct layers and mip maps to the frame buffers
+					if ( isSrc3D ) {
+
+						_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, srcTextureProperties.__webglTexture, srcLevel, minZ + i );
+
+					} else {
+
+						_gl.framebufferTexture2D( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, srcTextureProperties.__webglTexture, srcLevel );
+
+					}
+
+					if ( isDst3D ) {
+
+						_gl.framebufferTextureLayer( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, dstTextureProperties.__webglTexture, dstLevel, dstZ + i );
+
+					} else {
+
+						_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, dstTextureProperties.__webglTexture, dstLevel );
+
+					}
+
+					// copy the data using the fastest function that can achieve the copy
+					if ( srcLevel !== 0 ) {
+
+						_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.COLOR_BUFFER_BIT, _gl.NEAREST );
 
 					} else if ( isDst3D ) {
 
@@ -2702,78 +2731,15 @@ class WebGLRenderer {
 
 					} else {
 
-						_gl.copyTexSubImage2D( glTarget, dstLevel, dstX, dstY, dstZ + i, minX, minY, width, height );
+						_gl.copyTexSubImage2D( glTarget, dstLevel, dstX, dstY, minX, minY, width, height );
 
 					}
-
-				}
-
-				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
-				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
-
-			} else if ( srcLevel !== 0 ) {
-
-				// get the appropriate frame buffers
-				const srcTextureProperties = properties.get( srcTexture );
-				const dstTextureProperties = properties.get( dstTexture );
-				let srcFrameBuffer, dstFrameBuffer;
-				if ( srcTextureProperties.__renderTarget ) {
-
-					srcFrameBuffer = properties.get( srcTextureProperties.__renderTarget ).__webglFramebuffer;
-
-				} else {
-
-					srcFrameBuffer = _gl.createFramebuffer();
-
-				}
-
-				if ( dstTextureProperties.__renderTarget ) {
-
-					dstFrameBuffer = properties.get( dstTextureProperties.__renderTarget ).__webglFramebuffer;
-
-				} else {
-
-					dstFrameBuffer = _gl.createFramebuffer();
-
-				}
-
-				// bind the frame buffer targets
-				_gl.bindFramebuffer( _gl.READ_FRAMEBUFFER, srcFrameBuffer );
-				_gl.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, dstFrameBuffer );
-
-				for ( let i = 0; i < depth; i ++ ) {
-
-					// assign the correct layers and mip maps
-					if ( isSrc3D ) {
-
-						_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, srcLevel, minZ + i );
-
-					} else {
-
-						_gl.framebufferTexture2D( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( srcTexture ).__webglTexture, srcLevel );
-
-					}
-
-					if ( isDst3D ) {
-
-						_gl.framebufferTextureLayer( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, dstLevel, dstZ + i );
-
-					} else {
-
-						_gl.framebufferTexture2D( _gl.DRAW_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, properties.get( dstTexture ).__webglTexture, dstLevel );
-
-					}
-
-					// blit the data
-					_gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, _gl.DEPTH_BUFFER_BIT, _gl.NEAREST );
 
 				}
 
 				// unbind read, draw buffers
 				state.bindFramebuffer( _gl.READ_FRAMEBUFFER, null );
 				state.bindFramebuffer( _gl.DRAW_FRAMEBUFFER, null );
-
-				// TODO: delete temporary frame buffers
 
 			} else {
 
