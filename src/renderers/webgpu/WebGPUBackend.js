@@ -103,14 +103,14 @@ class WebGPUBackend extends Backend {
 
 		device.lost.then( ( info ) => {
 
-			const contextLossInfo = {
+			const deviceLossInfo = {
 				api: 'WebGPU',
 				message: info.message || 'Unknown reason',
 				reason: info.reason || null,
 				originalEvent: info
 			};
 
-			renderer.onDeviceLost( contextLossInfo );
+			renderer.onDeviceLost( deviceLossInfo );
 
 		} );
 
