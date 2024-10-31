@@ -25,7 +25,8 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, texture, vec3, pass, color, uint, screenUV, positionWorld, positionLocal, timerLocal, vec2, hash, gaussianBlur, instanceIndex, storage, If } from 'three/tsl';
+			import { Fn, texture, vec3, pass, color, uint, screenUV, positionWorld, positionLocal, time, vec2, hash, instanceIndex, storage, If } from 'three/tsl';
+			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
@@ -84,6 +85,7 @@
 				collisionPosRT.texture.type = THREE.HalfFloatType;
 				collisionPosRT.texture.magFilter = THREE.NearestFilter;
 				collisionPosRT.texture.minFilter = THREE.NearestFilter;
+				collisionPosRT.texture.generateMipmaps = false;
 
 				collisionPosMaterial = new THREE.MeshBasicNodeMaterial();
 				collisionPosMaterial.fog = false;
@@ -100,8 +102,6 @@
 				const dataBuffer = createBuffer( 'vec4' );
 
 				// compute
-
-				const timer = timerLocal();
 
 				const randUint = () => uint( Math.random() * 0xFFFFFF );
 
@@ -152,8 +152,8 @@
 
 					If( position.y.greaterThan( rippleFloorArea ), () => {
 
-						position.x = particleData.x.add( timer.mul( random.mul( random ) ).mul( speed ).sin().mul( 3 ) );
-						position.z = particleData.z.add( timer.mul( random ).mul( speed ).cos().mul( random.mul( 10 ) ) );
+						position.x = particleData.x.add( time.mul( random.mul( random ) ).mul( speed ).sin().mul( 3 ) );
+						position.z = particleData.z.add( time.mul( random ).mul( speed ).cos().mul( random.mul( 10 ) ) );
 
 						position.y = position.y.add( velocity );
 

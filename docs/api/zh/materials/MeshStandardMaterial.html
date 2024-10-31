@@ -132,6 +132,11 @@
 			环境贴图，为了能够保证物理渲染准确，您应该添加由[page:PMREMGenerator]预处理过的环境贴图，默认为null。
 		</p>
 
+		<h3>[property:Euler envMapRotation]</h3>
+		<p>
+			环境贴图的旋转（以弧度为单位）。默认值为 `(0,0,0)`。
+		</p>
+
 		<h3>[property:Float envMapIntensity]</h3>
 		<p> 通过乘以环境贴图的颜色来缩放环境贴图的效果。</p>
 
@@ -169,9 +174,9 @@
 		<p> 该纹理的蓝色通道用于改变材质的金属度。</p>
 
 		<h3>[property:Texture normalMap]</h3>
-		<p>用于创建法线贴图的纹理。RGB值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
-			In case the material has a normal map authored using the left handed convention, the y component of normalScale
-			should be negated to compensate for the different handedness.
+		<p>
+			用于创建法线贴图的纹理。RGB 值会影响每个像素片段的曲面法线，并更改颜色照亮的方式。法线贴图不会改变曲面的实际形状，只会改变光照。
+			如果材质的法线贴图使用左手惯例编写，则应将 normalScale 的 y 分量取反以补偿不同的手性。
 		</p>
 
 		<h3>[property:Integer normalMapType]</h3>
@@ -181,14 +186,6 @@
 
 		<h3>[property:Vector2 normalScale]</h3>
 		<p> 法线贴图对材质的影响程度。典型范围是0-1。默认值是[page:Vector2]设置为（1,1）。
-		</p>
-
-		<h3>[property:Float refractionRatio]</h3>
-		<p> 空气的折射率（IOR）（约为1）除以材质的折射率。它与环境映射模式[page:Textures THREE.CubeRefractionMapping]
-			和[page:Textures THREE.EquirectangularRefractionMapping]一起使用。
-			The index of refraction (IOR) of air (approximately 1) divided by the index of refraction of the material.
-			It is used with environment mapping mode [page:Textures THREE.CubeRefractionMapping].
-			折射率不应超过1。默认值为*0.98*。
 		</p>
 
 		<h3>[property:Float roughness]</h3>

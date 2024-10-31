@@ -20,7 +20,8 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { cubeTexture, positionWorld, oscSine, timerGlobal, pass, dof, uniform } from 'three/tsl';
+			import { cubeTexture, positionWorld, oscSine, time, pass, uniform } from 'three/tsl';
+			import { dof } from 'three/addons/tsl/display/DepthOfFieldNode.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
@@ -62,7 +63,7 @@
 
 				const textureCube = new THREE.CubeTextureLoader().load( urls );
 				const cubeTextureNode = cubeTexture( textureCube );
-				const oscPos = oscSine( positionWorld.div( 1000 /* scene distance */ ).add( timerGlobal( .2 /* speed */ ) ) );
+				const oscPos = oscSine( positionWorld.div( 1000 /* scene distance */ ).add( time.mul( .2 ) ) );
 
 				const geometry = new THREE.SphereGeometry( 60, 20, 10 );
 				const material = new THREE.MeshBasicNodeMaterial();
@@ -169,7 +170,8 @@
 			function animate() {
 
 				render();
-				//stats.update();
+
+				stats.update();
 
 			}
 

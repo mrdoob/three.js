@@ -260,7 +260,13 @@
 		<p>
 			Adds the given geometry to the [name] and returns the associated geometry id referring to it to be used in other functions.
 		</p>
-
+		<h3>
+			[method:Integer deleteGeometry]( [param:Integer geometryId] )
+		</h3>
+		<p>
+			[page:Integer geometryId]: The id of a geometry to remove from the [name] that was previously added via "addGeometry". Any instances referencing
+			this geometry will also be removed as a side effect.
+		</p>
 		<h3>
 			[method:Integer addInstance]( [param:Integer geometryId] )
 		</h3>
@@ -293,6 +299,36 @@
 		<p>
 			Replaces the geometry at `geometryId` with the provided geometry. Throws an error if there is not enough space reserved for geometry.
 			Calling this will change all instances that are rendering that geometry.
+		</p>
+
+		<h3>
+			[method:this optimize]()
+		</h3>
+		<p>
+			Repacks the sub geometries in [name] to remove any unused space remaining from previously deleted geometry, freeing up space to add new geometry.
+		</p>
+
+		<h3>
+			[method:this setGeometrySize]( maxVertexCount, maxIndexCount )
+		</h3>
+		<p>
+			Resizes the available space in [name]'s vertex and index buffer attributes to the provided sizes. If the provided arguments shrink the geometry buffers
+			but there is not enough unused space at the end of the geometry attributes then an error is thrown. 
+		</p>
+		<p>
+			[page:Integer maxVertexCount] - the max number of vertices to be used by all unique geometries to resize to.<br />
+			[page:Integer maxIndexCount] - the max number of indices to be used by all unique geometries to resize to.<br />
+		</p>
+
+		<h3>
+			[method:this setInstanceCount]( maxInstanceCount )
+		</h3>
+		<p>
+			Resizes the necessary buffers to support the provided number of instances. If the provided arguments shrink the number of instances but there are not enough
+			unused ids at the end of the list then an error is thrown.
+		</p>
+		<p>
+			[page:Integer maxInstanceCount] - the max number of individual instances that can be added and rendered by the [name].<br />
 		</p>
 
 		<!--

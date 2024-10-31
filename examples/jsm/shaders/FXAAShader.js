@@ -2,14 +2,6 @@ import {
 	Vector2
 } from 'three';
 
-/**
- * NVIDIA FXAA by Timothy Lottes
- * https://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
- * - WebGL port by @supereggbert
- * http://www.glge.org/demos/fxaa/
- * Further improved by Daniel Sturk
- */
-
 const FXAAShader = {
 
 	name: 'FXAAShader',
@@ -33,253 +25,262 @@ const FXAAShader = {
 		}`,
 
 	fragmentShader: /* glsl */`
-		precision highp float;
+
+		// FXAA algorithm from NVIDIA, C# implementation by Jasper Flick, GLSL port by Dave Hoskins
+		// http://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
+		// https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
 
 		uniform sampler2D tDiffuse;
-
 		uniform vec2 resolution;
-
 		varying vec2 vUv;
 
-		// FXAA 3.11 implementation by NVIDIA, ported to WebGL by Agost Biro (biro@archilogic.com)
+		#define EDGE_STEP_COUNT 6
+		#define EDGE_GUESS 8.0
+		#define EDGE_STEPS 1.0, 1.5, 2.0, 2.0, 2.0, 4.0
+		const float edgeSteps[EDGE_STEP_COUNT] = float[EDGE_STEP_COUNT]( EDGE_STEPS );
 
-		//----------------------------------------------------------------------------------
-		// File:        es3-kepler\FXAA\assets\shaders/FXAA_DefaultES.frag
-		// SDK Version: v3.00
-		// Email:       gameworks@nvidia.com
-		// Site:        http://developer.nvidia.com/
-		//
-		// Copyright (c) 2014-2015, NVIDIA CORPORATION. All rights reserved.
-		//
-		// Redistribution and use in source and binary forms, with or without
-		// modification, are permitted provided that the following conditions
-		// are met:
-		//  * Redistributions of source code must retain the above copyright
-		//    notice, this list of conditions and the following disclaimer.
-		//  * Redistributions in binary form must reproduce the above copyright
-		//    notice, this list of conditions and the following disclaimer in the
-		//    documentation and/or other materials provided with the distribution.
-		//  * Neither the name of NVIDIA CORPORATION nor the names of its
-		//    contributors may be used to endorse or promote products derived
-		//    from this software without specific prior written permission.
-		//
-		// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
-		// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-		// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-		// PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
-		// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-		// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-		// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-		// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
-		// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-		// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-		// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-		//
-		//----------------------------------------------------------------------------------
+		float _ContrastThreshold = 0.0312;
+		float _RelativeThreshold = 0.063;
+		float _SubpixelBlending = 1.0;
 
-		#ifndef FXAA_DISCARD
-			//
-			// Only valid for PC OpenGL currently.
-			// Probably will not work when FXAA_GREEN_AS_LUMA = 1.
-			//
-			// 1 = Use discard on pixels which don't need AA.
-			//     For APIs which enable concurrent TEX+ROP from same surface.
-			// 0 = Return unchanged color on pixels which don't need AA.
-			//
-			#define FXAA_DISCARD 0
-		#endif
+		vec4 Sample( sampler2D  tex2D, vec2 uv ) {
 
-		/*--------------------------------------------------------------------------*/
-		#define FxaaTexTop(t, p) texture2D(t, p, -100.0)
-		#define FxaaTexOff(t, p, o, r) texture2D(t, p + (o * r), -100.0)
-		/*--------------------------------------------------------------------------*/
+			return texture( tex2D, uv );
 
-		#define NUM_SAMPLES 5
-
-		// assumes colors have premultipliedAlpha, so that the calculated color contrast is scaled by alpha
-		float contrast( vec4 a, vec4 b ) {
-			vec4 diff = abs( a - b );
-			return max( max( max( diff.r, diff.g ), diff.b ), diff.a );
 		}
 
-		/*============================================================================
+		float SampleLuminance( sampler2D tex2D, vec2 uv ) {
 
-									FXAA3 QUALITY - PC
+			return dot( Sample( tex2D, uv ).rgb, vec3( 0.3, 0.59, 0.11 ) );
 
-		============================================================================*/
+		}
 
-		/*--------------------------------------------------------------------------*/
-		vec4 FxaaPixelShader(
-			vec2 posM,
-			sampler2D tex,
-			vec2 fxaaQualityRcpFrame,
-			float fxaaQualityEdgeThreshold,
-			float fxaaQualityinvEdgeThreshold
-		) {
-			vec4 rgbaM = FxaaTexTop(tex, posM);
-			vec4 rgbaS = FxaaTexOff(tex, posM, vec2( 0.0, 1.0), fxaaQualityRcpFrame.xy);
-			vec4 rgbaE = FxaaTexOff(tex, posM, vec2( 1.0, 0.0), fxaaQualityRcpFrame.xy);
-			vec4 rgbaN = FxaaTexOff(tex, posM, vec2( 0.0,-1.0), fxaaQualityRcpFrame.xy);
-			vec4 rgbaW = FxaaTexOff(tex, posM, vec2(-1.0, 0.0), fxaaQualityRcpFrame.xy);
-			// . S .
-			// W M E
-			// . N .
+		float SampleLuminance( sampler2D tex2D, vec2 texSize, vec2 uv, float uOffset, float vOffset ) {
 
-			bool earlyExit = max( max( max(
-					contrast( rgbaM, rgbaN ),
-					contrast( rgbaM, rgbaS ) ),
-					contrast( rgbaM, rgbaE ) ),
-					contrast( rgbaM, rgbaW ) )
-					< fxaaQualityEdgeThreshold;
-			// . 0 .
-			// 0 0 0
-			// . 0 .
+			uv += texSize * vec2(uOffset, vOffset);
+			return SampleLuminance(tex2D, uv);
 
-			#if (FXAA_DISCARD == 1)
-				if(earlyExit) FxaaDiscard;
-			#else
-				if(earlyExit) return rgbaM;
-			#endif
+		}
 
-			float contrastN = contrast( rgbaM, rgbaN );
-			float contrastS = contrast( rgbaM, rgbaS );
-			float contrastE = contrast( rgbaM, rgbaE );
-			float contrastW = contrast( rgbaM, rgbaW );
+		struct LuminanceData {
 
-			float relativeVContrast = ( contrastN + contrastS ) - ( contrastE + contrastW );
-			relativeVContrast *= fxaaQualityinvEdgeThreshold;
+			float m, n, e, s, w;
+			float ne, nw, se, sw;
+			float highest, lowest, contrast;
 
-			bool horzSpan = relativeVContrast > 0.;
-			// . 1 .
-			// 0 0 0
-			// . 1 .
+		};
 
-			// 45 deg edge detection and corners of objects, aka V/H contrast is too similar
-			if( abs( relativeVContrast ) < .3 ) {
-				// locate the edge
-				vec2 dirToEdge;
-				dirToEdge.x = contrastE > contrastW ? 1. : -1.;
-				dirToEdge.y = contrastS > contrastN ? 1. : -1.;
-				// . 2 .      . 1 .
-				// 1 0 2  ~=  0 0 1
-				// . 1 .      . 0 .
+		LuminanceData SampleLuminanceNeighborhood( sampler2D tex2D, vec2 texSize, vec2 uv ) {
 
-				// tap 2 pixels and see which ones are "outside" the edge, to
-				// determine if the edge is vertical or horizontal
+			LuminanceData l;
+			l.m = SampleLuminance( tex2D, uv );
+			l.n = SampleLuminance( tex2D, texSize, uv,  0.0,  1.0 );
+			l.e = SampleLuminance( tex2D, texSize, uv,  1.0,  0.0 );
+			l.s = SampleLuminance( tex2D, texSize, uv,  0.0, -1.0 );
+			l.w = SampleLuminance( tex2D, texSize, uv, -1.0,  0.0 );
 
-				vec4 rgbaAlongH = FxaaTexOff(tex, posM, vec2( dirToEdge.x, -dirToEdge.y ), fxaaQualityRcpFrame.xy);
-				float matchAlongH = contrast( rgbaM, rgbaAlongH );
-				// . 1 .
-				// 0 0 1
-				// . 0 H
+			l.ne = SampleLuminance( tex2D, texSize, uv,  1.0,  1.0 );
+			l.nw = SampleLuminance( tex2D, texSize, uv, -1.0,  1.0 );
+			l.se = SampleLuminance( tex2D, texSize, uv,  1.0, -1.0 );
+			l.sw = SampleLuminance( tex2D, texSize, uv, -1.0, -1.0 );
 
-				vec4 rgbaAlongV = FxaaTexOff(tex, posM, vec2( -dirToEdge.x, dirToEdge.y ), fxaaQualityRcpFrame.xy);
-				float matchAlongV = contrast( rgbaM, rgbaAlongV );
-				// V 1 .
-				// 0 0 1
-				// . 0 .
+			l.highest = max( max( max( max( l.n, l.e ), l.s ), l.w ), l.m );
+			l.lowest = min( min( min( min( l.n, l.e ), l.s ), l.w ), l.m );
+			l.contrast = l.highest - l.lowest;
+			return l;
 
-				relativeVContrast = matchAlongV - matchAlongH;
-				relativeVContrast *= fxaaQualityinvEdgeThreshold;
+		}
 
-				if( abs( relativeVContrast ) < .3 ) { // 45 deg edge
-					// 1 1 .
-					// 0 0 1
-					// . 0 1
+		bool ShouldSkipPixel( LuminanceData l ) {
 
-					// do a simple blur
-					return mix(
-						rgbaM,
-						(rgbaN + rgbaS + rgbaE + rgbaW) * .25,
-						.4
-					);
-				}
+			float threshold = max( _ContrastThreshold, _RelativeThreshold * l.highest );
+			return l.contrast < threshold;
 
-				horzSpan = relativeVContrast > 0.;
+		}
+
+		float DeterminePixelBlendFactor( LuminanceData l ) {
+
+			float f = 2.0 * ( l.n + l.e + l.s + l.w );
+			f += l.ne + l.nw + l.se + l.sw;
+			f *= 1.0 / 12.0;
+			f = abs( f - l.m );
+			f = clamp( f / l.contrast, 0.0, 1.0 );
+
+			float blendFactor = smoothstep( 0.0, 1.0, f );
+			return blendFactor * blendFactor * _SubpixelBlending;
+
+		}
+
+		struct EdgeData {
+
+			bool isHorizontal;
+			float pixelStep;
+			float oppositeLuminance, gradient;
+
+		};
+
+		EdgeData DetermineEdge( vec2 texSize, LuminanceData l ) {
+
+			EdgeData e;
+			float horizontal =
+				abs( l.n + l.s - 2.0 * l.m ) * 2.0 +
+				abs( l.ne + l.se - 2.0 * l.e ) +
+				abs( l.nw + l.sw - 2.0 * l.w );
+			float vertical =
+				abs( l.e + l.w - 2.0 * l.m ) * 2.0 +
+				abs( l.ne + l.nw - 2.0 * l.n ) +
+				abs( l.se + l.sw - 2.0 * l.s );
+			e.isHorizontal = horizontal >= vertical;
+
+			float pLuminance = e.isHorizontal ? l.n : l.e;
+			float nLuminance = e.isHorizontal ? l.s : l.w;
+			float pGradient = abs( pLuminance - l.m );
+			float nGradient = abs( nLuminance - l.m );
+
+			e.pixelStep = e.isHorizontal ? texSize.y : texSize.x;
+			
+			if (pGradient < nGradient) {
+
+				e.pixelStep = -e.pixelStep;
+				e.oppositeLuminance = nLuminance;
+				e.gradient = nGradient;
+
+			} else {
+
+				e.oppositeLuminance = pLuminance;
+				e.gradient = pGradient;
+
 			}
 
-			if(!horzSpan) rgbaN = rgbaW;
-			if(!horzSpan) rgbaS = rgbaE;
-			// . 0 .      1
-			// 1 0 1  ->  0
-			// . 0 .      1
+			return e;
 
-			bool pairN = contrast( rgbaM, rgbaN ) > contrast( rgbaM, rgbaS );
-			if(!pairN) rgbaN = rgbaS;
+		}
 
-			vec2 offNP;
-			offNP.x = (!horzSpan) ? 0.0 : fxaaQualityRcpFrame.x;
-			offNP.y = ( horzSpan) ? 0.0 : fxaaQualityRcpFrame.y;
+		float DetermineEdgeBlendFactor( sampler2D  tex2D, vec2 texSize, LuminanceData l, EdgeData e, vec2 uv ) {
 
-			bool doneN = false;
-			bool doneP = false;
+			vec2 uvEdge = uv;
+			vec2 edgeStep;
+			if (e.isHorizontal) {
 
-			float nDist = 0.;
-			float pDist = 0.;
+				uvEdge.y += e.pixelStep * 0.5;
+				edgeStep = vec2( texSize.x, 0.0 );
 
-			vec2 posN = posM;
-			vec2 posP = posM;
+			} else {
 
-			int iterationsUsedN = 0;
-			int iterationsUsedP = 0;
-			for( int i = 0; i < NUM_SAMPLES; i++ ) {
+				uvEdge.x += e.pixelStep * 0.5;
+				edgeStep = vec2( 0.0, texSize.y );
 
-				float increment = float(i + 1);
-
-				if(!doneN) {
-					nDist += increment;
-					posN = posM + offNP * nDist;
-					vec4 rgbaEndN = FxaaTexTop(tex, posN.xy);
-					doneN = contrast( rgbaEndN, rgbaM ) > contrast( rgbaEndN, rgbaN );
-					iterationsUsedN = i;
-				}
-
-				if(!doneP) {
-					pDist += increment;
-					posP = posM - offNP * pDist;
-					vec4 rgbaEndP = FxaaTexTop(tex, posP.xy);
-					doneP = contrast( rgbaEndP, rgbaM ) > contrast( rgbaEndP, rgbaN );
-					iterationsUsedP = i;
-				}
-
-				if(doneN || doneP) break;
 			}
 
+			float edgeLuminance = ( l.m + e.oppositeLuminance ) * 0.5;
+			float gradientThreshold = e.gradient * 0.25;
 
-			if ( !doneP && !doneN ) return rgbaM; // failed to find end of edge
+			vec2 puv = uvEdge + edgeStep * edgeSteps[0];
+			float pLuminanceDelta = SampleLuminance( tex2D, puv ) - edgeLuminance;
+			bool pAtEnd = abs( pLuminanceDelta ) >= gradientThreshold;
 
-			float dist = min(
-				doneN ? float( iterationsUsedN ) / float( NUM_SAMPLES - 1 ) : 1.,
-				doneP ? float( iterationsUsedP ) / float( NUM_SAMPLES - 1 ) : 1.
-			);
+			for ( int i = 1; i < EDGE_STEP_COUNT && !pAtEnd; i++ ) {
 
-			// hacky way of reduces blurriness of mostly diagonal edges
-			// but reduces AA quality
-			dist = pow(dist, .5);
+				puv += edgeStep * edgeSteps[i];
+				pLuminanceDelta = SampleLuminance( tex2D, puv ) - edgeLuminance;
+				pAtEnd = abs( pLuminanceDelta ) >= gradientThreshold;
 
-			dist = 1. - dist;
+			}
 
-			return mix(
-				rgbaM,
-				rgbaN,
-				dist * .5
-			);
+			if ( !pAtEnd ) {
+
+				puv += edgeStep * EDGE_GUESS;
+
+			}
+
+			vec2 nuv = uvEdge - edgeStep * edgeSteps[0];
+			float nLuminanceDelta = SampleLuminance( tex2D, nuv ) - edgeLuminance;
+			bool nAtEnd = abs( nLuminanceDelta ) >= gradientThreshold;
+
+			for ( int i = 1; i < EDGE_STEP_COUNT && !nAtEnd; i++ ) {
+
+				nuv -= edgeStep * edgeSteps[i];
+				nLuminanceDelta = SampleLuminance( tex2D, nuv ) - edgeLuminance;
+				nAtEnd = abs( nLuminanceDelta ) >= gradientThreshold;
+
+			}
+
+			if ( !nAtEnd ) {
+
+				nuv -= edgeStep * EDGE_GUESS;
+
+			}
+
+			float pDistance, nDistance;
+			if ( e.isHorizontal ) {
+
+				pDistance = puv.x - uv.x;
+				nDistance = uv.x - nuv.x;
+
+			} else {
+				
+				pDistance = puv.y - uv.y;
+				nDistance = uv.y - nuv.y;
+
+			}
+
+			float shortestDistance;
+			bool deltaSign;
+			if ( pDistance <= nDistance ) {
+
+				shortestDistance = pDistance;
+				deltaSign = pLuminanceDelta >= 0.0;
+
+			} else {
+
+				shortestDistance = nDistance;
+				deltaSign = nLuminanceDelta >= 0.0;
+
+			}
+
+			if ( deltaSign == ( l.m - edgeLuminance >= 0.0 ) ) {
+
+				return 0.0;
+
+			}
+
+			return 0.5 - shortestDistance / ( pDistance + nDistance );
+
+		}
+
+		vec4 ApplyFXAA( sampler2D  tex2D, vec2 texSize, vec2 uv ) {
+
+			LuminanceData luminance = SampleLuminanceNeighborhood( tex2D, texSize, uv );
+			if ( ShouldSkipPixel( luminance ) ) {
+
+				return Sample( tex2D, uv );
+
+			}
+
+			float pixelBlend = DeterminePixelBlendFactor( luminance );
+			EdgeData edge = DetermineEdge( texSize, luminance );
+			float edgeBlend = DetermineEdgeBlendFactor( tex2D, texSize, luminance, edge, uv );
+			float finalBlend = max( pixelBlend, edgeBlend );
+
+			if (edge.isHorizontal) {
+
+				uv.y += edge.pixelStep * finalBlend;
+
+			} else {
+
+				uv.x += edge.pixelStep * finalBlend;
+
+			}
+
+			return Sample( tex2D, uv );
+
 		}
 
 		void main() {
-			const float edgeDetectionQuality = .2;
-			const float invEdgeDetectionQuality = 1. / edgeDetectionQuality;
 
-			gl_FragColor = FxaaPixelShader(
-				vUv,
-				tDiffuse,
-				resolution,
-				edgeDetectionQuality, // [0,1] contrast needed, otherwise early discard
-				invEdgeDetectionQuality
-			);
-
-		}
-	`
+			gl_FragColor = ApplyFXAA( tDiffuse, resolution.xy, vUv );
+			
+		}`
 
 };
 

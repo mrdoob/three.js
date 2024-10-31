@@ -73,6 +73,11 @@
 		<h3>[property:Texture envMap]</h3>
 		<p>环境贴图。默认值为null。</p>
 
+		<h3>[property:Euler envMapRotation]</h3>
+		<p>
+			环境贴图的旋转（以弧度为单位）。默认值为 `(0,0,0)`。
+		</p>
+
 		<h3>[property:Boolean fog]</h3>
 		<p>材质是否受雾影响。默认为*true*。</p>
 
@@ -95,8 +100,6 @@
 		<h3>[property:Float refractionRatio]</h3>
 		<p> 空气的折射率（IOR）（约为1）除以材质的折射率。它与环境映射模式[page:Textures THREE.CubeRefractionMapping]
 			和[page:Textures THREE.EquirectangularRefractionMapping]一起使用。
-			The index of refraction (IOR) of air (approximately 1) divided by the index of refraction of the material.
-			It is used with environment mapping mode [page:Textures THREE.CubeRefractionMapping].
 			折射率不应超过1。默认值为*0.98*。
 		</p>
 

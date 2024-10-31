@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webpu - postprocessing manual ssaa</title>
+		<title>three.js webgpu - postprocessing manual ssaa</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { ssaaPass } from 'three/tsl';
+			import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js';
 
 			import { Timer } from 'three/addons/misc/Timer.js';
 			import Stats from 'three/addons/libs/stats.module.js';

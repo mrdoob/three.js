@@ -27,7 +27,7 @@
 			import * as THREE from 'three';
 			import * as TSL from 'three/tsl';
 
-			import { Fn, wgslFn, positionLocal, scriptable, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, screenUV, js, string, global, Loop, cameraProjectionMatrix } from 'three/tsl';
+			import { Fn, wgslFn, positionLocal, scriptable, positionWorld, normalLocal, normalWorld, normalView, color, texture, uv, float, vec2, vec3, vec4, oscSine, triplanarTexture, screenUV, js, string, Loop, cameraProjectionMatrix, ScriptableNodeResources } from 'three/tsl';
 
 			import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 
@@ -218,7 +218,7 @@
 				const loopCount = 10;
 				material.colorNode = Loop( loopCount, ( { i } ) => {
 
-					const output = vec4().temp();
+					const output = vec4().toVar();
 					const scale = oscSine().mul( .09 ); // just a value to test
 
 					const scaleI = scale.mul( i );
@@ -240,8 +240,8 @@
 
 				// Scriptable
 
-				global.set( 'THREE', THREE );
-				global.set( 'TSL', TSL );
+				ScriptableNodeResources.set( 'THREE', THREE );
+				ScriptableNodeResources.set( 'TSL', TSL );
 
 				const asyncNode = scriptable( js( `
 
