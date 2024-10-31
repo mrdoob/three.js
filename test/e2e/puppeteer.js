@@ -3,7 +3,7 @@ import puppeteer from 'puppeteer';
 import express from 'express';
 import path from 'path';
 import pixelmatch from 'pixelmatch';
-import jimp from 'jimp';
+import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
 
 class PromiseQueue {
@@ -561,7 +561,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 		}
 
-		const screenshot = ( await jimp.read( await page.screenshot() ) ).scale( 1 / viewScale ).quality( jpgQuality );
+		const screenshot = ( await Jimp.read( await page.screenshot(), { quality: jpgQuality } ) ).scale( 1 / viewScale );
 
 		if ( page.error !== undefined ) throw new Error( page.error );
 
@@ -569,7 +569,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			/* Make screenshots */
 
-			await screenshot.writeAsync( `examples/screenshots/${ file }.jpg` );
+			await screenshot.write( `examples/screenshots/${ file }.jpg` );
 
 			console.green( `Screenshot generated for file ${ file }` );
 
@@ -581,11 +581,11 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			try {
 
-				expected = ( await jimp.read( `examples/screenshots/${ file }.jpg` ) ).quality( jpgQuality );
+				expected = ( await Jimp.read( `examples/screenshots/${ file }.jpg`, { quality: jpgQuality } ) );
 
 			} catch {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
 				throw new Error( `Screenshot does not exist: ${ file }` );
 
 			}
@@ -604,8 +604,8 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} catch {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
-				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
+				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg` );
 				throw new Error( `Image sizes does not match in file: ${ file }` );
 
 			}
@@ -620,9 +620,9 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			} else {
 
-				await screenshot.writeAsync( `test/e2e/output-screenshots/${ file }-actual.jpg` );
-				await expected.writeAsync( `test/e2e/output-screenshots/${ file }-expected.jpg` );
-				await diff.writeAsync( `test/e2e/output-screenshots/${ file }-diff.jpg` );
+				await screenshot.write( `test/e2e/output-screenshots/${ file }-actual.jpg` );
+				await expected.write( `test/e2e/output-screenshots/${ file }-expected.jpg` );
+				await diff.write( `test/e2e/output-screenshots/${ file }-diff.jpg` );
 				throw new Error( `Diff wrong in ${ differentPixels.toFixed( 1 ) }% of pixels in file: ${ file }` );
 
 			}
