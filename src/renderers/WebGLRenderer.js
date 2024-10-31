@@ -2586,7 +2586,7 @@ class WebGLRenderer {
 
 				if ( srcLevel !== 0 ) {
 
-					// @deprecated, r170
+					// @deprecated, r171
 					warnOnce( 'WebGLRenderer: copyTextureToTexture function signature has changed to support src and dst mipmap levels.' );
 					dstLevel = srcLevel;
 					srcLevel = 0;
