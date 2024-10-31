@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.169.0",
+  "version": "0.170.0",
   "description": "JavaScript 3D library",
   "type": "module",
   "main": "./build/three.cjs",
@@ -101,7 +101,7 @@
     "eslint-plugin-html": "^8.0.0",
     "eslint-plugin-import": "^2.27.5",
     "failonlyreporter": "^1.0.0",
-    "jimp": "^0.22.7",
+    "jimp": "^1.6.0",
     "magic-string": "^0.30.0",
     "pixelmatch": "^6.0.0",
     "puppeteer": "^22.0.0",

@@ -127,6 +127,20 @@ class WebGPUTextureUtils {
 
 		const { width, height, depth, levels } = options;
 
+		if ( texture.isFramebufferTexture ) {
+
+			if ( options.renderTarget ) {
+
+				options.format = this.backend.utils.getCurrentColorFormat( options.renderTarget );
+
+			} else {
+
+				options.format = this.backend.utils.getPreferredCanvasFormat();
+
+			}
+
+		}
+
 		const dimension = this._getDimension( texture );
 		const format = texture.internalFormat || options.format || getFormat( texture, backend.device );
 
@@ -858,11 +872,7 @@ export function getFormat( texture, device = null ) {
 
 	let formatGPU;
 
-	if ( texture.isFramebufferTexture === true && texture.type === UnsignedByteType ) {
-
-		formatGPU = GPUTextureFormat.BGRA8Unorm;
-
-	} else if ( texture.isCompressedTexture === true || texture.isCompressedArrayTexture === true ) {
+	if ( texture.isCompressedTexture === true || texture.isCompressedArrayTexture === true ) {
 
 		switch ( format ) {
 

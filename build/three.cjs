@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const REVISION = '170dev';
+const REVISION = '170';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -2598,6 +2598,17 @@ class Vector4 {
 		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z + e[ 13 ] * w;
 		this.z = e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] * w;
 		this.w = e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] * w;
+
+		return this;
+
+	}
+
+	divide( v ) {
+
+		this.x /= v.x;
+		this.y /= v.y;
+		this.z /= v.z;
+		this.w /= v.w;
 
 		return this;
 
@@ -27149,18 +27160,14 @@ class WebXRManager extends EventDispatcher {
 		//
 
 		const cameraL = new PerspectiveCamera();
-		cameraL.layers.enable( 1 );
 		cameraL.viewport = new Vector4();
 
 		const cameraR = new PerspectiveCamera();
-		cameraR.layers.enable( 2 );
 		cameraR.viewport = new Vector4();
 
 		const cameras = [ cameraL, cameraR ];
 
 		const cameraXR = new ArrayCamera();
-		cameraXR.layers.enable( 1 );
-		cameraXR.layers.enable( 2 );
 
 		let _currentDepthNear = null;
 		let _currentDepthFar = null;
@@ -27669,6 +27676,10 @@ class WebXRManager extends EventDispatcher {
 				_currentDepthFar = cameraXR.far;
 
 			}
+
+			cameraL.layers.mask = camera.layers.mask | 0b010;
+			cameraR.layers.mask = camera.layers.mask | 0b100;
+			cameraXR.layers.mask = cameraL.layers.mask | cameraR.layers.mask;
 
 			const parent = camera.parent;
 			const cameras = cameraXR.cameras;

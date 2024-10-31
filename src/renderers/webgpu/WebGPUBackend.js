@@ -101,6 +101,19 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		device.lost.then( ( info ) => {
+
+			const deviceLossInfo = {
+				api: 'WebGPU',
+				message: info.message || 'Unknown reason',
+				reason: info.reason || null,
+				originalEvent: info
+			};
+
+			renderer.onDeviceLost( deviceLossInfo );
+
+		} );
+
 		const context = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgpu' );
 
 		this.device = device;
@@ -1469,8 +1482,6 @@ class WebGPUBackend extends Backend {
 
 		const renderContextData = this.get( renderContext );
 
-		const { encoder, descriptor } = renderContextData;
-
 		let sourceGPU = null;
 
 		if ( renderContext.renderTarget ) {
@@ -1509,7 +1520,19 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		renderContextData.currentPass.end();
+		let encoder;
+
+		if ( renderContextData.currentPass ) {
+
+			renderContextData.currentPass.end();
+
+			encoder = renderContextData.encoder;
+
+		} else {
+
+			encoder = this.device.createCommandEncoder( { label: 'copyFramebufferToTexture_' + texture.id } );
+
+		}
 
 		encoder.copyTextureToTexture(
 			{
@@ -1527,17 +1550,27 @@ class WebGPUBackend extends Backend {
 
 		if ( texture.generateMipmaps ) this.textureUtils.generateMipmaps( texture );
 
-		for ( let i = 0; i < descriptor.colorAttachments.length; i ++ ) {
+		if ( renderContextData.currentPass ) {
 
-			descriptor.colorAttachments[ i ].loadOp = GPULoadOp.Load;
+			const { descriptor } = renderContextData;
+
+			for ( let i = 0; i < descriptor.colorAttachments.length; i ++ ) {
+
+				descriptor.colorAttachments[ i ].loadOp = GPULoadOp.Load;
+
+			}
+
+			if ( renderContext.depth ) descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+			if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+
+			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
+			renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+
+		} else {
+
+			this.device.queue.submit( [ encoder.finish() ] );
 
 		}
-
-		if ( renderContext.depth ) descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
-		if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
-
-		renderContextData.currentPass = encoder.beginRenderPass( descriptor );
-		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 
 	}
 

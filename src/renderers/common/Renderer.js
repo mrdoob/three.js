@@ -143,6 +143,9 @@ class Renderer {
 
 		this._handleObjectFunction = this._renderObjectDirect;
 
+		this._isDeviceLost = false;
+		this.onDeviceLost = this._onDeviceLost;
+
 		this._initialized = false;
 		this._initPromise = null;
 
@@ -264,6 +267,8 @@ class Renderer {
 	}
 
 	async compileAsync( scene, camera, targetScene = null ) {
+
+		if ( this._isDeviceLost === true ) return;
 
 		if ( this._initialized === false ) await this.init();
 
@@ -418,6 +423,23 @@ class Renderer {
 
 	}
 
+	_onDeviceLost( info ) {
+
+		let errorMessage = `THREE.WebGPURenderer: ${info.api} Device Lost:\n\nMessage: ${info.message}`;
+
+		if ( info.reason ) {
+
+			errorMessage += `\nReason: ${info.reason}`;
+
+		}
+
+		console.error( errorMessage );
+
+		this._isDeviceLost = true;
+
+	}
+
+
 	_renderBundle( bundle, sceneRef, lightsNode ) {
 
 		const { bundleGroup, camera, renderList } = bundle;
@@ -551,6 +573,8 @@ class Renderer {
 	}
 
 	_renderScene( scene, camera, useFrameBufferTarget = true ) {
+
+		if ( this._isDeviceLost === true ) return;
 
 		const frameBufferTarget = useFrameBufferTarget ? this._getFrameBufferTarget() : null;
 
@@ -1120,6 +1144,7 @@ class Renderer {
 	dispose() {
 
 		this.info.dispose();
+		this.backend.dispose();
 
 		this._animation.dispose();
 		this._objects.dispose();
@@ -1162,6 +1187,8 @@ class Renderer {
 	}
 
 	compute( computeNodes ) {
+
+		if ( this.isDeviceLost === true ) return;
 
 		if ( this._initialized === false ) {
 
@@ -1284,11 +1311,56 @@ class Renderer {
 
 	copyFramebufferToTexture( framebufferTexture, rectangle = null ) {
 
-		const renderContext = this._currentRenderContext;
+		if ( rectangle !== null ) {
 
-		this._textures.updateTexture( framebufferTexture );
+			if ( rectangle.isVector2 ) {
 
-		rectangle = rectangle === null ? _vector4.set( 0, 0, framebufferTexture.image.width, framebufferTexture.image.height ) : rectangle;
+				rectangle = _vector4.set( rectangle.x, rectangle.y, framebufferTexture.image.width, framebufferTexture.image.height ).floor();
+
+			} else if ( rectangle.isVector4 ) {
+
+				rectangle = _vector4.copy( rectangle ).floor();
+
+			} else {
+
+				console.error( 'THREE.Renderer.copyFramebufferToTexture: Invalid rectangle.' );
+
+				return;
+
+			}
+
+		} else {
+
+			rectangle = _vector4.set( 0, 0, framebufferTexture.image.width, framebufferTexture.image.height );
+
+		}
+
+		//
+
+		let renderContext = this._currentRenderContext;
+		let renderTarget;
+
+		if ( renderContext !== null ) {
+
+			renderTarget = renderContext.renderTarget;
+
+		} else {
+
+			renderTarget = this._renderTarget || this._getFrameBufferTarget();
+
+			if ( renderTarget !== null ) {
+
+				this._textures.updateRenderTarget( renderTarget );
+
+				renderContext = this._textures.get( renderTarget );
+
+			}
+
+		}
+
+		//
+
+		this._textures.updateTexture( framebufferTexture, { renderTarget } );
 
 		this.backend.copyFramebufferToTexture( framebufferTexture, renderContext, rectangle );
 
@@ -1302,7 +1374,6 @@ class Renderer {
 		this.backend.copyTextureToTexture( srcTexture, dstTexture, srcRegion, dstPosition, level );
 
 	}
-
 
 	readRenderTargetPixelsAsync( renderTarget, x, y, width, height, index = 0, faceIndex = 0 ) {
 
