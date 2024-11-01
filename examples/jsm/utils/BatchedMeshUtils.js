@@ -178,6 +178,7 @@ function analyzeGLTFModel( scene ) {
 
 	const batchGroups = new Map();
 	const singleGroups = new Map();
+	const uniqueGeometries = new Set();
 
 	scene.updateMatrixWorld( true );
 	scene.traverse( ( node ) => {
@@ -187,30 +188,32 @@ function analyzeGLTFModel( scene ) {
 		const materialProps = getMaterialPropertiesHash( node.material );
 		const attributesSignature = getAttributesSignature( node.geometry );
 		const batchKey = getBatchKey( materialProps, attributesSignature );
+		const geometryHash = getGeometryHash( node.geometry );
+		uniqueGeometries.add( geometryHash );
 
 		if ( ! batchGroups.has( batchKey ) ) {
 
 			batchGroups.set( batchKey, {
 				meshes: [],
 				geometryStats: new Map(),
-				totalInstances: 0
+				totalInstances: 0,
+				materialProps: node.material.clone(),
 			} );
 
 		}
 
 		const group = batchGroups.get( batchKey );
 		group.meshes.push( node );
-		group.totalInstances ++; // Increment total instances for this batch
+		group.totalInstances ++;
 
 		// Track geometry statistics
-		const geometryHash = getGeometryHash( node.geometry );
 		if ( ! group.geometryStats.has( geometryHash ) ) {
 
 			group.geometryStats.set( geometryHash, {
 				count: 0,
 				vertices: node.geometry.attributes.position.count,
 				indices: node.geometry.index ? node.geometry.index.count : 0,
-				geometry: node.geometry
+				geometry: node.geometry,
 			} );
 
 		}
@@ -231,68 +234,51 @@ function analyzeGLTFModel( scene ) {
 
 	}
 
-	return { batchGroups, singleGroups };
+	return { batchGroups, singleGroups, uniqueGeometries: uniqueGeometries.size };
 
 }
 
 /**
- * Creates a BatchedMesh with exact buffer sizes
+ * Creates BatchedMeshes and places them in the correct parent
  */
-function createPreciseBatchedMesh( materialProps, group ) {
+function createBatchedMeshes( batchGroups ) {
 
-	const maxGeometries = group.totalInstances;
+	const meshesToRemove = new Set();
 
-	const maxVertices = Array.from( group.geometryStats.values() ).reduce(
-		( sum, stats ) => sum + stats.vertices,
-		0
-	);
-
-	const maxIndices = Array.from( group.geometryStats.values() ).reduce(
-		( sum, stats ) => sum + stats.indices,
-		0
-	);
-
-	// Create material with shared properties
-	const batchedMaterial = new THREE.MeshPhysicalMaterial( materialProps );
-
-	const batchedMesh = new THREE.BatchedMesh(
-		maxGeometries,
-		maxVertices,
-		maxIndices,
-		batchedMaterial
-	);
-
-	return batchedMesh;
-
-}
-
-/**
- * Converts a GLTF model into BatchedMeshes and individual meshes where appropriate
- * @param {THREE.Group} Scene - The group/scene
- * @param {boolean} debug - Log statistics to console
- * @returns {THREE.BatchedMesh|THREE.Mesh[]} Converted meshes
- */
-export function optimizeSceneToBatchedMesh( scene, debug = false ) {
-
-	const { batchGroups, singleGroups } = analyzeGLTFModel( scene );
-	const batchedMeshes = [];
-	const singleInstanceMeshes = [];
-
-	const stats = {
-		totalObjects: 0,
-		batchedMeshes: 0,
-		meshes: 0,
-		totalInstances: 0,
-		uniqueGeometries: 0,
-		uniqueMaterialVariants: new Set(),
-	};
-
-	// Create batched meshes
 	for ( const [ , group ] of batchGroups ) {
 
-		const batchedMesh = createPreciseBatchedMesh( group.materialProps, group );
+		const maxGeometries = group.totalInstances;
+		const maxVertices = Array.from( group.geometryStats.values() ).reduce(
+			( sum, stats ) => sum + stats.vertices,
+			0
+		);
+		const maxIndices = Array.from( group.geometryStats.values() ).reduce(
+			( sum, stats ) => sum + stats.indices,
+			0
+		);
+
+		const batchedMaterial = new THREE.MeshPhysicalMaterial( group.materialProps );
+		const batchedMesh = new THREE.BatchedMesh(
+			maxGeometries,
+			maxVertices,
+			maxIndices,
+			batchedMaterial
+		);
+
+		// Get the first mesh in the group to determine parent
+		const referenceMesh = group.meshes[ 0 ];
+		batchedMesh.name = `${referenceMesh.name}_batch`;
 
 		const geometryIds = new Map();
+		const inverseParentMatrix = new THREE.Matrix4();
+
+		// Get parent's inverse matrix for local transforms
+		if ( referenceMesh.parent ) {
+
+			referenceMesh.parent.updateWorldMatrix( true, false );
+			inverseParentMatrix.copy( referenceMesh.parent.matrixWorld ).invert();
+
+		}
 
 		// Add all meshes to the batch
 		for ( const mesh of group.meshes ) {
@@ -302,96 +288,98 @@ export function optimizeSceneToBatchedMesh( scene, debug = false ) {
 			if ( ! geometryIds.has( geometryHash ) ) {
 
 				geometryIds.set( geometryHash, batchedMesh.addGeometry( mesh.geometry ) );
-				stats.uniqueGeometries ++;
 
 			}
 
 			const geometryId = geometryIds.get( geometryHash );
 			const instanceId = batchedMesh.addInstance( geometryId );
 
-			if ( instanceId === - 1 ) {
+			// Calculate local matrix relative to the BatchedMesh's parent
+			const localMatrix = new THREE.Matrix4();
+			mesh.updateWorldMatrix( true, false );
+			localMatrix.copy( mesh.matrixWorld );
+			if ( referenceMesh.parent ) {
 
-				console.warn( 'Failed to add instance - capacity exceeded' );
-				continue;
+				localMatrix.premultiply( inverseParentMatrix );
 
 			}
 
-			batchedMesh.setMatrixAt( instanceId, mesh.matrixWorld );
+			batchedMesh.setMatrixAt( instanceId, localMatrix );
 			batchedMesh.setColorAt( instanceId, mesh.material.color );
 
-			stats.totalInstances ++;
-			stats.uniqueMaterialVariants.add(
-				getMaterialPropertiesHash( mesh.material )
-			);
+			meshesToRemove.add( mesh );
 
 		}
 
-		batchedMeshes.push( batchedMesh );
-		stats.batchedMeshes ++;
+		// Add BatchedMesh to the same parent as the reference mesh
+		if ( referenceMesh.parent ) {
+
+			referenceMesh.parent.add( batchedMesh );
+
+		}
 
 	}
 
-	// Handle single instance meshes
-	for ( const [ , /* batchKey */ group ] of singleGroups ) {
-
-		const mesh = group.meshes[ 0 ];
-		// Clone the mesh to preserve the original
-		const singleMesh = mesh.clone();
-		singleInstanceMeshes.push( singleMesh );
-		stats.meshes ++;
-		stats.totalInstances ++;
-
-	}
-
-	if ( debug === true ) {
-
-		_debugBatchedMeshStats( scene, stats );
-
-	}
-
-	return new THREE.Group().add( ...batchedMeshes, ...singleInstanceMeshes );
+	return meshesToRemove;
 
 }
 
-/**
- * Logs batched mesh statistics
- * @param {Object} stats - Batched mesh statistics
- */
-function _debugBatchedMeshStats( scene, stats ) {
+export function optimizeSceneToBatchedMesh( scene, debug = false ) {
 
-	scene.traverse( () => stats.totalObjects ++ );
+	const { batchGroups, singleGroups, uniqueGeometries } = analyzeGLTFModel( scene );
+	const meshesToRemove = createBatchedMeshes( batchGroups );
 
-	// In your convertGLTFToBatchedMeshes function:
-	console.group( 'Scene Optimization Results' );
+	// Remove original meshes that were batched
+	meshesToRemove.forEach( ( mesh ) => {
 
-	// Pre-optimization stats
-	console.log( 'Original Scene:' );
-	console.log( `  Total Objects: ${stats.totalObjects}` );
-	console.log( `  Total Meshes: ${stats.totalInstances}` );
-	console.log( `  Unique Geometries: ${stats.uniqueGeometries}` );
-	console.log( `  Unique Materials: ${stats.uniqueMaterialVariants.size}` );
+		if ( mesh.parent ) {
 
-	// Optimization results
-	console.log( '\nAfter Optimization:' );
-	console.log( `  BatchedMeshes: ${stats.batchedMeshes}` );
-	console.log( `  Single Meshes: ${stats.meshes}` );
-	console.log( `  Total Draw Calls: ${stats.batchedMeshes + stats.meshes}` );
+			mesh.parent.remove( mesh );
 
-	// Detailed stats
-	console.log( '\nDetailed Statistics:' );
-	console.log(
-		`  Reduction Ratio: ${(
-			( 1 - ( stats.batchedMeshes + stats.meshes ) / stats.totalInstances ) *
-      100
-		).toFixed( 1 )}% fewer draw calls`
-	);
+		}
 
-	console.groupEnd();
+		if ( mesh.geometry ) mesh.geometry.dispose();
+		if ( mesh.material ) {
+
+			if ( Array.isArray( mesh.material ) ) {
+
+				mesh.material.forEach( ( m ) => m.dispose() );
+
+			} else {
+
+				mesh.material.dispose();
+
+			}
+
+		}
+
+	} );
+
+	if ( debug ) {
+
+		const totalOriginalMeshes = meshesToRemove.size + singleGroups.size;
+		const totalFinalMeshes = batchGroups.size + singleGroups.size;
+
+		const stats = {
+			originalMeshes: totalOriginalMeshes,
+			batchedMeshes: batchGroups.size,
+			singleMeshes: singleGroups.size,
+			drawCalls: totalFinalMeshes,
+			uniqueGeometries: uniqueGeometries,
+			reductionRatio: ( ( 1 - totalFinalMeshes / totalOriginalMeshes ) * 100 ).toFixed( 1 )
+		};
+
+		console.group( 'Scene Optimization Results' );
+		console.log( `Original meshes: ${stats.originalMeshes}` );
+		console.log( `Batched into: ${stats.batchedMeshes} BatchedMesh` );
+		console.log( `Single meshes: ${stats.singleMeshes} Mesh` );
+		console.log( `Total draw calls: ${stats.drawCalls}` );
+		console.log( `Reduction Ratio: ${stats.reductionRatio}% fewer draw calls` );
+		console.groupEnd();
+
+	}
+
+
+	return scene;
 
 }
-
-// Example usage:
-/*
-const batchedMeshes = sceneToBatchedMeshes(gltf.scene);
-batchedMeshes.forEach(mesh => scene.add(mesh));
-*/
