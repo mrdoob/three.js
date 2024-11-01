@@ -166,13 +166,13 @@ function getBatchKey( materialProps, attributesSignature ) {
 /**
  * Analyzes a GLTF model to group meshes by material properties (excluding color) and attributes
  */
-function analyzeGLTFModel( gltfScene ) {
+function analyzeGLTFModel( scene ) {
 
 	const batchGroups = new Map();
 	const singleGroups = new Map(); // Store single mesh groups separately
 
-	gltfScene.updateMatrixWorld( true );
-	gltfScene.traverse( node => {
+	scene.updateMatrixWorld( true );
+	scene.traverse( node => {
 
 		if ( ! node.isMesh ) return;
 
@@ -228,6 +228,37 @@ function analyzeGLTFModel( gltfScene ) {
 
 }
 
+/**
+ * Logs batched mesh statistics
+ * @param {Object} stats - Batched mesh statistics
+*/
+function debugBatchedMeshStats( scene, stats ) {
+
+	scene.traverse( () => stats.totalObjects ++ );
+
+	// In your convertGLTFToBatchedMeshes function:
+	console.group( 'Scene Optimization Results' );
+
+	// Pre-optimization stats
+	console.log( 'Original Scene:' );
+	console.log( `  Total Objects: ${stats.totalObjects}` );
+	console.log( `  Total Meshes: ${stats.totalInstances}` );
+	console.log( `  Unique Geometries: ${stats.uniqueGeometries}` );
+	console.log( `  Unique Materials: ${stats.uniqueMaterialVariants.size}` );
+
+	// Optimization results
+	console.log( '\nAfter Optimization:' );
+	console.log( `  BatchedMeshes: ${stats.batchedMeshes}` );
+	console.log( `  Single Meshes: ${stats.meshes}` );
+	console.log( `  Total Draw Calls: ${stats.batchedMeshes + stats.meshes}` );
+
+	// Detailed stats
+	console.log( '\nDetailed Statistics:' );
+	console.log( `  Reduction Ratio: ${( ( 1 - ( stats.batchedMeshes + stats.meshes ) / stats.totalInstances ) * 100 ).toFixed( 1 )}% fewer draw calls` );
+
+	console.groupEnd();
+
+}
 
 /**
  * Creates a BatchedMesh with exact buffer sizes
@@ -254,16 +285,18 @@ function createPreciseBatchedMesh( materialProps, geometryStats ) {
 
 /**
  * Converts a GLTF model into BatchedMeshes and individual meshes where appropriate
- * @param {THREE.Group} gltfScene - The loaded GLTF scene
- * @returns {{batched: THREE.BatchedMesh[], single: THREE.Mesh[]}} Converted meshes
+ * @param {THREE.Group} Scene - The group/scene
+ * @param {boolean} debug - Log statistics to console
+ * @returns {THREE.BatchedMesh|THREE.Mesh[]} Converted meshes
  */
-export function convertGLTFToBatchedMeshes( gltfScene ) {
+export function sceneToBatchedMeshes( scene, debug = false ) {
 
-	const { batchGroups, singleGroups } = analyzeGLTFModel( gltfScene );
+	const { batchGroups, singleGroups } = analyzeGLTFModel( scene );
 	const batchedMeshes = [];
 	const singleInstanceMeshes = [];
 
 	const stats = {
+		totalObjects: 0,
 		batchedMeshes: 0,
 		meshes: 0,
 		totalInstances: 0,
@@ -325,11 +358,11 @@ export function convertGLTFToBatchedMeshes( gltfScene ) {
 
 	}
 
-	// console.log( 'Conversion stats:', {
-	// 	...stats,
-	// 	uniqueMaterialVariants: stats.uniqueMaterialVariants.size,
-	// 	totalMeshes: stats.batchedMeshes + stats.meshes
-	// } );
+	if ( debug === true ) {
+
+		debugBatchedMeshStats( scene, stats );
+
+	}
 
 	return [ ...batchedMeshes, ...singleInstanceMeshes ];
 
@@ -337,6 +370,6 @@ export function convertGLTFToBatchedMeshes( gltfScene ) {
 
 // Example usage:
 /*
-const batchedMeshes = convertGLTFToBatchedMeshes(gltf.scene);
+const batchedMeshes = sceneToBatchedMeshes(gltf.scene);
 batchedMeshes.forEach(mesh => scene.add(mesh));
 */
