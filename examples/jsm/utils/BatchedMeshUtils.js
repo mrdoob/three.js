@@ -324,9 +324,35 @@ function createBatchedMeshes( batchGroups ) {
 
 }
 
+/**
+   * Removes empty groups and object3D nodes from the scene
+   */
+function removeEmptyNodes( object ) {
+
+	const children = [ ...object.children ]; // Create copy to safely modify during iteration
+
+	for ( const child of children ) {
+
+		// Recurse first
+		removeEmptyNodes( child );
+
+		// Then remove if empty Group or Object3D
+		if ( ( child instanceof THREE.Group || child.constructor === THREE.Object3D )
+              && child.children.length === 0 ) {
+
+			object.remove( child );
+
+		}
+
+	}
+
+}
+
+
 export function optimizeSceneToBatchedMesh( scene, debug = false ) {
 
-	const { batchGroups, singleGroups, uniqueGeometries } = analyzeGLTFModel( scene );
+	const { batchGroups, singleGroups, uniqueGeometries } =
+    analyzeGLTFModel( scene );
 	const meshesToRemove = createBatchedMeshes( batchGroups );
 
 	// Remove original meshes that were batched
@@ -355,6 +381,8 @@ export function optimizeSceneToBatchedMesh( scene, debug = false ) {
 
 	} );
 
+	removeEmptyNodes( scene );
+
 	if ( debug ) {
 
 		const totalOriginalMeshes = meshesToRemove.size + singleGroups.size;
@@ -366,7 +394,10 @@ export function optimizeSceneToBatchedMesh( scene, debug = false ) {
 			singleMeshes: singleGroups.size,
 			drawCalls: totalFinalMeshes,
 			uniqueGeometries: uniqueGeometries,
-			reductionRatio: ( ( 1 - totalFinalMeshes / totalOriginalMeshes ) * 100 ).toFixed( 1 )
+			reductionRatio: (
+				( 1 - totalFinalMeshes / totalOriginalMeshes ) *
+        100
+			).toFixed( 1 ),
 		};
 
 		console.group( 'Scene Optimization Results' );
