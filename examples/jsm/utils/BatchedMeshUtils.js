@@ -8,7 +8,11 @@ function bufferToHash( buffer ) {
 		let uintArray;
 		if ( buffer.buffer ) {
 
-			uintArray = new Uint8Array( buffer.buffer, buffer.byteOffset, buffer.byteLength );
+			uintArray = new Uint8Array(
+				buffer.buffer,
+				buffer.byteOffset,
+				buffer.byteLength
+			);
 
 		} else {
 
@@ -19,7 +23,7 @@ function bufferToHash( buffer ) {
 		for ( let i = 0; i < buffer.byteLength; i ++ ) {
 
 			const byte = uintArray[ i ];
-			hash = ( ( hash << 5 ) - hash ) + byte;
+			hash = ( hash << 5 ) - hash + byte;
 			hash |= 0;
 
 		}
@@ -47,17 +51,19 @@ function getMaterialPropertiesHash( material ) {
 		'lightMap',
 		'metalnessMap',
 		'normalMap',
-		'roughnessMap'
+		'roughnessMap',
 	];
 
 	// Build map hash
-	const mapHash = mapProps.map( prop => {
+	const mapHash = mapProps
+		.map( ( prop ) => {
 
-		const map = material[ prop ];
-		if ( ! map ) return 0;
-		return `${map.uuid}_${map.offset.x}_${map.offset.y}_${map.repeat.x}_${map.repeat.y}_${map.rotation}`;
+			const map = material[ prop ];
+			if ( ! map ) return 0;
+			return `${map.uuid}_${map.offset.x}_${map.offset.y}_${map.repeat.x}_${map.repeat.y}_${map.rotation}`;
 
-	} ).join( '|' );
+		} )
+		.join( '|' );
 
 	// Build physical properties hash
 	const physicalProps = [
@@ -90,29 +96,29 @@ function getMaterialPropertiesHash( material ) {
 		'iridescence',
 		'iridescenceIOR',
 		'iridescenceThicknessRange',
-		'reflectivity'
-	].map( prop => {
+		'reflectivity',
+	]
+		.map( ( prop ) => {
 
-		if ( typeof material[ prop ] === 'undefined' ) return 0;
-		if ( material[ prop ] === null ) return 0;
-		return material[ prop ].toString();
+			if ( typeof material[ prop ] === 'undefined' ) return 0;
+			if ( material[ prop ] === null ) return 0;
+			return material[ prop ].toString();
 
-	} ).join( '|' );
+		} )
+		.join( '|' );
 
 	// Include emissive color (unlike base color, this can't vary per instance)
-	const emissiveHash = material.emissive ?
-		material.emissive.getHexString() :
-		0;
+	const emissiveHash = material.emissive ? material.emissive.getHexString() : 0;
 
 	// Include attenuationColor
-	const attenuationHash = material.attenuationColor ?
-		material.attenuationColor.getHexString() :
-		0;
+	const attenuationHash = material.attenuationColor
+		? material.attenuationColor.getHexString()
+		: 0;
 
 	// Include sheenColor
-	const sheenColorHash = material.sheenColor ?
-		material.sheenColor.getHexString() :
-		0;
+	const sheenColorHash = material.sheenColor
+		? material.sheenColor.getHexString()
+		: 0;
 
 	return [
 		material.type,
@@ -120,7 +126,7 @@ function getMaterialPropertiesHash( material ) {
 		mapHash,
 		emissiveHash,
 		attenuationHash,
-		sheenColorHash
+		sheenColorHash,
 	].join( '_' );
 
 }
@@ -132,7 +138,7 @@ function getAttributesSignature( geometry ) {
 
 	return Object.keys( geometry.attributes )
 		.sort()
-		.map( name => {
+		.map( ( name ) => {
 
 			const attribute = geometry.attributes[ name ];
 			return `${name}_${attribute.itemSize}_${attribute.normalized}`;
@@ -147,7 +153,9 @@ function getAttributesSignature( geometry ) {
  */
 function getGeometryHash( geometry ) {
 
-	const indexHash = geometry.index ? bufferToHash( geometry.index.array ) : 'noIndex';
+	const indexHash = geometry.index
+		? bufferToHash( geometry.index.array )
+		: 'noIndex';
 	const positionHash = bufferToHash( geometry.attributes.position.array );
 	const attributesSignature = getAttributesSignature( geometry );
 	return `${indexHash}_${positionHash}_${attributesSignature}`;
@@ -164,15 +172,15 @@ function getBatchKey( materialProps, attributesSignature ) {
 }
 
 /**
- * Analyzes a GLTF model to group meshes by material properties (excluding color) and attributes
+ * Analyzes a GLTF model to group meshes by material properties and attributes
  */
 function analyzeGLTFModel( scene ) {
 
 	const batchGroups = new Map();
-	const singleGroups = new Map(); // Store single mesh groups separately
+	const singleGroups = new Map();
 
 	scene.updateMatrixWorld( true );
-	scene.traverse( node => {
+	scene.traverse( ( node ) => {
 
 		if ( ! node.isMesh ) return;
 
@@ -184,13 +192,15 @@ function analyzeGLTFModel( scene ) {
 
 			batchGroups.set( batchKey, {
 				meshes: [],
-				geometryStats: new Map()
+				geometryStats: new Map(),
+				totalInstances: 0
 			} );
 
 		}
 
 		const group = batchGroups.get( batchKey );
 		group.meshes.push( node );
+		group.totalInstances ++; // Increment total instances for this batch
 
 		// Track geometry statistics
 		const geometryHash = getGeometryHash( node.geometry );
@@ -212,10 +222,7 @@ function analyzeGLTFModel( scene ) {
 	// Move single instance groups to singleGroups
 	for ( const [ batchKey, group ] of batchGroups ) {
 
-		const totalInstances = Array.from( group.geometryStats.values() )
-			.reduce( ( sum, stats ) => sum + stats.count, 0 );
-
-		if ( totalInstances === 1 ) {
+		if ( group.totalInstances === 1 ) {
 
 			singleGroups.set( batchKey, group );
 			batchGroups.delete( batchKey );
@@ -229,9 +236,127 @@ function analyzeGLTFModel( scene ) {
 }
 
 /**
+ * Creates a BatchedMesh with exact buffer sizes
+ */
+function createPreciseBatchedMesh( materialProps, group ) {
+
+	const maxGeometries = group.totalInstances;
+
+	const maxVertices = Array.from( group.geometryStats.values() ).reduce(
+		( sum, stats ) => sum + stats.vertices,
+		0
+	);
+
+	const maxIndices = Array.from( group.geometryStats.values() ).reduce(
+		( sum, stats ) => sum + stats.indices,
+		0
+	);
+
+	// Create material with shared properties
+	const batchedMaterial = new THREE.MeshPhysicalMaterial( materialProps );
+
+	const batchedMesh = new THREE.BatchedMesh(
+		maxGeometries,
+		maxVertices,
+		maxIndices,
+		batchedMaterial
+	);
+
+	return batchedMesh;
+
+}
+
+/**
+ * Converts a GLTF model into BatchedMeshes and individual meshes where appropriate
+ * @param {THREE.Group} Scene - The group/scene
+ * @param {boolean} debug - Log statistics to console
+ * @returns {THREE.BatchedMesh|THREE.Mesh[]} Converted meshes
+ */
+export function sceneToBatchedMeshes( scene, debug = false ) {
+
+	const { batchGroups, singleGroups } = analyzeGLTFModel( scene );
+	const batchedMeshes = [];
+	const singleInstanceMeshes = [];
+
+	const stats = {
+		totalObjects: 0,
+		batchedMeshes: 0,
+		meshes: 0,
+		totalInstances: 0,
+		uniqueGeometries: 0,
+		uniqueMaterialVariants: new Set(),
+	};
+
+	// Create batched meshes
+	for ( const [ , group ] of batchGroups ) {
+
+		const batchedMesh = createPreciseBatchedMesh( group.materialProps, group );
+
+		const geometryIds = new Map();
+
+		// Add all meshes to the batch
+		for ( const mesh of group.meshes ) {
+
+			const geometryHash = getGeometryHash( mesh.geometry );
+
+			if ( ! geometryIds.has( geometryHash ) ) {
+
+				geometryIds.set( geometryHash, batchedMesh.addGeometry( mesh.geometry ) );
+				stats.uniqueGeometries ++;
+
+			}
+
+			const geometryId = geometryIds.get( geometryHash );
+			const instanceId = batchedMesh.addInstance( geometryId );
+
+			if ( instanceId === - 1 ) {
+
+				console.warn( 'Failed to add instance - capacity exceeded' );
+				continue;
+
+			}
+
+			batchedMesh.setMatrixAt( instanceId, mesh.matrixWorld );
+			batchedMesh.setColorAt( instanceId, mesh.material.color );
+
+			stats.totalInstances ++;
+			stats.uniqueMaterialVariants.add(
+				getMaterialPropertiesHash( mesh.material )
+			);
+
+		}
+
+		batchedMeshes.push( batchedMesh );
+		stats.batchedMeshes ++;
+
+	}
+
+	// Handle single instance meshes
+	for ( const [ , /* batchKey */ group ] of singleGroups ) {
+
+		const mesh = group.meshes[ 0 ];
+		// Clone the mesh to preserve the original
+		const singleMesh = mesh.clone();
+		singleInstanceMeshes.push( singleMesh );
+		stats.meshes ++;
+		stats.totalInstances ++;
+
+	}
+
+	if ( debug === true ) {
+
+		debugBatchedMeshStats( scene, stats );
+
+	}
+
+	return [ ...batchedMeshes, ...singleInstanceMeshes ];
+
+}
+
+/**
  * Logs batched mesh statistics
  * @param {Object} stats - Batched mesh statistics
-*/
+ */
 function debugBatchedMeshStats( scene, stats ) {
 
 	scene.traverse( () => stats.totalObjects ++ );
@@ -254,117 +379,14 @@ function debugBatchedMeshStats( scene, stats ) {
 
 	// Detailed stats
 	console.log( '\nDetailed Statistics:' );
-	console.log( `  Reduction Ratio: ${( ( 1 - ( stats.batchedMeshes + stats.meshes ) / stats.totalInstances ) * 100 ).toFixed( 1 )}% fewer draw calls` );
-
-	console.groupEnd();
-
-}
-
-/**
- * Creates a BatchedMesh with exact buffer sizes
- */
-function createPreciseBatchedMesh( materialProps, geometryStats ) {
-
-	const maxGeometries = geometryStats.size + 1;
-	const maxVertices = Array.from( geometryStats.values() )
-		.reduce( ( sum, stats ) => sum + stats.vertices, 0 );
-	const maxIndices = Array.from( geometryStats.values() )
-		.reduce( ( sum, stats ) => sum + stats.indices, 0 );
-
-	// Create material with shared properties
-	const batchedMaterial = new THREE.MeshPhysicalMaterial( materialProps );
-
-	return new THREE.BatchedMesh(
-		maxGeometries,
-		maxVertices,
-		maxIndices,
-		batchedMaterial
+	console.log(
+		`  Reduction Ratio: ${(
+			( 1 - ( stats.batchedMeshes + stats.meshes ) / stats.totalInstances ) *
+      100
+		).toFixed( 1 )}% fewer draw calls`
 	);
 
-}
-
-/**
- * Converts a GLTF model into BatchedMeshes and individual meshes where appropriate
- * @param {THREE.Group} Scene - The group/scene
- * @param {boolean} debug - Log statistics to console
- * @returns {THREE.BatchedMesh|THREE.Mesh[]} Converted meshes
- */
-export function sceneToBatchedMeshes( scene, debug = false ) {
-
-	const { batchGroups, singleGroups } = analyzeGLTFModel( scene );
-	const batchedMeshes = [];
-	const singleInstanceMeshes = [];
-
-	const stats = {
-		totalObjects: 0,
-		batchedMeshes: 0,
-		meshes: 0,
-		totalInstances: 0,
-		uniqueGeometries: 0,
-		uniqueMaterialVariants: new Set()
-	};
-
-	// Create batched meshes
-	for ( const [ /* batchKey */, group ] of batchGroups ) {
-
-		const batchedMesh = createPreciseBatchedMesh(
-			group.materialProps,
-			group.geometryStats
-		);
-
-		const geometryIds = new Map();
-
-		// Add all meshes to the batch
-		for ( const mesh of group.meshes ) {
-
-			const geometryHash = getGeometryHash( mesh.geometry );
-
-			if ( ! geometryIds.has( geometryHash ) ) {
-
-				geometryIds.set(
-					geometryHash,
-					batchedMesh.addGeometry( mesh.geometry )
-				);
-				stats.uniqueGeometries ++;
-
-			}
-
-			const geometryId = geometryIds.get( geometryHash );
-			const instanceId = batchedMesh.addInstance( geometryId );
-
-			batchedMesh.setMatrixAt( instanceId, mesh.matrixWorld );
-			// Set the color per instance
-			batchedMesh.setColorAt( instanceId, mesh.material.color );
-
-			stats.totalInstances ++;
-			stats.uniqueMaterialVariants.add( getMaterialPropertiesHash( mesh.material ) );
-
-		}
-
-		batchedMeshes.push( batchedMesh );
-		stats.batchedMeshes ++;
-
-	}
-
-	// Handle single instance meshes
-	for ( const [ /* batchKey */, group ] of singleGroups ) {
-
-		const mesh = group.meshes[ 0 ];
-		// Clone the mesh to preserve the original
-		const singleMesh = mesh.clone();
-		singleInstanceMeshes.push( singleMesh );
-		stats.meshes ++;
-		stats.totalInstances ++;
-
-	}
-
-	if ( debug === true ) {
-
-		debugBatchedMeshStats( scene, stats );
-
-	}
-
-	return [ ...batchedMeshes, ...singleInstanceMeshes ];
+	console.groupEnd();
 
 }
 
