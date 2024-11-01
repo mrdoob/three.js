@@ -250,6 +250,7 @@ class Renderer {
 
 			//
 
+			this._animation.start();
 			this._initialized = true;
 
 			resolve();
