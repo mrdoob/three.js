@@ -193,7 +193,7 @@ function analyzeGLTFModel( scene ) {
 			batchGroups.set( batchKey, {
 				meshes: [],
 				geometryStats: new Map(),
-				totalInstances: 0
+				totalInstances: 0, // Add instance counter per batch group
 			} );
 
 		}
@@ -210,7 +210,7 @@ function analyzeGLTFModel( scene ) {
 				count: 0,
 				vertices: node.geometry.attributes.position.count,
 				indices: node.geometry.index ? node.geometry.index.count : 0,
-				geometry: node.geometry
+				geometry: node.geometry,
 			} );
 
 		}
@@ -267,17 +267,14 @@ function createPreciseBatchedMesh( materialProps, group ) {
 }
 
 /**
- * Converts a GLTF model into BatchedMeshes and individual meshes where appropriate
- * @param {THREE.Group} Scene - The group/scene
+ * Modifies the original scene to use batched meshes while preserving structure
+ * @param {THREE.Group} scene - The scene to modify
  * @param {boolean} debug - Log statistics to console
- * @returns {THREE.BatchedMesh|THREE.Mesh[]} Converted meshes
+ * @returns {Map<string, THREE.BatchedMesh>} Map of created batched meshes
  */
-export function sceneToBatchedMeshes( scene, debug = false ) {
+export function optimizeSceneToBatchedMesh( scene, debug = false ) {
 
-	const { batchGroups, singleGroups } = analyzeGLTFModel( scene );
-	const batchedMeshes = [];
-	const singleInstanceMeshes = [];
-
+	const { batchGroups } = analyzeGLTFModel( scene );
 	const stats = {
 		totalObjects: 0,
 		batchedMeshes: 0,
@@ -288,68 +285,106 @@ export function sceneToBatchedMeshes( scene, debug = false ) {
 	};
 
 	// Create batched meshes
-	for ( const [ , group ] of batchGroups ) {
+	const batchedMeshesMap = new Map();
+	for ( const [ batchKey, group ] of batchGroups ) {
 
 		const batchedMesh = createPreciseBatchedMesh( group.materialProps, group );
+		batchedMeshesMap.set( batchKey, {
+			mesh: batchedMesh,
+			geometryIds: new Map(),
+			instanceCount: 0,
+			originalMeshes: new Map(), // Track original meshes and their instance IDs
+		} );
 
-		const geometryIds = new Map();
-
-		// Add all meshes to the batch
-		for ( const mesh of group.meshes ) {
-
-			const geometryHash = getGeometryHash( mesh.geometry );
-
-			if ( ! geometryIds.has( geometryHash ) ) {
-
-				geometryIds.set( geometryHash, batchedMesh.addGeometry( mesh.geometry ) );
-				stats.uniqueGeometries ++;
-
-			}
-
-			const geometryId = geometryIds.get( geometryHash );
-			const instanceId = batchedMesh.addInstance( geometryId );
-
-			if ( instanceId === - 1 ) {
-
-				console.warn( 'Failed to add instance - capacity exceeded' );
-				continue;
-
-			}
-
-			batchedMesh.setMatrixAt( instanceId, mesh.matrixWorld );
-			batchedMesh.setColorAt( instanceId, mesh.material.color );
-
-			stats.totalInstances ++;
-			stats.uniqueMaterialVariants.add(
-				getMaterialPropertiesHash( mesh.material )
-			);
-
-		}
-
-		batchedMeshes.push( batchedMesh );
 		stats.batchedMeshes ++;
 
 	}
 
-	// Handle single instance meshes
-	for ( const [ , /* batchKey */ group ] of singleGroups ) {
+	// Process the scene and replace meshes with instances
+	scene.updateMatrixWorld( true ); // Ensure world matrices are up to date
 
-		const mesh = group.meshes[ 0 ];
-		// Clone the mesh to preserve the original
-		const singleMesh = mesh.clone();
-		singleInstanceMeshes.push( singleMesh );
-		stats.meshes ++;
-		stats.totalInstances ++;
+	scene.traverse( ( node ) => {
+
+		if ( ! node.isMesh ) return;
+
+		const materialProps = getMaterialPropertiesHash( node.material );
+		const attributesSignature = getAttributesSignature( node.geometry );
+		const batchKey = getBatchKey( materialProps, attributesSignature );
+
+		// Check if this mesh should be batched
+		const batchData = batchedMeshesMap.get( batchKey );
+		if ( batchData ) {
+
+			const geometryHash = getGeometryHash( node.geometry );
+
+			// Add geometry to batch if not already added
+			if ( ! batchData.geometryIds.has( geometryHash ) ) {
+
+				batchData.geometryIds.set(
+					geometryHash,
+					batchData.mesh.addGeometry( node.geometry )
+				);
+				stats.uniqueGeometries ++;
+
+			}
+
+			const geometryId = batchData.geometryIds.get( geometryHash );
+			const instanceId = batchData.mesh.addInstance( geometryId );
+
+			if ( instanceId === - 1 ) {
+
+				console.warn( 'Failed to add instance - capacity exceeded' );
+				return;
+
+			}
+
+			// Store the original mesh's world matrix and color
+			batchData.mesh.setMatrixAt( instanceId, node.matrixWorld );
+			batchData.mesh.setColorAt( instanceId, node.material.color );
+
+			// Track this mesh and its instance
+			batchData.originalMeshes.set( node, {
+				instanceId,
+				originalMatrix: node.matrix.clone(),
+				originalParent: node.parent,
+			} );
+
+			stats.totalInstances ++;
+			stats.uniqueMaterialVariants.add( materialProps );
+			batchData.instanceCount ++;
+
+			// Keep the original mesh's properties but make it invisible
+			node.visible = false;
+			node.userData.batchData = {
+				batchKey,
+				instanceId,
+				originalMatrix: node.matrix.clone(),
+			};
+
+		} else {
+
+			// This is a single instance mesh, leave it as is
+			stats.meshes ++;
+			stats.totalInstances ++;
+
+		}
+
+	} );
+
+	// Add all batched meshes to the scene root
+	for ( const [ , batchData ] of batchedMeshesMap ) {
+
+		scene.add( batchData.mesh );
 
 	}
 
 	if ( debug === true ) {
 
-		debugBatchedMeshStats( scene, stats );
+		_debugBatchedMeshStats( scene, stats );
 
 	}
 
-	return [ ...batchedMeshes, ...singleInstanceMeshes ];
+	return scene;
 
 }
 
@@ -357,7 +392,7 @@ export function sceneToBatchedMeshes( scene, debug = false ) {
  * Logs batched mesh statistics
  * @param {Object} stats - Batched mesh statistics
  */
-function debugBatchedMeshStats( scene, stats ) {
+function _debugBatchedMeshStats( scene, stats ) {
 
 	scene.traverse( () => stats.totalObjects ++ );
 
