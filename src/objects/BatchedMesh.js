@@ -965,7 +965,7 @@ class BatchedMesh extends Mesh {
 		}
 
 		// check if the provided geometryId is within the valid range
-		if ( geometryId >= geometryInfoList.length || geometryInfoList[ geometryId ].active === false ) {
+		if ( geometryId < 0 || geometryId >= geometryInfoList.length || geometryInfoList[ geometryId ].active === false ) {
 
 			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or has been deleted.` );
 
