@@ -300,8 +300,8 @@ class Textures extends DataMap {
 
 			if ( image.image !== undefined ) image = image.image;
 
-			target.width = image.width;
-			target.height = image.height;
+			target.width = image.width || 1;
+			target.height = image.height || 1;
 			target.depth = texture.isCubeTexture ? 6 : ( image.depth || 1 );
 
 		} else {
@@ -320,7 +320,15 @@ class Textures extends DataMap {
 
 		if ( texture.isCompressedTexture ) {
 
-			mipLevelCount = texture.mipmaps.length;
+			if ( texture.mipmaps ) {
+
+				mipLevelCount = texture.mipmaps.length;
+
+			} else {
+
+				mipLevelCount = 1;
+
+			}
 
 		} else {
 

@@ -952,6 +952,10 @@ export function getFormat( texture, device = null ) {
 				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC12x12UnormSRGB : GPUTextureFormat.ASTC12x12Unorm;
 				break;
 
+			case RGBAFormat:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm;
+				break;
+
 			default:
 				console.error( 'WebGPURenderer: Unsupported texture format.', format );
 
