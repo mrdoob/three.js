@@ -926,12 +926,6 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		if ( drawInfo[ instanceId ].visible === value ) {
-
-			return this;
-
-		}
-
 		instanceInfo[ instanceId ].visible = value;
 		this._visibilityChanged = true;
 
