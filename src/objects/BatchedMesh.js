@@ -330,6 +330,29 @@ class BatchedMesh extends Mesh {
 
 	}
 
+	validateInstanceId( instanceId ) {
+
+		const instanceInfo = this._instanceInfo;
+		if ( instanceId < 0 || instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
+
+			throw new Error( `BatchedMesh: Invalid instanceId ${instanceId}. Instance is either out of range or has been deleted.` );
+
+		}
+
+	}
+
+	validateGeometryId( geometryId ) {
+
+		const geometryInfoList = this._geometryInfo;
+		if ( geometryId < 0 || geometryId >= geometryInfoList.length || geometryInfoList[ geometryId ].active === false ) {
+
+			throw new Error( `BatchedMesh: Invalid geometryId ${geometryId}. Geometry is either out of range or has been deleted.` );
+
+		}
+
+	}
+
+
 	setCustomSort( func ) {
 
 		this.customSort = func;
@@ -652,14 +675,9 @@ class BatchedMesh extends Mesh {
 
 	deleteInstance( instanceId ) {
 
-		const instanceInfo = this._instanceInfo;
-		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
+		this.validateInstanceId( instanceId );
 
-			return this;
-
-		}
-
-		instanceInfo[ instanceId ].active = false;
+		this._instanceInfo[ instanceId ].active = false;
 		this._availableInstanceIds.push( instanceId );
 		this._visibilityChanged = true;
 
@@ -843,15 +861,10 @@ class BatchedMesh extends Mesh {
 
 	setMatrixAt( instanceId, matrix ) {
 
-		const instanceInfo = this._instanceInfo;
+		this.validateInstanceId( instanceId );
+
 		const matricesTexture = this._matricesTexture;
 		const matricesArray = this._matricesTexture.image.data;
-		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
-
-			return this;
-
-		}
-
 		matrix.toArray( matricesArray, instanceId * 16 );
 		matricesTexture.needsUpdate = true;
 
@@ -861,19 +874,14 @@ class BatchedMesh extends Mesh {
 
 	getMatrixAt( instanceId, matrix ) {
 
-		const instanceInfo = this._instanceInfo;
-		const matricesArray = this._matricesTexture.image.data;
-		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
-
-			return null;
-
-		}
-
-		return matrix.fromArray( matricesArray, instanceId * 16 );
+		this.validateInstanceId( instanceId );
+		return matrix.fromArray( this._matricesTexture.image.data, instanceId * 16 );
 
 	}
 
 	setColorAt( instanceId, color ) {
+
+		this.validateInstanceId( instanceId );
 
 		if ( this._colorsTexture === null ) {
 
@@ -881,17 +889,8 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		const colorsTexture = this._colorsTexture;
-		const colorsArray = this._colorsTexture.image.data;
-		const instanceInfo = this._instanceInfo;
-		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
-
-			return this;
-
-		}
-
-		color.toArray( colorsArray, instanceId * 4 );
-		colorsTexture.needsUpdate = true;
+		color.toArray( this._colorsTexture.image.data, instanceId * 4 );
+		this._colorsTexture.needsUpdate = true;
 
 		return this;
 
@@ -899,34 +898,22 @@ class BatchedMesh extends Mesh {
 
 	getColorAt( instanceId, color ) {
 
-		const colorsArray = this._colorsTexture.image.data;
-		const instanceInfo = this._instanceInfo;
-		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
-
-			return null;
-
-		}
-
-		return color.fromArray( colorsArray, instanceId * 4 );
+		this.validateInstanceId( instanceId );
+		return color.fromArray( this._colorsTexture.image.data, instanceId * 4 );
 
 	}
 
 	setVisibleAt( instanceId, value ) {
 
-		// if the geometry is out of range, not active, or visibility state
-		// does not change then return early
-		const instanceInfo = this._instanceInfo;
-		if (
-			instanceId >= instanceInfo.length ||
-			instanceInfo[ instanceId ].active === false ||
-			instanceInfo[ instanceId ].visible === value
-		) {
+		this.validateInstanceId( instanceId );
+
+		if ( this._instanceInfo[ instanceId ].visible === value ) {
 
 			return this;
 
 		}
 
-		instanceInfo[ instanceId ].visible = value;
+		this._instanceInfo[ instanceId ].visible = value;
 		this._visibilityChanged = true;
 
 		return this;
@@ -935,37 +922,18 @@ class BatchedMesh extends Mesh {
 
 	getVisibleAt( instanceId ) {
 
-		// return early if the geometry is out of range or not active
-		const instanceInfo = this._instanceInfo;
-		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
+		this.validateInstanceId( instanceId );
 
-			return false;
-
-		}
-
-		return instanceInfo[ instanceId ].visible;
+		return this._instanceInfo[ instanceId ].visible;
 
 	}
 
 	setGeometryIdAt( instanceId, geometryId ) {
 
-		// return early if the geometry is out of range or not active
-		const instanceInfo = this._instanceInfo;
-		const geometryInfoList = this._geometryInfo;
-		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
+		this.validateInstanceId( instanceId );
+		this.validateGeometryId( geometryId );
 
-			return null;
-
-		}
-
-		// check if the provided geometryId is within the valid range
-		if ( geometryId >= geometryInfoList.length || geometryInfoList[ geometryId ].active === false ) {
-
-			return null;
-
-		}
-
-		instanceInfo[ instanceId ].geometryIndex = geometryId;
+		this._instanceInfo[ instanceId ].geometryIndex = geometryId;
 
 		return this;
 
@@ -973,24 +941,15 @@ class BatchedMesh extends Mesh {
 
 	getGeometryIdAt( instanceId ) {
 
-		const instanceInfo = this._instanceInfo;
-		if ( instanceId >= instanceInfo.length || instanceInfo[ instanceId ].active === false ) {
+		this.validateInstanceId( instanceId );
 
-			return - 1;
-
-		}
-
-		return instanceInfo[ instanceId ].geometryIndex;
+		return this._instanceInfo[ instanceId ].geometryIndex;
 
 	}
 
 	getGeometryRangeAt( geometryId, target = {} ) {
 
-		if ( geometryId < 0 || geometryId >= this._geometryCount ) {
-
-			return null;
-
-		}
+		this.validateGeometryId( geometryId );
 
 		const geometryInfo = this._geometryInfo[ geometryId ];
 		target.vertexStart = geometryInfo.vertexStart;
