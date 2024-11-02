@@ -1,22 +1,16 @@
-import { MultiplyOperation, TangentSpaceNormalMap } from '../constants.js';
 import { Material } from './Material.js';
-import { Vector2 } from '../math/Vector2.js';
+import { MultiplyOperation } from '../constants.js';
 import { Color } from '../math/Color.js';
-import { Euler } from '../math/Euler.js';
 
 class MeshLambertMaterial extends Material {
-
-	static get type() {
-
-		return 'MeshLambertMaterial';
-
-	}
 
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshLambertMaterial = true;
+
+		this.type = 'MeshLambertMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
 
@@ -32,23 +26,11 @@ class MeshLambertMaterial extends Material {
 		this.emissiveIntensity = 1.0;
 		this.emissiveMap = null;
 
-		this.bumpMap = null;
-		this.bumpScale = 1;
-
-		this.normalMap = null;
-		this.normalMapType = TangentSpaceNormalMap;
-		this.normalScale = new Vector2( 1, 1 );
-
-		this.displacementMap = null;
-		this.displacementScale = 1;
-		this.displacementBias = 0;
-
 		this.specularMap = null;
 
 		this.alphaMap = null;
 
 		this.envMap = null;
-		this.envMapRotation = new Euler();
 		this.combine = MultiplyOperation;
 		this.reflectivity = 1;
 		this.refractionRatio = 0.98;
@@ -57,8 +39,6 @@ class MeshLambertMaterial extends Material {
 		this.wireframeLinewidth = 1;
 		this.wireframeLinecap = 'round';
 		this.wireframeLinejoin = 'round';
-
-		this.flatShading = false;
 
 		this.fog = true;
 
@@ -84,23 +64,11 @@ class MeshLambertMaterial extends Material {
 		this.emissiveMap = source.emissiveMap;
 		this.emissiveIntensity = source.emissiveIntensity;
 
-		this.bumpMap = source.bumpMap;
-		this.bumpScale = source.bumpScale;
-
-		this.normalMap = source.normalMap;
-		this.normalMapType = source.normalMapType;
-		this.normalScale.copy( source.normalScale );
-
-		this.displacementMap = source.displacementMap;
-		this.displacementScale = source.displacementScale;
-		this.displacementBias = source.displacementBias;
-
 		this.specularMap = source.specularMap;
 
 		this.alphaMap = source.alphaMap;
 
 		this.envMap = source.envMap;
-		this.envMapRotation.copy( source.envMapRotation );
 		this.combine = source.combine;
 		this.reflectivity = source.reflectivity;
 		this.refractionRatio = source.refractionRatio;
@@ -109,8 +77,6 @@ class MeshLambertMaterial extends Material {
 		this.wireframeLinewidth = source.wireframeLinewidth;
 		this.wireframeLinecap = source.wireframeLinecap;
 		this.wireframeLinejoin = source.wireframeLinejoin;
-
-		this.flatShading = source.flatShading;
 
 		this.fog = source.fog;
 

@@ -1,18 +1,19 @@
 import { Material } from './Material.js';
+import { Vector3 } from '../math/Vector3.js';
 
 class MeshDistanceMaterial extends Material {
-
-	static get type() {
-
-		return 'MeshDistanceMaterial';
-
-	}
 
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshDistanceMaterial = true;
+
+		this.type = 'MeshDistanceMaterial';
+
+		this.referencePosition = new Vector3();
+		this.nearDistance = 1;
+		this.farDistance = 1000;
 
 		this.map = null;
 
@@ -29,6 +30,10 @@ class MeshDistanceMaterial extends Material {
 	copy( source ) {
 
 		super.copy( source );
+
+		this.referencePosition.copy( source.referencePosition );
+		this.nearDistance = source.nearDistance;
+		this.farDistance = source.farDistance;
 
 		this.map = source.map;
 

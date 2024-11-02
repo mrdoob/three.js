@@ -2,17 +2,12 @@ import { LineBasicMaterial } from './LineBasicMaterial.js';
 
 class LineDashedMaterial extends LineBasicMaterial {
 
-	static get type() {
-
-		return 'LineDashedMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isLineDashedMaterial = true;
+		this.type = 'LineDashedMaterial';
 
 		this.scale = 1;
 		this.dashSize = 3;
