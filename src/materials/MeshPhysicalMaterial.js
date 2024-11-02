@@ -20,6 +20,9 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.type = 'MeshPhysicalMaterial';
 
+		this.anisotropyRotation = 0;
+		this.anisotropyMap = null;
+
 		this.clearcoatMap = null;
 		this.clearcoatRoughness = 0.0;
 		this.clearcoatRoughnessMap = null;
@@ -41,6 +44,11 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 			}
 		} );
 
+		this.iridescenceMap = null;
+		this.iridescenceIOR = 1.3;
+		this.iridescenceThicknessRange = [ 100, 400 ];
+		this.iridescenceThicknessMap = null;
+
 		this.sheenColor = new Color( 0x000000 );
 		this.sheenColorMap = null;
 		this.sheenRoughness = 1.0;
@@ -50,7 +58,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.thickness = 0;
 		this.thicknessMap = null;
-		this.attenuationDistance = 0.0;
+		this.attenuationDistance = Infinity;
 		this.attenuationColor = new Color( 1, 1, 1 );
 
 		this.specularIntensity = 1.0;
@@ -58,29 +66,32 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.specularColor = new Color( 1, 1, 1 );
 		this.specularColorMap = null;
 
-		this._sheen = 0.0;
+		this._anisotropy = 0;
 		this._clearcoat = 0;
+		this._dispersion = 0;
+		this._iridescence = 0;
+		this._sheen = 0.0;
 		this._transmission = 0;
 
 		this.setValues( parameters );
 
 	}
 
-	get sheen() {
+	get anisotropy() {
 
-		return this._sheen;
+		return this._anisotropy;
 
 	}
 
-	set sheen( value ) {
+	set anisotropy( value ) {
 
-		if ( this._sheen > 0 !== value > 0 ) {
+		if ( this._anisotropy > 0 !== value > 0 ) {
 
 			this.version ++;
 
 		}
 
-		this._sheen = value;
+		this._anisotropy = value;
 
 	}
 
@@ -99,6 +110,60 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		}
 
 		this._clearcoat = value;
+
+	}
+
+	get iridescence() {
+
+		return this._iridescence;
+
+	}
+
+	set iridescence( value ) {
+
+		if ( this._iridescence > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._iridescence = value;
+
+	}
+
+	get dispersion() {
+
+		return this._dispersion;
+
+	}
+
+	set dispersion( value ) {
+
+		if ( this._dispersion > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._dispersion = value;
+
+	}
+
+	get sheen() {
+
+		return this._sheen;
+
+	}
+
+	set sheen( value ) {
+
+		if ( this._sheen > 0 !== value > 0 ) {
+
+			this.version ++;
+
+		}
+
+		this._sheen = value;
 
 	}
 
@@ -131,6 +196,10 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		};
 
+		this.anisotropy = source.anisotropy;
+		this.anisotropyRotation = source.anisotropyRotation;
+		this.anisotropyMap = source.anisotropyMap;
+
 		this.clearcoat = source.clearcoat;
 		this.clearcoatMap = source.clearcoatMap;
 		this.clearcoatRoughness = source.clearcoatRoughness;
@@ -138,7 +207,14 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 		this.clearcoatNormalMap = source.clearcoatNormalMap;
 		this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
 
+		this.dispersion = source.dispersion;
 		this.ior = source.ior;
+
+		this.iridescence = source.iridescence;
+		this.iridescenceMap = source.iridescenceMap;
+		this.iridescenceIOR = source.iridescenceIOR;
+		this.iridescenceThicknessRange = [ ...source.iridescenceThicknessRange ];
+		this.iridescenceThicknessMap = source.iridescenceThicknessMap;
 
 		this.sheen = source.sheen;
 		this.sheenColor.copy( source.sheenColor );
