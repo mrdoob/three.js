@@ -405,17 +405,11 @@ ShaderLib[ 'line' ] = {
 
 class LineMaterial extends ShaderMaterial {
 
-
-	static get type() {
-
-		return 'LineMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super( {
 
+			type: 'LineMaterial',
 			uniforms: UniformsUtils.clone( ShaderLib[ 'line' ].uniforms ),
 
 			vertexShader: ShaderLib[ 'line' ].vertexShader,

@@ -3,17 +3,13 @@ import { BasicDepthPacking } from '../constants.js';
 
 class MeshDepthMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshDepthMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshDepthMaterial = true;
+
+		this.type = 'MeshDepthMaterial';
 
 		this.depthPacking = BasicDepthPacking;
 

@@ -5,12 +5,6 @@ import { Color } from '../math/Color.js';
 
 class MeshToonMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshToonMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
@@ -18,6 +12,8 @@ class MeshToonMaterial extends Material {
 		this.isMeshToonMaterial = true;
 
 		this.defines = { 'TOON': '' };
+
+		this.type = 'MeshToonMaterial';
 
 		this.color = new Color( 0xffffff );
 

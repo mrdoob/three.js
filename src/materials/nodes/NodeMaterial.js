@@ -32,13 +32,19 @@ class NodeMaterial extends Material {
 
 	}
 
+	get type() {
+
+		return this.constructor.type;
+
+	}
+
+	set type( _value ) { /* */ }
+
 	constructor() {
 
 		super();
 
 		this.isNodeMaterial = true;
-
-		this.type = this.constructor.type;
 
 		this.forceSinglePass = false;
 

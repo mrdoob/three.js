@@ -1,31 +1,18 @@
 import NodeLibrary from '../../common/nodes/NodeLibrary.js';
 
 // Materials
-import { MeshPhongMaterial } from '../../../materials/MeshPhongMaterial.js';
 import MeshPhongNodeMaterial from '../../../materials/nodes/MeshPhongNodeMaterial.js';
-import { MeshStandardMaterial } from '../../../materials/MeshStandardMaterial.js';
 import MeshStandardNodeMaterial from '../../../materials/nodes/MeshStandardNodeMaterial.js';
-import { MeshPhysicalMaterial } from '../../../materials/MeshPhysicalMaterial.js';
 import MeshPhysicalNodeMaterial from '../../../materials/nodes/MeshPhysicalNodeMaterial.js';
-import { MeshToonMaterial } from '../../../materials/MeshToonMaterial.js';
 import MeshToonNodeMaterial from '../../../materials/nodes/MeshToonNodeMaterial.js';
-import { MeshBasicMaterial } from '../../../materials/MeshBasicMaterial.js';
 import MeshBasicNodeMaterial from '../../../materials/nodes/MeshBasicNodeMaterial.js';
-import { MeshLambertMaterial } from '../../../materials/MeshLambertMaterial.js';
 import MeshLambertNodeMaterial from '../../../materials/nodes/MeshLambertNodeMaterial.js';
-import { MeshNormalMaterial } from '../../../materials/MeshNormalMaterial.js';
 import MeshNormalNodeMaterial from '../../../materials/nodes/MeshNormalNodeMaterial.js';
-import { MeshMatcapMaterial } from '../../../materials/MeshMatcapMaterial.js';
 import MeshMatcapNodeMaterial from '../../../materials/nodes/MeshMatcapNodeMaterial.js';
-import { LineBasicMaterial } from '../../../materials/LineBasicMaterial.js';
 import LineBasicNodeMaterial from '../../../materials/nodes/LineBasicNodeMaterial.js';
-import { LineDashedMaterial } from '../../../materials/LineDashedMaterial.js';
 import LineDashedNodeMaterial from '../../../materials/nodes/LineDashedNodeMaterial.js';
-import { PointsMaterial } from '../../../materials/PointsMaterial.js';
 import PointsNodeMaterial from '../../../materials/nodes/PointsNodeMaterial.js';
-import { SpriteMaterial } from '../../../materials/SpriteMaterial.js';
 import SpriteNodeMaterial from '../../../materials/nodes/SpriteNodeMaterial.js';
-import { ShadowMaterial } from '../../../materials/ShadowMaterial.js';
 import ShadowNodeMaterial from '../../../materials/nodes/ShadowNodeMaterial.js';
 //import { MeshDepthMaterial } from '../../../materials/MeshDepthMaterial.js';
 //import MeshDepthNodeMaterial from '../../../materials/nodes/MeshDepthNodeMaterial.js';
@@ -60,19 +47,19 @@ class StandardNodeLibrary extends NodeLibrary {
 
 		super();
 
-		this.addMaterial( MeshPhongNodeMaterial, MeshPhongMaterial );
-		this.addMaterial( MeshStandardNodeMaterial, MeshStandardMaterial );
-		this.addMaterial( MeshPhysicalNodeMaterial, MeshPhysicalMaterial );
-		this.addMaterial( MeshToonNodeMaterial, MeshToonMaterial );
-		this.addMaterial( MeshBasicNodeMaterial, MeshBasicMaterial );
-		this.addMaterial( MeshLambertNodeMaterial, MeshLambertMaterial );
-		this.addMaterial( MeshNormalNodeMaterial, MeshNormalMaterial );
-		this.addMaterial( MeshMatcapNodeMaterial, MeshMatcapMaterial );
-		this.addMaterial( LineBasicNodeMaterial, LineBasicMaterial );
-		this.addMaterial( LineDashedNodeMaterial, LineDashedMaterial );
-		this.addMaterial( PointsNodeMaterial, PointsMaterial );
-		this.addMaterial( SpriteNodeMaterial, SpriteMaterial );
-		this.addMaterial( ShadowNodeMaterial, ShadowMaterial );
+		this.addMaterial( MeshPhongNodeMaterial, 'MeshPhongMaterial' );
+		this.addMaterial( MeshStandardNodeMaterial, 'MeshStandardMaterial' );
+		this.addMaterial( MeshPhysicalNodeMaterial, 'MeshPhysicalMaterial' );
+		this.addMaterial( MeshToonNodeMaterial, 'MeshToonMaterial' );
+		this.addMaterial( MeshBasicNodeMaterial, 'MeshBasicMaterial' );
+		this.addMaterial( MeshLambertNodeMaterial, 'MeshLambertMaterial' );
+		this.addMaterial( MeshNormalNodeMaterial, 'MeshNormalMaterial' );
+		this.addMaterial( MeshMatcapNodeMaterial, 'MeshMatcapMaterial' );
+		this.addMaterial( LineBasicNodeMaterial, 'LineBasicMaterial' );
+		this.addMaterial( LineDashedNodeMaterial, 'LineDashedMaterial' );
+		this.addMaterial( PointsNodeMaterial, 'PointsMaterial' );
+		this.addMaterial( SpriteNodeMaterial, 'SpriteMaterial' );
+		this.addMaterial( ShadowNodeMaterial, 'ShadowMaterial' );
 
 		this.addLight( PointLightNode, PointLight );
 		this.addLight( DirectionalLightNode, DirectionalLight );

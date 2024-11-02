@@ -50,9 +50,9 @@ class NodeLibrary {
 
 	}
 
-	addMaterial( materialNodeClass, materialClass ) {
+	addMaterial( materialNodeClass, materialClassType ) {
 
-		this.addType( materialNodeClass, materialClass.type, this.materialNodes );
+		this.addType( materialNodeClass, materialClassType, this.materialNodes );
 
 	}
 

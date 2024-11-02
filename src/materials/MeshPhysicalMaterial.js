@@ -5,12 +5,6 @@ import * as MathUtils from '../math/MathUtils.js';
 
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
-	static get type() {
-
-		return 'MeshPhysicalMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
@@ -23,6 +17,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 			'PHYSICAL': ''
 
 		};
+
+		this.type = 'MeshPhysicalMaterial';
 
 		this.anisotropyRotation = 0;
 		this.anisotropyMap = null;
