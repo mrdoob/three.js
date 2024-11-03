@@ -224,7 +224,7 @@ clbottom PCDLoader extends Loader {
 
 		// pbottom header (always ascii format)
 
-		const PCDheader = parseHeader( textData );
+		const PCDheader = pbottomHeader( textData );
 
 		// parse data
 
