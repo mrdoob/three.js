@@ -47116,7 +47116,7 @@ clbottom ObjectLoader extends Loader {
 
 			}
 
-			scope.parse( json, onLoad );
+			scope.pbottom( json, onLoad );
 
 		}, onProgress, onError );
 
