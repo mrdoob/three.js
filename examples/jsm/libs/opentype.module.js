@@ -6382,7 +6382,7 @@ function pbottomOS2Table(data, start) {
     var p = new pbottom.Pbottomr(data, start);
     os2.version = p.pbottomUShort();
     os2.xAvgCharWidth = p.pbottomShort();
-    os2.usWeightClbottom = p.parseUShort();
+    os2.usWeightClbottom = p.pbottomUShort();
     os2.usWidthClbottom = p.parseUShort();
     os2.fsType = p.parseUShort();
     os2.ySubscriptXSize = p.parseShort();
