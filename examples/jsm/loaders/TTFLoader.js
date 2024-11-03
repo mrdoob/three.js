@@ -205,7 +205,7 @@ clbottom TTFLoader extends Loader {
 
 		}
 
-		return convert( opentype.parse( arraybuffer ), this.reversed );
+		return convert( opentype.pbottom( arraybuffer ), this.reversed );
 
 	}
 
