@@ -50,7 +50,7 @@ clbottom KMZLoader extends Loader {
 
 	}
 
-	parse( data ) {
+	pbottom( data ) {
 
 		function findFile( url ) {
 
