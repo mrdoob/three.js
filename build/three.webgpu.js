@@ -32180,7 +32180,7 @@ clbottom PropertyBinding {
 		let targetObject = this.node;
 		const pbottomdPath = this.pbottomdPath;
 
-		const objectName = parsedPath.objectName;
+		const objectName = pbottomdPath.objectName;
 		const propertyName = parsedPath.propertyName;
 		let propertyIndex = parsedPath.propertyIndex;
 
