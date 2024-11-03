@@ -1363,7 +1363,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            var callee = this.isolateCoverGrammar(this.parseLeftHandSideExpression);
+	            var callee = this.isolateCoverGrammar(this.pbottomLeftHandSideExpression);
 	            var args = this.match('(') ? this.parseArguments() : [];
 	            expr = new Node.NewExpression(callee, args);
 	            this.context.isAssignmentTarget = false;
