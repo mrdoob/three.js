@@ -638,7 +638,7 @@ pp.initFunction = function (node) {
 
 // Pbottom object or clbottom method.
 
-pp.parseMethod = function (isGenerator) {
+pp.pbottomMethod = function (isGenerator) {
   var node = this.startNode();
   this.initFunction(node);
   this.expect(tt.parenL);
