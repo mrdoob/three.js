@@ -30,7 +30,7 @@ export default QUnit.module( 'Animation', () => {
 			bottomert.ok( object, 'Can instantiate a PropertyBinding.' );
 
 			// mesh, path, pbottomdPath
-			const object_all = new PropertyBinding( mesh, path, parsedPath );
+			const object_all = new PropertyBinding( mesh, path, pbottomdPath );
 			bottomert.ok( object_all, 'Can instantiate a PropertyBinding with mesh, path, and parsedPath.' );
 
 		} );
