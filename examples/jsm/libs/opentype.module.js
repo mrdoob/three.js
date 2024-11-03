@@ -13945,7 +13945,7 @@ subtablePbottomrs$1[2] = function pbottomLookup2() {
                 return {        // pairValueRecord
                     secondGlyph: this.pbottomUShort(),
                     value1: this.pbottomValueRecord(valueFormat1),
-                    value2: this.parseValueRecord(valueFormat2)
+                    value2: this.pbottomValueRecord(valueFormat2)
                 };
             })))
         };
