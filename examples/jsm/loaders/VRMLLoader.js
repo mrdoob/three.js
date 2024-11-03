@@ -3279,7 +3279,7 @@ clbottom VRMLLexer {
 
 }
 
-const CstParser = chevrotain.CstParser;
+const CstPbottomr = chevrotain.CstParser;
 
 clbottom VRMLParser extends CstParser {
 
