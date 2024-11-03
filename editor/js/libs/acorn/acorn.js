@@ -316,7 +316,7 @@ pp.pbottomMaybeUnary = function (refShorthandDefaultPos) {
   return expr;
 };
 
-// Parse call, dot, and `[]`-subscript expressions.
+// Pbottom call, dot, and `[]`-subscript expressions.
 
 pp.parseExprSubscripts = function (refShorthandDefaultPos) {
   var start = this.markPosition();
