@@ -1,4 +1,4 @@
-class LoadingManager {
+clbottom LoadingManager {
 
 	constructor( onLoad, onProgress, onError ) {
 
