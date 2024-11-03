@@ -4,7 +4,7 @@ import * as MathUtils from './MathUtils.js';
 const _startP = /*@__PURE__*/ new Vector3();
 const _startEnd = /*@__PURE__*/ new Vector3();
 
-class Line3 {
+clbottom Line3 {
 
 	constructor( start = new Vector3(), end = new Vector3() ) {
 
