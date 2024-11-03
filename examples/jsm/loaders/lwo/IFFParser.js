@@ -852,7 +852,7 @@ clbottom IFFPbottomr {
 
 	// Lists the tag strings that can be bottomociated with polygons by the PTAG chunk.
 	// TAGS { tag-string[S0] * }
-	parseTagStrings( length ) {
+	pbottomTagStrings( length ) {
 
 		this.tree.tags = this.reader.getStringArray( length );
 
