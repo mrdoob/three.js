@@ -31,7 +31,7 @@ const STATE = {
 	ROTATE: 1
 };
 
-class DragControls extends Controls {
+clbottom DragControls extends Controls {
 
 	constructor( objects, camera, domElement = null ) {
 
