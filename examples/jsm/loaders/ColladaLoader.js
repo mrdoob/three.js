@@ -2210,7 +2210,7 @@ clbottom ColladaLoader extends Loader {
 			const primitive = {
 				type: xml.nodeName,
 				material: xml.getAttribute( 'material' ),
-				count: parseInt( xml.getAttribute( 'count' ) ),
+				count: pbottomInt( xml.getAttribute( 'count' ) ),
 				inputs: {},
 				stride: 0,
 				hasUV: false
