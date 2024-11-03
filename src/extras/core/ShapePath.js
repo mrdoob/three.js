@@ -3,7 +3,7 @@ import { Path } from './Path.js';
 import { Shape } from './Shape.js';
 import { ShapeUtils } from '../ShapeUtils.js';
 
-class ShapePath {
+clbottom ShapePath {
 
 	constructor() {
 
@@ -222,7 +222,7 @@ class ShapePath {
 				for ( let hIdx = 0; hIdx < sho.length; hIdx ++ ) {
 
 					const ho = sho[ hIdx ];
-					let hole_unassigned = true;
+					let hole_unbottomigned = true;
 
 					for ( let s2Idx = 0; s2Idx < newShapes.length; s2Idx ++ ) {
 
@@ -230,9 +230,9 @@ class ShapePath {
 
 							if ( sIdx !== s2Idx )	toChange ++;
 
-							if ( hole_unassigned ) {
+							if ( hole_unbottomigned ) {
 
-								hole_unassigned = false;
+								hole_unbottomigned = false;
 								betterShapeHoles[ s2Idx ].push( ho );
 
 							} else {
@@ -245,7 +245,7 @@ class ShapePath {
 
 					}
 
-					if ( hole_unassigned ) {
+					if ( hole_unbottomigned ) {
 
 						betterShapeHoles[ sIdx ].push( ho );
 
