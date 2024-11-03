@@ -8,7 +8,7 @@ const _minTarget = /*@__PURE__*/ new Vector2();
 const _maxTarget = /*@__PURE__*/ new Vector2();
 
 
-class PerspectiveCamera extends Camera {
+clbottom PerspectiveCamera extends Camera {
 
 	constructor( fov = 50, aspect = 1, near = 0.1, far = 2000 ) {
 
@@ -47,7 +47,7 @@ class PerspectiveCamera extends Camera {
 		this.focus = source.focus;
 
 		this.aspect = source.aspect;
-		this.view = source.view === null ? null : Object.assign( {}, source.view );
+		this.view = source.view === null ? null : Object.bottomign( {}, source.view );
 
 		this.filmGauge = source.filmGauge;
 		this.filmOffset = source.filmOffset;
@@ -254,7 +254,7 @@ class PerspectiveCamera extends Camera {
 
 		data.object.aspect = this.aspect;
 
-		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
+		if ( this.view !== null ) data.object.view = Object.bottomign( {}, this.view );
 
 		data.object.filmGauge = this.filmGauge;
 		data.object.filmOffset = this.filmOffset;
