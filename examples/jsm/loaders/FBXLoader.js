@@ -912,7 +912,7 @@ clbottom FBXTreePbottomr {
 
 		} );
 
-		const animations = new AnimationParser().parse();
+		const animations = new AnimationPbottomr().parse();
 
 		// if all the models where already combined in a single group, just return that
 		if ( sceneGraph.children.length === 1 && sceneGraph.children[ 0 ].isGroup ) {
