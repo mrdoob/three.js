@@ -20,12 +20,12 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>でピッキング</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p><em>ピッキング</em>とはユーザーがどのオブジェクトをクリックしたか、またはタッチしたかを把握するプロセスの事です。
 ピッキングする方法のそれぞれにトレードオフがありますが、実装の仕方はたくさんあります。最も一般的な2つの方法を見てみましょう。</p>
 <p>おそらく、最も一般的な<em>ピッキング</em>はレイキャスティングでマウスからシーンの錐台を通して光線を<em>キャスト</em>し、その光線が交差するオブジェクトを計算する方法です。
@@ -37,12 +37,12 @@
 もしシーンに1000個のオブジェクトがあり、各オブジェクトに1000個の三角形がある場合、100万個の三角形をチェックする必要があります。</p>
 <p>光線がオブジェクトのバウンディングスフィアやバウンディングボックス、つまりオブジェクト全体を含む球やボックスと交差するかを最初にチェックする事は最適化になります。
 もし光線がオブジェクトと交差しなければ、そのオブジェクトの三角形をチェックする必要はありません。</p>
-<p>Three.jsにはこれを行う <code class="notranslate" translate="no">RayCaster</code> クラスを提供しています。</p>
+<p>Three.jsにはこれを行う <code clbottom="notranslate" translate="no">RayCaster</code> クラスを提供しています。</p>
 <p>100個のオブジェクトがあるシーンを作ってピッキングしてみましょう。
 <a href="responsive.html">レスポンシブデザインの記事</a>のコード例から始めてみます。</p>
 <p>いくつかの変更点</p>
 <p>カメラを別のオブジェクトの親にして、そのオブジェクトを回転させるとカメラが自撮り棒のようにシーンの周りを動き回るようになります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">*const fov = 60;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">*const fov = 60;
 const aspect = 2;  // the canvas default
 const near = 0.1;
 *const far = 200;
@@ -58,15 +58,15 @@ const scene = new THREE.Scene();
 +scene.add(cameraPole);
 +cameraPole.add(camera);
 </pre>
-<p>そして、<code class="notranslate" translate="no">render</code> 関数でcameraPoleを回転させます。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">cameraPole.rotation.y = time * .1;
+<p>そして、<code clbottom="notranslate" translate="no">render</code> 関数でcameraPoleを回転させます。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">cameraPole.rotation.y = time * .1;
 </pre>
 <p>カメラにライトを追加し、ライトが動くようにしましょう。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-scene.add(light);
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-scene.add(light);
 +camera.add(light);
 </pre>
 <p>ランダムな色、位置、向き、スケールの100個のキューブを生成してみましょう。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const boxWidth = 1;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const boxWidth = 1;
 const boxHeight = 1;
 const boxDepth = 1;
 const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
@@ -99,7 +99,7 @@ for (let i = 0; i &lt; numObjects; ++i) {
 </pre>
 <p>最後にピックします。</p>
 <p>ピッキングを管理する簡単なクラスを作ってみましょう。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom PickHelper {
   constructor() {
     this.raycaster = new THREE.Raycaster();
     this.pickedObject = null;
@@ -127,11 +127,11 @@ for (let i = 0; i &lt; numObjects; ++i) {
   }
 }
 </pre>
-<p><code class="notranslate" translate="no">RayCaster</code> を作成し、<code class="notranslate" translate="no">pick</code> 関数を呼び出してシーンに光線をキャストできます。
+<p><code clbottom="notranslate" translate="no">RayCaster</code> を作成し、<code clbottom="notranslate" translate="no">pick</code> 関数を呼び出してシーンに光線をキャストできます。
 光線が何かに当たった場合、最初に当たったオブジェクトの色を変更します。</p>
 <p>もちろん、マウスを <em>down</em> した時だけこの関数を呼べますが、今回は全てのフレームでマウスの下に何かあるかピックします。
 そのためにはまずマウスがどこにあるかを追跡する必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickPosition = {x: 0, y: 0};
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const pickPosition = {x: 0, y: 0};
 clearPickPosition();
 
 ...
@@ -167,11 +167,11 @@ window.addEventListener('mouseleave', clearPickPosition);
 キャンバスの大きさに関わらず、leftの-1からrightの+1までの値が必要です。
 同様にbottomが-1からtopが+1になるような値が必要です。</p>
 <p>これでモバイル端末もサポートできます。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">window.addEventListener('touchstart', (event) =&gt; {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">window.addEventListener('touchstart', (event) =&gt; {
   // prevent the window from scrolling
   event.preventDefault();
   setPickPosition(event.touches[0]);
-}, {passive: false});
+}, {pbottomive: false});
 
 window.addEventListener('touchmove', (event) =&gt; {
   setPickPosition(event.touches[0]);
@@ -179,8 +179,8 @@ window.addEventListener('touchmove', (event) =&gt; {
 
 window.addEventListener('touchend', clearPickPosition);
 </pre>
-<p>最後に <code class="notranslate" translate="no">render</code> 関数で <code class="notranslate" translate="no">PickHelper</code> の <code class="notranslate" translate="no">pick</code> 関数を呼び出します。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const pickHelper = new PickHelper();
+<p>最後に <code clbottom="notranslate" translate="no">render</code> 関数で <code clbottom="notranslate" translate="no">PickHelper</code> の <code clbottom="notranslate" translate="no">pick</code> 関数を呼び出します。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+const pickHelper = new PickHelper();
 
 function render(time) {
   time *= 0.001;  // convert to seconds;
@@ -194,9 +194,9 @@ function render(time) {
   ...
 </pre>
 <p>その結果がこれです。</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/picking-raycaster.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/picking-raycaster.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/picking-raycaster.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/picking-raycaster.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -218,10 +218,10 @@ function render(time) {
 </li>
 </ol>
 <p>例として、このテクスチャをキューブに適用してみましょう。</p>
-<div class="threejs_center"><img class="checkerboard" src="../examples/resources/images/frame.png"></div>
+<div clbottom="threejs_center"><img clbottom="checkerboard" src="../examples/resources/images/frame.png"></div>
 
 <p>以下のように変更します。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+const loader = new THREE.TextureLoader();
 +const texture = loader.load('resources/images/frame.png');
 
 const numObjects = 100;
@@ -240,14 +240,14 @@ for (let i = 0; i &lt; numObjects; ++i) {
   ...
 </pre>
 <p>以下の例で動作確認をすると、すぐにこの問題が分かると思います。</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/picking-raycaster-transparency.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/picking-raycaster-transparency.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/picking-raycaster-transparency.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/picking-raycaster-transparency.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
 <p>ボックスの穴の部分でピックしてみて下さい。</p>
-<div class="threejs_center"><img src="../resources/images/picking-transparent-issue.jpg" style="width: 635px;"></div>
+<div clbottom="threejs_center"><img src="../resources/images/picking-transparent-issue.jpg" style="width: 635px;"></div>
 
 <p>この原因は、JavaScriptがテクスチャやマテリアルを調べて、オブジェクトの一部が本当に透明か判断できないからです。</p>
 <p>これらの問題を全て解決するのが、GPUベースのピッキングです。
@@ -260,22 +260,22 @@ for (let i = 0; i &lt; numObjects; ++i) {
 1回は見るための描画、もう1回はピッキングの描画です。
 洗練された解決策は、その両方を同時に行う事ですが今回はそれを試しません。</p>
 <p>1つのやり方としては、1つのピクセルしか読まないのでそのピクセルだけ描画されるようにカメラを設定します。
-これを行うには <a href="/docs/#api/ja/cameras/PerspectiveCamera.setViewOffset"><code class="notranslate" translate="no">PerspectiveCamera.setViewOffset</code></a> を使用します。
+これを行うには <a href="/docs/#api/ja/cameras/PerspectiveCamera.setViewOffset"><code clbottom="notranslate" translate="no">PerspectiveCamera.setViewOffset</code></a> を使用します。
 これでカメラを計算できます。
 これで時間を節約できるはずです。</p>
 <p>現時点ではこのピッキングを行うには、2つのシーンを作成する必要があります。
 1つは通常のメッシュで埋めます。
 もう1つはピッキングマテリアルを使用したメッシュで埋めます。</p>
 <p>そこでまず2つ目のシーンを作り黒でクリアします。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 scene.background = new THREE.Color('white');
 const pickingScene = new THREE.Scene();
 pickingScene.background = new THREE.Color(0);
 </pre>
-<p>次にメインシーンに配置する各キューブでオリジナルのキューブと同じ位置に対応する"ピッキングキューブ"を作成し、<code class="notranslate" translate="no">pickingScene</code> に配置します。
+<p>次にメインシーンに配置する各キューブでオリジナルのキューブと同じ位置に対応する"ピッキングキューブ"を作成し、<code clbottom="notranslate" translate="no">pickingScene</code> に配置します。
 オブジェクトのidを色として描画するようにマテリアルを設定します。
 また、idとオブジェクトのマップがあるので、後でidを調べた時に対応するオブジェクトにマップを戻す事ができます。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const idToObject = {};
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const idToObject = {};
 +const numObjects = 100;
 for (let i = 0; i &lt; numObjects; ++i) {
 +  const id = i + 1;
@@ -312,13 +312,13 @@ for (let i = 0; i &lt; numObjects; ++i) {
 +  pickingCube.scale.copy(cube.scale);
 }
 </pre>
-<p>ここでは <a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a> を悪用している事に注意して下さい。
-<code class="notranslate" translate="no">emissive</code> をidにし、<code class="notranslate" translate="no">color</code> と <code class="notranslate" translate="no">specular</code> を0に設定しテクスチャのアルファ値が <code class="notranslate" translate="no">alphaTest</code> よりも大きい場合にのみ、idをレンダリングできます。
-また、<code class="notranslate" translate="no">blending</code> を <code class="notranslate" translate="no">NoBlending</code> に設定し、idにアルファが乗算しないようにする必要があります。</p>
-<p><a href="/docs/#api/ja/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>を悪用する事は、最良の解決策でない事に注意して下さい。
-さらに最適化された解決策は、テクスチャのアルファ値が <code class="notranslate" translate="no">alphaTest</code> よりも大きい場合にidを書き込むカスタムシェーダーを作成する事です。</p>
+<p>ここでは <a href="/docs/#api/ja/materials/MeshPhongMaterial"><code clbottom="notranslate" translate="no">MeshPhongMaterial</code></a> を悪用している事に注意して下さい。
+<code clbottom="notranslate" translate="no">emissive</code> をidにし、<code clbottom="notranslate" translate="no">color</code> と <code clbottom="notranslate" translate="no">specular</code> を0に設定しテクスチャのアルファ値が <code clbottom="notranslate" translate="no">alphaTest</code> よりも大きい場合にのみ、idをレンダリングできます。
+また、<code clbottom="notranslate" translate="no">blending</code> を <code clbottom="notranslate" translate="no">NoBlending</code> に設定し、idにアルファが乗算しないようにする必要があります。</p>
+<p><a href="/docs/#api/ja/materials/MeshPhongMaterial"><code clbottom="notranslate" translate="no">MeshPhongMaterial</code></a>を悪用する事は、最良の解決策でない事に注意して下さい。
+さらに最適化された解決策は、テクスチャのアルファ値が <code clbottom="notranslate" translate="no">alphaTest</code> よりも大きい場合にidを書き込むカスタムシェーダーを作成する事です。</p>
 <p>レイキャスティングではなくピクセルからピックしているので、ピック位置を設定するコードを変更してピクセルだけを使用できます。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function setPickPosition(event) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function setPickPosition(event) {
   const pos = getCanvasRelativePosition(event);
 -  pickPosition.x = (pos.x / canvas.clientWidth ) *  2 - 1;
 -  pickPosition.y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
@@ -326,11 +326,11 @@ for (let i = 0; i &lt; numObjects; ++i) {
 +  pickPosition.y = pos.y;
 }
 </pre>
-<p><code class="notranslate" translate="no">PickHelper</code> を <code class="notranslate" translate="no">GPUPickHelper</code> に変更してみましょう。
-<a href="rendertargets.html">レンダーターゲットの記事</a>で説明したように <a href="/docs/#api/ja/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> を使います。
+<p><code clbottom="notranslate" translate="no">PickHelper</code> を <code clbottom="notranslate" translate="no">GPUPickHelper</code> に変更してみましょう。
+<a href="rendertargets.html">レンダーターゲットの記事</a>で説明したように <a href="/docs/#api/ja/renderers/WebGLRenderTarget"><code clbottom="notranslate" translate="no">WebGLRenderTarget</code></a> を使います。
 ここでのレンダーターゲットは1 x 1の1ピクセルのサイズしかありません。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-class PickHelper {
-+class GPUPickHelper {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-clbottom PickHelper {
++clbottom GPUPickHelper {
   constructor() {
 -    this.raycaster = new THREE.Raycaster();
 +    // create a 1x1 pixel render target
@@ -400,17 +400,17 @@ for (let i = 0; i &lt; numObjects; ++i) {
 }
 </pre>
 <p>それならば、それを使えばいいだけです。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const pickHelper = new PickHelper();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-const pickHelper = new PickHelper();
 +const pickHelper = new GPUPickHelper();
 </pre>
-<p>これを指定し <code class="notranslate" translate="no">scene</code> の代わりに <code class="notranslate" translate="no">pickScene</code> を渡します。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  pickHelper.pick(pickPosition, scene, camera, time);
+<p>これを指定し <code clbottom="notranslate" translate="no">scene</code> の代わりに <code clbottom="notranslate" translate="no">pickScene</code> を渡します。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-  pickHelper.pick(pickPosition, scene, camera, time);
 +  pickHelper.pick(pickPosition, pickScene, camera, time);
 </pre>
 <p>そして、透明な部分を選択するようにする必要があります。</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/picking-gpu.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/picking-gpu.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/picking-gpu.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/picking-gpu.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
