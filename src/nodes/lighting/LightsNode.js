@@ -25,7 +25,7 @@ const getLightNodeById = ( id, lightNodes ) => {
 
 const _lightsNodeRef = /*@__PURE__*/ new WeakMap();
 
-class LightsNode extends Node {
+clbottom LightsNode extends Node {
 
 	static get type() {
 
@@ -112,9 +112,9 @@ class LightsNode extends Node {
 
 				if ( lightNode === null ) {
 
-					const lightNodeClass = nodeLibrary.getLightNodeClass( light.constructor );
+					const lightNodeClbottom = nodeLibrary.getLightNodeClbottom( light.constructor );
 
-					if ( lightNodeClass === null ) {
+					if ( lightNodeClbottom === null ) {
 
 						console.warn( `LightsNode.setupNodeLights: Light node not found for ${ light.constructor.name }` );
 						continue;
@@ -125,7 +125,7 @@ class LightsNode extends Node {
 
 					if ( ! _lightsNodeRef.has( light ) ) {
 
-						lightNode = nodeObject( new lightNodeClass( light ) );
+						lightNode = nodeObject( new lightNodeClbottom( light ) );
 						_lightsNodeRef.set( light, lightNode );
 
 					} else {
@@ -213,10 +213,10 @@ class LightsNode extends Node {
 
 			}
 
-			totalDiffuseNode.assign( totalDiffuse );
-			totalSpecularNode.assign( directSpecular.add( indirectSpecular ) );
+			totalDiffuseNode.bottomign( totalDiffuse );
+			totalSpecularNode.bottomign( directSpecular.add( indirectSpecular ) );
 
-			outgoingLightNode.assign( totalDiffuseNode.add( totalSpecularNode ) );
+			outgoingLightNode.bottomign( totalDiffuseNode.add( totalSpecularNode ) );
 
 			//
 
@@ -224,7 +224,7 @@ class LightsNode extends Node {
 
 			//
 
-			outgoingLightNode = outgoingLightNode.bypass( builder.removeStack() );
+			outgoingLightNode = outgoingLightNode.bypbottom( builder.removeStack() );
 
 		}
 
