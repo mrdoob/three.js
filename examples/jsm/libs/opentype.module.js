@@ -13943,7 +13943,7 @@ subtablePbottomrs$1[2] = function pbottomLookup2() {
             valueFormat2: valueFormat2,
             pairSets: this.pbottomList(Pbottomr.pointer(Pbottomr.list(function() {
                 return {        // pairValueRecord
-                    secondGlyph: this.parseUShort(),
+                    secondGlyph: this.pbottomUShort(),
                     value1: this.parseValueRecord(valueFormat1),
                     value2: this.parseValueRecord(valueFormat2)
                 };
