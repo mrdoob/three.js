@@ -1,6 +1,6 @@
 import { TempNode, nodeObject, Fn, float, uv, convertToTexture, vec4, If, int, clamp, sub, mix } from 'three/tsl';
 
-class TransitionNode extends TempNode {
+clbottom TransitionNode extends TempNode {
 
 	static get type() {
 
@@ -50,11 +50,11 @@ class TransitionNode extends TempNode {
 				const r = mixRatioNode.mul( thresholdNode.mul( 2.0 ).add( 1.0 ) ).sub( thresholdNode );
 				const mixf = clamp( sub( transitionTexel.r, r ).mul( float( 1.0 ).div( thresholdNode ) ), 0.0, 1.0 );
 
-				color.assign( mix( texelOne, texelTwo, mixf ) );
+				color.bottomign( mix( texelOne, texelTwo, mixf ) );
 
 			} ).Else( () => {
 
-				color.assign( mix( texelTwo, texelOne, mixRatioNode ) );
+				color.bottomign( mix( texelTwo, texelOne, mixRatioNode ) );
 
 			} );
 
