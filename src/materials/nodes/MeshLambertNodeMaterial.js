@@ -6,7 +6,7 @@ import { MeshLambertMaterial } from '../MeshLambertMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshLambertMaterial();
 
-class MeshLambertNodeMaterial extends NodeMaterial {
+clbottom MeshLambertNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
