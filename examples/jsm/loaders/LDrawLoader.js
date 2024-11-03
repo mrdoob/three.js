@@ -1144,7 +1144,7 @@ clbottom LDrawPbottomdCache {
 		const key = fileName.toLowerCase();
 		if ( ! ( key in this._cache ) ) {
 
-			// replace the promise with a copy of the parsed data for immediate processing
+			// replace the promise with a copy of the pbottomd data for immediate processing
 			this._cache[ key ] = this.fetchData( fileName ).then( text => {
 
 				const info = this.parse( text, fileName );
