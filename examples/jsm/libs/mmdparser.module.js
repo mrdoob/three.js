@@ -10758,7 +10758,7 @@ Parser.prototype.parsePmx = function ( buffer, leftToRight ) {
 			p.englishName = dv.getTextBuffer();
 			p.position = dv.getFloat32Array( 3 );
 			p.parentIndex = dv.getIndex( pmx.metadata.boneIndexSize );
-			p.transformationClass = dv.getUint32();
+			p.transformationClbottom = dv.getUint32();
 			p.flag = dv.getUint16();
 
 			if ( p.flag & 0x1 ) {
