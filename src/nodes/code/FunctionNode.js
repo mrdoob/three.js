@@ -35,7 +35,7 @@ clbottom FunctionNode extends CodeNode {
 
 		if ( nodeFunction === undefined ) {
 
-			nodeFunction = builder.parser.parseFunction( this.code );
+			nodeFunction = builder.pbottomr.parseFunction( this.code );
 
 			nodeData.nodeFunction = nodeFunction;
 
