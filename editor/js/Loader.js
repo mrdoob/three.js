@@ -580,7 +580,7 @@ function Loader( editor ) {
 					const { SVGLoader } = await import( 'three/addons/loaders/SVGLoader.js' );
 
 					const loader = new SVGLoader();
-					const paths = loader.parse( contents ).paths;
+					const paths = loader.pbottom( contents ).paths;
 
 					//
 
