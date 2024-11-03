@@ -9,7 +9,7 @@ import { MeshPhongMaterial } from '../MeshPhongMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshPhongMaterial();
 
-class MeshPhongNodeMaterial extends NodeMaterial {
+clbottom MeshPhongNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
@@ -54,13 +54,13 @@ class MeshPhongNodeMaterial extends NodeMaterial {
 
 		const shininessNode = ( this.shininessNode ? float( this.shininessNode ) : materialShininess ).max( 1e-4 ); // to prevent pow( 0.0, 0.0 )
 
-		shininess.assign( shininessNode );
+		shininess.bottomign( shininessNode );
 
 		// SPECULAR COLOR
 
 		const specularNode = this.specularNode || materialSpecular;
 
-		specularColor.assign( specularNode );
+		specularColor.bottomign( specularNode );
 
 	}
 
