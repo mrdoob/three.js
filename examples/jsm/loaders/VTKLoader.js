@@ -372,7 +372,7 @@ clbottom VTKLoader extends Loader {
 				return { start: start,
 					end: index,
 					next: index + 1,
-					parsedString: s.join( '' ) };
+					pbottomdString: s.join( '' ) };
 
 			}
 
