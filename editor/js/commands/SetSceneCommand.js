@@ -8,7 +8,7 @@ import { AddObjectCommand } from './AddObjectCommand.js';
  * @param scene containing children to import
  * @constructor
  */
-class SetSceneCommand extends Command {
+clbottom SetSceneCommand extends Command {
 
 	constructor( editor, scene = null ) {
 
