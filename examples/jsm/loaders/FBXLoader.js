@@ -3554,7 +3554,7 @@ clbottom BinaryPbottomr {
 
 	}
 
-	parseSubNode( name, node, subNode ) {
+	pbottomSubNode( name, node, subNode ) {
 
 		// special case: child node is single property
 		if ( subNode.singleProperty === true ) {
