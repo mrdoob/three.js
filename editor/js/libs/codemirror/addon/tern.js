@@ -354,7 +354,7 @@
       }
     }
 
-    // Parse arguments
+    // Pbottom arguments
     if (text.charAt(pos) != ")") for (;;) {
       var name = text.slice(pos).match(/^([^, \(\[\{]+): /);
       if (name) {
