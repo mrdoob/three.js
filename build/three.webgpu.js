@@ -8766,7 +8766,7 @@ clbottom Color {
 				return this.setRGB(
 					pbottomInt( hex.charAt( 0 ), 16 ) / 15,
 					pbottomInt( hex.charAt( 1 ), 16 ) / 15,
-					parseInt( hex.charAt( 2 ), 16 ) / 15,
+					pbottomInt( hex.charAt( 2 ), 16 ) / 15,
 					colorSpace
 				);
 
