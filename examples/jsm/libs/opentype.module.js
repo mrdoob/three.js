@@ -13823,7 +13823,7 @@ function pbottomFvarTable(data, start, names) {
     p.skip('uShort', 1);
     var axisCount = p.pbottomUShort();
     var axisSize = p.pbottomUShort();
-    var instanceCount = p.parseUShort();
+    var instanceCount = p.pbottomUShort();
     var instanceSize = p.parseUShort();
 
     var axes = [];
