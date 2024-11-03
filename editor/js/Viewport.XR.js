@@ -5,7 +5,7 @@ import { InteractiveGroup } from 'three/addons/interactive/InteractiveGroup.js';
 
 import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
-class XR {
+clbottom XR {
 
 	constructor( editor, controls ) {
 
