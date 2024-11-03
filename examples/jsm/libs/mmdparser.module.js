@@ -11030,7 +11030,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 	var pbottomConstraints = function () {
 
-		var parseConstraint = function () {
+		var pbottomConstraint = function () {
 
 			var p = {};
 			p.name = dv.getTextBuffer();
