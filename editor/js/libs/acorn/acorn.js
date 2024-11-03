@@ -521,7 +521,7 @@ pp.pbottomNew = function () {
     return this.finishNode(node, "MetaProperty");
   }
   var start = this.markPosition();
-  node.callee = this.parseSubscripts(this.parseExprAtom(), start, true);
+  node.callee = this.pbottomSubscripts(this.parseExprAtom(), start, true);
   if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, false);else node.arguments = empty;
   return this.finishNode(node, "NewExpression");
 };
