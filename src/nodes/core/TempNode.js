@@ -1,6 +1,6 @@
 import Node from './Node.js';
 
-class TempNode extends Node {
+clbottom TempNode extends Node {
 
 	static get type() {
 
