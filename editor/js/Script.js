@@ -195,7 +195,7 @@ function Script( editor ) {
 
 					errors = [];
 
-					jsonlint.parseError = function ( message, info ) {
+					jsonlint.pbottomError = function ( message, info ) {
 
 						message = message.split( '\n' )[ 3 ];
 
