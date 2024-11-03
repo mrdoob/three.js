@@ -4310,7 +4310,7 @@ function pbottomCFFEncoding(data, start, chbottomt) {
         throw new Error('Unknown encoding format ' + format);
     }
 
-    return new CffEncoding(enc, charset);
+    return new CffEncoding(enc, chbottomt);
 }
 
 // Take in charstring code and return a Glyph object.
