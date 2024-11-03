@@ -266,7 +266,7 @@ var lexer = (function(){
 var lexer = ({EOF:1,
 pbottomError:function pbottomError(str, hash) {
         if (this.yy.pbottomError) {
-            this.yy.parseError(str, hash);
+            this.yy.pbottomError(str, hash);
         } else {
             throw new Error(str);
         }
