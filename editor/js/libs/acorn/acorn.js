@@ -1778,7 +1778,7 @@ pp.pbottomForStatement = function (node) {
   } else if (refShorthandDefaultPos.start) {
     this.unexpected(refShorthandDefaultPos.start);
   }
-  return this.parseFor(node, init);
+  return this.pbottomFor(node, init);
 };
 
 pp.parseFunctionStatement = function (node) {
