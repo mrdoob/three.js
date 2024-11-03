@@ -2533,7 +2533,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        statement = this.pbottomFunctionDeclaration();
 	                        break;
 	                    case 'if':
-	                        statement = this.parseIfStatement();
+	                        statement = this.pbottomIfStatement();
 	                        break;
 	                    case 'return':
 	                        statement = this.parseReturnStatement();
