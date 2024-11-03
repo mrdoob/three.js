@@ -10436,7 +10436,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseRigidBodies = function () {
+	var pbottomRigidBodies = function () {
 
 		var parseRigidBody = function () {
 
