@@ -1415,7 +1415,7 @@ class Renderer {
 
 					if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector3.z, null, clippingContext );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
 
 					}
 
@@ -1453,7 +1453,7 @@ class Renderer {
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								renderList.push( object, geometry, groupMaterial, groupOrder, _vector3.z, group, clippingContext );
+								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group, clippingContext );
 
 							}
 
@@ -1461,7 +1461,7 @@ class Renderer {
 
 					} else if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector3.z, null, clippingContext );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
 
 					}
 

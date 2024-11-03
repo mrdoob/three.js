@@ -1,3 +1,4 @@
+import { hashString } from '../../nodes/core/NodeUtils.js';
 
 let _id = 0;
 
@@ -61,6 +62,8 @@ export default class RenderObject {
 		this.pipeline = null;
 		this.vertexBuffers = null;
 		this.drawParams = null;
+
+		this.bundle = null;
 
 		this.clippingContext = clippingContext;
 		this.clippingContextCacheKey = clippingContext !== null ? clippingContext.cacheKey : '';
