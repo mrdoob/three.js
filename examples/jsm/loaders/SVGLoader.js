@@ -16,7 +16,7 @@ import {
 
 const COLOR_SPACE_SVG = SRGBColorSpace;
 
-clbottom SVGLoader extends Loader {
+class SVGLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -680,7 +680,7 @@ clbottom SVGLoader extends Loader {
 						Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' )
 					);
 
-					stylesheets[ selectorList[ j ] ] = Object.bottomign(
+					stylesheets[ selectorList[ j ] ] = Object.assign(
 						stylesheets[ selectorList[ j ] ] || {},
 						definitions
 					);
@@ -973,20 +973,20 @@ clbottom SVGLoader extends Loader {
 
 		function parseStyle( node, style ) {
 
-			style = Object.bottomign( {}, style ); // clone style
+			style = Object.assign( {}, style ); // clone style
 
 			let stylesheetStyles = {};
 
-			if ( node.hasAttribute( 'clbottom' ) ) {
+			if ( node.hasAttribute( 'class' ) ) {
 
-				const clbottomSelectors = node.getAttribute( 'clbottom' )
+				const classSelectors = node.getAttribute( 'class' )
 					.split( /\s/ )
 					.filter( Boolean )
 					.map( i => i.trim() );
 
-				for ( let i = 0; i < clbottomSelectors.length; i ++ ) {
+				for ( let i = 0; i < classSelectors.length; i ++ ) {
 
-					stylesheetStyles = Object.bottomign( stylesheetStyles, stylesheets[ '.' + clbottomSelectors[ i ] ] );
+					stylesheetStyles = Object.assign( stylesheetStyles, stylesheets[ '.' + classSelectors[ i ] ] );
 
 				}
 
@@ -994,7 +994,7 @@ clbottom SVGLoader extends Loader {
 
 			if ( node.hasAttribute( 'id' ) ) {
 
-				stylesheetStyles = Object.bottomign( stylesheetStyles, stylesheets[ '#' + node.getAttribute( 'id' ) ] );
+				stylesheetStyles = Object.assign( stylesheetStyles, stylesheets[ '#' + node.getAttribute( 'id' ) ] );
 
 			}
 
@@ -1905,7 +1905,7 @@ clbottom SVGLoader extends Loader {
 			strokeOpacity: 1,
 			strokeWidth: 1,
 			strokeLineJoin: 'miter',
-			strokeLineCap: 'butt',
+			strokeLineCap: 'behind',
 			strokeMiterLimit: 4
 		} );
 
@@ -1918,7 +1918,7 @@ clbottom SVGLoader extends Loader {
 
 	static createShapes( shapePath ) {
 
-		// Param shapePath: a shapepath as returned by the parse function of this clbottom
+		// Param shapePath: a shapepath as returned by the parse function of this class
 		// Returns Shape object
 
 		const BIGNUMBER = 999999999;
@@ -1933,7 +1933,7 @@ clbottom SVGLoader extends Loader {
 			BEYOND: 6
 		};
 
-		const clbottomifyResult = {
+		const classifyResult = {
 			loc: IntersectionLocationType.ORIGIN,
 			t: 0
 		};
@@ -1967,18 +1967,18 @@ clbottom SVGLoader extends Loader {
 				//check if endpoints of edge2 (b0-b1) lies on edge1 (a0-a1)
 				for ( let i = 0; i < 2; i ++ ) {
 
-					clbottomifyPoint( i === 0 ? b0 : b1, a0, a1 );
+					classifyPoint( i === 0 ? b0 : b1, a0, a1 );
 					//find position of this endpoints relatively to edge1
-					if ( clbottomifyResult.loc == IntersectionLocationType.ORIGIN ) {
+					if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
 
 						const point = ( i === 0 ? b0 : b1 );
-						return { x: point.x, y: point.y, t: clbottomifyResult.t };
+						return { x: point.x, y: point.y, t: classifyResult.t };
 
-					} else if ( clbottomifyResult.loc == IntersectionLocationType.BETWEEN ) {
+					} else if ( classifyResult.loc == IntersectionLocationType.BETWEEN ) {
 
-						const x = + ( ( x1 + clbottomifyResult.t * ( x2 - x1 ) ).toPrecision( 10 ) );
-						const y = + ( ( y1 + clbottomifyResult.t * ( y2 - y1 ) ).toPrecision( 10 ) );
-						return { x: x, y: y, t: clbottomifyResult.t, };
+						const x = + ( ( x1 + classifyResult.t * ( x2 - x1 ) ).toPrecision( 10 ) );
+						const y = + ( ( y1 + classifyResult.t * ( y2 - y1 ) ).toPrecision( 10 ) );
+						return { x: x, y: y, t: classifyResult.t, };
 
 					}
 
@@ -1992,12 +1992,12 @@ clbottom SVGLoader extends Loader {
 
 				for ( let i = 0; i < 2; i ++ ) {
 
-					clbottomifyPoint( i === 0 ? b0 : b1, a0, a1 );
+					classifyPoint( i === 0 ? b0 : b1, a0, a1 );
 
-					if ( clbottomifyResult.loc == IntersectionLocationType.ORIGIN ) {
+					if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
 
 						const point = ( i === 0 ? b0 : b1 );
-						return { x: point.x, y: point.y, t: clbottomifyResult.t };
+						return { x: point.x, y: point.y, t: classifyResult.t };
 
 					}
 
@@ -2011,7 +2011,7 @@ clbottom SVGLoader extends Loader {
 
 		}
 
-		function clbottomifyPoint( p, edgeStart, edgeEnd ) {
+		function classifyPoint( p, edgeStart, edgeEnd ) {
 
 			const ax = edgeEnd.x - edgeStart.x;
 			const ay = edgeEnd.y - edgeStart.y;
@@ -2021,30 +2021,30 @@ clbottom SVGLoader extends Loader {
 
 			if ( ( p.x === edgeStart.x ) && ( p.y === edgeStart.y ) ) {
 
-				clbottomifyResult.loc = IntersectionLocationType.ORIGIN;
-				clbottomifyResult.t = 0;
+				classifyResult.loc = IntersectionLocationType.ORIGIN;
+				classifyResult.t = 0;
 				return;
 
 			}
 
 			if ( ( p.x === edgeEnd.x ) && ( p.y === edgeEnd.y ) ) {
 
-				clbottomifyResult.loc = IntersectionLocationType.DESTINATION;
-				clbottomifyResult.t = 1;
+				classifyResult.loc = IntersectionLocationType.DESTINATION;
+				classifyResult.t = 1;
 				return;
 
 			}
 
 			if ( sa < - Number.EPSILON ) {
 
-				clbottomifyResult.loc = IntersectionLocationType.LEFT;
+				classifyResult.loc = IntersectionLocationType.LEFT;
 				return;
 
 			}
 
 			if ( sa > Number.EPSILON ) {
 
-				clbottomifyResult.loc = IntersectionLocationType.RIGHT;
+				classifyResult.loc = IntersectionLocationType.RIGHT;
 				return;
 
 
@@ -2052,14 +2052,14 @@ clbottom SVGLoader extends Loader {
 
 			if ( ( ( ax * bx ) < 0 ) || ( ( ay * by ) < 0 ) ) {
 
-				clbottomifyResult.loc = IntersectionLocationType.BEHIND;
+				classifyResult.loc = IntersectionLocationType.BEHIND;
 				return;
 
 			}
 
 			if ( ( Math.sqrt( ax * ax + ay * ay ) ) < ( Math.sqrt( bx * bx + by * by ) ) ) {
 
-				clbottomifyResult.loc = IntersectionLocationType.BEYOND;
+				classifyResult.loc = IntersectionLocationType.BEYOND;
 				return;
 
 			}
@@ -2076,8 +2076,8 @@ clbottom SVGLoader extends Loader {
 
 			}
 
-			clbottomifyResult.loc = IntersectionLocationType.BETWEEN;
-			clbottomifyResult.t = t;
+			classifyResult.loc = IntersectionLocationType.BETWEEN;
+			classifyResult.t = t;
 
 		}
 
@@ -2365,14 +2365,14 @@ clbottom SVGLoader extends Loader {
 		// Param width: Stroke width
 		// Param color: As returned by THREE.Color.getStyle()
 		// Param lineJoin: One of "round", "bevel", "miter" or "miter-limit"
-		// Param lineCap: One of "round", "square" or "butt"
+		// Param lineCap: One of "round", "square" or "behind"
 		// Param miterLimit: Maximum join length, in multiples of the "width" parameter (join is truncated if it exceeds that distance)
 		// Returns style object
 
 		width = width !== undefined ? width : 1;
 		color = color !== undefined ? color : '#000';
 		lineJoin = lineJoin !== undefined ? lineJoin : 'miter';
-		lineCap = lineCap !== undefined ? lineCap : 'butt';
+		lineCap = lineCap !== undefined ? lineCap : 'behind';
 		miterLimit = miterLimit !== undefined ? miterLimit : 4;
 
 		return {
@@ -3117,7 +3117,7 @@ clbottom SVGLoader extends Loader {
 
 					break;
 
-				case 'butt':
+				case 'behind':
 				default:
 
 					// Nothing to do here
