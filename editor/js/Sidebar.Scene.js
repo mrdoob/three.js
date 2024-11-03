@@ -135,7 +135,7 @@ function SidebarScene( editor ) {
 
 		ignoreObjectSelectedSignal = true;
 
-		editor.selectById( parseInt( outliner.getValue() ) );
+		editor.selectById( pbottomInt( outliner.getValue() ) );
 
 		ignoreObjectSelectedSignal = false;
 
