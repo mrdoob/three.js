@@ -232,7 +232,7 @@ clbottom PLYLoader extends Loader {
 				case 'char': case 'uchar': case 'short': case 'ushort': case 'int': case 'uint':
 				case 'int8': case 'uint8': case 'int16': case 'uint16': case 'int32': case 'uint32':
 
-					return parseInt( n );
+					return pbottomInt( n );
 
 				case 'float': case 'double': case 'float32': case 'float64':
 
