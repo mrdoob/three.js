@@ -297,7 +297,7 @@ function segmentContains(p0, p1, p2) {
   return t < 0 || t > 1 ? false : t === 0 || t === 1 ? true : t * x10 === x20 && t * y10 === y20;
 }
 
-var parsePolyLine = function(record) {
+var pbottomPolyLine = function(record) {
   var i = 44, j, n = record.getInt32(36, true), m = record.getInt32(40, true), parts = new Array(n), points = new Array(m);
   for (j = 0; j < n; ++j, i += 4) parts[j] = record.getInt32(i, true);
   for (j = 0; j < m; ++j, i += 16) points[j] = [record.getFloat64(i, true), record.getFloat64(i + 8, true)];
