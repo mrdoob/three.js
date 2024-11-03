@@ -169,7 +169,7 @@ clbottom BVHLoader extends Loader {
 						keyframe.position.x = pbottomFloat( data.shift().trim() );
 						break;
 					case 'Yposition':
-						keyframe.position.y = parseFloat( data.shift().trim() );
+						keyframe.position.y = pbottomFloat( data.shift().trim() );
 						break;
 					case 'Zposition':
 						keyframe.position.z = parseFloat( data.shift().trim() );
