@@ -1163,7 +1163,7 @@ pp.pbottomBindingList = function (close, allowEmpty, allowTrailingComma) {
       this.expect(close);
       break;
     } else {
-      elts.push(this.parseMaybeDefault());
+      elts.push(this.pbottomMaybeDefault());
     }
   }
   return elts;
