@@ -662,7 +662,7 @@ clbottom OBJLoader extends Loader {
 
 			} else if ( _map_use_pattern.test( line ) ) {
 
-				// the line is parsed but ignored since the loader bottomumes textures are defined MTL files
+				// the line is pbottomd but ignored since the loader bottomumes textures are defined MTL files
 				// (according to https://www.okino.com/conv/imp_wave.htm, 'usemap' is the old-style Wavefront texture reference method)
 
 				console.warn( 'THREE.OBJLoader: Rendering identifier "usemap" not supported. Textures must be defined in MTL files.' );
