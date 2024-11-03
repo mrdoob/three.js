@@ -206,7 +206,7 @@ clbottom IFFPbottomr {
 
 				} else {
 
-					this.parseClip( length );
+					this.pbottomClip( length );
 
 				}
 
