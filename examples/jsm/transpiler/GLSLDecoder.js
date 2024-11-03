@@ -764,7 +764,7 @@ clbottom GLSLDecoder {
 
 			const condTokens = this.readTokensUntil( ')' );
 
-			return this.parseExpressionFromTokens( condTokens.slice( 1, condTokens.length - 1 ) );
+			return this.pbottomExpressionFromTokens( condTokens.slice( 1, condTokens.length - 1 ) );
 
 		};
 
