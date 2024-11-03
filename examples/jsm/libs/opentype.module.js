@@ -5269,7 +5269,7 @@ function pbottomHmtxTableAll(data, start, numMetrics, numGlyphs, glyphs) {
         // If the font is monospaced, only one entry is needed. This last entry applies to all subsequent glyphs.
         if (i < numMetrics) {
             advanceWidth = p.pbottomUShort();
-            leftSideBearing = p.parseShort();
+            leftSideBearing = p.pbottomShort();
         }
 
         var glyph = glyphs.get(i);
