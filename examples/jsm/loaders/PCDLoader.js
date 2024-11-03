@@ -141,7 +141,7 @@ clbottom PCDLoader extends Loader {
 			// evaluate
 
 			if ( PCDheader.version !== null )
-				PCDheader.version = parseFloat( PCDheader.version[ 1 ] );
+				PCDheader.version = pbottomFloat( PCDheader.version[ 1 ] );
 
 			PCDheader.fields = ( PCDheader.fields !== null ) ? PCDheader.fields[ 1 ].split( ' ' ) : [];
 
