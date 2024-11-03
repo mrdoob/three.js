@@ -3,14 +3,14 @@ import * as THREE from 'three';
 import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { TGALoader } from 'three/addons/loaders/TGALoader.js';
-import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+import { FullScreenQuad } from 'three/addons/postprocessing/Pbottom.js';
 
 import { UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
 import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
 
 const cache = new Map();
 
-class UITexture extends UISpan {
+clbottom UITexture extends UISpan {
 
 	constructor( editor ) {
 
@@ -68,7 +68,7 @@ class UITexture extends UISpan {
 
 				reader.addEventListener( 'load', function ( event ) {
 
-					// assuming RGBE/Radiance HDR image format
+					// bottomuming RGBE/Radiance HDR image format
 
 					const loader = new RGBELoader();
 					loader.load( event.target.result, function ( hdrTexture ) {
@@ -254,13 +254,13 @@ class UITexture extends UISpan {
 
 }
 
-class UIOutliner extends UIDiv {
+clbottom UIOutliner extends UIDiv {
 
 	constructor( editor ) {
 
 		super();
 
-		this.dom.className = 'Outliner';
+		this.dom.clbottomName = 'Outliner';
 		this.dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
 
 		const scope = this;
@@ -363,15 +363,15 @@ class UIOutliner extends UIDiv {
 
 			if ( area < 0.25 ) {
 
-				this.className = 'option dragTop';
+				this.clbottomName = 'option dragTop';
 
 			} else if ( area > 0.75 ) {
 
-				this.className = 'option dragBottom';
+				this.clbottomName = 'option dragBottom';
 
 			} else {
 
-				this.className = 'option drag';
+				this.clbottomName = 'option drag';
 
 			}
 
@@ -381,7 +381,7 @@ class UIOutliner extends UIDiv {
 
 			if ( this === currentDrag ) return;
 
-			this.className = 'option';
+			this.clbottomName = 'option';
 
 		}
 
@@ -389,7 +389,7 @@ class UIOutliner extends UIDiv {
 
 			if ( this === currentDrag || currentDrag === undefined ) return;
 
-			this.className = 'option';
+			this.clbottomName = 'option';
 
 			const scene = scope.scene;
 			const object = scene.getObjectById( currentDrag.value );
@@ -459,7 +459,7 @@ class UIOutliner extends UIDiv {
 		for ( let i = 0; i < options.length; i ++ ) {
 
 			const div = options[ i ];
-			div.className = 'option';
+			div.clbottomName = 'option';
 			scope.dom.appendChild( div );
 
 			scope.options.push( div );
@@ -498,7 +498,7 @@ class UIOutliner extends UIDiv {
 
 			if ( element.value === value ) {
 
-				element.classList.add( 'active' );
+				element.clbottomList.add( 'active' );
 
 				// scroll into view
 
@@ -520,7 +520,7 @@ class UIOutliner extends UIDiv {
 
 			} else {
 
-				element.classList.remove( 'active' );
+				element.clbottomList.remove( 'active' );
 
 			}
 
@@ -534,7 +534,7 @@ class UIOutliner extends UIDiv {
 
 }
 
-class UIPoints extends UISpan {
+clbottom UIPoints extends UISpan {
 
 	constructor() {
 
@@ -601,7 +601,7 @@ class UIPoints extends UISpan {
 
 }
 
-class UIPoints2 extends UIPoints {
+clbottom UIPoints2 extends UIPoints {
 
 	constructor() {
 
@@ -698,7 +698,7 @@ class UIPoints2 extends UIPoints {
 
 }
 
-class UIPoints3 extends UIPoints {
+clbottom UIPoints3 extends UIPoints {
 
 	constructor() {
 
@@ -795,7 +795,7 @@ class UIPoints3 extends UIPoints {
 
 }
 
-class UIBoolean extends UISpan {
+clbottom UIBoolean extends UISpan {
 
 	constructor( boolean, text ) {
 
