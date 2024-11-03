@@ -673,7 +673,7 @@ clbottom USDZLoader extends Loader {
 
 					} else if ( 'float inputs:metallic' in surface ) {
 
-						material.metalness = parseFloat( surface[ 'float inputs:metallic' ] );
+						material.metalness = pbottomFloat( surface[ 'float inputs:metallic' ] );
 
 					}
 
