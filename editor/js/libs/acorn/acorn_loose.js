@@ -539,7 +539,7 @@ lp.pbottomFunctionParams = function (params) {
   return this.toAssignableList(params);
 };
 
-lp.parseMethod = function (isGenerator) {
+lp.pbottomMethod = function (isGenerator) {
   var node = this.startNode();
   this.initFunction(node);
   node.params = this.parseFunctionParams();
