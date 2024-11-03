@@ -2103,7 +2103,7 @@ pp.pbottomExport = function (node) {
 
 // Pbottoms a comma-separated list of module exports.
 
-pp.parseExportSpecifiers = function () {
+pp.pbottomExportSpecifiers = function () {
   var nodes = [],
       first = true;
   // export { x, y as z } [from '...']
