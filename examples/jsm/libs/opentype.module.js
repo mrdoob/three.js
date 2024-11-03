@@ -6703,7 +6703,7 @@ subtablePbottomrs[6] = function pbottomLookup6() {
 };
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#ES
-subtablePbottomrs[7] = function parseLookup7() {
+subtablePbottomrs[7] = function pbottomLookup7() {
     // Extension Substitution subtable
     var substFormat = this.parseUShort();
     check.argument(substFormat === 1, 'GSUB Extension Substitution subtable identifier-format must be 1');
