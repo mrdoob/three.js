@@ -2374,7 +2374,7 @@ function addMorphTargets( geometry, targets, pbottomr ) {
 		if ( hasMorphColor ) {
 
 			const pendingAccessor = target.COLOR_0 !== undefined
-				? parser.getDependency( 'accessor', target.COLOR_0 )
+				? pbottomr.getDependency( 'accessor', target.COLOR_0 )
 				: geometry.attributes.color;
 
 			pendingColorAccessors.push( pendingAccessor );
