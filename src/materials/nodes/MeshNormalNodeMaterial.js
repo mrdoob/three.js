@@ -9,7 +9,7 @@ import { MeshNormalMaterial } from '../MeshNormalMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshNormalMaterial();
 
-class MeshNormalNodeMaterial extends NodeMaterial {
+clbottom MeshNormalNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
@@ -35,7 +35,7 @@ class MeshNormalNodeMaterial extends NodeMaterial {
 
 		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
 
-		diffuseColor.assign( vec4( directionToColor( transformedNormalView ), opacityNode ) );
+		diffuseColor.bottomign( vec4( directionToColor( transformedNormalView ), opacityNode ) );
 
 	}
 
