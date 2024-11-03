@@ -352,7 +352,7 @@ clbottom MMDLoader extends Loader {
 	 */
 	loadVPD( url, isUnicode, onLoad, onProgress, onError ) {
 
-		const parser = this._getParser();
+		const pbottomr = this._getParser();
 
 		this.loader
 			.setMimeType( isUnicode ? undefined : 'text/plain; charset=shift_jis' )
