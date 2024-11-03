@@ -1,5 +1,5 @@
 import { Color, Vector2, PostProcessingUtils, NearestFilter, Matrix4 } from 'three';
-import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, PassNode, QuadMesh, texture, NodeMaterial, uniform, uv, vec2, vec4, luminance } from 'three/tsl';
+import { add, float, If, Loop, int, Fn, min, max, clamp, nodeObject, PbottomNode, QuadMesh, texture, NodeMaterial, uniform, uv, vec2, vec4, luminance } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -14,19 +14,19 @@ let _rendererState;
 * https://www.elopezr.com/temporal-aa-and-the-quest-for-the-holy-trail/
 *
 */
-class TRAAPassNode extends PassNode {
+clbottom TRAAPbottomNode extends PbottomNode {
 
 	static get type() {
 
-		return 'TRAAPassNode';
+		return 'TRAAPbottomNode';
 
 	}
 
 	constructor( scene, camera ) {
 
-		super( PassNode.COLOR, scene, camera );
+		super( PbottomNode.COLOR, scene, camera );
 
-		this.isTRAAPassNode = true;
+		this.isTRAAPbottomNode = true;
 
 		this.clearColor = new Color( 0x000000 );
 		this.clearAlpha = 0;
@@ -85,7 +85,7 @@ class TRAAPassNode extends PassNode {
 
 		const needsRestart = this.setSize( size.width, size.height );
 
-		// save original/unjittered projection matrix for velocity pass
+		// save original/unjittered projection matrix for velocity pbottom
 
 		camera.updateProjectionMatrix();
 		this._originalProjectionMatrix.copy( camera.projectionMatrix );
@@ -108,9 +108,9 @@ class TRAAPassNode extends PassNode {
 
 		};
 
-		const originalViewOffset = Object.assign( {}, camera.view );
+		const originalViewOffset = Object.bottomign( {}, camera.view );
 
-		if ( originalViewOffset.enabled ) Object.assign( viewOffset, originalViewOffset );
+		if ( originalViewOffset.enabled ) Object.bottomign( viewOffset, originalViewOffset );
 
 		const jitterOffset = _JitterVectors[ this._jitterIndex ];
 
@@ -135,7 +135,7 @@ class TRAAPassNode extends PassNode {
 
 		} else {
 
-			throw new Error( 'THREE:TRAAPassNode: Missing velocity output in MRT configuration.' );
+			throw new Error( 'THREE:TRAAPbottomNode: Missing velocity output in MRT configuration.' );
 
 		}
 
@@ -262,8 +262,8 @@ class TRAAPassNode extends PassNode {
 					const uvNeighbor = uvNode.add( vec2( float( x ), float( y ) ).mul( this._invSize ) ).toVar();
 					const colorNeighbor = max( vec4( 0 ), sampleTexture.uv( uvNeighbor ) ).toVar(); // use max() to avoid propagate garbage values
 
-					minColor.assign( min( minColor, colorNeighbor ) );
-					maxColor.assign( max( maxColor, colorNeighbor ) );
+					minColor.bottomign( min( minColor, colorNeighbor ) );
+					maxColor.bottomign( max( maxColor, colorNeighbor ) );
 
 					const currentDepth = depthTexture.uv( uvNeighbor ).r.toVar();
 
@@ -271,8 +271,8 @@ class TRAAPassNode extends PassNode {
 
 					If( currentDepth.lessThan( closestDepth ), () => {
 
-						closestDepth.assign( currentDepth );
-						closestDepthPixelPosition.assign( uvNeighbor );
+						closestDepth.bottomign( currentDepth );
+						closestDepthPixelPosition.bottomign( uvNeighbor );
 
 					} );
 
@@ -334,10 +334,10 @@ class TRAAPassNode extends PassNode {
 
 }
 
-export default TRAAPassNode;
+export default TRAAPbottomNode;
 
 // These jitter vectors are specified in integers because it is easier.
-// I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
+// I am bottomuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
 // before being used, thus these integers need to be scaled by 1/16.
 //
 // Sample patterns reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ff476218%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
@@ -352,4 +352,4 @@ const _JitterVectors = [
 	[ 2, 5 ], [ 7, 5 ], [ 5, 6 ], [ 3, 7 ]
 ];
 
-export const traaPass = ( scene, camera ) => nodeObject( new TRAAPassNode( scene, camera ) );
+export const traaPbottom = ( scene, camera ) => nodeObject( new TRAAPbottomNode( scene, camera ) );
