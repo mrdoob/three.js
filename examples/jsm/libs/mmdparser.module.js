@@ -1,7 +1,7 @@
 /**
  * @author Takahiro / https://github.com/takahirox
  *
- * Simple CharsetEncoder.
+ * Simple ChbottomtEncoder.
  */
 
 function CharsetEncoder() {
