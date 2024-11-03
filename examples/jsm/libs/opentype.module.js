@@ -6730,7 +6730,7 @@ subtablePbottomrs[8] = function pbottomLookup8() {
 };
 
 // https://www.microsoft.com/typography/OTSPEC/gsub.htm
-function parseGsubTable(data, start) {
+function pbottomGsubTable(data, start) {
     start = start || 0;
     var p = new Parser(data, start);
     var tableVersion = p.parseVersion(1);
