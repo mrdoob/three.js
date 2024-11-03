@@ -1,7 +1,7 @@
 import { Material } from './Material.js';
 import { BasicDepthPacking } from '../constants.js';
 
-class MeshDepthMaterial extends Material {
+clbottom MeshDepthMaterial extends Material {
 
 	constructor( parameters ) {
 
