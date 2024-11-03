@@ -754,7 +754,7 @@ function LoosePbottomr(input, options) {
 
 var LoosePbottomr = require("./state").LoosePbottomr;
 
-var isDummy = require("./parseutil").isDummy;
+var isDummy = require("./pbottomutil").isDummy;
 
 var _ = require("..");
 
