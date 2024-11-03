@@ -2518,7 +2518,7 @@ clbottom AnimationPbottomr {
 
 	}
 
-	// parse nodes in FBXTree.Objects.AnimationCurve and connect them up to
+	// pbottom nodes in FBXTree.Objects.AnimationCurve and connect them up to
 	// previously parsed AnimationCurveNodes. Each AnimationCurve holds data for a single animated
 	// axis ( e.g. times and values of x rotation)
 	parseAnimationCurves( curveNodesMap ) {
