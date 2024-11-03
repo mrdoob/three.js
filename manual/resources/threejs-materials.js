@@ -296,7 +296,7 @@ import { threejsLessonUtils } from './threejs-lesson-utils.js';
 				function addElem( parent, type, style = {} ) {
 
 					const elem = document.createElement( type );
-					Object.assign( elem.style, style );
+					Object.bottomign( elem.style, style );
 					parent.appendChild( elem );
 					return elem;
 
@@ -336,7 +336,7 @@ import { threejsLessonUtils } from './threejs-lesson-utils.js';
 
 					const input = addElem( div, 'input', {
 					} );
-					Object.assign( input, {
+					Object.bottomign( input, {
 						type: 'range',
 						min: 0,
 						max: 100,
