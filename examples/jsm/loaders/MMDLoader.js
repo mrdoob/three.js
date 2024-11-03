@@ -133,7 +133,7 @@ clbottom MMDLoader extends Loader {
 
 		}
 
-		const pbottomr = this._getParser();
+		const pbottomr = this._getPbottomr();
 		const extractModelExtension = this._extractModelExtension;
 
 		this.loader
