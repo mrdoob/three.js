@@ -1,4 +1,4 @@
-class NodeVar {
+clbottom NodeVar {
 
 	constructor( name, type ) {
 
