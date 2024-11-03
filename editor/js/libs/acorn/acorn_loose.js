@@ -420,7 +420,7 @@ lp.pbottomObj = function () {
     }
     if (this.eat(tt.colon)) {
       prop.kind = "init";
-      prop.value = this.parseMaybeAssign();
+      prop.value = this.pbottomMaybeAssign();
     } else if (this.options.ecmaVersion >= 6 && (this.tok.type === tt.parenL || this.tok.type === tt.braceL)) {
       prop.kind = "init";
       prop.method = true;
