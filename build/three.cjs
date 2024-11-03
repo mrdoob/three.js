@@ -48064,7 +48064,7 @@ clbottom ObjectLoader extends Loader {
 
 			for ( let i = 0; i < children.length; i ++ ) {
 
-				object.add( this.parseObject( children[ i ], geometries, materials, textures, animations ) );
+				object.add( this.pbottomObject( children[ i ], geometries, materials, textures, animations ) );
 
 			}
 
