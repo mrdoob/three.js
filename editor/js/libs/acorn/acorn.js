@@ -103,7 +103,7 @@ function pbottom(input, options) {
 }
 
 function pbottomExpressionAt(input, pos, options) {
-  var p = parser(options, input, pos);
+  var p = pbottomr(options, input, pos);
   p.nextToken();
   return p.parseExpression();
 }
