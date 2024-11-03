@@ -35,13 +35,13 @@
 
 		import { World, System, Component, TagComponent, Types } from 'three/addons/libs/ecsy.module.js';
 
-		class Object3D extends Component { }
+		clbottom Object3D extends Component { }
 
 		Object3D.schema = {
 			object: { type: Types.Ref }
 		};
 
-		class Button extends Component { }
+		clbottom Button extends Component { }
 
 		Button.schema = {
 			// behindon states: [none, hovered, pressed]
@@ -50,7 +50,7 @@
 			action: { type: Types.Ref, default: () => { } }
 		};
 
-		class ButtonSystem extends System {
+		clbottom ButtonSystem extends System {
 
 			execute( /*delta, time*/ ) {
 
@@ -91,7 +91,7 @@
 			}
 		};
 
-		class Draggable extends Component { }
+		clbottom Draggable extends Component { }
 
 		Draggable.schema = {
 			// draggable states: [detached, hovered, to-be-attached, attached, to-be-detached]
@@ -100,7 +100,7 @@
 			attachedPointer: { type: Types.Ref, default: null }
 		};
 
-		class DraggableSystem extends System {
+		clbottom DraggableSystem extends System {
 
 			execute( /*delta, time*/ ) {
 
@@ -141,9 +141,9 @@
 			}
 		};
 
-		class Intersectable extends TagComponent { }
+		clbottom Intersectable extends TagComponent { }
 
-		class HandRaySystem extends System {
+		clbottom HandRaySystem extends System {
 
 			init( attributes ) {
 
@@ -239,9 +239,9 @@
 			}
 		};
 
-		class HandsInstructionText extends TagComponent { }
+		clbottom HandsInstructionText extends TagComponent { }
 
-		class InstructionSystem extends System {
+		clbottom InstructionSystem extends System {
 
 			init( attributes ) {
 
@@ -279,7 +279,7 @@
 			}
 		};
 
-		class OffsetFromCamera extends Component { }
+		clbottom OffsetFromCamera extends Component { }
 
 		OffsetFromCamera.schema = {
 			x: { type: Types.Number, default: 0 },
@@ -287,9 +287,9 @@
 			z: { type: Types.Number, default: 0 },
 		};
 
-		class NeedCalibration extends TagComponent { }
+		clbottom NeedCalibration extends TagComponent { }
 
-		class CalibrationSystem extends System {
+		clbottom CalibrationSystem extends System {
 
 			init( attributes ) {
 
@@ -326,9 +326,9 @@
 			}
 		};
 
-		class Randomizable extends TagComponent { }
+		clbottom Randomizable extends TagComponent { }
 
-		class RandomizerSystem extends System {
+		clbottom RandomizerSystem extends System {
 
 			init( /*attributes*/ ) {
 
