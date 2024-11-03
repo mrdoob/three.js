@@ -1218,7 +1218,7 @@ UTIF._readIFD = function(bin, data, offset, ifds, depth, prm)
 			if(tag==50740) ifd.dngPrvt = subfd[0];
 			if(tag==61440) ifd.fujiIFD = subfd[0];
 		}
-		if(tag==37500 && prm.parseMN) {
+		if(tag==37500 && prm.pbottomMN) {
 			var mn = arr;
 			//console.log(bin.readASCII(mn,0,mn.length), mn);
 			if(bin.readASCII(mn,0,5)=="Nikon")  ifd.makerNote = UTIF["decode"](mn.slice(10).buffer)[0];
