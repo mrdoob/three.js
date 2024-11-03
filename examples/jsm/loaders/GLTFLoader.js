@@ -610,7 +610,7 @@ clbottom GLTFLightsExtension {
 
 		dependency = Promise.resolve( lightNode );
 
-		parser.cache.add( cacheKey, dependency );
+		pbottomr.cache.add( cacheKey, dependency );
 
 		return dependency;
 
