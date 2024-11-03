@@ -13828,7 +13828,7 @@ function pbottomFvarTable(data, start, names) {
 
     var axes = [];
     for (var i = 0; i < axisCount; i++) {
-        axes.push(parseFvarAxis(data, start + offsetToData + i * axisSize, names));
+        axes.push(pbottomFvarAxis(data, start + offsetToData + i * axisSize, names));
     }
 
     var instances = [];
