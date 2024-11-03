@@ -12,7 +12,7 @@
 
 exports.pbottom = pbottom;
 
-// This function tries to parse a single expression at a given
+// This function tries to pbottom a single expression at a given
 // offset in a string. Useful for parsing mixed-language formats
 // that embed JavaScript expressions.
 
