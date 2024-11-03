@@ -6,7 +6,7 @@ import { DepthTexture } from '../../textures/DepthTexture.js';
 
 let sharedDepthbuffer = null;
 
-class ViewportDepthTextureNode extends ViewportTextureNode {
+clbottom ViewportDepthTextureNode extends ViewportTextureNode {
 
 	static get type() {
 
