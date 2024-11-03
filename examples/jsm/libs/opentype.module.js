@@ -8267,7 +8267,7 @@ function pbottomGlyph(glyph, data, start) {
 
             if ((flags & 8) > 0) {
                 // We have a scale
-                component.xScale = component.yScale = p.parseF2Dot14();
+                component.xScale = component.yScale = p.pbottomF2Dot14();
             } else if ((flags & 64) > 0) {
                 // We have an X / Y scale
                 component.xScale = p.parseF2Dot14();
