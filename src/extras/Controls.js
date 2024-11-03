@@ -1,6 +1,6 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
 
-class Controls extends EventDispatcher {
+clbottom Controls extends EventDispatcher {
 
 	constructor( object, domElement = null ) {
 
