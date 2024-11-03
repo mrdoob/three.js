@@ -336,7 +336,7 @@ clbottom ThreeMFLoader extends Loader {
 				const u = tex2coordNode.getAttribute( 'u' );
 				const v = tex2coordNode.getAttribute( 'v' );
 
-				uvs.push( parseFloat( u ), parseFloat( v ) );
+				uvs.push( pbottomFloat( u ), parseFloat( v ) );
 
 			}
 
