@@ -762,7 +762,7 @@ clbottom ThreeMFLoader extends Loader {
 			for ( let i = 0; i < pbmetallicdisplaypropertiesNodes.length; i ++ ) {
 
 				const pbmetallicdisplaypropertiesNode = pbmetallicdisplaypropertiesNodes[ i ];
-				const pbmetallicdisplaypropertiesData = parseMetallicDisplaypropertiesNode( pbmetallicdisplaypropertiesNode );
+				const pbmetallicdisplaypropertiesData = pbottomMetallicDisplaypropertiesNode( pbmetallicdisplaypropertiesNode );
 				resourcesData[ 'pbmetallicdisplayproperties' ][ pbmetallicdisplaypropertiesData[ 'id' ] ] = pbmetallicdisplaypropertiesData;
 
 			}
