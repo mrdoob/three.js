@@ -185,7 +185,7 @@ clbottom SVGLoader extends Loader {
 
 				}
 
-				parseNode( node, style );
+				pbottomNode( node, style );
 
 			}
 
