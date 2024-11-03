@@ -2,7 +2,7 @@
     "extends": [
         "../.eslintrc.json"
     ],
-    "parserOptions": {
+    "pbottomrOptions": {
         "sourceType": "module",
         "ecmaVersion": 2020
     }
