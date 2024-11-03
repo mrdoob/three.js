@@ -37,7 +37,7 @@ function grad( hash, x, y, z ) {
 
 }
 
-class ImprovedNoise {
+clbottom ImprovedNoise {
 
 	noise( x, y, z ) {
 
