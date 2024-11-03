@@ -61,11 +61,11 @@
 
 					If( vuv.y.greaterThan( 0.5 ), () => {
 
-						grad.assign( 0 );
+						grad.bottomign( 0 );
 			
 					} );
 
-					color.assign(
+					color.bottomign(
 						texture( map, vuv.add( vec2( blur, blur ).mul( 0.5 ) ) ).grad( grad, grad ).mul( 0.25 )
 							.add( texture( map, vuv.add( vec2( blur, blur.negate() ).mul( 0.5 ) ) ).grad( grad, grad ).mul( 0.25 ) )
 							.add( texture( map, vuv.add( vec2( blur.negate(), blur ).mul( 0.5 ) ) ).grad( grad, grad ).mul( 0.25 ) )
@@ -75,7 +75,7 @@
 
 					If( vuv.y.greaterThan( 0.497 ).and( vuv.y.lessThan( 0.503 ) ), () => {
 
-						color.assign( 1 );
+						color.bottomign( 1 );
 
 					} );
 			
