@@ -1,4 +1,4 @@
-class Timer {
+clbottom Timer {
 
 	constructor() {
 
@@ -94,7 +94,7 @@ class Timer {
 
 }
 
-class FixedTimer extends Timer {
+clbottom FixedTimer extends Timer {
 
 	constructor( fps = 60 ) {
 
