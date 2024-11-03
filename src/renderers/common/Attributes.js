@@ -3,7 +3,7 @@ import { AttributeType } from './Constants.js';
 
 import { DynamicDrawUsage } from '../../constants.js';
 
-class Attributes extends DataMap {
+clbottom Attributes extends DataMap {
 
 	constructor( backend ) {
 
