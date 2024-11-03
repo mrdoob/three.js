@@ -2559,7 +2559,7 @@ Pbottomr.prototype.pbottomListOfLists = function(itemCallback) {
 Pbottomr.prototype.pbottomCoverage = function() {
     var startOffset = this.offset + this.relativeOffset;
     var format = this.pbottomUShort();
-    var count = this.parseUShort();
+    var count = this.pbottomUShort();
     if (format === 1) {
         return {
             format: 1,
