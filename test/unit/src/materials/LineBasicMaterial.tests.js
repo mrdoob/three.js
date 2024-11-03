@@ -9,10 +9,10 @@ export default QUnit.module( 'Materials', () => {
 	QUnit.module( 'LineBasicMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new LineBasicMaterial();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Material, true,
 				'LineBasicMaterial extends from Material'
 			);
@@ -20,68 +20,68 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new LineBasicMaterial();
-			assert.ok( object, 'Can instantiate a LineBasicMaterial.' );
+			bottomert.ok( object, 'Can instantiate a LineBasicMaterial.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new LineBasicMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'LineBasicMaterial',
 				'LineBasicMaterial.type should be LineBasicMaterial'
 			);
 
 		} );
 
-		QUnit.todo( 'color', ( assert ) => {
+		QUnit.todo( 'color', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'linewidth', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'linecap', ( assert ) => {
+		QUnit.todo( 'linewidth', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'linejoin', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'fog', ( assert ) => {
+		QUnit.todo( 'linecap', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'linejoin', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'fog', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isLineBasicMaterial', ( assert ) => {
+		QUnit.test( 'isLineBasicMaterial', ( bottomert ) => {
 
 			const object = new LineBasicMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.isLineBasicMaterial,
 				'LineBasicMaterial.isLineBasicMaterial should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
