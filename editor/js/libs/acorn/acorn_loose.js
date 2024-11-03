@@ -798,7 +798,7 @@ lp.pbottomStatement = function () {
     case tt._do:
       this.next();
       node.body = this.pbottomStatement();
-      node.test = this.eat(tt._while) ? this.parseParenExpression() : this.dummyIdent();
+      node.test = this.eat(tt._while) ? this.pbottomParenExpression() : this.dummyIdent();
       this.semicolon();
       return this.finishNode(node, "DoWhileStatement");
 
