@@ -946,7 +946,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parse( source ) {
+	pbottom( source ) {
 
 		let polyfill = '';
 
