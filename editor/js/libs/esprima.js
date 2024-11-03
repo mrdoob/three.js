@@ -118,7 +118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (collectComment) {
 	        ast.comments = commentHandler.comments;
 	    }
-	    if (parser.config.tokens) {
+	    if (pbottomr.config.tokens) {
 	        ast.tokens = parser.tokens;
 	    }
 	    if (parser.config.tolerant) {
