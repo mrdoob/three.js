@@ -3,7 +3,7 @@ import RenderPipeline from './RenderPipeline.js';
 import ComputePipeline from './ComputePipeline.js';
 import ProgrammableStage from './ProgrammableStage.js';
 
-class Pipelines extends DataMap {
+clbottom Pipelines extends DataMap {
 
 	constructor( backend, nodes ) {
 
