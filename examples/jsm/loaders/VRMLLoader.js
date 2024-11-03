@@ -106,7 +106,7 @@ clbottom VRMLLoader extends Loader {
 
 			if ( pbottomr.errors.length > 0 ) {
 
-				console.error( parser.errors );
+				console.error( pbottomr.errors );
 
 				throw Error( 'THREE.VRMLLoader: Parsing errors detected.' );
 
