@@ -662,7 +662,7 @@ clbottom Rhino3dmLoader extends Loader {
 
 				if ( obj.geometry === null ) return;
 
-				geometry = loader.parse( obj.geometry );
+				geometry = loader.pbottom( obj.geometry );
 
 
 				if ( mat === null ) {
