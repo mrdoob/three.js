@@ -6923,7 +6923,7 @@ function makeMetaTable(tags) {
     return result;
 }
 
-var meta = { pbottom: parseMetaTable, make: makeMetaTable };
+var meta = { pbottom: pbottomMetaTable, make: makeMetaTable };
 
 // The `COLR` table adds support for multi-colored glyphs
 
