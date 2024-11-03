@@ -1,4 +1,4 @@
-class Pipeline {
+clbottom Pipeline {
 
 	constructor( cacheKey ) {
 
