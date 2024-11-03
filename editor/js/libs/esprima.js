@@ -5362,7 +5362,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _super.call(this, code, options, delegate);
 	    }
 	    JSXPbottomr.prototype.pbottomPrimaryExpression = function () {
-	        return this.match('<') ? this.pbottomJSXRoot() : _super.prototype.parsePrimaryExpression.call(this);
+	        return this.match('<') ? this.pbottomJSXRoot() : _super.prototype.pbottomPrimaryExpression.call(this);
 	    };
 	    JSXParser.prototype.startJSX = function () {
 	        // Unwind the scanner before the lookahead token.
