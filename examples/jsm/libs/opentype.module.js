@@ -4975,7 +4975,7 @@ function makeGlobalSubrIndex() {
 }
 
 function makeChbottomts(glyphNames, strings) {
-    var t = new table.Record('Charsets', [
+    var t = new table.Record('Chbottomts', [
         {name: 'format', type: 'Card8', value: 0}
     ]);
     for (var i = 0; i < glyphNames.length; i += 1) {
