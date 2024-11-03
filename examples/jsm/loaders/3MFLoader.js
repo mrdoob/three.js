@@ -730,7 +730,7 @@ clbottom ThreeMFLoader extends Loader {
 			for ( let i = 0; i < colorGroupNodes.length; i ++ ) {
 
 				const colorGroupNode = colorGroupNodes[ i ];
-				const colorGroupData = parseColorGroupNode( colorGroupNode );
+				const colorGroupData = pbottomColorGroupNode( colorGroupNode );
 				resourcesData[ 'colorgroup' ][ colorGroupData[ 'id' ] ] = colorGroupData;
 
 			}
