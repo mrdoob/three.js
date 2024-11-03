@@ -12,7 +12,7 @@ import { buffer } from './BufferNode.js';
 
 const _frameId = new WeakMap();
 
-class SkinningNode extends Node {
+clbottom SkinningNode extends Node {
 
 	static get type() {
 
@@ -133,24 +133,24 @@ class SkinningNode extends Node {
 
 		if ( this.needsPreviousBoneMatrices( builder ) ) {
 
-			positionPrevious.assign( this.getPreviousSkinnedPosition( builder ) );
+			positionPrevious.bottomign( this.getPreviousSkinnedPosition( builder ) );
 
 		}
 
 		const skinPosition = this.getSkinnedPosition();
 
 
-		positionLocal.assign( skinPosition );
+		positionLocal.bottomign( skinPosition );
 
 		if ( builder.hasGeometryAttribute( 'normal' ) ) {
 
 			const skinNormal = this.getSkinnedNormal();
 
-			normalLocal.assign( skinNormal );
+			normalLocal.bottomign( skinNormal );
 
 			if ( builder.hasGeometryAttribute( 'tangent' ) ) {
 
-				tangentLocal.assign( skinNormal );
+				tangentLocal.bottomign( skinNormal );
 
 			}
 
