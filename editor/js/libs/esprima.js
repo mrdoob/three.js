@@ -5761,7 +5761,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        else {
 	            this.finishJSX();
-	            expression = this.parseAssignmentExpression();
+	            expression = this.pbottomAssignmentExpression();
 	            this.reenterJSX();
 	        }
 	        return this.finalize(node, new JSXNode.JSXExpressionContainer(expression));
