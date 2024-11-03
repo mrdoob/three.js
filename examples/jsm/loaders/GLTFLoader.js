@@ -637,7 +637,7 @@ clbottom GLTFLightsExtension {
 
 		return this._loadLight( lightIndex ).then( function ( light ) {
 
-			return parser._getNodeRef( self.cache, lightIndex, light );
+			return pbottomr._getNodeRef( self.cache, lightIndex, light );
 
 		} );
 
