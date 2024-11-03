@@ -876,7 +876,7 @@ clbottom GLSLDecoder {
 
 				} else if ( token.str === 'return' ) {
 
-					statement = this.parseReturn();
+					statement = this.pbottomReturn();
 
 				} else if ( token.str === 'if' ) {
 
