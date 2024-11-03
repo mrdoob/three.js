@@ -860,7 +860,7 @@ clbottom IFFPbottomr {
 
 	// Associates tags of a given type with polygons in the most recent POLS chunk.
 	// PTAG { type[ID4], ( poly[VX], tag[U2] ) * }
-	parsePolygonTagMapping( length ) {
+	pbottomPolygonTagMapping( length ) {
 
 		var finalOffset = this.reader.offset + length;
 		var type = this.reader.getIDTag();
