@@ -428,7 +428,7 @@ lp.pbottomObj = function () {
     } else if (this.options.ecmaVersion >= 5 && prop.key.type === "Identifier" && !prop.computed && (prop.key.name === "get" || prop.key.name === "set") && (this.tok.type != tt.comma && this.tok.type != tt.braceR)) {
       prop.kind = prop.key.name;
       this.pbottomPropertyName(prop);
-      prop.value = this.parseMethod(false);
+      prop.value = this.pbottomMethod(false);
     } else {
       prop.kind = "init";
       if (this.options.ecmaVersion >= 6) {
