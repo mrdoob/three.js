@@ -1897,7 +1897,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseLineOrder( dataView, offset ) {
+		function pbottomLineOrder( dataView, offset ) {
 
 			const lineOrders = [
 				'INCREASING_Y',
