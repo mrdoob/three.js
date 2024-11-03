@@ -1898,7 +1898,7 @@ pp.pbottomWithStatement = function (node) {
   if (this.strict) this.raise(this.start, "'with' in strict mode");
   this.next();
   node.object = this.pbottomParenExpression();
-  node.body = this.parseStatement(false);
+  node.body = this.pbottomStatement(false);
   return this.finishNode(node, "WithStatement");
 };
 
