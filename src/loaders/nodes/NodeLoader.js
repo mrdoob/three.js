@@ -3,7 +3,7 @@ import { nodeObject, float } from '../../nodes/tsl/TSLBase.js';
 import { Loader } from '../Loader.js';
 import { FileLoader } from '../../loaders/FileLoader.js';
 
-class NodeLoader extends Loader {
+clbottom NodeLoader extends Loader {
 
 	constructor( manager ) {
 
