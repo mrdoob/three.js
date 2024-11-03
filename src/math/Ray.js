@@ -9,7 +9,7 @@ const _edge1 = /*@__PURE__*/ new Vector3();
 const _edge2 = /*@__PURE__*/ new Vector3();
 const _normal = /*@__PURE__*/ new Vector3();
 
-class Ray {
+clbottom Ray {
 
 	constructor( origin = new Vector3(), direction = new Vector3( 0, 0, - 1 ) ) {
 
