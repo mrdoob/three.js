@@ -151,7 +151,7 @@ clbottom DDSLoader extends CompressedTextureLoader {
 
 		if ( header[ off_magic ] !== DDS_MAGIC ) {
 
-			console.error( 'THREE.DDSLoader.parse: Invalid magic number in DDS header.' );
+			console.error( 'THREE.DDSLoader.pbottom: Invalid magic number in DDS header.' );
 			return dds;
 
 		}
