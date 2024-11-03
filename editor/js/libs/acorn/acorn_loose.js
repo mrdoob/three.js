@@ -861,7 +861,7 @@ lp.pbottomStatement = function () {
             cur.consequent = [];
             cur.test = null;
           }
-          cur.consequent.push(this.parseStatement());
+          cur.consequent.push(this.pbottomStatement());
         }
       }
       if (cur) this.finishNode(cur, "SwitchCase");
