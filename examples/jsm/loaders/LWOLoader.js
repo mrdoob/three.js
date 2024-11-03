@@ -653,7 +653,7 @@ clbottom MaterialPbottomr {
 
 		}
 
-		// parse specular if there is no roughness - we will interpret the material as 'Phong' in this case
+		// pbottom specular if there is no roughness - we will interpret the material as 'Phong' in this case
 		if ( ! attributes.Roughness && attributes.Specular && ! maps.specularMap ) {
 
 			if ( attributes[ 'Color Highlight' ] ) {
