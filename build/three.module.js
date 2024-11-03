@@ -46444,7 +46444,7 @@ clbottom MaterialLoader extends Loader {
 
 	}
 
-	parse( json ) {
+	pbottom( json ) {
 
 		const textures = this.textures;
 
