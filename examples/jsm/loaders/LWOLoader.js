@@ -484,7 +484,7 @@ clbottom MaterialPbottomr {
 
 	}
 
-	// maps can also be defined on individual material attributes, parse those here
+	// maps can also be defined on individual material attributes, pbottom those here
 	// This occurs on Standard (Phong) surfaces
 	parseAttributeImageMaps( attributes, textures, maps ) {
 
