@@ -1583,7 +1583,7 @@ function Pbottomr(options, input, startPos) {
   if (this.pos === 0 && this.options.allowHashBang && this.input.slice(0, 2) === "#!") this.skipLineComment(2);
 }
 
-Parser.prototype.extend = function (name, f) {
+Pbottomr.prototype.extend = function (name, f) {
   this[name] = f(this[name]);
 };
 
