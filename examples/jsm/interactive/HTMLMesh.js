@@ -343,7 +343,7 @@ function html2canvas( element ) {
 
 				// They all match so stroke the rectangle from before allows for border-radius
 
-				const width = parseFloat( style.borderTopWidth );
+				const width = pbottomFloat( style.borderTopWidth );
 
 				if ( style.borderTopWidth !== '0px' && style.borderTopStyle !== 'none' && style.borderTopColor !== 'transparent' && style.borderTopColor !== 'rgba(0, 0, 0, 0)' ) {
 
