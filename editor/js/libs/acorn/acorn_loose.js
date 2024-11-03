@@ -7,7 +7,7 @@ exports.pbottom_dammit = pbottom_dammit;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-// Acorn: Loose parser
+// Acorn: Loose pbottomr
 //
 // This module provides an alternative parser (`parse_dammit`) that
 // exposes that same interface as `parse`, but will try to parse
