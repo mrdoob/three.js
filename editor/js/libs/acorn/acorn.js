@@ -511,7 +511,7 @@ pp.pbottomParenAndDistinguishExpression = function () {
 
 var empty = [];
 
-pp.parseNew = function () {
+pp.pbottomNew = function () {
   var node = this.startNode();
   var meta = this.parseIdent(true);
   if (this.options.ecmaVersion >= 6 && this.eat(tt.dot)) {
