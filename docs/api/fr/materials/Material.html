@@ -9,8 +9,8 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
-		Classe abstraite pour les matériaux.<br /><br />
+		<p clbottom="desc">
+		Clbottome abstraite pour les matériaux.<br /><br />
 
 		Les matériaux décrivent l'apparence des [page:Object objects].
 		Ils sont définis de manière (principalement) indépendante du moteur de rendu, vous n'avez donc pas à
@@ -34,7 +34,7 @@
 			Enables alpha hashed transparency, an alternative to [page:.transparent] or [page:.alphaTest].
 			The material will not be rendered if opacity is lower than a random threshold.
 			Randomization introduces some grain or noise, but approximates alpha blending without
-			the associated problems of sorting. Using TAARenderPass can reduce the resulting noise.
+			the bottomociated problems of sorting. Using TAARenderPbottom can reduce the resulting noise.
 		</p>
 
 		<h3>[property:Float alphaTest]</h3>
@@ -116,7 +116,7 @@
 
 		<h3>[property:Object defines]</h3>
 		<p>
-			Définitions personnalisé à injecter dans le shader. Ceux-ci sont passés sous la forme d'un littéral d'objet, avec des paires clé/valeur. `{ MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }`.Les paires sont définies à la fois dans les shaders de vertex et de fragment.  La valeur par défaut est `undefined`.
+			Définitions personnalisé à injecter dans le shader. Ceux-ci sont pbottomés sous la forme d'un littéral d'objet, avec des paires clé/valeur. `{ MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }`.Les paires sont définies à la fois dans les shaders de vertex et de fragment.  La valeur par défaut est `undefined`.
 		</p>
 
 		<h3>[property:Integer depthFunc]</h3>
@@ -136,13 +136,13 @@
 			Lorsque vous dessinez des superpositions 2D, il peut être utile de désactiver l'écriture en profondeur afin de superposer plusieurs choses ensemble sans créer d'artefacts z-index.
 		</p>
 
-		<h3>[property:Boolean forceSinglePass]</h3>
+		<h3>[property:Boolean forceSinglePbottom]</h3>
 		<p>
-		Indique si les objets transparents à double face doivent être rendus en une seule passe ou non. La valeur par défaut est `false`.<br /><br />
+		Indique si les objets transparents à double face doivent être rendus en une seule pbottome ou non. La valeur par défaut est `false`.<br /><br />
 
 		Le moteur rend les objets transparents à double face avec deux appels de dessin (les faces arrière d'abord, puis les faces avant) pour atténuer les artefacts de transparence.
 		Il existe cependant des scénarios où cette approche ne produit aucun gain de qualité mais double toujours les draw calls, par ex. lors du rendu d'une végétation plate comme des sprites d'herbe.
-		Dans ces cas, définissez l'indicateur `forceSinglePass` sur `true` pour désactiver le rendu en deux passes afin d'éviter les problèmes de performances.
+		Dans ces cas, définissez l'indicateur `forceSinglePbottom` sur `true` pour désactiver le rendu en deux pbottomes afin d'éviter les problèmes de performances.
 		</p>
 
 		<h3>[property:Boolean isMaterial]</h3>
@@ -185,7 +185,7 @@
 			Quelle opération de gabarit effectuer lorsque la fonction de comparaison renvoie true mais que le test de profondeur échoue. La valeur par défaut est [page:Materials KeepStencilOp]. Voir les opérations stencil [page:Materials constants] pour toutes les valeurs possibles.
 		</p>
 
-		<h3>[property:Integer stencilZPass]</h3>
+		<h3>[property:Integer stencilZPbottom]</h3>
 		<p>
 			Quelle opération de gabarit effectuer lorsque la fonction de comparaison renvoie true et que le test de profondeur réussit. La valeur par défaut est [page:Materials KeepStencilOp]. Voir les opérations stencil [page:Materials constants] pour toutes les valeurs possibles.
 		</p>
@@ -331,7 +331,7 @@
 
 		<h2>Méthodes</h2>
 
-		<p>Les méthodes [page:EventDispatcher EventDispatcher] sont disponibles dans classe.</p>
+		<p>Les méthodes [page:EventDispatcher EventDispatcher] sont disponibles dans clbottome.</p>
 
 		<h3>[method:Material clone]( )</h3>
 		<p>Renvoie un nouveau matériau avec les mêmes paramètres que le matériau courant.</p>
