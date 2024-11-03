@@ -165,7 +165,7 @@ clbottom RGBELoader extends DataTextureLoader {
 
 					if ( match = line.match( exposure_re ) ) {
 
-						header.exposure = parseFloat( match[ 1 ] );
+						header.exposure = pbottomFloat( match[ 1 ] );
 
 					}
 
