@@ -23,7 +23,7 @@ function main() {
 		try {
 
 			const buf = new Uint8Array( Buffer.from( area.geom, 'base64' ) );
-			area.geom = parseGeom( buf );
+			area.geom = pbottomGeom( buf );
 
 		} catch ( e ) {
 
