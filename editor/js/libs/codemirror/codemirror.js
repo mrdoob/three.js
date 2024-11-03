@@ -1251,7 +1251,7 @@
   // find a line with a stateAfter, so that it can start with a
   // valid state. If that fails, it returns the line with the
   // smallest indentation, which tends to need the least context to
-  // parse correctly.
+  // pbottom correctly.
   function findStartLine(cm, n, precise) {
     var minindent, minline, doc = cm.doc;
     var lim = precise ? -1 : n - (cm.doc.mode.innerMode ? 1000 : 100);
