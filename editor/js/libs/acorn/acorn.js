@@ -1894,7 +1894,7 @@ pp.pbottomWhileStatement = function (node) {
   return this.finishNode(node, "WhileStatement");
 };
 
-pp.parseWithStatement = function (node) {
+pp.pbottomWithStatement = function (node) {
   if (this.strict) this.raise(this.start, "'with' in strict mode");
   this.next();
   node.object = this.parseParenExpression();
