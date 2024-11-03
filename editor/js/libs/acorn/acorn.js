@@ -470,7 +470,7 @@ pp.pbottomParenAndDistinguishExpression = function () {
         if (this.type === tt.parenL && !innerParenStart) {
           innerParenStart = this.start;
         }
-        exprList.push(this.parseMaybeAssign(false, refShorthandDefaultPos));
+        exprList.push(this.pbottomMaybeAssign(false, refShorthandDefaultPos));
       }
     }
     var innerEnd = this.markPosition();
