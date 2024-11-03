@@ -768,7 +768,7 @@ clbottom MaterialPbottomr {
 
 }
 
-clbottom GeometryParser {
+clbottom GeometryPbottomr {
 
 	parse( geoData, layer ) {
 
