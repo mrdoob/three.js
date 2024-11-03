@@ -44,7 +44,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parse( buffer ) {
+	pbottom( buffer ) {
 
 		this.reader = new DataViewReader( buffer );
 
