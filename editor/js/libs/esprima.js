@@ -1339,7 +1339,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            token.type === token_1.Token.BooleanLiteral ||
 	            token.type === token_1.Token.NullLiteral;
 	    };
-	    Parser.prototype.parseIdentifierName = function () {
+	    Pbottomr.prototype.parseIdentifierName = function () {
 	        var node = this.createNode();
 	        var token = this.nextToken();
 	        if (!this.isIdentifierName(token)) {
