@@ -20,12 +20,12 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>Оптимизация большого количества анимированных объектов</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p></p>
 <p>Эта статья является продолжением  <a href="optimize-lots-of-objects.html">статьи об оптимизации множества объектов
 </a>. Если вы еще не прочитали это, пожалуйста, прочитайте его, прежде чем продолжить.  </p>
@@ -36,13 +36,13 @@
 В идеале мы бы, вероятно, предварительно обрабатывали данные в автономном режиме,
 но в этом случае давайте загрузим 2 набора данных и сгенерируем еще 2 </p>
 <p>Вот наш старый код загрузки </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
   .then(parseData)
   .then(addBoxes)
   .then(render);
 </pre>
 <p>Давайте изменим это на что-то вроде этого </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function loadData(info) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">async function loadData(info) {
   const text = await loadFile(info.url);
   info.file = parseData(text);
 }
@@ -59,16 +59,16 @@ async function loadAll() {
 }
 loadAll();
 </pre>
-<p>Приведенный выше код загрузит все файлы в <code class="notranslate" translate="no">fileInfos</code>, и после этого каждый объект в <code class="notranslate" translate="no">fileInfos</code>
-будет иметь свойство <code class="notranslate" translate="no">file</code> с загруженным файлом. <code class="notranslate" translate="no">name</code> и <code class="notranslate" translate="no">hueRange</code> мы будем использовать позже.
-<code class="notranslate" translate="no">name</code> будет для поля пользовательского интерфейса. <code class="notranslate" translate="no">hueRange</code> будет использоваться для выбора диапазона оттенков для отображения. </p>
+<p>Приведенный выше код загрузит все файлы в <code clbottom="notranslate" translate="no">fileInfos</code>, и после этого каждый объект в <code clbottom="notranslate" translate="no">fileInfos</code>
+будет иметь свойство <code clbottom="notranslate" translate="no">file</code> с загруженным файлом. <code clbottom="notranslate" translate="no">name</code> и <code clbottom="notranslate" translate="no">hueRange</code> мы будем использовать позже.
+<code clbottom="notranslate" translate="no">name</code> будет для поля пользовательского интерфейса. <code clbottom="notranslate" translate="no">hueRange</code> будет использоваться для выбора диапазона оттенков для отображения. </p>
 <p>Два файла выше, по-видимому, представляют собой количество мужчин на область и число женщин на область по состоянию на 2010 год. Обратите внимание,
 я не знаю, верны ли эти данные, но на самом деле это не важно. Важная часть показывает разные наборы данных. </p>
 <p>Давайте сгенерируем еще 2 набора данных. Одним из них являются места,
 где число мужчин превышает число женщин, и наоборот, места, где число женщин превышает число мужчин. </p>
 <p>Первым делом давайте напишем функцию, которая с помощью двухмерного массива массивов,
 как мы делали раньше, отобразит ее, чтобы сгенерировать новый двумерный массив массивов. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function mapValues(data, fn) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function mapValues(data, fn) {
   return data.map((row, rowNdx) =&gt; {
     return row.map((value, colNdx) =&gt; {
       return fn(value, rowNdx, colNdx);
@@ -76,10 +76,10 @@ loadAll();
   });
 }
 </pre>
-<p>Как и обычная функция <code class="notranslate" translate="no">Array.map</code>, функция <code class="notranslate" translate="no">mapValues</code> вызывает функцию fn для каждого значения в массиве массивов.
+<p>Как и обычная функция <code clbottom="notranslate" translate="no">Array.map</code>, функция <code clbottom="notranslate" translate="no">mapValues</code> вызывает функцию fn для каждого значения в массиве массивов.
 Он передает ему значение, а также индексы строки и столбца. </p>
 <p>Теперь давайте создадим некоторый код для генерации нового файла, который сравнивает 2 файла. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeDiffFile(baseFile, otherFile, compareFn) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function makeDiffFile(baseFile, otherFile, compareFn) {
   let min;
   let max;
   const baseData = baseFile.data;
@@ -99,12 +99,12 @@ loadAll();
   return {...baseFile, min, max, data};
 }
 </pre>
-<p>Приведенный выше код использует <code class="notranslate" translate="no">mapValues</code> для генерации нового набора данных,
-который представляет собой сравнение на основе переданной функции <code class="notranslate" translate="no">CompareFn</code>.
+<p>Приведенный выше код использует <code clbottom="notranslate" translate="no">mapValues</code> для генерации нового набора данных,
+который представляет собой сравнение на основе переданной функции <code clbottom="notranslate" translate="no">CompareFn</code>.
 Он также отслеживает минимальные и максимальные результаты сравнения. Наконец,
-он создает новый файл со всеми теми же свойствами, что и <code class="notranslate" translate="no">baseFile</code>, за исключением новых <code class="notranslate" translate="no">min</code>, <code class="notranslate" translate="no">max</code> и <code class="notranslate" translate="no">data</code>. </p>
+он создает новый файл со всеми теми же свойствами, что и <code clbottom="notranslate" translate="no">baseFile</code>, за исключением новых <code clbottom="notranslate" translate="no">min</code>, <code clbottom="notranslate" translate="no">max</code> и <code clbottom="notranslate" translate="no">data</code>. </p>
 <p>Тогда давайте использовать это, чтобы сделать 2 новых набора данных </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const menInfo = fileInfos[0];
   const womenInfo = fileInfos[1];
   const menFile = menInfo.file;
@@ -130,13 +130,13 @@ loadAll();
 }
 </pre>
 <p>Теперь давайте сгенерируем пользовательский интерфейс для выбора между этими наборами данных. Для начала нам нужен HTML-интерфейс </p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
 +  &lt;div id="ui"&gt;&lt;/div&gt;
 &lt;/body&gt;
 </pre>
 <p>и немного CSS, чтобы он появился в верхней левой области </p>
-<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#ui {
+<pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">#ui {
   position: absolute;
   left: 1em;
   top: 1em;
@@ -152,12 +152,12 @@ loadAll();
 </pre>
 <p>Затем мы можем просмотреть каждый файл и сгенерировать набор объединенных блоков
 для набора данных и элемент, который при наведении курсора отобразит этот набор и скроет все остальные.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
 function showFileInfo(fileInfos, fileInfo) {
   fileInfos.forEach((info) =&gt; {
     const visible = fileInfo === info;
     info.root.visible = visible;
-    info.elem.className = visible ? 'selected' : '';
+    info.elem.clbottomName = visible ? 'selected' : '';
   });
   requestRenderIfNotRequested();
 }
@@ -177,8 +177,8 @@ fileInfos.forEach((info) =&gt; {
 // show the first set of data
 showFileInfo(fileInfos, fileInfos[0]);
 </pre>
-<p>Еще одно изменение, которое нам нужно из предыдущего примера, заключается в том, что мы должны заставить <code class="notranslate" translate="no">addBoxes</code> принимать <code class="notranslate" translate="no">hueRange</code> </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function addBoxes(file) {
+<p>Еще одно изменение, которое нам нужно из предыдущего примера, заключается в том, что мы должны заставить <code clbottom="notranslate" translate="no">addBoxes</code> принимать <code clbottom="notranslate" translate="no">hueRange</code> </p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-function addBoxes(file) {
 +function addBoxes(file, hueRange) {
 
   ...
@@ -190,9 +190,9 @@ showFileInfo(fileInfos, fileInfos[0]);
   ...
 </pre>
 <p>и с этим мы должны быть в состоянии показать 4 набора данных. Наведите указатель мыши на ярлыки или коснитесь их, чтобы переключать наборы </p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-multiple-data-sets.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lots-of-objects-multiple-data-sets.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-multiple-data-sets.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/lots-of-objects-multiple-data-sets.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
 </div>
 
 <p></p>
@@ -200,7 +200,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 Интересно, что с ними? ??! В любом случае, как мы анимируем между этими 4 наборами данных. </p>
 <p>Много идей. </p>
 <ul>
-<li><p>Просто исчезните между ними, используя <a href="/docs/#api/en/materials/Material.opacity"><code class="notranslate" translate="no">Material.opacity</code></a> </p>
+<li><p>Просто исчезните между ними, используя <a href="/docs/#api/en/materials/Material.opacity"><code clbottom="notranslate" translate="no">Material.opacity</code></a> </p>
 <p>Проблема с этим решением заключается в том, что кубы полностью перекрываются,
 что означает, что возникнут проблемы z-борьбы. Возможно, мы могли бы исправить это,
 изменив функцию глубины и используя смешивание. Вероятно, мы должны изучить это. </p>
@@ -222,8 +222,8 @@ showFileInfo(fileInfos, fileInfos[0]);
 <p>Давайте попробуем morphtargets. </p>
 <p>Мы по-прежнему создадим геометрию для каждого набора данных,
 но затем мы извлечем атрибут позиции из каждого из них и будем использовать их как морфтинги. </p>
-<p>Сначала давайте изменим <code class="notranslate" translate="no">addBoxes</code>, чтобы просто создать и вернуть объединенную геометрию. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function addBoxes(file, hueRange) {
+<p>Сначала давайте изменим <code clbottom="notranslate" translate="no">addBoxes</code>, чтобы просто создать и вернуть объединенную геометрию. </p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-function addBoxes(file, hueRange) {
 +function makeBoxes(file, hueRange) {
   const {min, max, data} = file;
   const range = max - min;
@@ -247,7 +247,7 @@ showFileInfo(fileInfos, fileInfos[0]);
 разные наборы данных могут иметь некоторые точки данных без данных, поэтому для этой точки не будет сгенерировано ни одного блока,
 что означало бы отсутствие соответствующих вершин для другого набора. Итак, нам нужно проверить все наборы данных и либо всегда генерировать что-либо, если
 в каком-либо наборе есть данные, либо ничего не генерировать, если в каком-либо наборе отсутствуют данные. Давайте сделаем последнее. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function dataMissingInAnySet(fileInfos, latNdx, lonNdx) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+function dataMissingInAnySet(fileInfos, latNdx, lonNdx) {
 +  for (const fileInfo of fileInfos) {
 +    if (fileInfo.file.data[latNdx][lonNdx] === undefined) {
 +      return true;
@@ -273,8 +273,8 @@ showFileInfo(fileInfos, fileInfos[0]);
 
   ...
 </pre>
-<p>Теперь мы изменим код, который вызывал <code class="notranslate" translate="no">addBoxes</code>, для использования <code class="notranslate" translate="no">makeBoxes</code> и установки morphtargets. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+// make geometry for each data set
+<p>Теперь мы изменим код, который вызывал <code clbottom="notranslate" translate="no">addBoxes</code>, для использования <code clbottom="notranslate" translate="no">makeBoxes</code> и установки morphtargets. </p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+// make geometry for each data set
 +const geometries = fileInfos.map((info) =&gt; {
 +  return makeBoxes(info.file, info.hueRange, fileInfos);
 +});
@@ -328,18 +328,18 @@ showFileInfo(fileInfos, fileInfos[0]);
 но поскольку оригинальный глобус webgl использует
 <a href="https://github.com/tweenjs/tween.js/">библиотеку анимации</a> давайте используем тот же самый здесь.</p>
 <p>Нам нужно включить библиотеку </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 +import TWEEN from 'three/addons/libs/tween.module.js';
 </pre>
-<p>А затем создайте <code class="notranslate" translate="no">Tween</code> чтобы оживить влияние.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
+<p>А затем создайте <code clbottom="notranslate" translate="no">Tween</code> чтобы оживить влияние.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
 function showFileInfo(fileInfos, fileInfo) {
   fileInfos.forEach((info) =&gt; {
     const visible = fileInfo === info;
 -    info.root.visible = visible;
-    info.elem.className = visible ? 'selected' : '';
+    info.elem.clbottomName = visible ? 'selected' : '';
 +    const targets = {};
 +    fileInfos.forEach((info, i) =&gt; {
 +      targets[i] = info === fileInfo ? 1 : 0;
@@ -356,16 +356,16 @@ function showFileInfo(fileInfos, fileInfo) {
 "tween.js" предназначен для непрерывного рендеринга, но мы делаем <a href="rendering-on-demand.html">рендеринг по требованию </a>.
 Мы могли бы переключиться на непрерывный рендеринг, но иногда приятно рендерить только по требованию, так как он перестает использовать
 силу пользователя, когда ничего не происходит, поэтому давайте посмотрим, сможем ли мы сделать его анимированным по запросу. </p>
-<p>Мы сделаем <code class="notranslate" translate="no">TweenManager</code>, чтобы помочь. Мы будем использовать его для создания
-<code class="notranslate" translate="no">Tweens</code> и отслеживания их. Он будет иметь метод <code class="notranslate" translate="no">update</code>, который будет
+<p>Мы сделаем <code clbottom="notranslate" translate="no">TweenManager</code>, чтобы помочь. Мы будем использовать его для создания
+<code clbottom="notranslate" translate="no">Tweens</code> и отслеживания их. Он будет иметь метод <code clbottom="notranslate" translate="no">update</code>, который будет
 возвращать true, если нам нужно будет вызвать его снова, и false, если все анимации завершены. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class TweenManger {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom TweenManger {
   constructor() {
     this.numTweensRunning = 0;
   }
   _handleComplete() {
     --this.numTweensRunning;
-    console.assert(this.numTweensRunning &gt;= 0);
+    console.bottomert(this.numTweensRunning &gt;= 0);
   }
   createTween(targetObject) {
     const self = this;
@@ -391,19 +391,19 @@ function showFileInfo(fileInfos, fileInfo) {
 }
 </pre>
 <p>Чтобы использовать его, мы создадим один </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  const tweenManager = new TweenManger();
 
   ...
 </pre>
-<p>Мы будем использовать его для создания наших <code class="notranslate" translate="no">Tween</code>s.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
+<p>Мы будем использовать его для создания наших <code clbottom="notranslate" translate="no">Tween</code>s.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// show the selected data, hide the rest
 function showFileInfo(fileInfos, fileInfo) {
   fileInfos.forEach((info) =&gt; {
     const visible = fileInfo === info;
-    info.elem.className = visible ? 'selected' : '';
+    info.elem.clbottomName = visible ? 'selected' : '';
     const targets = {};
     fileInfos.forEach((info, i) =&gt; {
       targets[i] = info === fileInfo ? 1 : 0;
@@ -418,7 +418,7 @@ function showFileInfo(fileInfos, fileInfo) {
 }
 </pre>
 <p>Затем мы обновим наш цикл рендеринга, чтобы обновить анимацию и продолжать рендеринг, если анимация все еще выполняется. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
   renderRequested = false;
 
   if (resizeRendererToDisplaySize(renderer)) {
@@ -437,9 +437,9 @@ function showFileInfo(fileInfos, fileInfo) {
 render();
 </pre>
 <p>И с этим мы должны анимировать между наборами данных. </p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-morphtargets.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lots-of-objects-morphtargets.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-morphtargets.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/lots-of-objects-morphtargets.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
 </div>
 
 <p></p>
