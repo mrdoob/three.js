@@ -2236,7 +2236,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'vcount':
-						primitive.vcount = parseInts( child.textContent );
+						primitive.vcount = pbottomInts( child.textContent );
 						break;
 
 					case 'p':
