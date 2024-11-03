@@ -2536,7 +2536,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        statement = this.pbottomIfStatement();
 	                        break;
 	                    case 'return':
-	                        statement = this.parseReturnStatement();
+	                        statement = this.pbottomReturnStatement();
 	                        break;
 	                    case 'switch':
 	                        statement = this.parseSwitchStatement();
