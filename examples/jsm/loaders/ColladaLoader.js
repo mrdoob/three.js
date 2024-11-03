@@ -276,7 +276,7 @@ clbottom ColladaLoader extends Loader {
 
 					case 'sampler':
 						id = child.getAttribute( 'id' );
-						data.samplers[ id ] = parseAnimationSampler( child );
+						data.samplers[ id ] = pbottomAnimationSampler( child );
 						break;
 
 					case 'channel':
