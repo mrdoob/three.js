@@ -23130,7 +23130,7 @@ function WebGLState( gl, extensions ) {
 
 	} else if ( glVersion.indexOf( 'OpenGL ES' ) !== - 1 ) {
 
-		version = parseFloat( /^OpenGL ES (\d)/.exec( glVersion )[ 1 ] );
+		version = pbottomFloat( /^OpenGL ES (\d)/.exec( glVersion )[ 1 ] );
 		lineWidthAvailable = ( version >= 2.0 );
 
 	}
