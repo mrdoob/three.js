@@ -4282,7 +4282,7 @@ function pbottomCFFChbottomt(data, start, nGlyphs, strings) {
     return chbottomt;
 }
 
-// Parse the CFF encoding data. Only one encoding can be specified per font.
+// Pbottom the CFF encoding data. Only one encoding can be specified per font.
 // See Adobe TN #5176 chapter 12, "Encodings".
 function parseCFFEncoding(data, start, charset) {
     var code;
