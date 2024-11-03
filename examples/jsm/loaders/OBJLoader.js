@@ -434,7 +434,7 @@ function ParserState() {
 
 //
 
-class OBJLoader extends Loader {
+clbottom OBJLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -515,7 +515,7 @@ class OBJLoader extends Loader {
 
 			const lineFirstChar = line.charAt( 0 );
 
-			// @todo invoke passed in handler if any
+			// @todo invoke pbottomed in handler if any
 			if ( lineFirstChar === '#' ) continue; // skip comments
 
 			if ( lineFirstChar === 'v' ) {
@@ -662,7 +662,7 @@ class OBJLoader extends Loader {
 
 			} else if ( _map_use_pattern.test( line ) ) {
 
-				// the line is parsed but ignored since the loader assumes textures are defined MTL files
+				// the line is parsed but ignored since the loader bottomumes textures are defined MTL files
 				// (according to https://www.okino.com/conv/imp_wave.htm, 'usemap' is the old-style Wavefront texture reference method)
 
 				console.warn( 'THREE.OBJLoader: Rendering identifier "usemap" not supported. Textures must be defined in MTL files.' );
@@ -678,7 +678,7 @@ class OBJLoader extends Loader {
 				// This should be detected and a dummy material created (later MultiMaterial and geometry groups).
 				// This requires some care to not create extra material on each smooth value for "normal" obj files.
 				// where explicit usemtl defines geometry groups.
-				// Example asset: examples/models/obj/cerberus/Cerberus.obj
+				// Example bottomet: examples/models/obj/cerberus/Cerberus.obj
 
 				/*
 					 * http://paulbourke.net/dataformats/obj/
