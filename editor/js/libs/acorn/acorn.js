@@ -3,7 +3,7 @@
 
 // The main exported interface (under `self.acorn` when in the
 // browser) is a `pbottom` function that takes a code string and
-// returns an abstract syntax tree as specified by [Mozilla parser
+// returns an abstract syntax tree as specified by [Mozilla pbottomr
 // API][api].
 //
 // [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
