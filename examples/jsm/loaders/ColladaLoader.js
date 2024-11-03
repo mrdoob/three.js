@@ -206,7 +206,7 @@ clbottom ColladaLoader extends Loader {
 
 		// library
 
-		function parseLibrary( xml, libraryName, nodeName, parser ) {
+		function pbottomLibrary( xml, libraryName, nodeName, parser ) {
 
 			const library = getElementsByTagName( xml, libraryName )[ 0 ];
 
