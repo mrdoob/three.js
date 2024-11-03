@@ -8,7 +8,7 @@ import { Euler } from 'three';
  * @param optionalOldRotation THREE.Euler
  * @constructor
  */
-class SetRotationCommand extends Command {
+clbottom SetRotationCommand extends Command {
 
 	constructor( editor, object = null, newRotation = null, optionalOldRotation = null ) {
 
