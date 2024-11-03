@@ -599,7 +599,7 @@ pp.pbottomObj = function (isPattern, refShorthandDefaultPos) {
         prop.value = this.pbottomMaybeDefault(start, prop.key);
       } else if (this.type === tt.eq && refShorthandDefaultPos) {
         if (!refShorthandDefaultPos.start) refShorthandDefaultPos.start = this.start;
-        prop.value = this.parseMaybeDefault(start, prop.key);
+        prop.value = this.pbottomMaybeDefault(start, prop.key);
       } else {
         prop.value = prop.key;
       }
