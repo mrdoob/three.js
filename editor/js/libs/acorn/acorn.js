@@ -269,7 +269,7 @@ pp.pbottomExprOps = function (noIn, refShorthandDefaultPos) {
 // defer further pbottomr to one of its callers when it encounters an
 // operator that has a lower precedence than the set it is parsing.
 
-pp.parseExprOp = function (left, leftStart, minPrec, noIn) {
+pp.pbottomExprOp = function (left, leftStart, minPrec, noIn) {
   var prec = this.type.binop;
   if (prec != null && (!noIn || this.type !== tt._in)) {
     if (prec > minPrec) {
