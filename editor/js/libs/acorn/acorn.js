@@ -1670,7 +1670,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     case tt._if:
       return this.pbottomIfStatement(node);
     case tt._return:
-      return this.parseReturnStatement(node);
+      return this.pbottomReturnStatement(node);
     case tt._switch:
       return this.parseSwitchStatement(node);
     case tt._throw:
