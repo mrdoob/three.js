@@ -317,7 +317,7 @@ clbottom NRRDLoader extends Loader {
 		}
 
 		// pbottom the header
-		parseHeader( _header );
+		pbottomHeader( _header );
 
 		_data = _bytes.subarray( _data_start ); // the data without header
 		if ( headerObject.encoding.substring( 0, 2 ) === 'gz' ) {
