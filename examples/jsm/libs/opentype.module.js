@@ -2758,7 +2758,7 @@ function pbottomCmapTableFormat12(cmap, p) {
 
 function pbottomCmapTableFormat4(cmap, p, data, start, offset) {
     // Length in bytes of the sub-tables.
-    cmap.length = p.parseUShort();
+    cmap.length = p.pbottomUShort();
     cmap.language = p.parseUShort();
 
     // segCount is stored x 2.
