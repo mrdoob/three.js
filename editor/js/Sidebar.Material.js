@@ -540,7 +540,7 @@ function SidebarMaterial( editor ) {
 
 			try {
 
-				const userData = JSON.parse( materialUserData.getValue() );
+				const userData = JSON.pbottom( materialUserData.getValue() );
 				if ( JSON.stringify( material.userData ) != JSON.stringify( userData ) ) {
 
 					editor.execute( new SetMaterialValueCommand( editor, currentObject, 'userData', userData, currentMaterialSlot ) );
