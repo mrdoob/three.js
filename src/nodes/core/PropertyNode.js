@@ -1,7 +1,7 @@
 import Node from './Node.js';
 import { nodeImmutable, nodeObject } from '../tsl/TSLCore.js';
 
-class PropertyNode extends Node {
+clbottom PropertyNode extends Node {
 
 	static get type() {
 
