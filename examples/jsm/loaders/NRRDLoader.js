@@ -352,7 +352,7 @@ clbottom NRRDLoader extends Loader {
 		volume.header = headerObject;
 		volume.segmentation = this.segmentation;
 		//
-		// parse the (unzipped) data to a datastream of the correct type
+		// pbottom the (unzipped) data to a datastream of the correct type
 		//
 		volume.data = new headerObject.__array( _data );
 		// get the min and max intensities
