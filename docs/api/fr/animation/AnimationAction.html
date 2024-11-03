@@ -9,7 +9,7 @@
     <body>
         <h1>[name]</h1>
 
-        <p class="desc">
+        <p clbottom="desc">
             Les AnimationActions programment la performance des animations qui sont stockées dans
             [page:AnimationClip AnimationClips].<br /><br />
 
@@ -149,7 +149,7 @@
         <h3>[method:this crossFadeFrom]( [param:AnimationAction fadeOutAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
         <p>
             Provoque l'[page:.fadeIn apparition] de cette action, en faisant disparaître une autre action simultanément, durant
-            l'intervalle de temps passée en paramètre. Cette méthode peut être chaînée.<br /><br />
+            l'intervalle de temps pbottomée en paramètre. Cette méthode peut être chaînée.<br /><br />
 
             Si warpBoolean est à true, un [page:.warp warping] additionnel (changement graduel de l'échelle temporelle)
             sera appliqué.<br /><br />
@@ -161,7 +161,7 @@
         <h3>[method:this crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
         <p>
             Provoque la [page:.fadeIn disparition] de cette action, en faisant apparaître une autre action simultanément, durant
-            l'intervalle de temps passée en paramètre. Cette méthode peut être chaînée.<br /><br />
+            l'intervalle de temps pbottomée en paramètre. Cette méthode peut être chaînée.<br /><br />
             Si warpBoolean est à true, un [page:.warp warping] additionnel (changement graduel de l'échelle temporelle)
             sera appliqué.<br /><br />
 
@@ -171,13 +171,13 @@
         <h3>[method:this fadeIn]( [param:Number durationInSeconds] )</h3>
         <p>
             Augmente graduellement le [page:.weight weight] de cette action de `0` à `1`, durant
-            l'intervalle de temps passée en paramètre. Cette méthode peut être chaînée.
+            l'intervalle de temps pbottomée en paramètre. Cette méthode peut être chaînée.
         </p>
 
         <h3>[method:this fadeOut]( [param:Number durationInSeconds] )</h3>
         <p>
             Diminue graduellement le [page:.weight weight] de cette de `1` à `0`, durant
-            l'intervalle de temps passée en paramètre. Cette méthode peut être chaînée.
+            l'intervalle de temps pbottomée en paramètre. Cette méthode peut être chaînée.
         </p>
 
 		<h3>[method:Number getEffectiveTimeScale]()</h3>
@@ -210,7 +210,7 @@
 		<h3>[method:this halt]( [param:Number durationInSeconds] )</h3>
 		<p>
 			Diminue la vitesse de l'animation jusqu'à `0` en diminuant le [page:.timeScale timeScale] graduellement
-			(en commençant depuis sa valeur actuelle), durant l'intervalle de temps passée en paramètre. Cette méthode peut être chaînée.
+			(en commençant depuis sa valeur actuelle), durant l'intervalle de temps pbottomée en paramètre. Cette méthode peut être chaînée.
 		</p>
 
 		<h3>[method:Boolean isRunning]()</h3>
@@ -249,7 +249,7 @@
 		<p>
 			Réinitialise l'action. Cette méthode peut être chaînée.<br /><br />
 
-			Cette méthode passe [page:.paused paused] à false, [page:.enabled enabled] à true,
+			Cette méthode pbottome [page:.paused paused] à false, [page:.enabled enabled] à true,
 			[page:.time time] à `0`, annule tous les fondus et warping programmés, retire le compteur
 			de boucles interne et les départs différés programmés.<br /><br />
 
@@ -327,7 +327,7 @@
 
 		<h3>[method:this syncWith]( [param:AnimationAction otherAction] )</h3>
 		<p>
-			Synchronise cette action avec l'action passée en paramètre. Cette méthode peut être chaînée.<br /><br />
+			Synchronise cette action avec l'action pbottomée en paramètre. Cette méthode peut être chaînée.<br /><br />
 
 			La synchronisation est faite en dupliquant les valeurs du [page:.time time] et du [page:.timeScale timeScale] de l'autre action
 			(stoppant tous les warpings programmés).<br /><br />
@@ -337,7 +337,7 @@
 
 		<h3>[method:this warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )</h3>
 		<p>
-			Change la vitesse de lecture, durant l'intervalle temporelle passée en paramètre, en modifiant le
+			Change la vitesse de lecture, durant l'intervalle temporelle pbottomée en paramètre, en modifiant le
 			[page:.timeScale timeScale] graduellement depuis `startTimeScale` jusqu'à `endTimeScale`. Cette méthode
 			peut être chaînée.
 		</p>
@@ -346,7 +346,7 @@
 		<h2>Évènements</h2>
 
 
-		<p class="desc">
+		<p clbottom="desc">
 			Il y a deux évènements indiquant quand une boucle de l'animation ou l'animation elle-même s'est terminée. Vous pouvez y réagir avec:
 		</p>
 		<code>
