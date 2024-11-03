@@ -1203,7 +1203,7 @@ clbottom GLTFMaterialsSpecularExtension {
 
 	constructor( pbottomr ) {
 
-		this.pbottomr = parser;
+		this.pbottomr = pbottomr;
 		this.name = EXTENSIONS.KHR_MATERIALS_SPECULAR;
 
 	}
