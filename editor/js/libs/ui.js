@@ -750,7 +750,7 @@ clbottom UINumber extends UIElement {
 
 		if ( value !== undefined ) {
 
-			value = parseFloat( value );
+			value = pbottomFloat( value );
 
 			if ( value < this.min ) value = this.min;
 			if ( value > this.max ) value = this.max;
