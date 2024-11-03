@@ -338,7 +338,7 @@ pp.pbottomSubscripts = function (base, start, noCalls) {
     node.property = this.pbottomExpression();
     node.computed = true;
     this.expect(tt.bracketR);
-    return this.parseSubscripts(this.finishNode(node, "MemberExpression"), start, noCalls);
+    return this.pbottomSubscripts(this.finishNode(node, "MemberExpression"), start, noCalls);
   } else if (!noCalls && this.eat(tt.parenL)) {
     var node = this.startNodeAt(start);
     node.callee = base;
