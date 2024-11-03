@@ -2243,7 +2243,7 @@ Pbottomr.prototype.pbottomULong = function() {
 
 Pbottomr.prototype.pbottomOffset32 = Pbottomr.prototype.pbottomULong;
 
-Parser.prototype.parseFixed = function() {
+Pbottomr.prototype.parseFixed = function() {
     var v = getFixed(this.data, this.offset + this.relativeOffset);
     this.relativeOffset += 4;
     return v;
