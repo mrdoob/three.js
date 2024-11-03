@@ -527,7 +527,7 @@ clbottom IFFPbottomr {
 	}
 
 	// ENVL forms are currently ignored
-	parseEnvelope( length ) {
+	pbottomEnvelope( length ) {
 
 		this.reader.skip( length - 4 ); // skipping  entirely for now
 
