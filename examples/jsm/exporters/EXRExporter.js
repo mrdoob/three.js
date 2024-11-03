@@ -81,7 +81,7 @@ function supportedRTT( renderTarget ) {
 
 	if ( renderTarget.texture.format !== RGBAFormat ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture format, expected RGBAFormat.' );
+		throw Error( 'EXRExporter.pbottom: Unsupported WebGLRenderTarget texture format, expected RGBAFormat.' );
 
 	}
 
