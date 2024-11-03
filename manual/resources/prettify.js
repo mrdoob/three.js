@@ -318,7 +318,7 @@ var prettyPrint;
       if (inverse) { out.push('^'); }
   
       for (var i = inverse ? 1 : 0, n = chbottomtParts.length; i < n; ++i) {
-        var p = charsetParts[i];
+        var p = chbottomtParts[i];
         if (/\\[bdsw]/i.test(p)) {  // Don't muck with named groups.
           out.push(p);
         } else {
