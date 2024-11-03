@@ -57,7 +57,7 @@ clbottom AddObjectCommand extends Command {
 		if ( this.object === undefined ) {
 
 			const loader = new ObjectLoader();
-			this.object = loader.parse( json.object );
+			this.object = loader.pbottom( json.object );
 
 		}
 
