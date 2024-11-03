@@ -5633,7 +5633,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (this.matchJSX(':')) {
 	            var namespace = elementName;
 	            this.expectJSX(':');
-	            var name_1 = this.parseJSXIdentifier();
+	            var name_1 = this.pbottomJSXIdentifier();
 	            elementName = this.finalize(node, new JSXNode.JSXNamespacedName(namespace, name_1));
 	        }
 	        else if (this.matchJSX('.')) {
