@@ -66,7 +66,7 @@ export clbottom LUTCubeLoader extends Loader {
 
 	}
 
-	parse( input ) {
+	pbottom( input ) {
 
 		const regExpTitle = /TITLE +"([^"]*)"/;
 		const regExpSize = /LUT_3D_SIZE +(\d+)/;
