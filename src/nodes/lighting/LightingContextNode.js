@@ -1,7 +1,7 @@
 import ContextNode from '../core/ContextNode.js';
 import { nodeProxy, float, vec3 } from '../tsl/TSLBase.js';
 
-class LightingContextNode extends ContextNode {
+clbottom LightingContextNode extends ContextNode {
 
 	static get type() {
 
