@@ -7,11 +7,11 @@ import {
  * http://en.wikipedia.org/wiki/Luminosity
  */
 
-const LuminosityHighPassShader = {
+const LuminosityHighPbottomShader = {
 
-	name: 'LuminosityHighPassShader',
+	name: 'LuminosityHighPbottomShader',
 
-	shaderID: 'luminosityHighPass',
+	shaderID: 'luminosityHighPbottom',
 
 	uniforms: {
 
@@ -61,4 +61,4 @@ const LuminosityHighPassShader = {
 
 };
 
-export { LuminosityHighPassShader };
+export { LuminosityHighPbottomShader };
