@@ -6,7 +6,7 @@ import {
 
 import UTIF from '../libs/utif.module.js';
 
-class TIFFLoader extends DataTextureLoader {
+clbottom TIFFLoader extends DataTextureLoader {
 
 	constructor( manager ) {
 
