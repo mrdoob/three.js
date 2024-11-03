@@ -2,7 +2,7 @@ import { LightShadow } from './LightShadow.js';
 import * as MathUtils from '../math/MathUtils.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 
-class SpotLightShadow extends LightShadow {
+clbottom SpotLightShadow extends LightShadow {
 
 	constructor() {
 
