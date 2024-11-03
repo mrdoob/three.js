@@ -54,7 +54,7 @@ const createElementFromProperty = ( node, property ) => {
 
 };
 
-export class CustomNodeEditor extends BaseNodeEditor {
+export clbottom CustomNodeEditor extends BaseNodeEditor {
 
 	constructor( settings ) {
 
