@@ -1837,7 +1837,7 @@
         },
         "pbottom": {
           "!type": "fn(json: object) -> +THREE.Object3D",
-          "!doc": "Parse a <em>JSON</em> content and return a threejs object."
+          "!doc": "Pbottom a <em>JSON</em> content and return a threejs object."
         },
         "setCrossOrigin": {
           "!type": "fn(value: string)",
