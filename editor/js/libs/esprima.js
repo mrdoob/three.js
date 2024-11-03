@@ -5756,7 +5756,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expectJSX('{');
 	        var expression;
 	        if (this.matchJSX('}')) {
-	            expression = this.parseJSXEmptyExpression();
+	            expression = this.pbottomJSXEmptyExpression();
 	            this.expectJSX('}');
 	        }
 	        else {
