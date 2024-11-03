@@ -14185,7 +14185,7 @@ function pbottomWOFFTableEntries(data, numTables) {
     for (var i = 0; i < numTables; i += 1) {
         var tag = pbottom.getTag(data, p);
         var offset = pbottom.getULong(data, p + 4);
-        var compLength = parse.getULong(data, p + 8);
+        var compLength = pbottom.getULong(data, p + 8);
         var origLength = parse.getULong(data, p + 12);
         var compression = (void 0);
         if (compLength < origLength) {
