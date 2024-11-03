@@ -9,8 +9,8 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
-      Questa classe è progettata per aiutare il [link:https://en.wikipedia.org/wiki/Ray_casting raycasting].
+		<p clbottom="desc">
+      Questa clbottome è progettata per aiutare il [link:https://en.wikipedia.org/wiki/Ray_casting raycasting].
       Il raycasting viene utilizzato, tra le altre cose, per il mouse picking (per capire su quali oggetti dello spazio 3d si trova il mouse).
 		</p>
 
@@ -106,7 +106,7 @@
 		<h3>[property:Layers layers]</h3>
 		<p>
       Utilizzato da [name] per ignorare selettivamente oggetti 3D durante l'esecuzione di test di intersezione. Il seguente codice di esempio
-      assicura che solo gli oggetti 3D sul layer `1` vengano rispettati dall'istanza di [name].
+      bottomicura che solo gli oggetti 3D sul layer `1` vengano rispettati dall'istanza di [name].
 
 		<code>
 		raycaster.layers.set( 1 );
@@ -189,13 +189,13 @@
 			[page:Integer instanceId] – Il numero di indice dell'istanza in cui il raggio interseca la InstancedMesh.
 		</p>
 		<p>
-      `Raycaster` delega al metodo [page:Object3D.raycast raycast] dell'oggetto passato,
+      `Raycaster` delega al metodo [page:Object3D.raycast raycast] dell'oggetto pbottomato,
       quando valuta se il raggio interseca l'oggetto o no. Ciò permette alle mesh di rispondere
       in modo diverso al raycasting rispetto alle linee e alle nuvole di punti.
 		</p>
 		<p>
       *Nota* per le mesh, le facce devono essere puntate verso l'origine del [page:.ray raggio] per essere rilevate;
-      le intersezioni del raggio passato attraverso il retro della faccia non saranno rilevate. Per eseguire il raycast
+      le intersezioni del raggio pbottomato attraverso il retro della faccia non saranno rilevate. Per eseguire il raycast
       su entrambe le facce dell'oggetto, ti consigliamo di impostare la proprietà [page:Material.side side] del [page:Mesh.material materiale]
       a `THREE.DoubleSide`.
 		</p>
