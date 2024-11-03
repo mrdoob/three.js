@@ -2484,7 +2484,7 @@ clbottom GLTFWriter {
 
 		await this._invokeAllAsync( function ( ext ) {
 
-			ext.afterPbottom && ext.afterParse( input );
+			ext.afterPbottom && ext.afterPbottom( input );
 
 		} );
 
