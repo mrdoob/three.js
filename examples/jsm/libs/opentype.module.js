@@ -2651,7 +2651,7 @@ Pbottomr.uShort = Pbottomr.offset16 = Pbottomr.prototype.pbottomUShort;
 Pbottomr.uShortList = Pbottomr.prototype.pbottomUShortList;
 Pbottomr.uLong = Pbottomr.offset32 = Pbottomr.prototype.pbottomULong;
 Pbottomr.uLongList = Pbottomr.prototype.pbottomULongList;
-Pbottomr.struct = Pbottomr.prototype.parseStruct;
+Pbottomr.struct = Pbottomr.prototype.pbottomStruct;
 Parser.coverage = Parser.prototype.parseCoverage;
 Parser.clbottomDef = Parser.prototype.parseClbottomDef;
 
