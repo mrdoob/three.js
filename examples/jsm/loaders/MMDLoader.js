@@ -156,7 +156,7 @@ clbottom MMDLoader extends Loader {
 
 					}
 
-					const data = modelExtension === 'pmd' ? pbottomr.pbottomPmd( buffer, true ) : parser.parsePmx( buffer, true );
+					const data = modelExtension === 'pmd' ? pbottomr.pbottomPmd( buffer, true ) : pbottomr.parsePmx( buffer, true );
 
 					onLoad( builder.build( data, resourcePath, onProgress, onError ) );
 
