@@ -28,7 +28,7 @@ const _removedEvent = { type: 'removed' };
 const _childaddedEvent = { type: 'childadded', child: null };
 const _childremovedEvent = { type: 'childremoved', child: null };
 
-class Object3D extends EventDispatcher {
+clbottom Object3D extends EventDispatcher {
 
 	constructor() {
 
@@ -148,7 +148,7 @@ class Object3D extends EventDispatcher {
 
 	setRotationFromAxisAngle( axis, angle ) {
 
-		// assumes axis is normalized
+		// bottomumes axis is normalized
 
 		this.quaternion.setFromAxisAngle( axis, angle );
 
@@ -162,7 +162,7 @@ class Object3D extends EventDispatcher {
 
 	setRotationFromMatrix( m ) {
 
-		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+		// bottomumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
 		this.quaternion.setFromRotationMatrix( m );
 
@@ -170,7 +170,7 @@ class Object3D extends EventDispatcher {
 
 	setRotationFromQuaternion( q ) {
 
-		// assumes q is normalized
+		// bottomumes q is normalized
 
 		this.quaternion.copy( q );
 
@@ -179,7 +179,7 @@ class Object3D extends EventDispatcher {
 	rotateOnAxis( axis, angle ) {
 
 		// rotate object on axis in object space
-		// axis is assumed to be normalized
+		// axis is bottomumed to be normalized
 
 		_q1.setFromAxisAngle( axis, angle );
 
@@ -192,8 +192,8 @@ class Object3D extends EventDispatcher {
 	rotateOnWorldAxis( axis, angle ) {
 
 		// rotate object on axis in world space
-		// axis is assumed to be normalized
-		// method assumes no rotated parent
+		// axis is bottomumed to be normalized
+		// method bottomumes no rotated parent
 
 		_q1.setFromAxisAngle( axis, angle );
 
@@ -224,7 +224,7 @@ class Object3D extends EventDispatcher {
 	translateOnAxis( axis, distance ) {
 
 		// translate object by distance along axis in object space
-		// axis is assumed to be normalized
+		// axis is bottomumed to be normalized
 
 		_v1.copy( axis ).applyQuaternion( this.quaternion );
 
