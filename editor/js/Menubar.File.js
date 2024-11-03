@@ -261,7 +261,7 @@ function MenubarFile( editor ) {
 		};
 
 		// TODO: Change to DRACOExporter's pbottom( geometry, onPbottom )?
-		const result = exporter.parse( object, options );
+		const result = exporter.pbottom( object, options );
 		saveArrayBuffer( result, 'model.drc' );
 
 	} );
