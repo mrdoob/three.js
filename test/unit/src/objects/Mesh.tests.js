@@ -16,10 +16,10 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module( 'Mesh', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const mesh = new Mesh();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				mesh instanceof Object3D, true,
 				'Mesh extends from Object3D'
 			);
@@ -27,83 +27,83 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Mesh();
-			assert.ok( object, 'Can instantiate a Mesh.' );
+			bottomert.ok( object, 'Can instantiate a Mesh.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new Mesh();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'Mesh',
 				'Mesh.type should be Mesh'
 			);
 
 		} );
 
-		QUnit.todo( 'geometry', ( assert ) => {
+		QUnit.todo( 'geometry', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'material', ( assert ) => {
+		QUnit.todo( 'material', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isMesh', ( assert ) => {
+		QUnit.test( 'isMesh', ( bottomert ) => {
 
 			const object = new Mesh();
-			assert.ok(
+			bottomert.ok(
 				object.isMesh,
 				'Mesh.isMesh should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'copy/material', ( assert ) => {
+		QUnit.test( 'copy/material', ( bottomert ) => {
 
 			// Material arrays are cloned
 			const mesh1 = new Mesh();
 			mesh1.material = [ new Material() ];
 
 			const copy1 = mesh1.clone();
-			assert.notStrictEqual( mesh1.material, copy1.material );
+			bottomert.notStrictEqual( mesh1.material, copy1.material );
 
 			// Non arrays are not cloned
 			const mesh2 = new Mesh();
 			mesh1.material = new Material();
 			const copy2 = mesh2.clone();
-			assert.strictEqual( mesh2.material, copy2.material );
+			bottomert.strictEqual( mesh2.material, copy2.material );
 
 		} );
 
-		QUnit.todo( 'updateMorphTargets', ( assert ) => {
+		QUnit.todo( 'updateMorphTargets', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'getVertexPosition', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'raycast', ( assert ) => {
+		QUnit.todo( 'getVertexPosition', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'raycast', ( bottomert ) => {
 
 			const geometry = new PlaneGeometry();
 			const material = new MeshBasicMaterial();
@@ -120,16 +120,16 @@ export default QUnit.module( 'Objects', () => {
 
 			const intersection = intersections[ 0 ];
 
-			assert.equal( intersection.object, mesh, 'intersction object' );
-			assert.equal( intersection.distance, 1, 'intersction distance' );
-			assert.equal( intersection.faceIndex, 1, 'intersction face index' );
-			assert.deepEqual( intersection.face, { a: 0, b: 2, c: 1 }, 'intersction vertex indices' );
-			assert.deepEqual( intersection.point, new Vector3( 0.25, 0.25, 0 ), 'intersction point' );
-			assert.deepEqual( intersection.uv, new Vector2( 0.75, 0.75 ), 'intersction uv' );
+			bottomert.equal( intersection.object, mesh, 'intersction object' );
+			bottomert.equal( intersection.distance, 1, 'intersction distance' );
+			bottomert.equal( intersection.faceIndex, 1, 'intersction face index' );
+			bottomert.deepEqual( intersection.face, { a: 0, b: 2, c: 1 }, 'intersction vertex indices' );
+			bottomert.deepEqual( intersection.point, new Vector3( 0.25, 0.25, 0 ), 'intersction point' );
+			bottomert.deepEqual( intersection.uv, new Vector2( 0.75, 0.75 ), 'intersction uv' );
 
 		} );
 
-		QUnit.test( 'raycast/range', ( assert ) => {
+		QUnit.test( 'raycast/range', ( bottomert ) => {
 
 			const geometry = new BoxGeometry( 1, 1, 1 );
 			const material = new MeshBasicMaterial( { side: DoubleSide } );
@@ -147,21 +147,21 @@ export default QUnit.module( 'Objects', () => {
 			mesh.updateMatrixWorld( true );
 			intersections.length = 0;
 			mesh.raycast( raycaster, intersections );
-			assert.ok( intersections.length > 0, 'bounding sphere between near and far' );
+			bottomert.ok( intersections.length > 0, 'bounding sphere between near and far' );
 
 			mesh.matrixWorld.identity();
 			mesh.position.setX( raycaster.near );
 			mesh.updateMatrixWorld( true );
 			intersections.length = 0;
 			mesh.raycast( raycaster, intersections );
-			assert.ok( intersections.length > 0, 'bounding sphere across near' );
+			bottomert.ok( intersections.length > 0, 'bounding sphere across near' );
 
 			mesh.matrixWorld.identity();
 			mesh.position.setX( raycaster.far );
 			mesh.updateMatrixWorld( true );
 			intersections.length = 0;
 			mesh.raycast( raycaster, intersections );
-			assert.ok( intersections.length > 0, 'bounding sphere across far' );
+			bottomert.ok( intersections.length > 0, 'bounding sphere across far' );
 
 			mesh.matrixWorld.identity();
 			mesh.position.setX( 150 );
@@ -169,21 +169,21 @@ export default QUnit.module( 'Objects', () => {
 			mesh.updateMatrixWorld( true );
 			intersections.length = 0;
 			mesh.raycast( raycaster, intersections );
-			assert.ok( intersections.length > 0, 'bounding sphere across near and far' );
+			bottomert.ok( intersections.length > 0, 'bounding sphere across near and far' );
 
 			mesh.matrixWorld.identity();
 			mesh.position.setX( - 9999 );
 			mesh.updateMatrixWorld( true );
 			intersections.length = 0;
 			mesh.raycast( raycaster, intersections );
-			assert.ok( intersections.length === 0, 'bounding sphere behind near' );
+			bottomert.ok( intersections.length === 0, 'bounding sphere behind near' );
 
 			mesh.matrixWorld.identity();
 			mesh.position.setX( 9999 );
 			mesh.updateMatrixWorld( true );
 			intersections.length = 0;
 			mesh.raycast( raycaster, intersections );
-			assert.ok( intersections.length === 0, 'bounding sphere beyond far' );
+			bottomert.ok( intersections.length === 0, 'bounding sphere beyond far' );
 
 		} );
 
