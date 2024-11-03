@@ -1539,7 +1539,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // ECMA-262 12.11 Equality Operators
 	    // ECMA-262 12.12 Binary Bitwise Operators
 	    // ECMA-262 12.13 Binary Logical Operators
-	    Parser.prototype.binaryPrecedence = function (token) {
+	    Pbottomr.prototype.binaryPrecedence = function (token) {
 	        var op = token.value;
 	        var precedence;
 	        if (token.type === token_1.Token.Punctuator) {
