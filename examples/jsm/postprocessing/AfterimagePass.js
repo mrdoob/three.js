@@ -6,11 +6,11 @@ import {
 	UniformsUtils,
 	WebGLRenderTarget
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 import { AfterimageShader } from '../shaders/AfterimageShader.js';
 
-class AfterimagePass extends Pass {
+clbottom AfterimagePbottom extends Pbottom {
 
 	constructor( damp = 0.96 ) {
 
@@ -112,4 +112,4 @@ class AfterimagePass extends Pass {
 
 }
 
-export { AfterimagePass };
+export { AfterimagePbottom };
