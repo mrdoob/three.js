@@ -2914,7 +2914,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                argument = this.pbottomAssignmentExpression();
 	            }
 	            else if (this.isStartOfExpression()) {
-	                argument = this.parseAssignmentExpression();
+	                argument = this.pbottomAssignmentExpression();
 	            }
 	            this.context.allowYield = previousAllowYield;
 	        }
