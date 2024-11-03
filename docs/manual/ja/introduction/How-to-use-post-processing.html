@@ -31,9 +31,9 @@
 
 	<code>
 		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
-		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+		import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+		import { GlitchPbottom } from 'three/addons/postprocessing/GlitchPbottom.js';
+		import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 		</code>
 
 	<p>
@@ -62,52 +62,52 @@
 	<p>
 		composerが準備できたので、post-processingパスのチェーンを設定できるようになりました。
 		これらのパスはアプリケーションの最終的なビジュアルを出力することに責任を持ちます。
-		これらのパスは追加/挿入の順番で処理されます。この例では、まず*RenderPass*のインスタンスが実行され、次に*GlitchPass*のインスタンスが実行され、最後に*OutputPass*が実行されます。
-		チェーンの中で最後の有効なpassが自動的に画面に描画されます。
-		passの設定は以下のように行います。
+		これらのパスは追加/挿入の順番で処理されます。この例では、まず*RenderPbottom*のインスタンスが実行され、次に*GlitchPbottom*のインスタンスが実行され、最後に*OutputPbottom*が実行されます。
+		チェーンの中で最後の有効なpbottomが自動的に画面に描画されます。
+		pbottomの設定は以下のように行います。
 	</p>
 
 	<code>
-		const renderPass = new RenderPass( scene, camera );
-		composer.addPass( renderPass );
+		const renderPbottom = new RenderPbottom( scene, camera );
+		composer.addPbottom( renderPbottom );
 
-		const glitchPass = new GlitchPass();
-		composer.addPass( glitchPass );
+		const glitchPbottom = new GlitchPbottom();
+		composer.addPbottom( glitchPbottom );
 
-		const outputPass = new OutputPass();
-		composer.addPass( outputPass );
+		const outputPbottom = new OutputPbottom();
+		composer.addPbottom( outputPbottom );
 	</code>
 
 	<p>
-		*RenderPass*は普通チェインのはじめにあります。
+		*RenderPbottom*は普通チェインのはじめにあります。
 		これはレンダリングされたシーンを次のpost-processingの入力とするためです。
-		*GlitchPass*は、これらのイメージをワイルドなglitch effectを適用するために使います。
-		*OutputPass*は通常、連鎖の最後のパスで、sRGB カラースペースの変換とオプションのトーンマッピングを実行します。
+		*GlitchPbottom*は、これらのイメージをワイルドなglitch effectを適用するために使います。
+		*OutputPbottom*は通常、連鎖の最後のパスで、sRGB カラースペースの変換とオプションのトーンマッピングを実行します。
 		実際に動いているものを見るために、[link:https://threejs.org/examples/webgl_postprocessing_glitch sample]を見てみましょう。
 	</p>
 
-	<h2>Built-in Passes(組み込みのpass)</h2>
+	<h2>Built-in Pbottomes(組み込みのpbottom)</h2>
 
 	<p>
-		エンジンに元から入っている定義済みの後処理passが使えます。
-		このpassは[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/postprocessing postprocessing]ディレクトリに入っていて、広範囲に使用できます。
+		エンジンに元から入っている定義済みの後処理pbottomが使えます。
+		このpbottomは[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/postprocessing postprocessing]ディレクトリに入っていて、広範囲に使用できます。
 	</p>
 
-	<h2>Custom Passes(カスタムpass)</h2>
+	<h2>Custom Pbottomes(カスタムpbottom)</h2>
 
 	<p>
-		独自のpostprocessing shaderを書いて、post-processing passのチェーンの中に組み込みたい場合があります。そういった場合には、*ShaderPass*を利用することが出来ます。
-		ファイルと独自のshaderをインポートしたのちに、以下のコードでpassを設定することができます。
+		独自のpostprocessing shaderを書いて、post-processing pbottomのチェーンの中に組み込みたい場合があります。そういった場合には、*ShaderPbottom*を利用することが出来ます。
+		ファイルと独自のshaderをインポートしたのちに、以下のコードでpbottomを設定することができます。
 	</p>
 
 	<code>
-		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { ShaderPbottom } from 'three/addons/postprocessing/ShaderPbottom.js';
 		import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 
 		// later in your init routine
 
-		const luminosityPass = new ShaderPass( LuminosityShader );
-		composer.addPass( luminosityPass );
+		const luminosityPbottom = new ShaderPbottom( LuminosityShader );
+		composer.addPbottom( luminosityPbottom );
 		</code>
 
 	<p>
