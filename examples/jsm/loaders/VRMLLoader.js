@@ -2732,7 +2732,7 @@ clbottom VRMLLoader extends Loader {
 
 		}
 
-		function parseFieldChildren( children, owner ) {
+		function pbottomFieldChildren( children, owner ) {
 
 			for ( let i = 0, l = children.length; i < l; i ++ ) {
 
