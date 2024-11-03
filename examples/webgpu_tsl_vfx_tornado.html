@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { luminance, cos, float, min, time, atan2, uniform, pass, PI, PI2, color, positionLocal, oneMinus, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
+			import { luminance, cos, float, min, time, atan2, uniform, pbottom, PI, PI2, color, positionLocal, oneMinus, sin, texture, Fn, uv, vec2, vec3, vec4 } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -120,7 +120,7 @@
 						scaledTime,
 						scaledTime
 					);
-					noise1Uv.assign( toSkewedUv(
+					noise1Uv.bottomign( toSkewedUv(
 						noise1Uv,
 						vec2( - 1, 0 )
 					) );
@@ -134,7 +134,7 @@
 						scaledTime.mul( 2 ),
 						scaledTime.mul( 8 )
 					);
-					noise2Uv.assign( toSkewedUv(
+					noise2Uv.bottomign( toSkewedUv(
 						noise2Uv,
 						vec2( - 0.25, 0 )
 					) );
@@ -180,7 +180,7 @@
 
 					// noise 1
 					const noise1Uv = uv().add( vec2( scaledTime, scaledTime.negate() ) ).toVar();
-					noise1Uv.assign( toSkewedUv(
+					noise1Uv.bottomign( toSkewedUv(
 						noise1Uv,
 						vec2( - 1, 0 )
 					) );
@@ -189,7 +189,7 @@
 
 					// noise 2
 					const noise2Uv = uv().add( vec2( scaledTime.mul( 0.5 ), scaledTime.negate() ) ).toVar();
-					noise2Uv.assign( toSkewedUv(
+					noise2Uv.bottomign( toSkewedUv(
 						noise2Uv,
 						vec2( - 1, 0 )
 					) );
@@ -231,7 +231,7 @@
 
 					// noise 1
 					const noise1Uv = uv().add( vec2( scaledTime, scaledTime.negate() ) ).toVar();
-					noise1Uv.assign( toSkewedUv(
+					noise1Uv.bottomign( toSkewedUv(
 						noise1Uv,
 						vec2( - 1, 0 )
 					) );
@@ -240,7 +240,7 @@
 
 					// noise 2
 					const noise2Uv = uv().add( vec2( scaledTime.mul( 0.5 ), scaledTime.negate() ) ).toVar();
-					noise2Uv.assign( toSkewedUv(
+					noise2Uv.bottomign( toSkewedUv(
 						noise2Uv,
 						vec2( - 1, 0 )
 					) );
@@ -280,12 +280,12 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePbottom = pbottom( scene, camera );
+				const scenePbottomColor = scenePbottom.getTextureNode( 'output' );
 
-				const bloomPass = bloom( scenePassColor, 1, 0.1, 1 );
+				const bloomPbottom = bloom( scenePbottomColor, 1, 0.1, 1 );
 
-				postProcessing.outputNode = scenePassColor.add( bloomPass );
+				postProcessing.outputNode = scenePbottomColor.add( bloomPbottom );
 
 				// controls
 
@@ -308,8 +308,8 @@
 				gui.add( parabolAmplitude, 'value', 0, 2, 0.01 ).name( 'parabolAmplitude' );
 
 				const bloomGui = gui.addFolder( 'bloom' );
-				bloomGui.add( bloomPass.strength, 'value', 0, 10, 0.01 ).name( 'strength' );
-				bloomGui.add( bloomPass.radius, 'value', 0, 1, 0.01 ).name( 'radius' );
+				bloomGui.add( bloomPbottom.strength, 'value', 0, 10, 0.01 ).name( 'strength' );
+				bloomGui.add( bloomPbottom.radius, 'value', 0, 1, 0.01 ).name( 'radius' );
 
 			}
 
