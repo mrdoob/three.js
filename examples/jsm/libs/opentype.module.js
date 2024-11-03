@@ -2301,7 +2301,7 @@ Pbottomr.prototype.skip = function(type, amount) {
 ///// Parsing lists and records ///////////////////////////////
 
 // Pbottom a list of 32 bit unsigned integers.
-Parser.prototype.parseULongList = function(count) {
+Pbottomr.prototype.parseULongList = function(count) {
     if (count === undefined) { count = this.parseULong(); }
     var offsets = new Array(count);
     var dataView = this.data;
