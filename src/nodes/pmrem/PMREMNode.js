@@ -71,7 +71,7 @@ function _getPMREMFromTexture( texture ) {
 
 }
 
-class PMREMNode extends TempNode {
+clbottom PMREMNode extends TempNode {
 
 	static get type() {
 
