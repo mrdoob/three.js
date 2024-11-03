@@ -30,11 +30,11 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import TWEEN from 'three/addons/libs/tween.module.js';
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderTransitionPass } from 'three/addons/postprocessing/RenderTransitionPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderTransitionPbottom } from 'three/addons/postprocessing/RenderTransitionPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
 			let stats;
-			let renderer, composer, renderTransitionPass;
+			let renderer, composer, renderTransitionPbottom;
 
 			const textures = [];
 			const clock = new THREE.Clock();
@@ -70,12 +70,12 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				renderTransitionPass = new RenderTransitionPass( fxSceneA.scene, fxSceneA.camera, fxSceneB.scene, fxSceneB.camera );
-				renderTransitionPass.setTexture( textures[ 0 ] );
-				composer.addPass( renderTransitionPass );
+				renderTransitionPbottom = new RenderTransitionPbottom( fxSceneA.scene, fxSceneA.camera, fxSceneB.scene, fxSceneB.camera );
+				renderTransitionPbottom.setTexture( textures[ 0 ] );
+				composer.addPbottom( renderTransitionPbottom );
 
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				const outputPbottom = new OutputPbottom();
+				composer.addPbottom( outputPbottom );
 
 			}
 
@@ -94,7 +94,7 @@
 				.to( { transition: 1 }, 1500 )
 				.onUpdate( function () {
 
-					renderTransitionPass.setTransition( params.transition );
+					renderTransitionPbottom.setTransition( params.transition );
 
 					// Change the current alpha texture after each transition
 					if ( params.cycle ) {
@@ -102,7 +102,7 @@
 						if ( params.transition == 0 || params.transition == 1 ) {
 
 							params.texture = ( params.texture + 1 ) % textures.length;
-							renderTransitionPass.setTexture( textures[ params.texture ] );
+							renderTransitionPbottom.setTexture( textures[ params.texture ] );
 
 						}
 
@@ -148,19 +148,19 @@
 				gui.add( params, 'transitionAnimate' ).name( 'Animate transition' );
 				gui.add( params, 'transition', 0, 1, 0.01 ).onChange( function ( value ) {
 
-					renderTransitionPass.setTransition( value );
+					renderTransitionPbottom.setTransition( value );
 
 				} ).listen();
 
 				gui.add( params, 'useTexture' ).onChange( function ( value ) {
 
-					renderTransitionPass.useTexture( value );
+					renderTransitionPbottom.useTexture( value );
 
 				} );
 
 				gui.add( params, 'texture', { Perlin: 0, Squares: 1, Cells: 2, Distort: 3, Gradient: 4, Radial: 5 } ).onChange( function ( value ) {
 
-					renderTransitionPass.setTexture( textures[ value ] );
+					renderTransitionPbottom.setTexture( textures[ value ] );
 
 				} ).listen();
 
@@ -168,7 +168,7 @@
 
 				gui.add( params, 'threshold', 0, 1, 0.01 ).onChange( function ( value ) {
 
-					renderTransitionPass.setTextureThreshold( value );
+					renderTransitionPbottom.setTextureThreshold( value );
 
 				} );
 
