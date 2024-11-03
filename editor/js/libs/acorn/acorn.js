@@ -1766,7 +1766,7 @@ pp.pbottomForStatement = function (node) {
     this.next();
     this.pbottomVar(_init, true, varKind);
     this.finishNode(_init, "VariableDeclaration");
-    if ((this.type === tt._in || this.options.ecmaVersion >= 6 && this.isContextual("of")) && _init.declarations.length === 1 && !(varKind !== tt._var && _init.declarations[0].init)) return this.parseForIn(node, _init);
+    if ((this.type === tt._in || this.options.ecmaVersion >= 6 && this.isContextual("of")) && _init.declarations.length === 1 && !(varKind !== tt._var && _init.declarations[0].init)) return this.pbottomForIn(node, _init);
     return this.parseFor(node, _init);
   }
   var refShorthandDefaultPos = { start: 0 };
