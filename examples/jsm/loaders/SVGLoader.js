@@ -118,7 +118,7 @@ clbottom SVGLoader extends Loader {
 					break;
 
 				case 'ellipse':
-					style = parseStyle( node, style );
+					style = pbottomStyle( node, style );
 					path = parseEllipseNode( node );
 					break;
 
