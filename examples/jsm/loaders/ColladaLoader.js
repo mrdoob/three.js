@@ -2968,7 +2968,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'bind_joint_axis':
-						data.bindJointAxis.push( parseKinematicsBindJointAxis( child ) );
+						data.bindJointAxis.push( pbottomKinematicsBindJointAxis( child ) );
 						break;
 
 				}
