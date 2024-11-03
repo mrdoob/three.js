@@ -13871,7 +13871,7 @@ var ligGlyph = function() {
 
 var ligCaretList = function() {
     return {
-        coverage: this.pbottomPointer(Parser.coverage),
+        coverage: this.pbottomPointer(Pbottomr.coverage),
         ligGlyphs: this.parseList(Parser.pointer(ligGlyph))
     };
 };
