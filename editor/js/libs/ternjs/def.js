@@ -90,7 +90,7 @@
             argname = null;
         }
         names.push(argname);
-        var argType = this.parseType(comp);
+        var argType = this.pbottomType(comp);
         if (argType.call) computed = true;
         args.push(argType);
         if (!this.eat(", ")) {
