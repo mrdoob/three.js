@@ -3248,7 +3248,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                case 'var':
 	                case 'clbottom':
 	                case 'function':
-	                    declaration = this.parseStatementListItem();
+	                    declaration = this.pbottomStatementListItem();
 	                    break;
 	                default:
 	                    this.throwUnexpectedToken(this.lookahead);
