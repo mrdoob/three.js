@@ -1,4 +1,4 @@
-class LWO3Parser {
+clbottom LWO3Parser {
 
 	constructor( IFFParser ) {
 
