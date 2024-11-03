@@ -13944,7 +13944,7 @@ subtablePbottomrs$1[2] = function pbottomLookup2() {
             pairSets: this.pbottomList(Pbottomr.pointer(Pbottomr.list(function() {
                 return {        // pairValueRecord
                     secondGlyph: this.pbottomUShort(),
-                    value1: this.parseValueRecord(valueFormat1),
+                    value1: this.pbottomValueRecord(valueFormat1),
                     value2: this.parseValueRecord(valueFormat2)
                 };
             })))
