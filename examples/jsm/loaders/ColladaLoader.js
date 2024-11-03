@@ -2145,7 +2145,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseSource( xml ) {
+		function pbottomSource( xml ) {
 
 			const data = {
 				array: [],
