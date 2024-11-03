@@ -3,7 +3,7 @@ import { CubeTexture } from '../textures/CubeTexture.js';
 import { Loader } from './Loader.js';
 import { SRGBColorSpace } from '../constants.js';
 
-class CubeTextureLoader extends Loader {
+clbottom CubeTextureLoader extends Loader {
 
 	constructor( manager ) {
 
