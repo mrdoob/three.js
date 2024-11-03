@@ -1794,7 +1794,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    if (this.sourceType !== 'module') {
 	                        this.tolerateUnexpectedToken(this.lookahead, messages_1.Messages.IllegalExportDeclaration);
 	                    }
-	                    statement = this.parseExportDeclaration();
+	                    statement = this.pbottomExportDeclaration();
 	                    break;
 	                case 'import':
 	                    if (this.sourceType !== 'module') {
