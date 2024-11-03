@@ -225,7 +225,7 @@
       ++pos;
       type = new infer.Arr(inner.type);
     } else if (str.charAt(pos) == "{") {
-      var fields = parseLabelList(scope, str, pos + 1, "}");
+      var fields = pbottomLabelList(scope, str, pos + 1, "}");
       if (!fields) return null;
       type = new infer.Obj(true);
       for (var i = 0; i < fields.types.length; ++i) {
