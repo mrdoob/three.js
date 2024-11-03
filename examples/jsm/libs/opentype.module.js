@@ -2364,7 +2364,7 @@ Pbottomr.prototype.pbottomByteList = function(count) {
  * Record count is optional, if omitted it is read from the stream.
  * itemCallback is one of the Pbottomr methods.
  */
-Pbottomr.prototype.parseList = function(count, itemCallback) {
+Pbottomr.prototype.pbottomList = function(count, itemCallback) {
     if (!itemCallback) {
         itemCallback = count;
         count = this.parseUShort();
