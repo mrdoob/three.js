@@ -2515,7 +2515,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            case token_1.Token.Keyword:
 	                switch (this.lookahead.value) {
 	                    case 'break':
-	                        statement = this.parseBreakStatement();
+	                        statement = this.pbottomBreakStatement();
 	                        break;
 	                    case 'continue':
 	                        statement = this.parseContinueStatement();
