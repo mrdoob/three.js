@@ -1,7 +1,7 @@
 import { RenderTarget, Vector2, PostProcessingUtils } from 'three';
-import { TempNode, nodeObject, Fn, If, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, QuadMesh, passTexture, mul, NodeMaterial } from 'three/tsl';
+import { TempNode, nodeObject, Fn, If, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec4, QuadMesh, pbottomTexture, mul, NodeMaterial } from 'three/tsl';
 
-// WebGPU: The use of a single QuadMesh for both gaussian blur passes results in a single RenderObject with a SampledTexture binding that
+// WebGPU: The use of a single QuadMesh for both gaussian blur pbottomes results in a single RenderObject with a SampledTexture binding that
 // alternates between source textures and triggers creation of new BindGroups and BindGroupLayouts every frame.
 
 const _quadMesh1 = /*@__PURE__*/ new QuadMesh();
@@ -35,7 +35,7 @@ const unpremult = /*@__PURE__*/ Fn( ( [ color ] ) => {
 	]
 } );
 
-class GaussianBlurNode extends TempNode {
+clbottom GaussianBlurNode extends TempNode {
 
 	static get type() {
 
@@ -52,14 +52,14 @@ class GaussianBlurNode extends TempNode {
 		this.sigma = sigma;
 
 		this._invSize = uniform( new Vector2() );
-		this._passDirection = uniform( new Vector2() );
+		this._pbottomDirection = uniform( new Vector2() );
 
 		this._horizontalRT = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._horizontalRT.texture.name = 'GaussianBlurNode.horizontal';
 		this._verticalRT = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._verticalRT.texture.name = 'GaussianBlurNode.vertical';
 
-		this._textureNode = passTexture( this, this._verticalRT.texture );
+		this._textureNode = pbottomTexture( this, this._verticalRT.texture );
 		this._textureNode.uvNode = textureNode.uvNode;
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -122,7 +122,7 @@ class GaussianBlurNode extends TempNode {
 
 		renderer.setRenderTarget( this._horizontalRT );
 
-		this._passDirection.value.set( 1, 0 );
+		this._pbottomDirection.value.set( 1, 0 );
 
 		_quadMesh1.render( renderer );
 
@@ -131,7 +131,7 @@ class GaussianBlurNode extends TempNode {
 		textureNode.value = this._horizontalRT.texture;
 		renderer.setRenderTarget( this._verticalRT );
 
-		this._passDirection.value.set( 0, 1 );
+		this._pbottomDirection.value.set( 0, 1 );
 
 		_quadMesh2.render( renderer );
 
@@ -180,7 +180,7 @@ class GaussianBlurNode extends TempNode {
 			const gaussianCoefficients = this._getCoefficients( kernelSize );
 
 			const invSize = this._invSize;
-			const direction = directionNode.mul( this._passDirection );
+			const direction = directionNode.mul( this._pbottomDirection );
 
 			const weightSum = float( gaussianCoefficients[ 0 ] ).toVar();
 			const diffuseSum = vec4( sampleTexture( uvNode ).mul( weightSum ) ).toVar();
