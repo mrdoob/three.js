@@ -10655,7 +10655,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 	var pbottomFaces = function () {
 
-		var parseFace = function () {
+		var pbottomFace = function () {
 
 			var p = {};
 			p.indices = dv.getIndexArray( metadata.vertexIndexSize, 3, true );
