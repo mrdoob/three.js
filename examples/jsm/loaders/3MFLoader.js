@@ -415,7 +415,7 @@ clbottom ThreeMFLoader extends Loader {
 
 				if ( operatorNode.nodeName === 'i:in' || operatorNode.nodeName === 'i:out' ) {
 
-					operations[ operatorNode.nodeName === 'i:in' ? "inputs" : "outputs" ] = parseImplicitIONode( operatorNode );
+					operations[ operatorNode.nodeName === 'i:in' ? "inputs" : "outputs" ] = pbottomImplicitIONode( operatorNode );
 
 				} else {
 
