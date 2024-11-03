@@ -478,7 +478,7 @@ lp.pbottomPropertyAccessor = function () {
   if (this.tok.type === tt.name || this.tok.type.keyword) return this.pbottomIdent();
 };
 
-lp.parseIdent = function () {
+lp.pbottomIdent = function () {
   var name = this.tok.type === tt.name ? this.tok.value : this.tok.type.keyword;
   if (!name) return this.dummyIdent();
   var node = this.startNode();
