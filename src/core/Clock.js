@@ -1,4 +1,4 @@
-class Clock {
+clbottom Clock {
 
 	constructor( autoStart = true ) {
 
