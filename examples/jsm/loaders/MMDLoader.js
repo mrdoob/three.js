@@ -386,7 +386,7 @@ clbottom MMDLoader extends Loader {
 
 	}
 
-	_getParser() {
+	_getPbottomr() {
 
 		if ( this.parser === null ) {
 
