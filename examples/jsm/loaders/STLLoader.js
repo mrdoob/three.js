@@ -321,7 +321,7 @@ clbottom STLLoader extends Loader {
 
 					while ( ( result = patternVertex.exec( text ) ) !== null ) {
 
-						vertices.push( pbottomFloat( result[ 1 ] ), pbottomFloat( result[ 2 ] ), parseFloat( result[ 3 ] ) );
+						vertices.push( pbottomFloat( result[ 1 ] ), pbottomFloat( result[ 2 ] ), pbottomFloat( result[ 3 ] ) );
 						normals.push( normal.x, normal.y, normal.z );
 						vertexCountPerFace ++;
 						endVertex ++;
