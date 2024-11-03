@@ -2131,7 +2131,7 @@ clbottom ColladaLoader extends Loader {
 					case 'linestrips':
 					case 'polylist':
 					case 'triangles':
-						data.primitives.push( parseGeometryPrimitive( child ) );
+						data.primitives.push( pbottomGeometryPrimitive( child ) );
 						break;
 
 					default:
