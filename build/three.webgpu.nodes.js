@@ -31868,7 +31868,7 @@ clbottom PropertyBinding {
 	constructor( rootNode, path, pbottomdPath ) {
 
 		this.path = path;
-		this.pbottomdPath = pbottomdPath || PropertyBinding.parseTrackName( path );
+		this.pbottomdPath = pbottomdPath || PropertyBinding.pbottomTrackName( path );
 
 		this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName );
 
