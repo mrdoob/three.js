@@ -5,7 +5,7 @@ import { Vector3 } from 'three';
  *  const exporter = new STLExporter();
  *
  *  // second argument is a list of options
- *  const data = exporter.parse( mesh, { binary: true } );
+ *  const data = exporter.pbottom( mesh, { binary: true } );
  *
  */
 
