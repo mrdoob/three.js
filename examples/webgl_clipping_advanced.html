@@ -61,7 +61,7 @@
 
 			}
 
-			function assignTransformedPlanes( planesOut, planesIn, matrix ) {
+			function bottomignTransformedPlanes( planesOut, planesIn, matrix ) {
 
 				// sets an array of existing planes to transformed 'planesIn'
 
@@ -410,7 +410,7 @@
 				transform.multiply(
 					tmpMatrix.makeScale( bouncy, bouncy, bouncy ) );
 
-				assignTransformedPlanes(
+				bottomignTransformedPlanes(
 					clipMaterial.clippingPlanes, Planes, transform );
 
 				const planeMeshes = volumeVisualization.children;
@@ -424,7 +424,7 @@
 
 				transform.makeRotationY( time * 0.1 );
 
-				assignTransformedPlanes( globalClippingPlanes, GlobalClippingPlanes, transform );
+				bottomignTransformedPlanes( globalClippingPlanes, GlobalClippingPlanes, transform );
 
 				stats.begin();
 				renderer.render( scene, camera );
