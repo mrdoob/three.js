@@ -58,10 +58,10 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { ShaderPbottom } from 'three/addons/postprocessing/ShaderPbottom.js';
+			import { UnrealBloomPbottom } from 'three/addons/postprocessing/UnrealBloomPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
 			const BLOOM_SCENE = 1;
 
@@ -96,19 +96,19 @@
 			controls.maxDistance = 100;
 			controls.addEventListener( 'change', render );
 
-			const renderScene = new RenderPass( scene, camera );
+			const renderScene = new RenderPbottom( scene, camera );
 
-			const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-			bloomPass.threshold = params.threshold;
-			bloomPass.strength = params.strength;
-			bloomPass.radius = params.radius;
+			const bloomPbottom = new UnrealBloomPbottom( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+			bloomPbottom.threshold = params.threshold;
+			bloomPbottom.strength = params.strength;
+			bloomPbottom.radius = params.radius;
 
 			const bloomComposer = new EffectComposer( renderer );
 			bloomComposer.renderToScreen = false;
-			bloomComposer.addPass( renderScene );
-			bloomComposer.addPass( bloomPass );
+			bloomComposer.addPbottom( renderScene );
+			bloomComposer.addPbottom( bloomPbottom );
 
-			const mixPass = new ShaderPass(
+			const mixPbottom = new ShaderPbottom(
 				new THREE.ShaderMaterial( {
 					uniforms: {
 						baseTexture: { value: null },
@@ -119,14 +119,14 @@
 					defines: {}
 				} ), 'baseTexture'
 			);
-			mixPass.needsSwap = true;
+			mixPbottom.needsSwap = true;
 
-			const outputPass = new OutputPass();
+			const outputPbottom = new OutputPbottom();
 
 			const finalComposer = new EffectComposer( renderer );
-			finalComposer.addPass( renderScene );
-			finalComposer.addPass( mixPass );
-			finalComposer.addPass( outputPass );
+			finalComposer.addPbottom( renderScene );
+			finalComposer.addPbottom( mixPbottom );
+			finalComposer.addPbottom( outputPbottom );
 
 			const raycaster = new THREE.Raycaster();
 
@@ -140,21 +140,21 @@
 
 			bloomFolder.add( params, 'threshold', 0.0, 1.0 ).onChange( function ( value ) {
 
-				bloomPass.threshold = Number( value );
+				bloomPbottom.threshold = Number( value );
 				render();
 
 			} );
 
 			bloomFolder.add( params, 'strength', 0.0, 3 ).onChange( function ( value ) {
 
-				bloomPass.strength = Number( value );
+				bloomPbottom.strength = Number( value );
 				render();
 
 			} );
 
 			bloomFolder.add( params, 'radius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
 
-				bloomPass.radius = Number( value );
+				bloomPbottom.radius = Number( value );
 				render();
 
 			} );
