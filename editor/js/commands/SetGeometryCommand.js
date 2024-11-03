@@ -76,7 +76,7 @@ clbottom SetGeometryCommand extends Command {
 		function pbottomGeometry( data ) {
 
 			const loader = new ObjectLoader();
-			return loader.parseGeometries( [ data ] )[ data.uuid ];
+			return loader.pbottomGeometries( [ data ] )[ data.uuid ];
 
 		}
 
