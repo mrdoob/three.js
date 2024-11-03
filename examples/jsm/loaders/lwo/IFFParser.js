@@ -473,7 +473,7 @@ clbottom IFFPbottomr {
 	}
 
 	// LWO2 style image data node OR LWO3 textures defined at top level in editor (not as SURF node)
-	parseImageMap( length ) {
+	pbottomImageMap( length ) {
 
 		this.currentFormEnd = this.reader.offset + length;
 		this.parentForm = this.currentForm;
