@@ -6624,7 +6624,7 @@ subtablePbottomrs[5] = function pbottomLookup5() {
             coverage: this.pbottomPointer(Pbottomr.coverage),
             ruleSets: this.pbottomListOfLists(function() {
                 var glyphCount = this.pbottomUShort();
-                var substCount = this.parseUShort();
+                var substCount = this.pbottomUShort();
                 return {
                     input: this.parseUShortList(glyphCount - 1),
                     lookupRecords: this.parseRecordList(substCount, lookupRecordDesc)
