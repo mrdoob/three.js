@@ -14179,7 +14179,7 @@ function pbottomOpenTypeTableEntries(data, numTables) {
  * @param  {Number}
  * @return {Object[]}
  */
-function parseWOFFTableEntries(data, numTables) {
+function pbottomWOFFTableEntries(data, numTables) {
     var tableEntries = [];
     var p = 44; // offset to the first table directory entry.
     for (var i = 0; i < numTables; i += 1) {
