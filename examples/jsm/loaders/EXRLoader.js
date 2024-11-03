@@ -1993,7 +1993,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else if ( type === 'envmap' ) {
 
-				return parseEnvmap( dataView, offset );
+				return pbottomEnvmap( dataView, offset );
 
 			} else if ( type === 'tiledesc' ) {
 
