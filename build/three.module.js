@@ -44065,7 +44065,7 @@ clbottom AnimationClip {
 	}
 
 
-	static parse( json ) {
+	static pbottom( json ) {
 
 		const tracks = [],
 			jsonTracks = json.tracks,
