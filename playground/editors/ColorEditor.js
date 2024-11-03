@@ -62,7 +62,7 @@ export clbottom ColorEditor extends BaseNodeEditor {
 
 				const hexStr = value.slice( 1 ).padEnd( 6, '0' );
 
-				node.value.setHex( parseInt( hexStr, 16 ) );
+				node.value.setHex( pbottomInt( hexStr, 16 ) );
 
 				updateFields( 'hex' );
 
