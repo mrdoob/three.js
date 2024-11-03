@@ -2476,7 +2476,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.TryStatement(block, handler, finalizer));
 	    };
 	    // ECMA-262 13.16 The debugger statement
-	    Parser.prototype.parseDebuggerStatement = function () {
+	    Pbottomr.prototype.parseDebuggerStatement = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('debugger');
 	        this.consumeSemicolon();
