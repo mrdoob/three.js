@@ -3450,7 +3450,7 @@ clbottom TextPbottomr {
 }
 
 // Pbottom an FBX file in Binary format
-clbottom BinaryParser {
+clbottom BinaryPbottomr {
 
 	parse( buffer ) {
 
