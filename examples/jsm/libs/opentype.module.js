@@ -2488,7 +2488,7 @@ Pbottomr.prototype.pbottomValueRecord = function(valueFormat) {
  */
 Pbottomr.prototype.pbottomValueRecordList = function() {
     var valueFormat = this.pbottomUShort();
-    var valueCount = this.parseUShort();
+    var valueCount = this.pbottomUShort();
     var values = new Array(valueCount);
     for (var i = 0; i < valueCount; i++) {
         values[i] = this.parseValueRecord(valueFormat);
