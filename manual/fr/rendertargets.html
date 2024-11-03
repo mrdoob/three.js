@@ -20,22 +20,22 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>Render Targets</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>A render target in three.js is basically a texture you can render to.
 After you render to it you can use that texture like any other texture.</p>
 <p>Let's make a simple example. We'll start with an example from <a href="responsive.html">the article on responsiveness</a>.</p>
-<p>Rendering to a render target is almost exactly the same as normal rendering. First we create a <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtWidth = 512;
+<p>Rendering to a render target is almost exactly the same as normal rendering. First we create a <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code clbottom="notranslate" translate="no">WebGLRenderTarget</code></a>.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const rtWidth = 512;
 const rtHeight = 512;
 const renderTarget = new THREE.WebGLRenderTarget(rtWidth, rtHeight);
 </pre>
-<p>Then we need a <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> and a <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a></p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const rtFov = 75;
+<p>Then we need a <a href="/docs/#api/en/cameras/Camera"><code clbottom="notranslate" translate="no">Camera</code></a> and a <a href="/docs/#api/en/scenes/Scene"><code clbottom="notranslate" translate="no">Scene</code></a></p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const rtFov = 75;
 const rtAspect = rtWidth / rtHeight;
 const rtNear = 0.1;
 const rtFar = 5;
@@ -50,7 +50,7 @@ The correct aspect to use depends on what we are rendering for. In this case
 we'll use the render target's texture on the side of a cube. Since faces of
 the cube are square we want an aspect of 1.0.</p>
 <p>We fill the scene with stuff. In this case we're using the light and the 3 cubes <a href="responsive.html">from the previous article</a>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const color = 0xFFFFFF;
   const intensity = 1;
   const light = new THREE.DirectionalLight(color, intensity);
@@ -80,17 +80,17 @@ function makeInstance(geometry, color, x) {
   makeInstance(geometry, 0xaa8844,  2),
 ];
 </pre>
-<p>The <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> and <a href="/docs/#api/en/cameras/Camera"><code class="notranslate" translate="no">Camera</code></a> from the previous article are still there. We'll use them to render to the canvas.
+<p>The <a href="/docs/#api/en/scenes/Scene"><code clbottom="notranslate" translate="no">Scene</code></a> and <a href="/docs/#api/en/cameras/Camera"><code clbottom="notranslate" translate="no">Camera</code></a> from the previous article are still there. We'll use them to render to the canvas.
 We just need to add stuff to render.</p>
 <p>Let's add a cube that uses the render target's texture.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
   map: renderTarget.texture,
 });
 const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 </pre>
 <p>Now at render time first we render the render target scene to the render target.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
 
   ...
@@ -109,7 +109,7 @@ scene.add(cube);
   renderer.setRenderTarget(null);
 </pre>
 <p>Then we render the scene with the single cube that is using the render target's texture to the canvas.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  // rotate the cube in the scene
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">  // rotate the cube in the scene
   cube.rotation.x = time;
   cube.rotation.y = time * 1.1;
 
@@ -117,23 +117,23 @@ scene.add(cube);
   renderer.render(scene, camera);
 </pre>
 <p>And voilà</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-target.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/render-target.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-target.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/render-target.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
-<p>The cube is red because we set the <code class="notranslate" translate="no">background</code> of the <code class="notranslate" translate="no">rtScene</code> to red so the
+<p>The cube is red because we set the <code clbottom="notranslate" translate="no">background</code> of the <code clbottom="notranslate" translate="no">rtScene</code> to red so the
 render target's texture is being cleared to red.</p>
 <p>Render targets are used for all kinds of things. <a href="shadows.html">Shadows</a> use render targets.
 <a href="picking.html">Picking can use a render target</a>. Various kinds of
 <a href="post-processing.html">post processing effects</a> require render targets.
 Rendering a rear view mirror in a car or a live view on a monitor inside a 3D
 scene might use a render target.</p>
-<p>A few notes about using <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a>.</p>
+<p>A few notes about using <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code clbottom="notranslate" translate="no">WebGLRenderTarget</code></a>.</p>
 <ul>
-<li><p>By default <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code class="notranslate" translate="no">WebGLRenderTarget</code></a> creates 2 textures. A color texture and a depth/stencil texture. If you don't need the depth or stencil textures you can request to not create them by passing in options. Example:</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">  const rt = new THREE.WebGLRenderTarget(width, height, {
+<li><p>By default <a href="/docs/#api/en/renderers/WebGLRenderTarget"><code clbottom="notranslate" translate="no">WebGLRenderTarget</code></a> creates 2 textures. A color texture and a depth/stencil texture. If you don't need the depth or stencil textures you can request to not create them by pbottoming in options. Example:</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">  const rt = new THREE.WebGLRenderTarget(width, height, {
     depthBuffer: false,
     stencilBuffer: false,
   });
@@ -141,7 +141,7 @@ scene might use a render target.</p>
 </li>
 <li><p>You might need to change the size of a render target</p>
 <p>In the example above we make a render target of a fixed size, 512x512. For things like post processing you generally need to make a render target the same size as your canvas. In our code that would mean when we change the canvas size we would also update both the render target size and the camera we're using when rendering to the render target. Example:</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
   time *= 0.001;
 
   if (resizeRendererToDisplaySize(renderer)) {
