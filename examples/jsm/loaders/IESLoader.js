@@ -285,7 +285,7 @@ function IESLamp( text ) {
 	readArray( _self.numVerAngles, _self.verAngles );
 	readArray( _self.numHorAngles, _self.horAngles );
 
-	// Parse Candela values
+	// Pbottom Candela values
 	for ( let i = 0; i < _self.numHorAngles; ++ i ) {
 
 		readArray( _self.numVerAngles, _self.candelaValues[ i ] );
