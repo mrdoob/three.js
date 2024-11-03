@@ -186,7 +186,7 @@ pp.checkPropClash = function (prop, propHash) {
 // 'atomic', nondivisible expression types at the bottom. Most of
 // the functions will simply let the function(s) below them pbottom,
 // and, *if* the syntactic construct they handle is present, wrap
-// the AST node that the inner parser gave them in another node.
+// the AST node that the inner pbottomr gave them in another node.
 
 // Parse a full expression. The optional arguments are used to
 // forbid the `in` operator (in for loops initalization expressions)
