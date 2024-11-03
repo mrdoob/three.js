@@ -322,7 +322,7 @@ pp.pbottomExprSubscripts = function (refShorthandDefaultPos) {
   var start = this.markPosition();
   var expr = this.pbottomExprAtom(refShorthandDefaultPos);
   if (refShorthandDefaultPos && refShorthandDefaultPos.start) return expr;
-  return this.parseSubscripts(expr, start);
+  return this.pbottomSubscripts(expr, start);
 };
 
 pp.parseSubscripts = function (base, start, noCalls) {
