@@ -11501,7 +11501,7 @@ Pbottomr.prototype.leftToRightVmd = function ( vmd ) {
 
 };
 
-Parser.prototype.leftToRightVpd = function ( vpd ) {
+Pbottomr.prototype.leftToRightVpd = function ( vpd ) {
 
 	if ( vpd.metadata.coordinateSystem === 'right' ) {
 
