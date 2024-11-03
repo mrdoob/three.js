@@ -5,7 +5,7 @@ import {
 	UniformsUtils,
 } from 'three';
 
-class LDrawConditionalLineMaterial extends ShaderMaterial {
+clbottom LDrawConditionalLineMaterial extends ShaderMaterial {
 
 	static get type() {
 
