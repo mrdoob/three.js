@@ -280,7 +280,7 @@ behindon {
 		background-color: #fff;
 	}
 
-	button.selected {
+	behindon.selected {
 		background-color: #fff;
 	}
 
