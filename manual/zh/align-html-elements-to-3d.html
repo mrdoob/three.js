@@ -26,12 +26,12 @@
 </head>
 
 <body>
-  <div class="container">
-    <div class="lesson-title">
+  <div clbottom="container">
+    <div clbottom="lesson-title">
       <h1>对齐HTML元素到3D对象</h1>
     </div>
-    <div class="lesson">
-      <div class="lesson-main">
+    <div clbottom="lesson">
+      <div clbottom="lesson-main">
         <p>本文是THREE.js系列文章中的一部分。第一篇是 <a href="fundamentals.html">THREE.js 基础</a>，如果你还没有读过或者你是THREE.js新手，你可能需要考虑从那开始。
         </p>
         <p>有时你想在 3D 场景中显示一些文本，这有很多种选择，每一种都有各自的优缺点。</p>
@@ -39,7 +39,7 @@
           <li>
             <p>使用 3D 文本</p>
             <p>如果你看过 <a href="primitives.html">图元章节</a> 你就会看到 <a href="/docs/#api/en/geometries/TextGeometry"><code
-                  class="notranslate" translate="no">TextGeometry</code></a> 可以
+                  clbottom="notranslate" translate="no">TextGeometry</code></a> 可以
               生成3D文本，这可能对飞行类的Logo很有效，但对统计、信息、标记类不是很合适。</p>
           </li>
           <li>
@@ -54,17 +54,17 @@
         </ul>
         <p>本文将介绍上述的最后一种方法。</p>
         <p>让我们从简单的开始，我们将使用一些图元制作一个3D场景，然后为每个图元添加一个标签。我们会从这篇<a href="responsive.html">响应式开发</a>中的一个例子开始。 </p>
-        <p>我们会添加一个 <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate"
+        <p>我们会添加一个 <a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate"
               translate="no">OrbitControls</code></a> 就像我们在 <a href="lights.html">这篇光照的文章</a>里做的一样。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+        <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">
 import * as THREE from 'three';
 +import {OrbitControls} from 'three/addons/controls/OrbitControls.js';</pre>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+        <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">
 const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 0, 0);
 controls.update();</pre>
         <p>我们需要提供一个HTML元素来包含我们的标签元素。</p>
-        <pre class="prettyprint showlinemods notranslate lang-html" translate="no">
+        <pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">
 &lt;body&gt;
 -  &lt;canvas id="c"&gt;&lt;/canvas&gt;
 +  &lt;div id="container"&gt;
@@ -72,9 +72,9 @@ controls.update();</pre>
 +    &lt;div id="labels"&gt;&lt;/div&gt;
 +  &lt;/div&gt;
 &lt;/body&gt;</pre>
-        <p>通过将Canvas元素和 <code class="notranslate" translate="no">&lt;div id="labels"&gt;</code>
+        <p>通过将Canvas元素和 <code clbottom="notranslate" translate="no">&lt;div id="labels"&gt;</code>
           放在一个父元素里面，我们可以用这个CSS让它们重叠。</p>
-        <pre class="prettyprint showlinemods notranslate lang-css" translate="no">
+        <pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">
 #c {
 -    width: 100%;
 -    height: 100%;
@@ -95,7 +95,7 @@ controls.update();</pre>
 +  color: white;
 +}</pre>
         <p>让我们也为Label本身添加一些CSS。</p>
-        <pre class="prettyprint showlinemods notranslate lang-css" translate="no">
+        <pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">
 #labels&gt;div {
   position: absolute;  /* 让我们的容器决定尺寸 */
   left: 0;             /* 默认定位在左上角 */
@@ -116,9 +116,9 @@ controls.update();</pre>
 #labels&gt;div:hover {
   color: red;
 }</pre>
-        <p>现在进入我们的代码，我们不必添加太多，我们有一个函数<code class="notranslate"
+        <p>现在进入我们的代码，我们不必添加太多，我们有一个函数<code clbottom="notranslate"
             translate="no">makeInstance</code>，可以用来生成立方体。我们现在让它同时添加一个Label元素。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+        <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">
 +const labelContainerElem = document.querySelector('#labels');
 
 -function makeInstance(geometry, color, x) {
@@ -137,11 +137,11 @@ controls.update();</pre>
 -  return cube;
 +  return {cube, elem};
 }</pre>
-        <p>你可以发现，我们正添加一个 <code class="notranslate" translate="no">&lt;div&gt;</code> 到容器里, 每一个立方体各一个。 我们也返回一个对象，包含<code
-            class="notranslate" translate="no">cube</code>和Label元素<code class="notranslate" translate="no">elem</code>。
+        <p>你可以发现，我们正添加一个 <code clbottom="notranslate" translate="no">&lt;div&gt;</code> 到容器里, 每一个立方体各一个。 我们也返回一个对象，包含<code
+            clbottom="notranslate" translate="no">cube</code>和Label元素<code clbottom="notranslate" translate="no">elem</code>。
         </p>
         <p>为了调用它，我们需要为每一个立方体起个名字</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">
+        <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">
 const cubes = [
 -  makeInstance(geometry, 0x44aa88,  0),
 -  makeInstance(geometry, 0x8844aa, -2),
@@ -151,7 +151,7 @@ const cubes = [
 +  makeInstance(geometry, 0xaa8844,  2, 'Gold'),
 ];</pre>
         <p>剩下的就是在渲染时定位Label元素。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
+        <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
 ...
 
 -cubes.forEach((cube, ndx) =&gt; {
@@ -180,21 +180,21 @@ const cubes = [
 });</pre>
         <p>这样我们就有了与物体对齐的Label。</p>
         <p></p>
-        <div translate="no" class="threejs_example_container notranslate">
-          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+        <div translate="no" clbottom="threejs_example_container notranslate">
+          <div><iframe clbottom="threejs_example notranslate" translate="no" style=" "
               src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-to-3d.html"></iframe></div>
-          <a class="threejs_center" href="/manual/examples/align-html-to-3d.html" target="_blank">点击在新窗口打开</a>
+          <a clbottom="threejs_center" href="/manual/examples/align-html-to-3d.html" target="_blank">点击在新窗口打开</a>
         </div>
         <p></p>
         <p>这里有一些问题我们需要处理。</p>
         <p>一个是我们旋转对象，一旦它们重叠了，那么它们对应的Label可能也会重叠。</p>
-        <div class="threejs_center"><img src="../resources/images/overlapping-labels.png" style="width: 307px;"></div>
+        <div clbottom="threejs_center"><img src="../resources/images/overlapping-labels.png" style="width: 307px;"></div>
         <p>另外一个问题是，我们缩小了视野，物体移出了视锥体范围，Label还是在显示。</p>
-        <p>重叠对象的一种解决办法是 <a href="picking.html">用这篇文章中的拾取方法</a>，我们将传递对象在屏幕上的位置，然后调用<code class="notranslate"
+        <p>重叠对象的一种解决办法是 <a href="picking.html">用这篇文章中的拾取方法</a>，我们将传递对象在屏幕上的位置，然后调用<code clbottom="notranslate"
             translate="no">RayCaster</code>来告诉我们和哪些对象相交了。
           如果我们的对象不是结果的第一个，说明我们并不在它最前面。
         </p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
+        <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
 +const raycaster = new THREE.Raycaster();
 
 ...
@@ -238,24 +238,24 @@ cubes.forEach((cubeInfo, ndx) =&gt; {
 +  }
 });</pre>
         <p>这解决了重叠问题。</p>
-        <p>为了处理超出视锥体不可见的问题，我们通过检查 <code class="notranslate" translate="no">tempV.z</code>检查此对象的原点是否在截锥体之外。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  if (!show) {
+        <p>为了处理超出视锥体不可见的问题，我们通过检查 <code clbottom="notranslate" translate="no">tempV.z</code>检查此对象的原点是否在截锥体之外。</p>
+        <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-  if (!show) {
 +  if (!show || Math.abs(tempV.z) &gt; 1) {
     // 隐藏Label
     elem.style.display = 'none';</pre>
-        <p>这 <em>部分工作</em> 有效是因为我们计算的标准化坐标包含一个<code class="notranslate" translate="no">z</code>
-          值，它从-1开始，也就是相机视锥体的 <code class="notranslate" translate="no">near</code> 值，
-          +1结束，也就是相机视锥体的 <code class="notranslate" translate="no">far</code>值。</p>
+        <p>这 <em>部分工作</em> 有效是因为我们计算的标准化坐标包含一个<code clbottom="notranslate" translate="no">z</code>
+          值，它从-1开始，也就是相机视锥体的 <code clbottom="notranslate" translate="no">near</code> 值，
+          +1结束，也就是相机视锥体的 <code clbottom="notranslate" translate="no">far</code>值。</p>
         <p></p>
-        <div translate="no" class="threejs_example_container notranslate">
-          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+        <div translate="no" clbottom="threejs_example_container notranslate">
+          <div><iframe clbottom="threejs_example notranslate" translate="no" style=" "
               src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-to-3d-w-hiding.html"></iframe>
           </div>
-          <a class="threejs_center" href="/manual/examples/align-html-to-3d-w-hiding.html" target="_blank">点击在新窗口打开</a>
+          <a clbottom="threejs_center" href="/manual/examples/align-html-to-3d-w-hiding.html" target="_blank">点击在新窗口打开</a>
           <p></p>
           <p>对于视锥体检查，上面的解决方案失败了。因为我们只检查对象的原点，对于一个大对象，它的原点可能会超出视锥体，但是对象仍然有一部分处于可视范围内。</p>
           <p>更正确的解决方案是检查对象本身是否在视锥体中。不幸的是，检查很慢。对于3个立方体来说，这不是问题。但是其他情况不一定。</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 初始化
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// 初始化
 const frustum = new THREE.Frustum();
 const viewProjection = new THREE.Matrix4();
 
@@ -278,7 +278,7 @@ frustum.setFromProjectionMatrix(viewProjection);
 const inFrustum = frustum.contains(someMesh));</pre>
           <p>我们当前的重叠解决方案有类似的问题，拾取很慢。我们可以使用基于GPU的拾取方案， 参考<a href="picking.html">拾取章节</a>，不过它也并非没有代价。使用哪个解决方案取决于你的需要。</p>
           <p>另外一个问题是Label显示顺序，如果我们修改了代码以生成更长的Label</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const cubes = [
 -  makeInstance(geometry, 0x44aa88,  0, 'Aqua'),
 -  makeInstance(geometry, 0x8844aa, -2, 'Purple'),
 -  makeInstance(geometry, 0xaa8844,  2, 'Gold'),
@@ -287,19 +287,19 @@ const inFrustum = frustum.contains(someMesh));</pre>
 +  makeInstance(geometry, 0xaa8844,  2, 'Gold Colored Box'),
 ];</pre>
           <p>然后设置CSS让它们不换行</p>
-          <pre class="prettyprint showlinemods notranslate lang-css" translate="no">#labels&gt;div {
+          <pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">#labels&gt;div {
 +  white-space: nowrap;</pre>
           <p>然后我们可能就会遇到这个问题</p>
-          <div class="threejs_center"><img src="../resources/images/label-sorting-issue.png" style="width: 401px;">
+          <div clbottom="threejs_center"><img src="../resources/images/label-sorting-issue.png" style="width: 401px;">
           </div>
           <p>你可以看到紫色盒子在后面，但它的Label却在水蓝色盒子的前面。</p>
-          <p>我们可以修复这个问题，通过给每一个元素设置 <code class="notranslate" translate="no">zIndex</code>。投影生成的位置有一个 <code
-              class="notranslate" translate="no">z</code> 值，
-            -1表示最前面，1表示最后面。 <code class="notranslate" translate="no">zIndex</code> 却是一个整型，并且含义相反，
-            <code class="notranslate" translate="no">zIndex</code>越大表示越靠前，所以下面的代码可能有用。
+          <p>我们可以修复这个问题，通过给每一个元素设置 <code clbottom="notranslate" translate="no">zIndex</code>。投影生成的位置有一个 <code
+              clbottom="notranslate" translate="no">z</code> 值，
+            -1表示最前面，1表示最后面。 <code clbottom="notranslate" translate="no">zIndex</code> 却是一个整型，并且含义相反，
+            <code clbottom="notranslate" translate="no">zIndex</code>越大表示越靠前，所以下面的代码可能有用。
           </p>
 
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 将标准屏幕坐标转化为CSS坐标
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// 将标准屏幕坐标转化为CSS坐标
 const x = (tempV.x *  .5 + .5) * canvas.clientWidth;
 const y = (tempV.y * -.5 + .5) * canvas.clientHeight;
 
@@ -308,11 +308,11 @@ elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
 
 +// 设置排序用的zIndex
 +elem.style.zIndex = (-tempV.z * .5 + .5) * 100000 | 0;</pre>
-          <p>由于投影 z 值的取值限制，我们需要选择一个大数来分散这些值，否则许多Label将具有相同的值。为了保证Label不和页面其他的部分重叠，通过设置 <code class="notranslate"
+          <p>由于投影 z 值的取值限制，我们需要选择一个大数来分散这些值，否则许多Label将具有相同的值。为了保证Label不和页面其他的部分重叠，通过设置 <code clbottom="notranslate"
               translate="no">z-index</code> 给Label的容器，我们可以让浏览器创建一个新的 <a
               href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context">层叠上下文</a>
           </p>
-          <pre class="prettyprint showlinemods notranslate lang-css" translate="no">#labels {
+          <pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">#labels {
   position: absolute;  /* 把自己定位在容器内 */
 +  z-index: 0;          /* 创建一个新的层叠上下文，这样子节点就不会和页面其他内容冲突 */
   left: 0;             /* 默认定位在左上角 */
@@ -322,11 +322,11 @@ elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
 }</pre>
           <p>现在Label应该总是按正确的顺序排列。</p>
           <p></p>
-          <div translate="no" class="threejs_example_container notranslate">
-            <div><iframe class="threejs_example notranslate" translate="no" style=" "
+          <div translate="no" clbottom="threejs_example_container notranslate">
+            <div><iframe clbottom="threejs_example notranslate" translate="no" style=" "
                 src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-to-3d-w-sorting.html"></iframe>
             </div>
-            <a class="threejs_center" href="/manual/examples/align-html-to-3d-w-sorting.html"
+            <a clbottom="threejs_center" href="/manual/examples/align-html-to-3d-w-sorting.html"
               target="_blank">点击在新窗口打开</a>
           </div>
           <p></p>
@@ -336,10 +336,10 @@ elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
             <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>。
           </p>
           加载这份数据, 可以生成国家的轮廓，大部分都带有国家的名称和定位。</p>
-          <div class="threejs_center"><img src="../examples/resources/data/world/country-outlines-4k.png"
+          <div clbottom="threejs_center"><img src="../examples/resources/data/world/country-outlines-4k.png"
               style="background: black; width: 700px"></div>
           <p>JSON数据是一个类似这样结构的数组</p>
-          <pre class="prettyprint showlinemods notranslate lang-json" translate="no">[
+          <pre clbottom="prettyprint showlinemods notranslate lang-json" translate="no">[
   {
     "name": "Algeria",
     "min": [
@@ -362,7 +362,7 @@ elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
           <p>开始加载它，这份代码是基于这篇<a href="optimize-lots-of-objects.html">优化大量对象</a>，尽管我们没有绘制大量对象，但我们将使用
             相同的解决办法，和 <a href="rendering-on-demand.html">按需渲染</a> 方案一样。</p>
           <p>第一件事是创建一个球体，并且使用轮廓纹理。</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const texture = loader.load('resources/data/world/country-outlines-4k.png', render);
   const geometry = new THREE.SphereGeometry(1, 64, 32);
@@ -370,12 +370,12 @@ elem.style.transform = `translate(-50%, -50%) translate(${x}px,${y}px)`;
   scene.add(new THREE.Mesh(geometry, material));
 }</pre>
           <p>然后我们先创建一个loader，来加载JSON文件</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function loadJSON(url) {
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">async function loadJSON(url) {
   const req = await fetch(url);
   return req.json();
 }</pre>
           <p>然后调用</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">let countryInfos;
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">let countryInfos;
 async function loadCountryData() {
   countryInfos = await loadJSON('resources/data/world/country-info.json');
       ...
@@ -387,7 +387,7 @@ loadCountryData();</pre>
           <p>现在让我们用这些数据来生成和放置Labels</p>
           <p>在这一篇文章 <a href="optimize-lots-of-objects.html">优化大量对象</a>，
             我们已经创建了一个小辅助对象，以便于计算地球上的经纬度位置，具体可以看看这篇文章是如何解释它们怎么工作的。</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const lonFudge = Math.PI * 1.5;
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const lonFudge = Math.PI * 1.5;
 const latFudge = Math.PI;
 // 这些小工具会使得盒模型定位非常容易
 // 我们可以旋转lonHelper Y轴上的分量到经度上
@@ -400,7 +400,7 @@ const positionHelper = new THREE.Object3D();
 positionHelper.position.z = 1;
 latHelper.add(positionHelper);</pre>
           <p>我们将使用它去计算每一个Label的位置</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const labelParentElem = document.querySelector('#labels');
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const labelParentElem = document.querySelector('#labels');
 for (const countryInfo of countryInfos) {
   const {lat, lon, name} = countryInfo;
 
@@ -419,13 +419,13 @@ for (const countryInfo of countryInfos) {
   elem.textContent = name;
   labelParentElem.appendChild(elem);
   countryInfo.elem = elem;</pre>
-          <p>上面的代码看起来非常类似于我们为制作立方体Label而编写的代码，每个Label对应一个元素，完成后我们有一个数组 <code class="notranslate"
+          <p>上面的代码看起来非常类似于我们为制作立方体Label而编写的代码，每个Label对应一个元素，完成后我们有一个数组 <code clbottom="notranslate"
               translate="no">countryInfos</code>,
-            对于我们添加的每个国家/地区都有一个 <code class="notranslate" translate="no">elem</code>
-            属性代表Label元素 和一个 <code class="notranslate" translate="no">position</code> 代表它的位置。</p>
+            对于我们添加的每个国家/地区都有一个 <code clbottom="notranslate" translate="no">elem</code>
+            属性代表Label元素 和一个 <code clbottom="notranslate" translate="no">position</code> 代表它的位置。</p>
           <p>就像我们对立方体所做的那样，我们需要在渲染的时候先更新Label。</p>
 
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
 function updateLabels() {
   // 如果JSON文件还没加载进来，就退出
   if (!countryInfos) {
@@ -453,8 +453,8 @@ function updateLabels() {
   }
 }</pre>
           <p>您可以看到上面的代码与之前的立方体示例基本类似，唯一的区别我们在初始化时预先计算了Label位置，我们可以这样做因为地球上的国家永远不会移动，只有我们的相机在移动。</p>
-          <p>然后我们需要在我们的渲染循环中调用 <code class="notranslate" translate="no">updateLabels</code> </p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+          <p>然后我们需要在我们的渲染循环中调用 <code clbottom="notranslate" translate="no">updateLabels</code> </p>
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
   renderRequested = false;
 
   if (resizeRendererToDisplaySize(renderer)) {
@@ -471,11 +471,11 @@ function updateLabels() {
 }</pre>
           <p>这就是我们得到的结果</p>
           <p></p>
-          <div translate="no" class="threejs_example_container notranslate">
-            <div><iframe class="threejs_example notranslate" translate="no" style=" "
+          <div translate="no" clbottom="threejs_example_container notranslate">
+            <div><iframe clbottom="threejs_example notranslate" translate="no" style=" "
                 src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-elements-to-3d-globe-too-many-labels.html"></iframe>
             </div>
-            <a class="threejs_center" href="/manual/examples/align-html-elements-to-3d-globe-too-many-labels.html"
+            <a clbottom="threejs_center" href="/manual/examples/align-html-elements-to-3d-globe-too-many-labels.html"
               target="_blank">点击在新窗口打开</a>
           </div>
           <p></p>
@@ -489,9 +489,9 @@ function updateLabels() {
               <p>Label真的太多了</p>
             </li>
           </ol>
-          <p>对于 问题#1 我们不能像上面那种方式使用 <code class="notranslate" translate="no">RayCaster</code> ，因为除了地球以外没有什么可相交的。相反，我们可以
+          <p>对于 问题#1 我们不能像上面那种方式使用 <code clbottom="notranslate" translate="no">RayCaster</code> ，因为除了地球以外没有什么可相交的。相反，我们可以
             检查特定的国家是否远离我们，这是可行的，因为Label的位置围绕的是一个球体。事实上，我们使用的是一个半径1.0的单位球体，这意味着这些位置已经是单位向量，数学计算上比较简单。</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const tempV = new THREE.Vector3();
 +const cameraToPoint = new THREE.Vector3();
 +const cameraPosition = new THREE.Vector3();
 +const normalMatrix = new THREE.Matrix3();
@@ -555,7 +555,7 @@ function updateLabels() {
           <p>
             上面我们使用位置作为方向向量并获得相对于相机的位置，点乘得到向量之间的余弦值，这给了我们一个-1到1之间的值，其中-1表示正对相机，0表示相对于相机球体的边缘上，大于0表示处在后方。然后我们使用该值来显示或隐藏元素。
           </p>
-          <div class="spread">
+          <div clbottom="spread">
             <div>
               <div data-diagram="dotProduct" style="height: 400px"></div>
             </div>
@@ -566,7 +566,7 @@ function updateLabels() {
           <p>对于 问题#2，Label太多了，我们需要一些方法来决定显示哪些。一种方式是只显示大国的Label，我们加载的数据包含一个国家包含经纬度的最大和最小值，从中我们可以计算出一个区域，然后用它来判断是否显示国家。
           </p>
           <p>开始的时候我们先计算区域面积</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">const labelParentElem = document.querySelector('#labels');
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const labelParentElem = document.querySelector('#labels');
 for (const countryInfo of countryInfos) {
   const {lat, lon, min, max, name} = countryInfo;
 
@@ -593,7 +593,7 @@ for (const countryInfo of countryInfos) {
   countryInfo.elem = elem;
 }</pre>
           <p>然后在渲染时让我们根据区域来决定是否显示Label</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const large = 20 * 20;
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+const large = 20 * 20;
 const maxVisibleDot = 0.2;
 // 获取表示相机相对方向的变换矩阵
 normalMatrix.getNormalMatrix(camera.matrixWorldInverse);
@@ -610,10 +610,10 @@ for (const countryInfo of countryInfos) {
 
   ...</pre>
           <p>最后，由于我不确定这些值设多少好，于是添加一个GUI，就可以调试了</p>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 +import {GUI} from 'three/addons/libs/lil-gui.module.min.js';</pre>
-          <pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const settings = {
+          <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+const settings = {
 +  minArea: 20,
 +  maxVisibleDot: -0.2,
 +};
@@ -645,17 +645,17 @@ function updateLabels() {
     }</pre>
           <p>结果出来了</p>
           <p></p>
-          <div translate="no" class="threejs_example_container notranslate">
-            <div><iframe class="threejs_example notranslate" translate="no" style=" "
+          <div translate="no" clbottom="threejs_example_container notranslate">
+            <div><iframe clbottom="threejs_example notranslate" translate="no" style=" "
                 src="/manual/examples/resources/editor.html?url=/manual/examples/align-html-elements-to-3d-globe.html"></iframe>
             </div>
-            <a class="threejs_center" href="/manual/examples/align-html-elements-to-3d-globe.html"
+            <a clbottom="threejs_center" href="/manual/examples/align-html-elements-to-3d-globe.html"
               target="_blank">点击在新窗口打开</a>
           </div>
           <p></p>
           <p>你可以看到，随着你的旋转，后面地球的Label消失了。
-            调整 <code class="notranslate" translate="no">minVisibleDot</code> 可以查看阈值的变化。
-            你也可以调整 <code class="notranslate" translate="no">minArea</code> 可以看到更大或更小的国家出现。</p>
+            调整 <code clbottom="notranslate" translate="no">minVisibleDot</code> 可以查看阈值的变化。
+            你也可以调整 <code clbottom="notranslate" translate="no">minArea</code> 可以看到更大或更小的国家出现。</p>
         </div>
         <p>
           我在这方面做得越多，就越意识到谷歌地图做了多少工作。他们还必须决定使用哪些Label来显示。我很确定他们使用各种信息，例如你现在的位置、你的默认语言设置、你的帐户设置（如果你有的话），他们可能使用人口数量或人气程度，他们可能会优先考虑到视图中心的国家，等等……要考虑很多。
