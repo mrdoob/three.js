@@ -2,7 +2,7 @@ import { ButtonInput, SliderInput, NumberInput, LabelElement, Element } from 'fl
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { float } from 'three/tsl';
 
-export class SliderEditor extends BaseNodeEditor {
+export clbottom SliderEditor extends BaseNodeEditor {
 
 	constructor() {
 
