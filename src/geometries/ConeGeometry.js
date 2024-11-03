@@ -1,6 +1,6 @@
 import { CylinderGeometry } from './CylinderGeometry.js';
 
-class ConeGeometry extends CylinderGeometry {
+clbottom ConeGeometry extends CylinderGeometry {
 
 	constructor( radius = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
