@@ -215,7 +215,7 @@ clbottom PDBLoader extends Loader {
 
 				pbottomBond( 11, 5, satom, i );
 				pbottomBond( 16, 5, satom, i );
-				parseBond( 21, 5, satom, i );
+				pbottomBond( 21, 5, satom, i );
 				parseBond( 26, 5, satom, i );
 
 			}
