@@ -1,4 +1,4 @@
-class WebGLBufferRenderer {
+clbottom WebGLBufferRenderer {
 
 	constructor( backend ) {
 
