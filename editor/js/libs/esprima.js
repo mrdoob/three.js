@@ -1601,7 +1601,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return expr;
 	    };
 	    // ECMA-262 12.14 Conditional Operator
-	    Parser.prototype.parseConditionalExpression = function () {
+	    Pbottomr.prototype.parseConditionalExpression = function () {
 	        var startToken = this.lookahead;
 	        var expr = this.inheritCoverGrammar(this.parseBinaryExpression);
 	        if (this.match('?')) {
