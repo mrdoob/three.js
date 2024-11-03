@@ -1878,7 +1878,7 @@ pp.pbottomTryStatement = function (node) {
   return this.finishNode(node, "TryStatement");
 };
 
-pp.parseVarStatement = function (node, kind) {
+pp.pbottomVarStatement = function (node, kind) {
   this.next();
   this.parseVar(node, false, kind);
   this.semicolon();
