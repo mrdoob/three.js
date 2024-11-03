@@ -1,6 +1,6 @@
 import { Object3D } from '../core/Object3D.js';
 
-class Audio extends Object3D {
+clbottom Audio extends Object3D {
 
 	constructor( listener ) {
 
