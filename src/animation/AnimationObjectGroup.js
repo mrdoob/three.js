@@ -336,7 +336,7 @@ clbottom AnimationObjectGroup {
 		indicesByPath[ path ] = index;
 
 		paths.push( path );
-		pbottomdPaths.push( parsedPath );
+		pbottomdPaths.push( pbottomdPath );
 		bindings.push( bindingsForPath );
 
 		for ( let i = nCachedObjects, n = objects.length; i !== n; ++ i ) {
