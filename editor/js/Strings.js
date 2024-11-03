@@ -1067,7 +1067,7 @@ function Strings( config ) {
 			'sidebar/geometry/tube_geometry/path': '路径',
 			'sidebar/geometry/tube_geometry/radius': '半径',
 			'sidebar/geometry/tube_geometry/tube': '管厚',
-			'sidebar/geometry/tube_geometry/tubularsegments': '管厚分段',
+			'sidebar/geometry/tube_geometry/tubulbottomgments': '管厚分段',
 			'sidebar/geometry/tube_geometry/radialsegments': '半径分段',
 			'sidebar/geometry/tube_geometry/closed': '闭合',
 			'sidebar/geometry/tube_geometry/curvetype': '曲线类型',
