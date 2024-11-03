@@ -327,9 +327,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    BreakStatement: 'BreakStatement',
 	    CallExpression: 'CallExpression',
 	    CatchClause: 'CatchClause',
-	    ClassBody: 'ClassBody',
-	    ClassDeclaration: 'ClassDeclaration',
-	    ClassExpression: 'ClassExpression',
+	    ClbottomBody: 'ClbottomBody',
+	    ClbottomDeclaration: 'ClbottomDeclaration',
+	    ClbottomExpression: 'ClbottomExpression',
 	    ConditionalExpression: 'ConditionalExpression',
 	    ContinueStatement: 'ContinueStatement',
 	    DoWhileStatement: 'DoWhileStatement',
@@ -390,7 +390,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var assert_1 = __webpack_require__(4);
+	var bottomert_1 = __webpack_require__(4);
 	var messages_1 = __webpack_require__(5);
 	var error_handler_1 = __webpack_require__(6);
 	var token_1 = __webpack_require__(7);
@@ -485,7 +485,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        var args = Array.prototype.slice.call(arguments, 1);
 	        var msg = messageFormat.replace(/%(\d)/g, function (whole, idx) {
-	            assert_1.assert(idx < args.length, 'Message reference must be in range');
+	            bottomert_1.bottomert(idx < args.length, 'Message reference must be in range');
 	            return args[idx];
 	        });
 	        var index = this.lastMarker.index;
@@ -500,7 +500,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        var args = Array.prototype.slice.call(arguments, 1);
 	        var msg = messageFormat.replace(/%(\d)/g, function (whole, idx) {
-	            assert_1.assert(idx < args.length, 'Message reference must be in range');
+	            bottomert_1.bottomert(idx < args.length, 'Message reference must be in range');
 	            return args[idx];
 	        });
 	        var index = this.lastMarker.index;
@@ -756,7 +756,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Parser.prototype.matchContextualKeyword = function (keyword) {
 	        return this.lookahead.type === token_1.Token.Identifier && this.lookahead.value === keyword;
 	    };
-	    // Return true if the next token is an assignment operator
+	    // Return true if the next token is an bottomignment operator
 	    Parser.prototype.matchAssign = function () {
 	        if (this.lookahead.type !== token_1.Token.Punctuator) {
 	            return false;
@@ -778,7 +778,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    // Cover grammar support.
 	    //
-	    // When an assignment expression position starts with an left parenthesis, the determination of the type
+	    // When an bottomignment expression position starts with an left parenthesis, the determination of the type
 	    // of the syntax is to be deferred arbitrarily long until the end of the parentheses pair (plus a lookahead)
 	    // or the first comma. This situation also defers the determination of all the expressions nested in the pair.
 	    //
@@ -790,7 +790,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    //   3. AssignmentTargets
 	    //
 	    // In order to avoid exponential backtracking, we use two flags to denote if the production can be
-	    // binding element or assignment target.
+	    // binding element or bottomignment target.
 	    //
 	    // The three productions have the relationship:
 	    //
@@ -934,8 +934,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        this.nextToken();
 	                        expr = this.finalize(node, new Node.ThisExpression());
 	                    }
-	                    else if (this.matchKeyword('class')) {
-	                        expr = this.parseClassExpression();
+	                    else if (this.matchKeyword('clbottom')) {
+	                        expr = this.parseClbottomExpression();
 	                    }
 	                    else {
 	                        this.throwUnexpectedToken(this.nextToken());
@@ -1140,7 +1140,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    // ECMA-262 12.2.9 Template Literals
 	    Parser.prototype.parseTemplateHead = function () {
-	        assert_1.assert(this.lookahead.head, 'Template literal must start with a template head');
+	        bottomert_1.bottomert(this.lookahead.head, 'Template literal must start with a template head');
 	        var node = this.createNode();
 	        var token = this.nextToken();
 	        var value = {
@@ -1350,7 +1350,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Parser.prototype.parseNewExpression = function () {
 	        var node = this.createNode();
 	        var id = this.parseIdentifierName();
-	        assert_1.assert(id.name === 'new', 'New expression must start with `new`');
+	        bottomert_1.bottomert(id.name === 'new', 'New expression must start with `new`');
 	        var expr;
 	        if (this.match('.')) {
 	            this.nextToken();
@@ -1429,7 +1429,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.Super());
 	    };
 	    Parser.prototype.parseLeftHandSideExpression = function () {
-	        assert_1.assert(this.context.allowIn, 'callee of new expression always allow in keyword.');
+	        bottomert_1.bottomert(this.context.allowIn, 'callee of new expression always allow in keyword.');
 	        var node = this.startNode(this.lookahead);
 	        var expr = (this.matchKeyword('super') && this.context.inFunctionBody) ? this.parseSuper() :
 	            this.inheritCoverGrammar(this.matchKeyword('new') ? this.parseNewExpression : this.parsePrimaryExpression);
@@ -1640,7 +1640,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            case syntax_1.Syntax.YieldExpression:
 	                break;
 	            default:
-	                assert_1.assert(param.type === syntax_1.Syntax.ObjectPattern, 'Invalid type');
+	                bottomert_1.bottomert(param.type === syntax_1.Syntax.ObjectPattern, 'Invalid type');
 	                for (var i = 0; i < param.properties.length; i++) {
 	                    this.checkPatternParam(options, param.properties[i].value);
 	                }
@@ -1808,8 +1808,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                case 'function':
 	                    statement = this.parseFunctionDeclaration();
 	                    break;
-	                case 'class':
-	                    statement = this.parseClassDeclaration();
+	                case 'clbottom':
+	                    statement = this.parseClbottomDeclaration();
 	                    break;
 	                case 'let':
 	                    statement = this.isLexicalDeclaration() ? this.parseLexicalDeclaration({ inFor: false }) : this.parseStatement();
@@ -1887,7 +1887,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Parser.prototype.parseLexicalDeclaration = function (options) {
 	        var node = this.createNode();
 	        var kind = this.nextToken().value;
-	        assert_1.assert(kind === 'let' || kind === 'const', 'Lexical declaration must be either let or const');
+	        bottomert_1.bottomert(kind === 'let' || kind === 'const', 'Lexical declaration must be either let or const');
 	        var declarations = this.parseBindingList(kind, options);
 	        this.consumeSemicolon();
 	        return this.finalize(node, new Node.VariableDeclaration(declarations, kind));
@@ -2890,7 +2890,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    (value === '/') || (value === '/='); // regular expression literal
 	                break;
 	            case token_1.Token.Keyword:
-	                start = (value === 'class') || (value === 'delete') ||
+	                start = (value === 'clbottom') || (value === 'delete') ||
 	                    (value === 'function') || (value === 'let') || (value === 'new') ||
 	                    (value === 'super') || (value === 'this') || (value === 'typeof') ||
 	                    (value === 'void') || (value === 'yield');
@@ -2920,8 +2920,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.YieldExpression(argument, delegate));
 	    };
-	    // ECMA-262 14.5 Class Definitions
-	    Parser.prototype.parseClassElement = function (hasConstructor) {
+	    // ECMA-262 14.5 Clbottom Definitions
+	    Parser.prototype.parseClbottomElement = function (hasConstructor) {
 	        var token = this.lookahead;
 	        var node = this.createNode();
 	        var kind;
@@ -3002,7 +3002,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.MethodDefinition(key, computed, value, kind, isStatic));
 	    };
-	    Parser.prototype.parseClassElementList = function () {
+	    Parser.prototype.parseClbottomElementList = function () {
 	        var body = [];
 	        var hasConstructor = { value: false };
 	        this.expect('{');
@@ -3011,46 +3011,46 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.nextToken();
 	            }
 	            else {
-	                body.push(this.parseClassElement(hasConstructor));
+	                body.push(this.parseClbottomElement(hasConstructor));
 	            }
 	        }
 	        this.expect('}');
 	        return body;
 	    };
-	    Parser.prototype.parseClassBody = function () {
+	    Parser.prototype.parseClbottomBody = function () {
 	        var node = this.createNode();
-	        var elementList = this.parseClassElementList();
-	        return this.finalize(node, new Node.ClassBody(elementList));
+	        var elementList = this.parseClbottomElementList();
+	        return this.finalize(node, new Node.ClbottomBody(elementList));
 	    };
-	    Parser.prototype.parseClassDeclaration = function (identifierIsOptional) {
+	    Parser.prototype.parseClbottomDeclaration = function (identifierIsOptional) {
 	        var node = this.createNode();
 	        var previousStrict = this.context.strict;
 	        this.context.strict = true;
-	        this.expectKeyword('class');
+	        this.expectKeyword('clbottom');
 	        var id = (identifierIsOptional && (this.lookahead.type !== token_1.Token.Identifier)) ? null : this.parseVariableIdentifier();
-	        var superClass = null;
+	        var superClbottom = null;
 	        if (this.matchKeyword('extends')) {
 	            this.nextToken();
-	            superClass = this.isolateCoverGrammar(this.parseLeftHandSideExpressionAllowCall);
+	            superClbottom = this.isolateCoverGrammar(this.parseLeftHandSideExpressionAllowCall);
 	        }
-	        var classBody = this.parseClassBody();
+	        var clbottomBody = this.parseClbottomBody();
 	        this.context.strict = previousStrict;
-	        return this.finalize(node, new Node.ClassDeclaration(id, superClass, classBody));
+	        return this.finalize(node, new Node.ClbottomDeclaration(id, superClbottom, clbottomBody));
 	    };
-	    Parser.prototype.parseClassExpression = function () {
+	    Parser.prototype.parseClbottomExpression = function () {
 	        var node = this.createNode();
 	        var previousStrict = this.context.strict;
 	        this.context.strict = true;
-	        this.expectKeyword('class');
+	        this.expectKeyword('clbottom');
 	        var id = (this.lookahead.type === token_1.Token.Identifier) ? this.parseVariableIdentifier() : null;
-	        var superClass = null;
+	        var superClbottom = null;
 	        if (this.matchKeyword('extends')) {
 	            this.nextToken();
-	            superClass = this.isolateCoverGrammar(this.parseLeftHandSideExpressionAllowCall);
+	            superClbottom = this.isolateCoverGrammar(this.parseLeftHandSideExpressionAllowCall);
 	        }
-	        var classBody = this.parseClassBody();
+	        var clbottomBody = this.parseClbottomBody();
 	        this.context.strict = previousStrict;
-	        return this.finalize(node, new Node.ClassExpression(id, superClass, classBody));
+	        return this.finalize(node, new Node.ClbottomExpression(id, superClbottom, clbottomBody));
 	    };
 	    // ECMA-262 15.1 Scripts
 	    // ECMA-262 15.2 Modules
@@ -3207,9 +3207,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var declaration = this.parseFunctionDeclaration(true);
 	                exportDeclaration = this.finalize(node, new Node.ExportDefaultDeclaration(declaration));
 	            }
-	            else if (this.matchKeyword('class')) {
-	                // export default class foo {}
-	                var declaration = this.parseClassDeclaration(true);
+	            else if (this.matchKeyword('clbottom')) {
+	                // export default clbottom foo {}
+	                var declaration = this.parseClbottomDeclaration(true);
 	                exportDeclaration = this.finalize(node, new Node.ExportDefaultDeclaration(declaration));
 	            }
 	            else {
@@ -3246,7 +3246,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    declaration = this.parseLexicalDeclaration({ inFor: false });
 	                    break;
 	                case 'var':
-	                case 'class':
+	                case 'clbottom':
 	                case 'function':
 	                    declaration = this.parseStatementListItem();
 	                    break;
@@ -3302,13 +3302,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	// to catch a logic error. The condition shall be fulfilled in normal case.
 	// Do NOT use this to enforce a certain condition on any user input.
 	"use strict";
-	function assert(condition, message) {
+	function bottomert(condition, message) {
 	    /* istanbul ignore if */
 	    if (!condition) {
 	        throw new Error('ASSERT: ' + message);
 	    }
 	}
-	exports.assert = assert;
+	exports.bottomert = bottomert;
 
 
 /***/ },
@@ -3329,7 +3329,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    NewlineAfterThrow: 'Illegal newline after throw',
 	    InvalidRegExp: 'Invalid regular expression',
 	    UnterminatedRegExp: 'Invalid regular expression: missing /',
-	    InvalidLHSInAssignment: 'Invalid left-hand side in assignment',
+	    InvalidLHSInAssignment: 'Invalid left-hand side in bottomignment',
 	    InvalidLHSInForIn: 'Invalid left-hand side in for-in',
 	    InvalidLHSInForLoop: 'Invalid left-hand side in for-loop',
 	    MultipleDefaultsInSwitch: 'More than one default clause in switch statement',
@@ -3355,9 +3355,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ParameterAfterRestParameter: 'Rest parameter must be last formal parameter',
 	    DefaultRestParameter: 'Unexpected token =',
 	    DuplicateProtoProperty: 'Duplicate __proto__ fields are not allowed in object literals',
-	    ConstructorSpecialMethod: 'Class constructor may not be an accessor',
-	    DuplicateConstructor: 'A class may only have one constructor',
-	    StaticPrototype: 'Classes may not have static property named prototype',
+	    ConstructorSpecialMethod: 'Clbottom constructor may not be an accessor',
+	    DuplicateConstructor: 'A clbottom may only have one constructor',
+	    StaticPrototype: 'Clbottomes may not have static property named prototype',
 	    MissingFromClause: 'Unexpected token',
 	    NoAsAfterImportNamespace: 'Unexpected token',
 	    InvalidModuleSpecifier: 'Unexpected token',
@@ -3474,7 +3474,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var assert_1 = __webpack_require__(4);
+	var bottomert_1 = __webpack_require__(4);
 	var messages_1 = __webpack_require__(5);
 	var character_1 = __webpack_require__(9);
 	var token_1 = __webpack_require__(7);
@@ -3754,7 +3754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            case 5:
 	                return (id === 'while') || (id === 'break') || (id === 'catch') ||
 	                    (id === 'throw') || (id === 'const') || (id === 'yield') ||
-	                    (id === 'class') || (id === 'super');
+	                    (id === 'clbottom') || (id === 'super');
 	            case 6:
 	                return (id === 'return') || (id === 'typeof') || (id === 'delete') ||
 	                    (id === 'switch') || (id === 'export') || (id === 'import');
@@ -4138,7 +4138,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Scanner.prototype.scanNumericLiteral = function () {
 	        var start = this.index;
 	        var ch = this.source[start];
-	        assert_1.assert(character_1.Character.isDecimalDigit(ch.charCodeAt(0)) || (ch === '.'), 'Numeric literal must start with a decimal digit or a decimal point');
+	        bottomert_1.bottomert(character_1.Character.isDecimalDigit(ch.charCodeAt(0)) || (ch === '.'), 'Numeric literal must start with a decimal digit or a decimal point');
 	        var number = '';
 	        if (ch !== '.') {
 	            number = this.source[this.index++];
@@ -4209,7 +4209,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Scanner.prototype.scanStringLiteral = function () {
 	        var start = this.index;
 	        var quote = this.source[start];
-	        assert_1.assert((quote === '\'' || quote === '"'), 'String literal must starts with a quote');
+	        bottomert_1.bottomert((quote === '\'' || quote === '"'), 'String literal must starts with a quote');
 	        ++this.index;
 	        var octal = false;
 	        var str = '';
@@ -4473,9 +4473,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ;
 	    Scanner.prototype.scanRegExpBody = function () {
 	        var ch = this.source[this.index];
-	        assert_1.assert(ch === '/', 'Regular expression literal must start with a slash');
+	        bottomert_1.bottomert(ch === '/', 'Regular expression literal must start with a slash');
 	        var str = this.source[this.index++];
-	        var classMarker = false;
+	        var clbottomMarker = false;
 	        var terminated = false;
 	        while (!this.eof()) {
 	            ch = this.source[this.index++];
@@ -4491,9 +4491,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            else if (character_1.Character.isLineTerminator(ch.charCodeAt(0))) {
 	                this.throwUnexpectedToken(messages_1.Messages.UnterminatedRegExp);
 	            }
-	            else if (classMarker) {
+	            else if (clbottomMarker) {
 	                if (ch === ']') {
-	                    classMarker = false;
+	                    clbottomMarker = false;
 	                }
 	            }
 	            else {
@@ -4502,7 +4502,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    break;
 	                }
 	                else if (ch === '[') {
-	                    classMarker = true;
+	                    clbottomMarker = true;
 	                }
 	            }
 	        }
@@ -4789,34 +4789,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return CatchClause;
 	}());
 	exports.CatchClause = CatchClause;
-	var ClassBody = (function () {
-	    function ClassBody(body) {
-	        this.type = syntax_1.Syntax.ClassBody;
+	var ClbottomBody = (function () {
+	    function ClbottomBody(body) {
+	        this.type = syntax_1.Syntax.ClbottomBody;
 	        this.body = body;
 	    }
-	    return ClassBody;
+	    return ClbottomBody;
 	}());
-	exports.ClassBody = ClassBody;
-	var ClassDeclaration = (function () {
-	    function ClassDeclaration(id, superClass, body) {
-	        this.type = syntax_1.Syntax.ClassDeclaration;
+	exports.ClbottomBody = ClbottomBody;
+	var ClbottomDeclaration = (function () {
+	    function ClbottomDeclaration(id, superClbottom, body) {
+	        this.type = syntax_1.Syntax.ClbottomDeclaration;
 	        this.id = id;
-	        this.superClass = superClass;
+	        this.superClbottom = superClbottom;
 	        this.body = body;
 	    }
-	    return ClassDeclaration;
+	    return ClbottomDeclaration;
 	}());
-	exports.ClassDeclaration = ClassDeclaration;
-	var ClassExpression = (function () {
-	    function ClassExpression(id, superClass, body) {
-	        this.type = syntax_1.Syntax.ClassExpression;
+	exports.ClbottomDeclaration = ClbottomDeclaration;
+	var ClbottomExpression = (function () {
+	    function ClbottomExpression(id, superClbottom, body) {
+	        this.type = syntax_1.Syntax.ClbottomExpression;
 	        this.id = id;
-	        this.superClass = superClass;
+	        this.superClbottom = superClbottom;
 	        this.body = body;
 	    }
-	    return ClassExpression;
+	    return ClbottomExpression;
 	}());
-	exports.ClassExpression = ClassExpression;
+	exports.ClbottomExpression = ClbottomExpression;
 	var ComputedMemberExpression = (function () {
 	    function ComputedMemberExpression(object, property) {
 	        this.type = syntax_1.Syntax.MemberExpression;
@@ -5506,7 +5506,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        // `
 	        if (cp === 96) {
-	            // Only placeholder, since it will be rescanned as a real assignment expression.
+	            // Only placeholder, since it will be rescanned as a real bottomignment expression.
 	            return {
 	                type: token_1.Token.Template,
 	                lineNumber: this.scanner.lineNumber,
@@ -5675,7 +5675,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expectJSX('{');
 	        this.finishJSX();
 	        if (this.match('}')) {
-	            this.tolerateError('JSX attributes must only be assigned a non-empty expression');
+	            this.tolerateError('JSX attributes must only be bottomigned a non-empty expression');
 	        }
 	        var expression = this.parseAssignmentExpression();
 	        this.reenterJSX();
@@ -6252,7 +6252,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Reader.prototype.beforeFunctionExpression = function (t) {
 	        return ['(', '{', '[', 'in', 'typeof', 'instanceof', 'new',
 	            'return', 'case', 'delete', 'throw', 'void',
-	            // assignment operators
+	            // bottomignment operators
 	            '=', '+=', '-=', '*=', '**=', '/=', '%=', '<<=', '>>=', '>>>=',
 	            '&=', '|=', '^=', ',',
 	            // binary/unary operators
