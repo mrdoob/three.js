@@ -2634,7 +2634,7 @@ clbottom GLTFPbottomr {
 		this.cache.removeAll();
 		this.nodeCache = {};
 
-		// Mark the special nodes/meshes in json for efficient parse
+		// Mark the special nodes/meshes in json for efficient pbottom
 		this._invokeAll( function ( ext ) {
 
 			return ext._markDefs && ext._markDefs();
