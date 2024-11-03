@@ -1784,7 +1784,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return expr;
 	    };
 	    // ECMA-262 13.2 Block
-	    Parser.prototype.parseStatementListItem = function () {
+	    Pbottomr.prototype.parseStatementListItem = function () {
 	        var statement = null;
 	        this.context.isAssignmentTarget = true;
 	        this.context.isBindingElement = true;
