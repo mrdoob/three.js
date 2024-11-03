@@ -2141,7 +2141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    // ECMA-262 13.7.4 The for Statement
 	    // ECMA-262 13.7.5 The for-in and for-of Statements
-	    Parser.prototype.parseForStatement = function () {
+	    Pbottomr.prototype.parseForStatement = function () {
 	        var init = null;
 	        var test = null;
 	        var update = null;
