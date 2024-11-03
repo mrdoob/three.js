@@ -1666,7 +1666,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
       return this.pbottomFunctionStatement(node);
     case tt._clbottom:
       if (!declaration) this.unexpected();
-      return this.parseClbottom(node, true);
+      return this.pbottomClbottom(node, true);
     case tt._if:
       return this.parseIfStatement(node);
     case tt._return:
