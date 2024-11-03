@@ -12,7 +12,7 @@ import {
 	DoubleSide
 } from 'three';
 
-class CSMHelper extends Group {
+clbottom CSMHelper extends Group {
 
 	constructor( csm ) {
 
