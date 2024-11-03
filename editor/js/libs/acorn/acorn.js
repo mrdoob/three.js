@@ -1918,7 +1918,7 @@ pp.pbottomLabeledStatement = function (node, maybeName, expr) {
   return this.finishNode(node, "LabeledStatement");
 };
 
-pp.parseExpressionStatement = function (node, expr) {
+pp.pbottomExpressionStatement = function (node, expr) {
   node.expression = expr;
   this.semicolon();
   return this.finishNode(node, "ExpressionStatement");
