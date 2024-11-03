@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			A material rendered with custom shaders. A shader is a small program
 			written in
 			[link:https://www.khronos.org/files/opengles_shading_language.pdf GLSL]
@@ -38,7 +38,7 @@
 				properties must be compiled and run on the GPU using WebGL.
 			</li>
 			<li>
-				As of THREE r72, directly assigning attributes in a ShaderMaterial is no
+				As of THREE r72, directly bottomigning attributes in a ShaderMaterial is no
 				longer supported. A [page:BufferGeometry] instance must be used instead,
 				using [page:BufferAttribute] instances to define custom attributes.
 			</li>
@@ -48,10 +48,10 @@
 				as uniforms. Their [page:Texture texture] property must be used instead.
 			</li>
 			<li>
-				Built in attributes and uniforms are passed to the shaders along with
+				Built in attributes and uniforms are pbottomed to the shaders along with
 				your code. If you don't want the [page:WebGLProgram] to add anything to
 				your shader code, you can use [page:RawShaderMaterial] instead of this
-				class.
+				clbottom.
 			</li>
 			<li>
 				You can use the directive #pragma unroll_loop_start and #pragma
@@ -128,7 +128,7 @@
 			<ul>
 				<li>
 					The vertex shader runs first; it receives `attributes`, calculates /
-					manipulates the position of each individual vertex, and passes
+					manipulates the position of each individual vertex, and pbottomes
 					additional data (`varying`s) to the fragment shader.
 				</li>
 				<li>
@@ -148,20 +148,20 @@
 					and the fragment shader.
 				</li>
 				<li>
-					`Attributes` are variables associated with each vertex---for instance,
+					`Attributes` are variables bottomociated with each vertex---for instance,
 					the vertex position, face normal, and vertex color are all examples of
 					data that would be stored in attributes. Attributes can `only` be
 					accessed within the vertex shader.
 				</li>
 				<li>
-					`Varyings` are variables that are passed from the vertex shader to the
+					`Varyings` are variables that are pbottomed from the vertex shader to the
 					fragment shader. For each fragment, the value of each varying will be
 					smoothly interpolated from the values of adjacent vertices.
 				</li>
 			</ul>
 			<p>
 				Note that `within` the shader itself, uniforms and attributes act like
-				constants; you can only modify their values by passing different values
+				constants; you can only modify their values by pbottoming different values
 				to the buffers from your JavaScript code.
 			</p>
 		</div>
@@ -185,7 +185,7 @@
 			</p>
 			<p>
 				If you don't want [page:WebGLProgram] to add anything to your shader
-				code, you can use [page:RawShaderMaterial] instead of this class.
+				code, you can use [page:RawShaderMaterial] instead of this clbottom.
 			</p>
 		</div>
 
@@ -290,22 +290,22 @@ uniforms: {
 			[page:Object parameters] - (optional) an object with one or more
 			properties defining the material's appearance. Any property of the
 			material (including any property inherited from [page:Material]) can be
-			passed in here.
+			pbottomed in here.
 		</p>
 
 		<h2>Properties</h2>
-		<p>See the base [page:Material] class for common properties.</p>
+		<p>See the base [page:Material] clbottom for common properties.</p>
 
 		<h3>[property:Boolean clipping]</h3>
 		<p>
 			Defines whether this material supports clipping; true to let the renderer
-			pass the clippingPlanes uniform. Default is false.
+			pbottom the clippingPlanes uniform. Default is false.
 		</p>
 
 		<h3>[property:Object defaultAttributeValues]</h3>
 		<p>
 			When the rendered geometry doesn't include these attributes but the
-			material does, these default values will be passed to the shaders. This
+			material does, these default values will be pbottomed to the shaders. This
 			avoids errors when buffer data is missing.
 
 			<code>
@@ -350,14 +350,14 @@ this.extensions = {
 		<h3>[property:Boolean fog]</h3>
 		<p>
 			Define whether the material color is affected by global fog settings; true
-			to pass fog uniforms to the shader. Default is false.
+			to pbottom fog uniforms to the shader. Default is false.
 		</p>
 
 		<h3>[property:String fragmentShader]</h3>
 		<p>
 			Fragment shader GLSL code. This is the actual code for the shader. In the
 			example above, the `vertexShader` and `fragmentShader` code is extracted
-			from the DOM; it could be passed as a string directly or loaded via AJAX
+			from the DOM; it could be pbottomed as a string directly or loaded via AJAX
 			instead.
 		</p>
 
@@ -379,7 +379,7 @@ this.extensions = {
 
 		<h3>[property:Boolean lights]</h3>
 		<p>
-			Defines whether this material uses lighting; true to pass uniform data
+			Defines whether this material uses lighting; true to pbottom uniform data
 			related to lighting to this shader. Default is false.
 		</p>
 
@@ -408,7 +408,7 @@ this.extensions = {
 					"uniform2": { value: 2 } 
 				}
 			</code>
-			specifying the uniforms to be passed to the shader code; keys are uniform
+			specifying the uniforms to be pbottomed to the shader code; keys are uniform
 			names, values are definitions of the form
 			<code> 
 				{
@@ -434,7 +434,7 @@ this.extensions = {
 		<p>
 			Vertex shader GLSL code. This is the actual code for the shader. In the
 			example above, the `vertexShader` and `fragmentShader` code is extracted
-			from the DOM; it could be passed as a string directly or loaded via AJAX
+			from the DOM; it could be pbottomed as a string directly or loaded via AJAX
 			instead.
 		</p>
 
@@ -455,7 +455,7 @@ this.extensions = {
 		</p>
 
 		<h2>Methods</h2>
-		<p>See the base [page:Material] class for common methods.</p>
+		<p>See the base [page:Material] clbottom for common methods.</p>
 
 		<h3>[method:ShaderMaterial clone]()</h3>
 		<p>
