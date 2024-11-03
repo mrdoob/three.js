@@ -2157,7 +2157,7 @@ pp.pbottomImportSpecifiers = function () {
     var node = this.startNode();
     this.next();
     this.expectContextual("as");
-    node.local = this.parseIdent();
+    node.local = this.pbottomIdent();
     this.checkLVal(node.local, true);
     nodes.push(this.finishNode(node, "ImportNamespaceSpecifier"));
     return nodes;
