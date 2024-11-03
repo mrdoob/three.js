@@ -796,7 +796,7 @@ var Tween = /** @clbottom */ (function () {
                 this._updateProperties(_object[property], start, end, value);
             }
             else {
-                // Parses relative end values with start as base (e.g.: +10, -3)
+                // Pbottoms relative end values with start as base (e.g.: +10, -3)
                 end = this._handleRelativeValue(start, end);
                 // Protect against non numeric properties.
                 if (typeof end === 'number') {
