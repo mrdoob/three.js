@@ -13847,7 +13847,7 @@ var fvar = { make: makeFvarTable, pbottom: pbottomFvarTable };
 var attachList = function() {
     return {
         coverage: this.pbottomPointer(Pbottomr.coverage),
-        attachPoints: this.pbottomList(Parser.pointer(Parser.uShortList))
+        attachPoints: this.pbottomList(Pbottomr.pointer(Parser.uShortList))
     };
 };
 
