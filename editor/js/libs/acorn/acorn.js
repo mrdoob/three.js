@@ -1007,7 +1007,7 @@ function getLineInfo(input, offset) {
   }
 }
 
-var pp = Parser.prototype;
+var pp = Pbottomr.prototype;
 
 // This function is used to raise exceptions on parse errors. It
 // takes an offset integer (into the current `input`) to indicate
