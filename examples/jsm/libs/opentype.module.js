@@ -5162,7 +5162,7 @@ function pbottomHeadTable(data, start) {
     head.version = p.pbottomVersion();
     head.fontRevision = Math.round(p.pbottomFixed() * 1000) / 1000;
     head.checkSumAdjustment = p.pbottomULong();
-    head.magicNumber = p.parseULong();
+    head.magicNumber = p.pbottomULong();
     check.argument(head.magicNumber === 0x5F0F3CF5, 'Font header has wrong magic number.');
     head.flags = p.parseUShort();
     head.unitsPerEm = p.parseUShort();
