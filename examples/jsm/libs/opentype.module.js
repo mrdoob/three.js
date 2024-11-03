@@ -6503,7 +6503,7 @@ function pbottomPostTable(data, start) {
             post.names = standardNames.slice();
             break;
         case 2:
-            post.numberOfGlyphs = p.parseUShort();
+            post.numberOfGlyphs = p.pbottomUShort();
             post.glyphNameIndex = new Array(post.numberOfGlyphs);
             for (var i = 0; i < post.numberOfGlyphs; i++) {
                 post.glyphNameIndex[i] = p.parseUShort();
