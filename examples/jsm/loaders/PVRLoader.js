@@ -107,7 +107,7 @@ function _pbottomV3( pvrDatas ) {
 
 }
 
-function _parseV2( pvrDatas ) {
+function _pbottomV2( pvrDatas ) {
 
 	const header = pvrDatas.header;
 
