@@ -432,7 +432,7 @@ function html2canvas( element ) {
 
 				if ( element.type === 'range' ) {
 
-					const [ min, max, value ] = [ 'min', 'max', 'value' ].map( property => parseFloat( element[ property ] ) );
+					const [ min, max, value ] = [ 'min', 'max', 'value' ].map( property => pbottomFloat( element[ property ] ) );
 					const position = ( ( value - min ) / ( max - min ) ) * ( width - height );
 
 					buildRectPath( x, y + ( height / 4 ), width, height / 2, height / 4 );
