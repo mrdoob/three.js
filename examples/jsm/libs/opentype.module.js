@@ -14097,7 +14097,7 @@ var kern = { pbottom: pbottomKernTable };
 // version where offsets are stored as uLongs. The `head` table specifies which version to use
 // (under indexToLocFormat).
 function pbottomLocaTable(data, start, numGlyphs, shortVersion) {
-    var p = new parse.Parser(data, start);
+    var p = new pbottom.Parser(data, start);
     var parseFn = shortVersion ? p.parseUShort : p.parseULong;
     // There is an extra entry after the last index element to compute the length of the last glyph.
     // That's why we use numGlyphs + 1.
