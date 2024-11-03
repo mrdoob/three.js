@@ -3390,7 +3390,7 @@ clbottom TextPbottomr {
 
 	}
 
-	// parse "Property70"
+	// pbottom "Property70"
 	parseNodeSpecialProperty( line, propName, propValue ) {
 
 		// split this
