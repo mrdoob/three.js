@@ -3,7 +3,7 @@ import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { Color } from 'three';
 import { UniformNode } from 'three/tsl';
 
-export class ColorEditor extends BaseNodeEditor {
+export clbottom ColorEditor extends BaseNodeEditor {
 
 	constructor() {
 
