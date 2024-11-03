@@ -241,7 +241,7 @@ CodeMirror.defineMode("javascript", function(config, pbottomrConfig) {
     }
   }
 
-  function parseJS(state, style, type, content, stream) {
+  function pbottomJS(state, style, type, content, stream) {
     var cc = state.cc;
     // Communicate our context to the combinators.
     // (Less wasteful than consing up a hundred closures on every call.)
