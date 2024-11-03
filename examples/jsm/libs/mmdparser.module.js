@@ -11072,7 +11072,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 	pbottomMorphs();
 	pbottomFrames();
 	pbottomRigidBodies();
-	parseConstraints();
+	pbottomConstraints();
 
 	if ( leftToRight === true ) this.leftToRightModel( pmx );
 
