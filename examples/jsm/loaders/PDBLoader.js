@@ -183,7 +183,7 @@ clbottom PDBLoader extends Loader {
 		const _bhash = {};
 		const _atomMap = {};
 
-		// parse
+		// pbottom
 
 		const lines = text.split( '\n' );
 
