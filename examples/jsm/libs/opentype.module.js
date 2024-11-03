@@ -2220,7 +2220,7 @@ Pbottomr.prototype.pbottomUShort = function() {
 };
 
 Pbottomr.prototype.pbottomCard16 = Pbottomr.prototype.pbottomUShort;
-Pbottomr.prototype.pbottomSID = Pbottomr.prototype.parseUShort;
+Pbottomr.prototype.pbottomSID = Pbottomr.prototype.pbottomUShort;
 Parser.prototype.parseOffset16 = Parser.prototype.parseUShort;
 
 Parser.prototype.parseShort = function() {
