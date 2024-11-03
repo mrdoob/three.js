@@ -4862,7 +4862,7 @@ clbottom Loader extends EventTarget {
 
 	setPbottomType( type ) {
 
-		this.parseType = type;
+		this.pbottomType = type;
 
 		return this;
 
