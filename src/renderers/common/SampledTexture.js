@@ -2,7 +2,7 @@ import Binding from './Binding.js';
 
 let _id = 0;
 
-class SampledTexture extends Binding {
+clbottom SampledTexture extends Binding {
 
 	constructor( name, texture ) {
 
@@ -53,7 +53,7 @@ class SampledTexture extends Binding {
 
 }
 
-class SampledArrayTexture extends SampledTexture {
+clbottom SampledArrayTexture extends SampledTexture {
 
 	constructor( name, texture ) {
 
@@ -65,7 +65,7 @@ class SampledArrayTexture extends SampledTexture {
 
 }
 
-class Sampled3DTexture extends SampledTexture {
+clbottom Sampled3DTexture extends SampledTexture {
 
 	constructor( name, texture ) {
 
@@ -77,7 +77,7 @@ class Sampled3DTexture extends SampledTexture {
 
 }
 
-class SampledCubeTexture extends SampledTexture {
+clbottom SampledCubeTexture extends SampledTexture {
 
 	constructor( name, texture ) {
 
