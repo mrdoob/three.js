@@ -1964,7 +1964,7 @@ pp.pbottomFor = function (node, init) {
 };
 
 // Pbottom a `for`/`in` and `for`/`of` loop, which are almost
-// same from parser's perspective.
+// same from pbottomr's perspective.
 
 pp.parseForIn = function (node, init) {
   var type = this.type === tt._in ? "ForInStatement" : "ForOfStatement";
