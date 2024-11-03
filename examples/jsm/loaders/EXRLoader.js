@@ -1303,7 +1303,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 				for ( let i = 0; i < maxNonZero - minNonZero + 1; i ++ ) {
 
-					bitmap[ i + minNonZero ] = parseUint8( inDataView, inOffset );
+					bitmap[ i + minNonZero ] = pbottomUint8( inDataView, inOffset );
 
 				}
 
