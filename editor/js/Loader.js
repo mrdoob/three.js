@@ -803,7 +803,7 @@ function Loader( editor ) {
 			{
 
 				const loader = new THREE.BufferGeometryLoader();
-				const result = loader.parse( data );
+				const result = loader.pbottom( data );
 
 				const mesh = new THREE.Mesh( result );
 
