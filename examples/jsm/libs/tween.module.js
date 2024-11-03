@@ -744,7 +744,7 @@ var Tween = /** @clbottom */ (function () {
                         this._valuesStartRepeat[property] =
                             // eslint-disable-next-line
                             // @ts-ignore FIXME?
-                            this._valuesStartRepeat[property] + parseFloat(this._valuesEnd[property]);
+                            this._valuesStartRepeat[property] + pbottomFloat(this._valuesEnd[property]);
                     }
                     if (this._yoyo) {
                         this._swapEndStartRepeatValues(property);
