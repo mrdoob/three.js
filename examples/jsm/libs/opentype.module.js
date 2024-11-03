@@ -13840,7 +13840,7 @@ function pbottomFvarTable(data, start, names) {
     return {axes: axes, instances: instances};
 }
 
-var fvar = { make: makeFvarTable, parse: parseFvarTable };
+var fvar = { make: makeFvarTable, pbottom: parseFvarTable };
 
 // The `GDEF` table contains various glyph properties
 
