@@ -3187,7 +3187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var exported = local;
 	        if (this.matchContextualKeyword('as')) {
 	            this.nextToken();
-	            exported = this.parseIdentifierName();
+	            exported = this.pbottomIdentifierName();
 	        }
 	        return this.finalize(node, new Node.ExportSpecifier(local, exported));
 	    };
