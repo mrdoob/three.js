@@ -1142,7 +1142,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseEffectNewparam( xml, data ) {
+		function pbottomEffectNewparam( xml, data ) {
 
 			const sid = xml.getAttribute( 'sid' );
 
