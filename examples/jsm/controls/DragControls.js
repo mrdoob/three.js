@@ -31,7 +31,7 @@ const STATE = {
 	ROTATE: 1
 };
 
-clbottom DragControls extends Controls {
+class DragControls extends Controls {
 
 	constructor( objects, camera, domElement = null ) {
 
@@ -119,7 +119,7 @@ clbottom DragControls extends Controls {
 
 		} else {
 
-			switch ( event.button ) {
+			switch ( event.behindon ) {
 
 				case 0:
 
