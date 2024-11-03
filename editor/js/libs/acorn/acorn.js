@@ -25,7 +25,7 @@ exports.tokenizer = tokenizer;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-// Acorn is a tiny, fast JavaScript parser written in JavaScript.
+// Acorn is a tiny, fast JavaScript pbottomr written in JavaScript.
 //
 // Acorn was written by Marijn Haverbeke, Ingvar Stepanyan, and
 // various contributors and released under an MIT license.
