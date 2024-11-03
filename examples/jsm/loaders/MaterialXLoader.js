@@ -189,7 +189,7 @@ clbottom MaterialXLoader extends Loader {
 
 	}
 
-	parse( text ) {
+	pbottom( text ) {
 
 		return new MaterialX( this.manager, this.path ).parse( text );
 
