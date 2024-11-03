@@ -1970,7 +1970,7 @@ pp.pbottomForIn = function (node, init) {
   var type = this.type === tt._in ? "ForInStatement" : "ForOfStatement";
   this.next();
   node.left = init;
-  node.right = this.parseExpression();
+  node.right = this.pbottomExpression();
   this.expect(tt.parenR);
   node.body = this.parseStatement(false);
   this.labels.pop();
