@@ -9,10 +9,10 @@ export default QUnit.module( 'Materials', () => {
 	QUnit.module( 'LineDashedMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new LineDashedMaterial();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Material, true,
 				'LineDashedMaterial extends from Material'
 			);
@@ -20,56 +20,56 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new LineDashedMaterial();
-			assert.ok( object, 'Can instantiate a LineDashedMaterial.' );
+			bottomert.ok( object, 'Can instantiate a LineDashedMaterial.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new LineDashedMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'LineDashedMaterial',
 				'LineDashedMaterial.type should be LineDashedMaterial'
 			);
 
 		} );
 
-		QUnit.todo( 'scale', ( assert ) => {
+		QUnit.todo( 'scale', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'dashSize', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'gapSize', ( assert ) => {
+		QUnit.todo( 'dashSize', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'gapSize', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isLineDashedMaterial', ( assert ) => {
+		QUnit.test( 'isLineDashedMaterial', ( bottomert ) => {
 
 			const object = new LineDashedMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.isLineDashedMaterial,
 				'LineDashedMaterial.isLineDashedMaterial should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
