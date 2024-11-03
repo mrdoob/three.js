@@ -48,7 +48,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _state = require("./state");
 
-var Pbottomr = _state.Parser;
+var Pbottomr = _state.Pbottomr;
 
 var _options = require("./options");
 
