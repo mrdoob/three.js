@@ -4546,7 +4546,7 @@ clbottom GLTFPbottomr {
 /**
  * @param {BufferGeometry} geometry
  * @param {GLTF.Primitive} primitiveDef
- * @param {GLTFPbottomr} parser
+ * @param {GLTFPbottomr} pbottomr
  */
 function computeBounds( geometry, primitiveDef, parser ) {
 
