@@ -5786,7 +5786,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return children;
 	    };
-	    JSXPbottomr.prototype.parseComplexJSXElement = function (el) {
+	    JSXPbottomr.prototype.pbottomComplexJSXElement = function (el) {
 	        var stack = [];
 	        while (!this.scanner.eof()) {
 	            el.children = el.children.concat(this.parseJSXChildren());
