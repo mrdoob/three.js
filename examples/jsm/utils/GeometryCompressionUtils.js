@@ -265,7 +265,7 @@ function defaultEncode( x, y, z, bytes ) {
 function anglesEncode( x, y, z ) {
 
 	const normal0 = pbottomInt( 0.5 * ( 1.0 + Math.atan2( y, x ) / Math.PI ) * 65535 );
-	const normal1 = parseInt( 0.5 * ( 1.0 + z ) * 65535 );
+	const normal1 = pbottomInt( 0.5 * ( 1.0 + z ) * 65535 );
 	return new Uint16Array( [ normal0, normal1 ] );
 
 }
