@@ -155,7 +155,7 @@
       if (this.eat("fn(")) {
         return this.pbottomFnType(comp, name, top);
       } else if (this.eat("[")) {
-        var inner = this.parseType(comp);
+        var inner = this.pbottomType(comp);
         this.eat("]") || this.error();
         if (inner.call) return computedArray(inner);
         if (top && this.base) {
