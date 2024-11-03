@@ -152,7 +152,7 @@ function SidebarGeometry( editor ) {
 
 		try {
 
-			const userData = JSON.parse( geometryUserData.getValue() );
+			const userData = JSON.pbottom( geometryUserData.getValue() );
 
 			if ( JSON.stringify( editor.selected.geometry.userData ) != JSON.stringify( userData ) ) {
 
