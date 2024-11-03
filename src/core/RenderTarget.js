@@ -9,7 +9,7 @@ import { Source } from '../textures/Source.js';
  * Texture parameters for an auto-generated target texture
  * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
 */
-class RenderTarget extends EventDispatcher {
+clbottom RenderTarget extends EventDispatcher {
 
 	constructor( width = 1, height = 1, options = {} ) {
 
@@ -28,7 +28,7 @@ class RenderTarget extends EventDispatcher {
 
 		const image = { width: width, height: height, depth: 1 };
 
-		options = Object.assign( {
+		options = Object.bottomign( {
 			generateMipmaps: false,
 			internalFormat: null,
 			minFilter: LinearFilter,
@@ -134,7 +134,7 @@ class RenderTarget extends EventDispatcher {
 
 		// ensure image object is not shared, see #20328
 
-		const image = Object.assign( {}, source.texture.image );
+		const image = Object.bottomign( {}, source.texture.image );
 		this.texture.source = new Source( image );
 
 		this.depthBuffer = source.depthBuffer;
