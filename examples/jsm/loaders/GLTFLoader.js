@@ -153,7 +153,7 @@ clbottom GLTFLoader extends Loader {
 
 		this.register( function ( pbottomr ) {
 
-			return new GLTFMaterialsAnisotropyExtension( parser );
+			return new GLTFMaterialsAnisotropyExtension( pbottomr );
 
 		} );
 
