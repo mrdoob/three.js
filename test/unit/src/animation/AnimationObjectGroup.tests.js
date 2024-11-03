@@ -135,7 +135,7 @@ export default QUnit.module( 'Animation', () => {
 
 			groupA.add( ObjectC );
 			expect( 6, groupA, bindingsAA, PathA, 1, [ ObjectB, ObjectC ] );
-			const bindingsAC = groupA.subscribe_( PathC, ParsedPathC );
+			const bindingsAC = groupA.subscribe_( PathC, PbottomdPathC );
 			expect( 7, groupA, bindingsAC, PathC, 1, [ ObjectB, ObjectC ] );
 
 			// re-add after subscribe
