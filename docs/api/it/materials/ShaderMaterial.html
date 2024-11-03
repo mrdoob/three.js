@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Un materiale renderizzato con shader personalizzati. Uno shader è un piccolo programma scritto in 
 			[link:https://www.khronos.org/files/opengles_shading_language.pdf GLSL]
 			che viene eseguito sulla GPU.
@@ -30,7 +30,7 @@
 				sulla GPU utilizzando WebGL.
 			</li>
 			<li>
-				A partire da THREE r72, l'assegnazione diretta di attributi in uno ShaderMaterial non è più supportata.
+				A partire da THREE r72, l'bottomegnazione diretta di attributi in uno ShaderMaterial non è più supportata.
 				È invece necessario utilizzare un'istanza di [page:BufferGeometry], utilizzando le istanze [page:BufferAttribute]
 				per definire gli attributi personalizzati.
 			</li>
@@ -39,8 +39,8 @@
 				non devono essere più utilizzate come uniformi. Al loro posto è necessario utilizzare la loro proprietà [page:Texture texture].
 			</li>
 			<li>
-				Gli attributi e le uniformi integrati vengono passati agli shader insieme al codice. 
-				Se non vuoi che [page:WebGLProgram] aggiunga nulla al tuo codice shader, puoi usare [page:RawShaderMaterial] invece di questa classe.
+				Gli attributi e le uniformi integrati vengono pbottomati agli shader insieme al codice. 
+				Se non vuoi che [page:WebGLProgram] aggiunga nulla al tuo codice shader, puoi usare [page:RawShaderMaterial] invece di questa clbottome.
 			</li>
 			<li>
 				È possibile utilizzare la direttiva #pragma unroll_loop_start e #pragma unroll_loop_end per srotolare un ciclo `for` in GLSL dal preprocessore dello shader.
@@ -122,7 +122,7 @@
 			<ul>
 				<li>
 					Il vertex shader viene eseguito per primo; riceve gli `attributes` (attributi), calcola / manipola
-					la posizione di ogni singolo vertice, e passa valori aggiuntivi (`varying`) al fragment shader.
+					la posizione di ogni singolo vertice, e pbottoma valori aggiuntivi (`varying`) al fragment shader.
 				</li>
 				<li>
 					Il fragment (o pixel) shader viene eseguito per secondo; imposta il colore di ogni singolo "fragment" (pixel)
@@ -137,18 +137,18 @@
 					È possibile accedere a queste varibili sia dal vertex shader sia dal fragment shader.
 				</li>
 				<li>
-					`Attributes` sono variabili associate ad ogni vertice; ad esempio, la posizione del vertice,
+					`Attributes` sono variabili bottomociate ad ogni vertice; ad esempio, la posizione del vertice,
 					la normale della faccia e il colore del vertice sono tutti esempi di dati che dovrebbero essere
 					memorizzati negli attributi. Si può accedere a queste variabili `solo` dal vertex shader.
 				</li>
 				<li>
-					`Varyings` sono variabili che vengono passate da il vertex shader al fragment shader.
+					`Varyings` sono variabili che vengono pbottomate da il vertex shader al fragment shader.
 					Per ogni fragment, il valore di ogni variazione sarà interpolato senza problemi dai valori dei vertici adiacenti.
 				</li>
 			</ul>
 			<p>
 				Si noti che `all'interno` dello shader stesso, uniforms e attributes agiscono come costanti;
-				si può solo modificare i loro valori passando valori diversi ai buffer dal codice JavaScript. 
+				si può solo modificare i loro valori pbottomando valori diversi ai buffer dal codice JavaScript. 
 			</p>
 		</div>
 
@@ -165,12 +165,12 @@
 			<p>
 				Alcune di queste uniformi o attributi (per esempio quelli relativi all'illuminazione, alla nebbia, etc.)
 				richiedono l'impostazione delle proprietà sul materiale affinché [page:WebGLRenderer] possa
-				copiare i valori appropriati alla GPU - assicurati di impostare questi flag se vuoi utilizzare 
+				copiare i valori appropriati alla GPU - bottomicurati di impostare questi flag se vuoi utilizzare 
 				queste funzionalità nel tuo shader.
 			</p>
 			<p>
 				Se non vuoi che [page:WebGLProgram] aggiungera niente al tuo codice shader, puoi usare
-				[page:RawShaderMaterial] invece di questa classe.
+				[page:RawShaderMaterial] invece di questa clbottome.
 			</p>
 		</div>
 
@@ -266,22 +266,22 @@ uniforms: {
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p>
 			[page:Object parameters] - (opzionale) un oggetto con una o più proprietà che definiscono l'aspetto del materiale.
-			Qualsiasi proprietà del materiale (inclusa qualsiasi proprietà ereditata da [page:Material]) può essere passata qui.
+			Qualsiasi proprietà del materiale (inclusa qualsiasi proprietà ereditata da [page:Material]) può essere pbottomata qui.
 		</p>
 
 		<h2>Proprietà</h2>
-		<p>Vedi la classe base [page:Material] per le proprietà comuni.</p>
+		<p>Vedi la clbottome base [page:Material] per le proprietà comuni.</p>
 
 		<h3>[property:Boolean clipping]</h3>
 		<p>
-			Definisce se questo materiale supporta il clipping; true per consetire al renderer di passare l'uniforme di clippingPlanes.
+			Definisce se questo materiale supporta il clipping; true per consetire al renderer di pbottomare l'uniforme di clippingPlanes.
 			L'impostazione predefinita è `false`.
 		</p>
 
 		<h3>[property:Object defaultAttributeValues]</h3>
 		<p>
 			Quando la geometria renderizzata non include questi attributi ma il materiale sì,
-			questi valori predefiniti verranno passati agli shader. Ciò evita errori quando mancano i dati del buffer.
+			questi valori predefiniti verranno pbottomati agli shader. Ciò evita errori quando mancano i dati del buffer.
 
 			<code>
 this.defaultAttributeValues = {
@@ -327,7 +327,7 @@ this.extensions = {
 		<h3>[property:Boolean fog]</h3>
 		<p>
 			Definisce se il colore del materiale è influenzato dalle impostazioni globali della nebbia. 
-			true per passare le uniformi allo shader.
+			true per pbottomare le uniformi allo shader.
 			Il valore predefinito è `false`.
 		</p>
 
@@ -335,7 +335,7 @@ this.extensions = {
 		<p>
 			Codice GLSL del fragment shader. Questo è il codice effettivo per lo shader.
 			Nell'esempio sopra, il codice `vertexShader` e `fragmentShader` viene estratto dal DOM;
-			potrebbe essere passato come stringa direttamente o caricato tramite AJAX.
+			potrebbe essere pbottomato come stringa direttamente o caricato tramite AJAX.
 		</p>
 
 		<h3>[property:String glslVersion]</h3>
@@ -347,13 +347,13 @@ this.extensions = {
 		<h3>[property:String index0AttributeName]</h3>
 		<p>
 			Se impostato, questo chiama [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation gl.bindAttribLocation]
-			per associare un indice di vertice generico a una variabile di attributo.
+			per bottomociare un indice di vertice generico a una variabile di attributo.
 			Il valore predefinito è `undefined`.
 		</p>
 
 		<h3>[property:Boolean isShaderMaterial]</h3>
 		<p>
-			Flag di sola lettura per verificare se l'oggetto passato è di tipo [name].
+			Flag di sola lettura per verificare se l'oggetto pbottomato è di tipo [name].
 		</p>
 
 		<h3>[property:Boolean lights]</h3>
@@ -381,7 +381,7 @@ this.extensions = {
 			<code>
 { "uniform1": { value: 1.0 }, "uniform2": { value: 2 } }
 			</code>
-			specificando le uniformi da passare al codice dello shader; la chiave è il nome della uniform, il valore è la definizione del modulo
+			specificando le uniformi da pbottomare al codice dello shader; la chiave è il nome della uniform, il valore è la definizione del modulo
 		<code>
 		{ value: 1.0 }
 		</code>
@@ -405,7 +405,7 @@ this.extensions = {
 		<p>
 			Il codice GLSL del vertex shader. Questo è il codice effettivo per lo shader.
 			Nell'esempio sopra, il codice `vertexShader` e `fragmentShader` viene estratto dal DOM;
-			potrebbe essere passato come stringa direttamente o caricato tramite AJAX.
+			potrebbe essere pbottomato come stringa direttamente o caricato tramite AJAX.
 		</p>
 
 		<h3>[property:Boolean wireframe]</h3>
@@ -423,7 +423,7 @@ this.extensions = {
 		</p>
 
 		<h2>Metodi</h2>
-		<p>Vedi la classe base [page:Material] per i metodi comuni.</p>
+		<p>Vedi la clbottome base [page:Material] per i metodi comuni.</p>
 
 		<h3>[method:ShaderMaterial clone]()</h3>
 		<p>
