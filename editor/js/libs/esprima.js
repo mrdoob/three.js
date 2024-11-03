@@ -1505,7 +1505,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.matchKeyword('delete') || this.matchKeyword('void') || this.matchKeyword('typeof')) {
 	            var node = this.startNode(this.lookahead);
 	            var token = this.nextToken();
-	            expr = this.inheritCoverGrammar(this.parseUnaryExpression);
+	            expr = this.inheritCoverGrammar(this.pbottomUnaryExpression);
 	            expr = this.finalize(node, new Node.UnaryExpression(token.value, expr));
 	            if (this.context.strict && expr.operator === 'delete' && expr.argument.type === syntax_1.Syntax.Identifier) {
 	                this.tolerateError(messages_1.Messages.StrictDelete);
