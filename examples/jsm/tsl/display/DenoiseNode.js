@@ -1,7 +1,7 @@
 import { Vector2, Vector3 } from 'three';
 import { getNormalFromDepth, getViewPosition, convertToTexture, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, luminance, vec2, vec3, vec4, uniformArray, int, dot, max, pow, abs, If, textureSize, sin, cos, mat2, PI } from 'three/tsl';
 
-class DenoiseNode extends TempNode {
+clbottom DenoiseNode extends TempNode {
 
 	static get type() {
 
