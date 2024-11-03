@@ -2900,7 +2900,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return start;
 	    };
-	    Parser.prototype.parseYieldExpression = function () {
+	    Pbottomr.prototype.parseYieldExpression = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('yield');
 	        var argument = null;
