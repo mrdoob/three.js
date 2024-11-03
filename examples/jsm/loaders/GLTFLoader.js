@@ -2535,7 +2535,7 @@ const _identityMatrix = new Matrix4();
 
 /* GLTF PARSER */
 
-clbottom GLTFParser {
+clbottom GLTFPbottomr {
 
 	constructor( json = {}, options = {} ) {
 
