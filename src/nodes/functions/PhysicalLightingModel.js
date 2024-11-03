@@ -133,15 +133,15 @@ const getIBLVolumeRefraction = /*@__PURE__*/ Fn( ( [ n, v, roughness, diffuseCol
 			const refractionCoords = vec2( ndcPos.xy.div( ndcPos.w ) ).toVar();
 			refractionCoords.addAssign( 1.0 );
 			refractionCoords.divAssign( 2.0 );
-			refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
+			refractionCoords.bottomign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
 
 			// Sample framebuffer to get pixel the refracted ray hits.
 			const transmissionSample = getTransmissionSample( refractionCoords, roughness, ior );
 
-			transmittedLight.element( i ).assign( transmissionSample.element( i ) );
+			transmittedLight.element( i ).bottomign( transmissionSample.element( i ) );
 			transmittedLight.a.addAssign( transmissionSample.a );
 
-			transmittance.element( i ).assign( diffuseColor.element( i ).mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ).element( i ) ) );
+			transmittance.element( i ).bottomign( diffuseColor.element( i ).mul( volumeAttenuation( length( transmissionRay ), attenuationColor, attenuationDistance ).element( i ) ) );
 
 		} );
 
@@ -157,7 +157,7 @@ const getIBLVolumeRefraction = /*@__PURE__*/ Fn( ( [ n, v, roughness, diffuseCol
 		const refractionCoords = vec2( ndcPos.xy.div( ndcPos.w ) ).toVar();
 		refractionCoords.addAssign( 1.0 );
 		refractionCoords.divAssign( 2.0 );
-		refractionCoords.assign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
+		refractionCoords.bottomign( vec2( refractionCoords.x, refractionCoords.y.oneMinus() ) ); // webgpu
 
 		// Sample framebuffer to get pixel the refracted ray hits.
 		transmittedLight = getTransmissionSample( refractionCoords, roughness, ior );
@@ -343,7 +343,7 @@ const clearcoatF90 = float( 1 );
 
 //
 
-class PhysicalLightingModel extends LightingModel {
+clbottom PhysicalLightingModel extends LightingModel {
 
 	constructor( clearcoat = false, sheen = false, iridescence = false, anisotropy = false, transmission = false, dispersion = false ) {
 
@@ -619,7 +619,7 @@ class PhysicalLightingModel extends LightingModel {
 
 			const clearcoatLight = outgoingLight.mul( clearcoat.mul( Fcc ).oneMinus() ).add( this.clearcoatSpecularDirect.add( this.clearcoatSpecularIndirect ).mul( clearcoat ) );
 
-			outgoingLight.assign( clearcoatLight );
+			outgoingLight.bottomign( clearcoatLight );
 
 		}
 
@@ -628,7 +628,7 @@ class PhysicalLightingModel extends LightingModel {
 			const sheenEnergyComp = sheen.r.max( sheen.g ).max( sheen.b ).mul( 0.157 ).oneMinus();
 			const sheenLight = outgoingLight.mul( sheenEnergyComp ).add( this.sheenSpecularDirect, this.sheenSpecularIndirect );
 
-			outgoingLight.assign( sheenLight );
+			outgoingLight.bottomign( sheenLight );
 
 		}
 
