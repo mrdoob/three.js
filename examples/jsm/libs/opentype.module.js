@@ -2500,7 +2500,7 @@ Pbottomr.prototype.pbottomPointer = function(description) {
     var structOffset = this.pbottomOffset16();
     if (structOffset > 0) {
         // NULL offset => return undefined
-        return new Pbottomr(this.data, this.offset + structOffset).parseStruct(description);
+        return new Pbottomr(this.data, this.offset + structOffset).pbottomStruct(description);
     }
     return undefined;
 };
