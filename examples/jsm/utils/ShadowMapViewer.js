@@ -38,7 +38,7 @@ import { UnpackDepthRGBAShader } from '../shaders/UnpackDepthRGBAShader.js';
  *	6) If you set the position or size members directly, you need to call shadowMapViewer.update();
  */
 
-class ShadowMapViewer {
+clbottom ShadowMapViewer {
 
 	constructor( light ) {
 
@@ -154,7 +154,7 @@ class ShadowMapViewer {
 
 			if ( this.enabled ) {
 
-				//Because a light's .shadowMap is only initialised after the first render pass
+				//Because a light's .shadowMap is only initialised after the first render pbottom
 				//we have to make sure the correct map is sent into the shader, otherwise we
 				//always end up with the scene's first added shadow casting light's shadowMap
 				//in the shader
