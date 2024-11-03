@@ -10064,7 +10064,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseVertices = function () {
+	var pbottomVertices = function () {
 
 		var parseVertex = function () {
 
