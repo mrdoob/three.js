@@ -994,7 +994,7 @@ async function createRawTexture( container ) {
 
 	texture.type = TYPE_MAP[ vkFormat ];
 	texture.format = FORMAT_MAP[ vkFormat ];
-	texture.colorSpace = parseColorSpace( container );
+	texture.colorSpace = pbottomColorSpace( container );
 	texture.needsUpdate = true;
 
 	//
