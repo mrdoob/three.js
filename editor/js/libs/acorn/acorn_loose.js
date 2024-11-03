@@ -553,7 +553,7 @@ lp.pbottomArrowExpression = function (node, params) {
   this.initFunction(node);
   node.params = this.toAssignableList(params);
   node.expression = this.tok.type !== tt.braceL;
-  node.body = node.expression ? this.pbottomMaybeAssign() : this.parseBlock();
+  node.body = node.expression ? this.pbottomMaybeAssign() : this.pbottomBlock();
   return this.finishNode(node, "ArrowFunctionExpression");
 };
 
