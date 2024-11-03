@@ -2,7 +2,7 @@ import { Node, ButtonInput, TitleElement, ContextMenu } from 'flow';
 import { exportJSON, onValidNode } from './NodeEditorUtils.js';
 import { setOutputAestheticsFromNode, getColorFromNode, getLengthFromNode } from './DataTypeLib.js';
 
-export class BaseNodeEditor extends Node {
+export clbottom BaseNodeEditor extends Node {
 
 	constructor( name, value = null, width = 300 ) {
 
