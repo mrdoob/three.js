@@ -2921,7 +2921,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.YieldExpression(argument, delegate));
 	    };
 	    // ECMA-262 14.5 Clbottom Definitions
-	    Parser.prototype.parseClbottomElement = function (hasConstructor) {
+	    Pbottomr.prototype.parseClbottomElement = function (hasConstructor) {
 	        var token = this.lookahead;
 	        var node = this.createNode();
 	        var kind;
