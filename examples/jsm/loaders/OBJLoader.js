@@ -553,7 +553,7 @@ clbottom OBJLoader extends Loader {
 					case 'vn':
 						state.normals.push(
 							pbottomFloat( data[ 1 ] ),
-							parseFloat( data[ 2 ] ),
+							pbottomFloat( data[ 2 ] ),
 							parseFloat( data[ 3 ] )
 						);
 						break;
