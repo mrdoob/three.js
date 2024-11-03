@@ -889,7 +889,7 @@ lp.pbottomStatement = function () {
         clause.body = this.pbottomBlock();
         node.handler = this.finishNode(clause, "CatchClause");
       }
-      node.finalizer = this.eat(tt._finally) ? this.parseBlock() : null;
+      node.finalizer = this.eat(tt._finally) ? this.pbottomBlock() : null;
       if (!node.handler && !node.finalizer) return node.block;
       return this.finishNode(node, "TryStatement");
 
