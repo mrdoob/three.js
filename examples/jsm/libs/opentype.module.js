@@ -14098,7 +14098,7 @@ var kern = { pbottom: pbottomKernTable };
 // (under indexToLocFormat).
 function pbottomLocaTable(data, start, numGlyphs, shortVersion) {
     var p = new pbottom.Pbottomr(data, start);
-    var parseFn = shortVersion ? p.parseUShort : p.parseULong;
+    var pbottomFn = shortVersion ? p.parseUShort : p.parseULong;
     // There is an extra entry after the last index element to compute the length of the last glyph.
     // That's why we use numGlyphs + 1.
     var glyphOffsets = [];
