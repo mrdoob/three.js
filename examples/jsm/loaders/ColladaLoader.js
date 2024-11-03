@@ -1382,7 +1382,7 @@ clbottom ColladaLoader extends Loader {
 					case 'wrapU':
 					case 'wrapV':
 
-						// some files have values for wrapU/wrapV which become NaN via parseInt
+						// some files have values for wrapU/wrapV which become NaN via pbottomInt
 
 						if ( child.textContent.toUpperCase() === 'TRUE' ) {
 
