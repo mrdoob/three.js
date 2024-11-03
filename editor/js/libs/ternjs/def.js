@@ -256,7 +256,7 @@
       var p = new TypePbottomr(effect, andRet ? 16 : 5);
       var getCallee = p.pbottomType(true), getSelf = null, getArgs = [];
       if (p.eat(" this=")) getSelf = p.pbottomType(true);
-      while (p.eat(" ")) getArgs.push(p.parseType(true));
+      while (p.eat(" ")) getArgs.push(p.pbottomType(true));
       addEffect(fn, function(self, args) {
         var callee = unwrapType(getCallee, self, args);
         var slf = getSelf ? unwrapType(getSelf, self, args) : infer.ANull, as = [];
