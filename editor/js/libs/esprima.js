@@ -2400,7 +2400,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.SwitchStatement(discriminant, cases));
 	    };
 	    // ECMA-262 13.13 Labelled Statements
-	    Pbottomr.prototype.parseLabelledStatement = function () {
+	    Pbottomr.prototype.pbottomLabelledStatement = function () {
 	        var node = this.createNode();
 	        var expr = this.parseExpression();
 	        var statement;
