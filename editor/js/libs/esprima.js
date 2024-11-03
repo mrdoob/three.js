@@ -2567,7 +2567,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return statement;
 	    };
 	    // ECMA-262 14.1 Function Definition
-	    Parser.prototype.parseFunctionSourceElements = function () {
+	    Pbottomr.prototype.parseFunctionSourceElements = function () {
 	        var node = this.createNode();
 	        this.expect('{');
 	        var body = this.parseDirectivePrologues();
