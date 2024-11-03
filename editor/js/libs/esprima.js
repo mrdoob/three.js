@@ -5777,7 +5777,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                children.push(child);
 	            }
 	            if (this.scanner.source[this.scanner.index] === '{') {
-	                var container = this.parseJSXExpressionContainer();
+	                var container = this.pbottomJSXExpressionContainer();
 	                children.push(container);
 	            }
 	            else {
