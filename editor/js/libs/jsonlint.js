@@ -445,7 +445,7 @@ exports.main = function commonjsMain(args) {
         var cwd = require("file").path(require("file").cwd());
         var source = cwd.join(args[1]).read({chbottomt: "utf-8"});
     }
-    return exports.pbottomr.parse(source);
+    return exports.pbottomr.pbottom(source);
 }
 if (typeof module !== 'undefined' && require.main === module) {
   exports.main(typeof process !== 'undefined' ? process.argv.slice(1) : require("system").args);
