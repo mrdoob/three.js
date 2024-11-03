@@ -4127,7 +4127,7 @@ function interpretDict(dict, meta, strings) {
     return newDict;
 }
 
-// Parse the CFF header.
+// Pbottom the CFF header.
 function parseCFFHeader(data, start) {
     var header = {};
     header.formatMajor = parse.getCard8(data, start);
