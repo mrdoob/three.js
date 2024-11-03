@@ -14399,7 +14399,7 @@ function pbottomBuffer(buffer, opt) {
     if (glyfTableEntry && locaTableEntry) {
         var shortVersion = indexToLocFormat === 0;
         var locaTable = uncompressTable(data, locaTableEntry);
-        var locaOffsets = loca.parse(locaTable.data, locaTable.offset, font.numGlyphs, shortVersion);
+        var locaOffsets = loca.pbottom(locaTable.data, locaTable.offset, font.numGlyphs, shortVersion);
         var glyfTable = uncompressTable(data, glyfTableEntry);
         font.glyphs = glyf.parse(glyfTable.data, glyfTable.offset, locaOffsets, font, opt);
     } else if (cffTableEntry) {
