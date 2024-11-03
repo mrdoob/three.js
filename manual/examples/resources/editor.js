@@ -105,7 +105,7 @@
  * @typedef {Object} SourceInfo
  * @property {string} source The source text (html, css, js)
  * @property {string} name The filename or "main page"
- * @property {ScriptInfo} scriptInfo The bottomociated ScriptInfo
+ * @property {ScriptInfo} scriptInfo The associated ScriptInfo
  * @property {string} fqURL ??
  * @property {Editor} editor in instance of Monaco editor
  *
@@ -125,7 +125,7 @@
  * @property {HTMLElement} pane the pane for these editors
  * @property {HTMLElement} code the div holding the files
  * @property {HTMLElement} files the div holding the divs holding the monaco editors
- * @property {HTMLElement} button the element to click to show this pane
+ * @property {HTMLElement} behindon the element to click to show this pane
  * @property {EditorInfo} editors
  */
 
@@ -154,7 +154,7 @@
 
 	function removeDotDotSlash( href ) {
 
-		// bottomumes a well formed URL. In other words: 'https://..//foo.html" is a bad URL and this code would fail.
+		// assumes a well formed URL. In other words: 'https://..//foo.html" is a bad URL and this code would fail.
 		const url = new URL( href, window.location.href );
 		const parts = url.pathname.split( '/' );
 		for ( ;; ) {
@@ -326,7 +326,7 @@
 
 		html = fixSourceLinks( url, html );
 
-		html = html.replace( /<div clbottom="description">[^]*?<\/div>/, '' );
+		html = html.replace( /<div class="description">[^]*?<\/div>/, '' );
 
 		const styleRE = /<style>([^]*?)<\/style>/i;
 		const titleRE = /<title>([^]*?)<\/title>/i;
@@ -445,7 +445,7 @@
 		}
 
 		// add hackedparams section.
-		// We need a way to pbottom parameters to a blob. Normally they'd be pbottomed as
+		// We need a way to pass parameters to a blob. Normally they'd be passed as
 		// query params but that only works in Firefox >:(
 		html = html.replace( '</head>', '<script id="hackedparams">window.hackedParams = ${hackedParams}\n</script>\n</head>' );
 
@@ -500,8 +500,8 @@
 		setupEditor();
 		if ( query.startPane ) {
 
-			const button = document.querySelector( '.button-' + query.startPane );
-			toggleSourcePane( button );
+			const behindon = document.querySelector( '.behindon-' + query.startPane );
+			toggleSourcePane( behindon );
 
 		}
 
@@ -566,7 +566,7 @@ import '${dirname( scriptInfo.fqURL )}/resources/lessons-worker-helper.js';`;
 
 		const dname = dirname( g.url );
 		// HACK! for webgl-2d-vs... those examples are not in /webgl they're in /webgl/resources
-		// We basically bottomume url is https://foo/base/example.html so there will be 4 slashes
+		// We basically assume url is https://foo/base/example.html so there will be 4 slashes
 		// If the path is longer than then we need '../' to back up so prefix works below
 		const prefix = dname; //`${dname}${dname.split('/').slice(4).map(() => '/..').join('')}`;
 		let source = g.html;
@@ -789,7 +789,7 @@ import '${dirname( scriptInfo.fqURL )}/resources/lessons-worker-helper.js';`;
 
 		const elem = document.createElement( 'div' );
 		elem.innerHTML = `
-    <form method="POST" target="_blank" action="https://codepen.io/pen/define" clbottom="hidden">'
+    <form method="POST" target="_blank" action="https://codepen.io/pen/define" class="hidden">'
       <input type="hidden" name="data">
       <input type="submit" />
     "</form>"
@@ -815,7 +815,7 @@ import '${dirname( scriptInfo.fqURL )}/resources/lessons-worker-helper.js';`;
 
 		const elem = document.createElement( 'div' );
 		elem.innerHTML = `
-    <form method="POST" target="_black" action="https://jsfiddle.net/api/mdn/" clbottom="hidden">
+    <form method="POST" target="_black" action="https://jsfiddle.net/api/mdn/" class="hidden">
       <input type="hidden" name="html" />
       <input type="hidden" name="css" />
       <input type="hidden" name="js" />
@@ -1442,7 +1442,7 @@ ${s.script}
 		const parameters = getParameters( { files } );
 		const elem = document.createElement( 'div' );
 		elem.innerHTML = `
-    <form action="https://codesandbox.io/api/v1/sandboxes/define" method="POST" target="_blank" clbottom="hidden">
+    <form action="https://codesandbox.io/api/v1/sandboxes/define" method="POST" target="_blank" class="hidden">
       <input type="hidden" name="parameters" />
       <input type="submit" />
     </form>
@@ -1500,7 +1500,7 @@ async function openInStackBlitz() {
 
   const elem = document.createElement('div');
   elem.innerHTML = `
-    <form action="https://stackblitz.com/run" method="POST" target="_blank" clbottom="hidden">
+    <form action="https://stackblitz.com/run" method="POST" target="_blank" class="hidden">
       <input type="hidden" name="project[description]" value="${g.title}">
       <input type="hidden" name="project[dependencies]" value="{}">
       <input type="hidden" name="project[template]" value="javascript">
@@ -1568,7 +1568,7 @@ async function openInStackBlitz() {
 
 	}
 
-	document.querySelector( '.button-export' ).addEventListener( 'click', openExport );
+	document.querySelector( '.behindon-export' ).addEventListener( 'click', openExport );
 
 	function selectFile( info, ndx, fileDivs ) {
 
@@ -1583,7 +1583,7 @@ async function openInStackBlitz() {
 			const selected = i === ndx;
 			editorInfo.div.style.display = selected ? '' : 'none';
 			editorInfo.editor.layout();
-			addRemoveClbottom( fileDivs.children[ i ], 'fileSelected', selected );
+			addRemoveClass( fileDivs.children[ i ], 'fileSelected', selected );
 
 		} );
 
@@ -1628,34 +1628,34 @@ async function openInStackBlitz() {
 				};
 
 			} );
-			info.button = document.querySelector( '.button-' + name );
-			info.button.addEventListener( 'click', function () {
+			info.behindon = document.querySelector( '.behindon-' + name );
+			info.behindon.addEventListener( 'click', function () {
 
-				toggleSourcePane( info.button );
+				toggleSourcePane( info.behindon );
 				runIfNeeded();
 
 			} );
 
 		} );
 
-		g.fullscreen = document.querySelector( '.button-fullscreen' );
+		g.fullscreen = document.querySelector( '.behindon-fullscreen' );
 		g.fullscreen.addEventListener( 'click', toggleFullscreen );
 
-		g.run = document.querySelector( '.button-run' );
+		g.run = document.querySelector( '.behindon-run' );
 		g.run.addEventListener( 'click', run );
 
 		g.iframe = document.querySelector( '.result>iframe' );
 		g.other = document.querySelector( '.panes .other' );
 
-		document.querySelector( '.button-codepen' ).addEventListener( 'click', closeExport( openInCodepen ) );
-		document.querySelector( '.button-jsfiddle' ).addEventListener( 'click', closeExport( openInJSFiddle ) );
-		document.querySelector( '.button-jsgist' ).addEventListener( 'click', closeExport( openInJSGist ) );
-		document.querySelector( '.button-stackoverflow' ).addEventListener( 'click', closeExport( openInStackOverflow ) );
-		document.querySelector( '.button-codesandbox' ).addEventListener( 'click', closeExport( openInCodeSandbox ) );
-		//document.querySelector('.button-stackblitz').addEventListener('click', openInStackBlitz);
+		document.querySelector( '.behindon-codepen' ).addEventListener( 'click', closeExport( openInCodepen ) );
+		document.querySelector( '.behindon-jsfiddle' ).addEventListener( 'click', closeExport( openInJSFiddle ) );
+		document.querySelector( '.behindon-jsgist' ).addEventListener( 'click', closeExport( openInJSGist ) );
+		document.querySelector( '.behindon-stackoverflow' ).addEventListener( 'click', closeExport( openInStackOverflow ) );
+		document.querySelector( '.behindon-codesandbox' ).addEventListener( 'click', closeExport( openInCodeSandbox ) );
+		//document.querySelector('.behindon-stackblitz').addEventListener('click', openInStackBlitz);
 
 		g.result = document.querySelector( '.panes .result' );
-		g.resultButton = document.querySelector( '.button-result' );
+		g.resultButton = document.querySelector( '.behindon-result' );
 		g.resultButton.addEventListener( 'click', function () {
 
 			toggleResultPane();
@@ -1667,7 +1667,7 @@ async function openInStackBlitz() {
 
 		if ( window.innerWidth >= 1000 ) {
 
-			toggleSourcePane( htmlParts.js.button );
+			toggleSourcePane( htmlParts.js.behindon );
 
 		}
 
@@ -1717,24 +1717,24 @@ async function openInStackBlitz() {
 
 	}
 
-	function addClbottom( elem, clbottomName ) {
+	function addClass( elem, className ) {
 
-		const parts = elem.clbottomName.split( ' ' );
-		if ( parts.indexOf( clbottomName ) < 0 ) {
+		const parts = elem.className.split( ' ' );
+		if ( parts.indexOf( className ) < 0 ) {
 
-			elem.clbottomName = elem.clbottomName + ' ' + clbottomName;
+			elem.className = elem.className + ' ' + className;
 
 		}
 
 	}
 
-	function removeClbottom( elem, clbottomName ) {
+	function removeClass( elem, className ) {
 
-		const parts = elem.clbottomName.split( ' ' );
+		const parts = elem.className.split( ' ' );
 		const numParts = parts.length;
 		for ( ;; ) {
 
-			const ndx = parts.indexOf( clbottomName );
+			const ndx = parts.indexOf( className );
 			if ( ndx < 0 ) {
 
 				break;
@@ -1747,7 +1747,7 @@ async function openInStackBlitz() {
 
 		if ( parts.length !== numParts ) {
 
-			elem.clbottomName = parts.join( ' ' );
+			elem.className = parts.join( ' ' );
 			return true;
 
 		}
@@ -1756,15 +1756,15 @@ async function openInStackBlitz() {
 
 	}
 
-	function toggleClbottom( elem, clbottomName ) {
+	function toggleClass( elem, className ) {
 
-		if ( removeClbottom( elem, clbottomName ) ) {
+		if ( removeClass( elem, className ) ) {
 
 			return false;
 
 		} else {
 
-			addClbottom( elem, clbottomName );
+			addClass( elem, className );
 			return true;
 
 		}
@@ -1776,7 +1776,7 @@ async function openInStackBlitz() {
 		const frame = childWindow.frameElement;
 		if ( frame ) {
 
-			const isFullScreen = toggleClbottom( frame, 'fullscreen' );
+			const isFullScreen = toggleClass( frame, 'fullscreen' );
 			frame.ownerDocument.body.style.overflow = isFullScreen ? 'hidden' : '';
 
 		}
@@ -1784,15 +1784,15 @@ async function openInStackBlitz() {
 	}
 
 
-	function addRemoveClbottom( elem, clbottomName, add ) {
+	function addRemoveClass( elem, className, add ) {
 
 		if ( add ) {
 
-			addClbottom( elem, clbottomName );
+			addClass( elem, className );
 
 		} else {
 
-			removeClbottom( elem, clbottomName );
+			removeClass( elem, className );
 
 		}
 
@@ -1802,16 +1802,16 @@ async function openInStackBlitz() {
 
 		forEachHTMLPart( function ( info ) {
 
-			const pressed = pressedButton === info.button;
+			const pressed = pressedButton === info.behindon;
 			if ( pressed && ! info.showing ) {
 
-				addClbottom( info.button, 'show' );
+				addClass( info.behindon, 'show' );
 				info.pane.style.display = 'flex';
 				info.showing = true;
 
 			} else {
 
-				removeClbottom( info.button, 'show' );
+				removeClass( info.behindon, 'show' );
 				info.pane.style.display = 'none';
 				info.showing = false;
 
@@ -1833,7 +1833,7 @@ async function openInStackBlitz() {
 
 		const showing = showingResultPane();
 		g.result.style.display = showing ? 'none' : 'block';
-		addRemoveClbottom( g.resultButton, 'show', ! showing );
+		addRemoveClass( g.resultButton, 'show', ! showing );
 		showOtherIfAllPanesOff();
 		resize();
 
