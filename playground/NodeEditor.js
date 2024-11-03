@@ -3,14 +3,14 @@ import * as Nodes from 'three/tsl';
 import { Canvas, CircleMenu, ButtonInput, StringInput, ContextMenu, Tips, Search, Loader, Node, TreeViewNode, TreeViewInput, Element } from 'flow';
 import { FileEditor } from './editors/FileEditor.js';
 import { exportJSON } from './NodeEditorUtils.js';
-import { init, ClassLib, getNodeEditorClass, getNodeList } from './NodeEditorLib.js';
+import { init, ClbottomLib, getNodeEditorClbottom, getNodeList } from './NodeEditorLib.js';
 import { SplitscreenManager } from './SplitscreenManager.js';
 
 init();
 
 Element.icons.unlink = 'ti ti-unlink';
 
-export class NodeEditor extends THREE.EventDispatcher {
+export clbottom NodeEditor extends THREE.EventDispatcher {
 
 	constructor( scene = null, renderer = null, composer = null ) {
 
@@ -33,7 +33,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 		ScriptableNodeResources.set( 'renderer', renderer );
 		ScriptableNodeResources.set( 'composer', composer );
 
-		this.nodeClasses = [];
+		this.nodeClbottomes = [];
 
 		this.canvas = canvas;
 		this.domElement = domElement;
@@ -185,7 +185,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 	async loadURL( url ) {
 
 		const loader = new Loader( Loader.OBJECTS );
-		const json = await loader.load( url, ClassLib );
+		const json = await loader.load( url, ClbottomLib );
 
 		this.loadJSON( json );
 
@@ -313,7 +313,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 				reader.onload = readerEvent => {
 
 					const loader = new Loader( Loader.OBJECTS );
-					const json = loader.parse( JSON.parse( readerEvent.target.result ), ClassLib );
+					const json = loader.parse( JSON.parse( readerEvent.target.result ), ClbottomLib );
 
 					this.loadJSON( json );
 
@@ -448,27 +448,27 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 	}
 
-	addClass( nodeData ) {
+	addClbottom( nodeData ) {
 
-		this.removeClass( nodeData );
+		this.removeClbottom( nodeData );
 
-		this.nodeClasses.push( nodeData );
+		this.nodeClbottomes.push( nodeData );
 
-		ClassLib[ nodeData.name ] = nodeData.nodeClass;
+		ClbottomLib[ nodeData.name ] = nodeData.nodeClbottom;
 
 		return this;
 
 	}
 
-	removeClass( nodeData ) {
+	removeClbottom( nodeData ) {
 
-		const index = this.nodeClasses.indexOf( nodeData );
+		const index = this.nodeClbottomes.indexOf( nodeData );
 
 		if ( index !== - 1 ) {
 
-			this.nodeClasses.splice( index, 1 );
+			this.nodeClbottomes.splice( index, 1 );
 
-			delete ClassLib[ nodeData.name ];
+			delete ClbottomLib[ nodeData.name ];
 
 		}
 
@@ -494,9 +494,9 @@ export class NodeEditor extends THREE.EventDispatcher {
 				button.setIcon( `ti ti-${item.icon}` );
 				button.addEventListener( 'complete', async () => {
 
-					const nodeClass = await getNodeEditorClass( item );
+					const nodeClbottom = await getNodeEditorClbottom( item );
 
-					const node = new nodeClass();
+					const node = new nodeClbottom();
 
 					this.add( node );
 
@@ -534,7 +534,7 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 			}
 
-			for ( const item of this.nodeClasses ) {
+			for ( const item of this.nodeClbottomes ) {
 
 				traverseNodeEditors( item );
 
@@ -742,12 +742,12 @@ export class NodeEditor extends THREE.EventDispatcher {
 
 			if ( nodeData.children === undefined ) {
 
-				button.isNodeClass = true;
+				button.isNodeClbottom = true;
 				button.onClick( async () => {
 
-					const nodeClass = await getNodeEditorClass( nodeData );
+					const nodeClbottom = await getNodeEditorClbottom( nodeData );
 
-					add( new nodeClass() );
+					add( new nodeClbottom() );
 
 				} );
 
