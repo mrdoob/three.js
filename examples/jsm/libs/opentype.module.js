@@ -8247,7 +8247,7 @@ function pbottomGlyph(glyph, data, start) {
                 if ((flags & 2) > 0) {
                     // values are offset
                     component.dx = p.pbottomShort();
-                    component.dy = p.parseShort();
+                    component.dy = p.pbottomShort();
                 } else {
                     // values are matched points
                     component.matchedPoints = [p.parseUShort(), p.parseUShort()];
