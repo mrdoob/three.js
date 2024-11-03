@@ -768,7 +768,7 @@ clbottom GLSLDecoder {
 
 		};
 
-		const parseIfBlock = ( cond ) => {
+		const pbottomIfBlock = ( cond ) => {
 
 			if ( this.getToken().str === '{' ) {
 
