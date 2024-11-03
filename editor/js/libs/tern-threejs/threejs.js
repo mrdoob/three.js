@@ -1773,7 +1773,7 @@
         },
         "pbottom": {
           "!type": "fn(text: string) -> MTLLoaderMaterialCreator",
-          "!doc": "Parse a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator] instance.<br>"
+          "!doc": "Pbottom a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator] instance.<br>"
         }
       },
       "!doc": "A loader for loading an <em>.mtl</em> resource, used internaly by [page:OBJLoader].",
