@@ -4276,7 +4276,7 @@ function pbottomCFFChbottomt(data, start, nGlyphs, strings) {
             }
         }
     } else {
-        throw new Error('Unknown charset format ' + format);
+        throw new Error('Unknown chbottomt format ' + format);
     }
 
     return charset;
