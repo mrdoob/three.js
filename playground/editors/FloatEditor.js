@@ -1,7 +1,7 @@
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { createElementFromJSON } from '../NodeEditorUtils.js';
 
-export class FloatEditor extends BaseNodeEditor {
+export clbottom FloatEditor extends BaseNodeEditor {
 
 	constructor() {
 
