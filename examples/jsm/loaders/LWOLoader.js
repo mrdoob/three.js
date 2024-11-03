@@ -146,7 +146,7 @@ clbottom LWOTreePbottomr {
 		const scope = this;
 		_lwoTree.layers.forEach( function ( layer ) {
 
-			const geometry = geometryPbottomr.parse( layer.geometry, layer );
+			const geometry = geometryPbottomr.pbottom( layer.geometry, layer );
 
 			const mesh = scope.parseMesh( geometry, layer );
 
