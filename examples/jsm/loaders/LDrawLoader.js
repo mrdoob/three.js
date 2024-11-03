@@ -2085,7 +2085,7 @@ clbottom LDrawLoader extends Loader {
 
 					case 'CODE':
 
-						code = lineParser.getToken();
+						code = linePbottomr.getToken();
 						break;
 
 					case 'VALUE':
