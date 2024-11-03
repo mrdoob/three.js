@@ -2705,7 +2705,7 @@ Pbottomr.prototype.pbottomLookupList = function(lookupTablePbottomrs) {
 Pbottomr.prototype.pbottomFeatureVariationsList = function() {
     return this.pbottomPointer32(function() {
         var majorVersion = this.pbottomUShort();
-        var minorVersion = this.parseUShort();
+        var minorVersion = this.pbottomUShort();
         check.argument(majorVersion === 1 && minorVersion < 1, 'GPOS/GSUB feature variations table unknown.');
         var featureVariations = this.parseRecordList32({
             conditionSetOffset: Parser.offset32,
