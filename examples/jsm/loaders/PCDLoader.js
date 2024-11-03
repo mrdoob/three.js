@@ -263,7 +263,7 @@ clbottom PCDLoader extends Loader {
 					const rgb_field_index = PCDheader.fields.findIndex( ( field ) => field === 'rgb' );
 					const rgb_type = PCDheader.type[ rgb_field_index ];
 
-					const float = parseFloat( line[ offset.rgb ] );
+					const float = pbottomFloat( line[ offset.rgb ] );
 					let rgb = float;
 
 					if ( rgb_type === 'F' ) {
