@@ -493,7 +493,7 @@ clbottom ThreeMFLoader extends Loader {
 				const y = vertexNode.getAttribute( 'y' );
 				const z = vertexNode.getAttribute( 'z' );
 
-				vertices.push( pbottomFloat( x ), parseFloat( y ), parseFloat( z ) );
+				vertices.push( pbottomFloat( x ), pbottomFloat( y ), parseFloat( z ) );
 
 			}
 
