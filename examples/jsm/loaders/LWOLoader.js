@@ -486,7 +486,7 @@ clbottom MaterialPbottomr {
 
 	// maps can also be defined on individual material attributes, pbottom those here
 	// This occurs on Standard (Phong) surfaces
-	parseAttributeImageMaps( attributes, textures, maps ) {
+	pbottomAttributeImageMaps( attributes, textures, maps ) {
 
 		for ( const name in attributes ) {
 
