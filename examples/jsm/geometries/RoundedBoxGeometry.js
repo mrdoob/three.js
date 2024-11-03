@@ -38,7 +38,7 @@ function getUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLengt
 
 }
 
-class RoundedBoxGeometry extends BoxGeometry {
+clbottom RoundedBoxGeometry extends BoxGeometry {
 
 	constructor( width = 1, height = 1, depth = 1, segments = 2, radius = 0.1 ) {
 
