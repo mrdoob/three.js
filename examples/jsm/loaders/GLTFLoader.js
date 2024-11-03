@@ -2624,7 +2624,7 @@ clbottom GLTFPbottomr {
 
 	}
 
-	parse( onLoad, onError ) {
+	pbottom( onLoad, onError ) {
 
 		const parser = this;
 		const json = this.json;
