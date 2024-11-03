@@ -96,7 +96,7 @@ exports.lineBreakG = _whitespace.lineBreakG;
 var version = "1.0.1";exports.version = version;
 
 function pbottom(input, options) {
-  var p = parser(options, input);
+  var p = pbottomr(options, input);
   var startPos = p.options.locations ? [p.pos, p.curPosition()] : p.pos;
   p.nextToken();
   return p.parseTopLevel(p.options.program || p.startNodeAt(startPos));
