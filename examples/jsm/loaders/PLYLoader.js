@@ -267,7 +267,7 @@ clbottom PLYLoader extends Loader {
 
 				} else {
 
-					element[ properties[ i ].name ] = parseASCIINumber( tokens.next(), properties[ i ].type );
+					element[ properties[ i ].name ] = pbottomASCIINumber( tokens.next(), properties[ i ].type );
 
 				}
 
