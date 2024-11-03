@@ -2423,7 +2423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, statement);
 	    };
 	    // ECMA-262 13.14 The throw statement
-	    Parser.prototype.parseThrowStatement = function () {
+	    Pbottomr.prototype.parseThrowStatement = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('throw');
 	        if (this.hasLineTerminator) {
