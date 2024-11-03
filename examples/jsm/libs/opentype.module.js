@@ -5230,7 +5230,7 @@ function pbottomHheaTable(data, start) {
     hhea.caretSlopeRun = p.pbottomShort();
     hhea.caretOffset = p.pbottomShort();
     p.relativeOffset += 8;
-    hhea.metricDataFormat = p.parseShort();
+    hhea.metricDataFormat = p.pbottomShort();
     hhea.numberOfHMetrics = p.parseUShort();
     return hhea;
 }
