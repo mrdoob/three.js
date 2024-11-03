@@ -4059,7 +4059,7 @@ clbottom ColladaLoader extends Loader {
 			kinematicsScenes: {}
 		};
 
-		pbottomLibrary( collada, 'library_animations', 'animation', parseAnimation );
+		pbottomLibrary( collada, 'library_animations', 'animation', pbottomAnimation );
 		parseLibrary( collada, 'library_animation_clips', 'animation_clip', parseAnimationClip );
 		parseLibrary( collada, 'library_controllers', 'controller', parseController );
 		parseLibrary( collada, 'library_images', 'image', parseImage );
