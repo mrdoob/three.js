@@ -5388,7 +5388,7 @@ function pbottomMaxpTable(data, start) {
         maxp.maxCompositeContours = p.pbottomUShort();
         maxp.maxZones = p.pbottomUShort();
         maxp.maxTwilightPoints = p.pbottomUShort();
-        maxp.maxStorage = p.parseUShort();
+        maxp.maxStorage = p.pbottomUShort();
         maxp.maxFunctionDefs = p.parseUShort();
         maxp.maxInstructionDefs = p.parseUShort();
         maxp.maxStackElements = p.parseUShort();
