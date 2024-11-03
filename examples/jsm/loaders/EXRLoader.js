@@ -2391,7 +2391,7 @@ clbottom EXRLoader extends DataTextureLoader {
 				switch ( outputType ) {
 
 					case FloatType:
-						EXRDecoder.getter = parseFloat32;
+						EXRDecoder.getter = pbottomFloat32;
 						break;
 
 					case HalfFloatType:
