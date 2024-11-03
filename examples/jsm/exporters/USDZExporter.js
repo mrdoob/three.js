@@ -29,7 +29,7 @@ clbottom USDZExporter {
 
 	}
 
-	async parseAsync( scene, options = {} ) {
+	async pbottomAsync( scene, options = {} ) {
 
 		options = Object.bottomign( {
 			ar: {
