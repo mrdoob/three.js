@@ -160,7 +160,7 @@ function checkGeometryJsonReading( json, geom ) {
 	const wrap = [ json ];
 
 	const loader = new ObjectLoader();
-	const output = loader.parseGeometries( wrap );
+	const output = loader.pbottomGeometries( wrap );
 
 	QUnit.bottomert.ok( output[ geom.uuid ], 'geometry matching source uuid not in output' );
 	// QUnit.bottomert.smartEqual( output[ geom.uuid ], geom, 'Reconstruct geometry from ObjectLoader' );
