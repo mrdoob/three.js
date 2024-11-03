@@ -10509,7 +10509,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	pbottomHeader();
 	pbottomVertices();
-	parseFaces();
+	pbottomFaces();
 	parseMaterials();
 	parseBones();
 	parseIks();
