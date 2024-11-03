@@ -20,12 +20,12 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>Post Processing</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p><em>Post processing</em> generally refers to applying some kind of effect or filter to
 a 2D image. In the case of THREE.js we have a scene with a bunch of meshes in
 it. We render that scene into a 2D image. Normally that image is rendered
@@ -35,81 +35,81 @@ processing</em> effects to the result before drawing it to the canvas. It's call
 post processing because it happens after (post) the main scene processing.</p>
 <p>Examples of post processing are Instagram like filters,
 Photoshop filters, etc...</p>
-<p>THREE.js has some example classes to help setup a post processing pipeline. The
-way it works is you create an <code class="notranslate" translate="no">EffectComposer</code> and to it you add multiple <code class="notranslate" translate="no">Pass</code>
-objects. You then call <code class="notranslate" translate="no">EffectComposer.render</code> and it renders your scene to a
-<a href="rendertargets.html">render target</a> and then applies each <code class="notranslate" translate="no">Pass</code>.</p>
-<p>Each <code class="notranslate" translate="no">Pass</code> can be some post processing effect like adding a vignette, blurring,
+<p>THREE.js has some example clbottomes to help setup a post processing pipeline. The
+way it works is you create an <code clbottom="notranslate" translate="no">EffectComposer</code> and to it you add multiple <code clbottom="notranslate" translate="no">Pbottom</code>
+objects. You then call <code clbottom="notranslate" translate="no">EffectComposer.render</code> and it renders your scene to a
+<a href="rendertargets.html">render target</a> and then applies each <code clbottom="notranslate" translate="no">Pbottom</code>.</p>
+<p>Each <code clbottom="notranslate" translate="no">Pbottom</code> can be some post processing effect like adding a vignette, blurring,
 applying a bloom, applying film grain, adjusting the hue, saturation, contrast,
 etc... and finally rendering the result to the canvas.</p>
-<p>It's a little bit important to understand how <code class="notranslate" translate="no">EffectComposer</code> functions. It
+<p>It's a little bit important to understand how <code clbottom="notranslate" translate="no">EffectComposer</code> functions. It
 creates two <a href="rendertargets.html">render targets</a>. Let's call them
 <strong>rtA</strong> and <strong>rtB</strong>.</p>
-<p>Then, you call <code class="notranslate" translate="no">EffectComposer.addPass</code> to add each pass in the order you want
-to apply them. The passes are then applied <em>something like</em> this.</p>
-<div class="threejs_center"><img src="../resources/images/threejs-postprocessing.svg" style="width: 600px"></div>
+<p>Then, you call <code clbottom="notranslate" translate="no">EffectComposer.addPbottom</code> to add each pbottom in the order you want
+to apply them. The pbottomes are then applied <em>something like</em> this.</p>
+<div clbottom="threejs_center"><img src="../resources/images/threejs-postprocessing.svg" style="width: 600px"></div>
 
-<p>First the scene you passed into <code class="notranslate" translate="no">RenderPass</code> is rendered to <strong>rtA</strong>, then
-<strong>rtA</strong> is passed to the next pass, whatever it is. That pass uses <strong>rtA</strong> as
+<p>First the scene you pbottomed into <code clbottom="notranslate" translate="no">RenderPbottom</code> is rendered to <strong>rtA</strong>, then
+<strong>rtA</strong> is pbottomed to the next pbottom, whatever it is. That pbottom uses <strong>rtA</strong> as
 input to do whatever it does and writes the results to <strong>rtB</strong>. <strong>rtB</strong> is then
-passed to the next pass which uses <strong>rtB</strong> as input and writes back to <strong>rtA</strong>.
-This continues through all the passes. </p>
-<p>Each <code class="notranslate" translate="no">Pass</code> has 4 basic options</p>
-<h2 id="-enabled-"><code class="notranslate" translate="no">enabled</code></h2>
-<p>Whether or not to use this pass</p>
-<h2 id="-needsswap-"><code class="notranslate" translate="no">needsSwap</code></h2>
-<p>Whether or not to swap <code class="notranslate" translate="no">rtA</code> and <code class="notranslate" translate="no">rtB</code> after finishing this pass</p>
-<h2 id="-clear-"><code class="notranslate" translate="no">clear</code></h2>
-<p>Whether or not to clear before rendering this pass</p>
-<h2 id="-rendertoscreen-"><code class="notranslate" translate="no">renderToScreen</code></h2>
+pbottomed to the next pbottom which uses <strong>rtB</strong> as input and writes back to <strong>rtA</strong>.
+This continues through all the pbottomes. </p>
+<p>Each <code clbottom="notranslate" translate="no">Pbottom</code> has 4 basic options</p>
+<h2 id="-enabled-"><code clbottom="notranslate" translate="no">enabled</code></h2>
+<p>Whether or not to use this pbottom</p>
+<h2 id="-needsswap-"><code clbottom="notranslate" translate="no">needsSwap</code></h2>
+<p>Whether or not to swap <code clbottom="notranslate" translate="no">rtA</code> and <code clbottom="notranslate" translate="no">rtB</code> after finishing this pbottom</p>
+<h2 id="-clear-"><code clbottom="notranslate" translate="no">clear</code></h2>
+<p>Whether or not to clear before rendering this pbottom</p>
+<h2 id="-rendertoscreen-"><code clbottom="notranslate" translate="no">renderToScreen</code></h2>
 <p>Whether or not to render to the canvas instead the current destination render
-target. In most use cases you do not set this flag explicitly since the last pass in the pass chain is automatically rendered to screen.</p>
+target. In most use cases you do not set this flag explicitly since the last pbottom in the pbottom chain is automatically rendered to screen.</p>
 <p>Let's put together a basic example. We'll start with the example from <a href="responsive.html">the
 article on responsiveness</a>.</p>
-<p>To that first we create an <code class="notranslate" translate="no">EffectComposer</code>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const composer = new EffectComposer(renderer);
+<p>To that first we create an <code clbottom="notranslate" translate="no">EffectComposer</code>.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const composer = new EffectComposer(renderer);
 </pre>
-<p>Then as the first pass we add a <code class="notranslate" translate="no">RenderPass</code> that will render our scene with our
+<p>Then as the first pbottom we add a <code clbottom="notranslate" translate="no">RenderPbottom</code> that will render our scene with our
 camera into the first render target.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">composer.addPass(new RenderPass(scene, camera));
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">composer.addPbottom(new RenderPbottom(scene, camera));
 </pre>
-<p>Next we add a <code class="notranslate" translate="no">BloomPass</code>. A <code class="notranslate" translate="no">BloomPass</code> renders its input to a generally
+<p>Next we add a <code clbottom="notranslate" translate="no">BloomPbottom</code>. A <code clbottom="notranslate" translate="no">BloomPbottom</code> renders its input to a generally
 smaller render target and blurs the result. It then adds that blurred result on
 top of the original input. This makes the scene <em>bloom</em></p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const bloomPass = new BloomPass(
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const bloomPbottom = new BloomPbottom(
     1,    // strength
     25,   // kernel size
     4,    // sigma ?
     256,  // blur render target resolution
 );
-composer.addPass(bloomPass);
+composer.addPbottom(bloomPbottom);
 </pre>
-<p>Next we had a <code class="notranslate" translate="no">FilmPass</code> that draws noise and scanlines on top of its input.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const filmPass = new FilmPass(
+<p>Next we had a <code clbottom="notranslate" translate="no">FilmPbottom</code> that draws noise and scanlines on top of its input.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const filmPbottom = new FilmPbottom(
     0.5,   // intensity
     false,  // grayscale
 );
-composer.addPass(filmPass);
+composer.addPbottom(filmPbottom);
 </pre>
-<p>Finally we had a <code class="notranslate" translate="no">OutputPass</code> which performs color space conversion to sRGB and optional tone mapping.
-This pass is usually the last pass of the pass chain.
+<p>Finally we had a <code clbottom="notranslate" translate="no">OutputPbottom</code> which performs color space conversion to sRGB and optional tone mapping.
+This pbottom is usually the last pbottom of the pbottom chain.
 </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const outputPass = new OutputPass();
-composer.addPass(outputPass);
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const outputPbottom = new OutputPbottom();
+composer.addPbottom(outputPbottom);
 </pre>
-<p>To use these classes we need to import a bunch of scripts.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
-import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
-import {BloomPass} from 'three/addons/postprocessing/BloomPass.js';
-import {FilmPass} from 'three/addons/postprocessing/FilmPass.js';
-import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
+<p>To use these clbottomes we need to import a bunch of scripts.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPbottom} from 'three/addons/postprocessing/RenderPbottom.js';
+import {BloomPbottom} from 'three/addons/postprocessing/BloomPbottom.js';
+import {FilmPbottom} from 'three/addons/postprocessing/FilmPbottom.js';
+import {OutputPbottom} from 'three/addons/postprocessing/OutputPbottom.js';
 </pre>
-<p>For pretty much any post processing <code class="notranslate" translate="no">EffectComposer.js</code>, <code class="notranslate" translate="no">RenderPass.js</code> and <code class="notranslate" translate="no">OutputPass.js</code>
+<p>For pretty much any post processing <code clbottom="notranslate" translate="no">EffectComposer.js</code>, <code clbottom="notranslate" translate="no">RenderPbottom.js</code> and <code clbottom="notranslate" translate="no">OutputPbottom.js</code>
 are required.</p>
-<p>The last things we need to do are to use <code class="notranslate" translate="no">EffectComposer.render</code> instead of
-<a href="/docs/#api/en/renderers/WebGLRenderer.render"><code class="notranslate" translate="no">WebGLRenderer.render</code></a> <em>and</em> to tell the <code class="notranslate" translate="no">EffectComposer</code> to match the size of
+<p>The last things we need to do are to use <code clbottom="notranslate" translate="no">EffectComposer.render</code> instead of
+<a href="/docs/#api/en/renderers/WebGLRenderer.render"><code clbottom="notranslate" translate="no">WebGLRenderer.render</code></a> <em>and</em> to tell the <code clbottom="notranslate" translate="no">EffectComposer</code> to match the size of
 the canvas.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function render(now) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-function render(now) {
 -  time *= 0.001;
 +let then = 0;
 +function render(now) {
@@ -138,12 +138,12 @@ the canvas.</p>
   requestAnimationFrame(render);
 }
 </pre>
-<p><code class="notranslate" translate="no">EffectComposer.render</code> takes a <code class="notranslate" translate="no">deltaTime</code> which is the time in seconds since
-the last frame was rendered. It passes this to the various effects in case any
-of them are animated. In this case the <code class="notranslate" translate="no">FilmPass</code> is animated.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/postprocessing.html" target="_blank">click here to open in a separate window</a>
+<p><code clbottom="notranslate" translate="no">EffectComposer.render</code> takes a <code clbottom="notranslate" translate="no">deltaTime</code> which is the time in seconds since
+the last frame was rendered. It pbottomes this to the various effects in case any
+of them are animated. In this case the <code clbottom="notranslate" translate="no">FilmPbottom</code> is animated.</p>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/postprocessing.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -152,41 +152,41 @@ Let's add a gui to adjust some of the parameters. Figuring out which values you
 can easily adjust and how to adjust them requires digging through the code for
 that effect.</p>
 <p>Looking inside
-<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/BloomPass.js"><code class="notranslate" translate="no">BloomPass.js</code></a>
+<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/BloomPbottom.js"><code clbottom="notranslate" translate="no">BloomPbottom.js</code></a>
 I found this line:</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.copyUniforms[ "opacity" ].value = strength;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">this.copyUniforms[ "opacity" ].value = strength;
 </pre>
 <p>So we can set the strength by setting</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">bloomPass.copyUniforms.opacity.value = someValue;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">bloomPbottom.copyUniforms.opacity.value = someValue;
 </pre>
 <p>Similarly looking in
-<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPass.js"><code class="notranslate" translate="no">FilmPass.js</code></a>
+<a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/FilmPbottom.js"><code clbottom="notranslate" translate="no">FilmPbottom.js</code></a>
 I found these lines:</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">this.uniforms.intensity.value = intensity;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">this.uniforms.intensity.value = intensity;
 this.uniforms.grayscale.value = grayscale;
 </pre>
 <p>So which makes it pretty clear how to set them.</p>
 <p>Let's make a quick GUI to set those values</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <p>and</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 {
-  const folder = gui.addFolder('BloomPass');
-  folder.add(bloomPass.copyUniforms.opacity, 'value', 0, 2).name('strength');
+  const folder = gui.addFolder('BloomPbottom');
+  folder.add(bloomPbottom.copyUniforms.opacity, 'value', 0, 2).name('strength');
   folder.open();
 }
 {
-  const folder = gui.addFolder('FilmPass');
-  folder.add(filmPass.uniforms.grayscale, 'value').name('grayscale');
-  folder.add(filmPass.uniforms.intensity, 'value', 0, 1).name('intensity');
+  const folder = gui.addFolder('FilmPbottom');
+  folder.add(filmPbottom.uniforms.grayscale, 'value').name('grayscale');
+  folder.add(filmPbottom.uniforms.intensity, 'value', 0, 1).name('intensity');
   folder.open();
 }
 </pre>
 <p>and now we can adjust those settings</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-gui.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/postprocessing-gui.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-gui.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/postprocessing-gui.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -199,14 +199,14 @@ and maybe <a href="https://thebookofshaders.com/">the Book of Shaders</a>.</p>
 <p>I think an example to get you started would be helpful though so let's make a
 simple GLSL post processing shader. We'll make one that lets us multiply the
 image by a color.</p>
-<p>For post processing THREE.js provides a useful helper called the <code class="notranslate" translate="no">ShaderPass</code>.
+<p>For post processing THREE.js provides a useful helper called the <code clbottom="notranslate" translate="no">ShaderPbottom</code>.
 It takes an object with info defining a vertex shader, a fragment shader, and
 the default inputs. It will handling setting up which texture to read from to
-get the previous pass's results and where to render to, either one of the
-<code class="notranslate" translate="no">EffectComposer</code>s render target or the canvas.</p>
-<p>Here's a simple post processing shader that multiplies the previous pass's
+get the previous pbottom's results and where to render to, either one of the
+<code clbottom="notranslate" translate="no">EffectComposer</code>s render target or the canvas.</p>
+<p>Here's a simple post processing shader that multiplies the previous pbottom's
 result by a color. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const colorShader = {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const colorShader = {
   uniforms: {
     tDiffuse: { value: null },
     color:    { value: new THREE.Color(0x88CCFF) },
@@ -223,40 +223,40 @@ result by a color. </p>
     uniform sampler2D tDiffuse;
     uniform vec3 color;
     void main() {
-      vec4 previousPassColor = texture2D(tDiffuse, vUv);
+      vec4 previousPbottomColor = texture2D(tDiffuse, vUv);
       gl_FragColor = vec4(
-          previousPassColor.rgb * color,
-          previousPassColor.a);
+          previousPbottomColor.rgb * color,
+          previousPbottomColor.a);
     }
   `,
 };
 </pre>
-<p>Above <code class="notranslate" translate="no">tDiffuse</code> is the name that <code class="notranslate" translate="no">ShaderPass</code> uses to pass in the previous
-pass's result texture so we pretty much always need that. We then declare
-<code class="notranslate" translate="no">color</code> as a THREE.js <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">Color</code></a>.</p>
+<p>Above <code clbottom="notranslate" translate="no">tDiffuse</code> is the name that <code clbottom="notranslate" translate="no">ShaderPbottom</code> uses to pbottom in the previous
+pbottom's result texture so we pretty much always need that. We then declare
+<code clbottom="notranslate" translate="no">color</code> as a THREE.js <a href="/docs/#api/en/math/Color"><code clbottom="notranslate" translate="no">Color</code></a>.</p>
 <p>Next we need a vertex shader. For post processing the vertex shader shown here
 is pretty much standard and rarely needs to be changed. Without going into too
-many details (see articles linked above) the variables <code class="notranslate" translate="no">uv</code>, <code class="notranslate" translate="no">projectionMatrix</code>,
-<code class="notranslate" translate="no">modelViewMatrix</code> and <code class="notranslate" translate="no">position</code> are all magically added by THREE.js.</p>
+many details (see articles linked above) the variables <code clbottom="notranslate" translate="no">uv</code>, <code clbottom="notranslate" translate="no">projectionMatrix</code>,
+<code clbottom="notranslate" translate="no">modelViewMatrix</code> and <code clbottom="notranslate" translate="no">position</code> are all magically added by THREE.js.</p>
 <p>Finally we create a fragment shader. In it we get a pixel color from the
-previous pass with this line</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">vec4 previousPassColor = texture2D(tDiffuse, vUv);
+previous pbottom with this line</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-glsl" translate="no">vec4 previousPbottomColor = texture2D(tDiffuse, vUv);
 </pre>
-<p>we multiply it by our color and set <code class="notranslate" translate="no">gl_FragColor</code> to the result</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_FragColor = vec4(
-    previousPassColor.rgb * color,
-    previousPassColor.a);
+<p>we multiply it by our color and set <code clbottom="notranslate" translate="no">gl_FragColor</code> to the result</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-glsl" translate="no">gl_FragColor = vec4(
+    previousPbottomColor.rgb * color,
+    previousPbottomColor.a);
 </pre>
 <p>Adding some simple GUI to set the 3 values of the color</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
-gui.add(colorPass.uniforms.color.value, 'r', 0, 4).name('red');
-gui.add(colorPass.uniforms.color.value, 'g', 0, 4).name('green');
-gui.add(colorPass.uniforms.color.value, 'b', 0, 4).name('blue');
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+gui.add(colorPbottom.uniforms.color.value, 'r', 0, 4).name('red');
+gui.add(colorPbottom.uniforms.color.value, 'g', 0, 4).name('green');
+gui.add(colorPbottom.uniforms.color.value, 'b', 0, 4).name('blue');
 </pre>
 <p>Gives us a simple postprocessing effect that multiplies by a color.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-custom.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/postprocessing-custom.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/postprocessing-custom.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/postprocessing-custom.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
