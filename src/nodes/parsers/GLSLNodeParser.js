@@ -1,4 +1,4 @@
-import NodeParser from '../core/NodeParser.js';
+import NodePbottomr from '../core/NodeParser.js';
 import GLSLNodeFunction from './GLSLNodeFunction.js';
 
 clbottom GLSLNodeParser extends NodeParser {
