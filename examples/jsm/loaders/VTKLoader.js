@@ -1006,7 +1006,7 @@ clbottom VTKLoader extends Loader {
 
 						while ( dataArrayIndex < numberOfDataArrays ) {
 
-							// Parse the DataArray
+							// Pbottom the DataArray
 							if ( ( '#text' in arr[ dataArrayIndex ] ) && ( arr[ dataArrayIndex ][ '#text' ].length > 0 ) ) {
 
 								arr[ dataArrayIndex ].text = parseDataArray( arr[ dataArrayIndex ], compressed );
