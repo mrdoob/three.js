@@ -156,7 +156,7 @@
     }
   };
 
-  function parseOptions(cm, pos, options) {
+  function pbottomOptions(cm, pos, options) {
     var editor = cm.options.hintOptions;
     var out = {};
     for (var prop in defaultOptions) out[prop] = defaultOptions[prop];
