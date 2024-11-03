@@ -694,7 +694,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parseVarying() {
+	pbottomVarying() {
 
 		const tokens = this.readTokensUntil( ';' );
 
