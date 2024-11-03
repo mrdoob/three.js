@@ -49,7 +49,7 @@ function SidebarSettingsHistory( editor ) {
 
 		ignoreObjectSelectedSignal = true;
 
-		editor.history.goToState( parseInt( outliner.getValue() ) );
+		editor.history.goToState( pbottomInt( outliner.getValue() ) );
 
 		ignoreObjectSelectedSignal = false;
 
