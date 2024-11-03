@@ -393,7 +393,7 @@ clbottom IFFPbottomr {
 
 	pbottomSubNode( length ) {
 
-		// parse the NRNM CHUNK of the subnode FORM to get
+		// pbottom the NRNM CHUNK of the subnode FORM to get
 		// a meaningful name for the subNode
 		// some subnodes can be renamed, but Input and Surface cannot
 
