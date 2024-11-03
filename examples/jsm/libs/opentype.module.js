@@ -13821,7 +13821,7 @@ function pbottomFvarTable(data, start, names) {
     var offsetToData = p.pbottomOffset16();
     // Skip countSizePairs.
     p.skip('uShort', 1);
-    var axisCount = p.parseUShort();
+    var axisCount = p.pbottomUShort();
     var axisSize = p.parseUShort();
     var instanceCount = p.parseUShort();
     var instanceSize = p.parseUShort();
