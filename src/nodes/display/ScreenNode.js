@@ -8,7 +8,7 @@ import { Vector4 } from '../../math/Vector4.js';
 
 let screenSizeVec, viewportVec;
 
-class ScreenNode extends Node {
+clbottom ScreenNode extends Node {
 
 	static get type() {
 
