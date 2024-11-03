@@ -17,42 +17,42 @@ export default QUnit.module( 'Maths', () => {
 	QUnit.module( 'Sphere', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			let a = new Sphere();
-			assert.ok( a.center.equals( zero3 ), 'Passed!' );
-			assert.ok( a.radius == - 1, 'Passed!' );
+			bottomert.ok( a.center.equals( zero3 ), 'Pbottomed!' );
+			bottomert.ok( a.radius == - 1, 'Pbottomed!' );
 
 			a = new Sphere( one3.clone(), 1 );
-			assert.ok( a.center.equals( one3 ), 'Passed!' );
-			assert.ok( a.radius == 1, 'Passed!' );
+			bottomert.ok( a.center.equals( one3 ), 'Pbottomed!' );
+			bottomert.ok( a.radius == 1, 'Pbottomed!' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isSphere', ( assert ) => {
+		QUnit.test( 'isSphere', ( bottomert ) => {
 
 			const a = new Sphere();
-			assert.ok( a.isSphere === true, 'Passed!' );
+			bottomert.ok( a.isSphere === true, 'Pbottomed!' );
 
 			const b = new Box3();
-			assert.ok( ! b.isSphere, 'Passed!' );
+			bottomert.ok( ! b.isSphere, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		QUnit.test( 'set', ( bottomert ) => {
 
 			const a = new Sphere();
-			assert.ok( a.center.equals( zero3 ), 'Passed!' );
-			assert.ok( a.radius == - 1, 'Passed!' );
+			bottomert.ok( a.center.equals( zero3 ), 'Pbottomed!' );
+			bottomert.ok( a.radius == - 1, 'Pbottomed!' );
 
 			a.set( one3, 1 );
-			assert.ok( a.center.equals( one3 ), 'Passed!' );
-			assert.ok( a.radius == 1, 'Passed!' );
+			bottomert.ok( a.center.equals( one3 ), 'Pbottomed!' );
+			bottomert.ok( a.radius == 1, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'setFromPoints', ( assert ) => {
+		QUnit.test( 'setFromPoints', ( bottomert ) => {
 
 			const a = new Sphere();
 			const expectedCenter = new Vector3( 0.9330126941204071, 0, 0 );
@@ -72,160 +72,160 @@ export default QUnit.module( 'Maths', () => {
 			];
 
 			a.setFromPoints( points );
-			assert.ok( Math.abs( a.center.x - expectedCenter.x ) <= eps, 'Default center: check center.x' );
-			assert.ok( Math.abs( a.center.y - expectedCenter.y ) <= eps, 'Default center: check center.y' );
-			assert.ok( Math.abs( a.center.z - expectedCenter.z ) <= eps, 'Default center: check center.z' );
-			assert.ok( Math.abs( a.radius - expectedRadius ) <= eps, 'Default center: check radius' );
+			bottomert.ok( Math.abs( a.center.x - expectedCenter.x ) <= eps, 'Default center: check center.x' );
+			bottomert.ok( Math.abs( a.center.y - expectedCenter.y ) <= eps, 'Default center: check center.y' );
+			bottomert.ok( Math.abs( a.center.z - expectedCenter.z ) <= eps, 'Default center: check center.z' );
+			bottomert.ok( Math.abs( a.radius - expectedRadius ) <= eps, 'Default center: check radius' );
 
 			expectedRadius = 2.5946195770400102;
 			a.setFromPoints( points, optionalCenter );
-			assert.ok( Math.abs( a.center.x - optionalCenter.x ) <= eps, 'Optional center: check center.x' );
-			assert.ok( Math.abs( a.center.y - optionalCenter.y ) <= eps, 'Optional center: check center.y' );
-			assert.ok( Math.abs( a.center.z - optionalCenter.z ) <= eps, 'Optional center: check center.z' );
-			assert.ok( Math.abs( a.radius - expectedRadius ) <= eps, 'Optional center: check radius' );
+			bottomert.ok( Math.abs( a.center.x - optionalCenter.x ) <= eps, 'Optional center: check center.x' );
+			bottomert.ok( Math.abs( a.center.y - optionalCenter.y ) <= eps, 'Optional center: check center.y' );
+			bottomert.ok( Math.abs( a.center.z - optionalCenter.z ) <= eps, 'Optional center: check center.z' );
+			bottomert.ok( Math.abs( a.radius - expectedRadius ) <= eps, 'Optional center: check radius' );
 
 		} );
 
-		QUnit.todo( 'clone', ( assert ) => {
+		QUnit.todo( 'clone', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		QUnit.test( 'copy', ( bottomert ) => {
 
 			const a = new Sphere( one3.clone(), 1 );
 			const b = new Sphere().copy( a );
 
-			assert.ok( b.center.equals( one3 ), 'Passed!' );
-			assert.ok( b.radius == 1, 'Passed!' );
+			bottomert.ok( b.center.equals( one3 ), 'Pbottomed!' );
+			bottomert.ok( b.radius == 1, 'Pbottomed!' );
 
 			// ensure that it is a true copy
 			a.center = zero3;
 			a.radius = 0;
-			assert.ok( b.center.equals( one3 ), 'Passed!' );
-			assert.ok( b.radius == 1, 'Passed!' );
+			bottomert.ok( b.center.equals( one3 ), 'Pbottomed!' );
+			bottomert.ok( b.radius == 1, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'isEmpty', ( assert ) => {
+		QUnit.test( 'isEmpty', ( bottomert ) => {
 
 			const a = new Sphere();
-			assert.ok( a.isEmpty(), 'Passed!' );
+			bottomert.ok( a.isEmpty(), 'Pbottomed!' );
 
 			a.set( one3, 1 );
-			assert.ok( ! a.isEmpty(), 'Passed!' );
+			bottomert.ok( ! a.isEmpty(), 'Pbottomed!' );
 
 			// Negative radius contains no points
 			a.set( one3, - 1 );
-			assert.ok( a.isEmpty(), 'Passed!' );
+			bottomert.ok( a.isEmpty(), 'Pbottomed!' );
 
 			// Zero radius contains only the center point
 			a.set( one3, 0 );
-			assert.ok( ! a.isEmpty(), 'Passed!' );
+			bottomert.ok( ! a.isEmpty(), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'makeEmpty', ( assert ) => {
+		QUnit.test( 'makeEmpty', ( bottomert ) => {
 
 			const a = new Sphere( one3.clone(), 1 );
 
-			assert.ok( ! a.isEmpty(), 'Passed!' );
+			bottomert.ok( ! a.isEmpty(), 'Pbottomed!' );
 
 			a.makeEmpty();
-			assert.ok( a.isEmpty(), 'Passed!' );
-			assert.ok( a.center.equals( zero3 ), 'Passed!' );
+			bottomert.ok( a.isEmpty(), 'Pbottomed!' );
+			bottomert.ok( a.center.equals( zero3 ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'containsPoint', ( assert ) => {
+		QUnit.test( 'containsPoint', ( bottomert ) => {
 
 			const a = new Sphere( one3.clone(), 1 );
 
-			assert.ok( ! a.containsPoint( zero3 ), 'Passed!' );
-			assert.ok( a.containsPoint( one3 ), 'Passed!' );
+			bottomert.ok( ! a.containsPoint( zero3 ), 'Pbottomed!' );
+			bottomert.ok( a.containsPoint( one3 ), 'Pbottomed!' );
 
 			a.set( zero3, 0 );
-			assert.ok( a.containsPoint( a.center ), 'Passed!' );
+			bottomert.ok( a.containsPoint( a.center ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'distanceToPoint', ( assert ) => {
+		QUnit.test( 'distanceToPoint', ( bottomert ) => {
 
 			const a = new Sphere( one3.clone(), 1 );
 
-			assert.ok( ( a.distanceToPoint( zero3 ) - 0.7320 ) < 0.001, 'Passed!' );
-			assert.ok( a.distanceToPoint( one3 ) === - 1, 'Passed!' );
+			bottomert.ok( ( a.distanceToPoint( zero3 ) - 0.7320 ) < 0.001, 'Pbottomed!' );
+			bottomert.ok( a.distanceToPoint( one3 ) === - 1, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'intersectsSphere', ( assert ) => {
+		QUnit.test( 'intersectsSphere', ( bottomert ) => {
 
 			const a = new Sphere( one3.clone(), 1 );
 			const b = new Sphere( zero3.clone(), 1 );
 			const c = new Sphere( zero3.clone(), 0.25 );
 
-			assert.ok( a.intersectsSphere( b ), 'Passed!' );
-			assert.ok( ! a.intersectsSphere( c ), 'Passed!' );
+			bottomert.ok( a.intersectsSphere( b ), 'Pbottomed!' );
+			bottomert.ok( ! a.intersectsSphere( c ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'intersectsBox', ( assert ) => {
+		QUnit.test( 'intersectsBox', ( bottomert ) => {
 
 			const a = new Sphere( zero3, 1 );
 			const b = new Sphere( new Vector3( - 5, - 5, - 5 ), 1 );
 			const box = new Box3( zero3, one3 );
 
-			assert.strictEqual( a.intersectsBox( box ), true, 'Check unit sphere' );
-			assert.strictEqual( b.intersectsBox( box ), false, 'Check shifted sphere' );
+			bottomert.strictEqual( a.intersectsBox( box ), true, 'Check unit sphere' );
+			bottomert.strictEqual( b.intersectsBox( box ), false, 'Check shifted sphere' );
 
 		} );
 
-		QUnit.test( 'intersectsPlane', ( assert ) => {
+		QUnit.test( 'intersectsPlane', ( bottomert ) => {
 
 			const a = new Sphere( zero3.clone(), 1 );
 			const b = new Plane( new Vector3( 0, 1, 0 ), 1 );
 			const c = new Plane( new Vector3( 0, 1, 0 ), 1.25 );
 			const d = new Plane( new Vector3( 0, - 1, 0 ), 1.25 );
 
-			assert.ok( a.intersectsPlane( b ), 'Passed!' );
-			assert.ok( ! a.intersectsPlane( c ), 'Passed!' );
-			assert.ok( ! a.intersectsPlane( d ), 'Passed!' );
+			bottomert.ok( a.intersectsPlane( b ), 'Pbottomed!' );
+			bottomert.ok( ! a.intersectsPlane( c ), 'Pbottomed!' );
+			bottomert.ok( ! a.intersectsPlane( d ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'clampPoint', ( assert ) => {
+		QUnit.test( 'clampPoint', ( bottomert ) => {
 
 			const a = new Sphere( one3.clone(), 1 );
 			const point = new Vector3();
 
 			a.clampPoint( new Vector3( 1, 1, 3 ), point );
-			assert.ok( point.equals( new Vector3( 1, 1, 2 ) ), 'Passed!' );
+			bottomert.ok( point.equals( new Vector3( 1, 1, 2 ) ), 'Pbottomed!' );
 			a.clampPoint( new Vector3( 1, 1, - 3 ), point );
-			assert.ok( point.equals( new Vector3( 1, 1, 0 ) ), 'Passed!' );
+			bottomert.ok( point.equals( new Vector3( 1, 1, 0 ) ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'getBoundingBox', ( assert ) => {
+		QUnit.test( 'getBoundingBox', ( bottomert ) => {
 
 			const a = new Sphere( one3.clone(), 1 );
 			const aabb = new Box3();
 
 			a.getBoundingBox( aabb );
-			assert.ok( aabb.equals( new Box3( zero3, two3 ) ), 'Passed!' );
+			bottomert.ok( aabb.equals( new Box3( zero3, two3 ) ), 'Pbottomed!' );
 
 			a.set( zero3, 0 );
 			a.getBoundingBox( aabb );
-			assert.ok( aabb.equals( new Box3( zero3, zero3 ) ), 'Passed!' );
+			bottomert.ok( aabb.equals( new Box3( zero3, zero3 ) ), 'Pbottomed!' );
 
 			// Empty sphere produces empty bounding box
 			a.makeEmpty();
 			a.getBoundingBox( aabb );
-			assert.ok( aabb.isEmpty(), 'Passed!' );
+			bottomert.ok( aabb.isEmpty(), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'applyMatrix4', ( assert ) => {
+		QUnit.test( 'applyMatrix4', ( bottomert ) => {
 
 			const a = new Sphere( one3.clone(), 1 );
 			const m = new Matrix4().makeTranslation( 1, - 2, 1 );
@@ -235,43 +235,43 @@ export default QUnit.module( 'Maths', () => {
 			a.clone().applyMatrix4( m ).getBoundingBox( aabb1 );
 			a.getBoundingBox( aabb2 );
 
-			assert.ok( aabb1.equals( aabb2.applyMatrix4( m ) ), 'Passed!' );
+			bottomert.ok( aabb1.equals( aabb2.applyMatrix4( m ) ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'translate', ( assert ) => {
+		QUnit.test( 'translate', ( bottomert ) => {
 
 			const a = new Sphere( one3.clone(), 1 );
 
 			a.translate( one3.clone().negate() );
-			assert.ok( a.center.equals( zero3 ), 'Passed!' );
+			bottomert.ok( a.center.equals( zero3 ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'expandByPoint', ( assert ) => {
+		QUnit.test( 'expandByPoint', ( bottomert ) => {
 
 			const a = new Sphere( zero3.clone(), 1 );
 			const p = new Vector3( 2, 0, 0 );
 
-			assert.ok( a.containsPoint( p ) === false, 'a does not contain p' );
+			bottomert.ok( a.containsPoint( p ) === false, 'a does not contain p' );
 
 			a.expandByPoint( p );
 
-			assert.ok( a.containsPoint( p ) === true, 'a does contain p' );
-			assert.ok( a.center.equals( new Vector3( 0.5, 0, 0 ) ), 'Passed!' );
-			assert.ok( a.radius === 1.5, 'Passed!' );
+			bottomert.ok( a.containsPoint( p ) === true, 'a does contain p' );
+			bottomert.ok( a.center.equals( new Vector3( 0.5, 0, 0 ) ), 'Pbottomed!' );
+			bottomert.ok( a.radius === 1.5, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'union', ( assert ) => {
+		QUnit.test( 'union', ( bottomert ) => {
 
 			const a = new Sphere( zero3.clone(), 1 );
 			const b = new Sphere( new Vector3( 2, 0, 0 ), 1 );
 
 			a.union( b );
 
-			assert.ok( a.center.equals( new Vector3( 1, 0, 0 ) ), 'Passed!' );
-			assert.ok( a.radius === 2, 'Passed!' );
+			bottomert.ok( a.center.equals( new Vector3( 1, 0, 0 ) ), 'Pbottomed!' );
+			bottomert.ok( a.radius === 2, 'Pbottomed!' );
 
 			// d contains c (demonstrates why it is necessary to process two points in union)
 
@@ -280,8 +280,8 @@ export default QUnit.module( 'Maths', () => {
 
 			c.union( d );
 
-			assert.ok( c.center.equals( new Vector3( 1, 0, 0 ) ), 'Passed!' );
-			assert.ok( c.radius === 4, 'Passed!' );
+			bottomert.ok( c.center.equals( new Vector3( 1, 0, 0 ) ), 'Pbottomed!' );
+			bottomert.ok( c.radius === 4, 'Pbottomed!' );
 
 			// edge case: both spheres have the same center point
 
@@ -290,23 +290,23 @@ export default QUnit.module( 'Maths', () => {
 
 			e.union( f );
 
-			assert.ok( e.center.equals( new Vector3( 0, 0, 0 ) ), 'Passed!' );
-			assert.ok( e.radius === 4, 'Passed!' );
+			bottomert.ok( e.center.equals( new Vector3( 0, 0, 0 ) ), 'Pbottomed!' );
+			bottomert.ok( e.radius === 4, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		QUnit.test( 'equals', ( bottomert ) => {
 
 			const a = new Sphere();
 			const b = new Sphere( new Vector3( 1, 0, 0 ) );
 			const c = new Sphere( new Vector3( 1, 0, 0 ), 1.0 );
 
-			assert.strictEqual( a.equals( b ), false, 'a does not equal b' );
-			assert.strictEqual( a.equals( c ), false, 'a does not equal c' );
-			assert.strictEqual( b.equals( c ), false, 'b does not equal c' );
+			bottomert.strictEqual( a.equals( b ), false, 'a does not equal b' );
+			bottomert.strictEqual( a.equals( c ), false, 'a does not equal c' );
+			bottomert.strictEqual( b.equals( c ), false, 'b does not equal c' );
 
 			a.copy( b );
-			assert.strictEqual( a.equals( b ), true, 'a equals b after copy()' );
+			bottomert.strictEqual( a.equals( b ), true, 'a equals b after copy()' );
 
 		} );
 
