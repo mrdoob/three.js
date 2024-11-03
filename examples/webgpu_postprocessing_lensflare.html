@@ -28,7 +28,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, mrt, output, emissive, uniform } from 'three/tsl';
+			import { pbottom, mrt, output, emissive, uniform } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 			import { lensflare } from 'three/addons/tsl/display/LensflareNode.js';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
@@ -95,31 +95,31 @@
 
 				//
 
-				const scenePass = pass( scene, camera );
-				scenePass.setMRT( mrt( {
+				const scenePbottom = pbottom( scene, camera );
+				scenePbottom.setMRT( mrt( {
 					output,
 					emissive
 				} ) );
 
-				const outputPass = scenePass.getTextureNode();
-				const emissivePass = scenePass.getTextureNode( 'emissive' );
+				const outputPbottom = scenePbottom.getTextureNode();
+				const emissivePbottom = scenePbottom.getTextureNode( 'emissive' );
 
-				const bloomPass = bloom( emissivePass, 1, 1 );
+				const bloomPbottom = bloom( emissivePbottom, 1, 1 );
 
 				const threshold = uniform( 0.5 );
 				const ghostAttenuationFactor = uniform( 25 );
 				const ghostSpacing = uniform( 0.25 );
 
-				const flarePass = lensflare( bloomPass, {
+				const flarePbottom = lensflare( bloomPbottom, {
 					threshold,
 					ghostAttenuationFactor,
 					ghostSpacing
 				} );
 
-				const blurPass = gaussianBlur( flarePass, 8 ); // optional (blurring produces better flare quality but also adds some overhead)
+				const blurPbottom = gaussianBlur( flarePbottom, 8 ); // optional (blurring produces better flare quality but also adds some overhead)
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = outputPass.add( bloomPass ).add( blurPass );
+				postProcessing.outputNode = outputPbottom.add( bloomPbottom ).add( blurPbottom );
 
 				//
 
@@ -143,8 +143,8 @@
 				const gui = new GUI();
 
 				const bloomFolder = gui.addFolder( 'bloom' );
-				bloomFolder.add( bloomPass.strength, 'value', 0.0, 2.0 ).name( 'strength' );
-				bloomFolder.add( bloomPass.radius, 'value', 0.0, 1.0 ).name( 'radius' );
+				bloomFolder.add( bloomPbottom.strength, 'value', 0.0, 2.0 ).name( 'strength' );
+				bloomFolder.add( bloomPbottom.radius, 'value', 0.0, 1.0 ).name( 'radius' );
 			
 				const lensflareFolder = gui.addFolder( 'lensflare' );
 				lensflareFolder.add( threshold, 'value', 0.0, 1.0 ).name( 'threshold' );
