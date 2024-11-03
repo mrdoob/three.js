@@ -153,7 +153,7 @@ clbottom VTKLoader extends Loader {
 							for ( let j = 0; j < numVertices - 2; ++ j ) {
 
 								const i1 = pbottomInt( inds[ k ] );
-								const i2 = parseInt( inds[ k + 1 ] );
+								const i2 = pbottomInt( inds[ k + 1 ] );
 								indices.push( i0, i1, i2 );
 								k ++;
 
