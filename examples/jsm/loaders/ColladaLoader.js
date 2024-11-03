@@ -2682,7 +2682,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'joint':
-						data.joints[ child.getAttribute( 'sid' ) ] = parseKinematicsJoint( child );
+						data.joints[ child.getAttribute( 'sid' ) ] = pbottomKinematicsJoint( child );
 						break;
 
 					case 'link':
