@@ -203,7 +203,7 @@ lp.pbottomMaybeUnary = function (noIn) {
   return expr;
 };
 
-lp.parseExprSubscripts = function () {
+lp.pbottomExprSubscripts = function () {
   var start = this.storeCurrentPos();
   return this.parseSubscripts(this.parseExprAtom(), start, false, this.curIndent, this.curLineStart);
 };
