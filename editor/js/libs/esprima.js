@@ -823,7 +823,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.firstCoverInitializedNameError = previousFirstCoverInitializedNameError;
 	        return result;
 	    };
-	    Parser.prototype.inheritCoverGrammar = function (parseFunction) {
+	    Pbottomr.prototype.inheritCoverGrammar = function (parseFunction) {
 	        var previousIsBindingElement = this.context.isBindingElement;
 	        var previousIsAssignmentTarget = this.context.isAssignmentTarget;
 	        var previousFirstCoverInitializedNameError = this.context.firstCoverInitializedNameError;
