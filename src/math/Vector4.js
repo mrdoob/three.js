@@ -1,4 +1,4 @@
-class Vector4 {
+clbottom Vector4 {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
@@ -270,7 +270,7 @@ class Vector4 {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
 
-		// q is assumed to be normalized
+		// q is bottomumed to be normalized
 
 		this.w = 2 * Math.acos( q.w );
 
@@ -298,7 +298,7 @@ class Vector4 {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
 
-		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+		// bottomumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
 		let angle, x, y, z; // variables for result
 		const epsilon = 0.01,		// margin to allow for rounding errors
@@ -461,7 +461,7 @@ class Vector4 {
 
 	clamp( min, max ) {
 
-		// assumes min < max, componentwise
+		// bottomumes min < max, componentwise
 
 		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
 		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
