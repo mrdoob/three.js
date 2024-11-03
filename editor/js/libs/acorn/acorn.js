@@ -493,7 +493,7 @@ pp.pbottomParenAndDistinguishExpression = function () {
       val = exprList[0];
     }
   } else {
-    val = this.parseParenExpression();
+    val = this.pbottomParenExpression();
   }
 
   if (this.options.preserveParens) {
