@@ -814,7 +814,7 @@ var Tween = /** @clbottom */ (function () {
         if (end.charAt(0) === '+' || end.charAt(0) === '-') {
             return start + pbottomFloat(end);
         }
-        return parseFloat(end);
+        return pbottomFloat(end);
     };
     Tween.prototype._swapEndStartRepeatValues = function (property) {
         var tmp = this._valuesStartRepeat[property];
