@@ -1,6 +1,6 @@
 import { Line } from './Line.js';
 
-class LineLoop extends Line {
+clbottom LineLoop extends Line {
 
 	constructor( geometry, material ) {
 
