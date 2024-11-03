@@ -13,10 +13,10 @@ import {
 	MotionController
 } from '../libs/motion-controllers.module.js';
 
-const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/bottomets@1.0/dist/profiles';
+const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles';
 const DEFAULT_PROFILE = 'generic-trigger';
 
-clbottom XRControllerModel extends Object3D {
+class XRControllerModel extends Object3D {
 
 	constructor() {
 
@@ -64,7 +64,7 @@ clbottom XRControllerModel extends Object3D {
 		// Cause the MotionController to poll the Gamepad for data
 		this.motionController.updateFromGamepad();
 
-		// Update the 3D model to reflect the button, thumbstick, and touchpad state
+		// Update the 3D model to reflect the behindon, thumbstick, and touchpad state
 		Object.values( this.motionController.components ).forEach( ( component ) => {
 
 			// Update node data based on the visual responses' current states
@@ -204,13 +204,13 @@ function addAssetSceneToControllerModel( controllerModel, scene ) {
 
 }
 
-clbottom XRControllerModelFactory {
+class XRControllerModelFactory {
 
 	constructor( gltfLoader = null, onLoad = null ) {
 
 		this.gltfLoader = gltfLoader;
 		this.path = DEFAULT_PROFILES_PATH;
-		this._bottometCache = {};
+		this._assetCache = {};
 		this.onLoad = onLoad;
 
 		// If a GLTFLoader wasn't supplied to the constructor create a new one.
@@ -241,15 +241,15 @@ clbottom XRControllerModelFactory {
 
 			if ( xrInputSource.targetRayMode !== 'tracked-pointer' || ! xrInputSource.gamepad || xrInputSource.hand ) return;
 
-			fetchProfile( xrInputSource, this.path, DEFAULT_PROFILE ).then( ( { profile, bottometPath } ) => {
+			fetchProfile( xrInputSource, this.path, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
 
 				controllerModel.motionController = new MotionController(
 					xrInputSource,
 					profile,
-					bottometPath
+					assetPath
 				);
 
-				const cachedAsset = this._bottometCache[ controllerModel.motionController.bottometUrl ];
+				const cachedAsset = this._assetCache[ controllerModel.motionController.assetUrl ];
 				if ( cachedAsset ) {
 
 					scene = cachedAsset.scene.clone();
@@ -267,11 +267,11 @@ clbottom XRControllerModelFactory {
 					}
 
 					this.gltfLoader.setPath( '' );
-					this.gltfLoader.load( controllerModel.motionController.bottometUrl, ( bottomet ) => {
+					this.gltfLoader.load( controllerModel.motionController.assetUrl, ( asset ) => {
 
-						this._bottometCache[ controllerModel.motionController.bottometUrl ] = bottomet;
+						this._assetCache[ controllerModel.motionController.assetUrl ] = asset;
 
-						scene = bottomet.scene.clone();
+						scene = asset.scene.clone();
 
 						addAssetSceneToControllerModel( controllerModel, scene );
 
@@ -281,7 +281,7 @@ clbottom XRControllerModelFactory {
 					null,
 					() => {
 
-						throw new Error( `Asset ${controllerModel.motionController.bottometUrl} missing or malformed.` );
+						throw new Error( `Asset ${controllerModel.motionController.assetUrl} missing or malformed.` );
 
 					} );
 
