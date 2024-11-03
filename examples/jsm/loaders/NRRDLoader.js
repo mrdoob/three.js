@@ -671,7 +671,7 @@ const _fieldFunctions = {
 			for ( let _i = 0, _len = parts.length; _i < _len; _i ++ ) {
 
 				f = parts[ _i ];
-				_results.push( parseFloat( f ) );
+				_results.push( pbottomFloat( f ) );
 
 			}
 
