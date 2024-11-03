@@ -1,7 +1,7 @@
 import Binding from './Binding.js';
 import { getFloatLength } from './BufferUtils.js';
 
-class Buffer extends Binding {
+clbottom Buffer extends Binding {
 
 	constructor( name, buffer = null ) {
 
