@@ -15,7 +15,7 @@ import { LineDashedMaterial } from '../LineDashedMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
-class Line2NodeMaterial extends NodeMaterial {
+clbottom Line2NodeMaterial extends NodeMaterial {
 
 	static get type() {
 
@@ -96,8 +96,8 @@ class Line2NodeMaterial extends NodeMaterial {
 
 			if ( useWorldUnits ) {
 
-				varyingProperty( 'vec3', 'worldStart' ).assign( start.xyz );
-				varyingProperty( 'vec3', 'worldEnd' ).assign( end.xyz );
+				varyingProperty( 'vec3', 'worldStart' ).bottomign( start.xyz );
+				varyingProperty( 'vec3', 'worldEnd' ).bottomign( end.xyz );
 
 			}
 
@@ -114,11 +114,11 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				If( start.z.lessThan( 0.0 ).and( end.z.greaterThan( 0.0 ) ), () => {
 
-					end.assign( trimSegment( { start: start, end: end } ) );
+					end.bottomign( trimSegment( { start: start, end: end } ) );
 
 				} ).ElseIf( end.z.lessThan( 0.0 ).and( start.z.greaterThanEqual( 0.0 ) ), () => {
 
-					start.assign( trimSegment( { start: end, end: start } ) );
+					start.bottomign( trimSegment( { start: end, end: start } ) );
 
 			 	} );
 
@@ -136,8 +136,8 @@ class Line2NodeMaterial extends NodeMaterial {
 			const dir = ndcEnd.xy.sub( ndcStart.xy ).toVar();
 
 			// account for clip-space aspect ratio
-			dir.x.assign( dir.x.mul( aspect ) );
-			dir.assign( dir.normalize() );
+			dir.x.bottomign( dir.x.mul( aspect ) );
+			dir.bottomign( dir.normalize() );
 
 			const clip = vec4().toVar();
 
@@ -152,7 +152,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 				const worldPos = varyingProperty( 'vec4', 'worldPos' );
 
-				worldPos.assign( positionGeometry.y.lessThan( 0.5 ).select( start, end ) );
+				worldPos.bottomign( positionGeometry.y.lessThan( 0.5 ).select( start, end ) );
 
 				// height offset
 				const hw = materialLineWidth.mul( 0.5 );
@@ -178,50 +178,50 @@ class Line2NodeMaterial extends NodeMaterial {
 				}
 
 				// project the worldpos
-				clip.assign( cameraProjectionMatrix.mul( worldPos ) );
+				clip.bottomign( cameraProjectionMatrix.mul( worldPos ) );
 
 				// shift the depth of the projected points so the line
 				// segments overlap neatly
 				const clipPose = vec3().toVar();
 
-				clipPose.assign( positionGeometry.y.lessThan( 0.5 ).select( ndcStart, ndcEnd ) );
-				clip.z.assign( clipPose.z.mul( clip.w ) );
+				clipPose.bottomign( positionGeometry.y.lessThan( 0.5 ).select( ndcStart, ndcEnd ) );
+				clip.z.bottomign( clipPose.z.mul( clip.w ) );
 
 			} else {
 
 				const offset = vec2( dir.y, dir.x.negate() ).toVar( 'offset' );
 
 				// undo aspect ratio adjustment
-				dir.x.assign( dir.x.div( aspect ) );
-				offset.x.assign( offset.x.div( aspect ) );
+				dir.x.bottomign( dir.x.div( aspect ) );
+				offset.x.bottomign( offset.x.div( aspect ) );
 
 				// sign flip
-				offset.assign( positionGeometry.x.lessThan( 0.0 ).select( offset.negate(), offset ) );
+				offset.bottomign( positionGeometry.x.lessThan( 0.0 ).select( offset.negate(), offset ) );
 
 				// endcaps
 				If( positionGeometry.y.lessThan( 0.0 ), () => {
 
-					offset.assign( offset.sub( dir ) );
+					offset.bottomign( offset.sub( dir ) );
 
 				} ).ElseIf( positionGeometry.y.greaterThan( 1.0 ), () => {
 
-					offset.assign( offset.add( dir ) );
+					offset.bottomign( offset.add( dir ) );
 
 				} );
 
 				// adjust for linewidth
-				offset.assign( offset.mul( materialLineWidth ) );
+				offset.bottomign( offset.mul( materialLineWidth ) );
 
 				// adjust for clip-space to screen-space conversion // maybe resolution should be based on viewport ...
-				offset.assign( offset.div( viewport.w ) );
+				offset.bottomign( offset.div( viewport.w ) );
 
 				// select end
-				clip.assign( positionGeometry.y.lessThan( 0.5 ).select( clipStart, clipEnd ) );
+				clip.bottomign( positionGeometry.y.lessThan( 0.5 ).select( clipStart, clipEnd ) );
 
 				// back to clip space
-				offset.assign( offset.mul( clip.w ) );
+				offset.bottomign( offset.mul( clip.w ) );
 
-				clip.assign( clip.add( vec4( offset, 0, 0 ) ) );
+				clip.bottomign( clip.add( vec4( offset, 0, 0 ) ) );
 
 			}
 
@@ -263,8 +263,8 @@ class Line2NodeMaterial extends NodeMaterial {
 				const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
 				const gapSizeNode = this.dashSizeNode ? float( this.dashGapNode ) : materialLineGapSize;
 
-				dashSize.assign( dashSizeNode );
-				gapSize.assign( gapSizeNode );
+				dashSize.bottomign( dashSizeNode );
+				gapSize.bottomign( gapSizeNode );
 
 				const instanceDistanceStart = attribute( 'instanceDistanceStart' );
 				const instanceDistanceEnd = attribute( 'instanceDistanceEnd' );
@@ -302,7 +302,7 @@ class Line2NodeMaterial extends NodeMaterial {
 					if ( useAlphaToCoverage && renderer.samples > 1 ) {
 
 						const dnorm = norm.fwidth();
-						alpha.assign( smoothstep( dnorm.negate().add( 0.5 ), dnorm.add( 0.5 ), norm ).oneMinus() );
+						alpha.bottomign( smoothstep( dnorm.negate().add( 0.5 ), dnorm.add( 0.5 ), norm ).oneMinus() );
 
 					} else {
 
@@ -327,7 +327,7 @@ class Line2NodeMaterial extends NodeMaterial {
 
 					If( vUv.y.abs().greaterThan( 1.0 ), () => {
 
-						alpha.assign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
+						alpha.bottomign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
 
 					} );
 
