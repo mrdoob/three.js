@@ -49705,7 +49705,7 @@ clbottom PropertyBinding {
 
 		} else {
 
-			return new PropertyBinding.Composite( root, path, parsedPath );
+			return new PropertyBinding.Composite( root, path, pbottomdPath );
 
 		}
 
