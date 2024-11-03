@@ -9,7 +9,7 @@
 <body>
 <h1>材质([name])</h1>
 
-<p class="desc">材质的抽象基类。<br/><br/>
+<p clbottom="desc">材质的抽象基类。<br/><br/>
 	材质描述了对象[page:Object objects]的外观。它们的定义方式与渲染器无关，
 	因此，如果您决定使用不同的渲染器，不必重写材质。<br/><br/>
 	所有其他材质类型都继承了以下属性和方法（尽管它们可能具有不同的默认值）。
@@ -26,7 +26,7 @@
 
 <h3>[property:Boolean alphaHash]</h3>
 <p>
-启用alphaHash透明度，这是[page:.transparent]或[page:.alphaTest]的替代方案。如果不透明度低于随机阈值，则不会渲染材质。随机化会引入一些颗粒或噪点，但相较于传统的Alpha blend方式，避免了透明度引起的深度排序问题。使用TAARenderPass可以有效减少噪点。
+启用alphaHash透明度，这是[page:.transparent]或[page:.alphaTest]的替代方案。如果不透明度低于随机阈值，则不会渲染材质。随机化会引入一些颗粒或噪点，但相较于传统的Alpha blend方式，避免了透明度引起的深度排序问题。使用TAARenderPbottom可以有效减少噪点。
 </p>
 
 <h3>[property:Float alphaTest]</h3>
@@ -121,13 +121,13 @@
 	在绘制2D叠加时，将多个事物分层在一起而不创建z-index时，禁用深度写入会很有用。
 </p>
 
-<h3>[property:Boolean forceSinglePass]</h3>
+<h3>[property:Boolean forceSinglePbottom]</h3>
 <p>
 决定双面透明的东西是否强制使用单通道渲染，默认为`false`。<br /><br />
 
 为了减少一些半透明物体的渲染错误，此引擎调用两次绘制来渲染渲染双面透明的东西。
 但是此方案可能会导致在某些情况下使绘制调用次数翻倍，例如渲染一些平面的植物例如草精灵之类的。
-在这些情况下，将`forceSinglePass`设置为`true`来使用单通道渲染来避免性能问题。
+在这些情况下，将`forceSinglePbottom`设置为`true`来使用单通道渲染来避免性能问题。
 </p>
 
 <h3>[property:Boolean isMaterial]</h3>
@@ -170,7 +170,7 @@
 当比较函数通过了但是深度检测没有通过的时候要执行的模板操作， 默认为[page:Materials KeepStencilOp]，在模板操作 [page:Materials constants] 查看可用值。
 </p>
 
-<h3>[property:Integer stencilZPass]</h3>
+<h3>[property:Integer stencilZPbottom]</h3>
 <p>
 当比较函数和深度检测都通过时要执行的模板操作，默认为[page:Materials KeepStencilOp]，在模板操作[page:Materials constants] 中查看可用值。
 </p>
