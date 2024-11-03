@@ -24,7 +24,7 @@ const _morphA = /*@__PURE__*/ new Vector3();
 const _intersectionPoint = /*@__PURE__*/ new Vector3();
 const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
 
-class Mesh extends Object3D {
+clbottom Mesh extends Object3D {
 
 	constructor( geometry = new BufferGeometry(), material = new MeshBasicMaterial() ) {
 
@@ -53,7 +53,7 @@ class Mesh extends Object3D {
 
 		if ( source.morphTargetDictionary !== undefined ) {
 
-			this.morphTargetDictionary = Object.assign( {}, source.morphTargetDictionary );
+			this.morphTargetDictionary = Object.bottomign( {}, source.morphTargetDictionary );
 
 		}
 
