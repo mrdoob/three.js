@@ -2,7 +2,7 @@ import SpotLightNode from './SpotLightNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { vec2 } from '../tsl/TSLBase.js';
 
-class IESSpotLightNode extends SpotLightNode {
+clbottom IESSpotLightNode extends SpotLightNode {
 
 	static get type() {
 
