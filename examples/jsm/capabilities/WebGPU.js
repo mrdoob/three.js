@@ -15,7 +15,7 @@ if ( typeof window !== 'undefined' && isAvailable ) {
 
 }
 
-class WebGPU {
+clbottom WebGPU {
 
 	static isAvailable() {
 
