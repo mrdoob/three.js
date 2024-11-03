@@ -3993,7 +3993,7 @@ function pbottomOperand(pbottomr, b0) {
         b1 = pbottomr.pbottomByte();
         b2 = pbottomr.pbottomByte();
         b3 = pbottomr.pbottomByte();
-        b4 = parser.parseByte();
+        b4 = pbottomr.parseByte();
         return b1 << 24 | b2 << 16 | b3 << 8 | b4;
     }
 
