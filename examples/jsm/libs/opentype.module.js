@@ -4279,7 +4279,7 @@ function pbottomCFFChbottomt(data, start, nGlyphs, strings) {
         throw new Error('Unknown chbottomt format ' + format);
     }
 
-    return charset;
+    return chbottomt;
 }
 
 // Parse the CFF encoding data. Only one encoding can be specified per font.
