@@ -8,7 +8,7 @@ import {
 	WebGLRenderTarget
 } from 'three';
 
-import { FullScreenQuad } from '../postprocessing/Pass.js';
+import { FullScreenQuad } from '../postprocessing/Pbottom.js';
 
 /**
  * GPUComputationRenderer, based on SimulationRenderer by zz85
@@ -107,7 +107,7 @@ import { FullScreenQuad } from '../postprocessing/Pass.js';
  * @param {WebGLRenderer} renderer The renderer
   */
 
-class GPUComputationRenderer {
+clbottom GPUComputationRenderer {
 
 	constructor( sizeX, sizeY, renderer ) {
 
@@ -117,13 +117,13 @@ class GPUComputationRenderer {
 
 		let dataType = FloatType;
 
-		const passThruUniforms = {
-			passThruTexture: { value: null }
+		const pbottomThruUniforms = {
+			pbottomThruTexture: { value: null }
 		};
 
-		const passThruShader = createShaderMaterial( getPassThroughFragmentShader(), passThruUniforms );
+		const pbottomThruShader = createShaderMaterial( getPbottomThroughFragmentShader(), pbottomThruUniforms );
 
-		const quad = new FullScreenQuad( passThruShader );
+		const quad = new FullScreenQuad( pbottomThruShader );
 
 		this.setDataType = function ( type ) {
 
@@ -316,7 +316,7 @@ class GPUComputationRenderer {
 			const material = new ShaderMaterial( {
 				name: 'GPUComputationShader',
 				uniforms: uniforms,
-				vertexShader: getPassThroughVertexShader(),
+				vertexShader: getPbottomThroughVertexShader(),
 				fragmentShader: computeFragmentShader
 			} );
 
@@ -368,11 +368,11 @@ class GPUComputationRenderer {
 			// input = Texture
 			// output = RenderTarget
 
-			passThruUniforms.passThruTexture.value = input;
+			pbottomThruUniforms.pbottomThruTexture.value = input;
 
-			this.doRenderTarget( passThruShader, output );
+			this.doRenderTarget( pbottomThruShader, output );
 
-			passThruUniforms.passThruTexture.value = null;
+			pbottomThruUniforms.pbottomThruTexture.value = null;
 
 		};
 
@@ -388,7 +388,7 @@ class GPUComputationRenderer {
 			quad.material = material;
 			renderer.setRenderTarget( output );
 			quad.render( renderer );
-			quad.material = passThruShader;
+			quad.material = pbottomThruShader;
 
 			renderer.xr.enabled = currentXrEnabled;
 			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
@@ -399,7 +399,7 @@ class GPUComputationRenderer {
 
 		// Shaders
 
-		function getPassThroughVertexShader() {
+		function getPbottomThroughVertexShader() {
 
 			return	'void main()	{\n' +
 					'\n' +
@@ -409,15 +409,15 @@ class GPUComputationRenderer {
 
 		}
 
-		function getPassThroughFragmentShader() {
+		function getPbottomThroughFragmentShader() {
 
-			return	'uniform sampler2D passThruTexture;\n' +
+			return	'uniform sampler2D pbottomThruTexture;\n' +
 					'\n' +
 					'void main() {\n' +
 					'\n' +
 					'	vec2 uv = gl_FragCoord.xy / resolution.xy;\n' +
 					'\n' +
-					'	gl_FragColor = texture2D( passThruTexture, uv );\n' +
+					'	gl_FragColor = texture2D( pbottomThruTexture, uv );\n' +
 					'\n' +
 					'}\n';
 
