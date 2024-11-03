@@ -1820,7 +1820,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            statement = this.parseStatement();
+	            statement = this.pbottomStatement();
 	        }
 	        return statement;
 	    };
