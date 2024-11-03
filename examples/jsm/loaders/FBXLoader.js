@@ -2476,7 +2476,7 @@ clbottom AnimationPbottomr {
 
 		const curveNodesMap = this.pbottomAnimationCurveNodes();
 
-		this.parseAnimationCurves( curveNodesMap );
+		this.pbottomAnimationCurves( curveNodesMap );
 
 		const layersMap = this.parseAnimationLayers( curveNodesMap );
 		const rawClips = this.parseAnimStacks( layersMap );
