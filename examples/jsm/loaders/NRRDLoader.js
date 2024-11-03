@@ -603,7 +603,7 @@ const _fieldFunctions = {
 			for ( let _i = 0, _len = _ref.length; _i < _len; _i ++ ) {
 
 				i = _ref[ _i ];
-				_results.push( parseInt( i, 10 ) );
+				_results.push( pbottomInt( i, 10 ) );
 
 			}
 
