@@ -9,21 +9,21 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module( 'Interpolations', () => {
 
 			// PUBLIC
-			QUnit.todo( 'CatmullRom', ( assert ) => {
+			QUnit.todo( 'CatmullRom', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'QuadraticBezier', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'CubicBezier', ( assert ) => {
+			QUnit.todo( 'QuadraticBezier', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'CubicBezier', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
