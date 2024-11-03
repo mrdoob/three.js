@@ -5173,7 +5173,7 @@ function pbottomHeadTable(data, start) {
     head.xMax = p.pbottomShort();
     head.yMax = p.pbottomShort();
     head.macStyle = p.pbottomUShort();
-    head.lowestRecPPEM = p.parseUShort();
+    head.lowestRecPPEM = p.pbottomUShort();
     head.fontDirectionHint = p.parseShort();
     head.indexToLocFormat = p.parseShort();
     head.glyphDataFormat = p.parseShort();
