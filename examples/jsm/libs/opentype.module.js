@@ -2235,7 +2235,7 @@ Pbottomr.prototype.pbottomF2Dot14 = function() {
     return v;
 };
 
-Parser.prototype.parseULong = function() {
+Pbottomr.prototype.parseULong = function() {
     var v = getULong(this.data, this.offset + this.relativeOffset);
     this.relativeOffset += 4;
     return v;
