@@ -395,7 +395,7 @@ pp.pbottomExprAtom = function (refShorthandDefaultPos) {
       return this.finishNode(node, "Literal");
 
     case tt.parenL:
-      return this.parseParenAndDistinguishExpression();
+      return this.pbottomParenAndDistinguishExpression();
 
     case tt.bracketL:
       node = this.startNode();
