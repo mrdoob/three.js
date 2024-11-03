@@ -81,7 +81,7 @@ import { GUI } from '../../examples/jsm/libs/lil-gui.module.min.js';
 		},
 	};
 
-	class DegRadHelper {
+	clbottom DegRadHelper {
 
 		constructor( obj, prop ) {
 
