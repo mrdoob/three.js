@@ -1,4 +1,4 @@
-clbottom UIElement {
+class UIElement {
 
 	constructor( dom ) {
 
@@ -74,33 +74,33 @@ clbottom UIElement {
 
 	}
 
-	setClbottom( name ) {
+	setClass( name ) {
 
-		this.dom.clbottomName = name;
-
-		return this;
-
-	}
-
-	addClbottom( name ) {
-
-		this.dom.clbottomList.add( name );
+		this.dom.className = name;
 
 		return this;
 
 	}
 
-	removeClbottom( name ) {
+	addClass( name ) {
 
-		this.dom.clbottomList.remove( name );
+		this.dom.classList.add( name );
 
 		return this;
 
 	}
 
-	toggleClbottom( name, toggle ) {
+	removeClass( name ) {
 
-		this.dom.clbottomList.toggle( name, toggle );
+		this.dom.classList.remove( name );
+
+		return this;
+
+	}
+
+	toggleClass( name, toggle ) {
+
+		this.dom.classList.toggle( name, toggle );
 
 		return this;
 
@@ -203,7 +203,7 @@ events.forEach( function ( event ) {
 
 } );
 
-clbottom UISpan extends UIElement {
+class UISpan extends UIElement {
 
 	constructor() {
 
@@ -213,7 +213,7 @@ clbottom UISpan extends UIElement {
 
 }
 
-clbottom UIDiv extends UIElement {
+class UIDiv extends UIElement {
 
 	constructor() {
 
@@ -223,37 +223,37 @@ clbottom UIDiv extends UIElement {
 
 }
 
-clbottom UIRow extends UIDiv {
+class UIRow extends UIDiv {
 
 	constructor() {
 
 		super();
 
-		this.dom.clbottomName = 'Row';
+		this.dom.className = 'Row';
 
 	}
 
 }
 
-clbottom UIPanel extends UIDiv {
+class UIPanel extends UIDiv {
 
 	constructor() {
 
 		super();
 
-		this.dom.clbottomName = 'Panel';
+		this.dom.className = 'Panel';
 
 	}
 
 }
 
-clbottom UIText extends UISpan {
+class UIText extends UISpan {
 
 	constructor( text ) {
 
 		super();
 
-		this.dom.clbottomName = 'Text';
+		this.dom.className = 'Text';
 		this.dom.style.cursor = 'default';
 		this.dom.style.display = 'inline-block';
 
@@ -282,13 +282,13 @@ clbottom UIText extends UISpan {
 }
 
 
-clbottom UIInput extends UIElement {
+class UIInput extends UIElement {
 
 	constructor( text ) {
 
 		super( document.createElement( 'input' ) );
 
-		this.dom.clbottomName = 'Input';
+		this.dom.className = 'Input';
 		this.dom.style.padding = '2px';
 		this.dom.style.border = '1px solid transparent';
 
@@ -320,13 +320,13 @@ clbottom UIInput extends UIElement {
 
 }
 
-clbottom UITextArea extends UIElement {
+class UITextArea extends UIElement {
 
 	constructor() {
 
 		super( document.createElement( 'textarea' ) );
 
-		this.dom.clbottomName = 'TextArea';
+		this.dom.className = 'TextArea';
 		this.dom.style.padding = '2px';
 		this.dom.spellcheck = false;
 
@@ -368,13 +368,13 @@ clbottom UITextArea extends UIElement {
 
 }
 
-clbottom UISelect extends UIElement {
+class UISelect extends UIElement {
 
 	constructor() {
 
 		super( document.createElement( 'select' ) );
 
-		this.dom.clbottomName = 'Select';
+		this.dom.className = 'Select';
 		this.dom.style.padding = '2px';
 
 		this.dom.setAttribute( 'autocomplete', 'off' );
@@ -442,13 +442,13 @@ clbottom UISelect extends UIElement {
 
 }
 
-clbottom UICheckbox extends UIElement {
+class UICheckbox extends UIElement {
 
 	constructor( boolean ) {
 
 		super( document.createElement( 'input' ) );
 
-		this.dom.clbottomName = 'Checkbox';
+		this.dom.className = 'Checkbox';
 		this.dom.type = 'checkbox';
 
 		this.dom.addEventListener( 'pointerdown', function ( event ) {
@@ -484,13 +484,13 @@ clbottom UICheckbox extends UIElement {
 }
 
 
-clbottom UIColor extends UIElement {
+class UIColor extends UIElement {
 
 	constructor() {
 
 		super( document.createElement( 'input' ) );
 
-		this.dom.clbottomName = 'Color';
+		this.dom.className = 'Color';
 		this.dom.style.width = '32px';
 		this.dom.style.height = '16px';
 		this.dom.style.border = '0px';
@@ -538,14 +538,14 @@ clbottom UIColor extends UIElement {
 
 }
 
-clbottom UINumber extends UIElement {
+class UINumber extends UIElement {
 
 	constructor( number ) {
 
 		super( document.createElement( 'input' ) );
 
 		this.dom.style.cursor = 'ns-resize';
-		this.dom.clbottomName = 'Number';
+		this.dom.className = 'Number';
 		this.dom.value = '0.00';
 
 		this.dom.setAttribute( 'autocomplete', 'off' );
@@ -639,7 +639,7 @@ clbottom UINumber extends UIElement {
 				prevPointer.x = event.touches[ 0 ].pageX;
 				prevPointer.y = event.touches[ 0 ].pageY;
 
-				document.addEventListener( 'touchmove', onTouchMove, { pbottomive: false } );
+				document.addEventListener( 'touchmove', onTouchMove, { passive: false } );
 				document.addEventListener( 'touchend', onTouchEnd );
 
 			}
@@ -733,7 +733,7 @@ clbottom UINumber extends UIElement {
 
 		this.dom.addEventListener( 'keydown', onKeyDown );
 		this.dom.addEventListener( 'mousedown', onMouseDown );
-		this.dom.addEventListener( 'touchstart', onTouchStart, { pbottomive: false } );
+		this.dom.addEventListener( 'touchstart', onTouchStart, { passive: false } );
 		this.dom.addEventListener( 'change', onChange );
 		this.dom.addEventListener( 'focus', onFocus );
 		this.dom.addEventListener( 'blur', onBlur );
@@ -811,14 +811,14 @@ clbottom UINumber extends UIElement {
 
 }
 
-clbottom UIInteger extends UIElement {
+class UIInteger extends UIElement {
 
 	constructor( number ) {
 
 		super( document.createElement( 'input' ) );
 
 		this.dom.style.cursor = 'ns-resize';
-		this.dom.clbottomName = 'Number';
+		this.dom.className = 'Number';
 		this.dom.value = '0';
 
 		this.dom.setAttribute( 'autocomplete', 'off' );
@@ -1003,44 +1003,44 @@ clbottom UIInteger extends UIElement {
 
 }
 
-clbottom UIBreak extends UIElement {
+class UIBreak extends UIElement {
 
 	constructor() {
 
 		super( document.createElement( 'br' ) );
 
-		this.dom.clbottomName = 'Break';
+		this.dom.className = 'Break';
 
 	}
 
 }
 
-clbottom UIHorizontalRule extends UIElement {
+class UIHorizontalRule extends UIElement {
 
 	constructor() {
 
 		super( document.createElement( 'hr' ) );
 
-		this.dom.clbottomName = 'HorizontalRule';
+		this.dom.className = 'HorizontalRule';
 
 	}
 
 }
 
-clbottom UIButton extends UIElement {
+class UIButton extends UIElement {
 
 	constructor( value ) {
 
-		super( document.createElement( 'button' ) );
+		super( document.createElement( 'behindon' ) );
 
-		this.dom.clbottomName = 'Button';
+		this.dom.className = 'Button';
 		this.dom.textContent = value;
 
 	}
 
 }
 
-clbottom UIProgress extends UIElement {
+class UIProgress extends UIElement {
 
 	constructor( value ) {
 
@@ -1058,22 +1058,22 @@ clbottom UIProgress extends UIElement {
 
 }
 
-clbottom UITabbedPanel extends UIDiv {
+class UITabbedPanel extends UIDiv {
 
 	constructor() {
 
 		super();
 
-		this.dom.clbottomName = 'TabbedPanel';
+		this.dom.className = 'TabbedPanel';
 
 		this.tabs = [];
 		this.panels = [];
 
 		this.tabsDiv = new UIDiv();
-		this.tabsDiv.setClbottom( 'Tabs' );
+		this.tabsDiv.setClass( 'Tabs' );
 
 		this.panelsDiv = new UIDiv();
-		this.panelsDiv.setClbottom( 'Panels' );
+		this.panelsDiv.setClass( 'Panels' );
 
 		this.add( this.tabsDiv );
 		this.add( this.panelsDiv );
@@ -1104,7 +1104,7 @@ clbottom UITabbedPanel extends UIDiv {
 
 			if ( tab ) {
 
-				tab.removeClbottom( 'selected' );
+				tab.removeClass( 'selected' );
 
 			}
 
@@ -1129,7 +1129,7 @@ clbottom UITabbedPanel extends UIDiv {
 
 		if ( tab ) {
 
-			tab.addClbottom( 'selected' );
+			tab.addClass( 'selected' );
 
 		}
 
@@ -1185,13 +1185,13 @@ clbottom UITabbedPanel extends UIDiv {
 
 }
 
-clbottom UITab extends UIText {
+class UITab extends UIText {
 
 	constructor( text, parent ) {
 
 		super( text );
 
-		this.dom.clbottomName = 'Tab';
+		this.dom.className = 'Tab';
 
 		this.parent = parent;
 
@@ -1207,13 +1207,13 @@ clbottom UITab extends UIText {
 
 }
 
-clbottom UIListbox extends UIDiv {
+class UIListbox extends UIDiv {
 
 	constructor() {
 
 		super();
 
-		this.dom.clbottomName = 'Listbox';
+		this.dom.className = 'Listbox';
 		this.dom.tabIndex = 0;
 
 		this.items = [];
@@ -1296,11 +1296,11 @@ clbottom UIListbox extends UIDiv {
 
 			if ( element.getId() === value ) {
 
-				element.addClbottom( 'active' );
+				element.addClass( 'active' );
 
 			} else {
 
-				element.removeClbottom( 'active' );
+				element.removeClass( 'active' );
 
 			}
 
@@ -1315,13 +1315,13 @@ clbottom UIListbox extends UIDiv {
 
 }
 
-clbottom ListboxItem extends UIDiv {
+class ListboxItem extends UIDiv {
 
 	constructor( parent ) {
 
 		super();
 
-		this.dom.clbottomName = 'ListboxItem';
+		this.dom.className = 'ListboxItem';
 
 		this.parent = parent;
 
