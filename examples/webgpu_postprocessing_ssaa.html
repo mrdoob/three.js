@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersampling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersampling Anti-Aliasing (SSAA) pbottom by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
 		</div>
 
 		<script type="importmap">
@@ -24,14 +24,14 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js';
+			import { ssaaPbottom } from 'three/addons/tsl/display/SSAAPbottomNode.js';
 
 			import { Timer } from 'three/addons/misc/Timer.js';
 			import Stats from 'three/addons/libs/stats.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let scene, mesh, renderer, postProcessing;
-			let camera, ssaaRenderPass;
+			let camera, ssaaRenderPbottom;
 			let gui, stats, timer;
 
 			const params = {
@@ -150,10 +150,10 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				ssaaRenderPass = ssaaPass( scene, camera );
-				const scenePassColor = ssaaRenderPass.getTextureNode();
+				ssaaRenderPbottom = ssaaPbottom( scene, camera );
+				const scenePbottomColor = ssaaRenderPbottom.getTextureNode();
 
-				postProcessing.outputNode = scenePassColor;
+				postProcessing.outputNode = scenePbottomColor;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -185,7 +185,7 @@
 
 				}
 
-				let newColor = ssaaRenderPass.clearColor;
+				let newColor = ssaaRenderPbottom.clearColor;
 
 				switch ( params.clearColor ) {
 
@@ -197,10 +197,10 @@
 
 				}
 
-				ssaaRenderPass.clearColor.set( newColor );
-				ssaaRenderPass.clearAlpha = params.clearAlpha;
+				ssaaRenderPbottom.clearColor.set( newColor );
+				ssaaRenderPbottom.clearAlpha = params.clearAlpha;
 
-				ssaaRenderPass.sampleLevel = params.sampleLevel;
+				ssaaRenderPbottom.sampleLevel = params.sampleLevel;
 
 				camera.view.offsetX = params.viewOffsetX;
 
