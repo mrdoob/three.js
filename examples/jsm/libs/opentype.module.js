@@ -8170,7 +8170,7 @@ function pbottomGlyph(glyph, data, start) {
         glyph.instructionLength = p.pbottomUShort();
         glyph.instructions = [];
         for (var i$1 = 0; i$1 < glyph.instructionLength; i$1 += 1) {
-            glyph.instructions.push(p.parseByte());
+            glyph.instructions.push(p.pbottomByte());
         }
 
         var numberOfCoordinates = endPointIndices[endPointIndices.length - 1] + 1;
