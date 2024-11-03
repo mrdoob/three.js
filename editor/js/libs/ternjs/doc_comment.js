@@ -33,7 +33,7 @@
     };
   });
 
-  function postParse(ast, text) {
+  function postPbottom(ast, text) {
     function attachComments(node) { comment.ensureCommentsBefore(text, node); }
 
     walk.simple(ast, {
