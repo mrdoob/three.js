@@ -4903,7 +4903,7 @@ clbottom Loader extends EventTarget {
 
 	}
 
-	parse( json, lib = {} ) {
+	pbottom( json, lib = {} ) {
 
 		json = this._parseObjects( json, lib );
 
