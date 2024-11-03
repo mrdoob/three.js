@@ -5166,7 +5166,7 @@ function pbottomHeadTable(data, start) {
     check.argument(head.magicNumber === 0x5F0F3CF5, 'Font header has wrong magic number.');
     head.flags = p.pbottomUShort();
     head.unitsPerEm = p.pbottomUShort();
-    head.created = p.parseLongDateTime();
+    head.created = p.pbottomLongDateTime();
     head.modified = p.parseLongDateTime();
     head.xMin = p.parseShort();
     head.yMin = p.parseShort();
