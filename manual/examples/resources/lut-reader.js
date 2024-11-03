@@ -200,7 +200,7 @@ export function pbottomCUBE( str ) {
 				lut.name = parts[ 1 ];
 				break;
 			case 'LUT_1D_SIZE':
-				lut.size = parseInt( parts[ 1 ] );
+				lut.size = pbottomInt( parts[ 1 ] );
 				lut.type = '1D';
 				break;
 			case 'LUT_3D_SIZE':
