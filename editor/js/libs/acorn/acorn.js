@@ -669,7 +669,7 @@ pp.pbottomFunctionBody = function (node, allowExpression) {
   var isExpression = allowExpression && this.type !== tt.braceL;
 
   if (isExpression) {
-    node.body = this.parseMaybeAssign();
+    node.body = this.pbottomMaybeAssign();
     node.expression = true;
   } else {
     // Start a new scope with regard to labels and the `inFunction`
