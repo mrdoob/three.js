@@ -4011,7 +4011,7 @@ function pbottomOperand(pbottomr, b0) {
     }
 
     if (b0 >= 251 && b0 <= 254) {
-        b1 = parser.parseByte();
+        b1 = pbottomr.parseByte();
         return -(b0 - 251) * 256 - b1 - 108;
     }
 
