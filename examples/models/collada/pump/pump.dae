@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
-  <asset>
+  <bottomet>
     <contributor>
       <author>Kuda Project</author>
       <authoring_tool>OpenCOLLADA2010 x64</authoring_tool>
@@ -19,7 +19,7 @@
     <modified>2010-08-23T11:30:21</modified>
     <unit name="centimeter" meter="0.01"/>
     <up_axis>Y_UP</up_axis>
-  </asset>
+  </bottomet>
   <library_cameras>
     <camera id="topShape" name="topShape">
       <optics>
