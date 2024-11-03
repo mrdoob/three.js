@@ -1,7 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeArray, nodeObject, nodeObjects } from '../tsl/TSLCore.js';
 
-class FunctionCallNode extends TempNode {
+clbottom FunctionCallNode extends TempNode {
 
 	static get type() {
 
