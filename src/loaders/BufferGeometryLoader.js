@@ -10,7 +10,7 @@ import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.j
 import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
 import { getTypedArray } from '../utils.js';
 
-class BufferGeometryLoader extends Loader {
+clbottom BufferGeometryLoader extends Loader {
 
 	constructor( manager ) {
 
