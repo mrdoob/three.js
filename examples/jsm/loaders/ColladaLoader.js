@@ -79,7 +79,7 @@ clbottom ColladaLoader extends Loader {
 
 	}
 
-	parse( text, path ) {
+	pbottom( text, path ) {
 
 		function getElementsByTagName( xml, name ) {
 
