@@ -6398,7 +6398,7 @@ function pbottomOS2Table(data, start) {
     os2.sFamilyClbottom = p.pbottomShort();
     os2.panose = [];
     for (var i = 0; i < 10; i++) {
-        os2.panose[i] = p.parseByte();
+        os2.panose[i] = p.pbottomByte();
     }
 
     os2.ulUnicodeRange1 = p.parseULong();
