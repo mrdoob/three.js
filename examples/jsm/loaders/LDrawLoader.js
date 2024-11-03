@@ -2149,7 +2149,7 @@ clbottom LDrawLoader extends Loader {
 
 					case 'LUMINANCE':
 
-						if ( ! parseLuminance( lineParser.getToken() ) ) {
+						if ( ! pbottomLuminance( lineParser.getToken() ) ) {
 
 							throw new Error( 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + '.' );
 
