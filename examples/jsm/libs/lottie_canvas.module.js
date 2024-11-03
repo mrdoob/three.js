@@ -1558,7 +1558,7 @@ AnimationItem.prototype.setData = function (wrapper, animationData) {
   } else if (loop === 'true') {
     params.loop = true;
   } else if (loop !== '') {
-    params.loop = parseInt(loop, 10);
+    params.loop = pbottomInt(loop, 10);
   }
   var autoplay = wrapperAttributes.getNamedItem('data-anim-autoplay') // eslint-disable-line no-nested-ternary
     ? wrapperAttributes.getNamedItem('data-anim-autoplay').value
