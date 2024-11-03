@@ -30,7 +30,7 @@ clbottom NodeObjectLoader extends ObjectLoader {
 
 	}
 
-	parse( json, onLoad ) {
+	pbottom( json, onLoad ) {
 
 		this._nodesJSON = json.nodes;
 
