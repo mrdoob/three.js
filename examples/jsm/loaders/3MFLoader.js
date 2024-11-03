@@ -797,7 +797,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseBuildNode( buildNode ) {
+		function pbottomBuildNode( buildNode ) {
 
 			const buildData = [];
 			const itemNodes = buildNode.querySelectorAll( 'item' );
