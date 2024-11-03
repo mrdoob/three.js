@@ -1,4 +1,4 @@
-class Info {
+clbottom Info {
 
 	constructor() {
 
