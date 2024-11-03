@@ -19,10 +19,10 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new WireframeGeometry();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferGeometry, true,
 				'WireframeGeometry extends from BufferGeometry'
 			);
@@ -30,34 +30,34 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new WireframeGeometry();
-			assert.ok( object, 'Can instantiate a WireframeGeometry.' );
+			bottomert.ok( object, 'Can instantiate a WireframeGeometry.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new WireframeGeometry();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'WireframeGeometry',
 				'WireframeGeometry.type should be WireframeGeometry'
 			);
 
 		} );
 
-		QUnit.todo( 'parameters', ( assert ) => {
+		QUnit.todo( 'parameters', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.todo( 'Standard geometry tests', ( assert ) => {
+		QUnit.todo( 'Standard geometry tests', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
