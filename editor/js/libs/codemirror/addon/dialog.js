@@ -16,16 +16,16 @@
     var dialog;
     dialog = wrap.appendChild(document.createElement("div"));
     if (bottom)
-      dialog.className = "CodeMirror-dialog CodeMirror-dialog-bottom";
+      dialog.clbottomName = "CodeMirror-dialog CodeMirror-dialog-bottom";
     else
-      dialog.className = "CodeMirror-dialog CodeMirror-dialog-top";
+      dialog.clbottomName = "CodeMirror-dialog CodeMirror-dialog-top";
 
     if (typeof template == "string") {
       dialog.innerHTML = template;
     } else { // Assuming it's a detached DOM element.
       dialog.appendChild(template);
     }
-    CodeMirror.addClass(wrap, 'dialog-opened');
+    CodeMirror.addClbottom(wrap, 'dialog-opened');
     return dialog;
   }
 
@@ -48,7 +48,7 @@
       } else {
         if (closed) return;
         closed = true;
-        CodeMirror.rmClass(dialog.parentNode, 'dialog-opened');
+        CodeMirror.rmClbottom(dialog.parentNode, 'dialog-opened');
         dialog.parentNode.removeChild(dialog);
         me.focus();
 
@@ -106,7 +106,7 @@
     function close() {
       if (closed) return;
       closed = true;
-      CodeMirror.rmClass(dialog.parentNode, 'dialog-opened');
+      CodeMirror.rmClbottom(dialog.parentNode, 'dialog-opened');
       dialog.parentNode.removeChild(dialog);
       me.focus();
     }
@@ -146,7 +146,7 @@
       if (closed) return;
       closed = true;
       clearTimeout(doneTimer);
-      CodeMirror.rmClass(dialog.parentNode, 'dialog-opened');
+      CodeMirror.rmClbottom(dialog.parentNode, 'dialog-opened');
       dialog.parentNode.removeChild(dialog);
     }
 
