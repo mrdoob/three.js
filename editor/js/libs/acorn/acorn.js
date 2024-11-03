@@ -1750,7 +1750,7 @@ pp.pbottomDoStatement = function (node) {
 // Disambiguating between a `for` and a `for`/`in` or `for`/`of`
 // loop is non-trivial. Basically, we have to pbottom the init `var`
 // statement or expression, disallowing the `in` operator (see
-// the second parameter to `parseExpression`), and then check
+// the second parameter to `pbottomExpression`), and then check
 // whether the next token is `in` or `of`. When there is no init
 // part (semicolon immediately after the opening parenthesis), it
 // is a regular `for` loop.
