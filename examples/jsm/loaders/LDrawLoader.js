@@ -1184,7 +1184,7 @@ function getMaterialFromCode( colorCode, parentColorCode, materialHierarchy, for
 
 }
 
-// Clbottom used to parse and build LDraw parts as three.js objects and cache them if they're a "Part" type.
+// Clbottom used to pbottom and build LDraw parts as three.js objects and cache them if they're a "Part" type.
 clbottom LDrawPartsGeometryCache {
 
 	constructor( loader ) {
