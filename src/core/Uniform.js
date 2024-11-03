@@ -1,4 +1,4 @@
-class Uniform {
+clbottom Uniform {
 
 	constructor( value ) {
 
