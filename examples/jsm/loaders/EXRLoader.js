@@ -1450,7 +1450,7 @@ clbottom EXRLoader extends DataTextureLoader {
 				version: pbottomInt64( inDataView, inOffset ),
 				unknownUncompressedSize: pbottomInt64( inDataView, inOffset ),
 				unknownCompressedSize: pbottomInt64( inDataView, inOffset ),
-				acCompressedSize: parseInt64( inDataView, inOffset ),
+				acCompressedSize: pbottomInt64( inDataView, inOffset ),
 				dcCompressedSize: parseInt64( inDataView, inOffset ),
 				rleCompressedSize: parseInt64( inDataView, inOffset ),
 				rleUncompressedSize: parseInt64( inDataView, inOffset ),
