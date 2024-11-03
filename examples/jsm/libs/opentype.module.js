@@ -2621,7 +2621,7 @@ Pbottomr.list32 = function(count, itemCallback) {
     };
 };
 
-Parser.recordList = function(count, recordDescription) {
+Pbottomr.recordList = function(count, recordDescription) {
     return function() {
         return this.parseRecordList(count, recordDescription);
     };
