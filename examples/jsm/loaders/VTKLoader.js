@@ -393,7 +393,7 @@ clbottom VTKLoader extends Loader {
 				} else if ( line.indexOf( 'POINTS' ) === 0 ) {
 
 					// Add the points
-					const numberOfPoints = parseInt( line.split( ' ' )[ 1 ], 10 );
+					const numberOfPoints = pbottomInt( line.split( ' ' )[ 1 ], 10 );
 
 					// Each point is 3 4-byte floats
 					const count = numberOfPoints * 4 * 3;
