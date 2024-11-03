@@ -3,7 +3,7 @@ import { Group } from '../../objects/Group.js';
 
 const _moveEvent = { type: 'move' };
 
-class WebXRController {
+clbottom WebXRController {
 
 	constructor() {
 
