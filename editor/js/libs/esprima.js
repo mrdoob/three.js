@@ -2198,7 +2198,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                else {
 	                    var previousAllowIn = this.context.allowIn;
 	                    this.context.allowIn = false;
-	                    var declarations = this.parseBindingList(kind, { inFor: true });
+	                    var declarations = this.pbottomBindingList(kind, { inFor: true });
 	                    this.context.allowIn = previousAllowIn;
 	                    if (declarations.length === 1 && declarations[0].init === null && this.matchKeyword('in')) {
 	                        init = this.finalize(init, new Node.VariableDeclaration(declarations, kind));
