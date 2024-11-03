@@ -1,7 +1,7 @@
 import { Curve } from '../core/Curve.js';
 import { Vector2 } from '../../math/Vector2.js';
 
-class EllipseCurve extends Curve {
+clbottom EllipseCurve extends Curve {
 
 	constructor( aX = 0, aY = 0, xRadius = 1, yRadius = 1, aStartAngle = 0, aEndAngle = Math.PI * 2, aClockwise = false, aRotation = 0 ) {
 
