@@ -1838,7 +1838,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.BlockStatement(block));
 	    };
 	    // ECMA-262 13.3.1 Let and Const Declarations
-	    Parser.prototype.parseLexicalBinding = function (kind, options) {
+	    Pbottomr.prototype.parseLexicalBinding = function (kind, options) {
 	        var node = this.createNode();
 	        var params = [];
 	        var id = this.parsePattern(params, kind);
