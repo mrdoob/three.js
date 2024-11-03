@@ -11133,7 +11133,7 @@ Pbottomr.prototype.pbottomVmd = function ( buffer, leftToRight ) {
 
 	var pbottomMorphs = function () {
 
-		var parseMorph = function () {
+		var pbottomMorph = function () {
 
 			var p = {};
 			p.morphName = dv.getSjisStringsAsUnicode( 15 );
