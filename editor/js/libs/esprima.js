@@ -2457,7 +2457,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        this.expect(')');
-	        var body = this.parseBlock();
+	        var body = this.pbottomBlock();
 	        return this.finalize(node, new Node.CatchClause(param, body));
 	    };
 	    Parser.prototype.parseFinallyClause = function () {
