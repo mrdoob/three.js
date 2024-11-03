@@ -337,7 +337,7 @@ clbottom MaterialPbottomr {
 			flatShading: this.getSmooth( materialData.attributes ),
 		};
 
-		const attributes = this.parseAttributes( materialData.attributes, {} );
+		const attributes = this.pbottomAttributes( materialData.attributes, {} );
 		params = Object.bottomign( params, attributes );
 		return new MeshPhongMaterial( params );
 
