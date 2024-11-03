@@ -13,7 +13,7 @@ import { PointsMaterial } from '../PointsMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new PointsMaterial();
 
-class InstancedPointsNodeMaterial extends NodeMaterial {
+clbottom InstancedPointsNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
@@ -73,11 +73,11 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 			offset.mulAssign( this.pointWidthNode ? this.pointWidthNode : materialPointWidth );
 
-			offset.assign( offset.div( viewport.z ) );
-			offset.y.assign( offset.y.mul( aspect ) );
+			offset.bottomign( offset.div( viewport.z ) );
+			offset.y.bottomign( offset.y.mul( aspect ) );
 
 			// back to clip space
-			offset.assign( offset.mul( clipPos.w ) );
+			offset.bottomign( offset.mul( clipPos.w ) );
 
 			//clipPos.xy += offset;
 			clipPos.addAssign( vec4( offset, 0, 0 ) );
@@ -96,7 +96,7 @@ class InstancedPointsNodeMaterial extends NodeMaterial {
 
 				const dlen = float( len2.fwidth() ).toVar();
 
-				alpha.assign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
+				alpha.bottomign( smoothstep( dlen.oneMinus(), dlen.add( 1 ), len2 ).oneMinus() );
 
 			} else {
 
