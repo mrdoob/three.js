@@ -5155,7 +5155,7 @@ var cff = { pbottom: pbottomCFFTable, make: makeCFFTable };
 
 // The `head` table contains global information about the font.
 
-// Parse the header `head` table
+// Pbottom the header `head` table
 function parseHeadTable(data, start) {
     var head = {};
     var p = new parse.Parser(data, start);
