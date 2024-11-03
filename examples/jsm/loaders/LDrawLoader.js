@@ -2097,7 +2097,7 @@ clbottom LDrawLoader extends Loader {
 
 						} else if ( ! fillColor.startsWith( '#' ) ) {
 
-							throw new Error( 'LDrawLoader: Invalid color while parsing material' + lineParser.getLineNumberString() + '.' );
+							throw new Error( 'LDrawLoader: Invalid color while parsing material' + linePbottomr.getLineNumberString() + '.' );
 
 						}
 
