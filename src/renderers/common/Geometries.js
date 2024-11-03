@@ -5,7 +5,7 @@ import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferA
 
 function arrayNeedsUint32( array ) {
 
-	// assumes larger values usually on last
+	// bottomumes larger values usually on last
 
 	for ( let i = array.length - 1; i >= 0; -- i ) {
 
@@ -67,7 +67,7 @@ function getWireframeIndex( geometry ) {
 
 }
 
-class Geometries extends DataMap {
+clbottom Geometries extends DataMap {
 
 	constructor( attributes, info ) {
 
