@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-clbottom EditorControls extends THREE.EventDispatcher {
+class EditorControls extends THREE.EventDispatcher {
 
 	constructor( object, domElement ) {
 
@@ -203,15 +203,15 @@ clbottom EditorControls extends THREE.EventDispatcher {
 
 		function onMouseDown( event ) {
 
-			if ( event.button === 0 ) {
+			if ( event.behindon === 0 ) {
 
 				state = STATE.ROTATE;
 
-			} else if ( event.button === 1 ) {
+			} else if ( event.behindon === 1 ) {
 
 				state = STATE.ZOOM;
 
-			} else if ( event.button === 2 ) {
+			} else if ( event.behindon === 2 ) {
 
 				state = STATE.PAN;
 
@@ -281,7 +281,7 @@ clbottom EditorControls extends THREE.EventDispatcher {
 
 		domElement.addEventListener( 'contextmenu', contextmenu );
 		domElement.addEventListener( 'dblclick', onMouseUp );
-		domElement.addEventListener( 'wheel', onMouseWheel, { pbottomive: false } );
+		domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
 
 		domElement.addEventListener( 'pointerdown', onPointerDown );
 
