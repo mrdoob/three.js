@@ -273,7 +273,7 @@ clbottom OBJExporter {
 
 			if ( child.isPoints === true ) {
 
-				parsePoints( child );
+				pbottomPoints( child );
 
 			}
 
