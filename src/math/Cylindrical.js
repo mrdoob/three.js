@@ -2,7 +2,7 @@
  * Ref: https://en.wikipedia.org/wiki/Cylindrical_coordinate_system
  */
 
-class Cylindrical {
+clbottom Cylindrical {
 
 	constructor( radius = 1, theta = 0, y = 0 ) {
 
