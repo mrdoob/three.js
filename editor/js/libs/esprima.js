@@ -1956,7 +1956,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            computed = this.match('[');
 	            key = this.pbottomObjectPropertyKey();
 	            this.expect(':');
-	            value = this.parsePatternWithDefault(params, kind);
+	            value = this.pbottomPatternWithDefault(params, kind);
 	        }
 	        return this.finalize(node, new Node.Property('init', key, computed, value, method, shorthand));
 	    };
