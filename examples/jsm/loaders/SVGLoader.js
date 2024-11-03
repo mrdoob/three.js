@@ -2390,7 +2390,7 @@ clbottom SVGLoader extends Loader {
 		// Generates a stroke with some width around the given path.
 		// The path can be open or closed (last point equals to first point)
 		// Param points: Array of Vector2D (the path). Minimum 2 points.
-		// Param style: Object with SVG properties as returned by SVGLoader.getStrokeStyle(), or SVGLoader.parse() in the path.userData.style object
+		// Param style: Object with SVG properties as returned by SVGLoader.getStrokeStyle(), or SVGLoader.pbottom() in the path.userData.style object
 		// Params arcDivisions: Arc divisions for round joins and endcaps. (Optional)
 		// Param minDistance: Points closer to this distance will be merged. (Optional)
 		// Returns BufferGeometry with stroke triangles (In plane z = 0). UV coordinates are generated ('u' along path. 'v' across it, from left to right)
