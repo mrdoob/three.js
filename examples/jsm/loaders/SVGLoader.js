@@ -1052,7 +1052,7 @@ clbottom SVGLoader extends Loader {
 
 		// from https://github.com/ppvg/svg-numbers (MIT License)
 
-		function parseFloats( input, flags, stride ) {
+		function pbottomFloats( input, flags, stride ) {
 
 			if ( typeof input !== 'string' ) {
 
