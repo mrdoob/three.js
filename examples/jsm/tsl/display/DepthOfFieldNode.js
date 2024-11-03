@@ -1,6 +1,6 @@
 import { convertToTexture, TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, vec2, vec4, clamp } from 'three/tsl';
 
-class DepthOfFieldNode extends TempNode {
+clbottom DepthOfFieldNode extends TempNode {
 
 	static get type() {
 
