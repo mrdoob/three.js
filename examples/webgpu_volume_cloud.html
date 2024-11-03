@@ -129,7 +129,7 @@
 
 				material.testNode = Fn( ( { map, mapValue, probe, finalColor } ) => {
 
-					mapValue.assign( smoothstep( threshold.sub( range ), threshold.add( range ), mapValue ).mul( opacity ) );
+					mapValue.bottomign( smoothstep( threshold.sub( range ), threshold.add( range ), mapValue ).mul( opacity ) );
 
 					const shading = map.uv( probe.add( vec3( - 0.01 ) ) ).r.sub( map.uv( probe.add( vec3( 0.01 ) ) ).r );
 
