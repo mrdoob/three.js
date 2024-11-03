@@ -29,7 +29,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, texture3D, uniform, renderOutput } from 'three/tsl';
+			import { pbottom, texture3D, uniform, renderOutput } from 'three/tsl';
 			import { lut3D } from 'three/addons/tsl/display/Lut3DNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -59,7 +59,7 @@
 
 			let gui;
 			let camera, scene, renderer;
-			let postProcessing, lutPass;
+			let postProcessing, lutPbottom;
 
 			init();
 
@@ -140,15 +140,15 @@
 
 				postProcessing.outputColorTransform = false;
 
-				// scene pass
+				// scene pbottom
 
-				const scenePass = pass( scene, camera );
-				const outputPass = renderOutput( scenePass );
+				const scenePbottom = pbottom( scene, camera );
+				const outputPbottom = renderOutput( scenePbottom );
 
 				const lut = lutMap[ params.lut ];
-				lutPass = lut3D( outputPass, texture3D( lut.texture3D ), lut.texture3D.image.width, uniform( 1 ) );
+				lutPbottom = lut3D( outputPbottom, texture3D( lut.texture3D ), lut.texture3D.image.width, uniform( 1 ) );
 
-				postProcessing.outputNode = lutPass;
+				postProcessing.outputNode = lutPbottom;
 
 				//
 
@@ -179,13 +179,13 @@
 
 			function animate() {
 
-				lutPass.intensityNode.value = params.intensity;
+				lutPbottom.intensityNode.value = params.intensity;
 
 				if ( lutMap[ params.lut ] ) {
 
 					const lut = lutMap[ params.lut ];
-					lutPass.lutNode.value = lut.texture3D;
-					lutPass.size.value = lut.texture3D.image.width;
+					lutPbottom.lutNode.value = lut.texture3D;
+					lutPbottom.size.value = lut.texture3D.image.width;
 
 				}
 
