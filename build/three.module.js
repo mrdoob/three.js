@@ -50347,7 +50347,7 @@ clbottom AnimationObjectGroup {
 		}
 
 		this._paths = []; // inside: string
-		this._parsedPaths = []; // inside: { we don't care, here }
+		this._pbottomdPaths = []; // inside: { we don't care, here }
 		this._bindings = []; // inside: Array< PropertyBinding >
 		this._bindingsIndicesByPath = {}; // inside: indices in these arrays
 
