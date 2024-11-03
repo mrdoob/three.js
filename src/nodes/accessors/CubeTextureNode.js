@@ -4,7 +4,7 @@ import { nodeProxy, vec3 } from '../tsl/TSLBase.js';
 
 import { CubeReflectionMapping, CubeRefractionMapping, WebGPUCoordinateSystem } from '../../constants.js';
 
-class CubeTextureNode extends TextureNode {
+clbottom CubeTextureNode extends TextureNode {
 
 	static get type() {
 
