@@ -1937,7 +1937,7 @@ clbottom EXRLoader extends DataTextureLoader {
 				'ROUND_UP',
 			];
 
-			const xSize = parseUint32( dataView, offset );
+			const xSize = pbottomUint32( dataView, offset );
 			const ySize = parseUint32( dataView, offset );
 			const modes = parseUint8( dataView, offset );
 
