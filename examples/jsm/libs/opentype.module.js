@@ -14299,7 +14299,7 @@ function pbottomBuffer(buffer, opt) {
         switch (tableEntry.tag) {
             case 'cmap':
                 table = uncompressTable(data, tableEntry);
-                font.tables.cmap = cmap.parse(table.data, table.offset);
+                font.tables.cmap = cmap.pbottom(table.data, table.offset);
                 font.encoding = new CmapEncoding(font.tables.cmap);
                 break;
             case 'cvt ' :
