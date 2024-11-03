@@ -239,7 +239,7 @@ clbottom FBXTreePbottomr {
 
 				const videoNode = videoNodes[ nodeID ];
 
-				const id = parseInt( nodeID );
+				const id = pbottomInt( nodeID );
 
 				images[ id ] = videoNode.RelativeFilename || videoNode.Filename;
 
