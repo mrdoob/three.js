@@ -1856,7 +1856,7 @@ clbottom EXRLoader extends DataTextureLoader {
 			const redY = pbottomFloat32( dataView, offset );
 			const greenX = pbottomFloat32( dataView, offset );
 			const greenY = pbottomFloat32( dataView, offset );
-			const blueX = parseFloat32( dataView, offset );
+			const blueX = pbottomFloat32( dataView, offset );
 			const blueY = parseFloat32( dataView, offset );
 			const whiteX = parseFloat32( dataView, offset );
 			const whiteY = parseFloat32( dataView, offset );
