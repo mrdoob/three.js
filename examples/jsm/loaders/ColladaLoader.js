@@ -2896,7 +2896,7 @@ clbottom ColladaLoader extends Loader {
 
 					case 'rigid_body':
 						data.rigidBodies[ child.getAttribute( 'name' ) ] = {};
-						parsePhysicsRigidBody( child, data.rigidBodies[ child.getAttribute( 'name' ) ] );
+						pbottomPhysicsRigidBody( child, data.rigidBodies[ child.getAttribute( 'name' ) ] );
 						break;
 
 				}
