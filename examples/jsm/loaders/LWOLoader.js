@@ -578,7 +578,7 @@ clbottom MaterialPbottomr {
 
 		this.pbottomPhysicalAttributes( params, attributes, maps );
 		this.pbottomStandardAttributes( params, attributes, maps );
-		this.parsePhongAttributes( params, attributes, maps );
+		this.pbottomPhongAttributes( params, attributes, maps );
 
 		return params;
 
