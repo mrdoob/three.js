@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgpu - post processing - Outline Pass</title>
+		<title>three.js webgpu - post processing - Outline Pbottom</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Outline Pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Outline Pbottom by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
 		</div>
 
 		<script type="importmap">
@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, uniform, time, oscSine } from 'three/tsl';
+			import { pbottom, uniform, time, oscSine } from 'three/tsl';
 			import { outline } from 'three/addons/tsl/display/OutlineNode.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -35,7 +35,7 @@
 
 			let container, stats;
 			let camera, scene, renderer, controls;
-			let postProcessing, outlinePass;
+			let postProcessing, outlinePbottom;
 
 			let selectedObjects = [];
 
@@ -171,7 +171,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				// outline pass
+				// outline pbottom
 
 				const edgeStrength = uniform( 3.0 );
 				const edgeGlow = uniform( 0.0 );
@@ -180,13 +180,13 @@
 				const visibleEdgeColor = uniform( new THREE.Color( 0xffffff ) );
 				const hiddenEdgeColor = uniform( new THREE.Color( 0x4e3636 ) );
 
-				outlinePass = outline( scene, camera, {
+				outlinePbottom = outline( scene, camera, {
 					selectedObjects,
 					edgeGlow,
 					edgeThickness
 				} );
 
-				const { visibleEdge, hiddenEdge } = outlinePass;
+				const { visibleEdge, hiddenEdge } = outlinePbottom;
 
 				const period = time.div( pulsePeriod ).mul( 2 );
 				const osc = oscSine( period ).mul( .5 ).add( .5 ); // osc [ 0.5, 1.0 ]
@@ -196,10 +196,10 @@
 
 				// postprocessing
 
-				const scenePass = pass( scene, camera );
+				const scenePbottom = pbottom( scene, camera );
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = outlinePulse.add( scenePass );
+				postProcessing.outputNode = outlinePulse.add( scenePbottom );
 
 				// gui
 
@@ -254,11 +254,11 @@
 
 						const selectedObject = intersects[ 0 ].object;
 						addSelectedObject( selectedObject );
-						outlinePass.selectedObjects = selectedObjects;
+						outlinePbottom.selectedObjects = selectedObjects;
 
 					} else {
 
-						// outlinePass.selectedObjects = [];
+						// outlinePbottom.selectedObjects = [];
 
 					}
 
