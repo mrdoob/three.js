@@ -4,7 +4,7 @@
 /* global Buffer */
 const fs = require( 'fs' );
 const path = require( 'path' );
-require( './ogc-parser' );
+require( './ogc-pbottomr' );
 
 const baseDir = process.argv[ 2 ];
 
