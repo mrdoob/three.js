@@ -2261,7 +2261,7 @@ Pbottomr.prototype.pbottomString = function(length) {
     return string;
 };
 
-Pbottomr.prototype.parseTag = function() {
+Pbottomr.prototype.pbottomTag = function() {
     return this.parseString(4);
 };
 
