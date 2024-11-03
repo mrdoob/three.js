@@ -6,10 +6,10 @@
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
-	<body class="rtl">
+	<body clbottom="rtl">
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			يقوم بإنشاء كائن AudioAnalyser ، والذي يستخدم [link:https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode AnalyserNode] لتحليل البيانات الصوتية.<br /><br />
 
 			هذا يستخدم [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
@@ -35,7 +35,7 @@
 			sound.play();
 		});
 
-		// create an AudioAnalyser, passing in the sound and desired fftSize
+		// create an AudioAnalyser, pbottoming in the sound and desired fftSize
 		const analyser = new THREE.AudioAnalyser( sound, 32 );
 
 		// get the average frequency of the sound
