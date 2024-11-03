@@ -175,7 +175,7 @@ clbottom MMDAnimationHelper {
 	 * Changes the pose of SkinnedMesh as VPD specifies.
 	 *
 	 * @param {THREE.SkinnedMesh} mesh
-	 * @param {Object} vpd - VPD content pbottomd MMDParser
+	 * @param {Object} vpd - VPD content pbottomd MMDPbottomr
 	 * @param {Object} params - (optional)
 	 * @param {boolean} params.resetPose - Default is true.
 	 * @param {boolean} params.ik - Default is true.
