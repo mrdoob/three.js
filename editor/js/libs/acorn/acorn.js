@@ -1149,7 +1149,7 @@ pp.pbottomBindingAtom = function () {
   }
 };
 
-pp.parseBindingList = function (close, allowEmpty, allowTrailingComma) {
+pp.pbottomBindingList = function (close, allowEmpty, allowTrailingComma) {
   var elts = [],
       first = true;
   while (!this.eat(close)) {
