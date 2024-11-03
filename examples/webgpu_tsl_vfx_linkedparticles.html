@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { atan2, cos, float, max, min, mix, PI, PI2, sin, vec2, vec3, color, Fn, hash, hue, If, instanceIndex, Loop, mx_fractal_noise_float, mx_fractal_noise_vec3, pass, pcurve, storage, deltaTime, time, uv, uniform } from 'three/tsl';
+			import { atan2, cos, float, max, min, mix, PI, PI2, sin, vec2, vec3, color, Fn, hash, hue, If, instanceIndex, Loop, mx_fractal_noise_float, mx_fractal_noise_vec3, pbottom, pcurve, storage, deltaTime, time, uv, uniform } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -111,8 +111,8 @@
 				// init particles buffers
 				renderer.computeAsync( /*#__PURE__*/ Fn( () => {
 
-					particlePositions.element( instanceIndex ).xyz.assign( vec3( 10000.0 ) );
-					particlePositions.element( instanceIndex ).w.assign( vec3( - 1.0 ) ); // life is stored in w component; x<0 means dead
+					particlePositions.element( instanceIndex ).xyz.bottomign( vec3( 10000.0 ) );
+					particlePositions.element( instanceIndex ).w.bottomign( vec3( - 1.0 ) ); // life is stored in w component; x<0 means dead
 
 				} )().compute( nbParticles ) );
 
@@ -236,15 +236,15 @@
 
 								If( dist.lessThan( closestDist1 ).and( moreThanZero ), () => {
 
-									closestDist1.assign( dist );
-									closestPos1.assign( otherPosition.xyz );
-									closestLife1.assign( otherPart.w );
+									closestDist1.bottomign( dist );
+									closestPos1.bottomign( otherPosition.xyz );
+									closestLife1.bottomign( otherPart.w );
 
 								} ).ElseIf( dist.lessThan( closestDist2 ).and( moreThanZero ), () => {
 
-									closestDist2.assign( dist );
-									closestPos2.assign( otherPosition.xyz );
-									closestLife2.assign( otherPart.w );
+									closestDist2.bottomign( dist );
+									closestPos2.bottomign( otherPosition.xyz );
+									closestLife2.bottomign( otherPart.w );
 
 								} );
 
@@ -259,23 +259,23 @@
 						const secondLinkIndex = firstLinkIndex.add( 4 );
 
 						// positions link 1
-						linksPositions.element( firstLinkIndex ).xyz.assign( position );
+						linksPositions.element( firstLinkIndex ).xyz.bottomign( position );
 						linksPositions.element( firstLinkIndex ).y.addAssign( linksWidth );
-						linksPositions.element( firstLinkIndex.add( 1 ) ).xyz.assign( position );
+						linksPositions.element( firstLinkIndex.add( 1 ) ).xyz.bottomign( position );
 						linksPositions.element( firstLinkIndex.add( 1 ) ).y.addAssign( linksWidth.negate() );
-						linksPositions.element( firstLinkIndex.add( 2 ) ).xyz.assign( closestPos1 );
+						linksPositions.element( firstLinkIndex.add( 2 ) ).xyz.bottomign( closestPos1 );
 						linksPositions.element( firstLinkIndex.add( 2 ) ).y.addAssign( linksWidth.negate() );
-						linksPositions.element( firstLinkIndex.add( 3 ) ).xyz.assign( closestPos1 );
+						linksPositions.element( firstLinkIndex.add( 3 ) ).xyz.bottomign( closestPos1 );
 						linksPositions.element( firstLinkIndex.add( 3 ) ).y.addAssign( linksWidth );
 
 						// positions link 2
-						linksPositions.element( secondLinkIndex ).xyz.assign( position );
+						linksPositions.element( secondLinkIndex ).xyz.bottomign( position );
 						linksPositions.element( secondLinkIndex ).y.addAssign( linksWidth );
-						linksPositions.element( secondLinkIndex.add( 1 ) ).xyz.assign( position );
+						linksPositions.element( secondLinkIndex.add( 1 ) ).xyz.bottomign( position );
 						linksPositions.element( secondLinkIndex.add( 1 ) ).y.addAssign( linksWidth.negate() );
-						linksPositions.element( secondLinkIndex.add( 2 ) ).xyz.assign( closestPos2 );
+						linksPositions.element( secondLinkIndex.add( 2 ) ).xyz.bottomign( closestPos2 );
 						linksPositions.element( secondLinkIndex.add( 2 ) ).y.addAssign( linksWidth.negate() );
-						linksPositions.element( secondLinkIndex.add( 3 ) ).xyz.assign( closestPos2 );
+						linksPositions.element( secondLinkIndex.add( 3 ) ).xyz.bottomign( closestPos2 );
 						linksPositions.element( secondLinkIndex.add( 3 ) ).y.addAssign( linksWidth );
 
 						// colors are the same for all vertices of both quads
@@ -287,10 +287,10 @@
 
 						Loop( 4, ( { i } ) => {
 
-							linksColors.element( firstLinkIndex.add( i ) ).xyz.assign( linkColor );
-							linksColors.element( firstLinkIndex.add( i ) ).w.assign( l1 );
-							linksColors.element( secondLinkIndex.add( i ) ).xyz.assign( linkColor );
-							linksColors.element( secondLinkIndex.add( i ) ).w.assign( l2 );
+							linksColors.element( firstLinkIndex.add( i ) ).xyz.bottomign( linkColor );
+							linksColors.element( firstLinkIndex.add( i ) ).w.bottomign( l1 );
+							linksColors.element( secondLinkIndex.add( i ) ).xyz.bottomign( linkColor );
+							linksColors.element( secondLinkIndex.add( i ) ).w.bottomign( l2 );
 
 						} );
 
@@ -305,7 +305,7 @@
 					const life = particlePositions.element( particleIndex ).w;
 					const velocity = particleVelocities.element( particleIndex ).xyz;
 
-					life.assign( 1.0 ); // sets it alive
+					life.bottomign( 1.0 ); // sets it alive
 
 					// random spherical direction
 					const rRange = float( 0.01 );
@@ -318,10 +318,10 @@
 
 					// position is interpolated between the previous cursor position and the current one over the number of particles spawned
 					const pos = mix( previousSpawnPosition, spawnPosition, instanceIndex.toFloat().div( nbToSpawn.sub( 1 ).toFloat() ).clamp() );
-					position.assign( pos.add( rDir.mul( rRange ) ) );
+					position.bottomign( pos.add( rDir.mul( rRange ) ) );
 
 					// start in that direction
-					velocity.assign( rDir.mul( 5.0 ) );
+					velocity.bottomign( rDir.mul( 5.0 ) );
 
 				} )().compute( nbToSpawn.value );
 
@@ -345,12 +345,12 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePbottom = pbottom( scene, camera );
+				const scenePbottomColor = scenePbottom.getTextureNode( 'output' );
 
-				const bloomPass = bloom( scenePassColor, 0.75, 0.1, 0.5 );
+				const bloomPbottom = bloom( scenePbottomColor, 0.75, 0.1, 0.5 );
 
-				postProcessing.outputNode = scenePassColor.add( bloomPass );
+				postProcessing.outputNode = scenePbottomColor.add( bloomPbottom );
 
 				// controls
 
@@ -389,9 +389,9 @@
 				turbFolder.add( turbGain, 'value', 0.0, 1.0, 0.01 ).name( 'Gain' );
 
 				const bloomFolder = gui.addFolder( 'bloom' );
-				bloomFolder.add( bloomPass.threshold, 'value', 0, 2.0, 0.01 ).name( 'Threshold' );
-				bloomFolder.add( bloomPass.strength, 'value', 0, 10, 0.01 ).name( 'Strength' );
-				bloomFolder.add( bloomPass.radius, 'value', 0, 1, 0.01 ).name( 'Radius' );
+				bloomFolder.add( bloomPbottom.threshold, 'value', 0, 2.0, 0.01 ).name( 'Threshold' );
+				bloomFolder.add( bloomPbottom.strength, 'value', 0, 10, 0.01 ).name( 'Strength' );
+				bloomFolder.add( bloomPbottom.radius, 'value', 0, 1, 0.01 ).name( 'Radius' );
 
 			}
 
