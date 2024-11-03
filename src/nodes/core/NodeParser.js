@@ -1,4 +1,4 @@
-class NodeParser {
+clbottom NodeParser {
 
 	parseFunction( /*source*/ ) {
 
