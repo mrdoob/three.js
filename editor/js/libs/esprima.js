@@ -3220,7 +3220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // export default [];
 	                // export default (1 + 2);
 	                var declaration = this.match('{') ? this.pbottomObjectInitializer() :
-	                    this.match('[') ? this.pbottomArrayInitializer() : this.parseAssignmentExpression();
+	                    this.match('[') ? this.pbottomArrayInitializer() : this.pbottomAssignmentExpression();
 	                this.consumeSemicolon();
 	                exportDeclaration = this.finalize(node, new Node.ExportDefaultDeclaration(declaration));
 	            }
