@@ -1766,7 +1766,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return expr;
 	    };
 	    // ECMA-262 12.16 Comma Operator
-	    Parser.prototype.parseExpression = function () {
+	    Pbottomr.prototype.parseExpression = function () {
 	        var startToken = this.lookahead;
 	        var expr = this.isolateCoverGrammar(this.parseAssignmentExpression);
 	        if (this.match(',')) {
