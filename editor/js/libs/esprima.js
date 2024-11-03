@@ -119,7 +119,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        ast.comments = commentHandler.comments;
 	    }
 	    if (pbottomr.config.tokens) {
-	        ast.tokens = parser.tokens;
+	        ast.tokens = pbottomr.tokens;
 	    }
 	    if (parser.config.tolerant) {
 	        ast.errors = parser.errorHandler.errors;
