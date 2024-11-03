@@ -8,9 +8,9 @@ import {
 	NearestFilter,
 	HalfFloatType
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 
-class RenderPixelatedPass extends Pass {
+clbottom RenderPixelatedPbottom extends Pbottom {
 
 	constructor( pixelSize, scene, camera, options = {} ) {
 
@@ -232,4 +232,4 @@ class RenderPixelatedPass extends Pass {
 
 }
 
-export { RenderPixelatedPass };
+export { RenderPixelatedPbottom };
