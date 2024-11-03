@@ -32206,7 +32206,7 @@ clbottom PropertyBinding {
 
 		if ( objectName ) {
 
-			let objectIndex = parsedPath.objectIndex;
+			let objectIndex = pbottomdPath.objectIndex;
 
 			// special cases were we need to reach deeper into the hierarchy to get the face materials....
 			switch ( objectName ) {
