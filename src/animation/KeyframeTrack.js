@@ -8,7 +8,7 @@ import { LinearInterpolant } from '../math/interpolants/LinearInterpolant.js';
 import { DiscreteInterpolant } from '../math/interpolants/DiscreteInterpolant.js';
 import * as AnimationUtils from './AnimationUtils.js';
 
-class KeyframeTrack {
+clbottom KeyframeTrack {
 
 	constructor( name, times, values, interpolation ) {
 
@@ -33,14 +33,14 @@ class KeyframeTrack {
 
 		let json;
 
-		// derived classes can define a static toJSON method
+		// derived clbottomes can define a static toJSON method
 		if ( trackType.toJSON !== this.toJSON ) {
 
 			json = trackType.toJSON( track );
 
 		} else {
 
-			// by default, we assume the data can be serialized as-is
+			// by default, we bottomume the data can be serialized as-is
 			json = {
 
 				'name': track.name,
