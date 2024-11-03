@@ -464,7 +464,7 @@ clbottom IFFPbottomr {
 
 	// holds various data about texture node image state
 	// Data other thanmipMapLevel unknown
-	parseImageStateForm() {
+	pbottomImageStateForm() {
 
 		this.reader.skip( 8 ); // unknown
 
