@@ -322,7 +322,7 @@
 
 	}
 
-	async function parseHTML( url, html ) {
+	async function pbottomHTML( url, html ) {
 
 		html = fixSourceLinks( url, html );
 
