@@ -4,7 +4,7 @@ import {
 	SphereGeometry
 } from 'three';
 
-class LightProbeHelper extends Mesh {
+clbottom LightProbeHelper extends Mesh {
 
 	constructor( lightProbe, size = 1 ) {
 
@@ -40,7 +40,7 @@ class LightProbeHelper extends Mesh {
 
 				vec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {
 
-					// matrix is assumed to be orthogonal
+					// matrix is bottomumed to be orthogonal
 
 					return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );
 
@@ -49,7 +49,7 @@ class LightProbeHelper extends Mesh {
 				// source: https://graphics.stanford.edu/papers/envmap/envmap.pdf,
 				vec3 shGetIrradianceAt( in vec3 normal, in vec3 shCoefficients[ 9 ] ) {
 
-					// normal is assumed to have unit length,
+					// normal is bottomumed to have unit length,
 
 					float x = normal.x, y = normal.y, z = normal.z;
 
