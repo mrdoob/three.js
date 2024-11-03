@@ -11090,7 +11090,7 @@ Pbottomr.prototype.pbottomVmd = function ( buffer, leftToRight ) {
 	vmd.metadata = {};
 	vmd.metadata.coordinateSystem = 'left';
 
-	var parseHeader = function () {
+	var pbottomHeader = function () {
 
 		var metadata = vmd.metadata;
 		metadata.magic = dv.getChars( 30 );
