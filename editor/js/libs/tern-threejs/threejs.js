@@ -36,7 +36,7 @@
           "!doc": "vector — point to look at<br>\n\t\t<br>\n\t\tThis makes the camera look at the vector position in the global space as long as the parent of this camera is the scene or at position (0,0,0)."
         }
       },
-      "!doc": "Abstract base class for cameras. This class should always be inherited when you build a new camera.",
+      "!doc": "Abstract base clbottom for cameras. This clbottom should always be inherited when you build a new camera.",
       "!type": "fn()"
     },
     "CubeCamera": {
@@ -152,11 +152,11 @@
       "prototype": {
         "array": {
           "!type": "[]",
-          "!doc": "Stores the data associated with this attribute; can be an Array or a Typed Array. This element should have <code>itemSize * numVertices</code> elements, where numVertices is the number of vertices in the associated [page:BufferGeometry geometry]."
+          "!doc": "Stores the data bottomociated with this attribute; can be an Array or a Typed Array. This element should have <code>itemSize * numVertices</code> elements, where numVertices is the number of vertices in the bottomociated [page:BufferGeometry geometry]."
         },
         "itemSize": {
           "!type": "number",
-          "!doc": "Records how many items of the array are associated with a particular vertex. For instance, if this\n\t\tattribute is storing a 3-component vector (such as a position, normal, or color), then itemSize should be 3."
+          "!doc": "Records how many items of the array are bottomociated with a particular vertex. For instance, if this\n\t\tattribute is storing a 3-component vector (such as a position, normal, or color), then itemSize should be 3."
         },
         "length": {
           "!type": "number",
@@ -195,7 +195,7 @@
           "!doc": "Copies this attribute."
         }
       },
-      "!doc": "This class stores data for an attribute associated with a [page:BufferGeometry]. See that page for details and a usage example. This class is used to store builtin attributes such as vertex position, normals, color, etc., but can also be used in your code to store custom attributes in a [page:BufferGeometry].",
+      "!doc": "This clbottom stores data for an attribute bottomociated with a [page:BufferGeometry]. See that page for details and a usage example. This clbottom is used to store builtin attributes such as vertex position, normals, color, etc., but can also be used in your code to store custom attributes in a [page:BufferGeometry].",
       "!type": "fn(array: [], itemSize: number)"
     },
     "BufferGeometry": {
@@ -266,7 +266,7 @@
           "!doc": "Every normal vector in a geometry will have a magnitude of 1.\n\t\tThis will correct lighting on the geometry surfaces."
         }
       },
-      "!doc": "<p>\n\t\tThis class is an efficient alternative to [page:Geometry], because it stores all data, including\n\t\tvertex positions, face indices, normals, colors, UVs, and custom attributes within buffers; this\n\t\treduces the cost of passing all this data to the GPU. \n\t\tThis also makes BufferGeometry harder to work with than [page:Geometry]; rather than accessing \n\t\tposition data as [page:Vector3] objects, color data as [page:Color] objects, and so on, you have to \n\t\taccess the raw data from the appropriate [page:BufferAttribute attribute] buffer. This makes \n\t\tBufferGeometry best-suited for static objects where you don't need to manipulate the geometry much\n\t\tafter instantiating it.\n\t\t</p>\n\n\t\t<h3>Example</h3>\n\t\t<code>\n\t\tvar geometry = new THREE.BufferGeometry();\n\t\t// create a simple square shape. We duplicate the top left and bottom right\n\t\t// vertices because each vertex needs to appear once per triangle. \n\t\tvar vertexPositions = [ \n\t\t\t[-1.0, -1.0,  1.0],\n\t\t\t[ 1.0, -1.0,  1.0],\n\t\t\t[ 1.0,  1.0,  1.0],\n\n\t\t\t[ 1.0,  1.0,  1.0],\n\t\t\t[-1.0,  1.0,  1.0],\n\t\t\t[-1.0, -1.0,  1.0]\n\t\t];\n\t\tvar vertices = new Float32Array( vertexPositions.length * 3 ); // three components per vertex\n\n\t\t// components of the position vector for each vertex are stored\n\t\t// contiguously in the buffer.\n\t\tfor ( var i = 0; i &lt; vertexPositions.length; i++ )\n\t\t{\n\t\t\tvertices[ i*3 + 0 ] = vertexPositions[i][0];\n\t\t\tvertices[ i*3 + 1 ] = vertexPositions[i][1];\n\t\t\tvertices[ i*3 + 2 ] = vertexPositions[i][2];\n\t\t}\n\n\t\t// itemSize = 3 because there are 3 values (components) per vertex\n\t\tgeometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );\n\t\tvar material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );\n\t\tvar mesh = new THREE.Mesh( geometry, material );\n\t\t</code>\n\t\t<p>More examples: [example:webgl_buffergeometry Complex mesh with non-indexed faces], [example:webgl_buffergeometry_uint Complex mesh with indexed faces], [example:webgl_buffergeometry_lines Lines], [example:webgl_buffergeometry_lines_indexed Indexed Lines], [example:webgl_buffergeometry_particles Particles], and [example:webgl_buffergeometry_rawshader Raw Shaders].</p>\n\n\t\t\n\t\t<h3>Accessing attributes</h3>\n\t\t<p>\n\t\tWebGL stores data associated with individual vertices of a geometry in <emph>attributes</emph>. \n\t\tExamples include the position of the vertex, the normal vector for the vertex, the vertex color,\n\t\tand so on. When using [page:Geometry], the [page:WebGLRenderer renderer] takes care of wrapping\n\t\tup this information into typed array buffers and sending this data to the shader. With \n\t\tBufferGeometry, all of this data is stored in buffers associated with an individual attributes.\n\t\tThis means that to get the position data associated with a vertex (for instance), you must call\n\t\t[page:.getAttribute] to access the 'position' [page:BufferAttribute attribute], then access the individual \n\t\tx, y, and z coordinates of the position.  \n\t\t</p>\n\t\t<p>\n\t\tThe following attributes are set by various members of this class:\n\t\t</p>\n\t\t<h4>[page:BufferAttribute position] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the x, y, and z coordinates of each vertex in this geometry. Set by [page:.fromGeometry]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute normal] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the x, y, and z components of the face or vertex normal vector of each vertex in this geometry.\n\t\tSet by [page:.fromGeometry]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute color] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the red, green, and blue channels of vertex color of each vertex in this geometry.\n\t\tSet by [page:.fromGeometry]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute tangent] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the x, y, and z components of the tangent vector of each vertex in this geometry. Set by [page:.computeTangents]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute index] (itemSize: 3)</h4>\n\t\tAllows for vertices to be re-used across multiple triangles; this is called using \"indexed triangles,\" and works much the same as it does in [page:Geometry]: each triangle is associated with the index of three vertices. This attribute therefore stores the index of each vertex for each triangular face.\n\n\t\tIf this attribute is not set, the [page:WebGLRenderer renderer] assumes that each three contiguous positions represent a single triangle.",
+      "!doc": "<p>\n\t\tThis clbottom is an efficient alternative to [page:Geometry], because it stores all data, including\n\t\tvertex positions, face indices, normals, colors, UVs, and custom attributes within buffers; this\n\t\treduces the cost of pbottoming all this data to the GPU. \n\t\tThis also makes BufferGeometry harder to work with than [page:Geometry]; rather than accessing \n\t\tposition data as [page:Vector3] objects, color data as [page:Color] objects, and so on, you have to \n\t\taccess the raw data from the appropriate [page:BufferAttribute attribute] buffer. This makes \n\t\tBufferGeometry best-suited for static objects where you don't need to manipulate the geometry much\n\t\tafter instantiating it.\n\t\t</p>\n\n\t\t<h3>Example</h3>\n\t\t<code>\n\t\tvar geometry = new THREE.BufferGeometry();\n\t\t// create a simple square shape. We duplicate the top left and bottom right\n\t\t// vertices because each vertex needs to appear once per triangle. \n\t\tvar vertexPositions = [ \n\t\t\t[-1.0, -1.0,  1.0],\n\t\t\t[ 1.0, -1.0,  1.0],\n\t\t\t[ 1.0,  1.0,  1.0],\n\n\t\t\t[ 1.0,  1.0,  1.0],\n\t\t\t[-1.0,  1.0,  1.0],\n\t\t\t[-1.0, -1.0,  1.0]\n\t\t];\n\t\tvar vertices = new Float32Array( vertexPositions.length * 3 ); // three components per vertex\n\n\t\t// components of the position vector for each vertex are stored\n\t\t// contiguously in the buffer.\n\t\tfor ( var i = 0; i &lt; vertexPositions.length; i++ )\n\t\t{\n\t\t\tvertices[ i*3 + 0 ] = vertexPositions[i][0];\n\t\t\tvertices[ i*3 + 1 ] = vertexPositions[i][1];\n\t\t\tvertices[ i*3 + 2 ] = vertexPositions[i][2];\n\t\t}\n\n\t\t// itemSize = 3 because there are 3 values (components) per vertex\n\t\tgeometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );\n\t\tvar material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );\n\t\tvar mesh = new THREE.Mesh( geometry, material );\n\t\t</code>\n\t\t<p>More examples: [example:webgl_buffergeometry Complex mesh with non-indexed faces], [example:webgl_buffergeometry_uint Complex mesh with indexed faces], [example:webgl_buffergeometry_lines Lines], [example:webgl_buffergeometry_lines_indexed Indexed Lines], [example:webgl_buffergeometry_particles Particles], and [example:webgl_buffergeometry_rawshader Raw Shaders].</p>\n\n\t\t\n\t\t<h3>Accessing attributes</h3>\n\t\t<p>\n\t\tWebGL stores data bottomociated with individual vertices of a geometry in <emph>attributes</emph>. \n\t\tExamples include the position of the vertex, the normal vector for the vertex, the vertex color,\n\t\tand so on. When using [page:Geometry], the [page:WebGLRenderer renderer] takes care of wrapping\n\t\tup this information into typed array buffers and sending this data to the shader. With \n\t\tBufferGeometry, all of this data is stored in buffers bottomociated with an individual attributes.\n\t\tThis means that to get the position data bottomociated with a vertex (for instance), you must call\n\t\t[page:.getAttribute] to access the 'position' [page:BufferAttribute attribute], then access the individual \n\t\tx, y, and z coordinates of the position.  \n\t\t</p>\n\t\t<p>\n\t\tThe following attributes are set by various members of this clbottom:\n\t\t</p>\n\t\t<h4>[page:BufferAttribute position] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the x, y, and z coordinates of each vertex in this geometry. Set by [page:.fromGeometry]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute normal] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the x, y, and z components of the face or vertex normal vector of each vertex in this geometry.\n\t\tSet by [page:.fromGeometry]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute color] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the red, green, and blue channels of vertex color of each vertex in this geometry.\n\t\tSet by [page:.fromGeometry]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute tangent] (itemSize: 3)</h4>\n\t\t<div>\n\t\tStores the x, y, and z components of the tangent vector of each vertex in this geometry. Set by [page:.computeTangents]().\n\t\t</div>\n\n\t\t<h4>[page:BufferAttribute index] (itemSize: 3)</h4>\n\t\tAllows for vertices to be re-used across multiple triangles; this is called using \"indexed triangles,\" and works much the same as it does in [page:Geometry]: each triangle is bottomociated with the index of three vertices. This attribute therefore stores the index of each vertex for each triangular face.\n\n\t\tIf this attribute is not set, the [page:WebGLRenderer renderer] bottomumes that each three contiguous positions represent a single triangle.",
       "!type": "fn()"
     },
     "Clock": {
@@ -302,11 +302,11 @@
         },
         "getElapsedTime": {
           "!type": "fn() -> number",
-          "!doc": "Get the seconds passed since the clock started."
+          "!doc": "Get the seconds pbottomed since the clock started."
         },
         "getDelta": {
           "!type": "fn() -> number",
-          "!doc": "Get the seconds passed since the last call to this method."
+          "!doc": "Get the seconds pbottomed since the last call to this method."
         }
       },
       "!doc": "Object for keeping track of time.",
@@ -502,7 +502,7 @@
           "!doc": "Removes The object from memory. <br>\n\t\tDon't forget to call this method when you remove a geometry because it can cause memory leaks."
         }
       },
-      "!doc": "Base class for geometries.<br>\n\t\tA geometry holds all data necessary to describe a 3D model.",
+      "!doc": "Base clbottom for geometries.<br>\n\t\tA geometry holds all data necessary to describe a 3D model.",
       "!type": "fn()"
     },
     "Object3D": {
@@ -514,7 +514,7 @@
         },
         "uuid": {
           "!type": "string",
-          "!doc": "[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this object instance.\n\t\tThis gets automatically assigned, so this shouldn't be edited."
+          "!doc": "[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this object instance.\n\t\tThis gets automatically bottomigned, so this shouldn't be edited."
         },
         "name": {
           "!type": "string",
@@ -646,18 +646,18 @@
         },
         "translateOnAxis": {
           "!type": "fn(axis: +THREE.Vector3, distance: number) -> +THREE.Object3D",
-          "!doc": "Translate an object by distance along an axis in object space. The axis is assumed to be normalized."
+          "!doc": "Translate an object by distance along an axis in object space. The axis is bottomumed to be normalized."
         },
         "rotateOnAxis": {
           "!type": "fn(axis: +THREE.Vector3, angle: number) -> +THREE.Object3D",
-          "!doc": "Rotate an object along an axis in object space. The axis is assumed to be normalized."
+          "!doc": "Rotate an object along an axis in object space. The axis is bottomumed to be normalized."
         },
         "raycast": {
           "!type": "fn(raycaster: +THREE.Raycaster, intersects: []) -> []",
-          "!doc": "Abstract method to get intersections between a casted ray and this object. Subclasses such as [page:Mesh], [page:Line], and [page:PointCloud] implement this method in order to participate in raycasting."
+          "!doc": "Abstract method to get intersections between a casted ray and this object. Subclbottomes such as [page:Mesh], [page:Line], and [page:PointCloud] implement this method in order to participate in raycasting."
         }
       },
-      "!doc": "Base class for scene graph objects.",
+      "!doc": "Base clbottom for scene graph objects.",
       "!type": "fn()"
     },
     "Raycaster": {
@@ -689,14 +689,14 @@
         },
         "intersectObject": {
           "!type": "fn(object: +THREE.Object3D, recursive: bool) -> []",
-          "!doc": "Checks all intersection between the ray and the object with or without the descendants. Intersections are returned sorted by distance, closest first. An array of intersections is returned...\n        <code>\n            [ { distance, point, face, faceIndex, indices, object }, ... ]\n        </code>\n        <p>\n        [page:Float distance] – distance between the origin of the ray and the intersection<br>\n        [page:Vector3 point] – point of intersection, in world coordinates<br>\n        [page:Face3 face] – intersected face<br>\n        [page:Integer faceIndex] – index of the intersected face<br>\n        [page:Array indices] – indices of vertices comprising the intersected face<br>\n        [page:Object3D object] – the intersected object\n    \t</p>\n        <p>\n        When intersecting a [page:Mesh] with a [page:BufferGeometry], the *faceIndex* will be *undefined*, and *indices* will be set; when intersecting a [page:Mesh] with a [page:Geometry], *indices* will be *undefined*. \n        </p>\n\t\t<p>\n\t\t*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:PointCloud pointclouds].\n\t\t</p>\n\t\t<p>\n\t\t*Note* that for meshes, faces must be pointed towards the origin of the [page:.ray ray] in order to be detected; intersections of the ray passing through the back of a face will not be detected. To raycast against both faces of an object, you'll want to set the [page:Mesh.material material]'s [page:Material.side side] property to *THREE.DoubleSide*.  \n\t\t</p>"
+          "!doc": "Checks all intersection between the ray and the object with or without the descendants. Intersections are returned sorted by distance, closest first. An array of intersections is returned...\n        <code>\n            [ { distance, point, face, faceIndex, indices, object }, ... ]\n        </code>\n        <p>\n        [page:Float distance] – distance between the origin of the ray and the intersection<br>\n        [page:Vector3 point] – point of intersection, in world coordinates<br>\n        [page:Face3 face] – intersected face<br>\n        [page:Integer faceIndex] – index of the intersected face<br>\n        [page:Array indices] – indices of vertices comprising the intersected face<br>\n        [page:Object3D object] – the intersected object\n    \t</p>\n        <p>\n        When intersecting a [page:Mesh] with a [page:BufferGeometry], the *faceIndex* will be *undefined*, and *indices* will be set; when intersecting a [page:Mesh] with a [page:Geometry], *indices* will be *undefined*. \n        </p>\n\t\t<p>\n\t\t*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the pbottomed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:PointCloud pointclouds].\n\t\t</p>\n\t\t<p>\n\t\t*Note* that for meshes, faces must be pointed towards the origin of the [page:.ray ray] in order to be detected; intersections of the ray pbottoming through the back of a face will not be detected. To raycast against both faces of an object, you'll want to set the [page:Mesh.material material]'s [page:Material.side side] property to *THREE.DoubleSide*.  \n\t\t</p>"
         },
         "intersectObjects": {
           "!type": "fn(objects: [], recursive: bool) -> []",
           "!doc": "Checks all intersection between the ray and the objects with or without the descendants. Intersections are returned sorted by distance, closest first. Intersections are of the same form as those returned by [page:.intersectObject]."
         }
       },
-      "!doc": "This class makes raycasting easier. Raycasting is used for picking and more.",
+      "!doc": "This clbottom makes raycasting easier. Raycasting is used for picking and more.",
       "!type": "fn(origin: +THREE.Vector3, direction: +THREE.Vector3, near: number, far: number)"
     },
     "Lut": {
@@ -794,7 +794,7 @@
           "!doc": "Returns the used font its data based on its style and weight."
         }
       },
-      "!doc": "A class for text operations in three.js (See [page:TextGeometry])"
+      "!doc": "A clbottom for text operations in three.js (See [page:TextGeometry])"
     },
     "GeometryUtils": {
       "!url": "http://threejs.org/docs/#Reference/extras/GeometryUtils",
@@ -838,7 +838,7 @@
         },
         "getTangent": {
           "!type": "fn(t) -> Vector",
-          "!doc": "Returns a unit vector tangent at t. If the subclassed curve do not implement its tangent derivation, 2 points a small delta apart will be used to find its gradient which seems to give a reasonable approximation"
+          "!doc": "Returns a unit vector tangent at t. If the subclbottomed curve do not implement its tangent derivation, 2 points a small delta apart will be used to find its gradient which seems to give a reasonable approximation"
         },
         "getTangentAt": {
           "!type": "fn(u) -> Vector",
@@ -1065,7 +1065,7 @@
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
-      "!doc": "BoxGeometry is the quadrilateral primitive geometry class. It is typically used for creating a cube or irregular quadrilateral of the dimensions provided with the 'width', 'height', and 'depth' constructor arguments.",
+      "!doc": "BoxGeometry is the quadrilateral primitive geometry clbottom. It is typically used for creating a cube or irregular quadrilateral of the dimensions provided with the 'width', 'height', and 'depth' constructor arguments.",
       "!type": "fn(width: number, height: number, depth: number, widthSegments: number, heightSegments: number, depthSegments: number)"
     },
     "CircleGeometry": {
@@ -1088,7 +1088,7 @@
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
-      "!doc": "A class for generating cylinder geometries",
+      "!doc": "A clbottom for generating cylinder geometries",
       "!type": "fn(radiusTop: number, radiusBottom: number, height: number, radiusSegments: number, heightSegments: number, openEnded: bool, thetaStart: number, thetaLength: number)"
     },
     "DodecahedronGeometry": {
@@ -1100,7 +1100,7 @@
           "!doc": "An object with all of the parameters that were used to generate the geometry."
         }
       },
-      "!doc": "A class for generating a dodecahedron geometries.",
+      "!doc": "A clbottom for generating a dodecahedron geometries.",
       "!type": "fn(radius: number, detail: number)"
     },
     "ExtrudeGeometry": {
@@ -1128,7 +1128,7 @@
           "!doc": "An object with all of the parameters that were used to generate the geometry."
         }
       },
-      "!doc": "A class for generating an icosahedron geometry.",
+      "!doc": "A clbottom for generating an icosahedron geometry.",
       "!type": "fn(radius: number, detail: number)"
     },
     "LatheGeometry": {
@@ -1136,7 +1136,7 @@
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
-      "!doc": "Class for generating meshes with axial symmetry. Possible uses include donuts, pipes, vases etc. The lathe rotate around the Y axis.",
+      "!doc": "Clbottom for generating meshes with axial symmetry. Possible uses include donuts, pipes, vases etc. The lathe rotate around the Y axis.",
       "!type": "fn(points: [], segments: number, phiStart: number, phiLength: number)"
     },
     "OctahedronGeometry": {
@@ -1148,7 +1148,7 @@
           "!doc": "An object with all of the parameters that were used to generate the geometry."
         }
       },
-      "!doc": "A class for generating an octahedron geometry.",
+      "!doc": "A clbottom for generating an octahedron geometry.",
       "!type": "fn(radius: number, detail: number)"
     },
     "ParametricGeometry": {
@@ -1164,7 +1164,7 @@
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
-      "!doc": "A class for generating plane geometries",
+      "!doc": "A clbottom for generating plane geometries",
       "!type": "fn(width: number, height: number, widthSegments: number, heightSegments: number)"
     },
     "PolyhedronGeometry": {
@@ -1176,7 +1176,7 @@
           "!doc": "An object with all of the parameters that were used to generate the geometry."
         }
       },
-      "!doc": "A polyhedron is a solid in three dimensions with flat faces. This class will take an array of vertices,\n\t\t\tproject them onto a sphere, and then divide them up to the desired level of detail. This class is used\n\t\t\tby [page:DodecahedronGeometry], [page:IcosahedronGeometry], [page:OctahedronGeometry],\n\t\t\tand [page:TetrahedronGeometry] to generate their respective geometries.",
+      "!doc": "A polyhedron is a solid in three dimensions with flat faces. This clbottom will take an array of vertices,\n\t\t\tproject them onto a sphere, and then divide them up to the desired level of detail. This clbottom is used\n\t\t\tby [page:DodecahedronGeometry], [page:IcosahedronGeometry], [page:OctahedronGeometry],\n\t\t\tand [page:TetrahedronGeometry] to generate their respective geometries.",
       "!type": "fn(vertices: [], faces: [], radius: number, detail: number)"
     },
     "RingGeometry": {
@@ -1184,7 +1184,7 @@
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
-      "!doc": "A class for generating a two-dimensional ring geometry.",
+      "!doc": "A clbottom for generating a two-dimensional ring geometry.",
       "!type": "fn(innerRadius: number, outerRadius: number, thetaSegments: number, phiSegments: number, thetaStart: number, thetaLength: number)"
     },
     "ShapeGeometry": {
@@ -1204,7 +1204,7 @@
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
-      "!doc": "A class for generating sphere geometries",
+      "!doc": "A clbottom for generating sphere geometries",
       "!type": "fn(radius: number, widthSegments: number, heightSegments: number, phiStart: number, phiLength: number, thetaStart: number, thetaLength: number)"
     },
     "TetrahedronGeometry": {
@@ -1216,7 +1216,7 @@
           "!doc": "An object with all of the parameters that were used to generate the geometry."
         }
       },
-      "!doc": "A class for generating a tetrahedron geometries.",
+      "!doc": "A clbottom for generating a tetrahedron geometries.",
       "!type": "fn(radius: number, detail: number)"
     },
     "TextGeometry": {
@@ -1232,7 +1232,7 @@
       "prototype": {
         "!proto": "THREE.Geometry.prototype"
       },
-      "!doc": "A class for generating torus geometries",
+      "!doc": "A clbottom for generating torus geometries",
       "!type": "fn(radius: number, tube: number, radialSegments: number, tubularSegments: number, arc: number)"
     },
     "TorusKnotGeometry": {
@@ -1329,7 +1329,7 @@
         "!proto": "THREE.Line.prototype",
         "update": {
           "!type": "fn(object: +THREE.Object3D)",
-          "!doc": "Updates the helper's geometry to match the dimensions of the [page:Geometry.boundingBox bounding box] of the passed object's geometry.\n\n\t\t<h2>Source</h2>\n\n\t\t[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]"
+          "!doc": "Updates the helper's geometry to match the dimensions of the [page:Geometry.boundingBox bounding box] of the pbottomed object's geometry.\n\n\t\t<h2>Source</h2>\n\n\t\t[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]"
         }
       },
       "!doc": "Helper object to show a wireframe box (with no face diagonals) around an object",
@@ -1548,7 +1548,7 @@
           "!doc": "Color of the light.<br>"
         }
       },
-      "!doc": "Abstract base class for lights.",
+      "!doc": "Abstract base clbottom for lights.",
       "!type": "fn(hex: number)"
     },
     "PointLight": {
@@ -1642,14 +1642,14 @@
         },
         "remove": {
           "!type": "fn(key: string)",
-          "!doc": "Remove the cached value associated with the key."
+          "!doc": "Remove the cached value bottomociated with the key."
         },
         "clear": {
           "!type": "fn()",
           "!doc": "Remove all values from the cache."
         }
       },
-      "!doc": "A simple caching classe, used internaly by [page:FileLoader].",
+      "!doc": "A simple caching clbottome, used internaly by [page:FileLoader].",
       "!type": "fn()"
     },
     "ColladaLoader": {
@@ -1734,7 +1734,7 @@
           "!doc": "Creates an array of [page:Material] based on the array of parameters m. The index of the parameters decide the correct index of the materials."
         }
       },
-      "!doc": "Base class for implementing loaders.",
+      "!doc": "Base clbottom for implementing loaders.",
       "!type": "fn()"
     },
     "LoadingManager": {
@@ -1882,10 +1882,10 @@
       "prototype": {
         "load": {
           "!type": "fn(url: string, onLoad: function, onProgress: function, onError: function) -> +THREE.DataTexture",
-          "!doc": "Begin loading from url and pass the loaded [page:DataTexture texture] to onLoad. The [page:DataTexture texture] is also directly returned for immediate use (but may not be fully loaded)."
+          "!doc": "Begin loading from url and pbottom the loaded [page:DataTexture texture] to onLoad. The [page:DataTexture texture] is also directly returned for immediate use (but may not be fully loaded)."
         }
       },
-      "!doc": "Class for loading a <em>.tga</em> [page:DataTexture texture].",
+      "!doc": "Clbottom for loading a <em>.tga</em> [page:DataTexture texture].",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
     "TextureLoader": {
@@ -1893,14 +1893,14 @@
       "prototype": {
         "crossOrigin": {
           "!type": "string",
-          "!doc": "default — *null*.<br>\n\t\tIf set, assigns the *crossOrigin* attribute of the image to the value of *crossOrigin*, prior to starting the load."
+          "!doc": "default — *null*.<br>\n\t\tIf set, bottomigns the *crossOrigin* attribute of the image to the value of *crossOrigin*, prior to starting the load."
         },
         "load": {
           "!type": "fn(url: string, onLoad: function, onProgress: function, onError: function)",
-          "!doc": "Begin loading from url and pass the loaded [page:Texture texture] to onLoad."
+          "!doc": "Begin loading from url and pbottom the loaded [page:Texture texture] to onLoad."
         }
       },
-      "!doc": "Class for loading a [page:Texture texture].",
+      "!doc": "Clbottom for loading a [page:Texture texture].",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
     "FileLoader": {
@@ -1931,7 +1931,7 @@
           "!doc": "[page:String value] — the empty string (default), \"arraybuffer\", \"blob\", \"document\", \"json\", or \"text\"."
         }
       },
-      "!doc": "A low level class for loading resources with XMLHttpRequest, used internaly by most loaders.",
+      "!doc": "A low level clbottom for loading resources with XMLHttpRequest, used internaly by most loaders.",
       "!type": "fn(manager: +THREE.LoadingManager)"
     },
     "GLTFLoader": {
@@ -2290,7 +2290,7 @@
         },
         "morphNormals": {
           "!type": "boolean",
-          "!doc": "Defines whether the material uses morphNormals. Set as true to pass morphNormal attributes from the [page:Geometry]\n\t\t\tto the shader. Default is *false*."
+          "!doc": "Defines whether the material uses morphNormals. Set as true to pbottom morphNormal attributes from the [page:Geometry]\n\t\t\tto the shader. Default is *false*."
         }
       },
       "!doc": "A material for non-shiny (Lambertian) surfaces, evaluated per vertex.",
@@ -2430,7 +2430,7 @@
         },
         "morphNormals": {
           "!type": "boolean",
-          "!doc": "Defines whether the material uses morphNormals. Set as true to pass morphNormal attributes from the [page:Geometry]\n\t\t\tto the shader. Default is *false*."
+          "!doc": "Defines whether the material uses morphNormals. Set as true to pbottom morphNormal attributes from the [page:Geometry]\n\t\t\tto the shader. Default is *false*."
         }
       },
       "!doc": "A material for shiny surfaces, evaluated per pixel.",
@@ -2473,7 +2473,7 @@
       "prototype": {
         "!proto": "THREE.ShaderMaterial.prototype"
       },
-      "!doc": "This class works just like [page:ShaderMaterial], except that definitions of built-in uniforms and attributes are not automatically prepended to the GLSL shader code."
+      "!doc": "This clbottom works just like [page:ShaderMaterial], except that definitions of built-in uniforms and attributes are not automatically prepended to the GLSL shader code."
     },
     "ShaderMaterial": {
       "!url": "http://threejs.org/docs/#Reference/materials/ShaderMaterial",
@@ -2481,11 +2481,11 @@
         "!proto": "THREE.Material.prototype",
         "uniforms": {
           "!type": "object",
-          "!doc": "Object specifying the uniforms to be passed to the shader code; keys are uniform names, values are definitions of the form\n\t\t<code>\n\t\t{ type: 'f', value: 1.0 }\n\t\t</code>\n\t\twhere *type* is a <a href=\"#uniform-types\">uniform type string</a>, and *value* is the value of the uniform. Names must match the name of the uniform, as defined in the GLSL code. Note that uniforms are refreshed on every frame, so updating the value of the uniform will immediately update the value available to the GLSL code."
+          "!doc": "Object specifying the uniforms to be pbottomed to the shader code; keys are uniform names, values are definitions of the form\n\t\t<code>\n\t\t{ type: 'f', value: 1.0 }\n\t\t</code>\n\t\twhere *type* is a <a href=\"#uniform-types\">uniform type string</a>, and *value* is the value of the uniform. Names must match the name of the uniform, as defined in the GLSL code. Note that uniforms are refreshed on every frame, so updating the value of the uniform will immediately update the value available to the GLSL code."
         },
         "attributes": {
           "!type": "object",
-          "!doc": "<p>\n\t\tObject specifying the custom attributes to be passed to the shader code; keys are attribute names, values are definitions of the form\n\t\t<code>\n\t\t{ type: 'f', value: [1.0, 0.5, 2.0, ...] }\n\t\t</code>\n\t\twhere *type* is an <a href=\"#attribute-types\">attribute type string</a>, and *value* is an array containing an attribute value for each vertex in the geometry (or *undefined* if using [page:BufferGeometry]). Names must match the name of the attribute, as defined in the GLSL code.\n\t\t</p>\n\t\t<p>\n\t\tNote that attribute buffers are <emph>not</emph> refreshed automatically when their values change; if using [page:Geometry], set <code>needsUpdate = true</code> on the attribute definition. If using [page:BufferGeometry], set <code>needsUpdate = true</code> on the [page:BufferAttribute].\n\t\t</p>"
+          "!doc": "<p>\n\t\tObject specifying the custom attributes to be pbottomed to the shader code; keys are attribute names, values are definitions of the form\n\t\t<code>\n\t\t{ type: 'f', value: [1.0, 0.5, 2.0, ...] }\n\t\t</code>\n\t\twhere *type* is an <a href=\"#attribute-types\">attribute type string</a>, and *value* is an array containing an attribute value for each vertex in the geometry (or *undefined* if using [page:BufferGeometry]). Names must match the name of the attribute, as defined in the GLSL code.\n\t\t</p>\n\t\t<p>\n\t\tNote that attribute buffers are <emph>not</emph> refreshed automatically when their values change; if using [page:Geometry], set <code>needsUpdate = true</code> on the attribute definition. If using [page:BufferGeometry], set <code>needsUpdate = true</code> on the [page:BufferAttribute].\n\t\t</p>"
         },
         "defines": {
           "!type": "object",
@@ -2493,11 +2493,11 @@
         },
         "vertexShader": {
           "!type": "string",
-          "!doc": "Vertex shader GLSL code.  This is the actual code for the shader. In the example above, the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be passed as a string directly or loaded via AJAX instead."
+          "!doc": "Vertex shader GLSL code.  This is the actual code for the shader. In the example above, the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be pbottomed as a string directly or loaded via AJAX instead."
         },
         "fragmentShader": {
           "!type": "string",
-          "!doc": "Fragment shader GLSL code.  This is the actual code for the shader. In the example above, the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be passed as a string directly or loaded via AJAX instead."
+          "!doc": "Fragment shader GLSL code.  This is the actual code for the shader. In the example above, the *vertexShader* and *fragmentShader* code is extracted from the DOM; it could be pbottomed as a string directly or loaded via AJAX instead."
         },
         "shading": {
           "!type": "number",
@@ -2517,11 +2517,11 @@
         },
         "fog": {
           "!type": "bool",
-          "!doc": "Define whether the material color is affected by global fog settings; true to pass fog uniforms to the shader. Default is false."
+          "!doc": "Define whether the material color is affected by global fog settings; true to pbottom fog uniforms to the shader. Default is false."
         },
         "lights": {
           "!type": "bool",
-          "!doc": "Defines whether this material uses lighting; true to pass uniform data related to lighting to this shader"
+          "!doc": "Defines whether this material uses lighting; true to pbottom uniform data related to lighting to this shader"
         },
         "vertexColors": {
           "!type": "bool",
@@ -2533,18 +2533,18 @@
         },
         "morphNormals": {
           "!type": "boolean",
-          "!doc": "Defines whether the material uses morphNormals. Set as true to pass morphNormal attributes from the [page:Geometry]\n\t\t\tto the shader. Default is *false*."
+          "!doc": "Defines whether the material uses morphNormals. Set as true to pbottom morphNormal attributes from the [page:Geometry]\n\t\t\tto the shader. Default is *false*."
         },
         "program": {
           "!type": "+THREE.WebGLProgram",
-          "!doc": "The compiled shader program associated with this material, generated by [page:WebGLRenderer]. You should not need to access this property."
+          "!doc": "The compiled shader program bottomociated with this material, generated by [page:WebGLRenderer]. You should not need to access this property."
         },
         "clone": {
           "!type": "fn() -> +THREE.ShaderMaterial",
           "!doc": "Generates a shallow copy of this material. Note that the vertexShader and fragmentShader are copied <emph>by reference</emph>, as are the definitions of the *attributes*; this means that clones of the material will share the same compiled [page:WebGLProgram]. However, the *uniforms* are copied <emph>by value</emph>, which allows you to have different sets of uniforms for different copies of the material."
         }
       },
-      "!doc": "Material rendered with custom shaders. A shader is a small program written in [link:https://www.opengl.org/documentation/glsl/ GLSL] to run on the GPU. You may want to use a custom shader if you need to:\n\t\t<ul>\n\t\t\t<li>implement an effect not included with any of the built-in [page:Material materials]</li>\n\t\t\t<li>combine many objects into a single [page:Geometry] or [page:BufferGeometry] in order to improve performance</li>\n\t\t\t<li>associate custom data with individual vertices (\"custom attributes\")</li>\n\t\t</ul>\n\t\tNote that a ShaderMaterial will only be rendered properly by [page:WebGLRenderer], since the GLSL code in the vertexShader and fragmentShader properties must be compiled and run on the GPU using WebGL.",
+      "!doc": "Material rendered with custom shaders. A shader is a small program written in [link:https://www.opengl.org/documentation/glsl/ GLSL] to run on the GPU. You may want to use a custom shader if you need to:\n\t\t<ul>\n\t\t\t<li>implement an effect not included with any of the built-in [page:Material materials]</li>\n\t\t\t<li>combine many objects into a single [page:Geometry] or [page:BufferGeometry] in order to improve performance</li>\n\t\t\t<li>bottomociate custom data with individual vertices (\"custom attributes\")</li>\n\t\t</ul>\n\t\tNote that a ShaderMaterial will only be rendered properly by [page:WebGLRenderer], since the GLSL code in the vertexShader and fragmentShader properties must be compiled and run on the GPU using WebGL.",
       "!type": "fn(parameters: object)"
     },
     "SpriteCanvasMaterial": {
@@ -2953,7 +2953,7 @@
         },
         "fromArray": {
           "!type": "fn(array: []) -> +THREE.Euler",
-          "!doc": "Assigns this euler's x angle to array[0]. <br>\n\t\tAssigns this euler's y angle to array[1]. <br>\n\t\tAssigns this euler's z angle to array[2]. <br>\n\t\tOptionally assigns this euler's order to array[3]."
+          "!doc": "Assigns this euler's x angle to array[0]. <br>\n\t\tAssigns this euler's y angle to array[1]. <br>\n\t\tAssigns this euler's z angle to array[2]. <br>\n\t\tOptionally bottomigns this euler's order to array[3]."
         },
         "toArray": {
           "!type": "fn(array: []) -> []",
@@ -2992,11 +2992,11 @@
         },
         "set": {
           "!type": "fn(p0: +THREE.Plane, p1: +THREE.Plane, p2: +THREE.Plane, p3: +THREE.Plane, p4: +THREE.Plane, p5: +THREE.Plane) -> bool",
-          "!doc": "Sets the current frustum from the passed planes. No plane order is implicitely implied."
+          "!doc": "Sets the current frustum from the pbottomed planes. No plane order is implicitely implied."
         },
         "copy": {
           "!type": "fn(frustum: +THREE.Frustum) -> +THREE.Frustum",
-          "!doc": "Copies the values of the passed frustum."
+          "!doc": "Copies the values of the pbottomed frustum."
         },
         "containsPoint": {
           "!type": "fn(point: +THREE.Vector3) -> bool",
@@ -3021,7 +3021,7 @@
         },
         "copy": {
           "!type": "fn(line: +THREE.Line3) -> +THREE.Line3",
-          "!doc": "Copies the passed line's start and end vectors to this line."
+          "!doc": "Copies the pbottomed line's start and end vectors to this line."
         },
         "clone": {
           "!type": "fn() -> +THREE.Line3",
@@ -3154,15 +3154,15 @@
         },
         "getNormalMatrix": {
           "!type": "fn(matrix4: +THREE.Matrix4) -> +THREE.Matrix3",
-          "!doc": "Set this matrix as the normal matrix of the passed [page:Matrix4 matrix4]. The normal matrix is the inverse transpose of the matrix."
+          "!doc": "Set this matrix as the normal matrix of the pbottomed [page:Matrix4 matrix4]. The normal matrix is the inverse transpose of the matrix."
         },
         "getInverse": {
           "!type": "fn(matrix4: +THREE.Matrix4, throwOnInvertible: bool) -> +THREE.Matrix3",
-          "!doc": "Set this matrix to the inverse of the passed matrix."
+          "!doc": "Set this matrix to the inverse of the pbottomed matrix."
         },
         "copy": {
           "!type": "fn(matrix: +THREE.Matrix3) -> +THREE.Matrix3",
-          "!doc": "Copy the values of the passed matrix."
+          "!doc": "Copy the values of the pbottomed matrix."
         },
         "clone": {
           "!type": "fn() -> +THREE.Matrix3",
@@ -3330,7 +3330,7 @@
         },
         "copy": {
           "!type": "fn(plane: +THREE.Plane) -> +THREE.Plane",
-          "!doc": "Copies the values of the passed plane to this plane."
+          "!doc": "Copies the values of the pbottomed plane to this plane."
         },
         "applyMatrix4": {
           "!type": "fn(matrix: +THREE.Matrix4, optionalNormalMatrix: +THREE.Matrix3) -> +THREE.Plane",
@@ -3338,7 +3338,7 @@
         },
         "orthoPoint": {
           "!type": "fn(point: +THREE.Vector3, optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
-          "!doc": "Returns a vector in the same direction as the Plane's normal, but the magnitude is passed point's original distance to the plane."
+          "!doc": "Returns a vector in the same direction as the Plane's normal, but the magnitude is pbottomed point's original distance to the plane."
         },
         "isIntersectionLine": {
           "!type": "fn(line: +THREE.Line3) -> bool",
@@ -3346,7 +3346,7 @@
         },
         "intersectLine": {
           "!type": "fn(line: +THREE.Line3, optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
-          "!doc": "Returns the intersection point of the passed line and the plane. Returns undefined if the line does not intersect. Returns the line's starting point if the line is coplanar with the plane."
+          "!doc": "Returns the intersection point of the pbottomed line and the plane. Returns undefined if the line does not intersect. Returns the line's starting point if the line is coplanar with the plane."
         },
         "setFromNormalAndCoplanarPoint": {
           "!type": "fn(normal: +THREE.Vector3, point: +THREE.Vector3) -> +THREE.Vector3",
@@ -3378,7 +3378,7 @@
         },
         "projectPoint": {
           "!type": "fn(point: +THREE.Vector3, optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
-          "!doc": "Projects a point onto the plane. The projected point is the closest point on the plane to the passed point, so a line drawn from the projected point and the passed point would be orthogonal to the plane."
+          "!doc": "Projects a point onto the plane. The projected point is the closest point on the plane to the pbottomed point, so a line drawn from the projected point and the pbottomed point would be orthogonal to the plane."
         },
         "negate": {
           "!type": "fn() -> +THREE.Plane",
@@ -3425,7 +3425,7 @@
         },
         "setFromUnitVectors": {
           "!type": "fn(vFrom: +THREE.Vector3, vTo: +THREE.Vector3) -> +THREE.Quaternion",
-          "!doc": "Sets this quaternion to the rotation required to rotate direction vector *vFrom* to direction vector *vTo*.<br>\n\t\tAdapted from [link:http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors].<br>\n\t\t*vFrom* and *vTo* are assumed to be normalized."
+          "!doc": "Sets this quaternion to the rotation required to rotate direction vector *vFrom* to direction vector *vTo*.<br>\n\t\tAdapted from [link:http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors].<br>\n\t\t*vFrom* and *vTo* are bottomumed to be normalized."
         },
         "inverse": {
           "!type": "fn() -> +THREE.Quaternion",
@@ -3573,7 +3573,7 @@
         },
         "setFromPoints": {
           "!type": "fn(points: [], optionalCenter: +THREE.Vector3) -> +THREE.Sphere",
-          "!doc": "Computes the minimum bounding sphere for *points*. If *optionalCenter* is given, it is used as the sphere's center. Otherwise, the center of the axis-aligned bounding box encompassing *points* is calculated."
+          "!doc": "Computes the minimum bounding sphere for *points*. If *optionalCenter* is given, it is used as the sphere's center. Otherwise, the center of the axis-aligned bounding box encompbottoming *points* is calculated."
         },
         "distanceToPoint": {
           "!type": "fn(point: +THREE.Vector3) -> number",
@@ -3589,7 +3589,7 @@
         },
         "copy": {
           "!type": "fn(sphere: +THREE.Sphere) -> +THREE.Sphere",
-          "!doc": "Copies the values of the passed sphere to this sphere."
+          "!doc": "Copies the values of the pbottomed sphere to this sphere."
         },
         "intersectsSphere": {
           "!type": "fn(sphere: +THREE.Sphere) -> bool",
@@ -3624,7 +3624,7 @@
         },
         "set": {
           "!type": "fn(a: +THREE.Vector3, b: +THREE.Vector3, c: +THREE.Vector3) -> +THREE.Triangle",
-          "!doc": "Sets the triangle's vectors to the passed vectors."
+          "!doc": "Sets the triangle's vectors to the pbottomed vectors."
         },
         "getNormal": {
           "!type": "fn(optionalTarget: +THREE.Vector3) -> +THREE.Vector3",
@@ -3656,11 +3656,11 @@
         },
         "containsPoint": {
           "!type": "fn(point: +THREE.Vector3) -> bool",
-          "!doc": "Checks to see if the passed vector is within the triangle."
+          "!doc": "Checks to see if the pbottomed vector is within the triangle."
         },
         "copy": {
           "!type": "fn(triangle: +THREE.Triangle) -> +THREE.Triangle",
-          "!doc": "Copies the values of the vertices of the passed triangle to this triangle."
+          "!doc": "Copies the values of the vertices of the pbottomed triangle to this triangle."
         }
       },
       "!doc": "A geometric triangle as defined by three vectors.",
@@ -4019,7 +4019,7 @@
         },
         "reflect": {
           "!type": "fn(normal: +THREE.Vector3) -> +THREE.Vector3",
-          "!doc": "Reflect incident vector off of plane orthogonal to normal. Normal is assumed to have unit length."
+          "!doc": "Reflect incident vector off of plane orthogonal to normal. Normal is bottomumed to have unit length."
         },
         "fromArray": {
           "!type": "fn(array: []) -> +THREE.Vector3",
@@ -4282,7 +4282,7 @@
         },
         "type": {
           "!type": "number",
-          "!doc": "In OpenGL terms, LineStrip is the classic GL_LINE_STRIP and LinePieces is the equivalent to GL_LINES."
+          "!doc": "In OpenGL terms, LineStrip is the clbottomic GL_LINE_STRIP and LinePieces is the equivalent to GL_LINES."
         },
         "raycast": {
           "!type": "fn(raycaster: +THREE.Raycaster, intersects: []) -> []",
@@ -4317,7 +4317,7 @@
           "!doc": "Get intersections between a casted ray and this mesh. [page:Raycaster.intersectObject] will call this method."
         }
       },
-      "!doc": "Base class for Mesh objects, such as [page:MorphAnimMesh] and [page:SkinnedMesh].",
+      "!doc": "Base clbottom for Mesh objects, such as [page:MorphAnimMesh] and [page:SkinnedMesh].",
       "!type": "fn(geometry: +THREE.Geometry, material: +THREE.Material)"
     },
     "MorphAnimMesh": {
@@ -4417,7 +4417,7 @@
           "!doc": "Get intersections between a casted ray and this PointCloud. [page:Raycaster.intersectObject] will call this method."
         }
       },
-      "!doc": "A class for displaying particles in the form of variable size points. For example, if using the [page:WebGLRenderer], the particles are displayed using GL_POINTS.",
+      "!doc": "A clbottom for displaying particles in the form of variable size points. For example, if using the [page:WebGLRenderer], the particles are displayed using GL_POINTS.",
       "!type": "fn(geometry: +THREE.Geometry, material: +THREE.Material)"
     },
     "SkinnedMesh": {
@@ -4829,7 +4829,7 @@
           "!doc": "Prepares the shadowmaps to be rendered defined in the scene."
         }
       },
-      "!doc": "The Webglrenderer plugin class that allows shadowmaps to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
+      "!doc": "The Webglrenderer plugin clbottom that allows shadowmaps to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
       "!type": "fn()"
     },
     "SpritePlugin": {
@@ -4840,7 +4840,7 @@
           "!doc": "Renders the sprites defined in the scene."
         }
       },
-      "!doc": "The Webglrenderer plugin class that allows Sprites to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
+      "!doc": "The Webglrenderer plugin clbottom that allows Sprites to be rendered in the WebglRenderer. This plugin is automatically loaded in the Webglrenderer.",
       "!type": "fn()"
     },
     "Fog": {
@@ -4867,7 +4867,7 @@
           "!doc": "Returns a copy of this."
         }
       },
-      "!doc": "This class contains the parameters that define linear fog, i.e., that grows linearly denser with the distance.",
+      "!doc": "This clbottom contains the parameters that define linear fog, i.e., that grows linearly denser with the distance.",
       "!type": "fn(hex: number, near: number, far: number)"
     },
     "FogExp2": {
@@ -4890,7 +4890,7 @@
           "!doc": "Returns a copy of this."
         }
       },
-      "!doc": "This class contains the parameters that define exponential fog, i.e., that grows exponentially denser with the distance.",
+      "!doc": "This clbottom contains the parameters that define exponential fog, i.e., that grows exponentially denser with the distance.",
       "!type": "fn(hex: number, density: number)"
     },
     "Scene": {
@@ -4946,7 +4946,7 @@
         },
         "image": {
           "!type": "Image",
-          "!doc": "An Image object, typically created using the [page:ImageLoader ImageLoader] class. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing."
+          "!doc": "An Image object, typically created using the [page:ImageLoader ImageLoader] clbottom. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map. To use video as a texture you need to have a playing HTML5 video element as a source for your texture image and continuously update this texture as long as video is playing."
         },
         "mapping": {
           "!type": "object",
