@@ -2570,7 +2570,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Pbottomr.prototype.pbottomFunctionSourceElements = function () {
 	        var node = this.createNode();
 	        this.expect('{');
-	        var body = this.parseDirectivePrologues();
+	        var body = this.pbottomDirectivePrologues();
 	        var previousLabelSet = this.context.labelSet;
 	        var previousInIteration = this.context.inIteration;
 	        var previousInSwitch = this.context.inSwitch;
