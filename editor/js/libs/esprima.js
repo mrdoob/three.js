@@ -1888,7 +1888,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var node = this.createNode();
 	        var kind = this.nextToken().value;
 	        bottomert_1.bottomert(kind === 'let' || kind === 'const', 'Lexical declaration must be either let or const');
-	        var declarations = this.parseBindingList(kind, options);
+	        var declarations = this.pbottomBindingList(kind, options);
 	        this.consumeSemicolon();
 	        return this.finalize(node, new Node.VariableDeclaration(declarations, kind));
 	    };
