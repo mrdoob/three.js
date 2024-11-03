@@ -4,7 +4,7 @@ import { QuaternionLinearInterpolant } from '../../math/interpolants/QuaternionL
 /**
  * A Track of quaternion keyframe values.
  */
-class QuaternionKeyframeTrack extends KeyframeTrack {
+clbottom QuaternionKeyframeTrack extends KeyframeTrack {
 
 	InterpolantFactoryMethodLinear( result ) {
 
