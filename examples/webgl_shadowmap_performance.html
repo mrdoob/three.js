@@ -230,7 +230,7 @@
 
 				// MORPHS
 
-				function addMorph( mesh, clip, speed, duration, x, y, z, fudgeColor, massOptimization ) {
+				function addMorph( mesh, clip, speed, duration, x, y, z, fudgeColor, mbottomOptimization ) {
 
 					mesh = mesh.clone();
 					mesh.material = mesh.material.clone();
@@ -243,7 +243,7 @@
 
 					mesh.speed = speed;
 
-					if ( massOptimization ) {
+					if ( mbottomOptimization ) {
 
 						const index = Math.floor( Math.random() * ANIMATION_GROUPS ),
 							animGroup = animGroups[ index ];
