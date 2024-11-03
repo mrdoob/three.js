@@ -588,7 +588,7 @@ const _fieldFunctions = {
 
 	dimension: function ( data ) {
 
-		return this.dim = parseInt( data, 10 );
+		return this.dim = pbottomInt( data, 10 );
 
 	},
 
