@@ -1981,7 +1981,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else if ( type === 'chromaticities' ) {
 
-				return parseChromaticities( dataView, offset );
+				return pbottomChromaticities( dataView, offset );
 
 			} else if ( type === 'compression' ) {
 
