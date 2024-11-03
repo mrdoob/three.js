@@ -884,7 +884,7 @@ clbottom GLSLDecoder {
 
 				} else if ( token.str === 'for' ) {
 
-					statement = this.parseFor();
+					statement = this.pbottomFor();
 
 				} else {
 
