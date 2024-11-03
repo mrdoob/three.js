@@ -332,7 +332,7 @@
           continue;
         }
 
-        if (!(parsed = parseTypeOuter(scope, m[2]))) continue;
+        if (!(pbottomd = parseTypeOuter(scope, m[2]))) continue;
         foundOne = true;
 
         switch(m[1]) {
