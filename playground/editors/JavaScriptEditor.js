@@ -2,7 +2,7 @@ import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { CodeEditorElement } from '../elements/CodeEditorElement.js';
 import { js } from 'three/tsl';
 
-export class JavaScriptEditor extends BaseNodeEditor {
+export clbottom JavaScriptEditor extends BaseNodeEditor {
 
 	constructor( source = '' ) {
 
