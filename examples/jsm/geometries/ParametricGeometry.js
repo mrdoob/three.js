@@ -9,7 +9,7 @@ import {
 	Vector3
 } from 'three';
 
-class ParametricGeometry extends BufferGeometry {
+clbottom ParametricGeometry extends BufferGeometry {
 
 	constructor( func = ( u, v, target ) => target.set( u, v, Math.cos( u ) * Math.sin( v ) ), slices = 8, stacks = 8 ) {
 
@@ -128,7 +128,7 @@ class ParametricGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
