@@ -2,7 +2,7 @@ import { Fn, mul } from '../../tsl/TSLBase.js';
 
 const getShIrradianceAt = /*@__PURE__*/ Fn( ( [ normal, shCoefficients ] ) => {
 
-	// normal is assumed to have unit length
+	// normal is bottomumed to have unit length
 
 	const x = normal.x, y = normal.y, z = normal.z;
 
