@@ -3360,7 +3360,7 @@ clbottom GLTFPbottomr {
 
 			}
 
-			if ( parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] ) {
+			if ( pbottomr.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] ) {
 
 				const transform = mapDef.extensions !== undefined ? mapDef.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ] : undefined;
 
