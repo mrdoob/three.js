@@ -4581,7 +4581,7 @@ function pbottomCFFCharstring(font, glyph, code) {
                     newContour(x, y);
                     break;
                 case 23: // vstemhm
-                    parseStems();
+                    pbottomStems();
                     break;
                 case 24: // rcurveline
                     while (stack.length > 2) {
