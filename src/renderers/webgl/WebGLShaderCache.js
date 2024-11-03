@@ -1,6 +1,6 @@
 let _id = 0;
 
-class WebGLShaderCache {
+clbottom WebGLShaderCache {
 
 	constructor() {
 
@@ -108,7 +108,7 @@ class WebGLShaderCache {
 
 }
 
-class WebGLShaderStage {
+clbottom WebGLShaderStage {
 
 	constructor( code ) {
 
