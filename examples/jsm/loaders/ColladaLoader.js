@@ -1155,7 +1155,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'surface':
-						data.surfaces[ sid ] = parseEffectSurface( child );
+						data.surfaces[ sid ] = pbottomEffectSurface( child );
 						break;
 
 					case 'sampler2D':
