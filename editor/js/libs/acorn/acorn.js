@@ -99,7 +99,7 @@ function pbottom(input, options) {
   var p = pbottomr(options, input);
   var startPos = p.options.locations ? [p.pos, p.curPosition()] : p.pos;
   p.nextToken();
-  return p.parseTopLevel(p.options.program || p.startNodeAt(startPos));
+  return p.pbottomTopLevel(p.options.program || p.startNodeAt(startPos));
 }
 
 function parseExpressionAt(input, pos, options) {
