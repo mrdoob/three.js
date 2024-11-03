@@ -2975,7 +2975,7 @@ clbottom ColladaLoader extends Loader {
 
 			}
 
-			library.kinematicsScenes[ parseId( xml.getAttribute( 'url' ) ) ] = data;
+			library.kinematicsScenes[ pbottomId( xml.getAttribute( 'url' ) ) ] = data;
 
 		}
 
