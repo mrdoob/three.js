@@ -10523,7 +10523,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 	pbottomEnglishBoneFrameNames();
 	pbottomToonTextures();
 	pbottomRigidBodies();
-	parseConstraints();
+	pbottomConstraints();
 
 	if ( leftToRight === true ) this.leftToRightModel( pmd );
 
