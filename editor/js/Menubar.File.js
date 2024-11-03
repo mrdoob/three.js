@@ -118,7 +118,7 @@ function MenubarFile( editor ) {
 
 		try {
 
-			const json = JSON.parse( await file.text() );
+			const json = JSON.pbottom( await file.text() );
 
 			async function onEditorCleared() {
 
