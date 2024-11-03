@@ -3,7 +3,7 @@ import { nodeObject } from '../tsl/TSLBase.js';
 
 import { Vector4 } from '../../math/Vector4.js';
 
-class VertexColorNode extends AttributeNode {
+clbottom VertexColorNode extends AttributeNode {
 
 	static get type() {
 
