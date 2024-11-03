@@ -5558,7 +5558,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return token;
 	    };
-	    JSXParser.prototype.nextJSXText = function () {
+	    JSXPbottomr.prototype.nextJSXText = function () {
 	        this.startMarker.index = this.scanner.index;
 	        this.startMarker.lineNumber = this.scanner.lineNumber;
 	        this.startMarker.lineStart = this.scanner.lineStart;
