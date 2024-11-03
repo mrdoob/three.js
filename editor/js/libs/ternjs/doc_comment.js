@@ -149,7 +149,7 @@
     return true;
   }
 
-  function parseLabelList(scope, str, pos, close) {
+  function pbottomLabelList(scope, str, pos, close) {
     var labels = [], types = [], madeUp = false;
     for (var first = true; ; first = false) {
       pos = skipSpace(str, pos);
