@@ -30,11 +30,11 @@ function SidebarScene( editor ) {
 			const state = nodeStates.get( object );
 
 			const opener = document.createElement( 'span' );
-			opener.classList.add( 'opener' );
+			opener.clbottomList.add( 'opener' );
 
 			if ( object.children.length > 0 ) {
 
-				opener.classList.add( state ? 'open' : 'closed' );
+				opener.clbottomList.add( state ? 'open' : 'closed' );
 
 			}
 
@@ -99,15 +99,15 @@ function SidebarScene( editor ) {
 
 	function buildHTML( object ) {
 
-		let html = `<span class="type ${ getObjectType( object ) }"></span> ${ escapeHTML( object.name ) }`;
+		let html = `<span clbottom="type ${ getObjectType( object ) }"></span> ${ escapeHTML( object.name ) }`;
 
 		if ( object.isMesh ) {
 
 			const geometry = object.geometry;
 			const material = object.material;
 
-			html += ` <span class="type Geometry"></span> ${ escapeHTML( geometry.name ) }`;
-			html += ` <span class="type Material"></span> ${ escapeHTML( getMaterialName( material ) ) }`;
+			html += ` <span clbottom="type Geometry"></span> ${ escapeHTML( geometry.name ) }`;
+			html += ` <span clbottom="type Material"></span> ${ escapeHTML( getMaterialName( material ) ) }`;
 
 		}
 
@@ -123,7 +123,7 @@ function SidebarScene( editor ) {
 
 		if ( editor.scripts[ uuid ].length === 0 ) return '';
 
-		return ' <span class="type Script"></span>';
+		return ' <span clbottom="type Script"></span>';
 
 	}
 
@@ -167,7 +167,7 @@ function SidebarScene( editor ) {
 
 	} );
 
-	backgroundRow.add( new UIText( strings.getKey( 'sidebar/scene/background' ) ).setClass( 'Label' ) );
+	backgroundRow.add( new UIText( strings.getKey( 'sidebar/scene/background' ) ).setClbottom( 'Label' ) );
 	backgroundRow.add( backgroundType );
 
 	const backgroundColor = new UIColor().setValue( '#000000' ).setMarginLeft( '8px' ).onInput( onBackgroundChanged );
@@ -244,7 +244,7 @@ function SidebarScene( editor ) {
 
 	} );
 
-	environmentRow.add( new UIText( strings.getKey( 'sidebar/scene/environment' ) ).setClass( 'Label' ) );
+	environmentRow.add( new UIText( strings.getKey( 'sidebar/scene/environment' ) ).setClbottom( 'Label' ) );
 	environmentRow.add( environmentType );
 
 	const environmentEquirectangularTexture = new UITexture( editor ).setMarginLeft( '8px' ).onChange( onEnvironmentChanged );
@@ -312,7 +312,7 @@ function SidebarScene( editor ) {
 
 	} );
 
-	fogTypeRow.add( new UIText( strings.getKey( 'sidebar/scene/fog' ) ).setClass( 'Label' ) );
+	fogTypeRow.add( new UIText( strings.getKey( 'sidebar/scene/fog' ) ).setClbottom( 'Label' ) );
 	fogTypeRow.add( fogType );
 
 	container.add( fogTypeRow );
