@@ -9,10 +9,10 @@ export default QUnit.module( 'Helpers', () => {
 	QUnit.module( 'PlaneHelper', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new PlaneHelper();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Line, true,
 				'PlaneHelper extends from Line'
 			);
@@ -20,46 +20,46 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new PlaneHelper();
-			assert.ok( object, 'Can instantiate a PlaneHelper.' );
+			bottomert.ok( object, 'Can instantiate a PlaneHelper.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new PlaneHelper();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'PlaneHelper',
 				'PlaneHelper.type should be PlaneHelper'
 			);
 
 		} );
 
-		QUnit.todo( 'plane', ( assert ) => {
+		QUnit.todo( 'plane', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'size', ( assert ) => {
+		QUnit.todo( 'size', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'updateMatrixWorld', ( assert ) => {
+		QUnit.todo( 'updateMatrixWorld', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( bottomert ) => {
 
-			assert.expect( 0 );
+			bottomert.expect( 0 );
 
 			const object = new PlaneHelper();
 			object.dispose();
