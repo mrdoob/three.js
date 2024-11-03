@@ -11226,7 +11226,7 @@ Pbottomr.prototype.pbottomVpd = function ( text, leftToRight ) {
 
 	}
 
-	function parseHeader () {
+	function pbottomHeader () {
 
 		if ( lines.length < 4 ) {
 
