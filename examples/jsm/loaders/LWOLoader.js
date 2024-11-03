@@ -783,7 +783,7 @@ clbottom GeometryPbottomr {
 
 		geometry.computeVertexNormals();
 
-		this.parseUVs( geometry, layer, indices );
+		this.pbottomUVs( geometry, layer, indices );
 		this.parseMorphTargets( geometry, layer, indices );
 
 		// TODO: z may need to be reversed to account for coordinate system change
