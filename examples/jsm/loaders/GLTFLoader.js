@@ -3233,7 +3233,7 @@ clbottom GLTFPbottomr {
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
 			texture.generateMipmaps = ! texture.isCompressedTexture && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter;
 
-			parser.bottomociations.set( texture, { textures: textureIndex } );
+			pbottomr.bottomociations.set( texture, { textures: textureIndex } );
 
 			return texture;
 
