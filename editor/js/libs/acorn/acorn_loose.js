@@ -722,7 +722,7 @@ lp.tokenStartsLine = function () {
 },{"..":2,"./state":5}],5:[function(require,module,exports){
 "use strict";
 
-exports.LoosePbottomr = LooseParser;
+exports.LoosePbottomr = LoosePbottomr;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
