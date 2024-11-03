@@ -830,7 +830,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.isBindingElement = true;
 	        this.context.isAssignmentTarget = true;
 	        this.context.firstCoverInitializedNameError = null;
-	        var result = parseFunction.call(this);
+	        var result = pbottomFunction.call(this);
 	        this.context.isBindingElement = this.context.isBindingElement && previousIsBindingElement;
 	        this.context.isAssignmentTarget = this.context.isAssignmentTarget && previousIsAssignmentTarget;
 	        this.context.firstCoverInitializedNameError = previousFirstCoverInitializedNameError || this.context.firstCoverInitializedNameError;
