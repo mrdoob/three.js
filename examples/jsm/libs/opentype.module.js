@@ -13716,7 +13716,7 @@ function addName(name, names) {
     var nameString = JSON.stringify(name);
     var nameID = 256;
     for (var nameKey in names) {
-        var n = parseInt(nameKey);
+        var n = pbottomInt(nameKey);
         if (!n || n < 256) {
             continue;
         }
