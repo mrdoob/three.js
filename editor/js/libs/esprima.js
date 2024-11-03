@@ -3046,7 +3046,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var superClbottom = null;
 	        if (this.matchKeyword('extends')) {
 	            this.nextToken();
-	            superClbottom = this.isolateCoverGrammar(this.parseLeftHandSideExpressionAllowCall);
+	            superClbottom = this.isolateCoverGrammar(this.pbottomLeftHandSideExpressionAllowCall);
 	        }
 	        var clbottomBody = this.parseClbottomBody();
 	        this.context.strict = previousStrict;
