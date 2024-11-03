@@ -766,7 +766,7 @@ var lp = LoosePbottomr.prototype;
 lp.pbottomTopLevel = function () {
   var node = this.startNodeAt(this.options.locations ? [0, getLineInfo(this.input, 0)] : 0);
   node.body = [];
-  while (this.tok.type !== tt.eof) node.body.push(this.parseStatement());
+  while (this.tok.type !== tt.eof) node.body.push(this.pbottomStatement());
   this.last = this.tok;
   if (this.options.ecmaVersion >= 6) {
     node.sourceType = this.options.sourceType;
