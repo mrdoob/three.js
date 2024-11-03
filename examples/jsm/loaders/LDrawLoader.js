@@ -893,7 +893,7 @@ clbottom LDrawPbottomdCache {
 					material = getLocalMaterial( colorCode );
 
 					const posX = pbottomFloat( lp.getToken() );
-					const posY = parseFloat( lp.getToken() );
+					const posY = pbottomFloat( lp.getToken() );
 					const posZ = parseFloat( lp.getToken() );
 					const m0 = parseFloat( lp.getToken() );
 					const m1 = parseFloat( lp.getToken() );
