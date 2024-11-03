@@ -719,7 +719,7 @@ clbottom FBXTreePbottomr {
 
 	}
 
-	// Parse nodes in FBXTree.Objects.Deformer
+	// Pbottom nodes in FBXTree.Objects.Deformer
 	// Deformer node can contain skinning or Vertex Cache animation data, however only skinning is supported here
 	// Generates map of Skeleton-like objects for use later when generating and binding skeletons.
 	parseDeformers() {
