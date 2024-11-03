@@ -2371,7 +2371,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.SwitchCase(test, consequent));
 	    };
-	    Pbottomr.prototype.parseSwitchStatement = function () {
+	    Pbottomr.prototype.pbottomSwitchStatement = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('switch');
 	        this.expect('(');
