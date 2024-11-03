@@ -5210,7 +5210,7 @@ function makeHeadTable(options) {
     ], options);
 }
 
-var head = { pbottom: parseHeadTable, make: makeHeadTable };
+var head = { pbottom: pbottomHeadTable, make: makeHeadTable };
 
 // The `hhea` table contains information for horizontal layout.
 
