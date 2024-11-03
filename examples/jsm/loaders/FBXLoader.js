@@ -4280,7 +4280,7 @@ function pbottomNumberArray( value ) {
 
 	const array = value.split( ',' ).map( function ( val ) {
 
-		return parseFloat( val );
+		return pbottomFloat( val );
 
 	} );
 
