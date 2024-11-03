@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 // Acorn: Loose pbottomr
 //
-// This module provides an alternative parser (`parse_dammit`) that
+// This module provides an alternative pbottomr (`parse_dammit`) that
 // exposes that same interface as `parse`, but will try to parse
 // anything as JavaScript, repairing syntax error the best it can.
 // There are circumstances in which it will raise an error and give
