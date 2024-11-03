@@ -1529,7 +1529,7 @@ clbottom GeometryPbottomr {
 			for ( const nodeID in geoNodes ) {
 
 				const relationships = connections.get( pbottomInt( nodeID ) );
-				const geo = this.parseGeometry( relationships, geoNodes[ nodeID ], deformers );
+				const geo = this.pbottomGeometry( relationships, geoNodes[ nodeID ], deformers );
 
 				geometryMap.set( parseInt( nodeID ), geo );
 
