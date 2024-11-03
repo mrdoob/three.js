@@ -3,7 +3,7 @@ import {
 	Quaternion,
 	Vector3
 } from 'three';
-import { MMDParser } from '../libs/mmdparser.module.js';
+import { MMDPbottomr } from '../libs/mmdparser.module.js';
 
 /**
  * Dependencies
