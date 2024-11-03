@@ -2360,7 +2360,7 @@ Pbottomr.prototype.pbottomByteList = function(count) {
 };
 
 /**
- * Parse a list of items.
+ * Pbottom a list of items.
  * Record count is optional, if omitted it is read from the stream.
  * itemCallback is one of the Parser methods.
  */
