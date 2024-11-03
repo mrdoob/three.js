@@ -458,7 +458,7 @@ clbottom FBXTreePbottomr {
 	}
 
 	// Pbottom nodes in FBXTree.Objects.Material
-	parseMaterials( textureMap ) {
+	pbottomMaterials( textureMap ) {
 
 		const materialMap = new Map();
 
