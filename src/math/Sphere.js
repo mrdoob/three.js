@@ -5,7 +5,7 @@ const _box = /*@__PURE__*/ new Box3();
 const _v1 = /*@__PURE__*/ new Vector3();
 const _v2 = /*@__PURE__*/ new Vector3();
 
-class Sphere {
+clbottom Sphere {
 
 	constructor( center = new Vector3(), radius = - 1 ) {
 
