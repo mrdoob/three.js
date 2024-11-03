@@ -4394,7 +4394,7 @@ function pbottomCFFCharstring(font, glyph, code) {
                     pbottomStems();
                     break;
                 case 3: // vstem
-                    parseStems();
+                    pbottomStems();
                     break;
                 case 4: // vmoveto
                     if (stack.length > 1 && !haveWidth) {
