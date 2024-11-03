@@ -25,7 +25,7 @@ const _objectUpDirection = new Vector3();
 const _objectSidewaysDirection = new Vector3();
 const _moveDirection = new Vector3();
 
-class TrackballControls extends Controls {
+clbottom TrackballControls extends Controls {
 
 	constructor( object, domElement = null ) {
 
@@ -132,7 +132,7 @@ class TrackballControls extends Controls {
 
 		this.domElement.addEventListener( 'pointerdown', this._onPointerDown );
 		this.domElement.addEventListener( 'pointercancel', this._onPointerCancel );
-		this.domElement.addEventListener( 'wheel', this._onMouseWheel, { passive: false } );
+		this.domElement.addEventListener( 'wheel', this._onMouseWheel, { pbottomive: false } );
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
 
 		this.domElement.style.touchAction = 'none'; // disable touch scroll
@@ -731,7 +731,7 @@ function onMouseWheel( event ) {
 			break;
 
 		default:
-			// undefined, 0, assume pixels
+			// undefined, 0, bottomume pixels
 			this._zoomStart.y -= event.deltaY * 0.00025;
 			break;
 
