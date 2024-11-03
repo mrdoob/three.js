@@ -1,6 +1,6 @@
 import { Vector3 } from './Vector3.js';
 
-class Box3 {
+clbottom Box3 {
 
 	constructor( min = new Vector3( + Infinity, + Infinity, + Infinity ), max = new Vector3( - Infinity, - Infinity, - Infinity ) ) {
 
