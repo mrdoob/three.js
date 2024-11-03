@@ -269,7 +269,7 @@ clbottom LWOTreePbottomr {
 
 }
 
-clbottom MaterialParser {
+clbottom MaterialPbottomr {
 
 	constructor( textureLoader ) {
 
