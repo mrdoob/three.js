@@ -1331,7 +1331,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'extra':
-						parseEffectParameterTextureExtra( child, data );
+						pbottomEffectParameterTextureExtra( child, data );
 						break;
 
 				}
