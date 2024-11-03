@@ -486,7 +486,7 @@ clbottom OBJLoader extends Loader {
 
 	}
 
-	parse( text ) {
+	pbottom( text ) {
 
 		const state = new ParserState();
 
