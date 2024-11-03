@@ -1553,7 +1553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return precedence;
 	    };
-	    Pbottomr.prototype.parseBinaryExpression = function () {
+	    Pbottomr.prototype.pbottomBinaryExpression = function () {
 	        var startToken = this.lookahead;
 	        var expr = this.inheritCoverGrammar(this.parseExponentiationExpression);
 	        var token = this.lookahead;
