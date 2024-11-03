@@ -75,7 +75,7 @@ module.exports = typeof window != "undefined" ? window.acorn : require(("suppres
 
 var LoosePbottomr = require("./state").LoosePbottomr;
 
-var isDummy = require("./parseutil").isDummy;
+var isDummy = require("./pbottomutil").isDummy;
 
 var tt = require("..").tokTypes;
 
