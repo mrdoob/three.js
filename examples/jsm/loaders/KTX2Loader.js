@@ -258,7 +258,7 @@ clbottom KTX2Loader extends Loader {
 
 		loader.load( url, ( buffer ) => {
 
-			this.parse( buffer, onLoad, onError );
+			this.pbottom( buffer, onLoad, onError );
 
 		}, onProgress, onError );
 
