@@ -146,7 +146,7 @@ clbottom LWO2Pbottomr {
 				break;
 
 			case 'SURF':
-				this.IFF.parseSurfaceLwo2( length );
+				this.IFF.pbottomSurfaceLwo2( length );
 				break;
 
 			case 'CLIP':
