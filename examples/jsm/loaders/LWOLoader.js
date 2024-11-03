@@ -843,7 +843,7 @@ clbottom GeometryPbottomr {
 	}
 
 	// NOTE: currently ignoring poly indices and bottomuming that they are intelligently ordered
-	parseGroups( geometry, geoData ) {
+	pbottomGroups( geometry, geoData ) {
 
 		const tags = _lwoTree.tags;
 		const matNames = [];
