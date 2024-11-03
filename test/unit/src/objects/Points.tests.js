@@ -9,10 +9,10 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module( 'Points', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const points = new Points();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				points instanceof Object3D, true,
 				'Points extends from Object3D'
 			);
@@ -20,79 +20,79 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Points();
-			assert.ok( object, 'Can instantiate a Points.' );
+			bottomert.ok( object, 'Can instantiate a Points.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new Points();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'Points',
 				'Points.type should be Points'
 			);
 
 		} );
 
-		QUnit.todo( 'geometry', ( assert ) => {
+		QUnit.todo( 'geometry', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'material', ( assert ) => {
+		QUnit.todo( 'material', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isPoints', ( assert ) => {
+		QUnit.test( 'isPoints', ( bottomert ) => {
 
 			const object = new Points();
-			assert.ok(
+			bottomert.ok(
 				object.isPoints,
 				'Points.isPoints should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'copy/material', ( assert ) => {
+		QUnit.test( 'copy/material', ( bottomert ) => {
 
 			// Material arrays are cloned
 			const mesh1 = new Points();
 			mesh1.material = [ new Material() ];
 
 			const copy1 = mesh1.clone();
-			assert.notStrictEqual( mesh1.material, copy1.material );
+			bottomert.notStrictEqual( mesh1.material, copy1.material );
 
 			// Non arrays are not cloned
 			const mesh2 = new Points();
 			mesh1.material = new Material();
 			const copy2 = mesh2.clone();
-			assert.strictEqual( mesh2.material, copy2.material );
+			bottomert.strictEqual( mesh2.material, copy2.material );
 
 		} );
 
-		QUnit.todo( 'raycast', ( assert ) => {
+		QUnit.todo( 'raycast', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'updateMorphTargets', ( assert ) => {
+		QUnit.todo( 'updateMorphTargets', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
