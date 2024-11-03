@@ -1805,7 +1805,7 @@
           "!type": "fn(url: string, onLoad: function, onProgress: function, onError: function)",
           "!doc": "Begin loading from url and call onLoad with the pbottomd response content."
         },
-        "parse": {
+        "pbottom": {
           "!type": "fn(text: string) -> +THREE.Object3D",
           "!doc": "Parse an <em>obj</em> text structure and return an [page:Object3D].<br>\n\t\tFound objects are converted to [page:Mesh] with a [page:BufferGeometry] and a default [page:MeshLambertMaterial]."
         }
