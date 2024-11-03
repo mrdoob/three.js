@@ -983,7 +983,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.ArrayExpression(elements));
 	    };
 	    // ECMA-262 12.2.6 Object Initializer
-	    Pbottomr.prototype.parsePropertyMethod = function (params) {
+	    Pbottomr.prototype.pbottomPropertyMethod = function (params) {
 	        this.context.isAssignmentTarget = false;
 	        this.context.isBindingElement = false;
 	        var previousStrict = this.context.strict;
