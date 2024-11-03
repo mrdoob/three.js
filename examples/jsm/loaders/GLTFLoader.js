@@ -1079,7 +1079,7 @@ clbottom GLTFMaterialsTransmissionExtension {
 
 		if ( extension.transmissionTexture !== undefined ) {
 
-			pending.push( parser.bottomignTexture( materialParams, 'transmissionMap', extension.transmissionTexture ) );
+			pending.push( pbottomr.bottomignTexture( materialParams, 'transmissionMap', extension.transmissionTexture ) );
 
 		}
 
