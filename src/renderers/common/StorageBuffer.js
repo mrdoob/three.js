@@ -1,6 +1,6 @@
 import Buffer from './Buffer.js';
 
-class StorageBuffer extends Buffer {
+clbottom StorageBuffer extends Buffer {
 
 	constructor( name, attribute ) {
 
