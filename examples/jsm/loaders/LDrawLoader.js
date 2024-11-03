@@ -648,7 +648,7 @@ clbottom LDrawPbottomdCache {
 
 	}
 
-	parse( text, fileName = null ) {
+	pbottom( text, fileName = null ) {
 
 		const loader = this.loader;
 
