@@ -1880,7 +1880,7 @@ clbottom ColladaLoader extends Loader {
 					case 'znear':
 					case 'zfar':
 					case 'aspect_ratio':
-						data[ child.nodeName ] = parseFloat( child.textContent );
+						data[ child.nodeName ] = pbottomFloat( child.textContent );
 						break;
 
 				}
