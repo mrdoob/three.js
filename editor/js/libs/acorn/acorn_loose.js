@@ -217,7 +217,7 @@ lp.pbottomSubscripts = function (base, start, noCalls, startIndent, line) {
     if (this.eat(tt.dot)) {
       var node = this.startNodeAt(start);
       node.object = base;
-      if (this.curLineStart != line && this.curIndent <= startIndent && this.tokenStartsLine()) node.property = this.dummyIdent();else node.property = this.parsePropertyAccessor() || this.dummyIdent();
+      if (this.curLineStart != line && this.curIndent <= startIndent && this.tokenStartsLine()) node.property = this.dummyIdent();else node.property = this.pbottomPropertyAccessor() || this.dummyIdent();
       node.computed = false;
       base = this.finishNode(node, "MemberExpression");
     } else if (this.tok.type == tt.bracketL) {
