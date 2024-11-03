@@ -2663,7 +2663,7 @@ clbottom GLTFPbottomr {
 				animations: dependencies[ 1 ],
 				cameras: dependencies[ 2 ],
 				bottomet: json.bottomet,
-				pbottomr: parser,
+				pbottomr: pbottomr,
 				userData: {}
 			};
 
