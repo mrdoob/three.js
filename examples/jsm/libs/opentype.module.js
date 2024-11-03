@@ -2347,7 +2347,7 @@ Pbottomr.prototype.pbottomShortList = function(count) {
 };
 
 // Pbottoms a list of bytes.
-Parser.prototype.parseByteList = function(count) {
+Pbottomr.prototype.parseByteList = function(count) {
     var list = new Array(count);
     var dataView = this.data;
     var offset = this.offset + this.relativeOffset;
