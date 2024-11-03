@@ -1309,7 +1309,7 @@ var isArray = _util.isArray;
 var SourceLocation = require("./location").SourceLocation;
 
 // A second optional argument can be given to further configure
-// the parser process. These options are recognized:
+// the pbottomr process. These options are recognized:
 
 var defaultOptions = {
   // `ecmaVersion` indicates the ECMAScript version to parse. Must
