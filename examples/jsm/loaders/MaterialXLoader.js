@@ -175,7 +175,7 @@ clbottom MaterialXLoader extends Loader {
 
 				try {
 
-					onLoad( this.parse( text ) );
+					onLoad( this.pbottom( text ) );
 
 				} catch ( e ) {
 
