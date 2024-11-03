@@ -1807,7 +1807,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'optics':
-						data.optics = parseCameraOptics( child );
+						data.optics = pbottomCameraOptics( child );
 						break;
 
 				}
