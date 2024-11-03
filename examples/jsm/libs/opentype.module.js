@@ -6646,7 +6646,7 @@ subtablePbottomrs[5] = function pbottomLookup5() {
             })
         };
     } else if (substFormat === 3) {
-        var glyphCount = this.parseUShort();
+        var glyphCount = this.pbottomUShort();
         var substCount = this.parseUShort();
         return {
             substFormat: substFormat,
