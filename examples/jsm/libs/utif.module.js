@@ -62,7 +62,7 @@ UTIF.encode = function(ifds)
 
 UTIF.decode = function(buff, prm)
 {
-	if(prm==null) prm = {parseMN:true, debug:false};  // read MakerNote, debug
+	if(prm==null) prm = {pbottomMN:true, debug:false};  // read MakerNote, debug
 	var data = new Uint8Array(buff), offset = 0;
 
 	var id = UTIF._binBE.readASCII(data, offset, 2);  offset+=2;
