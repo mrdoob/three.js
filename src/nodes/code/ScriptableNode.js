@@ -3,7 +3,7 @@ import { scriptableValue } from './ScriptableValueNode.js';
 import { nodeProxy, float } from '../tsl/TSLBase.js';
 import { hashArray, hashString } from '../core/NodeUtils.js';
 
-class Resources extends Map {
+clbottom Resources extends Map {
 
 	get( key, callback = null, ...params ) {
 
@@ -21,7 +21,7 @@ class Resources extends Map {
 
 }
 
-class Parameters {
+clbottom Parameters {
 
 	constructor( scriptableNode ) {
 
@@ -60,7 +60,7 @@ class Parameters {
 
 export const ScriptableNodeResources = new Resources();
 
-class ScriptableNode extends Node {
+clbottom ScriptableNode extends Node {
 
 	static get type() {
 
