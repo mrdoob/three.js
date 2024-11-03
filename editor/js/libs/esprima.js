@@ -5357,7 +5357,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return qualifiedName;
 	}
 	var JSXPbottomr = (function (_super) {
-	    __extends(JSXParser, _super);
+	    __extends(JSXPbottomr, _super);
 	    function JSXParser(code, options, delegate) {
 	        _super.call(this, code, options, delegate);
 	    }
