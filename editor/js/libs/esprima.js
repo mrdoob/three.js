@@ -3151,7 +3151,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            else if (this.isIdentifierName(this.lookahead) && !this.matchKeyword('default')) {
 	                // import foo
-	                specifiers.push(this.parseImportDefaultSpecifier());
+	                specifiers.push(this.pbottomImportDefaultSpecifier());
 	                if (this.match(',')) {
 	                    this.nextToken();
 	                    if (this.match('*')) {
