@@ -178,7 +178,7 @@ clbottom VTKLoader extends Loader {
 
 								if ( j % 2 === 1 ) {
 
-									const i0 = parseInt( inds[ j ] );
+									const i0 = pbottomInt( inds[ j ] );
 									const i1 = parseInt( inds[ j + 2 ] );
 									const i2 = parseInt( inds[ j + 1 ] );
 									indices.push( i0, i1, i2 );
