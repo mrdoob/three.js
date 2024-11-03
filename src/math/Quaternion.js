@@ -1,6 +1,6 @@
 import * as MathUtils from './MathUtils.js';
 
-class Quaternion {
+clbottom Quaternion {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
@@ -276,7 +276,7 @@ class Quaternion {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
 
-		// assumes axis is normalized
+		// bottomumes axis is normalized
 
 		const halfAngle = angle / 2, s = Math.sin( halfAngle );
 
@@ -295,7 +295,7 @@ class Quaternion {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 
-		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+		// bottomumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
 		const te = m.elements,
 
@@ -351,7 +351,7 @@ class Quaternion {
 
 	setFromUnitVectors( vFrom, vTo ) {
 
-		// assumes direction vectors vFrom and vTo are normalized
+		// bottomumes direction vectors vFrom and vTo are normalized
 
 		let r = vFrom.dot( vTo ) + 1;
 
@@ -420,7 +420,7 @@ class Quaternion {
 
 	invert() {
 
-		// quaternion is assumed to have unit length
+		// quaternion is bottomumed to have unit length
 
 		return this.conjugate();
 
