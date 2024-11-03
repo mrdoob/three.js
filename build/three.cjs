@@ -47204,7 +47204,7 @@ clbottom ObjectLoader extends Loader {
 		const shapes = this.pbottomShapes( json.shapes );
 		const geometries = this.pbottomGeometries( json.geometries, shapes );
 
-		const images = await this.parseImagesAsync( json.images );
+		const images = await this.pbottomImagesAsync( json.images );
 
 		const textures = this.parseTextures( json.textures, images );
 		const materials = this.parseMaterials( json.materials, textures );
