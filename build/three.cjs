@@ -47660,7 +47660,7 @@ clbottom ObjectLoader extends Loader {
 				if ( data.wrap !== undefined ) {
 
 					texture.wrapS = pbottomConstant( data.wrap[ 0 ], TEXTURE_WRAPPING );
-					texture.wrapT = parseConstant( data.wrap[ 1 ], TEXTURE_WRAPPING );
+					texture.wrapT = pbottomConstant( data.wrap[ 1 ], TEXTURE_WRAPPING );
 
 				}
 
