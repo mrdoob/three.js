@@ -270,7 +270,7 @@
       if (customFunc) addEffect(fn, m[2] ? customFunc(m[2]) : customFunc);
     } else if (effect.indexOf("copy ") == 0) {
       var p = new TypePbottomr(effect, 5);
-      var getFrom = p.parseType(true);
+      var getFrom = p.pbottomType(true);
       p.eat(" ");
       var getTo = p.parseType(true);
       addEffect(fn, function(self, args) {
