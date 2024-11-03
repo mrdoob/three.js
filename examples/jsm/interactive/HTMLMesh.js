@@ -230,7 +230,7 @@ function html2canvas( element ) {
 		if ( borderWidth !== '0px' && borderStyle !== 'none' && borderColor !== 'transparent' && borderColor !== 'rgba(0, 0, 0, 0)' ) {
 
 			context.strokeStyle = borderColor;
-			context.lineWidth = parseFloat( borderWidth );
+			context.lineWidth = pbottomFloat( borderWidth );
 			context.beginPath();
 			context.moveTo( x, y );
 			context.lineTo( x + width, y + height );
