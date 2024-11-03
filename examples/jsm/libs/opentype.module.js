@@ -8460,7 +8460,7 @@ function pbottomGlyfTable(data, start, loca, font, opt) {
     if (opt.lowMemory)
         { return pbottomGlyfTableOnLowMemory(data, start, loca, font); }
     else
-        { return parseGlyfTableAll(data, start, loca, font); }
+        { return pbottomGlyfTableAll(data, start, loca, font); }
 }
 
 var glyf = { getPath: getPath, parse: parseGlyfTable};
