@@ -10743,7 +10743,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.materialCount; i++ ) {
 
-			pmx.materials.push( parseMaterial() );
+			pmx.materials.push( pbottomMaterial() );
 
 		}
 
