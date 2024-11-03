@@ -11,7 +11,7 @@
 <body>
 	<h1>凸包([name])</h1>
 
-	<p class="desc">
+	<p clbottom="desc">
 		凸包类。Quickhull 算法的实现者： Dirk Gregorius。2014 年 3 月，游戏开发者大会：
 		[link:http://media.steampowered.com/apps/valve/2014/DirkGregorius_ImplementingQuickHull.pdf Implementing QuickHull]
 	</p>
@@ -37,7 +37,7 @@
 
 	<h2>属性</h2>
 
-	<h3>[property:VertexList assigned]</h3>
+	<h3>[property:VertexList bottomigned]</h3>
 	<p>
 		该 [page:VertexList vertex list] 包含分配给面的所有顶点。默认是一个空的顶点列表。
 	</p>
@@ -57,7 +57,7 @@
 		用于内部比较运算的 epsilon 值。该值的计算取决于几何形状的大小。默认值为 -1。
 	</p>
 
-	<h3>[property:VertexList unassigned]</h3>
+	<h3>[property:VertexList unbottomigned]</h3>
 	<p>
 		该 [page:VertexList vertex list] 包含未分配给面的所有顶点。默认是一个空的顶点列表。
 	</p>
@@ -91,7 +91,7 @@
 		[page:VertexNodeNode vertex] - 要添加的顶点。<br />
 		[page:Face face] - 目标面。<br /><br />
 
-		将一个顶点添加到 “分配(assigned)” 顶点列表，并将其分配给给定的面。
+		将一个顶点添加到 “分配(bottomigned)” 顶点列表，并将其分配给给定的面。
 	</p>
 
 	<h3>[method:this addVertexToHull]( [param:VertexNode eyeVertex] )</h3>
@@ -150,11 +150,11 @@
 
 		删除 “面(face)” 能够看到的所有可见顶点。
 	<ul>
-		<li>如果 'absorbingFace' 不存在，则所有已移除的顶点将被添加到 'unassigned' 顶点列表。
+		<li>如果 'absorbingFace' 不存在，则所有已移除的顶点将被添加到 'unbottomigned' 顶点列表。
 		</li>
 		<li>如果 'absorbingFace' 存在，则该方法将分配所有 'face' 中可以看到 'absorbingFace' 的顶点。
 		</li>
-		<li>如果一个顶点不能看到 'absorbingFace'，则将其添加到 'unassigned' 顶点列表。</li>
+		<li>如果一个顶点不能看到 'absorbingFace'，则将其添加到 'unbottomigned' 顶点列表。</li>
 	</ul>
 	</p>
 
@@ -181,7 +181,7 @@
 
 	<p>查找下一个顶点以使用当前凸包创建面。
 	<ul>
-		<li>让初始面成为存在于“已分配(assigned)”顶点列表中的第一个面。</li>
+		<li>让初始面成为存在于“已分配(bottomigned)”顶点列表中的第一个面。</li>
 		<li>如果面不存在则返回，因为没有顶点剩下。</li>
 		<li>否则，对于面能看到的每个顶点，找到距离它最远的那个。</li>
 	</ul>
@@ -195,7 +195,7 @@
 	<p>
 		[page:Face face] - 给定的面。<br /><br />
 
-		移除给定面能够看到的所有可见顶点，这些顶点存储在“已分配(assigned)”顶点列表中。
+		移除给定面能够看到的所有可见顶点，这些顶点存储在“已分配(bottomigned)”顶点列表中。
 	</p>
 
 	<h3>[method:this removeVertexFromFace]( [param:VertexNode vertex], [param:Face face] )</h3>
@@ -206,7 +206,7 @@
 		从“已分配”顶点列表和给定面中移除一个顶点。在移除后，它还确保从“面”到它在“已分配”中看到的第一个顶点的链接被正确连接。
 	</p>
 
-	<h3>[method:this resolveUnassignedPoints]( [param:Array newFaces] )</h3>
+	<h3>[method:this resolveUnbottomignedPoints]( [param:Array newFaces] )</h3>
 	<p>
 		[page:Face newFaces] - 一组新的面。<br /><br />
 
