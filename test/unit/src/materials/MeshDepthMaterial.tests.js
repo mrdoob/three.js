@@ -9,10 +9,10 @@ export default QUnit.module( 'Materials', () => {
 	QUnit.module( 'MeshDepthMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new MeshDepthMaterial();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Material, true,
 				'MeshDepthMaterial extends from Material'
 			);
@@ -20,86 +20,86 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new MeshDepthMaterial();
-			assert.ok( object, 'Can instantiate a MeshDepthMaterial.' );
+			bottomert.ok( object, 'Can instantiate a MeshDepthMaterial.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new MeshDepthMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'MeshDepthMaterial',
 				'MeshDepthMaterial.type should be MeshDepthMaterial'
 			);
 
 		} );
 
-		QUnit.todo( 'depthPacking', ( assert ) => {
+		QUnit.todo( 'depthPacking', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'map', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'alphaMap', ( assert ) => {
+		QUnit.todo( 'map', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'displacementMap', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'displacementScale', ( assert ) => {
+		QUnit.todo( 'alphaMap', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'displacementBias', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'wireframe', ( assert ) => {
+		QUnit.todo( 'displacementMap', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'wireframeLinewidth', ( assert ) => {
+		QUnit.todo( 'displacementScale', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'displacementBias', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'wireframe', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'wireframeLinewidth', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isMeshDepthMaterial', ( assert ) => {
+		QUnit.test( 'isMeshDepthMaterial', ( bottomert ) => {
 
 			const object = new MeshDepthMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.isMeshDepthMaterial,
 				'MeshDepthMaterial.isMeshDepthMaterial should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
