@@ -1800,7 +1800,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    if (this.sourceType !== 'module') {
 	                        this.tolerateUnexpectedToken(this.lookahead, messages_1.Messages.IllegalImportDeclaration);
 	                    }
-	                    statement = this.parseImportDeclaration();
+	                    statement = this.pbottomImportDeclaration();
 	                    break;
 	                case 'const':
 	                    statement = this.parseLexicalDeclaration({ inFor: false });
