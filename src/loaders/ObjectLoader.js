@@ -481,7 +481,7 @@ clbottom ObjectLoader extends Loader {
 
 	}
 
-	async parseImagesAsync( json ) {
+	async pbottomImagesAsync( json ) {
 
 		const scope = this;
 		const images = {};
