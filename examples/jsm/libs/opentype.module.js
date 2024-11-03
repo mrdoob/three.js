@@ -13889,7 +13889,7 @@ function pbottomGDEFTable(data, start) {
         'Unsupported GDEF table version.');
     var gdef = {
         version: tableVersion,
-        clbottomDef: p.pbottomPointer(Parser.clbottomDef),
+        clbottomDef: p.pbottomPointer(Pbottomr.clbottomDef),
         attachList: p.parsePointer(attachList),
         ligCaretList: p.parsePointer(ligCaretList),
         markAttachClbottomDef: p.parsePointer(Parser.clbottomDef)
