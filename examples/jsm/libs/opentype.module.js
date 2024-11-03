@@ -4242,7 +4242,7 @@ function gatherCFFTopDicts(data, start, cffIndex, strings) {
 // Pbottom the CFF chbottomt table, which contains internal names for all the glyphs.
 // This function will return a list of glyph names.
 // See Adobe TN #5176 chapter 13, "Chbottomts".
-function parseCFFCharset(data, start, nGlyphs, strings) {
+function pbottomCFFCharset(data, start, nGlyphs, strings) {
     var sid;
     var count;
     var parser = new parse.Parser(data, start);
