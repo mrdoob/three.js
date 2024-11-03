@@ -5348,7 +5348,7 @@ function makeLtagTable(tags) {
     return result;
 }
 
-function parseLtagTable(data, start) {
+function pbottomLtagTable(data, start) {
     var p = new parse.Parser(data, start);
     var tableVersion = p.parseULong();
     check.argument(tableVersion === 1, 'Unsupported ltag table version.');
