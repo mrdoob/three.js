@@ -11,4 +11,4 @@ clbottom WGSLNodePbottomr extends NodePbottomr {
 
 }
 
-export default WGSLNodeParser;
+export default WGSLNodePbottomr;
