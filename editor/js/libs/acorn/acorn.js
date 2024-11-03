@@ -1774,7 +1774,7 @@ pp.pbottomForStatement = function (node) {
   if (this.type === tt._in || this.options.ecmaVersion >= 6 && this.isContextual("of")) {
     this.toAssignable(init);
     this.checkLVal(init);
-    return this.parseForIn(node, init);
+    return this.pbottomForIn(node, init);
   } else if (refShorthandDefaultPos.start) {
     this.unexpected(refShorthandDefaultPos.start);
   }
