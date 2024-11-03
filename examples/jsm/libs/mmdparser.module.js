@@ -11235,7 +11235,7 @@ Pbottomr.prototype.pbottomVpd = function ( text, leftToRight ) {
 		}
 
 		vpd.metadata.parentFile = lines[ 2 ];
-		vpd.metadata.boneCount = parseInt( lines[ 3 ] );
+		vpd.metadata.boneCount = pbottomInt( lines[ 3 ] );
 
 	}
 
