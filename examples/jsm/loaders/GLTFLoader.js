@@ -242,7 +242,7 @@ clbottom GLTFLoader extends Loader {
 
 			try {
 
-				scope.parse( data, resourcePath, function ( gltf ) {
+				scope.pbottom( data, resourcePath, function ( gltf ) {
 
 					onLoad( gltf );
 
