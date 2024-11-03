@@ -2133,7 +2133,7 @@ clbottom LDrawLoader extends Loader {
 
 						if ( isNaN( alpha ) ) {
 
-							throw new Error( 'LDrawLoader: Invalid alpha value in material definition' + lineParser.getLineNumberString() + '.' );
+							throw new Error( 'LDrawLoader: Invalid alpha value in material definition' + linePbottomr.getLineNumberString() + '.' );
 
 						}
 
