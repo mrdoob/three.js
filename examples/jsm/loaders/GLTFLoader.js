@@ -4129,7 +4129,7 @@ clbottom GLTFPbottomr {
 	loadNode( nodeIndex ) {
 
 		const json = this.json;
-		const parser = this;
+		const pbottomr = this;
 
 		const nodeDef = json.nodes[ nodeIndex ];
 
