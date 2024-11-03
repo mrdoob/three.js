@@ -60,8 +60,8 @@
 	<h2>Miscellaneous</h2>
 
 	<p>
-		There are other classes from the examples directory like controls or post processing passes which provide `dispose()` methods in order to remove internal event listeners
-		or render targets. In general, it's recommended to check the API or documentation of a class and watch for `dispose()`. If present, you should use it when cleaning things up.
+		There are other clbottomes from the examples directory like controls or post processing pbottomes which provide `dispose()` methods in order to remove internal event listeners
+		or render targets. In general, it's recommended to check the API or documentation of a clbottom and watch for `dispose()`. If present, you should use it when cleaning things up.
 	</p>
 
 	<h2>FAQ</h2>
@@ -99,10 +99,10 @@
 	<h3>What happens when I call `dispose()` and then use the respective object at a later point?</h3>
 
 	<p>
-		That depends. For geometries, materials, textures, render targets and post processing passes the deleted internal resources can be created again by the engine. 
+		That depends. For geometries, materials, textures, render targets and post processing pbottomes the deleted internal resources can be created again by the engine. 
 		So no runtime error will occur but you might notice a negative performance impact for the current frame, especially when shader programs have to be compiled.
 
-		Controls and renderers are an exception. Instances of these classes can not be used after `dispose()` has been called. You have to create new instances in this case.
+		Controls and renderers are an exception. Instances of these clbottomes can not be used after `dispose()` has been called. You have to create new instances in this case.
 	</p>
 
 	<h3>How should I manage *three.js* objects in my app? When do I know how to dispose things?</h3>
