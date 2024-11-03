@@ -11303,7 +11303,7 @@ Pbottomr.prototype.pbottomVpd = function ( text, leftToRight ) {
 
 				q = [
 
-					parseFloat( result[ 1 ] ),
+					pbottomFloat( result[ 1 ] ),
 					parseFloat( result[ 2 ] ),
 					parseFloat( result[ 3 ] ),
 					parseFloat( result[ 4 ] )
