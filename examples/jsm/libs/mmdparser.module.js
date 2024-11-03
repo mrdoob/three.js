@@ -10288,7 +10288,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.boneFrameNameCount; i++ ) {
 
-			pmd.boneFrameNames.push( parseBoneFrameName() );
+			pmd.boneFrameNames.push( pbottomBoneFrameName() );
 
 		}
 
