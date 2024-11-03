@@ -2279,7 +2279,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.expect(')');
 	            var previousInIteration = this.context.inIteration;
 	            this.context.inIteration = true;
-	            body = this.isolateCoverGrammar(this.parseStatement);
+	            body = this.isolateCoverGrammar(this.pbottomStatement);
 	            this.context.inIteration = previousInIteration;
 	        }
 	        return (typeof left === 'undefined') ?
