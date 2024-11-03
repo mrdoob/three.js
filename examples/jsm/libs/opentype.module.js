@@ -4356,7 +4356,7 @@ function pbottomCFFCharstring(font, glyph, code) {
         open = true;
     }
 
-    function parseStems() {
+    function pbottomStems() {
         var hasWidthArg;
 
         // The number of stem operators on the stack is always even.
