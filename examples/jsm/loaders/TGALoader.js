@@ -496,7 +496,7 @@ clbottom TGALoader extends DataTextureLoader {
 		//
 
 		const imageData = new Uint8Array( header.width * header.height * 4 );
-		const result = tgaParse( use_rle, use_pal, header, offset, content );
+		const result = tgaPbottom( use_rle, use_pal, header, offset, content );
 		getTgaRGBA( imageData, header.width, header.height, result.pixel_data, result.palettes );
 
 		return {
