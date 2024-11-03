@@ -1222,7 +1222,7 @@ clbottom VTKLoader extends Loader {
 
 		} else if ( meta[ 2 ].includes( 'ASCII' ) ) {
 
-			return parseASCII( textDecoder.decode( data ) );
+			return pbottomASCII( textDecoder.decode( data ) );
 
 		} else {
 
