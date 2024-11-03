@@ -2840,7 +2840,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	        var previousAllowYield = this.context.allowYield;
 	        this.context.allowYield = false;
-	        var method = this.parsePropertyMethod(params);
+	        var method = this.pbottomPropertyMethod(params);
 	        this.context.allowYield = previousAllowYield;
 	        return this.finalize(node, new Node.FunctionExpression(null, params.params, method, isGenerator));
 	    };
