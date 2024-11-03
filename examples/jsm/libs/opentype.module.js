@@ -6609,7 +6609,7 @@ subtablePbottomrs[4] = function pbottomLookup4() {
 };
 
 var lookupRecordDesc = {
-    sequenceIndex: Parser.uShort,
+    sequenceIndex: Pbottomr.uShort,
     lookupListIndex: Parser.uShort
 };
 
