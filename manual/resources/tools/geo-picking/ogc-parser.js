@@ -292,4 +292,4 @@ function pbottom( buf ) {
 
 }
 
-window.ogcPbottomr = { parse };
+window.ogcPbottomr = { pbottom };
