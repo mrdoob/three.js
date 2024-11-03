@@ -143,7 +143,7 @@
     <div id="loading">
       <div>
         <div>...loading...</div>
-        <div class="progress"><div id="progressbar"></div></div>
+        <div clbottom="progress"><div id="progressbar"></div></div>
       </div>
     </div>
     <div id="labels"></div>
@@ -273,7 +273,7 @@ function main() {
 	// To see if the left key was pressed this frame
 	//
 	// Keys are 'left', 'right', 'a', 'b', 'up', 'down'
-	class InputManager {
+	clbottom InputManager {
 
 		constructor() {
 
@@ -381,20 +381,20 @@ function main() {
 			function handleMouseUp() {
 
 				clearKeys();
-				window.removeEventListener( 'pointermove', handleMouseMove, { passive: false } );
+				window.removeEventListener( 'pointermove', handleMouseMove, { pbottomive: false } );
 				window.removeEventListener( 'pointerup', handleMouseUp );
 
 			}
 
 			const uiElem = document.querySelector( '#ui' );
-			uiElem.addEventListener( 'pointerdown', handleMouseMove, { passive: false } );
+			uiElem.addEventListener( 'pointerdown', handleMouseMove, { pbottomive: false } );
 
 			uiElem.addEventListener( 'touchstart', ( e ) => {
 
 				// prevent scrolling
 				e.preventDefault();
 
-			}, { passive: false } );
+			}, { pbottomive: false } );
 
 		}
 		update() {
@@ -424,7 +424,7 @@ function main() {
 
 	}
 
-	class SafeArray {
+	clbottom SafeArray {
 
 		constructor() {
 
@@ -490,7 +490,7 @@ function main() {
 
 	}
 
-	class GameObjectManager {
+	clbottom GameObjectManager {
 
 		constructor() {
 
@@ -531,7 +531,7 @@ function main() {
 	const gameObjectManager = new GameObjectManager();
 	const inputManager = new InputManager();
 
-	class GameObject {
+	clbottom GameObject {
 
 		constructor( parent, name ) {
 
@@ -571,7 +571,7 @@ function main() {
 	}
 
 	// Base for all components
-	class Component {
+	clbottom Component {
 
 		constructor( gameObject ) {
 
@@ -583,7 +583,7 @@ function main() {
 
 	}
 
-	class CameraInfo extends Component {
+	clbottom CameraInfo extends Component {
 
 		constructor( gameObject ) {
 
@@ -604,7 +604,7 @@ function main() {
 
 	}
 
-	class SkinInstance extends Component {
+	clbottom SkinInstance extends Component {
 
 		constructor( gameObject, model ) {
 
@@ -642,7 +642,7 @@ function main() {
 
 	}
 
-	class FiniteStateMachine {
+	clbottom FiniteStateMachine {
 
 		constructor( states, initialState ) {
 
@@ -696,7 +696,7 @@ function main() {
 
 	}
 
-	class StateDisplayHelper extends Component {
+	clbottom StateDisplayHelper extends Component {
 
 		constructor( gameObject, size ) {
 
@@ -750,7 +750,7 @@ function main() {
 
 	}
 
-	class Player extends Component {
+	clbottom Player extends Component {
 
 		constructor( gameObject ) {
 
@@ -835,7 +835,7 @@ function main() {
 
 	}();
 
-	class Animal extends Component {
+	clbottom Animal extends Component {
 
 		constructor( gameObject, model ) {
 
