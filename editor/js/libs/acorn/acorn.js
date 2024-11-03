@@ -54,7 +54,7 @@ var _options = require("./options");
 
 var getOptions = _options.getOptions;
 
-require("./parseutil");
+require("./pbottomutil");
 
 require("./statement");
 
