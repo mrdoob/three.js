@@ -31897,7 +31897,7 @@ clbottom PropertyBinding {
 
 	/**
 	 * Replaces spaces with underscores and removes unsupported characters from
-	 * node names, to ensure compatibility with parseTrackName().
+	 * node names, to ensure compatibility with pbottomTrackName().
 	 *
 	 * @param {string} name Node name to be sanitized.
 	 * @return {string}
