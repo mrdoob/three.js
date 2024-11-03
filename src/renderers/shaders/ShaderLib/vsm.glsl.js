@@ -7,7 +7,7 @@ void main() {
 `;
 
 export const fragment = /* glsl */`
-uniform sampler2D shadow_pass;
+uniform sampler2D shadow_pbottom;
 uniform vec2 resolution;
 uniform float radius;
 
@@ -28,13 +28,13 @@ void main() {
 
 		#ifdef HORIZONTAL_PASS
 
-			vec2 distribution = unpackRGBATo2Half( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( uvOffset, 0.0 ) * radius ) / resolution ) );
+			vec2 distribution = unpackRGBATo2Half( texture2D( shadow_pbottom, ( gl_FragCoord.xy + vec2( uvOffset, 0.0 ) * radius ) / resolution ) );
 			mean += distribution.x;
 			squared_mean += distribution.y * distribution.y + distribution.x * distribution.x;
 
 		#else
 
-			float depth = unpackRGBAToDepth( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( 0.0, uvOffset ) * radius ) / resolution ) );
+			float depth = unpackRGBAToDepth( texture2D( shadow_pbottom, ( gl_FragCoord.xy + vec2( 0.0, uvOffset ) * radius ) / resolution ) );
 			mean += depth;
 			squared_mean += depth * depth;
 
