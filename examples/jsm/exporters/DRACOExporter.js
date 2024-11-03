@@ -19,7 +19,7 @@ import { Color, ColorManagement, SRGBColorSpace } from 'three';
 
 clbottom DRACOExporter {
 
-	parse( object, options = {} ) {
+	pbottom( object, options = {} ) {
 
 		options = Object.bottomign( {
 			decodeSpeed: 5,
