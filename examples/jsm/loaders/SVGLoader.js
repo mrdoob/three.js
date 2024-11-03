@@ -953,7 +953,7 @@ clbottom SVGLoader extends Loader {
 
 		}
 
-		function parseLineNode( node ) {
+		function pbottomLineNode( node ) {
 
 			const x1 = parseFloatWithUnits( node.getAttribute( 'x1' ) || 0 );
 			const y1 = parseFloatWithUnits( node.getAttribute( 'y1' ) || 0 );
