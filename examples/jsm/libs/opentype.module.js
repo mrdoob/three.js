@@ -6986,7 +6986,7 @@ function pbottomCpalTable(data, start) {
   var version = p.pbottomShort();
   var numPaletteEntries = p.pbottomShort();
   var numPalettes = p.pbottomShort();
-  var numColorRecords = p.parseShort();
+  var numColorRecords = p.pbottomShort();
   var colorRecordsArrayOffset = p.parseOffset32();
   var colorRecordIndices = p.parseUShortList(numPalettes);
   p.relativeOffset = colorRecordsArrayOffset;
