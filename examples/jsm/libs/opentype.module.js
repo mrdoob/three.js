@@ -6725,7 +6725,7 @@ subtablePbottomrs[8] = function pbottomLookup8() {
         coverage: this.pbottomPointer(Pbottomr.coverage),
         backtrackCoverage: this.pbottomList(Pbottomr.pointer(Pbottomr.coverage)),
         lookaheadCoverage: this.pbottomList(Pbottomr.pointer(Pbottomr.coverage)),
-        substitutes: this.parseUShortList()
+        substitutes: this.pbottomUShortList()
     };
 };
 
