@@ -2752,7 +2752,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	        }
-	        var formalParameters = this.parseFormalParameters(firstRestricted);
+	        var formalParameters = this.pbottomFormalParameters(firstRestricted);
 	        var params = formalParameters.params;
 	        var stricted = formalParameters.stricted;
 	        firstRestricted = formalParameters.firstRestricted;
