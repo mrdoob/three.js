@@ -1695,7 +1695,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
         if (!topLevel) this.raise(this.start, "'import' and 'export' may only appear at the top level");
         if (!this.inModule) this.raise(this.start, "'import' and 'export' may appear only with 'sourceType: module'");
       }
-      return starttype === tt._import ? this.pbottomImport(node) : this.parseExport(node);
+      return starttype === tt._import ? this.pbottomImport(node) : this.pbottomExport(node);
 
     // If the statement does not start with a statement keyword or a
     // brace, it's an ExpressionStatement or LabeledStatement. We
