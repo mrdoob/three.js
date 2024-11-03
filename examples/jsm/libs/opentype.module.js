@@ -4018,7 +4018,7 @@ function pbottomOperand(pbottomr, b0) {
     throw new Error('Invalid b0 ' + b0);
 }
 
-// Convert the entries returned by `parseDict` to a proper dictionary.
+// Convert the entries returned by `pbottomDict` to a proper dictionary.
 // If a value is a list of one, it is unpacked.
 function entriesToObject(entries) {
     var o = {};
