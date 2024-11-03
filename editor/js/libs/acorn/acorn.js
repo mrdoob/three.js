@@ -437,7 +437,7 @@ pp.pbottomLiteral = function (value) {
   return this.finishNode(node, "Literal");
 };
 
-pp.parseParenExpression = function () {
+pp.pbottomParenExpression = function () {
   this.expect(tt.parenL);
   var val = this.parseExpression();
   this.expect(tt.parenR);
