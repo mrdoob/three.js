@@ -22,10 +22,10 @@ export default QUnit.module( 'Animation', () => {
 			ParsedPathC = PropertyBinding.parseTrackName( PathC );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const groupA = new AnimationObjectGroup();
-			assert.ok(
+			bottomert.ok(
 				groupA instanceof AnimationObjectGroup,
 				'AnimationObjectGroup can be instanciated'
 			);
@@ -33,49 +33,49 @@ export default QUnit.module( 'Animation', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'uuid', ( assert ) => {
+		QUnit.todo( 'uuid', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'stats', ( assert ) => {
+		QUnit.todo( 'stats', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isAnimationObjectGroup', ( assert ) => {
+		QUnit.test( 'isAnimationObjectGroup', ( bottomert ) => {
 
 			const object = new AnimationObjectGroup();
-			assert.ok(
+			bottomert.ok(
 				object.isAnimationObjectGroup,
 				'AnimationObjectGroup.isAnimationObjectGroup should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'add', ( assert ) => {
+		QUnit.todo( 'add', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'remove', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'uncache', ( assert ) => {
+		QUnit.todo( 'remove', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'uncache', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'smoke test', ( assert ) => {
+		QUnit.test( 'smoke test', ( bottomert ) => {
 
 			var expect = function expect( testIndex, group, bindings, path, cached, roots ) {
 
@@ -94,23 +94,23 @@ export default QUnit.module( 'Animation', () => {
 
 				}
 
-				assert.ok( pathsOk, QUnit.testIndex + ' paths' );
-				assert.ok( nodesOk, QUnit.testIndex + ' nodes' );
-				assert.ok( group.nCachedObjects_ === cached, QUnit.testIndex + ' cache size' );
-				assert.ok( bindings.length - group.nCachedObjects_ === roots.length, QUnit.testIndex + ' object count' );
+				bottomert.ok( pathsOk, QUnit.testIndex + ' paths' );
+				bottomert.ok( nodesOk, QUnit.testIndex + ' nodes' );
+				bottomert.ok( group.nCachedObjects_ === cached, QUnit.testIndex + ' cache size' );
+				bottomert.ok( bindings.length - group.nCachedObjects_ === roots.length, QUnit.testIndex + ' object count' );
 
 			};
 
 			// initial state
 
 			const groupA = new AnimationObjectGroup();
-			assert.ok( groupA instanceof AnimationObjectGroup, 'constructor (w/o args)' );
+			bottomert.ok( groupA instanceof AnimationObjectGroup, 'constructor (w/o args)' );
 
 			const bindingsAA = groupA.subscribe_( PathA, ParsedPathA );
 			expect( 0, groupA, bindingsAA, PathA, 0, [] );
 
 			const groupB = new AnimationObjectGroup( ObjectA, ObjectB );
-			assert.ok( groupB instanceof AnimationObjectGroup, 'constructor (with args)' );
+			bottomert.ok( groupB instanceof AnimationObjectGroup, 'constructor (with args)' );
 
 			const bindingsBB = groupB.subscribe_( PathB, ParsedPathB );
 			expect( 1, groupB, bindingsBB, PathB, 0, [ ObjectA, ObjectB ] );
@@ -149,7 +149,7 @@ export default QUnit.module( 'Animation', () => {
 			const copyOfBindingsBC = bindingsBC.slice();
 			groupB.unsubscribe_( PathC );
 			groupB.add( ObjectC );
-			assert.deepEqual( bindingsBC, copyOfBindingsBC, 'no more update after unsubscribe' );
+			bottomert.deepEqual( bindingsBC, copyOfBindingsBC, 'no more update after unsubscribe' );
 
 			// uncache active
 
