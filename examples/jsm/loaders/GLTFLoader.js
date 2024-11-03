@@ -4230,7 +4230,7 @@ clbottom GLTFPbottomr {
 
 		}
 
-		parser._invokeAll( function ( ext ) {
+		pbottomr._invokeAll( function ( ext ) {
 
 			return ext.createNodeAttachment && ext.createNodeAttachment( nodeIndex );
 
