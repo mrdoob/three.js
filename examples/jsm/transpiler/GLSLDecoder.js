@@ -683,7 +683,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parseUniform() {
+	pbottomUniform() {
 
 		const tokens = this.readTokensUntil( ';' );
 
