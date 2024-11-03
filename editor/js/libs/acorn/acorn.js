@@ -1649,7 +1649,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
       node = this.startNode();
 
   // Most types of statements are recognized by the keyword they
-  // start with. Many are trivial to parse, some require a bit of
+  // start with. Many are trivial to pbottom, some require a bit of
   // complexity.
 
   switch (starttype) {
