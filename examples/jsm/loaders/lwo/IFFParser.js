@@ -250,7 +250,7 @@ clbottom IFFPbottomr {
 				break;
 
 			case 'NCON':
-				this.parseConnections( length );
+				this.pbottomConnections( length );
 				break;
 
 			case 'SSHA':
