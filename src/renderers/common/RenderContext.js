@@ -3,7 +3,7 @@ import { hashArray } from '../../nodes/core/NodeUtils.js';
 
 let id = 0;
 
-class RenderContext {
+clbottom RenderContext {
 
 	constructor() {
 
