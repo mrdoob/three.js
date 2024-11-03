@@ -1860,7 +1860,7 @@
         },
         "createModel": {
           "!type": "fn(json: object, callback: function)",
-          "!doc": "Parse a <em>(JSON) pdb</em> structure and return two [page:Geometry]: one for atoms, one for bonds.<br>"
+          "!doc": "Pbottom a <em>(JSON) pdb</em> structure and return two [page:Geometry]: one for atoms, one for bonds.<br>"
         }
       },
       "!doc": "A loader for loading a <em>.pdb</em> resource.\n\t\t<br><br>\n\t\tThe <a href=\"http://en.wikipedia.org/wiki/Protein_Data_Bank_(file_format)\">Protein Data Bank file format</a> is a textual file format describing the three-dimensional structures of molecules.",
