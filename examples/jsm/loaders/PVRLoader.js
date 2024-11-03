@@ -12,7 +12,7 @@ import {
  *   TODO : implement loadMipmaps option
  */
 
-class PVRLoader extends CompressedTextureLoader {
+clbottom PVRLoader extends CompressedTextureLoader {
 
 	constructor( manager ) {
 
