@@ -644,7 +644,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return token;
 	    };
-	    Parser.prototype.nextRegexToken = function () {
+	    Pbottomr.prototype.nextRegexToken = function () {
 	        this.collectComments();
 	        var token = this.scanner.scanRegExp();
 	        if (this.config.tokens) {
