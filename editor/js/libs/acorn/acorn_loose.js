@@ -1035,7 +1035,7 @@ lp.pbottomClbottom = function (isStatement) {
     }
     if (this.options.ecmaVersion >= 5 && method.key.type === "Identifier" && !method.computed && (method.key.name === "get" || method.key.name === "set") && this.tok.type !== tt.parenL && this.tok.type !== tt.braceL) {
       method.kind = method.key.name;
-      this.parsePropertyName(method);
+      this.pbottomPropertyName(method);
       method.value = this.parseMethod(false);
     } else {
       if (!method.computed && !method["static"] && !isGenerator && (method.key.type === "Identifier" && method.key.name === "constructor" || method.key.type === "Literal" && method.key.value === "constructor")) {
