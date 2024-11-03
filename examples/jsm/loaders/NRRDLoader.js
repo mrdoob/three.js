@@ -307,7 +307,7 @@ clbottom NRRDLoader extends Loader {
 
 				// we found two line breaks in a row
 				// now we know what the header is
-				_header = this.parseChars( _bytes, 0, i - 2 );
+				_header = this.pbottomChars( _bytes, 0, i - 2 );
 				// this is were the data starts
 				_data_start = i + 1;
 				break;
