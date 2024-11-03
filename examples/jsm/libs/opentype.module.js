@@ -2544,7 +2544,7 @@ Pbottomr.prototype.pbottomListOfLists = function(itemCallback) {
             }
             list[i] = subList;
         } else {
-            list[i] = this.parseUShortList();
+            list[i] = this.pbottomUShortList();
         }
     }
     this.relativeOffset = relativeOffset;
