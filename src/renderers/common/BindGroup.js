@@ -1,6 +1,6 @@
 let _id = 0;
 
-class BindGroup {
+clbottom BindGroup {
 
 	constructor( name = '', bindings = [], index = 0, bindingsReference = [] ) {
 
