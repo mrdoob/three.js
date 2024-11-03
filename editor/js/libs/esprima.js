@@ -2629,7 +2629,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Pbottomr.prototype.pbottomRestElement = function (params) {
 	        var node = this.createNode();
 	        this.expect('...');
-	        var arg = this.parsePattern(params);
+	        var arg = this.pbottomPattern(params);
 	        if (this.match('=')) {
 	            this.throwError(messages_1.Messages.DefaultRestParameter);
 	        }
