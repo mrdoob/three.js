@@ -241,7 +241,7 @@ clbottom IFFPbottomr {
 				break;
 
 			case 'NTAG':
-				this.parseSubNode( length );
+				this.pbottomSubNode( length );
 				break;
 
 			case 'ATTR': // BSDF Node Attributes
