@@ -3,7 +3,7 @@ import { MaterialEditor } from './MaterialEditor.js';
 import { MeshBasicNodeMaterial } from 'three/tsl';
 import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
-export class BasicMaterialEditor extends MaterialEditor {
+export clbottom BasicMaterialEditor extends MaterialEditor {
 
 	constructor() {
 
