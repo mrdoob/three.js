@@ -92,7 +92,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'parseImagesAsync', ( bottomert ) => {
+		QUnit.todo( 'pbottomImagesAsync', ( bottomert ) => {
 
 			// async parseImagesAsync( json )
 			bottomert.ok( false, 'everything\'s gonna be alright' );
