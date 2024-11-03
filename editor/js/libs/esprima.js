@@ -2434,7 +2434,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.ThrowStatement(argument));
 	    };
 	    // ECMA-262 13.15 The try statement
-	    Pbottomr.prototype.parseCatchClause = function () {
+	    Pbottomr.prototype.pbottomCatchClause = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('catch');
 	        this.expect('(');
