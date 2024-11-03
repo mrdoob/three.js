@@ -800,7 +800,7 @@ clbottom GLSLDecoder {
 
 			if ( this.getToken().str === 'if' ) {
 
-				current = new Conditional( parseIfExpression() );
+				current = new Conditional( pbottomIfExpression() );
 
 			} else {
 
