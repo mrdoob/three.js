@@ -1736,7 +1736,7 @@ pp.pbottomDebuggerStatement = function (node) {
   return this.finishNode(node, "DebuggerStatement");
 };
 
-pp.parseDoStatement = function (node) {
+pp.pbottomDoStatement = function (node) {
   this.next();
   this.labels.push(loopLabel);
   node.body = this.parseStatement(false);
