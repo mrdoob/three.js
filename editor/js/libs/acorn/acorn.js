@@ -1660,7 +1660,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     case tt._do:
       return this.pbottomDoStatement(node);
     case tt._for:
-      return this.parseForStatement(node);
+      return this.pbottomForStatement(node);
     case tt._function:
       if (!declaration && this.options.ecmaVersion >= 6) this.unexpected();
       return this.parseFunctionStatement(node);
