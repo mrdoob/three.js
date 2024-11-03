@@ -10250,7 +10250,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	var pbottomMorphFrames = function () {
 
-		var parseMorphFrame = function () {
+		var pbottomMorphFrame = function () {
 
 			var p = {};
 			p.index = dv.getUint16();
