@@ -11,7 +11,7 @@
 
 		<h2>Aperçu</h2>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Dans le système d'animation de three.js vous pouvez animer différentes propriétés de vos modèles:
 			les os d'un [page:SkinnedMesh skinned and rigged model], les morph targets, les différentes propriétés des matériaux
 			(couleurs, opacité, booléens), la visibilité et les transformations. Les propriétés animées peuvent avoir différentes animations comme un fade-in,
@@ -22,7 +22,7 @@
 
 			Pour effectuer tout cela dans un système homogène, le système d'animation three.js 
 			[link:https://github.com/mrdoob/three.js/issues/6881 a complètement changé en 2015]
-			(attention aux informations dépassées!), et a maintenant une architecture similaire à
+			(attention aux informations dépbottomées!), et a maintenant une architecture similaire à
 			Unity/Unreal Engine 4. Cette page offre un bref aperçu des principaux composants du système
 			et de comment ils fonctionnent ensemble.
 
@@ -30,7 +30,7 @@
 
 		<h3>Animation Clips</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			Si vous aveez réussi à importer un modèle 3D (peu importe qu'il ait
 			des os ou une morph targets ou les deux) — par exemple en l'exportant depuis Blender avec le
@@ -47,7 +47,7 @@
 
 		<h3>Keyframe Tracks</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			A l'intérieur d'un `AnimationClip` les données pour chaque propriétés animées sont stockées
 			dans un [page:KeyframeTrack] séparé. En considérant que l'objet personnage a un [page:Skeleton skeleton],
@@ -65,7 +65,7 @@
 
 		<h3>Mixer d'Animations</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			Les informations stockées représentent uniquement la base de l'animation - le playback est en réalité contrôlé par
 			l'[page:AnimationMixer]. Vous vous doutez bien que ce n'est pas uniquement un visualiseur d'animations, mais
@@ -76,7 +76,7 @@
 
 		<h3>Actions d'Animations</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			L'`AnimationMixer` en lui-même a seulement quelques propriétés (générales) et méthodes, car il
 			peut-être contrôlé par l'[page:AnimationAction AnimationActions]. En configurant un
@@ -89,7 +89,7 @@
 
 		<h3>Animations de Groupes d'Objets</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			Si vous voulez qu'un groupe d'objets reçoive un statut d'animation partagé, vous pouvez utiliser un
 			[page:AnimationObjectGroup].
@@ -98,7 +98,7 @@
 
 		<h3>Formats et loaders supportés</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Notez que tous les formats de modèles n'incluent pas les animations (notamment OBJ ne les supporte pas), et que seulement certains
 			loaders three.js supportent les séquences d'[page:AnimationClip AnimationClip]. Plusieurs autres <i>supportent</i>
 			ce type d'animations:
@@ -113,7 +113,7 @@
 				<li>THREE.MMDLoader</li>
 			</ul>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Notez que 3ds max et Maya ne peuvent actuellement pas exporter plusieurs animations (qui ne sont pas sur
 			la même timeline) directement dans un seul fichier.
 		</p>
