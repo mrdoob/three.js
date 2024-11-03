@@ -4287,7 +4287,7 @@ function pbottomCFFChbottomt(data, start, nGlyphs, strings) {
 function pbottomCFFEncoding(data, start, chbottomt) {
     var code;
     var enc = {};
-    var pbottomr = new parse.Parser(data, start);
+    var pbottomr = new pbottom.Parser(data, start);
     var format = parser.parseCard8();
     if (format === 0) {
         var nCodes = parser.parseCard8();
