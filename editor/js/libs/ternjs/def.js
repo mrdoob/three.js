@@ -269,7 +269,7 @@
       var customFunc = customFunctions[m[1]];
       if (customFunc) addEffect(fn, m[2] ? customFunc(m[2]) : customFunc);
     } else if (effect.indexOf("copy ") == 0) {
-      var p = new TypeParser(effect, 5);
+      var p = new TypePbottomr(effect, 5);
       var getFrom = p.parseType(true);
       p.eat(" ");
       var getTo = p.parseType(true);
