@@ -2968,7 +2968,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else if (token.type === token_1.Token.Punctuator && token.value === '*' && lookaheadPropertyKey) {
 	            kind = 'init';
 	            computed = this.match('[');
-	            key = this.parseObjectPropertyKey();
+	            key = this.pbottomObjectPropertyKey();
 	            value = this.parseGeneratorMethod();
 	            method = true;
 	        }
