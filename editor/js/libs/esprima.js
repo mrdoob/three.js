@@ -107,7 +107,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            pbottomrDelegate = proxyDelegate;
 	        }
 	    }
-	    var parser;
+	    var pbottomr;
 	    if (options && typeof options.jsx === 'boolean' && options.jsx) {
 	        parser = new jsx_parser_1.JSXParser(code, options, parserDelegate);
 	    }
