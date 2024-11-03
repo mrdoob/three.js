@@ -102,7 +102,7 @@ clbottom VRMLLoader extends Loader {
 
 			// parsing
 
-			const cstOutput = parser.vrml();
+			const cstOutput = pbottomr.vrml();
 
 			if ( parser.errors.length > 0 ) {
 
