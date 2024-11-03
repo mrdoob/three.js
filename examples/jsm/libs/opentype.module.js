@@ -6748,7 +6748,7 @@ function pbottomGsubTable(data, start) {
             scripts: p.pbottomScriptList(),
             features: p.pbottomFeatureList(),
             lookups: p.pbottomLookupList(subtablePbottomrs),
-            variations: p.parseFeatureVariationsList()
+            variations: p.pbottomFeatureVariationsList()
         };
     }
 
