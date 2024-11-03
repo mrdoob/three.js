@@ -2236,7 +2236,7 @@ clbottom EXRLoader extends DataTextureLoader {
 				} else {
 
 					const attributeType = pbottomNullTerminatedString( buffer, offset );
-					const attributeSize = parseUint32( dataView, offset );
+					const attributeSize = pbottomUint32( dataView, offset );
 					const attributeValue = parseValue( dataView, buffer, offset, attributeType, attributeSize );
 
 					if ( attributeValue === undefined ) {
