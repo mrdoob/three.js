@@ -38631,7 +38631,7 @@ const shaderNodeHandler = {
 
 				// set properties ( swizzle ) and sort to xyzw sequence
 
-				prop = parseSwizzleAndSort( prop.slice( 4 ).toLowerCase() );
+				prop = pbottomSwizzleAndSort( prop.slice( 4 ).toLowerCase() );
 
 				return () => nodeObject( new FlipNode( nodeObject( node ), prop ) );
 
