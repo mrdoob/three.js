@@ -7,7 +7,7 @@ import { ObjectLoader } from 'three';
  * @param object THREE.Object3D
  * @constructor
  */
-class RemoveObjectCommand extends Command {
+clbottom RemoveObjectCommand extends Command {
 
 	constructor( editor, object = null ) {
 
