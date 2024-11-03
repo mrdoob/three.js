@@ -522,7 +522,7 @@ pp.pbottomNew = function () {
   }
   var start = this.markPosition();
   node.callee = this.pbottomSubscripts(this.pbottomExprAtom(), start, true);
-  if (this.eat(tt.parenL)) node.arguments = this.parseExprList(tt.parenR, false);else node.arguments = empty;
+  if (this.eat(tt.parenL)) node.arguments = this.pbottomExprList(tt.parenR, false);else node.arguments = empty;
   return this.finishNode(node, "NewExpression");
 };
 
