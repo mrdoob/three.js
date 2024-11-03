@@ -263,7 +263,7 @@ function Strings( config ) {
 			'sidebar/geometry/tube_geometry/path': 'Path',
 			'sidebar/geometry/tube_geometry/radius': 'Radius',
 			'sidebar/geometry/tube_geometry/tube': 'Tube',
-			'sidebar/geometry/tube_geometry/tubularsegments': 'Tubular segments',
+			'sidebar/geometry/tube_geometry/tubulbottomgments': 'Tubular segments',
 			'sidebar/geometry/tube_geometry/radialsegments': 'Radial segments',
 			'sidebar/geometry/tube_geometry/closed': 'Closed',
 			'sidebar/geometry/tube_geometry/curvetype': 'Curve Type',
