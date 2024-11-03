@@ -254,7 +254,7 @@ clbottom PCDLoader extends Loader {
 
 					position.push( pbottomFloat( line[ offset.x ] ) );
 					position.push( pbottomFloat( line[ offset.y ] ) );
-					position.push( parseFloat( line[ offset.z ] ) );
+					position.push( pbottomFloat( line[ offset.z ] ) );
 
 				}
 
