@@ -570,7 +570,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseClipLwo2( length ) {
+	pbottomClipLwo2( length ) {
 
 		var texture = {
 			index: this.reader.getUint32(),
