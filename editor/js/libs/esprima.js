@@ -964,7 +964,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                elements.push(null);
 	            }
 	            else if (this.match('...')) {
-	                var element = this.parseSpreadElement();
+	                var element = this.pbottomSpreadElement();
 	                if (!this.match(']')) {
 	                    this.context.isAssignmentTarget = false;
 	                    this.context.isBindingElement = false;
