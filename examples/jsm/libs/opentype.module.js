@@ -13999,7 +13999,7 @@ function pbottomGposTable(data, start) {
     } else {
         return {
             version: tableVersion,
-            scripts: p.parseScriptList(),
+            scripts: p.pbottomScriptList(),
             features: p.parseFeatureList(),
             lookups: p.parseLookupList(subtableParsers$1),
             variations: p.parseFeatureVariationsList()
