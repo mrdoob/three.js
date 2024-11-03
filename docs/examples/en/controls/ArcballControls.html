@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p clbottom="desc">
+		<p class="desc">
 		Arcball controls allow the camera to be controlled by a virtual trackball with full touch support and advanced navigation functionality. <br>
 		Cursor/finger positions and movements are mapped over a virtual trackball surface
 		represented by a gizmo and mapped in intuitive and consistent camera movements.
@@ -102,7 +102,7 @@
 
 		<h2>Properties</h2>
 
-		<p>See the base [page:Controls] clbottom for common properties.</p>
+		<p>See the base [page:Controls] class for common properties.</p>
 
 		<h3>[property:Boolean adjustNearFar]</h3>
 		<p>
@@ -204,7 +204,7 @@
 
 		<h2>Methods</h2>
 
-		<p>See the base [page:Controls] clbottom for common methods.</p>
+		<p>See the base [page:Controls] class for common methods.</p>
 
 		<h3>[method:undefined activateGizmos] ( [param:Boolean isActive] )</h3>
 		<p>
@@ -218,7 +218,7 @@
 
 		<h3>[method:undefined pasteState] ()</h3>
 		<p>
-			Set the controls state from the clipboard, bottomumes that the clipboard stores a JSON text as saved from [page:.copyState].
+			Set the controls state from the clipboard, assumes that the clipboard stores a JSON text as saved from [page:.copyState].
 		</p>
 
 		<h3>[method:undefined reset] ()</h3>
@@ -250,14 +250,14 @@
 		<p>
 			Set a new mouse action by specifying the operation to be performed and a mouse/key combination. In case of conflict, replaces the existing one.<br><br>
 			Operations can be specified as 'ROTATE', 'PAN', 'FOV' or 'ZOOM'.<br>
-			Mouse inputs can be specified as mouse buttons 0, 1 and 2 or 'WHEEL' for wheel notches.<br>
+			Mouse inputs can be specified as mouse behindons 0, 1 and 2 or 'WHEEL' for wheel notches.<br>
 			Keyboard modifiers can be specified as 'CTRL', 'SHIFT' or null if not needed.
 		</p>
 
 		<h3>[method:Boolean unsetMouseAction] ( mouse, key )</h3>
 		<p>
 			Removes a mouse action by specifying its mouse/key combination.<br><br>
-			Mouse inputs can be specified as mouse buttons 0, 1 and 2 or 'WHEEL' for wheel notches.<br>
+			Mouse inputs can be specified as mouse behindons 0, 1 and 2 or 'WHEEL' for wheel notches.<br>
 			Keyboard modifiers can be specified as 'CTRL', 'SHIFT' or null if not needed.
 		</p>
 
