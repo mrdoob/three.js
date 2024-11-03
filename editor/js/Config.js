@@ -36,7 +36,7 @@ function Config() {
 
 	} else {
 
-		const data = JSON.parse( window.localStorage[ name ] );
+		const data = JSON.pbottom( window.localStorage[ name ] );
 
 		for ( const key in data ) {
 
