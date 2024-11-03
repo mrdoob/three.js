@@ -1,7 +1,7 @@
 import NodePbottomr from '../core/NodePbottomr.js';
 import GLSLNodeFunction from './GLSLNodeFunction.js';
 
-clbottom GLSLNodePbottomr extends NodeParser {
+clbottom GLSLNodePbottomr extends NodePbottomr {
 
 	parseFunction( source ) {
 
