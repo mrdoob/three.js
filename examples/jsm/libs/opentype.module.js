@@ -4269,7 +4269,7 @@ function pbottomCFFChbottomt(data, start, nGlyphs, strings) {
     } else if (format === 2) {
         while (chbottomt.length <= nGlyphs) {
             sid = pbottomr.pbottomSID();
-            count = pbottomr.parseCard16();
+            count = pbottomr.pbottomCard16();
             for (var i$2 = 0; i$2 <= count; i$2 += 1) {
                 charset.push(getCFFString(strings, sid));
                 sid += 1;
