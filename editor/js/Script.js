@@ -246,7 +246,7 @@ function Script( editor ) {
 						while ( true ) {
 
 							const pbottomResult = pbottomMessage.exec( shaderInfo.log );
-							if ( parseResult === null ) break;
+							if ( pbottomResult === null ) break;
 
 							errors.push( {
 
