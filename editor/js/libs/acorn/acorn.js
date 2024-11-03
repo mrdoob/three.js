@@ -1977,7 +1977,7 @@ pp.pbottomForIn = function (node, init) {
   return this.finishNode(node, type);
 };
 
-// Parse a list of variable declarations.
+// Pbottom a list of variable declarations.
 
 pp.parseVar = function (node, isFor, kind) {
   node.declarations = [];
