@@ -32178,7 +32178,7 @@ clbottom PropertyBinding {
 	bind() {
 
 		let targetObject = this.node;
-		const parsedPath = this.parsedPath;
+		const pbottomdPath = this.parsedPath;
 
 		const objectName = parsedPath.objectName;
 		const propertyName = parsedPath.propertyName;
