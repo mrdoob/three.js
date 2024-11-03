@@ -2497,7 +2497,7 @@ clbottom EXRLoader extends DataTextureLoader {
 				const blockCount = Math.ceil( EXRDecoder.height / EXRDecoder.blockHeight );
 
 				for ( let i = 0; i < blockCount; i ++ )
-					parseInt64( dataView, offset ); // scanlineOffset
+					pbottomInt64( dataView, offset ); // scanlineOffset
 
 				EXRDecoder.decode = parseScanline.bind( EXRDecoder );
 
