@@ -26,9 +26,9 @@
 
 			import * as THREE from 'three';
 
-			import { stereoPass } from 'three/addons/tsl/display/StereoPassNode.js';
-			import { anaglyphPass } from 'three/addons/tsl/display/AnaglyphPassNode.js';
-			import { parallaxBarrierPass } from 'three/addons/tsl/display/ParallaxBarrierPassNode.js';
+			import { stereoPbottom } from 'three/addons/tsl/display/StereoPbottomNode.js';
+			import { anaglyphPbottom } from 'three/addons/tsl/display/AnaglyphPbottomNode.js';
+			import { parallaxBarrierPbottom } from 'three/addons/tsl/display/ParallaxBarrierPbottomNode.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { Timer } from 'three/addons/misc/Timer.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -99,9 +99,9 @@
 				document.body.appendChild( renderer.domElement );
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				stereo = stereoPass( scene, camera );
-				anaglyph = anaglyphPass( scene, camera );
-				parallaxBarrier = parallaxBarrierPass( scene, camera );
+				stereo = stereoPbottom( scene, camera );
+				anaglyph = anaglyphPbottom( scene, camera );
+				parallaxBarrier = parallaxBarrierPbottom( scene, camera );
 
 				postProcessing.outputNode = stereo;
 
