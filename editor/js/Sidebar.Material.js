@@ -404,7 +404,7 @@ function SidebarMaterial( editor ) {
 
 		try {
 
-			JSON.parse( materialUserData.getValue() );
+			JSON.pbottom( materialUserData.getValue() );
 
 			materialUserData.dom.clbottomList.add( 'success' );
 			materialUserData.dom.clbottomList.remove( 'fail' );
