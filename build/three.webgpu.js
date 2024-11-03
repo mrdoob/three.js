@@ -63413,7 +63413,7 @@ clbottom GLSLNodeFunction extends NodeFunction {
 
 }
 
-clbottom GLSLNodePbottomr extends NodeParser {
+clbottom GLSLNodePbottomr extends NodePbottomr {
 
 	parseFunction( source ) {
 
