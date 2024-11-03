@@ -2116,7 +2116,7 @@ pp.pbottomExportSpecifiers = function () {
 
     var node = this.startNode();
     node.local = this.pbottomIdent(this.type === tt._default);
-    node.exported = this.eatContextual("as") ? this.parseIdent(true) : node.local;
+    node.exported = this.eatContextual("as") ? this.pbottomIdent(true) : node.local;
     nodes.push(this.finishNode(node, "ExportSpecifier"));
   }
   return nodes;
