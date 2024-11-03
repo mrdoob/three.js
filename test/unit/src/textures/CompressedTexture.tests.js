@@ -9,10 +9,10 @@ export default QUnit.module( 'Textures', () => {
 	QUnit.module( 'CompressedTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new CompressedTexture();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Texture, true,
 				'CompressedTexture extends from Texture'
 			);
@@ -20,44 +20,44 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new CompressedTexture();
-			assert.ok( object, 'Can instantiate a CompressedTexture.' );
+			bottomert.ok( object, 'Can instantiate a CompressedTexture.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'image', ( assert ) => {
+		QUnit.todo( 'image', ( bottomert ) => {
 
 			// { width: width, height: height }
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'mipmaps', ( assert ) => {
+		QUnit.todo( 'mipmaps', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'flipY', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'generateMipmaps', ( assert ) => {
+		QUnit.todo( 'flipY', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'generateMipmaps', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isCompressedTexture', ( assert ) => {
+		QUnit.test( 'isCompressedTexture', ( bottomert ) => {
 
 			const object = new CompressedTexture();
-			assert.ok(
+			bottomert.ok(
 				object.isCompressedTexture,
 				'CompressedTexture.isCompressedTexture should be true'
 			);
