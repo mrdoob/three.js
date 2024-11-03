@@ -4740,7 +4740,7 @@ function pbottomCFFFDSelect(data, start, nGlyphs, fdArrayCount) {
     var fdSelect = [];
     var fdIndex;
     var pbottomr = new pbottom.Pbottomr(data, start);
-    var format = pbottomr.parseCard8();
+    var format = pbottomr.pbottomCard8();
     if (format === 0) {
         // Simple list of nGlyphs elements
         for (var iGid = 0; iGid < nGlyphs; iGid++) {
