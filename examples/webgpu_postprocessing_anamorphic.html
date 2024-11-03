@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, cubeTexture, screenUV, grayscale, uniform } from 'three/tsl';
+			import { pbottom, cubeTexture, screenUV, grayscale, uniform } from 'three/tsl';
 			import { anamorphic } from 'three/addons/tsl/display/AnamorphicNode.js';
 
 			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
@@ -83,19 +83,19 @@
 
 				// post-processing
 
-				const scenePass = pass( scene, camera );
+				const scenePbottom = pbottom( scene, camera );
 
 				const threshold = uniform( 1.4 );
 				const scaleNode = uniform( 5 );
 				const intensity = uniform( 1 );
 				const samples = 64;
 
-				const anamorphicPass = anamorphic( scenePass.getTextureNode(), threshold, scaleNode, samples );
-				anamorphicPass.resolution = new THREE.Vector2( .2, .2 ); // 1 = full resolution
+				const anamorphicPbottom = anamorphic( scenePbottom.getTextureNode(), threshold, scaleNode, samples );
+				anamorphicPbottom.resolution = new THREE.Vector2( .2, .2 ); // 1 = full resolution
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = scenePass.add( anamorphicPass.mul( intensity ) );
-				//postProcessing.outputNode = scenePass.add( anamorphicPass.getTextureNode().gaussianBlur() );
+				postProcessing.outputNode = scenePbottom.add( anamorphicPbottom.mul( intensity ) );
+				//postProcessing.outputNode = scenePbottom.add( anamorphicPbottom.getTextureNode().gaussianBlur() );
 
 				// gui
 
@@ -103,7 +103,7 @@
 				gui.add( intensity, 'value', 0, 4, 0.1 ).name( 'intensity' );
 				gui.add( threshold, 'value', .8, 3, .001 ).name( 'threshold' );
 				gui.add( scaleNode, 'value', 1, 10, 0.1 ).name( 'scale' );
-				gui.add( anamorphicPass.resolution, 'x', .1, 1, 0.1 ).name( 'resolution' ).onChange( ( v ) => anamorphicPass.resolution.y = v );
+				gui.add( anamorphicPbottom.resolution, 'x', .1, 1, 0.1 ).name( 'resolution' ).onChange( ( v ) => anamorphicPbottom.resolution.y = v );
 
 				//
 
