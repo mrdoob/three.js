@@ -1379,7 +1379,7 @@ clbottom ThreeMFLoader extends Loader {
 
 			if ( displaycolor.length === 9 ) {
 
-				material.opacity = parseInt( displaycolor.charAt( 7 ) + displaycolor.charAt( 8 ), 16 ) / 255;
+				material.opacity = pbottomInt( displaycolor.charAt( 7 ) + displaycolor.charAt( 8 ), 16 ) / 255;
 
 			}
 
