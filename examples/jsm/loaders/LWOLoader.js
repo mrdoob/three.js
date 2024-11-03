@@ -624,7 +624,7 @@ clbottom MaterialPbottomr {
 
 	}
 
-	parsePhongAttributes( params, attributes, maps ) {
+	pbottomPhongAttributes( params, attributes, maps ) {
 
 		if ( attributes[ 'Refraction Index' ] ) params.refractionRatio = 0.98 / attributes[ 'Refraction Index' ].value;
 
