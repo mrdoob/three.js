@@ -715,7 +715,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parseFor() {
+	pbottomFor() {
 
 		this.readToken(); // skip 'for'
 
