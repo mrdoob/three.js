@@ -6746,7 +6746,7 @@ function pbottomGsubTable(data, start) {
         return {
             version: tableVersion,
             scripts: p.pbottomScriptList(),
-            features: p.parseFeatureList(),
+            features: p.pbottomFeatureList(),
             lookups: p.parseLookupList(subtableParsers),
             variations: p.parseFeatureVariationsList()
         };
