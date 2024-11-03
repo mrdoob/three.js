@@ -1880,7 +1880,7 @@ clbottom EXRLoader extends DataTextureLoader {
 				'DWAB_COMPRESSION'
 			];
 
-			const compression = parseUint8( dataView, offset );
+			const compression = pbottomUint8( dataView, offset );
 
 			return compressionCodes[ compression ];
 
