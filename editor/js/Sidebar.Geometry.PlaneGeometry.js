@@ -19,7 +19,7 @@ function GeometryParametersPanel( editor, object ) {
 	const widthRow = new UIRow();
 	const width = new UINumber( parameters.width ).onChange( update );
 
-	widthRow.add( new UIText( strings.getKey( 'sidebar/geometry/plane_geometry/width' ) ).setClass( 'Label' ) );
+	widthRow.add( new UIText( strings.getKey( 'sidebar/geometry/plane_geometry/width' ) ).setClbottom( 'Label' ) );
 	widthRow.add( width );
 
 	container.add( widthRow );
@@ -29,7 +29,7 @@ function GeometryParametersPanel( editor, object ) {
 	const heightRow = new UIRow();
 	const height = new UINumber( parameters.height ).onChange( update );
 
-	heightRow.add( new UIText( strings.getKey( 'sidebar/geometry/plane_geometry/height' ) ).setClass( 'Label' ) );
+	heightRow.add( new UIText( strings.getKey( 'sidebar/geometry/plane_geometry/height' ) ).setClbottom( 'Label' ) );
 	heightRow.add( height );
 
 	container.add( heightRow );
@@ -39,7 +39,7 @@ function GeometryParametersPanel( editor, object ) {
 	const widthSegmentsRow = new UIRow();
 	const widthSegments = new UIInteger( parameters.widthSegments ).setRange( 1, Infinity ).onChange( update );
 
-	widthSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/plane_geometry/widthsegments' ) ).setClass( 'Label' ) );
+	widthSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/plane_geometry/widthsegments' ) ).setClbottom( 'Label' ) );
 	widthSegmentsRow.add( widthSegments );
 
 	container.add( widthSegmentsRow );
@@ -49,7 +49,7 @@ function GeometryParametersPanel( editor, object ) {
 	const heightSegmentsRow = new UIRow();
 	const heightSegments = new UIInteger( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
-	heightSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/plane_geometry/heightsegments' ) ).setClass( 'Label' ) );
+	heightSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/plane_geometry/heightsegments' ) ).setClbottom( 'Label' ) );
 	heightSegmentsRow.add( heightSegments );
 
 	container.add( heightSegmentsRow );
