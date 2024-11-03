@@ -60,7 +60,7 @@ export const mx_floor = /*@__PURE__*/ Fn( ( [ x_immutable ] ) => {
 export const mx_floorfrac = /*@__PURE__*/ Fn( ( [ x_immutable, i ] ) => {
 
 	const x = float( x_immutable ).toVar();
-	i.assign( mx_floor( x ) );
+	i.bottomign( mx_floor( x ) );
 
 	return x.sub( float( i ) );
 
@@ -461,7 +461,7 @@ export const mx_hash_int_1 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable ] ) 
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 2 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
+	a.bottomign( b.bottomign( c.bottomign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 
@@ -483,7 +483,7 @@ export const mx_hash_int_2 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_i
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 3 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
+	a.bottomign( b.bottomign( c.bottomign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 	c.addAssign( uint( z ) );
@@ -508,7 +508,7 @@ export const mx_hash_int_3 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_i
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 4 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
+	a.bottomign( b.bottomign( c.bottomign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 	c.addAssign( uint( z ) );
@@ -537,7 +537,7 @@ export const mx_hash_int_4 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_i
 	const x = int( x_immutable ).toVar();
 	const len = uint( uint( 5 ) ).toVar();
 	const a = uint().toVar(), b = uint().toVar(), c = uint().toVar();
-	a.assign( b.assign( c.assign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
+	a.bottomign( b.bottomign( c.bottomign( uint( int( 0xdeadbeef ) ).add( len.shiftLeft( uint( 2 ) ) ).add( uint( 13 ) ) ) ) );
 	a.addAssign( uint( x ) );
 	b.addAssign( uint( y ) );
 	c.addAssign( uint( z ) );
@@ -567,9 +567,9 @@ export const mx_hash_vec3_0 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable ] )
 	const x = int( x_immutable ).toVar();
 	const h = uint( mx_hash_int( x, y ) ).toVar();
 	const result = uvec3().toVar();
-	result.x.assign( h.bitAnd( int( 0xFF ) ) );
-	result.y.assign( h.shiftRight( int( 8 ) ).bitAnd( int( 0xFF ) ) );
-	result.z.assign( h.shiftRight( int( 16 ) ).bitAnd( int( 0xFF ) ) );
+	result.x.bottomign( h.bitAnd( int( 0xFF ) ) );
+	result.y.bottomign( h.shiftRight( int( 8 ) ).bitAnd( int( 0xFF ) ) );
+	result.z.bottomign( h.shiftRight( int( 16 ) ).bitAnd( int( 0xFF ) ) );
 
 	return result;
 
@@ -589,9 +589,9 @@ export const mx_hash_vec3_1 = /*@__PURE__*/ Fn( ( [ x_immutable, y_immutable, z_
 	const x = int( x_immutable ).toVar();
 	const h = uint( mx_hash_int( x, y, z ) ).toVar();
 	const result = uvec3().toVar();
-	result.x.assign( h.bitAnd( int( 0xFF ) ) );
-	result.y.assign( h.shiftRight( int( 8 ) ).bitAnd( int( 0xFF ) ) );
-	result.z.assign( h.shiftRight( int( 16 ) ).bitAnd( int( 0xFF ) ) );
+	result.x.bottomign( h.bitAnd( int( 0xFF ) ) );
+	result.y.bottomign( h.shiftRight( int( 8 ) ).bitAnd( int( 0xFF ) ) );
+	result.z.bottomign( h.shiftRight( int( 16 ) ).bitAnd( int( 0xFF ) ) );
 
 	return result;
 
@@ -1042,7 +1042,7 @@ export const mx_worley_noise_float_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter
 		Loop( { start: - 1, end: int( 1 ), name: 'y', condition: '<=' }, ( { y } ) => {
 
 			const dist = float( mx_worley_distance( localpos, x, y, X, Y, jitter, metric ) ).toVar();
-			sqdist.assign( min( sqdist, dist ) );
+			sqdist.bottomign( min( sqdist, dist ) );
 
 		} );
 
@@ -1050,7 +1050,7 @@ export const mx_worley_noise_float_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter
 
 	If( metric.equal( int( 0 ) ), () => {
 
-		sqdist.assign( sqrt( sqdist ) );
+		sqdist.bottomign( sqrt( sqdist ) );
 
 	} );
 
@@ -1083,12 +1083,12 @@ export const mx_worley_noise_vec2_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 
 			If( dist.lessThan( sqdist.x ), () => {
 
-				sqdist.y.assign( sqdist.x );
-				sqdist.x.assign( dist );
+				sqdist.y.bottomign( sqdist.x );
+				sqdist.x.bottomign( dist );
 
 			} ).ElseIf( dist.lessThan( sqdist.y ), () => {
 
-				sqdist.y.assign( dist );
+				sqdist.y.bottomign( dist );
 
 			} );
 
@@ -1098,7 +1098,7 @@ export const mx_worley_noise_vec2_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 
 	If( metric.equal( int( 0 ) ), () => {
 
-		sqdist.assign( sqrt( sqdist ) );
+		sqdist.bottomign( sqrt( sqdist ) );
 
 	} );
 
@@ -1131,18 +1131,18 @@ export const mx_worley_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 
 			If( dist.lessThan( sqdist.x ), () => {
 
-				sqdist.z.assign( sqdist.y );
-				sqdist.y.assign( sqdist.x );
-				sqdist.x.assign( dist );
+				sqdist.z.bottomign( sqdist.y );
+				sqdist.y.bottomign( sqdist.x );
+				sqdist.x.bottomign( dist );
 
 			} ).ElseIf( dist.lessThan( sqdist.y ), () => {
 
-				sqdist.z.assign( sqdist.y );
-				sqdist.y.assign( dist );
+				sqdist.z.bottomign( sqdist.y );
+				sqdist.y.bottomign( dist );
 
 			} ).ElseIf( dist.lessThan( sqdist.z ), () => {
 
-				sqdist.z.assign( dist );
+				sqdist.z.bottomign( dist );
 
 			} );
 
@@ -1152,7 +1152,7 @@ export const mx_worley_noise_vec3_0 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 
 	If( metric.equal( int( 0 ) ), () => {
 
-		sqdist.assign( sqrt( sqdist ) );
+		sqdist.bottomign( sqrt( sqdist ) );
 
 	} );
 
@@ -1184,7 +1184,7 @@ export const mx_worley_noise_float_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter
 			Loop( { start: - 1, end: int( 1 ), name: 'z', condition: '<=' }, ( { z } ) => {
 
 				const dist = float( mx_worley_distance( localpos, x, y, z, X, Y, Z, jitter, metric ) ).toVar();
-				sqdist.assign( min( sqdist, dist ) );
+				sqdist.bottomign( min( sqdist, dist ) );
 
 			} );
 
@@ -1194,7 +1194,7 @@ export const mx_worley_noise_float_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter
 
 	If( metric.equal( int( 0 ) ), () => {
 
-		sqdist.assign( sqrt( sqdist ) );
+		sqdist.bottomign( sqrt( sqdist ) );
 
 	} );
 
@@ -1231,12 +1231,12 @@ export const mx_worley_noise_vec2_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 
 				If( dist.lessThan( sqdist.x ), () => {
 
-					sqdist.y.assign( sqdist.x );
-					sqdist.x.assign( dist );
+					sqdist.y.bottomign( sqdist.x );
+					sqdist.x.bottomign( dist );
 
 				} ).ElseIf( dist.lessThan( sqdist.y ), () => {
 
-					sqdist.y.assign( dist );
+					sqdist.y.bottomign( dist );
 
 				} );
 
@@ -1248,7 +1248,7 @@ export const mx_worley_noise_vec2_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 
 	If( metric.equal( int( 0 ) ), () => {
 
-		sqdist.assign( sqrt( sqdist ) );
+		sqdist.bottomign( sqrt( sqdist ) );
 
 	} );
 
@@ -1285,18 +1285,18 @@ export const mx_worley_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 
 				If( dist.lessThan( sqdist.x ), () => {
 
-					sqdist.z.assign( sqdist.y );
-					sqdist.y.assign( sqdist.x );
-					sqdist.x.assign( dist );
+					sqdist.z.bottomign( sqdist.y );
+					sqdist.y.bottomign( sqdist.x );
+					sqdist.x.bottomign( dist );
 
 				} ).ElseIf( dist.lessThan( sqdist.y ), () => {
 
-					sqdist.z.assign( sqdist.y );
-					sqdist.y.assign( dist );
+					sqdist.z.bottomign( sqdist.y );
+					sqdist.y.bottomign( dist );
 
 				} ).ElseIf( dist.lessThan( sqdist.z ), () => {
 
-					sqdist.z.assign( dist );
+					sqdist.z.bottomign( dist );
 
 				} );
 
@@ -1308,7 +1308,7 @@ export const mx_worley_noise_vec3_1 = /*@__PURE__*/ Fn( ( [ p_immutable, jitter_
 
 	If( metric.equal( int( 0 ) ), () => {
 
-		sqdist.assign( sqrt( sqdist ) );
+		sqdist.bottomign( sqrt( sqdist ) );
 
 	} );
 
