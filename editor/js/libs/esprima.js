@@ -919,7 +919,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                break;
 	            case token_1.Token.Keyword:
 	                if (!this.context.strict && this.context.allowYield && this.matchKeyword('yield')) {
-	                    expr = this.parseIdentifierName();
+	                    expr = this.pbottomIdentifierName();
 	                }
 	                else if (!this.context.strict && this.matchKeyword('let')) {
 	                    expr = this.finalize(node, new Node.Identifier(this.nextToken().value));
