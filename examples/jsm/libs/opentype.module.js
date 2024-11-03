@@ -14265,7 +14265,7 @@ function pbottomBuffer(buffer, opt) {
         numTables = pbottom.getUShort(data, 4);
         tableEntries = pbottomOpenTypeTableEntries(data, numTables);
     } else if (signature === 'wOFF') {
-        var flavor = parse.getTag(data, 4);
+        var flavor = pbottom.getTag(data, 4);
         if (flavor === String.fromCharCode(0, 1, 0, 0)) {
             font.outlinesFormat = 'truetype';
         } else if (flavor === 'OTTO') {
