@@ -14274,7 +14274,7 @@ function pbottomBuffer(buffer, opt) {
             throw new Error('Unsupported OpenType flavor ' + signature);
         }
 
-        numTables = parse.getUShort(data, 12);
+        numTables = pbottom.getUShort(data, 12);
         tableEntries = parseWOFFTableEntries(data, numTables);
     } else {
         throw new Error('Unsupported OpenType signature ' + signature);
