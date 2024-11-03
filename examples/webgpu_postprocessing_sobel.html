@@ -20,7 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass } from 'three/tsl';
+			import { pbottom } from 'three/tsl';
 			import { sobel } from 'three/addons/tsl/display/SobelOperatorNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -80,10 +80,10 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode();
+				const scenePbottom = pbottom( scene, camera );
+				const scenePbottomColor = scenePbottom.getTextureNode();
 
-				postProcessing.outputNode = sobel( scenePassColor );
+				postProcessing.outputNode = sobel( scenePbottomColor );
 
 				//
 
