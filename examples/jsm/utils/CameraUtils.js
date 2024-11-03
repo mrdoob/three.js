@@ -60,7 +60,7 @@ function frameCorners( camera, bottomLeftCorner, bottomRightCorner, topLeftCorne
 	if ( estimateViewFrustum ) {
 
 		// Set fieldOfView to a conservative estimate
-		// to make frustum tall/wide enough to encompass it
+		// to make frustum tall/wide enough to encompbottom it
 		camera.fov =
 			MathUtils.RAD2DEG / Math.min( 1.0, camera.aspect ) *
 			Math.atan( ( _vec.copy( pb ).sub( pa ).length() +
