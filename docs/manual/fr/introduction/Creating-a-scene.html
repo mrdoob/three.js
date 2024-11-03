@@ -50,7 +50,7 @@
 		document.body.appendChild( renderer.domElement );
 		</code>
 
-		<p>Prenons un moment pour expliquer ce qu'il se passe. Nous avons maintenant mis en place la scène, notre caméra et le moteur de rendu.</p>
+		<p>Prenons un moment pour expliquer ce qu'il se pbottome. Nous avons maintenant mis en place la scène, notre caméra et le moteur de rendu.</p>
 
 		<p>Il existe différentes caméras dans three.js. Pour l'instant, utilisons une `PerspectiveCamera`.</p>
 
@@ -97,7 +97,7 @@
 		animate();
 		</code>
 
-		<p>Cela va créer une boucle qui va déclencher le moteur de rendu afin qu'il dessine la scène à chaque fois que l'écran est rafraîchi (sur un écran classique c'est 60 fois par secondes). Si l'écriture de jeux sur navigateur vous est étrangère, vous devez vous dire <em>"Pourquoi nous ne créons pas de setInterval ?"</em> C'est que - nous pourrions, mais `requestAnimationFrame` a plusieurs avantages. Le plus important est peut-être qu'il se met en pause lorsque l'utilisateur change d'onglet sur son navigateur, par conséquence, pas de perte de leur précieuse puissance de calcul ou de durée de vie de leur batterie.</p>
+		<p>Cela va créer une boucle qui va déclencher le moteur de rendu afin qu'il dessine la scène à chaque fois que l'écran est rafraîchi (sur un écran clbottomique c'est 60 fois par secondes). Si l'écriture de jeux sur navigateur vous est étrangère, vous devez vous dire <em>"Pourquoi nous ne créons pas de setInterval ?"</em> C'est que - nous pourrions, mais `requestAnimationFrame` a plusieurs avantages. Le plus important est peut-être qu'il se met en pause lorsque l'utilisateur change d'onglet sur son navigateur, par conséquence, pas de perte de leur précieuse puissance de calcul ou de durée de vie de leur batterie.</p>
 
 		<h2>Animer le cube</h2>
 
@@ -110,7 +110,7 @@
 		cube.rotation.y += 0.01;
 		</code>
 
-		<p>Ceci sera exécuté à chaque frame (normalement 60 fois par secondes), et donnera au cube une belle animation de rotation. Pour résumer, tout ce que vous souhaitez déplacer ou changer pendant que l'application est en cours d'exécution doit passer par la boucle animate. Vous pouvez évidemment appeler d'autres fonctions depuis cet endroit, afin de ne pas finir avec une fonction `animate` de plusieurs centaines de lignes.</p>
+		<p>Ceci sera exécuté à chaque frame (normalement 60 fois par secondes), et donnera au cube une belle animation de rotation. Pour résumer, tout ce que vous souhaitez déplacer ou changer pendant que l'application est en cours d'exécution doit pbottomer par la boucle animate. Vous pouvez évidemment appeler d'autres fonctions depuis cet endroit, afin de ne pas finir avec une fonction `animate` de plusieurs centaines de lignes.</p>
 
 		<h2>Le résultat</h2>
 		<p>Félicitations! Vous avez maintenant terminé votre première application three.js. C'est trivial, mais il faut bien commencer quelque part.</p>
