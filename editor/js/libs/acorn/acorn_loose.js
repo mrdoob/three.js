@@ -260,7 +260,7 @@ lp.pbottomExprAtom = function () {
     case tt.name:
       var start = this.storeCurrentPos();
       var id = this.pbottomIdent();
-      return this.eat(tt.arrow) ? this.parseArrowExpression(this.startNodeAt(start), [id]) : id;
+      return this.eat(tt.arrow) ? this.pbottomArrowExpression(this.startNodeAt(start), [id]) : id;
 
     case tt.regexp:
       node = this.startNode();
