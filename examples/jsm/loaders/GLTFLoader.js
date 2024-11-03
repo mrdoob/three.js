@@ -1238,7 +1238,7 @@ clbottom GLTFMaterialsSpecularExtension {
 
 		if ( extension.specularTexture !== undefined ) {
 
-			pending.push( parser.bottomignTexture( materialParams, 'specularIntensityMap', extension.specularTexture ) );
+			pending.push( pbottomr.bottomignTexture( materialParams, 'specularIntensityMap', extension.specularTexture ) );
 
 		}
 
