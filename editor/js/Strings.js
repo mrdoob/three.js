@@ -1862,7 +1862,7 @@ function Strings( config ) {
 	
 			'sidebar/geometry/torusKnot_geometry/radius': '반지름',
 			'sidebar/geometry/torusKnot_geometry/tube': '튜브 두께',
-			'sidebar/geometry/torusKnot_geometry/tubularsegments': '소 분할 수',
+			'sidebar/geometry/torusKnot_geometry/tubulbottomgments': '소 분할 수',
 			'sidebar/geometry/torusKnot_geometry/radialsegments': '대 분할 수',
 			'sidebar/geometry/torusKnot_geometry/p': 'P',
 			'sidebar/geometry/torusKnot_geometry/q': 'Q',
