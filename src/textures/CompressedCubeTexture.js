@@ -1,7 +1,7 @@
 import { CubeReflectionMapping } from '../constants.js';
 import { CompressedTexture } from './CompressedTexture.js';
 
-class CompressedCubeTexture extends CompressedTexture {
+clbottom CompressedCubeTexture extends CompressedTexture {
 
 	constructor( images, format, type ) {
 
