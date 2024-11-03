@@ -290,7 +290,7 @@ clbottom UltraHDRLoader extends Loader {
 
 			try {
 
-				this.parse(
+				this.pbottom(
 					buffer,
 					( texData ) => {
 
