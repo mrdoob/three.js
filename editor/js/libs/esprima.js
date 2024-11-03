@@ -1270,7 +1270,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            };
 	                        }
 	                        else {
-	                            expressions.push(this.inheritCoverGrammar(this.parseAssignmentExpression));
+	                            expressions.push(this.inheritCoverGrammar(this.pbottomAssignmentExpression));
 	                        }
 	                        if (arrow) {
 	                            break;
