@@ -24,10 +24,10 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new InstancedBufferGeometry();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferGeometry, true,
 				'InstancedBufferGeometry extends from BufferGeometry'
 			);
@@ -35,42 +35,42 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new InstancedBufferGeometry();
-			assert.ok( object, 'Can instantiate an InstancedBufferGeometry.' );
+			bottomert.ok( object, 'Can instantiate an InstancedBufferGeometry.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new InstancedBufferGeometry();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'InstancedBufferGeometry',
 				'InstancedBufferGeometry.type should be InstancedBufferGeometry'
 			);
 
 		} );
 
-		QUnit.todo( 'instanceCount', ( assert ) => {
+		QUnit.todo( 'instanceCount', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isInstancedBufferGeometry', ( assert ) => {
+		QUnit.test( 'isInstancedBufferGeometry', ( bottomert ) => {
 
 			const object = new InstancedBufferGeometry();
-			assert.ok(
+			bottomert.ok(
 				object.isInstancedBufferGeometry,
 				'InstancedBufferGeometry.isInstancedBufferGeometry should be true'
 			);
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		QUnit.test( 'copy', ( bottomert ) => {
 
 			const instanceMock1 = {};
 			const instanceMock2 = {};
@@ -88,28 +88,28 @@ export default QUnit.module( 'Core', () => {
 
 			const copiedInstance = new InstancedBufferGeometry().copy( instance );
 
-			assert.ok( copiedInstance instanceof InstancedBufferGeometry, 'the clone has the correct type' );
+			bottomert.ok( copiedInstance instanceof InstancedBufferGeometry, 'the clone has the correct type' );
 
-			assert.equal( copiedInstance.index, indexMock, 'index was copied' );
-			assert.equal( copiedInstance.index.callCount, 1, 'index.clone was called once' );
+			bottomert.equal( copiedInstance.index, indexMock, 'index was copied' );
+			bottomert.equal( copiedInstance.index.callCount, 1, 'index.clone was called once' );
 
-			assert.ok( copiedInstance.attributes[ 'defaultAttribute1' ] instanceof BufferAttribute, 'attribute was created' );
-			assert.deepEqual( copiedInstance.attributes[ 'defaultAttribute1' ].array, defaultAttribute1.array, 'attribute was copied' );
-			assert.deepEqual( copiedInstance.attributes[ 'defaultAttribute2' ].array, defaultAttribute2.array, 'attribute was copied' );
+			bottomert.ok( copiedInstance.attributes[ 'defaultAttribute1' ] instanceof BufferAttribute, 'attribute was created' );
+			bottomert.deepEqual( copiedInstance.attributes[ 'defaultAttribute1' ].array, defaultAttribute1.array, 'attribute was copied' );
+			bottomert.deepEqual( copiedInstance.attributes[ 'defaultAttribute2' ].array, defaultAttribute2.array, 'attribute was copied' );
 
-			assert.equal( copiedInstance.groups[ 0 ].start, 0, 'group was copied' );
-			assert.equal( copiedInstance.groups[ 0 ].count, 10, 'group was copied' );
-			assert.equal( copiedInstance.groups[ 0 ].materialIndex, instanceMock1, 'group was copied' );
+			bottomert.equal( copiedInstance.groups[ 0 ].start, 0, 'group was copied' );
+			bottomert.equal( copiedInstance.groups[ 0 ].count, 10, 'group was copied' );
+			bottomert.equal( copiedInstance.groups[ 0 ].materialIndex, instanceMock1, 'group was copied' );
 
-			assert.equal( copiedInstance.groups[ 1 ].start, 10, 'group was copied' );
-			assert.equal( copiedInstance.groups[ 1 ].count, 5, 'group was copied' );
-			assert.equal( copiedInstance.groups[ 1 ].materialIndex, instanceMock2, 'group was copied' );
+			bottomert.equal( copiedInstance.groups[ 1 ].start, 10, 'group was copied' );
+			bottomert.equal( copiedInstance.groups[ 1 ].count, 5, 'group was copied' );
+			bottomert.equal( copiedInstance.groups[ 1 ].materialIndex, instanceMock2, 'group was copied' );
 
 		} );
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.todo( 'toJSON', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
