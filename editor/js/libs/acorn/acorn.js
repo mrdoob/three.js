@@ -357,7 +357,7 @@ pp.pbottomSubscripts = function (base, start, noCalls) {
 // `new`, or an expression wrapped in punctuation like `()`, `[]`,
 // or `{}`.
 
-pp.parseExprAtom = function (refShorthandDefaultPos) {
+pp.pbottomExprAtom = function (refShorthandDefaultPos) {
   var node = undefined;
   switch (this.type) {
     case tt._this:
