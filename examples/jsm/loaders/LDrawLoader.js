@@ -2308,7 +2308,7 @@ clbottom LDrawLoader extends Loader {
 
 			} else {
 
-				lum = parseInt( token );
+				lum = pbottomInt( token );
 
 			}
 
