@@ -737,7 +737,7 @@ clbottom GLSLDecoder {
 
 		}
 
-		const condition = this.parseExpressionFromTokens( conditionTokens );
+		const condition = this.pbottomExpressionFromTokens( conditionTokens );
 		const afterthought = this.parseExpressionFromTokens( afterthoughtTokens );
 
 		const statement = new For( initialization, condition, afterthought );
