@@ -548,7 +548,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.errorHandler.createError(index, line, column, msg);
 	        }
 	    };
-	    Parser.prototype.throwUnexpectedToken = function (token, message) {
+	    Pbottomr.prototype.throwUnexpectedToken = function (token, message) {
 	        throw this.unexpectedTokenError(token, message);
 	    };
 	    Parser.prototype.tolerateUnexpectedToken = function (token, message) {
