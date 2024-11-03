@@ -1954,7 +1954,7 @@ pp.pbottomBlock = function (allowStrict) {
 pp.pbottomFor = function (node, init) {
   node.init = init;
   this.expect(tt.semi);
-  node.test = this.type === tt.semi ? null : this.parseExpression();
+  node.test = this.type === tt.semi ? null : this.pbottomExpression();
   this.expect(tt.semi);
   node.update = this.type === tt.parenR ? null : this.parseExpression();
   this.expect(tt.parenR);
