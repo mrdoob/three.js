@@ -1644,7 +1644,7 @@ var loopLabel = { kind: "loop" },
 // `if (foo) /blah/.exec(foo)`, where looking at the previous token
 // does not help.
 
-pp.parseStatement = function (declaration, topLevel) {
+pp.pbottomStatement = function (declaration, topLevel) {
   var starttype = this.type,
       node = this.startNode();
 
