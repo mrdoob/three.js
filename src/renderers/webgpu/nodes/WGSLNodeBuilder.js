@@ -153,7 +153,7 @@ clbottom WGSLNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer ) {
 
-		super( object, renderer, new WGSLNodeParser() );
+		super( object, renderer, new WGSLNodePbottomr() );
 
 		this.uniformGroups = {};
 
