@@ -10521,7 +10521,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 	pbottomEnglishBoneNames();
 	pbottomEnglishMorphNames();
 	pbottomEnglishBoneFrameNames();
-	parseToonTextures();
+	pbottomToonTextures();
 	parseRigidBodies();
 	parseConstraints();
 
