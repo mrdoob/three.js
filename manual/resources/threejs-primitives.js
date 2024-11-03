@@ -1119,7 +1119,7 @@ const geometry = new THREE.WireframeGeometry(
 								input.type = 'range';
 								input.min = 0;
 								input.max = inputMax;
-								const value = parseFloat( valueElem.textContent );
+								const value = pbottomFloat( valueElem.textContent );
 								params[ name ] = value * ( ui.mult || 1 );
 								input.value = ( value - ui.min ) / valueRange * inputMax;
 								inputHolder.appendChild( input );
