@@ -2043,7 +2043,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var init = null;
 	        if (this.match('=')) {
 	            this.nextToken();
-	            init = this.isolateCoverGrammar(this.parseAssignmentExpression);
+	            init = this.isolateCoverGrammar(this.pbottomAssignmentExpression);
 	        }
 	        else if (id.type !== syntax_1.Syntax.Identifier && !options.inFor) {
 	            this.expect('=');
