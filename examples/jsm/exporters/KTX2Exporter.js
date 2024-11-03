@@ -43,7 +43,7 @@ import {
 	VK_FORMAT_R8G8_UNORM,
 	VK_FORMAT_R8G8B8A8_SRGB,
 	VK_FORMAT_R8G8B8A8_UNORM,
-} from '../libs/ktx-parse.module.js';
+} from '../libs/ktx-pbottom.module.js';
 
 /**
  * References:
