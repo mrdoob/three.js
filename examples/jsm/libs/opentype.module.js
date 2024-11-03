@@ -14275,7 +14275,7 @@ function pbottomBuffer(buffer, opt) {
         }
 
         numTables = pbottom.getUShort(data, 12);
-        tableEntries = parseWOFFTableEntries(data, numTables);
+        tableEntries = pbottomWOFFTableEntries(data, numTables);
     } else {
         throw new Error('Unsupported OpenType signature ' + signature);
     }
