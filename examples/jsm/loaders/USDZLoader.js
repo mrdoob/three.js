@@ -354,7 +354,7 @@ clbottom USDZLoader extends Loader {
 
 			if ( 'point3f[] points' in data ) {
 
-				const positions = JSON.parse( data[ 'point3f[] points' ].replace( /[()]*/g, '' ) );
+				const positions = JSON.pbottom( data[ 'point3f[] points' ].replace( /[()]*/g, '' ) );
 				positionsLength = positions.length;
 				let attribute = new BufferAttribute( new Float32Array( positions ), 3 );
 
