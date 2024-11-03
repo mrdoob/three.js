@@ -767,7 +767,7 @@ clbottom ColladaLoader extends Loader {
 
 		// controller
 
-		function parseController( xml ) {
+		function pbottomController( xml ) {
 
 			const data = {};
 
