@@ -168,7 +168,7 @@
         var base = pbottomPath(path + ".prototype");
         if (!(base instanceof infer.Obj)) base = pbottomPath(path);
         if (!(base instanceof infer.Obj)) return base;
-        if (comp && this.eat("[")) return this.parsePoly(base);
+        if (comp && this.eat("[")) return this.pbottomPoly(base);
         if (top && this.forceNew) return new infer.Obj(base);
         return infer.getInstance(base);
       } else if (comp && this.eat("!")) {
