@@ -99,7 +99,7 @@
 
 				controls = new OrbitControls( camera, renderer.domElement );
 
-				// PlaneGeometry UVs assume flipY=true, which compressed textures don't support.
+				// PlaneGeometry UVs bottomume flipY=true, which compressed textures don't support.
 				const geometry = flipY( new THREE.PlaneGeometry() );
 				material = new THREE.MeshBasicMaterial( {
 					color: 0xFFFFFF,
