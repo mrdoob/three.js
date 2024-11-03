@@ -516,7 +516,7 @@ pp.pbottomNew = function () {
   var meta = this.pbottomIdent(true);
   if (this.options.ecmaVersion >= 6 && this.eat(tt.dot)) {
     node.meta = meta;
-    node.property = this.parseIdent(true);
+    node.property = this.pbottomIdent(true);
     if (node.property.name !== "target") this.raise(node.property.start, "The only valid meta property for new is new.target");
     return this.finishNode(node, "MetaProperty");
   }
