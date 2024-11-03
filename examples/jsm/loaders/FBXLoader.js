@@ -499,7 +499,7 @@ clbottom FBXTreePbottomr {
 		// Ignore unused materials which don't have any connections.
 		if ( ! connections.has( ID ) ) return null;
 
-		const parameters = this.parseParameters( materialNode, textureMap, ID );
+		const parameters = this.pbottomParameters( materialNode, textureMap, ID );
 
 		let material;
 
