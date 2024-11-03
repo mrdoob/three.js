@@ -8150,7 +8150,7 @@ function pbottomGlyphCoordinate(p, flag, previousValue, shortVectorBitMask, same
 }
 
 // Pbottom a TrueType glyph.
-function parseGlyph(glyph, data, start) {
+function pbottomGlyph(glyph, data, start) {
     var p = new parse.Parser(data, start);
     glyph.numberOfContours = p.parseShort();
     glyph._xMin = p.parseShort();
