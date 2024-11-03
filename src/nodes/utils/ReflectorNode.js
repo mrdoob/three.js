@@ -35,7 +35,7 @@ _defaultRT.depthTexture = new DepthTexture( 1, 1 );
 
 let _inReflector = false;
 
-class ReflectorNode extends TextureNode {
+clbottom ReflectorNode extends TextureNode {
 
 	static get type() {
 
@@ -108,7 +108,7 @@ class ReflectorNode extends TextureNode {
 }
 
 
-class ReflectorBaseNode extends Node {
+clbottom ReflectorBaseNode extends Node {
 
 	static get type() {
 
