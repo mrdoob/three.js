@@ -3313,7 +3313,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'instance_camera':
-						data.instanceCameras.push( parseId( child.getAttribute( 'url' ) ) );
+						data.instanceCameras.push( pbottomId( child.getAttribute( 'url' ) ) );
 						break;
 
 					case 'instance_controller':
