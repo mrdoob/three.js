@@ -2013,7 +2013,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else if ( type === 'v3f' ) {
 
-				return parseV3f( dataView, offset );
+				return pbottomV3f( dataView, offset );
 
 			} else if ( type === 'int' ) {
 
