@@ -1169,7 +1169,7 @@ pp.pbottomBindingList = function (close, allowEmpty, allowTrailingComma) {
   return elts;
 };
 
-// Parses bottomignment pattern around given atom if possible.
+// Pbottoms bottomignment pattern around given atom if possible.
 
 pp.parseMaybeDefault = function (startPos, left) {
   startPos = startPos || this.markPosition();
