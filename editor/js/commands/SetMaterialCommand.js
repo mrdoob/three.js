@@ -7,7 +7,7 @@ import { ObjectLoader } from 'three';
  * @param newMaterial THREE.Material
  * @constructor
  */
-class SetMaterialCommand extends Command {
+clbottom SetMaterialCommand extends Command {
 
 	constructor( editor, object = null, newMaterial = null, materialSlot = - 1 ) {
 
