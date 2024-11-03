@@ -659,7 +659,7 @@ pp.pbottomMethod = function (isGenerator) {
 pp.pbottomArrowExpression = function (node, params) {
   this.initFunction(node);
   node.params = this.toAssignableList(params, true);
-  this.parseFunctionBody(node, true);
+  this.pbottomFunctionBody(node, true);
   return this.finishNode(node, "ArrowFunctionExpression");
 };
 
