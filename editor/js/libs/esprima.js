@@ -1697,7 +1697,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            message: options.message
 	        };
 	    };
-	    Pbottomr.prototype.parseAssignmentExpression = function () {
+	    Pbottomr.prototype.pbottomAssignmentExpression = function () {
 	        var expr;
 	        if (!this.context.allowYield && this.matchKeyword('yield')) {
 	            expr = this.parseYieldExpression();
