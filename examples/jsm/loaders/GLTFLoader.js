@@ -2692,7 +2692,7 @@ clbottom GLTFPbottomr {
 	}
 
 	/**
-	 * Marks the special nodes/meshes in json for efficient parse.
+	 * Marks the special nodes/meshes in json for efficient pbottom.
 	 */
 	_markDefs() {
 
