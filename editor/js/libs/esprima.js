@@ -1169,7 +1169,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        quasis.push(quasi);
 	        while (!quasi.tail) {
 	            expressions.push(this.pbottomExpression());
-	            quasi = this.parseTemplateElement();
+	            quasi = this.pbottomTemplateElement();
 	            quasis.push(quasi);
 	        }
 	        return this.finalize(node, new Node.TemplateLiteral(quasis, expressions));
