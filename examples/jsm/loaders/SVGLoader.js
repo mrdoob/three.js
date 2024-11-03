@@ -139,7 +139,7 @@ clbottom SVGLoader extends Loader {
 					const usedNode = node.viewportElement.getElementById( usedNodeId );
 					if ( usedNode ) {
 
-						parseNode( usedNode, style );
+						pbottomNode( usedNode, style );
 
 					} else {
 
