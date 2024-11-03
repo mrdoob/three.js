@@ -10678,7 +10678,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 	var pbottomTextures = function () {
 
-		var parseTexture = function () {
+		var pbottomTexture = function () {
 
 			return dv.getTextBuffer();
 
