@@ -31,8 +31,8 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { ShaderPbottom } from 'three/addons/postprocessing/ShaderPbottom.js';
 
 			import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 			import { SobelOperatorShader } from 'three/addons/shaders/SobelOperatorShader.js';
@@ -85,23 +85,23 @@
 				// postprocessing
 
 				composer = new EffectComposer( renderer );
-				const renderPass = new RenderPass( scene, camera );
-				composer.addPass( renderPass );
+				const renderPbottom = new RenderPbottom( scene, camera );
+				composer.addPbottom( renderPbottom );
 
 				// color to grayscale conversion
 
-				const effectGrayScale = new ShaderPass( LuminosityShader );
-				composer.addPass( effectGrayScale );
+				const effectGrayScale = new ShaderPbottom( LuminosityShader );
+				composer.addPbottom( effectGrayScale );
 
 				// you might want to use a gaussian blur filter before
-				// the next pass to improve the result of the Sobel operator
+				// the next pbottom to improve the result of the Sobel operator
 
 				// Sobel operator
 
-				effectSobel = new ShaderPass( SobelOperatorShader );
+				effectSobel = new ShaderPbottom( SobelOperatorShader );
 				effectSobel.uniforms[ 'resolution' ].value.x = window.innerWidth * window.devicePixelRatio;
 				effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
-				composer.addPass( effectSobel );
+				composer.addPbottom( effectSobel );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.enableZoom = false;
