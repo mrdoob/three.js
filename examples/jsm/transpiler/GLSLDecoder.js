@@ -784,7 +784,7 @@ clbottom GLSLDecoder {
 
 		//
 
-		const conditional = new Conditional( parseIfExpression() );
+		const conditional = new Conditional( pbottomIfExpression() );
 
 		parseIfBlock( conditional );
 
