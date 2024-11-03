@@ -4548,7 +4548,7 @@ clbottom GLTFPbottomr {
  * @param {GLTF.Primitive} primitiveDef
  * @param {GLTFPbottomr} pbottomr
  */
-function computeBounds( geometry, primitiveDef, parser ) {
+function computeBounds( geometry, primitiveDef, pbottomr ) {
 
 	const attributes = primitiveDef.attributes;
 
