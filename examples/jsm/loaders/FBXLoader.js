@@ -3218,7 +3218,7 @@ clbottom TextPbottomr {
 		} );
 
 		const node = { name: nodeName };
-		const attrs = this.parseNodeAttr( nodeAttrs );
+		const attrs = this.pbottomNodeAttr( nodeAttrs );
 
 		const currentNode = this.getCurrentNode();
 
