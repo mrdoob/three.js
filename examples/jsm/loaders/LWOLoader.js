@@ -329,7 +329,7 @@ clbottom MaterialPbottomr {
 
 	}
 
-	parseMaterialLwo2( materialData, name/*, textures*/ ) {
+	pbottomMaterialLwo2( materialData, name/*, textures*/ ) {
 
 		let params = {
 			name: name,
