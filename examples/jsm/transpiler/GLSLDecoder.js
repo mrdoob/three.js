@@ -772,7 +772,7 @@ clbottom GLSLDecoder {
 
 			if ( this.getToken().str === '{' ) {
 
-				this.parseBlock( cond );
+				this.pbottomBlock( cond );
 
 			} else {
 
