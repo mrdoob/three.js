@@ -11,7 +11,7 @@ import { MeshPhysicalMaterial } from '../MeshPhysicalMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshPhysicalMaterial();
 
-class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
+clbottom MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 	static get type() {
 
@@ -94,9 +94,9 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 		const iorNode = this.iorNode ? float( this.iorNode ) : materialIOR;
 
-		ior.assign( iorNode );
-		specularColor.assign( mix( min( pow2( ior.sub( 1.0 ).div( ior.add( 1.0 ) ) ).mul( materialSpecularColor ), vec3( 1.0 ) ).mul( materialSpecularIntensity ), diffuseColor.rgb, metalness ) );
-		specularF90.assign( mix( materialSpecularIntensity, 1.0, metalness ) );
+		ior.bottomign( iorNode );
+		specularColor.bottomign( mix( min( pow2( ior.sub( 1.0 ).div( ior.add( 1.0 ) ) ).mul( materialSpecularColor ), vec3( 1.0 ) ).mul( materialSpecularIntensity ), diffuseColor.rgb, metalness ) );
+		specularF90.bottomign( mix( materialSpecularIntensity, 1.0, metalness ) );
 
 	}
 
@@ -117,8 +117,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 			const clearcoatNode = this.clearcoatNode ? float( this.clearcoatNode ) : materialClearcoat;
 			const clearcoatRoughnessNode = this.clearcoatRoughnessNode ? float( this.clearcoatRoughnessNode ) : materialClearcoatRoughness;
 
-			clearcoat.assign( clearcoatNode );
-			clearcoatRoughness.assign( getRoughness( { roughness: clearcoatRoughnessNode } ) );
+			clearcoat.bottomign( clearcoatNode );
+			clearcoatRoughness.bottomign( getRoughness( { roughness: clearcoatRoughnessNode } ) );
 
 		}
 
@@ -129,8 +129,8 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 			const sheenNode = this.sheenNode ? vec3( this.sheenNode ) : materialSheen;
 			const sheenRoughnessNode = this.sheenRoughnessNode ? float( this.sheenRoughnessNode ) : materialSheenRoughness;
 
-			sheen.assign( sheenNode );
-			sheenRoughness.assign( sheenRoughnessNode );
+			sheen.bottomign( sheenNode );
+			sheenRoughness.bottomign( sheenRoughnessNode );
 
 		}
 
@@ -142,9 +142,9 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 			const iridescenceIORNode = this.iridescenceIORNode ? float( this.iridescenceIORNode ) : materialIridescenceIOR;
 			const iridescenceThicknessNode = this.iridescenceThicknessNode ? float( this.iridescenceThicknessNode ) : materialIridescenceThickness;
 
-			iridescence.assign( iridescenceNode );
-			iridescenceIOR.assign( iridescenceIORNode );
-			iridescenceThickness.assign( iridescenceThicknessNode );
+			iridescence.bottomign( iridescenceNode );
+			iridescenceIOR.bottomign( iridescenceIORNode );
+			iridescenceThickness.bottomign( iridescenceThicknessNode );
 
 		}
 
@@ -154,24 +154,24 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 
 			const anisotropyV = ( this.anisotropyNode ? vec2( this.anisotropyNode ) : materialAnisotropy ).toVar();
 
-			anisotropy.assign( anisotropyV.length() );
+			anisotropy.bottomign( anisotropyV.length() );
 
 			If( anisotropy.equal( 0.0 ), () => {
 
-				anisotropyV.assign( vec2( 1.0, 0.0 ) );
+				anisotropyV.bottomign( vec2( 1.0, 0.0 ) );
 
 			} ).Else( () => {
 
 				anisotropyV.divAssign( vec2( anisotropy ) );
-				anisotropy.assign( anisotropy.saturate() );
+				anisotropy.bottomign( anisotropy.saturate() );
 
 			} );
 
 			// Roughness along the anisotropy bitangent is the material roughness, while the tangent roughness increases with anisotropy.
-			alphaT.assign( anisotropy.pow2().mix( roughness.pow2(), 1.0 ) );
+			alphaT.bottomign( anisotropy.pow2().mix( roughness.pow2(), 1.0 ) );
 
-			anisotropyT.assign( TBNViewMatrix[ 0 ].mul( anisotropyV.x ).add( TBNViewMatrix[ 1 ].mul( anisotropyV.y ) ) );
-			anisotropyB.assign( TBNViewMatrix[ 1 ].mul( anisotropyV.x ).sub( TBNViewMatrix[ 0 ].mul( anisotropyV.y ) ) );
+			anisotropyT.bottomign( TBNViewMatrix[ 0 ].mul( anisotropyV.x ).add( TBNViewMatrix[ 1 ].mul( anisotropyV.y ) ) );
+			anisotropyB.bottomign( TBNViewMatrix[ 1 ].mul( anisotropyV.x ).sub( TBNViewMatrix[ 0 ].mul( anisotropyV.y ) ) );
 
 		}
 
@@ -184,16 +184,16 @@ class MeshPhysicalNodeMaterial extends MeshStandardNodeMaterial {
 			const attenuationDistanceNode = this.attenuationDistanceNode ? float( this.attenuationDistanceNode ) : materialAttenuationDistance;
 			const attenuationColorNode = this.attenuationColorNode ? vec3( this.attenuationColorNode ) : materialAttenuationColor;
 
-			transmission.assign( transmissionNode );
-			thickness.assign( thicknessNode );
-			attenuationDistance.assign( attenuationDistanceNode );
-			attenuationColor.assign( attenuationColorNode );
+			transmission.bottomign( transmissionNode );
+			thickness.bottomign( thicknessNode );
+			attenuationDistance.bottomign( attenuationDistanceNode );
+			attenuationColor.bottomign( attenuationColorNode );
 
 			if ( this.useDispersion ) {
 
 				const dispersionNode = this.dispersionNode ? float( this.dispersionNode ) : materialDispersion;
 
-				dispersion.assign( dispersionNode );
+				dispersion.bottomign( dispersionNode );
 
 			}
 
