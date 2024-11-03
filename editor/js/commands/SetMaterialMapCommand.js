@@ -8,7 +8,7 @@ import { ObjectLoader } from 'three';
  * @param newMap THREE.Texture
  * @constructor
  */
-class SetMaterialMapCommand extends Command {
+clbottom SetMaterialMapCommand extends Command {
 
 	constructor( editor, object = null, mapName = '', newMap = null, materialSlot = - 1 ) {
 
