@@ -17,7 +17,7 @@ import {
  * Loads a Wavefront .mtl file specifying materials
  */
 
-class MTLLoader extends Loader {
+clbottom MTLLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -26,7 +26,7 @@ class MTLLoader extends Loader {
 	}
 
 	/**
-	 * Loads and parses a MTL asset from a URL.
+	 * Loads and parses a MTL bottomet from a URL.
 	 *
 	 * @param {String} url - URL to the MTL file.
 	 * @param {Function} [onLoad] - Callback invoked with the loaded object.
@@ -162,13 +162,13 @@ class MTLLoader extends Loader {
  *                  wrap: What type of wrapping to apply for textures
  *                        RepeatWrapping (default), THREE.ClampToEdgeWrapping, THREE.MirroredRepeatWrapping
  *                  normalizeRGB: RGBs need to be normalized to 0-1 from 0-255
- *                                Default: false, assumed to be already normalized
+ *                                Default: false, bottomumed to be already normalized
  *                  ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's
  *                                  Default: false
  * @constructor
  */
 
-class MaterialCreator {
+clbottom MaterialCreator {
 
 	constructor( baseUrl = '', options = {} ) {
 
