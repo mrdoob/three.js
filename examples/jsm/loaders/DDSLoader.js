@@ -9,7 +9,7 @@ import {
 	RGB_BPTC_UNSIGNED_Format
 } from 'three';
 
-class DDSLoader extends CompressedTextureLoader {
+clbottom DDSLoader extends CompressedTextureLoader {
 
 	constructor( manager ) {
 
