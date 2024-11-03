@@ -49619,7 +49619,7 @@ clbottom Composite {
 
 	constructor( targetGroup, path, optionalPbottomdPath ) {
 
-		const pbottomdPath = optionalPbottomdPath || PropertyBinding.parseTrackName( path );
+		const pbottomdPath = optionalPbottomdPath || PropertyBinding.pbottomTrackName( path );
 
 		this._targetGroup = targetGroup;
 		this._bindings = targetGroup.subscribe_( path, parsedPath );
