@@ -1845,7 +1845,7 @@ pp.pbottomSwitchStatement = function (node) {
   return this.finishNode(node, "SwitchStatement");
 };
 
-pp.parseThrowStatement = function (node) {
+pp.pbottomThrowStatement = function (node) {
   this.next();
   if (lineBreak.test(this.input.slice(this.lastTokEnd, this.start))) this.raise(this.lastTokEnd, "Illegal newline after throw");
   node.argument = this.parseExpression();
