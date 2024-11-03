@@ -724,7 +724,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'instance_animation':
-						data.animations.push( parseId( child.getAttribute( 'url' ) ) );
+						data.animations.push( pbottomId( child.getAttribute( 'url' ) ) );
 						break;
 
 				}
