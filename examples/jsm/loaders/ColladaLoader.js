@@ -2845,7 +2845,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseKinematicsTransform( xml ) {
+		function pbottomKinematicsTransform( xml ) {
 
 			const data = {
 				type: xml.nodeName
