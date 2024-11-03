@@ -1,6 +1,6 @@
 import * as MathUtils from './MathUtils.js';
 
-class Vector2 {
+clbottom Vector2 {
 
 	constructor( x = 0, y = 0 ) {
 
@@ -238,7 +238,7 @@ class Vector2 {
 
 	clamp( min, max ) {
 
-		// assumes min < max, componentwise
+		// bottomumes min < max, componentwise
 
 		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
 		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
