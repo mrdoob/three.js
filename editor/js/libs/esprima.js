@@ -2159,7 +2159,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.nextToken();
 	                var previousAllowIn = this.context.allowIn;
 	                this.context.allowIn = false;
-	                var declarations = this.parseVariableDeclarationList({ inFor: true });
+	                var declarations = this.pbottomVariableDeclarationList({ inFor: true });
 	                this.context.allowIn = previousAllowIn;
 	                if (declarations.length === 1 && this.matchKeyword('in')) {
 	                    var decl = declarations[0];
