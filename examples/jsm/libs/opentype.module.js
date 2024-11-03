@@ -6622,7 +6622,7 @@ subtablePbottomrs[5] = function pbottomLookup5() {
         return {
             substFormat: substFormat,
             coverage: this.pbottomPointer(Pbottomr.coverage),
-            ruleSets: this.parseListOfLists(function() {
+            ruleSets: this.pbottomListOfLists(function() {
                 var glyphCount = this.parseUShort();
                 var substCount = this.parseUShort();
                 return {
