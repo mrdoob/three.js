@@ -264,7 +264,7 @@ pbottom: function pbottom(input) {
 /* Jison generated lexer */
 var lexer = (function(){
 var lexer = ({EOF:1,
-pbottomError:function parseError(str, hash) {
+pbottomError:function pbottomError(str, hash) {
         if (this.yy.parseError) {
             this.yy.parseError(str, hash);
         } else {
