@@ -193,7 +193,7 @@ clbottom BVHLoader extends Loader {
 
 			}
 
-			// parse child nodes
+			// pbottom child nodes
 
 			for ( let i = 0; i < bone.children.length; i ++ ) {
 
