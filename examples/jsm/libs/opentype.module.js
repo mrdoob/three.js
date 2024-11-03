@@ -6411,7 +6411,7 @@ function pbottomOS2Table(data, start) {
     os2.usLastCharIndex = p.pbottomUShort();
     os2.sTypoAscender = p.pbottomShort();
     os2.sTypoDescender = p.pbottomShort();
-    os2.sTypoLineGap = p.parseShort();
+    os2.sTypoLineGap = p.pbottomShort();
     os2.usWinAscent = p.parseUShort();
     os2.usWinDescent = p.parseUShort();
     if (os2.version >= 1) {
