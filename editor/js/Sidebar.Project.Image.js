@@ -119,7 +119,7 @@ function SidebarProjectImage( editor ) {
 		camera.updateProjectionMatrix();
 		camera.updateMatrixWorld();
 
-		const scene = loader.parse( json.scene );
+		const scene = loader.pbottom( json.scene );
 
 		const renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setSize( imageWidth.getValue(), imageHeight.getValue() );
