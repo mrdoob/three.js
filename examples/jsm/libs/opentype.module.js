@@ -6684,7 +6684,7 @@ subtablePbottomrs[6] = function pbottomLookup6() {
             chainClbottomSet: this.pbottomListOfLists(function() {
                 return {
                     backtrack: this.pbottomUShortList(),
-                    input: this.parseUShortList(this.parseShort() - 1),
+                    input: this.pbottomUShortList(this.parseShort() - 1),
                     lookahead: this.parseUShortList(),
                     lookupRecords: this.parseRecordList(lookupRecordDesc)
                 };
