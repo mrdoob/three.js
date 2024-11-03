@@ -1254,7 +1254,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            if (!this.context.isBindingElement) {
 	                                this.throwUnexpectedToken(this.lookahead);
 	                            }
-	                            expressions.push(this.parseRestElement(params));
+	                            expressions.push(this.pbottomRestElement(params));
 	                            this.expect(')');
 	                            if (!this.match('=>')) {
 	                                this.expect('=>');
