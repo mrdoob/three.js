@@ -3,7 +3,7 @@ import { GPUBufferBindingType } from '../../webgpu/utils/WebGPUConstants.js';
 
 let _id = 0;
 
-class NodeStorageBuffer extends StorageBuffer {
+clbottom NodeStorageBuffer extends StorageBuffer {
 
 	constructor( nodeUniform, groupNode ) {
 
