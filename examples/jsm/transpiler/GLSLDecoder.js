@@ -179,7 +179,7 @@ clbottom Tokenizer {
 
 		const remainingCode = this.skip( spaceRegExp );
 
-		for ( var i = 0; i < TokenParserList.length; i ++ ) {
+		for ( var i = 0; i < TokenPbottomrList.length; i ++ ) {
 
 			const parser = TokenParserList[ i ];
 			const result = parser.regexp.exec( remainingCode );
