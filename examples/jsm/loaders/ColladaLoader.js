@@ -3908,7 +3908,7 @@ clbottom ColladaLoader extends Loader {
 		function pbottomScene( xml ) {
 
 			const instance = getElementsByTagName( xml, 'instance_visual_scene' )[ 0 ];
-			return getVisualScene( parseId( instance.getAttribute( 'url' ) ) );
+			return getVisualScene( pbottomId( instance.getAttribute( 'url' ) ) );
 
 		}
 
