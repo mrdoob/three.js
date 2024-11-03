@@ -20,12 +20,12 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>Основы </h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p></p>
 <p>Это первая статья в серии статей о three.js.
 <a href="https://threejs.org">Three.js</a> это 3D-библиотека, которая максимально
@@ -48,15 +48,15 @@
 Конечно, пользователи, использующие действительно старые браузеры,
 вероятно, имеют машины, которые не могут запускать three.js.</p>
 <p>При изучении большинства языков программирования первое, что делают люди,
-это заставляют компьютер напечатать <code class="notranslate" translate="no">"Hello World!"</code>. Для 3D одна из самых
-распространенных задач - создать 3D-куб, так что давайте начнем с <code class="notranslate" translate="no">"Hello Cube!"</code></p>
-<p>Первое, что нам нужно, это тэг <code class="notranslate" translate="no">&lt;canvas&gt;</code>:</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">&lt;body&gt;
+это заставляют компьютер напечатать <code clbottom="notranslate" translate="no">"Hello World!"</code>. Для 3D одна из самых
+распространенных задач - создать 3D-куб, так что давайте начнем с <code clbottom="notranslate" translate="no">"Hello Cube!"</code></p>
+<p>Первое, что нам нужно, это тэг <code clbottom="notranslate" translate="no">&lt;canvas&gt;</code>:</p>
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
 &lt;/body&gt;
 </pre><p>Three.js будет рисовать на этом холсте, так что нам нужно найти
 его и передать three.js.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">&lt;script type="module"&gt;
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">&lt;script type="module"&gt;
 import * as THREE from 'three';
 
 function main() {
@@ -73,27 +73,27 @@ function main() {
 и код найдет его там, как если бы у меня был код для вставки холста в документ,
 и мне, вероятно, пришлось бы изменить этот код, если бы изменился мой вариант
 использования.</p>
-<p>Когда канвас найден, мы создаем <a href="/docs/#api/en/renderers/WebGLRenderer"><code class="notranslate" translate="no">WebGLRenderer</code></a>. Renderer - это то, что отвечает
+<p>Когда канвас найден, мы создаем <a href="/docs/#api/en/renderers/WebGLRenderer"><code clbottom="notranslate" translate="no">WebGLRenderer</code></a>. Renderer - это то, что отвечает
 за фактическое получение всех предоставленных вами данных и их отрисовку на холст.</p>
 <p>Далее нам нужна камера.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const fov = 75;
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">const fov = 75;
 const aspect = 2;  // значение для canvas по умолчанию
 const near = 0.1;
 const far = 5;
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-</pre><p><code class="notranslate" translate="no">fov</code> сокращение от <code class="notranslate" translate="no">field of view</code>, <a href="https://en.wikipedia.org/wiki/Field_of_view">поле зрения</a>. В этом случае 75 градусов в
+</pre><p><code clbottom="notranslate" translate="no">fov</code> сокращение от <code clbottom="notranslate" translate="no">field of view</code>, <a href="https://en.wikipedia.org/wiki/Field_of_view">поле зрения</a>. В этом случае 75 градусов в
 вертикальном измерении. Обратите внимание, что большинство углов в Three.js
 указаны в радианах, но по какой-то причине перспективная камера принимает градусы.</p>
-<p><code class="notranslate" translate="no">aspect</code> это <a href="https://ru.wikipedia.org/wiki/Соотношение_сторон_экрана">соотношение сторон холста</a> (англ. aspect ratio). Мы рассмотрим детали
+<p><code clbottom="notranslate" translate="no">aspect</code> это <a href="https://ru.wikipedia.org/wiki/Соотношение_сторон_экрана">соотношение сторон холста</a> (англ. aspect ratio). Мы рассмотрим детали
 в другой статье, но по умолчанию холст имеет размер 300x150 пикселей,
 значит соотношение сторон 300/150 или 2.</p>
-<p><code class="notranslate" translate="no">near</code> и <code class="notranslate" translate="no">far</code> представляют пространство перед камерой, которое будет отображаться.
+<p><code clbottom="notranslate" translate="no">near</code> и <code clbottom="notranslate" translate="no">far</code> представляют пространство перед камерой, которое будет отображаться.
 Все, что находится до или после этого диапазона, будет обрезано (не нарисовано).</p>
 <p>Эти 4 параметра определяют <a href="https://ru.wikipedia.org/wiki/Усечённая_пирамида">усеченную пирамиду</a> <em>"frustum"</em>. <em>Frustum</em> это
 название 3D фигуры, напоминающей пирамиду с отсеченной верхушкой. Другими словами,
 думайте о слове "frustum" как о трехмерной фигуре,
 такой как сфера, куб и призма.</p>
-<p><img src="../resources/frustum-3d.svg" width="500" class="threejs_center"></p>
+<p><img src="../resources/frustum-3d.svg" width="500" clbottom="threejs_center"></p>
 <p>Высота ближней и дальней плоскостей определяется полем зрения (field of view).
 Ширина обеих плоскостей определяется полем зрения и соотношением сторон (aspect).</p>
 <p>Все, что находится внутри определенного усеченного контура, будет нарисовано.
@@ -101,45 +101,45 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <p>По умолчанию камера смотрит вниз по оси -Z и вверх по оси +Y. Мы поместим наш куб
 в начало координат (origin), поэтому нам нужно немного отодвинуть камеру назад,
 чтобы что-то увидеть.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">camera.position.z = 2;
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">camera.position.z = 2;
 </pre><p>Вот как мы её направили.</p>
-<p><img src="../resources/scene-down.svg" width="500" class="threejs_center"></p>
-<p>На диаграмме выше мы видим, что наша камера находится в <code class="notranslate" translate="no">z = 2</code>. И смотрит вниз по оси -Z.
+<p><img src="../resources/scene-down.svg" width="500" clbottom="threejs_center"></p>
+<p>На диаграмме выше мы видим, что наша камера находится в <code clbottom="notranslate" translate="no">z = 2</code>. И смотрит вниз по оси -Z.
 Усеченная пирамида начинается с 0.1 единицы спереди камеры и до 5 единиц перед камерой.
 Поскольку на этой диаграмме мы смотрим вниз, поле зрения (fov) зависит от отношения
 сторон (aspect). Так как ширина холста в 2 раза больше высоты, при просмотре поле обзора
 будет намного шире, чем указанные нами 75 градусов, которые являются вертикальным
 полем зрения.</p>
-<p>Далее создадим <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a>. <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> в three.js корень формы графа сцены.
+<p>Далее создадим <a href="/docs/#api/en/scenes/Scene"><code clbottom="notranslate" translate="no">Scene</code></a>. <a href="/docs/#api/en/scenes/Scene"><code clbottom="notranslate" translate="no">Scene</code></a> в three.js корень формы графа сцены.
 Все, что вы хотите нарисовать необходимо добавить на сцену. Мы рассмотрим подробнее,
 <a href="scenegraph.html">как работают сцены, в следующей статье</a>.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const scene = new THREE.Scene();
-</pre><p>Далее мы создаем <a href="/docs/#api/en/geometries/BoxGeometry"><code class="notranslate" translate="no">BoxGeometry</code></a> который содержит данные для <a href="https://ru.wikipedia.org/wiki/Прямоугольный_параллелепипед">прямоугольного параллелепипеда</a>.
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">const scene = new THREE.Scene();
+</pre><p>Далее мы создаем <a href="/docs/#api/en/geometries/BoxGeometry"><code clbottom="notranslate" translate="no">BoxGeometry</code></a> который содержит данные для <a href="https://ru.wikipedia.org/wiki/Прямоугольный_параллелепипед">прямоугольного параллелепипеда</a>.
 Почти все, что мы хотим отобразить в Three.js, нуждается в геометрии,
 которая определяет вершины нашего трехмерного объекта.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const boxWidth = 1;
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">const boxWidth = 1;
 const boxHeight = 1;
 const boxDepth = 1;
 const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 </pre><p>Затем мы создаем основной материал и устанавливаем его цвет.
 Цвета могут быть определены с использованием 6-значных шестнадцатеричных
 значений цвета, как в CSS.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
 </pre><p>Затем мы создаем <a href="https://ru.wikipedia.org/wiki/Полигональная_сетка">полигональную сетку</a>
-<a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> в three.js представляет комбинацию
-формы объекта <code class="notranslate" translate="no">Geometry</code> и <a href="/docs/#api/en/materials/Material"><code class="notranslate" translate="no">Material</code></a> (как нарисовать объект,
+<a href="/docs/#api/en/objects/Mesh"><code clbottom="notranslate" translate="no">Mesh</code></a>. <a href="/docs/#api/en/objects/Mesh"><code clbottom="notranslate" translate="no">Mesh</code></a> в three.js представляет комбинацию
+формы объекта <code clbottom="notranslate" translate="no">Geometry</code> и <a href="/docs/#api/en/materials/Material"><code clbottom="notranslate" translate="no">Material</code></a> (как нарисовать объект,
 блестящий или плоский, какой цвет, какую текстуру(ры) применить и т.д.)
 а также положение, ориентацию, и масштаб этого объекта в сцене.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const cube = new THREE.Mesh(geometry, material);
-</pre><p>И, наконец, мы добавляем <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> на сцену</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">scene.add(cube);
-</pre><p>Затем мы можем отрендерить сцену, вызвав функцию <code class="notranslate" translate="no">render</code> рендерера
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">const cube = new THREE.Mesh(geometry, material);
+</pre><p>И, наконец, мы добавляем <a href="/docs/#api/en/objects/Mesh"><code clbottom="notranslate" translate="no">Mesh</code></a> на сцену</p>
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">scene.add(cube);
+</pre><p>Затем мы можем отрендерить сцену, вызвав функцию <code clbottom="notranslate" translate="no">render</code> рендерера
 передав ей сцену и камеру.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">renderer.render(scene, camera);
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">renderer.render(scene, camera);
 </pre><p>Вот рабочий пример</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fundamentals.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/fundamentals.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fundamentals.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/fundamentals.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
 </div>
 
 <p></p>
@@ -147,9 +147,9 @@ const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 -Z, а сам куб выровнен по этой оси, поэтому мы видим только одну грань.</p>
 <p>Давайте оживим его, и, надеюсь, это прояснит, что он рисуется в 3D. Для его
 анимации мы будем отрисовывать внутри цикла отрисовки, используя
-<a href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame"><code class="notranslate" translate="no">requestAnimationFrame</code></a>.</p>
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame"><code clbottom="notranslate" translate="no">requestAnimationFrame</code></a>.</p>
 <p>Вот наш цикл</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
   time *= 0.001;  // конвертировать время в секунды
 
   cube.rotation.x = time;
@@ -160,12 +160,12 @@ const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
   requestAnimationFrame(render);
 }
 requestAnimationFrame(render);
-</pre><p><code class="notranslate" translate="no">requestAnimationFrame</code> это запрос к браузеру, что вы хотите что-то анимировать.
-Вы передаете ему функцию для вызова. В нашем случае эта функция <code class="notranslate" translate="no">render</code>.
+</pre><p><code clbottom="notranslate" translate="no">requestAnimationFrame</code> это запрос к браузеру, что вы хотите что-то анимировать.
+Вы передаете ему функцию для вызова. В нашем случае эта функция <code clbottom="notranslate" translate="no">render</code>.
 Браузер вызовет вашу функцию, и если вы обновите что-либо, связанное с
 отображением страницы, браузер выполнит перерисовку страницы.
-В нашем случае мы вызываем <code class="notranslate" translate="no">renderer.render</code>, которая нарисует нашу сцену.</p>
-<p><code class="notranslate" translate="no">requestAnimationFrame</code> передает время с момента загрузки страницы в нашу функцию.
+В нашем случае мы вызываем <code clbottom="notranslate" translate="no">renderer.render</code>, которая нарисует нашу сцену.</p>
+<p><code clbottom="notranslate" translate="no">requestAnimationFrame</code> передает время с момента загрузки страницы в нашу функцию.
 Это время приходит в миллисекундах. Я считаю, что работать с секундами намного проще,
 поэтому здесь мы конвертируем время в секунды.</p>
 <p>Затем мы устанавливаем вращение куба по X и Y на текущее время. Эти повороты в
@@ -174,10 +174,10 @@ requestAnimationFrame(render);
 секунд.</p>
 <p>Затем мы отрисовываем сцену и запрашиваем еще один кадр анимации,
 чтобы продолжить наш цикл.</p>
-<p>Вне цикла мы вызываем <code class="notranslate" translate="no">requestAnimationFrame</code> один раз, чтобы запустить цикл.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fundamentals-with-animation.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/fundamentals-with-animation.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+<p>Вне цикла мы вызываем <code clbottom="notranslate" translate="no">requestAnimationFrame</code> один раз, чтобы запустить цикл.</p>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fundamentals-with-animation.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/fundamentals-with-animation.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
 </div>
 
 <p></p>
@@ -185,7 +185,7 @@ requestAnimationFrame(render);
 добавить немного освещения, поэтому давайте добавим источник света.
 В Three.js есть много разных источников света, о которых мы поговорим в
 следующей статье. А пока давайте создадим направленный свет.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">{
   const color = 0xFFFFFF;
   const intensity = 3;
   const light = new THREE.DirectionalLight(color, intensity);
@@ -196,14 +196,14 @@ requestAnimationFrame(render);
 случае мы устанавливаем положение источника света на -1, 2, 4 чтобы оно было немного слева,
 сверху и позади нашей камеры. Цель по-прежнему 0, 0, 0, поэтому они будут светить
 в направлении начала координат.</p>
-<p>Нам также нужно изменить материал. <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> не воспреимчив к свету.
-Давайте изменим его на <a href="/docs/#api/en/materials/MeshPhongMaterial"><code class="notranslate" translate="no">MeshPhongMaterial</code></a>, который отражает свет.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">-const material = new THREE.MeshBasicMaterial({color: 0x44aa88});  // greenish blue
+<p>Нам также нужно изменить материал. <a href="/docs/#api/en/materials/MeshBasicMaterial"><code clbottom="notranslate" translate="no">MeshBasicMaterial</code></a> не воспреимчив к свету.
+Давайте изменим его на <a href="/docs/#api/en/materials/MeshPhongMaterial"><code clbottom="notranslate" translate="no">MeshPhongMaterial</code></a>, который отражает свет.</p>
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">-const material = new THREE.MeshBasicMaterial({color: 0x44aa88});  // greenish blue
 +const material = new THREE.MeshPhongMaterial({color: 0x44aa88});  // greenish blue
 </pre><p>И вот оно работает.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fundamentals-with-light.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/fundamentals-with-light.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fundamentals-with-light.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/fundamentals-with-light.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
 </div>
 
 <p></p>
@@ -214,7 +214,7 @@ requestAnimationFrame(render);
 <p>Сначала мы сделаем функцию, которая создает новый материал с указанным цветом.
 Затем создает mesh, используя указанную геометрию, добавляет ее к сцене и
 устанавливает ей позицию X.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function makeInstance(geometry, color, x) {
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">function makeInstance(geometry, color, x) {
   const material = new THREE.MeshPhongMaterial({color});
 
   const cube = new THREE.Mesh(geometry, material);
@@ -225,15 +225,15 @@ requestAnimationFrame(render);
   return cube;
 }
 </pre><p>Затем мы будем вызывать его 3 раза с 3 разными цветами и позициями X,
-сохраняя экземпляры <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> в массив.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">const cubes = [
+сохраняя экземпляры <a href="/docs/#api/en/objects/Mesh"><code clbottom="notranslate" translate="no">Mesh</code></a> в массив.</p>
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">const cubes = [
   makeInstance(geometry, 0x44aa88,  0),
   makeInstance(geometry, 0x8844aa, -2),
   makeInstance(geometry, 0xaa8844,  2),
 ];
 </pre><p>Наконец, мы закрутим все 3 куба в нашей функции отрисовки.
 Мы рассчитываем немного разные коэффициенты вращения для каждого.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">function render(time) {
   time *= 0.001;  // конвертировать время в секунды
 
   cubes.forEach((cube, ndx) =&gt; {
@@ -245,9 +245,9 @@ requestAnimationFrame(render);
 
   ...
 </pre><p>и вот оно.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fundamentals-3-cubes.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/fundamentals-3-cubes.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/fundamentals-3-cubes.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/fundamentals-3-cubes.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
 </div>
 
 <p></p>
