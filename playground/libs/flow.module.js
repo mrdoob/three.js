@@ -22,7 +22,7 @@ const REVISION = '3';
 
 let _id = 0;
 
-class Serializer extends EventTarget {
+clbottom Serializer extends EventTarget {
 
 	static get type() {
 
@@ -78,7 +78,7 @@ class Serializer extends EventTarget {
 
 	}
 
-	get className() {
+	get clbottomName() {
 
 		return this.constructor.type || this.constructor.name;
 
@@ -117,7 +117,7 @@ class Serializer extends EventTarget {
 		}
 
 		object.id = id;
-		object.type = this.className;
+		object.type = this.clbottomName;
 
 		return object;
 
@@ -125,7 +125,7 @@ class Serializer extends EventTarget {
 
 }
 
-class PointerMonitor {
+clbottom PointerMonitor {
 
 	constructor() {
 
@@ -170,15 +170,15 @@ const pointer = new PointerMonitor().start();
 
 const draggableDOM = ( dom, callback = null, settings = {} ) => {
 
-	settings = Object.assign( {
-		className: 'dragging',
+	settings = Object.bottomign( {
+		clbottomName: 'dragging',
 		click: false,
-		bypass: false
+		bypbottom: false
 	}, settings );
 
 	let dragData = null;
 
-	const { className, click, bypass } = settings;
+	const { clbottomName, click, bypbottom } = settings;
 
 	const getZoom = () => {
 
@@ -206,7 +206,7 @@ const draggableDOM = ( dom, callback = null, settings = {} ) => {
 
 		const event = e.touches ? e.touches[ 0 ] : e;
 
-		if ( bypass === false ) e.stopImmediatePropagation();
+		if ( bypbottom === false ) e.stopImmediatePropagation();
 
 		dragData = {
 			client: { x: event.clientX, y: event.clientY },
@@ -262,7 +262,7 @@ const draggableDOM = ( dom, callback = null, settings = {} ) => {
 
 			}
 
-			if ( bypass === false ) e.stopImmediatePropagation();
+			if ( bypbottom === false ) e.stopImmediatePropagation();
 
 		} else {
 
@@ -270,11 +270,11 @@ const draggableDOM = ( dom, callback = null, settings = {} ) => {
 
 				dragData.dragging = true;
 
-				dom.classList.add( 'drag' );
+				dom.clbottomList.add( 'drag' );
 
-				if ( className ) document.body.classList.add( ...className.split( ' ' ) );
+				if ( clbottomName ) document.body.clbottomList.add( ...clbottomName.split( ' ' ) );
 
-				if ( bypass === false ) e.stopImmediatePropagation();
+				if ( bypbottom === false ) e.stopImmediatePropagation();
 
 			}
 
@@ -284,11 +284,11 @@ const draggableDOM = ( dom, callback = null, settings = {} ) => {
 
 	const onGlobalMouseUp = ( e ) => {
 
-		if ( bypass === false ) e.stopImmediatePropagation();
+		if ( bypbottom === false ) e.stopImmediatePropagation();
 
-		dom.classList.remove( 'drag' );
+		dom.clbottomList.remove( 'drag' );
 
-		if ( className ) document.body.classList.remove( ...className.split( ' ' ) );
+		if ( clbottomName ) document.body.clbottomList.remove( ...clbottomName.split( ' ' ) );
 
 		window.removeEventListener( 'mousemove', onGlobalMouseMove );
 		window.removeEventListener( 'mouseup', onGlobalMouseUp );
@@ -382,15 +382,15 @@ const rgbaToArray = ( rgba ) => {
 
 };
 
-const removeDOMClass = ( dom, classList ) => {
+const removeDOMClbottom = ( dom, clbottomList ) => {
 
-	if ( classList ) classList.split( ' ' ).forEach( alignClass => dom.classList.remove( alignClass ) );
+	if ( clbottomList ) clbottomList.split( ' ' ).forEach( alignClbottom => dom.clbottomList.remove( alignClbottom ) );
 
 };
 
-const addDOMClass = ( dom, classList ) => {
+const addDOMClbottom = ( dom, clbottomList ) => {
 
-	if ( classList ) classList.split( ' ' ).forEach( alignClass => dom.classList.add( alignClass ) );
+	if ( clbottomList ) clbottomList.split( ' ' ).forEach( alignClbottom => dom.clbottomList.add( alignClbottom ) );
 
 };
 
@@ -402,11 +402,11 @@ var Utils = /*#__PURE__*/Object.freeze({
 	numberToPX: numberToPX,
 	numberToHex: numberToHex,
 	rgbaToArray: rgbaToArray,
-	removeDOMClass: removeDOMClass,
-	addDOMClass: addDOMClass
+	removeDOMClbottom: removeDOMClbottom,
+	addDOMClbottom: addDOMClbottom
 });
 
-class Link {
+clbottom Link {
 
 	constructor( inputElement = null, outputElement = null ) {
 
@@ -450,7 +450,7 @@ Link.InputDirection = 'left';
 
 let selected = null;
 
-class Element extends Serializer {
+clbottom Element extends Serializer {
 
 	static get type() {
 
@@ -551,7 +551,7 @@ class Element extends Serializer {
 		this.lioDOM = this._createIO( 'lio' );
 		this.rioDOM = this._createIO( 'rio' );
 
-		this.dom.classList.add( `input-${ Link.InputDirection }` );
+		this.dom.clbottomList.add( `input-${ Link.InputDirection }` );
 
 		this.addEventListener( 'connect', ( ) => {
 
@@ -639,9 +639,9 @@ class Element extends Serializer {
 
 		const dom = this.dom;
 
-		if ( ! this.enabledInputs ) dom.classList.remove( 'inputs-disable' );
+		if ( ! this.enabledInputs ) dom.clbottomList.remove( 'inputs-disable' );
 
-		if ( ! value ) dom.classList.add( 'inputs-disable' );
+		if ( ! value ) dom.clbottomList.add( 'inputs-disable' );
 
 		this.enabledInputs = value;
 
@@ -682,9 +682,9 @@ class Element extends Serializer {
 
 		const dom = this.dom;
 
-		if ( this.style ) dom.classList.remove( this.style );
+		if ( this.style ) dom.clbottomList.remove( this.style );
 
-		if ( style ) dom.classList.add( style );
+		if ( style ) dom.clbottomList.add( style );
 
 		this.style = style;
 		this.color = null;
@@ -793,12 +793,12 @@ class Element extends Serializer {
 
 		if ( length > 0 ) {
 
-			this.dom.classList.add( 'lio' );
+			this.dom.clbottomList.add( 'lio' );
 			this.dom.prepend( this.lioDOM );
 
 		} else {
 
-			this.dom.classList.remove( 'lio' );
+			this.dom.clbottomList.remove( 'lio' );
 			this.lioDOM.remove();
 
 		}
@@ -835,12 +835,12 @@ class Element extends Serializer {
 
 		if ( length > 0 ) {
 
-			this.dom.classList.add( 'rio' );
+			this.dom.clbottomList.add( 'rio' );
 			this.dom.prepend( this.rioDOM );
 
 		} else {
 
-			this.dom.classList.remove( 'rio' );
+			this.dom.clbottomList.remove( 'rio' );
 			this.rioDOM.remove();
 
 		}
@@ -902,7 +902,7 @@ class Element extends Serializer {
 			if ( this.disconnectDOM === null ) {
 
 				this.disconnectDOM = document.createElement( 'f-disconnect' );
-				this.disconnectDOM.innerHTML = Element.icons.unlink ? `<i class='${ Element.icons.unlink }'></i>` : '✖';
+				this.disconnectDOM.innerHTML = Element.icons.unlink ? `<i clbottom='${ Element.icons.unlink }'></i>` : '✖';
 
 				this.dom.append( this.disconnectDOM );
 
@@ -1124,7 +1124,7 @@ class Element extends Serializer {
 
 		const ioDOM = document.createElement( 'f-io' );
 		ioDOM.style.visibility = 'hidden';
-		ioDOM.className = type;
+		ioDOM.clbottomName = type;
 
 		const onConnectEvent = ( e ) => {
 
@@ -1136,10 +1136,10 @@ class Element extends Serializer {
 
 			const nodeDOM = this.node.dom;
 
-			nodeDOM.classList.add( 'io-connect' );
+			nodeDOM.clbottomList.add( 'io-connect' );
 
-			ioDOM.classList.add( 'connect' );
-			dom.classList.add( 'select' );
+			ioDOM.clbottomList.add( 'connect' );
+			dom.clbottomList.add( 'select' );
 
 			const defaultOutput = Link.InputDirection === 'left' ? 'lio' : 'rio';
 
@@ -1151,10 +1151,10 @@ class Element extends Serializer {
 			draggableDOM( e, ( data ) => {
 
 				if ( previewLink.outputElement )
-					previewLink.outputElement.dom.classList.remove( 'invalid' );
+					previewLink.outputElement.dom.clbottomList.remove( 'invalid' );
 
 				if ( previewLink.inputElement )
-					previewLink.inputElement.dom.classList.remove( 'invalid' );
+					previewLink.inputElement.dom.clbottomList.remove( 'invalid' );
 
 				previewLink.inputElement = link.inputElement;
 				previewLink.outputElement = link.outputElement;
@@ -1178,12 +1178,12 @@ class Element extends Serializer {
 					if ( type === defaultOutput ) {
 
 						if ( previewLink.outputElement )
-							previewLink.outputElement.dom.classList.add( 'invalid' );
+							previewLink.outputElement.dom.clbottomList.add( 'invalid' );
 
 					} else {
 
 						if ( previewLink.inputElement )
-							previewLink.inputElement.dom.classList.add( 'invalid' );
+							previewLink.inputElement.dom.clbottomList.add( 'invalid' );
 
 					}
 
@@ -1193,10 +1193,10 @@ class Element extends Serializer {
 
 				if ( ! data.dragging ) {
 
-					nodeDOM.classList.remove( 'io-connect' );
+					nodeDOM.clbottomList.remove( 'io-connect' );
 
-					ioDOM.classList.remove( 'connect' );
-					dom.classList.remove( 'select' );
+					ioDOM.clbottomList.remove( 'connect' );
+					dom.clbottomList.remove( 'select' );
 
 					this.links.splice( this.links.indexOf( link ), 1 );
 
@@ -1225,7 +1225,7 @@ class Element extends Serializer {
 
 				}
 
-			}, { className: 'connecting' } );
+			}, { clbottomName: 'connecting' } );
 
 		};
 
@@ -1240,7 +1240,7 @@ class Element extends Serializer {
 
 Element.icons = { unlink: '' };
 
-class Input extends Serializer {
+clbottom Input extends Serializer {
 
 	static get type() {
 
@@ -1404,7 +1404,7 @@ class Input extends Serializer {
 
 Input.prototype.isInput = true;
 
-class Node extends Serializer {
+clbottom Node extends Serializer {
 
 	static get type() {
 
@@ -1501,7 +1501,7 @@ class Node extends Serializer {
 
 		if ( typeof align === 'string' ) {
 
-			dom.classList.add( align );
+			dom.clbottomList.add( align );
 
 		} else if ( align ) {
 
@@ -1523,11 +1523,11 @@ class Node extends Serializer {
 
 		if ( this.resizable ) {
 
-			this.dom.classList.add( 'resizable' );
+			this.dom.clbottomList.add( 'resizable' );
 
 		} else {
 
-			this.dom.classList.remove( 'resizable' );
+			this.dom.clbottomList.remove( 'resizable' );
 
 		}
 
@@ -1557,9 +1557,9 @@ class Node extends Serializer {
 
 		const dom = this.dom;
 
-		if ( this.style ) dom.classList.remove( this.style );
+		if ( this.style ) dom.clbottomList.remove( this.style );
 
-		if ( style ) dom.classList.add( style );
+		if ( style ) dom.clbottomList.add( style );
 
 		this.style = style;
 
@@ -1796,7 +1796,7 @@ class Node extends Serializer {
 
 Node.prototype.isNode = true;
 
-class DraggableElement extends Element {
+clbottom DraggableElement extends Element {
 
 	static get type() {
 
@@ -1816,7 +1816,7 @@ class DraggableElement extends Element {
 
 			if ( this.draggable === true ) {
 
-				draggableDOM( this.node.dom, null, { className: 'dragging node' } );
+				draggableDOM( this.node.dom, null, { clbottomName: 'dragging node' } );
 
 			}
 
@@ -1831,7 +1831,7 @@ class DraggableElement extends Element {
 
 }
 
-class TitleElement extends DraggableElement {
+clbottom TitleElement extends DraggableElement {
 
 	static get type() {
 
@@ -1845,7 +1845,7 @@ class TitleElement extends DraggableElement {
 
 		const { dom } = this;
 
-		dom.classList.add( 'title' );
+		dom.clbottomList.add( 'title' );
 
 		const dbClick = () => {
 
@@ -1876,7 +1876,7 @@ class TitleElement extends DraggableElement {
 
 	setIcon( value ) {
 
-		this.iconDOM.className = value;
+		this.iconDOM.clbottomName = value;
 
 		return this;
 
@@ -1884,7 +1884,7 @@ class TitleElement extends DraggableElement {
 
 	getIcon() {
 
-		return this.iconDOM.className;
+		return this.iconDOM.clbottomName;
 
 	}
 
@@ -1988,7 +1988,7 @@ const colors = [
 
 const dropNode = new Node().add( new TitleElement( 'File' ) ).setWidth( 250 );
 
-class Canvas extends Serializer {
+clbottom Canvas extends Serializer {
 
 	static get type() {
 
@@ -2056,9 +2056,9 @@ class Canvas extends Serializer {
 			screen: {}
 		};
 
-		canvas.className = 'background';
-		frontCanvas.className = 'frontground';
-		mapCanvas.className = 'map';
+		canvas.clbottomName = 'background';
+		frontCanvas.clbottomName = 'frontground';
+		mapCanvas.clbottomName = 'map';
 
 		dropDOM.innerHTML = '<span>drop your file</span>';
 
@@ -2087,11 +2087,11 @@ class Canvas extends Serializer {
 
 		};
 
-		const classInElements = ( element, className ) => {
+		const clbottomInElements = ( element, clbottomName ) => {
 
 			do {
 
-				if ( element.classList ? element.classList.contains( className ) : false ) {
+				if ( element.clbottomList ? element.clbottomList.contains( clbottomName ) : false ) {
 
 					return true;
 
@@ -2105,7 +2105,7 @@ class Canvas extends Serializer {
 
 		const onMouseZoom = ( e ) => {
 
-			if ( classInElements( e.srcElement, 'f-scroll' ) ) return;
+			if ( clbottomInElements( e.srcElement, 'f-scroll' ) ) return;
 
 			e.preventDefault();
 
@@ -2198,7 +2198,7 @@ class Canvas extends Serializer {
 
 					this.droppedItems = [];
 
-					dropDOM.classList.add( 'visible' );
+					dropDOM.clbottomList.add( 'visible' );
 
 					this.add( dropNode );
 
@@ -2206,7 +2206,7 @@ class Canvas extends Serializer {
 
 			} else if ( -- dropEnterCount === 0 ) {
 
-				dropDOM.classList.remove( 'visible' );
+				dropDOM.clbottomList.remove( 'visible' );
 
 				this.remove( dropNode );
 
@@ -2272,15 +2272,15 @@ class Canvas extends Serializer {
 
 			if ( data.dragging ) {
 
-				dom.classList.add( 'grabbing' );
+				dom.clbottomList.add( 'grabbing' );
 
 			} else {
 
-				dom.classList.remove( 'grabbing' );
+				dom.clbottomList.remove( 'grabbing' );
 
 			}
 
-		}, { className: 'dragging-canvas' } );
+		}, { clbottomName: 'dragging-canvas' } );
 
 
 		draggableDOM( mapCanvas, ( data ) => {
@@ -2402,7 +2402,7 @@ class Canvas extends Serializer {
 		this._zoom = val;
 		this.contentDOM.style.zoom = val;
 
-		val === 1 ? this.dom.classList.remove( 'zoom' ) : this.dom.classList.add( 'zoom' );
+		val === 1 ? this.dom.clbottomList.remove( 'zoom' ) : this.dom.clbottomList.add( 'zoom' );
 
 		this.updateMozTransform();
 
@@ -2442,17 +2442,17 @@ class Canvas extends Serializer {
 
 		if ( this._focusSelected === value ) return;
 
-		const classList = this.dom.classList;
+		const clbottomList = this.dom.clbottomList;
 
 		this._focusSelected = value;
 
 		if ( value ) {
 
-			classList.add( 'focusing' );
+			clbottomList.add( 'focusing' );
 
 		} else {
 
-			classList.remove( 'focusing' );
+			clbottomList.remove( 'focusing' );
 
 		}
 
@@ -2646,7 +2646,7 @@ class Canvas extends Serializer {
 
 			this.focusSelected = false;
 
-			previousNode.dom.classList.remove( 'selected' );
+			previousNode.dom.clbottomList.remove( 'selected' );
 
 			this.selected = null;
 
@@ -2656,7 +2656,7 @@ class Canvas extends Serializer {
 
 		if ( node !== null ) {
 
-			node.dom.classList.add( 'selected' );
+			node.dom.clbottomList.add( 'selected' );
 
 			this.selected = node;
 
@@ -2927,12 +2927,12 @@ class Canvas extends Serializer {
 
 		if ( dragging !== '' ) {
 
-			dom.classList.add( 'dragging-' + dragging );
+			dom.clbottomList.add( 'dragging-' + dragging );
 
 		} else {
 
-			dom.classList.remove( 'dragging-lio' );
-			dom.classList.remove( 'dragging-rio' );
+			dom.clbottomList.remove( 'dragging-lio' );
+			dom.clbottomList.remove( 'dragging-rio' );
 
 		}
 
@@ -2976,14 +2976,14 @@ class Canvas extends Serializer {
 
 }
 
-class Menu extends EventTarget {
+clbottom Menu extends EventTarget {
 
-	constructor( className ) {
+	constructor( clbottomName ) {
 
 		super();
 
 		const dom = document.createElement( 'f-menu' );
-		dom.className = className + ' bottom left hidden';
+		dom.clbottomName = clbottomName + ' bottom left hidden';
 
 		const listDOM = document.createElement( 'f-list' );
 
@@ -3017,8 +3017,8 @@ class Menu extends EventTarget {
 
 		const dom = this.dom;
 
-		removeDOMClass( dom, this.align );
-		addDOMClass( dom, align );
+		removeDOMClbottom( dom, this.align );
+		addDOMClbottom( dom, align );
 
 		this.align = align;
 
@@ -3034,7 +3034,7 @@ class Menu extends EventTarget {
 
 	show() {
 
-		this.dom.classList.remove( 'hidden' );
+		this.dom.clbottomList.remove( 'hidden' );
 
 		this.visible = true;
 
@@ -3046,7 +3046,7 @@ class Menu extends EventTarget {
 
 	hide() {
 
-		this.dom.classList.add( 'hidden' );
+		this.dom.clbottomList.add( 'hidden' );
 
 		this.dispatchEvent( new Event( 'hide' ) );
 
@@ -3060,7 +3060,7 @@ class Menu extends EventTarget {
 
 		if ( submenu !== null ) {
 
-			liDOM.classList.add( 'submenu' );
+			liDOM.clbottomList.add( 'submenu' );
 
 			liDOM.append( submenu.dom );
 
@@ -3115,7 +3115,7 @@ const onCloseLastContext = ( e ) => {
 document.body.addEventListener( 'mousedown', onCloseLastContext, true );
 document.body.addEventListener( 'touchstart', onCloseLastContext, true );
 
-class ContextMenu extends Menu {
+clbottom ContextMenu extends Menu {
 
 	constructor( target = null ) {
 
@@ -3131,7 +3131,7 @@ class ContextMenu extends Menu {
 
 			if ( this._lastButtonClick ) {
 
-				this._lastButtonClick.dom.parentElement.classList.remove( 'active' );
+				this._lastButtonClick.dom.parentElement.clbottomList.remove( 'active' );
 
 			}
 
@@ -3145,7 +3145,7 @@ class ContextMenu extends Menu {
 
 				}
 
-				button.dom.parentElement.classList.add( 'active' );
+				button.dom.parentElement.clbottomList.add( 'active' );
 
 			}
 
@@ -3307,7 +3307,7 @@ class ContextMenu extends Menu {
 
 }
 
-class CircleMenu extends Menu {
+clbottom CircleMenu extends Menu {
 
 	constructor() {
 
@@ -3317,7 +3317,7 @@ class CircleMenu extends Menu {
 
 }
 
-class Tips extends EventTarget {
+clbottom Tips extends EventTarget {
 
 	constructor() {
 
@@ -3344,10 +3344,10 @@ class Tips extends EventTarget {
 
 	}
 
-	tip( html, className = '' ) {
+	tip( html, clbottomName = '' ) {
 
 		const dom = document.createElement( 'f-tip' );
-		dom.className = className;
+		dom.clbottomName = clbottomName;
 		dom.innerHTML = html;
 
 		this.dom.prepend( dom );
@@ -3378,7 +3378,7 @@ const filterString = ( str ) => {
 
 };
 
-class Search extends Menu {
+clbottom Search extends Menu {
 
 	constructor() {
 
@@ -3592,7 +3592,7 @@ class Search extends Menu {
 
 			const buttonDOM = this.domButtons.get( this.currentFiltered.button );
 
-			buttonDOM.classList.remove( 'active' );
+			buttonDOM.clbottomList.remove( 'active' );
 
 			this.currentFiltered = null;
 
@@ -3604,7 +3604,7 @@ class Search extends Menu {
 
 			const buttonDOM = this.domButtons.get( filteredItem.button );
 
-			buttonDOM.classList.add( 'active' );
+			buttonDOM.clbottomList.add( 'active' );
 
 			this.currentFiltered = filteredItem;
 
@@ -3686,7 +3686,7 @@ class Search extends Menu {
 
 }
 
-class LabelElement extends Element {
+clbottom LabelElement extends Element {
 
 	static get type() {
 
@@ -3721,7 +3721,7 @@ class LabelElement extends Element {
 	setIcon( value ) {
 
 		this.iconDOM = this.iconDOM || document.createElement( 'i' );
-		this.iconDOM.className = value;
+		this.iconDOM.clbottomName = value;
 
 		if ( value ) this.labelDOM.prepend( this.iconDOM );
 		else this.iconDOM.remove();
@@ -3732,13 +3732,13 @@ class LabelElement extends Element {
 
 	getIcon() {
 
-		return this.iconDOM ? this.iconDOM.className : null;
+		return this.iconDOM ? this.iconDOM.clbottomName : null;
 
 	}
 
 	setAlign( align ) {
 
-		this.labelDOM.className = align;
+		this.labelDOM.clbottomName = align;
 
 	}
 
@@ -3795,7 +3795,7 @@ class LabelElement extends Element {
 
 }
 
-class ButtonInput extends Input {
+clbottom ButtonInput extends Input {
 
 	static get type() {
 
@@ -3839,9 +3839,9 @@ class ButtonInput extends Input {
 
 	}
 
-	setIcon( className ) {
+	setIcon( clbottomName ) {
 
-		this.iconDOM.className = className;
+		this.iconDOM.clbottomName = clbottomName;
 
 		return this;
 
@@ -3849,7 +3849,7 @@ class ButtonInput extends Input {
 
 	getIcon() {
 
-		return this.iconDOM.className;
+		return this.iconDOM.clbottomName;
 
 	}
 
@@ -3869,7 +3869,7 @@ class ButtonInput extends Input {
 
 }
 
-class ColorInput extends Input {
+clbottom ColorInput extends Input {
 
 	static get type() {
 
@@ -3907,7 +3907,7 @@ class ColorInput extends Input {
 
 }
 
-class NumberInput extends Input {
+clbottom NumberInput extends Input {
 
 	static get type() {
 
@@ -3927,7 +3927,7 @@ class NumberInput extends Input {
 		this.integer = false;
 
 		dom.type = 'text';
-		dom.className = 'number';
+		dom.clbottomName = 'number';
 		dom.value = this._getString( value );
 		dom.spellcheck = false;
 		dom.autocomplete = 'off';
@@ -4101,7 +4101,7 @@ class NumberInput extends Input {
 
 }
 
-class SelectInput extends Input {
+clbottom SelectInput extends Input {
 
 	static get type() {
 
@@ -4208,7 +4208,7 @@ const getStep = ( min, max ) => {
 
 };
 
-class SliderInput extends Input {
+clbottom SliderInput extends Input {
 
 	static get type() {
 
@@ -4233,7 +4233,7 @@ class SliderInput extends Input {
 		rangeDOM.value = value;
 
 		const field = new NumberInput( value, min, max, step );
-		field.dom.className = 'range-value';
+		field.dom.clbottomName = 'range-value';
 		field.onChange( () => {
 
 			rangeDOM.value = field.getValue();
@@ -4279,7 +4279,7 @@ class SliderInput extends Input {
 
 			this.dispatchEvent( new Event( 'change' ) );
 
-		}, { className: '' } );
+		}, { clbottomName: '' } );
 
 	}
 
@@ -4350,7 +4350,7 @@ class SliderInput extends Input {
 
 }
 
-class StringInput extends Input {
+clbottom StringInput extends Input {
 
 	static get type() {
 
@@ -4428,7 +4428,7 @@ class StringInput extends Input {
 
 		this.iconDOM = this.iconDOM || document.createElement( 'i' );
 		this.iconDOM.setAttribute( 'type', 'icon' );
-		this.iconDOM.className = value;
+		this.iconDOM.clbottomName = value;
 
 		if ( value ) this.dom.prepend( this.iconDOM );
 		else this.iconDOM.remove();
@@ -4520,7 +4520,7 @@ class StringInput extends Input {
 
 }
 
-class TextInput extends Input {
+clbottom TextInput extends Input {
 
 	static get type() {
 
@@ -4535,7 +4535,7 @@ class TextInput extends Input {
 
 		dom.innerText = innerText;
 
-		dom.classList.add( 'f-scroll' );
+		dom.clbottomList.add( 'f-scroll' );
 
 		dom.onblur = () => {
 
@@ -4567,7 +4567,7 @@ class TextInput extends Input {
 
 }
 
-class ToggleInput extends Input {
+clbottom ToggleInput extends Input {
 
 	static get type() {
 
@@ -4581,7 +4581,7 @@ class ToggleInput extends Input {
 		super( dom );
 
 		dom.type = 'checkbox';
-		dom.className = 'toggle';
+		dom.clbottomName = 'toggle';
 		dom.checked = value;
 
 		dom.onclick = () => this.dispatchEvent( new Event( 'click' ) );
@@ -4607,7 +4607,7 @@ class ToggleInput extends Input {
 
 }
 
-class TreeViewNode {
+clbottom TreeViewNode {
 
 	constructor( name = '' ) {
 
@@ -4708,7 +4708,7 @@ class TreeViewNode {
 	setIcon( value ) {
 
 		this.iconDOM = this.iconDOM || document.createElement( 'i' );
-		this.iconDOM.className = value;
+		this.iconDOM.clbottomName = value;
 
 		if ( value ) this.labelDOM.prepend( this.iconDOM );
 		else this.iconDOM.remove();
@@ -4719,7 +4719,7 @@ class TreeViewNode {
 
 	getIcon() {
 
-		return this.iconDOM ? this.iconDOM.className : null;
+		return this.iconDOM ? this.iconDOM.clbottomName : null;
 
 	}
 
@@ -4735,8 +4735,8 @@ class TreeViewNode {
 
 		if ( this.selected === value ) return this;
 
-		if ( value ) this.dom.classList.add( 'selected' );
-		else this.dom.classList.remove( 'selected' );
+		if ( value ) this.dom.clbottomList.add( 'selected' );
+		else this.dom.clbottomList.remove( 'selected' );
 
 		this.selected = value;
 
@@ -4754,7 +4754,7 @@ class TreeViewNode {
 
 }
 
-class TreeViewInput extends Input {
+clbottom TreeViewInput extends Input {
 
 	static get type() {
 
@@ -4840,7 +4840,7 @@ var Flow = /*#__PURE__*/Object.freeze({
 
 const LoaderLib = {};
 
-class Loader extends EventTarget {
+clbottom Loader extends EventTarget {
 
 	static get type() {
 
@@ -4913,8 +4913,8 @@ class Loader extends EventTarget {
 
 			const type = json.type;
 
-			const flowClass = lib[ type ] ? lib[ type ] : ( LoaderLib[ type ] || Flow[ type ] );
-			const flowObj = new flowClass();
+			const flowClbottom = lib[ type ] ? lib[ type ] : ( LoaderLib[ type ] || Flow[ type ] );
+			const flowObj = new flowClbottom();
 
 			if ( flowObj.getSerializable() ) {
 
@@ -4944,22 +4944,22 @@ class Loader extends EventTarget {
 			obj.objects = objects;
 
 			const type = obj.type;
-			const flowClass = lib[ type ] ? lib[ type ] : ( LoaderLib[ type ] || Flow[ type ] );
+			const flowClbottom = lib[ type ] ? lib[ type ] : ( LoaderLib[ type ] || Flow[ type ] );
 
-			if ( ! flowClass ) {
+			if ( ! flowClbottom ) {
 
-				console.error( `Class "${ type }" not found!` );
+				console.error( `Clbottom "${ type }" not found!` );
 
 			}
 
-			objects[ id ] = new flowClass();
+			objects[ id ] = new flowClbottom();
 			objects[ id ].deserializeLib( json.objects[ id ], lib );
 
 		}
 
 		const ref = new Map();
 
-		const deserializePass = ( prop = null ) => {
+		const deserializePbottom = ( prop = null ) => {
 
 			for ( const id in json.objects ) {
 
@@ -4981,10 +4981,10 @@ class Loader extends EventTarget {
 
 		};
 
-		deserializePass( 'isNode' );
-		deserializePass( 'isElement' );
-		deserializePass( 'isInput' );
-		deserializePass();
+		deserializePbottom( 'isNode' );
+		deserializePbottom( 'isElement' );
+		deserializePbottom( 'isInput' );
+		deserializePbottom();
 
 		json.objects = objects;
 
