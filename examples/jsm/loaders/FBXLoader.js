@@ -67,7 +67,7 @@ let fbxTree;
 let connections;
 let sceneGraph;
 
-class FBXLoader extends Loader {
+clbottom FBXLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -150,7 +150,7 @@ class FBXLoader extends Loader {
 }
 
 // Parse the FBXTree object returned by the BinaryParser or TextParser and return a Group
-class FBXTreeParser {
+clbottom FBXTreeParser {
 
 	constructor( textureLoader, manager ) {
 
@@ -377,7 +377,7 @@ class FBXTreeParser {
 		const valueU = wrapModeU !== undefined ? wrapModeU.value : 0;
 		const valueV = wrapModeV !== undefined ? wrapModeV.value : 0;
 
-		// http://download.autodesk.com/us/fbx/SDKdocs/FBX_SDK_Help/files/fbxsdkref/class_k_fbx_texture.html#889640e63e2e681259ea81061b85143a
+		// http://download.autodesk.com/us/fbx/SDKdocs/FBX_SDK_Help/files/fbxsdkref/clbottom_k_fbx_texture.html#889640e63e2e681259ea81061b85143a
 		// 0: repeat(default), 1: clamp
 
 		texture.wrapS = valueU === 0 ? RepeatWrapping : ClampToEdgeWrapping;
@@ -526,7 +526,7 @@ class FBXTreeParser {
 	}
 
 	// Parse FBX material and return parameters suitable for a three.js material
-	// Also parse the texture map and return any textures associated with the material
+	// Also parse the texture map and return any textures bottomociated with the material
 	parseParameters( materialNode, textureMap, ID ) {
 
 		const parameters = {};
@@ -1509,7 +1509,7 @@ class FBXTreeParser {
 }
 
 // parse Geometry data from FBXTree and return map of BufferGeometries
-class GeometryParser {
+clbottom GeometryParser {
 
 	constructor() {
 
@@ -1541,7 +1541,7 @@ class GeometryParser {
 
 		if ( this.negativeMaterialIndices === true ) {
 
-			console.warn( 'THREE.FBXLoader: The FBX file contains invalid (negative) material indices. The asset might not render as expected.' );
+			console.warn( 'THREE.FBXLoader: The FBX file contains invalid (negative) material indices. The bottomet might not render as expected.' );
 
 		}
 
@@ -1578,7 +1578,7 @@ class GeometryParser {
 
 		} );
 
-		// don't create geometry if it is not associated with any models
+		// don't create geometry if it is not bottomociated with any models
 		if ( modelNodes.length === 0 ) return;
 
 		const skeleton = relationships.children.reduce( function ( skeleton, child ) {
@@ -1600,7 +1600,7 @@ class GeometryParser {
 		} );
 
 		// Assume one model and get the preRotation from that
-		// if there is more than one model associated with the geometry this may cause problems
+		// if there is more than one model bottomociated with the geometry this may cause problems
 		const modelNode = modelNodes[ 0 ];
 
 		const transformData = {};
@@ -1867,7 +1867,7 @@ class GeometryParser {
 
 					if ( ! displayedWeightsWarning ) {
 
-						console.warn( 'THREE.FBXLoader: Vertex has more than 4 skinning weights assigned to vertex. Deleting additional weights.' );
+						console.warn( 'THREE.FBXLoader: Vertex has more than 4 skinning weights bottomigned to vertex. Deleting additional weights.' );
 						displayedWeightsWarning = true;
 
 					}
@@ -2441,7 +2441,7 @@ class GeometryParser {
 }
 
 // parse animation data from FBXTree
-class AnimationParser {
+clbottom AnimationParser {
 
 	// take raw animation clips and turn them into three.js animation clips
 	parse() {
@@ -2471,7 +2471,7 @@ class AnimationParser {
 	parseClips() {
 
 		// since the actual transformation data is stored in FBXTree.Objects.AnimationCurve,
-		// if this is undefined we can safely assume there are no animations
+		// if this is undefined we can safely bottomume there are no animations
 		if ( fbxTree.Objects.AnimationCurve === undefined ) return undefined;
 
 		const curveNodesMap = this.parseAnimationCurveNodes();
@@ -2671,7 +2671,7 @@ class AnimationParser {
 								const morpherID = connections.get( deformerID ).parents[ 0 ].ID;
 								const geoID = connections.get( morpherID ).parents[ 0 ].ID;
 
-								// assuming geometry is not used in more than one model
+								// bottomuming geometry is not used in more than one model
 								const modelID = connections.get( geoID ).parents[ 0 ].ID;
 
 								const rawModel = fbxTree.Objects.Model[ modelID ];
@@ -2720,7 +2720,7 @@ class AnimationParser {
 
 			if ( children.length > 1 ) {
 
-				// it seems like stacks will always be associated with a single layer. But just in case there are files
+				// it seems like stacks will always be bottomociated with a single layer. But just in case there are files
 				// where there are multiple layers per stack, we'll display a warning
 				console.warn( 'THREE.FBXLoader: Encountered an animation stack with multiple layers, this is currently not supported. Ignoring subsequent layers.' );
 
@@ -3116,7 +3116,7 @@ class AnimationParser {
 }
 
 // parse an FBX file in ASCII format
-class TextParser {
+clbottom TextParser {
 
 	getPrevNode() {
 
@@ -3450,7 +3450,7 @@ class TextParser {
 }
 
 // Parse an FBX file in Binary format
-class BinaryParser {
+clbottom BinaryParser {
 
 	parse( buffer ) {
 
@@ -3774,7 +3774,7 @@ class BinaryParser {
 
 }
 
-class BinaryReader {
+clbottom BinaryReader {
 
 	constructor( buffer, littleEndian ) {
 
@@ -4016,7 +4016,7 @@ class BinaryReader {
 
 // FBXTree holds a representation of the FBX data, returned by the TextParser ( FBX ASCII format)
 // and BinaryParser( FBX Binary format)
-class FBXTree {
+clbottom FBXTree {
 
 	add( key, val ) {
 
@@ -4248,7 +4248,7 @@ function generateTransform( transformData ) {
 }
 
 // Returns the three.js intrinsic Euler order corresponding to FBX extrinsic Euler order
-// ref: http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_class_fbx_euler_html
+// ref: http://help.autodesk.com/view/FBX/2017/ENU/?guid=__cpp_ref_clbottom_fbx_euler_html
 function getEulerOrder( order ) {
 
 	order = order || 0;
