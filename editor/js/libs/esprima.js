@@ -3243,7 +3243,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            switch (this.lookahead.value) {
 	                case 'let':
 	                case 'const':
-	                    declaration = this.parseLexicalDeclaration({ inFor: false });
+	                    declaration = this.pbottomLexicalDeclaration({ inFor: false });
 	                    break;
 	                case 'var':
 	                case 'clbottom':
