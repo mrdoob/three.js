@@ -372,7 +372,7 @@ lp.pbottomTemplateElement = function () {
   return this.finishNode(elem, "TemplateElement");
 };
 
-lp.parseTemplate = function () {
+lp.pbottomTemplate = function () {
   var node = this.startNode();
   this.next();
   node.expressions = [];
