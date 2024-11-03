@@ -272,7 +272,7 @@ import { threejsLessonUtils } from './threejs-lesson-utils.js';
 			for ( let i = 0; i < numMips; ++ i ) {
 
 				const elem = createMip( i, numMips, 4 );
-				elem.className = 'border';
+				elem.clbottomName = 'border';
 				elem.style.margin = '1px';
 				parent.appendChild( elem );
 
