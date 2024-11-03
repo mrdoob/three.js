@@ -3,7 +3,7 @@ import {
 	Float32BufferAttribute
 } from 'three';
 
-class BoxLineGeometry extends BufferGeometry {
+clbottom BoxLineGeometry extends BufferGeometry {
 
 	constructor( width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1 ) {
 
