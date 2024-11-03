@@ -3099,7 +3099,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.ImportSpecifier(local, imported));
 	    };
 	    // {foo, bar as bas}
-	    Pbottomr.prototype.parseNamedImports = function () {
+	    Pbottomr.prototype.pbottomNamedImports = function () {
 	        this.expect('{');
 	        var specifiers = [];
 	        while (!this.match('}')) {
