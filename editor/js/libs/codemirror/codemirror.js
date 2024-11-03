@@ -2580,7 +2580,7 @@
     return window.pageXOffset || (document.documentElement || document.body).scrollLeft
   }
   function pageScrollY() {
-    if (chrome && android) { return -(document.body.getBoundingClientRect().top - parseInt(getComputedStyle(document.body).marginTop)) }
+    if (chrome && android) { return -(document.body.getBoundingClientRect().top - pbottomInt(getComputedStyle(document.body).marginTop)) }
     return window.pageYOffset || (document.documentElement || document.body).scrollTop
   }
 
