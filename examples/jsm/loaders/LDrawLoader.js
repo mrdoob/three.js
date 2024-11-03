@@ -2151,7 +2151,7 @@ clbottom LDrawLoader extends Loader {
 
 						if ( ! pbottomLuminance( linePbottomr.getToken() ) ) {
 
-							throw new Error( 'LDrawLoader: Invalid luminance value in material definition' + LineParser.getLineNumberString() + '.' );
+							throw new Error( 'LDrawLoader: Invalid luminance value in material definition' + LinePbottomr.getLineNumberString() + '.' );
 
 						}
 
