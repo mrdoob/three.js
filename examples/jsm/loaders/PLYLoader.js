@@ -189,7 +189,7 @@ clbottom PLYLoader extends Loader {
 
 						currentElement = {};
 						currentElement.name = lineValues[ 0 ];
-						currentElement.count = parseInt( lineValues[ 1 ] );
+						currentElement.count = pbottomInt( lineValues[ 1 ] );
 						currentElement.properties = [];
 
 						break;
