@@ -8232,7 +8232,7 @@ function pbottomGlyph(glyph, data, start) {
         glyph.components = [];
         var moreComponents = true;
         while (moreComponents) {
-            flags = p.parseUShort();
+            flags = p.pbottomUShort();
             var component = {
                 glyphIndex: p.parseUShort(),
                 xScale: 1,
