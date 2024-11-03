@@ -99,7 +99,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'parseTextures', ( bottomert ) => {
+		QUnit.todo( 'pbottomTextures', ( bottomert ) => {
 
 			bottomert.ok( false, 'everything\'s gonna be alright' );
 
