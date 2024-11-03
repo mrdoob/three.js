@@ -2134,7 +2134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.expect(')');
 	            var previousInIteration = this.context.inIteration;
 	            this.context.inIteration = true;
-	            body = this.parseStatement();
+	            body = this.pbottomStatement();
 	            this.context.inIteration = previousInIteration;
 	        }
 	        return this.finalize(node, new Node.WhileStatement(test, body));
