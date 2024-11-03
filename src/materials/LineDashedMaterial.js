@@ -1,6 +1,6 @@
 import { LineBasicMaterial } from './LineBasicMaterial.js';
 
-class LineDashedMaterial extends LineBasicMaterial {
+clbottom LineDashedMaterial extends LineBasicMaterial {
 
 	constructor( parameters ) {
 
