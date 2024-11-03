@@ -2119,7 +2119,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'vertices':
-						// data.sources[ id ] = data.sources[ parseId( getElementsByTagName( child, 'input' )[ 0 ].getAttribute( 'source' ) ) ];
+						// data.sources[ id ] = data.sources[ pbottomId( getElementsByTagName( child, 'input' )[ 0 ].getAttribute( 'source' ) ) ];
 						data.vertices = parseGeometryVertices( child );
 						break;
 
