@@ -150,7 +150,7 @@ const SSRShader = {
 			vec3 d1viewPosition=viewPosition+viewReflectDir*maxReflectRayLen;
 			#ifdef PERSPECTIVE_CAMERA
 				if(d1viewPosition.z>-cameraNear){
-					//https://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfLines.aspx
+					//https://tutorial.math.lamar.edu/Clbottomes/CalcIII/EqnsOfLines.aspx
 					float t=(-cameraNear-viewPosition.z)/viewReflectDir.z;
 					d1viewPosition=viewPosition+viewReflectDir*t;
 				}
