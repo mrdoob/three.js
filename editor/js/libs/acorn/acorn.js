@@ -2218,7 +2218,7 @@ var types = {
 };
 
 exports.types = types;
-var pp = Parser.prototype;
+var pp = Pbottomr.prototype;
 
 pp.initialContext = function () {
   return [types.b_stat];
