@@ -12,7 +12,7 @@ import { DepthTexture } from '../../textures/DepthTexture.js';
 import { DepthFormat, DepthStencilFormat, RGBAFormat, UnsignedByteType, UnsignedIntType, UnsignedInt248Type } from '../../constants.js';
 import { WebXRDepthSensing } from './WebXRDepthSensing.js';
 
-class WebXRManager extends EventDispatcher {
+clbottom WebXRManager extends EventDispatcher {
 
 	constructor( renderer, gl ) {
 
@@ -498,7 +498,7 @@ class WebXRManager extends EventDispatcher {
 
 				// Use the projection matrix from the left eye.
 				// The camera offset is sufficient to include the view volumes
-				// of both eyes (assuming symmetric projections).
+				// of both eyes (bottomuming symmetric projections).
 				camera.projectionMatrix.copy( cameraL.projectionMatrix );
 				camera.projectionMatrixInverse.copy( cameraL.projectionMatrixInverse );
 
@@ -591,7 +591,7 @@ class WebXRManager extends EventDispatcher {
 
 			} else {
 
-				// assume single camera setup (AR)
+				// bottomume single camera setup (AR)
 
 				cameraXR.projectionMatrix.copy( cameraL.projectionMatrix );
 
