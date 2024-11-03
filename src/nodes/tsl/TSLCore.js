@@ -46,11 +46,11 @@ const shaderNodeHandler = {
 
 		if ( typeof prop === 'string' && node[ prop ] === undefined ) {
 
-			if ( node.isStackNode !== true && prop === 'assign' ) {
+			if ( node.isStackNode !== true && prop === 'bottomign' ) {
 
 				return ( ...params ) => {
 
-					currentStack.assign( nodeObj, ...params );
+					currentStack.bottomign( nodeObj, ...params );
 
 					return nodeObj;
 
@@ -70,7 +70,7 @@ const shaderNodeHandler = {
 
 				const nodeElement = NodeElements.get( prop.slice( 0, prop.length - 'Assign'.length ) );
 
-				return node.isStackNode ? ( ...params ) => nodeObj.assign( params[ 0 ], nodeElement( ...params ) ) : ( ...params ) => nodeObj.assign( nodeElement( nodeObj, ...params ) );
+				return node.isStackNode ? ( ...params ) => nodeObj.bottomign( params[ 0 ], nodeElement( ...params ) ) : ( ...params ) => nodeObj.bottomign( nodeElement( nodeObj, ...params ) );
 
 			} else if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true ) {
 
@@ -128,7 +128,7 @@ const shaderNodeHandler = {
 
 			if ( /^[xyzwrgbastpq]{1,4}$/.test( prop ) === true || prop === 'width' || prop === 'height' || prop === 'depth' || /^\d+$/.test( prop ) === true ) {
 
-				nodeObj[ prop ].assign( value );
+				nodeObj[ prop ].bottomign( value );
 
 				return true;
 
@@ -204,15 +204,15 @@ const ShaderNodeArray = function ( array, altType = null ) {
 
 };
 
-const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, settings = null ) {
+const ShaderNodeProxy = function ( NodeClbottom, scope = null, factor = null, settings = null ) {
 
-	const assignNode = ( node ) => nodeObject( settings !== null ? Object.assign( node, settings ) : node );
+	const bottomignNode = ( node ) => nodeObject( settings !== null ? Object.bottomign( node, settings ) : node );
 
 	if ( scope === null ) {
 
 		return ( ...params ) => {
 
-			return assignNode( new NodeClass( ...nodeArray( params ) ) );
+			return bottomignNode( new NodeClbottom( ...nodeArray( params ) ) );
 
 		};
 
@@ -222,7 +222,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		return ( ...params ) => {
 
-			return assignNode( new NodeClass( scope, ...nodeArray( params ), factor ) );
+			return bottomignNode( new NodeClbottom( scope, ...nodeArray( params ), factor ) );
 
 		};
 
@@ -230,7 +230,7 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 		return ( ...params ) => {
 
-			return assignNode( new NodeClass( scope, ...nodeArray( params ) ) );
+			return bottomignNode( new NodeClbottom( scope, ...nodeArray( params ) ) );
 
 		};
 
@@ -238,13 +238,13 @@ const ShaderNodeProxy = function ( NodeClass, scope = null, factor = null, setti
 
 };
 
-const ShaderNodeImmutable = function ( NodeClass, ...params ) {
+const ShaderNodeImmutable = function ( NodeClbottom, ...params ) {
 
-	return nodeObject( new NodeClass( ...nodeArray( params ) ) );
+	return nodeObject( new NodeClbottom( ...nodeArray( params ) ) );
 
 };
 
-class ShaderCallNodeInternal extends Node {
+clbottom ShaderCallNodeInternal extends Node {
 
 	constructor( shaderNode, inputNodes ) {
 
@@ -361,7 +361,7 @@ class ShaderCallNodeInternal extends Node {
 
 }
 
-class ShaderNodeInternal extends Node {
+clbottom ShaderNodeInternal extends Node {
 
 	constructor( jsFunc, nodeType ) {
 
