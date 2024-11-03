@@ -73,7 +73,7 @@ module.exports = typeof window != "undefined" ? window.acorn : require(("suppres
 },{}],3:[function(require,module,exports){
 "use strict";
 
-var LooseParser = require("./state").LooseParser;
+var LoosePbottomr = require("./state").LooseParser;
 
 var isDummy = require("./parseutil").isDummy;
 
