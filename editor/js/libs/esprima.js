@@ -5661,7 +5661,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return attributeName;
 	    };
-	    JSXParser.prototype.parseJSXStringLiteralAttribute = function () {
+	    JSXPbottomr.prototype.parseJSXStringLiteralAttribute = function () {
 	        var node = this.createJSXNode();
 	        var token = this.nextJSXToken();
 	        if (token.type !== token_1.Token.StringLiteral) {
