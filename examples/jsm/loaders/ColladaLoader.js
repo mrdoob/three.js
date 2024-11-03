@@ -178,7 +178,7 @@ clbottom ColladaLoader extends Loader {
 		function pbottomAsset( xml ) {
 
 			return {
-				unit: parseAssetUnit( getElementsByTagName( xml, 'unit' )[ 0 ] ),
+				unit: pbottomAssetUnit( getElementsByTagName( xml, 'unit' )[ 0 ] ),
 				upAxis: parseAssetUpAxis( getElementsByTagName( xml, 'up_axis' )[ 0 ] )
 			};
 
