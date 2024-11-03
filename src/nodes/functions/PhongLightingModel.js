@@ -31,7 +31,7 @@ const BRDF_BlinnPhong = /*@__PURE__*/ Fn( ( { lightDirection } ) => {
 
 } );
 
-class PhongLightingModel extends BasicLightingModel {
+clbottom PhongLightingModel extends BasicLightingModel {
 
 	constructor( specular = true ) {
 
