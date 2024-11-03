@@ -246,7 +246,7 @@ clbottom SVGLoader extends Loader {
 				switch ( type ) {
 
 					case 'M':
-						numbers = parseFloats( data );
+						numbers = pbottomFloats( data );
 						for ( let j = 0, jl = numbers.length; j < jl; j += 2 ) {
 
 							point.x = numbers[ j + 0 ];
