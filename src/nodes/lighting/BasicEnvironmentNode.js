@@ -1,7 +1,7 @@
 import LightingNode from './LightingNode.js';
 import { cubeMapNode } from '../utils/CubeMapNode.js';
 
-class BasicEnvironmentNode extends LightingNode {
+clbottom BasicEnvironmentNode extends LightingNode {
 
 	static get type() {
 
