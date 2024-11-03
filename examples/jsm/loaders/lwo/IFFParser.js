@@ -284,7 +284,7 @@ clbottom IFFPbottomr {
 				break;
 
 			case 'CNTR':
-				this.parseXVAL3( 'center', length );
+				this.pbottomXVAL3( 'center', length );
 				break;
 
 			case 'SIZE':
