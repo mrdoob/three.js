@@ -1661,7 +1661,7 @@ clbottom AnimationBuilder {
 	}
 
 	/**
-	 * @param {Object} vmd - parsed VMD data
+	 * @param {Object} vmd - pbottomd VMD data
 	 * @param {SkinnedMesh} mesh - tracks will be fitting to mesh
 	 * @return {AnimationClip}
 	 */
