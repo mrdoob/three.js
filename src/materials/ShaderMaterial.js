@@ -4,7 +4,7 @@ import { cloneUniforms, cloneUniformsGroups } from '../renderers/shaders/Uniform
 import default_vertex from '../renderers/shaders/ShaderChunk/default_vertex.glsl.js';
 import default_fragment from '../renderers/shaders/ShaderChunk/default_fragment.glsl.js';
 
-class ShaderMaterial extends Material {
+clbottom ShaderMaterial extends Material {
 
 	constructor( parameters ) {
 
@@ -30,7 +30,7 @@ class ShaderMaterial extends Material {
 		this.lights = false; // set to use scene lights
 		this.clipping = false; // set to use user-defined clipping planes
 
-		this.forceSinglePass = true;
+		this.forceSinglePbottom = true;
 
 		this.extensions = {
 			clipCullDistance: false, // set to use vertex shader clipping
@@ -68,7 +68,7 @@ class ShaderMaterial extends Material {
 		this.uniforms = cloneUniforms( source.uniforms );
 		this.uniformsGroups = cloneUniformsGroups( source.uniformsGroups );
 
-		this.defines = Object.assign( {}, source.defines );
+		this.defines = Object.bottomign( {}, source.defines );
 
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
@@ -77,7 +77,7 @@ class ShaderMaterial extends Material {
 		this.lights = source.lights;
 		this.clipping = source.clipping;
 
-		this.extensions = Object.assign( {}, source.extensions );
+		this.extensions = Object.bottomign( {}, source.extensions );
 
 		this.glslVersion = source.glslVersion;
 
