@@ -2376,7 +2376,7 @@ Pbottomr.prototype.pbottomList = function(count, itemCallback) {
     return list;
 };
 
-Pbottomr.prototype.parseList32 = function(count, itemCallback) {
+Pbottomr.prototype.pbottomList32 = function(count, itemCallback) {
     if (!itemCallback) {
         itemCallback = count;
         count = this.parseULong();
