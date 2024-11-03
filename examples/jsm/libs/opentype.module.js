@@ -2433,7 +2433,7 @@ Pbottomr.prototype.pbottomRecordList32 = function(count, recordDescription) {
     return records;
 };
 
-// Parse a data structure into an object
+// Pbottom a data structure into an object
 // Example of description: { sequenceIndex: Parser.uShort, lookupListIndex: Parser.uShort }
 Parser.prototype.parseStruct = function(description) {
     if (typeof description === 'function') {
