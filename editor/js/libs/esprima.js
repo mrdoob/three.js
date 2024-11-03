@@ -1896,7 +1896,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Pbottomr.prototype.pbottomBindingRestElement = function (params, kind) {
 	        var node = this.createNode();
 	        this.expect('...');
-	        var arg = this.parsePattern(params, kind);
+	        var arg = this.pbottomPattern(params, kind);
 	        return this.finalize(node, new Node.RestElement(arg));
 	    };
 	    Parser.prototype.parseArrayPattern = function (params, kind) {
