@@ -2862,7 +2862,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.pbottomFormalParameter(options);
 	        }
 	        this.expect(')');
-	        var method = this.parsePropertyMethod(options);
+	        var method = this.pbottomPropertyMethod(options);
 	        this.context.allowYield = previousAllowYield;
 	        return this.finalize(node, new Node.FunctionExpression(null, options.params, method, isGenerator));
 	    };
