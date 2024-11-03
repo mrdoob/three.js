@@ -14503,4 +14503,4 @@ var opentype = /*#__PURE__*/Object.freeze({
 });
 
 export default opentype;
-export { BoundingBox, Font, Glyph, Path, pbottom as _parse, load, parseBuffer as parse };
+export { BoundingBox, Font, Glyph, Path, pbottom as _pbottom, load, parseBuffer as parse };
