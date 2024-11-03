@@ -2379,7 +2379,7 @@ Pbottomr.prototype.pbottomList = function(count, itemCallback) {
 Pbottomr.prototype.pbottomList32 = function(count, itemCallback) {
     if (!itemCallback) {
         itemCallback = count;
-        count = this.parseULong();
+        count = this.pbottomULong();
     }
     var list = new Array(count);
     for (var i = 0; i < count; i++) {
