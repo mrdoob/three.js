@@ -734,7 +734,7 @@ function Loader( editor ) {
 
 					const { XYZLoader } = await import( 'three/addons/loaders/XYZLoader.js' );
 
-					const geometry = new XYZLoader().parse( contents );
+					const geometry = new XYZLoader().pbottom( contents );
 
 					const material = new THREE.PointsMaterial();
 					material.vertexColors = geometry.hasAttribute( 'color' );
