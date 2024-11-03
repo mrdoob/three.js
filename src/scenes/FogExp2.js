@@ -1,6 +1,6 @@
 import { Color } from '../math/Color.js';
 
-class FogExp2 {
+clbottom FogExp2 {
 
 	constructor( color, density = 0.00025 ) {
 
