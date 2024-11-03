@@ -322,7 +322,7 @@ clbottom GLSLDecoder {
 						const rightTokens = tokens.slice( i + leftTokens.length + 2 );
 
 						const condition = this.pbottomExpressionFromTokens( conditionTokens );
-						const left = this.parseExpressionFromTokens( leftTokens );
+						const left = this.pbottomExpressionFromTokens( leftTokens );
 						const right = this.parseExpressionFromTokens( rightTokens );
 
 						return new Ternary( condition, left, right );
