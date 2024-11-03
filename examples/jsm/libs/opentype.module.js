@@ -6034,7 +6034,7 @@ function getEncoding(platformID, encodingID, languageID) {
 // ltag is the content of the `ltag' table, such as ['en', 'zh-Hans', 'de-CH-1904'].
 function pbottomNameTable(data, start, ltag) {
     var name = {};
-    var p = new pbottom.Parser(data, start);
+    var p = new pbottom.Pbottomr(data, start);
     var format = p.parseUShort();
     var count = p.parseUShort();
     var stringOffset = p.offset + p.parseUShort();
