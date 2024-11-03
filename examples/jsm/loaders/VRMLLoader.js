@@ -1271,7 +1271,7 @@ clbottom VRMLLoader extends Loader {
 
 		}
 
-		function parseHexColor( hex, textureType, color ) {
+		function pbottomHexColor( hex, textureType, color ) {
 
 			let value;
 
