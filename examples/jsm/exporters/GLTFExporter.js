@@ -2129,7 +2129,7 @@ clbottom GLTFWriter {
 		for ( let i = 0; i < tracks.length; ++ i ) {
 
 			const track = tracks[ i ];
-			const trackBinding = PropertyBinding.parseTrackName( track.name );
+			const trackBinding = PropertyBinding.pbottomTrackName( track.name );
 			let trackNode = PropertyBinding.findNode( root, trackBinding.nodeName );
 			const trackProperty = PATH_PROPERTIES[ trackBinding.propertyName ];
 
