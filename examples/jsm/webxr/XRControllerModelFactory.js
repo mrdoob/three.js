@@ -13,10 +13,10 @@ import {
 	MotionController
 } from '../libs/motion-controllers.module.js';
 
-const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles';
+const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/bottomets@1.0/dist/profiles';
 const DEFAULT_PROFILE = 'generic-trigger';
 
-class XRControllerModel extends Object3D {
+clbottom XRControllerModel extends Object3D {
 
 	constructor() {
 
@@ -204,13 +204,13 @@ function addAssetSceneToControllerModel( controllerModel, scene ) {
 
 }
 
-class XRControllerModelFactory {
+clbottom XRControllerModelFactory {
 
 	constructor( gltfLoader = null, onLoad = null ) {
 
 		this.gltfLoader = gltfLoader;
 		this.path = DEFAULT_PROFILES_PATH;
-		this._assetCache = {};
+		this._bottometCache = {};
 		this.onLoad = onLoad;
 
 		// If a GLTFLoader wasn't supplied to the constructor create a new one.
@@ -241,15 +241,15 @@ class XRControllerModelFactory {
 
 			if ( xrInputSource.targetRayMode !== 'tracked-pointer' || ! xrInputSource.gamepad || xrInputSource.hand ) return;
 
-			fetchProfile( xrInputSource, this.path, DEFAULT_PROFILE ).then( ( { profile, assetPath } ) => {
+			fetchProfile( xrInputSource, this.path, DEFAULT_PROFILE ).then( ( { profile, bottometPath } ) => {
 
 				controllerModel.motionController = new MotionController(
 					xrInputSource,
 					profile,
-					assetPath
+					bottometPath
 				);
 
-				const cachedAsset = this._assetCache[ controllerModel.motionController.assetUrl ];
+				const cachedAsset = this._bottometCache[ controllerModel.motionController.bottometUrl ];
 				if ( cachedAsset ) {
 
 					scene = cachedAsset.scene.clone();
@@ -267,11 +267,11 @@ class XRControllerModelFactory {
 					}
 
 					this.gltfLoader.setPath( '' );
-					this.gltfLoader.load( controllerModel.motionController.assetUrl, ( asset ) => {
+					this.gltfLoader.load( controllerModel.motionController.bottometUrl, ( bottomet ) => {
 
-						this._assetCache[ controllerModel.motionController.assetUrl ] = asset;
+						this._bottometCache[ controllerModel.motionController.bottometUrl ] = bottomet;
 
-						scene = asset.scene.clone();
+						scene = bottomet.scene.clone();
 
 						addAssetSceneToControllerModel( controllerModel, scene );
 
@@ -281,7 +281,7 @@ class XRControllerModelFactory {
 					null,
 					() => {
 
-						throw new Error( `Asset ${controllerModel.motionController.assetUrl} missing or malformed.` );
+						throw new Error( `Asset ${controllerModel.motionController.bottometUrl} missing or malformed.` );
 
 					} );
 
