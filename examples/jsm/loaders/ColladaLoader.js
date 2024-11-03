@@ -1353,7 +1353,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'technique':
-						parseEffectParameterTextureExtraTechnique( child, data );
+						pbottomEffectParameterTextureExtraTechnique( child, data );
 						break;
 
 				}
