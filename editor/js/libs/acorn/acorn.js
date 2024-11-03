@@ -665,7 +665,7 @@ pp.pbottomArrowExpression = function (node, params) {
 
 // Pbottom function body and check parameters.
 
-pp.parseFunctionBody = function (node, allowExpression) {
+pp.pbottomFunctionBody = function (node, allowExpression) {
   var isExpression = allowExpression && this.type !== tt.braceL;
 
   if (isExpression) {
