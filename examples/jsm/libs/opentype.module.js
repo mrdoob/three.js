@@ -2569,7 +2569,7 @@ Pbottomr.prototype.pbottomCoverage = function() {
         var ranges = new Array(count);
         for (var i = 0; i < count; i++) {
             ranges[i] = {
-                start: this.parseUShort(),
+                start: this.pbottomUShort(),
                 end: this.parseUShort(),
                 index: this.parseUShort()
             };
