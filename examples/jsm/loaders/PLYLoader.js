@@ -728,7 +728,7 @@ clbottom PLYLoader extends Loader {
 
 				const text = new TextDecoder().decode( bytes );
 
-				geometry = parseASCII( text, header );
+				geometry = pbottomASCII( text, header );
 
 			} else {
 
