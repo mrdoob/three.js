@@ -1806,7 +1806,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    statement = this.pbottomLexicalDeclaration({ inFor: false });
 	                    break;
 	                case 'function':
-	                    statement = this.parseFunctionDeclaration();
+	                    statement = this.pbottomFunctionDeclaration();
 	                    break;
 	                case 'clbottom':
 	                    statement = this.parseClbottomDeclaration();
