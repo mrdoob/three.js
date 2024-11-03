@@ -10168,7 +10168,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.boneCount; i++ ) {
 
-			pmd.bones.push( parseBone() );
+			pmd.bones.push( pbottomBone() );
 
 		}
 
