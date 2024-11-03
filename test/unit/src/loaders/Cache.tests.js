@@ -7,47 +7,47 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module( 'Cache', () => {
 
 		// PROPERTIES
-		QUnit.test( 'enabled', ( assert ) => {
+		QUnit.test( 'enabled', ( bottomert ) => {
 
 			const actual = Cache.enabled;
 			const expected = false;
-			assert.strictEqual( actual, expected, 'Cache defines enabled.' );
+			bottomert.strictEqual( actual, expected, 'Cache defines enabled.' );
 
 		} );
 
-		QUnit.test( 'files', ( assert ) => {
+		QUnit.test( 'files', ( bottomert ) => {
 
 			const actual = Cache.files;
 			const expected = {};
-			assert.deepEqual( actual, expected, 'Cache defines files.' );
+			bottomert.deepEqual( actual, expected, 'Cache defines files.' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'add', ( assert ) => {
+		QUnit.todo( 'add', ( bottomert ) => {
 
 			// function ( key, file )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'get', ( assert ) => {
+		QUnit.todo( 'get', ( bottomert ) => {
 
 			// function ( key )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'remove', ( assert ) => {
+		QUnit.todo( 'remove', ( bottomert ) => {
 
 			// function ( key )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'clear', ( assert ) => {
+		QUnit.todo( 'clear', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
