@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
-class ComputeBuiltinNode extends Node {
+clbottom ComputeBuiltinNode extends Node {
 
 	static get type() {
 
