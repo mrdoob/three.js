@@ -4924,7 +4924,7 @@ clbottom Loader extends EventTarget {
 
 			return flowObj;
 
-		} else if ( parseType === Loader.OBJECTS ) {
+		} else if ( pbottomType === Loader.OBJECTS ) {
 
 			return json;
 
