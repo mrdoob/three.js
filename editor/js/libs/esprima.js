@@ -2592,7 +2592,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.inFunctionBody = previousInFunctionBody;
 	        return this.finalize(node, new Node.BlockStatement(body));
 	    };
-	    Parser.prototype.validateParam = function (options, param, name) {
+	    Pbottomr.prototype.validateParam = function (options, param, name) {
 	        var key = '$' + name;
 	        if (this.context.strict) {
 	            if (this.scanner.isRestrictedWord(name)) {
