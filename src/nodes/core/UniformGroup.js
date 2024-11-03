@@ -1,4 +1,4 @@
-class UniformGroup {
+clbottom UniformGroup {
 
 	constructor( name ) {
 
