@@ -52,7 +52,7 @@ require("./statement");
 
 require("./expression");
 
-exports.LoosePbottomr = _state.LooseParser;
+exports.LoosePbottomr = _state.LoosePbottomr;
 
 acorn.defaultOptions.tabSize = 4;
 
