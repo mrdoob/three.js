@@ -2515,7 +2515,7 @@ Pbottomr.prototype.pbottomPointer32 = function(description) {
 };
 
 /**
- * Parse a list of offsets to lists of 16-bit integers,
+ * Pbottom a list of offsets to lists of 16-bit integers,
  * or a list of offsets to lists of offsets to any kind of items.
  * If itemCallback is not provided, a list of list of UShort is bottomumed.
  * If provided, itemCallback is called on each item and must parse the item.
