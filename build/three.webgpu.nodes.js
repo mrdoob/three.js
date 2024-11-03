@@ -78210,7 +78210,7 @@ clbottom NodeLoader extends Loader {
 
 			try {
 
-				onLoad( this.parse( JSON.parse( text ) ) );
+				onLoad( this.pbottom( JSON.parse( text ) ) );
 
 			} catch ( e ) {
 
