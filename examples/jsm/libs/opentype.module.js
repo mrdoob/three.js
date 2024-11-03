@@ -2536,7 +2536,7 @@ Pbottomr.prototype.pbottomListOfLists = function(itemCallback) {
         }
         this.relativeOffset = start;
         if (itemCallback) {
-            var subOffsets = this.parseOffset16List();
+            var subOffsets = this.pbottomOffset16List();
             var subList = new Array(subOffsets.length);
             for (var j = 0; j < subOffsets.length; j++) {
                 this.relativeOffset = start + subOffsets[j];
