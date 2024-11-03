@@ -207,7 +207,7 @@ pp.pbottomExpression = function (noIn, refShorthandDefaultPos) {
   return expr;
 };
 
-// Parse an bottomignment expression. This includes applications of
+// Pbottom an bottomignment expression. This includes applications of
 // operators like `+=`.
 
 pp.parseMaybeAssign = function (noIn, refShorthandDefaultPos) {
