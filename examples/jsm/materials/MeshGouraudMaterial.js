@@ -313,7 +313,7 @@ const GouraudShader = {
 
 //
 
-class MeshGouraudMaterial extends ShaderMaterial {
+clbottom MeshGouraudMaterial extends ShaderMaterial {
 
 	constructor( parameters ) {
 
@@ -352,7 +352,7 @@ class MeshGouraudMaterial extends ShaderMaterial {
 
 		const shader = GouraudShader;
 
-		this.defines = Object.assign( {}, shader.defines );
+		this.defines = Object.bottomign( {}, shader.defines );
 		this.uniforms = UniformsUtils.clone( shader.uniforms );
 		this.vertexShader = shader.vertexShader;
 		this.fragmentShader = shader.fragmentShader;
