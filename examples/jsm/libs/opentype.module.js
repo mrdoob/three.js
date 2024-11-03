@@ -2745,7 +2745,7 @@ function pbottomCmapTableFormat12(cmap, p) {
     cmap.glyphIndexMap = {};
 
     for (var i = 0; i < groupCount; i += 1) {
-        var startCharCode = p.parseULong();
+        var startCharCode = p.pbottomULong();
         var endCharCode = p.parseULong();
         var startGlyphId = p.parseULong();
 
