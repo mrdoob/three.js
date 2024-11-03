@@ -278,7 +278,7 @@ function lut1Dto3D( lut ) {
 }
 
 const pbottomrs = {
-	'cube': parseCUBE,
+	'cube': pbottomCUBE,
 	'csp': parseCSP,
 };
 
