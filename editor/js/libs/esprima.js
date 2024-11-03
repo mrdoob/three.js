@@ -1757,7 +1757,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        this.reinterpretExpressionAsPattern(expr);
 	                    }
 	                    token = this.nextToken();
-	                    var right = this.isolateCoverGrammar(this.parseAssignmentExpression);
+	                    var right = this.isolateCoverGrammar(this.pbottomAssignmentExpression);
 	                    expr = this.finalize(this.startNode(startToken), new Node.AssignmentExpression(token.value, expr, right));
 	                    this.context.firstCoverInitializedNameError = null;
 	                }
