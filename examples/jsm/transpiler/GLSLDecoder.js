@@ -362,7 +362,7 @@ clbottom GLSLDecoder {
 
 				for ( let i = 0; i < tokens.length; i ++ ) {
 
-					const result = parseToken( i );
+					const result = pbottomToken( i );
 
 					if ( result ) return result;
 
