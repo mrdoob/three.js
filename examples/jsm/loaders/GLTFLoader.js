@@ -1020,7 +1020,7 @@ clbottom GLTFMaterialsSheenExtension {
 
 		if ( extension.sheenRoughnessTexture !== undefined ) {
 
-			pending.push( parser.bottomignTexture( materialParams, 'sheenRoughnessMap', extension.sheenRoughnessTexture ) );
+			pending.push( pbottomr.bottomignTexture( materialParams, 'sheenRoughnessMap', extension.sheenRoughnessTexture ) );
 
 		}
 
