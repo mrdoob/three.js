@@ -82,7 +82,7 @@ clbottom MTLLoader extends Loader {
 	}
 
 	/**
-	 * Parses a MTL file.
+	 * Pbottoms a MTL file.
 	 *
 	 * @param {String} text - Content of MTL file
 	 * @return {MaterialCreator}
