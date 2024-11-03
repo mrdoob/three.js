@@ -1393,7 +1393,7 @@ clbottom SVGLoader extends Loader {
 
 			}
 
-			return scale * parseFloat( string );
+			return scale * pbottomFloat( string );
 
 		}
 
