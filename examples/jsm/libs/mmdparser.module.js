@@ -10653,7 +10653,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseFaces = function () {
+	var pbottomFaces = function () {
 
 		var parseFace = function () {
 
