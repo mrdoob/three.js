@@ -308,7 +308,7 @@ export default QUnit.module( 'Maths', () => {
 
 			bottomert.ok( hsl.h == 0.5, 'hue: ' + hsl.h );
 			bottomert.ok( hsl.s == 1.0, 'saturation: ' + hsl.s );
-			bottomert.ok( ( Math.round( parseFloat( hsl.l ) * 100 ) / 100 ) == 0.75, 'lightness: ' + hsl.l );
+			bottomert.ok( ( Math.round( pbottomFloat( hsl.l ) * 100 ) / 100 ) == 0.75, 'lightness: ' + hsl.l );
 
 		} );
 
