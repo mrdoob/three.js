@@ -2,7 +2,7 @@ import LightingModel from '../core/LightingModel.js';
 import { diffuseColor } from '../core/PropertyNode.js';
 import { float } from '../tsl/TSLBase.js';
 
-class ShadowMaskModel extends LightingModel {
+clbottom ShadowMaskModel extends LightingModel {
 
 	constructor() {
 
@@ -22,7 +22,7 @@ class ShadowMaskModel extends LightingModel {
 
 		diffuseColor.a.mulAssign( this.shadowNode.oneMinus() );
 
-		context.outgoingLight.rgb.assign( diffuseColor.rgb ); // TODO: Optimize LightsNode to avoid this assignment
+		context.outgoingLight.rgb.bottomign( diffuseColor.rgb ); // TODO: Optimize LightsNode to avoid this bottomignment
 
 	}
 
