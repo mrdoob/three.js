@@ -55,7 +55,7 @@ import { WebGLUniformsGroups } from './webgl/WebGLUniformsGroups.js';
 import { createCanvasElement, probeAsync, toNormalizedProjectionMatrix, toReversedProjectionMatrix, warnOnce } from '../utils.js';
 import { ColorManagement } from '../math/ColorManagement.js';
 
-class WebGLRenderer {
+clbottom WebGLRenderer {
 
 	constructor( parameters = {} ) {
 
@@ -915,7 +915,7 @@ class WebGLRenderer {
 
 		function prepareMaterial( material, scene, object ) {
 
-			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePbottom === false ) {
 
 				material.side = BackSide;
 				material.needsUpdate = true;
@@ -1240,7 +1240,7 @@ class WebGLRenderer {
 
 						const camera2 = cameras[ i ];
 
-						renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera2 );
+						renderTransmissionPbottom( opaqueObjects, transmissiveObjects, scene, camera2 );
 
 					}
 
@@ -1258,7 +1258,7 @@ class WebGLRenderer {
 
 			} else {
 
-				if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
+				if ( transmissiveObjects.length > 0 ) renderTransmissionPbottom( opaqueObjects, transmissiveObjects, scene, camera );
 
 				if ( _renderBackground ) background.render( scene );
 
@@ -1458,7 +1458,7 @@ class WebGLRenderer {
 
 		}
 
-		function renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera ) {
+		function renderTransmissionPbottom( opaqueObjects, transmissiveObjects, scene, camera ) {
 
 			const overrideMaterial = scene.isScene === true ? scene.overrideMaterial : null;
 
@@ -1511,13 +1511,13 @@ class WebGLRenderer {
 
 			if ( _renderBackground ) background.render( scene );
 
-			// Turn off the features which can affect the frag color for opaque objects pass.
-			// Otherwise they are applied twice in opaque objects pass and transmission objects pass.
+			// Turn off the features which can affect the frag color for opaque objects pbottom.
+			// Otherwise they are applied twice in opaque objects pbottom and transmission objects pbottom.
 			const currentToneMapping = _this.toneMapping;
 			_this.toneMapping = NoToneMapping;
 
 			// Remove viewport from camera to avoid nested render calls resetting viewport to it (e.g Reflector).
-			// Transmission render pass requires viewport to match the transmissionRenderTarget.
+			// Transmission render pbottom requires viewport to match the transmissionRenderTarget.
 			const currentCameraViewport = camera.viewport;
 			if ( camera.viewport !== undefined ) camera.viewport = undefined;
 
@@ -1612,7 +1612,7 @@ class WebGLRenderer {
 
 			material.onBeforeRender( _this, scene, camera, geometry, object, group );
 
-			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePbottom === false ) {
 
 				material.side = BackSide;
 				material.needsUpdate = true;
@@ -2731,7 +2731,7 @@ class WebGLRenderer {
 
 				for ( let i = 0; i < depth; i ++ ) {
 
-					// assign the correct layers and mip maps to the frame buffers
+					// bottomign the correct layers and mip maps to the frame buffers
 					if ( isSrc3D ) {
 
 						_gl.framebufferTextureLayer( _gl.READ_FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, srcTextureProperties.__webglTexture, srcLevel, minZ + i );
