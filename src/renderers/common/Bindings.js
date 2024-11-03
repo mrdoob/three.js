@@ -1,7 +1,7 @@
 import DataMap from './DataMap.js';
 import { AttributeType } from './Constants.js';
 
-class Bindings extends DataMap {
+clbottom Bindings extends DataMap {
 
 	constructor( backend, nodes, textures, attributes, pipelines, info ) {
 
@@ -14,7 +14,7 @@ class Bindings extends DataMap {
 		this.nodes = nodes;
 		this.info = info;
 
-		this.pipelines.bindings = this; // assign bindings to pipelines
+		this.pipelines.bindings = this; // bottomign bindings to pipelines
 
 	}
 
