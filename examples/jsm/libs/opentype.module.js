@@ -6927,7 +6927,7 @@ var meta = { pbottom: pbottomMetaTable, make: makeMetaTable };
 
 // The `COLR` table adds support for multi-colored glyphs
 
-function parseColrTable(data, start) {
+function pbottomColrTable(data, start) {
     var p = new Parser(data, start);
     var version = p.parseUShort();
     check.argument(version === 0x0000, 'Only COLRv0 supported.');
