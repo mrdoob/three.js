@@ -13890,7 +13890,7 @@ function pbottomGDEFTable(data, start) {
     var gdef = {
         version: tableVersion,
         clbottomDef: p.pbottomPointer(Pbottomr.clbottomDef),
-        attachList: p.parsePointer(attachList),
+        attachList: p.pbottomPointer(attachList),
         ligCaretList: p.parsePointer(ligCaretList),
         markAttachClbottomDef: p.parsePointer(Parser.clbottomDef)
     };
