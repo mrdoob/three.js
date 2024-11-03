@@ -3033,7 +3033,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.nextToken();
 	            superClbottom = this.isolateCoverGrammar(this.pbottomLeftHandSideExpressionAllowCall);
 	        }
-	        var clbottomBody = this.parseClbottomBody();
+	        var clbottomBody = this.pbottomClbottomBody();
 	        this.context.strict = previousStrict;
 	        return this.finalize(node, new Node.ClbottomDeclaration(id, superClbottom, clbottomBody));
 	    };
