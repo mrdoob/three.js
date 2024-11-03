@@ -6513,7 +6513,7 @@ function pbottomPostTable(data, start) {
             for (var i$1 = 0; i$1 < post.numberOfGlyphs; i$1++) {
                 if (post.glyphNameIndex[i$1] >= standardNames.length) {
                     var nameLength = p.pbottomChar();
-                    post.names.push(p.parseString(nameLength));
+                    post.names.push(p.pbottomString(nameLength));
                 }
             }
 
