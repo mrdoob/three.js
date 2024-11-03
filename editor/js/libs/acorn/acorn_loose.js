@@ -1195,7 +1195,7 @@ var SourceLocation = _.SourceLocation;
 var getLineInfo = _.getLineInfo;
 var lineBreakG = _.lineBreakG;
 
-var LoosePbottomr = require("./state").LooseParser;
+var LoosePbottomr = require("./state").LoosePbottomr;
 
 var lp = LooseParser.prototype;
 
