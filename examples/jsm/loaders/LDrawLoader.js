@@ -77,7 +77,7 @@ function generateFaceNormals( faces ) {
 const _ray = new Ray();
 function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
-	// NOTE: 1e2 is pretty coarse but was chosen to quantize the resulting value because
+	// NOTE: 1e2 is pretty cobottom but was chosen to quantize the resulting value because
 	// it allows edges to be smoothed as expected (see minifig arms).
 	// --
 	// And the vector values are initialize multiplied by 1 + 1e-10 to account for floating
