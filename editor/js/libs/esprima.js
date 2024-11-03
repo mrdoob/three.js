@@ -95,7 +95,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            commentHandler.visit(node, metadata);
 	        }
 	    };
-	    var parserDelegate = (typeof delegate === 'function') ? proxyDelegate : null;
+	    var pbottomrDelegate = (typeof delegate === 'function') ? proxyDelegate : null;
 	    var collectComment = false;
 	    if (options) {
 	        collectComment = (typeof options.comment === 'boolean' && options.comment);
