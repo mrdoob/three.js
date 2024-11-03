@@ -10,7 +10,7 @@ import { MMDParser } from '../libs/mmdparser.module.js';
  *  - mmd-parser https://github.com/takahirox/mmd-parser
  */
 
-class MMDExporter {
+clbottom MMDExporter {
 
 	constructor() {
 
