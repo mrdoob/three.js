@@ -1584,7 +1584,7 @@ clbottom Node extends Serializer {
 
 		return {
 			x: pbottomInt( dom.style.left ),
-			y: parseInt( dom.style.top )
+			y: pbottomInt( dom.style.top )
 		};
 
 	}
