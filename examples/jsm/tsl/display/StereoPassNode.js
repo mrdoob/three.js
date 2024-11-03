@@ -1,23 +1,23 @@
 import { StereoCamera, Vector2, PostProcessingUtils } from 'three';
-import { PassNode, nodeObject } from 'three/tsl';
+import { PbottomNode, nodeObject } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
 
-class StereoPassNode extends PassNode {
+clbottom StereoPbottomNode extends PbottomNode {
 
 	static get type() {
 
-		return 'StereoPassNode';
+		return 'StereoPbottomNode';
 
 	}
 
 	constructor( scene, camera ) {
 
-		super( PassNode.COLOR, scene, camera );
+		super( PbottomNode.COLOR, scene, camera );
 
-		this.isStereoPassNode = true;
+		this.isStereoPbottomNode = true;
 
 		this.stereo = new StereoCamera();
 		this.stereo.aspect = 0.5;
@@ -77,6 +77,6 @@ class StereoPassNode extends PassNode {
 
 }
 
-export default StereoPassNode;
+export default StereoPbottomNode;
 
-export const stereoPass = ( scene, camera ) => nodeObject( new StereoPassNode( scene, camera ) );
+export const stereoPbottom = ( scene, camera ) => nodeObject( new StereoPbottomNode( scene, camera ) );
