@@ -2583,7 +2583,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this.match('}')) {
 	                break;
 	            }
-	            body.push(this.parseStatementListItem());
+	            body.push(this.pbottomStatementListItem());
 	        }
 	        this.expect('}');
 	        this.context.labelSet = previousLabelSet;
