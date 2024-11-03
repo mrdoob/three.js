@@ -2455,7 +2455,7 @@ Pbottomr.prototype.pbottomStruct = function(description) {
  * https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#value-record
  * valueFormat is optional, if omitted it is read from the stream.
  */
-Parser.prototype.parseValueRecord = function(valueFormat) {
+Pbottomr.prototype.parseValueRecord = function(valueFormat) {
     if (valueFormat === undefined) {
         valueFormat = this.parseUShort();
     }
