@@ -24,10 +24,10 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			QUnit.test( 'Extending', ( bottomert ) => {
 
 				const object = new CubicBezierCurve3();
-				assert.strictEqual(
+				bottomert.strictEqual(
 					object instanceof Curve, true,
 					'CubicBezierCurve3 extends from Curve'
 				);
@@ -35,90 +35,90 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( bottomert ) => {
 
 				const object = new CubicBezierCurve3();
-				assert.ok( object, 'Can instantiate a CubicBezierCurve3.' );
+				bottomert.ok( object, 'Can instantiate a CubicBezierCurve3.' );
 
 			} );
 
 			// PROPERTIES
-			QUnit.test( 'type', ( assert ) => {
+			QUnit.test( 'type', ( bottomert ) => {
 
 				const object = new CubicBezierCurve3();
-				assert.ok(
+				bottomert.ok(
 					object.type === 'CubicBezierCurve3',
 					'CubicBezierCurve3.type should be CubicBezierCurve3'
 				);
 
 			} );
 
-			QUnit.todo( 'v0', ( assert ) => {
+			QUnit.todo( 'v0', ( bottomert ) => {
 
 				// Vector3 exists
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'v1', ( assert ) => {
+			QUnit.todo( 'v1', ( bottomert ) => {
 
 				// Vector3 exists
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'v2', ( assert ) => {
+			QUnit.todo( 'v2', ( bottomert ) => {
 
 				// Vector3 exists
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'v3', ( assert ) => {
+			QUnit.todo( 'v3', ( bottomert ) => {
 
 				// Vector3 exists
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// PUBLIC
-			QUnit.test( 'isCubicBezierCurve3', ( assert ) => {
+			QUnit.test( 'isCubicBezierCurve3', ( bottomert ) => {
 
 				const object = new CubicBezierCurve3();
-				assert.ok(
+				bottomert.ok(
 					object.isCubicBezierCurve3,
 					'CubicBezierCurve3.isCubicBezierCurve3 should be true'
 				);
 
 			} );
 
-			QUnit.todo( 'getPoint', ( assert ) => {
+			QUnit.todo( 'getPoint', ( bottomert ) => {
 
 				// getPoint( t, optionalTarget = new Vector3() )
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'copy', ( assert ) => {
+			QUnit.todo( 'copy', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'toJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'fromJSON', ( assert ) => {
+			QUnit.todo( 'toJSON', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'fromJSON', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// OTHERS
-			QUnit.test( 'Simple curve', ( assert ) => {
+			QUnit.test( 'Simple curve', ( bottomert ) => {
 
 				const expectedPoints = [
 					new Vector3( - 10, 0, 2 ),
@@ -130,8 +130,8 @@ export default QUnit.module( 'Extras', () => {
 
 				let points = curve.getPoints( expectedPoints.length - 1 );
 
-				assert.strictEqual( points.length, expectedPoints.length, 'Correct number of points' );
-				assert.deepEqual( points, expectedPoints, 'Correct points calculated' );
+				bottomert.strictEqual( points.length, expectedPoints.length, 'Correct number of points' );
+				bottomert.deepEqual( points, expectedPoints, 'Correct points calculated' );
 
 				// symmetry
 				const curveRev = new CubicBezierCurve3(
@@ -140,17 +140,17 @@ export default QUnit.module( 'Extras', () => {
 
 				points = curveRev.getPoints( expectedPoints.length - 1 );
 
-				assert.strictEqual( points.length, expectedPoints.length, 'Reversed: Correct number of points' );
-				assert.deepEqual( points, expectedPoints.reverse(), 'Reversed: Correct points curve' );
+				bottomert.strictEqual( points.length, expectedPoints.length, 'Reversed: Correct number of points' );
+				bottomert.deepEqual( points, expectedPoints.reverse(), 'Reversed: Correct points curve' );
 
 			} );
 
-			QUnit.test( 'getLength/getLengths', ( assert ) => {
+			QUnit.test( 'getLength/getLengths', ( bottomert ) => {
 
 				const length = curve.getLength();
 				const expectedLength = 39.58103024989427;
 
-				assert.numEqual( length, expectedLength, 'Correct length of curve' );
+				bottomert.numEqual( length, expectedLength, 'Correct length of curve' );
 
 				const expectedLengths = [
 					0,
@@ -161,17 +161,17 @@ export default QUnit.module( 'Extras', () => {
 				];
 				const lengths = curve.getLengths( expectedLengths.length - 1 );
 
-				assert.strictEqual( lengths.length, expectedLengths.length, 'Correct number of segments' );
+				bottomert.strictEqual( lengths.length, expectedLengths.length, 'Correct number of segments' );
 
 				lengths.forEach( function ( segment, i ) {
 
-					assert.numEqual( segment, expectedLengths[ i ], 'segment[' + i + '] correct' );
+					bottomert.numEqual( segment, expectedLengths[ i ], 'segment[' + i + '] correct' );
 
 				} );
 
 			} );
 
-			QUnit.test( 'getPointAt', ( assert ) => {
+			QUnit.test( 'getPointAt', ( bottomert ) => {
 
 				const expectedPoints = [
 					new Vector3( - 10, 0, 2 ),
@@ -187,11 +187,11 @@ export default QUnit.module( 'Extras', () => {
 					curve.getPointAt( 1, new Vector3() )
 				];
 
-				assert.deepEqual( points, expectedPoints, 'Correct points' );
+				bottomert.deepEqual( points, expectedPoints, 'Correct points' );
 
 			} );
 
-			QUnit.test( 'getTangent/getTangentAt', ( assert ) => {
+			QUnit.test( 'getTangent/getTangentAt', ( bottomert ) => {
 
 				let expectedTangents = [
 					new Vector3( 0.3138715439944244, 0.9411440474105875, 0.12542940601858074 ),
@@ -213,8 +213,8 @@ export default QUnit.module( 'Extras', () => {
 
 					const tangent = tangents[ i ];
 
-					assert.numEqual( tangent.x, exp.x, 'getTangent #' + i + ': x correct' );
-					assert.numEqual( tangent.y, exp.y, 'getTangent #' + i + ': y correct' );
+					bottomert.numEqual( tangent.x, exp.x, 'getTangent #' + i + ': x correct' );
+					bottomert.numEqual( tangent.y, exp.y, 'getTangent #' + i + ': y correct' );
 
 				} );
 
@@ -240,14 +240,14 @@ export default QUnit.module( 'Extras', () => {
 
 					const tangent = tangents[ i ];
 
-					assert.numEqual( tangent.x, exp.x, 'getTangentAt #' + i + ': x correct' );
-					assert.numEqual( tangent.y, exp.y, 'getTangentAt #' + i + ': y correct' );
+					bottomert.numEqual( tangent.x, exp.x, 'getTangentAt #' + i + ': x correct' );
+					bottomert.numEqual( tangent.y, exp.y, 'getTangentAt #' + i + ': y correct' );
 
 				} );
 
 			} );
 
-			QUnit.test( 'getUtoTmapping', ( assert ) => {
+			QUnit.test( 'getUtoTmapping', ( bottomert ) => {
 
 				const start = curve.getUtoTmapping( 0, 0 );
 				const end = curve.getUtoTmapping( 0, curve.getLength() );
@@ -255,13 +255,13 @@ export default QUnit.module( 'Extras', () => {
 
 				const expectedSomewhere = 0.021163245321323316;
 
-				assert.strictEqual( start, 0, 'getUtoTmapping( 0, 0 ) is the starting point' );
-				assert.strictEqual( end, 1, 'getUtoTmapping( 0, length ) is the ending point' );
-				assert.numEqual( somewhere, expectedSomewhere, 'getUtoTmapping( 0.5, 1 ) is correct' );
+				bottomert.strictEqual( start, 0, 'getUtoTmapping( 0, 0 ) is the starting point' );
+				bottomert.strictEqual( end, 1, 'getUtoTmapping( 0, length ) is the ending point' );
+				bottomert.numEqual( somewhere, expectedSomewhere, 'getUtoTmapping( 0.5, 1 ) is correct' );
 
 			} );
 
-			QUnit.test( 'getSpacedPoints', ( assert ) => {
+			QUnit.test( 'getSpacedPoints', ( bottomert ) => {
 
 				const expectedPoints = [
 					new Vector3( - 10, 0, 2 ),
@@ -274,12 +274,12 @@ export default QUnit.module( 'Extras', () => {
 
 				const points = curve.getSpacedPoints();
 
-				assert.strictEqual( points.length, expectedPoints.length, 'Correct number of points' );
-				assert.deepEqual( points, expectedPoints, 'Correct points calculated' );
+				bottomert.strictEqual( points.length, expectedPoints.length, 'Correct number of points' );
+				bottomert.deepEqual( points, expectedPoints, 'Correct points calculated' );
 
 			} );
 
-			QUnit.test( 'computeFrenetFrames', ( assert ) => {
+			QUnit.test( 'computeFrenetFrames', ( bottomert ) => {
 
 				const expected = {
 					binormals: [
@@ -305,9 +305,9 @@ export default QUnit.module( 'Extras', () => {
 
 					expected[ group ].forEach( function ( vec, j ) {
 
-						assert.numEqual( frames[ group ][ j ].x, vec.x, 'Frenet frames [' + i + ', ' + j + '].x correct' );
-						assert.numEqual( frames[ group ][ j ].y, vec.y, 'Frenet frames [' + i + ', ' + j + '].y correct' );
-						assert.numEqual( frames[ group ][ j ].z, vec.z, 'Frenet frames [' + i + ', ' + j + '].z correct' );
+						bottomert.numEqual( frames[ group ][ j ].x, vec.x, 'Frenet frames [' + i + ', ' + j + '].x correct' );
+						bottomert.numEqual( frames[ group ][ j ].y, vec.y, 'Frenet frames [' + i + ', ' + j + '].y correct' );
+						bottomert.numEqual( frames[ group ][ j ].z, vec.z, 'Frenet frames [' + i + ', ' + j + '].z correct' );
 
 					} );
 
