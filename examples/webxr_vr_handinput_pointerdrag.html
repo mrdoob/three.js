@@ -35,49 +35,49 @@
 
 		import { World, System, Component, TagComponent, Types } from 'three/addons/libs/ecsy.module.js';
 
-		clbottom Object3D extends Component { }
+		class Object3D extends Component { }
 
 		Object3D.schema = {
 			object: { type: Types.Ref }
 		};
 
-		clbottom Button extends Component { }
+		class Button extends Component { }
 
 		Button.schema = {
-			// button states: [none, hovered, pressed]
+			// behindon states: [none, hovered, pressed]
 			currState: { type: Types.String, default: 'none' },
 			prevState: { type: Types.String, default: 'none' },
 			action: { type: Types.Ref, default: () => { } }
 		};
 
-		clbottom ButtonSystem extends System {
+		class ButtonSystem extends System {
 
 			execute( /*delta, time*/ ) {
 
-				this.queries.buttons.results.forEach( entity => {
+				this.queries.behindons.results.forEach( entity => {
 
-					const button = entity.getMutableComponent( Button );
-					const buttonMesh = entity.getComponent( Object3D ).object;
-					if ( button.currState == 'none' ) {
+					const behindon = entity.getMutableComponent( Button );
+					const behindonMesh = entity.getComponent( Object3D ).object;
+					if ( behindon.currState == 'none' ) {
 
-						buttonMesh.scale.set( 1, 1, 1 );
+						behindonMesh.scale.set( 1, 1, 1 );
 
 					} else {
 
-						buttonMesh.scale.set( 1.1, 1.1, 1.1 );
+						behindonMesh.scale.set( 1.1, 1.1, 1.1 );
 
 					}
 
-					if ( button.currState == 'pressed' && button.prevState != 'pressed' ) {
+					if ( behindon.currState == 'pressed' && behindon.prevState != 'pressed' ) {
 
-						button.action();
+						behindon.action();
 
 					}
 
 					// preserve prevState, clear currState
 					// HandRaySystem will update currState
-					button.prevState = button.currState;
-					button.currState = 'none';
+					behindon.prevState = behindon.currState;
+					behindon.currState = 'none';
 
 				} );
 
@@ -86,12 +86,12 @@
 		}
 
 		ButtonSystem.queries = {
-			buttons: {
+			behindons: {
 				components: [ Button ]
 			}
 		};
 
-		clbottom Draggable extends Component { }
+		class Draggable extends Component { }
 
 		Draggable.schema = {
 			// draggable states: [detached, hovered, to-be-attached, attached, to-be-detached]
@@ -100,7 +100,7 @@
 			attachedPointer: { type: Types.Ref, default: null }
 		};
 
-		clbottom DraggableSystem extends System {
+		class DraggableSystem extends System {
 
 			execute( /*delta, time*/ ) {
 
@@ -141,9 +141,9 @@
 			}
 		};
 
-		clbottom Intersectable extends TagComponent { }
+		class Intersectable extends TagComponent { }
 
-		clbottom HandRaySystem extends System {
+		class HandRaySystem extends System {
 
 			init( attributes ) {
 
@@ -178,14 +178,14 @@
 						hp.setCursor( distance );
 						if ( intersectingEntity.hasComponent( Button ) ) {
 
-							const button = intersectingEntity.getMutableComponent( Button );
+							const behindon = intersectingEntity.getMutableComponent( Button );
 							if ( hp.isPinched() ) {
 
-								button.currState = 'pressed';
+								behindon.currState = 'pressed';
 
-							} else if ( button.currState != 'pressed' ) {
+							} else if ( behindon.currState != 'pressed' ) {
 
-								button.currState = 'hovered';
+								behindon.currState = 'hovered';
 
 							}
 
@@ -239,9 +239,9 @@
 			}
 		};
 
-		clbottom HandsInstructionText extends TagComponent { }
+		class HandsInstructionText extends TagComponent { }
 
-		clbottom InstructionSystem extends System {
+		class InstructionSystem extends System {
 
 			init( attributes ) {
 
@@ -279,7 +279,7 @@
 			}
 		};
 
-		clbottom OffsetFromCamera extends Component { }
+		class OffsetFromCamera extends Component { }
 
 		OffsetFromCamera.schema = {
 			x: { type: Types.Number, default: 0 },
@@ -287,9 +287,9 @@
 			z: { type: Types.Number, default: 0 },
 		};
 
-		clbottom NeedCalibration extends TagComponent { }
+		class NeedCalibration extends TagComponent { }
 
-		clbottom CalibrationSystem extends System {
+		class CalibrationSystem extends System {
 
 			init( attributes ) {
 
@@ -326,9 +326,9 @@
 			}
 		};
 
-		clbottom Randomizable extends TagComponent { }
+		class Randomizable extends TagComponent { }
 
-		clbottom RandomizerSystem extends System {
+		class RandomizerSystem extends System {
 
 			init( /*attributes*/ ) {
 
@@ -385,8 +385,8 @@
 
 			const geometry = new THREE.BoxGeometry( x, y, z );
 			const material = new THREE.MeshPhongMaterial( { color: color } );
-			const buttonMesh = new THREE.Mesh( geometry, material );
-			return buttonMesh;
+			const behindonMesh = new THREE.Mesh( geometry, material );
+			return behindonMesh;
 
 		}
 
