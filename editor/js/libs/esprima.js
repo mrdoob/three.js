@@ -1979,7 +1979,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            pattern = this.pbottomArrayPattern(params, kind);
 	        }
 	        else if (this.match('{')) {
-	            pattern = this.parseObjectPattern(params, kind);
+	            pattern = this.pbottomObjectPattern(params, kind);
 	        }
 	        else {
 	            if (this.matchKeyword('let') && (kind === 'const' || kind === 'let')) {
