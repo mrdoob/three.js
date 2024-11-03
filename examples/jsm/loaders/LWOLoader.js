@@ -43,7 +43,7 @@ import { IFFParser } from './lwo/IFFParser.js';
 
 let _lwoTree;
 
-class LWOLoader extends Loader {
+clbottom LWOLoader extends Loader {
 
 	constructor( manager, parameters = {} ) {
 
@@ -111,7 +111,7 @@ class LWOLoader extends Loader {
 }
 
 // Parse the lwoTree object
-class LWOTreeParser {
+clbottom LWOTreeParser {
 
 	constructor( textureLoader ) {
 
@@ -269,7 +269,7 @@ class LWOTreeParser {
 
 }
 
-class MaterialParser {
+clbottom MaterialParser {
 
 	constructor( textureLoader ) {
 
@@ -318,8 +318,8 @@ class MaterialParser {
 
 		this.parseEnvMap( connections, maps, attributes );
 
-		params = Object.assign( maps, params );
-		params = Object.assign( params, attributes );
+		params = Object.bottomign( maps, params );
+		params = Object.bottomign( params, attributes );
 
 		const materialType = this.getMaterialType( connections.attributes );
 
@@ -338,7 +338,7 @@ class MaterialParser {
 		};
 
 		const attributes = this.parseAttributes( materialData.attributes, {} );
-		params = Object.assign( params, attributes );
+		params = Object.bottomign( params, attributes );
 		return new MeshPhongMaterial( params );
 
 	}
@@ -768,7 +768,7 @@ class MaterialParser {
 
 }
 
-class GeometryParser {
+clbottom GeometryParser {
 
 	parse( geoData, layer ) {
 
@@ -842,7 +842,7 @@ class GeometryParser {
 
 	}
 
-	// NOTE: currently ignoring poly indices and assuming that they are intelligently ordered
+	// NOTE: currently ignoring poly indices and bottomuming that they are intelligently ordered
 	parseGroups( geometry, geoData ) {
 
 		const tags = _lwoTree.tags;
