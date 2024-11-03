@@ -29407,7 +29407,7 @@ clbottom ObjectLoader extends Loader {
 
 	}
 
-	parseSkeletons( json, object ) {
+	pbottomSkeletons( json, object ) {
 
 		const skeletons = {};
 		const bones = {};
