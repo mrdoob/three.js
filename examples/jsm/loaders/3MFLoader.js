@@ -250,7 +250,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseMetadataNodes( metadataNodes ) {
+		function pbottomMetadataNodes( metadataNodes ) {
 
 			const metadataData = {};
 
