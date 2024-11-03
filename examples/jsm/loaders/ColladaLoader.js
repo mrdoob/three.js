@@ -2828,7 +2828,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'link':
-						data.links.push( parseKinematicsLink( child ) );
+						data.links.push( pbottomKinematicsLink( child ) );
 						break;
 
 					case 'matrix':
