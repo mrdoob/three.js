@@ -6,12 +6,12 @@ import {
 	UniformsUtils,
 	WebGLRenderTarget
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
 /**
 *
-* Supersample Anti-Aliasing Render Pass
+* Supersample Anti-Aliasing Render Pbottom
 *
 * This manual approach to SSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
 *
@@ -19,7 +19,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
 *
 */
 
-class SSAARenderPass extends Pass {
+clbottom SSAARenderPbottom extends Pbottom {
 
 	constructor( scene, camera, clearColor, clearAlpha ) {
 
@@ -33,7 +33,7 @@ class SSAARenderPass extends Pass {
 
 		this.stencilBuffer = false;
 
-		// as we need to clear the buffer in this pass, clearColor must be set to something, defaults to black.
+		// as we need to clear the buffer in this pbottom, clearColor must be set to something, defaults to black.
 		this.clearColor = ( clearColor !== undefined ) ? clearColor : 0x000000;
 		this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
 		this._oldClearColor = new Color();
@@ -82,7 +82,7 @@ class SSAARenderPass extends Pass {
 		if ( ! this.sampleRenderTarget ) {
 
 			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType, stencilBuffer: this.stencilBuffer } );
-			this.sampleRenderTarget.texture.name = 'SSAARenderPass.sample';
+			this.sampleRenderTarget.texture.name = 'SSAARenderPbottom.sample';
 
 		}
 
@@ -109,9 +109,9 @@ class SSAARenderPass extends Pass {
 
 		};
 
-		const originalViewOffset = Object.assign( {}, this.camera.view );
+		const originalViewOffset = Object.bottomign( {}, this.camera.view );
 
-		if ( originalViewOffset.enabled ) Object.assign( viewOffset, originalViewOffset );
+		if ( originalViewOffset.enabled ) Object.bottomign( viewOffset, originalViewOffset );
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 		for ( let i = 0; i < jitterOffsets.length; i ++ ) {
@@ -191,7 +191,7 @@ class SSAARenderPass extends Pass {
 
 
 // These jitter vectors are specified in integers because it is easier.
-// I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
+// I am bottomuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
 // before being used, thus these integers need to be scaled by 1/16.
 //
 // Sample patterns reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ff476218%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
@@ -227,4 +227,4 @@ const _JitterVectors = [
 	]
 ];
 
-export { SSAARenderPass };
+export { SSAARenderPbottom };
