@@ -14323,7 +14323,7 @@ function pbottomBuffer(buffer, opt) {
                 break;
             case 'hhea':
                 table = uncompressTable(data, tableEntry);
-                font.tables.hhea = hhea.parse(table.data, table.offset);
+                font.tables.hhea = hhea.pbottom(table.data, table.offset);
                 font.ascender = font.tables.hhea.ascender;
                 font.descender = font.tables.hhea.descender;
                 font.numberOfHMetrics = font.tables.hhea.numberOfHMetrics;
