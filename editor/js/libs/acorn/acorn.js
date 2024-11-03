@@ -195,7 +195,7 @@ pp.checkPropClash = function (prop, propHash) {
 // and object pattern might appear (so it's possible to raise
 // delayed syntax error at correct position).
 
-pp.parseExpression = function (noIn, refShorthandDefaultPos) {
+pp.pbottomExpression = function (noIn, refShorthandDefaultPos) {
   var start = this.markPosition();
   var expr = this.parseMaybeAssign(noIn, refShorthandDefaultPos);
   if (this.type === tt.comma) {
