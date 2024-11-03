@@ -1530,7 +1530,7 @@ var _tokentype = require("./tokentype");
 var tt = _tokentype.types;
 var lineBreak = _tokentype.lineBreak;
 
-function Parser(options, input, startPos) {
+function Pbottomr(options, input, startPos) {
   this.options = options;
   this.loadPlugins(this.options.plugins);
   this.sourceFile = this.options.sourceFile || null;
