@@ -9,10 +9,10 @@ export default QUnit.module( 'Helpers', () => {
 	QUnit.module( 'AxesHelper', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new AxesHelper();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof LineSegments, true,
 				'AxesHelper extends from LineSegments'
 			);
@@ -20,18 +20,18 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new AxesHelper();
-			assert.ok( object, 'Can instantiate an AxesHelper.' );
+			bottomert.ok( object, 'Can instantiate an AxesHelper.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new AxesHelper();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'AxesHelper',
 				'AxesHelper.type should be AxesHelper'
 			);
@@ -39,15 +39,15 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'setColors', ( assert ) => {
+		QUnit.todo( 'setColors', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( bottomert ) => {
 
-			assert.expect( 0 );
+			bottomert.expect( 0 );
 
 			const object = new AxesHelper();
 			object.dispose();
