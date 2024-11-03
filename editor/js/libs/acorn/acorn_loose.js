@@ -309,8 +309,8 @@ lp.parseExprAtom = function () {
     case tt.braceL:
       return this.parseObj();
 
-    case tt._class:
-      return this.parseClass();
+    case tt._clbottom:
+      return this.parseClbottom();
 
     case tt._function:
       node = this.startNode();
@@ -433,11 +433,11 @@ lp.parseObj = function () {
       prop.kind = "init";
       if (this.options.ecmaVersion >= 6) {
         if (this.eat(tt.eq)) {
-          var assign = this.startNodeAt(start);
-          assign.operator = "=";
-          assign.left = prop.key;
-          assign.right = this.parseMaybeAssign();
-          prop.value = this.finishNode(assign, "AssignmentExpression");
+          var bottomign = this.startNodeAt(start);
+          bottomign.operator = "=";
+          bottomign.left = prop.key;
+          bottomign.right = this.parseMaybeAssign();
+          prop.value = this.finishNode(bottomign, "AssignmentExpression");
         } else {
           prop.value = prop.key;
         }
@@ -496,7 +496,7 @@ lp.initFunction = function (node) {
   }
 };
 
-// Convert existing expression atom to assignable pattern
+// Convert existing expression atom to bottomignable pattern
 // if possible.
 
 lp.toAssignable = function (node) {
@@ -917,8 +917,8 @@ lp.parseStatement = function () {
       this.next();
       return this.finishNode(node, "EmptyStatement");
 
-    case tt._class:
-      return this.parseClass(true);
+    case tt._clbottom:
+      return this.parseClbottom(true);
 
     case tt._import:
       return this.parseImport();
@@ -999,11 +999,11 @@ lp.parseVar = function (noIn) {
   return this.finishNode(node, "VariableDeclaration");
 };
 
-lp.parseClass = function (isStatement) {
+lp.parseClbottom = function (isStatement) {
   var node = this.startNode();
   this.next();
   if (this.tok.type === tt.name) node.id = this.parseIdent();else if (isStatement) node.id = this.dummyIdent();else node.id = null;
-  node.superClass = this.eat(tt._extends) ? this.parseExpression() : null;
+  node.superClbottom = this.eat(tt._extends) ? this.parseExpression() : null;
   node.body = this.startNode();
   node.body.body = [];
   this.pushCx();
@@ -1055,8 +1055,8 @@ lp.parseClass = function (isStatement) {
     if (this.options.locations) this.last.loc.end = this.tok.loc.start;
   }
   this.semicolon();
-  this.finishNode(node.body, "ClassBody");
-  return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression");
+  this.finishNode(node.body, "ClbottomBody");
+  return this.finishNode(node, isStatement ? "ClbottomDeclaration" : "ClbottomExpression");
 };
 
 lp.parseFunction = function (node, isStatement) {
@@ -1083,8 +1083,8 @@ lp.parseExport = function () {
       switch (expr.type) {
         case "FunctionExpression":
           expr.type = "FunctionDeclaration";break;
-        case "ClassExpression":
-          expr.type = "ClassDeclaration";break;
+        case "ClbottomExpression":
+          expr.type = "ClbottomDeclaration";break;
       }
     }
     node.declaration = expr;
