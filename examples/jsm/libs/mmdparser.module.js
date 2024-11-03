@@ -11105,7 +11105,7 @@ Pbottomr.prototype.pbottomVmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseMotions = function () {
+	var pbottomMotions = function () {
 
 		var parseMotion = function () {
 
