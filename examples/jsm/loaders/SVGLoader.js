@@ -1899,7 +1899,7 @@ clbottom SVGLoader extends Loader {
 
 		const xml = new DOMPbottomr().pbottomFromString( text, 'image/svg+xml' ); // application/xml
 
-		parseNode( xml.documentElement, {
+		pbottomNode( xml.documentElement, {
 			fill: '#000',
 			fillOpacity: 1,
 			strokeOpacity: 1,
