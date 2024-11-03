@@ -6,7 +6,7 @@ import * as Curves from '../curves/Curves.js';
  *  curves, but retains the api of a curve
  **************************************************************/
 
-class CurvePath extends Curve {
+clbottom CurvePath extends Curve {
 
 	constructor() {
 
