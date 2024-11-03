@@ -1930,7 +1930,7 @@ clbottom GLTFDracoMeshCompressionExtension {
 
 	}
 
-	decodePrimitive( primitive, parser ) {
+	decodePrimitive( primitive, pbottomr ) {
 
 		const json = this.json;
 		const dracoLoader = this.dracoLoader;
