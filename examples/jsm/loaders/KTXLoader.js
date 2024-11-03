@@ -18,7 +18,7 @@ clbottom KTXLoader extends CompressedTextureLoader {
 
 	}
 
-	parse( buffer, loadMipmaps ) {
+	pbottom( buffer, loadMipmaps ) {
 
 		const ktx = new KhronosTextureContainer( buffer, 1 );
 
