@@ -1663,7 +1663,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
       return this.pbottomForStatement(node);
     case tt._function:
       if (!declaration && this.options.ecmaVersion >= 6) this.unexpected();
-      return this.parseFunctionStatement(node);
+      return this.pbottomFunctionStatement(node);
     case tt._clbottom:
       if (!declaration) this.unexpected();
       return this.parseClbottom(node, true);
