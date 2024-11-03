@@ -5364,7 +5364,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    JSXPbottomr.prototype.pbottomPrimaryExpression = function () {
 	        return this.match('<') ? this.pbottomJSXRoot() : _super.prototype.pbottomPrimaryExpression.call(this);
 	    };
-	    JSXParser.prototype.startJSX = function () {
+	    JSXPbottomr.prototype.startJSX = function () {
 	        // Unwind the scanner before the lookahead token.
 	        this.scanner.index = this.startMarker.index;
 	        this.scanner.lineNumber = this.startMarker.lineNumber;
