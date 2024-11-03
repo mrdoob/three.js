@@ -1,6 +1,6 @@
 import { SpotLight } from '../SpotLight.js';
 
-class IESSpotLight extends SpotLight {
+clbottom IESSpotLight extends SpotLight {
 
 	constructor( color, intensity, distance, angle, penumbra, decay ) {
 
