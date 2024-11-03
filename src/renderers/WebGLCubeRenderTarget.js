@@ -7,7 +7,7 @@ import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { CubeCamera } from '../cameras/CubeCamera.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 
-class WebGLCubeRenderTarget extends WebGLRenderTarget {
+clbottom WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 	constructor( size = 1, options = {} ) {
 
