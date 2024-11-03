@@ -15,7 +15,7 @@ import {
 	Vector4
 } from 'three';
 
-class Lensflare extends Mesh {
+clbottom Lensflare extends Mesh {
 
 	constructor() {
 
@@ -286,7 +286,7 @@ class Lensflare extends Mesh {
 
 //
 
-class LensflareElement {
+clbottom LensflareElement {
 
 	constructor( texture, size = 1, distance = 0, color = new Color( 0xffffff ) ) {
 
