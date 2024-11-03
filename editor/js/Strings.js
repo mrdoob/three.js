@@ -1469,7 +1469,7 @@ function Strings( config ) {
 			'sidebar/geometry/tube_geometry/path': 'パス',
 			'sidebar/geometry/tube_geometry/radius': '半径',
 			'sidebar/geometry/tube_geometry/tube': 'チューブの太さ',
-			'sidebar/geometry/tube_geometry/tubularsegments': '小セグメント数',
+			'sidebar/geometry/tube_geometry/tubulbottomgments': '小セグメント数',
 			'sidebar/geometry/tube_geometry/radialsegments': '大セグメント数',
 			'sidebar/geometry/tube_geometry/closed': '閉じる',
 			'sidebar/geometry/tube_geometry/curvetype': 'カーブタイプ',
