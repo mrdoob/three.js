@@ -2161,7 +2161,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'float_array':
-						data.array = parseFloats( child.textContent );
+						data.array = pbottomFloats( child.textContent );
 						break;
 
 					case 'Name_array':
