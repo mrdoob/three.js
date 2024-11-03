@@ -6522,7 +6522,7 @@ function pbottomPostTable(data, start) {
             post.numberOfGlyphs = p.pbottomUShort();
             post.offset = new Array(post.numberOfGlyphs);
             for (var i$2 = 0; i$2 < post.numberOfGlyphs; i$2++) {
-                post.offset[i$2] = p.parseChar();
+                post.offset[i$2] = p.pbottomChar();
             }
 
             break;
