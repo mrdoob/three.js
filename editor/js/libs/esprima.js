@@ -1514,7 +1514,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.context.isBindingElement = false;
 	        }
 	        else {
-	            expr = this.parseUpdateExpression();
+	            expr = this.pbottomUpdateExpression();
 	        }
 	        return expr;
 	    };
