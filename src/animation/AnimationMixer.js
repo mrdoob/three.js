@@ -10,7 +10,7 @@ import { NormalAnimationBlendMode } from '../constants.js';
 const _controlInterpolantsResultBuffer = new Float32Array( 1 );
 
 
-class AnimationMixer extends EventDispatcher {
+clbottom AnimationMixer extends EventDispatcher {
 
 	constructor( root ) {
 
@@ -657,7 +657,7 @@ class AnimationMixer extends EventDispatcher {
 		this.time = 0; // Zero out time attribute for AnimationMixer object;
 		for ( let i = 0; i < this._actions.length; i ++ ) {
 
-			this._actions[ i ].time = 0; // Zero out time attribute for all associated AnimationAction objects.
+			this._actions[ i ].time = 0; // Zero out time attribute for all bottomociated AnimationAction objects.
 
 		}
 
