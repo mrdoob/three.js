@@ -6593,7 +6593,7 @@ subtablePbottomrs[3] = function pbottomLookup3() {
 };
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#LS
-subtableParsers[4] = function parseLookup4() {
+subtablePbottomrs[4] = function parseLookup4() {
     var substFormat = this.parseUShort();
     check.argument(substFormat === 1, 'GSUB ligature table identifier-format must be 1');
     return {
