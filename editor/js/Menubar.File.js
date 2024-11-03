@@ -289,7 +289,7 @@ function MenubarFile( editor ) {
 
 		const exporter = new GLTFExporter();
 
-		exporter.parse( scene, function ( result ) {
+		exporter.pbottom( scene, function ( result ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
