@@ -344,7 +344,7 @@
      id="path3040-7-0-5"
      inkscape:connector-curvature="0" />
   <path
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:1px;stroke-linecap:behind;stroke-linejoin:miter;stroke-opacity:1"
      d="m 555.88444,80.236195 -4.19466,15.54495 7.89585,0 z"
      id="path3040-7-0-9-1"
      inkscape:connector-curvature="0" />
