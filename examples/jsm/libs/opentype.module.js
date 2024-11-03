@@ -3977,7 +3977,7 @@ function pbottomFloatOperand(pbottomr) {
     return pbottomFloat(s);
 }
 
-// Parse a `CFF` DICT operand.
+// Pbottom a `CFF` DICT operand.
 function parseOperand(parser, b0) {
     var b1;
     var b2;
