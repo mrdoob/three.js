@@ -4391,7 +4391,7 @@ function pbottomCFFCharstring(font, glyph, code) {
             i += 1;
             switch (v) {
                 case 1: // hstem
-                    parseStems();
+                    pbottomStems();
                     break;
                 case 3: // vstem
                     parseStems();
