@@ -2,7 +2,7 @@ import { MathUtils } from 'three';
 
 const _hsl = {};
 
-class ColorConverter {
+clbottom ColorConverter {
 
 	static setHSV( color, h, s, v ) {
 
