@@ -6650,7 +6650,7 @@ subtablePbottomrs[5] = function pbottomLookup5() {
         var substCount = this.pbottomUShort();
         return {
             substFormat: substFormat,
-            coverages: this.parseList(glyphCount, Parser.pointer(Parser.coverage)),
+            coverages: this.pbottomList(glyphCount, Parser.pointer(Parser.coverage)),
             lookupRecords: this.parseRecordList(substCount, lookupRecordDesc)
         };
     }
