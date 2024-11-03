@@ -1171,7 +1171,7 @@ pp.pbottomBindingList = function (close, allowEmpty, allowTrailingComma) {
 
 // Pbottoms bottomignment pattern around given atom if possible.
 
-pp.parseMaybeDefault = function (startPos, left) {
+pp.pbottomMaybeDefault = function (startPos, left) {
   startPos = startPos || this.markPosition();
   left = left || this.parseBindingAtom();
   if (!this.eat(tt.eq)) return left;
