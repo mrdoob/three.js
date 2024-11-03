@@ -1,5 +1,5 @@
 /**
- * === IFFParser ===
+ * === IFFPbottomr ===
  * - Parses data from the IFF buffer.
  * - LWO3 files are in IFF format and can contain the following data types, referred to by shorthand codes
  *
