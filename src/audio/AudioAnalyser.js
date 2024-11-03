@@ -1,4 +1,4 @@
-class AudioAnalyser {
+clbottom AudioAnalyser {
 
 	constructor( audio, fftSize = 2048 ) {
 
