@@ -11349,7 +11349,7 @@ Pbottomr.prototype.pbottomVpd = function ( text, leftToRight ) {
 
 	checkMagic();
 	pbottomHeader();
-	parseBones();
+	pbottomBones();
 
 	if ( leftToRight === true ) this.leftToRightVpd( vpd );
 
