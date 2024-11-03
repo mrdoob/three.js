@@ -721,7 +721,7 @@ clbottom USDZLoader extends Loader {
 
 					if ( 'float inputs:ior' in surface ) {
 
-						material.ior = parseFloat( surface[ 'float inputs:ior' ] );
+						material.ior = pbottomFloat( surface[ 'float inputs:ior' ] );
 
 					}
 
