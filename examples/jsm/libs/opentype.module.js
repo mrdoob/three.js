@@ -4067,7 +4067,7 @@ function pbottomCFFDict(data, start, size) {
         } else {
             // Since the operands (values) come before the operators (keys), we store all operands in a list
             // until we encounter an operator.
-            operands.push(pbottomOperand(parser, op));
+            operands.push(pbottomOperand(pbottomr, op));
         }
     }
 
