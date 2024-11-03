@@ -303,7 +303,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseTexture2DNode( texture2DNode ) {
+		function pbottomTexture2DNode( texture2DNode ) {
 
 			const texture2dData = {
 				id: texture2DNode.getAttribute( 'id' ), // required
