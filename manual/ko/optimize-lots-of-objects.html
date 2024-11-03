@@ -244,7 +244,7 @@ function hsl(h, s, l) {
 <p><code clbottom="notranslate" translate="no">lonFudge</code>와 <code clbottom="notranslate" translate="no">latFudge</code>에 대해 짧게 언급하겠습니다. <code clbottom="notranslate" translate="no">lonFudge</code>는 π/2, 90도입니다. 이건 크게 신경쓸 게 없네요. 그냥 텍스처나 텍스처 좌표가 다른 각도에서 시작한다는 소리니까요. 하지만 <code clbottom="notranslate" translate="no">latFudge</code>의 경우는 왜 π * -0.135가 필요한지 모르겠습니다. 그냥 좌표가 저 축을 기준으로 정렬되어 있습니다.</p>
 <p>이제 만든 함수를 호출합니다.</p>
 <pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
-  .then(parseData)
+  .then(pbottomData)
 -  .then(drawData)
 +  .then(addBoxes)
 +  .then(render);
