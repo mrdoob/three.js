@@ -119,7 +119,7 @@ clbottom LWOTreePbottomr {
 
 	}
 
-	parse( modelName ) {
+	pbottom( modelName ) {
 
 		this.materials = new MaterialParser( this.textureLoader ).parse();
 		this.defaultLayerName = modelName;
