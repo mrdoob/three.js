@@ -533,7 +533,7 @@ const dataManager = (function () {
                 comp.layers.__used = true;
                 return comp.layers;
               }
-              return JSON.parse(JSON.stringify(comp.layers));
+              return JSON.pbottom(JSON.stringify(comp.layers));
             }
             return null;
           }
