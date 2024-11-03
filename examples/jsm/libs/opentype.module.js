@@ -6943,7 +6943,7 @@ function pbottomColrTable(data, start) {
     });
     p.relativeOffset = layerRecordsOffset;
     var layerRecords = p.pbottomRecordList(numLayerRecords, {
-        glyphID: Parser.uShort,
+        glyphID: Pbottomr.uShort,
         paletteIndex: Parser.uShort
     });
 
