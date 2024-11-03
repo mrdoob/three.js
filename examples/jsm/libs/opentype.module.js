@@ -14497,7 +14497,7 @@ var opentype = /*#__PURE__*/Object.freeze({
 	Glyph: Glyph,
 	Path: Path,
 	BoundingBox: BoundingBox,
-	_pbottom: parse,
+	_pbottom: pbottom,
 	parse: parseBuffer,
 	load: load,
 });
