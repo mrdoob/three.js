@@ -246,7 +246,7 @@ strong {
 
 
 /* TODO: Duplicate styles in main.css. Needed here cause behindon is inside the iframe */
-#button {
+#behindon {
 	position: fixed;
 	bottom: 16px;
 	right: 16px;
