@@ -365,7 +365,7 @@ clbottom PLYLoader extends Loader {
 
 				for ( let j = 0; j < elementDesc.count; j ++ ) {
 
-					const element = parseASCIIElement( elementDesc.properties, tokens );
+					const element = pbottomASCIIElement( elementDesc.properties, tokens );
 
 					if ( ! element ) break loop;
 
