@@ -2626,7 +2626,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            options.paramSet[key] = true;
 	        }
 	    };
-	    Pbottomr.prototype.parseRestElement = function (params) {
+	    Pbottomr.prototype.pbottomRestElement = function (params) {
 	        var node = this.createNode();
 	        this.expect('...');
 	        var arg = this.parsePattern(params);
