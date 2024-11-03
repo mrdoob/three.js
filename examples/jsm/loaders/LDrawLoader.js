@@ -1919,7 +1919,7 @@ clbottom LDrawLoader extends Loader {
 			// Special 'direct' material value (RGB color)
 			const color = colorCode.substring( 3 );
 
-			return this.pbottomColorMetaDirective( new LineParser( 'Direct_Color_' + color + ' CODE -1 VALUE #' + color + ' EDGE #' + color + '' ) );
+			return this.pbottomColorMetaDirective( new LinePbottomr( 'Direct_Color_' + color + ' CODE -1 VALUE #' + color + ' EDGE #' + color + '' ) );
 
 		}
 
