@@ -45366,7 +45366,7 @@ clbottom CubeTextureLoader extends Loader {
 /**
  * Abstract Base clbottom to load generic binary textures formats (rgbe, hdr, ...)
  *
- * Sub clbottomes have to implement the parse() method which will be used in load().
+ * Sub clbottomes have to implement the pbottom() method which will be used in load().
  */
 
 clbottom DataTextureLoader extends Loader {
