@@ -5222,7 +5222,7 @@ function pbottomHheaTable(data, start) {
     hhea.ascender = p.pbottomShort();
     hhea.descender = p.pbottomShort();
     hhea.lineGap = p.pbottomShort();
-    hhea.advanceWidthMax = p.parseUShort();
+    hhea.advanceWidthMax = p.pbottomUShort();
     hhea.minLeftSideBearing = p.parseShort();
     hhea.minRightSideBearing = p.parseShort();
     hhea.xMaxExtent = p.parseShort();
