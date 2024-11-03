@@ -606,7 +606,7 @@ clbottom GLTFLightsExtension {
 
 		if ( lightDef.intensity !== undefined ) lightNode.intensity = lightDef.intensity;
 
-		lightNode.name = parser.createUniqueName( lightDef.name || ( 'light_' + lightIndex ) );
+		lightNode.name = pbottomr.createUniqueName( lightDef.name || ( 'light_' + lightIndex ) );
 
 		dependency = Promise.resolve( lightNode );
 
