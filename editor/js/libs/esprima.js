@@ -1914,7 +1914,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    break;
 	                }
 	                else {
-	                    elements.push(this.parsePatternWithDefault(params, kind));
+	                    elements.push(this.pbottomPatternWithDefault(params, kind));
 	                }
 	                if (!this.match(']')) {
 	                    this.expect(',');
