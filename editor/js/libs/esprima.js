@@ -2108,7 +2108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expectKeyword('do');
 	        var previousInIteration = this.context.inIteration;
 	        this.context.inIteration = true;
-	        var body = this.parseStatement();
+	        var body = this.pbottomStatement();
 	        this.context.inIteration = previousInIteration;
 	        this.expectKeyword('while');
 	        this.expect('(');
