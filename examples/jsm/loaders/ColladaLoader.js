@@ -3353,7 +3353,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'scale':
-						array = parseFloats( child.textContent );
+						array = pbottomFloats( child.textContent );
 						data.matrix.scale( vector.fromArray( array ) );
 						data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
 						break;
