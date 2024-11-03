@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p clbottom="desc">
+		<p class="desc">
 			Un materiale standard a base fisica, che utilizza il flusso di lavoro Metallic-Roughness.<br /><br />
 
 			Physically based rendering (PBR) è recentemente diventato uno standard in molte applicazioni 3D, come
@@ -45,7 +45,7 @@
 		</p>
 		<p>
 			Dettagli tecnici dell'approccio utilizzato in three.js (e altri sistemi PBR) possono essere trovati in questo 
-			[link:https://media.disneyanimation.com/uploads/production/publication_bottomet/48/bottomet/s2012_pbs_disney_brdf_notes_v3.pdf articolo di Disney] (pdf),
+			[link:https://media.disneyanimation.com/uploads/production/publication_asset/48/asset/s2012_pbs_disney_brdf_notes_v3.pdf articolo di Disney] (pdf),
 			di Brent Burley.
 		</p>
 
@@ -72,14 +72,14 @@
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p>
 			[page:Object parameters] - (opzionale) un oggetto con una o più proprietà che definiscono l'aspetto del materiale.
-			Qualsiasi proprietà del materiale (inclusa qualsiasi proprietà ereditata da [page:Material]) può essere pbottomata qui. <br /><br />
+			Qualsiasi proprietà del materiale (inclusa qualsiasi proprietà ereditata da [page:Material]) può essere passata qui. <br /><br />
 
-			L'eccezione è la proprietà [page:Hexadecimal colore], la quale può essere pbottomata come stringa
+			L'eccezione è la proprietà [page:Hexadecimal colore], la quale può essere passata come stringa
 			esadecimale e per impostazione predefinita è `0xffffff` (bianco). [page:Color.set]( color ) viene chiamato internamente.
 		</p>
 
 		<h2>Proprietà</h2>
-		<p>Vedi la clbottome base [page:Material] per le proprietà comuni.</p>
+		<p>Vedi la classe base [page:Material] per le proprietà comuni.</p>
 
 		<h3>[property:Texture alphaMap]</h3>
 		<p>La mappa alfa è una texture in scala di grigi che controlla l'opacità sulla superficie
@@ -103,7 +103,7 @@
 
 		<h3>[property:Texture bumpMap]</h3>
 		<p>
-			La texture per creare una mappa di rilievo. I valori nero e bianco si bottomociano alla profondità percepita in relazione
+			La texture per creare una mappa di rilievo. I valori nero e bianco si associano alla profondità percepita in relazione
 			alle luci. Bump in realtà non influisce sulla geometria dell'oggetto, solo sull'illuminazione. Se viene definita una mappa
 			normale questa verrà ignorata.
 		</p>
@@ -136,7 +136,7 @@
 		<h3>[property:Float displacementScale]</h3>
 		<p>
 			Quando la mappa di spostamento influenza la mesh (dove il nero non è lo spostamento,
-			e il bianco è lo spostamento mbottomimo). Senza una mappa di spostamento impostata, questo valore
+			e il bianco è lo spostamento massimo). Senza una mappa di spostamento impostata, questo valore
 			non viene applicato.
 			Il valore predefinito è 1.
 		</p>
@@ -158,14 +158,14 @@
 		<p>
 			Imposta la mappa emissiva (bagliore). Il valore predefinito è `null`. Il colore della mappa emissiva
 			è modulato dal colore emissivo e dall'intensità emissiva. Se si dispone di una mappa emissiva, 
-			bottomicurarsi di impostare il colore emissivo su qualcosa di diverso dal nero. 
+			assicurarsi di impostare il colore emissivo su qualcosa di diverso dal nero. 
 		</p>
 
 		<h3>[property:Float emissiveIntensity]</h3>
 		<p>Intensità della luce emissiva. Modula il colore emissivo. Il valore predefinito è `1`.</p>
 
 		<h3>[property:Texture envMap]</h3>
-		<p>La mappa ambientale. Per bottomicurare un rendering fisicamente corretto, è necessario 
+		<p>La mappa ambientale. Per assicurare un rendering fisicamente corretto, è necessario 
 			aggiungere solo le mappe ambientali che sono state processate da [page:PMREMGenerator].
 			Il valore predefinito è `null`.</p>
 		</p>
@@ -245,7 +245,7 @@
 
 		<h3>[property:String wireframeLinecap]</h3>
 		<p>
-			Definisce l'aspetto delle estremità della linea. I valori possibili sono "butt", "round" e "square". Il valore predefinito è 'round'.<br /><br />
+			Definisce l'aspetto delle estremità della linea. I valori possibili sono "behind", "round" e "square". Il valore predefinito è 'round'.<br /><br />
 
 			Questa corrisponde alla proprietà [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
 			e viene ignorata dal renderer [page:WebGLRenderer WebGL].
@@ -268,7 +268,7 @@
 		</p>
 
 		<h2>Metodi</h2>
-		<p>Vedi la clbottome base [page:Material] per i metodi comuni.</p>
+		<p>Vedi la classe base [page:Material] per i metodi comuni.</p>
 
 		<h2>Source</h2>
 
