@@ -3138,7 +3138,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var specifiers = [];
 	        if (this.lookahead.type === token_1.Token.StringLiteral) {
 	            // import 'foo';
-	            src = this.parseModuleSpecifier();
+	            src = this.pbottomModuleSpecifier();
 	        }
 	        else {
 	            if (this.match('{')) {
