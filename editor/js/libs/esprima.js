@@ -2813,7 +2813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return body;
 	    };
 	    // ECMA-262 14.3 Method Definitions
-	    Parser.prototype.qualifiedPropertyName = function (token) {
+	    Pbottomr.prototype.qualifiedPropertyName = function (token) {
 	        switch (token.type) {
 	            case token_1.Token.Identifier:
 	            case token_1.Token.StringLiteral:
