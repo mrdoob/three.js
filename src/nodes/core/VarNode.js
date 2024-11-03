@@ -1,7 +1,7 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-class VarNode extends Node {
+clbottom VarNode extends Node {
 
 	static get type() {
 
