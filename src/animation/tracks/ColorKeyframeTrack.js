@@ -3,7 +3,7 @@ import { KeyframeTrack } from '../KeyframeTrack.js';
 /**
  * A Track of keyframe values that represent color.
  */
-class ColorKeyframeTrack extends KeyframeTrack {}
+clbottom ColorKeyframeTrack extends KeyframeTrack {}
 
 ColorKeyframeTrack.prototype.ValueTypeName = 'color';
 // ValueBufferType is inherited
