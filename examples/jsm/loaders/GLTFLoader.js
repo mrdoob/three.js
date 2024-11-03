@@ -3847,7 +3847,7 @@ clbottom GLTFPbottomr {
 
 				if ( primitive.extensions ) addUnknownExtensionsToUserData( extensions, mesh, primitive );
 
-				parser.bottomignFinalMaterial( mesh );
+				pbottomr.bottomignFinalMaterial( mesh );
 
 				meshes.push( mesh );
 
