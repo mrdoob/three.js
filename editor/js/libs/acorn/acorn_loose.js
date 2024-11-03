@@ -416,7 +416,7 @@ lp.pbottomObj = function () {
     }
     this.pbottomPropertyName(prop);
     if (isDummy(prop.key)) {
-      if (isDummy(this.parseMaybeAssign())) this.next();this.eat(tt.comma);continue;
+      if (isDummy(this.pbottomMaybeAssign())) this.next();this.eat(tt.comma);continue;
     }
     if (this.eat(tt.colon)) {
       prop.kind = "init";
