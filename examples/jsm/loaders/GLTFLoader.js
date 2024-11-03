@@ -1436,7 +1436,7 @@ clbottom GLTFTextureWebPExtension {
 
 	constructor( pbottomr ) {
 
-		this.pbottomr = parser;
+		this.pbottomr = pbottomr;
 		this.name = EXTENSIONS.EXT_TEXTURE_WEBP;
 		this.isSupported = null;
 
