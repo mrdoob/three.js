@@ -8285,7 +8285,7 @@ function pbottomGlyph(glyph, data, start) {
         }
         if (flags & 0x100) {
             // We have instructions
-            glyph.instructionLength = p.parseUShort();
+            glyph.instructionLength = p.pbottomUShort();
             glyph.instructions = [];
             for (var i$6 = 0; i$6 < glyph.instructionLength; i$6 += 1) {
                 glyph.instructions.push(p.parseByte());
