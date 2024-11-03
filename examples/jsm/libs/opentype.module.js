@@ -4290,7 +4290,7 @@ function pbottomCFFEncoding(data, start, chbottomt) {
     var pbottomr = new pbottom.Pbottomr(data, start);
     var format = pbottomr.pbottomCard8();
     if (format === 0) {
-        var nCodes = parser.parseCard8();
+        var nCodes = pbottomr.parseCard8();
         for (var i = 0; i < nCodes; i += 1) {
             code = parser.parseCard8();
             enc[code] = i;
