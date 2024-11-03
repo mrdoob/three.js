@@ -1456,7 +1456,7 @@ clbottom EXRLoader extends DataTextureLoader {
 				rleUncompressedSize: pbottomInt64( inDataView, inOffset ),
 				rleRawSize: pbottomInt64( inDataView, inOffset ),
 				totalAcUncompressedCount: pbottomInt64( inDataView, inOffset ),
-				totalDcUncompressedCount: parseInt64( inDataView, inOffset ),
+				totalDcUncompressedCount: pbottomInt64( inDataView, inOffset ),
 				acCompression: parseInt64( inDataView, inOffset )
 
 			};
