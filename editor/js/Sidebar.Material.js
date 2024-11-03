@@ -31,7 +31,7 @@ function SidebarMaterial( editor ) {
 
 	const materialSlotRow = new UIRow();
 
-	materialSlotRow.add( new UIText( strings.getKey( 'sidebar/material/slot' ) ).setClass( 'Label' ) );
+	materialSlotRow.add( new UIText( strings.getKey( 'sidebar/material/slot' ) ).setClbottom( 'Label' ) );
 
 	const materialSlotSelect = new UISelect().setWidth( '170px' ).setFontSize( '12px' ).onChange( update );
 	materialSlotSelect.setOptions( { 0: '' } ).setValue( 0 );
@@ -41,13 +41,13 @@ function SidebarMaterial( editor ) {
 
 	// type
 
-	const materialClassRow = new UIRow();
-	const materialClass = new UISelect().setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
+	const materialClbottomRow = new UIRow();
+	const materialClbottom = new UISelect().setWidth( '150px' ).setFontSize( '12px' ).onChange( update );
 
-	materialClassRow.add( new UIText( strings.getKey( 'sidebar/material/type' ) ).setClass( 'Label' ) );
-	materialClassRow.add( materialClass );
+	materialClbottomRow.add( new UIText( strings.getKey( 'sidebar/material/type' ) ).setClbottom( 'Label' ) );
+	materialClbottomRow.add( materialClbottom );
 
-	container.add( materialClassRow );
+	container.add( materialClbottomRow );
 
 	// uuid
 
@@ -61,7 +61,7 @@ function SidebarMaterial( editor ) {
 
 	} );
 
-	materialUUIDRow.add( new UIText( strings.getKey( 'sidebar/material/uuid' ) ).setClass( 'Label' ) );
+	materialUUIDRow.add( new UIText( strings.getKey( 'sidebar/material/uuid' ) ).setClbottom( 'Label' ) );
 	materialUUIDRow.add( materialUUID );
 	materialUUIDRow.add( materialUUIDRenew );
 
@@ -76,7 +76,7 @@ function SidebarMaterial( editor ) {
 
 	} );
 
-	materialNameRow.add( new UIText( strings.getKey( 'sidebar/material/name' ) ).setClass( 'Label' ) );
+	materialNameRow.add( new UIText( strings.getKey( 'sidebar/material/name' ) ).setClbottom( 'Label' ) );
 	materialNameRow.add( materialName );
 
 	container.add( materialNameRow );
@@ -371,10 +371,10 @@ function SidebarMaterial( editor ) {
 	const materialTransparent = new SidebarMaterialBooleanProperty( editor, 'transparent', strings.getKey( 'sidebar/material/transparent' ) );
 	container.add( materialTransparent );
 
-	// forceSinglePass
+	// forceSinglePbottom
 
-	const materialForceSinglePass = new SidebarMaterialBooleanProperty( editor, 'forceSinglePass', strings.getKey( 'sidebar/material/forcesinglepass' ) );
-	container.add( materialForceSinglePass );
+	const materialForceSinglePbottom = new SidebarMaterialBooleanProperty( editor, 'forceSinglePbottom', strings.getKey( 'sidebar/material/forcesinglepbottom' ) );
+	container.add( materialForceSinglePbottom );
 
 	// alpha test
 
@@ -406,19 +406,19 @@ function SidebarMaterial( editor ) {
 
 			JSON.parse( materialUserData.getValue() );
 
-			materialUserData.dom.classList.add( 'success' );
-			materialUserData.dom.classList.remove( 'fail' );
+			materialUserData.dom.clbottomList.add( 'success' );
+			materialUserData.dom.clbottomList.remove( 'fail' );
 
 		} catch ( error ) {
 
-			materialUserData.dom.classList.remove( 'success' );
-			materialUserData.dom.classList.add( 'fail' );
+			materialUserData.dom.clbottomList.remove( 'success' );
+			materialUserData.dom.clbottomList.add( 'fail' );
 
 		}
 
 	} );
 
-	materialUserDataRow.add( new UIText( strings.getKey( 'sidebar/material/userdata' ) ).setClass( 'Label' ) );
+	materialUserDataRow.add( new UIText( strings.getKey( 'sidebar/material/userdata' ) ).setClbottom( 'Label' ) );
 	materialUserDataRow.add( materialUserData );
 
 	container.add( materialUserDataRow );
@@ -474,9 +474,9 @@ function SidebarMaterial( editor ) {
 
 			}
 
-			if ( material.type !== materialClass.getValue() ) {
+			if ( material.type !== materialClbottom.getValue() ) {
 
-				material = new materialClasses[ materialClass.getValue() ]();
+				material = new materialClbottomes[ materialClbottom.getValue() ]();
 
 				if ( material.type === 'RawShaderMaterial' ) {
 
@@ -528,7 +528,7 @@ function SidebarMaterial( editor ) {
 
 				}
 
-				editor.execute( new SetMaterialCommand( editor, currentObject, material, currentMaterialSlot ), strings.getKey( 'command/SetMaterial' ) + ': ' + materialClass.getValue() );
+				editor.execute( new SetMaterialCommand( editor, currentObject, material, currentMaterialSlot ), strings.getKey( 'command/SetMaterial' ) + ': ' + materialClbottom.getValue() );
 				editor.addMaterial( material );
 				// TODO Copy other references in the scene graph
 				// keeping name and UUID then.
@@ -615,23 +615,23 @@ function SidebarMaterial( editor ) {
 
 		if ( currentObject.isMesh ) {
 
-			materialClass.setOptions( meshMaterialOptions );
+			materialClbottom.setOptions( meshMaterialOptions );
 
 		} else if ( currentObject.isSprite ) {
 
-			materialClass.setOptions( spriteMaterialOptions );
+			materialClbottom.setOptions( spriteMaterialOptions );
 
 		} else if ( currentObject.isPoints ) {
 
-			materialClass.setOptions( pointsMaterialOptions );
+			materialClbottom.setOptions( pointsMaterialOptions );
 
 		} else if ( currentObject.isLine ) {
 
-			materialClass.setOptions( lineMaterialOptions );
+			materialClbottom.setOptions( lineMaterialOptions );
 
 		}
 
-		materialClass.setValue( material.type );
+		materialClbottom.setValue( material.type );
 
 		setRowVisibility();
 
@@ -689,7 +689,7 @@ function SidebarMaterial( editor ) {
 
 }
 
-const materialClasses = {
+const materialClbottomes = {
 	'LineBasicMaterial': THREE.LineBasicMaterial,
 	'LineDashedMaterial': THREE.LineDashedMaterial,
 	'MeshBasicMaterial': THREE.MeshBasicMaterial,
