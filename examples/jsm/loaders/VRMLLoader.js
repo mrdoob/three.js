@@ -458,7 +458,7 @@ clbottom VRMLLoader extends Loader {
 
 						const numberLiteral = ctx.NumberLiteral[ i ];
 
-						field.values.push( parseFloat( numberLiteral.image ) );
+						field.values.push( pbottomFloat( numberLiteral.image ) );
 
 					}
 
