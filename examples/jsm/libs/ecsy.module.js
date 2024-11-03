@@ -45,7 +45,7 @@ function componentRegistered(T) {
   );
 }
 
-clbottom SystemManager {
+class SystemManager {
   constructor(world) {
     this._systems = [];
     this._executeSystems = []; // Systems that have `execute` method
@@ -53,19 +53,19 @@ clbottom SystemManager {
     this.lastExecutedSystem = null;
   }
 
-  registerSystem(SystemClbottom, attributes) {
-    if (!SystemClbottom.isSystem) {
+  registerSystem(SystemClass, attributes) {
+    if (!SystemClass.isSystem) {
       throw new Error(
-        `System '${SystemClbottom.name}' does not extend 'System' clbottom`
+        `System '${SystemClass.name}' does not extend 'System' class`
       );
     }
 
-    if (this.getSystem(SystemClbottom) !== undefined) {
-      console.warn(`System '${SystemClbottom.getName()}' already registered.`);
+    if (this.getSystem(SystemClass) !== undefined) {
+      console.warn(`System '${SystemClass.getName()}' already registered.`);
       return this;
     }
 
-    var system = new SystemClbottom(this.world, attributes);
+    var system = new SystemClass(this.world, attributes);
     if (system.init) system.init(attributes);
     system.order = this._systems.length;
     this._systems.push(system);
@@ -76,11 +76,11 @@ clbottom SystemManager {
     return this;
   }
 
-  unregisterSystem(SystemClbottom) {
-    let system = this.getSystem(SystemClbottom);
+  unregisterSystem(SystemClass) {
+    let system = this.getSystem(SystemClass);
     if (system === undefined) {
       console.warn(
-        `Can unregister system '${SystemClbottom.getName()}'. It doesn't exist.`
+        `Can unregister system '${SystemClass.getName()}'. It doesn't exist.`
       );
       return this;
     }
@@ -101,16 +101,16 @@ clbottom SystemManager {
     });
   }
 
-  getSystem(SystemClbottom) {
-    return this._systems.find((s) => s instanceof SystemClbottom);
+  getSystem(SystemClass) {
+    return this._systems.find((s) => s instanceof SystemClass);
   }
 
   getSystems() {
     return this._systems;
   }
 
-  removeSystem(SystemClbottom) {
-    var index = this._systems.indexOf(SystemClbottom);
+  removeSystem(SystemClass) {
+    var index = this._systems.indexOf(SystemClass);
     if (!~index) return;
 
     this._systems.splice(index, 1);
@@ -160,7 +160,7 @@ clbottom SystemManager {
   }
 }
 
-clbottom ObjectPool {
+class ObjectPool {
   // @todo Add initial size
   constructor(T, initialSize) {
     this.freeList = [];
@@ -213,9 +213,9 @@ clbottom ObjectPool {
 
 /**
  * @private
- * @clbottom EventDispatcher
+ * @class EventDispatcher
  */
-clbottom EventDispatcher {
+class EventDispatcher {
   constructor() {
     this._listeners = {};
     this.stats = {
@@ -294,7 +294,7 @@ clbottom EventDispatcher {
   }
 }
 
-clbottom Query {
+class Query {
   /**
    * @param {Array(Component)} Components List of types of components to query
    */
@@ -400,9 +400,9 @@ Query.prototype.COMPONENT_CHANGED = "Query#COMPONENT_CHANGED";
 
 /**
  * @private
- * @clbottom QueryManager
+ * @class QueryManager
  */
-clbottom QueryManager {
+class QueryManager {
   constructor(world) {
     this._world = world;
 
@@ -497,7 +497,7 @@ clbottom QueryManager {
   }
 
   /**
-   * Return some stats from this clbottom
+   * Return some stats from this class
    */
   stats() {
     var stats = {};
@@ -508,7 +508,7 @@ clbottom QueryManager {
   }
 }
 
-clbottom Component {
+class Component {
   constructor(props) {
     if (props !== false) {
       const schema = this.constructor.schema;
@@ -603,13 +603,13 @@ Component.getName = function () {
   return this.displayName || this.name;
 };
 
-clbottom SystemStateComponent extends Component {}
+class SystemStateComponent extends Component {}
 
 SystemStateComponent.isSystemStateComponent = true;
 
-clbottom EntityPool extends ObjectPool {
-  constructor(entityManager, entityClbottom, initialSize) {
-    super(entityClbottom, undefined);
+class EntityPool extends ObjectPool {
+  constructor(entityManager, entityClass, initialSize) {
+    super(entityClass, undefined);
     this.entityManager = entityManager;
 
     if (typeof initialSize !== "undefined") {
@@ -629,9 +629,9 @@ clbottom EntityPool extends ObjectPool {
 
 /**
  * @private
- * @clbottom EntityManager
+ * @class EntityManager
  */
-clbottom EntityManager {
+class EntityManager {
   constructor(world) {
     this.world = world;
     this.componentsManager = world.componentsManager;
@@ -646,7 +646,7 @@ clbottom EntityManager {
     this.eventDispatcher = new EventDispatcher();
     this._entityPool = new EntityPool(
       this,
-      this.world.options.entityClbottom,
+      this.world.options.entityClass,
       this.world.options.entityPoolSize
     );
 
@@ -917,7 +917,7 @@ const ENTITY_REMOVED = "EntityManager#ENTITY_REMOVED";
 const COMPONENT_ADDED = "EntityManager#COMPONENT_ADDED";
 const COMPONENT_REMOVE = "EntityManager#COMPONENT_REMOVE";
 
-clbottom ComponentManager {
+class ComponentManager {
   constructor() {
     this.Components = [];
     this._ComponentsMap = {};
@@ -1013,7 +1013,7 @@ function wrapImmutableComponent(T, component) {
   return wrappedComponent;
 }
 
-clbottom Entity {
+class Entity {
   constructor(entityManager) {
     this._entityManager = entityManager || null;
 
@@ -1166,12 +1166,12 @@ clbottom Entity {
 
 const DEFAULT_OPTIONS = {
   entityPoolSize: 0,
-  entityClbottom: Entity,
+  entityClass: Entity,
 };
 
-clbottom World {
+class World {
   constructor(options = {}) {
-    this.options = Object.bottomign({}, DEFAULT_OPTIONS, options);
+    this.options = Object.assign({}, DEFAULT_OPTIONS, options);
 
     this.componentsManager = new ComponentManager(this);
     this.entityManager = new EntityManager(this);
@@ -1210,8 +1210,8 @@ clbottom World {
     return this;
   }
 
-  getSystem(SystemClbottom) {
-    return this.systemManager.getSystem(SystemClbottom);
+  getSystem(SystemClass) {
+    return this.systemManager.getSystem(SystemClass);
   }
 
   getSystems() {
@@ -1253,7 +1253,7 @@ clbottom World {
   }
 }
 
-clbottom System {
+class System {
   canExecute() {
     if (this._mandatoryQueries.length === 0) return true;
 
@@ -1484,7 +1484,7 @@ function Not(Component) {
   };
 }
 
-clbottom TagComponent extends Component {
+class TagComponent extends Component {
   constructor() {
     super(false);
   }
@@ -1667,7 +1667,7 @@ function includeRemoteIdHTML(remoteId) {
     top: 0;
   `;
 
-  infoDiv.innerHTML = `Open ECSY devtools to connect to this page using the code:&nbsp;<b style="color: #fff">${remoteId}</b>&nbsp;<button onClick="generateNewCode()">Generate new code</button>`;
+  infoDiv.innerHTML = `Open ECSY devtools to connect to this page using the code:&nbsp;<b style="color: #fff">${remoteId}</b>&nbsp;<behindon onClick="generateNewCode()">Generate new code</behindon>`;
   document.body.appendChild(infoDiv);
 
   return infoDiv;
