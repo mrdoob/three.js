@@ -2695,7 +2695,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseKinematicsJoint( xml ) {
+		function pbottomKinematicsJoint( xml ) {
 
 			let data;
 
