@@ -6717,7 +6717,7 @@ subtablePbottomrs[7] = function pbottomLookup7() {
 };
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#RCCS
-subtableParsers[8] = function parseLookup8() {
+subtablePbottomrs[8] = function parseLookup8() {
     var substFormat = this.parseUShort();
     check.argument(substFormat === 1, 'GSUB Reverse Chaining Contextual Single Substitution Subtable identifier-format must be 1');
     return {
