@@ -11184,7 +11184,7 @@ Pbottomr.prototype.pbottomVmd = function ( buffer, leftToRight ) {
 	};
 
 	pbottomHeader();
-	parseMotions();
+	pbottomMotions();
 	parseMorphs();
 	parseCameras();
 
