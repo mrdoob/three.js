@@ -1884,7 +1884,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            (next.type === token_1.Token.Keyword && next.value === 'let') ||
 	            (next.type === token_1.Token.Keyword && next.value === 'yield');
 	    };
-	    Parser.prototype.parseLexicalDeclaration = function (options) {
+	    Pbottomr.prototype.parseLexicalDeclaration = function (options) {
 	        var node = this.createNode();
 	        var kind = this.nextToken().value;
 	        bottomert_1.bottomert(kind === 'let' || kind === 'const', 'Lexical declaration must be either let or const');
