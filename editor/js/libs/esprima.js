@@ -3086,7 +3086,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            imported = this.parseIdentifierName();
+	            imported = this.pbottomIdentifierName();
 	            local = imported;
 	            if (this.matchContextualKeyword('as')) {
 	                this.nextToken();
