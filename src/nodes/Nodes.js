@@ -4,7 +4,7 @@ export * from './core/constants.js';
 // core
 export { default as AssignNode } from './core/AssignNode.js';
 export { default as AttributeNode } from './core/AttributeNode.js';
-export { default as BypassNode } from './core/BypassNode.js';
+export { default as BypbottomNode } from './core/BypbottomNode.js';
 export { default as CacheNode } from './core/CacheNode.js';
 export { default as ConstNode } from './core/ConstNode.js';
 export { default as ContextNode } from './core/ContextNode.js';
@@ -92,8 +92,8 @@ export { default as ViewportSharedTextureNode } from './display/ViewportSharedTe
 export { default as ViewportDepthTextureNode } from './display/ViewportDepthTextureNode.js';
 export { default as ViewportDepthNode } from './display/ViewportDepthNode.js';
 export { default as RenderOutputNode } from './display/RenderOutputNode.js';
-export { default as PassNode } from './display/PassNode.js';
-export { default as ToonOutlinePassNode } from './display/ToonOutlinePassNode.js';
+export { default as PbottomNode } from './display/PbottomNode.js';
+export { default as ToonOutlinePbottomNode } from './display/ToonOutlinePbottomNode.js';
 
 // code
 export { default as ExpressionNode } from './code/ExpressionNode.js';
