@@ -398,7 +398,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var syntax_1 = __webpack_require__(2);
 	var Node = __webpack_require__(10);
 	var ArrowParameterPlaceHolder = 'ArrowParameterPlaceHolder';
-	var Parser = (function () {
+	var Pbottomr = (function () {
 	    function Parser(code, options, delegate) {
 	        if (options === void 0) { options = {}; }
 	        this.config = {
