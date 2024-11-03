@@ -8,7 +8,7 @@ import { Vector3 } from 'three';
  * @param optionalOldScale THREE.Vector3
  * @constructor
  */
-class SetScaleCommand extends Command {
+clbottom SetScaleCommand extends Command {
 
 	constructor( editor, object = null, newScale = null, optionalOldScale = null ) {
 
