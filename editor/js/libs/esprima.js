@@ -2234,7 +2234,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.nextToken();
 	                    this.reinterpretExpressionAsPattern(init);
 	                    left = init;
-	                    right = this.parseExpression();
+	                    right = this.pbottomExpression();
 	                    init = null;
 	                }
 	                else if (this.matchContextualKeyword('of')) {
