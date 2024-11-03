@@ -14,651 +14,651 @@ export default QUnit.module( 'Maths', () => {
 	QUnit.module( 'Vector2', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			let a = new Vector2();
-			assert.ok( a.x == 0, 'Passed!' );
-			assert.ok( a.y == 0, 'Passed!' );
+			bottomert.ok( a.x == 0, 'Pbottomed!' );
+			bottomert.ok( a.y == 0, 'Pbottomed!' );
 
 			a = new Vector2( x, y );
-			assert.ok( a.x === x, 'Passed!' );
-			assert.ok( a.y === y, 'Passed!' );
+			bottomert.ok( a.x === x, 'Pbottomed!' );
+			bottomert.ok( a.y === y, 'Pbottomed!' );
 
 		} );
 
 		// PROPERTIES // ( [Itee] WHAT ??? o_O )
-		QUnit.test( 'properties', ( assert ) => {
+		QUnit.test( 'properties', ( bottomert ) => {
 
 			const a = new Vector2( 0, 0 );
 			const width = 100;
 			const height = 200;
 
-			assert.ok( a.width = width, 'Set width' );
-			assert.ok( a.height = height, 'Set height' );
+			bottomert.ok( a.width = width, 'Set width' );
+			bottomert.ok( a.height = height, 'Set height' );
 
 			a.set( width, height );
-			assert.strictEqual( a.width, width, 'Get width' );
-			assert.strictEqual( a.height, height, 'Get height' );
+			bottomert.strictEqual( a.width, width, 'Get width' );
+			bottomert.strictEqual( a.height, height, 'Get height' );
 
 		} );
 
-		QUnit.todo( 'width', ( assert ) => {
+		QUnit.todo( 'width', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'height', ( assert ) => {
+		QUnit.todo( 'height', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isVector2', ( assert ) => {
+		QUnit.test( 'isVector2', ( bottomert ) => {
 
 			const object = new Vector2();
-			assert.ok( object.isVector2, 'Vector2.isVector2 should be true' );
+			bottomert.ok( object.isVector2, 'Vector2.isVector2 should be true' );
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		QUnit.test( 'set', ( bottomert ) => {
 
 			const a = new Vector2();
-			assert.ok( a.x == 0, 'Passed!' );
-			assert.ok( a.y == 0, 'Passed!' );
+			bottomert.ok( a.x == 0, 'Pbottomed!' );
+			bottomert.ok( a.y == 0, 'Pbottomed!' );
 
 			a.set( x, y );
-			assert.ok( a.x == x, 'Passed!' );
-			assert.ok( a.y == y, 'Passed!' );
+			bottomert.ok( a.x == x, 'Pbottomed!' );
+			bottomert.ok( a.y == y, 'Pbottomed!' );
 
 		} );
 
-		QUnit.todo( 'setScalar', ( assert ) => {
+		QUnit.todo( 'setScalar', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setX', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setY', ( assert ) => {
+		QUnit.todo( 'setX', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setComponent', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'getComponent', ( assert ) => {
+		QUnit.todo( 'setY', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'clone', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		QUnit.todo( 'setComponent', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'getComponent', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'clone', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'copy', ( bottomert ) => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2().copy( a );
-			assert.ok( b.x == x, 'Passed!' );
-			assert.ok( b.y == y, 'Passed!' );
+			bottomert.ok( b.x == x, 'Pbottomed!' );
+			bottomert.ok( b.y == y, 'Pbottomed!' );
 
 			// ensure that it is a true copy
 			a.x = 0;
 			a.y = - 1;
-			assert.ok( b.x == x, 'Passed!' );
-			assert.ok( b.y == y, 'Passed!' );
+			bottomert.ok( b.x == x, 'Pbottomed!' );
+			bottomert.ok( b.y == y, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'add', ( assert ) => {
+		QUnit.test( 'add', ( bottomert ) => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( - x, - y );
 
 			a.add( b );
-			assert.ok( a.x == 0, 'Passed!' );
-			assert.ok( a.y == 0, 'Passed!' );
+			bottomert.ok( a.x == 0, 'Pbottomed!' );
+			bottomert.ok( a.y == 0, 'Pbottomed!' );
 
 			const c = new Vector2().addVectors( b, b );
-			assert.ok( c.x == - 2 * x, 'Passed!' );
-			assert.ok( c.y == - 2 * y, 'Passed!' );
+			bottomert.ok( c.x == - 2 * x, 'Pbottomed!' );
+			bottomert.ok( c.y == - 2 * y, 'Pbottomed!' );
 
 		} );
 
-		QUnit.todo( 'addScalar', ( assert ) => {
+		QUnit.todo( 'addScalar', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'addVectors', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'addScaledVector', ( assert ) => {
+		QUnit.todo( 'addVectors', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'addScaledVector', ( bottomert ) => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( 2, 3 );
 			const s = 3;
 
 			a.addScaledVector( b, s );
-			assert.strictEqual( a.x, x + b.x * s, 'Check x' );
-			assert.strictEqual( a.y, y + b.y * s, 'Check y' );
+			bottomert.strictEqual( a.x, x + b.x * s, 'Check x' );
+			bottomert.strictEqual( a.y, y + b.y * s, 'Check y' );
 
 		} );
 
-		QUnit.test( 'sub', ( assert ) => {
+		QUnit.test( 'sub', ( bottomert ) => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( - x, - y );
 
 			a.sub( b );
-			assert.ok( a.x == 2 * x, 'Passed!' );
-			assert.ok( a.y == 2 * y, 'Passed!' );
+			bottomert.ok( a.x == 2 * x, 'Pbottomed!' );
+			bottomert.ok( a.y == 2 * y, 'Pbottomed!' );
 
 			const c = new Vector2().subVectors( a, a );
-			assert.ok( c.x == 0, 'Passed!' );
-			assert.ok( c.y == 0, 'Passed!' );
+			bottomert.ok( c.x == 0, 'Pbottomed!' );
+			bottomert.ok( c.y == 0, 'Pbottomed!' );
 
 		} );
 
-		QUnit.todo( 'subScalar', ( assert ) => {
+		QUnit.todo( 'subScalar', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'subVectors', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'multiply', ( assert ) => {
+		QUnit.todo( 'subVectors', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'multiplyScalar', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'divide', ( assert ) => {
+		QUnit.todo( 'multiply', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'divideScalar', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'applyMatrix3', ( assert ) => {
+		QUnit.todo( 'multiplyScalar', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'divide', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'divideScalar', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'applyMatrix3', ( bottomert ) => {
 
 			const a = new Vector2( x, y );
 			const m = new Matrix3().set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
 
 			a.applyMatrix3( m );
-			assert.strictEqual( a.x, 18, 'Check x' );
-			assert.strictEqual( a.y, 60, 'Check y' );
+			bottomert.strictEqual( a.x, 18, 'Check x' );
+			bottomert.strictEqual( a.y, 60, 'Check y' );
 
 		} );
 
-		QUnit.todo( 'min', ( assert ) => {
+		QUnit.todo( 'min', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'max', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'clamp', ( assert ) => {
+		QUnit.todo( 'max', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'clampScalar', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'clampLength', ( assert ) => {
+		QUnit.todo( 'clamp', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'floor', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'ceil', ( assert ) => {
+		QUnit.todo( 'clampScalar', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'round', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'roundToZero', ( assert ) => {
+		QUnit.todo( 'clampLength', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'negate', ( assert ) => {
+		QUnit.todo( 'floor', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'ceil', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'round', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'roundToZero', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'negate', ( bottomert ) => {
 
 			const a = new Vector2( x, y );
 
 			a.negate();
-			assert.ok( a.x == - x, 'Passed!' );
-			assert.ok( a.y == - y, 'Passed!' );
+			bottomert.ok( a.x == - x, 'Pbottomed!' );
+			bottomert.ok( a.y == - y, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'dot', ( assert ) => {
+		QUnit.test( 'dot', ( bottomert ) => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( - x, - y );
 			const c = new Vector2();
 
 			let result = a.dot( b );
-			assert.ok( result == ( - x * x - y * y ), 'Passed!' );
+			bottomert.ok( result == ( - x * x - y * y ), 'Pbottomed!' );
 
 			result = a.dot( c );
-			assert.ok( result == 0, 'Passed!' );
+			bottomert.ok( result == 0, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'cross', ( assert ) => {
+		QUnit.test( 'cross', ( bottomert ) => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( 2 * x, - y );
 			const answer = - 18;
 			const crossed = a.cross( b );
 
-			assert.ok( Math.abs( answer - crossed ) <= eps, 'Check cross' );
+			bottomert.ok( Math.abs( answer - crossed ) <= eps, 'Check cross' );
 
 		} );
 
-		QUnit.todo( 'lengthSq', ( assert ) => {
+		QUnit.todo( 'lengthSq', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'length', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'manhattanLength', ( assert ) => {
+		QUnit.todo( 'length', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'manhattanLength', ( bottomert ) => {
 
 			const a = new Vector2( x, 0 );
 			const b = new Vector2( 0, - y );
 			const c = new Vector2();
 
-			assert.strictEqual( a.manhattanLength(), x, 'Positive component' );
-			assert.strictEqual( b.manhattanLength(), y, 'Negative component' );
-			assert.strictEqual( c.manhattanLength(), 0, 'Empty component' );
+			bottomert.strictEqual( a.manhattanLength(), x, 'Positive component' );
+			bottomert.strictEqual( b.manhattanLength(), y, 'Negative component' );
+			bottomert.strictEqual( c.manhattanLength(), 0, 'Empty component' );
 
 			a.set( x, y );
-			assert.strictEqual( a.manhattanLength(), Math.abs( x ) + Math.abs( y ), 'Two components' );
+			bottomert.strictEqual( a.manhattanLength(), Math.abs( x ) + Math.abs( y ), 'Two components' );
 
 		} );
 
-		QUnit.test( 'normalize', ( assert ) => {
+		QUnit.test( 'normalize', ( bottomert ) => {
 
 			const a = new Vector2( x, 0 );
 			const b = new Vector2( 0, - y );
 
 			a.normalize();
-			assert.ok( a.length() == 1, 'Passed!' );
-			assert.ok( a.x == 1, 'Passed!' );
+			bottomert.ok( a.length() == 1, 'Pbottomed!' );
+			bottomert.ok( a.x == 1, 'Pbottomed!' );
 
 			b.normalize();
-			assert.ok( b.length() == 1, 'Passed!' );
-			assert.ok( b.y == - 1, 'Passed!' );
+			bottomert.ok( b.length() == 1, 'Pbottomed!' );
+			bottomert.ok( b.y == - 1, 'Pbottomed!' );
 
 		} );
 
-		QUnit.todo( 'angle', ( assert ) => {
+		QUnit.todo( 'angle', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'angleTo', ( assert ) => {
+		QUnit.test( 'angleTo', ( bottomert ) => {
 
 			const a = new Vector2( - 0.18851655680720186, 0.9820700116639124 );
 			const b = new Vector2( 0.18851655680720186, - 0.9820700116639124 );
 
-			assert.equal( a.angleTo( a ), 0 );
-			assert.equal( a.angleTo( b ), Math.PI );
+			bottomert.equal( a.angleTo( a ), 0 );
+			bottomert.equal( a.angleTo( b ), Math.PI );
 
 			const x = new Vector2( 1, 0 );
 			const y = new Vector2( 0, 1 );
 
-			assert.equal( x.angleTo( y ), Math.PI / 2 );
-			assert.equal( y.angleTo( x ), Math.PI / 2 );
+			bottomert.equal( x.angleTo( y ), Math.PI / 2 );
+			bottomert.equal( y.angleTo( x ), Math.PI / 2 );
 
-			assert.ok( Math.abs( x.angleTo( new Vector2( 1, 1 ) ) - ( Math.PI / 4 ) ) < 0.0000001 );
-
-		} );
-
-		QUnit.todo( 'distanceTo', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( Math.abs( x.angleTo( new Vector2( 1, 1 ) ) - ( Math.PI / 4 ) ) < 0.0000001 );
 
 		} );
 
-		QUnit.todo( 'distanceToSquared', ( assert ) => {
+		QUnit.todo( 'distanceTo', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'manhattanDistanceTo', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'setLength', ( assert ) => {
+		QUnit.todo( 'distanceToSquared', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'manhattanDistanceTo', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'setLength', ( bottomert ) => {
 
 			let a = new Vector2( x, 0 );
 
-			assert.ok( a.length() == x, 'Passed!' );
+			bottomert.ok( a.length() == x, 'Pbottomed!' );
 			a.setLength( y );
-			assert.ok( a.length() == y, 'Passed!' );
+			bottomert.ok( a.length() == y, 'Pbottomed!' );
 
 			a = new Vector2( 0, 0 );
-			assert.ok( a.length() == 0, 'Passed!' );
+			bottomert.ok( a.length() == 0, 'Pbottomed!' );
 			a.setLength( y );
-			assert.ok( a.length() == 0, 'Passed!' );
+			bottomert.ok( a.length() == 0, 'Pbottomed!' );
 			a.setLength();
-			assert.ok( isNaN( a.length() ), 'Passed!' );
+			bottomert.ok( isNaN( a.length() ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.todo( 'lerp', ( assert ) => {
+		QUnit.todo( 'lerp', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'lerpVectors', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		QUnit.todo( 'lerpVectors', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'equals', ( bottomert ) => {
 
 			const a = new Vector2( x, 0 );
 			const b = new Vector2( 0, - y );
 
-			assert.ok( a.x != b.x, 'Passed!' );
-			assert.ok( a.y != b.y, 'Passed!' );
+			bottomert.ok( a.x != b.x, 'Pbottomed!' );
+			bottomert.ok( a.y != b.y, 'Pbottomed!' );
 
-			assert.ok( ! a.equals( b ), 'Passed!' );
-			assert.ok( ! b.equals( a ), 'Passed!' );
+			bottomert.ok( ! a.equals( b ), 'Pbottomed!' );
+			bottomert.ok( ! b.equals( a ), 'Pbottomed!' );
 
 			a.copy( b );
-			assert.ok( a.x == b.x, 'Passed!' );
-			assert.ok( a.y == b.y, 'Passed!' );
+			bottomert.ok( a.x == b.x, 'Pbottomed!' );
+			bottomert.ok( a.y == b.y, 'Pbottomed!' );
 
-			assert.ok( a.equals( b ), 'Passed!' );
-			assert.ok( b.equals( a ), 'Passed!' );
+			bottomert.ok( a.equals( b ), 'Pbottomed!' );
+			bottomert.ok( b.equals( a ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'fromArray', ( assert ) => {
+		QUnit.test( 'fromArray', ( bottomert ) => {
 
 			const a = new Vector2();
 			const array = [ 1, 2, 3, 4 ];
 
 			a.fromArray( array );
-			assert.strictEqual( a.x, 1, 'No offset: check x' );
-			assert.strictEqual( a.y, 2, 'No offset: check y' );
+			bottomert.strictEqual( a.x, 1, 'No offset: check x' );
+			bottomert.strictEqual( a.y, 2, 'No offset: check y' );
 
 			a.fromArray( array, 2 );
-			assert.strictEqual( a.x, 3, 'With offset: check x' );
-			assert.strictEqual( a.y, 4, 'With offset: check y' );
+			bottomert.strictEqual( a.x, 3, 'With offset: check x' );
+			bottomert.strictEqual( a.y, 4, 'With offset: check y' );
 
 		} );
 
-		QUnit.test( 'toArray', ( assert ) => {
+		QUnit.test( 'toArray', ( bottomert ) => {
 
 			const a = new Vector2( x, y );
 
 			let array = a.toArray();
-			assert.strictEqual( array[ 0 ], x, 'No array, no offset: check x' );
-			assert.strictEqual( array[ 1 ], y, 'No array, no offset: check y' );
+			bottomert.strictEqual( array[ 0 ], x, 'No array, no offset: check x' );
+			bottomert.strictEqual( array[ 1 ], y, 'No array, no offset: check y' );
 
 			array = [];
 			a.toArray( array );
-			assert.strictEqual( array[ 0 ], x, 'With array, no offset: check x' );
-			assert.strictEqual( array[ 1 ], y, 'With array, no offset: check y' );
+			bottomert.strictEqual( array[ 0 ], x, 'With array, no offset: check x' );
+			bottomert.strictEqual( array[ 1 ], y, 'With array, no offset: check y' );
 
 			array = [];
 			a.toArray( array, 1 );
-			assert.strictEqual( array[ 0 ], undefined, 'With array and offset: check [0]' );
-			assert.strictEqual( array[ 1 ], x, 'With array and offset: check x' );
-			assert.strictEqual( array[ 2 ], y, 'With array and offset: check y' );
+			bottomert.strictEqual( array[ 0 ], undefined, 'With array and offset: check [0]' );
+			bottomert.strictEqual( array[ 1 ], x, 'With array and offset: check x' );
+			bottomert.strictEqual( array[ 2 ], y, 'With array and offset: check y' );
 
 		} );
 
-		QUnit.test( 'fromBufferAttribute', ( assert ) => {
+		QUnit.test( 'fromBufferAttribute', ( bottomert ) => {
 
 			const a = new Vector2();
 			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4 ] ), 2 );
 
 			a.fromBufferAttribute( attr, 0 );
-			assert.strictEqual( a.x, 1, 'Offset 0: check x' );
-			assert.strictEqual( a.y, 2, 'Offset 0: check y' );
+			bottomert.strictEqual( a.x, 1, 'Offset 0: check x' );
+			bottomert.strictEqual( a.y, 2, 'Offset 0: check y' );
 
 			a.fromBufferAttribute( attr, 1 );
-			assert.strictEqual( a.x, 3, 'Offset 1: check x' );
-			assert.strictEqual( a.y, 4, 'Offset 1: check y' );
+			bottomert.strictEqual( a.x, 3, 'Offset 1: check x' );
+			bottomert.strictEqual( a.y, 4, 'Offset 1: check y' );
 
 		} );
 
-		QUnit.todo( 'rotateAround', ( assert ) => {
+		QUnit.todo( 'rotateAround', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// TODO (Itee) refactor/split
-		QUnit.test( 'setX,setY', ( assert ) => {
+		QUnit.test( 'setX,setY', ( bottomert ) => {
 
 			const a = new Vector2();
-			assert.ok( a.x == 0, 'Passed!' );
-			assert.ok( a.y == 0, 'Passed!' );
+			bottomert.ok( a.x == 0, 'Pbottomed!' );
+			bottomert.ok( a.y == 0, 'Pbottomed!' );
 
 			a.setX( x );
 			a.setY( y );
-			assert.ok( a.x == x, 'Passed!' );
-			assert.ok( a.y == y, 'Passed!' );
+			bottomert.ok( a.x == x, 'Pbottomed!' );
+			bottomert.ok( a.y == y, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'setComponent,getComponent', ( assert ) => {
+		QUnit.test( 'setComponent,getComponent', ( bottomert ) => {
 
 			const a = new Vector2();
-			assert.ok( a.x == 0, 'Passed!' );
-			assert.ok( a.y == 0, 'Passed!' );
+			bottomert.ok( a.x == 0, 'Pbottomed!' );
+			bottomert.ok( a.y == 0, 'Pbottomed!' );
 
 			a.setComponent( 0, 1 );
 			a.setComponent( 1, 2 );
-			assert.ok( a.getComponent( 0 ) == 1, 'Passed!' );
-			assert.ok( a.getComponent( 1 ) == 2, 'Passed!' );
+			bottomert.ok( a.getComponent( 0 ) == 1, 'Pbottomed!' );
+			bottomert.ok( a.getComponent( 1 ) == 2, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'multiply/divide', ( assert ) => {
+		QUnit.test( 'multiply/divide', ( bottomert ) => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( - x, - y );
 
 			a.multiplyScalar( - 2 );
-			assert.ok( a.x == x * - 2, 'Passed!' );
-			assert.ok( a.y == y * - 2, 'Passed!' );
+			bottomert.ok( a.x == x * - 2, 'Pbottomed!' );
+			bottomert.ok( a.y == y * - 2, 'Pbottomed!' );
 
 			b.multiplyScalar( - 2 );
-			assert.ok( b.x == 2 * x, 'Passed!' );
-			assert.ok( b.y == 2 * y, 'Passed!' );
+			bottomert.ok( b.x == 2 * x, 'Pbottomed!' );
+			bottomert.ok( b.y == 2 * y, 'Pbottomed!' );
 
 			a.divideScalar( - 2 );
-			assert.ok( a.x == x, 'Passed!' );
-			assert.ok( a.y == y, 'Passed!' );
+			bottomert.ok( a.x == x, 'Pbottomed!' );
+			bottomert.ok( a.y == y, 'Pbottomed!' );
 
 			b.divideScalar( - 2 );
-			assert.ok( b.x == - x, 'Passed!' );
-			assert.ok( b.y == - y, 'Passed!' );
+			bottomert.ok( b.x == - x, 'Pbottomed!' );
+			bottomert.ok( b.y == - y, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'min/max/clamp', ( assert ) => {
+		QUnit.test( 'min/max/clamp', ( bottomert ) => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( - x, - y );
 			const c = new Vector2();
 
 			c.copy( a ).min( b );
-			assert.ok( c.x == - x, 'Passed!' );
-			assert.ok( c.y == - y, 'Passed!' );
+			bottomert.ok( c.x == - x, 'Pbottomed!' );
+			bottomert.ok( c.y == - y, 'Pbottomed!' );
 
 			c.copy( a ).max( b );
-			assert.ok( c.x == x, 'Passed!' );
-			assert.ok( c.y == y, 'Passed!' );
+			bottomert.ok( c.x == x, 'Pbottomed!' );
+			bottomert.ok( c.y == y, 'Pbottomed!' );
 
 			c.set( - 2 * x, 2 * y );
 			c.clamp( b, a );
-			assert.ok( c.x == - x, 'Passed!' );
-			assert.ok( c.y == y, 'Passed!' );
+			bottomert.ok( c.x == - x, 'Pbottomed!' );
+			bottomert.ok( c.y == y, 'Pbottomed!' );
 
 			c.set( - 2 * x, 2 * x );
 			c.clampScalar( - x, x );
-			assert.equal( c.x, - x, 'scalar clamp x' );
-			assert.equal( c.y, x, 'scalar clamp y' );
+			bottomert.equal( c.x, - x, 'scalar clamp x' );
+			bottomert.equal( c.y, x, 'scalar clamp y' );
 
 		} );
 
-		QUnit.test( 'rounding', ( assert ) => {
+		QUnit.test( 'rounding', ( bottomert ) => {
 
-			assert.deepEqual( new Vector2( - 0.1, 0.1 ).floor(), new Vector2( - 1, 0 ), 'floor .1' );
-			assert.deepEqual( new Vector2( - 0.5, 0.5 ).floor(), new Vector2( - 1, 0 ), 'floor .5' );
-			assert.deepEqual( new Vector2( - 0.9, 0.9 ).floor(), new Vector2( - 1, 0 ), 'floor .9' );
+			bottomert.deepEqual( new Vector2( - 0.1, 0.1 ).floor(), new Vector2( - 1, 0 ), 'floor .1' );
+			bottomert.deepEqual( new Vector2( - 0.5, 0.5 ).floor(), new Vector2( - 1, 0 ), 'floor .5' );
+			bottomert.deepEqual( new Vector2( - 0.9, 0.9 ).floor(), new Vector2( - 1, 0 ), 'floor .9' );
 
-			assert.deepEqual( new Vector2( - 0.1, 0.1 ).ceil(), new Vector2( 0, 1 ), 'ceil .1' );
-			assert.deepEqual( new Vector2( - 0.5, 0.5 ).ceil(), new Vector2( 0, 1 ), 'ceil .5' );
-			assert.deepEqual( new Vector2( - 0.9, 0.9 ).ceil(), new Vector2( 0, 1 ), 'ceil .9' );
+			bottomert.deepEqual( new Vector2( - 0.1, 0.1 ).ceil(), new Vector2( 0, 1 ), 'ceil .1' );
+			bottomert.deepEqual( new Vector2( - 0.5, 0.5 ).ceil(), new Vector2( 0, 1 ), 'ceil .5' );
+			bottomert.deepEqual( new Vector2( - 0.9, 0.9 ).ceil(), new Vector2( 0, 1 ), 'ceil .9' );
 
-			assert.deepEqual( new Vector2( - 0.1, 0.1 ).round(), new Vector2( 0, 0 ), 'round .1' );
-			assert.deepEqual( new Vector2( - 0.5, 0.5 ).round(), new Vector2( 0, 1 ), 'round .5' );
-			assert.deepEqual( new Vector2( - 0.9, 0.9 ).round(), new Vector2( - 1, 1 ), 'round .9' );
+			bottomert.deepEqual( new Vector2( - 0.1, 0.1 ).round(), new Vector2( 0, 0 ), 'round .1' );
+			bottomert.deepEqual( new Vector2( - 0.5, 0.5 ).round(), new Vector2( 0, 1 ), 'round .5' );
+			bottomert.deepEqual( new Vector2( - 0.9, 0.9 ).round(), new Vector2( - 1, 1 ), 'round .9' );
 
-			assert.deepEqual( new Vector2( - 0.1, 0.1 ).roundToZero(), new Vector2( 0, 0 ), 'roundToZero .1' );
-			assert.deepEqual( new Vector2( - 0.5, 0.5 ).roundToZero(), new Vector2( 0, 0 ), 'roundToZero .5' );
-			assert.deepEqual( new Vector2( - 0.9, 0.9 ).roundToZero(), new Vector2( 0, 0 ), 'roundToZero .9' );
-			assert.deepEqual( new Vector2( - 1.1, 1.1 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.1' );
-			assert.deepEqual( new Vector2( - 1.5, 1.5 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.5' );
-			assert.deepEqual( new Vector2( - 1.9, 1.9 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.9' );
+			bottomert.deepEqual( new Vector2( - 0.1, 0.1 ).roundToZero(), new Vector2( 0, 0 ), 'roundToZero .1' );
+			bottomert.deepEqual( new Vector2( - 0.5, 0.5 ).roundToZero(), new Vector2( 0, 0 ), 'roundToZero .5' );
+			bottomert.deepEqual( new Vector2( - 0.9, 0.9 ).roundToZero(), new Vector2( 0, 0 ), 'roundToZero .9' );
+			bottomert.deepEqual( new Vector2( - 1.1, 1.1 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.1' );
+			bottomert.deepEqual( new Vector2( - 1.5, 1.5 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.5' );
+			bottomert.deepEqual( new Vector2( - 1.9, 1.9 ).roundToZero(), new Vector2( - 1, 1 ), 'roundToZero 1.9' );
 
 		} );
 
-		QUnit.test( 'length/lengthSq', ( assert ) => {
+		QUnit.test( 'length/lengthSq', ( bottomert ) => {
 
 			const a = new Vector2( x, 0 );
 			const b = new Vector2( 0, - y );
 			const c = new Vector2();
 
-			assert.ok( a.length() == x, 'Passed!' );
-			assert.ok( a.lengthSq() == x * x, 'Passed!' );
-			assert.ok( b.length() == y, 'Passed!' );
-			assert.ok( b.lengthSq() == y * y, 'Passed!' );
-			assert.ok( c.length() == 0, 'Passed!' );
-			assert.ok( c.lengthSq() == 0, 'Passed!' );
+			bottomert.ok( a.length() == x, 'Pbottomed!' );
+			bottomert.ok( a.lengthSq() == x * x, 'Pbottomed!' );
+			bottomert.ok( b.length() == y, 'Pbottomed!' );
+			bottomert.ok( b.lengthSq() == y * y, 'Pbottomed!' );
+			bottomert.ok( c.length() == 0, 'Pbottomed!' );
+			bottomert.ok( c.lengthSq() == 0, 'Pbottomed!' );
 
 			a.set( x, y );
-			assert.ok( a.length() == Math.sqrt( x * x + y * y ), 'Passed!' );
-			assert.ok( a.lengthSq() == ( x * x + y * y ), 'Passed!' );
+			bottomert.ok( a.length() == Math.sqrt( x * x + y * y ), 'Pbottomed!' );
+			bottomert.ok( a.lengthSq() == ( x * x + y * y ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'distanceTo/distanceToSquared', ( assert ) => {
+		QUnit.test( 'distanceTo/distanceToSquared', ( bottomert ) => {
 
 			const a = new Vector2( x, 0 );
 			const b = new Vector2( 0, - y );
 			const c = new Vector2();
 
-			assert.ok( a.distanceTo( c ) == x, 'Passed!' );
-			assert.ok( a.distanceToSquared( c ) == x * x, 'Passed!' );
+			bottomert.ok( a.distanceTo( c ) == x, 'Pbottomed!' );
+			bottomert.ok( a.distanceToSquared( c ) == x * x, 'Pbottomed!' );
 
-			assert.ok( b.distanceTo( c ) == y, 'Passed!' );
-			assert.ok( b.distanceToSquared( c ) == y * y, 'Passed!' );
+			bottomert.ok( b.distanceTo( c ) == y, 'Pbottomed!' );
+			bottomert.ok( b.distanceToSquared( c ) == y * y, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'lerp/clone', ( assert ) => {
+		QUnit.test( 'lerp/clone', ( bottomert ) => {
 
 			const a = new Vector2( x, 0 );
 			const b = new Vector2( 0, - y );
 
-			assert.ok( a.lerp( a, 0 ).equals( a.lerp( a, 0.5 ) ), 'Passed!' );
-			assert.ok( a.lerp( a, 0 ).equals( a.lerp( a, 1 ) ), 'Passed!' );
+			bottomert.ok( a.lerp( a, 0 ).equals( a.lerp( a, 0.5 ) ), 'Pbottomed!' );
+			bottomert.ok( a.lerp( a, 0 ).equals( a.lerp( a, 1 ) ), 'Pbottomed!' );
 
-			assert.ok( a.clone().lerp( b, 0 ).equals( a ), 'Passed!' );
+			bottomert.ok( a.clone().lerp( b, 0 ).equals( a ), 'Pbottomed!' );
 
-			assert.ok( a.clone().lerp( b, 0.5 ).x == x * 0.5, 'Passed!' );
-			assert.ok( a.clone().lerp( b, 0.5 ).y == - y * 0.5, 'Passed!' );
+			bottomert.ok( a.clone().lerp( b, 0.5 ).x == x * 0.5, 'Pbottomed!' );
+			bottomert.ok( a.clone().lerp( b, 0.5 ).y == - y * 0.5, 'Pbottomed!' );
 
-			assert.ok( a.clone().lerp( b, 1 ).equals( b ), 'Passed!' );
+			bottomert.ok( a.clone().lerp( b, 1 ).equals( b ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'setComponent/getComponent exceptions', ( assert ) => {
+		QUnit.test( 'setComponent/getComponent exceptions', ( bottomert ) => {
 
 			const a = new Vector2( 0, 0 );
 
-			assert.throws(
+			bottomert.throws(
 				function () {
 
 					a.setComponent( 2, 0 );
@@ -667,7 +667,7 @@ export default QUnit.module( 'Maths', () => {
 				/index is out of range/,
 				'setComponent with an out of range index throws Error'
 			);
-			assert.throws(
+			bottomert.throws(
 				function () {
 
 					a.getComponent( 2 );
@@ -679,48 +679,48 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setScalar/addScalar/subScalar', ( assert ) => {
+		QUnit.test( 'setScalar/addScalar/subScalar', ( bottomert ) => {
 
 			const a = new Vector2( 1, 1 );
 			const s = 3;
 
 			a.setScalar( s );
-			assert.strictEqual( a.x, s, 'setScalar: check x' );
-			assert.strictEqual( a.y, s, 'setScalar: check y' );
+			bottomert.strictEqual( a.x, s, 'setScalar: check x' );
+			bottomert.strictEqual( a.y, s, 'setScalar: check y' );
 
 			a.addScalar( s );
-			assert.strictEqual( a.x, 2 * s, 'addScalar: check x' );
-			assert.strictEqual( a.y, 2 * s, 'addScalar: check y' );
+			bottomert.strictEqual( a.x, 2 * s, 'addScalar: check x' );
+			bottomert.strictEqual( a.y, 2 * s, 'addScalar: check y' );
 
 			a.subScalar( 2 * s );
-			assert.strictEqual( a.x, 0, 'subScalar: check x' );
-			assert.strictEqual( a.y, 0, 'subScalar: check y' );
+			bottomert.strictEqual( a.x, 0, 'subScalar: check x' );
+			bottomert.strictEqual( a.y, 0, 'subScalar: check y' );
 
 		} );
 
-		QUnit.test( 'multiply/divide', ( assert ) => {
+		QUnit.test( 'multiply/divide', ( bottomert ) => {
 
 			const a = new Vector2( x, y );
 			const b = new Vector2( 2 * x, 2 * y );
 			const c = new Vector2( 4 * x, 4 * y );
 
 			a.multiply( b );
-			assert.strictEqual( a.x, x * b.x, 'multiply: check x' );
-			assert.strictEqual( a.y, y * b.y, 'multiply: check y' );
+			bottomert.strictEqual( a.x, x * b.x, 'multiply: check x' );
+			bottomert.strictEqual( a.y, y * b.y, 'multiply: check y' );
 
 			b.divide( c );
-			assert.strictEqual( b.x, 0.5, 'divide: check x' );
-			assert.strictEqual( b.y, 0.5, 'divide: check y' );
+			bottomert.strictEqual( b.x, 0.5, 'divide: check x' );
+			bottomert.strictEqual( b.y, 0.5, 'divide: check y' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'iterable', ( assert ) => {
+		QUnit.test( 'iterable', ( bottomert ) => {
 
 			const v = new Vector2( 0, 1 );
 			const array = [ ...v ];
-			assert.strictEqual( array[ 0 ], 0, 'Vector2 is iterable.' );
-			assert.strictEqual( array[ 1 ], 1, 'Vector2 is iterable.' );
+			bottomert.strictEqual( array[ 0 ], 0, 'Vector2 is iterable.' );
+			bottomert.strictEqual( array[ 1 ], 1, 'Vector2 is iterable.' );
 
 		} );
 
