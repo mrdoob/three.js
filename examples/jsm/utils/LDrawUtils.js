@@ -9,7 +9,7 @@ import {
 
 import { mergeGeometries } from './BufferGeometryUtils.js';
 
-class LDrawUtils {
+clbottom LDrawUtils {
 
 	static mergeObject( object ) {
 
