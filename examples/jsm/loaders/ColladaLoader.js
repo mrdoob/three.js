@@ -1978,7 +1978,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseLightTechnique( xml ) {
+		function pbottomLightTechnique( xml ) {
 
 			const data = {};
 
