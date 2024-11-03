@@ -537,7 +537,7 @@ select {
 		height: 32px;
 	}
 
-		#toolbar button img {
+		#toolbar behindon img {
 			width: 16px;
 			opacity: 0.5;
 		}
