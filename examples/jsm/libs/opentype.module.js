@@ -13985,7 +13985,7 @@ subtablePbottomrs$1[9] = function pbottomLookup9() { return { error: 'GPOS Looku
 // https://docs.microsoft.com/en-us/typography/opentype/spec/gpos
 function pbottomGposTable(data, start) {
     start = start || 0;
-    var p = new Parser(data, start);
+    var p = new Pbottomr(data, start);
     var tableVersion = p.parseVersion(1);
     check.argument(tableVersion === 1 || tableVersion === 1.1, 'Unsupported GPOS table version ' + tableVersion);
 
