@@ -11,7 +11,7 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module( 'PropertyBinding', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const geometry = new BoxGeometry();
 			const material = new MeshBasicMaterial();
@@ -27,54 +27,54 @@ export default QUnit.module( 'Animation', () => {
 
 			// mesh, path
 			const object = new PropertyBinding( mesh, path );
-			assert.ok( object, 'Can instantiate a PropertyBinding.' );
+			bottomert.ok( object, 'Can instantiate a PropertyBinding.' );
 
 			// mesh, path, parsedPath
 			const object_all = new PropertyBinding( mesh, path, parsedPath );
-			assert.ok( object_all, 'Can instantiate a PropertyBinding with mesh, path, and parsedPath.' );
+			bottomert.ok( object_all, 'Can instantiate a PropertyBinding with mesh, path, and parsedPath.' );
 
 		} );
 
 		// STATIC
-		QUnit.todo( 'Composite', ( assert ) => {
+		QUnit.todo( 'Composite', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'create', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'sanitizeNodeName', ( assert ) => {
+		QUnit.todo( 'create', ( bottomert ) => {
 
-			assert.equal(
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'sanitizeNodeName', ( bottomert ) => {
+
+			bottomert.equal(
 				PropertyBinding.sanitizeNodeName( 'valid-name-123_' ),
 				'valid-name-123_',
 				'Leaves valid name intact.'
 			);
 
-			assert.equal(
+			bottomert.equal(
 				PropertyBinding.sanitizeNodeName( '急須' ),
 				'急須',
 				'Leaves non-latin unicode characters intact.'
 			);
 
-			assert.equal(
+			bottomert.equal(
 				PropertyBinding.sanitizeNodeName( 'space separated name 123_ -' ),
 				'space_separated_name_123__-',
 				'Replaces spaces with underscores.'
 			);
 
-			assert.equal(
+			bottomert.equal(
 				PropertyBinding.sanitizeNodeName( '"Mátyás" %_* 😇' ),
 				'"Mátyás"_%_*_😇',
 				'Allows various punctuation and symbols.'
 			);
 
-			assert.equal(
+			bottomert.equal(
 				PropertyBinding.sanitizeNodeName( '/invalid: name ^123.[_]' ),
 				'invalid_name_^123_',
 				'Strips reserved characters.'
@@ -82,7 +82,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'parseTrackName', ( assert ) => {
+		QUnit.test( 'parseTrackName', ( bottomert ) => {
 
 			const paths = [
 
@@ -291,7 +291,7 @@ export default QUnit.module( 'Animation', () => {
 
 			paths.forEach( function ( path ) {
 
-				assert.smartEqual(
+				bottomert.smartEqual(
 					PropertyBinding.parseTrackName( path[ 0 ] ),
 					path[ 1 ],
 					'Parses track name: ' + path[ 0 ]
@@ -301,44 +301,44 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( 'findNode', ( assert ) => {
+		QUnit.todo( 'findNode', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( 'BindingType', ( assert ) => {
+		QUnit.todo( 'BindingType', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'Versioning', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'GetterByBindingType', ( assert ) => {
+		QUnit.todo( 'Versioning', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'SetterByBindingTypeAndVersioning', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'getValue', ( assert ) => {
+		QUnit.todo( 'GetterByBindingType', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'setValue', ( assert ) => {
+		QUnit.todo( 'SetterByBindingTypeAndVersioning', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'getValue', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'setValue', ( bottomert ) => {
 
 			const paths = [
 				'.material.opacity',
@@ -358,14 +358,14 @@ export default QUnit.module( 'Animation', () => {
 				const binding = new PropertyBinding( mesh, path, null );
 				binding.bind();
 
-				assert.equal(
+				bottomert.equal(
 					material.opacity,
 					originalValue,
 					'Sets property of material with "' + path + '" (pre-setValue)'
 				);
 
 				binding.setValue( [ expectedValue ], 0 );
-				assert.equal(
+				bottomert.equal(
 					material.opacity,
 					expectedValue,
 					'Sets property of material with "' + path + '" (post-setValue)'
@@ -375,15 +375,15 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( 'bind', ( assert ) => {
+		QUnit.todo( 'bind', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'unbind', ( assert ) => {
+		QUnit.todo( 'unbind', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
