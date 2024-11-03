@@ -9,10 +9,10 @@ export default QUnit.module( 'Textures', () => {
 	QUnit.module( 'DepthTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new DepthTexture();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Texture, true,
 				'DepthTexture extends from Texture'
 			);
@@ -20,49 +20,49 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new DepthTexture();
-			assert.ok( object, 'Can instantiate a DepthTexture.' );
+			bottomert.ok( object, 'Can instantiate a DepthTexture.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'image', ( assert ) => {
+		QUnit.todo( 'image', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'magFilter', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'minFilter', ( assert ) => {
+		QUnit.todo( 'magFilter', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'flipY', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'generateMipmaps', ( assert ) => {
+		QUnit.todo( 'minFilter', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'flipY', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'generateMipmaps', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isDepthTexture', ( assert ) => {
+		QUnit.test( 'isDepthTexture', ( bottomert ) => {
 
 			const object = new DepthTexture();
-			assert.ok(
+			bottomert.ok(
 				object.isDepthTexture,
 				'DepthTexture.isDepthTexture should be true'
 			);
