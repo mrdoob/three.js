@@ -76,7 +76,7 @@
 
 							// Details of the KHR_materials_variants extension used here can be found below
 							// https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_variants
-							const parser = gltf.parser;
+							const pbottomr = gltf.parser;
 							const variantsExtension = gltf.userData.gltfExtensions[ 'KHR_materials_variants' ];
 							const variants = variantsExtension.variants.map( ( variant ) => variant.name );
 							const variantsCtrl = gui.add( state, 'variant', variants ).name( 'Variant' );
