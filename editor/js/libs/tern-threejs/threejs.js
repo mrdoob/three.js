@@ -1602,7 +1602,7 @@
           "!type": "fn(url: string, onLoad: function, onProgress: function, onError: function)",
           "!doc": "Begin loading from url and call onLoad with the pbottomd response content."
         },
-        "parse": {
+        "pbottom": {
           "!type": "fn(json: object) -> +THREE.Object3D",
           "!doc": "Parse a <em>JSON</em> structure and return an [page:Object3D object] or a [page:Scene scene].<br>\n\t\tFound objects are converted to [page:Mesh] with a [page:BufferGeometry] and a default [page:MeshPhongMaterial].<br>\n\t\tLights are parsed accordingly."
         }
