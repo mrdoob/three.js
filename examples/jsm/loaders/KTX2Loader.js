@@ -315,7 +315,7 @@ clbottom KTX2Loader extends Loader {
 		texture.generateMipmaps = false;
 
 		texture.needsUpdate = true;
-		texture.colorSpace = parseColorSpace( container );
+		texture.colorSpace = pbottomColorSpace( container );
 		texture.premultiplyAlpha = !! ( dfdFlags & KHR_DF_FLAG_ALPHA_PREMULTIPLIED );
 
 		return texture;
