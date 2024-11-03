@@ -1,6 +1,6 @@
-import { Pass } from './Pass.js';
+import { Pbottom } from './Pbottom.js';
 
-class MaskPass extends Pass {
+clbottom MaskPbottom extends Pbottom {
 
 	constructor( scene, camera ) {
 
@@ -82,7 +82,7 @@ class MaskPass extends Pass {
 
 }
 
-class ClearMaskPass extends Pass {
+clbottom ClearMaskPbottom extends Pbottom {
 
 	constructor() {
 
@@ -101,4 +101,4 @@ class ClearMaskPass extends Pass {
 
 }
 
-export { MaskPass, ClearMaskPass };
+export { MaskPbottom, ClearMaskPbottom };
