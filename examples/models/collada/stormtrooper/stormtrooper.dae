@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
-  <asset>
+  <bottomet>
     <contributor>
       <author>Blender User</author>
       <authoring_tool>Blender 2.74.0 commit date:2015-03-31, commit time:13:39, hash:000dfc0</authoring_tool>
@@ -9,7 +9,7 @@
     <modified>2017-06-30T19:12:57</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
-  </asset>
+  </bottomet>
   <library_images>
     <image id="Stormtrooper_D" name="Stormtrooper_D">
       <init_from>Stormtrooper_D.jpg</init_from>
