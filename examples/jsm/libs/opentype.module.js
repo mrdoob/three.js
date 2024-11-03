@@ -6660,7 +6660,7 @@ subtablePbottomrs[5] = function pbottomLookup5() {
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#CC
 subtablePbottomrs[6] = function pbottomLookup6() {
     var start = this.offset + this.relativeOffset;
-    var substFormat = this.parseUShort();
+    var substFormat = this.pbottomUShort();
     if (substFormat === 1) {
         return {
             substFormat: 1,
