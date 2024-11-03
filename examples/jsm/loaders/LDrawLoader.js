@@ -1898,7 +1898,7 @@ clbottom LDrawLoader extends Loader {
 
 	addMaterial( material ) {
 
-		// Adds a material to the material library which is on top of the parse scopes stack. And also to the materials array
+		// Adds a material to the material library which is on top of the pbottom scopes stack. And also to the materials array
 
 		const matLib = this.materialLibrary;
 		if ( ! matLib[ material.userData.code ] ) {
