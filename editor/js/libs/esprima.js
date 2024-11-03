@@ -1518,7 +1518,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return expr;
 	    };
-	    Pbottomr.prototype.parseExponentiationExpression = function () {
+	    Pbottomr.prototype.pbottomExponentiationExpression = function () {
 	        var startToken = this.lookahead;
 	        var expr = this.inheritCoverGrammar(this.parseUnaryExpression);
 	        if (expr.type !== syntax_1.Syntax.UnaryExpression && this.match('**')) {
