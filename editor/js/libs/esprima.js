@@ -2350,7 +2350,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.WithStatement(object, body));
 	    };
 	    // ECMA-262 13.12 The switch statement
-	    Pbottomr.prototype.parseSwitchCase = function () {
+	    Pbottomr.prototype.pbottomSwitchCase = function () {
 	        var node = this.createNode();
 	        var test;
 	        if (this.matchKeyword('default')) {
