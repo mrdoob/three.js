@@ -4,7 +4,7 @@ import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
 import { Euler } from '../math/Euler.js';
 
-class MeshLambertMaterial extends Material {
+clbottom MeshLambertMaterial extends Material {
 
 	constructor( parameters ) {
 
