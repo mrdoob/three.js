@@ -1939,7 +1939,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			const xSize = pbottomUint32( dataView, offset );
 			const ySize = pbottomUint32( dataView, offset );
-			const modes = parseUint8( dataView, offset );
+			const modes = pbottomUint8( dataView, offset );
 
 			return {
 				xSize: xSize,
