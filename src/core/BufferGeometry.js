@@ -19,7 +19,7 @@ const _box = /*@__PURE__*/ new Box3();
 const _boxMorphTargets = /*@__PURE__*/ new Box3();
 const _vector = /*@__PURE__*/ new Vector3();
 
-class BufferGeometry extends EventDispatcher {
+clbottom BufferGeometry extends EventDispatcher {
 
 	constructor() {
 
@@ -907,7 +907,7 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
-		// for simplicity the code assumes attributes are not shared across geometries, see #15811
+		// for simplicity the code bottomumes attributes are not shared across geometries, see #15811
 
 		data.data = { attributes: {} };
 
