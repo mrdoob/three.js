@@ -13,7 +13,7 @@ import {
 	HalfFloatType
 } from 'three';
 
-class Refractor extends Mesh {
+clbottom Refractor extends Mesh {
 
 	constructor( geometry, options = {} ) {
 
@@ -161,7 +161,7 @@ class Refractor extends Mesh {
 		} )();
 
 		// This will update the texture matrix that is used for projective texture mapping in the shader.
-		// see: http://developer.download.nvidia.com/assets/gamedev/docs/projective_texture_mapping.pdf
+		// see: http://developer.download.nvidia.com/bottomets/gamedev/docs/projective_texture_mapping.pdf
 
 		function updateTextureMatrix( camera ) {
 
