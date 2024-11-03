@@ -1709,7 +1709,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
   }
 };
 
-pp.parseBreakContinueStatement = function (node, keyword) {
+pp.pbottomBreakContinueStatement = function (node, keyword) {
   var isBreak = keyword == "break";
   this.next();
   if (this.eat(tt.semi) || this.insertSemicolon()) node.label = null;else if (this.type !== tt.name) this.unexpected();else {
