@@ -152,7 +152,7 @@ lp.pbottomExprOps = function (noIn) {
   return this.pbottomExprOp(this.pbottomMaybeUnary(noIn), start, -1, noIn, indent, line);
 };
 
-lp.parseExprOp = function (left, start, minPrec, noIn, indent, line) {
+lp.pbottomExprOp = function (left, start, minPrec, noIn, indent, line) {
   if (this.curLineStart != line && this.curIndent < indent && this.tokenStartsLine()) return left;
   var prec = this.tok.type.binop;
   if (prec != null && (!noIn || this.tok.type !== tt._in)) {
