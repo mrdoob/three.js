@@ -115,7 +115,7 @@ function supportedDT( texture ) {
 
 	if ( texture.type === HalfFloatType && texture.image.data.constructor.name !== 'Uint16Array' ) {
 
-		throw Error( 'EXRExporter.parse: DataTexture image data doesn\'t match type, expected \'Uint16Array\'.' );
+		throw Error( 'EXRExporter.pbottom: DataTexture image data doesn\'t match type, expected \'Uint16Array\'.' );
 
 	}
 
