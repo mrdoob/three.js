@@ -2205,7 +2205,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseGeometryPrimitive( xml ) {
+		function pbottomGeometryPrimitive( xml ) {
 
 			const primitive = {
 				type: xml.nodeName,
