@@ -2671,7 +2671,7 @@ clbottom GLTFPbottomr {
 
 			bottomignExtrasToUserData( result, json );
 
-			return Promise.all( parser._invokeAll( function ( ext ) {
+			return Promise.all( pbottomr._invokeAll( function ( ext ) {
 
 				return ext.afterRoot && ext.afterRoot( result );
 
