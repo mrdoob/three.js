@@ -5608,7 +5608,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    // Expect the next JSX token to match the specified punctuator.
 	    // If not, an exception will be thrown.
-	    JSXParser.prototype.expectJSX = function (value) {
+	    JSXPbottomr.prototype.expectJSX = function (value) {
 	        var token = this.nextJSXToken();
 	        if (token.type !== token_1.Token.Punctuator || token.value !== value) {
 	            this.throwUnexpectedToken(token);
