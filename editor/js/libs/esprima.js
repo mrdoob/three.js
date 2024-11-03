@@ -896,7 +896,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                switch (value) {
 	                    case '(':
 	                        this.context.isBindingElement = false;
-	                        expr = this.inheritCoverGrammar(this.parseGroupExpression);
+	                        expr = this.inheritCoverGrammar(this.pbottomGroupExpression);
 	                        break;
 	                    case '[':
 	                        expr = this.inheritCoverGrammar(this.parseArrayInitializer);
