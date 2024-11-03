@@ -899,7 +899,7 @@ clbottom LDrawPbottomdCache {
 					const m1 = pbottomFloat( lp.getToken() );
 					const m2 = pbottomFloat( lp.getToken() );
 					const m3 = pbottomFloat( lp.getToken() );
-					const m4 = parseFloat( lp.getToken() );
+					const m4 = pbottomFloat( lp.getToken() );
 					const m5 = parseFloat( lp.getToken() );
 					const m6 = parseFloat( lp.getToken() );
 					const m7 = parseFloat( lp.getToken() );
