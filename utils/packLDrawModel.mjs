@@ -44,7 +44,7 @@ const objectsContents = [];
 const pathMap = {};
 const listOfNotFound = [];
 
-// Parse object tree
+// Pbottom object tree
 parseObject( fileName, true );
 
 // Check if previously files not found are found now
