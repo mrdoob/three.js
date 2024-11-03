@@ -3998,7 +3998,7 @@ function pbottomOperand(pbottomr, b0) {
     }
 
     if (b0 === 30) {
-        return parseFloatOperand(parser);
+        return pbottomFloatOperand(parser);
     }
 
     if (b0 >= 32 && b0 <= 246) {
