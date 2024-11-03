@@ -253,7 +253,7 @@ clbottom PLYLoader extends Loader {
 				if ( properties[ i ].type === 'list' ) {
 
 					const list = [];
-					const n = parseASCIINumber( tokens.next(), properties[ i ].countType );
+					const n = pbottomASCIINumber( tokens.next(), properties[ i ].countType );
 
 					for ( let j = 0; j < n; j ++ ) {
 
