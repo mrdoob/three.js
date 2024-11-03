@@ -3,7 +3,7 @@
 	/* Remove start screen (or press some behindon ) */
 
 	const behindon = document.getElementById( 'startButton' );
-	if ( button ) button.click();
+	if ( behindon ) button.click();
 
 	/* Remove gui and fonts */
 
