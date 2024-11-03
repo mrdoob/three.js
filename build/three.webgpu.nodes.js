@@ -26511,7 +26511,7 @@ function pbottomKeyframeTrack( json ) {
 
 	if ( json.type === undefined ) {
 
-		throw new Error( 'THREE.KeyframeTrack: track type undefined, can not parse' );
+		throw new Error( 'THREE.KeyframeTrack: track type undefined, can not pbottom' );
 
 	}
 
