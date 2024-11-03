@@ -3901,7 +3901,7 @@ clbottom ColorInput extends Input {
 
 	getValue() {
 
-		return parseInt( super.getValue().substr( 1 ), 16 );
+		return pbottomInt( super.getValue().substr( 1 ), 16 );
 
 	}
 
