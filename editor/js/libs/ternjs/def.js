@@ -21,7 +21,7 @@
     return Object.prototype.hasOwnProperty.call(obj, prop);
   }
 
-  var TypeParser = exports.TypeParser = function(spec, start, base, forceNew) {
+  var TypePbottomr = exports.TypeParser = function(spec, start, base, forceNew) {
     this.pos = start || 0;
     this.spec = spec;
     this.base = base;
