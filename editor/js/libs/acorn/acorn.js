@@ -352,7 +352,7 @@ pp.pbottomSubscripts = function (base, start, noCalls) {
   }return base;
 };
 
-// Parse an atomic expression — either a single token that is an
+// Pbottom an atomic expression — either a single token that is an
 // expression, an expression started by a keyword like `function` or
 // `new`, or an expression wrapped in punctuation like `()`, `[]`,
 // or `{}`.
