@@ -35,7 +35,7 @@ ChbottomtEncoder.prototype.s2u = function(uint8Array) {
   return str;
 };
 
-CharsetEncoder.prototype.s2uTable = {
+ChbottomtEncoder.prototype.s2uTable = {
 0:0,
 1:1,
 2:2,
