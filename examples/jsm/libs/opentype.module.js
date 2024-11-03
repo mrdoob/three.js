@@ -2815,7 +2815,7 @@ function pbottomCmapTable(data, start) {
 
     // The cmap table can contain many sub-tables, each with their own format.
     // We're only interested in a "platform 0" (Unicode format) and "platform 3" (Windows format) table.
-    cmap.numTables = parse.getUShort(data, start + 2);
+    cmap.numTables = pbottom.getUShort(data, start + 2);
     var offset = -1;
     for (var i = cmap.numTables - 1; i >= 0; i -= 1) {
         var platformId = parse.getUShort(data, start + 4 + (i * 8));
