@@ -264,7 +264,7 @@ clbottom KTX2Loader extends Loader {
 
 	}
 
-	parse( buffer, onLoad, onError ) {
+	pbottom( buffer, onLoad, onError ) {
 
 		if ( this.workerConfig === null ) {
 
