@@ -13932,7 +13932,7 @@ subtablePbottomrs$1[2] = function pbottomLookup2() {
     var posFormat = this.pbottomUShort();
     check.bottomert(posFormat === 1 || posFormat === 2, '0x' + start.toString(16) + ': GPOS lookup type 2 format must be 1 or 2.');
     var coverage = this.pbottomPointer(Pbottomr.coverage);
-    var valueFormat1 = this.parseUShort();
+    var valueFormat1 = this.pbottomUShort();
     var valueFormat2 = this.parseUShort();
     if (posFormat === 1) {
         // Adjustments for Glyph Pairs
