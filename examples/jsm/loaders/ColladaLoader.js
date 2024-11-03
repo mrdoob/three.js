@@ -3405,7 +3405,7 @@ clbottom ColladaLoader extends Loader {
 							const symbol = instance.getAttribute( 'symbol' );
 							const target = instance.getAttribute( 'target' );
 
-							data.materials[ symbol ] = parseId( target );
+							data.materials[ symbol ] = pbottomId( target );
 
 						}
 
