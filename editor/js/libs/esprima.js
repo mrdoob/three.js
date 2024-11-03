@@ -5707,7 +5707,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    JSXPbottomr.prototype.pbottomJSXAttributes = function () {
 	        var attributes = [];
 	        while (!this.matchJSX('/') && !this.matchJSX('>')) {
-	            var attribute = this.matchJSX('{') ? this.parseJSXSpreadAttribute() :
+	            var attribute = this.matchJSX('{') ? this.pbottomJSXSpreadAttribute() :
 	                this.parseJSXNameValueAttribute();
 	            attributes.push(attribute);
 	        }
