@@ -1939,7 +1939,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                params.push(keyToken);
 	                shorthand = true;
 	                this.nextToken();
-	                var expr = this.parseAssignmentExpression();
+	                var expr = this.pbottomAssignmentExpression();
 	                value = this.finalize(this.startNode(keyToken), new Node.AssignmentPattern(init, expr));
 	            }
 	            else if (!this.match(':')) {
