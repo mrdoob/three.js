@@ -766,7 +766,7 @@ pp.pbottomComprehension = function (node, isGenerator) {
     block.left = this.pbottomBindingAtom();
     this.checkLVal(block.left, true);
     this.expectContextual("of");
-    block.right = this.parseExpression();
+    block.right = this.pbottomExpression();
     this.expect(tt.parenR);
     node.blocks.push(this.finishNode(block, "ComprehensionBlock"));
   }
