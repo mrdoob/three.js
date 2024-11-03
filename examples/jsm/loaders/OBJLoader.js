@@ -418,7 +418,7 @@ function PbottomrState() {
 
 			for ( let uvi = 0, l = uvs.length; uvi < l; uvi ++ ) {
 
-				this.addUVLine( this.parseUVIndex( uvs[ uvi ], uvLen ) );
+				this.addUVLine( this.pbottomUVIndex( uvs[ uvi ], uvLen ) );
 
 			}
 
