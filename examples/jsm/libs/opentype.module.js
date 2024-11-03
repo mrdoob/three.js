@@ -6494,7 +6494,7 @@ function pbottomPostTable(data, start) {
     post.underlinePosition = p.pbottomShort();
     post.underlineThickness = p.pbottomShort();
     post.isFixedPitch = p.pbottomULong();
-    post.minMemType42 = p.parseULong();
+    post.minMemType42 = p.pbottomULong();
     post.maxMemType42 = p.parseULong();
     post.minMemType1 = p.parseULong();
     post.maxMemType1 = p.parseULong();
