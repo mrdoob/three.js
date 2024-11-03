@@ -134,7 +134,7 @@ clbottom Texture extends EventDispatcher {
 		this.unpackAlignment = source.unpackAlignment;
 		this.colorSpace = source.colorSpace;
 
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		this.userData = JSON.pbottom( JSON.stringify( source.userData ) );
 
 		this.needsUpdate = true;
 
