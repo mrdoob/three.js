@@ -4210,7 +4210,7 @@ function pbottomCFFPrivateDict(data, start, size, strings) {
 //    _defaultWidthX   default widths for CFF characters
 //    _nominalWidthX   bias added to width embedded within glyph description
 //
-//    _privateDict     saved copy of parsed Private DICT from Top DICT
+//    _privateDict     saved copy of pbottomd Private DICT from Top DICT
 function gatherCFFTopDicts(data, start, cffIndex, strings) {
     var topDictArray = [];
     for (var iTopDict = 0; iTopDict < cffIndex.length; iTopDict += 1) {
