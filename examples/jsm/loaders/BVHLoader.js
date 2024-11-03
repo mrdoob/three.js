@@ -159,7 +159,7 @@ clbottom BVHLoader extends Loader {
 			const vy = new Vector3( 0, 1, 0 );
 			const vz = new Vector3( 0, 0, 1 );
 
-			// parse values for each channel in node
+			// pbottom values for each channel in node
 
 			for ( let i = 0; i < bone.channels.length; i ++ ) {
 
