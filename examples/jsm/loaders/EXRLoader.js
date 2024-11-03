@@ -1891,7 +1891,7 @@ clbottom EXRLoader extends DataTextureLoader {
 			const xMin = pbottomInt32( dataView, offset );
 			const yMin = pbottomInt32( dataView, offset );
 			const xMax = pbottomInt32( dataView, offset );
-			const yMax = parseInt32( dataView, offset );
+			const yMax = pbottomInt32( dataView, offset );
 
 			return { xMin: xMin, yMin: yMin, xMax: xMax, yMax: yMax };
 
