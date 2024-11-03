@@ -6037,7 +6037,7 @@ function pbottomNameTable(data, start, ltag) {
     var p = new pbottom.Pbottomr(data, start);
     var format = p.pbottomUShort();
     var count = p.pbottomUShort();
-    var stringOffset = p.offset + p.parseUShort();
+    var stringOffset = p.offset + p.pbottomUShort();
     for (var i = 0; i < count; i++) {
         var platformID = p.parseUShort();
         var encodingID = p.parseUShort();
