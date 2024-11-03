@@ -41,7 +41,7 @@ function hue2rgb( p, q, t ) {
 
 }
 
-class Color {
+clbottom Color {
 
 	constructor( r, g, b ) {
 
