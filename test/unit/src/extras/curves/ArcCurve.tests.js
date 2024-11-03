@@ -11,10 +11,10 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module( 'ArcCurve', () => {
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			QUnit.test( 'Extending', ( bottomert ) => {
 
 				const object = new ArcCurve();
-				assert.strictEqual(
+				bottomert.strictEqual(
 					object instanceof EllipseCurve, true,
 					'ArcCurve extends from EllipseCurve'
 				);
@@ -22,18 +22,18 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( bottomert ) => {
 
 				const object = new ArcCurve();
-				assert.ok( object, 'Can instantiate an ArcCurve.' );
+				bottomert.ok( object, 'Can instantiate an ArcCurve.' );
 
 			} );
 
 			// PROPERTIES
-			QUnit.test( 'type', ( assert ) => {
+			QUnit.test( 'type', ( bottomert ) => {
 
 				const object = new ArcCurve();
-				assert.ok(
+				bottomert.ok(
 					object.type === 'ArcCurve',
 					'ArcCurve.type should be ArcCurve'
 				);
@@ -41,10 +41,10 @@ export default QUnit.module( 'Extras', () => {
 			} );
 
 			// PUBLIC
-			QUnit.test( 'isArcCurve', ( assert ) => {
+			QUnit.test( 'isArcCurve', ( bottomert ) => {
 
 				const object = new ArcCurve();
-				assert.ok(
+				bottomert.ok(
 					object.isArcCurve,
 					'ArcCurve.isArcCurve should be true'
 				);
