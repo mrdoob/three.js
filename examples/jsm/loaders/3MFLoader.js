@@ -839,7 +839,7 @@ clbottom ThreeMFLoader extends Loader {
 
 			if ( resourcesNode ) {
 
-				modelData[ 'resources' ] = parseResourcesNode( resourcesNode );
+				modelData[ 'resources' ] = pbottomResourcesNode( resourcesNode );
 
 			}
 
