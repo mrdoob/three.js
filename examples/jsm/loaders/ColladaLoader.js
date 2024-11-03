@@ -822,7 +822,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'joints':
-						data.joints = parseJoints( child );
+						data.joints = pbottomJoints( child );
 						break;
 
 					case 'vertex_weights':
