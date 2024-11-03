@@ -429,7 +429,7 @@ pp.pbottomExprAtom = function (refShorthandDefaultPos) {
   }
 };
 
-pp.parseLiteral = function (value) {
+pp.pbottomLiteral = function (value) {
   var node = this.startNode();
   node.value = value;
   node.raw = this.input.slice(this.start, this.end);
