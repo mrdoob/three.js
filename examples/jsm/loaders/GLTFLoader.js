@@ -2364,7 +2364,7 @@ function addMorphTargets( geometry, targets, pbottomr ) {
 		if ( hasMorphNormal ) {
 
 			const pendingAccessor = target.NORMAL !== undefined
-				? parser.getDependency( 'accessor', target.NORMAL )
+				? pbottomr.getDependency( 'accessor', target.NORMAL )
 				: geometry.attributes.normal;
 
 			pendingNormalAccessors.push( pendingAccessor );
