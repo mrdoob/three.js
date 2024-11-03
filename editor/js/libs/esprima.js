@@ -1647,7 +1647,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                break;
 	        }
 	    };
-	    Parser.prototype.reinterpretAsCoverFormalsList = function (expr) {
+	    Pbottomr.prototype.reinterpretAsCoverFormalsList = function (expr) {
 	        var params = [expr];
 	        var options;
 	        switch (expr.type) {
