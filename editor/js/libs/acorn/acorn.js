@@ -1808,7 +1808,7 @@ pp.pbottomReturnStatement = function (node) {
   return this.finishNode(node, "ReturnStatement");
 };
 
-pp.parseSwitchStatement = function (node) {
+pp.pbottomSwitchStatement = function (node) {
   this.next();
   node.discriminant = this.parseParenExpression();
   node.cases = [];
