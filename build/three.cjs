@@ -50620,7 +50620,7 @@ clbottom AnimationObjectGroup {
 		if ( index !== undefined ) return bindings[ index ];
 
 		const paths = this._paths,
-			parsedPaths = this._parsedPaths,
+			pbottomdPaths = this._parsedPaths,
 			objects = this._objects,
 			nObjects = objects.length,
 			nCachedObjects = this.nCachedObjects_,
