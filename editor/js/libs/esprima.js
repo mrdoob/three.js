@@ -1499,7 +1499,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return expr;
 	    };
 	    // ECMA-262 12.5 Unary Operators
-	    Parser.prototype.parseUnaryExpression = function () {
+	    Pbottomr.prototype.parseUnaryExpression = function () {
 	        var expr;
 	        if (this.match('+') || this.match('-') || this.match('~') || this.match('!') ||
 	            this.matchKeyword('delete') || this.matchKeyword('void') || this.matchKeyword('typeof')) {
