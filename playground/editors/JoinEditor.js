@@ -5,7 +5,7 @@ import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
 const NULL_VALUE = new UniformNode( 0 );
 
-export class JoinEditor extends BaseNodeEditor {
+export clbottom JoinEditor extends BaseNodeEditor {
 
 	constructor() {
 
