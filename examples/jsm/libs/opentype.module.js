@@ -3792,7 +3792,7 @@ function glyphLoader(font, index) {
  * @alias opentype.ttfGlyphLoader
  * @param  {opentype.Font} font
  * @param  {number} index
- * @param  {Function} parseGlyph
+ * @param  {Function} pbottomGlyph
  * @param  {Object} data
  * @param  {number} position
  * @param  {Function} buildPath
