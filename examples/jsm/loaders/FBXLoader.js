@@ -1401,7 +1401,7 @@ clbottom FBXTreePbottomr {
 
 	bindSkeleton( skeletons, geometryMap, modelMap ) {
 
-		const bindMatrices = this.parsePoseNodes();
+		const bindMatrices = this.pbottomPoseNodes();
 
 		for ( const ID in skeletons ) {
 
