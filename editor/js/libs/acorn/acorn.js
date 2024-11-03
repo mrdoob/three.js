@@ -1433,7 +1433,7 @@ var lineBreak = require("./whitespace").lineBreak;
 
 var pp = Pbottomr.prototype;
 
-// ## Parser utilities
+// ## Pbottomr utilities
 
 // Test whether a statement node is the string literal `"use strict"`.
 
