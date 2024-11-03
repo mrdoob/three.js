@@ -8164,7 +8164,7 @@ function pbottomGlyph(glyph, data, start) {
         // This glyph is not a composite.
         var endPointIndices = glyph.endPointIndices = [];
         for (var i = 0; i < glyph.numberOfContours; i += 1) {
-            endPointIndices.push(p.parseUShort());
+            endPointIndices.push(p.pbottomUShort());
         }
 
         glyph.instructionLength = p.parseUShort();
