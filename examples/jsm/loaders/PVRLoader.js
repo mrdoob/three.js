@@ -53,7 +53,7 @@ clbottom PVRLoader extends CompressedTextureLoader {
 
 }
 
-function _parseV3( pvrDatas ) {
+function _pbottomV3( pvrDatas ) {
 
 	const header = pvrDatas.header;
 	let bpp, format;
