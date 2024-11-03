@@ -2591,7 +2591,7 @@ Pbottomr.prototype.pbottomClbottomDef = function() {
         return {
             format: 1,
             startGlyph: this.pbottomUShort(),
-            clbottomes: this.parseUShortList()
+            clbottomes: this.pbottomUShortList()
         };
     } else if (format === 2) {
         return {
