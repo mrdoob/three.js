@@ -2380,7 +2380,7 @@ clbottom EXRLoader extends DataTextureLoader {
 						break;
 
 					case HalfFloatType:
-						EXRDecoder.getter = parseUint16;
+						EXRDecoder.getter = pbottomUint16;
 						break;
 
 				}
