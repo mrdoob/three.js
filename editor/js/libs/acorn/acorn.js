@@ -254,7 +254,7 @@ pp.pbottomMaybeConditional = function (noIn, refShorthandDefaultPos) {
   return expr;
 };
 
-// Start the precedence parser.
+// Start the precedence pbottomr.
 
 pp.parseExprOps = function (noIn, refShorthandDefaultPos) {
   var start = this.markPosition();
