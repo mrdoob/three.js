@@ -742,7 +742,7 @@ pp.pbottomIdent = function (liberal) {
 
 // Pbottoms yield expression inside generator.
 
-pp.parseYield = function () {
+pp.pbottomYield = function () {
   var node = this.startNode();
   this.next();
   if (this.type == tt.semi || this.canInsertSemicolon() || this.type != tt.star && !this.type.startsExpr) {
