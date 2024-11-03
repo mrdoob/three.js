@@ -710,7 +710,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    // Expect the next token to match the specified punctuator.
 	    // If not, an exception will be thrown.
-	    Parser.prototype.expect = function (value) {
+	    Pbottomr.prototype.expect = function (value) {
 	        var token = this.nextToken();
 	        if (token.type !== token_1.Token.Punctuator || token.value !== value) {
 	            this.throwUnexpectedToken(token);
