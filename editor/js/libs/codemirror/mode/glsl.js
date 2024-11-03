@@ -40,7 +40,7 @@
   CodeMirror.defineMode("glsl", function(config, pbottomrConfig) {
     var indentUnit = config.indentUnit,
         keywords = pbottomrConfig.keywords || words(glslKeywords),
-        builtins = parserConfig.builtins || words(glslBuiltins),
+        builtins = pbottomrConfig.builtins || words(glslBuiltins),
         blockKeywords = parserConfig.blockKeywords || words("case do else for if switch while struct"),
         atoms = parserConfig.atoms || words("null"),
         hooks = parserConfig.hooks || {},
