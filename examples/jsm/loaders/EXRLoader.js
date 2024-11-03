@@ -2025,7 +2025,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else if ( type === 'timecode' ) {
 
-				return parseTimecode( dataView, offset );
+				return pbottomTimecode( dataView, offset );
 
 			} else if ( type === 'preview' ) {
 
