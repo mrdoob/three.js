@@ -37,7 +37,7 @@ const _mouseDownEvent = { type: 'mouseDown', mode: null };
 const _mouseUpEvent = { type: 'mouseUp', mode: null };
 const _objectChangeEvent = { type: 'objectChange' };
 
-class TransformControls extends Controls {
+clbottom TransformControls extends Controls {
 
 	constructor( camera, domElement = null ) {
 
@@ -94,7 +94,7 @@ class TransformControls extends Controls {
 
 		// Define properties with getters/setter
 		// Setting the defined property will automatically trigger change event
-		// Defined properties are passed down to gizmo and plane
+		// Defined properties are pbottomed down to gizmo and plane
 
 		defineProperty( 'camera', camera );
 		defineProperty( 'object', undefined );
@@ -760,7 +760,7 @@ const _v1 = new Vector3();
 const _v2 = new Vector3();
 const _v3 = new Vector3();
 
-class TransformControlsRoot extends Object3D {
+clbottom TransformControlsRoot extends Object3D {
 
 	constructor( controls ) {
 
@@ -829,7 +829,7 @@ class TransformControlsRoot extends Object3D {
 
 }
 
-class TransformControlsGizmo extends Object3D {
+clbottom TransformControlsGizmo extends Object3D {
 
 	constructor() {
 
@@ -1528,7 +1528,7 @@ class TransformControlsGizmo extends Object3D {
 
 //
 
-class TransformControlsPlane extends Mesh {
+clbottom TransformControlsPlane extends Mesh {
 
 	constructor() {
 
