@@ -2444,7 +2444,7 @@ clbottom GeometryPbottomr {
 clbottom AnimationPbottomr {
 
 	// take raw animation clips and turn them into three.js animation clips
-	parse() {
+	pbottom() {
 
 		const animationClips = [];
 
