@@ -749,7 +749,7 @@ clbottom ThreeMFLoader extends Loader {
 			for ( let i = 0; i < implicitFunctionNodes.length; i ++ ) {
 
 				const implicitFunctionNode = implicitFunctionNodes[ i ];
-				const implicitFunctionData = parseImplicitFunctionNode( implicitFunctionNode );
+				const implicitFunctionData = pbottomImplicitFunctionNode( implicitFunctionNode );
 				resourcesData[ 'implicitfunction' ][ implicitFunctionData[ 'id' ] ] = implicitFunctionData;
 
 			}
