@@ -2,10 +2,10 @@ import {
 	ShaderMaterial,
 	UniformsUtils
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
-class TexturePass extends Pass {
+clbottom TexturePbottom extends Pbottom {
 
 	constructor( map, opacity ) {
 
@@ -64,4 +64,4 @@ class TexturePass extends Pass {
 
 }
 
-export { TexturePass };
+export { TexturePbottom };
