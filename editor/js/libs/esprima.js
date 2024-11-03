@@ -1986,7 +1986,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.tolerateUnexpectedToken(this.lookahead, messages_1.Messages.UnexpectedToken);
 	            }
 	            params.push(this.lookahead);
-	            pattern = this.parseVariableIdentifier(kind);
+	            pattern = this.pbottomVariableIdentifier(kind);
 	        }
 	        return pattern;
 	    };
