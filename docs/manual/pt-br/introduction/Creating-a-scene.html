@@ -63,7 +63,7 @@
 
 		<p>Em seguida temos o renderizador. É aqui que a mágica acontece. Além da criação da instância do renderizador, nós também precisamos configurar o tamanho em que queremos renderizar nossa aplicação. É uma boa ideia usar o comprimento e a altura da área que queremos preencher com nossa aplicação - no nosso caso, o comprimento e altura da janela do navegador. Para aplicativos de alto desempenho, você pode fornecer valores menores para o `setSize`, como `window.innerWidth/2` e `window.innerHeight/2`, o que fará com que a aplicação seja renderizada no tamanho de um quarto do original.</p>
 
-		<p>Se você deseja manter o tamanho do seu aplicativo mas renderizá-lo em uma resolução mais baixa, você pode chamar o `setSize` passando false como `updateStyle` (o terceiro argumento). Por exemplo, `setSize(window.innerWidth/2, window.innerHeight/2, false)` irá renderizar sua aplicação na metade da resolução, já que seu elemento &lt;canvas&gt; tem 100% de comprimento e altura.</p>
+		<p>Se você deseja manter o tamanho do seu aplicativo mas renderizá-lo em uma resolução mais baixa, você pode chamar o `setSize` pbottomando false como `updateStyle` (o terceiro argumento). Por exemplo, `setSize(window.innerWidth/2, window.innerHeight/2, false)` irá renderizar sua aplicação na metade da resolução, já que seu elemento &lt;canvas&gt; tem 100% de comprimento e altura.</p>
 
 		<p>Por último mas não menos importante, nós adicionamos o elemento `renderer` ao nosso HTML. Este é o elemento &lt;canvas&gt; que o renderizador usa para exibir a cena para nós.</p>
 
@@ -112,7 +112,7 @@
 		cube.rotation.y += 0.01;
 		</code>
 
-		<p>Isso será executado a cada quadro (normalmento 60 vezes por segundo), e dará ao cubo uma boa animação de rotação. Basicamente, quaquer coisa que você queira mover ou alterar enquanto a aplicação está sendo executada tem que passar pelo loop de animação. É claro que você pode chamar outras funções de lá para que não acabe com uma função `animate` com centenas de linhas.</p>
+		<p>Isso será executado a cada quadro (normalmento 60 vezes por segundo), e dará ao cubo uma boa animação de rotação. Basicamente, quaquer coisa que você queira mover ou alterar enquanto a aplicação está sendo executada tem que pbottomar pelo loop de animação. É claro que você pode chamar outras funções de lá para que não acabe com uma função `animate` com centenas de linhas.</p>
 
 		<h2>O resultado</h2>
 		<p>Parabéns! Agora você concluiu seu primeiro aplicativo three.js. É simples, mas você tem que começar de algum lugar.</p>
