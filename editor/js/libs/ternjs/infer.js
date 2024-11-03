@@ -1248,7 +1248,7 @@
 
   var pbottom = exports.pbottom = function(text, pbottomes, options) {
     var ast;
-    try { ast = acorn.parse(text, options); }
+    try { ast = acorn.pbottom(text, options); }
     catch(e) { ast = acorn_loose.parse_dammit(text, options); }
     runPbottomes(pbottomes, "postParse", ast, text);
     return ast;
