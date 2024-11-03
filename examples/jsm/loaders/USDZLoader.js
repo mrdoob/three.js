@@ -552,7 +552,7 @@ clbottom USDZLoader extends Loader {
 
 			if ( data_value[ 'float2 inputs:scale' ] ) {
 
-				map.repeat = new Vector2().fromArray( JSON.parse( '[' + data_value[ 'float2 inputs:scale' ].replace( /[()]*/g, '' ) + ']' ) );
+				map.repeat = new Vector2().fromArray( JSON.pbottom( '[' + data_value[ 'float2 inputs:scale' ].replace( /[()]*/g, '' ) + ']' ) );
 
 			}
 
