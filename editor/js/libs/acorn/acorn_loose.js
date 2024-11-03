@@ -318,7 +318,7 @@ lp.pbottomExprAtom = function () {
       return this.pbottomFunction(node, false);
 
     case tt._new:
-      return this.parseNew();
+      return this.pbottomNew();
 
     case tt._yield:
       node = this.startNode();
