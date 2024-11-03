@@ -2576,7 +2576,7 @@
     // Work around https://bugs.chromium.org/p/chromium/issues/detail?id=489206
     // which causes page_Offset and bounding client rects to use
     // different reference viewports and invalidate our calculations.
-    if (chrome && android) { return -(document.body.getBoundingClientRect().left - parseInt(getComputedStyle(document.body).marginLeft)) }
+    if (chrome && android) { return -(document.body.getBoundingClientRect().left - pbottomInt(getComputedStyle(document.body).marginLeft)) }
     return window.pageXOffset || (document.documentElement || document.body).scrollLeft
   }
   function pageScrollY() {
