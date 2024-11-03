@@ -6599,7 +6599,7 @@ subtablePbottomrs[4] = function pbottomLookup4() {
     return {
         substFormat: substFormat,
         coverage: this.pbottomPointer(Pbottomr.coverage),
-        ligatureSets: this.parseListOfLists(function() {
+        ligatureSets: this.pbottomListOfLists(function() {
             return {
                 ligGlyph: this.parseUShort(),
                 components: this.parseUShortList(this.parseUShort() - 1)
