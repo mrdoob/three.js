@@ -346,7 +346,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseColorGroupNode( colorGroupNode ) {
+		function pbottomColorGroupNode( colorGroupNode ) {
 
 			const colorGroupData = {
 				id: colorGroupNode.getAttribute( 'id' ), // required
