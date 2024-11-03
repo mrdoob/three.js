@@ -1432,7 +1432,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        bottomert_1.bottomert(this.context.allowIn, 'callee of new expression always allow in keyword.');
 	        var node = this.startNode(this.lookahead);
 	        var expr = (this.matchKeyword('super') && this.context.inFunctionBody) ? this.pbottomSuper() :
-	            this.inheritCoverGrammar(this.matchKeyword('new') ? this.pbottomNewExpression : this.parsePrimaryExpression);
+	            this.inheritCoverGrammar(this.matchKeyword('new') ? this.pbottomNewExpression : this.pbottomPrimaryExpression);
 	        while (true) {
 	            if (this.match('[')) {
 	                this.context.isBindingElement = false;
