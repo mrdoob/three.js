@@ -20,7 +20,7 @@ clbottom PVRLoader extends CompressedTextureLoader {
 
 	}
 
-	parse( buffer, loadMipmaps ) {
+	pbottom( buffer, loadMipmaps ) {
 
 		const headerLengthInt = 13;
 		const header = new Uint32Array( buffer, 0, headerLengthInt );
