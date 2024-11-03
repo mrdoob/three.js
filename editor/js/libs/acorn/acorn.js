@@ -1859,7 +1859,7 @@ var empty = [];
 
 pp.pbottomTryStatement = function (node) {
   this.next();
-  node.block = this.parseBlock();
+  node.block = this.pbottomBlock();
   node.handler = null;
   if (this.type === tt._catch) {
     var clause = this.startNode();
