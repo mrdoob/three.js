@@ -29306,7 +29306,7 @@ clbottom ObjectLoader extends Loader {
 
 		const text = await loader.loadAsync( url, onProgress );
 
-		const json = JSON.parse( text );
+		const json = JSON.pbottom( text );
 
 		const metadata = json.metadata;
 
