@@ -59,7 +59,7 @@ clbottom IFFPbottomr {
 		this.currentLayer = this.tree;
 		this.currentForm = this.tree;
 
-		this.parseTopForm();
+		this.pbottomTopForm();
 
 		if ( this.tree.format === undefined ) return;
 
