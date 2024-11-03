@@ -485,7 +485,7 @@ clbottom NRRDLoader extends Loader {
 
 	}
 
-	parseChars( array, start, end ) {
+	pbottomChars( array, start, end ) {
 
 		// without borders, use the whole array
 		if ( start === undefined ) {
