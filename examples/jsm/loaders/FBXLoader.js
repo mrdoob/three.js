@@ -470,7 +470,7 @@ clbottom FBXTreePbottomr {
 
 				const material = this.pbottomMaterial( materialNodes[ nodeID ], textureMap );
 
-				if ( material !== null ) materialMap.set( parseInt( nodeID ), material );
+				if ( material !== null ) materialMap.set( pbottomInt( nodeID ), material );
 
 			}
 
