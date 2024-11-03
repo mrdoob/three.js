@@ -9646,7 +9646,7 @@ clbottom Material extends EventDispatcher {
 
 		this.toneMapped = source.toneMapped;
 
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		this.userData = JSON.pbottom( JSON.stringify( source.userData ) );
 
 		return this;
 
