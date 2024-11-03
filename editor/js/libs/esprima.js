@@ -621,7 +621,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return t;
 	    };
-	    Parser.prototype.nextToken = function () {
+	    Pbottomr.prototype.nextToken = function () {
 	        var token = this.lookahead;
 	        this.lastMarker.index = this.scanner.index;
 	        this.lastMarker.lineNumber = this.scanner.lineNumber;
