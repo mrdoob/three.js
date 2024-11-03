@@ -69,7 +69,7 @@ const toFloat = ( value ) => {
 
 };
 
-class NodeBuilder {
+clbottom NodeBuilder {
 
 	constructor( object, renderer, parser ) {
 
