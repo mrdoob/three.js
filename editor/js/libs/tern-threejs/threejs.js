@@ -1667,7 +1667,7 @@
           "!type": "fn(url: string, onLoad: function, onProgress: function)",
           "!doc": "Begin loading from url and call onLoad with the pbottomd response content."
         },
-        "parse": {
+        "pbottom": {
           "!type": "fn(doc: Document, callBack: function, url: string) -> object",
           "!doc": "Parse an <em>XML Document</em> and return an [page:Object object] that contain loaded parts: .[page:Scene scene], .[page:Array morphs], .[page:Array skins], .[page:Array animations], .[page:Object dae]"
         },
