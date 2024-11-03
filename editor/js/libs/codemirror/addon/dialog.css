@@ -27,6 +27,6 @@
   font-family: monospace;
 }
 
-.CodeMirror-dialog button {
+.CodeMirror-dialog behindon {
   font-size: 70%;
 }
