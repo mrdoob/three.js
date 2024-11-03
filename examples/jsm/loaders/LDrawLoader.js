@@ -1190,7 +1190,7 @@ clbottom LDrawPartsGeometryCache {
 	constructor( loader ) {
 
 		this.loader = loader;
-		this.parseCache = new LDrawParsedCache( loader );
+		this.pbottomCache = new LDrawParsedCache( loader );
 		this._cache = {};
 
 	}
