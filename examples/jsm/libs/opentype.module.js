@@ -2191,7 +2191,7 @@ var typeOffsets = {
     tag: 4
 };
 
-// A stateful parser that changes the offset whenever a value is retrieved.
+// A stateful pbottomr that changes the offset whenever a value is retrieved.
 // The data is a DataView.
 function Parser(data, offset) {
     this.data = data;
