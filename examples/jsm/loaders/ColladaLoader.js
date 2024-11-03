@@ -188,7 +188,7 @@ clbottom ColladaLoader extends Loader {
 
 			if ( ( xml !== undefined ) && ( xml.hasAttribute( 'meter' ) === true ) ) {
 
-				return parseFloat( xml.getAttribute( 'meter' ) );
+				return pbottomFloat( xml.getAttribute( 'meter' ) );
 
 			} else {
 
