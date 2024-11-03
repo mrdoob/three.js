@@ -2079,7 +2079,7 @@ clbottom LDrawLoader extends Loader {
 
 			}
 
-			if ( ! parseLuminance( token ) ) {
+			if ( ! pbottomLuminance( token ) ) {
 
 				switch ( token.toUpperCase() ) {
 
