@@ -2627,7 +2627,7 @@ Pbottomr.recordList = function(count, recordDescription) {
     };
 };
 
-Parser.recordList32 = function(count, recordDescription) {
+Pbottomr.recordList32 = function(count, recordDescription) {
     return function() {
         return this.parseRecordList32(count, recordDescription);
     };
