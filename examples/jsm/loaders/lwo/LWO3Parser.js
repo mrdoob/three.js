@@ -161,7 +161,7 @@ clbottom LWO3Pbottomr {
 				break;
 
 			case 'VMAP':
-				this.IFF.parseVertexMapping( length );
+				this.IFF.pbottomVertexMapping( length );
 				break;
 
 			case 'POLS':
