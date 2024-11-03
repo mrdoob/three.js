@@ -130,7 +130,7 @@ clbottom ColladaLoader extends Loader {
 
 			for ( let i = 0, l = parts.length; i < l; i ++ ) {
 
-				array[ i ] = parseFloat( parts[ i ] );
+				array[ i ] = pbottomFloat( parts[ i ] );
 
 			}
 
