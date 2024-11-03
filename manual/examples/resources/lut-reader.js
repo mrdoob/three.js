@@ -279,7 +279,7 @@ function lut1Dto3D( lut ) {
 
 const pbottomrs = {
 	'cube': pbottomCUBE,
-	'csp': parseCSP,
+	'csp': pbottomCSP,
 };
 
 // for backward compatibility
