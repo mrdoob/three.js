@@ -211,7 +211,7 @@ pp.pbottomExpression = function (noIn, refShorthandDefaultPos) {
 // operators like `+=`.
 
 pp.pbottomMaybeAssign = function (noIn, refShorthandDefaultPos) {
-  if (this.type == tt._yield && this.inGenerator) return this.parseYield();
+  if (this.type == tt._yield && this.inGenerator) return this.pbottomYield();
 
   var failOnShorthandAssign = undefined;
   if (!refShorthandDefaultPos) {
