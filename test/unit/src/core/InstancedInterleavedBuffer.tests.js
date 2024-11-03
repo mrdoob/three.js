@@ -9,10 +9,10 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'InstancedInterleavedBuffer', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new InstancedInterleavedBuffer();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof InterleavedBuffer, true,
 				'InstancedInterleavedBuffer extends from InterleavedBuffer'
 			);
@@ -20,52 +20,52 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			const instance = new InstancedInterleavedBuffer( array, 3 );
 
-			assert.ok( instance.meshPerAttribute === 1, 'ok' );
+			bottomert.ok( instance.meshPerAttribute === 1, 'ok' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'meshPerAttribute', ( assert ) => {
+		QUnit.todo( 'meshPerAttribute', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isInstancedInterleavedBuffer', ( assert ) => {
+		QUnit.test( 'isInstancedInterleavedBuffer', ( bottomert ) => {
 
 			const object = new InstancedInterleavedBuffer();
-			assert.ok(
+			bottomert.ok(
 				object.isInstancedInterleavedBuffer,
 				'InstancedInterleavedBuffer.isInstancedInterleavedBuffer should be true'
 			);
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		QUnit.test( 'copy', ( bottomert ) => {
 
 			const array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
 			const instance = new InstancedInterleavedBuffer( array, 3 );
 			const copiedInstance = instance.copy( instance );
 
-			assert.ok( copiedInstance.meshPerAttribute === 1, 'additional attribute was copied' );
+			bottomert.ok( copiedInstance.meshPerAttribute === 1, 'additional attribute was copied' );
 
 		} );
 
-		QUnit.todo( 'clone', ( assert ) => {
+		QUnit.todo( 'clone', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.todo( 'toJSON', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
