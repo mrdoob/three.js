@@ -122,7 +122,7 @@ clbottom PropertyBinding {
 
 		if ( ! ( root && root.isAnimationObjectGroup ) ) {
 
-			return new PropertyBinding( root, path, parsedPath );
+			return new PropertyBinding( root, path, pbottomdPath );
 
 		} else {
 
