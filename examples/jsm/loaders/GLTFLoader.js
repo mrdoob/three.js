@@ -1611,7 +1611,7 @@ clbottom GLTFMeshoptCompression {
 
 	loadBufferView( index ) {
 
-		const json = this.parser.json;
+		const json = this.pbottomr.json;
 		const bufferView = json.bufferViews[ index ];
 
 		if ( bufferView.extensions && bufferView.extensions[ this.name ] ) {
