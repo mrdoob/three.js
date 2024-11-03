@@ -600,7 +600,7 @@ clbottom MaterialPbottomr {
 
 	}
 
-	parseStandardAttributes( params, attributes, maps ) {
+	pbottomStandardAttributes( params, attributes, maps ) {
 
 
 		if ( attributes.Luminous ) {
