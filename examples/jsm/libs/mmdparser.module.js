@@ -10211,7 +10211,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseMorphs = function () {
+	var pbottomMorphs = function () {
 
 		var parseMorph = function () {
 
