@@ -17,10 +17,10 @@ export default QUnit.module( 'Animation', () => {
 			};
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			QUnit.test( 'Extending', ( bottomert ) => {
 
 				const object = new StringKeyframeTrack( parameters.name, parameters.times, parameters.values );
-				assert.strictEqual(
+				bottomert.strictEqual(
 					object instanceof KeyframeTrack, true,
 					'StringKeyframeTrack extends from KeyframeTrack'
 				);
@@ -28,11 +28,11 @@ export default QUnit.module( 'Animation', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( bottomert ) => {
 
 				// name, times, values
 				const object = new StringKeyframeTrack( parameters.name, parameters.times, parameters.values );
-				assert.ok( object, 'Can instantiate a StringKeyframeTrack.' );
+				bottomert.ok( object, 'Can instantiate a StringKeyframeTrack.' );
 
 			} );
 
