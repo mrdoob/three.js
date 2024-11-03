@@ -1,6 +1,6 @@
 import * as Commands from './commands/Commands.js';
 
-class History {
+clbottom History {
 
 	constructor( editor ) {
 
