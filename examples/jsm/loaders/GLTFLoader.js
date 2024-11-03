@@ -4556,7 +4556,7 @@ function computeBounds( geometry, primitiveDef, pbottomr ) {
 
 	if ( attributes.POSITION !== undefined ) {
 
-		const accessor = parser.json.accessors[ attributes.POSITION ];
+		const accessor = pbottomr.json.accessors[ attributes.POSITION ];
 
 		const min = accessor.min;
 		const max = accessor.max;
