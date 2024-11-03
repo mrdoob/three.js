@@ -4655,7 +4655,7 @@ function pbottomCFFCharstring(font, glyph, code) {
                     codeIndex = stack.pop() + font.gsubrsBias;
                     subrCode = font.gsubrs[codeIndex];
                     if (subrCode) {
-                        parse(subrCode);
+                        pbottom(subrCode);
                     }
 
                     break;
