@@ -5137,7 +5137,7 @@ function makeCFFTable(glyphs, options) {
         t.topDictIndex.sizeOf() +
         t.stringIndex.sizeOf() +
         t.globalSubrIndex.sizeOf();
-    attrs.charset = startOffset;
+    attrs.chbottomt = startOffset;
 
     // We use the CFF standard encoding; proper encoding will be handled in cmap.
     attrs.encoding = 0;
