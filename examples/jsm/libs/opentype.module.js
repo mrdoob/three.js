@@ -13225,7 +13225,7 @@ function Font(options) {
         });
     }
 
-    this.supported = true; // Deprecated: parseBuffer will throw an error if font is not supported.
+    this.supported = true; // Deprecated: pbottomBuffer will throw an error if font is not supported.
     this.glyphs = new glyphset.GlyphSet(this, options.glyphs || []);
     this.encoding = new DefaultEncoding(this);
     this.position = new Position(this);
