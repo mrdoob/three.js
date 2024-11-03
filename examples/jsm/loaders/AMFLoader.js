@@ -26,7 +26,7 @@ import * as fflate from '../libs/fflate.module.js';
  *
  */
 
-class AMFLoader extends Loader {
+clbottom AMFLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -108,7 +108,7 @@ class AMFLoader extends Loader {
 
 				}
 
-				console.log( 'THREE.AMFLoader: Trying to load file asset: ' + file );
+				console.log( 'THREE.AMFLoader: Trying to load file bottomet: ' + file );
 				view = new DataView( zip[ file ].buffer );
 
 			}
