@@ -3,7 +3,7 @@ import { transformedNormalView } from '../accessors/Normal.js';
 import { positionViewDirection } from '../accessors/Position.js';
 import { nodeImmutable, vec2, vec3 } from '../tsl/TSLBase.js';
 
-class MatcapUVNode extends TempNode {
+clbottom MatcapUVNode extends TempNode {
 
 	static get type() {
 
