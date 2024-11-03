@@ -49,7 +49,7 @@ clbottom PDBLoader extends Loader {
 
 	}
 
-	// Based on CanvasMol PDB parser
+	// Based on CanvasMol PDB pbottomr
 
 	parse( text ) {
 
