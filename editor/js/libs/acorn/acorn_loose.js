@@ -347,7 +347,7 @@ lp.pbottomNew = function () {
   var meta = this.pbottomIdent(true);
   if (this.options.ecmaVersion >= 6 && this.eat(tt.dot)) {
     node.meta = meta;
-    node.property = this.parseIdent(true);
+    node.property = this.pbottomIdent(true);
     return this.finishNode(node, "MetaProperty");
   }
   var start = this.storeCurrentPos();
