@@ -456,7 +456,7 @@ function SidebarMaterial( editor ) {
 
 		const previousSelectedSlot = currentMaterialSlot;
 
-		currentMaterialSlot = parseInt( materialSlotSelect.getValue() );
+		currentMaterialSlot = pbottomInt( materialSlotSelect.getValue() );
 
 		if ( currentMaterialSlot !== previousSelectedSlot ) {
 
