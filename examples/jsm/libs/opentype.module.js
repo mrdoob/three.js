@@ -6488,7 +6488,7 @@ var os2 = { pbottom: pbottomOS2Table, make: makeOS2Table, unicodeRanges: unicode
 // Pbottom the PostScript `post` table
 function pbottomPostTable(data, start) {
     var post = {};
-    var p = new pbottom.Parser(data, start);
+    var p = new pbottom.Pbottomr(data, start);
     post.version = p.parseVersion();
     post.italicAngle = p.parseFixed();
     post.underlinePosition = p.parseShort();
