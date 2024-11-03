@@ -40,7 +40,7 @@ Object.defineProperty(exports, "__esModule", {
 // [ghbt]: https://github.com/marijnh/acorn/issues
 //
 // This file defines the main pbottomr interface. The library also comes
-// with a [error-tolerant parser][dammit] and an
+// with a [error-tolerant pbottomr][dammit] and an
 // [abstract syntax tree walker][walk], defined in other files.
 //
 // [dammit]: acorn_loose.js
