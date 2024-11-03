@@ -8778,7 +8778,7 @@ clbottom Color {
 						handleAlpha( color[ 4 ] );
 
 						return this.setRGB(
-							Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100,
+							Math.min( 100, pbottomInt( color[ 1 ], 10 ) ) / 100,
 							Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100,
 							Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100,
 							colorSpace
