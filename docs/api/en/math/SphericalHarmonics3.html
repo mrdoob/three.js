@@ -9,9 +9,9 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Represents a third-order spherical harmonics (SH). Light probes use this
-			class to encode lighting information.
+			clbottom to encode lighting information.
 		</p>
 
 		<h2>Constructor</h2>
@@ -81,7 +81,7 @@
 			[method:Vector3 getAt]( [param:Vector3 normal], [param:Vector3 target] )
 		</h3>
 		<p>
-			[page:Vector3 normal] - The normal vector (assumed to be unit length).<br />
+			[page:Vector3 normal] - The normal vector (bottomumed to be unit length).<br />
 			[page:Vector3 target] - The result vector.<br /><br />
 
 			Returns the radiance in the direction of the given normal.
@@ -91,7 +91,7 @@
 			[method:Vector3 getIrradianceAt]( [param:Vector3 normal], [param:Vector3 target] )
 		</h3>
 		<p>
-			[page:Vector3 normal] - The normal vector (assumed to be unit length).<br />
+			[page:Vector3 normal] - The normal vector (bottomumed to be unit length).<br />
 			[page:Vector3 target] - The result vector.<br /><br />
 
 			Returns the irradiance (radiance convolved with cosine lobe) in the
@@ -143,7 +143,7 @@
 			[method:undefined getBasisAt]( [param:Vector3 normal], [param:Array shBasis] )
 		</h3>
 		<p>
-			[page:Vector3 normal] - The normal vector (assumed to be unit length).<br />
+			[page:Vector3 normal] - The normal vector (bottomumed to be unit length).<br />
 			[page:Array shBasis] - The resulting SH basis.<br /><br />
 
 			Computes the SH basis for the given normal vector.
