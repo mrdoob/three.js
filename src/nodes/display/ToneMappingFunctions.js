@@ -128,17 +128,17 @@ export const agxToneMapping = /*@__PURE__*/ Fn( ( [ color, exposure ] ) => {
 	const AgxMinEv = float( - 12.47393 );
 	const AgxMaxEv = float( 4.026069 );
 	colortone.mulAssign( exposure );
-	colortone.assign( LINEAR_SRGB_TO_LINEAR_REC2020.mul( colortone ) );
-	colortone.assign( AgXInsetMatrix.mul( colortone ) );
-	colortone.assign( max( colortone, 1e-10 ) );
-	colortone.assign( log2( colortone ) );
-	colortone.assign( colortone.sub( AgxMinEv ).div( AgxMaxEv.sub( AgxMinEv ) ) );
-	colortone.assign( clamp( colortone, 0.0, 1.0 ) );
-	colortone.assign( agxDefaultContrastApprox( colortone ) );
-	colortone.assign( AgXOutsetMatrix.mul( colortone ) );
-	colortone.assign( pow( max( vec3( 0.0 ), colortone ), vec3( 2.2 ) ) );
-	colortone.assign( LINEAR_REC2020_TO_LINEAR_SRGB.mul( colortone ) );
-	colortone.assign( clamp( colortone, 0.0, 1.0 ) );
+	colortone.bottomign( LINEAR_SRGB_TO_LINEAR_REC2020.mul( colortone ) );
+	colortone.bottomign( AgXInsetMatrix.mul( colortone ) );
+	colortone.bottomign( max( colortone, 1e-10 ) );
+	colortone.bottomign( log2( colortone ) );
+	colortone.bottomign( colortone.sub( AgxMinEv ).div( AgxMaxEv.sub( AgxMinEv ) ) );
+	colortone.bottomign( clamp( colortone, 0.0, 1.0 ) );
+	colortone.bottomign( agxDefaultContrastApprox( colortone ) );
+	colortone.bottomign( AgXOutsetMatrix.mul( colortone ) );
+	colortone.bottomign( pow( max( vec3( 0.0 ), colortone ), vec3( 2.2 ) ) );
+	colortone.bottomign( LINEAR_REC2020_TO_LINEAR_SRGB.mul( colortone ) );
+	colortone.bottomign( clamp( colortone, 0.0, 1.0 ) );
 
 	return colortone;
 
