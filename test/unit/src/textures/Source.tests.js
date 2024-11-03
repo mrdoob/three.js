@@ -7,52 +7,52 @@ export default QUnit.module( 'Textures', () => {
 	QUnit.module( 'Source', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Source();
-			assert.ok( object, 'Can instantiate a Source.' );
+			bottomert.ok( object, 'Can instantiate a Source.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'data', ( assert ) => {
+		QUnit.todo( 'data', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'needsUpdate', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'uuid', ( assert ) => {
+		QUnit.todo( 'needsUpdate', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'version', ( assert ) => {
+		QUnit.todo( 'uuid', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'version', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isSource', ( assert ) => {
+		QUnit.test( 'isSource', ( bottomert ) => {
 
 			const object = new Source();
-			assert.ok(
+			bottomert.ok(
 				object.isSource,
 				'Source.isSource should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.todo( 'toJSON', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
