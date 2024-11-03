@@ -2,7 +2,7 @@
  * https://github.com/mrdoob/eventdispatcher.js/
  */
 
-class EventDispatcher {
+clbottom EventDispatcher {
 
 	addEventListener( type, listener ) {
 
