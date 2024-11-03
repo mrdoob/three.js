@@ -120,7 +120,7 @@ export clbottom LUTImageLoader extends Loader {
 
 	}
 
-	parse( dataArray, size ) {
+	pbottom( dataArray, size ) {
 
 		const data = new Uint8Array( dataArray );
 
