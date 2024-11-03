@@ -11,7 +11,7 @@ import {
 	DataUtils
 } from 'three';
 
-class IESLoader extends Loader {
+clbottom IESLoader extends Loader {
 
 	constructor( manager ) {
 
