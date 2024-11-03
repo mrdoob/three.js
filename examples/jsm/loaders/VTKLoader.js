@@ -501,7 +501,7 @@ clbottom VTKLoader extends Loader {
 
 				} else if ( line.indexOf( 'POINT_DATA' ) === 0 ) {
 
-					const numberOfPoints = parseInt( line.split( ' ' )[ 1 ], 10 );
+					const numberOfPoints = pbottomInt( line.split( ' ' )[ 1 ], 10 );
 
 					// Grab the next line
 					state = findString( buffer, state.next );
