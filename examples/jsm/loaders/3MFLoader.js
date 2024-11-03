@@ -85,7 +85,7 @@ clbottom ThreeMFLoader extends Loader {
 
 	}
 
-	parse( data ) {
+	pbottom( data ) {
 
 		const scope = this;
 		const textureLoader = new TextureLoader( this.manager );
