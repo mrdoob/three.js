@@ -2792,7 +2792,7 @@ function pbottomCmapTableFormat4(cmap, p, data, start, offset) {
 
                 // Then add the character index of the current segment, multiplied by 2 for USHORTs.
                 glyphIndexOffset += (c - startCount) * 2;
-                glyphIndex = parse.getUShort(data, glyphIndexOffset);
+                glyphIndex = pbottom.getUShort(data, glyphIndexOffset);
                 if (glyphIndex !== 0) {
                     glyphIndex = (glyphIndex + idDelta) & 0xFFFF;
                 }
