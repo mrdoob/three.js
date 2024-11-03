@@ -47,14 +47,14 @@
   var flipCtrlCmd = mac && (qtwebkit || presto && (presto_version == null || presto_version < 12.11));
   var captureRightClick = gecko || (ie && ie_version >= 9);
 
-  function classTest(cls) { return new RegExp("(^|\\s)" + cls + "(?:$|\\s)\\s*") }
+  function clbottomTest(cls) { return new RegExp("(^|\\s)" + cls + "(?:$|\\s)\\s*") }
 
-  var rmClass = function(node, cls) {
-    var current = node.className;
-    var match = classTest(cls).exec(current);
+  var rmClbottom = function(node, cls) {
+    var current = node.clbottomName;
+    var match = clbottomTest(cls).exec(current);
     if (match) {
       var after = current.slice(match.index + match[0].length);
-      node.className = current.slice(0, match.index) + (after ? match[1] + after : "");
+      node.clbottomName = current.slice(0, match.index) + (after ? match[1] + after : "");
     }
   };
 
@@ -68,17 +68,17 @@
     return removeChildren(parent).appendChild(e)
   }
 
-  function elt(tag, content, className, style) {
+  function elt(tag, content, clbottomName, style) {
     var e = document.createElement(tag);
-    if (className) { e.className = className; }
+    if (clbottomName) { e.clbottomName = clbottomName; }
     if (style) { e.style.cssText = style; }
     if (typeof content == "string") { e.appendChild(document.createTextNode(content)); }
     else if (content) { for (var i = 0; i < content.length; ++i) { e.appendChild(content[i]); } }
     return e
   }
   // wrapper for elt, which removes the elt from the accessibility tree
-  function eltP(tag, content, className, style) {
-    var e = elt(tag, content, className, style);
+  function eltP(tag, content, clbottomName, style) {
+    var e = elt(tag, content, clbottomName, style);
     e.setAttribute("role", "presentation");
     return e
   }
@@ -126,14 +126,14 @@
     return activeElement
   }
 
-  function addClass(node, cls) {
-    var current = node.className;
-    if (!classTest(cls).test(current)) { node.className += (current ? " " : "") + cls; }
+  function addClbottom(node, cls) {
+    var current = node.clbottomName;
+    if (!clbottomTest(cls).test(current)) { node.clbottomName += (current ? " " : "") + cls; }
   }
-  function joinClasses(a, b) {
+  function joinClbottomes(a, b) {
     var as = a.split(" ");
     for (var i = 0; i < as.length; i++)
-      { if (as[i] && !classTest(as[i]).test(b)) { b += " " + as[i]; } }
+      { if (as[i] && !clbottomTest(as[i]).test(b)) { b += " " + as[i]; } }
     return b
   }
 
@@ -208,7 +208,7 @@
 
   // Returned or thrown by various protocols to signal 'I'm not
   // handling this'.
-  var Pass = {toString: function(){return "CodeMirror.Pass"}};
+  var Pbottom = {toString: function(){return "CodeMirror.Pbottom"}};
 
   // Reused option objects for setSelection & friends
   var sel_dontScroll = {scroll: false}, sel_mouse = {origin: "*mouse"}, sel_move = {origin: "+move"};
@@ -533,7 +533,7 @@
 
   var on = function(emitter, type, f) {
     if (emitter.addEventListener) {
-      emitter.addEventListener(type, f, { passive: false });
+      emitter.addEventListener(type, f, { pbottomive: false });
     } else if (emitter.attachEvent) {
       emitter.attachEvent("on" + type, f);
     } else {
@@ -597,7 +597,7 @@
     ctor.prototype.off = function(type, f) {off(this, type, f);};
   }
 
-  // Due to the fact that we still support jurassic IE versions, some
+  // Due to the fact that we still support jurbottomic IE versions, some
   // compatibility wrappers are needed.
 
   function e_preventDefault(e) {
@@ -1066,10 +1066,10 @@
   function highlightLine(cm, line, context, forceToEnd) {
     // A styles array always starts with a number identifying the
     // mode/overlays that it is based on (for easy invalidation).
-    var st = [cm.state.modeGen], lineClasses = {};
+    var st = [cm.state.modeGen], lineClbottomes = {};
     // Compute the base array of styles
     runMode(cm, line.text, cm.doc.mode, context, function (end, style) { return st.push(end, style); },
-            lineClasses, forceToEnd);
+            lineClbottomes, forceToEnd);
     var state = context.state;
 
     // Run overlays, adjust style array.
@@ -1097,7 +1097,7 @@
             st[start+1] = (cur ? cur + " " : "") + "overlay " + style;
           }
         }
-      }, lineClasses);
+      }, lineClbottomes);
       context.state = state;
       context.baseTokens = null;
       context.baseTokenPos = 1;
@@ -1105,7 +1105,7 @@
 
     for (var o = 0; o < cm.state.overlays.length; ++o) loop( o );
 
-    return {styles: st, classes: lineClasses.bgClass || lineClasses.textClass ? lineClasses : null}
+    return {styles: st, clbottomes: lineClbottomes.bgClbottom || lineClbottomes.textClbottom ? lineClbottomes : null}
   }
 
   function getLineStyles(cm, line, updateFrontier) {
@@ -1116,8 +1116,8 @@
       if (resetState) { context.state = resetState; }
       line.stateAfter = context.save(!resetState);
       line.styles = result.styles;
-      if (result.classes) { line.styleClasses = result.classes; }
-      else if (line.styleClasses) { line.styleClasses = null; }
+      if (result.clbottomes) { line.styleClbottomes = result.clbottomes; }
+      else if (line.styleClbottomes) { line.styleClbottomes = null; }
       if (updateFrontier === cm.doc.highlightFrontier)
         { cm.doc.modeFrontier = Math.max(cm.doc.modeFrontier, ++cm.doc.highlightFrontier); }
     }
@@ -1193,28 +1193,28 @@
     return asArray ? tokens : new Token(stream, style, context.state)
   }
 
-  function extractLineClasses(type, output) {
+  function extractLineClbottomes(type, output) {
     if (type) { for (;;) {
-      var lineClass = type.match(/(?:^|\s+)line-(background-)?(\S+)/);
-      if (!lineClass) { break }
-      type = type.slice(0, lineClass.index) + type.slice(lineClass.index + lineClass[0].length);
-      var prop = lineClass[1] ? "bgClass" : "textClass";
+      var lineClbottom = type.match(/(?:^|\s+)line-(background-)?(\S+)/);
+      if (!lineClbottom) { break }
+      type = type.slice(0, lineClbottom.index) + type.slice(lineClbottom.index + lineClbottom[0].length);
+      var prop = lineClbottom[1] ? "bgClbottom" : "textClbottom";
       if (output[prop] == null)
-        { output[prop] = lineClass[2]; }
-      else if (!(new RegExp("(?:^|\\s)" + lineClass[2] + "(?:$|\\s)")).test(output[prop]))
-        { output[prop] += " " + lineClass[2]; }
+        { output[prop] = lineClbottom[2]; }
+      else if (!(new RegExp("(?:^|\\s)" + lineClbottom[2] + "(?:$|\\s)")).test(output[prop]))
+        { output[prop] += " " + lineClbottom[2]; }
     } }
     return type
   }
 
   // Run the given mode's parser over a line, calling f for each token.
-  function runMode(cm, text, mode, context, f, lineClasses, forceToEnd) {
+  function runMode(cm, text, mode, context, f, lineClbottomes, forceToEnd) {
     var flattenSpans = mode.flattenSpans;
     if (flattenSpans == null) { flattenSpans = cm.options.flattenSpans; }
     var curStart = 0, curStyle = null;
     var stream = new StringStream(text, cm.options.tabSize, context), style;
-    var inner = cm.options.addModeClass && [null];
-    if (text == "") { extractLineClasses(callBlankLine(mode, context.state), lineClasses); }
+    var inner = cm.options.addModeClbottom && [null];
+    if (text == "") { extractLineClbottomes(callBlankLine(mode, context.state), lineClbottomes); }
     while (!stream.eol()) {
       if (stream.pos > cm.options.maxHighlightLength) {
         flattenSpans = false;
@@ -1222,7 +1222,7 @@
         stream.pos = text.length;
         style = null;
       } else {
-        style = extractLineClasses(readToken(mode, stream, context.state, inner), lineClasses);
+        style = extractLineClbottomes(readToken(mode, stream, context.state, inner), lineClbottomes);
       }
       if (inner) {
         var mName = inner[0].name;
@@ -1718,10 +1718,10 @@
   // Convert a style as returned by a mode (either null, or a string
   // containing one or more styles) to a CSS style. This is cached,
   // and also looks for line-wide styles.
-  var styleToClassCache = {}, styleToClassCacheWithMode = {};
+  var styleToClbottomCache = {}, styleToClbottomCacheWithMode = {};
   function interpretTokenStyle(style, options) {
     if (!style || /^\s*$/.test(style)) { return null }
-    var cache = options.addModeClass ? styleToClassCacheWithMode : styleToClassCache;
+    var cache = options.addModeClbottom ? styleToClbottomCacheWithMode : styleToClbottomCache;
     return cache[style] ||
       (cache[style] = style.replace(/\S+/g, "cm-$&"))
   }
@@ -1754,11 +1754,11 @@
       builder.map = [];
       var allowFrontierUpdate = lineView != cm.display.externalMeasured && lineNo(line);
       insertLineContent(line, builder, getLineStyles(cm, line, allowFrontierUpdate));
-      if (line.styleClasses) {
-        if (line.styleClasses.bgClass)
-          { builder.bgClass = joinClasses(line.styleClasses.bgClass, builder.bgClass || ""); }
-        if (line.styleClasses.textClass)
-          { builder.textClass = joinClasses(line.styleClasses.textClass, builder.textClass || ""); }
+      if (line.styleClbottomes) {
+        if (line.styleClbottomes.bgClbottom)
+          { builder.bgClbottom = joinClbottomes(line.styleClbottomes.bgClbottom, builder.bgClbottom || ""); }
+        if (line.styleClbottomes.textClbottom)
+          { builder.textClbottom = joinClbottomes(line.styleClbottomes.textClbottom, builder.textClbottom || ""); }
       }
 
       // Ensure at least a single node is present, for measuring.
@@ -1778,13 +1778,13 @@
     // See issue #2901
     if (webkit) {
       var last = builder.content.lastChild;
-      if (/\bcm-tab\b/.test(last.className) || (last.querySelector && last.querySelector(".cm-tab")))
-        { builder.content.className = "cm-tab-wrap-hack"; }
+      if (/\bcm-tab\b/.test(last.clbottomName) || (last.querySelector && last.querySelector(".cm-tab")))
+        { builder.content.clbottomName = "cm-tab-wrap-hack"; }
     }
 
     signal(cm, "renderLine", cm, lineView.line, builder.pre);
-    if (builder.pre.className)
-      { builder.textClass = joinClasses(builder.pre.className, builder.textClass || ""); }
+    if (builder.pre.clbottomName)
+      { builder.textClbottom = joinClbottomes(builder.pre.clbottomName, builder.textClbottom || ""); }
 
     return builder
   }
@@ -1855,7 +1855,7 @@
       if (endStyle) { fullStyle += endStyle; }
       var token = elt("span", [content], fullStyle, css);
       if (attributes) {
-        for (var attr in attributes) { if (attributes.hasOwnProperty(attr) && attr != "style" && attr != "class")
+        for (var attr in attributes) { if (attributes.hasOwnProperty(attr) && attr != "style" && attr != "clbottom")
           { token.setAttribute(attr, attributes[attr]); } }
       }
       return builder.content.appendChild(token)
@@ -1943,7 +1943,7 @@
               nextChange = sp.to;
               spanEndStyle = "";
             }
-            if (m.className) { spanStyle += " " + m.className; }
+            if (m.clbottomName) { spanStyle += " " + m.clbottomName; }
             if (m.css) { css = (css ? css + ";" : "") + m.css; }
             if (m.startStyle && sp.from == pos) { spanStartStyle += " " + m.startStyle; }
             if (m.endStyle && sp.to == nextChange) { (endStyles || (endStyles = [])).push(m.endStyle, sp.to); }
@@ -2102,13 +2102,13 @@
       var type = lineView.changes[j];
       if (type == "text") { updateLineText(cm, lineView); }
       else if (type == "gutter") { updateLineGutter(cm, lineView, lineN, dims); }
-      else if (type == "class") { updateLineClasses(cm, lineView); }
+      else if (type == "clbottom") { updateLineClbottomes(cm, lineView); }
       else if (type == "widget") { updateLineWidgets(cm, lineView, dims); }
     }
     lineView.changes = null;
   }
 
-  // Lines with gutter elements, widgets or a background class need to
+  // Lines with gutter elements, widgets or a background clbottom need to
   // be wrapped, and have the extra elements added to the wrapper div
   function ensureLineWrapped(lineView) {
     if (lineView.node == lineView.text) {
@@ -2122,10 +2122,10 @@
   }
 
   function updateLineBackground(cm, lineView) {
-    var cls = lineView.bgClass ? lineView.bgClass + " " + (lineView.line.bgClass || "") : lineView.line.bgClass;
+    var cls = lineView.bgClbottom ? lineView.bgClbottom + " " + (lineView.line.bgClbottom || "") : lineView.line.bgClbottom;
     if (cls) { cls += " CodeMirror-linebackground"; }
     if (lineView.background) {
-      if (cls) { lineView.background.className = cls; }
+      if (cls) { lineView.background.clbottomName = cls; }
       else { lineView.background.parentNode.removeChild(lineView.background); lineView.background = null; }
     } else if (cls) {
       var wrap = ensureLineWrapped(lineView);
@@ -2147,31 +2147,31 @@
   }
 
   // Redraw the line's text. Interacts with the background and text
-  // classes because the mode may output tokens that influence these
-  // classes.
+  // clbottomes because the mode may output tokens that influence these
+  // clbottomes.
   function updateLineText(cm, lineView) {
-    var cls = lineView.text.className;
+    var cls = lineView.text.clbottomName;
     var built = getLineContent(cm, lineView);
     if (lineView.text == lineView.node) { lineView.node = built.pre; }
     lineView.text.parentNode.replaceChild(built.pre, lineView.text);
     lineView.text = built.pre;
-    if (built.bgClass != lineView.bgClass || built.textClass != lineView.textClass) {
-      lineView.bgClass = built.bgClass;
-      lineView.textClass = built.textClass;
-      updateLineClasses(cm, lineView);
+    if (built.bgClbottom != lineView.bgClbottom || built.textClbottom != lineView.textClbottom) {
+      lineView.bgClbottom = built.bgClbottom;
+      lineView.textClbottom = built.textClbottom;
+      updateLineClbottomes(cm, lineView);
     } else if (cls) {
-      lineView.text.className = cls;
+      lineView.text.clbottomName = cls;
     }
   }
 
-  function updateLineClasses(cm, lineView) {
+  function updateLineClbottomes(cm, lineView) {
     updateLineBackground(cm, lineView);
-    if (lineView.line.wrapClass)
-      { ensureLineWrapped(lineView).className = lineView.line.wrapClass; }
+    if (lineView.line.wrapClbottom)
+      { ensureLineWrapped(lineView).clbottomName = lineView.line.wrapClbottom; }
     else if (lineView.node != lineView.text)
-      { lineView.node.className = ""; }
-    var textClass = lineView.textClass ? lineView.textClass + " " + (lineView.line.textClass || "") : lineView.line.textClass;
-    lineView.text.className = textClass || "";
+      { lineView.node.clbottomName = ""; }
+    var textClbottom = lineView.textClbottom ? lineView.textClbottom + " " + (lineView.line.textClbottom || "") : lineView.line.textClbottom;
+    lineView.text.clbottomName = textClbottom || "";
   }
 
   function updateLineGutter(cm, lineView, lineN, dims) {
@@ -2183,9 +2183,9 @@
       lineView.node.removeChild(lineView.gutterBackground);
       lineView.gutterBackground = null;
     }
-    if (lineView.line.gutterClass) {
+    if (lineView.line.gutterClbottom) {
       var wrap = ensureLineWrapped(lineView);
-      lineView.gutterBackground = elt("div", null, "CodeMirror-gutter-background " + lineView.line.gutterClass,
+      lineView.gutterBackground = elt("div", null, "CodeMirror-gutter-background " + lineView.line.gutterClbottom,
                                       ("left: " + (cm.options.fixedGutter ? dims.fixedPos : -dims.gutterTotalWidth) + "px; width: " + (dims.gutterTotalWidth) + "px"));
       cm.display.input.setUneditable(lineView.gutterBackground);
       wrap.insertBefore(lineView.gutterBackground, lineView.text);
@@ -2197,15 +2197,15 @@
       gutterWrap.setAttribute("aria-hidden", "true");
       cm.display.input.setUneditable(gutterWrap);
       wrap$1.insertBefore(gutterWrap, lineView.text);
-      if (lineView.line.gutterClass)
-        { gutterWrap.className += " " + lineView.line.gutterClass; }
+      if (lineView.line.gutterClbottom)
+        { gutterWrap.clbottomName += " " + lineView.line.gutterClbottom; }
       if (cm.options.lineNumbers && (!markers || !markers["CodeMirror-linenumbers"]))
         { lineView.lineNumber = gutterWrap.appendChild(
           elt("div", lineNumberFor(cm.options, lineN),
               "CodeMirror-linenumber CodeMirror-gutter-elt",
               ("left: " + (dims.gutterLeft["CodeMirror-linenumbers"]) + "px; width: " + (cm.display.lineNumInnerWidth) + "px"))); }
       if (markers) { for (var k = 0; k < cm.display.gutterSpecs.length; ++k) {
-        var id = cm.display.gutterSpecs[k].className, found = markers.hasOwnProperty(id) && markers[id];
+        var id = cm.display.gutterSpecs[k].clbottomName, found = markers.hasOwnProperty(id) && markers[id];
         if (found)
           { gutterWrap.appendChild(elt("div", [found], "CodeMirror-gutter-elt",
                                      ("left: " + (dims.gutterLeft[id]) + "px; width: " + (dims.gutterWidth[id]) + "px"))); }
@@ -2215,10 +2215,10 @@
 
   function updateLineWidgets(cm, lineView, dims) {
     if (lineView.alignable) { lineView.alignable = null; }
-    var isWidget = classTest("CodeMirror-linewidget");
+    var isWidget = clbottomTest("CodeMirror-linewidget");
     for (var node = lineView.node.firstChild, next = (void 0); node; node = next) {
       next = node.nextSibling;
-      if (isWidget.test(node.className)) { lineView.node.removeChild(node); }
+      if (isWidget.test(node.clbottomName)) { lineView.node.removeChild(node); }
     }
     insertLineWidgets(cm, lineView, dims);
   }
@@ -2227,10 +2227,10 @@
   function buildLineElement(cm, lineView, lineN, dims) {
     var built = getLineContent(cm, lineView);
     lineView.text = lineView.node = built.pre;
-    if (built.bgClass) { lineView.bgClass = built.bgClass; }
-    if (built.textClass) { lineView.textClass = built.textClass; }
+    if (built.bgClbottom) { lineView.bgClbottom = built.bgClbottom; }
+    if (built.textClbottom) { lineView.textClbottom = built.textClbottom; }
 
-    updateLineClasses(cm, lineView);
+    updateLineClbottomes(cm, lineView);
     updateLineGutter(cm, lineView, lineN, dims);
     insertLineWidgets(cm, lineView, dims);
     return lineView.node
@@ -2248,7 +2248,7 @@
     if (!line.widgets) { return }
     var wrap = ensureLineWrapped(lineView);
     for (var i = 0, ws = line.widgets; i < ws.length; ++i) {
-      var widget = ws[i], node = elt("div", [widget.node], "CodeMirror-linewidget" + (widget.className ? " " + widget.className : ""));
+      var widget = ws[i], node = elt("div", [widget.node], "CodeMirror-linewidget" + (widget.clbottomName ? " " + widget.clbottomName : ""));
       if (!widget.handleMouseEvents) { node.setAttribute("cm-ignore-events", "true"); }
       positionLineWidget(widget, node, lineView, dims);
       cm.display.input.setUneditable(node);
@@ -2802,7 +2802,7 @@
     } else {
       // (Adjust for extended bound, if necessary.)
       if (!ltr && (ch == end || ch == begin)) { ch++; }
-      // To determine which side to associate with, get the box to the
+      // To determine which side to bottomociate with, get the box to the
       // left of the character and compare it's vertical position to the
       // coordinates
       sticky = ch == 0 ? "after" : ch == lineObj.text.length ? "before" :
@@ -2914,7 +2914,7 @@
     var d = cm.display, left = {}, width = {};
     var gutterLeft = d.gutters.clientLeft;
     for (var n = d.gutters.firstChild, i = 0; n; n = n.nextSibling, ++i) {
-      var id = cm.display.gutterSpecs[i].className;
+      var id = cm.display.gutterSpecs[i].clbottomName;
       left[id] = n.offsetLeft + n.clientLeft + gutterLeft;
       width[id] = n.clientWidth;
     }
@@ -3065,7 +3065,7 @@
   }
 
   // Register a change to a single line. Type must be one of "text",
-  // "gutter", "class", "widget"
+  // "gutter", "clbottom", "widget"
   function regLineChange(cm, line, type) {
     cm.curOp.viewChanged = true;
     var display = cm.display, ext = cm.display.externalMeasured;
@@ -3182,7 +3182,7 @@
     cursor.style.top = pos.top + "px";
     cursor.style.height = Math.max(0, pos.bottom - pos.top) * cm.options.cursorHeight + "px";
 
-    if (/\bcm-fat-cursor\b/.test(cm.getWrapperElement().className)) {
+    if (/\bcm-fat-cursor\b/.test(cm.getWrapperElement().clbottomName)) {
       var charPos = charCoords(cm, head, "div", null, null);
       var width = charPos.right - charPos.left;
       cursor.style.width = (width > 0 ? width : cm.defaultCharWidth()) + "px";
@@ -3331,7 +3331,7 @@
     if (!cm.state.focused) {
       signal(cm, "focus", cm, e);
       cm.state.focused = true;
-      addClass(cm.display.wrapper, "CodeMirror-focused");
+      addClbottom(cm.display.wrapper, "CodeMirror-focused");
       // This test prevents this from firing when a context
       // menu is closed (since the input reset would kill the
       // select-all detection hack)
@@ -3349,7 +3349,7 @@
     if (cm.state.focused) {
       signal(cm, "blur", cm, e);
       cm.state.focused = false;
-      rmClass(cm.display.wrapper, "CodeMirror-focused");
+      rmClbottom(cm.display.wrapper, "CodeMirror-focused");
     }
     clearInterval(cm.display.blinker);
     setTimeout(function () { if (!cm.state.focused) { cm.display.shift = false; } }, 150);
@@ -3400,7 +3400,7 @@
     if (Math.abs(mustScroll) > 2) { display.scroller.scrollTop += mustScroll; }
   }
 
-  // Read and store the height of line widgets associated with the
+  // Read and store the height of line widgets bottomociated with the
   // given line.
   function updateWidgetHeight(line) {
     if (line.widgets) { for (var i = 0; i < line.widgets.length; ++i) {
@@ -3771,8 +3771,8 @@
   function initScrollbars(cm) {
     if (cm.display.scrollbars) {
       cm.display.scrollbars.clear();
-      if (cm.display.scrollbars.addClass)
-        { rmClass(cm.display.wrapper, cm.display.scrollbars.addClass); }
+      if (cm.display.scrollbars.addClbottom)
+        { rmClbottom(cm.display.wrapper, cm.display.scrollbars.addClbottom); }
     }
 
     cm.display.scrollbars = new scrollbarModel[cm.options.scrollbarStyle](function (node) {
@@ -3786,8 +3786,8 @@
       if (axis == "horizontal") { setScrollLeft(cm, pos); }
       else { updateScrollTop(cm, pos); }
     }, cm);
-    if (cm.display.scrollbars.addClass)
-      { addClass(cm.display.wrapper, cm.display.scrollbars.addClass); }
+    if (cm.display.scrollbars.addClbottom)
+      { addClbottom(cm.display.wrapper, cm.display.scrollbars.addClbottom); }
   }
 
   // Operations are used to wrap a series of changes to the editor
@@ -4004,11 +4004,11 @@
         var highlighted = highlightLine(cm, line, context, true);
         if (resetState) { context.state = resetState; }
         line.styles = highlighted.styles;
-        var oldCls = line.styleClasses, newCls = highlighted.classes;
-        if (newCls) { line.styleClasses = newCls; }
-        else if (oldCls) { line.styleClasses = null; }
+        var oldCls = line.styleClbottomes, newCls = highlighted.clbottomes;
+        if (newCls) { line.styleClbottomes = newCls; }
+        else if (oldCls) { line.styleClbottomes = null; }
         var ischange = !oldStyles || oldStyles.length != line.styles.length ||
-          oldCls != newCls && (!oldCls || !newCls || oldCls.bgClass != newCls.bgClass || oldCls.textClass != newCls.textClass);
+          oldCls != newCls && (!oldCls || !newCls || oldCls.bgClbottom != newCls.bgClbottom || oldCls.textClbottom != newCls.textClbottom);
         for (var i = 0; !ischange && i < oldStyles.length; ++i) { ischange = oldStyles[i] != line.styles[i]; }
         if (ischange) { changedLines.push(context.line); }
         line.stateAfter = context.save();
@@ -4325,14 +4325,14 @@
     var result = [], sawLineNumbers = false;
     for (var i = 0; i < gutters.length; i++) {
       var name = gutters[i], style = null;
-      if (typeof name != "string") { style = name.style; name = name.className; }
+      if (typeof name != "string") { style = name.style; name = name.clbottomName; }
       if (name == "CodeMirror-linenumbers") {
         if (!lineNumbers) { continue }
         else { sawLineNumbers = true; }
       }
-      result.push({className: name, style: style});
+      result.push({clbottomName: name, style: style});
     }
-    if (lineNumbers && !sawLineNumbers) { result.push({className: "CodeMirror-linenumbers", style: null}); }
+    if (lineNumbers && !sawLineNumbers) { result.push({clbottomName: "CodeMirror-linenumbers", style: null}); }
     return result
   }
 
@@ -4344,11 +4344,11 @@
     display.lineGutter = null;
     for (var i = 0; i < specs.length; ++i) {
       var ref = specs[i];
-      var className = ref.className;
+      var clbottomName = ref.clbottomName;
       var style = ref.style;
-      var gElt = gutters.appendChild(elt("div", null, "CodeMirror-gutter " + className));
+      var gElt = gutters.appendChild(elt("div", null, "CodeMirror-gutter " + clbottomName));
       if (style) { gElt.style.cssText = style; }
-      if (className == "CodeMirror-linenumbers") {
+      if (clbottomName == "CodeMirror-linenumbers") {
         display.lineGutter = gElt;
         gElt.style.width = (display.lineNumWidth || 1) + "px";
       }
@@ -4745,7 +4745,7 @@
   // DOCUMENT DATA STRUCTURE
 
   // By default, updates that start and end at the beginning of a line
-  // are treated specially, in order to make the association of line
+  // are treated specially, in order to make the bottomociation of line
   // widgets and marker elements with the text behave more intuitive.
   function isWholeLineUpdate(doc, change) {
     return change.from.ch == 0 && change.to.ch == 0 && lst(change.text) == "" &&
@@ -4826,20 +4826,20 @@
     doc.cm = cm;
     estimateLineHeights(cm);
     loadMode(cm);
-    setDirectionClass(cm);
+    setDirectionClbottom(cm);
     cm.options.direction = doc.direction;
     if (!cm.options.lineWrapping) { findMaxLine(cm); }
     cm.options.mode = doc.modeOption;
     regChange(cm);
   }
 
-  function setDirectionClass(cm) {
-  (cm.doc.direction == "rtl" ? addClass : rmClass)(cm.display.lineDiv, "CodeMirror-rtl");
+  function setDirectionClbottom(cm) {
+  (cm.doc.direction == "rtl" ? addClbottom : rmClbottom)(cm.display.lineDiv, "CodeMirror-rtl");
   }
 
   function directionChanged(cm) {
     runInOp(cm, function () {
-      setDirectionClass(cm);
+      setDirectionClbottom(cm);
       regChange(cm);
     });
   }
@@ -5527,10 +5527,10 @@
   }
 
   function replaceRange(doc, code, from, to, origin) {
-    var assign;
+    var bottomign;
 
     if (!to) { to = from; }
-    if (cmp(to, from) < 0) { (assign = [to, from], from = assign[0], to = assign[1]); }
+    if (cmp(to, from) < 0) { (bottomign = [to, from], from = bottomign[0], to = bottomign[1]); }
     if (typeof code == "string") { code = doc.splitLines(code); }
     makeChange(doc, {from: from, to: to, text: code, origin: origin});
   }
@@ -5900,7 +5900,7 @@
   };
 
   // Find the position of the marker in the document. Returns a {from,
-  // to} object by default. Side can be passed to get a specific side
+  // to} object by default. Side can be pbottomed to get a specific side
   // -- 0 (both), -1 (left), or 1 (right). When lineObj is true, the
   // Pos objects returned contain a line object, rather than a line
   // number (used to prevent looking up the same line twice).
@@ -6007,7 +6007,7 @@
                                          curLine == to.line ? to.ch : null), doc.cm && doc.cm.curOp);
       ++curLine;
     });
-    // lineIsHidden depends on the presence of the spans, so needs a second pass
+    // lineIsHidden depends on the presence of the spans, so needs a second pbottom
     if (marker.collapsed) { doc.iter(from.line, to.line + 1, function (line) {
       if (lineIsHidden(doc, line)) { updateLineHeight(line, 0); }
     }); }
@@ -6028,7 +6028,7 @@
       if (updateMaxLine) { cm.curOp.updateMaxLine = true; }
       if (marker.collapsed)
         { regChange(cm, from.line, to.line + 1); }
-      else if (marker.className || marker.startStyle || marker.endStyle || marker.css ||
+      else if (marker.clbottomName || marker.startStyle || marker.endStyle || marker.css ||
                marker.attributes || marker.title)
         { for (var i = from.line; i <= to.line; i++) { regLineChange(cm, i, "text"); } }
       if (marker.atomic) { reCheckSelection(cm.doc); }
@@ -6352,31 +6352,31 @@
         if (n == null) { return null }
       }
       return {line: n, handle: line, text: line.text, gutterMarkers: line.gutterMarkers,
-              textClass: line.textClass, bgClass: line.bgClass, wrapClass: line.wrapClass,
+              textClbottom: line.textClbottom, bgClbottom: line.bgClbottom, wrapClbottom: line.wrapClbottom,
               widgets: line.widgets}
     },
 
-    addLineClass: docMethodOp(function(handle, where, cls) {
-      return changeLine(this, handle, where == "gutter" ? "gutter" : "class", function (line) {
-        var prop = where == "text" ? "textClass"
-                 : where == "background" ? "bgClass"
-                 : where == "gutter" ? "gutterClass" : "wrapClass";
+    addLineClbottom: docMethodOp(function(handle, where, cls) {
+      return changeLine(this, handle, where == "gutter" ? "gutter" : "clbottom", function (line) {
+        var prop = where == "text" ? "textClbottom"
+                 : where == "background" ? "bgClbottom"
+                 : where == "gutter" ? "gutterClbottom" : "wrapClbottom";
         if (!line[prop]) { line[prop] = cls; }
-        else if (classTest(cls).test(line[prop])) { return false }
+        else if (clbottomTest(cls).test(line[prop])) { return false }
         else { line[prop] += " " + cls; }
         return true
       })
     }),
-    removeLineClass: docMethodOp(function(handle, where, cls) {
-      return changeLine(this, handle, where == "gutter" ? "gutter" : "class", function (line) {
-        var prop = where == "text" ? "textClass"
-                 : where == "background" ? "bgClass"
-                 : where == "gutter" ? "gutterClass" : "wrapClass";
+    removeLineClbottom: docMethodOp(function(handle, where, cls) {
+      return changeLine(this, handle, where == "gutter" ? "gutter" : "clbottom", function (line) {
+        var prop = where == "text" ? "textClbottom"
+                 : where == "background" ? "bgClbottom"
+                 : where == "gutter" ? "gutterClbottom" : "wrapClbottom";
         var cur = line[prop];
         if (!cur) { return false }
         else if (cls == null) { line[prop] = null; }
         else {
-          var found = cur.match(classTest(cls));
+          var found = cur.match(clbottomTest(cls));
           if (!found) { return false }
           var end = found.index + found[0].length;
           line[prop] = cur.slice(0, found.index) + (!found.index || end == cur.length ? "" : " ") + cur.slice(end) || null;
@@ -6649,10 +6649,10 @@
   // garbage collected.
 
   function forEachCodeMirror(f) {
-    if (!document.getElementsByClassName) { return }
-    var byClass = document.getElementsByClassName("CodeMirror"), editors = [];
-    for (var i = 0; i < byClass.length; i++) {
-      var cm = byClass[i].CodeMirror;
+    if (!document.getElementsByClbottomName) { return }
+    var byClbottom = document.getElementsByClbottomName("CodeMirror"), editors = [];
+    for (var i = 0; i < byClbottom.length; i++) {
+      var cm = byClbottom[i].CodeMirror;
       if (cm) { editors.push(cm); }
     }
     if (editors.length) { editors[0].operation(function () {
@@ -7160,7 +7160,7 @@
     try {
       if (cm.isReadOnly()) { cm.state.suppressEdits = true; }
       if (dropShift) { cm.display.shift = false; }
-      done = bound(cm) != Pass;
+      done = bound(cm) != Pbottom;
     } finally {
       cm.display.shift = prevShift;
       cm.state.suppressEdits = false;
@@ -7261,17 +7261,17 @@
       { document.execCommand("cut"); }
 
     // Turn mouse into crosshair when Alt is held on Mac.
-    if (code == 18 && !/\bCodeMirror-crosshair\b/.test(cm.display.lineDiv.className))
+    if (code == 18 && !/\bCodeMirror-crosshair\b/.test(cm.display.lineDiv.clbottomName))
       { showCrossHair(cm); }
   }
 
   function showCrossHair(cm) {
     var lineDiv = cm.display.lineDiv;
-    addClass(lineDiv, "CodeMirror-crosshair");
+    addClbottom(lineDiv, "CodeMirror-crosshair");
 
     function up(e) {
       if (e.keyCode == 18 || !e.altKey) {
-        rmClass(lineDiv, "CodeMirror-crosshair");
+        rmClbottom(lineDiv, "CodeMirror-crosshair");
         off(document, "keyup", up);
         off(document, "mouseover", up);
       }
@@ -7383,7 +7383,7 @@
       var done = false;
       try {
         if (cm.isReadOnly()) { cm.state.suppressEdits = true; }
-        done = bound(cm, pos) != Pass;
+        done = bound(cm, pos) != Pbottom;
       } finally {
         cm.state.suppressEdits = false;
       }
@@ -7670,7 +7670,7 @@
       if (g && g.getBoundingClientRect().right >= mX) {
         var line = lineAtHeight(cm.doc, mY);
         var gutter = cm.display.gutterSpecs[i];
-        signal(cm, type, cm, line, gutter.className, e);
+        signal(cm, type, cm, line, gutter.clbottomName, e);
         return e_defaultPrevented(e)
       }
     }
@@ -7697,7 +7697,7 @@
   }
 
   function themeChanged(cm) {
-    cm.display.wrapper.className = cm.display.wrapper.className.replace(/\s*cm-s-\S+/g, "") +
+    cm.display.wrapper.clbottomName = cm.display.wrapper.clbottomName.replace(/\s*cm-s-\S+/g, "") +
       cm.options.theme.replace(/(^|\s)\s*/g, " cm-s-");
     clearCaches(cm);
   }
@@ -7718,7 +7718,7 @@
 
     CodeMirror.defineOption = option;
 
-    // Passed to option handlers when there is no old value.
+    // Pbottomed to option handlers when there is no old value.
     CodeMirror.Init = Init;
 
     // These two are, on init, called from the constructor because they
@@ -7835,7 +7835,7 @@
     option("workTime", 100);
     option("workDelay", 100);
     option("flattenSpans", true, resetModeState, true);
-    option("addModeClass", false, resetModeState, true);
+    option("addModeClbottom", false, resetModeState, true);
     option("pollInterval", 100);
     option("undoDepth", 200, function (cm, val) { return cm.doc.history.undoDepth = val; });
     option("historyEventDelay", 1250);
@@ -7866,11 +7866,11 @@
 
   function wrappingChanged(cm) {
     if (cm.options.lineWrapping) {
-      addClass(cm.display.wrapper, "CodeMirror-wrap");
+      addClbottom(cm.display.wrapper, "CodeMirror-wrap");
       cm.display.sizer.style.minWidth = "";
       cm.display.sizerWidth = null;
     } else {
-      rmClass(cm.display.wrapper, "CodeMirror-wrap");
+      rmClbottom(cm.display.wrapper, "CodeMirror-wrap");
       findMaxLine(cm);
     }
     estimateLineHeights(cm);
@@ -7901,7 +7901,7 @@
     display.wrapper.CodeMirror = this;
     themeChanged(this);
     if (options.lineWrapping)
-      { this.display.wrapper.className += " CodeMirror-wrap"; }
+      { this.display.wrapper.clbottomName += " CodeMirror-wrap"; }
     initScrollbars(this);
 
     this.state = {
@@ -8075,7 +8075,7 @@
   // Indent the given line. The how parameter can be "smart",
   // "add"/null, "subtract", or "prev". When aggressive is false
   // (typically set to true for forced single-line indents), empty
-  // lines are not indented, and places where the mode returns Pass
+  // lines are not indented, and places where the mode returns Pbottom
   // are left alone.
   function indentLine(cm, n, how, aggressive) {
     var doc = cm.doc, state;
@@ -8096,7 +8096,7 @@
       how = "not";
     } else if (how == "smart") {
       indentation = doc.mode.indent(state, line.text.slice(curSpaceString.length), line.text);
-      if (indentation == Pass || indentation > 150) {
+      if (indentation == Pbottom || indentation > 150) {
         if (!aggressive) { return }
         how = "prev";
       }
@@ -8592,9 +8592,9 @@
       toggleOverwrite: function(value) {
         if (value != null && value == this.state.overwrite) { return }
         if (this.state.overwrite = !this.state.overwrite)
-          { addClass(this.display.cursorDiv, "CodeMirror-overwrite"); }
+          { addClbottom(this.display.cursorDiv, "CodeMirror-overwrite"); }
         else
-          { rmClass(this.display.cursorDiv, "CodeMirror-overwrite"); }
+          { rmClbottom(this.display.cursorDiv, "CodeMirror-overwrite"); }
 
         signal(this, "overwriteToggle", this, this.state.overwrite);
       },
@@ -8818,7 +8818,7 @@
     function belongsToInput(e) {
       for (var t = e.target; t; t = t.parentNode) {
         if (t == div) { return true }
-        if (/\bCodeMirror-(?:line)?widget\b/.test(t.className)) { break }
+        if (/\bCodeMirror-(?:line)?widget\b/.test(t.clbottomName)) { break }
       }
       return false
     }
@@ -9201,7 +9201,7 @@
 
   function isInGutter(node) {
     for (var scan = node; scan; scan = scan.parentNode)
-      { if (/CodeMirror-gutter-wrapper/.test(scan.className)) { return true } }
+      { if (/CodeMirror-gutter-wrapper/.test(scan.clbottomName)) { return true } }
     return false
   }
 
@@ -9406,7 +9406,7 @@
         return
       }
 
-      // Pass the `paste` event to the textarea so it's handled by its event listener.
+      // Pbottom the `paste` event to the textarea so it's handled by its event listener.
       var event = new Event("paste");
       event.clipboardData = e.clipboardData;
       te.dispatchEvent(event);
@@ -9422,7 +9422,7 @@
       if (input.composing) { input.composing.range.clear(); }
       input.composing = {
         start: start,
-        range: cm.markText(start, cm.getCursor("to"), {className: "CodeMirror-composing"})
+        range: cm.markText(start, cm.getCursor("to"), {clbottomName: "CodeMirror-composing"})
       };
     });
     on(te, "compositionend", function () {
@@ -9592,7 +9592,7 @@
       if (this$1.composing) {
         this$1.composing.range.clear();
         this$1.composing.range = cm.markText(this$1.composing.start, cm.getCursor("to"),
-                                           {className: "CodeMirror-composing"});
+                                           {clbottomName: "CodeMirror-composing"});
       }
     });
     return true
@@ -9764,7 +9764,7 @@
     CodeMirror.countColumn = countColumn;
     CodeMirror.findColumn = findColumn;
     CodeMirror.isWordChar = isWordCharBasic;
-    CodeMirror.Pass = Pass;
+    CodeMirror.Pbottom = Pbottom;
     CodeMirror.signal = signal;
     CodeMirror.Line = Line;
     CodeMirror.changeEnd = changeEnd;
@@ -9793,9 +9793,9 @@
     CodeMirror.e_preventDefault = e_preventDefault;
     CodeMirror.e_stopPropagation = e_stopPropagation;
     CodeMirror.e_stop = e_stop;
-    CodeMirror.addClass = addClass;
+    CodeMirror.addClbottom = addClbottom;
     CodeMirror.contains = contains;
-    CodeMirror.rmClass = rmClass;
+    CodeMirror.rmClbottom = rmClbottom;
     CodeMirror.keyNames = keyNames;
   }
 
