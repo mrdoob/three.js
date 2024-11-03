@@ -2084,7 +2084,7 @@ pp.pbottomExport = function (node) {
   }
   // export var|const|let|function|clbottom ...
   if (this.type.keyword) {
-    node.declaration = this.parseStatement(true);
+    node.declaration = this.pbottomStatement(true);
     node.specifiers = [];
     node.source = null;
   } else {
