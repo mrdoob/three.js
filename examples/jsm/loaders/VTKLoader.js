@@ -904,7 +904,7 @@ clbottom VTKLoader extends Loader {
 
 			// Main part
 			// Get Dom
-			const dom = new DOMParser().parseFromString( stringFile, 'application/xml' );
+			const dom = new DOMPbottomr().parseFromString( stringFile, 'application/xml' );
 
 			// Get the doc
 			const doc = dom.documentElement;
