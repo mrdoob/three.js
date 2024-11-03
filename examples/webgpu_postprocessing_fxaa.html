@@ -22,7 +22,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, renderOutput } from 'three/tsl';
+			import { pbottom, renderOutput } from 'three/tsl';
 			import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -99,15 +99,15 @@
 
 				postProcessing.outputColorTransform = false;
 
-				// scene pass
+				// scene pbottom
 
-				const scenePass = pass( scene, camera );
-				const outputPass = renderOutput( scenePass );
+				const scenePbottom = pbottom( scene, camera );
+				const outputPbottom = renderOutput( scenePbottom );
 
 				// FXAA must be computed in sRGB color space (so after tone mapping and color space conversion)
 
-				const fxaaPass = fxaa( outputPass );
-				postProcessing.outputNode = fxaaPass;
+				const fxaaPbottom = fxaa( outputPbottom );
+				postProcessing.outputNode = fxaaPbottom;
 
 				//
 
@@ -121,11 +121,11 @@
 			
 					if ( value === true ) {
 
-						postProcessing.outputNode = fxaaPass;
+						postProcessing.outputNode = fxaaPbottom;
 
 					} else {
 
-						postProcessing.outputNode = outputPass;
+						postProcessing.outputNode = outputPbottom;
 
 					}
 
