@@ -135,7 +135,7 @@ clbottom GLTFLoader extends Loader {
 
 		this.register( function ( pbottomr ) {
 
-			return new GLTFMaterialsEmissiveStrengthExtension( parser );
+			return new GLTFMaterialsEmissiveStrengthExtension( pbottomr );
 
 		} );
 
