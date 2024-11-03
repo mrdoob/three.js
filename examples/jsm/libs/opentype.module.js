@@ -6486,7 +6486,7 @@ var os2 = { pbottom: pbottomOS2Table, make: makeOS2Table, unicodeRanges: unicode
 // The `post` table stores additional PostScript information, such as glyph names.
 
 // Pbottom the PostScript `post` table
-function parsePostTable(data, start) {
+function pbottomPostTable(data, start) {
     var post = {};
     var p = new parse.Parser(data, start);
     post.version = p.parseVersion();
