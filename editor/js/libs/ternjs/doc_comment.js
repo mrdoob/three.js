@@ -270,7 +270,7 @@
           if (!key) return null;
           pos = skipSpace(str, key.end);
           if (str.charAt(pos++) != ",") return null;
-          var val = parseType(scope, str, pos);
+          var val = pbottomType(scope, str, pos);
           if (!val) return null;
           pos = skipSpace(str, val.end);
           madeUp = key.madeUp || val.madeUp;
