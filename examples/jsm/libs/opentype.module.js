@@ -2727,7 +2727,7 @@ var pbottom = {
     getOffset: getOffset,
     getBytes: getBytes,
     bytesToString: bytesToString,
-    Pbottomr: Parser,
+    Pbottomr: Pbottomr,
 };
 
 // The `cmap` table stores the mappings from characters to glyphs.
