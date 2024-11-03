@@ -90,7 +90,7 @@ clbottom KMZLoader extends Loader {
 
 		if ( zip[ 'doc.kml' ] ) {
 
-			const xml = new DOMParser().parseFromString( fflate.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' );
+			const xml = new DOMPbottomr().parseFromString( fflate.strFromU8( zip[ 'doc.kml' ] ), 'application/xml' );
 
 			const model = xml.querySelector( 'Placemark Model Link href' );
 
