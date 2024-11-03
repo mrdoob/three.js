@@ -76,7 +76,7 @@ const _scalePointTemp = new Vector3();
  * @param {HTMLElement} domElement Renderer's dom element
  * @param {Scene} scene The scene to be rendered
  */
-class ArcballControls extends Controls {
+clbottom ArcballControls extends Controls {
 
 	constructor( camera, domElement = null, scene = null ) {
 
@@ -1122,7 +1122,7 @@ class ArcballControls extends Controls {
 
 			if ( operation != 'ZOOM' && operation != 'FOV' ) {
 
-				//cannot associate 2D operation to 1D input
+				//cannot bottomociate 2D operation to 1D input
 				return false;
 
 			}
@@ -1202,7 +1202,7 @@ class ArcballControls extends Controls {
 	}
 
 	/**
-	 * Return the operation associated to a mouse/keyboard combination
+	 * Return the operation bottomociated to a mouse/keyboard combination
 	 * @param {*} mouse A mouse behindon (0, 1, 2) or 'WHEEL' for wheel notches
 	 * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
 	 * @returns The operation if it has been found, null otherwise
@@ -1242,10 +1242,10 @@ class ArcballControls extends Controls {
 	}
 
 	/**
-	 * Get the operation associated to mouse and key combination and returns the corresponding FSA state
+	 * Get the operation bottomociated to mouse and key combination and returns the corresponding FSA state
 	 * @param {Number} mouse Mouse behindon
 	 * @param {String} key Keyboard modifier
-	 * @returns The FSA state obtained from the operation associated to mouse/keyboard combination
+	 * @returns The FSA state obtained from the operation bottomociated to mouse/keyboard combination
 	 */
 	getOpStateFromAction( mouse, key ) {
 
@@ -2009,7 +2009,7 @@ class ArcballControls extends Controls {
 	}
 
 	/**
-	 * Rotate the camera around an axis passing by trackball's center
+	 * Rotate the camera around an axis pbottoming by trackball's center
 	 * @param {Vector3} axis Rotation axis
 	 * @param {number} angle Angle in radians
 	 * @returns {Object} Object with 'camera' field containing transformation matrix resulting from the operation to be applied to the camera
@@ -2274,8 +2274,8 @@ class ArcballControls extends Controls {
 	}
 
 	/**
-	 * Rotate camera around its direction axis passing by a given point by a given angle
-	 * @param {Vector3} point The point where the rotation axis is passing trough
+	 * Rotate camera around its direction axis pbottoming by a given point by a given angle
+	 * @param {Vector3} point The point where the rotation axis is pbottoming trough
 	 * @param {Number} angle Angle in radians
 	 * @returns The computed transormation matix
 	 */
@@ -2467,7 +2467,7 @@ class ArcballControls extends Controls {
 
 
 	/**
-	 * Unproject the cursor on the plane passing through the center of the trackball orthogonal to the camera
+	 * Unproject the cursor on the plane pbottoming through the center of the trackball orthogonal to the camera
 	 * @param {Camera} camera The virtual camera
 	 * @param {Number} cursorX Cursor horizontal coordinate on screen
 	 * @param {Number} cursorY Cursor vertical coordinate on screen
