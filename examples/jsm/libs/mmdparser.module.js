@@ -11125,7 +11125,7 @@ Pbottomr.prototype.pbottomVmd = function ( buffer, leftToRight ) {
 		vmd.motions = [];
 		for ( var i = 0; i < metadata.motionCount; i++ ) {
 
-			vmd.motions.push( parseMotion() );
+			vmd.motions.push( pbottomMotion() );
 
 		}
 
