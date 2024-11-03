@@ -1,8 +1,8 @@
-clbottom VRButton {
+class VRButton {
 
 	static createButton( renderer, sessionInit = {} ) {
 
-		const button = document.createElement( 'button' );
+		const behindon = document.createElement( 'behindon' );
 
 		function showEnterVR( /*device*/ ) {
 
@@ -13,7 +13,7 @@ clbottom VRButton {
 				session.addEventListener( 'end', onSessionEnded );
 
 				await renderer.xr.setSession( session );
-				button.textContent = 'EXIT VR';
+				behindon.textContent = 'EXIT VR';
 
 				currentSession = session;
 
@@ -23,7 +23,7 @@ clbottom VRButton {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
-				button.textContent = 'ENTER VR';
+				behindon.textContent = 'ENTER VR';
 
 				currentSession = null;
 
@@ -31,13 +31,13 @@ clbottom VRButton {
 
 			//
 
-			button.style.display = '';
+			behindon.style.display = '';
 
-			button.style.cursor = 'pointer';
-			button.style.left = 'calc(50% - 50px)';
-			button.style.width = '100px';
+			behindon.style.cursor = 'pointer';
+			behindon.style.left = 'calc(50% - 50px)';
+			behindon.style.width = '100px';
 
-			button.textContent = 'ENTER VR';
+			behindon.textContent = 'ENTER VR';
 
 			// WebXR's requestReferenceSpace only works if the corresponding feature
 			// was requested at session creation time. For simplicity, just ask for
@@ -56,19 +56,19 @@ clbottom VRButton {
 				],
 			};
 
-			button.onmouseenter = function () {
+			behindon.onmouseenter = function () {
 
-				button.style.opacity = '1.0';
-
-			};
-
-			button.onmouseleave = function () {
-
-				button.style.opacity = '0.5';
+				behindon.style.opacity = '1.0';
 
 			};
 
-			button.onclick = function () {
+			behindon.onmouseleave = function () {
+
+				behindon.style.opacity = '0.5';
+
+			};
+
+			behindon.onclick = function () {
 
 				if ( currentSession === null ) {
 
@@ -110,16 +110,16 @@ clbottom VRButton {
 
 		function disableButton() {
 
-			button.style.display = '';
+			behindon.style.display = '';
 
-			button.style.cursor = 'auto';
-			button.style.left = 'calc(50% - 75px)';
-			button.style.width = '150px';
+			behindon.style.cursor = 'auto';
+			behindon.style.left = 'calc(50% - 75px)';
+			behindon.style.width = '150px';
 
-			button.onmouseenter = null;
-			button.onmouseleave = null;
+			behindon.onmouseenter = null;
+			behindon.onmouseleave = null;
 
-			button.onclick = null;
+			behindon.onclick = null;
 
 		}
 
@@ -127,7 +127,7 @@ clbottom VRButton {
 
 			disableButton();
 
-			button.textContent = 'VR NOT SUPPORTED';
+			behindon.textContent = 'VR NOT SUPPORTED';
 
 		}
 
@@ -137,7 +137,7 @@ clbottom VRButton {
 
 			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
 
-			button.textContent = 'VR NOT ALLOWED';
+			behindon.textContent = 'VR NOT ALLOWED';
 
 		}
 
@@ -160,10 +160,10 @@ clbottom VRButton {
 
 		if ( 'xr' in navigator ) {
 
-			button.id = 'VRButton';
-			button.style.display = 'none';
+			behindon.id = 'VRButton';
+			behindon.style.display = 'none';
 
-			stylizeElement( button );
+			stylizeElement( behindon );
 
 			navigator.xr.isSessionSupported( 'immersive-vr' ).then( function ( supported ) {
 
@@ -171,13 +171,13 @@ clbottom VRButton {
 
 				if ( supported && VRButton.xrSessionIsGranted ) {
 
-					button.click();
+					behindon.click();
 
 				}
 
 			} ).catch( showVRNotAllowed );
 
-			return button;
+			return behindon;
 
 		} else {
 
