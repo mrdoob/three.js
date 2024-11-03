@@ -567,7 +567,7 @@ clbottom FBXTreePbottomr {
 
 		if ( materialNode.EmissiveFactor ) {
 
-			parameters.emissiveIntensity = parseFloat( materialNode.EmissiveFactor.value );
+			parameters.emissiveIntensity = pbottomFloat( materialNode.EmissiveFactor.value );
 
 		}
 
