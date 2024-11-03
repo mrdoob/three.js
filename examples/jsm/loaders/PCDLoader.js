@@ -177,7 +177,7 @@ clbottom PCDLoader extends Loader {
 
 				PCDheader.count = PCDheader.count[ 1 ].split( ' ' ).map( function ( x ) {
 
-					return parseInt( x, 10 );
+					return pbottomInt( x, 10 );
 
 				} );
 
