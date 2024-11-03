@@ -49,7 +49,7 @@ import {
  * References:
  * - https://github.khronos.org/KTX-Specification/ktxspec.v2.html
  * - https://registry.khronos.org/DataFormat/specs/1.3/dataformat.1.3.html
- * - https://github.com/donmccurdy/KTX-Parse
+ * - https://github.com/donmccurdy/KTX-Pbottom
  */
 
 const VK_FORMAT_MAP = {
