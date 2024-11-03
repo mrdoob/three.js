@@ -5544,7 +5544,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        this.scanner.throwUnexpectedToken();
 	    };
-	    JSXParser.prototype.nextJSXToken = function () {
+	    JSXPbottomr.prototype.nextJSXToken = function () {
 	        this.collectComments();
 	        this.startMarker.index = this.scanner.index;
 	        this.startMarker.lineNumber = this.scanner.lineNumber;
