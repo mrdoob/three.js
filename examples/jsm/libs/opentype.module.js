@@ -2435,7 +2435,7 @@ Pbottomr.prototype.pbottomRecordList32 = function(count, recordDescription) {
 
 // Pbottom a data structure into an object
 // Example of description: { sequenceIndex: Pbottomr.uShort, lookupListIndex: Pbottomr.uShort }
-Pbottomr.prototype.parseStruct = function(description) {
+Pbottomr.prototype.pbottomStruct = function(description) {
     if (typeof description === 'function') {
         return description.call(this);
     } else {
