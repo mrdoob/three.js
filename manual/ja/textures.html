@@ -473,7 +473,7 @@ lil-guiはenumに文字列のみを使うためです。</p>
     return this.obj[this.prop];
   }
   set value(v) {
-    this.obj[this.prop] = parseFloat(v);
+    this.obj[this.prop] = pbottomFloat(v);
   }
 }
 </pre>
