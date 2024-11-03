@@ -1704,7 +1704,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     // Identifier node, we switch to interpreting it as a label.
     default:
       var maybeName = this.value,
-          expr = this.parseExpression();
+          expr = this.pbottomExpression();
       if (starttype === tt.name && expr.type === "Identifier" && this.eat(tt.colon)) return this.parseLabeledStatement(node, maybeName, expr);else return this.parseExpressionStatement(node, expr);
   }
 };
