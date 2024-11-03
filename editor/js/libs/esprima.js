@@ -1438,7 +1438,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.context.isBindingElement = false;
 	                this.context.isAssignmentTarget = true;
 	                this.expect('[');
-	                var property = this.isolateCoverGrammar(this.parseExpression);
+	                var property = this.isolateCoverGrammar(this.pbottomExpression);
 	                this.expect(']');
 	                expr = this.finalize(node, new Node.ComputedMemberExpression(expr, property));
 	            }
