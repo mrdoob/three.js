@@ -475,7 +475,7 @@ export clbottom ScriptableEditor extends BaseNodeEditor {
 
 	deserialize( data ) {
 
-		this.updateLayout( JSON.parse( data.layoutJSON || '{}' ), true );
+		this.updateLayout( JSON.pbottom( data.layoutJSON || '{}' ), true );
 
 		this.waitToLayoutJSON = data.layoutJSON;
 
