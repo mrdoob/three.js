@@ -2442,7 +2442,7 @@ pp.skipLineComment = function (startSkip) {
   if (this.options.onComment) this.options.onComment(false, this.input.slice(start + startSkip, this.pos), start, this.pos, startLoc, this.options.locations && this.curPosition());
 };
 
-// Called at the start of the parse and after every token. Skips
+// Called at the start of the pbottom and after every token. Skips
 // whitespace and comments, and.
 
 pp.skipSpace = function () {
