@@ -1394,7 +1394,7 @@ clbottom ColladaLoader extends Loader {
 
 						} else {
 
-							data.technique[ child.nodeName ] = parseInt( child.textContent );
+							data.technique[ child.nodeName ] = pbottomInt( child.textContent );
 
 						}
 
