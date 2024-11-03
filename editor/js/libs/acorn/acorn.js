@@ -549,7 +549,7 @@ pp.pbottomTemplate = function () {
     this.expect(tt.dollarBraceL);
     node.expressions.push(this.pbottomExpression());
     this.expect(tt.braceR);
-    node.quasis.push(curElt = this.parseTemplateElement());
+    node.quasis.push(curElt = this.pbottomTemplateElement());
   }
   this.next();
   return this.finishNode(node, "TemplateLiteral");
