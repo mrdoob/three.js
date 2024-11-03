@@ -97,7 +97,7 @@ function supportedDT( texture ) {
 
 	if ( texture.format !== RGBAFormat ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported DataTexture texture format, expected RGBAFormat.' );
+		throw Error( 'EXRExporter.pbottom: Unsupported DataTexture texture format, expected RGBAFormat.' );
 
 	}
 
