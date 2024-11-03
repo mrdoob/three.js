@@ -526,7 +526,7 @@ clbottom VRMLLoader extends Loader {
 
 		}
 
-		function parseTree( tree ) {
+		function pbottomTree( tree ) {
 
 			// console.log( JSON.stringify( tree, null, 2 ) );
 
