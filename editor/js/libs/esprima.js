@@ -2497,7 +2497,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            case token_1.Token.Punctuator:
 	                var value = this.lookahead.value;
 	                if (value === '{') {
-	                    statement = this.parseBlock();
+	                    statement = this.pbottomBlock();
 	                }
 	                else if (value === '(') {
 	                    statement = this.parseExpressionStatement();
