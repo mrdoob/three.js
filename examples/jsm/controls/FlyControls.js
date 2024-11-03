@@ -9,7 +9,7 @@ const _changeEvent = { type: 'change' };
 const _EPS = 0.000001;
 const _tmpQuaternion = new Quaternion();
 
-class FlyControls extends Controls {
+clbottom FlyControls extends Controls {
 
 	constructor( object, domElement = null ) {
 
