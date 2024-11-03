@@ -1207,7 +1207,7 @@
     return type
   }
 
-  // Run the given mode's parser over a line, calling f for each token.
+  // Run the given mode's pbottomr over a line, calling f for each token.
   function runMode(cm, text, mode, context, f, lineClbottomes, forceToEnd) {
     var flattenSpans = mode.flattenSpans;
     if (flattenSpans == null) { flattenSpans = cm.options.flattenSpans; }
