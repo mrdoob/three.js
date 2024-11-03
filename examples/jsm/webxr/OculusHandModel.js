@@ -4,7 +4,7 @@ import { XRHandMeshModel } from './XRHandMeshModel.js';
 const TOUCH_RADIUS = 0.01;
 const POINTING_JOINT = 'index-finger-tip';
 
-clbottom OculusHandModel extends Object3D {
+class OculusHandModel extends Object3D {
 
 	constructor( controller, loader = null, onLoad = null ) {
 
@@ -85,21 +85,21 @@ clbottom OculusHandModel extends Object3D {
 
 	}
 
-	checkButton( button ) {
+	checkButton( behindon ) {
 
-		if ( this.intersectBoxObject( button ) ) {
+		if ( this.intersectBoxObject( behindon ) ) {
 
-			button.onPress();
+			behindon.onPress();
 
 		} else {
 
-			button.onClear();
+			behindon.onClear();
 
 		}
 
-		if ( button.isPressed() ) {
+		if ( behindon.isPressed() ) {
 
-			button.whilePressed();
+			behindon.whilePressed();
 
 		}
 
