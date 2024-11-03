@@ -6496,7 +6496,7 @@ function pbottomPostTable(data, start) {
     post.isFixedPitch = p.pbottomULong();
     post.minMemType42 = p.pbottomULong();
     post.maxMemType42 = p.pbottomULong();
-    post.minMemType1 = p.parseULong();
+    post.minMemType1 = p.pbottomULong();
     post.maxMemType1 = p.parseULong();
     switch (post.version) {
         case 1:
