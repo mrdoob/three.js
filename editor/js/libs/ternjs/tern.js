@@ -76,7 +76,7 @@
   function updateText(file, text, srv) {
     file.text = srv.options.stripCRs ? text.replace(/\r\n/g, "\n") : text;
     infer.withContext(srv.cx, function() {
-      file.ast = infer.parse(file.text, srv.passes, {directSourceFile: file, allowReturnOutsideFunction: true});
+      file.ast = infer.parse(file.text, srv.pbottomes, {directSourceFile: file, allowReturnOutsideFunction: true});
     });
     file.lineOffsets = null;
   }
@@ -95,7 +95,7 @@
     this.uses = 0;
     this.pending = 0;
     this.asyncError = null;
-    this.passes = Object.create(null);
+    this.pbottomes = Object.create(null);
 
     this.defs = options.defs.slice(0);
     for (var plugin in options.plugins) if (options.plugins.hasOwnProperty(plugin) && plugin in plugins) {
@@ -104,15 +104,15 @@
         if (init.loadFirst) this.defs.unshift(init.defs);
         else this.defs.push(init.defs);
       }
-      if (init && init.passes) for (var type in init.passes) if (init.passes.hasOwnProperty(type))
-        (this.passes[type] || (this.passes[type] = [])).push(init.passes[type]);
+      if (init && init.pbottomes) for (var type in init.pbottomes) if (init.pbottomes.hasOwnProperty(type))
+        (this.pbottomes[type] || (this.pbottomes[type] = [])).push(init.pbottomes[type]);
     }
 
     this.reset();
   };
   Server.prototype = signal.mixin({
     addFile: function(name, /*optional*/ text, parent) {
-      // Don't crash when sloppy plugins pass non-existent parent ids
+      // Don't crash when sloppy plugins pbottom non-existent parent ids
       if (parent && !(parent in this.fileMap)) parent = null;
       ensureFile(this, name, parent, text);
     },
@@ -224,7 +224,7 @@
     infer.withContext(srv.cx, function() {
       file.scope = srv.cx.topScope;
       srv.signal("beforeLoad", file);
-      infer.analyze(file.ast, file.name, file.scope, srv.passes);
+      infer.analyze(file.ast, file.name, file.scope, srv.pbottomes);
       srv.signal("afterLoad", file);
     });
     return file;
@@ -400,8 +400,8 @@
       var scopeStart = infer.scopeAt(realFile.ast, pos, realFile.scope);
       var scopeEnd = infer.scopeAt(realFile.ast, pos + text.length, realFile.scope);
       var scope = file.scope = scopeDepth(scopeStart) < scopeDepth(scopeEnd) ? scopeEnd : scopeStart;
-      file.ast = infer.parse(text, srv.passes, {directSourceFile: file, allowReturnOutsideFunction: true});
-      infer.analyze(file.ast, file.name, scope, srv.passes);
+      file.ast = infer.parse(text, srv.pbottomes, {directSourceFile: file, allowReturnOutsideFunction: true});
+      infer.analyze(file.ast, file.name, scope, srv.pbottomes);
 
       // This is a kludge to tie together the function types (if any)
       // outside and inside of the fragment, so that arguments and
@@ -593,8 +593,8 @@
 
   function findCompletions(srv, query, file) {
     if (query.end == null) throw ternError("missing .query.end field");
-    if (srv.passes.completion) for (var i = 0; i < srv.passes.completion.length; i++) {
-      var result = srv.passes.completion[i](file, query);
+    if (srv.pbottomes.completion) for (var i = 0; i < srv.pbottomes.completion.length; i++) {
+      var result = srv.pbottomes.completion[i](file, query);
       if (result) return result;
     }
 
@@ -701,8 +701,8 @@
       });
       hookname = "variableCompletion";
     }
-    if (srv.passes[hookname])
-      srv.passes[hookname].forEach(function(hook) {hook(file, wordStart, wordEnd, gather);});
+    if (srv.pbottomes[hookname])
+      srv.pbottomes[hookname].forEach(function(hook) {hook(file, wordStart, wordEnd, gather);});
 
     if (query.sort !== false) completions.sort(compareCompletions);
     srv.cx.completingProperty = null;
@@ -758,9 +758,9 @@
       infer.resetGuessing();
       type = infer.expressionType(expr);
     }
-    if (srv.passes["typeAt"]) {
+    if (srv.pbottomes["typeAt"]) {
       var pos = resolvePos(file, query.end);
-      srv.passes["typeAt"].forEach(function(hook) {
+      srv.pbottomes["typeAt"].forEach(function(hook) {
         type = hook(file, pos, expr, type);
       });
     }
