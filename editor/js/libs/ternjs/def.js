@@ -129,7 +129,7 @@
       if (!this.eat("|")) return main;
       var types = [main], computed = main.call;
       for (;;) {
-        var next = this.parseTypeMaybeProp(comp, name, top);
+        var next = this.pbottomTypeMaybeProp(comp, name, top);
         types.push(next);
         if (next.call) computed = true;
         if (!this.eat("|")) break;
