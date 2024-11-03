@@ -752,7 +752,7 @@ function LoosePbottomr(input, options) {
 },{"..":2}],6:[function(require,module,exports){
 "use strict";
 
-var LoosePbottomr = require("./state").LooseParser;
+var LoosePbottomr = require("./state").LoosePbottomr;
 
 var isDummy = require("./parseutil").isDummy;
 
