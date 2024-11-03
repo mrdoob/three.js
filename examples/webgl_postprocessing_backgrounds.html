@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Backgrounds: ClearPbottom, TexturePbottom and CubeTexturePbottom<br/>
 			by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
 		</div>
 
@@ -31,31 +31,31 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';
-			import { CubeTexturePass } from 'three/addons/postprocessing/CubeTexturePass.js';
-			import { ClearPass } from 'three/addons/postprocessing/ClearPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { TexturePbottom } from 'three/addons/postprocessing/TexturePbottom.js';
+			import { CubeTexturePbottom } from 'three/addons/postprocessing/CubeTexturePbottom.js';
+			import { ClearPbottom } from 'three/addons/postprocessing/ClearPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 			let scene, renderer, composer;
-			let clearPass, texturePass, renderPass;
-			let cameraP, cubeTexturePassP;
+			let clearPbottom, texturePbottom, renderPbottom;
+			let cameraP, cubeTexturePbottomP;
 			let gui, stats;
 
 			const params = {
 
-				clearPass: true,
+				clearPbottom: true,
 				clearColor: 'white',
 				clearAlpha: 1.0,
 
-				texturePass: true,
-				texturePassOpacity: 1.0,
+				texturePbottom: true,
+				texturePbottomOpacity: 1.0,
 
-				cubeTexturePass: true,
-				cubeTexturePassOpacity: 1.0,
+				cubeTexturePbottom: true,
+				cubeTexturePbottomOpacity: 1.0,
 
-				renderPass: true
+				renderPbottom: true
 			};
 
 			init();
@@ -68,17 +68,17 @@
 
 				gui = new GUI();
 
-				gui.add( params, 'clearPass' );
+				gui.add( params, 'clearPbottom' );
 				gui.add( params, 'clearColor', [ 'black', 'white', 'blue', 'green', 'red' ] );
 				gui.add( params, 'clearAlpha', 0, 1 );
 
-				gui.add( params, 'texturePass' );
-				gui.add( params, 'texturePassOpacity', 0, 1 );
+				gui.add( params, 'texturePbottom' );
+				gui.add( params, 'texturePbottomOpacity', 0, 1 );
 
-				gui.add( params, 'cubeTexturePass' );
-				gui.add( params, 'cubeTexturePassOpacity', 0, 1 );
+				gui.add( params, 'cubeTexturePbottom' );
+				gui.add( params, 'cubeTexturePbottomOpacity', 0, 1 );
 
-				gui.add( params, 'renderPass' );
+				gui.add( params, 'renderPbottom' );
 
 				gui.open();
 
@@ -154,36 +154,36 @@
 
 				composer = new EffectComposer( renderer );
 
-				clearPass = new ClearPass( params.clearColor, params.clearAlpha );
-				composer.addPass( clearPass );
+				clearPbottom = new ClearPbottom( params.clearColor, params.clearAlpha );
+				composer.addPbottom( clearPbottom );
 
-				texturePass = new TexturePass();
-				composer.addPass( texturePass );
+				texturePbottom = new TexturePbottom();
+				composer.addPbottom( texturePbottom );
 
 				const textureLoader = new THREE.TextureLoader();
 				textureLoader.load( 'textures/hardwood2_diffuse.jpg', function ( map ) {
 
 					map.colorSpace = THREE.SRGBColorSpace;
-					texturePass.map = map;
+					texturePbottom.map = map;
 
 				} );
 
-				cubeTexturePassP = null;
+				cubeTexturePbottomP = null;
 
 				const ldrUrls = genCubeUrls( 'textures/cube/pisa/', '.png' );
 				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
 
-					cubeTexturePassP = new CubeTexturePass( cameraP, ldrCubeMap );
-					composer.insertPass( cubeTexturePassP, 2 );
+					cubeTexturePbottomP = new CubeTexturePbottom( cameraP, ldrCubeMap );
+					composer.insertPbottom( cubeTexturePbottomP, 2 );
 
 				} );
 
-				renderPass = new RenderPass( scene, cameraP );
-				renderPass.clear = false;
-				composer.addPass( renderPass );
+				renderPbottom = new RenderPbottom( scene, cameraP );
+				renderPbottom.clear = false;
+				composer.addPbottom( renderPbottom );
 
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				const outputPbottom = new OutputPbottom();
+				composer.addPbottom( outputPbottom );
 
 				const controls = new OrbitControls( cameraP, renderer.domElement );
 				controls.enableZoom = false;
@@ -212,7 +212,7 @@
 
 				cameraP.updateMatrixWorld( true );
 
-				let newColor = clearPass.clearColor;
+				let newColor = clearPbottom.clearColor;
 
 				switch ( params.clearColor ) {
 
@@ -224,21 +224,21 @@
 
 				}
 
-				clearPass.enabled = params.clearPass;
-				clearPass.clearColor = newColor;
-				clearPass.clearAlpha = params.clearAlpha;
+				clearPbottom.enabled = params.clearPbottom;
+				clearPbottom.clearColor = newColor;
+				clearPbottom.clearAlpha = params.clearAlpha;
 
-				texturePass.enabled = params.texturePass;
-				texturePass.opacity = params.texturePassOpacity;
+				texturePbottom.enabled = params.texturePbottom;
+				texturePbottom.opacity = params.texturePbottomOpacity;
 
-				if ( cubeTexturePassP !== null ) {
+				if ( cubeTexturePbottomP !== null ) {
 
-					cubeTexturePassP.enabled = params.cubeTexturePass;
-					cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
+					cubeTexturePbottomP.enabled = params.cubeTexturePbottom;
+					cubeTexturePbottomP.opacity = params.cubeTexturePbottomOpacity;
 
 				}
 
-				renderPass.enabled = params.renderPass;
+				renderPbottom.enabled = params.renderPbottom;
 
 				composer.render();
 
