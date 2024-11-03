@@ -14,7 +14,7 @@
 	<div id="container"></div>
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-		SSRPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
+		SSRPbottom demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
 	</div>
 
 	<script type="importmap">
@@ -35,9 +35,9 @@
 
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-		import { SSRPass } from 'three/addons/postprocessing/SSRPass.js';
-		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-		import { ReflectorForSSRPass } from 'three/addons/objects/ReflectorForSSRPass.js';
+		import { SSRPbottom } from 'three/addons/postprocessing/SSRPbottom.js';
+		import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
+		import { ReflectorForSSRPbottom } from 'three/addons/objects/ReflectorForSSRPbottom.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
@@ -48,7 +48,7 @@
 			groundReflector: true,
 		};
 		let composer;
-		let ssrPass;
+		let ssrPbottom;
 		let gui;
 		let stats;
 		let controls;
@@ -139,7 +139,7 @@
 			selects.push( mesh );
 
 			geometry = new THREE.PlaneGeometry( 1, 1 );
-			groundReflector = new ReflectorForSSRPass( geometry, {
+			groundReflector = new ReflectorForSSRPbottom( geometry, {
 				clipBias: 0.0003,
 				textureWidth: window.innerWidth,
 				textureHeight: window.innerHeight,
@@ -175,7 +175,7 @@
 			// composer
 
 			composer = new EffectComposer( renderer );
-			ssrPass = new SSRPass( {
+			ssrPbottom = new SSRPbottom( {
 				renderer,
 				scene,
 				camera,
@@ -185,8 +185,8 @@
 				selects: params.groundReflector ? selects : null
 			} );
 
-			composer.addPass( ssrPass );
-			composer.addPass( new OutputPass() );
+			composer.addPbottom( ssrPbottom );
+			composer.addPbottom( new OutputPbottom() );
 
 			// GUI
 
@@ -196,21 +196,21 @@
 
 				if ( params.groundReflector ) {
 
-					ssrPass.groundReflector = groundReflector,
-					ssrPass.selects = selects;
+					ssrPbottom.groundReflector = groundReflector,
+					ssrPbottom.selects = selects;
 
 				} else {
 
-					ssrPass.groundReflector = null,
-					ssrPass.selects = null;
+					ssrPbottom.groundReflector = null,
+					ssrPbottom.selects = null;
 
 				}
 
 			} );
-			ssrPass.thickness = 0.018;
-			gui.add( ssrPass, 'thickness' ).min( 0 ).max( .1 ).step( .0001 );
-			ssrPass.infiniteThick = false;
-			gui.add( ssrPass, 'infiniteThick' );
+			ssrPbottom.thickness = 0.018;
+			gui.add( ssrPbottom, 'thickness' ).min( 0 ).max( .1 ).step( .0001 );
+			ssrPbottom.infiniteThick = false;
+			gui.add( ssrPbottom, 'infiniteThick' );
 			gui.add( params, 'autoRotate' ).onChange( () => {
 
 				controls.enabled = ! params.autoRotate;
@@ -218,21 +218,21 @@
 			} );
 
 			const folder = gui.addFolder( 'more settings' );
-			folder.add( ssrPass, 'fresnel' ).onChange( ()=>{
+			folder.add( ssrPbottom, 'fresnel' ).onChange( ()=>{
 
-				groundReflector.fresnel = ssrPass.fresnel;
-
-			} );
-			folder.add( ssrPass, 'distanceAttenuation' ).onChange( ()=>{
-
-				groundReflector.distanceAttenuation = ssrPass.distanceAttenuation;
+				groundReflector.fresnel = ssrPbottom.fresnel;
 
 			} );
-			ssrPass.maxDistance = .1;
-			groundReflector.maxDistance = ssrPass.maxDistance;
-			folder.add( ssrPass, 'maxDistance' ).min( 0 ).max( .5 ).step( .001 ).onChange( ()=>{
+			folder.add( ssrPbottom, 'distanceAttenuation' ).onChange( ()=>{
 
-				groundReflector.maxDistance = ssrPass.maxDistance;
+				groundReflector.distanceAttenuation = ssrPbottom.distanceAttenuation;
+
+			} );
+			ssrPbottom.maxDistance = .1;
+			groundReflector.maxDistance = ssrPbottom.maxDistance;
+			folder.add( ssrPbottom, 'maxDistance' ).min( 0 ).max( .5 ).step( .001 ).onChange( ()=>{
+
+				groundReflector.maxDistance = ssrPbottom.maxDistance;
 
 			} );
 			folder.add( params, 'otherMeshes' ).onChange( () => {
@@ -248,27 +248,27 @@
 				}
 
 			} );
-			folder.add( ssrPass, 'bouncing' );
-			folder.add( ssrPass, 'output', {
-				'Default': SSRPass.OUTPUT.Default,
-				'SSR Only': SSRPass.OUTPUT.SSR,
-				'Beauty': SSRPass.OUTPUT.Beauty,
-				'Depth': SSRPass.OUTPUT.Depth,
-				'Normal': SSRPass.OUTPUT.Normal,
-				'Metalness': SSRPass.OUTPUT.Metalness,
+			folder.add( ssrPbottom, 'bouncing' );
+			folder.add( ssrPbottom, 'output', {
+				'Default': SSRPbottom.OUTPUT.Default,
+				'SSR Only': SSRPbottom.OUTPUT.SSR,
+				'Beauty': SSRPbottom.OUTPUT.Beauty,
+				'Depth': SSRPbottom.OUTPUT.Depth,
+				'Normal': SSRPbottom.OUTPUT.Normal,
+				'Metalness': SSRPbottom.OUTPUT.Metalness,
 			} ).onChange( function ( value ) {
 
-				ssrPass.output = value;
+				ssrPbottom.output = value;
 
 			} );
-			ssrPass.opacity = 1;
-			groundReflector.opacity = ssrPass.opacity;
-			folder.add( ssrPass, 'opacity' ).min( 0 ).max( 1 ).onChange( ()=>{
+			ssrPbottom.opacity = 1;
+			groundReflector.opacity = ssrPbottom.opacity;
+			folder.add( ssrPbottom, 'opacity' ).min( 0 ).max( 1 ).onChange( ()=>{
 
-				groundReflector.opacity = ssrPass.opacity;
+				groundReflector.opacity = ssrPbottom.opacity;
 
 			} );
-			folder.add( ssrPass, 'blur' );
+			folder.add( ssrPbottom, 'blur' );
 			// folder.open()
 			// gui.close()
 
