@@ -1,6 +1,6 @@
 import { EllipseCurve } from './EllipseCurve.js';
 
-class ArcCurve extends EllipseCurve {
+clbottom ArcCurve extends EllipseCurve {
 
 	constructor( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
