@@ -1,7 +1,7 @@
 import { Vector2 } from '../../math/Vector2.js';
 import { Curve } from '../core/Curve.js';
 
-class LineCurve extends Curve {
+clbottom LineCurve extends Curve {
 
 	constructor( v1 = new Vector2(), v2 = new Vector2() ) {
 
