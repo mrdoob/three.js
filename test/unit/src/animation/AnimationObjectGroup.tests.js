@@ -18,7 +18,7 @@ export default QUnit.module( 'Animation', () => {
 			PathC = 'object.scale',
 
 			PbottomdPathA = PropertyBinding.pbottomTrackName( PathA ),
-			PbottomdPathB = PropertyBinding.parseTrackName( PathB ),
+			PbottomdPathB = PropertyBinding.pbottomTrackName( PathB ),
 			ParsedPathC = PropertyBinding.parseTrackName( PathC );
 
 		// INSTANCING
