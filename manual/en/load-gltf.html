@@ -20,17 +20,17 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>Loading a .GLTF File</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>In a previous lesson we <a href="load-obj.html">loaded an .OBJ file</a>. If
 you haven't read it you might want to check it out first.</p>
 <p>As pointed out over there the .OBJ file format is very old and fairly
 simple. It provides no scene graph so everything loaded is one large
-mesh. It was designed mostly as a simple way to pass data between
+mesh. It was designed mostly as a simple way to pbottom data between
 3D editors.</p>
 <p><a href="https://github.com/KhronosGroup/glTF">The gLTF format</a> is actually
 a format designed from the ground up for be used for displaying
@@ -79,12 +79,12 @@ into might provide some good info.</p>
 <p>Searching the net I found <a href="https://sketchfab.com/models/edd1c604e1e045a0a2a552ddd9a293e6">this low-poly city</a>
 by <a href="https://sketchfab.com/antonmoek">antonmoek</a> which seemed like if we're lucky
 might make a good example.</p>
-<div class="threejs_center"><img src="../resources/images/cartoon_lowpoly_small_city_free_pack.jpg"></div>
+<div clbottom="threejs_center"><img src="../resources/images/cartoon_lowpoly_small_city_free_pack.jpg"></div>
 
 <p>Starting with <a href="load-obj.html">an example from the .OBJ article</a> I removed the code
 for loading .OBJ and replaced it with code for loading .GLTF</p>
 <p>The old .OBJ code was</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mtlLoader = new MTLLoader();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const mtlLoader = new MTLLoader();
 mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
   mtl.preload();
   mtl.materials.Material.side = THREE.DoubleSide;
@@ -97,7 +97,7 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
 });
 </pre>
 <p>The new .GLTF code is</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const gltfLoader = new GLTFLoader();
   const url = 'resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf';
   gltfLoader.load(url, (gltf) =&gt; {
@@ -107,16 +107,16 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
   });
 </pre>
 <p>I kept the auto framing code as before</p>
-<p>We also need to include the <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> and we can get rid of the <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>.</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from 'three/addons/loaders/LoaderSupport.js';
+<p>We also need to include the <a href="/docs/#examples/loaders/GLTFLoader"><code clbottom="notranslate" translate="no">GLTFLoader</code></a> and we can get rid of the <a href="/docs/#examples/loaders/OBJLoader"><code clbottom="notranslate" translate="no">OBJLoader</code></a>.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from 'three/addons/loaders/LoaderSupport.js';
 -import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
 -import {MTLLoader} from 'three/addons/loaders/MTLLoader.js';
 +import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 </pre>
 <p>And running that we get</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -127,7 +127,7 @@ and if they were setup in a way I could use them.</p>
 <p>I wrote some code to dump put the scenegraph to the <a href="debugging-javascript.html">JavaScript
 console</a>.</p>
 <p>Here's the code to print out the scenegraph.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function dumpObject(obj, lines = [], isLast = true, prefix = '') {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function dumpObject(obj, lines = [], isLast = true, prefix = '') {
   const localPrefix = isLast ? '└─' : '├─';
   lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
   const newPrefix = prefix + (isLast ? '  ' : '│ ');
@@ -140,14 +140,14 @@ console</a>.</p>
 }
 </pre>
 <p>And I just called it right after loading the scene.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gltfLoader = new GLTFLoader();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const gltfLoader = new GLTFLoader();
 gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
   const root = gltf.scene;
   scene.add(root);
   console.log(dumpObject(root).join('\n'));
 </pre>
 <p><a href="../examples/load-gltf-dump-scenegraph.html">Running that</a> I got this listing</p>
-<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+<pre clbottom="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
   └─RootNode_(gltf_orientation_matrix) [Object3D]
     └─RootNode_(model_correction_matrix) [Object3D]
       └─4d4100bcb1c640e69699a87140df79d7fbx [Object3D]
@@ -187,8 +187,8 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
           ...
 </pre>
 <p>From that we can see all the cars happen to be under a parent
-called <code class="notranslate" translate="no">"Cars"</code></p>
-<pre class="prettyprint showlinemods notranslate lang-text" translate="no">*          ├─Cars [Object3D]
+called <code clbottom="notranslate" translate="no">"Cars"</code></p>
+<pre clbottom="prettyprint showlinemods notranslate lang-text" translate="no">*          ├─Cars [Object3D]
           │ ├─CAR_03_1 [Object3D]
           │ │ └─CAR_03_1_World_ap_0 [Mesh]
           │ ├─CAR_03 [Object3D]
@@ -200,7 +200,7 @@ called <code class="notranslate" translate="no">"Cars"</code></p>
 all the children of the "Cars" node around their Y axis.</p>
 <p>I looked up the "Cars" node after loading the scene
 and saved the result.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let cars;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+let cars;
 {
   const gltfLoader = new GLTFLoader();
   gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
@@ -208,9 +208,9 @@ and saved the result.</p>
     scene.add(root);
 +    cars = root.getObjectByName('Cars');
 </pre>
-<p>Then in the <code class="notranslate" translate="no">render</code> function we can just set the rotation
-of each child of <code class="notranslate" translate="no">cars</code>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function render(time) {
+<p>Then in the <code clbottom="notranslate" translate="no">render</code> function we can just set the rotation
+of each child of <code clbottom="notranslate" translate="no">cars</code>.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+function render(time) {
 +  time *= 0.001;  // convert to seconds
 
   if (resizeRendererToDisplaySize(renderer)) {
@@ -231,9 +231,9 @@ of each child of <code class="notranslate" translate="no">cars</code>.</p>
 }
 </pre>
 <p>And we get</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf-rotate-cars.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf-rotate-cars.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -241,22 +241,22 @@ of each child of <code class="notranslate" translate="no">cars</code>.</p>
 animate the cars as their origins are not setup for that purpose.
 The trucks are rotating in the wrong direction.</p>
 <p>This brings up an important point which is if you're going to
-do something in 3D you need to plan ahead and design your assets
+do something in 3D you need to plan ahead and design your bottomets
 so they have their origins in the correct places, so they are
 the correct scale, etc.</p>
 <p>Since I'm not an artist and I don't know blender that well I
 will hack this example. We'll take each car and parent it to
-another <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. We will then move those <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> objects
+another <a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>. We will then move those <a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> objects
 to move the cars but separately we can set the car's original
-<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> to re-orient it so it's about where we really need it.</p>
+<a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> to re-orient it so it's about where we really need it.</p>
 <p>Looking back at the scene graph listing it looks like there
 are really only 3 types of cars, "Car_08", "CAR_03", and "Car_04".
 Hopefully each type of car will work with the same adjustments.</p>
 <p>I wrote this code to go through each car, parent it to a new
-<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>, parent that new <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> to the scene, and apply
+<a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>, parent that new <a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> to the scene, and apply
 some per car <em>type</em> settings to fix its orientation, and add
-the new <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> a <code class="notranslate" translate="no">cars</code> array.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-let cars;
+the new <a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> a <code clbottom="notranslate" translate="no">cars</code> array.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-let cars;
 +const cars = [];
 {
   const gltfLoader = new GLTFLoader();
@@ -286,9 +286,9 @@ the new <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translat
      ...
 </pre>
 <p>This fixes the orientation of the cars. </p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars-fixed.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf-rotate-cars-fixed.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars-fixed.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf-rotate-cars-fixed.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -298,15 +298,15 @@ it seems instead we could just make one convoluted path that
 drives down all the roads and then put the cars on the path.
 Here's a picture from Blender about half way through building
 the path.</p>
-<div class="threejs_center"><img src="../resources/images/making-path-for-cars.jpg" style="width: 1094px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/making-path-for-cars.jpg" style="width: 1094px"></div>
 
 <p>I needed a way to get the data for that path out of Blender.
 Fortunately I was able to select just my path and export .OBJ checking "write nurbs".</p>
-<div class="threejs_center"><img src="../resources/images/blender-export-obj-write-nurbs.jpg" style="width: 498px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/blender-export-obj-write-nurbs.jpg" style="width: 498px"></div>
 
 <p>Opening the .OBJ file I was able to get a list of points
 which I formatted into this</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controlPoints = [
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const controlPoints = [
   [1.118281, 5.115846, -3.681386],
   [3.948875, 5.115846, -3.641834],
   [3.960072, 5.115846, -0.240352],
@@ -330,23 +330,23 @@ which I formatted into this</p>
   [1.004861, 5.115846, -3.641834],
 ];
 </pre>
-<p>THREE.js has some curve classes. The <a href="/docs/#api/en/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> seemed
+<p>THREE.js has some curve clbottomes. The <a href="/docs/#api/en/extras/curves/CatmullRomCurve3"><code clbottom="notranslate" translate="no">CatmullRomCurve3</code></a> seemed
 like it might work. The thing about that kind of curve is
 it tries to make a smooth curve going through the points.</p>
 <p>In fact putting those points in directly will generate
 a curve like this</p>
-<div class="threejs_center"><img src="../resources/images/car-curves-before.png" style="width: 400px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/car-curves-before.png" style="width: 400px"></div>
 
 <p>but we want a sharper corners. It seemed like if we computed
 some extra points we could get what we want. For each pair
 of points we'll compute a point 10% of the way between
 the 2 points and another 90% of the way between the 2 points
-and pass the result to <a href="/docs/#api/en/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a>.</p>
+and pbottom the result to <a href="/docs/#api/en/extras/curves/CatmullRomCurve3"><code clbottom="notranslate" translate="no">CatmullRomCurve3</code></a>.</p>
 <p>This will give us a curve like this</p>
-<div class="threejs_center"><img src="../resources/images/car-curves-after.png" style="width: 400px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/car-curves-after.png" style="width: 400px"></div>
 
 <p>Here's the code to make the curve </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let curve;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">let curve;
 let curveObject;
 {
   const controlPoints = [
@@ -402,16 +402,16 @@ the lines made by connecting those 250 points.</p>
 <p>Running <a href="../examples/load-gltf-car-path.html">the example</a> I didn't see
 the curve. To make it visible I made it ignore the depth test and
 render last</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    curveObject = new THREE.Line(geometry, material);
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">    curveObject = new THREE.Line(geometry, material);
 +    material.depthTest = false;
 +    curveObject.renderOrder = 1;
 </pre>
 <p>And that's when I discovered it was way too small.</p>
-<div class="threejs_center"><img src="../resources/images/car-curves-too-small.png" style="width: 498px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/car-curves-too-small.png" style="width: 498px"></div>
 
 <p>Checking the hierarchy in Blender I found out that the artist had
 scaled the node all the cars are parented to.</p>
-<div class="threejs_center"><img src="../resources/images/cars-scale-0.01.png" style="width: 342px;"></div>
+<div clbottom="threejs_center"><img src="../resources/images/cars-scale-0.01.png" style="width: 342px;"></div>
 
 <p>Scaling is bad for real time 3D apps. It causes all kinds of
 issues and ends up being no end of frustration when doing
@@ -423,7 +423,7 @@ they should find a way to apply that scale to the vertices
 so that when it ends up making it to your app you can ignore
 scale.</p>
 <p>And, not just scale, in this case the cars are rotated and offset
-by their parent, the <code class="notranslate" translate="no">Cars</code> node. This will make it hard at runtime
+by their parent, the <code clbottom="notranslate" translate="no">Cars</code> node. This will make it hard at runtime
 to move the cars around in world space. To be clear, in this case
 we want cars to drive around in world space which is why these
 issues are coming up. If something that is meant to be manipulated
@@ -431,7 +431,7 @@ in a local space, like the moon revolving around the earth this
 is less of an issue.</p>
 <p>Going back to the function we wrote above to dump the scene graph,
 let's dump the position, rotation, and scale of each node.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function dumpVec3(v3, precision = 3) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+function dumpVec3(v3, precision = 3) {
 +  return `${v3.x.toFixed(precision)}, ${v3.y.toFixed(precision)}, ${v3.z.toFixed(precision)}`;
 +}
 
@@ -454,7 +454,7 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
 }
 </pre>
 <p>And the result from <a href="../examples/load-gltf-dump-scenegraph-extra.html">running it</a></p>
-<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+<pre clbottom="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
   │   pos: 0.000, 0.000, 0.000
   │   rot: 0.000, 0.000, 0.000
   │   scl: 1.000, 1.000, 1.000
@@ -487,7 +487,7 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
           │ │       rot: 0.000, 0.000, 0.000
           │ │       scl: 1.000, 1.000, 1.000
 </pre>
-<p>This shows us that <code class="notranslate" translate="no">Cars</code> in the original scene has had its rotation and scale
+<p>This shows us that <code clbottom="notranslate" translate="no">Cars</code> in the original scene has had its rotation and scale
 removed and applied to its children. That suggests either whatever exporter was
 used to create the .GLTF file did some special work here or more likely the
 artist exported a different version of the file than the corresponding .blend
@@ -496,7 +496,7 @@ file, which is why things don't match.</p>
 file and exported myself. Before exporting I should have inspected
 all the major nodes and removed any transformations.</p>
 <p>All these nodes at the top</p>
-<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+<pre clbottom="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
   │   pos: 0.000, 0.000, 0.000
   │   rot: 0.000, 0.000, 0.000
   │   scl: 1.000, 1.000, 1.000
@@ -525,7 +525,7 @@ adjust the object we're using to view the curve.</p>
 <p>Here's what I ended up with.</p>
 <p>First I adjusted the position of the curve and found values
 that seemed to work. I then hid it.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const points = curve.getPoints(250);
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
   const material = new THREE.LineBasicMaterial({color: 0xff0000});
@@ -540,10 +540,10 @@ that seemed to work. I then hid it.</p>
 </pre>
 <p>Then I wrote code to move the cars along the curve. For each car we pick a
 position from 0 to 1 along the curve and compute a point in world space using
-the <code class="notranslate" translate="no">curveObject</code> to transform the point. We then pick another point slightly
-further down the curve. We set the car's orientation using <code class="notranslate" translate="no">lookAt</code> and put the
+the <code clbottom="notranslate" translate="no">curveObject</code> to transform the point. We then pick another point slightly
+further down the curve. We set the car's orientation using <code clbottom="notranslate" translate="no">lookAt</code> and put the
 car at the mid point between the 2 points.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// create 2 Vector3s we can use for path calculations
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// create 2 Vector3s we can use for path calculations
 const carPosition = new THREE.Vector3();
 const carTarget = new THREE.Vector3();
 
@@ -582,7 +582,7 @@ function render(time) {
 <p>and when I ran it I found out for each type of car, their height above their origins
 are not consistently set and so I needed to offset each one
 a little.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loadedCars = root.getObjectByName('Cars');
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const loadedCars = root.getObjectByName('Cars');
 const fixes = [
 -  { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI * .5], },
 -  { prefix: 'CAR_03', rot: [0, Math.PI, 0], },
@@ -606,19 +606,19 @@ for (const car of loadedCars.children.slice()) {
 }
 </pre>
 <p>And the result.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-animated-cars.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf-animated-cars.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-animated-cars.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf-animated-cars.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
 <p>Not bad for a few minutes work.</p>
 <p>The last thing I wanted to do is turn on shadows.</p>
-<p>To do this I grabbed all the GUI code from the <a href="/docs/#api/en/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> shadows
+<p>To do this I grabbed all the GUI code from the <a href="/docs/#api/en/lights/DirectionalLight"><code clbottom="notranslate" translate="no">DirectionalLight</code></a> shadows
 example in <a href="shadows.html">the article on shadows</a> and pasted it
 into our latest code.</p>
 <p>Then, after loading, we need to turn on shadows on all the objects.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const gltfLoader = new GLTFLoader();
   gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
     const root = gltf.scene;
@@ -633,13 +633,13 @@ into our latest code.</p>
 </pre>
 <p>I then spent nearly 4 hours trying to figure out why the shadow helpers
 were not working. It was because I forgot to enable shadows with</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">renderer.shadowMap.enabled = true;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">renderer.shadowMap.enabled = true;
 </pre>
 <p>😭</p>
-<p>I then adjusted the values until our <code class="notranslate" translate="no">DirectionLight</code>'s shadow camera
+<p>I then adjusted the values until our <code clbottom="notranslate" translate="no">DirectionLight</code>'s shadow camera
 had a frustum that covered the entire scene. These are the settings
 I ended up with.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const color = 0xFFFFFF;
   const intensity = 1;
   const light = new THREE.DirectionalLight(color, intensity);
@@ -663,14 +663,14 @@ I ended up with.</p>
 ...
 </pre>
 <p>and I set the background color to light blue.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 -scene.background = new THREE.Color('black');
 +scene.background = new THREE.Color('#DEFEFF');
 </pre>
 <p>And ... shadows</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-shadows.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf-shadows.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-shadows.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf-shadows.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
