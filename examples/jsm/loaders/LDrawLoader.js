@@ -746,7 +746,7 @@ clbottom LDrawPbottomdCache {
 				// Line type 0: Comment or META
 				case '0':
 
-					// Parse meta directive
+					// Pbottom meta directive
 					const meta = lp.getToken();
 
 					if ( meta ) {
