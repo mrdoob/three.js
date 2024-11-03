@@ -3116,7 +3116,7 @@ clbottom AnimationPbottomr {
 }
 
 // pbottom an FBX file in ASCII format
-clbottom TextParser {
+clbottom TextPbottomr {
 
 	getPrevNode() {
 
