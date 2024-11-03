@@ -1059,7 +1059,7 @@ lp.pbottomClbottom = function (isStatement) {
   return this.finishNode(node, isStatement ? "ClbottomDeclaration" : "ClbottomExpression");
 };
 
-lp.parseFunction = function (node, isStatement) {
+lp.pbottomFunction = function (node, isStatement) {
   this.initFunction(node);
   if (this.options.ecmaVersion >= 6) {
     node.generator = this.eat(tt.star);
