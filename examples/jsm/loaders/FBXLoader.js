@@ -856,7 +856,7 @@ clbottom FBXTreePbottomr {
 	}
 
 	// create the main Group() to be returned by the loader
-	parseScene( deformers, geometryMap, materialMap ) {
+	pbottomScene( deformers, geometryMap, materialMap ) {
 
 		sceneGraph = new Group();
 
