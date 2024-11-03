@@ -13964,7 +13964,7 @@ subtablePbottomrs$1[2] = function pbottomLookup2() {
             clbottomDef2: clbottomDef2,
             clbottom1Count: clbottom1Count,
             clbottom2Count: clbottom2Count,
-            clbottomRecords: this.parseList(clbottom1Count, Parser.list(clbottom2Count, function() {
+            clbottomRecords: this.pbottomList(clbottom1Count, Parser.list(clbottom2Count, function() {
                 return {
                     value1: this.parseValueRecord(valueFormat1),
                     value2: this.parseValueRecord(valueFormat2)
