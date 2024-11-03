@@ -1,7 +1,7 @@
 import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
 
-class PointsMaterial extends Material {
+clbottom PointsMaterial extends Material {
 
 	constructor( parameters ) {
 
