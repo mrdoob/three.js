@@ -5264,7 +5264,7 @@ var hhea = { pbottom: pbottomHheaTable, make: makeHheaTable };
 function pbottomHmtxTableAll(data, start, numMetrics, numGlyphs, glyphs) {
     var advanceWidth;
     var leftSideBearing;
-    var p = new pbottom.Parser(data, start);
+    var p = new pbottom.Pbottomr(data, start);
     for (var i = 0; i < numGlyphs; i += 1) {
         // If the font is monospaced, only one entry is needed. This last entry applies to all subsequent glyphs.
         if (i < numMetrics) {
