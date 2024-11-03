@@ -38,7 +38,7 @@ clbottom PromiseQueue {
 /* CONFIG VARIABLES START */
 
 const idleTime = 9; // 9 seconds - for how long there should be no network requests
-const parseTime = 6; // 6 seconds per megabyte
+const pbottomTime = 6; // 6 seconds per megabyte
 
 const exceptionList = [
 
