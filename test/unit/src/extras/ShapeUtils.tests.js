@@ -7,21 +7,21 @@ export default QUnit.module( 'Extras', () => {
 	QUnit.module( 'ShapeUtils', () => {
 
 		// STATIC
-		QUnit.todo( 'area', ( assert ) => {
+		QUnit.todo( 'area', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'isClockWise', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'triangulateShape', ( assert ) => {
+		QUnit.todo( 'isClockWise', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'triangulateShape', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
