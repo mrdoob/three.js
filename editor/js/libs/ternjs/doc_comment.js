@@ -1,4 +1,4 @@
-// Parses comments above variable declarations, function declarations,
+// Pbottoms comments above variable declarations, function declarations,
 // and object properties as docstrings and JSDoc-style type
 // annotations.
 
