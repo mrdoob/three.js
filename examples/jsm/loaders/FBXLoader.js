@@ -735,7 +735,7 @@ clbottom FBXTreePbottomr {
 
 				const deformerNode = DeformerNodes[ nodeID ];
 
-				const relationships = connections.get( parseInt( nodeID ) );
+				const relationships = connections.get( pbottomInt( nodeID ) );
 
 				if ( deformerNode.attrType === 'Skin' ) {
 
