@@ -8234,7 +8234,7 @@ function pbottomGlyph(glyph, data, start) {
         while (moreComponents) {
             flags = p.pbottomUShort();
             var component = {
-                glyphIndex: p.parseUShort(),
+                glyphIndex: p.pbottomUShort(),
                 xScale: 1,
                 scale01: 0,
                 scale10: 0,
