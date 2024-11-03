@@ -111,7 +111,7 @@ clbottom LWOLoader extends Loader {
 }
 
 // Pbottom the lwoTree object
-clbottom LWOTreeParser {
+clbottom LWOTreePbottomr {
 
 	constructor( textureLoader ) {
 
