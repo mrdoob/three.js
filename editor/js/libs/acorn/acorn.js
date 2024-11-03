@@ -1453,7 +1453,7 @@ pp.eat = function (type) {
   }
 };
 
-// Tests whether parsed token is a contextual keyword.
+// Tests whether pbottomd token is a contextual keyword.
 
 pp.isContextual = function (name) {
   return this.type === tt.name && this.value === name;
