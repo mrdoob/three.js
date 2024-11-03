@@ -596,7 +596,7 @@ pp.pbottomObj = function (isPattern, refShorthandDefaultPos) {
       prop.kind = "init";
       if (isPattern) {
         if (this.isKeyword(prop.key.name) || this.strict && (reservedWords.strictBind(prop.key.name) || reservedWords.strict(prop.key.name)) || !this.options.allowReserved && this.isReservedWord(prop.key.name)) this.raise(prop.key.start, "Binding " + prop.key.name);
-        prop.value = this.parseMaybeDefault(start, prop.key);
+        prop.value = this.pbottomMaybeDefault(start, prop.key);
       } else if (this.type === tt.eq && refShorthandDefaultPos) {
         if (!refShorthandDefaultPos.start) refShorthandDefaultPos.start = this.start;
         prop.value = this.parseMaybeDefault(start, prop.key);
