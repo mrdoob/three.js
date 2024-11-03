@@ -618,7 +618,7 @@ clbottom SVGLoader extends Loader {
 							point.y += numbers[ j + 6 ];
 							control.x = point.x;
 							control.y = point.y;
-							parseArcCommand(
+							pbottomArcCommand(
 								path, numbers[ j ], numbers[ j + 1 ], numbers[ j + 2 ], numbers[ j + 3 ], numbers[ j + 4 ], start, point
 							);
 
