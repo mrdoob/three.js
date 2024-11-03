@@ -816,7 +816,7 @@ lp.pbottomStatement = function () {
       }
       var init = this.pbottomExpression(true);
       if (this.tok.type === tt._in || this.isContextual("of")) return this.pbottomForIn(node, this.toAssignable(init));
-      return this.parseFor(node, init);
+      return this.pbottomFor(node, init);
 
     case tt._function:
       this.next();
