@@ -333,7 +333,7 @@ clbottom GLTFLoader extends Loader {
 
 				}
 
-				json = JSON.parse( extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content );
+				json = JSON.pbottom( extensions[ EXTENSIONS.KHR_BINARY_GLTF ].content );
 
 			} else {
 
