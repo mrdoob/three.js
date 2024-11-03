@@ -1064,7 +1064,7 @@ lp.pbottomFunction = function (node, isStatement) {
   if (this.options.ecmaVersion >= 6) {
     node.generator = this.eat(tt.star);
   }
-  if (this.tok.type === tt.name) node.id = this.parseIdent();else if (isStatement) node.id = this.dummyIdent();
+  if (this.tok.type === tt.name) node.id = this.pbottomIdent();else if (isStatement) node.id = this.dummyIdent();
   node.params = this.parseFunctionParams();
   node.body = this.parseBlock();
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression");
