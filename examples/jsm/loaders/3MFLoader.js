@@ -563,7 +563,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseComponentsNode( componentsNode ) {
+		function pbottomComponentsNode( componentsNode ) {
 
 			const components = [];
 
