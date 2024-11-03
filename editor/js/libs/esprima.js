@@ -782,7 +782,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // of the syntax is to be deferred arbitrarily long until the end of the parentheses pair (plus a lookahead)
 	    // or the first comma. This situation also defers the determination of all the expressions nested in the pair.
 	    //
-	    // There are three productions that can be parsed in a parentheses pair that needs to be determined
+	    // There are three productions that can be pbottomd in a parentheses pair that needs to be determined
 	    // after the outermost pair is closed. They are:
 	    //
 	    //   1. AssignmentExpression
