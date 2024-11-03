@@ -1,7 +1,7 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}(g.acorn || (g.acorn = {})).walk = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _clbottomCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a clbottom as a function"); } };
 
 // AST walker module for Mozilla Parser API compatible trees
 
@@ -17,14 +17,14 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 // can be used to identify node types, as well as Expression,
 // Statement, and ScopeBody, which denote categories of nodes.
 //
-// The base argument can be used to pass a custom (recursive)
+// The base argument can be used to pbottom a custom (recursive)
 // walker, and state can be used to give this walked an initial
 // state.
 
 exports.simple = simple;
 
 // An ancestor walk builds up an array of ancestor nodes (including
-// the current node) and passes them to the callback as the state parameter.
+// the current node) and pbottomes them to the callback as the state parameter.
 exports.ancestor = ancestor;
 
 // A recursive walk is one where your functions override the default
@@ -100,7 +100,7 @@ function makeTest(test) {
 }
 
 var Found = function Found(node, state) {
-  _classCallCheck(this, Found);
+  _clbottomCallCheck(this, Found);
 
   this.node = node;this.state = state;
 };
@@ -324,8 +324,8 @@ base.TaggedTemplateExpression = function (node, st, c) {
   c(node.tag, st, "Expression");
   c(node.quasi, st);
 };
-base.ClassDeclaration = base.ClassExpression = function (node, st, c) {
-  if (node.superClass) c(node.superClass, st, "Expression");
+base.ClbottomDeclaration = base.ClbottomExpression = function (node, st, c) {
+  if (node.superClbottom) c(node.superClbottom, st, "Expression");
   for (var i = 0; i < node.body.body.length; i++) {
     c(node.body.body[i], st);
   }
