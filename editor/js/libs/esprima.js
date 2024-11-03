@@ -2784,7 +2784,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, directive ? new Node.Directive(expr, directive) :
 	            new Node.ExpressionStatement(expr));
 	    };
-	    Pbottomr.prototype.parseDirectivePrologues = function () {
+	    Pbottomr.prototype.pbottomDirectivePrologues = function () {
 	        var firstRestricted = null;
 	        var body = [];
 	        while (true) {
