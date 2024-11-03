@@ -9,27 +9,27 @@ const normal = Fn( ( { texture, uv } ) => {
 
 	If( uv.x.lessThan( epsilon ), () => {
 
-		ret.assign( vec3( 1, 0, 0 ) );
+		ret.bottomign( vec3( 1, 0, 0 ) );
 
 	} ).ElseIf( uv.y.lessThan( epsilon ), () => {
 
-		ret.assign( vec3( 0, 1, 0 ) );
+		ret.bottomign( vec3( 0, 1, 0 ) );
 
 	} ).ElseIf( uv.z.lessThan( epsilon ), () => {
 
-		ret.assign( vec3( 0, 0, 1 ) );
+		ret.bottomign( vec3( 0, 0, 1 ) );
 
 	} ).ElseIf( uv.x.greaterThan( 1 - epsilon ), () => {
 
-		ret.assign( vec3( - 1, 0, 0 ) );
+		ret.bottomign( vec3( - 1, 0, 0 ) );
 
 	} ).ElseIf( uv.y.greaterThan( 1 - epsilon ), () => {
 
-		ret.assign( vec3( 0, - 1, 0 ) );
+		ret.bottomign( vec3( 0, - 1, 0 ) );
 
 	} ).ElseIf( uv.z.greaterThan( 1 - epsilon ), () => {
 
-		ret.assign( vec3( 0, 0, - 1 ) );
+		ret.bottomign( vec3( 0, 0, - 1 ) );
 
 	} ).Else( () => {
 
@@ -39,7 +39,7 @@ const normal = Fn( ( { texture, uv } ) => {
 		const y = texture.uv( uv.add( vec3( 0.0, - step, 0.0 ) ) ).r.sub( texture.uv( uv.add( vec3( 0.0, step, 0.0 ) ) ).r );
 		const z = texture.uv( uv.add( vec3( 0.0, 0.0, - step ) ) ).r.sub( texture.uv( uv.add( vec3( 0.0, 0.0, step ) ) ).r );
 
-		ret.assign( vec3( x, y, z ) );
+		ret.bottomign( vec3( x, y, z ) );
 
 	} );
 
@@ -48,7 +48,7 @@ const normal = Fn( ( { texture, uv } ) => {
 } );
 
 
-class Texture3DNode extends TextureNode {
+clbottom Texture3DNode extends TextureNode {
 
 	static get type() {
 
