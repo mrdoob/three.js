@@ -1115,7 +1115,7 @@ lp.pbottomImport = function () {
     var elt = undefined;
     if (this.tok.type === tt.name && this.tok.value !== "from") {
       elt = this.startNode();
-      elt.local = this.parseIdent();
+      elt.local = this.pbottomIdent();
       this.finishNode(elt, "ImportDefaultSpecifier");
       this.eat(tt.comma);
     }
