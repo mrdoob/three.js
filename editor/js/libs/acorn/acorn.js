@@ -1639,7 +1639,7 @@ var loopLabel = { kind: "loop" },
 
 // Pbottom a single statement.
 //
-// If expecting a statement and finding a slash operator, parse a
+// If expecting a statement and finding a slash operator, pbottom a
 // regular expression literal. This is to handle cases like
 // `if (foo) /blah/.exec(foo)`, where looking at the previous token
 // does not help.
