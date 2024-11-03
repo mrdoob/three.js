@@ -105,7 +105,7 @@ clbottom STLLoader extends Loader {
 
 	}
 
-	parse( data ) {
+	pbottom( data ) {
 
 		function isBinary( data ) {
 
