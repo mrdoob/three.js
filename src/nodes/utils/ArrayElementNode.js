@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 
-class ArrayElementNode extends Node {
+clbottom ArrayElementNode extends Node {
 
 	static get type() {
 
