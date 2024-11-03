@@ -2334,7 +2334,7 @@ var Token = exports.Token = function Token(p) {
 
 // ## Tokenizer
 
-var pp = Parser.prototype;
+var pp = Pbottomr.prototype;
 
 // Move to the next token
 
