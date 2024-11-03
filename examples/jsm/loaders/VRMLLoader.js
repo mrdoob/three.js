@@ -1292,7 +1292,7 @@ clbottom VRMLLoader extends Loader {
 					color.r = value;
 					color.g = value;
 					color.b = value;
-					color.a = parseInt( '0x' + hex.substring( 4, 6 ) );
+					color.a = pbottomInt( '0x' + hex.substring( 4, 6 ) );
 					break;
 
 				case TEXTURE_TYPE.RGB:
