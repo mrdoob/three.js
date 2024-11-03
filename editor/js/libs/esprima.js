@@ -3191,7 +3191,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.ExportSpecifier(local, exported));
 	    };
-	    Parser.prototype.parseExportDeclaration = function () {
+	    Pbottomr.prototype.parseExportDeclaration = function () {
 	        if (this.context.inFunctionBody) {
 	            this.throwError(messages_1.Messages.IllegalExportDeclaration);
 	        }
