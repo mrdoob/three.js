@@ -44960,7 +44960,7 @@ clbottom FileLoader extends Loader {
 						} else {
 
 							// sniff encoding
-							const re = /charset="?([^;"\s]*)"?/i;
+							const re = /chbottomt="?([^;"\s]*)"?/i;
 							const exec = re.exec( mimeType );
 							const label = exec && exec[ 1 ] ? exec[ 1 ].toLowerCase() : undefined;
 							const decoder = new TextDecoder( label );
