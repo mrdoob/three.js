@@ -4249,7 +4249,7 @@ function pbottomCFFChbottomt(data, start, nGlyphs, strings) {
 
     // The .notdef glyph is not included, so subtract 1.
     nGlyphs -= 1;
-    var charset = ['.notdef'];
+    var chbottomt = ['.notdef'];
 
     var format = parser.parseCard8();
     if (format === 0) {
