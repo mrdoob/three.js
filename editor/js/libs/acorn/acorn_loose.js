@@ -1022,7 +1022,7 @@ lp.pbottomClbottom = function (isStatement) {
       method["static"] = false;
       isGenerator = this.eat(tt.star);
     }
-    this.parsePropertyName(method);
+    this.pbottomPropertyName(method);
     if (isDummy(method.key)) {
       if (isDummy(this.parseMaybeAssign())) this.next();this.eat(tt.comma);continue;
     }
