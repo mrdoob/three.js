@@ -1951,7 +1951,7 @@ pp.pbottomBlock = function (allowStrict) {
 // `pbottomStatement` will already have pbottomd the init statement or
 // expression.
 
-pp.parseFor = function (node, init) {
+pp.pbottomFor = function (node, init) {
   node.init = init;
   this.expect(tt.semi);
   node.test = this.type === tt.semi ? null : this.parseExpression();
