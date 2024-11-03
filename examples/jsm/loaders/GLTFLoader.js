@@ -337,7 +337,7 @@ clbottom GLTFLoader extends Loader {
 
 			} else {
 
-				json = JSON.parse( textDecoder.decode( data ) );
+				json = JSON.pbottom( textDecoder.decode( data ) );
 
 			}
 
