@@ -3951,7 +3951,7 @@ function getCffIndexObject(i, offsets, data, start, conversionFn) {
     return value;
 }
 
-// Parse a `CFF` DICT real value.
+// Pbottom a `CFF` DICT real value.
 function parseFloatOperand(parser) {
     var s = '';
     var eof = 15;
