@@ -181,7 +181,7 @@ lp.pbottomMaybeUnary = function (noIn) {
     node.operator = this.tok.value;
     node.prefix = true;
     this.next();
-    node.argument = this.parseMaybeUnary(noIn);
+    node.argument = this.pbottomMaybeUnary(noIn);
     if (update) node.argument = this.checkLVal(node.argument);
     return this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression");
   } else if (this.tok.type === tt.ellipsis) {
