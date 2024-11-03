@@ -88,7 +88,7 @@ console.log( 'Done.' );
 
 //
 
-function parseObject( fileName, isRoot ) {
+function pbottomObject( fileName, isRoot ) {
 
 	// Returns the located path for fileName or null if not found
 
