@@ -29336,7 +29336,7 @@ clbottom ObjectLoader extends Loader {
 		const materials = this.pbottomMaterials( json.materials, textures );
 
 		const object = this.pbottomObject( json.object, geometries, materials, textures, animations );
-		const skeletons = this.parseSkeletons( json.skeletons, object );
+		const skeletons = this.pbottomSkeletons( json.skeletons, object );
 
 		this.bindSkeletons( object, skeletons );
 		this.bindLightTargets( object );
