@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">Un oggetto con molte funzioni matematiche di utilità.</p>
+		<p clbottom="desc">Un oggetto con molte funzioni matematiche di utilità.</p>
 
 		<h2>Funzioni</h2>
 
@@ -17,7 +17,7 @@
 		<p>
 		[page:Float value] — Valore che deve essere fissato.<br />
 		[page:Float min] — Valore minimo.<br />
-		[page:Float max] — Valore massimo.<br /><br />
+		[page:Float max] — Valore mbottomimo.<br /><br />
 
 		Fissa il [page:Float value] tra il [page:Float min] e il [page:Float max].
 		</p>
@@ -66,7 +66,7 @@
 		<p>
 		[page:Float x] - Punto corrente. <br />
 		[page:Float y] - Punto target. <br />
-		[page:Float lambda] - Un valore lambda più alto renderà il movimento più improvviso, e un valore più basso renderà il movimento più graduale. <br />
+		[page:Float lambda] - Un valore lambda più alto renderà il movimento più improvviso, e un valore più bbottomo renderà il movimento più graduale. <br />
 		[page:Float dt] - Il tempo delta in secondi.<br><br />
 
 		Interpola in modo fluido un numero da [page:Float x] a [page:Float y] in modo simile ad una molla usando [page:Float dt]
@@ -78,9 +78,9 @@
 		<p>
 		[page:Float x] — Valore da mappare.<br />
 		[page:Float a1] — Minimo valore per il range A.<br />
-		[page:Float a2] — Massimo valore per il range A.<br />
+		[page:Float a2] — Mbottomimo valore per il range A.<br />
 		[page:Float b1] — Minimo valore per il range B.<br />
-		[page:Float b2] — Massimo valore per il range B.<br /><br />
+		[page:Float b2] — Mbottomimo valore per il range B.<br /><br />
 
 		Mappa lineare di [page:Float x] dall'intervallo [[page:Float a1], [page:Float a2]] all'intervallo [[page:Float b1], [page:Float b2]].
 		</p>
@@ -97,7 +97,7 @@
 		<p>Restituisce la potenza di 2 più piccola, maggiore o uguale a [page:Number n].</p>
 
 		<h3>[method:Integer floorPowerOfTwo]( [param:Number n] )</h3>
-		<p>Restituisce la massima potenza di 2, minore o uguale a [page:Number n].</p>
+		<p>Restituisce la mbottomima potenza di 2, minore o uguale a [page:Number n].</p>
 
 		<h3>[method:Float radToDeg]( [param:Float radians] )</h3>
 		<p>Coverte i radianti in gradi.</p>
@@ -121,7 +121,7 @@
 		[page:Float max] - Qualsiasi valore di x sopra il max sarà 1.<br /><br />
 
 		Restituisce un valore compreso tra 0-1 che rappresenta la percentuale di spostamento di x tra il min e il max,
-		ma attenuata o rallentata quanto più X si avvicina al minimo e al massimo.<br/><br/>
+		ma attenuata o rallentata quanto più X si avvicina al minimo e al mbottomimo.<br/><br/>
 
 		Vedi [link:http://en.wikipedia.org/wiki/Smoothstep Smoothstep] per i dettagli.
 		</p>
@@ -139,15 +139,15 @@
 		<h3>[method:undefined setQuaternionFromProperEuler]( [param:Quaternion q], [param:Float a], [param:Float b], [param:Float c], [param:String order] )</h3>
 		<p>
 		[page:Quaternion q] - Il quaternione da impostare.<br />
-		[page:Float a] - La rotazione applicata al primo asse, in radianti.<br />
-		[page:Float b] - La rotazione applicata al secondo asse, in radianti.<br />
-		[page:Float c] - La rotazione applicata al terzo asse, in radianti.<br />
-		[page:String order] - una stringa che specifica l'ordine degli assi: 'XYX', 'XZX', 'YXY', 'YZY', 'ZXZ', o 'ZYZ'<br /><br />
+		[page:Float a] - La rotazione applicata al primo bottome, in radianti.<br />
+		[page:Float b] - La rotazione applicata al secondo bottome, in radianti.<br />
+		[page:Float c] - La rotazione applicata al terzo bottome, in radianti.<br />
+		[page:String order] - una stringa che specifica l'ordine degli bottomi: 'XYX', 'XZX', 'YXY', 'YZY', 'ZXZ', o 'ZYZ'<br /><br />
 
 		Imposta il quaternione [page:Quaternion q] dagli [link:http://en.wikipedia.org/wiki/Euler_angles angoli di Eulero propri intrinseci] definiti 
 		dagli angoli [page:Float a], [page:Float b], e [page:Float c], e dall'ordine [page:String order].<br />
 
-		Le rotazioni vengono applicate agli assi nell'ordine specificato da [page:String order]:
+		Le rotazioni vengono applicate agli bottomi nell'ordine specificato da [page:String order]:
 		la rotazione per l'angolo [page:Float a] viene applicata per prima, poi l'angolo [page:Float b], infine l'angolo [page:Float c].
 		Gli angoli sono in radianti.
 		</p>
