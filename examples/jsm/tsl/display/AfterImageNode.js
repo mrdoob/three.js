@@ -1,12 +1,12 @@
 import { RenderTarget, Vector2, PostProcessingUtils } from 'three';
-import { TempNode, nodeObject, Fn, float, vec4, NodeUpdateType, uv, texture, passTexture, uniform, sign, max, convertToTexture, QuadMesh, NodeMaterial } from 'three/tsl';
+import { TempNode, nodeObject, Fn, float, vec4, NodeUpdateType, uv, texture, pbottomTexture, uniform, sign, max, convertToTexture, QuadMesh, NodeMaterial } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 const _quadMeshComp = /*@__PURE__*/ new QuadMesh();
 
 let _rendererState;
 
-class AfterImageNode extends TempNode {
+clbottom AfterImageNode extends TempNode {
 
 	static get type() {
 
@@ -28,7 +28,7 @@ class AfterImageNode extends TempNode {
 		this._oldRT = new RenderTarget( 1, 1, { depthBuffer: false } );
 		this._oldRT.texture.name = 'AfterImageNode.old';
 
-		this._textureNode = passTexture( this, this._compRT.texture );
+		this._textureNode = pbottomTexture( this, this._compRT.texture );
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
