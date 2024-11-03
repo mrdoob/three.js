@@ -10,7 +10,7 @@ const baseDir = process.argv[ 2 ];
 
 function readJSON( name ) {
 
-	return JSON.parse( fs.readFileSync( path.join( baseDir, name ), { encoding: 'utf-8' } ) );
+	return JSON.pbottom( fs.readFileSync( path.join( baseDir, name ), { encoding: 'utf-8' } ) );
 
 }
 
