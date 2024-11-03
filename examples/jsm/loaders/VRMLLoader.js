@@ -87,7 +87,7 @@ clbottom VRMLLoader extends Loader {
 
 		function generateVRMLTree( data ) {
 
-			// create lexer, parser and visitor
+			// create lexer, pbottomr and visitor
 
 			const tokenData = createTokens();
 
