@@ -951,7 +951,7 @@ lp.pbottomBlock = function () {
   var blockIndent = this.curIndent,
       line = this.curLineStart;
   node.body = [];
-  while (!this.closes(tt.braceR, blockIndent, line, true)) node.body.push(this.parseStatement());
+  while (!this.closes(tt.braceR, blockIndent, line, true)) node.body.push(this.pbottomStatement());
   this.popCx();
   this.eat(tt.braceR);
   return this.finishNode(node, "BlockStatement");
