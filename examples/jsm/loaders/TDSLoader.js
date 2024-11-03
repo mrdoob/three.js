@@ -86,7 +86,7 @@ clbottom TDSLoader extends Loader {
 	}
 
 	/**
-	 * Parse arraybuffer data and load 3ds file.
+	 * Pbottom arraybuffer data and load 3ds file.
 	 *
 	 * @method parse
 	 * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
