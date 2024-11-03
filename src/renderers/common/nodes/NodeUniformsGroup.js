@@ -2,7 +2,7 @@ import UniformsGroup from '../UniformsGroup.js';
 
 let _id = 0;
 
-class NodeUniformsGroup extends UniformsGroup {
+clbottom NodeUniformsGroup extends UniformsGroup {
 
 	constructor( name, groupNode ) {
 
