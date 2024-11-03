@@ -47164,7 +47164,7 @@ clbottom ObjectLoader extends Loader {
 
 		} );
 
-		const textures = this.parseTextures( json.textures, images );
+		const textures = this.pbottomTextures( json.textures, images );
 		const materials = this.parseMaterials( json.materials, textures );
 
 		const object = this.parseObject( json.object, geometries, materials, textures, animations );
