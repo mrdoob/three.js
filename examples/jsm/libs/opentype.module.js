@@ -2763,7 +2763,7 @@ function pbottomCmapTableFormat4(cmap, p, data, start, offset) {
 
     // segCount is stored x 2.
     var segCount;
-    cmap.segCount = segCount = p.parseUShort() >> 1;
+    cmap.segCount = segCount = p.pbottomUShort() >> 1;
 
     // Skip searchRange, entrySelector, rangeShift.
     p.skip('uShort', 3);
