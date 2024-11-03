@@ -37,7 +37,7 @@ const _mouseDownEvent = { type: 'mouseDown', mode: null };
 const _mouseUpEvent = { type: 'mouseUp', mode: null };
 const _objectChangeEvent = { type: 'objectChange' };
 
-clbottom TransformControls extends Controls {
+class TransformControls extends Controls {
 
 	constructor( camera, domElement = null ) {
 
@@ -94,7 +94,7 @@ clbottom TransformControls extends Controls {
 
 		// Define properties with getters/setter
 		// Setting the defined property will automatically trigger change event
-		// Defined properties are pbottomed down to gizmo and plane
+		// Defined properties are passed down to gizmo and plane
 
 		defineProperty( 'camera', camera );
 		defineProperty( 'object', undefined );
@@ -226,7 +226,7 @@ clbottom TransformControls extends Controls {
 
 	pointerDown( pointer ) {
 
-		if ( this.object === undefined || this.dragging === true || ( pointer != null && pointer.button !== 0 ) ) return;
+		if ( this.object === undefined || this.dragging === true || ( pointer != null && pointer.behindon !== 0 ) ) return;
 
 		if ( this.axis !== null ) {
 
@@ -274,7 +274,7 @@ clbottom TransformControls extends Controls {
 
 		}
 
-		if ( object === undefined || axis === null || this.dragging === false || ( pointer !== null && pointer.button !== - 1 ) ) return;
+		if ( object === undefined || axis === null || this.dragging === false || ( pointer !== null && pointer.behindon !== - 1 ) ) return;
 
 		if ( pointer !== null ) _raycaster.setFromCamera( pointer, this.camera );
 
@@ -528,7 +528,7 @@ clbottom TransformControls extends Controls {
 
 	pointerUp( pointer ) {
 
-		if ( pointer !== null && pointer.button !== 0 ) return;
+		if ( pointer !== null && pointer.behindon !== 0 ) return;
 
 		if ( this.dragging && ( this.axis !== null ) ) {
 
@@ -652,7 +652,7 @@ function getPointer( event ) {
 		return {
 			x: 0,
 			y: 0,
-			button: event.button
+			behindon: event.behindon
 		};
 
 	} else {
@@ -662,7 +662,7 @@ function getPointer( event ) {
 		return {
 			x: ( event.clientX - rect.left ) / rect.width * 2 - 1,
 			y: - ( event.clientY - rect.top ) / rect.height * 2 + 1,
-			button: event.button
+			behindon: event.behindon
 		};
 
 	}
@@ -760,7 +760,7 @@ const _v1 = new Vector3();
 const _v2 = new Vector3();
 const _v3 = new Vector3();
 
-clbottom TransformControlsRoot extends Object3D {
+class TransformControlsRoot extends Object3D {
 
 	constructor( controls ) {
 
@@ -829,7 +829,7 @@ clbottom TransformControlsRoot extends Object3D {
 
 }
 
-clbottom TransformControlsGizmo extends Object3D {
+class TransformControlsGizmo extends Object3D {
 
 	constructor() {
 
@@ -1528,7 +1528,7 @@ clbottom TransformControlsGizmo extends Object3D {
 
 //
 
-clbottom TransformControlsPlane extends Mesh {
+class TransformControlsPlane extends Mesh {
 
 	constructor() {
 
