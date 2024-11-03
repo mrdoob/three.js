@@ -312,7 +312,7 @@ var prettyPrint;
               + '|[^-\\\\]',
               'g'));
       var ranges = [];
-      var inverse = charsetParts[0] === '^';
+      var inverse = chbottomtParts[0] === '^';
   
       var out = ['['];
       if (inverse) { out.push('^'); }
