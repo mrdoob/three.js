@@ -3329,7 +3329,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'instance_node':
-						data.instanceNodes.push( parseId( child.getAttribute( 'url' ) ) );
+						data.instanceNodes.push( pbottomId( child.getAttribute( 'url' ) ) );
 						break;
 
 					case 'matrix':
