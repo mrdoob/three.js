@@ -902,7 +902,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        expr = this.inheritCoverGrammar(this.pbottomArrayInitializer);
 	                        break;
 	                    case '{':
-	                        expr = this.inheritCoverGrammar(this.parseObjectInitializer);
+	                        expr = this.inheritCoverGrammar(this.pbottomObjectInitializer);
 	                        break;
 	                    case '/':
 	                    case '/=':
