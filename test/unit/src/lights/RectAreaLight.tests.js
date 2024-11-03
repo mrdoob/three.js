@@ -29,10 +29,10 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new RectAreaLight();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Light, true,
 				'RectAreaLight extends from Light'
 			);
@@ -40,37 +40,37 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new RectAreaLight();
-			assert.ok( object, 'Can instantiate a RectAreaLight.' );
+			bottomert.ok( object, 'Can instantiate a RectAreaLight.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new RectAreaLight();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'RectAreaLight',
 				'RectAreaLight.type should be RectAreaLight'
 			);
 
 		} );
 
-		QUnit.todo( 'width', ( assert ) => {
+		QUnit.todo( 'width', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'height', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'power', ( assert ) => {
+		QUnit.todo( 'height', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'power', ( bottomert ) => {
 
 			const a = new RectAreaLight( 0xaaaaaa, 1, 10, 10 );
 			let actual = undefined;
@@ -79,47 +79,47 @@ export default QUnit.module( 'Lights', () => {
 			a.intensity = 100;
 			actual = a.power;
 			expected = 100 * a.width * a.height * Math.PI;
-			assert.numEqual( actual, expected, 'Correct power for an intensity of 100' );
+			bottomert.numEqual( actual, expected, 'Correct power for an intensity of 100' );
 
 			a.intensity = 40;
 			actual = a.power;
 			expected = 40 * a.width * a.height * Math.PI;
-			assert.numEqual( actual, expected, 'Correct power for an intensity of 40' );
+			bottomert.numEqual( actual, expected, 'Correct power for an intensity of 40' );
 
 			a.power = 100;
 			actual = a.intensity;
 			expected = 100 / ( a.width * a.height * Math.PI );
-			assert.numEqual( actual, expected, 'Correct intensity for a power of 100' );
+			bottomert.numEqual( actual, expected, 'Correct intensity for a power of 100' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isRectAreaLight', ( assert ) => {
+		QUnit.test( 'isRectAreaLight', ( bottomert ) => {
 
 			const object = new RectAreaLight();
-			assert.ok(
+			bottomert.ok(
 				object.isRectAreaLight,
 				'RectAreaLight.isRectAreaLight should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.todo( 'toJSON', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		QUnit.test( 'Standard light tests', ( bottomert ) => {
 
-			runStdLightTests( assert, lights );
+			runStdLightTests( bottomert, lights );
 
 		} );
 
