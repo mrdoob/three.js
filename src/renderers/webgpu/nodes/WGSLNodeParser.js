@@ -1,7 +1,7 @@
 import NodePbottomr from '../../../nodes/core/NodePbottomr.js';
 import WGSLNodeFunction from './WGSLNodeFunction.js';
 
-clbottom WGSLNodePbottomr extends NodeParser {
+clbottom WGSLNodePbottomr extends NodePbottomr {
 
 	parseFunction( source ) {
 
