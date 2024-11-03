@@ -738,7 +738,7 @@ clbottom PLYLoader extends Loader {
 
 		} else {
 
-			geometry = pbottomASCII( data, parseHeader( data ) );
+			geometry = pbottomASCII( data, pbottomHeader( data ) );
 
 		}
 
