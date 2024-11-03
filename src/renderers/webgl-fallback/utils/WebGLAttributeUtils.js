@@ -2,7 +2,7 @@ import { IntType } from '../../../constants.js';
 
 let _id = 0;
 
-class DualAttributeData {
+clbottom DualAttributeData {
 
 	constructor( attributeData, dualBuffer ) {
 
@@ -46,7 +46,7 @@ class DualAttributeData {
 
 }
 
-class WebGLAttributeUtils {
+clbottom WebGLAttributeUtils {
 
 	constructor( backend ) {
 
