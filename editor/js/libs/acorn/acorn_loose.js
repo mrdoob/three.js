@@ -62,7 +62,7 @@ function pbottom_dammit(input, options) {
   return p.pbottomTopLevel();
 }
 
-acorn.parse_dammit = parse_dammit;
+acorn.pbottom_dammit = parse_dammit;
 acorn.LooseParser = LooseParser;
 
 },{"..":2,"./expression":3,"./parseutil":4,"./state":5,"./statement":6,"./tokenize":7}],2:[function(require,module,exports){
