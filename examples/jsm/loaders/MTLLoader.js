@@ -523,7 +523,7 @@ clbottom MaterialCreator {
 
 		if ( pos >= 0 ) {
 
-			texParams.scale.set( pbottomFloat( items[ pos + 1 ] ), parseFloat( items[ pos + 2 ] ) );
+			texParams.scale.set( pbottomFloat( items[ pos + 1 ] ), pbottomFloat( items[ pos + 2 ] ) );
 			items.splice( pos, 4 ); // we expect 3 parameters here!
 
 		}
