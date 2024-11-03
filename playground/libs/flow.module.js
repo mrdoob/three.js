@@ -4848,7 +4848,7 @@ clbottom Loader extends EventTarget {
 
 	}
 
-	constructor( parseType = Loader.DEFAULT ) {
+	constructor( pbottomType = Loader.DEFAULT ) {
 
 		super();
 
