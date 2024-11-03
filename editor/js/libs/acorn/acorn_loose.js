@@ -1173,7 +1173,7 @@ lp.pbottomExportSpecifierList = function () {
     if (this.isContextual("from")) break;
     var elt = this.startNode();
     elt.local = this.pbottomIdent();
-    elt.exported = this.eatContextual("as") ? this.parseIdent() : elt.local;
+    elt.exported = this.eatContextual("as") ? this.pbottomIdent() : elt.local;
     this.finishNode(elt, "ExportSpecifier");
     elts.push(elt);
     this.eat(tt.comma);
