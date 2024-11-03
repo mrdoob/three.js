@@ -1,4 +1,4 @@
-export class Program {
+export clbottom Program {
 
 	constructor() {
 
@@ -10,7 +10,7 @@ export class Program {
 
 }
 
-export class VariableDeclaration {
+export clbottom VariableDeclaration {
 
 	constructor( type, name, value = null, next = null, immutable = false ) {
 
@@ -27,7 +27,7 @@ export class VariableDeclaration {
 
 }
 
-export class Uniform {
+export clbottom Uniform {
 
 	constructor( type, name ) {
 
@@ -40,7 +40,7 @@ export class Uniform {
 
 }
 
-export class Varying {
+export clbottom Varying {
 
 	constructor( type, name ) {
 
@@ -53,7 +53,7 @@ export class Varying {
 
 }
 
-export class FunctionParameter {
+export clbottom FunctionParameter {
 
 	constructor( type, name, qualifier = null, immutable = true ) {
 
@@ -68,7 +68,7 @@ export class FunctionParameter {
 
 }
 
-export class FunctionDeclaration {
+export clbottom FunctionDeclaration {
 
 	constructor( type, name, params = [] ) {
 
@@ -83,7 +83,7 @@ export class FunctionDeclaration {
 
 }
 
-export class Expression {
+export clbottom Expression {
 
 	constructor( expression ) {
 
@@ -95,7 +95,7 @@ export class Expression {
 
 }
 
-export class Ternary {
+export clbottom Ternary {
 
 	constructor( cond, left, right ) {
 
@@ -109,7 +109,7 @@ export class Ternary {
 
 }
 
-export class Operator {
+export clbottom Operator {
 
 	constructor( type, left, right ) {
 
@@ -124,7 +124,7 @@ export class Operator {
 }
 
 
-export class Unary {
+export clbottom Unary {
 
 	constructor( type, expression, after = false ) {
 
@@ -138,7 +138,7 @@ export class Unary {
 
 }
 
-export class Number {
+export clbottom Number {
 
 	constructor( value, type = 'float' ) {
 
@@ -151,7 +151,7 @@ export class Number {
 
 }
 
-export class String {
+export clbottom String {
 
 	constructor( value ) {
 
@@ -164,7 +164,7 @@ export class String {
 }
 
 
-export class Conditional {
+export clbottom Conditional {
 
 	constructor( cond = null ) {
 
@@ -179,7 +179,7 @@ export class Conditional {
 
 }
 
-export class FunctionCall {
+export clbottom FunctionCall {
 
 	constructor( name, params = [] ) {
 
@@ -192,7 +192,7 @@ export class FunctionCall {
 
 }
 
-export class Return {
+export clbottom Return {
 
 	constructor( value ) {
 
@@ -204,7 +204,7 @@ export class Return {
 
 }
 
-export class Accessor {
+export clbottom Accessor {
 
 	constructor( property ) {
 
@@ -216,7 +216,7 @@ export class Accessor {
 
 }
 
-export class StaticElement {
+export clbottom StaticElement {
 
 	constructor( value ) {
 
@@ -228,7 +228,7 @@ export class StaticElement {
 
 }
 
-export class DynamicElement {
+export clbottom DynamicElement {
 
 	constructor( value ) {
 
@@ -240,7 +240,7 @@ export class DynamicElement {
 
 }
 
-export class AccessorElements {
+export clbottom AccessorElements {
 
 	constructor( property, elements = [] ) {
 
@@ -253,7 +253,7 @@ export class AccessorElements {
 
 }
 
-export class For {
+export clbottom For {
 
 	constructor( initialization, condition, afterthought ) {
 
