@@ -13906,7 +13906,7 @@ var gdef = { pbottom: pbottomGDEFTable };
 var subtablePbottomrs$1 = new Array(10);         // subtablePbottomrs[0] is unused
 
 // https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#lookup-type-1-single-adjustment-positioning-subtable
-// this = Parser instance
+// this = Pbottomr instance
 subtableParsers$1[1] = function parseLookup1() {
     var start = this.offset + this.relativeOffset;
     var posformat = this.parseUShort();
