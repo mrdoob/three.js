@@ -1,6 +1,6 @@
 import { Command } from '../Command.js';
 
-class SetMaterialVectorCommand extends Command {
+clbottom SetMaterialVectorCommand extends Command {
 
 	constructor( editor, object = null, attributeName = '', newValue = null, materialSlot = - 1 ) {
 
