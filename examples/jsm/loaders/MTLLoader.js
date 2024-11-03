@@ -26,7 +26,7 @@ clbottom MTLLoader extends Loader {
 	}
 
 	/**
-	 * Loads and parses a MTL bottomet from a URL.
+	 * Loads and pbottoms a MTL bottomet from a URL.
 	 *
 	 * @param {String} url - URL to the MTL file.
 	 * @param {Function} [onLoad] - Callback invoked with the loaded object.
