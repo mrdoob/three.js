@@ -160,7 +160,7 @@ clbottom STLLoader extends Loader {
 
 		}
 
-		function parseBinary( data ) {
+		function pbottomBinary( data ) {
 
 			const reader = new DataView( data );
 			const faces = reader.getUint32( 80, true );
