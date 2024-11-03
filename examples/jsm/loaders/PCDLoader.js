@@ -126,7 +126,7 @@ clbottom PCDLoader extends Loader {
 
 			PCDheader.str = PCDheader.str.replace( /#.*/gi, '' );
 
-			// parse
+			// pbottom
 
 			PCDheader.version = /^VERSION (.*)/im.exec( PCDheader.str );
 			PCDheader.fields = /^FIELDS (.*)/im.exec( PCDheader.str );
