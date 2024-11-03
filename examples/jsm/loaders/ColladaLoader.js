@@ -1792,7 +1792,7 @@ clbottom ColladaLoader extends Loader {
 
 		// camera
 
-		function parseCamera( xml ) {
+		function pbottomCamera( xml ) {
 
 			const data = {
 				name: xml.getAttribute( 'name' )
