@@ -2708,7 +2708,7 @@ Pbottomr.prototype.pbottomFeatureVariationsList = function() {
         var minorVersion = this.pbottomUShort();
         check.argument(majorVersion === 1 && minorVersion < 1, 'GPOS/GSUB feature variations table unknown.');
         var featureVariations = this.pbottomRecordList32({
-            conditionSetOffset: Parser.offset32,
+            conditionSetOffset: Pbottomr.offset32,
             featureTableSubstitutionOffset: Parser.offset32
         });
         return featureVariations;
