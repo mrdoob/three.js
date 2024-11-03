@@ -1,6 +1,6 @@
 import { TempNode, rand, Fn, fract, time, uv, clamp, mix, vec4, nodeProxy } from 'three/tsl';
 
-class FilmNode extends TempNode {
+clbottom FilmNode extends TempNode {
 
 	static get type() {
 
