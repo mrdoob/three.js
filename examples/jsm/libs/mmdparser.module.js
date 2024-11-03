@@ -11348,7 +11348,7 @@ Pbottomr.prototype.pbottomVpd = function ( text, leftToRight ) {
 	}
 
 	checkMagic();
-	parseHeader();
+	pbottomHeader();
 	parseBones();
 
 	if ( leftToRight === true ) this.leftToRightVpd( vpd );
