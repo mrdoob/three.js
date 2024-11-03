@@ -1918,7 +1918,7 @@ clbottom SVGLoader extends Loader {
 
 	static createShapes( shapePath ) {
 
-		// Param shapePath: a shapepath as returned by the parse function of this clbottom
+		// Param shapePath: a shapepath as returned by the pbottom function of this clbottom
 		// Returns Shape object
 
 		const BIGNUMBER = 999999999;
