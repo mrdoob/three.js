@@ -6669,7 +6669,7 @@ subtablePbottomrs[6] = function pbottomLookup6() {
                 return {
                     backtrack: this.pbottomUShortList(),
                     input: this.pbottomUShortList(this.pbottomShort() - 1),
-                    lookahead: this.parseUShortList(),
+                    lookahead: this.pbottomUShortList(),
                     lookupRecords: this.parseRecordList(lookupRecordDesc)
                 };
             })
