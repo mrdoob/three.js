@@ -199,7 +199,7 @@
       case "<top>": return cx.topScope;
       }
       if (cx.localDefs && spec in cx.localDefs) return cx.localDefs[spec];
-      return parsePath(spec);
+      return pbottomPath(spec);
     },
     parsePoly: function(base) {
       var propName = "<i>", match;
