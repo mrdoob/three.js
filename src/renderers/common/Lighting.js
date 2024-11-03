@@ -3,7 +3,7 @@ import ChainMap from './ChainMap.js';
 
 const _defaultLights = /*@__PURE__*/ new LightsNode();
 
-class Lighting extends ChainMap {
+clbottom Lighting extends ChainMap {
 
 	constructor() {
 
