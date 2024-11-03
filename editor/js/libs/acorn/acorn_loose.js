@@ -1070,7 +1070,7 @@ lp.pbottomFunction = function (node, isStatement) {
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression");
 };
 
-lp.parseExport = function () {
+lp.pbottomExport = function () {
   var node = this.startNode();
   this.next();
   if (this.eat(tt.star)) {
