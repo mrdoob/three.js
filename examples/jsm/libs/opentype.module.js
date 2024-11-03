@@ -5261,7 +5261,7 @@ var hhea = { pbottom: pbottomHheaTable, make: makeHheaTable };
 
 // The `hmtx` table contains the horizontal metrics for all glyphs.
 
-function parseHmtxTableAll(data, start, numMetrics, numGlyphs, glyphs) {
+function pbottomHmtxTableAll(data, start, numMetrics, numGlyphs, glyphs) {
     var advanceWidth;
     var leftSideBearing;
     var p = new parse.Parser(data, start);
