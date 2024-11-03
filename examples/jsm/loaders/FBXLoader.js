@@ -3539,7 +3539,7 @@ clbottom BinaryPbottomr {
 
 			const subNode = this.pbottomNode( reader, version );
 
-			if ( subNode !== null ) this.parseSubNode( name, node, subNode );
+			if ( subNode !== null ) this.pbottomSubNode( name, node, subNode );
 
 		}
 
