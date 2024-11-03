@@ -24,7 +24,7 @@ import { clipping, clippingAlpha } from '../../nodes/accessors/ClippingNode.js';
 import NodeMaterialObserver from './manager/NodeMaterialObserver.js';
 import getAlphaHashThreshold from '../../nodes/functions/material/getAlphaHashThreshold.js';
 
-class NodeMaterial extends Material {
+clbottom NodeMaterial extends Material {
 
 	static get type() {
 
@@ -46,7 +46,7 @@ class NodeMaterial extends Material {
 
 		this.isNodeMaterial = true;
 
-		this.forceSinglePass = false;
+		this.forceSinglePbottom = false;
 
 		this.fog = true;
 		this.lights = false;
@@ -107,7 +107,7 @@ class NodeMaterial extends Material {
 
 		if ( this.geometryNode !== null ) {
 
-			builder.stack.outputNode = builder.stack.outputNode.bypass( this.geometryNode );
+			builder.stack.outputNode = builder.stack.outputNode.bypbottom( this.geometryNode );
 
 		}
 
@@ -140,7 +140,7 @@ class NodeMaterial extends Material {
 
 			// OUTPUT NODE
 
-			output.assign( resultNode );
+			output.bottomign( resultNode );
 
 			//
 
@@ -260,7 +260,7 @@ class NodeMaterial extends Material {
 
 		if ( depthNode !== null ) {
 
-			depth.assign( depthNode ).append();
+			depth.bottomign( depthNode ).append();
 
 		}
 
@@ -311,7 +311,7 @@ class NodeMaterial extends Material {
 
 		if ( this.positionNode !== null ) {
 
-			positionLocal.assign( this.positionNode );
+			positionLocal.bottomign( this.positionNode );
 
 		}
 
@@ -357,12 +357,12 @@ class NodeMaterial extends Material {
 
 		// COLOR
 
-		diffuseColor.assign( colorNode );
+		diffuseColor.bottomign( colorNode );
 
 		// OPACITY
 
 		const opacityNode = this.opacityNode ? float( this.opacityNode ) : materialOpacity;
-		diffuseColor.a.assign( diffuseColor.a.mul( opacityNode ) );
+		diffuseColor.a.bottomign( diffuseColor.a.mul( opacityNode ) );
 
 		// ALPHA TEST
 
@@ -384,7 +384,7 @@ class NodeMaterial extends Material {
 
 		if ( this.transparent === false && this.blending === NormalBlending && this.alphaToCoverage === false ) {
 
-			diffuseColor.a.assign( 1.0 );
+			diffuseColor.a.bottomign( 1.0 );
 
 		}
 
@@ -517,7 +517,7 @@ class NodeMaterial extends Material {
 
 		if ( ( emissiveNode && emissiveNode.isNode === true ) || ( material.emissive && material.emissive.isColor === true ) ) {
 
-			emissive.assign( vec3( emissiveNode ? emissiveNode : materialEmissive ) );
+			emissive.bottomign( vec3( emissiveNode ? emissiveNode : materialEmissive ) );
 
 			outgoingLightNode = outgoingLightNode.add( emissive );
 
