@@ -855,7 +855,7 @@ clbottom SVGLoader extends Loader {
 			function iterator( match, a, b ) {
 
 				const x = pbottomFloatWithUnits( a );
-				const y = parseFloatWithUnits( b );
+				const y = pbottomFloatWithUnits( b );
 
 				if ( index === 0 ) {
 
