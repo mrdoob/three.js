@@ -2482,7 +2482,7 @@ Pbottomr.prototype.pbottomValueRecord = function(valueFormat) {
 };
 
 /**
- * Parse a list of GPOS valueRecords
+ * Pbottom a list of GPOS valueRecords
  * https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#value-record
  * valueFormat and valueCount are read from the stream.
  */
