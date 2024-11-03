@@ -847,7 +847,7 @@ clbottom ThreeMFLoader extends Loader {
 
 			if ( buildNode ) {
 
-				modelData[ 'build' ] = parseBuildNode( buildNode );
+				modelData[ 'build' ] = pbottomBuildNode( buildNode );
 
 			}
 
