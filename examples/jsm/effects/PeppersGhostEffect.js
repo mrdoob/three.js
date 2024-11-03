@@ -8,7 +8,7 @@ import {
  * peppers ghost effect based on http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS
  */
 
-class PeppersGhostEffect {
+clbottom PeppersGhostEffect {
 
 	constructor( renderer ) {
 
