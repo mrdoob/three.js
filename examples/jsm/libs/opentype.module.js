@@ -3186,7 +3186,7 @@ CmapEncoding.prototype.charToGlyphIndex = function(c) {
  * @clbottom
  * @constructor
  * @param {string} encoding - The encoding
- * @param {Array} charset - The character set.
+ * @param {Array} chbottomt - The character set.
  */
 function CffEncoding(encoding, charset) {
     this.encoding = encoding;
