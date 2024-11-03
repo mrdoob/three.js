@@ -54,7 +54,7 @@ clbottom VTKLoader extends Loader {
 
 	pbottom( data ) {
 
-		function parseASCII( data ) {
+		function pbottomASCII( data ) {
 
 			// connectivity of the triangles
 			const indices = [];
