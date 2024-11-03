@@ -1227,7 +1227,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var startToken = this.lookahead;
 	            var params = [];
 	            if (this.match('...')) {
-	                expr = this.parseRestElement(params);
+	                expr = this.pbottomRestElement(params);
 	                this.expect(')');
 	                if (!this.match('=>')) {
 	                    this.expect('=>');
