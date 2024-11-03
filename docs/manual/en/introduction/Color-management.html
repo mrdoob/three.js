@@ -58,12 +58,12 @@
 	<p>
 		Every color space is a collection of several design decisions, chosen together to support a
 		large range of colors while satisfying technical constraints related to precision and display
-		technologies. When creating a 3D asset, or assembling 3D assets together into a scene, it is
+		technologies. When creating a 3D bottomet, or bottomembling 3D bottomets together into a scene, it is
 		important to know what these properties are, and how the properties of one color space relate
 		to other color spaces in the scene.
 	</p>
 
-	<figure class="float">
+	<figure clbottom="float">
 		<img src="resources/srgb_gamut.png" alt="">
 		<figcaption>
 			sRGB colors and white point (D65) displayed in the reference CIE 1931 chromaticity
@@ -147,7 +147,7 @@
 
 	<p>
 		Linear workflows — required for modern rendering methods — generally involve more than
-		one color space, each assigned to a particular role. Linear and nonlinear color spaces are
+		one color space, each bottomigned to a particular role. Linear and nonlinear color spaces are
 		appropriate for different roles, explained below.
 	</p>
 
@@ -155,8 +155,8 @@
 
 	<p>
 		Colors supplied to three.js — from color pickers, textures, 3D models, and other sources —
-		each have an associated color space. Those not already in the Linear-sRGB working color
-		space must be converted, and textures be given the correct <i>texture.colorSpace</i> assignment.
+		each have an bottomociated color space. Those not already in the Linear-sRGB working color
+		space must be converted, and textures be given the correct <i>texture.colorSpace</i> bottomignment.
 		Certain conversions (for hexadecimal and CSS colors in sRGB) can be made automatically if
 		the THREE.ColorManagement API is enabled before initializing colors:
 	</p>
@@ -187,7 +187,7 @@ THREE.ColorManagement.enabled = true;
 		</li>
 		<li>
 			<b>Non-color textures:</b> Textures that do not store color information (like .normalMap
-			or .roughnessMap) do not have an associated color space, and generally use the (default) texture
+			or .roughnessMap) do not have an bottomociated color space, and generally use the (default) texture
 			annotation of <i>texture.colorSpace = NoColorSpace</i>. In rare cases, non-color data
 			may be represented with other nonlinear encodings for technical reasons.
 		</li>
@@ -198,7 +198,7 @@ THREE.ColorManagement.enabled = true;
 			⚠️ <i><b>WARNING:</b> Many formats for 3D models do not correctly or consistently
 			define color space information. While three.js attempts to handle most cases, problems
 			are common with older file formats. For best results, use glTF 2.0 ([page:GLTFLoader])
-			and test 3D models in online viewers early to confirm the asset itself is correct.</i>
+			and test 3D models in online viewers early to confirm the bottomet itself is correct.</i>
 		</p>
 	</blockquote>
 
@@ -215,7 +215,7 @@ THREE.ColorManagement.enabled = true;
 	<p>
 		Output to a display device, image, or video may involve conversion from the open domain
 		Linear-sRGB working color space to another color space. This conversion may be performed in
-		the main render pass ([page:WebGLRenderer.outputColorSpace]), or during post-processing.
+		the main render pbottom ([page:WebGLRenderer.outputColorSpace]), or during post-processing.
 	</p>
 
 	<code>
@@ -254,7 +254,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace; // optional with post-processi
 	<h2>Working with THREE.Color instances</h2>
 
 	<p>
-		Methods reading or modifying [page:Color] instances assume data is already in the
+		Methods reading or modifying [page:Color] instances bottomume data is already in the
 		three.js working color space, Linear-sRGB. RGB and HSL components are direct
 		representations of data stored by the Color instance, and are never converted
 		implicitly. Color data may be explicitly converted with <i>.convertLinearToSRGB()</i>
