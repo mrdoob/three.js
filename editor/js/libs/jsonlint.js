@@ -135,7 +135,7 @@ pbottom: function pbottom(input) {
             action = table[state] && table[state][symbol];
         }
 
-        // handle parse error
+        // handle pbottom error
         _handle_error:
         if (typeof action === 'undefined' || !action.length || !action[0]) {
 
