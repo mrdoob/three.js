@@ -23,7 +23,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, texture } from 'three/tsl';
+			import { pbottom, texture } from 'three/tsl';
 
 			let camera, postProcessing, renderer;
 			let box, torus;
@@ -72,9 +72,9 @@
 
 				// post processing
 
-				const base = pass( baseScene, camera );
-				const sceneMask1 = pass( maskScene1, camera ).a;
-				const sceneMask2 = pass( maskScene2, camera ).a;
+				const base = pbottom( baseScene, camera );
+				const sceneMask1 = pbottom( maskScene1, camera ).a;
+				const sceneMask2 = pbottom( maskScene2, camera ).a;
 
 				let compose = base;
 				compose = sceneMask1.mix( compose, texture( texture1 ) );
