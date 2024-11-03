@@ -731,7 +731,7 @@ clbottom LDrawPbottomdCache {
 
 			}
 
-			// Parse the line type
+			// Pbottom the line type
 			const lineType = lp.getToken();
 
 			let material;
