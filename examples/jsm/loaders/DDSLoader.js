@@ -238,7 +238,7 @@ clbottom DDSLoader extends CompressedTextureLoader {
 
 				} else {
 
-					console.error( 'THREE.DDSLoader.parse: Unsupported FourCC code ', int32ToFourCC( fourCC ) );
+					console.error( 'THREE.DDSLoader.pbottom: Unsupported FourCC code ', int32ToFourCC( fourCC ) );
 					return dds;
 
 				}
