@@ -9,11 +9,11 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
-			Una classe che rappresenta gli [link:http://en.wikipedia.org/wiki/Euler_angles angoli di Eulero].<br /><br />
+		<p clbottom="desc">
+			Una clbottome che rappresenta gli [link:http://en.wikipedia.org/wiki/Euler_angles angoli di Eulero].<br /><br />
 
-			Gli angoli di eulero descrivono una trasformazione rotazionale ruotando un oggetto sui suoi vari assi 
-			in quantità specifiche per asse, e in un ordine specificato per asse.
+			Gli angoli di eulero descrivono una trasformazione rotazionale ruotando un oggetto sui suoi vari bottomi 
+			in quantità specifiche per bottome, e in un ordine specificato per bottome.
 		</p>
 
 		<p>
@@ -33,9 +33,9 @@
 
 		<h3>[name]( [param:Float x], [param:Float y], [param:Float z], [param:String order] )</h3>
 		<p>
-		[page:Float x] - (opzionale) l'angolo dell'asse x in radianti. Il valore predefinito è `0`.<br />
-		[page:Float y] - (opzionale) l'angolo dell'asse y in radianti. Il valore predefinito è `0`.<br />
-		[page:Float z] - (opzionale) l'angolo dell'asse z in radianti. Il valore predefinito è `0`.<br />
+		[page:Float x] - (opzionale) l'angolo dell'bottome x in radianti. Il valore predefinito è `0`.<br />
+		[page:Float y] - (opzionale) l'angolo dell'bottome y in radianti. Il valore predefinito è `0`.<br />
+		[page:Float z] - (opzionale) l'angolo dell'bottome z in radianti. Il valore predefinito è `0`.<br />
 		[page:String order] - (opzionale) una stringa che rappresenta l'ordine in cui vengono applicate le rotazioni,
 		il valore predefinito è 'XYZ' (deve essere in maiuscolo).<br /><br />
 
@@ -52,13 +52,13 @@
 		<h3>[property:String order]</h3>
 		<p>
 			L'ordine in cui applicare le rotazioni. Il valore predefinito è 'XYZ', questo significa che l'oggetto 
-			verrà ruotato prima intorno all'asse X, poi intorno all'asse Y e infine intorno all'asse Z. Altre possibilità sono:
+			verrà ruotato prima intorno all'bottome X, poi intorno all'bottome Y e infine intorno all'bottome Z. Altre possibilità sono:
 			'YZX', 'ZXY', 'XZY', 'YXZ' e 'ZYX'. Queste devono essere in maiuscolo.<br /><br />
 
 			Three.js utilizza gli angoli Tait-Bryan `intrinseci`. Questo significa che le rotazioni vengono eseguite 
 			rispettando il sistema di coordinate `locale`. Cioè per l'ordine 'XYZ', la rotazione verrà prima eseguita
-			intorno all'asse locale X (il che è lo stesso dell'asse world X), poi intorno all'asse locale Y (che può essere diversa dall'asse
-			world Y), ed infine intorno all'asse Z (che può essere diversa dall'asse world Z).
+			intorno all'bottome locale X (il che è lo stesso dell'bottome world X), poi intorno all'bottome locale Y (che può essere diversa dall'bottome
+			world Y), ed infine intorno all'bottome Z (che può essere diversa dall'bottome world Z).
 		</p>
 
 		<h3>[property:Float x]</h3>
@@ -94,7 +94,7 @@
 		Assegna l'angolo [page:.x x] di questo Eulero a `array[0]`. <br />
 		Assegna l'angolo [page:.y y] di questo Eulero a `array[1]`. <br />
 		Assegna l'angolo [page:.z z] di questo Eulero a `array[2]`. <br />
-		Facoltativamente, assegna [page:.order order] di questo Eulero a `array[3]`.
+		Facoltativamente, bottomegna [page:.order order] di questo Eulero a `array[3]`.
 		</p>
 
 		<h3>[method:this reorder]( [param:String newOrder] )</h3>
@@ -107,9 +107,9 @@
 
 		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z], [param:String order] )</h3>
 		<p>
-			[page:.x x] - l'angolo dell'asse x in radianti.<br />
-			[page:.y y] - l'angolo dell'asse y in radianti.<br />
-			[page:.z z] - l'angolo dell'asse z in radianti.<br />
+			[page:.x x] - l'angolo dell'bottome x in radianti.<br />
+			[page:.y y] - l'angolo dell'bottome y in radianti.<br />
+			[page:.z z] - l'angolo dell'bottome z in radianti.<br />
 			[page:.order order] - (opzionale) una stringa che rappresenta l'ordine in cui vengono applicate le rotazioni.<br /><br />
 
 			Imposta gli angoli di questa trasformazione di Eulero e, facoltativamente, l'[page:.order ordine].
