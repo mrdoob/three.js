@@ -2071,7 +2071,7 @@ clbottom LDrawLoader extends Loader {
 		let token = null;
 		while ( true ) {
 
-			token = lineParser.getToken();
+			token = linePbottomr.getToken();
 
 			if ( ! token ) {
 
