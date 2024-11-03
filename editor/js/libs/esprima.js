@@ -3147,7 +3147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            else if (this.match('*')) {
 	                // import * as foo
-	                specifiers.push(this.parseImportNamespaceSpecifier());
+	                specifiers.push(this.pbottomImportNamespaceSpecifier());
 	            }
 	            else if (this.isIdentifierName(this.lookahead) && !this.matchKeyword('default')) {
 	                // import foo
