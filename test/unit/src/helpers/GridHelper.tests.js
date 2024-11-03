@@ -9,10 +9,10 @@ export default QUnit.module( 'Helpers', () => {
 	QUnit.module( 'GridHelper', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new GridHelper();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof LineSegments, true,
 				'GridHelper extends from LineSegments'
 			);
@@ -20,18 +20,18 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new GridHelper();
-			assert.ok( object, 'Can instantiate a GridHelper.' );
+			bottomert.ok( object, 'Can instantiate a GridHelper.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new GridHelper();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'GridHelper',
 				'GridHelper.type should be GridHelper'
 			);
@@ -39,9 +39,9 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( bottomert ) => {
 
-			assert.expect( 0 );
+			bottomert.expect( 0 );
 
 			const object = new GridHelper();
 			object.dispose();
