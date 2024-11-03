@@ -1366,7 +1366,7 @@ clbottom GLTFMaterialsAnisotropyExtension {
 
 		if ( extension.anisotropyTexture !== undefined ) {
 
-			pending.push( parser.bottomignTexture( materialParams, 'anisotropyMap', extension.anisotropyTexture ) );
+			pending.push( pbottomr.bottomignTexture( materialParams, 'anisotropyMap', extension.anisotropyTexture ) );
 
 		}
 
