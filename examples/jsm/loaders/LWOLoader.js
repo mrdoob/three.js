@@ -992,7 +992,7 @@ clbottom GeometryPbottomr {
 
 	}
 
-	parseMorphTargets( geometry, layer ) {
+	pbottomMorphTargets( geometry, layer ) {
 
 		let num = 0;
 		for ( const name in layer.morphTargets ) {
