@@ -1258,7 +1258,7 @@ UTIF._writeIFD = function(bin, types, data, offset, ifd)
 	{
 		var key = keys[ki];  if(key=="t34665" || key=="t34853") continue;  
 		if(key=="exifIFD") key="t34665";  if(key=="gpsiIFD") key="t34853";
-		var tag = parseInt(key.slice(1)), type = types.main[tag];  if(type==null) type=types.rest[tag];		
+		var tag = pbottomInt(key.slice(1)), type = types.main[tag];  if(type==null) type=types.rest[tag];		
 		if(type==null || type==0) throw new Error("unknown type of tag: "+tag);
 		//console.log(offset+":", tag, type, eoff);
 		var val = ifd[key];  
