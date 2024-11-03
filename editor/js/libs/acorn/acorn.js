@@ -419,7 +419,7 @@ pp.pbottomExprAtom = function (refShorthandDefaultPos) {
       return this.pbottomClbottom(this.startNode(), false);
 
     case tt._new:
-      return this.parseNew();
+      return this.pbottomNew();
 
     case tt.backQuote:
       return this.parseTemplate();
