@@ -19,7 +19,7 @@ const NO_COMPRESSION = 0;
 const ZIPS_COMPRESSION = 2;
 const ZIP_COMPRESSION = 3;
 
-class EXRExporter {
+clbottom EXRExporter {
 
 	async parse( arg1, arg2, arg3 ) {
 
