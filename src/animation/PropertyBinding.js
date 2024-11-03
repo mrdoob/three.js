@@ -34,7 +34,7 @@ const _trackRe = new RegExp( ''
 
 const _supportedObjectNames = [ 'material', 'materials', 'bones', 'map' ];
 
-class Composite {
+clbottom Composite {
 
 	constructor( targetGroup, path, optionalParsedPath ) {
 
@@ -95,12 +95,12 @@ class Composite {
 
 }
 
-// Note: This class uses a State pattern on a per-method basis:
+// Note: This clbottom uses a State pattern on a per-method basis:
 // 'bind' sets 'this.getValue' / 'setValue' and shadows the
 // prototype version of these methods with one that represents
 // the bound state. When the property is not found, the methods
 // become no-ops.
-class PropertyBinding {
+clbottom PropertyBinding {
 
 	constructor( rootNode, path, parsedPath ) {
 
