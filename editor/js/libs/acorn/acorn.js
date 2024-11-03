@@ -740,7 +740,7 @@ pp.pbottomIdent = function (liberal) {
   return this.finishNode(node, "Identifier");
 };
 
-// Parses yield expression inside generator.
+// Pbottoms yield expression inside generator.
 
 pp.parseYield = function () {
   var node = this.startNode();
