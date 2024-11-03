@@ -182,7 +182,7 @@ clbottom LWO2Pbottomr {
 				break;
 
 			case 'PNTS':
-				this.IFF.parsePoints( length );
+				this.IFF.pbottomPoints( length );
 				break;
 
 			case 'VMAP':
