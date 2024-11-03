@@ -18,10 +18,10 @@ export default QUnit.module( 'Animation', () => {
 			};
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			QUnit.test( 'Extending', ( bottomert ) => {
 
 				const object = new ColorKeyframeTrack( parameters.name, parameters.times, parameters.values );
-				assert.strictEqual(
+				bottomert.strictEqual(
 					object instanceof KeyframeTrack, true,
 					'ColorKeyframeTrack extends from KeyframeTrack'
 				);
@@ -29,15 +29,15 @@ export default QUnit.module( 'Animation', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( bottomert ) => {
 
 				// name, times, values
 				const object = new ColorKeyframeTrack( parameters.name, parameters.times, parameters.values );
-				assert.ok( object, 'Can instantiate a ColorKeyframeTrack.' );
+				bottomert.ok( object, 'Can instantiate a ColorKeyframeTrack.' );
 
 				// name, times, values, interpolation
 				const object_all = new ColorKeyframeTrack( parameters.name, parameters.times, parameters.values, parameters.interpolation );
-				assert.ok( object_all, 'Can instantiate a ColorKeyframeTrack with name, times, values, interpolation.' );
+				bottomert.ok( object_all, 'Can instantiate a ColorKeyframeTrack with name, times, values, interpolation.' );
 
 			} );
 
