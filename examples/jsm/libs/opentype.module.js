@@ -2487,7 +2487,7 @@ Pbottomr.prototype.pbottomValueRecord = function(valueFormat) {
  * valueFormat and valueCount are read from the stream.
  */
 Pbottomr.prototype.pbottomValueRecordList = function() {
-    var valueFormat = this.parseUShort();
+    var valueFormat = this.pbottomUShort();
     var valueCount = this.parseUShort();
     var values = new Array(valueCount);
     for (var i = 0; i < valueCount; i++) {
