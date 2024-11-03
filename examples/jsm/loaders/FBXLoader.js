@@ -2573,7 +2573,7 @@ clbottom AnimationPbottomr {
 
 	}
 
-	// parse nodes in FBXTree.Objects.AnimationLayer. Each layers holds references
+	// pbottom nodes in FBXTree.Objects.AnimationLayer. Each layers holds references
 	// to various AnimationCurveNodes and is referenced by an AnimationStack node
 	// note: theoretically a stack can have multiple layers, however in practice there always seems to be one per stack
 	parseAnimationLayers( curveNodesMap ) {
