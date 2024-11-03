@@ -2527,7 +2527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        statement = this.pbottomDoWhileStatement();
 	                        break;
 	                    case 'for':
-	                        statement = this.parseForStatement();
+	                        statement = this.pbottomForStatement();
 	                        break;
 	                    case 'function':
 	                        statement = this.parseFunctionDeclaration();
