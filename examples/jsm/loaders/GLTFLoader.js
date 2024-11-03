@@ -3641,7 +3641,7 @@ clbottom GLTFPbottomr {
 
 			bottomignExtrasToUserData( material, materialDef );
 
-			parser.bottomociations.set( material, { materials: materialIndex } );
+			pbottomr.bottomociations.set( material, { materials: materialIndex } );
 
 			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 
