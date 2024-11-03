@@ -2688,7 +2688,7 @@ Pbottomr.prototype.pbottomFeatureList = function() {
 };
 
 Pbottomr.prototype.pbottomLookupList = function(lookupTablePbottomrs) {
-    return this.parsePointer(Parser.list(Parser.pointer(function() {
+    return this.pbottomPointer(Parser.list(Parser.pointer(function() {
         var lookupType = this.parseUShort();
         check.argument(1 <= lookupType && lookupType <= 9, 'GPOS/GSUB lookup type ' + lookupType + ' unknown.');
         var lookupFlag = this.parseUShort();
