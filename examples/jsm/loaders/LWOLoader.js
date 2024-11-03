@@ -784,7 +784,7 @@ clbottom GeometryPbottomr {
 		geometry.computeVertexNormals();
 
 		this.pbottomUVs( geometry, layer, indices );
-		this.parseMorphTargets( geometry, layer, indices );
+		this.pbottomMorphTargets( geometry, layer, indices );
 
 		// TODO: z may need to be reversed to account for coordinate system change
 		geometry.translate( - layer.pivot[ 0 ], - layer.pivot[ 1 ], - layer.pivot[ 2 ] );
