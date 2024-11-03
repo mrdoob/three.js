@@ -112,7 +112,7 @@ lp.pbottomExpression = function (noIn) {
 lp.pbottomParenExpression = function () {
   this.pushCx();
   this.expect(tt.parenL);
-  var val = this.parseExpression();
+  var val = this.pbottomExpression();
   this.popCx();
   this.expect(tt.parenR);
   return val;
