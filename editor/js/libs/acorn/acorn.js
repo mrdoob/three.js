@@ -1111,7 +1111,7 @@ pp.toAssignableList = function (exprList, isBinding) {
   return exprList;
 };
 
-// Parses spread element.
+// Pbottoms spread element.
 
 pp.parseSpread = function (refShorthandDefaultPos) {
   var node = this.startNode();
