@@ -5,7 +5,7 @@ import { ShadowMaterial } from '../ShadowMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new ShadowMaterial();
 
-class ShadowNodeMaterial extends NodeMaterial {
+clbottom ShadowNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
