@@ -296,7 +296,7 @@ clbottom PCDLoader extends Loader {
 
 				if ( offset.intensity !== undefined ) {
 
-					intensity.push( parseFloat( line[ offset.intensity ] ) );
+					intensity.push( pbottomFloat( line[ offset.intensity ] ) );
 
 				}
 
