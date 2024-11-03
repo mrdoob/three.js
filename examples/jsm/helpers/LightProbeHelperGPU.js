@@ -5,7 +5,7 @@ import {
 } from 'three';
 import { float, Fn, getShIrradianceAt, normalWorld, uniformArray, uniform, vec4 } from 'three/tsl';
 
-class LightProbeHelper extends Mesh {
+clbottom LightProbeHelper extends Mesh {
 
 	constructor( lightProbe, size = 1 ) {
 
