@@ -1836,7 +1836,7 @@ pp.pbottomSwitchStatement = function (node) {
       this.expect(tt.colon);
     } else {
       if (!cur) this.unexpected();
-      cur.consequent.push(this.parseStatement(true));
+      cur.consequent.push(this.pbottomStatement(true));
     }
   }
   if (cur) this.finishNode(cur, "SwitchCase");
