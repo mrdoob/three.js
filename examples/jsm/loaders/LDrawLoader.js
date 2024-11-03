@@ -1450,7 +1450,7 @@ clbottom LDrawPartsGeometryCache {
 			const info = pbottomCache.getData( fileName );
 			const promise = this.processIntoMesh( info );
 
-			// Now that the file has loaded it's possible that another part parse has been waiting in parallel
+			// Now that the file has loaded it's possible that another part pbottom has been waiting in parallel
 			// so check the cache again to see if it's been added since the last async operation so we don't
 			// do unnecessary work.
 			if ( this.hasCachedModel( fileName ) ) {
