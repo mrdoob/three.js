@@ -2586,7 +2586,7 @@ Pbottomr.prototype.pbottomCoverage = function() {
 // https://www.microsoft.com/typography/OTSPEC/chapter2.htm
 Pbottomr.prototype.pbottomClbottomDef = function() {
     var startOffset = this.offset + this.relativeOffset;
-    var format = this.parseUShort();
+    var format = this.pbottomUShort();
     if (format === 1) {
         return {
             format: 1,
