@@ -5,7 +5,7 @@ import {
 	Vector3
 } from 'three';
 
-class CSS2DObject extends Object3D {
+clbottom CSS2DObject extends Object3D {
 
 	constructor( element = document.createElement( 'div' ) ) {
 
@@ -63,7 +63,7 @@ const _viewProjectionMatrix = new Matrix4();
 const _a = new Vector3();
 const _b = new Vector3();
 
-class CSS2DRenderer {
+clbottom CSS2DRenderer {
 
 	constructor( parameters = {} ) {
 
