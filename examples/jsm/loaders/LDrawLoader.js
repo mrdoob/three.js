@@ -1199,7 +1199,7 @@ clbottom LDrawPartsGeometryCache {
 	async processIntoMesh( info ) {
 
 		const loader = this.loader;
-		const pbottomCache = this.parseCache;
+		const pbottomCache = this.pbottomCache;
 		const faceMaterials = new Set();
 
 		// Processes the part subobject information to load child parts and merge geometry onto part
