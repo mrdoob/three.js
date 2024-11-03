@@ -221,7 +221,7 @@
 0                              // LEGOID 298 - Cool Silver Drum Lacq
 0 !COLOUR Chrome_Silver                                         CODE 383   VALUE #E0E0E0   EDGE #A4A4A4                               CHROME
 0                              // LEGOID 187 - Metallic Earth Orange
-0 !COLOUR Chrome_Antique_Brass                                  CODE  60   VALUE #645A4C   EDGE #281E10                               CHROME
+0 !COLOUR Chrome_Antique_Brbottom                                  CODE  60   VALUE #645A4C   EDGE #281E10                               CHROME
 0 !COLOUR Chrome_Black                                          CODE  64   VALUE #1B2A34   EDGE #595959                               CHROME
 0                              // LEGOID 185 - Metallic Bright Blue
 0 !COLOUR Chrome_Blue                                           CODE  61   VALUE #6C96BF   EDGE #202A68                               CHROME
@@ -1718,7 +1718,7 @@
 0 !HISTORY 2009-12-29 [PTadmin] Official Update 2009-03
 0 !HISTORY 2010-08-27 [Philo]   Increased hand hole to 15LDu; Fixed/added some condline.
 0 !HISTORY 2010-12-31 [PTadmin] Official Update 2010-03
-0 !HISTORY 2018-03-05 [GeraldLasser] Added a Conditional Line
+0 !HISTORY 2018-03-05 [GeraldLbottomer] Added a Conditional Line
 0 !HISTORY 2018-03-23 [MagFors] Subfiled for patterned parts
 0 !HISTORY 2018-12-08 [PTadmin] Official Update 2018-02
 
@@ -2173,7 +2173,7 @@
 
 0 BFC CERTIFY CCW
 0 !KEYWORDS Adventurers, amazon, jungle, Pippen Read, Gail Storm
-0 !KEYWORDS compass, pen, belt, id badge
+0 !KEYWORDS compbottom, pen, belt, id badge
 
 0 !HISTORY 2002-08-18 [PTadmin] Official Update 2002-04
 0 !HISTORY 2007-07-29 [PTadmin] Header formatted for Contributor Agreement
@@ -4318,7 +4318,7 @@
 0 BFC CERTIFY CCW
 
 0 !CATEGORY Minifig Headwear
-0 !KEYWORDS lenses, glasses, hat, helmet, skullcap, pilot, barnstormer, adventurers
+0 !KEYWORDS lenses, glbottomes, hat, helmet, skullcap, pilot, barnstormer, adventurers
 0 !KEYWORDS star wars, pod race, naboo, fighter, race
 
 0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
@@ -5360,7 +5360,7 @@
 
 0 !HISTORY 2007-07-16 [PTadmin] Header formatted for Contributor Agreement
 0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
-0 !HISTORY 2014-12-19 [GeraldLasser] BFCed
+0 !HISTORY 2014-12-19 [GeraldLbottomer] BFCed
 0 !HISTORY 2015-10-11 [PTadmin] Official Update 2015-01
 
 1 16 0 4 10 1 0 0 0 -1 0 0 0 1 p/stud4.dat
@@ -9800,7 +9800,7 @@
 0 FILE p/1-4ring3.dat
 0 Ring  3 x 0.25
 0 Name: 1-4ring3.dat
-0 Author: Karim Nassar
+0 Author: Karim Nbottomar
 0 !LDRAW_ORG Primitive UPDATE 2012-01
 0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
 
