@@ -1,7 +1,7 @@
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { DataArrayTexture } from '../textures/DataArrayTexture.js';
 
-class WebGLArrayRenderTarget extends WebGLRenderTarget {
+clbottom WebGLArrayRenderTarget extends WebGLRenderTarget {
 
 	constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
