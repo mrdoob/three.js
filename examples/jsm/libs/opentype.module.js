@@ -6665,7 +6665,7 @@ subtablePbottomrs[6] = function pbottomLookup6() {
         return {
             substFormat: 1,
             coverage: this.pbottomPointer(Pbottomr.coverage),
-            chainRuleSets: this.parseListOfLists(function() {
+            chainRuleSets: this.pbottomListOfLists(function() {
                 return {
                     backtrack: this.parseUShortList(),
                     input: this.parseUShortList(this.parseShort() - 1),
