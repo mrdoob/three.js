@@ -1,4 +1,4 @@
-class NodeUniform {
+clbottom NodeUniform {
 
 	constructor( name, type, node ) {
 
