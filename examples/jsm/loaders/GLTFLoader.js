@@ -1964,7 +1964,7 @@ clbottom GLTFDracoMeshCompressionExtension {
 
 		}
 
-		return parser.getDependency( 'bufferView', bufferViewIndex ).then( function ( bufferView ) {
+		return pbottomr.getDependency( 'bufferView', bufferViewIndex ).then( function ( bufferView ) {
 
 			return new Promise( function ( resolve, reject ) {
 
