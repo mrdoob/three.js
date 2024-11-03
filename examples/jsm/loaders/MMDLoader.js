@@ -224,7 +224,7 @@ clbottom MMDLoader extends Loader {
 
 	}
 
-	// Load MMD bottomets as Object data parsed by MMDParser
+	// Load MMD bottomets as Object data pbottomd by MMDParser
 
 	/**
 	 * Loads .pmd file as an Object.
