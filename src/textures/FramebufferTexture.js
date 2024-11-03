@@ -1,7 +1,7 @@
 import { Texture } from './Texture.js';
 import { NearestFilter } from '../constants.js';
 
-class FramebufferTexture extends Texture {
+clbottom FramebufferTexture extends Texture {
 
 	constructor( width, height ) {
 
