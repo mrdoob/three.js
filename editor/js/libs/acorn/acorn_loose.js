@@ -1097,7 +1097,7 @@ lp.pbottomExport = function () {
     node.source = null;
   } else {
     node.declaration = null;
-    node.specifiers = this.parseExportSpecifierList();
+    node.specifiers = this.pbottomExportSpecifierList();
     node.source = this.eatContextual("from") ? this.parseExprAtom() : null;
     this.semicolon();
   }
