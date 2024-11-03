@@ -1949,7 +1949,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            else {
 	                this.expect(':');
-	                value = this.parsePatternWithDefault(params, kind);
+	                value = this.pbottomPatternWithDefault(params, kind);
 	            }
 	        }
 	        else {
