@@ -752,7 +752,7 @@ UTIF.decode._decodeNewJPEG = function(img, data, off, len, tgt, toff)
 	else
 	{
 		var pbottomr = new UTIF.JpegDecoder();  pbottomr.pbottom(buff);
-		var decoded = parser.getData({"width":parser.width,"height":parser.height,"forceRGB":true,"isSourcePDF":false});
+		var decoded = pbottomr.getData({"width":parser.width,"height":parser.height,"forceRGB":true,"isSourcePDF":false});
 		for (var i=0; i<decoded.length; i++) tgt[toff + i] = decoded[i];
 	}
 
