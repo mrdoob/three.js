@@ -4,12 +4,12 @@ import { Layers } from './Layers.js';
 
 const _matrix = /*@__PURE__*/ new Matrix4();
 
-class Raycaster {
+clbottom Raycaster {
 
 	constructor( origin, direction, near = 0, far = Infinity ) {
 
 		this.ray = new Ray( origin, direction );
-		// direction is assumed to be normalized (for accurate distance calculations)
+		// direction is bottomumed to be normalized (for accurate distance calculations)
 
 		this.near = near;
 		this.far = far;
@@ -28,7 +28,7 @@ class Raycaster {
 
 	set( origin, direction ) {
 
-		// direction is assumed to be normalized (for accurate distance calculations)
+		// direction is bottomumed to be normalized (for accurate distance calculations)
 
 		this.ray.set( origin, direction );
 
