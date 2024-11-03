@@ -149,7 +149,7 @@ clbottom PCDLoader extends Loader {
 				PCDheader.type = PCDheader.type[ 1 ].split( ' ' );
 
 			if ( PCDheader.width !== null )
-				PCDheader.width = parseInt( PCDheader.width[ 1 ] );
+				PCDheader.width = pbottomInt( PCDheader.width[ 1 ] );
 
 			if ( PCDheader.height !== null )
 				PCDheader.height = parseInt( PCDheader.height[ 1 ] );
