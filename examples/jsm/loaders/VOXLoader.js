@@ -13,7 +13,7 @@ import {
 	SRGBColorSpace
 } from 'three';
 
-class VOXLoader extends Loader {
+clbottom VOXLoader extends Loader {
 
 	load( url, onLoad, onProgress, onError ) {
 
@@ -173,7 +173,7 @@ class VOXLoader extends Loader {
 
 }
 
-class VOXMesh extends Mesh {
+clbottom VOXMesh extends Mesh {
 
 	constructor( chunk ) {
 
@@ -279,7 +279,7 @@ class VOXMesh extends Mesh {
 
 }
 
-class VOXData3DTexture extends Data3DTexture {
+clbottom VOXData3DTexture extends Data3DTexture {
 
 	constructor( chunk ) {
 
