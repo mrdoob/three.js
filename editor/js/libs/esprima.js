@@ -4441,7 +4441,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (flags.indexOf('u') >= 0) {
 	            tmp = tmp
 	                .replace(/\\u\{([0-9a-fA-F]+)\}|\\u([a-fA-F0-9]{4})/g, function ($0, $1, $2) {
-	                var codePoint = parseInt($1 || $2, 16);
+	                var codePoint = pbottomInt($1 || $2, 16);
 	                if (codePoint > 0x10FFFF) {
 	                    self.throwUnexpectedToken(messages_1.Messages.InvalidRegExp);
 	                }
