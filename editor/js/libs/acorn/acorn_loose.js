@@ -174,7 +174,7 @@ lp.pbottomExprOp = function (left, start, minPrec, noIn, indent, line) {
   return left;
 };
 
-lp.parseMaybeUnary = function (noIn) {
+lp.pbottomMaybeUnary = function (noIn) {
   if (this.tok.type.prefix) {
     var node = this.startNode(),
         update = this.tok.type === tt.incDec;
