@@ -39,9 +39,9 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { GTAOPbottom } from 'three/addons/postprocessing/GTAOPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
 			let camera, scene, renderer, composer, controls, clock, stats, mixer;
 
@@ -88,15 +88,15 @@
 
 				composer = new EffectComposer( renderer );
 
-				const renderPass = new RenderPass( scene, camera );
-				composer.addPass( renderPass );
+				const renderPbottom = new RenderPbottom( scene, camera );
+				composer.addPbottom( renderPbottom );
 
-				const gtaoPass = new GTAOPass( scene, camera, width, height );
-				gtaoPass.output = GTAOPass.OUTPUT.Denoise;
-				composer.addPass( gtaoPass );
+				const gtaoPbottom = new GTAOPbottom( scene, camera, width, height );
+				gtaoPbottom.output = GTAOPbottom.OUTPUT.Denoise;
+				composer.addPbottom( gtaoPbottom );
 
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				const outputPbottom = new OutputPbottom();
+				composer.addPbottom( outputPbottom );
 
 				//
 
@@ -111,23 +111,23 @@
 					mixer.clipAction( gltf.animations[ 0 ] ).play();
 
 					const box = new THREE.Box3().setFromObject( scene );
-					gtaoPass.setSceneClipBox( box );
+					gtaoPbottom.setSceneClipBox( box );
 
 				}, undefined, ( e ) => console.error( e ) );
 
 				// Init gui
 				const gui = new GUI();
 
-				gui.add( gtaoPass, 'output', {
-					'Default': GTAOPass.OUTPUT.Default,
-					'Diffuse': GTAOPass.OUTPUT.Diffuse,
-					'AO Only': GTAOPass.OUTPUT.AO,
-					'AO Only + Denoise': GTAOPass.OUTPUT.Denoise,
-					'Depth': GTAOPass.OUTPUT.Depth,
-					'Normal': GTAOPass.OUTPUT.Normal
+				gui.add( gtaoPbottom, 'output', {
+					'Default': GTAOPbottom.OUTPUT.Default,
+					'Diffuse': GTAOPbottom.OUTPUT.Diffuse,
+					'AO Only': GTAOPbottom.OUTPUT.AO,
+					'AO Only + Denoise': GTAOPbottom.OUTPUT.Denoise,
+					'Depth': GTAOPbottom.OUTPUT.Depth,
+					'Normal': GTAOPbottom.OUTPUT.Normal
 				} ).onChange( function ( value ) {
 
-					gtaoPass.output = value;
+					gtaoPbottom.output = value;
 
 				} );
 
@@ -149,23 +149,23 @@
 					rings: 2.,
 					samples: 16,
 				};
-				gtaoPass.updateGtaoMaterial( aoParameters );
-				gtaoPass.updatePdMaterial( pdParameters );
-				gui.add( gtaoPass, 'blendIntensity' ).min( 0 ).max( 1 ).step( 0.01 );
-				gui.add( aoParameters, 'radius' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
-				gui.add( aoParameters, 'distanceExponent' ).min( 1 ).max( 4 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
-				gui.add( aoParameters, 'thickness' ).min( 0.01 ).max( 10 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
-				gui.add( aoParameters, 'distanceFallOff' ).min( 0 ).max( 1 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
-				gui.add( aoParameters, 'scale' ).min( 0.01 ).max( 2.0 ).step( 0.01 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
-				gui.add( aoParameters, 'samples' ).min( 2 ).max( 32 ).step( 1 ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
-				gui.add( aoParameters, 'screenSpaceRadius' ).onChange( () => gtaoPass.updateGtaoMaterial( aoParameters ) );
-				gui.add( pdParameters, 'lumaPhi' ).min( 0 ).max( 20 ).step( 0.01 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
-				gui.add( pdParameters, 'depthPhi' ).min( 0.01 ).max( 20 ).step( 0.01 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
-				gui.add( pdParameters, 'normalPhi' ).min( 0.01 ).max( 20 ).step( 0.01 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
-				gui.add( pdParameters, 'radius' ).min( 0 ).max( 32 ).step( 1 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
-				gui.add( pdParameters, 'radiusExponent' ).min( 0.1 ).max( 4. ).step( 0.1 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
-				gui.add( pdParameters, 'rings' ).min( 1 ).max( 16 ).step( 0.125 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
-				gui.add( pdParameters, 'samples' ).min( 2 ).max( 32 ).step( 1 ).onChange( () => gtaoPass.updatePdMaterial( pdParameters ) );
+				gtaoPbottom.updateGtaoMaterial( aoParameters );
+				gtaoPbottom.updatePdMaterial( pdParameters );
+				gui.add( gtaoPbottom, 'blendIntensity' ).min( 0 ).max( 1 ).step( 0.01 );
+				gui.add( aoParameters, 'radius' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( () => gtaoPbottom.updateGtaoMaterial( aoParameters ) );
+				gui.add( aoParameters, 'distanceExponent' ).min( 1 ).max( 4 ).step( 0.01 ).onChange( () => gtaoPbottom.updateGtaoMaterial( aoParameters ) );
+				gui.add( aoParameters, 'thickness' ).min( 0.01 ).max( 10 ).step( 0.01 ).onChange( () => gtaoPbottom.updateGtaoMaterial( aoParameters ) );
+				gui.add( aoParameters, 'distanceFallOff' ).min( 0 ).max( 1 ).step( 0.01 ).onChange( () => gtaoPbottom.updateGtaoMaterial( aoParameters ) );
+				gui.add( aoParameters, 'scale' ).min( 0.01 ).max( 2.0 ).step( 0.01 ).onChange( () => gtaoPbottom.updateGtaoMaterial( aoParameters ) );
+				gui.add( aoParameters, 'samples' ).min( 2 ).max( 32 ).step( 1 ).onChange( () => gtaoPbottom.updateGtaoMaterial( aoParameters ) );
+				gui.add( aoParameters, 'screenSpaceRadius' ).onChange( () => gtaoPbottom.updateGtaoMaterial( aoParameters ) );
+				gui.add( pdParameters, 'lumaPhi' ).min( 0 ).max( 20 ).step( 0.01 ).onChange( () => gtaoPbottom.updatePdMaterial( pdParameters ) );
+				gui.add( pdParameters, 'depthPhi' ).min( 0.01 ).max( 20 ).step( 0.01 ).onChange( () => gtaoPbottom.updatePdMaterial( pdParameters ) );
+				gui.add( pdParameters, 'normalPhi' ).min( 0.01 ).max( 20 ).step( 0.01 ).onChange( () => gtaoPbottom.updatePdMaterial( pdParameters ) );
+				gui.add( pdParameters, 'radius' ).min( 0 ).max( 32 ).step( 1 ).onChange( () => gtaoPbottom.updatePdMaterial( pdParameters ) );
+				gui.add( pdParameters, 'radiusExponent' ).min( 0.1 ).max( 4. ).step( 0.1 ).onChange( () => gtaoPbottom.updatePdMaterial( pdParameters ) );
+				gui.add( pdParameters, 'rings' ).min( 1 ).max( 16 ).step( 0.125 ).onChange( () => gtaoPbottom.updatePdMaterial( pdParameters ) );
+				gui.add( pdParameters, 'samples' ).min( 2 ).max( 32 ).step( 1 ).onChange( () => gtaoPbottom.updatePdMaterial( pdParameters ) );
 			
 				window.addEventListener( 'resize', onWindowResize );
 
