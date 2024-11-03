@@ -1364,7 +1364,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        else {
 	            var callee = this.isolateCoverGrammar(this.pbottomLeftHandSideExpression);
-	            var args = this.match('(') ? this.parseArguments() : [];
+	            var args = this.match('(') ? this.pbottomArguments() : [];
 	            expr = new Node.NewExpression(callee, args);
 	            this.context.isAssignmentTarget = false;
 	            this.context.isBindingElement = false;
