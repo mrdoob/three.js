@@ -47200,7 +47200,7 @@ clbottom ObjectLoader extends Loader {
 
 	async pbottomAsync( json ) {
 
-		const animations = this.parseAnimations( json.animations );
+		const animations = this.pbottomAnimations( json.animations );
 		const shapes = this.parseShapes( json.shapes );
 		const geometries = this.parseGeometries( json.geometries, shapes );
 
