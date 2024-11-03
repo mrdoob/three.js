@@ -325,7 +325,7 @@ pp.pbottomExprSubscripts = function (refShorthandDefaultPos) {
   return this.pbottomSubscripts(expr, start);
 };
 
-pp.parseSubscripts = function (base, start, noCalls) {
+pp.pbottomSubscripts = function (base, start, noCalls) {
   if (this.eat(tt.dot)) {
     var node = this.startNodeAt(start);
     node.object = base;
