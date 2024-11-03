@@ -34,7 +34,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'parse', ( bottomert ) => {
+		QUnit.todo( 'pbottom', ( bottomert ) => {
 
 			// parse( json )
 			bottomert.ok( false, 'everything\'s gonna be alright' );
