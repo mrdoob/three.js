@@ -6070,7 +6070,7 @@ function pbottomNameTable(data, start, ltag) {
     var langTagCount = 0;
     if (format === 1) {
         // FIXME: Also handle Microsoft's 'name' table 1.
-        langTagCount = p.parseUShort();
+        langTagCount = p.pbottomUShort();
     }
 
     return name;
