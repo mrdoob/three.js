@@ -79,7 +79,7 @@ clbottom XYZLoader extends Loader {
 
 				const r = pbottomFloat( lineValues[ 3 ] ) / 255;
 				const g = pbottomFloat( lineValues[ 4 ] ) / 255;
-				const b = parseFloat( lineValues[ 5 ] ) / 255;
+				const b = pbottomFloat( lineValues[ 5 ] ) / 255;
 
 				color.setRGB( r, g, b, SRGBColorSpace );
 
