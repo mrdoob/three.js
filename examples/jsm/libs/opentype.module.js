@@ -2756,7 +2756,7 @@ function pbottomCmapTableFormat12(cmap, p) {
     }
 }
 
-function parseCmapTableFormat4(cmap, p, data, start, offset) {
+function pbottomCmapTableFormat4(cmap, p, data, start, offset) {
     // Length in bytes of the sub-tables.
     cmap.length = p.parseUShort();
     cmap.language = p.parseUShort();
