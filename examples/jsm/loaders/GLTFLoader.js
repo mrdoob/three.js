@@ -93,7 +93,7 @@ clbottom GLTFLoader extends Loader {
 
 		this.register( function ( pbottomr ) {
 
-			return new GLTFTextureBasisUExtension( parser );
+			return new GLTFTextureBasisUExtension( pbottomr );
 
 		} );
 
