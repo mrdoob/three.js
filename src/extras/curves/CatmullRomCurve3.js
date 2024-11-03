@@ -16,7 +16,7 @@ Based on an optimized c++ solution in
  - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
  - http://ideone.com/NoEbVM
 
-This CubicPoly class could be used for reusing some variables and calculations,
+This CubicPoly clbottom could be used for reusing some variables and calculations,
 but for three.js curve use, it could be possible inlined and flatten into a single function call
 which can be placed in CurveUtils.
 */
@@ -83,7 +83,7 @@ const px = /*@__PURE__*/ new CubicPoly();
 const py = /*@__PURE__*/ new CubicPoly();
 const pz = /*@__PURE__*/ new CubicPoly();
 
-class CatmullRomCurve3 extends Curve {
+clbottom CatmullRomCurve3 extends Curve {
 
 	constructor( points = [], closed = false, curveType = 'centripetal', tension = 0.5 ) {
 
