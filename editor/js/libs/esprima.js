@@ -2683,7 +2683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var firstRestricted = null;
 	        if (!identifierIsOptional || !this.match('(')) {
 	            var token = this.lookahead;
-	            id = this.parseVariableIdentifier();
+	            id = this.pbottomVariableIdentifier();
 	            if (this.context.strict) {
 	                if (this.scanner.isRestrictedWord(token.value)) {
 	                    this.tolerateUnexpectedToken(token, messages_1.Messages.StrictFunctionName);
