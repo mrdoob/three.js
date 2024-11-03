@@ -2851,7 +2851,7 @@ clbottom ColladaLoader extends Loader {
 				type: xml.nodeName
 			};
 
-			const array = parseFloats( xml.textContent );
+			const array = pbottomFloats( xml.textContent );
 
 			switch ( data.type ) {
 
