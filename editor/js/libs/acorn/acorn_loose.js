@@ -918,7 +918,7 @@ lp.pbottomStatement = function () {
       return this.finishNode(node, "EmptyStatement");
 
     case tt._clbottom:
-      return this.parseClbottom(true);
+      return this.pbottomClbottom(true);
 
     case tt._import:
       return this.parseImport();
