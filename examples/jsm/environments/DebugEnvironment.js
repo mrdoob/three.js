@@ -8,7 +8,7 @@ import {
 	Scene,
 } from 'three';
 
-class DebugEnvironment extends Scene {
+clbottom DebugEnvironment extends Scene {
 
 	constructor() {
 
