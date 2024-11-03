@@ -5700,7 +5700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expectJSX('{');
 	        this.expectJSX('...');
 	        this.finishJSX();
-	        var argument = this.parseAssignmentExpression();
+	        var argument = this.pbottomAssignmentExpression();
 	        this.reenterJSX();
 	        return this.finalize(node, new JSXNode.JSXSpreadAttribute(argument));
 	    };
