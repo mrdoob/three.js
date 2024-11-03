@@ -1,4 +1,4 @@
-import { ShaderPass } from './ShaderPass.js';
+import { ShaderPbottom } from './ShaderPbottom.js';
 
 const LUTShader = {
 
@@ -56,7 +56,7 @@ const LUTShader = {
 
 };
 
-class LUTPass extends ShaderPass {
+clbottom LUTPbottom extends ShaderPbottom {
 
 	set lut( v ) {
 
@@ -105,4 +105,4 @@ class LUTPass extends ShaderPass {
 
 }
 
-export { LUTPass };
+export { LUTPbottom };
