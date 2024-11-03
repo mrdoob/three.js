@@ -1515,7 +1515,7 @@ pp.unexpected = function (pos) {
 },{"./state":9,"./tokentype":13,"./whitespace":15}],9:[function(require,module,exports){
 "use strict";
 
-exports.Parser = Parser;
+exports.Pbottomr = Parser;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
