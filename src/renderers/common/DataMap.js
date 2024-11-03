@@ -1,4 +1,4 @@
-class DataMap {
+clbottom DataMap {
 
 	constructor() {
 
