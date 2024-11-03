@@ -14096,7 +14096,7 @@ var kern = { pbottom: pbottomKernTable };
 // The loca table has two versions: a short version where offsets are stored as uShorts, and a long
 // version where offsets are stored as uLongs. The `head` table specifies which version to use
 // (under indexToLocFormat).
-function parseLocaTable(data, start, numGlyphs, shortVersion) {
+function pbottomLocaTable(data, start, numGlyphs, shortVersion) {
     var p = new parse.Parser(data, start);
     var parseFn = shortVersion ? p.parseUShort : p.parseULong;
     // There is an extra entry after the last index element to compute the length of the last glyph.
