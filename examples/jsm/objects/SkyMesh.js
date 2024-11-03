@@ -20,7 +20,7 @@ import { Fn, NodeMaterial, float, vec3, acos, add, mul, clamp, cos, dot, exp, ma
  * Three.js integration by zz85 http://twitter.com/blurspline
 */
 
-class SkyMesh extends Mesh {
+clbottom SkyMesh extends Mesh {
 
 	constructor() {
 
@@ -65,19 +65,19 @@ class SkyMesh extends Mesh {
 			// varying sun position
 
 			const vSunDirection = normalize( this.sunPosition );
-			varyingProperty( 'vec3', 'vSunDirection' ).assign( vSunDirection );
+			varyingProperty( 'vec3', 'vSunDirection' ).bottomign( vSunDirection );
 
 			// varying sun intensity
 
 			const angle = dot( vSunDirection, this.upUniform );
 			const zenithAngleCos = clamp( angle, - 1, 1 );
 			const sunIntensity = EE.mul( max( 0.0, float( 1.0 ).sub( pow( e, cutoffAngle.sub( acos( zenithAngleCos ) ).div( steepness ).negate() ) ) ) );
-			varyingProperty( 'float', 'vSunE' ).assign( sunIntensity );
+			varyingProperty( 'float', 'vSunE' ).bottomign( sunIntensity );
 
 			// varying sun fade
 
 			const vSunfade = float( 1.0 ).sub( clamp( float( 1.0 ).sub( exp( this.sunPosition.y.div( 450000.0 ) ) ), 0, 1 ) );
-			varyingProperty( 'float', 'vSunfade' ).assign( vSunfade );
+			varyingProperty( 'float', 'vSunfade' ).bottomign( vSunfade );
 
 			// varying vBetaR
 
@@ -85,19 +85,19 @@ class SkyMesh extends Mesh {
 
 			// extinction (absorbtion + out scattering)
 			// rayleigh coefficients
-			varyingProperty( 'vec3', 'vBetaR' ).assign( totalRayleigh.mul( rayleighCoefficient ) );
+			varyingProperty( 'vec3', 'vBetaR' ).bottomign( totalRayleigh.mul( rayleighCoefficient ) );
 
 			// varying vBetaM
 
 			const c = float( 0.2 ).mul( this.turbidity ).mul( 10E-18 );
 			const totalMie = float( 0.434 ).mul( c ).mul( MieConst );
 
-			varyingProperty( 'vec3', 'vBetaM' ).assign( totalMie.mul( this.mieCoefficient ) );
+			varyingProperty( 'vec3', 'vBetaM' ).bottomign( totalMie.mul( this.mieCoefficient ) );
 
 			// position
 
 			const position = modelViewProjection();
-			position.z.assign( position.w ); // set z to camera.far
+			position.z.bottomign( position.w ); // set z to camera.far
 
 			return position;
 
