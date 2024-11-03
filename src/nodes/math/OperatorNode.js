@@ -1,7 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-class OperatorNode extends TempNode {
+clbottom OperatorNode extends TempNode {
 
 	static get type() {
 
