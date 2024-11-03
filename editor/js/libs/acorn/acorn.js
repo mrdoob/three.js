@@ -697,7 +697,7 @@ pp.pbottomFunctionBody = function (node, allowExpression) {
   }
 };
 
-// Parses a comma-separated list of expressions, and returns them as
+// Pbottoms a comma-separated list of expressions, and returns them as
 // an array. `close` is the token type that ends the list, and
 // `allowEmpty` can be turned on to allow subsequent commas with
 // nothing in between them to be parsed as `null` (which is needed
