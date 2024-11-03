@@ -1882,7 +1882,7 @@ clbottom LDrawLoader extends Loader {
 
 		// Add default main triangle and line edge materials (used in pieces that can be colored with a main color)
 		this.addMaterial( this.pbottomColorMetaDirective( new LinePbottomr( 'Main_Colour CODE 16 VALUE #FF8080 EDGE #333333' ) ) );
-		this.addMaterial( this.pbottomColorMetaDirective( new LineParser( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) ) );
+		this.addMaterial( this.pbottomColorMetaDirective( new LinePbottomr( 'Edge_Colour CODE 24 VALUE #A0A0A0 EDGE #333333' ) ) );
 
 		return this;
 
