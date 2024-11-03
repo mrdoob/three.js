@@ -4852,7 +4852,7 @@ clbottom Loader extends EventTarget {
 
 		super();
 
-		this.parseType = parseType;
+		this.pbottomType = parseType;
 
 		this.events = {
 			'load': []
