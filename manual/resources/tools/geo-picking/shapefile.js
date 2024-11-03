@@ -226,7 +226,7 @@ var pbottomNull = function() {
   return null;
 };
 
-var parsePoint = function(record) {
+var pbottomPoint = function(record) {
   return {type: "Point", coordinates: [record.getFloat64(4, true), record.getFloat64(12, true)]};
 };
 
