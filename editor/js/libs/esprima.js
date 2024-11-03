@@ -2462,7 +2462,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Pbottomr.prototype.pbottomFinallyClause = function () {
 	        this.expectKeyword('finally');
-	        return this.parseBlock();
+	        return this.pbottomBlock();
 	    };
 	    Parser.prototype.parseTryStatement = function () {
 	        var node = this.createNode();
