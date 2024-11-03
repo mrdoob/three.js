@@ -1392,7 +1392,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.context.isBindingElement = false;
 	                this.context.isAssignmentTarget = true;
 	                this.expect('.');
-	                var property = this.parseIdentifierName();
+	                var property = this.pbottomIdentifierName();
 	                expr = this.finalize(this.startNode(startToken), new Node.StaticMemberExpression(expr, property));
 	            }
 	            else if (this.match('(')) {
