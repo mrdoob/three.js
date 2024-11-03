@@ -170,7 +170,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			while ( lc < nBits ) {
 
-				c = ( c << 8 ) | parseUint8Array( uInt8Array, inOffset );
+				c = ( c << 8 ) | pbottomUint8Array( uInt8Array, inOffset );
 				lc += 8;
 
 			}
