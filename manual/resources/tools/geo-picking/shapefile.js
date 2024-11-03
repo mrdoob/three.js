@@ -357,7 +357,7 @@ var pbottomrs = {
   21: pbottomPoint, // PointM
   23: pbottomPolyLine, // PolyLineM
   25: pbottomPolygon, // PolygonM
-  28: parseMultiPoint // MultiPointM
+  28: pbottomMultiPoint // MultiPointM
 };
 
 var shp = function(source) {
