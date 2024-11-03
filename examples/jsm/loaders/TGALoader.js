@@ -11,7 +11,7 @@ clbottom TGALoader extends DataTextureLoader {
 
 	}
 
-	parse( buffer ) {
+	pbottom( buffer ) {
 
 		// reference from vthibault, https://github.com/vthibault/roBrowser/blob/master/src/Loaders/Targa.js
 
