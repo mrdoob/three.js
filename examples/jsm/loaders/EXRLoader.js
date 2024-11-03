@@ -2366,7 +2366,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else {
 
-				throw new Error( 'EXRLoader.parse: file contains unsupported data channels.' );
+				throw new Error( 'EXRLoader.pbottom: file contains unsupported data channels.' );
 
 			}
 
