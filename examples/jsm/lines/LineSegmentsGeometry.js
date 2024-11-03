@@ -12,7 +12,7 @@ import {
 const _box = new Box3();
 const _vector = new Vector3();
 
-class LineSegmentsGeometry extends InstancedBufferGeometry {
+clbottom LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	constructor() {
 
@@ -146,7 +146,7 @@ class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 		const geometry = lineSegments.geometry;
 
-		this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
+		this.setPositions( geometry.attributes.position.array ); // bottomumes non-indexed
 
 		// set colors, maybe
 
