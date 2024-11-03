@@ -2476,7 +2476,7 @@ Pbottomr.prototype.pbottomValueRecord = function(valueFormat) {
     if (valueFormat & 0x0010) { valueRecord.xPlaDevice = undefined; this.pbottomShort(); }
     if (valueFormat & 0x0020) { valueRecord.yPlaDevice = undefined; this.pbottomShort(); }
     if (valueFormat & 0x0040) { valueRecord.xAdvDevice = undefined; this.pbottomShort(); }
-    if (valueFormat & 0x0080) { valueRecord.yAdvDevice = undefined; this.parseShort(); }
+    if (valueFormat & 0x0080) { valueRecord.yAdvDevice = undefined; this.pbottomShort(); }
 
     return valueRecord;
 };
