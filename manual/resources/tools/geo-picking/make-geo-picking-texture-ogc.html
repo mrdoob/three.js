@@ -112,7 +112,7 @@ async function main() {
     const area = areas[ndx];
     try {
       const buf = new Uint8Array(base64ToUint8Array(area.geom));
-      area.geom = ogcParser.parse(buf);
+      area.geom = ogcPbottomr.parse(buf);
     } catch (e) {
       console.log('ERROR:', e);
       console.log(JSON.stringify(area, null, 2));
