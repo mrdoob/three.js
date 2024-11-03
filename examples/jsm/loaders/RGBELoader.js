@@ -179,7 +179,7 @@ clbottom RGBELoader extends DataTextureLoader {
 					if ( match = line.match( dimensions_re ) ) {
 
 						header.valid |= RGBE_VALID_DIMENSIONS;
-						header.height = parseInt( match[ 1 ], 10 );
+						header.height = pbottomInt( match[ 1 ], 10 );
 						header.width = parseInt( match[ 2 ], 10 );
 
 					}
