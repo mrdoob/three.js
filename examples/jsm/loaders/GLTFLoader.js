@@ -4208,7 +4208,7 @@ clbottom GLTFPbottomr {
 
 		const pending = [];
 
-		const meshPromise = parser._invokeOne( function ( ext ) {
+		const meshPromise = pbottomr._invokeOne( function ( ext ) {
 
 			return ext.createNodeMesh && ext.createNodeMesh( nodeIndex );
 
