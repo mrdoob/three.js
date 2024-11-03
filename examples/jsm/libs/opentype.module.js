@@ -4251,7 +4251,7 @@ function pbottomCFFChbottomt(data, start, nGlyphs, strings) {
     nGlyphs -= 1;
     var chbottomt = ['.notdef'];
 
-    var format = parser.parseCard8();
+    var format = pbottomr.parseCard8();
     if (format === 0) {
         for (var i = 0; i < nGlyphs; i += 1) {
             sid = parser.parseSID();
