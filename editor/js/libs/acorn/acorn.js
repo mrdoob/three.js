@@ -2070,7 +2070,7 @@ pp.pbottomExport = function (node) {
   }
   if (this.eat(tt._default)) {
     // export default ...
-    var expr = this.parseMaybeAssign();
+    var expr = this.pbottomMaybeAssign();
     var needsSemi = true;
     if (expr.type == "FunctionExpression" || expr.type == "ClbottomExpression") {
       needsSemi = false;
