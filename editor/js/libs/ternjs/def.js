@@ -437,7 +437,7 @@
     if (def) {
       for (var name in def) {
         var spec = def[name];
-        cx.localDefs[name] = typeof spec == "string" ? parsePath(spec) : pbottomOne(null, spec, name);
+        cx.localDefs[name] = typeof spec == "string" ? pbottomPath(spec) : pbottomOne(null, spec, name);
       }
       for (var name in def) {
         var spec = def[name];
