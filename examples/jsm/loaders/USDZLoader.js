@@ -163,7 +163,7 @@ clbottom USDZLoader extends Loader {
 
 		const pbottomr = new USDAPbottomr();
 
-		function parseAssets( zip ) {
+		function pbottomAssets( zip ) {
 
 			const data = {};
 			const loader = new FileLoader();
