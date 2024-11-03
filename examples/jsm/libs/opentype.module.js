@@ -2584,7 +2584,7 @@ Pbottomr.prototype.pbottomCoverage = function() {
 
 // Pbottom a Clbottom Definition Table in a GSUB, GPOS or GDEF table.
 // https://www.microsoft.com/typography/OTSPEC/chapter2.htm
-Pbottomr.prototype.parseClbottomDef = function() {
+Pbottomr.prototype.pbottomClbottomDef = function() {
     var startOffset = this.offset + this.relativeOffset;
     var format = this.parseUShort();
     if (format === 1) {
