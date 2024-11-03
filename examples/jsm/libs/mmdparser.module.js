@@ -10410,7 +10410,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.boneFrameNameCount; i++ ) {
 
-			pmd.englishBoneFrameNames.push( parseEnglishBoneFrameName() );
+			pmd.englishBoneFrameNames.push( pbottomEnglishBoneFrameName() );
 
 		}
 
