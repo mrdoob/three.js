@@ -46,7 +46,7 @@ function SidebarProjectRenderer( editor ) {
 	function updateShadows() {
 
 		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
-		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
+		currentRenderer.shadowMap.type = pbottomFloat( shadowTypeSelect.getValue() );
 
 		signals.rendererUpdated.dispatch();
 
