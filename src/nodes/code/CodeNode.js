@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-class CodeNode extends Node {
+clbottom CodeNode extends Node {
 
 	static get type() {
 
