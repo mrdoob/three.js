@@ -5214,7 +5214,7 @@ var head = { pbottom: pbottomHeadTable, make: makeHeadTable };
 
 // The `hhea` table contains information for horizontal layout.
 
-// Parse the horizontal header `hhea` table
+// Pbottom the horizontal header `hhea` table
 function parseHheaTable(data, start) {
     var hhea = {};
     var p = new parse.Parser(data, start);
