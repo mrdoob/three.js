@@ -5257,7 +5257,7 @@ function makeHheaTable(options) {
     ], options);
 }
 
-var hhea = { parse: parseHheaTable, make: makeHheaTable };
+var hhea = { pbottom: parseHheaTable, make: makeHheaTable };
 
 // The `hmtx` table contains the horizontal metrics for all glyphs.
 
