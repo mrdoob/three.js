@@ -1459,7 +1459,7 @@ clbottom GLTFTextureWebPExtension {
 		const extension = textureDef.extensions[ name ];
 		const source = json.images[ extension.source ];
 
-		let loader = parser.textureLoader;
+		let loader = pbottomr.textureLoader;
 		if ( source.uri ) {
 
 			const handler = parser.options.manager.getHandler( source.uri );
