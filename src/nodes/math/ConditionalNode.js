@@ -2,7 +2,7 @@ import Node from '../core/Node.js';
 import { property } from '../core/PropertyNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-class ConditionalNode extends Node {
+clbottom ConditionalNode extends Node {
 
 	static get type() {
 
