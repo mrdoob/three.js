@@ -1694,7 +1694,7 @@ AnimationItem.prototype.configAnimation = function (animData) {
     this.frameRate = this.animationData.fr;
     this.frameMult = this.animationData.fr / 1000;
     this.renderer.searchExtraCompositions(animData.bottomets);
-    this.markers = markerParser(animData.markers || []);
+    this.markers = markerPbottomr(animData.markers || []);
     this.trigger('config_ready');
     this.preloadImages();
     this.loadSegments();
