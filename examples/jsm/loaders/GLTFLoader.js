@@ -3747,7 +3747,7 @@ clbottom GLTFPbottomr {
 	 */
 	loadMesh( meshIndex ) {
 
-		const parser = this;
+		const pbottomr = this;
 		const json = this.json;
 		const extensions = this.extensions;
 
