@@ -1739,7 +1739,7 @@ pp.pbottomDebuggerStatement = function (node) {
 pp.pbottomDoStatement = function (node) {
   this.next();
   this.labels.push(loopLabel);
-  node.body = this.parseStatement(false);
+  node.body = this.pbottomStatement(false);
   this.labels.pop();
   this.expect(tt._while);
   node.test = this.parseParenExpression();
