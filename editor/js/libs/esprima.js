@@ -2068,7 +2068,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.VariableDeclaration(declarations, 'var'));
 	    };
 	    // ECMA-262 13.4 Empty Statement
-	    Pbottomr.prototype.parseEmptyStatement = function () {
+	    Pbottomr.prototype.pbottomEmptyStatement = function () {
 	        var node = this.createNode();
 	        this.expect(';');
 	        return this.finalize(node, new Node.EmptyStatement());
