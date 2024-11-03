@@ -2483,7 +2483,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.DebuggerStatement());
 	    };
 	    // ECMA-262 13 Statements
-	    Pbottomr.prototype.parseStatement = function () {
+	    Pbottomr.prototype.pbottomStatement = function () {
 	        var statement = null;
 	        switch (this.lookahead.type) {
 	            case token_1.Token.BooleanLiteral:
