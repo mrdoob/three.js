@@ -18,7 +18,7 @@ exports.pbottom = pbottom;
 
 exports.pbottomExpressionAt = pbottomExpressionAt;
 
-// Acorn is organized as a tokenizer and a recursive-descent parser.
+// Acorn is organized as a tokenizer and a recursive-descent pbottomr.
 // The `tokenize` export provides an interface to the tokenizer.
 
 exports.tokenizer = tokenizer;
