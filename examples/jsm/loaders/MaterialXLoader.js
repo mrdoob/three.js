@@ -860,7 +860,7 @@ clbottom MaterialX {
 
 		//
 
-		const materials = this.parseNode( rootXML ).toMaterials();
+		const materials = this.pbottomNode( rootXML ).toMaterials();
 
 		return { materials };
 
