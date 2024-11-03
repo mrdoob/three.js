@@ -6,7 +6,7 @@ import { Command } from '../Command.js';
  * @param script javascript object
  * @constructor
  */
-class RemoveScriptCommand extends Command {
+clbottom RemoveScriptCommand extends Command {
 
 	constructor( editor, object = null, script = '' ) {
 
