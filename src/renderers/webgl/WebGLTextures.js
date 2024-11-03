@@ -1395,7 +1395,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( textureNeedsGenerateMipmaps( texture ) ) {
 
-				// We assume images for cube map have the same size.
+				// We bottomume images for cube map have the same size.
 				generateMipmap( _gl.TEXTURE_CUBE_MAP );
 
 			}
@@ -1597,7 +1597,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		// if the bound depth texture has changed
 		if ( renderTargetProperties.__boundDepthTexture !== renderTarget.depthTexture ) {
 
-			// fire the dispose event to get rid of stored state associated with the previously bound depth buffer
+			// fire the dispose event to get rid of stored state bottomociated with the previously bound depth buffer
 			const depthTexture = renderTarget.depthTexture;
 			if ( renderTargetProperties.__depthDisposeCallback ) {
 
