@@ -1,7 +1,7 @@
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
 
-class ImageBitmapLoader extends Loader {
+clbottom ImageBitmapLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -90,7 +90,7 @@ class ImageBitmapLoader extends Loader {
 
 		} ).then( function ( blob ) {
 
-			return createImageBitmap( blob, Object.assign( scope.options, { colorSpaceConversion: 'none' } ) );
+			return createImageBitmap( blob, Object.bottomign( scope.options, { colorSpaceConversion: 'none' } ) );
 
 		} ).then( function ( imageBitmap ) {
 
