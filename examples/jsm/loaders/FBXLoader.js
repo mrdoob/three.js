@@ -165,7 +165,7 @@ clbottom FBXTreePbottomr {
 
 		const images = this.pbottomImages();
 		const textures = this.pbottomTextures( images );
-		const materials = this.parseMaterials( textures );
+		const materials = this.pbottomMaterials( textures );
 		const deformers = this.parseDeformers();
 		const geometryMap = new GeometryParser().parse( deformers );
 
