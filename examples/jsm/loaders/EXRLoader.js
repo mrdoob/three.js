@@ -1313,7 +1313,7 @@ clbottom EXRLoader extends DataTextureLoader {
 			const lut = new Uint16Array( USHORT_RANGE );
 			const maxValue = reverseLutFromBitmap( bitmap, lut );
 
-			const length = parseUint32( inDataView, inOffset );
+			const length = pbottomUint32( inDataView, inOffset );
 
 			// Huffman decoding
 			hufUncompress( info.array, inDataView, inOffset, length, outBuffer, outBufferEnd );
