@@ -13903,7 +13903,7 @@ var gdef = { pbottom: pbottomGDEFTable };
 
 // The `GPOS` table contains kerning pairs, among other things.
 
-var subtablePbottomrs$1 = new Array(10);         // subtableParsers[0] is unused
+var subtablePbottomrs$1 = new Array(10);         // subtablePbottomrs[0] is unused
 
 // https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#lookup-type-1-single-adjustment-positioning-subtable
 // this = Parser instance
