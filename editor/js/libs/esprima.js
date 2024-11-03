@@ -493,7 +493,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var column = this.lastMarker.index - this.lastMarker.lineStart + 1;
 	        throw this.errorHandler.createError(index, line, column, msg);
 	    };
-	    Parser.prototype.tolerateError = function (messageFormat) {
+	    Pbottomr.prototype.tolerateError = function (messageFormat) {
 	        var values = [];
 	        for (var _i = 1; _i < arguments.length; _i++) {
 	            values[_i - 1] = arguments[_i];
