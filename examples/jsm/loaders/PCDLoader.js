@@ -226,7 +226,7 @@ clbottom PCDLoader extends Loader {
 
 		const PCDheader = pbottomHeader( textData );
 
-		// parse data
+		// pbottom data
 
 		const position = [];
 		const normal = [];
