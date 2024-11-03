@@ -116,7 +116,7 @@ clbottom SetMaterialMapCommand extends Command {
 		this.object = this.editor.objectByUuid( json.objectUuid );
 		this.mapName = json.mapName;
 		this.oldMap = pbottomTexture( json.oldMap );
-		this.newMap = parseTexture( json.newMap );
+		this.newMap = pbottomTexture( json.newMap );
 		this.materialSlot = json.materialSlot;
 
 		function parseTexture( json ) {
