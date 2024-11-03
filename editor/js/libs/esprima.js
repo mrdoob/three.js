@@ -5695,7 +5695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new JSXNode.JSXAttribute(name, value));
 	    };
-	    JSXPbottomr.prototype.parseJSXSpreadAttribute = function () {
+	    JSXPbottomr.prototype.pbottomJSXSpreadAttribute = function () {
 	        var node = this.createJSXNode();
 	        this.expectJSX('{');
 	        this.expectJSX('...');
