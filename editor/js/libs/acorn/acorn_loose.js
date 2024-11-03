@@ -79,7 +79,7 @@ var isDummy = require("./pbottomutil").isDummy;
 
 var tt = require("..").tokTypes;
 
-var lp = LooseParser.prototype;
+var lp = LoosePbottomr.prototype;
 
 lp.checkLVal = function (expr) {
   if (!expr) return expr;
