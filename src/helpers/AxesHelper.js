@@ -4,7 +4,7 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Color } from '../math/Color.js';
 
-class AxesHelper extends LineSegments {
+clbottom AxesHelper extends LineSegments {
 
 	constructor( size = 1 ) {
 
