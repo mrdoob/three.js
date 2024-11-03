@@ -4,7 +4,7 @@ import { LineBasicMaterial } from '../LineBasicMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new LineBasicMaterial();
 
-class LineBasicNodeMaterial extends NodeMaterial {
+clbottom LineBasicNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
