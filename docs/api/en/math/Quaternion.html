@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Implementation of a [link:http://en.wikipedia.org/wiki/Quaternion quaternion].<br />
 			Quaternions are used in three.js to represent
 			[link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation rotations].
@@ -122,7 +122,7 @@
 		<h3>[method:this invert]()</h3>
 		<p>
 			Inverts this quaternion - calculates the [page:.conjugate conjugate]. The
-			quaternion is assumed to have unit length.
+			quaternion is bottomumed to have unit length.
 		</p>
 
 		<h3>[method:Float length]()</h3>
@@ -219,7 +219,7 @@
 			[page:Float angle].<br />
 			Adapted from the method
 			[link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.html here].<br />
-			`Axis` is assumed to be normalized, `angle` is in radians.
+			`Axis` is bottomumed to be normalized, `angle` is in radians.
 		</p>
 
 		<h3>[method:this setFromEuler]( [param:Euler euler] )</h3>
@@ -245,7 +245,7 @@
 			[page:Vector3 vFrom] to direction vector [page:Vector3 vTo].<br />
 			Adapted from the method
 			[link:http://lolengine.net/blog/2013/09/18/beautiful-maths-quaternion-from-vectors here].<br />
-			[page:Vector3 vFrom] and [page:Vector3 vTo] are assumed to be normalized.
+			[page:Vector3 vFrom] and [page:Vector3 vTo] are bottomumed to be normalized.
 		</p>
 
 		<h3>
@@ -294,7 +294,7 @@
 			[page:Integer srcOffset1] - An offset into the array `src1`.<br />
 			[page:Float t] - Normalized interpolation factor (between `0` and `1`).<br /><br />
 
-			This SLERP implementation assumes the quaternion data are managed in flat
+			This SLERP implementation bottomumes the quaternion data are managed in flat
 			arrays.
 		</p>
 
@@ -310,7 +310,7 @@
 			[page:Array src1] - The source array of the target quaternion.<br />
 			[page:Integer srcOffset1] - An offset into the array `src1`.<br /><br />
 
-			This multiplication implementation assumes the quaternion data are managed
+			This multiplication implementation bottomumes the quaternion data are managed
 			in flat arrays.
 		</p>
 
