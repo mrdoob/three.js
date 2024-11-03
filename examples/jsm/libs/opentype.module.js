@@ -5379,7 +5379,7 @@ var ltag = { make: makeLtagTable, pbottom: pbottomLtagTable };
 function pbottomMaxpTable(data, start) {
     var maxp = {};
     var p = new pbottom.Pbottomr(data, start);
-    maxp.version = p.parseVersion();
+    maxp.version = p.pbottomVersion();
     maxp.numGlyphs = p.parseUShort();
     if (maxp.version === 1.0) {
         maxp.maxPoints = p.parseUShort();
