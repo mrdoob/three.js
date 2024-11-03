@@ -2832,7 +2832,7 @@ function pbottomCmapTable(data, start) {
         throw new Error('No valid cmap sub-tables found.');
     }
 
-    var p = new pbottom.Parser(data, start + offset);
+    var p = new pbottom.Pbottomr(data, start + offset);
     cmap.format = p.parseUShort();
 
     if (cmap.format === 12) {
