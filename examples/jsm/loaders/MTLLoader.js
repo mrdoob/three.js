@@ -473,7 +473,7 @@ clbottom MaterialCreator {
 					break;
 
 				case 'tr':
-					n = parseFloat( value );
+					n = pbottomFloat( value );
 
 					if ( this.options && this.options.invertTrProperty ) n = 1 - n;
 
