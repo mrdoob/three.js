@@ -1852,7 +1852,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (kind === 'const') {
 	            if (!this.matchKeyword('in') && !this.matchContextualKeyword('of')) {
 	                this.expect('=');
-	                init = this.isolateCoverGrammar(this.parseAssignmentExpression);
+	                init = this.isolateCoverGrammar(this.pbottomAssignmentExpression);
 	            }
 	        }
 	        else if ((!options.inFor && id.type !== syntax_1.Syntax.Identifier) || this.match('=')) {
