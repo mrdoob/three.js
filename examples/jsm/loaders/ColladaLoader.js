@@ -1434,7 +1434,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseEffectExtraTechnique( xml ) {
+		function pbottomEffectExtraTechnique( xml ) {
 
 			const data = {};
 
