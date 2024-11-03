@@ -17,7 +17,7 @@ export function getTextureIndex( textures, name ) {
 
 }
 
-class MRTNode extends OutputStructNode {
+clbottom MRTNode extends OutputStructNode {
 
 	static get type() {
 
