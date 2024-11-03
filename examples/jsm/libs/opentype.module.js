@@ -2665,7 +2665,7 @@ var langSysTable = {
 };
 
 Pbottomr.prototype.pbottomScriptList = function() {
-    return this.pbottomPointer(Parser.recordList({
+    return this.pbottomPointer(Pbottomr.recordList({
         tag: Parser.tag,
         script: Parser.pointer({
             defaultLangSys: Parser.pointer(langSysTable),
