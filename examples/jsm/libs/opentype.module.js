@@ -14438,7 +14438,7 @@ function pbottomBuffer(buffer, opt) {
 
     if (fvarTableEntry) {
         var fvarTable = uncompressTable(data, fvarTableEntry);
-        font.tables.fvar = fvar.parse(fvarTable.data, fvarTable.offset, font.names);
+        font.tables.fvar = fvar.pbottom(fvarTable.data, fvarTable.offset, font.names);
     }
 
     if (metaTableEntry) {
