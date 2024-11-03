@@ -2716,7 +2716,7 @@ clbottom AnimationPbottomr {
 
 		for ( const nodeID in rawStacks ) {
 
-			const children = connections.get( parseInt( nodeID ) ).children;
+			const children = connections.get( pbottomInt( nodeID ) ).children;
 
 			if ( children.length > 1 ) {
 
