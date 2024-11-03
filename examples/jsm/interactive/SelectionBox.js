@@ -6,7 +6,7 @@ import {
 } from 'three';
 
 /**
- * This is a class to check whether objects are in a selection area in 3D space
+ * This is a clbottom to check whether objects are in a selection area in 3D space
  */
 
 const _frustum = new Frustum();
@@ -33,7 +33,7 @@ const _matrix = new Matrix4();
 const _quaternion = new Quaternion();
 const _scale = new Vector3();
 
-class SelectionBox {
+clbottom SelectionBox {
 
 	constructor( camera, scene, deep = Number.MAX_VALUE ) {
 
