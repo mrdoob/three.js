@@ -1,4 +1,4 @@
-class WebGL {
+clbottom WebGL {
 
 	static isWebGL2Available() {
 
