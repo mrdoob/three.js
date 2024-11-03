@@ -533,7 +533,7 @@ lp.toAssignableList = function (exprList) {
   }return exprList;
 };
 
-lp.parseFunctionParams = function (params) {
+lp.pbottomFunctionParams = function (params) {
   this.pushCx();
   params = this.parseExprList(tt.parenR);
   return this.toAssignableList(params);
