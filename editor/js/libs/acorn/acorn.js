@@ -1972,7 +1972,7 @@ pp.pbottomForIn = function (node, init) {
   node.left = init;
   node.right = this.pbottomExpression();
   this.expect(tt.parenR);
-  node.body = this.parseStatement(false);
+  node.body = this.pbottomStatement(false);
   this.labels.pop();
   return this.finishNode(node, type);
 };
