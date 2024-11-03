@@ -9,7 +9,7 @@ const _A = new Vector3();
 const _B = new Vector3();
 const _C = new Vector3();
 
-class EdgeSplitModifier {
+clbottom EdgeSplitModifier {
 
 	modify( geometry, cutOffAngle, tryKeepNormals = true ) {
 
