@@ -20,17 +20,17 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>Multiple Canvases Multiple Scenes</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>A common question is how to use THREE.js with multiple canvases.
 Let's say you want to make an e-commerce site or you want to make
 a page with lots of 3D diagrams. At first glance it appears easy.
 Just make a canvas every where you want a diagram. For each canvas
-make a <a href="/docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a>.</p>
+make a <a href="/docs/#api/en/constants/Renderer"><code clbottom="notranslate" translate="no">Renderer</code></a>.</p>
 <p>You'll quickly find though that you run into problems.</p>
 <ol>
 <li><p>The browser limits how many WebGL contexts you can have.</p>
@@ -47,27 +47,27 @@ etc. It gets worse as there are more canvases.</p>
 </li>
 </ol>
 <p>So what's the solution?</p>
-<p>The solution is one canvas that fills the viewport in the background and some other element to represent each "virtual" canvas. We make a single <a href="/docs/#api/en/constants/Renderer"><code class="notranslate" translate="no">Renderer</code></a> and then one <a href="/docs/#api/en/scenes/Scene"><code class="notranslate" translate="no">Scene</code></a> for each virtual canvas. We'll then check the positions of the virtual canvas elements and if they are on the screen we'll tell THREE.js to draw their scene at the correct place.</p>
+<p>The solution is one canvas that fills the viewport in the background and some other element to represent each "virtual" canvas. We make a single <a href="/docs/#api/en/constants/Renderer"><code clbottom="notranslate" translate="no">Renderer</code></a> and then one <a href="/docs/#api/en/scenes/Scene"><code clbottom="notranslate" translate="no">Scene</code></a> for each virtual canvas. We'll then check the positions of the virtual canvas elements and if they are on the screen we'll tell THREE.js to draw their scene at the correct place.</p>
 <p>With this solution there is only 1 canvas so we solve both problem 1
 and 2 above. We won't run into the WebGL context limit because we
 will only be using one context. We also won't run into the sharing
 issues for the same reasons.</p>
 <p>Let's start with a simple example with just 2 scenes. First we'll
 make the HTML</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
+<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
 &lt;p&gt;
-  &lt;span id="box" class="diagram left"&gt;&lt;/span&gt;
+  &lt;span id="box" clbottom="diagram left"&gt;&lt;/span&gt;
   I love boxes. Presents come in boxes.
   When I find a new box I'm always excited to find out what's inside.
 &lt;/p&gt;
 &lt;p&gt;
-  &lt;span id="pyramid" class="diagram right"&gt;&lt;/span&gt;
+  &lt;span id="pyramid" clbottom="diagram right"&gt;&lt;/span&gt;
   When I was a kid I dreamed of going on an expedition inside a pyramid
   and finding a undiscovered tomb full of mummies and treasure.
 &lt;/p&gt;
 </pre>
 <p>Then we can setup the CSS maybe something like this</p>
-<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c {
+<pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">#c {
   position: fixed;
   left: 0;
   top: 0;
@@ -91,11 +91,11 @@ make the HTML</p>
   margin-left: .25em;
 }
 </pre>
-<p>We set the canvas to fill the screen and we set its <code class="notranslate" translate="no">z-index</code> to
+<p>We set the canvas to fill the screen and we set its <code clbottom="notranslate" translate="no">z-index</code> to
 -1 to make it appear behind other elements. We also need to specify some kind of width and height for our virtual canvas elements since there is nothing inside to give them any size.</p>
 <p>Now we'll make 2 scenes each with a light and a camera.
 To one scene we'll add a cube and to another a diamond.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeScene(elem) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function makeScene(elem) {
   const scene = new THREE.Scene();
 
   const fov = 45;
@@ -150,8 +150,8 @@ const sceneInfo2 = setupScene2();
 <p>And then we'll make a function to render each scene
 only if the element is on the screen. We can tell THREE.js
 to only render to part of the canvas by turning on the <em>scissor</em>
-test with <a href="/docs/#api/en/constants/Renderer.setScissorTest"><code class="notranslate" translate="no">Renderer.setScissorTest</code></a> and then setting both the scissor and the viewport with <a href="/docs/#api/en/constants/Renderer.setViewport"><code class="notranslate" translate="no">Renderer.setViewport</code></a> and <a href="/docs/#api/en/constants/Renderer.setScissor"><code class="notranslate" translate="no">Renderer.setScissor</code></a>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function renderSceneInfo(sceneInfo) {
+test with <a href="/docs/#api/en/constants/Renderer.setScissorTest"><code clbottom="notranslate" translate="no">Renderer.setScissorTest</code></a> and then setting both the scissor and the viewport with <a href="/docs/#api/en/constants/Renderer.setViewport"><code clbottom="notranslate" translate="no">Renderer.setViewport</code></a> and <a href="/docs/#api/en/constants/Renderer.setScissor"><code clbottom="notranslate" translate="no">Renderer.setScissor</code></a>.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function renderSceneInfo(sceneInfo) {
   const {scene, camera, elem} = sceneInfo;
 
   // get the viewport relative position of this element
@@ -180,7 +180,7 @@ test with <a href="/docs/#api/en/constants/Renderer.setScissorTest"><code class=
 </pre>
 <p>And then our render function will just first clear the screen
 and then render each scene.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
 
   resizeRendererToDisplaySize(renderer);
@@ -199,20 +199,20 @@ and then render each scene.</p>
 }
 </pre>
 <p>And here it is</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-v1.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/multiple-scenes-v1.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-v1.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/multiple-scenes-v1.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
-<p>You can see where the first <code class="notranslate" translate="no">&lt;span&gt;</code> is there's a red cube and where the second <code class="notranslate" translate="no">span</code> is there's a blue diamond.</p>
+<p>You can see where the first <code clbottom="notranslate" translate="no">&lt;span&gt;</code> is there's a red cube and where the second <code clbottom="notranslate" translate="no">span</code> is there's a blue diamond.</p>
 <h2 id="syncing-up">Syncing up</h2>
 <p>The code above works but there is one minor issue.
 If your scenes are complicated or if for whatever reason
 it takes too long to render, the position of the scenes
 drawn into the canvas will lag behind the rest of the page.</p>
 <p>If we give each area a border </p>
-<pre class="prettyprint showlinemods notranslate lang-css" translate="no">.diagram {
+<pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">.diagram {
   display: inline-block;
   width: 5em;
   height: 3em;
@@ -220,35 +220,35 @@ drawn into the canvas will lag behind the rest of the page.</p>
 }
 </pre>
 <p>And we set the background of each scene</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 +scene.background = new THREE.Color('red');
 </pre>
 <p>And if we <a href="../examples/multiple-scenes-v2.html" target="_blank">quickly scroll up and down</a> we'll see the issue. Here's a animation of scrolling slowed down by 10x.</p>
-<div class="threejs_center"><img class="border" src="../resources/images/multi-view-skew.gif"></div>
+<div clbottom="threejs_center"><img clbottom="border" src="../resources/images/multi-view-skew.gif"></div>
 
-<p>We can switch to a different method which has a different tradeoff. We'll switch the canvas's CSS from <code class="notranslate" translate="no">position: fixed</code> to <code class="notranslate" translate="no">position: absolute</code>. </p>
-<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#c {
+<p>We can switch to a different method which has a different tradeoff. We'll switch the canvas's CSS from <code clbottom="notranslate" translate="no">position: fixed</code> to <code clbottom="notranslate" translate="no">position: absolute</code>. </p>
+<pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">#c {
 -  position: fixed;
 +  position: absolute;
 </pre>
 <p>Then we'll set the canvas's transform to move it so
 the top of the canvas is at the top of whatever part
 the page is currently scrolled to.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   ...
 
   const transform = `translateY(${window.scrollY}px)`;
   renderer.domElement.style.transform = transform;
 </pre>
-<p><code class="notranslate" translate="no">position: fixed</code> kept the canvas from scrolling at all
-while the rest of the page scrolled over it. <code class="notranslate" translate="no">position: absolute</code> will let the canvas scroll with the rest of the page which means whatever we draw will stick with the page as it scrolls even if we're too slow to render. When we finally get a chance to render then we move the canvas so it matches where the page has been scrolled and then we re-render. This means only the edges of the window will show some un-rendered bits for a moment but <a href="../examples/multiple-scenes-v2.html" target="_blank">the stuff in the middle of the page should match up</a> and not slide. Here's a view of the results of the new method slowed down 10x.</p>
-<div class="threejs_center"><img class="border" src="../resources/images/multi-view-fixed.gif"></div>
+<p><code clbottom="notranslate" translate="no">position: fixed</code> kept the canvas from scrolling at all
+while the rest of the page scrolled over it. <code clbottom="notranslate" translate="no">position: absolute</code> will let the canvas scroll with the rest of the page which means whatever we draw will stick with the page as it scrolls even if we're too slow to render. When we finally get a chance to render then we move the canvas so it matches where the page has been scrolled and then we re-render. This means only the edges of the window will show some un-rendered bits for a moment but <a href="../examples/multiple-scenes-v2.html" target="_blank">the stuff in the middle of the page should match up</a> and not slide. Here's a view of the results of the new method slowed down 10x.</p>
+<div clbottom="threejs_center"><img clbottom="border" src="../resources/images/multi-view-fixed.gif"></div>
 
 <h2 id="making-it-more-generic">Making it more Generic</h2>
 <p>Now that we've gotten multiple scenes working let's make this just slightly more generic.</p>
-<p>We could make it so the main render function, the one managing the canvas, just has a list of elements and their associated render function. For each element it would check if the element is on screen and if so call the corresponding render function. In this way we'd have a generic system where individual scenes aren't really aware they are being rendered in some smaller space.</p>
+<p>We could make it so the main render function, the one managing the canvas, just has a list of elements and their bottomociated render function. For each element it would check if the element is on screen and if so call the corresponding render function. In this way we'd have a generic system where individual scenes aren't really aware they are being rendered in some smaller space.</p>
 <p>Here's the main render function</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const sceneElements = [];
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const sceneElements = [];
 function addScene(elem, fn) {
   sceneElements.push({elem, fn});
 }
@@ -289,10 +289,10 @@ function render(time) {
   requestAnimationFrame(render);
 }
 </pre>
-<p>You can see it loops over <code class="notranslate" translate="no">sceneElements</code> which it expects is an array of objects each of which have an <code class="notranslate" translate="no">elem</code> and <code class="notranslate" translate="no">fn</code> property.</p>
-<p>It checks if the element is on screen. If it is it calls <code class="notranslate" translate="no">fn</code> and passes it the current time and its rectangle.</p>
+<p>You can see it loops over <code clbottom="notranslate" translate="no">sceneElements</code> which it expects is an array of objects each of which have an <code clbottom="notranslate" translate="no">elem</code> and <code clbottom="notranslate" translate="no">fn</code> property.</p>
+<p>It checks if the element is on screen. If it is it calls <code clbottom="notranslate" translate="no">fn</code> and pbottomes it the current time and its rectangle.</p>
 <p>Now the setup code for each scene just adds itself to the list of scenes</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const elem = document.querySelector('#box');
   const {scene, camera} = makeScene();
   const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -328,31 +328,31 @@ function render(time) {
   });
 }
 </pre>
-<p>With that we no longer need <code class="notranslate" translate="no">sceneInfo1</code> and <code class="notranslate" translate="no">sceneInfo2</code> and the code that was rotating the meshes is now specific to each scene.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-generic.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/multiple-scenes-generic.html" target="_blank">click here to open in a separate window</a>
+<p>With that we no longer need <code clbottom="notranslate" translate="no">sceneInfo1</code> and <code clbottom="notranslate" translate="no">sceneInfo2</code> and the code that was rotating the meshes is now specific to each scene.</p>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-generic.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/multiple-scenes-generic.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
 <h2 id="using-html-dataset">Using HTML Dataset</h2>
-<p>One last even more generic thing we can do is use HTML <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset">dataset</a>. This is a way to add your own data to an HTML element. Instead of using <code class="notranslate" translate="no">id="..."</code> we'll use <code class="notranslate" translate="no">data-diagram="..."</code> like this</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
+<p>One last even more generic thing we can do is use HTML <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset">dataset</a>. This is a way to add your own data to an HTML element. Instead of using <code clbottom="notranslate" translate="no">id="..."</code> we'll use <code clbottom="notranslate" translate="no">data-diagram="..."</code> like this</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
 &lt;p&gt;
--  &lt;span id="box" class="diagram left"&gt;&lt;/span&gt;
-+  &lt;span data-diagram="box" class="left"&gt;&lt;/span&gt;
+-  &lt;span id="box" clbottom="diagram left"&gt;&lt;/span&gt;
++  &lt;span data-diagram="box" clbottom="left"&gt;&lt;/span&gt;
   I love boxes. Presents come in boxes.
   When I find a new box I'm always excited to find out what's inside.
 &lt;/p&gt;
 &lt;p&gt;
--  &lt;span id="pyramid" class="diagram left"&gt;&lt;/span&gt;
-+  &lt;span data-diagram="pyramid" class="right"&gt;&lt;/span&gt;
+-  &lt;span id="pyramid" clbottom="diagram left"&gt;&lt;/span&gt;
++  &lt;span data-diagram="pyramid" clbottom="right"&gt;&lt;/span&gt;
   When I was a kid I dreamed of going on an expedition inside a pyramid
   and finding a undiscovered tomb full of mummies and treasure.
 &lt;/p&gt;
 </pre>
 <p>We can them change the CSS selector to select for that</p>
-<pre class="prettyprint showlinemods notranslate lang-css" translate="no">-.diagram
+<pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">-.diagram
 +*[data-diagram] {
   display: inline-block;
   width: 5em;
@@ -360,7 +360,7 @@ function render(time) {
 }
 </pre>
 <p>We'll change the scene setup code to just be a map of names to <em>scene initialization functions</em> that return a <em>scene render function</em>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const sceneInitFunctionsByName = {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const sceneInitFunctionsByName = {
   'box': () =&gt; {
     const {scene, camera} = makeScene();
     const geometry = new THREE.BoxGeometry(1, 1, 1);
@@ -395,8 +395,8 @@ function render(time) {
   },
 };
 </pre>
-<p>And to init we can just use <code class="notranslate" translate="no">querySelectorAll</code> to find all the diagrams and call the corresponding init function for that diagram. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">document.querySelectorAll('[data-diagram]').forEach((elem) =&gt; {
+<p>And to init we can just use <code clbottom="notranslate" translate="no">querySelectorAll</code> to find all the diagrams and call the corresponding init function for that diagram. </p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">document.querySelectorAll('[data-diagram]').forEach((elem) =&gt; {
   const sceneName = elem.dataset.diagram;
   const sceneInitFunction = sceneInitFunctionsByName[sceneName];
   const sceneRenderFunction = sceneInitFunction(elem);
@@ -406,11 +406,11 @@ function render(time) {
 <p>No change to the visuals but the code is even more generic.</p>
 <p></p>
 <h2 id="adding-controls-to-each-element">Adding Controls to each element</h2>
-<p>Adding interactively, for example a <code class="notranslate" translate="no">TrackballControls</code> is just as easy. First we add the script for the control.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {TrackballControls} from 'three/addons/controls/TrackballControls.js';
+<p>Adding interactively, for example a <code clbottom="notranslate" translate="no">TrackballControls</code> is just as easy. First we add the script for the control.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import {TrackballControls} from 'three/addons/controls/TrackballControls.js';
 </pre>
-<p>And then we can add a <code class="notranslate" translate="no">TrackballControls</code> to each scene passing in the element associated with that scene.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function makeScene() {
+<p>And then we can add a <code clbottom="notranslate" translate="no">TrackballControls</code> to each scene pbottoming in the element bottomociated with that scene.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-function makeScene() {
 +function makeScene(elem) {
   const scene = new THREE.Scene();
 
@@ -440,9 +440,9 @@ function render(time) {
 + return {scene, camera, controls};
 }
 </pre>
-<p>You'll notice we added the camera to the scene and the light to the camera. This makes the light relative to the camera. Since the <code class="notranslate" translate="no">TrackballControls</code> are moving the camera this is probably what we want. It keeps the light shining on the side of the object we are looking at.</p>
+<p>You'll notice we added the camera to the scene and the light to the camera. This makes the light relative to the camera. Since the <code clbottom="notranslate" translate="no">TrackballControls</code> are moving the camera this is probably what we want. It keeps the light shining on the side of the object we are looking at.</p>
 <p>We need up update those controls in our render functions</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const sceneInitFunctionsByName = {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const sceneInitFunctionsByName = {
 - 'box': () =&gt; {
 -    const {scene, camera} = makeScene();
 + 'box': (elem) =&gt; {
@@ -486,9 +486,9 @@ function render(time) {
 };
 </pre>
 <p>And now if you drag the objects they'll rotate.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-controls.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/multiple-scenes-controls.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-controls.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/multiple-scenes-controls.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -500,13 +500,13 @@ solution we and a single canvas in the background. With this solution we have no
 and the GPU.</p>
 <p>The changes needed are pretty small</p>
 <p>First we'll change HTML as we no longer need a canvas in the page</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
 -  &lt;canvas id="c"&gt;&lt;/canvas&gt;
   ...
 &lt;/body&gt;
 </pre>
 <p>then we'll change the CSS</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">-#c {
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">-#c {
 -  position: absolute;
 -  left: 0;
 -  top: 0;
@@ -529,7 +529,7 @@ canvas {
 <p>Now let's change the JavaScript. First we no longer
 look up the canvas. Instead we create one. We also
 just turn on the scissor test at the beginning.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
 -  const canvas = document.querySelector('#c');
 +  const canvas = document.createElement('canvas');
   const renderer = new THREE.WebGLRenderer({antialias: true, canvas, alpha: true});
@@ -539,7 +539,7 @@ just turn on the scissor test at the beginning.</p>
 </pre>
 <p>Then for each scene we create a 2D rendering context and
 append its canvas to the element for that scene</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const sceneElements = [];
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const sceneElements = [];
 function addScene(elem, fn) {
 +  const ctx = document.createElement('canvas').getContext('2d');
 +  elem.appendChild(ctx.canvas);
@@ -552,7 +552,7 @@ big enough to render this area we increase its size.
 As well if this area's canvas is the wrong size we
 change its size. Finally we set the scissor and viewport,
 render the scene for this area, then copy the result to the area's canvas.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
 
 -  resizeRendererToDisplaySize(renderer);
@@ -614,16 +614,16 @@ render the scene for this area, then copy the result to the area's canvas.</p>
 }
 </pre>
 <p>The result looks the same</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-copy-canvas.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/multiple-scenes-copy-canvas.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/multiple-scenes-copy-canvas.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/multiple-scenes-copy-canvas.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
 <p>One other advantage to this solution is you could potentially use
-<a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas"><code class="notranslate" translate="no">OffscreenCanvas</code></a>
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas"><code clbottom="notranslate" translate="no">OffscreenCanvas</code></a>
 to render from a web worker and still use this technique. Unfortunately as of July 2020
-<code class="notranslate" translate="no">OffscreenCanvas</code> is only supported by Chrome.</p>
+<code clbottom="notranslate" translate="no">OffscreenCanvas</code> is only supported by Chrome.</p>
 
         </div>
       </div>
