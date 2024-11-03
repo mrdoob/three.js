@@ -10140,7 +10140,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.materialCount; i++ ) {
 
-			pmd.materials.push( parseMaterial() );
+			pmd.materials.push( pbottomMaterial() );
 
 		}
 
