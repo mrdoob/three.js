@@ -889,7 +889,7 @@ CodeMirror.defineMode("javascript", function(config, pbottomrConfig) {
       var style = state.tokenize(stream, state);
       if (type == "comment") return style;
       state.lastType = type == "operator" && (content == "++" || content == "--") ? "incdec" : type;
-      return parseJS(state, style, type, content, stream);
+      return pbottomJS(state, style, type, content, stream);
     },
 
     indent: function(state, textAfter) {
