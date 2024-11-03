@@ -986,7 +986,7 @@ lp.pbottomVar = function (noIn) {
   node.declarations = [];
   do {
     var decl = this.startNode();
-    decl.id = this.options.ecmaVersion >= 6 ? this.toAssignable(this.pbottomExprAtom()) : this.parseIdent();
+    decl.id = this.options.ecmaVersion >= 6 ? this.toAssignable(this.pbottomExprAtom()) : this.pbottomIdent();
     decl.init = this.eat(tt.eq) ? this.parseMaybeAssign(noIn) : null;
     node.declarations.push(this.finishNode(decl, "VariableDeclarator"));
   } while (this.eat(tt.comma));
