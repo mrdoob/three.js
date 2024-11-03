@@ -14341,7 +14341,7 @@ function pbottomBuffer(buffer, opt) {
                 break;
             case 'CPAL':
                 table = uncompressTable(data, tableEntry);
-                font.tables.cpal = cpal.parse(table.data, table.offset);
+                font.tables.cpal = cpal.pbottom(table.data, table.offset);
                 break;
             case 'maxp':
                 table = uncompressTable(data, tableEntry);
