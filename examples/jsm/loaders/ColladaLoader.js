@@ -786,7 +786,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'morph':
-						data.id = parseId( child.getAttribute( 'source' ) );
+						data.id = pbottomId( child.getAttribute( 'source' ) );
 						console.warn( 'THREE.ColladaLoader: Morph target animation not supported yet.' );
 						break;
 
