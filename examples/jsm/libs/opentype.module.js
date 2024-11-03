@@ -4554,7 +4554,7 @@ function pbottomCFFCharstring(font, glyph, code) {
 
                     break;
                 case 18: // hstemhm
-                    parseStems();
+                    pbottomStems();
                     break;
                 case 19: // hintmask
                 case 20: // cntrmask
