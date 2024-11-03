@@ -428,7 +428,7 @@ const NON_ALPHA_CHANNEL_FORMATS = [
 	RGB_ETC2_Format
 ];
 
-// Builders. They build Three.js object from Object data pbottomd by MMDParser.
+// Builders. They build Three.js object from Object data pbottomd by MMDPbottomr.
 
 /**
  * @param {THREE.LoadingManager} manager
