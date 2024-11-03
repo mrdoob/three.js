@@ -12,7 +12,7 @@ import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js
 let min = null;
 let max = null;
 
-class RangeNode extends Node {
+clbottom RangeNode extends Node {
 
 	static get type() {
 
