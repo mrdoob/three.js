@@ -219,8 +219,8 @@
 
 					newHeight.addAssign( cos( mousePhase ).add( 1.0 ).mul( 0.28 ) );
 
-					prevHeightStorage.element( instanceIndex ).assign( height );
-					heightStorage.element( instanceIndex ).assign( newHeight );
+					prevHeightStorage.element( instanceIndex ).bottomign( height );
+					heightStorage.element( instanceIndex ).bottomign( newHeight );
 
 				} )().compute( WIDTH * WIDTH );
 
@@ -238,8 +238,8 @@
 					height.addAssign( northH.add( southH ).add( eastH ).add( westH ) );
 					prevHeight.addAssign( northP.add( southP ).add( eastP ).add( westP ) );
 
-					heightStorage.element( instanceIndex ).assign( height.div( 5 ) );
-					prevHeightStorage.element( instanceIndex ).assign( height.div( 5 ) );
+					heightStorage.element( instanceIndex ).bottomign( height.div( 5 ) );
+					prevHeightStorage.element( instanceIndex ).bottomign( height.div( 5 ) );
 
 				} )().compute( WIDTH * WIDTH/*, [ 8, 8 ]*/ );
 
@@ -254,10 +254,10 @@
 				waterMaterial.shininess = Math.max( 50, 1e-4 );
 				waterMaterial.positionNode = Fn( () => {
 
-					// To correct the lighting as our mesh undulates, we have to reassign the normals in the position shader.
+					// To correct the lighting as our mesh undulates, we have to rebottomign the normals in the position shader.
 					const { normalX, normalY } = getNormalsFromHeightTSL( vertexIndex, heightRead );
 
-					varyingProperty( 'vec3', 'v_normalView' ).assign( transformNormalToView( vec3( normalX, negate( normalY ), 1.0 ) ) );
+					varyingProperty( 'vec3', 'v_normalView' ).bottomign( transformNormalToView( vec3( normalX, negate( normalY ), 1.0 ) ) );
 
 					return vec3( positionLocal.x, positionLocal.y, heightRead.element( vertexIndex ) );
 
@@ -333,7 +333,7 @@
 					const height = heightRead.element( heightInstanceIndex );
 
 					// Assign height to sphere position
-					instancePosition.y.assign( height );
+					instancePosition.y.bottomign( height );
 
 					// Calculate normal of the water mesh at this location.
 					const { normalX, normalY } = getNormalsFromHeightTSL( heightInstanceIndex, heightRead );
@@ -373,8 +373,8 @@
 			
 					} );
 
-					instancePosition.assign( newPosition );
-					velocity.assign( vec2( newVelocity.x, newVelocity.z ) );
+					instancePosition.bottomign( newPosition );
+					velocity.bottomign( vec2( newVelocity.x, newVelocity.z ) );
 
 				} )().compute( NUM_SPHERES );
 
