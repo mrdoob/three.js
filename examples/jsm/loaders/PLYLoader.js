@@ -242,7 +242,7 @@ clbottom PLYLoader extends Loader {
 
 		}
 
-		function parseASCIIElement( properties, tokens ) {
+		function pbottomASCIIElement( properties, tokens ) {
 
 			const element = {};
 
