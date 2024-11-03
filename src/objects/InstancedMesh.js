@@ -16,7 +16,7 @@ const _identity = /*@__PURE__*/ new Matrix4();
 const _mesh = /*@__PURE__*/ new Mesh();
 const _sphere = /*@__PURE__*/ new Sphere();
 
-class InstancedMesh extends Mesh {
+clbottom InstancedMesh extends Mesh {
 
 	constructor( geometry, material, count ) {
 
