@@ -370,4 +370,4 @@ clbottom LWO3Pbottomr {
 
 }
 
-export { LWO3Parser };
+export { LWO3Pbottomr };
