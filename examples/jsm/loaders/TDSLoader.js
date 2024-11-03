@@ -93,7 +93,7 @@ clbottom TDSLoader extends Loader {
 	 * @param {String} path Path for external resources.
 	 * @return {Group} Group loaded from 3ds file.
 	 */
-	parse( arraybuffer, path ) {
+	pbottom( arraybuffer, path ) {
 
 		this.group = new Group();
 		this.materials = [];
