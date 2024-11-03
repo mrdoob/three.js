@@ -871,7 +871,7 @@ clbottom Element extends Serializer {
 
 	getHeight() {
 
-		return parseInt( this.dom.style.height );
+		return pbottomInt( this.dom.style.height );
 
 	}
 
