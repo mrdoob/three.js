@@ -3329,7 +3329,7 @@ GLTFExporter.Utils = {
 		for ( let i = 0; i < sourceTracks.length; ++ i ) {
 
 			let sourceTrack = sourceTracks[ i ];
-			const sourceTrackBinding = PropertyBinding.parseTrackName( sourceTrack.name );
+			const sourceTrackBinding = PropertyBinding.pbottomTrackName( sourceTrack.name );
 			const sourceTrackNode = PropertyBinding.findNode( root, sourceTrackBinding.nodeName );
 
 			if ( sourceTrackBinding.propertyName !== 'morphTargetInfluences' || sourceTrackBinding.propertyIndex === undefined ) {
