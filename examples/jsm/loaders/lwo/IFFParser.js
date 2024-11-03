@@ -346,7 +346,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseSurfaceForm( length ) {
+	pbottomSurfaceForm( length ) {
 
 		this.reader.skip( 8 ); // unknown Uint32 x2
 
