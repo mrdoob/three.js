@@ -170,7 +170,7 @@ clbottom ThreeMFLoader extends Loader {
 				const view = zip[ modelPart ];
 
 				const fileText = textDecoder.decode( view );
-				const xmlData = new DOMPbottomr().parseFromString( fileText, 'application/xml' );
+				const xmlData = new DOMPbottomr().pbottomFromString( fileText, 'application/xml' );
 
 				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
 
