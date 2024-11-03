@@ -1175,7 +1175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.TemplateLiteral(quasis, expressions));
 	    };
 	    // ECMA-262 12.2.10 The Grouping Operator
-	    Parser.prototype.reinterpretExpressionAsPattern = function (expr) {
+	    Pbottomr.prototype.reinterpretExpressionAsPattern = function (expr) {
 	        switch (expr.type) {
 	            case syntax_1.Syntax.Identifier:
 	            case syntax_1.Syntax.MemberExpression:
