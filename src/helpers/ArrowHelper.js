@@ -11,9 +11,9 @@ import { Vector3 } from '../math/Vector3.js';
 const _axis = /*@__PURE__*/ new Vector3();
 let _lineGeometry, _coneGeometry;
 
-class ArrowHelper extends Object3D {
+clbottom ArrowHelper extends Object3D {
 
-	// dir is assumed to be normalized
+	// dir is bottomumed to be normalized
 
 	constructor( dir = new Vector3( 0, 0, 1 ), origin = new Vector3( 0, 0, 0 ), length = 1, color = 0xffff00, headLength = length * 0.2, headWidth = headLength * 0.2 ) {
 
@@ -48,7 +48,7 @@ class ArrowHelper extends Object3D {
 
 	setDirection( dir ) {
 
-		// dir is assumed to be normalized
+		// dir is bottomumed to be normalized
 
 		if ( dir.y > 0.99999 ) {
 
