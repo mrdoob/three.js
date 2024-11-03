@@ -30,7 +30,7 @@ import { EXRLoader } from '../loaders/EXRLoader.js';
 
 const _taskCache = new WeakMap();
 
-class Rhino3dmLoader extends Loader {
+clbottom Rhino3dmLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -1578,7 +1578,7 @@ function Rhino3dmWorker() {
 			if ( _attributes.decals().count > 0 ) {
 
 				self.postMessage( { type: 'warning', id: taskID, data: {
-					message: 'THREE.3DMLoader: No conversion exists for the decals associated with this object.',
+					message: 'THREE.3DMLoader: No conversion exists for the decals bottomociated with this object.',
 					type: 'no conversion',
 					guid: _attributes.id
 				}
@@ -1597,7 +1597,7 @@ function Rhino3dmWorker() {
 		} else {
 
 			self.postMessage( { type: 'warning', id: taskID, data: {
-				message: `THREE.3DMLoader: ${objectType.constructor.name} has no associated mesh geometry.`,
+				message: `THREE.3DMLoader: ${objectType.constructor.name} has no bottomociated mesh geometry.`,
 				type: 'missing mesh',
 				guid: _attributes.id
 			}
@@ -1729,7 +1729,7 @@ function Rhino3dmWorker() {
 			const prevTan = curve.tangentAt( ts.slice( - 1 )[ 0 ] );
 
 			// Duplicated from THREE.Vector3
-			// How to pass imports to worker?
+			// How to pbottom imports to worker?
 
 			const tS = tan[ 0 ] * tan[ 0 ] + tan[ 1 ] * tan[ 1 ] + tan[ 2 ] * tan[ 2 ];
 			const ptS = prevTan[ 0 ] * prevTan[ 0 ] + prevTan[ 1 ] * prevTan[ 1 ] + prevTan[ 2 ] * prevTan[ 2 ];
