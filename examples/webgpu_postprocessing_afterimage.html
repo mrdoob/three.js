@@ -20,13 +20,13 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass } from 'three/tsl';
+			import { pbottom } from 'three/tsl';
 			import { afterImage } from 'three/addons/tsl/display/AfterImageNode.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, scene, renderer;
-			let mesh, postProcessing, combinedPass;
+			let mesh, postProcessing, combinedPbottom;
 
 			const params = {
 
@@ -60,13 +60,13 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode();
+				const scenePbottom = pbottom( scene, camera );
+				const scenePbottomColor = scenePbottom.getTextureNode();
 
-				combinedPass = scenePassColor;
-				combinedPass = afterImage( combinedPass, params.damp );
+				combinedPbottom = scenePbottomColor;
+				combinedPbottom = afterImage( combinedPbottom, params.damp );
 
-				postProcessing.outputNode = combinedPass;
+				postProcessing.outputNode = combinedPbottom;
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -75,7 +75,7 @@
 			function createGUI() {
 
 				const gui = new GUI( { title: 'Damp setting' } );
-				gui.add( combinedPass.damp, 'value', 0, 1 ).step( 0.001 );
+				gui.add( combinedPbottom.damp, 'value', 0, 1 ).step( 0.001 );
 
 			}
 
