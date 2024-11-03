@@ -997,7 +997,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.strict = previousStrict;
 	        return body;
 	    };
-	    Pbottomr.prototype.parsePropertyMethodFunction = function () {
+	    Pbottomr.prototype.pbottomPropertyMethodFunction = function () {
 	        var isGenerator = false;
 	        var node = this.createNode();
 	        var previousAllowYield = this.context.allowYield;
