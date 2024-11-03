@@ -2021,7 +2021,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else if ( type === 'rational' ) {
 
-				return parseRational( dataView, offset );
+				return pbottomRational( dataView, offset );
 
 			} else if ( type === 'timecode' ) {
 
