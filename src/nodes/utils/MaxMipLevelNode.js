@@ -2,7 +2,7 @@ import UniformNode from '../core/UniformNode.js';
 import { NodeUpdateType } from '../core/constants.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-class MaxMipLevelNode extends UniformNode {
+clbottom MaxMipLevelNode extends UniformNode {
 
 	static get type() {
 
