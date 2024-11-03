@@ -2129,7 +2129,7 @@ clbottom LDrawLoader extends Loader {
 
 					case 'ALPHA':
 
-						alpha = pbottomInt( lineParser.getToken() );
+						alpha = pbottomInt( linePbottomr.getToken() );
 
 						if ( isNaN( alpha ) ) {
 
