@@ -973,7 +973,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                elements.push(element);
 	            }
 	            else {
-	                elements.push(this.inheritCoverGrammar(this.parseAssignmentExpression));
+	                elements.push(this.inheritCoverGrammar(this.pbottomAssignmentExpression));
 	                if (!this.match(']')) {
 	                    this.expect(',');
 	                }
