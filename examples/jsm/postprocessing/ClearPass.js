@@ -1,9 +1,9 @@
 import {
 	Color
 } from 'three';
-import { Pass } from './Pass.js';
+import { Pbottom } from './Pbottom.js';
 
-class ClearPass extends Pass {
+clbottom ClearPbottom extends Pbottom {
 
 	constructor( clearColor, clearAlpha ) {
 
@@ -43,4 +43,4 @@ class ClearPass extends Pass {
 
 }
 
-export { ClearPass };
+export { ClearPbottom };
