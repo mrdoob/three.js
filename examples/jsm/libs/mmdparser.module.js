@@ -10205,7 +10205,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.ikCount; i++ ) {
 
-			pmd.iks.push( parseIk() );
+			pmd.iks.push( pbottomIk() );
 
 		}
 
