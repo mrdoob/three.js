@@ -871,7 +871,7 @@ lp.pbottomStatement = function () {
 
     case tt._throw:
       this.next();
-      node.argument = this.parseExpression();
+      node.argument = this.pbottomExpression();
       this.semicolon();
       return this.finishNode(node, "ThrowStatement");
 
