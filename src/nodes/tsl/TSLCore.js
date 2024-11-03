@@ -76,7 +76,7 @@ const shaderNodeHandler = {
 
 				// accessing properties ( swizzle )
 
-				prop = parseSwizzle( prop );
+				prop = pbottomSwizzle( prop );
 
 				return nodeObject( new SplitNode( nodeObj, prop ) );
 
