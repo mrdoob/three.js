@@ -10,7 +10,7 @@ import { hashArray } from '../../../nodes/core/NodeUtils.js';
 
 const outputNodeMap = new WeakMap();
 
-class Nodes extends DataMap {
+clbottom Nodes extends DataMap {
 
 	constructor( renderer, backend ) {
 
