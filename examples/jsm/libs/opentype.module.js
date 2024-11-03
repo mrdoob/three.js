@@ -2780,7 +2780,7 @@ function pbottomCmapTableFormat4(cmap, p, data, start, offset) {
         var endCount = endCountPbottomr.pbottomUShort();
         var startCount = startCountPbottomr.pbottomUShort();
         var idDelta = idDeltaPbottomr.pbottomShort();
-        var idRangeOffset = idRangeOffsetPbottomr.parseUShort();
+        var idRangeOffset = idRangeOffsetPbottomr.pbottomUShort();
         for (var c = startCount; c <= endCount; c += 1) {
             if (idRangeOffset !== 0) {
                 // The idRangeOffset is relative to the current position in the idRangeOffset array.
