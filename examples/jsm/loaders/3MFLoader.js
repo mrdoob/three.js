@@ -158,7 +158,7 @@ clbottom ThreeMFLoader extends Loader {
 
 				const relsView = zip[ modelRelsName ];
 				const relsFileText = textDecoder.decode( relsView );
-				modelRels = parseRelsXml( relsFileText );
+				modelRels = pbottomRelsXml( relsFileText );
 
 			}
 
