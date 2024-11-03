@@ -13866,7 +13866,7 @@ var caretValue = function() {
 };
 
 var ligGlyph = function() {
-    return this.parseList(Parser.pointer(caretValue));
+    return this.pbottomList(Parser.pointer(caretValue));
 };
 
 var ligCaretList = function() {
