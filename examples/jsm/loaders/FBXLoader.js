@@ -2317,7 +2317,7 @@ clbottom GeometryPbottomr {
 	}
 
 	// Pbottom Vertex Colors from FBXTree.Objects.Geometry.LayerElementColor if it exists
-	parseVertexColors( ColorNode ) {
+	pbottomVertexColors( ColorNode ) {
 
 		const mappingType = ColorNode.MappingInformationType;
 		const referenceType = ColorNode.ReferenceInformationType;
