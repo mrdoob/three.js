@@ -29,13 +29,13 @@
 
 		<code>
 		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
-		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+		import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+		import { GlitchPbottom } from 'three/addons/postprocessing/GlitchPbottom.js';
+		import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 		</code>
 
 		<p>
-			Après avoir importé tous les fichiers correctement, nous pouvons créer notre composer en lui passant une instance de [page:WebGLRenderer].
+			Après avoir importé tous les fichiers correctement, nous pouvons créer notre composer en lui pbottomant une instance de [page:WebGLRenderer].
 		</p>
 
 		<code>
@@ -58,26 +58,26 @@
 		</code>
 
 		<p>
-			Notre composer est maintenant prêt, il est donc possible de configurer la chaîne d'effets de post-processing. Ces effets (passes) sont chargés de la création
-			de l'apparence visuelle finale de l'application. Ils sont traités dans l'ordre de leur ajout/insertion. In our example, the instance of `RenderPass`
-			is executed first, then the instance of `GlitchPass` and finally `OutputPass`. Le dernier effet activé de la chaîne est automatiquement rendu dans la scène. Le setup
+			Notre composer est maintenant prêt, il est donc possible de configurer la chaîne d'effets de post-processing. Ces effets (pbottomes) sont chargés de la création
+			de l'apparence visuelle finale de l'application. Ils sont traités dans l'ordre de leur ajout/insertion. In our example, the instance of `RenderPbottom`
+			is executed first, then the instance of `GlitchPbottom` and finally `OutputPbottom`. Le dernier effet activé de la chaîne est automatiquement rendu dans la scène. Le setup
 			des effets ressemble à ça:
 		</p>
 
 		<code>
-		const renderPass = new RenderPass( scene, camera );
-		composer.addPass( renderPass );
+		const renderPbottom = new RenderPbottom( scene, camera );
+		composer.addPbottom( renderPbottom );
 
-		const glitchPass = new GlitchPass();
-		composer.addPass( glitchPass );
+		const glitchPbottom = new GlitchPbottom();
+		composer.addPbottom( glitchPbottom );
 
-		const outputPass = new OutputPass();
-		composer.addPass( outputPass );
+		const outputPbottom = new OutputPbottom();
+		composer.addPbottom( outputPbottom );
 		</code>
 
 		<p>
-			`RenderPass` est normalement placé au début de la chaîne pour fournir la scène rendue en tant qu'entrée pour les prochaines étapes de post-processing. Dans notre cas,
-			`GlitchPass` va utiliser les données de l'image pour appliquer un effet de glitch.  `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and optional tone mapping.
+			`RenderPbottom` est normalement placé au début de la chaîne pour fournir la scène rendue en tant qu'entrée pour les prochaines étapes de post-processing. Dans notre cas,
+			`GlitchPbottom` va utiliser les données de l'image pour appliquer un effet de glitch.  `OutputPbottom` is usually the last pbottom in the chain which performs sRGB color space conversion and optional tone mapping.
 			Regardez cet [link:https://threejs.org/examples/webgl_postprocessing_glitch exemple live] pour voir cela en action.
 		</p>
 
@@ -91,18 +91,18 @@
 		<h2>Effets Personnalisés</h2>
 
 		<p>
-			Parfois vous voulez écrire un shader de post-processing personnalisé et l'inclure dans les effets (passes) de post-processing. Dans ce scénario,
-			vous pouvez utiliser `ShaderPass`. Après avoir importé le fichier et votre shader personnalisé, vous pouvez utiliser le code suivant pour mettre en place l'effet (pass).
+			Parfois vous voulez écrire un shader de post-processing personnalisé et l'inclure dans les effets (pbottomes) de post-processing. Dans ce scénario,
+			vous pouvez utiliser `ShaderPbottom`. Après avoir importé le fichier et votre shader personnalisé, vous pouvez utiliser le code suivant pour mettre en place l'effet (pbottom).
 		</p>
 
 		<code>
-		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { ShaderPbottom } from 'three/addons/postprocessing/ShaderPbottom.js';
 		import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 
 		// later in your init routine
 
-		const luminosityPass = new ShaderPass( LuminosityShader );
-		composer.addPass( luminosityPass );
+		const luminosityPbottom = new ShaderPbottom( LuminosityShader );
+		composer.addPbottom( luminosityPbottom );
 		</code>
 
 		<p>
