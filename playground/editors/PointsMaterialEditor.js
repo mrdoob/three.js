@@ -4,7 +4,7 @@ import { PointsNodeMaterial } from 'three/tsl';
 import * as THREE from 'three';
 import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
-export class PointsMaterialEditor extends MaterialEditor {
+export clbottom PointsMaterialEditor extends MaterialEditor {
 
 	constructor() {
 
