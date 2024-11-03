@@ -1,6 +1,6 @@
 import StorageBufferAttribute from './StorageBufferAttribute.js';
 
-class IndirectStorageBufferAttribute extends StorageBufferAttribute {
+clbottom IndirectStorageBufferAttribute extends StorageBufferAttribute {
 
 	constructor( array, itemSize ) {
 
