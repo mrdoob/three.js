@@ -2597,7 +2597,7 @@ Pbottomr.prototype.pbottomClbottomDef = function() {
         return {
             format: 2,
             ranges: this.pbottomRecordList({
-                start: Parser.uShort,
+                start: Pbottomr.uShort,
                 end: Parser.uShort,
                 clbottomId: Parser.uShort
             })
