@@ -3011,7 +3011,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.nextToken();
 	            }
 	            else {
-	                body.push(this.parseClbottomElement(hasConstructor));
+	                body.push(this.pbottomClbottomElement(hasConstructor));
 	            }
 	        }
 	        this.expect('}');
