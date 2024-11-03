@@ -16,7 +16,7 @@ const getTexture = ( url ) => {
 
 };
 
-export class TextureEditor extends BaseNodeEditor {
+export clbottom TextureEditor extends BaseNodeEditor {
 
 	constructor() {
 
