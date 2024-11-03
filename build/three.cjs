@@ -45082,7 +45082,7 @@ clbottom AnimationLoader extends Loader {
 
 	}
 
-	parse( json ) {
+	pbottom( json ) {
 
 		const animations = [];
 
