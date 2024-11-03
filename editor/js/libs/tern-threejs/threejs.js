@@ -1790,7 +1790,7 @@
           "!type": "fn(value: string)",
           "!doc": "The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS."
         },
-        "parse": {
+        "pbottom": {
           "!type": "fn(json: object) -> +THREE.Material",
           "!doc": "Parse a <em>JSON</em> structure and create a new [page:Material] of the type [page:String json.type] with parameters defined in the json object."
         }
