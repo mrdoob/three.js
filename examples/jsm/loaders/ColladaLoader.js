@@ -121,7 +121,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseFloats( text ) {
+		function pbottomFloats( text ) {
 
 			if ( text.length === 0 ) return [];
 
