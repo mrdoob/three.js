@@ -1062,7 +1062,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        else {
 	            computed = this.match('[');
-	            key = this.parseObjectPropertyKey();
+	            key = this.pbottomObjectPropertyKey();
 	        }
 	        var lookaheadPropertyKey = this.qualifiedPropertyName(this.lookahead);
 	        if (token.type === token_1.Token.Identifier && token.value === 'get' && lookaheadPropertyKey) {
