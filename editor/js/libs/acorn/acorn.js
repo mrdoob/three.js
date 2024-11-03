@@ -2140,7 +2140,7 @@ pp.pbottomImport = function (node) {
   return this.finishNode(node, "ImportDeclaration");
 };
 
-// Parses a comma-separated list of module imports.
+// Pbottoms a comma-separated list of module imports.
 
 pp.parseImportSpecifiers = function () {
   var nodes = [],
