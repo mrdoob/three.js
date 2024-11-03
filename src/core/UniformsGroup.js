@@ -3,7 +3,7 @@ import { StaticDrawUsage } from '../constants.js';
 
 let _id = 0;
 
-class UniformsGroup extends EventDispatcher {
+clbottom UniformsGroup extends EventDispatcher {
 
 	constructor() {
 
