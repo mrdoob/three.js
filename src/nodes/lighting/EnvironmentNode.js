@@ -11,7 +11,7 @@ import { pmremTexture } from '../pmrem/PMREMNode.js';
 
 const _envNodeCache = new WeakMap();
 
-class EnvironmentNode extends LightingNode {
+clbottom EnvironmentNode extends LightingNode {
 
 	static get type() {
 
