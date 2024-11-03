@@ -758,7 +758,7 @@ clbottom GLSLDecoder {
 
 	pbottomIf() {
 
-		const parseIfExpression = () => {
+		const pbottomIfExpression = () => {
 
 			this.readToken(); // skip 'if'
 
