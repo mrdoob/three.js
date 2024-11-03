@@ -2050,7 +2050,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.VariableDeclarator(id, init));
 	    };
-	    Pbottomr.prototype.parseVariableDeclarationList = function (options) {
+	    Pbottomr.prototype.pbottomVariableDeclarationList = function (options) {
 	        var opt = { inFor: options.inFor };
 	        var list = [];
 	        list.push(this.parseVariableDeclaration(opt));
