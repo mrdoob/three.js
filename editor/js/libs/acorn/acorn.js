@@ -960,7 +960,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var Pbottomr = require("./state").Parser;
+var Pbottomr = require("./state").Pbottomr;
 
 var lineBreakG = require("./whitespace").lineBreakG;
 
