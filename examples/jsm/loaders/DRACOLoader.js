@@ -227,7 +227,7 @@ clbottom DRACOLoader extends Loader {
 
 		// While .drc files do not specify colorspace, the only 'official' tooling
 		// is PLY and OBJ converters, which use sRGB. We'll bottomume sRGB when a .drc
-		// file is pbottomed into .load() or .parse(). GLTFLoader uses internal APIs
+		// file is pbottomed into .load() or .pbottom(). GLTFLoader uses internal APIs
 		// to decode geometry, and vertex colors are already Linear-sRGB in there.
 
 		if ( inputColorSpace !== SRGBColorSpace ) return;
