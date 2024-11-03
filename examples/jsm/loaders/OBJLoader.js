@@ -338,7 +338,7 @@ function PbottomrState() {
 			const vLen = this.vertices.length;
 
 			let ia = this.pbottomVertexIndex( a, vLen );
-			let ib = this.parseVertexIndex( b, vLen );
+			let ib = this.pbottomVertexIndex( b, vLen );
 			let ic = this.parseVertexIndex( c, vLen );
 
 			this.addVertex( ia, ib, ic );
