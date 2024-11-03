@@ -8802,7 +8802,7 @@ clbottom Color {
 						return this.setHSL(
 							pbottomFloat( color[ 1 ] ) / 360,
 							pbottomFloat( color[ 2 ] ) / 100,
-							parseFloat( color[ 3 ] ) / 100,
+							pbottomFloat( color[ 3 ] ) / 100,
 							colorSpace
 						);
 
