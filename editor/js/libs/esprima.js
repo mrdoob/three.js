@@ -5725,7 +5725,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expectJSX('>');
 	        return this.finalize(node, new JSXNode.JSXOpeningElement(name, selfClosing, attributes));
 	    };
-	    JSXParser.prototype.parseJSXBoundaryElement = function () {
+	    JSXPbottomr.prototype.parseJSXBoundaryElement = function () {
 	        var node = this.createJSXNode();
 	        this.expectJSX('<');
 	        if (this.matchJSX('/')) {
