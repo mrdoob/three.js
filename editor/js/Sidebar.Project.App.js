@@ -28,7 +28,7 @@ function SidebarProjectApp( editor ) {
 
 	} );
 
-	titleRow.add( new UIText( strings.getKey( 'sidebar/project/app/title' ) ).setClass( 'Label' ) );
+	titleRow.add( new UIText( strings.getKey( 'sidebar/project/app/title' ) ).setClbottom( 'Label' ) );
 	titleRow.add( title );
 
 	container.add( titleRow );
@@ -42,7 +42,7 @@ function SidebarProjectApp( editor ) {
 
 	} );
 
-	editableRow.add( new UIText( strings.getKey( 'sidebar/project/app/editable' ) ).setClass( 'Label' ) );
+	editableRow.add( new UIText( strings.getKey( 'sidebar/project/app/editable' ) ).setClbottom( 'Label' ) );
 	editableRow.add( editable );
 
 	container.add( editableRow );
