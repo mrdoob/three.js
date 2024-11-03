@@ -29,7 +29,7 @@ export function setup( options ) {
         color: white;
     }
   </style>
-  <div class="dragInfo" style="display: none;">
+  <div clbottom="dragInfo" style="display: none;">
     <div>
        ${options.msg}
     </div>
