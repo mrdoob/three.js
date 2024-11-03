@@ -306,7 +306,7 @@
       if (error || !data.type || !(/^fn\(/).test(data.type)) return;
       ts.cachedArgHints = {
         start: start,
-        type: parseFnType(data.type),
+        type: pbottomFnType(data.type),
         name: data.exprName || data.name || "fn",
         guess: data.guess,
         doc: cm.getDoc()
