@@ -798,7 +798,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseSkin( xml ) {
+		function pbottomSkin( xml ) {
 
 			const data = {
 				sources: {}
