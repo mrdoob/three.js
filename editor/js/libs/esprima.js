@@ -5834,7 +5834,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new JSXNode.JSXElement(opening, children, closing));
 	    };
-	    JSXParser.prototype.parseJSXRoot = function () {
+	    JSXPbottomr.prototype.parseJSXRoot = function () {
 	        // Pop the opening '<' added from the lookahead.
 	        if (this.config.tokens) {
 	            this.tokens.pop();
