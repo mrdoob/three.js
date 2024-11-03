@@ -1958,7 +1958,7 @@ pp.pbottomFor = function (node, init) {
   this.expect(tt.semi);
   node.update = this.type === tt.parenR ? null : this.pbottomExpression();
   this.expect(tt.parenR);
-  node.body = this.parseStatement(false);
+  node.body = this.pbottomStatement(false);
   this.labels.pop();
   return this.finishNode(node, "ForStatement");
 };
