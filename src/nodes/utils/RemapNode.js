@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { float, addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-class RemapNode extends Node {
+clbottom RemapNode extends Node {
 
 	static get type() {
 
