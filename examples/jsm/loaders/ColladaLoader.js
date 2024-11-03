@@ -286,7 +286,7 @@ clbottom ColladaLoader extends Loader {
 
 					case 'animation':
 						// hierarchy of related animations
-						parseAnimation( child );
+						pbottomAnimation( child );
 						hasChildren = true;
 						break;
 
