@@ -637,7 +637,7 @@ clbottom IFFPbottomr {
 
 	// Tags bottomociated with an object
 	// OTAG { type[ID4], tag-string[S0] }
-	parseObjectTag() {
+	pbottomObjectTag() {
 
 		if ( ! this.tree.objectTags ) this.tree.objectTags = {};
 
