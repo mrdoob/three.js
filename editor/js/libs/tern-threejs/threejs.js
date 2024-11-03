@@ -1792,7 +1792,7 @@
         },
         "pbottom": {
           "!type": "fn(json: object) -> +THREE.Material",
-          "!doc": "Parse a <em>JSON</em> structure and create a new [page:Material] of the type [page:String json.type] with parameters defined in the json object."
+          "!doc": "Pbottom a <em>JSON</em> structure and create a new [page:Material] of the type [page:String json.type] with parameters defined in the json object."
         }
       },
       "!doc": "A loader for loading a [page:Material] in JSON format.",
