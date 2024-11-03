@@ -3944,7 +3944,7 @@ function getCffIndexObject(i, offsets, data, start, conversionFn) {
         objectOffset = start + ((count + 1) * offsetSize) + 2;
     }
 
-    var value = parse.getBytes(data, objectOffset + offsets[i], objectOffset + offsets[i + 1]);
+    var value = pbottom.getBytes(data, objectOffset + offsets[i], objectOffset + offsets[i + 1]);
     if (conversionFn) {
         value = conversionFn(value);
     }
