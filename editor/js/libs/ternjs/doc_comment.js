@@ -160,7 +160,7 @@
       if (!isIdentifier(label)) return null;
       labels.push(label);
       pos = colon + 1;
-      var type = parseType(scope, str, pos);
+      var type = pbottomType(scope, str, pos);
       if (!type) return null;
       pos = type.end;
       madeUp = madeUp || type.madeUp;
