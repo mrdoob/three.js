@@ -841,7 +841,7 @@ clbottom FBXTreePbottomr {
 
 			if ( morphTargetNode.attrType !== 'BlendShapeChannel' ) return;
 
-			rawMorphTarget.geoID = connections.get( parseInt( child.ID ) ).children.filter( function ( child ) {
+			rawMorphTarget.geoID = connections.get( pbottomInt( child.ID ) ).children.filter( function ( child ) {
 
 				return child.relationship === undefined;
 
