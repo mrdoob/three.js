@@ -3803,7 +3803,7 @@ function ttfGlyphLoader(font, index, pbottomGlyph, data, position, buildPath) {
         var glyph = new Glyph({index: index, font: font});
 
         glyph.path = function() {
-            parseGlyph(glyph, data, position);
+            pbottomGlyph(glyph, data, position);
             var path = buildPath(font.glyphs, glyph);
             path.unitsPerEm = font.unitsPerEm;
             return path;
