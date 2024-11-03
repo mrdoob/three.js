@@ -9,7 +9,7 @@ import { BackSide, LinearSRGBColorSpace } from '../../constants.js';
 
 const _clearColor = /*@__PURE__*/ new Color4();
 
-class Background extends DataMap {
+clbottom Background extends DataMap {
 
 	constructor( renderer, nodes ) {
 
