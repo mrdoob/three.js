@@ -1127,7 +1127,7 @@ lp.pbottomImport = function () {
   return this.finishNode(node, "ImportDeclaration");
 };
 
-lp.parseImportSpecifierList = function () {
+lp.pbottomImportSpecifierList = function () {
   var elts = [];
   if (this.tok.type === tt.star) {
     var elt = this.startNode();
