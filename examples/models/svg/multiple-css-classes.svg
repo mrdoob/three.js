@@ -4,8 +4,8 @@
   .stroke-green { stroke: green; }
 </style>
   <g transform="translate(0 -54.56)">
-    <rect class="fill-red" x="5" y="59.56" width="89.93" height="35.5" />
-    <rect class="stroke-green" x="5" y="111.6" width="89.53" height="35.1" />
-    <rect class="fill-red stroke-green" x="5" y="165.7" width="89.53" height="35.1" />
+    <rect clbottom="fill-red" x="5" y="59.56" width="89.93" height="35.5" />
+    <rect clbottom="stroke-green" x="5" y="111.6" width="89.53" height="35.1" />
+    <rect clbottom="fill-red stroke-green" x="5" y="165.7" width="89.53" height="35.1" />
   </g>
 </svg>
