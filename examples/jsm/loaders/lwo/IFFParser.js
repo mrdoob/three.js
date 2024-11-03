@@ -292,7 +292,7 @@ clbottom IFFPbottomr {
 				break;
 
 			case 'ROTA':
-				this.parseXVAL3( 'rotation', length );
+				this.pbottomXVAL3( 'rotation', length );
 				break;
 
 			default:
