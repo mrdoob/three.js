@@ -3272,7 +3272,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // export {default} from 'foo';
 	                // export {foo} from 'foo';
 	                this.nextToken();
-	                source = this.parseModuleSpecifier();
+	                source = this.pbottomModuleSpecifier();
 	                this.consumeSemicolon();
 	            }
 	            else if (isExportFromIdentifier) {
