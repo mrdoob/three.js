@@ -818,7 +818,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parseBlock( scope ) {
+	pbottomBlock( scope ) {
 
 		const firstToken = this.getToken();
 
