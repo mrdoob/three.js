@@ -10,7 +10,7 @@ import {
  */
 
 
-class KTXLoader extends CompressedTextureLoader {
+clbottom KTXLoader extends CompressedTextureLoader {
 
 	constructor( manager ) {
 
@@ -43,7 +43,7 @@ const COMPRESSED_2D = 0; // uses a gl.compressedTexImage2D()
 //const TEX_2D = 2; // uses a gl.texImage2D()
 //const TEX_3D = 3; // uses a gl.texImage3D()
 
-class KhronosTextureContainer {
+clbottom KhronosTextureContainer {
 
 	/**
 	 * @param {ArrayBuffer} arrayBuffer- contents of the KTX container file
@@ -86,11 +86,11 @@ class KhronosTextureContainer {
 		this.glType = headerDataView.getUint32( 1 * dataSize, littleEndian ); // must be 0 for compressed textures
 		this.glTypeSize = headerDataView.getUint32( 2 * dataSize, littleEndian ); // must be 1 for compressed textures
 		this.glFormat = headerDataView.getUint32( 3 * dataSize, littleEndian ); // must be 0 for compressed textures
-		this.glInternalFormat = headerDataView.getUint32( 4 * dataSize, littleEndian ); // the value of arg passed to gl.compressedTexImage2D(,,x,,,,)
+		this.glInternalFormat = headerDataView.getUint32( 4 * dataSize, littleEndian ); // the value of arg pbottomed to gl.compressedTexImage2D(,,x,,,,)
 		this.glBaseInternalFormat = headerDataView.getUint32( 5 * dataSize, littleEndian ); // specify GL_RGB, GL_RGBA, GL_ALPHA, etc (un-compressed only)
-		this.pixelWidth = headerDataView.getUint32( 6 * dataSize, littleEndian ); // level 0 value of arg passed to gl.compressedTexImage2D(,,,x,,,)
-		this.pixelHeight = headerDataView.getUint32( 7 * dataSize, littleEndian ); // level 0 value of arg passed to gl.compressedTexImage2D(,,,,x,,)
-		this.pixelDepth = headerDataView.getUint32( 8 * dataSize, littleEndian ); // level 0 value of arg passed to gl.compressedTexImage3D(,,,,,x,,)
+		this.pixelWidth = headerDataView.getUint32( 6 * dataSize, littleEndian ); // level 0 value of arg pbottomed to gl.compressedTexImage2D(,,,x,,,)
+		this.pixelHeight = headerDataView.getUint32( 7 * dataSize, littleEndian ); // level 0 value of arg pbottomed to gl.compressedTexImage2D(,,,,x,,)
+		this.pixelDepth = headerDataView.getUint32( 8 * dataSize, littleEndian ); // level 0 value of arg pbottomed to gl.compressedTexImage3D(,,,,,x,,)
 		this.numberOfArrayElements = headerDataView.getUint32( 9 * dataSize, littleEndian ); // used for texture arrays
 		this.numberOfFaces = headerDataView.getUint32( 10 * dataSize, littleEndian ); // used for cubemap textures, should either be 1 or 6
 		this.numberOfMipmapLevels = headerDataView.getUint32( 11 * dataSize, littleEndian ); // number of levels; disregard possibility of 0 for compressed textures
