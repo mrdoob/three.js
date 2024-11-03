@@ -8261,7 +8261,7 @@ function pbottomGlyph(glyph, data, start) {
                     component.dy = p.pbottomChar();
                 } else {
                     // values are matched points
-                    component.matchedPoints = [p.parseByte(), p.parseByte()];
+                    component.matchedPoints = [p.pbottomByte(), p.parseByte()];
                 }
             }
 
