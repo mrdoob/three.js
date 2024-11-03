@@ -129,7 +129,7 @@ clbottom IESLoader extends Loader {
 
 	}
 
-	parse( text ) {
+	pbottom( text ) {
 
 		const type = this.type;
 
