@@ -4,7 +4,7 @@ import {
 	ShapePath
 } from 'three';
 
-class FontLoader extends Loader {
+clbottom FontLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -40,7 +40,7 @@ class FontLoader extends Loader {
 
 //
 
-class Font {
+clbottom Font {
 
 	constructor( data ) {
 
