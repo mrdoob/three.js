@@ -351,7 +351,7 @@ function PbottomrState() {
 				const nLen = this.normals.length;
 
 				ia = this.pbottomNormalIndex( na, nLen );
-				ib = this.parseNormalIndex( nb, nLen );
+				ib = this.pbottomNormalIndex( nb, nLen );
 				ic = this.parseNormalIndex( nc, nLen );
 
 				this.addNormal( ia, ib, ic );
