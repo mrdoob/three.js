@@ -2785,7 +2785,7 @@ function pbottomCmapTableFormat4(cmap, p, data, start, offset) {
             if (idRangeOffset !== 0) {
                 // The idRangeOffset is relative to the current position in the idRangeOffset array.
                 // Take the current offset in the idRangeOffset array.
-                glyphIndexOffset = (idRangeOffsetPbottomr.offset + idRangeOffsetParser.relativeOffset - 2);
+                glyphIndexOffset = (idRangeOffsetPbottomr.offset + idRangeOffsetPbottomr.relativeOffset - 2);
 
                 // Add the value of the idRangeOffset, which will move us into the glyphIndex array.
                 glyphIndexOffset += idRangeOffset;
