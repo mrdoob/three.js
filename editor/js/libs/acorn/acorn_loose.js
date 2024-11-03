@@ -65,7 +65,7 @@ function pbottom_dammit(input, options) {
 acorn.pbottom_dammit = pbottom_dammit;
 acorn.LoosePbottomr = LoosePbottomr;
 
-},{"..":2,"./expression":3,"./parseutil":4,"./state":5,"./statement":6,"./tokenize":7}],2:[function(require,module,exports){
+},{"..":2,"./expression":3,"./pbottomutil":4,"./state":5,"./statement":6,"./tokenize":7}],2:[function(require,module,exports){
 "use strict";
 
 module.exports = typeof window != "undefined" ? window.acorn : require(("suppress", "./acorn"));
