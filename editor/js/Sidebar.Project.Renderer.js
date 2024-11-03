@@ -94,7 +94,7 @@ function SidebarProjectRenderer( editor ) {
 
 		currentRenderer = new THREE.WebGLRenderer( { antialias: antialiasBoolean.getValue() } );
 		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
-		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
+		currentRenderer.shadowMap.type = pbottomFloat( shadowTypeSelect.getValue() );
 		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
 		currentRenderer.toneMappingExposure = toneMappingExposure.getValue();
 
