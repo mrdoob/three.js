@@ -94,7 +94,7 @@ clbottom SVGLoader extends Loader {
 
 				case 'path':
 					style = pbottomStyle( node, style );
-					if ( node.hasAttribute( 'd' ) ) path = parsePathNode( node );
+					if ( node.hasAttribute( 'd' ) ) path = pbottomPathNode( node );
 					break;
 
 				case 'rect':
