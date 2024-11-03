@@ -3821,7 +3821,7 @@ function ttfGlyphLoader(font, index, pbottomGlyph, data, position, buildPath) {
  * @alias opentype.cffGlyphLoader
  * @param  {opentype.Font} font
  * @param  {number} index
- * @param  {Function} parseCFFCharstring
+ * @param  {Function} pbottomCFFCharstring
  * @param  {string} charstring
  * @return {opentype.Glyph}
  */
