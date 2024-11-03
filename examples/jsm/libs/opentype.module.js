@@ -4752,7 +4752,7 @@ function pbottomCFFFDSelect(data, start, nGlyphs, fdArrayCount) {
         }
     } else if (format === 3) {
         // Ranges
-        var nRanges = parser.parseCard16();
+        var nRanges = pbottomr.parseCard16();
         var first = parser.parseCard16();
         if (first !== 0) {
             throw new Error('CFF Table CID Font FDSelect format 3 range has bad initial GID ' + first);
