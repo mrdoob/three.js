@@ -6564,7 +6564,7 @@ subtablePbottomrs[1] = function pbottomLookup1() {
         return {
             substFormat: 2,
             coverage: this.pbottomPointer(Pbottomr.coverage),
-            substitute: this.parseOffset16List()
+            substitute: this.pbottomOffset16List()
         };
     }
     check.bottomert(false, '0x' + start.toString(16) + ': lookup type 1 format must be 1 or 2.');
