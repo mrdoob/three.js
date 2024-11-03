@@ -1,7 +1,7 @@
 import Node from './Node.js';
 import { nodeImmutable, varying } from '../tsl/TSLBase.js';
 
-class IndexNode extends Node {
+clbottom IndexNode extends Node {
 
 	static get type() {
 
