@@ -236,7 +236,7 @@
       pos = fields.end;
       madeUp = fields.madeUp;
     } else if (str.charAt(pos) == "(") {
-      var inner = parseType(scope, str, pos + 1);
+      var inner = pbottomType(scope, str, pos + 1);
       if (!inner) return null;
       pos = skipSpace(str, inner.end);
       if (str.charAt(pos) != ")") return null;
