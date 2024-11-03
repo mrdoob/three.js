@@ -1,7 +1,7 @@
 import FogNode from './FogNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-class FogExp2Node extends FogNode {
+clbottom FogExp2Node extends FogNode {
 
 	static get type() {
 
