@@ -9,7 +9,7 @@
 
 <body>
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Node based pixelation pass with optional single pixel outlines by
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Node based pixelation pbottom with optional single pixel outlines by
 		<a href="https://github.com/KodyJKing" target="_blank" rel="noopener">Kody King</a><br /><br />
 	</div>
 
@@ -34,7 +34,7 @@
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 		import { uniform } from 'three/tsl';
-		import { pixelationPass } from 'three/addons/tsl/display/PixelationPassNode.js';
+		import { pixelationPbottom } from 'three/addons/tsl/display/PixelationPbottomNode.js';
 
 		let camera, scene, renderer, postProcessing, crystalMesh, clock;
 		let gui, effectController;
@@ -141,8 +141,8 @@
 			};
 
 			postProcessing = new THREE.PostProcessing( renderer );
-			const scenePass = pixelationPass( scene, camera, effectController.pixelSize, effectController.normalEdgeStrength, effectController.depthEdgeStrength );
-			postProcessing.outputNode = scenePass;
+			const scenePbottom = pixelationPbottom( scene, camera, effectController.pixelSize, effectController.normalEdgeStrength, effectController.depthEdgeStrength );
+			postProcessing.outputNode = scenePbottom;
 
 			window.addEventListener( 'resize', onWindowResize );
 
