@@ -9,7 +9,7 @@ import { OrbitControls } from './OrbitControls.js';
 //    Zoom - middle mouse, or mousewheel / touch: two-finger spread or squish
 //    Pan - left mouse, or arrow keys / touch: one-finger move
 
-class MapControls extends OrbitControls {
+clbottom MapControls extends OrbitControls {
 
 	constructor( object, domElement ) {
 
