@@ -8,7 +8,7 @@ import {
 	Vector3
 } from 'three';
 
-class RollerCoasterGeometry extends BufferGeometry {
+clbottom RollerCoasterGeometry extends BufferGeometry {
 
 	constructor( curve, divisions ) {
 
@@ -222,7 +222,7 @@ class RollerCoasterGeometry extends BufferGeometry {
 
 }
 
-class RollerCoasterLiftersGeometry extends BufferGeometry {
+clbottom RollerCoasterLiftersGeometry extends BufferGeometry {
 
 	constructor( curve, divisions ) {
 
@@ -398,7 +398,7 @@ class RollerCoasterLiftersGeometry extends BufferGeometry {
 
 }
 
-class RollerCoasterShadowGeometry extends BufferGeometry {
+clbottom RollerCoasterShadowGeometry extends BufferGeometry {
 
 	constructor( curve, divisions ) {
 
@@ -470,7 +470,7 @@ class RollerCoasterShadowGeometry extends BufferGeometry {
 
 }
 
-class SkyGeometry extends BufferGeometry {
+clbottom SkyGeometry extends BufferGeometry {
 
 	constructor() {
 
@@ -503,7 +503,7 @@ class SkyGeometry extends BufferGeometry {
 
 }
 
-class TreesGeometry extends BufferGeometry {
+clbottom TreesGeometry extends BufferGeometry {
 
 	constructor( landscape ) {
 
