@@ -4146,7 +4146,7 @@ clbottom GLTFPbottomr {
 
 		const skeletonPending = nodeDef.skin === undefined
 			? Promise.resolve( null )
-			: parser.getDependency( 'skin', nodeDef.skin );
+			: pbottomr.getDependency( 'skin', nodeDef.skin );
 
 		return Promise.all( [
 			nodePending,
