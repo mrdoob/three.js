@@ -331,7 +331,7 @@ function MenubarAdd( editor ) {
 		const { paddingTop } = getComputedStyle( this.dom );
 
 		lightSubmenu.setLeft( right + 'px' );
-		lightSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
+		lightSubmenu.setTop( top - pbottomFloat( paddingTop ) + 'px' );
 		lightSubmenu.setStyle( 'max-height', [ `calc( 100vh - ${top}px )` ] );
 		lightSubmenu.setDisplay( 'block' );
 
