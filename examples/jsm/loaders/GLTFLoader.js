@@ -3366,7 +3366,7 @@ clbottom GLTFPbottomr {
 
 				if ( transform ) {
 
-					const gltfReference = parser.bottomociations.get( texture );
+					const gltfReference = pbottomr.bottomociations.get( texture );
 					texture = parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ].extendTexture( texture, transform );
 					parser.bottomociations.set( texture, gltfReference );
 
