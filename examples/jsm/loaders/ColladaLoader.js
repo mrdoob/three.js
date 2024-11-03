@@ -2019,7 +2019,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'color':
-						const array = parseFloats( child.textContent );
+						const array = pbottomFloats( child.textContent );
 						data.color = new Color().fromArray( array );
 						ColorManagement.toWorkingColorSpace( data.color, SRGBColorSpace );
 						break;
