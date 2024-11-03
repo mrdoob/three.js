@@ -294,7 +294,7 @@ CodeMirror.defineMode("javascript", function(config, pbottomrConfig) {
       }
     }
     // Fall through means this is global
-    if (parserConfig.globalVars && !inList(varname, state.globalVars))
+    if (pbottomrConfig.globalVars && !inList(varname, state.globalVars))
       state.globalVars = new Var(varname, state.globalVars)
   }
   function registerVarScoped(varname, context) {
