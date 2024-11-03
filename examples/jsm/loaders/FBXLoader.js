@@ -4073,7 +4073,7 @@ function getFbxVersion( text ) {
 
 	if ( match ) {
 
-		const version = parseInt( match[ 1 ] );
+		const version = pbottomInt( match[ 1 ] );
 		return version;
 
 	}
