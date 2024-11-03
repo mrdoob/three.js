@@ -1520,7 +1520,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Pbottomr.prototype.pbottomExponentiationExpression = function () {
 	        var startToken = this.lookahead;
-	        var expr = this.inheritCoverGrammar(this.parseUnaryExpression);
+	        var expr = this.inheritCoverGrammar(this.pbottomUnaryExpression);
 	        if (expr.type !== syntax_1.Syntax.UnaryExpression && this.match('**')) {
 	            this.nextToken();
 	            this.context.isAssignmentTarget = false;
