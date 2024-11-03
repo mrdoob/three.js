@@ -158,7 +158,7 @@ clbottom NRRDLoader extends Loader {
 
 		}
 
-		//parse the header
+		//pbottom the header
 		function parseHeader( header ) {
 
 			let data, field, fn, i, l, m, _i, _len;
