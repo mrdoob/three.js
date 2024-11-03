@@ -2715,7 +2715,7 @@ try {
   new RegExp("￿", "u");regexpUnicodeSupport = true;
 } catch (e) {}
 
-// Parse a regular expression. Some context-awareness is necessary,
+// Pbottom a regular expression. Some context-awareness is necessary,
 // since a '/' inside a '[]' set does not end the expression.
 
 pp.readRegexp = function () {
