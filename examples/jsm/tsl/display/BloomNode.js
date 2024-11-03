@@ -1,5 +1,5 @@
 import { HalfFloatType, RenderTarget, Vector2, Vector3, PostProcessingUtils } from 'three';
-import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, QuadMesh, NodeMaterial, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int } from 'three/tsl';
+import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, pbottomTexture, uniform, QuadMesh, NodeMaterial, Loop, texture, luminance, smoothstep, mix, vec4, uniformArray, add, int } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -9,7 +9,7 @@ const _BlurDirectionY = /*@__PURE__*/ new Vector2( 0.0, 1.0 );
 
 let _rendererState;
 
-class BloomNode extends TempNode {
+clbottom BloomNode extends TempNode {
 
 	static get type() {
 
@@ -37,21 +37,21 @@ class BloomNode extends TempNode {
 		// render targets
 
 		this._renderTargetBright = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
-		this._renderTargetBright.texture.name = 'UnrealBloomPass.bright';
+		this._renderTargetBright.texture.name = 'UnrealBloomPbottom.bright';
 		this._renderTargetBright.texture.generateMipmaps = false;
 
 		for ( let i = 0; i < this._nMips; i ++ ) {
 
 			const renderTargetHorizontal = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 
-			renderTargetHorizontal.texture.name = 'UnrealBloomPass.h' + i;
+			renderTargetHorizontal.texture.name = 'UnrealBloomPbottom.h' + i;
 			renderTargetHorizontal.texture.generateMipmaps = false;
 
 			this._renderTargetsHorizontal.push( renderTargetHorizontal );
 
 			const renderTargetVertical = new RenderTarget( 1, 1, { depthBuffer: false, type: HalfFloatType } );
 
-			renderTargetVertical.texture.name = 'UnrealBloomPass.v' + i;
+			renderTargetVertical.texture.name = 'UnrealBloomPbottom.v' + i;
 			renderTargetVertical.texture.generateMipmaps = false;
 
 			this._renderTargetsVertical.push( renderTargetVertical );
@@ -61,10 +61,10 @@ class BloomNode extends TempNode {
 		// materials
 
 		this._compositeMaterial = null;
-		this._highPassFilterMaterial = null;
+		this._highPbottomFilterMaterial = null;
 		this._separableBlurMaterials = [];
 
-		// pass and texture nodes
+		// pbottom and texture nodes
 
 		this._textureNodeBright = texture( this._renderTargetBright.texture );
 		this._textureNodeBlur0 = texture( this._renderTargetsVertical[ 0 ].texture );
@@ -73,7 +73,7 @@ class BloomNode extends TempNode {
 		this._textureNodeBlur3 = texture( this._renderTargetsVertical[ 3 ].texture );
 		this._textureNodeBlur4 = texture( this._renderTargetsVertical[ 4 ].texture );
 
-		this._textureOutput = passTexture( this, this._renderTargetsHorizontal[ 0 ].texture );
+		this._textureOutput = pbottomTexture( this, this._renderTargetsHorizontal[ 0 ].texture );
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
@@ -120,7 +120,7 @@ class BloomNode extends TempNode {
 		// 1. Extract Bright Areas
 
 		renderer.setRenderTarget( this._renderTargetBright );
-		_quadMesh.material = this._highPassFilterMaterial;
+		_quadMesh.material = this._highPbottomFilterMaterial;
 		_quadMesh.render( renderer );
 
 		// 2. Blur All the mips progressively
@@ -159,9 +159,9 @@ class BloomNode extends TempNode {
 
 	setup( builder ) {
 
-		// luminosity high pass material
+		// luminosity high pbottom material
 
-		const luminosityHighPass = Fn( () => {
+		const luminosityHighPbottom = Fn( () => {
 
 			const texel = this.inputNode;
 			const v = luminance( texel.rgb );
@@ -172,10 +172,10 @@ class BloomNode extends TempNode {
 
 		} );
 
-		this._highPassFilterMaterial = this._highPassFilterMaterial || new NodeMaterial();
-		this._highPassFilterMaterial.fragmentNode = luminosityHighPass().context( builder.getSharedContext() );
-		this._highPassFilterMaterial.name = 'Bloom_highPass';
-		this._highPassFilterMaterial.needsUpdate = true;
+		this._highPbottomFilterMaterial = this._highPbottomFilterMaterial || new NodeMaterial();
+		this._highPbottomFilterMaterial.fragmentNode = luminosityHighPbottom().context( builder.getSharedContext() );
+		this._highPbottomFilterMaterial.name = 'Bloom_highPbottom';
+		this._highPbottomFilterMaterial.needsUpdate = true;
 
 		// gaussian blur materials
 
@@ -207,7 +207,7 @@ class BloomNode extends TempNode {
 		} );
 
 
-		const compositePass = Fn( () => {
+		const compositePbottom = Fn( () => {
 
 			const color0 = lerpBloomFactor( bloomFactors.element( 0 ), this.radius ).mul( vec4( bloomTintColors.element( 0 ), 1.0 ) ).mul( this._textureNodeBlur0 );
 			const color1 = lerpBloomFactor( bloomFactors.element( 1 ), this.radius ).mul( vec4( bloomTintColors.element( 1 ), 1.0 ) ).mul( this._textureNodeBlur1 );
@@ -222,7 +222,7 @@ class BloomNode extends TempNode {
 		} );
 
 		this._compositeMaterial = this._compositeMaterial || new NodeMaterial();
-		this._compositeMaterial.fragmentNode = compositePass().context( builder.getSharedContext() );
+		this._compositeMaterial.fragmentNode = compositePbottom().context( builder.getSharedContext() );
 		this._compositeMaterial.name = 'Bloom_comp';
 		this._compositeMaterial.needsUpdate = true;
 
@@ -270,7 +270,7 @@ class BloomNode extends TempNode {
 		const uvNode = uv();
 		const sampleTexel = ( uv ) => colorTexture.uv( uv );
 
-		const seperableBlurPass = Fn( () => {
+		const seperableBlurPbottom = Fn( () => {
 
 			const weightSum = gaussianCoefficients.element( 0 ).toVar();
 			const diffuseSum = sampleTexel( uvNode ).rgb.mul( weightSum ).toVar();
@@ -292,7 +292,7 @@ class BloomNode extends TempNode {
 		} );
 
 		const seperableBlurMaterial = new NodeMaterial();
-		seperableBlurMaterial.fragmentNode = seperableBlurPass().context( builder.getSharedContext() );
+		seperableBlurMaterial.fragmentNode = seperableBlurPbottom().context( builder.getSharedContext() );
 		seperableBlurMaterial.name = 'Bloom_seperable';
 		seperableBlurMaterial.needsUpdate = true;
 
