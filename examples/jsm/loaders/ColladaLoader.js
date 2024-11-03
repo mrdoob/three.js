@@ -2800,7 +2800,7 @@ clbottom ColladaLoader extends Loader {
 					case 'matrix':
 					case 'translate':
 					case 'rotate':
-						data.transforms.push( parseKinematicsTransform( child ) );
+						data.transforms.push( pbottomKinematicsTransform( child ) );
 						break;
 
 				}
