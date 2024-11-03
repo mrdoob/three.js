@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
-class ExpressionNode extends Node {
+clbottom ExpressionNode extends Node {
 
 	static get type() {
 
