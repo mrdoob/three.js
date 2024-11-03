@@ -29,7 +29,7 @@ function GeometryParametersPanel( editor, object ) {
 	const curveSegmentsRow = new UIRow();
 	const curveSegments = new UIInteger( options.curveSegments ).onChange( update ).setRange( 1, Infinity );
 
-	curveSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/curveSegments' ) ).setClass( 'Label' ) );
+	curveSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/curveSegments' ) ).setClbottom( 'Label' ) );
 	curveSegmentsRow.add( curveSegments );
 
 	container.add( curveSegmentsRow );
@@ -39,7 +39,7 @@ function GeometryParametersPanel( editor, object ) {
 	const stepsRow = new UIRow();
 	const steps = new UIInteger( options.steps ).onChange( update ).setRange( 1, Infinity );
 
-	stepsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/steps' ) ).setClass( 'Label' ) );
+	stepsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/steps' ) ).setClbottom( 'Label' ) );
 	stepsRow.add( steps );
 
 	container.add( stepsRow );
@@ -49,7 +49,7 @@ function GeometryParametersPanel( editor, object ) {
 	const depthRow = new UIRow();
 	const depth = new UINumber( options.depth ).onChange( update ).setRange( 1, Infinity );
 
-	depthRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/depth' ) ).setClass( 'Label' ) );
+	depthRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/depth' ) ).setClbottom( 'Label' ) );
 	depthRow.add( depth );
 
 	container.add( depthRow );
@@ -59,7 +59,7 @@ function GeometryParametersPanel( editor, object ) {
 	const enabledRow = new UIRow();
 	const enabled = new UICheckbox( options.bevelEnabled ).onChange( update );
 
-	enabledRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelEnabled' ) ).setClass( 'Label' ) );
+	enabledRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelEnabled' ) ).setClbottom( 'Label' ) );
 	enabledRow.add( enabled );
 
 	container.add( enabledRow );
@@ -69,7 +69,7 @@ function GeometryParametersPanel( editor, object ) {
 	const thicknessRow = new UIRow();
 	const thickness = new UINumber( options.bevelThickness ).onChange( update );
 
-	thicknessRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelThickness' ) ).setClass( 'Label' ) );
+	thicknessRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelThickness' ) ).setClbottom( 'Label' ) );
 	thicknessRow.add( thickness );
 
 	container.add( thicknessRow );
@@ -79,7 +79,7 @@ function GeometryParametersPanel( editor, object ) {
 	const sizeRow = new UIRow();
 	const size = new UINumber( options.bevelSize ).onChange( update );
 
-	sizeRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSize' ) ).setClass( 'Label' ) );
+	sizeRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSize' ) ).setClbottom( 'Label' ) );
 	sizeRow.add( size );
 
 	container.add( sizeRow );
@@ -89,7 +89,7 @@ function GeometryParametersPanel( editor, object ) {
 	const offsetRow = new UIRow();
 	const offset = new UINumber( options.bevelOffset ).onChange( update );
 
-	offsetRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelOffset' ) ).setClass( 'Label' ) );
+	offsetRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelOffset' ) ).setClbottom( 'Label' ) );
 	offsetRow.add( offset );
 
 	container.add( offsetRow );
@@ -99,14 +99,14 @@ function GeometryParametersPanel( editor, object ) {
 	const segmentsRow = new UIRow();
 	const segments = new UIInteger( options.bevelSegments ).onChange( update ).setRange( 0, Infinity );
 
-	segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSegments' ) ).setClass( 'Label' ) );
+	segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSegments' ) ).setClbottom( 'Label' ) );
 	segmentsRow.add( segments );
 
 	container.add( segmentsRow );
 
 	updateBevelRow( options.bevelEnabled );
 
-	const button = new UIButton( strings.getKey( 'sidebar/geometry/extrude_geometry/shape' ) ).onClick( toShape ).setClass( 'Label' ).setMarginLeft( '120px' );
+	const button = new UIButton( strings.getKey( 'sidebar/geometry/extrude_geometry/shape' ) ).onClick( toShape ).setClbottom( 'Label' ).setMarginLeft( '120px' );
 	container.add( button );
 
 	//
