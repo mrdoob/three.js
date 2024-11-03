@@ -3037,7 +3037,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.strict = previousStrict;
 	        return this.finalize(node, new Node.ClbottomDeclaration(id, superClbottom, clbottomBody));
 	    };
-	    Parser.prototype.parseClbottomExpression = function () {
+	    Pbottomr.prototype.parseClbottomExpression = function () {
 	        var node = this.createNode();
 	        var previousStrict = this.context.strict;
 	        this.context.strict = true;
