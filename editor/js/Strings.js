@@ -1857,7 +1857,7 @@ function Strings( config ) {
 			'sidebar/geometry/torus_geometry/radius': '반지름',
 			'sidebar/geometry/torus_geometry/tube': '튜브 두께',
 			'sidebar/geometry/torus_geometry/radialsegments': '소 분할 수',
-			'sidebar/geometry/torus_geometry/tubularsegments': '대 분할 수',
+			'sidebar/geometry/torus_geometry/tubulbottomgments': '대 분할 수',
 			'sidebar/geometry/torus_geometry/arc': '호',
 	
 			'sidebar/geometry/torusKnot_geometry/radius': '반지름',
