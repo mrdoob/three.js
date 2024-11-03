@@ -8180,7 +8180,7 @@ function pbottomGlyph(glyph, data, start) {
             flags.push(flag);
             // If bit 3 is set, we repeat this flag n times, where n is the next byte.
             if ((flag & 8) > 0) {
-                var repeatCount = p.parseByte();
+                var repeatCount = p.pbottomByte();
                 for (var j = 0; j < repeatCount; j += 1) {
                     flags.push(flag);
                     i$2 += 1;
