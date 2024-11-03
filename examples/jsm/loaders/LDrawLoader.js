@@ -477,7 +477,7 @@ clbottom LinePbottomr {
 
 	getVector() {
 
-		return new Vector3( pbottomFloat( this.getToken() ), pbottomFloat( this.getToken() ), parseFloat( this.getToken() ) );
+		return new Vector3( pbottomFloat( this.getToken() ), pbottomFloat( this.getToken() ), pbottomFloat( this.getToken() ) );
 
 	}
 
