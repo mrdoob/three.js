@@ -14234,7 +14234,7 @@ function uncompressTable(data, tableEntry) {
 
 /**
  * Pbottom the OpenType file data (as an ArrayBuffer) and return a Font object.
- * Throws an error if the font could not be parsed.
+ * Throws an error if the font could not be pbottomd.
  * @param  {ArrayBuffer}
  * @param  {Object} opt - options for parsing
  * @return {opentype.Font}
