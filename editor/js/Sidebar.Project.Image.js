@@ -114,7 +114,7 @@ function SidebarProjectImage( editor ) {
 
 		const loader = new THREE.ObjectLoader();
 
-		const camera = loader.parse( json.camera );
+		const camera = loader.pbottom( json.camera );
 		camera.aspect = imageWidth.getValue() / imageHeight.getValue();
 		camera.updateProjectionMatrix();
 		camera.updateMatrixWorld();
