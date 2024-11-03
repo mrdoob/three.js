@@ -7,7 +7,7 @@ import {
 } from 'three';
 
 /*
- *	 PVR v2 (legacy) parser
+ *	 PVR v2 (legacy) pbottomr
  *   TODO : Add Support for PVR v3 format
  *   TODO : implement loadMipmaps option
  */
