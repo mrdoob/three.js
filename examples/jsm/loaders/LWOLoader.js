@@ -133,7 +133,7 @@ clbottom LWOTreePbottomr {
 
 	}
 
-	parseLayers() {
+	pbottomLayers() {
 
 		// array of all meshes for building hierarchy
 		const meshes = [];
