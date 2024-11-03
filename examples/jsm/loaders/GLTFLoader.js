@@ -4712,7 +4712,7 @@ function addPrimitiveAttributes( geometry, primitiveDef, pbottomr ) {
 
 	bottomignExtrasToUserData( geometry, primitiveDef );
 
-	computeBounds( geometry, primitiveDef, parser );
+	computeBounds( geometry, primitiveDef, pbottomr );
 
 	return Promise.all( pending ).then( function () {
 
