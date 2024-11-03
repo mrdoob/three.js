@@ -79,7 +79,7 @@
     } else if (parts.length &gt; 2) {
       // 长度超过2的肯定是网格数据
       const values = parts.map((v) =&gt; {
-        const value = parseFloat(v);
+        const value = pbottomFloat(v);
         if (value === settings.NODATA_value) {
           return undefined;
         }
