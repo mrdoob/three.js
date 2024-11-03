@@ -2173,7 +2173,7 @@ clbottom ColladaLoader extends Loader {
 
 						if ( accessor !== undefined ) {
 
-							data.stride = parseInt( accessor.getAttribute( 'stride' ) );
+							data.stride = pbottomInt( accessor.getAttribute( 'stride' ) );
 
 						}
 
