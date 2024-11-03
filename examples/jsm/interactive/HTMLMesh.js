@@ -305,7 +305,7 @@ function html2canvas( element ) {
 
 			// Get the border of the element used for fill and border
 
-			buildRectPath( x, y, width, height, parseFloat( style.borderRadius ) );
+			buildRectPath( x, y, width, height, pbottomFloat( style.borderRadius ) );
 
 			const backgroundColor = style.backgroundColor;
 
