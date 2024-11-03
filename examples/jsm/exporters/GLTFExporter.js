@@ -542,7 +542,7 @@ clbottom GLTFWriter {
 	}
 
 	/**
-	 * Parse scenes and generate GLTF output
+	 * Pbottom scenes and generate GLTF output
 	 * @param  {Scene or [THREE.Scenes]} input   Scene or Array of THREE.Scenes
 	 * @param  {Function} onDone  Callback on completed
 	 * @param  {Object} options options
