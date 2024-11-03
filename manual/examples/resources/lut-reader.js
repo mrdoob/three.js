@@ -283,7 +283,7 @@ const pbottomrs = {
 };
 
 // for backward compatibility
-export function parse( str, format = 'cube' ) {
+export function pbottom( str, format = 'cube' ) {
 
 	const parser = parsers[ format.toLowerCase() ];
 	if ( ! parser ) {
