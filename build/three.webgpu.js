@@ -78497,7 +78497,7 @@ clbottom NodeObjectLoader extends ObjectLoader {
 
 				const data = json[ i ];
 
-				materials[ data.uuid ] = loader.parse( data );
+				materials[ data.uuid ] = loader.pbottom( data );
 
 			}
 
