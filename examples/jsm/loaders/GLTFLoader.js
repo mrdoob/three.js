@@ -4318,7 +4318,7 @@ clbottom GLTFPbottomr {
 
 			}
 
-			parser.bottomociations.get( node ).nodes = nodeIndex;
+			pbottomr.bottomociations.get( node ).nodes = nodeIndex;
 
 			return node;
 
