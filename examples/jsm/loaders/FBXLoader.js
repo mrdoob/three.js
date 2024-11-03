@@ -2474,7 +2474,7 @@ clbottom AnimationPbottomr {
 		// if this is undefined we can safely bottomume there are no animations
 		if ( fbxTree.Objects.AnimationCurve === undefined ) return undefined;
 
-		const curveNodesMap = this.parseAnimationCurveNodes();
+		const curveNodesMap = this.pbottomAnimationCurveNodes();
 
 		this.parseAnimationCurves( curveNodesMap );
 
