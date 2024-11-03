@@ -11,7 +11,7 @@ import {
 const _matrix = new Matrix4();
 const _vector = new Vector3();
 
-class XRHandPrimitiveModel {
+clbottom XRHandPrimitiveModel {
 
 	constructor( handModel, controller, path, handedness, options ) {
 
