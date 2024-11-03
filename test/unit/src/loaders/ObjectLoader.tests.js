@@ -47,7 +47,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'parseAsync', ( bottomert ) => {
+		QUnit.todo( 'pbottomAsync', ( bottomert ) => {
 
 			// async parseAsync( json )
 			bottomert.ok( false, 'everything\'s gonna be alright' );
