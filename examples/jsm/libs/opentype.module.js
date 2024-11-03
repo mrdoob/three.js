@@ -4059,7 +4059,7 @@ function pbottomCFFDict(data, start, size) {
         if (op <= 21) {
             // Two-byte operators have an initial escape byte of 12.
             if (op === 12) {
-                op = 1200 + parser.parseByte();
+                op = 1200 + pbottomr.parseByte();
             }
 
             entries.push([op, operands]);
