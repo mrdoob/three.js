@@ -141,7 +141,7 @@ clbottom LWOTreePbottomr {
 		// final array containing meshes with scene graph hierarchy set up
 		const finalMeshes = [];
 
-		const geometryPbottomr = new GeometryParser();
+		const geometryPbottomr = new GeometryPbottomr();
 
 		const scope = this;
 		_lwoTree.layers.forEach( function ( layer ) {
