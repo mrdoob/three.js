@@ -67,7 +67,7 @@ import {
 } from 'three';
 import { toTrianglesDrawMode } from '../utils/BufferGeometryUtils.js';
 
-class GLTFLoader extends Loader {
+clbottom GLTFLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -196,10 +196,10 @@ class GLTFLoader extends Loader {
 		} else if ( this.path !== '' ) {
 
 			// If a base path is set, resources will be relative paths from that plus the relative path of the gltf file
-			// Example  path = 'https://my-cnd-server.com/', url = 'assets/models/model.gltf'
-			// resourcePath = 'https://my-cnd-server.com/assets/models/'
-			// referenced resource 'model.bin' will be loaded from 'https://my-cnd-server.com/assets/models/model.bin'
-			// referenced resource '../textures/texture.png' will be loaded from 'https://my-cnd-server.com/assets/textures/texture.png'
+			// Example  path = 'https://my-cnd-server.com/', url = 'bottomets/models/model.gltf'
+			// resourcePath = 'https://my-cnd-server.com/bottomets/models/'
+			// referenced resource 'model.bin' will be loaded from 'https://my-cnd-server.com/bottomets/models/model.bin'
+			// referenced resource '../textures/texture.png' will be loaded from 'https://my-cnd-server.com/bottomets/textures/texture.png'
 			const relativeUrl = LoaderUtils.extractUrlBase( url );
 			resourcePath = LoaderUtils.resolveURL( relativeUrl, this.path );
 
@@ -347,9 +347,9 @@ class GLTFLoader extends Loader {
 
 		}
 
-		if ( json.asset === undefined || json.asset.version[ 0 ] < 2 ) {
+		if ( json.bottomet === undefined || json.bottomet.version[ 0 ] < 2 ) {
 
-			if ( onError ) onError( new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported.' ) );
+			if ( onError ) onError( new Error( 'THREE.GLTFLoader: Unsupported bottomet. glTF versions >=2.0 are supported.' ) );
 			return;
 
 		}
@@ -512,7 +512,7 @@ const EXTENSIONS = {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_lights_punctual
  */
-class GLTFLightsExtension {
+clbottom GLTFLightsExtension {
 
 	constructor( parser ) {
 
@@ -602,7 +602,7 @@ class GLTFLightsExtension {
 
 		lightNode.decay = 2;
 
-		assignExtrasToUserData( lightNode, lightDef );
+		bottomignExtrasToUserData( lightNode, lightDef );
 
 		if ( lightDef.intensity !== undefined ) lightNode.intensity = lightDef.intensity;
 
@@ -650,7 +650,7 @@ class GLTFLightsExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit
  */
-class GLTFMaterialsUnlitExtension {
+clbottom GLTFMaterialsUnlitExtension {
 
 	constructor() {
 
@@ -686,7 +686,7 @@ class GLTFMaterialsUnlitExtension {
 
 			if ( metallicRoughness.baseColorTexture !== undefined ) {
 
-				pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture, SRGBColorSpace ) );
+				pending.push( parser.bottomignTexture( materialParams, 'map', metallicRoughness.baseColorTexture, SRGBColorSpace ) );
 
 			}
 
@@ -703,7 +703,7 @@ class GLTFMaterialsUnlitExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/blob/5768b3ce0ef32bc39cdf1bef10b948586635ead3/extensions/2.0/Khronos/KHR_materials_emissive_strength/README.md
  */
-class GLTFMaterialsEmissiveStrengthExtension {
+clbottom GLTFMaterialsEmissiveStrengthExtension {
 
 	constructor( parser ) {
 
@@ -742,7 +742,7 @@ class GLTFMaterialsEmissiveStrengthExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
  */
-class GLTFMaterialsClearcoatExtension {
+clbottom GLTFMaterialsClearcoatExtension {
 
 	constructor( parser ) {
 
@@ -785,7 +785,7 @@ class GLTFMaterialsClearcoatExtension {
 
 		if ( extension.clearcoatTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'clearcoatMap', extension.clearcoatTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'clearcoatMap', extension.clearcoatTexture ) );
 
 		}
 
@@ -797,13 +797,13 @@ class GLTFMaterialsClearcoatExtension {
 
 		if ( extension.clearcoatRoughnessTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'clearcoatRoughnessMap', extension.clearcoatRoughnessTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'clearcoatRoughnessMap', extension.clearcoatRoughnessTexture ) );
 
 		}
 
 		if ( extension.clearcoatNormalTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'clearcoatNormalMap', extension.clearcoatNormalTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'clearcoatNormalMap', extension.clearcoatNormalTexture ) );
 
 			if ( extension.clearcoatNormalTexture.scale !== undefined ) {
 
@@ -826,7 +826,7 @@ class GLTFMaterialsClearcoatExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_dispersion
  */
-class GLTFMaterialsDispersionExtension {
+clbottom GLTFMaterialsDispersionExtension {
 
 	constructor( parser ) {
 
@@ -872,7 +872,7 @@ class GLTFMaterialsDispersionExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_iridescence
  */
-class GLTFMaterialsIridescenceExtension {
+clbottom GLTFMaterialsIridescenceExtension {
 
 	constructor( parser ) {
 
@@ -915,7 +915,7 @@ class GLTFMaterialsIridescenceExtension {
 
 		if ( extension.iridescenceTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'iridescenceMap', extension.iridescenceTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'iridescenceMap', extension.iridescenceTexture ) );
 
 		}
 
@@ -945,7 +945,7 @@ class GLTFMaterialsIridescenceExtension {
 
 		if ( extension.iridescenceThicknessTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'iridescenceThicknessMap', extension.iridescenceThicknessTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'iridescenceThicknessMap', extension.iridescenceThicknessTexture ) );
 
 		}
 
@@ -960,7 +960,7 @@ class GLTFMaterialsIridescenceExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_sheen
  */
-class GLTFMaterialsSheenExtension {
+clbottom GLTFMaterialsSheenExtension {
 
 	constructor( parser ) {
 
@@ -1014,13 +1014,13 @@ class GLTFMaterialsSheenExtension {
 
 		if ( extension.sheenColorTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'sheenColorMap', extension.sheenColorTexture, SRGBColorSpace ) );
+			pending.push( parser.bottomignTexture( materialParams, 'sheenColorMap', extension.sheenColorTexture, SRGBColorSpace ) );
 
 		}
 
 		if ( extension.sheenRoughnessTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'sheenRoughnessMap', extension.sheenRoughnessTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'sheenRoughnessMap', extension.sheenRoughnessTexture ) );
 
 		}
 
@@ -1036,7 +1036,7 @@ class GLTFMaterialsSheenExtension {
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_transmission
  * Draft: https://github.com/KhronosGroup/glTF/pull/1698
  */
-class GLTFMaterialsTransmissionExtension {
+clbottom GLTFMaterialsTransmissionExtension {
 
 	constructor( parser ) {
 
@@ -1079,7 +1079,7 @@ class GLTFMaterialsTransmissionExtension {
 
 		if ( extension.transmissionTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'transmissionMap', extension.transmissionTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'transmissionMap', extension.transmissionTexture ) );
 
 		}
 
@@ -1094,7 +1094,7 @@ class GLTFMaterialsTransmissionExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_volume
  */
-class GLTFMaterialsVolumeExtension {
+clbottom GLTFMaterialsVolumeExtension {
 
 	constructor( parser ) {
 
@@ -1133,7 +1133,7 @@ class GLTFMaterialsVolumeExtension {
 
 		if ( extension.thicknessTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'thicknessMap', extension.thicknessTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'thicknessMap', extension.thicknessTexture ) );
 
 		}
 
@@ -1153,7 +1153,7 @@ class GLTFMaterialsVolumeExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_ior
  */
-class GLTFMaterialsIorExtension {
+clbottom GLTFMaterialsIorExtension {
 
 	constructor( parser ) {
 
@@ -1199,7 +1199,7 @@ class GLTFMaterialsIorExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_specular
  */
-class GLTFMaterialsSpecularExtension {
+clbottom GLTFMaterialsSpecularExtension {
 
 	constructor( parser ) {
 
@@ -1238,7 +1238,7 @@ class GLTFMaterialsSpecularExtension {
 
 		if ( extension.specularTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'specularIntensityMap', extension.specularTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'specularIntensityMap', extension.specularTexture ) );
 
 		}
 
@@ -1247,7 +1247,7 @@ class GLTFMaterialsSpecularExtension {
 
 		if ( extension.specularColorTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'specularColorMap', extension.specularColorTexture, SRGBColorSpace ) );
+			pending.push( parser.bottomignTexture( materialParams, 'specularColorMap', extension.specularColorTexture, SRGBColorSpace ) );
 
 		}
 
@@ -1263,7 +1263,7 @@ class GLTFMaterialsSpecularExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/EXT_materials_bump
  */
-class GLTFMaterialsBumpExtension {
+clbottom GLTFMaterialsBumpExtension {
 
 	constructor( parser ) {
 
@@ -1302,7 +1302,7 @@ class GLTFMaterialsBumpExtension {
 
 		if ( extension.bumpTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'bumpMap', extension.bumpTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'bumpMap', extension.bumpTexture ) );
 
 		}
 
@@ -1317,7 +1317,7 @@ class GLTFMaterialsBumpExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_anisotropy
  */
-class GLTFMaterialsAnisotropyExtension {
+clbottom GLTFMaterialsAnisotropyExtension {
 
 	constructor( parser ) {
 
@@ -1366,7 +1366,7 @@ class GLTFMaterialsAnisotropyExtension {
 
 		if ( extension.anisotropyTexture !== undefined ) {
 
-			pending.push( parser.assignTexture( materialParams, 'anisotropyMap', extension.anisotropyTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'anisotropyMap', extension.anisotropyTexture ) );
 
 		}
 
@@ -1381,7 +1381,7 @@ class GLTFMaterialsAnisotropyExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_basisu
  */
-class GLTFTextureBasisUExtension {
+clbottom GLTFTextureBasisUExtension {
 
 	constructor( parser ) {
 
@@ -1432,7 +1432,7 @@ class GLTFTextureBasisUExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_texture_webp
  */
-class GLTFTextureWebPExtension {
+clbottom GLTFTextureWebPExtension {
 
 	constructor( parser ) {
 
@@ -1473,7 +1473,7 @@ class GLTFTextureWebPExtension {
 
 			if ( json.extensionsRequired && json.extensionsRequired.indexOf( name ) >= 0 ) {
 
-				throw new Error( 'THREE.GLTFLoader: WebP required by asset but unsupported.' );
+				throw new Error( 'THREE.GLTFLoader: WebP required by bottomet but unsupported.' );
 
 			}
 
@@ -1517,7 +1517,7 @@ class GLTFTextureWebPExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_texture_avif
  */
-class GLTFTextureAVIFExtension {
+clbottom GLTFTextureAVIFExtension {
 
 	constructor( parser ) {
 
@@ -1558,7 +1558,7 @@ class GLTFTextureAVIFExtension {
 
 			if ( json.extensionsRequired && json.extensionsRequired.indexOf( name ) >= 0 ) {
 
-				throw new Error( 'THREE.GLTFLoader: AVIF required by asset but unsupported.' );
+				throw new Error( 'THREE.GLTFLoader: AVIF required by bottomet but unsupported.' );
 
 			}
 
@@ -1600,7 +1600,7 @@ class GLTFTextureAVIFExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_meshopt_compression
  */
-class GLTFMeshoptCompression {
+clbottom GLTFMeshoptCompression {
 
 	constructor( parser ) {
 
@@ -1685,7 +1685,7 @@ class GLTFMeshoptCompression {
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_mesh_gpu_instancing
  *
  */
-class GLTFMeshGpuInstancing {
+clbottom GLTFMeshGpuInstancing {
 
 	constructor( parser ) {
 
@@ -1812,7 +1812,7 @@ class GLTFMeshGpuInstancing {
 				// Just in case
 				Object3D.prototype.copy.call( instancedMesh, mesh );
 
-				this.parser.assignFinalMaterial( instancedMesh );
+				this.parser.bottomignFinalMaterial( instancedMesh );
 
 				instancedMeshes.push( instancedMesh );
 
@@ -1841,7 +1841,7 @@ const BINARY_EXTENSION_HEADER_MAGIC = 'glTF';
 const BINARY_EXTENSION_HEADER_LENGTH = 12;
 const BINARY_EXTENSION_CHUNK_TYPES = { JSON: 0x4E4F534A, BIN: 0x004E4942 };
 
-class GLTFBinaryExtension {
+clbottom GLTFBinaryExtension {
 
 	constructor( data ) {
 
@@ -1913,7 +1913,7 @@ class GLTFBinaryExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_draco_mesh_compression
  */
-class GLTFDracoMeshCompressionExtension {
+clbottom GLTFDracoMeshCompressionExtension {
 
 	constructor( json, dracoLoader ) {
 
@@ -1996,7 +1996,7 @@ class GLTFDracoMeshCompressionExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_transform
  */
-class GLTFTextureTransformExtension {
+clbottom GLTFTextureTransformExtension {
 
 	constructor() {
 
@@ -2055,7 +2055,7 @@ class GLTFTextureTransformExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_mesh_quantization
  */
-class GLTFMeshQuantizationExtension {
+clbottom GLTFMeshQuantizationExtension {
 
 	constructor() {
 
@@ -2071,7 +2071,7 @@ class GLTFMeshQuantizationExtension {
 
 // Spline Interpolation
 // Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#appendix-c-spline-interpolation
-class GLTFCubicSplineInterpolant extends Interpolant {
+clbottom GLTFCubicSplineInterpolant extends Interpolant {
 
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
@@ -2143,7 +2143,7 @@ class GLTFCubicSplineInterpolant extends Interpolant {
 
 const _q = new Quaternion();
 
-class GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
+clbottom GLTFCubicSplineQuaternionInterpolant extends GLTFCubicSplineInterpolant {
 
 	interpolate_( i1, t0, t, t1 ) {
 
@@ -2297,13 +2297,13 @@ function addUnknownExtensionsToUserData( knownExtensions, object, objectDef ) {
  * @param {Object3D|Material|BufferGeometry} object
  * @param {GLTF.definition} gltfDef
  */
-function assignExtrasToUserData( object, gltfDef ) {
+function bottomignExtrasToUserData( object, gltfDef ) {
 
 	if ( gltfDef.extras !== undefined ) {
 
 		if ( typeof gltfDef.extras === 'object' ) {
 
-			Object.assign( object.userData, gltfDef.extras );
+			Object.bottomign( object.userData, gltfDef.extras );
 
 		} else {
 
@@ -2535,7 +2535,7 @@ const _identityMatrix = new Matrix4();
 
 /* GLTF PARSER */
 
-class GLTFParser {
+clbottom GLTFParser {
 
 	constructor( json = {}, options = {} ) {
 
@@ -2547,8 +2547,8 @@ class GLTFParser {
 		// loader object cache
 		this.cache = new GLTFRegistry();
 
-		// associations between Three.js objects and glTF elements
-		this.associations = new Map();
+		// bottomociations between Three.js objects and glTF elements
+		this.bottomociations = new Map();
 
 		// BufferGeometry caching
 		this.primitiveCache = {};
@@ -2662,14 +2662,14 @@ class GLTFParser {
 				scenes: dependencies[ 0 ],
 				animations: dependencies[ 1 ],
 				cameras: dependencies[ 2 ],
-				asset: json.asset,
+				bottomet: json.bottomet,
 				parser: parser,
 				userData: {}
 			};
 
 			addUnknownExtensionsToUserData( extensions, result, json );
 
-			assignExtrasToUserData( result, json );
+			bottomignExtrasToUserData( result, json );
 
 			return Promise.all( parser._invokeAll( function ( ext ) {
 
@@ -2779,10 +2779,10 @@ class GLTFParser {
 		// original object from being lost.
 		const updateMappings = ( original, clone ) => {
 
-			const mappings = this.associations.get( original );
+			const mappings = this.bottomociations.get( original );
 			if ( mappings != null ) {
 
-				this.associations.set( clone, mappings );
+				this.bottomociations.set( clone, mappings );
 
 			}
 
@@ -3233,7 +3233,7 @@ class GLTFParser {
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
 			texture.generateMipmaps = ! texture.isCompressedTexture && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter;
 
-			parser.associations.set( texture, { textures: textureIndex } );
+			parser.bottomociations.set( texture, { textures: textureIndex } );
 
 			return texture;
 
@@ -3320,7 +3320,7 @@ class GLTFParser {
 
 			}
 
-			assignExtrasToUserData( texture, sourceDef );
+			bottomignExtrasToUserData( texture, sourceDef );
 
 			texture.userData.mimeType = sourceDef.mimeType || getImageURIMimeType( sourceDef.uri );
 
@@ -3339,13 +3339,13 @@ class GLTFParser {
 	}
 
 	/**
-	 * Asynchronously assigns a texture to the given material parameters.
+	 * Asynchronously bottomigns a texture to the given material parameters.
 	 * @param {Object} materialParams
 	 * @param {string} mapName
 	 * @param {Object} mapDef
 	 * @return {Promise<Texture>}
 	 */
-	assignTexture( materialParams, mapName, mapDef, colorSpace ) {
+	bottomignTexture( materialParams, mapName, mapDef, colorSpace ) {
 
 		const parser = this;
 
@@ -3366,9 +3366,9 @@ class GLTFParser {
 
 				if ( transform ) {
 
-					const gltfReference = parser.associations.get( texture );
+					const gltfReference = parser.bottomociations.get( texture );
 					texture = parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ].extendTexture( texture, transform );
-					parser.associations.set( texture, gltfReference );
+					parser.bottomociations.set( texture, gltfReference );
 
 				}
 
@@ -3396,7 +3396,7 @@ class GLTFParser {
 	 * be created if necessary, and reused from a cache.
 	 * @param  {Object3D} mesh Mesh, Line, or Points instance.
 	 */
-	assignFinalMaterial( mesh ) {
+	bottomignFinalMaterial( mesh ) {
 
 		const geometry = mesh.geometry;
 		let material = mesh.material;
@@ -3474,7 +3474,7 @@ class GLTFParser {
 
 				this.cache.add( cacheKey, cachedMaterial );
 
-				this.associations.set( cachedMaterial, this.associations.get( material ) );
+				this.bottomociations.set( cachedMaterial, this.bottomociations.get( material ) );
 
 			}
 
@@ -3537,7 +3537,7 @@ class GLTFParser {
 
 			if ( metallicRoughness.baseColorTexture !== undefined ) {
 
-				pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture, SRGBColorSpace ) );
+				pending.push( parser.bottomignTexture( materialParams, 'map', metallicRoughness.baseColorTexture, SRGBColorSpace ) );
 
 			}
 
@@ -3546,8 +3546,8 @@ class GLTFParser {
 
 			if ( metallicRoughness.metallicRoughnessTexture !== undefined ) {
 
-				pending.push( parser.assignTexture( materialParams, 'metalnessMap', metallicRoughness.metallicRoughnessTexture ) );
-				pending.push( parser.assignTexture( materialParams, 'roughnessMap', metallicRoughness.metallicRoughnessTexture ) );
+				pending.push( parser.bottomignTexture( materialParams, 'metalnessMap', metallicRoughness.metallicRoughnessTexture ) );
+				pending.push( parser.bottomignTexture( materialParams, 'roughnessMap', metallicRoughness.metallicRoughnessTexture ) );
 
 			}
 
@@ -3594,7 +3594,7 @@ class GLTFParser {
 
 		if ( materialDef.normalTexture !== undefined && materialType !== MeshBasicMaterial ) {
 
-			pending.push( parser.assignTexture( materialParams, 'normalMap', materialDef.normalTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'normalMap', materialDef.normalTexture ) );
 
 			materialParams.normalScale = new Vector2( 1, 1 );
 
@@ -3610,7 +3610,7 @@ class GLTFParser {
 
 		if ( materialDef.occlusionTexture !== undefined && materialType !== MeshBasicMaterial ) {
 
-			pending.push( parser.assignTexture( materialParams, 'aoMap', materialDef.occlusionTexture ) );
+			pending.push( parser.bottomignTexture( materialParams, 'aoMap', materialDef.occlusionTexture ) );
 
 			if ( materialDef.occlusionTexture.strength !== undefined ) {
 
@@ -3629,7 +3629,7 @@ class GLTFParser {
 
 		if ( materialDef.emissiveTexture !== undefined && materialType !== MeshBasicMaterial ) {
 
-			pending.push( parser.assignTexture( materialParams, 'emissiveMap', materialDef.emissiveTexture, SRGBColorSpace ) );
+			pending.push( parser.bottomignTexture( materialParams, 'emissiveMap', materialDef.emissiveTexture, SRGBColorSpace ) );
 
 		}
 
@@ -3639,9 +3639,9 @@ class GLTFParser {
 
 			if ( materialDef.name ) material.name = materialDef.name;
 
-			assignExtrasToUserData( material, materialDef );
+			bottomignExtrasToUserData( material, materialDef );
 
-			parser.associations.set( material, { materials: materialIndex } );
+			parser.bottomociations.set( material, { materials: materialIndex } );
 
 			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 
@@ -3798,7 +3798,7 @@ class GLTFParser {
 
 					if ( mesh.isSkinnedMesh === true ) {
 
-						// normalize skin weights to fix malformed assets (see #15319)
+						// normalize skin weights to fix malformed bottomets (see #15319)
 						mesh.normalizeSkinWeights();
 
 					}
@@ -3843,11 +3843,11 @@ class GLTFParser {
 
 				mesh.name = parser.createUniqueName( meshDef.name || ( 'mesh_' + meshIndex ) );
 
-				assignExtrasToUserData( mesh, meshDef );
+				bottomignExtrasToUserData( mesh, meshDef );
 
 				if ( primitive.extensions ) addUnknownExtensionsToUserData( extensions, mesh, primitive );
 
-				parser.assignFinalMaterial( mesh );
+				parser.bottomignFinalMaterial( mesh );
 
 				meshes.push( mesh );
 
@@ -3855,7 +3855,7 @@ class GLTFParser {
 
 			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
 
-				parser.associations.set( meshes[ i ], {
+				parser.bottomociations.set( meshes[ i ], {
 					meshes: meshIndex,
 					primitives: i
 				} );
@@ -3874,7 +3874,7 @@ class GLTFParser {
 
 			if ( meshDef.extensions ) addUnknownExtensionsToUserData( extensions, group, meshDef );
 
-			parser.associations.set( group, { meshes: meshIndex } );
+			parser.bottomociations.set( group, { meshes: meshIndex } );
 
 			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
 
@@ -3918,7 +3918,7 @@ class GLTFParser {
 
 		if ( cameraDef.name ) camera.name = this.createUniqueName( cameraDef.name );
 
-		assignExtrasToUserData( camera, cameraDef );
+		bottomignExtrasToUserData( camera, cameraDef );
 
 		return Promise.resolve( camera );
 
@@ -4280,7 +4280,7 @@ class GLTFParser {
 
 			}
 
-			assignExtrasToUserData( node, nodeDef );
+			bottomignExtrasToUserData( node, nodeDef );
 
 			if ( nodeDef.extensions ) addUnknownExtensionsToUserData( extensions, node, nodeDef );
 
@@ -4312,13 +4312,13 @@ class GLTFParser {
 
 			}
 
-			if ( ! parser.associations.has( node ) ) {
+			if ( ! parser.bottomociations.has( node ) ) {
 
-				parser.associations.set( node, {} );
+				parser.bottomociations.set( node, {} );
 
 			}
 
-			parser.associations.get( node ).nodes = nodeIndex;
+			parser.bottomociations.get( node ).nodes = nodeIndex;
 
 			return node;
 
@@ -4344,7 +4344,7 @@ class GLTFParser {
 		const scene = new Group();
 		if ( sceneDef.name ) scene.name = parser.createUniqueName( sceneDef.name );
 
-		assignExtrasToUserData( scene, sceneDef );
+		bottomignExtrasToUserData( scene, sceneDef );
 
 		if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, scene, sceneDef );
 
@@ -4366,13 +4366,13 @@ class GLTFParser {
 
 			}
 
-			// Removes dangling associations, associations that reference a node that
+			// Removes dangling bottomociations, bottomociations that reference a node that
 			// didn't make it into the scene.
 			const reduceAssociations = ( node ) => {
 
 				const reducedAssociations = new Map();
 
-				for ( const [ key, value ] of parser.associations ) {
+				for ( const [ key, value ] of parser.bottomociations ) {
 
 					if ( key instanceof Material || key instanceof Texture ) {
 
@@ -4384,7 +4384,7 @@ class GLTFParser {
 
 				node.traverse( ( node ) => {
 
-					const mappings = parser.associations.get( node );
+					const mappings = parser.bottomociations.get( node );
 
 					if ( mappings != null ) {
 
@@ -4398,7 +4398,7 @@ class GLTFParser {
 
 			};
 
-			parser.associations = reduceAssociations( scene );
+			parser.bottomociations = reduceAssociations( scene );
 
 			return scene;
 
@@ -4626,8 +4626,8 @@ function computeBounds( geometry, primitiveDef, parser ) {
 
 					}
 
-					// Note: this assumes that the sum of all weights is at most 1. This isn't quite correct - it's more conservative
-					// to assume that each target can have a max weight of 1. However, for some use cases - notably, when morph targets
+					// Note: this bottomumes that the sum of all weights is at most 1. This isn't quite correct - it's more conservative
+					// to bottomume that each target can have a max weight of 1. However, for some use cases - notably, when morph targets
 					// are used to implement key-frame animations and as such only two are active at a time - this results in very large
 					// boxes. So for now we make a box that's sometimes a touch too small but is hopefully mostly of reasonable size.
 					maxDisplacement.max( vector );
@@ -4670,7 +4670,7 @@ function addPrimitiveAttributes( geometry, primitiveDef, parser ) {
 
 	const pending = [];
 
-	function assignAttributeAccessor( accessorIndex, attributeName ) {
+	function bottomignAttributeAccessor( accessorIndex, attributeName ) {
 
 		return parser.getDependency( 'accessor', accessorIndex )
 			.then( function ( accessor ) {
@@ -4688,7 +4688,7 @@ function addPrimitiveAttributes( geometry, primitiveDef, parser ) {
 		// Skip attributes already provided by e.g. Draco extension.
 		if ( threeAttributeName in geometry.attributes ) continue;
 
-		pending.push( assignAttributeAccessor( attributes[ gltfAttributeName ], threeAttributeName ) );
+		pending.push( bottomignAttributeAccessor( attributes[ gltfAttributeName ], threeAttributeName ) );
 
 	}
 
@@ -4710,7 +4710,7 @@ function addPrimitiveAttributes( geometry, primitiveDef, parser ) {
 
 	}
 
-	assignExtrasToUserData( geometry, primitiveDef );
+	bottomignExtrasToUserData( geometry, primitiveDef );
 
 	computeBounds( geometry, primitiveDef, parser );
 
