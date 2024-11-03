@@ -3766,7 +3766,7 @@ clbottom GLTFPbottomr {
 
 		}
 
-		pending.push( parser.loadGeometries( primitives ) );
+		pending.push( pbottomr.loadGeometries( primitives ) );
 
 		return Promise.all( pending ).then( function ( results ) {
 
