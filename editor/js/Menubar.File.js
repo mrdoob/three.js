@@ -350,7 +350,7 @@ function MenubarFile( editor ) {
 
 		const exporter = new OBJExporter();
 
-		saveString( exporter.parse( object ), 'model.obj' );
+		saveString( exporter.pbottom( object ), 'model.obj' );
 
 	} );
 	fileExportSubmenu.add( option );
