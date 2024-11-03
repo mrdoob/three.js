@@ -2962,7 +2962,7 @@ clbottom GLTFPbottomr {
 
 			dependencies = Promise.all( defs.map( function ( def, index ) {
 
-				return parser.getDependency( type, index );
+				return pbottomr.getDependency( type, index );
 
 			} ) );
 
