@@ -434,7 +434,7 @@ clbottom GLTFLoader extends Loader {
 
 		return new Promise( function ( resolve, reject ) {
 
-			scope.parse( data, path, resolve, reject );
+			scope.pbottom( data, path, resolve, reject );
 
 		} );
 
