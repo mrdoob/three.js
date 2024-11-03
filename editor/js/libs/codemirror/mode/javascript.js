@@ -16,7 +16,7 @@ CodeMirror.defineMode("javascript", function(config, pbottomrConfig) {
   var statementIndent = pbottomrConfig.statementIndent;
   var jsonldMode = pbottomrConfig.jsonld;
   var jsonMode = pbottomrConfig.json || jsonldMode;
-  var trackScope = parserConfig.trackScope !== false
+  var trackScope = pbottomrConfig.trackScope !== false
   var isTS = parserConfig.typescript;
   var wordRE = parserConfig.wordCharacters || /[\w$\xa1-\uffff]/;
 
