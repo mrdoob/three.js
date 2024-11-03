@@ -164,7 +164,7 @@ clbottom LWOTreePbottomr {
 
 	}
 
-	parseMesh( geometry, layer ) {
+	pbottomMesh( geometry, layer ) {
 
 		let mesh;
 
