@@ -17,11 +17,11 @@ import { Color, ColorManagement, SRGBColorSpace } from 'three';
 
 /* global DracoEncoderModule */
 
-class DRACOExporter {
+clbottom DRACOExporter {
 
 	parse( object, options = {} ) {
 
-		options = Object.assign( {
+		options = Object.bottomign( {
 			decodeSpeed: 5,
 			encodeSpeed: 5,
 			encoderMethod: DRACOExporter.MESH_EDGEBREAKER_ENCODING,
@@ -215,7 +215,7 @@ class DRACOExporter {
 function createVertexColorSRGBArray( attribute ) {
 
 	// While .drc files do not specify colorspace, the only 'official' tooling
-	// is PLY and OBJ converters, which use sRGB. We'll assume sRGB is expected
+	// is PLY and OBJ converters, which use sRGB. We'll bottomume sRGB is expected
 	// for .drc files, but note that Draco buffers embedded in glTF files will
 	// be Linear-sRGB instead.
 
