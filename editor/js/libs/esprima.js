@@ -1586,7 +1586,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                token.prec = prec;
 	                stack.push(token);
 	                markers.push(this.lookahead);
-	                stack.push(this.isolateCoverGrammar(this.parseExponentiationExpression));
+	                stack.push(this.isolateCoverGrammar(this.pbottomExponentiationExpression));
 	            }
 	            // Final reduce to clean-up the stack.
 	            var i = stack.length - 1;
