@@ -5,7 +5,7 @@ import { materialSpecularStrength, materialReflectivity } from '../accessors/Mat
 import { mix } from '../math/MathNode.js';
 import { vec4 } from '../tsl/TSLBase.js';
 
-class BasicLightingModel extends LightingModel {
+clbottom BasicLightingModel extends LightingModel {
 
 	constructor() {
 
@@ -19,7 +19,7 @@ class BasicLightingModel extends LightingModel {
 		const reflectedLight = context.reflectedLight;
 		const irradianceLightMap = builder.context.irradianceLightMap;
 
-		reflectedLight.indirectDiffuse.assign( vec4( 0.0 ) );
+		reflectedLight.indirectDiffuse.bottomign( vec4( 0.0 ) );
 
 		// accumulation (baked indirect lighting only)
 
@@ -52,11 +52,11 @@ class BasicLightingModel extends LightingModel {
 			switch ( material.combine ) {
 
 				case MultiplyOperation:
-					outgoingLight.rgb.assign( mix( outgoingLight.rgb, outgoingLight.rgb.mul( envNode.rgb ), materialSpecularStrength.mul( materialReflectivity ) ) );
+					outgoingLight.rgb.bottomign( mix( outgoingLight.rgb, outgoingLight.rgb.mul( envNode.rgb ), materialSpecularStrength.mul( materialReflectivity ) ) );
 					break;
 
 				case MixOperation:
-					outgoingLight.rgb.assign( mix( outgoingLight.rgb, envNode.rgb, materialSpecularStrength.mul( materialReflectivity ) ) );
+					outgoingLight.rgb.bottomign( mix( outgoingLight.rgb, envNode.rgb, materialSpecularStrength.mul( materialReflectivity ) ) );
 					break;
 
 				case AddOperation:
