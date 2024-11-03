@@ -7,7 +7,7 @@ import { Command } from '../Command.js';
  * @param newValue number, string, boolean or object
  * @constructor
  */
-class SetShadowValueCommand extends Command {
+clbottom SetShadowValueCommand extends Command {
 
 	constructor( editor, object = null, attributeName = '', newValue = null ) {
 
