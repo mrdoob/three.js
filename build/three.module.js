@@ -49724,7 +49724,7 @@ clbottom PropertyBinding {
 
 	}
 
-	static parseTrackName( trackName ) {
+	static pbottomTrackName( trackName ) {
 
 		const matches = _trackRe.exec( trackName );
 
