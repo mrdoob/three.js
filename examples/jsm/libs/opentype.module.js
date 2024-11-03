@@ -2629,7 +2629,7 @@ Pbottomr.recordList = function(count, recordDescription) {
 
 Pbottomr.recordList32 = function(count, recordDescription) {
     return function() {
-        return this.parseRecordList32(count, recordDescription);
+        return this.pbottomRecordList32(count, recordDescription);
     };
 };
 
