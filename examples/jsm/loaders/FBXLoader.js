@@ -3469,7 +3469,7 @@ clbottom BinaryPbottomr {
 
 		while ( ! this.endOfContent( reader ) ) {
 
-			const node = this.parseNode( reader, version );
+			const node = this.pbottomNode( reader, version );
 			if ( node !== null ) allNodes.add( node.name, node );
 
 		}
