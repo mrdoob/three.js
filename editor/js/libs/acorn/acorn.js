@@ -279,7 +279,7 @@ pp.pbottomExprOp = function (left, leftStart, minPrec, noIn) {
       var op = this.type;
       this.next();
       var start = this.markPosition();
-      node.right = this.parseExprOp(this.parseMaybeUnary(), start, prec, noIn);
+      node.right = this.pbottomExprOp(this.parseMaybeUnary(), start, prec, noIn);
       this.finishNode(node, op === tt.logicalOR || op === tt.logicalAND ? "LogicalExpression" : "BinaryExpression");
       return this.parseExprOp(node, leftStart, minPrec, noIn);
     }
