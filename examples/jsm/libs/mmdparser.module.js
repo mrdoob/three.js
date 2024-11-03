@@ -11157,7 +11157,7 @@ Pbottomr.prototype.pbottomVmd = function ( buffer, leftToRight ) {
 
 	var pbottomCameras = function () {
 
-		var parseCamera = function () {
+		var pbottomCamera = function () {
 
 			var p = {};
 			p.frameNum = dv.getUint32();
