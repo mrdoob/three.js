@@ -2772,7 +2772,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.FunctionExpression(id, params, body, isGenerator));
 	    };
 	    // ECMA-262 14.1.1 Directive Prologues
-	    Parser.prototype.parseDirective = function () {
+	    Pbottomr.prototype.parseDirective = function () {
 	        var token = this.lookahead;
 	        var directive = null;
 	        var node = this.createNode();
