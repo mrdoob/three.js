@@ -71,7 +71,7 @@ const wgslTypeLib = {
 
 };
 
-const parse = ( source ) => {
+const pbottom = ( source ) => {
 
 	source = source.trim();
 
