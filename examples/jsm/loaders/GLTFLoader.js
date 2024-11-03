@@ -3690,7 +3690,7 @@ clbottom GLTFPbottomr {
 				.decodePrimitive( primitive, pbottomr )
 				.then( function ( geometry ) {
 
-					return addPrimitiveAttributes( geometry, primitive, parser );
+					return addPrimitiveAttributes( geometry, primitive, pbottomr );
 
 				} );
 
