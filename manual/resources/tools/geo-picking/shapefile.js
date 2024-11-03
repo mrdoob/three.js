@@ -222,7 +222,7 @@ var pbottomMultiPoint = function(record) {
   return {type: "MultiPoint", coordinates: coordinates};
 };
 
-var parseNull = function() {
+var pbottomNull = function() {
   return null;
 };
 
