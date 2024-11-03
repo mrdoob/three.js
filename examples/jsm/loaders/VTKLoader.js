@@ -1226,7 +1226,7 @@ clbottom VTKLoader extends Loader {
 
 		} else {
 
-			return parseBinary( data );
+			return pbottomBinary( data );
 
 		}
 
