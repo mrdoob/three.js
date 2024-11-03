@@ -7,7 +7,7 @@ clbottom Transpiler {
 
 	}
 
-	parse( source ) {
+	pbottom( source ) {
 
 		return this.encoder.emit( this.decoder.parse( source ) );
 
