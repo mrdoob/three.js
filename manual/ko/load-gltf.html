@@ -21,12 +21,12 @@
     <link rel="stylesheet" href="/manual/ko/lang.css">
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>에서 .GLTF 파일 불러오기</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>이전 글에서는 <a href="load-obj.html">.OBJ 파일을 불러오는 법</a>에 대해
 배웠습니다. 이전 글을 읽지 않았다면 먼저 읽고 오길 권장합니다.</p>
 <p>이전 글에서 말했듯 .OBJ 파일은 굉장히 오래된 파일 형식이고 구성이 간단합니다.
@@ -79,12 +79,12 @@ VRML은 부족한 점이 많습니다.</p>
 <p>인터넷 검색으로 <a href="https://sketchfab.com/models/edd1c604e1e045a0a2a552ddd9a293e6">로우-폴리(low-poly) 마을</a>을
 하나 찾았습니다(작가: <a href="https://sketchfab.com/antonmoek">antonmoek</a>). 뭔가 괜찮은
 예제가 나올 것 같은 예감이 드네요.</p>
-<div class="threejs_center"><img src="../resources/images/cartoon_lowpoly_small_city_free_pack.jpg"></div>
+<div clbottom="threejs_center"><img src="../resources/images/cartoon_lowpoly_small_city_free_pack.jpg"></div>
 
 <p><a href="load-obj.html">.OBJ에 관한 글에서 썼던 예제</a>를 가져와 .OBJ 파일을 불러오는
 코드를 .GLTF를 불러오는 코드로 바꾸겠습니다.</p>
 <p>아래의 기존 코드를</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mtlLoader = new MTLLoader();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const mtlLoader = new MTLLoader();
 mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
   mtl.preload();
   mtl.materials.Material.side = THREE.DoubleSide;
@@ -97,7 +97,7 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
 });
 </pre>
 <p>.GLTF를 불러오는 코드로 바꿉니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const gltfLoader = new GLTFLoader();
   const url = 'resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf';
   gltfLoader.load(url, (gltf) =&gt; {
@@ -107,17 +107,17 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
   });
 </pre>
 <p>자동으로 카메라의 시야를 조정하는 코드는 그대로 두었습니다.</p>
-<p>모듈이 바뀌었으니 import 문도 변경해야 합니다. <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a>를 제거하고 <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a>를
+<p>모듈이 바뀌었으니 import 문도 변경해야 합니다. <a href="/docs/#examples/loaders/OBJLoader"><code clbottom="notranslate" translate="no">OBJLoader</code></a>를 제거하고 <a href="/docs/#examples/loaders/GLTFLoader"><code clbottom="notranslate" translate="no">GLTFLoader</code></a>를
 추가합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import { LoaderSupport } from 'three/addons/loaders/LoaderSupport.js';
+<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">-import { LoaderSupport } from 'three/addons/loaders/LoaderSupport.js';
 -import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 -import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 +import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 </pre>
 <p>이제 실행해보죠.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
@@ -126,7 +126,7 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
 차가 별도의 요소인지 확인하고, 별도의 요소라면 이 요소를 다룰 수 있는 방법을 찾아야 합니다.</p>
 <p>먼저 간단하게 함수를 만들어 씬 그래프를 <a href="debugging-javascript.html">자바스크립트 콘솔</a>에
 띄워보겠습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function dumpObject(obj, lines = [], isLast = true, prefix = '') {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function dumpObject(obj, lines = [], isLast = true, prefix = '') {
   const localPrefix = isLast ? '└─' : '├─';
   lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
   const newPrefix = prefix + (isLast ? '  ' : '│ ');
@@ -139,7 +139,7 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
 }
 </pre>
 <p>씬을 전부 불러온 뒤, 만든 함수를 호출합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gltfLoader = new GLTFLoader();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const gltfLoader = new GLTFLoader();
 gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
   const root = gltf.scene;
   scene.add(root);
@@ -147,7 +147,7 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 </pre>
 <p><a href="../examples/load-gltf-dump-scenegraph.html">코드를 실행하니</a> 아래와 같은 결과가
 나왔습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+<pre clbottom="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
   └─RootNode_(gltf_orientation_matrix) [Object3D]
     └─RootNode_(model_correction_matrix) [Object3D]
       └─4d4100bcb1c640e69699a87140df79d7fbx [Object3D]
@@ -186,8 +186,8 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
           │ │ └─Car_04_2_2_World_ap_0 [Mesh]
           ...
 </pre>
-<p>살펴보니 모든 자동차는 <code class="notranslate" translate="no">"Cars"</code>라는 부모의 자식이네요.</p>
-<pre class="prettyprint showlinemods notranslate lang-text" translate="no">*          ├─Cars [Object3D]
+<p>살펴보니 모든 자동차는 <code clbottom="notranslate" translate="no">"Cars"</code>라는 부모의 자식이네요.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-text" translate="no">*          ├─Cars [Object3D]
           │ ├─CAR_03_1 [Object3D]
           │ │ └─CAR_03_1_World_ap_0 [Mesh]
           │ ├─CAR_03 [Object3D]
@@ -198,7 +198,7 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 <p>간단히 테스트를 해봅시다. 먼저 "Cars"의 자식 요소 전부를 Y축을 기준으로
 회전시켜보겠습니다.</p>
 <p>장면을 불러온 뒤, "Cars" 요소를 참조해 변수로 저장합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let cars;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+let cars;
 {
   const gltfLoader = new GLTFLoader();
   gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
@@ -206,8 +206,8 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
     scene.add(root);
 +    cars = root.getObjectByName('Cars');
 </pre>
-<p>그리고 <code class="notranslate" translate="no">render</code> 함수 안에서 <code class="notranslate" translate="no">cars</code>의 자식 요소를 전부 회전시킵니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function render(time) {
+<p>그리고 <code clbottom="notranslate" translate="no">render</code> 함수 안에서 <code clbottom="notranslate" translate="no">cars</code>의 자식 요소를 전부 회전시킵니다.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+function render(time) {
 +  time *= 0.001;  // convert to seconds
 
   if (resizeRendererToDisplaySize(renderer)) {
@@ -228,9 +228,9 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 }
 </pre>
 <p>잘 작동하는지 볼까요?</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf-rotate-cars.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf-rotate-cars.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
@@ -239,15 +239,15 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 <p>이처럼 3D 프로젝트를 진행할 때는 목적에 따라 개체를 디자인해야 합니다. 그래야
 기준축이나, 크기 등이 제대로 적용될 테니까요.</p>
 <p>저는 디자이너도 아니고 블렌더를 그다지 잘 하지도 못하기에, 편법을 사용하겠습니다.
-각각의 자동차에 별도의 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 만들어 자동차를 이 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>의 자식으로
-지정할 겁니다. 이러면 자동차가 아닌 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>로 차를 움직일 수 있고, 자동차의
+각각의 자동차에 별도의 <a href="/docs/#api/ko/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>를 만들어 자동차를 이 <a href="/docs/#api/ko/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>의 자식으로
+지정할 겁니다. 이러면 자동차가 아닌 <a href="/docs/#api/ko/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>로 차를 움직일 수 있고, 자동차의
 기준축도 별도로 설정할 수 있죠.</p>
 <p>아까 봤던 씬 그래프를 다시 보니 자동차의 종류는 총 3개인 듯합니다. "Car_08",
 "CAR_03", "Car_04" 이렇게요. 종류별로 조정했을 때 제대로 적용되는지 봅시다.</p>
-<p>아래의 코드는 각 자동차를 새로운 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>의 자식으로 지정하고, 이 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를
+<p>아래의 코드는 각 자동차를 새로운 <a href="/docs/#api/ko/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>의 자식으로 지정하고, 이 <a href="/docs/#api/ko/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>를
 장면에 추가한 뒤, 자동차의 <em>종류별로</em> 기준축을 정렬합니다. 그리고 새로 만든
-<a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 <code class="notranslate" translate="no">cars</code> 배열에 추가하죠.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-let cars;
+<a href="/docs/#api/ko/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>를 <code clbottom="notranslate" translate="no">cars</code> 배열에 추가하죠.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-let cars;
 +const cars = [];
 {
   const gltfLoader = new GLTFLoader();
@@ -277,9 +277,9 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
      ...
 </pre>
 <p>이제 기준축이 제대로 정렬되었습니다.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars-fixed.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf-rotate-cars-fixed.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars-fixed.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf-rotate-cars-fixed.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
@@ -287,15 +287,15 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 <p>간단한 이동 시스템이라고 해도 튜토리얼에서 다루기에는 다소 복잡합니다. 대신
 도로 전체를 달리는 뒤얽힌 경로를 만들어 자동차를 해당 경로에 놓을 수는 있죠.
 아래 스크린샷은 경로를 반쯤 완성했을 때 블렌더의 화면을 캡쳐한 것입니다.</p>
-<div class="threejs_center"><img src="../resources/images/making-path-for-cars.jpg" style="width: 1094px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/making-path-for-cars.jpg" style="width: 1094px"></div>
 
 <p>이제 블렌더에서 데이터를 추출해야 합니다. 다행히 경로만을 골라 내보낼 수 있네요.
 "write nurbs"를 체크해 경로를 .OBJ 파일로 내보냅니다.</p>
-<div class="threejs_center"><img src="../resources/images/blender-export-obj-write-nurbs.jpg" style="width: 498px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/blender-export-obj-write-nurbs.jpg" style="width: 498px"></div>
 
 <p>.OBJ 파일을 열어보니 각 정점 데이터가 있습니다. 이를 배열로 바꿔 사용하도록
 하죠.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controlPoints = [
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const controlPoints = [
   [1.118281, 5.115846, -3.681386],
   [3.948875, 5.115846, -3.641834],
   [3.960072, 5.115846, -0.240352],
@@ -319,20 +319,20 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
   [1.004861, 5.115846, -3.641834],
 ];
 </pre>
-<p>Three.js에는 몇 가지 곡선 클래스가 있습니다. 이 경우 <a href="/docs/#api/ko/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a>가
+<p>Three.js에는 몇 가지 곡선 클래스가 있습니다. 이 경우 <a href="/docs/#api/ko/extras/curves/CatmullRomCurve3"><code clbottom="notranslate" translate="no">CatmullRomCurve3</code></a>가
 적당하겠네요. 이런 곡선은 각 정점을 지나는 부드러운 곡선을 만든다는 것이
 특징입니다.</p>
 <p>만약 위 정점으로 곡선을 생성하면 다음 그림과 같은 곡선이 생길 겁니다.</p>
-<div class="threejs_center"><img src="../resources/images/car-curves-before.png" style="width: 400px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/car-curves-before.png" style="width: 400px"></div>
 
 <p>모서리가 각지면 좀 더 깔끔할 듯하네요. 정점을 몇 개 더 추가해 원하는
 결과를 만들어봅시다. 각 정점 짝마다 10% 아래에 하나, 두 정점 사이 90%
-지점에 하나를 새로 만들어 <a href="/docs/#api/ko/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a>에 넘겨주겠습니다.</p>
+지점에 하나를 새로 만들어 <a href="/docs/#api/ko/extras/curves/CatmullRomCurve3"><code clbottom="notranslate" translate="no">CatmullRomCurve3</code></a>에 넘겨주겠습니다.</p>
 <p>우리가 원하는 곡선은 다음과 같죠.</p>
-<div class="threejs_center"><img src="../resources/images/car-curves-after.png" style="width: 400px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/car-curves-after.png" style="width: 400px"></div>
 
 <p>아래는 곡선을 생성하는 코드입니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let curve;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">let curve;
 let curveObject;
 {
   const controlPoints = [
@@ -386,16 +386,16 @@ let curveObject;
 <p>하지만 <a href="../examples/load-gltf-car-path.html">예제</a>를 실행하니 곡선이 보이지
 않습니다. 일단 어디에 있는지 확인하기 위해 깊이 테스트(depth test) 옵션을
 끄고, 마지막에 렌더링하도록 설정하겠습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    curveObject = new THREE.Line(geometry, material);
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">    curveObject = new THREE.Line(geometry, material);
 +    material.depthTest = false;
 +    curveObject.renderOrder = 1;
 </pre>
 <p>다시 예제를 실행해보니 곡선이 너무 작은 게 문제였네요.</p>
-<div class="threejs_center"><img src="../resources/images/car-curves-too-small.png" style="width: 498px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/car-curves-too-small.png" style="width: 498px"></div>
 
 <p>블렌더로 계층 구조를 확인해보니 디자이너가 자동차 부모의 스케일(scale)을
 건드렸습니다.</p>
-<div class="threejs_center"><img src="../resources/images/cars-scale-0.01.png" style="width: 342px;"></div>
+<div clbottom="threejs_center"><img src="../resources/images/cars-scale-0.01.png" style="width: 342px;"></div>
 
 <p>실제 3D 앱에서 스케일을 건드리는 것은 좋지 않습니다. 갖은 문제를 일으켜
 개발자를 좌절의 굴레에 빠지게 하거든요. 디자이너 입장에서야 각각의 크기를
@@ -404,14 +404,14 @@ let curveObject;
 바랍니다. 만약 디자이너가 스케일을 수정해야만 하는 경우라면, 앱을 만들 때
 스케일을 무시할 수 있도록 정점에까지 스케일을 적용할 수 있는 방법을 찾아야
 합니다.</p>
-<p>이 예제의 경우는 스케일뿐만 아니라 자동차들의 회전값과 위치값까지 <code class="notranslate" translate="no">Cars</code>
+<p>이 예제의 경우는 스케일뿐만 아니라 자동차들의 회전값과 위치값까지 <code clbottom="notranslate" translate="no">Cars</code>
 요소의 영향을 받습니다. 이러면 자동차가 돌아다니게 만들기가 훨씬 어렵죠.
 물론 예제의 경우 차를 전역 공간 안에서 움직여야 하기에 어려움이 있지만,
 지역 공간에서만 무언가를 조작하는 경우, 예를 들어 지구를 도는 달을 구현하는
 경우는 이런 것이 큰 걸림돌이 되진 않습니다.</p>
 <p>씬 그래프를 출력하기 위해 썼던 코드를 다시 가져와 이번에는 각 요소의
 위치값(position), 회전값(rotation), 크기값(scale)까지 출력해봅시다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function dumpVec3(v3, precision = 3) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+function dumpVec3(v3, precision = 3) {
 +  return `${v3.x.toFixed(precision)}, ${v3.y.toFixed(precision)}, ${v3.z.toFixed(precision)}`;
 +}
 
@@ -435,7 +435,7 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
 </pre>
 <p><a href="../examples/load-gltf-dump-scenegraph-extra.html">코드를 실행</a>하니
 다음과 같은 결과가 나옵니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+<pre clbottom="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
   │   pos: 0.000, 0.000, 0.000
   │   rot: 0.000, 0.000, 0.000
   │   scl: 1.000, 1.000, 1.000
@@ -468,7 +468,7 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
           │ │       rot: 0.000, 0.000, 0.000
           │ │       scl: 1.000, 1.000, 1.000
 </pre>
-<p>이제 보니 기존 장면의 <code class="notranslate" translate="no">Cars</code>에 있던 회전값과 크기값이 자식에게 옮겨갔네요.
+<p>이제 보니 기존 장면의 <code clbottom="notranslate" translate="no">Cars</code>에 있던 회전값과 크기값이 자식에게 옮겨갔네요.
 파일을 열었을 때와 렌더링했을 때의 데이터가 다른 이유는 아마 디자이너가
 .GLTF 파일을 만들 때 쓴 프로그램이 무언가를 건드렸거나, 디자이너가 .blend
 파일에서 조금 수정한 버젼으로 .GLTF 파일을 만들었기 때문일 겁니다.</p>
@@ -476,7 +476,7 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
 듭니다. 내보내기 전에 주요 요소를 점검해 불필요한 설정을 제거했으면 더
 좋았을 텐데 말이죠.</p>
 <p>아래의 이 요소들도</p>
-<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+<pre clbottom="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
   │   pos: 0.000, 0.000, 0.000
   │   rot: 0.000, 0.000, 0.000
   │   scl: 1.000, 1.000, 1.000
@@ -502,7 +502,7 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
 합니다.</p>
 <p>일단 저는 마지막 해결책을 선택하겠습니다.</p>
 <p>먼저 곡선의 위치를 옮겨 적당한 위치에 둔 뒤 곡선을 숨깁니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const points = curve.getPoints(250);
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
   const material = new THREE.LineBasicMaterial({color: 0xff0000});
@@ -516,10 +516,10 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
 }
 </pre>
 <p>다음으로 자동차가 곡선을 따라 달리도록 코드를 작성합니다. 자동차마다 곡선에 비례해
-0에서 1사이의 위치를 정한 뒤, <code class="notranslate" translate="no">curveObject</code>를 이용해 전역 공간에서의 위치값을
-구합니다. 그리고 곡선의에서 조금 더 낮은 값을 구한 뒤, <code class="notranslate" translate="no">looAt</code> 메서드를 이용해
+0에서 1사이의 위치를 정한 뒤, <code clbottom="notranslate" translate="no">curveObject</code>를 이용해 전역 공간에서의 위치값을
+구합니다. 그리고 곡선의에서 조금 더 낮은 값을 구한 뒤, <code clbottom="notranslate" translate="no">looAt</code> 메서드를 이용해
 자동차가 이 점을 바라보도록 설정하고, 자동차를 위치값과 방금 구한 점 중간에 둡니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 경로를 계산할 때 쓸 Vector3 객체를 생성합니다
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// 경로를 계산할 때 쓸 Vector3 객체를 생성합니다
 const carPosition = new THREE.Vector3();
 const carTarget = new THREE.Vector3();
 
@@ -556,7 +556,7 @@ function render(time) {
 +  }
 </pre>
 <p>실행시켜보니 자동차의 높이 기준도 제각기네요. 각 자동차의 위치값을 조금씩 수정하겠습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loadedCars = root.getObjectByName('Cars');
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const loadedCars = root.getObjectByName('Cars');
 const fixes = [
 -  { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI * .5], },
 -  { prefix: 'CAR_03', rot: [0, Math.PI, 0], },
@@ -579,18 +579,18 @@ for (const car of loadedCars.children.slice()) {
   cars.push(obj);
 }
 </pre>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-animated-cars.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf-animated-cars.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-animated-cars.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf-animated-cars.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
 <p>몇 분 투자한 것 치고는 괜찮은 결과물이네요!</p>
 <p>마지막으로 그림자까지 추가하면 완벽할 것 같습니다.</p>
-<p><a href="shadows.html">그림자에 관한 글</a>의 <a href="/docs/#api/ko/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> 그림자 예제를 가져와
+<p><a href="shadows.html">그림자에 관한 글</a>의 <a href="/docs/#api/ko/lights/DirectionalLight"><code clbottom="notranslate" translate="no">DirectionalLight</code></a> 그림자 예제를 가져와
 그대로 코드에 붙여 넣습니다.</p>
 <p>그리고 파일을 불러온 뒤, 모든 요소의 그림자 설정을 켜줍니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const gltfLoader = new GLTFLoader();
   gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
     const root = gltf.scene;
@@ -605,12 +605,12 @@ for (const car of loadedCars.children.slice()) {
 </pre>
 <p>그런데 그림자 헬퍼가 하나도 나타나지 않습니다. renderer의 그림자 설정을
 켜주지 않았기 때문이죠.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">renderer.shadowMap.enabled = true;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">renderer.shadowMap.enabled = true;
 </pre>
 <p>이 간단한 걸 해결하느라 무려 4시간이 걸렸다는 건 비밀입니다. 😭</p>
-<p>그리고 <code class="notranslate" translate="no">DirectionLight</code>의 그림자용 카메라가 장면 전체를 투사하도록 절두체를
+<p>그리고 <code clbottom="notranslate" translate="no">DirectionLight</code>의 그림자용 카메라가 장면 전체를 투사하도록 절두체를
 조정합니다. 다음과 같이요.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const color = 0xFFFFFF;
   const intensity = 1;
   const light = new THREE.DirectionalLight(color, intensity);
@@ -634,13 +634,13 @@ for (const car of loadedCars.children.slice()) {
 ...
 </pre>
 <p>마지막으로 배경색을 옅은 하늘색으로 설정합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 -scene.background = new THREE.Color('black');
 +scene.background = new THREE.Color('#DEFEFF');
 </pre>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-shadows.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf-shadows.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-shadows.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf-shadows.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
