@@ -1910,7 +1910,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            else {
 	                if (this.match('...')) {
-	                    elements.push(this.parseBindingRestElement(params, kind));
+	                    elements.push(this.pbottomBindingRestElement(params, kind));
 	                    break;
 	                }
 	                else {
