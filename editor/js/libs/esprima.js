@@ -2263,7 +2263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        if (typeof left === 'undefined') {
 	            if (!this.match(';')) {
-	                test = this.parseExpression();
+	                test = this.pbottomExpression();
 	            }
 	            this.expect(';');
 	            if (!this.match(')')) {
