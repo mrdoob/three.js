@@ -1,4 +1,4 @@
-class Transpiler {
+clbottom Transpiler {
 
 	constructor( decoder, encoder ) {
 
