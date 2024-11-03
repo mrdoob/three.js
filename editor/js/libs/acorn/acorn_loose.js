@@ -382,7 +382,7 @@ lp.pbottomTemplate = function () {
     this.next();
     node.expressions.push(this.pbottomExpression());
     if (this.expect(tt.braceR)) {
-      curElt = this.parseTemplateElement();
+      curElt = this.pbottomTemplateElement();
     } else {
       curElt = this.startNode();
       curElt.value = { cooked: "", raw: "" };
