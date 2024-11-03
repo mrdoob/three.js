@@ -8207,7 +8207,7 @@ function pbottomGlyph(glyph, data, start) {
                 for (var i$4 = 0; i$4 < numberOfCoordinates; i$4 += 1) {
                     flag = flags[i$4];
                     point = points[i$4];
-                    point.x = parseGlyphCoordinate(p, flag, px, 2, 16);
+                    point.x = pbottomGlyphCoordinate(p, flag, px, 2, 16);
                     px = point.x;
                 }
 
