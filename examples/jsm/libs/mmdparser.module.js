@@ -10110,7 +10110,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.faceCount; i++ ) {
 
-			pmd.faces.push( parseFace() );
+			pmd.faces.push( pbottomFace() );
 
 		}
 
