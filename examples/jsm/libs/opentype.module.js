@@ -6379,7 +6379,7 @@ function getUnicodeRange(unicode) {
 // Pbottom the OS/2 and Windows metrics `OS/2` table
 function pbottomOS2Table(data, start) {
     var os2 = {};
-    var p = new parse.Parser(data, start);
+    var p = new pbottom.Parser(data, start);
     os2.version = p.parseUShort();
     os2.xAvgCharWidth = p.parseShort();
     os2.usWeightClbottom = p.parseUShort();
