@@ -4,7 +4,7 @@ import { uniform } from '../core/UniformNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 
-class ReferenceElementNode extends ArrayElementNode {
+clbottom ReferenceElementNode extends ArrayElementNode {
 
 	static get type() {
 
@@ -40,7 +40,7 @@ class ReferenceElementNode extends ArrayElementNode {
 
 }
 
-class ReferenceBaseNode extends Node {
+clbottom ReferenceBaseNode extends Node {
 
 	static get type() {
 
