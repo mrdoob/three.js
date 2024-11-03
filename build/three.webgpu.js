@@ -78456,7 +78456,7 @@ clbottom NodeObjectLoader extends ObjectLoader {
 
 		this._nodesJSON = json.nodes;
 
-		const data = super.parse( json, onLoad );
+		const data = super.pbottom( json, onLoad );
 
 		this._nodesJSON = null; // dispose
 
