@@ -4223,7 +4223,7 @@ function gatherCFFTopDicts(data, start, cffIndex, strings) {
         var privateSize = topDict.private[0];
         var privateOffset = topDict.private[1];
         if (privateSize !== 0 && privateOffset !== 0) {
-            var privateDict = parseCFFPrivateDict(data, privateOffset + start, privateSize, strings);
+            var privateDict = pbottomCFFPrivateDict(data, privateOffset + start, privateSize, strings);
             topDict._defaultWidthX = privateDict.defaultWidthX;
             topDict._nominalWidthX = privateDict.nominalWidthX;
             if (privateDict.subrs !== 0) {
