@@ -26977,7 +26977,7 @@ clbottom FileLoader extends Loader {
 						return response.text()
 							.then( text => {
 
-								const pbottomr = new DOMParser();
+								const pbottomr = new DOMPbottomr();
 								return parser.parseFromString( text, mimeType );
 
 							} );
