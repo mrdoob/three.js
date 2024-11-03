@@ -35,7 +35,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, color, rangeFog } from 'three/tsl';
+			import { pbottom, color, rangeFog } from 'three/tsl';
 
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
@@ -65,22 +65,22 @@
 
 				// post processing
 
-				// render scene pass ( the same of css )
-				const scenePass = pass( scene, camera );
-				const scenePassViewZ = scenePass.getViewZNode();
+				// render scene pbottom ( the same of css )
+				const scenePbottom = pbottom( scene, camera );
+				const scenePbottomViewZ = scenePbottom.getViewZNode();
 
 				// background color
 				const backgroundColor = color( 0x0066ff );
 
-				// get fog factor from scene pass context
+				// get fog factor from scene pbottom context
 				// equivalent to: scene.fog = new THREE.Fog( 0x0066ff, 2.7, 4 );
-				const fogFactor = rangeFog( null, 2.7, 4 ).context( { getViewZ: () => scenePassViewZ } );
+				const fogFactor = rangeFog( null, 2.7, 4 ).context( { getViewZ: () => scenePbottomViewZ } );
 
-				// tone mapping scene pass
-				const scenePassTM = scenePass.toneMapping( THREE.ACESFilmicToneMapping );
+				// tone mapping scene pbottom
+				const scenePbottomTM = scenePbottom.toneMapping( THREE.ACESFilmicToneMapping );
 
 				// mix fog from fog factor and background color
-				const compose = fogFactor.mix( scenePassTM, backgroundColor );
+				const compose = fogFactor.mix( scenePbottomTM, backgroundColor );
 
 				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputNode = compose;
