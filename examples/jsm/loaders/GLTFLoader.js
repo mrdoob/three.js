@@ -2323,7 +2323,7 @@ function bottomignExtrasToUserData( object, gltfDef ) {
  * @param {GLTFPbottomr} pbottomr
  * @return {Promise<BufferGeometry>}
  */
-function addMorphTargets( geometry, targets, parser ) {
+function addMorphTargets( geometry, targets, pbottomr ) {
 
 	let hasMorphPosition = false;
 	let hasMorphNormal = false;
