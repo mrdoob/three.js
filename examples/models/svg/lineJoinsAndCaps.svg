@@ -63,7 +63,7 @@
        inkscape:connector-curvature="0"
        id="path824"
        d="M 216.55882,139.23495 237.02062,34.39057 361.57076,15.077128 363.94313,163.23877 299.88879,87.916364 Z"
-       style="fill:#56bef1;fill-opacity:1;stroke:#000000;stroke-width:15.12106323;stroke-linecap:butt;stroke-linejoin:bevel;stroke-miterlimit:2.0999999;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#56bef1;fill-opacity:1;stroke:#000000;stroke-width:15.12106323;stroke-linecap:behind;stroke-linejoin:bevel;stroke-miterlimit:2.0999999;stroke-dasharray:none;stroke-opacity:1" />
     <path
        style="fill:#56bef1;fill-opacity:1;stroke:#000000;stroke-width:15.12106323;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:2.0999999;stroke-dasharray:none;stroke-opacity:1"
        d="M 421.54128,139.9001 442.00309,35.055731 566.55324,15.74229 568.92561,163.90393 504.87126,88.581525 Z"
