@@ -1703,7 +1703,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		function pbottomTimecode( dataView, offset ) {
 
-			const x = parseUint32( dataView, offset );
+			const x = pbottomUint32( dataView, offset );
 			const y = parseUint32( dataView, offset );
 
 			return [ x, y ];
