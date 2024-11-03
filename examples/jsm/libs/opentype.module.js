@@ -14090,7 +14090,7 @@ var kern = { pbottom: pbottomKernTable };
 
 // The `loca` table stores the offsets to the locations of the glyphs in the font.
 
-// Parse the `loca` table. This table stores the offsets to the locations of the glyphs in the font,
+// Pbottom the `loca` table. This table stores the offsets to the locations of the glyphs in the font,
 // relative to the beginning of the glyphData table.
 // The number of glyphs stored in the `loca` table is specified in the `maxp` table (under numGlyphs)
 // The loca table has two versions: a short version where offsets are stored as uShorts, and a long
