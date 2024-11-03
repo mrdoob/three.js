@@ -82,7 +82,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseTopForm() {
+	pbottomTopForm() {
 
 		this.debugger.offset = this.reader.offset;
 
