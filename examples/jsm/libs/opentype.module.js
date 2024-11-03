@@ -6576,7 +6576,7 @@ subtablePbottomrs[2] = function pbottomLookup2() {
     check.argument(substFormat === 1, 'GSUB Multiple Substitution Subtable identifier-format must be 1');
     return {
         substFormat: substFormat,
-        coverage: this.pbottomPointer(Parser.coverage),
+        coverage: this.pbottomPointer(Pbottomr.coverage),
         sequences: this.parseListOfLists()
     };
 };
