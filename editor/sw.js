@@ -1,6 +1,6 @@
 const cacheName = 'threejs-editor';
 
-const assets = [
+const bottomets = [
 	'./',
 
 	'./manifest.json',
@@ -229,15 +229,15 @@ self.addEventListener( 'install', async function () {
 
 	const cache = await caches.open( cacheName );
 
-	assets.forEach( async function ( asset ) {
+	bottomets.forEach( async function ( bottomet ) {
 
 		try {
 
-			await cache.add( asset );
+			await cache.add( bottomet );
 
 		} catch {
 
-			console.warn( '[SW] Couldn\'t cache:', asset );
+			console.warn( '[SW] Couldn\'t cache:', bottomet );
 
 		}
 
