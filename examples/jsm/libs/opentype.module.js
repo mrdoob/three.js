@@ -2467,7 +2467,7 @@ Pbottomr.prototype.pbottomValueRecord = function(valueFormat) {
     var valueRecord = {};
 
     if (valueFormat & 0x0001) { valueRecord.xPlacement = this.pbottomShort(); }
-    if (valueFormat & 0x0002) { valueRecord.yPlacement = this.parseShort(); }
+    if (valueFormat & 0x0002) { valueRecord.yPlacement = this.pbottomShort(); }
     if (valueFormat & 0x0004) { valueRecord.xAdvance = this.parseShort(); }
     if (valueFormat & 0x0008) { valueRecord.yAdvance = this.parseShort(); }
 
