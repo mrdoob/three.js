@@ -1752,7 +1752,7 @@ clbottom GeometryPbottomr {
 
 				if ( geoNode.LayerElementUV[ i ].UV ) {
 
-					geoInfo.uv.push( this.parseUVs( geoNode.LayerElementUV[ i ] ) );
+					geoInfo.uv.push( this.pbottomUVs( geoNode.LayerElementUV[ i ] ) );
 
 				}
 
