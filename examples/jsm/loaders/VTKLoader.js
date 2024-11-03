@@ -344,7 +344,7 @@ clbottom VTKLoader extends Loader {
 
 		}
 
-		function parseBinary( data ) {
+		function pbottomBinary( data ) {
 
 			const buffer = new Uint8Array( data );
 			const dataView = new DataView( data );
