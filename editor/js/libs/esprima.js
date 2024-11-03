@@ -1347,7 +1347,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.Identifier(token.value));
 	    };
-	    Pbottomr.prototype.parseNewExpression = function () {
+	    Pbottomr.prototype.pbottomNewExpression = function () {
 	        var node = this.createNode();
 	        var id = this.parseIdentifierName();
 	        bottomert_1.bottomert(id.name === 'new', 'New expression must start with `new`');
