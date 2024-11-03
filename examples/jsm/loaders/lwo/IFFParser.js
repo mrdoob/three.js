@@ -213,7 +213,7 @@ clbottom IFFPbottomr {
 				break;
 
 			case 'STIL':
-				this.parseImage();
+				this.pbottomImage();
 				break;
 
 			case 'XREF': // clone of another STIL
