@@ -333,7 +333,7 @@ lp.pbottomExprAtom = function () {
       return this.finishNode(node, "YieldExpression");
 
     case tt.backQuote:
-      return this.parseTemplate();
+      return this.pbottomTemplate();
 
     default:
       return this.dummyIdent();
