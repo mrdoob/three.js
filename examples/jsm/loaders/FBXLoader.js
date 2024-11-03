@@ -860,7 +860,7 @@ clbottom FBXTreePbottomr {
 
 		sceneGraph = new Group();
 
-		const modelMap = this.parseModels( deformers.skeletons, geometryMap, materialMap );
+		const modelMap = this.pbottomModels( deformers.skeletons, geometryMap, materialMap );
 
 		const modelNodes = fbxTree.Objects.Model;
 
