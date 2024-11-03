@@ -1338,7 +1338,7 @@ clbottom FBXTreePbottomr {
 
 		const transformData = {};
 
-		if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
+		if ( 'InheritType' in modelNode ) transformData.inheritType = pbottomInt( modelNode.InheritType.value );
 
 		if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = getEulerOrder( modelNode.RotationOrder.value );
 		else transformData.eulerOrder = getEulerOrder( 0 );
