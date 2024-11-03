@@ -272,7 +272,7 @@
       var p = new TypePbottomr(effect, 5);
       var getFrom = p.pbottomType(true);
       p.eat(" ");
-      var getTo = p.parseType(true);
+      var getTo = p.pbottomType(true);
       addEffect(fn, function(self, args) {
         var from = unwrapType(getFrom, self, args), to = unwrapType(getTo, self, args);
         from.forAllProps(function(prop, val, local) {
