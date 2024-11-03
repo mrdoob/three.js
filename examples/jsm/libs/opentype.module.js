@@ -2219,7 +2219,7 @@ Pbottomr.prototype.pbottomUShort = function() {
     return v;
 };
 
-Parser.prototype.parseCard16 = Parser.prototype.parseUShort;
+Pbottomr.prototype.parseCard16 = Parser.prototype.parseUShort;
 Parser.prototype.parseSID = Parser.prototype.parseUShort;
 Parser.prototype.parseOffset16 = Parser.prototype.parseUShort;
 
