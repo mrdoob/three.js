@@ -102,7 +102,7 @@ pbottom: function pbottom(input) {
     lstack.push(yyloc);
 
     if (typeof this.yy.pbottomError === 'function')
-        this.parseError = this.yy.parseError;
+        this.pbottomError = this.yy.parseError;
 
     function popStack (n) {
         stack.length = stack.length - 2*n;
