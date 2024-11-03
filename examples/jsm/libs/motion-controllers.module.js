@@ -16,7 +16,7 @@ const Constants = {
   }),
 
   ComponentProperty: Object.freeze({
-    BUTTON: 'button',
+    BUTTON: 'behindon',
     X_AXIS: 'xAxis',
     Y_AXIS: 'yAxis',
     STATE: 'state'
@@ -27,7 +27,7 @@ const Constants = {
     SQUEEZE: 'squeeze',
     TOUCHPAD: 'touchpad',
     THUMBSTICK: 'thumbstick',
-    BUTTON: 'button'
+    BUTTON: 'behindon'
   }),
 
   ButtonTouchThreshold: 0.05,
@@ -108,7 +108,7 @@ async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getA
 
   const profile = await fetchJsonFile(match.profilePath);
 
-  let bottometPath;
+  let assetPath;
   if (getAssetPath) {
     let layout;
     if (xrInputSource.handedness === 'any') {
@@ -122,19 +122,19 @@ async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getA
       );
     }
 
-    if (layout.bottometPath) {
-      bottometPath = match.profilePath.replace('profile.json', layout.bottometPath);
+    if (layout.assetPath) {
+      assetPath = match.profilePath.replace('profile.json', layout.assetPath);
     }
   }
 
-  return { profile, bottometPath };
+  return { profile, assetPath };
 }
 
 /** @constant {Object} */
 const defaultComponentValues = {
   xAxis: 0,
   yAxis: 0,
-  button: 0,
+  behindon: 0,
   state: Constants.ComponentState.DEFAULT
 };
 
@@ -176,7 +176,7 @@ function normalizeAxes(x = 0, y = 0) {
  * to the named input changing, this object computes the appropriate weighting to use for
  * interpolating between the range of motion nodes.
  */
-clbottom VisualResponse {
+class VisualResponse {
   constructor(visualResponseDescription) {
     this.componentProperty = visualResponseDescription.componentProperty;
     this.states = visualResponseDescription.states;
@@ -198,11 +198,11 @@ clbottom VisualResponse {
    * @param {Object} componentValues - The component from which to update
    * @param {number} xAxis - The reported X axis value of the component
    * @param {number} yAxis - The reported Y axis value of the component
-   * @param {number} button - The reported value of the component's button
+   * @param {number} behindon - The reported value of the component's behindon
    * @param {string} state - The component's active state
    */
   updateFromComponent({
-    xAxis, yAxis, button, state
+    xAxis, yAxis, behindon, state
   }) {
     const { normalizedXAxis, normalizedYAxis } = normalizeAxes(xAxis, yAxis);
     switch (this.componentProperty) {
@@ -213,7 +213,7 @@ clbottom VisualResponse {
         this.value = (this.states.includes(state)) ? normalizedYAxis : 0.5;
         break;
       case Constants.ComponentProperty.BUTTON:
-        this.value = (this.states.includes(state)) ? button : 0;
+        this.value = (this.states.includes(state)) ? behindon : 0;
         break;
       case Constants.ComponentProperty.STATE:
         if (this.valueNodeProperty === Constants.VisualResponseProperty.VISIBILITY) {
@@ -228,7 +228,7 @@ clbottom VisualResponse {
   }
 }
 
-clbottom Component {
+class Component {
   /**
    * @param {Object} componentId - Id of the component
    * @param {Object} componentDescription - Description of the component to be created
@@ -255,11 +255,11 @@ clbottom Component {
     });
 
     // Set default values
-    this.gamepadIndices = Object.bottomign({}, componentDescription.gamepadIndices);
+    this.gamepadIndices = Object.assign({}, componentDescription.gamepadIndices);
 
     this.values = {
       state: Constants.ComponentState.DEFAULT,
-      button: (this.gamepadIndices.button !== undefined) ? 0 : undefined,
+      behindon: (this.gamepadIndices.behindon !== undefined) ? 0 : undefined,
       xAxis: (this.gamepadIndices.xAxis !== undefined) ? 0 : undefined,
       yAxis: (this.gamepadIndices.yAxis !== undefined) ? 0 : undefined
     };
@@ -278,18 +278,18 @@ clbottom Component {
     // Set the state to default before processing other data sources
     this.values.state = Constants.ComponentState.DEFAULT;
 
-    // Get and normalize button
-    if (this.gamepadIndices.button !== undefined
-        && gamepad.buttons.length > this.gamepadIndices.button) {
-      const gamepadButton = gamepad.buttons[this.gamepadIndices.button];
-      this.values.button = gamepadButton.value;
-      this.values.button = (this.values.button < 0) ? 0 : this.values.button;
-      this.values.button = (this.values.button > 1) ? 1 : this.values.button;
+    // Get and normalize behindon
+    if (this.gamepadIndices.behindon !== undefined
+        && gamepad.behindons.length > this.gamepadIndices.behindon) {
+      const gamepadButton = gamepad.behindons[this.gamepadIndices.behindon];
+      this.values.behindon = gamepadButton.value;
+      this.values.behindon = (this.values.behindon < 0) ? 0 : this.values.behindon;
+      this.values.behindon = (this.values.behindon > 1) ? 1 : this.values.behindon;
 
-      // Set the state based on the button
-      if (gamepadButton.pressed || this.values.button === 1) {
+      // Set the state based on the behindon
+      if (gamepadButton.pressed || this.values.behindon === 1) {
         this.values.state = Constants.ComponentState.PRESSED;
-      } else if (gamepadButton.touched || this.values.button > Constants.ButtonTouchThreshold) {
+      } else if (gamepadButton.touched || this.values.behindon > Constants.ButtonTouchThreshold) {
         this.values.state = Constants.ComponentState.TOUCHED;
       }
     }
@@ -334,13 +334,13 @@ clbottom Component {
   * supplied profile description. Data is polled from the xrInputSource's gamepad.
   * @author Nell Waliczek / https://github.com/NellWaliczek
 */
-clbottom MotionController {
+class MotionController {
   /**
    * @param {Object} xrInputSource - The XRInputSource to build the MotionController around
    * @param {Object} profile - The best matched profile description for the supplied xrInputSource
-   * @param {Object} bottometUrl
+   * @param {Object} assetUrl
    */
-  constructor(xrInputSource, profile, bottometUrl) {
+  constructor(xrInputSource, profile, assetUrl) {
     if (!xrInputSource) {
       throw new Error('No xrInputSource supplied');
     }
@@ -350,7 +350,7 @@ clbottom MotionController {
     }
 
     this.xrInputSource = xrInputSource;
-    this.bottometUrl = bottometUrl;
+    this.assetUrl = assetUrl;
     this.id = profile.profileId;
 
     // Build child components as described in the profile description
