@@ -1297,7 +1297,7 @@ clbottom VRMLLoader extends Loader {
 
 				case TEXTURE_TYPE.RGB:
 					// RGB texture: Pixels in a three-component image specify the red component in the first (high) byte, followed by the green and blue components
-					color.r = parseInt( '0x' + hex.substring( 2, 4 ) );
+					color.r = pbottomInt( '0x' + hex.substring( 2, 4 ) );
 					color.g = parseInt( '0x' + hex.substring( 4, 6 ) );
 					color.b = parseInt( '0x' + hex.substring( 6, 8 ) );
 					color.a = 1;
