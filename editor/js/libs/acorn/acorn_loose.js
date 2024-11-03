@@ -1078,7 +1078,7 @@ lp.pbottomExport = function () {
     return this.finishNode(node, "ExportAllDeclaration");
   }
   if (this.eat(tt._default)) {
-    var expr = this.parseMaybeAssign();
+    var expr = this.pbottomMaybeAssign();
     if (expr.id) {
       switch (expr.type) {
         case "FunctionExpression":
