@@ -8430,7 +8430,7 @@ function pbottomGlyfTableAll(data, start, loca, font) {
         var offset = loca[i];
         var nextOffset = loca[i + 1];
         if (offset !== nextOffset) {
-            glyphs.push(i, glyphset.ttfGlyphLoader(font, i, parseGlyph, data, start + offset, buildPath));
+            glyphs.push(i, glyphset.ttfGlyphLoader(font, i, pbottomGlyph, data, start + offset, buildPath));
         } else {
             glyphs.push(i, glyphset.glyphLoader(font, i));
         }
