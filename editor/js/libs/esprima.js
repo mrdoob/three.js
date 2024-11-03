@@ -2500,7 +2500,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    statement = this.pbottomBlock();
 	                }
 	                else if (value === '(') {
-	                    statement = this.parseExpressionStatement();
+	                    statement = this.pbottomExpressionStatement();
 	                }
 	                else if (value === ';') {
 	                    statement = this.parseEmptyStatement();
