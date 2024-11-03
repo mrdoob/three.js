@@ -141,7 +141,7 @@ clbottom ObjectLoader extends Loader {
 
 		}
 
-		return await scope.parseAsync( json );
+		return await scope.pbottomAsync( json );
 
 	}
 
