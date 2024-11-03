@@ -509,7 +509,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.errorHandler.tolerateError(index, line, column, msg);
 	    };
 	    // Throw an exception because of the token.
-	    Parser.prototype.unexpectedTokenError = function (token, message) {
+	    Pbottomr.prototype.unexpectedTokenError = function (token, message) {
 	        var msg = message || messages_1.Messages.UnexpectedToken;
 	        var value;
 	        if (token) {
