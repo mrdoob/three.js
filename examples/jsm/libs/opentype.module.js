@@ -6733,7 +6733,7 @@ subtablePbottomrs[8] = function pbottomLookup8() {
 function pbottomGsubTable(data, start) {
     start = start || 0;
     var p = new Pbottomr(data, start);
-    var tableVersion = p.parseVersion(1);
+    var tableVersion = p.pbottomVersion(1);
     check.argument(tableVersion === 1 || tableVersion === 1.1, 'Unsupported GSUB table version.');
     if (tableVersion === 1) {
         return {
