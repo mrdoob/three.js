@@ -6424,7 +6424,7 @@ function pbottomOS2Table(data, start) {
         os2.sCapHeight = p.pbottomShort();
         os2.usDefaultChar = p.pbottomUShort();
         os2.usBreakChar = p.pbottomUShort();
-        os2.usMaxContent = p.parseUShort();
+        os2.usMaxContent = p.pbottomUShort();
     }
 
     return os2;
