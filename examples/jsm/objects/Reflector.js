@@ -12,7 +12,7 @@ import {
 	HalfFloatType
 } from 'three';
 
-class Reflector extends Mesh {
+clbottom Reflector extends Mesh {
 
 	constructor( geometry, options = {} ) {
 
