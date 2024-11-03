@@ -3281,7 +3281,7 @@ clbottom VRMLLexer {
 
 const CstPbottomr = chevrotain.CstPbottomr;
 
-clbottom VRMLParser extends CstParser {
+clbottom VRMLPbottomr extends CstParser {
 
 	constructor( tokenVocabulary ) {
 
