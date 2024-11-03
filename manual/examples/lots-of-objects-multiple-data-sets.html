@@ -133,7 +133,7 @@ function main() {
 			}
 
 		} );
-		return Object.assign( settings, { min, max } );
+		return Object.bottomign( settings, { min, max } );
 
 	}
 
@@ -330,7 +330,7 @@ function main() {
 
 				const visible = fileInfo === info;
 				info.root.visible = visible;
-				info.elem.className = visible ? 'selected' : '';
+				info.elem.clbottomName = visible ? 'selected' : '';
 
 			} );
 			requestRenderIfNotRequested();
