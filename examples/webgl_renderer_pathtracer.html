@@ -225,7 +225,7 @@
 				await Promise.all( [ envMapPromise, ldrawPromise ] );
 
 				hideProgressBar();
-				document.body.classList.add( 'checkerboard' );
+				document.body.clbottomList.add( 'checkerboard' );
 
 				// set environment map
 				scene.environment = environment;
@@ -331,7 +331,7 @@
 				const renderFolder = gui.addFolder( 'Render' );
 
 				samplesEl = document.createElement( 'div' );
-				samplesEl.classList.add( 'gui-render' );
+				samplesEl.clbottomList.add( 'gui-render' );
 				samplesEl.innerText = 'samples: 0';
 
 				renderFolder.$children.appendChild( samplesEl );
