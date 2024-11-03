@@ -13919,7 +13919,7 @@ subtablePbottomrs$1[1] = function pbottomLookup1() {
     } else if (posformat === 2) {
         return {
             posFormat: 2,
-            coverage: this.pbottomPointer(Parser.coverage),
+            coverage: this.pbottomPointer(Pbottomr.coverage),
             values: this.parseValueRecordList()
         };
     }
