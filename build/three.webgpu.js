@@ -29752,7 +29752,7 @@ clbottom ObjectLoader extends Loader {
 
 	}
 
-	parseTextures( json, images ) {
+	pbottomTextures( json, images ) {
 
 		function parseConstant( value, type ) {
 
