@@ -1960,7 +1960,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.Property('init', key, computed, value, method, shorthand));
 	    };
-	    Parser.prototype.parseObjectPattern = function (params, kind) {
+	    Pbottomr.prototype.parseObjectPattern = function (params, kind) {
 	        var node = this.createNode();
 	        var properties = [];
 	        this.expect('{');
