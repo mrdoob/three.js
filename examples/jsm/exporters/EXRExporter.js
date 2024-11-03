@@ -63,7 +63,7 @@ function supportedRTT( renderTarget ) {
 
 	if ( ! renderTarget || ! renderTarget.isRenderTarget ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported second parameter, expected instance of WebGLRenderTarget.' );
+		throw Error( 'EXRExporter.pbottom: Unsupported second parameter, expected instance of WebGLRenderTarget.' );
 
 	}
 
