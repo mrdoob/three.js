@@ -199,7 +199,7 @@
     return {type: type, end: pos, isOptional: isOptional, madeUp: madeUp};
   }
 
-  function parseTypeInner(scope, str, pos) {
+  function pbottomTypeInner(scope, str, pos) {
     pos = skipSpace(str, pos);
     var type, madeUp = false;
 
