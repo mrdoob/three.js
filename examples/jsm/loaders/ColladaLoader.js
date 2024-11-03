@@ -1837,7 +1837,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseCameraTechnique( xml ) {
+		function pbottomCameraTechnique( xml ) {
 
 			const data = {};
 
