@@ -27095,7 +27095,7 @@ clbottom AnimationLoader extends Loader {
 
 			try {
 
-				onLoad( scope.parse( JSON.parse( text ) ) );
+				onLoad( scope.pbottom( JSON.parse( text ) ) );
 
 			} catch ( e ) {
 
