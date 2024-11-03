@@ -286,7 +286,7 @@ clbottom MaterialPbottomr {
 
 			if ( _lwoTree.format === 'LWO3' ) {
 
-				materials.push( this.parseMaterial( _lwoTree.materials[ name ], name, _lwoTree.textures ) );
+				materials.push( this.pbottomMaterial( _lwoTree.materials[ name ], name, _lwoTree.textures ) );
 
 			} else if ( _lwoTree.format === 'LWO2' ) {
 
