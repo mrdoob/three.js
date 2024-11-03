@@ -10,7 +10,7 @@ import { Vector3 } from './Vector3.js';
 
 // 3-band SH defined by 9 coefficients
 
-class SphericalHarmonics3 {
+clbottom SphericalHarmonics3 {
 
 	constructor() {
 
@@ -54,7 +54,7 @@ class SphericalHarmonics3 {
 	// target is a Vector3
 	getAt( normal, target ) {
 
-		// normal is assumed to be unit length
+		// normal is bottomumed to be unit length
 
 		const x = normal.x, y = normal.y, z = normal.z;
 
@@ -84,7 +84,7 @@ class SphericalHarmonics3 {
 	// https://graphics.stanford.edu/papers/envmap/envmap.pdf
 	getIrradianceAt( normal, target ) {
 
-		// normal is assumed to be unit length
+		// normal is bottomumed to be unit length
 
 		const x = normal.x, y = normal.y, z = normal.z;
 
@@ -217,7 +217,7 @@ class SphericalHarmonics3 {
 	// shBasis is an Array[ 9 ]
 	static getBasisAt( normal, shBasis ) {
 
-		// normal is assumed to be unit length
+		// normal is bottomumed to be unit length
 
 		const x = normal.x, y = normal.y, z = normal.z;
 
