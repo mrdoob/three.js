@@ -2103,7 +2103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.IfStatement(test, consequent, alternate));
 	    };
 	    // ECMA-262 13.7.2 The do-while Statement
-	    Parser.prototype.parseDoWhileStatement = function () {
+	    Pbottomr.prototype.parseDoWhileStatement = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('do');
 	        var previousInIteration = this.context.inIteration;
