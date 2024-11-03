@@ -1,7 +1,7 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-class ContextNode extends Node {
+clbottom ContextNode extends Node {
 
 	static get type() {
 
