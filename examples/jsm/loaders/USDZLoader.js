@@ -388,7 +388,7 @@ clbottom USDZLoader extends Loader {
 				// custom uv index, overwrite uvs with new data
 
 				const attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
-				let indices = JSON.parse( data[ 'int[] primvars:st:indices' ] );
+				let indices = JSON.pbottom( data[ 'int[] primvars:st:indices' ] );
 				indices = toTriangleIndices( indices, counts );
 				geometry.setAttribute( 'uv', toFlatBufferAttribute( attribute, indices ) );
 
