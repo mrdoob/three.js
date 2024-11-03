@@ -8,9 +8,9 @@ import {
 	ShaderMaterial,
 	UniformsUtils
 } from 'three';
-import { Pass } from './Pass.js';
+import { Pbottom } from './Pbottom.js';
 
-class CubeTexturePass extends Pass {
+clbottom CubeTexturePbottom extends Pbottom {
 
 	constructor( camera, tCube, opacity = 1 ) {
 
@@ -82,4 +82,4 @@ class CubeTexturePass extends Pass {
 
 }
 
-export { CubeTexturePass };
+export { CubeTexturePbottom };
