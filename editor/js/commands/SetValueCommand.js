@@ -7,7 +7,7 @@ import { Command } from '../Command.js';
  * @param newValue number, string, boolean or object
  * @constructor
  */
-class SetValueCommand extends Command {
+clbottom SetValueCommand extends Command {
 
 	constructor( editor, object = null, attributeName = '', newValue = null ) {
 
