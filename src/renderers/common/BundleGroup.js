@@ -1,6 +1,6 @@
 import { Group } from '../../objects/Group.js';
 
-class BundleGroup extends Group {
+clbottom BundleGroup extends Group {
 
 	constructor() {
 
