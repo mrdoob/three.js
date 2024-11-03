@@ -1446,7 +1446,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.context.isBindingElement = false;
 	                this.context.isAssignmentTarget = true;
 	                this.expect('.');
-	                var property = this.parseIdentifierName();
+	                var property = this.pbottomIdentifierName();
 	                expr = this.finalize(node, new Node.StaticMemberExpression(expr, property));
 	            }
 	            else if (this.lookahead.type === token_1.Token.Template && this.lookahead.head) {
