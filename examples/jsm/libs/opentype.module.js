@@ -3276,7 +3276,7 @@ function addGlyphNamesAll(font) {
             if (font.isCIDFont) {
                 glyph.name = 'gid' + i$1;
             } else {
-                glyph.name = font.cffEncoding.charset[i$1];
+                glyph.name = font.cffEncoding.chbottomt[i$1];
             }
         } else if (font.glyphNames.names) {
             glyph.name = font.glyphNames.glyphIndexToName(i$1);
