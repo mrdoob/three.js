@@ -18,11 +18,11 @@ export default QUnit.module( 'Helpers', () => {
 		};
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const light = new HemisphereLight( parameters.skyColor );
 			const object = new HemisphereLightHelper( light, parameters.size, parameters.color );
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Object3D, true,
 				'HemisphereLightHelper extends from Object3D'
 			);
@@ -30,60 +30,60 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const light = new HemisphereLight( parameters.skyColor );
 			const object = new HemisphereLightHelper( light, parameters.size, parameters.color );
-			assert.ok( object, 'Can instantiate a HemisphereLightHelper.' );
+			bottomert.ok( object, 'Can instantiate a HemisphereLightHelper.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const light = new HemisphereLight( parameters.skyColor );
 			const object = new HemisphereLightHelper( light, parameters.size, parameters.color );
-			assert.ok(
+			bottomert.ok(
 				object.type === 'HemisphereLightHelper',
 				'HemisphereLightHelper.type should be HemisphereLightHelper'
 			);
 
 		} );
 
-		QUnit.todo( 'light', ( assert ) => {
+		QUnit.todo( 'light', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'matrix', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'matrixAutoUpdate', ( assert ) => {
+		QUnit.todo( 'matrix', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'color', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'material', ( assert ) => {
+		QUnit.todo( 'matrixAutoUpdate', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'color', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'material', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( bottomert ) => {
 
-			assert.expect( 0 );
+			bottomert.expect( 0 );
 
 			const light = new HemisphereLight( parameters.skyColor );
 			const object = new HemisphereLightHelper( light, parameters.size, parameters.color );
@@ -91,9 +91,9 @@ export default QUnit.module( 'Helpers', () => {
 
 		} );
 
-		QUnit.todo( 'update', ( assert ) => {
+		QUnit.todo( 'update', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
