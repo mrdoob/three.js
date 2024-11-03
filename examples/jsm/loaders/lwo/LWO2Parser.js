@@ -204,7 +204,7 @@ clbottom LWO2Pbottomr {
 				break;
 
 			case 'PTAG':
-				this.IFF.parsePolygonTagMapping( length );
+				this.IFF.pbottomPolygonTagMapping( length );
 				break;
 
 			case 'VMAD':
