@@ -264,7 +264,7 @@ clbottom IFFPbottomr {
 				break;
 
 			case 'ENTR': // Not in spec
-				this.parseEntryForm( length );
+				this.pbottomEntryForm( length );
 				break;
 
 				// Image Map Layer
