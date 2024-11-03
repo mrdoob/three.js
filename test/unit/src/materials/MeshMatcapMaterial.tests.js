@@ -9,11 +9,11 @@ export default QUnit.module( 'Materials', () => {
 	QUnit.module( 'MeshMatcapMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new MeshMatcapMaterial();
 
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Material, true,
 				'MeshMatcapMaterial extends from Material'
 			);
@@ -21,130 +21,130 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new MeshMatcapMaterial();
-			assert.ok( object, 'Can instantiate a MeshMatcapMaterial.' );
+			bottomert.ok( object, 'Can instantiate a MeshMatcapMaterial.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'defines', ( assert ) => {
+		QUnit.test( 'defines', ( bottomert ) => {
 
 			const actual = new MeshMatcapMaterial().defines;
 			const expected = { 'MATCAP': '' };
-			assert.deepEqual( actual, expected, 'Contains a MATCAP definition.' );
+			bottomert.deepEqual( actual, expected, 'Contains a MATCAP definition.' );
 
 		} );
 
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new MeshMatcapMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'MeshMatcapMaterial',
 				'MeshMatcapMaterial.type should be MeshMatcapMaterial'
 			);
 
 		} );
 
-		QUnit.todo( 'color', ( assert ) => {
+		QUnit.todo( 'color', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'matcap', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'map', ( assert ) => {
+		QUnit.todo( 'matcap', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'bumpMap', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'bumpScale', ( assert ) => {
+		QUnit.todo( 'map', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'normalMap', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'normalMapType', ( assert ) => {
+		QUnit.todo( 'bumpMap', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'normalScale', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'displacementMap', ( assert ) => {
+		QUnit.todo( 'bumpScale', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'displacementScale', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'displacementBias', ( assert ) => {
+		QUnit.todo( 'normalMap', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'alphaMap', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'flatShading', ( assert ) => {
+		QUnit.todo( 'normalMapType', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'fog', ( assert ) => {
+		QUnit.todo( 'normalScale', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'displacementMap', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'displacementScale', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'displacementBias', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'alphaMap', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'flatShading', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'fog', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isMeshMatcapMaterial', ( assert ) => {
+		QUnit.test( 'isMeshMatcapMaterial', ( bottomert ) => {
 
 			const object = new MeshMatcapMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.isMeshMatcapMaterial,
 				'MeshMatcapMaterial.isMeshMatcapMaterial should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
