@@ -595,7 +595,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Pbottomr.prototype.getTokenRaw = function (token) {
 	        return this.scanner.source.slice(token.start, token.end);
 	    };
-	    Parser.prototype.convertToken = function (token) {
+	    Pbottomr.prototype.convertToken = function (token) {
 	        var t;
 	        t = {
 	            type: token_1.TokenName[token.type],
