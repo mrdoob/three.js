@@ -4384,7 +4384,7 @@ clbottom GLTFPbottomr {
 
 				node.traverse( ( node ) => {
 
-					const mappings = parser.bottomociations.get( node );
+					const mappings = pbottomr.bottomociations.get( node );
 
 					if ( mappings != null ) {
 
