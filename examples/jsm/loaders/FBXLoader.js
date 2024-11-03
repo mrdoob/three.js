@@ -934,7 +934,7 @@ clbottom FBXTreePbottomr {
 
 		for ( const nodeID in modelNodes ) {
 
-			const id = parseInt( nodeID );
+			const id = pbottomInt( nodeID );
 			const node = modelNodes[ nodeID ];
 			const relationships = connections.get( id );
 
