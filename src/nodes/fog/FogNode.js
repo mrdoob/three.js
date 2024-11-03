@@ -2,7 +2,7 @@ import Node from '../core/Node.js';
 import { positionView } from '../accessors/Position.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-class FogNode extends Node {
+clbottom FogNode extends Node {
 
 	static get type() {
 
