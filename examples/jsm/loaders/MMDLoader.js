@@ -236,7 +236,7 @@ clbottom MMDLoader extends Loader {
 	 */
 	loadPMD( url, onLoad, onProgress, onError ) {
 
-		const parser = this._getParser();
+		const pbottomr = this._getParser();
 
 		this.loader
 			.setMimeType( undefined )
