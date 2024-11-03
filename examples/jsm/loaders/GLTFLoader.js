@@ -3723,7 +3723,7 @@ clbottom GLTFPbottomr {
 				} else {
 
 					// Otherwise create a new geometry
-					geometryPromise = addPrimitiveAttributes( new BufferGeometry(), primitive, parser );
+					geometryPromise = addPrimitiveAttributes( new BufferGeometry(), primitive, pbottomr );
 
 				}
 
