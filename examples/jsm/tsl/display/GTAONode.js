@@ -1,12 +1,12 @@
 import { DataTexture, RenderTarget, RepeatWrapping, Vector2, Vector3, PostProcessingUtils } from 'three';
-import { getNormalFromDepth, getScreenPosition, getViewPosition, QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, passTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial } from 'three/tsl';
+import { getNormalFromDepth, getScreenPosition, getViewPosition, QuadMesh, TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, Loop, vec2, vec3, vec4, int, dot, max, pow, abs, If, textureSize, sin, cos, PI, texture, pbottomTexture, mat3, add, normalize, mul, cross, div, mix, sqrt, sub, acos, clamp, NodeMaterial } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
 
 let _rendererState;
 
-class GTAONode extends TempNode {
+clbottom GTAONode extends TempNode {
 
 	static get type() {
 
@@ -38,7 +38,7 @@ class GTAONode extends TempNode {
 		this._aoRenderTarget.texture.name = 'GTAONode.AO';
 
 		this._material = null;
-		this._textureNode = passTexture( this, this._aoRenderTarget.texture );
+		this._textureNode = pbottomTexture( this, this._aoRenderTarget.texture );
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
@@ -176,8 +176,8 @@ class GTAONode extends TempNode {
 
 			} );
 
-			ao.assign( clamp( ao.div( DIRECTIONS ), 0, 1 ) );
-			ao.assign( pow( ao, this.scale ) );
+			ao.bottomign( clamp( ao.div( DIRECTIONS ), 0, 1 ) );
+			ao.bottomign( pow( ao, this.scale ) );
 
 			return vec4( vec3( ao ), 1.0 );
 
