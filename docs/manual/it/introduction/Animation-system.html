@@ -11,7 +11,7 @@
 
 		<h2>Panoramica</h2>
 
-		<p class="desc">
+		<p clbottom="desc">
       Con il sistema di animazione di three.js si possono animare varie proprietà dei modelli:
       le ossa di un [page:SkinnedMesh modello skinned], i target morph, le diverse proprietà dei materiali 
       (colori, opacità, booleani), la visibilità e le trasformazioni. Le proprietà di animazione possono essere 
@@ -26,7 +26,7 @@
 
 		<h3>Clip di animazione (AnimationClips)</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
       Se si è importato con successo un oggetto 3D animato (non importa se ha ossa o target morph o entrambi)
       - per esempio esportandolo da Blender con [link:https://github.com/KhronosGroup/glTF-Blender-IO l'exporter glTF Blender] e caricandolo
       nella scena three.js usando [page:GLTFLoader] - uno dei campi di risposta dovrà essere un array chiamato "animations", contenente
@@ -38,7 +38,7 @@
 
 		<h3>Keyframe Tracks</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
       All'interno di un `AnimationClip` i dati, per ogni propietà di animazione, sono memorizzati in un [page:KeyframeTrack] separato.
       Supponendo che un oggetto personaggio abbia uno [page:Skeleton scheletro], un keyframe track potrebbe memorizzare i dati relativi alle variazioni di 
       posizione dell'osso inferiore del braccio nel tempo, un'altra traccia potrebbe memorizzare i dati relativi alle variazioni di rotazione dello stesso osso,
@@ -51,7 +51,7 @@
 
 		<h3>Mixer di Animazioni</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
       I dati memorizzati costituiscono solo la base per le animazioni - la riproduzione vera e propria è controllata dall'[page:AnimationMixer].
       È possibile immaginarlo non solo come un lettore di animazioni, ma come un simulatore di un hardware come una vera e propria console di mixaggio,
       che può controllare diverse animazioni simultaneamente, mescolandole e fondendole.
@@ -59,7 +59,7 @@
 
 		<h3>Azioni di Animazioni</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
       Lo stesso `AnimationMixer` ha pochissime proprietà e metodi (generali), perché può essere controllato dall'[page:AnimationAction AnimationActions].
       Per configurare un `AnimationAction` è necessario specificare quando un `AnimationClip` deve essere eseguito, messo in pausa o stoppato su uno dei mixer, 
       se e con quale frequenza la clip deve essere ripetuta, se deve essere eseguita con una dissolvenza o una scala temporale e altre cose aggiuntive come 
@@ -68,13 +68,13 @@
 
 		<h3>Gruppi di oggetti Animati</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
       Se si desidera che un gruppo di oggetti riceva uno stato di animazione condiviso, è possibile utilizzare un [page:AnimationObjectGroup].
 		</p>
 
 		<h3>Formati supportati e Loader</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
       Si noti che non tutti i formati includono le animazioni (in particolare OBJ non lo fa) e che solo alcuni loader di three.js
       supportano le sequenze [page:AnimationClip AnimationClip]. Di seguito alcuni che supportano questo tipo di animazioni:
 		</p>
@@ -88,7 +88,7 @@
 				<li>THREE.MMDLoader</li>
 			</ul>
 
-		<p class="desc">
+		<p clbottom="desc">
       Si noti che 3ds max e Maya attualmente non possono esportare più animazioni (ovvero animazioni che non si trovano nella stessa timeline)
       direttamente in un singolo file.
 		</p>
