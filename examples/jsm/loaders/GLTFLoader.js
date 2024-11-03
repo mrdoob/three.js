@@ -305,7 +305,7 @@ clbottom GLTFLoader extends Loader {
 
 	}
 
-	parse( data, path, onLoad, onError ) {
+	pbottom( data, path, onLoad, onError ) {
 
 		let json;
 		const extensions = {};
