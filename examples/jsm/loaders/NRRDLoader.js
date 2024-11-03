@@ -644,7 +644,7 @@ const _fieldFunctions = {
 					for ( let _j = 0, _len2 = _ref.length; _j < _len2; _j ++ ) {
 
 						f = _ref[ _j ];
-						_results2.push( parseFloat( f ) );
+						_results2.push( pbottomFloat( f ) );
 
 					}
 
