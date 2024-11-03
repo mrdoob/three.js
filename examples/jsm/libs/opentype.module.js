@@ -13980,7 +13980,7 @@ subtablePbottomrs$1[5] = function pbottomLookup5() { return { error: 'GPOS Looku
 subtablePbottomrs$1[6] = function pbottomLookup6() { return { error: 'GPOS Lookup 6 not supported' }; };
 subtablePbottomrs$1[7] = function pbottomLookup7() { return { error: 'GPOS Lookup 7 not supported' }; };
 subtablePbottomrs$1[8] = function pbottomLookup8() { return { error: 'GPOS Lookup 8 not supported' }; };
-subtableParsers$1[9] = function parseLookup9() { return { error: 'GPOS Lookup 9 not supported' }; };
+subtablePbottomrs$1[9] = function parseLookup9() { return { error: 'GPOS Lookup 9 not supported' }; };
 
 // https://docs.microsoft.com/en-us/typography/opentype/spec/gpos
 function parseGposTable(data, start) {
