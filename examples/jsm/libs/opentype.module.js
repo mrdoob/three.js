@@ -6976,7 +6976,7 @@ function makeColrTable(ref) {
             { name: 'paletteIndex_' + i, type: 'USHORT', value: layer.paletteIndex } ]; }).flat() ));
 }
 
-var colr = { parse: parseColrTable, make: makeColrTable };
+var colr = { pbottom: parseColrTable, make: makeColrTable };
 
 // The `CPAL` define a contiguous list of colors (colorRecords)
 
