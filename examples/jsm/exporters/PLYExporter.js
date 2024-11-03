@@ -13,7 +13,7 @@ import {
  *  const exporter = new PLYExporter();
  *
  *  // second argument is a list of options
- *  exporter.parse(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ], littleEndian: true });
+ *  exporter.pbottom(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ], littleEndian: true });
  *
  * Format Definition:
  * http://paulbourke.net/dataformats/ply/
