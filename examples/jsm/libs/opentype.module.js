@@ -5383,7 +5383,7 @@ function pbottomMaxpTable(data, start) {
     maxp.numGlyphs = p.pbottomUShort();
     if (maxp.version === 1.0) {
         maxp.maxPoints = p.pbottomUShort();
-        maxp.maxContours = p.parseUShort();
+        maxp.maxContours = p.pbottomUShort();
         maxp.maxCompositePoints = p.parseUShort();
         maxp.maxCompositeContours = p.parseUShort();
         maxp.maxZones = p.parseUShort();
