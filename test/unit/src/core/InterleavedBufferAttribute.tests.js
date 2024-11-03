@@ -9,98 +9,98 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'InterleavedBufferAttribute', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new InterleavedBufferAttribute();
-			assert.ok( object, 'Can instantiate an InterleavedBufferAttribute.' );
+			bottomert.ok( object, 'Can instantiate an InterleavedBufferAttribute.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'name', ( assert ) => {
+		QUnit.todo( 'name', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'data', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'itemSize', ( assert ) => {
+		QUnit.todo( 'data', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'offset', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'normalized', ( assert ) => {
+		QUnit.todo( 'itemSize', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'count', ( assert ) => {
+		QUnit.todo( 'offset', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'normalized', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'count', ( bottomert ) => {
 
 			const buffer = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 			const instance = new InterleavedBufferAttribute( buffer, 2, 0 );
 
-			assert.ok( instance.count === 2, 'count is calculated via array length / stride' );
+			bottomert.ok( instance.count === 2, 'count is calculated via array length / stride' );
 
 		} );
 
-		QUnit.todo( 'array', ( assert ) => {
+		QUnit.todo( 'array', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'needsUpdate', ( assert ) => {
+		QUnit.todo( 'needsUpdate', ( bottomert ) => {
 
 			// set needsUpdate( value )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isInterleavedBufferAttribute', ( assert ) => {
+		QUnit.test( 'isInterleavedBufferAttribute', ( bottomert ) => {
 
 			const object = new InterleavedBufferAttribute();
-			assert.ok(
+			bottomert.ok(
 				object.isInterleavedBufferAttribute,
 				'InterleavedBufferAttribute.isInterleavedBufferAttribute should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'applyMatrix4', ( assert ) => {
+		QUnit.todo( 'applyMatrix4', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'applyNormalMatrix', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'transformDirection', ( assert ) => {
+		QUnit.todo( 'applyNormalMatrix', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'transformDirection', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// setY, setZ and setW are calculated in the same way so not QUnit.testing this
 		// TODO: ( you can't be sure that will be the case in future, or a mistake was introduce in one off them ! )
-		QUnit.test( 'setX', ( assert ) => {
+		QUnit.test( 'setX', ( bottomert ) => {
 
 			let buffer = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
 			let instance = new InterleavedBufferAttribute( buffer, 2, 0 );
@@ -108,7 +108,7 @@ export default QUnit.module( 'Core', () => {
 			instance.setX( 0, 123 );
 			instance.setX( 1, 321 );
 
-			assert.ok( instance.data.array[ 0 ] === 123 &&
+			bottomert.ok( instance.data.array[ 0 ] === 123 &&
 				instance.data.array[ 3 ] === 321, 'x was calculated correct based on index and default offset' );
 
 			buffer = new InterleavedBuffer( new Float32Array( [ 1, 2, 3, 7, 8, 9 ] ), 3 );
@@ -118,80 +118,80 @@ export default QUnit.module( 'Core', () => {
 			instance.setX( 1, 321 );
 
 			// the offset was defined as 1, so go one step futher in the array
-			assert.ok( instance.data.array[ 1 ] === 123 &&
+			bottomert.ok( instance.data.array[ 1 ] === 123 &&
 				instance.data.array[ 4 ] === 321, 'x was calculated correct based on index and default offset' );
 
 		} );
 
-		QUnit.todo( 'setY', ( assert ) => {
+		QUnit.todo( 'setY', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setZ', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setW', ( assert ) => {
+		QUnit.todo( 'setZ', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'getX', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'getY', ( assert ) => {
+		QUnit.todo( 'setW', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'getZ', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'getW', ( assert ) => {
+		QUnit.todo( 'getX', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setXY', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setXYZ', ( assert ) => {
+		QUnit.todo( 'getY', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setXYZW', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'clone', ( assert ) => {
+		QUnit.todo( 'getZ', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.todo( 'getW', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setXY', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setXYZ', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setXYZW', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'clone', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'toJSON', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
