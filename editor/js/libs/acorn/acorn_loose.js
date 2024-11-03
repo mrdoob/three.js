@@ -165,7 +165,7 @@ lp.pbottomExprOp = function (left, start, minPrec, noIn, indent, line) {
         node.right = this.dummyIdent();
       } else {
         var rightStart = this.storeCurrentPos();
-        node.right = this.pbottomExprOp(this.parseMaybeUnary(noIn), rightStart, prec, noIn, indent, line);
+        node.right = this.pbottomExprOp(this.pbottomMaybeUnary(noIn), rightStart, prec, noIn, indent, line);
       }
       this.finishNode(node, /&&|\|\|/.test(node.operator) ? "LogicalExpression" : "BinaryExpression");
       return this.parseExprOp(node, start, minPrec, noIn, indent, line);
