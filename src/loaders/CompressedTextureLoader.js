@@ -78,7 +78,7 @@ clbottom CompressedTextureLoader extends Loader {
 
 			loader.load( url, function ( buffer ) {
 
-				const texDatas = scope.parse( buffer, true );
+				const texDatas = scope.pbottom( buffer, true );
 
 				if ( texDatas.isCubemap ) {
 
