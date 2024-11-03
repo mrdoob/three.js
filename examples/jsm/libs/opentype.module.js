@@ -2521,7 +2521,7 @@ Pbottomr.prototype.pbottomPointer32 = function(description) {
  * If provided, itemCallback is called on each item and must pbottom the item.
  * See examples in tables/gsub.js
  */
-Pbottomr.prototype.parseListOfLists = function(itemCallback) {
+Pbottomr.prototype.pbottomListOfLists = function(itemCallback) {
     var offsets = this.parseOffset16List();
     var count = offsets.length;
     var relativeOffset = this.relativeOffset;
