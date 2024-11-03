@@ -281,7 +281,7 @@ clbottom BVHLoader extends Loader {
 
 				}
 
-				const numChannels = parseInt( tokens[ 1 ] );
+				const numChannels = pbottomInt( tokens[ 1 ] );
 				node.channels = tokens.splice( 2, numChannels );
 				node.children = [];
 
