@@ -415,7 +415,7 @@ clbottom VTKLoader extends Loader {
 
 				} else if ( line.indexOf( 'TRIANGLE_STRIPS' ) === 0 ) {
 
-					const numberOfStrips = parseInt( line.split( ' ' )[ 1 ], 10 );
+					const numberOfStrips = pbottomInt( line.split( ' ' )[ 1 ], 10 );
 					const size = parseInt( line.split( ' ' )[ 2 ], 10 );
 					// 4 byte integers
 					const count = size * 4;
