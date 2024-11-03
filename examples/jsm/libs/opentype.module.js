@@ -2553,7 +2553,7 @@ Pbottomr.prototype.pbottomListOfLists = function(itemCallback) {
 
 ///// Complex tables parsing //////////////////////////////////
 
-// Parse a coverage table in a GSUB, GPOS or GDEF table.
+// Pbottom a coverage table in a GSUB, GPOS or GDEF table.
 // https://www.microsoft.com/typography/OTSPEC/chapter2.htm
 // parser.offset must point to the start of the table containing the coverage.
 Parser.prototype.parseCoverage = function() {
