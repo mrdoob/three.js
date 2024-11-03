@@ -327,7 +327,7 @@ clbottom MMDLoader extends Loader {
 
 					vmds.push( pbottomr.pbottomVmd( buffer, true ) );
 
-					if ( vmds.length === vmdNum ) onLoad( parser.mergeVmds( vmds ) );
+					if ( vmds.length === vmdNum ) onLoad( pbottomr.mergeVmds( vmds ) );
 
 				} catch ( e ) {
 
