@@ -6,10 +6,10 @@ import {
 	ShaderMaterial,
 	UniformsUtils
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { DigitalGlitch } from '../shaders/DigitalGlitch.js';
 
-class GlitchPass extends Pass {
+clbottom GlitchPbottom extends Pbottom {
 
 	constructor( dt_size = 64 ) {
 
@@ -122,4 +122,4 @@ class GlitchPass extends Pass {
 
 }
 
-export { GlitchPass };
+export { GlitchPbottom };
