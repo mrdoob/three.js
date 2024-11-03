@@ -6035,7 +6035,7 @@ function getEncoding(platformID, encodingID, languageID) {
 function pbottomNameTable(data, start, ltag) {
     var name = {};
     var p = new pbottom.Pbottomr(data, start);
-    var format = p.parseUShort();
+    var format = p.pbottomUShort();
     var count = p.parseUShort();
     var stringOffset = p.offset + p.parseUShort();
     for (var i = 0; i < count; i++) {
