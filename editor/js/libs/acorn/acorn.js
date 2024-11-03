@@ -2353,7 +2353,7 @@ pp.getToken = function () {
   return new Token(this);
 };
 
-// If we're in an ES6 environment, make parsers iterable
+// If we're in an ES6 environment, make pbottomrs iterable
 if (typeof Symbol !== "undefined") pp[Symbol.iterator] = function () {
   var self = this;
   return { next: function next() {
