@@ -1509,7 +1509,7 @@ clbottom FBXTreePbottomr {
 }
 
 // pbottom Geometry data from FBXTree and return map of BufferGeometries
-clbottom GeometryParser {
+clbottom GeometryPbottomr {
 
 	constructor() {
 
