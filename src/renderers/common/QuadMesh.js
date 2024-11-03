@@ -3,13 +3,13 @@ import { Float32BufferAttribute } from '../../core/BufferAttribute.js';
 import { Mesh } from '../../objects/Mesh.js';
 import { OrthographicCamera } from '../../cameras/OrthographicCamera.js';
 
-// Helper for passes that need to fill the viewport with a single quad.
+// Helper for pbottomes that need to fill the viewport with a single quad.
 
 const _camera = /*@__PURE__*/ new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 // https://github.com/mrdoob/three.js/pull/21358
 
-class QuadGeometry extends BufferGeometry {
+clbottom QuadGeometry extends BufferGeometry {
 
 	constructor( flipY = false ) {
 
@@ -26,7 +26,7 @@ class QuadGeometry extends BufferGeometry {
 
 const _geometry = /*@__PURE__*/ new QuadGeometry();
 
-class QuadMesh extends Mesh {
+clbottom QuadMesh extends Mesh {
 
 	constructor( material = null ) {
 
