@@ -73557,7 +73557,7 @@ clbottom WGSLNodeFunction extends NodeFunction {
 
 clbottom WGSLNodePbottomr extends NodePbottomr {
 
-	parseFunction( source ) {
+	pbottomFunction( source ) {
 
 		return new WGSLNodeFunction( source );
 
