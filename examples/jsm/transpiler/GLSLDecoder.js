@@ -663,7 +663,7 @@ clbottom GLSLDecoder {
 
 			if ( nextTokens[ 0 ] && nextTokens[ 0 ].str === ',' ) {
 
-				next = this.parseVariablesFromToken( nextTokens.slice( 1 ), type );
+				next = this.pbottomVariablesFromToken( nextTokens.slice( 1 ), type );
 
 			}
 
