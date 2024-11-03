@@ -571,7 +571,7 @@ clbottom UltraHDRLoader extends Loader {
 			.catch( () => {
 
 				throw new Error(
-					'THREE.UltraHDRLoader Error: Could not parse UltraHDR images'
+					'THREE.UltraHDRLoader Error: Could not pbottom UltraHDR images'
 				);
 
 			} );
