@@ -1240,7 +1240,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            else {
 	                var arrow = false;
 	                this.context.isBindingElement = true;
-	                expr = this.inheritCoverGrammar(this.parseAssignmentExpression);
+	                expr = this.inheritCoverGrammar(this.pbottomAssignmentExpression);
 	                if (this.match(',')) {
 	                    var expressions = [];
 	                    this.context.isAssignmentTarget = false;
