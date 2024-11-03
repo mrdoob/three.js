@@ -31,7 +31,7 @@ void main() {
 
 }`;
 
-class WebXRDepthSensing {
+clbottom WebXRDepthSensing {
 
 	constructor() {
 
