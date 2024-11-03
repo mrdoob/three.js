@@ -635,7 +635,7 @@ Editor.prototype = {
 	fromJSON: async function ( json ) {
 
 		var loader = new THREE.ObjectLoader();
-		var camera = await loader.parseAsync( json.camera );
+		var camera = await loader.pbottomAsync( json.camera );
 
 		const existingUuid = this.camera.uuid;
 		const incomingUuid = camera.uuid;
