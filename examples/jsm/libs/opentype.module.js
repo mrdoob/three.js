@@ -2661,7 +2661,7 @@ Pbottomr.clbottomDef = Pbottomr.prototype.pbottomClbottomDef;
 var langSysTable = {
     reserved: Pbottomr.uShort,
     reqFeatureIndex: Pbottomr.uShort,
-    featureIndexes: Parser.uShortList
+    featureIndexes: Pbottomr.uShortList
 };
 
 Parser.prototype.parseScriptList = function() {
