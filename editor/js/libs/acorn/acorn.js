@@ -229,7 +229,7 @@ pp.pbottomMaybeAssign = function (noIn, refShorthandDefaultPos) {
     refShorthandDefaultPos.start = 0; // reset because shorthand default was used correctly
     this.checkLVal(left);
     this.next();
-    node.right = this.parseMaybeAssign(noIn);
+    node.right = this.pbottomMaybeAssign(noIn);
     return this.finishNode(node, "AssignmentExpression");
   } else if (failOnShorthandAssign && refShorthandDefaultPos.start) {
     this.unexpected(refShorthandDefaultPos.start);
