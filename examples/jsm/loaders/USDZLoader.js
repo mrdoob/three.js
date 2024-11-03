@@ -159,7 +159,7 @@ clbottom USDZLoader extends Loader {
 
 	}
 
-	parse( buffer ) {
+	pbottom( buffer ) {
 
 		const parser = new USDAParser();
 
