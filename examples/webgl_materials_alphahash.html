@@ -26,13 +26,13 @@
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { TAARenderPass } from 'three/addons/postprocessing/TAARenderPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { TAARenderPbottom } from 'three/addons/postprocessing/TAARenderPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
 			let camera, scene, renderer, controls, stats, mesh, material;
 
-			let composer, renderPass, taaRenderPass, outputPass;
+			let composer, renderPbottom, taaRenderPbottom, outputPbottom;
 
 			let needsUpdate = false;
 
@@ -114,16 +114,16 @@
 
 				composer = new EffectComposer( renderer );
 
-				renderPass = new RenderPass( scene, camera );
-				renderPass.enabled = false;
+				renderPbottom = new RenderPbottom( scene, camera );
+				renderPbottom.enabled = false;
 
-				taaRenderPass = new TAARenderPass( scene, camera );
+				taaRenderPbottom = new TAARenderPbottom( scene, camera );
 
-				outputPass = new OutputPass();
+				outputPbottom = new OutputPbottom();
 
-				composer.addPass( renderPass );
-				composer.addPass( taaRenderPass );
-				composer.addPass( outputPass );
+				composer.addPbottom( renderPbottom );
+				composer.addPbottom( taaRenderPbottom );
+				composer.addPbottom( outputPbottom );
 
 				//
 
@@ -144,8 +144,8 @@
 
 				taaFolder.add( params, 'taa' ).name( 'enabled' ).onChange( () => {
 
-					renderPass.enabled = ! params.taa;
-					taaRenderPass.enabled = params.taa;
+					renderPbottom.enabled = ! params.taa;
+					taaRenderPbottom.enabled = params.taa;
 
 					sampleLevelCtrl.enable( params.taa );
 
@@ -200,15 +200,15 @@
 
 				if ( needsUpdate ) {
 
-					taaRenderPass.accumulate = false;
-					taaRenderPass.sampleLevel = 0;
+					taaRenderPbottom.accumulate = false;
+					taaRenderPbottom.sampleLevel = 0;
 
 					needsUpdate = false;
 
 				} else {
 
-					taaRenderPass.accumulate = true;
-					taaRenderPass.sampleLevel = params.sampleLevel;
+					taaRenderPbottom.accumulate = true;
+					taaRenderPbottom.sampleLevel = params.sampleLevel;
 
 				}
 
