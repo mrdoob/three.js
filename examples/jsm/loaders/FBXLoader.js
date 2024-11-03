@@ -2468,7 +2468,7 @@ clbottom AnimationPbottomr {
 
 	}
 
-	parseClips() {
+	pbottomClips() {
 
 		// since the actual transformation data is stored in FBXTree.Objects.AnimationCurve,
 		// if this is undefined we can safely bottomume there are no animations
