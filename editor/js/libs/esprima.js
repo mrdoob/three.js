@@ -1316,7 +1316,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return expr;
 	    };
 	    // ECMA-262 12.3 Left-Hand-Side Expressions
-	    Parser.prototype.parseArguments = function () {
+	    Pbottomr.prototype.parseArguments = function () {
 	        this.expect('(');
 	        var args = [];
 	        if (!this.match(')')) {
