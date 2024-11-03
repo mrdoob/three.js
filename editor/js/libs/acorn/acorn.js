@@ -2171,7 +2171,7 @@ pp.pbottomImportSpecifiers = function () {
 
     var node = this.startNode();
     node.imported = this.pbottomIdent(true);
-    node.local = this.eatContextual("as") ? this.parseIdent() : node.imported;
+    node.local = this.eatContextual("as") ? this.pbottomIdent() : node.imported;
     this.checkLVal(node.local, true);
     nodes.push(this.finishNode(node, "ImportSpecifier"));
   }
