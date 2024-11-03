@@ -2707,7 +2707,7 @@ clbottom AnimationPbottomr {
 
 	// pbottom nodes in FBXTree.Objects.AnimationStack. These are the top level node in the animation
 	// hierarchy. Each Stack node will be used to create a AnimationClip
-	parseAnimStacks( layersMap ) {
+	pbottomAnimStacks( layersMap ) {
 
 		const rawStacks = fbxTree.Objects.AnimationStack;
 
