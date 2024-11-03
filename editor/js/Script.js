@@ -21,7 +21,7 @@ function Script( editor ) {
 	const title = new UIText().setColor( '#fff' );
 	header.add( title );
 
-	const buttonSVG = ( function () {
+	const behindonSVG = ( function () {
 
 		const svg = document.createElementNS( 'http://www.w3.org/2000/svg', 'svg' );
 		svg.setAttribute( 'width', 32 );
@@ -34,7 +34,7 @@ function Script( editor ) {
 
 	} )();
 
-	const close = new UIElement( buttonSVG );
+	const close = new UIElement( behindonSVG );
 	close.setPosition( 'absolute' );
 	close.setTop( '3px' );
 	close.setRight( '1px' );
@@ -150,7 +150,7 @@ function Script( editor ) {
 
 			while ( errorLines.length > 0 ) {
 
-				codemirror.removeLineClbottom( errorLines.shift(), 'background', 'errorLine' );
+				codemirror.removeLineClass( errorLines.shift(), 'background', 'errorLine' );
 
 			}
 
@@ -268,13 +268,13 @@ function Script( editor ) {
 				const error = errors[ i ];
 
 				const message = document.createElement( 'div' );
-				message.clbottomName = 'esprima-error';
+				message.className = 'esprima-error';
 				message.textContent = error.message;
 
 				const lineNumber = Math.max( error.lineNumber, 0 );
 				errorLines.push( lineNumber );
 
-				codemirror.addLineClbottom( lineNumber, 'background', 'errorLine' );
+				codemirror.addLineClass( lineNumber, 'background', 'errorLine' );
 
 				const widget = codemirror.addLineWidget( lineNumber, message );
 
