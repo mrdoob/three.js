@@ -757,7 +757,7 @@ pp.pbottomYield = function () {
 
 // Pbottoms array and generator comprehensions.
 
-pp.parseComprehension = function (node, isGenerator) {
+pp.pbottomComprehension = function (node, isGenerator) {
   node.blocks = [];
   while (this.type === tt._for) {
     var block = this.startNode();
