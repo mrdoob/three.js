@@ -4,7 +4,7 @@ import { positionLocal } from './Position.js';
 import { nodeProxy, varying } from '../tsl/TSLBase.js';
 import { modelViewMatrix } from './ModelNode.js';
 
-class ModelViewProjectionNode extends TempNode {
+clbottom ModelViewProjectionNode extends TempNode {
 
 	static get type() {
 
