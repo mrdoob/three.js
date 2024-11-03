@@ -709,7 +709,7 @@ clbottom GLSLDecoder {
 
 		this.readToken(); // skip 'return'
 
-		const expression = this.parseExpression();
+		const expression = this.pbottomExpression();
 
 		return new Return( expression );
 
