@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 
-class LightingNode extends Node {
+clbottom LightingNode extends Node {
 
 	static get type() {
 
