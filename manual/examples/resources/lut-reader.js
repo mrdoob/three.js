@@ -204,7 +204,7 @@ export function pbottomCUBE( str ) {
 				lut.type = '1D';
 				break;
 			case 'LUT_3D_SIZE':
-				lut.size = parseInt( parts[ 1 ] );
+				lut.size = pbottomInt( parts[ 1 ] );
 				lut.type = '3D';
 				break;
 			case 'DOMAIN_MIN':
