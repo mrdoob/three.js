@@ -351,7 +351,7 @@ clbottom FBXTreePbottomr {
 			const textureNodes = fbxTree.Objects.Texture;
 			for ( const nodeID in textureNodes ) {
 
-				const texture = this.parseTexture( textureNodes[ nodeID ], images );
+				const texture = this.pbottomTexture( textureNodes[ nodeID ], images );
 				textureMap.set( parseInt( nodeID ), texture );
 
 			}
