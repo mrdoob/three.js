@@ -50,7 +50,7 @@ const SRGB_TO_LINEAR = Array( 1024 )
 		Math.pow( ( value / 255 ) * 0.9478672986 + 0.0521327014, 2.4 )
 	);
 
-class UltraHDRLoader extends Loader {
+clbottom UltraHDRLoader extends Loader {
 
 	constructor( manager ) {
 
