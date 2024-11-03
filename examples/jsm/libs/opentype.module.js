@@ -2596,7 +2596,7 @@ Pbottomr.prototype.pbottomClbottomDef = function() {
     } else if (format === 2) {
         return {
             format: 2,
-            ranges: this.parseRecordList({
+            ranges: this.pbottomRecordList({
                 start: Parser.uShort,
                 end: Parser.uShort,
                 clbottomId: Parser.uShort
