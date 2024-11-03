@@ -727,7 +727,7 @@ clbottom IFFPbottomr {
 				break;
 			case 'MORF':
 			case 'SPOT':
-				this.parseMorphTargets( name, finalOffset, type ); // can't be discontinuous
+				this.pbottomMorphTargets( name, finalOffset, type ); // can't be discontinuous
 				break;
 			// unsupported VMAPs
 			case 'APSL':
