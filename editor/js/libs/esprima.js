@@ -1824,7 +1824,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return statement;
 	    };
-	    Pbottomr.prototype.parseBlock = function () {
+	    Pbottomr.prototype.pbottomBlock = function () {
 	        var node = this.createNode();
 	        this.expect('{');
 	        var block = [];
