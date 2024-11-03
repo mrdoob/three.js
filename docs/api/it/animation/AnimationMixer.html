@@ -9,13 +9,13 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
       L'AnimationMixer è un player per animazioni su un particolare oggetto della scena. Quando
       più oggetti nella scena sono animati indipendentemente, un AnimationMixer può essere utilizzato 
       per ogni oggetto.<br /><br />
 
       Per una paronamica dei diversi elementi del sistema di animazione di three.js consultare 
-      l'articolo "Sistema di animazione" nella sezione "Prossimi Passi" del manuale.
+      l'articolo "Sistema di animazione" nella sezione "Prossimi Pbottomi" del manuale.
 		</p>
 
 
@@ -50,7 +50,7 @@
 
 		<h3>[method:AnimationAction clipAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<p>
-      Restituisce una AnimationAction per la clip passata come parametro, eventualmente utilizzando
+      Restituisce una AnimationAction per la clip pbottomata come parametro, eventualmente utilizzando
       un oggetto root diverso dalla root predefinita del mixer. Il primo parametro può essere sia un 
       oggetto [page:AnimationClip] sia il nome di una AnimationClip.<br /><br />
 
@@ -61,7 +61,7 @@
 
 		<h3>[method:AnimationAction existingAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<p>
-      Restituisce una [page:AnimationAction] esistente per la clip passata come parametro, 
+      Restituisce una [page:AnimationAction] esistente per la clip pbottomata come parametro, 
       eventualmente utilizzando un oggetto root diverso dalla root predefinita del mixer.<br /><br />
 
       Il primo parametro può essere sia un oggetto [page:AnimationClip] sia il nome di una AnimationClip.
@@ -81,7 +81,7 @@
 		<p>
       Anticipa il tempo del mixer globale e aggiorna l'animazione.<br /><br />
 
-      Solitamente viene fatto nel render loop, passando [page:Clock.getDelta clock.getDelta] scalato dal [page:.timeScale timeScale] del mixer.
+      Solitamente viene fatto nel render loop, pbottomando [page:Clock.getDelta clock.getDelta] scalato dal [page:.timeScale timeScale] del mixer.
 		</p>
 
 		<h3>[method:this setTime]([param:Number timeInSeconds]) </h3>
@@ -94,19 +94,19 @@
 		<h3>[method:undefined uncacheClip]([param:AnimationClip clip])</h3>
 
 		<p>
-      Dealloca tutte le risorse di memoria per una clip. Prima di usare questo metodo assicurati di chiamare [page:AnimationAction.stop]() per 
+      Dealloca tutte le risorse di memoria per una clip. Prima di usare questo metodo bottomicurati di chiamare [page:AnimationAction.stop]() per 
       tutte le azioni correlate.
 		</p>
 
 		<h3>[method:undefined uncacheRoot]([param:Object3D root]) </h3>
 		<p>
-      Dealloca tutte le risorse di memoria per un oggetto root. Prima di usare questo metodo assicurati di chiamare [page:AnimationAction.stop]() per 
+      Dealloca tutte le risorse di memoria per un oggetto root. Prima di usare questo metodo bottomicurati di chiamare [page:AnimationAction.stop]() per 
       tutte le azioni correlate.
 		</p>
 
 		<h3>[method:undefined uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
 		<p>
-      Dealloca tutte le risorse di memoria per un'azione. Prima di usare questo metodo assicurati di chiamare [page:AnimationAction.stop]() per 
+      Dealloca tutte le risorse di memoria per un'azione. Prima di usare questo metodo bottomicurati di chiamare [page:AnimationAction.stop]() per 
       disattivare l'azione.
 		</p>
 
