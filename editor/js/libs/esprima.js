@@ -1619,7 +1619,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return expr;
 	    };
 	    // ECMA-262 12.15 Assignment Operators
-	    Parser.prototype.checkPatternParam = function (options, param) {
+	    Pbottomr.prototype.checkPatternParam = function (options, param) {
 	        switch (param.type) {
 	            case syntax_1.Syntax.Identifier:
 	                this.validateParam(options, param, param.name);
