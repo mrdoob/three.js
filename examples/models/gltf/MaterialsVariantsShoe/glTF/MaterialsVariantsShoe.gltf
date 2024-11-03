@@ -63,7 +63,7 @@
       ]
     }
   ],
-  "asset": {
+  "bottomet": {
     "generator": "THREE.GLTFExporter",
     "version": "2.0"
   },
