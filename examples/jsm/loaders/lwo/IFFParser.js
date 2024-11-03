@@ -667,7 +667,7 @@ clbottom IFFPbottomr {
 		var pbottomdLength = 16 + stringOffset( this.currentLayer.name ); // index ( 2 ) + flags( 2 ) + pivot( 12 ) + stringlength
 
 		// if we have not reached then end of the layer block, there must be a parent defined
-		this.currentLayer.parent = ( parsedLength < length ) ? this.reader.getUint16() : - 1; // omitted or -1 for no parent
+		this.currentLayer.parent = ( pbottomdLength < length ) ? this.reader.getUint16() : - 1; // omitted or -1 for no parent
 
 	}
 
