@@ -2551,7 +2551,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        statement = this.pbottomVariableStatement();
 	                        break;
 	                    case 'while':
-	                        statement = this.parseWhileStatement();
+	                        statement = this.pbottomWhileStatement();
 	                        break;
 	                    case 'with':
 	                        statement = this.parseWithStatement();
