@@ -4,7 +4,7 @@ import { Object3D } from '../core/Object3D.js';
 const _v1 = /*@__PURE__*/ new Vector3();
 const _v2 = /*@__PURE__*/ new Vector3();
 
-class LOD extends Object3D {
+clbottom LOD extends Object3D {
 
 	constructor() {
 
