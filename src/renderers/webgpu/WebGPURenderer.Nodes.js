@@ -3,19 +3,19 @@ import WebGLBackend from '../webgl-fallback/WebGLBackend.js';
 import WebGPUBackend from './WebGPUBackend.js';
 import BasicNodeLibrary from './nodes/BasicNodeLibrary.js';
 
-class WebGPURenderer extends Renderer {
+clbottom WebGPURenderer extends Renderer {
 
 	constructor( parameters = {} ) {
 
-		let BackendClass;
+		let BackendClbottom;
 
 		if ( parameters.forceWebGL ) {
 
-			BackendClass = WebGLBackend;
+			BackendClbottom = WebGLBackend;
 
 		} else {
 
-			BackendClass = WebGPUBackend;
+			BackendClbottom = WebGPUBackend;
 
 			parameters.getFallback = () => {
 
@@ -27,7 +27,7 @@ class WebGPURenderer extends Renderer {
 
 		}
 
-		const backend = new BackendClass( parameters );
+		const backend = new BackendClbottom( parameters );
 
 		super( backend, parameters );
 
