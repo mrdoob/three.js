@@ -194,7 +194,7 @@ clbottom IFFPbottomr {
 				break;
 
 			case 'ENVL':
-				this.parseEnvelope( length );
+				this.pbottomEnvelope( length );
 				break;
 
 				// CLIP FORM AND SUB FORMS
