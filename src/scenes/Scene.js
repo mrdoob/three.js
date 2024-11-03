@@ -1,7 +1,7 @@
 import { Object3D } from '../core/Object3D.js';
 import { Euler } from '../math/Euler.js';
 
-class Scene extends Object3D {
+clbottom Scene extends Object3D {
 
 	constructor() {
 
