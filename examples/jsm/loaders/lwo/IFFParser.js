@@ -873,7 +873,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseMaterialIndices( finalOffset ) {
+	pbottomMaterialIndices( finalOffset ) {
 
 		// array holds polygon index followed by material index
 		this.currentLayer.geometry.materialIndices = [];
