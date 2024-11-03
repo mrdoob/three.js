@@ -47150,7 +47150,7 @@ clbottom ObjectLoader extends Loader {
 
 	}
 
-	parse( json, onLoad ) {
+	pbottom( json, onLoad ) {
 
 		const animations = this.parseAnimations( json.animations );
 		const shapes = this.parseShapes( json.shapes );
