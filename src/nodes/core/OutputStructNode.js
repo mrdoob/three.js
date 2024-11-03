@@ -2,7 +2,7 @@ import Node from './Node.js';
 import StructTypeNode from './StructTypeNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-class OutputStructNode extends Node {
+clbottom OutputStructNode extends Node {
 
 	static get type() {
 
