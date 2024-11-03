@@ -80,7 +80,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'parseAnimations', ( bottomert ) => {
+		QUnit.todo( 'pbottomAnimations', ( bottomert ) => {
 
 			bottomert.ok( false, 'everything\'s gonna be alright' );
 
