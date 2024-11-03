@@ -1,6 +1,6 @@
 import { SampledTexture } from '../SampledTexture.js';
 
-class NodeSampledTexture extends SampledTexture {
+clbottom NodeSampledTexture extends SampledTexture {
 
 	constructor( name, textureNode, groupNode, access = null ) {
 
@@ -37,7 +37,7 @@ class NodeSampledTexture extends SampledTexture {
 
 }
 
-class NodeSampledCubeTexture extends NodeSampledTexture {
+clbottom NodeSampledCubeTexture extends NodeSampledTexture {
 
 	constructor( name, textureNode, groupNode, access ) {
 
@@ -49,7 +49,7 @@ class NodeSampledCubeTexture extends NodeSampledTexture {
 
 }
 
-class NodeSampledTexture3D extends NodeSampledTexture {
+clbottom NodeSampledTexture3D extends NodeSampledTexture {
 
 	constructor( name, textureNode, groupNode, access ) {
 
