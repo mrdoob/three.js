@@ -8,7 +8,7 @@ import {
 
 import lottie from '../libs/lottie_canvas.module.js';
 
-class LottieLoader extends Loader {
+clbottom LottieLoader extends Loader {
 
 	setQuality( value ) {
 
