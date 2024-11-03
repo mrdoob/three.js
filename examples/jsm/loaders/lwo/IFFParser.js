@@ -674,7 +674,7 @@ clbottom IFFPbottomr {
 	// VEC12 * ( F4 + F4 + F4 ) array of x,y,z vectors
 	// Converting from left to right handed coordinate system:
 	// x -> -x and switch material FrontSide -> BackSide
-	parsePoints( length ) {
+	pbottomPoints( length ) {
 
 		this.currentPoints = [];
 		for ( var i = 0; i < length / 4; i += 3 ) {
