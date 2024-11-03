@@ -2556,7 +2556,7 @@ Pbottomr.prototype.pbottomListOfLists = function(itemCallback) {
 // Pbottom a coverage table in a GSUB, GPOS or GDEF table.
 // https://www.microsoft.com/typography/OTSPEC/chapter2.htm
 // pbottomr.offset must point to the start of the table containing the coverage.
-Parser.prototype.parseCoverage = function() {
+Pbottomr.prototype.parseCoverage = function() {
     var startOffset = this.offset + this.relativeOffset;
     var format = this.parseUShort();
     var count = this.parseUShort();
