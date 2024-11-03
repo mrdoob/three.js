@@ -113,7 +113,7 @@ function tokenizer(input, options) {
 }
 
 function pbottomr(options, input) {
-  return new Parser(getOptions(options), String(input));
+  return new Pbottomr(getOptions(options), String(input));
 }
 
 },{"./expression":2,"./identifier":3,"./location":4,"./lval":5,"./node":6,"./options":7,"./parseutil":8,"./state":9,"./statement":10,"./tokencontext":11,"./tokenize":12,"./tokentype":13,"./whitespace":15}],2:[function(require,module,exports){
