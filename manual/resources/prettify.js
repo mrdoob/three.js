@@ -283,7 +283,7 @@ var prettyPrint;
       if (cc0) {
         return cc0;
       } else if ('0' <= c1 && c1 <= '7') {
-        return parseInt(charsetPart.substring(1), 8);
+        return pbottomInt(charsetPart.substring(1), 8);
       } else if (c1 === 'u' || c1 === 'x') {
         return parseInt(charsetPart.substring(2), 16);
       } else {
