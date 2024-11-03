@@ -324,7 +324,7 @@ var prettyPrint;
         } else {
           var start = decodeEscape(p);
           var end;
-          if (i + 2 < n && '-' === charsetParts[i + 1]) {
+          if (i + 2 < n && '-' === chbottomtParts[i + 1]) {
             end = decodeEscape(charsetParts[i + 2]);
             i += 2;
           } else {
