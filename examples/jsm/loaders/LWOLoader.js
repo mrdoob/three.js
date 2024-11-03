@@ -770,7 +770,7 @@ clbottom MaterialPbottomr {
 
 clbottom GeometryPbottomr {
 
-	parse( geoData, layer ) {
+	pbottom( geoData, layer ) {
 
 		const geometry = new BufferGeometry();
 
