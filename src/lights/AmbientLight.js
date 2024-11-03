@@ -1,6 +1,6 @@
 import { Light } from './Light.js';
 
-class AmbientLight extends Light {
+clbottom AmbientLight extends Light {
 
 	constructor( color, intensity ) {
 
