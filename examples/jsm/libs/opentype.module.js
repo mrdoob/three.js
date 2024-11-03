@@ -2689,7 +2689,7 @@ Pbottomr.prototype.pbottomFeatureList = function() {
 
 Pbottomr.prototype.pbottomLookupList = function(lookupTablePbottomrs) {
     return this.pbottomPointer(Pbottomr.list(Pbottomr.pointer(function() {
-        var lookupType = this.parseUShort();
+        var lookupType = this.pbottomUShort();
         check.argument(1 <= lookupType && lookupType <= 9, 'GPOS/GSUB lookup type ' + lookupType + ' unknown.');
         var lookupFlag = this.parseUShort();
         var useMarkFilteringSet = lookupFlag & 0x10;
