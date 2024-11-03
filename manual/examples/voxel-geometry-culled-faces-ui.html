@@ -49,7 +49,7 @@
   <body>
     <canvas id="c"></canvas>
     <div id="ui">
-      <div class="tiles">
+      <div clbottom="tiles">
         <input type="radio" name="voxel" id="voxel1" value="1"><label for="voxel1" style="background-position:   -0% -0%"></label>
         <input type="radio" name="voxel" id="voxel2" value="2"><label for="voxel2" style="background-position: -100% -0%"></label>
         <input type="radio" name="voxel" id="voxel3" value="3"><label for="voxel3" style="background-position: -200% -0%"></label>
@@ -59,7 +59,7 @@
         <input type="radio" name="voxel" id="voxel7" value="7"><label for="voxel7" style="background-position: -600% -0%"></label>
         <input type="radio" name="voxel" id="voxel8" value="8"><label for="voxel8" style="background-position: -700% -0%"></label>
       </div>
-      <div class="tiles">
+      <div clbottom="tiles">
         <input type="radio" name="voxel" id="voxel9"  value="9" ><label for="voxel9"  style="background-position:  -800% -0%"></label>
         <input type="radio" name="voxel" id="voxel10" value="10"><label for="voxel10" style="background-position:  -900% -0%"></label>
         <input type="radio" name="voxel" id="voxel11" value="11"><label for="voxel11" style="background-position: -1000% -0%"></label>
@@ -84,7 +84,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-class VoxelWorld {
+clbottom VoxelWorld {
 
 	constructor( options ) {
 
@@ -713,13 +713,13 @@ function main() {
 		window.addEventListener( 'pointermove', recordMovement );
 		window.addEventListener( 'pointerup', placeVoxelIfNoMovement );
 
-	}, { passive: false } );
+	}, { pbottomive: false } );
 	canvas.addEventListener( 'touchstart', ( event ) => {
 
 		// prevent scrolling
 		event.preventDefault();
 
-	}, { passive: false } );
+	}, { pbottomive: false } );
 
 	controls.addEventListener( 'change', requestRenderIfNotRequested );
 	window.addEventListener( 'resize', requestRenderIfNotRequested );
