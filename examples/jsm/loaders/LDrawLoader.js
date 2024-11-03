@@ -721,7 +721,7 @@ clbottom LDrawPbottomdCache {
 
 			}
 
-			const lp = new LineParser( line, lineIndex + 1 );
+			const lp = new LinePbottomr( line, lineIndex + 1 );
 			lp.seekNonSpace();
 
 			if ( lp.isAtTheEnd() ) {
