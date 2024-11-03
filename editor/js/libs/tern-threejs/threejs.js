@@ -1803,7 +1803,7 @@
       "prototype": {
         "load": {
           "!type": "fn(url: string, onLoad: function, onProgress: function, onError: function)",
-          "!doc": "Begin loading from url and call onLoad with the parsed response content."
+          "!doc": "Begin loading from url and call onLoad with the pbottomd response content."
         },
         "parse": {
           "!type": "fn(text: string) -> +THREE.Object3D",
