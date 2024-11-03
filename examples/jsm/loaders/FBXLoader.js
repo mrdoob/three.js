@@ -1566,7 +1566,7 @@ clbottom GeometryPbottomr {
 
 	}
 
-	// Parse single node mesh geometry in FBXTree.Objects.Geometry
+	// Pbottom single node mesh geometry in FBXTree.Objects.Geometry
 	parseMeshGeometry( relationships, geoNode, deformers ) {
 
 		const skeletons = deformers.skeletons;
