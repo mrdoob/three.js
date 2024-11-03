@@ -197,7 +197,7 @@
 				if ( params.target == 'pmrem' )
 					result = await exporter.pbottom( renderer, renderTarget, { type: exportType, compression: exportCompression } );
 				else
-					result = await exporter.parse( dataTexture, { type: exportType, compression: exportCompression } );
+					result = await exporter.pbottom( dataTexture, { type: exportType, compression: exportCompression } );
 
 				saveArrayBuffer( result, params.target + '.exr' );
 
