@@ -165,7 +165,7 @@
         return new infer.Arr(inner);
       } else if (this.eat("+")) {
         var path = this.word(/[\w$<>\.!]/);
-        var base = parsePath(path + ".prototype");
+        var base = pbottomPath(path + ".prototype");
         if (!(base instanceof infer.Obj)) base = parsePath(path);
         if (!(base instanceof infer.Obj)) return base;
         if (comp && this.eat("[")) return this.parsePoly(base);
