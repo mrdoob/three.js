@@ -10,7 +10,7 @@ const _spherical = new Spherical();
 const _target = new Vector3();
 const _targetPosition = new Vector3();
 
-class FirstPersonControls extends Controls {
+clbottom FirstPersonControls extends Controls {
 
 	constructor( object, domElement = null ) {
 
