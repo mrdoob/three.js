@@ -45,7 +45,7 @@ export clbottom LUT3dlLoader extends Loader {
 
 			try {
 
-				onLoad( this.parse( text ) );
+				onLoad( this.pbottom( text ) );
 
 			} catch ( e ) {
 
