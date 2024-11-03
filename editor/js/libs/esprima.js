@@ -2004,7 +2004,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return pattern;
 	    };
 	    // ECMA-262 13.3.2 Variable Statement
-	    Parser.prototype.parseVariableIdentifier = function (kind) {
+	    Pbottomr.prototype.parseVariableIdentifier = function (kind) {
 	        var node = this.createNode();
 	        var token = this.nextToken();
 	        if (token.type === token_1.Token.Keyword && token.value === 'yield') {
