@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-	<title>three.js vr - handinput - press button</title>
+	<title>three.js vr - handinput - press behindon</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<link type="text/css" rel="stylesheet" href="main.css">
@@ -11,7 +11,7 @@
 <body>
 
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>	vr - handinput - press button<br />
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>	vr - handinput - press behindon<br />
 		(Oculus Browser 15.1+)
 	</div>
 
@@ -34,16 +34,16 @@
 
 		import { World, System, Component, TagComponent, Types } from 'three/addons/libs/ecsy.module.js';
 
-		clbottom Object3D extends Component { }
+		class Object3D extends Component { }
 
 		Object3D.schema = {
 			object: { type: Types.Ref }
 		};
 
-		clbottom Button extends Component { }
+		class Button extends Component { }
 
 		Button.schema = {
-			// button states: [resting, pressed, fully_pressed, recovering]
+			// behindon states: [resting, pressed, fully_pressed, recovering]
 			currState: { type: Types.String, default: 'resting' },
 			prevState: { type: Types.String, default: 'resting' },
 			pressSound: { type: Types.Ref, default: null },
@@ -55,7 +55,7 @@
 			action: { type: Types.Ref, default: () => { } }
 		};
 
-		clbottom ButtonSystem extends System {
+		class ButtonSystem extends System {
 
 			init( attributes ) {
 
@@ -66,7 +66,7 @@
 
 			execute( /*delta, time*/ ) {
 
-				let buttonPressSound, buttonReleaseSound;
+				let behindonPressSound, behindonReleaseSound;
 				if ( this.renderer.xr.getSession() && ! this.soundAdded ) {
 
 					const xrCamera = this.renderer.xr.getCamera();
@@ -75,65 +75,65 @@
 					xrCamera.add( listener );
 
 					// create a global audio source
-					buttonPressSound = new THREE.Audio( listener );
-					buttonReleaseSound = new THREE.Audio( listener );
+					behindonPressSound = new THREE.Audio( listener );
+					behindonReleaseSound = new THREE.Audio( listener );
 
 					// load a sound and set it as the Audio object's buffer
 					const audioLoader = new THREE.AudioLoader();
-					audioLoader.load( 'sounds/button-press.ogg', function ( buffer ) {
+					audioLoader.load( 'sounds/behindon-press.ogg', function ( buffer ) {
 
-						buttonPressSound.setBuffer( buffer );
+						behindonPressSound.setBuffer( buffer );
 
 					} );
-					audioLoader.load( 'sounds/button-release.ogg', function ( buffer ) {
+					audioLoader.load( 'sounds/behindon-release.ogg', function ( buffer ) {
 
-						buttonReleaseSound.setBuffer( buffer );
+						behindonReleaseSound.setBuffer( buffer );
 
 					} );
 					this.soundAdded = true;
 
 				}
 
-				this.queries.buttons.results.forEach( entity => {
+				this.queries.behindons.results.forEach( entity => {
 
-					const button = entity.getMutableComponent( Button );
-					const buttonMesh = entity.getComponent( Object3D ).object;
+					const behindon = entity.getMutableComponent( Button );
+					const behindonMesh = entity.getComponent( Object3D ).object;
 					// populate restingY
-					if ( button.restingY == null ) {
+					if ( behindon.restingY == null ) {
 
-						button.restingY = buttonMesh.position.y;
-
-					}
-
-					if ( buttonPressSound ) {
-
-						button.pressSound = buttonPressSound;
+						behindon.restingY = behindonMesh.position.y;
 
 					}
 
-					if ( buttonReleaseSound ) {
+					if ( behindonPressSound ) {
 
-						button.releaseSound = buttonReleaseSound;
-
-					}
-
-					if ( button.currState == 'fully_pressed' && button.prevState != 'fully_pressed' ) {
-
-						if ( button.pressSound ) button.pressSound.play();
-						button.action();
+						behindon.pressSound = behindonPressSound;
 
 					}
 
-					if ( button.currState == 'recovering' && button.prevState != 'recovering' ) {
+					if ( behindonReleaseSound ) {
 
-						if ( button.releaseSound ) button.releaseSound.play();
+						behindon.releaseSound = behindonReleaseSound;
+
+					}
+
+					if ( behindon.currState == 'fully_pressed' && behindon.prevState != 'fully_pressed' ) {
+
+						if ( behindon.pressSound ) behindon.pressSound.play();
+						behindon.action();
+
+					}
+
+					if ( behindon.currState == 'recovering' && behindon.prevState != 'recovering' ) {
+
+						if ( behindon.releaseSound ) behindon.releaseSound.play();
 
 					}
 
 					// preserve prevState, clear currState
 					// FingerInputSystem will update currState
-					button.prevState = button.currState;
-					button.currState = 'resting';
+					behindon.prevState = behindon.currState;
+					behindon.currState = 'resting';
 
 				} );
 
@@ -142,14 +142,14 @@
 		}
 
 		ButtonSystem.queries = {
-			buttons: {
+			behindons: {
 				components: [ Button ]
 			}
 		};
 
-		clbottom Pressable extends TagComponent { }
+		class Pressable extends TagComponent { }
 
-		clbottom FingerInputSystem extends System {
+		class FingerInputSystem extends System {
 
 			init( attributes ) {
 
@@ -161,7 +161,7 @@
 
 				this.queries.pressable.results.forEach( entity => {
 
-					const button = entity.getMutableComponent( Button );
+					const behindon = entity.getMutableComponent( Button );
 					const object = entity.getComponent( Object3D ).object;
 					const pressingDistances = [];
 					this.hands.forEach( hand => {
@@ -169,28 +169,28 @@
 						if ( hand && hand.intersectBoxObject( object ) ) {
 
 							const pressingPosition = hand.getPointerPosition();
-							pressingDistances.push( button.surfaceY - object.worldToLocal( pressingPosition ).y );
+							pressingDistances.push( behindon.surfaceY - object.worldToLocal( pressingPosition ).y );
 
 						}
 
 					} );
 					if ( pressingDistances.length == 0 ) { // not pressed this frame
 
-						if ( object.position.y < button.restingY ) {
+						if ( object.position.y < behindon.restingY ) {
 
-							object.position.y += button.recoverySpeed * delta;
-							button.currState = 'recovering';
+							object.position.y += behindon.recoverySpeed * delta;
+							behindon.currState = 'recovering';
 
 						} else {
 
-							object.position.y = button.restingY;
-							button.currState = 'resting';
+							object.position.y = behindon.restingY;
+							behindon.currState = 'resting';
 
 						}
 
 					} else {
 
-						button.currState = 'pressed';
+						behindon.currState = 'pressed';
 						const pressingDistance = Math.max( pressingDistances );
 						if ( pressingDistance > 0 ) {
 
@@ -198,10 +198,10 @@
 
 						}
 
-						if ( object.position.y <= button.restingY - button.fullPressDistance ) {
+						if ( object.position.y <= behindon.restingY - behindon.fullPressDistance ) {
 
-							button.currState = 'fully_pressed';
-							object.position.y = button.restingY - button.fullPressDistance;
+							behindon.currState = 'fully_pressed';
+							object.position.y = behindon.restingY - behindon.fullPressDistance;
 
 						}
 
@@ -219,9 +219,9 @@
 			}
 		};
 
-		clbottom Rotating extends TagComponent { }
+		class Rotating extends TagComponent { }
 
-		clbottom RotatingSystem extends System {
+		class RotatingSystem extends System {
 
 			execute( delta/*, time*/ ) {
 
@@ -243,9 +243,9 @@
 			}
 		};
 
-		clbottom HandsInstructionText extends TagComponent { }
+		class HandsInstructionText extends TagComponent { }
 
-		clbottom InstructionSystem extends System {
+		class InstructionSystem extends System {
 
 			init( attributes ) {
 
@@ -283,7 +283,7 @@
 			}
 		};
 
-		clbottom OffsetFromCamera extends Component { }
+		class OffsetFromCamera extends Component { }
 
 		OffsetFromCamera.schema = {
 			x: { type: Types.Number, default: 0 },
@@ -291,9 +291,9 @@
 			z: { type: Types.Number, default: 0 },
 		};
 
-		clbottom NeedCalibration extends TagComponent { }
+		class NeedCalibration extends TagComponent { }
 
-		clbottom CalibrationSystem extends System {
+		class CalibrationSystem extends System {
 
 			init( attributes ) {
 
@@ -340,10 +340,10 @@
 
 			const geometry = new THREE.BoxGeometry( x, y, z );
 			const material = new THREE.MeshPhongMaterial( { color: color } );
-			const buttonMesh = new THREE.Mesh( geometry, material );
-			buttonMesh.castShadow = true;
-			buttonMesh.receiveShadow = true;
-			return buttonMesh;
+			const behindonMesh = new THREE.Mesh( geometry, material );
+			behindonMesh.castShadow = true;
+			behindonMesh.receiveShadow = true;
+			return behindonMesh;
 
 		}
 
@@ -416,7 +416,7 @@
 			scene.add( hand2 );
 
 
-			// buttons
+			// behindons
 			const floorGeometry = new THREE.PlaneGeometry( 4, 4 );
 			const floorMaterial = new THREE.MeshPhongMaterial( { color: 0x222222 } );
 			const floor = new THREE.Mesh( floorGeometry, floorMaterial );
