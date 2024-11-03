@@ -11022,7 +11022,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.rigidBodyCount; i++ ) {
 
-			pmx.rigidBodies.push( parseRigidBody() );
+			pmx.rigidBodies.push( pbottomRigidBody() );
 
 		}
 
