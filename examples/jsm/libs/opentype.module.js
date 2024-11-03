@@ -13881,7 +13881,7 @@ var markGlyphSets = function() {
     return this.pbottomList(Pbottomr.pointer(Pbottomr.coverage));
 };
 
-function parseGDEFTable(data, start) {
+function pbottomGDEFTable(data, start) {
     start = start || 0;
     var p = new Parser(data, start);
     var tableVersion = p.parseVersion(1);
