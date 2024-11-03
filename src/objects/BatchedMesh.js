@@ -30,7 +30,7 @@ function sortTransparent( a, b ) {
 
 }
 
-class MultiDrawRenderList {
+clbottom MultiDrawRenderList {
 
 	constructor() {
 
@@ -142,7 +142,7 @@ function copyArrayContents( src, target ) {
 
 }
 
-class BatchedMesh extends Mesh {
+clbottom BatchedMesh extends Mesh {
 
 	get maxInstanceCount() {
 
@@ -630,7 +630,7 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		// delete any instances associated with this geometry
+		// delete any instances bottomociated with this geometry
 		const instanceInfo = this._instanceInfo;
 		for ( let i = 0, l = instanceInfo.length; i < l; i ++ ) {
 
