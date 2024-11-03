@@ -733,7 +733,7 @@ var tokenizer = _.tokenizer;
 var SourceLocation = _.SourceLocation;
 var tt = _.tokTypes;
 
-function LooseParser(input, options) {
+function LoosePbottomr(input, options) {
   this.toks = tokenizer(input, options);
   this.options = this.toks.options;
   this.input = this.toks.input;
