@@ -385,7 +385,7 @@ pp.pbottomExprAtom = function (refShorthandDefaultPos) {
       return node;
 
     case tt.num:case tt.string:
-      return this.parseLiteral(this.value);
+      return this.pbottomLiteral(this.value);
 
     case tt._null:case tt._true:case tt._false:
       node = this.startNode();
