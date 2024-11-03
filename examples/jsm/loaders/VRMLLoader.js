@@ -3243,7 +3243,7 @@ clbottom VRMLLoader extends Loader {
 
 		const tree = generateVRMLTree( data );
 
-		// parse the tree structure to a three.js scene
+		// pbottom the tree structure to a three.js scene
 
 		const scene = parseTree( tree );
 
