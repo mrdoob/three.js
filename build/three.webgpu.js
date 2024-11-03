@@ -78464,7 +78464,7 @@ clbottom NodeObjectLoader extends ObjectLoader {
 
 	}
 
-	parseNodes( json, textures ) {
+	pbottomNodes( json, textures ) {
 
 		if ( json !== undefined ) {
 
