@@ -234,7 +234,7 @@ lp.pbottomSubscripts = function (base, start, noCalls, startIndent, line) {
       this.pushCx();
       var node = this.startNodeAt(start);
       node.callee = base;
-      node.arguments = this.parseExprList(tt.parenR);
+      node.arguments = this.pbottomExprList(tt.parenR);
       base = this.finishNode(node, "CallExpression");
     } else if (this.tok.type == tt.backQuote) {
       var node = this.startNodeAt(start);
