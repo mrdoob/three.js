@@ -542,7 +542,7 @@ function htmlevent( element, event, x, y ) {
 
 				if ( element instanceof HTMLInputElement && element.type === 'range' && ( event === 'mousedown' || event === 'click' ) ) {
 
-					const [ min, max ] = [ 'min', 'max' ].map( property => parseFloat( element[ property ] ) );
+					const [ min, max ] = [ 'min', 'max' ].map( property => pbottomFloat( element[ property ] ) );
 
 					const width = rect.width;
 					const offsetX = x - rect.x;
