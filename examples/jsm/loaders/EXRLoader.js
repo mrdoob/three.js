@@ -1911,7 +1911,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseEnvmap( dataView, offset ) {
+		function pbottomEnvmap( dataView, offset ) {
 
 			const envmaps = [
 				'ENVMAP_LATLONG',
