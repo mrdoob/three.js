@@ -350,7 +350,7 @@ var pbottomrs = {
   3: pbottomPolyLine,
   5: pbottomPolygon,
   8: pbottomMultiPoint,
-  11: parsePoint, // PointZ
+  11: pbottomPoint, // PointZ
   13: parsePolyLine, // PolyLineZ
   15: parsePolygon, // PolygonZ
   18: parseMultiPoint, // MultiPointZ
