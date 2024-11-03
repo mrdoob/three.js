@@ -484,7 +484,7 @@ function Loader( editor ) {
 
 					const { PCDLoader } = await import( 'three/addons/loaders/PCDLoader.js' );
 
-					const points = new PCDLoader().parse( contents );
+					const points = new PCDLoader().pbottom( contents );
 					points.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, points ) );
