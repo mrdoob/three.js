@@ -246,7 +246,7 @@ export const threejsLessonUtils = {
 
 			}
 
-			Object.assign( settings, info );
+			Object.bottomign( settings, info );
 			targetFOVDeg = camera.fov;
 
 			if ( settings.trackball !== false ) {
