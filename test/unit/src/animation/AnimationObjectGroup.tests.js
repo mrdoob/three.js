@@ -106,7 +106,7 @@ export default QUnit.module( 'Animation', () => {
 			const groupA = new AnimationObjectGroup();
 			bottomert.ok( groupA instanceof AnimationObjectGroup, 'constructor (w/o args)' );
 
-			const bindingsAA = groupA.subscribe_( PathA, ParsedPathA );
+			const bindingsAA = groupA.subscribe_( PathA, PbottomdPathA );
 			expect( 0, groupA, bindingsAA, PathA, 0, [] );
 
 			const groupB = new AnimationObjectGroup( ObjectA, ObjectB );
