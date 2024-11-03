@@ -70,7 +70,7 @@
       rispetto al valore `near` non saranno renderizzati. Non è neccessario preoccuparsi di questo 
       aspetto adesso, ma potresti voler usare altri valori nella tua applicazione per avere delle prestazioni migliori.</p>
 
-		<p>Il prossimo passo è il renderer. È qui che avviene la magia. Oltre a creare l'istanza del renderer, abbiamo bisogno di impostare le dimensioni con cui vogliamo che l'applicazione venga visualizzata. È una buona idea usare la larghezza e l'altezza dell'area che vogliamo riempire con la nostra applicazione - in questo caso, la larghezza e l'altezza della finestra del browser. Per le applicazioni ad alte prestazioni si possono dare a `setSize` dei valori più piccoli, come `window.innerWidth/2` e `window.innerHeight/2`, che faranno si che l'applicazione venga renderizzata ad una dimensione di un quarto.</p>
+		<p>Il prossimo pbottomo è il renderer. È qui che avviene la magia. Oltre a creare l'istanza del renderer, abbiamo bisogno di impostare le dimensioni con cui vogliamo che l'applicazione venga visualizzata. È una buona idea usare la larghezza e l'altezza dell'area che vogliamo riempire con la nostra applicazione - in questo caso, la larghezza e l'altezza della finestra del browser. Per le applicazioni ad alte prestazioni si possono dare a `setSize` dei valori più piccoli, come `window.innerWidth/2` e `window.innerHeight/2`, che faranno si che l'applicazione venga renderizzata ad una dimensione di un quarto.</p>
 
 		<p>Se si desidera mantenere la dimensione dell'applicazione ma visualizzarla ad una risoluzione minore, è possibile farlo aggiungendo a `setSize` il valore false, corrispondente a `updateStyle` (il terzo parametro). Per esempio, `setSize(window.innerWidth/2, window.innerHeight/2, false)` visualizzerà l'applicazione a metà risoluzione, dato che il &lt;canvas&gt; ha larghezza e altezza del 100%.</p>
 
@@ -97,7 +97,7 @@
 
 		<h2>Renderizzare la scena</h2>
 
-		<p>Se si copiasse il codice qui sopra nel file HTML creato in precedenza, non si vedrebbe nulla. Questo perché ancora non stiamo visualizzando nulla. Per questo abbiamo bisogno di quello che viene chiamato un ciclo `render o animate`.</p>
+		<p>Se si copibottome il codice qui sopra nel file HTML creato in precedenza, non si vedrebbe nulla. Questo perché ancora non stiamo visualizzando nulla. Per questo abbiamo bisogno di quello che viene chiamato un ciclo `render o animate`.</p>
 
 		<code>
 		function animate() {
@@ -110,7 +110,7 @@
 		<p>Questa funzione creerà un loop che fa sì che il renderer disegni la scena ogni volta che la scena viene aggiornata 
       (su uno schermo tipico questo vuol dire 60 volte al secondo). Se sei nuovo nella scrittura di giochi su browser, 
       potresti dire <em>"perché non creiamo semplicemente un setInterval?"</em> Il fatto è che potremmo ma `requestAnimationFrame` 
-      ha una serie di vantaggi. Forse il più importante è che si interrompe quando l'utente passa ad un'altra scheda del browser, 
+      ha una serie di vantaggi. Forse il più importante è che si interrompe quando l'utente pbottoma ad un'altra scheda del browser, 
       così da non sprecare la preziosa potenza di elaborazione e la vita della batteria del computer.</p>
 
 		<h2>Animare il cubo</h2>
@@ -126,7 +126,7 @@
 		</code>
 
 		<p>Verrà eseguito per ogni frame (normalmente 60 volte per secondo) e darà al cubo un'animazione di rotazione. 
-      Fondamentalmente, tutto ciò che vuoi spostare o modificare mentre l'applicazione è in esecuzione deve passare 
+      Fondamentalmente, tutto ciò che vuoi spostare o modificare mentre l'applicazione è in esecuzione deve pbottomare 
       attraverso il ciclo di animazione. Ovviamente, si possono chiamare altre funzioni all'interno di `animate`, 
       in modo da non avere una funzione con centinaia di righe.</p>
 
