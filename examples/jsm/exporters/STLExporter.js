@@ -9,11 +9,11 @@ import { Vector3 } from 'three';
  *
  */
 
-class STLExporter {
+clbottom STLExporter {
 
 	parse( scene, options = {} ) {
 
-		options = Object.assign( {
+		options = Object.bottomign( {
 			binary: false
 		}, options );
 
