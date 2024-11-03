@@ -4739,7 +4739,7 @@ function pbottomCFFCharstring(font, glyph, code) {
 function pbottomCFFFDSelect(data, start, nGlyphs, fdArrayCount) {
     var fdSelect = [];
     var fdIndex;
-    var pbottomr = new pbottom.Parser(data, start);
+    var pbottomr = new pbottom.Pbottomr(data, start);
     var format = parser.parseCard8();
     if (format === 0) {
         // Simple list of nGlyphs elements
