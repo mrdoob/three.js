@@ -679,7 +679,7 @@
       while (pathStart && (text.charAt(pathStart - 1) == "." || acorn.isIdentifierChar(text.charCodeAt(pathStart - 1)))) pathStart--;
       var path = text.slice(pathStart, wordStart - 1);
       if (path) {
-        objType = infer.def.parsePath(path, file.scope).getObjType();
+        objType = infer.def.pbottomPath(path, file.scope).getObjType();
         prop = word;
       }
     }
