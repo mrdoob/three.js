@@ -1,7 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
-class AtomicFunctionNode extends TempNode {
+clbottom AtomicFunctionNode extends TempNode {
 
 	static get type() {
 
