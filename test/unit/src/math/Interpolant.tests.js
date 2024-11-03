@@ -6,10 +6,10 @@ export default QUnit.module( 'Maths', () => {
 
 	QUnit.module( 'Interpolant', () => {
 
-		// Since this is an abstract base class, we have to make it concrete in order
+		// Since this is an abstract base clbottom, we have to make it concrete in order
 		// to QUnit.test its functionality...
 
-		class Mock extends Interpolant {
+		clbottom Mock extends Interpolant {
 
 			constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
@@ -54,10 +54,10 @@ export default QUnit.module( 'Maths', () => {
 		// Tests
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const interpolant = new Mock( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );
-			assert.strictEqual(
+			bottomert.strictEqual(
 				interpolant instanceof Interpolant, true,
 				'Mock extends from Interpolant'
 			);
@@ -65,55 +65,55 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'parameterPositions', ( assert ) => {
+		QUnit.todo( 'parameterPositions', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'resultBuffer', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'sampleValues', ( assert ) => {
+		QUnit.todo( 'resultBuffer', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'valueSize', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'settings', ( assert ) => {
+		QUnit.todo( 'sampleValues', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'valueSize', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'settings', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'evaluate', ( assert ) => {
+		QUnit.todo( 'evaluate', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PRIVATE
-		QUnit.test( 'copySampleValue_', ( assert ) => {
+		QUnit.test( 'copySampleValue_', ( bottomert ) => {
 
 			const interpolant = new Mock( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );
 
-			assert.deepEqual( interpolant.copySampleValue_( 0 ), [ 1, 11 ], 'sample fetch (0)' );
-			assert.deepEqual( interpolant.copySampleValue_( 1 ), [ 2, 22 ], 'sample fetch (1)' );
-			assert.deepEqual( interpolant.copySampleValue_( 2 ), [ 3, 33 ], 'first sample (2)' );
+			bottomert.deepEqual( interpolant.copySampleValue_( 0 ), [ 1, 11 ], 'sample fetch (0)' );
+			bottomert.deepEqual( interpolant.copySampleValue_( 1 ), [ 2, 22 ], 'sample fetch (1)' );
+			bottomert.deepEqual( interpolant.copySampleValue_( 2 ), [ 3, 33 ], 'first sample (2)' );
 
 		} );
 
-		QUnit.test( 'evaluate -> intervalChanged_ / interpolate_', ( assert ) => {
+		QUnit.test( 'evaluate -> intervalChanged_ / interpolate_', ( bottomert ) => {
 
 			let actual, expect;
 
@@ -127,16 +127,16 @@ export default QUnit.module( 'Maths', () => {
 				func: 'intervalChanged',
 				args: [ 1, 11, 22 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
 			actual = Mock.calls[ 1 ];
 			expect = {
 				func: 'interpolate',
 				args: [ 1, 11, 11, 22 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
-			assert.ok( Mock.calls.length === 2, 'no further calls' );
+			bottomert.ok( Mock.calls.length === 2, 'no further calls' );
 
 			Mock.calls = [];
 			interpolant.evaluate( 12 ); // same interval
@@ -146,9 +146,9 @@ export default QUnit.module( 'Maths', () => {
 				func: 'interpolate',
 				args: [ 1, 11, 12, 22 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
-			assert.ok( Mock.calls.length === 1, 'no further calls' );
+			bottomert.ok( Mock.calls.length === 1, 'no further calls' );
 
 			Mock.calls = [];
 			interpolant.evaluate( 22 ); // step forward
@@ -158,16 +158,16 @@ export default QUnit.module( 'Maths', () => {
 				func: 'intervalChanged',
 				args: [ 2, 22, 33 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
 			actual = Mock.calls[ 1 ];
 			expect = {
 				func: 'interpolate',
 				args: [ 2, 22, 22, 33 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
-			assert.ok( Mock.calls.length === 2 );
+			bottomert.ok( Mock.calls.length === 2 );
 
 			Mock.calls = [];
 			interpolant.evaluate( 21 ); // step back
@@ -177,16 +177,16 @@ export default QUnit.module( 'Maths', () => {
 				func: 'intervalChanged',
 				args: [ 1, 11, 22 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
 			actual = Mock.calls[ 1 ];
 			expect = {
 				func: 'interpolate',
 				args: [ 1, 11, 21, 22 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
-			assert.ok( Mock.calls.length === 2, 'no further calls' );
+			bottomert.ok( Mock.calls.length === 2, 'no further calls' );
 
 			Mock.calls = [];
 			interpolant.evaluate( 20 ); // same interval
@@ -196,9 +196,9 @@ export default QUnit.module( 'Maths', () => {
 				func: 'interpolate',
 				args: [ 1, 11, 20, 22 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
-			assert.ok( Mock.calls.length === 1, 'no further calls' );
+			bottomert.ok( Mock.calls.length === 1, 'no further calls' );
 
 			Mock.calls = [];
 			interpolant.evaluate( 43 ); // two steps forward
@@ -208,16 +208,16 @@ export default QUnit.module( 'Maths', () => {
 				func: 'intervalChanged',
 				args: [ 3, 33, 44 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
 			actual = Mock.calls[ 1 ];
 			expect = {
 				func: 'interpolate',
 				args: [ 3, 33, 43, 44 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
-			assert.ok( Mock.calls.length === 2, 'no further calls' );
+			bottomert.ok( Mock.calls.length === 2, 'no further calls' );
 
 			Mock.calls = [];
 			interpolant.evaluate( 12 ); // two steps back
@@ -227,16 +227,16 @@ export default QUnit.module( 'Maths', () => {
 				func: 'intervalChanged',
 				args: [ 1, 11, 22 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
 			actual = Mock.calls[ 1 ];
 			expect = {
 				func: 'interpolate',
 				args: [ 1, 11, 12, 22 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
-			assert.ok( Mock.calls.length === 2, 'no further calls' );
+			bottomert.ok( Mock.calls.length === 2, 'no further calls' );
 
 			Mock.calls = [];
 			interpolant.evaluate( 77 ); // random access
@@ -246,16 +246,16 @@ export default QUnit.module( 'Maths', () => {
 				func: 'intervalChanged',
 				args: [ 7, 77, 88 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
 			actual = Mock.calls[ 1 ];
 			expect = {
 				func: 'interpolate',
 				args: [ 7, 77, 77, 88 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
-			assert.ok( Mock.calls.length === 2, 'no further calls' );
+			bottomert.ok( Mock.calls.length === 2, 'no further calls' );
 
 			Mock.calls = [];
 			interpolant.evaluate( 80 ); // same interval
@@ -265,9 +265,9 @@ export default QUnit.module( 'Maths', () => {
 				func: 'interpolate',
 				args: [ 7, 77, 80, 88 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
-			assert.ok( Mock.calls.length === 1, 'no further calls' );
+			bottomert.ok( Mock.calls.length === 1, 'no further calls' );
 
 			Mock.calls = [];
 			interpolant.evaluate( 36 ); // random access
@@ -277,16 +277,16 @@ export default QUnit.module( 'Maths', () => {
 				func: 'intervalChanged',
 				args: [ 3, 33, 44 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
 			actual = Mock.calls[ 1 ];
 			expect = {
 				func: 'interpolate',
 				args: [ 3, 33, 36, 44 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
-			assert.ok( Mock.calls.length === 2, 'no further calls' );
+			bottomert.ok( Mock.calls.length === 2, 'no further calls' );
 
 			Mock.calls = [];
 			interpolant.evaluate( 24 ); // fast reset / loop (2nd)
@@ -296,16 +296,16 @@ export default QUnit.module( 'Maths', () => {
 				func: 'intervalChanged',
 				args: [ 2, 22, 33 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
 			actual = Mock.calls[ 1 ];
 			expect = {
 				func: 'interpolate',
 				args: [ 2, 22, 24, 33 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
-			assert.ok( Mock.calls.length === 2, 'no further calls' );
+			bottomert.ok( Mock.calls.length === 2, 'no further calls' );
 
 			Mock.calls = [];
 			interpolant.evaluate( 16 ); // fast reset / loop (2nd)
@@ -315,16 +315,16 @@ export default QUnit.module( 'Maths', () => {
 				func: 'intervalChanged',
 				args: [ 1, 11, 22 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
 			actual = Mock.calls[ 1 ];
 			expect = {
 				func: 'interpolate',
 				args: [ 1, 11, 16, 22 ]
 			};
-			assert.deepEqual( actual, expect, JSON.stringify( expect ) );
+			bottomert.deepEqual( actual, expect, JSON.stringify( expect ) );
 
-			assert.ok( Mock.calls.length === 2, 'no further calls' );
+			bottomert.ok( Mock.calls.length === 2, 'no further calls' );
 
 		} );
 
