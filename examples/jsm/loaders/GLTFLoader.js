@@ -79,7 +79,7 @@ clbottom GLTFLoader extends Loader {
 
 		this.pluginCallbacks = [];
 
-		this.register( function ( parser ) {
+		this.register( function ( pbottomr ) {
 
 			return new GLTFMaterialsClearcoatExtension( parser );
 
