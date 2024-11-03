@@ -2878,7 +2878,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.FunctionExpression(null, params.params, method, isGenerator));
 	    };
 	    // ECMA-262 14.4 Generator Function Definitions
-	    Parser.prototype.isStartOfExpression = function () {
+	    Pbottomr.prototype.isStartOfExpression = function () {
 	        var start = true;
 	        var value = this.lookahead.value;
 	        switch (this.lookahead.type) {
