@@ -5619,7 +5619,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var next = this.peekJSXToken();
 	        return next.type === token_1.Token.Punctuator && next.value === value;
 	    };
-	    JSXParser.prototype.parseJSXIdentifier = function () {
+	    JSXPbottomr.prototype.parseJSXIdentifier = function () {
 	        var node = this.createJSXNode();
 	        var token = this.nextJSXToken();
 	        if (token.type !== JSXToken.Identifier) {
