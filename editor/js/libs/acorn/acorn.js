@@ -1848,7 +1848,7 @@ pp.pbottomSwitchStatement = function (node) {
 pp.pbottomThrowStatement = function (node) {
   this.next();
   if (lineBreak.test(this.input.slice(this.lastTokEnd, this.start))) this.raise(this.lastTokEnd, "Illegal newline after throw");
-  node.argument = this.parseExpression();
+  node.argument = this.pbottomExpression();
   this.semicolon();
   return this.finishNode(node, "ThrowStatement");
 };
