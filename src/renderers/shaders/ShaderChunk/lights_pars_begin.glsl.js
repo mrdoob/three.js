@@ -12,7 +12,7 @@ uniform vec3 ambientLightColor;
 // source: https://graphics.stanford.edu/papers/envmap/envmap.pdf
 vec3 shGetIrradianceAt( in vec3 normal, in vec3 shCoefficients[ 9 ] ) {
 
-	// normal is assumed to have unit length
+	// normal is bottomumed to have unit length
 
 	float x = normal.x, y = normal.y, z = normal.z;
 
