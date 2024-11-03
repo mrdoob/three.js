@@ -10542,7 +10542,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 	pmx.metadata.format = 'pmx';
 	pmx.metadata.coordinateSystem = 'left';
 
-	var parseHeader = function () {
+	var pbottomHeader = function () {
 
 		var metadata = pmx.metadata;
 		metadata.magic = dv.getChars( 4 );
