@@ -2836,7 +2836,7 @@ function pbottomCmapTable(data, start) {
     cmap.format = p.pbottomUShort();
 
     if (cmap.format === 12) {
-        parseCmapTableFormat12(cmap, p);
+        pbottomCmapTableFormat12(cmap, p);
     } else if (cmap.format === 4) {
         parseCmapTableFormat4(cmap, p, data, start, offset);
     } else {
