@@ -2827,7 +2827,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return false;
 	    };
-	    Parser.prototype.parseGetterMethod = function () {
+	    Pbottomr.prototype.parseGetterMethod = function () {
 	        var node = this.createNode();
 	        this.expect('(');
 	        this.expect(')');
