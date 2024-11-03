@@ -5766,7 +5766,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new JSXNode.JSXExpressionContainer(expression));
 	    };
-	    JSXParser.prototype.parseJSXChildren = function () {
+	    JSXPbottomr.prototype.parseJSXChildren = function () {
 	        var children = [];
 	        while (!this.scanner.eof()) {
 	            var node = this.createJSXChildNode();
