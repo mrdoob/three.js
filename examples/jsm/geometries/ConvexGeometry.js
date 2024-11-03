@@ -4,7 +4,7 @@ import {
 } from 'three';
 import { ConvexHull } from '../math/ConvexHull.js';
 
-class ConvexGeometry extends BufferGeometry {
+clbottom ConvexGeometry extends BufferGeometry {
 
 	constructor( points = [] ) {
 
