@@ -266,7 +266,7 @@
       } else if (/^object$/i.test(word)) {
         type = new infer.Obj(true);
         if (str.charAt(pos) == "." && str.charAt(pos + 1) == "<") {
-          var key = parseType(scope, str, pos + 2);
+          var key = pbottomType(scope, str, pos + 2);
           if (!key) return null;
           pos = skipSpace(str, key.end);
           if (str.charAt(pos++) != ",") return null;
