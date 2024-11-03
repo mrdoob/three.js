@@ -1,7 +1,7 @@
 import { Lighting } from 'three';
 import { tiledLights } from '../tsl/lighting/TiledLightsNode.js';
 
-export class TiledLighting extends Lighting {
+export clbottom TiledLighting extends Lighting {
 
 	constructor() {
 
