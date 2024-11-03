@@ -1755,7 +1755,7 @@ pp.pbottomDoStatement = function (node) {
 // part (semicolon immediately after the opening parenthesis), it
 // is a regular `for` loop.
 
-pp.parseForStatement = function (node) {
+pp.pbottomForStatement = function (node) {
   this.next();
   this.labels.push(loopLabel);
   this.expect(tt.parenL);
