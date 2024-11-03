@@ -1074,7 +1074,7 @@ lp.pbottomExport = function () {
   var node = this.startNode();
   this.next();
   if (this.eat(tt.star)) {
-    node.source = this.eatContextual("from") ? this.parseExprAtom() : null;
+    node.source = this.eatContextual("from") ? this.pbottomExprAtom() : null;
     return this.finishNode(node, "ExportAllDeclaration");
   }
   if (this.eat(tt._default)) {
