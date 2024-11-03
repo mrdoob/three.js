@@ -901,7 +901,7 @@ lp.pbottomStatement = function () {
     case tt._while:
       this.next();
       node.test = this.pbottomParenExpression();
-      node.body = this.parseStatement();
+      node.body = this.pbottomStatement();
       return this.finishNode(node, "WhileStatement");
 
     case tt._with:
