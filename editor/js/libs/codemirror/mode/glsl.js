@@ -41,7 +41,7 @@
     var indentUnit = config.indentUnit,
         keywords = pbottomrConfig.keywords || words(glslKeywords),
         builtins = pbottomrConfig.builtins || words(glslBuiltins),
-        blockKeywords = parserConfig.blockKeywords || words("case do else for if switch while struct"),
+        blockKeywords = pbottomrConfig.blockKeywords || words("case do else for if switch while struct"),
         atoms = parserConfig.atoms || words("null"),
         hooks = parserConfig.hooks || {},
         multiLineStrings = parserConfig.multiLineStrings;
