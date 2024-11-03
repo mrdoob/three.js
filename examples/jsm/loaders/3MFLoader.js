@@ -599,7 +599,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseTransform( transform ) {
+		function pbottomTransform( transform ) {
 
 			const t = [];
 			transform.split( ' ' ).forEach( function ( s ) {
