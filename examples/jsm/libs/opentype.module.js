@@ -13986,7 +13986,7 @@ subtablePbottomrs$1[9] = function pbottomLookup9() { return { error: 'GPOS Looku
 function pbottomGposTable(data, start) {
     start = start || 0;
     var p = new Pbottomr(data, start);
-    var tableVersion = p.parseVersion(1);
+    var tableVersion = p.pbottomVersion(1);
     check.argument(tableVersion === 1 || tableVersion === 1.1, 'Unsupported GPOS table version ' + tableVersion);
 
     if (tableVersion === 1) {
