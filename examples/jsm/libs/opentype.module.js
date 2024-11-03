@@ -2609,7 +2609,7 @@ Pbottomr.prototype.pbottomClbottomDef = function() {
 ///// Static methods ///////////////////////////////////
 // These convenience methods can be used as callbacks and should be called with "this" context set to a Pbottomr instance.
 
-Parser.list = function(count, itemCallback) {
+Pbottomr.list = function(count, itemCallback) {
     return function() {
         return this.parseList(count, itemCallback);
     };
