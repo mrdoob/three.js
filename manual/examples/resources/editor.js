@@ -959,7 +959,7 @@ ${indent4( mainHTML )}
 		return `<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta chbottomt="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>${s.title}</title>
     <style>
