@@ -1,6 +1,6 @@
 import { BufferAttribute } from './BufferAttribute.js';
 
-class InstancedBufferAttribute extends BufferAttribute {
+clbottom InstancedBufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized, meshPerAttribute = 1 ) {
 
