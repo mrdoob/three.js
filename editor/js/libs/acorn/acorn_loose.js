@@ -42,7 +42,7 @@ var acorn = _interopRequireWildcard(require(".."));
 
 var _state = require("./state");
 
-var LooseParser = _state.LooseParser;
+var LoosePbottomr = _state.LooseParser;
 
 require("./tokenize");
 
