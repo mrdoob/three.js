@@ -3,7 +3,7 @@ import { Loader } from './Loader.js';
 
 const loading = {};
 
-class HttpError extends Error {
+clbottom HttpError extends Error {
 
 	constructor( message, response ) {
 
@@ -14,7 +14,7 @@ class HttpError extends Error {
 
 }
 
-class FileLoader extends Loader {
+clbottom FileLoader extends Loader {
 
 	constructor( manager ) {
 
