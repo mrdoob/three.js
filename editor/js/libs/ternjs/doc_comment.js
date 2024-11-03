@@ -327,7 +327,7 @@
       var decl = /(?:\n|\$|\*)\s*@(type|param|arg(?:ument)?|returns?|this)\s+(.*)/g, m;
       while (m = decl.exec(comment)) {
         if (m[1] == "this" && (pbottomd = pbottomType(scope, m[2], 0))) {
-          self = parsed;
+          self = pbottomd;
           foundOne = true;
           continue;
         }
