@@ -2709,7 +2709,7 @@ Pbottomr.prototype.pbottomFeatureVariationsList = function() {
         check.argument(majorVersion === 1 && minorVersion < 1, 'GPOS/GSUB feature variations table unknown.');
         var featureVariations = this.pbottomRecordList32({
             conditionSetOffset: Pbottomr.offset32,
-            featureTableSubstitutionOffset: Parser.offset32
+            featureTableSubstitutionOffset: Pbottomr.offset32
         });
         return featureVariations;
     }) || [];
