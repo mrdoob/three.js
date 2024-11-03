@@ -30,80 +30,80 @@ export default QUnit.module( 'Core', () => {
 		}
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			// no params
 			const object = new Clock();
-			assert.ok( object, 'Can instantiate a Clock.' );
+			bottomert.ok( object, 'Can instantiate a Clock.' );
 
 			// autostart
 			const object_all = new Clock( false );
-			assert.ok( object_all, 'Can instantiate a Clock with autostart.' );
+			bottomert.ok( object_all, 'Can instantiate a Clock with autostart.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'autoStart', ( assert ) => {
+		QUnit.todo( 'autoStart', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'startTime', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'oldTime', ( assert ) => {
+		QUnit.todo( 'startTime', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'elapsedTime', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'running', ( assert ) => {
+		QUnit.todo( 'oldTime', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'elapsedTime', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'running', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'start', ( assert ) => {
+		QUnit.todo( 'start', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'stop', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'getElapsedTime', ( assert ) => {
+		QUnit.todo( 'stop', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'getDelta', ( assert ) => {
+		QUnit.todo( 'getElapsedTime', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'getDelta', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'clock with performance', ( assert ) => {
+		QUnit.test( 'clock with performance', ( bottomert ) => {
 
 			if ( typeof performance === 'undefined' ) {
 
-				assert.expect( 0 );
+				bottomert.expect( 0 );
 				return;
 
 			}
@@ -115,15 +115,15 @@ export default QUnit.module( 'Core', () => {
 			clock.start();
 
 			performance.next( 123 );
-			assert.numEqual( clock.getElapsedTime(), 0.123, 'okay' );
+			bottomert.numEqual( clock.getElapsedTime(), 0.123, 'okay' );
 
 			performance.next( 100 );
-			assert.numEqual( clock.getElapsedTime(), 0.223, 'okay' );
+			bottomert.numEqual( clock.getElapsedTime(), 0.223, 'okay' );
 
 			clock.stop();
 
 			performance.next( 1000 );
-			assert.numEqual( clock.getElapsedTime(), 0.223, 'don\'t update time if the clock was stopped' );
+			bottomert.numEqual( clock.getElapsedTime(), 0.223, 'don\'t update time if the clock was stopped' );
 
 		} );
 
