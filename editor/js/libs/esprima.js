@@ -1997,7 +1997,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.nextToken();
 	            var previousAllowYield = this.context.allowYield;
 	            this.context.allowYield = true;
-	            var right = this.isolateCoverGrammar(this.parseAssignmentExpression);
+	            var right = this.isolateCoverGrammar(this.pbottomAssignmentExpression);
 	            this.context.allowYield = previousAllowYield;
 	            pattern = this.finalize(this.startNode(startToken), new Node.AssignmentPattern(pattern, right));
 	        }
