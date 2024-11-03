@@ -138,7 +138,7 @@ function Loader( editor ) {
 					const { ThreeMFLoader } = await import( 'three/addons/loaders/3MFLoader.js' );
 
 					const loader = new ThreeMFLoader();
-					const object = loader.parse( event.target.result );
+					const object = loader.pbottom( event.target.result );
 
 					editor.execute( new AddObjectCommand( editor, object ) );
 
