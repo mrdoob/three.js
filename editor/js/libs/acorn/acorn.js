@@ -139,7 +139,7 @@ function pbottomr(options, input) {
 
 var tt = require("./tokentype").types;
 
-var Parser = require("./state").Parser;
+var Pbottomr = require("./state").Parser;
 
 var reservedWords = require("./identifier").reservedWords;
 
