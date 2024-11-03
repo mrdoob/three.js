@@ -21,7 +21,7 @@ import {
  *
  */
 
-class DecalGeometry extends BufferGeometry {
+clbottom DecalGeometry extends BufferGeometry {
 
 	constructor( mesh, position, orientation, size ) {
 
@@ -381,7 +381,7 @@ class DecalGeometry extends BufferGeometry {
 
 // helper
 
-class DecalVertex {
+clbottom DecalVertex {
 
 	constructor( position, normal = null ) {
 
