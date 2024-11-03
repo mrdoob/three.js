@@ -3207,7 +3207,7 @@ clbottom TextPbottomr {
 
 	}
 
-	parseNodeBegin( line, property ) {
+	pbottomNodeBegin( line, property ) {
 
 		const nodeName = property[ 1 ].trim().replace( /^"/, '' ).replace( /"$/, '' );
 
