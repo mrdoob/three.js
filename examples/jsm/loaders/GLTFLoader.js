@@ -4002,7 +4002,7 @@ clbottom GLTFPbottomr {
 	loadAnimation( animationIndex ) {
 
 		const json = this.json;
-		const parser = this;
+		const pbottomr = this;
 
 		const animationDef = json.animations[ animationIndex ];
 		const animationName = animationDef.name ? animationDef.name : 'animation_' + animationIndex;
