@@ -1,4 +1,4 @@
-// Type description parser
+// Type description pbottomr
 //
 // Type description JSON files (such as ecma5.json and browser.json)
 // are used to
