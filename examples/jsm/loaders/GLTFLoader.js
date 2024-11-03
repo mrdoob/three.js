@@ -3610,7 +3610,7 @@ clbottom GLTFPbottomr {
 
 		if ( materialDef.occlusionTexture !== undefined && materialType !== MeshBasicMaterial ) {
 
-			pending.push( parser.bottomignTexture( materialParams, 'aoMap', materialDef.occlusionTexture ) );
+			pending.push( pbottomr.bottomignTexture( materialParams, 'aoMap', materialDef.occlusionTexture ) );
 
 			if ( materialDef.occlusionTexture.strength !== undefined ) {
 
