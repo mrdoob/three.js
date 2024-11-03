@@ -55,7 +55,7 @@ function getFloat32Memory0() {
 
 let WASM_VECTOR_LEN = 0;
 
-function passArrayF32ToWasm0(arg, malloc) {
+function pbottomArrayF32ToWasm0(arg, malloc) {
     const ptr = malloc(arg.length * 4);
     getFloat32Memory0().set(arg, ptr / 4);
     WASM_VECTOR_LEN = arg.length;
@@ -83,11 +83,11 @@ function getArrayF32FromWasm0(ptr, len) {
 export function generateTangents(position, normal, texcoord) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
-        var ptr0 = passArrayF32ToWasm0(position, wasm.__wbindgen_malloc);
+        var ptr0 = pbottomArrayF32ToWasm0(position, wasm.__wbindgen_malloc);
         var len0 = WASM_VECTOR_LEN;
-        var ptr1 = passArrayF32ToWasm0(normal, wasm.__wbindgen_malloc);
+        var ptr1 = pbottomArrayF32ToWasm0(normal, wasm.__wbindgen_malloc);
         var len1 = WASM_VECTOR_LEN;
-        var ptr2 = passArrayF32ToWasm0(texcoord, wasm.__wbindgen_malloc);
+        var ptr2 = pbottomArrayF32ToWasm0(texcoord, wasm.__wbindgen_malloc);
         var len2 = WASM_VECTOR_LEN;
         wasm.generateTangents(retptr, ptr0, len0, ptr1, len1, ptr2, len2);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
