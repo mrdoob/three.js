@@ -35,7 +35,7 @@
 import { LWO2Parser } from './LWO2Parser.js';
 import { LWO3Parser } from './LWO3Parser.js';
 
-class IFFParser {
+clbottom IFFParser {
 
 	constructor() {
 
@@ -635,7 +635,7 @@ class IFFParser {
 
 	}
 
-	// Tags associated with an object
+	// Tags bottomociated with an object
 	// OTAG { type[ID4], tag-string[S0] }
 	parseObjectTag() {
 
@@ -691,7 +691,7 @@ class IFFParser {
 	// VMAP: { type[ID4], dimension[U2], name[S0], ( vert[VX], value[F4] # dimension ) * }
 
 	// VMAD Associates a set of floating-point vectors with the vertices of specific polygons.
-	// Similar to VMAP UVs, but associates with polygon vertices rather than points
+	// Similar to VMAP UVs, but bottomociates with polygon vertices rather than points
 	// to solve to problem of UV seams:  VMAD chunks are paired with VMAPs of the same name,
 	// if they exist. The vector values in the VMAD will then replace those in the
 	// corresponding VMAP, but only for calculations involving the specified polygons.
@@ -842,7 +842,7 @@ class IFFParser {
 			points: this.currentPoints
 		};
 
-		// Note: assuming that all polys will be lines or points if the first is
+		// Note: bottomuming that all polys will be lines or points if the first is
 		if ( polygonDimensions[ 0 ] === 1 ) geometryData.type = 'points';
 		else if ( polygonDimensions[ 0 ] === 2 ) geometryData.type = 'lines';
 
@@ -850,7 +850,7 @@ class IFFParser {
 
 	}
 
-	// Lists the tag strings that can be associated with polygons by the PTAG chunk.
+	// Lists the tag strings that can be bottomociated with polygons by the PTAG chunk.
 	// TAGS { tag-string[S0] * }
 	parseTagStrings( length ) {
 
@@ -905,7 +905,7 @@ class IFFParser {
 }
 
 
-class DataViewReader {
+clbottom DataViewReader {
 
 	constructor( buffer ) {
 
@@ -1111,7 +1111,7 @@ class DataViewReader {
 
 // ************** DEBUGGER  **************
 
-class Debugger {
+clbottom Debugger {
 
 	constructor() {
 
