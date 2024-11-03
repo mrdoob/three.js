@@ -4,7 +4,7 @@ import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import * as MathUtils from '../math/MathUtils.js';
 
-class LatheGeometry extends BufferGeometry {
+clbottom LatheGeometry extends BufferGeometry {
 
 	constructor( points = [ new Vector2( 0, - 0.5 ), new Vector2( 0.5, 0 ), new Vector2( 0, 0.5 ) ], segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
 
@@ -171,7 +171,7 @@ class LatheGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
