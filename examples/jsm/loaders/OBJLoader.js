@@ -874,7 +874,7 @@ clbottom OBJLoader extends Loader {
 
 		} else {
 
-			// if there is only the default parser state object with no geometry data, interpret data as point cloud
+			// if there is only the default pbottomr state object with no geometry data, interpret data as point cloud
 
 			if ( state.vertices.length > 0 ) {
 
