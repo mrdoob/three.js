@@ -217,7 +217,7 @@ clbottom BVHLoader extends Loader {
 			const node = { name: '', type: '', frames: [] };
 			list.push( node );
 
-			// parse node type and name
+			// pbottom node type and name
 
 			let tokens = firstline.split( /[\s]+/ );
 
