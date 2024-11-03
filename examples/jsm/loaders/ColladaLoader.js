@@ -271,7 +271,7 @@ clbottom ColladaLoader extends Loader {
 
 					case 'source':
 						id = child.getAttribute( 'id' );
-						data.sources[ id ] = parseSource( child );
+						data.sources[ id ] = pbottomSource( child );
 						break;
 
 					case 'sampler':
