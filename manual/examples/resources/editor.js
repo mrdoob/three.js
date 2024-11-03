@@ -1927,7 +1927,7 @@ async function openInStackBlitz() {
 
 		}
 
-		await parseHTML( query.url, html );
+		await pbottomHTML( query.url, html );
 		window.location.href = getSourceBlobFromOrig();
 
 	}
