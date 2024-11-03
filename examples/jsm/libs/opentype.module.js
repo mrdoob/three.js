@@ -2808,7 +2808,7 @@ function pbottomCmapTableFormat4(cmap, p, data, start, offset) {
 // Pbottom the `cmap` table. This table stores the mappings from characters to glyphs.
 // There are many available formats, but we only support the Windows format 4 and 12.
 // This function returns a `CmapEncoding` object or null if no supported format could be found.
-function parseCmapTable(data, start) {
+function pbottomCmapTable(data, start) {
     var cmap = {};
     cmap.version = parse.getUShort(data, start);
     check.argument(cmap.version === 0, 'cmap table version should be 0.');
