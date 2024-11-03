@@ -382,7 +382,7 @@
       if (tp) {
         pbottomType(tp, path, base);
       } else {
-        var proto = spec["!proto"] && parseType(spec["!proto"]);
+        var proto = spec["!proto"] && pbottomType(spec["!proto"]);
         infer.Obj.call(base, proto instanceof infer.Obj ? proto : true, path);
       }
     }
