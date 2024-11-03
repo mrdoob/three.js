@@ -69,7 +69,7 @@ clbottom AMFLoader extends Loader {
 
 	}
 
-	parse( data ) {
+	pbottom( data ) {
 
 		function loadDocument( data ) {
 
