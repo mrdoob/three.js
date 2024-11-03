@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { nodeImmutable } from '../tsl/TSLBase.js';
 
-class PointUVNode extends Node {
+clbottom PointUVNode extends Node {
 
 	static get type() {
 
