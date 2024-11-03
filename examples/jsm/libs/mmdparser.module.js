@@ -10952,7 +10952,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseFrames = function () {
+	var pbottomFrames = function () {
 
 		var parseFrame = function () {
 
