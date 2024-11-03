@@ -56,10 +56,10 @@ export default QUnit.module( 'Core', () => {
 		};
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new Object3D();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof EventDispatcher, true,
 				'Object3D extends from EventDispatcher'
 			);
@@ -67,193 +67,193 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Object3D();
-			assert.ok( object, 'Can instantiate an Object3D.' );
+			bottomert.ok( object, 'Can instantiate an Object3D.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'id', ( assert ) => {
+		QUnit.todo( 'id', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'uuid', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'name', ( assert ) => {
+		QUnit.todo( 'uuid', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.todo( 'name', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new Object3D();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'Object3D',
 				'Object3D.type should be Object3D'
 			);
 
 		} );
 
-		QUnit.todo( 'parent', ( assert ) => {
+		QUnit.todo( 'parent', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'children', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'up', ( assert ) => {
+		QUnit.todo( 'children', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'position', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'rotation', ( assert ) => {
+		QUnit.todo( 'up', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'quaternion', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'scale', ( assert ) => {
+		QUnit.todo( 'position', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'modelViewMatrix', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'normalMatrix', ( assert ) => {
+		QUnit.todo( 'rotation', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'matrix', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'matrixWorld', ( assert ) => {
+		QUnit.todo( 'quaternion', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'matrixAutoUpdate', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'matrixWorldNeedsUpdate', ( assert ) => {
+		QUnit.todo( 'scale', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'matrixWorldAutoUpdate', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'layers', ( assert ) => {
+		QUnit.todo( 'modelViewMatrix', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'visible', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'castShadow', ( assert ) => {
+		QUnit.todo( 'normalMatrix', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'receiveShadow', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'frustumCulled', ( assert ) => {
+		QUnit.todo( 'matrix', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'renderOrder', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'animations', ( assert ) => {
+		QUnit.todo( 'matrixWorld', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'userData', ( assert ) => {
+		QUnit.todo( 'matrixAutoUpdate', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'matrixWorldNeedsUpdate', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'matrixWorldAutoUpdate', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'layers', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'visible', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'castShadow', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'receiveShadow', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'frustumCulled', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'renderOrder', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'animations', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'userData', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// STATIC
-		QUnit.test( 'DEFAULT_UP', ( assert ) => {
+		QUnit.test( 'DEFAULT_UP', ( bottomert ) => {
 
 			const currentDefaultUp = new Vector3().copy( Object3D.DEFAULT_UP );
 			const v = new Vector3();
 
 			try {
 
-				assert.deepEqual( Object3D.DEFAULT_UP, v.set( 0, 1, 0 ), 'default DEFAULT_UP is Y-up' );
+				bottomert.deepEqual( Object3D.DEFAULT_UP, v.set( 0, 1, 0 ), 'default DEFAULT_UP is Y-up' );
 
 				const object = new Object3D();
 
-				assert.deepEqual( object.up, v.set( 0, 1, 0 ), '.up of a new object inherits Object3D.DEFAULT_UP = Y-up' );
+				bottomert.deepEqual( object.up, v.set( 0, 1, 0 ), '.up of a new object inherits Object3D.DEFAULT_UP = Y-up' );
 
 				Object3D.DEFAULT_UP.set( 0, 0, 1 );
 
 				const object2 = new Object3D();
 
-				assert.deepEqual( object2.up, v.set( 0, 0, 1 ), '.up of a new object inherits Object3D.DEFAULT_UP = Z-up' );
+				bottomert.deepEqual( object2.up, v.set( 0, 0, 1 ), '.up of a new object inherits Object3D.DEFAULT_UP = Z-up' );
 
 			} finally {
 
@@ -263,17 +263,17 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'DEFAULT_MATRIX_AUTO_UPDATE', ( assert ) => {
+		QUnit.test( 'DEFAULT_MATRIX_AUTO_UPDATE', ( bottomert ) => {
 
 			const currentDefaultMatrixAutoUpdate = Object3D.DEFAULT_MATRIX_AUTO_UPDATE;
 
 			try {
 
-				assert.equal( currentDefaultMatrixAutoUpdate, true, 'default DEFAULT_MATRIX_AUTO_UPDATE is true' );
+				bottomert.equal( currentDefaultMatrixAutoUpdate, true, 'default DEFAULT_MATRIX_AUTO_UPDATE is true' );
 
 				const object = new Object3D();
 
-				assert.equal(
+				bottomert.equal(
 					object.matrixAutoUpdate, true,
 					'.matrixAutoUpdate of a new object inherits Object3D.DEFAULT_MATRIX_AUTO_UPDATE = true'
 				);
@@ -282,7 +282,7 @@ export default QUnit.module( 'Core', () => {
 
 				const object2 = new Object3D();
 
-				assert.equal(
+				bottomert.equal(
 					object2.matrixAutoUpdate, false,
 					'.matrixAutoUpdate of a new object inherits Object3D.DEFAULT_MATRIX_AUTO_UPDATE = false'
 				);
@@ -296,35 +296,35 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isObject3D', ( assert ) => {
+		QUnit.test( 'isObject3D', ( bottomert ) => {
 
 			const object = new Object3D();
-			assert.ok(
+			bottomert.ok(
 				object.isObject3D,
 				'Object3D.isObject3D should be true'
 			);
 
 			const object2 = {};
-			assert.ok(
+			bottomert.ok(
 				object2.isObject3D === undefined,
 				'other object isObject3D should be undefined'
 			);
 
 		} );
 
-		QUnit.todo( 'onBeforeRender', ( assert ) => {
+		QUnit.todo( 'onBeforeRender', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'onAfterRender', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'applyMatrix4', ( assert ) => {
+		QUnit.todo( 'onAfterRender', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'applyMatrix4', ( bottomert ) => {
 
 			const a = new Object3D();
 			const m = new Matrix4();
@@ -336,8 +336,8 @@ export default QUnit.module( 'Core', () => {
 
 			a.applyMatrix4( m );
 
-			assert.deepEqual( a.position, expectedPos, 'Position has the expected values' );
-			assert.ok(
+			bottomert.deepEqual( a.position, expectedPos, 'Position has the expected values' );
+			bottomert.ok(
 				Math.abs( a.quaternion.x - expectedQuat.x ) <= eps &&
 				Math.abs( a.quaternion.y - expectedQuat.y ) <= eps &&
 				Math.abs( a.quaternion.z - expectedQuat.z ) <= eps,
@@ -346,7 +346,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'applyQuaternion', ( assert ) => {
+		QUnit.test( 'applyQuaternion', ( bottomert ) => {
 
 			const a = new Object3D();
 			const sqrt = 0.5 * Math.sqrt( 2 );
@@ -356,7 +356,7 @@ export default QUnit.module( 'Core', () => {
 			a.quaternion.set( 0.25, 0.25, 0.25, 0.25 );
 			a.applyQuaternion( quat );
 
-			assert.ok(
+			bottomert.ok(
 				Math.abs( a.quaternion.x - expected.x ) <= eps &&
 				Math.abs( a.quaternion.y - expected.y ) <= eps &&
 				Math.abs( a.quaternion.z - expected.z ) <= eps,
@@ -365,7 +365,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'setRotationFromAxisAngle', ( assert ) => {
+		QUnit.test( 'setRotationFromAxisAngle', ( bottomert ) => {
 
 			const a = new Object3D();
 			const axis = new Vector3( 0, 1, 0 );
@@ -375,7 +375,7 @@ export default QUnit.module( 'Core', () => {
 
 			a.setRotationFromAxisAngle( axis, angle );
 			euler.setFromQuaternion( a.getWorldQuaternion( new Quaternion() ) );
-			assert.ok( eulerEquals( euler, expected ), 'Correct values after rotation' );
+			bottomert.ok( eulerEquals( euler, expected ), 'Correct values after rotation' );
 
 			axis.set( 1, 0, 0 );
 			angle = 0;
@@ -383,11 +383,11 @@ export default QUnit.module( 'Core', () => {
 
 			a.setRotationFromAxisAngle( axis, angle );
 			euler.setFromQuaternion( a.getWorldQuaternion( new Quaternion() ) );
-			assert.ok( eulerEquals( euler, expected ), 'Correct values after zeroing' );
+			bottomert.ok( eulerEquals( euler, expected ), 'Correct values after zeroing' );
 
 		} );
 
-		QUnit.test( 'setRotationFromEuler', ( assert ) => {
+		QUnit.test( 'setRotationFromEuler', ( bottomert ) => {
 
 			const a = new Object3D();
 			const rotation = new Euler( ( 45 / RadToDeg ), 0, Math.PI );
@@ -396,11 +396,11 @@ export default QUnit.module( 'Core', () => {
 
 			a.setRotationFromEuler( rotation );
 			euler.setFromQuaternion( a.getWorldQuaternion( new Quaternion() ) );
-			assert.ok( eulerEquals( euler, expected ), 'Correct values after rotation' );
+			bottomert.ok( eulerEquals( euler, expected ), 'Correct values after rotation' );
 
 		} );
 
-		QUnit.test( 'setRotationFromMatrix', ( assert ) => {
+		QUnit.test( 'setRotationFromMatrix', ( bottomert ) => {
 
 			const a = new Object3D();
 			const m = new Matrix4();
@@ -412,11 +412,11 @@ export default QUnit.module( 'Core', () => {
 			m.lookAt( eye, target, up );
 			a.setRotationFromMatrix( m );
 			euler.setFromQuaternion( a.getWorldQuaternion( new Quaternion() ) );
-			assert.numEqual( euler.x * RadToDeg, 45, 'Correct rotation angle' );
+			bottomert.numEqual( euler.x * RadToDeg, 45, 'Correct rotation angle' );
 
 		} );
 
-		QUnit.test( 'setRotationFromQuaternion', ( assert ) => {
+		QUnit.test( 'setRotationFromQuaternion', ( bottomert ) => {
 
 			const a = new Object3D();
 			const rotation = new Quaternion().setFromEuler( new Euler( Math.PI, 0, - Math.PI ) );
@@ -424,60 +424,60 @@ export default QUnit.module( 'Core', () => {
 
 			a.setRotationFromQuaternion( rotation );
 			euler.setFromQuaternion( a.getWorldQuaternion( new Quaternion() ) );
-			assert.ok( eulerEquals( euler, new Euler( Math.PI, 0, - Math.PI ) ), 'Correct values after rotation' );
+			bottomert.ok( eulerEquals( euler, new Euler( Math.PI, 0, - Math.PI ) ), 'Correct values after rotation' );
 
 		} );
 
-		QUnit.todo( 'rotateOnAxis', ( assert ) => {
+		QUnit.todo( 'rotateOnAxis', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'rotateOnWorldAxis', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'rotateX', ( assert ) => {
+		QUnit.todo( 'rotateOnWorldAxis', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'rotateX', ( bottomert ) => {
 
 			const obj = new Object3D();
 			const angleInRad = 1.562;
 			obj.rotateX( angleInRad );
 
-			assert.numEqual( obj.rotation.x, angleInRad, 'x is equal' );
+			bottomert.numEqual( obj.rotation.x, angleInRad, 'x is equal' );
 
 		} );
 
-		QUnit.test( 'rotateY', ( assert ) => {
+		QUnit.test( 'rotateY', ( bottomert ) => {
 
 			const obj = new Object3D();
 			const angleInRad = - 0.346;
 			obj.rotateY( angleInRad );
 
-			assert.numEqual( obj.rotation.y, angleInRad, 'y is equal' );
+			bottomert.numEqual( obj.rotation.y, angleInRad, 'y is equal' );
 
 		} );
 
-		QUnit.test( 'rotateZ', ( assert ) => {
+		QUnit.test( 'rotateZ', ( bottomert ) => {
 
 			const obj = new Object3D();
 			const angleInRad = 1;
 			obj.rotateZ( angleInRad );
 
-			assert.numEqual( obj.rotation.z, angleInRad, 'z is equal' );
+			bottomert.numEqual( obj.rotation.z, angleInRad, 'z is equal' );
 
 		} );
 
-		QUnit.test( 'translateOnAxis', ( assert ) => {
+		QUnit.test( 'translateOnAxis', ( bottomert ) => {
 
 			const obj = new Object3D();
 			obj.translateOnAxis( new Vector3( 1, 0, 0 ), 1 );
 			obj.translateOnAxis( new Vector3( 0, 1, 0 ), 1.23 );
 			obj.translateOnAxis( new Vector3( 0, 0, 1 ), - 4.56 );
 
-			assert.propEqual( obj.position, {
+			bottomert.propEqual( obj.position, {
 				x: 1,
 				y: 1.23,
 				z: - 4.56,
@@ -485,34 +485,34 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'translateX', ( assert ) => {
+		QUnit.test( 'translateX', ( bottomert ) => {
 
 			const obj = new Object3D();
 			obj.translateX( 1.234 );
 
-			assert.numEqual( obj.position.x, 1.234, 'x is equal' );
+			bottomert.numEqual( obj.position.x, 1.234, 'x is equal' );
 
 		} );
 
-		QUnit.test( 'translateY', ( assert ) => {
+		QUnit.test( 'translateY', ( bottomert ) => {
 
 			const obj = new Object3D();
 			obj.translateY( 1.234 );
 
-			assert.numEqual( obj.position.y, 1.234, 'y is equal' );
+			bottomert.numEqual( obj.position.y, 1.234, 'y is equal' );
 
 		} );
 
-		QUnit.test( 'translateZ', ( assert ) => {
+		QUnit.test( 'translateZ', ( bottomert ) => {
 
 			const obj = new Object3D();
 			obj.translateZ( 1.234 );
 
-			assert.numEqual( obj.position.z, 1.234, 'z is equal' );
+			bottomert.numEqual( obj.position.z, 1.234, 'z is equal' );
 
 		} );
 
-		QUnit.test( 'localToWorld', ( assert ) => {
+		QUnit.test( 'localToWorld', ( bottomert ) => {
 
 			const v = new Vector3();
 			const expectedPosition = new Vector3( 5, - 1, - 4 );
@@ -533,7 +533,7 @@ export default QUnit.module( 'Core', () => {
 
 			child.localToWorld( v.set( 2, 2, 2 ) );
 
-			assert.ok(
+			bottomert.ok(
 				Math.abs( v.x - expectedPosition.x ) <= eps &&
 				Math.abs( v.y - expectedPosition.y ) <= eps &&
 				Math.abs( v.z - expectedPosition.z ) <= eps,
@@ -542,7 +542,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'worldToLocal', ( assert ) => {
+		QUnit.test( 'worldToLocal', ( bottomert ) => {
 
 			const v = new Vector3();
 			const expectedPosition = new Vector3( - 1, 0.5, - 1 );
@@ -563,7 +563,7 @@ export default QUnit.module( 'Core', () => {
 
 			child.worldToLocal( v.set( 2, 2, 2 ) );
 
-			assert.ok(
+			bottomert.ok(
 				Math.abs( v.x - expectedPosition.x ) <= eps &&
 				Math.abs( v.y - expectedPosition.y ) <= eps &&
 				Math.abs( v.z - expectedPosition.z ) <= eps,
@@ -572,63 +572,63 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'lookAt', ( assert ) => {
+		QUnit.test( 'lookAt', ( bottomert ) => {
 
 			const obj = new Object3D();
 			obj.lookAt( new Vector3( 0, - 1, 1 ) );
 
-			assert.numEqual( obj.rotation.x * RadToDeg, 45, 'x is equal' );
+			bottomert.numEqual( obj.rotation.x * RadToDeg, 45, 'x is equal' );
 
 		} );
 
-		QUnit.test( 'add/remove/removeFromParent/clear', ( assert ) => {
+		QUnit.test( 'add/remove/removeFromParent/clear', ( bottomert ) => {
 
 			const a = new Object3D();
 			const child1 = new Object3D();
 			const child2 = new Object3D();
 
-			assert.strictEqual( a.children.length, 0, 'Starts with no children' );
+			bottomert.strictEqual( a.children.length, 0, 'Starts with no children' );
 
 			a.add( child1 );
-			assert.strictEqual( a.children.length, 1, 'The first child was added' );
-			assert.strictEqual( a.children[ 0 ], child1, 'It\'s the right one' );
+			bottomert.strictEqual( a.children.length, 1, 'The first child was added' );
+			bottomert.strictEqual( a.children[ 0 ], child1, 'It\'s the right one' );
 
 			a.add( child2 );
-			assert.strictEqual( a.children.length, 2, 'The second child was added' );
-			assert.strictEqual( a.children[ 1 ], child2, 'It\'s the right one' );
-			assert.strictEqual( a.children[ 0 ], child1, 'The first one is still there' );
+			bottomert.strictEqual( a.children.length, 2, 'The second child was added' );
+			bottomert.strictEqual( a.children[ 1 ], child2, 'It\'s the right one' );
+			bottomert.strictEqual( a.children[ 0 ], child1, 'The first one is still there' );
 
 			a.remove( child1 );
-			assert.strictEqual( a.children.length, 1, 'The first child was removed' );
-			assert.strictEqual( a.children[ 0 ], child2, 'The second one is still there' );
+			bottomert.strictEqual( a.children.length, 1, 'The first child was removed' );
+			bottomert.strictEqual( a.children[ 0 ], child2, 'The second one is still there' );
 
 			a.add( child1 );
 			a.remove( child1, child2 );
-			assert.strictEqual( a.children.length, 0, 'Both children were removed at once' );
+			bottomert.strictEqual( a.children.length, 0, 'Both children were removed at once' );
 
 			child1.add( child2 );
-			assert.strictEqual( child1.children.length, 1, 'The second child was added to the first one' );
+			bottomert.strictEqual( child1.children.length, 1, 'The second child was added to the first one' );
 			a.add( child2 );
-			assert.strictEqual( a.children.length, 1, 'The second one was added to the parent (no remove)' );
-			assert.strictEqual( a.children[ 0 ], child2, 'The second one is now the parent\'s child again' );
-			assert.strictEqual( child1.children.length, 0, 'The first one no longer has any children' );
+			bottomert.strictEqual( a.children.length, 1, 'The second one was added to the parent (no remove)' );
+			bottomert.strictEqual( a.children[ 0 ], child2, 'The second one is now the parent\'s child again' );
+			bottomert.strictEqual( child1.children.length, 0, 'The first one no longer has any children' );
 
 			a.add( child1 );
-			assert.strictEqual( a.children.length, 2, 'The first child was added to the parent' );
+			bottomert.strictEqual( a.children.length, 2, 'The first child was added to the parent' );
 			a.clear();
-			assert.strictEqual( a.children.length, 0, 'All childrens were removed' );
-			assert.strictEqual( child1.parent, null, 'First child has no parent' );
-			assert.strictEqual( child2.parent, null, 'Second child has no parent' );
+			bottomert.strictEqual( a.children.length, 0, 'All childrens were removed' );
+			bottomert.strictEqual( child1.parent, null, 'First child has no parent' );
+			bottomert.strictEqual( child2.parent, null, 'Second child has no parent' );
 
 			a.add( child1 );
-			assert.strictEqual( a.children.length, 1, 'The child was added to the parent' );
+			bottomert.strictEqual( a.children.length, 1, 'The child was added to the parent' );
 			child1.removeFromParent();
-			assert.strictEqual( a.children.length, 0, 'The child was removed' );
-			assert.strictEqual( child1.parent, null, 'Child has no parent' );
+			bottomert.strictEqual( a.children.length, 0, 'The child was removed' );
+			bottomert.strictEqual( child1.parent, null, 'Child has no parent' );
 
 		} );
 
-		QUnit.test( 'attach', ( assert ) => {
+		QUnit.test( 'attach', ( bottomert ) => {
 
 			const object = new Object3D();
 			const oldParent = new Object3D();
@@ -650,11 +650,11 @@ export default QUnit.module( 'Core', () => {
 
 			newParent.attach( object );
 
-			assert.ok( object.parent && object.parent == newParent &&
+			bottomert.ok( object.parent && object.parent == newParent &&
 				oldParent.children.indexOf( object ) === - 1,
 			'object is a child of a new parent' );
 
-			assert.ok( matrixEquals4( expectedMatrixWorld, object.matrixWorld ), 'object\'s world matrix is maintained' );
+			bottomert.ok( matrixEquals4( expectedMatrixWorld, object.matrixWorld ), 'object\'s world matrix is maintained' );
 
 			// Attach to a new parent from an old parent
 
@@ -675,17 +675,17 @@ export default QUnit.module( 'Core', () => {
 
 			newParent.attach( object );
 
-			assert.ok( object.parent && object.parent == newParent &&
+			bottomert.ok( object.parent && object.parent == newParent &&
 				newParent.children.indexOf( object ) !== - 1 &&
 				oldParent.children.indexOf( object ) === - 1,
 			'object is no longer a child of an old parent and is a child of a new parent now' );
 
-			assert.ok( matrixEquals4( expectedMatrixWorld, object.matrixWorld ),
+			bottomert.ok( matrixEquals4( expectedMatrixWorld, object.matrixWorld ),
 				'object\'s world matrix is maintained even it had a parent' );
 
 		} );
 
-		QUnit.test( 'getObjectById/getObjectByName/getObjectByProperty', ( assert ) => {
+		QUnit.test( 'getObjectById/getObjectByName/getObjectByProperty', ( bottomert ) => {
 
 			const parent = new Object3D();
 			const childName = new Object3D();
@@ -696,17 +696,17 @@ export default QUnit.module( 'Core', () => {
 			childName.name = 'foo';
 			parent.add( childName, childId, childNothing );
 
-			assert.strictEqual( parent.getObjectByProperty( 'prop', true ), parent, 'Get parent by its own property' );
-			assert.strictEqual( parent.getObjectByName( 'foo' ), childName, 'Get child by name' );
-			assert.strictEqual( parent.getObjectById( parent.id + 2 ), childId, 'Get child by Id' );
-			assert.strictEqual(
+			bottomert.strictEqual( parent.getObjectByProperty( 'prop', true ), parent, 'Get parent by its own property' );
+			bottomert.strictEqual( parent.getObjectByName( 'foo' ), childName, 'Get child by name' );
+			bottomert.strictEqual( parent.getObjectById( parent.id + 2 ), childId, 'Get child by Id' );
+			bottomert.strictEqual(
 				parent.getObjectByProperty( 'no-property', 'no-value' ), undefined,
 				'Unknown property results in undefined'
 			);
 
 		} );
 
-		QUnit.test( 'getObjectsByProperty', ( assert ) => {
+		QUnit.test( 'getObjectsByProperty', ( bottomert ) => {
 
 			const parent = new Object3D();
 			const childName = new Object3D();
@@ -722,12 +722,12 @@ export default QUnit.module( 'Core', () => {
 			childName.add( childName2 );
 			parent.add( childName, childNothing );
 
-			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).length, 3, 'Get amount of all childs by name "foo"' );
-			assert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).some( obj => obj.name !== 'foo' ), false, 'Get all childs by name "foo"' );
+			bottomert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).length, 3, 'Get amount of all childs by name "foo"' );
+			bottomert.strictEqual( parent.getObjectsByProperty( 'name', 'foo' ).some( obj => obj.name !== 'foo' ), false, 'Get all childs by name "foo"' );
 
 		} );
 
-		QUnit.test( 'getWorldPosition', ( assert ) => {
+		QUnit.test( 'getWorldPosition', ( bottomert ) => {
 
 			const a = new Object3D();
 			const b = new Object3D();
@@ -740,25 +740,25 @@ export default QUnit.module( 'Core', () => {
 			a.translateY( y );
 			a.translateZ( z );
 
-			assert.deepEqual( a.getWorldPosition( position ), expectedSingle, 'WorldPosition as expected for single object' );
+			bottomert.deepEqual( a.getWorldPosition( position ), expectedSingle, 'WorldPosition as expected for single object' );
 
 			// translate child and then parent
 			b.translateZ( 7 );
 			a.add( b );
 			a.translateZ( - z );
 
-			assert.deepEqual( a.getWorldPosition( position ), expectedParent, 'WorldPosition as expected for parent' );
-			assert.deepEqual( b.getWorldPosition( position ), expectedChild, 'WorldPosition as expected for child' );
+			bottomert.deepEqual( a.getWorldPosition( position ), expectedParent, 'WorldPosition as expected for parent' );
+			bottomert.deepEqual( b.getWorldPosition( position ), expectedChild, 'WorldPosition as expected for child' );
 
 		} );
 
-		QUnit.todo( 'getWorldQuaternion', ( assert ) => {
+		QUnit.todo( 'getWorldQuaternion', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'getWorldScale', ( assert ) => {
+		QUnit.test( 'getWorldScale', ( bottomert ) => {
 
 			const a = new Object3D();
 			const m = new Matrix4().makeScale( x, y, z );
@@ -766,11 +766,11 @@ export default QUnit.module( 'Core', () => {
 
 			a.applyMatrix4( m );
 
-			assert.deepEqual( a.getWorldScale( new Vector3() ), expected, 'WorldScale as expected' );
+			bottomert.deepEqual( a.getWorldScale( new Vector3() ), expected, 'WorldScale as expected' );
 
 		} );
 
-		QUnit.test( 'getWorldDirection', ( assert ) => {
+		QUnit.test( 'getWorldDirection', ( bottomert ) => {
 
 			const a = new Object3D();
 			const expected = new Vector3( 0, - 0.5 * Math.sqrt( 2 ), 0.5 * Math.sqrt( 2 ) );
@@ -779,7 +779,7 @@ export default QUnit.module( 'Core', () => {
 			a.lookAt( new Vector3( 0, - 1, 1 ) );
 			a.getWorldDirection( direction );
 
-			assert.ok(
+			bottomert.ok(
 				Math.abs( direction.x - expected.x ) <= eps &&
 				Math.abs( direction.y - expected.y ) <= eps &&
 				Math.abs( direction.z - expected.z ) <= eps,
@@ -788,7 +788,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'localTransformVariableInstantiation', ( assert ) => {
+		QUnit.test( 'localTransformVariableInstantiation', ( bottomert ) => {
 
 			const a = new Object3D();
 			const b = new Object3D();
@@ -798,32 +798,32 @@ export default QUnit.module( 'Core', () => {
 			a.getWorldDirection( new Vector3() );
 			a.lookAt( new Vector3( 0, - 1, 1 ) );
 
-			assert.ok( true, 'Calling lookAt after getWorldDirection does not create errors' );
+			bottomert.ok( true, 'Calling lookAt after getWorldDirection does not create errors' );
 
 			b.getWorldPosition( new Vector3() );
 			b.lookAt( new Vector3( 0, - 1, 1 ) );
 
-			assert.ok( true, 'Calling lookAt after getWorldPosition does not create errors' );
+			bottomert.ok( true, 'Calling lookAt after getWorldPosition does not create errors' );
 
 			c.getWorldQuaternion( new Quaternion() );
 			c.lookAt( new Vector3( 0, - 1, 1 ) );
 
-			assert.ok( true, 'Calling lookAt after getWorldQuaternion does not create errors' );
+			bottomert.ok( true, 'Calling lookAt after getWorldQuaternion does not create errors' );
 
 			d.getWorldScale( new Vector3() );
 			d.lookAt( new Vector3( 0, - 1, 1 ) );
 
-			assert.ok( true, 'Calling lookAt after getWorldScale does not create errors' );
+			bottomert.ok( true, 'Calling lookAt after getWorldScale does not create errors' );
 
 		} );
 
-		QUnit.todo( 'raycast', ( assert ) => {
+		QUnit.todo( 'raycast', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'traverse/traverseVisible/traverseAncestors', ( assert ) => {
+		QUnit.test( 'traverse/traverseVisible/traverseAncestors', ( bottomert ) => {
 
 			const a = new Object3D();
 			const b = new Object3D();
@@ -849,7 +849,7 @@ export default QUnit.module( 'Core', () => {
 				names.push( obj.name );
 
 			} );
-			assert.deepEqual( names, expectedNormal, 'Traversed objects in expected order' );
+			bottomert.deepEqual( names, expectedNormal, 'Traversed objects in expected order' );
 
 			names = [];
 			a.traverseVisible( function ( obj ) {
@@ -857,7 +857,7 @@ export default QUnit.module( 'Core', () => {
 				names.push( obj.name );
 
 			} );
-			assert.deepEqual( names, expectedVisible, 'Traversed visible objects in expected order' );
+			bottomert.deepEqual( names, expectedVisible, 'Traversed visible objects in expected order' );
 
 			names = [];
 			c.traverseAncestors( function ( obj ) {
@@ -865,18 +865,18 @@ export default QUnit.module( 'Core', () => {
 				names.push( obj.name );
 
 			} );
-			assert.deepEqual( names, expectedAncestors, 'Traversed ancestors in expected order' );
+			bottomert.deepEqual( names, expectedAncestors, 'Traversed ancestors in expected order' );
 
 		} );
 
-		QUnit.test( 'updateMatrix', ( assert ) => {
+		QUnit.test( 'updateMatrix', ( bottomert ) => {
 
 			const a = new Object3D();
 			a.position.set( 2, 3, 4 );
 			a.quaternion.set( 5, 6, 7, 8 );
 			a.scale.set( 9, 10, 11 );
 
-			assert.deepEqual( a.matrix.elements, [
+			bottomert.deepEqual( a.matrix.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
@@ -885,18 +885,18 @@ export default QUnit.module( 'Core', () => {
 
 			a.updateMatrix();
 
-			assert.deepEqual( a.matrix.elements, [
+			bottomert.deepEqual( a.matrix.elements, [
 				- 1521, 1548, - 234, 0,
 				- 520, - 1470, 1640, 0,
 				1826, 44, - 1331, 0,
 				2, 3, 4, 1
 			], 'matrix is calculated from position, quaternion, and scale' );
 
-			assert.equal( a.matrixWorldNeedsUpdate, true, 'The flag indicating world matrix needs to be updated should be true' );
+			bottomert.equal( a.matrixWorldNeedsUpdate, true, 'The flag indicating world matrix needs to be updated should be true' );
 
 		} );
 
-		QUnit.test( 'updateMatrixWorld', ( assert ) => {
+		QUnit.test( 'updateMatrixWorld', ( bottomert ) => {
 
 			const parent = new Object3D();
 			const child = new Object3D();
@@ -909,42 +909,42 @@ export default QUnit.module( 'Core', () => {
 
 			parent.updateMatrixWorld();
 
-			assert.deepEqual( parent.matrix.elements, [
+			bottomert.deepEqual( parent.matrix.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
 				1, 2, 3, 1
 			], 'updateMatrixWorld() updates local matrix' );
 
-			assert.deepEqual( parent.matrixWorld.elements, [
+			bottomert.deepEqual( parent.matrixWorld.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
 				1, 2, 3, 1
 			], 'updateMatrixWorld() updates world matrix' );
 
-			assert.deepEqual( child.matrix.elements, [
+			bottomert.deepEqual( child.matrix.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
 				4, 5, 6, 1
 			], 'updateMatrixWorld() updates children\'s local matrix' );
 
-			assert.deepEqual( child.matrixWorld.elements, [
+			bottomert.deepEqual( child.matrixWorld.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
 				5, 7, 9, 1
 			], 'updateMatrixWorld() updates children\'s world matrices from their parent world matrix and their local matrices' );
 
-			assert.equal( parent.matrixWorldNeedsUpdate || child.matrixWorldNeedsUpdate, false, 'The flag indicating world matrix needs to be updated should be false after updating world matrix' );
+			bottomert.equal( parent.matrixWorldNeedsUpdate || child.matrixWorldNeedsUpdate, false, 'The flag indicating world matrix needs to be updated should be false after updating world matrix' );
 
 			// -- No sync between local position/quaternion/scale/matrix and world matrix test
 
 			parent.position.set( 0, 0, 0 );
 			parent.updateMatrix();
 
-			assert.deepEqual( parent.matrixWorld.elements, [
+			bottomert.deepEqual( parent.matrixWorld.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
@@ -962,21 +962,21 @@ export default QUnit.module( 'Core', () => {
 			child.matrixAutoUpdate = false;
 			parent.updateMatrixWorld();
 
-			assert.deepEqual( parent.matrix.elements, [
+			bottomert.deepEqual( parent.matrix.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
 				0, 0, 0, 1
 			], 'updateMatrixWorld() doesn\'t update local matrix if matrixAutoUpdate is false' );
 
-			assert.deepEqual( parent.matrixWorld.elements, [
+			bottomert.deepEqual( parent.matrixWorld.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
 				0, 0, 0, 1
 			], 'World matrix isn\'t updated because local matrix isn\'t updated and the flag indicating world matrix needs to be updated didn\'t rise' );
 
-			assert.deepEqual( child.matrixWorld.elements, [
+			bottomert.deepEqual( child.matrixWorld.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
@@ -994,7 +994,7 @@ export default QUnit.module( 'Core', () => {
 			child.matrixWorldAutoUpdate = false;
 			parent.updateMatrixWorld();
 
-			assert.deepEqual( child.matrixWorld.elements, [
+			bottomert.deepEqual( child.matrixWorld.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
@@ -1008,7 +1008,7 @@ export default QUnit.module( 'Core', () => {
 			child.matrixWorldAutoUpdate = true;
 			parent.updateMatrixWorld();
 
-			assert.deepEqual( child.matrixWorld.elements, [
+			bottomert.deepEqual( child.matrixWorld.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
@@ -1029,7 +1029,7 @@ export default QUnit.module( 'Core', () => {
 
 			parent.updateMatrixWorld( true );
 
-			assert.deepEqual( parent.matrixWorld.elements, [
+			bottomert.deepEqual( parent.matrixWorld.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
@@ -1050,21 +1050,21 @@ export default QUnit.module( 'Core', () => {
 
 			child.updateMatrixWorld();
 
-			assert.deepEqual( parent.matrix.elements, [
+			bottomert.deepEqual( parent.matrix.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
 				0, 0, 0, 1
 			], 'updateMatrixWorld() doesn\'t update parent local matrix' );
 
-			assert.deepEqual( parent.matrixWorld.elements, [
+			bottomert.deepEqual( parent.matrixWorld.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
 				0, 0, 0, 1
 			], 'updateMatrixWorld() doesn\'t update parent world matrix' );
 
-			assert.deepEqual( child.matrixWorld.elements, [
+			bottomert.deepEqual( child.matrixWorld.elements, [
 				1, 0, 0, 0,
 				0, 1, 0, 0,
 				0, 0, 1, 0,
@@ -1073,7 +1073,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'updateWorldMatrix', ( assert ) => {
+		QUnit.test( 'updateWorldMatrix', ( bottomert ) => {
 
 			const object = new Object3D();
 			const parent = new Object3D();
@@ -1093,27 +1093,27 @@ export default QUnit.module( 'Core', () => {
 
 			object.updateWorldMatrix();
 
-			assert.deepEqual( parent.matrix.elements,
+			bottomert.deepEqual( parent.matrix.elements,
 				m.elements,
 				'No effect to parents\' local matrices' );
 
-			assert.deepEqual( parent.matrixWorld.elements,
+			bottomert.deepEqual( parent.matrixWorld.elements,
 				m.elements,
 				'No effect to parents\' world matrices' );
 
-			assert.deepEqual( object.matrix.elements,
+			bottomert.deepEqual( object.matrix.elements,
 				m.setPosition( object.position ).elements,
 				'Object\'s local matrix is updated' );
 
-			assert.deepEqual( object.matrixWorld.elements,
+			bottomert.deepEqual( object.matrixWorld.elements,
 				m.setPosition( object.position ).elements,
 				'Object\'s world matrix is updated' );
 
-			assert.deepEqual( child.matrix.elements,
+			bottomert.deepEqual( child.matrix.elements,
 				m.identity().elements,
 				'No effect to children\'s local matrices' );
 
-			assert.deepEqual( child.matrixWorld.elements,
+			bottomert.deepEqual( child.matrixWorld.elements,
 				m.elements,
 				'No effect to children\'s world matrices' );
 
@@ -1124,27 +1124,27 @@ export default QUnit.module( 'Core', () => {
 
 			object.updateWorldMatrix( true, false );
 
-			assert.deepEqual( parent.matrix.elements,
+			bottomert.deepEqual( parent.matrix.elements,
 				m.setPosition( parent.position ).elements,
 				'Parents\' local matrices are updated' );
 
-			assert.deepEqual( parent.matrixWorld.elements,
+			bottomert.deepEqual( parent.matrixWorld.elements,
 				m.setPosition( parent.position ).elements,
 				'Parents\' world matrices are updated' );
 
-			assert.deepEqual( object.matrix.elements,
+			bottomert.deepEqual( object.matrix.elements,
 				m.setPosition( object.position ).elements,
 				'Object\'s local matrix is updated' );
 
-			assert.deepEqual( object.matrixWorld.elements,
+			bottomert.deepEqual( object.matrixWorld.elements,
 				m.setPosition( v.copy( parent.position ).add( object.position ) ).elements,
 				'Object\'s world matrix is updated' );
 
-			assert.deepEqual( child.matrix.elements,
+			bottomert.deepEqual( child.matrix.elements,
 				m.identity().elements,
 				'No effect to children\'s local matrices' );
 
-			assert.deepEqual( child.matrixWorld.elements,
+			bottomert.deepEqual( child.matrixWorld.elements,
 				m.identity().elements,
 				'No effect to children\'s world matrices' );
 
@@ -1157,27 +1157,27 @@ export default QUnit.module( 'Core', () => {
 
 			object.updateWorldMatrix( false, true );
 
-			assert.deepEqual( parent.matrix.elements,
+			bottomert.deepEqual( parent.matrix.elements,
 				m.elements,
 				'No effect to parents\' local matrices' );
 
-			assert.deepEqual( parent.matrixWorld.elements,
+			bottomert.deepEqual( parent.matrixWorld.elements,
 				m.elements,
 				'No effect to parents\' world matrices' );
 
-			assert.deepEqual( object.matrix.elements,
+			bottomert.deepEqual( object.matrix.elements,
 				m.setPosition( object.position ).elements,
 				'Object\'s local matrix is updated' );
 
-			assert.deepEqual( object.matrixWorld.elements,
+			bottomert.deepEqual( object.matrixWorld.elements,
 				m.setPosition( object.position ).elements,
 				'Object\'s world matrix is updated' );
 
-			assert.deepEqual( child.matrix.elements,
+			bottomert.deepEqual( child.matrix.elements,
 				m.setPosition( child.position ).elements,
 				'Children\'s local matrices are updated' );
 
-			assert.deepEqual( child.matrixWorld.elements,
+			bottomert.deepEqual( child.matrixWorld.elements,
 				m.setPosition( v.copy( object.position ).add( child.position ) ).elements,
 				'Children\'s world matrices are updated' );
 
@@ -1190,27 +1190,27 @@ export default QUnit.module( 'Core', () => {
 
 			object.updateWorldMatrix( true, true );
 
-			assert.deepEqual( parent.matrix.elements,
+			bottomert.deepEqual( parent.matrix.elements,
 				m.setPosition( parent.position ).elements,
 				'Parents\' local matrices are updated' );
 
-			assert.deepEqual( parent.matrixWorld.elements,
+			bottomert.deepEqual( parent.matrixWorld.elements,
 				m.setPosition( parent.position ).elements,
 				'Parents\' world matrices are updated' );
 
-			assert.deepEqual( object.matrix.elements,
+			bottomert.deepEqual( object.matrix.elements,
 				m.setPosition( object.position ).elements,
 				'Object\'s local matrix is updated' );
 
-			assert.deepEqual( object.matrixWorld.elements,
+			bottomert.deepEqual( object.matrixWorld.elements,
 				m.setPosition( v.copy( parent.position ).add( object.position ) ).elements,
 				'Object\'s world matrix is updated' );
 
-			assert.deepEqual( child.matrix.elements,
+			bottomert.deepEqual( child.matrix.elements,
 				m.setPosition( child.position ).elements,
 				'Children\'s local matrices are updated' );
 
-			assert.deepEqual( child.matrixWorld.elements,
+			bottomert.deepEqual( child.matrixWorld.elements,
 				m.setPosition( v.copy( parent.position ).add( object.position ).add( child.position ) ).elements,
 				'Children\'s world matrices are updated' );
 
@@ -1222,11 +1222,11 @@ export default QUnit.module( 'Core', () => {
 			object.matrixAutoUpdate = false;
 			object.updateWorldMatrix( true, false );
 
-			assert.deepEqual( object.matrix.elements,
+			bottomert.deepEqual( object.matrix.elements,
 				m.identity().elements,
 				'No effect to object\'s local matrix if matrixAutoUpdate is false' );
 
-			assert.deepEqual( object.matrixWorld.elements,
+			bottomert.deepEqual( object.matrixWorld.elements,
 				m.setPosition( parent.position ).elements,
 				'object\'s world matrix is updated even if matrixAutoUpdate is false' );
 
@@ -1240,17 +1240,17 @@ export default QUnit.module( 'Core', () => {
 
 			child.updateWorldMatrix( true, true );
 
-			assert.deepEqual( child.matrixWorld.elements,
+			bottomert.deepEqual( child.matrixWorld.elements,
 				m.identity().elements,
 				'No effect to child\'s world matrix if matrixWorldAutoUpdate is false' );
 
-			assert.deepEqual( parent.matrixWorld.elements,
+			bottomert.deepEqual( parent.matrixWorld.elements,
 				m.identity().elements,
 				'No effect to parent\'s world matrix if matrixWorldAutoUpdate is false' );
 
 		} );
 
-		QUnit.test( 'toJSON', ( assert ) => {
+		QUnit.test( 'toJSON', ( bottomert ) => {
 
 			const a = new Object3D();
 			const child = new Object3D();
@@ -1311,26 +1311,26 @@ export default QUnit.module( 'Core', () => {
 			const out = a.toJSON();
 			out.object.uuid = '0A1E4F43-CB5B-4097-8F82-DC2969C0B8C2';
 
-			assert.deepEqual( out, gold, 'JSON is as expected' );
+			bottomert.deepEqual( out, gold, 'JSON is as expected' );
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		QUnit.test( 'clone', ( bottomert ) => {
 
 			let a;
 			const b = new Object3D();
 
-			assert.strictEqual( a, undefined, 'Undefined pre-clone()' );
+			bottomert.strictEqual( a, undefined, 'Undefined pre-clone()' );
 
 			a = b.clone();
-			assert.notStrictEqual( a, b, 'Defined but seperate instances post-clone()' );
+			bottomert.notStrictEqual( a, b, 'Defined but seperate instances post-clone()' );
 
 			a.uuid = b.uuid;
-			assert.deepEqual( a, b, 'But identical properties' );
+			bottomert.deepEqual( a, b, 'But identical properties' );
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		QUnit.test( 'copy', ( bottomert ) => {
 
 			const a = new Object3D();
 			const b = new Object3D();
@@ -1365,11 +1365,11 @@ export default QUnit.module( 'Core', () => {
 			child.add( childChild );
 			b.add( child );
 
-			assert.notDeepEqual( a, b, 'Objects are not equal pre-copy()' );
+			bottomert.notDeepEqual( a, b, 'Objects are not equal pre-copy()' );
 			a.copy( b, true );
 
 			// check they're all unique instances
-			assert.ok(
+			bottomert.ok(
 				a.uuid !== b.uuid &&
 				a.children[ 0 ].uuid !== b.children[ 0 ].uuid &&
 				a.children[ 0 ].children[ 0 ].uuid !== b.children[ 0 ].children[ 0 ].uuid,
@@ -1381,7 +1381,7 @@ export default QUnit.module( 'Core', () => {
 			a.children[ 0 ].uuid = b.children[ 0 ].uuid;
 			a.children[ 0 ].children[ 0 ].uuid = b.children[ 0 ].children[ 0 ].uuid;
 
-			assert.deepEqual( a, b, 'Objects are equal post-copy()' );
+			bottomert.deepEqual( a, b, 'Objects are equal post-copy()' );
 
 		} );
 
