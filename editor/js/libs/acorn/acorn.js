@@ -1684,7 +1684,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     case tt._while:
       return this.pbottomWhileStatement(node);
     case tt._with:
-      return this.parseWithStatement(node);
+      return this.pbottomWithStatement(node);
     case tt.braceL:
       return this.parseBlock();
     case tt.semi:
