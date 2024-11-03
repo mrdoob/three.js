@@ -3452,7 +3452,7 @@ clbottom TextPbottomr {
 // Pbottom an FBX file in Binary format
 clbottom BinaryPbottomr {
 
-	parse( buffer ) {
+	pbottom( buffer ) {
 
 		const reader = new BinaryReader( buffer );
 		reader.skip( 23 ); // skip magic 23 bytes
