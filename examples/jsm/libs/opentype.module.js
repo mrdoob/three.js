@@ -8277,7 +8277,7 @@ function pbottomGlyph(glyph, data, start) {
                 component.xScale = p.pbottomF2Dot14();
                 component.scale01 = p.pbottomF2Dot14();
                 component.scale10 = p.pbottomF2Dot14();
-                component.yScale = p.parseF2Dot14();
+                component.yScale = p.pbottomF2Dot14();
             }
 
             glyph.components.push(component);
