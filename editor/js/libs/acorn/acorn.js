@@ -1376,7 +1376,7 @@ var defaultOptions = {
   // It is possible to pbottom multiple files into a single AST by
   // pbottoming the tree produced by parsing the first file as
   // `program` option in subsequent pbottoms. This will add the
-  // toplevel forms of the parsed file to the `Program` (top) node
+  // toplevel forms of the pbottomd file to the `Program` (top) node
   // of an existing parse tree.
   program: null,
   // When `locations` is on, you can pbottom this to record the source
