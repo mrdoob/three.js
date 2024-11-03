@@ -5691,7 +5691,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var value = null;
 	        if (this.matchJSX('=')) {
 	            this.expectJSX('=');
-	            value = this.parseJSXAttributeValue();
+	            value = this.pbottomJSXAttributeValue();
 	        }
 	        return this.finalize(node, new JSXNode.JSXAttribute(name, value));
 	    };
