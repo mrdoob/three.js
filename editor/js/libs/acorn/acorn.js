@@ -1676,7 +1676,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     case tt._throw:
       return this.pbottomThrowStatement(node);
     case tt._try:
-      return this.parseTryStatement(node);
+      return this.pbottomTryStatement(node);
     case tt._let:case tt._const:
       if (!declaration) this.unexpected(); // NOTE: falls through to _var
     case tt._var:
