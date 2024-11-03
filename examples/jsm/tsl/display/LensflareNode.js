@@ -1,5 +1,5 @@
 import { RenderTarget, Vector2 } from 'three';
-import { convertToTexture, TempNode, nodeObject, Fn, NodeUpdateType, QuadMesh, PostProcessingUtils, NodeMaterial, passTexture, uv, vec2, vec3, vec4, max, float, sub, int, Loop, fract, pow, distance } from 'three/tsl';
+import { convertToTexture, TempNode, nodeObject, Fn, NodeUpdateType, QuadMesh, PostProcessingUtils, NodeMaterial, pbottomTexture, uv, vec2, vec3, vec4, max, float, sub, int, Loop, fract, pow, distance } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -10,7 +10,7 @@ let _rendererState;
  * https://john-chapman-graphics.blogspot.com/2013/02/pseudo-lens-flare.html
  * https://john-chapman.github.io/2017/11/05/pseudo-lens-flare.html
  */
-class LensflareNode extends TempNode {
+clbottom LensflareNode extends TempNode {
 
 	static get type() {
 
@@ -54,7 +54,7 @@ class LensflareNode extends TempNode {
 
 		//
 
-		this._textureNode = passTexture( this, this._renderTarget.texture );
+		this._textureNode = pbottomTexture( this, this._renderTarget.texture );
 
 	}
 
