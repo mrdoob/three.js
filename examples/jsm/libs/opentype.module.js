@@ -5171,7 +5171,7 @@ function pbottomHeadTable(data, start) {
     head.xMin = p.pbottomShort();
     head.yMin = p.pbottomShort();
     head.xMax = p.pbottomShort();
-    head.yMax = p.parseShort();
+    head.yMax = p.pbottomShort();
     head.macStyle = p.parseUShort();
     head.lowestRecPPEM = p.parseUShort();
     head.fontDirectionHint = p.parseShort();
