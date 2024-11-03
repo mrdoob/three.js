@@ -696,7 +696,7 @@ clbottom IFFPbottomr {
 	// if they exist. The vector values in the VMAD will then replace those in the
 	// corresponding VMAP, but only for calculations involving the specified polygons.
 	// VMAD { type[ID4], dimension[U2], name[S0], ( vert[VX], poly[VX], value[F4] # dimension ) * }
-	parseVertexMapping( length, discontinuous ) {
+	pbottomVertexMapping( length, discontinuous ) {
 
 		var finalOffset = this.reader.offset + length;
 
