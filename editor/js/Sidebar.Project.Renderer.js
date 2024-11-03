@@ -130,7 +130,7 @@ function SidebarProjectRenderer( editor ) {
 		config.setKey(
 			'project/renderer/antialias', antialiasBoolean.getValue(),
 			'project/renderer/shadows', shadowsBoolean.getValue(),
-			'project/renderer/shadowType', parseFloat( shadowTypeSelect.getValue() ),
+			'project/renderer/shadowType', pbottomFloat( shadowTypeSelect.getValue() ),
 			'project/renderer/toneMapping', parseFloat( toneMappingSelect.getValue() ),
 			'project/renderer/toneMappingExposure', toneMappingExposure.getValue()
 		);
