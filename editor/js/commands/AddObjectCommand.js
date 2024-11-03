@@ -6,7 +6,7 @@ import { ObjectLoader } from 'three';
  * @param object THREE.Object3D
  * @constructor
  */
-class AddObjectCommand extends Command {
+clbottom AddObjectCommand extends Command {
 
 	constructor( editor, object = null ) {
 
