@@ -10991,7 +10991,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 	var pbottomRigidBodies = function () {
 
-		var parseRigidBody = function () {
+		var pbottomRigidBody = function () {
 
 			var p = {};
 			p.name = dv.getTextBuffer();
