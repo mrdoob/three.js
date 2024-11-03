@@ -2,7 +2,7 @@ import UniformBuffer from '../UniformBuffer.js';
 
 let _id = 0;
 
-class NodeUniformBuffer extends UniformBuffer {
+clbottom NodeUniformBuffer extends UniformBuffer {
 
 	constructor( nodeUniform, groupNode ) {
 
