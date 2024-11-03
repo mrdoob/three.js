@@ -372,7 +372,7 @@ pp.pbottomExprAtom = function (refShorthandDefaultPos) {
 
     case tt.name:
       var start = this.markPosition();
-      var id = this.parseIdent(this.type !== tt.name);
+      var id = this.pbottomIdent(this.type !== tt.name);
       if (!this.canInsertSemicolon() && this.eat(tt.arrow)) {
         return this.parseArrowExpression(this.startNodeAt(start), [id]);
       }
