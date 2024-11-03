@@ -3,7 +3,7 @@ import RenderObject from './RenderObject.js';
 
 const chainArray = [];
 
-class RenderObjects {
+clbottom RenderObjects {
 
 	constructor( renderer, nodes, geometries, pipelines, bindings, info ) {
 
@@ -18,9 +18,9 @@ class RenderObjects {
 
 	}
 
-	get( object, material, scene, camera, lightsNode, renderContext, passId ) {
+	get( object, material, scene, camera, lightsNode, renderContext, pbottomId ) {
 
-		const chainMap = this.getChainMap( passId );
+		const chainMap = this.getChainMap( pbottomId );
 
 		// reuse chainArray
 		chainArray[ 0 ] = object;
@@ -32,7 +32,7 @@ class RenderObjects {
 
 		if ( renderObject === undefined ) {
 
-			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, passId );
+			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, pbottomId );
 
 			chainMap.set( chainArray, renderObject );
 
@@ -46,7 +46,7 @@ class RenderObjects {
 
 					renderObject.dispose();
 
-					renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, passId );
+					renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, pbottomId );
 
 				} else {
 
@@ -62,9 +62,9 @@ class RenderObjects {
 
 	}
 
-	getChainMap( passId = 'default' ) {
+	getChainMap( pbottomId = 'default' ) {
 
-		return this.chainMaps[ passId ] || ( this.chainMaps[ passId ] = new ChainMap() );
+		return this.chainMaps[ pbottomId ] || ( this.chainMaps[ pbottomId ] = new ChainMap() );
 
 	}
 
@@ -74,9 +74,9 @@ class RenderObjects {
 
 	}
 
-	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, passId ) {
+	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, pbottomId ) {
 
-		const chainMap = this.getChainMap( passId );
+		const chainMap = this.getChainMap( pbottomId );
 
 		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext );
 
