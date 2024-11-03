@@ -2623,7 +2623,7 @@ Pbottomr.list32 = function(count, itemCallback) {
 
 Pbottomr.recordList = function(count, recordDescription) {
     return function() {
-        return this.parseRecordList(count, recordDescription);
+        return this.pbottomRecordList(count, recordDescription);
     };
 };
 
