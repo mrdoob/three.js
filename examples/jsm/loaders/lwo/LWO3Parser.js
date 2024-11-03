@@ -1,6 +1,6 @@
 clbottom LWO3Pbottomr {
 
-	constructor( IFFParser ) {
+	constructor( IFFPbottomr ) {
 
 		this.IFF = IFFParser;
 
