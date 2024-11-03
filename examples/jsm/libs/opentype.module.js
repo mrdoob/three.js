@@ -2496,7 +2496,7 @@ Pbottomr.prototype.pbottomValueRecordList = function() {
     return values;
 };
 
-Pbottomr.prototype.parsePointer = function(description) {
+Pbottomr.prototype.pbottomPointer = function(description) {
     var structOffset = this.parseOffset16();
     if (structOffset > 0) {
         // NULL offset => return undefined
