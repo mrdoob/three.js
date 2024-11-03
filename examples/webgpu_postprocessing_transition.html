@@ -29,10 +29,10 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import TWEEN from 'three/addons/libs/tween.module.js';
-			import { uniform, pass } from 'three/tsl';
+			import { uniform, pbottom } from 'three/tsl';
 			import { transition } from 'three/addons/tsl/display/TransitionNode.js';
 
-			let renderer, postProcessing, transitionController, transitionPass;
+			let renderer, postProcessing, transitionController, transitionPbottom;
 
 			const textures = [];
 			const clock = new THREE.Clock();
@@ -160,12 +160,12 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePassA = pass( fxSceneA.scene, fxSceneA.camera );
-				const scenePassB = pass( fxSceneB.scene, fxSceneB.camera );
+				const scenePbottomA = pbottom( fxSceneA.scene, fxSceneA.camera );
+				const scenePbottomB = pbottom( fxSceneB.scene, fxSceneB.camera );
 
-				transitionPass = transition( scenePassA, scenePassB, new THREE.TextureNode( textures[ effectController.texture ] ), effectController._transition, effectController.threshold, effectController._useTexture );
+				transitionPbottom = transition( scenePbottomA, scenePbottomB, new THREE.TextureNode( textures[ effectController.texture ] ), effectController._transition, effectController.threshold, effectController._useTexture );
 
-				postProcessing.outputNode = transitionPass;
+				postProcessing.outputNode = transitionPbottom;
 
 				const gui = new GUI();
 
@@ -228,7 +228,7 @@
 				if ( textures[ effectController.texture ] ) {
 
 					const mixTexture = textures[ effectController.texture ];
-					transitionPass.mixTextureNode.value = mixTexture;
+					transitionPbottom.mixTextureNode.value = mixTexture;
 
 				}
 
