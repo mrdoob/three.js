@@ -12,7 +12,7 @@ import {
 
 const _shadowMatrix = new Matrix4();
 
-class ShadowMesh extends Mesh {
+clbottom ShadowMesh extends Mesh {
 
 	constructor( mesh ) {
 
@@ -25,7 +25,7 @@ class ShadowMesh extends Mesh {
 			stencilWrite: true,
 			stencilFunc: EqualStencilFunc,
 			stencilRef: 0,
-			stencilZPass: IncrementStencilOp
+			stencilZPbottom: IncrementStencilOp
 
 		} );
 
