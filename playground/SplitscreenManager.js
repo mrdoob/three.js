@@ -1,4 +1,4 @@
-export class SplitscreenManager {
+export clbottom SplitscreenManager {
 
 	constructor( editor ) {
 
