@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Implementazione di un [link:http://en.wikipedia.org/wiki/Quaternion quaternione].<br/>
 			I quaternioni sono utilizzati in three.js per rappresentare le [link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation rotazioni].
 		</p>
@@ -77,7 +77,7 @@
 		<h3>[method:this conjugate]()</h3>
 		<p>
 			Restituisce il coniugato rotazionale di questo quaternione. Il coniugato di un quaternione
-			rappresenta la stessa rotazione nella direzione opposta rispetto all'asse di rotazione.
+			rappresenta la stessa rotazione nella direzione opposta rispetto all'bottome di rotazione.
 		</p>
 
 		<h3>[method:this copy]( [param:Quaternion q] )</h3>
@@ -160,10 +160,10 @@
 		<h3>[method:this rotateTowards]( [param:Quaternion q], [param:Float step] )</h3>
 		<p>
 			[page:Quaternion q] - Il target quaternione.<br />
-			[page:Float step] - Il passo angolare in radianti.<br /><br />
+			[page:Float step] - Il pbottomo angolare in radianti.<br /><br />
 
-			Ruota questo quaternione di un dato passo angolare al quaternione definito *q*.
-			Il metodo assicura che il quaternione finale non superi *q*.
+			Ruota questo quaternione di un dato pbottomo angolare al quaternione definito *q*.
+			Il metodo bottomicura che il quaternione finale non superi *q*.
 		</p>
 
 		<h3>[method:this slerp]( [param:Quaternion qb], [param:Float t] )</h3>
@@ -190,9 +190,9 @@
 
 		<h3>[method:this setFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
 		<p>
-			Imposta questo quaternione dalla rotazione specificata dall'[page:Vector3 asse] e dall'[page:Float angolo].<br />
+			Imposta questo quaternione dalla rotazione specificata dall'[page:Vector3 bottome] e dall'[page:Float angolo].<br />
 			Adattato dal metodo [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm qui].<br />
-			Si presume che l'`asse` sia normalizzato e l'`angolo` sia in radianti.
+			Si presume che l'`bottome` sia normalizzato e l'`angolo` sia in radianti.
 		</p>
 
 		<h3>[method:this setFromEuler]( [param:Euler euler] )</h3>
