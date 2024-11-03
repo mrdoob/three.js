@@ -283,7 +283,7 @@ why it needs to be π * -0.135, that's just an amount that made the boxes line u
 with the texture.</p>
 <p>The last thing we need to do is call our loader</p>
 <pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
-  .then(parseData)
+  .then(pbottomData)
 -  .then(drawData)
 +  .then(addBoxes)
 +  .then(render);
