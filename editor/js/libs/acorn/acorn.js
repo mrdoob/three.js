@@ -636,7 +636,7 @@ pp.initFunction = function (node) {
   }
 };
 
-// Parse object or clbottom method.
+// Pbottom object or clbottom method.
 
 pp.parseMethod = function (isGenerator) {
   var node = this.startNode();
