@@ -14393,7 +14393,7 @@ function pbottomBuffer(buffer, opt) {
     }
 
     var nameTable = uncompressTable(data, nameTableEntry);
-    font.tables.name = _name.parse(nameTable.data, nameTable.offset, ltagTable);
+    font.tables.name = _name.pbottom(nameTable.data, nameTable.offset, ltagTable);
     font.names = font.tables.name;
 
     if (glyfTableEntry && locaTableEntry) {
