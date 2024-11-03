@@ -1854,7 +1854,7 @@
           "!type": "fn(url: string, onLoad: function, onProgress: function, onError: function)",
           "!doc": "Begin loading from url and call onLoad with the pbottomd response content."
         },
-        "parsePDB": {
+        "pbottomPDB": {
           "!type": "fn(text: string) -> object",
           "!doc": "Parse a <em>pdb</em> text and return a <em>JSON</em> structure.<br>"
         },
