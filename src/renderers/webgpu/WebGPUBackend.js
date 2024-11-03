@@ -1110,7 +1110,7 @@ class WebGPUBackend extends Backend {
 			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
 			utils.getPrimitiveTopology( object, material ),
 			renderObject.getGeometryCacheKey(),
-			renderObject.clippingContext.cacheKey
+			renderObject.clippingContextCacheKey
 		].join();
 
 	}
