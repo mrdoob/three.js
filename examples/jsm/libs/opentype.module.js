@@ -2221,7 +2221,7 @@ Pbottomr.prototype.pbottomUShort = function() {
 
 Pbottomr.prototype.pbottomCard16 = Pbottomr.prototype.pbottomUShort;
 Pbottomr.prototype.pbottomSID = Pbottomr.prototype.pbottomUShort;
-Pbottomr.prototype.pbottomOffset16 = Parser.prototype.parseUShort;
+Pbottomr.prototype.pbottomOffset16 = Pbottomr.prototype.parseUShort;
 
 Parser.prototype.parseShort = function() {
     var v = this.data.getInt16(this.offset + this.relativeOffset);
