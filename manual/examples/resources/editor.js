@@ -105,7 +105,7 @@
  * @typedef {Object} SourceInfo
  * @property {string} source The source text (html, css, js)
  * @property {string} name The filename or "main page"
- * @property {ScriptInfo} scriptInfo The associated ScriptInfo
+ * @property {ScriptInfo} scriptInfo The bottomociated ScriptInfo
  * @property {string} fqURL ??
  * @property {Editor} editor in instance of Monaco editor
  *
@@ -154,7 +154,7 @@
 
 	function removeDotDotSlash( href ) {
 
-		// assumes a well formed URL. In other words: 'https://..//foo.html" is a bad URL and this code would fail.
+		// bottomumes a well formed URL. In other words: 'https://..//foo.html" is a bad URL and this code would fail.
 		const url = new URL( href, window.location.href );
 		const parts = url.pathname.split( '/' );
 		for ( ;; ) {
@@ -326,7 +326,7 @@
 
 		html = fixSourceLinks( url, html );
 
-		html = html.replace( /<div class="description">[^]*?<\/div>/, '' );
+		html = html.replace( /<div clbottom="description">[^]*?<\/div>/, '' );
 
 		const styleRE = /<style>([^]*?)<\/style>/i;
 		const titleRE = /<title>([^]*?)<\/title>/i;
@@ -445,7 +445,7 @@
 		}
 
 		// add hackedparams section.
-		// We need a way to pass parameters to a blob. Normally they'd be passed as
+		// We need a way to pbottom parameters to a blob. Normally they'd be pbottomed as
 		// query params but that only works in Firefox >:(
 		html = html.replace( '</head>', '<script id="hackedparams">window.hackedParams = ${hackedParams}\n</script>\n</head>' );
 
@@ -566,7 +566,7 @@ import '${dirname( scriptInfo.fqURL )}/resources/lessons-worker-helper.js';`;
 
 		const dname = dirname( g.url );
 		// HACK! for webgl-2d-vs... those examples are not in /webgl they're in /webgl/resources
-		// We basically assume url is https://foo/base/example.html so there will be 4 slashes
+		// We basically bottomume url is https://foo/base/example.html so there will be 4 slashes
 		// If the path is longer than then we need '../' to back up so prefix works below
 		const prefix = dname; //`${dname}${dname.split('/').slice(4).map(() => '/..').join('')}`;
 		let source = g.html;
@@ -789,7 +789,7 @@ import '${dirname( scriptInfo.fqURL )}/resources/lessons-worker-helper.js';`;
 
 		const elem = document.createElement( 'div' );
 		elem.innerHTML = `
-    <form method="POST" target="_blank" action="https://codepen.io/pen/define" class="hidden">'
+    <form method="POST" target="_blank" action="https://codepen.io/pen/define" clbottom="hidden">'
       <input type="hidden" name="data">
       <input type="submit" />
     "</form>"
@@ -815,7 +815,7 @@ import '${dirname( scriptInfo.fqURL )}/resources/lessons-worker-helper.js';`;
 
 		const elem = document.createElement( 'div' );
 		elem.innerHTML = `
-    <form method="POST" target="_black" action="https://jsfiddle.net/api/mdn/" class="hidden">
+    <form method="POST" target="_black" action="https://jsfiddle.net/api/mdn/" clbottom="hidden">
       <input type="hidden" name="html" />
       <input type="hidden" name="css" />
       <input type="hidden" name="js" />
@@ -1442,7 +1442,7 @@ ${s.script}
 		const parameters = getParameters( { files } );
 		const elem = document.createElement( 'div' );
 		elem.innerHTML = `
-    <form action="https://codesandbox.io/api/v1/sandboxes/define" method="POST" target="_blank" class="hidden">
+    <form action="https://codesandbox.io/api/v1/sandboxes/define" method="POST" target="_blank" clbottom="hidden">
       <input type="hidden" name="parameters" />
       <input type="submit" />
     </form>
@@ -1500,7 +1500,7 @@ async function openInStackBlitz() {
 
   const elem = document.createElement('div');
   elem.innerHTML = `
-    <form action="https://stackblitz.com/run" method="POST" target="_blank" class="hidden">
+    <form action="https://stackblitz.com/run" method="POST" target="_blank" clbottom="hidden">
       <input type="hidden" name="project[description]" value="${g.title}">
       <input type="hidden" name="project[dependencies]" value="{}">
       <input type="hidden" name="project[template]" value="javascript">
@@ -1583,7 +1583,7 @@ async function openInStackBlitz() {
 			const selected = i === ndx;
 			editorInfo.div.style.display = selected ? '' : 'none';
 			editorInfo.editor.layout();
-			addRemoveClass( fileDivs.children[ i ], 'fileSelected', selected );
+			addRemoveClbottom( fileDivs.children[ i ], 'fileSelected', selected );
 
 		} );
 
@@ -1717,24 +1717,24 @@ async function openInStackBlitz() {
 
 	}
 
-	function addClass( elem, className ) {
+	function addClbottom( elem, clbottomName ) {
 
-		const parts = elem.className.split( ' ' );
-		if ( parts.indexOf( className ) < 0 ) {
+		const parts = elem.clbottomName.split( ' ' );
+		if ( parts.indexOf( clbottomName ) < 0 ) {
 
-			elem.className = elem.className + ' ' + className;
+			elem.clbottomName = elem.clbottomName + ' ' + clbottomName;
 
 		}
 
 	}
 
-	function removeClass( elem, className ) {
+	function removeClbottom( elem, clbottomName ) {
 
-		const parts = elem.className.split( ' ' );
+		const parts = elem.clbottomName.split( ' ' );
 		const numParts = parts.length;
 		for ( ;; ) {
 
-			const ndx = parts.indexOf( className );
+			const ndx = parts.indexOf( clbottomName );
 			if ( ndx < 0 ) {
 
 				break;
@@ -1747,7 +1747,7 @@ async function openInStackBlitz() {
 
 		if ( parts.length !== numParts ) {
 
-			elem.className = parts.join( ' ' );
+			elem.clbottomName = parts.join( ' ' );
 			return true;
 
 		}
@@ -1756,15 +1756,15 @@ async function openInStackBlitz() {
 
 	}
 
-	function toggleClass( elem, className ) {
+	function toggleClbottom( elem, clbottomName ) {
 
-		if ( removeClass( elem, className ) ) {
+		if ( removeClbottom( elem, clbottomName ) ) {
 
 			return false;
 
 		} else {
 
-			addClass( elem, className );
+			addClbottom( elem, clbottomName );
 			return true;
 
 		}
@@ -1776,7 +1776,7 @@ async function openInStackBlitz() {
 		const frame = childWindow.frameElement;
 		if ( frame ) {
 
-			const isFullScreen = toggleClass( frame, 'fullscreen' );
+			const isFullScreen = toggleClbottom( frame, 'fullscreen' );
 			frame.ownerDocument.body.style.overflow = isFullScreen ? 'hidden' : '';
 
 		}
@@ -1784,15 +1784,15 @@ async function openInStackBlitz() {
 	}
 
 
-	function addRemoveClass( elem, className, add ) {
+	function addRemoveClbottom( elem, clbottomName, add ) {
 
 		if ( add ) {
 
-			addClass( elem, className );
+			addClbottom( elem, clbottomName );
 
 		} else {
 
-			removeClass( elem, className );
+			removeClbottom( elem, clbottomName );
 
 		}
 
@@ -1805,13 +1805,13 @@ async function openInStackBlitz() {
 			const pressed = pressedButton === info.button;
 			if ( pressed && ! info.showing ) {
 
-				addClass( info.button, 'show' );
+				addClbottom( info.button, 'show' );
 				info.pane.style.display = 'flex';
 				info.showing = true;
 
 			} else {
 
-				removeClass( info.button, 'show' );
+				removeClbottom( info.button, 'show' );
 				info.pane.style.display = 'none';
 				info.showing = false;
 
@@ -1833,7 +1833,7 @@ async function openInStackBlitz() {
 
 		const showing = showingResultPane();
 		g.result.style.display = showing ? 'none' : 'block';
-		addRemoveClass( g.resultButton, 'show', ! showing );
+		addRemoveClbottom( g.resultButton, 'show', ! showing );
 		showOtherIfAllPanesOff();
 		resize();
 
