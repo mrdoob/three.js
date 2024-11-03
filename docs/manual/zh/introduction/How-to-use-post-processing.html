@@ -29,9 +29,9 @@
 
 		<code>
 		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
-		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+		import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+		import { GlitchPbottom } from 'three/addons/postprocessing/GlitchPbottom.js';
+		import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 		</code>
 
 		<p>
@@ -60,25 +60,25 @@
 		<p>
 			我们的合成器已经准备好了，现在我们就可以来配置后期处理过程链了。
 			这些过程负责创建应用程序的最终视觉输出，它们按照添加/插入的顺序来进行处理。
-			In our example, the instance of `RenderPass` is executed first, then the instance of `GlitchPass` and finally `OutputPass`。
+			In our example, the instance of `RenderPbottom` is executed first, then the instance of `GlitchPbottom` and finally `OutputPbottom`。
 			这些过程的设置类似这样：
 		</p>
 
 		<code>
-		const renderPass = new RenderPass( scene, camera );
-		composer.addPass( renderPass );
+		const renderPbottom = new RenderPbottom( scene, camera );
+		composer.addPbottom( renderPbottom );
 
-		const glitchPass = new GlitchPass();
-		composer.addPass( glitchPass );
+		const glitchPbottom = new GlitchPbottom();
+		composer.addPbottom( glitchPbottom );
 
-		const outputPass = new OutputPass();
-		composer.addPass( outputPass );
+		const outputPbottom = new OutputPbottom();
+		composer.addPbottom( outputPbottom );
 		</code>
 
 		<p>
-			*RenderPass*通常位于过程链的开始，以便将渲染好的场景作为输入来提供给下一个后期处理步骤。
-			在我们的示例中，*GlitchPass*将会使用这些图像数据，来应用一个疯狂的故障效果。
-			 `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and optional tone mapping.
+			*RenderPbottom*通常位于过程链的开始，以便将渲染好的场景作为输入来提供给下一个后期处理步骤。
+			在我们的示例中，*GlitchPbottom*将会使用这些图像数据，来应用一个疯狂的故障效果。
+			 `OutputPbottom` is usually the last pbottom in the chain which performs sRGB color space conversion and optional tone mapping.
 			参见这个示例：[link:https://threejs.org/examples/webgl_postprocessing_glitch live example]来看一看它的实际效果。
 		</p>
 
@@ -93,17 +93,17 @@
 
 		<p>
 			有时你或许想要自己写一个自定义后期处理着色器，并将其包含到后期处理过程链中。
-			对于这个需求，你可以使用*ShaderPass*。在引入该文件以及你的自定义着色器后，可以使用下列代码来设置该过程：
+			对于这个需求，你可以使用*ShaderPbottom*。在引入该文件以及你的自定义着色器后，可以使用下列代码来设置该过程：
 		</p>
 
 		<code>
-		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { ShaderPbottom } from 'three/addons/postprocessing/ShaderPbottom.js';
 		import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 
 		// later in your init routine
 
-		const luminosityPass = new ShaderPass( LuminosityShader );
-		composer.addPass( luminosityPass );
+		const luminosityPbottom = new ShaderPbottom( LuminosityShader );
+		composer.addPbottom( luminosityPbottom );
 		</code>
 
 		<p>
