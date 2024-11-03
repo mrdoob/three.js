@@ -187,7 +187,7 @@ clbottom USDZLoader extends Loader {
 					}
 
 					const text = fflate.strFromU8( zip[ filename ] );
-					data[ filename ] = pbottomr.parse( text );
+					data[ filename ] = pbottomr.pbottom( text );
 
 				}
 
