@@ -1,7 +1,7 @@
 import TempNode from '../core/TempNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-class PosterizeNode extends TempNode {
+clbottom PosterizeNode extends TempNode {
 
 	static get type() {
 
