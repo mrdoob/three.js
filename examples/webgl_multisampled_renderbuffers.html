@@ -47,8 +47,8 @@
 			import * as THREE from 'three';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			let camera, renderer, group, container;
@@ -129,20 +129,20 @@
 				const size = renderer.getDrawingBufferSize( new THREE.Vector2() );
 				const renderTarget = new THREE.WebGLRenderTarget( size.width, size.height, { samples: 4, type: THREE.HalfFloatType } );
 
-				const renderPass = new RenderPass( scene, camera );
-				const outputPass = new OutputPass();
+				const renderPbottom = new RenderPbottom( scene, camera );
+				const outputPbottom = new OutputPbottom();
 
 				//
 
 				composer1 = new EffectComposer( renderer );
-				composer1.addPass( renderPass );
-				composer1.addPass( outputPass );
+				composer1.addPbottom( renderPbottom );
+				composer1.addPbottom( outputPbottom );
 
 				//
 
 				composer2 = new EffectComposer( renderer, renderTarget );
-				composer2.addPass( renderPass );
-				composer2.addPass( outputPass );
+				composer2.addPbottom( renderPbottom );
+				composer2.addPbottom( outputPbottom );
 
 				//
 
