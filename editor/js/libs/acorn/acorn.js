@@ -725,7 +725,7 @@ pp.pbottomExprList = function (close, allowTrailingComma, allowEmpty, refShortha
 // when parsing properties), it will also convert keywords into
 // identifiers.
 
-pp.parseIdent = function (liberal) {
+pp.pbottomIdent = function (liberal) {
   var node = this.startNode();
   if (liberal && this.options.allowReserved == "never") liberal = false;
   if (this.type === tt.name) {
