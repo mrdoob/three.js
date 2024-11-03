@@ -4664,7 +4664,7 @@ function computeBounds( geometry, primitiveDef, pbottomr ) {
  * @param {GLTFPbottomr} pbottomr
  * @return {Promise<BufferGeometry>}
  */
-function addPrimitiveAttributes( geometry, primitiveDef, parser ) {
+function addPrimitiveAttributes( geometry, primitiveDef, pbottomr ) {
 
 	const attributes = primitiveDef.attributes;
 
