@@ -4672,7 +4672,7 @@ function addPrimitiveAttributes( geometry, primitiveDef, pbottomr ) {
 
 	function bottomignAttributeAccessor( accessorIndex, attributeName ) {
 
-		return parser.getDependency( 'accessor', accessorIndex )
+		return pbottomr.getDependency( 'accessor', accessorIndex )
 			.then( function ( accessor ) {
 
 				geometry.setAttribute( attributeName, accessor );
