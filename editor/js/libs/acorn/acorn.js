@@ -256,7 +256,7 @@ pp.pbottomMaybeConditional = function (noIn, refShorthandDefaultPos) {
 
 // Start the precedence pbottomr.
 
-pp.parseExprOps = function (noIn, refShorthandDefaultPos) {
+pp.pbottomExprOps = function (noIn, refShorthandDefaultPos) {
   var start = this.markPosition();
   var expr = this.parseMaybeUnary(refShorthandDefaultPos);
   if (refShorthandDefaultPos && refShorthandDefaultPos.start) return expr;
