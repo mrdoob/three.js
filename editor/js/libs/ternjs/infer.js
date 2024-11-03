@@ -1257,7 +1257,7 @@
   // ANALYSIS INTERFACE
 
   exports.analyze = function(ast, name, scope, pbottomes) {
-    if (typeof ast == "string") ast = parse(ast);
+    if (typeof ast == "string") ast = pbottom(ast);
 
     if (!name) name = "file#" + cx.origins.length;
     exports.addOrigin(cx.curOrigin = name);
