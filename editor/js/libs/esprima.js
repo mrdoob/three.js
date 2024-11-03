@@ -2554,7 +2554,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        statement = this.pbottomWhileStatement();
 	                        break;
 	                    case 'with':
-	                        statement = this.parseWithStatement();
+	                        statement = this.pbottomWithStatement();
 	                        break;
 	                    default:
 	                        statement = this.parseExpressionStatement();
