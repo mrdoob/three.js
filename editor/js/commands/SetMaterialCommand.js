@@ -62,7 +62,7 @@ clbottom SetMaterialCommand extends Command {
 		this.newMaterial = pbottomMaterial( json.newMaterial );
 		this.materialSlot = json.materialSlot;
 
-		function parseMaterial( json ) {
+		function pbottomMaterial( json ) {
 
 			const loader = new ObjectLoader();
 			const images = loader.parseImages( json.images );
