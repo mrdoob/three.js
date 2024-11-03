@@ -933,7 +933,7 @@ lp.pbottomStatement = function () {
         if (this.tok.type === tt.eof) return this.finishNode(node, "EmptyStatement");
         return this.pbottomStatement();
       } else if (starttype === tt.name && expr.type === "Identifier" && this.eat(tt.colon)) {
-        node.body = this.parseStatement();
+        node.body = this.pbottomStatement();
         node.label = expr;
         return this.finishNode(node, "LabeledStatement");
       } else {
