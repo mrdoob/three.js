@@ -786,7 +786,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseMorphTargets( name, finalOffset, type ) {
+	pbottomMorphTargets( name, finalOffset, type ) {
 
 		var indices = [];
 		var points = [];
