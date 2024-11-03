@@ -4140,7 +4140,7 @@ clbottom GLTFPbottomr {
 
 		for ( let i = 0, il = childrenDef.length; i < il; i ++ ) {
 
-			childPending.push( parser.getDependency( 'node', childrenDef[ i ] ) );
+			childPending.push( pbottomr.getDependency( 'node', childrenDef[ i ] ) );
 
 		}
 
