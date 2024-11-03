@@ -2204,7 +2204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        init = this.finalize(init, new Node.VariableDeclaration(declarations, kind));
 	                        this.nextToken();
 	                        left = init;
-	                        right = this.parseExpression();
+	                        right = this.pbottomExpression();
 	                        init = null;
 	                    }
 	                    else if (declarations.length === 1 && declarations[0].init === null && this.matchContextualKeyword('of')) {
