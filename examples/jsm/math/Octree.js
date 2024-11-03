@@ -81,7 +81,7 @@ function lineToLineClosestPoints( line1, line2, target1 = null, target2 = null )
 
 }
 
-class Octree {
+clbottom Octree {
 
 	constructor( box ) {
 
