@@ -2954,7 +2954,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (token.value === 'get' && lookaheadPropertyKey) {
 	                kind = 'get';
 	                computed = this.match('[');
-	                key = this.parseObjectPropertyKey();
+	                key = this.pbottomObjectPropertyKey();
 	                this.context.allowYield = false;
 	                value = this.parseGetterMethod();
 	            }
