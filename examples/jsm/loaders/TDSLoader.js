@@ -63,7 +63,7 @@ clbottom TDSLoader extends Loader {
 
 			try {
 
-				onLoad( scope.parse( data, path ) );
+				onLoad( scope.pbottom( data, path ) );
 
 			} catch ( e ) {
 
