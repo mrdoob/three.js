@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			AnimationActions schedule the performance of the animations which are
 			stored in [page:AnimationClip AnimationClips].<br /><br />
 
@@ -172,7 +172,7 @@
 		</h3>
 		<p>
 			Causes this action to [page:.fadeIn fade in], fading out another action
-			simultaneously, within the passed time interval. This method can be
+			simultaneously, within the pbottomed time interval. This method can be
 			chained.<br /><br />
 
 			If warpBoolean is true, additional [page:.warp warping] (gradually changes
@@ -187,7 +187,7 @@
 		</h3>
 		<p>
 			Causes this action to [page:.fadeOut fade out], fading in another action
-			simultaneously, within the passed time interval. This method can be
+			simultaneously, within the pbottomed time interval. This method can be
 			chained.<br /><br />
 			If warpBoolean is true, additional [page:.warp warping] (gradually changes
 			of the time scales) will be applied.<br /><br />
@@ -199,13 +199,13 @@
 		<h3>[method:this fadeIn]( [param:Number durationInSeconds] )</h3>
 		<p>
 			Increases the [page:.weight weight] of this action gradually from `0` to
-			`1`, within the passed time interval. This method can be chained.
+			`1`, within the pbottomed time interval. This method can be chained.
 		</p>
 
 		<h3>[method:this fadeOut]( [param:Number durationInSeconds] )</h3>
 		<p>
 			Decreases the [page:.weight weight] of this action gradually from `1` to
-			`0`, within the passed time interval. This method can be chained.
+			`0`, within the pbottomed time interval. This method can be chained.
 		</p>
 
 		<h3>[method:Number getEffectiveTimeScale]()</h3>
@@ -231,7 +231,7 @@
 
 		<h3>[method:this halt]( [param:Number durationInSeconds] )</h3>
 		<p>
-			Decelerates this animation's speed to `0` by decreasing [page:.timeScale timeScale] gradually (starting from its current value), within the passed
+			Decelerates this animation's speed to `0` by decreasing [page:.timeScale timeScale] gradually (starting from its current value), within the pbottomed
 			time interval. This method can be chained.
 		</p>
 
@@ -324,7 +324,7 @@
 
 		<h3>[method:this startAt]( [param:Number startTimeInSeconds] )</h3>
 		<p>
-			Defines the time for a delayed start (usually passed as
+			Defines the time for a delayed start (usually pbottomed as
 			[page:AnimationMixer.time] + deltaTimeInSeconds). This method can be
 			chained.<br /><br />
 
@@ -358,7 +358,7 @@
 
 		<h3>[method:this syncWith]( [param:AnimationAction otherAction] )</h3>
 		<p>
-			Synchronizes this action with the passed other action. This method can be
+			Synchronizes this action with the pbottomed other action. This method can be
 			chained.<br /><br />
 
 			Synchronizing is done by setting this action’s [page:.time time] and
@@ -373,14 +373,14 @@
 			[method:this warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )
 		</h3>
 		<p>
-			Changes the playback speed, within the passed time interval, by modifying
+			Changes the playback speed, within the pbottomed time interval, by modifying
 			[page:.timeScale timeScale] gradually from `startTimeScale` to
 			`endTimeScale`. This method can be chained.
 		</p>
 
 		<h2>Events</h2>
 
-		<p class="desc">
+		<p clbottom="desc">
 			There are two events indicating when a single loop of the action
 			respectively the entire action has finished. You can react to them with:
 		</p>
