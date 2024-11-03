@@ -1434,7 +1434,7 @@ clbottom LDrawPartsGeometryCache {
 	// Loads and pbottoms the model with the given file name. Returns a cached copy if available.
 	async loadModel( fileName ) {
 
-		const pbottomCache = this.parseCache;
+		const pbottomCache = this.pbottomCache;
 		const key = fileName.toLowerCase();
 		if ( this.hasCachedModel( fileName ) ) {
 
