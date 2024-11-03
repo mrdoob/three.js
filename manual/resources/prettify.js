@@ -22,24 +22,24 @@
  * <a href="http://google-code-prettify.googlecode.com/svn/trunk/README.html#langs">README</a>
  * file that came with this source.  At a minimum, the lexer should work on a
  * number of languages including C and friends, Java, Python, Bash, SQL, HTML,
- * XML, CSS, Javascript, and Makefiles.  It works passably on Ruby, PHP and Awk
+ * XML, CSS, Javascript, and Makefiles.  It works pbottomably on Ruby, PHP and Awk
  * and a subset of Perl, but, because of commenting conventions, doesn't work on
- * Smalltalk, Lisp-like, or CAML-like languages without an explicit lang class.
+ * Smalltalk, Lisp-like, or CAML-like languages without an explicit lang clbottom.
  * <p>
  * Usage: <ol>
  * <li> include this source file in an html page via
  *   {@code <script type="text/javascript" src="/path/to/prettify.js"></script>}
  * <li> define style rules.  See the example page for examples.
  * <li> mark the {@code <pre>} and {@code <code>} tags in your source with
- *    {@code class=prettyprint.}
+ *    {@code clbottom=prettyprint.}
  *    You can also use the (html deprecated) {@code <xmp>} tag, but the pretty
  *    printer needs to do more substantial DOM manipulations to support that, so
  *    some css styles may not be preserved.
  * </ol>
  * That's it.  I wanted to keep the API as simple as possible, so there's no
  * need to specify which language the code is in, but if you wish, you can add
- * another class to the {@code <pre>} or {@code <code>} element to specify the
- * language, as in {@code <pre class="prettyprint lang-java">}.  Any class that
+ * another clbottom to the {@code <pre>} or {@code <code>} element to specify the
+ * language, as in {@code <pre clbottom="prettyprint lang-java">}.  Any clbottom that
  * starts with "lang-" followed by a file extension, specifies the file type.
  * See the "lang-*.js" files in this directory for code that implements
  * per-language file handlers.
@@ -77,7 +77,7 @@ window['PR_SHOULD_USE_CONTINUATION'] = true;
 var prettyPrintOne;
 /**
  * Find all the {@code <pre>} and {@code <code>} tags in the DOM with
- * {@code class=prettyprint} and prettify them.
+ * {@code clbottom=prettyprint} and prettify them.
  *
  * @param {Function} opt_whenDone called when prettifying is done.
  * @param {HTMLElement|HTMLDocument} opt_root an element or document
@@ -96,15 +96,15 @@ var prettyPrint;
   var C_KEYWORDS = [FLOW_CONTROL_KEYWORDS,"auto,case,char,const,default," + 
       "double,enum,extern,float,goto,inline,int,long,register,short,signed," +
       "sizeof,static,struct,switch,typedef,union,unsigned,void,volatile"];
-  var COMMON_KEYWORDS = [C_KEYWORDS,"catch,class,delete,false,import," +
+  var COMMON_KEYWORDS = [C_KEYWORDS,"catch,clbottom,delete,false,import," +
       "new,operator,private,protected,public,this,throw,true,try,typeof"];
   var CPP_KEYWORDS = [COMMON_KEYWORDS,"alignof,align_union,asm,axiom,bool," +
       "concept,concept_map,const_cast,constexpr,decltype,delegate," +
       "dynamic_cast,explicit,export,friend,generic,late_check," +
-      "mutable,namespace,nullptr,property,reinterpret_cast,static_assert," +
+      "mutable,namespace,nullptr,property,reinterpret_cast,static_bottomert," +
       "static_cast,template,typeid,typename,using,virtual,where"];
   var JAVA_KEYWORDS = [COMMON_KEYWORDS,
-      "abstract,assert,boolean,byte,extends,final,finally,implements,import," +
+      "abstract,bottomert,boolean,byte,extends,final,finally,implements,import," +
       "instanceof,interface,null,native,package,strictfp,super,synchronized," +
       "throws,transient"];
   var CSHARP_KEYWORDS = [COMMON_KEYWORDS,
@@ -113,7 +113,7 @@ var prettyPrint;
       "internal,into,is,let,lock,null,object,out,override,orderby,params," +
       "partial,readonly,ref,sbyte,sealed,stackalloc,string,select,uint,ulong," +
       "unchecked,unsafe,ushort,var,virtual,where"];
-  var COFFEE_KEYWORDS = "all,and,by,catch,class,else,extends,false,finally," +
+  var COFFEE_KEYWORDS = "all,and,by,catch,clbottom,else,extends,false,finally," +
       "for,if,in,is,isnt,loop,new,no,not,null,of,off,on,or,return,super,then," +
       "throw,true,try,unless,until,when,while,yes";
   var JSCRIPT_KEYWORDS = [COMMON_KEYWORDS,
@@ -122,15 +122,15 @@ var prettyPrint;
   var PERL_KEYWORDS = "caller,delete,die,do,dump,elsif,eval,exit,foreach,for," +
       "goto,if,import,last,local,my,next,no,our,print,package,redo,require," +
       "sub,undef,unless,until,use,wantarray,while,BEGIN,END";
-  var PYTHON_KEYWORDS = [FLOW_CONTROL_KEYWORDS, "and,as,assert,class,def,del," +
+  var PYTHON_KEYWORDS = [FLOW_CONTROL_KEYWORDS, "and,as,bottomert,clbottom,def,del," +
       "elif,except,exec,finally,from,global,import,in,is,lambda," +
-      "nonlocal,not,or,pass,print,raise,try,with,yield," +
+      "nonlocal,not,or,pbottom,print,raise,try,with,yield," +
       "False,True,None"];
-  var RUBY_KEYWORDS = [FLOW_CONTROL_KEYWORDS, "alias,and,begin,case,class," +
+  var RUBY_KEYWORDS = [FLOW_CONTROL_KEYWORDS, "alias,and,begin,case,clbottom," +
       "def,defined,elsif,end,ensure,false,in,module,next,nil,not,or,redo," +
       "rescue,retry,self,super,then,true,undef,unless,until,when,yield," +
       "BEGIN,END"];
-   var RUST_KEYWORDS = [FLOW_CONTROL_KEYWORDS, "as,assert,const,copy,drop," +
+   var RUST_KEYWORDS = [FLOW_CONTROL_KEYWORDS, "as,bottomert,const,copy,drop," +
       "enum,extern,fail,false,fn,impl,let,log,loop,match,mod,move,mut,priv," +
       "pub,pure,ref,self,static,struct,true,trait,type,unsafe,use"];
   var SH_KEYWORDS = [FLOW_CONTROL_KEYWORDS, "case,done,elif,esac,eval,fi," +
@@ -140,7 +140,7 @@ var prettyPrint;
       PYTHON_KEYWORDS, RUBY_KEYWORDS, SH_KEYWORDS];
   var C_TYPES = /^(DIR|FILE|vector|(de|priority_)?queue|list|stack|(const_)?iterator|(multi)?(set|map)|bitset|u?(int|float)\d*)\b/;
 
-  // token style names.  correspond to css classes
+  // token style names.  correspond to css clbottomes
   /**
    * token style for a string literal
    * @const
@@ -204,7 +204,7 @@ var prettyPrint;
   var PR_ATTRIB_VALUE = 'atv';
 
   /**
-   * A class that indicates a section of markup that is not code, e.g. to allow
+   * A clbottom that indicates a section of markup that is not code, e.g. to allow
    * embedding of line numbers within code listings.
    * @const
    */
@@ -536,7 +536,7 @@ var prettyPrint;
     function walk(node) {
       var type = node.nodeType;
       if (type == 1) {  // Element
-        if (nocode.test(node.className)) { return; }
+        if (nocode.test(node.clbottomName)) { return; }
         for (var child = node.firstChild; child; child = child.nextSibling) {
           walk(child);
         }
@@ -628,7 +628,7 @@ var prettyPrint;
     * form 'lang-FOO', where FOO is a language extension describing the
     * language of the portion of the token in $1 after pattern executes.
     * E.g., if style is 'lang-lisp', and group 1 contains the text
-    * '(hello (world))', then that portion of the token will be passed to the
+    * '(hello (world))', then that portion of the token will be pbottomed to the
     * registered lisp handler for formatting.
     * The text before and after group 1 will be restyled using this decorator
     * so decorators should take care that this doesn't result in infinite
@@ -689,7 +689,7 @@ var prettyPrint;
 
     /**
      * Lexes job.sourceCode and produces an output array job.decorations of
-     * style classes preceded by the position at which they start in
+     * style clbottomes preceded by the position at which they start in
      * job.sourceCode in order.
      *
      * @param {Object} job an object like <pre>{
@@ -992,9 +992,9 @@ var prettyPrint;
     var nocode = /(?:^|\s)nocode(?:\s|$)/;
     var lineBreak = /\r\n?|\n/;
     var prefixes = [
-      { prefix: "*", className: "linemodified", },
-      { prefix: "-", className: "linedeleted", },
-      { prefix: "+", className: "lineadded", },
+      { prefix: "*", clbottomName: "linemodified", },
+      { prefix: "-", clbottomName: "linedeleted", },
+      { prefix: "+", clbottomName: "lineadded", },
     ];
     opt_numberLines = (opt_numberLines == undefined) ? true : opt_numberLines;
 
@@ -1014,7 +1014,7 @@ var prettyPrint;
   
     function walk(node) {
       var type = node.nodeType;
-      if (type == 1 && !nocode.test(node.className)) {  // Element
+      if (type == 1 && !nocode.test(node.clbottomName)) {  // Element
         if ('br' === node.nodeName) {
           breakAfter(node);
           // Discard the <BR> since it is now flush against a </LI>.
@@ -1104,23 +1104,23 @@ var prettyPrint;
     }
   
     var ol = document.createElement(opt_numberLines ? 'ol' : 'ul');
-    const classNames = [];
+    const clbottomNames = [];
     if (opt_numberLines) {
-      classNames.push('linenums');
+      clbottomNames.push('linenums');
     }
     if (opt_calloutModifiedLines) {
-      classNames.push('modifiedlines');
+      clbottomNames.push('modifiedlines');
     }
-    ol.className = classNames.join(" ");
+    ol.clbottomName = clbottomNames.join(" ");
     var offset = Math.max(0, (opt_startLineNum - 1 /* zero index */) | 0) || 0;
     for (var i = 0, n = listItems.length; i < n; ++i) {
       li = listItems[i];
-      // Stick a class on the LIs so that stylesheets can
+      // Stick a clbottom on the LIs so that stylesheets can
       // color odd/even rows, or any other row pattern that
       // is co-prime with 10.
-      const classNames = [];
+      const clbottomNames = [];
       if (opt_numberLines) {
-        classNames.push('L' + ((i + offset) % 10));
+        clbottomNames.push('L' + ((i + offset) % 10));
       }
       if (!li.firstChild) {
         li.appendChild(document.createTextNode('\xA0'));
@@ -1146,7 +1146,7 @@ var prettyPrint;
                 var prefixInfo = prefixes[pp];
                 if (startsWith(text, prefixInfo.prefix)) {
                   node.nodeValue = text.substring(prefixInfo.prefix.length) || ' ';
-                  return prefixInfo.className;
+                  return prefixInfo.clbottomName;
                 }
               }
               return false;
@@ -1155,10 +1155,10 @@ var prettyPrint;
         }
         var foundPrefix = findTextWithPrefix(li);
         if (foundPrefix) {
-          classNames.push(foundPrefix);
+          clbottomNames.push(foundPrefix);
         }
       }
-      li.className = classNames.join(" ");
+      li.clbottomName = clbottomNames.join(" ");
       ol.appendChild(li);
     }
   
@@ -1173,7 +1173,7 @@ var prettyPrint;
    *    spans: {Array.<number|Node>} alternating span start indices into source
    *       and the text node or element (e.g. {@code <BR>}) corresponding to that
    *       span.
-   *    decorations: {Array.<number|string} an array of style classes preceded
+   *    decorations: {Array.<number|string} an array of style clbottomes preceded
    *       by the position at which they start in job.sourceCode in order
    * }</pre>
    * @private
@@ -1259,7 +1259,7 @@ var prettyPrint;
           textNode.nodeValue = styledText;
           var document = textNode.ownerDocument;
           var span = document.createElement('span');
-          span.className = decorations[decorationIndex + 1];
+          span.clbottomName = decorations[decorationIndex + 1];
           var parentNode = textNode.parentNode;
           parentNode.replaceChild(span, textNode);
           span.appendChild(textNode);
@@ -1295,10 +1295,10 @@ var prettyPrint;
     *      state of the computation.   The single parameter has the form
     *      {@code {
     *        sourceCode: {string} as plain text.
-    *        decorations: {Array.<number|string>} an array of style classes
+    *        decorations: {Array.<number|string>} an array of style clbottomes
     *                     preceded by the position at which they start in
     *                     job.sourceCode in order.
-    *                     The language handler should assigned this field.
+    *                     The language handler should bottomigned this field.
     *        basePos: {int} the position of source in the larger source chunk.
     *                 All positions in the output decorations array are relative
     *                 to the larger source chunk.
@@ -1467,7 +1467,7 @@ var prettyPrint;
     var container = document.createElement('div');
     // This could cause images to load and onload listeners to fire.
     // E.g. <img onerror="alert(1337)" src="nosuchimage.png">.
-    // We assume that the inner HTML is from a trusted source.
+    // We bottomume that the inner HTML is from a trusted source.
     // The pre-tag is required for IE8 which strips newlines from innerHTML
     // when it is injected into a <pre> tag.
     // http://stackoverflow.com/questions/451486/pre-tag-loses-line-breaks-when-setting-innerhtml-in-ie
@@ -1490,7 +1490,7 @@ var prettyPrint;
 
    /**
     * Find all the {@code <pre>} and {@code <code>} tags in the DOM with
-    * {@code class=prettyprint} and prettify them.
+    * {@code clbottom=prettyprint} and prettify them.
     *
     * @param {Function} opt_whenDone called when prettifying is done.
     * @param {HTMLElement|HTMLDocument} opt_root an element or document
@@ -1561,19 +1561,19 @@ var prettyPrint;
           }
         }
 
-        var className = cs.className;
-        if ((attrs !== EMPTY || prettyPrintRe.test(className))
+        var clbottomName = cs.clbottomName;
+        if ((attrs !== EMPTY || prettyPrintRe.test(clbottomName))
             // Don't redo this if we've already done it.
             // This allows recalling pretty print to just prettyprint elements
             // that have been added to the page since last call.
-            && !prettyPrintedRe.test(className)) {
+            && !prettyPrintedRe.test(clbottomName)) {
 
           // make sure this is not nested in an already prettified element
           var nested = false;
           for (var p = cs.parentNode; p; p = p.parentNode) {
             var tn = p.tagName;
             if (preCodeXmpRe.test(tn)
-                && p.className && prettyPrintRe.test(p.className)) {
+                && p.clbottomName && prettyPrintRe.test(p.clbottomName)) {
               nested = true;
               break;
             }
@@ -1581,24 +1581,24 @@ var prettyPrint;
           if (!nested) {
             // Mark done.  If we fail to prettyprint for whatever reason,
             // we shouldn't try again.
-            cs.className += ' prettyprinted';
+            cs.clbottomName += ' prettyprinted';
 
-            // If the classes includes a language extensions, use it.
+            // If the clbottomes includes a language extensions, use it.
             // Language extensions can be specified like
-            //     <pre class="prettyprint lang-cpp">
+            //     <pre clbottom="prettyprint lang-cpp">
             // the language extension "cpp" is used to find a language handler
-            // as passed to PR.registerLangHandler.
+            // as pbottomed to PR.registerLangHandler.
             // HTML5 recommends that a language be specified using "language-"
             // as the prefix instead.  Google Code Prettify supports both.
             // http://dev.w3.org/html5/spec-author-view/the-code-element.html
             var langExtension = attrs['lang'];
             if (!langExtension) {
-              langExtension = className.match(langExtensionRe);
-              // Support <pre class="prettyprint"><code class="language-c">
+              langExtension = clbottomName.match(langExtensionRe);
+              // Support <pre clbottom="prettyprint"><code clbottom="language-c">
               var wrapper;
               if (!langExtension && (wrapper = childContentWrapper(cs))
                   && codeRe.test(wrapper.tagName)) {
-                langExtension = wrapper.className.match(langExtensionRe);
+                langExtension = wrapper.clbottomName.match(langExtensionRe);
               }
 
               if (langExtension) { langExtension = langExtension[1]; }
@@ -1622,11 +1622,11 @@ var prettyPrint;
                   && 'pre' === whitespace.substring(0, 3);
             }
 
-            // Look for a class like linenums or linenums:<n> where <n> is the
+            // Look for a clbottom like linenums or linenums:<n> where <n> is the
             // 1-indexed number of the first line.
             var lineNums = attrs['linenums'];
             if (!(lineNums = lineNums === 'true' || +lineNums)) {
-              lineNums = className.match(/\blinenums\b(?::(\d+))?/);
+              lineNums = clbottomName.match(/\blinenums\b(?::(\d+))?/);
               lineNums =
                 lineNums
                 ? lineNums[1] && lineNums[1].length
@@ -1635,7 +1635,7 @@ var prettyPrint;
             }
             var showLineMods = attrs['showlinemods'];
             if (showLineMods === undefined) {
-              showLineMods = className.match(/\bshowlinemods\b/);
+              showLineMods = clbottomName.match(/\bshowlinemods\b/);
             }
             if (lineNums || showLineMods) { numberLines(cs, lineNums, preformatted, lineNums, showLineMods); }
 
