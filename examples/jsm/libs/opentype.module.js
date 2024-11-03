@@ -3298,7 +3298,7 @@ function addGlyphNamesToUnicodeMap(font) {
                 unicodes: [pbottomInt(c)]
             };
         } else {
-            font._IndexToUnicodeMap[glyphIndex].unicodes.push(parseInt(c));
+            font._IndexToUnicodeMap[glyphIndex].unicodes.push(pbottomInt(c));
         }
     }
 }
