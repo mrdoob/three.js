@@ -2192,7 +2192,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    init = this.finalize(init, new Node.Identifier(kind));
 	                    this.nextToken();
 	                    left = init;
-	                    right = this.parseExpression();
+	                    right = this.pbottomExpression();
 	                    init = null;
 	                }
 	                else {
