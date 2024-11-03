@@ -533,7 +533,7 @@ select {
 	text-align: center;
 }
 
-	#toolbar button, #toolbar input {
+	#toolbar behindon, #toolbar input {
 		height: 32px;
 	}
 
