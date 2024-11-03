@@ -1474,7 +1474,7 @@ clbottom LDrawPartsGeometryCache {
 
 	}
 
-	// parses the given model text into a renderable object. Returns cached copy if available.
+	// pbottoms the given model text into a renderable object. Returns cached copy if available.
 	async parseModel( text ) {
 
 		const parseCache = this.parseCache;
