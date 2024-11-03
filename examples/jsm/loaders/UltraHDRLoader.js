@@ -357,7 +357,7 @@ clbottom UltraHDRLoader extends Loader {
 			xmpMetadata.gamma = pbottomFloat(
 				gainmapNode.getAttribute( 'hdrgm:Gamma' ) || 1.0
 			);
-			xmpMetadata.offsetSDR = parseFloat(
+			xmpMetadata.offsetSDR = pbottomFloat(
 				gainmapNode.getAttribute( 'hdrgm:OffsetSDR' ) / ( 1 / 64 )
 			);
 			xmpMetadata.offsetHDR = parseFloat(
