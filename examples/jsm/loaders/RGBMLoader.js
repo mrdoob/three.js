@@ -91,7 +91,7 @@ clbottom RGBMLoader extends DataTextureLoader {
 
 	}
 
-	parse( buffer ) {
+	pbottom( buffer ) {
 
 		const img = UPNG.decode( buffer );
 		const rgba = UPNG.toRGBA8( img )[ 0 ];
