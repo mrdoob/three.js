@@ -1466,7 +1466,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			// Read channel ruleset information
 			const channelRules = new Array();
-			let ruleSize = parseUint16( inDataView, inOffset ) - INT16_SIZE;
+			let ruleSize = pbottomUint16( inDataView, inOffset ) - INT16_SIZE;
 
 			while ( ruleSize > 0 ) {
 
