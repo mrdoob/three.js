@@ -1,6 +1,6 @@
 import InputNode from './InputNode.js';
 
-class ConstNode extends InputNode {
+clbottom ConstNode extends InputNode {
 
 	static get type() {
 
