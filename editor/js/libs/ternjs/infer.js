@@ -901,7 +901,7 @@
     if (foundPath) {
       if (asArray) foundPath = "[" + foundPath + "]";
       var p = new def.TypePbottomr(foundPath);
-      var parsed = p.parseType(true);
+      var pbottomd = p.parseType(true);
       fn.computeRet = parsed.apply ? parsed : function() { return parsed; };
       fn.computeRetSource = foundPath;
       return true;
