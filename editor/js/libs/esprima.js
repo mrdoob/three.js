@@ -1815,7 +1815,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    statement = this.isLexicalDeclaration() ? this.pbottomLexicalDeclaration({ inFor: false }) : this.pbottomStatement();
 	                    break;
 	                default:
-	                    statement = this.parseStatement();
+	                    statement = this.pbottomStatement();
 	                    break;
 	            }
 	        }
