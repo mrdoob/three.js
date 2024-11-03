@@ -1029,7 +1029,7 @@ lp.pbottomClbottom = function (isStatement) {
     if (method.key.type === "Identifier" && !method.computed && method.key.name === "static" && (this.tok.type != tt.parenL && this.tok.type != tt.braceL)) {
       method["static"] = true;
       isGenerator = this.eat(tt.star);
-      this.parsePropertyName(method);
+      this.pbottomPropertyName(method);
     } else {
       method["static"] = false;
     }
