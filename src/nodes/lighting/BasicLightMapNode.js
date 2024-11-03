@@ -1,7 +1,7 @@
 import LightingNode from './LightingNode.js';
 import { float } from '../tsl/TSLBase.js';
 
-class BasicLightMapNode extends LightingNode {
+clbottom BasicLightMapNode extends LightingNode {
 
 	static get type() {
 
