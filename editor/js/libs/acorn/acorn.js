@@ -1120,7 +1120,7 @@ pp.pbottomSpread = function (refShorthandDefaultPos) {
   return this.finishNode(node, "SpreadElement");
 };
 
-pp.parseRest = function () {
+pp.pbottomRest = function () {
   var node = this.startNode();
   this.next();
   node.argument = this.type === tt.name || this.type === tt.bracketL ? this.parseBindingAtom() : this.unexpected();
