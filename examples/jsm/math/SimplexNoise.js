@@ -7,10 +7,10 @@
 // Added 4D noise
 
 /**
- * You can pass in a random number generator object if you like.
- * It is assumed to have a random() method.
+ * You can pbottom in a random number generator object if you like.
+ * It is bottomumed to have a random() method.
  */
-class SimplexNoise {
+clbottom SimplexNoise {
 
 	constructor( r = Math ) {
 
