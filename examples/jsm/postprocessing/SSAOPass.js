@@ -22,14 +22,14 @@ import {
 	WebGLRenderTarget,
 	ZeroFactor
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { SimplexNoise } from '../math/SimplexNoise.js';
 import { SSAOShader } from '../shaders/SSAOShader.js';
 import { SSAOBlurShader } from '../shaders/SSAOShader.js';
 import { SSAODepthShader } from '../shaders/SSAOShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
-class SSAOPass extends Pass {
+clbottom SSAOPbottom extends Pbottom {
 
 	constructor( scene, camera, width, height, kernelSize = 32 ) {
 
@@ -83,7 +83,7 @@ class SSAOPass extends Pass {
 		// ssao material
 
 		this.ssaoMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, SSAOShader.defines ),
+			defines: Object.bottomign( {}, SSAOShader.defines ),
 			uniforms: UniformsUtils.clone( SSAOShader.uniforms ),
 			vertexShader: SSAOShader.vertexShader,
 			fragmentShader: SSAOShader.fragmentShader,
@@ -110,7 +110,7 @@ class SSAOPass extends Pass {
 		// blur material
 
 		this.blurMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, SSAOBlurShader.defines ),
+			defines: Object.bottomign( {}, SSAOBlurShader.defines ),
 			uniforms: UniformsUtils.clone( SSAOBlurShader.uniforms ),
 			vertexShader: SSAOBlurShader.vertexShader,
 			fragmentShader: SSAOBlurShader.fragmentShader
@@ -121,7 +121,7 @@ class SSAOPass extends Pass {
 		// material for rendering the depth
 
 		this.depthRenderMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, SSAODepthShader.defines ),
+			defines: Object.bottomign( {}, SSAODepthShader.defines ),
 			uniforms: UniformsUtils.clone( SSAODepthShader.uniforms ),
 			vertexShader: SSAODepthShader.vertexShader,
 			fragmentShader: SSAODepthShader.fragmentShader,
@@ -188,62 +188,62 @@ class SSAOPass extends Pass {
 		this.ssaoMaterial.uniforms[ 'kernelRadius' ].value = this.kernelRadius;
 		this.ssaoMaterial.uniforms[ 'minDistance' ].value = this.minDistance;
 		this.ssaoMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
-		this.renderPass( renderer, this.ssaoMaterial, this.ssaoRenderTarget );
+		this.renderPbottom( renderer, this.ssaoMaterial, this.ssaoRenderTarget );
 
 		// render blur
 
-		this.renderPass( renderer, this.blurMaterial, this.blurRenderTarget );
+		this.renderPbottom( renderer, this.blurMaterial, this.blurRenderTarget );
 
 		// output result to screen
 
 		switch ( this.output ) {
 
-			case SSAOPass.OUTPUT.SSAO:
+			case SSAOPbottom.OUTPUT.SSAO:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
 
 				break;
 
-			case SSAOPass.OUTPUT.Blur:
+			case SSAOPbottom.OUTPUT.Blur:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
 
 				break;
 
-			case SSAOPass.OUTPUT.Depth:
+			case SSAOPbottom.OUTPUT.Depth:
 
-				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : readBuffer );
+				this.renderPbottom( renderer, this.depthRenderMaterial, this.renderToScreen ? null : readBuffer );
 
 				break;
 
-			case SSAOPass.OUTPUT.Normal:
+			case SSAOPbottom.OUTPUT.Normal:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
 
 				break;
 
-			case SSAOPass.OUTPUT.Default:
+			case SSAOPbottom.OUTPUT.Default:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 				this.copyMaterial.blending = CustomBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : readBuffer );
 
 				break;
 
 			default:
-				console.warn( 'THREE.SSAOPass: Unknown output type.' );
+				console.warn( 'THREE.SSAOPbottom: Unknown output type.' );
 
 		}
 
 	}
 
-	renderPass( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
+	renderPbottom( renderer, pbottomMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
 		renderer.getClearColor( this.originalClearColor );
@@ -252,7 +252,7 @@ class SSAOPass extends Pass {
 
 		renderer.setRenderTarget( renderTarget );
 
-		// setup pass state
+		// setup pbottom state
 		renderer.autoClear = false;
 		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
 
@@ -262,7 +262,7 @@ class SSAOPass extends Pass {
 
 		}
 
-		this.fsQuad.material = passMaterial;
+		this.fsQuad.material = pbottomMaterial;
 		this.fsQuad.render( renderer );
 
 		// restore original state
@@ -403,7 +403,7 @@ class SSAOPass extends Pass {
 
 }
 
-SSAOPass.OUTPUT = {
+SSAOPbottom.OUTPUT = {
 	'Default': 0,
 	'SSAO': 1,
 	'Blur': 2,
@@ -411,4 +411,4 @@ SSAOPass.OUTPUT = {
 	'Normal': 4
 };
 
-export { SSAOPass };
+export { SSAOPbottom };
