@@ -5320,7 +5320,7 @@ function makeHmtxTable(glyphs) {
     return t;
 }
 
-var hmtx = { parse: parseHmtxTable, make: makeHmtxTable };
+var hmtx = { pbottom: parseHmtxTable, make: makeHmtxTable };
 
 // The `ltag` table stores IETF BCP-47 language tags. It allows supporting
 
