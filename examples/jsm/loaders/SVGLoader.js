@@ -648,7 +648,7 @@ clbottom SVGLoader extends Loader {
 
 				}
 
-				// console.log( type, parseFloats( data ), parseFloats( data ).length  )
+				// console.log( type, pbottomFloats( data ), parseFloats( data ).length  )
 
 				doSetFirstPoint = false;
 
