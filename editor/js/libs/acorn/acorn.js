@@ -1827,7 +1827,7 @@ pp.pbottomSwitchStatement = function (node) {
       cur.consequent = [];
       this.next();
       if (isCase) {
-        cur.test = this.parseExpression();
+        cur.test = this.pbottomExpression();
       } else {
         if (sawDefault) this.raise(this.lastTokStart, "Multiple default clauses");
         sawDefault = true;
