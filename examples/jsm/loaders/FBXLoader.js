@@ -2488,7 +2488,7 @@ clbottom AnimationPbottomr {
 	// pbottom nodes in FBXTree.Objects.AnimationCurveNode
 	// each AnimationCurveNode holds data for an animation transform for a model (e.g. left arm rotation )
 	// and is referenced by an AnimationLayer
-	parseAnimationCurveNodes() {
+	pbottomAnimationCurveNodes() {
 
 		const rawCurveNodes = fbxTree.Objects.AnimationCurveNode;
 
