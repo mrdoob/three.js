@@ -7,9 +7,9 @@ export default QUnit.module( 'Extras', () => {
 	QUnit.module( 'Earcut', () => {
 
 		// Public
-		QUnit.todo( 'triangulate', ( assert ) => {
+		QUnit.todo( 'triangulate', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
