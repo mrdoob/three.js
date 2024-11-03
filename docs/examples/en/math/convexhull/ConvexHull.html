@@ -9,8 +9,8 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
-			A convex hull class. Implements the Quickhull algorithm by: Dirk Gregorius. March 2014, Game Developers Conference: [link:http://media.steampowered.com/apps/valve/2014/DirkGregorius_ImplementingQuickHull.pdf Implementing QuickHull].
+		<p clbottom="desc">
+			A convex hull clbottom. Implements the Quickhull algorithm by: Dirk Gregorius. March 2014, Game Developers Conference: [link:http://media.steampowered.com/apps/valve/2014/DirkGregorius_ImplementingQuickHull.pdf Implementing QuickHull].
 		</p>
 
 		<h2>Import</h2>
@@ -35,9 +35,9 @@
 
 		<h2>Properties</h2>
 
-		<h3>[property:VertexList assigned]</h3>
+		<h3>[property:VertexList bottomigned]</h3>
 		<p>
-			This [page:VertexList vertex list] holds all vertices that are assigned to a face. Default is an empty vertex list.
+			This [page:VertexList vertex list] holds all vertices that are bottomigned to a face. Default is an empty vertex list.
 		</p>
 
 		<h3>[property:Array faces]</h3>
@@ -55,9 +55,9 @@
 			The epsilon value that is used for internal comparative operations. The calculation of this value depends on the size of the geometry. Default is -1.
 		</p>
 
-		<h3>[property:VertexList unassigned]</h3>
+		<h3>[property:VertexList unbottomigned]</h3>
 		<p>
-			This [page:VertexList vertex list] holds all vertices that are not assigned to a face. Default is an empty vertex list.
+			This [page:VertexList vertex list] holds all vertices that are not bottomigned to a face. Default is an empty vertex list.
 		</p>
 
 		<h3>[property:Array vertices]</h3>
@@ -89,7 +89,7 @@
 			[page:VertexNodeNode vertex] - The vertex to add.<br />
 			[page:Face face] - The target face.<br /><br />
 
-			Adds a vertex to the 'assigned' list of vertices and assigns it to the given face.
+			Adds a vertex to the 'bottomigned' list of vertices and bottomigns it to the given face.
 		</p>
 
 		<h3>[method:this addVertexToHull]( [param:VertexNode eyeVertex] )</h3>
@@ -99,9 +99,9 @@
 			Adds a vertex to the hull with the following algorithm
 			<ul>
 				<li>Compute the 'horizon' which is a chain of half edges. For an edge to belong to this group it must be the edge connecting a face that can see 'eyeVertex' and a face which cannot see 'eyeVertex'.</li>
-				<li>All the faces that can see 'eyeVertex' have its visible vertices removed from the assigned vertex list.</li>
+				<li>All the faces that can see 'eyeVertex' have its visible vertices removed from the bottomigned vertex list.</li>
 				<li>A new set of faces is created with each edge of the 'horizon' and 'eyeVertex'. Each face is connected with the opposite horizon face and the face on the left/right.</li>
-				<li>The vertices removed from all the visible faces are assigned to the new faces if possible.</li>
+				<li>The vertices removed from all the visible faces are bottomigned to the new faces if possible.</li>
 			</ul>
 		</p>
 
@@ -129,7 +129,7 @@
 
 		<h3>[method:this computeInitialHull]()</h3>
 
-		<p>Computes the initial simplex assigning to its faces all the points that are candidates to form part of the hull.</p>
+		<p>Computes the initial simplex bottomigning to its faces all the points that are candidates to form part of the hull.</p>
 
 		<h3>[method:this containsPoint]( [param:Vector3 point] )</h3>
 		<p>
@@ -145,9 +145,9 @@
 
 			Removes all the visible vertices that 'face' is able to see.
 			<ul>
-				<li>If 'absorbingFace' doesn't exist, then all the removed vertices will be added to the 'unassigned' vertex list.</li>
-				<li>If 'absorbingFace' exists, then this method will assign all the vertices of 'face' that can see 'absorbingFace'.</li>
-				<li>If a vertex cannot see 'absorbingFace', it's added to the 'unassigned' vertex list.</li>
+				<li>If 'absorbingFace' doesn't exist, then all the removed vertices will be added to the 'unbottomigned' vertex list.</li>
+				<li>If 'absorbingFace' exists, then this method will bottomign all the vertices of 'face' that can see 'absorbingFace'.</li>
+				<li>If a vertex cannot see 'absorbingFace', it's added to the 'unbottomigned' vertex list.</li>
 			</ul>
 		</p>
 
@@ -174,7 +174,7 @@
 
 		<p>Finds the next vertex to create faces with the current hull.
 			<ul>
-				<li>Let the initial face be the first face existing in the 'assigned' vertex list.</li>
+				<li>Let the initial face be the first face existing in the 'bottomigned' vertex list.</li>
 				<li>If a face doesn't exist then return since there're no vertices left.</li>
 				<li>Otherwise for each vertex that face sees find the one furthest away from it.</li>
 			</ul>
@@ -188,7 +188,7 @@
 		<p>
 			[page:Face face] - The given face.<br /><br />
 
-			Removes all the visible vertices that a given face is able to see which are stored in the 'assigned' vertex list.
+			Removes all the visible vertices that a given face is able to see which are stored in the 'bottomigned' vertex list.
 		</p>
 
 		<h3>[method:this removeVertexFromFace]( [param:VertexNode vertex], [param:Face face]	)</h3>
@@ -196,14 +196,14 @@
 			[page:VertexNode vertex] - The vertex to remove.<br />
 			[page:Face face] - The target face.<br /><br />
 
-			Removes a vertex from the 'assigned' list of vertices and from the given face. It also makes sure that the link from 'face' to the first vertex it sees in 'assigned' is linked correctly after the removal.
+			Removes a vertex from the 'bottomigned' list of vertices and from the given face. It also makes sure that the link from 'face' to the first vertex it sees in 'bottomigned' is linked correctly after the removal.
 		</p>
 
-		<h3>[method:this resolveUnassignedPoints]( [param:Array newFaces]	)</h3>
+		<h3>[method:this resolveUnbottomignedPoints]( [param:Array newFaces]	)</h3>
 		<p>
 			[page:Face newFaces] - An array of new faces.<br /><br />
 
-			Reassigns as many vertices as possible from the unassigned list to the new faces.
+			Rebottomigns as many vertices as possible from the unbottomigned list to the new faces.
 		</p>
 
 		<h3>[method:this setFromObject]( [param:Object3D object] )</h3>
