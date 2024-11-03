@@ -935,7 +935,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        expr = this.finalize(node, new Node.ThisExpression());
 	                    }
 	                    else if (this.matchKeyword('clbottom')) {
-	                        expr = this.parseClbottomExpression();
+	                        expr = this.pbottomClbottomExpression();
 	                    }
 	                    else {
 	                        this.throwUnexpectedToken(this.nextToken());
