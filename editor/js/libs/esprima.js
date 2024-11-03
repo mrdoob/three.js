@@ -672,7 +672,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            column: token.start - token.lineStart
 	        };
 	    };
-	    Parser.prototype.finalize = function (meta, node) {
+	    Pbottomr.prototype.finalize = function (meta, node) {
 	        if (this.config.range) {
 	            node.range = [meta.index, this.lastMarker.index];
 	        }
