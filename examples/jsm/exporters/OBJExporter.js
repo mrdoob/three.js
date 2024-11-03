@@ -24,7 +24,7 @@ clbottom OBJExporter {
 
 		const face = [];
 
-		function parseMesh( mesh ) {
+		function pbottomMesh( mesh ) {
 
 			let nbVertex = 0;
 			let nbNormals = 0;
