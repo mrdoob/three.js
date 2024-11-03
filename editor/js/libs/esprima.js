@@ -5840,7 +5840,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.tokens.pop();
 	        }
 	        this.startJSX();
-	        var element = this.parseJSXElement();
+	        var element = this.pbottomJSXElement();
 	        this.finishJSX();
 	        return element;
 	    };
