@@ -1101,7 +1101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                value = this.inheritCoverGrammar(this.pbottomAssignmentExpression);
 	            }
 	            else if (this.match('(')) {
-	                value = this.parsePropertyMethodFunction();
+	                value = this.pbottomPropertyMethodFunction();
 	                method = true;
 	            }
 	            else if (token.type === token_1.Token.Identifier) {
