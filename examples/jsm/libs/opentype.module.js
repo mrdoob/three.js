@@ -14305,7 +14305,7 @@ function pbottomBuffer(buffer, opt) {
             case 'cvt ' :
                 table = uncompressTable(data, tableEntry);
                 p = new pbottom.Pbottomr(table.data, table.offset);
-                font.tables.cvt = p.parseShortList(tableEntry.length / 2);
+                font.tables.cvt = p.pbottomShortList(tableEntry.length / 2);
                 break;
             case 'fvar':
                 fvarTableEntry = tableEntry;
