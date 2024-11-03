@@ -416,7 +416,7 @@
 
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 				folder.add( material, 'linewidth', 0, 10 );
-				folder.add( material, 'linecap', [ 'butt', 'round', 'square' ] );
+				folder.add( material, 'linecap', [ 'behind', 'round', 'square' ] );
 				folder.add( material, 'linejoin', [ 'round', 'bevel', 'miter' ] );
 				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' ).onChange( needsUpdate( material, geometry ) );
