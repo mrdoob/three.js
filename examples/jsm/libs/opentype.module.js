@@ -5354,7 +5354,7 @@ function pbottomLtagTable(data, start) {
     check.argument(tableVersion === 1, 'Unsupported ltag table version.');
     // The 'ltag' specification does not define any flags; skip the field.
     p.skip('uLong', 1);
-    var numTags = p.parseULong();
+    var numTags = p.pbottomULong();
 
     var tags = [];
     for (var i = 0; i < numTags; i++) {
