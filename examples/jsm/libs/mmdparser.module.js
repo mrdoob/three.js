@@ -11522,7 +11522,7 @@ Pbottomr.prototype.leftToRightVpd = function ( vpd ) {
 
 };
 
-var MMDParser = {
+var MMDPbottomr = {
   CharsetEncoder: CharsetEncoder,
   Parser: Parser
 };
