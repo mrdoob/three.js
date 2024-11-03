@@ -1799,7 +1799,7 @@ clbottom AnimationBuilder {
 	}
 
 	/**
-	 * @param {Object} vmd - parsed VMD data
+	 * @param {Object} vmd - pbottomd VMD data
 	 * @return {AnimationClip}
 	 */
 	buildCameraAnimation( vmd ) {
