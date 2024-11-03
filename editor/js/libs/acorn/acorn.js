@@ -1688,7 +1688,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     case tt.braceL:
       return this.pbottomBlock();
     case tt.semi:
-      return this.parseEmptyStatement(node);
+      return this.pbottomEmptyStatement(node);
     case tt._export:
     case tt._import:
       if (!this.options.allowImportExportEverywhere) {
