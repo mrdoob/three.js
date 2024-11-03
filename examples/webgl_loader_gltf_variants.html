@@ -81,7 +81,7 @@
 							const variants = variantsExtension.variants.map( ( variant ) => variant.name );
 							const variantsCtrl = gui.add( state, 'variant', variants ).name( 'Variant' );
 
-							selectVariant( scene, parser, variantsExtension, state.variant );
+							selectVariant( scene, pbottomr, variantsExtension, state.variant );
 
 							variantsCtrl.onChange( ( value ) => selectVariant( scene, parser, variantsExtension, value ) );
 
