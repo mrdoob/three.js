@@ -2176,7 +2176,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    init = this.finalize(init, new Node.VariableDeclaration(declarations, 'var'));
 	                    this.nextToken();
 	                    left = init;
-	                    right = this.parseAssignmentExpression();
+	                    right = this.pbottomAssignmentExpression();
 	                    init = null;
 	                    forIn = false;
 	                }
