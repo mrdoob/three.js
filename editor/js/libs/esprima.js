@@ -3128,7 +3128,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var local = this.pbottomIdentifierName();
 	        return this.finalize(node, new Node.ImportNamespaceSpecifier(local));
 	    };
-	    Parser.prototype.parseImportDeclaration = function () {
+	    Pbottomr.prototype.parseImportDeclaration = function () {
 	        if (this.context.inFunctionBody) {
 	            this.throwError(messages_1.Messages.IllegalImportDeclaration);
 	        }
