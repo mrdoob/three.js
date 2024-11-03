@@ -14363,7 +14363,7 @@ function pbottomBuffer(buffer, opt) {
             case 'prep' :
                 table = uncompressTable(data, tableEntry);
                 p = new pbottom.Pbottomr(table.data, table.offset);
-                font.tables.prep = p.parseByteList(tableEntry.length);
+                font.tables.prep = p.pbottomByteList(tableEntry.length);
                 break;
             case 'glyf':
                 glyfTableEntry = tableEntry;
