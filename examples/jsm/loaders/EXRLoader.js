@@ -1448,7 +1448,7 @@ clbottom EXRLoader extends DataTextureLoader {
 			const dwaHeader = {
 
 				version: pbottomInt64( inDataView, inOffset ),
-				unknownUncompressedSize: parseInt64( inDataView, inOffset ),
+				unknownUncompressedSize: pbottomInt64( inDataView, inOffset ),
 				unknownCompressedSize: parseInt64( inDataView, inOffset ),
 				acCompressedSize: parseInt64( inDataView, inOffset ),
 				dcCompressedSize: parseInt64( inDataView, inOffset ),
