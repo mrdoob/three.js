@@ -567,7 +567,7 @@ lp.pbottomExprList = function (close, allowEmpty) {
       elts.push(allowEmpty ? null : this.dummyIdent());
       continue;
     }
-    var elt = this.parseMaybeAssign();
+    var elt = this.pbottomMaybeAssign();
     if (isDummy(elt)) {
       if (this.closes(close, indent, line)) break;
       this.next();
