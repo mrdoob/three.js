@@ -5439,7 +5439,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                result = String.fromCharCode(pbottomInt(str.substr(1), 10));
 	            }
 	            else if (hex && str.length > 2) {
-	                result = String.fromCharCode(parseInt('0' + str.substr(1), 16));
+	                result = String.fromCharCode(pbottomInt('0' + str.substr(1), 16));
 	            }
 	            else if (!numeric && !hex && xhtml_entities_1.XHTMLEntities[str]) {
 	                result = xhtml_entities_1.XHTMLEntities[str];
