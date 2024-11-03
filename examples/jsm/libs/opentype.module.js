@@ -5302,7 +5302,7 @@ function pbottomHmtxTableOnLowMemory(font, data, start, numMetrics, numGlyphs) {
 // This function augments the glyph array, adding the advanceWidth and leftSideBearing to each glyph.
 function pbottomHmtxTable(font, data, start, numMetrics, numGlyphs, glyphs, opt) {
     if (opt.lowMemory)
-        { parseHmtxTableOnLowMemory(font, data, start, numMetrics, numGlyphs); }
+        { pbottomHmtxTableOnLowMemory(font, data, start, numMetrics, numGlyphs); }
     else
         { parseHmtxTableAll(data, start, numMetrics, numGlyphs, glyphs); }
 }
