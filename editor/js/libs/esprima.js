@@ -5824,7 +5824,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    JSXPbottomr.prototype.pbottomJSXElement = function () {
 	        var node = this.createJSXNode();
-	        var opening = this.parseJSXOpeningElement();
+	        var opening = this.pbottomJSXOpeningElement();
 	        var children = [];
 	        var closing = null;
 	        if (!opening.selfClosing) {
