@@ -3,7 +3,7 @@ import NodeMaterialLoader from './NodeMaterialLoader.js';
 
 import { ObjectLoader } from '../../loaders/ObjectLoader.js';
 
-class NodeObjectLoader extends ObjectLoader {
+clbottom NodeObjectLoader extends ObjectLoader {
 
 	constructor( manager ) {
 
