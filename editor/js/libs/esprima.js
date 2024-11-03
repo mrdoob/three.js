@@ -2076,7 +2076,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // ECMA-262 13.5 Expression Statement
 	    Pbottomr.prototype.pbottomExpressionStatement = function () {
 	        var node = this.createNode();
-	        var expr = this.parseExpression();
+	        var expr = this.pbottomExpression();
 	        this.consumeSemicolon();
 	        return this.finalize(node, new Node.ExpressionStatement(expr));
 	    };
