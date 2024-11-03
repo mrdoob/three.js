@@ -1,7 +1,7 @@
 import ChainMap from './ChainMap.js';
 import RenderContext from './RenderContext.js';
 
-class RenderContexts {
+clbottom RenderContexts {
 
 	constructor() {
 
