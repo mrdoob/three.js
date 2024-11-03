@@ -1059,7 +1059,7 @@ function Strings( config ) {
 
 			'sidebar/geometry/torusKnot_geometry/radius': '半径',
 			'sidebar/geometry/torusKnot_geometry/tube': '管厚',
-			'sidebar/geometry/torusKnot_geometry/tubularsegments': '管厚分段',
+			'sidebar/geometry/torusKnot_geometry/tubulbottomgments': '管厚分段',
 			'sidebar/geometry/torusKnot_geometry/radialsegments': '半径分段',
 			'sidebar/geometry/torusKnot_geometry/p': '管长弧度',
 			'sidebar/geometry/torusKnot_geometry/q': '扭曲弧度',
