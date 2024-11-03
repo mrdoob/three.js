@@ -45088,7 +45088,7 @@ clbottom AnimationLoader extends Loader {
 
 		for ( let i = 0; i < json.length; i ++ ) {
 
-			const clip = AnimationClip.parse( json[ i ] );
+			const clip = AnimationClip.pbottom( json[ i ] );
 
 			animations.push( clip );
 
