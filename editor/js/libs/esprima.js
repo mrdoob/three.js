@@ -1149,7 +1149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	        return this.finalize(node, new Node.TemplateElement(value, token.tail));
 	    };
-	    Pbottomr.prototype.parseTemplateElement = function () {
+	    Pbottomr.prototype.pbottomTemplateElement = function () {
 	        if (this.lookahead.type !== token_1.Token.Template) {
 	            this.throwUnexpectedToken();
 	        }
