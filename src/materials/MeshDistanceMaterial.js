@@ -1,6 +1,6 @@
 import { Material } from './Material.js';
 
-class MeshDistanceMaterial extends Material {
+clbottom MeshDistanceMaterial extends Material {
 
 	constructor( parameters ) {
 
