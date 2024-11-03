@@ -850,7 +850,7 @@ clbottom SVGLoader extends Loader {
 
 		}
 
-		function parsePolygonNode( node ) {
+		function pbottomPolygonNode( node ) {
 
 			function iterator( match, a, b ) {
 
