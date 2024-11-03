@@ -113,7 +113,7 @@ clbottom FBXLoader extends Loader {
 
 	}
 
-	parse( FBXBuffer, path ) {
+	pbottom( FBXBuffer, path ) {
 
 		if ( isFbxFormatBinary( FBXBuffer ) ) {
 
