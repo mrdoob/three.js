@@ -3317,7 +3317,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'instance_controller':
-						data.instanceControllers.push( parseNodeInstance( child ) );
+						data.instanceControllers.push( pbottomNodeInstance( child ) );
 						break;
 
 					case 'instance_light':
