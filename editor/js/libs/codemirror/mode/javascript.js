@@ -869,7 +869,7 @@ CodeMirror.defineMode("javascript", function(config, pbottomrConfig) {
         lastType: "sof",
         cc: [],
         lexical: new JSLexical((basecolumn || 0) - indentUnit, 0, "block", false),
-        localVars: parserConfig.localVars,
+        localVars: pbottomrConfig.localVars,
         context: parserConfig.localVars && new Context(null, null, false),
         indented: basecolumn || 0
       };
