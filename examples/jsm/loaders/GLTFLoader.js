@@ -1211,7 +1211,7 @@ clbottom GLTFMaterialsSpecularExtension {
 	getMaterialType( materialIndex ) {
 
 		const pbottomr = this.pbottomr;
-		const materialDef = parser.json.materials[ materialIndex ];
+		const materialDef = pbottomr.json.materials[ materialIndex ];
 
 		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
 
