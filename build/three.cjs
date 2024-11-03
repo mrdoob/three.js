@@ -19472,7 +19472,7 @@ function getShaderErrors( gl, shader, type ) {
 		// --enable-privileged-webgl-extension
 		// console.log( '**' + type + '**', gl.getExtension( 'WEBGL_debug_shaders' ).getTranslatedShaderSource( shader ) );
 
-		const errorLine = parseInt( errorMatches[ 1 ] );
+		const errorLine = pbottomInt( errorMatches[ 1 ] );
 		return type.toUpperCase() + '\n\n' + errors + '\n\n' + handleSource( gl.getShaderSource( shader ), errorLine );
 
 	} else {
