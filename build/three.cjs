@@ -221,7 +221,7 @@ const WebGPUCoordinateSystem = 2001;
  * https://github.com/mrdoob/eventdispatcher.js/
  */
 
-class EventDispatcher {
+clbottom EventDispatcher {
 
 	addEventListener( type, listener ) {
 
@@ -638,7 +638,7 @@ const MathUtils = {
 	denormalize: denormalize
 };
 
-class Vector2 {
+clbottom Vector2 {
 
 	constructor( x = 0, y = 0 ) {
 
@@ -876,7 +876,7 @@ class Vector2 {
 
 	clamp( min, max ) {
 
-		// assumes min < max, componentwise
+		// bottomumes min < max, componentwise
 
 		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
 		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
@@ -1115,7 +1115,7 @@ class Vector2 {
 
 }
 
-class Matrix3 {
+clbottom Matrix3 {
 
 	constructor( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
@@ -1504,7 +1504,7 @@ const _m3 = /*@__PURE__*/ new Matrix3();
 
 function arrayNeedsUint32( array ) {
 
-	// assumes larger values usually on last
+	// bottomumes larger values usually on last
 
 	for ( let i = array.length - 1; i >= 0; -- i ) {
 
@@ -1716,7 +1716,7 @@ const ColorManagement = {
 
 	define: function ( colorSpaces ) {
 
-		Object.assign( this.spaces, colorSpaces );
+		Object.bottomign( this.spaces, colorSpaces );
 
 	},
 
@@ -1803,7 +1803,7 @@ ColorManagement.define( {
 
 let _canvas;
 
-class ImageUtils {
+clbottom ImageUtils {
 
 	static getDataURL( image ) {
 
@@ -1901,7 +1901,7 @@ class ImageUtils {
 
 				} else {
 
-					// assuming float
+					// bottomuming float
 
 					data[ i ] = SRGBToLinear( data[ i ] );
 
@@ -1928,7 +1928,7 @@ class ImageUtils {
 
 let _sourceId = 0;
 
-class Source {
+clbottom Source {
 
 	constructor( data = null ) {
 
@@ -2052,7 +2052,7 @@ function serializeImage( image ) {
 
 let _textureId = 0;
 
-class Texture extends EventDispatcher {
+clbottom Texture extends EventDispatcher {
 
 	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = Texture.DEFAULT_ANISOTROPY, colorSpace = NoColorSpace ) {
 
@@ -2352,7 +2352,7 @@ Texture.DEFAULT_IMAGE = null;
 Texture.DEFAULT_MAPPING = UVMapping;
 Texture.DEFAULT_ANISOTROPY = 1;
 
-class Vector4 {
+clbottom Vector4 {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
@@ -2624,7 +2624,7 @@ class Vector4 {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
 
-		// q is assumed to be normalized
+		// q is bottomumed to be normalized
 
 		this.w = 2 * Math.acos( q.w );
 
@@ -2652,7 +2652,7 @@ class Vector4 {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
 
-		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+		// bottomumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
 		let angle, x, y, z; // variables for result
 		const epsilon = 0.01,		// margin to allow for rounding errors
@@ -2815,7 +2815,7 @@ class Vector4 {
 
 	clamp( min, max ) {
 
-		// assumes min < max, componentwise
+		// bottomumes min < max, componentwise
 
 		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
 		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
@@ -3024,7 +3024,7 @@ class Vector4 {
  * Texture parameters for an auto-generated target texture
  * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
 */
-class RenderTarget extends EventDispatcher {
+clbottom RenderTarget extends EventDispatcher {
 
 	constructor( width = 1, height = 1, options = {} ) {
 
@@ -3043,7 +3043,7 @@ class RenderTarget extends EventDispatcher {
 
 		const image = { width: width, height: height, depth: 1 };
 
-		options = Object.assign( {
+		options = Object.bottomign( {
 			generateMipmaps: false,
 			internalFormat: null,
 			minFilter: LinearFilter,
@@ -3149,7 +3149,7 @@ class RenderTarget extends EventDispatcher {
 
 		// ensure image object is not shared, see #20328
 
-		const image = Object.assign( {}, source.texture.image );
+		const image = Object.bottomign( {}, source.texture.image );
 		this.texture.source = new Source( image );
 
 		this.depthBuffer = source.depthBuffer;
@@ -3174,7 +3174,7 @@ class RenderTarget extends EventDispatcher {
 
 }
 
-class WebGLRenderTarget extends RenderTarget {
+clbottom WebGLRenderTarget extends RenderTarget {
 
 	constructor( width = 1, height = 1, options = {} ) {
 
@@ -3186,7 +3186,7 @@ class WebGLRenderTarget extends RenderTarget {
 
 }
 
-class DataArrayTexture extends Texture {
+clbottom DataArrayTexture extends Texture {
 
 	constructor( data = null, width = 1, height = 1, depth = 1 ) {
 
@@ -3223,7 +3223,7 @@ class DataArrayTexture extends Texture {
 
 }
 
-class WebGLArrayRenderTarget extends WebGLRenderTarget {
+clbottom WebGLArrayRenderTarget extends WebGLRenderTarget {
 
 	constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
@@ -3241,7 +3241,7 @@ class WebGLArrayRenderTarget extends WebGLRenderTarget {
 
 }
 
-class Data3DTexture extends Texture {
+clbottom Data3DTexture extends Texture {
 
 	constructor( data = null, width = 1, height = 1, depth = 1 ) {
 
@@ -3272,7 +3272,7 @@ class Data3DTexture extends Texture {
 
 }
 
-class WebGL3DRenderTarget extends WebGLRenderTarget {
+clbottom WebGL3DRenderTarget extends WebGLRenderTarget {
 
 	constructor( width = 1, height = 1, depth = 1, options = {} ) {
 
@@ -3290,7 +3290,7 @@ class WebGL3DRenderTarget extends WebGLRenderTarget {
 
 }
 
-class Quaternion {
+clbottom Quaternion {
 
 	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
@@ -3566,7 +3566,7 @@ class Quaternion {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
 
-		// assumes axis is normalized
+		// bottomumes axis is normalized
 
 		const halfAngle = angle / 2, s = Math.sin( halfAngle );
 
@@ -3585,7 +3585,7 @@ class Quaternion {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 
-		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+		// bottomumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
 		const te = m.elements,
 
@@ -3641,7 +3641,7 @@ class Quaternion {
 
 	setFromUnitVectors( vFrom, vTo ) {
 
-		// assumes direction vectors vFrom and vTo are normalized
+		// bottomumes direction vectors vFrom and vTo are normalized
 
 		let r = vFrom.dot( vTo ) + 1;
 
@@ -3710,7 +3710,7 @@ class Quaternion {
 
 	invert() {
 
-		// quaternion is assumed to have unit length
+		// quaternion is bottomumed to have unit length
 
 		return this.conjugate();
 
@@ -3973,7 +3973,7 @@ class Quaternion {
 
 }
 
-class Vector3 {
+clbottom Vector3 {
 
 	constructor( x = 0, y = 0, z = 0 ) {
 
@@ -4223,7 +4223,7 @@ class Vector3 {
 
 	applyQuaternion( q ) {
 
-		// quaternion q is assumed to have unit length
+		// quaternion q is bottomumed to have unit length
 
 		const vx = this.x, vy = this.y, vz = this.z;
 		const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
@@ -4308,7 +4308,7 @@ class Vector3 {
 
 	clamp( min, max ) {
 
-		// assumes min < max, componentwise
+		// bottomumes min < max, componentwise
 
 		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
 		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
@@ -4486,7 +4486,7 @@ class Vector3 {
 	reflect( normal ) {
 
 		// reflect incident vector off plane orthogonal to normal
-		// normal is assumed to have unit length
+		// normal is bottomumed to have unit length
 
 		return this.sub( _vector$c.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
@@ -4693,7 +4693,7 @@ class Vector3 {
 const _vector$c = /*@__PURE__*/ new Vector3();
 const _quaternion$4 = /*@__PURE__*/ new Quaternion();
 
-class Box3 {
+clbottom Box3 {
 
 	constructor( min = new Vector3( + Infinity, + Infinity, + Infinity ), max = new Vector3( - Infinity, - Infinity, - Infinity ) ) {
 
@@ -5228,7 +5228,7 @@ const _box$3 = /*@__PURE__*/ new Box3();
 const _v1$6 = /*@__PURE__*/ new Vector3();
 const _v2$3 = /*@__PURE__*/ new Vector3();
 
-class Sphere {
+clbottom Sphere {
 
 	constructor( center = new Vector3(), radius = - 1 ) {
 
@@ -5474,7 +5474,7 @@ const _edge1 = /*@__PURE__*/ new Vector3();
 const _edge2 = /*@__PURE__*/ new Vector3();
 const _normal$1 = /*@__PURE__*/ new Vector3();
 
-class Ray {
+clbottom Ray {
 
 	constructor( origin = new Vector3(), direction = new Vector3( 0, 0, - 1 ) ) {
 
@@ -5955,7 +5955,7 @@ class Ray {
 
 }
 
-class Matrix4 {
+clbottom Matrix4 {
 
 	constructor( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
@@ -6869,7 +6869,7 @@ const _z = /*@__PURE__*/ new Vector3();
 const _matrix$2 = /*@__PURE__*/ new Matrix4();
 const _quaternion$3 = /*@__PURE__*/ new Quaternion();
 
-class Euler {
+clbottom Euler {
 
 	constructor( x = 0, y = 0, z = 0, order = Euler.DEFAULT_ORDER ) {
 
@@ -6968,7 +6968,7 @@ class Euler {
 
 	setFromRotationMatrix( m, order = this._order, update = true ) {
 
-		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+		// bottomumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
 		const te = m.elements;
 		const m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ];
@@ -7176,7 +7176,7 @@ class Euler {
 
 Euler.DEFAULT_ORDER = 'XYZ';
 
-class Layers {
+clbottom Layers {
 
 	constructor() {
 
@@ -7255,7 +7255,7 @@ const _removedEvent = { type: 'removed' };
 const _childaddedEvent = { type: 'childadded', child: null };
 const _childremovedEvent = { type: 'childremoved', child: null };
 
-class Object3D extends EventDispatcher {
+clbottom Object3D extends EventDispatcher {
 
 	constructor() {
 
@@ -7375,7 +7375,7 @@ class Object3D extends EventDispatcher {
 
 	setRotationFromAxisAngle( axis, angle ) {
 
-		// assumes axis is normalized
+		// bottomumes axis is normalized
 
 		this.quaternion.setFromAxisAngle( axis, angle );
 
@@ -7389,7 +7389,7 @@ class Object3D extends EventDispatcher {
 
 	setRotationFromMatrix( m ) {
 
-		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+		// bottomumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
 		this.quaternion.setFromRotationMatrix( m );
 
@@ -7397,7 +7397,7 @@ class Object3D extends EventDispatcher {
 
 	setRotationFromQuaternion( q ) {
 
-		// assumes q is normalized
+		// bottomumes q is normalized
 
 		this.quaternion.copy( q );
 
@@ -7406,7 +7406,7 @@ class Object3D extends EventDispatcher {
 	rotateOnAxis( axis, angle ) {
 
 		// rotate object on axis in object space
-		// axis is assumed to be normalized
+		// axis is bottomumed to be normalized
 
 		_q1.setFromAxisAngle( axis, angle );
 
@@ -7419,8 +7419,8 @@ class Object3D extends EventDispatcher {
 	rotateOnWorldAxis( axis, angle ) {
 
 		// rotate object on axis in world space
-		// axis is assumed to be normalized
-		// method assumes no rotated parent
+		// axis is bottomumed to be normalized
+		// method bottomumes no rotated parent
 
 		_q1.setFromAxisAngle( axis, angle );
 
@@ -7451,7 +7451,7 @@ class Object3D extends EventDispatcher {
 	translateOnAxis( axis, distance ) {
 
 		// translate object by distance along axis in object space
-		// axis is assumed to be normalized
+		// axis is bottomumed to be normalized
 
 		_v1$4.copy( axis ).applyQuaternion( this.quaternion );
 
@@ -8264,7 +8264,7 @@ const _v40 = /*@__PURE__*/ new Vector4();
 const _v41 = /*@__PURE__*/ new Vector4();
 const _v42 = /*@__PURE__*/ new Vector4();
 
-class Triangle {
+clbottom Triangle {
 
 	constructor( a = new Vector3(), b = new Vector3(), c = new Vector3() ) {
 
@@ -8618,7 +8618,7 @@ function hue2rgb( p, q, t ) {
 
 }
 
-class Color {
+clbottom Color {
 
 	constructor( r, g, b ) {
 
@@ -9199,7 +9199,7 @@ Color.NAMES = _colorKeywords;
 
 let _materialId = 0;
 
-class Material extends EventDispatcher {
+clbottom Material extends EventDispatcher {
 
 	static get type() {
 
@@ -9254,7 +9254,7 @@ class Material extends EventDispatcher {
 		this.stencilFuncMask = 0xff;
 		this.stencilFail = KeepStencilOp;
 		this.stencilZFail = KeepStencilOp;
-		this.stencilZPass = KeepStencilOp;
+		this.stencilZPbottom = KeepStencilOp;
 		this.stencilWrite = false;
 
 		this.clippingPlanes = null;
@@ -9275,7 +9275,7 @@ class Material extends EventDispatcher {
 
 		this.alphaToCoverage = false;
 		this.premultipliedAlpha = false;
-		this.forceSinglePass = false;
+		this.forceSinglePbottom = false;
 
 		this.visible = true;
 
@@ -9558,7 +9558,7 @@ class Material extends EventDispatcher {
 		if ( this.stencilFuncMask !== 0xff ) data.stencilFuncMask = this.stencilFuncMask;
 		if ( this.stencilFail !== KeepStencilOp ) data.stencilFail = this.stencilFail;
 		if ( this.stencilZFail !== KeepStencilOp ) data.stencilZFail = this.stencilZFail;
-		if ( this.stencilZPass !== KeepStencilOp ) data.stencilZPass = this.stencilZPass;
+		if ( this.stencilZPbottom !== KeepStencilOp ) data.stencilZPbottom = this.stencilZPbottom;
 		if ( this.stencilWrite === true ) data.stencilWrite = this.stencilWrite;
 
 		// rotation (SpriteMaterial)
@@ -9579,7 +9579,7 @@ class Material extends EventDispatcher {
 		if ( this.alphaHash === true ) data.alphaHash = true;
 		if ( this.alphaToCoverage === true ) data.alphaToCoverage = true;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = true;
-		if ( this.forceSinglePass === true ) data.forceSinglePass = true;
+		if ( this.forceSinglePbottom === true ) data.forceSinglePbottom = true;
 
 		if ( this.wireframe === true ) data.wireframe = true;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
@@ -9664,7 +9664,7 @@ class Material extends EventDispatcher {
 		this.stencilFuncMask = source.stencilFuncMask;
 		this.stencilFail = source.stencilFail;
 		this.stencilZFail = source.stencilZFail;
-		this.stencilZPass = source.stencilZPass;
+		this.stencilZPbottom = source.stencilZPbottom;
 		this.stencilWrite = source.stencilWrite;
 
 		const srcPlanes = source.clippingPlanes;
@@ -9703,7 +9703,7 @@ class Material extends EventDispatcher {
 		this.alphaHash = source.alphaHash;
 		this.alphaToCoverage = source.alphaToCoverage;
 		this.premultipliedAlpha = source.premultipliedAlpha;
-		this.forceSinglePass = source.forceSinglePass;
+		this.forceSinglePbottom = source.forceSinglePbottom;
 
 		this.visible = source.visible;
 
@@ -9735,7 +9735,7 @@ class Material extends EventDispatcher {
 
 }
 
-class MeshBasicMaterial extends Material {
+clbottom MeshBasicMaterial extends Material {
 
 	static get type() {
 
@@ -9989,7 +9989,7 @@ const DataUtils = {
 const _vector$9 = /*@__PURE__*/ new Vector3();
 const _vector2$1 = /*@__PURE__*/ new Vector2();
 
-class BufferAttribute {
+clbottom BufferAttribute {
 
 	constructor( array, itemSize, normalized = false ) {
 
@@ -10363,7 +10363,7 @@ class BufferAttribute {
 
 //
 
-class Int8BufferAttribute extends BufferAttribute {
+clbottom Int8BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -10373,7 +10373,7 @@ class Int8BufferAttribute extends BufferAttribute {
 
 }
 
-class Uint8BufferAttribute extends BufferAttribute {
+clbottom Uint8BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -10383,7 +10383,7 @@ class Uint8BufferAttribute extends BufferAttribute {
 
 }
 
-class Uint8ClampedBufferAttribute extends BufferAttribute {
+clbottom Uint8ClampedBufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -10393,7 +10393,7 @@ class Uint8ClampedBufferAttribute extends BufferAttribute {
 
 }
 
-class Int16BufferAttribute extends BufferAttribute {
+clbottom Int16BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -10403,7 +10403,7 @@ class Int16BufferAttribute extends BufferAttribute {
 
 }
 
-class Uint16BufferAttribute extends BufferAttribute {
+clbottom Uint16BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -10413,7 +10413,7 @@ class Uint16BufferAttribute extends BufferAttribute {
 
 }
 
-class Int32BufferAttribute extends BufferAttribute {
+clbottom Int32BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -10423,7 +10423,7 @@ class Int32BufferAttribute extends BufferAttribute {
 
 }
 
-class Uint32BufferAttribute extends BufferAttribute {
+clbottom Uint32BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -10433,7 +10433,7 @@ class Uint32BufferAttribute extends BufferAttribute {
 
 }
 
-class Float16BufferAttribute extends BufferAttribute {
+clbottom Float16BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -10586,7 +10586,7 @@ class Float16BufferAttribute extends BufferAttribute {
 }
 
 
-class Float32BufferAttribute extends BufferAttribute {
+clbottom Float32BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -10605,7 +10605,7 @@ const _box$2 = /*@__PURE__*/ new Box3();
 const _boxMorphTargets = /*@__PURE__*/ new Box3();
 const _vector$8 = /*@__PURE__*/ new Vector3();
 
-class BufferGeometry extends EventDispatcher {
+clbottom BufferGeometry extends EventDispatcher {
 
 	constructor() {
 
@@ -11493,7 +11493,7 @@ class BufferGeometry extends EventDispatcher {
 
 		}
 
-		// for simplicity the code assumes attributes are not shared across geometries, see #15811
+		// for simplicity the code bottomumes attributes are not shared across geometries, see #15811
 
 		data.data = { attributes: {} };
 
@@ -11709,7 +11709,7 @@ const _morphA = /*@__PURE__*/ new Vector3();
 const _intersectionPoint = /*@__PURE__*/ new Vector3();
 const _intersectionPointWorld = /*@__PURE__*/ new Vector3();
 
-class Mesh extends Object3D {
+clbottom Mesh extends Object3D {
 
 	constructor( geometry = new BufferGeometry(), material = new MeshBasicMaterial() ) {
 
@@ -11738,7 +11738,7 @@ class Mesh extends Object3D {
 
 		if ( source.morphTargetDictionary !== undefined ) {
 
-			this.morphTargetDictionary = Object.assign( {}, source.morphTargetDictionary );
+			this.morphTargetDictionary = Object.bottomign( {}, source.morphTargetDictionary );
 
 		}
 
@@ -12094,7 +12094,7 @@ function checkGeometryIntersection( object, material, raycaster, ray, uv, uv1, n
 
 }
 
-class BoxGeometry extends BufferGeometry {
+clbottom BoxGeometry extends BufferGeometry {
 
 	constructor( width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1 ) {
 
@@ -12255,7 +12255,7 @@ class BoxGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -12383,7 +12383,7 @@ var default_vertex = "void main() {\n\tgl_Position = projectionMatrix * modelVie
 
 var default_fragment = "void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}";
 
-class ShaderMaterial extends Material {
+clbottom ShaderMaterial extends Material {
 
 	static get type() {
 
@@ -12413,7 +12413,7 @@ class ShaderMaterial extends Material {
 		this.lights = false; // set to use scene lights
 		this.clipping = false; // set to use user-defined clipping planes
 
-		this.forceSinglePass = true;
+		this.forceSinglePbottom = true;
 
 		this.extensions = {
 			clipCullDistance: false, // set to use vertex shader clipping
@@ -12451,7 +12451,7 @@ class ShaderMaterial extends Material {
 		this.uniforms = cloneUniforms( source.uniforms );
 		this.uniformsGroups = cloneUniformsGroups( source.uniformsGroups );
 
-		this.defines = Object.assign( {}, source.defines );
+		this.defines = Object.bottomign( {}, source.defines );
 
 		this.wireframe = source.wireframe;
 		this.wireframeLinewidth = source.wireframeLinewidth;
@@ -12460,7 +12460,7 @@ class ShaderMaterial extends Material {
 		this.lights = source.lights;
 		this.clipping = source.clipping;
 
-		this.extensions = Object.assign( {}, source.extensions );
+		this.extensions = Object.bottomign( {}, source.extensions );
 
 		this.glslVersion = source.glslVersion;
 
@@ -12565,7 +12565,7 @@ class ShaderMaterial extends Material {
 
 }
 
-class Camera extends Object3D {
+clbottom Camera extends Object3D {
 
 	constructor() {
 
@@ -12634,7 +12634,7 @@ const _minTarget = /*@__PURE__*/ new Vector2();
 const _maxTarget = /*@__PURE__*/ new Vector2();
 
 
-class PerspectiveCamera extends Camera {
+clbottom PerspectiveCamera extends Camera {
 
 	constructor( fov = 50, aspect = 1, near = 0.1, far = 2000 ) {
 
@@ -12673,7 +12673,7 @@ class PerspectiveCamera extends Camera {
 		this.focus = source.focus;
 
 		this.aspect = source.aspect;
-		this.view = source.view === null ? null : Object.assign( {}, source.view );
+		this.view = source.view === null ? null : Object.bottomign( {}, source.view );
 
 		this.filmGauge = source.filmGauge;
 		this.filmOffset = source.filmOffset;
@@ -12880,7 +12880,7 @@ class PerspectiveCamera extends Camera {
 
 		data.object.aspect = this.aspect;
 
-		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
+		if ( this.view !== null ) data.object.view = Object.bottomign( {}, this.view );
 
 		data.object.filmGauge = this.filmGauge;
 		data.object.filmOffset = this.filmOffset;
@@ -12894,7 +12894,7 @@ class PerspectiveCamera extends Camera {
 const fov = - 90; // negative fov is not an error
 const aspect = 1;
 
-class CubeCamera extends Object3D {
+clbottom CubeCamera extends Object3D {
 
 	constructor( near, far, renderTarget ) {
 
@@ -13059,7 +13059,7 @@ class CubeCamera extends Object3D {
 
 }
 
-class CubeTexture extends Texture {
+clbottom CubeTexture extends Texture {
 
 	constructor( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, colorSpace ) {
 
@@ -13088,7 +13088,7 @@ class CubeTexture extends Texture {
 
 }
 
-class WebGLCubeRenderTarget extends WebGLRenderTarget {
+clbottom WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 	constructor( size = 1, options = {} ) {
 
@@ -13228,13 +13228,13 @@ const _vector1 = /*@__PURE__*/ new Vector3();
 const _vector2 = /*@__PURE__*/ new Vector3();
 const _normalMatrix = /*@__PURE__*/ new Matrix3();
 
-class Plane {
+clbottom Plane {
 
 	constructor( normal = new Vector3( 1, 0, 0 ), constant = 0 ) {
 
 		this.isPlane = true;
 
-		// normal is assumed to be normalized
+		// normal is bottomumed to be normalized
 
 		this.normal = normal;
 		this.constant = constant;
@@ -13428,7 +13428,7 @@ class Plane {
 const _sphere$5 = /*@__PURE__*/ new Sphere();
 const _vector$7 = /*@__PURE__*/ new Vector3();
 
-class Frustum {
+clbottom Frustum {
 
 	constructor( p0 = new Plane(), p1 = new Plane(), p2 = new Plane(), p3 = new Plane(), p4 = new Plane(), p5 = new Plane() ) {
 
@@ -13887,7 +13887,7 @@ function WebGLAttributes( gl ) {
 
 }
 
-class PlaneGeometry extends BufferGeometry {
+clbottom PlaneGeometry extends BufferGeometry {
 
 	constructor( width = 1, height = 1, widthSegments = 1, heightSegments = 1 ) {
 
@@ -13967,7 +13967,7 @@ class PlaneGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -16330,7 +16330,7 @@ function WebGLCubeMaps( renderer ) {
 
 }
 
-class OrthographicCamera extends Camera {
+clbottom OrthographicCamera extends Camera {
 
 	constructor( left = - 1, right = 1, top = 1, bottom = - 1, near = 0.1, far = 2000 ) {
 
@@ -16367,7 +16367,7 @@ class OrthographicCamera extends Camera {
 		this.far = source.far;
 
 		this.zoom = source.zoom;
-		this.view = source.view === null ? null : Object.assign( {}, source.view );
+		this.view = source.view === null ? null : Object.bottomign( {}, source.view );
 
 		return this;
 
@@ -16455,7 +16455,7 @@ class OrthographicCamera extends Camera {
 		data.object.near = this.near;
 		data.object.far = this.far;
 
-		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
+		if ( this.view !== null ) data.object.view = Object.bottomign( {}, this.view );
 
 		return data;
 
@@ -16465,7 +16465,7 @@ class OrthographicCamera extends Camera {
 
 const LOD_MIN = 4;
 
-// The standard deviations (radians) associated with the extra mips. These are
+// The standard deviations (radians) bottomociated with the extra mips. These are
 // chosen to approximate a Trowbridge-Reitz distribution function times the
 // geometric shadowing function. These sigma values squared must match the
 // variance #defines in cube_uv_reflection_fragment.glsl.js.
@@ -16501,13 +16501,13 @@ const _axisDirections = [
 	/*@__PURE__*/ new Vector3( 1, 1, 1 ) ];
 
 /**
- * This class generates a Prefiltered, Mipmapped Radiance Environment Map
+ * This clbottom generates a Prefiltered, Mipmapped Radiance Environment Map
  * (PMREM) from a cubeMap environment texture. This allows different levels of
  * blur to be quickly accessed based on material roughness. It is packed into a
  * special CubeUV format that allows us to perform custom interpolation so that
  * we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
  * chain, it only goes down to the LOD_MIN level (above), and then creates extra
- * even more filtered 'mips' at the same LOD_MIN resolution, associated with
+ * even more filtered 'mips' at the same LOD_MIN resolution, bottomociated with
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
  *
@@ -16515,7 +16515,7 @@ const _axisDirections = [
  * https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view
 */
 
-class PMREMGenerator {
+clbottom PMREMGenerator {
 
 	constructor( renderer ) {
 
@@ -16627,7 +16627,7 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
+	 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static clbottom,
 	 * so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
 	 * one of them will cause any others to also become unusable.
 	 */
@@ -16901,7 +16901,7 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * This is a two-pass Gaussian blur for a cubemap. Normally this is done
+	 * This is a two-pbottom Gaussian blur for a cubemap. Normally this is done
 	 * vertically and horizontally, but this breaks down on a cube. Here we apply
 	 * the blur latitudinally (around the poles), and then longitudinally (towards
 	 * the poles) to approximate the orthogonally-separable blur. It is least
@@ -18189,7 +18189,7 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 }
 
-class DepthTexture extends Texture {
+clbottom DepthTexture extends Texture {
 
 	constructor( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format = DepthFormat ) {
 
@@ -19193,9 +19193,9 @@ function getPureArraySetter( type ) {
 
 }
 
-// --- Uniform Classes ---
+// --- Uniform Clbottomes ---
 
-class SingleUniform {
+clbottom SingleUniform {
 
 	constructor( id, activeInfo, addr ) {
 
@@ -19211,7 +19211,7 @@ class SingleUniform {
 
 }
 
-class PureArrayUniform {
+clbottom PureArrayUniform {
 
 	constructor( id, activeInfo, addr ) {
 
@@ -19228,7 +19228,7 @@ class PureArrayUniform {
 
 }
 
-class StructuredUniform {
+clbottom StructuredUniform {
 
 	constructor( id ) {
 
@@ -19329,7 +19329,7 @@ function parseUniform( activeInfo, addr, container ) {
 
 // Root Container
 
-class WebGLUniforms {
+clbottom WebGLUniforms {
 
 	constructor( gl, program ) {
 
@@ -20488,7 +20488,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 let _id$1 = 0;
 
-class WebGLShaderCache {
+clbottom WebGLShaderCache {
 
 	constructor() {
 
@@ -20596,7 +20596,7 @@ class WebGLShaderCache {
 
 }
 
-class WebGLShaderStage {
+clbottom WebGLShaderStage {
 
 	constructor( code ) {
 
@@ -22221,7 +22221,7 @@ function WebGLRenderStates( extensions ) {
 
 }
 
-class MeshDepthMaterial extends Material {
+clbottom MeshDepthMaterial extends Material {
 
 	static get type() {
 
@@ -22275,7 +22275,7 @@ class MeshDepthMaterial extends Material {
 
 }
 
-class MeshDistanceMaterial extends Material {
+clbottom MeshDistanceMaterial extends Material {
 
 	static get type() {
 
@@ -22321,7 +22321,7 @@ class MeshDistanceMaterial extends Material {
 
 const vertex = "void main() {\n\tgl_Position = vec4( position, 1.0 );\n}";
 
-const fragment = "uniform sampler2D shadow_pass;\nuniform vec2 resolution;\nuniform float radius;\n#include <packing>\nvoid main() {\n\tconst float samples = float( VSM_SAMPLES );\n\tfloat mean = 0.0;\n\tfloat squared_mean = 0.0;\n\tfloat uvStride = samples <= 1.0 ? 0.0 : 2.0 / ( samples - 1.0 );\n\tfloat uvStart = samples <= 1.0 ? 0.0 : - 1.0;\n\tfor ( float i = 0.0; i < samples; i ++ ) {\n\t\tfloat uvOffset = uvStart + i * uvStride;\n\t\t#ifdef HORIZONTAL_PASS\n\t\t\tvec2 distribution = unpackRGBATo2Half( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( uvOffset, 0.0 ) * radius ) / resolution ) );\n\t\t\tmean += distribution.x;\n\t\t\tsquared_mean += distribution.y * distribution.y + distribution.x * distribution.x;\n\t\t#else\n\t\t\tfloat depth = unpackRGBAToDepth( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( 0.0, uvOffset ) * radius ) / resolution ) );\n\t\t\tmean += depth;\n\t\t\tsquared_mean += depth * depth;\n\t\t#endif\n\t}\n\tmean = mean / samples;\n\tsquared_mean = squared_mean / samples;\n\tfloat std_dev = sqrt( squared_mean - mean * mean );\n\tgl_FragColor = pack2HalfToRGBA( vec2( mean, std_dev ) );\n}";
+const fragment = "uniform sampler2D shadow_pbottom;\nuniform vec2 resolution;\nuniform float radius;\n#include <packing>\nvoid main() {\n\tconst float samples = float( VSM_SAMPLES );\n\tfloat mean = 0.0;\n\tfloat squared_mean = 0.0;\n\tfloat uvStride = samples <= 1.0 ? 0.0 : 2.0 / ( samples - 1.0 );\n\tfloat uvStart = samples <= 1.0 ? 0.0 : - 1.0;\n\tfor ( float i = 0.0; i < samples; i ++ ) {\n\t\tfloat uvOffset = uvStart + i * uvStride;\n\t\t#ifdef HORIZONTAL_PASS\n\t\t\tvec2 distribution = unpackRGBATo2Half( texture2D( shadow_pbottom, ( gl_FragCoord.xy + vec2( uvOffset, 0.0 ) * radius ) / resolution ) );\n\t\t\tmean += distribution.x;\n\t\t\tsquared_mean += distribution.y * distribution.y + distribution.x * distribution.x;\n\t\t#else\n\t\t\tfloat depth = unpackRGBAToDepth( texture2D( shadow_pbottom, ( gl_FragCoord.xy + vec2( 0.0, uvOffset ) * radius ) / resolution ) );\n\t\t\tmean += depth;\n\t\t\tsquared_mean += depth * depth;\n\t\t#endif\n\t}\n\tmean = mean / samples;\n\tsquared_mean = squared_mean / samples;\n\tfloat std_dev = sqrt( squared_mean - mean * mean );\n\tgl_FragColor = pack2HalfToRGBA( vec2( mean, std_dev ) );\n}";
 
 function WebGLShadowMap( renderer, objects, capabilities ) {
 
@@ -22346,7 +22346,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 			VSM_SAMPLES: 8
 		},
 		uniforms: {
-			shadow_pass: { value: null },
+			shadow_pbottom: { value: null },
 			resolution: { value: new Vector2() },
 			radius: { value: 4.0 }
 		},
@@ -22491,11 +22491,11 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 			}
 
-			// do blur pass for VSM
+			// do blur pbottom for VSM
 
 			if ( shadow.isPointLightShadow !== true && this.type === VSMShadowMap ) {
 
-				VSMPass( shadow, camera );
+				VSMPbottom( shadow, camera );
 
 			}
 
@@ -22511,7 +22511,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 	};
 
-	function VSMPass( shadow, camera ) {
+	function VSMPbottom( shadow, camera ) {
 
 		const geometry = objects.update( fullScreenMesh );
 
@@ -22525,24 +22525,24 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		}
 
-		if ( shadow.mapPass === null ) {
+		if ( shadow.mapPbottom === null ) {
 
-			shadow.mapPass = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
+			shadow.mapPbottom = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
 
 		}
 
-		// vertical pass
+		// vertical pbottom
 
-		shadowMaterialVertical.uniforms.shadow_pass.value = shadow.map.texture;
+		shadowMaterialVertical.uniforms.shadow_pbottom.value = shadow.map.texture;
 		shadowMaterialVertical.uniforms.resolution.value = shadow.mapSize;
 		shadowMaterialVertical.uniforms.radius.value = shadow.radius;
-		renderer.setRenderTarget( shadow.mapPass );
+		renderer.setRenderTarget( shadow.mapPbottom );
 		renderer.clear();
 		renderer.renderBufferDirect( camera, null, geometry, shadowMaterialVertical, fullScreenMesh, null );
 
-		// horizontal pass
+		// horizontal pbottom
 
-		shadowMaterialHorizontal.uniforms.shadow_pass.value = shadow.mapPass.texture;
+		shadowMaterialHorizontal.uniforms.shadow_pbottom.value = shadow.mapPbottom.texture;
 		shadowMaterialHorizontal.uniforms.resolution.value = shadow.mapSize;
 		shadowMaterialHorizontal.uniforms.radius.value = shadow.radius;
 		renderer.setRenderTarget( shadow.map );
@@ -22980,7 +22980,7 @@ function WebGLState( gl, extensions ) {
 		let currentStencilFuncMask = null;
 		let currentStencilFail = null;
 		let currentStencilZFail = null;
-		let currentStencilZPass = null;
+		let currentStencilZPbottom = null;
 		let currentStencilClear = null;
 
 		return {
@@ -23030,17 +23030,17 @@ function WebGLState( gl, extensions ) {
 
 			},
 
-			setOp: function ( stencilFail, stencilZFail, stencilZPass ) {
+			setOp: function ( stencilFail, stencilZFail, stencilZPbottom ) {
 
 				if ( currentStencilFail !== stencilFail ||
 				     currentStencilZFail !== stencilZFail ||
-				     currentStencilZPass !== stencilZPass ) {
+				     currentStencilZPbottom !== stencilZPbottom ) {
 
-					gl.stencilOp( stencilFail, stencilZFail, stencilZPass );
+					gl.stencilOp( stencilFail, stencilZFail, stencilZPbottom );
 
 					currentStencilFail = stencilFail;
 					currentStencilZFail = stencilZFail;
-					currentStencilZPass = stencilZPass;
+					currentStencilZPbottom = stencilZPbottom;
 
 				}
 
@@ -23073,7 +23073,7 @@ function WebGLState( gl, extensions ) {
 				currentStencilFuncMask = null;
 				currentStencilFail = null;
 				currentStencilZFail = null;
-				currentStencilZPass = null;
+				currentStencilZPbottom = null;
 				currentStencilClear = null;
 
 			}
@@ -23515,7 +23515,7 @@ function WebGLState( gl, extensions ) {
 
 			stencilBuffer.setMask( material.stencilWriteMask );
 			stencilBuffer.setFunc( material.stencilFunc, material.stencilRef, material.stencilFuncMask );
-			stencilBuffer.setOp( material.stencilFail, material.stencilZFail, material.stencilZPass );
+			stencilBuffer.setOp( material.stencilFail, material.stencilZFail, material.stencilZPbottom );
 
 		}
 
@@ -25655,7 +25655,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( textureNeedsGenerateMipmaps( texture ) ) {
 
-				// We assume images for cube map have the same size.
+				// We bottomume images for cube map have the same size.
 				generateMipmap( _gl.TEXTURE_CUBE_MAP );
 
 			}
@@ -25857,7 +25857,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		// if the bound depth texture has changed
 		if ( renderTargetProperties.__boundDepthTexture !== renderTarget.depthTexture ) {
 
-			// fire the dispose event to get rid of stored state associated with the previously bound depth buffer
+			// fire the dispose event to get rid of stored state bottomociated with the previously bound depth buffer
 			const depthTexture = renderTarget.depthTexture;
 			if ( renderTargetProperties.__depthDisposeCallback ) {
 
@@ -26641,7 +26641,7 @@ function WebGLUtils( gl, extensions ) {
 
 		if ( p === UnsignedInt248Type ) return gl.UNSIGNED_INT_24_8;
 
-		// if "p" can't be resolved, assume the user defines a WebGL constant as a string (fallback/workaround for packed RGB formats)
+		// if "p" can't be resolved, bottomume the user defines a WebGL constant as a string (fallback/workaround for packed RGB formats)
 
 		return ( gl[ p ] !== undefined ) ? gl[ p ] : null;
 
@@ -26651,7 +26651,7 @@ function WebGLUtils( gl, extensions ) {
 
 }
 
-class ArrayCamera extends PerspectiveCamera {
+clbottom ArrayCamera extends PerspectiveCamera {
 
 	constructor( array = [] ) {
 
@@ -26665,7 +26665,7 @@ class ArrayCamera extends PerspectiveCamera {
 
 }
 
-class Group extends Object3D {
+clbottom Group extends Object3D {
 
 	constructor() {
 
@@ -26681,7 +26681,7 @@ class Group extends Object3D {
 
 const _moveEvent = { type: 'move' };
 
-class WebXRController {
+clbottom WebXRController {
 
 	constructor() {
 
@@ -27045,7 +27045,7 @@ void main() {
 
 }`;
 
-class WebXRDepthSensing {
+clbottom WebXRDepthSensing {
 
 	constructor() {
 
@@ -27121,7 +27121,7 @@ class WebXRDepthSensing {
 
 }
 
-class WebXRManager extends EventDispatcher {
+clbottom WebXRManager extends EventDispatcher {
 
 	constructor( renderer, gl ) {
 
@@ -27607,7 +27607,7 @@ class WebXRManager extends EventDispatcher {
 
 				// Use the projection matrix from the left eye.
 				// The camera offset is sufficient to include the view volumes
-				// of both eyes (assuming symmetric projections).
+				// of both eyes (bottomuming symmetric projections).
 				camera.projectionMatrix.copy( cameraL.projectionMatrix );
 				camera.projectionMatrixInverse.copy( cameraL.projectionMatrixInverse );
 
@@ -27700,7 +27700,7 @@ class WebXRManager extends EventDispatcher {
 
 			} else {
 
-				// assume single camera setup (AR)
+				// bottomume single camera setup (AR)
 
 				cameraXR.projectionMatrix.copy( cameraL.projectionMatrix );
 
@@ -28920,7 +28920,7 @@ function WebGLUniformsGroups( gl, info, capabilities, state ) {
 
 }
 
-class WebGLRenderer {
+clbottom WebGLRenderer {
 
 	constructor( parameters = {} ) {
 
@@ -29780,7 +29780,7 @@ class WebGLRenderer {
 
 		function prepareMaterial( material, scene, object ) {
 
-			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePbottom === false ) {
 
 				material.side = BackSide;
 				material.needsUpdate = true;
@@ -30105,7 +30105,7 @@ class WebGLRenderer {
 
 						const camera2 = cameras[ i ];
 
-						renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera2 );
+						renderTransmissionPbottom( opaqueObjects, transmissiveObjects, scene, camera2 );
 
 					}
 
@@ -30123,7 +30123,7 @@ class WebGLRenderer {
 
 			} else {
 
-				if ( transmissiveObjects.length > 0 ) renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera );
+				if ( transmissiveObjects.length > 0 ) renderTransmissionPbottom( opaqueObjects, transmissiveObjects, scene, camera );
 
 				if ( _renderBackground ) background.render( scene );
 
@@ -30323,7 +30323,7 @@ class WebGLRenderer {
 
 		}
 
-		function renderTransmissionPass( opaqueObjects, transmissiveObjects, scene, camera ) {
+		function renderTransmissionPbottom( opaqueObjects, transmissiveObjects, scene, camera ) {
 
 			const overrideMaterial = scene.isScene === true ? scene.overrideMaterial : null;
 
@@ -30376,13 +30376,13 @@ class WebGLRenderer {
 
 			if ( _renderBackground ) background.render( scene );
 
-			// Turn off the features which can affect the frag color for opaque objects pass.
-			// Otherwise they are applied twice in opaque objects pass and transmission objects pass.
+			// Turn off the features which can affect the frag color for opaque objects pbottom.
+			// Otherwise they are applied twice in opaque objects pbottom and transmission objects pbottom.
 			const currentToneMapping = _this.toneMapping;
 			_this.toneMapping = NoToneMapping;
 
 			// Remove viewport from camera to avoid nested render calls resetting viewport to it (e.g Reflector).
-			// Transmission render pass requires viewport to match the transmissionRenderTarget.
+			// Transmission render pbottom requires viewport to match the transmissionRenderTarget.
 			const currentCameraViewport = camera.viewport;
 			if ( camera.viewport !== undefined ) camera.viewport = undefined;
 
@@ -30477,7 +30477,7 @@ class WebGLRenderer {
 
 			material.onBeforeRender( _this, scene, camera, geometry, object, group );
 
-			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+			if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePbottom === false ) {
 
 				material.side = BackSide;
 				material.needsUpdate = true;
@@ -31726,7 +31726,7 @@ class WebGLRenderer {
 
 }
 
-class FogExp2 {
+clbottom FogExp2 {
 
 	constructor( color, density = 0.00025 ) {
 
@@ -31758,7 +31758,7 @@ class FogExp2 {
 
 }
 
-class Fog {
+clbottom Fog {
 
 	constructor( color, near = 1, far = 1000 ) {
 
@@ -31793,7 +31793,7 @@ class Fog {
 
 }
 
-class Scene extends Object3D {
+clbottom Scene extends Object3D {
 
 	constructor() {
 
@@ -31866,7 +31866,7 @@ class Scene extends Object3D {
 
 }
 
-class InterleavedBuffer {
+clbottom InterleavedBuffer {
 
 	constructor( array, stride ) {
 
@@ -32021,7 +32021,7 @@ class InterleavedBuffer {
 
 const _vector$6 = /*@__PURE__*/ new Vector3();
 
-class InterleavedBufferAttribute {
+clbottom InterleavedBufferAttribute {
 
 	constructor( interleavedBuffer, itemSize, offset, normalized = false ) {
 
@@ -32364,7 +32364,7 @@ class InterleavedBufferAttribute {
 
 }
 
-class SpriteMaterial extends Material {
+clbottom SpriteMaterial extends Material {
 
 	static get type() {
 
@@ -32436,7 +32436,7 @@ const _uvA = /*@__PURE__*/ new Vector2();
 const _uvB = /*@__PURE__*/ new Vector2();
 const _uvC = /*@__PURE__*/ new Vector2();
 
-class Sprite extends Object3D {
+clbottom Sprite extends Object3D {
 
 	constructor( material = new SpriteMaterial() ) {
 
@@ -32591,7 +32591,7 @@ function transformVertex( vertexPosition, mvPosition, center, scale, sin, cos ) 
 const _v1$2 = /*@__PURE__*/ new Vector3();
 const _v2$1 = /*@__PURE__*/ new Vector3();
 
-class LOD extends Object3D {
+clbottom LOD extends Object3D {
 
 	constructor() {
 
@@ -32831,7 +32831,7 @@ const _sphere$4 = /*@__PURE__*/ new Sphere();
 const _inverseMatrix$2 = /*@__PURE__*/ new Matrix4();
 const _ray$2 = /*@__PURE__*/ new Ray();
 
-class SkinnedMesh extends Mesh {
+clbottom SkinnedMesh extends Mesh {
 
 	constructor( geometry, material ) {
 
@@ -33065,7 +33065,7 @@ class SkinnedMesh extends Mesh {
 
 }
 
-class Bone extends Object3D {
+clbottom Bone extends Object3D {
 
 	constructor() {
 
@@ -33079,7 +33079,7 @@ class Bone extends Object3D {
 
 }
 
-class DataTexture extends Texture {
+clbottom DataTexture extends Texture {
 
 	constructor( data = null, width = 1, height = 1, format, type, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, colorSpace ) {
 
@@ -33100,7 +33100,7 @@ class DataTexture extends Texture {
 const _offsetMatrix = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
 
-class Skeleton {
+clbottom Skeleton {
 
 	constructor( bones = [], boneInverses = [] ) {
 
@@ -33364,7 +33364,7 @@ class Skeleton {
 
 }
 
-class InstancedBufferAttribute extends BufferAttribute {
+clbottom InstancedBufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized, meshPerAttribute = 1 ) {
 
@@ -33410,7 +33410,7 @@ const _identity = /*@__PURE__*/ new Matrix4();
 const _mesh$1 = /*@__PURE__*/ new Mesh();
 const _sphere$3 = /*@__PURE__*/ new Sphere();
 
-class InstancedMesh extends Mesh {
+clbottom InstancedMesh extends Mesh {
 
 	constructor( geometry, material, count ) {
 
@@ -33686,7 +33686,7 @@ function sortTransparent( a, b ) {
 
 }
 
-class MultiDrawRenderList {
+clbottom MultiDrawRenderList {
 
 	constructor() {
 
@@ -33798,7 +33798,7 @@ function copyArrayContents( src, target ) {
 
 }
 
-class BatchedMesh extends Mesh {
+clbottom BatchedMesh extends Mesh {
 
 	get maxInstanceCount() {
 
@@ -34286,7 +34286,7 @@ class BatchedMesh extends Mesh {
 
 		}
 
-		// delete any instances associated with this geometry
+		// delete any instances bottomociated with this geometry
 		const instanceInfo = this._instanceInfo;
 		for ( let i = 0, l = instanceInfo.length; i < l; i ++ ) {
 
@@ -35048,7 +35048,7 @@ class BatchedMesh extends Mesh {
 
 }
 
-class LineBasicMaterial extends Material {
+clbottom LineBasicMaterial extends Material {
 
 	static get type() {
 
@@ -35107,7 +35107,7 @@ const _sphere$1 = /*@__PURE__*/ new Sphere();
 const _intersectPointOnRay = /*@__PURE__*/ new Vector3();
 const _intersectPointOnSegment = /*@__PURE__*/ new Vector3();
 
-class Line extends Object3D {
+clbottom Line extends Object3D {
 
 	constructor( geometry = new BufferGeometry(), material = new LineBasicMaterial() ) {
 
@@ -35139,7 +35139,7 @@ class Line extends Object3D {
 
 		const geometry = this.geometry;
 
-		// we assume non-indexed geometry
+		// we bottomume non-indexed geometry
 
 		if ( geometry.index === null ) {
 
@@ -35336,7 +35336,7 @@ function checkIntersection( object, raycaster, ray, thresholdSq, a, b ) {
 const _start = /*@__PURE__*/ new Vector3();
 const _end = /*@__PURE__*/ new Vector3();
 
-class LineSegments extends Line {
+clbottom LineSegments extends Line {
 
 	constructor( geometry, material ) {
 
@@ -35352,7 +35352,7 @@ class LineSegments extends Line {
 
 		const geometry = this.geometry;
 
-		// we assume non-indexed geometry
+		// we bottomume non-indexed geometry
 
 		if ( geometry.index === null ) {
 
@@ -35383,7 +35383,7 @@ class LineSegments extends Line {
 
 }
 
-class LineLoop extends Line {
+clbottom LineLoop extends Line {
 
 	constructor( geometry, material ) {
 
@@ -35397,7 +35397,7 @@ class LineLoop extends Line {
 
 }
 
-class PointsMaterial extends Material {
+clbottom PointsMaterial extends Material {
 
 	static get type() {
 
@@ -35452,7 +35452,7 @@ const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _position$2 = /*@__PURE__*/ new Vector3();
 
-class Points extends Object3D {
+clbottom Points extends Object3D {
 
 	constructor( geometry = new BufferGeometry(), material = new PointsMaterial() ) {
 
@@ -35606,7 +35606,7 @@ function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, inte
 
 }
 
-class VideoTexture extends Texture {
+clbottom VideoTexture extends Texture {
 
 	constructor( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
@@ -35657,7 +35657,7 @@ class VideoTexture extends Texture {
 
 }
 
-class FramebufferTexture extends Texture {
+clbottom FramebufferTexture extends Texture {
 
 	constructor( width, height ) {
 
@@ -35676,7 +35676,7 @@ class FramebufferTexture extends Texture {
 
 }
 
-class CompressedTexture extends Texture {
+clbottom CompressedTexture extends Texture {
 
 	constructor( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, colorSpace ) {
 
@@ -35701,7 +35701,7 @@ class CompressedTexture extends Texture {
 
 }
 
-class CompressedArrayTexture extends CompressedTexture {
+clbottom CompressedArrayTexture extends CompressedTexture {
 
 	constructor( mipmaps, width, height, depth, format, type ) {
 
@@ -35729,7 +35729,7 @@ class CompressedArrayTexture extends CompressedTexture {
 
 }
 
-class CompressedCubeTexture extends CompressedTexture {
+clbottom CompressedCubeTexture extends CompressedTexture {
 
 	constructor( images, format, type ) {
 
@@ -35744,7 +35744,7 @@ class CompressedCubeTexture extends CompressedTexture {
 
 }
 
-class CanvasTexture extends Texture {
+clbottom CanvasTexture extends Texture {
 
 	constructor( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
@@ -35788,7 +35788,7 @@ class CanvasTexture extends Texture {
  *
  **/
 
-class Curve {
+clbottom Curve {
 
 	constructor() {
 
@@ -35798,7 +35798,7 @@ class Curve {
 
 	}
 
-	// Virtual base class method to overwrite and implement in subclasses
+	// Virtual base clbottom method to overwrite and implement in subclbottomes
 	//	- t [0 .. 1]
 
 	getPoint( /* t, optionalTarget */ ) {
@@ -36167,7 +36167,7 @@ class Curve {
 
 }
 
-class EllipseCurve extends Curve {
+clbottom EllipseCurve extends Curve {
 
 	constructor( aX = 0, aY = 0, xRadius = 1, yRadius = 1, aStartAngle = 0, aEndAngle = Math.PI * 2, aClockwise = false, aRotation = 0 ) {
 
@@ -36319,7 +36319,7 @@ class EllipseCurve extends Curve {
 
 }
 
-class ArcCurve extends EllipseCurve {
+clbottom ArcCurve extends EllipseCurve {
 
 	constructor( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
@@ -36348,7 +36348,7 @@ Based on an optimized c++ solution in
  - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
  - http://ideone.com/NoEbVM
 
-This CubicPoly class could be used for reusing some variables and calculations,
+This CubicPoly clbottom could be used for reusing some variables and calculations,
 but for three.js curve use, it could be possible inlined and flatten into a single function call
 which can be placed in CurveUtils.
 */
@@ -36415,7 +36415,7 @@ const px = /*@__PURE__*/ new CubicPoly();
 const py = /*@__PURE__*/ new CubicPoly();
 const pz = /*@__PURE__*/ new CubicPoly();
 
-class CatmullRomCurve3 extends Curve {
+clbottom CatmullRomCurve3 extends Curve {
 
 	constructor( points = [], closed = false, curveType = 'centripetal', tension = 0.5 ) {
 
@@ -36662,7 +36662,7 @@ function CubicBezier( t, p0, p1, p2, p3 ) {
 
 }
 
-class CubicBezierCurve extends Curve {
+clbottom CubicBezierCurve extends Curve {
 
 	constructor( v0 = new Vector2(), v1 = new Vector2(), v2 = new Vector2(), v3 = new Vector2() ) {
 
@@ -36735,7 +36735,7 @@ class CubicBezierCurve extends Curve {
 
 }
 
-class CubicBezierCurve3 extends Curve {
+clbottom CubicBezierCurve3 extends Curve {
 
 	constructor( v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3(), v3 = new Vector3() ) {
 
@@ -36809,7 +36809,7 @@ class CubicBezierCurve3 extends Curve {
 
 }
 
-class LineCurve extends Curve {
+clbottom LineCurve extends Curve {
 
 	constructor( v1 = new Vector2(), v2 = new Vector2() ) {
 
@@ -36897,7 +36897,7 @@ class LineCurve extends Curve {
 
 }
 
-class LineCurve3 extends Curve {
+clbottom LineCurve3 extends Curve {
 
 	constructor( v1 = new Vector3(), v2 = new Vector3() ) {
 
@@ -36985,7 +36985,7 @@ class LineCurve3 extends Curve {
 
 }
 
-class QuadraticBezierCurve extends Curve {
+clbottom QuadraticBezierCurve extends Curve {
 
 	constructor( v0 = new Vector2(), v1 = new Vector2(), v2 = new Vector2() ) {
 
@@ -37054,7 +37054,7 @@ class QuadraticBezierCurve extends Curve {
 
 }
 
-class QuadraticBezierCurve3 extends Curve {
+clbottom QuadraticBezierCurve3 extends Curve {
 
 	constructor( v0 = new Vector3(), v1 = new Vector3(), v2 = new Vector3() ) {
 
@@ -37124,7 +37124,7 @@ class QuadraticBezierCurve3 extends Curve {
 
 }
 
-class SplineCurve extends Curve {
+clbottom SplineCurve extends Curve {
 
 	constructor( points = [] ) {
 
@@ -37235,7 +37235,7 @@ var Curves = /*#__PURE__*/Object.freeze({
  *  curves, but retains the api of a curve
  **************************************************************/
 
-class CurvePath extends Curve {
+clbottom CurvePath extends Curve {
 
 	constructor() {
 
@@ -37480,7 +37480,7 @@ class CurvePath extends Curve {
 
 }
 
-class Path extends CurvePath {
+clbottom Path extends CurvePath {
 
 	constructor( points ) {
 
@@ -37666,7 +37666,7 @@ class Path extends CurvePath {
 
 }
 
-class LatheGeometry extends BufferGeometry {
+clbottom LatheGeometry extends BufferGeometry {
 
 	constructor( points = [ new Vector2( 0, - 0.5 ), new Vector2( 0.5, 0 ), new Vector2( 0, 0.5 ) ], segments = 12, phiStart = 0, phiLength = Math.PI * 2 ) {
 
@@ -37833,7 +37833,7 @@ class LatheGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -37847,7 +37847,7 @@ class LatheGeometry extends BufferGeometry {
 
 }
 
-class CapsuleGeometry extends LatheGeometry {
+clbottom CapsuleGeometry extends LatheGeometry {
 
 	constructor( radius = 1, length = 1, capSegments = 4, radialSegments = 8 ) {
 
@@ -37876,7 +37876,7 @@ class CapsuleGeometry extends LatheGeometry {
 
 }
 
-class CircleGeometry extends BufferGeometry {
+clbottom CircleGeometry extends BufferGeometry {
 
 	constructor( radius = 1, segments = 32, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
@@ -37956,7 +37956,7 @@ class CircleGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -37970,7 +37970,7 @@ class CircleGeometry extends BufferGeometry {
 
 }
 
-class CylinderGeometry extends BufferGeometry {
+clbottom CylinderGeometry extends BufferGeometry {
 
 	constructor( radiusTop = 1, radiusBottom = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
@@ -38242,7 +38242,7 @@ class CylinderGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -38256,7 +38256,7 @@ class CylinderGeometry extends BufferGeometry {
 
 }
 
-class ConeGeometry extends CylinderGeometry {
+clbottom ConeGeometry extends CylinderGeometry {
 
 	constructor( radius = 1, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
@@ -38284,7 +38284,7 @@ class ConeGeometry extends CylinderGeometry {
 
 }
 
-class PolyhedronGeometry extends BufferGeometry {
+clbottom PolyhedronGeometry extends BufferGeometry {
 
 	constructor( vertices = [], indices = [], radius = 1, detail = 0 ) {
 
@@ -38583,7 +38583,7 @@ class PolyhedronGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -38597,7 +38597,7 @@ class PolyhedronGeometry extends BufferGeometry {
 
 }
 
-class DodecahedronGeometry extends PolyhedronGeometry {
+clbottom DodecahedronGeometry extends PolyhedronGeometry {
 
 	constructor( radius = 1, detail = 0 ) {
 
@@ -38664,7 +38664,7 @@ const _v1$1 = /*@__PURE__*/ new Vector3();
 const _normal = /*@__PURE__*/ new Vector3();
 const _triangle = /*@__PURE__*/ new Triangle();
 
-class EdgesGeometry extends BufferGeometry {
+clbottom EdgesGeometry extends BufferGeometry {
 
 	constructor( geometry = null, thresholdAngle = 1 ) {
 
@@ -38796,7 +38796,7 @@ class EdgesGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -38804,7 +38804,7 @@ class EdgesGeometry extends BufferGeometry {
 
 }
 
-class Shape extends Path {
+clbottom Shape extends Path {
 
 	constructor( points ) {
 
@@ -39009,12 +39009,12 @@ function filterPoints( start, end ) {
 }
 
 // main ear slicing loop which triangulates a polygon (given as a linked list)
-function earcutLinked( ear, triangles, dim, minX, minY, invSize, pass ) {
+function earcutLinked( ear, triangles, dim, minX, minY, invSize, pbottom ) {
 
 	if ( ! ear ) return;
 
 	// interlink polygon nodes in z-order
-	if ( ! pass && invSize ) indexCurve( ear, minX, minY, invSize );
+	if ( ! pbottom && invSize ) indexCurve( ear, minX, minY, invSize );
 
 	let stop = ear,
 		prev, next;
@@ -39048,20 +39048,20 @@ function earcutLinked( ear, triangles, dim, minX, minY, invSize, pass ) {
 		if ( ear === stop ) {
 
 			// try filtering points and slicing again
-			if ( ! pass ) {
+			if ( ! pbottom ) {
 
 				earcutLinked( filterPoints( ear ), triangles, dim, minX, minY, invSize, 1 );
 
 				// if this didn't work, try curing all small self-intersections locally
 
-			} else if ( pass === 1 ) {
+			} else if ( pbottom === 1 ) {
 
 				ear = cureLocalIntersections( filterPoints( ear ), triangles, dim );
 				earcutLinked( ear, triangles, dim, minX, minY, invSize, 2 );
 
 				// as a last resort, try splitting the remaining polygon into two
 
-			} else if ( pass === 2 ) {
+			} else if ( pbottom === 2 ) {
 
 				splitEarcut( ear, triangles, dim, minX, minY, invSize );
 
@@ -39689,7 +39689,7 @@ function signedArea( data, start, end, dim ) {
 
 }
 
-class ShapeUtils {
+clbottom ShapeUtils {
 
 	// calculate area of the contour polygon
 
@@ -39801,7 +39801,7 @@ function addContour( vertices, contour ) {
  */
 
 
-class ExtrudeGeometry extends BufferGeometry {
+clbottom ExtrudeGeometry extends BufferGeometry {
 
 	constructor( shapes = new Shape( [ new Vector2( 0.5, 0.5 ), new Vector2( - 0.5, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), options = {} ) {
 
@@ -40022,7 +40022,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 					// handle special case of collinear edges
 
-					let direction_eq = false; // assumes: opposite
+					let direction_eq = false; // bottomumes: opposite
 
 					if ( v_prev_x > Number.EPSILON ) {
 
@@ -40454,7 +40454,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -40575,7 +40575,7 @@ function toJSON$1( shapes, options, data ) {
 
 	}
 
-	data.options = Object.assign( {}, options );
+	data.options = Object.bottomign( {}, options );
 
 	if ( options.extrudePath !== undefined ) data.options.extrudePath = options.extrudePath.toJSON();
 
@@ -40583,7 +40583,7 @@ function toJSON$1( shapes, options, data ) {
 
 }
 
-class IcosahedronGeometry extends PolyhedronGeometry {
+clbottom IcosahedronGeometry extends PolyhedronGeometry {
 
 	constructor( radius = 1, detail = 0 ) {
 
@@ -40621,7 +40621,7 @@ class IcosahedronGeometry extends PolyhedronGeometry {
 
 }
 
-class OctahedronGeometry extends PolyhedronGeometry {
+clbottom OctahedronGeometry extends PolyhedronGeometry {
 
 	constructor( radius = 1, detail = 0 ) {
 
@@ -40655,7 +40655,7 @@ class OctahedronGeometry extends PolyhedronGeometry {
 
 }
 
-class RingGeometry extends BufferGeometry {
+clbottom RingGeometry extends BufferGeometry {
 
 	constructor( innerRadius = 0.5, outerRadius = 1, thetaSegments = 32, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
@@ -40762,7 +40762,7 @@ class RingGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -40776,7 +40776,7 @@ class RingGeometry extends BufferGeometry {
 
 }
 
-class ShapeGeometry extends BufferGeometry {
+clbottom ShapeGeometry extends BufferGeometry {
 
 	constructor( shapes = new Shape( [ new Vector2( 0, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), curveSegments = 12 ) {
 
@@ -40906,7 +40906,7 @@ class ShapeGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -40964,7 +40964,7 @@ function toJSON( shapes, data ) {
 
 }
 
-class SphereGeometry extends BufferGeometry {
+clbottom SphereGeometry extends BufferGeometry {
 
 	constructor( radius = 1, widthSegments = 32, heightSegments = 16, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI ) {
 
@@ -41082,7 +41082,7 @@ class SphereGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -41096,7 +41096,7 @@ class SphereGeometry extends BufferGeometry {
 
 }
 
-class TetrahedronGeometry extends PolyhedronGeometry {
+clbottom TetrahedronGeometry extends PolyhedronGeometry {
 
 	constructor( radius = 1, detail = 0 ) {
 
@@ -41127,7 +41127,7 @@ class TetrahedronGeometry extends PolyhedronGeometry {
 
 }
 
-class TorusGeometry extends BufferGeometry {
+clbottom TorusGeometry extends BufferGeometry {
 
 	constructor( radius = 1, tube = 0.4, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2 ) {
 
@@ -41228,7 +41228,7 @@ class TorusGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -41242,7 +41242,7 @@ class TorusGeometry extends BufferGeometry {
 
 }
 
-class TorusKnotGeometry extends BufferGeometry {
+clbottom TorusKnotGeometry extends BufferGeometry {
 
 	constructor( radius = 1, tube = 0.4, tubularSegments = 64, radialSegments = 8, p = 2, q = 3 ) {
 
@@ -41390,7 +41390,7 @@ class TorusKnotGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -41404,7 +41404,7 @@ class TorusKnotGeometry extends BufferGeometry {
 
 }
 
-class TubeGeometry extends BufferGeometry {
+clbottom TubeGeometry extends BufferGeometry {
 
 	constructor( path = new QuadraticBezierCurve3( new Vector3( - 1, - 1, 0 ), new Vector3( - 1, 1, 0 ), new Vector3( 1, 1, 0 ) ), tubularSegments = 64, radius = 1, radialSegments = 8, closed = false ) {
 
@@ -41567,7 +41567,7 @@ class TubeGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -41599,7 +41599,7 @@ class TubeGeometry extends BufferGeometry {
 
 }
 
-class WireframeGeometry extends BufferGeometry {
+clbottom WireframeGeometry extends BufferGeometry {
 
 	constructor( geometry = null ) {
 
@@ -41713,7 +41713,7 @@ class WireframeGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -41765,7 +41765,7 @@ var Geometries = /*#__PURE__*/Object.freeze({
 	WireframeGeometry: WireframeGeometry
 });
 
-class ShadowMaterial extends Material {
+clbottom ShadowMaterial extends Material {
 
 	static get type() {
 
@@ -41802,7 +41802,7 @@ class ShadowMaterial extends Material {
 
 }
 
-class RawShaderMaterial extends ShaderMaterial {
+clbottom RawShaderMaterial extends ShaderMaterial {
 
 	static get type() {
 
@@ -41820,7 +41820,7 @@ class RawShaderMaterial extends ShaderMaterial {
 
 }
 
-class MeshStandardMaterial extends Material {
+clbottom MeshStandardMaterial extends Material {
 
 	static get type() {
 
@@ -41944,7 +41944,7 @@ class MeshStandardMaterial extends Material {
 
 }
 
-class MeshPhysicalMaterial extends MeshStandardMaterial {
+clbottom MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	static get type() {
 
@@ -42186,7 +42186,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 }
 
-class MeshPhongMaterial extends Material {
+clbottom MeshPhongMaterial extends Material {
 
 	static get type() {
 
@@ -42306,7 +42306,7 @@ class MeshPhongMaterial extends Material {
 
 }
 
-class MeshToonMaterial extends Material {
+clbottom MeshToonMaterial extends Material {
 
 	static get type() {
 
@@ -42406,7 +42406,7 @@ class MeshToonMaterial extends Material {
 
 }
 
-class MeshNormalMaterial extends Material {
+clbottom MeshNormalMaterial extends Material {
 
 	static get type() {
 
@@ -42466,7 +42466,7 @@ class MeshNormalMaterial extends Material {
 
 }
 
-class MeshLambertMaterial extends Material {
+clbottom MeshLambertMaterial extends Material {
 
 	static get type() {
 
@@ -42582,7 +42582,7 @@ class MeshLambertMaterial extends Material {
 
 }
 
-class MeshMatcapMaterial extends Material {
+clbottom MeshMatcapMaterial extends Material {
 
 	static get type() {
 
@@ -42661,7 +42661,7 @@ class MeshMatcapMaterial extends Material {
 
 }
 
-class LineDashedMaterial extends LineBasicMaterial {
+clbottom LineDashedMaterial extends LineBasicMaterial {
 
 	static get type() {
 
@@ -42700,7 +42700,7 @@ class LineDashedMaterial extends LineBasicMaterial {
 // converts an array to a specific type
 function convertArray( array, type, forceClone ) {
 
-	if ( ! array || // let 'undefined' and 'null' pass
+	if ( ! array || // let 'undefined' and 'null' pbottom
 		! forceClone && array.constructor === type ) return array;
 
 	if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
@@ -42796,7 +42796,7 @@ function flattenJSON( jsonKeys, times, values, valuePropertyName ) {
 
 	} else if ( value.toArray !== undefined ) {
 
-		// ...assume THREE.Math-ish
+		// ...bottomume THREE.Math-ish
 
 		do {
 
@@ -43041,16 +43041,16 @@ const AnimationUtils = {
 };
 
 /**
- * Abstract base class of interpolants over parametric samples.
+ * Abstract base clbottom of interpolants over parametric samples.
  *
  * The parameter domain is one dimensional, typically the time or a path
  * along a curve defined by the data.
  *
- * The sample values can have any dimensionality and derived classes may
+ * The sample values can have any dimensionality and derived clbottomes may
  * apply special interpretations to the data.
  *
- * This class provides the interval seek in a Template Method, deferring
- * the actual interpolation to derived classes.
+ * This clbottom provides the interval seek in a Template Method, deferring
+ * the actual interpolation to derived clbottomes.
  *
  * Time complexity is O(1) for linear access crossing at most two points
  * and O(log N) for random access, where N is the number of positions.
@@ -43061,7 +43061,7 @@ const AnimationUtils = {
  *
  */
 
-class Interpolant {
+clbottom Interpolant {
 
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
@@ -43263,7 +43263,7 @@ class Interpolant {
 
 	}
 
-	// Template methods for derived classes:
+	// Template methods for derived clbottomes:
 
 	interpolate_( /* i1, t0, t, t1 */ ) {
 
@@ -43288,7 +43288,7 @@ class Interpolant {
  * over their parameter interval.
  */
 
-class CubicInterpolant extends Interpolant {
+clbottom CubicInterpolant extends Interpolant {
 
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
@@ -43426,7 +43426,7 @@ class CubicInterpolant extends Interpolant {
 
 }
 
-class LinearInterpolant extends Interpolant {
+clbottom LinearInterpolant extends Interpolant {
 
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
@@ -43466,7 +43466,7 @@ class LinearInterpolant extends Interpolant {
  * the parameter.
  */
 
-class DiscreteInterpolant extends Interpolant {
+clbottom DiscreteInterpolant extends Interpolant {
 
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
@@ -43482,7 +43482,7 @@ class DiscreteInterpolant extends Interpolant {
 
 }
 
-class KeyframeTrack {
+clbottom KeyframeTrack {
 
 	constructor( name, times, values, interpolation ) {
 
@@ -43507,14 +43507,14 @@ class KeyframeTrack {
 
 		let json;
 
-		// derived classes can define a static toJSON method
+		// derived clbottomes can define a static toJSON method
 		if ( trackType.toJSON !== this.toJSON ) {
 
 			json = trackType.toJSON( track );
 
 		} else {
 
-			// by default, we assume the data can be serialized as-is
+			// by default, we bottomume the data can be serialized as-is
 			json = {
 
 				'name': track.name,
@@ -43936,7 +43936,7 @@ KeyframeTrack.prototype.DefaultInterpolation = InterpolateLinear;
 /**
  * A Track of Boolean keyframe values.
  */
-class BooleanKeyframeTrack extends KeyframeTrack {
+clbottom BooleanKeyframeTrack extends KeyframeTrack {
 
 	// No interpolation parameter because only InterpolateDiscrete is valid.
 	constructor( name, times, values ) {
@@ -43956,14 +43956,14 @@ BooleanKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;
 /**
  * A Track of keyframe values that represent color.
  */
-class ColorKeyframeTrack extends KeyframeTrack {}
+clbottom ColorKeyframeTrack extends KeyframeTrack {}
 
 ColorKeyframeTrack.prototype.ValueTypeName = 'color';
 
 /**
  * A Track of numeric keyframe values.
  */
-class NumberKeyframeTrack extends KeyframeTrack {}
+clbottom NumberKeyframeTrack extends KeyframeTrack {}
 
 NumberKeyframeTrack.prototype.ValueTypeName = 'number';
 
@@ -43971,7 +43971,7 @@ NumberKeyframeTrack.prototype.ValueTypeName = 'number';
  * Spherical linear unit quaternion interpolant.
  */
 
-class QuaternionLinearInterpolant extends Interpolant {
+clbottom QuaternionLinearInterpolant extends Interpolant {
 
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
@@ -44004,7 +44004,7 @@ class QuaternionLinearInterpolant extends Interpolant {
 /**
  * A Track of quaternion keyframe values.
  */
-class QuaternionKeyframeTrack extends KeyframeTrack {
+clbottom QuaternionKeyframeTrack extends KeyframeTrack {
 
 	InterpolantFactoryMethodLinear( result ) {
 
@@ -44022,7 +44022,7 @@ QuaternionKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;
 /**
  * A Track that interpolates Strings
  */
-class StringKeyframeTrack extends KeyframeTrack {
+clbottom StringKeyframeTrack extends KeyframeTrack {
 
 	// No interpolation parameter because only InterpolateDiscrete is valid.
 	constructor( name, times, values ) {
@@ -44042,11 +44042,11 @@ StringKeyframeTrack.prototype.InterpolantFactoryMethodSmooth = undefined;
 /**
  * A Track of vectored keyframe values.
  */
-class VectorKeyframeTrack extends KeyframeTrack {}
+clbottom VectorKeyframeTrack extends KeyframeTrack {}
 
 VectorKeyframeTrack.prototype.ValueTypeName = 'vector';
 
-class AnimationClip {
+clbottom AnimationClip {
 
 	constructor( name = '', duration = - 1, tracks = [], blendMode = NormalAnimationBlendMode ) {
 
@@ -44319,7 +44319,7 @@ class AnimationClip {
 
 			} else {
 
-				// ...assume skeletal animation
+				// ...bottomume skeletal animation
 
 				const boneName = '.bones[' + bones[ h ].name + ']';
 
@@ -44493,14 +44493,14 @@ function parseKeyframeTrack( json ) {
 
 	}
 
-	// derived classes can define a static parse method
+	// derived clbottomes can define a static parse method
 	if ( trackType.parse !== undefined ) {
 
 		return trackType.parse( json );
 
 	} else {
 
-		// by default, we assume a constructor compatible with the base
+		// by default, we bottomume a constructor compatible with the base
 		return new trackType( json.name, json.times, json.values, json.interpolation );
 
 	}
@@ -44547,7 +44547,7 @@ const Cache = {
 
 };
 
-class LoadingManager {
+clbottom LoadingManager {
 
 	constructor( onLoad, onProgress, onError ) {
 
@@ -44688,7 +44688,7 @@ class LoadingManager {
 
 const DefaultLoadingManager = /*@__PURE__*/ new LoadingManager();
 
-class Loader {
+clbottom Loader {
 
 	constructor( manager ) {
 
@@ -44759,7 +44759,7 @@ Loader.DEFAULT_MATERIAL_NAME = '__DEFAULT';
 
 const loading = {};
 
-class HttpError extends Error {
+clbottom HttpError extends Error {
 
 	constructor( message, response ) {
 
@@ -44770,7 +44770,7 @@ class HttpError extends Error {
 
 }
 
-class FileLoader extends Loader {
+clbottom FileLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -45040,7 +45040,7 @@ class FileLoader extends Loader {
 
 }
 
-class AnimationLoader extends Loader {
+clbottom AnimationLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -45101,12 +45101,12 @@ class AnimationLoader extends Loader {
 }
 
 /**
- * Abstract Base class to block based textures loader (dds, pvr, ...)
+ * Abstract Base clbottom to block based textures loader (dds, pvr, ...)
  *
- * Sub classes have to implement the parse() method which will be used in load().
+ * Sub clbottomes have to implement the parse() method which will be used in load().
  */
 
-class CompressedTextureLoader extends Loader {
+clbottom CompressedTextureLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -45227,7 +45227,7 @@ class CompressedTextureLoader extends Loader {
 
 }
 
-class ImageLoader extends Loader {
+clbottom ImageLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -45312,7 +45312,7 @@ class ImageLoader extends Loader {
 
 }
 
-class CubeTextureLoader extends Loader {
+clbottom CubeTextureLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -45364,12 +45364,12 @@ class CubeTextureLoader extends Loader {
 }
 
 /**
- * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
+ * Abstract Base clbottom to load generic binary textures formats (rgbe, hdr, ...)
  *
- * Sub classes have to implement the parse() method which will be used in load().
+ * Sub clbottomes have to implement the parse() method which will be used in load().
  */
 
-class DataTextureLoader extends Loader {
+clbottom DataTextureLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -45487,7 +45487,7 @@ class DataTextureLoader extends Loader {
 
 }
 
-class TextureLoader extends Loader {
+clbottom TextureLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -45522,7 +45522,7 @@ class TextureLoader extends Loader {
 
 }
 
-class Light extends Object3D {
+clbottom Light extends Object3D {
 
 	constructor( color, intensity = 1 ) {
 
@@ -45539,7 +45539,7 @@ class Light extends Object3D {
 
 	dispose() {
 
-		// Empty here in base class; some subclasses override.
+		// Empty here in base clbottom; some subclbottomes override.
 
 	}
 
@@ -45577,7 +45577,7 @@ class Light extends Object3D {
 
 }
 
-class HemisphereLight extends Light {
+clbottom HemisphereLight extends Light {
 
 	constructor( skyColor, groundColor, intensity ) {
 
@@ -45610,7 +45610,7 @@ const _projScreenMatrix$1 = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld$1 = /*@__PURE__*/ new Vector3();
 const _lookTarget$1 = /*@__PURE__*/ new Vector3();
 
-class LightShadow {
+clbottom LightShadow {
 
 	constructor( camera ) {
 
@@ -45626,7 +45626,7 @@ class LightShadow {
 		this.mapSize = new Vector2( 512, 512 );
 
 		this.map = null;
-		this.mapPass = null;
+		this.mapPbottom = null;
 		this.matrix = new Matrix4();
 
 		this.autoUpdate = true;
@@ -45703,9 +45703,9 @@ class LightShadow {
 
 		}
 
-		if ( this.mapPass ) {
+		if ( this.mapPbottom ) {
 
-			this.mapPass.dispose();
+			this.mapPbottom.dispose();
 
 		}
 
@@ -45751,7 +45751,7 @@ class LightShadow {
 
 }
 
-class SpotLightShadow extends LightShadow {
+clbottom SpotLightShadow extends LightShadow {
 
 	constructor() {
 
@@ -45796,7 +45796,7 @@ class SpotLightShadow extends LightShadow {
 
 }
 
-class SpotLight extends Light {
+clbottom SpotLight extends Light {
 
 	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 2 ) {
 
@@ -45866,7 +45866,7 @@ const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
 
-class PointLightShadow extends LightShadow {
+clbottom PointLightShadow extends LightShadow {
 
 	constructor() {
 
@@ -45950,7 +45950,7 @@ class PointLightShadow extends LightShadow {
 
 }
 
-class PointLight extends Light {
+clbottom PointLight extends Light {
 
 	constructor( color, intensity, distance = 0, decay = 2 ) {
 
@@ -46003,7 +46003,7 @@ class PointLight extends Light {
 
 }
 
-class DirectionalLightShadow extends LightShadow {
+clbottom DirectionalLightShadow extends LightShadow {
 
 	constructor() {
 
@@ -46015,7 +46015,7 @@ class DirectionalLightShadow extends LightShadow {
 
 }
 
-class DirectionalLight extends Light {
+clbottom DirectionalLight extends Light {
 
 	constructor( color, intensity ) {
 
@@ -46053,7 +46053,7 @@ class DirectionalLight extends Light {
 
 }
 
-class AmbientLight extends Light {
+clbottom AmbientLight extends Light {
 
 	constructor( color, intensity ) {
 
@@ -46067,7 +46067,7 @@ class AmbientLight extends Light {
 
 }
 
-class RectAreaLight extends Light {
+clbottom RectAreaLight extends Light {
 
 	constructor( color, intensity, width = 10, height = 10 ) {
 
@@ -46130,7 +46130,7 @@ class RectAreaLight extends Light {
 
 // 3-band SH defined by 9 coefficients
 
-class SphericalHarmonics3 {
+clbottom SphericalHarmonics3 {
 
 	constructor() {
 
@@ -46174,7 +46174,7 @@ class SphericalHarmonics3 {
 	// target is a Vector3
 	getAt( normal, target ) {
 
-		// normal is assumed to be unit length
+		// normal is bottomumed to be unit length
 
 		const x = normal.x, y = normal.y, z = normal.z;
 
@@ -46204,7 +46204,7 @@ class SphericalHarmonics3 {
 	// https://graphics.stanford.edu/papers/envmap/envmap.pdf
 	getIrradianceAt( normal, target ) {
 
-		// normal is assumed to be unit length
+		// normal is bottomumed to be unit length
 
 		const x = normal.x, y = normal.y, z = normal.z;
 
@@ -46337,7 +46337,7 @@ class SphericalHarmonics3 {
 	// shBasis is an Array[ 9 ]
 	static getBasisAt( normal, shBasis ) {
 
-		// normal is assumed to be unit length
+		// normal is bottomumed to be unit length
 
 		const x = normal.x, y = normal.y, z = normal.z;
 
@@ -46360,7 +46360,7 @@ class SphericalHarmonics3 {
 
 }
 
-class LightProbe extends Light {
+clbottom LightProbe extends Light {
 
 	constructor( sh = new SphericalHarmonics3(), intensity = 1 ) {
 
@@ -46403,7 +46403,7 @@ class LightProbe extends Light {
 
 }
 
-class MaterialLoader extends Loader {
+clbottom MaterialLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -46517,7 +46517,7 @@ class MaterialLoader extends Loader {
 		if ( json.stencilFuncMask !== undefined ) material.stencilFuncMask = json.stencilFuncMask;
 		if ( json.stencilFail !== undefined ) material.stencilFail = json.stencilFail;
 		if ( json.stencilZFail !== undefined ) material.stencilZFail = json.stencilZFail;
-		if ( json.stencilZPass !== undefined ) material.stencilZPass = json.stencilZPass;
+		if ( json.stencilZPbottom !== undefined ) material.stencilZPbottom = json.stencilZPbottom;
 		if ( json.stencilWrite !== undefined ) material.stencilWrite = json.stencilWrite;
 
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
@@ -46540,7 +46540,7 @@ class MaterialLoader extends Loader {
 
 		if ( json.alphaToCoverage !== undefined ) material.alphaToCoverage = json.alphaToCoverage;
 		if ( json.premultipliedAlpha !== undefined ) material.premultipliedAlpha = json.premultipliedAlpha;
-		if ( json.forceSinglePass !== undefined ) material.forceSinglePass = json.forceSinglePass;
+		if ( json.forceSinglePbottom !== undefined ) material.forceSinglePbottom = json.forceSinglePbottom;
 
 		if ( json.visible !== undefined ) material.visible = json.visible;
 
@@ -46753,7 +46753,7 @@ class MaterialLoader extends Loader {
 
 }
 
-class LoaderUtils {
+clbottom LoaderUtils {
 
 	static decodeText( array ) { // @deprecated, r165
 
@@ -46772,7 +46772,7 @@ class LoaderUtils {
 
 		for ( let i = 0, il = array.length; i < il; i ++ ) {
 
-			// Implicitly assumes little-endian.
+			// Implicitly bottomumes little-endian.
 			s += String.fromCharCode( array[ i ] );
 
 		}
@@ -46829,7 +46829,7 @@ class LoaderUtils {
 
 }
 
-class InstancedBufferGeometry extends BufferGeometry {
+clbottom InstancedBufferGeometry extends BufferGeometry {
 
 	constructor() {
 
@@ -46866,7 +46866,7 @@ class InstancedBufferGeometry extends BufferGeometry {
 
 }
 
-class BufferGeometryLoader extends Loader {
+clbottom BufferGeometryLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -47070,7 +47070,7 @@ class BufferGeometryLoader extends Loader {
 
 }
 
-class ObjectLoader extends Loader {
+clbottom ObjectLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -47821,7 +47821,7 @@ class ObjectLoader extends Loader {
 				if ( data.zoom !== undefined ) object.zoom = data.zoom;
 				if ( data.filmGauge !== undefined ) object.filmGauge = data.filmGauge;
 				if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
-				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+				if ( data.view !== undefined ) object.view = Object.bottomign( {}, data.view );
 
 				break;
 
@@ -47830,7 +47830,7 @@ class ObjectLoader extends Loader {
 				object = new OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
 
 				if ( data.zoom !== undefined ) object.zoom = data.zoom;
-				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+				if ( data.view !== undefined ) object.view = Object.bottomign( {}, data.view );
 
 				break;
 
@@ -48187,7 +48187,7 @@ const TEXTURE_FILTER = {
 	LinearMipmapLinearFilter: LinearMipmapLinearFilter
 };
 
-class ImageBitmapLoader extends Loader {
+clbottom ImageBitmapLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -48276,7 +48276,7 @@ class ImageBitmapLoader extends Loader {
 
 		} ).then( function ( blob ) {
 
-			return createImageBitmap( blob, Object.assign( scope.options, { colorSpaceConversion: 'none' } ) );
+			return createImageBitmap( blob, Object.bottomign( scope.options, { colorSpaceConversion: 'none' } ) );
 
 		} ).then( function ( imageBitmap ) {
 
@@ -48308,7 +48308,7 @@ class ImageBitmapLoader extends Loader {
 
 let _context;
 
-class AudioContext {
+clbottom AudioContext {
 
 	static getContext() {
 
@@ -48330,7 +48330,7 @@ class AudioContext {
 
 }
 
-class AudioLoader extends Loader {
+clbottom AudioLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -48394,7 +48394,7 @@ const _eyeRight = /*@__PURE__*/ new Matrix4();
 const _eyeLeft = /*@__PURE__*/ new Matrix4();
 const _projectionMatrix = /*@__PURE__*/ new Matrix4();
 
-class StereoCamera {
+clbottom StereoCamera {
 
 	constructor() {
 
@@ -48485,7 +48485,7 @@ class StereoCamera {
 
 }
 
-class Clock {
+clbottom Clock {
 
 	constructor( autoStart = true ) {
 
@@ -48563,7 +48563,7 @@ const _quaternion$1 = /*@__PURE__*/ new Quaternion();
 const _scale$1 = /*@__PURE__*/ new Vector3();
 const _orientation$1 = /*@__PURE__*/ new Vector3();
 
-class AudioListener extends Object3D {
+clbottom AudioListener extends Object3D {
 
 	constructor() {
 
@@ -48688,7 +48688,7 @@ class AudioListener extends Object3D {
 
 }
 
-class Audio extends Object3D {
+clbottom Audio extends Object3D {
 
 	constructor( listener ) {
 
@@ -49090,7 +49090,7 @@ const _quaternion = /*@__PURE__*/ new Quaternion();
 const _scale = /*@__PURE__*/ new Vector3();
 const _orientation = /*@__PURE__*/ new Vector3();
 
-class PositionalAudio extends Audio {
+clbottom PositionalAudio extends Audio {
 
 	constructor( listener ) {
 
@@ -49226,7 +49226,7 @@ class PositionalAudio extends Audio {
 
 }
 
-class AudioAnalyser {
+clbottom AudioAnalyser {
 
 	constructor( audio, fftSize = 2048 ) {
 
@@ -49265,7 +49265,7 @@ class AudioAnalyser {
 
 }
 
-class PropertyMixer {
+clbottom PropertyMixer {
 
 	constructor( binding, typeName, valueSize ) {
 
@@ -49615,7 +49615,7 @@ const _trackRe = new RegExp( ''
 
 const _supportedObjectNames = [ 'material', 'materials', 'bones', 'map' ];
 
-class Composite {
+clbottom Composite {
 
 	constructor( targetGroup, path, optionalParsedPath ) {
 
@@ -49676,12 +49676,12 @@ class Composite {
 
 }
 
-// Note: This class uses a State pattern on a per-method basis:
+// Note: This clbottom uses a State pattern on a per-method basis:
 // 'bind' sets 'this.getValue' / 'setValue' and shadows the
 // prototype version of these methods with one that represents
 // the bound state. When the property is not found, the methods
 // become no-ops.
-class PropertyBinding {
+clbottom PropertyBinding {
 
 	constructor( rootNode, path, parsedPath ) {
 
@@ -50302,17 +50302,17 @@ PropertyBinding.prototype.SetterByBindingTypeAndVersioning = [
  *
  * Usage:
  *
- *  - Add objects you would otherwise pass as 'root' to the
+ *  - Add objects you would otherwise pbottom as 'root' to the
  *    constructor or the .clipAction method of AnimationMixer.
  *
- *  - Instead pass this object as 'root'.
+ *  - Instead pbottom this object as 'root'.
  *
  *  - You can also add and remove objects later when the mixer
  *    is running.
  *
  * Note:
  *
- *    Objects of this class appear as one object to the mixer,
+ *    Objects of this clbottom appear as one object to the mixer,
  *    so cache control of the individual objects must be done
  *    on the group.
  *
@@ -50325,7 +50325,7 @@ PropertyBinding.prototype.SetterByBindingTypeAndVersioning = [
  *    target group or directly, but not both.
  */
 
-class AnimationObjectGroup {
+clbottom AnimationObjectGroup {
 
 	constructor() {
 
@@ -50679,7 +50679,7 @@ class AnimationObjectGroup {
 
 }
 
-class AnimationAction {
+clbottom AnimationAction {
 
 	constructor( mixer, clip, localRoot = null, blendMode = clip.blendMode ) {
 
@@ -51322,7 +51322,7 @@ class AnimationAction {
 
 		} else {
 
-			// assuming for LoopOnce atStart == atEnd == true
+			// bottomuming for LoopOnce atStart == atEnd == true
 
 			if ( atStart ) {
 
@@ -51377,7 +51377,7 @@ class AnimationAction {
 const _controlInterpolantsResultBuffer = new Float32Array( 1 );
 
 
-class AnimationMixer extends EventDispatcher {
+clbottom AnimationMixer extends EventDispatcher {
 
 	constructor( root ) {
 
@@ -52024,7 +52024,7 @@ class AnimationMixer extends EventDispatcher {
 		this.time = 0; // Zero out time attribute for AnimationMixer object;
 		for ( let i = 0; i < this._actions.length; i ++ ) {
 
-			this._actions[ i ].time = 0; // Zero out time attribute for all associated AnimationAction objects.
+			this._actions[ i ].time = 0; // Zero out time attribute for all bottomociated AnimationAction objects.
 
 		}
 
@@ -52134,7 +52134,7 @@ class AnimationMixer extends EventDispatcher {
 
 }
 
-class Uniform {
+clbottom Uniform {
 
 	constructor( value ) {
 
@@ -52152,7 +52152,7 @@ class Uniform {
 
 let _id = 0;
 
-class UniformsGroup extends EventDispatcher {
+clbottom UniformsGroup extends EventDispatcher {
 
 	constructor() {
 
@@ -52244,7 +52244,7 @@ class UniformsGroup extends EventDispatcher {
 
 }
 
-class InstancedInterleavedBuffer extends InterleavedBuffer {
+clbottom InstancedInterleavedBuffer extends InterleavedBuffer {
 
 	constructor( array, stride, meshPerAttribute = 1 ) {
 
@@ -52289,7 +52289,7 @@ class InstancedInterleavedBuffer extends InterleavedBuffer {
 
 }
 
-class GLBufferAttribute {
+clbottom GLBufferAttribute {
 
 	constructor( buffer, type, itemSize, elementSize, count ) {
 
@@ -52350,12 +52350,12 @@ class GLBufferAttribute {
 
 const _matrix = /*@__PURE__*/ new Matrix4();
 
-class Raycaster {
+clbottom Raycaster {
 
 	constructor( origin, direction, near = 0, far = Infinity ) {
 
 		this.ray = new Ray( origin, direction );
-		// direction is assumed to be normalized (for accurate distance calculations)
+		// direction is bottomumed to be normalized (for accurate distance calculations)
 
 		this.near = near;
 		this.far = far;
@@ -52374,7 +52374,7 @@ class Raycaster {
 
 	set( origin, direction ) {
 
-		// direction is assumed to be normalized (for accurate distance calculations)
+		// direction is bottomumed to be normalized (for accurate distance calculations)
 
 		this.ray.set( origin, direction );
 
@@ -52477,7 +52477,7 @@ function intersect( object, raycaster, intersects, recursive ) {
  * phi (the polar angle) is measured from the positive y-axis. The positive y-axis is up.
  * theta (the azimuthal angle) is measured from the positive z-axis.
  */
-class Spherical {
+clbottom Spherical {
 
 	constructor( radius = 1, phi = 0, theta = 0 ) {
 
@@ -52557,7 +52557,7 @@ class Spherical {
  * Ref: https://en.wikipedia.org/wiki/Cylindrical_coordinate_system
  */
 
-class Cylindrical {
+clbottom Cylindrical {
 
 	constructor( radius = 1, theta = 0, y = 0 ) {
 
@@ -52613,7 +52613,7 @@ class Cylindrical {
 
 }
 
-class Matrix2 {
+clbottom Matrix2 {
 
 	constructor( n11, n12, n21, n22 ) {
 
@@ -52670,7 +52670,7 @@ class Matrix2 {
 
 const _vector$4 = /*@__PURE__*/ new Vector2();
 
-class Box2 {
+clbottom Box2 {
 
 	constructor( min = new Vector2( + Infinity, + Infinity ), max = new Vector2( - Infinity, - Infinity ) ) {
 
@@ -52872,7 +52872,7 @@ class Box2 {
 const _startP = /*@__PURE__*/ new Vector3();
 const _startEnd = /*@__PURE__*/ new Vector3();
 
-class Line3 {
+clbottom Line3 {
 
 	constructor( start = new Vector3(), end = new Vector3() ) {
 
@@ -52982,7 +52982,7 @@ class Line3 {
 
 const _vector$3 = /*@__PURE__*/ new Vector3();
 
-class SpotLightHelper extends Object3D {
+clbottom SpotLightHelper extends Object3D {
 
 	constructor( light, color ) {
 
@@ -53087,7 +53087,7 @@ const _boneMatrix = /*@__PURE__*/ new Matrix4();
 const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
 
 
-class SkeletonHelper extends LineSegments {
+clbottom SkeletonHelper extends LineSegments {
 
 	constructor( object ) {
 
@@ -53200,7 +53200,7 @@ function getBoneList( object ) {
 
 }
 
-class PointLightHelper extends Mesh {
+clbottom PointLightHelper extends Mesh {
 
 	constructor( light, sphereSize, color ) {
 
@@ -53290,7 +53290,7 @@ const _vector$1 = /*@__PURE__*/ new Vector3();
 const _color1 = /*@__PURE__*/ new Color();
 const _color2 = /*@__PURE__*/ new Color();
 
-class HemisphereLightHelper extends Object3D {
+clbottom HemisphereLightHelper extends Object3D {
 
 	constructor( light, size, color ) {
 
@@ -53364,7 +53364,7 @@ class HemisphereLightHelper extends Object3D {
 
 }
 
-class GridHelper extends LineSegments {
+clbottom GridHelper extends LineSegments {
 
 	constructor( size = 10, divisions = 10, color1 = 0x444444, color2 = 0x888888 ) {
 
@@ -53412,7 +53412,7 @@ class GridHelper extends LineSegments {
 
 }
 
-class PolarGridHelper extends LineSegments {
+clbottom PolarGridHelper extends LineSegments {
 
 	constructor( radius = 10, sectors = 16, rings = 8, divisions = 64, color1 = 0x444444, color2 = 0x888888 ) {
 
@@ -53504,7 +53504,7 @@ const _v1 = /*@__PURE__*/ new Vector3();
 const _v2 = /*@__PURE__*/ new Vector3();
 const _v3 = /*@__PURE__*/ new Vector3();
 
-class DirectionalLightHelper extends Object3D {
+clbottom DirectionalLightHelper extends Object3D {
 
 	constructor( light, size, color ) {
 
@@ -53594,7 +53594,7 @@ const _camera = /*@__PURE__*/ new Camera();
  *		https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html
  */
 
-class CameraHelper extends LineSegments {
+clbottom CameraHelper extends LineSegments {
 
 	constructor( camera ) {
 
@@ -53846,7 +53846,7 @@ function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
 const _box = /*@__PURE__*/ new Box3();
 
-class BoxHelper extends LineSegments {
+clbottom BoxHelper extends LineSegments {
 
 	constructor( object, color = 0xffff00 ) {
 
@@ -53949,7 +53949,7 @@ class BoxHelper extends LineSegments {
 
 }
 
-class Box3Helper extends LineSegments {
+clbottom Box3Helper extends LineSegments {
 
 	constructor( box, color = 0xffff00 ) {
 
@@ -53998,7 +53998,7 @@ class Box3Helper extends LineSegments {
 
 }
 
-class PlaneHelper extends Line {
+clbottom PlaneHelper extends Line {
 
 	constructor( plane, size = 1, hex = 0xffff00 ) {
 
@@ -54056,9 +54056,9 @@ class PlaneHelper extends Line {
 const _axis = /*@__PURE__*/ new Vector3();
 let _lineGeometry, _coneGeometry;
 
-class ArrowHelper extends Object3D {
+clbottom ArrowHelper extends Object3D {
 
-	// dir is assumed to be normalized
+	// dir is bottomumed to be normalized
 
 	constructor( dir = new Vector3( 0, 0, 1 ), origin = new Vector3( 0, 0, 0 ), length = 1, color = 0xffff00, headLength = length * 0.2, headWidth = headLength * 0.2 ) {
 
@@ -54093,7 +54093,7 @@ class ArrowHelper extends Object3D {
 
 	setDirection( dir ) {
 
-		// dir is assumed to be normalized
+		// dir is bottomumed to be normalized
 
 		if ( dir.y > 0.99999 ) {
 
@@ -54155,7 +54155,7 @@ class ArrowHelper extends Object3D {
 
 }
 
-class AxesHelper extends LineSegments {
+clbottom AxesHelper extends LineSegments {
 
 	constructor( size = 1 ) {
 
@@ -54215,7 +54215,7 @@ class AxesHelper extends LineSegments {
 
 }
 
-class ShapePath {
+clbottom ShapePath {
 
 	constructor() {
 
@@ -54434,7 +54434,7 @@ class ShapePath {
 				for ( let hIdx = 0; hIdx < sho.length; hIdx ++ ) {
 
 					const ho = sho[ hIdx ];
-					let hole_unassigned = true;
+					let hole_unbottomigned = true;
 
 					for ( let s2Idx = 0; s2Idx < newShapes.length; s2Idx ++ ) {
 
@@ -54442,9 +54442,9 @@ class ShapePath {
 
 							if ( sIdx !== s2Idx )	toChange ++;
 
-							if ( hole_unassigned ) {
+							if ( hole_unbottomigned ) {
 
-								hole_unassigned = false;
+								hole_unbottomigned = false;
 								betterShapeHoles[ s2Idx ].push( ho );
 
 							} else {
@@ -54457,7 +54457,7 @@ class ShapePath {
 
 					}
 
-					if ( hole_unassigned ) {
+					if ( hole_unbottomigned ) {
 
 						betterShapeHoles[ sIdx ].push( ho );
 
@@ -54499,7 +54499,7 @@ class ShapePath {
 
 }
 
-class Controls extends EventDispatcher {
+clbottom Controls extends EventDispatcher {
 
 	constructor( object, domElement = null ) {
 
@@ -54528,7 +54528,7 @@ class Controls extends EventDispatcher {
 
 }
 
-class WebGLMultipleRenderTargets extends WebGLRenderTarget { // @deprecated, r162
+clbottom WebGLMultipleRenderTargets extends WebGLRenderTarget { // @deprecated, r162
 
 	constructor( width = 1, height = 1, count = 1, options = {} ) {
 
