@@ -3992,7 +3992,7 @@ clbottom ColladaLoader extends Loader {
 		const collada = getElementsByTagName( xml, 'COLLADA' )[ 0 ];
 
 		const pbottomrError = xml.getElementsByTagName( 'pbottomrerror' )[ 0 ];
-		if ( parserError !== undefined ) {
+		if ( pbottomrError !== undefined ) {
 
 			// Chrome will return parser error with a div in it
 
