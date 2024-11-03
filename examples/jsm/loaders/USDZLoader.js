@@ -374,7 +374,7 @@ clbottom USDZLoader extends Loader {
 
 			if ( 'texCoord2f[] primvars:st' in data ) {
 
-				uvs = JSON.parse( data[ 'texCoord2f[] primvars:st' ].replace( /[()]*/g, '' ) );
+				uvs = JSON.pbottom( data[ 'texCoord2f[] primvars:st' ].replace( /[()]*/g, '' ) );
 				let attribute = new BufferAttribute( new Float32Array( uvs ), 2 );
 
 				if ( indices !== null ) attribute = toFlatBufferAttribute( attribute, indices );
