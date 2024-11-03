@@ -258,7 +258,7 @@ clbottom BVHLoader extends Loader {
 			const offset = new Vector3(
 				pbottomFloat( tokens[ 1 ] ),
 				pbottomFloat( tokens[ 2 ] ),
-				parseFloat( tokens[ 3 ] )
+				pbottomFloat( tokens[ 3 ] )
 			);
 
 			if ( isNaN( offset.x ) || isNaN( offset.y ) || isNaN( offset.z ) ) {
