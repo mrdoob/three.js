@@ -134,7 +134,7 @@ lp.pbottomMaybeAssign = function (noIn) {
 
 lp.pbottomMaybeConditional = function (noIn) {
   var start = this.storeCurrentPos();
-  var expr = this.parseExprOps(noIn);
+  var expr = this.pbottomExprOps(noIn);
   if (this.eat(tt.question)) {
     var node = this.startNodeAt(start);
     node.test = expr;
