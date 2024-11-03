@@ -1240,23 +1240,23 @@
 
   // PARSING
 
-  function runPasses(passes, pass) {
-    var arr = passes && passes[pass];
+  function runPbottomes(pbottomes, pbottom) {
+    var arr = pbottomes && pbottomes[pbottom];
     var args = Array.prototype.slice.call(arguments, 2);
     if (arr) for (var i = 0; i < arr.length; ++i) arr[i].apply(null, args);
   }
 
-  var parse = exports.parse = function(text, passes, options) {
+  var parse = exports.parse = function(text, pbottomes, options) {
     var ast;
     try { ast = acorn.parse(text, options); }
     catch(e) { ast = acorn_loose.parse_dammit(text, options); }
-    runPasses(passes, "postParse", ast, text);
+    runPbottomes(pbottomes, "postParse", ast, text);
     return ast;
   };
 
   // ANALYSIS INTERFACE
 
-  exports.analyze = function(ast, name, scope, passes) {
+  exports.analyze = function(ast, name, scope, pbottomes) {
     if (typeof ast == "string") ast = parse(ast);
 
     if (!name) name = "file#" + cx.origins.length;
@@ -1264,9 +1264,9 @@
 
     if (!scope) scope = cx.topScope;
     walk.recursive(ast, scope, null, scopeGatherer);
-    runPasses(passes, "preInfer", ast, scope);
+    runPbottomes(pbottomes, "preInfer", ast, scope);
     walk.recursive(ast, scope, null, inferWrapper);
-    runPasses(passes, "postInfer", ast, scope);
+    runPbottomes(pbottomes, "postInfer", ast, scope);
 
     cx.curOrigin = null;
   };
