@@ -20,12 +20,12 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>Primitives</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>Cet article fait partie d'une série consacrée à Three.js.
 Le premier article s'intitule <a href="fundamentals.html">Principes de base</a>.
 Si vous ne l'avez pas encore lu, vous voudriez peut-être commencer par là.</p>
@@ -41,7 +41,7 @@ dans un programme de modélisation 3D comme <a href="https://blender.org">Blende
 <a href="https://www.autodesk.com/products/maya/">Maya</a> ou <a href="https://www.maxon.net/en-us/products/cinema-4d/">Cinema 4D</a>.
 Plus tard dans cette série,
 nous aborderons la conception et le chargement de données provenant de
-plusieurs programme de modélisation 3D. Pour l'instant, passons
+plusieurs programme de modélisation 3D. Pour l'instant, pbottomons
 en revue certaines primitives disponibles.</p>
 <p>La plupart des primitives ci-dessous ont des valeurs par défaut
 pour certain ou tous leurs paramètres. Vous pouvez donc les
@@ -51,7 +51,7 @@ utiliser en fonction de vos besoins.</p>
 <div id="Diagram-ConeGeometry" data-primitive="ConeGeometry">Un Cône</div>
 <div id="Diagram-CylinderGeometry" data-primitive="CylinderGeometry">Un Cylindre</div>
 <div id="Diagram-DodecahedronGeometry" data-primitive="DodecahedronGeometry">Un Dodécaèdre (12 côtés)</div>
-<div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">Une forme 2D extrudée avec un biseautage optionnel. Ici, nous extrudons une forme de cœur. Notez qu'il s'agit du principe de fonctionnement pour les <a href="/docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a> et les <a href="/docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>.</div>
+<div id="Diagram-ExtrudeGeometry" data-primitive="ExtrudeGeometry">Une forme 2D extrudée avec un biseautage optionnel. Ici, nous extrudons une forme de cœur. Notez qu'il s'agit du principe de fonctionnement pour les <a href="/docs/#api/en/geometries/TextGeometry"><code clbottom="notranslate" translate="no">TextGeometry</code></a> et les <a href="/docs/#api/en/geometries/TextGeometry"><code clbottom="notranslate" translate="no">TextGeometry</code></a>.</div>
 <div id="Diagram-IcosahedronGeometry" data-primitive="IcosahedronGeometry">Un Icosaèdre (20 côtés)</div>
 <div id="Diagram-LatheGeometry" data-primitive="LatheGeometry">Une forme généré par la rotation d'une ligne pour, par exemple, dessiner une lampe, une quille, une bougie, un bougeoir, un verre à vin, etc. Vous fournissez une silhouette en deux dimensions comme une série de points et vous indiquez ensuite à Three.js combien de subdivisions sont nécessaires en faisant tourner la silhouette autour d'un axe.</div>
 <div id="Diagram-OctahedronGeometry" data-primitive="OctahedronGeometry">Un Octaèdre (8 côtés)</div>
@@ -68,17 +68,17 @@ utiliser en fonction de vos besoins.</p>
 <div id="Diagram-TubeGeometry" data-primitive="TubeGeometry">Extrusion contrôlée d'un cercle le long d'un tracé</div>
 <div id="Diagram-EdgesGeometry" data-primitive="EdgesGeometry">Un objet d'aide qui prend une autre
 géométrie en entrée et génère des arêtes que si l'angle entre les faces est supérieur à un certain
-seuil. Par exemple, si vous regardez en haut de la boîte, elle montre une ligne passant par chaque
+seuil. Par exemple, si vous regardez en haut de la boîte, elle montre une ligne pbottomant par chaque
 face et montrant chaque triangle qui forme la boîte. Si vous utilisez une
-<a href="/docs/#api/en/geometries/EdgesGeometry"><code class="notranslate" translate="no">EdgesGeometry</code></a> les lignes du milieu sont supprimées. Ajustez le "thresholdAngle"
+<a href="/docs/#api/en/geometries/EdgesGeometry"><code clbottom="notranslate" translate="no">EdgesGeometry</code></a> les lignes du milieu sont supprimées. Ajustez le "thresholdAngle"
 ci-dessous et vous verrez les arêtes en dessous de ce seuil disparatre.</div>
 <div id="Diagram-WireframeGeometry" data-primitive="WireframeGeometry">Génère une géométrie qui
 contient un segment de droite (2 points) par arête dans la géométrie donnée. Sans cela, il vous
 manquerait souvent des arêtes ou vous obtiendriez des arêtes supplémentaires puisque WebGL exige
 généralement 2 points par segment de ligne. Par exemple, si vous n'aviez qu'un seul triangle, il
 n'y aurait que 3 points. Si vous essayez de le dessiner en utilisant un matériau avec
-<code class="notranslate" translate="no">wireframe: true</code> vous n'obtiendrez qu'une seule ligne. Si vous passez cette géométrie
-triangulaire à un <a href="/docs/#api/en/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a> vous obtenez une nouvelle géométrie qui comporte
+<code clbottom="notranslate" translate="no">wireframe: true</code> vous n'obtiendrez qu'une seule ligne. Si vous pbottomez cette géométrie
+triangulaire à un <a href="/docs/#api/en/geometries/WireframeGeometry"><code clbottom="notranslate" translate="no">WireframeGeometry</code></a> vous obtenez une nouvelle géométrie qui comporte
 3 segments de lignes utilisant 6 points.</div>
 
 <p>Nous reviendrons sur la création de géométrie personnalisée dans
@@ -86,12 +86,12 @@ triangulaire à un <a href="/docs/#api/en/geometries/WireframeGeometry"><code cl
 faisons un exemple en créant chaque type de primitive. Nous
 commencerons par les <a href="responsive.html">exemples vus dans l'article précédent</a>.</p>
 <p>Mais tout d'abord, définissons un couleur de fond :</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 +scene.background = new THREE.Color(0xAAAAAA);
 </pre>
 <p>Cela indique à three.js d'utiliser un fond gris clair.</p>
 <p>La caméra doit changer de position pour que nous puissions voir tous les objets.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const fov = 75;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-const fov = 75;
 +const fov = 40; // champ de vue (field of view)
 const aspect = 2;
 const near = 0.1; // distance minimum
@@ -101,9 +101,9 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 -camera.position.z = 2;
 +camera.position.z = 120;
 </pre>
-<p>Ajoutons une fonction, <code class="notranslate" translate="no">addObject</code>, qui prend une position x, y et un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>
+<p>Ajoutons une fonction, <code clbottom="notranslate" translate="no">addObject</code>, qui prend une position x, y et un <a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>
 et ajoute l'objet à la scène.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const objects = [];
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const objects = [];
 const spread = 15;
 
 function addObject (x, y, obj) {
@@ -115,16 +115,16 @@ function addObject (x, y, obj) {
 }
 </pre>
 <p>Faisons aussi une fonction pour créer un matériau coloré aléatoire.
-Nous utiliserons une fonction de <a href="/docs/#api/en/math/Color"><code class="notranslate" translate="no">Color</code></a> qui vous permet de définir
+Nous utiliserons une fonction de <a href="/docs/#api/en/math/Color"><code clbottom="notranslate" translate="no">Color</code></a> qui vous permet de définir
 une couleur en fonction de la teinte, de la saturation et de la luminosité.</p>
-<p>La <code class="notranslate" translate="no">hue</code> (teinte) va de 0 à 1 autour de la roue des couleurs avec
-le rouge à 0, le vert à 0,33 et le bleu à 0,66. La <code class="notranslate" translate="no">saturation</code>
-va de 0 à 1, 0 n'ayant pas de couleur et 1 étant saturé. La <code class="notranslate" translate="no">luminance</code>
+<p>La <code clbottom="notranslate" translate="no">hue</code> (teinte) va de 0 à 1 autour de la roue des couleurs avec
+le rouge à 0, le vert à 0,33 et le bleu à 0,66. La <code clbottom="notranslate" translate="no">saturation</code>
+va de 0 à 1, 0 n'ayant pas de couleur et 1 étant saturé. La <code clbottom="notranslate" translate="no">luminance</code>
 (luminosité) va de 0 à 1, 0 étant le noir, 1 le blanc et 0,5 la
 quantité maximale de la couleur. En d'autres termes, lorsque la
-<code class="notranslate" translate="no">luminance</code> va de 0,0 à 0,5, la couleur passe du noir à <code class="notranslate" translate="no">hue</code> (la teinte).
-De 0,5 à 1,0 la couleur passe de <code class="notranslate" translate="no">hue</code> au blanc.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function createMaterial () {
+<code clbottom="notranslate" translate="no">luminance</code> va de 0,0 à 0,5, la couleur pbottome du noir à <code clbottom="notranslate" translate="no">hue</code> (la teinte).
+De 0,5 à 1,0 la couleur pbottome de <code clbottom="notranslate" translate="no">hue</code> au blanc.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function createMaterial () {
   const material = new THREE.MeshPhongMaterial({
     side: THREE.DoubleSide,
   });
@@ -137,32 +137,32 @@ De 0,5 à 1,0 la couleur passe de <code class="notranslate" translate="no">hue</
   return material;
 }
 </pre>
-<p>Nous avons également passé <code class="notranslate" translate="no">side: THREE.DoubleSide</code> au matériau.
+<p>Nous avons également pbottomé <code clbottom="notranslate" translate="no">side: THREE.DoubleSide</code> au matériau.
 Cela indique à three de dessiner les deux côtés des triangles
 qui constituent une forme. Pour un solide comme une sphère
 ou un cube, il n'y a généralement pas de raison de dessiner les
 côtés arrières des triangles car ils sont tous tournés ver l'intérieur
 de la forme. Dans notre cas, cependant, nous dessinons des objets
-comme la <a href="/docs/#api/en/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a> ou la <a href="/docs/#api/en/geometries/ShapeGeometry"><code class="notranslate" translate="no">ShapeGeometry</code></a>
+comme la <a href="/docs/#api/en/geometries/PlaneGeometry"><code clbottom="notranslate" translate="no">PlaneGeometry</code></a> ou la <a href="/docs/#api/en/geometries/ShapeGeometry"><code clbottom="notranslate" translate="no">ShapeGeometry</code></a>
 qui sont bidimensionnnels et n'ont donc pas d'intérieur.
-Sans le paramètre <code class="notranslate" translate="no">side: THREE.DoubleSide</code> ils disparaîtraient
+Sans le paramètre <code clbottom="notranslate" translate="no">side: THREE.DoubleSide</code> ils disparaîtraient
 quand on regarderait leur dos.</p>
 <p>Notons qu'il est plus rapide de dessiner quand on ne met <strong>pas</strong>
-<code class="notranslate" translate="no">side: THREE.DoubleSide</code>, donc l'idéal serait de ne le mettre que sur
+<code clbottom="notranslate" translate="no">side: THREE.DoubleSide</code>, donc l'idéal serait de ne le mettre que sur
 les matériaux qui en ont vraiment besoin, mais pour cet exemple, nous
 dessinons peu d'objets, donc il n'y a pas de raisons de s'en inquiéter.</p>
-<p>Faisons une fonction, <code class="notranslate" translate="no">addSolidGeometry</code>, qui
+<p>Faisons une fonction, <code clbottom="notranslate" translate="no">addSolidGeometry</code>, qui
 reçoit une géométrie et crée un matériau coloré
-aléatoire via <code class="notranslate" translate="no">createMaterial</code> et l'ajoute à la
-scène via <code class="notranslate" translate="no">addObject</code>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addSolidGeometry(x, y, geometry) {
+aléatoire via <code clbottom="notranslate" translate="no">createMaterial</code> et l'ajoute à la
+scène via <code clbottom="notranslate" translate="no">addObject</code>.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function addSolidGeometry(x, y, geometry) {
   const mesh = new THREE.Mesh(geometry, createMaterial());
   addObject(x, y, mesh);
 }
 </pre>
 <p>Nous pouvons maintenant l'utiliser pour la majorité des primitives que nous créons.
 Par exemple, la création d'une boîte :</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const width = 8; // largeur
   const height = 8; // hauteur
   const depth = 8; // profondeur
@@ -171,23 +171,23 @@ Par exemple, la création d'une boîte :</p>
 </pre>
 <p>Si vous regardez dans le code ci-dessous, vous verrez une section similaire pour chaque type de géométrie.</p>
 <p>Voici le résultat :</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/primitives.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/primitives.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/primitives.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/primitives.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
 <p>Il y a quelques exceptions notables au modèle ci-dessus.
-La plus grande est probablement le <a href="/docs/#api/en/geometries/TextGeometry"><code class="notranslate" translate="no">TextGeometry</code></a>. Il doit charger
+La plus grande est probablement le <a href="/docs/#api/en/geometries/TextGeometry"><code clbottom="notranslate" translate="no">TextGeometry</code></a>. Il doit charger
 des données de police en 3D avant de pouvoir générer un maillage pour le texte.
 Ces données se chargent de manière asynchrone, nous devons donc attendre
 qu'elles soient chargées avant d'essayer de créer la géométrie. En "promettant"
 le chargement des polices, nous pouvons faciliter la tâche.
-Une créons un <a href="/docs/#api/en/loaders/FontLoader"><code class="notranslate" translate="no">FontLoader</code></a> et une fonction <code class="notranslate" translate="no">loadFont</code> qui retourne
+Une créons un <a href="/docs/#api/en/loaders/FontLoader"><code clbottom="notranslate" translate="no">FontLoader</code></a> et une fonction <code clbottom="notranslate" translate="no">loadFont</code> qui retourne
 une promesse, qui une fois résolue, nous donnera la police. Nous créons
-une fonction <code class="notranslate" translate="no">async</code> appelée <code class="notranslate" translate="no">doit</code> (fais le) et chargeons la police en utilisant <code class="notranslate" translate="no">await</code> (attends).
-Et enfin, nous créons la géométrie et appelons <code class="notranslate" translate="no">addObject</code> pour l'ajouter à la scène.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+une fonction <code clbottom="notranslate" translate="no">async</code> appelée <code clbottom="notranslate" translate="no">doit</code> (fais le) et chargeons la police en utilisant <code clbottom="notranslate" translate="no">await</code> (attends).
+Et enfin, nous créons la géométrie et appelons <code clbottom="notranslate" translate="no">addObject</code> pour l'ajouter à la scène.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new FontLoader();
   // promisify font loading
   function loadFont(url) {
@@ -224,57 +224,57 @@ Et enfin, nous créons la géométrie et appelons <code class="notranslate" tran
 centre, mais par défaut three.js crée le texte de tel sorte que son centre de rotation
 se trouve sur le bord gauche. Pour contourner ce problème, nous pouvons demander à
 three.js de calculer une boite englobant la géométrie.
-Nous pouvons alors appeler la méthode <code class="notranslate" translate="no">getCenter</code> de cette boite
-et lui passer la position du maillage de notre objet. La méthode
-<code class="notranslate" translate="no">getCenter</code> copie le centre de la boite dans la position.
+Nous pouvons alors appeler la méthode <code clbottom="notranslate" translate="no">getCenter</code> de cette boite
+et lui pbottomer la position du maillage de notre objet. La méthode
+<code clbottom="notranslate" translate="no">getCenter</code> copie le centre de la boite dans la position.
 Elle renvoie également l'objet position afin que nous puissions appeler
-<code class="notranslate" translate="no">multiplyScalar(-1)</code> pour positionner l'objet entier de tel sorte que son
+<code clbottom="notranslate" translate="no">multiplyScalar(-1)</code> pour positionner l'objet entier de tel sorte que son
 centre de rotation soit positioné au centre de l'objet.</p>
-<p>Si nous appelons juste <code class="notranslate" translate="no">addSolidGeometry</code> comme dans les
+<p>Si nous appelons juste <code clbottom="notranslate" translate="no">addSolidGeometry</code> comme dans les
 exemples précédents, il s'établirait une position
-qui ne serait pas correcte. Donc, dans ce cas, nous créons un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>
-qui est un nœud standard pour les scènes three.js. <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>
-hérite également de <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> (confère l'article
+qui ne serait pas correcte. Donc, dans ce cas, nous créons un <a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>
+qui est un nœud standard pour les scènes three.js. <a href="/docs/#api/en/objects/Mesh"><code clbottom="notranslate" translate="no">Mesh</code></a>
+hérite également de <a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> (confère l'article
 <a href="scenegraph.html">comment un graphe de scène fonctionne</a>).
 Pour l'instant, il suffit de savoir que,
 comme les nœuds DOM, les enfants sont placés de façon relative par rapport à leur parent.
-En créant un <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> et en faisant de notre maillage (mesh) un
-enfant de celui-ci nous pouvons positionner l'<a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> où nous
+En créant un <a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> et en faisant de notre maillage (mesh) un
+enfant de celui-ci nous pouvons positionner l'<a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> où nous
 voulons tout en conservant le décalage central que nous avons
 fixé précédemment.</p>
 <p>Si nous ne faisions pas cela, le texte serait alors décentré !</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/primitives-text.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/primitives-text.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/primitives-text.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/primitives-text.html" target="_blank">Cliquer ici pour ouvrir dans une fenêtre séparée</a>
 </div>
 
 <p></p>
 <p>Notons que celui de gauche ne tourne pas autour de son centre
 alors que celui de droite le fait.</p>
-<p>Les autres exceptions sont les exemples de 2 lignes pour la <a href="/docs/#api/en/geometries/EdgesGeometry"><code class="notranslate" translate="no">EdgesGeometry</code></a>
-et la <a href="/docs/#api/en/geometries/WireframeGeometry"><code class="notranslate" translate="no">WireframeGeometry</code></a>. Au lieu d'appeler <code class="notranslate" translate="no">addSolidGeometry</code> ils appellent
-<code class="notranslate" translate="no">addLineGeometry</code> dont le code ressemble à :</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addLineGeometry(x, y, geometry) {
+<p>Les autres exceptions sont les exemples de 2 lignes pour la <a href="/docs/#api/en/geometries/EdgesGeometry"><code clbottom="notranslate" translate="no">EdgesGeometry</code></a>
+et la <a href="/docs/#api/en/geometries/WireframeGeometry"><code clbottom="notranslate" translate="no">WireframeGeometry</code></a>. Au lieu d'appeler <code clbottom="notranslate" translate="no">addSolidGeometry</code> ils appellent
+<code clbottom="notranslate" translate="no">addLineGeometry</code> dont le code ressemble à :</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function addLineGeometry(x, y, geometry) {
   const material = new THREE.LineBasicMaterial({color: 0x000000});
   const mesh = new THREE.LineSegments(geometry, material);
   addObject(x, y, mesh);
 }
 </pre>
-<p>Cette fonction crée un <a href="/docs/#api/en/materials/LineBasicMaterial"><code class="notranslate" translate="no">LineBasicMaterial</code></a> noir et crée ensuite un objet <a href="/docs/#api/en/objects/LineSegments"><code class="notranslate" translate="no">LineSegments</code></a>
-qui est enveloppé par le <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> qui permet à three de savoir que vous
+<p>Cette fonction crée un <a href="/docs/#api/en/materials/LineBasicMaterial"><code clbottom="notranslate" translate="no">LineBasicMaterial</code></a> noir et crée ensuite un objet <a href="/docs/#api/en/objects/LineSegments"><code clbottom="notranslate" translate="no">LineSegments</code></a>
+qui est enveloppé par le <a href="/docs/#api/en/objects/Mesh"><code clbottom="notranslate" translate="no">Mesh</code></a> qui permet à three de savoir que vous
 affichez des segments de droite (2 points par segment).</p>
-<p>Chacune des primitives a plusieurs paramètres que vous pouvez passer à la création
+<p>Chacune des primitives a plusieurs paramètres que vous pouvez pbottomer à la création
 et il est préférable que vous <a href="https://threejs.org/docs/">regardez la documentation</a>
 de tous ces paramètres par vous même plutôt que de la répéter dans ce document.
 Vous pouvez également cliquer sur les liens ci-dessus à côté de chaque
 forme pour accéder directement à la documentation correspondante.</p>
-<p>Il y a une paire de classe qui ne correspond pas vraiment aux modèles ci-dessus. Il s'agit des
-classes <a href="/docs/#api/en/materials/PointsMaterial"><code class="notranslate" translate="no">PointsMaterial</code></a> et  <a href="/docs/#api/en/objects/Points"><code class="notranslate" translate="no">Points</code></a>. Les <a href="/docs/#api/en/objects/Points"><code class="notranslate" translate="no">Points</code></a> sont comme les <a href="/docs/#api/en/objects/LineSegments"><code class="notranslate" translate="no">LineSegments</code></a> ci-dessus en
-ce sens qu'ils prennent une <code class="notranslate" translate="no">Geometry</code> ou une <a href="/docs/#api/en/core/BufferGeometry"><code class="notranslate" translate="no">BufferGeometry</code></a> mais dessinent des points à chaque
+<p>Il y a une paire de clbottome qui ne correspond pas vraiment aux modèles ci-dessus. Il s'agit des
+clbottomes <a href="/docs/#api/en/materials/PointsMaterial"><code clbottom="notranslate" translate="no">PointsMaterial</code></a> et  <a href="/docs/#api/en/objects/Points"><code clbottom="notranslate" translate="no">Points</code></a>. Les <a href="/docs/#api/en/objects/Points"><code clbottom="notranslate" translate="no">Points</code></a> sont comme les <a href="/docs/#api/en/objects/LineSegments"><code clbottom="notranslate" translate="no">LineSegments</code></a> ci-dessus en
+ce sens qu'ils prennent une <code clbottom="notranslate" translate="no">Geometry</code> ou une <a href="/docs/#api/en/core/BufferGeometry"><code clbottom="notranslate" translate="no">BufferGeometry</code></a> mais dessinent des points à chaque
 sommet au lieu de lignes.
-Pour l'utiliser, vous devez également lui passer un <a href="/docs/#api/en/materials/PointsMaterial"><code class="notranslate" translate="no">PointsMaterial</code></a> qui
-prend une taille (<a href="/docs/#api/en/materials/PointsMaterial#size"><code class="notranslate" translate="no">size</code></a>) pour la grosseur des points.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const radius = 7; // rayon
+Pour l'utiliser, vous devez également lui pbottomer un <a href="/docs/#api/en/materials/PointsMaterial"><code clbottom="notranslate" translate="no">PointsMaterial</code></a> qui
+prend une taille (<a href="/docs/#api/en/materials/PointsMaterial#size"><code clbottom="notranslate" translate="no">size</code></a>) pour la grosseur des points.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const radius = 7; // rayon
 const widthSegments = 12;
 const heightSegments = 8;
 const geometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments);
@@ -285,14 +285,14 @@ const material = new THREE.PointsMaterial({
 const points = new THREE.Points(geometry, material);
 scene.add(points);
 </pre>
-<div class="spread">
+<div clbottom="spread">
 <div data-diagram="Points"></div>
 </div>
 
-<p>Vous pouvez désactiver l'option <a href="/docs/#api/en/materials/PointsMaterial#sizeAttenuation"><code class="notranslate" translate="no">sizeAttenuation</code></a> en la réglant
+<p>Vous pouvez désactiver l'option <a href="/docs/#api/en/materials/PointsMaterial#sizeAttenuation"><code clbottom="notranslate" translate="no">sizeAttenuation</code></a> en la réglant
 sur "false" si vous souhaitez que les points soient de la même taille quelle que soit leur
 distance par rapport à la caméra.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.PointsMaterial({
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.PointsMaterial({
     color: 'red',
 +    sizeAttenuation: false,
 +    size: 3, // en pixels
@@ -300,7 +300,7 @@ distance par rapport à la caméra.</p>
 });
 ...
 </pre>
-<div class="spread">
+<div clbottom="spread">
 <div data-diagram="PointsUniformSize"></div>
 </div>
 
@@ -308,7 +308,7 @@ distance par rapport à la caméra.</p>
 réglages différents concernant leur subdivisions. Un bon exemple pourrait être les
 géométries des sphères prennant en paramètres le nombre de divisions à faire autour et de
 haut en bas. Par exemple :</p>
-<div class="spread">
+<div clbottom="spread">
 <div data-diagram="SphereGeometryLow"></div>
 <div data-diagram="SphereGeometryMedium"></div>
 <div data-diagram="SphereGeometryHigh"></div>
@@ -320,7 +320,7 @@ La deuxième sphère a 24 segments sur 10. cela fait 240 segments ou 480 triangl
 <p>C'est à vous de décider du nombre de subdivisions dont vous avez besoin. Il peut sembler que vous
 ayez besoin d'un grand nombre de segments, mais si vous enlevez les lignes et les ombres plates,
 nous obtenons ceci :</p>
-<div class="spread">
+<div clbottom="spread">
 <div data-diagram="SphereGeometryLowSmooth"></div>
 <div data-diagram="SphereGeometryMediumSmooth"></div>
 <div data-diagram="SphereGeometryHighSmooth"></div>
@@ -335,7 +335,7 @@ il faut que le navigateur dessine à 60 images par seconde pour que vous demandi
 de dessiner 600 millions de triangles par seconde. Cela fait beaucoup trop de calcul.</p>
 <p>Parfois, il est facile de choisir. Par exemple, vous pouvez aussi choisir
 de subdiviser un plan.</p>
-<div class="spread">
+<div clbottom="spread">
 <div data-diagram="PlaneGeometryLow"></div>
 <div data-diagram="PlaneGeometryHigh"></div>
 </div>
