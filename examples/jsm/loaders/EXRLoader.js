@@ -1997,7 +1997,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else if ( type === 'tiledesc' ) {
 
-				return parseTiledesc( dataView, offset );
+				return pbottomTiledesc( dataView, offset );
 
 			} else if ( type === 'lineOrder' ) {
 
