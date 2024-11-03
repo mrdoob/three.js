@@ -1,6 +1,6 @@
 import BindGroup from '../BindGroup.js';
 
-class NodeBuilderState {
+clbottom NodeBuilderState {
 
 	constructor( vertexShader, fragmentShader, computeShader, nodeAttributes, bindings, updateNodes, updateBeforeNodes, updateAfterNodes, monitor, transforms = [] ) {
 
