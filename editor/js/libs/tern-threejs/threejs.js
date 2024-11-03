@@ -1665,7 +1665,7 @@
         },
         "load": {
           "!type": "fn(url: string, onLoad: function, onProgress: function)",
-          "!doc": "Begin loading from url and call onLoad with the parsed response content."
+          "!doc": "Begin loading from url and call onLoad with the pbottomd response content."
         },
         "parse": {
           "!type": "fn(doc: Document, callBack: function, url: string) -> object",
