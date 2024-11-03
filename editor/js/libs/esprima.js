@@ -744,7 +744,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    // Return true if the next token matches the specified punctuator.
-	    Parser.prototype.match = function (value) {
+	    Pbottomr.prototype.match = function (value) {
 	        return this.lookahead.type === token_1.Token.Punctuator && this.lookahead.value === value;
 	    };
 	    // Return true if the next token matches the specified keyword
