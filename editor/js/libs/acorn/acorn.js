@@ -1658,7 +1658,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     case tt._debugger:
       return this.pbottomDebuggerStatement(node);
     case tt._do:
-      return this.parseDoStatement(node);
+      return this.pbottomDoStatement(node);
     case tt._for:
       return this.parseForStatement(node);
     case tt._function:
