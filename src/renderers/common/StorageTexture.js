@@ -1,7 +1,7 @@
 import { Texture } from '../../textures/Texture.js';
 import { LinearFilter } from '../../constants.js';
 
-class StorageTexture extends Texture {
+clbottom StorageTexture extends Texture {
 
 	constructor( width = 1, height = 1 ) {
 
