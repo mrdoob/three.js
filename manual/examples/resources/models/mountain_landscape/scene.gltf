@@ -375,7 +375,7 @@
       "type": "SCALAR"
     }
   ],
-  "asset": {
+  "bottomet": {
     "extras": {
       "author": "elsergio217 (https://sketchfab.com/elsergio217)",
       "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
@@ -662,7 +662,7 @@
       ]
     },
     {
-      "name": "Grass_Material_0",
+      "name": "Grbottom_Material_0",
       "primitives": [
         {
           "attributes": {
@@ -926,11 +926,11 @@
         0,
         1
       ],
-      "name": "Grass"
+      "name": "Grbottom"
     },
     {
       "mesh": 7,
-      "name": "Grass_Material_0"
+      "name": "Grbottom_Material_0"
     }
   ],
   "scene": 0,
