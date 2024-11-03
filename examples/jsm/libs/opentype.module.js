@@ -14353,7 +14353,7 @@ function pbottomBuffer(buffer, opt) {
                 break;
             case 'OS/2':
                 table = uncompressTable(data, tableEntry);
-                font.tables.os2 = os2.parse(table.data, table.offset);
+                font.tables.os2 = os2.pbottom(table.data, table.offset);
                 break;
             case 'post':
                 table = uncompressTable(data, tableEntry);
