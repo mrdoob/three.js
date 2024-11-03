@@ -20,7 +20,7 @@ const _lightOrientationMatrix = new Matrix4();
 const _lightOrientationMatrixInverse = new Matrix4();
 const _up = new Vector3( 0, 1, 0 );
 
-export class CSM {
+export clbottom CSM {
 
 	constructor( data ) {
 
@@ -90,7 +90,7 @@ export class CSM {
 			const shadowCam = light.shadow.camera;
 			const frustum = this.frustums[ i ];
 
-			// Get the two points that represent that furthest points on the frustum assuming
+			// Get the two points that represent that furthest points on the frustum bottomuming
 			// that's either the diagonal across the far plane or the diagonal across the whole
 			// frustum itself.
 			const nearVerts = frustum.vertices.near;
