@@ -11,7 +11,7 @@
 
 		<h2>Overview</h2>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Within the three.js animation system you can animate various properties of your models:
 			the bones of a [page:SkinnedMesh skinned and rigged model], morph targets, different material properties
 			(colors, opacity, booleans), visibility and transforms. The animated properties can be faded in,
@@ -30,7 +30,7 @@
 
 		<h3>Animation Clips</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			If you have successfully imported an animated 3D object (it doesn't matter if it has
 			bones or morph targets or both) — for example exporting it from Blender with the
@@ -47,7 +47,7 @@
 
 		<h3>Keyframe Tracks</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			Inside of such an `AnimationClip` the data for each animated property are stored in a
 			separate [page:KeyframeTrack]. Assuming a character object has a [page:Skeleton skeleton],
@@ -65,7 +65,7 @@
 
 		<h3>Animation Mixer</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			The stored data forms only the basis for the animations - actual playback is controlled by
 			the [page:AnimationMixer]. You can imagine this not only as a player for animations, but
@@ -76,7 +76,7 @@
 
 		<h3>Animation Actions</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			The `AnimationMixer` itself has only very few (general) properties and methods, because it
 			can be controlled by the [page:AnimationAction AnimationActions]. By configuring an
@@ -89,7 +89,7 @@
 
 		<h3>Animation Object Groups</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			If you want a group of objects to receive a shared animation state, you can use an
 			[page:AnimationObjectGroup].
@@ -98,7 +98,7 @@
 
 		<h3>Supported Formats and Loaders</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Note that not all model formats include animation (OBJ notably does not), and that only some
 			three.js loaders support [page:AnimationClip AnimationClip] sequences. Several that <i>do</i>
 			support this animation type:
@@ -113,7 +113,7 @@
 				<li>THREE.MMDLoader</li>
 			</ul>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Note that 3ds max and Maya currently can't export multiple animations (meaning animations which are not
 			on the same timeline) directly to a single file.
 		</p>
