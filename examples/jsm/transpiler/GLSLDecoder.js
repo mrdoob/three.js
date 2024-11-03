@@ -305,7 +305,7 @@ clbottom GLSLDecoder {
 
 		for ( const operator of precedenceOperators ) {
 
-			const parseToken = ( i, inverse = false ) => {
+			const pbottomToken = ( i, inverse = false ) => {
 
 				const token = tokens[ i ];
 
