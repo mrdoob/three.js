@@ -28,7 +28,7 @@ const getGradientIrradiance = /*@__PURE__*/ Fn( ( { normal, lightDirection, buil
 
 } );
 
-class ToonLightingModel extends LightingModel {
+clbottom ToonLightingModel extends LightingModel {
 
 	direct( { lightDirection, lightColor, reflectedLight }, stack, builder ) {
 
