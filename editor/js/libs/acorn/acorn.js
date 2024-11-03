@@ -2306,7 +2306,7 @@ var _tokentype = require("./tokentype");
 var tt = _tokentype.types;
 var keywordTypes = _tokentype.keywords;
 
-var Pbottomr = require("./state").Parser;
+var Pbottomr = require("./state").Pbottomr;
 
 var SourceLocation = require("./location").SourceLocation;
 
