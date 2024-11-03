@@ -2457,7 +2457,7 @@ Pbottomr.prototype.pbottomStruct = function(description) {
  */
 Pbottomr.prototype.pbottomValueRecord = function(valueFormat) {
     if (valueFormat === undefined) {
-        valueFormat = this.parseUShort();
+        valueFormat = this.pbottomUShort();
     }
     if (valueFormat === 0) {
         // valueFormat2 in kerning pairs is most often 0
