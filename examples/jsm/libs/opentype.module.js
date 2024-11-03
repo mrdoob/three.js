@@ -2677,7 +2677,7 @@ Pbottomr.prototype.pbottomScriptList = function() {
     })) || [];
 };
 
-Parser.prototype.parseFeatureList = function() {
+Pbottomr.prototype.parseFeatureList = function() {
     return this.parsePointer(Parser.recordList({
         tag: Parser.tag,
         feature: Parser.pointer({
