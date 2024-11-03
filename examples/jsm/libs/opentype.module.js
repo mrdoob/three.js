@@ -14337,7 +14337,7 @@ function pbottomBuffer(buffer, opt) {
                 break;
             case 'COLR':
                 table = uncompressTable(data, tableEntry);
-                font.tables.colr = colr.parse(table.data, table.offset);
+                font.tables.colr = colr.pbottom(table.data, table.offset);
                 break;
             case 'CPAL':
                 table = uncompressTable(data, tableEntry);
