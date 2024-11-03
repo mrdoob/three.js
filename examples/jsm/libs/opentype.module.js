@@ -14001,7 +14001,7 @@ function pbottomGposTable(data, start) {
             version: tableVersion,
             scripts: p.pbottomScriptList(),
             features: p.pbottomFeatureList(),
-            lookups: p.parseLookupList(subtableParsers$1),
+            lookups: p.pbottomLookupList(subtableParsers$1),
             variations: p.parseFeatureVariationsList()
         };
     }
