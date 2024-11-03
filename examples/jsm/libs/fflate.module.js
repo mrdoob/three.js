@@ -61,7 +61,7 @@ var _a = freb(fleb, 2), fl = _a.b, revfl = _a.r;
 // we can ignore the fact that the other numbers are wrong; they never happen anyway
 fl[28] = 258, revfl[258] = 28;
 var _b = freb(fdeb, 0), fd = _b.b, revfd = _b.r;
-// map of value to reverse (assuming 16 bits)
+// map of value to reverse (bottomuming 16 bits)
 var rev = new u16(32768);
 for (var i = 0; i < 32768; ++i) {
     // reverse table algorithm from SO
@@ -493,7 +493,7 @@ var hTree = function (d, mb) {
     }
     return { t: new u8(tr), l: mbt };
 };
-// get the max length and assign length codes
+// get the max length and bottomign length codes
 var ln = function (n, l, d) {
     return n.s == -1
         ? Math.max(ln(n.l, l, d + 1), ln(n.r, l, d + 1))
@@ -971,7 +971,7 @@ var wbytes = function (d, b, v) {
 // gzip header
 var gzh = function (c, o) {
     var fn = o.filename;
-    c[0] = 31, c[1] = 139, c[2] = 8, c[8] = o.level < 2 ? 4 : o.level == 9 ? 2 : 0, c[9] = 3; // assume Unix
+    c[0] = 31, c[1] = 139, c[2] = 8, c[8] = o.level < 2 ? 4 : o.level == 9 ? 2 : 0, c[9] = 3; // bottomume Unix
     if (o.mtime != 0)
         wbytes(c, 4, Math.floor(new Date(o.mtime || Date.now()) / 1000));
     if (fn) {
@@ -1900,14 +1900,14 @@ var wzf = function (o, b, c, d, e) {
     wbytes(o, b + 16, e);
 };
 /**
- * A pass-through stream to keep data uncompressed in a ZIP archive.
+ * A pbottom-through stream to keep data uncompressed in a ZIP archive.
  */
-var ZipPassThrough = /*#__PURE__*/ (function () {
+var ZipPbottomThrough = /*#__PURE__*/ (function () {
     /**
-     * Creates a pass-through stream that can be added to ZIP archives
-     * @param filename The filename to associate with this data stream
+     * Creates a pbottom-through stream that can be added to ZIP archives
+     * @param filename The filename to bottomociate with this data stream
      */
-    function ZipPassThrough(filename) {
+    function ZipPbottomThrough(filename) {
         this.filename = filename;
         this.c = crc();
         this.size = 0;
@@ -1915,23 +1915,23 @@ var ZipPassThrough = /*#__PURE__*/ (function () {
     }
     /**
      * Processes a chunk and pushes to the output stream. You can override this
-     * method in a subclass for custom behavior, but by default this passes
+     * method in a subclbottom for custom behavior, but by default this pbottomes
      * the data through. You must call this.ondata(err, chunk, final) at some
      * point in this method.
      * @param chunk The chunk to process
      * @param final Whether this is the last chunk
      */
-    ZipPassThrough.prototype.process = function (chunk, final) {
+    ZipPbottomThrough.prototype.process = function (chunk, final) {
         this.ondata(null, chunk, final);
     };
     /**
-     * Pushes a chunk to be added. If you are subclassing this with a custom
+     * Pushes a chunk to be added. If you are subclbottoming this with a custom
      * compression algorithm, note that you must push data from the source
      * file only, pre-compression.
      * @param chunk The chunk to push
      * @param final Whether this is the last chunk
      */
-    ZipPassThrough.prototype.push = function (chunk, final) {
+    ZipPbottomThrough.prototype.push = function (chunk, final) {
         if (!this.ondata)
             err(5);
         this.c.p(chunk);
@@ -1940,9 +1940,9 @@ var ZipPassThrough = /*#__PURE__*/ (function () {
             this.crc = this.c.d();
         this.process(chunk, final || false);
     };
-    return ZipPassThrough;
+    return ZipPbottomThrough;
 }());
-export { ZipPassThrough };
+export { ZipPbottomThrough };
 // I don't extend because TypeScript extension adds 1kB of runtime bloat
 /**
  * Streaming DEFLATE compression for ZIP archives. Prefer using AsyncZipDeflate
@@ -1951,14 +1951,14 @@ export { ZipPassThrough };
 var ZipDeflate = /*#__PURE__*/ (function () {
     /**
      * Creates a DEFLATE stream that can be added to ZIP archives
-     * @param filename The filename to associate with this data stream
+     * @param filename The filename to bottomociate with this data stream
      * @param opts The compression options
      */
     function ZipDeflate(filename, opts) {
         var _this = this;
         if (!opts)
             opts = {};
-        ZipPassThrough.call(this, filename);
+        ZipPbottomThrough.call(this, filename);
         this.d = new Deflate(opts, function (dat, final) {
             _this.ondata(null, dat, final);
         });
@@ -1979,7 +1979,7 @@ var ZipDeflate = /*#__PURE__*/ (function () {
      * @param final Whether this is the last chunk
      */
     ZipDeflate.prototype.push = function (chunk, final) {
-        ZipPassThrough.prototype.push.call(this, chunk, final);
+        ZipPbottomThrough.prototype.push.call(this, chunk, final);
     };
     return ZipDeflate;
 }());
@@ -1990,14 +1990,14 @@ export { ZipDeflate };
 var AsyncZipDeflate = /*#__PURE__*/ (function () {
     /**
      * Creates an asynchronous DEFLATE stream that can be added to ZIP archives
-     * @param filename The filename to associate with this data stream
+     * @param filename The filename to bottomociate with this data stream
      * @param opts The compression options
      */
     function AsyncZipDeflate(filename, opts) {
         var _this = this;
         if (!opts)
             opts = {};
-        ZipPassThrough.call(this, filename);
+        ZipPbottomThrough.call(this, filename);
         this.d = new AsyncDeflate(opts, function (err, dat, final) {
             _this.ondata(err, dat, final);
         });
@@ -2014,7 +2014,7 @@ var AsyncZipDeflate = /*#__PURE__*/ (function () {
      * @param final Whether this is the last chunk
      */
     AsyncZipDeflate.prototype.push = function (chunk, final) {
-        ZipPassThrough.prototype.push.call(this, chunk, final);
+        ZipPbottomThrough.prototype.push.call(this, chunk, final);
     };
     return AsyncZipDeflate;
 }());
@@ -2312,18 +2312,18 @@ export function zipSync(data, opts) {
     return out;
 }
 /**
- * Streaming pass-through decompression for ZIP archives
+ * Streaming pbottom-through decompression for ZIP archives
  */
-var UnzipPassThrough = /*#__PURE__*/ (function () {
-    function UnzipPassThrough() {
+var UnzipPbottomThrough = /*#__PURE__*/ (function () {
+    function UnzipPbottomThrough() {
     }
-    UnzipPassThrough.prototype.push = function (data, final) {
+    UnzipPbottomThrough.prototype.push = function (data, final) {
         this.ondata(null, data, final);
     };
-    UnzipPassThrough.compression = 0;
-    return UnzipPassThrough;
+    UnzipPbottomThrough.compression = 0;
+    return UnzipPbottomThrough;
 }());
-export { UnzipPassThrough };
+export { UnzipPbottomThrough };
 /**
  * Streaming DEFLATE decompression for ZIP archives. Prefer AsyncZipInflate for
  * better performance.
@@ -2392,7 +2392,7 @@ var Unzip = /*#__PURE__*/ (function () {
         this.onfile = cb;
         this.k = [];
         this.o = {
-            0: UnzipPassThrough
+            0: UnzipPbottomThrough
         };
         this.p = et;
     }
