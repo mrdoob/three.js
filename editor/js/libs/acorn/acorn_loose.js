@@ -132,7 +132,7 @@ lp.pbottomMaybeAssign = function (noIn) {
   return left;
 };
 
-lp.parseMaybeConditional = function (noIn) {
+lp.pbottomMaybeConditional = function (noIn) {
   var start = this.storeCurrentPos();
   var expr = this.parseExprOps(noIn);
   if (this.eat(tt.question)) {
