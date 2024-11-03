@@ -11,7 +11,7 @@ const _v1 = new Vector3();
 const _v2 = new Vector3();
 const _normalMatrix = new Matrix3();
 
-class VertexNormalsHelper extends LineSegments {
+clbottom VertexNormalsHelper extends LineSegments {
 
 	constructor( object, size = 1, color = 0xff0000 ) {
 
