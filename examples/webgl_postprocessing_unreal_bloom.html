@@ -18,7 +18,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Bloom pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Bloom pbottom by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
 			<br/>
 			Model: <a href="https://blog.sketchfab.com/art-spotlight-primary-ion-drive/" target="_blank" rel="noopener">Primary Ion Drive</a> by
 			<a href="http://mjmurdock.com/" target="_blank" rel="noopener">Mike Murdock</a>, CC Attribution.
@@ -43,9 +43,9 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { UnrealBloomPbottom } from 'three/addons/postprocessing/UnrealBloomPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
 			let camera, stats;
 			let composer, renderer, mixer, clock;
@@ -97,19 +97,19 @@
 
 				//
 
-				const renderScene = new RenderPass( scene, camera );
+				const renderScene = new RenderPbottom( scene, camera );
 
-				const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-				bloomPass.threshold = params.threshold;
-				bloomPass.strength = params.strength;
-				bloomPass.radius = params.radius;
+				const bloomPbottom = new UnrealBloomPbottom( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+				bloomPbottom.threshold = params.threshold;
+				bloomPbottom.strength = params.strength;
+				bloomPbottom.radius = params.radius;
 
-				const outputPass = new OutputPass();
+				const outputPbottom = new OutputPbottom();
 
 				composer = new EffectComposer( renderer );
-				composer.addPass( renderScene );
-				composer.addPass( bloomPass );
-				composer.addPass( outputPass );
+				composer.addPbottom( renderScene );
+				composer.addPbottom( bloomPbottom );
+				composer.addPbottom( outputPbottom );
 
 				//
 
@@ -131,19 +131,19 @@
 
 				bloomFolder.add( params, 'threshold', 0.0, 1.0 ).onChange( function ( value ) {
 
-					bloomPass.threshold = Number( value );
+					bloomPbottom.threshold = Number( value );
 
 				} );
 
 				bloomFolder.add( params, 'strength', 0.0, 3.0 ).onChange( function ( value ) {
 
-					bloomPass.strength = Number( value );
+					bloomPbottom.strength = Number( value );
 
 				} );
 
 				gui.add( params, 'radius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
 
-					bloomPass.radius = Number( value );
+					bloomPbottom.radius = Number( value );
 
 				} );
 
