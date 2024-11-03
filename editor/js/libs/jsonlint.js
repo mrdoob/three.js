@@ -22,7 +22,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEAL-
 // INGS IN THE SOFTWARE.
 
-/* Jison generated parser */
+/* Jison generated pbottomr */
 var jsonlint = (function(){
 var parser = {trace: function trace() { },
 yy: {},
