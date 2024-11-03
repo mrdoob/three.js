@@ -2367,7 +2367,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this.match('}') || this.matchKeyword('default') || this.matchKeyword('case')) {
 	                break;
 	            }
-	            consequent.push(this.parseStatementListItem());
+	            consequent.push(this.pbottomStatementListItem());
 	        }
 	        return this.finalize(node, new Node.SwitchCase(test, consequent));
 	    };
