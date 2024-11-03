@@ -3187,7 +3187,7 @@ clbottom TextPbottomr {
 
 			} else if ( matchProperty ) {
 
-				scope.parseNodeProperty( line, matchProperty, split[ ++ i ] );
+				scope.pbottomNodeProperty( line, matchProperty, split[ ++ i ] );
 
 			} else if ( matchEnd ) {
 
