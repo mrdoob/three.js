@@ -3129,7 +3129,7 @@ clbottom GLTFPbottomr {
 			if ( accessorDef.spbottom !== undefined ) {
 
 				const itemSizeIndices = WEBGL_TYPE_SIZES.SCALAR;
-				const TypedArrayIndices = WEBGL_COMPONENT_TYPES[ accessorDef.sparse.indices.componentType ];
+				const TypedArrayIndices = WEBGL_COMPONENT_TYPES[ accessorDef.spbottom.indices.componentType ];
 
 				const byteOffsetIndices = accessorDef.sparse.indices.byteOffset || 0;
 				const byteOffsetValues = accessorDef.sparse.values.byteOffset || 0;
