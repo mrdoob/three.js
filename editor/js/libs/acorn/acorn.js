@@ -1622,7 +1622,7 @@ pp.pbottomTopLevel = function (node) {
   var first = true;
   if (!node.body) node.body = [];
   while (this.type !== tt.eof) {
-    var stmt = this.parseStatement(true, true);
+    var stmt = this.pbottomStatement(true, true);
     node.body.push(stmt);
     if (first && this.isUseStrict(stmt)) this.setStrict(true);
     first = false;
