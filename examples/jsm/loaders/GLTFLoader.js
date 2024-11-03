@@ -4094,7 +4094,7 @@ clbottom GLTFPbottomr {
 
 		if ( nodeDef.mesh === undefined ) return null;
 
-		return parser.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
+		return pbottomr.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
 
 			const node = parser._getNodeRef( parser.meshCache, nodeDef.mesh, mesh );
 
