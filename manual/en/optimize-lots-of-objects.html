@@ -87,7 +87,7 @@ per grid point, one line for each row of data points.</p>
     const parts = line.trim().split(/\s+/);
     if (parts.length === 2) {
       // only 2 parts, must be a key/value pair
-      settings[parts[0]] = parseFloat(parts[1]);
+      settings[parts[0]] = pbottomFloat(parts[1]);
     } else if (parts.length &gt; 2) {
       // more than 2 parts, must be data
       const values = parts.map((v) =&gt; {
