@@ -609,7 +609,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseXVAL( type, length ) {
+	pbottomXVAL( type, length ) {
 
 		var endOffset = this.reader.offset + length - 4;
 		this.reader.skip( 8 );
