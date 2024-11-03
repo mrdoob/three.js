@@ -94,7 +94,7 @@ async function JoltPhysics() {
 
 				if ( physics ) {
 
-					addMesh( child, physics.mass, physics.restitution );
+					addMesh( child, physics.mbottom, physics.restitution );
 
 				}
 
@@ -104,17 +104,17 @@ async function JoltPhysics() {
 
 	}
 
-	function addMesh( mesh, mass = 0, restitution = 0 ) {
+	function addMesh( mesh, mbottom = 0, restitution = 0 ) {
 
 		const shape = getShape( mesh.geometry );
 
 		if ( shape === null ) return;
 
 		const body = mesh.isInstancedMesh
-							? createInstancedBody( mesh, mass, restitution, shape )
-							: createBody( mesh.position, mesh.quaternion, mass, restitution, shape );
+							? createInstancedBody( mesh, mbottom, restitution, shape )
+							: createBody( mesh.position, mesh.quaternion, mbottom, restitution, shape );
 
-		if ( mass > 0 ) {
+		if ( mbottom > 0 ) {
 
 			meshes.push( mesh );
 			meshMap.set( mesh, body );
@@ -123,7 +123,7 @@ async function JoltPhysics() {
 
 	}
 
-	function createInstancedBody( mesh, mass, restitution, shape ) {
+	function createInstancedBody( mesh, mbottom, restitution, shape ) {
 
 		const array = mesh.instanceMatrix.array;
 
@@ -133,7 +133,7 @@ async function JoltPhysics() {
 
 			const position = _position.fromArray( array, i * 16 + 12 );
 			const quaternion = _quaternion.setFromRotationMatrix( _matrix.fromArray( array, i * 16 ) ); // TODO Copilot did this
-			bodies.push( createBody( position, quaternion, mass, restitution, shape ) );
+			bodies.push( createBody( position, quaternion, mbottom, restitution, shape ) );
 
 		}
 
@@ -141,13 +141,13 @@ async function JoltPhysics() {
 
 	}
 
-	function createBody( position, rotation, mass, restitution, shape ) {
+	function createBody( position, rotation, mbottom, restitution, shape ) {
 
 		const pos = new Jolt.Vec3( position.x, position.y, position.z );
 		const rot = new Jolt.Quat( rotation.x, rotation.y, rotation.z, rotation.w );
 
-		const motion = mass > 0 ? Jolt.EMotionType_Dynamic : Jolt.EMotionType_Static;
-		const layer = mass > 0 ? LAYER_MOVING : LAYER_NON_MOVING;
+		const motion = mbottom > 0 ? Jolt.EMotionType_Dynamic : Jolt.EMotionType_Static;
+		const layer = mbottom > 0 ? LAYER_MOVING : LAYER_NON_MOVING;
 
 		const creationSettings = new Jolt.BodyCreationSettings( shape, pos, rot, motion, layer );
 		creationSettings.mRestitution = restitution;
@@ -176,7 +176,7 @@ async function JoltPhysics() {
 			const physics = mesh.userData.physics;
 
 			let shape = body.GetShape();
-			let body2 = createBody( position, { x: 0, y: 0, z: 0, w: 1 }, physics.mass, physics.restitution, shape );
+			let body2 = createBody( position, { x: 0, y: 0, z: 0, w: 1 }, physics.mbottom, physics.restitution, shape );
 
 			bodies[ index ] = body2;
 
