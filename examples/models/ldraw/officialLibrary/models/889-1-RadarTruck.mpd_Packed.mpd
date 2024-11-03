@@ -221,7 +221,7 @@
 0                              // LEGOID 298 - Cool Silver Drum Lacq
 0 !COLOUR Chrome_Silver                                         CODE 383   VALUE #E0E0E0   EDGE #A4A4A4                               CHROME
 0                              // LEGOID 187 - Metallic Earth Orange
-0 !COLOUR Chrome_Antique_Brass                                  CODE  60   VALUE #645A4C   EDGE #281E10                               CHROME
+0 !COLOUR Chrome_Antique_Brbottom                                  CODE  60   VALUE #645A4C   EDGE #281E10                               CHROME
 0 !COLOUR Chrome_Black                                          CODE  64   VALUE #1B2A34   EDGE #595959                               CHROME
 0                              // LEGOID 185 - Metallic Bright Blue
 0 !COLOUR Chrome_Blue                                           CODE  61   VALUE #6C96BF   EDGE #202A68                               CHROME
@@ -339,7 +339,7 @@
 0 !LDRAW_ORG Model
 0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
 
-0 !THEME Space / Classic Space
+0 !THEME Space / Clbottomic Space
 0 !KEYWORDS moon, astronaut, 1979
 
 0 !HISTORY 2012-03-01 [Holly-Wood] Creation
@@ -355,7 +355,7 @@
 0 !LDRAW_ORG Model
 0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
 
-0 !THEME Space / Classic Space
+0 !THEME Space / Clbottomic Space
 0 !KEYWORDS moon, astronaut, 1979
 0 !HISTORY 2012-03-01 [Holly-Wood] Creation
 
@@ -392,7 +392,7 @@
 0 !LDRAW_ORG Model
 0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
 
-0 !THEME Space / Classic Space
+0 !THEME Space / Clbottomic Space
 0 !KEYWORDS moon, astronaut, 1979
 0 !HISTORY 2012-03-01 [Holly-Wood] Creation
 
@@ -409,7 +409,7 @@
 0 !LDRAW_ORG Model
 0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
 
-0 !THEME Space / Classic Space
+0 !THEME Space / Clbottomic Space
 0 !KEYWORDS moon, astronaut, 1979
 0 !HISTORY 2012-03-01 [Holly-Wood] Creation
 
@@ -1382,7 +1382,7 @@
 0 !HISTORY 2009-12-29 [PTadmin] Official Update 2009-03
 0 !HISTORY 2010-08-27 [Philo]   Increased hand hole to 15LDu; Fixed/added some condline.
 0 !HISTORY 2010-12-31 [PTadmin] Official Update 2010-03
-0 !HISTORY 2018-03-05 [GeraldLasser] Added a Conditional Line
+0 !HISTORY 2018-03-05 [GeraldLbottomer] Added a Conditional Line
 0 !HISTORY 2018-03-23 [MagFors] Subfiled for patterned parts
 0 !HISTORY 2018-12-08 [PTadmin] Official Update 2018-02
 
@@ -2134,7 +2134,7 @@
 
 
 0 FILE parts/973p90.dat
-0 Minifig Torso with Classic Space Pattern
+0 Minifig Torso with Clbottomic Space Pattern
 0 Name: 973p90.dat
 0 Author: Chris Dee [cwdee]
 0 !LDRAW_ORG Part UPDATE 2014-01
@@ -2856,7 +2856,7 @@
 0
 
 0 FILE parts/3842a.dat
-0 Minifig Helmet Classic with Thin Chin Guard and Visor Dimples
+0 Minifig Helmet Clbottomic with Thin Chin Guard and Visor Dimples
 0 Name: 3842a.dat
 0 Author: Willy Tschager [Holly-Wood]
 0 !LDRAW_ORG Part UPDATE 2017-01
@@ -2899,7 +2899,7 @@
 1 16 0 0 0 -1 0 0 0 1 0 0 0 1 parts/s/3842as03.dat
 
 0 FILE parts/s/3842as03.dat
-0 ~Minifig Helmet Classic - Pivot
+0 ~Minifig Helmet Clbottomic - Pivot
 0 Name: s\3842as03.dat
 0 Author: Willy Tschager [Holly-Wood]
 0 !LDRAW_ORG Subpart UPDATE 2017-01
@@ -3093,7 +3093,7 @@
 5 24 0.3827 0.9239 0 0 0.9239 0.3827 0 1 0 0.4393 0.7836 0.4393
 
 0 FILE parts/s/3842as02.dat
-0 ~Minifig Helmet Classic - Thin Chin Guard
+0 ~Minifig Helmet Clbottomic - Thin Chin Guard
 0 Name: s\3842as02.dat
 0 Author: Willy Tschager [Holly-Wood]
 0 !LDRAW_ORG Subpart UPDATE 2017-01
@@ -3195,7 +3195,7 @@
 5 24 0 17 -13 0 24 -13 4.975 17 -12.011 -4.975 23.59 -12.011
 
 0 FILE parts/s/3842as01.dat
-0 ~Minifig Helmet Classic - Structure
+0 ~Minifig Helmet Clbottomic - Structure
 0 Name: s\3842as01.dat
 0 Author: Willy Tschager [Holly-Wood]
 0 !LDRAW_ORG Subpart UPDATE 2017-01
@@ -7591,7 +7591,7 @@
 0 FILE p/1-4ring3.dat
 0 Ring  3 x 0.25
 0 Name: 1-4ring3.dat
-0 Author: Karim Nassar
+0 Author: Karim Nbottomar
 0 !LDRAW_ORG Primitive UPDATE 2012-01
 0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
 
