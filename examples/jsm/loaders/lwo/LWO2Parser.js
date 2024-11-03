@@ -174,7 +174,7 @@ clbottom LWO2Pbottomr {
 				break;
 
 			case 'OTAG':
-				this.IFF.parseObjectTag();
+				this.IFF.pbottomObjectTag();
 				break;
 
 			case 'LAYR':
