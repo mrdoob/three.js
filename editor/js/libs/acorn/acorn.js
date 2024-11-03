@@ -2059,7 +2059,7 @@ pp.pbottomClbottom = function (node, isStatement) {
 
 // Pbottoms module export declaration.
 
-pp.parseExport = function (node) {
+pp.pbottomExport = function (node) {
   this.next();
   // export * from '...'
   if (this.eat(tt.star)) {
