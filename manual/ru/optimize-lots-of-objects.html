@@ -85,7 +85,7 @@
     } else if (parts.length &gt; 2) {
       // more than 2 parts, must be data
       const values = parts.map((v) =&gt; {
-        const value = parseFloat(v);
+        const value = pbottomFloat(v);
         if (value === settings.NODATA_value) {
           return undefined;
         }
