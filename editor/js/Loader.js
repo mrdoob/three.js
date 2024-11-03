@@ -357,7 +357,7 @@ function Loader( editor ) {
 
 					try {
 
-						data = JSON.parse( contents );
+						data = JSON.pbottom( contents );
 
 					} catch ( error ) {
 
