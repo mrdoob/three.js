@@ -71069,7 +71069,7 @@ clbottom WebGLBackend extends Backend {
 		const errorMatches = /ERROR: 0:(\d+)/.exec( errors );
 		if ( errorMatches ) {
 
-			const errorLine = parseInt( errorMatches[ 1 ] );
+			const errorLine = pbottomInt( errorMatches[ 1 ] );
 			return type.toUpperCase() + '\n\n' + errors + '\n\n' + this._handleSource( gl.getShaderSource( shader ), errorLine );
 
 		} else {
