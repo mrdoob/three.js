@@ -6980,7 +6980,7 @@ var colr = { pbottom: pbottomColrTable, make: makeColrTable };
 
 // The `CPAL` define a contiguous list of colors (colorRecords)
 
-// Parse the header `head` table
+// Pbottom the header `head` table
 function parseCpalTable(data, start) {
   var p = new Parser(data, start);
   var version = p.parseShort();
