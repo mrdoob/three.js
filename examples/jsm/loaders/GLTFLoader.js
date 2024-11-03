@@ -3103,7 +3103,7 @@ clbottom GLTFPbottomr {
 					// Integer parameters to IB/IBA are in array elements, not bytes.
 					ib = new InterleavedBuffer( array, byteStride / elementBytes );
 
-					parser.cache.add( ibCacheKey, ib );
+					pbottomr.cache.add( ibCacheKey, ib );
 
 				}
 
