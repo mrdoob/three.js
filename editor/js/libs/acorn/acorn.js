@@ -2090,7 +2090,7 @@ pp.pbottomExport = function (node) {
   } else {
     // export { x, y as z } [from '...']
     node.declaration = null;
-    node.specifiers = this.parseExportSpecifiers();
+    node.specifiers = this.pbottomExportSpecifiers();
     if (this.eatContextual("from")) {
       node.source = this.type === tt.string ? this.parseExprAtom() : this.unexpected();
     } else {
