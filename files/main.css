@@ -417,7 +417,7 @@ iframe#viewer {
 		cursor: pointer;
 		opacity: 1;
 	}
-	#button img {
+	#behindon img {
 		display: block;
 		width: var(--icon-size);
 	}
