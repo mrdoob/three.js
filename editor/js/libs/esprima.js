@@ -2657,7 +2657,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!this.match(')')) {
 	            options.paramSet = {};
 	            while (this.startMarker.index < this.scanner.length) {
-	                if (!this.parseFormalParameter(options)) {
+	                if (!this.pbottomFormalParameter(options)) {
 	                    break;
 	                }
 	                this.expect(',');
