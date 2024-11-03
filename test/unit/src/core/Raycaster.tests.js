@@ -10,9 +10,9 @@ import { Points } from '../../../../src/objects/Points.js';
 import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js';
 import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera.js';
 
-function checkRayDirectionAgainstReferenceVector( rayDirection, refVector, assert ) {
+function checkRayDirectionAgainstReferenceVector( rayDirection, refVector, bottomert ) {
 
-	assert.ok( refVector.x - rayDirection.x <= Number.EPSILON && refVector.y - rayDirection.y <= Number.EPSILON && refVector.z - rayDirection.z <= Number.EPSILON, 'camera is pointing to' +
+	bottomert.ok( refVector.x - rayDirection.x <= Number.EPSILON && refVector.y - rayDirection.y <= Number.EPSILON && refVector.z - rayDirection.z <= Number.EPSILON, 'camera is pointing to' +
 		' the same direction as expected' );
 
 }
@@ -73,71 +73,71 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Raycaster', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			// no params
 			const object = new Raycaster();
-			assert.ok( object, 'Can instantiate a Raycaster.' );
+			bottomert.ok( object, 'Can instantiate a Raycaster.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'ray', ( assert ) => {
+		QUnit.todo( 'ray', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'near', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'far', ( assert ) => {
+		QUnit.todo( 'near', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'camera', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'layers', ( assert ) => {
+		QUnit.todo( 'far', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'params', ( assert ) => {
+		QUnit.todo( 'camera', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'layers', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'params', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'set', ( assert ) => {
+		QUnit.test( 'set', ( bottomert ) => {
 
 			const origin = new Vector3( 0, 0, 0 );
 			const direction = new Vector3( 0, 0, - 1 );
 			const a = new Raycaster( origin.clone(), direction.clone() );
 
-			assert.deepEqual( a.ray.origin, origin, 'Origin is correct' );
-			assert.deepEqual( a.ray.direction, direction, 'Direction is correct' );
+			bottomert.deepEqual( a.ray.origin, origin, 'Origin is correct' );
+			bottomert.deepEqual( a.ray.direction, direction, 'Direction is correct' );
 
 			origin.set( 1, 1, 1 );
 			direction.set( - 1, 0, 0 );
 			a.set( origin, direction );
 
-			assert.deepEqual( a.ray.origin, origin, 'Origin was set correctly' );
-			assert.deepEqual( a.ray.direction, direction, 'Direction was set correctly' );
+			bottomert.deepEqual( a.ray.origin, origin, 'Origin was set correctly' );
+			bottomert.deepEqual( a.ray.direction, direction, 'Direction was set correctly' );
 
 		} );
 
-		QUnit.test( 'setFromCamera (Perspective)', ( assert ) => {
+		QUnit.test( 'setFromCamera (Perspective)', ( bottomert ) => {
 
 			const raycaster = new Raycaster();
 			const rayDirection = raycaster.ray.direction;
@@ -147,7 +147,7 @@ export default QUnit.module( 'Core', () => {
 				x: 0,
 				y: 0
 			}, camera );
-			assert.ok( rayDirection.x === 0 && rayDirection.y === 0 && rayDirection.z === - 1,
+			bottomert.ok( rayDirection.x === 0 && rayDirection.y === 0 && rayDirection.z === - 1,
 				'camera is looking straight to -z and so does the ray in the middle of the screen' );
 
 			const step = 0.1;
@@ -163,7 +163,7 @@ export default QUnit.module( 'Core', () => {
 
 					const refVector = new Vector3( x, y, - 1 ).normalize();
 
-					checkRayDirectionAgainstReferenceVector( rayDirection, refVector, assert );
+					checkRayDirectionAgainstReferenceVector( rayDirection, refVector, bottomert );
 
 				}
 
@@ -171,7 +171,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( 'setFromCamera (Orthographic)', ( assert ) => {
+		QUnit.test( 'setFromCamera (Orthographic)', ( bottomert ) => {
 
 			const raycaster = new Raycaster();
 			const rayOrigin = raycaster.ray.origin;
@@ -184,52 +184,52 @@ export default QUnit.module( 'Core', () => {
 				x: 0,
 				y: 0
 			}, camera );
-			assert.deepEqual( rayOrigin, expectedOrigin, 'Ray origin has the right coordinates' );
-			assert.deepEqual( rayDirection, expectedDirection, 'Camera and Ray are pointing towards -z' );
+			bottomert.deepEqual( rayOrigin, expectedOrigin, 'Ray origin has the right coordinates' );
+			bottomert.deepEqual( rayDirection, expectedDirection, 'Camera and Ray are pointing towards -z' );
 
 		} );
 
-		QUnit.test( 'intersectObject', ( assert ) => {
+		QUnit.test( 'intersectObject', ( bottomert ) => {
 
 			const raycaster = getRaycaster();
 			const objectsToCheck = getObjectsToCheck();
 
-			assert.ok( raycaster.intersectObject( objectsToCheck[ 0 ], false ).length === 1,
+			bottomert.ok( raycaster.intersectObject( objectsToCheck[ 0 ], false ).length === 1,
 				'no recursive search should lead to one hit' );
 
-			assert.ok( raycaster.intersectObject( objectsToCheck[ 0 ] ).length === 3,
+			bottomert.ok( raycaster.intersectObject( objectsToCheck[ 0 ] ).length === 3,
 				'recursive search should lead to three hits' );
 
 			const intersections = raycaster.intersectObject( objectsToCheck[ 0 ] );
 			for ( let i = 0; i < intersections.length - 1; i ++ ) {
 
-				assert.ok( intersections[ i ].distance <= intersections[ i + 1 ].distance, 'intersections are sorted' );
+				bottomert.ok( intersections[ i ].distance <= intersections[ i + 1 ].distance, 'intersections are sorted' );
 
 			}
 
 		} );
 
-		QUnit.test( 'intersectObjects', ( assert ) => {
+		QUnit.test( 'intersectObjects', ( bottomert ) => {
 
 			const raycaster = getRaycaster();
 			const objectsToCheck = getObjectsToCheck();
 
-			assert.ok( raycaster.intersectObjects( objectsToCheck, false ).length === 1,
+			bottomert.ok( raycaster.intersectObjects( objectsToCheck, false ).length === 1,
 				'no recursive search should lead to one hit' );
 
-			assert.ok( raycaster.intersectObjects( objectsToCheck ).length === 3,
+			bottomert.ok( raycaster.intersectObjects( objectsToCheck ).length === 3,
 				'recursive search should lead to three hits' );
 
 			const intersections = raycaster.intersectObjects( objectsToCheck );
 			for ( let i = 0; i < intersections.length - 1; i ++ ) {
 
-				assert.ok( intersections[ i ].distance <= intersections[ i + 1 ].distance, 'intersections are sorted' );
+				bottomert.ok( intersections[ i ].distance <= intersections[ i + 1 ].distance, 'intersections are sorted' );
 
 			}
 
 		} );
 
-		QUnit.test( 'Line intersection threshold', ( assert ) => {
+		QUnit.test( 'Line intersection threshold', ( bottomert ) => {
 
 			const raycaster = getRaycaster();
 			const points = [ new Vector3( - 2, - 10, - 5 ), new Vector3( - 2, 10, - 5 ) ];
@@ -237,16 +237,16 @@ export default QUnit.module( 'Core', () => {
 			const line = new Line( geometry, null );
 
 			raycaster.params.Line.threshold = 1.999;
-			assert.ok( raycaster.intersectObject( line ).length === 0,
+			bottomert.ok( raycaster.intersectObject( line ).length === 0,
 				'no Line intersection with a not-large-enough threshold' );
 
 			raycaster.params.Line.threshold = 2.001;
-			assert.ok( raycaster.intersectObject( line ).length === 1,
+			bottomert.ok( raycaster.intersectObject( line ).length === 1,
 				'successful Line intersection with a large-enough threshold' );
 
 		} );
 
-		QUnit.test( 'Points intersection threshold', ( assert ) => {
+		QUnit.test( 'Points intersection threshold', ( bottomert ) => {
 
 			const raycaster = getRaycaster();
 			const coordinates = [ new Vector3( - 2, 0, - 5 ) ];
@@ -254,11 +254,11 @@ export default QUnit.module( 'Core', () => {
 			const points = new Points( geometry, null );
 
 			raycaster.params.Points.threshold = 1.999;
-			assert.ok( raycaster.intersectObject( points ).length === 0,
+			bottomert.ok( raycaster.intersectObject( points ).length === 0,
 				'no Points intersection with a not-large-enough threshold' );
 
 			raycaster.params.Points.threshold = 2.001;
-			assert.ok( raycaster.intersectObject( points ).length === 1,
+			bottomert.ok( raycaster.intersectObject( points ).length === 1,
 				'successful Points intersection with a large-enough threshold' );
 
 		} );
