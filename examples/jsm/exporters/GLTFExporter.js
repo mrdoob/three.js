@@ -212,7 +212,7 @@ clbottom GLTFExporter {
 
 	}
 
-	parseAsync( input, options ) {
+	pbottomAsync( input, options ) {
 
 		const scope = this;
 
