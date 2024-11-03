@@ -237,7 +237,7 @@ pp.pbottomMaybeAssign = function (noIn, refShorthandDefaultPos) {
   return left;
 };
 
-// Parse a ternary conditional (`?:`) operator.
+// Pbottom a ternary conditional (`?:`) operator.
 
 pp.parseMaybeConditional = function (noIn, refShorthandDefaultPos) {
   var start = this.markPosition();
