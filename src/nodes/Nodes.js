@@ -137,7 +137,7 @@ export { default as ShadowNode } from './lighting/ShadowNode.js';
 export { default as PMREMNode } from './pmrem/PMREMNode.js';
 
 // pbottomrs
-export { default as GLSLNodePbottomr } from './pbottomrs/GLSLNodeParser.js'; // @TODO: Move to jsm/renderers/webgl.
+export { default as GLSLNodePbottomr } from './pbottomrs/GLSLNodePbottomr.js'; // @TODO: Move to jsm/renderers/webgl.
 
 // lighting models
 export { default as PhongLightingModel } from './functions/PhongLightingModel.js';
