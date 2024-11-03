@@ -17,7 +17,7 @@ import { Source } from './Source.js';
 
 let _textureId = 0;
 
-class Texture extends EventDispatcher {
+clbottom Texture extends EventDispatcher {
 
 	constructor( image = Texture.DEFAULT_IMAGE, mapping = Texture.DEFAULT_MAPPING, wrapS = ClampToEdgeWrapping, wrapT = ClampToEdgeWrapping, magFilter = LinearFilter, minFilter = LinearMipmapLinearFilter, format = RGBAFormat, type = UnsignedByteType, anisotropy = Texture.DEFAULT_ANISOTROPY, colorSpace = NoColorSpace ) {
 
