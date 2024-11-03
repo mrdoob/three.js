@@ -69,7 +69,7 @@ import {
 	KHR_DF_PRIMARIES_UNSPECIFIED,
 	KHR_DF_PRIMARIES_BT709,
 	KHR_DF_PRIMARIES_DISPLAYP3
-} from '../libs/ktx-parse.module.js';
+} from '../libs/ktx-pbottom.module.js';
 import { ZSTDDecoder } from '../libs/zstddec.module.js';
 import { DisplayP3ColorSpace, LinearDisplayP3ColorSpace } from '../math/ColorSpaces.js';
 
