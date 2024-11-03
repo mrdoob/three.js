@@ -1279,7 +1279,7 @@ clbottom VRMLLoader extends Loader {
 
 				case TEXTURE_TYPE.INTENSITY:
 					// Intensity texture: A one-component image specifies one-byte hexadecimal or integer values representing the intensity of the image
-					value = parseInt( hex );
+					value = pbottomInt( hex );
 					color.r = value;
 					color.g = value;
 					color.b = value;
