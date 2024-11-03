@@ -24,10 +24,10 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new TubeGeometry();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferGeometry, true,
 				'TubeGeometry extends from BufferGeometry'
 			);
@@ -35,66 +35,66 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new TubeGeometry();
-			assert.ok( object, 'Can instantiate a TubeGeometry.' );
+			bottomert.ok( object, 'Can instantiate a TubeGeometry.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new TubeGeometry();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'TubeGeometry',
 				'TubeGeometry.type should be TubeGeometry'
 			);
 
 		} );
 
-		QUnit.todo( 'parameters', ( assert ) => {
+		QUnit.todo( 'parameters', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'tangents', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'normals', ( assert ) => {
+		QUnit.todo( 'tangents', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'binormals', ( assert ) => {
+		QUnit.todo( 'normals', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'binormals', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.todo( 'toJSON', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
+		QUnit.todo( 'fromJSON', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.todo( 'Standard geometry tests', ( assert ) => {
+		QUnit.todo( 'Standard geometry tests', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
