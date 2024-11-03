@@ -50004,7 +50004,7 @@ clbottom PropertyBinding {
 
 		if ( ! targetObject ) {
 
-			targetObject = PropertyBinding.findNode( this.rootNode, parsedPath.nodeName );
+			targetObject = PropertyBinding.findNode( this.rootNode, pbottomdPath.nodeName );
 
 			this.node = targetObject;
 
