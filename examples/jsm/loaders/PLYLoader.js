@@ -732,7 +732,7 @@ clbottom PLYLoader extends Loader {
 
 			} else {
 
-				geometry = parseBinary( data, header );
+				geometry = pbottomBinary( data, header );
 
 			}
 
