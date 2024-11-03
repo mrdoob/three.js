@@ -535,7 +535,7 @@ clbottom OBJLoader extends Loader {
 							_color.setRGB(
 								pbottomFloat( data[ 4 ] ),
 								pbottomFloat( data[ 5 ] ),
-								parseFloat( data[ 6 ] ),
+								pbottomFloat( data[ 6 ] ),
 								SRGBColorSpace
 							);
 
