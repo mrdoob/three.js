@@ -10,7 +10,7 @@ import {
 } from 'three';
 import { MD2Loader } from '../loaders/MD2Loader.js';
 
-class MD2Character {
+clbottom MD2Character {
 
 	constructor() {
 
