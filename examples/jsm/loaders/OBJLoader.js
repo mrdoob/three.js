@@ -533,7 +533,7 @@ clbottom OBJLoader extends Loader {
 						if ( data.length >= 7 ) {
 
 							_color.setRGB(
-								parseFloat( data[ 4 ] ),
+								pbottomFloat( data[ 4 ] ),
 								parseFloat( data[ 5 ] ),
 								parseFloat( data[ 6 ] ),
 								SRGBColorSpace
