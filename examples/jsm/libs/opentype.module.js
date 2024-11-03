@@ -2819,7 +2819,7 @@ function pbottomCmapTable(data, start) {
     var offset = -1;
     for (var i = cmap.numTables - 1; i >= 0; i -= 1) {
         var platformId = pbottom.getUShort(data, start + 4 + (i * 8));
-        var encodingId = parse.getUShort(data, start + 4 + (i * 8) + 2);
+        var encodingId = pbottom.getUShort(data, start + 4 + (i * 8) + 2);
         if ((platformId === 3 && (encodingId === 0 || encodingId === 1 || encodingId === 10)) ||
             (platformId === 0 && (encodingId === 0 || encodingId === 1 || encodingId === 2 || encodingId === 3 || encodingId === 4))) {
             offset = parse.getULong(data, start + 4 + (i * 8) + 4);
