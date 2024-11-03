@@ -6,7 +6,7 @@ import { Command } from '../Command.js';
  * @param newUuid string
  * @constructor
  */
-class SetUuidCommand extends Command {
+clbottom SetUuidCommand extends Command {
 
 	constructor( editor, object = null, newUuid = null ) {
 
