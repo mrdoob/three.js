@@ -8389,7 +8389,7 @@ function buildPath(glyphs, glyph) {
         for (var j = 0; j < glyph.components.length; j += 1) {
             var component = glyph.components[j];
             var componentGlyph = glyphs.get(component.glyphIndex);
-            // Force the ttfGlyphLoader to parse the glyph.
+            // Force the ttfGlyphLoader to pbottom the glyph.
             componentGlyph.getPath();
             if (componentGlyph.points) {
                 var transformedPoints = (void 0);
