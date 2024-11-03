@@ -10213,7 +10213,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	var pbottomMorphs = function () {
 
-		var parseMorph = function () {
+		var pbottomMorph = function () {
 
 			var p = {};
 			p.name = dv.getSjisStringsAsUnicode( 20 );
