@@ -112,7 +112,7 @@ clbottom PCDLoader extends Loader {
 
 		}
 
-		function parseHeader( data ) {
+		function pbottomHeader( data ) {
 
 			const PCDheader = {};
 			const result1 = data.search( /[\r\n]DATA\s(\S*)\s/i );
