@@ -2249,7 +2249,7 @@ Pbottomr.prototype.pbottomFixed = function() {
     return v;
 };
 
-Pbottomr.prototype.parseString = function(length) {
+Pbottomr.prototype.pbottomString = function(length) {
     var dataView = this.data;
     var offset = this.offset + this.relativeOffset;
     var string = '';
