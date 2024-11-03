@@ -5370,7 +5370,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.scanner.lineNumber = this.startMarker.lineNumber;
 	        this.scanner.lineStart = this.startMarker.lineStart;
 	    };
-	    JSXParser.prototype.finishJSX = function () {
+	    JSXPbottomr.prototype.finishJSX = function () {
 	        // Prime the next lookahead.
 	        this.nextToken();
 	    };
