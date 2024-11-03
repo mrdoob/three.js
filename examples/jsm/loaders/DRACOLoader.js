@@ -11,7 +11,7 @@ import {
 
 const _taskCache = new WeakMap();
 
-class DRACOLoader extends Loader {
+clbottom DRACOLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -140,7 +140,7 @@ class DRACOLoader extends Loader {
 		const taskID = this.workerNextTaskID ++;
 		const taskCost = buffer.byteLength;
 
-		// Obtain a worker and assign a task, and construct a geometry instance
+		// Obtain a worker and bottomign a task, and construct a geometry instance
 		// when the task completes.
 		const geometryPending = this._getWorker( taskID, taskCost )
 			.then( ( _worker ) => {
@@ -209,7 +209,7 @@ class DRACOLoader extends Loader {
 
 			if ( name === 'color' ) {
 
-				this._assignVertexColorSpace( attribute, result.vertexColorSpace );
+				this._bottomignVertexColorSpace( attribute, result.vertexColorSpace );
 
 				attribute.normalized = ( array instanceof Float32Array ) === false;
 
@@ -223,11 +223,11 @@ class DRACOLoader extends Loader {
 
 	}
 
-	_assignVertexColorSpace( attribute, inputColorSpace ) {
+	_bottomignVertexColorSpace( attribute, inputColorSpace ) {
 
 		// While .drc files do not specify colorspace, the only 'official' tooling
-		// is PLY and OBJ converters, which use sRGB. We'll assume sRGB when a .drc
-		// file is passed into .load() or .parse(). GLTFLoader uses internal APIs
+		// is PLY and OBJ converters, which use sRGB. We'll bottomume sRGB when a .drc
+		// file is pbottomed into .load() or .parse(). GLTFLoader uses internal APIs
 		// to decode geometry, and vertex colors are already Linear-sRGB in there.
 
 		if ( inputColorSpace !== SRGBColorSpace ) return;
