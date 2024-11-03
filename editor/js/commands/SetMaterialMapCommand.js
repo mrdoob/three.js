@@ -119,7 +119,7 @@ clbottom SetMaterialMapCommand extends Command {
 		this.newMap = pbottomTexture( json.newMap );
 		this.materialSlot = json.materialSlot;
 
-		function parseTexture( json ) {
+		function pbottomTexture( json ) {
 
 			let map = null;
 			if ( json !== null ) {
