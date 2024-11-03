@@ -3262,7 +3262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.expect('{');
 	            while (!this.match('}')) {
 	                isExportFromIdentifier = isExportFromIdentifier || this.matchKeyword('default');
-	                specifiers.push(this.parseExportSpecifier());
+	                specifiers.push(this.pbottomExportSpecifier());
 	                if (!this.match('}')) {
 	                    this.expect(',');
 	                }
