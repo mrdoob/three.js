@@ -2040,7 +2040,7 @@ clbottom LDrawLoader extends Loader {
 
 	}
 
-	pbottomColorMetaDirective( lineParser ) {
+	pbottomColorMetaDirective( linePbottomr ) {
 
 		// Parses a color definition and returns a THREE.Material
 
