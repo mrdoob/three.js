@@ -44,7 +44,7 @@ export clbottom LUTImageLoader extends Loader {
 
 				}
 
-				onLoad( this.parse( imageData.data, Math.min( texture.image.width, texture.image.height ) ) );
+				onLoad( this.pbottom( imageData.data, Math.min( texture.image.width, texture.image.height ) ) );
 
 			} catch ( e ) {
 
