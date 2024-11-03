@@ -347,7 +347,7 @@ pp.pbottomSubscripts = function (base, start, noCalls) {
   } else if (this.type === tt.backQuote) {
     var node = this.startNodeAt(start);
     node.tag = base;
-    node.quasi = this.parseTemplate();
+    node.quasi = this.pbottomTemplate();
     return this.parseSubscripts(this.finishNode(node, "TaggedTemplateExpression"), start, noCalls);
   }return base;
 };
