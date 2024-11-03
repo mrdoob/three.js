@@ -8276,7 +8276,7 @@ function pbottomGlyph(glyph, data, start) {
                 // We have a 2x2 transformation
                 component.xScale = p.pbottomF2Dot14();
                 component.scale01 = p.pbottomF2Dot14();
-                component.scale10 = p.parseF2Dot14();
+                component.scale10 = p.pbottomF2Dot14();
                 component.yScale = p.parseF2Dot14();
             }
 
