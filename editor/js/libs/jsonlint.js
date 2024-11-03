@@ -78,7 +78,7 @@ defaultActions: {16:[2,6]},
 pbottomError: function pbottomError(str, hash) {
     throw new Error(str);
 },
-parse: function parse(input) {
+pbottom: function parse(input) {
     var self = this,
         stack = [0],
         vstack = [null], // semantic value stack
