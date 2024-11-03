@@ -1602,7 +1602,7 @@ clbottom GLTFTextureAVIFExtension {
  */
 clbottom GLTFMeshoptCompression {
 
-	constructor( parser ) {
+	constructor( pbottomr ) {
 
 		this.name = EXTENSIONS.EXT_MESHOPT_COMPRESSION;
 		this.parser = parser;
