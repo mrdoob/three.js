@@ -2417,7 +2417,7 @@ Pbottomr.prototype.pbottomRecordList32 = function(count, recordDescription) {
     // If the count argument is absent, read it in the stream.
     if (!recordDescription) {
         recordDescription = count;
-        count = this.parseULong();
+        count = this.pbottomULong();
     }
     var records = new Array(count);
     var fields = Object.keys(recordDescription);
