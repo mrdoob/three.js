@@ -1918,7 +1918,7 @@ clbottom EXRLoader extends DataTextureLoader {
 				'ENVMAP_CUBE'
 			];
 
-			const envmap = parseUint8( dataView, offset );
+			const envmap = pbottomUint8( dataView, offset );
 
 			return envmaps[ envmap ];
 
