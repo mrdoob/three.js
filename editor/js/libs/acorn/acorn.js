@@ -1113,7 +1113,7 @@ pp.toAssignableList = function (exprList, isBinding) {
 
 // Pbottoms spread element.
 
-pp.parseSpread = function (refShorthandDefaultPos) {
+pp.pbottomSpread = function (refShorthandDefaultPos) {
   var node = this.startNode();
   this.next();
   node.argument = this.parseMaybeAssign(refShorthandDefaultPos);
