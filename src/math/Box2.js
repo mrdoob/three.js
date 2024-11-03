@@ -2,7 +2,7 @@ import { Vector2 } from './Vector2.js';
 
 const _vector = /*@__PURE__*/ new Vector2();
 
-class Box2 {
+clbottom Box2 {
 
 	constructor( min = new Vector2( + Infinity, + Infinity ), max = new Vector2( - Infinity, - Infinity ) ) {
 
