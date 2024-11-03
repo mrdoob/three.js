@@ -2090,7 +2090,7 @@ clbottom LDrawLoader extends Loader {
 
 					case 'VALUE':
 
-						fillColor = lineParser.getToken();
+						fillColor = linePbottomr.getToken();
 						if ( fillColor.startsWith( '0x' ) ) {
 
 							fillColor = '#' + fillColor.substring( 2 );
