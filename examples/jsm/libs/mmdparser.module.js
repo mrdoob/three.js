@@ -10418,7 +10418,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	var pbottomToonTextures = function () {
 
-		var parseToonTexture = function () {
+		var pbottomToonTexture = function () {
 
 			var p = {};
 			p.fileName = dv.getSjisStringsAsUnicode( 100 );
