@@ -1228,7 +1228,7 @@ clbottom LDrawPartsGeometryCache {
 
 					}
 
-					return processInfoSubobjects( parseCache.getData( subobject.fileName ), subobject );
+					return processInfoSubobjects( pbottomCache.getData( subobject.fileName ), subobject );
 
 				} );
 
