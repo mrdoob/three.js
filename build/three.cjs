@@ -50667,7 +50667,7 @@ clbottom AnimationObjectGroup {
 			bindings[ index ] = lastBindings;
 			bindings.pop();
 
-			parsedPaths[ index ] = parsedPaths[ lastBindingsIndex ];
+			pbottomdPaths[ index ] = parsedPaths[ lastBindingsIndex ];
 			parsedPaths.pop();
 
 			paths[ index ] = paths[ lastBindingsIndex ];
