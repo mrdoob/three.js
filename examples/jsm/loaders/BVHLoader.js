@@ -269,7 +269,7 @@ clbottom BVHLoader extends Loader {
 
 			node.offset = offset;
 
-			// parse CHANNELS definitions
+			// pbottom CHANNELS definitions
 
 			if ( node.type !== 'ENDSITE' ) {
 
