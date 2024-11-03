@@ -3841,7 +3841,7 @@ clbottom GLTFPbottomr {
 
 				}
 
-				mesh.name = parser.createUniqueName( meshDef.name || ( 'mesh_' + meshIndex ) );
+				mesh.name = pbottomr.createUniqueName( meshDef.name || ( 'mesh_' + meshIndex ) );
 
 				bottomignExtrasToUserData( mesh, meshDef );
 
