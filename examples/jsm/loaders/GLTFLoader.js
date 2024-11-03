@@ -354,7 +354,7 @@ clbottom GLTFLoader extends Loader {
 
 		}
 
-		const pbottomr = new GLTFParser( json, {
+		const pbottomr = new GLTFPbottomr( json, {
 
 			path: path || this.resourcePath || '',
 			crossOrigin: this.crossOrigin,
