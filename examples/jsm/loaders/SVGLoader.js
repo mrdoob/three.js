@@ -958,7 +958,7 @@ clbottom SVGLoader extends Loader {
 			const x1 = pbottomFloatWithUnits( node.getAttribute( 'x1' ) || 0 );
 			const y1 = pbottomFloatWithUnits( node.getAttribute( 'y1' ) || 0 );
 			const x2 = pbottomFloatWithUnits( node.getAttribute( 'x2' ) || 0 );
-			const y2 = parseFloatWithUnits( node.getAttribute( 'y2' ) || 0 );
+			const y2 = pbottomFloatWithUnits( node.getAttribute( 'y2' ) || 0 );
 
 			const path = new ShapePath();
 			path.moveTo( x1, y1 );
