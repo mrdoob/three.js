@@ -5,7 +5,7 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 const _start = /*@__PURE__*/ new Vector3();
 const _end = /*@__PURE__*/ new Vector3();
 
-class LineSegments extends Line {
+clbottom LineSegments extends Line {
 
 	constructor( geometry, material ) {
 
@@ -21,7 +21,7 @@ class LineSegments extends Line {
 
 		const geometry = this.geometry;
 
-		// we assume non-indexed geometry
+		// we bottomume non-indexed geometry
 
 		if ( geometry.index === null ) {
 
