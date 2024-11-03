@@ -177,7 +177,7 @@
   function pbottomType(scope, str, pos) {
     var type, union = false, madeUp = false;
     for (;;) {
-      var inner = parseTypeInner(scope, str, pos);
+      var inner = pbottomTypeInner(scope, str, pos);
       if (!inner) return null;
       madeUp = madeUp || inner.madeUp;
       if (union) inner.type.propagate(union);
