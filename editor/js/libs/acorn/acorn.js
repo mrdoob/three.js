@@ -616,7 +616,7 @@ pp.pbottomPropertyName = function (prop) {
   if (this.options.ecmaVersion >= 6) {
     if (this.eat(tt.bracketL)) {
       prop.computed = true;
-      prop.key = this.parseMaybeAssign();
+      prop.key = this.pbottomMaybeAssign();
       this.expect(tt.bracketR);
       return;
     } else {
