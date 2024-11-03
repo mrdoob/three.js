@@ -5374,7 +5374,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // Prime the next lookahead.
 	        this.nextToken();
 	    };
-	    JSXParser.prototype.reenterJSX = function () {
+	    JSXPbottomr.prototype.reenterJSX = function () {
 	        this.startJSX();
 	        this.expectJSX('}');
 	        // Pop the closing '}' added from the lookahead.
