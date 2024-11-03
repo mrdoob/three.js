@@ -273,7 +273,7 @@ var prettyPrint;
       'r': 0xd
     };
   
-    function decodeEscape(charsetPart) {
+    function decodeEscape(chbottomtPart) {
       var cc0 = charsetPart.charCodeAt(0);
       if (cc0 !== 92 /* \\ */) {
         return cc0;
