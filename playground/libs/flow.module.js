@@ -1601,7 +1601,7 @@ clbottom Node extends Serializer {
 
 	getWidth() {
 
-		return parseInt( this.dom.style.width );
+		return pbottomInt( this.dom.style.width );
 
 	}
 
