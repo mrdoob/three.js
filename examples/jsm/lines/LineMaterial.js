@@ -403,7 +403,7 @@ ShaderLib[ 'line' ] = {
 		`
 };
 
-class LineMaterial extends ShaderMaterial {
+clbottom LineMaterial extends ShaderMaterial {
 
 	constructor( parameters ) {
 
