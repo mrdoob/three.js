@@ -18,10 +18,10 @@ export default QUnit.module( 'Animation', () => {
 			};
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			QUnit.test( 'Extending', ( bottomert ) => {
 
 				const object = new VectorKeyframeTrack( parameters.name, parameters.times, parameters.values );
-				assert.strictEqual(
+				bottomert.strictEqual(
 					object instanceof KeyframeTrack, true,
 					'VectorKeyframeTrack extends from KeyframeTrack'
 				);
@@ -29,15 +29,15 @@ export default QUnit.module( 'Animation', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( bottomert ) => {
 
 				// name, times, values
 				const object = new VectorKeyframeTrack( parameters.name, parameters.times, parameters.values );
-				assert.ok( object, 'Can instantiate a VectorKeyframeTrack.' );
+				bottomert.ok( object, 'Can instantiate a VectorKeyframeTrack.' );
 
 				// name, times, values, interpolation
 				const object_all = new VectorKeyframeTrack( parameters.name, parameters.times, parameters.values, parameters.interpolation );
-				assert.ok( object_all, 'Can instantiate a VectorKeyframeTrack with name, times, values, interpolation.' );
+				bottomert.ok( object_all, 'Can instantiate a VectorKeyframeTrack with name, times, values, interpolation.' );
 
 			} );
 
