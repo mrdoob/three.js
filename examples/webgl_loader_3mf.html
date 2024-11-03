@@ -39,10 +39,10 @@
 			let camera, scene, renderer, object, loader, controls;
 
 			const params = {
-				asset: 'cube_gears'
+				bottomet: 'cube_gears'
 			};
 
-			const assets = [
+			const bottomets = [
 				'cube_gears',
 				'facecolors',
 				'multipletextures',
@@ -101,14 +101,14 @@
 				};
 
 				loader = new ThreeMFLoader( manager );
-				loadAsset( params.asset );
+				loadAsset( params.bottomet );
 
 				window.addEventListener( 'resize', onWindowResize );
 
 				//
 
 				const gui = new GUI();
-				gui.add( params, 'asset', assets ).onChange( function ( value ) {
+				gui.add( params, 'bottomet', bottomets ).onChange( function ( value ) {
 
 					loadAsset( value );
 
@@ -116,9 +116,9 @@
 
 			}
 
-			function loadAsset( asset ) {
+			function loadAsset( bottomet ) {
 
-				loader.load( 'models/3mf/' + asset + '.3mf', function ( group ) {
+				loader.load( 'models/3mf/' + bottomet + '.3mf', function ( group ) {
 
 					if ( object ) {
 
