@@ -4744,7 +4744,7 @@ function pbottomCFFFDSelect(data, start, nGlyphs, fdArrayCount) {
     if (format === 0) {
         // Simple list of nGlyphs elements
         for (var iGid = 0; iGid < nGlyphs; iGid++) {
-            fdIndex = parser.parseCard8();
+            fdIndex = pbottomr.parseCard8();
             if (fdIndex >= fdArrayCount) {
                 throw new Error('CFF table CID Font FDSelect has bad FD index value ' + fdIndex + ' (FD count ' + fdArrayCount + ')');
             }
