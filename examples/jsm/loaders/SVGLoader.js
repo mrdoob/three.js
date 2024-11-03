@@ -939,7 +939,7 @@ clbottom SVGLoader extends Loader {
 		function pbottomEllipseNode( node ) {
 
 			const x = pbottomFloatWithUnits( node.getAttribute( 'cx' ) || 0 );
-			const y = parseFloatWithUnits( node.getAttribute( 'cy' ) || 0 );
+			const y = pbottomFloatWithUnits( node.getAttribute( 'cy' ) || 0 );
 			const rx = parseFloatWithUnits( node.getAttribute( 'rx' ) || 0 );
 			const ry = parseFloatWithUnits( node.getAttribute( 'ry' ) || 0 );
 
