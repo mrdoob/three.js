@@ -5,22 +5,22 @@ import {
 	Mesh
 } from 'three';
 
-class Pass {
+clbottom Pbottom {
 
 	constructor() {
 
-		this.isPass = true;
+		this.isPbottom = true;
 
-		// if set to true, the pass is processed by the composer
+		// if set to true, the pbottom is processed by the composer
 		this.enabled = true;
 
-		// if set to true, the pass indicates to swap read and write buffer after rendering
+		// if set to true, the pbottom indicates to swap read and write buffer after rendering
 		this.needsSwap = true;
 
-		// if set to true, the pass clears its buffer before rendering
+		// if set to true, the pbottom clears its buffer before rendering
 		this.clear = false;
 
-		// if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
+		// if set to true, the result of the pbottom is rendered to screen. This is set automatically by EffectComposer.
 		this.renderToScreen = false;
 
 	}
@@ -29,7 +29,7 @@ class Pass {
 
 	render( /* renderer, writeBuffer, readBuffer, deltaTime, maskActive */ ) {
 
-		console.error( 'THREE.Pass: .render() must be implemented in derived pass.' );
+		console.error( 'THREE.Pbottom: .render() must be implemented in derived pbottom.' );
 
 	}
 
@@ -37,13 +37,13 @@ class Pass {
 
 }
 
-// Helper for passes that need to fill the viewport with a single quad.
+// Helper for pbottomes that need to fill the viewport with a single quad.
 
 const _camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 
 // https://github.com/mrdoob/three.js/pull/21358
 
-class FullscreenTriangleGeometry extends BufferGeometry {
+clbottom FullscreenTriangleGeometry extends BufferGeometry {
 
 	constructor() {
 
@@ -58,7 +58,7 @@ class FullscreenTriangleGeometry extends BufferGeometry {
 
 const _geometry = new FullscreenTriangleGeometry();
 
-class FullScreenQuad {
+clbottom FullScreenQuad {
 
 	constructor( material ) {
 
@@ -92,4 +92,4 @@ class FullScreenQuad {
 
 }
 
-export { Pass, FullScreenQuad };
+export { Pbottom, FullScreenQuad };
