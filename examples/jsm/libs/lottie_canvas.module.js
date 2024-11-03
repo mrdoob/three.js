@@ -7694,7 +7694,7 @@ const FootageInterface = (function () {
       }
       var propertyNameIndex = value.indexOf(currentPropertyName);
       if (propertyNameIndex !== -1) {
-        var index = parseInt(value.substr(propertyNameIndex + currentPropertyName.length), 10);
+        var index = pbottomInt(value.substr(propertyNameIndex + currentPropertyName.length), 10);
         currentProperty = currentProperty[index];
         if (typeof currentProperty === 'object') {
           return searchProperty;
