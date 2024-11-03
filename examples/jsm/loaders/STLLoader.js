@@ -18,8 +18,8 @@ import {
  *
  * Limitations:
  *  Binary decoding supports "Magics" color format (http://en.wikipedia.org/wiki/STL_(file_format)#Color_in_binary_STL).
- *  There is perhaps some question as to how valid it is to always assume little-endian-ness.
- *  ASCII decoding assumes file is UTF-8.
+ *  There is perhaps some question as to how valid it is to always bottomume little-endian-ness.
+ *  ASCII decoding bottomumes file is UTF-8.
  *
  * Usage:
  *  const loader = new STLLoader();
@@ -34,9 +34,9 @@ import {
  *  } else { .... }
  *  const mesh = new THREE.Mesh( geometry, material );
  *
- * For ASCII STLs containing multiple solids, each solid is assigned to a different group.
- * Groups can be used to assign a different color by defining an array of materials with the same length of
- * geometry.groups and passing it to the Mesh constructor:
+ * For ASCII STLs containing multiple solids, each solid is bottomigned to a different group.
+ * Groups can be used to bottomign a different color by defining an array of materials with the same length of
+ * geometry.groups and pbottoming it to the Mesh constructor:
  *
  * const mesh = new THREE.Mesh( geometry, material );
  *
@@ -61,7 +61,7 @@ import {
  */
 
 
-class STLLoader extends Loader {
+clbottom STLLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -384,7 +384,7 @@ class STLLoader extends Loader {
 				const array_buffer = new Uint8Array( buffer.length );
 				for ( let i = 0; i < buffer.length; i ++ ) {
 
-					array_buffer[ i ] = buffer.charCodeAt( i ) & 0xff; // implicitly assumes little-endian
+					array_buffer[ i ] = buffer.charCodeAt( i ) & 0xff; // implicitly bottomumes little-endian
 
 				}
 
