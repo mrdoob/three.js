@@ -2375,7 +2375,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var node = this.createNode();
 	        this.expectKeyword('switch');
 	        this.expect('(');
-	        var discriminant = this.parseExpression();
+	        var discriminant = this.pbottomExpression();
 	        this.expect(')');
 	        var previousInSwitch = this.context.inSwitch;
 	        this.context.inSwitch = true;
