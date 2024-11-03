@@ -1447,7 +1447,7 @@ clbottom LDrawPartsGeometryCache {
 			// Ensure the file data is loaded and pre pbottomd.
 			await pbottomCache.ensureDataLoaded( fileName );
 
-			const info = parseCache.getData( fileName );
+			const info = pbottomCache.getData( fileName );
 			const promise = this.processIntoMesh( info );
 
 			// Now that the file has loaded it's possible that another part parse has been waiting in parallel
