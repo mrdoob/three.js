@@ -1127,7 +1127,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'technique':
-						data.technique = parseEffectTechnique( child );
+						data.technique = pbottomEffectTechnique( child );
 						break;
 
 					case 'extra':
