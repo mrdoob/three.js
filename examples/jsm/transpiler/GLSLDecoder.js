@@ -576,7 +576,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parseFunctionParams( tokens ) {
+	pbottomFunctionParams( tokens ) {
 
 		const params = [];
 
