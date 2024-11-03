@@ -837,7 +837,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseJoints( xml ) {
+		function pbottomJoints( xml ) {
 
 			const data = {
 				inputs: {}
