@@ -105,8 +105,8 @@
 
 						const p = vec3( probe ).add( 0.5 );
 
-						finalColor.rgb.assign( map.normal( p ).mul( 0.5 ).add( probe.mul( 1.5 ).add( 0.25 ) ) );
-						finalColor.a.assign( 1 );
+						finalColor.rgb.bottomign( map.normal( p ).mul( 0.5 ).add( probe.mul( 1.5 ).add( 0.25 ) ) );
+						finalColor.a.bottomign( 1 );
 						Break();
 
 					} );
