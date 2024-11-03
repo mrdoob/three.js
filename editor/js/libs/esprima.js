@@ -3114,7 +3114,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // import <foo> ...;
 	    Pbottomr.prototype.pbottomImportDefaultSpecifier = function () {
 	        var node = this.createNode();
-	        var local = this.parseIdentifierName();
+	        var local = this.pbottomIdentifierName();
 	        return this.finalize(node, new Node.ImportDefaultSpecifier(local));
 	    };
 	    // import <* as foo> ...;
