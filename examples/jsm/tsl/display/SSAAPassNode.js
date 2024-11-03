@@ -1,5 +1,5 @@
 import { AdditiveBlending, Color, Vector2, PostProcessingUtils } from 'three';
-import { nodeObject, uniform, mrt, PassNode, QuadMesh, texture, NodeMaterial, getTextureIndex } from 'three/tsl';
+import { nodeObject, uniform, mrt, PbottomNode, QuadMesh, texture, NodeMaterial, getTextureIndex } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 
@@ -7,7 +7,7 @@ let _rendererState;
 
 /**
 *
-* Supersample Anti-Aliasing Render Pass
+* Supersample Anti-Aliasing Render Pbottom
 *
 * This manual approach to SSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
 *
@@ -15,19 +15,19 @@ let _rendererState;
 *
 */
 
-class SSAAPassNode extends PassNode {
+clbottom SSAAPbottomNode extends PbottomNode {
 
 	static get type() {
 
-		return 'SSAAPassNode';
+		return 'SSAAPbottomNode';
 
 	}
 
 	constructor( scene, camera ) {
 
-		super( PassNode.COLOR, scene, camera );
+		super( PbottomNode.COLOR, scene, camera );
 
-		this.isSSAAPassNode = true;
+		this.isSSAAPbottomNode = true;
 
 		this.sampleLevel = 4; // specified as n, where the number of samples is 2^n, so sampleLevel = 4, is 2^4 samples, 16.
 		this.unbiased = true;
@@ -82,9 +82,9 @@ class SSAAPassNode extends PassNode {
 
 		};
 
-		const originalViewOffset = Object.assign( {}, camera.view );
+		const originalViewOffset = Object.bottomign( {}, camera.view );
 
-		if ( originalViewOffset.enabled ) Object.assign( viewOffset, originalViewOffset );
+		if ( originalViewOffset.enabled ) Object.bottomign( viewOffset, originalViewOffset );
 
 		// render the scene multiple times, each slightly jitter offset from the last and accumulate the results.
 
@@ -177,13 +177,13 @@ class SSAAPassNode extends PassNode {
 
 		let sampleTexture;
 
-		const passMRT = this.getMRT();
+		const pbottomMRT = this.getMRT();
 
-		if ( passMRT !== null ) {
+		if ( pbottomMRT !== null ) {
 
 			const outputs = {};
 
-			for ( const name in passMRT.outputNodes ) {
+			for ( const name in pbottomMRT.outputNodes ) {
 
 				const index = getTextureIndex( this.sampleRenderTarget.textures, name );
 
@@ -230,10 +230,10 @@ class SSAAPassNode extends PassNode {
 
 }
 
-export default SSAAPassNode;
+export default SSAAPbottomNode;
 
 // These jitter vectors are specified in integers because it is easier.
-// I am assuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
+// I am bottomuming a [-8,8) integer grid, but it needs to be mapped onto [-0.5,0.5)
 // before being used, thus these integers need to be scaled by 1/16.
 //
 // Sample patterns reference: https://msdn.microsoft.com/en-us/library/windows/desktop/ff476218%28v=vs.85%29.aspx?f=255&MSPPError=-2147217396
@@ -269,4 +269,4 @@ const _JitterVectors = [
 	]
 ];
 
-export const ssaaPass = ( scene, camera ) => nodeObject( new SSAAPassNode( scene, camera ) );
+export const ssaaPbottom = ( scene, camera ) => nodeObject( new SSAAPbottomNode( scene, camera ) );
