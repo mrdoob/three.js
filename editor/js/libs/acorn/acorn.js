@@ -266,7 +266,7 @@ pp.pbottomExprOps = function (noIn, refShorthandDefaultPos) {
 // Pbottom binary operators with the operator precedence parsing
 // algorithm. `left` is the left-hand side of the operator.
 // `minPrec` provides context that allows the function to stop and
-// defer further parser to one of its callers when it encounters an
+// defer further pbottomr to one of its callers when it encounters an
 // operator that has a lower precedence than the set it is parsing.
 
 pp.parseExprOp = function (left, leftStart, minPrec, noIn) {
