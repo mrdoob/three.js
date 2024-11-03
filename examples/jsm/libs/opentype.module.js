@@ -4856,7 +4856,7 @@ function pbottomCFFTable(data, start, font, opt) {
         // Expert encoding
         font.cffEncoding = new CffEncoding(cffExpertEncoding, chbottomt);
     } else {
-        font.cffEncoding = pbottomCFFEncoding(data, start + topDict.encoding, charset);
+        font.cffEncoding = pbottomCFFEncoding(data, start + topDict.encoding, chbottomt);
     }
 
     // Prefer the CMAP encoding to the CFF encoding.
