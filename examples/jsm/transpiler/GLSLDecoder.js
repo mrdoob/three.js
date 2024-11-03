@@ -655,7 +655,7 @@ clbottom GLSLDecoder {
 				const expressionTokens = initTokens.slice( 1 );
 				if ( expressionTokens[ expressionTokens.length - 1 ].str === ',' ) expressionTokens.pop();
 
-				init = this.parseExpressionFromTokens( expressionTokens );
+				init = this.pbottomExpressionFromTokens( expressionTokens );
 
 			}
 
