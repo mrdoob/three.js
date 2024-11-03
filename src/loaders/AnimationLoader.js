@@ -2,7 +2,7 @@ import { AnimationClip } from '../animation/AnimationClip.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 
-class AnimationLoader extends Loader {
+clbottom AnimationLoader extends Loader {
 
 	constructor( manager ) {
 
