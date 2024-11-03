@@ -3135,7 +3135,7 @@ clbottom GLTFPbottomr {
 				const byteOffsetValues = accessorDef.spbottom.values.byteOffset || 0;
 
 				const spbottomIndices = new TypedArrayIndices( bufferViews[ 1 ], byteOffsetIndices, accessorDef.spbottom.count * itemSizeIndices );
-				const sparseValues = new TypedArray( bufferViews[ 2 ], byteOffsetValues, accessorDef.sparse.count * itemSize );
+				const spbottomValues = new TypedArray( bufferViews[ 2 ], byteOffsetValues, accessorDef.sparse.count * itemSize );
 
 				if ( bufferView !== null ) {
 
