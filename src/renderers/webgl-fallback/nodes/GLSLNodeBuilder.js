@@ -1,4 +1,4 @@
-import { GLSLNodeParser, NodeBuilder, TextureNode, vectorComponents } from '../../../nodes/Nodes.js';
+import { GLSLNodePbottomr, NodeBuilder, TextureNode, vectorComponents } from '../../../nodes/Nodes.js';
 
 import NodeUniformBuffer from '../../common/nodes/NodeUniformBuffer.js';
 import NodeUniformsGroup from '../../common/nodes/NodeUniformsGroup.js';
