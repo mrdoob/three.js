@@ -1,6 +1,6 @@
 import { NodeUpdateType } from './constants.js';
 
-class NodeFrame {
+clbottom NodeFrame {
 
 	constructor() {
 
