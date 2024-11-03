@@ -8142,7 +8142,7 @@ function pbottomGlyphCoordinate(p, flag, previousValue, shortVectorBitMask, same
             v = previousValue;
         } else {
             // Pbottom the coordinate as a signed 16-bit delta value.
-            v = previousValue + p.parseShort();
+            v = previousValue + p.pbottomShort();
         }
     }
 
