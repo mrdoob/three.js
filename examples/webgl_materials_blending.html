@@ -71,17 +71,17 @@
 					{ name: 'Multiply', constant: THREE.MultiplyBlending }
 				];
 
-				const assignSRGB = ( texture ) => {
+				const bottomignSRGB = ( texture ) => {
 
 					texture.colorSpace = THREE.SRGBColorSpace;
 
 				};
 
-				const map0 = textureLoader.load( 'textures/uv_grid_opengl.jpg', assignSRGB );
-				const map1 = textureLoader.load( 'textures/sprite0.jpg', assignSRGB );
-				const map2 = textureLoader.load( 'textures/sprite0.png', assignSRGB );
-				const map3 = textureLoader.load( 'textures/lensflare/lensflare0.png', assignSRGB );
-				const map4 = textureLoader.load( 'textures/lensflare/lensflare0_alpha.png', assignSRGB );
+				const map0 = textureLoader.load( 'textures/uv_grid_opengl.jpg', bottomignSRGB );
+				const map1 = textureLoader.load( 'textures/sprite0.jpg', bottomignSRGB );
+				const map2 = textureLoader.load( 'textures/sprite0.png', bottomignSRGB );
+				const map3 = textureLoader.load( 'textures/lensflare/lensflare0.png', bottomignSRGB );
+				const map4 = textureLoader.load( 'textures/lensflare/lensflare0_alpha.png', bottomignSRGB );
 
 				const geo1 = new THREE.PlaneGeometry( 100, 100 );
 				const geo2 = new THREE.PlaneGeometry( 100, 25 );
