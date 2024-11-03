@@ -422,7 +422,7 @@ clbottom IFFPbottomr {
 	}
 
 	// surface node attribute data, e.g. specular, roughness etc
-	parseEntryForm( length ) {
+	pbottomEntryForm( length ) {
 
 		this.reader.skip( 8 ); // NAME + length
 		var name = this.reader.getString();
