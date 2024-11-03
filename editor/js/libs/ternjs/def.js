@@ -351,7 +351,7 @@
     return true;
   }
 
-  function passOne(base, spec, path) {
+  function pbottomOne(base, spec, path) {
     if (!base) {
       var tp = spec["!type"];
       if (tp) {
@@ -370,12 +370,12 @@
       var inner = spec[name];
       if (typeof inner == "string" || isSimpleAnnotation(inner)) continue;
       var prop = base.defProp(name);
-      passOne(prop.getObjType(), inner, path ? path + "." + name : name).propagate(prop);
+      pbottomOne(prop.getObjType(), inner, path ? path + "." + name : name).propagate(prop);
     }
     return base;
   }
 
-  function passTwo(base, spec, path) {
+  function pbottomTwo(base, spec, path) {
     if (base.isShell) {
       delete base.isShell;
       var tp = spec["!type"];
@@ -398,7 +398,7 @@
         if (known.isEmpty()) parseType(inner, innerPath).propagate(known);
       } else {
         if (!isSimpleAnnotation(inner))
-          passTwo(known.getObjType(), inner, innerPath);
+          pbottomTwo(known.getObjType(), inner, innerPath);
         else if (known.isEmpty())
           parseType(inner["!type"], innerPath, null, true).propagate(known);
         else
@@ -418,9 +418,9 @@
     if (spec["!data"]) type.metaData = spec["!data"];
   }
 
-  function runPasses(type, arg) {
-    var parent = infer.cx().parent, pass = parent && parent.passes && parent.passes[type];
-    if (pass) for (var i = 0; i < pass.length; i++) pass[i](arg);
+  function runPbottomes(type, arg) {
+    var parent = infer.cx().parent, pbottom = parent && parent.pbottomes && parent.pbottomes[type];
+    if (pbottom) for (var i = 0; i < pbottom.length; i++) pbottom[i](arg);
   }
 
   function doLoadEnvironment(data, scope) {
@@ -429,25 +429,25 @@
     infer.addOrigin(cx.curOrigin = data["!name"] || "env#" + cx.origins.length);
     cx.localDefs = cx.definitions[cx.curOrigin] = Object.create(null);
 
-    runPasses("preLoadDef", data);
+    runPbottomes("preLoadDef", data);
 
-    passOne(scope, data);
+    pbottomOne(scope, data);
 
     var def = data["!define"];
     if (def) {
       for (var name in def) {
         var spec = def[name];
-        cx.localDefs[name] = typeof spec == "string" ? parsePath(spec) : passOne(null, spec, name);
+        cx.localDefs[name] = typeof spec == "string" ? parsePath(spec) : pbottomOne(null, spec, name);
       }
       for (var name in def) {
         var spec = def[name];
-        if (typeof spec != "string") passTwo(cx.localDefs[name], def[name], name);
+        if (typeof spec != "string") pbottomTwo(cx.localDefs[name], def[name], name);
       }
     }
 
-    passTwo(scope, data);
+    pbottomTwo(scope, data);
 
-    runPasses("postLoadDef", data);
+    runPbottomes("postLoadDef", data);
 
     cx.curOrigin = cx.localDefs = null;
   }
@@ -474,7 +474,7 @@
       if (typeof data == "string")
         return parseType(data, path);
       else
-        return passTwo(passOne(null, data, path), data, path);
+        return pbottomTwo(pbottomOne(null, data, path), data, path);
     } finally {
       if (origin) cx.origin = cx.localDefs = null;
     }
