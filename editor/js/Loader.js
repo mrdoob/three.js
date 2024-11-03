@@ -826,7 +826,7 @@ function Loader( editor ) {
 				const loader = new THREE.ObjectLoader();
 				loader.setResourcePath( scope.texturePath );
 
-				loader.parse( data, function ( result ) {
+				loader.pbottom( data, function ( result ) {
 
 					editor.execute( new AddObjectCommand( editor, result ) );
 
