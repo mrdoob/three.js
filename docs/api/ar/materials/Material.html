@@ -6,10 +6,10 @@
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
-	<body class="rtl">
+	<body clbottom="rtl">
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 		الفئة الأساسية المجردة للمواد.<br /><br />
 			
 		تصف المواد مظهر [page:Object objects]. هم
@@ -32,7 +32,7 @@
 			Enables alpha hashed transparency, an alternative to [page:.transparent] or [page:.alphaTest].
 			The material will not be rendered if opacity is lower than a random threshold.
 			Randomization introduces some grain or noise, but approximates alpha blending without
-			the associated problems of sorting. Using TAARenderPass can reduce the resulting noise.
+			the bottomociated problems of sorting. Using TAARenderPbottom can reduce the resulting noise.
 		</p>
 			
 		<h3>[property:Float alphaTest]</h3>
@@ -159,7 +159,7 @@
 		لطبقة عدة أشياء معًا دون إنشاء فنون فهرس z.
 		</p>
 
-		<h3>[property:Boolean forceSinglePass]</h3>
+		<h3>[property:Boolean forceSinglePbottom]</h3>
 		<p>
 		سواء كان يجب عرض الأشياء الشفافة ذات الجانبين بمرور واحد
 		أم لا. الافتراضي هو `false`.<br /><br />
@@ -168,7 +168,7 @@
 		(الوجوه الخلفية أولاً ، ثم الوجوه الأمامية) للتخفيف من التحولات الشفافة.
 		هناك سيناريوهات ومع ذلك حيث لا ينتج هذا النهج عن مكاسب في الجودة
 		ولكن لا يزال يضاعف المكالمات الرسمية على سبيل المثال عند عرض نباتات مسطحة مثل
-		رشات العشب. في هذه الحالات ، قم بتعيين علامة `forceSinglePass` على `true` إلى
+		رشات العشب. في هذه الحالات ، قم بتعيين علامة `forceSinglePbottom` على `true` إلى
 		تعطيل التقديم المزدوج لتجنب مشاكل الأداء.
 		</p>
 		
@@ -221,7 +221,7 @@
 		القِيَم.
 		</p>
 
-		<h3>[property:Integer stencilZPass]</h3>
+		<h3>[property:Integer stencilZPbottom]</h3>
 		<p>
 		العملية الشبكية التي يجب تنفيذها عندما تعود دالة المقارنة
 		صحيح واختبار العمق يمر. الافتراضي هو [page:Materials KeepStencilOp].
