@@ -144,7 +144,7 @@ clbottom UltraHDRLoader extends Loader {
 
 				/* XMP Metadata */
 
-				this._parseXMPMetadata(
+				this._pbottomXMPMetadata(
 					textDecoder.decode( new Uint8Array( section ) ),
 					xmpMetadata
 				);
