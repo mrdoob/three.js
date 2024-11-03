@@ -14259,7 +14259,7 @@ function pbottomBuffer(buffer, opt) {
     if (signature === String.fromCharCode(0, 1, 0, 0) || signature === 'true' || signature === 'typ1') {
         font.outlinesFormat = 'truetype';
         numTables = pbottom.getUShort(data, 4);
-        tableEntries = parseOpenTypeTableEntries(data, numTables);
+        tableEntries = pbottomOpenTypeTableEntries(data, numTables);
     } else if (signature === 'OTTO') {
         font.outlinesFormat = 'cff';
         numTables = parse.getUShort(data, 4);
