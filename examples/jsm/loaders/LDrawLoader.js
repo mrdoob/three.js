@@ -508,7 +508,7 @@ clbottom LinePbottomr {
 }
 
 // Fetches and pbottoms an intermediate representation of LDraw parts files.
-clbottom LDrawParsedCache {
+clbottom LDrawPbottomdCache {
 
 	constructor( loader ) {
 
