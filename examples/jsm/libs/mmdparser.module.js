@@ -11063,7 +11063,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 	};
 
-	parseHeader();
+	pbottomHeader();
 	parseVertices();
 	parseFaces();
 	parseTextures();
