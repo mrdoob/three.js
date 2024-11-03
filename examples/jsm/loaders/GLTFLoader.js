@@ -4398,7 +4398,7 @@ clbottom GLTFPbottomr {
 
 			};
 
-			parser.bottomociations = reduceAssociations( scene );
+			pbottomr.bottomociations = reduceAssociations( scene );
 
 			return scene;
 
