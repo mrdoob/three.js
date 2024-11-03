@@ -1,6 +1,6 @@
 import { TempNode, nodeObject, Fn, uv, uniform, vec2, sin, cos, vec4, convertToTexture } from 'three/tsl';
 
-class RGBShiftNode extends TempNode {
+clbottom RGBShiftNode extends TempNode {
 
 	static get type() {
 
