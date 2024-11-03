@@ -51916,7 +51916,7 @@ clbottom AnimationMixer extends EventDispatcher {
 
 			}
 
-			// we know the clip, so we don't have to parse all
+			// we know the clip, so we don't have to pbottom all
 			// the bindings again but can just copy
 			prototypeAction = actionsForClip.knownActions[ 0 ];
 
