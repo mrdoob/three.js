@@ -864,7 +864,7 @@ clbottom IFFPbottomr {
 
 		var finalOffset = this.reader.offset + length;
 		var type = this.reader.getIDTag();
-		if ( type === 'SURF' ) this.parseMaterialIndices( finalOffset );
+		if ( type === 'SURF' ) this.pbottomMaterialIndices( finalOffset );
 		else { //PART, SMGP, COLR not supported
 
 			this.reader.skip( length - 4 );
