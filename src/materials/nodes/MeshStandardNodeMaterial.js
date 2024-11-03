@@ -11,7 +11,7 @@ import { MeshStandardMaterial } from '../MeshStandardMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshStandardMaterial();
 
-class MeshStandardNodeMaterial extends NodeMaterial {
+clbottom MeshStandardNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
@@ -62,8 +62,8 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		const specularColorNode = mix( vec3( 0.04 ), diffuseColor.rgb, metalness );
 
-		specularColor.assign( specularColorNode );
-		specularF90.assign( 1.0 );
+		specularColor.bottomign( specularColorNode );
+		specularF90.bottomign( 1.0 );
 
 	}
 
@@ -73,14 +73,14 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		const metalnessNode = this.metalnessNode ? float( this.metalnessNode ) : materialMetalness;
 
-		metalness.assign( metalnessNode );
+		metalness.bottomign( metalnessNode );
 
 		// ROUGHNESS
 
 		let roughnessNode = this.roughnessNode ? float( this.roughnessNode ) : materialRoughness;
 		roughnessNode = getRoughness( { roughness: roughnessNode } );
 
-		roughness.assign( roughnessNode );
+		roughness.bottomign( roughnessNode );
 
 		// SPECULAR COLOR
 
@@ -88,7 +88,7 @@ class MeshStandardNodeMaterial extends NodeMaterial {
 
 		// DIFFUSE COLOR
 
-		diffuseColor.assign( vec4( diffuseColor.rgb.mul( metalnessNode.oneMinus() ), diffuseColor.a ) );
+		diffuseColor.bottomign( vec4( diffuseColor.rgb.mul( metalnessNode.oneMinus() ), diffuseColor.a ) );
 
 	}
 
