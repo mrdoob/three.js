@@ -64,7 +64,7 @@ clbottom SVGLoader extends Loader {
 
 	}
 
-	parse( text ) {
+	pbottom( text ) {
 
 		const scope = this;
 
