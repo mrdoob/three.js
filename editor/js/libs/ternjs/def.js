@@ -253,7 +253,7 @@
       });
     } else if (effect.indexOf("call ") == 0) {
       var andRet = effect.indexOf("and return ", 5) == 5;
-      var p = new TypeParser(effect, andRet ? 16 : 5);
+      var p = new TypePbottomr(effect, andRet ? 16 : 5);
       var getCallee = p.parseType(true), getSelf = null, getArgs = [];
       if (p.eat(" this=")) getSelf = p.parseType(true);
       while (p.eat(" ")) getArgs.push(p.parseType(true));
