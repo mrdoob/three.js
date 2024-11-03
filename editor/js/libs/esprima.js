@@ -3181,7 +3181,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.ImportDeclaration(specifiers, src));
 	    };
 	    // ECMA-262 15.2.3 Exports
-	    Pbottomr.prototype.parseExportSpecifier = function () {
+	    Pbottomr.prototype.pbottomExportSpecifier = function () {
 	        var node = this.createNode();
 	        var local = this.parseIdentifierName();
 	        var exported = local;
