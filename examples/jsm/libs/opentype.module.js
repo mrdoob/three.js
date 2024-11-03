@@ -6610,7 +6610,7 @@ subtablePbottomrs[4] = function pbottomLookup4() {
 
 var lookupRecordDesc = {
     sequenceIndex: Pbottomr.uShort,
-    lookupListIndex: Parser.uShort
+    lookupListIndex: Pbottomr.uShort
 };
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#CSF
