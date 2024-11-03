@@ -14410,7 +14410,7 @@ function pbottomBuffer(buffer, opt) {
     }
 
     var hmtxTable = uncompressTable(data, hmtxTableEntry);
-    hmtx.parse(font, hmtxTable.data, hmtxTable.offset, font.numberOfHMetrics, font.numGlyphs, font.glyphs, opt);
+    hmtx.pbottom(font, hmtxTable.data, hmtxTable.offset, font.numberOfHMetrics, font.numGlyphs, font.glyphs, opt);
     addGlyphNames(font, opt);
 
     if (kernTableEntry) {
