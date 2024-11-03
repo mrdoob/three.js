@@ -1028,7 +1028,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                break;
 	            case token_1.Token.Punctuator:
 	                if (token.value === '[') {
-	                    key = this.isolateCoverGrammar(this.parseAssignmentExpression);
+	                    key = this.isolateCoverGrammar(this.pbottomAssignmentExpression);
 	                    this.expect(']');
 	                }
 	                else {
