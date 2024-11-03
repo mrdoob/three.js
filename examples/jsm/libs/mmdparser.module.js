@@ -10241,7 +10241,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.morphCount; i++ ) {
 
-			pmd.morphs.push( parseMorph() );
+			pmd.morphs.push( pbottomMorph() );
 
 		}
 
