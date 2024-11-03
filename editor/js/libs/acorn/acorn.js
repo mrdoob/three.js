@@ -1865,7 +1865,7 @@ pp.pbottomTryStatement = function (node) {
     var clause = this.startNode();
     this.next();
     this.expect(tt.parenL);
-    clause.param = this.parseBindingAtom();
+    clause.param = this.pbottomBindingAtom();
     this.checkLVal(clause.param, true);
     this.expect(tt.parenR);
     clause.guard = null;
