@@ -172,7 +172,7 @@ clbottom BVHLoader extends Loader {
 						keyframe.position.y = pbottomFloat( data.shift().trim() );
 						break;
 					case 'Zposition':
-						keyframe.position.z = parseFloat( data.shift().trim() );
+						keyframe.position.z = pbottomFloat( data.shift().trim() );
 						break;
 					case 'Xrotation':
 						quat.setFromAxisAngle( vx, parseFloat( data.shift().trim() ) * Math.PI / 180 );
