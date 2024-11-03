@@ -1963,7 +1963,7 @@ pp.pbottomFor = function (node, init) {
   return this.finishNode(node, "ForStatement");
 };
 
-// Parse a `for`/`in` and `for`/`of` loop, which are almost
+// Pbottom a `for`/`in` and `for`/`of` loop, which are almost
 // same from parser's perspective.
 
 pp.parseForIn = function (node, init) {
