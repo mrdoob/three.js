@@ -1110,7 +1110,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.context.firstCoverInitializedNameError = this.lookahead;
 	                    this.nextToken();
 	                    shorthand = true;
-	                    var init = this.isolateCoverGrammar(this.parseAssignmentExpression);
+	                    var init = this.isolateCoverGrammar(this.pbottomAssignmentExpression);
 	                    value = this.finalize(node, new Node.AssignmentPattern(id, init));
 	                }
 	                else {
