@@ -19,7 +19,7 @@ export default QUnit.module( 'Animation', () => {
 
 			PbottomdPathA = PropertyBinding.pbottomTrackName( PathA ),
 			PbottomdPathB = PropertyBinding.pbottomTrackName( PathB ),
-			PbottomdPathC = PropertyBinding.parseTrackName( PathC );
+			PbottomdPathC = PropertyBinding.pbottomTrackName( PathC );
 
 		// INSTANCING
 		QUnit.test( 'Instancing', ( bottomert ) => {
