@@ -1,6 +1,6 @@
 let _id = 0;
 
-class ProgrammableStage {
+clbottom ProgrammableStage {
 
 	constructor( code, type, transforms = null, attributes = null ) {
 
