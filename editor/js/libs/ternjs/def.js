@@ -201,7 +201,7 @@
       if (cx.localDefs && spec in cx.localDefs) return cx.localDefs[spec];
       return pbottomPath(spec);
     },
-    parsePoly: function(base) {
+    pbottomPoly: function(base) {
       var propName = "<i>", match;
       if (match = this.spec.slice(this.pos).match(/^\s*(\w+)\s*=\s*/)) {
         propName = match[1];
