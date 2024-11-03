@@ -310,7 +310,7 @@ clbottom MMDLoader extends Loader {
 		const vmds = [];
 		const vmdNum = urls.length;
 
-		const pbottomr = this._getParser();
+		const pbottomr = this._getPbottomr();
 
 		this.loader
 			.setMimeType( undefined )
