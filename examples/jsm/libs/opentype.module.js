@@ -2590,7 +2590,7 @@ Pbottomr.prototype.pbottomClbottomDef = function() {
     if (format === 1) {
         return {
             format: 1,
-            startGlyph: this.parseUShort(),
+            startGlyph: this.pbottomUShort(),
             clbottomes: this.parseUShortList()
         };
     } else if (format === 2) {
