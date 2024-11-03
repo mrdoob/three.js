@@ -274,7 +274,7 @@ clbottom IFFPbottomr {
 				break;
 
 			case 'TAMP':
-				this.parseXVAL( 'amplitude', length );
+				this.pbottomXVAL( 'amplitude', length );
 				break;
 
 				//Texture Mapping Form
