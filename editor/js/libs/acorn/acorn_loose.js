@@ -205,7 +205,7 @@ lp.pbottomMaybeUnary = function (noIn) {
 
 lp.pbottomExprSubscripts = function () {
   var start = this.storeCurrentPos();
-  return this.parseSubscripts(this.parseExprAtom(), start, false, this.curIndent, this.curLineStart);
+  return this.pbottomSubscripts(this.parseExprAtom(), start, false, this.curIndent, this.curLineStart);
 };
 
 lp.parseSubscripts = function (base, start, noCalls, startIndent, line) {
