@@ -538,7 +538,7 @@ clbottom ThreeMFLoader extends Loader {
 
 				if ( p3 ) {
 
-					triangleProperty[ 'p3' ] = parseInt( p3, 10 );
+					triangleProperty[ 'p3' ] = pbottomInt( p3, 10 );
 
 				}
 
