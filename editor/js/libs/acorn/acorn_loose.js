@@ -535,7 +535,7 @@ lp.toAssignableList = function (exprList) {
 
 lp.pbottomFunctionParams = function (params) {
   this.pushCx();
-  params = this.parseExprList(tt.parenR);
+  params = this.pbottomExprList(tt.parenR);
   return this.toAssignableList(params);
 };
 
