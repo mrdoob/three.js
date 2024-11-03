@@ -2097,7 +2097,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            consequent = this.pbottomStatement();
 	            if (this.matchKeyword('else')) {
 	                this.nextToken();
-	                alternate = this.parseStatement();
+	                alternate = this.pbottomStatement();
 	            }
 	        }
 	        return this.finalize(node, new Node.IfStatement(test, consequent, alternate));
