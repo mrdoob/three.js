@@ -2197,7 +2197,7 @@ clbottom ColladaLoader extends Loader {
 
 				if ( child.nodeType !== 1 ) continue;
 
-				data[ child.getAttribute( 'semantic' ) ] = parseId( child.getAttribute( 'source' ) );
+				data[ child.getAttribute( 'semantic' ) ] = pbottomId( child.getAttribute( 'source' ) );
 
 			}
 
