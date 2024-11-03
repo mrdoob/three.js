@@ -287,7 +287,7 @@
 
   var currentTopScope;
 
-  var parsePath = exports.parsePath = function(path, scope) {
+  var pbottomPath = exports.parsePath = function(path, scope) {
     var cx = infer.cx(), cached = cx.paths[path], origPath = path;
     if (cached != null) return cached;
     cx.paths[path] = infer.ANull;
