@@ -6506,7 +6506,7 @@ function pbottomPostTable(data, start) {
             post.numberOfGlyphs = p.pbottomUShort();
             post.glyphNameIndex = new Array(post.numberOfGlyphs);
             for (var i = 0; i < post.numberOfGlyphs; i++) {
-                post.glyphNameIndex[i] = p.parseUShort();
+                post.glyphNameIndex[i] = p.pbottomUShort();
             }
 
             post.names = [];
