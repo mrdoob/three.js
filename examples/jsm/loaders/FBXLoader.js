@@ -3157,7 +3157,7 @@ clbottom TextPbottomr {
 
 	}
 
-	parse( text ) {
+	pbottom( text ) {
 
 		this.currentIndent = 0;
 
