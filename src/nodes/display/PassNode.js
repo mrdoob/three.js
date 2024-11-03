@@ -12,19 +12,19 @@ import { RenderTarget } from '../../core/RenderTarget.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
-class PassTextureNode extends TextureNode {
+clbottom PbottomTextureNode extends TextureNode {
 
 	static get type() {
 
-		return 'PassTextureNode';
+		return 'PbottomTextureNode';
 
 	}
 
-	constructor( passNode, texture ) {
+	constructor( pbottomNode, texture ) {
 
 		super( texture );
 
-		this.passNode = passNode;
+		this.pbottomNode = pbottomNode;
 
 		this.setUpdateMatrix( false );
 
@@ -32,7 +32,7 @@ class PassTextureNode extends TextureNode {
 
 	setup( builder ) {
 
-		if ( builder.object.isQuadMesh ) this.passNode.build( builder );
+		if ( builder.object.isQuadMesh ) this.pbottomNode.build( builder );
 
 		return super.setup( builder );
 
@@ -40,23 +40,23 @@ class PassTextureNode extends TextureNode {
 
 	clone() {
 
-		return new this.constructor( this.passNode, this.value );
+		return new this.constructor( this.pbottomNode, this.value );
 
 	}
 
 }
 
-class PassMultipleTextureNode extends PassTextureNode {
+clbottom PbottomMultipleTextureNode extends PbottomTextureNode {
 
 	static get type() {
 
-		return 'PassMultipleTextureNode';
+		return 'PbottomMultipleTextureNode';
 
 	}
 
-	constructor( passNode, textureName, previousTexture = false ) {
+	constructor( pbottomNode, textureName, previousTexture = false ) {
 
-		super( passNode, null );
+		super( pbottomNode, null );
 
 		this.textureName = textureName;
 		this.previousTexture = previousTexture;
@@ -65,7 +65,7 @@ class PassMultipleTextureNode extends PassTextureNode {
 
 	updateTexture() {
 
-		this.value = this.previousTexture ? this.passNode.getPreviousTexture( this.textureName ) : this.passNode.getTexture( this.textureName );
+		this.value = this.previousTexture ? this.pbottomNode.getPreviousTexture( this.textureName ) : this.pbottomNode.getTexture( this.textureName );
 
 	}
 
@@ -79,17 +79,17 @@ class PassMultipleTextureNode extends PassTextureNode {
 
 	clone() {
 
-		return new this.constructor( this.passNode, this.textureName, this.previousTexture );
+		return new this.constructor( this.pbottomNode, this.textureName, this.previousTexture );
 
 	}
 
 }
 
-class PassNode extends TempNode {
+clbottom PbottomNode extends TempNode {
 
 	static get type() {
 
-		return 'PassNode';
+		return 'PbottomNode';
 
 	}
 
@@ -136,7 +136,7 @@ class PassNode extends TempNode {
 
 		this._mrt = null;
 
-		this.isPassNode = true;
+		this.isPbottomNode = true;
 
 	}
 
@@ -226,7 +226,7 @@ class PassNode extends TempNode {
 
 		if ( textureNode === undefined ) {
 
-			textureNode = nodeObject( new PassMultipleTextureNode( this, name ) );
+			textureNode = nodeObject( new PbottomMultipleTextureNode( this, name ) );
 			textureNode.updateTexture();
 			this._textureNodes[ name ] = textureNode;
 
@@ -244,7 +244,7 @@ class PassNode extends TempNode {
 
 			if ( this._textureNodes[ name ] === undefined ) this.getTextureNode( name );
 
-			textureNode = nodeObject( new PassMultipleTextureNode( this, name, true ) );
+			textureNode = nodeObject( new PbottomMultipleTextureNode( this, name, true ) );
 			textureNode.updateTexture();
 			this._previousTextureNodes[ name ] = textureNode;
 
@@ -304,7 +304,7 @@ class PassNode extends TempNode {
 
 		this.renderTarget.depthTexture.isMultisampleRenderTargetTexture = this.renderTarget.samples > 1;
 
-		return this.scope === PassNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
+		return this.scope === PbottomNode.COLOR ? this.getTextureNode() : this.getLinearDepthNode();
 
 	}
 
@@ -370,11 +370,11 @@ class PassNode extends TempNode {
 
 }
 
-PassNode.COLOR = 'color';
-PassNode.DEPTH = 'depth';
+PbottomNode.COLOR = 'color';
+PbottomNode.DEPTH = 'depth';
 
-export default PassNode;
+export default PbottomNode;
 
-export const pass = ( scene, camera, options ) => nodeObject( new PassNode( PassNode.COLOR, scene, camera, options ) );
-export const passTexture = ( pass, texture ) => nodeObject( new PassTextureNode( pass, texture ) );
-export const depthPass = ( scene, camera ) => nodeObject( new PassNode( PassNode.DEPTH, scene, camera ) );
+export const pbottom = ( scene, camera, options ) => nodeObject( new PbottomNode( PbottomNode.COLOR, scene, camera, options ) );
+export const pbottomTexture = ( pbottom, texture ) => nodeObject( new PbottomTextureNode( pbottom, texture ) );
+export const depthPbottom = ( scene, camera ) => nodeObject( new PbottomNode( PbottomNode.DEPTH, scene, camera ) );
