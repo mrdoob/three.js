@@ -3874,7 +3874,7 @@ clbottom GLTFPbottomr {
 
 			if ( meshDef.extensions ) addUnknownExtensionsToUserData( extensions, group, meshDef );
 
-			parser.bottomociations.set( group, { meshes: meshIndex } );
+			pbottomr.bottomociations.set( group, { meshes: meshIndex } );
 
 			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
 
