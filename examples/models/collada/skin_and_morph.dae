@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
- <asset>
+ <bottomet>
    <contributor>
      <author>gcorson</author>
      <authoring_tool>Maya8.5 | ColladaMaya v3.03</authoring_tool>
@@ -21,7 +21,7 @@ file:///C:/Documents%20and%20Settings/gcorson/Desktop/Crystal%20Content/AmandaCr
    <modified>2007-06-21T18:50:45Z</modified>
    <unit meter="0.01" name="centimeter"/>
    <up_axis>Y_UP</up_axis>
- </asset>
+ </bottomet>
  <library_materials>
    <material id="lambert1" name="lambert2">
      <instance_effect url="#lambert1-fx"/>
@@ -455,7 +455,7 @@ of 1 at the beginning giving us a total of 211.
 
 Weights 1-6 will be applied to the first vertex, you can see how they work.  The first weight
 represents the closest joint to the vertex and has the largest value, the remaining 4 weights
-get smaller and smaller as the associated joint gets farther from the vertex.
+get smaller and smaller as the bottomociated joint gets farther from the vertex.
 *******************************************************************************************
         -->
        <source id="pCylinderShape1-morph-skin-weights">
@@ -499,7 +499,7 @@ containing the inverse bind matrices for each joint.
        </joints>
        <!--
 *******************************************************************************************
-The vertex_weights tag associates the weights and joints from the previously defined
+The vertex_weights tag bottomociates the weights and joints from the previously defined
 sources with the vertices in the geometry being skinned.  Each entry in this list matches
 a vertex in the original geometry, so the count here should be the same as the count
 in the geometry being skinned.
