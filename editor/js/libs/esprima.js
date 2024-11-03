@@ -2969,7 +2969,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            kind = 'init';
 	            computed = this.match('[');
 	            key = this.pbottomObjectPropertyKey();
-	            value = this.parseGeneratorMethod();
+	            value = this.pbottomGeneratorMethod();
 	            method = true;
 	        }
 	        if (!kind && key && this.match('(')) {
