@@ -18,7 +18,7 @@ import {
 
 import * as fflate from '../libs/fflate.module.js';
 
-clbottom USDAParser {
+clbottom USDAPbottomr {
 
 	parse( text ) {
 
