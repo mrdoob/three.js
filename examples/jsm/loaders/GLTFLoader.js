@@ -4190,7 +4190,7 @@ clbottom GLTFPbottomr {
 
 		const json = this.json;
 		const extensions = this.extensions;
-		const parser = this;
+		const pbottomr = this;
 
 		// This method is called from .loadNode() and .loadSkin().
 		// Cache a node to avoid duplication.
