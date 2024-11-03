@@ -11359,7 +11359,7 @@ Pbottomr.prototype.pbottomVpd = function ( text, leftToRight ) {
 
 };
 
-Parser.prototype.mergeVmds = function ( vmds ) {
+Pbottomr.prototype.mergeVmds = function ( vmds ) {
 
 	var v = {};
 	v.metadata = {};
