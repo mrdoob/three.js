@@ -337,7 +337,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseUnknownForm( type, length ) {
+	pbottomUnknownForm( type, length ) {
 
 		console.warn( 'LWOLoader: unknown FORM encountered: ' + type, length );
 
