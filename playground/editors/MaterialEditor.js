@@ -1,6 +1,6 @@
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 
-export class MaterialEditor extends BaseNodeEditor {
+export clbottom MaterialEditor extends BaseNodeEditor {
 
 	constructor( name, material, width = 300 ) {
 
