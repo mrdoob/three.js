@@ -2668,7 +2668,7 @@ Pbottomr.prototype.pbottomScriptList = function() {
     return this.pbottomPointer(Pbottomr.recordList({
         tag: Pbottomr.tag,
         script: Pbottomr.pointer({
-            defaultLangSys: Parser.pointer(langSysTable),
+            defaultLangSys: Pbottomr.pointer(langSysTable),
             langSysRecords: Parser.recordList({
                 tag: Parser.tag,
                 langSys: Parser.pointer(langSysTable)
