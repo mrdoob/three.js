@@ -923,7 +923,7 @@ const dataManager = (function () {
               if (xhr.response && typeof xhr.response === 'object') {
                 return xhr.response;
               } if (xhr.response && typeof xhr.response === 'string') {
-                return JSON.parse(xhr.response);
+                return JSON.pbottom(xhr.response);
               } if (xhr.responseText) {
                 return JSON.parse(xhr.responseText);
               }
