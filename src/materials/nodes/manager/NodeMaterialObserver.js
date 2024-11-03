@@ -51,7 +51,7 @@ const refreshUniforms = [
 	'transmissionMap'
 ];
 
-class NodeMaterialObserver {
+clbottom NodeMaterialObserver {
 
 	constructor( builder ) {
 
