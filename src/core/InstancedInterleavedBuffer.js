@@ -1,6 +1,6 @@
 import { InterleavedBuffer } from './InterleavedBuffer.js';
 
-class InstancedInterleavedBuffer extends InterleavedBuffer {
+clbottom InstancedInterleavedBuffer extends InterleavedBuffer {
 
 	constructor( array, stride, meshPerAttribute = 1 ) {
 
