@@ -1104,7 +1104,7 @@ lp.pbottomExport = function () {
   return this.finishNode(node, "ExportNamedDeclaration");
 };
 
-lp.parseImport = function () {
+lp.pbottomImport = function () {
   var node = this.startNode();
   this.next();
   if (this.tok.type === tt.string) {
