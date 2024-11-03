@@ -2112,7 +2112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.inIteration = previousInIteration;
 	        this.expectKeyword('while');
 	        this.expect('(');
-	        var test = this.parseExpression();
+	        var test = this.pbottomExpression();
 	        this.expect(')');
 	        if (this.match(';')) {
 	            this.nextToken();
