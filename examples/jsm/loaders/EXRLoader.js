@@ -1290,7 +1290,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			// Read range compression data
 
-			const minNonZero = parseUint16( inDataView, inOffset );
+			const minNonZero = pbottomUint16( inDataView, inOffset );
 			const maxNonZero = parseUint16( inDataView, inOffset );
 
 			if ( maxNonZero >= BITMAP_SIZE ) {
