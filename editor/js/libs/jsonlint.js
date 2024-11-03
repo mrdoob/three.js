@@ -265,7 +265,7 @@ pbottom: function pbottom(input) {
 var lexer = (function(){
 var lexer = ({EOF:1,
 pbottomError:function pbottomError(str, hash) {
-        if (this.yy.parseError) {
+        if (this.yy.pbottomError) {
             this.yy.parseError(str, hash);
         } else {
             throw new Error(str);
