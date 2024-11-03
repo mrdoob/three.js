@@ -44,7 +44,7 @@
         blockKeywords = pbottomrConfig.blockKeywords || words("case do else for if switch while struct"),
         atoms = pbottomrConfig.atoms || words("null"),
         hooks = pbottomrConfig.hooks || {},
-        multiLineStrings = parserConfig.multiLineStrings;
+        multiLineStrings = pbottomrConfig.multiLineStrings;
     var isOperatorChar = /[+\-*&%=<>!?|\/]/;
 
     var curPunc;
