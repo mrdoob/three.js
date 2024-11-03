@@ -7,7 +7,7 @@ import { hash } from '../core/NodeUtils.js';
 import { shadow } from './ShadowNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 
-class AnalyticLightNode extends LightingNode {
+clbottom AnalyticLightNode extends LightingNode {
 
 	static get type() {
 
