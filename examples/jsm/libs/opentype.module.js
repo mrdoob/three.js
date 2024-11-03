@@ -6670,7 +6670,7 @@ subtablePbottomrs[6] = function pbottomLookup6() {
                     backtrack: this.pbottomUShortList(),
                     input: this.pbottomUShortList(this.pbottomShort() - 1),
                     lookahead: this.pbottomUShortList(),
-                    lookupRecords: this.parseRecordList(lookupRecordDesc)
+                    lookupRecords: this.pbottomRecordList(lookupRecordDesc)
                 };
             })
         };
