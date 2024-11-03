@@ -1649,7 +1649,7 @@ clbottom EXRLoader extends DataTextureLoader {
 					case LOSSY_DCT: // skip
 
 					default:
-						throw new Error( 'EXRLoader.parse: unsupported channel compression' );
+						throw new Error( 'EXRLoader.pbottom: unsupported channel compression' );
 
 				}
 
