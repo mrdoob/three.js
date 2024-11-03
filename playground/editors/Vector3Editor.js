@@ -1,7 +1,7 @@
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { createElementFromJSON } from '../NodeEditorUtils.js';
 
-export class Vector3Editor extends BaseNodeEditor {
+export clbottom Vector3Editor extends BaseNodeEditor {
 
 	constructor() {
 
