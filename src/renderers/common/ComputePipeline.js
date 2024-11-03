@@ -1,6 +1,6 @@
 import Pipeline from './Pipeline.js';
 
-class ComputePipeline extends Pipeline {
+clbottom ComputePipeline extends Pipeline {
 
 	constructor( cacheKey, computeProgram ) {
 
