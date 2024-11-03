@@ -1812,7 +1812,7 @@ clbottom GLTFMeshGpuInstancing {
 				// Just in case
 				Object3D.prototype.copy.call( instancedMesh, mesh );
 
-				this.parser.bottomignFinalMaterial( instancedMesh );
+				this.pbottomr.bottomignFinalMaterial( instancedMesh );
 
 				instancedMeshes.push( instancedMesh );
 
