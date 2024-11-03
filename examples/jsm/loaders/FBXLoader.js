@@ -3384,7 +3384,7 @@ clbottom TextPbottomr {
 		// so convert the string to an array
 		if ( line.slice( - 1 ) !== ',' ) {
 
-			currentNode.a = parseNumberArray( currentNode.a );
+			currentNode.a = pbottomNumberArray( currentNode.a );
 
 		}
 
