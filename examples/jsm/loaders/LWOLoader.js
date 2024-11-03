@@ -779,7 +779,7 @@ clbottom GeometryPbottomr {
 		const indices = this.splitIndices( geoData.vertexIndices, geoData.polygonDimensions );
 		geometry.setIndex( indices );
 
-		this.parseGroups( geometry, geoData );
+		this.pbottomGroups( geometry, geoData );
 
 		geometry.computeVertexNormals();
 
