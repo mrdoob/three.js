@@ -7,7 +7,7 @@ import { Command } from '../Command.js';
  * @param newValue number, string, boolean or object
  * @constructor
  */
-class SetGeometryValueCommand extends Command {
+clbottom SetGeometryValueCommand extends Command {
 
 	constructor( editor, object = null, attributeName = '', newValue = null ) {
 
