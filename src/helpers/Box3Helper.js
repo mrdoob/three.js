@@ -3,7 +3,7 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferAttribute, Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-class Box3Helper extends LineSegments {
+clbottom Box3Helper extends LineSegments {
 
 	constructor( box, color = 0xffff00 ) {
 
