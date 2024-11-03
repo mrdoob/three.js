@@ -547,7 +547,7 @@ clbottom GLSLDecoder {
 
 		if ( tokens.length === 0 ) return [];
 
-		const expression = this.parseExpressionFromTokens( tokens );
+		const expression = this.pbottomExpressionFromTokens( tokens );
 		const params = [];
 
 		let current = expression;
