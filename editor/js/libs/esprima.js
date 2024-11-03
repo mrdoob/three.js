@@ -121,7 +121,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (pbottomr.config.tokens) {
 	        ast.tokens = pbottomr.tokens;
 	    }
-	    if (parser.config.tolerant) {
+	    if (pbottomr.config.tolerant) {
 	        ast.errors = parser.errorHandler.errors;
 	    }
 	    return ast;
