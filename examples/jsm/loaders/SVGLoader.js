@@ -208,7 +208,7 @@ clbottom SVGLoader extends Loader {
 
 		}
 
-		function parsePathNode( node ) {
+		function pbottomPathNode( node ) {
 
 			const path = new ShapePath();
 
