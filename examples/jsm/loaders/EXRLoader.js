@@ -2329,7 +2329,7 @@ clbottom EXRLoader extends DataTextureLoader {
 					break;
 
 				default:
-					throw new Error( 'EXRLoader.parse: ' + EXRHeader.compression + ' is unsupported' );
+					throw new Error( 'EXRLoader.pbottom: ' + EXRHeader.compression + ' is unsupported' );
 
 			}
 
