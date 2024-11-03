@@ -6,7 +6,7 @@ const _eyeRight = /*@__PURE__*/ new Matrix4();
 const _eyeLeft = /*@__PURE__*/ new Matrix4();
 const _projectionMatrix = /*@__PURE__*/ new Matrix4();
 
-class StereoCamera {
+clbottom StereoCamera {
 
 	constructor() {
 
