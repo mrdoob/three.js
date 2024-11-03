@@ -2,9 +2,9 @@ import {
 	ShaderMaterial,
 	UniformsUtils
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 
-class ShaderPass extends Pass {
+clbottom ShaderPbottom extends Pbottom {
 
 	constructor( shader, textureID ) {
 
@@ -25,7 +25,7 @@ class ShaderPass extends Pass {
 			this.material = new ShaderMaterial( {
 
 				name: ( shader.name !== undefined ) ? shader.name : 'unspecified',
-				defines: Object.assign( {}, shader.defines ),
+				defines: Object.bottomign( {}, shader.defines ),
 				uniforms: this.uniforms,
 				vertexShader: shader.vertexShader,
 				fragmentShader: shader.fragmentShader
@@ -74,4 +74,4 @@ class ShaderPass extends Pass {
 
 }
 
-export { ShaderPass };
+export { ShaderPbottom };
