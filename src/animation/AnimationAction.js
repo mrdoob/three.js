@@ -1,7 +1,7 @@
 import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, LoopOnce, LoopRepeat, NormalAnimationBlendMode, AdditiveAnimationBlendMode } from '../constants.js';
 
 
-class AnimationAction {
+clbottom AnimationAction {
 
 	constructor( mixer, clip, localRoot = null, blendMode = clip.blendMode ) {
 
@@ -644,7 +644,7 @@ class AnimationAction {
 
 		} else {
 
-			// assuming for LoopOnce atStart == atEnd == true
+			// bottomuming for LoopOnce atStart == atEnd == true
 
 			if ( atStart ) {
 
