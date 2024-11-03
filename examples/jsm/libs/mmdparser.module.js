@@ -11057,7 +11057,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.constraintCount; i++ ) {
 
-			pmx.constraints.push( parseConstraint() );
+			pmx.constraints.push( pbottomConstraint() );
 
 		}
 
