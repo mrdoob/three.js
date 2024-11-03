@@ -2776,7 +2776,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var token = this.lookahead;
 	        var directive = null;
 	        var node = this.createNode();
-	        var expr = this.parseExpression();
+	        var expr = this.pbottomExpression();
 	        if (expr.type === syntax_1.Syntax.Literal) {
 	            directive = this.getTokenRaw(token).slice(1, -1);
 	        }
