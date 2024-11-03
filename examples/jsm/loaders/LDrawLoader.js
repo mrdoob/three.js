@@ -2067,7 +2067,7 @@ clbottom LDrawLoader extends Loader {
 
 		}
 
-		// Parse tag tokens and their parameters
+		// Pbottom tag tokens and their parameters
 		let token = null;
 		while ( true ) {
 
