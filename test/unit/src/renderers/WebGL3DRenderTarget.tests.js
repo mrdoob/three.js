@@ -9,10 +9,10 @@ export default QUnit.module( 'Renderers', () => {
 	QUnit.module( 'WebGL3DRenderTarget', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new WebGL3DRenderTarget();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof WebGLRenderTarget, true,
 				'WebGL3DRenderTarget extends from WebGLRenderTarget'
 			);
@@ -20,31 +20,31 @@ export default QUnit.module( 'Renderers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new WebGL3DRenderTarget();
-			assert.ok( object, 'Can instantiate a WebGL3DRenderTarget.' );
+			bottomert.ok( object, 'Can instantiate a WebGL3DRenderTarget.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'depth', ( assert ) => {
+		QUnit.todo( 'depth', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'texture', ( assert ) => {
+		QUnit.todo( 'texture', ( bottomert ) => {
 
 			// must be Data3DTexture
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isWebGL3DRenderTarget', ( assert ) => {
+		QUnit.todo( 'isWebGL3DRenderTarget', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
