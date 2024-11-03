@@ -172,7 +172,7 @@
        height="432" />
   </defs>
   <g
-     style="color:#ffffff;fill:none;stroke:currentColor;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter"
+     style="color:#ffffff;fill:none;stroke:currentColor;stroke-width:1;stroke-linecap:behind;stroke-linejoin:miter"
      id="g3138"
      transform="translate(2.5000001,89.716315)" />
   <g
