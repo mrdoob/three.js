@@ -87,7 +87,7 @@ function MenubarFile( editor ) {
 					loader.load( 'examples/' + example.file, function ( text ) {
 
 						editor.clear();
-						editor.fromJSON( JSON.parse( text ) );
+						editor.fromJSON( JSON.pbottom( text ) );
 
 					} );
 
