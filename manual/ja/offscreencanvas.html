@@ -20,31 +20,31 @@
 </script>
   </head>
   <body>
-    <div clbottom="container">
-      <div clbottom="lesson-title">
+    <div class="container">
+      <div class="lesson-title">
         <h1>のOffscreenCanvas</h1>
       </div>
-      <div clbottom="lesson">
-        <div clbottom="lesson-main">
-          <p><a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas"><code clbottom="notranslate" translate="no">OffscreenCanvas</code></a>は新しいブラウザの機能で現在はChromeでしか利用できませんが、他のブラウザにも来るようです。
-<code clbottom="notranslate" translate="no">OffscreenCanvas</code> はWeb Workerでキャンバスにレンダリングできます。
+      <div class="lesson">
+        <div class="lesson-main">
+          <p><a href="https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas"><code class="notranslate" translate="no">OffscreenCanvas</code></a>は新しいブラウザの機能で現在はChromeでしか利用できませんが、他のブラウザにも来るようです。
+<code class="notranslate" translate="no">OffscreenCanvas</code> はWeb Workerでキャンバスにレンダリングできます。
 複雑な3Dシーンのレンダリングなど重い作業をWeb Workerで行い負荷を軽減させ、ブラウザのレスポンスを低下させない方法です。
 また、データが読み込まれWorkerで解析されてるのでページ読み込み中にページ表示の途切れは少ないでしょう。</p>
 <p>OffscreenCanvasの利用を<em>開始</em>するのは非常に簡単です。
 <a href="responsive.html">レスポンシブデザインの記事</a>から3つのキューブを回転させるコードに修正してみましょう。</p>
 <p>通常はWorkerのコードを別ファイルに分離しますが、このサイトのほとんどのサンプルコードではスクリプトをHTMLファイルに埋め込んでいます。</p>
-<p>ここでは <code clbottom="notranslate" translate="no">offscreencanvas-cubes.js</code> というファイルを作成し、<a href="responsive.html">レスポンシブデザインの例</a>から全てのJavaScriptをコピーして下さい。
+<p>ここでは <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> というファイルを作成し、<a href="responsive.html">レスポンシブデザインの例</a>から全てのJavaScriptをコピーして下さい。
 そして、Workerで実行するために必要な変更を行います。</p>
 <p>HTMLファイルにはJavaScriptのいくつかの処理が必要です。
-まず最初に行う必要があるのはキャンバスを検索し、<code clbottom="notranslate" translate="no">canvas.transferControlToOffscreen</code> 呼び出してキャンバスのコントロールをオフスクリーンに転送します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+まず最初に行う必要があるのはキャンバスを検索し、<code class="notranslate" translate="no">canvas.transferControlToOffscreen</code> 呼び出してキャンバスのコントロールをオフスクリーンに転送します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
   const offscreen = canvas.transferControlToOffscreen();
 
   ...
 </pre>
-<p><code clbottom="notranslate" translate="no">new Worker(pathToScript, {type: 'module'})</code>でWorkerを起動し、<code clbottom="notranslate" translate="no">offscreen</code> オブジェクトを渡します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+<p><code class="notranslate" translate="no">new Worker(pathToScript, {type: 'module'})</code>でWorkerを起動し、<code class="notranslate" translate="no">offscreen</code> オブジェクトを渡します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
   const offscreen = canvas.transferControlToOffscreen();
   const worker = new Worker('offscreencanvas-cubes.js', {type: 'module'});
@@ -52,24 +52,24 @@
 }
 main();
 </pre>
-<p>ここで重要なのはWorkerが <code clbottom="notranslate" translate="no">DOM</code> にアクセスできない事です。
+<p>ここで重要なのはWorkerが <code class="notranslate" translate="no">DOM</code> にアクセスできない事です。
 HTML要素の参照やマウスイベントやキーボードイベントを受け取る事もできません。
 Workerは、送られたメッセージに返信してWebページにメッセージを送り返す事だけです。</p>
-<p>Workerにメッセージを送信するには<a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage"><code clbottom="notranslate" translate="no">worker.postMessage</code></a>を呼び出し、1つまたは2つの引数を渡します。
+<p>Workerにメッセージを送信するには<a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage"><code class="notranslate" translate="no">worker.postMessage</code></a>を呼び出し、1つまたは2つの引数を渡します。
 1つ目の引数は<a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">クローン</a>されるJavaScriptオブジェクトでWorkerに送ります。
 2番目の引数は任意でWorkerに <em>転送</em> したい最初のオブジェクトです。
 このオブジェクトはクローンされません。
 その代わりに <em>転送</em> され、メインページには存在しなくなります。
 存在しなくなるというのはおそらく間違った説明であり、むしろ取り除かれます。
 クローンではなく、特定のタイプのオブジェクトのみを転送する事ができます。
-転送するオブジェクトには <code clbottom="notranslate" translate="no">OffscreenCanvas</code> が含まれているので、1度転送した <code clbottom="notranslate" translate="no">offscreen</code> オブジェクトをメインページに戻しても意味がありません。</p>
-<p>Workerは <code clbottom="notranslate" translate="no">onmessage</code> ハンドラからメッセージを受け取ります。
-<code clbottom="notranslate" translate="no">postMessage</code> に渡したオブジェクトはWorkerの <code clbottom="notranslate" translate="no">onmessage</code> ハンドラに渡され <code clbottom="notranslate" translate="no">event.data</code> を更新します。
-上記のコードではWorkerに渡すオブジェクトに <code clbottom="notranslate" translate="no">type: 'main'</code> を宣言しています。
+転送するオブジェクトには <code class="notranslate" translate="no">OffscreenCanvas</code> が含まれているので、1度転送した <code class="notranslate" translate="no">offscreen</code> オブジェクトをメインページに戻しても意味がありません。</p>
+<p>Workerは <code class="notranslate" translate="no">onmessage</code> ハンドラからメッセージを受け取ります。
+<code class="notranslate" translate="no">postMessage</code> に渡したオブジェクトはWorkerの <code class="notranslate" translate="no">onmessage</code> ハンドラに渡され <code class="notranslate" translate="no">event.data</code> を更新します。
+上記のコードではWorkerに渡すオブジェクトに <code class="notranslate" translate="no">type: 'main'</code> を宣言しています。
 このオブジェクトはブラウザには何の意味もありません。Workerで使うためだけのものです。
-<code clbottom="notranslate" translate="no">type</code> に基づいて、Worker内で別の関数を呼び出すハンドラを作成します。
+<code class="notranslate" translate="no">type</code> に基づいて、Worker内で別の関数を呼び出すハンドラを作成します。
 あとは必要に応じて関数を追加し、メインページから簡単に呼び出す事ができます。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const handlers = {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const handlers = {
   main,
 };
 
@@ -81,10 +81,10 @@ self.onmessage = function(e) {
   fn(e.data);
 };
 </pre>
-<p>上記コードのように <code clbottom="notranslate" translate="no">type</code> に基づいてハンドラを検索し、メインページから送られてきた <code clbottom="notranslate" translate="no">data</code> を渡します。
-あとは<a href="responsive.html">レスポンシブデザインの記事</a>から <code clbottom="notranslate" translate="no">offscreencanvas-cubes.js</code> に貼り付けた <code clbottom="notranslate" translate="no">main</code> を変更するだけです。</p>
+<p>上記コードのように <code class="notranslate" translate="no">type</code> に基づいてハンドラを検索し、メインページから送られてきた <code class="notranslate" translate="no">data</code> を渡します。
+あとは<a href="responsive.html">レスポンシブデザインの記事</a>から <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> に貼り付けた <code class="notranslate" translate="no">main</code> を変更するだけです。</p>
 <p>DOMからキャンバスを探すのではなく、イベントデータからキャンバスを受け取ります。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-function main() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function main() {
 -  const canvas = document.querySelector('#c');
 +function main(data) {
 +  const {canvas} = data;
@@ -92,10 +92,10 @@ self.onmessage = function(e) {
 
   ...
 </pre>
-<p>最初の問題はWorkerからDOMを参照できず、<code clbottom="notranslate" translate="no">resizeRendererToDisplaySize</code> が <code clbottom="notranslate" translate="no">canvas.clientWidth</code> と <code clbottom="notranslate" translate="no">canvas.clientHeight</code> を参照できない事です。
-<code clbottom="notranslate" translate="no">clientWidth</code> と <code clbottom="notranslate" translate="no">canvas.clientHeight</code> はDOMの値です。</p>
+<p>最初の問題はWorkerからDOMを参照できず、<code class="notranslate" translate="no">resizeRendererToDisplaySize</code> が <code class="notranslate" translate="no">canvas.clientWidth</code> と <code class="notranslate" translate="no">canvas.clientHeight</code> を参照できない事です。
+<code class="notranslate" translate="no">clientWidth</code> と <code class="notranslate" translate="no">canvas.clientHeight</code> はDOMの値です。</p>
 <p>元のコードは以下の通りです。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
   const canvas = renderer.domElement;
   const width = canvas.clientWidth;
   const height = canvas.clientHeight;
@@ -108,13 +108,13 @@ self.onmessage = function(e) {
 </pre>
 <p>DOMを参照できないため、変更したサイズの値をWorkerに送る必要があります。
 そこでグローバルな状態を追加し、幅と高さを維持するようにしましょう。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const state = {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const state = {
   width: 300,  // canvas default
   height: 150,  // canvas default
 };
 </pre>
-<p>これらの値を更新するための <code clbottom="notranslate" translate="no">'size'</code> ハンドラを追加してみます。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+function size(data) {
+<p>これらの値を更新するための <code class="notranslate" translate="no">'size'</code> ハンドラを追加してみます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function size(data) {
 +  state.width = data.width;
 +  state.height = data.height;
 +}
@@ -124,8 +124,8 @@ const handlers = {
 +  size,
 };
 </pre>
-<p>これで <code clbottom="notranslate" translate="no">resizeRendererToDisplaySize</code> を変更すると <code clbottom="notranslate" translate="no">state.width</code> と <code clbottom="notranslate" translate="no">state.height</code> が使えるようになりました。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
+<p>これで <code class="notranslate" translate="no">resizeRendererToDisplaySize</code> を変更すると <code class="notranslate" translate="no">state.width</code> と <code class="notranslate" translate="no">state.height</code> が使えるようになりました。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
   const canvas = renderer.domElement;
 -  const width = canvas.clientWidth;
 -  const height = canvas.clientHeight;
@@ -139,7 +139,7 @@ const handlers = {
 }
 </pre>
 <p>以下も同様の変更が必要です。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
 
   if (resizeRendererToDisplaySize(renderer)) {
@@ -150,8 +150,8 @@ const handlers = {
 
   ...
 </pre>
-<p>メインページに戻りページのリサイズの度に <code clbottom="notranslate" translate="no">size</code> イベントを送信します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const worker = new Worker('offscreencanvas-picking.js', {type: 'module'});
+<p>メインページに戻りページのリサイズの度に <code class="notranslate" translate="no">size</code> イベントを送信します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const worker = new Worker('offscreencanvas-picking.js', {type: 'module'});
 worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 
 +function sendSize() {
@@ -166,10 +166,10 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 +sendSize();
 </pre>
 <p>初期サイズを送るために1度sendSizeを呼んでいます。</p>
-<p>ブラウザが <code clbottom="notranslate" translate="no">OffscreenCanvas</code> を完全にサポートしていると仮定して、これらの変更を行うだけで動作するはずです。
-実行する前にブラウザが <code clbottom="notranslate" translate="no">OffscreenCanvas</code> を実際にサポートしているか確認し、サポートしていない場合はエラーを表示してみましょう。
+<p>ブラウザが <code class="notranslate" translate="no">OffscreenCanvas</code> を完全にサポートしていると仮定して、これらの変更を行うだけで動作するはずです。
+実行する前にブラウザが <code class="notranslate" translate="no">OffscreenCanvas</code> を実際にサポートしているか確認し、サポートしていない場合はエラーを表示してみましょう。
 まずはエラーを表示するためのHTMLを追加します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
 +  &lt;div id="noOffscreenCanvas" style="display:none;"&gt;
 +    &lt;div&gt;no OffscreenCanvas support&lt;/div&gt;
@@ -177,7 +177,7 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 &lt;/body&gt;
 </pre>
 <p>そして、CSSを追加します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">#noOffscreenCanvas {
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#noOffscreenCanvas {
     display: flex;
     width: 100vw;
     height: 100vh;
@@ -187,8 +187,8 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
     color: white;
 }
 </pre>
-<p>ブラウザが <code clbottom="notranslate" translate="no">OffscreenCanvas</code> をサポートしているか確認するためには <code clbottom="notranslate" translate="no">transferControlToOffscreen</code> を呼びます。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+<p>ブラウザが <code class="notranslate" translate="no">OffscreenCanvas</code> をサポートしているか確認するためには <code class="notranslate" translate="no">transferControlToOffscreen</code> を呼びます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
 +  if (!canvas.transferControlToOffscreen) {
 +    canvas.style.display = 'none';
@@ -201,15 +201,15 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 
   ...
 </pre>
-<p>ブラウザが <code clbottom="notranslate" translate="no">OffscreenCanvas</code> をサポートしていれば、このサンプルは動作するはずです。</p>
-<p></p><div translate="no" clbottom="threejs_example_container notranslate">
-  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas.html"></iframe></div>
-  <a clbottom="threejs_center" href="/manual/examples/offscreencanvas.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p>ブラウザが <code class="notranslate" translate="no">OffscreenCanvas</code> をサポートしていれば、このサンプルは動作するはずです。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
-<p>これは素晴らしい事ですが、今の所は全てのブラウザが <code clbottom="notranslate" translate="no">OffscreenCanvas</code> をサポートしている訳ではなく、
-<code clbottom="notranslate" translate="no">OffscreenCanvas</code> サポートありとサポートなしの両方で動作するコードに変更し、サポートなしの場合はメインページのキャンバスを通常のように表示します。</p>
+<p>これは素晴らしい事ですが、今の所は全てのブラウザが <code class="notranslate" translate="no">OffscreenCanvas</code> をサポートしている訳ではなく、
+<code class="notranslate" translate="no">OffscreenCanvas</code> サポートありとサポートなしの両方で動作するコードに変更し、サポートなしの場合はメインページのキャンバスを通常のように表示します。</p>
 <blockquote>
 <p>余談ですがページをレスポンシブにするためにOffscreenCanvasが必要な場合、フォールバックを持つ意味がよくわかりません。
 メインページで実行するかWorkerで実行するかには、Workerで実行している時にメインページで実行している時よりも多くの事ができるように
@@ -220,19 +220,19 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 つまり、3つのファイルを持つ事になります。</p>
 <ol>
 <li><p>htmlファイル</p>
-<p><code clbottom="notranslate" translate="no">threejs-offscreencanvas-w-fallback.html</code></p>
+<p><code class="notranslate" translate="no">threejs-offscreencanvas-w-fallback.html</code></p>
 </li>
 <li><p>three.jsを含むJavaScriptコード</p>
-<p><code clbottom="notranslate" translate="no">shared-cubes.js</code></p>
+<p><code class="notranslate" translate="no">shared-cubes.js</code></p>
 </li>
 <li><p>workerをサポートするコード</p>
-<p><code clbottom="notranslate" translate="no">offscreencanvas-worker-cubes.js</code></p>
+<p><code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code></p>
 </li>
 </ol>
-<p><code clbottom="notranslate" translate="no">shared-cubes.js</code> と <code clbottom="notranslate" translate="no">offscreencanvas-worker-cubes.js</code> は前の <code clbottom="notranslate" translate="no">offscreencanvas-cubes.js</code> ファイルを分割したものです。</p>
-<p>まず <code clbottom="notranslate" translate="no">offscreencanvas-cubes.js</code> を全て <code clbottom="notranslate" translate="no">shared-cube.js</code> にコピーします。
-次にHTMLファイルには既に <code clbottom="notranslate" translate="no">main</code> があり、<code clbottom="notranslate" translate="no">init</code> と <code clbottom="notranslate" translate="no">state</code> をエクスポートする必要があるため <code clbottom="notranslate" translate="no">main</code> の名前を <code clbottom="notranslate" translate="no">init</code> に変更します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+<p><code class="notranslate" translate="no">shared-cubes.js</code> と <code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code> は前の <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> ファイルを分割したものです。</p>
+<p>まず <code class="notranslate" translate="no">offscreencanvas-cubes.js</code> を全て <code class="notranslate" translate="no">shared-cube.js</code> にコピーします。
+次にHTMLファイルには既に <code class="notranslate" translate="no">main</code> があり、<code class="notranslate" translate="no">init</code> と <code class="notranslate" translate="no">state</code> をエクスポートする必要があるため <code class="notranslate" translate="no">main</code> の名前を <code class="notranslate" translate="no">init</code> に変更します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 
 -const state = {
 +export const state = {
@@ -246,7 +246,7 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
   const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 </pre>
 <p>そして、three.js関連以外の部分だけを切り取ります。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-function size(data) {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function size(data) {
 -  state.width = data.width;
 -  state.height = data.height;
 -}
@@ -264,8 +264,8 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 -  fn(e.data);
 -};
 </pre>
-<p>削除した部分を <code clbottom="notranslate" translate="no">offscreencanvas-worker-cubes.js</code> にコピーして <code clbottom="notranslate" translate="no">shared-cubes.js</code> をインポートし、<code clbottom="notranslate" translate="no">main</code> の代わりに <code clbottom="notranslate" translate="no">init</code> を呼び出します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import {init, state} from './shared-cubes.js';
+<p>削除した部分を <code class="notranslate" translate="no">offscreencanvas-worker-cubes.js</code> にコピーして <code class="notranslate" translate="no">shared-cubes.js</code> をインポートし、<code class="notranslate" translate="no">main</code> の代わりに <code class="notranslate" translate="no">init</code> を呼び出します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {init, state} from './shared-cubes.js';
 
 function size(data) {
   state.width = data.width;
@@ -286,12 +286,12 @@ self.onmessage = function(e) {
   fn(e.data);
 };
 </pre>
-<p>同様にメインページに <code clbottom="notranslate" translate="no">shared-cubes.js</code> を含める必要があります。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
+<p>同様にメインページに <code class="notranslate" translate="no">shared-cubes.js</code> を含める必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;script type="module"&gt;
 +import {init, state} from './shared-cubes.js';
 </pre>
 <p>前に追加したHTMLとCSSを削除します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
 -  &lt;div id="noOffscreenCanvas" style="display:none;"&gt;
 -    &lt;div&gt;no OffscreenCanvas support&lt;/div&gt;
@@ -299,7 +299,7 @@ self.onmessage = function(e) {
 &lt;/body&gt;
 </pre>
 <p>そして、CSSは以下のようになります。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">-#noOffscreenCanvas {
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">-#noOffscreenCanvas {
 -    display: flex;
 -    width: 100vw;
 -    height: 100vh;
@@ -309,8 +309,8 @@ self.onmessage = function(e) {
 -    color: white;
 -}
 </pre>
-<p>次にブラウザが <code clbottom="notranslate" translate="no">OffscreenCanvas</code> をサポートありなしに応じて、メインページのコードを変更して起動関数を呼び出すようにしてみましょう。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+<p>次にブラウザが <code class="notranslate" translate="no">OffscreenCanvas</code> をサポートありなしに応じて、メインページのコードを変更して起動関数を呼び出すようにしてみましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
 -  if (!canvas.transferControlToOffscreen) {
 -    canvas.style.display = 'none';
@@ -327,8 +327,8 @@ self.onmessage = function(e) {
 +  }
   ...
 </pre>
-<p>Workerのセットアップコードを全て <code clbottom="notranslate" translate="no">startWorker</code> の中に移動します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function startWorker(canvas) {
+<p>Workerのセットアップコードを全て <code class="notranslate" translate="no">startWorker</code> の中に移動します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startWorker(canvas) {
   const offscreen = canvas.transferControlToOffscreen();
   const worker = new Worker('offscreencanvas-worker-cubes.js', {type: 'module'});
   worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
@@ -347,12 +347,12 @@ self.onmessage = function(e) {
   console.log('using OffscreenCanvas');
 }
 </pre>
-<p>そして <code clbottom="notranslate" translate="no">main</code> の代わりに <code clbottom="notranslate" translate="no">init</code> を送信します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
+<p>そして <code class="notranslate" translate="no">main</code> の代わりに <code class="notranslate" translate="no">init</code> を送信します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 +  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
 </pre>
 <p>メインページで開始するには次のようにします。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
   init({canvas});
 
   function sendSize() {
@@ -366,17 +366,17 @@ self.onmessage = function(e) {
 }
 </pre>
 <p>このサンプルコードではOffscreenCanvasで実行、またはメインページで実行されるようにフォールバックしています。</p>
-<p></p><div translate="no" clbottom="threejs_example_container notranslate">
-  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-fallback.html"></iframe></div>
-  <a clbottom="threejs_center" href="/manual/examples/offscreencanvas-w-fallback.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-fallback.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas-w-fallback.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
 <p>比較的簡単でした。ピッキングしてみましょう。
-<a href="picking.html">ピッキングの記事</a>にある <code clbottom="notranslate" translate="no">RayCaster</code> の例からコードをいくつか取り出し、画面外でオフスクリーンが動作するようにします。</p>
-<p><code clbottom="notranslate" translate="no">shared-cube.js</code> を <code clbottom="notranslate" translate="no">shared-picking.js</code> にコピーし、ピッキング部分を追加してみましょう。
-この例では <code clbottom="notranslate" translate="no">PickHelper</code> をコピーします。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom PickHelper {
+<a href="picking.html">ピッキングの記事</a>にある <code class="notranslate" translate="no">RayCaster</code> の例からコードをいくつか取り出し、画面外でオフスクリーンが動作するようにします。</p>
+<p><code class="notranslate" translate="no">shared-cube.js</code> を <code class="notranslate" translate="no">shared-picking.js</code> にコピーし、ピッキング部分を追加してみましょう。
+この例では <code class="notranslate" translate="no">PickHelper</code> をコピーします。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
   constructor() {
     this.raycaster = new THREE.Raycaster();
     this.pickedObject = null;
@@ -407,8 +407,8 @@ self.onmessage = function(e) {
 const pickPosition = {x: 0, y: 0};
 const pickHelper = new PickHelper();
 </pre>
-<p>マウスの <code clbottom="notranslate" translate="no">pickPosition</code> を以下のように更新しました。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+<p>マウスの <code class="notranslate" translate="no">pickPosition</code> を以下のように更新しました。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
   const rect = canvas.getBoundingClientRect();
   return {
     x: (event.clientX - rect.left) * canvas.width  / rect.width,
@@ -424,8 +424,8 @@ function setPickPosition(event) {
 window.addEventListener('mousemove', setPickPosition);
 </pre>
 <p>Workerではマウスの位置を直接読み取れないので、サイズのコードと同じようにマウスの位置を指定してメッセージを送信してみましょう。
-サイズのコードと同様にマウスの位置を送信して <code clbottom="notranslate" translate="no">pickPosition</code> を更新します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function size(data) {
+サイズのコードと同様にマウスの位置を送信して <code class="notranslate" translate="no">pickPosition</code> を更新します。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function size(data) {
   state.width = data.width;
   state.height = data.height;
 }
@@ -450,7 +450,7 @@ self.onmessage = function(e) {
 };
 </pre>
 <p>メインページに戻ってマウスをWorkerやメインページに渡すコードを追加します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+let sendMouse;
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let sendMouse;
 
 function startWorker(canvas) {
   const offscreen = canvas.transferControlToOffscreen();
@@ -497,8 +497,8 @@ function startMainPage(canvas) {
   console.log('using regular canvas');  /* eslint-disable-line no-console */
 }
 </pre>
-<p>全てのマウス操作コードをメインページにコピーし、<code clbottom="notranslate" translate="no">sendMouse</code> を使用するようにマイナーチェンジを加えます。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function setPickPosition(event) {
+<p>全てのマウス操作コードをメインページにコピーし、<code class="notranslate" translate="no">sendMouse</code> を使用するようにマイナーチェンジを加えます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function setPickPosition(event) {
   const pos = getCanvasRelativePosition(event);
 -  pickPosition.x = (pos.x / canvas.clientWidth ) *  2 - 1;
 -  pickPosition.y = (pos.y / canvas.clientHeight) * -2 + 1;  // note we flip Y
@@ -524,7 +524,7 @@ window.addEventListener('touchstart', (event) =&gt; {
   // prevent the window from scrolling
   event.preventDefault();
   setPickPosition(event.touches[0]);
-}, {pbottomive: false});
+}, {passive: false});
 
 window.addEventListener('touchmove', (event) =&gt; {
   setPickPosition(event.touches[0]);
@@ -532,19 +532,19 @@ window.addEventListener('touchmove', (event) =&gt; {
 
 window.addEventListener('touchend', clearPickPosition);
 </pre>
-<p>これでこのピッキングは <code clbottom="notranslate" translate="no">OffscreenCanvas</code> で動作するはずです。</p>
-<p></p><div translate="no" clbottom="threejs_example_container notranslate">
-  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-picking.html"></iframe></div>
-  <a clbottom="threejs_center" href="/manual/examples/offscreencanvas-w-picking.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p>これでこのピッキングは <code class="notranslate" translate="no">OffscreenCanvas</code> で動作するはずです。</p>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-picking.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas-w-picking.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
-<p>もう1歩踏み込んで <a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate" translate="no">OrbitControls</code></a> を追加してみましょう。
+<p>もう1歩踏み込んで <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を追加してみましょう。
 これはもう少し複雑です。
-<a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate" translate="no">OrbitControls</code></a> はマウス、タッチイベント、キーボードなどDOMをかなり広範囲にチェックしています。</p>
-<p>これまでのコードとは異なり、グローバルな <code clbottom="notranslate" translate="no">state</code> オブジェクトを使う事はできません。
+<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> はマウス、タッチイベント、キーボードなどDOMをかなり広範囲にチェックしています。</p>
+<p>これまでのコードとは異なり、グローバルな <code class="notranslate" translate="no">state</code> オブジェクトを使う事はできません。
 これを使用して動作するようにOrbitControlsのコードを全て書き換える必要はありません。
-OrbitControlsは <code clbottom="notranslate" translate="no">HTMLElement</code> を取り、それに使用するDOMイベントのほとんどをアタッチします。
+OrbitControlsは <code class="notranslate" translate="no">HTMLElement</code> を取り、それに使用するDOMイベントのほとんどをアタッチします。
 OrbitControlsが必要とする機能をサポートする必要があります。</p>
 <p><a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js">OrbitControlsのソースコード</a>を掘り下げてみると、次のイベントを処理する必要があるように見えます。</p>
 <ul>
@@ -558,17 +558,17 @@ OrbitControlsが必要とする機能をサポートする必要があります�
 <li>wheel</li>
 <li>keydown</li>
 </ul>
-<p>マウスイベントには <code clbottom="notranslate" translate="no">ctrlKey</code>、 <code clbottom="notranslate" translate="no">metaKey</code>、 <code clbottom="notranslate" translate="no">shiftKey</code>、 <code clbottom="notranslate" translate="no">button</code>、 <code clbottom="notranslate" translate="no">pointerType</code>、 <code clbottom="notranslate" translate="no">clientX</code>、 <code clbottom="notranslate" translate="no">clientY</code>、 <code clbottom="notranslate" translate="no">pageX</code>、 <code clbottom="notranslate" translate="no">pageY</code> プロパティが必要です。</p>
-<p>キーダウンイベントには <code clbottom="notranslate" translate="no">ctrlKey</code>, <code clbottom="notranslate" translate="no">metaKey</code>, <code clbottom="notranslate" translate="no">shiftKey</code>, <code clbottom="notranslate" translate="no">keyCode</code> プロパティが必要です。</p>
-<p>ホイールイベントに必要なのは <code clbottom="notranslate" translate="no">deltaY</code> プロパティだけです。</p>
-<p>また、タッチイベントに必要なのは <code clbottom="notranslate" translate="no">touches</code> プロパティの <code clbottom="notranslate" translate="no">pageX</code> と <code clbottom="notranslate" translate="no">pageY</code> だけです。</p>
+<p>マウスイベントには <code class="notranslate" translate="no">ctrlKey</code>、 <code class="notranslate" translate="no">metaKey</code>、 <code class="notranslate" translate="no">shiftKey</code>、 <code class="notranslate" translate="no">behindon</code>、 <code class="notranslate" translate="no">pointerType</code>、 <code class="notranslate" translate="no">clientX</code>、 <code class="notranslate" translate="no">clientY</code>、 <code class="notranslate" translate="no">pageX</code>、 <code class="notranslate" translate="no">pageY</code> プロパティが必要です。</p>
+<p>キーダウンイベントには <code class="notranslate" translate="no">ctrlKey</code>, <code class="notranslate" translate="no">metaKey</code>, <code class="notranslate" translate="no">shiftKey</code>, <code class="notranslate" translate="no">keyCode</code> プロパティが必要です。</p>
+<p>ホイールイベントに必要なのは <code class="notranslate" translate="no">deltaY</code> プロパティだけです。</p>
+<p>また、タッチイベントに必要なのは <code class="notranslate" translate="no">touches</code> プロパティの <code class="notranslate" translate="no">pageX</code> と <code class="notranslate" translate="no">pageY</code> だけです。</p>
 <p>そこでproxyオブジェクトのペアを作ってみましょう。
 ある時はメインページで実行され、全てのイベント、関連するプロパティ値をWorkerに渡します。
 また、ある時はWorkerで実行され、全てのイベント、DOMイベントと同じ構造をもつイベントをメインページに渡すので、OrbitControlsは違いを見分けられません。</p>
 <p>ここにWorker部分のコードがあります。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import {EventDispatcher} from 'three';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import {EventDispatcher} from 'three';
 
-clbottom ElementProxyReceiver extends EventDispatcher {
+class ElementProxyReceiver extends EventDispatcher {
   constructor() {
     super();
   }
@@ -578,11 +578,11 @@ clbottom ElementProxyReceiver extends EventDispatcher {
 }
 </pre>
 <p>メッセージを受信した場合にdataを送信するだけです。
-これは <a href="/docs/#api/ja/core/EventDispatcher"><code clbottom="notranslate" translate="no">EventDispatcher</code></a> を継承しており、DOM要素のように <code clbottom="notranslate" translate="no">addEventListener</code> や <code clbottom="notranslate" translate="no">removeEventListener</code> のようなメソッドを提供しているので、OrbitControlsに渡せば動作するはずです。</p>
-<p><code clbottom="notranslate" translate="no">ElementProxyReceiver</code> は1つの要素を扱います。
+これは <a href="/docs/#api/ja/core/EventDispatcher"><code class="notranslate" translate="no">EventDispatcher</code></a> を継承しており、DOM要素のように <code class="notranslate" translate="no">addEventListener</code> や <code class="notranslate" translate="no">removeEventListener</code> のようなメソッドを提供しているので、OrbitControlsに渡せば動作するはずです。</p>
+<p><code class="notranslate" translate="no">ElementProxyReceiver</code> は1つの要素を扱います。
 私たちの場合は1つの頭しか必要ありませんが、頭で考えるのがベストです。
 つまり、マネージャーを作って複数のElementProxyReceiverを管理するようにしましょう。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom ProxyManager {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ProxyManager {
   constructor() {
     this.targets = {};
     this.handleEvent = this.handleEvent.bind(this);
@@ -600,9 +600,9 @@ clbottom ElementProxyReceiver extends EventDispatcher {
   }
 }
 </pre>
-<p><code clbottom="notranslate" translate="no">ProxyManager</code>のインスタンスを作成し <code clbottom="notranslate" translate="no">makeProxy</code> メソッドにidを指定して呼び出す事で、そのidを持つメッセージに応答する <code clbottom="notranslate" translate="no">ElementProxyReceiver</code> を作成できます。</p>
+<p><code class="notranslate" translate="no">ProxyManager</code>のインスタンスを作成し <code class="notranslate" translate="no">makeProxy</code> メソッドにidを指定して呼び出す事で、そのidを持つメッセージに応答する <code class="notranslate" translate="no">ElementProxyReceiver</code> を作成できます。</p>
 <p>Workerのメッセージハンドラに接続してみましょう。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const proxyManager = new ProxyManager();
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const proxyManager = new ProxyManager();
 
 function start(data) {
   const proxy = proxyManager.getProxy(data.canvasId);
@@ -635,8 +635,8 @@ self.onmessage = function(e) {
   fn(e.data);
 };
 </pre>
-<p>共有のthree.jsコードでは <a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate" translate="no">OrbitControls</code></a> をインポートして設定する必要があります。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+<p>共有のthree.jsコードでは <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> をインポートして設定する必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 +import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 
 export function init(data) {
@@ -649,9 +649,9 @@ export function init(data) {
 +  controls.update();
 </pre>
 <p>OffscreenCanvas以外のサンプルコード例のようにキャンバスを渡すのではなく、
-<code clbottom="notranslate" translate="no">inputElement</code> を介してOrbitControlsをProxyに渡している事に注目して下さい。</p>
-<p>次に <code clbottom="notranslate" translate="no">canvas</code> を <code clbottom="notranslate" translate="no">inputElement</code> に変更し、HTMLファイルから全てのピッキングイベントのコードを共有のthree.jsコードに移動させます。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+<code class="notranslate" translate="no">inputElement</code> を介してOrbitControlsをProxyに渡している事に注目して下さい。</p>
+<p>次に <code class="notranslate" translate="no">canvas</code> を <code class="notranslate" translate="no">inputElement</code> に変更し、HTMLファイルから全てのピッキングイベントのコードを共有のthree.jsコードに移動させます。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
 -  const rect = canvas.getBoundingClientRect();
 +  const rect = inputElement.getBoundingClientRect();
   return {
@@ -687,7 +687,7 @@ function clearPickPosition() {
   // prevent the window from scrolling
   event.preventDefault();
   setPickPosition(event.touches[0]);
-}, {pbottomive: false});
+}, {passive: false});
 
 *inputElement.addEventListener('touchmove', (event) =&gt; {
   setPickPosition(event.touches[0]);
@@ -696,8 +696,8 @@ function clearPickPosition() {
 *inputElement.addEventListener('touchend', clearPickPosition);
 </pre>
 <p>メインページに戻り、上記で列挙した全てのイベントにメッセージを送信するコードが必要です。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">let nextProxyId = 0;
-clbottom ElementProxy {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let nextProxyId = 0;
+class ElementProxy {
   constructor(element, worker, eventHandlers) {
     this.id = nextProxyId++;
     this.worker = worker;
@@ -722,13 +722,13 @@ clbottom ElementProxy {
   }
 }
 </pre>
-<p><code clbottom="notranslate" translate="no">ElementProxy</code> はProxyしたいイベントの要素を受け取ります。
-次にWorkerにidを登録し、先ほど設定した <code clbottom="notranslate" translate="no">makeProxy</code> メッセージを使って送信します。
-Workerは <code clbottom="notranslate" translate="no">ElementProxyReceiver</code> を作成しそのidに登録します。</p>
+<p><code class="notranslate" translate="no">ElementProxy</code> はProxyしたいイベントの要素を受け取ります。
+次にWorkerにidを登録し、先ほど設定した <code class="notranslate" translate="no">makeProxy</code> メッセージを使って送信します。
+Workerは <code class="notranslate" translate="no">ElementProxyReceiver</code> を作成しそのidに登録します。</p>
 <p>そして登録するイベントハンドラのオブジェクトを用意します。
 このようにして、Workerに転送したいイベントにハンドラを渡す事ができます。</p>
 <p>Workerを起動する時はまずProxyを作成しイベントハンドラを渡します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function startWorker(canvas) {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startWorker(canvas) {
   const offscreen = canvas.transferControlToOffscreen();
   const worker = new Worker('offscreencanvas-worker-orbitcontrols.js', {type: 'module'});
 
@@ -757,13 +757,13 @@ Workerは <code clbottom="notranslate" translate="no">ElementProxyReceiver</code
 </pre>
 <p>以下はイベントハンドラです。
 受信したイベントからプロパティのリストをコピーするだけです。
-<code clbottom="notranslate" translate="no">sendEvent</code> 関数に渡され作成したデータを渡します。
+<code class="notranslate" translate="no">sendEvent</code> 関数に渡され作成したデータを渡します。
 この関数は正しいidを追加してWorkerに送信します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const mouseEventHandler = makeSendPropertiesHandler([
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mouseEventHandler = makeSendPropertiesHandler([
   'ctrlKey',
   'metaKey',
   'shiftKey',
-  'button',
+  'behindon',
   'pointerType',
   'clientX',
   'clientY',
@@ -832,9 +832,9 @@ function filteredKeydownEventHandler(event, sendFn) {
   }
 }
 </pre>
-<p>これで動くと思われるが、実際に試してみると <a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate" translate="no">OrbitControls</code></a> がもう少し必要なものがあると分かります。</p>
-<p>1つは <code clbottom="notranslate" translate="no">element.focus</code> です。Workerには必要ないのでStubを追加しておきましょう。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom ElementProxyReceiver extends THREE.EventDispatcher {
+<p>これで動くと思われるが、実際に試してみると <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> がもう少し必要なものがあると分かります。</p>
+<p>1つは <code class="notranslate" translate="no">element.focus</code> です。Workerには必要ないのでStubを追加しておきましょう。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxyReceiver extends THREE.EventDispatcher {
   constructor() {
     super();
   }
@@ -846,12 +846,12 @@ function filteredKeydownEventHandler(event, sendFn) {
 +  }
 }
 </pre>
-<p>もう1つは <code clbottom="notranslate" translate="no">event.preventDefault</code> と <code clbottom="notranslate" translate="no">event.stopPropagation</code> を呼び出す事です。
+<p>もう1つは <code class="notranslate" translate="no">event.preventDefault</code> と <code class="notranslate" translate="no">event.stopPropagation</code> を呼び出す事です。
 メインページでは既に対応してるのでそれらも不要になります。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+function noop() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function noop() {
 +}
 
-clbottom ElementProxyReceiver extends THREE.EventDispatcher {
+class ElementProxyReceiver extends THREE.EventDispatcher {
   constructor() {
     super();
   }
@@ -865,10 +865,10 @@ clbottom ElementProxyReceiver extends THREE.EventDispatcher {
   }
 }
 </pre>
-<p>もう1つは <code clbottom="notranslate" translate="no">clientWidth</code> と <code clbottom="notranslate" translate="no">clientHeight</code> を見る事です。
+<p>もう1つは <code class="notranslate" translate="no">clientWidth</code> と <code class="notranslate" translate="no">clientHeight</code> を見る事です。
 以前はサイズを渡してましたが、Proxyペアを更新してそれも渡すようにします。</p>
 <p>Workerの中では</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom ElementProxyReceiver extends THREE.EventDispatcher {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxyReceiver extends THREE.EventDispatcher {
   constructor() {
     super();
   }
@@ -907,8 +907,8 @@ clbottom ElementProxyReceiver extends THREE.EventDispatcher {
 </pre>
 <p>メインページに戻るにはサイズと左と上の位置も送信する必要があります。
 このままではキャンバスを移動しても処理されず、サイズを変更しても処理されないです。
-移動を処理したい場合は何かがキャンバスを移動する度に <code clbottom="notranslate" translate="no">sendSize</code> を呼び出す必要があります。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom ElementProxy {
+移動を処理したい場合は何かがキャンバスを移動する度に <code class="notranslate" translate="no">sendSize</code> を呼び出す必要があります。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class ElementProxy {
   constructor(element, worker, eventHandlers) {
     this.id = nextProxyId++;
     this.worker = worker;
@@ -947,8 +947,8 @@ clbottom ElementProxyReceiver extends THREE.EventDispatcher {
   }
 }
 </pre>
-<p>そして共有のthree.jsコードでは <code clbottom="notranslate" translate="no">state</code> は不要になりました。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-export const state = {
+<p>そして共有のthree.jsコードでは <code class="notranslate" translate="no">state</code> は不要になりました。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-export const state = {
 -  width: 300,   // canvas default
 -  height: 150,  // canvas default
 -};
@@ -980,11 +980,11 @@ function render(time) {
   ...
 </pre>
 <p>他にもいくつかのハックがあります。
-OrbitControlsは <code clbottom="notranslate" translate="no">pointermove</code> と <code clbottom="notranslate" translate="no">pointerup</code> イベントをマウスキャプチャ（マウスがウィンドウの外に出た時）を処理するための要素の <code clbottom="notranslate" translate="no">ownerDocument</code> です。</p>
-<p>さらにコードはグローバルな <code clbottom="notranslate" translate="no">document</code> を参照していますが、Workerにはグローバルなdocumentはありません。</p>
+OrbitControlsは <code class="notranslate" translate="no">pointermove</code> と <code class="notranslate" translate="no">pointerup</code> イベントをマウスキャプチャ（マウスがウィンドウの外に出た時）を処理するための要素の <code class="notranslate" translate="no">ownerDocument</code> です。</p>
+<p>さらにコードはグローバルな <code class="notranslate" translate="no">document</code> を参照していますが、Workerにはグローバルなdocumentはありません。</p>
 <p>これは2つの簡単なハックで全て解決できます。
 Workerコードでは両方の問題に対してProxyを再利用します。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function start(data) {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function start(data) {
   const proxy = proxyManager.getProxy(data.canvasId);
 +  proxy.ownerDocument = proxy; // HACK!
 +  self.document = {} // HACK!
@@ -994,23 +994,23 @@ Workerコードでは両方の問題に対してProxyを再利用します。</p
   });
 }
 </pre>
-<p>これで <a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate" translate="no">OrbitControls</code></a> が期待に沿った検査を行うための機能を提供します。</p>
+<p>これで <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> が期待に沿った検査を行うための機能を提供します。</p>
 <p>難しいのは分かっていますが手短に言うと:</p>
-<p><code clbottom="notranslate" translate="no">ElementProxy</code> はメインページ上で動作し、DOMイベントを転送します。
-Worker内の <code clbottom="notranslate" translate="no">ElementProxyReceiver</code> は一緒に使うことができる <code clbottom="notranslate" translate="no">HTMLElement</code> を装っています。
-<a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate" translate="no">OrbitControls</code></a> と独自のコードを使用しています。</p>
+<p><code class="notranslate" translate="no">ElementProxy</code> はメインページ上で動作し、DOMイベントを転送します。
+Worker内の <code class="notranslate" translate="no">ElementProxyReceiver</code> は一緒に使うことができる <code class="notranslate" translate="no">HTMLElement</code> を装っています。
+<a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> と独自のコードを使用しています。</p>
 <p>最後にOffscreenCanvasを使用していない時のフォールバックです。
-必要なのはcanvas自体を <code clbottom="notranslate" translate="no">inputElement</code> として渡す事です。</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
+必要なのはcanvas自体を <code class="notranslate" translate="no">inputElement</code> として渡す事です。</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function startMainPage(canvas) {
 -  init({canvas});
 +  init({canvas, inputElement: canvas});
   console.log('using regular canvas');
 }
 </pre>
 <p>これでOrbitControlsがOffscreenCanvasで動作するようになりました。</p>
-<p></p><div translate="no" clbottom="threejs_example_container notranslate">
-  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-orbitcontrols.html"></iframe></div>
-  <a clbottom="threejs_center" href="/manual/examples/offscreencanvas-w-orbitcontrols.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas-w-orbitcontrols.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas-w-orbitcontrols.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
