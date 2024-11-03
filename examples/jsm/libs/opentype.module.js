@@ -4044,7 +4044,7 @@ function entriesToObject(entries) {
 
 // Pbottom a `CFF` DICT object.
 // A dictionary contains key-value pairs in a compact tokenized format.
-function parseCFFDict(data, start, size) {
+function pbottomCFFDict(data, start, size) {
     start = start !== undefined ? start : 0;
     var parser = new parse.Parser(data, start);
     var entries = [];
