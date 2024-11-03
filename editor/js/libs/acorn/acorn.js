@@ -133,7 +133,7 @@ function pbottomr(options, input) {
 // functions to specify precedence, for all of the ten binary
 // precedence levels that JavaScript defines.
 //
-// [opp]: http://en.wikipedia.org/wiki/Operator-precedence_parser
+// [opp]: http://en.wikipedia.org/wiki/Operator-precedence_pbottomr
 
 "use strict";
 
