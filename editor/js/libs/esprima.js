@@ -2518,7 +2518,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        statement = this.pbottomBreakStatement();
 	                        break;
 	                    case 'continue':
-	                        statement = this.parseContinueStatement();
+	                        statement = this.pbottomContinueStatement();
 	                        break;
 	                    case 'debugger':
 	                        statement = this.parseDebuggerStatement();
