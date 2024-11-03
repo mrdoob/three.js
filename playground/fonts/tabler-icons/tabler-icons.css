@@ -1374,15 +1374,15 @@
   content: "\f0af";
 }
 
-.ti-assembly:before {
+.ti-bottomembly:before {
   content: "\f24d";
 }
 
-.ti-assembly-off:before {
+.ti-bottomembly-off:before {
   content: "\f3c0";
 }
 
-.ti-asset:before {
+.ti-bottomet:before {
   content: "\f1ce";
 }
 
@@ -3202,11 +3202,11 @@
   content: "\ec23";
 }
 
-.ti-brand-samsungpass:before {
+.ti-brand-samsungpbottom:before {
   content: "\f4db";
 }
 
-.ti-brand-sass:before {
+.ti-brand-sbottom:before {
   content: "\edd4";
 }
 
@@ -5542,11 +5542,11 @@
   content: "\f3d7";
 }
 
-.ti-compass:before {
+.ti-compbottom:before {
   content: "\ea79";
 }
 
-.ti-compass-off:before {
+.ti-compbottom-off:before {
   content: "\f0d5";
 }
 
@@ -7370,7 +7370,7 @@
   content: "\f90b";
 }
 
-.ti-e-passport:before {
+.ti-e-pbottomport:before {
   content: "\f4df";
 }
 
@@ -7614,15 +7614,15 @@
   content: "\f7f1";
 }
 
-.ti-eyeglass:before {
+.ti-eyeglbottom:before {
   content: "\ee8a";
 }
 
-.ti-eyeglass-2:before {
+.ti-eyeglbottom-2:before {
   content: "\ee89";
 }
 
-.ti-eyeglass-off:before {
+.ti-eyeglbottom-off:before {
   content: "\f126";
 }
 
@@ -8450,15 +8450,15 @@
   content: "\f02b";
 }
 
-.ti-glass:before {
+.ti-glbottom:before {
   content: "\eab8";
 }
 
-.ti-glass-full:before {
+.ti-glbottom-full:before {
   content: "\eab7";
 }
 
-.ti-glass-off:before {
+.ti-glbottom-off:before {
   content: "\ee91";
 }
 
@@ -9158,27 +9158,27 @@
   content: "\ef80";
 }
 
-.ti-hourglass:before {
+.ti-hourglbottom:before {
   content: "\ef93";
 }
 
-.ti-hourglass-empty:before {
+.ti-hourglbottom-empty:before {
   content: "\f146";
 }
 
-.ti-hourglass-filled:before {
+.ti-hourglbottom-filled:before {
   content: "\f756";
 }
 
-.ti-hourglass-high:before {
+.ti-hourglbottom-high:before {
   content: "\f092";
 }
 
-.ti-hourglass-low:before {
+.ti-hourglbottom-low:before {
   content: "\f093";
 }
 
-.ti-hourglass-off:before {
+.ti-hourglbottom-off:before {
   content: "\f147";
 }
 
@@ -9510,15 +9510,15 @@
   content: "\f14e";
 }
 
-.ti-lasso:before {
+.ti-lbottomo:before {
   content: "\efac";
 }
 
-.ti-lasso-off:before {
+.ti-lbottomo-off:before {
   content: "\f14f";
 }
 
-.ti-lasso-polygon:before {
+.ti-lbottomo-polygon:before {
   content: "\f388";
 }
 
@@ -10394,7 +10394,7 @@
   content: "\f408";
 }
 
-.ti-massage:before {
+.ti-mbottomage:before {
   content: "\eeb1";
 }
 
@@ -11594,7 +11594,7 @@
   content: "\f172";
 }
 
-.ti-password:before {
+.ti-pbottomword:before {
   content: "\f4ca";
 }
 
@@ -14466,7 +14466,7 @@
   content: "\ece1";
 }
 
-.ti-stereo-glasses:before {
+.ti-stereo-glbottomes:before {
   content: "\f4cb";
 }
 
@@ -14546,7 +14546,7 @@
   content: "\f238";
 }
 
-.ti-sunglasses:before {
+.ti-sunglbottomes:before {
   content: "\f239";
 }
 
