@@ -2442,7 +2442,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.throwUnexpectedToken(this.lookahead);
 	        }
 	        var params = [];
-	        var param = this.parsePattern(params);
+	        var param = this.pbottomPattern(params);
 	        var paramMap = {};
 	        for (var i = 0; i < params.length; i++) {
 	            var key = '$' + params[i].value;
