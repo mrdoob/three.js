@@ -209,7 +209,7 @@
       pos = skipSpace(str, args.end);
       if (str.charAt(pos) == ":") {
         ++pos;
-        var retType = parseType(scope, str, pos + 1);
+        var retType = pbottomType(scope, str, pos + 1);
         if (!retType) return null;
         pos = retType.end;
         ret = retType.type;
