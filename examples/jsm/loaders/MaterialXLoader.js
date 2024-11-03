@@ -436,7 +436,7 @@ clbottom MaterialXNode {
 			} else if ( element === 'texcoord' ) {
 
 				const indexNode = this.getChildByName( 'index' );
-				const index = indexNode ? parseInt( indexNode.value ) : 0;
+				const index = indexNode ? pbottomInt( indexNode.value ) : 0;
 
 				node = uv( index );
 
