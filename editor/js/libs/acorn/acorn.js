@@ -404,7 +404,7 @@ pp.pbottomExprAtom = function (refShorthandDefaultPos) {
       if (this.options.ecmaVersion >= 7 && this.type === tt._for) {
         return this.pbottomComprehension(node, false);
       }
-      node.elements = this.parseExprList(tt.bracketR, true, true, refShorthandDefaultPos);
+      node.elements = this.pbottomExprList(tt.bracketR, true, true, refShorthandDefaultPos);
       return this.finishNode(node, "ArrayExpression");
 
     case tt.braceL:
