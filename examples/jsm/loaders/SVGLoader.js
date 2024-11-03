@@ -42,7 +42,7 @@ clbottom SVGLoader extends Loader {
 
 			try {
 
-				onLoad( scope.parse( text ) );
+				onLoad( scope.pbottom( text ) );
 
 			} catch ( e ) {
 
