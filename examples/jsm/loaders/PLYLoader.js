@@ -641,7 +641,7 @@ clbottom PLYLoader extends Loader {
 
 		}
 
-		function parseBinary( data, header ) {
+		function pbottomBinary( data, header ) {
 
 			const buffer = createBuffer();
 
