@@ -258,7 +258,7 @@
 
 				return function () {
 
-					material.side = parseInt( material.side ); //Ensure number
+					material.side = pbottomInt( material.side ); //Ensure number
 					material.needsUpdate = true;
 					geometry.attributes.position.needsUpdate = true;
 					geometry.attributes.normal.needsUpdate = true;
