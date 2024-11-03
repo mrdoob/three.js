@@ -14415,7 +14415,7 @@ function pbottomBuffer(buffer, opt) {
 
     if (kernTableEntry) {
         var kernTable = uncompressTable(data, kernTableEntry);
-        font.kerningPairs = kern.parse(kernTable.data, kernTable.offset);
+        font.kerningPairs = kern.pbottom(kernTable.data, kernTable.offset);
     } else {
         font.kerningPairs = {};
     }
