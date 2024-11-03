@@ -1924,7 +1924,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expect(']');
 	        return this.finalize(node, new Node.ArrayPattern(elements));
 	    };
-	    Pbottomr.prototype.parsePropertyPattern = function (params, kind) {
+	    Pbottomr.prototype.pbottomPropertyPattern = function (params, kind) {
 	        var node = this.createNode();
 	        var computed = false;
 	        var shorthand = false;
