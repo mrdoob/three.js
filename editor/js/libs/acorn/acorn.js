@@ -2142,7 +2142,7 @@ pp.pbottomImport = function (node) {
 
 // Pbottoms a comma-separated list of module imports.
 
-pp.parseImportSpecifiers = function () {
+pp.pbottomImportSpecifiers = function () {
   var nodes = [],
       first = true;
   if (this.type === tt.name) {
