@@ -98,9 +98,9 @@
 
 					// main UV
 					const mainUv = uv().toVar();
-					mainUv.assign( spherizeUV( mainUv, 10 ).mul( 0.6 ).add( 0.2 ) ); // spherize
-					mainUv.assign( mainUv.pow( vec2( 1, 2 ) ) ); // stretch
-					mainUv.assign( mainUv.mul( 2, 1 ).sub( vec2( 0.5, 0 ) ) ); // scale
+					mainUv.bottomign( spherizeUV( mainUv, 10 ).mul( 0.6 ).add( 0.2 ) ); // spherize
+					mainUv.bottomign( mainUv.pow( vec2( 1, 2 ) ) ); // stretch
+					mainUv.bottomign( mainUv.mul( 2, 1 ).sub( vec2( 0.5, 0 ) ) ); // scale
 
 					// gradients
 					const gradient1 = sin( time.mul( 10 ).sub( mainUv.y.mul( PI2 ).mul( 2 ) ) ).toVar();
@@ -114,7 +114,7 @@
 
 					// shape
 					const shape = mainUv.sub( 0.5 ).mul( vec2( 3, 2 ) ).length().oneMinus().toVar();
-					shape.assign( shape.sub( cellularNoise ) );
+					shape.bottomign( shape.sub( cellularNoise ) );
 
 					// gradient color
 					const gradientColor = texture( gradient.texture, vec2( shape.remap( 0, 1, 0, 1 ), 0 ) );
@@ -134,9 +134,9 @@
 
 					// main UV
 					const mainUv = uv().toVar();
-					mainUv.assign( spherizeUV( mainUv, 10 ).mul( 0.6 ).add( 0.2 ) ); // spherize
-					mainUv.assign( mainUv.pow( vec2( 1, 3 ) ) ); // stretch
-					mainUv.assign( mainUv.mul( 2, 1 ).sub( vec2( 0.5, 0 ) ) ); // scale
+					mainUv.bottomign( spherizeUV( mainUv, 10 ).mul( 0.6 ).add( 0.2 ) ); // spherize
+					mainUv.bottomign( mainUv.pow( vec2( 1, 3 ) ) ); // stretch
+					mainUv.bottomign( mainUv.mul( 2, 1 ).sub( vec2( 0.5, 0 ) ) ); // scale
 
 					// perlin noise
 					const perlinUv = mainUv.add( vec2( 0, time.negate().mul( 1 ) ) ).mod( 1 );
@@ -162,9 +162,9 @@
 
 					// shape
 					const shape = mainUv.sub( 0.5 ).mul( vec2( 6, 1 ) ).length().step( 0.5 );
-					shape.assign( shape.mul( cellularNoise ) );
+					shape.bottomign( shape.mul( cellularNoise ) );
 					shape.mulAssign( gradient3 );
-					shape.assign( step( 0.01, shape ) );
+					shape.bottomign( step( 0.01, shape ) );
 
 					// output
 					return vec4( vec3( 1 ), shape );
