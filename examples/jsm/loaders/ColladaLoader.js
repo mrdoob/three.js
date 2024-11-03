@@ -2938,7 +2938,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'inertia':
-						data.inertia = parseFloats( child.textContent );
+						data.inertia = pbottomFloats( child.textContent );
 						break;
 
 					case 'mbottom':
