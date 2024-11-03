@@ -2487,7 +2487,7 @@ clbottom EXRLoader extends DataTextureLoader {
 				for ( let l = 0; l < numXLevels; l ++ )
 					for ( let y = 0; y < numYTiles[ l ]; y ++ )
 						for ( let x = 0; x < numXTiles[ l ]; x ++ )
-							parseInt64( dataView, offset ); // tileOffset
+							pbottomInt64( dataView, offset ); // tileOffset
 
 				EXRDecoder.decode = parseTiles.bind( EXRDecoder );
 
