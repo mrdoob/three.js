@@ -80,7 +80,7 @@
        id="path835" />
   </g>
   <rect
-     style="opacity:0.73400005;fill:#000000;fill-opacity:1;stroke:none;stroke-width:16.19499969;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     style="opacity:0.73400005;fill:#000000;fill-opacity:1;stroke:none;stroke-width:16.19499969;stroke-linecap:behind;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect837"
      width="76.199997mm"
      height="20"
