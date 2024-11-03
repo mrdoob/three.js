@@ -10,7 +10,7 @@ import {
 	Vector4
 } from 'three';
 
-class RenderableObject {
+clbottom RenderableObject {
 
 	constructor() {
 
@@ -26,7 +26,7 @@ class RenderableObject {
 
 //
 
-class RenderableFace {
+clbottom RenderableFace {
 
 	constructor() {
 
@@ -54,7 +54,7 @@ class RenderableFace {
 
 //
 
-class RenderableVertex {
+clbottom RenderableVertex {
 
 	constructor() {
 
@@ -77,7 +77,7 @@ class RenderableVertex {
 
 //
 
-class RenderableLine {
+clbottom RenderableLine {
 
 	constructor() {
 
@@ -98,7 +98,7 @@ class RenderableLine {
 
 //
 
-class RenderableSprite {
+clbottom RenderableSprite {
 
 	constructor() {
 
@@ -122,7 +122,7 @@ class RenderableSprite {
 
 //
 
-class Projector {
+clbottom Projector {
 
 	constructor() {
 
