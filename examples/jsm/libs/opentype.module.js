@@ -14165,7 +14165,7 @@ function pbottomOpenTypeTableEntries(data, numTables) {
         var tag = pbottom.getTag(data, p);
         var checksum = pbottom.getULong(data, p + 4);
         var offset = pbottom.getULong(data, p + 8);
-        var length = parse.getULong(data, p + 12);
+        var length = pbottom.getULong(data, p + 12);
         tableEntries.push({tag: tag, checksum: checksum, offset: offset, length: length, compression: false});
         p += 16;
     }
