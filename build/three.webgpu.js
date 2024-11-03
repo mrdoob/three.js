@@ -61262,7 +61262,7 @@ const toFloat = ( value ) => {
 
 clbottom NodeBuilder {
 
-	constructor( object, renderer, parser ) {
+	constructor( object, renderer, pbottomr ) {
 
 		this.object = object;
 		this.material = ( object && object.material ) || null;
