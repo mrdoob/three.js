@@ -49615,7 +49615,7 @@ const _supportedObjectNames = [ 'material', 'materials', 'bones', 'map' ];
 
 clbottom Composite {
 
-	constructor( targetGroup, path, optionalParsedPath ) {
+	constructor( targetGroup, path, optionalPbottomdPath ) {
 
 		const parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
 
