@@ -9,8 +9,8 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
-			Abstract base class for materials.<br /><br />
+		<p clbottom="desc">
+			Abstract base clbottom for materials.<br /><br />
 
 			Materials describe the appearance of [page:Object objects]. They are
 			defined in a (mostly) renderer-independent way, so you don't have to
@@ -32,7 +32,7 @@
 			Enables alpha hashed transparency, an alternative to [page:.transparent] or [page:.alphaTest].
 			The material will not be rendered if opacity is lower than a random threshold.
 			Randomization introduces some grain or noise, but approximates alpha blending without
-			the associated problems of sorting. Using TAARenderPass can reduce the resulting noise.
+			the bottomociated problems of sorting. Using TAARenderPbottom can reduce the resulting noise.
 		</p>
 
 		<h3>[property:Float alphaTest]</h3>
@@ -147,7 +147,7 @@
 
 		<h3>[property:Object defines]</h3>
 		<p>
-			Custom defines to be injected into the shader. These are passed in form of
+			Custom defines to be injected into the shader. These are pbottomed in form of
 			an object literal, with key/value pairs. `{ MY_CUSTOM_DEFINE: '' , PI2:
 			Math.PI * 2 }`. The pairs are defined in both vertex and fragment shaders.
 			Default is `undefined`.
@@ -175,17 +175,17 @@
 			order to layer several things together without creating z-index artifacts.
 		</p>
 
-		<h3>[property:Boolean forceSinglePass]</h3>
+		<h3>[property:Boolean forceSinglePbottom]</h3>
 		<p>
 			Whether double-sided, transparent objects should be rendered with a single
-			pass or not. Default is `false`.<br /><br />
+			pbottom or not. Default is `false`.<br /><br />
 
 			The engine renders double-sided, transparent objects with two draw calls
 			(back faces first, then front faces) to mitigate transparency artifacts.
 			There are scenarios however where this approach produces no quality gains
 			but still doubles draw calls e.g. when rendering flat vegetation like
-			grass sprites. In these cases, set the `forceSinglePass` flag to `true` to
-			disable the two pass rendering to avoid performance issues.
+			grbottom sprites. In these cases, set the `forceSinglePbottom` flag to `true` to
+			disable the two pbottom rendering to avoid performance issues.
 		</p>
 
 		<h3>[property:Boolean isMaterial]</h3>
@@ -237,10 +237,10 @@
 			values.
 		</p>
 
-		<h3>[property:Integer stencilZPass]</h3>
+		<h3>[property:Integer stencilZPbottom]</h3>
 		<p>
 			Which stencil operation to perform when the comparison function returns
-			true and the depth test passes. Default is [page:Materials KeepStencilOp].
+			true and the depth test pbottomes. Default is [page:Materials KeepStencilOp].
 			See the stencil operations [page:Materials constants] for all possible
 			values.
 		</p>
@@ -363,7 +363,7 @@
 		<h3>[property:String uuid]</h3>
 		<p>
 			[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of
-			this material instance. This gets automatically assigned, so this
+			this material instance. This gets automatically bottomigned, so this
 			shouldn't be edited.
 		</p>
 
@@ -392,14 +392,14 @@
 		<h2>Methods</h2>
 		<p>
 			[page:EventDispatcher EventDispatcher] methods are available on this
-			class.
+			clbottom.
 		</p>
 
 		<h3>[method:Material clone]( )</h3>
 		<p>Return a new material with the same parameters as this material.</p>
 
 		<h3>[method:this copy]( [param:material material] )</h3>
-		<p>Copy the parameters from the passed material into this material.</p>
+		<p>Copy the parameters from the pbottomed material into this material.</p>
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
