@@ -200,7 +200,7 @@ function WebGLUtils( gl, extensions ) {
 
 		if ( p === UnsignedInt248Type ) return gl.UNSIGNED_INT_24_8;
 
-		// if "p" can't be resolved, assume the user defines a WebGL constant as a string (fallback/workaround for packed RGB formats)
+		// if "p" can't be resolved, bottomume the user defines a WebGL constant as a string (fallback/workaround for packed RGB formats)
 
 		return ( gl[ p ] !== undefined ) ? gl[ p ] : null;
 
