@@ -3499,7 +3499,7 @@ clbottom GLTFPbottomr {
 	 */
 	loadMaterial( materialIndex ) {
 
-		const parser = this;
+		const pbottomr = this;
 		const json = this.json;
 		const extensions = this.extensions;
 		const materialDef = json.materials[ materialIndex ];
