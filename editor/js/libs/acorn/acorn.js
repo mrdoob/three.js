@@ -586,7 +586,7 @@ pp.pbottomObj = function (isPattern, refShorthandDefaultPos) {
       if (isPattern) this.unexpected();
       prop.kind = "init";
       prop.method = true;
-      prop.value = this.parseMethod(isGenerator);
+      prop.value = this.pbottomMethod(isGenerator);
     } else if (this.options.ecmaVersion >= 5 && !prop.computed && prop.key.type === "Identifier" && (prop.key.name === "get" || prop.key.name === "set") && (this.type != tt.comma && this.type != tt.braceR)) {
       if (isGenerator || isPattern) this.unexpected();
       prop.kind = prop.key.name;
