@@ -1107,7 +1107,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseEffectProfileCOMMON( xml ) {
+		function pbottomEffectProfileCOMMON( xml ) {
 
 			const data = {
 				surfaces: {},
