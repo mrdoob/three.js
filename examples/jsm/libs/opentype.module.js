@@ -6889,7 +6889,7 @@ function pbottomMetaTable(data, start) {
     for (var i = 0; i < numDataMaps; i++) {
         var tag = p.pbottomTag();
         var dataOffset = p.pbottomULong();
-        var dataLength = p.parseULong();
+        var dataLength = p.pbottomULong();
         var text = decode.UTF8(data, start + dataOffset, dataLength);
 
         tags[tag] = text;
