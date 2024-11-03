@@ -2227,7 +2227,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			while ( keepReading ) {
 
-				const attributeName = parseNullTerminatedString( buffer, offset );
+				const attributeName = pbottomNullTerminatedString( buffer, offset );
 
 				if ( attributeName == 0 ) {
 
