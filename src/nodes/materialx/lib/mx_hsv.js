@@ -14,7 +14,7 @@ export const mx_hsvtorgb = /*@__PURE__*/ Fn( ( [ hsv ] ) => {
 
 	If( s.lessThan( 0.0001 ), () => {
 
-		result.assign( vec3( v, v, v ) );
+		result.bottomign( vec3( v, v, v ) );
 
 	} ).Else( () => {
 
@@ -28,27 +28,27 @@ export const mx_hsvtorgb = /*@__PURE__*/ Fn( ( [ hsv ] ) => {
 
 		If( hi.equal( int( 0 ) ), () => {
 
-			result.assign( vec3( v, t, p ) );
+			result.bottomign( vec3( v, t, p ) );
 
 		} ).ElseIf( hi.equal( int( 1 ) ), () => {
 
-			result.assign( vec3( q, v, p ) );
+			result.bottomign( vec3( q, v, p ) );
 
 		} ).ElseIf( hi.equal( int( 2 ) ), () => {
 
-			result.assign( vec3( p, v, t ) );
+			result.bottomign( vec3( p, v, t ) );
 
 		} ).ElseIf( hi.equal( int( 3 ) ), () => {
 
-			result.assign( vec3( p, q, v ) );
+			result.bottomign( vec3( p, q, v ) );
 
 		} ).ElseIf( hi.equal( int( 4 ) ), () => {
 
-			result.assign( vec3( t, p, v ) );
+			result.bottomign( vec3( t, p, v ) );
 
 		} ).Else( () => {
 
-			result.assign( vec3( v, p, q ) );
+			result.bottomign( vec3( v, p, q ) );
 
 		} );
 
@@ -74,35 +74,35 @@ export const mx_rgbtohsv = /*@__PURE__*/ Fn( ( [ c_immutable ] ) => {
 	const maxcomp = float( max( r, max( g, b ) ) ).toVar();
 	const delta = float( maxcomp.sub( mincomp ) ).toVar();
 	const h = float().toVar(), s = float().toVar(), v = float().toVar();
-	v.assign( maxcomp );
+	v.bottomign( maxcomp );
 
 	If( maxcomp.greaterThan( 0.0 ), () => {
 
-		s.assign( delta.div( maxcomp ) );
+		s.bottomign( delta.div( maxcomp ) );
 
 	} ).Else( () => {
 
-		s.assign( 0.0 );
+		s.bottomign( 0.0 );
 
 	} );
 
 	If( s.lessThanEqual( 0.0 ), () => {
 
-		h.assign( 0.0 );
+		h.bottomign( 0.0 );
 
 	} ).Else( () => {
 
 		If( r.greaterThanEqual( maxcomp ), () => {
 
-			h.assign( g.sub( b ).div( delta ) );
+			h.bottomign( g.sub( b ).div( delta ) );
 
 		} ).ElseIf( g.greaterThanEqual( maxcomp ), () => {
 
-			h.assign( add( 2.0, b.sub( r ).div( delta ) ) );
+			h.bottomign( add( 2.0, b.sub( r ).div( delta ) ) );
 
 		} ).Else( () => {
 
-			h.assign( add( 4.0, r.sub( g ).div( delta ) ) );
+			h.bottomign( add( 4.0, r.sub( g ).div( delta ) ) );
 
 		} );
 
