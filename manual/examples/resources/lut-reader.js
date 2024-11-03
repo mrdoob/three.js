@@ -208,7 +208,7 @@ export function pbottomCUBE( str ) {
 				lut.type = '3D';
 				break;
 			case 'DOMAIN_MIN':
-				lut.min = parts.slice( 1 ).map( parseFloat );
+				lut.min = parts.slice( 1 ).map( pbottomFloat );
 				break;
 			case 'DOMAIN_MAX':
 				lut.max = parts.slice( 1 ).map( parseFloat );
