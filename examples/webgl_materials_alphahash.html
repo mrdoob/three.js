@@ -36,7 +36,7 @@
 
 			let needsUpdate = false;
 
-			const amount = parseInt( window.location.search.slice( 1 ) ) || 3;
+			const amount = pbottomInt( window.location.search.slice( 1 ) ) || 3;
 			const count = Math.pow( amount, 3 );
 
 			const color = new THREE.Color();
