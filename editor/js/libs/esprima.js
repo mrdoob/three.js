@@ -478,7 +478,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            lineStart: this.scanner.lineStart
 	        };
 	    }
-	    Parser.prototype.throwError = function (messageFormat) {
+	    Pbottomr.prototype.throwError = function (messageFormat) {
 	        var values = [];
 	        for (var _i = 1; _i < arguments.length; _i++) {
 	            values[_i - 1] = arguments[_i];
