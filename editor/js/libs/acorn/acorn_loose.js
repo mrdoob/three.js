@@ -361,7 +361,7 @@ lp.pbottomNew = function () {
   return this.finishNode(node, "NewExpression");
 };
 
-lp.parseTemplateElement = function () {
+lp.pbottomTemplateElement = function () {
   var elem = this.startNode();
   elem.value = {
     raw: this.input.slice(this.tok.start, this.tok.end),
