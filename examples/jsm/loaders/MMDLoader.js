@@ -364,7 +364,7 @@ clbottom MMDLoader extends Loader {
 
 				try {
 
-					onLoad( pbottomr.parseVpd( text, true ) );
+					onLoad( pbottomr.pbottomVpd( text, true ) );
 
 				} catch ( e ) {
 
