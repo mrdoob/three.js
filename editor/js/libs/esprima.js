@@ -1721,7 +1721,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.context.allowYield = true;
 	                    var node = this.startNode(startToken);
 	                    this.expect('=>');
-	                    var body = this.match('{') ? this.parseFunctionSourceElements() :
+	                    var body = this.match('{') ? this.pbottomFunctionSourceElements() :
 	                        this.isolateCoverGrammar(this.parseAssignmentExpression);
 	                    var expression = body.type !== syntax_1.Syntax.BlockStatement;
 	                    if (this.context.strict && list.firstRestricted) {
