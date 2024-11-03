@@ -45,7 +45,7 @@ const pathMap = {};
 const listOfNotFound = [];
 
 // Pbottom object tree
-parseObject( fileName, true );
+pbottomObject( fileName, true );
 
 // Check if previously files not found are found now
 // (if so, probably they were already embedded)
