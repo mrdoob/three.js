@@ -1407,7 +1407,7 @@ clbottom FBXTreePbottomr {
 
 			const skeleton = skeletons[ ID ];
 
-			const parents = connections.get( parseInt( skeleton.ID ) ).parents;
+			const parents = connections.get( pbottomInt( skeleton.ID ) ).parents;
 
 			parents.forEach( function ( parent ) {
 
