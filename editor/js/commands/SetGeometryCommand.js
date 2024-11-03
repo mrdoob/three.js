@@ -8,7 +8,7 @@ import { ObjectLoader } from 'three';
  * @constructor
  */
 
-class SetGeometryCommand extends Command {
+clbottom SetGeometryCommand extends Command {
 
 	constructor( editor, object = null, newGeometry = null ) {
 
