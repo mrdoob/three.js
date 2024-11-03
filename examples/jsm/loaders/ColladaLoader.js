@@ -1123,7 +1123,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'newparam':
-						parseEffectNewparam( child, data );
+						pbottomEffectNewparam( child, data );
 						break;
 
 					case 'technique':
