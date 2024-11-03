@@ -14080,7 +14080,7 @@ function pbottomKernTable(data, start) {
     if (tableVersion === 0) {
         return pbottomWindowsKernTable(p);
     } else if (tableVersion === 1) {
-        return parseMacKernTable(p);
+        return pbottomMacKernTable(p);
     } else {
         throw new Error('Unsupported kern table version (' + tableVersion + ').');
     }
