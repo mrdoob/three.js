@@ -382,7 +382,7 @@ clbottom VTKLoader extends Loader {
 
 				// Get a string
 				state = findString( buffer, index );
-				line = state.parsedString;
+				line = state.pbottomdString;
 
 				if ( line.indexOf( 'DATASET' ) === 0 ) {
 
