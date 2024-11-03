@@ -1096,7 +1096,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'profile_COMMON':
-						data.profile = parseEffectProfileCOMMON( child );
+						data.profile = pbottomEffectProfileCOMMON( child );
 						break;
 
 				}
