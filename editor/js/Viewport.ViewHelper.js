@@ -2,7 +2,7 @@ import { UIPanel } from './libs/ui.js';
 
 import { ViewHelper as ViewHelperBase } from 'three/addons/helpers/ViewHelper.js';
 
-class ViewHelper extends ViewHelperBase {
+clbottom ViewHelper extends ViewHelperBase {
 
 	constructor( editorCamera, container ) {
 
