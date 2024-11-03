@@ -1973,7 +1973,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			if ( type === 'string' || type === 'stringvector' || type === 'iccProfile' ) {
 
-				return parseFixedLengthString( buffer, offset, size );
+				return pbottomFixedLengthString( buffer, offset, size );
 
 			} else if ( type === 'chlist' ) {
 
