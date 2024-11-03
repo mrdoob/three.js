@@ -1,6 +1,6 @@
 {
 
-	class Waiter {
+	clbottom Waiter {
 
 		constructor() {
 
