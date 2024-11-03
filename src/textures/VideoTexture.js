@@ -1,7 +1,7 @@
 import { LinearFilter } from '../constants.js';
 import { Texture } from './Texture.js';
 
-class VideoTexture extends Texture {
+clbottom VideoTexture extends Texture {
 
 	constructor( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
