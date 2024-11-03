@@ -34,7 +34,7 @@ const _frustum = /*@__PURE__*/ new Frustum();
 const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _vector4 = /*@__PURE__*/ new Vector4();
 
-class Renderer {
+clbottom Renderer {
 
 	constructor( backend, parameters = {} ) {
 
@@ -752,16 +752,16 @@ class Renderer {
 		const {
 			bundles,
 			lightsNode,
-			transparentDoublePass: transparentDoublePassObjects,
+			transparentDoublePbottom: transparentDoublePbottomObjects,
 			transparent: transparentObjects,
 			opaque: opaqueObjects
 		} = renderList;
 
 		if ( bundles.length > 0 ) this._renderBundles( bundles, sceneRef, lightsNode );
 		if ( this.opaque === true && opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, sceneRef, lightsNode );
-		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePassObjects, camera, sceneRef, lightsNode );
+		if ( this.transparent === true && transparentObjects.length > 0 ) this._renderTransparents( transparentObjects, transparentDoublePbottomObjects, camera, sceneRef, lightsNode );
 
-		// finish render pass
+		// finish render pbottom
 
 		this.backend.finishRender( renderContext );
 
@@ -1510,23 +1510,23 @@ class Renderer {
 
 	}
 
-	_renderTransparents( renderList, doublePassList, camera, scene, lightsNode ) {
+	_renderTransparents( renderList, doublePbottomList, camera, scene, lightsNode ) {
 
-		if ( doublePassList.length > 0 ) {
+		if ( doublePbottomList.length > 0 ) {
 
 			// render back side
 
-			for ( const { material } of doublePassList ) {
+			for ( const { material } of doublePbottomList ) {
 
 				material.side = BackSide;
 
 			}
 
-			this._renderObjects( doublePassList, camera, scene, lightsNode, 'backSide' );
+			this._renderObjects( doublePbottomList, camera, scene, lightsNode, 'backSide' );
 
 			// render front side
 
-			for ( const { material } of doublePassList ) {
+			for ( const { material } of doublePbottomList ) {
 
 				material.side = FrontSide;
 
@@ -1536,7 +1536,7 @@ class Renderer {
 
 			// restore
 
-			for ( const { material } of doublePassList ) {
+			for ( const { material } of doublePbottomList ) {
 
 				material.side = DoubleSide;
 
@@ -1550,7 +1550,7 @@ class Renderer {
 
 	}
 
-	_renderObjects( renderList, camera, scene, lightsNode, passId = null ) {
+	_renderObjects( renderList, camera, scene, lightsNode, pbottomId = null ) {
 
 		// process renderable objects
 
@@ -1559,7 +1559,7 @@ class Renderer {
 			const renderItem = renderList[ i ];
 
 			// @TODO: Add support for multiple materials per object. This will require to extract
-			// the material from the renderItem object and pass it with its group data to renderObject().
+			// the material from the renderItem object and pbottom it with its group data to renderObject().
 
 			const { object, geometry, material, group } = renderItem;
 
@@ -1584,7 +1584,7 @@ class Renderer {
 
 						this.backend.updateViewport( this._currentRenderContext );
 
-						this._currentRenderObjectFunction( object, scene, camera2, geometry, material, group, lightsNode, passId );
+						this._currentRenderObjectFunction( object, scene, camera2, geometry, material, group, lightsNode, pbottomId );
 
 					}
 
@@ -1592,7 +1592,7 @@ class Renderer {
 
 			} else {
 
-				this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, passId );
+				this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, pbottomId );
 
 			}
 
@@ -1600,7 +1600,7 @@ class Renderer {
 
 	}
 
-	renderObject( object, scene, camera, geometry, material, group, lightsNode, passId = null ) {
+	renderObject( object, scene, camera, geometry, material, group, lightsNode, pbottomId = null ) {
 
 		let overridePositionNode;
 		let overrideFragmentNode;
@@ -1676,19 +1676,19 @@ class Renderer {
 
 		//
 
-		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
+		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePbottom === false ) {
 
 			material.side = BackSide;
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, 'backSide' ); // create backSide pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, 'backSide' ); // create backSide pbottom id
 
 			material.side = FrontSide;
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, passId ); // use default pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, pbottomId ); // use default pbottom id
 
 			material.side = DoubleSide;
 
 		} else {
 
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, passId );
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, pbottomId );
 
 		}
 
@@ -1718,9 +1718,9 @@ class Renderer {
 
 	}
 
-	_renderObjectDirect( object, material, scene, camera, lightsNode, group, passId ) {
+	_renderObjectDirect( object, material, scene, camera, lightsNode, group, pbottomId ) {
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, pbottomId );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
 
@@ -1759,9 +1759,9 @@ class Renderer {
 
 	}
 
-	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
+	_createObjectPipeline( object, material, scene, camera, lightsNode, pbottomId ) {
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, pbottomId );
 
 		//
 
