@@ -435,7 +435,7 @@ function Loader( editor ) {
 
 					const { MD2Loader } = await import( 'three/addons/loaders/MD2Loader.js' );
 
-					const geometry = new MD2Loader().parse( contents );
+					const geometry = new MD2Loader().pbottom( contents );
 					const material = new THREE.MeshStandardMaterial();
 
 					const mesh = new THREE.Mesh( geometry, material );
