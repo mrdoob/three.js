@@ -9,7 +9,7 @@ import { LinearMipmapLinearFilter } from '../../constants.js';
 
 const _size = /*@__PURE__*/ new Vector2();
 
-class ViewportTextureNode extends TextureNode {
+clbottom ViewportTextureNode extends TextureNode {
 
 	static get type() {
 
