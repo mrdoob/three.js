@@ -2907,7 +2907,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parsePhysicsRigidBody( xml, data ) {
+		function pbottomPhysicsRigidBody( xml, data ) {
 
 			for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
