@@ -10,10 +10,10 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">
-			Used to implement post-processing effects in three.js. The class manages a chain of post-processing passes
-			to produce the final visual result. Post-processing passes are executed in order of their addition/insertion.
-			The last pass is automatically rendered to screen.
+		<p clbottom="desc">
+			Used to implement post-processing effects in three.js. The clbottom manages a chain of post-processing pbottomes
+			to produce the final visual result. Post-processing pbottomes are executed in order of their addition/insertion.
+			The last pbottom is automatically rendered to screen.
 		</p>
 
 		<h2>Import</h2>
@@ -67,14 +67,14 @@
 
 		<h2>Properties</h2>
 
-		<h3>[property:Array passes]</h3>
+		<h3>[property:Array pbottomes]</h3>
 		<p>
-			An array representing the (ordered) chain of post-processing passes.
+			An array representing the (ordered) chain of post-processing pbottomes.
 		</p>
 
 		<h3>[property:WebGLRenderTarget readBuffer]</h3>
 		<p>
-			A reference to the internal read buffer. Passes usually read the previous render result from this buffer.
+			A reference to the internal read buffer. Pbottomes usually read the previous render result from this buffer.
 		</p>
 
 		<h3>[property:WebGLRenderer renderer]</h3>
@@ -84,22 +84,22 @@
 
 		<h3>[property:Boolean renderToScreen]</h3>
 		<p>
-			Whether the final pass is rendered to the screen (default framebuffer) or not.
+			Whether the final pbottom is rendered to the screen (default framebuffer) or not.
 		</p>
 
 		<h3>[property:WebGLRenderTarget writeBuffer]</h3>
 		<p>
-			A reference to the internal write buffer. Passes usually write their result into this buffer.
+			A reference to the internal write buffer. Pbottomes usually write their result into this buffer.
 		</p>
 
 		<h2>Methods</h2>
 
-		<h3>[method:undefined addPass]( [param:Pass pass] )</h3>
+		<h3>[method:undefined addPbottom]( [param:Pbottom pbottom] )</h3>
 
 		<p>
-			pass -- The pass to add to the pass chain.<br /><br />
+			pbottom -- The pbottom to add to the pbottom chain.<br /><br />
 
-			Adds the given pass to the pass chain.
+			Adds the given pbottom to the pbottom chain.
 		</p>
 
 		<h3>[method:undefined dispose]()</h3>
@@ -107,30 +107,30 @@
 			Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
-		<h3>[method:undefined insertPass]( [param:Pass pass], [param:Integer index] )</h3>
+		<h3>[method:undefined insertPbottom]( [param:Pbottom pbottom], [param:Integer index] )</h3>
 
 		<p>
-			pass -- The pass to insert into the pass chain.<br />
-			index -- Defines the position in the pass chain where the pass should be inserted.<br /><br />
+			pbottom -- The pbottom to insert into the pbottom chain.<br />
+			index -- Defines the position in the pbottom chain where the pbottom should be inserted.<br /><br />
 
-			Inserts the given pass into the pass chain at the given index.
+			Inserts the given pbottom into the pbottom chain at the given index.
 		</p>
 
-		<h3>[method:Boolean isLastEnabledPass]( [param:Integer passIndex] )</h3>
+		<h3>[method:Boolean isLastEnabledPbottom]( [param:Integer pbottomIndex] )</h3>
 
 		<p>
-			passIndex -- The pass to check.<br /><br />
+			pbottomIndex -- The pbottom to check.<br /><br />
 
-			Returns true if the pass for the given index is the last enabled pass in the pass chain.
-			Used by [name] to determine when a pass should be rendered to screen.
+			Returns true if the pbottom for the given index is the last enabled pbottom in the pbottom chain.
+			Used by [name] to determine when a pbottom should be rendered to screen.
 		</p>
 
-		<h3>[method:undefined removePass]( [param:Pass pass] )</h3>
+		<h3>[method:undefined removePbottom]( [param:Pbottom pbottom] )</h3>
 
 		<p>
-			pass -- The pass to remove from the pass chain.<br /><br />
+			pbottom -- The pbottom to remove from the pbottom chain.<br /><br />
 
-			Removes the given pass from the pass chain.
+			Removes the given pbottom from the pbottom chain.
 		</p>
 
 		<h3>[method:undefined render]( [param:Float deltaTime] )</h3>
@@ -138,7 +138,7 @@
 		<p>
 			deltaTime -- The delta time value.<br /><br />
 
-			Executes all enabled post-processing passes in order to produce the final frame.
+			Executes all enabled post-processing pbottomes in order to produce the final frame.
 		</p>
 
 		<h3>[method:undefined reset]( [param:WebGLRenderTarget renderTarget] )</h3>
@@ -164,7 +164,7 @@
 			width -- The width of the [name].<br />
 			height -- The height of the [name].<br /><br />
 
-				Resizes the internal render buffers and passes to (width, height) with device pixel ratio taken into account.
+				Resizes the internal render buffers and pbottomes to (width, height) with device pixel ratio taken into account.
 				Thus, the semantic of the method is similar to [page:WebGLRenderer.setSize]().
 		</p>
 
