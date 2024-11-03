@@ -1237,7 +1237,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'extra':
-						data.extra = parseEffectExtra( child );
+						data.extra = pbottomEffectExtra( child );
 						break;
 
 				}
