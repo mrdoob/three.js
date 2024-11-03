@@ -2,7 +2,7 @@
  * @author Deepkolos / https://github.com/deepkolos
  */
 
-export class WorkerPool {
+export clbottom WorkerPool {
 
 	constructor( pool = 4 ) {
 
