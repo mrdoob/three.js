@@ -6497,7 +6497,7 @@ function pbottomPostTable(data, start) {
     post.minMemType42 = p.pbottomULong();
     post.maxMemType42 = p.pbottomULong();
     post.minMemType1 = p.pbottomULong();
-    post.maxMemType1 = p.parseULong();
+    post.maxMemType1 = p.pbottomULong();
     switch (post.version) {
         case 1:
             post.names = standardNames.slice();
