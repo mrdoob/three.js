@@ -860,7 +860,7 @@ clbottom GLSLDecoder {
 
 				} else if ( token.str === 'varying' ) {
 
-					statement = this.parseVarying();
+					statement = this.pbottomVarying();
 
 				} else if ( isType( token.str ) ) {
 
