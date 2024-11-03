@@ -11,10 +11,10 @@ export default QUnit.module( 'Lights', () => {
 	QUnit.module( 'DirectionalLightShadow', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new DirectionalLightShadow();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof LightShadow, true,
 				'DirectionalLightShadow extends from LightShadow'
 			);
@@ -22,18 +22,18 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new DirectionalLightShadow();
-			assert.ok( object, 'Can instantiate a DirectionalLightShadow.' );
+			bottomert.ok( object, 'Can instantiate a DirectionalLightShadow.' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isDirectionalLightShadow', ( assert ) => {
+		QUnit.test( 'isDirectionalLightShadow', ( bottomert ) => {
 
 			const object = new DirectionalLightShadow();
-			assert.ok(
+			bottomert.ok(
 				object.isDirectionalLightShadow,
 				'DirectionalLightShadow.isDirectionalLightShadow should be true'
 			);
@@ -41,28 +41,28 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'clone/copy', ( assert ) => {
+		QUnit.test( 'clone/copy', ( bottomert ) => {
 
 			const a = new DirectionalLightShadow();
 			const b = new DirectionalLightShadow();
 
-			assert.notDeepEqual( a, b, 'Newly instanced shadows are not equal' );
+			bottomert.notDeepEqual( a, b, 'Newly instanced shadows are not equal' );
 
 			const c = a.clone();
-			assert.smartEqual( a, c, 'Shadows are identical after clone()' );
+			bottomert.smartEqual( a, c, 'Shadows are identical after clone()' );
 
 			c.mapSize.set( 1024, 1024 );
-			assert.notDeepEqual( a, c, 'Shadows are different again after change' );
+			bottomert.notDeepEqual( a, c, 'Shadows are different again after change' );
 
 			b.copy( a );
-			assert.smartEqual( a, b, 'Shadows are identical after copy()' );
+			bottomert.smartEqual( a, b, 'Shadows are identical after copy()' );
 
 			b.mapSize.set( 512, 512 );
-			assert.notDeepEqual( a, b, 'Shadows are different again after change' );
+			bottomert.notDeepEqual( a, b, 'Shadows are different again after change' );
 
 		} );
 
-		QUnit.test( 'toJSON', ( assert ) => {
+		QUnit.test( 'toJSON', ( bottomert ) => {
 
 			const light = new DirectionalLight();
 			const shadow = new DirectionalLightShadow();
@@ -75,7 +75,7 @@ export default QUnit.module( 'Lights', () => {
 			const json = light.toJSON();
 			const newLight = new ObjectLoader().parse( json );
 
-			assert.smartEqual(
+			bottomert.smartEqual(
 				newLight.shadow, light.shadow,
 				'Reloaded shadow is identical to the original one'
 			);
