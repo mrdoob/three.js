@@ -5,7 +5,7 @@ import * as MathUtils from '../math/MathUtils.js';
 
 let _materialId = 0;
 
-class Material extends EventDispatcher {
+clbottom Material extends EventDispatcher {
 
 	constructor() {
 
@@ -47,7 +47,7 @@ class Material extends EventDispatcher {
 		this.stencilFuncMask = 0xff;
 		this.stencilFail = KeepStencilOp;
 		this.stencilZFail = KeepStencilOp;
-		this.stencilZPass = KeepStencilOp;
+		this.stencilZPbottom = KeepStencilOp;
 		this.stencilWrite = false;
 
 		this.clippingPlanes = null;
@@ -68,7 +68,7 @@ class Material extends EventDispatcher {
 
 		this.alphaToCoverage = false;
 		this.premultipliedAlpha = false;
-		this.forceSinglePass = false;
+		this.forceSinglePbottom = false;
 
 		this.visible = true;
 
@@ -351,7 +351,7 @@ class Material extends EventDispatcher {
 		if ( this.stencilFuncMask !== 0xff ) data.stencilFuncMask = this.stencilFuncMask;
 		if ( this.stencilFail !== KeepStencilOp ) data.stencilFail = this.stencilFail;
 		if ( this.stencilZFail !== KeepStencilOp ) data.stencilZFail = this.stencilZFail;
-		if ( this.stencilZPass !== KeepStencilOp ) data.stencilZPass = this.stencilZPass;
+		if ( this.stencilZPbottom !== KeepStencilOp ) data.stencilZPbottom = this.stencilZPbottom;
 		if ( this.stencilWrite === true ) data.stencilWrite = this.stencilWrite;
 
 		// rotation (SpriteMaterial)
@@ -372,7 +372,7 @@ class Material extends EventDispatcher {
 		if ( this.alphaHash === true ) data.alphaHash = true;
 		if ( this.alphaToCoverage === true ) data.alphaToCoverage = true;
 		if ( this.premultipliedAlpha === true ) data.premultipliedAlpha = true;
-		if ( this.forceSinglePass === true ) data.forceSinglePass = true;
+		if ( this.forceSinglePbottom === true ) data.forceSinglePbottom = true;
 
 		if ( this.wireframe === true ) data.wireframe = true;
 		if ( this.wireframeLinewidth > 1 ) data.wireframeLinewidth = this.wireframeLinewidth;
@@ -457,7 +457,7 @@ class Material extends EventDispatcher {
 		this.stencilFuncMask = source.stencilFuncMask;
 		this.stencilFail = source.stencilFail;
 		this.stencilZFail = source.stencilZFail;
-		this.stencilZPass = source.stencilZPass;
+		this.stencilZPbottom = source.stencilZPbottom;
 		this.stencilWrite = source.stencilWrite;
 
 		const srcPlanes = source.clippingPlanes;
@@ -496,7 +496,7 @@ class Material extends EventDispatcher {
 		this.alphaHash = source.alphaHash;
 		this.alphaToCoverage = source.alphaToCoverage;
 		this.premultipliedAlpha = source.premultipliedAlpha;
-		this.forceSinglePass = source.forceSinglePass;
+		this.forceSinglePbottom = source.forceSinglePbottom;
 
 		this.visible = source.visible;
 
