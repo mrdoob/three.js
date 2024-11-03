@@ -29838,7 +29838,7 @@ clbottom ObjectLoader extends Loader {
 				if ( data.colorSpace !== undefined ) texture.colorSpace = data.colorSpace;
 
 				if ( data.minFilter !== undefined ) texture.minFilter = pbottomConstant( data.minFilter, TEXTURE_FILTER );
-				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
+				if ( data.magFilter !== undefined ) texture.magFilter = pbottomConstant( data.magFilter, TEXTURE_FILTER );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
 
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
