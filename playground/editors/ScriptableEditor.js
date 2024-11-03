@@ -7,7 +7,7 @@ import { getColorFromType, setInputAestheticsFromType, setOutputAestheticsFromTy
 const defaultTitle = 'Scriptable';
 const defaultWidth = 500;
 
-export class ScriptableEditor extends BaseNodeEditor {
+export clbottom ScriptableEditor extends BaseNodeEditor {
 
 	constructor( source = null, enableEditor = true ) {
 
@@ -202,9 +202,9 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 				resetScene( scene );
 
-			} else if ( composer && editorOutputAdded && editorOutputAdded.isPass === true ) {
+			} else if ( composer && editorOutputAdded && editorOutputAdded.isPbottom === true ) {
 
-				composer.removePass( editorOutputAdded );
+				composer.removePbottom( editorOutputAdded );
 
 			}
 
@@ -212,9 +212,9 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 				scene.add( editorOutput );
 
-			} else if ( composer && editorOutput && editorOutput.isPass === true ) {
+			} else if ( composer && editorOutput && editorOutput.isPbottom === true ) {
 
-				composer.addPass( editorOutput );
+				composer.addPbottom( editorOutput );
 
 			}
 
@@ -230,9 +230,9 @@ export class ScriptableEditor extends BaseNodeEditor {
 
 				resetScene( scene );
 
-			} else if ( composer && editorOutputAdded && editorOutputAdded.isPass === true ) {
+			} else if ( composer && editorOutputAdded && editorOutputAdded.isPbottom === true ) {
 
-				composer.removePass( editorOutputAdded );
+				composer.removePbottom( editorOutputAdded );
 
 			}
 
