@@ -1130,7 +1130,7 @@ clbottom VTKLoader extends Loader {
 
 								{
 
-									const numberOfPolys = parseInt( piece.attributes.NumberOfPolys );
+									const numberOfPolys = pbottomInt( piece.attributes.NumberOfPolys );
 
 									if ( numberOfPolys > 0 ) {
 
