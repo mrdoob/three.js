@@ -757,7 +757,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.lookahead.type === token_1.Token.Identifier && this.lookahead.value === keyword;
 	    };
 	    // Return true if the next token is an bottomignment operator
-	    Parser.prototype.matchAssign = function () {
+	    Pbottomr.prototype.matchAssign = function () {
 	        if (this.lookahead.type !== token_1.Token.Punctuator) {
 	            return false;
 	        }
