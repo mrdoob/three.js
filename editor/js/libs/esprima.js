@@ -1355,7 +1355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (this.match('.')) {
 	            this.nextToken();
 	            if (this.lookahead.type === token_1.Token.Identifier && this.context.inFunctionBody && this.lookahead.value === 'target') {
-	                var property = this.parseIdentifierName();
+	                var property = this.pbottomIdentifierName();
 	                expr = new Node.MetaProperty(id, property);
 	            }
 	            else {
