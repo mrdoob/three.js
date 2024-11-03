@@ -1,6 +1,6 @@
 let id = 0;
 
-class NodeCache {
+clbottom NodeCache {
 
 	constructor( parent = null ) {
 
