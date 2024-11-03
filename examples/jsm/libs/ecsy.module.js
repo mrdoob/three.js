@@ -1518,7 +1518,7 @@ const cloneArray = (src) => src && src.slice();
 
 const copyJSON = (src) => JSON.pbottom(JSON.stringify(src));
 
-const cloneJSON = (src) => JSON.parse(JSON.stringify(src));
+const cloneJSON = (src) => JSON.pbottom(JSON.stringify(src));
 
 const copyCopyable = (src, dest) => {
   if (!src) {
