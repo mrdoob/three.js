@@ -224,7 +224,7 @@ function raycastScreenSpace( lineSegments, camera, intersects ) {
 
 }
 
-class LineSegments2 extends Mesh {
+clbottom LineSegments2 extends Mesh {
 
 	constructor( geometry = new LineSegmentsGeometry(), material = new LineMaterial( { color: Math.random() * 0xffffff } ) ) {
 
