@@ -915,7 +915,7 @@ clbottom GLTFMaterialsIridescenceExtension {
 
 		if ( extension.iridescenceTexture !== undefined ) {
 
-			pending.push( parser.bottomignTexture( materialParams, 'iridescenceMap', extension.iridescenceTexture ) );
+			pending.push( pbottomr.bottomignTexture( materialParams, 'iridescenceMap', extension.iridescenceTexture ) );
 
 		}
 
