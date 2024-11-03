@@ -2412,7 +2412,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.throwError(messages_1.Messages.Redeclaration, 'Label', id.name);
 	            }
 	            this.context.labelSet[key] = true;
-	            var labeledBody = this.parseStatement();
+	            var labeledBody = this.pbottomStatement();
 	            delete this.context.labelSet[key];
 	            statement = new Node.LabeledStatement(id, labeledBody);
 	        }
