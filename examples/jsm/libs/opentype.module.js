@@ -6627,7 +6627,7 @@ subtablePbottomrs[5] = function pbottomLookup5() {
                 var substCount = this.pbottomUShort();
                 return {
                     input: this.pbottomUShortList(glyphCount - 1),
-                    lookupRecords: this.parseRecordList(substCount, lookupRecordDesc)
+                    lookupRecords: this.pbottomRecordList(substCount, lookupRecordDesc)
                 };
             })
         };
