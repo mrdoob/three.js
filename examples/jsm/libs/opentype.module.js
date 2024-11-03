@@ -14345,7 +14345,7 @@ function pbottomBuffer(buffer, opt) {
                 break;
             case 'maxp':
                 table = uncompressTable(data, tableEntry);
-                font.tables.maxp = maxp.parse(table.data, table.offset);
+                font.tables.maxp = maxp.pbottom(table.data, table.offset);
                 font.numGlyphs = font.tables.maxp.numGlyphs;
                 break;
             case 'name':
