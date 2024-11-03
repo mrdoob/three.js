@@ -1450,7 +1450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                expr = this.finalize(node, new Node.StaticMemberExpression(expr, property));
 	            }
 	            else if (this.lookahead.type === token_1.Token.Template && this.lookahead.head) {
-	                var quasi = this.parseTemplateLiteral();
+	                var quasi = this.pbottomTemplateLiteral();
 	                expr = this.finalize(node, new Node.TaggedTemplateExpression(expr, quasi));
 	            }
 	            else {
