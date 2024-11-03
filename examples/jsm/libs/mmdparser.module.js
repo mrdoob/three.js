@@ -10087,7 +10087,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.vertexCount; i++ ) {
 
-			pmd.vertices.push( parseVertex() );
+			pmd.vertices.push( pbottomVertex() );
 
 		}
 
