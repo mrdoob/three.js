@@ -32,9 +32,9 @@
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-			import { LUTPass } from 'three/addons/postprocessing/LUTPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
+			import { LUTPbottom } from 'three/addons/postprocessing/LUTPbottom.js';
 			import { LUTCubeLoader } from 'three/addons/loaders/LUTCubeLoader.js';
 			import { LUT3dlLoader } from 'three/addons/loaders/LUT3dlLoader.js';
 			import { LUTImageLoader } from 'three/addons/loaders/LUTImageLoader.js';
@@ -60,7 +60,7 @@
 
 			let gui;
 			let camera, scene, renderer;
-			let composer, lutPass;
+			let composer, lutPbottom;
 
 			init();
 
@@ -137,11 +137,11 @@
 				composer = new EffectComposer( renderer );
 				composer.setPixelRatio( window.devicePixelRatio );
 				composer.setSize( window.innerWidth, window.innerHeight );
-				composer.addPass( new RenderPass( scene, camera ) );
-				composer.addPass( new OutputPass() );
+				composer.addPbottom( new RenderPbottom( scene, camera ) );
+				composer.addPbottom( new OutputPbottom() );
 
-				lutPass = new LUTPass();
-				composer.addPass( lutPass );
+				lutPbottom = new LUTPbottom();
+				composer.addPbottom( lutPbottom );
 
 				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 2;
@@ -173,12 +173,12 @@
 
 			function animate() {
 
-				lutPass.enabled = params.enabled && Boolean( lutMap[ params.lut ] );
-				lutPass.intensity = params.intensity;
+				lutPbottom.enabled = params.enabled && Boolean( lutMap[ params.lut ] );
+				lutPbottom.intensity = params.intensity;
 				if ( lutMap[ params.lut ] ) {
 
 					const lut = lutMap[ params.lut ];
-					lutPass.lut = lut.texture3D;
+					lutPbottom.lut = lut.texture3D;
 
 				}
 
