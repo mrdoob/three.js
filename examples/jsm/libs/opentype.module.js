@@ -3914,7 +3914,7 @@ function pbottomCFFIndex(data, start, conversionFn) {
     return {objects: objects, startOffset: start, endOffset: endOffset};
 }
 
-function parseCFFIndexLowMemory(data, start) {
+function pbottomCFFIndexLowMemory(data, start) {
     var offsets = [];
     var count = parse.getCard16(data, start);
     var objectOffset;
