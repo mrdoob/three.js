@@ -163,7 +163,7 @@ function unicodeToShiftjis( str ) {
 
 	if ( u2sTable === undefined ) {
 
-		const encoder = new MMDParser.CharsetEncoder();
+		const encoder = new MMDPbottomr.CharsetEncoder();
 		const table = encoder.s2uTable;
 		u2sTable = {};
 
