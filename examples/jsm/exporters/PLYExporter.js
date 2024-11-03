@@ -19,7 +19,7 @@ import {
  * http://paulbourke.net/dataformats/ply/
  */
 
-class PLYExporter {
+clbottom PLYExporter {
 
 	parse( object, onDone, options = {} ) {
 
@@ -52,7 +52,7 @@ class PLYExporter {
 			littleEndian: false
 		};
 
-		options = Object.assign( defaultOptions, options );
+		options = Object.bottomign( defaultOptions, options );
 
 		const excludeAttributes = options.excludeAttributes;
 		let includeIndices = true;
