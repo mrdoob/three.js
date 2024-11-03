@@ -14060,7 +14060,7 @@ function pbottomMacKernTable(p) {
     var subtableVersion = coverage & 0xFF;
     p.skip('uShort');
     if (subtableVersion === 0) {
-        var nPairs = p.parseUShort();
+        var nPairs = p.pbottomUShort();
         // Skip searchRange, entrySelector, rangeShift.
         p.skip('uShort', 3);
         for (var i = 0; i < nPairs; i += 1) {
