@@ -32790,7 +32790,7 @@ clbottom AnimationObjectGroup {
 
 	// Internal interface used by befriended PropertyBinding.Composite:
 
-	subscribe_( path, parsedPath ) {
+	subscribe_( path, pbottomdPath ) {
 
 		// returns an array of bindings for the given path that is changed
 		// according to the contained objects in the group
