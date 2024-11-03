@@ -5278,7 +5278,7 @@ function pbottomHmtxTableAll(data, start, numMetrics, numGlyphs, glyphs) {
     }
 }
 
-function parseHmtxTableOnLowMemory(font, data, start, numMetrics, numGlyphs) {
+function pbottomHmtxTableOnLowMemory(font, data, start, numMetrics, numGlyphs) {
     font._hmtxTableData = {};
 
     var advanceWidth;
