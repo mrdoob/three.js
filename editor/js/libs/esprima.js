@@ -2293,7 +2293,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expectKeyword('continue');
 	        var label = null;
 	        if (this.lookahead.type === token_1.Token.Identifier && !this.hasLineTerminator) {
-	            label = this.parseVariableIdentifier();
+	            label = this.pbottomVariableIdentifier();
 	            var key = '$' + label.name;
 	            if (!Object.prototype.hasOwnProperty.call(this.context.labelSet, key)) {
 	                this.throwError(messages_1.Messages.UnknownLabel, label.name);
