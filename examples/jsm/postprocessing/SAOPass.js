@@ -17,7 +17,7 @@ import {
 	WebGLRenderTarget,
 	ZeroFactor
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { SAOShader } from '../shaders/SAOShader.js';
 import { DepthLimitedBlurShader } from '../shaders/DepthLimitedBlurShader.js';
 import { BlurShaderUtils } from '../shaders/DepthLimitedBlurShader.js';
@@ -27,7 +27,7 @@ import { CopyShader } from '../shaders/CopyShader.js';
  * SAO implementation inspired from bhouston previous SAO work
  */
 
-class SAOPass extends Pass {
+clbottom SAOPbottom extends Pbottom {
 
 	constructor( scene, camera, resolution = new Vector2( 256, 256 ) ) {
 
@@ -76,7 +76,7 @@ class SAOPass extends Pass {
 		this.normalMaterial.blending = NoBlending;
 
 		this.saoMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, SAOShader.defines ),
+			defines: Object.bottomign( {}, SAOShader.defines ),
 			fragmentShader: SAOShader.fragmentShader,
 			vertexShader: SAOShader.vertexShader,
 			uniforms: UniformsUtils.clone( SAOShader.uniforms )
@@ -91,7 +91,7 @@ class SAOPass extends Pass {
 
 		this.vBlurMaterial = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( DepthLimitedBlurShader.uniforms ),
-			defines: Object.assign( {}, DepthLimitedBlurShader.defines ),
+			defines: Object.bottomign( {}, DepthLimitedBlurShader.defines ),
 			vertexShader: DepthLimitedBlurShader.vertexShader,
 			fragmentShader: DepthLimitedBlurShader.fragmentShader
 		} );
@@ -104,7 +104,7 @@ class SAOPass extends Pass {
 
 		this.hBlurMaterial = new ShaderMaterial( {
 			uniforms: UniformsUtils.clone( DepthLimitedBlurShader.uniforms ),
-			defines: Object.assign( {}, DepthLimitedBlurShader.defines ),
+			defines: Object.bottomign( {}, DepthLimitedBlurShader.defines ),
 			vertexShader: DepthLimitedBlurShader.vertexShader,
 			fragmentShader: DepthLimitedBlurShader.fragmentShader
 		} );
@@ -144,7 +144,7 @@ class SAOPass extends Pass {
 			this.materialCopy.blending = NoBlending;
 			this.materialCopy.uniforms[ 'tDiffuse' ].value = readBuffer.texture;
 			this.materialCopy.needsUpdate = true;
-			this.renderPass( renderer, this.materialCopy, null );
+			this.renderPbottom( renderer, this.materialCopy, null );
 
 		}
 
@@ -185,20 +185,20 @@ class SAOPass extends Pass {
 		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
 
 		// Rendering SAO texture
-		this.renderPass( renderer, this.saoMaterial, this.saoRenderTarget, 0xffffff, 1.0 );
+		this.renderPbottom( renderer, this.saoMaterial, this.saoRenderTarget, 0xffffff, 1.0 );
 
 		// Blurring SAO texture
 		if ( this.params.saoBlur ) {
 
-			this.renderPass( renderer, this.vBlurMaterial, this.blurIntermediateRenderTarget, 0xffffff, 1.0 );
-			this.renderPass( renderer, this.hBlurMaterial, this.saoRenderTarget, 0xffffff, 1.0 );
+			this.renderPbottom( renderer, this.vBlurMaterial, this.blurIntermediateRenderTarget, 0xffffff, 1.0 );
+			this.renderPbottom( renderer, this.hBlurMaterial, this.saoRenderTarget, 0xffffff, 1.0 );
 
 		}
 
 		const outputMaterial = this.materialCopy;
 
 		// Setting up SAO rendering
-		if ( this.params.output === SAOPass.OUTPUT.Normal ) {
+		if ( this.params.output === SAOPbottom.OUTPUT.Normal ) {
 
 			this.materialCopy.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
 			this.materialCopy.needsUpdate = true;
@@ -211,7 +211,7 @@ class SAOPass extends Pass {
 		}
 
 		// Blending depends on output
-		if ( this.params.output === SAOPass.OUTPUT.Default ) {
+		if ( this.params.output === SAOPbottom.OUTPUT.Default ) {
 
 			outputMaterial.blending = CustomBlending;
 
@@ -221,15 +221,15 @@ class SAOPass extends Pass {
 
 		}
 
-		// Rendering SAOPass result on top of previous pass
-		this.renderPass( renderer, outputMaterial, this.renderToScreen ? null : readBuffer );
+		// Rendering SAOPbottom result on top of previous pbottom
+		this.renderPbottom( renderer, outputMaterial, this.renderToScreen ? null : readBuffer );
 
 		renderer.setClearColor( this._oldClearColor, this.oldClearAlpha );
 		renderer.autoClear = oldAutoClear;
 
 	}
 
-	renderPass( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
+	renderPbottom( renderer, pbottomMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
 		renderer.getClearColor( this.originalClearColor );
@@ -238,7 +238,7 @@ class SAOPass extends Pass {
 
 		renderer.setRenderTarget( renderTarget );
 
-		// setup pass state
+		// setup pbottom state
 		renderer.autoClear = false;
 		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
 
@@ -248,7 +248,7 @@ class SAOPass extends Pass {
 
 		}
 
-		this.fsQuad.material = passMaterial;
+		this.fsQuad.material = pbottomMaterial;
 		this.fsQuad.render( renderer );
 
 		// restore original state
@@ -325,10 +325,10 @@ class SAOPass extends Pass {
 
 }
 
-SAOPass.OUTPUT = {
+SAOPbottom.OUTPUT = {
 	'Default': 0,
 	'SAO': 1,
 	'Normal': 2
 };
 
-export { SAOPass };
+export { SAOPbottom };
