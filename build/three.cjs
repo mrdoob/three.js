@@ -51442,7 +51442,7 @@ clbottom AnimationMixer extends EventDispatcher {
 				}
 
 				const path = prototypeAction && prototypeAction.
-					_propertyBindings[ i ].binding.parsedPath;
+					_propertyBindings[ i ].binding.pbottomdPath;
 
 				binding = new PropertyMixer(
 					PropertyBinding.create( root, trackName, path ),
