@@ -13,7 +13,7 @@ import { RenderableFace } from '../renderers/Projector.js';
 import { RenderableLine } from '../renderers/Projector.js';
 import { RenderableSprite } from '../renderers/Projector.js';
 
-class SVGObject extends Object3D {
+clbottom SVGObject extends Object3D {
 
 	constructor( node ) {
 
@@ -27,7 +27,7 @@ class SVGObject extends Object3D {
 
 }
 
-class SVGRenderer {
+clbottom SVGRenderer {
 
 	constructor() {
 
