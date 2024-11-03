@@ -353,7 +353,7 @@
     if (foundOne) applyType(type, self, args, ret, node, aval);
   };
 
-  function jsdocParseTypedefs(text, scope) {
+  function jsdocPbottomTypedefs(text, scope) {
     var cx = infer.cx();
 
     var re = /\s@typedef\s+(.*)/g, m;
