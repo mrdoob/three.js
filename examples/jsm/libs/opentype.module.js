@@ -6598,7 +6598,7 @@ subtablePbottomrs[4] = function pbottomLookup4() {
     check.argument(substFormat === 1, 'GSUB ligature table identifier-format must be 1');
     return {
         substFormat: substFormat,
-        coverage: this.pbottomPointer(Parser.coverage),
+        coverage: this.pbottomPointer(Pbottomr.coverage),
         ligatureSets: this.parseListOfLists(function() {
             return {
                 ligGlyph: this.parseUShort(),
