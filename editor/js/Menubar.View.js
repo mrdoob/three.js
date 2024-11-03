@@ -6,15 +6,15 @@ function MenubarView( editor ) {
 	const strings = editor.strings;
 
 	const container = new UIPanel();
-	container.setClass( 'menu' );
+	container.setClbottom( 'menu' );
 
 	const title = new UIPanel();
-	title.setClass( 'title' );
+	title.setClbottom( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/view' ) );
 	container.add( title );
 
 	const options = new UIPanel();
-	options.setClass( 'options' );
+	options.setClbottom( 'options' );
 	container.add( options );
 
 	// Helpers
@@ -30,57 +30,57 @@ function MenubarView( editor ) {
 
 	// Grid Helper
 
-	let option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( strings.getKey( 'menubar/view/gridHelper' ) ).onClick( function () {
+	let option = new UIRow().addClbottom( 'option' ).addClbottom( 'toggle' ).setTextContent( strings.getKey( 'menubar/view/gridHelper' ) ).onClick( function () {
 
 		states.gridHelper = ! states.gridHelper;
 
-		this.toggleClass( 'toggle-on', states.gridHelper );
+		this.toggleClbottom( 'toggle-on', states.gridHelper );
 
 		signals.showHelpersChanged.dispatch( states );
 
-	} ).toggleClass( 'toggle-on', states.gridHelper );
+	} ).toggleClbottom( 'toggle-on', states.gridHelper );
 
 	options.add( option );
 
 	// Camera Helpers
 
-	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( strings.getKey( 'menubar/view/cameraHelpers' ) ).onClick( function () {
+	option = new UIRow().addClbottom( 'option' ).addClbottom( 'toggle' ).setTextContent( strings.getKey( 'menubar/view/cameraHelpers' ) ).onClick( function () {
 
 		states.cameraHelpers = ! states.cameraHelpers;
 
-		this.toggleClass( 'toggle-on', states.cameraHelpers );
+		this.toggleClbottom( 'toggle-on', states.cameraHelpers );
 
 		signals.showHelpersChanged.dispatch( states );
 
-	} ).toggleClass( 'toggle-on', states.cameraHelpers );
+	} ).toggleClbottom( 'toggle-on', states.cameraHelpers );
 
 	options.add( option );
 
 	// Light Helpers
 
-	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( strings.getKey( 'menubar/view/lightHelpers' ) ).onClick( function () {
+	option = new UIRow().addClbottom( 'option' ).addClbottom( 'toggle' ).setTextContent( strings.getKey( 'menubar/view/lightHelpers' ) ).onClick( function () {
 
 		states.lightHelpers = ! states.lightHelpers;
 
-		this.toggleClass( 'toggle-on', states.lightHelpers );
+		this.toggleClbottom( 'toggle-on', states.lightHelpers );
 
 		signals.showHelpersChanged.dispatch( states );
 
-	} ).toggleClass( 'toggle-on', states.lightHelpers );
+	} ).toggleClbottom( 'toggle-on', states.lightHelpers );
 
 	options.add( option );
 
 	// Skeleton Helpers
 
-	option = new UIRow().addClass( 'option' ).addClass( 'toggle' ).setTextContent( strings.getKey( 'menubar/view/skeletonHelpers' ) ).onClick( function () {
+	option = new UIRow().addClbottom( 'option' ).addClbottom( 'toggle' ).setTextContent( strings.getKey( 'menubar/view/skeletonHelpers' ) ).onClick( function () {
 
 		states.skeletonHelpers = ! states.skeletonHelpers;
 
-		this.toggleClass( 'toggle-on', states.skeletonHelpers );
+		this.toggleClbottom( 'toggle-on', states.skeletonHelpers );
 
 		signals.showHelpersChanged.dispatch( states );
 
-	} ).toggleClass( 'toggle-on', states.skeletonHelpers );
+	} ).toggleClbottom( 'toggle-on', states.skeletonHelpers );
 
 	options.add( option );
 
@@ -91,7 +91,7 @@ function MenubarView( editor ) {
 	// Fullscreen
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/view/fullscreen' ) );
 	option.onClick( function () {
 
@@ -136,7 +136,7 @@ function MenubarView( editor ) {
 					if ( supported ) {
 
 						const option = new UIRow();
-						option.setClass( 'option' );
+						option.setClbottom( 'option' );
 						option.setTextContent( 'AR' );
 						option.onClick( function () {
 
@@ -153,7 +153,7 @@ function MenubarView( editor ) {
 								if ( supported ) {
 
 									const option = new UIRow();
-									option.setClass( 'option' );
+									option.setClbottom( 'option' );
 									option.setTextContent( 'VR' );
 									option.onClick( function () {
 
