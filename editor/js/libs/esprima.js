@@ -1705,7 +1705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else {
 	            var startToken = this.lookahead;
 	            var token = startToken;
-	            expr = this.parseConditionalExpression();
+	            expr = this.pbottomConditionalExpression();
 	            if (expr.type === ArrowParameterPlaceHolder || this.match('=>')) {
 	                // ECMA-262 14.2 Arrow Function Definitions
 	                this.context.isAssignmentTarget = false;
