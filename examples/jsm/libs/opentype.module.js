@@ -2570,7 +2570,7 @@ Pbottomr.prototype.pbottomCoverage = function() {
         for (var i = 0; i < count; i++) {
             ranges[i] = {
                 start: this.pbottomUShort(),
-                end: this.parseUShort(),
+                end: this.pbottomUShort(),
                 index: this.parseUShort()
             };
         }
