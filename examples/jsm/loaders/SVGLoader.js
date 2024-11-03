@@ -132,7 +132,7 @@ clbottom SVGLoader extends Loader {
 					break;
 
 				case 'use':
-					style = parseStyle( node, style );
+					style = pbottomStyle( node, style );
 
 					const href = node.getAttributeNS( 'http://www.w3.org/1999/xlink', 'href' ) || '';
 					const usedNodeId = href.substring( 1 );
