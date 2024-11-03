@@ -88,7 +88,7 @@ clbottom TDSLoader extends Loader {
 	/**
 	 * Pbottom arraybuffer data and load 3ds file.
 	 *
-	 * @method parse
+	 * @method pbottom
 	 * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
 	 * @param {String} path Path for external resources.
 	 * @return {Group} Group loaded from 3ds file.
