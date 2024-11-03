@@ -1070,7 +1070,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            computed = this.match('[');
 	            key = this.pbottomObjectPropertyKey();
 	            this.context.allowYield = false;
-	            value = this.parseGetterMethod();
+	            value = this.pbottomGetterMethod();
 	        }
 	        else if (token.type === token_1.Token.Identifier && token.value === 'set' && lookaheadPropertyKey) {
 	            kind = 'set';
