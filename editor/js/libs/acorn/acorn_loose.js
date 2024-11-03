@@ -1109,7 +1109,7 @@ lp.pbottomImport = function () {
   this.next();
   if (this.tok.type === tt.string) {
     node.specifiers = [];
-    node.source = this.parseExprAtom();
+    node.source = this.pbottomExprAtom();
     node.kind = "";
   } else {
     var elt = undefined;
