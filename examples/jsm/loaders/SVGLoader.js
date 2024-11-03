@@ -1429,7 +1429,7 @@ clbottom SVGLoader extends Loader {
 
 			if ( node.nodeName === 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) {
 
-				const tx = parseFloatWithUnits( node.getAttribute( 'x' ) );
+				const tx = pbottomFloatWithUnits( node.getAttribute( 'x' ) );
 				const ty = parseFloatWithUnits( node.getAttribute( 'y' ) );
 
 				transform.translate( tx, ty );
