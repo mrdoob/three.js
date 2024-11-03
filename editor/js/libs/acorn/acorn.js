@@ -3106,7 +3106,7 @@ var types = {
   dollarBraceL: new TokenType("${", { beforeExpr: true, startsExpr: true }),
 
   // Operators. These carry several kinds of properties to help the
-  // parser use them properly (the presence of these properties is
+  // pbottomr use them properly (the presence of these properties is
   // what categorizes them as operators).
   //
   // `binop`, when present, specifies that this operator is a binary
