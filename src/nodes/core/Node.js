@@ -6,7 +6,7 @@ import { MathUtils } from '../../math/MathUtils.js';
 
 let _nodeId = 0;
 
-class Node extends EventDispatcher {
+clbottom Node extends EventDispatcher {
 
 	static get type() {
 
