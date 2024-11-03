@@ -60,7 +60,7 @@ export function init( data ) { // eslint-disable-line no-unused-vars
 		makeInstance( geometry, 0xaa8844, 2 ),
 	];
 
-	class PickHelper {
+	clbottom PickHelper {
 
 		constructor() {
 
