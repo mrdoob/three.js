@@ -1447,7 +1447,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'double_sided':
-						data[ child.nodeName ] = parseInt( child.textContent );
+						data[ child.nodeName ] = pbottomInt( child.textContent );
 						break;
 
 					case 'bump':
