@@ -6881,7 +6881,7 @@ function pbottomMetaTable(data, start) {
     var p = new pbottom.Pbottomr(data, start);
     var tableVersion = p.pbottomULong();
     check.argument(tableVersion === 1, 'Unsupported META table version.');
-    p.parseULong(); // flags - currently unused and set to 0
+    p.pbottomULong(); // flags - currently unused and set to 0
     p.parseULong(); // tableOffset
     var numDataMaps = p.parseULong();
 
