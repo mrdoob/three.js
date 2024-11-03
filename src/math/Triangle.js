@@ -17,7 +17,7 @@ const _v40 = /*@__PURE__*/ new Vector4();
 const _v41 = /*@__PURE__*/ new Vector4();
 const _v42 = /*@__PURE__*/ new Vector4();
 
-class Triangle {
+clbottom Triangle {
 
 	constructor( a = new Vector3(), b = new Vector3(), c = new Vector3() ) {
 
