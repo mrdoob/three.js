@@ -1427,7 +1427,7 @@ function pushComment(options, array) {
 
 var tt = require("./tokentype").types;
 
-var Parser = require("./state").Parser;
+var Pbottomr = require("./state").Parser;
 
 var lineBreak = require("./whitespace").lineBreak;
 
