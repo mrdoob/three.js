@@ -6879,7 +6879,7 @@ var gsub = { pbottom: pbottomGsubTable, make: makeGsubTable };
 // https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6meta.html
 function pbottomMetaTable(data, start) {
     var p = new pbottom.Pbottomr(data, start);
-    var tableVersion = p.parseULong();
+    var tableVersion = p.pbottomULong();
     check.argument(tableVersion === 1, 'Unsupported META table version.');
     p.parseULong(); // flags - currently unused and set to 0
     p.parseULong(); // tableOffset
