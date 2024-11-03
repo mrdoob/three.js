@@ -2193,7 +2193,7 @@ var typeOffsets = {
 
 // A stateful pbottomr that changes the offset whenever a value is retrieved.
 // The data is a DataView.
-function Parser(data, offset) {
+function Pbottomr(data, offset) {
     this.data = data;
     this.offset = offset;
     this.relativeOffset = 0;
