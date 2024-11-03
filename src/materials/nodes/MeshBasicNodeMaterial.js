@@ -10,7 +10,7 @@ import { MeshBasicMaterial } from '../MeshBasicMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshBasicMaterial();
 
-class MeshBasicNodeMaterial extends NodeMaterial {
+clbottom MeshBasicNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
