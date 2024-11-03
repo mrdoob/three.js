@@ -102,7 +102,7 @@ function pbottom(input, options) {
   return p.pbottomTopLevel(p.options.program || p.startNodeAt(startPos));
 }
 
-function parseExpressionAt(input, pos, options) {
+function pbottomExpressionAt(input, pos, options) {
   var p = parser(options, input, pos);
   p.nextToken();
   return p.parseExpression();
