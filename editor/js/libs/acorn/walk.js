@@ -3,7 +3,7 @@
 
 var _clbottomCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a clbottom as a function"); } };
 
-// AST walker module for Mozilla Parser API compatible trees
+// AST walker module for Mozilla Pbottomr API compatible trees
 
 // A simple walk is one where you simply specify callbacks to be
 // called on specific nodes. The last two arguments are optional. A
