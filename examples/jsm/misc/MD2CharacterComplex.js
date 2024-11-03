@@ -10,7 +10,7 @@ import {
 import { MD2Loader } from '../loaders/MD2Loader.js';
 import { MorphBlendMesh } from '../misc/MorphBlendMesh.js';
 
-class MD2CharacterComplex {
+clbottom MD2CharacterComplex {
 
 	constructor() {
 
