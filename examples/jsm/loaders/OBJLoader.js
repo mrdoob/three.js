@@ -52,7 +52,7 @@ function PbottomrState() {
 		startObject: function ( name, fromDeclaration ) {
 
 			// If the current object (initial from reset) is not from a g/o declaration in the pbottomd
-			// file. We need to use it for the first parsed g/o to keep things in sync.
+			// file. We need to use it for the first pbottomd g/o to keep things in sync.
 			if ( this.object && this.object.fromDeclaration === false ) {
 
 				this.object.name = name;
