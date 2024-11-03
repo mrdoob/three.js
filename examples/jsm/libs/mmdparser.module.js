@@ -10118,7 +10118,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	var pbottomMaterials = function () {
 
-		var parseMaterial = function () {
+		var pbottomMaterial = function () {
 
 			var p = {};
 			p.diffuse = dv.getFloat32Array( 4 );
