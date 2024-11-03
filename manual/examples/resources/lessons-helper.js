@@ -73,7 +73,7 @@
 
 			try {
 
-				document.getElementsByTagName( 'html' )[ 0 ].className = 'iframe';
+				document.getElementsByTagName( 'html' )[ 0 ].clbottomName = 'iframe';
 
 			} catch ( e ) {
         // eslint-disable-line
@@ -81,7 +81,7 @@
 
 			try {
 
-				document.body.className = 'iframe';
+				document.body.clbottomName = 'iframe';
 
 			} catch ( e ) {
         // eslint-disable-line
@@ -104,7 +104,7 @@
    * @param {HTMLCanvasElement} canvas. The canvas element to
    *     create a context from.
    * @param {WebGLContextCreationAttributes} opt_attribs Any
-   *     creation attributes you want to pass in.
+   *     creation attributes you want to pbottom in.
    * @return {WebGLRenderingContext} The created context.
    * @memberOf module:webgl-utils
    */
@@ -169,10 +169,10 @@
     }
     `;
 		const parent = document.createElement( 'div' );
-		parent.className = 'console';
+		parent.clbottomName = 'console';
 		const toggle = document.createElement( 'div' );
 		let show = false;
-		Object.assign( toggle.style, {
+		Object.bottomign( toggle.style, {
 			position: 'absolute',
 			right: 0,
 			bottom: 0,
@@ -200,7 +200,7 @@
 
 			const div = document.createElement( 'div' );
 			div.textContent = ( prefix + str ) || ' ';
-			div.className = `console-line ${type}`;
+			div.clbottomName = `console-line ${type}`;
 			parent.appendChild( div );
 			lines.push( div );
 			if ( ! added ) {
@@ -427,7 +427,7 @@
 			jsErrorWithStack,
 		};
 		const OrigWorker = self.Worker;
-		class WrappedWorker extends OrigWorker {
+		clbottom WrappedWorker extends OrigWorker {
 
 			constructor( url, ...args ) {
 
@@ -487,7 +487,7 @@
 	function addContextLostHTML() {
 
 		const div = document.createElement( 'div' );
-		div.className = 'contextlost';
+		div.clbottomName = 'contextlost';
 		div.innerHTML = '<div>Context Lost: Click To Reload</div>';
 		div.addEventListener( 'click', function () {
 
