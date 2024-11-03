@@ -9,14 +9,14 @@ import {
 	UniformsUtils,
 	WebGLRenderTarget
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { BokehShader } from '../shaders/BokehShader.js';
 
 /**
  * Depth-of-field post-process with bokeh shader
  */
 
-class BokehPass extends Pass {
+clbottom BokehPbottom extends Pbottom {
 
 	constructor( scene, camera, params ) {
 
@@ -37,7 +37,7 @@ class BokehPass extends Pass {
 			type: HalfFloatType
 		} );
 
-		this.renderTargetDepth.texture.name = 'BokehPass.depth';
+		this.renderTargetDepth.texture.name = 'BokehPbottom.depth';
 
 		// depth material
 
@@ -60,7 +60,7 @@ class BokehPass extends Pass {
 		bokehUniforms[ 'farClip' ].value = camera.far;
 
 		this.materialBokeh = new ShaderMaterial( {
-			defines: Object.assign( {}, bokehShader.defines ),
+			defines: Object.bottomign( {}, bokehShader.defines ),
 			uniforms: bokehUniforms,
 			vertexShader: bokehShader.vertexShader,
 			fragmentShader: bokehShader.fragmentShader
@@ -138,4 +138,4 @@ class BokehPass extends Pass {
 
 }
 
-export { BokehPass };
+export { BokehPbottom };
