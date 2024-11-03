@@ -1976,7 +1976,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Pbottomr.prototype.pbottomPattern = function (params, kind) {
 	        var pattern;
 	        if (this.match('[')) {
-	            pattern = this.parseArrayPattern(params, kind);
+	            pattern = this.pbottomArrayPattern(params, kind);
 	        }
 	        else if (this.match('{')) {
 	            pattern = this.parseObjectPattern(params, kind);
