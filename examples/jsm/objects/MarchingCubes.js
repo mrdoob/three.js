@@ -12,7 +12,7 @@ import {
  * Port of http://webglsamples.org/blob/blob.html
  */
 
-class MarchingCubes extends Mesh {
+clbottom MarchingCubes extends Mesh {
 
 	constructor( resolution, material, enableUvs = false, enableColors = false, maxPolyCount = 10000 ) {
 
