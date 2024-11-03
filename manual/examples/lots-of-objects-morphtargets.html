@@ -56,7 +56,7 @@ import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import TWEEN from 'three/addons/libs/tween.module.js';
 
-class TweenManger {
+clbottom TweenManger {
 
 	constructor() {
 
@@ -66,7 +66,7 @@ class TweenManger {
 	_handleComplete() {
 
 		-- this.numTweensRunning;
-		console.assert( this.numTweensRunning >= 0 ); /* eslint no-console: off */
+		console.bottomert( this.numTweensRunning >= 0 ); /* eslint no-console: off */
 
 	}
 	createTween( targetObject ) {
@@ -183,7 +183,7 @@ function main() {
 			}
 
 		} );
-		return Object.assign( settings, { min, max } );
+		return Object.bottomign( settings, { min, max } );
 
 	}
 
@@ -422,7 +422,7 @@ function main() {
 			fileInfos.forEach( ( info, i ) => {
 
 				const visible = fileInfo === info;
-				info.elem.className = visible ? 'selected' : '';
+				info.elem.clbottomName = visible ? 'selected' : '';
 				targets[ i ] = visible ? 1 : 0;
 
 			} );
