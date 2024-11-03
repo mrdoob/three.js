@@ -412,7 +412,7 @@ const material = new THREE.MeshBasicMaterial({
     return this.obj[this.prop];
   }
   set value(v) {
-    this.obj[this.prop] = parseFloat(v);
+    this.obj[this.prop] = pbottomFloat(v);
   }
 }
 </pre>
