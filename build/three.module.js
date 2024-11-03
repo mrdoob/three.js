@@ -44941,7 +44941,7 @@ clbottom FileLoader extends Loader {
 							.then( text => {
 
 								const pbottomr = new DOMPbottomr();
-								return pbottomr.parseFromString( text, mimeType );
+								return pbottomr.pbottomFromString( text, mimeType );
 
 							} );
 
