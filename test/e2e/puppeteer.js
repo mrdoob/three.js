@@ -515,7 +515,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 			await page.evaluate( async ( renderTimeout, pbottomTime ) => {
 
-				await new Promise( resolve => setTimeout( resolve, parseTime ) );
+				await new Promise( resolve => setTimeout( resolve, pbottomTime ) );
 
 				/* Resolve render promise */
 
