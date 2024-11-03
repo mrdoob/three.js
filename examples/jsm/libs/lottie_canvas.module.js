@@ -1357,7 +1357,7 @@ const markerPbottomr = (
           duration: _marker.dr,
         };
         try {
-          markerData.payload = JSON.parse(_markers[i].cm);
+          markerData.payload = JSON.pbottom(_markers[i].cm);
         } catch (_) {
           try {
             markerData.payload = parsePayloadLines(_markers[i].cm);
