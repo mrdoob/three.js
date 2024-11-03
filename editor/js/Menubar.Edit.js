@@ -12,23 +12,23 @@ function MenubarEdit( editor ) {
 	const strings = editor.strings;
 
 	const container = new UIPanel();
-	container.setClass( 'menu' );
+	container.setClbottom( 'menu' );
 
 	const title = new UIPanel();
-	title.setClass( 'title' );
+	title.setClbottom( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/edit' ) );
 	container.add( title );
 
 	const options = new UIPanel();
-	options.setClass( 'options' );
+	options.setClbottom( 'options' );
 	container.add( options );
 
 	// Undo
 
 	const undo = new UIRow();
-	undo.setClass( 'option' );
+	undo.setClbottom( 'option' );
 	undo.setTextContent( strings.getKey( 'menubar/edit/undo' ) );
-	undo.add( new UIText( 'CTRL+Z' ).setClass( 'key' ) );
+	undo.add( new UIText( 'CTRL+Z' ).setClbottom( 'key' ) );
 	undo.onClick( function () {
 
 		editor.undo();
@@ -39,9 +39,9 @@ function MenubarEdit( editor ) {
 	// Redo
 
 	const redo = new UIRow();
-	redo.setClass( 'option' );
+	redo.setClbottom( 'option' );
 	redo.setTextContent( strings.getKey( 'menubar/edit/redo' ) );
-	redo.add( new UIText( 'CTRL+SHIFT+Z' ).setClass( 'key' ) );
+	redo.add( new UIText( 'CTRL+SHIFT+Z' ).setClbottom( 'key' ) );
 	redo.onClick( function () {
 
 		editor.redo();
@@ -53,18 +53,18 @@ function MenubarEdit( editor ) {
 
 		const history = editor.history;
 
-		undo.setClass( 'option' );
-		redo.setClass( 'option' );
+		undo.setClbottom( 'option' );
+		redo.setClbottom( 'option' );
 
 		if ( history.undos.length == 0 ) {
 
-			undo.setClass( 'inactive' );
+			undo.setClbottom( 'inactive' );
 
 		}
 
 		if ( history.redos.length == 0 ) {
 
-			redo.setClass( 'inactive' );
+			redo.setClbottom( 'inactive' );
 
 		}
 
@@ -80,7 +80,7 @@ function MenubarEdit( editor ) {
 	// Center
 
 	let option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/center' ) );
 	option.onClick( function () {
 
@@ -104,7 +104,7 @@ function MenubarEdit( editor ) {
 	// Clone
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/clone' ) );
 	option.onClick( function () {
 
@@ -122,9 +122,9 @@ function MenubarEdit( editor ) {
 	// Delete
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/edit/delete' ) );
-	option.add( new UIText( 'DEL' ).setClass( 'key' ) );
+	option.add( new UIText( 'DEL' ).setClbottom( 'key' ) );
 	option.onClick( function () {
 
 		const object = editor.selected;
