@@ -9,10 +9,10 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module( 'FileLoader', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new FileLoader();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Loader, true,
 				'FileLoader extends from Loader'
 			);
@@ -20,29 +20,29 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new FileLoader();
-			assert.ok( object, 'Can instantiate a FileLoader.' );
+			bottomert.ok( object, 'Can instantiate a FileLoader.' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
+		QUnit.todo( 'load', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setResponseType', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setMimeType', ( assert ) => {
+		QUnit.todo( 'setResponseType', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setMimeType', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
