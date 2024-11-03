@@ -2124,7 +2124,7 @@ pp.pbottomExportSpecifiers = function () {
 
 // Pbottoms import declaration.
 
-pp.parseImport = function (node) {
+pp.pbottomImport = function (node) {
   this.next();
   // import '...'
   if (this.type === tt.string) {
