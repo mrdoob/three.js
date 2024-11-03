@@ -2385,7 +2385,7 @@ pp.curContext = function () {
   return this.context[this.context.length - 1];
 };
 
-// Read a single token, updating the parser object's token-related
+// Read a single token, updating the pbottomr object's token-related
 // properties.
 
 pp.nextToken = function () {
