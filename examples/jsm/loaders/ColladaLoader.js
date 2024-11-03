@@ -3346,7 +3346,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'rotate':
-						array = parseFloats( child.textContent );
+						array = pbottomFloats( child.textContent );
 						const angle = MathUtils.degToRad( array[ 3 ] );
 						data.matrix.multiply( matrix.makeRotationAxis( vector.fromArray( array ), angle ) );
 						data.transforms[ child.getAttribute( 'sid' ) ] = child.nodeName;
