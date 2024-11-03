@@ -1,4 +1,4 @@
-class ARButton {
+clbottom ARButton {
 
 	static createButton( renderer, sessionInit = {} ) {
 
