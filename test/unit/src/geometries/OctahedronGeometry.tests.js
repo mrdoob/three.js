@@ -26,10 +26,10 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new OctahedronGeometry();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof PolyhedronGeometry, true,
 				'OctahedronGeometry extends from PolyhedronGeometry'
 			);
@@ -37,41 +37,41 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new OctahedronGeometry();
-			assert.ok( object, 'Can instantiate an OctahedronGeometry.' );
+			bottomert.ok( object, 'Can instantiate an OctahedronGeometry.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new OctahedronGeometry();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'OctahedronGeometry',
 				'OctahedronGeometry.type should be OctahedronGeometry'
 			);
 
 		} );
 
-		QUnit.todo( 'parameters', ( assert ) => {
+		QUnit.todo( 'parameters', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
+		QUnit.todo( 'fromJSON', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard geometry tests', ( assert ) => {
+		QUnit.test( 'Standard geometry tests', ( bottomert ) => {
 
-			runStdGeometryTests( assert, geometries );
+			runStdGeometryTests( bottomert, geometries );
 
 		} );
 
