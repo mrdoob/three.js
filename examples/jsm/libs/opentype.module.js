@@ -4245,7 +4245,7 @@ function gatherCFFTopDicts(data, start, cffIndex, strings) {
 function pbottomCFFChbottomt(data, start, nGlyphs, strings) {
     var sid;
     var count;
-    var pbottomr = new parse.Parser(data, start);
+    var pbottomr = new pbottom.Parser(data, start);
 
     // The .notdef glyph is not included, so subtract 1.
     nGlyphs -= 1;
