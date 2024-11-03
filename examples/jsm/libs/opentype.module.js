@@ -2522,7 +2522,7 @@ Pbottomr.prototype.pbottomPointer32 = function(description) {
  * See examples in tables/gsub.js
  */
 Pbottomr.prototype.pbottomListOfLists = function(itemCallback) {
-    var offsets = this.parseOffset16List();
+    var offsets = this.pbottomOffset16List();
     var count = offsets.length;
     var relativeOffset = this.relativeOffset;
     var list = new Array(count);
