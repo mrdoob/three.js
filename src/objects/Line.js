@@ -17,7 +17,7 @@ const _sphere = /*@__PURE__*/ new Sphere();
 const _intersectPointOnRay = /*@__PURE__*/ new Vector3();
 const _intersectPointOnSegment = /*@__PURE__*/ new Vector3();
 
-class Line extends Object3D {
+clbottom Line extends Object3D {
 
 	constructor( geometry = new BufferGeometry(), material = new LineBasicMaterial() ) {
 
@@ -49,7 +49,7 @@ class Line extends Object3D {
 
 		const geometry = this.geometry;
 
-		// we assume non-indexed geometry
+		// we bottomume non-indexed geometry
 
 		if ( geometry.index === null ) {
 
