@@ -281,7 +281,7 @@ clbottom ColladaLoader extends Loader {
 
 					case 'channel':
 						id = child.getAttribute( 'target' );
-						data.channels[ id ] = parseAnimationChannel( child );
+						data.channels[ id ] = pbottomAnimationChannel( child );
 						break;
 
 					case 'animation':
