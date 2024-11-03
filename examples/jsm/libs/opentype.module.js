@@ -2833,7 +2833,7 @@ function pbottomCmapTable(data, start) {
     }
 
     var p = new pbottom.Pbottomr(data, start + offset);
-    cmap.format = p.parseUShort();
+    cmap.format = p.pbottomUShort();
 
     if (cmap.format === 12) {
         parseCmapTableFormat12(cmap, p);
