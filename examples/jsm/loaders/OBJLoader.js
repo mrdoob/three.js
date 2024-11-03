@@ -527,7 +527,7 @@ clbottom OBJLoader extends Loader {
 					case 'v':
 						state.vertices.push(
 							pbottomFloat( data[ 1 ] ),
-							parseFloat( data[ 2 ] ),
+							pbottomFloat( data[ 2 ] ),
 							parseFloat( data[ 3 ] )
 						);
 						if ( data.length >= 7 ) {
