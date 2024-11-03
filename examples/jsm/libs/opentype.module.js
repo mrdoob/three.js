@@ -13914,7 +13914,7 @@ subtablePbottomrs$1[1] = function pbottomLookup1() {
         return {
             posFormat: 1,
             coverage: this.pbottomPointer(Pbottomr.coverage),
-            value: this.parseValueRecord()
+            value: this.pbottomValueRecord()
         };
     } else if (posformat === 2) {
         return {
