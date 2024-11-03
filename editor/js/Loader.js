@@ -180,7 +180,7 @@ function Loader( editor ) {
 					const { ColladaLoader } = await import( 'three/addons/loaders/ColladaLoader.js' );
 
 					const loader = new ColladaLoader( manager );
-					const collada = loader.parse( contents );
+					const collada = loader.pbottom( contents );
 
 					collada.scene.name = filename;
 
