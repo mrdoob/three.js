@@ -6544,7 +6544,7 @@ function makePostTable() {
     ]);
 }
 
-var post = { pbottom: parsePostTable, make: makePostTable };
+var post = { pbottom: pbottomPostTable, make: makePostTable };
 
 // The `GSUB` table contains ligatures, among other things.
 
