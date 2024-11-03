@@ -6,10 +6,10 @@ import {
 	Vector2,
 	WebGLRenderTarget
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { ConvolutionShader } from '../shaders/ConvolutionShader.js';
 
-class BloomPass extends Pass {
+clbottom BloomPbottom extends Pbottom {
 
 	constructor( strength = 1, kernelSize = 25, sigma = 4 ) {
 
@@ -18,9 +18,9 @@ class BloomPass extends Pass {
 		// render targets
 
 		this.renderTargetX = new WebGLRenderTarget( 1, 1, { type: HalfFloatType } ); // will be resized later
-		this.renderTargetX.texture.name = 'BloomPass.x';
+		this.renderTargetX.texture.name = 'BloomPbottom.x';
 		this.renderTargetY = new WebGLRenderTarget( 1, 1, { type: HalfFloatType } ); // will be resized later
-		this.renderTargetY.texture.name = 'BloomPass.y';
+		this.renderTargetY.texture.name = 'BloomPbottom.y';
 
 		// combine material
 
@@ -45,7 +45,7 @@ class BloomPass extends Pass {
 
 		this.convolutionUniforms = UniformsUtils.clone( convolutionShader.uniforms );
 
-		this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPass.blurX;
+		this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPbottom.blurX;
 		this.convolutionUniforms[ 'cKernel' ].value = ConvolutionShader.buildKernel( sigma );
 
 		this.materialConvolution = new ShaderMaterial( {
@@ -71,22 +71,22 @@ class BloomPass extends Pass {
 
 		if ( maskActive ) renderer.state.buffers.stencil.setTest( false );
 
-		// Render quad with blured scene into texture (convolution pass 1)
+		// Render quad with blured scene into texture (convolution pbottom 1)
 
 		this.fsQuad.material = this.materialConvolution;
 
 		this.convolutionUniforms[ 'tDiffuse' ].value = readBuffer.texture;
-		this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPass.blurX;
+		this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPbottom.blurX;
 
 		renderer.setRenderTarget( this.renderTargetX );
 		renderer.clear();
 		this.fsQuad.render( renderer );
 
 
-		// Render quad with blured scene into texture (convolution pass 2)
+		// Render quad with blured scene into texture (convolution pbottom 2)
 
 		this.convolutionUniforms[ 'tDiffuse' ].value = this.renderTargetX.texture;
-		this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPass.blurY;
+		this.convolutionUniforms[ 'uImageIncrement' ].value = BloomPbottom.blurY;
 
 		renderer.setRenderTarget( this.renderTargetY );
 		renderer.clear();
@@ -166,7 +166,7 @@ const CombineShader = {
 
 };
 
-BloomPass.blurX = new Vector2( 0.001953125, 0.0 );
-BloomPass.blurY = new Vector2( 0.0, 0.001953125 );
+BloomPbottom.blurX = new Vector2( 0.001953125, 0.0 );
+BloomPbottom.blurY = new Vector2( 0.0, 0.001953125 );
 
-export { BloomPass };
+export { BloomPbottom };
