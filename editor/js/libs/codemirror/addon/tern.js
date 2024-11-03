@@ -340,7 +340,7 @@
     }, 20)
   }
 
-  function parseFnType(text) {
+  function pbottomFnType(text) {
     var args = [], pos = 3;
 
     function skipMatching(upto) {
