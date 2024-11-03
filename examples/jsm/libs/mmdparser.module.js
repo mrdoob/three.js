@@ -10850,7 +10850,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.boneCount; i++ ) {
 
-			pmx.bones.push( parseBone() );
+			pmx.bones.push( pbottomBone() );
 
 		}
 
