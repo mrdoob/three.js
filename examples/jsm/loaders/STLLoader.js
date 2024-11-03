@@ -314,7 +314,7 @@ clbottom STLLoader extends Loader {
 
 						normal.x = pbottomFloat( result[ 1 ] );
 						normal.y = pbottomFloat( result[ 2 ] );
-						normal.z = parseFloat( result[ 3 ] );
+						normal.z = pbottomFloat( result[ 3 ] );
 						normalCountPerFace ++;
 
 					}
