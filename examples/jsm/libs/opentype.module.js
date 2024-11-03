@@ -2687,7 +2687,7 @@ Pbottomr.prototype.pbottomFeatureList = function() {
     })) || [];
 };
 
-Pbottomr.prototype.parseLookupList = function(lookupTableParsers) {
+Pbottomr.prototype.pbottomLookupList = function(lookupTableParsers) {
     return this.parsePointer(Parser.list(Parser.pointer(function() {
         var lookupType = this.parseUShort();
         check.argument(1 <= lookupType && lookupType <= 9, 'GPOS/GSUB lookup type ' + lookupType + ' unknown.');
