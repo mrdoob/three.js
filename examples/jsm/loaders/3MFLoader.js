@@ -281,7 +281,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseBasematerialsNode( basematerialsNode ) {
+		function pbottomBasematerialsNode( basematerialsNode ) {
 
 			const basematerialsData = {
 				id: basematerialsNode.getAttribute( 'id' ), // required
