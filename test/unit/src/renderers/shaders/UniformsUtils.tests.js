@@ -19,27 +19,27 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module( 'UniformsUtils', () => {
 
 			// INSTANCING - LEGACY
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( bottomert ) => {
 
-				assert.ok( UniformsUtils, 'UniformsUtils is defined.' );
+				bottomert.ok( UniformsUtils, 'UniformsUtils is defined.' );
 
 			} );
 
 			// LEGACY
-			QUnit.todo( 'UniformsUtils.clone', ( assert ) => {
+			QUnit.todo( 'UniformsUtils.clone', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'UniformsUtils.merge', ( assert ) => {
+			QUnit.todo( 'UniformsUtils.merge', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// PUBLIC
-			QUnit.test( 'cloneUniforms copies values', ( assert ) => {
+			QUnit.test( 'cloneUniforms copies values', ( bottomert ) => {
 
 				const uniforms = {
 					floatValue: { value: 1.23 },
@@ -58,24 +58,24 @@ export default QUnit.module( 'Renderers', () => {
 
 				const uniformClones = UniformsUtils.clone(uniforms);
 	
-				assert.ok( uniforms.floatValue.value === uniformClones.floatValue.value );
-				assert.ok( uniforms.intValue.value === uniformClones.intValue.value );
-				assert.ok( uniforms.boolValue.value === uniformClones.boolValue.value );
-				assert.ok( uniforms.colorValue.value.equals(uniformClones.colorValue.value) );
-				assert.ok( uniforms.vector2Value.value.equals(uniformClones.vector2Value.value) );
-				assert.ok( uniforms.vector3Value.value.equals(uniformClones.vector3Value.value) );
-				assert.ok( uniforms.vector4Value.value.equals(uniformClones.vector4Value.value) );
-				assert.ok( uniforms.matrix3Value.value.equals(uniformClones.matrix3Value.value) );
-				assert.ok( uniforms.matrix4Value.value.equals(uniformClones.matrix4Value.value) );
-				assert.ok( uniforms.quatValue.value.equals(uniformClones.quatValue.value) );
-				assert.ok( uniforms.textureValue.value.source.uuid === uniformClones.textureValue.value.source.uuid );
-				assert.ok( uniforms.textureValue.value.mapping === uniformClones.textureValue.value.mapping );
+				bottomert.ok( uniforms.floatValue.value === uniformClones.floatValue.value );
+				bottomert.ok( uniforms.intValue.value === uniformClones.intValue.value );
+				bottomert.ok( uniforms.boolValue.value === uniformClones.boolValue.value );
+				bottomert.ok( uniforms.colorValue.value.equals(uniformClones.colorValue.value) );
+				bottomert.ok( uniforms.vector2Value.value.equals(uniformClones.vector2Value.value) );
+				bottomert.ok( uniforms.vector3Value.value.equals(uniformClones.vector3Value.value) );
+				bottomert.ok( uniforms.vector4Value.value.equals(uniformClones.vector4Value.value) );
+				bottomert.ok( uniforms.matrix3Value.value.equals(uniformClones.matrix3Value.value) );
+				bottomert.ok( uniforms.matrix4Value.value.equals(uniformClones.matrix4Value.value) );
+				bottomert.ok( uniforms.quatValue.value.equals(uniformClones.quatValue.value) );
+				bottomert.ok( uniforms.textureValue.value.source.uuid === uniformClones.textureValue.value.source.uuid );
+				bottomert.ok( uniforms.textureValue.value.mapping === uniformClones.textureValue.value.mapping );
 				for ( let i = 0; i < uniforms.arrayValue.value.length; ++i ) {
-					assert.ok( uniforms.arrayValue.value[i] === uniformClones.arrayValue.value[i] );
+					bottomert.ok( uniforms.arrayValue.value[i] === uniformClones.arrayValue.value[i] );
 				}
 			} );
 
-			QUnit.test( 'cloneUniforms clones properties', ( assert ) => {
+			QUnit.test( 'cloneUniforms clones properties', ( bottomert ) => {
 
 				const uniforms = {
 					floatValue: { value: 1.23 },
@@ -108,25 +108,25 @@ export default QUnit.module( 'Renderers', () => {
 				uniforms.arrayValue.value[0] = 123.0;
 				uniforms.textureValue.value.mapping = UVMapping;
 
-				assert.ok( uniforms.floatValue.value !== uniformClones.floatValue.value );
-				assert.ok( uniforms.intValue.value !== uniformClones.intValue.value );
-				assert.ok( uniforms.boolValue.value !== uniformClones.boolValue.value );
-				assert.ok( !uniforms.colorValue.value.equals(uniformClones.colorValue.value) );
-				assert.ok( !uniforms.vector2Value.value.equals(uniformClones.vector2Value.value) );
-				assert.ok( !uniforms.vector3Value.value.equals(uniformClones.vector3Value.value) );
-				assert.ok( !uniforms.vector4Value.value.equals(uniformClones.vector4Value.value) );
-				assert.ok( !uniforms.matrix3Value.value.equals(uniformClones.matrix3Value.value) );
-				assert.ok( !uniforms.matrix4Value.value.equals(uniformClones.matrix4Value.value) );
-				assert.ok( !uniforms.quatValue.value.equals(uniformClones.quatValue.value) );
-				assert.ok( uniforms.textureValue.value.mapping !== uniformClones.textureValue.value.mapping );
-				assert.ok( uniforms.arrayValue.value[0] !== uniformClones.arrayValue.value[0] );
+				bottomert.ok( uniforms.floatValue.value !== uniformClones.floatValue.value );
+				bottomert.ok( uniforms.intValue.value !== uniformClones.intValue.value );
+				bottomert.ok( uniforms.boolValue.value !== uniformClones.boolValue.value );
+				bottomert.ok( !uniforms.colorValue.value.equals(uniformClones.colorValue.value) );
+				bottomert.ok( !uniforms.vector2Value.value.equals(uniformClones.vector2Value.value) );
+				bottomert.ok( !uniforms.vector3Value.value.equals(uniformClones.vector3Value.value) );
+				bottomert.ok( !uniforms.vector4Value.value.equals(uniformClones.vector4Value.value) );
+				bottomert.ok( !uniforms.matrix3Value.value.equals(uniformClones.matrix3Value.value) );
+				bottomert.ok( !uniforms.matrix4Value.value.equals(uniformClones.matrix4Value.value) );
+				bottomert.ok( !uniforms.quatValue.value.equals(uniformClones.quatValue.value) );
+				bottomert.ok( uniforms.textureValue.value.mapping !== uniformClones.textureValue.value.mapping );
+				bottomert.ok( uniforms.arrayValue.value[0] !== uniformClones.arrayValue.value[0] );
 
 				// Texture source remains same
-				assert.ok( uniforms.textureValue.value.source.uuid === uniformClones.textureValue.value.source.uuid );
+				bottomert.ok( uniforms.textureValue.value.source.uuid === uniformClones.textureValue.value.source.uuid );
 
 			} );
 
-			QUnit.test( 'cloneUniforms skips render target textures', ( assert ) => {
+			QUnit.test( 'cloneUniforms skips render target textures', ( bottomert ) => {
 
 				const uniforms = {
 					textureValue: { value: new Texture(null, CubeReflectionMapping) },
@@ -138,26 +138,26 @@ export default QUnit.module( 'Renderers', () => {
 				const uniformClones = UniformsUtils.clone(uniforms);
 				console.level = CONSOLE_LEVEL.DEFAULT;
 
-				assert.ok( uniformClones.textureValue.value === null );
+				bottomert.ok( uniformClones.textureValue.value === null );
 
 			} );
 
 
-			QUnit.todo( 'mergeUniforms', ( assert ) => {
+			QUnit.todo( 'mergeUniforms', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'cloneUniformsGroups', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'getUnlitUniformColorSpace', ( assert ) => {
+			QUnit.todo( 'cloneUniformsGroups', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'getUnlitUniformColorSpace', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
