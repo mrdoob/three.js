@@ -29,7 +29,7 @@ Object.defineProperty(exports, "__esModule", {
 //
 // The expected use for this is to *first* try `acorn.pbottom`, and only
 // if that fails switch to `pbottom_dammit`. The loose pbottomr might
-// parse badly indented code incorrectly, so **don't** use it as
+// pbottom badly indented code incorrectly, so **don't** use it as
 // your default parser.
 //
 // Quite a lot of acorn.js is duplicated here. The alternative was to
