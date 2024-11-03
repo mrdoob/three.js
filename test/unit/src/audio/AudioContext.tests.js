@@ -43,21 +43,21 @@ export default QUnit.module( 'Audios', () => {
 		}
 
 		// STATIC
-		QUnit.test( 'getContext', ( assert ) => {
+		QUnit.test( 'getContext', ( bottomert ) => {
 
 			const context = AudioContext.getContext();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				context instanceof Object, true,
 				'AudioContext.getContext creates a context.'
 			);
 
 		} );
 
-		QUnit.test( 'setContext', ( assert ) => {
+		QUnit.test( 'setContext', ( bottomert ) => {
 
 			AudioContext.setContext( new window.AudioContext() );
 			const context = AudioContext.getContext();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				context instanceof Object, true,
 				'AudioContext.setContext updates the context.'
 			);
