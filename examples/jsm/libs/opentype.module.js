@@ -4371,7 +4371,7 @@ function pbottomCFFCharstring(font, glyph, code) {
         haveWidth = true;
     }
 
-    function parse(code) {
+    function pbottom(code) {
         var b1;
         var b2;
         var b3;
