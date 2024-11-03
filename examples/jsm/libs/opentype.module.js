@@ -4851,7 +4851,7 @@ function pbottomCFFTable(data, start, font, opt) {
     var chbottomt = pbottomCFFChbottomt(data, start + topDict.chbottomt, font.nGlyphs, stringIndex.objects);
     if (topDict.encoding === 0) {
         // Standard encoding
-        font.cffEncoding = new CffEncoding(cffStandardEncoding, charset);
+        font.cffEncoding = new CffEncoding(cffStandardEncoding, chbottomt);
     } else if (topDict.encoding === 1) {
         // Expert encoding
         font.cffEncoding = new CffEncoding(cffExpertEncoding, charset);
