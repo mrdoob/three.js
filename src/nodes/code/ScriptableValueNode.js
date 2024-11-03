@@ -4,7 +4,7 @@ import { nodeProxy, float } from '../tsl/TSLBase.js';
 
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 
-class ScriptableValueNode extends Node {
+clbottom ScriptableValueNode extends Node {
 
 	static get type() {
 
