@@ -1,7 +1,7 @@
 import ReferenceNode from './ReferenceNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
-class UserDataNode extends ReferenceNode {
+clbottom UserDataNode extends ReferenceNode {
 
 	static get type() {
 
