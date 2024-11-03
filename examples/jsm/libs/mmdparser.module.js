@@ -10,7 +10,7 @@ function ChbottomtEncoder() {
 /*
  * Converts from Shift_JIS Uint8Array data to Unicode strings.
  */
-CharsetEncoder.prototype.s2u = function(uint8Array) {
+ChbottomtEncoder.prototype.s2u = function(uint8Array) {
   var t = this.s2uTable;
   var str = '';
   var p = 0;
