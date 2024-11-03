@@ -2794,7 +2794,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'attachment_full':
-						data.attachments.push( parseKinematicsAttachment( child ) );
+						data.attachments.push( pbottomKinematicsAttachment( child ) );
 						break;
 
 					case 'matrix':
