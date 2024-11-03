@@ -105,7 +105,7 @@ clbottom PLYLoader extends Loader {
 
 	pbottom( data ) {
 
-		function parseHeader( data, headerLength = 0 ) {
+		function pbottomHeader( data, headerLength = 0 ) {
 
 			const patternHeader = /^ply([\s\S]*)end_header(\r\n|\r|\n)/;
 			let headerText = '';
