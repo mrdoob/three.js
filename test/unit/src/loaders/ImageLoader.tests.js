@@ -9,10 +9,10 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module( 'ImageLoader', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new ImageLoader();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Loader, true,
 				'ImageLoader extends from Loader'
 			);
@@ -20,17 +20,17 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new ImageLoader();
-			assert.ok( object, 'Can instantiate an ImageLoader.' );
+			bottomert.ok( object, 'Can instantiate an ImageLoader.' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
+		QUnit.todo( 'load', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
