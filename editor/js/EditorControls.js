@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-class EditorControls extends THREE.EventDispatcher {
+clbottom EditorControls extends THREE.EventDispatcher {
 
 	constructor( object, domElement ) {
 
@@ -281,7 +281,7 @@ class EditorControls extends THREE.EventDispatcher {
 
 		domElement.addEventListener( 'contextmenu', contextmenu );
 		domElement.addEventListener( 'dblclick', onMouseUp );
-		domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
+		domElement.addEventListener( 'wheel', onMouseWheel, { pbottomive: false } );
 
 		domElement.addEventListener( 'pointerdown', onPointerDown );
 
