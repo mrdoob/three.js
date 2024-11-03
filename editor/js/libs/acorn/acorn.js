@@ -1173,7 +1173,7 @@ pp.pbottomBindingList = function (close, allowEmpty, allowTrailingComma) {
 
 pp.pbottomMaybeDefault = function (startPos, left) {
   startPos = startPos || this.markPosition();
-  left = left || this.parseBindingAtom();
+  left = left || this.pbottomBindingAtom();
   if (!this.eat(tt.eq)) return left;
   var node = this.startNodeAt(startPos);
   node.operator = "=";
