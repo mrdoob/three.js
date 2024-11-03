@@ -7,121 +7,121 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module( 'AnimationClip', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const clip = new AnimationClip( 'clip1', 1000, [ {} ] );
-			assert.ok( clip, 'AnimationClip can be instanciated' );
+			bottomert.ok( clip, 'AnimationClip can be instanciated' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'name', ( assert ) => {
+		QUnit.test( 'name', ( bottomert ) => {
 
 			const clip = new AnimationClip( 'clip1', 1000, [ {} ] );
-			assert.strictEqual(
+			bottomert.strictEqual(
 				clip.name === 'clip1', true,
 				'AnimationClip can be named'
 			);
 
 		} );
 
-		QUnit.todo( 'tracks', ( assert ) => {
+		QUnit.todo( 'tracks', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'duration', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'blendMode', ( assert ) => {
+		QUnit.todo( 'duration', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'uuid', ( assert ) => {
+		QUnit.todo( 'blendMode', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'uuid', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// STATIC
-		QUnit.todo( 'parse', ( assert ) => {
+		QUnit.todo( 'parse', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.todo( 'toJSON', ( bottomert ) => {
 
 			// static toJSON
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'CreateFromMorphTargetSequence', ( assert ) => {
+		QUnit.todo( 'CreateFromMorphTargetSequence', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'findByName', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'CreateClipsFromMorphTargetSequences', ( assert ) => {
+		QUnit.todo( 'findByName', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'parseAnimation', ( assert ) => {
+		QUnit.todo( 'CreateClipsFromMorphTargetSequences', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'parseAnimation', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'resetDuration', ( assert ) => {
+		QUnit.todo( 'resetDuration', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'trim', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'validate', ( assert ) => {
+		QUnit.todo( 'trim', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'optimize', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'clone', ( assert ) => {
+		QUnit.todo( 'validate', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.todo( 'optimize', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'clone', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'toJSON', ( bottomert ) => {
 
 			// member method toJSON
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
