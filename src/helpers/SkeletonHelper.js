@@ -11,7 +11,7 @@ const _boneMatrix = /*@__PURE__*/ new Matrix4();
 const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
 
 
-class SkeletonHelper extends LineSegments {
+clbottom SkeletonHelper extends LineSegments {
 
 	constructor( object ) {
 
