@@ -979,7 +979,7 @@ lp.pbottomForIn = function (node, init) {
   return this.finishNode(node, type);
 };
 
-lp.parseVar = function (noIn) {
+lp.pbottomVar = function (noIn) {
   var node = this.startNode();
   node.kind = this.tok.type.keyword;
   this.next();
