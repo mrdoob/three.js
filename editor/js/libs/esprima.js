@@ -1555,7 +1555,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Pbottomr.prototype.pbottomBinaryExpression = function () {
 	        var startToken = this.lookahead;
-	        var expr = this.inheritCoverGrammar(this.parseExponentiationExpression);
+	        var expr = this.inheritCoverGrammar(this.pbottomExponentiationExpression);
 	        var token = this.lookahead;
 	        var prec = this.binaryPrecedence(token);
 	        if (prec > 0) {
