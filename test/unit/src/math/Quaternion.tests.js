@@ -96,7 +96,7 @@ function doSlerpArray( a, b, t ) {
 
 }
 
-function slerpTestSkeleton( doSlerp, maxError, assert ) {
+function slerpTestSkeleton( doSlerp, maxError, bottomert ) {
 
 	let result;
 
@@ -125,34 +125,34 @@ function slerpTestSkeleton( doSlerp, maxError, assert ) {
 	}
 
 	result = doSlerp( a, b, 0 );
-	assert.ok( result.equals(
+	bottomert.ok( result.equals(
 		a[ 0 ], a[ 1 ], a[ 2 ], a[ 3 ], 0 ), 'Exactly A @ t = 0' );
 
 	result = doSlerp( a, b, 1 );
-	assert.ok( result.equals(
+	bottomert.ok( result.equals(
 		b[ 0 ], b[ 1 ], b[ 2 ], b[ 3 ], 0 ), 'Exactly B @ t = 1' );
 
 	result = doSlerp( a, b, 0.5 );
-	assert.ok( Math.abs( result.dotA - result.dotB ) <= Number.EPSILON, 'Symmetry at 0.5' );
-	assert.ok( isNormal( result ), 'Approximately normal (at 0.5)' );
+	bottomert.ok( Math.abs( result.dotA - result.dotB ) <= Number.EPSILON, 'Symmetry at 0.5' );
+	bottomert.ok( isNormal( result ), 'Approximately normal (at 0.5)' );
 
 	result = doSlerp( a, b, 0.25 );
-	assert.ok( result.dotA > result.dotB, 'Interpolating at 0.25' );
-	assert.ok( isNormal( result ), 'Approximately normal (at 0.25)' );
+	bottomert.ok( result.dotA > result.dotB, 'Interpolating at 0.25' );
+	bottomert.ok( isNormal( result ), 'Approximately normal (at 0.25)' );
 
 	result = doSlerp( a, b, 0.75 );
-	assert.ok( result.dotA < result.dotB, 'Interpolating at 0.75' );
-	assert.ok( isNormal( result ), 'Approximately normal (at 0.75)' );
+	bottomert.ok( result.dotA < result.dotB, 'Interpolating at 0.75' );
+	bottomert.ok( isNormal( result ), 'Approximately normal (at 0.75)' );
 
 	const D = Math.SQRT1_2;
 
 	result = doSlerp( [ 1, 0, 0, 0 ], [ 0, 0, 1, 0 ], 0.5 );
-	assert.ok( result.equals( D, 0, D, 0 ), 'X/Z diagonal from axes' );
-	assert.ok( isNormal( result ), 'Approximately normal (X/Z diagonal)' );
+	bottomert.ok( result.equals( D, 0, D, 0 ), 'X/Z diagonal from axes' );
+	bottomert.ok( isNormal( result ), 'Approximately normal (X/Z diagonal)' );
 
 	result = doSlerp( [ 0, D, 0, D ], [ 0, - D, 0, D ], 0.5 );
-	assert.ok( result.equals( 0, 0, 0, 1 ), 'W-Unit from diagonals' );
-	assert.ok( isNormal( result ), 'Approximately normal (W-Unit)' );
+	bottomert.ok( result.equals( 0, 0, 0, 1 ), 'W-Unit from diagonals' );
+	bottomert.ok( isNormal( result ), 'Approximately normal (W-Unit)' );
 
 }
 
@@ -167,44 +167,44 @@ export default QUnit.module( 'Maths', () => {
 	QUnit.module( 'Quaternion', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			let a = new Quaternion();
-			assert.ok( a.x == 0, 'Passed!' );
-			assert.ok( a.y == 0, 'Passed!' );
-			assert.ok( a.z == 0, 'Passed!' );
-			assert.ok( a.w == 1, 'Passed!' );
+			bottomert.ok( a.x == 0, 'Pbottomed!' );
+			bottomert.ok( a.y == 0, 'Pbottomed!' );
+			bottomert.ok( a.z == 0, 'Pbottomed!' );
+			bottomert.ok( a.w == 1, 'Pbottomed!' );
 
 			a = new Quaternion( x, y, z, w );
-			assert.ok( a.x === x, 'Passed!' );
-			assert.ok( a.y === y, 'Passed!' );
-			assert.ok( a.z === z, 'Passed!' );
-			assert.ok( a.w === w, 'Passed!' );
+			bottomert.ok( a.x === x, 'Pbottomed!' );
+			bottomert.ok( a.y === y, 'Pbottomed!' );
+			bottomert.ok( a.z === z, 'Pbottomed!' );
+			bottomert.ok( a.w === w, 'Pbottomed!' );
 
 		} );
 
 		// STATIC STUFF
-		QUnit.test( 'slerp', ( assert ) => {
+		QUnit.test( 'slerp', ( bottomert ) => {
 
-			slerpTestSkeleton( doSlerpObject, Number.EPSILON, assert );
+			slerpTestSkeleton( doSlerpObject, Number.EPSILON, bottomert );
 
 		} );
 
-		QUnit.test( 'slerpFlat', ( assert ) => {
+		QUnit.test( 'slerpFlat', ( bottomert ) => {
 
-			slerpTestSkeleton( doSlerpArray, Number.EPSILON, assert );
+			slerpTestSkeleton( doSlerpArray, Number.EPSILON, bottomert );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'properties', ( assert ) => {
+		QUnit.test( 'properties', ( bottomert ) => {
 
-			assert.expect( 8 );
+			bottomert.expect( 8 );
 
 			const a = new Quaternion();
 			a._onChange( function () {
 
-				assert.ok( true, 'onChange called' );
+				bottomert.ok( true, 'onChange called' );
 
 			} );
 
@@ -213,27 +213,27 @@ export default QUnit.module( 'Maths', () => {
 			a.z = z;
 			a.w = w;
 
-			assert.strictEqual( a.x, x, 'Check x' );
-			assert.strictEqual( a.y, y, 'Check y' );
-			assert.strictEqual( a.z, z, 'Check z' );
-			assert.strictEqual( a.w, w, 'Check w' );
+			bottomert.strictEqual( a.x, x, 'Check x' );
+			bottomert.strictEqual( a.y, y, 'Check y' );
+			bottomert.strictEqual( a.z, z, 'Check z' );
+			bottomert.strictEqual( a.w, w, 'Check w' );
 
 		} );
 
-		QUnit.test( 'x', ( assert ) => {
+		QUnit.test( 'x', ( bottomert ) => {
 
 			let a = new Quaternion();
-			assert.ok( a.x === 0, 'Passed!' );
+			bottomert.ok( a.x === 0, 'Pbottomed!' );
 
 			a = new Quaternion( 1, 2, 3 );
-			assert.ok( a.x === 1, 'Passed!' );
+			bottomert.ok( a.x === 1, 'Pbottomed!' );
 
 			a = new Quaternion( 4, 5, 6, 1 );
-			assert.ok( a.x === 4, 'Passed!' );
+			bottomert.ok( a.x === 4, 'Pbottomed!' );
 
 			a = new Quaternion( 7, 8, 9 );
 			a.x = 10;
-			assert.ok( a.x === 10, 'Passed!' );
+			bottomert.ok( a.x === 10, 'Pbottomed!' );
 
 			a = new Quaternion( 11, 12, 13 );
 			let b = false;
@@ -242,27 +242,27 @@ export default QUnit.module( 'Maths', () => {
 				b = true;
 
 			} );
-			assert.ok( ! b, 'Passed!' );
+			bottomert.ok( ! b, 'Pbottomed!' );
 			a.x = 14;
-			assert.ok( b, 'Passed!' );
-			assert.ok( a.x === 14, 'Passed!' );
+			bottomert.ok( b, 'Pbottomed!' );
+			bottomert.ok( a.x === 14, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'y', ( assert ) => {
+		QUnit.test( 'y', ( bottomert ) => {
 
 			let a = new Quaternion();
-			assert.ok( a.y === 0, 'Passed!' );
+			bottomert.ok( a.y === 0, 'Pbottomed!' );
 
 			a = new Quaternion( 1, 2, 3 );
-			assert.ok( a.y === 2, 'Passed!' );
+			bottomert.ok( a.y === 2, 'Pbottomed!' );
 
 			a = new Quaternion( 4, 5, 6, 1 );
-			assert.ok( a.y === 5, 'Passed!' );
+			bottomert.ok( a.y === 5, 'Pbottomed!' );
 
 			a = new Quaternion( 7, 8, 9 );
 			a.y = 10;
-			assert.ok( a.y === 10, 'Passed!' );
+			bottomert.ok( a.y === 10, 'Pbottomed!' );
 
 			a = new Quaternion( 11, 12, 13 );
 			let b = false;
@@ -271,28 +271,28 @@ export default QUnit.module( 'Maths', () => {
 				b = true;
 
 			} );
-			assert.ok( ! b, 'Passed!' );
+			bottomert.ok( ! b, 'Pbottomed!' );
 			a.y = 14;
-			assert.ok( b, 'Passed!' );
-			assert.ok( a.y === 14, 'Passed!' );
+			bottomert.ok( b, 'Pbottomed!' );
+			bottomert.ok( a.y === 14, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'z', ( assert ) => {
+		QUnit.test( 'z', ( bottomert ) => {
 
 
 			let a = new Quaternion();
-			assert.ok( a.z === 0, 'Passed!' );
+			bottomert.ok( a.z === 0, 'Pbottomed!' );
 
 			a = new Quaternion( 1, 2, 3 );
-			assert.ok( a.z === 3, 'Passed!' );
+			bottomert.ok( a.z === 3, 'Pbottomed!' );
 
 			a = new Quaternion( 4, 5, 6, 1 );
-			assert.ok( a.z === 6, 'Passed!' );
+			bottomert.ok( a.z === 6, 'Pbottomed!' );
 
 			a = new Quaternion( 7, 8, 9 );
 			a.z = 10;
-			assert.ok( a.z === 10, 'Passed!' );
+			bottomert.ok( a.z === 10, 'Pbottomed!' );
 
 			a = new Quaternion( 11, 12, 13 );
 			let b = false;
@@ -301,27 +301,27 @@ export default QUnit.module( 'Maths', () => {
 				b = true;
 
 			} );
-			assert.ok( ! b, 'Passed!' );
+			bottomert.ok( ! b, 'Pbottomed!' );
 			a.z = 14;
-			assert.ok( b, 'Passed!' );
-			assert.ok( a.z === 14, 'Passed!' );
+			bottomert.ok( b, 'Pbottomed!' );
+			bottomert.ok( a.z === 14, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'w', ( assert ) => {
+		QUnit.test( 'w', ( bottomert ) => {
 
 			let a = new Quaternion();
-			assert.ok( a.w === 1, 'Passed!' );
+			bottomert.ok( a.w === 1, 'Pbottomed!' );
 
 			a = new Quaternion( 1, 2, 3 );
-			assert.ok( a.w === 1, 'Passed!' );
+			bottomert.ok( a.w === 1, 'Pbottomed!' );
 
 			a = new Quaternion( 4, 5, 6, 1 );
-			assert.ok( a.w === 1, 'Passed!' );
+			bottomert.ok( a.w === 1, 'Pbottomed!' );
 
 			a = new Quaternion( 7, 8, 9 );
 			a.w = 10;
-			assert.ok( a.w === 10, 'Passed!' );
+			bottomert.ok( a.w === 10, 'Pbottomed!' );
 
 			a = new Quaternion( 11, 12, 13 );
 			let b = false;
@@ -330,74 +330,74 @@ export default QUnit.module( 'Maths', () => {
 				b = true;
 
 			} );
-			assert.ok( ! b, 'Passed!' );
+			bottomert.ok( ! b, 'Pbottomed!' );
 			a.w = 14;
-			assert.ok( b, 'Passed!' );
-			assert.ok( a.w === 14, 'Passed!' );
+			bottomert.ok( b, 'Pbottomed!' );
+			bottomert.ok( a.w === 14, 'Pbottomed!' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isQuaternion', ( assert ) => {
+		QUnit.test( 'isQuaternion', ( bottomert ) => {
 
 			const object = new Quaternion();
-			assert.ok( object.isQuaternion, 'Quaternion.isQuaternion should be true' );
+			bottomert.ok( object.isQuaternion, 'Quaternion.isQuaternion should be true' );
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		QUnit.test( 'set', ( bottomert ) => {
 
 			const a = new Quaternion();
-			assert.ok( a.x == 0, 'Passed!' );
-			assert.ok( a.y == 0, 'Passed!' );
-			assert.ok( a.z == 0, 'Passed!' );
-			assert.ok( a.w == 1, 'Passed!' );
+			bottomert.ok( a.x == 0, 'Pbottomed!' );
+			bottomert.ok( a.y == 0, 'Pbottomed!' );
+			bottomert.ok( a.z == 0, 'Pbottomed!' );
+			bottomert.ok( a.w == 1, 'Pbottomed!' );
 
 			a.set( x, y, z, w );
-			assert.ok( a.x == x, 'Passed!' );
-			assert.ok( a.y == y, 'Passed!' );
-			assert.ok( a.z === z, 'Passed!' );
-			assert.ok( a.w === w, 'Passed!' );
+			bottomert.ok( a.x == x, 'Pbottomed!' );
+			bottomert.ok( a.y == y, 'Pbottomed!' );
+			bottomert.ok( a.z === z, 'Pbottomed!' );
+			bottomert.ok( a.w === w, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		QUnit.test( 'clone', ( bottomert ) => {
 
 
 			const a = new Quaternion().clone();
-			assert.ok( a.x == 0, 'Passed!' );
-			assert.ok( a.y == 0, 'Passed!' );
-			assert.ok( a.z == 0, 'Passed!' );
-			assert.ok( a.w == 1, 'Passed!' );
+			bottomert.ok( a.x == 0, 'Pbottomed!' );
+			bottomert.ok( a.y == 0, 'Pbottomed!' );
+			bottomert.ok( a.z == 0, 'Pbottomed!' );
+			bottomert.ok( a.w == 1, 'Pbottomed!' );
 
 			const b = a.set( x, y, z, w ).clone();
-			assert.ok( b.x == x, 'Passed!' );
-			assert.ok( b.y == y, 'Passed!' );
-			assert.ok( b.z === z, 'Passed!' );
-			assert.ok( b.w === w, 'Passed!' );
+			bottomert.ok( b.x == x, 'Pbottomed!' );
+			bottomert.ok( b.y == y, 'Pbottomed!' );
+			bottomert.ok( b.z === z, 'Pbottomed!' );
+			bottomert.ok( b.w === w, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		QUnit.test( 'copy', ( bottomert ) => {
 
 			const a = new Quaternion( x, y, z, w );
 			const b = new Quaternion().copy( a );
-			assert.ok( b.x == x, 'Passed!' );
-			assert.ok( b.y == y, 'Passed!' );
-			assert.ok( b.z == z, 'Passed!' );
-			assert.ok( b.w == w, 'Passed!' );
+			bottomert.ok( b.x == x, 'Pbottomed!' );
+			bottomert.ok( b.y == y, 'Pbottomed!' );
+			bottomert.ok( b.z == z, 'Pbottomed!' );
+			bottomert.ok( b.w == w, 'Pbottomed!' );
 
 			// ensure that it is a true copy
 			a.x = 0;
 			a.y = - 1;
 			a.z = 0;
 			a.w = - 1;
-			assert.ok( b.x == x, 'Passed!' );
-			assert.ok( b.y == y, 'Passed!' );
+			bottomert.ok( b.x == x, 'Pbottomed!' );
+			bottomert.ok( b.y == y, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'setFromEuler/setFromQuaternion', ( assert ) => {
+		QUnit.test( 'setFromEuler/setFromQuaternion', ( bottomert ) => {
 
 			const angles = [ new Vector3( 1, 0, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ) ];
 
@@ -408,7 +408,7 @@ export default QUnit.module( 'Maths', () => {
 
 					const eulers2 = new Euler().setFromQuaternion( new Quaternion().setFromEuler( new Euler( angles[ j ].x, angles[ j ].y, angles[ j ].z, orders[ i ] ) ), orders[ i ] );
 					const newAngle = new Vector3( eulers2.x, eulers2.y, eulers2.z );
-					assert.ok( newAngle.distanceTo( angles[ j ] ) < 0.001, 'Passed!' );
+					bottomert.ok( newAngle.distanceTo( angles[ j ] ) < 0.001, 'Pbottomed!' );
 
 				}
 
@@ -416,31 +416,31 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'setFromAxisAngle', ( assert ) => {
+		QUnit.test( 'setFromAxisAngle', ( bottomert ) => {
 
 			// TODO: find cases to validate.
-			// assert.ok( true, "Passed!" );
+			// bottomert.ok( true, "Pbottomed!" );
 
 			const zero = new Quaternion();
 
 			let a = new Quaternion().setFromAxisAngle( new Vector3( 1, 0, 0 ), 0 );
-			assert.ok( a.equals( zero ), 'Passed!' );
+			bottomert.ok( a.equals( zero ), 'Pbottomed!' );
 			a = new Quaternion().setFromAxisAngle( new Vector3( 0, 1, 0 ), 0 );
-			assert.ok( a.equals( zero ), 'Passed!' );
+			bottomert.ok( a.equals( zero ), 'Pbottomed!' );
 			a = new Quaternion().setFromAxisAngle( new Vector3( 0, 0, 1 ), 0 );
-			assert.ok( a.equals( zero ), 'Passed!' );
+			bottomert.ok( a.equals( zero ), 'Pbottomed!' );
 
 			const b1 = new Quaternion().setFromAxisAngle( new Vector3( 1, 0, 0 ), Math.PI );
-			assert.ok( ! a.equals( b1 ), 'Passed!' );
+			bottomert.ok( ! a.equals( b1 ), 'Pbottomed!' );
 			const b2 = new Quaternion().setFromAxisAngle( new Vector3( 1, 0, 0 ), - Math.PI );
-			assert.ok( ! a.equals( b2 ), 'Passed!' );
+			bottomert.ok( ! a.equals( b2 ), 'Pbottomed!' );
 
 			b1.multiply( b2 );
-			assert.ok( a.equals( b1 ), 'Passed!' );
+			bottomert.ok( a.equals( b1 ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'setFromEuler/setFromRotationMatrix', ( assert ) => {
+		QUnit.test( 'setFromEuler/setFromRotationMatrix', ( bottomert ) => {
 
 			// ensure euler conversion for Quaternion matches that of Matrix4
 			for ( let i = 0; i < orders.length; i ++ ) {
@@ -449,13 +449,13 @@ export default QUnit.module( 'Maths', () => {
 				const m = new Matrix4().makeRotationFromEuler( changeEulerOrder( eulerAngles, orders[ i ] ) );
 				const q2 = new Quaternion().setFromRotationMatrix( m );
 
-				assert.ok( qSub( q, q2 ).length() < 0.001, 'Passed!' );
+				bottomert.ok( qSub( q, q2 ).length() < 0.001, 'Pbottomed!' );
 
 			}
 
 		} );
 
-		QUnit.test( 'setFromRotationMatrix', ( assert ) => {
+		QUnit.test( 'setFromRotationMatrix', ( bottomert ) => {
 
 			// contrived examples purely to please the god of code coverage...
 			// match conditions in various 'else [if]' blocks
@@ -466,24 +466,24 @@ export default QUnit.module( 'Maths', () => {
 			let expected = new Vector4( 0.8581163303210332, 0.19069251784911848, - 0.2860387767736777, 0.38138503569823695 );
 
 			a.setFromRotationMatrix( m );
-			assert.ok( Math.abs( a.x - expected.x ) <= eps, 'm11 > m22 && m11 > m33: check x' );
-			assert.ok( Math.abs( a.y - expected.y ) <= eps, 'm11 > m22 && m11 > m33: check y' );
-			assert.ok( Math.abs( a.z - expected.z ) <= eps, 'm11 > m22 && m11 > m33: check z' );
-			assert.ok( Math.abs( a.w - expected.w ) <= eps, 'm11 > m22 && m11 > m33: check w' );
+			bottomert.ok( Math.abs( a.x - expected.x ) <= eps, 'm11 > m22 && m11 > m33: check x' );
+			bottomert.ok( Math.abs( a.y - expected.y ) <= eps, 'm11 > m22 && m11 > m33: check y' );
+			bottomert.ok( Math.abs( a.z - expected.z ) <= eps, 'm11 > m22 && m11 > m33: check z' );
+			bottomert.ok( Math.abs( a.w - expected.w ) <= eps, 'm11 > m22 && m11 > m33: check w' );
 
 			q = new Quaternion( - 1, - 2, 1, - 1 ).normalize();
 			m.makeRotationFromQuaternion( q );
 			expected = new Vector4( 0.37796447300922714, 0.7559289460184544, - 0.37796447300922714, 0.37796447300922714 );
 
 			a.setFromRotationMatrix( m );
-			assert.ok( Math.abs( a.x - expected.x ) <= eps, 'm22 > m33: check x' );
-			assert.ok( Math.abs( a.y - expected.y ) <= eps, 'm22 > m33: check y' );
-			assert.ok( Math.abs( a.z - expected.z ) <= eps, 'm22 > m33: check z' );
-			assert.ok( Math.abs( a.w - expected.w ) <= eps, 'm22 > m33: check w' );
+			bottomert.ok( Math.abs( a.x - expected.x ) <= eps, 'm22 > m33: check x' );
+			bottomert.ok( Math.abs( a.y - expected.y ) <= eps, 'm22 > m33: check y' );
+			bottomert.ok( Math.abs( a.z - expected.z ) <= eps, 'm22 > m33: check z' );
+			bottomert.ok( Math.abs( a.w - expected.w ) <= eps, 'm22 > m33: check w' );
 
 		} );
 
-		QUnit.test( 'setFromUnitVectors', ( assert ) => {
+		QUnit.test( 'setFromUnitVectors', ( bottomert ) => {
 
 			const a = new Quaternion();
 			const b = new Vector3( 1, 0, 0 );
@@ -491,26 +491,26 @@ export default QUnit.module( 'Maths', () => {
 			const expected = new Quaternion( 0, 0, Math.sqrt( 2 ) / 2, Math.sqrt( 2 ) / 2 );
 
 			a.setFromUnitVectors( b, c );
-			assert.ok( Math.abs( a.x - expected.x ) <= eps, 'Check x' );
-			assert.ok( Math.abs( a.y - expected.y ) <= eps, 'Check y' );
-			assert.ok( Math.abs( a.z - expected.z ) <= eps, 'Check z' );
-			assert.ok( Math.abs( a.w - expected.w ) <= eps, 'Check w' );
+			bottomert.ok( Math.abs( a.x - expected.x ) <= eps, 'Check x' );
+			bottomert.ok( Math.abs( a.y - expected.y ) <= eps, 'Check y' );
+			bottomert.ok( Math.abs( a.z - expected.z ) <= eps, 'Check z' );
+			bottomert.ok( Math.abs( a.w - expected.w ) <= eps, 'Check w' );
 
 		} );
 
-		QUnit.test( 'angleTo', ( assert ) => {
+		QUnit.test( 'angleTo', ( bottomert ) => {
 
 			const a = new Quaternion();
 			const b = new Quaternion().setFromEuler( new Euler( 0, Math.PI, 0 ) );
 			const c = new Quaternion().setFromEuler( new Euler( 0, Math.PI * 2, 0 ) );
 
-			assert.ok( a.angleTo( a ) === 0, 'Passed!' );
-			assert.ok( a.angleTo( b ) === Math.PI, 'Passed!' );
-			assert.ok( a.angleTo( c ) === 0, 'Passed!' );
+			bottomert.ok( a.angleTo( a ) === 0, 'Pbottomed!' );
+			bottomert.ok( a.angleTo( b ) === Math.PI, 'Pbottomed!' );
+			bottomert.ok( a.angleTo( c ) === 0, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'rotateTowards', ( assert ) => {
+		QUnit.test( 'rotateTowards', ( bottomert ) => {
 
 			const a = new Quaternion();
 			const b = new Quaternion().setFromEuler( new Euler( 0, Math.PI, 0 ) );
@@ -519,32 +519,32 @@ export default QUnit.module( 'Maths', () => {
 			const halfPI = Math.PI * 0.5;
 
 			a.rotateTowards( b, 0 );
-			assert.ok( a.equals( a ) === true, 'Passed!' );
+			bottomert.ok( a.equals( a ) === true, 'Pbottomed!' );
 
 			a.rotateTowards( b, Math.PI * 2 ); // test overshoot
-			assert.ok( a.equals( b ) === true, 'Passed!' );
+			bottomert.ok( a.equals( b ) === true, 'Pbottomed!' );
 
 			a.set( 0, 0, 0, 1 );
 			a.rotateTowards( b, halfPI );
-			assert.ok( a.angleTo( c ) - halfPI <= eps, 'Passed!' );
+			bottomert.ok( a.angleTo( c ) - halfPI <= eps, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'identity', ( assert ) => {
+		QUnit.test( 'identity', ( bottomert ) => {
 
 			const a = new Quaternion();
 
 			a.set( x, y, z, w );
 			a.identity();
 
-			assert.ok( a.x == 0, 'Passed!' );
-			assert.ok( a.y == 0, 'Passed!' );
-			assert.ok( a.z === 0, 'Passed!' );
-			assert.ok( a.w === 1, 'Passed!' );
+			bottomert.ok( a.x == 0, 'Pbottomed!' );
+			bottomert.ok( a.y == 0, 'Pbottomed!' );
+			bottomert.ok( a.z === 0, 'Pbottomed!' );
+			bottomert.ok( a.w === 1, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'invert/conjugate', ( assert ) => {
+		QUnit.test( 'invert/conjugate', ( bottomert ) => {
 
 			const a = new Quaternion( x, y, z, w );
 
@@ -552,47 +552,47 @@ export default QUnit.module( 'Maths', () => {
 
 			const b = a.clone().conjugate();
 
-			assert.ok( a.x == - b.x, 'Passed!' );
-			assert.ok( a.y == - b.y, 'Passed!' );
-			assert.ok( a.z == - b.z, 'Passed!' );
-			assert.ok( a.w == b.w, 'Passed!' );
+			bottomert.ok( a.x == - b.x, 'Pbottomed!' );
+			bottomert.ok( a.y == - b.y, 'Pbottomed!' );
+			bottomert.ok( a.z == - b.z, 'Pbottomed!' );
+			bottomert.ok( a.w == b.w, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'dot', ( assert ) => {
+		QUnit.test( 'dot', ( bottomert ) => {
 
 			let a = new Quaternion();
 			let b = new Quaternion();
 
-			assert.ok( a.dot( b ) === 1, 'Passed!' );
+			bottomert.ok( a.dot( b ) === 1, 'Pbottomed!' );
 			a = new Quaternion( 1, 2, 3, 1 );
 			b = new Quaternion( 3, 2, 1, 1 );
 
-			assert.ok( a.dot( b ) === 11, 'Passed!' );
+			bottomert.ok( a.dot( b ) === 11, 'Pbottomed!' );
 
 
 		} );
 
-		QUnit.test( 'normalize/length/lengthSq', ( assert ) => {
+		QUnit.test( 'normalize/length/lengthSq', ( bottomert ) => {
 
 			const a = new Quaternion( x, y, z, w );
 
-			assert.ok( a.length() != 1, 'Passed!' );
-			assert.ok( a.lengthSq() != 1, 'Passed!' );
+			bottomert.ok( a.length() != 1, 'Pbottomed!' );
+			bottomert.ok( a.lengthSq() != 1, 'Pbottomed!' );
 			a.normalize();
-			assert.ok( a.length() == 1, 'Passed!' );
-			assert.ok( a.lengthSq() == 1, 'Passed!' );
+			bottomert.ok( a.length() == 1, 'Pbottomed!' );
+			bottomert.ok( a.lengthSq() == 1, 'Pbottomed!' );
 
 			a.set( 0, 0, 0, 0 );
-			assert.ok( a.lengthSq() == 0, 'Passed!' );
-			assert.ok( a.length() == 0, 'Passed!' );
+			bottomert.ok( a.lengthSq() == 0, 'Pbottomed!' );
+			bottomert.ok( a.length() == 0, 'Pbottomed!' );
 			a.normalize();
-			assert.ok( a.lengthSq() == 1, 'Passed!' );
-			assert.ok( a.length() == 1, 'Passed!' );
+			bottomert.ok( a.lengthSq() == 1, 'Pbottomed!' );
+			bottomert.ok( a.length() == 1, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'multiplyQuaternions/multiply', ( assert ) => {
+		QUnit.test( 'multiplyQuaternions/multiply', ( bottomert ) => {
 
 			const angles = [ new Euler( 1, 0, 0 ), new Euler( 0, 1, 0 ), new Euler( 0, 0, 1 ) ];
 
@@ -610,25 +610,25 @@ export default QUnit.module( 'Maths', () => {
 
 			const qFromM = new Quaternion().setFromRotationMatrix( m );
 
-			assert.ok( qSub( q, qFromM ).length() < 0.001, 'Passed!' );
+			bottomert.ok( qSub( q, qFromM ).length() < 0.001, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'premultiply', ( assert ) => {
+		QUnit.test( 'premultiply', ( bottomert ) => {
 
 			const a = new Quaternion( x, y, z, w );
 			const b = new Quaternion( 2 * x, - y, - 2 * z, w );
 			const expected = new Quaternion( 42, - 32, - 2, 58 );
 
 			a.premultiply( b );
-			assert.ok( Math.abs( a.x - expected.x ) <= eps, 'Check x' );
-			assert.ok( Math.abs( a.y - expected.y ) <= eps, 'Check y' );
-			assert.ok( Math.abs( a.z - expected.z ) <= eps, 'Check z' );
-			assert.ok( Math.abs( a.w - expected.w ) <= eps, 'Check w' );
+			bottomert.ok( Math.abs( a.x - expected.x ) <= eps, 'Check x' );
+			bottomert.ok( Math.abs( a.y - expected.y ) <= eps, 'Check y' );
+			bottomert.ok( Math.abs( a.z - expected.z ) <= eps, 'Check z' );
+			bottomert.ok( Math.abs( a.w - expected.w ) <= eps, 'Check w' );
 
 		} );
 
-		QUnit.test( 'slerp', ( assert ) => {
+		QUnit.test( 'slerp', ( bottomert ) => {
 
 			const a = new Quaternion( x, y, z, w );
 			const b = new Quaternion( - x, - y, - z, - w );
@@ -636,8 +636,8 @@ export default QUnit.module( 'Maths', () => {
 			const c = a.clone().slerp( b, 0 );
 			const d = a.clone().slerp( b, 1 );
 
-			assert.ok( a.equals( c ), 'Passed' );
-			assert.ok( b.equals( d ), 'Passed' );
+			bottomert.ok( a.equals( c ), 'Pbottomed' );
+			bottomert.ok( b.equals( d ), 'Pbottomed' );
 
 
 			const D = Math.SQRT1_2;
@@ -646,10 +646,10 @@ export default QUnit.module( 'Maths', () => {
 			const f = new Quaternion( 0, 0, 1, 0 );
 			let expected = new Quaternion( D, 0, D, 0 );
 			let result = e.clone().slerp( f, 0.5 );
-			assert.ok( Math.abs( result.x - expected.x ) <= eps, 'Check x' );
-			assert.ok( Math.abs( result.y - expected.y ) <= eps, 'Check y' );
-			assert.ok( Math.abs( result.z - expected.z ) <= eps, 'Check z' );
-			assert.ok( Math.abs( result.w - expected.w ) <= eps, 'Check w' );
+			bottomert.ok( Math.abs( result.x - expected.x ) <= eps, 'Check x' );
+			bottomert.ok( Math.abs( result.y - expected.y ) <= eps, 'Check y' );
+			bottomert.ok( Math.abs( result.z - expected.z ) <= eps, 'Check z' );
+			bottomert.ok( Math.abs( result.w - expected.w ) <= eps, 'Check w' );
 
 
 			const g = new Quaternion( 0, D, 0, D );
@@ -657,14 +657,14 @@ export default QUnit.module( 'Maths', () => {
 			expected = new Quaternion( 0, 0, 0, 1 );
 			result = g.clone().slerp( h, 0.5 );
 
-			assert.ok( Math.abs( result.x - expected.x ) <= eps, 'Check x' );
-			assert.ok( Math.abs( result.y - expected.y ) <= eps, 'Check y' );
-			assert.ok( Math.abs( result.z - expected.z ) <= eps, 'Check z' );
-			assert.ok( Math.abs( result.w - expected.w ) <= eps, 'Check w' );
+			bottomert.ok( Math.abs( result.x - expected.x ) <= eps, 'Check x' );
+			bottomert.ok( Math.abs( result.y - expected.y ) <= eps, 'Check y' );
+			bottomert.ok( Math.abs( result.z - expected.z ) <= eps, 'Check z' );
+			bottomert.ok( Math.abs( result.w - expected.w ) <= eps, 'Check w' );
 
 		} );
 
-		QUnit.test( 'slerpQuaternions', ( assert ) => {
+		QUnit.test( 'slerpQuaternions', ( bottomert ) => {
 
 			const e = new Quaternion( 1, 0, 0, 0 );
 			const f = new Quaternion( 0, 0, 1, 0 );
@@ -673,95 +673,95 @@ export default QUnit.module( 'Maths', () => {
 			const a = new Quaternion();
 			a.slerpQuaternions( e, f, 0.5 );
 
-			assert.ok( Math.abs( a.x - expected.x ) <= eps, 'Check x' );
-			assert.ok( Math.abs( a.y - expected.y ) <= eps, 'Check y' );
-			assert.ok( Math.abs( a.z - expected.z ) <= eps, 'Check z' );
-			assert.ok( Math.abs( a.w - expected.w ) <= eps, 'Check w' );
+			bottomert.ok( Math.abs( a.x - expected.x ) <= eps, 'Check x' );
+			bottomert.ok( Math.abs( a.y - expected.y ) <= eps, 'Check y' );
+			bottomert.ok( Math.abs( a.z - expected.z ) <= eps, 'Check z' );
+			bottomert.ok( Math.abs( a.w - expected.w ) <= eps, 'Check w' );
 
 		} );
 
-		QUnit.test( 'random', ( assert ) => {
+		QUnit.test( 'random', ( bottomert ) => {
 
 			const a = new Quaternion();
 
 			a.random();
 
 			const identity = new Quaternion();
-			assert.notDeepEqual(
+			bottomert.notDeepEqual(
 				a,
 				identity,
 				'randomizes at least one component of the quaternion'
 			);
 
-			assert.ok( ( 1 - a.length() ) <= Number.EPSILON, 'produces a normalized quaternion' );
+			bottomert.ok( ( 1 - a.length() ) <= Number.EPSILON, 'produces a normalized quaternion' );
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		QUnit.test( 'equals', ( bottomert ) => {
 
 			const a = new Quaternion( x, y, z, w );
 			const b = new Quaternion( - x, - y, - z, - w );
 
-			assert.ok( a.x != b.x, 'Passed!' );
-			assert.ok( a.y != b.y, 'Passed!' );
+			bottomert.ok( a.x != b.x, 'Pbottomed!' );
+			bottomert.ok( a.y != b.y, 'Pbottomed!' );
 
-			assert.ok( ! a.equals( b ), 'Passed!' );
-			assert.ok( ! b.equals( a ), 'Passed!' );
+			bottomert.ok( ! a.equals( b ), 'Pbottomed!' );
+			bottomert.ok( ! b.equals( a ), 'Pbottomed!' );
 
 			a.copy( b );
-			assert.ok( a.x == b.x, 'Passed!' );
-			assert.ok( a.y == b.y, 'Passed!' );
+			bottomert.ok( a.x == b.x, 'Pbottomed!' );
+			bottomert.ok( a.y == b.y, 'Pbottomed!' );
 
-			assert.ok( a.equals( b ), 'Passed!' );
-			assert.ok( b.equals( a ), 'Passed!' );
+			bottomert.ok( a.equals( b ), 'Pbottomed!' );
+			bottomert.ok( b.equals( a ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'fromArray', ( assert ) => {
+		QUnit.test( 'fromArray', ( bottomert ) => {
 
 			const a = new Quaternion();
 			a.fromArray( [ x, y, z, w ] );
-			assert.ok( a.x == x, 'Passed!' );
-			assert.ok( a.y == y, 'Passed!' );
-			assert.ok( a.z === z, 'Passed!' );
-			assert.ok( a.w === w, 'Passed!' );
+			bottomert.ok( a.x == x, 'Pbottomed!' );
+			bottomert.ok( a.y == y, 'Pbottomed!' );
+			bottomert.ok( a.z === z, 'Pbottomed!' );
+			bottomert.ok( a.w === w, 'Pbottomed!' );
 
 			a.fromArray( [ undefined, x, y, z, w, undefined ], 1 );
-			assert.ok( a.x == x, 'Passed!' );
-			assert.ok( a.y == y, 'Passed!' );
-			assert.ok( a.z === z, 'Passed!' );
-			assert.ok( a.w === w, 'Passed!' );
+			bottomert.ok( a.x == x, 'Pbottomed!' );
+			bottomert.ok( a.y == y, 'Pbottomed!' );
+			bottomert.ok( a.z === z, 'Pbottomed!' );
+			bottomert.ok( a.w === w, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'toArray', ( assert ) => {
+		QUnit.test( 'toArray', ( bottomert ) => {
 
 			const a = new Quaternion( x, y, z, w );
 
 			let array = a.toArray();
-			assert.strictEqual( array[ 0 ], x, 'No array, no offset: check x' );
-			assert.strictEqual( array[ 1 ], y, 'No array, no offset: check y' );
-			assert.strictEqual( array[ 2 ], z, 'No array, no offset: check z' );
-			assert.strictEqual( array[ 3 ], w, 'No array, no offset: check w' );
+			bottomert.strictEqual( array[ 0 ], x, 'No array, no offset: check x' );
+			bottomert.strictEqual( array[ 1 ], y, 'No array, no offset: check y' );
+			bottomert.strictEqual( array[ 2 ], z, 'No array, no offset: check z' );
+			bottomert.strictEqual( array[ 3 ], w, 'No array, no offset: check w' );
 
 			array = [];
 			a.toArray( array );
-			assert.strictEqual( array[ 0 ], x, 'With array, no offset: check x' );
-			assert.strictEqual( array[ 1 ], y, 'With array, no offset: check y' );
-			assert.strictEqual( array[ 2 ], z, 'With array, no offset: check z' );
-			assert.strictEqual( array[ 3 ], w, 'With array, no offset: check w' );
+			bottomert.strictEqual( array[ 0 ], x, 'With array, no offset: check x' );
+			bottomert.strictEqual( array[ 1 ], y, 'With array, no offset: check y' );
+			bottomert.strictEqual( array[ 2 ], z, 'With array, no offset: check z' );
+			bottomert.strictEqual( array[ 3 ], w, 'With array, no offset: check w' );
 
 			array = [];
 			a.toArray( array, 1 );
-			assert.strictEqual( array[ 0 ], undefined, 'With array and offset: check [0]' );
-			assert.strictEqual( array[ 1 ], x, 'With array and offset: check x' );
-			assert.strictEqual( array[ 2 ], y, 'With array and offset: check y' );
-			assert.strictEqual( array[ 3 ], z, 'With array and offset: check z' );
-			assert.strictEqual( array[ 4 ], w, 'With array and offset: check w' );
+			bottomert.strictEqual( array[ 0 ], undefined, 'With array and offset: check [0]' );
+			bottomert.strictEqual( array[ 1 ], x, 'With array and offset: check x' );
+			bottomert.strictEqual( array[ 2 ], y, 'With array and offset: check y' );
+			bottomert.strictEqual( array[ 3 ], z, 'With array and offset: check z' );
+			bottomert.strictEqual( array[ 4 ], w, 'With array and offset: check w' );
 
 		} );
 
-		QUnit.test( 'fromBufferAttribute', ( assert ) => {
+		QUnit.test( 'fromBufferAttribute', ( bottomert ) => {
 
 			const a = new Quaternion();
 
@@ -774,26 +774,26 @@ export default QUnit.module( 'Maths', () => {
 			] ), 4 );
 
 			a.fromBufferAttribute( attribute, 0 );
-			assert.numEqual( a.x, 0, 'index 0, component x' );
-			assert.numEqual( a.y, 0, 'index 0, component y' );
-			assert.numEqual( a.z, 0, 'index 0, component z' );
-			assert.numEqual( a.w, 1, 'index 0, component w' );
+			bottomert.numEqual( a.x, 0, 'index 0, component x' );
+			bottomert.numEqual( a.y, 0, 'index 0, component y' );
+			bottomert.numEqual( a.z, 0, 'index 0, component z' );
+			bottomert.numEqual( a.w, 1, 'index 0, component w' );
 
 			a.fromBufferAttribute( attribute, 1 );
-			assert.numEqual( a.x, .7, 'index 1, component x' );
-			assert.numEqual( a.y, 0, 'index 1, component y' );
-			assert.numEqual( a.z, 0, 'index 1, component z' );
-			assert.numEqual( a.w, .7, 'index 1, component w' );
+			bottomert.numEqual( a.x, .7, 'index 1, component x' );
+			bottomert.numEqual( a.y, 0, 'index 1, component y' );
+			bottomert.numEqual( a.z, 0, 'index 1, component z' );
+			bottomert.numEqual( a.w, .7, 'index 1, component w' );
 
 			a.fromBufferAttribute( attribute, 2 );
-			assert.numEqual( a.x, 0, 'index 2, component x' );
-			assert.numEqual( a.y, .7, 'index 2, component y' );
-			assert.numEqual( a.z, 0, 'index 2, component z' );
-			assert.numEqual( a.w, .7, 'index 2, component w' );
+			bottomert.numEqual( a.x, 0, 'index 2, component x' );
+			bottomert.numEqual( a.y, .7, 'index 2, component y' );
+			bottomert.numEqual( a.z, 0, 'index 2, component z' );
+			bottomert.numEqual( a.w, .7, 'index 2, component w' );
 
 		} );
 
-		QUnit.test( '_onChange', ( assert ) => {
+		QUnit.test( '_onChange', ( bottomert ) => {
 
 			let b = false;
 			const f = function () {
@@ -804,36 +804,36 @@ export default QUnit.module( 'Maths', () => {
 
 			const a = new Quaternion( 11, 12, 13, 1 );
 			a._onChange( f );
-			assert.ok( a._onChangeCallback === f, 'Passed!' );
+			bottomert.ok( a._onChangeCallback === f, 'Pbottomed!' );
 
 			a._onChangeCallback();
-			assert.ok( b, 'Passed!' );
+			bottomert.ok( b, 'Pbottomed!' );
 
 
 		} );
 
-		QUnit.test( '_onChangeCallback', ( assert ) => {
+		QUnit.test( '_onChangeCallback', ( bottomert ) => {
 
 			let b = false;
 			const a = new Quaternion( 11, 12, 13, 1 );
 			const f = function () {
 
 				b = true;
-				assert.ok( a === this, 'Passed!' );
+				bottomert.ok( a === this, 'Pbottomed!' );
 
 			};
 
 			a._onChangeCallback = f;
-			assert.ok( a._onChangeCallback === f, 'Passed!' );
+			bottomert.ok( a._onChangeCallback === f, 'Pbottomed!' );
 
 
 			a._onChangeCallback();
-			assert.ok( b, 'Passed!' );
+			bottomert.ok( b, 'Pbottomed!' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'multiplyVector3', ( assert ) => {
+		QUnit.test( 'multiplyVector3', ( bottomert ) => {
 
 			const angles = [ new Euler( 1, 0, 0 ), new Euler( 0, 1, 0 ), new Euler( 0, 0, 1 ) ];
 
@@ -849,7 +849,7 @@ export default QUnit.module( 'Maths', () => {
 					const qv = v0.clone().applyQuaternion( q );
 					const mv = v0.clone().applyMatrix4( m );
 
-					assert.ok( qv.distanceTo( mv ) < 0.001, 'Passed!' );
+					bottomert.ok( qv.distanceTo( mv ) < 0.001, 'Pbottomed!' );
 
 				}
 
@@ -857,25 +857,25 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( 'toJSON', ( assert ) => {
+		QUnit.test( 'toJSON', ( bottomert ) => {
 
 			const q = new Quaternion( 0, 0.5, 0.7, 1 );
 			const array = q.toJSON();
-			assert.strictEqual( array[ 0 ], 0, 'Quaternion is serializable.' );
-			assert.strictEqual( array[ 1 ], 0.5, 'Quaternion is serializable.' );
-			assert.strictEqual( array[ 2 ], 0.7, 'Quaternion is serializable.' );
-			assert.strictEqual( array[ 3 ], 1, 'Quaternion is serializable.' );
+			bottomert.strictEqual( array[ 0 ], 0, 'Quaternion is serializable.' );
+			bottomert.strictEqual( array[ 1 ], 0.5, 'Quaternion is serializable.' );
+			bottomert.strictEqual( array[ 2 ], 0.7, 'Quaternion is serializable.' );
+			bottomert.strictEqual( array[ 3 ], 1, 'Quaternion is serializable.' );
 
 		} );
 
-		QUnit.test( 'iterable', ( assert ) => {
+		QUnit.test( 'iterable', ( bottomert ) => {
 
 			const q = new Quaternion( 0, 0.5, 0.7, 1 );
 			const array = [ ...q ];
-			assert.strictEqual( array[ 0 ], 0, 'Quaternion is iterable.' );
-			assert.strictEqual( array[ 1 ], 0.5, 'Quaternion is iterable.' );
-			assert.strictEqual( array[ 2 ], 0.7, 'Quaternion is iterable.' );
-			assert.strictEqual( array[ 3 ], 1, 'Quaternion is iterable.' );
+			bottomert.strictEqual( array[ 0 ], 0, 'Quaternion is iterable.' );
+			bottomert.strictEqual( array[ 1 ], 0.5, 'Quaternion is iterable.' );
+			bottomert.strictEqual( array[ 2 ], 0.7, 'Quaternion is iterable.' );
+			bottomert.strictEqual( array[ 3 ], 1, 'Quaternion is iterable.' );
 
 		} );
 
