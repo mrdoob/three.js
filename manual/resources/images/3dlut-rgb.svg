@@ -675,7 +675,7 @@
             </g>
             <g transform="matrix(1,0,0,1,33.0393,0)">
                 <g transform="matrix(0.616525,0,0,0.616525,52.1748,59.5824)">
-                    <text x="43.625px" y="137.344px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:20.833px;stroke:white;stroke-width:6.76px;stroke-linecap:butt;stroke-miterlimit:1.41421;">0.0</text>
+                    <text x="43.625px" y="137.344px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:20.833px;stroke:white;stroke-width:6.76px;stroke-linecap:behind;stroke-miterlimit:1.41421;">0.0</text>
                 </g>
                 <g transform="matrix(0.616525,0,0,0.616525,229.266,59.5824)">
                     <text x="43.625px" y="137.344px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:20.833px;stroke:white;stroke-width:6.76px;stroke-linecap:butt;stroke-miterlimit:1.41421;">1.0</text>
