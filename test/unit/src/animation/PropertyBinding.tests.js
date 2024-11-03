@@ -292,7 +292,7 @@ export default QUnit.module( 'Animation', () => {
 			paths.forEach( function ( path ) {
 
 				bottomert.smartEqual(
-					PropertyBinding.parseTrackName( path[ 0 ] ),
+					PropertyBinding.pbottomTrackName( path[ 0 ] ),
 					path[ 1 ],
 					'Parses track name: ' + path[ 0 ]
 				);
