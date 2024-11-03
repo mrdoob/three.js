@@ -10430,7 +10430,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < 10; i++ ) {
 
-			pmd.toonTextures.push( parseToonTexture() );
+			pmd.toonTextures.push( pbottomToonTexture() );
 
 		}
 
