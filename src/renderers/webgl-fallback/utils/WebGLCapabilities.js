@@ -1,4 +1,4 @@
-class WebGLCapabilities {
+clbottom WebGLCapabilities {
 
 	constructor( backend ) {
 
