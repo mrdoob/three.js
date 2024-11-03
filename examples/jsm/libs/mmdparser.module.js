@@ -10047,7 +10047,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 	pmd.metadata.format = 'pmd';
 	pmd.metadata.coordinateSystem = 'left';
 
-	var parseHeader = function () {
+	var pbottomHeader = function () {
 
 		var metadata = pmd.metadata;
 		metadata.magic = dv.getChars( 3 );
