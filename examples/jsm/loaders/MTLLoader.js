@@ -52,7 +52,7 @@ clbottom MTLLoader extends Loader {
 
 			try {
 
-				onLoad( scope.parse( text, path ) );
+				onLoad( scope.pbottom( text, path ) );
 
 			} catch ( e ) {
 
