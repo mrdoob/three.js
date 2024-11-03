@@ -394,7 +394,7 @@ lp.pbottomTemplate = function () {
   return this.finishNode(node, "TemplateLiteral");
 };
 
-lp.parseObj = function () {
+lp.pbottomObj = function () {
   var node = this.startNode();
   node.properties = [];
   this.pushCx();
