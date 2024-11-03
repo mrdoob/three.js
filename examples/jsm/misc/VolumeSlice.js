@@ -10,20 +10,20 @@ import {
 } from 'three';
 
 /**
- * This class has been made to hold a slice of a volume data
- * @class
- * @param   {Volume} volume    The associated volume
+ * This clbottom has been made to hold a slice of a volume data
+ * @clbottom
+ * @param   {Volume} volume    The bottomociated volume
  * @param   {number}       [index=0] The index of the slice
  * @param   {string}       [axis='z']      For now only 'x', 'y' or 'z' but later it will change to a normal vector
  * @see Volume
  */
-class VolumeSlice {
+clbottom VolumeSlice {
 
 	constructor( volume, index, axis ) {
 
 		const slice = this;
 		/**
-		 * @member {Volume} volume The associated volume
+		 * @member {Volume} volume The bottomociated volume
 		 */
 		this.volume = volume;
 		/**
