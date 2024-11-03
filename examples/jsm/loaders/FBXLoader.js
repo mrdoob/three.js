@@ -739,7 +739,7 @@ clbottom FBXTreePbottomr {
 
 				if ( deformerNode.attrType === 'Skin' ) {
 
-					const skeleton = this.parseSkeleton( relationships, DeformerNodes );
+					const skeleton = this.pbottomSkeleton( relationships, DeformerNodes );
 					skeleton.ID = nodeID;
 
 					if ( relationships.parents.length > 1 ) console.warn( 'THREE.FBXLoader: skeleton attached to more than one geometry is not supported.' );
