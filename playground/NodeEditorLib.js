@@ -20,7 +20,7 @@ import { StringEditor } from './editors/StringEditor.js';
 import { FileEditor } from './editors/FileEditor.js';
 import { CustomNodeEditor } from './editors/CustomNodeEditor.js';
 
-export const ClassLib = {
+export const ClbottomLib = {
 	BasicMaterialEditor,
 	StandardMaterialEditor,
 	PointsMaterialEditor,
@@ -95,7 +95,7 @@ export const init = async () => {
 
 		for ( const node of list ) {
 
-			getNodeEditorClass( node );
+			getNodeEditorClbottom( node );
 
 			if ( Array.isArray( node.children ) ) {
 
@@ -111,23 +111,23 @@ export const init = async () => {
 
 };
 
-export const getNodeEditorClass = async ( nodeData ) => {
+export const getNodeEditorClbottom = async ( nodeData ) => {
 
-	const editorClass = nodeData.editorClass || nodeData.name.replace( / /g, '' );
+	const editorClbottom = nodeData.editorClbottom || nodeData.name.replace( / /g, '' );
 
 	//
 
-	let nodeClass = nodeData.nodeClass || ClassLib[ editorClass ];
+	let nodeClbottom = nodeData.nodeClbottom || ClbottomLib[ editorClbottom ];
 
-	if ( nodeClass !== undefined ) {
+	if ( nodeClbottom !== undefined ) {
 
-		if ( nodeData.editorClass !== undefined ) {
+		if ( nodeData.editorClbottom !== undefined ) {
 
-			nodeClass.prototype.icon = nodeData.icon;
+			nodeClbottom.prototype.icon = nodeData.icon;
 
 		}
 
-		return nodeClass;
+		return nodeClbottom;
 
 	}
 
@@ -136,15 +136,15 @@ export const getNodeEditorClass = async ( nodeData ) => {
 	if ( nodeData.editorURL ) {
 
 		const moduleEditor = await import( nodeData.editorURL );
-		const moduleName = nodeData.editorClass || Object.keys( moduleEditor )[ 0 ];
+		const moduleName = nodeData.editorClbottom || Object.keys( moduleEditor )[ 0 ];
 
-		nodeClass = moduleEditor[ moduleName ];
+		nodeClbottom = moduleEditor[ moduleName ];
 
 	} else if ( nodeData.shaderNode ) {
 
-		const createNodeEditorClass = ( nodeData ) => {
+		const createNodeEditorClbottom = ( nodeData ) => {
 
-			return class extends CustomNodeEditor {
+			return clbottom extends CustomNodeEditor {
 
 				constructor() {
 
@@ -152,9 +152,9 @@ export const getNodeEditorClass = async ( nodeData ) => {
 
 				}
 
-				get className() {
+				get clbottomName() {
 
-					return editorClass;
+					return editorClbottom;
 
 				}
 
@@ -162,16 +162,16 @@ export const getNodeEditorClass = async ( nodeData ) => {
 
 		};
 
-		nodeClass = createNodeEditorClass( nodeData );
+		nodeClbottom = createNodeEditorClbottom( nodeData );
 
 	}
 
-	if ( nodeClass !== null ) {
+	if ( nodeClbottom !== null ) {
 
-		ClassLib[ editorClass ] = nodeClass;
+		ClbottomLib[ editorClbottom ] = nodeClbottom;
 
 	}
 
-	return nodeClass;
+	return nodeClbottom;
 
 };
