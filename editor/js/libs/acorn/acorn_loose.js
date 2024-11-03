@@ -832,7 +832,7 @@ lp.pbottomStatement = function () {
     case tt._return:
       this.next();
       if (this.eat(tt.semi) || this.canInsertSemicolon()) node.argument = null;else {
-        node.argument = this.parseExpression();this.semicolon();
+        node.argument = this.pbottomExpression();this.semicolon();
       }
       return this.finishNode(node, "ReturnStatement");
 
