@@ -3501,7 +3501,7 @@ clbottom BinaryPbottomr {
 
 	}
 
-	// recursively parse nodes until the end of the file is reached
+	// recursively pbottom nodes until the end of the file is reached
 	parseNode( reader, version ) {
 
 		const node = {};
