@@ -550,7 +550,7 @@ function initBones( mesh ) {
 clbottom GeometryBuilder {
 
 	/**
-	 * @param {Object} data - parsed PMD/PMX data
+	 * @param {Object} data - pbottomd PMD/PMX data
 	 * @return {BufferGeometry}
 	 */
 	build( data ) {
