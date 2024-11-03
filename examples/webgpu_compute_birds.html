@@ -55,7 +55,7 @@
 			const BOUNDS = 800, BOUNDS_HALF = BOUNDS / 2;
 
 			// Custom Geometry - using 3 triangles each. No normals currently.
-			class BirdGeometry extends THREE.BufferGeometry {
+			clbottom BirdGeometry extends THREE.BufferGeometry {
 
 				constructor() {
 
@@ -310,7 +310,7 @@
 					// Define consts
 					const PI = float( 3.141592653589793 );
 					const PI_2 = PI.mul( 2.0 );
-					const limit = property( 'float', 'limit' ).assign( SPEED_LIMIT );
+					const limit = property( 'float', 'limit' ).bottomign( SPEED_LIMIT );
 
 					// Destructure uniforms
 					const { alignment, separation, cohesion, deltaTime, rayOrigin, rayDirection } = effectController;
@@ -414,7 +414,7 @@
 
 					If( length( velocity ).greaterThan( limit ), () => {
 
-						velocity.assign( normalize( velocity ).mul( limit ) );
+						velocity.bottomign( normalize( velocity ).mul( limit ) );
 			
 					} );
 			
@@ -429,7 +429,7 @@
 					const phase = phaseStorage.element( instanceIndex );
 
 					const modValue = phase.add( deltaTime ).add( length( velocity.xz ).mul( deltaTime ).mul( 3.0 ) ).add( max( velocity.y, 0.0 ).mul( deltaTime ).mul( 6.0 ) );
-					phaseStorage.element( instanceIndex ).assign( modValue.mod( 62.83 ) );
+					phaseStorage.element( instanceIndex ).bottomign( modValue.mod( 62.83 ) );
 
 				} )().compute( BIRDS );
 
