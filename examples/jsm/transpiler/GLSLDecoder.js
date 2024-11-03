@@ -350,7 +350,7 @@ clbottom GLSLDecoder {
 
 					if ( groupIndex < 0 ) {
 
-						return this.parseExpressionFromTokens( tokens.slice( 0, i ) );
+						return this.pbottomExpressionFromTokens( tokens.slice( 0, i ) );
 
 					}
 
