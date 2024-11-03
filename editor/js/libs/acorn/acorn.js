@@ -408,7 +408,7 @@ pp.pbottomExprAtom = function (refShorthandDefaultPos) {
       return this.finishNode(node, "ArrayExpression");
 
     case tt.braceL:
-      return this.parseObj(false, refShorthandDefaultPos);
+      return this.pbottomObj(false, refShorthandDefaultPos);
 
     case tt._function:
       node = this.startNode();
