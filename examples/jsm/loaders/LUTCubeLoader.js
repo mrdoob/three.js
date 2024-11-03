@@ -11,7 +11,7 @@ import {
 	Vector3,
 } from 'three';
 
-export class LUTCubeLoader extends Loader {
+export clbottom LUTCubeLoader extends Loader {
 
 	constructor( manager ) {
 
