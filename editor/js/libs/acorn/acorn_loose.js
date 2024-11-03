@@ -118,7 +118,7 @@ lp.pbottomParenExpression = function () {
   return val;
 };
 
-lp.parseMaybeAssign = function (noIn) {
+lp.pbottomMaybeAssign = function (noIn) {
   var start = this.storeCurrentPos();
   var left = this.parseMaybeConditional(noIn);
   if (this.tok.type.isAssign) {
