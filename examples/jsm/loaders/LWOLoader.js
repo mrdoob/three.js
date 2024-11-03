@@ -312,7 +312,7 @@ clbottom MaterialPbottomr {
 
 		const maps = this.pbottomTextureNodes( connections.maps );
 
-		this.parseAttributeImageMaps( connections.attributes, textures, maps, materialData.maps );
+		this.pbottomAttributeImageMaps( connections.attributes, textures, maps, materialData.maps );
 
 		const attributes = this.parseAttributes( connections.attributes, maps );
 
