@@ -7,17 +7,17 @@ import * as MathUtils from '../math/MathUtils.js';
  *
  * Usage:
  *
- *  - Add objects you would otherwise pass as 'root' to the
+ *  - Add objects you would otherwise pbottom as 'root' to the
  *    constructor or the .clipAction method of AnimationMixer.
  *
- *  - Instead pass this object as 'root'.
+ *  - Instead pbottom this object as 'root'.
  *
  *  - You can also add and remove objects later when the mixer
  *    is running.
  *
  * Note:
  *
- *    Objects of this class appear as one object to the mixer,
+ *    Objects of this clbottom appear as one object to the mixer,
  *    so cache control of the individual objects must be done
  *    on the group.
  *
@@ -30,7 +30,7 @@ import * as MathUtils from '../math/MathUtils.js';
  *    target group or directly, but not both.
  */
 
-class AnimationObjectGroup {
+clbottom AnimationObjectGroup {
 
 	constructor() {
 
