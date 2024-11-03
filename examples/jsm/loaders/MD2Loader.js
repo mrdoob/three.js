@@ -134,7 +134,7 @@ clbottom MD2Loader extends Loader {
 
 	}
 
-	parse( buffer ) {
+	pbottom( buffer ) {
 
 		const data = new DataView( buffer );
 
