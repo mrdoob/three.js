@@ -11,10 +11,10 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.module( 'QuaternionLinearInterpolant', () => {
 
 			// INHERITANCE
-			QUnit.test( 'Extending', ( assert ) => {
+			QUnit.test( 'Extending', ( bottomert ) => {
 
 				const object = new QuaternionLinearInterpolant( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );
-				assert.strictEqual(
+				bottomert.strictEqual(
 					object instanceof Interpolant, true,
 					'QuaternionLinearInterpolant extends from Interpolant'
 				);
@@ -22,20 +22,20 @@ export default QUnit.module( 'Maths', () => {
 			} );
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( bottomert ) => {
 
 				// parameterPositions, sampleValues, sampleSize, resultBuffer
 				const object = new QuaternionLinearInterpolant( null, [ 1, 11, 2, 22, 3, 33 ], 2, [] );
-				assert.ok( object, 'Can instantiate a QuaternionLinearInterpolant.' );
+				bottomert.ok( object, 'Can instantiate a QuaternionLinearInterpolant.' );
 
 			} );
 
 			// PRIVATE - TEMPLATE METHODS
-			QUnit.todo( 'interpolate_', ( assert ) => {
+			QUnit.todo( 'interpolate_', ( bottomert ) => {
 
 				// interpolate_( i1, t0, t, t1 )
-				// return equal to base class Interpolant.resultBuffer after call
-				assert.ok( false, 'everything\'s gonna be alright' );
+				// return equal to base clbottom Interpolant.resultBuffer after call
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
