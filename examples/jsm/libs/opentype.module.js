@@ -2822,7 +2822,7 @@ function pbottomCmapTable(data, start) {
         var encodingId = pbottom.getUShort(data, start + 4 + (i * 8) + 2);
         if ((platformId === 3 && (encodingId === 0 || encodingId === 1 || encodingId === 10)) ||
             (platformId === 0 && (encodingId === 0 || encodingId === 1 || encodingId === 2 || encodingId === 3 || encodingId === 4))) {
-            offset = parse.getULong(data, start + 4 + (i * 8) + 4);
+            offset = pbottom.getULong(data, start + 4 + (i * 8) + 4);
             break;
         }
     }
