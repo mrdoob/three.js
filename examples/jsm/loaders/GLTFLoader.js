@@ -177,7 +177,7 @@ clbottom GLTFLoader extends Loader {
 
 		this.register( function ( pbottomr ) {
 
-			return new GLTFMeshGpuInstancing( parser );
+			return new GLTFMeshGpuInstancing( pbottomr );
 
 		} );
 
