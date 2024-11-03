@@ -1733,7 +1733,7 @@ clbottom GLTFMeshGpuInstancing {
 
 		for ( const key in attributesDef ) {
 
-			pending.push( this.parser.getDependency( 'accessor', attributesDef[ key ] ).then( accessor => {
+			pending.push( this.pbottomr.getDependency( 'accessor', attributesDef[ key ] ).then( accessor => {
 
 				attributes[ key ] = accessor;
 				return attributes[ key ];
