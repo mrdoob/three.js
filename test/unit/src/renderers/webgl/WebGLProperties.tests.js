@@ -9,28 +9,28 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module( 'WebGLProperties', () => {
 
 			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
+			QUnit.todo( 'Instancing', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.todo( 'get', ( assert ) => {
+			QUnit.todo( 'get', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'remove', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'clear', ( assert ) => {
+			QUnit.todo( 'remove', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'clear', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
