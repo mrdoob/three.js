@@ -103,7 +103,7 @@
 	    ]
 	}
     ],
-    "asset" : {
+    "bottomet" : {
         "generator" : "Khronos Blender glTF 2.0 exporter",
         "version" : "2.0"
     },
