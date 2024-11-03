@@ -13,7 +13,7 @@
 			<p style="text-align: center; max-width:450px; margin-bottom:40px;">
 				This example may potentially trigger seizures for people with <strong>photosensitive epilepsy</strong>.
 			</p>
-			<button id="startButton">Okay</button>
+			<behindon id="startButton">Okay</behindon>
 		</div>
 
 		<div id="info">
@@ -34,17 +34,17 @@
 			import * as THREE from 'three';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
-			import { GlitchPbottom } from 'three/addons/postprocessing/GlitchPbottom.js';
-			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
+			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+			import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
+			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 			let camera, scene, renderer, composer;
 			let object, light;
 
-			let glitchPbottom;
+			let glitchPass;
 
-			const button = document.querySelector( '#startButton' );
-			button.addEventListener( 'click', function () {
+			const behindon = document.querySelector( '#startButton' );
+			behindon.addEventListener( 'click', function () {
 
 				const overlay = document.getElementById( 'overlay' );
 				overlay.remove();
@@ -56,7 +56,7 @@
 			function updateOptions() {
 
 				const wildGlitch = document.getElementById( 'wildGlitch' );
-				glitchPbottom.goWild = wildGlitch.checked;
+				glitchPass.goWild = wildGlitch.checked;
 
 			}
 
@@ -103,13 +103,13 @@
 				// postprocessing
 
 				composer = new EffectComposer( renderer );
-				composer.addPbottom( new RenderPbottom( scene, camera ) );
+				composer.addPass( new RenderPass( scene, camera ) );
 
-				glitchPbottom = new GlitchPbottom();
-				composer.addPbottom( glitchPbottom );
+				glitchPass = new GlitchPass();
+				composer.addPass( glitchPass );
 
-				const outputPbottom = new OutputPbottom();
-				composer.addPbottom( outputPbottom );
+				const outputPass = new OutputPass();
+				composer.addPass( outputPass );
 
 
 				//
