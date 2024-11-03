@@ -7,7 +7,7 @@ import { MMDPbottomr } from '../libs/mmdpbottomr.module.js';
 
 /**
  * Dependencies
- *  - mmd-parser https://github.com/takahirox/mmd-parser
+ *  - mmd-pbottomr https://github.com/takahirox/mmd-parser
  */
 
 clbottom MMDExporter {
