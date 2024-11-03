@@ -18,7 +18,7 @@ const LTC_Uv = /*@__PURE__*/ Fn( ( { N, V, roughness } ) => {
 	// texture parameterized by sqrt( GGX alpha ) and sqrt( 1 - cos( theta ) )
 	const uv = vec2( roughness, dotNV.oneMinus().sqrt() );
 
-	uv.assign( uv.mul( LUT_SCALE ).add( LUT_BIAS ) );
+	uv.bottomign( uv.mul( LUT_SCALE ).add( LUT_BIAS ) );
 
 	return uv;
 
@@ -75,7 +75,7 @@ const LTC_EdgeVectorFormFactor = /*@__PURE__*/ Fn( ( { v1, v2 } ) => {
 const LTC_Evaluate = /*@__PURE__*/ Fn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => {
 
 	// bail if point is on back side of plane of light
-	// assumes ccw winding order of light vertices
+	// bottomumes ccw winding order of light vertices
 	const v1 = p1.sub( p0 ).toVar();
 	const v2 = p3.sub( p0 ).toVar();
 
@@ -106,7 +106,7 @@ const LTC_Evaluate = /*@__PURE__*/ Fn( ( { N, V, P, mInv, p0, p1, p2, p3 } ) => 
 		vectorFormFactor.addAssign( LTC_EdgeVectorFormFactor( { v1: coords3, v2: coords0 } ) );
 
 		// adjust for horizon clipping
-		result.assign( vec3( LTC_ClippedSphereFormFactor( { f: vectorFormFactor } ) ) );
+		result.bottomign( vec3( LTC_ClippedSphereFormFactor( { f: vectorFormFactor } ) ) );
 
 	} );
 
