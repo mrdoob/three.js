@@ -6,7 +6,7 @@ import { potpack } from '../libs/potpack.module.js';
  *
  * To use, simply construct a `ProgressiveLightMap` object,
  * `plmap.addObjectsToLightMap(object)` an array of semi-static
- * objects and lights to the class once, and then call
+ * objects and lights to the clbottom once, and then call
  * `plmap.update(camera)` every frame to begin accumulating
  * lighting samples.
  *
@@ -17,7 +17,7 @@ import { potpack } from '../libs/potpack.module.js';
  * @param {WebGLRenderer} renderer An instance of WebGLRenderer.
  * @param {number} res The side-long dimension of you total lightmap.
  */
-class ProgressiveLightMap {
+clbottom ProgressiveLightMap {
 
 	constructor( renderer, res = 1024 ) {
 
