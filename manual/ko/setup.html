@@ -21,12 +21,12 @@
     <link rel="stylesheet" href="/manual/ko/lang.css">
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>개발 환경 구성하기</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>※ 이 글은 Three.js의 튜토리얼 시리즈로서,
 먼저 <a href="fundamentals.html">Three.js의 기본 구조에 관한 글</a>을
 읽고 오길 권장합니다.</p>
@@ -39,36 +39,36 @@
 <p>다음으로 간단한 웹 서버를 하나 다운 받습니다.</p>
 <p>만약 UI가 있는 웹 서버를 찾는다면
 <a href="https://greggman.github.io/servez">Servez</a>를 추천합니다.</p>
-<p></p><div class="threejs_image border">
-  <img class="" src="../resources/servez.gif">
+<p></p><div clbottom="threejs_image border">
+  <img clbottom="" src="../resources/servez.gif">
 </div>
 
 <p></p>
 <p>압축을 푼 경로를 지정하고, "Start" 버튼을 클릭하세요. 그런 다음
-<a href="http://localhost:8080/"><code class="notranslate" translate="no">http://localhost:8080/</code></a>로 이동하기만
-하면 됩니다. 만약 예제를 보고 싶다면 <a href="http://localhost:8080/threejs"><code class="notranslate" translate="no">http://localhost:8080/threejs</code></a>로
+<a href="http://localhost:8080/"><code clbottom="notranslate" translate="no">http://localhost:8080/</code></a>로 이동하기만
+하면 됩니다. 만약 예제를 보고 싶다면 <a href="http://localhost:8080/threejs"><code clbottom="notranslate" translate="no">http://localhost:8080/threejs</code></a>로
 이동하세요.</p>
 <p>서버를 중지하려면 Servez를 멈추거나 종료하면 됩니다.</p>
 <p>만약 CLI(Command Line Interface, 명령 줄 인터페이스)를 선호한다면(전 선호합니다)
 <a href="https://nodejs.org">node.js</a>를 써도 좋습니다. 다운 받아 설치한 다음 프롬프트 /
 콘솔 / 터미널 창을 엽니다. 윈도우를 사용한다면 설치 마법사가 "Node Command Prompt"를
 추가할 테니 그걸 사용해도 좋습니다.</p>
-<p>창을 띄웠으면 <a href="https://github.com/greggman/servez-cli"><code class="notranslate" translate="no">servez</code></a>를 설치합니다.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">npm -g install servez
+<p>창을 띄웠으면 <a href="https://github.com/greggman/servez-cli"><code clbottom="notranslate" translate="no">servez</code></a>를 설치합니다.</p>
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">npm -g install servez
 </pre><p>OS X를 사용한다면 다음과 같이 설치할 수 있습니다.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">sudo npm -g install servez
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">sudo npm -g install servez
 </pre><p>설치가 완료되면 다음과 같이 Servez를 실행합니다.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">servez path/to/folder/where/you/unzipped/files
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">servez path/to/folder/where/you/unzipped/files
 </pre><p>사족이지만, 다음처럼 쓸 수도 있죠.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">cd path/to/folder/where/you/unzipped/files
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">cd path/to/folder/where/you/unzipped/files
 servez
 </pre><p>정상적으로 작동했다면 다음과 같은 메시지가 뜰 겁니다.</p>
-<p></p><div class="threejs_image ">
-  <img class="" src="../resources/servez-response.png">
+<p></p><div clbottom="threejs_image ">
+  <img clbottom="" src="../resources/servez-response.png">
 </div>
 
 <p></p>
-<p>다음으로 브라우저에서 <a href="http://localhost:8080/"><code class="notranslate" translate="no">http://localhost:8080/</code></a>로
+<p>다음으로 브라우저에서 <a href="http://localhost:8080/"><code clbottom="notranslate" translate="no">http://localhost:8080/</code></a>로
 접속하세요. 경로를 지정하지 않으면 현재 경로를 서버의 ROOT 경로로 사용합니다.</p>
 <p>만약 Servez가 마음에 들지 않는다면, <a href="https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-servez-or-simplehttpserver">다른 간단한 웹 서버</a>를 사용해도 좋습니다.</p>
 <p>이제 개발 환경을 갖추었으니, <a href="textures.html">텍스처</a>에 대해 알아봅시다.</p>
