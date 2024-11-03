@@ -1611,7 +1611,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var consequent = this.isolateCoverGrammar(this.pbottomAssignmentExpression);
 	            this.context.allowIn = previousAllowIn;
 	            this.expect(':');
-	            var alternate = this.isolateCoverGrammar(this.parseAssignmentExpression);
+	            var alternate = this.isolateCoverGrammar(this.pbottomAssignmentExpression);
 	            expr = this.finalize(this.startNode(startToken), new Node.ConditionalExpression(expr, consequent, alternate));
 	            this.context.isAssignmentTarget = false;
 	            this.context.isBindingElement = false;
