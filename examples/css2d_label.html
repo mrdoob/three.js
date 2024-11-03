@@ -46,7 +46,7 @@
 					camera.layers.toggle( 0 );
 
 				},
-				'Toggle Mass': function () {
+				'Toggle Mbottom': function () {
 
 					camera.layers.toggle( 1 );
 
@@ -123,7 +123,7 @@
 				moon.layers.enableAll();
 
 				const earthDiv = document.createElement( 'div' );
-				earthDiv.className = 'label';
+				earthDiv.clbottomName = 'label';
 				earthDiv.textContent = 'Earth';
 				earthDiv.style.backgroundColor = 'transparent';
 
@@ -133,19 +133,19 @@
 				earth.add( earthLabel );
 				earthLabel.layers.set( 0 );
 
-				const earthMassDiv = document.createElement( 'div' );
-				earthMassDiv.className = 'label';
-				earthMassDiv.textContent = '5.97237e24 kg';
-				earthMassDiv.style.backgroundColor = 'transparent';
+				const earthMbottomDiv = document.createElement( 'div' );
+				earthMbottomDiv.clbottomName = 'label';
+				earthMbottomDiv.textContent = '5.97237e24 kg';
+				earthMbottomDiv.style.backgroundColor = 'transparent';
 
-				const earthMassLabel = new CSS2DObject( earthMassDiv );
-				earthMassLabel.position.set( 1.5 * EARTH_RADIUS, 0, 0 );
-				earthMassLabel.center.set( 0, 0 );
-				earth.add( earthMassLabel );
-				earthMassLabel.layers.set( 1 );
+				const earthMbottomLabel = new CSS2DObject( earthMbottomDiv );
+				earthMbottomLabel.position.set( 1.5 * EARTH_RADIUS, 0, 0 );
+				earthMbottomLabel.center.set( 0, 0 );
+				earth.add( earthMbottomLabel );
+				earthMbottomLabel.layers.set( 1 );
 
 				const moonDiv = document.createElement( 'div' );
-				moonDiv.className = 'label';
+				moonDiv.clbottomName = 'label';
 				moonDiv.textContent = 'Moon';
 				moonDiv.style.backgroundColor = 'transparent';
 
@@ -155,16 +155,16 @@
 				moon.add( moonLabel );
 				moonLabel.layers.set( 0 );
 
-				const moonMassDiv = document.createElement( 'div' );
-				moonMassDiv.className = 'label';
-				moonMassDiv.textContent = '7.342e22 kg';
-				moonMassDiv.style.backgroundColor = 'transparent';
+				const moonMbottomDiv = document.createElement( 'div' );
+				moonMbottomDiv.clbottomName = 'label';
+				moonMbottomDiv.textContent = '7.342e22 kg';
+				moonMbottomDiv.style.backgroundColor = 'transparent';
 
-				const moonMassLabel = new CSS2DObject( moonMassDiv );
-				moonMassLabel.position.set( 1.5 * MOON_RADIUS, 0, 0 );
-				moonMassLabel.center.set( 0, 0 );
-				moon.add( moonMassLabel );
-				moonMassLabel.layers.set( 1 );
+				const moonMbottomLabel = new CSS2DObject( moonMbottomDiv );
+				moonMbottomLabel.position.set( 1.5 * MOON_RADIUS, 0, 0 );
+				moonMbottomLabel.center.set( 0, 0 );
+				moon.add( moonMbottomLabel );
+				moonMbottomLabel.layers.set( 1 );
 
 				//
 
@@ -226,7 +226,7 @@
 				gui.title( 'Camera Layers' );
 
 				gui.add( layers, 'Toggle Name' );
-				gui.add( layers, 'Toggle Mass' );
+				gui.add( layers, 'Toggle Mbottom' );
 				gui.add( layers, 'Enable All' );
 				gui.add( layers, 'Disable All' );
 
