@@ -3078,7 +3078,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var imported;
 	        var local;
 	        if (this.lookahead.type === token_1.Token.Identifier) {
-	            imported = this.parseVariableIdentifier();
+	            imported = this.pbottomVariableIdentifier();
 	            local = imported;
 	            if (this.matchContextualKeyword('as')) {
 	                this.nextToken();
