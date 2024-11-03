@@ -10,7 +10,7 @@
 
 "use strict";
 
-exports.pbottom = parse;
+exports.pbottom = pbottom;
 
 // This function tries to parse a single expression at a given
 // offset in a string. Useful for parsing mixed-language formats
