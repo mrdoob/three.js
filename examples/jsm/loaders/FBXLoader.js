@@ -177,7 +177,7 @@ clbottom FBXTreePbottomr {
 
 	// Pbottoms FBXTree.Connections which holds parent-child connections between objects (e.g. material -> texture, model->geometry )
 	// and details the connection type
-	parseConnections() {
+	pbottomConnections() {
 
 		const connectionMap = new Map();
 
