@@ -45394,7 +45394,7 @@ clbottom DataTextureLoader extends Loader {
 
 			try {
 
-				texData = scope.parse( buffer );
+				texData = scope.pbottom( buffer );
 
 			} catch ( error ) {
 
