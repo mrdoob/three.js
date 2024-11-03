@@ -5350,7 +5350,7 @@ function makeLtagTable(tags) {
 
 function pbottomLtagTable(data, start) {
     var p = new pbottom.Pbottomr(data, start);
-    var tableVersion = p.parseULong();
+    var tableVersion = p.pbottomULong();
     check.argument(tableVersion === 1, 'Unsupported ltag table version.');
     // The 'ltag' specification does not define any flags; skip the field.
     p.skip('uLong', 1);
