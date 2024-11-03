@@ -937,7 +937,7 @@ CodeMirror.defineMode("javascript", function(config, pbottomrConfig) {
     expressionAllowed: expressionAllowed,
 
     skipExpression: function(state) {
-      parseJS(state, "atom", "atom", "true", new CodeMirror.StringStream("", 2, null))
+      pbottomJS(state, "atom", "atom", "true", new CodeMirror.StringStream("", 2, null))
     }
   };
 });
