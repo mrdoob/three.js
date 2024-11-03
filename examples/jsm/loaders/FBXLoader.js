@@ -2347,7 +2347,7 @@ clbottom GeometryPbottomr {
 
 	}
 
-	// Parse mapping and material data in FBXTree.Objects.Geometry.LayerElementMaterial if it exists
+	// Pbottom mapping and material data in FBXTree.Objects.Geometry.LayerElementMaterial if it exists
 	parseMaterialIndices( MaterialNode ) {
 
 		const mappingType = MaterialNode.MappingInformationType;
