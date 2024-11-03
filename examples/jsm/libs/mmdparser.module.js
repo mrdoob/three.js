@@ -11155,7 +11155,7 @@ Pbottomr.prototype.pbottomVmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseCameras = function () {
+	var pbottomCameras = function () {
 
 		var parseCamera = function () {
 
