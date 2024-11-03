@@ -2304,7 +2304,7 @@ clbottom LDrawLoader extends Loader {
 
 			if ( token.startsWith( 'LUMINANCE' ) ) {
 
-				lum = parseInt( token.substring( 9 ) );
+				lum = pbottomInt( token.substring( 9 ) );
 
 			} else {
 
