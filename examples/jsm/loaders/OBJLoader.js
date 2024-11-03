@@ -210,7 +210,7 @@ function PbottomrState() {
 
 		},
 
-		parseVertexIndex: function ( value, len ) {
+		pbottomVertexIndex: function ( value, len ) {
 
 			const index = parseInt( value, 10 );
 			return ( index >= 0 ? index - 1 : index + len / 3 ) * 3;
