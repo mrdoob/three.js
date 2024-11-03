@@ -31,15 +31,15 @@
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
-			import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
-			import { DotScreenPass } from 'three/addons/postprocessing/DotScreenPass.js';
-			import { MaskPass, ClearMaskPass } from 'three/addons/postprocessing/MaskPass.js';
-			import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { ShaderPbottom } from 'three/addons/postprocessing/ShaderPbottom.js';
+			import { BloomPbottom } from 'three/addons/postprocessing/BloomPbottom.js';
+			import { FilmPbottom } from 'three/addons/postprocessing/FilmPbottom.js';
+			import { DotScreenPbottom } from 'three/addons/postprocessing/DotScreenPbottom.js';
+			import { MaskPbottom, ClearMaskPbottom } from 'three/addons/postprocessing/MaskPbottom.js';
+			import { TexturePbottom } from 'three/addons/postprocessing/TexturePbottom.js';
 
-			import { BleachBypassShader } from 'three/addons/shaders/BleachBypassShader.js';
+			import { BleachBypbottomShader } from 'three/addons/shaders/BleachBypbottomShader.js';
 			import { ColorifyShader } from 'three/addons/shaders/ColorifyShader.js';
 			import { HorizontalBlurShader } from 'three/addons/shaders/HorizontalBlurShader.js';
 			import { VerticalBlurShader } from 'three/addons/shaders/VerticalBlurShader.js';
@@ -140,14 +140,14 @@
 
 				//
 
-				const shaderBleach = BleachBypassShader;
+				const shaderBleach = BleachBypbottomShader;
 				const shaderSepia = SepiaShader;
 				const shaderVignette = VignetteShader;
 
-				const effectBleach = new ShaderPass( shaderBleach );
-				const effectSepia = new ShaderPass( shaderSepia );
-				const effectVignette = new ShaderPass( shaderVignette );
-				const gammaCorrection = new ShaderPass( GammaCorrectionShader );
+				const effectBleach = new ShaderPbottom( shaderBleach );
+				const effectSepia = new ShaderPbottom( shaderSepia );
+				const effectVignette = new ShaderPbottom( shaderVignette );
+				const gammaCorrection = new ShaderPbottom( GammaCorrectionShader );
 
 				effectBleach.uniforms[ 'opacity' ].value = 0.95;
 
@@ -156,24 +156,24 @@
 				effectVignette.uniforms[ 'offset' ].value = 1.6;
 				effectVignette.uniforms[ 'darkness' ].value = 0.95;
 
-				const effectBloom = new BloomPass( 0.5 );
-				const effectFilm = new FilmPass( 0.35 );
-				const effectFilmBW = new FilmPass( 0.35, true );
-				const effectDotScreen = new DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.8 );
+				const effectBloom = new BloomPbottom( 0.5 );
+				const effectFilm = new FilmPbottom( 0.35 );
+				const effectFilmBW = new FilmPbottom( 0.35, true );
+				const effectDotScreen = new DotScreenPbottom( new THREE.Vector2( 0, 0 ), 0.5, 0.8 );
 
-				const effectHBlur = new ShaderPass( HorizontalBlurShader );
-				const effectVBlur = new ShaderPass( VerticalBlurShader );
+				const effectHBlur = new ShaderPbottom( HorizontalBlurShader );
+				const effectVBlur = new ShaderPbottom( VerticalBlurShader );
 				effectHBlur.uniforms[ 'h' ].value = 2 / ( width / 2 );
 				effectVBlur.uniforms[ 'v' ].value = 2 / ( height / 2 );
 
-				const effectColorify1 = new ShaderPass( ColorifyShader );
-				const effectColorify2 = new ShaderPass( ColorifyShader );
+				const effectColorify1 = new ShaderPbottom( ColorifyShader );
+				const effectColorify2 = new ShaderPbottom( ColorifyShader );
 				effectColorify1.uniforms[ 'color' ] = new THREE.Uniform( new THREE.Color( 1, 0.8, 0.8 ) );
 				effectColorify2.uniforms[ 'color' ] = new THREE.Uniform( new THREE.Color( 1, 0.75, 0.5 ) );
 
-				const clearMask = new ClearMaskPass();
-				const renderMask = new MaskPass( sceneModel, cameraPerspective );
-				const renderMaskInverse = new MaskPass( sceneModel, cameraPerspective );
+				const clearMask = new ClearMaskPbottom();
+				const renderMask = new MaskPbottom( sceneModel, cameraPerspective );
+				const renderMaskInverse = new MaskPbottom( sceneModel, cameraPerspective );
 
 				renderMaskInverse.inverse = true;
 
@@ -188,68 +188,68 @@
 
 				//
 
-				const renderBackground = new RenderPass( sceneBG, cameraOrtho );
-				const renderModel = new RenderPass( sceneModel, cameraPerspective );
+				const renderBackground = new RenderPbottom( sceneBG, cameraOrtho );
+				const renderModel = new RenderPbottom( sceneModel, cameraPerspective );
 
 				renderModel.clear = false;
 
 				composerScene = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth * 2, rtHeight * 2, rtParameters ) );
 
-				composerScene.addPass( renderBackground );
-				composerScene.addPass( renderModel );
-				composerScene.addPass( renderMaskInverse );
-				composerScene.addPass( effectHBlur );
-				composerScene.addPass( effectVBlur );
-				composerScene.addPass( clearMask );
+				composerScene.addPbottom( renderBackground );
+				composerScene.addPbottom( renderModel );
+				composerScene.addPbottom( renderMaskInverse );
+				composerScene.addPbottom( effectHBlur );
+				composerScene.addPbottom( effectVBlur );
+				composerScene.addPbottom( clearMask );
 
 				//
 
-				renderScene = new TexturePass( composerScene.renderTarget2.texture );
+				renderScene = new TexturePbottom( composerScene.renderTarget2.texture );
 
 				//
 
 				composer1 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
-				composer1.addPass( renderScene );
-				composer1.addPass( gammaCorrection );
-				composer1.addPass( effectFilmBW );
-				composer1.addPass( effectVignette );
+				composer1.addPbottom( renderScene );
+				composer1.addPbottom( gammaCorrection );
+				composer1.addPbottom( effectFilmBW );
+				composer1.addPbottom( effectVignette );
 
 				//
 
 				composer2 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
-				composer2.addPass( renderScene );
-				composer2.addPass( gammaCorrection );
-				composer2.addPass( effectDotScreen );
-				composer2.addPass( renderMask );
-				composer2.addPass( effectColorify1 );
-				composer2.addPass( clearMask );
-				composer2.addPass( renderMaskInverse );
-				composer2.addPass( effectColorify2 );
-				composer2.addPass( clearMask );
-				composer2.addPass( effectVignette );
+				composer2.addPbottom( renderScene );
+				composer2.addPbottom( gammaCorrection );
+				composer2.addPbottom( effectDotScreen );
+				composer2.addPbottom( renderMask );
+				composer2.addPbottom( effectColorify1 );
+				composer2.addPbottom( clearMask );
+				composer2.addPbottom( renderMaskInverse );
+				composer2.addPbottom( effectColorify2 );
+				composer2.addPbottom( clearMask );
+				composer2.addPbottom( effectVignette );
 
 				//
 
 				composer3 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
-				composer3.addPass( renderScene );
-				composer3.addPass( gammaCorrection );
-				composer3.addPass( effectSepia );
-				composer3.addPass( effectFilm );
-				composer3.addPass( effectVignette );
+				composer3.addPbottom( renderScene );
+				composer3.addPbottom( gammaCorrection );
+				composer3.addPbottom( effectSepia );
+				composer3.addPbottom( effectFilm );
+				composer3.addPbottom( effectVignette );
 
 				//
 
 				composer4 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
-				composer4.addPass( renderScene );
-				composer4.addPass( gammaCorrection );
-				composer4.addPass( effectBloom );
-				composer4.addPass( effectFilm );
-				composer4.addPass( effectBleach );
-				composer4.addPass( effectVignette );
+				composer4.addPbottom( renderScene );
+				composer4.addPbottom( gammaCorrection );
+				composer4.addPbottom( effectBloom );
+				composer4.addPbottom( effectFilm );
+				composer4.addPbottom( effectBleach );
+				composer4.addPbottom( effectVignette );
 
 				renderScene.uniforms[ 'tDiffuse' ].value = composerScene.renderTarget2.texture;
 
