@@ -81,7 +81,7 @@ clbottom SVGLoader extends Loader {
 			switch ( node.nodeName ) {
 
 				case 'svg':
-					style = parseStyle( node, style );
+					style = pbottomStyle( node, style );
 					break;
 
 				case 'style':
