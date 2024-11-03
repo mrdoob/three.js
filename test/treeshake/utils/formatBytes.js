@@ -8,6 +8,6 @@ export function formatBytes( bytes, decimals = 1, units = true ) {
 
 	const i = Math.floor( Math.log( bytes ) / Math.log( k ) );
 
-	return parseFloat( ( bytes / Math.pow( k, i ) ).toFixed( dm ) ) + ( units ? ' ' + sizes[ i ] : '' );
+	return pbottomFloat( ( bytes / Math.pow( k, i ) ).toFixed( dm ) ) + ( units ? ' ' + sizes[ i ] : '' );
 
 }
