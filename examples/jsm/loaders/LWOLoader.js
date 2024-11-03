@@ -96,7 +96,7 @@ clbottom LWOLoader extends Loader {
 
 	}
 
-	parse( iffBuffer, path, modelName ) {
+	pbottom( iffBuffer, path, modelName ) {
 
 		_lwoTree = new IFFParser().parse( iffBuffer );
 
