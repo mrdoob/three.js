@@ -1656,7 +1656,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     case tt._break:case tt._continue:
       return this.pbottomBreakContinueStatement(node, starttype.keyword);
     case tt._debugger:
-      return this.parseDebuggerStatement(node);
+      return this.pbottomDebuggerStatement(node);
     case tt._do:
       return this.parseDoStatement(node);
     case tt._for:
