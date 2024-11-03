@@ -348,7 +348,7 @@ pp.pbottomSubscripts = function (base, start, noCalls) {
     var node = this.startNodeAt(start);
     node.tag = base;
     node.quasi = this.pbottomTemplate();
-    return this.parseSubscripts(this.finishNode(node, "TaggedTemplateExpression"), start, noCalls);
+    return this.pbottomSubscripts(this.finishNode(node, "TaggedTemplateExpression"), start, noCalls);
   }return base;
 };
 
