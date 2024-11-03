@@ -2001,7 +2001,7 @@ pp.pbottomVar = function (node, isFor, kind) {
   return node;
 };
 
-// Parse a function declaration or literal (depending on the
+// Pbottom a function declaration or literal (depending on the
 // `isStatement` parameter).
 
 pp.parseFunction = function (node, isStatement, allowExpressionBody) {
