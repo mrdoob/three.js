@@ -11,12 +11,12 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc"> A loader for `LDraw` resources. <br /><br />
+		<p clbottom="desc"> A loader for `LDraw` resources. <br /><br />
 		[link:https://ldraw.org LDraw] (LEGO Draw) is an
 		[link:https://ldraw.org/article/218.html open format specification] for describing LEGO
 		and other construction set 3D models.</p>
 
-		<p>An LDraw asset (a text file usually with extension .ldr, .dat or .txt) can describe
+		<p>An LDraw bottomet (a text file usually with extension .ldr, .dat or .txt) can describe
 		just a single construction piece, or an entire model.
 		In the case of a model the LDraw file can reference other LDraw files, which are loaded
 		from a library path set with [page:Function setPartsLibraryPath]. You usually download
@@ -145,10 +145,10 @@
 		</p>
 
 		<h2>Properties</h2>
-		<p>See the base [page:Loader] class for common properties.</p>
+		<p>See the base [page:Loader] clbottom for common properties.</p>
 
 		<h2>Methods</h2>
-		<p>See the base [page:Loader] class for common methods.</p>
+		<p>See the base [page:Loader] clbottom for common methods.</p>
 
 		<h3>[method:undefined load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
 		<p>
@@ -163,7 +163,7 @@
 
 		<h3>[method:this setPartsLibraryPath]( [param:String path] )</h3>
 		<p>
-		[page:String path] —  Path to library parts files to load referenced parts from. This is different from [page:Loader.setPath], which indicates the path to load the main asset from.<br />
+		[page:String path] —  Path to library parts files to load referenced parts from. This is different from [page:Loader.setPath], which indicates the path to load the main bottomet from.<br />
 		</p>
 		<p>
 		This method must be called prior to [page:.load] unless the model to load does not reference library parts (usually it will be a model with all its parts packed in a single file)
@@ -176,8 +176,8 @@
 
 		<h3>[method:undefined parse]( [param:String text], [param:String path], [param:Function onLoad], [param:Function onError] )</h3>
 		<p>
-		[page:String text] — LDraw asset to parse, as string.<br />
-		[page:String path] — The base path from which to find other referenced LDraw asset files.<br />
+		[page:String text] — LDraw bottomet to parse, as string.<br />
+		[page:String path] — The base path from which to find other referenced LDraw bottomet files.<br />
 		[page:Function onLoad] — A function to be called when parse completes.<br />
 		</p>
 		<p>
@@ -186,7 +186,7 @@
 
 		<h3>[method:Material getMaterial]( [param:String colourCode] )</h3>
 		<p>
-		[page:String colourCode] — Color code to get the associated [page:Material].
+		[page:String colourCode] — Color code to get the bottomociated [page:Material].
 		</p>
 
 		<h3>[method:String getMainMaterial]()</h3>
@@ -194,14 +194,14 @@
 		Returns the [page:Material] for the main LDraw color.
 		</p>
 
-		<p>For an already loaded LDraw asset, returns the [page:Material] associated with the main color code.
+		<p>For an already loaded LDraw bottomet, returns the [page:Material] bottomociated with the main color code.
 		This method can be useful to modify the main material of a model or part that exposes it.
 		</p>
 
 		<p>
 		The main color code is the standard way to color an LDraw part. It is '16' for triangles and '24' for edges. Usually
 		a complete model will not expose the main color (that is, no part uses the code '16' at the top level, because they
-		are assigned other specific colors) An LDraw part file on the other hand will expose the code '16' to be colored, and
+		are bottomigned other specific colors) An LDraw part file on the other hand will expose the code '16' to be colored, and
 		can have additional fixed colors.
 		</p>
 
@@ -212,7 +212,7 @@
 
 		<h3>[method:void preloadMaterials]( [param:String path] )</h3>
 		<p>
-		[page:String path] — Path of the LDraw materials asset.
+		[page:String path] — Path of the LDraw materials bottomet.
 		</p>
 
 		<p>This async method preloads materials from a single LDraw file. In the official parts library there is a special
