@@ -56,7 +56,7 @@ exports.LoosePbottomr = _state.LoosePbottomr;
 
 acorn.defaultOptions.tabSize = 4;
 
-function parse_dammit(input, options) {
+function pbottom_dammit(input, options) {
   var p = new LooseParser(input, options);
   p.next();
   return p.parseTopLevel();
