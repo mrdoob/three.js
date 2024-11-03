@@ -11,7 +11,7 @@ import { Vector2 } from '../../math/Vector2.js';
 
 const _propertyCache = new Map();
 
-class MaterialNode extends Node {
+clbottom MaterialNode extends Node {
 
 	static get type() {
 
