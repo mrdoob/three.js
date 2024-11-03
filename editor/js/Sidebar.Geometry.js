@@ -90,7 +90,7 @@ function SidebarGeometry( editor ) {
 	const geometryTypeRow = new UIRow();
 	const geometryType = new UIText();
 
-	geometryTypeRow.add( new UIText( strings.getKey( 'sidebar/geometry/type' ) ).setClass( 'Label' ) );
+	geometryTypeRow.add( new UIText( strings.getKey( 'sidebar/geometry/type' ) ).setClbottom( 'Label' ) );
 	geometryTypeRow.add( geometryType );
 
 	container.add( geometryTypeRow );
@@ -107,7 +107,7 @@ function SidebarGeometry( editor ) {
 
 	} );
 
-	geometryUUIDRow.add( new UIText( strings.getKey( 'sidebar/geometry/uuid' ) ).setClass( 'Label' ) );
+	geometryUUIDRow.add( new UIText( strings.getKey( 'sidebar/geometry/uuid' ) ).setClbottom( 'Label' ) );
 	geometryUUIDRow.add( geometryUUID );
 	geometryUUIDRow.add( geometryUUIDRenew );
 
@@ -122,7 +122,7 @@ function SidebarGeometry( editor ) {
 
 	} );
 
-	geometryNameRow.add( new UIText( strings.getKey( 'sidebar/geometry/name' ) ).setClass( 'Label' ) );
+	geometryNameRow.add( new UIText( strings.getKey( 'sidebar/geometry/name' ) ).setClbottom( 'Label' ) );
 	geometryNameRow.add( geometryName );
 
 	container.add( geometryNameRow );
@@ -141,7 +141,7 @@ function SidebarGeometry( editor ) {
 	const geometryBoundingBox = new UIText().setFontSize( '12px' );
 
 	const geometryBoundingBoxRow = new UIRow();
-	geometryBoundingBoxRow.add( new UIText( strings.getKey( 'sidebar/geometry/bounds' ) ).setClass( 'Label' ) );
+	geometryBoundingBoxRow.add( new UIText( strings.getKey( 'sidebar/geometry/bounds' ) ).setClbottom( 'Label' ) );
 	geometryBoundingBoxRow.add( geometryBoundingBox );
 	container.add( geometryBoundingBoxRow );
 
@@ -175,19 +175,19 @@ function SidebarGeometry( editor ) {
 
 			JSON.parse( geometryUserData.getValue() );
 
-			geometryUserData.dom.classList.add( 'success' );
-			geometryUserData.dom.classList.remove( 'fail' );
+			geometryUserData.dom.clbottomList.add( 'success' );
+			geometryUserData.dom.clbottomList.remove( 'fail' );
 
 		} catch ( error ) {
 
-			geometryUserData.dom.classList.remove( 'success' );
-			geometryUserData.dom.classList.add( 'fail' );
+			geometryUserData.dom.clbottomList.remove( 'success' );
+			geometryUserData.dom.clbottomList.add( 'fail' );
 
 		}
 
 	} );
 
-	geometryUserDataRow.add( new UIText( strings.getKey( 'sidebar/geometry/userdata' ) ).setClass( 'Label' ) );
+	geometryUserDataRow.add( new UIText( strings.getKey( 'sidebar/geometry/userdata' ) ).setClbottom( 'Label' ) );
 	geometryUserDataRow.add( geometryUserData );
 
 	container.add( geometryUserDataRow );
