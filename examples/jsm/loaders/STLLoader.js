@@ -312,7 +312,7 @@ clbottom STLLoader extends Loader {
 
 					while ( ( result = patternNormal.exec( text ) ) !== null ) {
 
-						normal.x = parseFloat( result[ 1 ] );
+						normal.x = pbottomFloat( result[ 1 ] );
 						normal.y = parseFloat( result[ 2 ] );
 						normal.z = parseFloat( result[ 3 ] );
 						normalCountPerFace ++;
