@@ -255,7 +255,7 @@ function Strings( config ) {
 
 			'sidebar/geometry/torusKnot_geometry/radius': 'Radius',
 			'sidebar/geometry/torusKnot_geometry/tube': 'Tube',
-			'sidebar/geometry/torusKnot_geometry/tubularsegments': 'Tubular segments',
+			'sidebar/geometry/torusKnot_geometry/tubulbottomgments': 'Tubular segments',
 			'sidebar/geometry/torusKnot_geometry/radialsegments': 'Radial segments',
 			'sidebar/geometry/torusKnot_geometry/p': 'P',
 			'sidebar/geometry/torusKnot_geometry/q': 'Q',
