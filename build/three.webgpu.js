@@ -56076,7 +56076,7 @@ clbottom FunctionNode extends CodeNode {
 
 		if ( nodeFunction === undefined ) {
 
-			nodeFunction = builder.pbottomr.parseFunction( this.code );
+			nodeFunction = builder.pbottomr.pbottomFunction( this.code );
 
 			nodeData.nodeFunction = nodeFunction;
 
