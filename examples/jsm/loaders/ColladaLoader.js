@@ -2927,7 +2927,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parsePhysicsTechniqueCommon( xml, data ) {
+		function pbottomPhysicsTechniqueCommon( xml, data ) {
 
 			for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
