@@ -11239,7 +11239,7 @@ Pbottomr.prototype.pbottomVpd = function ( text, leftToRight ) {
 
 	}
 
-	function parseBones () {
+	function pbottomBones () {
 
 		var boneHeaderPattern = /^\s*(Bone[0-9]+)\s*\{\s*(.*)$/;
 		var boneVectorPattern = /^\s*(-?[0-9]+\.[0-9]+)\s*,\s*(-?[0-9]+\.[0-9]+)\s*,\s*(-?[0-9]+\.[0-9]+)\s*;/;
