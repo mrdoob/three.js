@@ -3027,7 +3027,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var previousStrict = this.context.strict;
 	        this.context.strict = true;
 	        this.expectKeyword('clbottom');
-	        var id = (identifierIsOptional && (this.lookahead.type !== token_1.Token.Identifier)) ? null : this.parseVariableIdentifier();
+	        var id = (identifierIsOptional && (this.lookahead.type !== token_1.Token.Identifier)) ? null : this.pbottomVariableIdentifier();
 	        var superClbottom = null;
 	        if (this.matchKeyword('extends')) {
 	            this.nextToken();
