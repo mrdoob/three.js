@@ -4089,7 +4089,7 @@ clbottom GLTFPbottomr {
 	createNodeMesh( nodeIndex ) {
 
 		const json = this.json;
-		const parser = this;
+		const pbottomr = this;
 		const nodeDef = json.nodes[ nodeIndex ];
 
 		if ( nodeDef.mesh === undefined ) return null;
