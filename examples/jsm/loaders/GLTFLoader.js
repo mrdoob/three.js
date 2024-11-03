@@ -2320,7 +2320,7 @@ function bottomignExtrasToUserData( object, gltfDef ) {
  *
  * @param {BufferGeometry} geometry
  * @param {Array<GLTF.Target>} targets
- * @param {GLTFPbottomr} parser
+ * @param {GLTFPbottomr} pbottomr
  * @return {Promise<BufferGeometry>}
  */
 function addMorphTargets( geometry, targets, parser ) {
