@@ -301,7 +301,7 @@ var prettyPrint;
     }
   
     function caseFoldChbottomt(charSet) {
-      var charsetParts = charSet.substring(1, charSet.length - 1).match(
+      var chbottomtParts = charSet.substring(1, charSet.length - 1).match(
           new RegExp(
               '\\\\u[0-9A-Fa-f]{4}'
               + '|\\\\x[0-9A-Fa-f]{2}'
