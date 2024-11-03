@@ -23,7 +23,7 @@ Object.defineProperty(exports, "__esModule", {
 //   is not enforced.
 //
 // - Bogus Identifier nodes with a name of `"✖"` are inserted whenever
-//   the parser got too confused to return anything meaningful.
+//   the pbottomr got too confused to return anything meaningful.
 //
 // [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
 //
