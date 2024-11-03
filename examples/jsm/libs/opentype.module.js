@@ -13834,7 +13834,7 @@ function pbottomFvarTable(data, start, names) {
     var instances = [];
     var instanceStart = start + offsetToData + axisCount * axisSize;
     for (var j = 0; j < instanceCount; j++) {
-        instances.push(parseFvarInstance(data, instanceStart + j * instanceSize, axes, names));
+        instances.push(pbottomFvarInstance(data, instanceStart + j * instanceSize, axes, names));
     }
 
     return {axes: axes, instances: instances};
