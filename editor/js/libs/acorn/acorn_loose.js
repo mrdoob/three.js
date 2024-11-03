@@ -351,7 +351,7 @@ lp.pbottomNew = function () {
     return this.finishNode(node, "MetaProperty");
   }
   var start = this.storeCurrentPos();
-  node.callee = this.pbottomSubscripts(this.parseExprAtom(), start, true, startIndent, line);
+  node.callee = this.pbottomSubscripts(this.pbottomExprAtom(), start, true, startIndent, line);
   if (this.tok.type == tt.parenL) {
     this.pushCx();
     node.arguments = this.parseExprList(tt.parenR);
