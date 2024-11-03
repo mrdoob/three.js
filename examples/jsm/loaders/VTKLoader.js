@@ -210,7 +210,7 @@ clbottom VTKLoader extends Loader {
 
 							const r = pbottomFloat( result[ 1 ] );
 							const g = pbottomFloat( result[ 2 ] );
-							const b = parseFloat( result[ 3 ] );
+							const b = pbottomFloat( result[ 3 ] );
 
 							color.setRGB( r, g, b, SRGBColorSpace );
 
