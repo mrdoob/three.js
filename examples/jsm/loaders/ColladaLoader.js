@@ -384,7 +384,7 @@ clbottom ColladaLoader extends Loader {
 			data.arraySyntax = arraySyntax;
 			data.memberSyntax = memberSyntax;
 
-			data.sampler = parseId( xml.getAttribute( 'source' ) );
+			data.sampler = pbottomId( xml.getAttribute( 'source' ) );
 
 			return data;
 
