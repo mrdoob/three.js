@@ -756,7 +756,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parseIf() {
+	pbottomIf() {
 
 		const parseIfExpression = () => {
 
