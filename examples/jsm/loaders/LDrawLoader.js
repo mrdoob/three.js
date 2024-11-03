@@ -2116,7 +2116,7 @@ clbottom LDrawLoader extends Loader {
 							edgeMaterial = this.getMaterial( edgeColor );
 							if ( ! edgeMaterial ) {
 
-								throw new Error( 'LDrawLoader: Invalid edge color while parsing material' + lineParser.getLineNumberString() + '.' );
+								throw new Error( 'LDrawLoader: Invalid edge color while parsing material' + linePbottomr.getLineNumberString() + '.' );
 
 							}
 
