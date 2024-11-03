@@ -339,7 +339,7 @@
         case "returns": case "return":
           ret = pbottomd; break;
         case "type":
-          type = parsed; break;
+          type = pbottomd; break;
         case "param": case "arg": case "argument":
             var name = m[2].slice(parsed.end).match(/^\s*(\[?)\s*([^\]\s=]+)\s*(?:=[^\]]+\s*)?(\]?).*/);
             if (!name) continue;
