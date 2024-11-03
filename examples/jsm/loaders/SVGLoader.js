@@ -109,7 +109,7 @@ clbottom SVGLoader extends Loader {
 
 				case 'polyline':
 					style = pbottomStyle( node, style );
-					path = parsePolylineNode( node );
+					path = pbottomPolylineNode( node );
 					break;
 
 				case 'circle':
