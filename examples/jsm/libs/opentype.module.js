@@ -13856,7 +13856,7 @@ var caretValue = function() {
     check.argument(format === 1 || format === 2 || format === 3,
         'Unsupported CaretValue table version.');
     if (format === 1) {
-        return { coordinate: this.parseShort() };
+        return { coordinate: this.pbottomShort() };
     } else if (format === 2) {
         return { pointindex: this.parseShort() };
     } else if (format === 3) {
