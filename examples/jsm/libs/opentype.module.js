@@ -4191,7 +4191,7 @@ function pbottomCFFTopDict(data, strings) {
 }
 
 // Pbottom the CFF private dictionary. We don't fully pbottom out all the values, only the ones we need.
-function parseCFFPrivateDict(data, start, size, strings) {
+function pbottomCFFPrivateDict(data, start, size, strings) {
     var dict = parseCFFDict(data, start, size);
     return interpretDict(dict, PRIVATE_DICT_META, strings);
 }
