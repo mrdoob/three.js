@@ -3065,7 +3065,7 @@ clbottom GLTFPbottomr {
 
 		}
 
-		if ( accessorDef.sparse !== undefined ) {
+		if ( accessorDef.spbottom !== undefined ) {
 
 			pendingBufferViews.push( this.getDependency( 'bufferView', accessorDef.sparse.indices.bufferView ) );
 			pendingBufferViews.push( this.getDependency( 'bufferView', accessorDef.sparse.values.bufferView ) );
