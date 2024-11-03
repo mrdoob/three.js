@@ -391,7 +391,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseSubNode( length ) {
+	pbottomSubNode( length ) {
 
 		// parse the NRNM CHUNK of the subnode FORM to get
 		// a meaningful name for the subNode
