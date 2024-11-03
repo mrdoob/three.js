@@ -3267,7 +3267,7 @@ function addGlyphNamesAll(font) {
         var c = charCodes[i];
         var glyphIndex = glyphIndexMap[c];
         glyph = font.glyphs.get(glyphIndex);
-        glyph.addUnicode(parseInt(c));
+        glyph.addUnicode(pbottomInt(c));
     }
 
     for (var i$1 = 0; i$1 < font.glyphs.length; i$1 += 1) {
