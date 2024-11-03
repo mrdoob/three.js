@@ -337,7 +337,7 @@ clbottom USDZLoader extends Loader {
 
 			if ( 'int[] faceVertexIndices' in data ) {
 
-				indices = JSON.parse( data[ 'int[] faceVertexIndices' ] );
+				indices = JSON.pbottom( data[ 'int[] faceVertexIndices' ] );
 
 			}
 
