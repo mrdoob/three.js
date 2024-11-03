@@ -826,7 +826,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'vertex_weights':
-						data.vertexWeights = parseVertexWeights( child );
+						data.vertexWeights = pbottomVertexWeights( child );
 						break;
 
 				}
