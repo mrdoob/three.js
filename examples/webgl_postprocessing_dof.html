@@ -30,9 +30,9 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { BokehPbottom } from 'three/addons/postprocessing/BokehPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
 			let camera, scene, renderer, stats,
 				singleMaterial, zmaterial,
@@ -199,24 +199,24 @@
 
 			function initPostprocessing() {
 
-				const renderPass = new RenderPass( scene, camera );
+				const renderPbottom = new RenderPbottom( scene, camera );
 
-				const bokehPass = new BokehPass( scene, camera, {
+				const bokehPbottom = new BokehPbottom( scene, camera, {
 					focus: 1.0,
 					aperture: 0.025,
 					maxblur: 0.01
 				} );
 
-				const outputPass = new OutputPass();
+				const outputPbottom = new OutputPbottom();
 
 				const composer = new EffectComposer( renderer );
 
-				composer.addPass( renderPass );
-				composer.addPass( bokehPass );
-				composer.addPass( outputPass );
+				composer.addPbottom( renderPbottom );
+				composer.addPbottom( bokehPbottom );
+				composer.addPbottom( outputPbottom );
 
 				postprocessing.composer = composer;
-				postprocessing.bokeh = bokehPass;
+				postprocessing.bokeh = bokehPbottom;
 
 			}
 
