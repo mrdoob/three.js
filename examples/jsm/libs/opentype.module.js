@@ -14021,7 +14021,7 @@ function makeGposTable(gpos) {
     ]);
 }
 
-var gpos = { pbottom: parseGposTable, make: makeGposTable };
+var gpos = { pbottom: pbottomGposTable, make: makeGposTable };
 
 // The `kern` table contains kerning pairs.
 
