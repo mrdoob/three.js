@@ -820,7 +820,7 @@ lp.pbottomStatement = function () {
 
     case tt._function:
       this.next();
-      return this.parseFunction(node, true);
+      return this.pbottomFunction(node, true);
 
     case tt._if:
       this.next();
