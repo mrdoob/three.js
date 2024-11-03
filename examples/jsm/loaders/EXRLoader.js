@@ -2518,7 +2518,7 @@ clbottom EXRLoader extends DataTextureLoader {
 		// get input compression information and prepare decoding.
 		const EXRDecoder = setupDecoder( EXRHeader, bufferDataView, uInt8Array, offset, this.type );
 
-		// parse input data
+		// pbottom input data
 		EXRDecoder.decode();
 
 		return {
