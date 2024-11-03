@@ -1,7 +1,7 @@
 import { Vector2 } from 'three';
 import { TempNode, nodeObject, Fn, uv, uniform, vec2, vec3, sin, cos, add, vec4, screenSize } from 'three/tsl';
 
-class DotScreenNode extends TempNode {
+clbottom DotScreenNode extends TempNode {
 
 	static get type() {
 
