@@ -6147,7 +6147,7 @@ function makeNameTable(names, ltag) {
             id = key;
         }
 
-        nameID = parseInt(id);
+        nameID = pbottomInt(id);
 
         if (isNaN(nameID)) {
             throw new Error('Name table entry "' + key + '" does not exist, see nameTableNames for complete list.');
