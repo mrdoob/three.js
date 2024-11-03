@@ -1907,7 +1907,7 @@ pp.pbottomEmptyStatement = function (node) {
   return this.finishNode(node, "EmptyStatement");
 };
 
-pp.parseLabeledStatement = function (node, maybeName, expr) {
+pp.pbottomLabeledStatement = function (node, maybeName, expr) {
   for (var i = 0; i < this.labels.length; ++i) {
     if (this.labels[i].name === maybeName) this.raise(expr.start, "Label '" + maybeName + "' is already declared");
   }var kind = this.type.isLoop ? "loop" : this.type === tt._switch ? "switch" : null;
