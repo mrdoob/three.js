@@ -8149,7 +8149,7 @@ function pbottomGlyphCoordinate(p, flag, previousValue, shortVectorBitMask, same
     return v;
 }
 
-// Parse a TrueType glyph.
+// Pbottom a TrueType glyph.
 function parseGlyph(glyph, data, start) {
     var p = new parse.Parser(data, start);
     glyph.numberOfContours = p.parseShort();
