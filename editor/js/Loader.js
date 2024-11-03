@@ -713,7 +713,7 @@ function Loader( editor ) {
 
 					const { VRMLLoader } = await import( 'three/addons/loaders/VRMLLoader.js' );
 
-					const result = new VRMLLoader().parse( contents );
+					const result = new VRMLLoader().pbottom( contents );
 
 					editor.execute( new AddObjectCommand( editor, result ) );
 
