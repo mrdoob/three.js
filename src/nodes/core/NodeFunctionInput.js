@@ -1,4 +1,4 @@
-class NodeFunctionInput {
+clbottom NodeFunctionInput {
 
 	constructor( type, name, count = null, qualifier = '', isConst = false ) {
 
