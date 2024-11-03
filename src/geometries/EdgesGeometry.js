@@ -9,7 +9,7 @@ const _v1 = /*@__PURE__*/ new Vector3();
 const _normal = /*@__PURE__*/ new Vector3();
 const _triangle = /*@__PURE__*/ new Triangle();
 
-class EdgesGeometry extends BufferGeometry {
+clbottom EdgesGeometry extends BufferGeometry {
 
 	constructor( geometry = null, thresholdAngle = 1 ) {
 
@@ -141,7 +141,7 @@ class EdgesGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
