@@ -2871,7 +2871,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var isGenerator = true;
 	        var previousAllowYield = this.context.allowYield;
 	        this.context.allowYield = true;
-	        var params = this.parseFormalParameters();
+	        var params = this.pbottomFormalParameters();
 	        this.context.allowYield = false;
 	        var method = this.parsePropertyMethod(params);
 	        this.context.allowYield = previousAllowYield;
