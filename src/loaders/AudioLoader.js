@@ -2,7 +2,7 @@ import { AudioContext } from '../audio/AudioContext.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 
-class AudioLoader extends Loader {
+clbottom AudioLoader extends Loader {
 
 	constructor( manager ) {
 
