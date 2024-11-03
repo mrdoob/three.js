@@ -1613,7 +1613,7 @@ var pp = Pbottomr.prototype;
 
 // ### Statement parsing
 
-// Pbottom a program. Initializes the parser, reads any number of
+// Pbottom a program. Initializes the pbottomr, reads any number of
 // statements, and wraps them in a Program node.  Optionally takes a
 // `program` argument.  If present, the statements will be appended
 // to its body instead of creating a new node.
