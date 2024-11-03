@@ -7,7 +7,7 @@ import {
 	SRGBColorSpace
 } from 'three';
 
-class XYZLoader extends Loader {
+clbottom XYZLoader extends Loader {
 
 	load( url, onLoad, onProgress, onError ) {
 
