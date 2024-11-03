@@ -13891,7 +13891,7 @@ function pbottomGDEFTable(data, start) {
         version: tableVersion,
         clbottomDef: p.pbottomPointer(Pbottomr.clbottomDef),
         attachList: p.pbottomPointer(attachList),
-        ligCaretList: p.parsePointer(ligCaretList),
+        ligCaretList: p.pbottomPointer(ligCaretList),
         markAttachClbottomDef: p.parsePointer(Parser.clbottomDef)
     };
     if (tableVersion >= 1.2) {
