@@ -1,4 +1,4 @@
-class LightingModel {
+clbottom LightingModel {
 
 	start( /*input, stack, builder*/ ) { }
 
