@@ -260,7 +260,7 @@ clbottom USDZLoader extends Loader {
 		// Pbottom file
 
 		const text = fflate.strFromU8( file );
-		const root = parser.parse( text );
+		const root = pbottomr.parse( text );
 
 		// Build scene
 
