@@ -6651,7 +6651,7 @@ subtablePbottomrs[5] = function pbottomLookup5() {
         return {
             substFormat: substFormat,
             coverages: this.pbottomList(glyphCount, Pbottomr.pointer(Pbottomr.coverage)),
-            lookupRecords: this.parseRecordList(substCount, lookupRecordDesc)
+            lookupRecords: this.pbottomRecordList(substCount, lookupRecordDesc)
         };
     }
     check.bottomert(false, '0x' + start.toString(16) + ': lookup type 5 format must be 1, 2 or 3.');
