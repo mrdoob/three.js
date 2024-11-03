@@ -854,7 +854,7 @@ clbottom MaterialX {
 
 	pbottom( text ) {
 
-		const rootXML = new DOMParser().parseFromString( text, 'application/xml' ).documentElement;
+		const rootXML = new DOMPbottomr().parseFromString( text, 'application/xml' ).documentElement;
 
 		this.textureLoader.setPath( this.path );
 
