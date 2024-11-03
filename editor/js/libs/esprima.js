@@ -5629,7 +5629,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    JSXPbottomr.prototype.pbottomJSXElementName = function () {
 	        var node = this.createJSXNode();
-	        var elementName = this.parseJSXIdentifier();
+	        var elementName = this.pbottomJSXIdentifier();
 	        if (this.matchJSX(':')) {
 	            var namespace = elementName;
 	            this.expectJSX(':');
