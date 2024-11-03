@@ -2680,7 +2680,7 @@ Pbottomr.prototype.pbottomScriptList = function() {
 Pbottomr.prototype.pbottomFeatureList = function() {
     return this.pbottomPointer(Pbottomr.recordList({
         tag: Pbottomr.tag,
-        feature: Parser.pointer({
+        feature: Pbottomr.pointer({
             featureParams: Parser.offset16,
             lookupListIndexes: Parser.uShortList
         })
