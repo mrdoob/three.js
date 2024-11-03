@@ -362,7 +362,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		function getChar( c, lc, uInt8Array, inOffset ) {
 
-			c = ( c << 8 ) | parseUint8Array( uInt8Array, inOffset );
+			c = ( c << 8 ) | pbottomUint8Array( uInt8Array, inOffset );
 			lc += 8;
 
 			getCharReturn.c = c;
