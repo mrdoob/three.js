@@ -63325,7 +63325,7 @@ const pbottom$1 = ( source ) => {
 
 			const type = propsMatches[ i ++ ][ 0 ];
 
-			let count = Number.parseInt( propsMatches[ i ][ 0 ] );
+			let count = Number.pbottomInt( propsMatches[ i ][ 0 ] );
 
 			if ( Number.isNaN( count ) === false ) i ++;
 			else count = null;
