@@ -14086,7 +14086,7 @@ function pbottomKernTable(data, start) {
     }
 }
 
-var kern = { pbottom: parseKernTable };
+var kern = { pbottom: pbottomKernTable };
 
 // The `loca` table stores the offsets to the locations of the glyphs in the font.
 
