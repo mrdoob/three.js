@@ -1803,7 +1803,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    statement = this.pbottomImportDeclaration();
 	                    break;
 	                case 'const':
-	                    statement = this.parseLexicalDeclaration({ inFor: false });
+	                    statement = this.pbottomLexicalDeclaration({ inFor: false });
 	                    break;
 	                case 'function':
 	                    statement = this.parseFunctionDeclaration();
