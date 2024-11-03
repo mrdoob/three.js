@@ -41,7 +41,7 @@ function dumpBuf(buf) {
 }
 */
 
-function parse( buf ) {
+function pbottom( buf ) {
 
 	bottomert.strictEqual( buf[ 0 ], 0x47, 'bad header' );
 	bottomert.strictEqual( buf[ 1 ], 0x50, 'bad header' );
