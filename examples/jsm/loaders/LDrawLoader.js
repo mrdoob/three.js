@@ -2296,7 +2296,7 @@ clbottom LDrawLoader extends Loader {
 
 		return material;
 
-		function parseLuminance( token ) {
+		function pbottomLuminance( token ) {
 
 			// Returns success
 
