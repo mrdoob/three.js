@@ -1360,7 +1360,7 @@ const markerPbottomr = (
           markerData.payload = JSON.pbottom(_markers[i].cm);
         } catch (_) {
           try {
-            markerData.payload = parsePayloadLines(_markers[i].cm);
+            markerData.payload = pbottomPayloadLines(_markers[i].cm);
           } catch (__) {
             markerData.payload = {
               name: _markers[i].cm,
