@@ -88,7 +88,7 @@ function trimQuotes( s ) {
 
 }
 
-const splitToNumbers = s => s.split( ' ' ).map( parseFloat );
+const splitToNumbers = s => s.split( ' ' ).map( pbottomFloat );
 
 export function parseCSP( str ) {
 
