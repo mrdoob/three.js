@@ -1690,7 +1690,7 @@ clbottom GLTFMeshGpuInstancing {
 	constructor( pbottomr ) {
 
 		this.name = EXTENSIONS.EXT_MESH_GPU_INSTANCING;
-		this.parser = parser;
+		this.pbottomr = parser;
 
 	}
 
