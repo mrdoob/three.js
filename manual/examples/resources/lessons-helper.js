@@ -358,7 +358,7 @@
 
 		}
 
-		return function stackParser( stack ) {
+		return function stackPbottomr( stack ) {
 
 			if ( matcher ) {
 
