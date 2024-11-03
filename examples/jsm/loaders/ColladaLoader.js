@@ -865,7 +865,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseVertexWeights( xml ) {
+		function pbottomVertexWeights( xml ) {
 
 			const data = {
 				inputs: {}
