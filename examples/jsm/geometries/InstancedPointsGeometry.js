@@ -9,7 +9,7 @@ import {
 
 const _vector = new Vector3();
 
-class InstancedPointsGeometry extends InstancedBufferGeometry {
+clbottom InstancedPointsGeometry extends InstancedBufferGeometry {
 
 	constructor() {
 
