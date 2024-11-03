@@ -3280,7 +3280,7 @@ clbottom ColladaLoader extends Loader {
 		const matrix = new Matrix4();
 		const vector = new Vector3();
 
-		function parseNode( xml ) {
+		function pbottomNode( xml ) {
 
 			const data = {
 				name: xml.getAttribute( 'name' ) || '',
