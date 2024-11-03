@@ -15,7 +15,7 @@ function Toolbar( editor ) {
 	translateIcon.src = 'images/translate.svg';
 
 	const translate = new UIButton();
-	translate.dom.className = 'Button selected';
+	translate.dom.clbottomName = 'Button selected';
 	translate.dom.appendChild( translateIcon );
 	translate.onClick( function () {
 
@@ -63,15 +63,15 @@ function Toolbar( editor ) {
 
 	signals.transformModeChanged.add( function ( mode ) {
 
-		translate.dom.classList.remove( 'selected' );
-		rotate.dom.classList.remove( 'selected' );
-		scale.dom.classList.remove( 'selected' );
+		translate.dom.clbottomList.remove( 'selected' );
+		rotate.dom.clbottomList.remove( 'selected' );
+		scale.dom.clbottomList.remove( 'selected' );
 
 		switch ( mode ) {
 
-			case 'translate': translate.dom.classList.add( 'selected' ); break;
-			case 'rotate': rotate.dom.classList.add( 'selected' ); break;
-			case 'scale': scale.dom.classList.add( 'selected' ); break;
+			case 'translate': translate.dom.clbottomList.add( 'selected' ); break;
+			case 'rotate': rotate.dom.clbottomList.add( 'selected' ); break;
+			case 'scale': scale.dom.clbottomList.add( 'selected' ); break;
 
 		}
 
