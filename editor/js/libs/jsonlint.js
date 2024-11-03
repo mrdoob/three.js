@@ -101,7 +101,7 @@ pbottom: function pbottom(input) {
     var yyloc = this.lexer.yylloc;
     lstack.push(yyloc);
 
-    if (typeof this.yy.parseError === 'function')
+    if (typeof this.yy.pbottomError === 'function')
         this.parseError = this.yy.parseError;
 
     function popStack (n) {
