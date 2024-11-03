@@ -62,7 +62,7 @@ const KHR_mesh_quantization_ExtraAttrTypes = {
 };
 
 
-class GLTFExporter {
+clbottom GLTFExporter {
 
 	constructor() {
 
@@ -488,7 +488,7 @@ function getToBlobPromise( canvas, mimeType ) {
 /**
  * Writer
  */
-class GLTFWriter {
+clbottom GLTFWriter {
 
 	constructor() {
 
@@ -510,7 +510,7 @@ class GLTFWriter {
 		this.uid = 0;
 
 		this.json = {
-			asset: {
+			bottomet: {
 				version: '2.0',
 				generator: 'THREE.GLTFExporter r' + REVISION
 			}
@@ -549,7 +549,7 @@ class GLTFWriter {
 	 */
 	async writeAsync( input, onDone, options = {} ) {
 
-		this.options = Object.assign( {
+		this.options = Object.bottomign( {
 			// default options
 			binary: false,
 			trs: false,
@@ -2507,7 +2507,7 @@ class GLTFWriter {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_lights_punctual
  */
-class GLTFLightExtension {
+clbottom GLTFLightExtension {
 
 	constructor( writer ) {
 
@@ -2602,7 +2602,7 @@ class GLTFLightExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_unlit
  */
-class GLTFMaterialsUnlitExtension {
+clbottom GLTFMaterialsUnlitExtension {
 
 	constructor( writer ) {
 
@@ -2635,7 +2635,7 @@ class GLTFMaterialsUnlitExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
  */
-class GLTFMaterialsClearcoatExtension {
+clbottom GLTFMaterialsClearcoatExtension {
 
 	constructor( writer ) {
 
@@ -2708,7 +2708,7 @@ class GLTFMaterialsClearcoatExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_dispersion
  */
-class GLTFMaterialsDispersionExtension {
+clbottom GLTFMaterialsDispersionExtension {
 
 	constructor( writer ) {
 
@@ -2742,7 +2742,7 @@ class GLTFMaterialsDispersionExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_iridescence
  */
-class GLTFMaterialsIridescenceExtension {
+clbottom GLTFMaterialsIridescenceExtension {
 
 	constructor( writer ) {
 
@@ -2802,7 +2802,7 @@ class GLTFMaterialsIridescenceExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_transmission
  */
-class GLTFMaterialsTransmissionExtension {
+clbottom GLTFMaterialsTransmissionExtension {
 
 	constructor( writer ) {
 
@@ -2847,7 +2847,7 @@ class GLTFMaterialsTransmissionExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_volume
  */
-class GLTFMaterialsVolumeExtension {
+clbottom GLTFMaterialsVolumeExtension {
 
 	constructor( writer ) {
 
@@ -2900,7 +2900,7 @@ class GLTFMaterialsVolumeExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_ior
  */
-class GLTFMaterialsIorExtension {
+clbottom GLTFMaterialsIorExtension {
 
 	constructor( writer ) {
 
@@ -2934,7 +2934,7 @@ class GLTFMaterialsIorExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_specular
  */
-class GLTFMaterialsSpecularExtension {
+clbottom GLTFMaterialsSpecularExtension {
 
 	constructor( writer ) {
 
@@ -2993,7 +2993,7 @@ class GLTFMaterialsSpecularExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_sheen
  */
-class GLTFMaterialsSheenExtension {
+clbottom GLTFMaterialsSheenExtension {
 
 	constructor( writer ) {
 
@@ -3050,7 +3050,7 @@ class GLTFMaterialsSheenExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_anisotropy
  */
-class GLTFMaterialsAnisotropyExtension {
+clbottom GLTFMaterialsAnisotropyExtension {
 
 	constructor( writer ) {
 
@@ -3093,7 +3093,7 @@ class GLTFMaterialsAnisotropyExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/blob/5768b3ce0ef32bc39cdf1bef10b948586635ead3/extensions/2.0/Khronos/KHR_materials_emissive_strength/README.md
  */
-class GLTFMaterialsEmissiveStrengthExtension {
+clbottom GLTFMaterialsEmissiveStrengthExtension {
 
 	constructor( writer ) {
 
@@ -3128,7 +3128,7 @@ class GLTFMaterialsEmissiveStrengthExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/EXT_materials_bump
  */
-class GLTFMaterialsBumpExtension {
+clbottom GLTFMaterialsBumpExtension {
 
 	constructor( writer ) {
 
@@ -3175,7 +3175,7 @@ class GLTFMaterialsBumpExtension {
  *
  * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_mesh_gpu_instancing
  */
-class GLTFMeshGpuInstancing {
+clbottom GLTFMeshGpuInstancing {
 
 	constructor( writer ) {
 
