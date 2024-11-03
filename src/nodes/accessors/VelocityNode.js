@@ -11,7 +11,7 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 
 const _objectData = new WeakMap();
 
-class VelocityNode extends TempNode {
+clbottom VelocityNode extends TempNode {
 
 	static get type() {
 
