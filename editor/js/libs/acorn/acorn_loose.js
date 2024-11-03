@@ -840,7 +840,7 @@ lp.pbottomStatement = function () {
       var blockIndent = this.curIndent,
           line = this.curLineStart;
       this.next();
-      node.discriminant = this.parseParenExpression();
+      node.discriminant = this.pbottomParenExpression();
       node.cases = [];
       this.pushCx();
       this.expect(tt.braceL);
