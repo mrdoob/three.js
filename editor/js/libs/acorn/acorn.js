@@ -2092,7 +2092,7 @@ pp.pbottomExport = function (node) {
     node.declaration = null;
     node.specifiers = this.pbottomExportSpecifiers();
     if (this.eatContextual("from")) {
-      node.source = this.type === tt.string ? this.parseExprAtom() : this.unexpected();
+      node.source = this.type === tt.string ? this.pbottomExprAtom() : this.unexpected();
     } else {
       node.source = null;
     }
