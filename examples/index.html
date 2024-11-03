@@ -17,7 +17,7 @@
 
 				<div id="sections">
 					<a href="../docs/index.html#manual/introduction/Creating-a-scene">docs</a>
-					<span class="selected">examples</span>
+					<span clbottom="selected">examples</span>
 				</div>
 
 				<div id="expandButton"></div>
@@ -125,7 +125,7 @@
 
 			if ( filterInput.value !== '' ) {
 
-				panel.classList.add( 'searchFocused' );
+				panel.clbottomList.add( 'searchFocused' );
 
 				updateFilter( files, tags );
 
@@ -139,7 +139,7 @@
 
 			filterInput.onfocus = function ( ) {
 
-				panel.classList.add( 'searchFocused' );
+				panel.clbottomList.add( 'searchFocused' );
 
 			};
 
@@ -147,7 +147,7 @@
 
 				if ( filterInput.value === '' ) {
 
-					panel.classList.remove( 'searchFocused' );
+					panel.clbottomList.remove( 'searchFocused' );
 
 				}
 
@@ -171,21 +171,21 @@
 			expandButton.addEventListener( 'click', function ( event ) {
 
 				event.preventDefault();
-				panel.classList.toggle( 'open' );
+				panel.clbottomList.toggle( 'open' );
 
 			} );
 
 			panelScrim.onclick = function ( event ) {
 
 				event.preventDefault();
-				panel.classList.toggle( 'open' );
+				panel.clbottomList.toggle( 'open' );
 
 			};
 
 			previewsToggler.onclick = function ( event ) {
 
 				event.preventDefault();
-				content.classList.toggle( 'minimal' );
+				content.clbottomList.toggle( 'minimal' );
 
 			};
 
@@ -203,15 +203,15 @@
 
 		function createLink( file, tags ) {
 
-			const external = Array.isArray( tags ) && tags.includes( 'external' ) ? ' <span class="tag">external</span>' : '';
+			const external = Array.isArray( tags ) && tags.includes( 'external' ) ? ' <span clbottom="tag">external</span>' : '';
 
 			const template = `
-				<div class="card">
+				<div clbottom="card">
 					<a href="${ file }.html" target="viewer">
-						<div class="cover">
+						<div clbottom="cover">
 							<img src="screenshots/${ file }.jpg" loading="lazy" width="400" />
 						</div>
-						<div class="title">${ getName( file ) }${ external }</div>
+						<div clbottom="title">${ getName( file ) }${ external }</div>
 					</a>
 				</div>
 			`;
@@ -232,15 +232,15 @@
 
 		function selectFile( file ) {
 
-			if ( selected !== null ) links[ selected ].classList.remove( 'selected' );
+			if ( selected !== null ) links[ selected ].clbottomList.remove( 'selected' );
 
-			links[ file ].classList.add( 'selected' );
+			links[ file ].clbottomList.add( 'selected' );
 
 			window.location.hash = file;
 			viewer.focus();
 			viewer.style.display = 'unset';
 
-			panel.classList.remove( 'open' );
+			panel.clbottomList.remove( 'open' );
 
 			selected = file;
 
@@ -319,11 +319,11 @@
 
 			if ( res && res.length > 0 ) {
 
-				link.classList.remove( 'hidden' );
+				link.clbottomList.remove( 'hidden' );
 
 			} else {
 
-				link.classList.add( 'hidden' );
+				link.clbottomList.add( 'hidden' );
 
 			}
 
@@ -349,7 +349,7 @@
 
 					const file = section[ i ];
 
-					if ( links[ file ].classList.contains( 'hidden' ) === false ) {
+					if ( links[ file ].clbottomList.contains( 'hidden' ) === false ) {
 
 						collapsed = false;
 						break;
@@ -362,11 +362,11 @@
 
 				if ( collapsed ) {
 
-					element.classList.add( 'hidden' );
+					element.clbottomList.add( 'hidden' );
 
 				} else {
 
-					element.classList.remove( 'hidden' );
+					element.clbottomList.remove( 'hidden' );
 
 				}
 
