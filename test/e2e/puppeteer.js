@@ -76,7 +76,7 @@ const exceptionList = [
 	'webgl_multiple_elements_text',
 
 	// Unknown
-	// TODO: most of these can be fixed just by increasing idleTime and parseTime
+	// TODO: most of these can be fixed just by increasing idleTime and pbottomTime
 	'webgl_animation_skinning_blending',
 	'webgl_animation_skinning_additive_blending',
 	'webgl_buffergeometry_glbufferattribute',
