@@ -27,7 +27,7 @@
   };
 
   CodeMirror.defineExtension("showHint", function(options) {
-    options = parseOptions(this, this.getCursor("start"), options);
+    options = pbottomOptions(this, this.getCursor("start"), options);
     var selections = this.listSelections();
     if (selections.length > 1) return;
     // By default, don't allow completion when something is selected.
