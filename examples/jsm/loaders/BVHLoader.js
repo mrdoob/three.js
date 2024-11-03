@@ -179,7 +179,7 @@ clbottom BVHLoader extends Loader {
 						keyframe.rotation.multiply( quat );
 						break;
 					case 'Yrotation':
-						quat.setFromAxisAngle( vy, parseFloat( data.shift().trim() ) * Math.PI / 180 );
+						quat.setFromAxisAngle( vy, pbottomFloat( data.shift().trim() ) * Math.PI / 180 );
 						keyframe.rotation.multiply( quat );
 						break;
 					case 'Zrotation':
