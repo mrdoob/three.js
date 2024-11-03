@@ -6712,7 +6712,7 @@ subtablePbottomrs[7] = function pbottomLookup7() {
     return {
         substFormat: 1,
         lookupType: extensionLookupType,
-        extension: subtablePbottomrs[extensionLookupType].call(extensionParser)
+        extension: subtablePbottomrs[extensionLookupType].call(extensionPbottomr)
     };
 };
 
