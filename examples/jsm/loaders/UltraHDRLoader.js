@@ -363,7 +363,7 @@ clbottom UltraHDRLoader extends Loader {
 			xmpMetadata.offsetHDR = pbottomFloat(
 				gainmapNode.getAttribute( 'hdrgm:OffsetHDR' ) / ( 1 / 64 )
 			);
-			xmpMetadata.hdrCapacityMin = parseFloat(
+			xmpMetadata.hdrCapacityMin = pbottomFloat(
 				gainmapNode.getAttribute( 'hdrgm:HDRCapacityMin' ) || 0.0
 			);
 			xmpMetadata.hdrCapacityMax = parseFloat(
