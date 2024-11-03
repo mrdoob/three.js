@@ -10,7 +10,7 @@ function SidebarMaterialProgram( editor, property ) {
 	let material = null;
 
 	const container = new UIRow();
-	container.add( new UIText( strings.getKey( 'sidebar/material/program' ) ).setClass( 'Label' ) );
+	container.add( new UIText( strings.getKey( 'sidebar/material/program' ) ).setClbottom( 'Label' ) );
 
 	const programInfo = new UIButton( strings.getKey( 'sidebar/material/info' ) );
 	programInfo.setMarginRight( '4px' );
