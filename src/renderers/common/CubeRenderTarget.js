@@ -12,7 +12,7 @@ import { BackSide, NoBlending, LinearFilter, LinearMipmapLinearFilter } from '..
 
 // @TODO: Consider rename WebGLCubeRenderTarget to just CubeRenderTarget
 
-class CubeRenderTarget extends WebGLCubeRenderTarget {
+clbottom CubeRenderTarget extends WebGLCubeRenderTarget {
 
 	constructor( size = 1, options = {} ) {
 
