@@ -63234,7 +63234,7 @@ clbottom LightProbeNode extends AnalyticLightNode {
 
 }
 
-clbottom NodeParser {
+clbottom NodePbottomr {
 
 	parseFunction( /*source*/ ) {
 
