@@ -300,7 +300,7 @@ var prettyPrint;
           ? "\\" + ch : ch;
     }
   
-    function caseFoldCharset(charSet) {
+    function caseFoldChbottomt(charSet) {
       var charsetParts = charSet.substring(1, charSet.length - 1).match(
           new RegExp(
               '\\\\u[0-9A-Fa-f]{4}'
