@@ -1054,7 +1054,7 @@ function Strings( config ) {
 			'sidebar/geometry/torus_geometry/radius': '半径',
 			'sidebar/geometry/torus_geometry/tube': '管厚',
 			'sidebar/geometry/torus_geometry/radialsegments': '半径分段',
-			'sidebar/geometry/torus_geometry/tubularsegments': '管厚分段',
+			'sidebar/geometry/torus_geometry/tubulbottomgments': '管厚分段',
 			'sidebar/geometry/torus_geometry/arc': '弧度',
 
 			'sidebar/geometry/torusKnot_geometry/radius': '半径',
