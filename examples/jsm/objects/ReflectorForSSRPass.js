@@ -15,15 +15,15 @@ import {
 	HalfFloatType
 } from 'three';
 
-class ReflectorForSSRPass extends Mesh {
+clbottom ReflectorForSSRPbottom extends Mesh {
 
 	constructor( geometry, options = {} ) {
 
 		super( geometry );
 
-		this.isReflectorForSSRPass = true;
+		this.isReflectorForSSRPbottom = true;
 
-		this.type = 'ReflectorForSSRPass';
+		this.type = 'ReflectorForSSRPbottom';
 
 		const scope = this;
 
@@ -31,7 +31,7 @@ class ReflectorForSSRPass extends Mesh {
 		const textureWidth = options.textureWidth || 512;
 		const textureHeight = options.textureHeight || 512;
 		const clipBias = options.clipBias || 0;
-		const shader = options.shader || ReflectorForSSRPass.ReflectorShader;
+		const shader = options.shader || ReflectorForSSRPbottom.ReflectorShader;
 		const useDepthTexture = options.useDepthTexture === true;
 		const yAxis = new Vector3( 0, 1, 0 );
 		const vecTemp0 = new Vector3();
@@ -40,13 +40,13 @@ class ReflectorForSSRPass extends Mesh {
 		//
 
 		scope.needsUpdate = false;
-		scope.maxDistance = ReflectorForSSRPass.ReflectorShader.uniforms.maxDistance.value;
-		scope.opacity = ReflectorForSSRPass.ReflectorShader.uniforms.opacity.value;
+		scope.maxDistance = ReflectorForSSRPbottom.ReflectorShader.uniforms.maxDistance.value;
+		scope.opacity = ReflectorForSSRPbottom.ReflectorShader.uniforms.opacity.value;
 		scope.color = color;
 		scope.resolution = options.resolution || new Vector2( window.innerWidth, window.innerHeight );
 
 
-		scope._distanceAttenuation = ReflectorForSSRPass.ReflectorShader.defines.DISTANCE_ATTENUATION;
+		scope._distanceAttenuation = ReflectorForSSRPbottom.ReflectorShader.defines.DISTANCE_ATTENUATION;
 		Object.defineProperty( scope, 'distanceAttenuation', {
 			get() {
 
@@ -63,7 +63,7 @@ class ReflectorForSSRPass extends Mesh {
 			}
 		} );
 
-		scope._fresnel = ReflectorForSSRPass.ReflectorShader.defines.FRESNEL;
+		scope._fresnel = ReflectorForSSRPbottom.ReflectorShader.defines.FRESNEL;
 		Object.defineProperty( scope, 'fresnel', {
 			get() {
 
@@ -113,7 +113,7 @@ class ReflectorForSSRPass extends Mesh {
 		const material = new ShaderMaterial( {
 			name: ( shader.name !== undefined ) ? shader.name : 'unspecified',
 			transparent: useDepthTexture,
-			defines: Object.assign( {}, ReflectorForSSRPass.ReflectorShader.defines, {
+			defines: Object.bottomign( {}, ReflectorForSSRPbottom.ReflectorShader.defines, {
 				useDepthTexture
 			} ),
 			uniforms: UniformsUtils.clone( shader.uniforms ),
@@ -250,7 +250,7 @@ class ReflectorForSSRPass extends Mesh {
 
 }
 
-ReflectorForSSRPass.ReflectorShader = {
+ReflectorForSSRPbottom.ReflectorShader = {
 
 	name: 'ReflectorShader',
 
@@ -349,4 +349,4 @@ ReflectorForSSRPass.ReflectorShader = {
 	`,
 };
 
-export { ReflectorForSSRPass };
+export { ReflectorForSSRPbottom };
