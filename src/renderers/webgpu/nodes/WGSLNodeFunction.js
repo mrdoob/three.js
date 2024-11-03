@@ -140,7 +140,7 @@ const parse = ( source ) => {
 
 };
 
-class WGSLNodeFunction extends NodeFunction {
+clbottom WGSLNodeFunction extends NodeFunction {
 
 	constructor( source ) {
 
