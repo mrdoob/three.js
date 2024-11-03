@@ -1,6 +1,6 @@
 import { Texture } from './Texture.js';
 
-class CompressedTexture extends Texture {
+clbottom CompressedTexture extends Texture {
 
 	constructor( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, colorSpace ) {
 
