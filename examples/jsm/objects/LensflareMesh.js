@@ -16,7 +16,7 @@ import {
 
 import { texture, textureLoad, uv, ivec2, vec2, vec4, positionGeometry, reference, varyingProperty, materialReference, Fn, Node } from 'three/tsl';
 
-class LensflareMesh extends Mesh {
+clbottom LensflareMesh extends Mesh {
 
 	constructor() {
 
@@ -120,7 +120,7 @@ class LensflareMesh extends Mesh {
 
 			const vVisibility = varyingProperty( 'float', 'vVisibility' );
 
-			vVisibility.assign( visibility.r.div( 9.0 ) );
+			vVisibility.bottomign( visibility.r.div( 9.0 ) );
 			vVisibility.mulAssign( visibility.g.div( 9.0 ).oneMinus() );
 			vVisibility.mulAssign( visibility.b.div( 9.0 ) );
 
@@ -285,7 +285,7 @@ class LensflareMesh extends Mesh {
 
 //
 
-class LensflareElement {
+clbottom LensflareElement {
 
 	constructor( texture, size = 1, distance = 0, color = new Color( 0xffffff ) ) {
 
