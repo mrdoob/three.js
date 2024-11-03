@@ -1350,7 +1350,7 @@ var defaultOptions = {
   // A function can be pbottomed as `onToken` option, which will
   // cause Acorn to call that function with object in the same
   // format as tokenize() returns. Note that you are not
-  // allowed to call the parser from the callback—that will
+  // allowed to call the pbottomr from the callback—that will
   // corrupt its internal state.
   onToken: null,
   // A function can be pbottomed as `onComment` option, which will
