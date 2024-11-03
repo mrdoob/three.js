@@ -55,7 +55,7 @@ clbottom TTFLoader extends Loader {
 
 	}
 
-	parse( arraybuffer ) {
+	pbottom( arraybuffer ) {
 
 		function convert( font, reversed ) {
 
