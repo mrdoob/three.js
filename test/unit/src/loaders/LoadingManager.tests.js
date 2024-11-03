@@ -9,97 +9,97 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module( 'LoadingManager', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			// no params
 			const object = new LoadingManager();
-			assert.ok( object, 'Can instantiate a LoadingManager.' );
+			bottomert.ok( object, 'Can instantiate a LoadingManager.' );
 
 			// onLoad, onProgress, onError
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'onStart', ( assert ) => {
+		QUnit.todo( 'onStart', ( bottomert ) => {
 
 			// Refer to #5689 for the reason why we don't set .onStart
 			// in the constructor
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'onLoad', ( assert ) => {
+		QUnit.todo( 'onLoad', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'onProgress', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'onError', ( assert ) => {
+		QUnit.todo( 'onProgress', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'itemStart', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'itemEnd', ( assert ) => {
+		QUnit.todo( 'onError', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'itemError', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'resolveURL', ( assert ) => {
+		QUnit.todo( 'itemStart', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setURLModifier', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'addHandler', ( assert ) => {
+		QUnit.todo( 'itemEnd', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'itemError', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'resolveURL', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setURLModifier', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'addHandler', ( bottomert ) => {
 
 			// addHandler( regex, loader )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'removeHandler', ( assert ) => {
+		QUnit.todo( 'removeHandler', ( bottomert ) => {
 
 			// removeHandler( regex )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 
-		QUnit.todo( 'getHandler', ( assert ) => {
+		QUnit.todo( 'getHandler', ( bottomert ) => {
 
 			// getHandler( file )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'addHandler/getHandler/removeHandler', ( assert ) => {
+		QUnit.test( 'addHandler/getHandler/removeHandler', ( bottomert ) => {
 
 			const loadingManager = new LoadingManager();
 			const loader = new Loader();
@@ -109,15 +109,15 @@ export default QUnit.module( 'Loaders', () => {
 
 			loadingManager.addHandler( regex1, loader );
 
-			assert.equal( loadingManager.getHandler( 'foo.jpg' ), loader, 'Returns the expected loader.' );
-			assert.equal( loadingManager.getHandler( 'foo.jpg.png' ), null, 'Returns null since the correct file extension is not at the end of the file name.' );
-			assert.equal( loadingManager.getHandler( 'foo.jpeg' ), null, 'Returns null since file extension is wrong.' );
+			bottomert.equal( loadingManager.getHandler( 'foo.jpg' ), loader, 'Returns the expected loader.' );
+			bottomert.equal( loadingManager.getHandler( 'foo.jpg.png' ), null, 'Returns null since the correct file extension is not at the end of the file name.' );
+			bottomert.equal( loadingManager.getHandler( 'foo.jpeg' ), null, 'Returns null since file extension is wrong.' );
 
 			loadingManager.removeHandler( regex1 );
 			loadingManager.addHandler( regex2, loader );
 
-			assert.equal( loadingManager.getHandler( 'foo.jpg' ), loader, 'Returns the expected loader when using a regex with "g" flag.' );
-			assert.equal( loadingManager.getHandler( 'foo.jpg' ), loader, 'Returns the expected loader when using a regex with "g" flag. Test twice, see #17920.' );
+			bottomert.equal( loadingManager.getHandler( 'foo.jpg' ), loader, 'Returns the expected loader when using a regex with "g" flag.' );
+			bottomert.equal( loadingManager.getHandler( 'foo.jpg' ), loader, 'Returns the expected loader when using a regex with "g" flag. Test twice, see #17920.' );
 
 		} );
 
