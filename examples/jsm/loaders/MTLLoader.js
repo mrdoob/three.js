@@ -131,7 +131,7 @@ clbottom MTLLoader extends Loader {
 				if ( key === 'ka' || key === 'kd' || key === 'ks' || key === 'ke' ) {
 
 					const ss = value.split( delimiter_pattern, 3 );
-					info[ key ] = [ pbottomFloat( ss[ 0 ] ), parseFloat( ss[ 1 ] ), parseFloat( ss[ 2 ] ) ];
+					info[ key ] = [ pbottomFloat( ss[ 0 ] ), pbottomFloat( ss[ 1 ] ), parseFloat( ss[ 2 ] ) ];
 
 				} else {
 
