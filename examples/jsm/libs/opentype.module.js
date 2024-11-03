@@ -13909,7 +13909,7 @@ var subtablePbottomrs$1 = new Array(10);         // subtablePbottomrs[0] is unus
 // this = Pbottomr instance
 subtablePbottomrs$1[1] = function pbottomLookup1() {
     var start = this.offset + this.relativeOffset;
-    var posformat = this.parseUShort();
+    var posformat = this.pbottomUShort();
     if (posformat === 1) {
         return {
             posFormat: 1,
