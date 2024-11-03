@@ -10,10 +10,10 @@ export default QUnit.module( 'Cameras', () => {
 	QUnit.module( 'Camera', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new Camera();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Object3D, true,
 				'Camera extends from Object3D'
 			);
@@ -21,78 +21,78 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Camera();
-			assert.ok( object, 'Can instantiate a Camera.' );
+			bottomert.ok( object, 'Can instantiate a Camera.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new Camera();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'Camera',
 				'Camera.type should be Camera'
 			);
 
 		} );
 
-		QUnit.todo( 'matrixWorldInverse', ( assert ) => {
+		QUnit.todo( 'matrixWorldInverse', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'projectionMatrix', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'projectionMatrixInverse', ( assert ) => {
+		QUnit.todo( 'projectionMatrix', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'projectionMatrixInverse', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isCamera', ( assert ) => {
+		QUnit.test( 'isCamera', ( bottomert ) => {
 
 			const object = new Camera();
-			assert.ok(
+			bottomert.ok(
 				object.isCamera,
 				'Camera.isCamera should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'getWorldDirection', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'updateMatrixWorld', ( assert ) => {
+		QUnit.todo( 'getWorldDirection', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'updateWorldMatrix', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		QUnit.todo( 'updateMatrixWorld', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'updateWorldMatrix', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'clone', ( bottomert ) => {
 
 			const cam = new Camera();
 
@@ -104,20 +104,20 @@ export default QUnit.module( 'Cameras', () => {
 
 			// TODO: do not rely equality on object methods
 			// TODO: What's append if matrix.equal is wrongly implemented
-			// TODO: this MUST be check by assert
-			assert.ok( cam.matrixWorldInverse.equals( clonedCam.matrixWorldInverse ), 'matrixWorldInverse is equal' );
-			assert.ok( cam.projectionMatrix.equals( clonedCam.projectionMatrix ), 'projectionMatrix is equal' );
+			// TODO: this MUST be check by bottomert
+			bottomert.ok( cam.matrixWorldInverse.equals( clonedCam.matrixWorldInverse ), 'matrixWorldInverse is equal' );
+			bottomert.ok( cam.projectionMatrix.equals( clonedCam.projectionMatrix ), 'projectionMatrix is equal' );
 
 		} );
 
 		// OTHERS
 		// TODO: this should not be here, Object3D related
-		QUnit.test( 'lookAt', ( assert ) => {
+		QUnit.test( 'lookAt', ( bottomert ) => {
 
 			const cam = new Camera();
 			cam.lookAt( new Vector3( 0, 1, - 1 ) );
 
-			assert.numEqual( cam.rotation.x * ( 180 / Math.PI ), 45, 'x is equal' );
+			bottomert.numEqual( cam.rotation.x * ( 180 / Math.PI ), 45, 'x is equal' );
 
 		} );
 
