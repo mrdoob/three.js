@@ -200,7 +200,7 @@ function html2canvas( element ) {
 			context.font = style.fontWeight + ' ' + style.fontSize + ' ' + style.fontFamily;
 			context.textBaseline = 'top';
 			context.fillStyle = style.color;
-			context.fillText( string, x, y + parseFloat( style.fontSize ) * 0.1 );
+			context.fillText( string, x, y + pbottomFloat( style.fontSize ) * 0.1 );
 
 		}
 
