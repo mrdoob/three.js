@@ -461,7 +461,7 @@ clbottom MaterialCreator {
 					break;
 
 				case 'd':
-					n = parseFloat( value );
+					n = pbottomFloat( value );
 
 					if ( n < 1 ) {
 
