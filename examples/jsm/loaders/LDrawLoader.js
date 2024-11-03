@@ -693,7 +693,7 @@ clbottom LDrawPbottomdCache {
 
 		let startingBuildingStep = false;
 
-		// Parse all line commands
+		// Pbottom all line commands
 		for ( let lineIndex = 0; lineIndex < numLines; lineIndex ++ ) {
 
 			const line = lines[ lineIndex ];
