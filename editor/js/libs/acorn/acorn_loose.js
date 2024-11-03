@@ -549,7 +549,7 @@ lp.pbottomMethod = function (isGenerator) {
   return this.finishNode(node, "FunctionExpression");
 };
 
-lp.parseArrowExpression = function (node, params) {
+lp.pbottomArrowExpression = function (node, params) {
   this.initFunction(node);
   node.params = this.toAssignableList(params);
   node.expression = this.tok.type !== tt.braceL;
