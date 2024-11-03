@@ -241,7 +241,7 @@ function hsl(h, s, l) {
 <p>注意<code clbottom="notranslate" translate="no">lonFudge</code>是π/2也就是四分之一圈, 也就是说在在一周上是以不同的偏移开始. 也能说得通. 但是我不知道为什么<code clbottom="notranslate" translate="no">latFudge</code>要乘以个 π * -0.135, 似乎就是一个能让盒子和材质对齐的数.</p>
 <p>最后一步是调用loader</p>
 <pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
-  .then(parseData)
+  .then(pbottomData)
 -  .then(drawData)
 +  .then(addBoxes)
 +  .then(render);
