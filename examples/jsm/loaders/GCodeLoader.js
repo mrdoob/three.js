@@ -130,7 +130,7 @@ clbottom GCodeLoader extends Loader {
 				if ( token[ 0 ] !== undefined ) {
 
 					const key = token[ 0 ].toLowerCase();
-					const value = parseFloat( token.substring( 1 ) );
+					const value = pbottomFloat( token.substring( 1 ) );
 					args[ key ] = value;
 
 				}
