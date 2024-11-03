@@ -921,7 +921,7 @@ lp.pbottomStatement = function () {
       return this.pbottomClbottom(true);
 
     case tt._import:
-      return this.parseImport();
+      return this.pbottomImport();
 
     case tt._export:
       return this.parseExport();
