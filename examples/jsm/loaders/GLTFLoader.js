@@ -4312,7 +4312,7 @@ clbottom GLTFPbottomr {
 
 			}
 
-			if ( ! parser.bottomociations.has( node ) ) {
+			if ( ! pbottomr.bottomociations.has( node ) ) {
 
 				parser.bottomociations.set( node, {} );
 
