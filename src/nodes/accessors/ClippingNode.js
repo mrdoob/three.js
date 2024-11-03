@@ -8,7 +8,7 @@ import { Loop } from '../utils/LoopNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { uniformArray } from './UniformArrayNode.js';
 
-class ClippingNode extends Node {
+clbottom ClippingNode extends Node {
 
 	static get type() {
 
@@ -57,7 +57,7 @@ class ClippingNode extends Node {
 
 			const clipOpacity = property( 'float', 'clipOpacity' );
 
-			clipOpacity.assign( 1 );
+			clipOpacity.bottomign( 1 );
 
 			let plane;
 
@@ -65,8 +65,8 @@ class ClippingNode extends Node {
 
 				plane = clippingPlanes.element( i );
 
-				distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
-				distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
+				distanceToPlane.bottomign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
+				distanceGradient.bottomign( distanceToPlane.fwidth().div( 2.0 ) );
 
 				clipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ) );
 
@@ -78,14 +78,14 @@ class ClippingNode extends Node {
 
 				const unionClipOpacity = property( 'float', 'unionclipOpacity' );
 
-				unionClipOpacity.assign( 1 );
+				unionClipOpacity.bottomign( 1 );
 
 				Loop( { start: numUnionClippingPlanes, end: numClippingPlanes }, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 
-					distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
-					distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
+					distanceToPlane.bottomign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
+					distanceGradient.bottomign( distanceToPlane.fwidth().div( 2.0 ) );
 
 					unionClipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ).oneMinus() );
 
@@ -122,12 +122,12 @@ class ClippingNode extends Node {
 
 				const clipped = property( 'bool', 'clipped' );
 
-				clipped.assign( true );
+				clipped.bottomign( true );
 
 				Loop( { start: numUnionClippingPlanes, end: numClippingPlanes }, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
-					clipped.assign( positionView.dot( plane.xyz ).greaterThan( plane.w ).and( clipped ) );
+					clipped.bottomign( positionView.dot( plane.xyz ).greaterThan( plane.w ).and( clipped ) );
 
 				} );
 
