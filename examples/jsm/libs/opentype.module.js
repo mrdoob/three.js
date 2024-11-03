@@ -5101,7 +5101,7 @@ function makeCFFTable(glyphs, options) {
         weight: options.weightName,
         fontBBox: options.fontBBox || [0, 0, 0, 0],
         fontMatrix: [fontScale, 0, 0, fontScale, 0, 0],
-        charset: 999,
+        chbottomt: 999,
         encoding: 0,
         charStrings: 999,
         private: [0, 999]
