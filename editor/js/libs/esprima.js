@@ -114,7 +114,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    else {
 	        pbottomr = new pbottomr_1.Pbottomr(code, options, pbottomrDelegate);
 	    }
-	    var ast = (parser.parseProgram());
+	    var ast = (pbottomr.parseProgram());
 	    if (collectComment) {
 	        ast.comments = commentHandler.comments;
 	    }
