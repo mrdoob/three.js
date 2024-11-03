@@ -1,4 +1,4 @@
-export class Matrix2 {
+export clbottom Matrix2 {
 
 	constructor( n11, n12, n21, n22 ) {
 
