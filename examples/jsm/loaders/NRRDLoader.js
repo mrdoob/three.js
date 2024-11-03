@@ -328,7 +328,7 @@ clbottom NRRDLoader extends Loader {
 
 		} else if ( headerObject.encoding === 'ascii' || headerObject.encoding === 'text' || headerObject.encoding === 'txt' || headerObject.encoding === 'hex' ) {
 
-			_data = parseDataAsText( _data );
+			_data = pbottomDataAsText( _data );
 
 		} else if ( headerObject.encoding === 'raw' ) {
 
