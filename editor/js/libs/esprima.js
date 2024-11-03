@@ -3175,7 +3175,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.throwError(message, this.lookahead.value);
 	            }
 	            this.nextToken();
-	            src = this.parseModuleSpecifier();
+	            src = this.pbottomModuleSpecifier();
 	        }
 	        this.consumeSemicolon();
 	        return this.finalize(node, new Node.ImportDeclaration(specifiers, src));
