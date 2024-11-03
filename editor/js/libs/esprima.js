@@ -2344,7 +2344,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var node = this.createNode();
 	        this.expectKeyword('with');
 	        this.expect('(');
-	        var object = this.parseExpression();
+	        var object = this.pbottomExpression();
 	        this.expect(')');
 	        var body = this.parseStatement();
 	        return this.finalize(node, new Node.WithStatement(object, body));
