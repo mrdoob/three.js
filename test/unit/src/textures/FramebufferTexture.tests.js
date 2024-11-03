@@ -9,10 +9,10 @@ export default QUnit.module( 'Textures', () => {
 	QUnit.module( 'FramebufferTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new FramebufferTexture();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Texture, true,
 				'FramebufferTexture extends from Texture'
 			);
@@ -20,49 +20,49 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new FramebufferTexture();
-			assert.ok( object, 'Can instantiate a FramebufferTexture.' );
+			bottomert.ok( object, 'Can instantiate a FramebufferTexture.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'format', ( assert ) => {
+		QUnit.todo( 'format', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'magFilter', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'minFilter', ( assert ) => {
+		QUnit.todo( 'magFilter', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'generateMipmaps', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'needsUpdate', ( assert ) => {
+		QUnit.todo( 'minFilter', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'generateMipmaps', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'needsUpdate', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isFramebufferTexture', ( assert ) => {
+		QUnit.test( 'isFramebufferTexture', ( bottomert ) => {
 
 			const object = new FramebufferTexture();
-			assert.ok(
+			bottomert.ok(
 				object.isFramebufferTexture,
 				'FramebufferTexture.isFramebufferTexture should be true'
 			);
