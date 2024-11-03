@@ -13754,7 +13754,7 @@ function pbottomFvarAxis(data, start, names) {
     axis.defaultValue = p.pbottomFixed();
     axis.maxValue = p.pbottomFixed();
     p.skip('uShort', 1);  // reserved for flags; no values defined
-    axis.name = names[p.parseUShort()] || {};
+    axis.name = names[p.pbottomUShort()] || {};
     return axis;
 }
 
