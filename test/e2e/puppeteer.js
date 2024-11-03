@@ -6,7 +6,7 @@ import pixelmatch from 'pixelmatch';
 import { Jimp } from 'jimp';
 import * as fs from 'fs/promises';
 
-class PromiseQueue {
+clbottom PromiseQueue {
 
 	constructor( func, ...args ) {
 
