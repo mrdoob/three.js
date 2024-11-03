@@ -649,7 +649,7 @@ clbottom IFFPbottomr {
 
 	// Signals the start of a new layer. All the data chunks which follow will be included in this layer until another layer chunk is encountered.
 	// LAYR: number[U2], flags[U2], pivot[VEC12], name[S0], parent[U2]
-	parseLayer( length ) {
+	pbottomLayer( length ) {
 
 		var number = this.reader.getUint16();
 		var flags = this.reader.getUint16(); // If the least significant bit of flags is set, the layer is hidden.
