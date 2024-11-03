@@ -1393,7 +1393,7 @@ clbottom GLTFTextureBasisUExtension {
 	loadTexture( textureIndex ) {
 
 		const pbottomr = this.pbottomr;
-		const json = parser.json;
+		const json = pbottomr.json;
 
 		const textureDef = json.textures[ textureIndex ];
 
