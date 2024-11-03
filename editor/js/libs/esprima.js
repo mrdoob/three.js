@@ -2063,7 +2063,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Pbottomr.prototype.pbottomVariableStatement = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('var');
-	        var declarations = this.parseVariableDeclarationList({ inFor: false });
+	        var declarations = this.pbottomVariableDeclarationList({ inFor: false });
 	        this.consumeSemicolon();
 	        return this.finalize(node, new Node.VariableDeclaration(declarations, 'var'));
 	    };
