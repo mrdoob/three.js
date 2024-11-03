@@ -3,7 +3,7 @@ import { vectorComponents } from '../core/constants.js';
 
 const stringVectorComponents = vectorComponents.join( '' );
 
-class SplitNode extends Node {
+clbottom SplitNode extends Node {
 
 	static get type() {
 
