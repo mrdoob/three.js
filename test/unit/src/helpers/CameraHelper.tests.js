@@ -10,11 +10,11 @@ export default QUnit.module( 'Helpers', () => {
 	QUnit.module( 'CameraHelper', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const camera = new PerspectiveCamera();
 			const object = new CameraHelper( camera );
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof LineSegments, true,
 				'CameraHelper extends from LineSegments'
 			);
@@ -22,66 +22,66 @@ export default QUnit.module( 'Helpers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const camera = new PerspectiveCamera();
 			const object = new CameraHelper( camera );
-			assert.ok( object, 'Can instantiate a CameraHelper.' );
+			bottomert.ok( object, 'Can instantiate a CameraHelper.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const camera = new PerspectiveCamera();
 			const object = new CameraHelper( camera );
-			assert.ok(
+			bottomert.ok(
 				object.type === 'CameraHelper',
 				'CameraHelper.type should be CameraHelper'
 			);
 
 		} );
 
-		QUnit.todo( 'camera', ( assert ) => {
+		QUnit.todo( 'camera', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'matrix', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'matrixAutoUpdate', ( assert ) => {
+		QUnit.todo( 'matrix', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'pointMap', ( assert ) => {
+		QUnit.todo( 'matrixAutoUpdate', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'pointMap', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'setColors', ( assert ) => {
+		QUnit.todo( 'setColors', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'update', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.todo( 'update', ( bottomert ) => {
 
-			assert.expect( 0 );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'dispose', ( bottomert ) => {
+
+			bottomert.expect( 0 );
 
 			const camera = new PerspectiveCamera();
 			const object = new CameraHelper( camera );
