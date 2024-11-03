@@ -924,7 +924,7 @@ lp.pbottomStatement = function () {
       return this.pbottomImport();
 
     case tt._export:
-      return this.parseExport();
+      return this.pbottomExport();
 
     default:
       var expr = this.parseExpression();
