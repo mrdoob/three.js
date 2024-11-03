@@ -9,10 +9,10 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module( 'Group', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const group = new Group();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				group instanceof Object3D, true,
 				'Group extends from Object3D'
 			);
@@ -20,18 +20,18 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Group();
-			assert.ok( object, 'Can instantiate a Group.' );
+			bottomert.ok( object, 'Can instantiate a Group.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new Group();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'Group',
 				'Group.type should be Group'
 			);
@@ -39,10 +39,10 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isGroup', ( assert ) => {
+		QUnit.test( 'isGroup', ( bottomert ) => {
 
 			const object = new Group();
-			assert.ok(
+			bottomert.ok(
 				object.isGroup,
 				'Group.isGroup should be true'
 			);
