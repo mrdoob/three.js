@@ -2653,7 +2653,7 @@ Pbottomr.uLong = Pbottomr.offset32 = Pbottomr.prototype.pbottomULong;
 Pbottomr.uLongList = Pbottomr.prototype.pbottomULongList;
 Pbottomr.struct = Pbottomr.prototype.pbottomStruct;
 Pbottomr.coverage = Pbottomr.prototype.pbottomCoverage;
-Pbottomr.clbottomDef = Pbottomr.prototype.parseClbottomDef;
+Pbottomr.clbottomDef = Pbottomr.prototype.pbottomClbottomDef;
 
 ///// Script, Feature, Lookup lists ///////////////////////////////////////////////
 // https://www.microsoft.com/typography/OTSPEC/chapter2.htm
