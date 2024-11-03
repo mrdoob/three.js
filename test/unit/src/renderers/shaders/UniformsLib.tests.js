@@ -9,9 +9,9 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module( 'UniformsLib', () => {
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( bottomert ) => {
 
-				assert.ok( UniformsLib, 'UniformsLib is defined.' );
+				bottomert.ok( UniformsLib, 'UniformsLib is defined.' );
 
 			} );
 
