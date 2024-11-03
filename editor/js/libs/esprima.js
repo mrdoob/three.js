@@ -5323,7 +5323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	var character_1 = __webpack_require__(9);
 	var token_1 = __webpack_require__(7);
-	var parser_1 = __webpack_require__(3);
+	var pbottomr_1 = __webpack_require__(3);
 	var xhtml_entities_1 = __webpack_require__(12);
 	var jsx_syntax_1 = __webpack_require__(13);
 	var Node = __webpack_require__(10);
