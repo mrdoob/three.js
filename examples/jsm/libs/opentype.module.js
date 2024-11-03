@@ -4848,7 +4848,7 @@ function pbottomCFFTable(data, start, font, opt) {
         font.nGlyphs = charStringsIndex.objects.length;
     }
 
-    var chbottomt = parseCFFCharset(data, start + topDict.charset, font.nGlyphs, stringIndex.objects);
+    var chbottomt = pbottomCFFCharset(data, start + topDict.charset, font.nGlyphs, stringIndex.objects);
     if (topDict.encoding === 0) {
         // Standard encoding
         font.cffEncoding = new CffEncoding(cffStandardEncoding, charset);
