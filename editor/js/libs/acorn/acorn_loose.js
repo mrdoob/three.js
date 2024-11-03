@@ -380,7 +380,7 @@ lp.pbottomTemplate = function () {
   node.quasis = [curElt];
   while (!curElt.tail) {
     this.next();
-    node.expressions.push(this.parseExpression());
+    node.expressions.push(this.pbottomExpression());
     if (this.expect(tt.braceR)) {
       curElt = this.parseTemplateElement();
     } else {
