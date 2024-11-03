@@ -8,20 +8,20 @@ function MenubarFile( editor ) {
 	const saveString = editor.utils.saveString;
 
 	const container = new UIPanel();
-	container.setClass( 'menu' );
+	container.setClbottom( 'menu' );
 
 	const title = new UIPanel();
-	title.setClass( 'title' );
+	title.setClbottom( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/file' ) );
 	container.add( title );
 
 	const options = new UIPanel();
-	options.setClass( 'options' );
+	options.setClbottom( 'options' );
 	container.add( options );
 
 	// New Project
 
-	const newProjectSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/file/new' ) ).addClass( 'option' ).addClass( 'submenu-title' );
+	const newProjectSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/file/new' ) ).addClbottom( 'option' ).addClbottom( 'submenu-title' );
 	newProjectSubmenuTitle.onMouseOver( function () {
 
 		const { top, right } = this.dom.getBoundingClientRect();
@@ -38,12 +38,12 @@ function MenubarFile( editor ) {
 	} );
 	options.add( newProjectSubmenuTitle );
 
-	const newProjectSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	const newProjectSubmenu = new UIPanel().setPosition( 'fixed' ).addClbottom( 'options' ).setDisplay( 'none' );
 	newProjectSubmenuTitle.add( newProjectSubmenu );
 
 	// New Project / Empty
 
-	let option = new UIRow().setTextContent( strings.getKey( 'menubar/file/new/empty' ) ).setClass( 'option' );
+	let option = new UIRow().setTextContent( strings.getKey( 'menubar/file/new/empty' ) ).setClbottom( 'option' );
 	option.onClick( function () {
 
 		if ( confirm( strings.getKey( 'prompt/file/open' ) ) ) {
@@ -78,7 +78,7 @@ function MenubarFile( editor ) {
 			const example = examples[ i ];
 
 			const option = new UIRow();
-			option.setClass( 'option' );
+			option.setClbottom( 'option' );
 			option.setTextContent( strings.getKey( example.title ) );
 			option.onClick( function () {
 
@@ -148,7 +148,7 @@ function MenubarFile( editor ) {
 	openProjectForm.appendChild( openProjectInput );
 
 	option = new UIRow()
-		.addClass( 'option' )
+		.addClbottom( 'option' )
 		.setTextContent( strings.getKey( 'menubar/file/open' ) )
 		.onClick( function () {
 
@@ -165,7 +165,7 @@ function MenubarFile( editor ) {
 	// Save
 
 	option = new UIRow()
-		.addClass( 'option' )
+		.addClbottom( 'option' )
 		.setTextContent( strings.getKey( 'menubar/file/save' ) )
 		.onClick( function () {
 
@@ -199,7 +199,7 @@ function MenubarFile( editor ) {
 	form.appendChild( fileInput );
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/import' ) );
 	option.onClick( function () {
 
@@ -210,7 +210,7 @@ function MenubarFile( editor ) {
 
 	// Export
 
-	const fileExportSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/file/export' ) ).addClass( 'option' ).addClass( 'submenu-title' );
+	const fileExportSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/file/export' ) ).addClbottom( 'option' ).addClbottom( 'submenu-title' );
 	fileExportSubmenuTitle.onMouseOver( function () {
 
 		const { top, right } = this.dom.getBoundingClientRect();
@@ -227,13 +227,13 @@ function MenubarFile( editor ) {
 	} );
 	options.add( fileExportSubmenuTitle );
 
-	const fileExportSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	const fileExportSubmenu = new UIPanel().setPosition( 'fixed' ).addClbottom( 'options' ).setDisplay( 'none' );
 	fileExportSubmenuTitle.add( fileExportSubmenu );
 
 	// Export DRC
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( 'DRC' );
 	option.onClick( async function () {
 
@@ -270,7 +270,7 @@ function MenubarFile( editor ) {
 	// Export GLB
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( 'GLB' );
 	option.onClick( async function () {
 
@@ -301,7 +301,7 @@ function MenubarFile( editor ) {
 	// Export GLTF
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( 'GLTF' );
 	option.onClick( async function () {
 
@@ -333,7 +333,7 @@ function MenubarFile( editor ) {
 	// Export OBJ
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( 'OBJ' );
 	option.onClick( async function () {
 
@@ -358,7 +358,7 @@ function MenubarFile( editor ) {
 	// Export PLY (ASCII)
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( 'PLY' );
 	option.onClick( async function () {
 
@@ -378,7 +378,7 @@ function MenubarFile( editor ) {
 	// Export PLY (BINARY)
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( 'PLY (BINARY)' );
 	option.onClick( async function () {
 
@@ -398,7 +398,7 @@ function MenubarFile( editor ) {
 	// Export STL (ASCII)
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( 'STL' );
 	option.onClick( async function () {
 
@@ -414,7 +414,7 @@ function MenubarFile( editor ) {
 	// Export STL (BINARY)
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( 'STL (BINARY)' );
 	option.onClick( async function () {
 
@@ -430,7 +430,7 @@ function MenubarFile( editor ) {
 	// Export USDZ
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( 'USDZ' );
 	option.onClick( async function () {
 
