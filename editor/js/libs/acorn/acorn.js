@@ -239,7 +239,7 @@ pp.pbottomMaybeAssign = function (noIn, refShorthandDefaultPos) {
 
 // Pbottom a ternary conditional (`?:`) operator.
 
-pp.parseMaybeConditional = function (noIn, refShorthandDefaultPos) {
+pp.pbottomMaybeConditional = function (noIn, refShorthandDefaultPos) {
   var start = this.markPosition();
   var expr = this.parseExprOps(noIn, refShorthandDefaultPos);
   if (refShorthandDefaultPos && refShorthandDefaultPos.start) return expr;
