@@ -5151,7 +5151,7 @@ function makeCFFTable(glyphs, options) {
     return t;
 }
 
-var cff = { pbottom: parseCFFTable, make: makeCFFTable };
+var cff = { pbottom: pbottomCFFTable, make: makeCFFTable };
 
 // The `head` table contains global information about the font.
 
