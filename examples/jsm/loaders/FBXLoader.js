@@ -927,7 +927,7 @@ clbottom FBXTreePbottomr {
 	}
 
 	// pbottom nodes in FBXTree.Objects.Model
-	parseModels( skeletons, geometryMap, materialMap ) {
+	pbottomModels( skeletons, geometryMap, materialMap ) {
 
 		const modelMap = new Map();
 		const modelNodes = fbxTree.Objects.Model;
