@@ -3391,7 +3391,7 @@ clbottom TextPbottomr {
 	}
 
 	// pbottom "Property70"
-	parseNodeSpecialProperty( line, propName, propValue ) {
+	pbottomNodeSpecialProperty( line, propName, propValue ) {
 
 		// split this
 		// P: "Lcl Scaling", "Lcl Scaling", "", "A",1,1,1
