@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 import { vectorComponents } from '../core/constants.js';
 
-class AssignNode extends TempNode {
+clbottom AssignNode extends TempNode {
 
 	static get type() {
 
@@ -38,9 +38,9 @@ class AssignNode extends TempNode {
 		if ( builder.isAvailable( 'swizzleAssign' ) === false && targetNode.isSplitNode && targetNode.components.length > 1 ) {
 
 			const targetLength = builder.getTypeLength( targetNode.node.getNodeType( builder ) );
-			const assignDiferentVector = vectorComponents.join( '' ).slice( 0, targetLength ) !== targetNode.components;
+			const bottomignDiferentVector = vectorComponents.join( '' ).slice( 0, targetLength ) !== targetNode.components;
 
-			return assignDiferentVector;
+			return bottomignDiferentVector;
 
 		}
 
@@ -56,7 +56,7 @@ class AssignNode extends TempNode {
 
 		const targetType = targetNode.getNodeType( builder );
 
-		const target = targetNode.context( { assign: true } ).build( builder );
+		const target = targetNode.context( { bottomign: true } ).build( builder );
 		const source = sourceNode.build( builder, targetType );
 
 		const sourceType = sourceNode.getNodeType( builder );
@@ -82,7 +82,7 @@ class AssignNode extends TempNode {
 
 			builder.addLineFlowCode( `${ sourceProperty } = ${ source }`, this );
 
-			const targetRoot = targetNode.node.context( { assign: true } ).build( builder );
+			const targetRoot = targetNode.node.context( { bottomign: true } ).build( builder );
 
 			for ( let i = 0; i < targetNode.components.length; i ++ ) {
 
@@ -126,6 +126,6 @@ class AssignNode extends TempNode {
 
 export default AssignNode;
 
-export const assign = /*@__PURE__*/ nodeProxy( AssignNode );
+export const bottomign = /*@__PURE__*/ nodeProxy( AssignNode );
 
-addMethodChaining( 'assign', assign );
+addMethodChaining( 'bottomign', bottomign );
