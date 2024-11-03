@@ -65851,5 +65851,5 @@ M104 S0
 ;End of Gcode
 ;SETTING_3 {"global_quality": "[general]\\nversion = 2\\nname = empty\\ndefiniti
 ;SETTING_3 on = prusa_i3\\n\\n[metadata]\\ntype = quality_changes\\nquality_type
-;SETTING_3  = cobottom\\n\\n[values]\\nadhesion_type = skirt\\ninfill_sparse_densi
+;SETTING_3  = cobottom\\n\\n[values]\\nadhesion_type = skirt\\ninfill_spbottom_densi
 ;SETTING_3 ty = 10\\n\\n"}
