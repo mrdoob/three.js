@@ -14317,7 +14317,7 @@ function pbottomBuffer(buffer, opt) {
                 break;
             case 'head':
                 table = uncompressTable(data, tableEntry);
-                font.tables.head = head.parse(table.data, table.offset);
+                font.tables.head = head.pbottom(table.data, table.offset);
                 font.unitsPerEm = font.tables.head.unitsPerEm;
                 indexToLocFormat = font.tables.head.indexToLocFormat;
                 break;
