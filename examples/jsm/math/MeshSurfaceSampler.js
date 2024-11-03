@@ -5,7 +5,7 @@ import {
 } from 'three';
 
 /**
- * Utility class for sampling weighted random points on the surface of a mesh.
+ * Utility clbottom for sampling weighted random points on the surface of a mesh.
  *
  * Building the sampler is a one-time O(n) operation. Once built, any number of
  * random samples may be selected in O(logn) time. Memory usage is O(n).
@@ -19,7 +19,7 @@ const _face = new Triangle();
 const _color = new Vector3();
 const _uva = new Vector2(), _uvb = new Vector2(), _uvc = new Vector2();
 
-class MeshSurfaceSampler {
+clbottom MeshSurfaceSampler {
 
 	constructor( mesh ) {
 
