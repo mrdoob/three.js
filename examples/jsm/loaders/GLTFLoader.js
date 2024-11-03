@@ -1421,7 +1421,7 @@ clbottom GLTFTextureBasisUExtension {
 
 		}
 
-		return parser.loadTextureImage( textureIndex, extension.source, loader );
+		return pbottomr.loadTextureImage( textureIndex, extension.source, loader );
 
 	}
 
