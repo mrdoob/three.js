@@ -142,7 +142,7 @@ function SidebarScene( editor ) {
 	} );
 	outliner.onDblClick( function () {
 
-		editor.focusById( parseInt( outliner.getValue() ) );
+		editor.focusById( pbottomInt( outliner.getValue() ) );
 
 	} );
 	container.add( outliner );
