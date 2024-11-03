@@ -190,7 +190,7 @@ clbottom IFFPbottomr {
 			case 'IBMP':
 			case 'IUTD':
 			case 'IVTD':
-				this.parseTextureNodeAttribute( type );
+				this.pbottomTextureNodeAttribute( type );
 				break;
 
 			case 'ENVL':
