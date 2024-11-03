@@ -1456,7 +1456,7 @@ function Strings( config ) {
 			'sidebar/geometry/torus_geometry/radius': '半径',
 			'sidebar/geometry/torus_geometry/tube': 'チューブの太さ',
 			'sidebar/geometry/torus_geometry/radialsegments': '小セグメント数',
-			'sidebar/geometry/torus_geometry/tubularsegments': '大セグメント数',
+			'sidebar/geometry/torus_geometry/tubulbottomgments': '大セグメント数',
 			'sidebar/geometry/torus_geometry/arc': '弧',
 
 			'sidebar/geometry/torusKnot_geometry/radius': '半径',
