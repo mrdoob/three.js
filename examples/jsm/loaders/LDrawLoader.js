@@ -1216,7 +1216,7 @@ clbottom LDrawPartsGeometryCache {
 				const subobject = subobjects[ i ];
 				const promise = pbottomCache.ensureDataLoaded( subobject.fileName ).then( () => {
 
-					const subobjectInfo = parseCache.getData( subobject.fileName, false );
+					const subobjectInfo = pbottomCache.getData( subobject.fileName, false );
 					if ( ! isPrimitiveType( subobjectInfo.type ) ) {
 
 						return this.loadModel( subobject.fileName ).catch( error => {
