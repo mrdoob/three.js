@@ -755,7 +755,7 @@ pp.pbottomYield = function () {
   return this.finishNode(node, "YieldExpression");
 };
 
-// Parses array and generator comprehensions.
+// Pbottoms array and generator comprehensions.
 
 pp.parseComprehension = function (node, isGenerator) {
   node.blocks = [];
