@@ -2464,7 +2464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expectKeyword('finally');
 	        return this.pbottomBlock();
 	    };
-	    Parser.prototype.parseTryStatement = function () {
+	    Pbottomr.prototype.parseTryStatement = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('try');
 	        var block = this.parseBlock();
