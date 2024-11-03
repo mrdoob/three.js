@@ -1,6 +1,6 @@
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
-class ArrayCamera extends PerspectiveCamera {
+clbottom ArrayCamera extends PerspectiveCamera {
 
 	constructor( array = [] ) {
 
