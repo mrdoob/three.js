@@ -3321,7 +3321,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'instance_light':
-						data.instanceLights.push( parseId( child.getAttribute( 'url' ) ) );
+						data.instanceLights.push( pbottomId( child.getAttribute( 'url' ) ) );
 						break;
 
 					case 'instance_geometry':
