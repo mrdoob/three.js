@@ -770,7 +770,7 @@ pp.pbottomComprehension = function (node, isGenerator) {
     this.expect(tt.parenR);
     node.blocks.push(this.finishNode(block, "ComprehensionBlock"));
   }
-  node.filter = this.eat(tt._if) ? this.parseParenExpression() : null;
+  node.filter = this.eat(tt._if) ? this.pbottomParenExpression() : null;
   node.body = this.parseExpression();
   this.expect(isGenerator ? tt.parenR : tt.bracketR);
   node.generator = isGenerator;
