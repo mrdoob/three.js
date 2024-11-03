@@ -20,12 +20,12 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>Оптимизация большого количества объектов</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>Эта статья является частью серии статей о three.js. Первая статья - <a href="fundamentals.html">основы Three.js</a>.
 Если вы еще не читали это, и вы новичок в three.js, вы можете начать там. </p>
 <p>Есть много способов оптимизировать вещи для three.js. Один из способов часто называют геометрией слияния.
@@ -37,7 +37,7 @@
 Проверяя сайт, я увидел  <a href="https://beta.sedac.ciesin.columbia.edu/data/set/gpw-v4-basic-demographic-characteristics-rev10">демографические данные в виде сетки</a>.
 Я загрузил данные с 60-минутным разрешением. Затем я посмотрел на данные </p>
 <p>Это выглядит так </p>
-<pre class="prettyprint showlinemods notranslate lang-txt" translate="no"> ncols         360
+<pre clbottom="prettyprint showlinemods notranslate lang-txt" translate="no"> ncols         360
  nrows         145
  xllcorner     -180
  yllcorner     -60
@@ -63,14 +63,14 @@
 <p>Есть несколько строк, похожих на пары ключ / значение, за которыми следуют строки со значением для каждой точки сетки, по одной строке для каждой строки точек данных. </p>
 <p>Чтобы убедиться, что мы понимаем данные, давайте попробуем построить их в 2D. </p>
 <p>Сначала немного кода для загрузки текстового файла </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">async function loadFile(url) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">async function loadFile(url) {
   const res = await fetch(url);
   return res.text();
 }
 </pre>
-<p>Приведенный выше код возвращает <code class="notranslate" translate="no">Promise</code> с содержимым файла по адресу <code class="notranslate" translate="no">url</code>; </p>
+<p>Приведенный выше код возвращает <code clbottom="notranslate" translate="no">Promise</code> с содержимым файла по адресу <code clbottom="notranslate" translate="no">url</code>; </p>
 <p>Тогда нам нужен код для разбора файла </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function parseData(text) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function parseData(text) {
   const data = [];
   const settings = {data};
   let max;
@@ -96,13 +96,13 @@
       data.push(values);
     }
   });
-  return Object.assign(settings, {min, max});
+  return Object.bottomign(settings, {min, max});
 }
 </pre>
 <p>Приведенный выше код возвращает объект со всеми парами ключ / значение из файла,
-а также свойство <code class="notranslate" translate="no">data</code> со всеми данными в одном большом массиве и значениями <code class="notranslate" translate="no">min</code> и <code class="notranslate" translate="no">max</code>, найденными в данных. </p>
+а также свойство <code clbottom="notranslate" translate="no">data</code> со всеми данными в одном большом массиве и значениями <code clbottom="notranslate" translate="no">min</code> и <code clbottom="notranslate" translate="no">max</code>, найденными в данных. </p>
 <p>Тогда нам нужен код для рисования этих данных </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function drawData(file) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function drawData(file) {
   const {min, max, data} = file;
   const range = max - min;
   const ctx = document.querySelector('canvas').getContext('2d');
@@ -140,24 +140,24 @@ function hsl(h, s, l) {
 }
 </pre>
 <p>И, наконец, склеив все это </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
   .then(parseData)
   .then(drawData);
 </pre>
 <p>Дает нам этот результат </p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/gpw-data-viewer.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/gpw-data-viewer.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/gpw-data-viewer.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/gpw-data-viewer.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
 </div>
 
 <p></p>
 <p>Так что, кажется, это работает. </p>
 <p>Давайте попробуем это в 3D. Начиная с кода от <a href="rendering-on-demand.html">рендеринга по требованию</a> мы сделаем один блок на данные в файле. </p>
 <p>Сначала давайте сделаем простую сферу с текстурой мира. Вот текстура </p>
-<div class="threejs_center"><img src="../examples/resources/images/world.jpg" style="width: 600px"></div>
+<div clbottom="threejs_center"><img src="../examples/resources/images/world.jpg" style="width: 600px"></div>
 
 <p>И код для его настройки. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const texture = loader.load('resources/images/world.jpg', render);
   const geometry = new THREE.SphereGeometry(1, 64, 32);
@@ -168,7 +168,7 @@ function hsl(h, s, l) {
 <p>Обратите внимание на вызов для рендеринга после завершения загрузки текстуры. Нам это нужно, потому что мы выполняем  <a href="rendering-on-demand.html">рендеринг по требованию</a>
 а не постоянно, поэтому нам нужно рендерить один раз при загрузке текстуры. </p>
 <p>Затем нам нужно изменить код, который рисует точку на точку данных выше, чтобы вместо этого создать прямоугольник для точки данных. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addBoxes(file) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function addBoxes(file) {
   const {min, max, data} = file;
   const range = max - min;
 
@@ -225,34 +225,34 @@ function hsl(h, s, l) {
 <p>Код в основном прямо из нашего тестового кода рисования. </p>
 <p>Мы делаем одну коробку и корректируем ее центр так, чтобы она масштабировалась от положительного Z.
 Если бы мы этого не делали, она бы масштабировалась от центра, но мы хотим, чтобы они росли от начала координат. </p>
-<div class="spread">
+<div clbottom="spread">
   <div>
     <div data-diagram="scaleCenter" style="height: 250px"></div>
-    <div class="code">default</div>
+    <div clbottom="code">default</div>
   </div>
   <div>
     <div data-diagram="scalePositiveZ" style="height: 250px"></div>
-    <div class="code">adjusted</div>
+    <div clbottom="code">adjusted</div>
   </div>
 </div>
 
 <p>Конечно, мы могли бы также решить эту проблему, добавив в родительский блок больше объектов
 THREE.Object3D, как мы покрывали в <a href="scenegraph.html">графах сцены</a>
 но чем больше узлов мы добавляем в граф сцены, тем медленнее он становится. </p>
-<p>Мы также настраиваем эту небольшую иерархию узлов <code class="notranslate" translate="no">lonHelper</code>, <code class="notranslate" translate="no">latHelper</code> и <code class="notranslate" translate="no">positionHelper</code>.
+<p>Мы также настраиваем эту небольшую иерархию узлов <code clbottom="notranslate" translate="no">lonHelper</code>, <code clbottom="notranslate" translate="no">latHelper</code> и <code clbottom="notranslate" translate="no">positionHelper</code>.
 Мы используем эти объекты, чтобы вычислить положение вокруг сферы, чтобы разместить коробку. </p>
-<div class="spread">
+<div clbottom="spread">
   <div data-diagram="lonLatPos" style="width: 600px; height: 400px;"></div>
 </div>
 
-<p>Над <span style="color: green;">зелёной полосой</span> изображен  <code class="notranslate" translate="no">lonHelper</code> и используется для поворота в направлении долготы на экваторе.
-<span style="color: blue;">Синяя полоса</span> обозначает <code class="notranslate" translate="no">latHelper</code> который используется для поворота на широту выше или ниже экватора.
-<span style="color: red;">Красная сфера</span> представляет смещение, которое обеспечивает этот <code class="notranslate" translate="no">positionHelper</code>.</p>
+<p>Над <span style="color: green;">зелёной полосой</span> изображен  <code clbottom="notranslate" translate="no">lonHelper</code> и используется для поворота в направлении долготы на экваторе.
+<span style="color: blue;">Синяя полоса</span> обозначает <code clbottom="notranslate" translate="no">latHelper</code> который используется для поворота на широту выше или ниже экватора.
+<span style="color: red;">Красная сфера</span> представляет смещение, которое обеспечивает этот <code clbottom="notranslate" translate="no">positionHelper</code>.</p>
 <p>Мы могли бы сделать всю математику вручную, чтобы выяснить позиции на земном шаре, но, делая это таким образом,
 мы оставляем большую часть математики самой библиотеке, поэтому нам не нужно иметь с ней дело. </p>
-<p>Для каждой точки данных мы создаем <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> и <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>, а затем запрашиваем мировую матрицу
-<code class="notranslate" translate="no">positionHelper</code> и применяем ее к новой <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a>. Наконец мы масштабируем сетку в новой позиции. </p>
-<p>Как и выше, мы могли бы также создать <code class="notranslate" translate="no">latHelper</code>, <code class="notranslate" translate="no">lonHelper</code> и <code class="notranslate" translate="no">positionHelper</code> для каждого нового окна, но это было бы еще медленнее. </p>
+<p>Для каждой точки данных мы создаем <a href="/docs/#api/en/materials/MeshBasicMaterial"><code clbottom="notranslate" translate="no">MeshBasicMaterial</code></a> и <a href="/docs/#api/en/objects/Mesh"><code clbottom="notranslate" translate="no">Mesh</code></a>, а затем запрашиваем мировую матрицу
+<code clbottom="notranslate" translate="no">positionHelper</code> и применяем ее к новой <a href="/docs/#api/en/objects/Mesh"><code clbottom="notranslate" translate="no">Mesh</code></a>. Наконец мы масштабируем сетку в новой позиции. </p>
+<p>Как и выше, мы могли бы также создать <code clbottom="notranslate" translate="no">latHelper</code>, <code clbottom="notranslate" translate="no">lonHelper</code> и <code clbottom="notranslate" translate="no">positionHelper</code> для каждого нового окна, но это было бы еще медленнее. </p>
 <p>Мы собираемся создать до 360х145 коробок. Это до 52000 коробок.
 Поскольку некоторые точки данных помечены как «NO_DATA», фактическое
 количество блоков, которые мы собираемся создать, составляет около 19000.
@@ -260,36 +260,36 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
 это было бы почти 80000 узлов графа сцены, которые THREE.js должен был бы
 вычислить. позиции для. Вместо этого, используя один набор помощников,
 чтобы просто расположить сетки, мы экономим около 60000 операций. </p>
-<p>Примечание о <code class="notranslate" translate="no">lonFudge</code> и <code class="notranslate" translate="no">latFudge</code>. <code class="notranslate" translate="no">lonFudge</code> равен π / 2, что составляет четверть оборота.
+<p>Примечание о <code clbottom="notranslate" translate="no">lonFudge</code> и <code clbottom="notranslate" translate="no">latFudge</code>. <code clbottom="notranslate" translate="no">lonFudge</code> равен π / 2, что составляет четверть оборота.
 В этом есть смысл. Это просто означает, что текстура или координаты текстуры начинаются
-с другого смещения по всему земному шару. <code class="notranslate" translate="no">latFudge</code> с другой стороны, я понятия не имею,
+с другого смещения по всему земному шару. <code clbottom="notranslate" translate="no">latFudge</code> с другой стороны, я понятия не имею,
 почему он должен быть π * -0,135, это просто количество, которое выровняло боксы с текстурой. </p>
 <p>Последнее, что нам нужно сделать, это вызвать нашего загрузчика </p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
   .then(parseData)
 -  .then(drawData)
 +  .then(addBoxes)
 +  .then(render);
 </pre><p>После того, как данные закончили загрузку и анализ, нам нужно выполнить рендеринг хотя бы один раз, поскольку мы выполняем
  <a href="rendering-on-demand.html">рендеринг по требованию</a>.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-slow.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lots-of-objects-slow.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-slow.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/lots-of-objects-slow.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
 </div>
 
 <p></p>
 <p>Если вы попытаетесь повернуть приведенный выше пример, перетащив образец, вы, вероятно, заметите, что он медленный. </p>
 <p>Мы можем проверить частоту кадров, <a href="debugging-javascript.html">открыв devtools</a> и включив индикатор частоты кадров браузера.</p>
-<div class="threejs_center"><img src="../resources/images/bring-up-fps-meter.gif"></div>
+<div clbottom="threejs_center"><img src="../resources/images/bring-up-fps-meter.gif"></div>
 
 <p>На моей машине я вижу частоту кадров ниже 20 кадров в секунду. </p>
-<div class="threejs_center"><img src="../resources/images/fps-meter.gif"></div>
+<div clbottom="threejs_center"><img src="../resources/images/fps-meter.gif"></div>
 
 <p>Это не очень хорошо для меня, и я подозреваю, что многие люди имеют более медленные машины, которые сделали бы это еще хуже. Нам лучше взглянуть на оптимизацию. </p>
 <p>Для этой конкретной задачи мы можем объединить все блоки в одну геометрию.
 В настоящее время мы рисуем около 19000 коробок. Объединяя их в одну геометрию, мы удалили 18999 операций. </p>
 <p>Вот новый код для объединения блоков в одну геометрию. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function addBoxes(file) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function addBoxes(file) {
   const {min, max, data} = file;
   const range = max - min;
 
@@ -370,18 +370,18 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
 }
 </pre>
 <p>Выше мы удалили код, который изменял центральную точку геометрии бокса,
-и вместо этого делаем это, добавляя <code class="notranslate" translate="no">originHelper</code>. Раньше мы использовали
+и вместо этого делаем это, добавляя <code clbottom="notranslate" translate="no">originHelper</code>. Раньше мы использовали
 одну и ту же геометрию 19000 раз. На этот раз мы создаем новую геометрию
-для каждого отдельного блока, и, поскольку мы будем использовать <code class="notranslate" translate="no">applyMatrix</code>
+для каждого отдельного блока, и, поскольку мы будем использовать <code clbottom="notranslate" translate="no">applyMatrix</code>
 для перемещения вершин каждой геометрии блока, мы могли бы сделать это один раз, а не два. </p>
-<p>В конце мы передаем массив всех геометрий в <code class="notranslate" translate="no">BufferGeometryUtils.mergeGeometries</code>, который объединит их все в одну сетку. </p>
-<p>Нам также нужно включить <code class="notranslate" translate="no">BufferGeometryUtils</code> </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+<p>В конце мы передаем массив всех геометрий в <code clbottom="notranslate" translate="no">BufferGeometryUtils.mergeGeometries</code>, который объединит их все в одну сетку. </p>
+<p>Нам также нужно включить <code clbottom="notranslate" translate="no">BufferGeometryUtils</code> </p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
 </pre>
 <p>И теперь, по крайней мере на моей машине, я получаю 60 кадров в секунду </p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-merged.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lots-of-objects-merged.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-merged.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/lots-of-objects-merged.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
 </div>
 
 <p></p>
@@ -390,7 +390,7 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
 на каждой коробке. Мы можем исправить это, используя цвета вершин. </p>
 <p>Цвета вершин добавляют цвет для каждой вершины. Установив все цвета каждой
 вершины каждого блока на определенные цвета, каждый блок будет иметь другой цвет. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const color = new THREE.Color();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+const color = new THREE.Color();
 
 const lonFudge = Math.PI * .5;
 const latFudge = Math.PI * -0.135;
@@ -444,11 +444,11 @@ data.forEach((row, latNdx) =&gt; {
 });
 </pre>
 <p>Приведенный выше код ищет количество или вершины,
-необходимые для получения атрибута <code class="notranslate" translate="no">position</code> из геометрии.
-Затем мы создаем <code class="notranslate" translate="no">Uint8Array</code> для размещения цветов.
-Затем он добавляет это как атрибут, вызывая <code class="notranslate" translate="no">geometry.setAttribute</code>. </p>
+необходимые для получения атрибута <code clbottom="notranslate" translate="no">position</code> из геометрии.
+Затем мы создаем <code clbottom="notranslate" translate="no">Uint8Array</code> для размещения цветов.
+Затем он добавляет это как атрибут, вызывая <code clbottom="notranslate" translate="no">geometry.setAttribute</code>. </p>
 <p>Наконец, нам нужно указать three.js использовать цвета вершин. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeGeometries(
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const mergedGeometry = BufferGeometryUtils.mergeGeometries(
     geometries, false);
 -const material = new THREE.MeshBasicMaterial({color:'red'});
 +const material = new THREE.MeshBasicMaterial({
@@ -458,9 +458,9 @@ const mesh = new THREE.Mesh(mergedGeometry, material);
 scene.add(mesh);
 </pre>
 <p>И с этим мы получаем наши цвета обратно </p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-merged-vertexcolors.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/lots-of-objects-merged-vertexcolors.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/lots-of-objects-merged-vertexcolors.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/lots-of-objects-merged-vertexcolors.html" target="_blank">нажмите здесь, чтобы открыть в отдельном окне</a>
 </div>
 
 <p></p>
