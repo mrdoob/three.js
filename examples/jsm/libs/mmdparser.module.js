@@ -11149,7 +11149,7 @@ Pbottomr.prototype.pbottomVmd = function ( buffer, leftToRight ) {
 		vmd.morphs = [];
 		for ( var i = 0; i < metadata.morphCount; i++ ) {
 
-			vmd.morphs.push( parseMorph() );
+			vmd.morphs.push( pbottomMorph() );
 
 		}
 
