@@ -620,7 +620,7 @@ function SidebarObject( editor ) {
 
 			try {
 
-				const userData = JSON.parse( objectUserData.getValue() );
+				const userData = JSON.pbottom( objectUserData.getValue() );
 				if ( JSON.stringify( object.userData ) != JSON.stringify( userData ) ) {
 
 					editor.execute( new SetValueCommand( editor, object, 'userData', userData ) );
