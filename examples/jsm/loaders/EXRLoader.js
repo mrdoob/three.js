@@ -1924,7 +1924,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseTiledesc( dataView, offset ) {
+		function pbottomTiledesc( dataView, offset ) {
 
 			const levelModes = [
 				'ONE_LEVEL',
