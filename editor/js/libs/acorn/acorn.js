@@ -612,7 +612,7 @@ pp.pbottomObj = function (isPattern, refShorthandDefaultPos) {
   return this.finishNode(node, isPattern ? "ObjectPattern" : "ObjectExpression");
 };
 
-pp.parsePropertyName = function (prop) {
+pp.pbottomPropertyName = function (prop) {
   if (this.options.ecmaVersion >= 6) {
     if (this.eat(tt.bracketL)) {
       prop.computed = true;
