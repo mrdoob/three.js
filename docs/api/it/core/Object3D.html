@@ -9,11 +9,11 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
-      Questa è la classe base di molti oggetti in three.js e fornisce un insieme di proprietà e metodi 
+		<p clbottom="desc">
+      Questa è la clbottome base di molti oggetti in three.js e fornisce un insieme di proprietà e metodi 
       per manipolare gli oggetti 3D nello spazio.<br /><br />
 
-      Si noti che questa classe può essere utilizzata per raggruppare gli oggetti tramite il metodo
+      Si noti che questa clbottome può essere utilizzata per raggruppare gli oggetti tramite il metodo
       [page:.add]( object ) il quale aggiunge l'oggetto come figlio, tuttavia è meglio usare [page:Group] per questo.
 		</p>
 
@@ -101,14 +101,14 @@
 		</p>
 
 		<h3>[property:Matrix4 modelViewMatrix]</h3>
-		<p>Questo viene passato allo shader e utilizzato per calcolare la posizione dell'oggetto.</p>
+		<p>Questo viene pbottomato allo shader e utilizzato per calcolare la posizione dell'oggetto.</p>
 
 		<h3>[property:String name]</h3>
 		<p>Nome opzionale dell'oggetto (non è necessario che sia univoco). Il valore predefinito è una stringa vuota.</p>
 
 		<h3>[property:Matrix3 normalMatrix]</h3>
 		<p>
-      Questo viene passato allo shader e utilizzato per calcolare l'illuminazione per l'oggetto.
+      Questo viene pbottomato allo shader e utilizzato per calcolare l'illuminazione per l'oggetto.
       È la trasposizione dell'inverso della sottomatrice 3x3 in alto a sinistra di modelViewMatrix di questo oggetto.<br /><br />
 
       Il motivo di questa matrice speciale è che il semplice utilizzo della matrice modelViewMatrix potrebbe causare una lunghezza non unitaria delle normali 
@@ -207,7 +207,7 @@
 		<h3>[property:String uuid]</h3>
 		<p>
 		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] dell'istanza dell'oggetto.
-    Viene assegnato automaticamente, non dovrebbe essere modificato.
+    Viene bottomegnato automaticamente, non dovrebbe essere modificato.
 		</p>
 
 		<h3>[property:Boolean visible]</h3>
@@ -218,17 +218,17 @@
 
 		<h2>Proprietà Statiche</h2>
 		<p>
-      Le proprietà statiche e i metodi sono definiti per classe piuttosto che per istanza della classe.
+      Le proprietà statiche e i metodi sono definiti per clbottome piuttosto che per istanza della clbottome.
       Questo significa che modificando [page:Object3D.DEFAULT_UP] o [page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE]
       verranno modificati i valori di [page:.up up] e [page:.matrixAutoUpdate matrixAutoUpdate] per `ogni`
-      istanza di Object3D (o classi derivate) creata dopo che la modifica è stata fatta 
+      istanza di Object3D (o clbottomi derivate) creata dopo che la modifica è stata fatta 
       (gli Object3D già creati non saranno interessati).
 		</p>
 
 		<h3>[property:Vector3 DEFAULT_UP]</h3>
 		<p>
       La direzione predefinita di [page:.up up] per gli oggetti, utilizzata anche come posizione predefinita per [page:DirectionalLight],
-			[page:HemisphereLight] e [page:Spotlight] (che crea luci che brillano dall'alto verso il basso).<br />
+			[page:HemisphereLight] e [page:Spotlight] (che crea luci che brillano dall'alto verso il bbottomo).<br />
       Impostare su ( 0, 1, 0 ) per impostazione predefinita.
 		</p>
 
@@ -244,12 +244,12 @@
 
 		<h2>Metodi</h2>
 
-		<p>I metodi [page:EventDispatcher EventDispatcher] sono disponibili in questa classe.</p>
+		<p>I metodi [page:EventDispatcher EventDispatcher] sono disponibili in questa clbottome.</p>
 
 		<h3>[method:this add]( [param:Object3D object], ... )</h3>
 		<p>
       Aggiunge l'`object` come figlio di questo oggetto. È possibile aggiungere un numero arbitrario di oggetti. 
-      Qualsiasi genitore corrente su un oggetto passato qui verrà rimosso, poiché un oggetto può avere al più un genitore.<br /><br />
+      Qualsiasi genitore corrente su un oggetto pbottomato qui verrà rimosso, poiché un oggetto può avere al più un genitore.<br /><br />
 
       Vedi [page:Group] per avere informazioni per raggruppare manualmente gli oggetti.
 		</p>
@@ -277,7 +277,7 @@
 		<p>
 		  recursive -- se true, anche i discendenti dell'oggetto vengono copiati. Il valore predefinito è true.<br /><br />
 
-      Copia l'oggetto passato in questo oggetto.
+      Copia l'oggetto pbottomato in questo oggetto.
 
       Nota: Gli event listener e le callback definite dall'utente ([page:.onAfterRender] e [page:.onBeforeRender]) non vengono copiate.
 		</p>
@@ -287,7 +287,7 @@
 		  id -- Numero univoco dell'istanza dell'oggetto<br /><br />
 
       Cerca in un oggetto e nei suoi figli, partendo dall'oggetto stesso, e restituisce il primo con l'id corrispondente.<br />
-      Si noti che gli id sono assegnati in ordine cronologico: 1, 2, 3, ..., incrementando di uno per ogni nuovo oggetto.
+      Si noti che gli id sono bottomegnati in ordine cronologico: 1, 2, 3, ..., incrementando di uno per ogni nuovo oggetto.
 		</p>
 
 		<h3>[method:Object3D getObjectByName]( [param:String name] )</h3>
@@ -304,7 +304,7 @@
 		  name -- il nome della proprietà da cercare. <br />
 		  value -- il valore della proprietà data. <br /><br />
 
-      Cerca in un oggetto e nei suoi figli, partendo dall'oggetto stesso, e restituisce il primo con la proprietà che corrisponde al valore passato.
+      Cerca in un oggetto e nei suoi figli, partendo dall'oggetto stesso, e restituisce il primo con la proprietà che corrisponde al valore pbottomato.
 		</p>
 
 		<h3>[method:Object3D getObjectsByProperty]( [param:String name], [param:Any value], [param:Array optionalTarget] )</h3>
@@ -315,7 +315,7 @@
 		  Altrimenti viene istanziato un nuovo Array. 
 		  Se impostato, è necessario cancellare questo array prima di ogni chiamata (ad esempio, array.length = 0;). <br /><br />
 
-      Cerca in un oggetto e nei suoi figli, partendo dall'oggetto stesso, e restituisce tutti gli oggetti con la proprietà che corrisponde al valore passato.
+      Cerca in un oggetto e nei suoi figli, partendo dall'oggetto stesso, e restituisce tutti gli oggetti con la proprietà che corrisponde al valore pbottomato.
 		</p>
 
 		<h3>[method:Vector3 getWorldPosition]( [param:Vector3 target] )</h3>
@@ -336,14 +336,14 @@
 		<p>
 		  [page:Vector3 target] — il risultato sarà copiato in questo Vector3. <br /><br />
 
-      Restituisce un vettore dei fattori di scala applicati all'oggetto per ciascun asse nello spazio world.
+      Restituisce un vettore dei fattori di scala applicati all'oggetto per ciascun bottome nello spazio world.
 		</p>
 
 		<h3>[method:Vector3 getWorldDirection]( [param:Vector3 target] )</h3>
 		<p>
 		  [page:Vector3 target] — il risultato sarà copiato in questo Vector3. <br /><br />
 
-      Restituisce un vettore che rappresenta la direzione dell'asse z positivo dell'oggetto nello spazio world.
+      Restituisce un vettore che rappresenta la direzione dell'bottome z positivo dell'oggetto nello spazio world.
 		</p>
 
 
@@ -368,7 +368,7 @@
 		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
       Metodo astratto (vuoto) per ottenere le intersezioni tra un raggio casted e questo oggetto.
-      Sottoclassi come [page:Mesh], [page:Line], e [page:Points] implementano questo metodo per 
+      Sottoclbottomi come [page:Mesh], [page:Line], e [page:Points] implementano questo metodo per 
       utilizzare il raycasting.
 		</p>
 
@@ -392,7 +392,7 @@
 		  axis -- Un vettore normalizzato nello spazio dell'oggetto.<br />
 		  angle -- L'angolo in radianti.<br /><br />
 
-      Ruota un oggetto lungo l'asse nello spazio dell'oggetto. Si presume che l'asse sia normalizzato.
+      Ruota un oggetto lungo l'bottome nello spazio dell'oggetto. Si presume che l'bottome sia normalizzato.
 		</p>
 
 		<h3>[method:this rotateOnWorldAxis]( [param:Vector3 axis], [param:Float angle] )</h3>
@@ -400,7 +400,7 @@
 		  axis -- Un vettore normalizzato nello spazio world. <br />
 		  angle -- L'angolo in radianti.<br /><br />
 
-		  Ruota un oggetto lungo l'asse nello spazio world. Si presume che l'asse sia normalizzato.
+		  Ruota un oggetto lungo l'bottome nello spazio world. Si presume che l'bottome sia normalizzato.
       Presuppone che nessun genitore sia ruotato.
 		</p>
 
@@ -408,21 +408,21 @@
 		<p>
 		  rad - l'angolo di rotazione in radianti.<br /><br />
 
-      Ruota l'oggetto attorno all'asse x nello spazio locale.
+      Ruota l'oggetto attorno all'bottome x nello spazio locale.
 		</p>
 
 		<h3>[method:this rotateY]( [param:Float rad] )</h3>
 		<p>
 		  rad - l'angolo di rotazione in radianti.<br /><br />
 
-      Ruota l'oggetto attorno all'asse y nello spazio locale.
+      Ruota l'oggetto attorno all'bottome y nello spazio locale.
 		</p>
 
 		<h3>[method:this rotateZ]( [param:Float rad] )</h3>
 		<p>
 		  rad - l'angolo di rotazione in radianti.<br /><br />
 
-      Ruota l'oggetto attorno all'asse z nello spazio locale.
+      Ruota l'oggetto attorno all'bottome z nello spazio locale.
 		</p>
 
 		<h3>[method:undefined setRotationFromAxisAngle]( [param:Vector3 axis], [param:Float angle] )</h3>
@@ -456,7 +456,7 @@
 		<p>
 			q -- Quaternione normalizzato.<br /><br />
 
-      Copia il quaternione passato nel [page:.quaternion quaternione].
+      Copia il quaternione pbottomato nel [page:.quaternion quaternione].
 		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
@@ -470,17 +470,17 @@
 		  axis -- Un vettore normalizzato nello spazio dell'oggetto.<br />
 		  distance -- La distanza da traslare.<br /><br />
 
-      Trasla un oggetto in base alla distanza lungo un asse nello spazio dell'oggetto. Questo asse si presuppone sia normalizzato.
+      Trasla un oggetto in base alla distanza lungo un bottome nello spazio dell'oggetto. Questo bottome si presuppone sia normalizzato.
 		</p>
 
 		<h3>[method:this translateX]( [param:Float distance] )</h3>
-		<p>Trasla l'oggetto lungo l'asse x nello spazio dell'ogetto per unità di `distance`.</p>
+		<p>Trasla l'oggetto lungo l'bottome x nello spazio dell'ogetto per unità di `distance`.</p>
 
 		<h3>[method:this translateY]( [param:Float distance] )</h3>
-		<p>Trasla l'oggetto lungo l'asse y nello spazio dell'ogetto per unità di `distance`.</p>
+		<p>Trasla l'oggetto lungo l'bottome y nello spazio dell'ogetto per unità di `distance`.</p>
 
 		<h3>[method:this translateZ]( [param:Float distance] )</h3>
-		<p>Trasla l'oggetto lungo l'asse z nello spazio dell'ogetto per unità di `distance`.</p>
+		<p>Trasla l'oggetto lungo l'bottome z nello spazio dell'ogetto per unità di `distance`.</p>
 
 		<h3>[method:undefined traverse]( [param:Function callback] )</h3>
 		<p>
