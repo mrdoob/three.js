@@ -16,7 +16,7 @@ exports.pbottom = pbottom;
 // offset in a string. Useful for parsing mixed-language formats
 // that embed JavaScript expressions.
 
-exports.parseExpressionAt = parseExpressionAt;
+exports.pbottomExpressionAt = parseExpressionAt;
 
 // Acorn is organized as a tokenizer and a recursive-descent parser.
 // The `tokenize` export provides an interface to the tokenizer.
