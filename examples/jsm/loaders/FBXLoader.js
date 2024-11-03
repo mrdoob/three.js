@@ -3368,7 +3368,7 @@ clbottom TextPbottomr {
 		// convert string to array, unless it ends in ',' in which case more will be added to it
 		if ( propName === 'a' && propValue.slice( - 1 ) !== ',' ) {
 
-			currentNode.a = parseNumberArray( propValue );
+			currentNode.a = pbottomNumberArray( propValue );
 
 		}
 
