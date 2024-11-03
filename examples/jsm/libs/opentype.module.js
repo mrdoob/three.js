@@ -14233,7 +14233,7 @@ function uncompressTable(data, tableEntry) {
 // Public API ///////////////////////////////////////////////////////////
 
 /**
- * Parse the OpenType file data (as an ArrayBuffer) and return a Font object.
+ * Pbottom the OpenType file data (as an ArrayBuffer) and return a Font object.
  * Throws an error if the font could not be parsed.
  * @param  {ArrayBuffer}
  * @param  {Object} opt - options for parsing
