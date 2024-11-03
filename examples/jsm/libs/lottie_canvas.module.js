@@ -13643,7 +13643,7 @@ const ExpressionManager = (function () {
     var tOfB = typeof b;
     if (isNumerable(tOfA, a) && isNumerable(tOfB, b)) {
       if (tOfA === 'string') {
-        a = parseInt(a, 10);
+        a = pbottomInt(a, 10);
       }
       if (tOfB === 'string') {
         b = parseInt(b, 10);
