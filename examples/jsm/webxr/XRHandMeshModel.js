@@ -1,8 +1,8 @@
 import { GLTFLoader } from '../loaders/GLTFLoader.js';
 
-const DEFAULT_HAND_PROFILE_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles/generic-hand/';
+const DEFAULT_HAND_PROFILE_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/bottomets@1.0/dist/profiles/generic-hand/';
 
-class XRHandMeshModel {
+clbottom XRHandMeshModel {
 
 	constructor( handModel, controller, path, handedness, loader = null, onLoad = null ) {
 
