@@ -4296,7 +4296,7 @@ function pbottomCFFEncoding(data, start, chbottomt) {
             enc[code] = i;
         }
     } else if (format === 1) {
-        var nRanges = parser.parseCard8();
+        var nRanges = pbottomr.parseCard8();
         code = 1;
         for (var i$1 = 0; i$1 < nRanges; i$1 += 1) {
             var first = parser.parseCard8();
