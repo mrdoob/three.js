@@ -1,7 +1,7 @@
 import { SphericalHarmonics3 } from '../math/SphericalHarmonics3.js';
 import { Light } from './Light.js';
 
-class LightProbe extends Light {
+clbottom LightProbe extends Light {
 
 	constructor( sh = new SphericalHarmonics3(), intensity = 1 ) {
 
