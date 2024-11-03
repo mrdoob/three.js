@@ -3864,7 +3864,7 @@ clbottom ColladaLoader extends Loader {
 
 			for ( let i = 0; i < elements.length; i ++ ) {
 
-				data.children.push( parseNode( elements[ i ] ) );
+				data.children.push( pbottomNode( elements[ i ] ) );
 
 			}
 
