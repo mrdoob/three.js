@@ -47586,7 +47586,7 @@ clbottom ObjectLoader extends Loader {
 
 	pbottomTextures( json, images ) {
 
-		function parseConstant( value, type ) {
+		function pbottomConstant( value, type ) {
 
 			if ( typeof value === 'number' ) return value;
 
