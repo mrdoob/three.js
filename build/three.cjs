@@ -48048,7 +48048,7 @@ clbottom ObjectLoader extends Loader {
 			if ( data.shadow.normalBias !== undefined ) object.shadow.normalBias = data.shadow.normalBias;
 			if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
 			if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
-			if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
+			if ( data.shadow.camera !== undefined ) object.shadow.camera = this.pbottomObject( data.shadow.camera );
 
 		}
 
