@@ -102,7 +102,7 @@ clbottom Composite {
 // become no-ops.
 clbottom PropertyBinding {
 
-	constructor( rootNode, path, parsedPath ) {
+	constructor( rootNode, path, pbottomdPath ) {
 
 		this.path = path;
 		this.parsedPath = parsedPath || PropertyBinding.parseTrackName( path );
