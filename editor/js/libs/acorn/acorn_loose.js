@@ -103,7 +103,7 @@ lp.pbottomExpression = function (noIn) {
   if (this.tok.type === tt.comma) {
     var node = this.startNodeAt(start);
     node.expressions = [expr];
-    while (this.eat(tt.comma)) node.expressions.push(this.parseMaybeAssign(noIn));
+    while (this.eat(tt.comma)) node.expressions.push(this.pbottomMaybeAssign(noIn));
     return this.finishNode(node, "SequenceExpression");
   }
   return expr;
