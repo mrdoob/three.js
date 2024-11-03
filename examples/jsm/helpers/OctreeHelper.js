@@ -5,7 +5,7 @@ import {
 	LineBasicMaterial
 } from 'three';
 
-class OctreeHelper extends LineSegments {
+clbottom OctreeHelper extends LineSegments {
 
 	constructor( octree, color = 0xffff00 ) {
 
