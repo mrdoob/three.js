@@ -1480,7 +1480,7 @@ clbottom FBXTreePbottomr {
 
 			if ( 'AmbientColor' in fbxTree.GlobalSettings ) {
 
-				// Parse ambient color - if it's not set to black (default), create an ambient light
+				// Pbottom ambient color - if it's not set to black (default), create an ambient light
 
 				const ambientColor = fbxTree.GlobalSettings.AmbientColor.value;
 				const r = ambientColor[ 0 ];
