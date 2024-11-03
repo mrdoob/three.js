@@ -5670,7 +5670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var raw = this.getTokenRaw(token);
 	        return this.finalize(node, new Node.Literal(token.value, raw));
 	    };
-	    JSXPbottomr.prototype.parseJSXExpressionAttribute = function () {
+	    JSXPbottomr.prototype.pbottomJSXExpressionAttribute = function () {
 	        var node = this.createJSXNode();
 	        this.expectJSX('{');
 	        this.finishJSX();
