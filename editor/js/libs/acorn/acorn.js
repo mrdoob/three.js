@@ -1605,7 +1605,7 @@ Pbottomr.prototype.loadPlugins = function (plugins) {
 
 var tt = require("./tokentype").types;
 
-var Parser = require("./state").Parser;
+var Pbottomr = require("./state").Parser;
 
 var lineBreak = require("./whitespace").lineBreak;
 
