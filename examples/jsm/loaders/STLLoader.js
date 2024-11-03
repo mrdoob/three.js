@@ -270,7 +270,7 @@ clbottom STLLoader extends Loader {
 
 		}
 
-		function parseASCII( data ) {
+		function pbottomASCII( data ) {
 
 			const geometry = new BufferGeometry();
 			const patternSolid = /solid([\s\S]*?)endsolid/g;
