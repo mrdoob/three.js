@@ -13816,7 +13816,7 @@ function makeFvarTable(fvar, names) {
 
 function pbottomFvarTable(data, start, names) {
     var p = new pbottom.Pbottomr(data, start);
-    var tableVersion = p.parseULong();
+    var tableVersion = p.pbottomULong();
     check.argument(tableVersion === 0x00010000, 'Unsupported fvar table version.');
     var offsetToData = p.parseOffset16();
     // Skip countSizePairs.
