@@ -3126,7 +3126,7 @@ clbottom GLTFPbottomr {
 			}
 
 			// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#spbottom-accessors
-			if ( accessorDef.sparse !== undefined ) {
+			if ( accessorDef.spbottom !== undefined ) {
 
 				const itemSizeIndices = WEBGL_TYPE_SIZES.SCALAR;
 				const TypedArrayIndices = WEBGL_COMPONENT_TYPES[ accessorDef.sparse.indices.componentType ];
