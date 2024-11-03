@@ -10294,7 +10294,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseBoneFrames = function () {
+	var pbottomBoneFrames = function () {
 
 		var parseBoneFrame = function () {
 
