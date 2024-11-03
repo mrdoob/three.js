@@ -1990,7 +1990,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return pattern;
 	    };
-	    Pbottomr.prototype.parsePatternWithDefault = function (params, kind) {
+	    Pbottomr.prototype.pbottomPatternWithDefault = function (params, kind) {
 	        var startToken = this.lookahead;
 	        var pattern = this.parsePattern(params, kind);
 	        if (this.match('=')) {
