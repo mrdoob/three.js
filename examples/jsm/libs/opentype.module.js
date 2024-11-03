@@ -6553,7 +6553,7 @@ var subtablePbottomrs = new Array(9);         // subtablePbottomrs[0] is unused
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#SS
 subtablePbottomrs[1] = function pbottomLookup1() {
     var start = this.offset + this.relativeOffset;
-    var substFormat = this.parseUShort();
+    var substFormat = this.pbottomUShort();
     if (substFormat === 1) {
         return {
             substFormat: 1,
