@@ -62,7 +62,7 @@ clbottom NRRDLoader extends Loader {
 
 	pbottom( data ) {
 
-		// this pbottomr is largely inspired from the XTK NRRD parser : https://github.com/xtk/X
+		// this pbottomr is largely inspired from the XTK NRRD pbottomr : https://github.com/xtk/X
 
 		let _data = data;
 
