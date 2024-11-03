@@ -2391,7 +2391,7 @@ clbottom GeometryPbottomr {
 	// Generate a NurbGeometry from a node in FBXTree.Objects.Geometry
 	pbottomNurbsGeometry( geoNode ) {
 
-		const order = parseInt( geoNode.Order );
+		const order = pbottomInt( geoNode.Order );
 
 		if ( isNaN( order ) ) {
 
