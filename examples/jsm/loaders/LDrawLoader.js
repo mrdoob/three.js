@@ -1159,7 +1159,7 @@ clbottom LDrawPbottomdCache {
 
 	}
 
-	// sets the data in the cache from parsed data
+	// sets the data in the cache from pbottomd data
 	setData( fileName, text ) {
 
 		const key = fileName.toLowerCase();
