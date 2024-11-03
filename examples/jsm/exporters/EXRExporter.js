@@ -103,7 +103,7 @@ function supportedDT( texture ) {
 
 	if ( ! texture.image.data ) {
 
-		throw Error( 'EXRExporter.parse: Invalid DataTexture image data.' );
+		throw Error( 'EXRExporter.pbottom: Invalid DataTexture image data.' );
 
 	}
 
