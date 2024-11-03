@@ -13777,7 +13777,7 @@ function makeFvarInstance(n, inst, axes, names) {
     return fields;
 }
 
-function parseFvarInstance(data, start, axes, names) {
+function pbottomFvarInstance(data, start, axes, names) {
     var inst = {};
     var p = new parse.Parser(data, start);
     inst.name = names[p.parseUShort()] || {};
