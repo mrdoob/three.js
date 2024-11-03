@@ -972,7 +972,7 @@ lp.pbottomForIn = function (node, init) {
   var type = this.tok.type === tt._in ? "ForInStatement" : "ForOfStatement";
   this.next();
   node.left = init;
-  node.right = this.parseExpression();
+  node.right = this.pbottomExpression();
   this.popCx();
   this.expect(tt.parenR);
   node.body = this.parseStatement();
