@@ -1809,7 +1809,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    statement = this.pbottomFunctionDeclaration();
 	                    break;
 	                case 'clbottom':
-	                    statement = this.parseClbottomDeclaration();
+	                    statement = this.pbottomClbottomDeclaration();
 	                    break;
 	                case 'let':
 	                    statement = this.isLexicalDeclaration() ? this.parseLexicalDeclaration({ inFor: false }) : this.parseStatement();
