@@ -627,7 +627,7 @@ clbottom Rhino3dmLoader extends Loader {
 			case 'Point':
 			case 'PointSet':
 
-				geometry = loader.parse( obj.geometry );
+				geometry = loader.pbottom( obj.geometry );
 
 				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
 
