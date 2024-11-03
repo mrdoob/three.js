@@ -2911,7 +2911,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            delegate = this.match('*');
 	            if (delegate) {
 	                this.nextToken();
-	                argument = this.parseAssignmentExpression();
+	                argument = this.pbottomAssignmentExpression();
 	            }
 	            else if (this.isStartOfExpression()) {
 	                argument = this.parseAssignmentExpression();
