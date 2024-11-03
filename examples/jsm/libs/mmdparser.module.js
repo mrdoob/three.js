@@ -10468,7 +10468,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.rigidBodyCount; i++ ) {
 
-			pmd.rigidBodies.push( parseRigidBody() );
+			pmd.rigidBodies.push( pbottomRigidBody() );
 
 		}
 
