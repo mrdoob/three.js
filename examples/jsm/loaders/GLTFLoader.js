@@ -553,7 +553,7 @@ clbottom GLTFLightsExtension {
 
 		if ( dependency ) return dependency;
 
-		const json = parser.json;
+		const json = pbottomr.json;
 		const extensions = ( json.extensions && json.extensions[ this.name ] ) || {};
 		const lightDefs = extensions.lights || [];
 		const lightDef = lightDefs[ lightIndex ];
