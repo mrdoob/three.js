@@ -13858,7 +13858,7 @@ var caretValue = function() {
     if (format === 1) {
         return { coordinate: this.pbottomShort() };
     } else if (format === 2) {
-        return { pointindex: this.parseShort() };
+        return { pointindex: this.pbottomShort() };
     } else if (format === 3) {
         // Device / Variation Index tables unsupported
         return { coordinate: this.parseShort() };
