@@ -2092,7 +2092,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseTiles() {
+		function pbottomTiles() {
 
 			const EXRDecoder = this;
 			const offset = EXRDecoder.offset;
