@@ -19,145 +19,145 @@ export default QUnit.module( 'Maths', () => {
 	QUnit.module( 'Ray', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			let a = new Ray();
-			assert.ok( a.origin.equals( zero3 ), 'Passed!' );
-			assert.ok( a.direction.equals( new Vector3( 0, 0, - 1 ) ), 'Passed!' );
+			bottomert.ok( a.origin.equals( zero3 ), 'Pbottomed!' );
+			bottomert.ok( a.direction.equals( new Vector3( 0, 0, - 1 ) ), 'Pbottomed!' );
 
 			a = new Ray( two3.clone(), one3.clone() );
-			assert.ok( a.origin.equals( two3 ), 'Passed!' );
-			assert.ok( a.direction.equals( one3 ), 'Passed!' );
+			bottomert.ok( a.origin.equals( two3 ), 'Pbottomed!' );
+			bottomert.ok( a.direction.equals( one3 ), 'Pbottomed!' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'set', ( assert ) => {
+		QUnit.test( 'set', ( bottomert ) => {
 
 			const a = new Ray();
 
 			a.set( one3, one3 );
-			assert.ok( a.origin.equals( one3 ), 'Passed!' );
-			assert.ok( a.direction.equals( one3 ), 'Passed!' );
+			bottomert.ok( a.origin.equals( one3 ), 'Pbottomed!' );
+			bottomert.ok( a.direction.equals( one3 ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'recast/clone', ( assert ) => {
+		QUnit.test( 'recast/clone', ( bottomert ) => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
-			assert.ok( a.recast( 0 ).equals( a ), 'Passed!' );
+			bottomert.ok( a.recast( 0 ).equals( a ), 'Pbottomed!' );
 
 			const b = a.clone();
-			assert.ok( b.recast( - 1 ).equals( new Ray( new Vector3( 1, 1, 0 ), new Vector3( 0, 0, 1 ) ) ), 'Passed!' );
+			bottomert.ok( b.recast( - 1 ).equals( new Ray( new Vector3( 1, 1, 0 ), new Vector3( 0, 0, 1 ) ) ), 'Pbottomed!' );
 
 			const c = a.clone();
-			assert.ok( c.recast( 1 ).equals( new Ray( new Vector3( 1, 1, 2 ), new Vector3( 0, 0, 1 ) ) ), 'Passed!' );
+			bottomert.ok( c.recast( 1 ).equals( new Ray( new Vector3( 1, 1, 2 ), new Vector3( 0, 0, 1 ) ) ), 'Pbottomed!' );
 
 			const d = a.clone();
 			const e = d.clone().recast( 1 );
-			assert.ok( d.equals( a ), 'Passed!' );
-			assert.ok( ! e.equals( d ), 'Passed!' );
-			assert.ok( e.equals( c ), 'Passed!' );
+			bottomert.ok( d.equals( a ), 'Pbottomed!' );
+			bottomert.ok( ! e.equals( d ), 'Pbottomed!' );
+			bottomert.ok( e.equals( c ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'copy/equals', ( assert ) => {
+		QUnit.test( 'copy/equals', ( bottomert ) => {
 
 			const a = new Ray( zero3.clone(), one3.clone() );
 			const b = new Ray().copy( a );
-			assert.ok( b.origin.equals( zero3 ), 'Passed!' );
-			assert.ok( b.direction.equals( one3 ), 'Passed!' );
+			bottomert.ok( b.origin.equals( zero3 ), 'Pbottomed!' );
+			bottomert.ok( b.direction.equals( one3 ), 'Pbottomed!' );
 
 			// ensure that it is a true copy
 			a.origin = zero3;
 			a.direction = one3;
-			assert.ok( b.origin.equals( zero3 ), 'Passed!' );
-			assert.ok( b.direction.equals( one3 ), 'Passed!' );
+			bottomert.ok( b.origin.equals( zero3 ), 'Pbottomed!' );
+			bottomert.ok( b.direction.equals( one3 ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'at', ( assert ) => {
+		QUnit.test( 'at', ( bottomert ) => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			const point = new Vector3();
 
 			a.at( 0, point );
-			assert.ok( point.equals( one3 ), 'Passed!' );
+			bottomert.ok( point.equals( one3 ), 'Pbottomed!' );
 			a.at( - 1, point );
-			assert.ok( point.equals( new Vector3( 1, 1, 0 ) ), 'Passed!' );
+			bottomert.ok( point.equals( new Vector3( 1, 1, 0 ) ), 'Pbottomed!' );
 			a.at( 1, point );
-			assert.ok( point.equals( new Vector3( 1, 1, 2 ) ), 'Passed!' );
+			bottomert.ok( point.equals( new Vector3( 1, 1, 2 ) ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'lookAt', ( assert ) => {
+		QUnit.test( 'lookAt', ( bottomert ) => {
 
 			const a = new Ray( two3.clone(), one3.clone() );
 			const target = one3.clone();
 			const expected = target.sub( two3 ).normalize();
 
 			a.lookAt( target );
-			assert.ok( a.direction.equals( expected ), 'Check if we\'re looking in the right direction' );
+			bottomert.ok( a.direction.equals( expected ), 'Check if we\'re looking in the right direction' );
 
 		} );
 
-		QUnit.test( 'closestPointToPoint', ( assert ) => {
+		QUnit.test( 'closestPointToPoint', ( bottomert ) => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			const point = new Vector3();
 
 			// behind the ray
 			a.closestPointToPoint( zero3, point );
-			assert.ok( point.equals( one3 ), 'Passed!' );
+			bottomert.ok( point.equals( one3 ), 'Pbottomed!' );
 
 			// front of the ray
 			a.closestPointToPoint( new Vector3( 0, 0, 50 ), point );
-			assert.ok( point.equals( new Vector3( 1, 1, 50 ) ), 'Passed!' );
+			bottomert.ok( point.equals( new Vector3( 1, 1, 50 ) ), 'Pbottomed!' );
 
 			// exactly on the ray
 			a.closestPointToPoint( one3, point );
-			assert.ok( point.equals( one3 ), 'Passed!' );
+			bottomert.ok( point.equals( one3 ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'distanceToPoint', ( assert ) => {
+		QUnit.test( 'distanceToPoint', ( bottomert ) => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
 			// behind the ray
 			const b = a.distanceToPoint( zero3 );
-			assert.ok( b === Math.sqrt( 3 ), 'Passed!' );
+			bottomert.ok( b === Math.sqrt( 3 ), 'Pbottomed!' );
 
 			// front of the ray
 			const c = a.distanceToPoint( new Vector3( 0, 0, 50 ) );
-			assert.ok( c === Math.sqrt( 2 ), 'Passed!' );
+			bottomert.ok( c === Math.sqrt( 2 ), 'Pbottomed!' );
 
 			// exactly on the ray
 			const d = a.distanceToPoint( one3 );
-			assert.ok( d === 0, 'Passed!' );
+			bottomert.ok( d === 0, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'distanceSqToPoint', ( assert ) => {
+		QUnit.test( 'distanceSqToPoint', ( bottomert ) => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
 			// behind the ray
 			const b = a.distanceSqToPoint( zero3 );
-			assert.ok( b === 3, 'Passed!' );
+			bottomert.ok( b === 3, 'Pbottomed!' );
 
 			// front of the ray
 			const c = a.distanceSqToPoint( new Vector3( 0, 0, 50 ) );
-			assert.ok( c === 2, 'Passed!' );
+			bottomert.ok( c === 2, 'Pbottomed!' );
 
 			// exactly on the ray
 			const d = a.distanceSqToPoint( one3 );
-			assert.ok( d === 0, 'Passed!' );
+			bottomert.ok( d === 0, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'distanceSqToSegment', ( assert ) => {
+		QUnit.test( 'distanceSqToSegment', ( bottomert ) => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			const ptOnLine = new Vector3();
@@ -168,33 +168,33 @@ export default QUnit.module( 'Maths', () => {
 			let v1 = new Vector3( 50, 50, 50 ); // just a far away point
 			let distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
 
-			assert.ok( ptOnSegment.distanceTo( v0 ) < 0.0001, 'Passed!' );
-			assert.ok( ptOnLine.distanceTo( new Vector3( 1, 1, 50 ) ) < 0.0001, 'Passed!' );
+			bottomert.ok( ptOnSegment.distanceTo( v0 ) < 0.0001, 'Pbottomed!' );
+			bottomert.ok( ptOnLine.distanceTo( new Vector3( 1, 1, 50 ) ) < 0.0001, 'Pbottomed!' );
 			// ((3-1) * (3-1) + (5-1) * (5-1) = 4 + 16 = 20
-			assert.ok( Math.abs( distSqr - 20 ) < 0.0001, 'Passed!' );
+			bottomert.ok( Math.abs( distSqr - 20 ) < 0.0001, 'Pbottomed!' );
 
 			//segment behind the ray
 			v0 = new Vector3( - 50, - 50, - 50 ); // just a far away point
 			v1 = new Vector3( - 3, - 5, - 4 );
 			distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
 
-			assert.ok( ptOnSegment.distanceTo( v1 ) < 0.0001, 'Passed!' );
-			assert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, 'Passed!' );
+			bottomert.ok( ptOnSegment.distanceTo( v1 ) < 0.0001, 'Pbottomed!' );
+			bottomert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, 'Pbottomed!' );
 			// ((-3-1) * (-3-1) + (-5-1) * (-5-1) + (-4-1) + (-4-1) = 16 + 36 + 25 = 77
-			assert.ok( Math.abs( distSqr - 77 ) < 0.0001, 'Passed!' );
+			bottomert.ok( Math.abs( distSqr - 77 ) < 0.0001, 'Pbottomed!' );
 
 			//exact intersection between the ray and the segment
 			v0 = new Vector3( - 50, - 50, - 50 );
 			v1 = new Vector3( 50, 50, 50 );
 			distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
 
-			assert.ok( ptOnSegment.distanceTo( one3 ) < 0.0001, 'Passed!' );
-			assert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, 'Passed!' );
-			assert.ok( distSqr < 0.0001, 'Passed!' );
+			bottomert.ok( ptOnSegment.distanceTo( one3 ) < 0.0001, 'Pbottomed!' );
+			bottomert.ok( ptOnLine.distanceTo( one3 ) < 0.0001, 'Pbottomed!' );
+			bottomert.ok( distSqr < 0.0001, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'intersectSphere', ( assert ) => {
+		QUnit.test( 'intersectSphere', ( bottomert ) => {
 
 			const TOL = 0.0001;
 			const point = new Vector3();
@@ -207,37 +207,37 @@ export default QUnit.module( 'Maths', () => {
 			// sphere (radius of 2) located behind ray a0, should result in null
 			let b = new Sphere( new Vector3( 0, 0, 3 ), 2 );
 			a0.intersectSphere( b, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'Passed!' );
+			bottomert.ok( point.equals( posInf3 ), 'Pbottomed!' );
 
 			// sphere (radius of 2) located in front of, but too far right of ray a0, should result in null
 			b = new Sphere( new Vector3( 3, 0, - 1 ), 2 );
 			a0.intersectSphere( b, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'Passed!' );
+			bottomert.ok( point.equals( posInf3 ), 'Pbottomed!' );
 
 			// sphere (radius of 2) located below ray a1, should result in null
 			b = new Sphere( new Vector3( 1, - 2, 1 ), 2 );
 			a1.intersectSphere( b, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'Passed!' );
+			bottomert.ok( point.equals( posInf3 ), 'Pbottomed!' );
 
 			// sphere (radius of 1) located to the left of ray a1, should result in intersection at 0, 1, 1
 			b = new Sphere( new Vector3( - 1, 1, 1 ), 1 );
 			a1.intersectSphere( b, point );
-			assert.ok( point.distanceTo( new Vector3( 0, 1, 1 ) ) < TOL, 'Passed!' );
+			bottomert.ok( point.distanceTo( new Vector3( 0, 1, 1 ) ) < TOL, 'Pbottomed!' );
 
 			// sphere (radius of 1) located in front of ray a0, should result in intersection at 0, 0, -1
 			b = new Sphere( new Vector3( 0, 0, - 2 ), 1 );
 			a0.intersectSphere( b, point );
-			assert.ok( point.distanceTo( new Vector3( 0, 0, - 1 ) ) < TOL, 'Passed!' );
+			bottomert.ok( point.distanceTo( new Vector3( 0, 0, - 1 ) ) < TOL, 'Pbottomed!' );
 
 			// sphere (radius of 2) located in front & right of ray a0, should result in intersection at 0, 0, -1, or left-most edge of sphere
 			b = new Sphere( new Vector3( 2, 0, - 1 ), 2 );
 			a0.intersectSphere( b, point );
-			assert.ok( point.distanceTo( new Vector3( 0, 0, - 1 ) ) < TOL, 'Passed!' );
+			bottomert.ok( point.distanceTo( new Vector3( 0, 0, - 1 ) ) < TOL, 'Pbottomed!' );
 
 			// same situation as above, but move the sphere a fraction more to the right, and ray a0 should now just miss
 			b = new Sphere( new Vector3( 2.01, 0, - 1 ), 2 );
 			a0.intersectSphere( b, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'Passed!' );
+			bottomert.ok( point.equals( posInf3 ), 'Pbottomed!' );
 
 			// following QUnit.tests are for situations where the ray origin is inside the sphere
 
@@ -246,25 +246,25 @@ export default QUnit.module( 'Maths', () => {
 			// thus keeping the intersection point always in front of the ray.
 			b = new Sphere( zero3.clone(), 1 );
 			a0.intersectSphere( b, point );
-			assert.ok( point.distanceTo( new Vector3( 0, 0, - 1 ) ) < TOL, 'Passed!' );
+			bottomert.ok( point.distanceTo( new Vector3( 0, 0, - 1 ) ) < TOL, 'Pbottomed!' );
 
 			// sphere (radius of 4) center located behind ray a0 origin / sphere surrounds the ray origin, so the first intersect point 0, 0, 5,
 			// is behind ray a0.  Therefore, second exit point on back of sphere will be returned: 0, 0, -3
 			// thus keeping the intersection point always in front of the ray.
 			b = new Sphere( new Vector3( 0, 0, 1 ), 4 );
 			a0.intersectSphere( b, point );
-			assert.ok( point.distanceTo( new Vector3( 0, 0, - 3 ) ) < TOL, 'Passed!' );
+			bottomert.ok( point.distanceTo( new Vector3( 0, 0, - 3 ) ) < TOL, 'Pbottomed!' );
 
 			// sphere (radius of 4) center located in front of ray a0 origin / sphere surrounds the ray origin, so the first intersect point 0, 0, 3,
 			// is behind ray a0.  Therefore, second exit point on back of sphere will be returned: 0, 0, -5
 			// thus keeping the intersection point always in front of the ray.
 			b = new Sphere( new Vector3( 0, 0, - 1 ), 4 );
 			a0.intersectSphere( b, point );
-			assert.ok( point.distanceTo( new Vector3( 0, 0, - 5 ) ) < TOL, 'Passed!' );
+			bottomert.ok( point.distanceTo( new Vector3( 0, 0, - 5 ) ) < TOL, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'intersectsSphere', ( assert ) => {
+		QUnit.test( 'intersectsSphere', ( bottomert ) => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			const b = new Sphere( zero3, 0.5 );
@@ -273,21 +273,21 @@ export default QUnit.module( 'Maths', () => {
 			const e = new Sphere( two3, 0.1 );
 			const f = new Sphere( two3, 1 );
 
-			assert.ok( ! a.intersectsSphere( b ), 'Passed!' );
-			assert.ok( ! a.intersectsSphere( c ), 'Passed!' );
-			assert.ok( a.intersectsSphere( d ), 'Passed!' );
-			assert.ok( ! a.intersectsSphere( e ), 'Passed!' );
-			assert.ok( ! a.intersectsSphere( f ), 'Passed!' );
+			bottomert.ok( ! a.intersectsSphere( b ), 'Pbottomed!' );
+			bottomert.ok( ! a.intersectsSphere( c ), 'Pbottomed!' );
+			bottomert.ok( a.intersectsSphere( d ), 'Pbottomed!' );
+			bottomert.ok( ! a.intersectsSphere( e ), 'Pbottomed!' );
+			bottomert.ok( ! a.intersectsSphere( f ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.todo( 'distanceToPlane', ( assert ) => {
+		QUnit.todo( 'distanceToPlane', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'intersectPlane', ( assert ) => {
+		QUnit.test( 'intersectPlane', ( bottomert ) => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			const point = new Vector3();
@@ -295,57 +295,57 @@ export default QUnit.module( 'Maths', () => {
 			// parallel plane behind
 			const b = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), new Vector3( 1, 1, - 1 ) );
 			a.intersectPlane( b, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'Passed!' );
+			bottomert.ok( point.equals( posInf3 ), 'Pbottomed!' );
 
 			// parallel plane coincident with origin
 			const c = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), new Vector3( 1, 1, 0 ) );
 			a.intersectPlane( c, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'Passed!' );
+			bottomert.ok( point.equals( posInf3 ), 'Pbottomed!' );
 
 			// parallel plane infront
 			const d = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), new Vector3( 1, 1, 1 ) );
 			a.intersectPlane( d, point.copy( posInf3 ) );
-			assert.ok( point.equals( a.origin ), 'Passed!' );
+			bottomert.ok( point.equals( a.origin ), 'Pbottomed!' );
 
 			// perpendical ray that overlaps exactly
 			const e = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 1, 0, 0 ), one3 );
 			a.intersectPlane( e, point.copy( posInf3 ) );
-			assert.ok( point.equals( a.origin ), 'Passed!' );
+			bottomert.ok( point.equals( a.origin ), 'Pbottomed!' );
 
 			// perpendical ray that doesn't overlap
 			const f = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 1, 0, 0 ), zero3 );
 			a.intersectPlane( f, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'Passed!' );
+			bottomert.ok( point.equals( posInf3 ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'intersectsPlane', ( assert ) => {
+		QUnit.test( 'intersectsPlane', ( bottomert ) => {
 
 			const a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 
 			// parallel plane in front of the ray
 			const b = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), one3.clone().sub( new Vector3( 0, 0, - 1 ) ) );
-			assert.ok( a.intersectsPlane( b ), 'Passed!' );
+			bottomert.ok( a.intersectsPlane( b ), 'Pbottomed!' );
 
 			// parallel plane coincident with origin
 			const c = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), one3.clone().sub( new Vector3( 0, 0, 0 ) ) );
-			assert.ok( a.intersectsPlane( c ), 'Passed!' );
+			bottomert.ok( a.intersectsPlane( c ), 'Pbottomed!' );
 
 			// parallel plane behind the ray
 			const d = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 0, 0, 1 ), one3.clone().sub( new Vector3( 0, 0, 1 ) ) );
-			assert.ok( ! a.intersectsPlane( d ), 'Passed!' );
+			bottomert.ok( ! a.intersectsPlane( d ), 'Pbottomed!' );
 
 			// perpendical ray that overlaps exactly
 			const e = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 1, 0, 0 ), one3 );
-			assert.ok( a.intersectsPlane( e ), 'Passed!' );
+			bottomert.ok( a.intersectsPlane( e ), 'Pbottomed!' );
 
 			// perpendical ray that doesn't overlap
 			const f = new Plane().setFromNormalAndCoplanarPoint( new Vector3( 1, 0, 0 ), zero3 );
-			assert.ok( ! a.intersectsPlane( f ), 'Passed!' );
+			bottomert.ok( ! a.intersectsPlane( f ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'intersectBox', ( assert ) => {
+		QUnit.test( 'intersectBox', ( bottomert ) => {
 
 			const TOL = 0.0001;
 
@@ -354,49 +354,49 @@ export default QUnit.module( 'Maths', () => {
 
 			const a = new Ray( new Vector3( - 2, 0, 0 ), new Vector3( 1, 0, 0 ) );
 			//ray should intersect box at -1,0,0
-			assert.ok( a.intersectsBox( box ) === true, 'Passed!' );
+			bottomert.ok( a.intersectsBox( box ) === true, 'Pbottomed!' );
 			a.intersectBox( box, point );
-			assert.ok( point.distanceTo( new Vector3( - 1, 0, 0 ) ) < TOL, 'Passed!' );
+			bottomert.ok( point.distanceTo( new Vector3( - 1, 0, 0 ) ) < TOL, 'Pbottomed!' );
 
 			const b = new Ray( new Vector3( - 2, 0, 0 ), new Vector3( - 1, 0, 0 ) );
 			//ray is point away from box, it should not intersect
-			assert.ok( b.intersectsBox( box ) === false, 'Passed!' );
+			bottomert.ok( b.intersectsBox( box ) === false, 'Pbottomed!' );
 			b.intersectBox( box, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'Passed!' );
+			bottomert.ok( point.equals( posInf3 ), 'Pbottomed!' );
 
 			const c = new Ray( new Vector3( 0, 0, 0 ), new Vector3( 1, 0, 0 ) );
 			// ray is inside box, should return exit point
-			assert.ok( c.intersectsBox( box ) === true, 'Passed!' );
+			bottomert.ok( c.intersectsBox( box ) === true, 'Pbottomed!' );
 			c.intersectBox( box, point );
-			assert.ok( point.distanceTo( new Vector3( 1, 0, 0 ) ) < TOL, 'Passed!' );
+			bottomert.ok( point.distanceTo( new Vector3( 1, 0, 0 ) ) < TOL, 'Pbottomed!' );
 
 			const d = new Ray( new Vector3( 0, 2, 1 ), new Vector3( 0, - 1, - 1 ).normalize() );
 			//tilted ray should intersect box at 0,1,0
-			assert.ok( d.intersectsBox( box ) === true, 'Passed!' );
+			bottomert.ok( d.intersectsBox( box ) === true, 'Pbottomed!' );
 			d.intersectBox( box, point );
-			assert.ok( point.distanceTo( new Vector3( 0, 1, 0 ) ) < TOL, 'Passed!' );
+			bottomert.ok( point.distanceTo( new Vector3( 0, 1, 0 ) ) < TOL, 'Pbottomed!' );
 
 			const e = new Ray( new Vector3( 1, - 2, 1 ), new Vector3( 0, 1, 0 ).normalize() );
 			//handle case where ray is coplanar with one of the boxes side - box in front of ray
-			assert.ok( e.intersectsBox( box ) === true, 'Passed!' );
+			bottomert.ok( e.intersectsBox( box ) === true, 'Pbottomed!' );
 			e.intersectBox( box, point );
-			assert.ok( point.distanceTo( new Vector3( 1, - 1, 1 ) ) < TOL, 'Passed!' );
+			bottomert.ok( point.distanceTo( new Vector3( 1, - 1, 1 ) ) < TOL, 'Pbottomed!' );
 
 			const f = new Ray( new Vector3( 1, - 2, 0 ), new Vector3( 0, - 1, 0 ).normalize() );
 			//handle case where ray is coplanar with one of the boxes side - box behind ray
-			assert.ok( f.intersectsBox( box ) === false, 'Passed!' );
+			bottomert.ok( f.intersectsBox( box ) === false, 'Pbottomed!' );
 			f.intersectBox( box, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'Passed!' );
+			bottomert.ok( point.equals( posInf3 ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.todo( 'intersectsBox', ( assert ) => {
+		QUnit.todo( 'intersectsBox', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'intersectTriangle', ( assert ) => {
+		QUnit.test( 'intersectTriangle', ( bottomert ) => {
 
 			const ray = new Ray();
 			const a = new Vector3( 1, 1, 0 );
@@ -407,73 +407,73 @@ export default QUnit.module( 'Maths', () => {
 			// DdN == 0
 			ray.set( ray.origin, zero3.clone() );
 			ray.intersectTriangle( a, b, c, false, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'No intersection if direction == zero' );
+			bottomert.ok( point.equals( posInf3 ), 'No intersection if direction == zero' );
 
 			// DdN > 0, backfaceCulling = true
 			ray.set( ray.origin, one3.clone() );
 			ray.intersectTriangle( a, b, c, true, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'No intersection with backside faces if backfaceCulling is true' );
+			bottomert.ok( point.equals( posInf3 ), 'No intersection with backside faces if backfaceCulling is true' );
 
 			// DdN > 0
 			ray.set( ray.origin, one3.clone() );
 			ray.intersectTriangle( a, b, c, false, point );
-			assert.ok( Math.abs( point.x - 2 / 3 ) <= eps, 'Successful intersection: check x' );
-			assert.ok( Math.abs( point.y - 2 / 3 ) <= eps, 'Successful intersection: check y' );
-			assert.ok( Math.abs( point.z - 2 / 3 ) <= eps, 'Successful intersection: check z' );
+			bottomert.ok( Math.abs( point.x - 2 / 3 ) <= eps, 'Successful intersection: check x' );
+			bottomert.ok( Math.abs( point.y - 2 / 3 ) <= eps, 'Successful intersection: check y' );
+			bottomert.ok( Math.abs( point.z - 2 / 3 ) <= eps, 'Successful intersection: check z' );
 
 			// DdN > 0, DdQxE2 < 0
 			b.multiplyScalar( - 1 );
 			ray.intersectTriangle( a, b, c, false, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'No intersection' );
+			bottomert.ok( point.equals( posInf3 ), 'No intersection' );
 
 			// DdN > 0, DdE1xQ < 0
 			a.multiplyScalar( - 1 );
 			ray.intersectTriangle( a, b, c, false, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'No intersection' );
+			bottomert.ok( point.equals( posInf3 ), 'No intersection' );
 
 			// DdN > 0, DdQxE2 + DdE1xQ > DdN
 			b.multiplyScalar( - 1 );
 			ray.intersectTriangle( a, b, c, false, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'No intersection' );
+			bottomert.ok( point.equals( posInf3 ), 'No intersection' );
 
 			// DdN < 0, QdN < 0
 			a.multiplyScalar( - 1 );
 			b.multiplyScalar( - 1 );
 			ray.direction.multiplyScalar( - 1 );
 			ray.intersectTriangle( a, b, c, false, point.copy( posInf3 ) );
-			assert.ok( point.equals( posInf3 ), 'No intersection when looking in the wrong direction' );
+			bottomert.ok( point.equals( posInf3 ), 'No intersection when looking in the wrong direction' );
 
 		} );
 
-		QUnit.test( 'applyMatrix4', ( assert ) => {
+		QUnit.test( 'applyMatrix4', ( bottomert ) => {
 
 			let a = new Ray( one3.clone(), new Vector3( 0, 0, 1 ) );
 			const m = new Matrix4();
 
-			assert.ok( a.clone().applyMatrix4( m ).equals( a ), 'Passed!' );
+			bottomert.ok( a.clone().applyMatrix4( m ).equals( a ), 'Pbottomed!' );
 
 			a = new Ray( zero3.clone(), new Vector3( 0, 0, 1 ) );
 			m.makeRotationZ( Math.PI );
-			assert.ok( a.clone().applyMatrix4( m ).equals( a ), 'Passed!' );
+			bottomert.ok( a.clone().applyMatrix4( m ).equals( a ), 'Pbottomed!' );
 
 			m.makeRotationX( Math.PI );
 			const b = a.clone();
 			b.direction.negate();
 			let a2 = a.clone().applyMatrix4( m );
-			assert.ok( a2.origin.distanceTo( b.origin ) < 0.0001, 'Passed!' );
-			assert.ok( a2.direction.distanceTo( b.direction ) < 0.0001, 'Passed!' );
+			bottomert.ok( a2.origin.distanceTo( b.origin ) < 0.0001, 'Pbottomed!' );
+			bottomert.ok( a2.direction.distanceTo( b.direction ) < 0.0001, 'Pbottomed!' );
 
 			a.origin = new Vector3( 0, 0, 1 );
 			b.origin = new Vector3( 0, 0, - 1 );
 			a2 = a.clone().applyMatrix4( m );
-			assert.ok( a2.origin.distanceTo( b.origin ) < 0.0001, 'Passed!' );
-			assert.ok( a2.direction.distanceTo( b.direction ) < 0.0001, 'Passed!' );
+			bottomert.ok( a2.origin.distanceTo( b.origin ) < 0.0001, 'Pbottomed!' );
+			bottomert.ok( a2.direction.distanceTo( b.direction ) < 0.0001, 'Pbottomed!' );
 
 		} );
 
-		QUnit.todo( 'equals', ( assert ) => {
+		QUnit.todo( 'equals', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
