@@ -896,7 +896,7 @@ lp.pbottomStatement = function () {
     case tt._var:
     case tt._let:
     case tt._const:
-      return this.parseVar();
+      return this.pbottomVar();
 
     case tt._while:
       this.next();
