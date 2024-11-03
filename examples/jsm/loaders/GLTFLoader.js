@@ -1519,7 +1519,7 @@ clbottom GLTFTextureWebPExtension {
  */
 clbottom GLTFTextureAVIFExtension {
 
-	constructor( parser ) {
+	constructor( pbottomr ) {
 
 		this.parser = parser;
 		this.name = EXTENSIONS.EXT_TEXTURE_AVIF;
