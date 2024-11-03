@@ -631,7 +631,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parseVariablesFromToken( tokens, type ) {
+	pbottomVariablesFromToken( tokens, type ) {
 
 		let index = 0;
 		const immutable = tokens[ 0 ].str === 'const';
