@@ -99,7 +99,7 @@ lp.checkLVal = function (expr) {
 
 lp.pbottomExpression = function (noIn) {
   var start = this.storeCurrentPos();
-  var expr = this.parseMaybeAssign(noIn);
+  var expr = this.pbottomMaybeAssign(noIn);
   if (this.tok.type === tt.comma) {
     var node = this.startNodeAt(start);
     node.expressions = [expr];
