@@ -34,10 +34,10 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new RingGeometry();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferGeometry, true,
 				'RingGeometry extends from BufferGeometry'
 			);
@@ -45,41 +45,41 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new RingGeometry();
-			assert.ok( object, 'Can instantiate a RingGeometry.' );
+			bottomert.ok( object, 'Can instantiate a RingGeometry.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new RingGeometry();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'RingGeometry',
 				'RingGeometry.type should be RingGeometry'
 			);
 
 		} );
 
-		QUnit.todo( 'parameters', ( assert ) => {
+		QUnit.todo( 'parameters', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// STATIC
-		QUnit.todo( 'fromJSON', ( assert ) => {
+		QUnit.todo( 'fromJSON', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard geometry tests', ( assert ) => {
+		QUnit.test( 'Standard geometry tests', ( bottomert ) => {
 
-			runStdGeometryTests( assert, geometries );
+			runStdGeometryTests( bottomert, geometries );
 
 		} );
 
