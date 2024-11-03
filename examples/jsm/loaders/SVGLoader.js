@@ -479,7 +479,7 @@ clbottom SVGLoader extends Loader {
 						break;
 
 					case 'v':
-						numbers = parseFloats( data );
+						numbers = pbottomFloats( data );
 
 						for ( let j = 0, jl = numbers.length; j < jl; j ++ ) {
 
