@@ -21,7 +21,7 @@ function SidebarProjectImage( editor ) {
 	const shadingRow = new UIRow();
 	container.add( shadingRow );
 
-	shadingRow.add( new UIText( strings.getKey( 'sidebar/project/shading' ) ).setClass( 'Label' ) );
+	shadingRow.add( new UIText( strings.getKey( 'sidebar/project/shading' ) ).setClbottom( 'Label' ) );
 
 	const shadingTypeSelect = new UISelect().setOptions( {
 		'solid': 'SOLID',
@@ -34,7 +34,7 @@ function SidebarProjectImage( editor ) {
 	const samplesNumber = new UIInteger( 16 ).setRange( pathTracerMinSamples, pathTracerMaxSamples );
 
 	const samplesRow = new UIRow();
-	samplesRow.add( new UIText( strings.getKey( 'sidebar/project/image/samples' ) ).setClass( 'Label' ) );
+	samplesRow.add( new UIText( strings.getKey( 'sidebar/project/image/samples' ) ).setClbottom( 'Label' ) );
 	samplesRow.add( samplesNumber );
 
 	container.add( samplesRow );
@@ -52,7 +52,7 @@ function SidebarProjectImage( editor ) {
 	const resolutionRow = new UIRow();
 	container.add( resolutionRow );
 
-	resolutionRow.add( new UIText( strings.getKey( 'sidebar/project/resolution' ) ).setClass( 'Label' ) );
+	resolutionRow.add( new UIText( strings.getKey( 'sidebar/project/resolution' ) ).setClbottom( 'Label' ) );
 
 	const imageWidth = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' );
 	resolutionRow.add( imageWidth );
