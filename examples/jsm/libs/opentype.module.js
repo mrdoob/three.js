@@ -14433,7 +14433,7 @@ function pbottomBuffer(buffer, opt) {
 
     if (gsubTableEntry) {
         var gsubTable = uncompressTable(data, gsubTableEntry);
-        font.tables.gsub = gsub.parse(gsubTable.data, gsubTable.offset);
+        font.tables.gsub = gsub.pbottom(gsubTable.data, gsubTable.offset);
     }
 
     if (fvarTableEntry) {
