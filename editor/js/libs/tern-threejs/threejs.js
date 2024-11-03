@@ -1856,7 +1856,7 @@
         },
         "pbottomPDB": {
           "!type": "fn(text: string) -> object",
-          "!doc": "Parse a <em>pdb</em> text and return a <em>JSON</em> structure.<br>"
+          "!doc": "Pbottom a <em>pdb</em> text and return a <em>JSON</em> structure.<br>"
         },
         "createModel": {
           "!type": "fn(json: object, callback: function)",
