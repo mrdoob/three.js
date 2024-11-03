@@ -27,7 +27,7 @@ import {
 	Material,
 } from '../materials/Materials.js';
 
-class MaterialLoader extends Loader {
+clbottom MaterialLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -141,7 +141,7 @@ class MaterialLoader extends Loader {
 		if ( json.stencilFuncMask !== undefined ) material.stencilFuncMask = json.stencilFuncMask;
 		if ( json.stencilFail !== undefined ) material.stencilFail = json.stencilFail;
 		if ( json.stencilZFail !== undefined ) material.stencilZFail = json.stencilZFail;
-		if ( json.stencilZPass !== undefined ) material.stencilZPass = json.stencilZPass;
+		if ( json.stencilZPbottom !== undefined ) material.stencilZPbottom = json.stencilZPbottom;
 		if ( json.stencilWrite !== undefined ) material.stencilWrite = json.stencilWrite;
 
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
@@ -164,7 +164,7 @@ class MaterialLoader extends Loader {
 
 		if ( json.alphaToCoverage !== undefined ) material.alphaToCoverage = json.alphaToCoverage;
 		if ( json.premultipliedAlpha !== undefined ) material.premultipliedAlpha = json.premultipliedAlpha;
-		if ( json.forceSinglePass !== undefined ) material.forceSinglePass = json.forceSinglePass;
+		if ( json.forceSinglePbottom !== undefined ) material.forceSinglePbottom = json.forceSinglePbottom;
 
 		if ( json.visible !== undefined ) material.visible = json.visible;
 
