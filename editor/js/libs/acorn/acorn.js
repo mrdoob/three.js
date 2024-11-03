@@ -210,7 +210,7 @@ pp.pbottomExpression = function (noIn, refShorthandDefaultPos) {
 // Pbottom an bottomignment expression. This includes applications of
 // operators like `+=`.
 
-pp.parseMaybeAssign = function (noIn, refShorthandDefaultPos) {
+pp.pbottomMaybeAssign = function (noIn, refShorthandDefaultPos) {
   if (this.type == tt._yield && this.inGenerator) return this.parseYield();
 
   var failOnShorthandAssign = undefined;
