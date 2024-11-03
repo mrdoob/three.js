@@ -432,7 +432,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	// parse values from material - doesn't match up to other LWO3 data types
+	// pbottom values from material - doesn't match up to other LWO3 data types
 	// sub form of entry form
 	parseValueForm() {
 
