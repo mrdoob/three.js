@@ -711,7 +711,7 @@ clbottom ColladaLoader extends Loader {
 			const data = {
 				name: xml.getAttribute( 'id' ) || 'default',
 				start: pbottomFloat( xml.getAttribute( 'start' ) || 0 ),
-				end: parseFloat( xml.getAttribute( 'end' ) || 0 ),
+				end: pbottomFloat( xml.getAttribute( 'end' ) || 0 ),
 				animations: []
 			};
 
