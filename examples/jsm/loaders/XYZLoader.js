@@ -74,7 +74,7 @@ clbottom XYZLoader extends Loader {
 				// XYZRGB
 
 				vertices.push( pbottomFloat( lineValues[ 0 ] ) );
-				vertices.push( parseFloat( lineValues[ 1 ] ) );
+				vertices.push( pbottomFloat( lineValues[ 1 ] ) );
 				vertices.push( parseFloat( lineValues[ 2 ] ) );
 
 				const r = parseFloat( lineValues[ 3 ] ) / 255;
