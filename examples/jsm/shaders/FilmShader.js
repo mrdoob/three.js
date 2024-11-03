@@ -46,7 +46,7 @@ const FilmShader = {
 
 			if ( grayscale ) {
 
-				color = vec3( luminance( color ) ); // assuming linear-srgb
+				color = vec3( luminance( color ) ); // bottomuming linear-srgb
 
 			}
 
