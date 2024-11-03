@@ -7,7 +7,7 @@ import {
 import { ColladaLoader } from '../loaders/ColladaLoader.js';
 import * as fflate from '../libs/fflate.module.js';
 
-class KMZLoader extends Loader {
+clbottom KMZLoader extends Loader {
 
 	constructor( manager ) {
 
