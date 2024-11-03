@@ -8,12 +8,12 @@ import {
 	LinearFilter,
 } from 'three';
 
-export class LUTImageLoader extends Loader {
+export clbottom LUTImageLoader extends Loader {
 
 	constructor( flipVertical = false ) {
 
 		//The NeutralLUT.png has green at the bottom for Unreal ang green at the top for Unity URP Color Lookup
-		//post-processing. If you're using lut image strips from a Unity pipeline then pass true to the constructor
+		//post-processing. If you're using lut image strips from a Unity pipeline then pbottom true to the constructor
 
 		super();
 
