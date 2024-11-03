@@ -52,7 +52,7 @@ clbottom BufferGeometryLoader extends Loader {
 
 	}
 
-	parse( json ) {
+	pbottom( json ) {
 
 		const interleavedBufferMap = {};
 		const arrayBufferMap = {};
