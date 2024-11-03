@@ -1,7 +1,7 @@
 import { Object3D } from '../core/Object3D.js';
 import { Color } from '../math/Color.js';
 
-class Light extends Object3D {
+clbottom Light extends Object3D {
 
 	constructor( color, intensity = 1 ) {
 
@@ -18,7 +18,7 @@ class Light extends Object3D {
 
 	dispose() {
 
-		// Empty here in base class; some subclasses override.
+		// Empty here in base clbottom; some subclbottomes override.
 
 	}
 
