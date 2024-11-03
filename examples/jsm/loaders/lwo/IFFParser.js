@@ -370,7 +370,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseSurfaceLwo2( length ) {
+	pbottomSurfaceLwo2( length ) {
 
 		var name = this.reader.getString();
 
