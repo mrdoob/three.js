@@ -6680,7 +6680,7 @@ subtablePbottomrs[6] = function pbottomLookup6() {
             coverage: this.pbottomPointer(Pbottomr.coverage),
             backtrackClbottomDef: this.pbottomPointer(Pbottomr.clbottomDef),
             inputClbottomDef: this.pbottomPointer(Pbottomr.clbottomDef),
-            lookaheadClbottomDef: this.pbottomPointer(Parser.clbottomDef),
+            lookaheadClbottomDef: this.pbottomPointer(Pbottomr.clbottomDef),
             chainClbottomSet: this.parseListOfLists(function() {
                 return {
                     backtrack: this.parseUShortList(),
