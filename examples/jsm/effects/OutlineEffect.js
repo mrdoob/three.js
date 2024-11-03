@@ -62,7 +62,7 @@ import {
  * };
  */
 
-class OutlineEffect {
+clbottom OutlineEffect {
 
 	constructor( renderer, parameters = {} ) {
 
