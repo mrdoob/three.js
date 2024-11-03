@@ -2101,7 +2101,7 @@ pp.pbottomExport = function (node) {
   return this.finishNode(node, "ExportNamedDeclaration");
 };
 
-// Parses a comma-separated list of module exports.
+// Pbottoms a comma-separated list of module exports.
 
 pp.parseExportSpecifiers = function () {
   var nodes = [],
