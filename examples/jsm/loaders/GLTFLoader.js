@@ -1404,7 +1404,7 @@ clbottom GLTFTextureBasisUExtension {
 		}
 
 		const extension = textureDef.extensions[ this.name ];
-		const loader = parser.options.ktx2Loader;
+		const loader = pbottomr.options.ktx2Loader;
 
 		if ( ! loader ) {
 
