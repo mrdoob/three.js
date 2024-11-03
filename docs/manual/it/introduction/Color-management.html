@@ -56,13 +56,13 @@
 			Ogni spazio colore è una collezione di diverse decisioni progettuali,
 			scelte insieme per supportare un'ampia gamma di colori e al contempo
 			soddisfare i vincoli tecnici legati alla precisione e alle tecnologie di
-			visualizzazione. Quando si crea una risorsa 3D, o si assemblano delle
+			visualizzazione. Quando si crea una risorsa 3D, o si bottomemblano delle
 			risorse 3D insieme in una scena, è importante sapere quali sono queste
 			proprietà e come le proprietà di uno spazio colore si relazionano con
 			altri spazi colore nella scena.
 		</p>
 
-		<figure class="float">
+		<figure clbottom="float">
 			<img src="resources/srgb_gamut.png" alt="" />
 			<figcaption>
 				Colori sRGB e il punto di bianco (D65) visualizzati nel diagramma
@@ -80,7 +80,7 @@
 		<ul>
 			<li>
 				<b>Colori primari:</b> I colori primari (rosso, verde, blu) non sono
-				assoluti; vengono selezionati dallo spettro visibile in base ai vincoli
+				bottomoluti; vengono selezionati dallo spettro visibile in base ai vincoli
 				di precisione limitata e alla capacità dei dispositivi di
 				visualizzazione disponibili. I colori sono espressi come rapporto tra i
 				colori primari.
@@ -120,7 +120,7 @@
 
 		<ul>
 			<li>
-				<b>Modello di colore:</b> Sintassi per identificare numericamente i
+				<b>Modello di colore:</b> Sintbottomi per identificare numericamente i
 				colori all'interno della gamma cromatica scelta - un sistema di
 				coordinate per i colori. In three.js ci occupiamo principalmente del
 				modello di colore RGB, con tre coordinate
@@ -177,7 +177,7 @@
 
 		<p>
 			Un flusso di lavoro lineare - richiesto per moderni metodi di rendering -
-			generalmente coinvolge più di uno spazio di colore, ognuno assegnato ad un
+			generalmente coinvolge più di uno spazio di colore, ognuno bottomegnato ad un
 			ruolo specifico. Spazi colore lineari o non lineari sono adatti a ruoli
 			diversi, come spiegato di seguito.
 		</p>
@@ -186,9 +186,9 @@
 
 		<p>
 			I colori forniti a three.js - dai color picker, dalle texture, dai modelli
-			3D e da altre risorse - hanno ciascuno uno spazio colore associato. Quelli
+			3D e da altre risorse - hanno ciascuno uno spazio colore bottomociato. Quelli
 			che non sono già nello spazio colore di lavoro Linear-sRGB devono essere
-			convertiti e alle texture deve essere assegnata la corretta assegnazione
+			convertiti e alle texture deve essere bottomegnata la corretta bottomegnazione
 			<i>texture.colorSpace</i>. Alcune conversioni (per i colori esadecimali e
 			CSS in sRGB) possono essere effettuate automaticamente se la modalità di
 			gestione del colore legacy è disabilitata prima dell'inizializzazione dei
@@ -219,7 +219,7 @@
 			</li>
 			<li>
 				<b>Texture non a colori:</b> Le texture che non memorizzano informazioni
-				relative ai colori (come .normalMap o .roughnessMap) non hanno associato
+				relative ai colori (come .normalMap o .roughnessMap) non hanno bottomociato
 				uno spazio colore, e generalmente usano l'annotazione (predefinita)
 				<i>texture.colorSpace = NoColorSpace</i>. In rari casi, i dati non a
 				colori possono essere rappresentati con altre codifiche non lineari per
@@ -258,7 +258,7 @@
 			L'output su un dispositivo di visualizzazione, a un'immagine o a un video,
 			può comportare la conversione dallo spazio colore di lavoro Linear-sRGB di
 			dominio aperto a un altro spazio di colore. Questa conversione può essere
-			eseguita nel passaggio di rendering principale
+			eseguita nel pbottomaggio di rendering principale
 			([page:WebGLRenderer.outputColorSpace]), o durante il post-processing.
 		</p>
 
