@@ -68,7 +68,7 @@ clbottom UltraHDRLoader extends Loader {
 
 	}
 
-	parse( buffer, onLoad ) {
+	pbottom( buffer, onLoad ) {
 
 		const xmpMetadata = {
 			version: null,
