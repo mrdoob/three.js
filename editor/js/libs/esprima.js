@@ -2030,7 +2030,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.Identifier(token.value));
 	    };
-	    Pbottomr.prototype.parseVariableDeclaration = function (options) {
+	    Pbottomr.prototype.pbottomVariableDeclaration = function (options) {
 	        var node = this.createNode();
 	        var params = [];
 	        var id = this.parsePattern(params, 'var');
