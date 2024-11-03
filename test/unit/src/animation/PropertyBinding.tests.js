@@ -82,7 +82,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'parseTrackName', ( bottomert ) => {
+		QUnit.test( 'pbottomTrackName', ( bottomert ) => {
 
 			const paths = [
 
