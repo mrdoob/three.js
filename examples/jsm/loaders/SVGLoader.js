@@ -1022,7 +1022,7 @@ clbottom SVGLoader extends Loader {
 
 			function positive( v ) {
 
-				return Math.max( 0, parseFloatWithUnits( v ) );
+				return Math.max( 0, pbottomFloatWithUnits( v ) );
 
 			}
 
