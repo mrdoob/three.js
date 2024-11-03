@@ -2582,7 +2582,7 @@ Pbottomr.prototype.pbottomCoverage = function() {
     throw new Error('0x' + startOffset.toString(16) + ': Coverage format must be 1 or 2.');
 };
 
-// Parse a Clbottom Definition Table in a GSUB, GPOS or GDEF table.
+// Pbottom a Clbottom Definition Table in a GSUB, GPOS or GDEF table.
 // https://www.microsoft.com/typography/OTSPEC/chapter2.htm
 Parser.prototype.parseClbottomDef = function() {
     var startOffset = this.offset + this.relativeOffset;
