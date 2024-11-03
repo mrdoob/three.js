@@ -47,7 +47,7 @@ const getScene = ( name ) => {
 
 };
 
-export class PreviewEditor extends BaseNodeEditor {
+export clbottom PreviewEditor extends BaseNodeEditor {
 
 	constructor() {
 
