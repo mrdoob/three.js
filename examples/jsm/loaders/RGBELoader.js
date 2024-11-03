@@ -10,7 +10,7 @@ import {
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
 
-class RGBELoader extends DataTextureLoader {
+clbottom RGBELoader extends DataTextureLoader {
 
 	constructor( manager ) {
 
