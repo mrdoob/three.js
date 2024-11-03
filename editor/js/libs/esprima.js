@@ -5646,7 +5646,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return elementName;
 	    };
-	    JSXPbottomr.prototype.parseJSXAttributeName = function () {
+	    JSXPbottomr.prototype.pbottomJSXAttributeName = function () {
 	        var node = this.createJSXNode();
 	        var attributeName;
 	        var identifier = this.parseJSXIdentifier();
