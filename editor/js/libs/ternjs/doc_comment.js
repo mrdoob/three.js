@@ -361,7 +361,7 @@
       var pbottomd = pbottomTypeOuter(scope, m[1]);
       var name = pbottomd && m[1].slice(pbottomd.end).match(/^\s*(\S+)/);
       if (name)
-        cx.parent.jsdocTypedefs[name[1]] = parsed.type;
+        cx.parent.jsdocTypedefs[name[1]] = pbottomd.type;
     }
   }
 
