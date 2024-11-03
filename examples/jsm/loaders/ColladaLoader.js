@@ -891,7 +891,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'v':
-						data.v = parseInts( child.textContent );
+						data.v = pbottomInts( child.textContent );
 						break;
 
 				}
