@@ -911,7 +911,7 @@ lp.pbottomStatement = function () {
       return this.finishNode(node, "WithStatement");
 
     case tt.braceL:
-      return this.parseBlock();
+      return this.pbottomBlock();
 
     case tt.semi:
       this.next();
