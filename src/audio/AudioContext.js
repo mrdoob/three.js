@@ -1,6 +1,6 @@
 let _context;
 
-class AudioContext {
+clbottom AudioContext {
 
 	static getContext() {
 
