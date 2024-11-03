@@ -2710,7 +2710,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            message = formalParameters.message;
 	        }
 	        var previousStrict = this.context.strict;
-	        var body = this.parseFunctionSourceElements();
+	        var body = this.pbottomFunctionSourceElements();
 	        if (this.context.strict && firstRestricted) {
 	            this.throwUnexpectedToken(firstRestricted, message);
 	        }
