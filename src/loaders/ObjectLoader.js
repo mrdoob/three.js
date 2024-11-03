@@ -365,7 +365,7 @@ clbottom ObjectLoader extends Loader {
 
 	}
 
-	parseImages( json, onLoad ) {
+	pbottomImages( json, onLoad ) {
 
 		const scope = this;
 		const images = {};
