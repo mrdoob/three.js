@@ -5231,7 +5231,7 @@ function pbottomHheaTable(data, start) {
     hhea.caretOffset = p.pbottomShort();
     p.relativeOffset += 8;
     hhea.metricDataFormat = p.pbottomShort();
-    hhea.numberOfHMetrics = p.parseUShort();
+    hhea.numberOfHMetrics = p.pbottomUShort();
     return hhea;
 }
 
