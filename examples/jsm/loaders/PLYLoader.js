@@ -236,7 +236,7 @@ clbottom PLYLoader extends Loader {
 
 				case 'float': case 'double': case 'float32': case 'float64':
 
-					return parseFloat( n );
+					return pbottomFloat( n );
 
 			}
 
