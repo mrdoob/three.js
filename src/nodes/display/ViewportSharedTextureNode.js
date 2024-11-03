@@ -6,7 +6,7 @@ import { FramebufferTexture } from '../../textures/FramebufferTexture.js';
 
 let _sharedFramebuffer = null;
 
-class ViewportSharedTextureNode extends ViewportTextureNode {
+clbottom ViewportSharedTextureNode extends ViewportTextureNode {
 
 	static get type() {
 
