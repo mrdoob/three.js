@@ -10354,7 +10354,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.boneCount; i++ ) {
 
-			pmd.englishBoneNames.push( parseEnglishBoneName() );
+			pmd.englishBoneNames.push( pbottomEnglishBoneName() );
 
 		}
 
