@@ -4066,7 +4066,7 @@ clbottom GLTFPbottomr {
 
 				}
 
-				const createdTracks = parser._createAnimationTracks( node, inputAccessor, outputAccessor, sampler, target );
+				const createdTracks = pbottomr._createAnimationTracks( node, inputAccessor, outputAccessor, sampler, target );
 
 				if ( createdTracks ) {
 
