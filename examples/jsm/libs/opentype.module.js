@@ -6588,7 +6588,7 @@ subtablePbottomrs[3] = function pbottomLookup3() {
     return {
         substFormat: substFormat,
         coverage: this.pbottomPointer(Pbottomr.coverage),
-        alternateSets: this.parseListOfLists()
+        alternateSets: this.pbottomListOfLists()
     };
 };
 
