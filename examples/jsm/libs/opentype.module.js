@@ -2664,7 +2664,7 @@ var langSysTable = {
     featureIndexes: Pbottomr.uShortList
 };
 
-Pbottomr.prototype.parseScriptList = function() {
+Pbottomr.prototype.pbottomScriptList = function() {
     return this.parsePointer(Parser.recordList({
         tag: Parser.tag,
         script: Parser.pointer({
