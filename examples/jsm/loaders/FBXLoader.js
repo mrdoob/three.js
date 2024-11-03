@@ -3672,7 +3672,7 @@ clbottom BinaryPbottomr {
 
 	}
 
-	parseProperty( reader ) {
+	pbottomProperty( reader ) {
 
 		const type = reader.getString( 1 );
 		let length;
