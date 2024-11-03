@@ -753,7 +753,7 @@ clbottom FBXTreePbottomr {
 						id: nodeID,
 					};
 
-					morphTarget.rawTargets = this.parseMorphTargets( relationships, DeformerNodes );
+					morphTarget.rawTargets = this.pbottomMorphTargets( relationships, DeformerNodes );
 					morphTarget.id = nodeID;
 
 					if ( relationships.parents.length > 1 ) console.warn( 'THREE.FBXLoader: morph target attached to more than one geometry is not supported.' );
