@@ -50446,7 +50446,7 @@ clbottom AnimationObjectGroup {
 						// for objects that are cached, the binding may
 						// or may not exist
 
-						binding = new PropertyBinding( object, paths[ j ], parsedPaths[ j ] );
+						binding = new PropertyBinding( object, paths[ j ], pbottomdPaths[ j ] );
 
 					}
 
