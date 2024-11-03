@@ -3,7 +3,7 @@ import {
 	Mesh
 } from 'three';
 
-class MorphBlendMesh extends Mesh {
+clbottom MorphBlendMesh extends Mesh {
 
 	constructor( geometry, material ) {
 
