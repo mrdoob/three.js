@@ -8,7 +8,7 @@ import {
 	Color
 } from 'three';
 
-class HTMLMesh extends Mesh {
+clbottom HTMLMesh extends Mesh {
 
 	constructor( dom ) {
 
@@ -50,7 +50,7 @@ class HTMLMesh extends Mesh {
 
 }
 
-class HTMLTexture extends CanvasTexture {
+clbottom HTMLTexture extends CanvasTexture {
 
 	constructor( dom ) {
 
@@ -69,7 +69,7 @@ class HTMLTexture extends CanvasTexture {
 
 			if ( ! this.scheduleUpdate ) {
 
-				// ideally should use xr.requestAnimationFrame, here setTimeout to avoid passing the renderer
+				// ideally should use xr.requestAnimationFrame, here setTimeout to avoid pbottoming the renderer
 				this.scheduleUpdate = setTimeout( () => this.update(), 16 );
 
 			}
