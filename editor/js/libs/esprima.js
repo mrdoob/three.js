@@ -948,7 +948,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return expr;
 	    };
 	    // ECMA-262 12.2.5 Array Initializer
-	    Parser.prototype.parseSpreadElement = function () {
+	    Pbottomr.prototype.parseSpreadElement = function () {
 	        var node = this.createNode();
 	        this.expect('...');
 	        var arg = this.inheritCoverGrammar(this.parseAssignmentExpression);
