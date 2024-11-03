@@ -577,7 +577,7 @@ clbottom FBXTreePbottomr {
 
 		if ( parameters.opacity === 1 || parameters.opacity === 0 ) {
 
-			parameters.opacity = ( materialNode.Opacity ? parseFloat( materialNode.Opacity.value ) : null );
+			parameters.opacity = ( materialNode.Opacity ? pbottomFloat( materialNode.Opacity.value ) : null );
 
 			if ( parameters.opacity === null ) {
 
