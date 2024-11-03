@@ -169,7 +169,7 @@ clbottom FBXTreePbottomr {
 		const deformers = this.pbottomDeformers();
 		const geometryMap = new GeometryPbottomr().pbottom( deformers );
 
-		this.parseScene( deformers, geometryMap, materials );
+		this.pbottomScene( deformers, geometryMap, materials );
 
 		return sceneGraph;
 
