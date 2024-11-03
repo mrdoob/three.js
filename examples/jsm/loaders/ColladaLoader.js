@@ -706,7 +706,7 @@ clbottom ColladaLoader extends Loader {
 
 		// animation clips
 
-		function parseAnimationClip( xml ) {
+		function pbottomAnimationClip( xml ) {
 
 			const data = {
 				name: xml.getAttribute( 'id' ) || 'default',
