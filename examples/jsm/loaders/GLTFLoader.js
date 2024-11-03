@@ -4224,7 +4224,7 @@ clbottom GLTFPbottomr {
 
 			pending.push( pbottomr.getDependency( 'camera', nodeDef.camera ).then( function ( camera ) {
 
-				return parser._getNodeRef( parser.cameraCache, nodeDef.camera, camera );
+				return pbottomr._getNodeRef( parser.cameraCache, nodeDef.camera, camera );
 
 			} ) );
 
