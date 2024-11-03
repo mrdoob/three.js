@@ -183,7 +183,7 @@
 
 				sphere.collider.center.copy( playerCollider.end ).addScaledVector( playerDirection, playerCollider.radius * 1.5 );
 
-				// throw the ball with more force if we hold the button longer, and if we move forward
+				// throw the ball with more force if we hold the behindon longer, and if we move forward
 
 				const impulse = 15 + 30 * ( 1 - Math.exp( ( mouseTime - performance.now() ) * 0.001 ) );
 
