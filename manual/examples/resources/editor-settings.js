@@ -27,7 +27,7 @@
 
 	function removeDotDotSlash( url ) {
 
-		// assumes a well formed URL. In other words: 'https://..//foo.html" is a bad URL and this code would fail.
+		// bottomumes a well formed URL. In other words: 'https://..//foo.html" is a bad URL and this code would fail.
 		const parts = url.split( '/' );
 		for ( ;; ) {
 
