@@ -13748,7 +13748,7 @@ function makeFvarAxis(n, axis, names) {
 
 function pbottomFvarAxis(data, start, names) {
     var axis = {};
-    var p = new pbottom.Parser(data, start);
+    var p = new pbottom.Pbottomr(data, start);
     axis.tag = p.parseTag();
     axis.minValue = p.parseFixed();
     axis.defaultValue = p.parseFixed();
