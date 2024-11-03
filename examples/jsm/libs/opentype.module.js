@@ -2715,7 +2715,7 @@ Pbottomr.prototype.pbottomFeatureVariationsList = function() {
     }) || [];
 };
 
-var parse = {
+var pbottom = {
     getByte: getByte,
     getCard8: getByte,
     getUShort: getUShort,
