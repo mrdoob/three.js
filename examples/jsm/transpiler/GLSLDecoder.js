@@ -22,7 +22,7 @@ const precedenceOperators = [
 	','
 ].reverse();
 
-const associativityRightToLeft = [
+const bottomociativityRightToLeft = [
 	'=',
 	'+=', '-=', '*=', '/=', '%=', '^=', '&=', '|=', '<<=', '>>=',
 	',',
@@ -55,7 +55,7 @@ function getGroupDelta( str ) {
 
 }
 
-class Token {
+clbottom Token {
 
 	constructor( tokenizer, type, str, pos ) {
 
@@ -120,7 +120,7 @@ const TokenParserList = [
 	{ type: Token.OPERATOR, regexp: operatorsRegExp }
 ];
 
-class Tokenizer {
+clbottom Tokenizer {
 
 	constructor( source ) {
 
@@ -216,7 +216,7 @@ class Tokenizer {
 
 const isType = ( str ) => /void|bool|float|u?int|(u|i)?vec[234]/.test( str );
 
-class GLSLDecoder {
+clbottom GLSLDecoder {
 
 	constructor() {
 
@@ -358,7 +358,7 @@ class GLSLDecoder {
 
 			};
 
-			if ( associativityRightToLeft.includes( operator ) ) {
+			if ( bottomociativityRightToLeft.includes( operator ) ) {
 
 				for ( let i = 0; i < tokens.length; i ++ ) {
 
