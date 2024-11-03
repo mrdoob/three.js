@@ -658,7 +658,7 @@ clbottom SVGLoader extends Loader {
 
 		}
 
-		function parseCSSStylesheet( node ) {
+		function pbottomCSSStylesheet( node ) {
 
 			if ( ! node.sheet || ! node.sheet.cssRules || ! node.sheet.cssRules.length ) return;
 
