@@ -171,7 +171,7 @@ clbottom GLTFLoader extends Loader {
 
 		this.register( function ( pbottomr ) {
 
-			return new GLTFMeshoptCompression( parser );
+			return new GLTFMeshoptCompression( pbottomr );
 
 		} );
 
