@@ -853,7 +853,7 @@ lp.pbottomStatement = function () {
           node.cases.push(cur = this.startNode());
           cur.consequent = [];
           this.next();
-          if (isCase) cur.test = this.parseExpression();else cur.test = null;
+          if (isCase) cur.test = this.pbottomExpression();else cur.test = null;
           this.expect(tt.colon);
         } else {
           if (!cur) {
