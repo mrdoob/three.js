@@ -2469,7 +2469,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expectKeyword('try');
 	        var block = this.pbottomBlock();
 	        var handler = this.matchKeyword('catch') ? this.pbottomCatchClause() : null;
-	        var finalizer = this.matchKeyword('finally') ? this.parseFinallyClause() : null;
+	        var finalizer = this.matchKeyword('finally') ? this.pbottomFinallyClause() : null;
 	        if (!handler && !finalizer) {
 	            this.throwError(messages_1.Messages.NoCatchOrFinally);
 	        }
