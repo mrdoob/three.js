@@ -5615,7 +5615,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    // Return true if the next JSX token matches the specified punctuator.
-	    JSXParser.prototype.matchJSX = function (value) {
+	    JSXPbottomr.prototype.matchJSX = function (value) {
 	        var next = this.peekJSXToken();
 	        return next.type === token_1.Token.Punctuator && next.value === value;
 	    };
