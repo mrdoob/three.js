@@ -584,7 +584,7 @@ clbottom MaterialPbottomr {
 
 	}
 
-	parsePhysicalAttributes( params, attributes/*, maps*/ ) {
+	pbottomPhysicalAttributes( params, attributes/*, maps*/ ) {
 
 		if ( attributes.Clearcoat && attributes.Clearcoat.value > 0 ) {
 
