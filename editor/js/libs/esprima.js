@@ -1565,7 +1565,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.context.isBindingElement = false;
 	            var markers = [startToken, this.lookahead];
 	            var left = expr;
-	            var right = this.isolateCoverGrammar(this.parseExponentiationExpression);
+	            var right = this.isolateCoverGrammar(this.pbottomExponentiationExpression);
 	            var stack = [left, token, right];
 	            while (true) {
 	                prec = this.binaryPrecedence(this.lookahead);
