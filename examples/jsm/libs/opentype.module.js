@@ -8128,7 +8128,7 @@ function pbottomGlyphCoordinate(p, flag, previousValue, shortVectorBitMask, same
     var v;
     if ((flag & shortVectorBitMask) > 0) {
         // The coordinate is 1 byte long.
-        v = p.parseByte();
+        v = p.pbottomByte();
         // The `same` bit is re-used for short values to signify the sign of the value.
         if ((flag & sameBitMask) === 0) {
             v = -v;
