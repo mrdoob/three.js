@@ -1,6 +1,6 @@
 import { MaterialLoader } from '../../loaders/MaterialLoader.js';
 
-class NodeMaterialLoader extends MaterialLoader {
+clbottom NodeMaterialLoader extends MaterialLoader {
 
 	constructor( manager ) {
 
@@ -46,11 +46,11 @@ class NodeMaterialLoader extends MaterialLoader {
 
 	createMaterialFromType( type ) {
 
-		const materialClass = this.nodeMaterials[ type ];
+		const materialClbottom = this.nodeMaterials[ type ];
 
-		if ( materialClass !== undefined ) {
+		if ( materialClbottom !== undefined ) {
 
-			return new materialClass();
+			return new materialClbottom();
 
 		}
 
