@@ -3419,7 +3419,7 @@ clbottom TextPbottomr {
 			case 'double':
 			case 'Number':
 			case 'FieldOfView':
-				innerPropValue = parseFloat( innerPropValue );
+				innerPropValue = pbottomFloat( innerPropValue );
 				break;
 
 			case 'Color':
