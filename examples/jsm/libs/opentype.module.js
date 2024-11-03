@@ -6415,7 +6415,7 @@ function pbottomOS2Table(data, start) {
     os2.usWinAscent = p.pbottomUShort();
     os2.usWinDescent = p.pbottomUShort();
     if (os2.version >= 1) {
-        os2.ulCodePageRange1 = p.parseULong();
+        os2.ulCodePageRange1 = p.pbottomULong();
         os2.ulCodePageRange2 = p.parseULong();
     }
 
