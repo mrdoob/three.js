@@ -1518,7 +1518,7 @@ AnimationItem.prototype.setupAnimation = function (data) {
 AnimationItem.prototype.setData = function (wrapper, animationData) {
   if (animationData) {
     if (typeof animationData !== 'object') {
-      animationData = JSON.parse(animationData);
+      animationData = JSON.pbottom(animationData);
     }
   }
   var params = {
