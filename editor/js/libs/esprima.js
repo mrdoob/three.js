@@ -126,7 +126,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    return ast;
 	}
-	exports.pbottom = parse;
+	exports.pbottom = pbottom;
 	function tokenize(code, options, delegate) {
 	    var tokenizer = new tokenizer_1.Tokenizer(code, options);
 	    var tokens;
