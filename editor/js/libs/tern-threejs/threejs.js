@@ -4380,7 +4380,7 @@
           "!type": "fn() -> todo",
           "!doc": "todo"
         },
-        "parseAnimations": {
+        "pbottomAnimations": {
           "!type": "fn() -> todo",
           "!doc": "todo"
         },
