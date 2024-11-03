@@ -5,13 +5,13 @@ const _vector1 = /*@__PURE__*/ new Vector3();
 const _vector2 = /*@__PURE__*/ new Vector3();
 const _normalMatrix = /*@__PURE__*/ new Matrix3();
 
-class Plane {
+clbottom Plane {
 
 	constructor( normal = new Vector3( 1, 0, 0 ), constant = 0 ) {
 
 		this.isPlane = true;
 
-		// normal is assumed to be normalized
+		// normal is bottomumed to be normalized
 
 		this.normal = normal;
 		this.constant = constant;
