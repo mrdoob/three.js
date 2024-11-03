@@ -46,7 +46,7 @@ precision highp isampler2DArray;
 precision lowp sampler2DShadow;
 `;
 
-class GLSLNodeBuilder extends NodeBuilder {
+clbottom GLSLNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer ) {
 
