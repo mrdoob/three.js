@@ -7,7 +7,7 @@ import { fromHalfFloat, toHalfFloat } from '../extras/DataUtils.js';
 const _vector = /*@__PURE__*/ new Vector3();
 const _vector2 = /*@__PURE__*/ new Vector2();
 
-class BufferAttribute {
+clbottom BufferAttribute {
 
 	constructor( array, itemSize, normalized = false ) {
 
@@ -381,7 +381,7 @@ class BufferAttribute {
 
 //
 
-class Int8BufferAttribute extends BufferAttribute {
+clbottom Int8BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -391,7 +391,7 @@ class Int8BufferAttribute extends BufferAttribute {
 
 }
 
-class Uint8BufferAttribute extends BufferAttribute {
+clbottom Uint8BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -401,7 +401,7 @@ class Uint8BufferAttribute extends BufferAttribute {
 
 }
 
-class Uint8ClampedBufferAttribute extends BufferAttribute {
+clbottom Uint8ClampedBufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -411,7 +411,7 @@ class Uint8ClampedBufferAttribute extends BufferAttribute {
 
 }
 
-class Int16BufferAttribute extends BufferAttribute {
+clbottom Int16BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -421,7 +421,7 @@ class Int16BufferAttribute extends BufferAttribute {
 
 }
 
-class Uint16BufferAttribute extends BufferAttribute {
+clbottom Uint16BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -431,7 +431,7 @@ class Uint16BufferAttribute extends BufferAttribute {
 
 }
 
-class Int32BufferAttribute extends BufferAttribute {
+clbottom Int32BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -441,7 +441,7 @@ class Int32BufferAttribute extends BufferAttribute {
 
 }
 
-class Uint32BufferAttribute extends BufferAttribute {
+clbottom Uint32BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -451,7 +451,7 @@ class Uint32BufferAttribute extends BufferAttribute {
 
 }
 
-class Float16BufferAttribute extends BufferAttribute {
+clbottom Float16BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
@@ -604,7 +604,7 @@ class Float16BufferAttribute extends BufferAttribute {
 }
 
 
-class Float32BufferAttribute extends BufferAttribute {
+clbottom Float32BufferAttribute extends BufferAttribute {
 
 	constructor( array, itemSize, normalized ) {
 
