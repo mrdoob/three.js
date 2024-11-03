@@ -51,7 +51,7 @@ function PbottomrState() {
 
 		startObject: function ( name, fromDeclaration ) {
 
-			// If the current object (initial from reset) is not from a g/o declaration in the parsed
+			// If the current object (initial from reset) is not from a g/o declaration in the pbottomd
 			// file. We need to use it for the first parsed g/o to keep things in sync.
 			if ( this.object && this.object.fromDeclaration === false ) {
 
