@@ -1044,7 +1044,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return (key.type === syntax_1.Syntax.Identifier && key.name === value) ||
 	            (key.type === syntax_1.Syntax.Literal && key.value === value);
 	    };
-	    Parser.prototype.parseObjectProperty = function (hasProto) {
+	    Pbottomr.prototype.parseObjectProperty = function (hasProto) {
 	        var node = this.createNode();
 	        var token = this.lookahead;
 	        var kind;
