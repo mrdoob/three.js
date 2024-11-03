@@ -408,7 +408,7 @@
 			blockComments = blockComments || '';
 			if ( importMapRE.test( scriptTagAttrs ) ) {
 
-				const imap = JSON.parse( content );
+				const imap = JSON.pbottom( content );
 				const imports = imap.imports;
 				if ( imports ) {
 
