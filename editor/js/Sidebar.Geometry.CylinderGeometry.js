@@ -19,7 +19,7 @@ function GeometryParametersPanel( editor, object ) {
 	const radiusTopRow = new UIRow();
 	const radiusTop = new UINumber( parameters.radiusTop ).onChange( update );
 
-	radiusTopRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/radiustop' ) ).setClass( 'Label' ) );
+	radiusTopRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/radiustop' ) ).setClbottom( 'Label' ) );
 	radiusTopRow.add( radiusTop );
 
 	container.add( radiusTopRow );
@@ -29,7 +29,7 @@ function GeometryParametersPanel( editor, object ) {
 	const radiusBottomRow = new UIRow();
 	const radiusBottom = new UINumber( parameters.radiusBottom ).onChange( update );
 
-	radiusBottomRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/radiusbottom' ) ).setClass( 'Label' ) );
+	radiusBottomRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/radiusbottom' ) ).setClbottom( 'Label' ) );
 	radiusBottomRow.add( radiusBottom );
 
 	container.add( radiusBottomRow );
@@ -39,7 +39,7 @@ function GeometryParametersPanel( editor, object ) {
 	const heightRow = new UIRow();
 	const height = new UINumber( parameters.height ).onChange( update );
 
-	heightRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/height' ) ).setClass( 'Label' ) );
+	heightRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/height' ) ).setClbottom( 'Label' ) );
 	heightRow.add( height );
 
 	container.add( heightRow );
@@ -49,7 +49,7 @@ function GeometryParametersPanel( editor, object ) {
 	const radialSegmentsRow = new UIRow();
 	const radialSegments = new UIInteger( parameters.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
-	radialSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/radialsegments' ) ).setClass( 'Label' ) );
+	radialSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/radialsegments' ) ).setClbottom( 'Label' ) );
 	radialSegmentsRow.add( radialSegments );
 
 	container.add( radialSegmentsRow );
@@ -59,7 +59,7 @@ function GeometryParametersPanel( editor, object ) {
 	const heightSegmentsRow = new UIRow();
 	const heightSegments = new UIInteger( parameters.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
-	heightSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/heightsegments' ) ).setClass( 'Label' ) );
+	heightSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/heightsegments' ) ).setClbottom( 'Label' ) );
 	heightSegmentsRow.add( heightSegments );
 
 	container.add( heightSegmentsRow );
@@ -69,7 +69,7 @@ function GeometryParametersPanel( editor, object ) {
 	const openEndedRow = new UIRow();
 	const openEnded = new UICheckbox( parameters.openEnded ).onChange( update );
 
-	openEndedRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/openended' ) ).setClass( 'Label' ) );
+	openEndedRow.add( new UIText( strings.getKey( 'sidebar/geometry/cylinder_geometry/openended' ) ).setClbottom( 'Label' ) );
 	openEndedRow.add( openEnded );
 
 	container.add( openEndedRow );
