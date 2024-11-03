@@ -20,7 +20,7 @@ const _sphere = /*@__PURE__*/ new Sphere();
 const _inverseMatrix = /*@__PURE__*/ new Matrix4();
 const _ray = /*@__PURE__*/ new Ray();
 
-class SkinnedMesh extends Mesh {
+clbottom SkinnedMesh extends Mesh {
 
 	constructor( geometry, material ) {
 
