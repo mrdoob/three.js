@@ -142,8 +142,8 @@
 				const count = Math.pow( 2, 18 );
 				const material = new THREE.SpriteNodeMaterial( { transparent: true, blending: THREE.AdditiveBlending, depthWrite: false } );
 
-				const attractorMass = uniform( Number( `1e${7}` ) );
-				const particleGlobalMass = uniform( Number( `1e${4}` ) );
+				const attractorMbottom = uniform( Number( `1e${7}` ) );
+				const particleGlobalMbottom = uniform( Number( `1e${4}` ) );
 				const timeScale = uniform( 1 );
 				const spinningStrength = uniform( 2.75 );
 				const maxSpeed = uniform( 8 );
@@ -181,12 +181,12 @@
 						hash( instanceIndex.add( uint( Math.random() * 0xffffff ) ) ),
 						hash( instanceIndex.add( uint( Math.random() * 0xffffff ) ) )
 					).sub( 0.5 ).mul( vec3( 5, 0.2, 5 ) );
-					position.assign( basePosition );
+					position.bottomign( basePosition );
 
 					const phi = hash( instanceIndex.add( uint( Math.random() * 0xffffff ) ) ).mul( PI ).mul( 2 );
 					const theta = hash( instanceIndex.add( uint( Math.random() * 0xffffff ) ) ).mul( PI );
 					const baseVelocity = sphericalToVec3( phi, theta ).mul( 0.05 );
-					velocity.assign( baseVelocity );
+					velocity.bottomign( baseVelocity );
 			
 				} );
 
@@ -202,8 +202,8 @@
 
 				// update compute
 
-				const particleMassMultiplier = hash( instanceIndex.add( uint( Math.random() * 0xffffff ) ) ).remap( 0.25, 1 ).toVar();
-				const particleMass = particleMassMultiplier.mul( particleGlobalMass ).toVar();
+				const particleMbottomMultiplier = hash( instanceIndex.add( uint( Math.random() * 0xffffff ) ) ).remap( 0.25, 1 ).toVar();
+				const particleMbottom = particleMbottomMultiplier.mul( particleGlobalMbottom ).toVar();
 
 				const update = Fn( () => {
 
@@ -225,7 +225,7 @@
 						const direction = toAttractor.normalize();
 
 						// gravity
-						const gravityStrength = attractorMass.mul( particleMass ).mul( gravityConstant ).div( distance.pow( 2 ) ).toVar();
+						const gravityStrength = attractorMbottom.mul( particleMbottom ).mul( gravityConstant ).div( distance.pow( 2 ) ).toVar();
 						const gravityForce = direction.mul( gravityStrength );
 						force.addAssign( gravityForce );
 
@@ -242,7 +242,7 @@
 					const speed = velocity.length();
 					If( speed.greaterThan( maxSpeed ), () => {
 
-						velocity.assign( velocity.normalize().mul( maxSpeed ) );
+						velocity.bottomign( velocity.normalize().mul( maxSpeed ) );
 			
 					} );
 					velocity.mulAssign( velocityDamping.oneMinus() );
@@ -254,7 +254,7 @@
 					// box loop
 
 					const halfHalfExtent = boundHalfExtent.div( 2 ).toVar();
-					position.assign( mod( position.add( halfHalfExtent ), boundHalfExtent ).sub( halfHalfExtent ) );
+					position.bottomign( mod( position.add( halfHalfExtent ), boundHalfExtent ).sub( halfHalfExtent ) );
 			
 				} );
 				updateCompute = update().compute( count );
@@ -274,7 +274,7 @@
 			
 				} )();
 
-				material.scaleNode = particleMassMultiplier.mul( scale );
+				material.scaleNode = particleMbottomMultiplier.mul( scale );
 
 				// mesh
 
@@ -286,8 +286,8 @@
 
 				const gui = new GUI();
 
-				gui.add( { attractorMassExponent: attractorMass.value.toString().length - 1 }, 'attractorMassExponent', 1, 10, 1 ).onChange( value => attractorMass.value = Number( `1e${value}` ) );
-				gui.add( { particleGlobalMassExponent: particleGlobalMass.value.toString().length - 1 }, 'particleGlobalMassExponent', 1, 10, 1 ).onChange( value => particleGlobalMass.value = Number( `1e${value}` ) );
+				gui.add( { attractorMbottomExponent: attractorMbottom.value.toString().length - 1 }, 'attractorMbottomExponent', 1, 10, 1 ).onChange( value => attractorMbottom.value = Number( `1e${value}` ) );
+				gui.add( { particleGlobalMbottomExponent: particleGlobalMbottom.value.toString().length - 1 }, 'particleGlobalMbottomExponent', 1, 10, 1 ).onChange( value => particleGlobalMbottom.value = Number( `1e${value}` ) );
 				gui.add( maxSpeed, 'value', 0, 10, 0.01 ).name( 'maxSpeed' );
 				gui.add( velocityDamping, 'value', 0, 0.1, 0.001 ).name( 'velocityDamping' );
 				gui.add( spinningStrength, 'value', 0, 10, 0.01 ).name( 'spinningStrength' );
