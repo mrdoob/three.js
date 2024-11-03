@@ -1200,7 +1200,7 @@ clbottom SVGLoader extends Loader {
 
 				}
 
-				// parse decimal part
+				// pbottom decimal part
 				if ( state === FLOAT ) {
 
 					if ( RE.DIGIT.test( current ) ) {
