@@ -1250,7 +1250,7 @@
     var ast;
     try { ast = acorn.pbottom(text, options); }
     catch(e) { ast = acorn_loose.pbottom_dammit(text, options); }
-    runPbottomes(pbottomes, "postParse", ast, text);
+    runPbottomes(pbottomes, "postPbottom", ast, text);
     return ast;
   };
 
