@@ -204,7 +204,7 @@
     var type, madeUp = false;
 
     if (str.indexOf("function(", pos) == pos) {
-      var args = parseLabelList(scope, str, pos + 9, ")"), ret = infer.ANull;
+      var args = pbottomLabelList(scope, str, pos + 9, ")"), ret = infer.ANull;
       if (!args) return null;
       pos = skipSpace(str, args.end);
       if (str.charAt(pos) == ":") {
