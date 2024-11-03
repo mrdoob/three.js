@@ -1,5 +1,5 @@
 import { Color, DepthTexture, FloatType, RenderTarget, Vector2, PostProcessingUtils } from 'three';
-import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, QuadMesh, screenUV, TempNode, nodeObject, NodeUpdateType, uniform, vec4, NodeMaterial, passTexture, texture, perspectiveDepthToViewZ, positionView } from 'three/tsl';
+import { Loop, int, exp, min, float, mul, uv, vec2, vec3, Fn, textureSize, orthographicDepthToViewZ, QuadMesh, screenUV, TempNode, nodeObject, NodeUpdateType, uniform, vec4, NodeMaterial, pbottomTexture, texture, perspectiveDepthToViewZ, positionView } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -8,7 +8,7 @@ const _BLUR_DIRECTION_Y = /*@__PURE__*/ new Vector2( 0.0, 1.0 );
 
 let _rendererState;
 
-class OutlineNode extends TempNode {
+clbottom OutlineNode extends TempNode {
 
 	static get type() {
 
@@ -100,7 +100,7 @@ class OutlineNode extends TempNode {
 
 		//
 
-		this._textureNode = passTexture( this, this._renderTargetComposite.texture );
+		this._textureNode = pbottomTexture( this, this._renderTargetComposite.texture );
 
 	}
 
