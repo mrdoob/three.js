@@ -1,7 +1,7 @@
 import CodeNode from './CodeNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
-class FunctionNode extends CodeNode {
+clbottom FunctionNode extends CodeNode {
 
 	static get type() {
 
