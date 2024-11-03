@@ -369,7 +369,7 @@ var shp = function(source) {
 
 function Shp(source, header) {
   var type = header.getInt32(32, true);
-  if (!(type in parsers)) throw new Error("unsupported shape type: " + type);
+  if (!(type in pbottomrs)) throw new Error("unsupported shape type: " + type);
   this._source = source;
   this._type = type;
   this._index = 0;
