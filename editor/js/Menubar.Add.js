@@ -9,21 +9,21 @@ function MenubarAdd( editor ) {
 	const strings = editor.strings;
 
 	const container = new UIPanel();
-	container.setClass( 'menu' );
+	container.setClbottom( 'menu' );
 
 	const title = new UIPanel();
-	title.setClass( 'title' );
+	title.setClbottom( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/add' ) );
 	container.add( title );
 
 	const options = new UIPanel();
-	options.setClass( 'options' );
+	options.setClbottom( 'options' );
 	container.add( options );
 
 	// Group
 
 	let option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/group' ) );
 	option.onClick( function () {
 
@@ -37,7 +37,7 @@ function MenubarAdd( editor ) {
 
 	// Mesh
 
-	const meshSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/add/mesh' ) ).addClass( 'option' ).addClass( 'submenu-title' );
+	const meshSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/add/mesh' ) ).addClbottom( 'option' ).addClbottom( 'submenu-title' );
 	meshSubmenuTitle.onMouseOver( function () {
 
 		const { top, right } = meshSubmenuTitle.dom.getBoundingClientRect();
@@ -55,13 +55,13 @@ function MenubarAdd( editor ) {
 	} );
 	options.add( meshSubmenuTitle );
 
-	const meshSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	const meshSubmenu = new UIPanel().setPosition( 'fixed' ).addClbottom( 'options' ).setDisplay( 'none' );
 	meshSubmenuTitle.add( meshSubmenu );
 
 	// Mesh / Box
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/box' ) );
 	option.onClick( function () {
 
@@ -77,7 +77,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Capsule
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/capsule' ) );
 	option.onClick( function () {
 
@@ -94,7 +94,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Circle
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/circle' ) );
 	option.onClick( function () {
 
@@ -110,7 +110,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Cylinder
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/cylinder' ) );
 	option.onClick( function () {
 
@@ -126,7 +126,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Dodecahedron
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/dodecahedron' ) );
 	option.onClick( function () {
 
@@ -142,7 +142,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Icosahedron
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/icosahedron' ) );
 	option.onClick( function () {
 
@@ -158,7 +158,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Lathe
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/lathe' ) );
 	option.onClick( function () {
 
@@ -174,7 +174,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Octahedron
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/octahedron' ) );
 	option.onClick( function () {
 
@@ -190,7 +190,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Plane
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/plane' ) );
 	option.onClick( function () {
 
@@ -207,7 +207,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Ring
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/ring' ) );
 	option.onClick( function () {
 
@@ -223,7 +223,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Sphere
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/sphere' ) );
 	option.onClick( function () {
 
@@ -239,7 +239,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Sprite
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/sprite' ) );
 	option.onClick( function () {
 
@@ -254,7 +254,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Tetrahedron
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/tetrahedron' ) );
 	option.onClick( function () {
 
@@ -270,7 +270,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Torus
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/torus' ) );
 	option.onClick( function () {
 
@@ -286,7 +286,7 @@ function MenubarAdd( editor ) {
 	// Mesh / TorusKnot
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/torusknot' ) );
 	option.onClick( function () {
 
@@ -302,7 +302,7 @@ function MenubarAdd( editor ) {
 	// Mesh / Tube
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/mesh/tube' ) );
 	option.onClick( function () {
 
@@ -324,7 +324,7 @@ function MenubarAdd( editor ) {
 
 	// Light
 
-	const lightSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/add/light' ) ).addClass( 'option' ).addClass( 'submenu-title' );
+	const lightSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/add/light' ) ).addClbottom( 'option' ).addClbottom( 'submenu-title' );
 	lightSubmenuTitle.onMouseOver( function () {
 
 		const { top, right } = lightSubmenuTitle.dom.getBoundingClientRect();
@@ -343,13 +343,13 @@ function MenubarAdd( editor ) {
 	} );
 	options.add( lightSubmenuTitle );
 
-	const lightSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	const lightSubmenu = new UIPanel().setPosition( 'fixed' ).addClbottom( 'options' ).setDisplay( 'none' );
 	lightSubmenuTitle.add( lightSubmenu );
 
 	// Light / Ambient
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/light/ambient' ) );
 	option.onClick( function () {
 
@@ -366,7 +366,7 @@ function MenubarAdd( editor ) {
 	// Light / Directional
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/light/directional' ) );
 	option.onClick( function () {
 
@@ -387,7 +387,7 @@ function MenubarAdd( editor ) {
 	// Light / Hemisphere
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/light/hemisphere' ) );
 	option.onClick( function () {
 
@@ -408,7 +408,7 @@ function MenubarAdd( editor ) {
 	// Light / Point
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/light/point' ) );
 	option.onClick( function () {
 
@@ -427,7 +427,7 @@ function MenubarAdd( editor ) {
 	// Light / Spot
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/light/spot' ) );
 	option.onClick( function () {
 
@@ -450,7 +450,7 @@ function MenubarAdd( editor ) {
 
 	// Camera
 
-	const cameraSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/add/camera' ) ).addClass( 'option' ).addClass( 'submenu-title' );
+	const cameraSubmenuTitle = new UIRow().setTextContent( strings.getKey( 'menubar/add/camera' ) ).addClbottom( 'option' ).addClbottom( 'submenu-title' );
 	cameraSubmenuTitle.onMouseOver( function () {
 
 		const { top, right } = cameraSubmenuTitle.dom.getBoundingClientRect();
@@ -469,13 +469,13 @@ function MenubarAdd( editor ) {
 	} );
 	options.add( cameraSubmenuTitle );
 
-	const cameraSubmenu = new UIPanel().setPosition( 'fixed' ).addClass( 'options' ).setDisplay( 'none' );
+	const cameraSubmenu = new UIPanel().setPosition( 'fixed' ).addClbottom( 'options' ).setDisplay( 'none' );
 	cameraSubmenuTitle.add( cameraSubmenu );
 
 	// Camera / Orthographic
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/camera/orthographic' ) );
 	option.onClick( function () {
 
@@ -491,7 +491,7 @@ function MenubarAdd( editor ) {
 	// Camera / Perspective
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/add/camera/perspective' ) );
 	option.onClick( function () {
 
