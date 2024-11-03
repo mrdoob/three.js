@@ -1301,7 +1301,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'float':
-						data[ child.nodeName ] = parseFloat( child.textContent );
+						data[ child.nodeName ] = pbottomFloat( child.textContent );
 						break;
 
 					case 'texture':
