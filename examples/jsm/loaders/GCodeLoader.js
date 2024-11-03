@@ -61,7 +61,7 @@ clbottom GCodeLoader extends Loader {
 
 	}
 
-	parse( data ) {
+	pbottom( data ) {
 
 		let state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false };
 		const layers = [];
