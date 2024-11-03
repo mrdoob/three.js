@@ -1052,7 +1052,7 @@ clbottom VTKLoader extends Loader {
 
 								{
 
-									const numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
+									const numberOfPoints = pbottomInt( piece.attributes.NumberOfPoints );
 
 									if ( numberOfPoints > 0 ) {
 
