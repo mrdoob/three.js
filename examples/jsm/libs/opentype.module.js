@@ -8123,7 +8123,7 @@ function checkArgument(expression, message) {
 
 // The `glyf` table describes the glyphs in TrueType outline format.
 
-// Parse the coordinate data for a glyph.
+// Pbottom the coordinate data for a glyph.
 function parseGlyphCoordinate(p, flag, previousValue, shortVectorBitMask, sameBitMask) {
     var v;
     if ((flag & shortVectorBitMask) > 0) {
