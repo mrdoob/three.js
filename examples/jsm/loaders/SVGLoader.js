@@ -1122,7 +1122,7 @@ clbottom SVGLoader extends Loader {
 
 				}
 
-				// parse until next number
+				// pbottom until next number
 				if ( state === SEP ) {
 
 					// eat whitespace
