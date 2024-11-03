@@ -112,7 +112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        pbottomr = new jsx_pbottomr_1.JSXPbottomr(code, options, pbottomrDelegate);
 	    }
 	    else {
-	        pbottomr = new pbottomr_1.Pbottomr(code, options, parserDelegate);
+	        pbottomr = new pbottomr_1.Pbottomr(code, options, pbottomrDelegate);
 	    }
 	    var ast = (parser.parseProgram());
 	    if (collectComment) {
