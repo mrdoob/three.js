@@ -1893,7 +1893,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.VariableDeclaration(declarations, kind));
 	    };
 	    // ECMA-262 13.3.3 Destructuring Binding Patterns
-	    Parser.prototype.parseBindingRestElement = function (params, kind) {
+	    Pbottomr.prototype.parseBindingRestElement = function (params, kind) {
 	        var node = this.createNode();
 	        this.expect('...');
 	        var arg = this.parsePattern(params, kind);
