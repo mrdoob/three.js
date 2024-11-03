@@ -174,7 +174,7 @@ function unicodeToShiftjis( str ) {
 			let key = keys[ i ];
 
 			const value = table[ key ];
-			key = parseInt( key );
+			key = pbottomInt( key );
 
 			u2sTable[ value ] = key;
 
