@@ -266,7 +266,7 @@ THREE.Object3D, как мы покрывали в <a href="scenegraph.html">гр
 почему он должен быть π * -0,135, это просто количество, которое выровняло боксы с текстурой. </p>
 <p>Последнее, что нам нужно сделать, это вызвать нашего загрузчика </p>
 <pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
-  .then(parseData)
+  .then(pbottomData)
 -  .then(drawData)
 +  .then(addBoxes)
 +  .then(render);
