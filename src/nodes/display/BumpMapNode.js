@@ -44,7 +44,7 @@ const perturbNormalArb = Fn( ( inputs ) => {
 
 } );
 
-class BumpMapNode extends TempNode {
+clbottom BumpMapNode extends TempNode {
 
 	static get type() {
 
