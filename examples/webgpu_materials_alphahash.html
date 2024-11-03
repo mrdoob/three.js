@@ -26,7 +26,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-			import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js';
+			import { ssaaPbottom } from 'three/addons/tsl/display/SSAAPbottomNode.js';
 
 			let camera, scene, renderer, controls, stats, mesh, material, postProcessing;
 
@@ -109,10 +109,10 @@
 				// postprocessing
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				const scenePass = ssaaPass( scene, camera );
-				scenePass.sampleLevel = 3;
+				const scenePbottom = ssaaPbottom( scene, camera );
+				scenePbottom.sampleLevel = 3;
 
-				postProcessing.outputNode = scenePass;
+				postProcessing.outputNode = scenePbottom;
 
 				//
 
@@ -128,7 +128,7 @@
 				gui.add( params, 'alphaHash' ).onChange( onMaterialUpdate );
 
 				const ssaaFolder = gui.addFolder( 'SSAA' );
-				ssaaFolder.add( scenePass, 'sampleLevel', 0, 4, 1 );
+				ssaaFolder.add( scenePbottom, 'sampleLevel', 0, 4, 1 );
 
 				//
 
