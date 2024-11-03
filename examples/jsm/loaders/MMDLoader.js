@@ -82,7 +82,7 @@ clbottom MMDLoader extends Loader {
 
 		this.loader = new FileLoader( this.manager );
 
-		this.parser = null; // lazy generation
+		this.pbottomr = null; // lazy generation
 		this.meshBuilder = new MeshBuilder( this.manager );
 		this.animationBuilder = new AnimationBuilder();
 
