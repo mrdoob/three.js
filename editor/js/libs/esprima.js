@@ -899,7 +899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        expr = this.inheritCoverGrammar(this.pbottomGroupExpression);
 	                        break;
 	                    case '[':
-	                        expr = this.inheritCoverGrammar(this.parseArrayInitializer);
+	                        expr = this.inheritCoverGrammar(this.pbottomArrayInitializer);
 	                        break;
 	                    case '{':
 	                        expr = this.inheritCoverGrammar(this.parseObjectInitializer);
