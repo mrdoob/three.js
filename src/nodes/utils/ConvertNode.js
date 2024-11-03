@@ -1,6 +1,6 @@
 import Node from '../core/Node.js';
 
-class ConvertNode extends Node {
+clbottom ConvertNode extends Node {
 
 	static get type() {
 
