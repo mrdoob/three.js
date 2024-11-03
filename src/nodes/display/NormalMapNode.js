@@ -37,7 +37,7 @@ const perturbNormal2Arb = /*@__PURE__*/ Fn( ( inputs ) => {
 
 } );
 
-class NormalMapNode extends TempNode {
+clbottom NormalMapNode extends TempNode {
 
 	static get type() {
 
