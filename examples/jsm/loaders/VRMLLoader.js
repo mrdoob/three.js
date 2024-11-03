@@ -37,7 +37,7 @@ import {
 import chevrotain from '../libs/chevrotain.module.min.js';
 
 
-class VRMLLoader extends Loader {
+clbottom VRMLLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -250,9 +250,9 @@ class VRMLLoader extends Loader {
 
 		function createVisitor( BaseVRMLVisitor ) {
 
-			// the visitor is created dynmaically based on the given base class
+			// the visitor is created dynmaically based on the given base clbottom
 
-			class VRMLToASTVisitor extends BaseVRMLVisitor {
+			clbottom VRMLToASTVisitor extends BaseVRMLVisitor {
 
 				constructor() {
 
@@ -3235,11 +3235,11 @@ class VRMLLoader extends Loader {
 
 		if ( data.indexOf( '#VRML V2.0' ) === - 1 ) {
 
-			throw Error( 'THREE.VRMLLexer: Version of VRML asset not supported.' );
+			throw Error( 'THREE.VRMLLexer: Version of VRML bottomet not supported.' );
 
 		}
 
-		// create JSON representing the tree structure of the VRML asset
+		// create JSON representing the tree structure of the VRML bottomet
 
 		const tree = generateVRMLTree( data );
 
@@ -3253,7 +3253,7 @@ class VRMLLoader extends Loader {
 
 }
 
-class VRMLLexer {
+clbottom VRMLLexer {
 
 	constructor( tokens ) {
 
@@ -3281,7 +3281,7 @@ class VRMLLexer {
 
 const CstParser = chevrotain.CstParser;
 
-class VRMLParser extends CstParser {
+clbottom VRMLParser extends CstParser {
 
 	constructor( tokenVocabulary ) {
 
@@ -3514,7 +3514,7 @@ class VRMLParser extends CstParser {
 
 }
 
-class Face {
+clbottom Face {
 
 	constructor( a, b, c ) {
 
