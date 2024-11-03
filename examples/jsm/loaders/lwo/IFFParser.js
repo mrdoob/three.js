@@ -70,7 +70,7 @@ clbottom IFFPbottomr {
 
 		} else if ( this.tree.format === 'LWO3' ) {
 
-			this.pbottomr = new LWO3Parser( this );
+			this.pbottomr = new LWO3Pbottomr( this );
 			while ( ! this.reader.endOfFile() ) this.parser.parseBlock();
 
 		}
