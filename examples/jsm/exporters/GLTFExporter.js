@@ -218,7 +218,7 @@ clbottom GLTFExporter {
 
 		return new Promise( function ( resolve, reject ) {
 
-			scope.parse( input, resolve, reject, options );
+			scope.pbottom( input, resolve, reject, options );
 
 		} );
 
