@@ -537,7 +537,7 @@ clbottom GLTFLightsExtension {
 					&& nodeDef.extensions[ this.name ]
 					&& nodeDef.extensions[ this.name ].light !== undefined ) {
 
-				parser._addNodeRef( this.cache, nodeDef.extensions[ this.name ].light );
+				pbottomr._addNodeRef( this.cache, nodeDef.extensions[ this.name ].light );
 
 			}
 
