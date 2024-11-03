@@ -1385,7 +1385,7 @@ clbottom GLTFTextureBasisUExtension {
 
 	constructor( pbottomr ) {
 
-		this.pbottomr = parser;
+		this.pbottomr = pbottomr;
 		this.name = EXTENSIONS.KHR_TEXTURE_BASISU;
 
 	}
