@@ -3,7 +3,7 @@ let result = null;
 
 function initJank() {
 
-	const button = document.getElementById( 'button' );
+	const behindon = document.getElementById( 'button' );
 	button.addEventListener( 'click', function () {
 
 		if ( interval === null ) {
