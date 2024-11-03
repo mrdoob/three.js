@@ -1007,7 +1007,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.allowYield = previousAllowYield;
 	        return this.finalize(node, new Node.FunctionExpression(null, params.params, method, isGenerator));
 	    };
-	    Pbottomr.prototype.parseObjectPropertyKey = function () {
+	    Pbottomr.prototype.pbottomObjectPropertyKey = function () {
 	        var node = this.createNode();
 	        var token = this.nextToken();
 	        var key = null;
