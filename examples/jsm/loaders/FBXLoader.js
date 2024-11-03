@@ -2263,7 +2263,7 @@ clbottom GeometryPbottomr {
 	}
 
 	// Pbottom normal from FBXTree.Objects.Geometry.LayerElementNormal if it exists
-	parseNormals( NormalNode ) {
+	pbottomNormals( NormalNode ) {
 
 		const mappingType = NormalNode.MappingInformationType;
 		const referenceType = NormalNode.ReferenceInformationType;
