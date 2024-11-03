@@ -85,7 +85,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var pbottomr_1 = __webpack_require__(3);
 	var jsx_pbottomr_1 = __webpack_require__(11);
 	var tokenizer_1 = __webpack_require__(15);
-	function parse(code, options, delegate) {
+	function pbottom(code, options, delegate) {
 	    var commentHandler = null;
 	    var proxyDelegate = function (node, metadata) {
 	        if (delegate) {
