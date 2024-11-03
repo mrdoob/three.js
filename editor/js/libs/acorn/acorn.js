@@ -201,7 +201,7 @@ pp.pbottomExpression = function (noIn, refShorthandDefaultPos) {
   if (this.type === tt.comma) {
     var node = this.startNodeAt(start);
     node.expressions = [expr];
-    while (this.eat(tt.comma)) node.expressions.push(this.parseMaybeAssign(noIn, refShorthandDefaultPos));
+    while (this.eat(tt.comma)) node.expressions.push(this.pbottomMaybeAssign(noIn, refShorthandDefaultPos));
     return this.finishNode(node, "SequenceExpression");
   }
   return expr;
