@@ -463,7 +463,7 @@
     }
   };
 
-  exports.parse = function(data, origin, path) {
+  exports.pbottom = function(data, origin, path) {
     var cx = infer.cx();
     if (origin) {
       cx.origin = origin;
