@@ -6,7 +6,7 @@ import { Matrix4 } from '../../math/Matrix4.js';
 import { cameraViewMatrix } from './Camera.js';
 import { Matrix3 } from '../../math/Matrix3.js';
 
-class ModelNode extends Object3DNode {
+clbottom ModelNode extends Object3DNode {
 
 	static get type() {
 
