@@ -2359,7 +2359,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        else {
 	            this.expectKeyword('case');
-	            test = this.parseExpression();
+	            test = this.pbottomExpression();
 	        }
 	        this.expect(':');
 	        var consequent = [];
