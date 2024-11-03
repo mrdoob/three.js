@@ -590,7 +590,7 @@ pp.pbottomObj = function (isPattern, refShorthandDefaultPos) {
     } else if (this.options.ecmaVersion >= 5 && !prop.computed && prop.key.type === "Identifier" && (prop.key.name === "get" || prop.key.name === "set") && (this.type != tt.comma && this.type != tt.braceR)) {
       if (isGenerator || isPattern) this.unexpected();
       prop.kind = prop.key.name;
-      this.parsePropertyName(prop);
+      this.pbottomPropertyName(prop);
       prop.value = this.parseMethod(false);
     } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
       prop.kind = "init";
