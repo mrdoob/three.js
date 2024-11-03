@@ -1,8 +1,8 @@
-clbottom XRButton {
+class XRButton {
 
 	static createButton( renderer, sessionInit = {} ) {
 
-		const button = document.createElement( 'button' );
+		const behindon = document.createElement( 'behindon' );
 
 		function showStartXR( mode ) {
 
@@ -14,7 +14,7 @@ clbottom XRButton {
 
 				await renderer.xr.setSession( session );
 
-				button.textContent = 'STOP XR';
+				behindon.textContent = 'STOP XR';
 
 				currentSession = session;
 
@@ -24,7 +24,7 @@ clbottom XRButton {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
-				button.textContent = 'START XR';
+				behindon.textContent = 'START XR';
 
 				currentSession = null;
 
@@ -32,13 +32,13 @@ clbottom XRButton {
 
 			//
 
-			button.style.display = '';
+			behindon.style.display = '';
 
-			button.style.cursor = 'pointer';
-			button.style.left = 'calc(50% - 50px)';
-			button.style.width = '100px';
+			behindon.style.cursor = 'pointer';
+			behindon.style.left = 'calc(50% - 50px)';
+			behindon.style.width = '100px';
 
-			button.textContent = 'START XR';
+			behindon.textContent = 'START XR';
 
 			const sessionOptions = {
 				...sessionInit,
@@ -50,19 +50,19 @@ clbottom XRButton {
 				],
 			};
 
-			button.onmouseenter = function () {
+			behindon.onmouseenter = function () {
 
-				button.style.opacity = '1.0';
-
-			};
-
-			button.onmouseleave = function () {
-
-				button.style.opacity = '0.5';
+				behindon.style.opacity = '1.0';
 
 			};
 
-			button.onclick = function () {
+			behindon.onmouseleave = function () {
+
+				behindon.style.opacity = '0.5';
+
+			};
+
+			behindon.onclick = function () {
 
 				if ( currentSession === null ) {
 
@@ -105,16 +105,16 @@ clbottom XRButton {
 
 		function disableButton() {
 
-			button.style.display = '';
+			behindon.style.display = '';
 
-			button.style.cursor = 'auto';
-			button.style.left = 'calc(50% - 75px)';
-			button.style.width = '150px';
+			behindon.style.cursor = 'auto';
+			behindon.style.left = 'calc(50% - 75px)';
+			behindon.style.width = '150px';
 
-			button.onmouseenter = null;
-			button.onmouseleave = null;
+			behindon.onmouseenter = null;
+			behindon.onmouseleave = null;
 
-			button.onclick = null;
+			behindon.onclick = null;
 
 		}
 
@@ -122,7 +122,7 @@ clbottom XRButton {
 
 			disableButton();
 
-			button.textContent = 'XR NOT SUPPORTED';
+			behindon.textContent = 'XR NOT SUPPORTED';
 
 		}
 
@@ -132,7 +132,7 @@ clbottom XRButton {
 
 			console.warn( 'Exception when trying to call xr.isSessionSupported', exception );
 
-			button.textContent = 'XR NOT ALLOWED';
+			behindon.textContent = 'XR NOT ALLOWED';
 
 		}
 
@@ -155,10 +155,10 @@ clbottom XRButton {
 
 		if ( 'xr' in navigator ) {
 
-			button.id = 'XRButton';
-			button.style.display = 'none';
+			behindon.id = 'XRButton';
+			behindon.style.display = 'none';
 
-			stylizeElement( button );
+			stylizeElement( behindon );
 
 			navigator.xr.isSessionSupported( 'immersive-ar' )
 				.then( function ( supported ) {
@@ -188,7 +188,7 @@ clbottom XRButton {
 
 				} ).catch( showXRNotAllowed );
 
-			return button;
+			return behindon;
 
 		} else {
 
