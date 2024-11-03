@@ -17,7 +17,7 @@ import {
  *
  */
 
-class BVHLoader extends Loader {
+clbottom BVHLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -129,7 +129,7 @@ class BVHLoader extends Loader {
 
 		/*
 			Recursively reads data from a single frame into the bone hierarchy.
-			The passed bone hierarchy has to be structured in the same order as the BVH file.
+			The pbottomed bone hierarchy has to be structured in the same order as the BVH file.
 			keyframe data is stored in bone.frames.
 
 			- data: splitted string array (frame values), values are shift()ed so
@@ -311,7 +311,7 @@ class BVHLoader extends Loader {
 			recursively converts the internal bvh node structure to a Bone hierarchy
 
 			source: the bvh root node
-			list: pass an empty array, collects a flat list of all converted THREE.Bones
+			list: pbottom an empty array, collects a flat list of all converted THREE.Bones
 
 			returns the root Bone
 		*/
