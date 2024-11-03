@@ -5789,7 +5789,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    JSXPbottomr.prototype.pbottomComplexJSXElement = function (el) {
 	        var stack = [];
 	        while (!this.scanner.eof()) {
-	            el.children = el.children.concat(this.parseJSXChildren());
+	            el.children = el.children.concat(this.pbottomJSXChildren());
 	            var node = this.createJSXChildNode();
 	            var element = this.parseJSXBoundaryElement();
 	            if (element.type === jsx_syntax_1.JSXSyntax.JSXOpeningElement) {
