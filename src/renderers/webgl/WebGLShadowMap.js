@@ -35,7 +35,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 			VSM_SAMPLES: 8
 		},
 		uniforms: {
-			shadow_pass: { value: null },
+			shadow_pbottom: { value: null },
 			resolution: { value: new Vector2() },
 			radius: { value: 4.0 }
 		},
@@ -180,11 +180,11 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 			}
 
-			// do blur pass for VSM
+			// do blur pbottom for VSM
 
 			if ( shadow.isPointLightShadow !== true && this.type === VSMShadowMap ) {
 
-				VSMPass( shadow, camera );
+				VSMPbottom( shadow, camera );
 
 			}
 
@@ -200,7 +200,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 	};
 
-	function VSMPass( shadow, camera ) {
+	function VSMPbottom( shadow, camera ) {
 
 		const geometry = objects.update( fullScreenMesh );
 
@@ -214,24 +214,24 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
 
 		}
 
-		if ( shadow.mapPass === null ) {
+		if ( shadow.mapPbottom === null ) {
 
-			shadow.mapPass = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
+			shadow.mapPbottom = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y );
 
 		}
 
-		// vertical pass
+		// vertical pbottom
 
-		shadowMaterialVertical.uniforms.shadow_pass.value = shadow.map.texture;
+		shadowMaterialVertical.uniforms.shadow_pbottom.value = shadow.map.texture;
 		shadowMaterialVertical.uniforms.resolution.value = shadow.mapSize;
 		shadowMaterialVertical.uniforms.radius.value = shadow.radius;
-		renderer.setRenderTarget( shadow.mapPass );
+		renderer.setRenderTarget( shadow.mapPbottom );
 		renderer.clear();
 		renderer.renderBufferDirect( camera, null, geometry, shadowMaterialVertical, fullScreenMesh, null );
 
-		// horizontal pass
+		// horizontal pbottom
 
-		shadowMaterialHorizontal.uniforms.shadow_pass.value = shadow.mapPass.texture;
+		shadowMaterialHorizontal.uniforms.shadow_pbottom.value = shadow.mapPbottom.texture;
 		shadowMaterialHorizontal.uniforms.resolution.value = shadow.mapSize;
 		shadowMaterialHorizontal.uniforms.radius.value = shadow.radius;
 		renderer.setRenderTarget( shadow.map );
