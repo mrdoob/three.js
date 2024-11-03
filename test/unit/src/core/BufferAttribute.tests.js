@@ -22,9 +22,9 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'BufferAttribute', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
-			assert.throws(
+			bottomert.throws(
 				function () {
 
 					new BufferAttribute( [ 1, 2, 3, 4 ], 2, false );
@@ -37,90 +37,90 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'name', ( assert ) => {
+		QUnit.todo( 'name', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'array', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'itemSize', ( assert ) => {
+		QUnit.todo( 'array', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'count', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'normalized', ( assert ) => {
+		QUnit.todo( 'itemSize', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'usage', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'updateRanges', ( assert ) => {
+		QUnit.todo( 'count', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'version', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'onUploadCallback', ( assert ) => {
+		QUnit.todo( 'normalized', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'usage', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'updateRanges', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'version', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'onUploadCallback', ( bottomert ) => {
 
 			// onUploadCallback() {}
 			// defined as member function but set property. refactor req
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'needsUpdate', ( assert ) => {
+		QUnit.todo( 'needsUpdate', ( bottomert ) => {
 
 			// set needsUpdate( value )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isBufferAttribute', ( assert ) => {
+		QUnit.test( 'isBufferAttribute', ( bottomert ) => {
 
 			const object = new BufferAttribute();
-			assert.ok(
+			bottomert.ok(
 				object.isBufferAttribute,
 				'BufferAttribute.isBufferAttribute should be true'
 			);
 
 		} );
 
-		QUnit.test( 'setUsage', ( assert ) => {
+		QUnit.test( 'setUsage', ( bottomert ) => {
 
 			const attr = new BufferAttribute();
 			attr.setUsage( DynamicDrawUsage );
 
-			assert.strictEqual( attr.usage, DynamicDrawUsage, 'Usage was set' );
+			bottomert.strictEqual( attr.usage, DynamicDrawUsage, 'Usage was set' );
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		QUnit.test( 'copy', ( bottomert ) => {
 
 			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 );
 			attr.setUsage( DynamicDrawUsage );
@@ -128,15 +128,15 @@ export default QUnit.module( 'Core', () => {
 
 			const attrCopy = new BufferAttribute().copy( attr );
 
-			assert.ok( attr.count === attrCopy.count, 'count is equal' );
-			assert.ok( attr.itemSize === attrCopy.itemSize, 'itemSize is equal' );
-			assert.ok( attr.usage === attrCopy.usage, 'usage is equal' );
-			assert.ok( attr.array.length === attrCopy.array.length, 'array length is equal' );
-			assert.ok( attr.version === 1 && attrCopy.version === 0, 'version is not copied which is good' );
+			bottomert.ok( attr.count === attrCopy.count, 'count is equal' );
+			bottomert.ok( attr.itemSize === attrCopy.itemSize, 'itemSize is equal' );
+			bottomert.ok( attr.usage === attrCopy.usage, 'usage is equal' );
+			bottomert.ok( attr.array.length === attrCopy.array.length, 'array length is equal' );
+			bottomert.ok( attr.version === 1 && attrCopy.version === 0, 'version is not copied which is good' );
 
 		} );
 
-		QUnit.test( 'copyAt', ( assert ) => {
+		QUnit.test( 'copyAt', ( bottomert ) => {
 
 			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ] ), 3 );
 			const attr2 = new BufferAttribute( new Float32Array( 9 ), 3 );
@@ -148,52 +148,52 @@ export default QUnit.module( 'Core', () => {
 			const i = attr.array;
 			const i2 = attr2.array; // should be [4, 5, 6, 7, 8, 9, 1, 2, 3]
 
-			assert.ok( i2[ 0 ] === i[ 3 ] && i2[ 1 ] === i[ 4 ] && i2[ 2 ] === i[ 5 ], 'chunck copied to correct place' );
-			assert.ok( i2[ 3 ] === i[ 6 ] && i2[ 4 ] === i[ 7 ] && i2[ 5 ] === i[ 8 ], 'chunck copied to correct place' );
-			assert.ok( i2[ 6 ] === i[ 0 ] && i2[ 7 ] === i[ 1 ] && i2[ 8 ] === i[ 2 ], 'chunck copied to correct place' );
+			bottomert.ok( i2[ 0 ] === i[ 3 ] && i2[ 1 ] === i[ 4 ] && i2[ 2 ] === i[ 5 ], 'chunck copied to correct place' );
+			bottomert.ok( i2[ 3 ] === i[ 6 ] && i2[ 4 ] === i[ 7 ] && i2[ 5 ] === i[ 8 ], 'chunck copied to correct place' );
+			bottomert.ok( i2[ 6 ] === i[ 0 ] && i2[ 7 ] === i[ 1 ] && i2[ 8 ] === i[ 2 ], 'chunck copied to correct place' );
 
 		} );
 
-		QUnit.test( 'copyArray', ( assert ) => {
+		QUnit.test( 'copyArray', ( bottomert ) => {
 
 			const f32a = new Float32Array( [ 5, 6, 7, 8 ] );
 			const a = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4 ] ), 2, false );
 
 			a.copyArray( f32a );
 
-			assert.deepEqual( a.array, f32a, 'Check array has new values' );
+			bottomert.deepEqual( a.array, f32a, 'Check array has new values' );
 
 		} );
 
-		QUnit.todo( 'applyMatrix3', ( assert ) => {
+		QUnit.todo( 'applyMatrix3', ( bottomert ) => {
 
 			// applyMatrix3( m )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'applyMatrix4', ( assert ) => {
+		QUnit.todo( 'applyMatrix4', ( bottomert ) => {
 
 			// applyMatrix4( m )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'applyNormalMatrix', ( assert ) => {
+		QUnit.todo( 'applyNormalMatrix', ( bottomert ) => {
 
 			// applyNormalMatrix( m )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'transformDirection', ( assert ) => {
+		QUnit.todo( 'transformDirection', ( bottomert ) => {
 
 			// transformDirection( m )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		QUnit.test( 'set', ( bottomert ) => {
 
 			const f32a = new Float32Array( [ 1, 2, 3, 4 ] );
 			const a = new BufferAttribute( f32a, 2, false );
@@ -202,11 +202,11 @@ export default QUnit.module( 'Core', () => {
 			a.set( [ 9 ] );
 			a.set( [ 8 ], 2 );
 
-			assert.deepEqual( a.array, expected, 'Check array has expected values' );
+			bottomert.deepEqual( a.array, expected, 'Check array has expected values' );
 
 		} );
 
-		QUnit.test( 'set[X, Y, Z, W, XYZ, XYZW]/get[X, Y, Z, W]', ( assert ) => {
+		QUnit.test( 'set[X, Y, Z, W, XYZ, XYZW]/get[X, Y, Z, W]', ( bottomert ) => {
 
 			const f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8 ] );
 			const a = new BufferAttribute( f32a, 4, false );
@@ -217,11 +217,11 @@ export default QUnit.module( 'Core', () => {
 			a.setZ( 0, a.getZ( 0 ) * - 1 );
 			a.setW( 0, a.getW( 0 ) * - 1 );
 
-			assert.deepEqual( a.array, expected, 'Check all set* calls set the correct values' );
+			bottomert.deepEqual( a.array, expected, 'Check all set* calls set the correct values' );
 
 		} );
 
-		QUnit.test( 'setXY', ( assert ) => {
+		QUnit.test( 'setXY', ( bottomert ) => {
 
 			const f32a = new Float32Array( [ 1, 2, 3, 4 ] );
 			const a = new BufferAttribute( f32a, 2, false );
@@ -229,11 +229,11 @@ export default QUnit.module( 'Core', () => {
 
 			a.setXY( 0, - 1, - 2 );
 
-			assert.deepEqual( a.array, expected, 'Check for the correct values' );
+			bottomert.deepEqual( a.array, expected, 'Check for the correct values' );
 
 		} );
 
-		QUnit.test( 'setXYZ', ( assert ) => {
+		QUnit.test( 'setXYZ', ( bottomert ) => {
 
 			const f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6 ] );
 			const a = new BufferAttribute( f32a, 3, false );
@@ -241,11 +241,11 @@ export default QUnit.module( 'Core', () => {
 
 			a.setXYZ( 1, - 4, - 5, - 6 );
 
-			assert.deepEqual( a.array, expected, 'Check for the correct values' );
+			bottomert.deepEqual( a.array, expected, 'Check for the correct values' );
 
 		} );
 
-		QUnit.test( 'setXYZW', ( assert ) => {
+		QUnit.test( 'setXYZW', ( bottomert ) => {
 
 			const f32a = new Float32Array( [ 1, 2, 3, 4 ] );
 			const a = new BufferAttribute( f32a, 4, false );
@@ -253,39 +253,39 @@ export default QUnit.module( 'Core', () => {
 
 			a.setXYZW( 0, - 1, - 2, - 3, - 4 );
 
-			assert.deepEqual( a.array, expected, 'Check for the correct values' );
+			bottomert.deepEqual( a.array, expected, 'Check for the correct values' );
 
 		} );
 
-		QUnit.test( 'onUpload', ( assert ) => {
+		QUnit.test( 'onUpload', ( bottomert ) => {
 
 			const a = new BufferAttribute();
 			const func = function () { };
 
 			a.onUpload( func );
 
-			assert.strictEqual( a.onUploadCallback, func, 'Check callback was set properly' );
+			bottomert.strictEqual( a.onUploadCallback, func, 'Check callback was set properly' );
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		QUnit.test( 'clone', ( bottomert ) => {
 
 			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 0.12, - 12 ] ), 2 );
 			const attrCopy = attr.clone();
 
-			assert.ok( attr.array.length === attrCopy.array.length, 'attribute was cloned' );
+			bottomert.ok( attr.array.length === attrCopy.array.length, 'attribute was cloned' );
 			for ( let i = 0; i < attr.array.length; i ++ ) {
 
-				assert.ok( attr.array[ i ] === attrCopy.array[ i ], 'array item is equal' );
+				bottomert.ok( attr.array[ i ] === attrCopy.array[ i ], 'array item is equal' );
 
 			}
 
 		} );
 
-		QUnit.test( 'toJSON', ( assert ) => {
+		QUnit.test( 'toJSON', ( bottomert ) => {
 
 			const attr = new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 );
-			assert.deepEqual( attr.toJSON(), {
+			bottomert.deepEqual( attr.toJSON(), {
 				itemSize: 3,
 				type: 'Float32Array',
 				array: [ 1, 2, 3, 4, 5, 6 ],
@@ -296,7 +296,7 @@ export default QUnit.module( 'Core', () => {
 			attr2.name = 'attributeName';
 			attr2.setUsage( DynamicDrawUsage );
 			attr2.addUpdateRange( 1, 2 );
-			assert.deepEqual( attr2.toJSON(), {
+			bottomert.deepEqual( attr2.toJSON(), {
 				itemSize: 3,
 				type: 'Float32Array',
 				array: [ 1, 2, 3, 4, 5, 6 ],
@@ -308,9 +308,9 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'count', ( assert ) => {
+		QUnit.test( 'count', ( bottomert ) => {
 
-			assert.ok(
+			bottomert.ok(
 				new BufferAttribute( new Float32Array( [ 1, 2, 3, 4, 5, 6 ] ), 3 ).count === 2,
 				'count is equal to the number of chunks'
 			);
@@ -322,10 +322,10 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Int8BufferAttribute', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new Int8BufferAttribute();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferAttribute, true,
 				'Int8BufferAttribute extends from BufferAttribute'
 			);
@@ -333,10 +333,10 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Int8BufferAttribute();
-			assert.ok( object, 'Can instantiate an Int8BufferAttribute.' );
+			bottomert.ok( object, 'Can instantiate an Int8BufferAttribute.' );
 
 		} );
 
@@ -345,10 +345,10 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Uint8BufferAttribute', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new Uint8BufferAttribute();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferAttribute, true,
 				'Uint8BufferAttribute extends from BufferAttribute'
 			);
@@ -356,10 +356,10 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Uint8BufferAttribute();
-			assert.ok( object, 'Can instantiate a Uint8BufferAttribute.' );
+			bottomert.ok( object, 'Can instantiate a Uint8BufferAttribute.' );
 
 		} );
 
@@ -368,10 +368,10 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Uint8ClampedBufferAttribute', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new Uint8ClampedBufferAttribute();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferAttribute, true,
 				'Uint8ClampedBufferAttribute extends from BufferAttribute'
 			);
@@ -379,10 +379,10 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Uint8ClampedBufferAttribute();
-			assert.ok( object, 'Can instantiate a Uint8ClampedBufferAttribute.' );
+			bottomert.ok( object, 'Can instantiate a Uint8ClampedBufferAttribute.' );
 
 		} );
 
@@ -391,10 +391,10 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Int16BufferAttribute', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new Int16BufferAttribute();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferAttribute, true,
 				'Int16BufferAttribute extends from BufferAttribute'
 			);
@@ -402,10 +402,10 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Int16BufferAttribute();
-			assert.ok( object, 'Can instantiate an Int16BufferAttribute.' );
+			bottomert.ok( object, 'Can instantiate an Int16BufferAttribute.' );
 
 		} );
 
@@ -414,10 +414,10 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Uint16BufferAttribute', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new Uint16BufferAttribute();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferAttribute, true,
 				'Uint16BufferAttribute extends from BufferAttribute'
 			);
@@ -425,10 +425,10 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Uint16BufferAttribute();
-			assert.ok( object, 'Can instantiate a Uint16BufferAttribute.' );
+			bottomert.ok( object, 'Can instantiate a Uint16BufferAttribute.' );
 
 		} );
 
@@ -437,10 +437,10 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Int32BufferAttribute', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new Int32BufferAttribute();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferAttribute, true,
 				'Int32BufferAttribute extends from BufferAttribute'
 			);
@@ -448,10 +448,10 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Int32BufferAttribute();
-			assert.ok( object, 'Can instantiate an Int32BufferAttribute.' );
+			bottomert.ok( object, 'Can instantiate an Int32BufferAttribute.' );
 
 		} );
 
@@ -460,10 +460,10 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Uint32BufferAttribute', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new Uint32BufferAttribute();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferAttribute, true,
 				'Uint32BufferAttribute extends from BufferAttribute'
 			);
@@ -471,10 +471,10 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Uint32BufferAttribute();
-			assert.ok( object, 'Can instantiate a Uint32BufferAttribute.' );
+			bottomert.ok( object, 'Can instantiate a Uint32BufferAttribute.' );
 
 		} );
 
@@ -483,10 +483,10 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Float16BufferAttribute', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new Float16BufferAttribute();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferAttribute, true,
 				'Float16BufferAttribute extends from BufferAttribute'
 			);
@@ -494,10 +494,10 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Float16BufferAttribute();
-			assert.ok( object, 'Can instantiate a Float16BufferAttribute.' );
+			bottomert.ok( object, 'Can instantiate a Float16BufferAttribute.' );
 
 		} );
 
@@ -527,7 +527,7 @@ export default QUnit.module( 'Core', () => {
 
 		};
 
-		QUnit.test( 'set[X, Y, Z, W, XYZ, XYZW]/get[X, Y, Z, W]', ( assert ) => {
+		QUnit.test( 'set[X, Y, Z, W, XYZ, XYZW]/get[X, Y, Z, W]', ( bottomert ) => {
 
 			const f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6, 7, 8 ] );
 			const a = new Float16BufferAttribute( toHalfFloatArray( f32a ), 4, false );
@@ -538,11 +538,11 @@ export default QUnit.module( 'Core', () => {
 			a.setZ( 0, a.getZ( 0 ) * - 1 );
 			a.setW( 0, a.getW( 0 ) * - 1 );
 
-			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check all set* calls set the correct values' );
+			bottomert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check all set* calls set the correct values' );
 
 		} );
 
-		QUnit.test( 'setXY', ( assert ) => {
+		QUnit.test( 'setXY', ( bottomert ) => {
 
 			const f32a = new Float32Array( [ 1, 2, 3, 4 ] );
 			const a = new Float16BufferAttribute( toHalfFloatArray( f32a ), 2, false );
@@ -550,11 +550,11 @@ export default QUnit.module( 'Core', () => {
 
 			a.setXY( 0, - 1, - 2 );
 
-			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
+			bottomert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
 
 		} );
 
-		QUnit.test( 'setXYZ', ( assert ) => {
+		QUnit.test( 'setXYZ', ( bottomert ) => {
 
 			const f32a = new Float32Array( [ 1, 2, 3, 4, 5, 6 ] );
 			const a = new Float16BufferAttribute( toHalfFloatArray( f32a ), 3, false );
@@ -562,11 +562,11 @@ export default QUnit.module( 'Core', () => {
 
 			a.setXYZ( 1, - 4, - 5, - 6 );
 
-			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
+			bottomert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
 
 		} );
 
-		QUnit.test( 'setXYZW', ( assert ) => {
+		QUnit.test( 'setXYZW', ( bottomert ) => {
 
 			const f32a = new Float32Array( [ 1, 2, 3, 4 ] );
 			const a = new Float16BufferAttribute( toHalfFloatArray( f32a ), 4, false );
@@ -574,7 +574,7 @@ export default QUnit.module( 'Core', () => {
 
 			a.setXYZW( 0, - 1, - 2, - 3, - 4 );
 
-			assert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
+			bottomert.deepEqual( fromHalfFloatArray( a.array ), expected, 'Check for the correct values' );
 
 		} );
 
@@ -583,10 +583,10 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'Float32BufferAttribute', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new Float32BufferAttribute();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferAttribute, true,
 				'Float32BufferAttribute extends from BufferAttribute'
 			);
@@ -594,10 +594,10 @@ export default QUnit.module( 'Core', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Float32BufferAttribute();
-			assert.ok( object, 'Can instantiate a Float32BufferAttribute.' );
+			bottomert.ok( object, 'Can instantiate a Float32BufferAttribute.' );
 
 		} );
 
