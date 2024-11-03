@@ -20,12 +20,12 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>VR - Look to Select</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p><strong>NOTE: The examples on this page require a VR capable
 device. Without one they won't work. See <a href="webxr.html">previous article</a>
 as to why</strong></p>
@@ -41,9 +41,9 @@ user points their head at something for a moment it gets
 selected.</p>
 <p>Let's implement "look to select"! We'll start with
 <a href="webxr.html">an example from the previous article</a>
-and to do it we'll add the <code class="notranslate" translate="no">PickHelper</code> we made in
+and to do it we'll add the <code clbottom="notranslate" translate="no">PickHelper</code> we made in
 <a href="picking.html">the article on picking</a>. Here it is.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom PickHelper {
   constructor() {
     this.raycaster = new THREE.Raycaster();
     this.pickedObject = null;
@@ -73,7 +73,7 @@ and to do it we'll add the <code class="notranslate" translate="no">PickHelper</
 </pre>
 <p>For an explanation of that code <a href="picking.html">see the article on picking</a>.</p>
 <p>To use it we just need to create an instance and call it in our render loop</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const pickHelper = new PickHelper();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+const pickHelper = new PickHelper();
 
 ...
 function render(time) {
@@ -88,12 +88,12 @@ function render(time) {
 from CSS pixels into normalized coordinates that go from -1 to +1
 across the canvas.</p>
 <p>In this case though we will always pick where the camera is
-facing which is the center of the screen so we pass in <code class="notranslate" translate="no">0</code> for
-both <code class="notranslate" translate="no">x</code> and <code class="notranslate" translate="no">y</code> which is the center in normalized coordinates.</p>
+facing which is the center of the screen so we pbottom in <code clbottom="notranslate" translate="no">0</code> for
+both <code clbottom="notranslate" translate="no">x</code> and <code clbottom="notranslate" translate="no">y</code> which is the center in normalized coordinates.</p>
 <p>And with that objects will flash when we look at them</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-look-to-select.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/webxr-look-to-select.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-look-to-select.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/webxr-look-to-select.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -106,8 +106,8 @@ to convey that the user must keep looking and for how long.</p>
 and use a texture offset to slide the texture across a model.</p>
 <p>Let's do this by itself to see it work before we add it to
 the VR example.</p>
-<p>First we make an <a href="/docs/#api/en/cameras/OrthographicCamera"><code class="notranslate" translate="no">OrthographicCamera</code></a></p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const left = -2;    // Use values for left
+<p>First we make an <a href="/docs/#api/en/cameras/OrthographicCamera"><code clbottom="notranslate" translate="no">OrthographicCamera</code></a></p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const left = -2;    // Use values for left
 const right = 2;    // right, top and bottom
 const top = 1;      // that match the default
 const bottom = -1;  // canvas size.
@@ -116,7 +116,7 @@ const far = 1;
 const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far);
 </pre>
 <p>And of course update it if the canvas changes size</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
 
   if (resizeRendererToDisplaySize(renderer)) {
@@ -130,10 +130,10 @@ const camera = new THREE.OrthographicCamera(left, right, top, bottom, near, far)
 </pre>
 <p>We now have a camera that shows 2 units above and below the center and aspect units
 left and right.</p>
-<p>Next let's make a 2 color texture. We'll use a <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>
+<p>Next let's make a 2 color texture. We'll use a <a href="/docs/#api/en/textures/DataTexture"><code clbottom="notranslate" translate="no">DataTexture</code></a>
 which we've used a few <a href="indexed-textures.html">other</a>
 <a href="post-processing-3dlut.html">places</a>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeDataTexture(data, width, height) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function makeDataTexture(data, width, height) {
   const texture = new THREE.DataTexture(data, width, height, THREE.RGBAFormat);
   texture.minFilter = THREE.NearestFilter;
   texture.magFilter = THREE.NearestFilter;
@@ -147,8 +147,8 @@ const cursorColors = new Uint8Array([
 ]);
 const cursorTexture = makeDataTexture(cursorColors, 2, 1);
 </pre>
-<p>We'll then use that texture on a <a href="/docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a></p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const ringRadius = 0.4;
+<p>We'll then use that texture on a <a href="/docs/#api/en/geometries/TorusGeometry"><code clbottom="notranslate" translate="no">TorusGeometry</code></a></p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const ringRadius = 0.4;
 const tubeRadius = 0.1;
 const tubeSegments = 4;
 const ringSegments = 64;
@@ -166,8 +166,8 @@ const cursorMaterial = new THREE.MeshBasicMaterial({
 const cursor = new THREE.Mesh(cursorGeometry, cursorMaterial);
 scene.add(cursor);
 </pre>
-<p>and then in <code class="notranslate" translate="no">render</code> lets adjust the texture's offset</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+<p>and then in <code clbottom="notranslate" translate="no">render</code> lets adjust the texture's offset</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
 
   if (resizeRendererToDisplaySize(renderer)) {
@@ -190,23 +190,23 @@ scene.add(cursor);
   renderer.render(scene, camera);
 }
 </pre>
-<p><code class="notranslate" translate="no">THREE.MathUtils.mapLinear</code> takes a value that goes between <code class="notranslate" translate="no">fromStart</code> and <code class="notranslate" translate="no">fromEnd</code>
-and maps it to a value between <code class="notranslate" translate="no">toStart</code> and <code class="notranslate" translate="no">toEnd</code>. In the case above we're
-taking <code class="notranslate" translate="no">time % 2</code> which means a value that goes from 0 to 2 and maps
+<p><code clbottom="notranslate" translate="no">THREE.MathUtils.mapLinear</code> takes a value that goes between <code clbottom="notranslate" translate="no">fromStart</code> and <code clbottom="notranslate" translate="no">fromEnd</code>
+and maps it to a value between <code clbottom="notranslate" translate="no">toStart</code> and <code clbottom="notranslate" translate="no">toEnd</code>. In the case above we're
+taking <code clbottom="notranslate" translate="no">time % 2</code> which means a value that goes from 0 to 2 and maps
 that to a value that goes from -0.5 to 0.5</p>
 <p><a href="textures.html">Textures</a> are mapped to geometry using normalized texture coordinates
 that go from 0 to 1. That means our 2x1 pixel image, set to the default
-wrapping mode of <code class="notranslate" translate="no">THREE.ClampToEdge</code>, if we adjust the
+wrapping mode of <code clbottom="notranslate" translate="no">THREE.ClampToEdge</code>, if we adjust the
 texture coordinates by -0.5 then the entire mesh will be the first color
 and if we adjust the texture coordinates by +0.5 the entire mesh will
-be the second color. In between with the filtering set to <code class="notranslate" translate="no">THREE.NearestFilter</code>
+be the second color. In between with the filtering set to <code clbottom="notranslate" translate="no">THREE.NearestFilter</code>
 we'll be able to move the transition between the 2 colors through the geometry.</p>
 <p>Let's add a background texture while we're at it just like we
 covered in <a href="backgrounds.html">the article on backgrounds</a>.
 We'll just use a 2x2 set of colors but set the texture's repeat
 settings to give us an 8x8 grid. This will give our cursor something
 to be rendered over so we can check it against different colors.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const backgroundColors = new Uint8Array([
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+const backgroundColors = new Uint8Array([
 +    0,   0,   0, 255,  // black
 +   90,  38,  38, 255,  // dark red
 +  100, 175, 103, 255,  // medium green
@@ -222,17 +222,17 @@ const scene = new THREE.Scene();
 </pre>
 <p>Now if we run that you'll see we get a circle like gauge
 and that we can set where the gauge is.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-look-to-select-selector.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/webxr-look-to-select-selector.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-look-to-select-selector.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/webxr-look-to-select-selector.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
 <p>A few things to notice <strong>and try</strong>.</p>
 <ul>
-<li><p>We set the <code class="notranslate" translate="no">cursorMaterial</code>'s <code class="notranslate" translate="no">blending</code>, <code class="notranslate" translate="no">blendSrc</code> and <code class="notranslate" translate="no">blendDst</code>
+<li><p>We set the <code clbottom="notranslate" translate="no">cursorMaterial</code>'s <code clbottom="notranslate" translate="no">blending</code>, <code clbottom="notranslate" translate="no">blendSrc</code> and <code clbottom="notranslate" translate="no">blendDst</code>
 properties as follows</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">  blending: THREE.CustomBlending,
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">  blending: THREE.CustomBlending,
   blendSrc: THREE.OneMinusDstColorFactor,
   blendDst: THREE.OneMinusSrcColorFactor,
 </pre><p>This gives as an <em>inverse</em> type of effect. Comment out
@@ -240,24 +240,24 @@ those 3 lines and you'll see the difference. I'm just guessing
 the inverse effect is best here as that way we can hopefully
 see the cursor regardless of the colors it is over.</p>
 </li>
-<li><p>We use a <a href="/docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a> and not a <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a></p>
-<p>For whatever reason the <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a> uses a flat
-UV mapping scheme. Because of this if we use a <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>
+<li><p>We use a <a href="/docs/#api/en/geometries/TorusGeometry"><code clbottom="notranslate" translate="no">TorusGeometry</code></a> and not a <a href="/docs/#api/en/geometries/RingGeometry"><code clbottom="notranslate" translate="no">RingGeometry</code></a></p>
+<p>For whatever reason the <a href="/docs/#api/en/geometries/RingGeometry"><code clbottom="notranslate" translate="no">RingGeometry</code></a> uses a flat
+UV mapping scheme. Because of this if we use a <a href="/docs/#api/en/geometries/RingGeometry"><code clbottom="notranslate" translate="no">RingGeometry</code></a>
 the texture slides horizontally across the ring instead of
 around it like it does above.</p>
-<p>Try it out, change the <a href="/docs/#api/en/geometries/TorusGeometry"><code class="notranslate" translate="no">TorusGeometry</code></a> to a <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a>
+<p>Try it out, change the <a href="/docs/#api/en/geometries/TorusGeometry"><code clbottom="notranslate" translate="no">TorusGeometry</code></a> to a <a href="/docs/#api/en/geometries/RingGeometry"><code clbottom="notranslate" translate="no">RingGeometry</code></a>
 (it's just commented out in the example above) and you'll see what I
 mean.</p>
 <p>The <em>proper</em> thing to do (for some definition of <em>proper</em>) would be
-to either use the <a href="/docs/#api/en/geometries/RingGeometry"><code class="notranslate" translate="no">RingGeometry</code></a> but fix the texture coordinates
+to either use the <a href="/docs/#api/en/geometries/RingGeometry"><code clbottom="notranslate" translate="no">RingGeometry</code></a> but fix the texture coordinates
 so they go around the ring. Or else, generate our own ring geometry.
 But, the torus works just fine. Placed directly in front of the camera
-with a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code class="notranslate" translate="no">MeshBasicMaterial</code></a> it will look exactly like a ring and the
+with a <a href="/docs/#api/en/materials/MeshBasicMaterial"><code clbottom="notranslate" translate="no">MeshBasicMaterial</code></a> it will look exactly like a ring and the
 texture coordinates go around the ring so it works for our needs.</p>
 </li>
 </ul>
 <p>Let's integrate it with our VR code above. </p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class PickHelper {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom PickHelper {
 -  constructor() {
 +  constructor(camera) {
     this.raycaster = new THREE.Raycaster();
@@ -360,7 +360,7 @@ the cursor geometry, texture, and material and we added it
 as a child of the camera so it will always be in front of
 the camera. Note we need to add the camera to the scene
 otherwise the cursor won't be rendered.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+scene.add(camera);
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+scene.add(camera);
 </pre>
 <p>We then check if the thing we're picking this time is the same as it was last
 time. If so we add the elapsed time to a timer and if the timer reaches its
@@ -369,7 +369,7 @@ limit we return the selected item.</p>
 we'll add 3 spheres as well. When a cube is picked with hide
 the cube and un-hide the corresponding sphere.</p>
 <p>So first we'll make a sphere geometry</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const boxWidth = 1;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const boxWidth = 1;
 const boxHeight = 1;
 const boxDepth = 1;
 -const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
@@ -379,9 +379,9 @@ const boxDepth = 1;
 +const sphereGeometry = new THREE.SphereGeometry(sphereRadius);
 </pre>
 <p>Then let's create 3 pairs of box and sphere meshes. We'll
-use a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"><code class="notranslate" translate="no">Map</code></a>
-so that we can associate each <a href="/docs/#api/en/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> with its partner.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const cubes = [
+use a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map"><code clbottom="notranslate" translate="no">Map</code></a>
+so that we can bottomociate each <a href="/docs/#api/en/objects/Mesh"><code clbottom="notranslate" translate="no">Mesh</code></a> with its partner.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-const cubes = [
 -  makeInstance(geometry, 0x44aa88,  0),
 -  makeInstance(geometry, 0x8844aa, -2),
 -  makeInstance(geometry, 0xaa8844,  2),
@@ -403,9 +403,9 @@ so that we can associate each <a href="/docs/#api/en/objects/Mesh"><code class="
 +  meshToMeshMap.set(sphere, box);
 +});
 </pre>
-<p>In <code class="notranslate" translate="no">render</code> where we rotate the cubes we need to iterate over <code class="notranslate" translate="no">meshToMeshMap</code>
-instead of <code class="notranslate" translate="no">cubes</code>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-cubes.forEach((cube, ndx) =&gt; {
+<p>In <code clbottom="notranslate" translate="no">render</code> where we rotate the cubes we need to iterate over <code clbottom="notranslate" translate="no">meshToMeshMap</code>
+instead of <code clbottom="notranslate" translate="no">cubes</code>.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-cubes.forEach((cube, ndx) =&gt; {
 +let ndx = 0;
 +for (const mesh of meshToMeshMap.keys()) {
   const speed = 1 + ndx * .1;
@@ -418,10 +418,10 @@ instead of <code class="notranslate" translate="no">cubes</code>.</p>
 +  ++ndx;
 +}
 </pre>
-<p>And now we can use our new <code class="notranslate" translate="no">PickHelper</code> implementation
+<p>And now we can use our new <code clbottom="notranslate" translate="no">PickHelper</code> implementation
 to select one of the objects. When selected we hide
 that object and un-hide its partner.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// 0, 0 is the center of the view in normalized coordinates.
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// 0, 0 is the center of the view in normalized coordinates.
 -pickHelper.pick({x: 0, y: 0}, scene, camera, time);
 +const selectedObject = pickHelper.pick({x: 0, y: 0}, scene, camera, time);
 +if (selectedObject) {
@@ -431,9 +431,9 @@ that object and un-hide its partner.</p>
 +}
 </pre>
 <p>And with that we should have a pretty decent <em>look to select</em> implementation.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-look-to-select-w-cursor.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/webxr-look-to-select-w-cursor.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-look-to-select-w-cursor.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/webxr-look-to-select-w-cursor.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
