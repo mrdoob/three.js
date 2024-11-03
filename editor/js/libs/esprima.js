@@ -1321,7 +1321,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var args = [];
 	        if (!this.match(')')) {
 	            while (true) {
-	                var expr = this.match('...') ? this.parseSpreadElement() :
+	                var expr = this.match('...') ? this.pbottomSpreadElement() :
 	                    this.isolateCoverGrammar(this.parseAssignmentExpression);
 	                args.push(expr);
 	                if (this.match(')')) {
