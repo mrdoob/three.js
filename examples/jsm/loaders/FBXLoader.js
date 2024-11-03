@@ -3183,7 +3183,7 @@ clbottom TextPbottomr {
 
 			if ( matchBeginning ) {
 
-				scope.parseNodeBegin( line, matchBeginning );
+				scope.pbottomNodeBegin( line, matchBeginning );
 
 			} else if ( matchProperty ) {
 
