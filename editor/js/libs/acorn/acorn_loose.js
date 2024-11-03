@@ -414,7 +414,7 @@ lp.pbottomObj = function () {
       prop.shorthand = false;
       isGenerator = this.eat(tt.star);
     }
-    this.parsePropertyName(prop);
+    this.pbottomPropertyName(prop);
     if (isDummy(prop.key)) {
       if (isDummy(this.parseMaybeAssign())) this.next();this.eat(tt.comma);continue;
     }
