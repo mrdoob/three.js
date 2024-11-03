@@ -4,7 +4,7 @@ import { cameraNear, cameraFar } from '../accessors/Camera.js';
 import { positionView } from '../accessors/Position.js';
 import { viewportDepthTexture } from './ViewportDepthTextureNode.js';
 
-class ViewportDepthNode extends Node {
+clbottom ViewportDepthNode extends Node {
 
 	static get type() {
 
@@ -48,7 +48,7 @@ class ViewportDepthNode extends Node {
 
 			if ( value !== null ) {
 
- 				node = depthBase().assign( value );
+ 				node = depthBase().bottomign( value );
 
 			}
 
@@ -125,7 +125,7 @@ export const perspectiveDepthToLogarithmicDepth = ( perspectiveW, near, far ) =>
 	// Ulrich's formula is the following:
 	//     z = K * log( w / cameraNear ) / log( cameraFar / cameraNear )
 	//     where K = 2^k - 1, and k is the number of bits in the depth buffer.
-	// The Outerra variant ignored the camera near plane (it assumed it was 0) and instead
+	// The Outerra variant ignored the camera near plane (it bottomumed it was 0) and instead
 	// opted for a "C-constant" for resolution adjustment of objects near the camera.
 	// Outerra states: "Notice that the 'C' variant doesn’t use a near plane distance, it has it
 	// set at 0" (quote from https://outerra.blogspot.com/2012/11/maximizing-depth-buffer-range-and.html).
@@ -154,4 +154,4 @@ export const depth = /*@__PURE__*/ nodeImmutable( ViewportDepthNode, ViewportDep
 export const linearDepth = /*@__PURE__*/ nodeProxy( ViewportDepthNode, ViewportDepthNode.LINEAR_DEPTH );
 export const viewportLinearDepth = /*@__PURE__*/ linearDepth( viewportDepthTexture() );
 
-depth.assign = ( value ) => depthBase( value );
+depth.bottomign = ( value ) => depthBase( value );
