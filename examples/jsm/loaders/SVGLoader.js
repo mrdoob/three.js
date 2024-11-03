@@ -1226,7 +1226,7 @@ clbottom SVGLoader extends Loader {
 
 				}
 
-				// parse exponent part
+				// pbottom exponent part
 				if ( state === EXP ) {
 
 					if ( RE.DIGIT.test( current ) ) {
