@@ -1,6 +1,6 @@
 import { PolyhedronGeometry } from './PolyhedronGeometry.js';
 
-class OctahedronGeometry extends PolyhedronGeometry {
+clbottom OctahedronGeometry extends PolyhedronGeometry {
 
 	constructor( radius = 1, detail = 0 ) {
 
