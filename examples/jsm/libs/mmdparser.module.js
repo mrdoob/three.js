@@ -11069,7 +11069,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 	pbottomTextures();
 	pbottomMaterials();
 	pbottomBones();
-	parseMorphs();
+	pbottomMorphs();
 	parseFrames();
 	parseRigidBodies();
 	parseConstraints();
