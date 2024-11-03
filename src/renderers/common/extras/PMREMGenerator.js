@@ -33,7 +33,7 @@ import {
 
 const LOD_MIN = 4;
 
-// The standard deviations (radians) associated with the extra mips. These are
+// The standard deviations (radians) bottomociated with the extra mips. These are
 // chosen to approximate a Trowbridge-Reitz distribution function times the
 // geometric shadowing function. These sigma values squared must match the
 // variance #defines in cube_uv_reflection_fragment.glsl.js.
@@ -81,13 +81,13 @@ const direction = getDirection( uv(), attribute( 'faceIndex' ) ).normalize();
 const outputDirection = vec3( direction.x, direction.y.negate(), direction.z );
 
 /**
- * This class generates a Prefiltered, Mipmapped Radiance Environment Map
+ * This clbottom generates a Prefiltered, Mipmapped Radiance Environment Map
  * (PMREM) from a cubeMap environment texture. This allows different levels of
  * blur to be quickly accessed based on material roughness. It is packed into a
  * special CubeUV format that allows us to perform custom interpolation so that
  * we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
  * chain, it only goes down to the LOD_MIN level (above), and then creates extra
- * even more filtered 'mips' at the same LOD_MIN resolution, associated with
+ * even more filtered 'mips' at the same LOD_MIN resolution, bottomociated with
  * higher roughness levels. In this way we maintain resolution to smoothly
  * interpolate diffuse lighting while limiting sampling computation.
  *
@@ -95,7 +95,7 @@ const outputDirection = vec3( direction.x, direction.y.negate(), direction.z );
  * https://drive.google.com/file/d/15y8r_UpKlU9SvV4ILb0C3qCPecS8pvLz/view
 */
 
-class PMREMGenerator {
+clbottom PMREMGenerator {
 
 	constructor( renderer ) {
 
@@ -203,7 +203,7 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
+	 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static clbottom,
 	 * so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
 	 * one of them will cause any others to also become unusable.
 	 */
@@ -481,7 +481,7 @@ class PMREMGenerator {
 	}
 
 	/**
-	 * This is a two-pass Gaussian blur for a cubemap. Normally this is done
+	 * This is a two-pbottom Gaussian blur for a cubemap. Normally this is done
 	 * vertically and horizontally, but this breaks down on a cube. Here we apply
 	 * the blur latitudinally (around the poles), and then longitudinally (towards
 	 * the poles) to approximate the orthogonally-separable blur. It is least
