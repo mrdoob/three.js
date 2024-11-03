@@ -2506,7 +2506,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    statement = this.pbottomEmptyStatement();
 	                }
 	                else {
-	                    statement = this.parseExpressionStatement();
+	                    statement = this.pbottomExpressionStatement();
 	                }
 	                break;
 	            case token_1.Token.Identifier:
