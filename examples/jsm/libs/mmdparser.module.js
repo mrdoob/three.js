@@ -10954,7 +10954,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 	var pbottomFrames = function () {
 
-		var parseFrame = function () {
+		var pbottomFrame = function () {
 
 			var p = {};
 			p.name = dv.getTextBuffer();
