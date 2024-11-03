@@ -2,7 +2,7 @@ clbottom LWO2Pbottomr {
 
 	constructor( IFFPbottomr ) {
 
-		this.IFF = IFFParser;
+		this.IFF = IFFPbottomr;
 
 	}
 
