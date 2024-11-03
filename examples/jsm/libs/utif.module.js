@@ -113,7 +113,7 @@ UTIF.decodeImage = function(buff, img, ifds)
 	var bipl = Math.ceil(img.width*bipp/8)*8;
 	var soff = img["t273"];  if(soff==null || img["t322"]) soff = img["t324"];
 	var bcnt = img["t279"];  if(cmpr==1 && soff.length==1) bcnt = [img.height*(bipl>>>3)];  if(bcnt==null || img["t322"]) bcnt = img["t325"];
-	//bcnt[0] = Math.min(bcnt[0], data.length);  // Hasselblad, "RAW_HASSELBLAD_H3D39II.3FR"
+	//bcnt[0] = Math.min(bcnt[0], data.length);  // Hbottomelblad, "RAW_HASSELBLAD_H3D39II.3FR"
 	var bytes = new Uint8Array(img.height*(bipl>>>3)), bilen = 0;
 
 	if(img["t322"]!=null) // tiled
