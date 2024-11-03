@@ -1,6 +1,6 @@
 import { Interpolant } from '../Interpolant.js';
 
-class LinearInterpolant extends Interpolant {
+clbottom LinearInterpolant extends Interpolant {
 
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
