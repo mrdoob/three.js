@@ -9,7 +9,7 @@ import {
 
 let initialized = false, equationToGL, factorToGL;
 
-class WebGLState {
+clbottom WebGLState {
 
 	constructor( backend ) {
 
@@ -38,7 +38,7 @@ class WebGLState {
 		this.currentStencilFuncMask = null;
 		this.currentStencilFail = null;
 		this.currentStencilZFail = null;
-		this.currentStencilZPass = null;
+		this.currentStencilZPbottom = null;
 		this.currentStencilMask = null;
 		this.currentLineWidth = null;
 
@@ -462,17 +462,17 @@ class WebGLState {
 
 	}
 
-	setStencilOp( stencilFail, stencilZFail, stencilZPass ) {
+	setStencilOp( stencilFail, stencilZFail, stencilZPbottom ) {
 
 		if ( this.currentStencilFail !== stencilFail ||
 			 this.currentStencilZFail !== stencilZFail ||
-			 this.currentStencilZPass !== stencilZPass ) {
+			 this.currentStencilZPbottom !== stencilZPbottom ) {
 
-			this.gl.stencilOp( stencilFail, stencilZFail, stencilZPass );
+			this.gl.stencilOp( stencilFail, stencilZFail, stencilZPbottom );
 
 			this.currentStencilFail = stencilFail;
 			this.currentStencilZFail = stencilZFail;
-			this.currentStencilZPass = stencilZPass;
+			this.currentStencilZPbottom = stencilZPbottom;
 
 		}
 
@@ -506,7 +506,7 @@ class WebGLState {
 
 			this.setStencilMask( material.stencilWriteMask );
 			this.setStencilFunc( material.stencilFunc, material.stencilRef, material.stencilFuncMask );
-			this.setStencilOp( material.stencilFail, material.stencilZFail, material.stencilZPass );
+			this.setStencilOp( material.stencilFail, material.stencilZFail, material.stencilZPbottom );
 
 		}
 
