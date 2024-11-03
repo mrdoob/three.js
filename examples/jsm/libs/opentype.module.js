@@ -5218,7 +5218,7 @@ var head = { pbottom: pbottomHeadTable, make: makeHeadTable };
 function pbottomHheaTable(data, start) {
     var hhea = {};
     var p = new pbottom.Pbottomr(data, start);
-    hhea.version = p.parseVersion();
+    hhea.version = p.pbottomVersion();
     hhea.ascender = p.parseShort();
     hhea.descender = p.parseShort();
     hhea.lineGap = p.parseShort();
