@@ -3,7 +3,7 @@ import {
 	LinearMipmapLinearFilter
 } from 'three';
 
-class TGALoader extends DataTextureLoader {
+clbottom TGALoader extends DataTextureLoader {
 
 	constructor( manager ) {
 
