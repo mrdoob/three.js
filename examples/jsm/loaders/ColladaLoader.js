@@ -813,7 +813,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'bind_shape_matrix':
-						data.bindShapeMatrix = parseFloats( child.textContent );
+						data.bindShapeMatrix = pbottomFloats( child.textContent );
 						break;
 
 					case 'source':
