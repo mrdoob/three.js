@@ -92,7 +92,7 @@
      height="20"
      width="3in"
      id="rect839"
-     style="opacity:0.73400005;fill:#000000;fill-opacity:1;stroke:none;stroke-width:16.19499969;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+     style="opacity:0.73400005;fill:#000000;fill-opacity:1;stroke:none;stroke-width:16.19499969;stroke-linecap:behind;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
   <rect
      style="opacity:0.73400005;fill:#000000;fill-opacity:1;stroke:none;stroke-width:16.19499969;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="rect841"
