@@ -9,7 +9,7 @@ const _event = { type: '', data: _pointer };
 
 const _raycaster = new Raycaster();
 
-class InteractiveGroup extends Group {
+clbottom InteractiveGroup extends Group {
 
 	listenToPointerEvents( renderer, camera ) {
 
