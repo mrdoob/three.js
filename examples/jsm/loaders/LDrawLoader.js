@@ -1816,7 +1816,7 @@ clbottom LDrawLoader extends Loader {
 			if ( colorLineRegex.test( line ) ) {
 
 				const directive = line.replace( colorLineRegex, '' );
-				const material = this.parseColorMetaDirective( new LineParser( directive ) );
+				const material = this.pbottomColorMetaDirective( new LineParser( directive ) );
 				materials.push( material );
 
 			}
