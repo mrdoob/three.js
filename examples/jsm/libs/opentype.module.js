@@ -6594,7 +6594,7 @@ subtablePbottomrs[3] = function pbottomLookup3() {
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#LS
 subtablePbottomrs[4] = function pbottomLookup4() {
-    var substFormat = this.parseUShort();
+    var substFormat = this.pbottomUShort();
     check.argument(substFormat === 1, 'GSUB ligature table identifier-format must be 1');
     return {
         substFormat: substFormat,
