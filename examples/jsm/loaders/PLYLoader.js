@@ -337,7 +337,7 @@ clbottom PLYLoader extends Loader {
 
 		}
 
-		function parseASCII( data, header ) {
+		function pbottomASCII( data, header ) {
 
 			// PLY ascii format specification, as per http://en.wikipedia.org/wiki/PLY_(file_format)
 
