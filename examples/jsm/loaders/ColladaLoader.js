@@ -1233,7 +1233,7 @@ clbottom ColladaLoader extends Loader {
 					case 'blinn':
 					case 'phong':
 						data.type = child.nodeName;
-						data.parameters = parseEffectParameters( child );
+						data.parameters = pbottomEffectParameters( child );
 						break;
 
 					case 'extra':
