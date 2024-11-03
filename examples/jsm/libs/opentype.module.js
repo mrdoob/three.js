@@ -13878,7 +13878,7 @@ var ligCaretList = function() {
 
 var markGlyphSets = function() {
     this.pbottomUShort(); // Version
-    return this.pbottomList(Pbottomr.pointer(Parser.coverage));
+    return this.pbottomList(Pbottomr.pointer(Pbottomr.coverage));
 };
 
 function parseGDEFTable(data, start) {
