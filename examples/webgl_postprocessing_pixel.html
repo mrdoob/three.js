@@ -10,7 +10,7 @@
 
 <body>
 	<div id="info">
-		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Pixelation pass with optional single pixel outlines by
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Pixelation pbottom with optional single pixel outlines by
 		<a href="https://github.com/KodyJKing" target="_blank" rel="noopener">Kody King</a><br /><br />
 	</div>
 
@@ -31,8 +31,8 @@
 
 		import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-		import { RenderPixelatedPass } from 'three/addons/postprocessing/RenderPixelatedPass.js';
-		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+		import { RenderPixelatedPbottom } from 'three/addons/postprocessing/RenderPixelatedPbottom.js';
+		import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 		import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 		let camera, scene, renderer, composer, crystalMesh, clock;
@@ -61,11 +61,11 @@
 			document.body.appendChild( renderer.domElement );
 
 			composer = new EffectComposer( renderer );
-			const renderPixelatedPass = new RenderPixelatedPass( 6, scene, camera );
-			composer.addPass( renderPixelatedPass );
+			const renderPixelatedPbottom = new RenderPixelatedPbottom( 6, scene, camera );
+			composer.addPbottom( renderPixelatedPbottom );
 
-			const outputPass = new OutputPass();
-			composer.addPass( outputPass );
+			const outputPbottom = new OutputPbottom();
+			composer.addPbottom( outputPbottom );
 
 			window.addEventListener( 'resize', onWindowResize );
 
@@ -79,11 +79,11 @@
 			gui.add( params, 'pixelSize' ).min( 1 ).max( 16 ).step( 1 )
 				.onChange( () => {
 
-					renderPixelatedPass.setPixelSize( params.pixelSize );
+					renderPixelatedPbottom.setPixelSize( params.pixelSize );
 
 				} );
-			gui.add( renderPixelatedPass, 'normalEdgeStrength' ).min( 0 ).max( 2 ).step( .05 );
-			gui.add( renderPixelatedPass, 'depthEdgeStrength' ).min( 0 ).max( 1 ).step( .05 );
+			gui.add( renderPixelatedPbottom, 'normalEdgeStrength' ).min( 0 ).max( 2 ).step( .05 );
+			gui.add( renderPixelatedPbottom, 'depthEdgeStrength' ).min( 0 ).max( 1 ).step( .05 );
 			gui.add( params, 'pixelAlignedPanning' );
 
 			// textures
