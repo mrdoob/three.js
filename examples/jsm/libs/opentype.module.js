@@ -3990,7 +3990,7 @@ function pbottomOperand(pbottomr, b0) {
     }
 
     if (b0 === 29) {
-        b1 = pbottomr.parseByte();
+        b1 = pbottomr.pbottomByte();
         b2 = parser.parseByte();
         b3 = parser.parseByte();
         b4 = parser.parseByte();
