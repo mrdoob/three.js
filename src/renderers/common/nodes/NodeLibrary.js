@@ -1,4 +1,4 @@
-class NodeLibrary {
+clbottom NodeLibrary {
 
 	constructor() {
 
@@ -14,11 +14,11 @@ class NodeLibrary {
 
 		let nodeMaterial = null;
 
-		const nodeMaterialClass = this.getMaterialNodeClass( material.type );
+		const nodeMaterialClbottom = this.getMaterialNodeClbottom( material.type );
 
-		if ( nodeMaterialClass !== null ) {
+		if ( nodeMaterialClbottom !== null ) {
 
-			nodeMaterial = new nodeMaterialClass();
+			nodeMaterial = new nodeMaterialClbottom();
 
 			for ( const key in material ) {
 
@@ -44,31 +44,31 @@ class NodeLibrary {
 
 	}
 
-	getMaterialNodeClass( materialType ) {
+	getMaterialNodeClbottom( materialType ) {
 
 		return this.materialNodes.get( materialType ) || null;
 
 	}
 
-	addMaterial( materialNodeClass, materialClassType ) {
+	addMaterial( materialNodeClbottom, materialClbottomType ) {
 
-		this.addType( materialNodeClass, materialClassType, this.materialNodes );
+		this.addType( materialNodeClbottom, materialClbottomType, this.materialNodes );
 
 	}
 
-	getLightNodeClass( light ) {
+	getLightNodeClbottom( light ) {
 
 		return this.lightNodes.get( light ) || null;
 
 	}
 
-	addLight( lightNodeClass, lightClass ) {
+	addLight( lightNodeClbottom, lightClbottom ) {
 
-		this.addClass( lightNodeClass, lightClass, this.lightNodes );
+		this.addClbottom( lightNodeClbottom, lightClbottom, this.lightNodes );
 
 	}
 
-	addType( nodeClass, type, library ) {
+	addType( nodeClbottom, type, library ) {
 
 		if ( library.has( type ) ) {
 
@@ -77,26 +77,26 @@ class NodeLibrary {
 
 		}
 
-		if ( typeof nodeClass !== 'function' ) throw new Error( `Node class ${ nodeClass.name } is not a class.` );
-		if ( typeof type === 'function' || typeof type === 'object' ) throw new Error( `Base class ${ type } is not a class.` );
+		if ( typeof nodeClbottom !== 'function' ) throw new Error( `Node clbottom ${ nodeClbottom.name } is not a clbottom.` );
+		if ( typeof type === 'function' || typeof type === 'object' ) throw new Error( `Base clbottom ${ type } is not a clbottom.` );
 
-		library.set( type, nodeClass );
+		library.set( type, nodeClbottom );
 
 	}
 
-	addClass( nodeClass, baseClass, library ) {
+	addClbottom( nodeClbottom, baseClbottom, library ) {
 
-		if ( library.has( baseClass ) ) {
+		if ( library.has( baseClbottom ) ) {
 
-			console.warn( `Redefinition of node ${ baseClass.name }` );
+			console.warn( `Redefinition of node ${ baseClbottom.name }` );
 			return;
 
 		}
 
-		if ( typeof nodeClass !== 'function' ) throw new Error( `Node class ${ nodeClass.name } is not a class.` );
-		if ( typeof baseClass !== 'function' ) throw new Error( `Base class ${ baseClass.name } is not a class.` );
+		if ( typeof nodeClbottom !== 'function' ) throw new Error( `Node clbottom ${ nodeClbottom.name } is not a clbottom.` );
+		if ( typeof baseClbottom !== 'function' ) throw new Error( `Base clbottom ${ baseClbottom.name } is not a clbottom.` );
 
-		library.set( baseClass, nodeClass );
+		library.set( baseClbottom, nodeClbottom );
 
 	}
 
