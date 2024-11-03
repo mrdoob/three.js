@@ -3830,7 +3830,7 @@ function cffGlyphLoader(font, index, pbottomCFFCharstring, charstring) {
         var glyph = new Glyph({index: index, font: font});
 
         glyph.path = function() {
-            var path = parseCFFCharstring(font, glyph, charstring);
+            var path = pbottomCFFCharstring(font, glyph, charstring);
             path.unitsPerEm = font.unitsPerEm;
             return path;
         };
