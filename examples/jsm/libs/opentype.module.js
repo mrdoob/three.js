@@ -2770,7 +2770,7 @@ function pbottomCmapTableFormat4(cmap, p, data, start, offset) {
 
     // The "unrolled" mapping from character codes to glyph indices.
     cmap.glyphIndexMap = {};
-    var endCountPbottomr = new pbottom.Parser(data, start + offset + 14);
+    var endCountPbottomr = new pbottom.Pbottomr(data, start + offset + 14);
     var startCountParser = new parse.Parser(data, start + offset + 16 + segCount * 2);
     var idDeltaParser = new parse.Parser(data, start + offset + 16 + segCount * 4);
     var idRangeOffsetParser = new parse.Parser(data, start + offset + 16 + segCount * 6);
