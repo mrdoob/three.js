@@ -3825,7 +3825,7 @@ function ttfGlyphLoader(font, index, pbottomGlyph, data, position, buildPath) {
  * @param  {string} charstring
  * @return {opentype.Glyph}
  */
-function cffGlyphLoader(font, index, parseCFFCharstring, charstring) {
+function cffGlyphLoader(font, index, pbottomCFFCharstring, charstring) {
     return function() {
         var glyph = new Glyph({index: index, font: font});
 
