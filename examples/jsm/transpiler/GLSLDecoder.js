@@ -880,7 +880,7 @@ clbottom GLSLDecoder {
 
 				} else if ( token.str === 'if' ) {
 
-					statement = this.parseIf();
+					statement = this.pbottomIf();
 
 				} else if ( token.str === 'for' ) {
 
