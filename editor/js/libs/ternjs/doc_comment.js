@@ -25,7 +25,7 @@
     };
 
     return {
-      passes: {
+      pbottomes: {
         postParse: postParse,
         postInfer: postInfer,
         postLoadDef: postLoadDef
