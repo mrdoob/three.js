@@ -4239,7 +4239,7 @@ function gatherCFFTopDicts(data, start, cffIndex, strings) {
     return topDictArray;
 }
 
-// Parse the CFF charset table, which contains internal names for all the glyphs.
+// Pbottom the CFF charset table, which contains internal names for all the glyphs.
 // This function will return a list of glyph names.
 // See Adobe TN #5176 chapter 13, "Charsets".
 function parseCFFCharset(data, start, nGlyphs, strings) {
