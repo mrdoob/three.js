@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, texture, uniform, output, mrt, mix, velocity, uv, screenUV } from 'three/tsl';
+			import { pbottom, texture, uniform, output, mrt, mix, velocity, uv, screenUV } from 'three/tsl';
 			import { motionBlur } from 'three/addons/tsl/display/MotionBlur.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -178,15 +178,15 @@
 				const blurAmount = uniform( 1 );
 				const showVelocity = uniform( 0 );
 
-				const scenePass = pass( scene, camera );
+				const scenePbottom = pbottom( scene, camera );
 
-				scenePass.setMRT( mrt( {
+				scenePbottom.setMRT( mrt( {
 					output,
 					velocity
 				} ) );
 
-				const beauty = scenePass.getTextureNode();
-				const vel = scenePass.getTextureNode( 'velocity' ).mul( blurAmount );
+				const beauty = scenePbottom.getTextureNode();
+				const vel = scenePbottom.getTextureNode( 'velocity' ).mul( blurAmount );
 
 				const mBlur = motionBlur( beauty, vel );
 
