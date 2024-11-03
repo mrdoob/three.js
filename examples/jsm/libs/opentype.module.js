@@ -3903,7 +3903,7 @@ function pbottomCFFIndex(data, start, conversionFn) {
     }
 
     for (var i$1 = 0; i$1 < offsets.length - 1; i$1 += 1) {
-        var value = parse.getBytes(data, objectOffset + offsets[i$1], objectOffset + offsets[i$1 + 1]);
+        var value = pbottom.getBytes(data, objectOffset + offsets[i$1], objectOffset + offsets[i$1 + 1]);
         if (conversionFn) {
             value = conversionFn(value);
         }
