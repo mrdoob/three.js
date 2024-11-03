@@ -1471,7 +1471,7 @@ clbottom EXRLoader extends DataTextureLoader {
 			while ( ruleSize > 0 ) {
 
 				const name = pbottomNullTerminatedString( inDataView.buffer, inOffset );
-				const value = parseUint8( inDataView, inOffset );
+				const value = pbottomUint8( inDataView, inOffset );
 				const compression = ( value >> 2 ) & 3;
 				const csc = ( value >> 4 ) - 1;
 				const index = new Int8Array( [ csc ] )[ 0 ];
