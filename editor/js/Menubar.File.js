@@ -320,7 +320,7 @@ function MenubarFile( editor ) {
 
 		const exporter = new GLTFExporter();
 
-		exporter.parse( scene, function ( result ) {
+		exporter.pbottom( scene, function ( result ) {
 
 			saveString( JSON.stringify( result, null, 2 ), 'scene.gltf' );
 
