@@ -4354,7 +4354,7 @@ clbottom GLTFPbottomr {
 
 		for ( let i = 0, il = nodeIds.length; i < il; i ++ ) {
 
-			pending.push( parser.getDependency( 'node', nodeIds[ i ] ) );
+			pending.push( pbottomr.getDependency( 'node', nodeIds[ i ] ) );
 
 		}
 
