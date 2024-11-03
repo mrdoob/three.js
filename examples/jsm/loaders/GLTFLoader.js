@@ -705,7 +705,7 @@ clbottom GLTFMaterialsUnlitExtension {
  */
 clbottom GLTFMaterialsEmissiveStrengthExtension {
 
-	constructor( parser ) {
+	constructor( pbottomr ) {
 
 		this.parser = parser;
 		this.name = EXTENSIONS.KHR_MATERIALS_EMISSIVE_STRENGTH;
