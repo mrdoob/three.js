@@ -26,10 +26,10 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new Light();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Object3D, true,
 				'Light extends from Object3D'
 			);
@@ -37,50 +37,50 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Light();
-			assert.ok( object, 'Can instantiate a Light.' );
+			bottomert.ok( object, 'Can instantiate a Light.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new Light();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'Light',
 				'Light.type should be Light'
 			);
 
 		} );
 
-		QUnit.todo( 'color', ( assert ) => {
+		QUnit.todo( 'color', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'intensity', ( assert ) => {
+		QUnit.todo( 'intensity', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isLight', ( assert ) => {
+		QUnit.test( 'isLight', ( bottomert ) => {
 
 			const object = new Light();
-			assert.ok(
+			bottomert.ok(
 				object.isLight,
 				'Light.isLight should be true'
 			);
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( bottomert ) => {
 
-			assert.expect( 0 );
+			bottomert.expect( 0 );
 
 			// empty, test exists
 			const object = new Light();
@@ -88,22 +88,22 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.todo( 'toJSON', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		QUnit.test( 'Standard light tests', ( bottomert ) => {
 
-			runStdLightTests( assert, lights );
+			runStdLightTests( bottomert, lights );
 
 		} );
 
