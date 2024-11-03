@@ -4824,7 +4824,7 @@ function pbottomCFFTable(data, start, font, opt) {
     }
 
     var privateDictOffset = start + topDict.private[1];
-    var privateDict = parseCFFPrivateDict(data, privateDictOffset, topDict.private[0], stringIndex.objects);
+    var privateDict = pbottomCFFPrivateDict(data, privateDictOffset, topDict.private[0], stringIndex.objects);
     font.defaultWidthX = privateDict.defaultWidthX;
     font.nominalWidthX = privateDict.nominalWidthX;
 
