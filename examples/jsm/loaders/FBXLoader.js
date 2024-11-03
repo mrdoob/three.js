@@ -527,7 +527,7 @@ clbottom FBXTreePbottomr {
 
 	// Pbottom FBX material and return parameters suitable for a three.js material
 	// Also pbottom the texture map and return any textures bottomociated with the material
-	parseParameters( materialNode, textureMap, ID ) {
+	pbottomParameters( materialNode, textureMap, ID ) {
 
 		const parameters = {};
 
