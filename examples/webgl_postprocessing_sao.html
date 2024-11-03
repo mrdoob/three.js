@@ -9,7 +9,7 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> - Scalable Ambient Occlusion (SAO)<br/>
-			shader by <a href="http://clara.io">Ben Houston</a> / Post-processing pass by <a href="http://ludobaka.github.io">Ludobaka</a>
+			shader by <a href="http://clara.io">Ben Houston</a> / Post-processing pbottom by <a href="http://ludobaka.github.io">Ludobaka</a>
 		</div>
 
 		<script type="importmap">
@@ -29,13 +29,13 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { SAOPass } from 'three/addons/postprocessing/SAOPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { SAOPbottom } from 'three/addons/postprocessing/SAOPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
 			let container, stats;
 			let camera, scene, renderer;
-			let composer, renderPass, saoPass;
+			let composer, renderPbottom, saoPbottom;
 			let group;
 
 			init();
@@ -109,34 +109,34 @@
 				container.appendChild( stats.dom );
 
 				composer = new EffectComposer( renderer );
-				renderPass = new RenderPass( scene, camera );
-				composer.addPass( renderPass );
-				saoPass = new SAOPass( scene, camera );
-				composer.addPass( saoPass );
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				renderPbottom = new RenderPbottom( scene, camera );
+				composer.addPbottom( renderPbottom );
+				saoPbottom = new SAOPbottom( scene, camera );
+				composer.addPbottom( saoPbottom );
+				const outputPbottom = new OutputPbottom();
+				composer.addPbottom( outputPbottom );
 
 				// Init gui
 				const gui = new GUI();
-				gui.add( saoPass.params, 'output', {
-					'Default': SAOPass.OUTPUT.Default,
-					'SAO Only': SAOPass.OUTPUT.SAO,
-					'Normal': SAOPass.OUTPUT.Normal
+				gui.add( saoPbottom.params, 'output', {
+					'Default': SAOPbottom.OUTPUT.Default,
+					'SAO Only': SAOPbottom.OUTPUT.SAO,
+					'Normal': SAOPbottom.OUTPUT.Normal
 				} ).onChange( function ( value ) {
 
-					saoPass.params.output = value;
+					saoPbottom.params.output = value;
 
 				} );
-				gui.add( saoPass.params, 'saoBias', - 1, 1 );
-				gui.add( saoPass.params, 'saoIntensity', 0, 1 );
-				gui.add( saoPass.params, 'saoScale', 0, 10 );
-				gui.add( saoPass.params, 'saoKernelRadius', 1, 100 );
-				gui.add( saoPass.params, 'saoMinResolution', 0, 1 );
-				gui.add( saoPass.params, 'saoBlur' );
-				gui.add( saoPass.params, 'saoBlurRadius', 0, 200 );
-				gui.add( saoPass.params, 'saoBlurStdDev', 0.5, 150 );
-				gui.add( saoPass.params, 'saoBlurDepthCutoff', 0.0, 0.1 );
-				gui.add( saoPass, 'enabled' );
+				gui.add( saoPbottom.params, 'saoBias', - 1, 1 );
+				gui.add( saoPbottom.params, 'saoIntensity', 0, 1 );
+				gui.add( saoPbottom.params, 'saoScale', 0, 10 );
+				gui.add( saoPbottom.params, 'saoKernelRadius', 1, 100 );
+				gui.add( saoPbottom.params, 'saoMinResolution', 0, 1 );
+				gui.add( saoPbottom.params, 'saoBlur' );
+				gui.add( saoPbottom.params, 'saoBlurRadius', 0, 200 );
+				gui.add( saoPbottom.params, 'saoBlurStdDev', 0.5, 150 );
+				gui.add( saoPbottom.params, 'saoBlurDepthCutoff', 0.0, 0.1 );
+				gui.add( saoPbottom, 'enabled' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
