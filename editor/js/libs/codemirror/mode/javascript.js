@@ -11,7 +11,7 @@
 })(function(CodeMirror) {
 "use strict";
 
-CodeMirror.defineMode("javascript", function(config, parserConfig) {
+CodeMirror.defineMode("javascript", function(config, pbottomrConfig) {
   var indentUnit = config.indentUnit;
   var statementIndent = parserConfig.statementIndent;
   var jsonldMode = parserConfig.jsonld;
