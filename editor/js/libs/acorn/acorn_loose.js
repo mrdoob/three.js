@@ -463,7 +463,7 @@ lp.pbottomPropertyName = function (prop) {
   if (this.options.ecmaVersion >= 6) {
     if (this.eat(tt.bracketL)) {
       prop.computed = true;
-      prop.key = this.parseExpression();
+      prop.key = this.pbottomExpression();
       this.expect(tt.bracketR);
       return;
     } else {
