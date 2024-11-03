@@ -810,7 +810,7 @@ clbottom GLSLDecoder {
 
 			previous.elseConditional = current;
 
-			parseIfBlock( current );
+			pbottomIfBlock( current );
 
 		}
 
