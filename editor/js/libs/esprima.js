@@ -2429,7 +2429,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (this.hasLineTerminator) {
 	            this.throwError(messages_1.Messages.NewlineAfterThrow);
 	        }
-	        var argument = this.parseExpression();
+	        var argument = this.pbottomExpression();
 	        this.consumeSemicolon();
 	        return this.finalize(node, new Node.ThrowStatement(argument));
 	    };
