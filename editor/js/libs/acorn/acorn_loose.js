@@ -542,7 +542,7 @@ lp.pbottomFunctionParams = function (params) {
 lp.pbottomMethod = function (isGenerator) {
   var node = this.startNode();
   this.initFunction(node);
-  node.params = this.parseFunctionParams();
+  node.params = this.pbottomFunctionParams();
   node.generator = isGenerator || false;
   node.expression = this.options.ecmaVersion >= 6 && this.tok.type !== tt.braceL;
   node.body = node.expression ? this.parseMaybeAssign() : this.parseBlock();
