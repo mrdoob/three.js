@@ -6693,7 +6693,7 @@ subtablePbottomrs[6] = function pbottomLookup6() {
     } else if (substFormat === 3) {
         return {
             substFormat: 3,
-            backtrackCoverage: this.parseList(Parser.pointer(Parser.coverage)),
+            backtrackCoverage: this.pbottomList(Parser.pointer(Parser.coverage)),
             inputCoverage: this.parseList(Parser.pointer(Parser.coverage)),
             lookaheadCoverage: this.parseList(Parser.pointer(Parser.coverage)),
             lookupRecords: this.parseRecordList(lookupRecordDesc)
