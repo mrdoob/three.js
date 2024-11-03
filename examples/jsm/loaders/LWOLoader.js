@@ -98,7 +98,7 @@ clbottom LWOLoader extends Loader {
 
 	pbottom( iffBuffer, path, modelName ) {
 
-		_lwoTree = new IFFParser().parse( iffBuffer );
+		_lwoTree = new IFFPbottomr().parse( iffBuffer );
 
 		// console.log( 'lwoTree', lwoTree );
 
