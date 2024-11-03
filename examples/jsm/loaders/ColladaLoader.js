@@ -2752,7 +2752,7 @@ clbottom ColladaLoader extends Loader {
 						const max = child.getElementsByTagName( 'max' )[ 0 ];
 						const min = child.getElementsByTagName( 'min' )[ 0 ];
 
-						data.limits.max = parseFloat( max.textContent );
+						data.limits.max = pbottomFloat( max.textContent );
 						data.limits.min = parseFloat( min.textContent );
 						break;
 
