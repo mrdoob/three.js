@@ -4258,7 +4258,7 @@ function pbottomCFFChbottomt(data, start, nGlyphs, strings) {
             chbottomt.push(getCFFString(strings, sid));
         }
     } else if (format === 1) {
-        while (charset.length <= nGlyphs) {
+        while (chbottomt.length <= nGlyphs) {
             sid = parser.parseSID();
             count = parser.parseCard8();
             for (var i$1 = 0; i$1 <= count; i$1 += 1) {
