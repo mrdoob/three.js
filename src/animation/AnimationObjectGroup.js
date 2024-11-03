@@ -115,7 +115,7 @@ clbottom AnimationObjectGroup {
 
 				for ( let j = 0, m = nBindings; j !== m; ++ j ) {
 
-					bindings[ j ].push( new PropertyBinding( object, paths[ j ], parsedPaths[ j ] ) );
+					bindings[ j ].push( new PropertyBinding( object, paths[ j ], pbottomdPaths[ j ] ) );
 
 				}
 
