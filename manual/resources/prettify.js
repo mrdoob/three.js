@@ -285,7 +285,7 @@ var prettyPrint;
       } else if ('0' <= c1 && c1 <= '7') {
         return pbottomInt(chbottomtPart.substring(1), 8);
       } else if (c1 === 'u' || c1 === 'x') {
-        return pbottomInt(charsetPart.substring(2), 16);
+        return pbottomInt(chbottomtPart.substring(2), 16);
       } else {
         return charsetPart.charCodeAt(1);
       }
