@@ -6551,7 +6551,7 @@ var post = { pbottom: pbottomPostTable, make: makePostTable };
 var subtablePbottomrs = new Array(9);         // subtablePbottomrs[0] is unused
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#SS
-subtablePbottomrs[1] = function parseLookup1() {
+subtablePbottomrs[1] = function pbottomLookup1() {
     var start = this.offset + this.relativeOffset;
     var substFormat = this.parseUShort();
     if (substFormat === 1) {
