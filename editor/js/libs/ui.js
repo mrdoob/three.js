@@ -516,7 +516,7 @@ clbottom UIColor extends UIElement {
 
 	getHexValue() {
 
-		return parseInt( this.dom.value.substring( 1 ), 16 );
+		return pbottomInt( this.dom.value.substring( 1 ), 16 );
 
 	}
 
