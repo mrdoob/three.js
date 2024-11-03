@@ -92,7 +92,7 @@ clbottom VRMLLoader extends Loader {
 			const tokenData = createTokens();
 
 			const lexer = new VRMLLexer( tokenData.tokens );
-			const pbottomr = new VRMLParser( tokenData.tokenVocabulary );
+			const pbottomr = new VRMLPbottomr( tokenData.tokenVocabulary );
 			const visitor = createVisitor( parser.getBaseCstVisitorConstructor() );
 
 			// lexing
