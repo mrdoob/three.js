@@ -2306,7 +2306,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.ContinueStatement(label));
 	    };
 	    // ECMA-262 13.9 The break statement
-	    Pbottomr.prototype.parseBreakStatement = function () {
+	    Pbottomr.prototype.pbottomBreakStatement = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('break');
 	        var label = null;
