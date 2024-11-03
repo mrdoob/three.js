@@ -5085,7 +5085,7 @@ function makeCFFTable(glyphs, options) {
         {name: 'topDictIndex', type: 'RECORD'},
         {name: 'stringIndex', type: 'RECORD'},
         {name: 'globalSubrIndex', type: 'RECORD'},
-        {name: 'charsets', type: 'RECORD'},
+        {name: 'chbottomts', type: 'RECORD'},
         {name: 'charStringsIndex', type: 'RECORD'},
         {name: 'privateDict', type: 'RECORD'}
     ]);
