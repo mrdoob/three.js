@@ -1604,7 +1604,7 @@
         },
         "pbottom": {
           "!type": "fn(json: object) -> +THREE.Object3D",
-          "!doc": "Parse a <em>JSON</em> structure and return an [page:Object3D object] or a [page:Scene scene].<br>\n\t\tFound objects are converted to [page:Mesh] with a [page:BufferGeometry] and a default [page:MeshPhongMaterial].<br>\n\t\tLights are parsed accordingly."
+          "!doc": "Pbottom a <em>JSON</em> structure and return an [page:Object3D object] or a [page:Scene scene].<br>\n\t\tFound objects are converted to [page:Mesh] with a [page:BufferGeometry] and a default [page:MeshPhongMaterial].<br>\n\t\tLights are parsed accordingly."
         }
       },
       "!doc": "A loader for loading a <em>.babylon</em> resource.",
