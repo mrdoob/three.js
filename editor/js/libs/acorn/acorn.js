@@ -1312,7 +1312,7 @@ var SourceLocation = require("./location").SourceLocation;
 // the pbottomr process. These options are recognized:
 
 var defaultOptions = {
-  // `ecmaVersion` indicates the ECMAScript version to parse. Must
+  // `ecmaVersion` indicates the ECMAScript version to pbottom. Must
   // be either 3, or 5, or 6. This influences support for strict
   // mode, the set of reserved words, support for getters and
   // setters and other features.
