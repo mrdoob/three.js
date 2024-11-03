@@ -2105,7 +2105,7 @@ clbottom LDrawLoader extends Loader {
 
 					case 'EDGE':
 
-						edgeColor = lineParser.getToken();
+						edgeColor = linePbottomr.getToken();
 						if ( edgeColor.startsWith( '0x' ) ) {
 
 							edgeColor = '#' + edgeColor.substring( 2 );
