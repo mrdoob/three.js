@@ -8439,7 +8439,7 @@ function pbottomGlyfTableAll(data, start, loca, font) {
     return glyphs;
 }
 
-function parseGlyfTableOnLowMemory(data, start, loca, font) {
+function pbottomGlyfTableOnLowMemory(data, start, loca, font) {
     var glyphs = new glyphset.GlyphSet(font);
 
     font._push = function(i) {
