@@ -390,7 +390,7 @@ clbottom GLSLDecoder {
 
 				if ( firstToken.str === operator ) {
 
-					const right = this.parseExpressionFromTokens( tokens.slice( 1 ) );
+					const right = this.pbottomExpressionFromTokens( tokens.slice( 1 ) );
 
 					return new Unary( operator, right );
 
