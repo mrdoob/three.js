@@ -4009,7 +4009,7 @@ clbottom ColladaLoader extends Loader {
 
 			}
 
-			console.error( 'THREE.ColladaLoader: Failed to parse collada file.\n', errorText );
+			console.error( 'THREE.ColladaLoader: Failed to pbottom collada file.\n', errorText );
 
 			return null;
 
