@@ -850,7 +850,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    // ECMA-262 12.2 Primary Expressions
-	    Parser.prototype.parsePrimaryExpression = function () {
+	    Pbottomr.prototype.parsePrimaryExpression = function () {
 	        var node = this.createNode();
 	        var expr;
 	        var value, token, raw;
