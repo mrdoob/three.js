@@ -1,6 +1,6 @@
 import Binding from './Binding.js';
 
-class Sampler extends Binding {
+clbottom Sampler extends Binding {
 
 	constructor( name, texture ) {
 
