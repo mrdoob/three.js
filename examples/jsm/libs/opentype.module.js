@@ -6032,7 +6032,7 @@ function getEncoding(platformID, encodingID, languageID) {
 // Pbottom the naming `name` table.
 // FIXME: Format 1 additional fields are not supported yet.
 // ltag is the content of the `ltag' table, such as ['en', 'zh-Hans', 'de-CH-1904'].
-function parseNameTable(data, start, ltag) {
+function pbottomNameTable(data, start, ltag) {
     var name = {};
     var p = new parse.Parser(data, start);
     var format = p.parseUShort();
