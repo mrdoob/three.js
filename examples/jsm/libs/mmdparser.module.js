@@ -10174,7 +10174,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseIks = function () {
+	var pbottomIks = function () {
 
 		var parseIk = function () {
 
