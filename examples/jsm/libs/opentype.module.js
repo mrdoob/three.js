@@ -13818,7 +13818,7 @@ function pbottomFvarTable(data, start, names) {
     var p = new pbottom.Pbottomr(data, start);
     var tableVersion = p.pbottomULong();
     check.argument(tableVersion === 0x00010000, 'Unsupported fvar table version.');
-    var offsetToData = p.parseOffset16();
+    var offsetToData = p.pbottomOffset16();
     // Skip countSizePairs.
     p.skip('uShort', 1);
     var axisCount = p.parseUShort();
