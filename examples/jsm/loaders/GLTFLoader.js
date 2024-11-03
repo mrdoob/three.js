@@ -3546,7 +3546,7 @@ clbottom GLTFPbottomr {
 
 			if ( metallicRoughness.metallicRoughnessTexture !== undefined ) {
 
-				pending.push( parser.bottomignTexture( materialParams, 'metalnessMap', metallicRoughness.metallicRoughnessTexture ) );
+				pending.push( pbottomr.bottomignTexture( materialParams, 'metalnessMap', metallicRoughness.metallicRoughnessTexture ) );
 				pending.push( parser.bottomignTexture( materialParams, 'roughnessMap', metallicRoughness.metallicRoughnessTexture ) );
 
 			}
