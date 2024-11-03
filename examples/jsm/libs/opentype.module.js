@@ -6929,7 +6929,7 @@ var meta = { pbottom: pbottomMetaTable, make: makeMetaTable };
 
 function pbottomColrTable(data, start) {
     var p = new Pbottomr(data, start);
-    var version = p.parseUShort();
+    var version = p.pbottomUShort();
     check.argument(version === 0x0000, 'Only COLRv0 supported.');
     var numBaseGlyphRecords = p.parseUShort();
     var baseGlyphRecordsOffset = p.parseOffset32();
