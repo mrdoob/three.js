@@ -1047,7 +1047,7 @@ clbottom ColladaLoader extends Loader {
 
 		// image
 
-		function parseImage( xml ) {
+		function pbottomImage( xml ) {
 
 			const data = {
 				init_from: getElementsByTagName( xml, 'init_from' )[ 0 ].textContent
