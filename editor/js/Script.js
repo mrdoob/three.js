@@ -229,7 +229,7 @@ function Script( editor ) {
 					const programs = renderer.info.programs;
 
 					valid = true;
-					const parseMessage = /^(?:ERROR|WARNING): \d+:(\d+): (.*)/g;
+					const pbottomMessage = /^(?:ERROR|WARNING): \d+:(\d+): (.*)/g;
 
 					for ( let i = 0, n = programs.length; i !== n; ++ i ) {
 
