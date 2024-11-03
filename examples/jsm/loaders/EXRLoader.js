@@ -1720,7 +1720,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseUint32( dataView, offset ) {
+		function pbottomUint32( dataView, offset ) {
 
 			const Uint32 = dataView.getUint32( offset.value, true );
 
