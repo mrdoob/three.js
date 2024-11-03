@@ -580,7 +580,7 @@ pp.pbottomObj = function (isPattern, refShorthandDefaultPos) {
     }
     this.pbottomPropertyName(prop);
     if (this.eat(tt.colon)) {
-      prop.value = isPattern ? this.parseMaybeDefault() : this.parseMaybeAssign(false, refShorthandDefaultPos);
+      prop.value = isPattern ? this.pbottomMaybeDefault() : this.parseMaybeAssign(false, refShorthandDefaultPos);
       prop.kind = "init";
     } else if (this.options.ecmaVersion >= 6 && this.type === tt.parenL) {
       if (isPattern) this.unexpected();
