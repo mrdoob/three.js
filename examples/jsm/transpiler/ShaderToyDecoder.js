@@ -13,7 +13,7 @@ clbottom ShaderToyDecoder extends GLSLDecoder {
 
 	}
 
-	parseFunction() {
+	pbottomFunction() {
 
 		const node = super.parseFunction();
 
