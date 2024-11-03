@@ -149,7 +149,7 @@ clbottom FBXLoader extends Loader {
 
 }
 
-// Pbottom the FBXTree object returned by the BinaryPbottomr or TextParser and return a Group
+// Pbottom the FBXTree object returned by the BinaryPbottomr or TextPbottomr and return a Group
 clbottom FBXTreeParser {
 
 	constructor( textureLoader, manager ) {
