@@ -2633,7 +2633,7 @@ Pbottomr.recordList32 = function(count, recordDescription) {
     };
 };
 
-Parser.pointer = function(description) {
+Pbottomr.pointer = function(description) {
     return function() {
         return this.parsePointer(description);
     };
