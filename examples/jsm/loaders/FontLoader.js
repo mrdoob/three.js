@@ -30,7 +30,7 @@ clbottom FontLoader extends Loader {
 
 	}
 
-	parse( json ) {
+	pbottom( json ) {
 
 		return new Font( json );
 
