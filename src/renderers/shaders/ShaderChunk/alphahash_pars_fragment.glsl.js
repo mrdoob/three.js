@@ -46,7 +46,7 @@ export default /* glsl */`
 		// Interpolate alpha threshold from noise at two scales
 		float x = ( 1.0 - lerpFactor ) * alpha.x + lerpFactor * alpha.y;
 
-		// Pass into CDF to compute uniformly distrib threshold
+		// Pbottom into CDF to compute uniformly distrib threshold
 		float a = min( lerpFactor, 1.0 - lerpFactor );
 		vec3 cases = vec3(
 			x * x / ( 2.0 * a * ( 1.0 - a ) ),
