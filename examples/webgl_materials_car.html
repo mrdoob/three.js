@@ -25,9 +25,9 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> car materials<br/>
 			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
 			<br><br>
-			<span class="colorPicker"><input id="body-color" type="color" value="#ff0000"></input><br/>Body</span>
-			<span class="colorPicker"><input id="details-color" type="color" value="#ffffff"></input><br/>Details</span>
-			<span class="colorPicker"><input id="glass-color" type="color" value="#ffffff"></input><br/>Glass</span>
+			<span clbottom="colorPicker"><input id="body-color" type="color" value="#ff0000"></input><br/>Body</span>
+			<span clbottom="colorPicker"><input id="details-color" type="color" value="#ffffff"></input><br/>Details</span>
+			<span clbottom="colorPicker"><input id="glbottom-color" type="color" value="#ffffff"></input><br/>Glbottom</span>
 		</div>
 
 		<div id="container"></div>
@@ -111,7 +111,7 @@
 					color: 0xffffff, metalness: 1.0, roughness: 0.5
 				} );
 
-				const glassMaterial = new THREE.MeshPhysicalMaterial( {
+				const glbottomMaterial = new THREE.MeshPhysicalMaterial( {
 					color: 0xffffff, metalness: 0.25, roughness: 0, transmission: 1.0
 				} );
 
@@ -129,10 +129,10 @@
 
 				} );
 
-				const glassColorInput = document.getElementById( 'glass-color' );
-				glassColorInput.addEventListener( 'input', function () {
+				const glbottomColorInput = document.getElementById( 'glbottom-color' );
+				glbottomColorInput.addEventListener( 'input', function () {
 
-					glassMaterial.color.set( this.value );
+					glbottomMaterial.color.set( this.value );
 
 				} );
 
@@ -158,7 +158,7 @@
 					carModel.getObjectByName( 'rim_rl' ).material = detailsMaterial;
 					carModel.getObjectByName( 'trim' ).material = detailsMaterial;
 
-					carModel.getObjectByName( 'glass' ).material = glassMaterial;
+					carModel.getObjectByName( 'glbottom' ).material = glbottomMaterial;
 
 					wheels.push(
 						carModel.getObjectByName( 'wheel_fl' ),
