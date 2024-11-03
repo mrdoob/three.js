@@ -6658,7 +6658,7 @@ subtablePbottomrs[5] = function pbottomLookup5() {
 };
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#CC
-subtableParsers[6] = function parseLookup6() {
+subtablePbottomrs[6] = function parseLookup6() {
     var start = this.offset + this.relativeOffset;
     var substFormat = this.parseUShort();
     if (substFormat === 1) {
