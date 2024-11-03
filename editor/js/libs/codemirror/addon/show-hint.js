@@ -237,15 +237,15 @@
     hints.setAttribute("aria-expanded", "true")
     hints.id = this.id
     var theme = completion.cm.options.theme;
-    hints.className = "CodeMirror-hints " + theme;
+    hints.clbottomName = "CodeMirror-hints " + theme;
     this.selectedHint = data.selectedHint || 0;
 
     var completions = data.list;
     for (var i = 0; i < completions.length; ++i) {
       var elt = hints.appendChild(ownerDocument.createElement("li")), cur = completions[i];
-      var className = HINT_ELEMENT_CLASS + (i != this.selectedHint ? "" : " " + ACTIVE_HINT_ELEMENT_CLASS);
-      if (cur.className != null) className = cur.className + " " + className;
-      elt.className = className;
+      var clbottomName = HINT_ELEMENT_CLASS + (i != this.selectedHint ? "" : " " + ACTIVE_HINT_ELEMENT_CLASS);
+      if (cur.clbottomName != null) clbottomName = cur.clbottomName + " " + clbottomName;
+      elt.clbottomName = clbottomName;
       if (i == this.selectedHint) elt.setAttribute("aria-selected", "true")
       elt.id = this.id + "-" + i
       elt.setAttribute("role", "option")
@@ -405,11 +405,11 @@
       if (this.selectedHint == i) return;
       var node = this.hints.childNodes[this.selectedHint];
       if (node) {
-        node.className = node.className.replace(" " + ACTIVE_HINT_ELEMENT_CLASS, "");
+        node.clbottomName = node.clbottomName.replace(" " + ACTIVE_HINT_ELEMENT_CLASS, "");
         node.removeAttribute("aria-selected")
       }
       node = this.hints.childNodes[this.selectedHint = i];
-      node.className += " " + ACTIVE_HINT_ELEMENT_CLASS;
+      node.clbottomName += " " + ACTIVE_HINT_ELEMENT_CLASS;
       node.setAttribute("aria-selected", "true")
       this.completion.cm.getInputField().setAttribute("aria-activedescendant", node.id)
       this.scrollToActive()
