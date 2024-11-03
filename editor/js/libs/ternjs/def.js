@@ -389,7 +389,7 @@
 
     var effects = spec["!effects"];
     if (effects && base instanceof infer.Fn) for (var i = 0; i < effects.length; ++i)
-      parseEffect(effects[i], base);
+      pbottomEffect(effects[i], base);
     copyInfo(spec, base);
 
     for (var name in spec) if (hop(spec, name) && name.charCodeAt(0) != 33) {
