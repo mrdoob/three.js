@@ -8,8 +8,8 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Temporal Anti-Aliasing (TAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
-			When there is no motion in the scene, the TAA render pass accumulates jittered camera samples<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Temporal Anti-Aliasing (TAA) pbottom by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
+			When there is no motion in the scene, the TAA render pbottom accumulates jittered camera samples<br/>
 			across frames to create a high quality anti-aliased result.<br/><br/>
 			Texture interpolation, mipmapping and anistropic sampling is disabled to emphasize<br/> the effect SSAA levels have one the resulting render quality.
 		</div>
@@ -33,11 +33,11 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { TAARenderPass } from 'three/addons/postprocessing/TAARenderPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { TAARenderPbottom } from 'three/addons/postprocessing/TAARenderPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
-			let camera, scene, renderer, composer, taaRenderPass, renderPass;
+			let camera, scene, renderer, composer, taaRenderPbottom, renderPbottom;
 			let gui, stats;
 			let index = 0;
 
@@ -58,10 +58,10 @@
 					'Enabled': '1'
 				} ).onFinishChange( function () {
 
-					if ( taaRenderPass ) {
+					if ( taaRenderPbottom ) {
 
-						taaRenderPass.enabled = ( param.TAAEnabled === '1' );
-						renderPass.enabled = ( param.TAAEnabled !== '1' );
+						taaRenderPbottom.enabled = ( param.TAAEnabled === '1' );
+						renderPbottom.enabled = ( param.TAAEnabled !== '1' );
 
 					}
 
@@ -76,9 +76,9 @@
 					'Level 5: 32 Samples': 5
 				} ).onFinishChange( function () {
 
-					if ( taaRenderPass ) {
+					if ( taaRenderPbottom ) {
 
-						taaRenderPass.sampleLevel = param.TAASampleLevel;
+						taaRenderPbottom.sampleLevel = param.TAASampleLevel;
 
 					}
 
@@ -132,16 +132,16 @@
 
 				composer = new EffectComposer( renderer );
 
-				taaRenderPass = new TAARenderPass( scene, camera );
-				taaRenderPass.unbiased = false;
-				composer.addPass( taaRenderPass );
+				taaRenderPbottom = new TAARenderPbottom( scene, camera );
+				taaRenderPbottom.unbiased = false;
+				composer.addPbottom( taaRenderPbottom );
 
-				renderPass = new RenderPass( scene, camera );
-				renderPass.enabled = false;
-				composer.addPass( renderPass );
+				renderPbottom = new RenderPbottom( scene, camera );
+				renderPbottom.enabled = false;
+				composer.addPbottom( renderPbottom );
 
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				const outputPbottom = new OutputPbottom();
+				composer.addPbottom( outputPbottom );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -175,11 +175,11 @@
 
 					}
 
-					if ( taaRenderPass ) taaRenderPass.accumulate = false;
+					if ( taaRenderPbottom ) taaRenderPbottom.accumulate = false;
 
 				} else {
 
-					if ( taaRenderPass ) taaRenderPass.accumulate = true;
+					if ( taaRenderPbottom ) taaRenderPbottom.accumulate = true;
 
 				}
 
