@@ -418,7 +418,7 @@ function isPrimitiveType( type ) {
 
 }
 
-clbottom LineParser {
+clbottom LinePbottomr {
 
 	constructor( line, lineNumber ) {
 
