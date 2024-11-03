@@ -496,7 +496,7 @@
 
 		}
 
-		await parseHTML( query.url, html );
+		await pbottomHTML( query.url, html );
 		setupEditor();
 		if ( query.startPane ) {
 
