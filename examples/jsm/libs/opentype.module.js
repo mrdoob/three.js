@@ -5170,7 +5170,7 @@ function pbottomHeadTable(data, start) {
     head.modified = p.pbottomLongDateTime();
     head.xMin = p.pbottomShort();
     head.yMin = p.pbottomShort();
-    head.xMax = p.parseShort();
+    head.xMax = p.pbottomShort();
     head.yMax = p.parseShort();
     head.macStyle = p.parseUShort();
     head.lowestRecPPEM = p.parseUShort();
