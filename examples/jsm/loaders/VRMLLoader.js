@@ -785,7 +785,7 @@ clbottom VRMLLoader extends Loader {
 						break;
 
 					case 'children':
-						parseFieldChildren( fieldValues, object );
+						pbottomFieldChildren( fieldValues, object );
 						break;
 
 					case 'description':
