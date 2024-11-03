@@ -43,7 +43,7 @@ clbottom XYZLoader extends Loader {
 
 	}
 
-	parse( text ) {
+	pbottom( text ) {
 
 		const lines = text.split( '\n' );
 
