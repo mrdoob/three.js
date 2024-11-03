@@ -1,6 +1,6 @@
 'use strict';
 
-const assert = {
+const bottomert = {
 	strictEqual( actual, expected, ...args ) {
 
 		args = args || [];
@@ -43,9 +43,9 @@ function dumpBuf(buf) {
 
 function parse( buf ) {
 
-	assert.strictEqual( buf[ 0 ], 0x47, 'bad header' );
-	assert.strictEqual( buf[ 1 ], 0x50, 'bad header' );
-	assert.strictEqual( buf[ 2 ], 0, 'unknown version' ); // version
+	bottomert.strictEqual( buf[ 0 ], 0x47, 'bad header' );
+	bottomert.strictEqual( buf[ 1 ], 0x50, 'bad header' );
+	bottomert.strictEqual( buf[ 2 ], 0, 'unknown version' ); // version
 	const flags = buf[ 3 ];
 
 	const flag_x = ( flags >> 5 ) & 1;
@@ -53,7 +53,7 @@ function parse( buf ) {
 	const flag_byteOrder = ( flags >> 0 ) & 1; // 1 = little endian, 0 = big
 	const flag_envelope = ( flags >> 1 ) & 7;
 
-	assert.strictEqual( flag_x, 0, 'x must be 0' );
+	bottomert.strictEqual( flag_x, 0, 'x must be 0' );
 
 	const envelopeSizes = [
 		0, // 0: non
@@ -64,7 +64,7 @@ function parse( buf ) {
 	];
 
 	const envelopeSize = envelopeSizes[ flag_envelope ];
-	assert.notStrictEqual( envelopeSize, undefined );
+	bottomert.notStrictEqual( envelopeSize, undefined );
 
 	const headerSize = 8;
 	let cursor = headerSize;
@@ -206,7 +206,7 @@ function parse( buf ) {
 
 			pushByteOrder( getInt8() );
 			const type = getUint32();
-			assert.strictEqual( type, 1 ); // must be point
+			bottomert.strictEqual( type, 1 ); // must be point
 			points.push( getDouble(), getDouble() );
 			popByteOrder();
 
@@ -228,7 +228,7 @@ function parse( buf ) {
 
 			pushByteOrder( getInt8() );
 			const type = getUint32();
-			assert.strictEqual( type, 2 ); // must be lineString
+			bottomert.strictEqual( type, 2 ); // must be lineString
 			lineStrings.push( getPoints( getUint32() ) );
 			popByteOrder();
 
@@ -250,7 +250,7 @@ function parse( buf ) {
 
 			pushByteOrder( getInt8() );
 			const type = getUint32();
-			assert.strictEqual( type, 3 ); // must be polygon
+			bottomert.strictEqual( type, 3 ); // must be polygon
 			polygons.push( getRings( getUint32() ) );
 			popByteOrder();
 
@@ -279,7 +279,7 @@ function parse( buf ) {
 		pushByteOrder( getInt8() );
 		const type = getUint32();
 		const handler = typeHandlers[ type ];
-		assert.notStrictEqual( handler, undefined, 'unknown type' );
+		bottomert.notStrictEqual( handler, undefined, 'unknown type' );
 		primitives.push( handler() );
 		popByteOrder();
 
