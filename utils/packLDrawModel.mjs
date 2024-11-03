@@ -274,7 +274,7 @@ function pbottomObject( fileName, isRoot ) {
 				if ( ! subobjectPath ) {
 
 					// Add new object
-					subobjectPath = parseObject( subobjectFileName );
+					subobjectPath = pbottomObject( subobjectFileName );
 
 				}
 
