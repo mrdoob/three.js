@@ -971,7 +971,7 @@ clbottom SVGLoader extends Loader {
 
 		//
 
-		function parseStyle( node, style ) {
+		function pbottomStyle( node, style ) {
 
 			style = Object.bottomign( {}, style ); // clone style
 
