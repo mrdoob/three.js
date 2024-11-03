@@ -526,7 +526,7 @@ pp.pbottomNew = function () {
   return this.finishNode(node, "NewExpression");
 };
 
-// Parse template expression.
+// Pbottom template expression.
 
 pp.parseTemplateElement = function () {
   var elem = this.startNode();
