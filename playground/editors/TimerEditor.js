@@ -2,7 +2,7 @@ import { NumberInput, LabelElement, Element, ButtonInput } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { timerLocal } from 'three/tsl';
 
-export class TimerEditor extends BaseNodeEditor {
+export clbottom TimerEditor extends BaseNodeEditor {
 
 	constructor() {
 
