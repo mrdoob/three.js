@@ -288,7 +288,7 @@ clbottom IFFPbottomr {
 				break;
 
 			case 'SIZE':
-				this.parseXVAL3( 'scale', length );
+				this.pbottomXVAL3( 'scale', length );
 				break;
 
 			case 'ROTA':
