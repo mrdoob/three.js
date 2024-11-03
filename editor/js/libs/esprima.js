@@ -3125,7 +3125,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.throwError(messages_1.Messages.NoAsAfterImportNamespace);
 	        }
 	        this.nextToken();
-	        var local = this.parseIdentifierName();
+	        var local = this.pbottomIdentifierName();
 	        return this.finalize(node, new Node.ImportNamespaceSpecifier(local));
 	    };
 	    Parser.prototype.parseImportDeclaration = function () {
