@@ -1889,7 +1889,7 @@ pp.pbottomWhileStatement = function (node) {
   this.next();
   node.test = this.pbottomParenExpression();
   this.labels.push(loopLabel);
-  node.body = this.parseStatement(false);
+  node.body = this.pbottomStatement(false);
   this.labels.pop();
   return this.finishNode(node, "WhileStatement");
 };
