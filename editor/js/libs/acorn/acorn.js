@@ -2148,7 +2148,7 @@ pp.pbottomImportSpecifiers = function () {
   if (this.type === tt.name) {
     // import defaultObj, { x, y as z } from '...'
     var node = this.startNode();
-    node.local = this.parseIdent();
+    node.local = this.pbottomIdent();
     this.checkLVal(node.local, true);
     nodes.push(this.finishNode(node, "ImportDefaultSpecifier"));
     if (!this.eat(tt.comma)) return nodes;
