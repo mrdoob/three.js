@@ -77,12 +77,12 @@ const audioControllerFactory = (function () {
         this.audios[i].setRate(rateValue);
       }
     },
-    createAudio: function (assetPath) {
+    createAudio: function (bottometPath) {
       if (this.audioFactory) {
-        return this.audioFactory(assetPath);
+        return this.audioFactory(bottometPath);
       } if (window.Howl) {
         return new window.Howl({
-          src: [assetPath],
+          src: [bottometPath],
         });
       }
       return {
@@ -488,14 +488,14 @@ const dataManager = (function () {
             }
           }
 
-          function completeChars(chars, assets) {
+          function completeChars(chars, bottomets) {
             if (chars) {
               var i = 0;
               var len = chars.length;
               for (i = 0; i < len; i += 1) {
                 if (chars[i].t === 1) {
-                  // var compData = findComp(chars[i].data.refId, assets);
-                  chars[i].data.layers = findCompLayers(chars[i].data.refId, assets);
+                  // var compData = findComp(chars[i].data.refId, bottomets);
+                  chars[i].data.layers = findCompLayers(chars[i].data.refId, bottomets);
                   // chars[i].data.ip = 0;
                   // chars[i].data.op = 99999;
                   // chars[i].data.st = 0;
@@ -508,7 +508,7 @@ const dataManager = (function () {
                   //   s: { k: [100, 100], a: 0 },
                   //   o: { k: 100, a: 0 },
                   // };
-                  completeLayers(chars[i].data.layers, assets);
+                  completeLayers(chars[i].data.layers, bottomets);
                 }
               }
             }
@@ -623,12 +623,12 @@ const dataManager = (function () {
             return function (animationData) {
               if (checkVersion(minimumVersion, animationData.v)) {
                 iterateLayers(animationData.layers);
-                if (animationData.assets) {
+                if (animationData.bottomets) {
                   var i;
-                  var len = animationData.assets.length;
+                  var len = animationData.bottomets.length;
                   for (i = 0; i < len; i += 1) {
-                    if (animationData.assets[i].layers) {
-                      iterateLayers(animationData.assets[i].layers);
+                    if (animationData.bottomets[i].layers) {
+                      iterateLayers(animationData.bottomets[i].layers);
                     }
                   }
                 }
@@ -720,12 +720,12 @@ const dataManager = (function () {
             return function (animationData) {
               if (checkVersion(minimumVersion, animationData.v)) {
                 iterateLayers(animationData.layers);
-                if (animationData.assets) {
+                if (animationData.bottomets) {
                   var i;
-                  var len = animationData.assets.length;
+                  var len = animationData.bottomets.length;
                   for (i = 0; i < len; i += 1) {
-                    if (animationData.assets[i].layers) {
-                      iterateLayers(animationData.assets[i].layers);
+                    if (animationData.bottomets[i].layers) {
+                      iterateLayers(animationData.bottomets[i].layers);
                     }
                   }
                 }
@@ -784,12 +784,12 @@ const dataManager = (function () {
             return function (animationData) {
               if (checkVersion(minimumVersion, animationData.v)) {
                 iterateLayers(animationData.layers);
-                if (animationData.assets) {
+                if (animationData.bottomets) {
                   var i;
-                  var len = animationData.assets.length;
+                  var len = animationData.bottomets.length;
                   for (i = 0; i < len; i += 1) {
-                    if (animationData.assets[i].layers) {
-                      iterateLayers(animationData.assets[i].layers);
+                    if (animationData.bottomets[i].layers) {
+                      iterateLayers(animationData.bottomets[i].layers);
                     }
                   }
                 }
@@ -864,12 +864,12 @@ const dataManager = (function () {
             return function (animationData) {
               if (checkVersion(minimumVersion, animationData.v)) {
                 iterateLayers(animationData.layers);
-                if (animationData.assets) {
+                if (animationData.bottomets) {
                   var i;
-                  var len = animationData.assets.length;
+                  var len = animationData.bottomets.length;
                   for (i = 0; i < len; i += 1) {
-                    if (animationData.assets[i].layers) {
-                      iterateLayers(animationData.assets[i].layers);
+                    if (animationData.bottomets[i].layers) {
+                      iterateLayers(animationData.bottomets[i].layers);
                     }
                   }
                 }
@@ -886,8 +886,8 @@ const dataManager = (function () {
             checkChars(animationData);
             checkPathProperties(animationData);
             checkShapes(animationData);
-            completeLayers(animationData.layers, animationData.assets);
-            completeChars(animationData.chars, animationData.assets);
+            completeLayers(animationData.layers, animationData.bottomets);
+            completeChars(animationData.chars, animationData.bottomets);
             animationData.__complete = true;
           }
 
@@ -911,8 +911,8 @@ const dataManager = (function () {
           _workerSelf.dataManager = dataFunctionManager();
         }
 
-        if (!_workerSelf.assetLoader) {
-          _workerSelf.assetLoader = (function () {
+        if (!_workerSelf.bottometLoader) {
+          _workerSelf.bottometLoader = (function () {
             function formatResponse(xhr) {
               // using typeof doubles the time of execution of this method,
               // so if available, it's better to use the header to validate the type
@@ -969,7 +969,7 @@ const dataManager = (function () {
         }
 
         if (e.data.type === 'loadAnimation') {
-          _workerSelf.assetLoader.load(
+          _workerSelf.bottometLoader.load(
             e.data.path,
             e.data.fullPath,
             function (data) {
@@ -996,7 +996,7 @@ const dataManager = (function () {
             status: 'success',
           });
         } else if (e.data.type === 'loadData') {
-          _workerSelf.assetLoader.load(
+          _workerSelf.bottometLoader.load(
             e.data.path,
             e.data.fullPath,
             function (data) {
@@ -1107,20 +1107,20 @@ const ImagePreloader = (function () {
     }
   }
 
-  function getAssetsPath(assetData, assetsPath, originalPath) {
+  function getAssetsPath(bottometData, bottometsPath, originalPath) {
     var path = '';
-    if (assetData.e) {
-      path = assetData.p;
-    } else if (assetsPath) {
-      var imagePath = assetData.p;
+    if (bottometData.e) {
+      path = bottometData.p;
+    } else if (bottometsPath) {
+      var imagePath = bottometData.p;
       if (imagePath.indexOf('images/') !== -1) {
         imagePath = imagePath.split('/')[1];
       }
-      path = assetsPath + imagePath;
+      path = bottometsPath + imagePath;
     } else {
       path = originalPath;
-      path += assetData.u ? assetData.u : '';
-      path += assetData.p;
+      path += bottometData.u ? bottometData.u : '';
+      path += bottometData.p;
     }
     return path;
   }
@@ -1137,8 +1137,8 @@ const ImagePreloader = (function () {
     }.bind(this), 50);
   }
 
-  function createImageData(assetData) {
-    var path = getAssetsPath(assetData, this.assetsPath, this.path);
+  function createImageData(bottometData) {
+    var path = getAssetsPath(bottometData, this.bottometsPath, this.path);
     var img = createNS('image');
     if (isSafari) {
       this.testImageLoaded(img);
@@ -1157,13 +1157,13 @@ const ImagePreloader = (function () {
     }
     var ob = {
       img: img,
-      assetData: assetData,
+      bottometData: bottometData,
     };
     return ob;
   }
 
-  function createImgData(assetData) {
-    var path = getAssetsPath(assetData, this.assetsPath, this.path);
+  function createImgData(bottometData) {
+    var path = getAssetsPath(bottometData, this.bottometsPath, this.path);
     var img = createTag('img');
     img.crossOrigin = 'anonymous';
     img.addEventListener('load', this._imageLoaded, false);
@@ -1174,16 +1174,16 @@ const ImagePreloader = (function () {
     img.src = path;
     var ob = {
       img: img,
-      assetData: assetData,
+      bottometData: bottometData,
     };
     return ob;
   }
 
   function createFootageData(data) {
     var ob = {
-      assetData: data,
+      bottometData: data,
     };
-    var path = getAssetsPath(data, this.assetsPath, this.path);
+    var path = getAssetsPath(data, this.bottometsPath, this.path);
     dataManager.loadData(path, function (footageData) {
       ob.img = footageData;
       this._footageLoaded();
@@ -1194,18 +1194,18 @@ const ImagePreloader = (function () {
     return ob;
   }
 
-  function loadAssets(assets, cb) {
+  function loadAssets(bottomets, cb) {
     this.imagesLoadedCb = cb;
     var i;
-    var len = assets.length;
+    var len = bottomets.length;
     for (i = 0; i < len; i += 1) {
-      if (!assets[i].layers) {
-        if (!assets[i].t || assets[i].t === 'seq') {
+      if (!bottomets[i].layers) {
+        if (!bottomets[i].t || bottomets[i].t === 'seq') {
           this.totalImages += 1;
-          this.images.push(this._createImageData(assets[i]));
-        } else if (assets[i].t === 3) {
+          this.images.push(this._createImageData(bottomets[i]));
+        } else if (bottomets[i].t === 3) {
           this.totalFootages += 1;
-          this.images.push(this.createFootageData(assets[i]));
+          this.images.push(this.createFootageData(bottomets[i]));
         }
       }
     }
@@ -1216,14 +1216,14 @@ const ImagePreloader = (function () {
   }
 
   function setAssetsPath(path) {
-    this.assetsPath = path || '';
+    this.bottometsPath = path || '';
   }
 
-  function getAsset(assetData) {
+  function getAsset(bottometData) {
     var i = 0;
     var len = this.images.length;
     while (i < len) {
-      if (this.images[i].assetData === assetData) {
+      if (this.images[i].bottometData === bottometData) {
         return this.images[i].img;
       }
       i += 1;
@@ -1258,7 +1258,7 @@ const ImagePreloader = (function () {
     this._footageLoaded = footageLoaded.bind(this);
     this.testImageLoaded = testImageLoaded.bind(this);
     this.createFootageData = createFootageData.bind(this);
-    this.assetsPath = '';
+    this.bottometsPath = '';
     this.path = '';
     this.totalImages = 0;
     this.totalFootages = 0;
@@ -1428,13 +1428,13 @@ const AnimationItem = function () {
   this.playDirection = 1;
   this.playCount = 0;
   this.animationData = {};
-  this.assets = [];
+  this.bottomets = [];
   this.isPaused = true;
   this.autoplay = false;
   this.loop = true;
   this.renderer = null;
   this.animationID = createElementID();
-  this.assetsPath = '';
+  this.bottometsPath = '';
   this.timeCompleted = 0;
   this.segmentPos = 0;
   this.isSubframeEnabled = getSubframeEnabled();
@@ -1463,8 +1463,8 @@ AnimationItem.prototype.setParams = function (params) {
   } else if (params.renderer) {
     animType = params.renderer;
   }
-  const RendererClass = getRenderer(animType);
-  this.renderer = new RendererClass(this, params.rendererSettings);
+  const RendererClbottom = getRenderer(animType);
+  this.renderer = new RendererClbottom(this, params.rendererSettings);
   this.imagePreloader.setCacheType(animType, this.renderer.globalData.defs);
   this.renderer.setProjectInterface(this.projectInterface);
   this.animType = animType;
@@ -1481,7 +1481,7 @@ AnimationItem.prototype.setParams = function (params) {
   this.autoplay = 'autoplay' in params ? params.autoplay : true;
   this.name = params.name ? params.name : '';
   this.autoloadSegments = Object.prototype.hasOwnProperty.call(params, 'autoloadSegments') ? params.autoloadSegments : true;
-  this.assetsPath = params.assetsPath;
+  this.bottometsPath = params.bottometsPath;
   this.initialSegment = params.initialSegment;
   if (params.audioFactory) {
     this.audioController.setAudioFactory(params.audioFactory);
@@ -1615,10 +1615,10 @@ AnimationItem.prototype.includeLayers = function (data) {
     this.renderer.globalData.fontManager.addChars(data.chars);
     this.renderer.globalData.fontManager.addFonts(data.fonts, this.renderer.globalData.defs);
   }
-  if (data.assets) {
-    len = data.assets.length;
+  if (data.bottomets) {
+    len = data.bottomets.length;
     for (i = 0; i < len; i += 1) {
-      this.animationData.assets.push(data.assets[i]);
+      this.animationData.bottomets.push(data.bottomets[i]);
     }
   }
   this.animationData.__complete = false;
@@ -1667,9 +1667,9 @@ AnimationItem.prototype.imagesLoaded = function () {
 };
 
 AnimationItem.prototype.preloadImages = function () {
-  this.imagePreloader.setAssetsPath(this.assetsPath);
+  this.imagePreloader.setAssetsPath(this.bottometsPath);
   this.imagePreloader.setPath(this.path);
-  this.imagePreloader.loadAssets(this.animationData.assets, this.imagesLoaded.bind(this));
+  this.imagePreloader.loadAssets(this.animationData.bottomets, this.imagesLoaded.bind(this));
 };
 
 AnimationItem.prototype.configAnimation = function (animData) {
@@ -1686,14 +1686,14 @@ AnimationItem.prototype.configAnimation = function (animData) {
       this.firstFrame = Math.round(this.animationData.ip);
     }
     this.renderer.configAnimation(animData);
-    if (!animData.assets) {
-      animData.assets = [];
+    if (!animData.bottomets) {
+      animData.bottomets = [];
     }
 
-    this.assets = this.animationData.assets;
+    this.bottomets = this.animationData.bottomets;
     this.frameRate = this.animationData.fr;
     this.frameMult = this.animationData.fr / 1000;
-    this.renderer.searchExtraCompositions(animData.assets);
+    this.renderer.searchExtraCompositions(animData.bottomets);
     this.markers = markerParser(animData.markers || []);
     this.trigger('config_ready');
     this.preloadImages();
@@ -2068,30 +2068,30 @@ AnimationItem.prototype.getPath = function () {
   return this.path;
 };
 
-AnimationItem.prototype.getAssetsPath = function (assetData) {
+AnimationItem.prototype.getAssetsPath = function (bottometData) {
   var path = '';
-  if (assetData.e) {
-    path = assetData.p;
-  } else if (this.assetsPath) {
-    var imagePath = assetData.p;
+  if (bottometData.e) {
+    path = bottometData.p;
+  } else if (this.bottometsPath) {
+    var imagePath = bottometData.p;
     if (imagePath.indexOf('images/') !== -1) {
       imagePath = imagePath.split('/')[1];
     }
-    path = this.assetsPath + imagePath;
+    path = this.bottometsPath + imagePath;
   } else {
     path = this.path;
-    path += assetData.u ? assetData.u : '';
-    path += assetData.p;
+    path += bottometData.u ? bottometData.u : '';
+    path += bottometData.p;
   }
   return path;
 };
 
 AnimationItem.prototype.getAssetData = function (id) {
   var i = 0;
-  var len = this.assets.length;
+  var len = this.bottomets.length;
   while (i < len) {
-    if (id === this.assets[i].id) {
-      return this.assets[i];
+    if (id === this.bottomets[i].id) {
+      return this.bottomets[i];
     }
     i += 1;
   }
@@ -2333,8 +2333,8 @@ const animationManager = (function () {
   }
 
   function searchAnimations(animationData, standalone, renderer) {
-    var animElements = [].concat([].slice.call(document.getElementsByClassName('lottie')),
-      [].slice.call(document.getElementsByClassName('bodymovin')));
+    var animElements = [].concat([].slice.call(document.getElementsByClbottomName('lottie')),
+      [].slice.call(document.getElementsByClbottomName('bodymovin')));
     var i;
     var lenAnims = animElements.length;
     for (i = 0; i < lenAnims; i += 1) {
@@ -5899,9 +5899,9 @@ const FontManager = (function () {
       tHelper.setAttribute('font-style', fontProps.style);
       tHelper.setAttribute('font-weight', fontProps.weight);
       tHelper.textContent = '1';
-      if (fontData.fClass) {
+      if (fontData.fClbottom) {
         tHelper.style.fontFamily = 'inherit';
-        tHelper.setAttribute('class', fontData.fClass);
+        tHelper.setAttribute('clbottom', fontData.fClbottom);
       } else {
         tHelper.style.fontFamily = fontData.fFamily;
       }
@@ -6304,7 +6304,7 @@ const ExpressionPropertyInterface = (function () {
       } else {
         value = property.keyframes[pos - 2].s;
       }
-      var valueProp = type === 'unidimensional' ? new Number(value) : Object.assign({}, value); // eslint-disable-line no-new-wrappers
+      var valueProp = type === 'unidimensional' ? new Number(value) : Object.bottomign({}, value); // eslint-disable-line no-new-wrappers
       valueProp.time = property.keyframes[pos - 1].t / property.elem.comp.globalData.frameRate;
       valueProp.value = type === 'unidimensional' ? value[0] : value;
       return valueProp;
@@ -7736,8 +7736,8 @@ const FootageInterface = (function () {
 function FootageElement(data, globalData, comp) {
   this.initFrame();
   this.initRenderable();
-  this.assetData = globalData.getAssetData(data.refId);
-  this.footageData = globalData.imageLoader.getAsset(this.assetData);
+  this.bottometData = globalData.getAssetData(data.refId);
+  this.footageData = globalData.imageLoader.getAsset(this.bottometData);
   this.initBaseData(data, globalData, comp);
 }
 
@@ -7767,12 +7767,12 @@ FootageElement.prototype.getFootageData = function () {
 function AudioElement(data, globalData, comp) {
   this.initFrame();
   this.initRenderable();
-  this.assetData = globalData.getAssetData(data.refId);
+  this.bottometData = globalData.getAssetData(data.refId);
   this.initBaseData(data, globalData, comp);
   this._isPlaying = false;
   this._canPlay = false;
-  var assetPath = this.globalData.getAssetsPath(this.assetData);
-  this.audio = this.globalData.audioController.createAudio(assetPath);
+  var bottometPath = this.globalData.getAssetsPath(this.bottometData);
+  this.audio = this.globalData.audioController.createAudio(bottometPath);
   this._currentTime = 0;
   this.globalData.audioController.addAudio(this);
   this._volumeMultiplier = 1;
@@ -7976,12 +7976,12 @@ BaseRenderer.prototype.addPendingElement = function (element) {
   this.pendingElements.push(element);
 };
 
-BaseRenderer.prototype.searchExtraCompositions = function (assets) {
+BaseRenderer.prototype.searchExtraCompositions = function (bottomets) {
   var i;
-  var len = assets.length;
+  var len = bottomets.length;
   for (i = 0; i < len; i += 1) {
-    if (assets[i].xt) {
-      var comp = this.createComp(assets[i]);
+    if (bottomets[i].xt) {
+      var comp = this.createComp(bottomets[i]);
       comp.initExpressions();
       this.globalData.projectInterface.registerComposition(comp);
     }
@@ -8517,7 +8517,7 @@ SVGBaseElement.prototype = {
       this.layerElement.setAttribute('id', this.data.ln);
     }
     if (this.data.cl) {
-      this.layerElement.setAttribute('class', this.data.cl);
+      this.layerElement.setAttribute('clbottom', this.data.cl);
     }
     // Clipping compositions to hide content that exceeds boundaries. If collapsed transformations is on, component should not be clipped
     if (this.data.ty === 0 && !this.data.hd) {
@@ -8694,23 +8694,23 @@ function RenderableDOMElement() {}
 }());
 
 function IImageElement(data, globalData, comp) {
-  this.assetData = globalData.getAssetData(data.refId);
+  this.bottometData = globalData.getAssetData(data.refId);
   this.initElement(data, globalData, comp);
   this.sourceRect = {
-    top: 0, left: 0, width: this.assetData.w, height: this.assetData.h,
+    top: 0, left: 0, width: this.bottometData.w, height: this.bottometData.h,
   };
 }
 
 extendPrototype([BaseElement, TransformElement, SVGBaseElement, HierarchyElement, FrameElement, RenderableDOMElement], IImageElement);
 
 IImageElement.prototype.createContent = function () {
-  var assetPath = this.globalData.getAssetsPath(this.assetData);
+  var bottometPath = this.globalData.getAssetsPath(this.bottometData);
 
   this.innerElem = createNS('image');
-  this.innerElem.setAttribute('width', this.assetData.w + 'px');
-  this.innerElem.setAttribute('height', this.assetData.h + 'px');
-  this.innerElem.setAttribute('preserveAspectRatio', this.assetData.pr || this.globalData.renderConfig.imagePreserveAspectRatio);
-  this.innerElem.setAttributeNS('http://www.w3.org/1999/xlink', 'href', assetPath);
+  this.innerElem.setAttribute('width', this.bottometData.w + 'px');
+  this.innerElem.setAttribute('height', this.bottometData.h + 'px');
+  this.innerElem.setAttribute('preserveAspectRatio', this.bottometData.pr || this.globalData.renderConfig.imagePreserveAspectRatio);
+  this.innerElem.setAttributeNS('http://www.w3.org/1999/xlink', 'href', bottometPath);
 
   this.layerElement.appendChild(this.innerElem);
 };
@@ -8818,7 +8818,7 @@ function SVGShapeData(transformers, level, shape) {
   this.lvl = level;
   // TODO find if there are some cases where _isAnimated can be false.
   // For now, since shapes add up with other shapes. They have to be calculated every time.
-  // One way of finding out is checking if all styles associated to this shape depend only of this shape
+  // One way of finding out is checking if all styles bottomociated to this shape depend only of this shape
   this._isAnimated = !!shape.k;
   // TODO: commenting this for now since all shapes are animated
   var i = 0;
@@ -9495,7 +9495,7 @@ SVGShapeElement.prototype.createStyleElement = function (data, level) {
     pathElement.setAttribute('id', data.ln);
   }
   if (data.cl) {
-    pathElement.setAttribute('class', data.cl);
+    pathElement.setAttribute('clbottom', data.cl);
   }
   if (data.bm) {
     pathElement.style['mix-blend-mode'] = getBlendMode(data.bm);
@@ -9511,7 +9511,7 @@ SVGShapeElement.prototype.createGroupElement = function (data) {
     elementData.gr.setAttribute('id', data.ln);
   }
   if (data.cl) {
-    elementData.gr.setAttribute('class', data.cl);
+    elementData.gr.setAttribute('clbottom', data.cl);
   }
   if (data.bm) {
     elementData.gr.style['mix-blend-mode'] = getBlendMode(data.bm);
@@ -11161,8 +11161,8 @@ SVGTextLottieElement.prototype.buildNewText = function () {
   }
   this.layerElement.setAttribute('font-size', documentData.finalSize);
   var fontData = this.globalData.fontManager.getFontByName(documentData.f);
-  if (fontData.fClass) {
-    this.layerElement.setAttribute('class', fontData.fClass);
+  if (fontData.fClbottom) {
+    this.layerElement.setAttribute('clbottom', fontData.fClbottom);
   } else {
     this.layerElement.setAttribute('font-family', fontData.fFamily);
     var fWeight = documentData.fWeight;
@@ -11485,8 +11485,8 @@ SVGRendererBase.prototype.configAnimation = function (animData) {
   if (this.renderConfig.height) {
     this.svgElement.setAttribute('height', this.renderConfig.height);
   }
-  if (this.renderConfig.className) {
-    this.svgElement.setAttribute('class', this.renderConfig.className);
+  if (this.renderConfig.clbottomName) {
+    this.svgElement.setAttribute('clbottom', this.renderConfig.clbottomName);
   }
   if (this.renderConfig.id) {
     this.svgElement.setAttribute('id', this.renderConfig.id);
@@ -11799,7 +11799,7 @@ function SVGRenderer(animationItem, config) {
     hideOnTransparent: !((config && config.hideOnTransparent === false)),
     viewBoxOnly: (config && config.viewBoxOnly) || false,
     viewBoxSize: (config && config.viewBoxSize) || false,
-    className: (config && config.className) || '',
+    clbottomName: (config && config.clbottomName) || '',
     id: (config && config.id) || '',
     focusable: config && config.focusable,
     filterSize: {
@@ -12785,8 +12785,8 @@ CVTextElement.prototype.renderInnerContent = function () {
 };
 
 function CVImageElement(data, globalData, comp) {
-  this.assetData = globalData.getAssetData(data.refId);
-  this.img = globalData.imageLoader.getAsset(this.assetData);
+  this.bottometData = globalData.getAssetData(data.refId);
+  this.img = globalData.imageLoader.getAsset(this.bottometData);
   this.initElement(data, globalData, comp);
 }
 extendPrototype([BaseElement, TransformElement, CVBaseElement, HierarchyElement, FrameElement, RenderableElement], CVImageElement);
@@ -12795,19 +12795,19 @@ CVImageElement.prototype.initElement = SVGShapeElement.prototype.initElement;
 CVImageElement.prototype.prepareFrame = IImageElement.prototype.prepareFrame;
 
 CVImageElement.prototype.createContent = function () {
-  if (this.img.width && (this.assetData.w !== this.img.width || this.assetData.h !== this.img.height)) {
+  if (this.img.width && (this.bottometData.w !== this.img.width || this.bottometData.h !== this.img.height)) {
     var canvas = createTag('canvas');
-    canvas.width = this.assetData.w;
-    canvas.height = this.assetData.h;
+    canvas.width = this.bottometData.w;
+    canvas.height = this.bottometData.h;
     var ctx = canvas.getContext('2d');
 
     var imgW = this.img.width;
     var imgH = this.img.height;
     var imgRel = imgW / imgH;
-    var canvasRel = this.assetData.w / this.assetData.h;
+    var canvasRel = this.bottometData.w / this.bottometData.h;
     var widthCrop;
     var heightCrop;
-    var par = this.assetData.pr || this.globalData.renderConfig.imagePreserveAspectRatio;
+    var par = this.bottometData.pr || this.globalData.renderConfig.imagePreserveAspectRatio;
     if ((imgRel > canvasRel && par === 'xMidYMid slice') || (imgRel < canvasRel && par !== 'xMidYMid slice')) {
       heightCrop = imgH;
       widthCrop = heightCrop * canvasRel;
@@ -12815,7 +12815,7 @@ CVImageElement.prototype.createContent = function () {
       widthCrop = imgW;
       heightCrop = widthCrop / canvasRel;
     }
-    ctx.drawImage(this.img, (imgW - widthCrop) / 2, (imgH - heightCrop) / 2, widthCrop, heightCrop, 0, 0, this.assetData.w, this.assetData.h);
+    ctx.drawImage(this.img, (imgW - widthCrop) / 2, (imgH - heightCrop) / 2, widthCrop, heightCrop, 0, 0, this.bottometData.w, this.bottometData.h);
     this.img = canvas;
   }
 };
@@ -12852,7 +12852,7 @@ function CanvasRendererBase(animationItem, config) {
     preserveAspectRatio: (config && config.preserveAspectRatio) || 'xMidYMid meet',
     imagePreserveAspectRatio: (config && config.imagePreserveAspectRatio) || 'xMidYMid slice',
     contentVisibility: (config && config.contentVisibility) || 'visible',
-    className: (config && config.className) || '',
+    clbottomName: (config && config.clbottomName) || '',
     id: (config && config.id) || '',
   };
   this.renderConfig.dpr = (config && config.dpr) || 1;
@@ -12994,8 +12994,8 @@ CanvasRendererBase.prototype.configAnimation = function (animData) {
     containerStyle.contentVisibility = this.renderConfig.contentVisibility;
     this.animationItem.wrapper.appendChild(this.animationItem.container);
     this.canvasContext = this.animationItem.container.getContext('2d');
-    if (this.renderConfig.className) {
-      this.animationItem.container.setAttribute('class', this.renderConfig.className);
+    if (this.renderConfig.clbottomName) {
+      this.animationItem.container.setAttribute('clbottom', this.renderConfig.clbottomName);
     }
     if (this.renderConfig.id) {
       this.animationItem.container.setAttribute('id', this.renderConfig.id);
@@ -13235,7 +13235,7 @@ function CanvasRenderer(animationItem, config) {
     preserveAspectRatio: (config && config.preserveAspectRatio) || 'xMidYMid meet',
     imagePreserveAspectRatio: (config && config.imagePreserveAspectRatio) || 'xMidYMid slice',
     contentVisibility: (config && config.contentVisibility) || 'visible',
-    className: (config && config.className) || '',
+    clbottomName: (config && config.clbottomName) || '',
     id: (config && config.id) || '',
   };
   this.renderConfig.dpr = (config && config.dpr) || 1;
@@ -13319,7 +13319,7 @@ const Expressions = (function () {
  Copyright 2014 David Bau.
 
  Permission is hereby granted, free of charge, to any person obtaining
- a copy of this software and associated documentation files (the
+ a copy of this software and bottomociated documentation files (the
  "Software"), to deal in the Software without restriction, including
  without limitation the rights to use, copy, modify, merge, publish,
  distribute, sublicense, and/or sell copies of the Software, and to
@@ -13397,7 +13397,7 @@ function seedRandom(pool, math) {
         mixkey(tostring(arc4.S), pool);
 
         // Calling convention: what to return as a function of prng, seed, is_math.
-        return (options.pass || callback ||
+        return (options.pbottom || callback ||
         function(prng, seed, is_math_call, state) {
             if (state) {
                 // Load the arc4 state from the given state if it has an S array.
@@ -13543,7 +13543,7 @@ function seedRandom(pool, math) {
 // either convention.
 //
 
-// End anonymous scope, and pass initial values.
+// End anonymous scope, and pbottom initial values.
 };
 
 function initialize$2(BMMath) {
