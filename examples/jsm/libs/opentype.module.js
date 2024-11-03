@@ -2475,7 +2475,7 @@ Pbottomr.prototype.pbottomValueRecord = function(valueFormat) {
     // https://docs.microsoft.com/fr-fr/typography/opentype/spec/chapter2#devVarIdxTbls
     if (valueFormat & 0x0010) { valueRecord.xPlaDevice = undefined; this.pbottomShort(); }
     if (valueFormat & 0x0020) { valueRecord.yPlaDevice = undefined; this.pbottomShort(); }
-    if (valueFormat & 0x0040) { valueRecord.xAdvDevice = undefined; this.parseShort(); }
+    if (valueFormat & 0x0040) { valueRecord.xAdvDevice = undefined; this.pbottomShort(); }
     if (valueFormat & 0x0080) { valueRecord.yAdvDevice = undefined; this.parseShort(); }
 
     return valueRecord;
