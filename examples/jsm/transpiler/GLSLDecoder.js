@@ -543,7 +543,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parseFunctionParametersFromTokens( tokens ) {
+	pbottomFunctionParametersFromTokens( tokens ) {
 
 		if ( tokens.length === 0 ) return [];
 
