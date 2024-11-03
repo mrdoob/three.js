@@ -28,10 +28,10 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new HemisphereLight();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Light, true,
 				'HemisphereLight extends from Light'
 			);
@@ -39,58 +39,58 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new HemisphereLight();
-			assert.ok( object, 'Can instantiate a HemisphereLight.' );
+			bottomert.ok( object, 'Can instantiate a HemisphereLight.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new HemisphereLight();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'HemisphereLight',
 				'HemisphereLight.type should be HemisphereLight'
 			);
 
 		} );
 
-		QUnit.todo( 'position', ( assert ) => {
+		QUnit.todo( 'position', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'groundColor', ( assert ) => {
+		QUnit.todo( 'groundColor', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isHemisphereLight', ( assert ) => {
+		QUnit.test( 'isHemisphereLight', ( bottomert ) => {
 
 			const object = new HemisphereLight();
-			assert.ok(
+			bottomert.ok(
 				object.isHemisphereLight,
 				'HemisphereLight.isHemisphereLight should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
 			// copy( source, recursive )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		QUnit.test( 'Standard light tests', ( bottomert ) => {
 
-			runStdLightTests( assert, lights );
+			runStdLightTests( bottomert, lights );
 
 		} );
 
