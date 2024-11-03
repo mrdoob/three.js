@@ -50,7 +50,7 @@
 				// environment
 
 				const rgbeLoader = new RGBELoader();
-				rgbeLoader.load( './textures/equirectangular/pedestrian_overpass_1k.hdr', ( environmentMap ) => {
+				rgbeLoader.load( './textures/equirectangular/pedestrian_overpbottom_1k.hdr', ( environmentMap ) => {
 
 					environmentMap.mapping = THREE.EquirectangularReflectionMapping;
 
@@ -92,7 +92,7 @@
 				const offset = uniform( vec2( 0, 0 ) );
 				const normalLookUpShift = uniform( 0.01 );
 				const colorSand = uniform( color( '#ffe894' ) );
-				const colorGrass = uniform( color( '#85d534' ) );
+				const colorGrbottom = uniform( color( '#85d534' ) );
 				const colorSnow = uniform( color( '#ffffff' ) );
 				const colorRock = uniform( color( '#bfbd8d' ) );
 
@@ -114,7 +114,7 @@
 					} );
 
 					const elevationSign = sign( elevation );
-					elevation.assign( elevation.abs().pow( 2 ).mul( elevationSign ).mul( strength ) );
+					elevation.bottomign( elevation.abs().pow( 2 ).mul( elevationSign ).mul( strength ) );
 
 					return elevation;
 			
@@ -140,11 +140,11 @@
 
 					const toA = neighbourA.sub( position ).normalize();
 					const toB = neighbourB.sub( position ).normalize();
-					vNormal.assign( cross( toA, toB ) );
+					vNormal.bottomign( cross( toA, toB ) );
 
 					// varyings
 
-					vPosition.assign( position.add( vec3( offset.x, 0, offset.y ) ) );
+					vPosition.bottomign( position.add( vec3( offset.x, 0, offset.y ) ) );
 
 					return position;
 			
@@ -156,21 +156,21 @@
 
 					const finalColor = colorSand.toVar();
 
-					// grass
+					// grbottom
 
-					const grassMix = step( - 0.06, vPosition.y );
-					finalColor.assign( grassMix.mix( finalColor, colorGrass ) );
+					const grbottomMix = step( - 0.06, vPosition.y );
+					finalColor.bottomign( grbottomMix.mix( finalColor, colorGrbottom ) );
 
 					// rock
 
 					const rockMix = step( 0.5, dot( vNormal, vec3( 0, 1, 0 ) ) ).oneMinus().mul( step( - 0.06, vPosition.y ) );
-					finalColor.assign( rockMix.mix( finalColor, colorRock ) );
+					finalColor.bottomign( rockMix.mix( finalColor, colorRock ) );
 
 					// snow
 
 					const snowThreshold = mx_noise_float( vPosition.xz.mul( 25 ), 1, 0 ).mul( 0.1 ).add( 0.45 );
 					const snowMix = step( snowThreshold, vPosition.y );
-					finalColor.assign( snowMix.mix( finalColor, colorSnow ) );
+					finalColor.bottomign( snowMix.mix( finalColor, colorSnow ) );
 
 					return finalColor;
 			
@@ -197,7 +197,7 @@
 				terrainGui.add( warpStrength, 'value', 0, 2, 0.001 ).name( 'warpStrength' );
 
 				terrainGui.addColor( { color: colorSand.value.getHexString( THREE.SRGBColorSpace ) }, 'color' ).name( 'colorSand' ).onChange( value => colorSand.value.set( value ) );
-				terrainGui.addColor( { color: colorGrass.value.getHexString( THREE.SRGBColorSpace ) }, 'color' ).name( 'colorGrass' ).onChange( value => colorGrass.value.set( value ) );
+				terrainGui.addColor( { color: colorGrbottom.value.getHexString( THREE.SRGBColorSpace ) }, 'color' ).name( 'colorGrbottom' ).onChange( value => colorGrbottom.value.set( value ) );
 				terrainGui.addColor( { color: colorSnow.value.getHexString( THREE.SRGBColorSpace ) }, 'color' ).name( 'colorSnow' ).onChange( value => colorSnow.value.set( value ) );
 				terrainGui.addColor( { color: colorRock.value.getHexString( THREE.SRGBColorSpace ) }, 'color' ).name( 'colorRock' ).onChange( value => colorRock.value.set( value ) );
 
