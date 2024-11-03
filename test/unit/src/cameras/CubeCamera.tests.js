@@ -9,10 +9,10 @@ export default QUnit.module( 'Cameras', () => {
 	QUnit.module( 'CubeCamera', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new CubeCamera();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Object3D, true,
 				'CubeCamera extends from Object3D'
 			);
@@ -20,35 +20,35 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new CubeCamera();
-			assert.ok( object, 'Can instantiate a CubeCamera.' );
+			bottomert.ok( object, 'Can instantiate a CubeCamera.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new CubeCamera();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'CubeCamera',
 				'CubeCamera.type should be CubeCamera'
 			);
 
 		} );
 
-		QUnit.todo( 'renderTarget', ( assert ) => {
+		QUnit.todo( 'renderTarget', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'update', ( assert ) => {
+		QUnit.todo( 'update', ( bottomert ) => {
 
 			// update( renderer, scene )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
