@@ -10676,7 +10676,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseTextures = function () {
+	var pbottomTextures = function () {
 
 		var parseTexture = function () {
 
