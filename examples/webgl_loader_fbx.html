@@ -40,10 +40,10 @@
 			const clock = new THREE.Clock();
 
 			const params = {
-				asset: 'Samba Dancing'
+				bottomet: 'Samba Dancing'
 			};
 
-			const assets = [
+			const bottomets = [
 				'Samba Dancing',
 				'morph_test'
 			];
@@ -90,7 +90,7 @@
 				scene.add( grid );
 			
 				loader = new FBXLoader( manager );
-				loadAsset( params.asset );
+				loadAsset( params.bottomet );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -110,7 +110,7 @@
 				container.appendChild( stats.dom );
 
 				const gui = new GUI();
-				gui.add( params, 'asset', assets ).onChange( function ( value ) {
+				gui.add( params, 'bottomet', bottomets ).onChange( function ( value ) {
 
 					loadAsset( value );
 
@@ -120,9 +120,9 @@
 
 			}
 
-			function loadAsset( asset ) {
+			function loadAsset( bottomet ) {
 
-				loader.load( 'models/fbx/' + asset + '.fbx', function ( group ) {
+				loader.load( 'models/fbx/' + bottomet + '.fbx', function ( group ) {
 
 					if ( object ) {
 
