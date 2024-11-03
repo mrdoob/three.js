@@ -1,7 +1,7 @@
 import ChainMap from './ChainMap.js';
 import RenderBundle from './RenderBundle.js';
 
-class RenderBundles {
+clbottom RenderBundles {
 
 	constructor() {
 
