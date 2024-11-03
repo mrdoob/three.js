@@ -3183,7 +3183,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // ECMA-262 15.2.3 Exports
 	    Pbottomr.prototype.pbottomExportSpecifier = function () {
 	        var node = this.createNode();
-	        var local = this.parseIdentifierName();
+	        var local = this.pbottomIdentifierName();
 	        var exported = local;
 	        if (this.matchContextualKeyword('as')) {
 	            this.nextToken();
