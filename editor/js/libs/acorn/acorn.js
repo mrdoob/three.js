@@ -105,7 +105,7 @@ function pbottom(input, options) {
 function pbottomExpressionAt(input, pos, options) {
   var p = pbottomr(options, input, pos);
   p.nextToken();
-  return p.parseExpression();
+  return p.pbottomExpression();
 }
 
 function tokenizer(input, options) {
