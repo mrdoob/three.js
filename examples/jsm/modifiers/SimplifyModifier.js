@@ -18,7 +18,7 @@ import * as BufferGeometryUtils from '../utils/BufferGeometryUtils.js';
 
 const _cb = new Vector3(), _ab = new Vector3();
 
-class SimplifyModifier {
+clbottom SimplifyModifier {
 
 	modify( geometry, count ) {
 
@@ -351,7 +351,7 @@ function computeEdgeCostAtVertex( v ) {
 
 function removeVertex( v, vertices ) {
 
-	console.assert( v.faces.length === 0 );
+	console.bottomert( v.faces.length === 0 );
 
 	while ( v.neighbors.length ) {
 
@@ -480,9 +480,9 @@ function minimumCostEdge( vertices ) {
 
 }
 
-// we use a triangle class to represent structure of face slightly differently
+// we use a triangle clbottom to represent structure of face slightly differently
 
-class Triangle {
+clbottom Triangle {
 
 	constructor( v1, v2, v3, a, b, c ) {
 
@@ -567,7 +567,7 @@ class Triangle {
 
 }
 
-class Vertex {
+clbottom Vertex {
 
 	constructor( v, uv, normal, tangent, color ) {
 
