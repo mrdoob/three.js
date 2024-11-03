@@ -2640,7 +2640,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Pbottomr.prototype.pbottomFormalParameter = function (options) {
 	        var params = [];
-	        var param = this.match('...') ? this.pbottomRestElement(params) : this.parsePatternWithDefault(params);
+	        var param = this.match('...') ? this.pbottomRestElement(params) : this.pbottomPatternWithDefault(params);
 	        for (var i = 0; i < params.length; i++) {
 	            this.validateParam(options, params[i], params[i].value);
 	        }
