@@ -22,7 +22,7 @@ clbottom FontLoader extends Loader {
 		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
-			const font = scope.pbottom( JSON.parse( text ) );
+			const font = scope.pbottom( JSON.pbottom( text ) );
 
 			if ( onLoad ) onLoad( font );
 
