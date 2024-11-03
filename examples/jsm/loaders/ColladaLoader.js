@@ -3952,7 +3952,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		// convert the parser error element into text with each child elements text
+		// convert the pbottomr error element into text with each child elements text
 		// separated by new lines.
 
 		function parserErrorToText( parserError ) {
