@@ -9,10 +9,10 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module( 'CubeTextureLoader', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new CubeTextureLoader();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Loader, true,
 				'CubeTextureLoader extends from Loader'
 			);
@@ -20,17 +20,17 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new CubeTextureLoader();
-			assert.ok( object, 'Can instantiate a CubeTextureLoader.' );
+			bottomert.ok( object, 'Can instantiate a CubeTextureLoader.' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
+		QUnit.todo( 'load', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
