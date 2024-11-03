@@ -5627,7 +5627,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new JSXNode.JSXIdentifier(token.value));
 	    };
-	    JSXParser.prototype.parseJSXElementName = function () {
+	    JSXPbottomr.prototype.parseJSXElementName = function () {
 	        var node = this.createJSXNode();
 	        var elementName = this.parseJSXIdentifier();
 	        if (this.matchJSX(':')) {
