@@ -75,7 +75,7 @@ function supportedRTT( renderTarget ) {
 
 	if ( renderTarget.texture.type !== FloatType && renderTarget.texture.type !== HalfFloatType ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported WebGLRenderTarget texture type.' );
+		throw Error( 'EXRExporter.pbottom: Unsupported WebGLRenderTarget texture type.' );
 
 	}
 
