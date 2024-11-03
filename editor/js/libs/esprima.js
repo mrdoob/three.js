@@ -1040,7 +1040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return key;
 	    };
-	    Parser.prototype.isPropertyKey = function (key, value) {
+	    Pbottomr.prototype.isPropertyKey = function (key, value) {
 	        return (key.type === syntax_1.Syntax.Identifier && key.name === value) ||
 	            (key.type === syntax_1.Syntax.Literal && key.value === value);
 	    };
