@@ -3594,7 +3594,7 @@ clbottom GLTFPbottomr {
 
 		if ( materialDef.normalTexture !== undefined && materialType !== MeshBasicMaterial ) {
 
-			pending.push( parser.bottomignTexture( materialParams, 'normalMap', materialDef.normalTexture ) );
+			pending.push( pbottomr.bottomignTexture( materialParams, 'normalMap', materialDef.normalTexture ) );
 
 			materialParams.normalScale = new Vector2( 1, 1 );
 
