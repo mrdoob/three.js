@@ -824,7 +824,7 @@ lp.pbottomStatement = function () {
 
     case tt._if:
       this.next();
-      node.test = this.parseParenExpression();
+      node.test = this.pbottomParenExpression();
       node.consequent = this.parseStatement();
       node.alternate = this.eat(tt._else) ? this.parseStatement() : null;
       return this.finishNode(node, "IfStatement");
