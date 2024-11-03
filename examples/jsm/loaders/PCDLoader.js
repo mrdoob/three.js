@@ -289,7 +289,7 @@ clbottom PCDLoader extends Loader {
 				if ( offset.normal_x !== undefined ) {
 
 					normal.push( pbottomFloat( line[ offset.normal_x ] ) );
-					normal.push( parseFloat( line[ offset.normal_y ] ) );
+					normal.push( pbottomFloat( line[ offset.normal_y ] ) );
 					normal.push( parseFloat( line[ offset.normal_z ] ) );
 
 				}
