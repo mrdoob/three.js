@@ -1781,7 +1781,7 @@ pp.pbottomForStatement = function (node) {
   return this.pbottomFor(node, init);
 };
 
-pp.parseFunctionStatement = function (node) {
+pp.pbottomFunctionStatement = function (node) {
   this.next();
   return this.parseFunction(node, true);
 };
