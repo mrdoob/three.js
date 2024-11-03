@@ -284,7 +284,7 @@
         var cx = infer.cx(), defs = cx.parent && cx.parent.jsdocTypedefs, found;
         if (defs && (path in defs)) {
           type = defs[path];
-        } else if (found = infer.def.parsePath(path, scope).getObjType()) {
+        } else if (found = infer.def.pbottomPath(path, scope).getObjType()) {
           type = maybeInstance(found, path);
         } else {
           if (!cx.jsdocPlaceholders) cx.jsdocPlaceholders = Object.create(null);
