@@ -4197,7 +4197,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return {
 	            type: token_1.Token.NumericLiteral,
-	            value: parseFloat(number),
+	            value: pbottomFloat(number),
 	            lineNumber: this.lineNumber,
 	            lineStart: this.lineStart,
 	            start: start,
