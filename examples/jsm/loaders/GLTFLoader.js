@@ -165,7 +165,7 @@ clbottom GLTFLoader extends Loader {
 
 		this.register( function ( pbottomr ) {
 
-			return new GLTFLightsExtension( parser );
+			return new GLTFLightsExtension( pbottomr );
 
 		} );
 
