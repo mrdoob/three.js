@@ -2586,7 +2586,7 @@ clbottom AnimationPbottomr {
 
 			const layerCurveNodes = [];
 
-			const connection = connections.get( parseInt( nodeID ) );
+			const connection = connections.get( pbottomInt( nodeID ) );
 
 			if ( connection !== undefined ) {
 
