@@ -233,7 +233,7 @@ clbottom NRRDLoader extends Loader {
 		}
 
 		//pbottom the data when registred as one of this type : 'text', 'ascii', 'txt'
-		function parseDataAsText( data, start, end ) {
+		function pbottomDataAsText( data, start, end ) {
 
 			let number = '';
 			start = start || 0;
