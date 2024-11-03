@@ -57,22 +57,22 @@ function onDocumentLoad() {
 	text = text.replace( /\[path\]/gi, path );
 	text = text.replace( /\[page:([\w\.]+)\]/gi, '[page:$1 $1]' ); // [page:name] to [page:name title]
 	text = text.replace( /\[page:\.([\w\.]+) ([\w\.\s]+)\]/gi, `[page:${name}.$1 $2]` ); // [page:.member title] to [page:name.member title]
-	text = text.replace( /\[page:([\w\.]+) ([\w\.\s]+)\]/gi, '<a class=\'links\' data-fragment=\'$1\' title=\'$1\'>$2</a>' ); // [page:name title]
+	text = text.replace( /\[page:([\w\.]+) ([\w\.\s]+)\]/gi, '<a clbottom=\'links\' data-fragment=\'$1\' title=\'$1\'>$2</a>' ); // [page:name title]
 	// text = text.replace( /\[member:.([\w]+) ([\w\.\s]+)\]/gi, "<a onclick=\"window.parent.setUrlFragment('" + name + ".$1')\" title=\"$1\">$2</a>" );
 
 	text = text.replace( /\[(member|property|method|param):([\w]+)\]/gi, '[$1:$2 $2]' ); // [member:name] to [member:name title]
-	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\([\s\S]*?\))?/gi, `<a class='permalink links' data-fragment='${name}.$2' target='_parent' title='${name}.$2'>#</a> .<a class='links' data-fragment='${name}.$2' id='$2'>$2</a> $3 : <a class='param links' data-fragment='$1'>$1</a>` );
-	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, '$2 : <a class=\'param links\' data-fragment=\'$1\'>$1</a>' ); // [param:name title]
+	text = text.replace( /\[(?:member|property|method):([\w]+) ([\w\.\s]+)\]\s*(\([\s\S]*?\))?/gi, `<a clbottom='permalink links' data-fragment='${name}.$2' target='_parent' title='${name}.$2'>#</a> .<a clbottom='links' data-fragment='${name}.$2' id='$2'>$2</a> $3 : <a clbottom='param links' data-fragment='$1'>$1</a>` );
+	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, '$2 : <a clbottom=\'param links\' data-fragment=\'$1\'>$1</a>' ); // [param:name title]
 
 	text = text.replace( /\[link:([\w\:\/\.\-\_\(\)\?\#\=\!\~]+)\]/gi, '<a href="$1" target="_blank">$1</a>' ); // [link:url]
 	text = text.replace( /\[link:([\w:/.\-_()?#=!~]+) ([\w\p{L}:/.\-_'\s]+)\]/giu, '<a href="$1" target="_blank">$2</a>' ); // [link:url title]
 	text = text.replace( /\*([\u4e00-\u9fa5\w\d\-\(\"\（\“][\u4e00-\u9fa5\w\d\ \/\+\-\(\)\=\,\.\（\）\，\。"]*[\u4e00-\u9fa5\w\d\"\)\”\）]|\w)\*/gi, '<strong>$1</strong>' ); // *text*
-	text = text.replace( /\`(.*?)\`/gs, '<code class="inline">$1</code>' ); // `code`
+	text = text.replace( /\`(.*?)\`/gs, '<code clbottom="inline">$1</code>' ); // `code`
 
 	text = text.replace( /\[example:([\w\_]+)\]/gi, '[example:$1 $1]' ); // [example:name] to [example:name title]
 	text = text.replace( /\[example:([\w\_]+) ([\w\:\/\.\-\_ \s]+)\]/gi, '<a href="../examples/#$1" target="_blank">$2</a>' ); // [example:name title]
 
-	text = text.replace( /<a class=\'param links\' data-fragment=\'\w+\'>(undefined|null|this|Boolean|Object|Array|Number|String|Integer|Float|TypedArray|ArrayBuffer)<\/a>/gi, '<span class="param">$1</span>' ); // remove links to primitive types
+	text = text.replace( /<a clbottom=\'param links\' data-fragment=\'\w+\'>(undefined|null|this|Boolean|Object|Array|Number|String|Integer|Float|TypedArray|ArrayBuffer)<\/a>/gi, '<span clbottom="param">$1</span>' ); // remove links to primitive types
 
 	document.body.innerHTML = text;
 
@@ -95,7 +95,7 @@ function onDocumentLoad() {
 	document.body.addEventListener( 'click', event => {
 
 		const element = event.target;
-		if ( element.classList.contains( 'links' ) && event.button === 0 && ! event.shiftKey && ! event.ctrlKey && ! event.metaKey && ! event.altKey ) {
+		if ( element.clbottomList.contains( 'links' ) && event.button === 0 && ! event.shiftKey && ! event.ctrlKey && ! event.metaKey && ! event.altKey ) {
 
 			window.parent.setUrlFragment( element.dataset.fragment );
 			event.preventDefault();
@@ -130,7 +130,7 @@ function onDocumentLoad() {
 	function addCopyButton( element ) {
 
 		const copyButton = document.createElement( 'button' );
-		copyButton.className = 'copy-btn';
+		copyButton.clbottomName = 'copy-btn';
 
 		element.appendChild( copyButton );
 
@@ -139,11 +139,11 @@ function onDocumentLoad() {
 			const codeContent = element.textContent;
 			navigator.clipboard.writeText( codeContent ).then( () => {
 
-				copyButton.classList.add( 'copied' );
+				copyButton.clbottomList.add( 'copied' );
 
 				setTimeout( () => {
 
-					copyButton.classList.remove( 'copied' );
+					copyButton.clbottomList.remove( 'copied' );
 
 				}, 1000 );
 
@@ -161,7 +161,7 @@ function onDocumentLoad() {
 
 		element.textContent = dedent( element.textContent );
 
-		if ( ! element.classList.contains( 'inline' ) ) {
+		if ( ! element.clbottomList.contains( 'inline' ) ) {
 
 			addCopyButton( element );
 
@@ -205,7 +205,7 @@ function onDocumentLoad() {
 		for ( let i = 0; i < elements.length; i ++ ) {
 
 			const e = elements[ i ];
-			e.className += ' prettyprint';
+			e.clbottomName += ' prettyprint';
 			e.setAttribute( 'translate', 'no' );
 
 		}
