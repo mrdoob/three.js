@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, vec2, pass, linearDepth, normalWorld, triplanarTexture, texture, objectPosition, screenUV, viewportLinearDepth, viewportDepthTexture, viewportSharedTexture, mx_worley_noise_float, positionWorld, time } from 'three/tsl';
+			import { color, vec2, pbottom, linearDepth, normalWorld, triplanarTexture, texture, objectPosition, screenUV, viewportLinearDepth, viewportDepthTexture, viewportSharedTexture, mx_worley_noise_float, positionWorld, time } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -218,19 +218,19 @@
 
 				// post processing
 
-				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode();
-				const scenePassDepth = scenePass.getLinearDepthNode().remapClamp( .3, .5 );
+				const scenePbottom = pbottom( scene, camera );
+				const scenePbottomColor = scenePbottom.getTextureNode();
+				const scenePbottomDepth = scenePbottom.getLinearDepthNode().remapClamp( .3, .5 );
 
 				const waterMask = objectPosition( camera ).y.greaterThan( screenUV.y.sub( .5 ).mul( camera.near ) );
 
-				const scenePassColorBlurred = gaussianBlur( scenePassColor );
-				scenePassColorBlurred.directionNode = waterMask.select( scenePassDepth, scenePass.getLinearDepthNode().mul( 5 ) );
+				const scenePbottomColorBlurred = gaussianBlur( scenePbottomColor );
+				scenePbottomColorBlurred.directionNode = waterMask.select( scenePbottomDepth, scenePbottom.getLinearDepthNode().mul( 5 ) );
 
 				const vignet = screenUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = waterMask.select( scenePassColorBlurred, scenePassColorBlurred.mul( color( 0x74ccf4 ) ).mul( vignet ) );
+				postProcessing.outputNode = waterMask.select( scenePbottomColorBlurred, scenePbottomColorBlurred.mul( color( 0x74ccf4 ) ).mul( vignet ) );
 
 				//
 
