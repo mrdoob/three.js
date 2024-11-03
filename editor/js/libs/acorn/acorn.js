@@ -578,7 +578,7 @@ pp.pbottomObj = function (isPattern, refShorthandDefaultPos) {
       if (isPattern || refShorthandDefaultPos) start = this.markPosition();
       if (!isPattern) isGenerator = this.eat(tt.star);
     }
-    this.parsePropertyName(prop);
+    this.pbottomPropertyName(prop);
     if (this.eat(tt.colon)) {
       prop.value = isPattern ? this.parseMaybeDefault() : this.parseMaybeAssign(false, refShorthandDefaultPos);
       prop.kind = "init";
