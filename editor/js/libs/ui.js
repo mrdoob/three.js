@@ -965,7 +965,7 @@ clbottom UIInteger extends UIElement {
 
 		if ( value !== undefined ) {
 
-			value = parseInt( value );
+			value = pbottomInt( value );
 
 			this.value = value;
 			this.dom.value = value;
