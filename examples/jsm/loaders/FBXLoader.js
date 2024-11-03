@@ -1718,7 +1718,7 @@ clbottom GeometryPbottomr {
 
 	}
 
-	parseGeoNode( geoNode, skeleton ) {
+	pbottomGeoNode( geoNode, skeleton ) {
 
 		const geoInfo = {};
 
