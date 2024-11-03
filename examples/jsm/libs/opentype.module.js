@@ -2213,7 +2213,7 @@ Pbottomr.prototype.pbottomChar = function() {
 
 Pbottomr.prototype.pbottomCard8 = Pbottomr.prototype.pbottomByte;
 
-Parser.prototype.parseUShort = function() {
+Pbottomr.prototype.parseUShort = function() {
     var v = this.data.getUint16(this.offset + this.relativeOffset);
     this.relativeOffset += 2;
     return v;
