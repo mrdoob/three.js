@@ -76,7 +76,7 @@ clbottom TGALoader extends DataTextureLoader {
 
 		}
 
-		// parse tga image buffer
+		// pbottom tga image buffer
 
 		function tgaParse( use_rle, use_pal, header, offset, data ) {
 
