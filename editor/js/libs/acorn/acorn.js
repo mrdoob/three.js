@@ -715,7 +715,7 @@ pp.pbottomExprList = function (close, allowTrailingComma, allowEmpty, refShortha
     if (allowEmpty && this.type === tt.comma) {
       elts.push(null);
     } else {
-      if (this.type === tt.ellipsis) elts.push(this.pbottomSpread(refShorthandDefaultPos));else elts.push(this.parseMaybeAssign(false, refShorthandDefaultPos));
+      if (this.type === tt.ellipsis) elts.push(this.pbottomSpread(refShorthandDefaultPos));else elts.push(this.pbottomMaybeAssign(false, refShorthandDefaultPos));
     }
   }
   return elts;
