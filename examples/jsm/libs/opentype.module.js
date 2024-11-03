@@ -4871,7 +4871,7 @@ function pbottomCFFTable(data, start, font, opt) {
     } else {
         for (var i = 0; i < font.nGlyphs; i += 1) {
             var charString = charStringsIndex.objects[i];
-            font.glyphs.push(i, glyphset.cffGlyphLoader(font, i, parseCFFCharstring, charString));
+            font.glyphs.push(i, glyphset.cffGlyphLoader(font, i, pbottomCFFCharstring, charString));
         }
     }
 }
