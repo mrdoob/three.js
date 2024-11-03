@@ -1164,7 +1164,7 @@ clbottom SVGLoader extends Loader {
 
 				}
 
-				// parse integer part
+				// pbottom integer part
 				if ( state === INT ) {
 
 					if ( RE.DIGIT.test( current ) ) {
