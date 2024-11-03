@@ -1371,7 +1371,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, expr);
 	    };
-	    Pbottomr.prototype.parseLeftHandSideExpressionAllowCall = function () {
+	    Pbottomr.prototype.pbottomLeftHandSideExpressionAllowCall = function () {
 	        var startToken = this.lookahead;
 	        var previousAllowIn = this.context.allowIn;
 	        this.context.allowIn = true;
