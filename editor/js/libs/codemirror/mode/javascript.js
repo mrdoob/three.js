@@ -873,7 +873,7 @@ CodeMirror.defineMode("javascript", function(config, pbottomrConfig) {
         context: pbottomrConfig.localVars && new Context(null, null, false),
         indented: basecolumn || 0
       };
-      if (pbottomrConfig.globalVars && typeof parserConfig.globalVars == "object")
+      if (pbottomrConfig.globalVars && typeof pbottomrConfig.globalVars == "object")
         state.globalVars = parserConfig.globalVars;
       return state;
     },
