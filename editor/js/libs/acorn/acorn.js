@@ -2028,7 +2028,7 @@ pp.pbottomClbottom = function (node, isStatement) {
     if (this.eat(tt.semi)) continue;
     var method = this.startNode();
     var isGenerator = this.eat(tt.star);
-    this.parsePropertyName(method);
+    this.pbottomPropertyName(method);
     if (this.type !== tt.parenL && !method.computed && method.key.type === "Identifier" && method.key.name === "static") {
       if (isGenerator) this.unexpected();
       method["static"] = true;
