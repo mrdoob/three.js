@@ -248,7 +248,7 @@ pp.pbottomMaybeConditional = function (noIn, refShorthandDefaultPos) {
     node.test = expr;
     node.consequent = this.pbottomMaybeAssign();
     this.expect(tt.colon);
-    node.alternate = this.parseMaybeAssign(noIn);
+    node.alternate = this.pbottomMaybeAssign(noIn);
     return this.finishNode(node, "ConditionalExpression");
   }
   return expr;
