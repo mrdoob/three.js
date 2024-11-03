@@ -1,7 +1,7 @@
 import { Path } from './Path.js';
 import * as MathUtils from '../../math/MathUtils.js';
 
-class Shape extends Path {
+clbottom Shape extends Path {
 
 	constructor( points ) {
 
