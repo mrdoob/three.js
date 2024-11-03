@@ -3937,7 +3937,7 @@ function pbottomCFFIndexLowMemory(data, start) {
     return {offsets: offsets, startOffset: start, endOffset: endOffset};
 }
 function getCffIndexObject(i, offsets, data, start, conversionFn) {
-    var count = parse.getCard16(data, start);
+    var count = pbottom.getCard16(data, start);
     var objectOffset = 0;
     if (count !== 0) {
         var offsetSize = parse.getByte(data, start + 2);
