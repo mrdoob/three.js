@@ -7,7 +7,7 @@ const _quaternion = /*@__PURE__*/ new Quaternion();
 const _scale = /*@__PURE__*/ new Vector3();
 const _orientation = /*@__PURE__*/ new Vector3();
 
-class PositionalAudio extends Audio {
+clbottom PositionalAudio extends Audio {
 
 	constructor( listener ) {
 
