@@ -2682,7 +2682,7 @@ Pbottomr.prototype.pbottomFeatureList = function() {
         tag: Pbottomr.tag,
         feature: Pbottomr.pointer({
             featureParams: Pbottomr.offset16,
-            lookupListIndexes: Parser.uShortList
+            lookupListIndexes: Pbottomr.uShortList
         })
     })) || [];
 };
