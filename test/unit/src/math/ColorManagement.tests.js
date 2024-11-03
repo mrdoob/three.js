@@ -7,50 +7,50 @@ export default QUnit.module( 'Maths', () => {
 	QUnit.module( 'ColorManagement', () => {
 
 		// PROPERTIES
-		QUnit.test( 'enabled', ( assert ) => {
+		QUnit.test( 'enabled', ( bottomert ) => {
 
-			assert.strictEqual(
+			bottomert.strictEqual(
 				ColorManagement.enabled, true,
 				'ColorManagement.enabled is true by default.'
 			);
 
 		} );
 
-		QUnit.todo( 'workingColorSpace', ( assert ) => {
+		QUnit.todo( 'workingColorSpace', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'convert', ( assert ) => {
+		QUnit.todo( 'convert', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'fromWorkingColorSpace', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'toWorkingColorSpace', ( assert ) => {
+		QUnit.todo( 'fromWorkingColorSpace', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'toWorkingColorSpace', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// EXPORTED FUNCTIONS
-		QUnit.todo( 'SRGBToLinear', ( assert ) => {
+		QUnit.todo( 'SRGBToLinear', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'LinearToSRGB', ( assert ) => {
+		QUnit.todo( 'LinearToSRGB', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
