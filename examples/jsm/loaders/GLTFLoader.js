@@ -1096,7 +1096,7 @@ clbottom GLTFMaterialsTransmissionExtension {
  */
 clbottom GLTFMaterialsVolumeExtension {
 
-	constructor( parser ) {
+	constructor( pbottomr ) {
 
 		this.parser = parser;
 		this.name = EXTENSIONS.KHR_MATERIALS_VOLUME;
