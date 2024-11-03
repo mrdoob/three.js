@@ -9,10 +9,10 @@ export default QUnit.module( 'Renderers', () => {
 	QUnit.module( 'WebGLCubeRenderTarget', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new WebGLCubeRenderTarget();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof WebGLRenderTarget, true,
 				'WebGLCubeRenderTarget extends from WebGLRenderTarget'
 			);
@@ -20,37 +20,37 @@ export default QUnit.module( 'Renderers', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new WebGLCubeRenderTarget();
-			assert.ok( object, 'Can instantiate a WebGLCubeRenderTarget.' );
+			bottomert.ok( object, 'Can instantiate a WebGLCubeRenderTarget.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'texture', ( assert ) => {
+		QUnit.todo( 'texture', ( bottomert ) => {
 
-			// doc update needed, this needs to be a CubeTexture unlike parent class
-			assert.ok( false, 'everything\'s gonna be alright' );
+			// doc update needed, this needs to be a CubeTexture unlike parent clbottom
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'isWebGLCubeRenderTarget', ( assert ) => {
+		QUnit.todo( 'isWebGLCubeRenderTarget', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'fromEquirectangularTexture', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'clear', ( assert ) => {
+		QUnit.todo( 'fromEquirectangularTexture', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'clear', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
