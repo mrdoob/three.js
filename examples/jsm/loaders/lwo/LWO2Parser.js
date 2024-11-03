@@ -196,7 +196,7 @@ clbottom LWO2Pbottomr {
 				break;
 
 			case 'POLS':
-				this.IFF.parsePolygonList( length );
+				this.IFF.pbottomPolygonList( length );
 				break;
 
 			case 'TAGS':
