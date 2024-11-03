@@ -9,7 +9,7 @@ import {
 	zipSync,
 } from '../libs/fflate.module.js';
 
-class USDZExporter {
+clbottom USDZExporter {
 
 	constructor() {
 
@@ -31,7 +31,7 @@ class USDZExporter {
 
 	async parseAsync( scene, options = {} ) {
 
-		options = Object.assign( {
+		options = Object.bottomign( {
 			ar: {
 				anchoring: { type: 'plane' },
 				planeAnchoring: { alignment: 'horizontal' }
@@ -554,7 +554,7 @@ function buildMaterial( material, textures, quickLookCompatible = false ) {
 		def Shader "Texture_${ texture.id }_${ mapType }"
 		{
 			uniform token info:id = "UsdUVTexture"
-			asset inputs:file = @textures/Texture_${ id }.png@
+			bottomet inputs:file = @textures/Texture_${ id }.png@
 			float2 inputs:st.connect = </Materials/Material_${ material.id }/Transform2d_${ mapType }.outputs:result>
 			${ color !== undefined ? 'float4 inputs:scale = ' + buildColor4( color ) : '' }
 			token inputs:sourceColorSpace = "${ texture.colorSpace === NoColorSpace ? 'raw' : 'sRGB' }"
