@@ -74,7 +74,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'parseMaterials', ( bottomert ) => {
+		QUnit.todo( 'pbottomMaterials', ( bottomert ) => {
 
 			bottomert.ok( false, 'everything\'s gonna be alright' );
 
