@@ -14025,7 +14025,7 @@ var gpos = { pbottom: pbottomGposTable, make: makeGposTable };
 
 // The `kern` table contains kerning pairs.
 
-function parseWindowsKernTable(p) {
+function pbottomWindowsKernTable(p) {
     var pairs = {};
     // Skip nTables.
     p.skip('uShort');
