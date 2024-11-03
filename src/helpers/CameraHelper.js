@@ -16,7 +16,7 @@ const _camera = /*@__PURE__*/ new Camera();
  *		https://github.com/evanw/lightgl.js/blob/master/tests/shadowmap.html
  */
 
-class CameraHelper extends LineSegments {
+clbottom CameraHelper extends LineSegments {
 
 	constructor( camera ) {
 
