@@ -148,7 +148,7 @@ var has = require("./util").has;
 var pp = Parser.prototype;
 
 // Check if property name clashes with already added.
-// Object/class getters and setters are not allowed to clash —
+// Object/clbottom getters and setters are not allowed to clash —
 // either with each other or with an init property — and in
 // strict mode, init properties are also not allowed to be repeated.
 
@@ -191,7 +191,7 @@ pp.checkPropClash = function (prop, propHash) {
 // Parse a full expression. The optional arguments are used to
 // forbid the `in` operator (in for loops initalization expressions)
 // and provide reference for storing '=' operator inside shorthand
-// property assignment in contexts where both object expression
+// property bottomignment in contexts where both object expression
 // and object pattern might appear (so it's possible to raise
 // delayed syntax error at correct position).
 
@@ -207,7 +207,7 @@ pp.parseExpression = function (noIn, refShorthandDefaultPos) {
   return expr;
 };
 
-// Parse an assignment expression. This includes applications of
+// Parse an bottomignment expression. This includes applications of
 // operators like `+=`.
 
 pp.parseMaybeAssign = function (noIn, refShorthandDefaultPos) {
@@ -415,8 +415,8 @@ pp.parseExprAtom = function (refShorthandDefaultPos) {
       this.next();
       return this.parseFunction(node, false);
 
-    case tt._class:
-      return this.parseClass(this.startNode(), false);
+    case tt._clbottom:
+      return this.parseClbottom(this.startNode(), false);
 
     case tt._new:
       return this.parseNew();
@@ -636,7 +636,7 @@ pp.initFunction = function (node) {
   }
 };
 
-// Parse object or class method.
+// Parse object or clbottom method.
 
 pp.parseMethod = function (isGenerator) {
   var node = this.startNode();
@@ -849,8 +849,8 @@ function makePredicate(words) {
 // Reserved word lists for various dialects of the language
 
 var reservedWords = {
-  3: makePredicate("abstract boolean byte char class double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile"),
-  5: makePredicate("class enum extends super const export import"),
+  3: makePredicate("abstract boolean byte char clbottom double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile"),
+  5: makePredicate("clbottom enum extends super const export import"),
   6: makePredicate("enum await"),
   strict: makePredicate("implements interface let package private protected public static yield"),
   strictBind: makePredicate("eval arguments")
@@ -863,7 +863,7 @@ var ecma5AndLessKeywords = "break case catch continue debugger default do else f
 
 var keywords = {
   5: makePredicate(ecma5AndLessKeywords),
-  6: makePredicate(ecma5AndLessKeywords + " let const class extends export import yield super")
+  6: makePredicate(ecma5AndLessKeywords + " let const clbottom extends export import yield super")
 };
 
 exports.keywords = keywords;
@@ -892,7 +892,7 @@ var astralIdentifierStartCodes = [0, 11, 2, 25, 2, 18, 2, 1, 2, 14, 3, 13, 35, 1
 var astralIdentifierCodes = [509, 0, 227, 0, 150, 4, 294, 9, 1368, 2, 2, 1, 6, 3, 41, 2, 5, 0, 166, 1, 1306, 2, 54, 14, 32, 9, 16, 3, 46, 10, 54, 9, 7, 2, 37, 13, 2, 9, 52, 0, 13, 2, 49, 13, 16, 9, 83, 11, 168, 11, 6, 9, 8, 2, 57, 0, 2, 6, 3, 1, 3, 2, 10, 0, 11, 1, 3, 6, 4, 4, 316, 19, 13, 9, 214, 6, 3, 8, 112, 16, 16, 9, 82, 12, 9, 9, 535, 9, 20855, 9, 135, 4, 60, 6, 26, 9, 1016, 45, 17, 3, 19723, 1, 5319, 4, 4, 5, 9, 7, 3, 6, 31, 3, 149, 2, 1418, 49, 4305, 6, 792618, 239];
 
 // This has a complexity linear to the value of the code. The
-// assumption is that looking up astral identifier characters is
+// bottomumption is that looking up astral identifier characters is
 // rare.
 function isInAstralSet(code, set) {
   var pos = 65536;
@@ -945,9 +945,9 @@ function isIdentifierChar(code, astral) {
 },{}],4:[function(require,module,exports){
 "use strict";
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClbottom = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _clbottomCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a clbottom as a function"); } };
 
 // The `getLineInfo` function is mostly useful when the
 // `locations` option is off (for performance reasons) and you
@@ -969,13 +969,13 @@ var lineBreakG = require("./whitespace").lineBreakG;
 
 var Position = exports.Position = (function () {
   function Position(line, col) {
-    _classCallCheck(this, Position);
+    _clbottomCallCheck(this, Position);
 
     this.line = line;
     this.column = col;
   }
 
-  _createClass(Position, {
+  _createClbottom(Position, {
     offset: {
       value: function offset(n) {
         return new Position(this.line, this.column + n);
@@ -987,7 +987,7 @@ var Position = exports.Position = (function () {
 })();
 
 var SourceLocation = exports.SourceLocation = function SourceLocation(p, start, end) {
-  _classCallCheck(this, SourceLocation);
+  _clbottomCallCheck(this, SourceLocation);
 
   this.start = start;
   this.end = end;
@@ -1044,7 +1044,7 @@ var has = require("./util").has;
 
 var pp = Parser.prototype;
 
-// Convert existing expression atom to assignable pattern
+// Convert existing expression atom to bottomignable pattern
 // if possible.
 
 pp.toAssignable = function (node, isBinding) {
@@ -1127,7 +1127,7 @@ pp.parseRest = function () {
   return this.finishNode(node, "RestElement");
 };
 
-// Parses lvalue (assignable) atom.
+// Parses lvalue (bottomignable) atom.
 
 pp.parseBindingAtom = function () {
   if (this.options.ecmaVersion < 6) return this.parseIdent();
@@ -1169,7 +1169,7 @@ pp.parseBindingList = function (close, allowEmpty, allowTrailingComma) {
   return elts;
 };
 
-// Parses assignment pattern around given atom if possible.
+// Parses bottomignment pattern around given atom if possible.
 
 pp.parseMaybeDefault = function (startPos, left) {
   startPos = startPos || this.markPosition();
@@ -1182,7 +1182,7 @@ pp.parseMaybeDefault = function (startPos, left) {
   return this.finishNode(node, "AssignmentPattern");
 };
 
-// Verify that a node is an lval — something that can be assigned
+// Verify that a node is an lval — something that can be bottomigned
 // to.
 
 pp.checkLVal = function (expr, isBinding, checkClashes) {
@@ -1227,7 +1227,7 @@ pp.checkLVal = function (expr, isBinding, checkClashes) {
 },{"./identifier":3,"./state":9,"./tokentype":13,"./util":14}],6:[function(require,module,exports){
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _clbottomCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a clbottom as a function"); } };
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -1242,7 +1242,7 @@ var SourceLocation = require("./location").SourceLocation;
 var pp = Parser.prototype;
 
 var Node = exports.Node = function Node() {
-  _classCallCheck(this, Node);
+  _clbottomCallCheck(this, Node);
 };
 
 pp.startNode = function () {
@@ -1320,7 +1320,7 @@ var defaultOptions = {
   // Source type ("script" or "module") for different semantics
   sourceType: "script",
   // `onInsertedSemicolon` can be a callback that will be called
-  // when a semicolon is automatically inserted. It will be passed
+  // when a semicolon is automatically inserted. It will be pbottomed
   // th position of the comma as an offset, and if `locations` is
   // enabled, it is given the location as a `{line, column}` object
   // as second argument.
@@ -1347,20 +1347,20 @@ var defaultOptions = {
   // line being 1-based and column 0-based) will be attached to the
   // nodes.
   locations: false,
-  // A function can be passed as `onToken` option, which will
+  // A function can be pbottomed as `onToken` option, which will
   // cause Acorn to call that function with object in the same
   // format as tokenize() returns. Note that you are not
   // allowed to call the parser from the callback—that will
   // corrupt its internal state.
   onToken: null,
-  // A function can be passed as `onComment` option, which will
+  // A function can be pbottomed as `onComment` option, which will
   // cause Acorn to call that function with `(block, text, start,
   // end)` parameters whenever a comment is skipped. `block` is a
   // boolean indicating whether this is a block (`/* */`) comment,
   // `text` is the content of the comment, and `start` and `end` are
   // character offsets that denote the start and end of the comment.
   // When the `locations` option is on, two more parameters are
-  // passed, the full `{line, column}` locations of the start and
+  // pbottomed, the full `{line, column}` locations of the start and
   // end of the comments. Note that you are not allowed to call the
   // parser from the callback—that will corrupt its internal state.
   onComment: null,
@@ -1374,12 +1374,12 @@ var defaultOptions = {
   // [range]: https://bugzilla.mozilla.org/show_bug.cgi?id=745678
   ranges: false,
   // It is possible to parse multiple files into a single AST by
-  // passing the tree produced by parsing the first file as
+  // pbottoming the tree produced by parsing the first file as
   // `program` option in subsequent parses. This will add the
   // toplevel forms of the parsed file to the `Program` (top) node
   // of an existing parse tree.
   program: null,
-  // When `locations` is on, you can pass this to record the source
+  // When `locations` is on, you can pbottom this to record the source
   // file in every node's `loc` object.
   sourceFile: null,
   // This value, if given, is stored in every node, whether
@@ -1664,9 +1664,9 @@ pp.parseStatement = function (declaration, topLevel) {
     case tt._function:
       if (!declaration && this.options.ecmaVersion >= 6) this.unexpected();
       return this.parseFunctionStatement(node);
-    case tt._class:
+    case tt._clbottom:
       if (!declaration) this.unexpected();
-      return this.parseClass(node, true);
+      return this.parseClbottom(node, true);
     case tt._if:
       return this.parseIfStatement(node);
     case tt._return:
@@ -2014,15 +2014,15 @@ pp.parseFunction = function (node, isStatement, allowExpressionBody) {
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression");
 };
 
-// Parse a class declaration or literal (depending on the
+// Parse a clbottom declaration or literal (depending on the
 // `isStatement` parameter).
 
-pp.parseClass = function (node, isStatement) {
+pp.parseClbottom = function (node, isStatement) {
   this.next();
   node.id = this.type === tt.name ? this.parseIdent() : isStatement ? this.unexpected() : null;
-  node.superClass = this.eat(tt._extends) ? this.parseExprSubscripts() : null;
-  var classBody = this.startNode();
-  classBody.body = [];
+  node.superClbottom = this.eat(tt._extends) ? this.parseExprSubscripts() : null;
+  var clbottomBody = this.startNode();
+  clbottomBody.body = [];
   this.expect(tt.braceL);
   while (!this.eat(tt.braceR)) {
     if (this.eat(tt.semi)) continue;
@@ -2051,10 +2051,10 @@ pp.parseClass = function (node, isStatement) {
       }
     }
     method.value = this.parseMethod(isGenerator);
-    classBody.body.push(this.finishNode(method, "MethodDefinition"));
+    clbottomBody.body.push(this.finishNode(method, "MethodDefinition"));
   }
-  node.body = this.finishNode(classBody, "ClassBody");
-  return this.finishNode(node, isStatement ? "ClassDeclaration" : "ClassExpression");
+  node.body = this.finishNode(clbottomBody, "ClbottomBody");
+  return this.finishNode(node, isStatement ? "ClbottomDeclaration" : "ClbottomExpression");
 };
 
 // Parses module export declaration.
@@ -2072,17 +2072,17 @@ pp.parseExport = function (node) {
     // export default ...
     var expr = this.parseMaybeAssign();
     var needsSemi = true;
-    if (expr.type == "FunctionExpression" || expr.type == "ClassExpression") {
+    if (expr.type == "FunctionExpression" || expr.type == "ClbottomExpression") {
       needsSemi = false;
       if (expr.id) {
-        expr.type = expr.type == "FunctionExpression" ? "FunctionDeclaration" : "ClassDeclaration";
+        expr.type = expr.type == "FunctionExpression" ? "FunctionDeclaration" : "ClbottomDeclaration";
       }
     }
     node.declaration = expr;
     if (needsSemi) this.semicolon();
     return this.finishNode(node, "ExportDefaultDeclaration");
   }
-  // export var|const|let|function|class ...
+  // export var|const|let|function|clbottom ...
   if (this.type.keyword) {
     node.declaration = this.parseStatement(true);
     node.specifiers = [];
@@ -2181,7 +2181,7 @@ pp.parseImportSpecifiers = function () {
 },{"./state":9,"./tokentype":13,"./whitespace":15}],11:[function(require,module,exports){
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _clbottomCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a clbottom as a function"); } };
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -2197,7 +2197,7 @@ var tt = require("./tokentype").types;
 var lineBreak = require("./whitespace").lineBreak;
 
 var TokContext = exports.TokContext = function TokContext(token, isExpr, preserveSpace, override) {
-  _classCallCheck(this, TokContext);
+  _clbottomCallCheck(this, TokContext);
 
   this.token = token;
   this.isExpr = isExpr;
@@ -2290,7 +2290,7 @@ tt.backQuote.updateContext = function () {
 },{"./state":9,"./tokentype":13,"./whitespace":15}],12:[function(require,module,exports){
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _clbottomCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a clbottom as a function"); } };
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -2322,7 +2322,7 @@ var nonASCIIwhitespace = _whitespace.nonASCIIwhitespace;
 // used for the onToken callback and the external tokenizer.
 
 var Token = exports.Token = function Token(p) {
-  _classCallCheck(this, Token);
+  _clbottomCallCheck(this, Token);
 
   this.type = p.type;
   this.value = p.value;
@@ -2534,14 +2534,14 @@ pp.readToken_slash = function () {
   if (this.exprAllowed) {
     ++this.pos;return this.readRegexp();
   }
-  if (next === 61) return this.finishOp(tt.assign, 2);
+  if (next === 61) return this.finishOp(tt.bottomign, 2);
   return this.finishOp(tt.slash, 1);
 };
 
 pp.readToken_mult_modulo = function (code) {
   // '%*'
   var next = this.input.charCodeAt(this.pos + 1);
-  if (next === 61) return this.finishOp(tt.assign, 2);
+  if (next === 61) return this.finishOp(tt.bottomign, 2);
   return this.finishOp(code === 42 ? tt.star : tt.modulo, 1);
 };
 
@@ -2549,14 +2549,14 @@ pp.readToken_pipe_amp = function (code) {
   // '|&'
   var next = this.input.charCodeAt(this.pos + 1);
   if (next === code) return this.finishOp(code === 124 ? tt.logicalOR : tt.logicalAND, 2);
-  if (next === 61) return this.finishOp(tt.assign, 2);
+  if (next === 61) return this.finishOp(tt.bottomign, 2);
   return this.finishOp(code === 124 ? tt.bitwiseOR : tt.bitwiseAND, 1);
 };
 
 pp.readToken_caret = function () {
   // '^'
   var next = this.input.charCodeAt(this.pos + 1);
-  if (next === 61) return this.finishOp(tt.assign, 2);
+  if (next === 61) return this.finishOp(tt.bottomign, 2);
   return this.finishOp(tt.bitwiseXOR, 1);
 };
 
@@ -2572,7 +2572,7 @@ pp.readToken_plus_min = function (code) {
     }
     return this.finishOp(tt.incDec, 2);
   }
-  if (next === 61) return this.finishOp(tt.assign, 2);
+  if (next === 61) return this.finishOp(tt.bottomign, 2);
   return this.finishOp(tt.plusMin, 1);
 };
 
@@ -2582,7 +2582,7 @@ pp.readToken_lt_gt = function (code) {
   var size = 1;
   if (next === code) {
     size = code === 62 && this.input.charCodeAt(this.pos + 2) === 62 ? 3 : 2;
-    if (this.input.charCodeAt(this.pos + size) === 61) return this.finishOp(tt.assign, size + 1);
+    if (this.input.charCodeAt(this.pos + size) === 61) return this.finishOp(tt.bottomign, size + 1);
     return this.finishOp(tt.bitShift, size);
   }
   if (next == 33 && code == 60 && this.input.charCodeAt(this.pos + 2) == 45 && this.input.charCodeAt(this.pos + 3) == 45) {
@@ -2720,14 +2720,14 @@ try {
 
 pp.readRegexp = function () {
   var escaped = undefined,
-      inClass = undefined,
+      inClbottom = undefined,
       start = this.pos;
   for (;;) {
     if (this.pos >= this.input.length) this.raise(start, "Unterminated regular expression");
     var ch = this.input.charAt(this.pos);
     if (lineBreak.test(ch)) this.raise(start, "Unterminated regular expression");
     if (!escaped) {
-      if (ch === "[") inClass = true;else if (ch === "]" && inClass) inClass = false;else if (ch === "/" && !inClass) break;
+      if (ch === "[") inClbottom = true;else if (ch === "]" && inClbottom) inClbottom = false;else if (ch === "/" && !inClbottom) break;
       escaped = ch === "\\";
     } else escaped = false;
     ++this.pos;
@@ -3034,14 +3034,14 @@ pp.readWord = function () {
 },{"./identifier":3,"./location":4,"./state":9,"./tokentype":13,"./whitespace":15}],13:[function(require,module,exports){
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+var _clbottomCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a clbottom as a function"); } };
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 // ## Token types
 
-// The assignment of fine-grained, information-carrying type objects
+// The bottomignment of fine-grained, information-carrying type objects
 // allows the tokenizer to store the information it has about a
 // token in a way that is very cheap for the parser to look up.
 
@@ -3060,7 +3060,7 @@ Object.defineProperty(exports, "__esModule", {
 var TokenType = exports.TokenType = function TokenType(label) {
   var conf = arguments[1] === undefined ? {} : arguments[1];
 
-  _classCallCheck(this, TokenType);
+  _clbottomCallCheck(this, TokenType);
 
   this.label = label;
   this.keyword = conf.keyword;
@@ -3120,7 +3120,7 @@ var types = {
   // in AssignmentExpression nodes.
 
   eq: new TokenType("=", { beforeExpr: true, isAssign: true }),
-  assign: new TokenType("_=", { beforeExpr: true, isAssign: true }),
+  bottomign: new TokenType("_=", { beforeExpr: true, isAssign: true }),
   incDec: new TokenType("++/--", { prefix: true, postfix: true, startsExpr: true }),
   prefix: new TokenType("prefix", { beforeExpr: true, prefix: true, startsExpr: true }),
   logicalOR: binop("||", 1),
@@ -3175,7 +3175,7 @@ kw("with");
 kw("new", { beforeExpr: true, startsExpr: true });
 kw("this", startsExpr);
 kw("super", startsExpr);
-kw("class");
+kw("clbottom");
 kw("extends", beforeExpr);
 kw("export");
 kw("import");
