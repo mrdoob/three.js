@@ -2120,7 +2120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.DoWhileStatement(body, test));
 	    };
 	    // ECMA-262 13.7.3 The while Statement
-	    Parser.prototype.parseWhileStatement = function () {
+	    Pbottomr.prototype.parseWhileStatement = function () {
 	        var node = this.createNode();
 	        var body;
 	        this.expectKeyword('while');
