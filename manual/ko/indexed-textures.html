@@ -21,12 +21,12 @@
     <link rel="stylesheet" href="/manual/ko/lang.css">
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>피킹과 색상에 인덱스 텍스처 사용하기</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>※ 이 글은 <a href="align-html-elements-to-3d.html">HTML 요소를 3D로 정렬하기</a>에서 이어집니다. 이전 글을 읽지 않았다면 먼저 읽고 오기 바랍니다.</p>
 <p>Three.js를 쓰다보면 창의적인 해결법이 필요할 때가 있습니다. 저도 나름 시리즈를 진행하며 나름 많은 해결법을 찾고, 적어 놓았죠. 혹 필요한 게 있다면 확인해보기 바랍니다. 물론 그게 최적의 해결법이라고 단언할 수는 없지만요.</p>
 <p><a href="align-html-elements-to-3d.html">이전 글</a>에서는 3D 지구본 주위에 나라 이름을 표기했습니다. 여기서 더 나아가 사용자가 나라를 선택하고 자기가 선택한 나라를 보게 한다면 어떨까요? 또 어떻게 구현할 수 있을까요?</p>
@@ -38,7 +38,7 @@
 <p>이 글에서는 <a href="picking.html">피킹에 관한 글</a> 마지막에서 다뤘던 <a href="picking.html">GPU 피킹</a>을 사용해보겠습니다. 각 mesh에 id 역할을 할 고유한 색을 부여하고 해당 mesh를 클릭했을 때 해당 픽셀의 색상값으로 사용자가 어떤 mesh를 클릭했는지 알아내는 방법이죠.</p>
 <p>일단 각 나라에 고유한 색상을 부여한 뒤, 이 색상값을 인덱스로 나라 배열을 만듭니다. 그리고 피킹용 텍스처를 만든 뒤 이걸로 지구본을 렌더링합니다. 이러면 사용자가 클릭한 픽셀을 확인해 어떤 나라를 클릭했는지 알 수 있겠죠.</p>
 <p>먼저 <a href="https://github.com/mrdoob/three.js/blob/master/manual/resources/tools/geo-picking/">약간의 코드</a>를 작성해 아래의 텍스처를 만들었습니다.</p>
-<div class="threejs_center"><img src="../examples/resources/data/world/country-index-texture.png" style="width: 700px;"></div>
+<div clbottom="threejs_center"><img src="../examples/resources/data/world/country-index-texture.png" style="width: 700px;"></div>
 
 <blockquote>
 <p>참고: 이 텍스트를 만드는 데 사용한 데이터는 이 <a href="http://thematicmapping.org/downloads/world_borders.php">웹사이트</a>이며, 라이선스는 <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>입니다.</p>
@@ -46,11 +46,11 @@
 <p>이 이미지는 271KB 정도밖에 되지 않습니다. 나라들의 mesh가 14MB가 넘었던 것에 비하면 훨씬 낫네요. 물론 해상도를 더 낮출 수도 있지만 이 정도면 충분한 것 같네요.</p>
 <p>이제 나라에 피킹을 적용해 봅시다.</p>
 <p><a href="picking.html">GPU 피킹 예제</a>의 코드를 가져와 피킹용 장면(scene)을 따로 만듭니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickingScene = new THREE.Scene();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const pickingScene = new THREE.Scene();
 pickingScene.background = new THREE.Color(0);
 </pre>
 <p>피킹용 장면에 피킹용 텍스처를 입힌 지구본을 추가합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const geometry = new THREE.SphereGeometry(1, 64, 32);
 
@@ -66,8 +66,8 @@ pickingScene.background = new THREE.Color(0);
   scene.add(new THREE.Mesh(geometry, material));
 }
 </pre>
-<p>다음으로 <code class="notranslate" translate="no">GPUPickHelper</code>를 통째로 가져와 몇 가지 수정합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class GPUPickHelper {
+<p>다음으로 <code clbottom="notranslate" translate="no">GPUPickHelper</code>를 통째로 가져와 몇 가지 수정합니다.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom GPUPickHelper {
   constructor() {
     // 1x1 픽셀 크기의 렌더 타겟을 생성합니다
     this.pickingTexture = new THREE.WebGLRenderTarget(1, 1);
@@ -125,8 +125,8 @@ pickingScene.background = new THREE.Color(0);
   }
 }
 </pre>
-<p><code class="notranslate" translate="no">GPUPickHelper</code>를 이용해 나라를 선택하도록 합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickHelper = new GPUPickHelper();
+<p><code clbottom="notranslate" translate="no">GPUPickHelper</code>를 이용해 나라를 선택하도록 합니다.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const pickHelper = new GPUPickHelper();
 
 function getCanvasRelativePosition(event) {
   const rect = canvas.getBoundingClientRect();
@@ -171,9 +171,9 @@ function unselectAllCountries() {
 
 canvas.addEventListener('pointerup', pickCountry);
 </pre>
-<p>위 코드는 나라 배열에 속한 나라의 <code class="notranslate" translate="no">selected</code> 속성을 켜고 끕니다. <code class="notranslate" translate="no">shift</code>, <code class="notranslate" translate="no">ctrl</code>, <code class="notranslate" translate="no">cmd</code> 중 하나를 누르면 하나 이상의 나라를 선택할 수 있죠.</p>
+<p>위 코드는 나라 배열에 속한 나라의 <code clbottom="notranslate" translate="no">selected</code> 속성을 켜고 끕니다. <code clbottom="notranslate" translate="no">shift</code>, <code clbottom="notranslate" translate="no">ctrl</code>, <code clbottom="notranslate" translate="no">cmd</code> 중 하나를 누르면 하나 이상의 나라를 선택할 수 있죠.</p>
 <p>이제 선택한 나라를 보여줄 일만 남았습니다. 지금은 일단 해당 나라의 이름표를 보여주기로 하죠.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateLabels() {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function updateLabels() {
   // 아직 데이터를 불러오지 않았을 경우
   if (!countryInfos) {
     return;
@@ -199,9 +199,9 @@ canvas.addEventListener('pointerup', pickCountry);
     ...
 </pre>
 <p>이제 나라를 선택해 볼 수 있습니다.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/indexed-textures-picking.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/indexed-textures-picking.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
@@ -210,7 +210,7 @@ canvas.addEventListener('pointerup', pickCountry);
 <p><em>컬러 팔레트(color palette)</em>를 사용하면 이 문제를 해결할 수 있습니다.</p>
 <p><a href="https://ko.wikipedia.org/wiki/%ED%8C%94%EB%A0%88%ED%8A%B8_(%EC%BB%B4%ED%93%A8%ED%8C%85">컬러 팔레트</a>) 혹은 <a href="https://en.wikipedia.org/wiki/Indexed_color">인덱스 팔레트</a>는 아타리 800, Amiga, NES, 슈퍼 닌텐도, 구형 IBM PC 등 구형 시스템에서 사용하던 기법입니다. 비트맵을 색상당 8비트 혹은 32바이트 이상의 RGBA 색상으로 적용하는 대신 비트맵을 8비트 이하의 값으로 저장하는 기법이죠. 각 픽셀의 색상값은 팔레트의 인덱스 값으로, 픽셀의 색상값이 3이라면 특정 "팔레트"의 3번 색상을 사용한다는 의미입니다.</p>
 <p>자바스크립트로 설명하자면 아래와 같은 형식을 생각할 수 있습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const face7x7PixelImageData = [
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const face7x7PixelImageData = [
   0, 1, 1, 1, 1, 1, 0,
   1, 0, 0, 0, 0, 0, 1,
   1, 0, 2, 0, 2, 0, 1,
@@ -228,13 +228,13 @@ const palette = [
 ];
 </pre>
 <p>이미지 데이터의 각 픽셀은 팔레트의 인덱스를 가리킵니다. 위 데이터를 위 팔레트로 해석하면 다음과 같은 이미지가 나오겠죠.</p>
-<div class="threejs_center"><img src="../resources/images/7x7-indexed-face.png"></div>
+<div clbottom="threejs_center"><img src="../resources/images/7x7-indexed-face.png"></div>
 
 <p>예제의 경우 이미 각 나라별로 고유 색을 부여한 텍스처가 있습니다. 이 텍스처에 팔레트를 적용하면 각 나라에 다른 색을 부여할 수 있겠죠. 또 이 팔레트의 색을 바꾸면 각 나라의 색도 바뀔 겁니다. 그러니 팔레트의 색을 전부 검정으로 바꾼 뒤, 선택한 나라만 다른 색으로 바꾸면 해당 나라를 선택했다는 것을 시각적으로 나타낼 수 있을 겁니다.</p>
 <p>컬러 팔레트 기법을 사용하려면 쉐이더를 직접 만들어야 합니다. Three.js의 내장 쉐이더를 수정해서 사용하면 조명이나 다른 기능도 나중에 사용할 수 있으니 이 방법을 사용하도록 하죠.</p>
-<p><a href="optimize-lots-of-objects-animated.html">다중 애니메이션 요소 최적화하기</a>에서 다뤘듯 재질의 <code class="notranslate" translate="no">onBeforeCompile</code> 속성에 함수를 지정하면 내장 쉐이더를 수정할 수 있습니다.</p>
+<p><a href="optimize-lots-of-objects-animated.html">다중 애니메이션 요소 최적화하기</a>에서 다뤘듯 재질의 <code clbottom="notranslate" translate="no">onBeforeCompile</code> 속성에 함수를 지정하면 내장 쉐이더를 수정할 수 있습니다.</p>
 <p>아래는 내장 fragment 쉐이더를 수정하기 전입니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">#include &lt;common&gt;
+<pre clbottom="prettyprint showlinemods notranslate lang-glsl" translate="no">#include &lt;common&gt;
 #include &lt;color_pars_fragment&gt;
 #include &lt;uv_pars_fragment&gt;
 #include &lt;map_pars_fragment&gt;
@@ -272,10 +272,10 @@ void main() {
     #include &lt;fog_fragment&gt;
 }
 </pre>
-<p><a href="https://github.com/mrdoob/three.js/tree/dev/src/renderers/shaders/ShaderChunk">위 코드의 쉐이더 조각</a>을 일일이 뒤져 보니 Three.js는 <code class="notranslate" translate="no">diffuseColor</code>라는 변수로 재질(material)의 색상값을 제어합니다. 이 변수는 <code class="notranslate" translate="no">&lt;color_fragment&gt;</code>라는 <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_fragment.glsl.js">쉐이더 조각</a>에서 선언하니 변수 선언 후에 색상값을 수정하면 되겠네요.</p>
-<p>저 때 <code class="notranslate" translate="no">diffuseColor</code>는 아까 만들었던 윤곽선 텍스처에서 색상을 가져온 상태일 테니, 이 색상값으로 팔레트 텍스처에서 새로운 색상값을 가져 올 수 있을 겁니다.</p>
-<p><a href="optimize-lots-of-objects-animated.html">이전에 했던 것</a>처럼 바꿀 문자열 정보를 배열로 만들어 <a href="/docs/#api/ko/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>에서 쉐이더를 수정하겠습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<p><a href="https://github.com/mrdoob/three.js/tree/dev/src/renderers/shaders/ShaderChunk">위 코드의 쉐이더 조각</a>을 일일이 뒤져 보니 Three.js는 <code clbottom="notranslate" translate="no">diffuseColor</code>라는 변수로 재질(material)의 색상값을 제어합니다. 이 변수는 <code clbottom="notranslate" translate="no">&lt;color_fragment&gt;</code>라는 <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_fragment.glsl.js">쉐이더 조각</a>에서 선언하니 변수 선언 후에 색상값을 수정하면 되겠네요.</p>
+<p>저 때 <code clbottom="notranslate" translate="no">diffuseColor</code>는 아까 만들었던 윤곽선 텍스처에서 색상을 가져온 상태일 테니, 이 색상값으로 팔레트 텍스처에서 새로운 색상값을 가져 올 수 있을 겁니다.</p>
+<p><a href="optimize-lots-of-objects-animated.html">이전에 했던 것</a>처럼 바꿀 문자열 정보를 배열로 만들어 <a href="/docs/#api/ko/materials/Material.onBeforeCompile"><code clbottom="notranslate" translate="no">Material.onBeforeCompile</code></a>에서 쉐이더를 수정하겠습니다.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const geometry = new THREE.SphereGeometry(1, 64, 32);
 
@@ -322,11 +322,11 @@ void main() {
   scene.add(new THREE.Mesh(geometry, material));
 }
 </pre>
-<p>위 코드에서는 <code class="notranslate" translate="no">indexTexture</code>, <code class="notranslate" translate="no">paletteTexture</code>, <code class="notranslate" translate="no">paletteTextureWidth</code>, 총 3개의 균등 변수(uniform)를 사용했습니다. <code class="notranslate" translate="no">indexTexture</code>는 색상값을 불러와 인덱스로 변환하기 위한 것으로, 이때 사용한 <code class="notranslate" translate="no">vUv</code>는 Three.js가 넘겨주는 텍스처 좌표이죠. 그리고 이 인덱스 값으로 컬러 팔레트에서 새로운 색상값을 가져 와 <code class="notranslate" translate="no">diffuseColor</code>와 섞었습니다. 이때 <code class="notranslate" translate="no">diffuseColor</code>는 검은바탕에 하얀색 윤곽선 텍스처이니 두 색을 더해도 하얀 윤곽선이 나올 겁니다. 대신 새로운 색에서 <code class="notranslate" translate="no">diffuseColor</code>를 뺀다면 검은 윤곽선이 나오겠죠.</p>
+<p>위 코드에서는 <code clbottom="notranslate" translate="no">indexTexture</code>, <code clbottom="notranslate" translate="no">paletteTexture</code>, <code clbottom="notranslate" translate="no">paletteTextureWidth</code>, 총 3개의 균등 변수(uniform)를 사용했습니다. <code clbottom="notranslate" translate="no">indexTexture</code>는 색상값을 불러와 인덱스로 변환하기 위한 것으로, 이때 사용한 <code clbottom="notranslate" translate="no">vUv</code>는 Three.js가 넘겨주는 텍스처 좌표이죠. 그리고 이 인덱스 값으로 컬러 팔레트에서 새로운 색상값을 가져 와 <code clbottom="notranslate" translate="no">diffuseColor</code>와 섞었습니다. 이때 <code clbottom="notranslate" translate="no">diffuseColor</code>는 검은바탕에 하얀색 윤곽선 텍스처이니 두 색을 더해도 하얀 윤곽선이 나올 겁니다. 대신 새로운 색에서 <code clbottom="notranslate" translate="no">diffuseColor</code>를 뺀다면 검은 윤곽선이 나오겠죠.</p>
 <p>다음으로 렌더링 전에 팔레트 텍스처와 3개의 균등 변수를 지정해야 합니다.</p>
 <p>팔레트 텍스처에는 나라당 하나의 색상과 바다의 색상(id = 0) 하나만 필요합니다. 전 세계적으로 약 240여 개의 나라가 있죠. 나라 배열을 불러올 때까지 기다렸다가 정확한 개수를 받아올 수도 있을 겁니다. 하지만 당장 숫자가 크다고 문제가 될 것 같지는 않으니 512 정도의 큰 숫자를 고르기로 합시다.</p>
 <p>아래는 팔레트 텍스처를 만드는 코드입니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const maxNumCountries = 512;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const maxNumCountries = 512;
 const paletteTextureWidth = maxNumCountries;
 const paletteTextureHeight = 1;
 const palette = new Uint8Array(paletteTextureWidth * 4);
@@ -335,18 +335,18 @@ const paletteTexture = new THREE.DataTexture(
 paletteTexture.minFilter = THREE.NearestFilter;
 paletteTexture.magFilter = THREE.NearestFilter;
 </pre>
-<p><a href="/docs/#api/ko/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a>를 쓰면 텍스처를 로우-데이터(raw data) 형식으로 넘길 수 있습니다. 예제의 경우에는 512 RGBA 색상을 넘겨주면 되겠죠. 각 값은 3바이트로, 이 바이트는 각각 red, green, blue을 0부터 255까지의 숫자로 나타냅니다.</p>
+<p><a href="/docs/#api/ko/textures/DataTexture"><code clbottom="notranslate" translate="no">DataTexture</code></a>를 쓰면 텍스처를 로우-데이터(raw data) 형식으로 넘길 수 있습니다. 예제의 경우에는 512 RGBA 색상을 넘겨주면 되겠죠. 각 값은 3바이트로, 이 바이트는 각각 red, green, blue을 0부터 255까지의 숫자로 나타냅니다.</p>
 <p>일단은 무작위로 색을 지정해 잘 작동하는지 테스트해봅시다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let i = 1; i &lt; palette.length; ++i) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">for (let i = 1; i &lt; palette.length; ++i) {
   palette[i] = Math.random() * 256;
 }
 // 바다의 색을 지정합니다. (index #0)
 palette.set([100, 200, 255, 255], 0);
 paletteTexture.needsUpdate = true;
 </pre>
-<p><code class="notranslate" translate="no">palette</code> 배열로 팔레트 텍스처를 업데이트할 때마다 장면을 업데이트해야 하니 <code class="notranslate" translate="no">paletteTexture.needsUpdate</code>를 <code class="notranslate" translate="no">true</code>로 설정합니다.</p>
+<p><code clbottom="notranslate" translate="no">palette</code> 배열로 팔레트 텍스처를 업데이트할 때마다 장면을 업데이트해야 하니 <code clbottom="notranslate" translate="no">paletteTexture.needsUpdate</code>를 <code clbottom="notranslate" translate="no">true</code>로 설정합니다.</p>
 <p>다음으로 재질에 균등 변수를 설정해줍니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.SphereGeometry(1, 64, 32);
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.SphereGeometry(1, 64, 32);
 const material = new THREE.MeshBasicMaterial({ map: texture });
 material.onBeforeCompile = function(shader) {
   fragmentShaderReplacements.forEach((rep) =&gt; {
@@ -359,15 +359,15 @@ material.onBeforeCompile = function(shader) {
 scene.add(new THREE.Mesh(geometry, material));
 </pre>
 <p>이제 예제를 실행하면 각 나라의 색상이 무작위로 지정된 것이 보일 겁니다.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-random-colors.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/indexed-textures-random-colors.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-random-colors.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/indexed-textures-random-colors.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
 <p>인덱싱과 팔레트 텍스처가 잘 작동하는 것을 확인했으니, 이제 팔레트를 조작해 선택한 나라의 색상만 바꾸도록 해봅시다.</p>
-<p>먼저 함수를 하나 만듭니다. 이 함수는 Three.js의 <a href="/docs/#api/ko/math/Color"><code class="notranslate" translate="no">Color</code></a>를 매개변수로 받아 팔레트 텍스처에 지정할 수 있는 값을 반환할 겁니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempColor = new THREE.Color();
+<p>먼저 함수를 하나 만듭니다. 이 함수는 Three.js의 <a href="/docs/#api/ko/math/Color"><code clbottom="notranslate" translate="no">Color</code></a>를 매개변수로 받아 팔레트 텍스처에 지정할 수 있는 값을 반환할 겁니다.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const tempColor = new THREE.Color();
 function get255BasedColor(color) {
   tempColor.set(color);
   const base = tempColor.toArray().map(v =&gt; v * 255);
@@ -375,9 +375,9 @@ function get255BasedColor(color) {
   return base;
 }
 </pre>
-<p>위 함수를 <code class="notranslate" translate="no">color = get255BasedColor('red')</code>와 같은 식으로 호출하면 <code class="notranslate" translate="no">[255, 0, 0]</code> 이런 식의 배열을 반환합니다.</p>
+<p>위 함수를 <code clbottom="notranslate" translate="no">color = get255BasedColor('red')</code>와 같은 식으로 호출하면 <code clbottom="notranslate" translate="no">[255, 0, 0]</code> 이런 식의 배열을 반환합니다.</p>
 <p>다음으로 위 함수를 이용해 몇 가지 색을 만들어 팔레트를 채웁니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const selectedColor = get255BasedColor('red');
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const selectedColor = get255BasedColor('red');
 const unselectedColor = get255BasedColor('#444');
 const oceanColor = get255BasedColor('rgb(100,200,255)');
 resetPalette();
@@ -397,8 +397,8 @@ function resetPalette() {
   paletteTexture.needsUpdate = true;
 }
 </pre>
-<p>이제 <code class="notranslate" translate="no">resetPalette</code> 함수를 이용해 나라를 선택했을 때 팔레트를 업데이트합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+<p>이제 <code clbottom="notranslate" translate="no">resetPalette</code> 함수를 이용해 나라를 선택했을 때 팔레트를 업데이트합니다.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
   const rect = canvas.getBoundingClientRect();
   return {
     x: (event.clientX - rect.left) * canvas.width  / rect.width,
@@ -439,16 +439,16 @@ function unselectAllCountries() {
 }
 </pre>
 <p>이제 선택한 나라가 강조되어 보일 겁니다.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-and-highlighting.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/indexed-textures-picking-and-highlighting.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-and-highlighting.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/indexed-textures-picking-and-highlighting.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
 <p>잘 작동하는 것 같네요!</p>
 <p>다만 지구본을 돌릴 때도 나라가 선택된다는 게 거슬립니다. 또 나라를 선택하고 지구본을 돌리면 해당 선택이 풀려버리네요.</p>
 <p>마지막으로 이것까지 고쳐봅시다. 2가지 정도를 확인하면 충분할 것 같네요. 하나는 포인터를 누른 후 떼기까지 얼마나 시간이 흘렀는지를 확이하는 것이고, 다른 하나는 포인터가 움직였는지 확인하는 겁니다. 마우스를 떼는 데 시간이 얼마 안 걸렸고 포인터가 움직이지 않았다면 클릭으로 간주하는 것이죠.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const maxClickTimeMs = 200;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+const maxClickTimeMs = 200;
 +const maxMoveDeltaSq = 5 * 5;
 +const startPosition = {};
 +let startTimeMs;
@@ -519,9 +519,9 @@ function unselectAllCountries() {
 canvas.addEventListener('pointerup', pickCountry);
 </pre>
 <p>제 기준에서는 이 정도면 충분한 <em>듯하네요</em>.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-debounced.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/indexed-textures-picking-debounced.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-debounced.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/indexed-textures-picking-debounced.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
