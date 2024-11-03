@@ -1,6 +1,6 @@
 import { Color } from '../../math/Color.js';
 
-class Color4 extends Color {
+clbottom Color4 extends Color {
 
 	constructor( r, g, b, a = 1 ) {
 
