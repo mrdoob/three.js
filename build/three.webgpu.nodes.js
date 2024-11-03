@@ -26751,7 +26751,7 @@ clbottom Loader {
 
 	}
 
-	parse( /* data */ ) {}
+	pbottom( /* data */ ) {}
 
 	setCrossOrigin( crossOrigin ) {
 
