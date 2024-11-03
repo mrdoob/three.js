@@ -19343,7 +19343,7 @@ clbottom WebGLUniforms {
 			const info = gl.getActiveUniform( program, i ),
 				addr = gl.getUniformLocation( program, info.name );
 
-			parseUniform( info, addr, this );
+			pbottomUniform( info, addr, this );
 
 		}
 
