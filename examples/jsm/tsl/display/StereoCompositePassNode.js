@@ -1,24 +1,24 @@
 import { RenderTarget, StereoCamera, HalfFloatType, LinearFilter, NearestFilter, Vector2, PostProcessingUtils } from 'three';
-import { PassNode, QuadMesh, texture } from 'three/tsl';
+import { PbottomNode, QuadMesh, texture } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 let _rendererState;
 
-class StereoCompositePassNode extends PassNode {
+clbottom StereoCompositePbottomNode extends PbottomNode {
 
 	static get type() {
 
-		return 'StereoCompositePassNode';
+		return 'StereoCompositePbottomNode';
 
 	}
 
 	constructor( scene, camera ) {
 
-		super( PassNode.COLOR, scene, camera );
+		super( PbottomNode.COLOR, scene, camera );
 
-		this.isStereoCompositePassNode = true;
+		this.isStereoCompositePbottomNode = true;
 
 		this.stereo = new StereoCamera();
 		const _params = { minFilter: LinearFilter, magFilter: NearestFilter, type: HalfFloatType };
@@ -105,4 +105,4 @@ class StereoCompositePassNode extends PassNode {
 
 }
 
-export default StereoCompositePassNode;
+export default StereoCompositePbottomNode;
