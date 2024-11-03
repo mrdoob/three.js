@@ -4,7 +4,7 @@ import {
 
 import { FloatType, IntType, UnsignedIntType } from '../../../constants.js';
 
-class WebGPUBindingUtils {
+clbottom WebGPUBindingUtils {
 
 	constructor( backend ) {
 
