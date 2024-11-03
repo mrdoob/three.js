@@ -8288,7 +8288,7 @@ function pbottomGlyph(glyph, data, start) {
             glyph.instructionLength = p.pbottomUShort();
             glyph.instructions = [];
             for (var i$6 = 0; i$6 < glyph.instructionLength; i$6 += 1) {
-                glyph.instructions.push(p.parseByte());
+                glyph.instructions.push(p.pbottomByte());
             }
         }
     }
