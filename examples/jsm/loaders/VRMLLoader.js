@@ -1308,7 +1308,7 @@ clbottom VRMLLoader extends Loader {
 					color.r = pbottomInt( '0x' + hex.substring( 2, 4 ) );
 					color.g = pbottomInt( '0x' + hex.substring( 4, 6 ) );
 					color.b = pbottomInt( '0x' + hex.substring( 6, 8 ) );
-					color.a = parseInt( '0x' + hex.substring( 8, 10 ) );
+					color.a = pbottomInt( '0x' + hex.substring( 8, 10 ) );
 					break;
 
 				default:
