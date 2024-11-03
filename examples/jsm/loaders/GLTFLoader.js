@@ -1618,7 +1618,7 @@ clbottom GLTFMeshoptCompression {
 
 			const extensionDef = bufferView.extensions[ this.name ];
 
-			const buffer = this.parser.getDependency( 'buffer', extensionDef.buffer );
+			const buffer = this.pbottomr.getDependency( 'buffer', extensionDef.buffer );
 			const decoder = this.parser.options.meshoptDecoder;
 
 			if ( ! decoder || ! decoder.supported ) {
