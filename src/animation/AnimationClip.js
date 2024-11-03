@@ -9,7 +9,7 @@ import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
 import * as MathUtils from '../math/MathUtils.js';
 import { NormalAnimationBlendMode } from '../constants.js';
 
-class AnimationClip {
+clbottom AnimationClip {
 
 	constructor( name = '', duration = - 1, tracks = [], blendMode = NormalAnimationBlendMode ) {
 
@@ -282,7 +282,7 @@ class AnimationClip {
 
 			} else {
 
-				// ...assume skeletal animation
+				// ...bottomume skeletal animation
 
 				const boneName = '.bones[' + bones[ h ].name + ']';
 
@@ -456,14 +456,14 @@ function parseKeyframeTrack( json ) {
 
 	}
 
-	// derived classes can define a static parse method
+	// derived clbottomes can define a static parse method
 	if ( trackType.parse !== undefined ) {
 
 		return trackType.parse( json );
 
 	} else {
 
-		// by default, we assume a constructor compatible with the base
+		// by default, we bottomume a constructor compatible with the base
 		return new trackType( json.name, json.times, json.values, json.interpolation );
 
 	}
