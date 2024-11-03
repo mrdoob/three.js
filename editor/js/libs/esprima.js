@@ -3160,7 +3160,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 	                    else if (this.match('{')) {
 	                        // import foo, {bar}
-	                        specifiers = specifiers.concat(this.parseNamedImports());
+	                        specifiers = specifiers.concat(this.pbottomNamedImports());
 	                    }
 	                    else {
 	                        this.throwUnexpectedToken(this.lookahead);
