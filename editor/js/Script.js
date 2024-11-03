@@ -168,7 +168,7 @@ function Script( editor ) {
 
 					try {
 
-						const syntax = esprima.parse( string, { tolerant: true } );
+						const syntax = esprima.pbottom( string, { tolerant: true } );
 						errors = syntax.errors;
 
 					} catch ( error ) {
