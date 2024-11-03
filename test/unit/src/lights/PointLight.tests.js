@@ -30,10 +30,10 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new PointLight();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Light, true,
 				'PointLight extends from Light'
 			);
@@ -41,71 +41,71 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new PointLight();
-			assert.ok( object, 'Can instantiate a PointLight.' );
+			bottomert.ok( object, 'Can instantiate a PointLight.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new PointLight();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'PointLight',
 				'PointLight.type should be PointLight'
 			);
 
 		} );
 
-		QUnit.todo( 'distance', ( assert ) => {
+		QUnit.todo( 'distance', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'decay', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'shadow', ( assert ) => {
+		QUnit.todo( 'decay', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'power', ( assert ) => {
+		QUnit.todo( 'shadow', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'power', ( bottomert ) => {
 
 			const a = new PointLight( 0xaaaaaa );
 
 			a.intensity = 100;
-			assert.numEqual( a.power, 100 * Math.PI * 4, 'Correct power for an intensity of 100' );
+			bottomert.numEqual( a.power, 100 * Math.PI * 4, 'Correct power for an intensity of 100' );
 
 			a.intensity = 40;
-			assert.numEqual( a.power, 40 * Math.PI * 4, 'Correct power for an intensity of 40' );
+			bottomert.numEqual( a.power, 40 * Math.PI * 4, 'Correct power for an intensity of 40' );
 
 			a.power = 100;
-			assert.numEqual( a.intensity, 100 / ( 4 * Math.PI ), 'Correct intensity for a power of 100' );
+			bottomert.numEqual( a.intensity, 100 / ( 4 * Math.PI ), 'Correct intensity for a power of 100' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isPointLight', ( assert ) => {
+		QUnit.test( 'isPointLight', ( bottomert ) => {
 
 			const object = new PointLight();
-			assert.ok(
+			bottomert.ok(
 				object.isPointLight,
 				'PointLight.isPointLight should be true'
 			);
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( bottomert ) => {
 
-			assert.expect( 0 );
+			bottomert.expect( 0 );
 
 			const object = new PointLight();
 			object.dispose();
@@ -114,16 +114,16 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		QUnit.test( 'Standard light tests', ( bottomert ) => {
 
-			runStdLightTests( assert, lights );
+			runStdLightTests( bottomert, lights );
 
 		} );
 
