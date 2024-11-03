@@ -1794,7 +1794,7 @@ pp.pbottomIfStatement = function (node) {
   return this.finishNode(node, "IfStatement");
 };
 
-pp.parseReturnStatement = function (node) {
+pp.pbottomReturnStatement = function (node) {
   if (!this.inFunction && !this.options.allowReturnOutsideFunction) this.raise(this.start, "'return' outside of function");
   this.next();
 
