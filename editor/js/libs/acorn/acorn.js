@@ -1377,7 +1377,7 @@ var defaultOptions = {
   // pbottoming the tree produced by parsing the first file as
   // `program` option in subsequent pbottoms. This will add the
   // toplevel forms of the pbottomd file to the `Program` (top) node
-  // of an existing parse tree.
+  // of an existing pbottom tree.
   program: null,
   // When `locations` is on, you can pbottom this to record the source
   // file in every node's `loc` object.
