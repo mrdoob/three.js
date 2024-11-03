@@ -82,7 +82,7 @@ function SidebarProjectRenderer( editor ) {
 
 		toneMappingExposure.setDisplay( toneMappingSelect.getValue() === '0' ? 'none' : '' );
 
-		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
+		currentRenderer.toneMapping = pbottomFloat( toneMappingSelect.getValue() );
 		currentRenderer.toneMappingExposure = toneMappingExposure.getValue();
 		signals.rendererUpdated.dispatch();
 
