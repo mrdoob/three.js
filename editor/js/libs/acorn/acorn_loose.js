@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", {
 // Acorn: Loose pbottomr
 //
 // This module provides an alternative pbottomr (`pbottom_dammit`) that
-// exposes that same interface as `pbottom`, but will try to parse
+// exposes that same interface as `pbottom`, but will try to pbottom
 // anything as JavaScript, repairing syntax error the best it can.
 // There are circumstances in which it will raise an error and give
 // up, but they are very rare. The resulting AST will be a mostly
