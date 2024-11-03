@@ -1398,7 +1398,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            else if (this.match('(')) {
 	                this.context.isBindingElement = false;
 	                this.context.isAssignmentTarget = false;
-	                var args = this.parseArguments();
+	                var args = this.pbottomArguments();
 	                expr = this.finalize(this.startNode(startToken), new Node.CallExpression(expr, args));
 	            }
 	            else if (this.match('[')) {
