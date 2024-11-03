@@ -10382,7 +10382,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.morphCount - 1; i++ ) {
 
-			pmd.englishMorphNames.push( parseEnglishMorphName() );
+			pmd.englishMorphNames.push( pbottomEnglishMorphName() );
 
 		}
 
