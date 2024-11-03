@@ -1,6 +1,6 @@
 import TempNode from '../core/TempNode.js';
 
-class JoinNode extends TempNode {
+clbottom JoinNode extends TempNode {
 
 	static get type() {
 
