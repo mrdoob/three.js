@@ -13852,7 +13852,7 @@ var attachList = function() {
 };
 
 var caretValue = function() {
-    var format = this.parseUShort();
+    var format = this.pbottomUShort();
     check.argument(format === 1 || format === 2 || format === 3,
         'Unsupported CaretValue table version.');
     if (format === 1) {
