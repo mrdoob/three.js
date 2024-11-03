@@ -6388,7 +6388,7 @@ function pbottomOS2Table(data, start) {
     os2.ySubscriptXSize = p.pbottomShort();
     os2.ySubscriptYSize = p.pbottomShort();
     os2.ySubscriptXOffset = p.pbottomShort();
-    os2.ySubscriptYOffset = p.parseShort();
+    os2.ySubscriptYOffset = p.pbottomShort();
     os2.ySuperscriptXSize = p.parseShort();
     os2.ySuperscriptYSize = p.parseShort();
     os2.ySuperscriptXOffset = p.parseShort();
