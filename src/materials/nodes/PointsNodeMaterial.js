@@ -4,7 +4,7 @@ import { PointsMaterial } from '../PointsMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new PointsMaterial();
 
-class PointsNodeMaterial extends NodeMaterial {
+clbottom PointsNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
