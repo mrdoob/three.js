@@ -35,10 +35,10 @@ export default QUnit.module( 'Cameras', () => {
 		};
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new PerspectiveCamera();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Camera, true,
 				'PerspectiveCamera extends from Camera'
 			);
@@ -46,138 +46,138 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new PerspectiveCamera();
-			assert.ok( object, 'Can instantiate a PerspectiveCamera.' );
+			bottomert.ok( object, 'Can instantiate a PerspectiveCamera.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new PerspectiveCamera();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'PerspectiveCamera',
 				'PerspectiveCamera.type should be PerspectiveCamera'
 			);
 
 		} );
 
-		QUnit.todo( 'fov', ( assert ) => {
+		QUnit.todo( 'fov', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'zoom', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'near', ( assert ) => {
+		QUnit.todo( 'zoom', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'far', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'focus', ( assert ) => {
+		QUnit.todo( 'near', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'aspect', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'view', ( assert ) => {
+		QUnit.todo( 'far', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'filmGauge', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'filmOffset', ( assert ) => {
+		QUnit.todo( 'focus', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'aspect', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'view', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'filmGauge', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'filmOffset', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isPerspectiveCamera', ( assert ) => {
+		QUnit.test( 'isPerspectiveCamera', ( bottomert ) => {
 
 			const object = new PerspectiveCamera();
-			assert.ok(
+			bottomert.ok(
 				object.isPerspectiveCamera,
 				'PerspectiveCamera.isPerspectiveCamera should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setFocalLength', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'getFocalLength', ( assert ) => {
+		QUnit.todo( 'setFocalLength', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'getEffectiveFOV', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'getFilmWidth', ( assert ) => {
+		QUnit.todo( 'getFocalLength', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'getFilmHeight', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setViewOffset', ( assert ) => {
+		QUnit.todo( 'getEffectiveFOV', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'clearViewOffset', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'updateProjectionMatrix', ( assert ) => {
+		QUnit.todo( 'getFilmWidth', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'getFilmHeight', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setViewOffset', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'clearViewOffset', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'updateProjectionMatrix', ( bottomert ) => {
 
 			const cam = new PerspectiveCamera( 75, 16 / 9, 0.1, 300.0 );
 
@@ -199,20 +199,20 @@ export default QUnit.module( 'Cameras', () => {
 				0, 0, - 1, 0
 			);
 
-			// assert.ok( reference.equals(m) );
-			assert.ok( matrixEquals4( reference, m, 0.000001 ) );
+			// bottomert.ok( reference.equals(m) );
+			bottomert.ok( matrixEquals4( reference, m, 0.000001 ) );
 
 		} );
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.todo( 'toJSON', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
 		// TODO: clone is a camera methods that relied to copy method
-		QUnit.test( 'clone', ( assert ) => {
+		QUnit.test( 'clone', ( bottomert ) => {
 
 			const near = 1,
 				far = 3,
@@ -223,12 +223,12 @@ export default QUnit.module( 'Cameras', () => {
 
 			const clonedCam = cam.clone();
 
-			assert.ok( cam.fov === clonedCam.fov, 'fov is equal' );
-			assert.ok( cam.aspect === clonedCam.aspect, 'aspect is equal' );
-			assert.ok( cam.near === clonedCam.near, 'near is equal' );
-			assert.ok( cam.far === clonedCam.far, 'far is equal' );
-			assert.ok( cam.zoom === clonedCam.zoom, 'zoom is equal' );
-			assert.ok( cam.projectionMatrix.equals( clonedCam.projectionMatrix ), 'projectionMatrix is equal' );
+			bottomert.ok( cam.fov === clonedCam.fov, 'fov is equal' );
+			bottomert.ok( cam.aspect === clonedCam.aspect, 'aspect is equal' );
+			bottomert.ok( cam.near === clonedCam.near, 'near is equal' );
+			bottomert.ok( cam.far === clonedCam.far, 'far is equal' );
+			bottomert.ok( cam.zoom === clonedCam.zoom, 'zoom is equal' );
+			bottomert.ok( cam.projectionMatrix.equals( clonedCam.projectionMatrix ), 'projectionMatrix is equal' );
 
 		} );
 
