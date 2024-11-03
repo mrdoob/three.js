@@ -2337,7 +2337,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.ReturnStatement(argument));
 	    };
 	    // ECMA-262 13.11 The with statement
-	    Pbottomr.prototype.parseWithStatement = function () {
+	    Pbottomr.prototype.pbottomWithStatement = function () {
 	        if (this.context.strict) {
 	            this.tolerateError(messages_1.Messages.StrictModeWith);
 	        }
