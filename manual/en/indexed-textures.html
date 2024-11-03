@@ -20,12 +20,12 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>Indexed Textures for Picking and Color</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>This article is a continuation of <a href="align-html-elements-to-3d.html">an article about aligning html elements to 3d</a>.
 If you haven't read that yet you should start there before continuing here.</p>
 <p>Sometimes using three.js requires coming up with creative solutions.
@@ -65,7 +65,7 @@ this index texture. Looking at the color of the pixel the user clicks would
 tell us the country id.</p>
 <p>So, I <a href="https://github.com/mrdoob/three.js/blob/master/manual/resources/tools/geo-picking/">wrote some code</a>
 to generate such a texture. Here it is. </p>
-<div class="threejs_center"><img src="../examples/resources/data/world/country-index-texture.png" style="width: 700px;"></div>
+<div clbottom="threejs_center"><img src="../examples/resources/data/world/country-index-texture.png" style="width: 700px;"></div>
 
 <p>Note: The data used to generate this texture comes from <a href="http://thematicmapping.org/downloads/world_borders.php">this website</a>
 and is therefore licensed as <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>.</p>
@@ -74,12 +74,12 @@ even lower the resolution but 217k seems good enough for now.</p>
 <p>So let's try using it for picking countries.</p>
 <p>Grabbing code from the <a href="picking.html">gpu picking example</a> we need
 a scene for picking.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickingScene = new THREE.Scene();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const pickingScene = new THREE.Scene();
 pickingScene.background = new THREE.Color(0);
 </pre>
 <p>and we need to add the globe with the our index texture to the
 picking scene.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const geometry = new THREE.SphereGeometry(1, 64, 32);
 
@@ -95,9 +95,9 @@ picking scene.</p>
   scene.add(new THREE.Mesh(geometry, material));
 }
 </pre>
-<p>Then let's copy over the <code class="notranslate" translate="no">GPUPickingHelper</code> class we used
+<p>Then let's copy over the <code clbottom="notranslate" translate="no">GPUPickingHelper</code> clbottom we used
 before with a few minor changes.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class GPUPickHelper {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom GPUPickHelper {
   constructor() {
     // create a 1x1 pixel render target
     this.pickingTexture = new THREE.WebGLRenderTarget(1, 1);
@@ -156,7 +156,7 @@ before with a few minor changes.</p>
 }
 </pre>
 <p>Now we can use that to pick countries.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const pickHelper = new GPUPickHelper();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const pickHelper = new GPUPickHelper();
 
 function getCanvasRelativePosition(event) {
   const rect = canvas.getBoundingClientRect();
@@ -201,12 +201,12 @@ function unselectAllCountries() {
 
 canvas.addEventListener('pointerup', pickCountry);
 </pre>
-<p>The code above sets/unsets the <code class="notranslate" translate="no">selected</code> property on
-the array of countries. If <code class="notranslate" translate="no">shift</code> or <code class="notranslate" translate="no">ctrl</code> or <code class="notranslate" translate="no">cmd</code>
+<p>The code above sets/unsets the <code clbottom="notranslate" translate="no">selected</code> property on
+the array of countries. If <code clbottom="notranslate" translate="no">shift</code> or <code clbottom="notranslate" translate="no">ctrl</code> or <code clbottom="notranslate" translate="no">cmd</code>
 is pressed then you can select more than one country.</p>
 <p>All that's left is showing the selected countries. For now
 let's just update the labels.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function updateLabels() {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function updateLabels() {
   // exit if we have not loaded the data yet
   if (!countryInfos) {
     return;
@@ -232,9 +232,9 @@ let's just update the labels.</p>
     ...
 </pre>
 <p>and with that we should be able to pick countries</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/indexed-textures-picking.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/indexed-textures-picking.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -253,7 +253,7 @@ into a palette. So for example a value
 of 3 in the image means "display color 3". What color color#3 is is
 defined somewhere else called a "palette".</p>
 <p>In JavaScript you can think of it like this</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const face7x7PixelImageData = [
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const face7x7PixelImageData = [
   0, 1, 1, 1, 1, 1, 0,
   1, 0, 0, 0, 0, 0, 1,
   1, 0, 2, 0, 2, 0, 1,
@@ -272,7 +272,7 @@ const palette = [
 </pre>
 <p>Where each pixel in the image data is an index into palette. If you interpreted
 the image data through the palette above you'd get this image</p>
-<div class="threejs_center"><img src="../resources/images/7x7-indexed-face.png"></div>
+<div clbottom="threejs_center"><img src="../resources/images/7x7-indexed-face.png"></div>
 
 <p>In our case we already have a texture above that has a different id
 per country. So, we could use that same texture through a palette
@@ -285,9 +285,9 @@ Let's modify the default shaders in three.js.
 That way we can use lighting and other features if we want.</p>
 <p>Like we covered in <a href="optimize-lots-of-objects-animated.html">the article on animating lots of objects</a>
 we can modify the default shaders by adding a function to a material's
-<code class="notranslate" translate="no">onBeforeCompile</code> property.</p>
+<code clbottom="notranslate" translate="no">onBeforeCompile</code> property.</p>
 <p>The default fragment shader looks something like this before compiling.</p>
-<pre class="prettyprint showlinemods notranslate lang-glsl" translate="no">#include &lt;common&gt;
+<pre clbottom="prettyprint showlinemods notranslate lang-glsl" translate="no">#include &lt;common&gt;
 #include &lt;color_pars_fragment&gt;
 #include &lt;uv_pars_fragment&gt;
 #include &lt;map_pars_fragment&gt;
@@ -326,16 +326,16 @@ void main() {
 }
 </pre>
 <p><a href="https://github.com/mrdoob/three.js/tree/dev/src/renderers/shaders/ShaderChunk">Digging through all those snippets</a>
-we find that three.js uses a variable called <code class="notranslate" translate="no">diffuseColor</code> to manage the
-base material color. It sets this in the <code class="notranslate" translate="no">&lt;color_fragment&gt;</code> <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_fragment.glsl.js">snippet</a>
+we find that three.js uses a variable called <code clbottom="notranslate" translate="no">diffuseColor</code> to manage the
+base material color. It sets this in the <code clbottom="notranslate" translate="no">&lt;color_fragment&gt;</code> <a href="https://github.com/mrdoob/three.js/blob/dev/src/renderers/shaders/ShaderChunk/color_fragment.glsl.js">snippet</a>
 so we should be able to modify it after that point.</p>
-<p><code class="notranslate" translate="no">diffuseColor</code> at that point in the shader should already be the color from
+<p><code clbottom="notranslate" translate="no">diffuseColor</code> at that point in the shader should already be the color from
 our outline texture so we can look up the color from a palette texture
 and mix them for the final result.</p>
 <p>Like we <a href="optimize-lots-of-objects-animated.html">did before</a> we'll make an array
 of search and replacement strings and apply them to the shader in
-<a href="/docs/#api/en/materials/Material.onBeforeCompile"><code class="notranslate" translate="no">Material.onBeforeCompile</code></a>.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<a href="/docs/#api/en/materials/Material.onBeforeCompile"><code clbottom="notranslate" translate="no">Material.onBeforeCompile</code></a>.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const loader = new THREE.TextureLoader();
   const geometry = new THREE.SphereGeometry(1, 64, 32);
 
@@ -382,11 +382,11 @@ of search and replacement strings and apply them to the shader in
   scene.add(new THREE.Mesh(geometry, material));
 }
 </pre>
-<p>Above can see above we add 3 uniforms, <code class="notranslate" translate="no">indexTexture</code>, <code class="notranslate" translate="no">paletteTexture</code>,
-and <code class="notranslate" translate="no">paletteTextureWidth</code>. We get a color from the <code class="notranslate" translate="no">indexTexture</code>
-and convert it to an index. <code class="notranslate" translate="no">vUv</code> is the texture coordinates provided by
+<p>Above can see above we add 3 uniforms, <code clbottom="notranslate" translate="no">indexTexture</code>, <code clbottom="notranslate" translate="no">paletteTexture</code>,
+and <code clbottom="notranslate" translate="no">paletteTextureWidth</code>. We get a color from the <code clbottom="notranslate" translate="no">indexTexture</code>
+and convert it to an index. <code clbottom="notranslate" translate="no">vUv</code> is the texture coordinates provided by
 three.js. We then use that index to get a color out of the palette texture.
-We then mix the result with the current <code class="notranslate" translate="no">diffuseColor</code>. The <code class="notranslate" translate="no">diffuseColor</code>
+We then mix the result with the current <code clbottom="notranslate" translate="no">diffuseColor</code>. The <code clbottom="notranslate" translate="no">diffuseColor</code>
 at this point is our black and white outline texture so if we add the 2 colors
 we'll get white outlines. If we subtract the current diffuse color we'll get
 black outlines.</p>
@@ -399,7 +399,7 @@ list of countries loads to get an exact number or look it up.
 There's not much harm in just picking some larger number so
 let's choose 512.</p>
 <p>Here's the code to create the palette texture</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const maxNumCountries = 512;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const maxNumCountries = 512;
 const paletteTextureWidth = maxNumCountries;
 const paletteTextureHeight = 1;
 const palette = new Uint8Array(paletteTextureWidth * 4);
@@ -408,11 +408,11 @@ const paletteTexture = new THREE.DataTexture(
 paletteTexture.minFilter = THREE.NearestFilter;
 paletteTexture.magFilter = THREE.NearestFilter;
 </pre>
-<p>A <a href="/docs/#api/en/textures/DataTexture"><code class="notranslate" translate="no">DataTexture</code></a> let's us give a texture raw data. In this case
+<p>A <a href="/docs/#api/en/textures/DataTexture"><code clbottom="notranslate" translate="no">DataTexture</code></a> let's us give a texture raw data. In this case
 we're giving it 512 RGBA colors, 4 bytes each where each byte is
 red, green, and blue respectively using values that go from 0 to 255.</p>
 <p>Let's fill it with random colors just to see it work</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (let i = 1; i &lt; palette.length; ++i) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">for (let i = 1; i &lt; palette.length; ++i) {
   palette[i] = Math.random() * 256;
 }
 // set the ocean color (index #0)
@@ -420,10 +420,10 @@ palette.set([100, 200, 255, 255], 0);
 paletteTexture.needsUpdate = true;
 </pre>
 <p>Anytime we want three.js to update the palette texture with
-the contents of the <code class="notranslate" translate="no">palette</code> array we need to set <code class="notranslate" translate="no">paletteTexture.needsUpdate</code>
-to <code class="notranslate" translate="no">true</code>.</p>
+the contents of the <code clbottom="notranslate" translate="no">palette</code> array we need to set <code clbottom="notranslate" translate="no">paletteTexture.needsUpdate</code>
+to <code clbottom="notranslate" translate="no">true</code>.</p>
 <p>And then we still need to set the uniforms on the material.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.SphereGeometry(1, 64, 32);
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const geometry = new THREE.SphereGeometry(1, 64, 32);
 const material = new THREE.MeshBasicMaterial({map: texture});
 material.onBeforeCompile = function(shader) {
   fragmentShaderReplacements.forEach((rep) =&gt; {
@@ -436,17 +436,17 @@ material.onBeforeCompile = function(shader) {
 scene.add(new THREE.Mesh(geometry, material));
 </pre>
 <p>and with that we get randomly colored countries.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-random-colors.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/indexed-textures-random-colors.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-random-colors.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/indexed-textures-random-colors.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
 <p>Now that we can see the index and palette textures are working
 let's manipulate the palette for highlighting.</p>
-<p>First let's make function that will let us pass in a three.js
+<p>First let's make function that will let us pbottom in a three.js
 style color and give us values we can put in the palette texture.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const tempColor = new THREE.Color();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const tempColor = new THREE.Color();
 function get255BasedColor(color) {
   tempColor.set(color);
   const base = tempColor.toArray().map(v =&gt; v * 255);
@@ -454,11 +454,11 @@ function get255BasedColor(color) {
   return base;
 }
 </pre>
-<p>Calling it like this <code class="notranslate" translate="no">color = get255BasedColor('red')</code> will
-return an array like <code class="notranslate" translate="no">[255, 0, 0, 255]</code>.</p>
+<p>Calling it like this <code clbottom="notranslate" translate="no">color = get255BasedColor('red')</code> will
+return an array like <code clbottom="notranslate" translate="no">[255, 0, 0, 255]</code>.</p>
 <p>Next let's use it to make a few colors and fill out the
 palette.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const selectedColor = get255BasedColor('red');
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const selectedColor = get255BasedColor('red');
 const unselectedColor = get255BasedColor('#444');
 const oceanColor = get255BasedColor('rgb(100,200,255)');
 resetPalette();
@@ -480,7 +480,7 @@ function resetPalette() {
 </pre>
 <p>Now let's use those functions to update the palette when a country
 is selected</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function getCanvasRelativePosition(event) {
   const rect = canvas.getBoundingClientRect();
   return {
     x: (event.clientX - rect.left) * canvas.width  / rect.width,
@@ -521,9 +521,9 @@ function unselectAllCountries() {
 }
 </pre>
 <p>and we that we should be able to highlight 1 or more countries.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-and-highlighting.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/indexed-textures-picking-and-highlighting.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-and-highlighting.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/indexed-textures-picking-and-highlighting.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -532,12 +532,12 @@ function unselectAllCountries() {
 the selection state. If we select a country and then want to
 rotate the globe the selection will change.</p>
 <p>Let's try to fix that. Off the top of my head we can check 2 things.
-How much time passed between clicking and letting go.
+How much time pbottomed between clicking and letting go.
 Another is did the user actually move the mouse. If the
 time is short or if they didn't move the mouse then it
 was probably a click. Otherwise they were probably trying
 to drag the globe.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const maxClickTimeMs = 200;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+const maxClickTimeMs = 200;
 +const maxMoveDeltaSq = 5 * 5;
 +const startPosition = {};
 +let startTimeMs;
@@ -564,13 +564,13 @@ function pickCountry(event) {
   }
 
 +  // if it's been a moment since the user started
-+  // then assume it was a drag action, not a select action
++  // then bottomume it was a drag action, not a select action
 +  const clickTimeMs = performance.now() - startTimeMs;
 +  if (clickTimeMs &gt; maxClickTimeMs) {
 +    return;
 +  }
 +
-+  // if they moved assume it was a drag action
++  // if they moved bottomume it was a drag action
 +  const position = getCanvasRelativePosition(event);
 +  const moveDeltaSq = (startPosition.x - position.x) ** 2 +
 +                      (startPosition.y - position.y) ** 2;
@@ -608,9 +608,9 @@ function unselectAllCountries() {
 canvas.addEventListener('pointerup', pickCountry);
 </pre>
 <p>and with those changes it <em>seems</em> like it works to me.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-debounced.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/indexed-textures-picking-debounced.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/indexed-textures-picking-debounced.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/indexed-textures-picking-debounced.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
