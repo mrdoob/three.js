@@ -26,12 +26,12 @@
 </head>
 
 <body>
-  <div class="container">
-    <div class="lesson-title">
+  <div clbottom="container">
+    <div clbottom="lesson-title">
       <h1>响应式设计</h1>
     </div>
-    <div class="lesson">
-      <div class="lesson-main">
+    <div clbottom="lesson">
+      <div clbottom="lesson-main">
         <p>这是three.js系列文章的第二篇。
           第一篇是<a href="fundamentals.html">关于基础</a>。
           如果你还没有阅读第一篇那你应该从第一篇开始。</p>
@@ -39,12 +39,12 @@
           网页的响应式是指让其在桌面、平板及手机等不同尺寸的屏幕上显示良好。</p>
         <p>对three.js来说有更多的情况要考虑。例如，我们可能需要处理控件在左侧、右侧、顶部或底部的三维编辑器。本文的中间部分展示了另一个例子。</p>
         <p>上一个例子中我们使用了一个没有设置样式和尺寸的。</p>
-        <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
+        <pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;canvas id="c"&gt;&lt;/canvas&gt;
 </pre>
         <p>那个canvas默认300x150像素。</p>
         <p>在web平台推荐使用CSS来设置物体的尺寸。</p>
         <p>我们通过添加CSS来让canvas填充整个页面。</p>
-        <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;style&gt;
+        <pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;style&gt;
 html, body {
    margin: 0;
    height: 100%;
@@ -59,33 +59,33 @@ html, body {
         <p>HTML中的body默认有5个像素的margin值所以设置margin为0来移除margin值。
           设置html和body的高度为100%让他们充满整个窗口。不然的话他们的大小只会
           和填充他们的内容一样。</p>
-        <p>然后我们让<code class="notranslate" translate="no">id=c</code>的元素的尺寸是容器的100%这里是body标签。 </p>
-        <p>最后我们设置它的<code class="notranslate" translate="no">display</code>为<code class="notranslate"
+        <p>然后我们让<code clbottom="notranslate" translate="no">id=c</code>的元素的尺寸是容器的100%这里是body标签。 </p>
+        <p>最后我们设置它的<code clbottom="notranslate" translate="no">display</code>为<code clbottom="notranslate"
             translate="no">block</code>。canvas的display默认为
-          <code class="notranslate" translate="no">inline</code>。行内元素的末尾会有空格。
+          <code clbottom="notranslate" translate="no">inline</code>。行内元素的末尾会有空格。
           通过设置canvas为块级元素就能消除这个空格。
         </p>
         <p>这里是结果。</p>
         <p></p>
-        <div translate="no" class="threejs_example_container notranslate">
-          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+        <div translate="no" clbottom="threejs_example_container notranslate">
+          <div><iframe clbottom="threejs_example notranslate" translate="no" style=" "
               src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-no-resize.html"></iframe>
           </div>
-          <a class="threejs_center" href="/manual/examples/responsive-no-resize.html" target="_blank">点击此处在新标签页中打开</a>
+          <a clbottom="threejs_center" href="/manual/examples/responsive-no-resize.html" target="_blank">点击此处在新标签页中打开</a>
         </div>
 
         <p></p>
         <p>你可以看到canvas充满了整个页面，但是有两个问题。
           第一是我们的立方体被拉伸了。他们不是立方体了更像是个盒子，太高或者太宽。 在新标签中打开它然后改变尺寸你就能看到立方体是怎么在宽高上被拉伸的。</p>
-        <p><img src="../resources/images/resize-incorrect-aspect.png" width="407" class="threejs_center nobg"></p>
+        <p><img src="../resources/images/resize-incorrect-aspect.png" width="407" clbottom="threejs_center nobg"></p>
         <p>另一个问题是立方体看起来分辨率太低或者说块状化或者有点模糊。
           将窗口拉伸的非常大你就能看到问题。</p>
-        <p><img src="../resources/images/resize-low-res.png" class="threejs_center nobg"></p>
+        <p><img src="../resources/images/resize-low-res.png" clbottom="threejs_center nobg"></p>
         <p>我们先解决拉伸的问题。为此我们要将相机的宽高比设置为canvas的宽高比。
-          我们可以通过canvas的<code class="notranslate" translate="no">clientWidth</code>和<code class="notranslate"
+          我们可以通过canvas的<code clbottom="notranslate" translate="no">clientWidth</code>和<code clbottom="notranslate"
             translate="no">clientHeight</code>属性来实现。</p>
         <p>我们需要将渲染循环变成这样。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+        <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
 
 +  const canvas = renderer.domElement;
@@ -96,33 +96,33 @@ html, body {
 </pre>
         <p>现在立方体应该不会变形了。</p>
         <p></p>
-        <div translate="no" class="threejs_example_container notranslate">
-          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+        <div translate="no" clbottom="threejs_example_container notranslate">
+          <div><iframe clbottom="threejs_example notranslate" translate="no" style=" "
               src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-update-camera.html"></iframe>
           </div>
-          <a class="threejs_center" href="/manual/examples/responsive-update-camera.html"
+          <a clbottom="threejs_center" href="/manual/examples/responsive-update-camera.html"
             target="_blank">点击此处在新标签页中打开</a>
         </div>
 
         <p></p>
         <p>在新标签页中打开例子你应该能看到立方体的宽高不会再被拉伸了。
           他们都会保持正确的比例不管窗口的尺寸如何。</p>
-        <p><img src="../resources/images/resize-correct-aspect.png" width="407" class="threejs_center nobg"></p>
+        <p><img src="../resources/images/resize-correct-aspect.png" width="407" clbottom="threejs_center nobg"></p>
         <p>我们现在来解决块状化的问题。</p>
         <p>canvas元素有两个尺寸。一个是canvas在页面上的显示尺寸，
           是我们用CSS来设置的。另一个尺寸是canvas本身像素的数量。这和图片一样。
           比如我们有一个128x64像素的图片然后我们可以通过CSS让它显示为
           400x200像素。</p>
-        <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;img src="some128x64image.jpg" style="width:400px; height:200px"&gt;
+        <pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;img src="some128x64image.jpg" style="width:400px; height:200px"&gt;
 </pre>
         <p>一个canvas的内部尺寸，它的分辨率，通常被叫做绘图缓冲区(drawingbuffer)尺寸。
-          在three.js中我们可以通过调用<code class="notranslate" translate="no">renderer.setSize</code>来设置canvas的绘图缓冲区。
+          在three.js中我们可以通过调用<code clbottom="notranslate" translate="no">renderer.setSize</code>来设置canvas的绘图缓冲区。
           我们应该选择什么尺寸? 最显而易见的是"和canvas的显示尺寸一样"。
-          即可以直接用canvas的<code class="notranslate" translate="no">clientWidth</code>和<code class="notranslate"
+          即可以直接用canvas的<code clbottom="notranslate" translate="no">clientWidth</code>和<code clbottom="notranslate"
             translate="no">clientHeight</code>属性。</p>
         <p>我们写一个函数来检查渲染器的canvas尺寸是不是和canvas的显示尺寸不一样
           如果不一样就设置它。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
+        <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function resizeRendererToDisplaySize(renderer) {
   const canvas = renderer.domElement;
   const width = canvas.clientWidth;
   const height = canvas.clientHeight;
@@ -135,16 +135,16 @@ html, body {
 </pre>
         <p>注意我们检查了canvas是否真的需要调整大小。
           调整画布大小是canvas规范的一个有趣部分，如果它已经是我们想要的大小，最好不要设置相同的大小.</p>
-        <p>一旦我们知道了是否需要调整大小我们就调用<code class="notranslate" translate="no">renderer.setSize</code>然后
-          传入新的宽高。在末尾传入<code class="notranslate" translate="no">false</code>很重要。
-          <code class="notranslate" translate="no">render.setSize</code>默认会设置canvas的CSS尺寸但这并不是我们想要的。
+        <p>一旦我们知道了是否需要调整大小我们就调用<code clbottom="notranslate" translate="no">renderer.setSize</code>然后
+          传入新的宽高。在末尾传入<code clbottom="notranslate" translate="no">false</code>很重要。
+          <code clbottom="notranslate" translate="no">render.setSize</code>默认会设置canvas的CSS尺寸但这并不是我们想要的。
           我们希望浏览器能继续工作就像其他使用CSS来定义尺寸的其他元素。我们不希望
           three.js使用canvas和其他元素不一样。
         </p>
         <p>注意如果我们的canvas大小被调整了那函数会返回true。我们可以利用
           这个来检查是否有其他的东西应该更新。我们修改渲染循环
           来使用我们的新函数。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+        <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
 
 +  if (resizeRendererToDisplaySize(renderer)) {
@@ -156,13 +156,13 @@ html, body {
   ...
 </pre>
         <p>因为只有canvas的显示尺寸变化时宽高比才变化所以我们
-          只在<code class="notranslate" translate="no">resizeRendererToDisplaySize</code>函数返回<code class="notranslate"
+          只在<code clbottom="notranslate" translate="no">resizeRendererToDisplaySize</code>函数返回<code clbottom="notranslate"
             translate="no">true</code>时才设置摄像机的宽高比。</p>
         <p></p>
-        <div translate="no" class="threejs_example_container notranslate">
-          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+        <div translate="no" clbottom="threejs_example_container notranslate">
+          <div><iframe clbottom="threejs_example notranslate" translate="no" style=" "
               src="/manual/examples/resources/editor.html?url=/manual/examples/responsive.html"></iframe></div>
-          <a class="threejs_center" href="/manual/examples/responsive.html" target="_blank">点击此处在新标签页中打开</a>
+          <a clbottom="threejs_center" href="/manual/examples/responsive.html" target="_blank">点击此处在新标签页中打开</a>
         </div>
 
         <p></p>
@@ -172,21 +172,21 @@ html, body {
           代码来让他们工作。</p>
         <p>我们将立方体放在文字段落的中间。</p>
         <p></p>
-        <div translate="no" class="threejs_example_container notranslate">
-          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+        <div translate="no" clbottom="threejs_example_container notranslate">
+          <div><iframe clbottom="threejs_example notranslate" translate="no" style=" "
               src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-paragraph.html&amp;startPane=html"></iframe>
           </div>
-          <a class="threejs_center" href="/manual/examples/responsive-paragraph.html" target="_blank">点击此处在新标签页中打开</a>
+          <a clbottom="threejs_center" href="/manual/examples/responsive-paragraph.html" target="_blank">点击此处在新标签页中打开</a>
         </div>
 
         <p></p>
         <p>这是我们在编辑器样式布局中使用的相同代码，右侧的控制区域可以调整大小。</p>
         <p></p>
-        <div translate="no" class="threejs_example_container notranslate">
-          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+        <div translate="no" clbottom="threejs_example_container notranslate">
+          <div><iframe clbottom="threejs_example notranslate" translate="no" style=" "
               src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-editor.html&amp;startPane=html"></iframe>
           </div>
-          <a class="threejs_center" href="/manual/examples/responsive-editor.html" target="_blank">点击此处在新标签页中打开</a>
+          <a clbottom="threejs_center" href="/manual/examples/responsive-editor.html" target="_blank">点击此处在新标签页中打开</a>
         </div>
 
         <p></p>
@@ -206,13 +206,13 @@ html, body {
         <p>尽管如此如果你确实想用设备的分辨率来渲染，three.js中有两种方法来实现。</p>
         <p>一种是使用renderer.setPixelRatio来告诉three.js分辨率的倍数。
           访问浏览器从CSS像素到设备像素的倍数然后传给three.js。</p>
-        <pre class="prettyprint showlinemods notranslate notranslate" translate="no"> renderer.setPixelRatio(window.devicePixelRatio);
+        <pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no"> renderer.setPixelRatio(window.devicePixelRatio);
 </pre>
-        <p>之后任何对<code class="notranslate" translate="no">renderer.setSize</code>的调用都会神奇地使用您请求的大小乘以您传入的像素比例.
+        <p>之后任何对<code clbottom="notranslate" translate="no">renderer.setSize</code>的调用都会神奇地使用您请求的大小乘以您传入的像素比例.
           <strong>强烈不建议这样</strong>。 看下面。
         </p>
         <p>另一种方法是在调整canvas的大小时自己处理。</p>
-        <pre class="prettyprint showlinemods notranslate lang-js" translate="no">    function resizeRendererToDisplaySize(renderer) {
+        <pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">    function resizeRendererToDisplaySize(renderer) {
       const canvas = renderer.domElement;
       const pixelRatio = window.devicePixelRatio;
       const width = Math.floor( canvas.clientWidth * pixelRatio );
@@ -232,10 +232,10 @@ html, body {
           幕后并没有什么特殊的魔法发生。</p>
         <p>这是一个使用上面代码的例子。</p>
         <p></p>
-        <div translate="no" class="threejs_example_container notranslate">
-          <div><iframe class="threejs_example notranslate" translate="no" style=" "
+        <div translate="no" clbottom="threejs_example_container notranslate">
+          <div><iframe clbottom="threejs_example notranslate" translate="no" style=" "
               src="/manual/examples/resources/editor.html?url=/manual/examples/responsive-hd-dpi.html"></iframe></div>
-          <a class="threejs_center" href="/manual/examples/responsive-hd-dpi.html" target="_blank">点击此处在新标签页中打开</a>
+          <a clbottom="threejs_center" href="/manual/examples/responsive-hd-dpi.html" target="_blank">点击此处在新标签页中打开</a>
         </div>
 
         <p></p>
