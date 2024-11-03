@@ -26,10 +26,10 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new DirectionalLight();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Light, true,
 				'DirectionalLight extends from Light'
 			);
@@ -37,56 +37,56 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new DirectionalLight();
-			assert.ok( object, 'Can instantiate a DirectionalLight.' );
+			bottomert.ok( object, 'Can instantiate a DirectionalLight.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new DirectionalLight();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'DirectionalLight',
 				'DirectionalLight.type should be DirectionalLight'
 			);
 
 		} );
 
-		QUnit.todo( 'position', ( assert ) => {
+		QUnit.todo( 'position', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'target', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'shadow', ( assert ) => {
+		QUnit.todo( 'target', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'shadow', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isDirectionalLight', ( assert ) => {
+		QUnit.test( 'isDirectionalLight', ( bottomert ) => {
 
 			const object = new DirectionalLight();
-			assert.ok(
+			bottomert.ok(
 				object.isDirectionalLight,
 				'DirectionalLight.isDirectionalLight should be true'
 			);
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( bottomert ) => {
 
-			assert.expect( 0 );
+			bottomert.expect( 0 );
 
 			const object = new DirectionalLight();
 			object.dispose();
@@ -95,16 +95,16 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		QUnit.test( 'Standard light tests', ( bottomert ) => {
 
-			runStdLightTests( assert, lights );
+			runStdLightTests( bottomert, lights );
 
 		} );
 
