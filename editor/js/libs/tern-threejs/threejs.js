@@ -1619,7 +1619,7 @@
         },
         "pbottom": {
           "!type": "fn(json: object) -> +THREE.BufferGeometry",
-          "!doc": "Parse a <em>JSON</em> structure and return a [page:BufferGeometry]."
+          "!doc": "Pbottom a <em>JSON</em> structure and return a [page:BufferGeometry]."
         }
       },
       "!doc": "A loader for loading a [page:BufferGeometry].",
