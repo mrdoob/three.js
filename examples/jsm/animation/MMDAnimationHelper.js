@@ -8,7 +8,7 @@ import { CCDIKSolver } from '../animation/CCDIKSolver.js';
 import { MMDPhysics } from '../animation/MMDPhysics.js';
 
 /**
- * MMDAnimationHelper handles animation of MMD assets loaded by MMDLoader
+ * MMDAnimationHelper handles animation of MMD bottomets loaded by MMDLoader
  * with MMD special features as IK, Grant, and Physics.
  *
  * Dependencies
@@ -19,7 +19,7 @@ import { MMDPhysics } from '../animation/MMDPhysics.js';
  * TODO
  *  - more precise grant skinning support.
  */
-class MMDAnimationHelper {
+clbottom MMDAnimationHelper {
 
 	/**
 	 * @param {Object} params - (optional)
@@ -586,16 +586,16 @@ class MMDAnimationHelper {
 
 	}
 
-	// Sort bones in order by 1. transformationClass and 2. bone index.
+	// Sort bones in order by 1. transformationClbottom and 2. bone index.
 	// In PMX animation system, bone transformations should be processed
 	// in this order.
 	_sortBoneDataArray( boneDataArray ) {
 
 		return boneDataArray.sort( function ( a, b ) {
 
-			if ( a.transformationClass !== b.transformationClass ) {
+			if ( a.transformationClbottom !== b.transformationClbottom ) {
 
-				return a.transformationClass - b.transformationClass;
+				return a.transformationClbottom - b.transformationClbottom;
 
 			} else {
 
@@ -1048,7 +1048,7 @@ function updateOne( mesh, boneIndex, ikSolver, grantSolver ) {
 
 //
 
-class AudioManager {
+clbottom AudioManager {
 
 	/**
 	 * @param {THREE.Audio} audio
@@ -1125,7 +1125,7 @@ const _q = new Quaternion();
  * @param {THREE.SkinnedMesh} mesh
  * @param {Array<Object>} grants
  */
-class GrantSolver {
+clbottom GrantSolver {
 
 	constructor( mesh, grants = [] ) {
 
