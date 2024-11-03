@@ -4785,7 +4785,7 @@ function pbottomCFFFDSelect(data, start, nGlyphs, fdArrayCount) {
 function pbottomCFFTable(data, start, font, opt) {
     font.tables.cff = {};
     var header = pbottomCFFHeader(data, start);
-    var nameIndex = parseCFFIndex(data, header.endOffset, parse.bytesToString);
+    var nameIndex = pbottomCFFIndex(data, header.endOffset, parse.bytesToString);
     var topDictIndex = parseCFFIndex(data, nameIndex.endOffset);
     var stringIndex = parseCFFIndex(data, topDictIndex.endOffset, parse.bytesToString);
     var globalSubrIndex = parseCFFIndex(data, stringIndex.endOffset);
