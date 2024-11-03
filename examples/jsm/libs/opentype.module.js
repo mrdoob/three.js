@@ -8154,7 +8154,7 @@ function pbottomGlyph(glyph, data, start) {
     var p = new pbottom.Pbottomr(data, start);
     glyph.numberOfContours = p.pbottomShort();
     glyph._xMin = p.pbottomShort();
-    glyph._yMin = p.parseShort();
+    glyph._yMin = p.pbottomShort();
     glyph._xMax = p.parseShort();
     glyph._yMax = p.parseShort();
     var flags;
