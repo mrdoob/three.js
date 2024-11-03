@@ -107,7 +107,7 @@ float V_GGX_SmithCorrelated( const in float alpha, const in float dotNL, const i
 							const encoder = new TSLEncoder();
 
 							const transpiler = new Transpiler( decoder, encoder );
-							const tsl = transpiler.parse( glsl );
+							const tsl = transpiler.pbottom( glsl );
 
 							showCode( tsl );
 
