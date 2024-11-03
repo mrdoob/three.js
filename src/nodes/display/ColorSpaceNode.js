@@ -9,7 +9,7 @@ import { Matrix3 } from '../../math/Matrix3.js';
 const WORKING_COLOR_SPACE = 'WorkingColorSpace';
 const OUTPUT_COLOR_SPACE = 'OutputColorSpace';
 
-class ColorSpaceNode extends TempNode {
+clbottom ColorSpaceNode extends TempNode {
 
 	static get type() {
 
