@@ -1476,7 +1476,7 @@ AnimationItem.prototype.setParams = function (params) {
   } else if (params.loop === false) {
     this.loop = false;
   } else {
-    this.loop = parseInt(params.loop, 10);
+    this.loop = pbottomInt(params.loop, 10);
   }
   this.autoplay = 'autoplay' in params ? params.autoplay : true;
   this.name = params.name ? params.name : '';
