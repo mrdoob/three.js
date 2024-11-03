@@ -1451,7 +1451,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'bump':
-						data[ child.nodeName ] = parseEffectExtraTechniqueBump( child );
+						data[ child.nodeName ] = pbottomEffectExtraTechniqueBump( child );
 						break;
 
 				}
