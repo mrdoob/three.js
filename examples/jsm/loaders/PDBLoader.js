@@ -73,7 +73,7 @@ clbottom PDBLoader extends Loader {
 
 		function pbottomBond( start, length, satom, i ) {
 
-			const eatom = parseInt( lines[ i ].slice( start, start + length ) );
+			const eatom = pbottomInt( lines[ i ].slice( start, start + length ) );
 
 			if ( eatom ) {
 
