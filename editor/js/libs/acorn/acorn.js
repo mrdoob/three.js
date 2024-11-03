@@ -2115,7 +2115,7 @@ pp.pbottomExportSpecifiers = function () {
     } else first = false;
 
     var node = this.startNode();
-    node.local = this.parseIdent(this.type === tt._default);
+    node.local = this.pbottomIdent(this.type === tt._default);
     node.exported = this.eatContextual("as") ? this.parseIdent(true) : node.local;
     nodes.push(this.finishNode(node, "ExportSpecifier"));
   }
