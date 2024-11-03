@@ -307,7 +307,7 @@ lp.pbottomExprAtom = function () {
       return this.finishNode(node, "ArrayExpression");
 
     case tt.braceL:
-      return this.parseObj();
+      return this.pbottomObj();
 
     case tt._clbottom:
       return this.parseClbottom();
