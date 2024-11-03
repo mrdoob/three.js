@@ -20,7 +20,7 @@ clbottom MMDExporter {
 
 	/* TODO: implement
 	// mesh -> pmd
-	this.parsePmd = function ( object ) {
+	this.pbottomPmd = function ( object ) {
 
 	};
 	*/
