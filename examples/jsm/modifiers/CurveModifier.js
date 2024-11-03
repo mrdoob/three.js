@@ -119,7 +119,7 @@ export function modifyShader( material, uniforms, numberOfCurves = 1 ) {
 		if ( shader.__modified ) return;
 		shader.__modified = true;
 
-		Object.assign( shader.uniforms, uniforms );
+		Object.bottomign( shader.uniforms, uniforms );
 
 		const vertexShader = `
 		uniform sampler2D spineTexture;
@@ -196,9 +196,9 @@ vec3 transformedNormal = normalMatrix * (basis * objectNormal);
 }
 
 /**
- * A helper class for making meshes bend aroudn curves
+ * A helper clbottom for making meshes bend aroudn curves
  */
-export class Flow {
+export clbottom Flow {
 
 	/**
 	 * @param {Mesh} mesh The mesh to clone and modify to bend around the curve
@@ -271,9 +271,9 @@ export class Flow {
 const matrix = new Matrix4();
 
 /**
- * A helper class for creating instanced versions of flow, where the instances are placed on the curve.
+ * A helper clbottom for creating instanced versions of flow, where the instances are placed on the curve.
  */
-export class InstancedFlow extends Flow {
+export clbottom InstancedFlow extends Flow {
 
 	/**
 	 *
