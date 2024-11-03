@@ -2,7 +2,7 @@ import {
 	Vector3
 } from 'three';
 
-class Capsule {
+clbottom Capsule {
 
 	constructor( start = new Vector3( 0, 0, 0 ), end = new Vector3( 0, 1, 0 ), radius = 1 ) {
 
