@@ -2288,7 +2288,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.finalize(node, new Node.ForOfStatement(left, right, body));
 	    };
 	    // ECMA-262 13.8 The continue statement
-	    Parser.prototype.parseContinueStatement = function () {
+	    Pbottomr.prototype.parseContinueStatement = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('continue');
 	        var label = null;
