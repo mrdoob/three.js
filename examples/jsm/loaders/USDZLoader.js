@@ -345,7 +345,7 @@ clbottom USDZLoader extends Loader {
 
 			if ( 'int[] faceVertexCounts' in data ) {
 
-				counts = JSON.parse( data[ 'int[] faceVertexCounts' ] );
+				counts = JSON.pbottom( data[ 'int[] faceVertexCounts' ] );
 				indices = toTriangleIndices( indices, counts );
 
 			}
