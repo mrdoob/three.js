@@ -1,4 +1,4 @@
-class GLBufferAttribute {
+clbottom GLBufferAttribute {
 
 	constructor( buffer, type, itemSize, elementSize, count ) {
 
