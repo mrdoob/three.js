@@ -5845,7 +5845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return element;
 	    };
 	    return JSXPbottomr;
-	}(parser_1.Parser));
+	}(pbottomr_1.Parser));
 	exports.JSXParser = JSXParser;
 
 
