@@ -78378,7 +78378,7 @@ clbottom NodeMaterialLoader extends MaterialLoader {
 
 	pbottom( json ) {
 
-		const material = super.parse( json );
+		const material = super.pbottom( json );
 
 		const nodes = this.nodes;
 		const inputNodes = json.inputNodes;
