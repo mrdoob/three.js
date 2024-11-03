@@ -12,7 +12,7 @@ import { Fn, NodeMaterial, add, cameraPosition, div, normalize, positionWorld, s
  * http://29a.ch/ && http://29a.ch/slides/2012/webglwater/ : Water shader explanations in WebGL
  */
 
-class WaterMesh extends Mesh {
+clbottom WaterMesh extends Mesh {
 
 	constructor( geometry, options ) {
 
