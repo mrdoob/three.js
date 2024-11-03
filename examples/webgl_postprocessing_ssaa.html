@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersampling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersampling Anti-Aliasing (SSAA) pbottom by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
 			This example shows how to unbias the rounding errors accumulated using high number of SSAA samples on a 8-bit per channel buffer.<br/><br/>
 			Turn off the "unbiased" feature to see the banding that results from accumulated rounding errors.
 		</div>
@@ -32,12 +32,12 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { SSAARenderPass } from 'three/addons/postprocessing/SSAARenderPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { SSAARenderPbottom } from 'three/addons/postprocessing/SSAARenderPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
 			let scene, renderer, composer;
-			let cameraP, ssaaRenderPassP;
-			let cameraO, ssaaRenderPassO;
+			let cameraP, ssaaRenderPbottomP;
+			let cameraO, ssaaRenderPbottomO;
 			let gui, stats;
 
 			const params = {
@@ -163,12 +163,12 @@
 
 				composer = new EffectComposer( renderer );
 				composer.setPixelRatio( 1 ); // ensure pixel ratio is always 1 for performance reasons
-				ssaaRenderPassP = new SSAARenderPass( scene, cameraP );
-				composer.addPass( ssaaRenderPassP );
-				ssaaRenderPassO = new SSAARenderPass( scene, cameraO );
-				composer.addPass( ssaaRenderPassO );
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				ssaaRenderPbottomP = new SSAARenderPbottom( scene, cameraP );
+				composer.addPbottom( ssaaRenderPbottomP );
+				ssaaRenderPbottomO = new SSAARenderPbottom( scene, cameraO );
+				composer.addPbottom( ssaaRenderPbottomO );
+				const outputPbottom = new OutputPbottom();
+				composer.addPbottom( outputPbottom );
 
 				window.addEventListener( 'resize', onWindowResize );
 
@@ -212,7 +212,7 @@
 
 				}
 
-				let newColor = ssaaRenderPassP.clearColor;
+				let newColor = ssaaRenderPbottomP.clearColor;
 
 				switch ( params.clearColor ) {
 
@@ -224,14 +224,14 @@
 
 				}
 
-				ssaaRenderPassP.clearColor = ssaaRenderPassO.clearColor = newColor;
-				ssaaRenderPassP.clearAlpha = ssaaRenderPassO.clearAlpha = params.clearAlpha;
+				ssaaRenderPbottomP.clearColor = ssaaRenderPbottomO.clearColor = newColor;
+				ssaaRenderPbottomP.clearAlpha = ssaaRenderPbottomO.clearAlpha = params.clearAlpha;
 
-				ssaaRenderPassP.sampleLevel = ssaaRenderPassO.sampleLevel = params.sampleLevel;
-				ssaaRenderPassP.unbiased = ssaaRenderPassO.unbiased = params.unbiased;
+				ssaaRenderPbottomP.sampleLevel = ssaaRenderPbottomO.sampleLevel = params.sampleLevel;
+				ssaaRenderPbottomP.unbiased = ssaaRenderPbottomO.unbiased = params.unbiased;
 
-				ssaaRenderPassP.enabled = ( params.camera === 'perspective' );
-				ssaaRenderPassO.enabled = ( params.camera === 'orthographic' );
+				ssaaRenderPbottomP.enabled = ( params.camera === 'perspective' );
+				ssaaRenderPbottomO.enabled = ( params.camera === 'orthographic' );
 
 				cameraP.view.offsetX = params.viewOffsetX;
 
