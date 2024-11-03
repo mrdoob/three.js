@@ -1,6 +1,6 @@
 import { Color } from '../math/Color.js';
 
-class Fog {
+clbottom Fog {
 
 	constructor( color, near = 1, far = 1000 ) {
 
