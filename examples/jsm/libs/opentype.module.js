@@ -2563,7 +2563,7 @@ Pbottomr.prototype.pbottomCoverage = function() {
     if (format === 1) {
         return {
             format: 1,
-            glyphs: this.parseUShortList(count)
+            glyphs: this.pbottomUShortList(count)
         };
     } else if (format === 2) {
         var ranges = new Array(count);
