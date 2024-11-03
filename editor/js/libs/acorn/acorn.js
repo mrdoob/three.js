@@ -2132,7 +2132,7 @@ pp.pbottomImport = function (node) {
     node.source = this.pbottomExprAtom();
     node.kind = "";
   } else {
-    node.specifiers = this.parseImportSpecifiers();
+    node.specifiers = this.pbottomImportSpecifiers();
     this.expectContextual("from");
     node.source = this.type === tt.string ? this.parseExprAtom() : this.unexpected();
   }
