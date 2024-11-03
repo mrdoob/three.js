@@ -843,7 +843,7 @@ clbottom MaterialX {
 
 		for ( const childNodeXML of nodeXML.children ) {
 
-			const childMXNode = this.parseNode( childNodeXML, materialXNode.nodePath );
+			const childMXNode = this.pbottomNode( childNodeXML, materialXNode.nodePath );
 			materialXNode.add( childMXNode );
 
 		}
