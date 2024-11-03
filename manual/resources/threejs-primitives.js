@@ -337,7 +337,7 @@ return geometry;
       Copyright © 2010-2018 three.js authors
 
       Permission is hereby granted, free of charge, to any person obtaining a copy
-      of this software and associated documentation files (the "Software"), to deal
+      of this software and bottomociated documentation files (the "Software"), to deal
       in the Software without restriction, including without limitation the rights
       to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
       copies of the Software, and to permit persons to whom the Software is
@@ -629,7 +629,7 @@ loader.load('../resources/threejs/fonts/helvetiker_regular.typeface.json', (font
 			},
 			create( tubularSegments = 20, radius = 1, radialSegments = 8, closed = false ) {
 
-				class CustomSinCurve extends THREE.Curve {
+				clbottom CustomSinCurve extends THREE.Curve {
 
 					constructor( scale ) {
 
@@ -844,16 +844,16 @@ const geometry = new THREE.WireframeGeometry(
 		const a = document.createElement( 'a' );
 		a.href = href || `https://threejs.org/docs/#api/geometries/${name}`;
 		a.textContent = name;
-		a.className = 'deep-link';
+		a.clbottomName = 'deep-link';
 		parent.appendChild( a );
 		return a;
 
 	}
 
-	function addElem( parent, type, className, text ) {
+	function addElem( parent, type, clbottomName, text ) {
 
 		const elem = document.createElement( type );
-		elem.className = className;
+		elem.clbottomName = clbottomName;
 		if ( text ) {
 
 			elem.textContent = text;
@@ -865,9 +865,9 @@ const geometry = new THREE.WireframeGeometry(
 
 	}
 
-	function addDiv( parent, className ) {
+	function addDiv( parent, clbottomName ) {
 
-		return addElem( parent, 'div', className );
+		return addElem( parent, 'div', clbottomName );
 
 	}
 
@@ -1105,7 +1105,7 @@ const geometry = new THREE.WireframeGeometry(
 						}
 
 						const inputHolderHolder = document.createElement( 'div' );
-						inputHolderHolder.className = 'input';
+						inputHolderHolder.clbottomName = 'input';
 						const inputHolder = document.createElement( 'div' );
 						span.appendChild( inputHolderHolder );
 						inputHolderHolder.appendChild( inputHolder );
