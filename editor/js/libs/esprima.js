@@ -1768,7 +1768,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // ECMA-262 12.16 Comma Operator
 	    Pbottomr.prototype.pbottomExpression = function () {
 	        var startToken = this.lookahead;
-	        var expr = this.isolateCoverGrammar(this.parseAssignmentExpression);
+	        var expr = this.isolateCoverGrammar(this.pbottomAssignmentExpression);
 	        if (this.match(',')) {
 	            var expressions = [];
 	            expressions.push(expr);
