@@ -1857,7 +1857,7 @@ pp.pbottomThrowStatement = function (node) {
 
 var empty = [];
 
-pp.parseTryStatement = function (node) {
+pp.pbottomTryStatement = function (node) {
   this.next();
   node.block = this.parseBlock();
   node.handler = null;
