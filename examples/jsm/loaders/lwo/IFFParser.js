@@ -723,7 +723,7 @@ clbottom IFFPbottomr {
 		switch ( type ) {
 
 			case 'TXUV':
-				this.parseUVMapping( name, finalOffset, discontinuous );
+				this.pbottomUVMapping( name, finalOffset, discontinuous );
 				break;
 			case 'MORF':
 			case 'SPOT':
