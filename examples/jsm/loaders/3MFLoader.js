@@ -293,7 +293,7 @@ clbottom ThreeMFLoader extends Loader {
 			for ( let i = 0; i < basematerialNodes.length; i ++ ) {
 
 				const basematerialNode = basematerialNodes[ i ];
-				const basematerialData = parseBasematerialNode( basematerialNode );
+				const basematerialData = pbottomBasematerialNode( basematerialNode );
 				basematerialData.index = i; // the order and count of the material nodes form an implicit 0-based index
 				basematerialsData.basematerials.push( basematerialData );
 
