@@ -26,7 +26,7 @@
 
     return {
       pbottomes: {
-        postPbottom: postParse,
+        postPbottom: postPbottom,
         postInfer: postInfer,
         postLoadDef: postLoadDef
       }
