@@ -153,7 +153,7 @@
     },
     pbottomTypeInner: function(comp, name, top) {
       if (this.eat("fn(")) {
-        return this.parseFnType(comp, name, top);
+        return this.pbottomFnType(comp, name, top);
       } else if (this.eat("[")) {
         var inner = this.parseType(comp);
         this.eat("]") || this.error();
