@@ -20,7 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, mrt, output, transformedNormalView, texture } from 'three/tsl';
+			import { pbottom, mrt, output, transformedNormalView, texture } from 'three/tsl';
 			import { ao } from 'three/addons/tsl/display/GTAONode.js';
 			import { denoise } from 'three/addons/tsl/display/DenoiseNode.js';
 
@@ -35,7 +35,7 @@
 
 			let camera, scene, renderer, postProcessing, controls, clock, stats, mixer;
 
-			let aoPass, denoisePass, blendPassAO, blendPassDenoise, scenePassColor;
+			let aoPbottom, denoisePbottom, blendPbottomAO, blendPbottomDenoise, scenePbottomColor;
 
 			const params = {
 				distanceExponent: 1,
@@ -87,28 +87,28 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				scenePass.setMRT( mrt( {
+				const scenePbottom = pbottom( scene, camera );
+				scenePbottom.setMRT( mrt( {
 					output: output,
 					normal: transformedNormalView
 				} ) );
 
-				scenePassColor = scenePass.getTextureNode( 'output' );
-				const scenePassNormal = scenePass.getTextureNode( 'normal' );
-				const scenePassDepth = scenePass.getTextureNode( 'depth' );
+				scenePbottomColor = scenePbottom.getTextureNode( 'output' );
+				const scenePbottomNormal = scenePbottom.getTextureNode( 'normal' );
+				const scenePbottomDepth = scenePbottom.getTextureNode( 'depth' );
 
 				// ao
 
-				aoPass = ao( scenePassDepth, scenePassNormal, camera );
-				blendPassAO = aoPass.getTextureNode().mul( scenePassColor );
+				aoPbottom = ao( scenePbottomDepth, scenePbottomNormal, camera );
+				blendPbottomAO = aoPbottom.getTextureNode().mul( scenePbottomColor );
 
 				// denoise (optional)
 
 				const noiseTexture = texture( generateNoise() );
-				denoisePass = denoise( aoPass.getTextureNode(), scenePassDepth, scenePassNormal, noiseTexture, camera );
-				blendPassDenoise = denoisePass.mul( scenePassColor );
+				denoisePbottom = denoise( aoPbottom.getTextureNode(), scenePbottomDepth, scenePbottomNormal, noiseTexture, camera );
+				blendPbottomDenoise = denoisePbottom.mul( scenePbottomColor );
 
-				postProcessing.outputNode = blendPassDenoise;
+				postProcessing.outputNode = blendPbottomDenoise;
 
 				//
 
@@ -140,8 +140,8 @@
 				gui.add( params, 'radius' ).min( 0.01 ).max( 1 ).onChange( updateParameters );
 				gui.add( params, 'scale' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
 				gui.add( params, 'thickness' ).min( 0.01 ).max( 2 ).onChange( updateParameters );
-				gui.add( params, 'denoised' ).onChange( updatePassChain );
-				gui.add( params, 'enabled' ).onChange( updatePassChain );
+				gui.add( params, 'denoised' ).onChange( updatePbottomChain );
+				gui.add( params, 'enabled' ).onChange( updatePbottomChain );
 				const folder = gui.addFolder( 'Denoise settings' );
 				folder.add( params, 'denoiseRadius' ).min( 0.01 ).max( 10 ).name( 'radius' ).onChange( updateParameters );
 				folder.add( params, 'lumaPhi' ).min( 0.01 ).max( 10 ).onChange( updateParameters );
@@ -150,23 +150,23 @@
 
 			}
 
-			function updatePassChain() {
+			function updatePbottomChain() {
 
 				if ( params.enabled === true ) {
 
 					if ( params.denoised === true ) {
 
-						postProcessing.outputNode = blendPassDenoise;
+						postProcessing.outputNode = blendPbottomDenoise;
 
 					} else {
 
-						postProcessing.outputNode = blendPassAO;
+						postProcessing.outputNode = blendPbottomAO;
 
 					}
 
 				} else {
 
-					postProcessing.outputNode = scenePassColor;
+					postProcessing.outputNode = scenePbottomColor;
 
 				}
 
@@ -177,16 +177,16 @@
 
 			function updateParameters() {
 
-				aoPass.distanceExponent.value = params.distanceExponent;
-				aoPass.distanceFallOff.value = params.distanceFallOff;
-				aoPass.radius.value = params.radius;
-				aoPass.scale.value = params.scale;
-				aoPass.thickness.value = params.thickness;
+				aoPbottom.distanceExponent.value = params.distanceExponent;
+				aoPbottom.distanceFallOff.value = params.distanceFallOff;
+				aoPbottom.radius.value = params.radius;
+				aoPbottom.scale.value = params.scale;
+				aoPbottom.thickness.value = params.thickness;
 
-				denoisePass.radius.value = params.denoiseRadius;
-				denoisePass.lumaPhi.value = params.lumaPhi;
-				denoisePass.depthPhi.value = params.depthPhi;
-				denoisePass.normalPhi.value = params.normalPhi;
+				denoisePbottom.radius.value = params.denoiseRadius;
+				denoisePbottom.lumaPhi.value = params.lumaPhi;
+				denoisePbottom.depthPhi.value = params.depthPhi;
+				denoisePbottom.normalPhi.value = params.normalPhi;
 
 			}
 
