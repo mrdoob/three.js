@@ -9,10 +9,10 @@ export default QUnit.module( 'Materials', () => {
 	QUnit.module( 'MeshDistanceMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new MeshDistanceMaterial();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Material, true,
 				'MeshDistanceMaterial extends from Material'
 			);
@@ -20,68 +20,68 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new MeshDistanceMaterial();
-			assert.ok( object, 'Can instantiate a MeshDistanceMaterial.' );
+			bottomert.ok( object, 'Can instantiate a MeshDistanceMaterial.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new MeshDistanceMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'MeshDistanceMaterial',
 				'MeshDistanceMaterial.type should be MeshDistanceMaterial'
 			);
 
 		} );
 
-		QUnit.todo( 'map', ( assert ) => {
+		QUnit.todo( 'map', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'alphaMap', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'displacementMap', ( assert ) => {
+		QUnit.todo( 'alphaMap', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'displacementScale', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'displacementBias', ( assert ) => {
+		QUnit.todo( 'displacementMap', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'displacementScale', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'displacementBias', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isMeshDistanceMaterial', ( assert ) => {
+		QUnit.test( 'isMeshDistanceMaterial', ( bottomert ) => {
 
 			const object = new MeshDistanceMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.isMeshDistanceMaterial,
 				'MeshDistanceMaterial.isMeshDistanceMaterial should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
