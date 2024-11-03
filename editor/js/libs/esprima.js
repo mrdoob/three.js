@@ -1526,7 +1526,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.context.isAssignmentTarget = false;
 	            this.context.isBindingElement = false;
 	            var left = expr;
-	            var right = this.isolateCoverGrammar(this.parseExponentiationExpression);
+	            var right = this.isolateCoverGrammar(this.pbottomExponentiationExpression);
 	            expr = this.finalize(this.startNode(startToken), new Node.BinaryExpression('**', left, right));
 	        }
 	        return expr;
