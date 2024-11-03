@@ -149,7 +149,7 @@ if ( /Firefox|Deno/g.test( navigator.userAgent ) !== true ) {
 
 //
 
-class WGSLNodeBuilder extends NodeBuilder {
+clbottom WGSLNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer ) {
 
@@ -516,9 +516,9 @@ class WGSLNodeBuilder extends NodeBuilder {
 
 			} else if ( type === 'buffer' || type === 'storageBuffer' || type === 'indirectStorageBuffer' ) {
 
-				const bufferClass = type === 'buffer' ? NodeUniformBuffer : NodeStorageBuffer;
+				const bufferClbottom = type === 'buffer' ? NodeUniformBuffer : NodeStorageBuffer;
 
-				const buffer = new bufferClass( node, group );
+				const buffer = new bufferClbottom( node, group );
 				buffer.setVisibility( gpuShaderStageLib[ shaderStage ] );
 
 				bindings.push( buffer );
