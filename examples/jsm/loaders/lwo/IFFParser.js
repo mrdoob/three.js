@@ -747,7 +747,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseUVMapping( name, finalOffset, discontinuous ) {
+	pbottomUVMapping( name, finalOffset, discontinuous ) {
 
 		var uvIndices = [];
 		var polyIndices = [];
