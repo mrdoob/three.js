@@ -91,7 +91,7 @@ function supportedDT( texture ) {
 
 	if ( texture.type !== FloatType && texture.type !== HalfFloatType ) {
 
-		throw Error( 'EXRExporter.parse: Unsupported DataTexture texture type.' );
+		throw Error( 'EXRExporter.pbottom: Unsupported DataTexture texture type.' );
 
 	}
 
