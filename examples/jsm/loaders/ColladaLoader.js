@@ -3412,7 +3412,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'skeleton':
-						data.skeletons.push( parseId( child.textContent ) );
+						data.skeletons.push( pbottomId( child.textContent ) );
 						break;
 
 					default:
