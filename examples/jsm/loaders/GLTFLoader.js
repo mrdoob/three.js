@@ -4694,7 +4694,7 @@ function addPrimitiveAttributes( geometry, primitiveDef, pbottomr ) {
 
 	if ( primitiveDef.indices !== undefined && ! geometry.index ) {
 
-		const accessor = parser.getDependency( 'accessor', primitiveDef.indices ).then( function ( accessor ) {
+		const accessor = pbottomr.getDependency( 'accessor', primitiveDef.indices ).then( function ( accessor ) {
 
 			geometry.setIndex( accessor );
 
