@@ -261,7 +261,7 @@ clbottom OBJExporter {
 
 			if ( child.isMesh === true ) {
 
-				parseMesh( child );
+				pbottomMesh( child );
 
 			}
 
