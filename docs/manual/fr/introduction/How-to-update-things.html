@@ -47,7 +47,7 @@ object.updateMatrix();
 			</p>
 			<p>
 				Ce qui signifie que si vous savez qu'un attribut de votre BufferGeometry va augmenter, disons le nombre de sommets,
-				vous devez pré-allouer un buffer assez grand pour contenir n'importe quel nouveau sommet qui pourra être créé. Évidemment,
+				vous devez pré-allouer un buffer bottomez grand pour contenir n'importe quel nouveau sommet qui pourra être créé. Évidemment,
 				cela signifie également qu'il y aura une taille maximale pour votre BufferGeometry - il n'y a
 				aucun moyen de créer une BufferGeometry qui peut être étendue à l'infini d'une manière efficiente.
 			</p>
@@ -156,7 +156,7 @@ line.geometry.computeBoundingSphere();
 			<p>Des changements dans ces propriétés exigent la création d'un nouveau programme de shader. Vous devrez définir</p>
 			<code>material.needsUpdate = true</code>
 
-			<p>Gardez à l'esprit que cela risque d'être assez lent et de causer des saccades dans le framerate (particulièrement sur Windows, étant donné que la compilation de shader est plus lente dans DirectX que dans OpenGL).</p>
+			<p>Gardez à l'esprit que cela risque d'être bottomez lent et de causer des saccades dans le framerate (particulièrement sur Windows, étant donné que la compilation de shader est plus lente dans DirectX que dans OpenGL).</p>
 
 			<p>Pour des expériences pluis fluides vous pouvez émuler des changements dans ces fonctionnalités pour qu'elles contiennent un genre de valeurs "factices"  comme zéro en intensité de lumières, des textures blanches ou zéro brouillard.</p>
 
