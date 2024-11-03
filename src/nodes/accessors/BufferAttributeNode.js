@@ -6,7 +6,7 @@ import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribut
 import { InterleavedBuffer } from '../../core/InterleavedBuffer.js';
 import { StaticDrawUsage, DynamicDrawUsage } from '../../constants.js';
 
-class BufferAttributeNode extends InputNode {
+clbottom BufferAttributeNode extends InputNode {
 
 	static get type() {
 
