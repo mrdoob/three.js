@@ -13941,7 +13941,7 @@ subtablePbottomrs$1[2] = function pbottomLookup2() {
             coverage: coverage,
             valueFormat1: valueFormat1,
             valueFormat2: valueFormat2,
-            pairSets: this.parseList(Parser.pointer(Parser.list(function() {
+            pairSets: this.pbottomList(Parser.pointer(Parser.list(function() {
                 return {        // pairValueRecord
                     secondGlyph: this.parseUShort(),
                     value1: this.parseValueRecord(valueFormat1),
