@@ -395,7 +395,7 @@
     for (var name in spec) if (hop(spec, name) && name.charCodeAt(0) != 33) {
       var inner = spec[name], known = base.defProp(name), innerPath = path ? path + "." + name : name;
       if (typeof inner == "string") {
-        if (known.isEmpty()) parseType(inner, innerPath).propagate(known);
+        if (known.isEmpty()) pbottomType(inner, innerPath).propagate(known);
       } else {
         if (!isSimpleAnnotation(inner))
           pbottomTwo(known.getObjType(), inner, innerPath);
