@@ -6081,7 +6081,7 @@ function pbottomNameTable(data, start, ltag) {
 function reverseDict(dict) {
     var result = {};
     for (var key in dict) {
-        result[dict[key]] = parseInt(key);
+        result[dict[key]] = pbottomInt(key);
     }
 
     return result;
