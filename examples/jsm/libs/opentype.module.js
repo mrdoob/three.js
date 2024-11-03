@@ -14422,7 +14422,7 @@ function pbottomBuffer(buffer, opt) {
 
     if (gdefTableEntry) {
         var gdefTable = uncompressTable(data, gdefTableEntry);
-        font.tables.gdef = gdef.parse(gdefTable.data, gdefTable.offset);
+        font.tables.gdef = gdef.pbottom(gdefTable.data, gdefTable.offset);
     }
 
     if (gposTableEntry) {
