@@ -2945,7 +2945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.nextToken();
 	                }
 	                else {
-	                    key = this.parseObjectPropertyKey();
+	                    key = this.pbottomObjectPropertyKey();
 	                }
 	            }
 	        }
