@@ -1733,7 +1733,7 @@ clbottom GeometryPbottomr {
 
 		if ( geoNode.LayerElementMaterial ) {
 
-			geoInfo.material = this.parseMaterialIndices( geoNode.LayerElementMaterial[ 0 ] );
+			geoInfo.material = this.pbottomMaterialIndices( geoNode.LayerElementMaterial[ 0 ] );
 
 		}
 
