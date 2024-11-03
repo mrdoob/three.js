@@ -20,12 +20,12 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>でGLFTファイルを読み込む</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>前回のレッスンは<a href="load-obj.html">OBJファイルの読み込み</a>でした。
 まだ読んでいない方は、まずそちらをチェックしてみて下さい。</p>
 <p>前回の記事で指摘したように、OBJファイルフォーマットは非常に古くかなり単純です。
@@ -74,11 +74,11 @@ OBJとは異なり、gLTFではマテリアルはフォーマットの直接的�
 少なくともglTFファイルを読み込む例を見せるべきで、私が遭遇した問題をレビューすると皆さんが良い情報を得られるかもしれないと思いました。</p>
 <p>ネットで検索したら<a href="https://sketchfab.com/antonmoek">antonmoek</a>さんの<a href="https://sketchfab.com/models/edd1c604e1e045a0a2a552ddd9a293e6">低ポリゴンのシティモデル</a>を見つけました。
 運が良ければ良い例になるように思えました。</p>
-<div class="threejs_center"><img src="../resources/images/cartoon_lowpoly_small_city_free_pack.jpg"></div>
+<div clbottom="threejs_center"><img src="../resources/images/cartoon_lowpoly_small_city_free_pack.jpg"></div>
 
 <p><a href="load-obj.html">OBJファイルの読み込みのコード例</a>から始めて、OBJを読み込むコードを削除し、GLTFを読み込むコードに置き換えました。</p>
 <p>以前のOBJコードは</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const mtlLoader = new MTLLoader();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const mtlLoader = new MTLLoader();
 mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
   mtl.preload();
   mtl.materials.Material.side = THREE.DoubleSide;
@@ -91,7 +91,7 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
 });
 </pre>
 <p>新しいGLTFのコードは</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const gltfLoader = new GLTFLoader();
   const url = 'resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf';
   gltfLoader.load(url, (gltf) =&gt; {
@@ -101,16 +101,16 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
   });
 </pre>
 <p>自動フレーミングのコードは以前のままです。</p>
-<p>また <a href="/docs/#examples/loaders/OBJLoader"><code class="notranslate" translate="no">OBJLoader</code></a> を取り除き <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> を含める必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from 'three/addons/loaders/LoaderSupport.js';
+<p>また <a href="/docs/#examples/loaders/OBJLoader"><code clbottom="notranslate" translate="no">OBJLoader</code></a> を取り除き <a href="/docs/#examples/loaders/GLTFLoader"><code clbottom="notranslate" translate="no">GLTFLoader</code></a> を含める必要があります。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">-import {LoaderSupport} from 'three/addons/loaders/LoaderSupport.js';
 -import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
 -import {MTLLoader} from 'three/addons/loaders/MTLLoader.js';
 +import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 </pre>
 <p>実行すると以下になりました。</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -118,7 +118,7 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
 <p>次に走り回る車をアニメーションしたかったので、シーンに車が別のエンティティとして設定されているか、それが使用できるように設定されているか確認する必要があります。</p>
 <p><a href="debugging-javascript.html">JavaScriptコンソール</a>にシーングラフをダンプするコードを書いてみました。</p>
 <p>シーングラフを表示するコードです。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function dumpObject(obj, lines = [], isLast = true, prefix = '') {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function dumpObject(obj, lines = [], isLast = true, prefix = '') {
   const localPrefix = isLast ? '└─' : '├─';
   lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
   const newPrefix = prefix + (isLast ? '  ' : '│ ');
@@ -131,14 +131,14 @@ mtlLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', (mtl) =&gt; {
 }
 </pre>
 <p>そして、シーンを読み込み直後に呼び出します。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gltfLoader = new GLTFLoader();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const gltfLoader = new GLTFLoader();
 gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
   const root = gltf.scene;
   scene.add(root);
   console.log(dumpObject(root).join('\n'));
 </pre>
 <p><a href="../examples/load-gltf-dump-scenegraph.html">実行すると</a> このようなリストが得られました。</p>
-<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+<pre clbottom="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
   └─RootNode_(gltf_orientation_matrix) [Object3D]
     └─RootNode_(model_correction_matrix) [Object3D]
       └─4d4100bcb1c640e69699a87140df79d7fbx [Object3D]
@@ -177,8 +177,8 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
           │ │ └─Car_04_2_2_World_ap_0 [Mesh]
           ...
 </pre>
-<p>この結果から全ての車が <code class="notranslate" translate="no">"Cars"</code> という名前の親の下にある事がわかります。</p>
-<pre class="prettyprint showlinemods notranslate lang-text" translate="no">*          ├─Cars [Object3D]
+<p>この結果から全ての車が <code clbottom="notranslate" translate="no">"Cars"</code> という名前の親の下にある事がわかります。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-text" translate="no">*          ├─Cars [Object3D]
           │ ├─CAR_03_1 [Object3D]
           │ │ └─CAR_03_1_World_ap_0 [Mesh]
           │ ├─CAR_03 [Object3D]
@@ -188,7 +188,7 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 </pre>
 <p>そこで簡単なテストとして、"Cars"ノードの全ての子をY軸の周りに回転させようと思いました。</p>
 <p>シーンを読み込み後に"Cars"ノードを調べて結果を保存しました。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let cars;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+let cars;
 {
   const gltfLoader = new GLTFLoader();
   gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
@@ -196,8 +196,8 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
     scene.add(root);
 +    cars = root.getObjectByName('Cars');
 </pre>
-<p><code class="notranslate" translate="no">render</code> 関数で <code class="notranslate" translate="no">cars</code> の全ての子の回転を設定します。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function render(time) {
+<p><code clbottom="notranslate" translate="no">render</code> 関数で <code clbottom="notranslate" translate="no">cars</code> の全ての子の回転を設定します。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+function render(time) {
 +  time *= 0.001;  // convert to seconds
 
   if (resizeRendererToDisplaySize(renderer)) {
@@ -218,23 +218,23 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 }
 </pre>
 <p>これが結果です。</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf-rotate-cars.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf-rotate-cars.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
 <p>うーん、残念ながら子のオリジンが回転目的のために設定されておらず、アニメーション用に設計されてないようです。トラックの回転方向が間違っています。</p>
 <p>3Dで何かする場合の重要なポイントは、事前に計画を立ててアセットを設計する必要があります。アセットを正しい場所に配置し、正しいスケールになるようにデザインします。</p>
 <p>私は3DCGアーティストではなくBlenderもよく知らないので、ハックしてみます。
-それぞれの車で別の <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を親にします。
-次に <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> オブジェクトを移動させて車を移動させます。
-個々に車のオリジンに <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を設定して向きを変えられるので、必要な位置に設定する事ができます。</p>
+それぞれの車で別の <a href="/docs/#api/ja/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> を親にします。
+次に <a href="/docs/#api/ja/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> オブジェクトを移動させて車を移動させます。
+個々に車のオリジンに <a href="/docs/#api/ja/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> を設定して向きを変えられるので、必要な位置に設定する事ができます。</p>
 <p>シーングラフのリストを見返すと "Car_08", "CAR_03", "Car_04" の3種類しかないようです。上手くいけば3種類の調整で済みます。</p>
 <p>コードを以下のように変更しました。
-それぞれの車でインスタンス作成した <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> を親にし、その <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> をシーンに追加します。
-<em>車種</em>ごとの設定で向きを固定し、車の親の <a href="/docs/#api/ja/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a> の <code class="notranslate" translate="no">cars</code> 配列を追加します。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-let cars;
+それぞれの車でインスタンス作成した <a href="/docs/#api/ja/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> を親にし、その <a href="/docs/#api/ja/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> をシーンに追加します。
+<em>車種</em>ごとの設定で向きを固定し、車の親の <a href="/docs/#api/ja/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a> の <code clbottom="notranslate" translate="no">cars</code> 配列を追加します。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-let cars;
 +const cars = [];
 {
   const gltfLoader = new GLTFLoader();
@@ -264,9 +264,9 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
      ...
 </pre>
 <p>これで車の向きを修正しました。</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars-fixed.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf-rotate-cars-fixed.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-rotate-cars-fixed.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf-rotate-cars-fixed.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
@@ -274,14 +274,14 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 <p>簡単なドライビングシステムを作るのはこの記事では無理がありますが、
 その代わりに入り組んだパスを1本にし、そのパスに車を乗せる事ができそうです。
 以下の画像はBlenderでパスを作っている途中です。</p>
-<div class="threejs_center"><img src="../resources/images/making-path-for-cars.jpg" style="width: 1094px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/making-path-for-cars.jpg" style="width: 1094px"></div>
 
 <p>Blenderからパスのデータを取り出す方法が必要でした。
 幸運な事にパスだけを選択し、"write nurbs"をチェックしてobjをエクスポートできました。</p>
-<div class="threejs_center"><img src="../resources/images/blender-export-obj-write-nurbs.jpg" style="width: 498px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/blender-export-obj-write-nurbs.jpg" style="width: 498px"></div>
 
 <p>OBJファイルを開くと頂点のリストを得る事ができました。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const controlPoints = [
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const controlPoints = [
   [1.118281, 5.115846, -3.681386],
   [3.948875, 5.115846, -3.641834],
   [3.960072, 5.115846, -0.240352],
@@ -306,19 +306,19 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
 ];
 </pre>
 <p>THREE.jsにはいくつかの曲線クラスがあります。
-<a href="/docs/#api/ja/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> が使えそうな気がしたので <a href="/docs/#api/ja/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> を使ってみた。
+<a href="/docs/#api/ja/extras/curves/CatmullRomCurve3"><code clbottom="notranslate" translate="no">CatmullRomCurve3</code></a> が使えそうな気がしたので <a href="/docs/#api/ja/extras/curves/CatmullRomCurve3"><code clbottom="notranslate" translate="no">CatmullRomCurve3</code></a> を使ってみた。
 この曲線は頂点を通る滑らかな曲線を作ります。</p>
 <p>実際にはこれらの頂点を直接入力すると次のような曲線が生成されます。</p>
-<div class="threejs_center"><img src="../resources/images/car-curves-before.png" style="width: 400px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/car-curves-before.png" style="width: 400px"></div>
 
 <p>しかし、もっと角をシャープにして欲しいです。
 いくつかの頂点を追加し計算すれば、望んだ角度が得られる気がします。
-各頂点のペアで2つのポイントの間の10%と90%の道を計算し、その結果を <a href="/docs/#api/ja/extras/curves/CatmullRomCurve3"><code class="notranslate" translate="no">CatmullRomCurve3</code></a> に渡します。</p>
+各頂点のペアで2つのポイントの間の10%と90%の道を計算し、その結果を <a href="/docs/#api/ja/extras/curves/CatmullRomCurve3"><code clbottom="notranslate" translate="no">CatmullRomCurve3</code></a> に渡します。</p>
 <p>このような曲線が得られます。</p>
-<div class="threejs_center"><img src="../resources/images/car-curves-after.png" style="width: 400px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/car-curves-after.png" style="width: 400px"></div>
 
 <p>曲線を作成するコードは以下の通りです。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let curve;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">let curve;
 let curveObject;
 {
   const controlPoints = [
@@ -371,27 +371,27 @@ let curveObject;
 コードの2番目の部分は曲線から250頂点を生成し、その250頂点を結んで作られた線を表示するオブジェクトを作成します。</p>
 <p><a href="../examples/load-gltf-car-path.html">このサンプル</a>を実行してもカーブが見えませんでした。
 見えるようにするために、深度テストを無視して最後にレンダリングするようにしました。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">    curveObject = new THREE.Line(geometry, material);
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">    curveObject = new THREE.Line(geometry, material);
 +    material.depthTest = false;
 +    curveObject.renderOrder = 1;
 </pre>
 <p>そして、カーブがあまりにも小さすぎる事に気がつきました。</p>
-<div class="threejs_center"><img src="../resources/images/car-curves-too-small.png" style="width: 498px"></div>
+<div clbottom="threejs_center"><img src="../resources/images/car-curves-too-small.png" style="width: 498px"></div>
 
 <p>Blenderで階層を確認してみると、3DCGアーティストが全ての親となるノードをスケーリングしていました。</p>
-<div class="threejs_center"><img src="../resources/images/cars-scale-0.01.png" style="width: 342px;"></div>
+<div clbottom="threejs_center"><img src="../resources/images/cars-scale-0.01.png" style="width: 342px;"></div>
 
 <p>リアルタイムの3Dアプリではスケーリングが悪です。
 リアルタイム3Dを行う際には、様々な問題が発生し不満が尽きません。
 3Dアプリ開発ではシーン全体を拡大縮小するのはとても簡単ですが、3DCGアーティストはこれを知らない事が多いです。
 もしあなたがリアルタイムの3Dアプリを作ろうと決めたら、3DCGアーティストには絶対に何もスケールしないようにお願いする事をお勧めします。
 スケールを変更する場合は、そのスケールを頂点に適用する方法を見つける必要があります。</p>
-<p>スケールだけでなく、その親である <code class="notranslate" translate="no">Cars</code> ノードによって回転されオフセットされます。
+<p>スケールだけでなく、その親である <code clbottom="notranslate" translate="no">Cars</code> ノードによって回転されオフセットされます。
 これでは実行時にワールド座標での車の移動が困難になります。
 はっきり言うと、この場合はワールド座標で車を走らせたいのでこの問題が出てきます。
 月が地球を中心に回転しているようなローカル座標で操作される場合、これはあまり問題ではありません。</p>
 <p>上記で書いたシーングラフをダンプする関数に戻り、各ノードの位置、回転、スケールをダンプしてみましょう。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function dumpVec3(v3, precision = 3) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+function dumpVec3(v3, precision = 3) {
 +  return `${v3.x.toFixed(precision)}, ${v3.y.toFixed(precision)}, ${v3.z.toFixed(precision)}`;
 +}
 
@@ -414,7 +414,7 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
 }
 </pre>
 <p><a href="../examples/load-gltf-dump-scenegraph-extra.html">それを実行</a>した結果です。</p>
-<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+<pre clbottom="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
   │   pos: 0.000, 0.000, 0.000
   │   rot: 0.000, 0.000, 0.000
   │   scl: 1.000, 1.000, 1.000
@@ -447,12 +447,12 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
           │ │       rot: 0.000, 0.000, 0.000
           │ │       scl: 1.000, 1.000, 1.000
 </pre>
-<p>これは元のシーンの <code class="notranslate" translate="no">Cars</code> の回転とスケールが削除され、子に適用されています。
+<p>これは元のシーンの <code clbottom="notranslate" translate="no">Cars</code> の回転とスケールが削除され、子に適用されています。
 この原因は、GLTFファイルを作成するために使用されたエクスポータが何か特別な作業をしたか、または3DCGアーティストが対応するblendファイルとは異なるバージョンのファイルをエクスポートした可能性が高いです。</p>
 <p>この事から学ぶ教訓は、blendファイルをダウンロードして自分でエクスポートするべきという事です。
 エクスポートする前に主要なノードを全て検査し、変換を削除しておくべきでした。</p>
 <p>Topにあるこれら全てのノードは以下の通りです。</p>
-<pre class="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
+<pre clbottom="prettyprint showlinemods notranslate lang-text" translate="no">OSG_Scene [Scene]
   │   pos: 0.000, 0.000, 0.000
   │   rot: 0.000, 0.000, 0.000
   │   scl: 1.000, 1.000, 1.000
@@ -476,7 +476,7 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
 <p>いずれにしても、カーブを表示するために使用しているオブジェクトを調整するのが一番手っ取り早いのですが、最善の方法ではないかもしれません。</p>
 <p>結局はこんな感じですね。</p>
 <p>最初にカーブの位置を調整し、上手くいきそうな値を見つけました。そして隠しました。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const points = curve.getPoints(250);
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
   const material = new THREE.LineBasicMaterial({color: 0xff0000});
@@ -490,10 +490,10 @@ function dumpObject(obj, lines, isLast = true, prefix = '') {
 }
 </pre>
 <p>それからカーブに沿って移動させるコードを書きました。
-それぞれの車で曲線に沿って0から1までの位置を選び <code class="notranslate" translate="no">curveObject</code> を用いてワールド座標上の頂点を計算して変換します。
+それぞれの車で曲線に沿って0から1までの位置を選び <code clbottom="notranslate" translate="no">curveObject</code> を用いてワールド座標上の頂点を計算して変換します。
 次にカーブの少し下の方にある別の頂点を選びます。
-車の向きを <code class="notranslate" translate="no">lookAt</code> で設定し、2点間の中間点に車を配置します。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// create 2 Vector3s we can use for path calculations
+車の向きを <code clbottom="notranslate" translate="no">lookAt</code> で設定し、2点間の中間点に車を配置します。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// create 2 Vector3s we can use for path calculations
 const carPosition = new THREE.Vector3();
 const carTarget = new THREE.Vector3();
 
@@ -530,7 +530,7 @@ function render(time) {
 +  }
 </pre>
 <p>そしてそれを実行すると、それぞれの車のオリジンの上に高さが一貫して設定されていなかったので、少しオフセットする必要がありました。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const loadedCars = root.getObjectByName('Cars');
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const loadedCars = root.getObjectByName('Cars');
 const fixes = [
 -  { prefix: 'Car_08', rot: [Math.PI * .5, 0, Math.PI * .5], },
 -  { prefix: 'CAR_03', rot: [0, Math.PI, 0], },
@@ -554,17 +554,17 @@ for (const car of loadedCars.children.slice()) {
 }
 </pre>
 <p>その結果です。</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-animated-cars.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf-animated-cars.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-animated-cars.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf-animated-cars.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
 <p>数分間の作業にしては悪くない結果です。</p>
 <p>最後にやりたいのはシャドウをつける事です。</p>
-<p>これを行うために<a href="shadows.html">シャドウの記事</a>にある <a href="/docs/#api/ja/lights/DirectionalLight"><code class="notranslate" translate="no">DirectionalLight</code></a> の例から全てのGUIコードを取得し、最新のコードに貼り付けました。</p>
+<p>これを行うために<a href="shadows.html">シャドウの記事</a>にある <a href="/docs/#api/ja/lights/DirectionalLight"><code clbottom="notranslate" translate="no">DirectionalLight</code></a> の例から全てのGUIコードを取得し、最新のコードに貼り付けました。</p>
 <p>読み込み後に全てのオブジェクトにシャドウをオンにする必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const gltfLoader = new GLTFLoader();
   gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.gltf', (gltf) =&gt; {
     const root = gltf.scene;
@@ -579,12 +579,12 @@ for (const car of loadedCars.children.slice()) {
 </pre>
 <p>シャドウヘルパーが機能していない理由を探るのに4時間近くを費やしました。
 シャドウを有効にするのを忘れていたのが原因でした。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">renderer.shadowMap.enabled = true;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">renderer.shadowMap.enabled = true;
 </pre>
 <p>😭</p>
-<p>そのあと、<code class="notranslate" translate="no">DirectionLight</code> のシャドウカメラがシーン全体を覆うようになるまで値を調整しました。
+<p>そのあと、<code clbottom="notranslate" translate="no">DirectionLight</code> のシャドウカメラがシーン全体を覆うようになるまで値を調整しました。
 これらの設定は私が最終的にたどり着いたものです。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">{
   const color = 0xFFFFFF;
   const intensity = 1;
   const light = new THREE.DirectionalLight(color, intensity);
@@ -608,14 +608,14 @@ for (const car of loadedCars.children.slice()) {
 ...
 </pre>
 <p>また、背景色を水色に設定してみました。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 -scene.background = new THREE.Color('black');
 +scene.background = new THREE.Color('#DEFEFF');
 </pre>
 <p>そして、シャドウをつけた結果です。</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-shadows.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/load-gltf-shadows.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/load-gltf-shadows.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/load-gltf-shadows.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
