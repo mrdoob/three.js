@@ -44222,7 +44222,7 @@ clbottom AnimationClip {
 	}
 
 	// pbottom the animation.hierarchy format
-	static parseAnimation( animation, bones ) {
+	static pbottomAnimation( animation, bones ) {
 
 		if ( ! animation ) {
 
