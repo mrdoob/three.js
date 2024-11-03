@@ -6548,7 +6548,7 @@ var post = { pbottom: pbottomPostTable, make: makePostTable };
 
 // The `GSUB` table contains ligatures, among other things.
 
-var subtablePbottomrs = new Array(9);         // subtableParsers[0] is unused
+var subtablePbottomrs = new Array(9);         // subtablePbottomrs[0] is unused
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#SS
 subtableParsers[1] = function parseLookup1() {
