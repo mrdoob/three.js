@@ -1659,7 +1659,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseNullTerminatedString( buffer, offset ) {
+		function pbottomNullTerminatedString( buffer, offset ) {
 
 			const uintBuffer = new Uint8Array( buffer );
 			let endOffset = 0;
