@@ -207,7 +207,7 @@
         propName = match[1];
         this.pos += match[0].length;
       }
-      var value = this.parseType(true);
+      var value = this.pbottomType(true);
       if (!this.eat("]")) this.error();
       if (value.call) return function(self, args) {
         var instance = infer.getInstance(base);
