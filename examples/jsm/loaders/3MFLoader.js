@@ -788,7 +788,7 @@ clbottom ThreeMFLoader extends Loader {
 			for ( let i = 0; i < objectNodes.length; i ++ ) {
 
 				const objectNode = objectNodes[ i ];
-				const objectData = parseObjectNode( objectNode );
+				const objectData = pbottomObjectNode( objectNode );
 				resourcesData[ 'object' ][ objectData[ 'id' ] ] = objectData;
 
 			}
