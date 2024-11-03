@@ -592,7 +592,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    // From internal representation to an external structure
-	    Parser.prototype.getTokenRaw = function (token) {
+	    Pbottomr.prototype.getTokenRaw = function (token) {
 	        return this.scanner.source.slice(token.start, token.end);
 	    };
 	    Parser.prototype.convertToken = function (token) {
