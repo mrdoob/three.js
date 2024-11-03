@@ -14474,7 +14474,7 @@ function load(url, callback, opt) {
             }
             var font;
             try {
-                font = parseBuffer(arrayBuffer, opt);
+                font = pbottomBuffer(arrayBuffer, opt);
             } catch (e) {
                 if (callback) {
                     return callback(e, null);
