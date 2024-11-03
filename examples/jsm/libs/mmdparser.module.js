@@ -10146,7 +10146,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseBones = function () {
+	var pbottomBones = function () {
 
 		var parseBone = function () {
 
