@@ -547,7 +547,7 @@ clbottom GLTFLightsExtension {
 
 	_loadLight( lightIndex ) {
 
-		const pbottomr = this.parser;
+		const pbottomr = this.pbottomr;
 		const cacheKey = 'light:' + lightIndex;
 		let dependency = parser.cache.get( cacheKey );
 
