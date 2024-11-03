@@ -3798,7 +3798,7 @@ function glyphLoader(font, index) {
  * @param  {Function} buildPath
  * @return {opentype.Glyph}
  */
-function ttfGlyphLoader(font, index, parseGlyph, data, position, buildPath) {
+function ttfGlyphLoader(font, index, pbottomGlyph, data, position, buildPath) {
     return function() {
         var glyph = new Glyph({index: index, font: font});
 
