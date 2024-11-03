@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass } from 'three/tsl';
+			import { pbottom } from 'three/tsl';
 			import { smaa } from 'three/addons/tsl/display/SMAANode.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -78,10 +78,10 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				const smaaPass = smaa( scenePass );
+				const scenePbottom = pbottom( scene, camera );
+				const smaaPbottom = smaa( scenePbottom );
 
-				postProcessing.outputNode = smaaPass;
+				postProcessing.outputNode = smaaPbottom;
 
 				//
 
@@ -94,11 +94,11 @@
 			
 					if ( value === true ) {
 
-						postProcessing.outputNode = smaaPass;
+						postProcessing.outputNode = smaaPbottom;
 
 					} else {
 
-						postProcessing.outputNode = scenePass;
+						postProcessing.outputNode = scenePbottom;
 
 					}
 
