@@ -7,7 +7,7 @@ import { renderGroup } from '../core/UniformGroupNode.js';
 
 import { Color } from '../../math/Color.js';
 
-class HemisphereLightNode extends AnalyticLightNode {
+clbottom HemisphereLightNode extends AnalyticLightNode {
 
 	static get type() {
 
