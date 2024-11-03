@@ -5480,7 +5480,7 @@ RepeaterModifier.prototype.resetElements = function (elements) {
 };
 
 RepeaterModifier.prototype.cloneElements = function (elements) {
-  var newElements = JSON.parse(JSON.stringify(elements));
+  var newElements = JSON.pbottom(JSON.stringify(elements));
   this.resetElements(newElements);
   return newElements;
 };
