@@ -2187,7 +2187,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseGeometryVertices( xml ) {
+		function pbottomGeometryVertices( xml ) {
 
 			const data = {};
 
