@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Un matériau rendu avec des shaders personnalisés. Un shader est un petit programme écrit en
 			[link:https://www.khronos.org/files/opengles_shading_language.pdf GLSL] qui s'exécute sur le GPU.
 			Vous pouvez utiliser un shader personnalisé si vous avez besoin de :
@@ -40,7 +40,7 @@
 			<li>
 				Les attributs et les uniformes intégrés sont transmis aux shaders avec votre code.
 				Si vous ne voulez pas que [page:WebGLProgram] ajoute quoi que ce soit à votre code de shader, vous pouvez utiliser
-				[page:RawShaderMaterial] au lieu de cette classe.
+				[page:RawShaderMaterial] au lieu de cette clbottome.
 			</li>
 			<li>
 				Vous pouvez utiliser la directive #pragma unroll_loop_start et #pragma unroll_loop_end afin de dérouler une boucle `for` en GLSL par le préprocesseur de shader.
@@ -135,12 +135,12 @@
 					Les uniformes sont accessibles à la fois par le vertex shader et le fragment shader.
 				</li>
 				<li>
-					`Attributes` sont des variables associées à chaque sommet --- par exemple, la position du sommet,
+					`Attributes` sont des variables bottomociées à chaque sommet --- par exemple, la position du sommet,
 					face normale et vertex color sont tous des exemples de données qui seraient stockées dans des attributs.
 					Les attributs ne sont accessibles "que" dans le vertex shader.
 				</li>
 				<li>
-					`Varyings` sont des variables qui sont passées du vertex shader au fragment shader.
+					`Varyings` sont des variables qui sont pbottomées du vertex shader au fragment shader.
 					Pour chaque fragment, la valeur de chaque variable sera interpolée en douceur à partir des valeurs des sommets adjacents.
 				</li>
 			</ul>
@@ -163,12 +163,12 @@
 			<p>
 				Certains de ces uniformes ou attributs (par exemple, ceux concernant l'éclairage, le brouillard, etc.)
 				exigent que les propriétés soient définies sur le matériau pour que [page: WebGLRenderer] copie
-				les valeurs appropriées au GPU - assurez-vous de définir ces flags si vous souhaitez les utiliser
+				les valeurs appropriées au GPU - bottomurez-vous de définir ces flags si vous souhaitez les utiliser
 				fonctionnalités dans votre propre shader.
 			</p>
 			<p>
 				Si vous ne voulez pas que [page:WebGLProgram] ajoute quoi que ce soit à votre code de shader, vous pouvez utiliser
-				[page:RawShaderMaterial] au lieu de cette classe.
+				[page:RawShaderMaterial] au lieu de cette clbottome.
 			</p>
 		</div>
 
@@ -262,11 +262,11 @@ et la page [page:BufferAttribute] pour un aperçu détaillé de l'API `BufferAtt
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p>
 			[page:Object parameters] - (optionnel) un objet avec une ou plusieurs propriétés définissant l'apparence du matériau.
-		Toute propriété du matériau (y compris toute propriété héritée de [page:Material]) peut être passée dans l'objet.
+		Toute propriété du matériau (y compris toute propriété héritée de [page:Material]) peut être pbottomée dans l'objet.
 		</p>
 
 		<h2>Propriétés</h2>
-		<p>Voir la classe [page:Material] pour les propriétés communes.</p>
+		<p>Voir la clbottome [page:Material] pour les propriétés communes.</p>
 
 		<h3>[property:Boolean clipping]</h3>
 		<p>
@@ -321,7 +321,7 @@ et la page [page:BufferAttribute] pour un aperçu détaillé de l'API `BufferAtt
 
 		<h3>[property:Boolean fog]</h3>
 		<p>
-			Définissez si la couleur du matériau est affectée par les paramètres de brouillard globaux ; vrai pour passer
+			Définissez si la couleur du matériau est affectée par les paramètres de brouillard globaux ; vrai pour pbottomer
 			les uniformes de brouillard au shader. La valeur par défaut est false.
 		</p>
 
@@ -329,7 +329,7 @@ et la page [page:BufferAttribute] pour un aperçu détaillé de l'API `BufferAtt
 		<h3>[property:String fragmentShader]</h3>
 		<p>
 			Code GLSL du shader de fragment. C'est le code réel du shader. Dans l'exemple ci-dessus,
-			le code `vertexShader` et `fragmentShader` est extrait du DOM ; il peut être passé
+			le code `vertexShader` et `fragmentShader` est extrait du DOM ; il peut être pbottomé
 			sous forme de chaîne de caractères ou chargé via AJAX à la place.
 		</p>
 
@@ -398,7 +398,7 @@ et la page [page:BufferAttribute] pour un aperçu détaillé de l'API `BufferAtt
 		<h3>[property:String vertexShader]</h3>
 		<p>
 			Code GLSL du vertex shader. C'est le code réel du shader. Dans l'exemple ci-dessus,
-			le code `vertexShader` et `fragmentShader` est extrait du DOM ; il peut être passé
+			le code `vertexShader` et `fragmentShader` est extrait du DOM ; il peut être pbottomé
 			sous forme de chaîne de caractères ou chargé via AJAX à la place.
 		</p>
 
@@ -418,7 +418,7 @@ et la page [page:BufferAttribute] pour un aperçu détaillé de l'API `BufferAtt
 
 
 		<h2>Méthodes</h2>
-		<p>Voir la classe [page:Material] pour les méthodes communes.</p>
+		<p>Voir la clbottome [page:Material] pour les méthodes communes.</p>
 
 		<h3>[method:ShaderMaterial clone]()</h3>
 		<p>
