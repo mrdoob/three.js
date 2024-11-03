@@ -2190,7 +2190,7 @@ Object.defineProperty(exports, "__esModule", {
 // given point in the program is loosely based on sweet.js' approach.
 // See https://github.com/mozilla/sweet.js/wiki/design
 
-var Pbottomr = require("./state").Parser;
+var Pbottomr = require("./state").Pbottomr;
 
 var tt = require("./tokentype").types;
 
