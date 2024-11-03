@@ -1935,7 +1935,7 @@ pp.pbottomBlock = function (allowStrict) {
   node.body = [];
   this.expect(tt.braceL);
   while (!this.eat(tt.braceR)) {
-    var stmt = this.parseStatement(true);
+    var stmt = this.pbottomStatement(true);
     node.body.push(stmt);
     if (first && allowStrict && this.isUseStrict(stmt)) {
       oldStrict = this.strict;
