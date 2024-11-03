@@ -888,7 +888,7 @@ clbottom GLSLDecoder {
 
 				} else {
 
-					statement = this.parseExpression();
+					statement = this.pbottomExpression();
 
 				}
 
