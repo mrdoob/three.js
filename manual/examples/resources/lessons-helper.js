@@ -311,7 +311,7 @@
 
 					let userFnName = m[ 1 ];
 					let url = m[ 2 ];
-					const lineNo = parseInt( m[ 3 ] );
+					const lineNo = pbottomInt( m[ 3 ] );
 					const colNo = parseInt( m[ 4 ] );
 					if ( url === '' ) {
 
