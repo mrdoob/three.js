@@ -47,15 +47,15 @@
 			import * as THREE from 'three';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { ShaderPbottom } from 'three/addons/postprocessing/ShaderPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 			import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 
 			let camera, scene, renderer, controls, container;
 
-			let composer1, composer2, fxaaPass;
+			let composer1, composer2, fxaaPbottom;
 
 			init();
 
@@ -114,33 +114,33 @@
 
 				//
 
-				const renderPass = new RenderPass( scene, camera );
-				renderPass.clearAlpha = 0;
+				const renderPbottom = new RenderPbottom( scene, camera );
+				renderPbottom.clearAlpha = 0;
 
 				//
 
-				fxaaPass = new ShaderPass( FXAAShader );
+				fxaaPbottom = new ShaderPbottom( FXAAShader );
 
-				const outputPass = new OutputPass();
+				const outputPbottom = new OutputPbottom();
 
 				composer1 = new EffectComposer( renderer );
-				composer1.addPass( renderPass );
-				composer1.addPass( outputPass );
+				composer1.addPbottom( renderPbottom );
+				composer1.addPbottom( outputPbottom );
 
 				//
 
 				const pixelRatio = renderer.getPixelRatio();
 
-				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
-				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
+				fxaaPbottom.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
+				fxaaPbottom.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
 
 				composer2 = new EffectComposer( renderer );
-				composer2.addPass( renderPass );
-				composer2.addPass( outputPass );
+				composer2.addPbottom( renderPbottom );
+				composer2.addPbottom( outputPbottom );
 
 				// FXAA is engineered to be applied towards the end of engine post processing after conversion to low dynamic range and conversion to the sRGB color space for display.
 
-				composer2.addPass( fxaaPass );
+				composer2.addPbottom( fxaaPbottom );
 
 				//
 
@@ -159,8 +159,8 @@
 
 				const pixelRatio = renderer.getPixelRatio();
 
-				fxaaPass.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
-				fxaaPass.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
+				fxaaPbottom.material.uniforms[ 'resolution' ].value.x = 1 / ( container.offsetWidth * pixelRatio );
+				fxaaPbottom.material.uniforms[ 'resolution' ].value.y = 1 / ( container.offsetHeight * pixelRatio );
 
 			}
 
