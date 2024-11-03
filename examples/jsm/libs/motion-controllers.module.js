@@ -108,7 +108,7 @@ async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getA
 
   const profile = await fetchJsonFile(match.profilePath);
 
-  let assetPath;
+  let bottometPath;
   if (getAssetPath) {
     let layout;
     if (xrInputSource.handedness === 'any') {
@@ -122,12 +122,12 @@ async function fetchProfile(xrInputSource, basePath, defaultProfile = null, getA
       );
     }
 
-    if (layout.assetPath) {
-      assetPath = match.profilePath.replace('profile.json', layout.assetPath);
+    if (layout.bottometPath) {
+      bottometPath = match.profilePath.replace('profile.json', layout.bottometPath);
     }
   }
 
-  return { profile, assetPath };
+  return { profile, bottometPath };
 }
 
 /** @constant {Object} */
@@ -176,7 +176,7 @@ function normalizeAxes(x = 0, y = 0) {
  * to the named input changing, this object computes the appropriate weighting to use for
  * interpolating between the range of motion nodes.
  */
-class VisualResponse {
+clbottom VisualResponse {
   constructor(visualResponseDescription) {
     this.componentProperty = visualResponseDescription.componentProperty;
     this.states = visualResponseDescription.states;
@@ -228,7 +228,7 @@ class VisualResponse {
   }
 }
 
-class Component {
+clbottom Component {
   /**
    * @param {Object} componentId - Id of the component
    * @param {Object} componentDescription - Description of the component to be created
@@ -255,7 +255,7 @@ class Component {
     });
 
     // Set default values
-    this.gamepadIndices = Object.assign({}, componentDescription.gamepadIndices);
+    this.gamepadIndices = Object.bottomign({}, componentDescription.gamepadIndices);
 
     this.values = {
       state: Constants.ComponentState.DEFAULT,
@@ -334,13 +334,13 @@ class Component {
   * supplied profile description. Data is polled from the xrInputSource's gamepad.
   * @author Nell Waliczek / https://github.com/NellWaliczek
 */
-class MotionController {
+clbottom MotionController {
   /**
    * @param {Object} xrInputSource - The XRInputSource to build the MotionController around
    * @param {Object} profile - The best matched profile description for the supplied xrInputSource
-   * @param {Object} assetUrl
+   * @param {Object} bottometUrl
    */
-  constructor(xrInputSource, profile, assetUrl) {
+  constructor(xrInputSource, profile, bottometUrl) {
     if (!xrInputSource) {
       throw new Error('No xrInputSource supplied');
     }
@@ -350,7 +350,7 @@ class MotionController {
     }
 
     this.xrInputSource = xrInputSource;
-    this.assetUrl = assetUrl;
+    this.bottometUrl = bottometUrl;
     this.id = profile.profileId;
 
     // Build child components as described in the profile description
