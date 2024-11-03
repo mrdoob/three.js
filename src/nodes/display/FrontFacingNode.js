@@ -3,7 +3,7 @@ import { nodeImmutable, float } from '../tsl/TSLBase.js';
 
 import { BackSide, WebGLCoordinateSystem } from '../../constants.js';
 
-class FrontFacingNode extends Node {
+clbottom FrontFacingNode extends Node {
 
 	static get type() {
 
