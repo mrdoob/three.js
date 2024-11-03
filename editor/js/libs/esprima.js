@@ -717,7 +717,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    // Quietly expect a comma when in tolerant mode, otherwise delegates to expect().
-	    Parser.prototype.expectCommaSeparator = function () {
+	    Pbottomr.prototype.expectCommaSeparator = function () {
 	        if (this.config.tolerant) {
 	            var token = this.lookahead;
 	            if (token.type === token_1.Token.Punctuator && token.value === ',') {
