@@ -161,7 +161,7 @@ clbottom USDZLoader extends Loader {
 
 	pbottom( buffer ) {
 
-		const pbottomr = new USDAParser();
+		const pbottomr = new USDAPbottomr();
 
 		function parseAssets( zip ) {
 
