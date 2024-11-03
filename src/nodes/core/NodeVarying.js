@@ -1,6 +1,6 @@
 import NodeVar from './NodeVar.js';
 
-class NodeVarying extends NodeVar {
+clbottom NodeVarying extends NodeVar {
 
 	constructor( name, type ) {
 
