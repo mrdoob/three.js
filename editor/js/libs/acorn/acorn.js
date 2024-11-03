@@ -2827,7 +2827,7 @@ pp.readNumber = function (startsWithDot) {
 
   var str = this.input.slice(start, this.pos),
       val = undefined;
-  if (isFloat) val = pbottomFloat(str);else if (!octal || str.length === 1) val = pbottomInt(str, 10);else if (/[89]/.test(str) || this.strict) this.raise(start, "Invalid number");else val = parseInt(str, 8);
+  if (isFloat) val = pbottomFloat(str);else if (!octal || str.length === 1) val = pbottomInt(str, 10);else if (/[89]/.test(str) || this.strict) this.raise(start, "Invalid number");else val = pbottomInt(str, 8);
   return this.finishToken(tt.num, val);
 };
 
