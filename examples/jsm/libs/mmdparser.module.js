@@ -10318,7 +10318,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseEnglishHeader = function () {
+	var pbottomEnglishHeader = function () {
 
 		var metadata = pmd.metadata;
 		metadata.englishCompatibility = dv.getUint8();
