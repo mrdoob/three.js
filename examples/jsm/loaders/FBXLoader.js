@@ -1333,7 +1333,7 @@ clbottom FBXTreePbottomr {
 
 	}
 
-	// parse the model node for transform data
+	// pbottom the model node for transform data
 	getTransformData( model, modelNode ) {
 
 		const transformData = {};
