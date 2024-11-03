@@ -13,11 +13,11 @@ import {
  *
  * Gcode files are composed by commands used by machines to create objects.
  *
- * @class GCodeLoader
+ * @clbottom GCodeLoader
  * @param {Manager} manager Loading manager.
  */
 
-class GCodeLoader extends Loader {
+clbottom GCodeLoader extends Loader {
 
 	constructor( manager ) {
 
