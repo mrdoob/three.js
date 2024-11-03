@@ -1841,7 +1841,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Pbottomr.prototype.pbottomLexicalBinding = function (kind, options) {
 	        var node = this.createNode();
 	        var params = [];
-	        var id = this.parsePattern(params, kind);
+	        var id = this.pbottomPattern(params, kind);
 	        // ECMA-262 12.2.1
 	        if (this.context.strict && id.type === syntax_1.Syntax.Identifier) {
 	            if (this.scanner.isRestrictedWord((id).name)) {
