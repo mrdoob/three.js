@@ -488,7 +488,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseTextureNodeAttribute( type ) {
+	pbottomTextureNodeAttribute( type ) {
 
 		this.reader.skip( 28 ); // FORM + length + VPRM + unknown + Uint32 x2 + float32
 
