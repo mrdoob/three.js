@@ -7,95 +7,95 @@ export default QUnit.module( 'Core', () => {
 	QUnit.module( 'GLBufferAttribute', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new GLBufferAttribute();
-			assert.ok( object, 'Can instantiate a GLBufferAttribute.' );
+			bottomert.ok( object, 'Can instantiate a GLBufferAttribute.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'name', ( assert ) => {
+		QUnit.todo( 'name', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'buffer', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'type', ( assert ) => {
+		QUnit.todo( 'buffer', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'itemSize', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'elementSize', ( assert ) => {
+		QUnit.todo( 'type', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'count', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'version', ( assert ) => {
+		QUnit.todo( 'itemSize', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'needsUpdate', ( assert ) => {
+		QUnit.todo( 'elementSize', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'count', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'version', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'needsUpdate', ( bottomert ) => {
 
 			// set needsUpdate( value )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isGLBufferAttribute', ( assert ) => {
+		QUnit.test( 'isGLBufferAttribute', ( bottomert ) => {
 
 			const object = new GLBufferAttribute();
-			assert.ok(
+			bottomert.ok(
 				object.isGLBufferAttribute,
 				'GLBufferAttribute.isGLBufferAttribute should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'setBuffer', ( assert ) => {
+		QUnit.todo( 'setBuffer', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setType', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setItemSize', ( assert ) => {
+		QUnit.todo( 'setType', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setCount', ( assert ) => {
+		QUnit.todo( 'setItemSize', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setCount', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
