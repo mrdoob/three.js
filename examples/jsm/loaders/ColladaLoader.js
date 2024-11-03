@@ -184,7 +184,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseAssetUnit( xml ) {
+		function pbottomAssetUnit( xml ) {
 
 			if ( ( xml !== undefined ) && ( xml.hasAttribute( 'meter' ) === true ) ) {
 
