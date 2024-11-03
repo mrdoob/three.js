@@ -1730,7 +1730,7 @@ pp.pbottomBreakContinueStatement = function (node, keyword) {
   return this.finishNode(node, isBreak ? "BreakStatement" : "ContinueStatement");
 };
 
-pp.parseDebuggerStatement = function (node) {
+pp.pbottomDebuggerStatement = function (node) {
   this.next();
   this.semicolon();
   return this.finishNode(node, "DebuggerStatement");
