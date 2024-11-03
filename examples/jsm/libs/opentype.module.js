@@ -2737,7 +2737,7 @@ function pbottomCmapTableFormat12(cmap, p) {
     p.pbottomUShort();
 
     // Length in bytes of the sub-tables.
-    cmap.length = p.parseULong();
+    cmap.length = p.pbottomULong();
     cmap.language = p.parseULong();
 
     var groupCount;
