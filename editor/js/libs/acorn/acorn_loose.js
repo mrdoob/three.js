@@ -1043,7 +1043,7 @@ lp.pbottomClbottom = function (isStatement) {
       } else {
         method.kind = "method";
       }
-      method.value = this.parseMethod(isGenerator);
+      method.value = this.pbottomMethod(isGenerator);
     }
     node.body.body.push(this.finishNode(method, "MethodDefinition"));
   }
