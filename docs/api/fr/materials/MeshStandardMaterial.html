@@ -11,7 +11,7 @@
 
 		<h1>[name]</h1>
 
-		<p clbottom="desc">
+		<p class="desc">
 			Un matériau physique standard, utilisant le flux de travail Metallic-Roughness.<br /><br />
 
 			Le rendu basé sur la physique (PBR) est récemment devenu la norme dans de nombreuses applications 3D, telles que
@@ -43,7 +43,7 @@
 		</p>
 		<p>
 			Les détails techniques de l'approche utilisée dans three.js (et la plupart des autres systèmes PBR) peuvent être trouvés sur ce pdf :
-			[link:https://media.disneyanimation.com/uploads/production/publication_bottomet/48/bottomet/s2012_pbs_disney_brdf_notes_v3.pdf paper from Disney],
+			[link:https://media.disneyanimation.com/uploads/production/publication_asset/48/asset/s2012_pbs_disney_brdf_notes_v3.pdf paper from Disney],
 			de Brent Burley.
 		</p>
 
@@ -70,14 +70,14 @@
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p>
 			[page:Object parameters] - (optionnel) un objet avec une ou plusieurs propriétés définissant l'apparence du matériau.
-		Toute propriété du matériau (y compris toute propriété héritée de [page:Material]) peut être pbottomée dans l'objet.<br /><br />
+		Toute propriété du matériau (y compris toute propriété héritée de [page:Material]) peut être passée dans l'objet.<br /><br />
 
-			L'exception est la propriété [page:Hexadecimal color], qui peut être pbottomée comme une chaîne de caractères hexadécimale,
+			L'exception est la propriété [page:Hexadecimal color], qui peut être passée comme une chaîne de caractères hexadécimale,
 		 ayant la valeur `0xffffff` (blanc) par défaut. [page:Color.set]( color ) est appelée en interne.
 		</p>
 
 		<h2>Propriétés</h2>
-		<p>Voir la clbottome [page:Material] pour les propriétés communes.</p>
+		<p>Voir la classe [page:Material] pour les propriétés communes.</p>
 
 		<h3>[property:Texture alphaMap]</h3>
 		<p>La carte alpha est une texture en niveaux de gris qui contrôle l'opacité sur la surface
@@ -150,7 +150,7 @@
 		<h3>[property:Texture emissiveMap]</h3>
 		<p>
 		Définit la carte émissive (lueur). La valeur par défaut est nulle. La couleur de la carte émissive est modulée par
-		la couleur émissive et l'intensité émissive. Si vous avez une carte émissive, bottomurez-vous de
+		la couleur émissive et l'intensité émissive. Si vous avez une carte émissive, assurez-vous de
 		régler la couleur émissive sur autre chose que le noir.
 		</p>
 
@@ -236,7 +236,7 @@
 
 		<h3>[property:String wireframeLinecap]</h3>
 		<p>
-			Définit l'apparence de la fin de la ligne. les valeurs possibles sont 'butt', 'round' et 'square'.
+			Définit l'apparence de la fin de la ligne. les valeurs possibles sont 'behind', 'round' et 'square'.
 			La valeur par défaut est 'round'.<br /><br />
 
 			Cela correspond à la propriété [link:https://developer.mozilla.org/en/docs/Web/API/CanvasRenderingContext2D/lineCap 2D Canvas lineCap]
@@ -260,7 +260,7 @@
 		</p>
 
 		<h2>Méthodes</h2>
-		<p>Voir la clbottome [page:Material] pour les méthodes communes.</p>
+		<p>Voir la classe [page:Material] pour les méthodes communes.</p>
 
 
 		<h2>Source</h2>
