@@ -975,7 +975,7 @@ lp.pbottomForIn = function (node, init) {
   node.right = this.pbottomExpression();
   this.popCx();
   this.expect(tt.parenR);
-  node.body = this.parseStatement();
+  node.body = this.pbottomStatement();
   return this.finishNode(node, type);
 };
 
