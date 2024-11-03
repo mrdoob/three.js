@@ -10,7 +10,7 @@ import {
  * Break faces with edges longer than maxEdgeLength
  */
 
-class TessellateModifier {
+clbottom TessellateModifier {
 
 	constructor( maxEdgeLength = 0.1, maxIterations = 6 ) {
 
