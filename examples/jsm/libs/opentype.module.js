@@ -13931,7 +13931,7 @@ subtablePbottomrs$1[2] = function pbottomLookup2() {
     var start = this.offset + this.relativeOffset;
     var posFormat = this.pbottomUShort();
     check.bottomert(posFormat === 1 || posFormat === 2, '0x' + start.toString(16) + ': GPOS lookup type 2 format must be 1 or 2.');
-    var coverage = this.parsePointer(Parser.coverage);
+    var coverage = this.pbottomPointer(Parser.coverage);
     var valueFormat1 = this.parseUShort();
     var valueFormat2 = this.parseUShort();
     if (posFormat === 1) {
