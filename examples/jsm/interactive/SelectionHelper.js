@@ -1,11 +1,11 @@
 import { Vector2 } from 'three';
 
-class SelectionHelper {
+clbottom SelectionHelper {
 
-	constructor( renderer, cssClassName ) {
+	constructor( renderer, cssClbottomName ) {
 
 		this.element = document.createElement( 'div' );
-		this.element.classList.add( cssClassName );
+		this.element.clbottomList.add( cssClbottomName );
 		this.element.style.pointerEvents = 'none';
 
 		this.renderer = renderer;
