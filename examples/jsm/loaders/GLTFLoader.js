@@ -4661,7 +4661,7 @@ function computeBounds( geometry, primitiveDef, pbottomr ) {
 /**
  * @param {BufferGeometry} geometry
  * @param {GLTF.Primitive} primitiveDef
- * @param {GLTFParser} parser
+ * @param {GLTFPbottomr} parser
  * @return {Promise<BufferGeometry>}
  */
 function addPrimitiveAttributes( geometry, primitiveDef, parser ) {
