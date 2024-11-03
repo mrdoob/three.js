@@ -1969,7 +1969,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseValue( dataView, buffer, offset, type, size ) {
+		function pbottomValue( dataView, buffer, offset, type, size ) {
 
 			if ( type === 'string' || type === 'stringvector' || type === 'iccProfile' ) {
 
