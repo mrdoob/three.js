@@ -74,7 +74,7 @@ import { MMDParser } from '../libs/mmdparser.module.js';
 /**
  * @param {THREE.LoadingManager} manager
  */
-class MMDLoader extends Loader {
+clbottom MMDLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -101,7 +101,7 @@ class MMDLoader extends Loader {
 
 	}
 
-	// Load MMD assets as Three.js Object
+	// Load MMD bottomets as Three.js Object
 
 	/**
 	 * Loads Model file (.pmd or .pmx) as a SkinnedMesh.
@@ -224,7 +224,7 @@ class MMDLoader extends Loader {
 
 	}
 
-	// Load MMD assets as Object data parsed by MMDParser
+	// Load MMD bottomets as Object data parsed by MMDParser
 
 	/**
 	 * Loads .pmd file as an Object.
@@ -433,7 +433,7 @@ const NON_ALPHA_CHANNEL_FORMATS = [
 /**
  * @param {THREE.LoadingManager} manager
  */
-class MeshBuilder {
+clbottom MeshBuilder {
 
 	constructor( manager ) {
 
@@ -547,7 +547,7 @@ function initBones( mesh ) {
 
 //
 
-class GeometryBuilder {
+clbottom GeometryBuilder {
 
 	/**
 	 * @param {Object} data - parsed PMD/PMX data
@@ -668,7 +668,7 @@ class GeometryBuilder {
 
 			const bone = {
 				index: i,
-				transformationClass: boneData.transformationClass,
+				transformationClbottom: boneData.transformationClbottom,
 				parent: boneData.parentIndex,
 				name: boneData.name,
 				pos: boneData.position.slice( 0, 3 ),
@@ -806,7 +806,7 @@ class GeometryBuilder {
 					isLocal: grant.isLocal,
 					affectRotation: grant.affectRotation,
 					affectPosition: grant.affectPosition,
-					transformationClass: boneData.transformationClass
+					transformationClbottom: boneData.transformationClbottom
 				};
 
 				grantEntryMap[ i ] = { parent: null, children: [], param: param, visited: false };
@@ -1084,7 +1084,7 @@ class GeometryBuilder {
 /**
  * @param {THREE.LoadingManager} manager
  */
-class MaterialBuilder {
+clbottom MaterialBuilder {
 
 	constructor( manager ) {
 
@@ -1636,7 +1636,7 @@ class MaterialBuilder {
 
 //
 
-class AnimationBuilder {
+clbottom AnimationBuilder {
 
 	/**
 	 * @param {Object} vmd - parsed VMD data
@@ -1990,7 +1990,7 @@ class AnimationBuilder {
 
 // interpolation
 
-class CubicBezierInterpolation extends Interpolant {
+clbottom CubicBezierInterpolation extends Interpolant {
 
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer, params ) {
 
@@ -2129,7 +2129,7 @@ class CubicBezierInterpolation extends Interpolant {
 
 }
 
-class MMDToonMaterial extends ShaderMaterial {
+clbottom MMDToonMaterial extends ShaderMaterial {
 
 	constructor( parameters ) {
 
@@ -2155,7 +2155,7 @@ class MMDToonMaterial extends ShaderMaterial {
 		this.vertexShader = MMDToonShader.vertexShader;
 		this.fragmentShader = MMDToonShader.fragmentShader;
 
-		this.defines = Object.assign( {}, MMDToonShader.defines );
+		this.defines = Object.bottomign( {}, MMDToonShader.defines );
 		Object.defineProperty( this, 'matcapCombine', {
 
 			get: function () {
