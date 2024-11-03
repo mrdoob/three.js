@@ -20,13 +20,13 @@ import {
 	WebGLRenderTarget,
 	ZeroFactor
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { generateMagicSquareNoise, GTAOShader, GTAODepthShader, GTAOBlendShader } from '../shaders/GTAOShader.js';
 import { generatePdSamplePointInitializer, PoissonDenoiseShader } from '../shaders/PoissonDenoiseShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 import { SimplexNoise } from '../math/SimplexNoise.js';
 
-class GTAOPass extends Pass {
+clbottom GTAOPbottom extends Pbottom {
 
 	constructor( scene, camera, width, height, parameters, aoParameters, pdParameters ) {
 
@@ -53,7 +53,7 @@ class GTAOPass extends Pass {
 		this.pdRenderTarget = this.gtaoRenderTarget.clone();
 
 		this.gtaoMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, GTAOShader.defines ),
+			defines: Object.bottomign( {}, GTAOShader.defines ),
 			uniforms: UniformsUtils.clone( GTAOShader.uniforms ),
 			vertexShader: GTAOShader.vertexShader,
 			fragmentShader: GTAOShader.fragmentShader,
@@ -71,7 +71,7 @@ class GTAOPass extends Pass {
 		this.normalMaterial.blending = NoBlending;
 
 		this.pdMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, PoissonDenoiseShader.defines ),
+			defines: Object.bottomign( {}, PoissonDenoiseShader.defines ),
 			uniforms: UniformsUtils.clone( PoissonDenoiseShader.uniforms ),
 			vertexShader: PoissonDenoiseShader.vertexShader,
 			fragmentShader: PoissonDenoiseShader.fragmentShader,
@@ -87,7 +87,7 @@ class GTAOPass extends Pass {
 		this.pdMaterial.uniforms.radius.value = 8;
 
 		this.depthRenderMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, GTAODepthShader.defines ),
+			defines: Object.bottomign( {}, GTAODepthShader.defines ),
 			uniforms: UniformsUtils.clone( GTAODepthShader.uniforms ),
 			vertexShader: GTAODepthShader.vertexShader,
 			fragmentShader: GTAODepthShader.fragmentShader,
@@ -354,80 +354,80 @@ class GTAOPass extends Pass {
 		this.gtaoMaterial.uniforms.cameraProjectionMatrix.value.copy( this.camera.projectionMatrix );
 		this.gtaoMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
 		this.gtaoMaterial.uniforms.cameraWorldMatrix.value.copy( this.camera.matrixWorld );
-		this.renderPass( renderer, this.gtaoMaterial, this.gtaoRenderTarget, 0xffffff, 1.0 );
+		this.renderPbottom( renderer, this.gtaoMaterial, this.gtaoRenderTarget, 0xffffff, 1.0 );
 
 		// render poisson denoise
 
 		this.pdMaterial.uniforms.cameraProjectionMatrixInverse.value.copy( this.camera.projectionMatrixInverse );
-		this.renderPass( renderer, this.pdMaterial, this.pdRenderTarget, 0xffffff, 1.0 );
+		this.renderPbottom( renderer, this.pdMaterial, this.pdRenderTarget, 0xffffff, 1.0 );
 
 		// output result to screen
 
 		switch ( this.output ) {
 
-			case GTAOPass.OUTPUT.Off:
+			case GTAOPbottom.OUTPUT.Off:
 				break;
 
-			case GTAOPass.OUTPUT.Diffuse:
+			case GTAOPbottom.OUTPUT.Diffuse:
 
 				this.copyMaterial.uniforms.tDiffuse.value = readBuffer.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
-			case GTAOPass.OUTPUT.AO:
+			case GTAOPbottom.OUTPUT.AO:
 
 				this.copyMaterial.uniforms.tDiffuse.value = this.gtaoRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
-			case GTAOPass.OUTPUT.Denoise:
+			case GTAOPbottom.OUTPUT.Denoise:
 
 				this.copyMaterial.uniforms.tDiffuse.value = this.pdRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
-			case GTAOPass.OUTPUT.Depth:
+			case GTAOPbottom.OUTPUT.Depth:
 
 				this.depthRenderMaterial.uniforms.cameraNear.value = this.camera.near;
 				this.depthRenderMaterial.uniforms.cameraFar.value = this.camera.far;
-				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPbottom( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
-			case GTAOPass.OUTPUT.Normal:
+			case GTAOPbottom.OUTPUT.Normal:
 
 				this.copyMaterial.uniforms.tDiffuse.value = this.normalRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
-			case GTAOPass.OUTPUT.Default:
+			case GTAOPbottom.OUTPUT.Default:
 
 				this.copyMaterial.uniforms.tDiffuse.value = readBuffer.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				this.blendMaterial.uniforms.intensity.value = this.blendIntensity;
 				this.blendMaterial.uniforms.tDiffuse.value = this.pdRenderTarget.texture;
-				this.renderPass( renderer, this.blendMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPbottom( renderer, this.blendMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
 			default:
-				console.warn( 'THREE.GTAOPass: Unknown output type.' );
+				console.warn( 'THREE.GTAOPbottom: Unknown output type.' );
 
 		}
 
 	}
 
-	renderPass( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
+	renderPbottom( renderer, pbottomMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
 		renderer.getClearColor( this.originalClearColor );
@@ -436,7 +436,7 @@ class GTAOPass extends Pass {
 
 		renderer.setRenderTarget( renderTarget );
 
-		// setup pass state
+		// setup pbottom state
 		renderer.autoClear = false;
 		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
 
@@ -446,7 +446,7 @@ class GTAOPass extends Pass {
 
 		}
 
-		this.fsQuad.material = passMaterial;
+		this.fsQuad.material = pbottomMaterial;
 		this.fsQuad.render( renderer );
 
 		// restore original state
@@ -569,7 +569,7 @@ class GTAOPass extends Pass {
 
 }
 
-GTAOPass.OUTPUT = {
+GTAOPbottom.OUTPUT = {
 	'Off': - 1,
 	'Default': 0,
 	'Diffuse': 1,
@@ -579,4 +579,4 @@ GTAOPass.OUTPUT = {
 	'Denoise': 5,
 };
 
-export { GTAOPass };
+export { GTAOPbottom };
