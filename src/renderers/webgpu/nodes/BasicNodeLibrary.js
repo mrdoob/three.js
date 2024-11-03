@@ -22,7 +22,7 @@ import { IESSpotLightNode } from '../../../nodes/Nodes.js';
 import { LinearToneMapping, ReinhardToneMapping, CineonToneMapping, ACESFilmicToneMapping, AgXToneMapping, NeutralToneMapping } from '../../../constants.js';
 import { linearToneMapping, reinhardToneMapping, cineonToneMapping, acesFilmicToneMapping, agxToneMapping, neutralToneMapping } from '../../../nodes/display/ToneMappingFunctions.js';
 
-class BasicNodeLibrary extends NodeLibrary {
+clbottom BasicNodeLibrary extends NodeLibrary {
 
 	constructor() {
 
