@@ -29,9 +29,9 @@
 
 		<code>
 		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
-		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+		import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+		import { GlitchPbottom } from 'three/addons/postprocessing/GlitchPbottom.js';
+		import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 		</code>
 
 		<p>
@@ -60,25 +60,25 @@
 		<p>
             composer는 이제 준비가 다 되었으니, 후처리 과정 연결을 설정할 수 있습니다.
             이러한 과정은 앱을 만드는 최종 화면 출력을 담당하며, 첨부/삽입한 순서대로 처리합니다.
-            In our example, the instance of `RenderPass` is executed first, then the instance of `GlitchPass` and finally `OutputPass`.
+            In our example, the instance of `RenderPbottom` is executed first, then the instance of `GlitchPbottom` and finally `OutputPbottom`.
             마지막 과정이 끝나면 자동으로 화면에 렌더링됩니다. 패스 설정은 아래와 같습니다.
 		</p>
 
 		<code>
-		const renderPass = new RenderPass( scene, camera );
-		composer.addPass( renderPass );
+		const renderPbottom = new RenderPbottom( scene, camera );
+		composer.addPbottom( renderPbottom );
 
-		const glitchPass = new GlitchPass();
-		composer.addPass( glitchPass );
+		const glitchPbottom = new GlitchPbottom();
+		composer.addPbottom( glitchPbottom );
 
-		const outputPass = new OutputPass();
-		composer.addPass( outputPass );
+		const outputPbottom = new OutputPbottom();
+		composer.addPbottom( outputPbottom );
 		</code>
 
 		<p>
-            *RenderPass*는 일반적으로 맨 위에 위치해서 렌더링된 장면을 후처리의 기본 입력 장면으로 활용합니다. 예제의 경우,
-            *GlitchPass*는 이 이미지 데이터에 거친 글리치 효과를 넣어줍니다. 
-             `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and optional tone mapping.
+            *RenderPbottom*는 일반적으로 맨 위에 위치해서 렌더링된 장면을 후처리의 기본 입력 장면으로 활용합니다. 예제의 경우,
+            *GlitchPbottom*는 이 이미지 데이터에 거친 글리치 효과를 넣어줍니다. 
+             `OutputPbottom` is usually the last pbottom in the chain which performs sRGB color space conversion and optional tone mapping.
             [link:https://threejs.org/examples/webgl_postprocessing_glitch live example]에서 작동을 확인해보세요.
 		</p>
 
@@ -93,17 +93,17 @@
 
 		<p>
             본인만의 후처리 셰이더를 작성하고 후처리 절차 안에 넣고 싶을 때가 있습니다. 이 때에는,
-            *ShaderPass*를 활용합니다. 파일과 커스텀 셰이더를 불러오고 다음 코드를 통해 설정합니다.
+            *ShaderPbottom*를 활용합니다. 파일과 커스텀 셰이더를 불러오고 다음 코드를 통해 설정합니다.
 		</p>
 
 		<code>
-		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { ShaderPbottom } from 'three/addons/postprocessing/ShaderPbottom.js';
 		import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 
 		// later in your init routine
 
-		const luminosityPass = new ShaderPass( LuminosityShader );
-		composer.addPass( luminosityPass );
+		const luminosityPbottom = new ShaderPbottom( LuminosityShader );
+		composer.addPbottom( luminosityPbottom );
 		</code>
 
 		<p>
