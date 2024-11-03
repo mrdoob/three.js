@@ -686,7 +686,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	// parse VMAP or VMAD
+	// pbottom VMAP or VMAD
 	// Associates a set of floating-point vectors with a set of points.
 	// VMAP: { type[ID4], dimension[U2], name[S0], ( vert[VX], value[F4] # dimension ) * }
 
