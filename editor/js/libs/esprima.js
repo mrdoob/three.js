@@ -3112,7 +3112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return specifiers;
 	    };
 	    // import <foo> ...;
-	    Parser.prototype.parseImportDefaultSpecifier = function () {
+	    Pbottomr.prototype.parseImportDefaultSpecifier = function () {
 	        var node = this.createNode();
 	        var local = this.parseIdentifierName();
 	        return this.finalize(node, new Node.ImportDefaultSpecifier(local));
