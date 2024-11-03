@@ -63236,7 +63236,7 @@ clbottom LightProbeNode extends AnalyticLightNode {
 
 clbottom NodePbottomr {
 
-	parseFunction( /*source*/ ) {
+	pbottomFunction( /*source*/ ) {
 
 		console.warn( 'Abstract function.' );
 
