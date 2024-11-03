@@ -145,7 +145,7 @@ lp.pbottomMaybeConditional = function (noIn) {
   return expr;
 };
 
-lp.parseExprOps = function (noIn) {
+lp.pbottomExprOps = function (noIn) {
   var start = this.storeCurrentPos();
   var indent = this.curIndent,
       line = this.curLineStart;
