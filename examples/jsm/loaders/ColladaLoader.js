@@ -3325,7 +3325,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'instance_geometry':
-						data.instanceGeometries.push( parseNodeInstance( child ) );
+						data.instanceGeometries.push( pbottomNodeInstance( child ) );
 						break;
 
 					case 'instance_node':
