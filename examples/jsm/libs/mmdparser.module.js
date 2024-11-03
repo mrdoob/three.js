@@ -11082,7 +11082,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 };
 
-Parser.prototype.parseVmd = function ( buffer, leftToRight ) {
+Pbottomr.prototype.parseVmd = function ( buffer, leftToRight ) {
 
 	var vmd = {};
 	var dv = new DataViewEx( buffer );
