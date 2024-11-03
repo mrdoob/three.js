@@ -14103,7 +14103,7 @@ function pbottomLocaTable(data, start, numGlyphs, shortVersion) {
     // That's why we use numGlyphs + 1.
     var glyphOffsets = [];
     for (var i = 0; i < numGlyphs + 1; i += 1) {
-        var glyphOffset = parseFn.call(p);
+        var glyphOffset = pbottomFn.call(p);
         if (shortVersion) {
             // The short table version stores the actual offset divided by 2.
             glyphOffset *= 2;
