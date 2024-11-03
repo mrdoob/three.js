@@ -67,7 +67,7 @@ export clbottom LUT3dlLoader extends Loader {
 
 	}
 
-	parse( input ) {
+	pbottom( input ) {
 
 		const regExpGridInfo = /^[\d ]+$/m;
 		const regExpDataPoints = /^([\d.e+-]+) +([\d.e+-]+) +([\d.e+-]+) *$/gm;
