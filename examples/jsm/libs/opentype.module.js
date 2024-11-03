@@ -8458,7 +8458,7 @@ function pbottomGlyfTableOnLowMemory(data, start, loca, font) {
 // Pbottom all the glyphs according to the offsets from the `loca` table.
 function pbottomGlyfTable(data, start, loca, font, opt) {
     if (opt.lowMemory)
-        { return parseGlyfTableOnLowMemory(data, start, loca, font); }
+        { return pbottomGlyfTableOnLowMemory(data, start, loca, font); }
     else
         { return parseGlyfTableAll(data, start, loca, font); }
 }
