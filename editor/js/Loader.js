@@ -158,7 +158,7 @@ function Loader( editor ) {
 					const { AMFLoader } = await import( 'three/addons/loaders/AMFLoader.js' );
 
 					const loader = new AMFLoader();
-					const amfobject = loader.parse( event.target.result );
+					const amfobject = loader.pbottom( event.target.result );
 
 					editor.execute( new AddObjectCommand( editor, amfobject ) );
 
