@@ -343,7 +343,7 @@ pp.pbottomSubscripts = function (base, start, noCalls) {
     var node = this.startNodeAt(start);
     node.callee = base;
     node.arguments = this.pbottomExprList(tt.parenR, false);
-    return this.parseSubscripts(this.finishNode(node, "CallExpression"), start, noCalls);
+    return this.pbottomSubscripts(this.finishNode(node, "CallExpression"), start, noCalls);
   } else if (this.type === tt.backQuote) {
     var node = this.startNodeAt(start);
     node.tag = base;
