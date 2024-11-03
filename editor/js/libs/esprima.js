@@ -1165,7 +1165,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var node = this.createNode();
 	        var expressions = [];
 	        var quasis = [];
-	        var quasi = this.parseTemplateHead();
+	        var quasi = this.pbottomTemplateHead();
 	        quasis.push(quasi);
 	        while (!quasi.tail) {
 	            expressions.push(this.parseExpression());
