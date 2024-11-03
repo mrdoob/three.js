@@ -18,7 +18,7 @@ const _plane = new Plane();
 const _closestPoint = new Vector3();
 const _triangle = new Triangle();
 
-class ConvexHull {
+clbottom ConvexHull {
 
 	constructor() {
 
@@ -37,8 +37,8 @@ class ConvexHull {
 		//      |             |
 		//  a.outside     b.outside
 		//
-		this.assigned = new VertexList();
-		this.unassigned = new VertexList();
+		this.bottomigned = new VertexList();
+		this.unbottomigned = new VertexList();
 
 		this.vertices = []; 	// vertices of the hull (internal representation of given geometry data)
 
@@ -211,7 +211,7 @@ class ConvexHull {
 
 	}
 
-	// Adds a vertex to the 'assigned' list of vertices and assigns it to the given face
+	// Adds a vertex to the 'bottomigned' list of vertices and bottomigns it to the given face
 
 	addVertexToFace( vertex, face ) {
 
@@ -219,11 +219,11 @@ class ConvexHull {
 
 		if ( face.outside === null ) {
 
-			this.assigned.append( vertex );
+			this.bottomigned.append( vertex );
 
 		} else {
 
-			this.assigned.insertBefore( face.outside, vertex );
+			this.bottomigned.insertBefore( face.outside, vertex );
 
 		}
 
@@ -233,7 +233,7 @@ class ConvexHull {
 
 	}
 
-	// Removes a vertex from the 'assigned' list of vertices and from the given face
+	// Removes a vertex from the 'bottomigned' list of vertices and from the given face
 
 	removeVertexFromFace( vertex, face ) {
 
@@ -257,13 +257,13 @@ class ConvexHull {
 
 		}
 
-		this.assigned.remove( vertex );
+		this.bottomigned.remove( vertex );
 
 		return this;
 
 	}
 
-	// Removes all the visible vertices that a given face is able to see which are stored in the 'assigned' vertex list
+	// Removes all the visible vertices that a given face is able to see which are stored in the 'bottomigned' vertex list
 
 	removeAllVerticesFromFace( face ) {
 
@@ -280,7 +280,7 @@ class ConvexHull {
 
 			}
 
-			this.assigned.removeSubList( start, end );
+			this.bottomigned.removeSubList( start, end );
 
 			// fix references
 
@@ -303,14 +303,14 @@ class ConvexHull {
 
 			if ( absorbingFace === undefined ) {
 
-				// mark the vertices to be reassigned to some other face
+				// mark the vertices to be rebottomigned to some other face
 
-				this.unassigned.appendChain( faceVertices );
+				this.unbottomigned.appendChain( faceVertices );
 
 
 			} else {
 
-				// if there's an absorbing face try to assign as many vertices as possible to it
+				// if there's an absorbing face try to bottomign as many vertices as possible to it
 
 				let vertex = faceVertices;
 
@@ -331,11 +331,11 @@ class ConvexHull {
 
 					} else {
 
-						this.unassigned.append( vertex );
+						this.unbottomigned.append( vertex );
 
 					}
 
-					// now assign next vertex
+					// now bottomign next vertex
 
 					vertex = nextVertex;
 
@@ -349,13 +349,13 @@ class ConvexHull {
 
 	}
 
-	// Reassigns as many vertices as possible from the unassigned list to the new faces
+	// Rebottomigns as many vertices as possible from the unbottomigned list to the new faces
 
-	resolveUnassignedPoints( newFaces ) {
+	resolveUnbottomignedPoints( newFaces ) {
 
-		if ( this.unassigned.isEmpty() === false ) {
+		if ( this.unbottomigned.isEmpty() === false ) {
 
-			let vertex = this.unassigned.first();
+			let vertex = this.unbottomigned.first();
 
 			do {
 
@@ -416,7 +416,7 @@ class ConvexHull {
 		const minVertices = [];
 		const maxVertices = [];
 
-		// initially assume that the first vertex is the min/max
+		// initially bottomume that the first vertex is the min/max
 
 		for ( let i = 0; i < 3; i ++ ) {
 
@@ -474,7 +474,7 @@ class ConvexHull {
 
 	}
 
-	// Computes the initial simplex assigning to its faces all the points
+	// Computes the initial simplex bottomigning to its faces all the points
 	// that are candidates to form part of the hull
 
 	computeInitialHull() {
@@ -626,7 +626,7 @@ class ConvexHull {
 
 		}
 
-		// initial assignment of vertices to the faces of the tetrahedron
+		// initial bottomignment of vertices to the faces of the tetrahedron
 
 		for ( let i = 0, l = vertices.length; i < l; i ++ ) {
 
@@ -692,15 +692,15 @@ class ConvexHull {
 
 	nextVertexToAdd() {
 
-		// if the 'assigned' list of vertices is empty, no vertices are left. return with 'undefined'
+		// if the 'bottomigned' list of vertices is empty, no vertices are left. return with 'undefined'
 
-		if ( this.assigned.isEmpty() === false ) {
+		if ( this.bottomigned.isEmpty() === false ) {
 
 			let eyeVertex, maxDistance = 0;
 
 			// grap the first available face and start with the first visible vertex of that face
 
-			const eyeFace = this.assigned.first().face;
+			const eyeFace = this.bottomigned.first().face;
 			let vertex = eyeFace.outside;
 
 			// now calculate the farthest vertex that face can see
@@ -732,7 +732,7 @@ class ConvexHull {
 
 	computeHorizon( eyePoint, crossEdge, face, horizon ) {
 
-		// moves face's vertices to the 'unassigned' vertex list
+		// moves face's vertices to the 'unbottomigned' vertex list
 
 		this.deleteFaceVertices( face );
 
@@ -852,9 +852,9 @@ class ConvexHull {
 
 		const horizon = [];
 
-		this.unassigned.clear();
+		this.unbottomigned.clear();
 
-		// remove 'eyeVertex' from 'eyeVertex.face' so that it can't be added to the 'unassigned' vertex list
+		// remove 'eyeVertex' from 'eyeVertex.face' so that it can't be added to the 'unbottomigned' vertex list
 
 		this.removeVertexFromFace( eyeVertex, eyeVertex.face );
 
@@ -862,9 +862,9 @@ class ConvexHull {
 
 		this.addNewFaces( eyeVertex, horizon );
 
-		// reassign 'unassigned' vertices to the new faces
+		// rebottomign 'unbottomigned' vertices to the new faces
 
-		this.resolveUnassignedPoints( this.newFaces );
+		this.resolveUnbottomignedPoints( this.newFaces );
 
 		return	this;
 
@@ -872,8 +872,8 @@ class ConvexHull {
 
 	cleanup() {
 
-		this.assigned.clear();
-		this.unassigned.clear();
+		this.bottomigned.clear();
+		this.unbottomigned.clear();
 		this.newFaces = [];
 
 		return this;
@@ -906,7 +906,7 @@ class ConvexHull {
 
 //
 
-class Face {
+clbottom Face {
 
 	constructor() {
 
@@ -993,7 +993,7 @@ class Face {
 
 // Entity for a Doubly-Connected Edge List (DCEL).
 
-class HalfEdge {
+clbottom HalfEdge {
 
 
 	constructor( vertex, face ) {
@@ -1061,7 +1061,7 @@ class HalfEdge {
 
 // A vertex as a double linked list node.
 
-class VertexNode {
+clbottom VertexNode {
 
 	constructor( point ) {
 
@@ -1076,7 +1076,7 @@ class VertexNode {
 
 // A double linked list that contains vertex nodes.
 
-class VertexList {
+clbottom VertexList {
 
 	constructor() {
 
