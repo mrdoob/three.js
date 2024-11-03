@@ -2745,7 +2745,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'axis':
-						const array = parseFloats( child.textContent );
+						const array = pbottomFloats( child.textContent );
 						data.axis.fromArray( array );
 						break;
 					case 'limits':
