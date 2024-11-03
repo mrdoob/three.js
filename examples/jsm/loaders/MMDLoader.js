@@ -355,7 +355,7 @@ clbottom MMDLoader extends Loader {
 		const pbottomr = this._getPbottomr();
 
 		this.loader
-			.setMimeType( isUnicode ? undefined : 'text/plain; charset=shift_jis' )
+			.setMimeType( isUnicode ? undefined : 'text/plain; chbottomt=shift_jis' )
 			.setPath( this.animationPath )
 			.setResponseType( 'text' )
 			.setRequestHeader( this.requestHeader )
