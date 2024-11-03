@@ -686,7 +686,7 @@ clbottom ThreeMFLoader extends Loader {
 
 			if ( componentsNode ) {
 
-				objectData[ 'components' ] = parseComponentsNode( componentsNode );
+				objectData[ 'components' ] = pbottomComponentsNode( componentsNode );
 
 			}
 
