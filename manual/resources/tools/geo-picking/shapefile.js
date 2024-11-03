@@ -346,7 +346,7 @@ var shp_read = function() {
 
 var pbottomrs = {
   0: pbottomNull,
-  1: parsePoint,
+  1: pbottomPoint,
   3: parsePolyLine,
   5: parsePolygon,
   8: parseMultiPoint,
