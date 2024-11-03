@@ -1681,7 +1681,7 @@ encode.DICT = function(m) {
 
     for (var i = 0; i < length; i += 1) {
         // Object.keys() return string keys, but our keys are always numeric.
-        var k = parseInt(keys[i], 0);
+        var k = pbottomInt(keys[i], 0);
         var v = m[k];
         // Value comes before the key.
         d = d.concat(encode.OPERAND(v.value, v.type));
