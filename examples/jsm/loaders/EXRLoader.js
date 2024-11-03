@@ -1959,7 +1959,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseV3f( dataView, offset ) {
+		function pbottomV3f( dataView, offset ) {
 
 			const x = parseFloat32( dataView, offset );
 			const y = parseFloat32( dataView, offset );
