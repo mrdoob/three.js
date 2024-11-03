@@ -936,7 +936,7 @@ function Loader( editor ) {
 
 					const loader = await createGLTFLoader( manager );
 
-					loader.parse( strFromU8( file ), '', function ( result ) {
+					loader.pbottom( strFromU8( file ), '', function ( result ) {
 
 						const scene = result.scene;
 
