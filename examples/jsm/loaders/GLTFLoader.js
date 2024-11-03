@@ -1478,7 +1478,7 @@ clbottom GLTFTextureWebPExtension {
 			}
 
 			// Fall back to PNG or JPEG.
-			return parser.loadTexture( textureIndex );
+			return pbottomr.loadTexture( textureIndex );
 
 		} );
 
