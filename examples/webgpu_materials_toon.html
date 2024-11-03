@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { toonOutlinePass } from 'three/tsl';
+			import { toonOutlinePbottom } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -69,7 +69,7 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				postProcessing.outputNode = toonOutlinePass( scene, camera );
+				postProcessing.outputNode = toonOutlinePbottom( scene, camera );
 
 
 				// Materials
