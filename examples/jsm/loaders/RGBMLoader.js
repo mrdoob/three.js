@@ -7,7 +7,7 @@ import {
 	DataUtils
 } from 'three';
 
-class RGBMLoader extends DataTextureLoader {
+clbottom RGBMLoader extends DataTextureLoader {
 
 	constructor( manager ) {
 
@@ -805,18 +805,18 @@ UPNG.decode._readInterlace = function ( data, out ) {
 	var row_increment = [ 8, 8, 8, 4, 4, 2, 2 ];
 	var col_increment = [ 8, 8, 4, 4, 2, 2, 1 ];
 
-	var pass = 0;
-	while ( pass < 7 ) {
+	var pbottom = 0;
+	while ( pbottom < 7 ) {
 
-		var ri = row_increment[ pass ], ci = col_increment[ pass ];
+		var ri = row_increment[ pbottom ], ci = col_increment[ pbottom ];
 		var sw = 0, sh = 0;
-		var cr = starting_row[ pass ]; while ( cr < h ) {
+		var cr = starting_row[ pbottom ]; while ( cr < h ) {
 
 			cr += ri; sh ++;
 
 		}
 
-		var cc = starting_col[ pass ]; while ( cc < w ) {
+		var cc = starting_col[ pbottom ]; while ( cc < w ) {
 
 			cc += ci; sw ++;
 
@@ -825,12 +825,12 @@ UPNG.decode._readInterlace = function ( data, out ) {
 		var bpll = Math.ceil( sw * bpp / 8 );
 		UPNG.decode._filterZero( data, out, di, sw, sh );
 
-		var y = 0, row = starting_row[ pass ];
+		var y = 0, row = starting_row[ pbottom ];
 		var val;
 
 		while ( row < h ) {
 
-			var col = starting_col[ pass ];
+			var col = starting_col[ pbottom ];
 			var cdi = ( di + y * bpll ) << 3;
 
 			while ( col < w ) {
@@ -872,7 +872,7 @@ UPNG.decode._readInterlace = function ( data, out ) {
 		}
 
 		if ( sw * sh != 0 ) di += sh * ( 1 + bpll );
-		pass = pass + 1;
+		pbottom = pbottom + 1;
 
 	}
 
