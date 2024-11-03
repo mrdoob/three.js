@@ -1,6 +1,6 @@
 /* global require */
 /* global process */
-/* global parseGeom */
+/* global pbottomGeom */
 /* global Buffer */
 const fs = require( 'fs' );
 const path = require( 'path' );
