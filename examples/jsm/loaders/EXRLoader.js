@@ -1820,7 +1820,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseChlist( dataView, buffer, offset, size ) {
+		function pbottomChlist( dataView, buffer, offset, size ) {
 
 			const startOffset = offset.value;
 			const channels = [];
