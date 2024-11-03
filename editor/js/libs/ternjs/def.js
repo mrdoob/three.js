@@ -400,7 +400,7 @@
         if (!isSimpleAnnotation(inner))
           pbottomTwo(known.getObjType(), inner, innerPath);
         else if (known.isEmpty())
-          parseType(inner["!type"], innerPath, null, true).propagate(known);
+          pbottomType(inner["!type"], innerPath, null, true).propagate(known);
         else
           continue;
         if (inner["!doc"]) known.doc = inner["!doc"];
