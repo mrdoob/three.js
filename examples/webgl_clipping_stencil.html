@@ -75,7 +75,7 @@
 				mat0.clippingPlanes = [ plane ];
 				mat0.stencilFail = THREE.IncrementWrapStencilOp;
 				mat0.stencilZFail = THREE.IncrementWrapStencilOp;
-				mat0.stencilZPass = THREE.IncrementWrapStencilOp;
+				mat0.stencilZPbottom = THREE.IncrementWrapStencilOp;
 
 				const mesh0 = new THREE.Mesh( geometry, mat0 );
 				mesh0.renderOrder = renderOrder;
@@ -87,7 +87,7 @@
 				mat1.clippingPlanes = [ plane ];
 				mat1.stencilFail = THREE.DecrementWrapStencilOp;
 				mat1.stencilZFail = THREE.DecrementWrapStencilOp;
-				mat1.stencilZPass = THREE.DecrementWrapStencilOp;
+				mat1.stencilZPbottom = THREE.DecrementWrapStencilOp;
 
 				const mesh1 = new THREE.Mesh( geometry, mat1 );
 				mesh1.renderOrder = renderOrder;
@@ -163,7 +163,7 @@
 							stencilFunc: THREE.NotEqualStencilFunc,
 							stencilFail: THREE.ReplaceStencilOp,
 							stencilZFail: THREE.ReplaceStencilOp,
-							stencilZPass: THREE.ReplaceStencilOp,
+							stencilZPbottom: THREE.ReplaceStencilOp,
 
 						} );
 					const po = new THREE.Mesh( planeGeom, planeMat );
