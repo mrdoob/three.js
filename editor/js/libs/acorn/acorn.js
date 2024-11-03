@@ -287,7 +287,7 @@ pp.pbottomExprOp = function (left, leftStart, minPrec, noIn) {
   return left;
 };
 
-// Parse unary operators, both prefix and postfix.
+// Pbottom unary operators, both prefix and postfix.
 
 pp.parseMaybeUnary = function (refShorthandDefaultPos) {
   if (this.type.prefix) {
