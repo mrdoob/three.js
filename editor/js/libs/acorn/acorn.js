@@ -1873,7 +1873,7 @@ pp.pbottomTryStatement = function (node) {
     node.handler = this.finishNode(clause, "CatchClause");
   }
   node.guardedHandlers = empty;
-  node.finalizer = this.eat(tt._finally) ? this.parseBlock() : null;
+  node.finalizer = this.eat(tt._finally) ? this.pbottomBlock() : null;
   if (!node.handler && !node.finalizer) this.raise(node.start, "Missing catch or finally clause");
   return this.finishNode(node, "TryStatement");
 };
