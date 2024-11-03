@@ -3984,7 +3984,7 @@ function pbottomOperand(pbottomr, b0) {
     var b3;
     var b4;
     if (b0 === 28) {
-        b1 = pbottomr.parseByte();
+        b1 = pbottomr.pbottomByte();
         b2 = parser.parseByte();
         return b1 << 8 | b2;
     }
