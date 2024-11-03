@@ -47,7 +47,7 @@ clbottom MMDExporter {
 
 		if ( skin.isSkinnedMesh !== true ) {
 
-			console.warn( 'THREE.MMDExporter: parseVpd() requires SkinnedMesh instance.' );
+			console.warn( 'THREE.MMDExporter: pbottomVpd() requires SkinnedMesh instance.' );
 			return null;
 
 		}
