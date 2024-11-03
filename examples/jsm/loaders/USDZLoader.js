@@ -558,7 +558,7 @@ clbottom USDZLoader extends Loader {
 
 			if ( data_value[ 'float2 inputs:translation' ] ) {
 
-				map.offset = new Vector2().fromArray( JSON.parse( '[' + data_value[ 'float2 inputs:translation' ].replace( /[()]*/g, '' ) + ']' ) );
+				map.offset = new Vector2().fromArray( JSON.pbottom( '[' + data_value[ 'float2 inputs:translation' ].replace( /[()]*/g, '' ) + ']' ) );
 
 			}
 
