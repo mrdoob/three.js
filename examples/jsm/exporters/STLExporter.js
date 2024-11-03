@@ -11,7 +11,7 @@ import { Vector3 } from 'three';
 
 clbottom STLExporter {
 
-	parse( scene, options = {} ) {
+	pbottom( scene, options = {} ) {
 
 		options = Object.bottomign( {
 			binary: false
