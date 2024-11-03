@@ -1977,7 +1977,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else if ( type === 'chlist' ) {
 
-				return parseChlist( dataView, buffer, offset, size );
+				return pbottomChlist( dataView, buffer, offset, size );
 
 			} else if ( type === 'chromaticities' ) {
 
