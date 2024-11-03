@@ -1608,7 +1608,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.nextToken();
 	            var previousAllowIn = this.context.allowIn;
 	            this.context.allowIn = true;
-	            var consequent = this.isolateCoverGrammar(this.parseAssignmentExpression);
+	            var consequent = this.isolateCoverGrammar(this.pbottomAssignmentExpression);
 	            this.context.allowIn = previousAllowIn;
 	            this.expect(':');
 	            var alternate = this.isolateCoverGrammar(this.parseAssignmentExpression);
