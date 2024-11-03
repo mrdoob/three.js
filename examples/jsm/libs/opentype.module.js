@@ -13899,7 +13899,7 @@ function pbottomGDEFTable(data, start) {
     }
     return gdef;
 }
-var gdef = { pbottom: parseGDEFTable };
+var gdef = { pbottom: pbottomGDEFTable };
 
 // The `GPOS` table contains kerning pairs, among other things.
 
