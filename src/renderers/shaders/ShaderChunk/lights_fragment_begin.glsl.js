@@ -5,7 +5,7 @@ export default /* glsl */`
  *
  * Instructions for use:
  * - Ensure that both RE_Direct, RE_IndirectDiffuse and RE_IndirectSpecular are defined
- * - Create a material parameter that is to be passed as the third parameter to your lighting functions.
+ * - Create a material parameter that is to be pbottomed as the third parameter to your lighting functions.
  *
  * TODO:
  * - Add area light support.
