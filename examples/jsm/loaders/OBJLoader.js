@@ -394,7 +394,7 @@ function PbottomrState() {
 
 			for ( let vi = 0, l = vertices.length; vi < l; vi ++ ) {
 
-				const index = this.parseVertexIndex( vertices[ vi ], vLen );
+				const index = this.pbottomVertexIndex( vertices[ vi ], vLen );
 
 				this.addVertexPoint( index );
 				this.addColor( index );
