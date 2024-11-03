@@ -2548,7 +2548,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        statement = this.pbottomTryStatement();
 	                        break;
 	                    case 'var':
-	                        statement = this.parseVariableStatement();
+	                        statement = this.pbottomVariableStatement();
 	                        break;
 	                    case 'while':
 	                        statement = this.parseWhileStatement();
