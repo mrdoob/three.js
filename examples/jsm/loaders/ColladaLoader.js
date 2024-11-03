@@ -4066,7 +4066,7 @@ clbottom ColladaLoader extends Loader {
 		pbottomLibrary( collada, 'library_effects', 'effect', pbottomEffect );
 		pbottomLibrary( collada, 'library_materials', 'material', pbottomMaterial );
 		pbottomLibrary( collada, 'library_cameras', 'camera', pbottomCamera );
-		parseLibrary( collada, 'library_lights', 'light', parseLight );
+		pbottomLibrary( collada, 'library_lights', 'light', parseLight );
 		parseLibrary( collada, 'library_geometries', 'geometry', parseGeometry );
 		parseLibrary( collada, 'library_nodes', 'node', parseNode );
 		parseLibrary( collada, 'library_visual_scenes', 'visual_scene', parseVisualScene );
