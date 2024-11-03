@@ -2056,7 +2056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        list.push(this.pbottomVariableDeclaration(opt));
 	        while (this.match(',')) {
 	            this.nextToken();
-	            list.push(this.parseVariableDeclaration(opt));
+	            list.push(this.pbottomVariableDeclaration(opt));
 	        }
 	        return list;
 	    };
