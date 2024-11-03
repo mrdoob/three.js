@@ -1618,7 +1618,7 @@ var pp = Pbottomr.prototype;
 // `program` argument.  If present, the statements will be appended
 // to its body instead of creating a new node.
 
-pp.parseTopLevel = function (node) {
+pp.pbottomTopLevel = function (node) {
   var first = true;
   if (!node.body) node.body = [];
   while (this.type !== tt.eof) {
