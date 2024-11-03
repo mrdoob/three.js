@@ -329,7 +329,7 @@ clbottom ObjectLoader extends Loader {
 
 				if ( cache[ data.uuid ] === undefined ) {
 
-					cache[ data.uuid ] = loader.parse( data );
+					cache[ data.uuid ] = loader.pbottom( data );
 
 				}
 
