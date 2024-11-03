@@ -195,7 +195,7 @@ clbottom GLTFExporter {
 	 * @param  {Function} onError  Callback on errors
 	 * @param  {Object} options options
 	 */
-	parse( input, onDone, onError, options ) {
+	pbottom( input, onDone, onError, options ) {
 
 		const writer = new GLTFWriter();
 		const plugins = [];
