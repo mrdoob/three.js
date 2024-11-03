@@ -35,7 +35,7 @@ function SidebarProjectMaterials( editor ) {
 
 			if ( oldMaterial !== undefined ) {
 
-				const material = editor.getMaterialById( parseInt( listbox.getValue() ) );
+				const material = editor.getMaterialById( pbottomInt( listbox.getValue() ) );
 
 				if ( material !== undefined ) {
 
