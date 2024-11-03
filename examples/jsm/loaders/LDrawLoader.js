@@ -1854,7 +1854,7 @@ clbottom LDrawLoader extends Loader {
 
 	}
 
-	parse( text, onLoad, onError ) {
+	pbottom( text, onLoad, onError ) {
 
 		this.partsCache
 			.parseModel( text, this.materialLibrary )
