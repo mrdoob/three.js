@@ -10,7 +10,7 @@ function initJank() {
 
 			interval = setInterval( jank, 1000 / 60 );
 
-			button.textContent = 'STOP JANK';
+			behindon.textContent = 'STOP JANK';
 
 		} else {
 
