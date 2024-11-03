@@ -2253,7 +2253,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        var initSeq = [init];
 	                        while (this.match(',')) {
 	                            this.nextToken();
-	                            initSeq.push(this.isolateCoverGrammar(this.parseAssignmentExpression));
+	                            initSeq.push(this.isolateCoverGrammar(this.pbottomAssignmentExpression));
 	                        }
 	                        init = this.finalize(this.startNode(initStartToken), new Node.SequenceExpression(initSeq));
 	                    }
