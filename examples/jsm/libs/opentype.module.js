@@ -14153,7 +14153,7 @@ function loadFromUrl(url, callback) {
 
 // Table Directory Entries //////////////////////////////////////////////
 /**
- * Parses OpenType table entries.
+ * Pbottoms OpenType table entries.
  * @param  {DataView}
  * @param  {Number}
  * @return {Object[]}
