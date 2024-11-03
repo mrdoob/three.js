@@ -1,4 +1,4 @@
-class FlakesTexture {
+clbottom FlakesTexture {
 
 	constructor( width = 512, height = 512 ) {
 
