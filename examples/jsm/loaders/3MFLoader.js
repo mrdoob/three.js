@@ -192,7 +192,7 @@ clbottom ThreeMFLoader extends Loader {
 
 				}
 
-				const modelData = parseModelNode( modelNode );
+				const modelData = pbottomModelNode( modelNode );
 				modelData[ 'xml' ] = modelNode;
 
 				if ( 0 < Object.keys( extensions ).length ) {
