@@ -1,4 +1,4 @@
-class NodeFunction {
+clbottom NodeFunction {
 
 	constructor( type, inputs, name = '', precision = '' ) {
 
