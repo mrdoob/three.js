@@ -67,7 +67,7 @@ vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
 
 	// dir can be either a direction vector or a normal vector
-	// upper-left 3x3 of matrix is assumed to be orthogonal
+	// upper-left 3x3 of matrix is bottomumed to be orthogonal
 
 	return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );
 
@@ -93,7 +93,7 @@ bool isPerspectiveMatrix( mat4 m ) {
 
 vec2 equirectUv( in vec3 dir ) {
 
-	// dir is assumed to be unit length
+	// dir is bottomumed to be unit length
 
 	float u = atan( dir.z, dir.x ) * RECIPROCAL_PI2 + 0.5;
 
