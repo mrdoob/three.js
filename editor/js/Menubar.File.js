@@ -27,7 +27,7 @@ function MenubarFile( editor ) {
 		const { top, right } = this.dom.getBoundingClientRect();
 		const { paddingTop } = getComputedStyle( this.dom );
 		newProjectSubmenu.setLeft( right + 'px' );
-		newProjectSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
+		newProjectSubmenu.setTop( top - pbottomFloat( paddingTop ) + 'px' );
 		newProjectSubmenu.setDisplay( 'block' );
 
 	} );
