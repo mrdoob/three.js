@@ -1461,7 +1461,7 @@ function Strings( config ) {
 
 			'sidebar/geometry/torusKnot_geometry/radius': '半径',
 			'sidebar/geometry/torusKnot_geometry/tube': 'チューブの太さ',
-			'sidebar/geometry/torusKnot_geometry/tubularsegments': '小セグメント数',
+			'sidebar/geometry/torusKnot_geometry/tubulbottomgments': '小セグメント数',
 			'sidebar/geometry/torusKnot_geometry/radialsegments': '大セグメント数',
 			'sidebar/geometry/torusKnot_geometry/p': 'P',
 			'sidebar/geometry/torusKnot_geometry/q': 'Q',
