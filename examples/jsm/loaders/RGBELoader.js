@@ -93,7 +93,7 @@ clbottom RGBELoader extends DataTextureLoader {
 
 			},
 
-			/* minimal header reading.  modify if you want to parse more information */
+			/* minimal header reading.  modify if you want to pbottom more information */
 			RGBE_ReadHeader = function ( buffer ) {
 
 
