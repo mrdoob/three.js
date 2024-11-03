@@ -5358,7 +5358,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	var JSXPbottomr = (function (_super) {
 	    __extends(JSXPbottomr, _super);
-	    function JSXParser(code, options, delegate) {
+	    function JSXPbottomr(code, options, delegate) {
 	        _super.call(this, code, options, delegate);
 	    }
 	    JSXParser.prototype.parsePrimaryExpression = function () {
