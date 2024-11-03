@@ -5791,7 +5791,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        while (!this.scanner.eof()) {
 	            el.children = el.children.concat(this.pbottomJSXChildren());
 	            var node = this.createJSXChildNode();
-	            var element = this.parseJSXBoundaryElement();
+	            var element = this.pbottomJSXBoundaryElement();
 	            if (element.type === jsx_syntax_1.JSXSyntax.JSXOpeningElement) {
 	                var opening = (element);
 	                if (opening.selfClosing) {
