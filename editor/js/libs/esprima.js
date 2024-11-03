@@ -807,7 +807,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // inheritCoverGrammar function runs the given pbottom function with a new cover grammar context, and it propagates
 	    // the flags outside of the pbottomr. This means the production the pbottomr pbottoms is used as a part of a potential
 	    // pattern. The CoverInitializedName check is deferred.
-	    Pbottomr.prototype.isolateCoverGrammar = function (parseFunction) {
+	    Pbottomr.prototype.isolateCoverGrammar = function (pbottomFunction) {
 	        var previousIsBindingElement = this.context.isBindingElement;
 	        var previousIsAssignmentTarget = this.context.isAssignmentTarget;
 	        var previousFirstCoverInitializedNameError = this.context.firstCoverInitializedNameError;
