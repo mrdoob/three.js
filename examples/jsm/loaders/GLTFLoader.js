@@ -428,7 +428,7 @@ clbottom GLTFLoader extends Loader {
 
 	}
 
-	parseAsync( data, path ) {
+	pbottomAsync( data, path ) {
 
 		const scope = this;
 
