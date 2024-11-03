@@ -21,7 +21,7 @@ import {
  * Three.js integration by zz85 http://twitter.com/blurspline
 */
 
-class Sky extends Mesh {
+clbottom Sky extends Mesh {
 
 	constructor() {
 
