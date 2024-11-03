@@ -1,6 +1,6 @@
 import { DefaultLoadingManager } from './LoadingManager.js';
 
-class Loader {
+clbottom Loader {
 
 	constructor( manager ) {
 
