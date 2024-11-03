@@ -9,10 +9,10 @@ export default QUnit.module( 'Cameras', () => {
 	QUnit.module( 'ArrayCamera', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new ArrayCamera();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof PerspectiveCamera, true,
 				'ArrayCamera extends from PerspectiveCamera'
 			);
@@ -20,26 +20,26 @@ export default QUnit.module( 'Cameras', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new ArrayCamera();
-			assert.ok( object, 'Can instantiate an ArrayCamera.' );
+			bottomert.ok( object, 'Can instantiate an ArrayCamera.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'cameras', ( assert ) => {
+		QUnit.todo( 'cameras', ( bottomert ) => {
 
 			// array
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isArrayCamera', ( assert ) => {
+		QUnit.test( 'isArrayCamera', ( bottomert ) => {
 
 			const object = new ArrayCamera();
-			assert.ok(
+			bottomert.ok(
 				object.isArrayCamera,
 				'ArrayCamera.isArrayCamera should be true'
 			);
