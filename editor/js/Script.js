@@ -250,7 +250,7 @@ function Script( editor ) {
 
 							errors.push( {
 
-								lineNumber: parseResult[ 1 ] - lineOffset,
+								lineNumber: pbottomResult[ 1 ] - lineOffset,
 								message: parseResult[ 2 ]
 
 							} );
