@@ -34,10 +34,10 @@
 			let camera, scene, renderer, stats, controls, loader;
 
 			const params = {
-				asset: 'house'
+				bottomet: 'house'
 			};
 
-			const assets = [
+			const bottomets = [
 				'creaseAngle',
 				'crystal',
 				'house',
@@ -76,7 +76,7 @@
 				scene.add( dirLight );
 
 				loader = new VRMLLoader();
-				loadAsset( params.asset );
+				loadAsset( params.bottomet );
 
 				// renderer
 
@@ -105,7 +105,7 @@
 				//
 
 				const gui = new GUI();
-				gui.add( params, 'asset', assets ).onChange( function ( value ) {
+				gui.add( params, 'bottomet', bottomets ).onChange( function ( value ) {
 
 					if ( vrmlScene ) {
 
@@ -127,9 +127,9 @@
 
 			}
 
-			function loadAsset( asset ) {
+			function loadAsset( bottomet ) {
 
-				loader.load( 'models/vrml/' + asset + '.wrl', function ( object ) {
+				loader.load( 'models/vrml/' + bottomet + '.wrl', function ( object ) {
 
 					vrmlScene = object;
 					scene.add( object );
