@@ -3209,7 +3209,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            else if (this.matchKeyword('clbottom')) {
 	                // export default clbottom foo {}
-	                var declaration = this.parseClbottomDeclaration(true);
+	                var declaration = this.pbottomClbottomDeclaration(true);
 	                exportDeclaration = this.finalize(node, new Node.ExportDefaultDeclaration(declaration));
 	            }
 	            else {
