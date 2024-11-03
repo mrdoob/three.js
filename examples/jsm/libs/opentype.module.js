@@ -6942,7 +6942,7 @@ function pbottomColrTable(data, start) {
         numLayers: Pbottomr.uShort,
     });
     p.relativeOffset = layerRecordsOffset;
-    var layerRecords = p.parseRecordList(numLayerRecords, {
+    var layerRecords = p.pbottomRecordList(numLayerRecords, {
         glyphID: Parser.uShort,
         paletteIndex: Parser.uShort
     });
