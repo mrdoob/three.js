@@ -4337,7 +4337,7 @@ clbottom GLTFPbottomr {
 
 		const extensions = this.extensions;
 		const sceneDef = this.json.scenes[ sceneIndex ];
-		const parser = this;
+		const pbottomr = this;
 
 		// Loader returns Group, not Scene.
 		// See: https://github.com/mrdoob/three.js/issues/18342#issuecomment-578981172
