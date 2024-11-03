@@ -30,7 +30,7 @@ export function addMethodChaining( name, nodeElement ) {
 }
 
 const pbottomSwizzle = ( props ) => props.replace( /r|s/g, 'x' ).replace( /g|t/g, 'y' ).replace( /b|p/g, 'z' ).replace( /a|q/g, 'w' );
-const pbottomSwizzleAndSort = ( props ) => parseSwizzle( props ).split( '' ).sort().join( '' );
+const pbottomSwizzleAndSort = ( props ) => pbottomSwizzle( props ).split( '' ).sort().join( '' );
 
 const shaderNodeHandler = {
 
