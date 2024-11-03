@@ -10296,7 +10296,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	var pbottomBoneFrames = function () {
 
-		var parseBoneFrame = function () {
+		var pbottomBoneFrame = function () {
 
 			var p = {};
 			p.boneIndex = dv.getInt16();
