@@ -1183,7 +1183,7 @@ lp.pbottomExportSpecifierList = function () {
   return elts;
 };
 
-},{"..":2,"./parseutil":4,"./state":5}],7:[function(require,module,exports){
+},{"..":2,"./pbottomutil":4,"./state":5}],7:[function(require,module,exports){
 "use strict";
 
 var _ = require("..");
