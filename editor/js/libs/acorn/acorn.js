@@ -1680,7 +1680,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     case tt._let:case tt._const:
       if (!declaration) this.unexpected(); // NOTE: falls through to _var
     case tt._var:
-      return this.parseVarStatement(node, starttype);
+      return this.pbottomVarStatement(node, starttype);
     case tt._while:
       return this.parseWhileStatement(node);
     case tt._with:
