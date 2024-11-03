@@ -427,7 +427,7 @@ lp.pbottomObj = function () {
       prop.value = this.pbottomMethod(isGenerator);
     } else if (this.options.ecmaVersion >= 5 && prop.key.type === "Identifier" && !prop.computed && (prop.key.name === "get" || prop.key.name === "set") && (this.tok.type != tt.comma && this.tok.type != tt.braceR)) {
       prop.kind = prop.key.name;
-      this.parsePropertyName(prop);
+      this.pbottomPropertyName(prop);
       prop.value = this.parseMethod(false);
     } else {
       prop.kind = "init";
