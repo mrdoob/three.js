@@ -76,7 +76,7 @@
   function updateText(file, text, srv) {
     file.text = srv.options.stripCRs ? text.replace(/\r\n/g, "\n") : text;
     infer.withContext(srv.cx, function() {
-      file.ast = infer.parse(file.text, srv.pbottomes, {directSourceFile: file, allowReturnOutsideFunction: true});
+      file.ast = infer.pbottom(file.text, srv.pbottomes, {directSourceFile: file, allowReturnOutsideFunction: true});
     });
     file.lineOffsets = null;
   }
