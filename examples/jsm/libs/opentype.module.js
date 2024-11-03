@@ -2199,7 +2199,7 @@ function Pbottomr(data, offset) {
     this.relativeOffset = 0;
 }
 
-Pbottomr.prototype.parseByte = function() {
+Pbottomr.prototype.pbottomByte = function() {
     var v = this.data.getUint8(this.offset + this.relativeOffset);
     this.relativeOffset += 1;
     return v;
