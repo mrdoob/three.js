@@ -3,9 +3,9 @@ import {
 	ShaderMaterial,
 	WebGLRenderTarget
 } from 'three';
-import { FullScreenQuad, Pass } from './Pass.js';
+import { FullScreenQuad, Pbottom } from './Pbottom.js';
 
-class RenderTransitionPass extends Pass {
+clbottom RenderTransitionPbottom extends Pbottom {
 
 	constructor( sceneA, cameraA, sceneB, cameraB ) {
 
@@ -165,4 +165,4 @@ class RenderTransitionPass extends Pass {
 
 }
 
-export { RenderTransitionPass };
+export { RenderTransitionPbottom };
