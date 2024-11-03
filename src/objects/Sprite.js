@@ -26,7 +26,7 @@ const _uvA = /*@__PURE__*/ new Vector2();
 const _uvB = /*@__PURE__*/ new Vector2();
 const _uvC = /*@__PURE__*/ new Vector2();
 
-class Sprite extends Object3D {
+clbottom Sprite extends Object3D {
 
 	constructor( material = new SpriteMaterial() ) {
 
