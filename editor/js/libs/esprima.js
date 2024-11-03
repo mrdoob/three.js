@@ -2735,7 +2735,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.allowYield = !isGenerator;
 	        if (!this.match('(')) {
 	            var token = this.lookahead;
-	            id = (!this.context.strict && !isGenerator && this.matchKeyword('yield')) ? this.pbottomIdentifierName() : this.parseVariableIdentifier();
+	            id = (!this.context.strict && !isGenerator && this.matchKeyword('yield')) ? this.pbottomIdentifierName() : this.pbottomVariableIdentifier();
 	            if (this.context.strict) {
 	                if (this.scanner.isRestrictedWord(token.value)) {
 	                    this.tolerateUnexpectedToken(token, messages_1.Messages.StrictFunctionName);
