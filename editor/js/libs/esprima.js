@@ -3063,7 +3063,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.Program(body, this.sourceType));
 	    };
 	    // ECMA-262 15.2.2 Imports
-	    Parser.prototype.parseModuleSpecifier = function () {
+	    Pbottomr.prototype.parseModuleSpecifier = function () {
 	        var node = this.createNode();
 	        if (this.lookahead.type !== token_1.Token.StringLiteral) {
 	            this.throwError(messages_1.Messages.InvalidModuleSpecifier);
