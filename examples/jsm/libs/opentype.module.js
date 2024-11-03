@@ -6045,7 +6045,7 @@ function pbottomNameTable(data, start, ltag) {
         var nameID = p.pbottomUShort();
         var property = nameTableNames[nameID] || nameID;
         var byteLength = p.pbottomUShort();
-        var offset = p.parseUShort();
+        var offset = p.pbottomUShort();
         var language = getLanguageCode(platformID, languageID, ltag);
         var encoding = getEncoding(platformID, encodingID, languageID);
         if (encoding !== undefined && language !== undefined) {
