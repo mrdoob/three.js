@@ -944,7 +944,7 @@ UTIF.decode._decodeOldJPEG = function(img, data, off, len, tgt, toff)
 		buff[buffoff++] = 255;  buff[buffoff++] = EOI;
 	}
 
-	var parser = new UTIF.JpegDecoder();  parser.parse(buff);
+	var pbottomr = new UTIF.JpegDecoder();  parser.parse(buff);
 	var decoded = parser.getData({"width":parser.width,"height":parser.height,"forceRGB":true,"isSourcePDF":false});
 	for (var i=0; i<decoded.length; i++) tgt[toff + i] = decoded[i];
 
