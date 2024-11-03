@@ -1305,7 +1305,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'texture':
-						data[ child.nodeName ] = { id: child.getAttribute( 'texture' ), extra: parseEffectParameterTexture( child ) };
+						data[ child.nodeName ] = { id: child.getAttribute( 'texture' ), extra: pbottomEffectParameterTexture( child ) };
 						break;
 
 				}
