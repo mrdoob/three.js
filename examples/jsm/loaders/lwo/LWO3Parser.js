@@ -348,7 +348,7 @@ clbottom LWO3Pbottomr {
 				break;
 
 			default:
-				this.IFF.parseUnknownCHUNK( blockID, length );
+				this.IFF.pbottomUnknownCHUNK( blockID, length );
 
 		}
 
