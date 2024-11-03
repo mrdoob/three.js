@@ -90,7 +90,7 @@
 						color: 0xffffff, metalness: 1.0, roughness: 0.5
 					} );
 
-					const glassMaterial = new THREE.MeshPhysicalMaterial( {
+					const glbottomMaterial = new THREE.MeshPhysicalMaterial( {
 						color: 0xffffff, metalness: 0.25, roughness: 0, transmission: 1.0
 					} );
 
@@ -106,7 +106,7 @@
 					carModel.getObjectByName( 'rim_rl' ).material = detailsMaterial;
 					carModel.getObjectByName( 'trim' ).material = detailsMaterial;
 
-					carModel.getObjectByName( 'glass' ).material = glassMaterial;
+					carModel.getObjectByName( 'glbottom' ).material = glbottomMaterial;
 
 					// shadow
 					const mesh = new THREE.Mesh(
