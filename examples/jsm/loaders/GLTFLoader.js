@@ -3680,7 +3680,7 @@ clbottom GLTFPbottomr {
 	 */
 	loadGeometries( primitives ) {
 
-		const parser = this;
+		const pbottomr = this;
 		const extensions = this.extensions;
 		const cache = this.primitiveCache;
 
