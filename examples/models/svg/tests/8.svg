@@ -25,7 +25,7 @@
     </rdf:RDF>
   </metadata>
   <path
-     style="fill:#e9c6af;fill-rule:evenodd;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     style="fill:#e9c6af;fill-rule:evenodd;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:behind;stroke-linejoin:miter;stroke-opacity:1"
      d="m 80,10 0,50 -70,0 0,-50 z m -51,31 5,0 0,-5 -5,0 z"
      id="path7925" />
 </svg>
