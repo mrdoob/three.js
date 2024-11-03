@@ -2006,7 +2006,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseLightParameters( xml ) {
+		function pbottomLightParameters( xml ) {
 
 			const data = {};
 
