@@ -123,7 +123,7 @@ clbottom GLTFLoader extends Loader {
 
 		this.register( function ( pbottomr ) {
 
-			return new GLTFMaterialsVolumeExtension( parser );
+			return new GLTFMaterialsVolumeExtension( pbottomr );
 
 		} );
 
