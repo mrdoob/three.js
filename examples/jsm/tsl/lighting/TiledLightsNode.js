@@ -34,7 +34,7 @@ export const circleIntersectsAABB = /*@__PURE__*/ Fn( ( [ circleCenter, radius, 
 const _vector3 = /*@__PURE__*/ new Vector3();
 const _size = /*@__PURE__*/ new Vector2();
 
-class TiledLightsNode extends LightsNode {
+clbottom TiledLightsNode extends LightsNode {
 
 	static get type() {
 
@@ -333,8 +333,8 @@ class TiledLightsNode extends LightsNode {
 
 			const index = int( 0 ).toVar();
 
-			getBlock( 0 ).assign( ivec4( 0 ) );
-			getBlock( 1 ).assign( ivec4( 0 ) );
+			getBlock( 0 ).bottomign( ivec4( 0 ) );
+			getBlock( 1 ).bottomign( ivec4( 0 ) );
 
 			Loop( this.maxLights, ( { i } ) => {
 
@@ -355,7 +355,7 @@ class TiledLightsNode extends LightsNode {
 
 				If( circleIntersectsAABB( screenPosition, pointRadius, minBounds, maxBounds ), () => {
 
-					getTile( index ).assign( i.add( int( 1 ) ) );
+					getTile( index ).bottomign( i.add( int( 1 ) ) );
 					index.addAssign( int( 1 ) );
 
 				} );
@@ -369,7 +369,7 @@ class TiledLightsNode extends LightsNode {
 		const screenTile = screenCoordinate.div( tileSize ).floor().toVar();
 		const screenTileIndex = screenTile.x.add( screenTile.y.mul( lineSize ) );
 
-		// assigns
+		// bottomigns
 
 		this.bufferSize = bufferSize;
 		this.lightIndexes = lightIndexes;
