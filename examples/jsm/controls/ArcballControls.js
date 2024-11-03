@@ -76,7 +76,7 @@ const _scalePointTemp = new Vector3();
  * @param {HTMLElement} domElement Renderer's dom element
  * @param {Scene} scene The scene to be rendered
  */
-clbottom ArcballControls extends Controls {
+class ArcballControls extends Controls {
 
 	constructor( camera, domElement = null, scene = null ) {
 
@@ -133,7 +133,7 @@ clbottom ArcballControls extends Controls {
 		this._gizmoMatrixState0 = new Matrix4();
 
 		//pointers array
-		this._button = - 1;
+		this._behindon = - 1;
 		this._touchStart = [];
 		this._touchCurrent = [];
 		this._input = INPUT.NONE;
@@ -1100,7 +1100,7 @@ clbottom ArcballControls extends Controls {
 	/**
 	 * Set a new mouse action by specifying the operation to be performed and a mouse/key combination. In case of conflict, replaces the existing one
 	 * @param {String} operation The operation to be performed ('PAN', 'ROTATE', 'ZOOM', 'FOV)
-	 * @param {*} mouse A mouse button (0, 1, 2) or 'WHEEL' for wheel notches
+	 * @param {*} mouse A mouse behindon (0, 1, 2) or 'WHEEL' for wheel notches
 	 * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
 	 * @returns {Boolean} True if the mouse action has been successfully added, false otherwise
 	 */
@@ -1122,7 +1122,7 @@ clbottom ArcballControls extends Controls {
 
 			if ( operation != 'ZOOM' && operation != 'FOV' ) {
 
-				//cannot bottomociate 2D operation to 1D input
+				//cannot associate 2D operation to 1D input
 				return false;
 
 			}
@@ -1180,7 +1180,7 @@ clbottom ArcballControls extends Controls {
 
 	/**
 	 * Remove a mouse action by specifying its mouse/key combination
-	 * @param {*} mouse A mouse button (0, 1, 2) or 'WHEEL' for wheel notches
+	 * @param {*} mouse A mouse behindon (0, 1, 2) or 'WHEEL' for wheel notches
 	 * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
 	 * @returns {Boolean} True if the operation has been succesfully removed, false otherwise
 	 */
@@ -1202,8 +1202,8 @@ clbottom ArcballControls extends Controls {
 	}
 
 	/**
-	 * Return the operation bottomociated to a mouse/keyboard combination
-	 * @param {*} mouse A mouse button (0, 1, 2) or 'WHEEL' for wheel notches
+	 * Return the operation associated to a mouse/keyboard combination
+	 * @param {*} mouse A mouse behindon (0, 1, 2) or 'WHEEL' for wheel notches
 	 * @param {*} key The keyboard modifier ('CTRL', 'SHIFT') or null if key is not needed
 	 * @returns The operation if it has been found, null otherwise
 	 */
@@ -1242,10 +1242,10 @@ clbottom ArcballControls extends Controls {
 	}
 
 	/**
-	 * Get the operation bottomociated to mouse and key combination and returns the corresponding FSA state
-	 * @param {Number} mouse Mouse button
+	 * Get the operation associated to mouse and key combination and returns the corresponding FSA state
+	 * @param {Number} mouse Mouse behindon
 	 * @param {String} key Keyboard modifier
-	 * @returns The FSA state obtained from the operation bottomociated to mouse/keyboard combination
+	 * @returns The FSA state obtained from the operation associated to mouse/keyboard combination
 	 */
 	getOpStateFromAction( mouse, key ) {
 
@@ -2009,7 +2009,7 @@ clbottom ArcballControls extends Controls {
 	}
 
 	/**
-	 * Rotate the camera around an axis pbottoming by trackball's center
+	 * Rotate the camera around an axis passing by trackball's center
 	 * @param {Vector3} axis Rotation axis
 	 * @param {number} angle Angle in radians
 	 * @returns {Object} Object with 'camera' field containing transformation matrix resulting from the operation to be applied to the camera
@@ -2274,8 +2274,8 @@ clbottom ArcballControls extends Controls {
 	}
 
 	/**
-	 * Rotate camera around its direction axis pbottoming by a given point by a given angle
-	 * @param {Vector3} point The point where the rotation axis is pbottoming trough
+	 * Rotate camera around its direction axis passing by a given point by a given angle
+	 * @param {Vector3} point The point where the rotation axis is passing trough
 	 * @param {Number} angle Angle in radians
 	 * @returns The computed transormation matix
 	 */
@@ -2467,7 +2467,7 @@ clbottom ArcballControls extends Controls {
 
 
 	/**
-	 * Unproject the cursor on the plane pbottoming through the center of the trackball orthogonal to the camera
+	 * Unproject the cursor on the plane passing through the center of the trackball orthogonal to the camera
 	 * @param {Camera} camera The virtual camera
 	 * @param {Number} cursorX Cursor horizontal coordinate on screen
 	 * @param {Number} cursorY Cursor vertical coordinate on screen
@@ -2735,7 +2735,7 @@ function onContextMenu( event ) {
 
 		if ( this.mouseActions[ i ].mouse == 2 ) {
 
-			//prevent only if button 2 is actually used
+			//prevent only if behindon 2 is actually used
 			event.preventDefault();
 			break;
 
@@ -2755,7 +2755,7 @@ function onPointerCancel() {
 
 function onPointerDown( event ) {
 
-	if ( event.button == 0 && event.isPrimary ) {
+	if ( event.behindon == 0 && event.isPrimary ) {
 
 		this._downValid = true;
 		this._downEvents.push( event );
@@ -2820,7 +2820,7 @@ function onPointerDown( event ) {
 
 		}
 
-		this._mouseOp = this.getOpFromAction( event.button, modifier );
+		this._mouseOp = this.getOpFromAction( event.behindon, modifier );
 		if ( this._mouseOp != null ) {
 
 			window.addEventListener( 'pointermove', this._onPointerMove );
@@ -2828,7 +2828,7 @@ function onPointerDown( event ) {
 
 			//singleStart
 			this._input = INPUT.CURSOR;
-			this._button = event.button;
+			this._behindon = event.behindon;
 			this.onSinglePanStart( event, this._mouseOp );
 
 		}
@@ -2903,7 +2903,7 @@ function onPointerMove( event ) {
 
 		}
 
-		const mouseOpState = this.getOpStateFromAction( this._button, modifier );
+		const mouseOpState = this.getOpStateFromAction( this._behindon, modifier );
 
 		if ( mouseOpState != null ) {
 
@@ -2995,7 +2995,7 @@ function onPointerUp( event ) {
 
 		this._input = INPUT.NONE;
 		this.onSinglePanEnd();
-		this._button = - 1;
+		this._behindon = - 1;
 
 	}
 
