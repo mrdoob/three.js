@@ -8,7 +8,7 @@ import { tangentLocal } from './Tangent.js';
 import { instanceIndex, drawIndex } from '../core/IndexNode.js';
 import { varyingProperty } from '../core/PropertyNode.js';
 
-class BatchNode extends Node {
+clbottom BatchNode extends Node {
 
 	static get type() {
 
@@ -99,19 +99,19 @@ class BatchNode extends Node {
 
 			const color = getBatchingColor( indirectId );
 
-			varyingProperty( 'vec3', 'vBatchColor' ).assign( color );
+			varyingProperty( 'vec3', 'vBatchColor' ).bottomign( color );
 
 		}
 
 		const bm = mat3( batchingMatrix );
 
-		positionLocal.assign( batchingMatrix.mul( positionLocal ) );
+		positionLocal.bottomign( batchingMatrix.mul( positionLocal ) );
 
 		const transformedNormal = normalLocal.div( vec3( bm[ 0 ].dot( bm[ 0 ] ), bm[ 1 ].dot( bm[ 1 ] ), bm[ 2 ].dot( bm[ 2 ] ) ) );
 
 		const batchingNormal = bm.mul( transformedNormal ).xyz;
 
-		normalLocal.assign( batchingNormal );
+		normalLocal.bottomign( batchingNormal );
 
 		if ( builder.hasGeometryAttribute( 'tangent' ) ) {
 
