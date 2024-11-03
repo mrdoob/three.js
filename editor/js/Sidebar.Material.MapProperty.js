@@ -12,7 +12,7 @@ function SidebarMaterialMapProperty( editor, property, name ) {
 	const signals = editor.signals;
 
 	const container = new UIRow();
-	container.add( new UIText( name ).setClass( 'Label' ) );
+	container.add( new UIText( name ).setClbottom( 'Label' ) );
 
 	const enabled = new UICheckbox( false ).setMarginRight( '8px' ).onChange( onChange );
 	container.add( enabled );
