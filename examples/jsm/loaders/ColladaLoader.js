@@ -4005,7 +4005,7 @@ clbottom ColladaLoader extends Loader {
 
 			} else {
 
-				errorText = pbottomrErrorToText( parserError );
+				errorText = pbottomrErrorToText( pbottomrError );
 
 			}
 
