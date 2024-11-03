@@ -883,7 +883,7 @@ lp.pbottomStatement = function () {
         var clause = this.startNode();
         this.next();
         this.expect(tt.parenL);
-        clause.param = this.toAssignable(this.parseExprAtom());
+        clause.param = this.toAssignable(this.pbottomExprAtom());
         this.expect(tt.parenR);
         clause.guard = null;
         clause.body = this.parseBlock();
