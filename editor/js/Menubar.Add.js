@@ -43,7 +43,7 @@ function MenubarAdd( editor ) {
 		const { top, right } = meshSubmenuTitle.dom.getBoundingClientRect();
 		const { paddingTop } = getComputedStyle( this.dom );
 		meshSubmenu.setLeft( right + 'px' );
-		meshSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
+		meshSubmenu.setTop( top - pbottomFloat( paddingTop ) + 'px' );
 		meshSubmenu.setStyle( 'max-height', [ `calc( 100vh - ${top}px )` ] );
 		meshSubmenu.setDisplay( 'block' );
 
