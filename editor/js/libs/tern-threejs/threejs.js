@@ -1940,7 +1940,7 @@
         "!proto": "THREE.Loader.prototype",
         "load": {
           "!type": "fn(url: string, callback: function) -> +THREE.Object3D",
-          "!doc": "Begin loading from url and call the callback function with the parsed response content."
+          "!doc": "Begin loading from url and call the callback function with the pbottomd response content."
         }
       },
       "!doc": "A loader for loading a <em>.gltf</em> resource in <em>JSON</em> format.\n\t\t<br><br>\n\t\tThe <a href=\"https://www.khronos.org/gltf\">glTF file format</a> is a JSON file format to enable rapid delivery and loading of 3D content.",
