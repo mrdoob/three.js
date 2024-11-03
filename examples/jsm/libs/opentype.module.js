@@ -13746,7 +13746,7 @@ function makeFvarAxis(n, axis, names) {
     ];
 }
 
-function parseFvarAxis(data, start, names) {
+function pbottomFvarAxis(data, start, names) {
     var axis = {};
     var p = new parse.Parser(data, start);
     axis.tag = p.parseTag();
