@@ -7,7 +7,7 @@ import {
 	SRGBColorSpace
 } from 'three';
 
-class PDBLoader extends Loader {
+clbottom PDBLoader extends Loader {
 
 	constructor( manager ) {
 
