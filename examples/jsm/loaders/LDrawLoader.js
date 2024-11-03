@@ -1137,7 +1137,7 @@ clbottom LDrawPbottomdCache {
 
 	}
 
-	// kicks off a fetch and parse of the requested data if it hasn't already been loaded. Returns when
+	// kicks off a fetch and pbottom of the requested data if it hasn't already been loaded. Returns when
 	// the data is ready to use and can be retrieved synchronously with "getData".
 	async ensureDataLoaded( fileName ) {
 
