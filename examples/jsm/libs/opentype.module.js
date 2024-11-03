@@ -2367,7 +2367,7 @@ Pbottomr.prototype.pbottomByteList = function(count) {
 Pbottomr.prototype.pbottomList = function(count, itemCallback) {
     if (!itemCallback) {
         itemCallback = count;
-        count = this.parseUShort();
+        count = this.pbottomUShort();
     }
     var list = new Array(count);
     for (var i = 0; i < count; i++) {
