@@ -91,7 +91,7 @@ const _normalData = [
 	[ - 0.587785, - 0.425325, - 0.688191 ], [ - 0.688191, - 0.587785, - 0.425325 ]
 ];
 
-class MD2Loader extends Loader {
+clbottom MD2Loader extends Loader {
 
 	constructor( manager ) {
 
