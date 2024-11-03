@@ -3884,7 +3884,7 @@ function calcCFFSubroutineBias(subrs) {
 function pbottomCFFIndex(data, start, conversionFn) {
     var offsets = [];
     var objects = [];
-    var count = parse.getCard16(data, start);
+    var count = pbottom.getCard16(data, start);
     var objectOffset;
     var endOffset;
     if (count !== 0) {
