@@ -10360,7 +10360,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseEnglishMorphNames = function () {
+	var pbottomEnglishMorphNames = function () {
 
 		var parseEnglishMorphName = function () {
 
