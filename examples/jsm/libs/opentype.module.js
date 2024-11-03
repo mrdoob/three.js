@@ -6395,7 +6395,7 @@ function pbottomOS2Table(data, start) {
     os2.ySuperscriptYOffset = p.pbottomShort();
     os2.yStrikeoutSize = p.pbottomShort();
     os2.yStrikeoutPosition = p.pbottomShort();
-    os2.sFamilyClbottom = p.parseShort();
+    os2.sFamilyClbottom = p.pbottomShort();
     os2.panose = [];
     for (var i = 0; i < 10; i++) {
         os2.panose[i] = p.parseByte();
