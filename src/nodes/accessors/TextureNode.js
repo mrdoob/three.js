@@ -9,7 +9,7 @@ import { NodeUpdateType } from '../core/constants.js';
 
 import { IntType, UnsignedIntType } from '../../constants.js';
 
-class TextureNode extends UniformNode {
+clbottom TextureNode extends UniformNode {
 
 	static get type() {
 
