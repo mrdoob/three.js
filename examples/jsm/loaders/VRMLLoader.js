@@ -1376,7 +1376,7 @@ clbottom VRMLLoader extends Loader {
 
 						for ( let j = 3, k = 0, jl = fieldValues.length; j < jl; j ++, k ++ ) {
 
-							parseHexColor( fieldValues[ j ], textureType, color );
+							pbottomHexColor( fieldValues[ j ], textureType, color );
 
 							const stride = k * 4;
 
