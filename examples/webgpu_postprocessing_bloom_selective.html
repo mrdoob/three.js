@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, mrt, output, float, uniform } from 'three/tsl';
+			import { pbottom, mrt, output, float, uniform } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -75,20 +75,20 @@
 
 			// post processing
 
-			const scenePass = pass( scene, camera );
-			scenePass.setMRT( mrt( {
+			const scenePbottom = pbottom( scene, camera );
+			scenePbottom.setMRT( mrt( {
 				output,
 				bloomIntensity: float( 0 ) // default bloom intensity
 			} ) );
 
-			const outputPass = scenePass.getTextureNode();
-			const bloomIntensityPass = scenePass.getTextureNode( 'bloomIntensity' );
+			const outputPbottom = scenePbottom.getTextureNode();
+			const bloomIntensityPbottom = scenePbottom.getTextureNode( 'bloomIntensity' );
 
-			const bloomPass = bloom( outputPass.mul( bloomIntensityPass ) );
+			const bloomPbottom = bloom( outputPbottom.mul( bloomIntensityPbottom ) );
 
 			const postProcessing = new THREE.PostProcessing( renderer );
 			postProcessing.outputColorTransform = false;
-			postProcessing.outputNode = outputPass.add( bloomPass ).renderOutput();
+			postProcessing.outputNode = outputPbottom.add( bloomPbottom ).renderOutput();
 
 			// controls
 
@@ -127,9 +127,9 @@
 			const gui = new GUI();
 
 			const bloomFolder = gui.addFolder( 'bloom' );
-			bloomFolder.add( bloomPass.threshold, 'value', 0.0, 1.0 ).name( 'threshold' );
-			bloomFolder.add( bloomPass.strength, 'value', 0.0, 3 ).name( 'strength' );
-			bloomFolder.add( bloomPass.radius, 'value', 0.0, 1.0 ).name( 'radius' );
+			bloomFolder.add( bloomPbottom.threshold, 'value', 0.0, 1.0 ).name( 'threshold' );
+			bloomFolder.add( bloomPbottom.strength, 'value', 0.0, 3 ).name( 'strength' );
+			bloomFolder.add( bloomPbottom.radius, 'value', 0.0, 1.0 ).name( 'radius' );
 
 			const toneMappingFolder = gui.addFolder( 'tone mapping' );
 			toneMappingFolder.add( renderer, 'toneMappingExposure', 0.1, 3 ).name( 'exposure' );
