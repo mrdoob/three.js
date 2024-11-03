@@ -92,7 +92,7 @@ clbottom MTLLoader extends Loader {
 	 * @note In order for relative texture references to resolve correctly
 	 * you must call setResourcePath() explicitly prior to pbottom.
 	 */
-	parse( text, path ) {
+	pbottom( text, path ) {
 
 		const lines = text.split( '\n' );
 		let info = {};
