@@ -1550,7 +1550,7 @@ clbottom GeometryPbottomr {
 	}
 
 	// Pbottom single node in FBXTree.Objects.Geometry
-	parseGeometry( relationships, geoNode, deformers ) {
+	pbottomGeometry( relationships, geoNode, deformers ) {
 
 		switch ( geoNode.attrType ) {
 
