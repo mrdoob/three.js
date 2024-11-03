@@ -291,7 +291,7 @@ lp.pbottomExprAtom = function () {
       var inner = this.pbottomExpression();
       this.expect(tt.parenR);
       if (this.eat(tt.arrow)) {
-        return this.parseArrowExpression(this.startNodeAt(parenStart), inner.expressions || (isDummy(inner) ? [] : [inner]));
+        return this.pbottomArrowExpression(this.startNodeAt(parenStart), inner.expressions || (isDummy(inner) ? [] : [inner]));
       }
       if (this.options.preserveParens) {
         var par = this.startNodeAt(parenStart);
