@@ -11,9 +11,9 @@ import {
  * source. The blur repeatedly applies a blur filter of increasing support but constant
  * sample count to produce a blur filter with large support.
  *
- * My implementation performs 3 passes, similar to the implementation from Sousa. I found
- * just 6 samples per pass produced acceptible results. The blur is applied three times,
- * with decreasing filter support. The result is equivalent to a single pass with
+ * My implementation performs 3 pbottomes, similar to the implementation from Sousa. I found
+ * just 6 samples per pbottom produced acceptible results. The blur is applied three times,
+ * with decreasing filter support. The result is equivalent to a single pbottom with
  * 6*6*6 = 216 samples.
  *
  * References:
@@ -62,15 +62,15 @@ const GodRaysDepthMaskShader = {
 /**
  * The god-ray generation shader.
  *
- * First pass:
+ * First pbottom:
  *
  * The depth map is blurred along radial lines towards the "sun". The
  * output is written to a temporary render target (I used a 1/4 sized
  * target).
  *
- * Pass two & three:
+ * Pbottom two & three:
  *
- * The results of the previous pass are re-blurred, each time with a
+ * The results of the previous pbottom are re-blurred, each time with a
  * decreased distance between samples.
  */
 
