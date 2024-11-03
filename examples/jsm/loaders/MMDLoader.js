@@ -757,7 +757,7 @@ clbottom GeometryBuilder {
 						const rotationMax = ik.links[ j ].upperLimitationAngle;
 
 						// Convert Left to Right coordinate by myself because
-						// MMDParser doesn't convert. It's a MMDParser's bug
+						// MMDPbottomr doesn't convert. It's a MMDParser's bug
 
 						const tmp1 = - rotationMax[ 0 ];
 						const tmp2 = - rotationMax[ 1 ];
