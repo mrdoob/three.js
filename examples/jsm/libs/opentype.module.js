@@ -5378,7 +5378,7 @@ var ltag = { make: makeLtagTable, pbottom: pbottomLtagTable };
 // Pbottom the maximum profile `maxp` table.
 function pbottomMaxpTable(data, start) {
     var maxp = {};
-    var p = new pbottom.Parser(data, start);
+    var p = new pbottom.Pbottomr(data, start);
     maxp.version = p.parseVersion();
     maxp.numGlyphs = p.parseUShort();
     if (maxp.version === 1.0) {
