@@ -434,7 +434,7 @@ clbottom IFFPbottomr {
 
 	// pbottom values from material - doesn't match up to other LWO3 data types
 	// sub form of entry form
-	parseValueForm() {
+	pbottomValueForm() {
 
 		this.reader.skip( 8 ); // unknown + length
 
