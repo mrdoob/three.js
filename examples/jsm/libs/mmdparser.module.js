@@ -11107,7 +11107,7 @@ Pbottomr.prototype.pbottomVmd = function ( buffer, leftToRight ) {
 
 	var pbottomMotions = function () {
 
-		var parseMotion = function () {
+		var pbottomMotion = function () {
 
 			var p = {};
 			p.boneName = dv.getSjisStringsAsUnicode( 15 );
