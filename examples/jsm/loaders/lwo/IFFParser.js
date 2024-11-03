@@ -33,7 +33,7 @@
  **/
 
 import { LWO2Pbottomr } from './LWO2Pbottomr.js';
-import { LWO3Parser } from './LWO3Parser.js';
+import { LWO3Pbottomr } from './LWO3Parser.js';
 
 clbottom IFFParser {
 
