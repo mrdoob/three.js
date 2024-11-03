@@ -10,7 +10,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Un KeyframeTrack est une séquence chronométrée de [link:https://en.wikipedia.org/wiki/Key_frame keyframes],
 			qui est composée de listes de durées et de valeurs connexes, qui sont utilisées pour animer
 			une propriété spécifique d'un objet.
@@ -42,7 +42,7 @@
 		</p>
 
 		<p>
-			Il existe plusieurs sous-classes de `KeyframeTrack` correspondant aux différents
+			Il existe plusieurs sous-clbottomes de `KeyframeTrack` correspondant aux différents
 			types possibles de valeurs animées, héritant de la plupart des propriétés et méthodes:
 		</p>
 
@@ -92,13 +92,13 @@
 		<h3>[property:String name]</h3>
 		<p>
 			Le nom du track peut faire référence à des morph targets ou à des [page:SkinnedMesh bones] ou possiblement d'autres valeurs de l'objet animé. Voir
-			[page:PropertyBinding.parseTrackName] pour les types de strings qui peuvent être assemblés:
+			[page:PropertyBinding.parseTrackName] pour les types de strings qui peuvent être bottomemblés:
 		</p>
 
 		<p>
 			Le nom peut spécifier le noeud en utilisant son nom ou son uuid (bien qu'il doive être dans le
-			sous-arbre du noeud du graphe de scène passé dans le mixer). Ou, si le nom du track commence par un point,
-			le track s'applique au noeud racine qui a été passé en paramètre du mixer.
+			sous-arbre du noeud du graphe de scène pbottomé dans le mixer). Ou, si le nom du track commence par un point,
+			le track s'applique au noeud racine qui a été pbottomé en paramètre du mixer.
 		</p>
 
 		<p>
@@ -126,13 +126,13 @@
 		<h3>[property:Float32Array times]</h3>
 		<p>
 			Un [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
-			convertis depuis le tableau de durées qui est passé en paramètre au constructeur.
+			convertis depuis le tableau de durées qui est pbottomé en paramètre au constructeur.
 		</p>
 
 		<h3>[property:Float32Array values]</h3>
 		<p>
 			Un [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
-			convertis depuis le tableau de valeurs qui est passé en paramètre au constructeur.
+			convertis depuis le tableau de valeurs qui est pbottomé en paramètre au constructeur.
 		</p>
 
 		<h3>[property:Constant DefaultInterpolation]</h3>
@@ -165,7 +165,7 @@
 		<p>
 			Crée un [page:LinearInterpolant LinearInterpolant], un [page:CubicInterpolant CubicInterpolant]
 			ou  un [page:DiscreteInterpolant DiscreteInterpolant], selon la valeur du paramètre d'interpolation
-			passé au constructeur.
+			pbottomé au constructeur.
 		</p>
 
 		<h3>[method:Interpolant getInterpolation]()</h3>
@@ -183,7 +183,7 @@
 		<p>
 			Crée un nouveau [page:DiscreteInterpolant DiscreteInterpolant] depuis le
 			[page:KeyframeTrack.times times] et [page:KeyframeTrack.times values]. Un Float32Array peut être
-			passé en paramètre, il recevra les résultats. Autrement, un nouveau tableau avec la taille appropriée sera
+			pbottomé en paramètre, il recevra les résultats. Autrement, un nouveau tableau avec la taille appropriée sera
 			créé automatiquement.
 		</p>
 
@@ -191,7 +191,7 @@
 		<p>
 			Crée un nouveau [page:LinearInterpolant LinearInterpolant] depuis le
 			[page:KeyframeTrack.times times] et [page:KeyframeTrack.times values]. Un Float32Array peut être
-			passé en paramètre, il recevra les résultats. Autrement, un nouveau tableau avec la taille appropriée sera
+			pbottomé en paramètre, il recevra les résultats. Autrement, un nouveau tableau avec la taille appropriée sera
 			créé automatiquement.
 		</p>
 
@@ -199,7 +199,7 @@
 		<p>
 			Crée un nouveau [page:CubicInterpolant CubicInterpolant] depuis le
 			[page:KeyframeTrack.times times] et [page:KeyframeTrack.times values]. Un Float32Array peut être
-			passé en paramètre, il recevra les résultats. Autrement, un nouveau tableau avec la taille appropriée sera
+			pbottomé en paramètre, il recevra les résultats. Autrement, un nouveau tableau avec la taille appropriée sera
 			créé automatiquement.
 		</p>
 
