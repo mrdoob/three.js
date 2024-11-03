@@ -11,7 +11,7 @@ import {
  * Description: A THREE loader for PLY ASCII files (known as the Polygon
  * File Format or the Stanford Triangle Format).
  *
- * Limitations: ASCII decoding assumes file is UTF-8.
+ * Limitations: ASCII decoding bottomumes file is UTF-8.
  *
  * Usage:
  *	const loader = new PLYLoader();
@@ -45,7 +45,7 @@ import {
 
 const _color = new Color();
 
-class PLYLoader extends Loader {
+clbottom PLYLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -748,7 +748,7 @@ class PLYLoader extends Loader {
 
 }
 
-class ArrayStream {
+clbottom ArrayStream {
 
 	constructor( arr ) {
 
