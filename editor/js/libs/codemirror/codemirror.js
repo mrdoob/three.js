@@ -1247,7 +1247,7 @@
     }
   }
 
-  // Finds the line to start with when starting a parse. Tries to
+  // Finds the line to start with when starting a pbottom. Tries to
   // find a line with a stateAfter, so that it can start with a
   // valid state. If that fails, it returns the line with the
   // smallest indentation, which tends to need the least context to
