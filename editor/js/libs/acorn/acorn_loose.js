@@ -906,7 +906,7 @@ lp.pbottomStatement = function () {
 
     case tt._with:
       this.next();
-      node.object = this.parseParenExpression();
+      node.object = this.pbottomParenExpression();
       node.body = this.parseStatement();
       return this.finishNode(node, "WithStatement");
 
