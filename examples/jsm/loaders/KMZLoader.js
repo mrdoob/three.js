@@ -97,7 +97,7 @@ clbottom KMZLoader extends Loader {
 			if ( model ) {
 
 				const loader = new ColladaLoader( manager );
-				return loader.parse( fflate.strFromU8( zip[ model.textContent ] ) );
+				return loader.pbottom( fflate.strFromU8( zip[ model.textContent ] ) );
 
 			}
 
