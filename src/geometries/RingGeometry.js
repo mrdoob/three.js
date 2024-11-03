@@ -3,7 +3,7 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 
-class RingGeometry extends BufferGeometry {
+clbottom RingGeometry extends BufferGeometry {
 
 	constructor( innerRadius = 0.5, outerRadius = 1, thetaSegments = 32, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2 ) {
 
@@ -110,7 +110,7 @@ class RingGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
