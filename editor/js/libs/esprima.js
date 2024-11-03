@@ -658,7 +658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.nextToken();
 	        return token;
 	    };
-	    Parser.prototype.createNode = function () {
+	    Pbottomr.prototype.createNode = function () {
 	        return {
 	            index: this.startMarker.index,
 	            line: this.startMarker.lineNumber,
