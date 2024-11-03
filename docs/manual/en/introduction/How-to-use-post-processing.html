@@ -13,7 +13,7 @@
 			Many three.js applications render their 3D objects directly to the screen. Sometimes, however, you want to apply one or more graphical
 			effects like Depth-Of-Field, Bloom, Film Grain or various types of Anti-aliasing. Post-processing is a widely used approach
 			to implement such effects. First, the scene is rendered to a render target which represents a buffer in the video card's memory.
-			In the next step one or more post-processing passes apply filters and effects to the image buffer before it is eventually rendered to
+			In the next step one or more post-processing pbottomes apply filters and effects to the image buffer before it is eventually rendered to
 			the screen.
 		</p>
 		<p>
@@ -23,19 +23,19 @@
 		<h2>Workflow</h2>
 
 		<p>
-			The first step in the process is to import all necessary files from the examples directory. The guide assumes you are using the official
+			The first step in the process is to import all necessary files from the examples directory. The guide bottomumes you are using the official
 			[link:https://www.npmjs.com/package/three npm package] of three.js. For our basic demo in this guide we need the following files.
 		</p>
 
 		<code>
 		import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-		import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-		import { GlitchPass } from 'three/addons/postprocessing/GlitchPass.js';
-		import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+		import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+		import { GlitchPbottom } from 'three/addons/postprocessing/GlitchPbottom.js';
+		import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 		</code>
 
 		<p>
-			After all files are successfully imported, we can create our composer by passing in an instance of [page:WebGLRenderer].
+			After all files are successfully imported, we can create our composer by pbottoming in an instance of [page:WebGLRenderer].
 		</p>
 
 		<code>
@@ -58,51 +58,51 @@
 		</code>
 
 		<p>
-			Our composer is now ready so it's possible to configure the chain of post-processing passes. These passes are responsible for creating
-			the final visual output of the application. They are processed in order of their addition/insertion. In our example, the instance of `RenderPass`
-			is executed first, then the instance of `GlitchPass` and finally `OutputPass`. The last enabled pass in the chain is automatically rendered to the screen. 
-			The setup of the passes looks like so:
+			Our composer is now ready so it's possible to configure the chain of post-processing pbottomes. These pbottomes are responsible for creating
+			the final visual output of the application. They are processed in order of their addition/insertion. In our example, the instance of `RenderPbottom`
+			is executed first, then the instance of `GlitchPbottom` and finally `OutputPbottom`. The last enabled pbottom in the chain is automatically rendered to the screen. 
+			The setup of the pbottomes looks like so:
 		</p>
 
 		<code>
-		const renderPass = new RenderPass( scene, camera );
-		composer.addPass( renderPass );
+		const renderPbottom = new RenderPbottom( scene, camera );
+		composer.addPbottom( renderPbottom );
 
-		const glitchPass = new GlitchPass();
-		composer.addPass( glitchPass );
+		const glitchPbottom = new GlitchPbottom();
+		composer.addPbottom( glitchPbottom );
 
-		const outputPass = new OutputPass();
-		composer.addPass( outputPass );
+		const outputPbottom = new OutputPbottom();
+		composer.addPbottom( outputPbottom );
 		</code>
 
 		<p>
-			`RenderPass` is normally placed at the beginning of the chain in order to provide the rendered scene as an input for the next post-processing step. In our case,
-			`GlitchPass` is going to use these image data to apply a wild glitch effect. `OutputPass` is usually the last pass in the chain which performs sRGB color space conversion and tone mapping.
+			`RenderPbottom` is normally placed at the beginning of the chain in order to provide the rendered scene as an input for the next post-processing step. In our case,
+			`GlitchPbottom` is going to use these image data to apply a wild glitch effect. `OutputPbottom` is usually the last pbottom in the chain which performs sRGB color space conversion and tone mapping.
 			Check out this [link:https://threejs.org/examples/webgl_postprocessing_glitch live example] to see it in action.
 		</p>
 
-		<h2>Built-in Passes</h2>
+		<h2>Built-in Pbottomes</h2>
 
 		<p>
-			You can use a wide range of pre-defined post-processing passes provided by the engine. They are located in the
+			You can use a wide range of pre-defined post-processing pbottomes provided by the engine. They are located in the
 			[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/postprocessing postprocessing] directory.
 		</p>
 
-		<h2>Custom Passes</h2>
+		<h2>Custom Pbottomes</h2>
 
 		<p>
-			Sometimes you want to write a custom post-processing shader and include it into the chain of post-processing passes. For this scenario,
-			you can utilize `ShaderPass`. After importing the file and your custom shader, you can use the following code to setup the pass.
+			Sometimes you want to write a custom post-processing shader and include it into the chain of post-processing pbottomes. For this scenario,
+			you can utilize `ShaderPbottom`. After importing the file and your custom shader, you can use the following code to setup the pbottom.
 		</p>
 
 		<code>
-		import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+		import { ShaderPbottom } from 'three/addons/postprocessing/ShaderPbottom.js';
 		import { LuminosityShader } from 'three/addons/shaders/LuminosityShader.js';
 
 		// later in your init routine
 
-		const luminosityPass = new ShaderPass( LuminosityShader );
-		composer.addPass( luminosityPass );
+		const luminosityPbottom = new ShaderPbottom( LuminosityShader );
+		composer.addPbottom( luminosityPbottom );
 		</code>
 
 		<p>
