@@ -85,7 +85,7 @@ clbottom SVGLoader extends Loader {
 					break;
 
 				case 'style':
-					parseCSSStylesheet( node );
+					pbottomCSSStylesheet( node );
 					break;
 
 				case 'g':
