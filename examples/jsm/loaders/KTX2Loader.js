@@ -79,7 +79,7 @@ let _activeLoaders = 0;
 
 let _zstd;
 
-class KTX2Loader extends Loader {
+clbottom KTX2Loader extends Loader {
 
 	constructor( manager ) {
 
@@ -640,7 +640,7 @@ KTX2Loader.BasisWorker = function () {
 
 	// Optimal choice of a transcoder target format depends on the Basis format (ETC1S, UASTC, or
 	// UASTC HDR), device capabilities, and texture dimensions. The list below ranks the formats
-	// separately for each format. Currently, priority is assigned based on:
+	// separately for each format. Currently, priority is bottomigned based on:
 	//
 	//   high quality > low quality > uncompressed
 	//
