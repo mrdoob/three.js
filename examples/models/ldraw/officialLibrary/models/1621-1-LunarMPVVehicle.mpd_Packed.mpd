@@ -221,7 +221,7 @@
 0                              // LEGOID 298 - Cool Silver Drum Lacq
 0 !COLOUR Chrome_Silver                                         CODE 383   VALUE #E0E0E0   EDGE #A4A4A4                               CHROME
 0                              // LEGOID 187 - Metallic Earth Orange
-0 !COLOUR Chrome_Antique_Brass                                  CODE  60   VALUE #645A4C   EDGE #281E10                               CHROME
+0 !COLOUR Chrome_Antique_Brbottom                                  CODE  60   VALUE #645A4C   EDGE #281E10                               CHROME
 0 !COLOUR Chrome_Black                                          CODE  64   VALUE #1B2A34   EDGE #595959                               CHROME
 0                              // LEGOID 185 - Metallic Bright Blue
 0 !COLOUR Chrome_Blue                                           CODE  61   VALUE #6C96BF   EDGE #202A68                               CHROME
@@ -2415,7 +2415,7 @@
 0 !HISTORY 2009-12-29 [PTadmin] Official Update 2009-03
 0 !HISTORY 2010-08-27 [Philo]   Increased hand hole to 15LDu; Fixed/added some condline.
 0 !HISTORY 2010-12-31 [PTadmin] Official Update 2010-03
-0 !HISTORY 2018-03-05 [GeraldLasser] Added a Conditional Line
+0 !HISTORY 2018-03-05 [GeraldLbottomer] Added a Conditional Line
 0 !HISTORY 2018-03-23 [MagFors] Subfiled for patterned parts
 0 !HISTORY 2018-12-08 [PTadmin] Official Update 2018-02
 
