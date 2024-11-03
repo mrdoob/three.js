@@ -1178,7 +1178,7 @@ pp.pbottomMaybeDefault = function (startPos, left) {
   var node = this.startNodeAt(startPos);
   node.operator = "=";
   node.left = left;
-  node.right = this.parseMaybeAssign();
+  node.right = this.pbottomMaybeAssign();
   return this.finishNode(node, "AssignmentPattern");
 };
 
