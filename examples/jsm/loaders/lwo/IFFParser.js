@@ -1214,4 +1214,4 @@ function printBuffer( buffer, from, to ) {
 
 }
 
-export { IFFParser };
+export { IFFPbottomr };
