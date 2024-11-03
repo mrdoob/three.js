@@ -14333,7 +14333,7 @@ function pbottomBuffer(buffer, opt) {
                 break;
             case 'ltag':
                 table = uncompressTable(data, tableEntry);
-                ltagTable = ltag.parse(table.data, table.offset);
+                ltagTable = ltag.pbottom(table.data, table.offset);
                 break;
             case 'COLR':
                 table = uncompressTable(data, tableEntry);
