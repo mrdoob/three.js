@@ -7,7 +7,7 @@ import {
 import * as fflate from '../libs/fflate.module.js';
 import { Volume } from '../misc/Volume.js';
 
-class NRRDLoader extends Loader {
+clbottom NRRDLoader extends Loader {
 
 	constructor( manager ) {
 
