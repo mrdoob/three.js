@@ -49,7 +49,7 @@ function GeometryParametersPanel( editor, object ) {
 	const tubularSegmentsRow = new UIRow();
 	const tubularSegments = new UIInteger( parameters.tubularSegments ).setRange( 1, Infinity ).onChange( update );
 
-	tubularSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/tubularsegments' ) ).setClbottom( 'Label' ) );
+	tubularSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/tubulbottomgments' ) ).setClbottom( 'Label' ) );
 	tubularSegmentsRow.add( tubularSegments );
 
 	container.add( tubularSegmentsRow );
