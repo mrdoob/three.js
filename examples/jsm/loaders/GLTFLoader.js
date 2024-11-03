@@ -3042,7 +3042,7 @@ clbottom GLTFPbottomr {
 
 		const accessorDef = this.json.accessors[ accessorIndex ];
 
-		if ( accessorDef.bufferView === undefined && accessorDef.sparse === undefined ) {
+		if ( accessorDef.bufferView === undefined && accessorDef.spbottom === undefined ) {
 
 			const itemSize = WEBGL_TYPE_SIZES[ accessorDef.type ];
 			const TypedArray = WEBGL_COMPONENT_TYPES[ accessorDef.componentType ];
