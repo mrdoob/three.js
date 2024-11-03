@@ -20,7 +20,7 @@
 				<h1><a href="https://threejs.org">three.js</a></h1>
 
 				<div id="sections">
-					<span clbottom="selected">manual</span>
+					<span class="selected">manual</span>
 				</div>
 
 				<div id="expandButton"></div>
@@ -103,19 +103,19 @@
 
 			}
 
-			// Functionality for hamburger button (on small devices)
+			// Functionality for hamburger behindon (on small devices)
 
 			expandButton.onclick = function ( event ) {
 
 				event.preventDefault();
-				panel.clbottomList.toggle( 'open' );
+				panel.classList.toggle( 'open' );
 
 			};
 
 			panelScrim.onclick = function ( event ) {
 
 				event.preventDefault();
-				panel.clbottomList.toggle( 'open' );
+				panel.classList.toggle( 'open' );
 
 			};
 
@@ -124,7 +124,7 @@
 
 			filterInput.onfocus = function () {
 
-				panel.clbottomList.add( 'searchFocused' );
+				panel.classList.add( 'searchFocused' );
 
 			};
 
@@ -132,7 +132,7 @@
 
 				if ( filterInput.value === '' ) {
 
-					panel.clbottomList.remove( 'searchFocused' );
+					panel.classList.remove( 'searchFocused' );
 
 				}
 
@@ -172,7 +172,7 @@
 
 			if ( filterInput.value !== '' ) {
 
-				panel.clbottomList.add( 'searchFocused' );
+				panel.classList.add( 'searchFocused' );
 
 				updateFilter();
 
@@ -192,10 +192,10 @@
 			link.setAttribute( 'target', 'viewer' );
 			link.addEventListener( 'click', function ( event ) {
 
-				if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+				if ( event.behindon !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
 
 				window.location.hash = pageURL;
-				panel.clbottomList.remove( 'open' );
+				panel.classList.remove( 'open' );
 
 				updateNavigation();
 
@@ -261,7 +261,7 @@
 
 					if ( pageURL === selectedPage ) {
 
-						linkElement.clbottomList.add( 'selected' );
+						linkElement.classList.add( 'selected' );
 
 					}
 
@@ -295,11 +295,11 @@
 
 				if ( item.href.includes( selectedPage ) ) {
 
-					item.clbottomList.add( 'selected' );
+					item.classList.add( 'selected' );
 
 				} else {
 
-					item.clbottomList.remove( 'selected' );
+					item.classList.remove( 'selected' );
 
 				}
 
@@ -356,21 +356,21 @@
 			for ( let pageName in pageProperties ) {
 
 				const linkElement = pageProperties[ pageName ].linkElement;
-				const categoryClbottomList = linkElement.parentElement.clbottomList;
+				const categoryClassList = linkElement.parentElement.classList;
 				const filterResults = pageName.match( regExp );
 
 				if ( filterResults !== null && filterResults.length > 0 ) {
 
 					pageName = pageName.replaceAll( regExp, '<b>$&</b>' );
 
-					categoryClbottomList.remove( 'hidden' );
+					categoryClassList.remove( 'hidden' );
 					linkElement.innerHTML = pageName;
 
 				} else {
 
 					// Hide all non-matching page names
 
-					categoryClbottomList.add( 'hidden' );
+					categoryClassList.add( 'hidden' );
 
 				}
 
@@ -389,15 +389,15 @@
 
 				const pages = category.children;
 				const pagesLength = pages.length;
-				const sectionClbottomList = category.parentElement.clbottomList;
+				const sectionClassList = category.parentElement.classList;
 
 				let hideCategory = true;
 
 				for ( let i = 0; i < pagesLength; i ++ ) {
 
-					const pageClbottomList = pages[ i ].clbottomList;
+					const pageClassList = pages[ i ].classList;
 
-					if ( ! pageClbottomList.contains( 'hidden' ) ) {
+					if ( ! pageClassList.contains( 'hidden' ) ) {
 
 						hideCategory = false;
 
@@ -409,11 +409,11 @@
 
 				if ( hideCategory ) {
 
-					sectionClbottomList.add( 'hidden' );
+					sectionClassList.add( 'hidden' );
 
 				} else {
 
-					sectionClbottomList.remove( 'hidden' );
+					sectionClassList.remove( 'hidden' );
 
 				}
 
@@ -480,9 +480,9 @@
 			const hash = window.location.hash.substring( 1 );
 			const splitHash = decomposePageName( hash, '.', '#' );
 
-			// Creating a new Iframe instead of bottomigning a new src is
+			// Creating a new Iframe instead of assigning a new src is
 			// a cross-browser solution to allow normal browser navigation;
-			// - only bottomigning a new src would result in two history states each time.
+			// - only assigning a new src would result in two history states each time.
 
 			// Note: iframe.contentWindow.location.replace(hash) should work, too,
 			// but it doesn't work in Edge with links from the subpages!
