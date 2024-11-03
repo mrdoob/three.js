@@ -369,7 +369,7 @@ clbottom MaterialPbottomr {
 
 	}
 
-	parseConnections( connections, nodes ) {
+	pbottomConnections( connections, nodes ) {
 
 		const materialConnections = {
 			maps: {}
