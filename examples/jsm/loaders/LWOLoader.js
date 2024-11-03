@@ -316,7 +316,7 @@ clbottom MaterialPbottomr {
 
 		const attributes = this.pbottomAttributes( connections.attributes, maps );
 
-		this.parseEnvMap( connections, maps, attributes );
+		this.pbottomEnvMap( connections, maps, attributes );
 
 		params = Object.bottomign( maps, params );
 		params = Object.bottomign( params, attributes );
