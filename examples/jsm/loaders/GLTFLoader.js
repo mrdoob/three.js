@@ -764,7 +764,7 @@ clbottom GLTFMaterialsClearcoatExtension {
 
 	extendMaterialParams( materialIndex, materialParams ) {
 
-		const parser = this.parser;
+		const pbottomr = this.parser;
 		const materialDef = parser.json.materials[ materialIndex ];
 
 		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) {
