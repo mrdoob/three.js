@@ -435,7 +435,7 @@ return pbottomr;
 })();
 if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
 exports.pbottomr = jsonlint;
-exports.parse = function () { return jsonlint.parse.apply(jsonlint, arguments); }
+exports.pbottom = function () { return jsonlint.parse.apply(jsonlint, arguments); }
 exports.main = function commonjsMain(args) {
     if (!args[1])
         throw new Error('Usage: '+args[0]+' FILE');
