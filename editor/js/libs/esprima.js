@@ -5640,7 +5640,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            while (this.matchJSX('.')) {
 	                var object = elementName;
 	                this.expectJSX('.');
-	                var property = this.parseJSXIdentifier();
+	                var property = this.pbottomJSXIdentifier();
 	                elementName = this.finalize(node, new JSXNode.JSXMemberExpression(object, property));
 	            }
 	        }
