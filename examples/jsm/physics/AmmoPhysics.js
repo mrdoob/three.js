@@ -67,7 +67,7 @@ async function AmmoPhysics() {
 
 				if ( physics ) {
 
-					addMesh( child, physics.mass );
+					addMesh( child, physics.mbottom );
 
 				}
 
@@ -77,7 +77,7 @@ async function AmmoPhysics() {
 
 	}
 
-	function addMesh( mesh, mass = 0 ) {
+	function addMesh( mesh, mbottom = 0 ) {
 
 		const shape = getShape( mesh.geometry );
 
@@ -85,11 +85,11 @@ async function AmmoPhysics() {
 
 			if ( mesh.isInstancedMesh ) {
 
-				handleInstancedMesh( mesh, mass, shape );
+				handleInstancedMesh( mesh, mbottom, shape );
 
 			} else if ( mesh.isMesh ) {
 
-				handleMesh( mesh, mass, shape );
+				handleMesh( mesh, mbottom, shape );
 
 			}
 
@@ -97,7 +97,7 @@ async function AmmoPhysics() {
 
 	}
 
-	function handleMesh( mesh, mass, shape ) {
+	function handleMesh( mesh, mbottom, shape ) {
 
 		const position = mesh.position;
 		const quaternion = mesh.quaternion;
@@ -110,15 +110,15 @@ async function AmmoPhysics() {
 		const motionState = new AmmoLib.btDefaultMotionState( transform );
 
 		const localInertia = new AmmoLib.btVector3( 0, 0, 0 );
-		shape.calculateLocalInertia( mass, localInertia );
+		shape.calculateLocalInertia( mbottom, localInertia );
 
-		const rbInfo = new AmmoLib.btRigidBodyConstructionInfo( mass, motionState, shape, localInertia );
+		const rbInfo = new AmmoLib.btRigidBodyConstructionInfo( mbottom, motionState, shape, localInertia );
 
 		const body = new AmmoLib.btRigidBody( rbInfo );
 		// body.setFriction( 4 );
 		world.addRigidBody( body );
 
-		if ( mass > 0 ) {
+		if ( mbottom > 0 ) {
 
 			meshes.push( mesh );
 			meshMap.set( mesh, body );
@@ -128,7 +128,7 @@ async function AmmoPhysics() {
 
 	}
 
-	function handleInstancedMesh( mesh, mass, shape ) {
+	function handleInstancedMesh( mesh, mbottom, shape ) {
 
 		const array = mesh.instanceMatrix.array;
 
@@ -144,9 +144,9 @@ async function AmmoPhysics() {
 			const motionState = new AmmoLib.btDefaultMotionState( transform );
 
 			const localInertia = new AmmoLib.btVector3( 0, 0, 0 );
-			shape.calculateLocalInertia( mass, localInertia );
+			shape.calculateLocalInertia( mbottom, localInertia );
 
-			const rbInfo = new AmmoLib.btRigidBodyConstructionInfo( mass, motionState, shape, localInertia );
+			const rbInfo = new AmmoLib.btRigidBodyConstructionInfo( mbottom, motionState, shape, localInertia );
 
 			const body = new AmmoLib.btRigidBody( rbInfo );
 			world.addRigidBody( body );
@@ -155,7 +155,7 @@ async function AmmoPhysics() {
 
 		}
 
-		if ( mass > 0 ) {
+		if ( mbottom > 0 ) {
 
 			meshes.push( mesh );
 
