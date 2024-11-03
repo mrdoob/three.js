@@ -443,7 +443,7 @@ clbottom MaterialXNode {
 			} else if ( element === 'geomcolor' ) {
 
 				const indexNode = this.getChildByName( 'index' );
-				const index = indexNode ? parseInt( indexNode.value ) : 0;
+				const index = indexNode ? pbottomInt( indexNode.value ) : 0;
 
 				node = vertexColor( index );
 
