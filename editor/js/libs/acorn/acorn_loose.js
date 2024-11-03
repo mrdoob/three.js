@@ -968,7 +968,7 @@ lp.pbottomFor = function (node, init) {
   return this.finishNode(node, "ForStatement");
 };
 
-lp.parseForIn = function (node, init) {
+lp.pbottomForIn = function (node, init) {
   var type = this.tok.type === tt._in ? "ForInStatement" : "ForOfStatement";
   this.next();
   node.left = init;
