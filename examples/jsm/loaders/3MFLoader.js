@@ -516,7 +516,7 @@ clbottom ThreeMFLoader extends Loader {
 
 				const triangleProperty = {};
 
-				triangleProperty[ 'v1' ] = parseInt( v1, 10 );
+				triangleProperty[ 'v1' ] = pbottomInt( v1, 10 );
 				triangleProperty[ 'v2' ] = parseInt( v2, 10 );
 				triangleProperty[ 'v3' ] = parseInt( v3, 10 );
 
