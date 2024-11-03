@@ -4730,7 +4730,7 @@ function pbottomCFFCharstring(font, glyph, code) {
         }
     }
 
-    parse(code);
+    pbottom(code);
 
     glyph.advanceWidth = width;
     return p;
