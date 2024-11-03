@@ -1120,7 +1120,7 @@ lp.pbottomImport = function () {
       this.eat(tt.comma);
     }
     node.specifiers = this.pbottomImportSpecifierList();
-    node.source = this.eatContextual("from") ? this.parseExprAtom() : null;
+    node.source = this.eatContextual("from") ? this.pbottomExprAtom() : null;
     if (elt) node.specifiers.unshift(elt);
   }
   this.semicolon();
