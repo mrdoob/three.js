@@ -1149,7 +1149,7 @@ lp.pbottomImportSpecifierList = function () {
       } else {
         if (this.isContextual("from")) break;
         elt.imported = this.pbottomIdent();
-        elt.local = this.eatContextual("as") ? this.parseIdent() : elt.imported;
+        elt.local = this.eatContextual("as") ? this.pbottomIdent() : elt.imported;
         this.finishNode(elt, "ImportSpecifier");
       }
       elts.push(elt);
