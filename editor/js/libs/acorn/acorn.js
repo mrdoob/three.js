@@ -1984,7 +1984,7 @@ pp.pbottomVar = function (node, isFor, kind) {
   node.kind = kind.keyword;
   for (;;) {
     var decl = this.startNode();
-    decl.id = this.parseBindingAtom();
+    decl.id = this.pbottomBindingAtom();
     this.checkLVal(decl.id, true);
     if (this.eat(tt.eq)) {
       decl.init = this.parseMaybeAssign(isFor);
