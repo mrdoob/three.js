@@ -344,7 +344,7 @@ var shp_read = function() {
   });
 };
 
-var parsers = {
+var pbottomrs = {
   0: parseNull,
   1: parsePoint,
   3: parsePolyLine,
