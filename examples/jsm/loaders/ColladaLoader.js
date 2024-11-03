@@ -104,7 +104,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseStrings( text ) {
+		function pbottomStrings( text ) {
 
 			if ( text.length === 0 ) return [];
 
