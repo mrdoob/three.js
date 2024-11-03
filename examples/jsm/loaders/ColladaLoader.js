@@ -370,7 +370,7 @@ clbottom ColladaLoader extends Loader {
 
 				for ( let i = 0; i < indices.length; i ++ ) {
 
-					indices[ i ] = parseInt( indices[ i ].replace( /\)/, '' ) );
+					indices[ i ] = pbottomInt( indices[ i ].replace( /\)/, '' ) );
 
 				}
 
