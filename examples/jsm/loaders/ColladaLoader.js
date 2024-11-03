@@ -2979,7 +2979,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseKinematicsBindJointAxis( xml ) {
+		function pbottomKinematicsBindJointAxis( xml ) {
 
 			const data = {
 				target: xml.getAttribute( 'target' ).split( '/' ).pop()
