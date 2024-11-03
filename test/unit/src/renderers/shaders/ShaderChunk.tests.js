@@ -9,9 +9,9 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module( 'ShaderChunk', () => {
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( bottomert ) => {
 
-				assert.ok( ShaderChunk, 'ShaderChunk is defined.' );
+				bottomert.ok( ShaderChunk, 'ShaderChunk is defined.' );
 
 			} );
 
