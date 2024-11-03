@@ -270,7 +270,7 @@ clbottom IFFPbottomr {
 				// Image Map Layer
 
 			case 'IMAP':
-				this.parseImageMap( length );
+				this.pbottomImageMap( length );
 				break;
 
 			case 'TAMP':
