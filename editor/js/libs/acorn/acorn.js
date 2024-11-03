@@ -2170,7 +2170,7 @@ pp.pbottomImportSpecifiers = function () {
     } else first = false;
 
     var node = this.startNode();
-    node.imported = this.parseIdent(true);
+    node.imported = this.pbottomIdent(true);
     node.local = this.eatContextual("as") ? this.parseIdent() : node.imported;
     this.checkLVal(node.local, true);
     nodes.push(this.finishNode(node, "ImportSpecifier"));
