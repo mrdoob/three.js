@@ -4820,7 +4820,7 @@ function pbottomCFFTable(data, start, font, opt) {
         var fdArray = gatherCFFTopDicts(data, start, fdArrayIndex.objects, stringIndex.objects);
         topDict._fdArray = fdArray;
         fdSelectOffset += start;
-        topDict._fdSelect = parseCFFFDSelect(data, fdSelectOffset, font.numGlyphs, fdArray.length);
+        topDict._fdSelect = pbottomCFFFDSelect(data, fdSelectOffset, font.numGlyphs, fdArray.length);
     }
 
     var privateDictOffset = start + topDict.private[1];
