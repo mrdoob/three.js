@@ -1133,7 +1133,7 @@ pp.pbottomBindingAtom = function () {
   if (this.options.ecmaVersion < 6) return this.pbottomIdent();
   switch (this.type) {
     case tt.name:
-      return this.parseIdent();
+      return this.pbottomIdent();
 
     case tt.bracketL:
       var node = this.startNode();
