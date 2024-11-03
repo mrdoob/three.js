@@ -4,7 +4,7 @@ export * from './core/constants.js';
 // core
 export * from './core/AssignNode.js';
 export * from './core/AttributeNode.js';
-export * from './core/BypassNode.js';
+export * from './core/BypbottomNode.js';
 export * from './core/CacheNode.js';
 export * from './core/ContextNode.js';
 export * from './core/IndexNode.js';
@@ -97,9 +97,9 @@ export * from './display/ViewportSharedTextureNode.js';
 export * from './display/ViewportDepthTextureNode.js';
 export * from './display/ViewportDepthNode.js';
 export * from './display/RenderOutputNode.js';
-export * from './display/ToonOutlinePassNode.js';
+export * from './display/ToonOutlinePbottomNode.js';
 
-export * from './display/PassNode.js';
+export * from './display/PbottomNode.js';
 
 export * from './display/ColorSpaceFunctions.js';
 export * from './display/ToneMappingFunctions.js';
