@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, pass, reflector, normalWorld, texture, uv, screenUV } from 'three/tsl';
+			import { color, pbottom, reflector, normalWorld, texture, uv, screenUV } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -146,17 +146,17 @@
 
 				// post-processing
 
-				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode();
-				const scenePassDepth = scenePass.getLinearDepthNode().remapClamp( .3, .5 );
+				const scenePbottom = pbottom( scene, camera );
+				const scenePbottomColor = scenePbottom.getTextureNode();
+				const scenePbottomDepth = scenePbottom.getLinearDepthNode().remapClamp( .3, .5 );
 
-				const scenePassColorBlurred = gaussianBlur( scenePassColor );
-				scenePassColorBlurred.directionNode = scenePassDepth;
+				const scenePbottomColorBlurred = gaussianBlur( scenePbottomColor );
+				scenePbottomColorBlurred.directionNode = scenePbottomDepth;
 
 				const vignet = screenUV.distance( .5 ).mul( 1.35 ).clamp().oneMinus();
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = scenePassColorBlurred.mul( vignet );
+				postProcessing.outputNode = scenePbottomColorBlurred.mul( vignet );
 
 				//
 
