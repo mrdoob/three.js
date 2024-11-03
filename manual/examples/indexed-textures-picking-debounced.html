@@ -344,7 +344,7 @@ function main() {
 
 	}
 
-	class GPUPickHelper {
+	clbottom GPUPickHelper {
 
 		constructor() {
 
@@ -429,7 +429,7 @@ function main() {
 		}
 
 		// if it's been a moment since the user started
-		// then assume it was a drag action, not a select action
+		// then bottomume it was a drag action, not a select action
 		const clickTimeMs = performance.now() - startTimeMs;
 		if ( clickTimeMs > maxClickTimeMs ) {
 
@@ -437,7 +437,7 @@ function main() {
 
 		}
 
-		// if they moved assume it was a drag action
+		// if they moved bottomume it was a drag action
 		const position = getCanvasRelativePosition( event );
 		const moveDeltaSq = ( startPosition.x - position.x ) ** 2 +
                         ( startPosition.y - position.y ) ** 2;
