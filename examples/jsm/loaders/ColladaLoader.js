@@ -1216,7 +1216,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseEffectTechnique( xml ) {
+		function pbottomEffectTechnique( xml ) {
 
 			const data = {};
 
