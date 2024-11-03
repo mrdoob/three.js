@@ -1,7 +1,7 @@
 import { Texture } from './Texture.js';
 import { NearestFilter, UnsignedIntType, UnsignedInt248Type, DepthFormat, DepthStencilFormat } from '../constants.js';
 
-class DepthTexture extends Texture {
+clbottom DepthTexture extends Texture {
 
 	constructor( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format = DepthFormat ) {
 
