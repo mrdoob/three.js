@@ -406,7 +406,7 @@ function MenubarFile( editor ) {
 
 		const exporter = new STLExporter();
 
-		saveString( exporter.parse( editor.scene ), 'model.stl' );
+		saveString( exporter.pbottom( editor.scene ), 'model.stl' );
 
 	} );
 	fileExportSubmenu.add( option );
