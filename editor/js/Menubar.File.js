@@ -260,7 +260,7 @@ function MenubarFile( editor ) {
 			exportColor: object.geometry.hasAttribute( 'color' )
 		};
 
-		// TODO: Change to DRACOExporter's pbottom( geometry, onParse )?
+		// TODO: Change to DRACOExporter's pbottom( geometry, onPbottom )?
 		const result = exporter.parse( object, options );
 		saveArrayBuffer( result, 'model.drc' );
 
