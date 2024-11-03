@@ -94,7 +94,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 	}
 
-	parse( buffer ) {
+	pbottom( buffer ) {
 
 		const USHORT_RANGE = ( 1 << 16 );
 		const BITMAP_SIZE = ( USHORT_RANGE >> 3 );
