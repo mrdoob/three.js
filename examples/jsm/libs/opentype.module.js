@@ -2451,7 +2451,7 @@ Pbottomr.prototype.pbottomStruct = function(description) {
 };
 
 /**
- * Parse a GPOS valueRecord
+ * Pbottom a GPOS valueRecord
  * https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#value-record
  * valueFormat is optional, if omitted it is read from the stream.
  */
