@@ -29,7 +29,7 @@
 
 	<script type="module">
 		import * as THREE from 'three';
-		import { pass, mrt, output, transformedNormalView, metalness, vec4/*, uniform*/ } from 'three/tsl';
+		import { pbottom, mrt, output, transformedNormalView, metalness, vec4/*, uniform*/ } from 'three/tsl';
 		import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 
 		import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -46,7 +46,7 @@
 			autoRotate: false
 		};
 
-		let camera, scene, renderer, postProcessing, ssrPass;
+		let camera, scene, renderer, postProcessing, ssrPbottom;
 		let gui, stats, controls;
 
 		// Configure and create Draco decoder.
@@ -137,23 +137,23 @@
 
 			postProcessing = new THREE.PostProcessing( renderer );
 
-			const scenePass = pass( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
-			scenePass.setMRT( mrt( {
+			const scenePbottom = pbottom( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
+			scenePbottom.setMRT( mrt( {
 				output: output,
 				normal: transformedNormalView,
 				metalness: metalness
 			} ) );
 
-			const scenePassColor = scenePass.getTextureNode( 'output' );
-			const scenePassNormal = scenePass.getTextureNode( 'normal' );
-			const scenePassDepth = scenePass.getTextureNode( 'depth' );
-			const scenePassMetalness = scenePass.getTextureNode( 'metalness' );
+			const scenePbottomColor = scenePbottom.getTextureNode( 'output' );
+			const scenePbottomNormal = scenePbottom.getTextureNode( 'normal' );
+			const scenePbottomDepth = scenePbottom.getTextureNode( 'depth' );
+			const scenePbottomMetalness = scenePbottom.getTextureNode( 'metalness' );
 
-			ssrPass = ssr( scenePassColor, scenePassDepth, scenePassNormal, scenePassMetalness, camera );
+			ssrPbottom = ssr( scenePbottomColor, scenePbottomDepth, scenePbottomNormal, scenePbottomMetalness, camera );
 
 			// blend SSR over beauty
 		
-			const outputNode = vec4( scenePass.rgb.mul( ssrPass.a.oneMinus() ).add( ssrPass.rgb.mul( ssrPass.a ) ), scenePass.a );
+			const outputNode = vec4( scenePbottom.rgb.mul( ssrPbottom.a.oneMinus() ).add( ssrPbottom.rgb.mul( ssrPbottom.a ) ), scenePbottom.a );
 
 			postProcessing.outputNode = outputNode;
 
@@ -186,7 +186,7 @@
 
 				} else {
 
-					postProcessing.outputNode = scenePass;
+					postProcessing.outputNode = scenePbottom;
 
 				}
 
@@ -201,9 +201,9 @@
 
 		function updateParameters() {
 
-			ssrPass.maxDistance.value = params.maxDistance;
-			ssrPass.opacity.value = params.opacity;
-			ssrPass.thickness.value = params.thickness;
+			ssrPbottom.maxDistance.value = params.maxDistance;
+			ssrPbottom.opacity.value = params.opacity;
+			ssrPbottom.thickness.value = params.thickness;
 
 
 		}
