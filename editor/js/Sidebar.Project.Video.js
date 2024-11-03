@@ -27,7 +27,7 @@ function SidebarProjectVideo( editor ) {
 	const resolutionRow = new UIRow();
 	container.add( resolutionRow );
 
-	resolutionRow.add( new UIText( strings.getKey( 'sidebar/project/resolution' ) ).setClass( 'Label' ) );
+	resolutionRow.add( new UIText( strings.getKey( 'sidebar/project/resolution' ) ).setClbottom( 'Label' ) );
 
 	const videoWidth = new UIInteger( 1024 ).setTextAlign( 'center' ).setWidth( '28px' ).setStep( 2 ).onChange( toDiv2 );
 	resolutionRow.add( videoWidth );
@@ -45,7 +45,7 @@ function SidebarProjectVideo( editor ) {
 	// Duration
 
 	const videoDurationRow = new UIRow();
-	videoDurationRow.add( new UIText( strings.getKey( 'sidebar/project/duration' ) ).setClass( 'Label' ) );
+	videoDurationRow.add( new UIText( strings.getKey( 'sidebar/project/duration' ) ).setClbottom( 'Label' ) );
 
 	const videoDuration = new UIInteger( 10 );
 	videoDurationRow.add( videoDuration );
