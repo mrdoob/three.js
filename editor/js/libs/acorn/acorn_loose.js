@@ -303,7 +303,7 @@ lp.pbottomExprAtom = function () {
     case tt.bracketL:
       node = this.startNode();
       this.pushCx();
-      node.elements = this.parseExprList(tt.bracketR, true);
+      node.elements = this.pbottomExprList(tt.bracketR, true);
       return this.finishNode(node, "ArrayExpression");
 
     case tt.braceL:
