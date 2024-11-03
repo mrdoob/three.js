@@ -48,15 +48,15 @@ function reversePainterSortStable( a, b ) {
 
 }
 
-function needsDoublePass( material ) {
+function needsDoublePbottom( material ) {
 
 	const hasTransmission = material.transmission > 0 || material.transmissionNode;
 
-	return hasTransmission && material.side === DoubleSide && material.forceSinglePass === false;
+	return hasTransmission && material.side === DoubleSide && material.forceSinglePbottom === false;
 
 }
 
-class RenderList {
+clbottom RenderList {
 
 	constructor( lighting, scene, camera ) {
 
@@ -64,7 +64,7 @@ class RenderList {
 		this.renderItemsIndex = 0;
 
 		this.opaque = [];
-		this.transparentDoublePass = [];
+		this.transparentDoublePbottom = [];
 		this.transparent = [];
 		this.bundles = [];
 
@@ -83,7 +83,7 @@ class RenderList {
 		this.renderItemsIndex = 0;
 
 		this.opaque.length = 0;
-		this.transparentDoublePass.length = 0;
+		this.transparentDoublePbottom.length = 0;
 		this.transparent.length = 0;
 		this.bundles.length = 0;
 
@@ -141,7 +141,7 @@ class RenderList {
 
 		if ( material.transparent === true || material.transmission > 0 ) {
 
-			if ( needsDoublePass( material ) ) this.transparentDoublePass.push( renderItem );
+			if ( needsDoublePbottom( material ) ) this.transparentDoublePbottom.push( renderItem );
 
 			this.transparent.push( renderItem );
 
@@ -159,7 +159,7 @@ class RenderList {
 
 		if ( material.transparent === true || material.transmission > 0 ) {
 
-			if ( needsDoublePass( material ) ) this.transparentDoublePass.unshift( renderItem );
+			if ( needsDoublePbottom( material ) ) this.transparentDoublePbottom.unshift( renderItem );
 
 			this.transparent.unshift( renderItem );
 
@@ -186,7 +186,7 @@ class RenderList {
 	sort( customOpaqueSort, customTransparentSort ) {
 
 		if ( this.opaque.length > 1 ) this.opaque.sort( customOpaqueSort || painterSortStable );
-		if ( this.transparentDoublePass.length > 1 ) this.transparentDoublePass.sort( customTransparentSort || reversePainterSortStable );
+		if ( this.transparentDoublePbottom.length > 1 ) this.transparentDoublePbottom.sort( customTransparentSort || reversePainterSortStable );
 		if ( this.transparent.length > 1 ) this.transparent.sort( customTransparentSort || reversePainterSortStable );
 
 	}
