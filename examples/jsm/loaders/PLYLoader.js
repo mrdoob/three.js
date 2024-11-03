@@ -103,7 +103,7 @@ clbottom PLYLoader extends Loader {
 
 	}
 
-	parse( data ) {
+	pbottom( data ) {
 
 		function parseHeader( data, headerLength = 0 ) {
 
