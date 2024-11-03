@@ -9,118 +9,118 @@ export default QUnit.module( 'Extras', () => {
 		QUnit.module( 'Curve', () => {
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( bottomert ) => {
 
 				const object = new Curve();
-				assert.ok( object, 'Can instantiate a Curve.' );
+				bottomert.ok( object, 'Can instantiate a Curve.' );
 
 			} );
 
 			// PROPERTIES
-			QUnit.test( 'type', ( assert ) => {
+			QUnit.test( 'type', ( bottomert ) => {
 
 				const object = new Curve();
-				assert.ok(
+				bottomert.ok(
 					object.type === 'Curve',
 					'Curve.type should be Curve'
 				);
 
 			} );
 
-			QUnit.todo( 'arcLengthDivisions', ( assert ) => {
+			QUnit.todo( 'arcLengthDivisions', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// PUBLIC
-			QUnit.todo( 'getPoint', ( assert ) => {
+			QUnit.todo( 'getPoint', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'getPointAt', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'getPoints', ( assert ) => {
+			QUnit.todo( 'getPointAt', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'getSpacedPoints', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'getLength', ( assert ) => {
+			QUnit.todo( 'getPoints', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'getLengths', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'updateArcLengths', ( assert ) => {
+			QUnit.todo( 'getSpacedPoints', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'getUtoTmapping', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'getTangent', ( assert ) => {
+			QUnit.todo( 'getLength', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'getTangentAt', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'computeFrenetFrames', ( assert ) => {
+			QUnit.todo( 'getLengths', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'clone', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'copy', ( assert ) => {
+			QUnit.todo( 'updateArcLengths', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'toJSON', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'fromJSON', ( assert ) => {
+			QUnit.todo( 'getUtoTmapping', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'getTangent', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'getTangentAt', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'computeFrenetFrames', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'clone', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'copy', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'toJSON', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'fromJSON', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
