@@ -10066,7 +10066,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	var pbottomVertices = function () {
 
-		var parseVertex = function () {
+		var pbottomVertex = function () {
 
 			var p = {};
 			p.position = dv.getFloat32Array( 3 );
