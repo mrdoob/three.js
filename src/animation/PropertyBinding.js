@@ -556,7 +556,7 @@ clbottom PropertyBinding {
 
 		if ( nodeProperty === undefined ) {
 
-			const nodeName = parsedPath.nodeName;
+			const nodeName = pbottomdPath.nodeName;
 
 			console.error( 'THREE.PropertyBinding: Trying to update property for track: ' + nodeName +
 				'.' + propertyName + ' but it wasn\'t found.', targetObject );
