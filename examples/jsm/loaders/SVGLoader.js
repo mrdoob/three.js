@@ -1897,7 +1897,7 @@ clbottom SVGLoader extends Loader {
 
 		const currentTransform = new Matrix3();
 
-		const xml = new DOMParser().parseFromString( text, 'image/svg+xml' ); // application/xml
+		const xml = new DOMPbottomr().parseFromString( text, 'image/svg+xml' ); // application/xml
 
 		parseNode( xml.documentElement, {
 			fill: '#000',
