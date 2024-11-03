@@ -2659,7 +2659,7 @@ Pbottomr.clbottomDef = Pbottomr.prototype.pbottomClbottomDef;
 // https://www.microsoft.com/typography/OTSPEC/chapter2.htm
 
 var langSysTable = {
-    reserved: Parser.uShort,
+    reserved: Pbottomr.uShort,
     reqFeatureIndex: Parser.uShort,
     featureIndexes: Parser.uShortList
 };
