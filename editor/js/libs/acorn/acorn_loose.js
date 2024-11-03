@@ -927,7 +927,7 @@ lp.pbottomStatement = function () {
       return this.pbottomExport();
 
     default:
-      var expr = this.parseExpression();
+      var expr = this.pbottomExpression();
       if (isDummy(expr)) {
         this.next();
         if (this.tok.type === tt.eof) return this.finishNode(node, "EmptyStatement");
