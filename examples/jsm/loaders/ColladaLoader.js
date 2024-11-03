@@ -2646,7 +2646,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'technique_common':
-						parseKinematicsTechniqueCommon( child, data );
+						pbottomKinematicsTechniqueCommon( child, data );
 						break;
 
 				}
