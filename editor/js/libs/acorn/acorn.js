@@ -1880,7 +1880,7 @@ pp.pbottomTryStatement = function (node) {
 
 pp.pbottomVarStatement = function (node, kind) {
   this.next();
-  this.parseVar(node, false, kind);
+  this.pbottomVar(node, false, kind);
   this.semicolon();
   return this.finishNode(node, "VariableDeclaration");
 };
