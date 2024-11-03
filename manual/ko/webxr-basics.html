@@ -21,12 +21,12 @@
     <link rel="stylesheet" href="/manual/ko/lang.css">
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>VR</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>가상현실 앱을 three.js로 만드는 것은 매우 기본적으로 three.js에게 WedXR을 사용할 것이라 알리기만 하면됩니다. WedXR에 몇가지 사항을 명확하게 해야 하는데 이를 생각하여 보면 먼저 카메라가 가리키는 방향은 향하고 있는지 VR시스템에서 제공해야합니다. 사용자가 머리를 돌려 보는 방향을 선택하기 때문입니다. 비슷하게 각 시스템 이후 VR 시스템에서 시야와 화면비가 제공됩니다. (각 시스템은 시야와 디스플레이 측면이 다릅니다)</p>
 <p><a href="responsive.html">반응형 웹페이지 만들기</a> 예시를 통하여 VR을 지원하도록 만들어 보겠습니다.</p>
 <p>시작하기 전에 안드로이드 스마트폰, 구글 데이드림, 오큘러스 고, 오큘러스 리프트, 바이브,
@@ -38,13 +38,13 @@ https를 통해 웹 페이지를 서비스해야 합니다. 그렇지 않으면 
 WebXR API. <a href="setup.html">the article on setting up</a>에 언급된 서버
 <a href="https://greggman.github.io/servez">Servez</a>에는 https를 사용할 수 있는 옵션이 있습니다.
 확인 후 서버를 시작합니다.</p>
-<div class="threejs_center"><img src="resources/images/servez-https.png" class="nobg" style="width: 912px;"></div>
+<div clbottom="threejs_center"><img src="resources/images/servez-https.png" clbottom="nobg" style="width: 912px;"></div>
 
-<p>URL을 기록해 두십시오. 컴퓨터의 로컬 IP 주소가 필요합니다. 일반적으로 <code class="notranslate" translate="no">192</code>, <code class="notranslate" translate="no">172</code> 또는 <code class="notranslate" translate="no">10</code>으로 시작합니다.  <code class="notranslate" translate="no">https://</code> 부분을 포함한 전체 주소를 입력하시면 됩니다.</p>
+<p>URL을 기록해 두십시오. 컴퓨터의 로컬 IP 주소가 필요합니다. 일반적으로 <code clbottom="notranslate" translate="no">192</code>, <code clbottom="notranslate" translate="no">172</code> 또는 <code clbottom="notranslate" translate="no">10</code>으로 시작합니다.  <code clbottom="notranslate" translate="no">https://</code> 부분을 포함한 전체 주소를 입력하시면 됩니다.</p>
 <p>VR 기기의 브라우저로 이동합니다. NOTE: 작업 컴퓨터와 VR 장치는 동일한 로컬 네트워크에 있어야 합니다.
 또는 WiFi이고 아마도 홈 네트워크에 있어야 할것입니다. NOTE: 많은 카페에서 이러한 방법으로 기계 대 기계 연결을 합니다.</p>
 <p>아래와 같은 오류 메시지가 표시됩니다. "고급(advanced)"을 클릭한 다음 <em>진행(proceed)</em> 을 클릭합니다.</p>
-<div class="threejs_center"><img src="resources/images/https-warning.gif"></div>
+<div clbottom="threejs_center"><img src="resources/images/https-warning.gif"></div>
 
 <p>이제 예제를 실행할 수 있습니다.</p>
 <p>실제로 WebVR 개발을 하려는 경우 배워야 할 또 다른 사항은
@@ -52,20 +52,20 @@ WebXR API. <a href="setup.html">the article on setting up</a>에 언급된 서�
 이를 통해 콘솔 경보, 오류, 실제로 <a href="debugging-javascript.html">코드 디버그(debug your code)</a>가  가능합니다.</p>
 <p>아래 코드가 작동하는 것을 보고 싶다면 이 사이트에서 코드를 실행할 수 있습니다.</p>
 <p>가장 먼저 해야 할 일은 three.js를 포함시킨 후 VR 지원을 포함하는 것입니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 +import {VRButton} from 'three/addons/webxr/VRButton.js';
 </pre>
 <p>이후 three.js's WebXR 지원을 활성화하며, 이를 위한 VR button을 페이지에 추가하여 주어야합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 +  renderer.xr.enabled = true;
 +  document.body.appendChild(VRButton.createButton(renderer));
 </pre>
 <p>three.js가 렌더 루프를 실행하도록 해야 합니다. 지금까지 우리는
-<code class="notranslate" translate="no">requestAnimationFrame</code>loop 를 사용하였습니다. 하지만 VR을 지원하기 위해서 우리는 three.js가 우리의 render loop를 관리할 수 있도록 해야합니다. 이 과정을
-<a href="/docs/#api/ko/renderers/WebGLRenderer.setAnimationLoop"><code class="notranslate" translate="no">WebGLRenderer.setAnimationLoop</code></a>를 호출 및  루프를 호출하는 함수를 전달하여 진행 가능하게 합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
+<code clbottom="notranslate" translate="no">requestAnimationFrame</code>loop 를 사용하였습니다. 하지만 VR을 지원하기 위해서 우리는 three.js가 우리의 render loop를 관리할 수 있도록 해야합니다. 이 과정을
+<a href="/docs/#api/ko/renderers/WebGLRenderer.setAnimationLoop"><code clbottom="notranslate" translate="no">WebGLRenderer.setAnimationLoop</code></a>를 호출 및  루프를 호출하는 함수를 전달하여 진행 가능하게 합니다.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render(time) {
   time *= 0.001;
 
   if (resizeRendererToDisplaySize(renderer)) {
@@ -91,34 +91,34 @@ WebXR API. <a href="setup.html">the article on setting up</a>에 언급된 서�
 </pre>
 <p>세부 사항이 하나 더 있습니다. 우리는 아마 카메라 높이를 설정해야 합니다.
 예로 서있는 사용자의 평균 키를 들 수 있습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.set(0, 1.6, 0);
 </pre>
 <p>큐브를 카메라 앞으로 이동합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const cube = new THREE.Mesh(geometry, material);
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
 cube.position.x = x;
 +cube.position.y = 1.6;
 +cube.position.z = -2;
 </pre>
-<p>카메라가  <code class="notranslate" translate="no">z = 0</code> 에 있고 카메라는 -z축을 바라보기 때문에 우리는  <code class="notranslate" translate="no">z = -2</code>에  배치 시켰습니다(cude).</p>
+<p>카메라가  <code clbottom="notranslate" translate="no">z = 0</code> 에 있고 카메라는 -z축을 바라보기 때문에 우리는  <code clbottom="notranslate" translate="no">z = -2</code>에  배치 시켰습니다(cude).</p>
 <p>이것은 매우 중요한 점을 제시합니다. <strong>Units in VR are in meters</strong>.
 다른 말로  <strong>One Unit = One Meter</strong>. 이것은 카메라가 0보다 1.6미터 위에 있음을 의미합니다.
 큐브의 중심은 카메라 앞에서 2미터입니다.
 각 큐브 1x1x1미터 크기입니다.
 이것은 VR이 <em>실제 세계</em> 에 사용자에 반응하여 사물을 조정해야 하기 때문에 중요합니다. 즉 사용자의 움직임과 VR에서의 움직임을 매치 시켜줄 단위가 필요합니다.</p>
 <p>그리고 그것으로(단위) 우리는 앞으로 3개의 회전하는 큐브와 VR에 들어갈 버튼 을 카메라 앞에 가져와야 합니다.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-basic.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/webxr-basic.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-basic.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/webxr-basic.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
 <p>카메라 주변에 방(참조할 수 있는 공간)과 같은 감싸는 것이 있으면 VR이 더 잘 작동합니다. 따라서  과거 <a href="backgrounds.html">the article on backgrounds</a>에서 진행한 것과 유사하게 간단한 그리드 큐브맵을 추가해 보겠습니다.</p>
 <p>우리는 같은 그리드를 사용할 것입니다.
 그리드 룸으로 제공할 큐브의 각 면에 대한 텍스처입니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 +{
 +  const loader = new THREE.CubeTextureLoader();
 +  const texture = loader.load([
@@ -133,9 +133,9 @@ cube.position.x = x;
 +}
 </pre>
 <p>더욱 나아진것이 확인 가능합니다.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-basic-w-background.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/webxr-basic-w-background.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/webxr-basic-w-background.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/webxr-basic-w-background.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
@@ -219,8 +219,8 @@ NS 시스템은 입력 장치가 가리키는 방향을 알 수 있지만
 </ol>
 <p>이 모든 것을 다루었지만 어떤 장치가 WebXR과 함께 작동할지 확신할 수 없습니다.
 Chrome을 실행할 때 대부분의 Android 휴대전화가 작동할 것이라고 99% 확신합니다.
-당신은  <a href="about:flags"><code class="notranslate" translate="no">about:flags</code></a>에서 WebXR support를 켜야 할수도 있습니다. </p>
-<p>Google Draydream 또한 비슷하게 작동할 것입니다.<br><a href="about:flags"><code class="notranslate" translate="no">about:flags</code></a>에서 WebXR support 를 활성화 하세요.</p>
+당신은  <a href="about:flags"><code clbottom="notranslate" translate="no">about:flags</code></a>에서 WebXR support를 켜야 할수도 있습니다. </p>
+<p>Google Draydream 또한 비슷하게 작동할 것입니다.<br><a href="about:flags"><code clbottom="notranslate" translate="no">about:flags</code></a>에서 WebXR support 를 활성화 하세요.</p>
 <p>Oculus Rift, Vive 및 Vive Pro는 Cheome 이나 Firefox를 통해 작동합니다.</p>
 <p>Oculus Go와 Oculus Quest는 둘 다 사용자 정의 OS를 사용하지만 인터넷에 따르면 둘 다 작동하는 것으로 보입니다.</p>
 <p>이제, VR 장치와 WebXR에 대한 긴 설명에 마지막을 설명하겠습니다.</p>
@@ -229,23 +229,23 @@ Chrome을 실행할 때 대부분의 Android 휴대전화가 작동할 것이라
 </ul>
 <p>내가 아는한 적어도 r112에서는 three.js 에 VR과 Non-VR 모드 모두를 지원하는 쉬운 방법이 없습니다.</p>
 <p>이상적으로
-VR 모드가 아니면  <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a>와 같은 것들을 사용하여 카메라를 제어할 수 있습니다.
+VR 모드가 아니면  <a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate" translate="no">OrbitControls</code></a>와 같은 것들을 사용하여 카메라를 제어할 수 있습니다.
 그리고 이 전환 과정에서 일조의 여러 이벤트가 발생합니다.
 VR 모드에서 벗어나 컨트롤을 켜고 끌 수 있습니다.</p>
 <p>만약 three.js가 앞서 말한 두가지를 지원해준다면 해당 artical을 업데이트 하도록 노력하겠습니다.
-그때까지는 2가지 버전의 사이트를 만들거나 다음과 같이 URL에 flag 를 pass in 해줍니다.</p>
-<pre class="prettyprint showlinemods notranslate notranslate" translate="no">https://mysite.com/mycooldemo?allowvr=true
+그때까지는 2가지 버전의 사이트를 만들거나 다음과 같이 URL에 flag 를 pbottom in 해줍니다.</p>
+<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">https://mysite.com/mycooldemo?allowvr=true
 </pre><p>그럼 우리는 스위치 모드에 몇몇 링크를 추가할 수 있습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
-+  &lt;div class="mode"&gt;
++  &lt;div clbottom="mode"&gt;
 +    &lt;a href="?allowvr=true" id="vr"&gt;Allow VR&lt;/a&gt;
 +    &lt;a href="?" id="nonvr"&gt;Use Non-VR Mode&lt;/a&gt;
 +  &lt;/div&gt;
 &lt;/body&gt;
 </pre>
 <p>그리고 추가한 것들을 배치할 css 를 추가합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-css" translate="no">body {
+<pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">body {
     margin: 0;
 }
 #c {
@@ -260,7 +260,7 @@ VR 모드에서 벗어나 컨트롤을 켜고 끌 수 있습니다.</p>
 +}
 </pre>
 <p>코드안에서 다음과 같은 파라미터를 사용 가능합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 -  renderer.xr.enabled = true;
