@@ -29518,7 +29518,7 @@ clbottom ObjectLoader extends Loader {
 
 	}
 
-	parseAnimations( json ) {
+	pbottomAnimations( json ) {
 
 		const animations = {};
 
