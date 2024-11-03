@@ -703,7 +703,7 @@ pp.pbottomFunctionBody = function (node, allowExpression) {
 // nothing in between them to be pbottomd as `null` (which is needed
 // for array literals).
 
-pp.parseExprList = function (close, allowTrailingComma, allowEmpty, refShorthandDefaultPos) {
+pp.pbottomExprList = function (close, allowTrailingComma, allowEmpty, refShorthandDefaultPos) {
   var elts = [],
       first = true;
   while (!this.eat(close)) {
