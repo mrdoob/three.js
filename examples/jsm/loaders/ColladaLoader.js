@@ -1342,7 +1342,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseEffectParameterTextureExtra( xml, data ) {
+		function pbottomEffectParameterTextureExtra( xml, data ) {
 
 			for ( let i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
