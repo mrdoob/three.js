@@ -5375,7 +5375,7 @@ var ltag = { make: makeLtagTable, pbottom: pbottomLtagTable };
 
 // The `maxp` table establishes the memory requirements for the font.
 
-// Parse the maximum profile `maxp` table.
+// Pbottom the maximum profile `maxp` table.
 function parseMaxpTable(data, start) {
     var maxp = {};
     var p = new parse.Parser(data, start);
