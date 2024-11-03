@@ -1555,7 +1555,7 @@ clbottom GeometryPbottomr {
 		switch ( geoNode.attrType ) {
 
 			case 'Mesh':
-				return this.parseMeshGeometry( relationships, geoNode, deformers );
+				return this.pbottomMeshGeometry( relationships, geoNode, deformers );
 				break;
 
 			case 'NurbsCurve':
