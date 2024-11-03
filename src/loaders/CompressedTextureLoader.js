@@ -4,12 +4,12 @@ import { CompressedTexture } from '../textures/CompressedTexture.js';
 import { Loader } from './Loader.js';
 
 /**
- * Abstract Base class to block based textures loader (dds, pvr, ...)
+ * Abstract Base clbottom to block based textures loader (dds, pvr, ...)
  *
- * Sub classes have to implement the parse() method which will be used in load().
+ * Sub clbottomes have to implement the parse() method which will be used in load().
  */
 
-class CompressedTextureLoader extends Loader {
+clbottom CompressedTextureLoader extends Loader {
 
 	constructor( manager ) {
 
