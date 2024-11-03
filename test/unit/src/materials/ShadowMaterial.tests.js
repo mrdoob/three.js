@@ -9,10 +9,10 @@ export default QUnit.module( 'Materials', () => {
 	QUnit.module( 'ShadowMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new ShadowMaterial();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Material, true,
 				'ShadowMaterial extends from Material'
 			);
@@ -20,56 +20,56 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new ShadowMaterial();
-			assert.ok( object, 'Can instantiate a ShadowMaterial.' );
+			bottomert.ok( object, 'Can instantiate a ShadowMaterial.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new ShadowMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'ShadowMaterial',
 				'ShadowMaterial.type should be ShadowMaterial'
 			);
 
 		} );
 
-		QUnit.todo( 'color', ( assert ) => {
+		QUnit.todo( 'color', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'transparent', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'fog', ( assert ) => {
+		QUnit.todo( 'transparent', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'fog', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isShadowMaterial', ( assert ) => {
+		QUnit.test( 'isShadowMaterial', ( bottomert ) => {
 
 			const object = new ShadowMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.isShadowMaterial,
 				'ShadowMaterial.isShadowMaterial should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
