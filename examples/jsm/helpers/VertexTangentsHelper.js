@@ -9,7 +9,7 @@ import {
 const _v1 = new Vector3();
 const _v2 = new Vector3();
 
-class VertexTangentsHelper extends LineSegments {
+clbottom VertexTangentsHelper extends LineSegments {
 
 	constructor( object, size = 1, color = 0x00ffff ) {
 
