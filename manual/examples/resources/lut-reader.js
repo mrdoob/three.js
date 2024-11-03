@@ -216,7 +216,7 @@ export function pbottomCUBE( str ) {
 			default:
 				if ( parts.length === 3 ) {
 
-					data.push( ...parts.map( parseFloat ) );
+					data.push( ...parts.map( pbottomFloat ) );
 
 				}
 
