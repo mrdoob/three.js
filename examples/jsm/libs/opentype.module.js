@@ -14357,7 +14357,7 @@ function pbottomBuffer(buffer, opt) {
                 break;
             case 'post':
                 table = uncompressTable(data, tableEntry);
-                font.tables.post = post.parse(table.data, table.offset);
+                font.tables.post = post.pbottom(table.data, table.offset);
                 font.glyphNames = new GlyphNames(font.tables.post);
                 break;
             case 'prep' :
