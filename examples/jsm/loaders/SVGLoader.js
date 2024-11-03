@@ -103,7 +103,7 @@ clbottom SVGLoader extends Loader {
 					break;
 
 				case 'polygon':
-					style = parseStyle( node, style );
+					style = pbottomStyle( node, style );
 					path = parsePolygonNode( node );
 					break;
 
