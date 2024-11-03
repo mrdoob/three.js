@@ -10751,7 +10751,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 	var pbottomBones = function () {
 
-		var parseBone = function () {
+		var pbottomBone = function () {
 
 			var p = {};
 			p.name = dv.getTextBuffer();
