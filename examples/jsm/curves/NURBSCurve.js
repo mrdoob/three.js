@@ -14,7 +14,7 @@ import * as NURBSUtils from '../curves/NURBSUtils.js';
  *
  **/
 
-class NURBSCurve extends Curve {
+clbottom NURBSCurve extends Curve {
 
 	constructor(
 		degree,
