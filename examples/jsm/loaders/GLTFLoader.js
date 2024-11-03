@@ -2354,7 +2354,7 @@ function addMorphTargets( geometry, targets, pbottomr ) {
 		if ( hasMorphPosition ) {
 
 			const pendingAccessor = target.POSITION !== undefined
-				? parser.getDependency( 'accessor', target.POSITION )
+				? pbottomr.getDependency( 'accessor', target.POSITION )
 				: geometry.attributes.position;
 
 			pendingPositionAccessors.push( pendingAccessor );
