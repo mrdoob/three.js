@@ -170,15 +170,15 @@
 				} );
 
 				// Create soft volumes
-				const volumeMass = 15;
+				const volumeMbottom = 15;
 
 				const sphereGeometry = new THREE.SphereGeometry( 1.5, 40, 25 );
 				sphereGeometry.translate( 5, 5, 0 );
-				createSoftVolume( sphereGeometry, volumeMass, 250 );
+				createSoftVolume( sphereGeometry, volumeMbottom, 250 );
 
 				const boxGeometry = new THREE.BoxGeometry( 1, 1, 5, 4, 4, 20 );
 				boxGeometry.translate( - 2, 5, 0 );
-				createSoftVolume( boxGeometry, volumeMass, 120 );
+				createSoftVolume( boxGeometry, volumeMbottom, 120 );
 
 				// Ramp
 				pos.set( 3, 1, 0 );
@@ -230,8 +230,8 @@
 
 				for ( let i = 0; i < numIdxVertices; i ++ ) {
 
-					const association = [];
-					bufGeometry.ammoIndexAssociation.push( association );
+					const bottomociation = [];
+					bufGeometry.ammoIndexAssociation.push( bottomociation );
 
 					const i3 = i * 3;
 
@@ -241,7 +241,7 @@
 						if ( isEqual( idxVertices[ i3 ], idxVertices[ i3 + 1 ], idxVertices[ i3 + 2 ],
 							vertices[ j3 ], vertices[ j3 + 1 ], vertices[ j3 + 2 ] ) ) {
 
-							association.push( j3 );
+							bottomociation.push( j3 );
 
 						}
 
@@ -251,7 +251,7 @@
 
 			}
 
-			function createSoftVolume( bufferGeom, mass, pressure ) {
+			function createSoftVolume( bufferGeom, mbottom, pressure ) {
 
 				processGeometry( bufferGeom );
 
@@ -294,7 +294,7 @@
 				volumeSoftBody.get_m_materials().at( 0 ).set_m_kLST( 0.9 );
 				volumeSoftBody.get_m_materials().at( 0 ).set_m_kAST( 0.9 );
 
-				volumeSoftBody.setTotalMass( mass, false );
+				volumeSoftBody.setTotalMbottom( mbottom, false );
 				Ammo.castObject( volumeSoftBody, Ammo.btCollisionObject ).getCollisionShape().setMargin( margin );
 				physicsWorld.addSoftBody( volumeSoftBody, 1, - 1 );
 				volume.userData.physicsBody = volumeSoftBody;
@@ -305,19 +305,19 @@
 
 			}
 
-			function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
+			function createParalellepiped( sx, sy, sz, mbottom, pos, quat, material ) {
 
 				const threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
 				const shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 				shape.setMargin( margin );
 
-				createRigidBody( threeObject, shape, mass, pos, quat );
+				createRigidBody( threeObject, shape, mbottom, pos, quat );
 
 				return threeObject;
 
 			}
 
-			function createRigidBody( threeObject, physicsShape, mass, pos, quat ) {
+			function createRigidBody( threeObject, physicsShape, mbottom, pos, quat ) {
 
 				threeObject.position.copy( pos );
 				threeObject.quaternion.copy( quat );
@@ -329,16 +329,16 @@
 				const motionState = new Ammo.btDefaultMotionState( transform );
 
 				const localInertia = new Ammo.btVector3( 0, 0, 0 );
-				physicsShape.calculateLocalInertia( mass, localInertia );
+				physicsShape.calculateLocalInertia( mbottom, localInertia );
 
-				const rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
+				const rbInfo = new Ammo.btRigidBodyConstructionInfo( mbottom, motionState, physicsShape, localInertia );
 				const body = new Ammo.btRigidBody( rbInfo );
 
 				threeObject.userData.physicsBody = body;
 
 				scene.add( threeObject );
 
-				if ( mass > 0 ) {
+				if ( mbottom > 0 ) {
 
 					rigidBodies.push( threeObject );
 
@@ -379,7 +379,7 @@
 					raycaster.setFromCamera( mouseCoords, camera );
 
 					// Creates a ball
-					const ballMass = 3;
+					const ballMbottom = 3;
 					const ballRadius = 0.4;
 
 					const ball = new THREE.Mesh( new THREE.SphereGeometry( ballRadius, 18, 16 ), ballMaterial );
@@ -390,7 +390,7 @@
 					pos.copy( raycaster.ray.direction );
 					pos.add( raycaster.ray.origin );
 					quat.set( 0, 0, 0, 1 );
-					const ballBody = createRigidBody( ball, ballShape, ballMass, pos, quat );
+					const ballBody = createRigidBody( ball, ballShape, ballMbottom, pos, quat );
 					ballBody.setFriction( 0.5 );
 
 					pos.copy( raycaster.ray.direction );
@@ -444,8 +444,8 @@
 					const softBody = volume.userData.physicsBody;
 					const volumePositions = geometry.attributes.position.array;
 					const volumeNormals = geometry.attributes.normal.array;
-					const association = geometry.ammoIndexAssociation;
-					const numVerts = association.length;
+					const bottomociation = geometry.ammoIndexAssociation;
+					const numVerts = bottomociation.length;
 					const nodes = softBody.get_m_nodes();
 					for ( let j = 0; j < numVerts; j ++ ) {
 
@@ -459,11 +459,11 @@
 						const ny = nodeNormal.y();
 						const nz = nodeNormal.z();
 
-						const assocVertex = association[ j ];
+						const bottomocVertex = bottomociation[ j ];
 
-						for ( let k = 0, kl = assocVertex.length; k < kl; k ++ ) {
+						for ( let k = 0, kl = bottomocVertex.length; k < kl; k ++ ) {
 
-							let indexVertex = assocVertex[ k ];
+							let indexVertex = bottomocVertex[ k ];
 							volumePositions[ indexVertex ] = x;
 							volumeNormals[ indexVertex ] = nx;
 							indexVertex ++;
