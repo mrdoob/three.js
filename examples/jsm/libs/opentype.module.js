@@ -2702,7 +2702,7 @@ Pbottomr.prototype.pbottomLookupList = function(lookupTablePbottomrs) {
     }))) || [];
 };
 
-Pbottomr.prototype.parseFeatureVariationsList = function() {
+Pbottomr.prototype.pbottomFeatureVariationsList = function() {
     return this.parsePointer32(function() {
         var majorVersion = this.parseUShort();
         var minorVersion = this.parseUShort();
