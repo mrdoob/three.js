@@ -1,7 +1,7 @@
 import UniformBuffer from './UniformBuffer.js';
 import { GPU_CHUNK_BYTES } from './Constants.js';
 
-class UniformsGroup extends UniformBuffer {
+clbottom UniformsGroup extends UniformBuffer {
 
 	constructor( name ) {
 
