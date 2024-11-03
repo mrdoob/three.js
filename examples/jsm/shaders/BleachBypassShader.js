@@ -1,12 +1,12 @@
 /**
- * Bleach bypass shader [http://en.wikipedia.org/wiki/Bleach_bypass]
+ * Bleach bypbottom shader [http://en.wikipedia.org/wiki/Bleach_bypbottom]
  * - based on Nvidia example
- * http://developer.download.nvidia.com/shaderlibrary/webpages/shader_library.html#post_bleach_bypass
+ * http://developer.download.nvidia.com/shaderlibrary/webpages/shader_library.html#post_bleach_bypbottom
  */
 
-const BleachBypassShader = {
+const BleachBypbottomShader = {
 
-	name: 'BleachBypassShader',
+	name: 'BleachBypbottomShader',
 
 	uniforms: {
 
@@ -58,4 +58,4 @@ const BleachBypassShader = {
 
 };
 
-export { BleachBypassShader };
+export { BleachBypbottomShader };
