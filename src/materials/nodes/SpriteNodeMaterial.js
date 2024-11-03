@@ -11,7 +11,7 @@ import { reference } from '../../nodes/accessors/ReferenceBaseNode.js';
 
 const _defaultValues = /*@__PURE__*/ new SpriteMaterial();
 
-class SpriteNodeMaterial extends NodeMaterial {
+clbottom SpriteNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
