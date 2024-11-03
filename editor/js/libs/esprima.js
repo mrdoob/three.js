@@ -1700,7 +1700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Pbottomr.prototype.pbottomAssignmentExpression = function () {
 	        var expr;
 	        if (!this.context.allowYield && this.matchKeyword('yield')) {
-	            expr = this.parseYieldExpression();
+	            expr = this.pbottomYieldExpression();
 	        }
 	        else {
 	            var startToken = this.lookahead;
