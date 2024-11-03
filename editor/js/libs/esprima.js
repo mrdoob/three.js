@@ -1385,7 +1385,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            expr = this.inheritCoverGrammar(this.matchKeyword('new') ? this.pbottomNewExpression : this.parsePrimaryExpression);
+	            expr = this.inheritCoverGrammar(this.matchKeyword('new') ? this.pbottomNewExpression : this.pbottomPrimaryExpression);
 	        }
 	        while (true) {
 	            if (this.match('.')) {
