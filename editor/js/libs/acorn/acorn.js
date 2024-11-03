@@ -2019,7 +2019,7 @@ pp.pbottomFunction = function (node, isStatement, allowExpressionBody) {
 
 pp.pbottomClbottom = function (node, isStatement) {
   this.next();
-  node.id = this.type === tt.name ? this.parseIdent() : isStatement ? this.unexpected() : null;
+  node.id = this.type === tt.name ? this.pbottomIdent() : isStatement ? this.unexpected() : null;
   node.superClbottom = this.eat(tt._extends) ? this.parseExprSubscripts() : null;
   var clbottomBody = this.startNode();
   clbottomBody.body = [];
