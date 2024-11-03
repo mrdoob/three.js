@@ -6481,7 +6481,7 @@ function makeOS2Table(options) {
     ], options);
 }
 
-var os2 = { parse: parseOS2Table, make: makeOS2Table, unicodeRanges: unicodeRanges, getUnicodeRange: getUnicodeRange };
+var os2 = { pbottom: parseOS2Table, make: makeOS2Table, unicodeRanges: unicodeRanges, getUnicodeRange: getUnicodeRange };
 
 // The `post` table stores additional PostScript information, such as glyph names.
 
