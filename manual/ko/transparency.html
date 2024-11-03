@@ -21,19 +21,19 @@
     <link rel="stylesheet" href="/manual/ko/lang.css">
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>투명도</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>Three.js에서 투명도는 간단하지만 동시에 까다로운 주제입니다.</p>
 <p>먼저 쉬운 것부터 알아보죠. 예제로 정육면체 8개를 2x2x2 그리드에 맞춘 장면을
 만들어보겠습니다.</p>
 <p><a href="rendering-on-demand.html">불필요한 렌더링 제거하기</a>에서 썼던
-예제를 가져와 정육면체 3개를 8개로 수정합니다. 먼저 <code class="notranslate" translate="no">makeInstance</code> 함수가
+예제를 가져와 정육면체 3개를 8개로 수정합니다. 먼저 <code clbottom="notranslate" translate="no">makeInstance</code> 함수가
 x, y, z 값을 받도록 수정하겠습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function makeInstance(geometry, color) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-function makeInstance(geometry, color) {
 +function makeInstance(geometry, color, x, y, z) {
   const material = new THREE.MeshPhongMaterial({color});
 
@@ -47,7 +47,7 @@ x, y, z 값을 받도록 수정하겠습니다.</p>
 }
 </pre>
 <p>그리고 정육면체 8개를 만듭니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function hsl(h, s, l) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+function hsl(h, s, l) {
 +  return (new THREE.Color()).setHSL(h, s, l);
 +}
 
@@ -68,7 +68,7 @@ x, y, z 값을 받도록 수정하겠습니다.</p>
 +}
 </pre>
 <p>카메라도 조정합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // canvas 기본값
 const near = 0.1;
 -const far = 5;
@@ -78,11 +78,11 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +camera.position.z = 2;
 </pre>
 <p>배경색은 하얀색으로 바꿔주고</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const scene = new THREE.Scene();
 +scene.background = new THREE.Color('white');
 </pre>
 <p>정육면체의 옆면도 빛을 받도록 조명을 하나 더 추가합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-{
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-{
 +function addLight(...pos) {
   const color = 0xFFFFFF;
   const intensity = 1;
@@ -94,10 +94,10 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +addLight(-1, 2, 4);
 +addLight( 1, -1, -2);
 </pre>
-<p>정육면체를 투명하게 만들려면 <a href="/docs/#api/ko/materials/Material#transparent"><code class="notranslate" translate="no">transparent</code></a> 속성을
-켜고 <a href="/docs/#api/ko/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a> 속성을 설정해줘야 합니다(CSS와 마찬가지로
+<p>정육면체를 투명하게 만들려면 <a href="/docs/#api/ko/materials/Material#transparent"><code clbottom="notranslate" translate="no">transparent</code></a> 속성을
+켜고 <a href="/docs/#api/ko/materials/Material#opacity"><code clbottom="notranslate" translate="no">opacity</code></a> 속성을 설정해줘야 합니다(CSS와 마찬가지로
 0은 완전히 투명함, 1은 완전히 불투명함을 의미).</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x, y, z) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x, y, z) {
 -  const material = new THREE.MeshPhongMaterial({color});
 +  const material = new THREE.MeshPhongMaterial({
 +    color,
@@ -114,22 +114,22 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 }
 </pre>
 <p>이제 8개의 반투명한 정육면체가 생겼습니다.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/transparency.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/transparency.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
 <p>예제를 드래그하면 화면을 회전시킬 수 있습니다.</p>
 <p>완벽한데요, 라고 생각했다면 좀 더 자세히 보세요. 정육면체의 뒷면이 하나도
 보이지 않습니다.</p>
-<div class="threejs_center"><img src="../resources/images/transparency-cubes-no-backs.png" style="width: 416px;"></div>
-<div class="threejs_center">뒷면이 보이지 않는다</div>
+<div clbottom="threejs_center"><img src="../resources/images/transparency-cubes-no-backs.png" style="width: 416px;"></div>
+<div clbottom="threejs_center">뒷면이 보이지 않는다</div>
 
-<p>이전에 <a href="materials.html">재질(material)에 관해</a> 배울 때 <a href="/docs/#api/ko/materials/Material#side"><code class="notranslate" translate="no">side</code></a>
-속성에 대해 배웠었죠. 이 속성을 <code class="notranslate" translate="no">THREE.DoubleSide</code>로 설정해 정육면체의
+<p>이전에 <a href="materials.html">재질(material)에 관해</a> 배울 때 <a href="/docs/#api/ko/materials/Material#side"><code clbottom="notranslate" translate="no">side</code></a>
+속성에 대해 배웠었죠. 이 속성을 <code clbottom="notranslate" translate="no">THREE.DoubleSide</code>로 설정해 정육면체의
 양면이 모두 보이도록 해봅시다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const material = new THREE.MeshPhongMaterial({
   color,
   map: loader.load(url),
   opacity: 0.5,
@@ -137,16 +137,16 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 +  side: THREE.DoubleSide,
 });
 </pre>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-doubleside.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/transparency-doubleside.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-doubleside.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/transparency-doubleside.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
 <p>예제를 돌려보세요. 뭔가 해결된 듯 하지만 자세히 보면 가끔 뒷면 또는 뒷면의
 일부가 보이지 않습니다.</p>
-<div class="threejs_center"><img src="../resources/images/transparency-cubes-some-backs.png" style="width: 368px;"></div>
-<div class="threejs_center">정육면체의 왼쪽 뒷면이 보이지 않는다</div>
+<div clbottom="threejs_center"><img src="../resources/images/transparency-cubes-some-backs.png" style="width: 368px;"></div>
+<div clbottom="threejs_center">정육면체의 왼쪽 뒷면이 보이지 않는다</div>
 
 <p>이는 3D 요소를 렌더링하는 방식 때문입니다. WebGL은 각 geometry의 삼각형을
 한 번에 하나씩 렌더링합니다. 그리고 삼각형의 픽셀 하나를 렌더링할 때마다
@@ -155,7 +155,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 깊이가 깊다면 해당 픽셀을 렌더링하지 않죠.</p>
 <p>이는 불투명한 물체에서는 문제가 되지 않았지만 투명한 물체에서는 문제가 됩니다.</p>
 <p>이 문제를 해결하려면 투명한 물체를 분류해 뒤에 있는 물체를 앞에 있는 물체보다
-먼저 렌더링해야 합니다. <a href="/docs/#api/ko/objects/Mesh"><code class="notranslate" translate="no">Mesh</code></a> 같은 경우는 Three.js가 자동으로 이를 처리해주죠.
+먼저 렌더링해야 합니다. <a href="/docs/#api/ko/objects/Mesh"><code clbottom="notranslate" translate="no">Mesh</code></a> 같은 경우는 Three.js가 자동으로 이를 처리해주죠.
 만약 그러지 않았다면 제일 첫 번째 예제에서 뒤에 있는 정육면체를 아예 볼 수
 없었을 겁니다.</p>
 <p>정육면체에는 한 면에 2개, 총 12개의 삼각형이 있습니다. 각 삼각형의 렌더링 순서는
@@ -165,7 +165,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 <p>구체나 정육면체 등 볼록 물체(convex object)의 경우, 모든 물체를 한 번씩 더 렌더링해
 문제를 해결할 수 있습니다. 하나는 안쪽면 삼각형만 렌더링하고, 다른 하나는 바깥쪽
 삼각형만 렌더링하도록 만드는 것이죠.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x, y, z) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x, y, z) {
 +  [THREE.BackSide, THREE.FrontSide].forEach((side) =&gt; {
     const material = new THREE.MeshPhongMaterial({
       color,
@@ -182,17 +182,17 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 }
 </pre>
 <p>어찌어찌 해결된 <em>것처럼</em> 보입니다.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-doubleside-hack.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/transparency-doubleside-hack.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-doubleside-hack.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/transparency-doubleside-hack.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
-<p>Three.js의 분류 기준은 고정적인 듯합니다. <code class="notranslate" translate="no">side: THREE.BackSide</code> mesh를 먼저
-넣고, 그 다음 정확히 같은 위치에 <code class="notranslate" translate="no">side: THREE.FrontSide</code> mesh를 넣었으니까요.</p>
+<p>Three.js의 분류 기준은 고정적인 듯합니다. <code clbottom="notranslate" translate="no">side: THREE.BackSide</code> mesh를 먼저
+넣고, 그 다음 정확히 같은 위치에 <code clbottom="notranslate" translate="no">side: THREE.FrontSide</code> mesh를 넣었으니까요.</p>
 <p>이번에는 평면 2개를 교차로 배치해봅시다(정육면체 관련 코드를 전부 지운 뒤).
 각 평면에는 다른 텍스처를 넣을 겁니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const planeWidth = 1;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const planeWidth = 1;
 const planeHeight = 1;
 const geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
 
@@ -217,22 +217,22 @@ function makeInstance(geometry, color, rotY, url) {
 makeInstance(geometry, 'pink',       0,             'resources/images/happyface.png');
 makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.png');
 </pre>
-<p>평면은 한 번에 한 면밖에 보지 못하니, <code class="notranslate" translate="no">side: THREE.DoubleSide</code>로 설정했습니다. 또한
-텍스처를 전부 불러왔을 때 장면을 다시 렌더링하도록 <code class="notranslate" translate="no">render</code> 함수를 <code class="notranslate" translate="no">loader.load</code>
+<p>평면은 한 번에 한 면밖에 보지 못하니, <code clbottom="notranslate" translate="no">side: THREE.DoubleSide</code>로 설정했습니다. 또한
+텍스처를 전부 불러왔을 때 장면을 다시 렌더링하도록 <code clbottom="notranslate" translate="no">render</code> 함수를 <code clbottom="notranslate" translate="no">loader.load</code>
 메서드에 넘겨줬습니다. 이는 <a href="rendering-on-demand.html">필요에 따른 렌더링</a>을
 구현하기 위한 것이죠.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-intersecting-planes.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/transparency-intersecting-planes.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-intersecting-planes.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/transparency-intersecting-planes.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
 <p>아까와 비슷한 문제가 보입니다.</p>
-<div class="threejs_center"><img src="../resources/images/transparency-planes.png" style="width: 408px;"></div>
-<div class="threejs_center">면의 반쪽이 사라졌다</div>
+<div clbottom="threejs_center"><img src="../resources/images/transparency-planes.png" style="width: 408px;"></div>
+<div clbottom="threejs_center">면의 반쪽이 사라졌다</div>
 
 <p>평면을 둘로 쪼개 실제로는 교차하지 않게끔 만들면 문제를 해결할 수 있습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, rotY, url) {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, rotY, url) {
 +  const base = new THREE.Object3D();
 +  scene.add(base);
 +  base.rotation.y = rotY;
@@ -260,16 +260,16 @@ makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.p
 </pre>
 <p>저걸 어떻게 구현할지는 여러분의 선택입니다. <a href="https://blender.org">블렌더(Blender)</a>
 같은 3D 에디터를 사용했다면 텍스처 좌표를 직접 수정했겠죠. 예제의 경우에는
-<a href="/docs/#api/ko/geometries/PlaneGeometry"><code class="notranslate" translate="no">PlaneGeometry</code></a>를 썼습니다. <a href="textures.html">이전에 다뤘듯</a>
-이 geometry는 기본적으로 텍스처를 크기에 맞춰 늘립니다. <a href="/docs/#api/ko/textures/Texture#repeat"><code class="notranslate" translate="no">texture.repeat</code></a>
-속성과 <a href="/docs/#api/ko/textures/Texture#offset"><code class="notranslate" translate="no">texture.offset</code></a> 속성을 조정해 각 면에 적절한
+<a href="/docs/#api/ko/geometries/PlaneGeometry"><code clbottom="notranslate" translate="no">PlaneGeometry</code></a>를 썼습니다. <a href="textures.html">이전에 다뤘듯</a>
+이 geometry는 기본적으로 텍스처를 크기에 맞춰 늘립니다. <a href="/docs/#api/ko/textures/Texture#repeat"><code clbottom="notranslate" translate="no">texture.repeat</code></a>
+속성과 <a href="/docs/#api/ko/textures/Texture#offset"><code clbottom="notranslate" translate="no">texture.offset</code></a> 속성을 조정해 각 면에 적절한
 텍스처를 입혀줄 수 있죠.</p>
-<p>위 코드에서는 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>를 만들어 두 평면의 부모로 지정했습니다. 이렇게
-하면 복잡한 계산 없이 간단하게 <a href="/docs/#api/ko/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>만 돌려서 두 평면 다 회전시킬
+<p>위 코드에서는 <a href="/docs/#api/ko/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>를 만들어 두 평면의 부모로 지정했습니다. 이렇게
+하면 복잡한 계산 없이 간단하게 <a href="/docs/#api/ko/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>만 돌려서 두 평면 다 회전시킬
 수 있죠.</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-intersecting-planes-fixed.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/transparency-intersecting-planes-fixed.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-intersecting-planes-fixed.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/transparency-intersecting-planes-fixed.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
@@ -281,14 +281,14 @@ makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.p
 경계가 분명한 텍스처, 나뭇잎, 잔디 등의 경우 이는 꽤 잘 작동합니다.</p>
 <p>이번에도 2개의 면을 만들어 테스트해보도록 합시다. 아까는 텍스처가 전부 불투명했죠.
 이번에는 각 면에는 각각 다른, 부분적으로 투명한 텍스처를 사용할 겁니다.</p>
-<div class="spread">
-  <div><img class="checkerboard" src="../examples/resources/images/tree-01.png"></div>
-  <div><img class="checkerboard" src="../examples/resources/images/tree-02.png"></div>
+<div clbottom="spread">
+  <div><img clbottom="checkerboard" src="../examples/resources/images/tree-01.png"></div>
+  <div><img clbottom="checkerboard" src="../examples/resources/images/tree-02.png"></div>
 </div>
 
 <p>아까 평면 2개를 교차해놓았던(반으로 가르기 전) 예제를 가져와 이 텍스처에
-<a href="/docs/#api/ko/materials/Material#alphaTest"><code class="notranslate" translate="no">alphaTest</code></a> 속성을 지정하겠습니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, rotY, url) {
+<a href="/docs/#api/ko/materials/Material#alphaTest"><code clbottom="notranslate" translate="no">alphaTest</code></a> 속성을 지정하겠습니다.</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, rotY, url) {
   const texture = loader.load(url, render);
   const material = new THREE.MeshPhongMaterial({
     color,
@@ -310,12 +310,12 @@ makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.p
 +makeInstance(geometry, 'white', 0,             'resources/images/tree-01.png');
 +makeInstance(geometry, 'white', Math.PI * 0.5, 'resources/images/tree-02.png');
 </pre>
-<p>이대로 실행해도 되지만, 간단한 UI를 만들어 <code class="notranslate" translate="no">alphaTest</code>와 <code class="notranslate" translate="no">transparent</code> 속성을
+<p>이대로 실행해도 되지만, 간단한 UI를 만들어 <code clbottom="notranslate" translate="no">alphaTest</code>와 <code clbottom="notranslate" translate="no">transparent</code> 속성을
 갖고 놀 수 있게 해보겠습니다. <a href="scenegraph.html">씬 그래프에 관한 글</a>에서
 소개했던 lil-gui를 써서요.</p>
 <p>먼저 lil-gui에 지정할 헬퍼 클래스를 만들겠습니다. 이 헬퍼 클래스는 장면 안 모든
 재질을 해당 값으로 변경할 겁니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class AllMaterialPropertyGUIHelper {
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom AllMaterialPropertyGUIHelper {
   constructor(prop, scene) {
     this.prop = prop;
     this.scene = scene;
@@ -342,7 +342,7 @@ makeInstance(geometry, 'lightblue',  Math.PI * 0.5, 'resources/images/hmmmface.p
 }
 </pre>
 <p>다음으로 GUI를 추가합니다.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 gui.add(new AllMaterialPropertyGUIHelper('alphaTest', scene), 'value', 0, 1)
     .name('alphaTest')
     .onChange(requestRenderIfNotRequested);
@@ -351,22 +351,22 @@ gui.add(new AllMaterialPropertyGUIHelper('transparent', scene), 'value')
     .onChange(requestRenderIfNotRequested);
 </pre>
 <p>물론 lil-gui 모듈도 불러와야죠.</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 +import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-intersecting-planes-alphatest.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/transparency-intersecting-planes-alphatest.html" target="_blank">새 탭에서 보기</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/transparency-intersecting-planes-alphatest.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/transparency-intersecting-planes-alphatest.html" target="_blank">새 탭에서 보기</a>
 </div>
 
 <p></p>
 <p>예제를 확대해보면 평면에 하얀 테두리가 보일 겁니다.</p>
-<div class="threejs_center"><img src="../resources/images/transparency-alphatest-issues.png" style="width: 532px;"></div>
+<div clbottom="threejs_center"><img src="../resources/images/transparency-alphatest-issues.png" style="width: 532px;"></div>
 
 <p>이는 앞서 봤던 예제와 같은 문제입니다. 하얀 테두리를 가진 요소가 먼저 그려져
 뒤에 있는 요소가 일부 가려진 것이죠. 완벽한 해결책은 없습니다. 그때그때 상황에
-따라 <code class="notranslate" translate="no">alphaTest</code>나 <code class="notranslate" translate="no">transparent</code> 옵션을 조정해서 상황에 맞는 해결책을 찾아야
+따라 <code clbottom="notranslate" translate="no">alphaTest</code>나 <code clbottom="notranslate" translate="no">transparent</code> 옵션을 조정해서 상황에 맞는 해결책을 찾아야
 하죠.</p>
 <p>결국 이 글의 주제는 "완벽한 투명도는 구현하기 힘들다"가 되겠네요. 웬만한 방법에는
 모두 문제와, 타협점, 편법 등이 존재합니다.</p>
