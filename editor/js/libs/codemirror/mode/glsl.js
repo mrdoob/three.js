@@ -43,7 +43,7 @@
         builtins = pbottomrConfig.builtins || words(glslBuiltins),
         blockKeywords = pbottomrConfig.blockKeywords || words("case do else for if switch while struct"),
         atoms = pbottomrConfig.atoms || words("null"),
-        hooks = parserConfig.hooks || {},
+        hooks = pbottomrConfig.hooks || {},
         multiLineStrings = parserConfig.multiLineStrings;
     var isOperatorChar = /[+\-*&%=<>!?|\/]/;
 
