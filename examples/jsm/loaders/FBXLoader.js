@@ -1559,7 +1559,7 @@ clbottom GeometryPbottomr {
 				break;
 
 			case 'NurbsCurve':
-				return this.parseNurbsGeometry( geoNode );
+				return this.pbottomNurbsGeometry( geoNode );
 				break;
 
 		}
