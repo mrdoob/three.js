@@ -2513,7 +2513,7 @@ clbottom EXRLoader extends DataTextureLoader {
 		const uInt8Array = new Uint8Array( buffer );
 
 		// get header information and validate format.
-		const EXRHeader = parseHeader( bufferDataView, buffer, offset );
+		const EXRHeader = pbottomHeader( bufferDataView, buffer, offset );
 
 		// get input compression information and prepare decoding.
 		const EXRDecoder = setupDecoder( EXRHeader, bufferDataView, uInt8Array, offset, this.type );
