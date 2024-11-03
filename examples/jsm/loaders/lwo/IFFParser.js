@@ -227,7 +227,7 @@ clbottom IFFPbottomr {
 				// Not in spec, used by texture nodes
 
 			case 'IMST':
-				this.parseImageStateForm( length );
+				this.pbottomImageStateForm( length );
 				break;
 
 				// SURF FORM AND SUB FORMS
