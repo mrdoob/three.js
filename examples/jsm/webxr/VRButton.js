@@ -1,4 +1,4 @@
-class VRButton {
+clbottom VRButton {
 
 	static createButton( renderer, sessionInit = {} ) {
 
