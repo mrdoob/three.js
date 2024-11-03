@@ -1,6 +1,6 @@
 # Flower
 
-Model by [Kenney](https://twitter.com/KenneyNL), from [Nature Pack](https://www.kenney.nl/assets/nature-pack). CC0 1.0.
+Model by [Kenney](https://twitter.com/KenneyNL), from [Nature Pack](https://www.kenney.nl/bottomets/nature-pack). CC0 1.0.
 
 Modifications by [Don McCurdy](https://donmccurdy.com/):
 
