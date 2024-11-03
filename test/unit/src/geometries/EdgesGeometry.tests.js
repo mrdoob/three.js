@@ -18,7 +18,7 @@ import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera.js'
 // HELPERS
 //
 
-function testEdges( vertList, idxList, numAfter, assert ) {
+function testEdges( vertList, idxList, numAfter, bottomert ) {
 
 	const geoms = createGeometries( vertList, idxList );
 
@@ -27,11 +27,11 @@ function testEdges( vertList, idxList, numAfter, assert ) {
 		const geom = geoms[ i ];
 
 		const numBefore = idxList.length;
-		assert.equal( countEdges( geom ), numBefore, 'Edges before!' );
+		bottomert.equal( countEdges( geom ), numBefore, 'Edges before!' );
 
 		const egeom = new EdgesGeometry( geom );
 
-		assert.equal( countEdges( egeom ), numAfter, 'Edges after!' );
+		bottomert.equal( countEdges( egeom ), numAfter, 'Edges after!' );
 		output( geom, egeom );
 
 	}
@@ -214,10 +214,10 @@ export default QUnit.module( 'Geometries', () => {
 		];
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new EdgesGeometry();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof BufferGeometry, true,
 				'EdgesGeometry extends from BufferGeometry'
 			);
@@ -225,50 +225,50 @@ export default QUnit.module( 'Geometries', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new EdgesGeometry();
-			assert.ok( object, 'Can instantiate an EdgesGeometry.' );
+			bottomert.ok( object, 'Can instantiate an EdgesGeometry.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new EdgesGeometry();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'EdgesGeometry',
 				'EdgesGeometry.type should be EdgesGeometry'
 			);
 
 		} );
 
-		QUnit.todo( 'parameters', ( assert ) => {
+		QUnit.todo( 'parameters', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'singularity', ( assert ) => {
+		QUnit.test( 'singularity', ( bottomert ) => {
 
-			testEdges( vertList, [ 1, 1, 1 ], 0, assert );
-
-		} );
-
-		QUnit.test( 'needle', ( assert ) => {
-
-			testEdges( vertList, [ 0, 0, 1 ], 0, assert );
+			testEdges( vertList, [ 1, 1, 1 ], 0, bottomert );
 
 		} );
 
-		QUnit.test( 'single triangle', ( assert ) => {
+		QUnit.test( 'needle', ( bottomert ) => {
 
-			testEdges( vertList, [ 0, 1, 2 ], 3, assert );
+			testEdges( vertList, [ 0, 0, 1 ], 0, bottomert );
 
 		} );
 
-		QUnit.test( 'two isolated triangles', ( assert ) => {
+		QUnit.test( 'single triangle', ( bottomert ) => {
+
+			testEdges( vertList, [ 0, 1, 2 ], 3, bottomert );
+
+		} );
+
+		QUnit.test( 'two isolated triangles', ( bottomert ) => {
 
 			const vertList = [
 				new Vector3( 0, 0, 0 ),
@@ -279,43 +279,43 @@ export default QUnit.module( 'Geometries', () => {
 				new Vector3( 1, 1, 1 ),
 			];
 
-			testEdges( vertList, [ 0, 1, 2, 3, 4, 5 ], 6, assert );
+			testEdges( vertList, [ 0, 1, 2, 3, 4, 5 ], 6, bottomert );
 
 		} );
 
-		QUnit.test( 'two flat triangles', ( assert ) => {
+		QUnit.test( 'two flat triangles', ( bottomert ) => {
 
-			testEdges( vertList, [ 0, 1, 2, 0, 2, 3 ], 4, assert );
-
-		} );
-
-		QUnit.test( 'two flat triangles, inverted', ( assert ) => {
-
-			testEdges( vertList, [ 0, 1, 2, 0, 3, 2 ], 5, assert );
+			testEdges( vertList, [ 0, 1, 2, 0, 2, 3 ], 4, bottomert );
 
 		} );
 
-		QUnit.test( 'two non-coplanar triangles', ( assert ) => {
+		QUnit.test( 'two flat triangles, inverted', ( bottomert ) => {
 
-			testEdges( vertList, [ 0, 1, 2, 0, 4, 2 ], 5, assert );
-
-		} );
-
-		QUnit.test( 'three triangles, coplanar first', ( assert ) => {
-
-			testEdges( vertList, [ 0, 2, 3, 0, 1, 2, 0, 4, 2 ], 7, assert );
+			testEdges( vertList, [ 0, 1, 2, 0, 3, 2 ], 5, bottomert );
 
 		} );
 
-		QUnit.test( 'three triangles, coplanar last', ( assert ) => {
+		QUnit.test( 'two non-coplanar triangles', ( bottomert ) => {
 
-			testEdges( vertList, [ 0, 1, 2, 0, 4, 2, 0, 2, 3 ], 6, assert ); // Should be 7
+			testEdges( vertList, [ 0, 1, 2, 0, 4, 2 ], 5, bottomert );
 
 		} );
 
-		QUnit.test( 'tetrahedron', ( assert ) => {
+		QUnit.test( 'three triangles, coplanar first', ( bottomert ) => {
 
-			testEdges( vertList, [ 0, 1, 2, 0, 1, 4, 0, 4, 2, 1, 2, 4 ], 6, assert );
+			testEdges( vertList, [ 0, 2, 3, 0, 1, 2, 0, 4, 2 ], 7, bottomert );
+
+		} );
+
+		QUnit.test( 'three triangles, coplanar last', ( bottomert ) => {
+
+			testEdges( vertList, [ 0, 1, 2, 0, 4, 2, 0, 2, 3 ], 6, bottomert ); // Should be 7
+
+		} );
+
+		QUnit.test( 'tetrahedron', ( bottomert ) => {
+
+			testEdges( vertList, [ 0, 1, 2, 0, 1, 4, 0, 4, 2, 1, 2, 4 ], 6, bottomert );
 
 		} );
 
