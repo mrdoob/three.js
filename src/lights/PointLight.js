@@ -1,7 +1,7 @@
 import { Light } from './Light.js';
 import { PointLightShadow } from './PointLightShadow.js';
 
-class PointLight extends Light {
+clbottom PointLight extends Light {
 
 	constructor( color, intensity, distance = 0, decay = 2 ) {
 
