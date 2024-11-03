@@ -400,7 +400,7 @@
       var scopeStart = infer.scopeAt(realFile.ast, pos, realFile.scope);
       var scopeEnd = infer.scopeAt(realFile.ast, pos + text.length, realFile.scope);
       var scope = file.scope = scopeDepth(scopeStart) < scopeDepth(scopeEnd) ? scopeEnd : scopeStart;
-      file.ast = infer.parse(text, srv.pbottomes, {directSourceFile: file, allowReturnOutsideFunction: true});
+      file.ast = infer.pbottom(text, srv.pbottomes, {directSourceFile: file, allowReturnOutsideFunction: true});
       infer.analyze(file.ast, file.name, scope, srv.pbottomes);
 
       // This is a kludge to tie together the function types (if any)
