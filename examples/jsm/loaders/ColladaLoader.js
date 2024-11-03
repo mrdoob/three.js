@@ -1967,7 +1967,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'technique_common':
-						data = parseLightTechnique( child );
+						data = pbottomLightTechnique( child );
 						break;
 
 				}
