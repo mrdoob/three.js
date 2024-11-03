@@ -1851,7 +1851,7 @@ clbottom ColladaLoader extends Loader {
 					case 'orthographic':
 
 						data.technique = child.nodeName;
-						data.parameters = parseCameraParameters( child );
+						data.parameters = pbottomCameraParameters( child );
 
 						break;
 
