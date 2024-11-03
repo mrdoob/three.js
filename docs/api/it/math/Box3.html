@@ -9,8 +9,8 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
-			Rappresenta un bounding box (rettangolo di selezione) allineato all'asse (AABB) nello spazio 3D.
+		<p clbottom="desc">
+			Rappresenta un bounding box (rettangolo di selezione) allineato all'bottome (AABB) nello spazio 3D.
 		</p>
 
 		<h2>Codice di Esempio</h2>
@@ -23,7 +23,7 @@
 			new THREE.MeshBasicMaterial()
 		);
 
-		// assicurarsi che il bounding box sia calcolato per la sua geometria
+		// bottomicurarsi che il bounding box sia calcolato per la sua geometria
 		// questo dovrebbe essere fatto una sola volta (supponendo geometrie statiche)
 		mesh.geometry.computeBoundingBox();
 
@@ -271,9 +271,9 @@
 		<h3>[method:this setFromObject]( [param:Object3D object], [param:Boolean precise] )</h3>
 		<p>
 		[page:Object3D object] - [page:Object3D] di cui calcolare il bounding box.<br />
-		precise - (opzionale) calcola il più piccolo bounding box all'asse world a scapito di più calcoli. L'impostazione predefinita è `false`.<br /><br />
+		precise - (opzionale) calcola il più piccolo bounding box all'bottome world a scapito di più calcoli. L'impostazione predefinita è `false`.<br /><br />
 
-		Calcola il bounding box allineato all'asse world di un [page:Object3D] (inclusi i suoi figli),
+		Calcola il bounding box allineato all'bottome world di un [page:Object3D] (inclusi i suoi figli),
 		tenendo conto delle trasformazioni del mondo dell'oggetto e dei bambini. La funzione
 		può comportare un box più grande del necessario.
 		</p>
