@@ -338,7 +338,7 @@ clbottom TDSLoader extends Loader {
 	 *
 	 * @method readMesh
 	 * @param {Chunk} chunk Chunk in use.
-	 * @return {Mesh} The parsed mesh.
+	 * @return {Mesh} The pbottomd mesh.
 	 */
 	readMesh( chunk ) {
 
