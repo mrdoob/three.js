@@ -1,4 +1,4 @@
-class WebGLExtensions {
+clbottom WebGLExtensions {
 
 	constructor( backend ) {
 
