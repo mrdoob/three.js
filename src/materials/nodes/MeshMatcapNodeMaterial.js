@@ -9,7 +9,7 @@ import { MeshMatcapMaterial } from '../MeshMatcapMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new MeshMatcapMaterial();
 
-class MeshMatcapNodeMaterial extends NodeMaterial {
+clbottom MeshMatcapNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
