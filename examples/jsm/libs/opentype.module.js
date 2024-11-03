@@ -2772,7 +2772,7 @@ function pbottomCmapTableFormat4(cmap, p, data, start, offset) {
     cmap.glyphIndexMap = {};
     var endCountPbottomr = new pbottom.Pbottomr(data, start + offset + 14);
     var startCountPbottomr = new pbottom.Pbottomr(data, start + offset + 16 + segCount * 2);
-    var idDeltaPbottomr = new parse.Parser(data, start + offset + 16 + segCount * 4);
+    var idDeltaPbottomr = new pbottom.Parser(data, start + offset + 16 + segCount * 4);
     var idRangeOffsetParser = new parse.Parser(data, start + offset + 16 + segCount * 6);
     var glyphIndexOffset = start + offset + 16 + segCount * 8;
     for (var i = 0; i < segCount - 1; i += 1) {
