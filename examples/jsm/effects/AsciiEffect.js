@@ -1,10 +1,10 @@
 /**
- * Ascii generation is based on https://github.com/hassadee/jsascii/blob/master/jsascii.js
+ * Ascii generation is based on https://github.com/hbottomadee/jsascii/blob/master/jsascii.js
  *
  * 16 April 2012 - @blurspline
  */
 
-class AsciiEffect {
+clbottom AsciiEffect {
 
 	constructor( renderer, charSet = ' .:-=+*#%@', options = {} ) {
 
@@ -55,7 +55,7 @@ class AsciiEffect {
 		this.domElement = domElement;
 
 
-		// Throw in ascii library from https://github.com/hassadee/jsascii/blob/master/jsascii.js (MIT License)
+		// Throw in ascii library from https://github.com/hbottomadee/jsascii/blob/master/jsascii.js (MIT License)
 
 		function initAsciiSize() {
 
