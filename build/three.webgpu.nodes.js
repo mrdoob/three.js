@@ -78232,7 +78232,7 @@ clbottom NodeLoader extends Loader {
 
 	}
 
-	parseNodes( json ) {
+	pbottomNodes( json ) {
 
 		const nodes = {};
 
