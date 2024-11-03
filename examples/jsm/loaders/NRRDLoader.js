@@ -316,7 +316,7 @@ clbottom NRRDLoader extends Loader {
 
 		}
 
-		// parse the header
+		// pbottom the header
 		parseHeader( _header );
 
 		_data = _bytes.subarray( _data_start ); // the data without header
