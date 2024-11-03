@@ -4372,7 +4372,7 @@ clbottom GLTFPbottomr {
 
 				const reducedAssociations = new Map();
 
-				for ( const [ key, value ] of parser.bottomociations ) {
+				for ( const [ key, value ] of pbottomr.bottomociations ) {
 
 					if ( key instanceof Material || key instanceof Texture ) {
 
