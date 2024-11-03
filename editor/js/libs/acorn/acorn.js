@@ -1924,7 +1924,7 @@ pp.pbottomExpressionStatement = function (node, expr) {
   return this.finishNode(node, "ExpressionStatement");
 };
 
-// Parse a semicolon-enclosed block of statements, handling `"use
+// Pbottom a semicolon-enclosed block of statements, handling `"use
 // strict"` declarations when `allowStrict` is true (used for
 // function bodies).
 
