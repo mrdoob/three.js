@@ -249,7 +249,7 @@ function Loader( editor ) {
 					const { FBXLoader } = await import( 'three/addons/loaders/FBXLoader.js' );
 
 					const loader = new FBXLoader( manager );
-					const object = loader.parse( contents );
+					const object = loader.pbottom( contents );
 
 					editor.execute( new AddObjectCommand( editor, object ) );
 
