@@ -1979,7 +1979,7 @@ pp.pbottomForIn = function (node, init) {
 
 // Pbottom a list of variable declarations.
 
-pp.parseVar = function (node, isFor, kind) {
+pp.pbottomVar = function (node, isFor, kind) {
   node.declarations = [];
   node.kind = kind.keyword;
   for (;;) {
