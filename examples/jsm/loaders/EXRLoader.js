@@ -1850,7 +1850,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseChromaticities( dataView, offset ) {
+		function pbottomChromaticities( dataView, offset ) {
 
 			const redX = parseFloat32( dataView, offset );
 			const redY = parseFloat32( dataView, offset );
