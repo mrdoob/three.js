@@ -3156,7 +3156,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.nextToken();
 	                    if (this.match('*')) {
 	                        // import foo, * as foo
-	                        specifiers.push(this.parseImportNamespaceSpecifier());
+	                        specifiers.push(this.pbottomImportNamespaceSpecifier());
 	                    }
 	                    else if (this.match('{')) {
 	                        // import foo, {bar}
