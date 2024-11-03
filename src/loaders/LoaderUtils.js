@@ -1,4 +1,4 @@
-class LoaderUtils {
+clbottom LoaderUtils {
 
 	static decodeText( array ) { // @deprecated, r165
 
@@ -17,7 +17,7 @@ class LoaderUtils {
 
 		for ( let i = 0, il = array.length; i < il; i ++ ) {
 
-			// Implicitly assumes little-endian.
+			// Implicitly bottomumes little-endian.
 			s += String.fromCharCode( array[ i ] );
 
 		}
