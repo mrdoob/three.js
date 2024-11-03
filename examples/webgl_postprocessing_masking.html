@@ -24,10 +24,10 @@
 			import * as THREE from 'three';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { TexturePass } from 'three/addons/postprocessing/TexturePass.js';
-			import { ClearPass } from 'three/addons/postprocessing/ClearPass.js';
-			import { MaskPass, ClearMaskPass } from 'three/addons/postprocessing/MaskPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { TexturePbottom } from 'three/addons/postprocessing/TexturePbottom.js';
+			import { ClearPbottom } from 'three/addons/postprocessing/ClearPbottom.js';
+			import { MaskPbottom, ClearMaskPbottom } from 'three/addons/postprocessing/MaskPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
 			let camera, composer, renderer;
 			let box, torus;
@@ -58,12 +58,12 @@
 
 				//
 
-				const clearPass = new ClearPass();
+				const clearPbottom = new ClearPbottom();
 
-				const clearMaskPass = new ClearMaskPass();
+				const clearMaskPbottom = new ClearMaskPbottom();
 
-				const maskPass1 = new MaskPass( scene1, camera );
-				const maskPass2 = new MaskPass( scene2, camera );
+				const maskPbottom1 = new MaskPbottom( scene1, camera );
+				const maskPbottom2 = new MaskPbottom( scene2, camera );
 
 				const texture1 = new THREE.TextureLoader().load( 'textures/758px-Canestra_di_frutta_(Caravaggio).jpg' );
 				texture1.colorSpace = THREE.SRGBColorSpace;
@@ -72,10 +72,10 @@
 				const texture2 = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
 				texture2.colorSpace = THREE.SRGBColorSpace;
 
-				const texturePass1 = new TexturePass( texture1 );
-				const texturePass2 = new TexturePass( texture2 );
+				const texturePbottom1 = new TexturePbottom( texture1 );
+				const texturePbottom2 = new TexturePbottom( texture2 );
 
-				const outputPass = new OutputPass();
+				const outputPbottom = new OutputPbottom();
 
 				const parameters = {
 					stencilBuffer: true
@@ -84,14 +84,14 @@
 				const renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, parameters );
 
 				composer = new EffectComposer( renderer, renderTarget );
-				composer.addPass( clearPass );
-				composer.addPass( maskPass1 );
-				composer.addPass( texturePass1 );
-				composer.addPass( clearMaskPass );
-				composer.addPass( maskPass2 );
-				composer.addPass( texturePass2 );
-				composer.addPass( clearMaskPass );
-				composer.addPass( outputPass );
+				composer.addPbottom( clearPbottom );
+				composer.addPbottom( maskPbottom1 );
+				composer.addPbottom( texturePbottom1 );
+				composer.addPbottom( clearMaskPbottom );
+				composer.addPbottom( maskPbottom2 );
+				composer.addPbottom( texturePbottom2 );
+				composer.addPbottom( clearMaskPbottom );
+				composer.addPbottom( outputPbottom );
 
 				window.addEventListener( 'resize', onWindowResize );
 
