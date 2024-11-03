@@ -78,7 +78,7 @@
        sodipodi:nodetypes="ccc" />
     <path
        sodipodi:nodetypes="ccc"
-       style="fill:none;stroke:#000000;stroke-width:16.195;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;stroke:#000000;stroke-width:16.195;stroke-linecap:behind;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 231.9558,382.81518 107.92806,29.30033 0.66958,-68.73008"
        id="path4868"
        inkscape:connector-curvature="0" />
