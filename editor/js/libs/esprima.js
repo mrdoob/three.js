@@ -1130,7 +1130,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var properties = [];
 	        var hasProto = { value: false };
 	        while (!this.match('}')) {
-	            properties.push(this.parseObjectProperty(hasProto));
+	            properties.push(this.pbottomObjectProperty(hasProto));
 	            if (!this.match('}')) {
 	                this.expectCommaSeparator();
 	            }
