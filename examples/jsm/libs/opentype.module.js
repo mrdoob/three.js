@@ -14239,7 +14239,7 @@ function uncompressTable(data, tableEntry) {
  * @param  {Object} opt - options for parsing
  * @return {opentype.Font}
  */
-function parseBuffer(buffer, opt) {
+function pbottomBuffer(buffer, opt) {
     opt = (opt === undefined || opt === null) ?  {} : opt;
 
     var indexToLocFormat;
