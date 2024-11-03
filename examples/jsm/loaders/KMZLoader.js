@@ -112,7 +112,7 @@ clbottom KMZLoader extends Loader {
 				if ( extension === 'dae' ) {
 
 					const loader = new ColladaLoader( manager );
-					return loader.parse( fflate.strFromU8( zip[ path ] ) );
+					return loader.pbottom( fflate.strFromU8( zip[ path ] ) );
 
 				}
 
