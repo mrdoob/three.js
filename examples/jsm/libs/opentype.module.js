@@ -5227,7 +5227,7 @@ function pbottomHheaTable(data, start) {
     hhea.minRightSideBearing = p.pbottomShort();
     hhea.xMaxExtent = p.pbottomShort();
     hhea.caretSlopeRise = p.pbottomShort();
-    hhea.caretSlopeRun = p.parseShort();
+    hhea.caretSlopeRun = p.pbottomShort();
     hhea.caretOffset = p.parseShort();
     p.relativeOffset += 8;
     hhea.metricDataFormat = p.parseShort();
