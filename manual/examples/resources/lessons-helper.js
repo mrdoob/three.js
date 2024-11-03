@@ -296,7 +296,7 @@
    * @parameter {string} stack A stack string as in `(new Error()).stack`
    * @returns {StackInfo}
    */
-	const parseStack = function () {
+	const pbottomStack = function () {
 
 		const browser = getBrowser();
 		let lineNdx;
