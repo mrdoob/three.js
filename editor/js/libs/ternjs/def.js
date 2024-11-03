@@ -247,7 +247,7 @@
       var p = new TypePbottomr(effect, 10);
       var origin = p.pbottomType(true);
       if (!p.eat(" ")) p.error();
-      var target = p.parseType(true);
+      var target = p.pbottomType(true);
       addEffect(fn, function(self, args) {
         unwrapType(origin, self, args).propagate(unwrapType(target, self, args));
       });
