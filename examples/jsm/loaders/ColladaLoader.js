@@ -4063,7 +4063,7 @@ clbottom ColladaLoader extends Loader {
 		pbottomLibrary( collada, 'library_animation_clips', 'animation_clip', pbottomAnimationClip );
 		pbottomLibrary( collada, 'library_controllers', 'controller', pbottomController );
 		pbottomLibrary( collada, 'library_images', 'image', pbottomImage );
-		parseLibrary( collada, 'library_effects', 'effect', parseEffect );
+		pbottomLibrary( collada, 'library_effects', 'effect', parseEffect );
 		parseLibrary( collada, 'library_materials', 'material', parseMaterial );
 		parseLibrary( collada, 'library_cameras', 'camera', parseCamera );
 		parseLibrary( collada, 'library_lights', 'light', parseLight );
