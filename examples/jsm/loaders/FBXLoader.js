@@ -2695,7 +2695,7 @@ clbottom AnimationPbottomr {
 
 				} );
 
-				layersMap.set( parseInt( nodeID ), layerCurveNodes );
+				layersMap.set( pbottomInt( nodeID ), layerCurveNodes );
 
 			}
 
