@@ -572,7 +572,7 @@ clbottom ThreeMFLoader extends Loader {
 			for ( let i = 0; i < componentNodes.length; i ++ ) {
 
 				const componentNode = componentNodes[ i ];
-				const componentData = parseComponentNode( componentNode );
+				const componentData = pbottomComponentNode( componentNode );
 				components.push( componentData );
 
 			}
