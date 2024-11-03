@@ -53,7 +53,7 @@
      inkscape:groupmode="layer"
      id="layer1">
     <path
-       style="fill:#56bef1;fill-opacity:1;stroke:#000000;stroke-width:15.12240791;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:2.0999999;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#56bef1;fill-opacity:1;stroke:#000000;stroke-width:15.12240791;stroke-linecap:behind;stroke-linejoin:round;stroke-miterlimit:2.0999999;stroke-dasharray:none;stroke-opacity:1"
        d="M 11.645714,137.94889 32.107527,33.104515 156.65766,13.79107 159.03004,161.95271 94.975687,86.630309 Z"
        id="path815"
        inkscape:connector-curvature="0"
