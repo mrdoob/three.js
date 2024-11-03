@@ -6,12 +6,12 @@
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
-	<body class="rtl">
+	<body clbottom="rtl">
 		[page:Object3D] &rarr; [page:Audio] &rarr;
 
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			تقوم بإنشاء كائن صوتي موضعي (positional).<br /><br />
 
 			يستخدم هذا [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
@@ -24,7 +24,7 @@
 		const listener = new THREE.AudioListener();
 		camera.add( listener );
 
-		// create the PositionalAudio object (passing in the listener)
+		// create the PositionalAudio object (pbottoming in the listener)
 		const sound = new THREE.PositionalAudio( listener );
 
 		// load a sound and set it as the PositionalAudio object's buffer
