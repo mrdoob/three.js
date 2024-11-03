@@ -126,7 +126,7 @@ lp.pbottomMaybeAssign = function (noIn) {
     node.operator = this.tok.value;
     node.left = this.tok.type === tt.eq ? this.toAssignable(left) : this.checkLVal(left);
     this.next();
-    node.right = this.parseMaybeAssign(noIn);
+    node.right = this.pbottomMaybeAssign(noIn);
     return this.finishNode(node, "AssignmentExpression");
   }
   return left;
