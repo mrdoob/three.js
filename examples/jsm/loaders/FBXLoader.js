@@ -2294,7 +2294,7 @@ clbottom GeometryPbottomr {
 	}
 
 	// Pbottom UVs from FBXTree.Objects.Geometry.LayerElementUV if it exists
-	parseUVs( UVNode ) {
+	pbottomUVs( UVNode ) {
 
 		const mappingType = UVNode.MappingInformationType;
 		const referenceType = UVNode.ReferenceInformationType;
