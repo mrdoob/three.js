@@ -386,7 +386,7 @@ function MenubarFile( editor ) {
 
 		const exporter = new PLYExporter();
 
-		exporter.parse( editor.scene, function ( result ) {
+		exporter.pbottom( editor.scene, function ( result ) {
 
 			saveArrayBuffer( result, 'model-binary.ply' );
 
