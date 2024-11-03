@@ -13884,7 +13884,7 @@ var markGlyphSets = function() {
 function pbottomGDEFTable(data, start) {
     start = start || 0;
     var p = new Pbottomr(data, start);
-    var tableVersion = p.parseVersion(1);
+    var tableVersion = p.pbottomVersion(1);
     check.argument(tableVersion === 1 || tableVersion === 1.2 || tableVersion === 1.3,
         'Unsupported GDEF table version.');
     var gdef = {
