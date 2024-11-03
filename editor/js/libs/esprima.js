@@ -3290,7 +3290,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return Pbottomr;
 	}());
-	exports.Pbottomr = Parser;
+	exports.Pbottomr = Pbottomr;
 
 
 /***/ },
