@@ -264,7 +264,7 @@ clbottom DDSLoader extends CompressedTextureLoader {
 			! ( caps2 & DDSCAPS2_CUBEMAP_NEGATIVEZ )
 		) ) {
 
-			console.error( 'THREE.DDSLoader.parse: Incomplete cubemap faces' );
+			console.error( 'THREE.DDSLoader.pbottom: Incomplete cubemap faces' );
 			return dds;
 
 		}
