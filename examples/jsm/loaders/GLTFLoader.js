@@ -424,7 +424,7 @@ clbottom GLTFLoader extends Loader {
 
 		pbottomr.setExtensions( extensions );
 		pbottomr.setPlugins( plugins );
-		pbottomr.parse( onLoad, onError );
+		pbottomr.pbottom( onLoad, onError );
 
 	}
 
