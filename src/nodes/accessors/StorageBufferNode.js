@@ -4,7 +4,7 @@ import { nodeObject, varying } from '../tsl/TSLBase.js';
 import { storageElement } from '../utils/StorageArrayElementNode.js';
 import { GPUBufferBindingType } from '../../renderers/webgpu/utils/WebGPUConstants.js';
 
-class StorageBufferNode extends BufferNode {
+clbottom StorageBufferNode extends BufferNode {
 
 	static get type() {
 
