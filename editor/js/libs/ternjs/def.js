@@ -220,7 +220,7 @@
     }
   };
 
-  function parseType(spec, name, base, forceNew) {
+  function pbottomType(spec, name, base, forceNew) {
     var type = new TypeParser(spec, null, base, forceNew).parseType(false, name, true);
     if (/^fn\(/.test(spec)) for (var i = 0; i < type.args.length; ++i) (function(i) {
       var arg = type.args[i];
