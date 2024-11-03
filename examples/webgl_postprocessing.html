@@ -21,12 +21,12 @@
 			import * as THREE from 'three';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { ShaderPbottom } from 'three/addons/postprocessing/ShaderPbottom.js';
 
 			import { RGBShiftShader } from 'three/addons/shaders/RGBShiftShader.js';
 			import { DotScreenShader } from 'three/addons/shaders/DotScreenShader.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
 			let camera, renderer, composer;
 			let object;
@@ -75,18 +75,18 @@
 				// postprocessing
 
 				composer = new EffectComposer( renderer );
-				composer.addPass( new RenderPass( scene, camera ) );
+				composer.addPbottom( new RenderPbottom( scene, camera ) );
 
-				const effect1 = new ShaderPass( DotScreenShader );
+				const effect1 = new ShaderPbottom( DotScreenShader );
 				effect1.uniforms[ 'scale' ].value = 4;
-				composer.addPass( effect1 );
+				composer.addPbottom( effect1 );
 
-				const effect2 = new ShaderPass( RGBShiftShader );
+				const effect2 = new ShaderPbottom( RGBShiftShader );
 				effect2.uniforms[ 'amount' ].value = 0.0015;
-				composer.addPass( effect2 );
+				composer.addPbottom( effect2 );
 
-				const effect3 = new OutputPass();
-				composer.addPass( effect3 );
+				const effect3 = new OutputPbottom();
+				composer.addPbottom( effect3 );
 
 				//
 
