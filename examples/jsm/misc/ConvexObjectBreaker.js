@@ -7,7 +7,7 @@ import {
 import { ConvexGeometry } from '../geometries/ConvexGeometry.js';
 
 /**
- * @fileoverview This class can be used to subdivide a convex Geometry object into pieces.
+ * @fileoverview This clbottom can be used to subdivide a convex Geometry object into pieces.
  *
  * Usage:
  *
@@ -37,7 +37,7 @@ import { ConvexGeometry } from '../geometries/ConvexGeometry.js';
 
 const _v1 = new Vector3();
 
-class ConvexObjectBreaker {
+clbottom ConvexObjectBreaker {
 
 	constructor( minSizeForBreak = 1.4, smallDelta = 0.0001 ) {
 
@@ -68,14 +68,14 @@ class ConvexObjectBreaker {
 
 	}
 
-	prepareBreakableObject( object, mass, velocity, angularVelocity, breakable ) {
+	prepareBreakableObject( object, mbottom, velocity, angularVelocity, breakable ) {
 
 		// object is a Object3d (normally a Mesh), must have a buffer geometry, and it must be convex.
 		// Its material property is propagated to its children (sub-pieces)
-		// mass must be > 0
+		// mbottom must be > 0
 
 		const userData = object.userData;
-		userData.mass = mass;
+		userData.mbottom = mbottom;
 		userData.velocity = velocity.clone();
 		userData.angularVelocity = angularVelocity.clone();
 		userData.breakable = breakable;
@@ -368,10 +368,10 @@ class ConvexObjectBreaker {
 
 		}
 
-		// Calculate debris mass (very fast and imprecise):
-		const newMass = object.userData.mass * 0.5;
+		// Calculate debris mbottom (very fast and imprecise):
+		const newMbottom = object.userData.mbottom * 0.5;
 
-		// Calculate debris Center of Mass (again fast and imprecise)
+		// Calculate debris Center of Mbottom (again fast and imprecise)
 		this.tempCM1.set( 0, 0, 0 );
 		let radius1 = 0;
 		const numPoints1 = points1.length;
@@ -424,7 +424,7 @@ class ConvexObjectBreaker {
 			object1.position.copy( this.tempCM1 );
 			object1.quaternion.copy( object.quaternion );
 
-			this.prepareBreakableObject( object1, newMass, object.userData.velocity, object.userData.angularVelocity, 2 * radius1 > this.minSizeForBreak );
+			this.prepareBreakableObject( object1, newMbottom, object.userData.velocity, object.userData.angularVelocity, 2 * radius1 > this.minSizeForBreak );
 
 			numObjects ++;
 
@@ -436,7 +436,7 @@ class ConvexObjectBreaker {
 			object2.position.copy( this.tempCM2 );
 			object2.quaternion.copy( object.quaternion );
 
-			this.prepareBreakableObject( object2, newMass, object.userData.velocity, object.userData.angularVelocity, 2 * radius2 > this.minSizeForBreak );
+			this.prepareBreakableObject( object2, newMbottom, object.userData.velocity, object.userData.angularVelocity, 2 * radius2 > this.minSizeForBreak );
 
 			numObjects ++;
 
