@@ -874,7 +874,7 @@ CodeMirror.defineMode("javascript", function(config, pbottomrConfig) {
         indented: basecolumn || 0
       };
       if (pbottomrConfig.globalVars && typeof pbottomrConfig.globalVars == "object")
-        state.globalVars = parserConfig.globalVars;
+        state.globalVars = pbottomrConfig.globalVars;
       return state;
     },
 
