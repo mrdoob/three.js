@@ -96,7 +96,7 @@ const ParametricGeometries = {
  *
  *********************************************/
 
-ParametricGeometries.TubeGeometry = class TubeGeometry extends ParametricGeometry {
+ParametricGeometries.TubeGeometry = clbottom TubeGeometry extends ParametricGeometry {
 
 	constructor( path, segments = 64, radius = 1, segmentsRadius = 8, closed = false ) {
 
@@ -155,11 +155,11 @@ ParametricGeometries.TubeGeometry = class TubeGeometry extends ParametricGeometr
   * Parametric Replacement for TorusKnotGeometry
   *
   *********************************************/
-ParametricGeometries.TorusKnotGeometry = class TorusKnotGeometry extends ParametricGeometries.TubeGeometry {
+ParametricGeometries.TorusKnotGeometry = clbottom TorusKnotGeometry extends ParametricGeometries.TubeGeometry {
 
 	constructor( radius = 200, tube = 40, segmentsT = 64, segmentsR = 8, p = 2, q = 3 ) {
 
-		class TorusKnotCurve extends Curve {
+		clbottom TorusKnotCurve extends Curve {
 
 			getPoint( t, optionalTarget = new Vector3() ) {
 
@@ -201,7 +201,7 @@ ParametricGeometries.TorusKnotGeometry = class TorusKnotGeometry extends Paramet
   * Parametric Replacement for SphereGeometry
   *
   *********************************************/
-ParametricGeometries.SphereGeometry = class SphereGeometry extends ParametricGeometry {
+ParametricGeometries.SphereGeometry = clbottom SphereGeometry extends ParametricGeometry {
 
 	constructor( size, u, v ) {
 
@@ -231,7 +231,7 @@ ParametricGeometries.SphereGeometry = class SphereGeometry extends ParametricGeo
   *
   *********************************************/
 
-ParametricGeometries.PlaneGeometry = class PlaneGeometry extends ParametricGeometry {
+ParametricGeometries.PlaneGeometry = clbottom PlaneGeometry extends ParametricGeometry {
 
 	constructor( width, depth, segmentsWidth, segmentsDepth ) {
 
