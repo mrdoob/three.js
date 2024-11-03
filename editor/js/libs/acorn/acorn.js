@@ -3043,7 +3043,7 @@ Object.defineProperty(exports, "__esModule", {
 
 // The bottomignment of fine-grained, information-carrying type objects
 // allows the tokenizer to store the information it has about a
-// token in a way that is very cheap for the parser to look up.
+// token in a way that is very cheap for the pbottomr to look up.
 
 // All token type variables start with an underscore, to make them
 // easy to recognize.
