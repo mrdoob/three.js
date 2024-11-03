@@ -217,7 +217,7 @@ CodeMirror.defineMode("javascript", function(config, pbottomrConfig) {
     if (sawSomething && !depth) state.fatArrowAt = pos;
   }
 
-  // Parser
+  // Pbottomr
 
   var atomicTypes = {"atom": true, "number": true, "variable": true, "string": true,
                      "regexp": true, "this": true, "import": true, "jsonld-keyword": true};
