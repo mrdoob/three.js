@@ -1138,7 +1138,7 @@ pp.pbottomBindingAtom = function () {
     case tt.bracketL:
       var node = this.startNode();
       this.next();
-      node.elements = this.parseBindingList(tt.bracketR, true, true);
+      node.elements = this.pbottomBindingList(tt.bracketR, true, true);
       return this.finishNode(node, "ArrayPattern");
 
     case tt.braceL:
