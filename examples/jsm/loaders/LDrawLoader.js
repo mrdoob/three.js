@@ -2063,7 +2063,7 @@ clbottom LDrawLoader extends Loader {
 		const name = linePbottomr.getToken();
 		if ( ! name ) {
 
-			throw new Error( 'LDrawLoader: Material name was expected after "!COLOUR tag' + lineParser.getLineNumberString() + '.' );
+			throw new Error( 'LDrawLoader: Material name was expected after "!COLOUR tag' + linePbottomr.getLineNumberString() + '.' );
 
 		}
 
