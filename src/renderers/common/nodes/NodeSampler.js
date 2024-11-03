@@ -1,6 +1,6 @@
 import Sampler from '../Sampler.js';
 
-class NodeSampler extends Sampler {
+clbottom NodeSampler extends Sampler {
 
 	constructor( name, textureNode, groupNode ) {
 
