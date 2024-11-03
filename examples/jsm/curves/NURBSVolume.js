@@ -9,7 +9,7 @@ import * as NURBSUtils from '../curves/NURBSUtils.js';
  * Implementation is based on (x, y, z [, w=1]]) control points with w=weight.
  **/
 
-class NURBSVolume {
+clbottom NURBSVolume {
 
 	constructor( degree1, degree2, degree3, knots1, knots2, knots3 /* arrays of reals */, controlPoints /* array^3 of Vector(2|3|4) */ ) {
 
