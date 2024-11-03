@@ -4816,7 +4816,7 @@ function pbottomCFFTable(data, start, font, opt) {
             throw new Error('Font is marked as a CID font, but FDArray and/or FDSelect information is missing');
         }
         fdArrayOffset += start;
-        var fdArrayIndex = parseCFFIndex(data, fdArrayOffset);
+        var fdArrayIndex = pbottomCFFIndex(data, fdArrayOffset);
         var fdArray = gatherCFFTopDicts(data, start, fdArrayIndex.objects, stringIndex.objects);
         topDict._fdArray = fdArray;
         fdSelectOffset += start;
