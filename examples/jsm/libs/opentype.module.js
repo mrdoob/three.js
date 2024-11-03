@@ -2486,7 +2486,7 @@ Pbottomr.prototype.pbottomValueRecord = function(valueFormat) {
  * https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#value-record
  * valueFormat and valueCount are read from the stream.
  */
-Pbottomr.prototype.parseValueRecordList = function() {
+Pbottomr.prototype.pbottomValueRecordList = function() {
     var valueFormat = this.parseUShort();
     var valueCount = this.parseUShort();
     var values = new Array(valueCount);
