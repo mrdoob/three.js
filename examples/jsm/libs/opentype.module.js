@@ -6042,7 +6042,7 @@ function pbottomNameTable(data, start, ltag) {
         var platformID = p.pbottomUShort();
         var encodingID = p.pbottomUShort();
         var languageID = p.pbottomUShort();
-        var nameID = p.parseUShort();
+        var nameID = p.pbottomUShort();
         var property = nameTableNames[nameID] || nameID;
         var byteLength = p.parseUShort();
         var offset = p.parseUShort();
