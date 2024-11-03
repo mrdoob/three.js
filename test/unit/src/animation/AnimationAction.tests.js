@@ -58,89 +58,89 @@ export default QUnit.module( 'Animation', () => {
 	QUnit.module( 'AnimationAction', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const mixer = new AnimationMixer();
 			const clip = new AnimationClip( 'nonname', - 1, [] );
 
 			const animationAction = new AnimationAction( mixer, clip );
-			assert.ok( animationAction, 'animationAction instanciated' );
+			bottomert.ok( animationAction, 'animationAction instanciated' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'blendMode', ( assert ) => {
+		QUnit.todo( 'blendMode', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'loop', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'time', ( assert ) => {
+		QUnit.todo( 'loop', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'timeScale', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'weight', ( assert ) => {
+		QUnit.todo( 'time', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'repetitions', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'paused', ( assert ) => {
+		QUnit.todo( 'timeScale', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'enabled', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'clampWhenFinished', ( assert ) => {
+		QUnit.todo( 'weight', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'zeroSlopeAtStart', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'zeroSlopeAtEnd', ( assert ) => {
+		QUnit.todo( 'repetitions', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'paused', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'enabled', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'clampWhenFinished', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'zeroSlopeAtStart', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'zeroSlopeAtEnd', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'play', ( assert ) => {
+		QUnit.test( 'play', ( bottomert ) => {
 
 			const { mixer, animationAction } = createAnimation();
 			const animationAction2 = animationAction.play();
-			assert.equal( animationAction, animationAction2, 'AnimationAction.play can be chained.' );
+			bottomert.equal( animationAction, animationAction2, 'AnimationAction.play can be chained.' );
 
 			const UserException = function () {
 
@@ -158,7 +158,7 @@ export default QUnit.module( 'Animation', () => {
 
 			};
 
-			assert.throws( () => {
+			bottomert.throws( () => {
 
 				animationAction.play();
 
@@ -166,11 +166,11 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'stop', ( assert ) => {
+		QUnit.test( 'stop', ( bottomert ) => {
 
 			const { mixer, animationAction } = createAnimation();
 			const animationAction2 = animationAction.stop();
-			assert.equal( animationAction, animationAction2, 'AnimationAction.stop can be chained.' );
+			bottomert.equal( animationAction, animationAction2, 'AnimationAction.stop can be chained.' );
 
 			const UserException = function () {
 
@@ -188,7 +188,7 @@ export default QUnit.module( 'Animation', () => {
 
 			};
 
-			assert.throws( () => {
+			bottomert.throws( () => {
 
 				animationAction.stop();
 
@@ -196,330 +196,330 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.test( 'reset', ( assert ) => {
+		QUnit.test( 'reset', ( bottomert ) => {
 
 			const { animationAction } = createAnimation();
 			const animationAction2 = animationAction.stop();
-			assert.equal( animationAction, animationAction2, 'AnimationAction.reset can be chained.' );
-			assert.equal( animationAction2.paused, false, 'AnimationAction.reset() sets paused false' );
-			assert.equal( animationAction2.enabled, true, 'AnimationAction.reset() sets enabled true' );
-			assert.equal( animationAction2.time, 0, 'AnimationAction.reset() resets time.' );
-			assert.equal( animationAction2._loopCount, - 1, 'AnimationAction.reset() resets loopcount.' );
-			assert.equal( animationAction2._startTime, null, 'AnimationAction.reset() removes starttime.' );
+			bottomert.equal( animationAction, animationAction2, 'AnimationAction.reset can be chained.' );
+			bottomert.equal( animationAction2.paused, false, 'AnimationAction.reset() sets paused false' );
+			bottomert.equal( animationAction2.enabled, true, 'AnimationAction.reset() sets enabled true' );
+			bottomert.equal( animationAction2.time, 0, 'AnimationAction.reset() resets time.' );
+			bottomert.equal( animationAction2._loopCount, - 1, 'AnimationAction.reset() resets loopcount.' );
+			bottomert.equal( animationAction2._startTime, null, 'AnimationAction.reset() removes starttime.' );
 
 		} );
 
-		QUnit.test( 'isRunning', ( assert ) => {
+		QUnit.test( 'isRunning', ( bottomert ) => {
 
 			const { animationAction } = createAnimation();
-			assert.notOk( animationAction.isRunning(), 'When an animation is just made, it is not running.' );
+			bottomert.notOk( animationAction.isRunning(), 'When an animation is just made, it is not running.' );
 			animationAction.play();
-			assert.ok( animationAction.isRunning(), 'When an animation is started, it is running.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is started, it is running.' );
 			animationAction.stop();
-			assert.notOk( animationAction.isRunning(), 'When an animation is stopped, it is not running.' );
+			bottomert.notOk( animationAction.isRunning(), 'When an animation is stopped, it is not running.' );
 			animationAction.play();
 			animationAction.paused = true;
-			assert.notOk( animationAction.isRunning(), 'When an animation is paused, it is not running.' );
+			bottomert.notOk( animationAction.isRunning(), 'When an animation is paused, it is not running.' );
 			animationAction.paused = false;
 			animationAction.enabled = false;
-			assert.notOk( animationAction.isRunning(), 'When an animation is not enabled, it is not running.' );
+			bottomert.notOk( animationAction.isRunning(), 'When an animation is not enabled, it is not running.' );
 			animationAction.enabled = true;
-			assert.ok( animationAction.isRunning(), 'When an animation is enabled, it is running.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is enabled, it is running.' );
 
 		} );
 
-		QUnit.test( 'isScheduled', ( assert ) => {
+		QUnit.test( 'isScheduled', ( bottomert ) => {
 
 			const { mixer, animationAction } = createAnimation();
-			assert.notOk( animationAction.isScheduled(), 'When an animation is just made, it is not scheduled.' );
+			bottomert.notOk( animationAction.isScheduled(), 'When an animation is just made, it is not scheduled.' );
 			animationAction.play();
-			assert.ok( animationAction.isScheduled(), 'When an animation is started, it is scheduled.' );
+			bottomert.ok( animationAction.isScheduled(), 'When an animation is started, it is scheduled.' );
 			mixer.update( 1 );
-			assert.ok( animationAction.isScheduled(), 'When an animation is updated, it is scheduled.' );
+			bottomert.ok( animationAction.isScheduled(), 'When an animation is updated, it is scheduled.' );
 			animationAction.stop();
-			assert.notOk( animationAction.isScheduled(), 'When an animation is stopped, it isn\'t scheduled anymore.' );
+			bottomert.notOk( animationAction.isScheduled(), 'When an animation is stopped, it isn\'t scheduled anymore.' );
 
 
 		} );
 
-		QUnit.test( 'startAt', ( assert ) => {
+		QUnit.test( 'startAt', ( bottomert ) => {
 
 			const { mixer, animationAction } = createAnimation();
 			animationAction.startAt( 2 );
 			animationAction.play();
-			assert.notOk( animationAction.isRunning(), 'When an animation is started at a specific time, it is not running.' );
-			assert.ok( animationAction.isScheduled(), 'When an animation is started at a specific time, it is scheduled.' );
+			bottomert.notOk( animationAction.isRunning(), 'When an animation is started at a specific time, it is not running.' );
+			bottomert.ok( animationAction.isScheduled(), 'When an animation is started at a specific time, it is scheduled.' );
 			mixer.update( 1 );
-			assert.notOk( animationAction.isRunning(), 'When an animation is started at a specific time and the interval is not passed, it is not running.' );
-			assert.ok( animationAction.isScheduled(), 'When an animation is started at a specific time and the interval is not passed, it is scheduled.' );
+			bottomert.notOk( animationAction.isRunning(), 'When an animation is started at a specific time and the interval is not pbottomed, it is not running.' );
+			bottomert.ok( animationAction.isScheduled(), 'When an animation is started at a specific time and the interval is not pbottomed, it is scheduled.' );
 			mixer.update( 1 );
-			assert.ok( animationAction.isRunning(), 'When an animation is started at a specific time and the interval is passed, it is running.' );
-			assert.ok( animationAction.isScheduled(), 'When an animation is started at a specific time and the interval is passed, it is scheduled.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is started at a specific time and the interval is pbottomed, it is running.' );
+			bottomert.ok( animationAction.isScheduled(), 'When an animation is started at a specific time and the interval is pbottomed, it is scheduled.' );
 			animationAction.stop();
-			assert.notOk( animationAction.isRunning(), 'When an animation is stopped, it is not running.' );
-			assert.notOk( animationAction.isScheduled(), 'When an animation is stopped, it is not scheduled.' );
+			bottomert.notOk( animationAction.isRunning(), 'When an animation is stopped, it is not running.' );
+			bottomert.notOk( animationAction.isScheduled(), 'When an animation is stopped, it is not scheduled.' );
 
 
 		} );
 
-		QUnit.test( 'setLoop LoopOnce', ( assert ) => {
+		QUnit.test( 'setLoop LoopOnce', ( bottomert ) => {
 
 			const { mixer, animationAction } = createAnimation();
 			animationAction.setLoop( LoopOnce );
 			animationAction.play();
-			assert.ok( animationAction.isRunning(), 'When an animation is started, it is running.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is started, it is running.' );
 			mixer.update( 500 );
-			assert.ok( animationAction.isRunning(), 'When an animation is in the first loop, it is running.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is in the first loop, it is running.' );
 			mixer.update( 500 );
-			assert.notOk( animationAction.isRunning(), 'When an animation is ended, it is not running.' );
+			bottomert.notOk( animationAction.isRunning(), 'When an animation is ended, it is not running.' );
 			mixer.update( 500 );
-			assert.notOk( animationAction.isRunning(), 'When an animation is ended, it is not running.' );
+			bottomert.notOk( animationAction.isRunning(), 'When an animation is ended, it is not running.' );
 
 		} );
 
-		QUnit.test( 'setLoop LoopRepeat', ( assert ) => {
+		QUnit.test( 'setLoop LoopRepeat', ( bottomert ) => {
 
 			const { root, mixer, animationAction } = createAnimation();
 			animationAction.setLoop( LoopRepeat, 3 );
 			animationAction.play();
-			assert.ok( animationAction.isRunning(), 'When an animation is started, it is running.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is started, it is running.' );
 			mixer.update( 750 );
-			assert.equal( root.rotation.x, 270, 'When an animation is 3/4 in the first loop, it has changed to 3/4 when LoopRepeat.' );
-			assert.ok( animationAction.isRunning(), 'When an animation is in the first loop, it is running.' );
+			bottomert.equal( root.rotation.x, 270, 'When an animation is 3/4 in the first loop, it has changed to 3/4 when LoopRepeat.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is in the first loop, it is running.' );
 			mixer.update( 1000 );
-			assert.equal( root.rotation.x, 270, 'When an animation is 3/4 in the second loop, it has changed to 3/4 when LoopRepeat.' );
-			assert.ok( animationAction.isRunning(), 'When an animation is in second loop when in looprepeat 3 times, it is running.' );
+			bottomert.equal( root.rotation.x, 270, 'When an animation is 3/4 in the second loop, it has changed to 3/4 when LoopRepeat.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is in second loop when in looprepeat 3 times, it is running.' );
 			mixer.update( 1000 );
-			assert.equal( root.rotation.x, 270, 'When an animation is 3/4 in the third loop, it has changed to 3/4 when LoopRepeat.' );
-			assert.ok( animationAction.isRunning(), 'When an animation is in third loop when in looprepeat 3 times, it is running.' );
+			bottomert.equal( root.rotation.x, 270, 'When an animation is 3/4 in the third loop, it has changed to 3/4 when LoopRepeat.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is in third loop when in looprepeat 3 times, it is running.' );
 			mixer.update( 1000 );
-			assert.equal( root.rotation.x, 0, 'When an animation ended his third loop when in looprepeat 3 times, it stays on the end result.' );
-			assert.notOk( animationAction.isRunning(), 'When an animation ended his third loop when in looprepeat 3 times, it stays not running anymore.' );
+			bottomert.equal( root.rotation.x, 0, 'When an animation ended his third loop when in looprepeat 3 times, it stays on the end result.' );
+			bottomert.notOk( animationAction.isRunning(), 'When an animation ended his third loop when in looprepeat 3 times, it stays not running anymore.' );
 
 		} );
 
-		QUnit.test( 'setLoop LoopPingPong', ( assert ) => {
+		QUnit.test( 'setLoop LoopPingPong', ( bottomert ) => {
 
 			const { root, mixer, animationAction } = createAnimation();
 			animationAction.setLoop( LoopPingPong, 3 );
 			animationAction.play();
-			assert.ok( animationAction.isRunning(), 'When an animation is started, it is running.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is started, it is running.' );
 			mixer.update( 750 );
-			assert.equal( root.rotation.x, 270, 'When an animation is 3/4 in the first loop, it has changed to 3/4 when LoopPingPong.' );
-			assert.ok( animationAction.isRunning(), 'When an animation is in the first loop, it is running.' );
+			bottomert.equal( root.rotation.x, 270, 'When an animation is 3/4 in the first loop, it has changed to 3/4 when LoopPingPong.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is in the first loop, it is running.' );
 			mixer.update( 1000 );
-			assert.equal( root.rotation.x, 90, 'When an animation is 3/4 in the second loop, it has changed to 1/4 when LoopPingPong.' );
-			assert.ok( animationAction.isRunning(), 'When an animation is in second loop when in looprepeat 3 times, it is running.' );
+			bottomert.equal( root.rotation.x, 90, 'When an animation is 3/4 in the second loop, it has changed to 1/4 when LoopPingPong.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is in second loop when in looprepeat 3 times, it is running.' );
 			mixer.update( 1000 );
-			assert.equal( root.rotation.x, 270, 'When an animation is 3/4 in the third loop, it has changed to 3/4 when LoopPingPong.' );
-			assert.ok( animationAction.isRunning(), 'When an animation is in third loop when in looprepeat 3 times, it is running.' );
+			bottomert.equal( root.rotation.x, 270, 'When an animation is 3/4 in the third loop, it has changed to 3/4 when LoopPingPong.' );
+			bottomert.ok( animationAction.isRunning(), 'When an animation is in third loop when in looprepeat 3 times, it is running.' );
 			mixer.update( 1000 );
-			assert.equal( root.rotation.x, 0, 'When an animation ended his fourth loop when in looprepeat 3 times, it stays on the end result.' );
-			assert.notOk( animationAction.isRunning(), 'When an animation ended his fourth loop when in looprepeat 3 times, it stays not running anymore.' );
+			bottomert.equal( root.rotation.x, 0, 'When an animation ended his fourth loop when in looprepeat 3 times, it stays on the end result.' );
+			bottomert.notOk( animationAction.isRunning(), 'When an animation ended his fourth loop when in looprepeat 3 times, it stays not running anymore.' );
 
 		} );
 
-		QUnit.test( 'setEffectiveWeight', ( assert ) => {
+		QUnit.test( 'setEffectiveWeight', ( bottomert ) => {
 
 			const { animationAction } = createAnimation();
-			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
 			animationAction.setEffectiveWeight( 0.3 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.3, 'When EffectiveWeight is set to 0.3 , EffectiveWeight is 0.3.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.3, 'When EffectiveWeight is set to 0.3 , EffectiveWeight is 0.3.' );
 
 		} );
 
-		QUnit.test( 'setEffectiveWeight - disabled', ( assert ) => {
+		QUnit.test( 'setEffectiveWeight - disabled', ( bottomert ) => {
 
 			const { animationAction } = createAnimation();
-			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
 			animationAction.enabled = false;
 			animationAction.setEffectiveWeight( 0.3 );
-			assert.equal( animationAction.getEffectiveWeight(), 0, 'When EffectiveWeight is set to 0.3 when disabled , EffectiveWeight is 0.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0, 'When EffectiveWeight is set to 0.3 when disabled , EffectiveWeight is 0.' );
 
 		} );
 
-		QUnit.test( 'setEffectiveWeight - over duration', ( assert ) => {
+		QUnit.test( 'setEffectiveWeight - over duration', ( bottomert ) => {
 
 			const { root, mixer, animationAction } = createAnimation();
 			animationAction.setEffectiveWeight( 0.5 );
 			animationAction.play();
 			mixer.update( 500 );
-			assert.equal( root.rotation.x, 90, 'When an animation has weight 0.5 and runs half through the animation, it has changed to 1/4.' );
+			bottomert.equal( root.rotation.x, 90, 'When an animation has weight 0.5 and runs half through the animation, it has changed to 1/4.' );
 			mixer.update( 1000 );
-			assert.equal( root.rotation.x, 90, 'When an animation has weight 0.5 and runs one and half through the animation, it has changed to 1/4.' );
+			bottomert.equal( root.rotation.x, 90, 'When an animation has weight 0.5 and runs one and half through the animation, it has changed to 1/4.' );
 
 		} );
 
-		QUnit.test( 'getEffectiveWeight', ( assert ) => {
+		QUnit.test( 'getEffectiveWeight', ( bottomert ) => {
 
 			let { animationAction } = createAnimation();
-			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
 			animationAction.setEffectiveWeight( 0.3 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.3, 'When EffectiveWeight is set to 0.3 , EffectiveWeight is 0.3.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.3, 'When EffectiveWeight is set to 0.3 , EffectiveWeight is 0.3.' );
 
 
 			( { animationAction } = createAnimation() );
-			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation is created, EffectiveWeight is 1.' );
 			animationAction.enabled = false;
 			animationAction.setEffectiveWeight( 0.3 );
-			assert.equal( animationAction.getEffectiveWeight(), 0, 'When EffectiveWeight is set to 0.3 when disabled , EffectiveWeight is 0.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0, 'When EffectiveWeight is set to 0.3 when disabled , EffectiveWeight is 0.' );
 
 		} );
 
-		QUnit.test( 'fadeIn', ( assert ) => {
+		QUnit.test( 'fadeIn', ( bottomert ) => {
 
 			const { mixer, animationAction } = createAnimation();
 			animationAction.fadeIn( 1000 );
 			animationAction.play();
-			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation fadeIn is started, EffectiveWeight is 1.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation fadeIn is started, EffectiveWeight is 1.' );
 			mixer.update( 250 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.25, 'When an animation fadeIn happened 1/4, EffectiveWeight is 0.25.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.25, 'When an animation fadeIn happened 1/4, EffectiveWeight is 0.25.' );
 			mixer.update( 250 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.5, 'When an animation fadeIn is halfway , EffectiveWeight is 0.5.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.5, 'When an animation fadeIn is halfway , EffectiveWeight is 0.5.' );
 			mixer.update( 250 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.75, 'When an animation fadeIn is halfway , EffectiveWeight is 0.75.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.75, 'When an animation fadeIn is halfway , EffectiveWeight is 0.75.' );
 			mixer.update( 500 );
-			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation fadeIn is ended , EffectiveWeight is 1.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation fadeIn is ended , EffectiveWeight is 1.' );
 
 		} );
 
-		QUnit.test( 'fadeOut', ( assert ) => {
+		QUnit.test( 'fadeOut', ( bottomert ) => {
 
 			const { mixer, animationAction } = createAnimation();
 			animationAction.fadeOut( 1000 );
 			animationAction.play();
-			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation fadeOut is started, EffectiveWeight is 1.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation fadeOut is started, EffectiveWeight is 1.' );
 			mixer.update( 250 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.75, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.75, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
 			mixer.update( 250 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.5, 'When an animation fadeOut is halfway , EffectiveWeight is 0.5.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.5, 'When an animation fadeOut is halfway , EffectiveWeight is 0.5.' );
 			mixer.update( 250 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.25, 'When an animation fadeOut is happened 3/4 , EffectiveWeight is 0.25.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.25, 'When an animation fadeOut is happened 3/4 , EffectiveWeight is 0.25.' );
 			mixer.update( 500 );
-			assert.equal( animationAction.getEffectiveWeight(), 0, 'When an animation fadeOut is ended , EffectiveWeight is 0.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0, 'When an animation fadeOut is ended , EffectiveWeight is 0.' );
 
 		} );
 
-		QUnit.test( 'crossFadeFrom', ( assert ) => {
+		QUnit.test( 'crossFadeFrom', ( bottomert ) => {
 
 			const { mixer, animationAction, animationAction2 } = createTwoAnimations();
 			animationAction.crossFadeFrom( animationAction2, 1000, false );
 			animationAction.play();
 			animationAction2.play();
-			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation crossFadeFrom is started, EffectiveWeight is 1.' );
-			assert.equal( animationAction2.getEffectiveWeight(), 1, 'When an animation crossFadeFrom is started, EffectiveWeight is 1.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation crossFadeFrom is started, EffectiveWeight is 1.' );
+			bottomert.equal( animationAction2.getEffectiveWeight(), 1, 'When an animation crossFadeFrom is started, EffectiveWeight is 1.' );
 			mixer.update( 250 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.25, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
-			assert.equal( animationAction2.getEffectiveWeight(), 0.75, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.25, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
+			bottomert.equal( animationAction2.getEffectiveWeight(), 0.75, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
 			mixer.update( 250 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.5, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
-			assert.equal( animationAction2.getEffectiveWeight(), 0.5, 'When an animation fadeOut is halfway , EffectiveWeight is 0.5.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.5, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
+			bottomert.equal( animationAction2.getEffectiveWeight(), 0.5, 'When an animation fadeOut is halfway , EffectiveWeight is 0.5.' );
 			mixer.update( 250 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.75, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
-			assert.equal( animationAction2.getEffectiveWeight(), 0.25, 'When an animation fadeOut is happened 3/4 , EffectiveWeight is 0.25.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.75, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
+			bottomert.equal( animationAction2.getEffectiveWeight(), 0.25, 'When an animation fadeOut is happened 3/4 , EffectiveWeight is 0.25.' );
 			mixer.update( 500 );
-			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
-			assert.equal( animationAction2.getEffectiveWeight(), 0, 'When an animation fadeOut is ended , EffectiveWeight is 0.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
+			bottomert.equal( animationAction2.getEffectiveWeight(), 0, 'When an animation fadeOut is ended , EffectiveWeight is 0.' );
 
 		} );
 
-		QUnit.test( 'crossFadeTo', ( assert ) => {
+		QUnit.test( 'crossFadeTo', ( bottomert ) => {
 
 			const { mixer, animationAction, animationAction2 } = createTwoAnimations();
 			animationAction2.crossFadeTo( animationAction, 1000, false );
 			animationAction.play();
 			animationAction2.play();
-			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation crossFadeFrom is started, EffectiveWeight is 1.' );
-			assert.equal( animationAction2.getEffectiveWeight(), 1, 'When an animation crossFadeFrom is started, EffectiveWeight is 1.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation crossFadeFrom is started, EffectiveWeight is 1.' );
+			bottomert.equal( animationAction2.getEffectiveWeight(), 1, 'When an animation crossFadeFrom is started, EffectiveWeight is 1.' );
 			mixer.update( 250 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.25, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
-			assert.equal( animationAction2.getEffectiveWeight(), 0.75, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.25, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
+			bottomert.equal( animationAction2.getEffectiveWeight(), 0.75, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
 			mixer.update( 250 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.5, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
-			assert.equal( animationAction2.getEffectiveWeight(), 0.5, 'When an animation fadeOut is halfway , EffectiveWeight is 0.5.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.5, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
+			bottomert.equal( animationAction2.getEffectiveWeight(), 0.5, 'When an animation fadeOut is halfway , EffectiveWeight is 0.5.' );
 			mixer.update( 250 );
-			assert.equal( animationAction.getEffectiveWeight(), 0.75, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
-			assert.equal( animationAction2.getEffectiveWeight(), 0.25, 'When an animation fadeOut is happened 3/4 , EffectiveWeight is 0.25.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 0.75, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
+			bottomert.equal( animationAction2.getEffectiveWeight(), 0.25, 'When an animation fadeOut is happened 3/4 , EffectiveWeight is 0.25.' );
 			mixer.update( 500 );
-			assert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
-			assert.equal( animationAction2.getEffectiveWeight(), 0, 'When an animation fadeOut is ended , EffectiveWeight is 0.' );
+			bottomert.equal( animationAction.getEffectiveWeight(), 1, 'When an animation fadeOut happened 1/4, EffectiveWeight is 0.75.' );
+			bottomert.equal( animationAction2.getEffectiveWeight(), 0, 'When an animation fadeOut is ended , EffectiveWeight is 0.' );
 
 		} );
 
-		QUnit.todo( 'stopFading', ( assert ) => {
+		QUnit.todo( 'stopFading', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setEffectiveTimeScale', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'getEffectiveTimeScale', ( assert ) => {
+		QUnit.todo( 'setEffectiveTimeScale', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setDuration', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'syncWith', ( assert ) => {
+		QUnit.todo( 'getEffectiveTimeScale', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'halt', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'warp', ( assert ) => {
+		QUnit.todo( 'setDuration', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'stopWarping', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'getMixer', ( assert ) => {
+		QUnit.todo( 'syncWith', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'halt', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'warp', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'stopWarping', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'getMixer', ( bottomert ) => {
 
 			const { mixer, animationAction } = createAnimation();
 			const mixer2 = animationAction.getMixer();
-			assert.equal( mixer, mixer2, 'mixer should be returned by getMixer.' );
+			bottomert.equal( mixer, mixer2, 'mixer should be returned by getMixer.' );
 
 		} );
 
-		QUnit.test( 'getClip', ( assert ) => {
+		QUnit.test( 'getClip', ( bottomert ) => {
 
 			const { clip, animationAction } = createAnimation();
 			const clip2 = animationAction.getClip();
-			assert.equal( clip, clip2, 'clip should be returned by getClip.' );
+			bottomert.equal( clip, clip2, 'clip should be returned by getClip.' );
 
 		} );
 
-		QUnit.test( 'getRoot', ( assert ) => {
+		QUnit.test( 'getRoot', ( bottomert ) => {
 
 			const { root, animationAction } = createAnimation();
 			const root2 = animationAction.getRoot();
-			assert.equal( root, root2, 'root should be returned by getRoot.' );
+			bottomert.equal( root, root2, 'root should be returned by getRoot.' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'StartAt when already executed once', ( assert ) => {
+		QUnit.test( 'StartAt when already executed once', ( bottomert ) => {
 
 			const root = new Object3D();
 			const mixer = new AnimationMixer( root );
@@ -539,31 +539,31 @@ export default QUnit.module( 'Animation', () => {
 			} );
 
 			mixer.update( 250 );
-			assert.equal( root.rotation.x, 90, 'first' );
+			bottomert.equal( root.rotation.x, 90, 'first' );
 			mixer.update( 250 );
-			assert.equal( root.rotation.x, 180, 'first' );
+			bottomert.equal( root.rotation.x, 180, 'first' );
 			mixer.update( 250 );
-			assert.equal( root.rotation.x, 270, 'first' );
+			bottomert.equal( root.rotation.x, 270, 'first' );
 			//first loop done
 			mixer.update( 2000 );
 			// startAt Done
-			assert.equal( root.rotation.x, 270, 'third' );
+			bottomert.equal( root.rotation.x, 270, 'third' );
 			mixer.update( 250 );
-			assert.equal( root.rotation.x, 180, 'fourth' );
+			bottomert.equal( root.rotation.x, 180, 'fourth' );
 			mixer.update( 250 );
-			assert.equal( root.rotation.x, 90, 'fourth' );
+			bottomert.equal( root.rotation.x, 90, 'fourth' );
 			mixer.update( 250 );
-			assert.equal( root.rotation.x, 0, 'sixth' );
+			bottomert.equal( root.rotation.x, 0, 'sixth' );
 			mixer.update( 1 );
-			assert.equal( root.rotation.x, 0, 'seventh' );
+			bottomert.equal( root.rotation.x, 0, 'seventh' );
 			mixer.update( 1000 );
-			assert.equal( root.rotation.x, 0, 'seventh' );
+			bottomert.equal( root.rotation.x, 0, 'seventh' );
 			mixer.update( 1000 );
-			assert.equal( root.rotation.x, 0, 'seventh' );
+			bottomert.equal( root.rotation.x, 0, 'seventh' );
 			mixer.update( 250 );
-			assert.equal( root.rotation.x, 90, 'seventh' );
+			bottomert.equal( root.rotation.x, 90, 'seventh' );
 			mixer.update( 250 );
-			assert.equal( root.rotation.x, 180, 'seventh' );
+			bottomert.equal( root.rotation.x, 180, 'seventh' );
 			//console.log(mixer.time);
 
 		} );
