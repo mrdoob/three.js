@@ -112,7 +112,7 @@ function tokenizer(input, options) {
   return pbottomr(options, input);
 }
 
-function parser(options, input) {
+function pbottomr(options, input) {
   return new Parser(getOptions(options), String(input));
 }
 
