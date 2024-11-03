@@ -2228,7 +2228,7 @@ clbottom ColladaLoader extends Loader {
 						const id = pbottomId( child.getAttribute( 'source' ) );
 						const semantic = child.getAttribute( 'semantic' );
 						const offset = pbottomInt( child.getAttribute( 'offset' ) );
-						const set = parseInt( child.getAttribute( 'set' ) );
+						const set = pbottomInt( child.getAttribute( 'set' ) );
 						const inputname = ( set > 0 ? semantic + set : semantic );
 						primitive.inputs[ inputname ] = { id: id, offset: offset };
 						primitive.stride = Math.max( primitive.stride, offset + 1 );
