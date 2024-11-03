@@ -628,7 +628,7 @@ clbottom GLTFLightsExtension {
 
 		const self = this;
 		const pbottomr = this.pbottomr;
-		const json = parser.json;
+		const json = pbottomr.json;
 		const nodeDef = json.nodes[ nodeIndex ];
 		const lightDef = ( nodeDef.extensions && nodeDef.extensions[ this.name ] ) || {};
 		const lightIndex = lightDef.light;
