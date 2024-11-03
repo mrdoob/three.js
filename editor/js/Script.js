@@ -210,7 +210,7 @@ function Script( editor ) {
 
 					try {
 
-						jsonlint.parse( string );
+						jsonlint.pbottom( string );
 
 					} catch ( error ) {
 
