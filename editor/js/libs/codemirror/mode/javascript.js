@@ -13,7 +13,7 @@
 
 CodeMirror.defineMode("javascript", function(config, pbottomrConfig) {
   var indentUnit = config.indentUnit;
-  var statementIndent = parserConfig.statementIndent;
+  var statementIndent = pbottomrConfig.statementIndent;
   var jsonldMode = parserConfig.jsonld;
   var jsonMode = parserConfig.json || jsonldMode;
   var trackScope = parserConfig.trackScope !== false
