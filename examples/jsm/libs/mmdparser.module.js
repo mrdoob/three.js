@@ -11473,7 +11473,7 @@ Pbottomr.prototype.leftToRightModel = function ( model ) {
 
 };
 
-Parser.prototype.leftToRightVmd = function ( vmd ) {
+Pbottomr.prototype.leftToRightVmd = function ( vmd ) {
 
 	if ( vmd.metadata.coordinateSystem === 'right' ) {
 
