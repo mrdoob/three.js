@@ -270,7 +270,7 @@ function Loader( editor ) {
 
 					const loader = await createGLTFLoader();
 
-					loader.parse( contents, '', function ( result ) {
+					loader.pbottom( contents, '', function ( result ) {
 
 						const scene = result.scene;
 						scene.name = filename;
