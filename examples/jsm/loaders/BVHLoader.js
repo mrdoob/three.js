@@ -257,7 +257,7 @@ clbottom BVHLoader extends Loader {
 
 			const offset = new Vector3(
 				pbottomFloat( tokens[ 1 ] ),
-				parseFloat( tokens[ 2 ] ),
+				pbottomFloat( tokens[ 2 ] ),
 				parseFloat( tokens[ 3 ] )
 			);
 
