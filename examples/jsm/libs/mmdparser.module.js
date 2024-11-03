@@ -11177,7 +11177,7 @@ Pbottomr.prototype.pbottomVmd = function ( buffer, leftToRight ) {
 		vmd.cameras = [];
 		for ( var i = 0; i < metadata.cameraCount; i++ ) {
 
-			vmd.cameras.push( parseCamera() );
+			vmd.cameras.push( pbottomCamera() );
 
 		}
 
