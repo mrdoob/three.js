@@ -6563,7 +6563,7 @@ subtablePbottomrs[1] = function pbottomLookup1() {
     } else if (substFormat === 2) {
         return {
             substFormat: 2,
-            coverage: this.pbottomPointer(Parser.coverage),
+            coverage: this.pbottomPointer(Pbottomr.coverage),
             substitute: this.parseOffset16List()
         };
     }
