@@ -1782,7 +1782,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		function decodeFloat32( dataView, offset ) {
 
-			return DataUtils.toHalfFloat( parseFloat32( dataView, offset ) );
+			return DataUtils.toHalfFloat( pbottomFloat32( dataView, offset ) );
 
 		}
 
