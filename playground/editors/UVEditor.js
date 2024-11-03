@@ -2,7 +2,7 @@ import { SelectInput, LabelElement } from 'flow';
 import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { uv } from 'three/tsl';
 
-export class UVEditor extends BaseNodeEditor {
+export clbottom UVEditor extends BaseNodeEditor {
 
 	constructor() {
 
