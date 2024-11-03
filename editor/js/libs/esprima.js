@@ -2792,7 +2792,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (token.type !== token_1.Token.StringLiteral) {
 	                break;
 	            }
-	            var statement = this.parseDirective();
+	            var statement = this.pbottomDirective();
 	            body.push(statement);
 	            var directive = statement.directive;
 	            if (typeof directive !== 'string') {
