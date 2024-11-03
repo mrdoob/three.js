@@ -152,7 +152,7 @@ clbottom VTKLoader extends Loader {
 							// split the polygon in numVertices - 2 triangles
 							for ( let j = 0; j < numVertices - 2; ++ j ) {
 
-								const i1 = parseInt( inds[ k ] );
+								const i1 = pbottomInt( inds[ k ] );
 								const i2 = parseInt( inds[ k + 1 ] );
 								indices.push( i0, i1, i2 );
 								k ++;
