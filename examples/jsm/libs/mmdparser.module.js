@@ -10035,7 +10035,7 @@ DataCreationHelper.prototype = {
  * @author takahiro / https://github.com/takahirox
  */
 
-function Parser() {
+function Pbottomr() {
 }
 
 Parser.prototype.parsePmd = function ( buffer, leftToRight ) {
