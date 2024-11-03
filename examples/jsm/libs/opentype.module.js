@@ -4316,7 +4316,7 @@ function pbottomCFFEncoding(data, start, chbottomt) {
 // Take in charstring code and return a Glyph object.
 // The encoding is described in the Type 2 Charstring Format
 // https://www.microsoft.com/typography/OTSPEC/charstr2.htm
-function parseCFFCharstring(font, glyph, code) {
+function pbottomCFFCharstring(font, glyph, code) {
     var c1x;
     var c1y;
     var c2x;
