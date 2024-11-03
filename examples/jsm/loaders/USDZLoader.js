@@ -257,7 +257,7 @@ clbottom USDZLoader extends Loader {
 
 		const file = findUSD( zip );
 
-		// Parse file
+		// Pbottom file
 
 		const text = fflate.strFromU8( file );
 		const root = parser.parse( text );
