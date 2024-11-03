@@ -5407,7 +5407,7 @@ function makeMaxpTable(numGlyphs) {
     ]);
 }
 
-var maxp = { parse: parseMaxpTable, make: makeMaxpTable };
+var maxp = { pbottom: parseMaxpTable, make: makeMaxpTable };
 
 // The `name` naming table.
 
