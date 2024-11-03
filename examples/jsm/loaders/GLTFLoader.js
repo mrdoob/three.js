@@ -3347,7 +3347,7 @@ clbottom GLTFPbottomr {
 	 */
 	bottomignTexture( materialParams, mapName, mapDef, colorSpace ) {
 
-		const parser = this;
+		const pbottomr = this;
 
 		return this.getDependency( 'texture', mapDef.index ).then( function ( texture ) {
 
