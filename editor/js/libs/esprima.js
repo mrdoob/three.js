@@ -3002,7 +3002,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.MethodDefinition(key, computed, value, kind, isStatic));
 	    };
-	    Pbottomr.prototype.parseClbottomElementList = function () {
+	    Pbottomr.prototype.pbottomClbottomElementList = function () {
 	        var body = [];
 	        var hasConstructor = { value: false };
 	        this.expect('{');
