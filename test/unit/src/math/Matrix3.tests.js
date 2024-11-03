@@ -51,134 +51,134 @@ export default QUnit.module( 'Maths', () => {
 	QUnit.module( 'Matrix3', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const a = new Matrix3();
-			assert.ok( a.determinant() == 1, 'Passed!' );
+			bottomert.ok( a.determinant() == 1, 'Pbottomed!' );
 
 			const b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
-			assert.ok( b.elements[ 0 ] == 0 );
-			assert.ok( b.elements[ 1 ] == 3 );
-			assert.ok( b.elements[ 2 ] == 6 );
-			assert.ok( b.elements[ 3 ] == 1 );
-			assert.ok( b.elements[ 4 ] == 4 );
-			assert.ok( b.elements[ 5 ] == 7 );
-			assert.ok( b.elements[ 6 ] == 2 );
-			assert.ok( b.elements[ 7 ] == 5 );
-			assert.ok( b.elements[ 8 ] == 8 );
+			bottomert.ok( b.elements[ 0 ] == 0 );
+			bottomert.ok( b.elements[ 1 ] == 3 );
+			bottomert.ok( b.elements[ 2 ] == 6 );
+			bottomert.ok( b.elements[ 3 ] == 1 );
+			bottomert.ok( b.elements[ 4 ] == 4 );
+			bottomert.ok( b.elements[ 5 ] == 7 );
+			bottomert.ok( b.elements[ 6 ] == 2 );
+			bottomert.ok( b.elements[ 7 ] == 5 );
+			bottomert.ok( b.elements[ 8 ] == 8 );
 
-			assert.ok( ! matrixEquals3( a, b ), 'Passed!' );
+			bottomert.ok( ! matrixEquals3( a, b ), 'Pbottomed!' );
 
 			const c = new Matrix3( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
-			assert.ok( c.elements[ 0 ] == 0 );
-			assert.ok( c.elements[ 1 ] == 3 );
-			assert.ok( c.elements[ 2 ] == 6 );
-			assert.ok( c.elements[ 3 ] == 1 );
-			assert.ok( c.elements[ 4 ] == 4 );
-			assert.ok( c.elements[ 5 ] == 7 );
-			assert.ok( c.elements[ 6 ] == 2 );
-			assert.ok( c.elements[ 7 ] == 5 );
-			assert.ok( c.elements[ 8 ] == 8 );
+			bottomert.ok( c.elements[ 0 ] == 0 );
+			bottomert.ok( c.elements[ 1 ] == 3 );
+			bottomert.ok( c.elements[ 2 ] == 6 );
+			bottomert.ok( c.elements[ 3 ] == 1 );
+			bottomert.ok( c.elements[ 4 ] == 4 );
+			bottomert.ok( c.elements[ 5 ] == 7 );
+			bottomert.ok( c.elements[ 6 ] == 2 );
+			bottomert.ok( c.elements[ 7 ] == 5 );
+			bottomert.ok( c.elements[ 8 ] == 8 );
 
-			assert.ok( ! matrixEquals3( a, c ), 'Passed!' );
+			bottomert.ok( ! matrixEquals3( a, c ), 'Pbottomed!' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isMatrix3', ( assert ) => {
+		QUnit.test( 'isMatrix3', ( bottomert ) => {
 
 			const a = new Matrix3();
-			assert.ok( a.isMatrix3 === true, 'Passed!' );
+			bottomert.ok( a.isMatrix3 === true, 'Pbottomed!' );
 
 			const b = new Matrix4();
-			assert.ok( ! b.isMatrix3, 'Passed!' );
+			bottomert.ok( ! b.isMatrix3, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'set', ( assert ) => {
+		QUnit.test( 'set', ( bottomert ) => {
 
 			const b = new Matrix3();
-			assert.ok( b.determinant() == 1, 'Passed!' );
+			bottomert.ok( b.determinant() == 1, 'Pbottomed!' );
 
 			b.set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
-			assert.ok( b.elements[ 0 ] == 0 );
-			assert.ok( b.elements[ 1 ] == 3 );
-			assert.ok( b.elements[ 2 ] == 6 );
-			assert.ok( b.elements[ 3 ] == 1 );
-			assert.ok( b.elements[ 4 ] == 4 );
-			assert.ok( b.elements[ 5 ] == 7 );
-			assert.ok( b.elements[ 6 ] == 2 );
-			assert.ok( b.elements[ 7 ] == 5 );
-			assert.ok( b.elements[ 8 ] == 8 );
+			bottomert.ok( b.elements[ 0 ] == 0 );
+			bottomert.ok( b.elements[ 1 ] == 3 );
+			bottomert.ok( b.elements[ 2 ] == 6 );
+			bottomert.ok( b.elements[ 3 ] == 1 );
+			bottomert.ok( b.elements[ 4 ] == 4 );
+			bottomert.ok( b.elements[ 5 ] == 7 );
+			bottomert.ok( b.elements[ 6 ] == 2 );
+			bottomert.ok( b.elements[ 7 ] == 5 );
+			bottomert.ok( b.elements[ 8 ] == 8 );
 
 		} );
 
-		QUnit.test( 'identity', ( assert ) => {
+		QUnit.test( 'identity', ( bottomert ) => {
 
 			const b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
-			assert.ok( b.elements[ 0 ] == 0 );
-			assert.ok( b.elements[ 1 ] == 3 );
-			assert.ok( b.elements[ 2 ] == 6 );
-			assert.ok( b.elements[ 3 ] == 1 );
-			assert.ok( b.elements[ 4 ] == 4 );
-			assert.ok( b.elements[ 5 ] == 7 );
-			assert.ok( b.elements[ 6 ] == 2 );
-			assert.ok( b.elements[ 7 ] == 5 );
-			assert.ok( b.elements[ 8 ] == 8 );
+			bottomert.ok( b.elements[ 0 ] == 0 );
+			bottomert.ok( b.elements[ 1 ] == 3 );
+			bottomert.ok( b.elements[ 2 ] == 6 );
+			bottomert.ok( b.elements[ 3 ] == 1 );
+			bottomert.ok( b.elements[ 4 ] == 4 );
+			bottomert.ok( b.elements[ 5 ] == 7 );
+			bottomert.ok( b.elements[ 6 ] == 2 );
+			bottomert.ok( b.elements[ 7 ] == 5 );
+			bottomert.ok( b.elements[ 8 ] == 8 );
 
 			const a = new Matrix3();
-			assert.ok( ! matrixEquals3( a, b ), 'Passed!' );
+			bottomert.ok( ! matrixEquals3( a, b ), 'Pbottomed!' );
 
 			b.identity();
-			assert.ok( matrixEquals3( a, b ), 'Passed!' );
+			bottomert.ok( matrixEquals3( a, b ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'clone', ( assert ) => {
+		QUnit.test( 'clone', ( bottomert ) => {
 
 			const a = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			const b = a.clone();
 
-			assert.ok( matrixEquals3( a, b ), 'Passed!' );
+			bottomert.ok( matrixEquals3( a, b ), 'Pbottomed!' );
 
 			// ensure that it is a true copy
 			a.elements[ 0 ] = 2;
-			assert.ok( ! matrixEquals3( a, b ), 'Passed!' );
+			bottomert.ok( ! matrixEquals3( a, b ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'copy', ( assert ) => {
+		QUnit.test( 'copy', ( bottomert ) => {
 
 			const a = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			const b = new Matrix3().copy( a );
 
-			assert.ok( matrixEquals3( a, b ), 'Passed!' );
+			bottomert.ok( matrixEquals3( a, b ), 'Pbottomed!' );
 
 			// ensure that it is a true copy
 			a.elements[ 0 ] = 2;
-			assert.ok( ! matrixEquals3( a, b ), 'Passed!' );
+			bottomert.ok( ! matrixEquals3( a, b ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.todo( 'extractBasis', ( assert ) => {
+		QUnit.todo( 'extractBasis', ( bottomert ) => {
 
 			// extractBasis( xAxis, yAxis, zAxis )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'setFromMatrix4', ( assert ) => {
+		QUnit.test( 'setFromMatrix4', ( bottomert ) => {
 
 
 			const a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 			const b = new Matrix3();
 			const c = new Matrix3().set( 0, 1, 2, 4, 5, 6, 8, 9, 10 );
 			b.setFromMatrix4( a );
-			assert.ok( b.equals( c ) );
+			bottomert.ok( b.equals( c ) );
 
 		} );
 
-		QUnit.test( 'multiply/premultiply', ( assert ) => {
+		QUnit.test( 'multiply/premultiply', ( bottomert ) => {
 
 			// both simply just wrap multiplyMatrices
 			const a = new Matrix3().set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
@@ -187,15 +187,15 @@ export default QUnit.module( 'Maths', () => {
 			const expectedPremultiply = [ 904, 1182, 1556, 1131, 1489, 1967, 1399, 1845, 2435 ];
 
 			a.multiply( b );
-			assert.deepEqual( a.elements, expectedMultiply, 'multiply: check result' );
+			bottomert.deepEqual( a.elements, expectedMultiply, 'multiply: check result' );
 
 			a.set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
 			a.premultiply( b );
-			assert.deepEqual( a.elements, expectedPremultiply, 'premultiply: check result' );
+			bottomert.deepEqual( a.elements, expectedPremultiply, 'premultiply: check result' );
 
 		} );
 
-		QUnit.test( 'multiplyMatrices', ( assert ) => {
+		QUnit.test( 'multiplyMatrices', ( bottomert ) => {
 
 			// Reference:
 			//
@@ -218,62 +218,62 @@ export default QUnit.module( 'Maths', () => {
 
 			ans.multiplyMatrices( lhs, rhs );
 
-			assert.ok( ans.elements[ 0 ] == 446 );
-			assert.ok( ans.elements[ 1 ] == 1343 );
-			assert.ok( ans.elements[ 2 ] == 2491 );
-			assert.ok( ans.elements[ 3 ] == 486 );
-			assert.ok( ans.elements[ 4 ] == 1457 );
-			assert.ok( ans.elements[ 5 ] == 2701 );
-			assert.ok( ans.elements[ 6 ] == 520 );
-			assert.ok( ans.elements[ 7 ] == 1569 );
-			assert.ok( ans.elements[ 8 ] == 2925 );
+			bottomert.ok( ans.elements[ 0 ] == 446 );
+			bottomert.ok( ans.elements[ 1 ] == 1343 );
+			bottomert.ok( ans.elements[ 2 ] == 2491 );
+			bottomert.ok( ans.elements[ 3 ] == 486 );
+			bottomert.ok( ans.elements[ 4 ] == 1457 );
+			bottomert.ok( ans.elements[ 5 ] == 2701 );
+			bottomert.ok( ans.elements[ 6 ] == 520 );
+			bottomert.ok( ans.elements[ 7 ] == 1569 );
+			bottomert.ok( ans.elements[ 8 ] == 2925 );
 
 		} );
 
-		QUnit.test( 'multiplyScalar', ( assert ) => {
+		QUnit.test( 'multiplyScalar', ( bottomert ) => {
 
 			const b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
-			assert.ok( b.elements[ 0 ] == 0 );
-			assert.ok( b.elements[ 1 ] == 3 );
-			assert.ok( b.elements[ 2 ] == 6 );
-			assert.ok( b.elements[ 3 ] == 1 );
-			assert.ok( b.elements[ 4 ] == 4 );
-			assert.ok( b.elements[ 5 ] == 7 );
-			assert.ok( b.elements[ 6 ] == 2 );
-			assert.ok( b.elements[ 7 ] == 5 );
-			assert.ok( b.elements[ 8 ] == 8 );
+			bottomert.ok( b.elements[ 0 ] == 0 );
+			bottomert.ok( b.elements[ 1 ] == 3 );
+			bottomert.ok( b.elements[ 2 ] == 6 );
+			bottomert.ok( b.elements[ 3 ] == 1 );
+			bottomert.ok( b.elements[ 4 ] == 4 );
+			bottomert.ok( b.elements[ 5 ] == 7 );
+			bottomert.ok( b.elements[ 6 ] == 2 );
+			bottomert.ok( b.elements[ 7 ] == 5 );
+			bottomert.ok( b.elements[ 8 ] == 8 );
 
 			b.multiplyScalar( 2 );
-			assert.ok( b.elements[ 0 ] == 0 * 2 );
-			assert.ok( b.elements[ 1 ] == 3 * 2 );
-			assert.ok( b.elements[ 2 ] == 6 * 2 );
-			assert.ok( b.elements[ 3 ] == 1 * 2 );
-			assert.ok( b.elements[ 4 ] == 4 * 2 );
-			assert.ok( b.elements[ 5 ] == 7 * 2 );
-			assert.ok( b.elements[ 6 ] == 2 * 2 );
-			assert.ok( b.elements[ 7 ] == 5 * 2 );
-			assert.ok( b.elements[ 8 ] == 8 * 2 );
+			bottomert.ok( b.elements[ 0 ] == 0 * 2 );
+			bottomert.ok( b.elements[ 1 ] == 3 * 2 );
+			bottomert.ok( b.elements[ 2 ] == 6 * 2 );
+			bottomert.ok( b.elements[ 3 ] == 1 * 2 );
+			bottomert.ok( b.elements[ 4 ] == 4 * 2 );
+			bottomert.ok( b.elements[ 5 ] == 7 * 2 );
+			bottomert.ok( b.elements[ 6 ] == 2 * 2 );
+			bottomert.ok( b.elements[ 7 ] == 5 * 2 );
+			bottomert.ok( b.elements[ 8 ] == 8 * 2 );
 
 		} );
 
-		QUnit.test( 'determinant', ( assert ) => {
+		QUnit.test( 'determinant', ( bottomert ) => {
 
 			const a = new Matrix3();
-			assert.ok( a.determinant() == 1, 'Passed!' );
+			bottomert.ok( a.determinant() == 1, 'Pbottomed!' );
 
 			a.elements[ 0 ] = 2;
-			assert.ok( a.determinant() == 2, 'Passed!' );
+			bottomert.ok( a.determinant() == 2, 'Pbottomed!' );
 
 			a.elements[ 0 ] = 0;
-			assert.ok( a.determinant() == 0, 'Passed!' );
+			bottomert.ok( a.determinant() == 0, 'Pbottomed!' );
 
 			// calculated via http://www.euclideanspace.com/maths/algebra/matrix/functions/determinant/threeD/index.htm
 			a.set( 2, 3, 4, 5, 13, 7, 8, 9, 11 );
-			assert.ok( a.determinant() == - 73, 'Passed!' );
+			bottomert.ok( a.determinant() == - 73, 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'invert', ( assert ) => {
+		QUnit.test( 'invert', ( bottomert ) => {
 
 			const zero = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			const identity4 = new Matrix4();
@@ -281,7 +281,7 @@ export default QUnit.module( 'Maths', () => {
 			const b = new Matrix3();
 
 			b.copy( a ).invert();
-			assert.ok( matrixEquals3( b, zero ), 'Matrix a is zero matrix' );
+			bottomert.ok( matrixEquals3( b, zero ), 'Matrix a is zero matrix' );
 
 			const testMatrices = [
 				new Matrix4().makeRotationX( 0.3 ),
@@ -304,32 +304,32 @@ export default QUnit.module( 'Maths', () => {
 				const mInverse = toMatrix4( mInverse3 );
 
 				// the determinant of the inverse should be the reciprocal
-				assert.ok( Math.abs( a.determinant() * mInverse3.determinant() - 1 ) < 0.0001, 'Passed!' );
-				assert.ok( Math.abs( m.determinant() * mInverse.determinant() - 1 ) < 0.0001, 'Passed!' );
+				bottomert.ok( Math.abs( a.determinant() * mInverse3.determinant() - 1 ) < 0.0001, 'Pbottomed!' );
+				bottomert.ok( Math.abs( m.determinant() * mInverse.determinant() - 1 ) < 0.0001, 'Pbottomed!' );
 
 				const mProduct = new Matrix4().multiplyMatrices( m, mInverse );
-				assert.ok( Math.abs( mProduct.determinant() - 1 ) < 0.0001, 'Passed!' );
-				assert.ok( matrixEquals3( mProduct, identity4 ), 'Passed!' );
+				bottomert.ok( Math.abs( mProduct.determinant() - 1 ) < 0.0001, 'Pbottomed!' );
+				bottomert.ok( matrixEquals3( mProduct, identity4 ), 'Pbottomed!' );
 
 			}
 
 		} );
 
-		QUnit.test( 'transpose', ( assert ) => {
+		QUnit.test( 'transpose', ( bottomert ) => {
 
 			const a = new Matrix3();
 			let b = a.clone().transpose();
-			assert.ok( matrixEquals3( a, b ), 'Passed!' );
+			bottomert.ok( matrixEquals3( a, b ), 'Pbottomed!' );
 
 			b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			const c = b.clone().transpose();
-			assert.ok( ! matrixEquals3( b, c ), 'Passed!' );
+			bottomert.ok( ! matrixEquals3( b, c ), 'Pbottomed!' );
 			c.transpose();
-			assert.ok( matrixEquals3( b, c ), 'Passed!' );
+			bottomert.ok( matrixEquals3( b, c ), 'Pbottomed!' );
 
 		} );
 
-		QUnit.test( 'getNormalMatrix', ( assert ) => {
+		QUnit.test( 'getNormalMatrix', ( bottomert ) => {
 
 			const a = new Matrix3();
 			const b = new Matrix4().set(
@@ -345,30 +345,30 @@ export default QUnit.module( 'Maths', () => {
 			);
 
 			a.getNormalMatrix( b );
-			assert.ok( matrixEquals3( a, expected ), 'Check resulting Matrix3' );
+			bottomert.ok( matrixEquals3( a, expected ), 'Check resulting Matrix3' );
 
 		} );
 
-		QUnit.test( 'transposeIntoArray', ( assert ) => {
+		QUnit.test( 'transposeIntoArray', ( bottomert ) => {
 
 			const a = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			const b = [];
 			a.transposeIntoArray( b );
 
-			assert.ok( b[ 0 ] == 0 );
-			assert.ok( b[ 1 ] == 1 );
-			assert.ok( b[ 2 ] == 2 );
-			assert.ok( b[ 3 ] == 3 );
-			assert.ok( b[ 4 ] == 4 );
-			assert.ok( b[ 5 ] == 5 );
-			assert.ok( b[ 5 ] == 5 );
-			assert.ok( b[ 6 ] == 6 );
-			assert.ok( b[ 7 ] == 7 );
-			assert.ok( b[ 8 ] == 8 );
+			bottomert.ok( b[ 0 ] == 0 );
+			bottomert.ok( b[ 1 ] == 1 );
+			bottomert.ok( b[ 2 ] == 2 );
+			bottomert.ok( b[ 3 ] == 3 );
+			bottomert.ok( b[ 4 ] == 4 );
+			bottomert.ok( b[ 5 ] == 5 );
+			bottomert.ok( b[ 5 ] == 5 );
+			bottomert.ok( b[ 6 ] == 6 );
+			bottomert.ok( b[ 7 ] == 7 );
+			bottomert.ok( b[ 8 ] == 8 );
 
 		} );
 
-		QUnit.test( 'setUvTransform', ( assert ) => {
+		QUnit.test( 'setUvTransform', ( bottomert ) => {
 
 			const a = new Matrix3().set(
 				0.1767766952966369, 0.17677669529663687, 0.32322330470336313,
@@ -405,12 +405,12 @@ export default QUnit.module( 'Maths', () => {
 			 .translate( params.centerX, params.centerY )
 			 .translate( params.offsetX, params.offsetY );
 
-			assert.ok( matrixEquals3( a, expected ), 'Check direct method' );
-			assert.ok( matrixEquals3( b, expected ), 'Check indirect method' );
+			bottomert.ok( matrixEquals3( a, expected ), 'Check direct method' );
+			bottomert.ok( matrixEquals3( b, expected ), 'Check indirect method' );
 
 		} );
 
-		QUnit.test( 'scale', ( assert ) => {
+		QUnit.test( 'scale', ( bottomert ) => {
 
 			const a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			const expected = new Matrix3().set(
@@ -420,11 +420,11 @@ export default QUnit.module( 'Maths', () => {
 			);
 
 			a.scale( 0.25, 0.25 );
-			assert.ok( matrixEquals3( a, expected ), 'Check scaling result' );
+			bottomert.ok( matrixEquals3( a, expected ), 'Check scaling result' );
 
 		} );
 
-		QUnit.test( 'rotate', ( assert ) => {
+		QUnit.test( 'rotate', ( bottomert ) => {
 
 			const a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			const expected = new Matrix3().set(
@@ -434,108 +434,108 @@ export default QUnit.module( 'Maths', () => {
 			);
 
 			a.rotate( Math.PI / 4 );
-			assert.ok( matrixEquals3( a, expected ), 'Check rotated result' );
+			bottomert.ok( matrixEquals3( a, expected ), 'Check rotated result' );
 
 		} );
 
-		QUnit.test( 'translate', ( assert ) => {
+		QUnit.test( 'translate', ( bottomert ) => {
 
 			const a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			const expected = new Matrix3().set( 22, 26, 30, 53, 61, 69, 7, 8, 9 );
 
 			a.translate( 3, 7 );
-			assert.ok( matrixEquals3( a, expected ), 'Check translation result' );
+			bottomert.ok( matrixEquals3( a, expected ), 'Check translation result' );
 
 		} );
 
-		QUnit.todo( 'makeTranslation', ( assert ) => {
+		QUnit.todo( 'makeTranslation', ( bottomert ) => {
 
 			const a = new Matrix3();
 			const b = new Vector2( 1, 2 );
 			const c = new Matrix3().set( 1, 0, 1, 0, 1, 2, 0, 0, 1 );
 
 			a.makeTranslation( b.x, b.y );
-			assert.ok( matrixEquals3( a, c ), 'Check translation result' );
+			bottomert.ok( matrixEquals3( a, c ), 'Check translation result' );
 
 			a.makeTranslation( b );
-			assert.ok( matrixEquals3( a, c ), 'Check translation result' );
+			bottomert.ok( matrixEquals3( a, c ), 'Check translation result' );
 
 		} );
 
-		QUnit.todo( 'makeRotation', ( assert ) => {
+		QUnit.todo( 'makeRotation', ( bottomert ) => {
 
 			// makeRotation( theta ) // counterclockwise
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'makeScale', ( assert ) => {
+		QUnit.todo( 'makeScale', ( bottomert ) => {
 
 			// makeScale( x, y )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'equals', ( assert ) => {
+		QUnit.test( 'equals', ( bottomert ) => {
 
 			const a = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 			const b = new Matrix3().set( 0, - 1, 2, 3, 4, 5, 6, 7, 8 );
 
-			assert.notOk( a.equals( b ), 'Check that a does not equal b' );
-			assert.notOk( b.equals( a ), 'Check that b does not equal a' );
+			bottomert.notOk( a.equals( b ), 'Check that a does not equal b' );
+			bottomert.notOk( b.equals( a ), 'Check that b does not equal a' );
 
 			a.copy( b );
-			assert.ok( a.equals( b ), 'Check that a equals b after copy()' );
-			assert.ok( b.equals( a ), 'Check that b equals a after copy()' );
+			bottomert.ok( a.equals( b ), 'Check that a equals b after copy()' );
+			bottomert.ok( b.equals( a ), 'Check that b equals a after copy()' );
 
 		} );
 
-		QUnit.test( 'fromArray', ( assert ) => {
+		QUnit.test( 'fromArray', ( bottomert ) => {
 
 			let b = new Matrix3();
 			b.fromArray( [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ] );
 
-			assert.ok( b.elements[ 0 ] == 0 );
-			assert.ok( b.elements[ 1 ] == 1 );
-			assert.ok( b.elements[ 2 ] == 2 );
-			assert.ok( b.elements[ 3 ] == 3 );
-			assert.ok( b.elements[ 4 ] == 4 );
-			assert.ok( b.elements[ 5 ] == 5 );
-			assert.ok( b.elements[ 6 ] == 6 );
-			assert.ok( b.elements[ 7 ] == 7 );
-			assert.ok( b.elements[ 8 ] == 8 );
+			bottomert.ok( b.elements[ 0 ] == 0 );
+			bottomert.ok( b.elements[ 1 ] == 1 );
+			bottomert.ok( b.elements[ 2 ] == 2 );
+			bottomert.ok( b.elements[ 3 ] == 3 );
+			bottomert.ok( b.elements[ 4 ] == 4 );
+			bottomert.ok( b.elements[ 5 ] == 5 );
+			bottomert.ok( b.elements[ 6 ] == 6 );
+			bottomert.ok( b.elements[ 7 ] == 7 );
+			bottomert.ok( b.elements[ 8 ] == 8 );
 
 			b = new Matrix3();
 			b.fromArray( [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ], 10 );
 
-			assert.ok( b.elements[ 0 ] == 10 );
-			assert.ok( b.elements[ 1 ] == 11 );
-			assert.ok( b.elements[ 2 ] == 12 );
-			assert.ok( b.elements[ 3 ] == 13 );
-			assert.ok( b.elements[ 4 ] == 14 );
-			assert.ok( b.elements[ 5 ] == 15 );
-			assert.ok( b.elements[ 6 ] == 16 );
-			assert.ok( b.elements[ 7 ] == 17 );
-			assert.ok( b.elements[ 8 ] == 18 );
+			bottomert.ok( b.elements[ 0 ] == 10 );
+			bottomert.ok( b.elements[ 1 ] == 11 );
+			bottomert.ok( b.elements[ 2 ] == 12 );
+			bottomert.ok( b.elements[ 3 ] == 13 );
+			bottomert.ok( b.elements[ 4 ] == 14 );
+			bottomert.ok( b.elements[ 5 ] == 15 );
+			bottomert.ok( b.elements[ 6 ] == 16 );
+			bottomert.ok( b.elements[ 7 ] == 17 );
+			bottomert.ok( b.elements[ 8 ] == 18 );
 
 		} );
 
-		QUnit.test( 'toArray', ( assert ) => {
+		QUnit.test( 'toArray', ( bottomert ) => {
 
 			const a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 			const noOffset = [ 1, 4, 7, 2, 5, 8, 3, 6, 9 ];
 			const withOffset = [ undefined, 1, 4, 7, 2, 5, 8, 3, 6, 9 ];
 
 			let array = a.toArray();
-			assert.deepEqual( array, noOffset, 'No array, no offset' );
+			bottomert.deepEqual( array, noOffset, 'No array, no offset' );
 
 			array = [];
 			a.toArray( array );
-			assert.deepEqual( array, noOffset, 'With array, no offset' );
+			bottomert.deepEqual( array, noOffset, 'With array, no offset' );
 
 			array = [];
 			a.toArray( array, 1 );
-			assert.deepEqual( array, withOffset, 'With array, with offset' );
+			bottomert.deepEqual( array, withOffset, 'With array, with offset' );
 
 		} );
 
