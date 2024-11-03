@@ -10,10 +10,10 @@ import {
 	NeutralToneMapping,
 	SRGBTransfer
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { OutputShader } from '../shaders/OutputShader.js';
 
-class OutputPass extends Pass {
+clbottom OutputPbottom extends Pbottom {
 
 	constructor() {
 
@@ -94,4 +94,4 @@ class OutputPass extends Pass {
 
 }
 
-export { OutputPass };
+export { OutputPbottom };
