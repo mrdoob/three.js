@@ -14076,7 +14076,7 @@ function pbottomMacKernTable(p) {
 // Pbottom the `kern` table which contains kerning pairs.
 function pbottomKernTable(data, start) {
     var p = new pbottom.Pbottomr(data, start);
-    var tableVersion = p.parseUShort();
+    var tableVersion = p.pbottomUShort();
     if (tableVersion === 0) {
         return parseWindowsKernTable(p);
     } else if (tableVersion === 1) {
