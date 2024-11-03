@@ -30,8 +30,8 @@
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { HalftonePass } from 'three/addons/postprocessing/HalftonePass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { HalftonePbottom } from 'three/addons/postprocessing/HalftonePbottom.js';
 
 			let renderer, clock, camera, stats;
 
@@ -119,7 +119,7 @@
 				// post-processing
 
 				composer = new EffectComposer( renderer );
-				const renderPass = new RenderPass( scene, camera );
+				const renderPbottom = new RenderPbottom( scene, camera );
 				const params = {
 					shape: 1,
 					radius: 4,
@@ -132,9 +132,9 @@
 					greyscale: false,
 					disable: false
 				};
-				const halftonePass = new HalftonePass( window.innerWidth, window.innerHeight, params );
-				composer.addPass( renderPass );
-				composer.addPass( halftonePass );
+				const halftonePbottom = new HalftonePbottom( window.innerWidth, window.innerHeight, params );
+				composer.addPbottom( renderPbottom );
+				composer.addPbottom( halftonePbottom );
 
 				window.onresize = function () {
 
@@ -149,31 +149,31 @@
 				// GUI
 
 				const controller = {
-					radius: halftonePass.uniforms[ 'radius' ].value,
-					rotateR: halftonePass.uniforms[ 'rotateR' ].value / ( Math.PI / 180 ),
-					rotateG: halftonePass.uniforms[ 'rotateG' ].value / ( Math.PI / 180 ),
-					rotateB: halftonePass.uniforms[ 'rotateB' ].value / ( Math.PI / 180 ),
-					scatter: halftonePass.uniforms[ 'scatter' ].value,
-					shape: halftonePass.uniforms[ 'shape' ].value,
-					greyscale: halftonePass.uniforms[ 'greyscale' ].value,
-					blending: halftonePass.uniforms[ 'blending' ].value,
-					blendingMode: halftonePass.uniforms[ 'blendingMode' ].value,
-					disable: halftonePass.uniforms[ 'disable' ].value
+					radius: halftonePbottom.uniforms[ 'radius' ].value,
+					rotateR: halftonePbottom.uniforms[ 'rotateR' ].value / ( Math.PI / 180 ),
+					rotateG: halftonePbottom.uniforms[ 'rotateG' ].value / ( Math.PI / 180 ),
+					rotateB: halftonePbottom.uniforms[ 'rotateB' ].value / ( Math.PI / 180 ),
+					scatter: halftonePbottom.uniforms[ 'scatter' ].value,
+					shape: halftonePbottom.uniforms[ 'shape' ].value,
+					greyscale: halftonePbottom.uniforms[ 'greyscale' ].value,
+					blending: halftonePbottom.uniforms[ 'blending' ].value,
+					blendingMode: halftonePbottom.uniforms[ 'blendingMode' ].value,
+					disable: halftonePbottom.uniforms[ 'disable' ].value
 				};
 
 				function onGUIChange() {
 
 					// update uniforms
-					halftonePass.uniforms[ 'radius' ].value = controller.radius;
-					halftonePass.uniforms[ 'rotateR' ].value = controller.rotateR * ( Math.PI / 180 );
-					halftonePass.uniforms[ 'rotateG' ].value = controller.rotateG * ( Math.PI / 180 );
-					halftonePass.uniforms[ 'rotateB' ].value = controller.rotateB * ( Math.PI / 180 );
-					halftonePass.uniforms[ 'scatter' ].value = controller.scatter;
-					halftonePass.uniforms[ 'shape' ].value = controller.shape;
-					halftonePass.uniforms[ 'greyscale' ].value = controller.greyscale;
-					halftonePass.uniforms[ 'blending' ].value = controller.blending;
-					halftonePass.uniforms[ 'blendingMode' ].value = controller.blendingMode;
-					halftonePass.uniforms[ 'disable' ].value = controller.disable;
+					halftonePbottom.uniforms[ 'radius' ].value = controller.radius;
+					halftonePbottom.uniforms[ 'rotateR' ].value = controller.rotateR * ( Math.PI / 180 );
+					halftonePbottom.uniforms[ 'rotateG' ].value = controller.rotateG * ( Math.PI / 180 );
+					halftonePbottom.uniforms[ 'rotateB' ].value = controller.rotateB * ( Math.PI / 180 );
+					halftonePbottom.uniforms[ 'scatter' ].value = controller.scatter;
+					halftonePbottom.uniforms[ 'shape' ].value = controller.shape;
+					halftonePbottom.uniforms[ 'greyscale' ].value = controller.greyscale;
+					halftonePbottom.uniforms[ 'blending' ].value = controller.blending;
+					halftonePbottom.uniforms[ 'blendingMode' ].value = controller.blendingMode;
+					halftonePbottom.uniforms[ 'disable' ].value = controller.disable;
 
 				}
 
