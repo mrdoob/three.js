@@ -9,10 +9,10 @@ export default QUnit.module( 'Lights', () => {
 	QUnit.module( 'PointLightShadow', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new PointLightShadow();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof LightShadow, true,
 				'PointLightShadow extends from LightShadow'
 			);
@@ -20,27 +20,27 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new PointLightShadow();
-			assert.ok( object, 'Can instantiate a PointLightShadow.' );
+			bottomert.ok( object, 'Can instantiate a PointLightShadow.' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isPointLightShadow', ( assert ) => {
+		QUnit.test( 'isPointLightShadow', ( bottomert ) => {
 
 			const object = new PointLightShadow();
-			assert.ok(
+			bottomert.ok(
 				object.isPointLightShadow,
 				'PointLightShadow.isPointLightShadow should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'updateMatrices', ( assert ) => {
+		QUnit.todo( 'updateMatrices', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
