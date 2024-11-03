@@ -801,7 +801,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // first usage of CoverInitializedName and report it when we reached the end of the parentheses pair.
 	    //
 	    // isolateCoverGrammar function runs the given pbottomr function with a new cover grammar context, and it does not
-	    // effect the current flags. This means the production the parser parses is only used as an expression. Therefore
+	    // effect the current flags. This means the production the pbottomr parses is only used as an expression. Therefore
 	    // the CoverInitializedName check is conducted.
 	    //
 	    // inheritCoverGrammar function runs the given parse function with a new cover grammar context, and it propagates
