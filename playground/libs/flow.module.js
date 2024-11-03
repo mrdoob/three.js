@@ -16,13 +16,13 @@ function __flow__addCSS( css ) {
 
 }
 
-__flow__addCSS( `f-element .ti { vertical-align: middle; font-size: 17px; display: inline-block; margin-right: 5px;}f-element f-disconnect .ti { font-size: 20px; margin-top: -6px; margin-left: 2px;}@keyframes f-animation-open { 0% { transform: scale(.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; }}f-canvas,f-canvas canvas.background,f-canvas canvas.frontground { position: absolute; top: 0; left: 0; margin: 0; padding: 0; width: 100%; height: 100%; -webkit-touch-callout: none; transition: opacity .17s;}f-canvas { cursor: grab;}f-canvas canvas.frontground { z-index: 10;}body.dragging *:not(.drag) { pointer-events: none !important;}f-canvas.grabbing * { cursor: grabbing; user-select: none;}f-canvas canvas.background,f-canvas canvas.frontground { position: fixed; overflow: hidden;}f-canvas canvas.frontground { pointer-events: none;}::-webkit-scrollbar { width: 6px; height: 6px;}::-webkit-scrollbar-thumb:hover{ background: #014fc5;}::-webkit-scrollbar-track { background: #363636;}::-webkit-scrollbar-thumb { background-color: #666666; border-radius: 8px; border: 0;}f-canvas f-content { left: 0; top: 0;}f-canvas f-content,f-canvas f-area { position: absolute; display: block;}f-canvas canvas.map { position: absolute; top: 10px; right: 10px; z-index: 50; backdrop-filter: blur( 10px ); background-color: rgba( 45, 45, 48, .8 );}f-node { position: absolute; margin: 0; padding: 0; user-select: none; width: 320px; z-index: 1; cursor: auto; filter: drop-shadow(0 0 10px #00000061); backdrop-filter: blur(4px);}f-node.selected { z-index: 2;}f-canvas.focusing canvas.background,f-canvas.focusing f-node:not(.selected),f-canvas.focusing f-element f-disconnect:not(.selected) { opacity: 0; pointer-events: none;}.dragging f-canvas f-element f-disconnect { opacity: 0;}.dragging.node f-canvas.focusing canvas.background,.dragging.node f-canvas.focusing f-node:not(.selected) { opacity: .5;}f-node.selected,f-canvas.dragging-rio f-node:hover,f-canvas.dragging-lio f-node:hover { filter: drop-shadow(0 0 10px #00000061) drop-shadow(0 0 8px #4444dd);}f-node.closed f-element:not(:first-child) { display: none;}f-node.center { top: 50%; left: 50%; transform: translate( -50%, -50% );}f-node.top-right { top: 0; right: 0;}f-node.top-center { top: 0; left: 50%; transform: translateX( -50% );}f-node.top-left { top: 0; left: 0;}f-node { transition: filter 0.2s ease, opacity 0.12s ease;}f-node { animation: .2s f-animation-open 1 alternate ease-out;}f-tips,f-drop,f-menu,f-menu input,f-menu button,f-element,f-element input,f-element select,f-element button,f-element textarea { font-family: 'Open Sans', sans-serif; font-size: 12px; text-transform: initial; line-height: normal; color: #eeeeee; outline: solid 0px #000; margin: 0; padding: 0; border: 0; user-select: none; -webkit-tap-highlight-color: transparent; transition: background 0.2s ease, filter 0.2s ease;}f-node.resizable { display: grid; width: auto !important;}f-node.resizable f-element:last-child { resize: both; overflow: auto; min-width: 100px;}f-element input:read-only { color: #666;}f-element input,f-element textarea { text-transform: initial;}f-element input { transition: background 0.1s ease;}f-element input,f-element select,f-element button,f-element textarea { background-color: #232324d1;}f-element { position: relative; width: calc( 100% - 14px ); background: rgba(45, 45, 48, 0.95); pointer-events: auto; border-bottom: 2px solid #232323; display: flex; padding-left: 7px; padding-right: 7px; padding-top: 2px; padding-bottom: 2px;}f-element:after,f-element:before { transition: opacity .17s; opacity: 0; content: '';}f-element[tooltip]:hover:after,f-element[tooltip]:focus-within:after { font-size: 14px !important; display: flex; justify-content: center; position: fixed; margin-left: -7px; width: calc( 100% ); background: #1d1d1de8; border: 1px solid #444444a1; border-radius: 6px; color: #dadada; content: attr( tooltip ); margin-top: -41px; font-size: 16px; padding-top: 3px; padding-bottom: 3px; z-index: 10; opacity: 1; backdrop-filter: blur(4px); white-space: nowrap; overflow: hidden; text-shadow: 1px 1px 0px #0007;}f-element[tooltip]:hover:before,f-element[tooltip]:focus-within:before { border: solid; border-color: #1d1d1de8 transparent; border-width: 12px 6px 0 6px; left: calc( 50% - 6px ); bottom: 30px; position: absolute; opacity: 1; z-index: 11;}f-element[error] { background-color: #ff0000;}f-element[error]:hover:after,f-element[error]:focus-within:after { border: none; background-color: #ff0000bb; filter: drop-shadow( 2px 2px 5px #000 ); color: #fff;}f-element[error]:hover:before,f-element[error]:focus-within:before { border-color: #ff0000bb transparent;}f-element { height: 24px;}f-element input { margin-top: 2px; margin-bottom: 2px; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%); margin-left: 2px; margin-right: 2px; width: 100%; padding-left: 4px; padding-right: 4px; line-height: 100%;}f-element f-string:has( i[type=icon] ) input { padding-right: 23px;}f-element input.number { cursor: col-resize;}f-element input:focus[type='text'], f-element input:focus[type='range'], f-element input:focus[type='color'] { background: rgba( 0, 0, 0, 0.6 ); outline: solid 1px rgba( 0, 80, 200, 0.98 );}f-element input[type='color'] { appearance: none; padding: 0; margin-left: 2px; margin-right: 2px; height: calc( 100% - 4px ); margin-top: 2px; border: none;}f-element input[type='color']::-webkit-color-swatch-wrapper { padding: 2px;}f-element input[type='color']::-webkit-color-swatch { border: none; cursor: alias;}f-element input[type='range'] { appearance: none; width: 100%; overflow: hidden; padding: 0; cursor: ew-resize;}f-element input[type='range']::-webkit-slider-runnable-track { appearance: none; height: 10px; color: #13bba4; margin: 0;}f-element input[type='range']::-webkit-slider-thumb { appearance: none; width: 0; background: #434343; box-shadow: -500px 0 0 500px rgba( 0, 120, 255, 0.98 ); border-radius: 50%; border: 0 !important;}f-element input[type='range']::-webkit-slider-runnable-track { margin-left: -4px; margin-right: -5px;}f-element input[type='checkbox'] { appearance: none; cursor: pointer;}f-element input[type='checkbox'].toggle { height: 20px; width: 45px; border-radius: 16px; display: inline-block; position: relative; margin: 0; margin-top: 2px; background: linear-gradient( 0deg, #292929 0%, #0a0a0ac2 100% ); transition: all 0.2s ease;}f-element input[type='checkbox'].toggle:after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: white; box-shadow: 0 1px 2px rgba(44, 44, 44, 0.2); transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);}f-element input[type='checkbox'].toggle:checked { background: linear-gradient( 0deg, #0177fb 0%, #0177fb 100% );}f-element input[type='checkbox'].toggle:checked:after { transform: translatex(25px);}f-element.auto-height { display: table;}f-element textarea { width: calc( 100% - 18px ); padding-top: 1px; padding-bottom: 3px; padding-left: 4px; padding-right: 8px; margin-top: 2px; margin-left: 2px; height: calc( 100% - 8px ); max-height: 300px; border-radius: 2px; resize: none; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-element.auto-height textarea { resize: auto;}f-element select { width: 100%; margin-top: 2px; margin-bottom: 2px; margin-left: 2px; margin-right: 2px; cursor: pointer; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-element f-toolbar { position: absolute; top: 0; height: 100%; align-content: space-around; margin-top: auto; margin-bottom: auto; margin-left: 6px; margin-right: 6px; font-size: 18px; line-height: 18px; display: inline-flex; justify-content: flex-end; left: 2px;}f-element f-toolbar button { opacity: .7; cursor: pointer; font-size: 14px; width: unset; height: unset; border-radius: unset; border: unset; outline: 0; background-color: unset; box-shadow: unset; padding-right: 0; padding-left: 0; margin-left: 0; margin-right: 0;}f-element f-toolbar button span { padding-right: 5px;}f-element f-toolbar button:hover,f-element f-toolbar button:active { opacity: 1; border: 0; background-color: unset;}f-element input.range-value { width: 60px; text-align: center;}f-menu.context button,f-element button { width: 100%; height: calc( 100% - 4px ); margin-left: 2px; margin-right: 2px; margin-top: 3px; border-radius: 3px; cursor: pointer;}f-element button { box-shadow: inset 1px 1px 1px 0 rgb(255 255 255 / 17%), inset -2px -2px 2px 0 rgb(0 0 0 / 26%);}f-element button:hover { color: #fff; background-color: #2a2a2a;}f-element button:active { border: 1px solid rgba( 0, 120, 255, 0.98 );}f-element f-inputs,f-element f-subinputs { display: flex; justify-content: flex-end; width: 100%;}f-element f-inputs { left: 100px; top: 50%; transform: translateY( -50% ); position: absolute; width: calc( 100% - 106px ); height: calc( 100% - 4px );}f-element.inputs-disable f-inputs { filter: grayscale(100%); opacity: .5;}f-element.inputs-disable f-inputs input { pointer-events: none;}f-element f-label,f-element span { margin: auto; text-shadow: 1px 1px 0px #0007;}f-element f-label { padding-left: 4px; white-space: nowrap; position: absolute; top: 50%; transform: translateY( -50% ); width: calc( 100% - 20px );}f-element.right f-label { text-align: right;}f-element.center f-label { text-align: center;}f-element f-label i { font-size: 18px; margin-right: 4px; vertical-align: sub; margin-right: 0;}f-element f-label.center { width: 100%; text-align: center; display: block;}f-element.title { height: 29px; background-color: #3a3a3ab0; background-color: #3b3b43ed; cursor: all-scroll; border-top-left-radius: 6px; border-top-right-radius: 6px;}f-element:last-child { border-bottom-left-radius: 6px; border-bottom-right-radius: 6px;}f-element.blue { background-color: #014fc5;}f-element.red { background-color: #bd0b0b;}f-element.green { background-color: #148d05;}f-element.yellow { background-color: #d6b100;}f-element.title.left { text-align: left; display: inline-grid; justify-content: start;}f-element.title f-title { text-align: center; font-size: 15px; position: absolute; top: 50%; transform: translateY( -50% ); width: calc( 100% - 14px );}f-element.title > i { font-size: 21px; position: absolute; right: 8px; top: 50%; transform: translateY( -50% ); opacity: .7;}f-element.title f-toolbar i { font-size: 22px; display: contents; right: unset; left: unset;}f-element.title.left span { text-align: left;}f-element f-io { border: 2px solid #dadada; width: 7px; height: 7px; position: absolute; background: #242427; border-radius: 8px; float: left; left: -7px; top: calc( 50% - 5px ); cursor: alias; box-shadow: 0 0 3px 2px #0000005e; z-index: 1;}f-element f-io.connect,f-canvas.dragging-rio f-element:hover f-io.lio,f-canvas.dragging-lio f-element:hover f-io.rio { zoom: 1.4;}f-node.io-connect f-io:not(.connect) { border: 2px solid #dadada !important; zoom: 1 !important;}f-element f-io.rio { float: right; right: -7px; left: unset;}f-element f-disconnect { position: absolute; left: -35px; top: 50%; font-size: 22px; transform: translateY( -50% ); filter: drop-shadow(0 0 5px #000); text-shadow: 0px 0px 5px black; cursor: pointer; transition: all .2s;}f-element.input-right f-disconnect { right: -35px; left: unset;}f-element f-disconnect:hover { color: #ff3300;}f-element textarea::-webkit-scrollbar { width: 6px;}f-element textarea::-webkit-scrollbar-track { background: #111; } f-element textarea::-webkit-scrollbar-thumb { background: #0177fb; }f-element textarea::-webkit-scrollbar-thumb:hover { background: #1187ff; }f-element.small { height: 18px;}f-element.large { height: 36px;}f-canvas.dragging-lio f-node:not(.io-connect) f-element.rio:hover,f-canvas.dragging-rio f-node:not(.io-connect) f-element.lio:hover,f-element.select { background-color: rgba(61, 70, 82, 0.98);}f-element.invalid > f-io { zoom: 1 !important;}f-element.invalid::after,.zoom f-element.no-zoom::after { font-size: 14px !important; display: flex; justify-content: center; align-items:center; margin: auto; position: absolute; width: 100%; height: 100%; background: #bd0b0b77; vertical-align: middle; color: #fff; content: 'Incompatible!'; opacity: .95; backdrop-filter: grayscale(100%); white-space: nowrap; overflow: hidden; left: 0; top: 0; text-transform: initial;}.zoom f-element.no-zoom::after { background: #0b3fbd77; content: 'Incompatible with zoom!';}f-treeview { width: 100%; background-color: #232324d1; border-radius: 2px; overflow-y: auto; overflow-x: hidden; margin-top: 2px; margin-left: 2px; height: calc( 100% - 6px ); box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-treeview f-treeview-node { position: relative; margin-top: 1px; min-height: 24px;}f-treeview f-treeview-node f-treeview-children { position: relative; display: none; padding-left: 16px;}f-treeview f-treeview-node input[type='checkbox'] { position: absolute; width: 100%; height: 24px; margin-top: 0px; background: none; box-shadow: none; cursor: default; width: calc( 100% + 100px ); padding-top: 3px; margin-left: -100px;}f-treeview f-treeview-node input[type='checkbox']:checked ~ f-treeview-children { display: block;}f-treeview f-arrow { border: solid #999; border-width: 0 2px 2px 0; display: inline-block; padding: 3px; position: absolute; right: 10px; margin-top: 8px; transform: rotate( -45deg ); transition: all 0.1s ease; pointer-events: none;}f-treeview f-treeview-node input[type='checkbox']:checked ~ f-arrow { margin-top: 7px; transform: rotate( 45deg );}f-treeview f-treeview-label { display: flex; align-content: center; width: 100%; height: 22px; background: none; box-shadow: none; cursor: default; width: calc( 100% + 100px ); padding-top: 3px; margin-left: -100px; padding-left: 105px; border-bottom: 1px solid #333; pointer-events: none; z-index: 1;}f-treeview f-treeview-node input[type='checkbox']:hover { background: #2c2c2f;}f-treeview f-treeview-node:has( f-arrow ) > input[type='checkbox'] { background: #2c2c2f;}f-treeview f-treeview-node:has( f-arrow ) > input[type='checkbox']:hover { background: #333339;}f-treeview f-treeview-label { color: #aaa;}f-treeview f-treeview-label spam { margin-top: 1px;}f-treeview f-treeview-label i { color: #ccc; transition: color 0.1s ease; margin-top: 1px;}f-treeview f-treeview-node { position: relative; display: flex; flex-direction: column;}f-treeview f-treeview-node input[type='checkbox']:hover ~ f-treeview-label { color: #eee;}f-treeview f-treeview-node input[type='checkbox']:hover ~ f-treeview-label i { color: #fff;}f-menu.context f-item f-node { position: relative; display: block; width: calc( 100% - 6px ) !important; margin: 3px; animation: unset;}f-treeview f-treeview-node.selected > input[type='checkbox'] { background-color: #014fc5;}f-treeview f-treeview-node.selected > f-treeview-label,f-treeview f-treeview-node.selected > f-treeview-label i { color: #fff;}f-treeview f-treeview-node.selected > input[type='checkbox']:hover { background-color: #06f;}f-string { display: contents;}f-string f-buttons { position: absolute; top: 50%; right: 1px; transform: translateY( -50% );}f-string f-buttons i { color: #999; padding-left: 4px; padding-right: 4px; padding-bottom: 1px; margin-right: 1px; cursor: pointer; background: #252526eb; height: 100%; padding-top: 1px; margin-right: 1px !important;}f-string i[type=icon] { color: #999; position: absolute; right: 8px; top: calc( 50% - 8px ); margin-right: 5px;}f-inputs f-string i[type=icon] { right: 0;}f-string f-buttons i:hover { color: #eeeeee;}f-string input:focus ~ f-string { opacity: .9;}f-string:hover input::placeholder { color: #999;}f-string f-treeview { position: absolute; max-height: 200px; height: 200px; background-color: #000; z-index: 10;}f-drop { width: 100%; height: 100%; position: sticky; left: 0; top: 0; background: #02358417; text-align: center; justify-content: center; align-items: center; display: flex; box-shadow: inset 0 0 20px 10px #464ace17; pointer-events: none; transition: all .07s; opacity: 0; visibility: hidden;}f-drop.visible { visibility: unset; opacity: unset; transition: all .23s;}f-drop span { opacity: .5; font-size: 40px; text-shadow: 0px 0px 5px #000; font-weight: bold;}f-tooltip { pointer-events: none;}f-tooltip { position: absolute; left: 0; top: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(4px); font-size: 14px; padding: 7px; left: 50%; border-radius: 10px; transform: translateX(-50%); visibility: hidden; pointer-events: none; opacity: 0; transition: all 0.3s ease; z-index: 150; white-space: nowrap;}f-menu.context,f-menu.search { position: absolute;}f-menu.context { width: 170px; z-index: 110;}f-menu.search { bottom: 85px; left: 50%; transform: translateX(-50%); z-index: 10; width: 300px;}f-menu.context f-list { display: block; margin: 0; background: #171717e6; font-size: 12px; border-radius: 6px; backdrop-filter: blur(6px); border: 1px solid #7e7e7e45; box-shadow: 3px 3px 6px rgba(0,0,0,.2); transition: opacity 0.2s ease, transform 0.1s ease;}f-menu.search f-list { margin: 0 6px 0 6px; display: flex; flex-direction: column-reverse; margin-bottom: 5px;}f-menu.context.hidden { visibility: hidden; opacity: 0;}f-menu.context f-item,f-menu.search f-item { display: block; position: relative; margin: 0; padding: 0; white-space: nowrap;}f-menu.search f-item { opacity: 0;}f-menu.context f-item.submenu::after { content: ""; position: absolute; right: 6px; top: 50%; -webkit-transform: translateY( -50% ); transform: translateY( -50% ); border: 5px solid transparent; border-left-color: #808080;}f-menu.context f-item:hover > f-menu,f-menu.context f-item.active > f-menu { visibility: unset; transform: unset; opacity: unset;}f-menu.context f-menu { top: 0px; left: calc( 100% - 4px );}f-menu.context f-item button,f-menu.search f-item button { overflow: visible; display: block; width: calc( 100% - 6px ); text-align: left; cursor: pointer; white-space: nowrap; padding: 6px 8px; border-radius: 3px; background: rgba(45, 45, 48, 0.95); border: 0; color: #ddd; margin: 3px; text-shadow: 1px 1px 0px #0007;}f-menu.context f-item button i,f-menu.search f-item button i { float: left; font-size: 20px; margin-top: -1px; margin-right: 3px;}f-menu.context f-item button i { height: 18px; margin-top: -2px;}f-menu.context f-item button span,f-menu.search f-item button span { margin-left: 4px;}f-menu.context f-item:hover > button,f-menu.search f-item:hover > button,f-menu.search f-item.active > button { color: #fff; background-color: rgba(61, 70, 82, 0.98);}f-menu.search f-item:hover,f-menu.search f-item.active { opacity: 1 !important;}f-menu.context f-item button:active { outline: solid 1px rgba( 0, 80, 200, 0.98 );}f-menu.context f-item f-tooltip { margin-left: 85px; top: -50px;}f-menu.search f-item { display: none;}f-menu.search f-item:nth-child(1) { opacity: 1; display: unset;}f-menu.search f-item:nth-child(2) { opacity: .8; display: unset;}f-menu.search f-item:nth-child(3) { opacity: .6; display: unset;}f-menu.search f-item:nth-child(4) { opacity: .4; display: unset;}f-menu.search f-item button { border-radius: 14px;}f-tips { right: 10px; top: 10px; position: absolute; z-index: 100; pointer-events: none; display: flex; flex-direction: column;}f-tips f-tip { width: 450px; font-size: 13px; border-radius: 6px; text-align: center; display: block; height: auto; color: #ffffffe0; margin: 4px; padding: 4px; background: #17171794; border: 1px solid #7e7e7e38; line-height: 100%; backdrop-filter: blur(6px); transition: all 0.2s ease; text-transform: initial; opacity: 0;}f-tips f-tip:nth-child(1) { opacity: 1;}f-tips f-tip:nth-child(2) { opacity: .75;}f-tips f-tip:nth-child(3) { opacity: .25;}f-tips f-tip:nth-child(4) { opacity: .1;}f-tips f-tip.error { background: #b900005e;}f-menu.search input { width: calc( 100% - 28px ); height: 41px; position: absolute; z-index: 10; border-radius: 20px; padding-left: 14px; padding-right: 14px; font-size: 15px; background-color: #17171794; border: 1px solid #7e7e7e45; backdrop-filter: blur(6px); box-shadow: 3px 3px 6px rgb(0 0 0 / 20%); text-transform: initial;}f-menu.circle { position: absolute; z-index: 100;}f-menu.circle.top { top: 40px;}f-menu.circle.left { left: 40px;}f-menu.circle.bottom { bottom: 40px;}f-menu.circle.right { right: 40px;}f-menu.circle f-item { align-content: space-around; margin-right: 20px;}f-menu.circle f-item button { width: 46px; height: 46px; font-size: 22px; background: #17171794; border-radius: 50%; backdrop-filter: blur(6px); border: 1px solid #7e7e7e45; line-height: 100%; cursor: pointer; box-shadow: 3px 3px 6px rgba(0,0,0,.2); margin-bottom: 20px;}f-menu.circle f-item f-tooltip { margin-top: -60px;}f-menu.circle.top f-item f-tooltip { margin-top: 50px;}.f-rounded f-node f-element,.f-rounded f-node f-element.title.left { border-radius: 10px 5px 10px 5px;}.f-rounded f-node f-element input, .f-rounded f-node f-element select,.f-rounded f-node f-element button,.f-rounded f-node f-element textarea,.f-rounded f-node f-element input[type='checkbox'].toggle,.f-rounded f-node f-element input[type='checkbox'].toggle:after { border-radius: 20px 10px;}.f-rounded f-node f-element input { padding-left: 7px; padding-right: 7px;}.f-rounded f-menu.context,.f-rounded f-menu.context f-item button { border-radius: 20px 10px;}@media (hover: hover) and (pointer: fine) { f-node:not(.selected):hover { filter: drop-shadow(0 0 6px #66666630); } f-element f-toolbar { visibility: hidden; opacity: 0; transition: opacity 0.2s ease; } body:not(.connecting) f-node:hover > f-element f-toolbar, f-node.selected f-element f-toolbar { visibility: visible; opacity: 1; } f-element f-io:hover { zoom: 1.4; } f-menu.circle f-item button:hover { background-color: #2a2a2a; } f-menu.search input:hover, f-menu.search input:focus { background-color: #1a1a1a; filter: drop-shadow(0 0 6px #66666630); } f-menu.search input:focus { filter: drop-shadow(0 0 8px #4444dd); } f-menu.circle f-item button:hover > f-tooltip, f-menu.context f-item button:hover > f-tooltip { visibility: visible; opacity: 1; } f-menu.circle f-item button:hover > f-tooltip { margin-top: -50px; } f-menu.circle.top f-item button:hover > f-tooltip { margin-top: 60px; } f-menu.context f-item button:hover > f-tooltip { top: -30px; } f-menu.circle f-item button:focus > f-tooltip, f-menu.context f-item button:focus > f-tooltip { visibility: hidden; opacity: 0; }}@media (hover: none) and (pointer: coarse) { body.dragging f-canvas, body.connecting f-canvas { overflow: hidden !important; }}f-element.invalid > f-inputs,f-element.invalid > f-label,f-element.invalid > f-title,f-element.invalid > f-toolbar,f-element.invalid > input,f-element.invalid > select { opacity: .1 !important;}f-canvas { will-change: top, left;}f-node { will-change: transform !important;}` );
+__flow__addCSS( `f-element .ti { vertical-align: middle; font-size: 17px; display: inline-block; margin-right: 5px;}f-element f-disconnect .ti { font-size: 20px; margin-top: -6px; margin-left: 2px;}@keyframes f-animation-open { 0% { transform: scale(.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; }}f-canvas,f-canvas canvas.background,f-canvas canvas.frontground { position: absolute; top: 0; left: 0; margin: 0; padding: 0; width: 100%; height: 100%; -webkit-touch-callout: none; transition: opacity .17s;}f-canvas { cursor: grab;}f-canvas canvas.frontground { z-index: 10;}body.dragging *:not(.drag) { pointer-events: none !important;}f-canvas.grabbing * { cursor: grabbing; user-select: none;}f-canvas canvas.background,f-canvas canvas.frontground { position: fixed; overflow: hidden;}f-canvas canvas.frontground { pointer-events: none;}::-webkit-scrollbar { width: 6px; height: 6px;}::-webkit-scrollbar-thumb:hover{ background: #014fc5;}::-webkit-scrollbar-track { background: #363636;}::-webkit-scrollbar-thumb { background-color: #666666; border-radius: 8px; border: 0;}f-canvas f-content { left: 0; top: 0;}f-canvas f-content,f-canvas f-area { position: absolute; display: block;}f-canvas canvas.map { position: absolute; top: 10px; right: 10px; z-index: 50; backdrop-filter: blur( 10px ); background-color: rgba( 45, 45, 48, .8 );}f-node { position: absolute; margin: 0; padding: 0; user-select: none; width: 320px; z-index: 1; cursor: auto; filter: drop-shadow(0 0 10px #00000061); backdrop-filter: blur(4px);}f-node.selected { z-index: 2;}f-canvas.focusing canvas.background,f-canvas.focusing f-node:not(.selected),f-canvas.focusing f-element f-disconnect:not(.selected) { opacity: 0; pointer-events: none;}.dragging f-canvas f-element f-disconnect { opacity: 0;}.dragging.node f-canvas.focusing canvas.background,.dragging.node f-canvas.focusing f-node:not(.selected) { opacity: .5;}f-node.selected,f-canvas.dragging-rio f-node:hover,f-canvas.dragging-lio f-node:hover { filter: drop-shadow(0 0 10px #00000061) drop-shadow(0 0 8px #4444dd);}f-node.closed f-element:not(:first-child) { display: none;}f-node.center { top: 50%; left: 50%; transform: translate( -50%, -50% );}f-node.top-right { top: 0; right: 0;}f-node.top-center { top: 0; left: 50%; transform: translateX( -50% );}f-node.top-left { top: 0; left: 0;}f-node { transition: filter 0.2s ease, opacity 0.12s ease;}f-node { animation: .2s f-animation-open 1 alternate ease-out;}f-tips,f-drop,f-menu,f-menu input,f-menu behindon,f-element,f-element input,f-element select,f-element behindon,f-element textarea { font-family: 'Open Sans', sans-serif; font-size: 12px; text-transform: initial; line-height: normal; color: #eeeeee; outline: solid 0px #000; margin: 0; padding: 0; border: 0; user-select: none; -webkit-tap-highlight-color: transparent; transition: background 0.2s ease, filter 0.2s ease;}f-node.resizable { display: grid; width: auto !important;}f-node.resizable f-element:last-child { resize: both; overflow: auto; min-width: 100px;}f-element input:read-only { color: #666;}f-element input,f-element textarea { text-transform: initial;}f-element input { transition: background 0.1s ease;}f-element input,f-element select,f-element behindon,f-element textarea { background-color: #232324d1;}f-element { position: relative; width: calc( 100% - 14px ); background: rgba(45, 45, 48, 0.95); pointer-events: auto; border-bottom: 2px solid #232323; display: flex; padding-left: 7px; padding-right: 7px; padding-top: 2px; padding-bottom: 2px;}f-element:after,f-element:before { transition: opacity .17s; opacity: 0; content: '';}f-element[tooltip]:hover:after,f-element[tooltip]:focus-within:after { font-size: 14px !important; display: flex; justify-content: center; position: fixed; margin-left: -7px; width: calc( 100% ); background: #1d1d1de8; border: 1px solid #444444a1; border-radius: 6px; color: #dadada; content: attr( tooltip ); margin-top: -41px; font-size: 16px; padding-top: 3px; padding-bottom: 3px; z-index: 10; opacity: 1; backdrop-filter: blur(4px); white-space: nowrap; overflow: hidden; text-shadow: 1px 1px 0px #0007;}f-element[tooltip]:hover:before,f-element[tooltip]:focus-within:before { border: solid; border-color: #1d1d1de8 transparent; border-width: 12px 6px 0 6px; left: calc( 50% - 6px ); bottom: 30px; position: absolute; opacity: 1; z-index: 11;}f-element[error] { background-color: #ff0000;}f-element[error]:hover:after,f-element[error]:focus-within:after { border: none; background-color: #ff0000bb; filter: drop-shadow( 2px 2px 5px #000 ); color: #fff;}f-element[error]:hover:before,f-element[error]:focus-within:before { border-color: #ff0000bb transparent;}f-element { height: 24px;}f-element input { margin-top: 2px; margin-bottom: 2px; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%); margin-left: 2px; margin-right: 2px; width: 100%; padding-left: 4px; padding-right: 4px; line-height: 100%;}f-element f-string:has( i[type=icon] ) input { padding-right: 23px;}f-element input.number { cursor: col-resize;}f-element input:focus[type='text'], f-element input:focus[type='range'], f-element input:focus[type='color'] { background: rgba( 0, 0, 0, 0.6 ); outline: solid 1px rgba( 0, 80, 200, 0.98 );}f-element input[type='color'] { appearance: none; padding: 0; margin-left: 2px; margin-right: 2px; height: calc( 100% - 4px ); margin-top: 2px; border: none;}f-element input[type='color']::-webkit-color-swatch-wrapper { padding: 2px;}f-element input[type='color']::-webkit-color-swatch { border: none; cursor: alias;}f-element input[type='range'] { appearance: none; width: 100%; overflow: hidden; padding: 0; cursor: ew-resize;}f-element input[type='range']::-webkit-slider-runnable-track { appearance: none; height: 10px; color: #13bba4; margin: 0;}f-element input[type='range']::-webkit-slider-thumb { appearance: none; width: 0; background: #434343; box-shadow: -500px 0 0 500px rgba( 0, 120, 255, 0.98 ); border-radius: 50%; border: 0 !important;}f-element input[type='range']::-webkit-slider-runnable-track { margin-left: -4px; margin-right: -5px;}f-element input[type='checkbox'] { appearance: none; cursor: pointer;}f-element input[type='checkbox'].toggle { height: 20px; width: 45px; border-radius: 16px; display: inline-block; position: relative; margin: 0; margin-top: 2px; background: linear-gradient( 0deg, #292929 0%, #0a0a0ac2 100% ); transition: all 0.2s ease;}f-element input[type='checkbox'].toggle:after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: white; box-shadow: 0 1px 2px rgba(44, 44, 44, 0.2); transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);}f-element input[type='checkbox'].toggle:checked { background: linear-gradient( 0deg, #0177fb 0%, #0177fb 100% );}f-element input[type='checkbox'].toggle:checked:after { transform: translatex(25px);}f-element.auto-height { display: table;}f-element textarea { width: calc( 100% - 18px ); padding-top: 1px; padding-bottom: 3px; padding-left: 4px; padding-right: 8px; margin-top: 2px; margin-left: 2px; height: calc( 100% - 8px ); max-height: 300px; border-radius: 2px; resize: none; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-element.auto-height textarea { resize: auto;}f-element select { width: 100%; margin-top: 2px; margin-bottom: 2px; margin-left: 2px; margin-right: 2px; cursor: pointer; box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-element f-toolbar { position: absolute; top: 0; height: 100%; align-content: space-around; margin-top: auto; margin-bottom: auto; margin-left: 6px; margin-right: 6px; font-size: 18px; line-height: 18px; display: inline-flex; justify-content: flex-end; left: 2px;}f-element f-toolbar behindon { opacity: .7; cursor: pointer; font-size: 14px; width: unset; height: unset; border-radius: unset; border: unset; outline: 0; background-color: unset; box-shadow: unset; padding-right: 0; padding-left: 0; margin-left: 0; margin-right: 0;}f-element f-toolbar behindon span { padding-right: 5px;}f-element f-toolbar behindon:hover,f-element f-toolbar behindon:active { opacity: 1; border: 0; background-color: unset;}f-element input.range-value { width: 60px; text-align: center;}f-menu.context behindon,f-element behindon { width: 100%; height: calc( 100% - 4px ); margin-left: 2px; margin-right: 2px; margin-top: 3px; border-radius: 3px; cursor: pointer;}f-element behindon { box-shadow: inset 1px 1px 1px 0 rgb(255 255 255 / 17%), inset -2px -2px 2px 0 rgb(0 0 0 / 26%);}f-element behindon:hover { color: #fff; background-color: #2a2a2a;}f-element behindon:active { border: 1px solid rgba( 0, 120, 255, 0.98 );}f-element f-inputs,f-element f-subinputs { display: flex; justify-content: flex-end; width: 100%;}f-element f-inputs { left: 100px; top: 50%; transform: translateY( -50% ); position: absolute; width: calc( 100% - 106px ); height: calc( 100% - 4px );}f-element.inputs-disable f-inputs { filter: grayscale(100%); opacity: .5;}f-element.inputs-disable f-inputs input { pointer-events: none;}f-element f-label,f-element span { margin: auto; text-shadow: 1px 1px 0px #0007;}f-element f-label { padding-left: 4px; white-space: nowrap; position: absolute; top: 50%; transform: translateY( -50% ); width: calc( 100% - 20px );}f-element.right f-label { text-align: right;}f-element.center f-label { text-align: center;}f-element f-label i { font-size: 18px; margin-right: 4px; vertical-align: sub; margin-right: 0;}f-element f-label.center { width: 100%; text-align: center; display: block;}f-element.title { height: 29px; background-color: #3a3a3ab0; background-color: #3b3b43ed; cursor: all-scroll; border-top-left-radius: 6px; border-top-right-radius: 6px;}f-element:last-child { border-bottom-left-radius: 6px; border-bottom-right-radius: 6px;}f-element.blue { background-color: #014fc5;}f-element.red { background-color: #bd0b0b;}f-element.green { background-color: #148d05;}f-element.yellow { background-color: #d6b100;}f-element.title.left { text-align: left; display: inline-grid; justify-content: start;}f-element.title f-title { text-align: center; font-size: 15px; position: absolute; top: 50%; transform: translateY( -50% ); width: calc( 100% - 14px );}f-element.title > i { font-size: 21px; position: absolute; right: 8px; top: 50%; transform: translateY( -50% ); opacity: .7;}f-element.title f-toolbar i { font-size: 22px; display: contents; right: unset; left: unset;}f-element.title.left span { text-align: left;}f-element f-io { border: 2px solid #dadada; width: 7px; height: 7px; position: absolute; background: #242427; border-radius: 8px; float: left; left: -7px; top: calc( 50% - 5px ); cursor: alias; box-shadow: 0 0 3px 2px #0000005e; z-index: 1;}f-element f-io.connect,f-canvas.dragging-rio f-element:hover f-io.lio,f-canvas.dragging-lio f-element:hover f-io.rio { zoom: 1.4;}f-node.io-connect f-io:not(.connect) { border: 2px solid #dadada !important; zoom: 1 !important;}f-element f-io.rio { float: right; right: -7px; left: unset;}f-element f-disconnect { position: absolute; left: -35px; top: 50%; font-size: 22px; transform: translateY( -50% ); filter: drop-shadow(0 0 5px #000); text-shadow: 0px 0px 5px black; cursor: pointer; transition: all .2s;}f-element.input-right f-disconnect { right: -35px; left: unset;}f-element f-disconnect:hover { color: #ff3300;}f-element textarea::-webkit-scrollbar { width: 6px;}f-element textarea::-webkit-scrollbar-track { background: #111; } f-element textarea::-webkit-scrollbar-thumb { background: #0177fb; }f-element textarea::-webkit-scrollbar-thumb:hover { background: #1187ff; }f-element.small { height: 18px;}f-element.large { height: 36px;}f-canvas.dragging-lio f-node:not(.io-connect) f-element.rio:hover,f-canvas.dragging-rio f-node:not(.io-connect) f-element.lio:hover,f-element.select { background-color: rgba(61, 70, 82, 0.98);}f-element.invalid > f-io { zoom: 1 !important;}f-element.invalid::after,.zoom f-element.no-zoom::after { font-size: 14px !important; display: flex; justify-content: center; align-items:center; margin: auto; position: absolute; width: 100%; height: 100%; background: #bd0b0b77; vertical-align: middle; color: #fff; content: 'Incompatible!'; opacity: .95; backdrop-filter: grayscale(100%); white-space: nowrap; overflow: hidden; left: 0; top: 0; text-transform: initial;}.zoom f-element.no-zoom::after { background: #0b3fbd77; content: 'Incompatible with zoom!';}f-treeview { width: 100%; background-color: #232324d1; border-radius: 2px; overflow-y: auto; overflow-x: hidden; margin-top: 2px; margin-left: 2px; height: calc( 100% - 6px ); box-shadow: inset 0px 1px 1px rgb(0 0 0 / 20%), 0px 1px 0px rgb(255 255 255 / 5%);}f-treeview f-treeview-node { position: relative; margin-top: 1px; min-height: 24px;}f-treeview f-treeview-node f-treeview-children { position: relative; display: none; padding-left: 16px;}f-treeview f-treeview-node input[type='checkbox'] { position: absolute; width: 100%; height: 24px; margin-top: 0px; background: none; box-shadow: none; cursor: default; width: calc( 100% + 100px ); padding-top: 3px; margin-left: -100px;}f-treeview f-treeview-node input[type='checkbox']:checked ~ f-treeview-children { display: block;}f-treeview f-arrow { border: solid #999; border-width: 0 2px 2px 0; display: inline-block; padding: 3px; position: absolute; right: 10px; margin-top: 8px; transform: rotate( -45deg ); transition: all 0.1s ease; pointer-events: none;}f-treeview f-treeview-node input[type='checkbox']:checked ~ f-arrow { margin-top: 7px; transform: rotate( 45deg );}f-treeview f-treeview-label { display: flex; align-content: center; width: 100%; height: 22px; background: none; box-shadow: none; cursor: default; width: calc( 100% + 100px ); padding-top: 3px; margin-left: -100px; padding-left: 105px; border-bottom: 1px solid #333; pointer-events: none; z-index: 1;}f-treeview f-treeview-node input[type='checkbox']:hover { background: #2c2c2f;}f-treeview f-treeview-node:has( f-arrow ) > input[type='checkbox'] { background: #2c2c2f;}f-treeview f-treeview-node:has( f-arrow ) > input[type='checkbox']:hover { background: #333339;}f-treeview f-treeview-label { color: #aaa;}f-treeview f-treeview-label spam { margin-top: 1px;}f-treeview f-treeview-label i { color: #ccc; transition: color 0.1s ease; margin-top: 1px;}f-treeview f-treeview-node { position: relative; display: flex; flex-direction: column;}f-treeview f-treeview-node input[type='checkbox']:hover ~ f-treeview-label { color: #eee;}f-treeview f-treeview-node input[type='checkbox']:hover ~ f-treeview-label i { color: #fff;}f-menu.context f-item f-node { position: relative; display: block; width: calc( 100% - 6px ) !important; margin: 3px; animation: unset;}f-treeview f-treeview-node.selected > input[type='checkbox'] { background-color: #014fc5;}f-treeview f-treeview-node.selected > f-treeview-label,f-treeview f-treeview-node.selected > f-treeview-label i { color: #fff;}f-treeview f-treeview-node.selected > input[type='checkbox']:hover { background-color: #06f;}f-string { display: contents;}f-string f-behindons { position: absolute; top: 50%; right: 1px; transform: translateY( -50% );}f-string f-behindons i { color: #999; padding-left: 4px; padding-right: 4px; padding-bottom: 1px; margin-right: 1px; cursor: pointer; background: #252526eb; height: 100%; padding-top: 1px; margin-right: 1px !important;}f-string i[type=icon] { color: #999; position: absolute; right: 8px; top: calc( 50% - 8px ); margin-right: 5px;}f-inputs f-string i[type=icon] { right: 0;}f-string f-behindons i:hover { color: #eeeeee;}f-string input:focus ~ f-string { opacity: .9;}f-string:hover input::placeholder { color: #999;}f-string f-treeview { position: absolute; max-height: 200px; height: 200px; background-color: #000; z-index: 10;}f-drop { width: 100%; height: 100%; position: sticky; left: 0; top: 0; background: #02358417; text-align: center; justify-content: center; align-items: center; display: flex; box-shadow: inset 0 0 20px 10px #464ace17; pointer-events: none; transition: all .07s; opacity: 0; visibility: hidden;}f-drop.visible { visibility: unset; opacity: unset; transition: all .23s;}f-drop span { opacity: .5; font-size: 40px; text-shadow: 0px 0px 5px #000; font-weight: bold;}f-tooltip { pointer-events: none;}f-tooltip { position: absolute; left: 0; top: 0; background: rgba(0,0,0,.8); backdrop-filter: blur(4px); font-size: 14px; padding: 7px; left: 50%; border-radius: 10px; transform: translateX(-50%); visibility: hidden; pointer-events: none; opacity: 0; transition: all 0.3s ease; z-index: 150; white-space: nowrap;}f-menu.context,f-menu.search { position: absolute;}f-menu.context { width: 170px; z-index: 110;}f-menu.search { bottom: 85px; left: 50%; transform: translateX(-50%); z-index: 10; width: 300px;}f-menu.context f-list { display: block; margin: 0; background: #171717e6; font-size: 12px; border-radius: 6px; backdrop-filter: blur(6px); border: 1px solid #7e7e7e45; box-shadow: 3px 3px 6px rgba(0,0,0,.2); transition: opacity 0.2s ease, transform 0.1s ease;}f-menu.search f-list { margin: 0 6px 0 6px; display: flex; flex-direction: column-reverse; margin-bottom: 5px;}f-menu.context.hidden { visibility: hidden; opacity: 0;}f-menu.context f-item,f-menu.search f-item { display: block; position: relative; margin: 0; padding: 0; white-space: nowrap;}f-menu.search f-item { opacity: 0;}f-menu.context f-item.submenu::after { content: ""; position: absolute; right: 6px; top: 50%; -webkit-transform: translateY( -50% ); transform: translateY( -50% ); border: 5px solid transparent; border-left-color: #808080;}f-menu.context f-item:hover > f-menu,f-menu.context f-item.active > f-menu { visibility: unset; transform: unset; opacity: unset;}f-menu.context f-menu { top: 0px; left: calc( 100% - 4px );}f-menu.context f-item behindon,f-menu.search f-item behindon { overflow: visible; display: block; width: calc( 100% - 6px ); text-align: left; cursor: pointer; white-space: nowrap; padding: 6px 8px; border-radius: 3px; background: rgba(45, 45, 48, 0.95); border: 0; color: #ddd; margin: 3px; text-shadow: 1px 1px 0px #0007;}f-menu.context f-item behindon i,f-menu.search f-item behindon i { float: left; font-size: 20px; margin-top: -1px; margin-right: 3px;}f-menu.context f-item behindon i { height: 18px; margin-top: -2px;}f-menu.context f-item behindon span,f-menu.search f-item behindon span { margin-left: 4px;}f-menu.context f-item:hover > behindon,f-menu.search f-item:hover > behindon,f-menu.search f-item.active > behindon { color: #fff; background-color: rgba(61, 70, 82, 0.98);}f-menu.search f-item:hover,f-menu.search f-item.active { opacity: 1 !important;}f-menu.context f-item behindon:active { outline: solid 1px rgba( 0, 80, 200, 0.98 );}f-menu.context f-item f-tooltip { margin-left: 85px; top: -50px;}f-menu.search f-item { display: none;}f-menu.search f-item:nth-child(1) { opacity: 1; display: unset;}f-menu.search f-item:nth-child(2) { opacity: .8; display: unset;}f-menu.search f-item:nth-child(3) { opacity: .6; display: unset;}f-menu.search f-item:nth-child(4) { opacity: .4; display: unset;}f-menu.search f-item behindon { border-radius: 14px;}f-tips { right: 10px; top: 10px; position: absolute; z-index: 100; pointer-events: none; display: flex; flex-direction: column;}f-tips f-tip { width: 450px; font-size: 13px; border-radius: 6px; text-align: center; display: block; height: auto; color: #ffffffe0; margin: 4px; padding: 4px; background: #17171794; border: 1px solid #7e7e7e38; line-height: 100%; backdrop-filter: blur(6px); transition: all 0.2s ease; text-transform: initial; opacity: 0;}f-tips f-tip:nth-child(1) { opacity: 1;}f-tips f-tip:nth-child(2) { opacity: .75;}f-tips f-tip:nth-child(3) { opacity: .25;}f-tips f-tip:nth-child(4) { opacity: .1;}f-tips f-tip.error { background: #b900005e;}f-menu.search input { width: calc( 100% - 28px ); height: 41px; position: absolute; z-index: 10; border-radius: 20px; padding-left: 14px; padding-right: 14px; font-size: 15px; background-color: #17171794; border: 1px solid #7e7e7e45; backdrop-filter: blur(6px); box-shadow: 3px 3px 6px rgb(0 0 0 / 20%); text-transform: initial;}f-menu.circle { position: absolute; z-index: 100;}f-menu.circle.top { top: 40px;}f-menu.circle.left { left: 40px;}f-menu.circle.bottom { bottom: 40px;}f-menu.circle.right { right: 40px;}f-menu.circle f-item { align-content: space-around; margin-right: 20px;}f-menu.circle f-item behindon { width: 46px; height: 46px; font-size: 22px; background: #17171794; border-radius: 50%; backdrop-filter: blur(6px); border: 1px solid #7e7e7e45; line-height: 100%; cursor: pointer; box-shadow: 3px 3px 6px rgba(0,0,0,.2); margin-bottom: 20px;}f-menu.circle f-item f-tooltip { margin-top: -60px;}f-menu.circle.top f-item f-tooltip { margin-top: 50px;}.f-rounded f-node f-element,.f-rounded f-node f-element.title.left { border-radius: 10px 5px 10px 5px;}.f-rounded f-node f-element input, .f-rounded f-node f-element select,.f-rounded f-node f-element behindon,.f-rounded f-node f-element textarea,.f-rounded f-node f-element input[type='checkbox'].toggle,.f-rounded f-node f-element input[type='checkbox'].toggle:after { border-radius: 20px 10px;}.f-rounded f-node f-element input { padding-left: 7px; padding-right: 7px;}.f-rounded f-menu.context,.f-rounded f-menu.context f-item behindon { border-radius: 20px 10px;}@media (hover: hover) and (pointer: fine) { f-node:not(.selected):hover { filter: drop-shadow(0 0 6px #66666630); } f-element f-toolbar { visibility: hidden; opacity: 0; transition: opacity 0.2s ease; } body:not(.connecting) f-node:hover > f-element f-toolbar, f-node.selected f-element f-toolbar { visibility: visible; opacity: 1; } f-element f-io:hover { zoom: 1.4; } f-menu.circle f-item behindon:hover { background-color: #2a2a2a; } f-menu.search input:hover, f-menu.search input:focus { background-color: #1a1a1a; filter: drop-shadow(0 0 6px #66666630); } f-menu.search input:focus { filter: drop-shadow(0 0 8px #4444dd); } f-menu.circle f-item behindon:hover > f-tooltip, f-menu.context f-item behindon:hover > f-tooltip { visibility: visible; opacity: 1; } f-menu.circle f-item behindon:hover > f-tooltip { margin-top: -50px; } f-menu.circle.top f-item behindon:hover > f-tooltip { margin-top: 60px; } f-menu.context f-item behindon:hover > f-tooltip { top: -30px; } f-menu.circle f-item behindon:focus > f-tooltip, f-menu.context f-item behindon:focus > f-tooltip { visibility: hidden; opacity: 0; }}@media (hover: none) and (pointer: coarse) { body.dragging f-canvas, body.connecting f-canvas { overflow: hidden !important; }}f-element.invalid > f-inputs,f-element.invalid > f-label,f-element.invalid > f-title,f-element.invalid > f-toolbar,f-element.invalid > input,f-element.invalid > select { opacity: .1 !important;}f-canvas { will-change: top, left;}f-node { will-change: transform !important;}` );
 
 const REVISION = '3';
 
 let _id = 0;
 
-clbottom Serializer extends EventTarget {
+class Serializer extends EventTarget {
 
 	static get type() {
 
@@ -78,7 +78,7 @@ clbottom Serializer extends EventTarget {
 
 	}
 
-	get clbottomName() {
+	get className() {
 
 		return this.constructor.type || this.constructor.name;
 
@@ -117,7 +117,7 @@ clbottom Serializer extends EventTarget {
 		}
 
 		object.id = id;
-		object.type = this.clbottomName;
+		object.type = this.className;
 
 		return object;
 
@@ -125,7 +125,7 @@ clbottom Serializer extends EventTarget {
 
 }
 
-clbottom PointerMonitor {
+class PointerMonitor {
 
 	constructor() {
 
@@ -170,15 +170,15 @@ const pointer = new PointerMonitor().start();
 
 const draggableDOM = ( dom, callback = null, settings = {} ) => {
 
-	settings = Object.bottomign( {
-		clbottomName: 'dragging',
+	settings = Object.assign( {
+		className: 'dragging',
 		click: false,
-		bypbottom: false
+		bypass: false
 	}, settings );
 
 	let dragData = null;
 
-	const { clbottomName, click, bypbottom } = settings;
+	const { className, click, bypass } = settings;
 
 	const getZoom = () => {
 
@@ -206,7 +206,7 @@ const draggableDOM = ( dom, callback = null, settings = {} ) => {
 
 		const event = e.touches ? e.touches[ 0 ] : e;
 
-		if ( bypbottom === false ) e.stopImmediatePropagation();
+		if ( bypass === false ) e.stopImmediatePropagation();
 
 		dragData = {
 			client: { x: event.clientX, y: event.clientY },
@@ -262,7 +262,7 @@ const draggableDOM = ( dom, callback = null, settings = {} ) => {
 
 			}
 
-			if ( bypbottom === false ) e.stopImmediatePropagation();
+			if ( bypass === false ) e.stopImmediatePropagation();
 
 		} else {
 
@@ -270,11 +270,11 @@ const draggableDOM = ( dom, callback = null, settings = {} ) => {
 
 				dragData.dragging = true;
 
-				dom.clbottomList.add( 'drag' );
+				dom.classList.add( 'drag' );
 
-				if ( clbottomName ) document.body.clbottomList.add( ...clbottomName.split( ' ' ) );
+				if ( className ) document.body.classList.add( ...className.split( ' ' ) );
 
-				if ( bypbottom === false ) e.stopImmediatePropagation();
+				if ( bypass === false ) e.stopImmediatePropagation();
 
 			}
 
@@ -284,11 +284,11 @@ const draggableDOM = ( dom, callback = null, settings = {} ) => {
 
 	const onGlobalMouseUp = ( e ) => {
 
-		if ( bypbottom === false ) e.stopImmediatePropagation();
+		if ( bypass === false ) e.stopImmediatePropagation();
 
-		dom.clbottomList.remove( 'drag' );
+		dom.classList.remove( 'drag' );
 
-		if ( clbottomName ) document.body.clbottomList.remove( ...clbottomName.split( ' ' ) );
+		if ( className ) document.body.classList.remove( ...className.split( ' ' ) );
 
 		window.removeEventListener( 'mousemove', onGlobalMouseMove );
 		window.removeEventListener( 'mouseup', onGlobalMouseUp );
@@ -382,15 +382,15 @@ const rgbaToArray = ( rgba ) => {
 
 };
 
-const removeDOMClbottom = ( dom, clbottomList ) => {
+const removeDOMClass = ( dom, classList ) => {
 
-	if ( clbottomList ) clbottomList.split( ' ' ).forEach( alignClbottom => dom.clbottomList.remove( alignClbottom ) );
+	if ( classList ) classList.split( ' ' ).forEach( alignClass => dom.classList.remove( alignClass ) );
 
 };
 
-const addDOMClbottom = ( dom, clbottomList ) => {
+const addDOMClass = ( dom, classList ) => {
 
-	if ( clbottomList ) clbottomList.split( ' ' ).forEach( alignClbottom => dom.clbottomList.add( alignClbottom ) );
+	if ( classList ) classList.split( ' ' ).forEach( alignClass => dom.classList.add( alignClass ) );
 
 };
 
@@ -402,11 +402,11 @@ var Utils = /*#__PURE__*/Object.freeze({
 	numberToPX: numberToPX,
 	numberToHex: numberToHex,
 	rgbaToArray: rgbaToArray,
-	removeDOMClbottom: removeDOMClbottom,
-	addDOMClbottom: addDOMClbottom
+	removeDOMClass: removeDOMClass,
+	addDOMClass: addDOMClass
 });
 
-clbottom Link {
+class Link {
 
 	constructor( inputElement = null, outputElement = null ) {
 
@@ -450,7 +450,7 @@ Link.InputDirection = 'left';
 
 let selected = null;
 
-clbottom Element extends Serializer {
+class Element extends Serializer {
 
 	static get type() {
 
@@ -551,7 +551,7 @@ clbottom Element extends Serializer {
 		this.lioDOM = this._createIO( 'lio' );
 		this.rioDOM = this._createIO( 'rio' );
 
-		this.dom.clbottomList.add( `input-${ Link.InputDirection }` );
+		this.dom.classList.add( `input-${ Link.InputDirection }` );
 
 		this.addEventListener( 'connect', ( ) => {
 
@@ -639,9 +639,9 @@ clbottom Element extends Serializer {
 
 		const dom = this.dom;
 
-		if ( ! this.enabledInputs ) dom.clbottomList.remove( 'inputs-disable' );
+		if ( ! this.enabledInputs ) dom.classList.remove( 'inputs-disable' );
 
-		if ( ! value ) dom.clbottomList.add( 'inputs-disable' );
+		if ( ! value ) dom.classList.add( 'inputs-disable' );
 
 		this.enabledInputs = value;
 
@@ -682,9 +682,9 @@ clbottom Element extends Serializer {
 
 		const dom = this.dom;
 
-		if ( this.style ) dom.clbottomList.remove( this.style );
+		if ( this.style ) dom.classList.remove( this.style );
 
-		if ( style ) dom.clbottomList.add( style );
+		if ( style ) dom.classList.add( style );
 
 		this.style = style;
 		this.color = null;
@@ -793,12 +793,12 @@ clbottom Element extends Serializer {
 
 		if ( length > 0 ) {
 
-			this.dom.clbottomList.add( 'lio' );
+			this.dom.classList.add( 'lio' );
 			this.dom.prepend( this.lioDOM );
 
 		} else {
 
-			this.dom.clbottomList.remove( 'lio' );
+			this.dom.classList.remove( 'lio' );
 			this.lioDOM.remove();
 
 		}
@@ -835,12 +835,12 @@ clbottom Element extends Serializer {
 
 		if ( length > 0 ) {
 
-			this.dom.clbottomList.add( 'rio' );
+			this.dom.classList.add( 'rio' );
 			this.dom.prepend( this.rioDOM );
 
 		} else {
 
-			this.dom.clbottomList.remove( 'rio' );
+			this.dom.classList.remove( 'rio' );
 			this.rioDOM.remove();
 
 		}
@@ -902,7 +902,7 @@ clbottom Element extends Serializer {
 			if ( this.disconnectDOM === null ) {
 
 				this.disconnectDOM = document.createElement( 'f-disconnect' );
-				this.disconnectDOM.innerHTML = Element.icons.unlink ? `<i clbottom='${ Element.icons.unlink }'></i>` : '✖';
+				this.disconnectDOM.innerHTML = Element.icons.unlink ? `<i class='${ Element.icons.unlink }'></i>` : '✖';
 
 				this.dom.append( this.disconnectDOM );
 
@@ -1124,7 +1124,7 @@ clbottom Element extends Serializer {
 
 		const ioDOM = document.createElement( 'f-io' );
 		ioDOM.style.visibility = 'hidden';
-		ioDOM.clbottomName = type;
+		ioDOM.className = type;
 
 		const onConnectEvent = ( e ) => {
 
@@ -1136,10 +1136,10 @@ clbottom Element extends Serializer {
 
 			const nodeDOM = this.node.dom;
 
-			nodeDOM.clbottomList.add( 'io-connect' );
+			nodeDOM.classList.add( 'io-connect' );
 
-			ioDOM.clbottomList.add( 'connect' );
-			dom.clbottomList.add( 'select' );
+			ioDOM.classList.add( 'connect' );
+			dom.classList.add( 'select' );
 
 			const defaultOutput = Link.InputDirection === 'left' ? 'lio' : 'rio';
 
@@ -1151,10 +1151,10 @@ clbottom Element extends Serializer {
 			draggableDOM( e, ( data ) => {
 
 				if ( previewLink.outputElement )
-					previewLink.outputElement.dom.clbottomList.remove( 'invalid' );
+					previewLink.outputElement.dom.classList.remove( 'invalid' );
 
 				if ( previewLink.inputElement )
-					previewLink.inputElement.dom.clbottomList.remove( 'invalid' );
+					previewLink.inputElement.dom.classList.remove( 'invalid' );
 
 				previewLink.inputElement = link.inputElement;
 				previewLink.outputElement = link.outputElement;
@@ -1178,12 +1178,12 @@ clbottom Element extends Serializer {
 					if ( type === defaultOutput ) {
 
 						if ( previewLink.outputElement )
-							previewLink.outputElement.dom.clbottomList.add( 'invalid' );
+							previewLink.outputElement.dom.classList.add( 'invalid' );
 
 					} else {
 
 						if ( previewLink.inputElement )
-							previewLink.inputElement.dom.clbottomList.add( 'invalid' );
+							previewLink.inputElement.dom.classList.add( 'invalid' );
 
 					}
 
@@ -1193,10 +1193,10 @@ clbottom Element extends Serializer {
 
 				if ( ! data.dragging ) {
 
-					nodeDOM.clbottomList.remove( 'io-connect' );
+					nodeDOM.classList.remove( 'io-connect' );
 
-					ioDOM.clbottomList.remove( 'connect' );
-					dom.clbottomList.remove( 'select' );
+					ioDOM.classList.remove( 'connect' );
+					dom.classList.remove( 'select' );
 
 					this.links.splice( this.links.indexOf( link ), 1 );
 
@@ -1225,7 +1225,7 @@ clbottom Element extends Serializer {
 
 				}
 
-			}, { clbottomName: 'connecting' } );
+			}, { className: 'connecting' } );
 
 		};
 
@@ -1240,7 +1240,7 @@ clbottom Element extends Serializer {
 
 Element.icons = { unlink: '' };
 
-clbottom Input extends Serializer {
+class Input extends Serializer {
 
 	static get type() {
 
@@ -1404,7 +1404,7 @@ clbottom Input extends Serializer {
 
 Input.prototype.isInput = true;
 
-clbottom Node extends Serializer {
+class Node extends Serializer {
 
 	static get type() {
 
@@ -1501,7 +1501,7 @@ clbottom Node extends Serializer {
 
 		if ( typeof align === 'string' ) {
 
-			dom.clbottomList.add( align );
+			dom.classList.add( align );
 
 		} else if ( align ) {
 
@@ -1523,11 +1523,11 @@ clbottom Node extends Serializer {
 
 		if ( this.resizable ) {
 
-			this.dom.clbottomList.add( 'resizable' );
+			this.dom.classList.add( 'resizable' );
 
 		} else {
 
-			this.dom.clbottomList.remove( 'resizable' );
+			this.dom.classList.remove( 'resizable' );
 
 		}
 
@@ -1557,9 +1557,9 @@ clbottom Node extends Serializer {
 
 		const dom = this.dom;
 
-		if ( this.style ) dom.clbottomList.remove( this.style );
+		if ( this.style ) dom.classList.remove( this.style );
 
-		if ( style ) dom.clbottomList.add( style );
+		if ( style ) dom.classList.add( style );
 
 		this.style = style;
 
@@ -1796,7 +1796,7 @@ clbottom Node extends Serializer {
 
 Node.prototype.isNode = true;
 
-clbottom DraggableElement extends Element {
+class DraggableElement extends Element {
 
 	static get type() {
 
@@ -1816,7 +1816,7 @@ clbottom DraggableElement extends Element {
 
 			if ( this.draggable === true ) {
 
-				draggableDOM( this.node.dom, null, { clbottomName: 'dragging node' } );
+				draggableDOM( this.node.dom, null, { className: 'dragging node' } );
 
 			}
 
@@ -1831,7 +1831,7 @@ clbottom DraggableElement extends Element {
 
 }
 
-clbottom TitleElement extends DraggableElement {
+class TitleElement extends DraggableElement {
 
 	static get type() {
 
@@ -1845,7 +1845,7 @@ clbottom TitleElement extends DraggableElement {
 
 		const { dom } = this;
 
-		dom.clbottomList.add( 'title' );
+		dom.classList.add( 'title' );
 
 		const dbClick = () => {
 
@@ -1862,7 +1862,7 @@ clbottom TitleElement extends DraggableElement {
 
 		const toolbarDOM = document.createElement( 'f-toolbar' );
 
-		this.buttons = [];
+		this.behindons = [];
 
 		this.titleDOM = titleDOM;
 		this.iconDOM = iconDOM;
@@ -1876,7 +1876,7 @@ clbottom TitleElement extends DraggableElement {
 
 	setIcon( value ) {
 
-		this.iconDOM.clbottomName = value;
+		this.iconDOM.className = value;
 
 		return this;
 
@@ -1884,7 +1884,7 @@ clbottom TitleElement extends DraggableElement {
 
 	getIcon() {
 
-		return this.iconDOM.clbottomName;
+		return this.iconDOM.className;
 
 	}
 
@@ -1902,11 +1902,11 @@ clbottom TitleElement extends DraggableElement {
 
 	}
 
-	addButton( button ) {
+	addButton( behindon ) {
 
-		this.buttons.push( button );
+		this.behindons.push( behindon );
 
-		this.toolbarDOM.append( button.dom );
+		this.toolbarDOM.append( behindon.dom );
 
 		return this;
 
@@ -1988,7 +1988,7 @@ const colors = [
 
 const dropNode = new Node().add( new TitleElement( 'File' ) ).setWidth( 250 );
 
-clbottom Canvas extends Serializer {
+class Canvas extends Serializer {
 
 	static get type() {
 
@@ -2056,9 +2056,9 @@ clbottom Canvas extends Serializer {
 			screen: {}
 		};
 
-		canvas.clbottomName = 'background';
-		frontCanvas.clbottomName = 'frontground';
-		mapCanvas.clbottomName = 'map';
+		canvas.className = 'background';
+		frontCanvas.className = 'frontground';
+		mapCanvas.className = 'map';
 
 		dropDOM.innerHTML = '<span>drop your file</span>';
 
@@ -2087,11 +2087,11 @@ clbottom Canvas extends Serializer {
 
 		};
 
-		const clbottomInElements = ( element, clbottomName ) => {
+		const classInElements = ( element, className ) => {
 
 			do {
 
-				if ( element.clbottomList ? element.clbottomList.contains( clbottomName ) : false ) {
+				if ( element.classList ? element.classList.contains( className ) : false ) {
 
 					return true;
 
@@ -2105,7 +2105,7 @@ clbottom Canvas extends Serializer {
 
 		const onMouseZoom = ( e ) => {
 
-			if ( clbottomInElements( e.srcElement, 'f-scroll' ) ) return;
+			if ( classInElements( e.srcElement, 'f-scroll' ) ) return;
 
 			e.preventDefault();
 
@@ -2198,7 +2198,7 @@ clbottom Canvas extends Serializer {
 
 					this.droppedItems = [];
 
-					dropDOM.clbottomList.add( 'visible' );
+					dropDOM.classList.add( 'visible' );
 
 					this.add( dropNode );
 
@@ -2206,7 +2206,7 @@ clbottom Canvas extends Serializer {
 
 			} else if ( -- dropEnterCount === 0 ) {
 
-				dropDOM.clbottomList.remove( 'visible' );
+				dropDOM.classList.remove( 'visible' );
 
 				this.remove( dropNode );
 
@@ -2272,15 +2272,15 @@ clbottom Canvas extends Serializer {
 
 			if ( data.dragging ) {
 
-				dom.clbottomList.add( 'grabbing' );
+				dom.classList.add( 'grabbing' );
 
 			} else {
 
-				dom.clbottomList.remove( 'grabbing' );
+				dom.classList.remove( 'grabbing' );
 
 			}
 
-		}, { clbottomName: 'dragging-canvas' } );
+		}, { className: 'dragging-canvas' } );
 
 
 		draggableDOM( mapCanvas, ( data ) => {
@@ -2402,7 +2402,7 @@ clbottom Canvas extends Serializer {
 		this._zoom = val;
 		this.contentDOM.style.zoom = val;
 
-		val === 1 ? this.dom.clbottomList.remove( 'zoom' ) : this.dom.clbottomList.add( 'zoom' );
+		val === 1 ? this.dom.classList.remove( 'zoom' ) : this.dom.classList.add( 'zoom' );
 
 		this.updateMozTransform();
 
@@ -2442,17 +2442,17 @@ clbottom Canvas extends Serializer {
 
 		if ( this._focusSelected === value ) return;
 
-		const clbottomList = this.dom.clbottomList;
+		const classList = this.dom.classList;
 
 		this._focusSelected = value;
 
 		if ( value ) {
 
-			clbottomList.add( 'focusing' );
+			classList.add( 'focusing' );
 
 		} else {
 
-			clbottomList.remove( 'focusing' );
+			classList.remove( 'focusing' );
 
 		}
 
@@ -2646,7 +2646,7 @@ clbottom Canvas extends Serializer {
 
 			this.focusSelected = false;
 
-			previousNode.dom.clbottomList.remove( 'selected' );
+			previousNode.dom.classList.remove( 'selected' );
 
 			this.selected = null;
 
@@ -2656,7 +2656,7 @@ clbottom Canvas extends Serializer {
 
 		if ( node !== null ) {
 
-			node.dom.clbottomList.add( 'selected' );
+			node.dom.classList.add( 'selected' );
 
 			this.selected = node;
 
@@ -2927,12 +2927,12 @@ clbottom Canvas extends Serializer {
 
 		if ( dragging !== '' ) {
 
-			dom.clbottomList.add( 'dragging-' + dragging );
+			dom.classList.add( 'dragging-' + dragging );
 
 		} else {
 
-			dom.clbottomList.remove( 'dragging-lio' );
-			dom.clbottomList.remove( 'dragging-rio' );
+			dom.classList.remove( 'dragging-lio' );
+			dom.classList.remove( 'dragging-rio' );
 
 		}
 
@@ -2976,14 +2976,14 @@ clbottom Canvas extends Serializer {
 
 }
 
-clbottom Menu extends EventTarget {
+class Menu extends EventTarget {
 
-	constructor( clbottomName ) {
+	constructor( className ) {
 
 		super();
 
 		const dom = document.createElement( 'f-menu' );
-		dom.clbottomName = clbottomName + ' bottom left hidden';
+		dom.className = className + ' bottom left hidden';
 
 		const listDOM = document.createElement( 'f-list' );
 
@@ -2999,7 +2999,7 @@ clbottom Menu extends EventTarget {
 		this.subMenus = new WeakMap();
 		this.domButtons = new WeakMap();
 
-		this.buttons = [];
+		this.behindons = [];
 
 		this.events = {};
 
@@ -3017,8 +3017,8 @@ clbottom Menu extends EventTarget {
 
 		const dom = this.dom;
 
-		removeDOMClbottom( dom, this.align );
-		addDOMClbottom( dom, align );
+		removeDOMClass( dom, this.align );
+		addDOMClass( dom, align );
 
 		this.align = align;
 
@@ -3034,7 +3034,7 @@ clbottom Menu extends EventTarget {
 
 	show() {
 
-		this.dom.clbottomList.remove( 'hidden' );
+		this.dom.classList.remove( 'hidden' );
 
 		this.visible = true;
 
@@ -3046,7 +3046,7 @@ clbottom Menu extends EventTarget {
 
 	hide() {
 
-		this.dom.clbottomList.add( 'hidden' );
+		this.dom.classList.add( 'hidden' );
 
 		this.dispatchEvent( new Event( 'hide' ) );
 
@@ -3054,30 +3054,30 @@ clbottom Menu extends EventTarget {
 
 	}
 
-	add( button, submenu = null ) {
+	add( behindon, submenu = null ) {
 
 		const liDOM = document.createElement( 'f-item' );
 
 		if ( submenu !== null ) {
 
-			liDOM.clbottomList.add( 'submenu' );
+			liDOM.classList.add( 'submenu' );
 
 			liDOM.append( submenu.dom );
 
-			this.subMenus.set( button, submenu );
+			this.subMenus.set( behindon, submenu );
 
-			button.dom.addEventListener( 'mouseover', () => submenu.show() );
-			button.dom.addEventListener( 'mouseout', () => submenu.hide() );
+			behindon.dom.addEventListener( 'mouseover', () => submenu.show() );
+			behindon.dom.addEventListener( 'mouseout', () => submenu.hide() );
 
 		}
 
-		liDOM.append( button.dom );
+		liDOM.append( behindon.dom );
 
-		this.buttons.push( button );
+		this.behindons.push( behindon );
 
 		this.listDOM.append( liDOM );
 
-		this.domButtons.set( button, liDOM );
+		this.domButtons.set( behindon, liDOM );
 
 		return this;
 
@@ -3085,7 +3085,7 @@ clbottom Menu extends EventTarget {
 
 	clear() {
 
-		this.buttons = [];
+		this.behindons = [];
 
 		this.subMenus = new WeakMap();
 		this.domButtons = new WeakMap();
@@ -3115,7 +3115,7 @@ const onCloseLastContext = ( e ) => {
 document.body.addEventListener( 'mousedown', onCloseLastContext, true );
 document.body.addEventListener( 'touchstart', onCloseLastContext, true );
 
-clbottom ContextMenu extends Menu {
+class ContextMenu extends Menu {
 
 	constructor( target = null ) {
 
@@ -3127,25 +3127,25 @@ clbottom ContextMenu extends Menu {
 
 		this._onButtonClick = ( e = null ) => {
 
-			const button = e ? e.target : null;
+			const behindon = e ? e.target : null;
 
 			if ( this._lastButtonClick ) {
 
-				this._lastButtonClick.dom.parentElement.clbottomList.remove( 'active' );
+				this._lastButtonClick.dom.parentElement.classList.remove( 'active' );
 
 			}
 
-			this._lastButtonClick = button;
+			this._lastButtonClick = behindon;
 
-			if ( button ) {
+			if ( behindon ) {
 
-				if ( this.subMenus.has( button ) ) {
+				if ( this.subMenus.has( behindon ) ) {
 
-					this.subMenus.get( button )._onButtonClick();
+					this.subMenus.get( behindon )._onButtonClick();
 
 				}
 
-				button.dom.parentElement.clbottomList.add( 'active' );
+				behindon.dom.parentElement.classList.add( 'active' );
 
 			}
 
@@ -3153,9 +3153,9 @@ clbottom ContextMenu extends Menu {
 
 		this._onButtonMouseOver = ( e ) => {
 
-			const button = e.target;
+			const behindon = e.target;
 
-			if ( this.subMenus.has( button ) && this._lastButtonClick !== button ) {
+			if ( this.subMenus.has( behindon ) && this._lastButtonClick !== behindon ) {
 
 				this._onButtonClick();
 
@@ -3290,12 +3290,12 @@ clbottom ContextMenu extends Menu {
 
 	}
 
-	add( button, submenu = null ) {
+	add( behindon, submenu = null ) {
 
-		button.addEventListener( 'click', this._onButtonClick );
-		button.addEventListener( 'mouseover', this._onButtonMouseOver );
+		behindon.addEventListener( 'click', this._onButtonClick );
+		behindon.addEventListener( 'mouseover', this._onButtonMouseOver );
 
-		return super.add( button, submenu );
+		return super.add( behindon, submenu );
 
 	}
 
@@ -3307,7 +3307,7 @@ clbottom ContextMenu extends Menu {
 
 }
 
-clbottom CircleMenu extends Menu {
+class CircleMenu extends Menu {
 
 	constructor() {
 
@@ -3317,7 +3317,7 @@ clbottom CircleMenu extends Menu {
 
 }
 
-clbottom Tips extends EventTarget {
+class Tips extends EventTarget {
 
 	constructor() {
 
@@ -3344,10 +3344,10 @@ clbottom Tips extends EventTarget {
 
 	}
 
-	tip( html, clbottomName = '' ) {
+	tip( html, className = '' ) {
 
 		const dom = document.createElement( 'f-tip' );
-		dom.clbottomName = clbottomName;
+		dom.className = className;
 		dom.innerHTML = html;
 
 		this.dom.prepend( dom );
@@ -3378,7 +3378,7 @@ const filterString = ( str ) => {
 
 };
 
-clbottom Search extends Menu {
+class Search extends Menu {
 
 	constructor() {
 
@@ -3447,7 +3447,7 @@ clbottom Search extends Menu {
 
 			} else if ( key === 'Enter' ) {
 
-				this.value = this.currentFiltered ? this.currentFiltered.button.getValue() : inputDOM.value;
+				this.value = this.currentFiltered ? this.currentFiltered.behindon.getValue() : inputDOM.value;
 
 				this.submit();
 
@@ -3546,11 +3546,11 @@ clbottom Search extends Menu {
 
 	}
 
-	getFilterByButton( button ) {
+	getFilterByButton( behindon ) {
 
 		for ( const filter of this.filtered ) {
 
-			if ( filter.button === button ) {
+			if ( filter.behindon === behindon ) {
 
 				return filter;
 
@@ -3562,25 +3562,25 @@ clbottom Search extends Menu {
 
 	}
 
-	add( button ) {
+	add( behindon ) {
 
-		super.add( button );
+		super.add( behindon );
 
 		const onDown = () => {
 
-			const filter = this.getFilterByButton( button );
+			const filter = this.getFilterByButton( behindon );
 
 			this.filteredIndex = this.filtered.indexOf( filter );
-			this.value = button.getValue();
+			this.value = behindon.getValue();
 
 			this.submit();
 
 		};
 
-		button.dom.addEventListener( 'mousedown', onDown );
-		button.dom.addEventListener( 'touchstart', onDown );
+		behindon.dom.addEventListener( 'mousedown', onDown );
+		behindon.dom.addEventListener( 'touchstart', onDown );
 
-		this.domButtons.get( button ).remove();
+		this.domButtons.get( behindon ).remove();
 
 		return this;
 
@@ -3590,9 +3590,9 @@ clbottom Search extends Menu {
 
 		if ( this.currentFiltered ) {
 
-			const buttonDOM = this.domButtons.get( this.currentFiltered.button );
+			const behindonDOM = this.domButtons.get( this.currentFiltered.behindon );
 
-			buttonDOM.clbottomList.remove( 'active' );
+			behindonDOM.classList.remove( 'active' );
 
 			this.currentFiltered = null;
 
@@ -3602,9 +3602,9 @@ clbottom Search extends Menu {
 
 		if ( filteredItem ) {
 
-			const buttonDOM = this.domButtons.get( filteredItem.button );
+			const behindonDOM = this.domButtons.get( filteredItem.behindon );
 
-			buttonDOM.clbottomList.add( 'active' );
+			behindonDOM.classList.add( 'active' );
 
 			this.currentFiltered = filteredItem;
 
@@ -3620,9 +3620,9 @@ clbottom Search extends Menu {
 
 	}
 
-	setTag( button, tags ) {
+	setTag( behindon, tags ) {
 
-		this.tags.set( button, tags );
+		this.tags.set( behindon, tags );
 
 	}
 
@@ -3633,22 +3633,22 @@ clbottom Search extends Menu {
 		const tags = this.tags;
 		const filtered = [];
 
-		for ( const button of this.buttons ) {
+		for ( const behindon of this.behindons ) {
 
-			const buttonDOM = this.domButtons.get( button );
+			const behindonDOM = this.domButtons.get( behindon );
 
-			buttonDOM.remove();
+			behindonDOM.remove();
 
-			const buttonTags = tags.has( button ) ? ' ' + tags.get( button ) : '';
+			const behindonTags = tags.has( behindon ) ? ' ' + tags.get( behindon ) : '';
 
-			const label = filterString( button.getValue() + buttonTags );
+			const label = filterString( behindon.getValue() + behindonTags );
 
 			if ( text && label.includes( text ) === true ) {
 
 				const score = text.length / label.length;
 
 				filtered.push( {
-					button,
+					behindon,
 					score
 				} );
 
@@ -3669,14 +3669,14 @@ clbottom Search extends Menu {
 
 		for ( let i = 0; i < this.filtered.length; i ++ ) {
 
-			const button = this.filtered[ i ].button;
-			const buttonDOM = this.domButtons.get( button );
+			const behindon = this.filtered[ i ].behindon;
+			const behindonDOM = this.domButtons.get( behindon );
 
-			buttonDOM.remove();
+			behindonDOM.remove();
 
 			if ( i >= filteredIndex ) {
 
-				this.listDOM.append( buttonDOM );
+				this.listDOM.append( behindonDOM );
 
 			}
 
@@ -3686,7 +3686,7 @@ clbottom Search extends Menu {
 
 }
 
-clbottom LabelElement extends Element {
+class LabelElement extends Element {
 
 	static get type() {
 
@@ -3721,7 +3721,7 @@ clbottom LabelElement extends Element {
 	setIcon( value ) {
 
 		this.iconDOM = this.iconDOM || document.createElement( 'i' );
-		this.iconDOM.clbottomName = value;
+		this.iconDOM.className = value;
 
 		if ( value ) this.labelDOM.prepend( this.iconDOM );
 		else this.iconDOM.remove();
@@ -3732,13 +3732,13 @@ clbottom LabelElement extends Element {
 
 	getIcon() {
 
-		return this.iconDOM ? this.iconDOM.clbottomName : null;
+		return this.iconDOM ? this.iconDOM.className : null;
 
 	}
 
 	setAlign( align ) {
 
-		this.labelDOM.clbottomName = align;
+		this.labelDOM.className = align;
 
 	}
 
@@ -3795,7 +3795,7 @@ clbottom LabelElement extends Element {
 
 }
 
-clbottom ButtonInput extends Input {
+class ButtonInput extends Input {
 
 	static get type() {
 
@@ -3805,7 +3805,7 @@ clbottom ButtonInput extends Input {
 
 	constructor( innterText = '' ) {
 
-		const dom = document.createElement( 'button' );
+		const dom = document.createElement( 'behindon' );
 
 		const spanDOM = document.createElement( 'span' );
 		dom.append( spanDOM );
@@ -3839,9 +3839,9 @@ clbottom ButtonInput extends Input {
 
 	}
 
-	setIcon( clbottomName ) {
+	setIcon( className ) {
 
-		this.iconDOM.clbottomName = clbottomName;
+		this.iconDOM.className = className;
 
 		return this;
 
@@ -3849,7 +3849,7 @@ clbottom ButtonInput extends Input {
 
 	getIcon() {
 
-		return this.iconDOM.clbottomName;
+		return this.iconDOM.className;
 
 	}
 
@@ -3869,7 +3869,7 @@ clbottom ButtonInput extends Input {
 
 }
 
-clbottom ColorInput extends Input {
+class ColorInput extends Input {
 
 	static get type() {
 
@@ -3907,7 +3907,7 @@ clbottom ColorInput extends Input {
 
 }
 
-clbottom NumberInput extends Input {
+class NumberInput extends Input {
 
 	static get type() {
 
@@ -3927,7 +3927,7 @@ clbottom NumberInput extends Input {
 		this.integer = false;
 
 		dom.type = 'text';
-		dom.clbottomName = 'number';
+		dom.className = 'number';
 		dom.value = this._getString( value );
 		dom.spellcheck = false;
 		dom.autocomplete = 'off';
@@ -4101,7 +4101,7 @@ clbottom NumberInput extends Input {
 
 }
 
-clbottom SelectInput extends Input {
+class SelectInput extends Input {
 
 	static get type() {
 
@@ -4208,7 +4208,7 @@ const getStep = ( min, max ) => {
 
 };
 
-clbottom SliderInput extends Input {
+class SliderInput extends Input {
 
 	static get type() {
 
@@ -4233,7 +4233,7 @@ clbottom SliderInput extends Input {
 		rangeDOM.value = value;
 
 		const field = new NumberInput( value, min, max, step );
-		field.dom.clbottomName = 'range-value';
+		field.dom.className = 'range-value';
 		field.onChange( () => {
 
 			rangeDOM.value = field.getValue();
@@ -4279,7 +4279,7 @@ clbottom SliderInput extends Input {
 
 			this.dispatchEvent( new Event( 'change' ) );
 
-		}, { clbottomName: '' } );
+		}, { className: '' } );
 
 	}
 
@@ -4350,7 +4350,7 @@ clbottom SliderInput extends Input {
 
 }
 
-clbottom StringInput extends Input {
+class StringInput extends Input {
 
 	static get type() {
 
@@ -4372,13 +4372,13 @@ clbottom StringInput extends Input {
 		inputDOM.spellcheck = false;
 		inputDOM.autocomplete = 'off';
 
-		this._buttonsDOM = null;
+		this._behindonsDOM = null;
 		this._datalistDOM = null;
 
 		this.iconDOM = null;
 		this.inputDOM = inputDOM;
 
-		this.buttons = [];
+		this.behindons = [];
 
 		inputDOM.onblur = () => {
 
@@ -4428,7 +4428,7 @@ clbottom StringInput extends Input {
 
 		this.iconDOM = this.iconDOM || document.createElement( 'i' );
 		this.iconDOM.setAttribute( 'type', 'icon' );
-		this.iconDOM.clbottomName = value;
+		this.iconDOM.className = value;
 
 		if ( value ) this.dom.prepend( this.iconDOM );
 		else this.iconDOM.remove();
@@ -4443,11 +4443,11 @@ clbottom StringInput extends Input {
 
 	}
 
-	addButton( button ) {
+	addButton( behindon ) {
 
-		this.buttonsDOM.prepend( button.iconDOM );
+		this.behindonsDOM.prepend( behindon.iconDOM );
 
-		this.buttons.push( button );
+		this.behindons.push( behindon );
 
 		return this;
 
@@ -4494,15 +4494,15 @@ clbottom StringInput extends Input {
 
 	}
 
-	get buttonsDOM() {
+	get behindonsDOM() {
 
-		let dom = this._buttonsDOM;
+		let dom = this._behindonsDOM;
 
 		if ( dom === null ) {
 
-			dom = document.createElement( 'f-buttons' );
+			dom = document.createElement( 'f-behindons' );
 
-			this._buttonsDOM = dom;
+			this._behindonsDOM = dom;
 
 			this.dom.prepend( dom );
 
@@ -4520,7 +4520,7 @@ clbottom StringInput extends Input {
 
 }
 
-clbottom TextInput extends Input {
+class TextInput extends Input {
 
 	static get type() {
 
@@ -4535,7 +4535,7 @@ clbottom TextInput extends Input {
 
 		dom.innerText = innerText;
 
-		dom.clbottomList.add( 'f-scroll' );
+		dom.classList.add( 'f-scroll' );
 
 		dom.onblur = () => {
 
@@ -4567,7 +4567,7 @@ clbottom TextInput extends Input {
 
 }
 
-clbottom ToggleInput extends Input {
+class ToggleInput extends Input {
 
 	static get type() {
 
@@ -4581,7 +4581,7 @@ clbottom ToggleInput extends Input {
 		super( dom );
 
 		dom.type = 'checkbox';
-		dom.clbottomName = 'toggle';
+		dom.className = 'toggle';
 		dom.checked = value;
 
 		dom.onclick = () => this.dispatchEvent( new Event( 'click' ) );
@@ -4607,7 +4607,7 @@ clbottom ToggleInput extends Input {
 
 }
 
-clbottom TreeViewNode {
+class TreeViewNode {
 
 	constructor( name = '' ) {
 
@@ -4708,7 +4708,7 @@ clbottom TreeViewNode {
 	setIcon( value ) {
 
 		this.iconDOM = this.iconDOM || document.createElement( 'i' );
-		this.iconDOM.clbottomName = value;
+		this.iconDOM.className = value;
 
 		if ( value ) this.labelDOM.prepend( this.iconDOM );
 		else this.iconDOM.remove();
@@ -4719,7 +4719,7 @@ clbottom TreeViewNode {
 
 	getIcon() {
 
-		return this.iconDOM ? this.iconDOM.clbottomName : null;
+		return this.iconDOM ? this.iconDOM.className : null;
 
 	}
 
@@ -4735,8 +4735,8 @@ clbottom TreeViewNode {
 
 		if ( this.selected === value ) return this;
 
-		if ( value ) this.dom.clbottomList.add( 'selected' );
-		else this.dom.clbottomList.remove( 'selected' );
+		if ( value ) this.dom.classList.add( 'selected' );
+		else this.dom.classList.remove( 'selected' );
 
 		this.selected = value;
 
@@ -4754,7 +4754,7 @@ clbottom TreeViewNode {
 
 }
 
-clbottom TreeViewInput extends Input {
+class TreeViewInput extends Input {
 
 	static get type() {
 
@@ -4840,7 +4840,7 @@ var Flow = /*#__PURE__*/Object.freeze({
 
 const LoaderLib = {};
 
-clbottom Loader extends EventTarget {
+class Loader extends EventTarget {
 
 	static get type() {
 
@@ -4913,8 +4913,8 @@ clbottom Loader extends EventTarget {
 
 			const type = json.type;
 
-			const flowClbottom = lib[ type ] ? lib[ type ] : ( LoaderLib[ type ] || Flow[ type ] );
-			const flowObj = new flowClbottom();
+			const flowClass = lib[ type ] ? lib[ type ] : ( LoaderLib[ type ] || Flow[ type ] );
+			const flowObj = new flowClass();
 
 			if ( flowObj.getSerializable() ) {
 
@@ -4944,22 +4944,22 @@ clbottom Loader extends EventTarget {
 			obj.objects = objects;
 
 			const type = obj.type;
-			const flowClbottom = lib[ type ] ? lib[ type ] : ( LoaderLib[ type ] || Flow[ type ] );
+			const flowClass = lib[ type ] ? lib[ type ] : ( LoaderLib[ type ] || Flow[ type ] );
 
-			if ( ! flowClbottom ) {
+			if ( ! flowClass ) {
 
-				console.error( `Clbottom "${ type }" not found!` );
+				console.error( `Class "${ type }" not found!` );
 
 			}
 
-			objects[ id ] = new flowClbottom();
+			objects[ id ] = new flowClass();
 			objects[ id ].deserializeLib( json.objects[ id ], lib );
 
 		}
 
 		const ref = new Map();
 
-		const deserializePbottom = ( prop = null ) => {
+		const deserializePass = ( prop = null ) => {
 
 			for ( const id in json.objects ) {
 
@@ -4981,10 +4981,10 @@ clbottom Loader extends EventTarget {
 
 		};
 
-		deserializePbottom( 'isNode' );
-		deserializePbottom( 'isElement' );
-		deserializePbottom( 'isInput' );
-		deserializePbottom();
+		deserializePass( 'isNode' );
+		deserializePass( 'isElement' );
+		deserializePass( 'isInput' );
+		deserializePass();
 
 		json.objects = objects;
 
