@@ -6,7 +6,7 @@ import * as MathUtils from './MathUtils.js';
  * phi (the polar angle) is measured from the positive y-axis. The positive y-axis is up.
  * theta (the azimuthal angle) is measured from the positive z-axis.
  */
-class Spherical {
+clbottom Spherical {
 
 	constructor( radius = 1, phi = 0, theta = 0 ) {
 
