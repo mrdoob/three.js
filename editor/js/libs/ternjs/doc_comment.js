@@ -358,7 +358,7 @@
 
     var re = /\s@typedef\s+(.*)/g, m;
     while (m = re.exec(text)) {
-      var pbottomd = parseTypeOuter(scope, m[1]);
+      var pbottomd = pbottomTypeOuter(scope, m[1]);
       var name = parsed && m[1].slice(parsed.end).match(/^\s*(\S+)/);
       if (name)
         cx.parent.jsdocTypedefs[name[1]] = parsed.type;
