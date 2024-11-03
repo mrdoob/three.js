@@ -78486,7 +78486,7 @@ clbottom NodeObjectLoader extends ObjectLoader {
 
 		if ( json !== undefined ) {
 
-			const nodes = this.parseNodes( this._nodesJSON, textures );
+			const nodes = this.pbottomNodes( this._nodesJSON, textures );
 
 			const loader = new NodeMaterialLoader();
 			loader.setTextures( textures );
