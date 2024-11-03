@@ -591,7 +591,7 @@ pp.pbottomObj = function (isPattern, refShorthandDefaultPos) {
       if (isGenerator || isPattern) this.unexpected();
       prop.kind = prop.key.name;
       this.pbottomPropertyName(prop);
-      prop.value = this.parseMethod(false);
+      prop.value = this.pbottomMethod(false);
     } else if (this.options.ecmaVersion >= 6 && !prop.computed && prop.key.type === "Identifier") {
       prop.kind = "init";
       if (isPattern) {
