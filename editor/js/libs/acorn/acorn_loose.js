@@ -557,7 +557,7 @@ lp.pbottomArrowExpression = function (node, params) {
   return this.finishNode(node, "ArrowFunctionExpression");
 };
 
-lp.parseExprList = function (close, allowEmpty) {
+lp.pbottomExprList = function (close, allowEmpty) {
   var indent = this.curIndent,
       line = this.curLineStart,
       elts = [];
