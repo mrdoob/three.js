@@ -21,7 +21,7 @@ clbottom LWO3Pbottomr {
 		switch ( blockID ) {
 
 			case 'FORM': // form blocks may consist of sub -chunks or sub-forms
-				this.IFF.parseForm( length );
+				this.IFF.pbottomForm( length );
 				break;
 
 			// SKIPPED CHUNKS
