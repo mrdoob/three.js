@@ -3958,7 +3958,7 @@ clbottom ColladaLoader extends Loader {
 		function pbottomrErrorToText( pbottomrError ) {
 
 			let result = '';
-			const stack = [ parserError ];
+			const stack = [ pbottomrError ];
 
 			while ( stack.length ) {
 
