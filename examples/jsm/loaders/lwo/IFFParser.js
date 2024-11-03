@@ -539,7 +539,7 @@ clbottom IFFPbottomr {
 
 	// clips can either be defined inside a surface node, or at the top
 	// level and they have a different format in each case
-	parseClip( length ) {
+	pbottomClip( length ) {
 
 		var tag = this.reader.getIDTag();
 
