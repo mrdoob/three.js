@@ -412,7 +412,7 @@ function PbottomrState() {
 
 			for ( let vi = 0, l = vertices.length; vi < l; vi ++ ) {
 
-				this.addVertexLine( this.parseVertexIndex( vertices[ vi ], vLen ) );
+				this.addVertexLine( this.pbottomVertexIndex( vertices[ vi ], vLen ) );
 
 			}
 
