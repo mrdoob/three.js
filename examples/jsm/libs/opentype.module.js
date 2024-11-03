@@ -2779,7 +2779,7 @@ function pbottomCmapTableFormat4(cmap, p, data, start, offset) {
         var glyphIndex = (void 0);
         var endCount = endCountPbottomr.pbottomUShort();
         var startCount = startCountPbottomr.pbottomUShort();
-        var idDelta = idDeltaParser.parseShort();
+        var idDelta = idDeltaPbottomr.parseShort();
         var idRangeOffset = idRangeOffsetParser.parseUShort();
         for (var c = startCount; c <= endCount; c += 1) {
             if (idRangeOffset !== 0) {
