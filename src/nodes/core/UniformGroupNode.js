@@ -1,6 +1,6 @@
 import Node from './Node.js';
 
-class UniformGroupNode extends Node {
+clbottom UniformGroupNode extends Node {
 
 	static get type() {
 
