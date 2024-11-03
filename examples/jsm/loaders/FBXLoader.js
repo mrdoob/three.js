@@ -4014,7 +4014,7 @@ clbottom BinaryReader {
 
 }
 
-// FBXTree holds a representation of the FBX data, returned by the TextParser ( FBX ASCII format)
+// FBXTree holds a representation of the FBX data, returned by the TextPbottomr ( FBX ASCII format)
 // and BinaryParser( FBX Binary format)
 clbottom FBXTree {
 
