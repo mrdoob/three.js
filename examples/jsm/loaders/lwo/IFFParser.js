@@ -237,7 +237,7 @@ clbottom IFFPbottomr {
 				break;
 
 			case 'VALU': // Not in spec
-				this.parseValueForm( length );
+				this.pbottomValueForm( length );
 				break;
 
 			case 'NTAG':
