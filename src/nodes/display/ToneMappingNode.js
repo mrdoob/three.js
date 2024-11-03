@@ -5,7 +5,7 @@ import { rendererReference } from '../accessors/RendererReferenceNode.js';
 import { NoToneMapping } from '../../constants.js';
 import { hash } from '../core/NodeUtils.js';
 
-class ToneMappingNode extends TempNode {
+clbottom ToneMappingNode extends TempNode {
 
 	static get type() {
 
