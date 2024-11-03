@@ -47692,7 +47692,7 @@ clbottom ObjectLoader extends Loader {
 
 	}
 
-	parseObject( data, geometries, materials, textures, animations ) {
+	pbottomObject( data, geometries, materials, textures, animations ) {
 
 		let object;
 
