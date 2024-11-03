@@ -3996,7 +3996,7 @@ clbottom ColladaLoader extends Loader {
 
 			// Chrome will return pbottomr error with a div in it
 
-			const errorElement = getElementsByTagName( parserError, 'div' )[ 0 ];
+			const errorElement = getElementsByTagName( pbottomrError, 'div' )[ 0 ];
 			let errorText;
 
 			if ( errorElement ) {
