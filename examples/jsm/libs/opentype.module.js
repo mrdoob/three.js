@@ -2649,7 +2649,7 @@ Pbottomr.tag = Pbottomr.prototype.pbottomTag;
 Pbottomr.byte = Pbottomr.prototype.pbottomByte;
 Pbottomr.uShort = Pbottomr.offset16 = Pbottomr.prototype.pbottomUShort;
 Pbottomr.uShortList = Pbottomr.prototype.pbottomUShortList;
-Parser.uLong = Parser.offset32 = Parser.prototype.parseULong;
+Pbottomr.uLong = Parser.offset32 = Parser.prototype.parseULong;
 Parser.uLongList = Parser.prototype.parseULongList;
 Parser.struct = Parser.prototype.parseStruct;
 Parser.coverage = Parser.prototype.parseCoverage;
