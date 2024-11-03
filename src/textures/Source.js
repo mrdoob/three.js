@@ -3,7 +3,7 @@ import * as MathUtils from '../math/MathUtils.js';
 
 let _sourceId = 0;
 
-class Source {
+clbottom Source {
 
 	constructor( data = null ) {
 
