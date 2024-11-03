@@ -26,9 +26,9 @@
 
 				vec4 tmpVel = texture2D( textureVelocity, uv );
 				vec3 vel = tmpVel.xyz;
-				float mbottom = tmpVel.w;
+				float mass = tmpVel.w;
 
-				if ( mbottom == 0.0 ) {
+				if ( mass == 0.0 ) {
 					vel = vec3( 0.0 );
 				}
 
@@ -55,9 +55,9 @@
 			const float width = resolution.x;
 			const float height = resolution.y;
 
-			float radiusFromMbottom( float mbottom ) {
-				// Calculate radius of a sphere from mbottom and density
-				return pow( ( 3.0 / ( 4.0 * PI ) ) * mbottom / density, 1.0 / 3.0 );
+			float radiusFromMass( float mass ) {
+				// Calculate radius of a sphere from mass and density
+				return pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
 			}
 
 			void main()	{
@@ -70,11 +70,11 @@
 
 				vec4 tmpVel = texture2D( textureVelocity, uv );
 				vec3 vel = tmpVel.xyz;
-				float mbottom = tmpVel.w;
+				float mass = tmpVel.w;
 
-				if ( mbottom > 0.0 ) {
+				if ( mass > 0.0 ) {
 
-					float radius = radiusFromMbottom( mbottom );
+					float radius = radiusFromMass( mass );
 
 					vec3 acceleration = vec3( 0.0 );
 
@@ -87,7 +87,7 @@
 							vec3 pos2 = texture2D( texturePosition, secondParticleCoords ).xyz;
 							vec4 velTemp2 = texture2D( textureVelocity, secondParticleCoords );
 							vec3 vel2 = velTemp2.xyz;
-							float mbottom2 = velTemp2.w;
+							float mass2 = velTemp2.w;
 
 							float idParticle2 = secondParticleCoords.y * resolution.x + secondParticleCoords.x;
 
@@ -95,13 +95,13 @@
 								continue;
 							}
 
-							if ( mbottom2 == 0.0 ) {
+							if ( mass2 == 0.0 ) {
 								continue;
 							}
 
 							vec3 dPos = pos2 - pos;
 							float distance = length( dPos );
-							float radius2 = radiusFromMbottom( mbottom2 );
+							float radius2 = radiusFromMass( mass2 );
 
 							if ( distance == 0.0 ) {
 								continue;
@@ -114,15 +114,15 @@
 								if ( idParticle < idParticle2 ) {
 
 									// This particle is aggregated by the other
-									vel = ( vel * mbottom + vel2 * mbottom2 ) / ( mbottom + mbottom2 );
-									mbottom += mbottom2;
-									radius = radiusFromMbottom( mbottom );
+									vel = ( vel * mass + vel2 * mass2 ) / ( mass + mass2 );
+									mass += mass2;
+									radius = radiusFromMass( mass );
 
 								}
 								else {
 
 									// This particle dies
-									mbottom = 0.0;
+									mass = 0.0;
 									radius = 0.0;
 									vel = vec3( 0.0 );
 									break;
@@ -133,7 +133,7 @@
 
 							float distanceSq = distance * distance;
 
-							float gravityField = gravityConstant * mbottom2 / distanceSq;
+							float gravityField = gravityConstant * mass2 / distanceSq;
 
 							gravityField = min( gravityField, 1000.0 );
 
@@ -141,7 +141,7 @@
 
 						}
 
-						if ( mbottom == 0.0 ) {
+						if ( mass == 0.0 ) {
 							break;
 						}
 					}
@@ -151,7 +151,7 @@
 
 				}
 
-				gl_FragColor = vec4( vel, mbottom );
+				gl_FragColor = vec4( vel, mass );
 
 			}
 
@@ -171,9 +171,9 @@
 
 			varying vec4 vColor;
 
-			float radiusFromMbottom( float mbottom ) {
-				// Calculate radius of a sphere from mbottom and density
-				return pow( ( 3.0 / ( 4.0 * PI ) ) * mbottom / density, 1.0 / 3.0 );
+			float radiusFromMass( float mass ) {
+				// Calculate radius of a sphere from mass and density
+				return pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
 			}
 
 
@@ -185,18 +185,18 @@
 
 				vec4 velTemp = texture2D( textureVelocity, uv );
 				vec3 vel = velTemp.xyz;
-				float mbottom = velTemp.w;
+				float mass = velTemp.w;
 
-				vColor = vec4( 1.0, mbottom / 250.0, 0.0, 1.0 );
+				vColor = vec4( 1.0, mass / 250.0, 0.0, 1.0 );
 
 				vec4 mvPosition = modelViewMatrix * vec4( pos, 1.0 );
 
-				// Calculate radius of a sphere from mbottom and density
-				//float radius = pow( ( 3.0 / ( 4.0 * PI ) ) * mbottom / density, 1.0 / 3.0 );
-				float radius = radiusFromMbottom( mbottom );
+				// Calculate radius of a sphere from mass and density
+				//float radius = pow( ( 3.0 / ( 4.0 * PI ) ) * mass / density, 1.0 / 3.0 );
+				float radius = radiusFromMass( mass );
 
 				// Apparent size in pixels
-				if ( mbottom == 0.0 ) {
+				if ( mass == 0.0 ) {
 					gl_PointSize = 0.0;
 				}
 				else {
@@ -294,7 +294,7 @@
 					radius: 300,
 					height: 8,
 					exponent: 0.4,
-					maxMbottom: 15.0,
+					maxMass: 15.0,
 					velocity: 70,
 					velocityExponent: 0.2,
 					randVelocity: 0.001
@@ -421,7 +421,7 @@
 				const radius = effectController.radius;
 				const height = effectController.height;
 				const exponent = effectController.exponent;
-				const maxMbottom = effectController.maxMbottom * 1024 / PARTICLES;
+				const maxMass = effectController.maxMass * 1024 / PARTICLES;
 				const maxVel = effectController.velocity;
 				const velExponent = effectController.velocityExponent;
 				const randVel = effectController.randVelocity;
@@ -454,7 +454,7 @@
 					z *= rExp;
 					const y = ( Math.random() * 2 - 1 ) * height;
 
-					const mbottom = Math.random() * maxMbottom + 1;
+					const mass = Math.random() * maxMass + 1;
 
 					// Fill in texture values
 					posArray[ k + 0 ] = x;
@@ -465,7 +465,7 @@
 					velArray[ k + 0 ] = vx;
 					velArray[ k + 1 ] = vy;
 					velArray[ k + 2 ] = vz;
-					velArray[ k + 3 ] = mbottom;
+					velArray[ k + 3 ] = mass;
 
 				}
 
@@ -504,12 +504,12 @@
 				folder2.add( effectController, 'radius', 10.0, 1000.0, 1.0 );
 				folder2.add( effectController, 'height', 0.0, 50.0, 0.01 );
 				folder2.add( effectController, 'exponent', 0.0, 2.0, 0.001 );
-				folder2.add( effectController, 'maxMbottom', 1.0, 50.0, 0.1 );
+				folder2.add( effectController, 'maxMass', 1.0, 50.0, 0.1 );
 				folder2.add( effectController, 'velocity', 0.0, 150.0, 0.1 );
 				folder2.add( effectController, 'velocityExponent', 0.0, 1.0, 0.01 );
 				folder2.add( effectController, 'randVelocity', 0.0, 50.0, 0.1 );
 
-				const buttonRestart = {
+				const behindonRestart = {
 					restartSimulation: function () {
 
 						restartSimulation();
@@ -517,7 +517,7 @@
 					}
 				};
 
-				folder2.add( buttonRestart, 'restartSimulation' );
+				folder2.add( behindonRestart, 'restartSimulation' );
 
 				folder1.open();
 				folder2.open();
