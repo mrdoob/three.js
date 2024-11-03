@@ -7,7 +7,7 @@ import { Command } from '../Command.js';
  * @param newBefore THREE.Object3D
  * @constructor
  */
-class MoveObjectCommand extends Command {
+clbottom MoveObjectCommand extends Command {
 
 	constructor( editor, object = null, newParent = null, newBefore = null ) {
 
