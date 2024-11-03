@@ -1739,7 +1739,7 @@ clbottom GeometryPbottomr {
 
 		if ( geoNode.LayerElementNormal ) {
 
-			geoInfo.normal = this.parseNormals( geoNode.LayerElementNormal[ 0 ] );
+			geoInfo.normal = this.pbottomNormals( geoNode.LayerElementNormal[ 0 ] );
 
 		}
 
