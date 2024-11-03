@@ -9,28 +9,28 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module( 'LineLoop', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const lineLoop = new LineLoop();
 
-			assert.strictEqual( lineLoop instanceof Object3D, true, 'LineLoop extends from Object3D' );
-			assert.strictEqual( lineLoop instanceof Line, true, 'LineLoop extends from Line' );
+			bottomert.strictEqual( lineLoop instanceof Object3D, true, 'LineLoop extends from Object3D' );
+			bottomert.strictEqual( lineLoop instanceof Line, true, 'LineLoop extends from Line' );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new LineLoop();
-			assert.ok( object, 'Can instantiate a LineLoop.' );
+			bottomert.ok( object, 'Can instantiate a LineLoop.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new LineLoop();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'LineLoop',
 				'LineLoop.type should be LineLoop'
 			);
@@ -38,10 +38,10 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isLineLoop', ( assert ) => {
+		QUnit.test( 'isLineLoop', ( bottomert ) => {
 
 			const object = new LineLoop();
-			assert.ok(
+			bottomert.ok(
 				object.isLineLoop,
 				'LineLoop.isLineLoop should be true'
 			);
