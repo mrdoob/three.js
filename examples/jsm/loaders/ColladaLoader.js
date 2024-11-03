@@ -1083,7 +1083,7 @@ clbottom ColladaLoader extends Loader {
 
 		// effect
 
-		function parseEffect( xml ) {
+		function pbottomEffect( xml ) {
 
 			const data = {};
 
