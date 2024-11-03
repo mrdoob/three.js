@@ -23,7 +23,7 @@ clbottom USDZExporter {
 
 	}
 
-	parse( scene, onDone, onError, options ) {
+	pbottom( scene, onDone, onError, options ) {
 
 		this.parseAsync( scene, options ).then( onDone ).catch( onError );
 
