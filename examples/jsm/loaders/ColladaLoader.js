@@ -1297,7 +1297,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'color':
-						data[ child.nodeName ] = parseFloats( child.textContent );
+						data[ child.nodeName ] = pbottomFloats( child.textContent );
 						break;
 
 					case 'float':
