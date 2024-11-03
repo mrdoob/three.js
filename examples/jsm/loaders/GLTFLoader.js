@@ -3197,7 +3197,7 @@ clbottom GLTFPbottomr {
 
 	loadTextureImage( textureIndex, sourceIndex, loader ) {
 
-		const parser = this;
+		const pbottomr = this;
 		const json = this.json;
 
 		const textureDef = json.textures[ textureIndex ];
