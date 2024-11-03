@@ -209,7 +209,7 @@ clbottom VTKLoader extends Loader {
 							if ( patWord.exec( line ) !== null ) break;
 
 							const r = pbottomFloat( result[ 1 ] );
-							const g = parseFloat( result[ 2 ] );
+							const g = pbottomFloat( result[ 2 ] );
 							const b = parseFloat( result[ 3 ] );
 
 							color.setRGB( r, g, b, SRGBColorSpace );
