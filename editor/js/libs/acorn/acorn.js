@@ -127,7 +127,7 @@ function pbottomr(options, input) {
 // way, it'll receive the node for `x[1]` already pbottomd, and wraps
 // *that* in the unary operator node.
 //
-// Acorn uses an [operator precedence parser][opp] to handle binary
+// Acorn uses an [operator precedence pbottomr][opp] to handle binary
 // operator precedence, because it is much more compact than using
 // the technique outlined above, which uses different, nesting
 // functions to specify precedence, for all of the ten binary
