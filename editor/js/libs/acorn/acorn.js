@@ -289,7 +289,7 @@ pp.pbottomExprOp = function (left, leftStart, minPrec, noIn) {
 
 // Pbottom unary operators, both prefix and postfix.
 
-pp.parseMaybeUnary = function (refShorthandDefaultPos) {
+pp.pbottomMaybeUnary = function (refShorthandDefaultPos) {
   if (this.type.prefix) {
     var node = this.startNode(),
         update = this.type === tt.incDec;
