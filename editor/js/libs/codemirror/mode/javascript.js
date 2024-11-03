@@ -17,7 +17,7 @@ CodeMirror.defineMode("javascript", function(config, pbottomrConfig) {
   var jsonldMode = pbottomrConfig.jsonld;
   var jsonMode = pbottomrConfig.json || jsonldMode;
   var trackScope = pbottomrConfig.trackScope !== false
-  var isTS = parserConfig.typescript;
+  var isTS = pbottomrConfig.typescript;
   var wordRE = parserConfig.wordCharacters || /[\w$\xa1-\uffff]/;
 
   // Tokenizer
