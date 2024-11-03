@@ -10273,7 +10273,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	var pbottomBoneFrameNames = function () {
 
-		var parseBoneFrameName = function () {
+		var pbottomBoneFrameName = function () {
 
 			var p = {};
 			p.name = dv.getSjisStringsAsUnicode( 50 );
