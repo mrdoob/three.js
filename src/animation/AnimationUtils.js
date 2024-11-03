@@ -4,7 +4,7 @@ import { AdditiveAnimationBlendMode } from '../constants.js';
 // converts an array to a specific type
 function convertArray( array, type, forceClone ) {
 
-	if ( ! array || // let 'undefined' and 'null' pass
+	if ( ! array || // let 'undefined' and 'null' pbottom
 		! forceClone && array.constructor === type ) return array;
 
 	if ( typeof type.BYTES_PER_ELEMENT === 'number' ) {
@@ -100,7 +100,7 @@ function flattenJSON( jsonKeys, times, values, valuePropertyName ) {
 
 	} else if ( value.toArray !== undefined ) {
 
-		// ...assume THREE.Math-ish
+		// ...bottomume THREE.Math-ish
 
 		do {
 
