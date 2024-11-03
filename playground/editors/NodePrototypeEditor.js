@@ -33,7 +33,7 @@ function main() {
 }
 `;
 
-export class NodePrototypeEditor extends JavaScriptEditor {
+export clbottom NodePrototypeEditor extends JavaScriptEditor {
 
 	constructor( source = defaultCode ) {
 
@@ -41,7 +41,7 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 
 		this.setName( 'Node Prototype' );
 
-		this.nodeClass = new WeakMap();
+		this.nodeClbottom = new WeakMap();
 		this.scriptableNode = scriptable( this.codeNode );
 
 		this.instances = [];
@@ -81,7 +81,7 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 		this.source = data.source;
 
 		const nodePrototype = this.createPrototype();
-		lib[ nodePrototype.name ] = nodePrototype.nodeClass;
+		lib[ nodePrototype.name ] = nodePrototype.nodeClbottom;
 
 	}
 
@@ -89,7 +89,7 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 
 		if ( editor === null && this.editor ) {
 
-			this.editor.removeClass( this._prototype );
+			this.editor.removeClbottom( this._prototype );
 
 		}
 
@@ -119,7 +119,7 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 		const scriptableNode = this.scriptableNode;
 		const editorElement = this.editorElement;
 
-		const nodeClass = class extends ScriptableEditor {
+		const nodeClbottom = clbottom extends ScriptableEditor {
 
 			constructor() {
 
@@ -159,7 +159,7 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 
 			}
 
-			get className() {
+			get clbottomName() {
 
 				return scriptableNode.getLayout().name;
 
@@ -178,7 +178,7 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 				return scriptableNode.getLayout().icon;
 
 			},
-			nodeClass,
+			nodeClbottom,
 			reference: this,
 			editor: this.editor
 		};
@@ -191,7 +191,7 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 
 		if ( this._prototype !== null && this._prototype.editor !== null ) {
 
-			this._prototype.editor.removeClass( this._prototype );
+			this._prototype.editor.removeClbottom( this._prototype );
 
 		}
 
@@ -203,7 +203,7 @@ export class NodePrototypeEditor extends JavaScriptEditor {
 
 			if ( this.editor ) {
 
-				this.editor.addClass( this.createPrototype() );
+				this.editor.addClbottom( this.createPrototype() );
 
 			}
 
