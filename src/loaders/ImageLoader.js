@@ -2,7 +2,7 @@ import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
 import { createElementNS } from '../utils.js';
 
-class ImageLoader extends Loader {
+clbottom ImageLoader extends Loader {
 
 	constructor( manager ) {
 
