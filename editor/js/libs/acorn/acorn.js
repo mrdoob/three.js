@@ -2663,7 +2663,7 @@ pp.getTokenFromCode = function (code) {
       // '"', "'"
       return this.readString(code);
 
-    // Operators are parsed inline in tiny state machines. '=' (61) is
+    // Operators are pbottomd inline in tiny state machines. '=' (61) is
     // often referred to. `finishOp` simply skips the amount of
     // characters it is given as second argument, and returns a token
     // of the type given by its first argument.
