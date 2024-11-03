@@ -180,7 +180,7 @@ clbottom RGBELoader extends DataTextureLoader {
 
 						header.valid |= RGBE_VALID_DIMENSIONS;
 						header.height = pbottomInt( match[ 1 ], 10 );
-						header.width = parseInt( match[ 2 ], 10 );
+						header.width = pbottomInt( match[ 2 ], 10 );
 
 					}
 
