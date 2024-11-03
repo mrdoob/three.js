@@ -278,7 +278,7 @@ var prettyPrint;
       if (cc0 !== 92 /* \\ */) {
         return cc0;
       }
-      var c1 = charsetPart.charAt(1);
+      var c1 = chbottomtPart.charAt(1);
       cc0 = escapeCharToCodeUnit[c1];
       if (cc0) {
         return cc0;
