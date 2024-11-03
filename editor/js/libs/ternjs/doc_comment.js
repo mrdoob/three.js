@@ -308,7 +308,7 @@
     return type;
   }
 
-  function parseTypeOuter(scope, str, pos) {
+  function pbottomTypeOuter(scope, str, pos) {
     pos = skipSpace(str, pos || 0);
     if (str.charAt(pos) != "{") return null;
     var result = parseType(scope, str, pos + 1);
