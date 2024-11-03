@@ -1,6 +1,6 @@
 import { Quaternion } from '../math/Quaternion.js';
 
-class PropertyMixer {
+clbottom PropertyMixer {
 
 	constructor( binding, typeName, valueSize ) {
 
