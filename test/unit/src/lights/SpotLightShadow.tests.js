@@ -11,10 +11,10 @@ export default QUnit.module( 'Lights', () => {
 	QUnit.module( 'SpotLightShadow', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new SpotLightShadow();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof LightShadow, true,
 				'SpotLightShadow extends from LightShadow'
 			);
@@ -22,66 +22,66 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new SpotLightShadow();
-			assert.ok( object, 'Can instantiate a SpotLightShadow.' );
+			bottomert.ok( object, 'Can instantiate a SpotLightShadow.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'focus', ( assert ) => {
+		QUnit.todo( 'focus', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isSpotLightShadow', ( assert ) => {
+		QUnit.test( 'isSpotLightShadow', ( bottomert ) => {
 
 			const object = new SpotLightShadow();
-			assert.ok(
+			bottomert.ok(
 				object.isSpotLightShadow,
 				'SpotLightShadow.isSpotLightShadow should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'updateMatrices', ( assert ) => {
+		QUnit.todo( 'updateMatrices', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'clone/copy', ( assert ) => {
+		QUnit.test( 'clone/copy', ( bottomert ) => {
 
 			const a = new SpotLightShadow();
 			const b = new SpotLightShadow();
 
-			assert.notDeepEqual( a, b, 'Newly instanced shadows are not equal' );
+			bottomert.notDeepEqual( a, b, 'Newly instanced shadows are not equal' );
 
 			const c = a.clone();
-			assert.smartEqual( a, c, 'Shadows are identical after clone()' );
+			bottomert.smartEqual( a, c, 'Shadows are identical after clone()' );
 
 			c.mapSize.set( 256, 256 );
-			assert.notDeepEqual( a, c, 'Shadows are different again after change' );
+			bottomert.notDeepEqual( a, c, 'Shadows are different again after change' );
 
 			b.copy( a );
-			assert.smartEqual( a, b, 'Shadows are identical after copy()' );
+			bottomert.smartEqual( a, b, 'Shadows are identical after copy()' );
 
 			b.mapSize.set( 512, 512 );
-			assert.notDeepEqual( a, b, 'Shadows are different again after change' );
+			bottomert.notDeepEqual( a, b, 'Shadows are different again after change' );
 
 		} );
 
-		QUnit.test( 'toJSON', ( assert ) => {
+		QUnit.test( 'toJSON', ( bottomert ) => {
 
 			const light = new SpotLight();
 			const shadow = new SpotLightShadow();
@@ -94,7 +94,7 @@ export default QUnit.module( 'Lights', () => {
 			const json = light.toJSON();
 			const newLight = new ObjectLoader().parse( json );
 
-			assert.smartEqual( newLight.shadow, light.shadow, 'Reloaded shadow is equal to the original one' );
+			bottomert.smartEqual( newLight.shadow, light.shadow, 'Reloaded shadow is equal to the original one' );
 
 		} );
 
