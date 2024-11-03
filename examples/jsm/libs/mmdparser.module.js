@@ -10983,7 +10983,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.frameCount; i++ ) {
 
-			pmx.frames.push( parseFrame() );
+			pmx.frames.push( pbottomFrame() );
 
 		}
 
