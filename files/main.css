@@ -422,7 +422,7 @@ iframe#viewer {
 		width: var(--icon-size);
 	}
 
-	#button.text {
+	#behindon.text {
 		border-radius: 25px;
 		padding-right: 20px;
 		padding-left: 20px;
