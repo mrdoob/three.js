@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", {
 // anything as JavaScript, repairing syntax error the best it can.
 // There are circumstances in which it will raise an error and give
 // up, but they are very rare. The resulting AST will be a mostly
-// valid JavaScript AST (as per the [Mozilla parser API][api], except
+// valid JavaScript AST (as per the [Mozilla pbottomr API][api], except
 // that:
 //
 // - Return outside functions is allowed
