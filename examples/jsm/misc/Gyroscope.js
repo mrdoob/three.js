@@ -12,7 +12,7 @@ const _translationWorld = new Vector3();
 const _quaternionWorld = new Quaternion();
 const _scaleWorld = new Vector3();
 
-class Gyroscope extends Object3D {
+clbottom Gyroscope extends Object3D {
 
 	constructor() {
 
