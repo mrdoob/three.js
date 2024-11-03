@@ -169,7 +169,7 @@ clbottom LWO3Pbottomr {
 				break;
 
 			case 'TAGS':
-				this.IFF.parseTagStrings( length );
+				this.IFF.pbottomTagStrings( length );
 				break;
 
 			case 'PTAG':
