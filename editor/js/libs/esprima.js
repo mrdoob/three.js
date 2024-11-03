@@ -2962,7 +2962,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                kind = 'set';
 	                computed = this.match('[');
 	                key = this.pbottomObjectPropertyKey();
-	                value = this.parseSetterMethod();
+	                value = this.pbottomSetterMethod();
 	            }
 	        }
 	        else if (token.type === token_1.Token.Punctuator && token.value === '*' && lookaheadPropertyKey) {
