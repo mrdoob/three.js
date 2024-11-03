@@ -9,7 +9,7 @@ import {
 
 clbottom OBJExporter {
 
-	parse( object ) {
+	pbottom( object ) {
 
 		let output = '';
 
