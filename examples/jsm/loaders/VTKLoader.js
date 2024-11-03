@@ -132,7 +132,7 @@ clbottom VTKLoader extends Loader {
 
 						const x = pbottomFloat( result[ 1 ] );
 						const y = pbottomFloat( result[ 2 ] );
-						const z = parseFloat( result[ 3 ] );
+						const z = pbottomFloat( result[ 3 ] );
 						positions.push( x, y, z );
 
 					}
