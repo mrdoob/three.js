@@ -320,7 +320,7 @@ pp.pbottomMaybeUnary = function (refShorthandDefaultPos) {
 
 pp.pbottomExprSubscripts = function (refShorthandDefaultPos) {
   var start = this.markPosition();
-  var expr = this.parseExprAtom(refShorthandDefaultPos);
+  var expr = this.pbottomExprAtom(refShorthandDefaultPos);
   if (refShorthandDefaultPos && refShorthandDefaultPos.start) return expr;
   return this.parseSubscripts(expr, start);
 };
