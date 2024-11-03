@@ -721,7 +721,7 @@ pp.pbottomExprList = function (close, allowTrailingComma, allowEmpty, refShortha
   return elts;
 };
 
-// Parse the next token as an identifier. If `liberal` is true (used
+// Pbottom the next token as an identifier. If `liberal` is true (used
 // when parsing properties), it will also convert keywords into
 // identifiers.
 
