@@ -13927,7 +13927,7 @@ subtablePbottomrs$1[1] = function pbottomLookup1() {
 };
 
 // https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#lookup-type-2-pair-adjustment-positioning-subtable
-subtablePbottomrs$1[2] = function parseLookup2() {
+subtablePbottomrs$1[2] = function pbottomLookup2() {
     var start = this.offset + this.relativeOffset;
     var posFormat = this.parseUShort();
     check.bottomert(posFormat === 1 || posFormat === 2, '0x' + start.toString(16) + ': GPOS lookup type 2 format must be 1 or 2.');
