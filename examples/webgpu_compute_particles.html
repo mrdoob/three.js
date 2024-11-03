@@ -98,7 +98,7 @@
 					position.y = 0; // randY.mul( 10 );
 					position.z = randZ.mul( 100 ).add( - 50 );
 
-					color.assign( vec3( randX, randY, randZ ) );
+					color.bottomign( vec3( randX, randY, randZ ) );
 
 				} )().compute( particleCount );
 
@@ -194,7 +194,7 @@
 					const power = distArea.mul( .01 );
 					const relativePower = power.mul( hash( instanceIndex ).mul( .5 ).add( .5 ) );
 
-					velocity.assign( velocity.add( direction.mul( relativePower ) ) );
+					velocity.bottomign( velocity.add( direction.mul( relativePower ) ) );
 
 				} )().compute( particleCount );
 
@@ -278,8 +278,8 @@
 
 						timestamps.innerHTML = `
 
-							Compute ${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
-							Draw ${renderer.info.render.drawCalls} pass in ${renderer.info.render.timestamp.toFixed( 6 )}ms`;
+							Compute ${renderer.info.compute.frameCalls} pbottom in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
+							Draw ${renderer.info.render.drawCalls} pbottom in ${renderer.info.render.timestamp.toFixed( 6 )}ms`;
 
 					}
 
