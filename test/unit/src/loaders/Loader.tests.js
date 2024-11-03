@@ -9,111 +9,111 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module( 'Loader', () => {
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Loader();
-			assert.ok( object, 'Can instantiate a Loader.' );
+			bottomert.ok( object, 'Can instantiate a Loader.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'manager', ( assert ) => {
+		QUnit.test( 'manager', ( bottomert ) => {
 
 			// uses default LoadingManager if not supplied in constructor
 			const object = new Loader().manager;
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof LoadingManager, true,
 				'Loader defines a default manager if not supplied in constructor.'
 			);
 
 		} );
 
-		QUnit.test( 'crossOrigin', ( assert ) => {
+		QUnit.test( 'crossOrigin', ( bottomert ) => {
 
 			const actual = new Loader().crossOrigin;
 			const expected = 'anonymous';
-			assert.strictEqual( actual, expected, 'Loader defines crossOrigin.' );
+			bottomert.strictEqual( actual, expected, 'Loader defines crossOrigin.' );
 
 		} );
 
-		QUnit.test( 'withCredentials', ( assert ) => {
+		QUnit.test( 'withCredentials', ( bottomert ) => {
 
 			const actual = new Loader().withCredentials;
 			const expected = false;
-			assert.strictEqual( actual, expected, 'Loader defines withCredentials.' );
+			bottomert.strictEqual( actual, expected, 'Loader defines withCredentials.' );
 
 		} );
 
-		QUnit.test( 'path', ( assert ) => {
+		QUnit.test( 'path', ( bottomert ) => {
 
 			const actual = new Loader().path;
 			const expected = '';
-			assert.strictEqual( actual, expected, 'Loader defines path.' );
+			bottomert.strictEqual( actual, expected, 'Loader defines path.' );
 
 		} );
 
-		QUnit.test( 'resourcePath', ( assert ) => {
+		QUnit.test( 'resourcePath', ( bottomert ) => {
 
 			const actual = new Loader().resourcePath;
 			const expected = '';
-			assert.strictEqual( actual, expected, 'Loader defines resourcePath.' );
+			bottomert.strictEqual( actual, expected, 'Loader defines resourcePath.' );
 
 		} );
 
-		QUnit.test( 'requestHeader', ( assert ) => {
+		QUnit.test( 'requestHeader', ( bottomert ) => {
 
 			const actual = new Loader().requestHeader;
 			const expected = {};
-			assert.deepEqual( actual, expected, 'Loader defines requestHeader.' );
+			bottomert.deepEqual( actual, expected, 'Loader defines requestHeader.' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
+		QUnit.todo( 'load', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'loadAsync', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'parse', ( assert ) => {
+		QUnit.todo( 'loadAsync', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setCrossOrigin', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setWithCredentials', ( assert ) => {
+		QUnit.todo( 'parse', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setPath', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setResourcePath', ( assert ) => {
+		QUnit.todo( 'setCrossOrigin', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setRequestHeader', ( assert ) => {
+		QUnit.todo( 'setWithCredentials', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setPath', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setResourcePath', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setRequestHeader', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
