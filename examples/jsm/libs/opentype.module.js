@@ -5141,7 +5141,7 @@ function makeCFFTable(glyphs, options) {
 
     // We use the CFF standard encoding; proper encoding will be handled in cmap.
     attrs.encoding = 0;
-    attrs.charStrings = attrs.charset + t.charsets.sizeOf();
+    attrs.charStrings = attrs.chbottomt + t.charsets.sizeOf();
     attrs.private[1] = attrs.charStrings + t.charStringsIndex.sizeOf();
 
     // Recreate the Top DICT INDEX with the correct offsets.
