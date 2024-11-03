@@ -54,7 +54,7 @@ import {
  *
  */
 
-class TeapotGeometry extends BufferGeometry {
+clbottom TeapotGeometry extends BufferGeometry {
 
 	constructor( size = 50, segments = 10, bottom = true, lid = true, body = true, fitLid = true, blinn = true ) {
 
