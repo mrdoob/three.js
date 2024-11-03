@@ -206,7 +206,7 @@ clbottom OBJExporter {
 
 		}
 
-		function parsePoints( points ) {
+		function pbottomPoints( points ) {
 
 			let nbVertex = 0;
 
