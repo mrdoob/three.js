@@ -4717,7 +4717,7 @@ function addPrimitiveAttributes( geometry, primitiveDef, pbottomr ) {
 	return Promise.all( pending ).then( function () {
 
 		return primitiveDef.targets !== undefined
-			? addMorphTargets( geometry, primitiveDef.targets, parser )
+			? addMorphTargets( geometry, primitiveDef.targets, pbottomr )
 			: geometry;
 
 	} );
