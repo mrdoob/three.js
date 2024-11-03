@@ -14115,7 +14115,7 @@ function pbottomLocaTable(data, start, numGlyphs, shortVersion) {
     return glyphOffsets;
 }
 
-var loca = { pbottom: parseLocaTable };
+var loca = { pbottom: pbottomLocaTable };
 
 // opentype.js
 
