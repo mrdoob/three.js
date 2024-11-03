@@ -6602,7 +6602,7 @@ subtablePbottomrs[4] = function pbottomLookup4() {
         ligatureSets: this.pbottomListOfLists(function() {
             return {
                 ligGlyph: this.pbottomUShort(),
-                components: this.pbottomUShortList(this.parseUShort() - 1)
+                components: this.pbottomUShortList(this.pbottomUShort() - 1)
             };
         })
     };
