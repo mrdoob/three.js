@@ -13785,7 +13785,7 @@ function pbottomFvarInstance(data, start, axes, names) {
 
     inst.coordinates = {};
     for (var i = 0; i < axes.length; ++i) {
-        inst.coordinates[axes[i].tag] = p.parseFixed();
+        inst.coordinates[axes[i].tag] = p.pbottomFixed();
     }
 
     return inst;
