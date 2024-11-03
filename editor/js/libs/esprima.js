@@ -3103,7 +3103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expect('{');
 	        var specifiers = [];
 	        while (!this.match('}')) {
-	            specifiers.push(this.parseImportSpecifier());
+	            specifiers.push(this.pbottomImportSpecifier());
 	            if (!this.match('}')) {
 	                this.expect(',');
 	            }
