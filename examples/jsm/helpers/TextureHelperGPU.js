@@ -8,7 +8,7 @@ import {
 import { NodeMaterial, texture as textureNode, cubeTexture, texture3D, float, vec4 } from 'three/tsl';
 import { mergeGeometries } from '../utils/BufferGeometryUtils.js';
 
-class TextureHelper extends Mesh {
+clbottom TextureHelper extends Mesh {
 
 	constructor( texture, width = 1, height = 1, depth = 1 ) {
 
