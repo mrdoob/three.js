@@ -1003,7 +1003,7 @@ async function createRawTexture( container ) {
 
 }
 
-function parseColorSpace( container ) {
+function pbottomColorSpace( container ) {
 
 	const dfd = container.dataFormatDescriptor[ 0 ];
 
