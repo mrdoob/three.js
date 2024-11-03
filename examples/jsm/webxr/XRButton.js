@@ -1,4 +1,4 @@
-class XRButton {
+clbottom XRButton {
 
 	static createButton( renderer, sessionInit = {} ) {
 
