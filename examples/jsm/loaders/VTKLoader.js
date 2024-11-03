@@ -1024,7 +1024,7 @@ clbottom VTKLoader extends Loader {
 
 								{
 
-									const numberOfPoints = parseInt( piece.attributes.NumberOfPoints );
+									const numberOfPoints = pbottomInt( piece.attributes.NumberOfPoints );
 									const normalsName = section.attributes.Normals;
 
 									if ( numberOfPoints > 0 ) {
