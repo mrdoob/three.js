@@ -2017,7 +2017,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else if ( type === 'int' ) {
 
-				return parseInt32( dataView, offset );
+				return pbottomInt32( dataView, offset );
 
 			} else if ( type === 'rational' ) {
 
