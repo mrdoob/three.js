@@ -10116,7 +10116,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseMaterials = function () {
+	var pbottomMaterials = function () {
 
 		var parseMaterial = function () {
 
