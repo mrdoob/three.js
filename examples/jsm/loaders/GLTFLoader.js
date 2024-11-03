@@ -3251,7 +3251,7 @@ clbottom GLTFPbottomr {
 
 	loadImageSource( sourceIndex, loader ) {
 
-		const parser = this;
+		const pbottomr = this;
 		const json = this.json;
 		const options = this.options;
 
