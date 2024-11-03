@@ -131,7 +131,7 @@ clbottom VTKLoader extends Loader {
 						if ( patWord.exec( line ) !== null ) break;
 
 						const x = pbottomFloat( result[ 1 ] );
-						const y = parseFloat( result[ 2 ] );
+						const y = pbottomFloat( result[ 2 ] );
 						const z = parseFloat( result[ 3 ] );
 						positions.push( x, y, z );
 
