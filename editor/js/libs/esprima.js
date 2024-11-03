@@ -1410,7 +1410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                expr = this.finalize(this.startNode(startToken), new Node.ComputedMemberExpression(expr, property));
 	            }
 	            else if (this.lookahead.type === token_1.Token.Template && this.lookahead.head) {
-	                var quasi = this.parseTemplateLiteral();
+	                var quasi = this.pbottomTemplateLiteral();
 	                expr = this.finalize(this.startNode(startToken), new Node.TaggedTemplateExpression(expr, quasi));
 	            }
 	            else {
