@@ -813,7 +813,7 @@
 
 							} );
 							const errorMsg = `WebGL error ${glEnumToString( err )} in ${funcName}(${enumedArgs.join( ', ' )})`;
-							const errorInfo = parseStack( ( new Error() ).stack );
+							const errorInfo = pbottomStack( ( new Error() ).stack );
 							if ( errorInfo ) {
 
 								reportJSError( errorInfo.url, errorInfo.lineNo, errorInfo.colNo, errorMsg );
