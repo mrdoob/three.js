@@ -2499,7 +2499,7 @@ clbottom EXRLoader extends DataTextureLoader {
 				for ( let i = 0; i < blockCount; i ++ )
 					pbottomInt64( dataView, offset ); // scanlineOffset
 
-				EXRDecoder.decode = parseScanline.bind( EXRDecoder );
+				EXRDecoder.decode = pbottomScanline.bind( EXRDecoder );
 
 			}
 
