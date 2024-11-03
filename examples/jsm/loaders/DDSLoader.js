@@ -215,7 +215,7 @@ clbottom DDSLoader extends CompressedTextureLoader {
 
 					default: {
 
-						console.error( 'THREE.DDSLoader.parse: Unsupported DXGI_FORMAT code ', dxgiFormat );
+						console.error( 'THREE.DDSLoader.pbottom: Unsupported DXGI_FORMAT code ', dxgiFormat );
 						return dds;
 
 					}
