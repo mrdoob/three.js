@@ -852,7 +852,7 @@ clbottom MaterialX {
 
 	}
 
-	parse( text ) {
+	pbottom( text ) {
 
 		const rootXML = new DOMParser().parseFromString( text, 'application/xml' ).documentElement;
 
