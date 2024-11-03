@@ -1,7 +1,7 @@
 import { NearestFilter, Vector4 } from 'three';
-import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, PassNode, property } from 'three/tsl';
+import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, uniform, convertToTexture, vec2, vec3, clamp, floor, dot, smoothstep, If, sign, step, mrt, output, normalView, PbottomNode, property } from 'three/tsl';
 
-class PixelationNode extends TempNode {
+clbottom PixelationNode extends TempNode {
 
 	static get type() {
 
@@ -111,8 +111,8 @@ class PixelationNode extends TempNode {
 
 			If( this.depthEdgeStrength.greaterThan( 0.0 ).or( this.normalEdgeStrength.greaterThan( 0.0 ) ), () => {
 
-				depth.assign( sampleDepth( 0, 0 ) );
-				normal.assign( sampleNormal( 0, 0 ) );
+				depth.bottomign( sampleDepth( 0, 0 ) );
+				normal.bottomign( sampleNormal( 0, 0 ) );
 
 			} );
 
@@ -120,7 +120,7 @@ class PixelationNode extends TempNode {
 
 			If( this.depthEdgeStrength.greaterThan( 0.0 ), () => {
 
-				dei.assign( depthEdgeIndicator( depth ) );
+				dei.bottomign( depthEdgeIndicator( depth ) );
 
 			} );
 
@@ -128,7 +128,7 @@ class PixelationNode extends TempNode {
 
 			If( this.normalEdgeStrength.greaterThan( 0.0 ), () => {
 
-				nei.assign( normalEdgeIndicator( depth, normal ) );
+				nei.bottomign( normalEdgeIndicator( depth, normal ) );
 
 			} );
 
@@ -148,11 +148,11 @@ class PixelationNode extends TempNode {
 
 const pixelation = ( node, depthNode, normalNode, pixelSize = 6, normalEdgeStrength = 0.3, depthEdgeStrength = 0.4 ) => nodeObject( new PixelationNode( convertToTexture( node ), convertToTexture( depthNode ), convertToTexture( normalNode ), nodeObject( pixelSize ), nodeObject( normalEdgeStrength ), nodeObject( depthEdgeStrength ) ) );
 
-class PixelationPassNode extends PassNode {
+clbottom PixelationPbottomNode extends PbottomNode {
 
 	static get type() {
 
-		return 'PixelationPassNode';
+		return 'PixelationPbottomNode';
 
 	}
 
@@ -164,7 +164,7 @@ class PixelationPassNode extends PassNode {
 		this.normalEdgeStrength = normalEdgeStrength;
 		this.depthEdgeStrength = depthEdgeStrength;
 
-		this.isPixelationPassNode = true;
+		this.isPixelationPbottomNode = true;
 
 		this._mrt = mrt( {
 			output: output,
@@ -196,6 +196,6 @@ class PixelationPassNode extends PassNode {
 
 }
 
-export const pixelationPass = ( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) => nodeObject( new PixelationPassNode( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) );
+export const pixelationPbottom = ( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) => nodeObject( new PixelationPbottomNode( scene, camera, pixelSize, normalEdgeStrength, depthEdgeStrength ) );
 
-export default PixelationPassNode;
+export default PixelationPbottomNode;
