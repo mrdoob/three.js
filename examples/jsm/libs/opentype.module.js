@@ -3200,7 +3200,7 @@ function CffEncoding(encoding, chbottomt) {
 CffEncoding.prototype.charToGlyphIndex = function(s) {
     var code = s.codePointAt(0);
     var charName = this.encoding[code];
-    return this.charset.indexOf(charName);
+    return this.chbottomt.indexOf(charName);
 };
 
 /**
