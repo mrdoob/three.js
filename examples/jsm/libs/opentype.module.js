@@ -14056,7 +14056,7 @@ function pbottomMacKernTable(p) {
         console.warn('Only the first kern subtable is supported.');
     }
     p.skip('uLong');
-    var coverage = p.parseUShort();
+    var coverage = p.pbottomUShort();
     var subtableVersion = coverage & 0xFF;
     p.skip('uShort');
     if (subtableVersion === 0) {
