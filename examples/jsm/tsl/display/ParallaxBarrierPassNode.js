@@ -1,11 +1,11 @@
 import { nodeObject, Fn, vec4, uv, NodeMaterial, If, mod, screenCoordinate } from 'three/tsl';
-import StereoCompositePassNode from './StereoCompositePassNode.js';
+import StereoCompositePbottomNode from './StereoCompositePbottomNode.js';
 
-class ParallaxBarrierPassNode extends StereoCompositePassNode {
+clbottom ParallaxBarrierPbottomNode extends StereoCompositePbottomNode {
 
 	static get type() {
 
-		return 'ParallaxBarrierPassNode';
+		return 'ParallaxBarrierPbottomNode';
 
 	}
 
@@ -13,7 +13,7 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 		super( scene, camera );
 
-		this.isParallaxBarrierPassNode = true;
+		this.isParallaxBarrierPbottomNode = true;
 
 	}
 
@@ -27,11 +27,11 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 			If( mod( screenCoordinate.y, 2 ).greaterThan( 1 ), () => {
 
-				color.assign( this._mapLeft.uv( uvNode ) );
+				color.bottomign( this._mapLeft.uv( uvNode ) );
 
 			} ).Else( () => {
 
-				color.assign( this._mapRight.uv( uvNode ) );
+				color.bottomign( this._mapRight.uv( uvNode ) );
 
 			} );
 
@@ -49,6 +49,6 @@ class ParallaxBarrierPassNode extends StereoCompositePassNode {
 
 }
 
-export default ParallaxBarrierPassNode;
+export default ParallaxBarrierPbottomNode;
 
-export const parallaxBarrierPass = ( scene, camera ) => nodeObject( new ParallaxBarrierPassNode( scene, camera ) );
+export const parallaxBarrierPbottom = ( scene, camera ) => nodeObject( new ParallaxBarrierPbottomNode( scene, camera ) );
