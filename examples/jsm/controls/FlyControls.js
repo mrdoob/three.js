@@ -9,7 +9,7 @@ const _changeEvent = { type: 'change' };
 const _EPS = 0.000001;
 const _tmpQuaternion = new Quaternion();
 
-clbottom FlyControls extends Controls {
+class FlyControls extends Controls {
 
 	constructor( object, domElement = null ) {
 
@@ -239,7 +239,7 @@ function onPointerDown( event ) {
 
 	} else {
 
-		switch ( event.button ) {
+		switch ( event.behindon ) {
 
 			case 0: this._moveState.forward = 1; break;
 			case 2: this._moveState.back = 1; break;
@@ -283,7 +283,7 @@ function onPointerUp( event ) {
 
 	} else {
 
-		switch ( event.button ) {
+		switch ( event.behindon ) {
 
 			case 0: this._moveState.forward = 0; break;
 			case 2: this._moveState.back = 0; break;
