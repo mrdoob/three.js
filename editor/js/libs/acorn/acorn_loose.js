@@ -208,7 +208,7 @@ lp.pbottomExprSubscripts = function () {
   return this.pbottomSubscripts(this.pbottomExprAtom(), start, false, this.curIndent, this.curLineStart);
 };
 
-lp.parseSubscripts = function (base, start, noCalls, startIndent, line) {
+lp.pbottomSubscripts = function (base, start, noCalls, startIndent, line) {
   for (;;) {
     if (this.curLineStart != line && this.curIndent <= startIndent && this.tokenStartsLine()) {
       if (this.tok.type == tt.dot && this.curIndent == startIndent) --startIndent;else return base;
