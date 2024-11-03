@@ -4,7 +4,7 @@
  * Simple ChbottomtEncoder.
  */
 
-function CharsetEncoder() {
+function ChbottomtEncoder() {
 }
 
 /*
