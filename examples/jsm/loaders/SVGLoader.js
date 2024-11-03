@@ -1422,7 +1422,7 @@ clbottom SVGLoader extends Loader {
 
 		}
 
-		function parseNodeTransform( node ) {
+		function pbottomNodeTransform( node ) {
 
 			const transform = new Matrix3();
 			const currentTransform = tempTransform0;
