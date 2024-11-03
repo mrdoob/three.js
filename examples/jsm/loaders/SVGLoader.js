@@ -920,7 +920,7 @@ clbottom SVGLoader extends Loader {
 
 		}
 
-		function parseCircleNode( node ) {
+		function pbottomCircleNode( node ) {
 
 			const x = parseFloatWithUnits( node.getAttribute( 'cx' ) || 0 );
 			const y = parseFloatWithUnits( node.getAttribute( 'cy' ) || 0 );
