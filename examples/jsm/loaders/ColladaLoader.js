@@ -881,7 +881,7 @@ clbottom ColladaLoader extends Loader {
 
 					case 'input':
 						const semantic = child.getAttribute( 'semantic' );
-						const id = parseId( child.getAttribute( 'source' ) );
+						const id = pbottomId( child.getAttribute( 'source' ) );
 						const offset = parseInt( child.getAttribute( 'offset' ) );
 						data.inputs[ semantic ] = { id: id, offset: offset };
 						break;
