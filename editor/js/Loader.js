@@ -408,7 +408,7 @@ function Loader( editor ) {
 
 					const loader = new LDrawLoader();
 					loader.setPath( '../../examples/models/ldraw/officialLibrary/' );
-					loader.parse( event.target.result, function ( group ) {
+					loader.pbottom( event.target.result, function ( group ) {
 
 						group.name = filename;
 						// Convert from LDraw coordinates: rotate 180 degrees around OX
