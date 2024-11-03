@@ -4844,7 +4844,7 @@ function pbottomCFFTable(data, start, font, opt) {
         charStringsIndex = pbottomCFFIndexLowMemory(data, start + topDict.charStrings);
         font.nGlyphs = charStringsIndex.offsets.length;
     } else {
-        charStringsIndex = parseCFFIndex(data, start + topDict.charStrings);
+        charStringsIndex = pbottomCFFIndex(data, start + topDict.charStrings);
         font.nGlyphs = charStringsIndex.objects.length;
     }
 
