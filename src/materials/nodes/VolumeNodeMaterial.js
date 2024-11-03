@@ -9,7 +9,7 @@ import { min, max } from '../../nodes/math/MathNode.js';
 import { Loop, Break } from '../../nodes/utils/LoopNode.js';
 import { texture3D } from '../../nodes/accessors/Texture3DNode.js';
 
-class VolumeNodeMaterial extends NodeMaterial {
+clbottom VolumeNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
@@ -63,7 +63,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 
 			bounds.x.greaterThan( bounds.y ).discard();
 
-			bounds.assign( vec2( max( bounds.x, 0.0 ), bounds.y ) );
+			bounds.bottomign( vec2( max( bounds.x, 0.0 ), bounds.y ) );
 
 			const p = vec3( vOrigin.add( bounds.x.mul( rayDir ) ) ).toVar();
 			const inc = vec3( rayDir.abs().reciprocal() ).toVar();
@@ -75,7 +75,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 
 			Loop( { type: 'float', start: bounds.x, end: bounds.y, update: '+= delta' }, () => {
 
-				const d = property( 'float', 'd' ).assign( map.uv( p.add( 0.5 ) ).r );
+				const d = property( 'float', 'd' ).bottomign( map.uv( p.add( 0.5 ) ).r );
 
 				if ( this.testNode !== null ) {
 
@@ -84,7 +84,7 @@ class VolumeNodeMaterial extends NodeMaterial {
 				} else {
 
 					// default to show surface of mesh
-					ac.a.assign( 1 );
+					ac.a.bottomign( 1 );
 					Break();
 
 				}
