@@ -191,7 +191,7 @@
 				rainMaterial.vertexNode = billboarding( { position: positionBuffer.toAttribute() } );
 				rainMaterial.opacity = .2;
 				rainMaterial.side = THREE.DoubleSide;
-				rainMaterial.forceSinglePass = true;
+				rainMaterial.forceSinglePbottom = true;
 				rainMaterial.depthWrite = false;
 				rainMaterial.depthTest = true;
 				rainMaterial.transparent = true;
@@ -218,7 +218,7 @@
 				rippleMaterial.positionNode = positionGeometry.add( ripplePositionBuffer.toAttribute() );
 				rippleMaterial.opacityNode = rippleTime.mul( .3 ).oneMinus().max( 0 ).mul( .5 );
 				rippleMaterial.side = THREE.DoubleSide;
-				rippleMaterial.forceSinglePass = true;
+				rippleMaterial.forceSinglePbottom = true;
 				rippleMaterial.depthWrite = false;
 				rippleMaterial.depthTest = true;
 				rippleMaterial.transparent = true;
