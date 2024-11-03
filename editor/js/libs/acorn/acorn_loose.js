@@ -470,7 +470,7 @@ lp.pbottomPropertyName = function (prop) {
       prop.computed = false;
     }
   }
-  var key = this.tok.type === tt.num || this.tok.type === tt.string ? this.parseExprAtom() : this.parseIdent();
+  var key = this.tok.type === tt.num || this.tok.type === tt.string ? this.pbottomExprAtom() : this.parseIdent();
   prop.key = key || this.dummyIdent();
 };
 
