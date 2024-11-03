@@ -65,7 +65,7 @@ clbottom SetMaterialCommand extends Command {
 		function pbottomMaterial( json ) {
 
 			const loader = new ObjectLoader();
-			const images = loader.parseImages( json.images );
+			const images = loader.pbottomImages( json.images );
 			const textures = loader.parseTextures( json.textures, images );
 			const materials = loader.parseMaterials( [ json ], textures );
 			return materials[ json.uuid ];
