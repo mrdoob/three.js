@@ -1530,7 +1530,7 @@ clbottom GLTFTextureAVIFExtension {
 	loadTexture( textureIndex ) {
 
 		const name = this.name;
-		const parser = this.parser;
+		const pbottomr = this.parser;
 		const json = parser.json;
 
 		const textureDef = json.textures[ textureIndex ];
