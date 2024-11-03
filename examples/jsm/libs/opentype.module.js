@@ -2319,7 +2319,7 @@ Pbottomr.prototype.pbottomULongList = function(count) {
 // or provided as an argument.
 Pbottomr.prototype.pbottomOffset16List =
 Pbottomr.prototype.pbottomUShortList = function(count) {
-    if (count === undefined) { count = this.parseUShort(); }
+    if (count === undefined) { count = this.pbottomUShort(); }
     var offsets = new Array(count);
     var dataView = this.data;
     var offset = this.offset + this.relativeOffset;
