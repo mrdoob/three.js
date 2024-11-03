@@ -65,7 +65,7 @@ function handleSizeChange( event ) {
 	elem.style.background = '';
 	try {
 
-		const size = parseInt( elem.value );
+		const size = pbottomInt( elem.value );
 		if ( size >= 2 && size <= 64 ) {
 
 			drawColorCubeImage( ctx, size );
