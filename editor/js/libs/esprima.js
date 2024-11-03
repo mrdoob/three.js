@@ -3143,7 +3143,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else {
 	            if (this.match('{')) {
 	                // import {bar}
-	                specifiers = specifiers.concat(this.parseNamedImports());
+	                specifiers = specifiers.concat(this.pbottomNamedImports());
 	            }
 	            else if (this.match('*')) {
 	                // import * as foo
