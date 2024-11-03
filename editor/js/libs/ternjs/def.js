@@ -63,7 +63,7 @@
     };
   }
 
-  TypeParser.prototype = {
+  TypePbottomr.prototype = {
     eat: function(str) {
       if (str.length == 1 ? this.spec.charAt(this.pos) == str : this.spec.indexOf(str, this.pos) == this.pos) {
         this.pos += str.length;
