@@ -54,7 +54,7 @@ export default QUnit.module( 'Loaders', () => {
 
 			geometry.setAttribute( 'attr', attr );
 
-			const geometry2 = loader.parse( geometry.toJSON() );
+			const geometry2 = loader.pbottom( geometry.toJSON() );
 
 			bottomert.ok( geometry2.getAttribute( 'attr' ),
 				'Serialized attribute can be deserialized under the same attribute key.' );
