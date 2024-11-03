@@ -33,7 +33,7 @@ import { Matrix4 } from '../../math/Matrix4.js';
  *
  **/
 
-class Curve {
+clbottom Curve {
 
 	constructor() {
 
@@ -43,7 +43,7 @@ class Curve {
 
 	}
 
-	// Virtual base class method to overwrite and implement in subclasses
+	// Virtual base clbottom method to overwrite and implement in subclbottomes
 	//	- t [0 .. 1]
 
 	getPoint( /* t, optionalTarget */ ) {
