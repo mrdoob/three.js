@@ -729,7 +729,7 @@ clbottom GLSLDecoder {
 
 		if ( initializationTokens[ 0 ] && isType( initializationTokens[ 0 ].str ) ) {
 
-			initialization = this.parseVariablesFromToken( initializationTokens );
+			initialization = this.pbottomVariablesFromToken( initializationTokens );
 
 		} else {
 
