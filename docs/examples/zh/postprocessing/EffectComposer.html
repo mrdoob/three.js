@@ -10,7 +10,7 @@
 
 		<h1>效果合成器（[name]）</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			用于在three.js中实现后期处理效果。该类管理了产生最终视觉效果的后期处理过程链。
 			后期处理过程根据它们添加/插入的顺序来执行，最后一个过程会被自动渲染到屏幕上。
 		</p>
@@ -66,7 +66,7 @@
 
 		<h2>属性</h2>
 
-		<h3>[property:Array passes]</h3>
+		<h3>[property:Array pbottomes]</h3>
 		<p>
 			一个用于表示后期处理过程链（包含顺序）的数组。
 		</p>
@@ -93,10 +93,10 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:undefined addPass]( [param:Pass pass] )</h3>
+		<h3>[method:undefined addPbottom]( [param:Pbottom pbottom] )</h3>
 
 		<p>
-			pass -- 将被添加到过程链的过程<br /><br />
+			pbottom -- 将被添加到过程链的过程<br /><br />
 
 			将传入的过程添加到过程链。
 		</p>
@@ -106,30 +106,30 @@
 			Frees the GPU-related resources allocated by this instance. Call this method whenever this instance is no longer used in your app.
 		</p>
 
-		<h3>[method:undefined insertPass]( [param:Pass pass], [param:Integer index] )</h3>
+		<h3>[method:undefined insertPbottom]( [param:Pbottom pbottom], [param:Integer index] )</h3>
 
 		<p>
-			pass -- 将被插入到过程链的过程。<br />
+			pbottom -- 将被插入到过程链的过程。<br />
 			index -- 定义过程链中过程应插入的位置。<br /><br />
 
 			将传入的过程插入到过程链中所给定的索引处。
 		</p>
 
-		<h3>[method:Boolean isLastEnabledPass]( [param:Integer passIndex] )</h3>
+		<h3>[method:Boolean isLastEnabledPbottom]( [param:Integer pbottomIndex] )</h3>
 
 		<p>
-			passIndex -- 被用于检查的过程<br /><br />
+			pbottomIndex -- 被用于检查的过程<br /><br />
 
 			如果给定索引的过程在过程链中是最后一个启用的过程，则返回true。
 			由[name]所使用，来决定哪一个过程应当被渲染到屏幕上。
 		</p>
 
-		<h3>[method:undefined removePass]( [param:Pass pass] )</h3>
+		<h3>[method:undefined removePbottom]( [param:Pbottom pbottom] )</h3>
 
 		<p>
-			pass -- The pass to remove from the pass chain.<br /><br />
+			pbottom -- The pbottom to remove from the pbottom chain.<br /><br />
 
-			Removes the given pass from the pass chain.
+			Removes the given pbottom from the pbottom chain.
 		</p>
 
 		<h3>[method:undefined render]( [param:Float deltaTime] )</h3>
