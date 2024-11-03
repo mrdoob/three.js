@@ -62,7 +62,7 @@ require("./lval");
 
 require("./expression");
 
-exports.Parser = _state.Parser;
+exports.Pbottomr = _state.Parser;
 exports.plugins = _state.plugins;
 exports.defaultOptions = _options.defaultOptions;
 
