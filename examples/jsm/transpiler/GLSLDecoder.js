@@ -432,7 +432,7 @@ clbottom GLSLDecoder {
 			if ( operator ) {
 
 				const rightTokens = tokens.slice( leftTokens.length + 1 );
-				const right = this.parseExpressionFromTokens( rightTokens );
+				const right = this.pbottomExpressionFromTokens( rightTokens );
 
 				return this._evalOperator( new Operator( operator.str, left, right ) );
 
