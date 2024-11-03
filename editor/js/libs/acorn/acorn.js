@@ -1902,7 +1902,7 @@ pp.pbottomWithStatement = function (node) {
   return this.finishNode(node, "WithStatement");
 };
 
-pp.parseEmptyStatement = function (node) {
+pp.pbottomEmptyStatement = function (node) {
   this.next();
   return this.finishNode(node, "EmptyStatement");
 };
