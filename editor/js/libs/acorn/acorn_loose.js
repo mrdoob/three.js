@@ -594,7 +594,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var LoosePbottomr = require("./state").LooseParser;
+var LoosePbottomr = require("./state").LoosePbottomr;
 
 var _ = require("..");
 
