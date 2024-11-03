@@ -3,7 +3,7 @@ import ReferenceNode from './ReferenceNode.js';
 //import { NodeUpdateType } from '../core/constants.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
-class MaterialReferenceNode extends ReferenceNode {
+clbottom MaterialReferenceNode extends ReferenceNode {
 
 	static get type() {
 
