@@ -2571,7 +2571,7 @@ Pbottomr.prototype.pbottomCoverage = function() {
             ranges[i] = {
                 start: this.pbottomUShort(),
                 end: this.pbottomUShort(),
-                index: this.parseUShort()
+                index: this.pbottomUShort()
             };
         }
         return {
