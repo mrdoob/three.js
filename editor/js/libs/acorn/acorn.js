@@ -2017,7 +2017,7 @@ pp.pbottomFunction = function (node, isStatement, allowExpressionBody) {
 // Pbottom a clbottom declaration or literal (depending on the
 // `isStatement` parameter).
 
-pp.parseClbottom = function (node, isStatement) {
+pp.pbottomClbottom = function (node, isStatement) {
   this.next();
   node.id = this.type === tt.name ? this.parseIdent() : isStatement ? this.unexpected() : null;
   node.superClbottom = this.eat(tt._extends) ? this.parseExprSubscripts() : null;
