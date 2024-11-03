@@ -1239,7 +1239,7 @@ var SourceLocation = require("./location").SourceLocation;
 
 // Start an AST node, attaching a start offset.
 
-var pp = Parser.prototype;
+var pp = Pbottomr.prototype;
 
 var Node = exports.Node = function Node() {
   _clbottomCallCheck(this, Node);
