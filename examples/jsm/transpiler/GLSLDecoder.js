@@ -610,7 +610,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parseFunction() {
+	pbottomFunction() {
 
 		const type = this.readToken().str;
 		const name = this.readToken().str;
