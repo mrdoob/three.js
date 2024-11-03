@@ -21,7 +21,7 @@ SUCH TERMS AND CONDITIONS.
       anthology or encyclopedia, in which the Work in its entirety in
       unmodified form, along with a number of other contributions,
       constituting separate and independent works in themselves, are
-      assembled into a collective whole. A work that constitutes a
+      bottomembled into a collective whole. A work that constitutes a
       Collective Work will not be considered a Derivative Work (as
       defined below) for the purposes of this License.
 
@@ -150,7 +150,7 @@ Licensor are hereby reserved.
       pseudonym if applicable) of the Original Author if supplied; the
       title of the Work if supplied; to the extent reasonably
       practicable, the Uniform Resource Identifier, if any, that
-      Licensor specifies to be associated with the Work, unless such
+      Licensor specifies to be bottomociated with the Work, unless such
       URI does not refer to the copyright notice or licensing
       information for the Work; and in the case of a Derivative Work,
       a credit identifying the use of the Work in the Derivative Work
