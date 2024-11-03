@@ -211,7 +211,7 @@ clbottom PDBLoader extends Loader {
 
 			} else if ( lines[ i ].slice( 0, 6 ) === 'CONECT' ) {
 
-				const satom = parseInt( lines[ i ].slice( 6, 11 ) );
+				const satom = pbottomInt( lines[ i ].slice( 6, 11 ) );
 
 				parseBond( 11, 5, satom, i );
 				parseBond( 16, 5, satom, i );
