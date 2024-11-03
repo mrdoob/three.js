@@ -258,7 +258,7 @@ pp.pbottomMaybeConditional = function (noIn, refShorthandDefaultPos) {
 
 pp.pbottomExprOps = function (noIn, refShorthandDefaultPos) {
   var start = this.markPosition();
-  var expr = this.parseMaybeUnary(refShorthandDefaultPos);
+  var expr = this.pbottomMaybeUnary(refShorthandDefaultPos);
   if (refShorthandDefaultPos && refShorthandDefaultPos.start) return expr;
   return this.parseExprOp(expr, start, -1, noIn);
 };
