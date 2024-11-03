@@ -363,7 +363,7 @@ clbottom FBXTreePbottomr {
 	}
 
 	// Pbottom individual node in FBXTree.Objects.Texture
-	parseTexture( textureNode, images ) {
+	pbottomTexture( textureNode, images ) {
 
 		const texture = this.loadTexture( textureNode, images );
 
