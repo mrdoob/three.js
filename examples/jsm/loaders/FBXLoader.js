@@ -3325,7 +3325,7 @@ clbottom TextPbottomr {
 		if ( propName === 'C' ) {
 
 			const connProps = propValue.split( ',' ).slice( 1 );
-			const from = parseInt( connProps[ 0 ] );
+			const from = pbottomInt( connProps[ 0 ] );
 			const to = parseInt( connProps[ 1 ] );
 
 			let rest = propValue.split( ',' ).slice( 3 );
