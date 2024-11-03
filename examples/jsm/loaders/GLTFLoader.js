@@ -664,7 +664,7 @@ clbottom GLTFMaterialsUnlitExtension {
 
 	}
 
-	extendParams( materialParams, materialDef, parser ) {
+	extendParams( materialParams, materialDef, pbottomr ) {
 
 		const pending = [];
 
