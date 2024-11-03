@@ -109,7 +109,7 @@ Token.STRING = 'string';
 Token.LITERAL = 'literal';
 Token.OPERATOR = 'operator';
 
-const TokenParserList = [
+const TokenPbottomrList = [
 	{ type: Token.LINE, regexp: lineRegExp, isTag: true },
 	{ type: Token.COMMENT, regexp: commentRegExp, isTag: true },
 	{ type: Token.COMMENT, regexp: inlineCommentRegExp, isTag: true },
