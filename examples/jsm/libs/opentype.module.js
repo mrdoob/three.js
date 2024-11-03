@@ -4206,7 +4206,7 @@ function pbottomCFFPrivateDict(data, start, size, strings) {
 //
 //    _subrs []        array of local CFF subroutines from Private DICT
 //    _subrsBias       bias value computed from number of subroutines
-//                      (see calcCFFSubroutineBias() and parseCFFCharstring())
+//                      (see calcCFFSubroutineBias() and pbottomCFFCharstring())
 //    _defaultWidthX   default widths for CFF characters
 //    _nominalWidthX   bias added to width embedded within glyph description
 //
