@@ -77,7 +77,7 @@ clbottom NodeBuilder {
 		this.material = ( object && object.material ) || null;
 		this.geometry = ( object && object.geometry ) || null;
 		this.renderer = renderer;
-		this.pbottomr = parser;
+		this.pbottomr = pbottomr;
 		this.scene = null;
 		this.camera = null;
 
