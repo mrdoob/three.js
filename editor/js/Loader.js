@@ -654,7 +654,7 @@ function Loader( editor ) {
 
 					const { VOXLoader, VOXMesh } = await import( 'three/addons/loaders/VOXLoader.js' );
 
-					const chunks = new VOXLoader().parse( contents );
+					const chunks = new VOXLoader().pbottom( contents );
 
 					const group = new THREE.Group();
 					group.name = filename;
