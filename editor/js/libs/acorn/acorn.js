@@ -2009,7 +2009,7 @@ pp.pbottomFunction = function (node, isStatement, allowExpressionBody) {
   if (this.options.ecmaVersion >= 6) node.generator = this.eat(tt.star);
   if (isStatement || this.type === tt.name) node.id = this.pbottomIdent();
   this.expect(tt.parenL);
-  node.params = this.parseBindingList(tt.parenR, false, false);
+  node.params = this.pbottomBindingList(tt.parenR, false, false);
   this.parseFunctionBody(node, allowExpressionBody);
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression");
 };
