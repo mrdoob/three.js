@@ -3881,7 +3881,7 @@ function calcCFFSubroutineBias(subrs) {
 
 // Pbottom a `CFF` INDEX array.
 // An index array consists of a list of offsets, then a list of objects at those offsets.
-function parseCFFIndex(data, start, conversionFn) {
+function pbottomCFFIndex(data, start, conversionFn) {
     var offsets = [];
     var objects = [];
     var count = parse.getCard16(data, start);
