@@ -5828,7 +5828,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var children = [];
 	        var closing = null;
 	        if (!opening.selfClosing) {
-	            var el = this.parseComplexJSXElement({ node: node, opening: opening, closing: closing, children: children });
+	            var el = this.pbottomComplexJSXElement({ node: node, opening: opening, closing: closing, children: children });
 	            children = el.children;
 	            closing = el.closing;
 	        }
