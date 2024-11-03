@@ -2229,7 +2229,7 @@ Pbottomr.prototype.pbottomShort = function() {
     return v;
 };
 
-Pbottomr.prototype.parseF2Dot14 = function() {
+Pbottomr.prototype.pbottomF2Dot14 = function() {
     var v = this.data.getInt16(this.offset + this.relativeOffset) / 16384;
     this.relativeOffset += 2;
     return v;
