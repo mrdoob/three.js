@@ -10416,7 +10416,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseToonTextures = function () {
+	var pbottomToonTextures = function () {
 
 		var parseToonTexture = function () {
 
