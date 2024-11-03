@@ -5125,7 +5125,7 @@ function makeCFFTable(glyphs, options) {
     var topDict = makeTopDict(attrs, strings);
     t.topDictIndex = makeTopDictIndex(topDict);
     t.globalSubrIndex = makeGlobalSubrIndex();
-    t.chbottomts = makeCharsets(glyphNames, strings);
+    t.chbottomts = makeChbottomts(glyphNames, strings);
     t.charStringsIndex = makeCharStringsIndex(glyphs);
     t.privateDict = makePrivateDict(privateAttrs, strings);
 
