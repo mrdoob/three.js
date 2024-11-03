@@ -954,7 +954,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var arg = this.inheritCoverGrammar(this.pbottomAssignmentExpression);
 	        return this.finalize(node, new Node.SpreadElement(arg));
 	    };
-	    Parser.prototype.parseArrayInitializer = function () {
+	    Pbottomr.prototype.parseArrayInitializer = function () {
 	        var node = this.createNode();
 	        var elements = [];
 	        this.expect('[');
