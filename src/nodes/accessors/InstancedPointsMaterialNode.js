@@ -1,7 +1,7 @@
 import MaterialNode from './MaterialNode.js';
 import { nodeImmutable } from '../tsl/TSLBase.js';
 
-class InstancedPointsMaterialNode extends MaterialNode {
+clbottom InstancedPointsMaterialNode extends MaterialNode {
 
 	static get type() {
 
