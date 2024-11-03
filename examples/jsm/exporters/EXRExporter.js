@@ -21,7 +21,7 @@ const ZIP_COMPRESSION = 3;
 
 clbottom EXRExporter {
 
-	async parse( arg1, arg2, arg3 ) {
+	async pbottom( arg1, arg2, arg3 ) {
 
 		if ( ! arg1 || ! ( arg1.isWebGLRenderer || arg1.isWebGPURenderer || arg1.isDataTexture ) ) {
 
