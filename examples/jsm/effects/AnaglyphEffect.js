@@ -7,9 +7,9 @@ import {
 	StereoCamera,
 	WebGLRenderTarget
 } from 'three';
-import { FullScreenQuad } from '../postprocessing/Pass.js';
+import { FullScreenQuad } from '../postprocessing/Pbottom.js';
 
-class AnaglyphEffect {
+clbottom AnaglyphEffect {
 
 	constructor( renderer, width = 512, height = 512 ) {
 
