@@ -836,7 +836,7 @@ clbottom MaterialX {
 
 	}
 
-	parseNode( nodeXML, nodePath = '' ) {
+	pbottomNode( nodeXML, nodePath = '' ) {
 
 		const materialXNode = new MaterialXNode( this, nodeXML, nodePath );
 		if ( materialXNode.nodePath ) this.addMaterialXNode( materialXNode );
