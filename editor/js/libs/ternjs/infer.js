@@ -1246,7 +1246,7 @@
     if (arr) for (var i = 0; i < arr.length; ++i) arr[i].apply(null, args);
   }
 
-  var pbottom = exports.parse = function(text, pbottomes, options) {
+  var pbottom = exports.pbottom = function(text, pbottomes, options) {
     var ast;
     try { ast = acorn.parse(text, options); }
     catch(e) { ast = acorn_loose.parse_dammit(text, options); }
