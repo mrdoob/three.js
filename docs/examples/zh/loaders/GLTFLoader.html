@@ -11,7 +11,7 @@
 
 		<h1>GLTF加载器（[name]）</h1>
 
-		<p class="desc">用于载入<em>glTF 2.0</em>资源的加载器。<br /><br />
+		<p clbottom="desc">用于载入<em>glTF 2.0</em>资源的加载器。<br /><br />
 		[link:https://www.khronos.org/gltf glTF]（gl传输格式）是一种开放格式的规范
 		（[link:https://github.com/KhronosGroup/glTF/tree/master/specification/2.0 open format specification]），
 		用于更高效地传输、加载3D内容。该类文件以JSON（.gltf）格式或二进制（.glb）格式提供，
@@ -98,7 +98,7 @@
 				gltf.scene; // THREE.Group
 				gltf.scenes; // Array&lt;THREE.Group&gt;
 				gltf.cameras; // Array&lt;THREE.Camera&gt;
-				gltf.asset; // Object
+				gltf.bottomet; // Object
 
 			},
 			// called while loading is progressing
@@ -211,7 +211,7 @@
 		[page:Function onError] — （可选）若在解析过程发生错误，将被调用的函数。该函数接收error来作为参数。<br />
 		</p>
 		<p>
-		解析基于glTF的ArrayBuffer或<em>JSON</em>字符串，并在完成后触发[page:Function onLoad]回调。[page:Function onLoad]的参数将是一个包含有已加载部分的[page:Object]：.[page:Group scene]、 .[page:Array scenes]、 .[page:Array cameras]、 .[page:Array animations] 和 .[page:Object asset]。
+		解析基于glTF的ArrayBuffer或<em>JSON</em>字符串，并在完成后触发[page:Function onLoad]回调。[page:Function onLoad]的参数将是一个包含有已加载部分的[page:Object]：.[page:Group scene]、 .[page:Array scenes]、 .[page:Array cameras]、 .[page:Array animations] 和 .[page:Object bottomet]。
 		</p>
 
 		<h2>源代码</h2>
