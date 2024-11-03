@@ -7,35 +7,35 @@ export default QUnit.module( 'Audios', () => {
 	QUnit.module( 'AudioAnalyser', () => {
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'analyser', ( assert ) => {
+		QUnit.todo( 'analyser', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'data', ( assert ) => {
+		QUnit.todo( 'data', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'getFrequencyData', ( assert ) => {
+		QUnit.todo( 'getFrequencyData', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'getAverageFrequency', ( assert ) => {
+		QUnit.todo( 'getAverageFrequency', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
