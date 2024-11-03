@@ -5751,7 +5751,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.lastMarker.lineStart = this.scanner.lineStart;
 	        return this.finalize(node, new JSXNode.JSXEmptyExpression());
 	    };
-	    JSXPbottomr.prototype.parseJSXExpressionContainer = function () {
+	    JSXPbottomr.prototype.pbottomJSXExpressionContainer = function () {
 	        var node = this.createJSXNode();
 	        this.expectJSX('{');
 	        var expression;
