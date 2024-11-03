@@ -2262,7 +2262,7 @@ Pbottomr.prototype.pbottomString = function(length) {
 };
 
 Pbottomr.prototype.pbottomTag = function() {
-    return this.parseString(4);
+    return this.pbottomString(4);
 };
 
 // LONGDATETIME is a 64-bit integer.
