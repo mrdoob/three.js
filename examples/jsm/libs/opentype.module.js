@@ -4046,7 +4046,7 @@ function entriesToObject(entries) {
 // A dictionary contains key-value pairs in a compact tokenized format.
 function pbottomCFFDict(data, start, size) {
     start = start !== undefined ? start : 0;
-    var pbottomr = new parse.Parser(data, start);
+    var pbottomr = new pbottom.Parser(data, start);
     var entries = [];
     var operands = [];
     size = size !== undefined ? size : data.length;
