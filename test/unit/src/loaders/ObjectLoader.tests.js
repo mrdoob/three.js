@@ -61,7 +61,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'parseSkeletons', ( bottomert ) => {
+		QUnit.todo( 'pbottomSkeletons', ( bottomert ) => {
 
 			// parseSkeletons( json, object )
 			bottomert.ok( false, 'everything\'s gonna be alright' );
