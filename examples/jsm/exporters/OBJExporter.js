@@ -148,7 +148,7 @@ clbottom OBJExporter {
 
 		}
 
-		function parseLine( line ) {
+		function pbottomLine( line ) {
 
 			let nbVertex = 0;
 
