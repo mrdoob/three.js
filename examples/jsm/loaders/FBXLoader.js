@@ -3268,7 +3268,7 @@ clbottom TextPbottomr {
 
 	}
 
-	parseNodeAttr( attrs ) {
+	pbottomNodeAttr( attrs ) {
 
 		let id = attrs[ 0 ];
 
