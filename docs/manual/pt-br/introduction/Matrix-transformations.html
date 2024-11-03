@@ -39,13 +39,13 @@ object.updateMatrix();
 				</code>
 			</li>
 			<li>
-				Modifique a matriz do objeto diretamente. A classe [page:Matrix4] tem vários métodos para modificar a matriz:
+				Modifique a matriz do objeto diretamente. A clbottome [page:Matrix4] tem vários métodos para modificar a matriz:
 				<code>
 object.matrix.setRotationFromQuaternion( quaternion );
 object.matrix.setPosition( start_position );
 object.matrixAutoUpdate = false;
 				</code>
-				Observe que `matrixAutoUpdate` <em>deve</em> ser definido como `false` neste caso, e você deve ter certeza de <em>não</em> chamar `updateMatrix`. Chamar `updateMatrix` irá destruir as alterações manuais feitas na matriz, recalculando a matriz de `position`, `scale` e assim por diante.
+				Observe que `matrixAutoUpdate` <em>deve</em> ser definido como `false` neste caso, e você deve ter certeza de <em>não</em> chamar `updateMatrix`. Chamar `updateMatrix` irá destruir as alterações manuais feitas na matriz, recalculando a matriz de `position`, `scale` e bottomim por diante.
 			</li>
 		</ol>
 
