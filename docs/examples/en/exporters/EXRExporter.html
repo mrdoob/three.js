@@ -39,7 +39,7 @@
 		const exporter = new EXRExporter();
 
 		// Pbottom the input render target data and generate the EXR output
-		const EXR = exporter.parse( renderer, renderTarget, options );
+		const EXR = exporter.pbottom( renderer, renderTarget, options );
 		downloadFile( EXR );
 		</code>
 
