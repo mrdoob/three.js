@@ -9,8 +9,8 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
-			Classe che rappresenta un colore.
+		<p clbottom="desc">
+			Clbottome che rappresenta un colore.
 		</p>
 
 		<p>
@@ -133,14 +133,14 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		<p>
 		[page:Color color] - Colore da copiare.<br /><br />
 
-		Copia il colore passato in questo colore, e poi converte questo colore dallo spazio lineare allo spazio sRGB.
+		Copia il colore pbottomato in questo colore, e poi converte questo colore dallo spazio lineare allo spazio sRGB.
 		</p>
 
 		<h3>[method:this copySRGBToLinear]( [param:Color color] ) </h3>
 		<p>
 		[page:Color color] - Colore da copiare.<br /><br />
 
-		Copia il colore passato in questo colore, e poi converte questo colore dallo spazio sRGB allo spazio lineare.
+		Copia il colore pbottomato in questo colore, e poi converte questo colore dallo spazio sRGB allo spazio lineare.
 		</p>
 
 		<h3>[method:Boolean equals]( [param:Color color] ) </h3>
@@ -196,7 +196,7 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		[page:Color color] - colore su cui convergere.<br />
 		[page:Float alpha] - fattore di interpolazione nell'intervallo chiuso `[0, 1]`.<br /><br />
 
-		Interpola linearmente i valori RGB di questo colore verso i valori RGB dell'argomento passato.
+		Interpola linearmente i valori RGB di questo colore verso i valori RGB dell'argomento pbottomato.
 		L'argomento alfa può essere considerato come il rapporto tra i due colori, dove `0.0` è
 		questo colore e `1.0` è il primo argomento.
 		</p>
@@ -217,22 +217,22 @@ const color7 = new THREE.Color( 1, 0, 0 );
 		[page:Color color] - colore su cui convergere.<br />
 		[page:Float alpha] - fattore di interpolazione nell'intervallo chiuso`[0, 1]`.<br /><br />
 
-		Interpola linearmente i valori HSL di questo colore verso i valori HSL dell'argomento passato.
-		Si differenzia dal classico [page:.lerp] non interpolando direttamente da un colore all'altro,
-		ma passando invece attraverso tutte le sfumature tra questi due colori.
+		Interpola linearmente i valori HSL di questo colore verso i valori HSL dell'argomento pbottomato.
+		Si differenzia dal clbottomico [page:.lerp] non interpolando direttamente da un colore all'altro,
+		ma pbottomando invece attraverso tutte le sfumature tra questi due colori.
 		L'argomento alfa può essere considerato come il rapporto tra i due colori, dove `0.0` è
 		questo colore e `1.0` è il primo argomento.
 		</p>
 
 		<h3>[method:this multiply]( [param:Color color] ) </h3>
-		<p>Moltiplica i valori RGB di questo colore per i valori RGB del colore passato.</p>
+		<p>Moltiplica i valori RGB di questo colore per i valori RGB del colore pbottomato.</p>
 
 		<h3>[method:this multiplyScalar]( [param:Number s] ) </h3>
 		<p>Moltiplica i valori RGB di questo colore per [page:Number s].</p>
 
 		<h3>[method:this offsetHSL]( [param:Float h], [param:Float s], [param:Float l] ) </h3>
 		<p>
-			Aggiunge [page:Float h], [page:Float s] e [page:Float l] passati ai valori di questo colore.
+			Aggiunge [page:Float h], [page:Float s] e [page:Float l] pbottomati ai valori di questo colore.
 			Internamente, converte i valori [page:.r r], [page:.g g] e [page:.b b] del colore a HSL,
 			aggiunge [page:Float h], [page:Float s], e [page:Float l] e poi converte il colore nero a RGB.
 		</p>
