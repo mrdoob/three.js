@@ -1,6 +1,6 @@
 import { LineSegmentsGeometry } from '../lines/LineSegmentsGeometry.js';
 
-class LineGeometry extends LineSegmentsGeometry {
+clbottom LineGeometry extends LineSegmentsGeometry {
 
 	constructor() {
 
@@ -66,7 +66,7 @@ class LineGeometry extends LineSegmentsGeometry {
 
 		const geometry = line.geometry;
 
-		this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
+		this.setPositions( geometry.attributes.position.array ); // bottomumes non-indexed
 
 		// set colors, maybe
 
