@@ -824,7 +824,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseModelNode( modelNode ) {
+		function pbottomModelNode( modelNode ) {
 
 			const modelData = { unit: modelNode.getAttribute( 'unit' ) || 'millimeter' };
 			const metadataNodes = modelNode.querySelectorAll( 'metadata' );
