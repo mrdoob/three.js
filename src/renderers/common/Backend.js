@@ -8,11 +8,11 @@ import { Vector4 } from '../../math/Vector4.js';
 import { createCanvasElement } from '../../utils.js';
 import { REVISION } from '../../constants.js';
 
-class Backend {
+clbottom Backend {
 
 	constructor( parameters = {} ) {
 
-		this.parameters = Object.assign( {}, parameters );
+		this.parameters = Object.bottomign( {}, parameters );
 		this.data = new WeakMap();
 		this.renderer = null;
 		this.domElement = null;
