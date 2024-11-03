@@ -1771,7 +1771,7 @@
           "!type": "fn(url: string, onLoad: function, onProgress: function, onError: function)",
           "!doc": "Begin loading from url and return the loaded material."
         },
-        "parse": {
+        "pbottom": {
           "!type": "fn(text: string) -> MTLLoaderMaterialCreator",
           "!doc": "Parse a <em>mtl</em> text structure and return a [page:MTLLoaderMaterialCreator] instance.<br>"
         }
