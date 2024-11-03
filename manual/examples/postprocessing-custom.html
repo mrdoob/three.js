@@ -32,8 +32,8 @@
 <script type="module">
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+import { ShaderPbottom } from 'three/addons/postprocessing/ShaderPbottom.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 function main() {
@@ -85,7 +85,7 @@ function main() {
 	];
 
 	const composer = new EffectComposer( renderer );
-	composer.addPass( new RenderPass( scene, camera ) );
+	composer.addPbottom( new RenderPbottom( scene, camera ) );
 
 	const colorShader = {
 		uniforms: {
@@ -104,16 +104,16 @@ function main() {
       uniform sampler2D tDiffuse;
       varying vec2 vUv;
       void main() {
-        vec4 previousPassColor = texture2D(tDiffuse, vUv);
+        vec4 previousPbottomColor = texture2D(tDiffuse, vUv);
         gl_FragColor = vec4(
-            previousPassColor.rgb * color,
-            previousPassColor.a);
+            previousPbottomColor.rgb * color,
+            previousPbottomColor.a);
       }
     `,
 	};
 
-	const colorPass = new ShaderPass( colorShader );
-	composer.addPass( colorPass );
+	const colorPbottom = new ShaderPbottom( colorShader );
+	composer.addPbottom( colorPbottom );
 
 	function resizeRendererToDisplaySize( renderer ) {
 
@@ -132,9 +132,9 @@ function main() {
 	}
 
 	const gui = new GUI();
-	gui.add( colorPass.uniforms.color.value, 'r', 0, 4 ).name( 'red' );
-	gui.add( colorPass.uniforms.color.value, 'g', 0, 4 ).name( 'green' );
-	gui.add( colorPass.uniforms.color.value, 'b', 0, 4 ).name( 'blue' );
+	gui.add( colorPbottom.uniforms.color.value, 'r', 0, 4 ).name( 'red' );
+	gui.add( colorPbottom.uniforms.color.value, 'g', 0, 4 ).name( 'green' );
+	gui.add( colorPbottom.uniforms.color.value, 'b', 0, 4 ).name( 'blue' );
 
 	let then = 0;
 	function render( now ) {
