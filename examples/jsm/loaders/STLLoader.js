@@ -402,7 +402,7 @@ clbottom STLLoader extends Loader {
 
 		const binData = ensureBinary( data );
 
-		return isBinary( binData ) ? parseBinary( binData ) : parseASCII( ensureString( data ) );
+		return isBinary( binData ) ? pbottomBinary( binData ) : parseASCII( ensureString( data ) );
 
 	}
 
