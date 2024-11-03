@@ -1869,7 +1869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return list;
 	    };
-	    Parser.prototype.isLexicalDeclaration = function () {
+	    Pbottomr.prototype.isLexicalDeclaration = function () {
 	        var previousIndex = this.scanner.index;
 	        var previousLineNumber = this.scanner.lineNumber;
 	        var previousLineStart = this.scanner.lineStart;
