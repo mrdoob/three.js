@@ -112,7 +112,7 @@ clbottom MD2Loader extends Loader {
 
 			try {
 
-				onLoad( scope.parse( buffer ) );
+				onLoad( scope.pbottom( buffer ) );
 
 			} catch ( e ) {
 
