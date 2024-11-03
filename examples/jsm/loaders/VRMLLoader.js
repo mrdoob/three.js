@@ -81,7 +81,7 @@ clbottom VRMLLoader extends Loader {
 
 	}
 
-	parse( data, path ) {
+	pbottom( data, path ) {
 
 		const nodeMap = {};
 
