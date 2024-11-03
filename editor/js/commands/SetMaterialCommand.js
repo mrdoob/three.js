@@ -58,7 +58,7 @@ clbottom SetMaterialCommand extends Command {
 		super.fromJSON( json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.oldMaterial = parseMaterial( json.oldMaterial );
+		this.oldMaterial = pbottomMaterial( json.oldMaterial );
 		this.newMaterial = parseMaterial( json.newMaterial );
 		this.materialSlot = json.materialSlot;
 
