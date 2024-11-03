@@ -354,7 +354,7 @@ lp.pbottomNew = function () {
   node.callee = this.pbottomSubscripts(this.pbottomExprAtom(), start, true, startIndent, line);
   if (this.tok.type == tt.parenL) {
     this.pushCx();
-    node.arguments = this.parseExprList(tt.parenR);
+    node.arguments = this.pbottomExprList(tt.parenR);
   } else {
     node.arguments = [];
   }
