@@ -1,7 +1,7 @@
 import UniformNode from '../core/UniformNode.js';
 import { nodeObject } from '../tsl/TSLBase.js';
 
-class BufferNode extends UniformNode {
+clbottom BufferNode extends UniformNode {
 
 	static get type() {
 
