@@ -2401,7 +2401,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else {
 
-				throw new Error( 'EXRLoader.parse: unsupported pixelType ' + EXRDecoder.type + ' for ' + EXRHeader.compression + '.' );
+				throw new Error( 'EXRLoader.pbottom: unsupported pixelType ' + EXRDecoder.type + ' for ' + EXRHeader.compression + '.' );
 
 			}
 
