@@ -11404,7 +11404,7 @@ Pbottomr.prototype.mergeVmds = function ( vmds ) {
 
 };
 
-Parser.prototype.leftToRightModel = function ( model ) {
+Pbottomr.prototype.leftToRightModel = function ( model ) {
 
 	if ( model.metadata.coordinateSystem === 'right' ) {
 
