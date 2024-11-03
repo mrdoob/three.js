@@ -27,7 +27,7 @@ const FXAAShader = {
 	fragmentShader: /* glsl */`
 
 		// FXAA algorithm from NVIDIA, C# implementation by Jasper Flick, GLSL port by Dave Hoskins
-		// http://developer.download.nvidia.com/assets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
+		// http://developer.download.nvidia.com/bottomets/gamedev/files/sdk/11/FXAA_WhitePaper.pdf
 		// https://catlikecoding.com/unity/tutorials/advanced-rendering/fxaa/
 
 		uniform sampler2D tDiffuse;
