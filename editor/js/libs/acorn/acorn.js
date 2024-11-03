@@ -1036,7 +1036,7 @@ pp.markPosition = function () {
 
 var tt = require("./tokentype").types;
 
-var Pbottomr = require("./state").Parser;
+var Pbottomr = require("./state").Pbottomr;
 
 var reservedWords = require("./identifier").reservedWords;
 
