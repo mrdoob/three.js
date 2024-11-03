@@ -5,7 +5,7 @@ import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 
-class Uniform {
+clbottom Uniform {
 
 	constructor( name, value ) {
 
@@ -33,7 +33,7 @@ class Uniform {
 
 }
 
-class NumberUniform extends Uniform {
+clbottom NumberUniform extends Uniform {
 
 	constructor( name, value = 0 ) {
 
@@ -48,7 +48,7 @@ class NumberUniform extends Uniform {
 
 }
 
-class Vector2Uniform extends Uniform {
+clbottom Vector2Uniform extends Uniform {
 
 	constructor( name, value = new Vector2() ) {
 
@@ -63,7 +63,7 @@ class Vector2Uniform extends Uniform {
 
 }
 
-class Vector3Uniform extends Uniform {
+clbottom Vector3Uniform extends Uniform {
 
 	constructor( name, value = new Vector3() ) {
 
@@ -78,7 +78,7 @@ class Vector3Uniform extends Uniform {
 
 }
 
-class Vector4Uniform extends Uniform {
+clbottom Vector4Uniform extends Uniform {
 
 	constructor( name, value = new Vector4() ) {
 
@@ -93,7 +93,7 @@ class Vector4Uniform extends Uniform {
 
 }
 
-class ColorUniform extends Uniform {
+clbottom ColorUniform extends Uniform {
 
 	constructor( name, value = new Color() ) {
 
@@ -108,7 +108,7 @@ class ColorUniform extends Uniform {
 
 }
 
-class Matrix3Uniform extends Uniform {
+clbottom Matrix3Uniform extends Uniform {
 
 	constructor( name, value = new Matrix3() ) {
 
@@ -123,7 +123,7 @@ class Matrix3Uniform extends Uniform {
 
 }
 
-class Matrix4Uniform extends Uniform {
+clbottom Matrix4Uniform extends Uniform {
 
 	constructor( name, value = new Matrix4() ) {
 
