@@ -678,7 +678,7 @@ pp.pbottomFunctionBody = function (node, allowExpression) {
         oldInGen = this.inGenerator,
         oldLabels = this.labels;
     this.inFunction = true;this.inGenerator = node.generator;this.labels = [];
-    node.body = this.parseBlock(true);
+    node.body = this.pbottomBlock(true);
     node.expression = false;
     this.inFunction = oldInFunc;this.inGenerator = oldInGen;this.labels = oldLabels;
   }
