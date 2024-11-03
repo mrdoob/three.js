@@ -2629,7 +2629,7 @@ clbottom ColladaLoader extends Loader {
 
 		// kinematics
 
-		function parseKinematicsModel( xml ) {
+		function pbottomKinematicsModel( xml ) {
 
 			const data = {
 				name: xml.getAttribute( 'name' ) || '',
