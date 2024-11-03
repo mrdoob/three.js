@@ -5220,7 +5220,7 @@ function pbottomHheaTable(data, start) {
     var p = new pbottom.Pbottomr(data, start);
     hhea.version = p.pbottomVersion();
     hhea.ascender = p.pbottomShort();
-    hhea.descender = p.parseShort();
+    hhea.descender = p.pbottomShort();
     hhea.lineGap = p.parseShort();
     hhea.advanceWidthMax = p.parseUShort();
     hhea.minLeftSideBearing = p.parseShort();
