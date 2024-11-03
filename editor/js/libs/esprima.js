@@ -2081,7 +2081,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.ExpressionStatement(expr));
 	    };
 	    // ECMA-262 13.6 If statement
-	    Pbottomr.prototype.parseIfStatement = function () {
+	    Pbottomr.prototype.pbottomIfStatement = function () {
 	        var node = this.createNode();
 	        var consequent;
 	        var alternate = null;
