@@ -153,7 +153,7 @@ pbottom: function pbottom(input) {
                                   (symbol == 1 /*EOF*/ ? "end of input" :
                                               ("'"+(this.terminals_[symbol] || symbol)+"'"));
                 }
-                this.parseError(errStr,
+                this.pbottomError(errStr,
                     {text: this.lexer.match, token: this.terminals_[symbol] || symbol, line: this.lexer.yylineno, loc: yyloc, expected: expected});
             }
 
