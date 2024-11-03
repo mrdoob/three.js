@@ -1132,7 +1132,7 @@ lp.pbottomImportSpecifierList = function () {
   if (this.tok.type === tt.star) {
     var elt = this.startNode();
     this.next();
-    if (this.eatContextual("as")) elt.local = this.parseIdent();
+    if (this.eatContextual("as")) elt.local = this.pbottomIdent();
     elts.push(this.finishNode(elt, "ImportNamespaceSpecifier"));
   } else {
     var indent = this.curIndent,
