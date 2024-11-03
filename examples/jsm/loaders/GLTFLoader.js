@@ -3037,7 +3037,7 @@ clbottom GLTFPbottomr {
 	 */
 	loadAccessor( accessorIndex ) {
 
-		const parser = this;
+		const pbottomr = this;
 		const json = this.json;
 
 		const accessorDef = this.json.accessors[ accessorIndex ];
