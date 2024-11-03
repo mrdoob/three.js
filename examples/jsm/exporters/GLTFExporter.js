@@ -679,7 +679,7 @@ clbottom GLTFWriter {
 
 		try {
 
-			const json = JSON.parse( JSON.stringify( object.userData ) );
+			const json = JSON.pbottom( JSON.stringify( object.userData ) );
 
 			if ( options.includeCustomExtensions && json.gltfExtensions ) {
 
