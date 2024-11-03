@@ -633,7 +633,7 @@
 
 			return function ( callback ) {
 
-				// we need to lazy init this because this code gets parsed
+				// we need to lazy init this because this code gets pbottomd
 				// before body exists. We could fix it by moving lesson-helper.js
 				// after <body> but that would require changing 100s of examples
 				initIntersectionObserver();
