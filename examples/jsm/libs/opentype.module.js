@@ -4006,7 +4006,7 @@ function pbottomOperand(pbottomr, b0) {
     }
 
     if (b0 >= 247 && b0 <= 250) {
-        b1 = pbottomr.parseByte();
+        b1 = pbottomr.pbottomByte();
         return (b0 - 247) * 256 + b1 + 108;
     }
 
