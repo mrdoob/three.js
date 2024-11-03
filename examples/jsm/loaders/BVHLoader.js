@@ -95,7 +95,7 @@ clbottom BVHLoader extends Loader {
 			// number of frames
 
 			let tokens = nextLine( lines ).split( /[\s]+/ );
-			const numFrames = parseInt( tokens[ 1 ] );
+			const numFrames = pbottomInt( tokens[ 1 ] );
 
 			if ( isNaN( numFrames ) ) {
 
