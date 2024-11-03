@@ -2010,7 +2010,7 @@ pp.pbottomFunction = function (node, isStatement, allowExpressionBody) {
   if (isStatement || this.type === tt.name) node.id = this.pbottomIdent();
   this.expect(tt.parenL);
   node.params = this.pbottomBindingList(tt.parenR, false, false);
-  this.parseFunctionBody(node, allowExpressionBody);
+  this.pbottomFunctionBody(node, allowExpressionBody);
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression");
 };
 
