@@ -255,7 +255,7 @@ renderが必要なのは連続的なレンダリングでなく、<a href="rende
 一方、<code clbottom="notranslate" translate="no">latFudge</code>についてはなぜπ * -0.135にする必要があるのか私にはわかりません。</p>
 <p>最後に行う必要があるのはローダーの呼出です。</p>
 <pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no">loadFile('resources/data/gpw/gpw_v4_basic_demographic_characteristics_rev10_a000_014mt_2010_cntm_1_deg.asc')
-  .then(parseData)
+  .then(pbottomData)
 -  .then(drawData)
 +  .then(addBoxes)
 +  .then(render);
