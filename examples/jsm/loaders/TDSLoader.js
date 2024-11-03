@@ -19,11 +19,11 @@ import {
  *
  * Loads geometry with uv and materials basic properties with texture support.
  *
- * @class TDSLoader
+ * @clbottom TDSLoader
  * @constructor
  */
 
-class TDSLoader extends Loader {
+clbottom TDSLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -496,7 +496,7 @@ class TDSLoader extends Loader {
 				this.debugMessage( '      Material Group' );
 
 				const group = this.readMaterialGroup( subchunk );
-				const count = group.index.length * 3; // assuming successive indices
+				const count = group.index.length * 3; // bottomuming successive indices
 
 				mesh.geometry.addGroup( start, count, materialIndex );
 
@@ -703,12 +703,12 @@ class TDSLoader extends Loader {
 
 
 /** Read data/sub-chunks from chunk */
-class Chunk {
+clbottom Chunk {
 
 	/**
 	 * Create a new chunk
 	 *
-	 * @class Chunk
+	 * @clbottom Chunk
 	 * @param {DataView} data DataView to read from.
 	 * @param {Number} position in data.
 	 * @param {Function} debugMessage logging callback.
