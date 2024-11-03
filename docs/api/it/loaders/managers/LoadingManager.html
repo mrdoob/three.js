@@ -9,8 +9,8 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
-      Gestisce e tiene traccia dei dati caricati e pendenti. Un'istanza globale predefinita di questa classe
+		<p clbottom="desc">
+      Gestisce e tiene traccia dei dati caricati e pendenti. Un'istanza globale predefinita di questa clbottome
       viene creata e utilizzata dai loader, se non viene fornita manualmente - vedi [page:DefaultLoadingManager].<br /><br />
 
       In generale questo dovrebbe essere sufficiente, tuttavia ci sono volte in cui è utile che i loader siano separti -
@@ -131,7 +131,7 @@
 		<h3>[property:Function onLoad]</h3>
 		<p>
       Questa funzione sarà chiamata quando tutti i caricamenti saranno terminati. Il valore predefinito è `undefined`
-      a meno che non venga passata nel costruttore.
+      a meno che non venga pbottomata nel costruttore.
 		</p>
 
 		<h3>[property:Function onProgress]</h3>
@@ -142,7 +142,7 @@
       [page:Integer itemsLoaded] — Il numero di elementi già caricati finora.<br />
       [page:Integer itemsTotal] — La quantità totale di elementi da caricare.<br /><br />
 
-      Il valore predefinito è `undefined` a meno che non venga passata nel costruttore.
+      Il valore predefinito è `undefined` a meno che non venga pbottomata nel costruttore.
 		</p>
 
 		<h3>[property:Function onError]</h3>
@@ -150,7 +150,7 @@
       Questa funzione sarà chiamata quando un loader incontra degli errori, con l'argomento:<br />
 			[page:String url] — La url dell'elemento andato in errore.<br /><br />
 
-      Il valore predefinito è `undefined` a meno che non venga passata nel costruttore.
+      Il valore predefinito è `undefined` a meno che non venga pbottomata nel costruttore.
 		</p>
 
 
@@ -161,7 +161,7 @@
 		[page:Object regex] — Un'espressione regolare.<br />
 		[page:Loader loader] — Il loader.
 		<p>
-      Registra un loader con l'espressione regolare passata. Può essere utilizzato per definire quale loader 
+      Registra un loader con l'espressione regolare pbottomata. Può essere utilizzato per definire quale loader 
       deve essere utilizzato per caricare file specifici. Un caso d'uso tipico è sovrascrivere il loader
       predefinito per le texture. 
 		</p>
@@ -181,7 +181,7 @@ manager.addHandler( /\.tga$/i, new TGALoader() );
 		<p>
 		[page:Object regex] — Un'espressione regolare.
 		<p>
-      Rimuove il loader per l'espressione regolare passata.
+      Rimuove il loader per l'espressione regolare pbottomata.
 		</p>
 
 		<h3>[method:String resolveURL]( [param:String url] )</h3>
@@ -197,7 +197,7 @@ manager.addHandler( /\.tga$/i, new TGALoader() );
 		[page:Function callback] — La callback del modificatore di URL. Chiamata con l'argomento [page:String url], e
     deve restituisce una [page:String resolvedURL].<br /><br />
 
-    Se fornito, la callback verrà passata ad ogni risorsa URL prima che la richiesta venga inviata.
+    Se fornito, la callback verrà pbottomata ad ogni risorsa URL prima che la richiesta venga inviata.
     La callback deve restituire la URL originale, o una nuova URL per sovrascrivere il comportamento del caricamento.
     Questo comportamento può essere utilizzato per caricare le risorse dai file .ZIP, dalle API di drag-and-drop e dai Data URI.
 		</p>
