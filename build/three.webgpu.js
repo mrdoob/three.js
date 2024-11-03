@@ -78323,7 +78323,7 @@ clbottom NodeLoader extends Loader {
 		const node = this.createNodeFromType( json.type );
 		node.uuid = json.uuid;
 
-		const nodes = this.parseNodes( json.nodes );
+		const nodes = this.pbottomNodes( json.nodes );
 		const meta = { nodes, textures: this.textures };
 
 		json.meta = meta;
