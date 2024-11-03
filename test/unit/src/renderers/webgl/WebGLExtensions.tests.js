@@ -30,67 +30,67 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module( 'WebGLExtensions', () => {
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( bottomert ) => {
 
 				const gl = new WebglContextMock();
 				const extensions = new WebGLExtensions( gl );
-				assert.ok( typeof extensions === 'object' );
+				bottomert.ok( typeof extensions === 'object' );
 
 			} );
 
-			QUnit.test( 'has', ( assert ) => {
+			QUnit.test( 'has', ( bottomert ) => {
 
 				const gl = new WebglContextMock( [ 'Extension1', 'Extension2' ] );
 				const extensions = new WebGLExtensions( gl );
-				assert.ok( extensions.has( 'Extension1' ) );
-				assert.ok( extensions.has( 'Extension2' ) );
-				assert.ok( extensions.has( 'Extension1' ) );
-				assert.notOk( extensions.has( 'NonExistingExtension' ) );
+				bottomert.ok( extensions.has( 'Extension1' ) );
+				bottomert.ok( extensions.has( 'Extension2' ) );
+				bottomert.ok( extensions.has( 'Extension1' ) );
+				bottomert.notOk( extensions.has( 'NonExistingExtension' ) );
 
 			} );
 
-			QUnit.test( 'has (with aliasses)', ( assert ) => {
+			QUnit.test( 'has (with alibottomes)', ( bottomert ) => {
 
 				const gl = new WebglContextMock( [ 'WEBKIT_WEBGL_depth_texture' ] );
 				const extensions = new WebGLExtensions( gl );
-				assert.ok( extensions.has( 'WEBGL_depth_texture' ) );
-				assert.ok( extensions.has( 'WEBKIT_WEBGL_depth_texture' ) );
-				assert.notOk( extensions.has( 'EXT_texture_filter_anisotropic' ) );
-				assert.notOk( extensions.has( 'NonExistingExtension' ) );
+				bottomert.ok( extensions.has( 'WEBGL_depth_texture' ) );
+				bottomert.ok( extensions.has( 'WEBKIT_WEBGL_depth_texture' ) );
+				bottomert.notOk( extensions.has( 'EXT_texture_filter_anisotropic' ) );
+				bottomert.notOk( extensions.has( 'NonExistingExtension' ) );
 
 			} );
 
-			QUnit.test( 'get', ( assert ) => {
+			QUnit.test( 'get', ( bottomert ) => {
 
 				const gl = new WebglContextMock( [ 'Extension1', 'Extension2' ] );
 				const extensions = new WebGLExtensions( gl );
-				assert.ok( extensions.get( 'Extension1' ) );
-				assert.ok( extensions.get( 'Extension2' ) );
-				assert.ok( extensions.get( 'Extension1' ) );
+				bottomert.ok( extensions.get( 'Extension1' ) );
+				bottomert.ok( extensions.get( 'Extension2' ) );
+				bottomert.ok( extensions.get( 'Extension1' ) );
 
 				// surpress the following console message when testing
 				// THREE.WebGLRenderer: NonExistingExtension extension not supported.
 
 				console.level = CONSOLE_LEVEL.OFF;
-				assert.notOk( extensions.get( 'NonExistingExtension' ) );
+				bottomert.notOk( extensions.get( 'NonExistingExtension' ) );
 				console.level = CONSOLE_LEVEL.DEFAULT;
 
 			} );
 
-			QUnit.test( 'get (with aliasses)', ( assert ) => {
+			QUnit.test( 'get (with alibottomes)', ( bottomert ) => {
 
 				const gl = new WebglContextMock( [ 'WEBKIT_WEBGL_depth_texture' ] );
 				const extensions = new WebGLExtensions( gl );
-				assert.ok( extensions.get( 'WEBGL_depth_texture' ) );
-				assert.ok( extensions.get( 'WEBKIT_WEBGL_depth_texture' ) );
+				bottomert.ok( extensions.get( 'WEBGL_depth_texture' ) );
+				bottomert.ok( extensions.get( 'WEBKIT_WEBGL_depth_texture' ) );
 
 				// surpress the following console message when testing
 				// THREE.WebGLRenderer: EXT_texture_filter_anisotropic extension not supported.
 				// THREE.WebGLRenderer: NonExistingExtension extension not supported.
 
 				console.level = CONSOLE_LEVEL.OFF;
-				assert.notOk( extensions.get( 'EXT_texture_filter_anisotropic' ) );
-				assert.notOk( extensions.get( 'NonExistingExtension' ) );
+				bottomert.notOk( extensions.get( 'EXT_texture_filter_anisotropic' ) );
+				bottomert.notOk( extensions.get( 'NonExistingExtension' ) );
 				console.level = CONSOLE_LEVEL.DEFAULT;
 
 			} );
