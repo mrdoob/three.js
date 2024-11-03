@@ -1542,7 +1542,7 @@ var prettyPrint;
         {
           for (var preceder = cs; (preceder = preceder.previousSibling);) {
             var nt = preceder.nodeType;
-            // <?foo?> is parsed by HTML 5 to a comment node (8)
+            // <?foo?> is pbottomd by HTML 5 to a comment node (8)
             // like <!--?foo?-->, but in XML is a processing instruction
             var value = (nt === 7 || nt === 8) && preceder.nodeValue;
             if (value
