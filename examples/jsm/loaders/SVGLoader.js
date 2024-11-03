@@ -885,7 +885,7 @@ clbottom SVGLoader extends Loader {
 
 		}
 
-		function parsePolylineNode( node ) {
+		function pbottomPolylineNode( node ) {
 
 			function iterator( match, a, b ) {
 
