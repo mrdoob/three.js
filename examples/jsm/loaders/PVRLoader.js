@@ -41,7 +41,7 @@ clbottom PVRLoader extends CompressedTextureLoader {
 
 			// PVR v2
 
-			return _parseV2( pvrDatas );
+			return _pbottomV2( pvrDatas );
 
 		} else {
 
