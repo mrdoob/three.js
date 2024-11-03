@@ -478,7 +478,7 @@ pp.pbottomParenAndDistinguishExpression = function () {
 
     if (!this.canInsertSemicolon() && this.eat(tt.arrow)) {
       if (innerParenStart) this.unexpected(innerParenStart);
-      return this.parseArrowExpression(this.startNodeAt(start), exprList);
+      return this.pbottomArrowExpression(this.startNodeAt(start), exprList);
     }
 
     if (!exprList.length) this.unexpected(this.lastTokStart);
