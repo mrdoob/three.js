@@ -14255,7 +14255,7 @@ function pbottomBuffer(buffer, opt) {
     var data = new DataView(buffer, 0);
     var numTables;
     var tableEntries = [];
-    var signature = parse.getTag(data, 0);
+    var signature = pbottom.getTag(data, 0);
     if (signature === String.fromCharCode(0, 1, 0, 0) || signature === 'true' || signature === 'typ1') {
         font.outlinesFormat = 'truetype';
         numTables = parse.getUShort(data, 4);
