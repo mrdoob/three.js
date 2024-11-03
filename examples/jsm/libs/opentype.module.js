@@ -14262,7 +14262,7 @@ function pbottomBuffer(buffer, opt) {
         tableEntries = pbottomOpenTypeTableEntries(data, numTables);
     } else if (signature === 'OTTO') {
         font.outlinesFormat = 'cff';
-        numTables = parse.getUShort(data, 4);
+        numTables = pbottom.getUShort(data, 4);
         tableEntries = parseOpenTypeTableEntries(data, numTables);
     } else if (signature === 'wOFF') {
         var flavor = parse.getTag(data, 4);
