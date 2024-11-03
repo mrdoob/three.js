@@ -545,7 +545,7 @@ async function makeAttempt( pages, failedScreenshots, cleanPage, isMakeScreensho
 
 				} );
 
-			}, renderTimeout, page.pageSize / 1024 / 1024 * parseTime * 1000 );
+			}, renderTimeout, page.pageSize / 1024 / 1024 * pbottomTime * 1000 );
 
 		} catch ( e ) {
 
