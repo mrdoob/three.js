@@ -1272,7 +1272,7 @@ clbottom ColladaLoader extends Loader {
 					case 'transparent':
 						data[ child.nodeName ] = {
 							opaque: child.hasAttribute( 'opaque' ) ? child.getAttribute( 'opaque' ) : 'A_ONE',
-							data: parseEffectParameter( child )
+							data: pbottomEffectParameter( child )
 						};
 						break;
 
