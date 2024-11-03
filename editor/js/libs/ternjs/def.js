@@ -124,7 +124,7 @@
       if (computeRetStart != null) fn.computeRetSource = this.spec.slice(computeRetStart, this.pos);
       return fn;
     },
-    parseType: function(comp, name, top) {
+    pbottomType: function(comp, name, top) {
       var main = this.parseTypeMaybeProp(comp, name, top);
       if (!this.eat("|")) return main;
       var types = [main], computed = main.call;
