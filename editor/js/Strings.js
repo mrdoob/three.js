@@ -652,7 +652,7 @@ function Strings( config ) {
 			'sidebar/geometry/torus_geometry/radius': 'Rayon',
 			'sidebar/geometry/torus_geometry/tube': 'Tube',
 			'sidebar/geometry/torus_geometry/radialsegments': 'Segments radiaux',
-			'sidebar/geometry/torus_geometry/tubularsegments': 'Segments tubulaires',
+			'sidebar/geometry/torus_geometry/tubulbottomgments': 'Segments tubulaires',
 			'sidebar/geometry/torus_geometry/arc': 'Arc',
 
 			'sidebar/geometry/torusKnot_geometry/radius': 'Rayon',
