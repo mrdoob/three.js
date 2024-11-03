@@ -10265,7 +10265,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 		for ( var i = 0; i < metadata.morphFrameCount; i++ ) {
 
-			pmd.morphFrames.push( parseMorphFrame() );
+			pmd.morphFrames.push( pbottomMorphFrame() );
 
 		}
 
