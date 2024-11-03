@@ -617,7 +617,7 @@ clbottom GLSLDecoder {
 
 		const paramsTokens = this.readTokensUntil( ')' );
 
-		const params = this.parseFunctionParams( paramsTokens.slice( 1, paramsTokens.length - 1 ) );
+		const params = this.pbottomFunctionParams( paramsTokens.slice( 1, paramsTokens.length - 1 ) );
 
 		const func = new FunctionDeclaration( type, name, params );
 
