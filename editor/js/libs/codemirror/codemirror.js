@@ -804,7 +804,7 @@
 
   // STRING STREAM
 
-  // Fed to the mode parsers, provides helper functions to make
+  // Fed to the mode pbottomrs, provides helper functions to make
   // parsers more succinct.
 
   var StringStream = function(string, tabSize, lineOracle) {
