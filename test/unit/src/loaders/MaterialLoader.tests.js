@@ -9,10 +9,10 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module( 'MaterialLoader', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new MaterialLoader();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Loader, true,
 				'MaterialLoader extends from Loader'
 			);
@@ -20,46 +20,46 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'textures', ( assert ) => {
+		QUnit.test( 'textures', ( bottomert ) => {
 
 			const actual = new MaterialLoader().textures;
 			const expected = {};
-			assert.deepEqual( actual, expected, 'MaterialLoader defines textures.' );
+			bottomert.deepEqual( actual, expected, 'MaterialLoader defines textures.' );
 
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new MaterialLoader();
-			assert.ok( object, 'Can instantiate a MaterialLoader.' );
+			bottomert.ok( object, 'Can instantiate a MaterialLoader.' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
+		QUnit.todo( 'load', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'parse', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setTextures', ( assert ) => {
+		QUnit.todo( 'parse', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setTextures', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// STATIC
-		QUnit.todo( 'createMaterialFromType', ( assert ) => {
+		QUnit.todo( 'createMaterialFromType', ( bottomert ) => {
 
 			// static createMaterialFromType( type )
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
