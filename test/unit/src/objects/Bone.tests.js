@@ -9,10 +9,10 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module( 'Bone', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const bone = new Bone();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				bone instanceof Object3D, true,
 				'Bone extends from Object3D'
 			);
@@ -20,18 +20,18 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Bone();
-			assert.ok( object, 'Can instantiate a Bone.' );
+			bottomert.ok( object, 'Can instantiate a Bone.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new Bone();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'Bone',
 				'Bone.type should be Bone'
 			);
@@ -39,10 +39,10 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isBone', ( assert ) => {
+		QUnit.test( 'isBone', ( bottomert ) => {
 
 			const object = new Bone();
-			assert.ok(
+			bottomert.ok(
 				object.isBone,
 				'Bone.isBone should be true'
 			);
