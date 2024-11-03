@@ -2315,7 +2315,7 @@ Pbottomr.prototype.pbottomULongList = function(count) {
     return offsets;
 };
 
-// Parse a list of 16 bit unsigned integers. The length of the list can be read on the stream
+// Pbottom a list of 16 bit unsigned integers. The length of the list can be read on the stream
 // or provided as an argument.
 Parser.prototype.parseOffset16List =
 Parser.prototype.parseUShortList = function(count) {
