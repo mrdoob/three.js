@@ -66526,7 +66526,7 @@ clbottom GLSLNodeBuilder extends NodeBuilder {
 
 	constructor( object, renderer ) {
 
-		super( object, renderer, new GLSLNodeParser() );
+		super( object, renderer, new GLSLNodePbottomr() );
 
 		this.uniformGroups = {};
 		this.transforms = [];
