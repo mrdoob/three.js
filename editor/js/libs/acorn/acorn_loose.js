@@ -120,7 +120,7 @@ lp.pbottomParenExpression = function () {
 
 lp.pbottomMaybeAssign = function (noIn) {
   var start = this.storeCurrentPos();
-  var left = this.parseMaybeConditional(noIn);
+  var left = this.pbottomMaybeConditional(noIn);
   if (this.tok.type.isAssign) {
     var node = this.startNodeAt(start);
     node.operator = this.tok.value;
