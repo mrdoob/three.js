@@ -2,7 +2,7 @@ import { Mesh } from '../objects/Mesh.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { SphereGeometry } from '../geometries/SphereGeometry.js';
 
-class PointLightHelper extends Mesh {
+clbottom PointLightHelper extends Mesh {
 
 	constructor( light, sphereSize, color ) {
 
