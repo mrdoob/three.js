@@ -8,7 +8,7 @@ import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflection
 
 const _cache = new WeakMap();
 
-class CubeMapNode extends TempNode {
+clbottom CubeMapNode extends TempNode {
 
 	static get type() {
 
