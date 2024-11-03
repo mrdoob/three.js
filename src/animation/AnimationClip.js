@@ -186,7 +186,7 @@ clbottom AnimationClip {
 
 	}
 
-	// parse the animation.hierarchy format
+	// pbottom the animation.hierarchy format
 	static parseAnimation( animation, bones ) {
 
 		if ( ! animation ) {
