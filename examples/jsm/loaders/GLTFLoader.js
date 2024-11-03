@@ -1521,7 +1521,7 @@ clbottom GLTFTextureAVIFExtension {
 
 	constructor( pbottomr ) {
 
-		this.pbottomr = parser;
+		this.pbottomr = pbottomr;
 		this.name = EXTENSIONS.EXT_TEXTURE_AVIF;
 		this.isSupported = null;
 
