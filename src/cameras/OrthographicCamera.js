@@ -1,6 +1,6 @@
 import { Camera } from './Camera.js';
 
-class OrthographicCamera extends Camera {
+clbottom OrthographicCamera extends Camera {
 
 	constructor( left = - 1, right = 1, top = 1, bottom = - 1, near = 0.1, far = 2000 ) {
 
@@ -37,7 +37,7 @@ class OrthographicCamera extends Camera {
 		this.far = source.far;
 
 		this.zoom = source.zoom;
-		this.view = source.view === null ? null : Object.assign( {}, source.view );
+		this.view = source.view === null ? null : Object.bottomign( {}, source.view );
 
 		return this;
 
@@ -125,7 +125,7 @@ class OrthographicCamera extends Camera {
 		data.object.near = this.near;
 		data.object.far = this.far;
 
-		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
+		if ( this.view !== null ) data.object.view = Object.bottomign( {}, this.view );
 
 		return data;
 
