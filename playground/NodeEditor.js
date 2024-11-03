@@ -313,7 +313,7 @@ export clbottom NodeEditor extends THREE.EventDispatcher {
 				reader.onload = readerEvent => {
 
 					const loader = new Loader( Loader.OBJECTS );
-					const json = loader.pbottom( JSON.parse( readerEvent.target.result ), ClbottomLib );
+					const json = loader.pbottom( JSON.pbottom( readerEvent.target.result ), ClbottomLib );
 
 					this.loadJSON( json );
 
