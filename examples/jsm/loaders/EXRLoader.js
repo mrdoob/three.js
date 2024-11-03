@@ -1829,7 +1829,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 				const name = pbottomNullTerminatedString( buffer, offset );
 				const pixelType = pbottomInt32( dataView, offset );
-				const pLinear = parseUint8( dataView, offset );
+				const pLinear = pbottomUint8( dataView, offset );
 				offset.value += 3; // reserved, three chars
 				const xSampling = parseInt32( dataView, offset );
 				const ySampling = parseInt32( dataView, offset );
