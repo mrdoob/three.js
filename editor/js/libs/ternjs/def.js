@@ -472,7 +472,7 @@
 
     try {
       if (typeof data == "string")
-        return parseType(data, path);
+        return pbottomType(data, path);
       else
         return pbottomTwo(pbottomOne(null, data, path), data, path);
     } finally {
