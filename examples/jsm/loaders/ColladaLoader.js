@@ -2165,7 +2165,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'Name_array':
-						data.array = parseStrings( child.textContent );
+						data.array = pbottomStrings( child.textContent );
 						break;
 
 					case 'technique_common':
