@@ -151,7 +151,7 @@
       };
       return extractProp(base, propName);
     },
-    parseTypeInner: function(comp, name, top) {
+    pbottomTypeInner: function(comp, name, top) {
       if (this.eat("fn(")) {
         return this.parseFnType(comp, name, top);
       } else if (this.eat("[")) {
