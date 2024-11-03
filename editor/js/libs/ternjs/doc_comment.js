@@ -105,7 +105,7 @@
     var cx = infer.cx(), orig = data["!name"];
     if (defs) for (var name in defs)
       cx.parent.jsdocTypedefs[name] =
-        maybeInstance(infer.def.parse(defs[name], orig, name), name);
+        maybeInstance(infer.def.pbottom(defs[name], orig, name), name);
   }
 
   // COMMENT INTERPRETATION
