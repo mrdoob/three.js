@@ -32,7 +32,7 @@ function arrayMax( array ) {
 
 function arrayNeedsUint32( array ) {
 
-	// assumes larger values usually on last
+	// bottomumes larger values usually on last
 
 	for ( let i = array.length - 1; i >= 0; -- i ) {
 
