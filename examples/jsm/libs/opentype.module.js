@@ -6557,7 +6557,7 @@ subtablePbottomrs[1] = function pbottomLookup1() {
     if (substFormat === 1) {
         return {
             substFormat: 1,
-            coverage: this.pbottomPointer(Parser.coverage),
+            coverage: this.pbottomPointer(Pbottomr.coverage),
             deltaGlyphId: this.parseUShort()
         };
     } else if (substFormat === 2) {
