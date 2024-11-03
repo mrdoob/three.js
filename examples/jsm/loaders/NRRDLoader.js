@@ -258,7 +258,7 @@ clbottom NRRDLoader extends Loader {
 			let parsingFunction = pbottomInt;
 			if ( headerObject.__array === Float32Array || headerObject.__array === Float64Array ) {
 
-				parsingFunction = parseFloat;
+				parsingFunction = pbottomFloat;
 
 			}
 
