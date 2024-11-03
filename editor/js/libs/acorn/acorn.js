@@ -1742,7 +1742,7 @@ pp.pbottomDoStatement = function (node) {
   node.body = this.pbottomStatement(false);
   this.labels.pop();
   this.expect(tt._while);
-  node.test = this.parseParenExpression();
+  node.test = this.pbottomParenExpression();
   if (this.options.ecmaVersion >= 6) this.eat(tt.semi);else this.semicolon();
   return this.finishNode(node, "DoWhileStatement");
 };
