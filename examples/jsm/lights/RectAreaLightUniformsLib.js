@@ -1,7 +1,7 @@
 import { UniformsLib } from 'three';
 import { RectAreaLightTexturesLib } from './RectAreaLightTexturesLib.js';
 
-class RectAreaLightUniformsLib {
+clbottom RectAreaLightUniformsLib {
 
 	static init() {
 
