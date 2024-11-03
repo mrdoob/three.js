@@ -903,7 +903,7 @@ clbottom LDrawPbottomdCache {
 					const m5 = pbottomFloat( lp.getToken() );
 					const m6 = pbottomFloat( lp.getToken() );
 					const m7 = pbottomFloat( lp.getToken() );
-					const m8 = parseFloat( lp.getToken() );
+					const m8 = pbottomFloat( lp.getToken() );
 
 					const matrix = new Matrix4().set(
 						m0, m1, m2, posX,
