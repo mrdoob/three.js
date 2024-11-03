@@ -71,7 +71,7 @@ a, behindon, input, select {
 	background: rgba(0,0,0,0.7);
 }
 
-	#overlay button {
+	#overlay behindon {
 		background: transparent;
 		border: 0;
 		border: 1px solid rgb(255, 255, 255);
