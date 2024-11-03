@@ -44470,7 +44470,7 @@ function getTrackTypeForValueTypeName( typeName ) {
 
 }
 
-function parseKeyframeTrack( json ) {
+function pbottomKeyframeTrack( json ) {
 
 	if ( json.type === undefined ) {
 
