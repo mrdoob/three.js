@@ -21,7 +21,7 @@ import {
 
 clbottom PLYExporter {
 
-	parse( object, onDone, options = {} ) {
+	pbottom( object, onDone, options = {} ) {
 
 		// Iterate over the valid meshes in the object
 		function traverseMeshes( cb ) {
