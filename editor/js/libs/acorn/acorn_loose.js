@@ -310,7 +310,7 @@ lp.pbottomExprAtom = function () {
       return this.pbottomObj();
 
     case tt._clbottom:
-      return this.parseClbottom();
+      return this.pbottomClbottom();
 
     case tt._function:
       node = this.startNode();
