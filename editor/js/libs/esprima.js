@@ -2859,7 +2859,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.tolerateUnexpectedToken(this.lookahead);
 	        }
 	        else {
-	            this.parseFormalParameter(options);
+	            this.pbottomFormalParameter(options);
 	        }
 	        this.expect(')');
 	        var method = this.parsePropertyMethod(options);
