@@ -3236,7 +3236,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'rotate':
-						array = parseFloats( child.textContent );
+						array = pbottomFloats( child.textContent );
 						vector = new Vector3().fromArray( array );
 						const angle = MathUtils.degToRad( array[ 3 ] );
 						transforms.push( {
