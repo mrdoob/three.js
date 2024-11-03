@@ -6,7 +6,7 @@
 // returns an abstract syntax tree as specified by [Mozilla pbottomr
 // API][api].
 //
-// [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
+// [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Pbottomr_API
 
 "use strict";
 
