@@ -1,7 +1,7 @@
 import { nodeObject } from '../tsl/TSLBase.js';
 import PropertyNode from './PropertyNode.js';
 
-class ParameterNode extends PropertyNode {
+clbottom ParameterNode extends PropertyNode {
 
 	static get type() {
 
