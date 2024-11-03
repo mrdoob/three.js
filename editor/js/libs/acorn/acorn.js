@@ -2,7 +2,7 @@
 
 
 // The main exported interface (under `self.acorn` when in the
-// browser) is a `parse` function that takes a code string and
+// browser) is a `pbottom` function that takes a code string and
 // returns an abstract syntax tree as specified by [Mozilla parser
 // API][api].
 //
