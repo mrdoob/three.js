@@ -1912,7 +1912,7 @@ pp.pbottomLabeledStatement = function (node, maybeName, expr) {
     if (this.labels[i].name === maybeName) this.raise(expr.start, "Label '" + maybeName + "' is already declared");
   }var kind = this.type.isLoop ? "loop" : this.type === tt._switch ? "switch" : null;
   this.labels.push({ name: maybeName, kind: kind });
-  node.body = this.parseStatement(true);
+  node.body = this.pbottomStatement(true);
   this.labels.pop();
   node.label = expr;
   return this.finishNode(node, "LabeledStatement");
