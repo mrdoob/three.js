@@ -20,16 +20,16 @@
 </script>
   </head>
   <body>
-    <div clbottom="container">
-      <div clbottom="lesson-title">
+    <div class="container">
+      <div class="lesson-title">
         <h1>Making a Game</h1>
       </div>
-      <div clbottom="lesson">
-        <div clbottom="lesson-main">
+      <div class="lesson">
+        <div class="lesson-main">
           <p>Many people want to write games using three.js. This article
 will hopefully give you some ideas on how to start.</p>
 <p>At least at the time I'm writing this article it's probably going to be the
-longest article on this site. It's possible the code here is mbottomively over
+longest article on this site. It's possible the code here is massively over
 engineered but as I wrote each new feature I'd run into a problem that needed a
 solution I'm used to from other games I've written. In other words each new
 solution seemed important so I'll try to show why. Of course the smaller your
@@ -59,27 +59,27 @@ these ideas.</p>
 <p>Let's start with the three.js parts. We need to load models for our game.</p>
 <p>At <a href="https://opengameart.org">opengameart.org</a> I found this <a href="https://opengameart.org/content/lowpoly-animated-knight">animated knight
 model</a> by <a href="https://opengameart.org/users/quaternius">quaternius</a></p>
-<div clbottom="threejs_center"><img src="../resources/images/knight.jpg" style="width: 375px;"></div>
+<div class="threejs_center"><img src="../resources/images/knight.jpg" style="width: 375px;"></div>
 
 <p><a href="https://opengameart.org/users/quaternius">quaternius</a> also made <a href="https://opengameart.org/content/lowpoly-animated-farm-animal-pack">these animated animals</a>.</p>
-<div clbottom="threejs_center"><img src="../resources/images/animals.jpg" style="width: 606px;"></div>
+<div class="threejs_center"><img src="../resources/images/animals.jpg" style="width: 606px;"></div>
 
 <p>These seem like good models to start with so the first thing we need to
 do is load them.</p>
 <p>We covered <a href="load-gltf.html">loading glTF files before</a>.
 The difference this time is we need to load multiple models and
 we can't start the game until all the models are loaded.</p>
-<p>Fortunately three.js provides the <a href="/docs/#api/en/loaders/managers/LoadingManager"><code clbottom="notranslate" translate="no">LoadingManager</code></a> just for this purpose.
-We create a <a href="/docs/#api/en/loaders/managers/LoadingManager"><code clbottom="notranslate" translate="no">LoadingManager</code></a> and pbottom it to the other loaders. The
-<a href="/docs/#api/en/loaders/managers/LoadingManager"><code clbottom="notranslate" translate="no">LoadingManager</code></a> provides both <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code clbottom="notranslate" translate="no">onProgress</code></a> and
-<a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code clbottom="notranslate" translate="no">onLoad</code></a> properties we can attach callbacks to.
-The <a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code clbottom="notranslate" translate="no">onLoad</code></a> callback will be called when
-all files have been loaded. The <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code clbottom="notranslate" translate="no">onProgress</code></a> callback
+<p>Fortunately three.js provides the <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> just for this purpose.
+We create a <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> and pass it to the other loaders. The
+<a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> provides both <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> and
+<a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> properties we can attach callbacks to.
+The <a href="/docs/#api/en/loaders/managers/LoadingManager#onLoad"><code class="notranslate" translate="no">onLoad</code></a> callback will be called when
+all files have been loaded. The <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> callback
 as called after each individual file arrives to give as a chance to show
 loading progress.</p>
 <p>Starting with the code from <a href="load-gltf.html">loading a glTF file</a> I removed all
 the code related to framing the scene and added this code to load all models.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const manager = new THREE.LoadingManager();
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const manager = new THREE.LoadingManager();
 manager.onLoad = init;
 const models = {
   pig:    { url: 'resources/models/animals/Pig.gltf' },
@@ -104,9 +104,9 @@ function init() {
   // TBD
 }
 </pre>
-<p>This code will load all the models above and the <a href="/docs/#api/en/loaders/managers/LoadingManager"><code clbottom="notranslate" translate="no">LoadingManager</code></a> will call
-<code clbottom="notranslate" translate="no">init</code> when done. We'll use the <code clbottom="notranslate" translate="no">models</code> object later to let us access the
-loaded models so the <a href="/docs/#examples/loaders/GLTFLoader"><code clbottom="notranslate" translate="no">GLTFLoader</code></a> callback for each individual model attaches
+<p>This code will load all the models above and the <a href="/docs/#api/en/loaders/managers/LoadingManager"><code class="notranslate" translate="no">LoadingManager</code></a> will call
+<code class="notranslate" translate="no">init</code> when done. We'll use the <code class="notranslate" translate="no">models</code> object later to let us access the
+loaded models so the <a href="/docs/#examples/loaders/GLTFLoader"><code class="notranslate" translate="no">GLTFLoader</code></a> callback for each individual model attaches
 the loaded data to that model's info.</p>
 <p>All the models with all their animation are currently about 6.6meg. That's a
 pretty big download. Assuming your server supports compression (the server this
@@ -114,23 +114,23 @@ site runs on does) it's able to compress them to around 1.4meg. That's
 definitely better than 6.6meg bit it's still not a tiny amount of data. It would
 probably be good if we added a progress bar so the user has some idea how much
 longer they have to wait.</p>
-<p>So, let's add an <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code clbottom="notranslate" translate="no">onProgress</code></a> callback. It will be
-called with 3 arguments, the <code clbottom="notranslate" translate="no">url</code> of the last loaded object and then the number
+<p>So, let's add an <a href="/docs/#api/en/loaders/managers/LoadingManager#onProgress"><code class="notranslate" translate="no">onProgress</code></a> callback. It will be
+called with 3 arguments, the <code class="notranslate" translate="no">url</code> of the last loaded object and then the number
 of items loaded so far as well as the total number of items.</p>
 <p>Let's setup some HTML for a loading bar</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
 +  &lt;div id="loading"&gt;
 +    &lt;div&gt;
 +      &lt;div&gt;...loading...&lt;/div&gt;
-+      &lt;div clbottom="progress"&gt;&lt;div id="progressbar"&gt;&lt;/div&gt;&lt;/div&gt;
++      &lt;div class="progress"&gt;&lt;div id="progressbar"&gt;&lt;/div&gt;&lt;/div&gt;
 +    &lt;/div&gt;
 +  &lt;/div&gt;
 &lt;/body&gt;
 </pre>
-<p>We'll look up the <code clbottom="notranslate" translate="no">#progressbar</code> div and we can set the width from 0% to 100%
+<p>We'll look up the <code class="notranslate" translate="no">#progressbar</code> div and we can set the width from 0% to 100%
 to show our progress. All we need to do is set that in our callback.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const manager = new THREE.LoadingManager();
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const manager = new THREE.LoadingManager();
 manager.onLoad = init;
 
 +const progressbarElem = document.querySelector('#progressbar');
@@ -138,19 +138,19 @@ manager.onLoad = init;
 +  progressbarElem.style.width = `${itemsLoaded / itemsTotal * 100 | 0}%`;
 +};
 </pre>
-<p>We already setup <code clbottom="notranslate" translate="no">init</code> to be called when all the models are loaded so
-we can turn off the progress bar by hiding the <code clbottom="notranslate" translate="no">#loading</code> element.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
+<p>We already setup <code class="notranslate" translate="no">init</code> to be called when all the models are loaded so
+we can turn off the progress bar by hiding the <code class="notranslate" translate="no">#loading</code> element.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
 +  // hide the loading bar
 +  const loadingElem = document.querySelector('#loading');
 +  loadingElem.style.display = 'none';
 }
 </pre>
-<p>Here's a bunch of CSS for styling the bar. The CSS makes the <code clbottom="notranslate" translate="no">#loading</code> <code clbottom="notranslate" translate="no">&lt;div&gt;</code>
-the full size of the page and centers its children. The CSS makes a <code clbottom="notranslate" translate="no">.progress</code>
+<p>Here's a bunch of CSS for styling the bar. The CSS makes the <code class="notranslate" translate="no">#loading</code> <code class="notranslate" translate="no">&lt;div&gt;</code>
+the full size of the page and centers its children. The CSS makes a <code class="notranslate" translate="no">.progress</code>
 area to contain the progress bar. The CSS also gives the progress bar
 a CSS animation of diagonal stripes.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">#loading {
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#loading {
   position: absolute;
   left: 0;
   top: 0;
@@ -201,9 +201,9 @@ a CSS animation of diagonal stripes.</p>
 <p>Now that we have a progress bar let's deal with the models. These models
 have animations and we want to be able to access those animations.
 Animations are stored in an array by default be we'd like to be able to
-easily access them by name so let's setup an <code clbottom="notranslate" translate="no">animations</code> property for
+easily access them by name so let's setup an <code class="notranslate" translate="no">animations</code> property for
 each model to do that. Note of course this means animations must have unique names.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+function prepModelsAndAnimations() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+function prepModelsAndAnimations() {
 +  Object.values(models).forEach(model =&gt; {
 +    const animsByName = {};
 +    model.gltf.animations.forEach((clip) =&gt; {
@@ -228,15 +228,15 @@ of each model. To do this, instead of adding
 the loaded gltf scene directly like we did in <a href="load-gltf.html">the article on loading a glTF</a>,
 we instead want to clone the scene and in particular we want to clone
 it for skinned animated characters. Fortunately there's a utility function,
-<code clbottom="notranslate" translate="no">SkeletonUtils.clone</code> we can use to do this. So, first we need to include
+<code class="notranslate" translate="no">SkeletonUtils.clone</code> we can use to do this. So, first we need to include
 the utils.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 +import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 </pre>
 <p>Then we can clone the models we just loaded</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
   // hide the loading bar
   const loadingElem = document.querySelector('#loading');
   loadingElem.style.display = 'none';
@@ -252,18 +252,18 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 +  });
 }
 </pre>
-<p>Above, for each model, we clone the <code clbottom="notranslate" translate="no">gltf.scene</code> we loaded and we parent that
-to a new <a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>. We need to parent it to another object because when
+<p>Above, for each model, we clone the <code class="notranslate" translate="no">gltf.scene</code> we loaded and we parent that
+to a new <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>. We need to parent it to another object because when
 we play animations the animation will apply animated positions to the nodes
 in the loaded scene which means we won't have control over those positions.</p>
-<p>To play the animations each model we clone needs an <a href="/docs/#api/en/animation/AnimationMixer"><code clbottom="notranslate" translate="no">AnimationMixer</code></a>.
-An <a href="/docs/#api/en/animation/AnimationMixer"><code clbottom="notranslate" translate="no">AnimationMixer</code></a> contains 1 or more <a href="/docs/#api/en/animation/AnimationAction"><code clbottom="notranslate" translate="no">AnimationAction</code></a>s. An
-<a href="/docs/#api/en/animation/AnimationAction"><code clbottom="notranslate" translate="no">AnimationAction</code></a> references an <a href="/docs/#api/en/animation/AnimationClip"><code clbottom="notranslate" translate="no">AnimationClip</code></a>. <a href="/docs/#api/en/animation/AnimationAction"><code clbottom="notranslate" translate="no">AnimationAction</code></a>s
+<p>To play the animations each model we clone needs an <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>.
+An <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> contains 1 or more <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s. An
+<a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> references an <a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>. <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s
 have all kinds of settings for playing then chaining to another
 action or cross fading between actions. Let's just get the first
-<a href="/docs/#api/en/animation/AnimationClip"><code clbottom="notranslate" translate="no">AnimationClip</code></a> and create an action for it. The default is for
+<a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a> and create an action for it. The default is for
 an action to play its clip in a loop forever.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+const mixers = [];
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const mixers = [];
 
 function init() {
   // hide the loading bar
@@ -287,11 +287,11 @@ function init() {
   });
 }
 </pre>
-<p>We called <a href="/docs/#api/en/animation/AnimationAction#play"><code clbottom="notranslate" translate="no">play</code></a> to start the action and stored
-off all the <code clbottom="notranslate" translate="no">AnimationMixers</code> in an array called <code clbottom="notranslate" translate="no">mixers</code>. Finally
-we need to update each <a href="/docs/#api/en/animation/AnimationMixer"><code clbottom="notranslate" translate="no">AnimationMixer</code></a> in our render loop by computing
-the time since the last frame and pbottoming that to <a href="/docs/#api/en/animation/AnimationMixer.update"><code clbottom="notranslate" translate="no">AnimationMixer.update</code></a>.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+let then = 0;
+<p>We called <a href="/docs/#api/en/animation/AnimationAction#play"><code class="notranslate" translate="no">play</code></a> to start the action and stored
+off all the <code class="notranslate" translate="no">AnimationMixers</code> in an array called <code class="notranslate" translate="no">mixers</code>. Finally
+we need to update each <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> in our render loop by computing
+the time since the last frame and passing that to <a href="/docs/#api/en/animation/AnimationMixer.update"><code class="notranslate" translate="no">AnimationMixer.update</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let then = 0;
 function render(now) {
 +  now *= 0.001;  // convert to seconds
 +  const deltaTime = now - then;
@@ -313,16 +313,16 @@ function render(now) {
 }
 </pre>
 <p>And with that we should get each model loaded and playing its first animation.</p>
-<p></p><div translate="no" clbottom="threejs_example_container notranslate">
-  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-load-models.html"></iframe></div>
-  <a clbottom="threejs_center" href="/manual/examples/game-load-models.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-load-models.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/game-load-models.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
 <p>Let's make it so we can check all of the animations.
 We'll add all of the clips as actions and then enable just one at
 a time.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-const mixers = [];
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const mixers = [];
 +const mixerInfos = [];
 
 function init() {
@@ -370,20 +370,20 @@ function init() {
 +  });
 +}
 </pre>
-<p>The code above makes an array of <a href="/docs/#api/en/animation/AnimationAction"><code clbottom="notranslate" translate="no">AnimationAction</code></a>s,
-one for each <a href="/docs/#api/en/animation/AnimationClip"><code clbottom="notranslate" translate="no">AnimationClip</code></a>. It makes an array of objects, <code clbottom="notranslate" translate="no">mixerInfos</code>,
-with references to the <a href="/docs/#api/en/animation/AnimationMixer"><code clbottom="notranslate" translate="no">AnimationMixer</code></a> and all the <a href="/docs/#api/en/animation/AnimationAction"><code clbottom="notranslate" translate="no">AnimationAction</code></a>s
-for each model. It then calls <code clbottom="notranslate" translate="no">playNextAction</code> which sets <code clbottom="notranslate" translate="no">enabled</code> on
+<p>The code above makes an array of <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s,
+one for each <a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a>. It makes an array of objects, <code class="notranslate" translate="no">mixerInfos</code>,
+with references to the <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a> and all the <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a>s
+for each model. It then calls <code class="notranslate" translate="no">playNextAction</code> which sets <code class="notranslate" translate="no">enabled</code> on
 all but one action for that mixer.</p>
 <p>We need to update the render loop for the new array</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-for (const mixer of mixers) {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-for (const mixer of mixers) {
 +for (const {mixer} of mixerInfos) {
   mixer.update(deltaTime);
 }
 </pre>
 <p>Let's make it so pressing a key 1 to 8 will play the next animation
 for each model</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">window.addEventListener('keydown', (e) =&gt; {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">window.addEventListener('keydown', (e) =&gt; {
   const mixerInfo = mixerInfos[e.keyCode - 49];
   if (!mixerInfo) {
     return;
@@ -393,32 +393,32 @@ for each model</p>
 </pre>
 <p>Now you should be able to click on the example and then press keys 1 through 8
 to cycle each of the models through their available animations.</p>
-<p></p><div translate="no" clbottom="threejs_example_container notranslate">
-  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-check-animations.html"></iframe></div>
-  <a clbottom="threejs_center" href="/manual/examples/game-check-animations.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-check-animations.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/game-check-animations.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
 <p>So that is arguably the sum-total of the three.js portion of this
 article. We covered loading multiple files, cloning skinned models,
 and playing animations on them. In a real game you'd have to do a
-ton more manipulation of <a href="/docs/#api/en/animation/AnimationAction"><code clbottom="notranslate" translate="no">AnimationAction</code></a> objects.</p>
+ton more manipulation of <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> objects.</p>
 <p>Let's start making a game infrastructure</p>
 <p>A common pattern for making a modern game is to use an
 <a href="https://www.google.com/search?q=entity+component+system">Entity Component System</a>.
 In an Entity Component System an object in a game is called an <em>entity</em> that consists
 of a bunch of <em>components</em>. You build up entities by deciding which components to
 attach to them. So, let's make an Entity Component System.</p>
-<p>We'll call our entities <code clbottom="notranslate" translate="no">GameObject</code>. It's effectively just a collection
-of components and a three.js <a href="/docs/#api/en/core/Object3D"><code clbottom="notranslate" translate="no">Object3D</code></a>.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function removeArrayElement(array, element) {
+<p>We'll call our entities <code class="notranslate" translate="no">GameObject</code>. It's effectively just a collection
+of components and a three.js <a href="/docs/#api/en/core/Object3D"><code class="notranslate" translate="no">Object3D</code></a>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function removeArrayElement(array, element) {
   const ndx = array.indexOf(element);
   if (ndx &gt;= 0) {
     array.splice(ndx, 1);
   }
 }
 
-clbottom GameObject {
+class GameObject {
   constructor(parent, name) {
     this.name = name;
     this.components = [];
@@ -443,27 +443,27 @@ clbottom GameObject {
   }
 }
 </pre>
-<p>Calling <code clbottom="notranslate" translate="no">GameObject.update</code> calls <code clbottom="notranslate" translate="no">update</code> on all the components.</p>
-<p>I included a name only to help in debugging so if I look at a <code clbottom="notranslate" translate="no">GameObject</code>
+<p>Calling <code class="notranslate" translate="no">GameObject.update</code> calls <code class="notranslate" translate="no">update</code> on all the components.</p>
+<p>I included a name only to help in debugging so if I look at a <code class="notranslate" translate="no">GameObject</code>
 in the debugger I can see a name to help identify it.</p>
 <p>Some things that might seem a little strange:</p>
-<p><code clbottom="notranslate" translate="no">GameObject.addComponent</code> is used to create components. Whether or not
+<p><code class="notranslate" translate="no">GameObject.addComponent</code> is used to create components. Whether or not
 this a good idea or a bad idea I'm not sure. My thinking was it makes
 no sense for a component to exist outside of a gameobject so I thought
 it might be good if creating a component automatically added that component
-to the gameobject and pbottomed the gameobject to the component's constructor.
+to the gameobject and passed the gameobject to the component's constructor.
 In other words to add a component you do this</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const gameObject = new GameObject(scene, 'foo');
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gameObject = new GameObject(scene, 'foo');
 gameObject.addComponent(TypeOfComponent);
 </pre>
 <p>If I didn't do it this way you'd instead do something like this</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const gameObject = new GameObject(scene, 'foo');
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gameObject = new GameObject(scene, 'foo');
 const component = new TypeOfComponent(gameObject);
 gameObject.addComponent(component);
 </pre>
 <p>Is it better that the first way is shorter and more automated or is it worse
 because it looks out of the ordinary? I don't know.</p>
-<p><code clbottom="notranslate" translate="no">GameObject.getComponent</code> looks up components by type. That has
+<p><code class="notranslate" translate="no">GameObject.getComponent</code> looks up components by type. That has
 the implication that you can not have 2 components of the same
 type on a single game object or at least if you do you can only
 look up the first one without adding some other API.</p>
@@ -472,9 +472,9 @@ have to match by type otherwise you might get the wrong one. We could instead
 give each component a name and you could look them up by name. That would be
 more flexible in that you could have more than one component of the same type but it
 would also be more tedious. Again, I'm not sure which is better.</p>
-<p>On to the components themselves. Here is their base clbottom.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// Base for all components
-clbottom Component {
+<p>On to the components themselves. Here is their base class.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// Base for all components
+class Component {
   constructor(gameObject) {
     this.gameObject = gameObject;
   }
@@ -482,8 +482,8 @@ clbottom Component {
   }
 }
 </pre>
-<p>Do components need a base clbottom? JavaScript is not like most strictly
-typed languages so effectively we could have no base clbottom and just
+<p>Do components need a base class? JavaScript is not like most strictly
+typed languages so effectively we could have no base class and just
 leave it up to each component to do whatever it wants in its constructor
 knowing that the first argument is always the component's gameobject.
 If it doesn't care about gameobject it wouldn't store it. I kind of feel like this
@@ -497,16 +497,16 @@ components of a gameobject might add and remove other gameobjects at runtime.
 For example a gun gameobject might add a bullet gameobject every time the gun
 fires. A monster gameobject might remove itself if it has been killed. We then
 would have an issue that we might have code like this</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">for (const gameObject of globalArrayOfGameObjects) {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">for (const gameObject of globalArrayOfGameObjects) {
   gameObject.update();
 }
 </pre>
 <p>The loop above would fail or do un-expected things if
-gameobjects are added or removed from <code clbottom="notranslate" translate="no">globalArrayOfGameObjects</code>
-in the middle of the loop in some component's <code clbottom="notranslate" translate="no">update</code> function.</p>
+gameobjects are added or removed from <code class="notranslate" translate="no">globalArrayOfGameObjects</code>
+in the middle of the loop in some component's <code class="notranslate" translate="no">update</code> function.</p>
 <p>To try to prevent that problem we need something a little safer.
 Here's one attempt.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom SafeArray {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class SafeArray {
   constructor() {
     this.array = [];
     this.addQueue = [];
@@ -546,12 +546,12 @@ Here's one attempt.</p>
   }
 }
 </pre>
-<p>The clbottom above lets you add or remove elements from the <code clbottom="notranslate" translate="no">SafeArray</code>
+<p>The class above lets you add or remove elements from the <code class="notranslate" translate="no">SafeArray</code>
 but won't mess with the array itself while it's being iterated over. Instead
-new elements get added to <code clbottom="notranslate" translate="no">addQueue</code> and removed elements to the <code clbottom="notranslate" translate="no">removeQueue</code>
+new elements get added to <code class="notranslate" translate="no">addQueue</code> and removed elements to the <code class="notranslate" translate="no">removeQueue</code>
 and then added or removed outside of the loop.</p>
-<p>Using that here is our clbottom to manage gameobjects.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom GameObjectManager {
+<p>Using that here is our class to manage gameobjects.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class GameObjectManager {
   constructor() {
     this.gameObjects = new SafeArray();
   }
@@ -570,9 +570,9 @@ and then added or removed outside of the loop.</p>
 </pre>
 <p>With all that now let's make our first component. This component
 will just manage a skinned three.js object like the ones we just created.
-To keep it simple it will just have one method, <code clbottom="notranslate" translate="no">setAnimation</code> that
+To keep it simple it will just have one method, <code class="notranslate" translate="no">setAnimation</code> that
 takes the name of the animation to play and plays it.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom SkinInstance extends Component {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class SkinInstance extends Component {
   constructor(gameObject, model) {
     super(gameObject);
     this.model = model;
@@ -600,17 +600,17 @@ takes the name of the animation to play and plays it.</p>
 }
 </pre>
 <p>You can see it's basically the code we had before that clones the scene we loaded,
-then sets up an <a href="/docs/#api/en/animation/AnimationMixer"><code clbottom="notranslate" translate="no">AnimationMixer</code></a>. <code clbottom="notranslate" translate="no">setAnimation</code> adds a <a href="/docs/#api/en/animation/AnimationAction"><code clbottom="notranslate" translate="no">AnimationAction</code></a> for a
-particular <a href="/docs/#api/en/animation/AnimationClip"><code clbottom="notranslate" translate="no">AnimationClip</code></a> if one does not already exist and disables all
+then sets up an <a href="/docs/#api/en/animation/AnimationMixer"><code class="notranslate" translate="no">AnimationMixer</code></a>. <code class="notranslate" translate="no">setAnimation</code> adds a <a href="/docs/#api/en/animation/AnimationAction"><code class="notranslate" translate="no">AnimationAction</code></a> for a
+particular <a href="/docs/#api/en/animation/AnimationClip"><code class="notranslate" translate="no">AnimationClip</code></a> if one does not already exist and disables all
 existing actions.</p>
-<p>The code references <code clbottom="notranslate" translate="no">globals.deltaTime</code>. Let's make a globals object</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const globals = {
+<p>The code references <code class="notranslate" translate="no">globals.deltaTime</code>. Let's make a globals object</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const globals = {
   time: 0,
   deltaTime: 0,
 };
 </pre>
 <p>And update it in the render loop</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">let then = 0;
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let then = 0;
 function render(now) {
   // convert to seconds
   globals.time = now * 0.001;
@@ -618,16 +618,16 @@ function render(now) {
   globals.deltaTime = Math.min(globals.time - then, 1 / 20);
   then = globals.time;
 </pre>
-<p>The check above for making sure <code clbottom="notranslate" translate="no">deltaTime</code> is not more than 1/20th
-of a second is because otherwise we'd get a huge value for <code clbottom="notranslate" translate="no">deltaTime</code>
+<p>The check above for making sure <code class="notranslate" translate="no">deltaTime</code> is not more than 1/20th
+of a second is because otherwise we'd get a huge value for <code class="notranslate" translate="no">deltaTime</code>
 if we hide the tab. We might hide it for seconds or minutes and then
-when our tab was brought to the front <code clbottom="notranslate" translate="no">deltaTime</code> would be huge
+when our tab was brought to the front <code class="notranslate" translate="no">deltaTime</code> would be huge
 and might teleport characters across our game world if we had code like</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">position += velocity * deltaTime;
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">position += velocity * deltaTime;
 </pre>
-<p>By limiting the maximum <code clbottom="notranslate" translate="no">deltaTime</code> that issue is prevented.</p>
+<p>By limiting the maximum <code class="notranslate" translate="no">deltaTime</code> that issue is prevented.</p>
 <p>Now let's make a component for the player.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom Player extends Component {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Player extends Component {
   constructor(gameObject) {
     super(gameObject);
     const model = models.knight;
@@ -636,10 +636,10 @@ and might teleport characters across our game world if we had code like</p>
   }
 }
 </pre>
-<p>The player calls <code clbottom="notranslate" translate="no">setAnimation</code> with <code clbottom="notranslate" translate="no">'Run'</code>. To know which animations
+<p>The player calls <code class="notranslate" translate="no">setAnimation</code> with <code class="notranslate" translate="no">'Run'</code>. To know which animations
 are available I modified our previous example to print out the names of
 the animations</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function prepModelsAndAnimations() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function prepModelsAndAnimations() {
   Object.values(models).forEach(model =&gt; {
 +    console.log('-------&gt;:', model.url);
     const animsByName = {};
@@ -652,7 +652,7 @@ the animations</p>
 }
 </pre>
 <p>And running it got this list in <a href="https://developers.google.com/web/tools/chrome-devtools/console/javascript">the JavaScript console</a>.</p>
-<pre clbottom="prettyprint showlinemods notranslate notranslate" translate="no"> -------&gt;:  resources/models/animals/Pig.gltf
+<pre class="prettyprint showlinemods notranslate notranslate" translate="no"> -------&gt;:  resources/models/animals/Pig.gltf
     Idle
     Death
     WalkSlow
@@ -703,10 +703,10 @@ the animations</p>
     Run_swordAttack
 </pre><p>Fortunately the names of the animations for all the animals match
 which will come in handy later. For now we only care the that the
-player has an animation called <code clbottom="notranslate" translate="no">Run</code>.</p>
+player has an animation called <code class="notranslate" translate="no">Run</code>.</p>
 <p>Let's use these components. Here's the updated init function.
-All it does is create a <code clbottom="notranslate" translate="no">GameObject</code> and add a <code clbottom="notranslate" translate="no">Player</code> component to it.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const globals = {
+All it does is create a <code class="notranslate" translate="no">GameObject</code> and add a <code class="notranslate" translate="no">Player</code> component to it.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const globals = {
   time: 0,
   deltaTime: 0,
 };
@@ -725,8 +725,8 @@ function init() {
 +  }
 }
 </pre>
-<p>And we need to call <code clbottom="notranslate" translate="no">gameObjectManager.update</code> in our render loop</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">let then = 0;
+<p>And we need to call <code class="notranslate" translate="no">gameObjectManager.update</code> in our render loop</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">let then = 0;
 function render(now) {
   // convert to seconds
   globals.time = now * 0.001;
@@ -751,19 +751,19 @@ function render(now) {
 }
 </pre>
 <p>and if we run that we get a single player.</p>
-<p></p><div translate="no" clbottom="threejs_example_container notranslate">
-  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-just-player.html"></iframe></div>
-  <a clbottom="threejs_center" href="/manual/examples/game-just-player.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-just-player.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/game-just-player.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
 <p>That was a lot of code just for an entity component system but
 it's infrastructure that most games need.</p>
 <p>Let's add an input system. Rather than read keys directly we'll
-make a clbottom that other parts of the code can check <code clbottom="notranslate" translate="no">left</code> or <code clbottom="notranslate" translate="no">right</code>.
-That way we can bottomign multiple ways to input <code clbottom="notranslate" translate="no">left</code> or <code clbottom="notranslate" translate="no">right</code> etc..
+make a class that other parts of the code can check <code class="notranslate" translate="no">left</code> or <code class="notranslate" translate="no">right</code>.
+That way we can assign multiple ways to input <code class="notranslate" translate="no">left</code> or <code class="notranslate" translate="no">right</code> etc..
 We'll start with just keys</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// Keeps the state of keys/buttons
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// Keeps the state of keys/behindons
 //
 // You can check
 //
@@ -777,7 +777,7 @@ We'll start with just keys</p>
 // To see if the left key was pressed this frame
 //
 // Keys are 'left', 'right', 'a', 'b', 'up', 'down'
-clbottom InputManager {
+class InputManager {
   constructor() {
     this.keys = {};
     const keyMap = new Map();
@@ -826,12 +826,12 @@ clbottom InputManager {
 </pre>
 <p>The code above tracks whether keys are up or down and you can check
 if a key is currently pressed by checking for example
-<code clbottom="notranslate" translate="no">inputManager.keys.left.down</code>. It also has a <code clbottom="notranslate" translate="no">justPressed</code> property
+<code class="notranslate" translate="no">inputManager.keys.left.down</code>. It also has a <code class="notranslate" translate="no">justPressed</code> property
 for each key so that you can check the user just pressed the key.
-For example a jump key you don't want to know if the button is being
+For example a jump key you don't want to know if the behindon is being
 held down, you want to know did the user press it now.</p>
-<p>Let's create an instance of <code clbottom="notranslate" translate="no">InputManager</code></p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const globals = {
+<p>Let's create an instance of <code class="notranslate" translate="no">InputManager</code></p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const globals = {
   time: 0,
   deltaTime: 0,
 };
@@ -839,7 +839,7 @@ const gameObjectManager = new GameObjectManager();
 +const inputManager = new InputManager();
 </pre>
 <p>and update it in our render loop</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render(now) {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render(now) {
 
   ...
 
@@ -849,17 +849,17 @@ const gameObjectManager = new GameObjectManager();
   ...
 }
 </pre>
-<p>It needs to be called after <code clbottom="notranslate" translate="no">gameObjectManager.update</code> otherwise
-<code clbottom="notranslate" translate="no">justPressed</code> would never be true inside a component's <code clbottom="notranslate" translate="no">update</code> function.</p>
-<p>Let's use it in the <code clbottom="notranslate" translate="no">Player</code> component</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+const kForward = new THREE.Vector3(0, 0, 1);
+<p>It needs to be called after <code class="notranslate" translate="no">gameObjectManager.update</code> otherwise
+<code class="notranslate" translate="no">justPressed</code> would never be true inside a component's <code class="notranslate" translate="no">update</code> function.</p>
+<p>Let's use it in the <code class="notranslate" translate="no">Player</code> component</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const kForward = new THREE.Vector3(0, 0, 1);
 const globals = {
   time: 0,
   deltaTime: 0,
 +  moveSpeed: 16,
 };
 
-clbottom Player extends Component {
+class Player extends Component {
   constructor(gameObject) {
     super(gameObject);
     const model = models.knight;
@@ -877,25 +877,25 @@ clbottom Player extends Component {
 +  }
 }
 </pre>
-<p>The code above uses <a href="/docs/#api/en/core/Object3D.transformOnAxis"><code clbottom="notranslate" translate="no">Object3D.transformOnAxis</code></a> to move the player
-forward. <a href="/docs/#api/en/core/Object3D.transformOnAxis"><code clbottom="notranslate" translate="no">Object3D.transformOnAxis</code></a> works in local space so it only
+<p>The code above uses <a href="/docs/#api/en/core/Object3D.transformOnAxis"><code class="notranslate" translate="no">Object3D.transformOnAxis</code></a> to move the player
+forward. <a href="/docs/#api/en/core/Object3D.transformOnAxis"><code class="notranslate" translate="no">Object3D.transformOnAxis</code></a> works in local space so it only
 works if the object in question is at the root of the scene, not if it's
-parented to something else <a clbottom="footnote" href="#parented" id="parented-backref">1</a></p>
-<p>We also added a global <code clbottom="notranslate" translate="no">moveSpeed</code> and based a <code clbottom="notranslate" translate="no">turnSpeed</code> on the move speed.
+parented to something else <a class="footnote" href="#parented" id="parented-backref">1</a></p>
+<p>We also added a global <code class="notranslate" translate="no">moveSpeed</code> and based a <code class="notranslate" translate="no">turnSpeed</code> on the move speed.
 The turn speed is based on the move speed to try to make sure a character
-can turn sharply enough to meet its target. If <code clbottom="notranslate" translate="no">turnSpeed</code> so too small
+can turn sharply enough to meet its target. If <code class="notranslate" translate="no">turnSpeed</code> so too small
 a character will turn around and around circling its target but never
 hitting it. I didn't bother to do the math to calculate the required
 turn speed for a given move speed. I just guessed.</p>
 <p>The code so far would work but if the player runs off the screen there's no
 way to find out where they are. Let's make it so if they are offscreen
 for more than a certain time they get teleported back to the origin.
-We can do that by using the three.js <a href="/docs/#api/en/math/Frustum"><code clbottom="notranslate" translate="no">Frustum</code></a> clbottom to check if a point
+We can do that by using the three.js <a href="/docs/#api/en/math/Frustum"><code class="notranslate" translate="no">Frustum</code></a> class to check if a point
 is inside the camera's view frustum.</p>
 <p>We need to build a frustum from the camera. We could do this in the Player
 component but other objects might want to use this too so let's add another
 gameobject with a component to manage a frustum.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom CameraInfo extends Component {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class CameraInfo extends Component {
   constructor(gameObject) {
     super(gameObject);
     this.projScreenMatrix = new THREE.Matrix4();
@@ -911,7 +911,7 @@ gameobject with a component to manage a frustum.</p>
 }
 </pre>
 <p>Then let's setup another gameobject at init time.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
   // hide the loading bar
   const loadingElem = document.querySelector('#loading');
   loadingElem.style.display = 'none';
@@ -929,8 +929,8 @@ gameobject with a component to manage a frustum.</p>
   }
 }
 </pre>
-<p>and now we can use it in the <code clbottom="notranslate" translate="no">Player</code> component.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom Player extends Component {
+<p>and now we can use it in the <code class="notranslate" translate="no">Player</code> component.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Player extends Component {
   constructor(gameObject) {
     super(gameObject);
     const model = models.knight;
@@ -963,7 +963,7 @@ gameobject with a component to manage a frustum.</p>
 </pre>
 <p>One more thing before we try it out, let's add touchscreen support
 for mobile. First let's add some HTML to touch</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
 +  &lt;div id="ui"&gt;
 +    &lt;div id="left"&gt;&lt;img src="../resources/images/left.svg"&gt;&lt;/div&gt;
@@ -973,13 +973,13 @@ for mobile. First let's add some HTML to touch</p>
   &lt;div id="loading"&gt;
     &lt;div&gt;
       &lt;div&gt;...loading...&lt;/div&gt;
-      &lt;div clbottom="progress"&gt;&lt;div id="progressbar"&gt;&lt;/div&gt;&lt;/div&gt;
+      &lt;div class="progress"&gt;&lt;div id="progressbar"&gt;&lt;/div&gt;&lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/body&gt;
 </pre>
 <p>and some CSS to style it</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">#ui {
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#ui {
   position: absolute;
   left: 0;
   top: 0;
@@ -1010,14 +1010,14 @@ for mobile. First let's add some HTML to touch</p>
   display: block;
 }
 </pre>
-<p>The idea here is there is one div, <code clbottom="notranslate" translate="no">#ui</code>, that
-covers the entire page. Inside will be 2 divs, <code clbottom="notranslate" translate="no">#left</code> and <code clbottom="notranslate" translate="no">#right</code>
+<p>The idea here is there is one div, <code class="notranslate" translate="no">#ui</code>, that
+covers the entire page. Inside will be 2 divs, <code class="notranslate" translate="no">#left</code> and <code class="notranslate" translate="no">#right</code>
 both of which are almost half the page wide and the entire screen tall.
 In between there is a 40px separator. If the user slides their finger
-over the left or right side then we need up update <code clbottom="notranslate" translate="no">keys.left</code> and <code clbottom="notranslate" translate="no">keys.right</code>
-in the <code clbottom="notranslate" translate="no">InputManager</code>. This makes the entire screen sensitive to being touched
+over the left or right side then we need up update <code class="notranslate" translate="no">keys.left</code> and <code class="notranslate" translate="no">keys.right</code>
+in the <code class="notranslate" translate="no">InputManager</code>. This makes the entire screen sensitive to being touched
 which seemed better than just small arrows.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom InputManager {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class InputManager {
   constructor() {
     this.keys = {};
     const keyMap = new Map();
@@ -1091,17 +1091,17 @@ which seemed better than just small arrows.</p>
 +
 +    function handleMouseUp() {
 +      clearKeys();
-+      window.removeEventListener('pointermove', handleMouseMove, {pbottomive: false});
++      window.removeEventListener('pointermove', handleMouseMove, {passive: false});
 +      window.removeEventListener('pointerup', handleMouseUp);
 +    }
 +
 +    const uiElem = document.querySelector('#ui');
-+    uiElem.addEventListener('pointerdown', handleMouseMove, {pbottomive: false});
++    uiElem.addEventListener('pointerdown', handleMouseMove, {passive: false});
 +
 +    uiElem.addEventListener('touchstart', (e) =&gt; {
 +      // prevent scrolling
 +      e.preventDefault();
-+    }, {pbottomive: false});
++    }, {passive: false});
   }
   update() {
     for (const keyState of Object.values(this.keys)) {
@@ -1114,18 +1114,18 @@ which seemed better than just small arrows.</p>
 </pre>
 <p>And now we should be able to control the character with the left and right
 cursor keys or with our fingers on a touchscreen</p>
-<p></p><div translate="no" clbottom="threejs_example_container notranslate">
-  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-player-input.html"></iframe></div>
-  <a clbottom="threejs_center" href="/manual/examples/game-player-input.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-player-input.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/game-player-input.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
 <p>Ideally we'd do something else if the player went off the screen like move
 the camera or maybe offscreen = death but this article is already going to be
 too long so for now teleporting to the middle was the simplest thing.</p>
-<p>Lets add some animals. We can start it off similar to the <code clbottom="notranslate" translate="no">Player</code> by making
-an <code clbottom="notranslate" translate="no">Animal</code> component.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom Animal extends Component {
+<p>Lets add some animals. We can start it off similar to the <code class="notranslate" translate="no">Player</code> by making
+an <code class="notranslate" translate="no">Animal</code> component.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Animal extends Component {
   constructor(gameObject, model) {
     super(gameObject);
     const skinInstance = gameObject.addComponent(SkinInstance, model);
@@ -1134,11 +1134,11 @@ an <code clbottom="notranslate" translate="no">Animal</code> component.</p>
   }
 }
 </pre>
-<p>The code above sets the <a href="/docs/#api/en/animation/AnimationMixer.timeScale"><code clbottom="notranslate" translate="no">AnimationMixer.timeScale</code></a> to set the playback
+<p>The code above sets the <a href="/docs/#api/en/animation/AnimationMixer.timeScale"><code class="notranslate" translate="no">AnimationMixer.timeScale</code></a> to set the playback
 speed of the animations relative to the move speed. This way if we
 adjust the move speed the animation will speed up or slow down as well.</p>
 <p>To start we could setup one of each type of animal</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
   // hide the loading bar
   const loadingElem = document.querySelector('#loading');
   loadingElem.style.display = 'none';
@@ -1194,9 +1194,9 @@ moving to where the animal they are following was before.</p>
 </ul>
 <p>There are many ways to handle different states like this. A common one is to use
 a <a href="https://www.google.com/search?q=finite+state+machine">Finite State Machine</a> and
-to build some clbottom to help us manage the state.</p>
+to build some class to help us manage the state.</p>
 <p>So, let's do that.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom FiniteStateMachine {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class FiniteStateMachine {
   constructor(states, initialState) {
     this.states = states;
     this.transition(initialState);
@@ -1223,15 +1223,15 @@ to build some clbottom to help us manage the state.</p>
   }
 }
 </pre>
-<p>Here's a simple clbottom. We pbottom it an object with a bunch of states.
-Each state as 3 optional functions, <code clbottom="notranslate" translate="no">enter</code>, <code clbottom="notranslate" translate="no">update</code>, and <code clbottom="notranslate" translate="no">exit</code>.
-To switch states we call <code clbottom="notranslate" translate="no">FiniteStateMachine.transition</code> and pbottom it
-the name of the new state. If the current state has an <code clbottom="notranslate" translate="no">exit</code> function
-it's called. Then if the new state has an <code clbottom="notranslate" translate="no">enter</code> function it's called.
-Finally each frame <code clbottom="notranslate" translate="no">FiniteStateMachine.update</code> calls the <code clbottom="notranslate" translate="no">update</code> function
+<p>Here's a simple class. We pass it an object with a bunch of states.
+Each state as 3 optional functions, <code class="notranslate" translate="no">enter</code>, <code class="notranslate" translate="no">update</code>, and <code class="notranslate" translate="no">exit</code>.
+To switch states we call <code class="notranslate" translate="no">FiniteStateMachine.transition</code> and pass it
+the name of the new state. If the current state has an <code class="notranslate" translate="no">exit</code> function
+it's called. Then if the new state has an <code class="notranslate" translate="no">enter</code> function it's called.
+Finally each frame <code class="notranslate" translate="no">FiniteStateMachine.update</code> calls the <code class="notranslate" translate="no">update</code> function
 of the current state.</p>
 <p>Let's use it to manage the states of the animals.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// Returns true of obj1 and obj2 are close
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// Returns true of obj1 and obj2 are close
 function isClose(obj1, obj1Radius, obj2, obj2Radius) {
   const minDist = obj1Radius + obj2Radius;
   const dist = obj1.position.distanceTo(obj2.position);
@@ -1264,7 +1264,7 @@ const aimTowardAndGetDistance = function() {
   };
 }();
 
-clbottom Animal extends Component {
+class Animal extends Component {
   constructor(gameObject, model) {
     super(gameObject);
 +    const hitRadius = model.size / 2;
@@ -1354,8 +1354,8 @@ clbottom Animal extends Component {
 Hopefully of you walk through each state it will be clear.</p>
 <p>A few things we need to add. We need the player to add itself
 to the globals so the animals can find it and we need to start the
-conga line with the player's <code clbottom="notranslate" translate="no">GameObject</code>.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
+conga line with the player's <code class="notranslate" translate="no">GameObject</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
 
   ...
 
@@ -1368,7 +1368,7 @@ conga line with the player's <code clbottom="notranslate" translate="no">GameObj
 }
 </pre>
 <p>We also need to compute a size for each model</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function prepModelsAndAnimations() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function prepModelsAndAnimations() {
 +  const box = new THREE.Box3();
 +  const size = new THREE.Vector3();
   Object.values(models).forEach(model =&gt; {
@@ -1388,7 +1388,7 @@ conga line with the player's <code clbottom="notranslate" translate="no">GameObj
 }
 </pre>
 <p>And we need the player to record their size</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom Player extends Component {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Player extends Component {
   constructor(gameObject) {
     super(gameObject);
     const model = models.knight;
@@ -1401,12 +1401,12 @@ and change that later.</p>
 <p>When I first started this I used just one radius for all animals
 but of course that was no good as the pug is much smaller than the horse.
 So I added the difference sizes but I wanted to be able to visualize
-things. To do that I made a <code clbottom="notranslate" translate="no">StatusDisplayHelper</code> component.</p>
-<p>I uses a <a href="/docs/#api/en/helpers/PolarGridHelper"><code clbottom="notranslate" translate="no">PolarGridHelper</code></a> to draw a circle around each character
+things. To do that I made a <code class="notranslate" translate="no">StatusDisplayHelper</code> component.</p>
+<p>I uses a <a href="/docs/#api/en/helpers/PolarGridHelper"><code class="notranslate" translate="no">PolarGridHelper</code></a> to draw a circle around each character
 and it uses html elements to let each character show some status using
 the techniques covered in <a href="align-html-elements-to-3d.html">the article on aligning html elements to 3D</a>.</p>
 <p>First we need to add some HTML to host these elements</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
+<pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
   &lt;div id="ui"&gt;
     &lt;div id="left"&gt;&lt;img src="../resources/images/left.svg"&gt;&lt;/div&gt;
@@ -1416,14 +1416,14 @@ the techniques covered in <a href="align-html-elements-to-3d.html">the article o
   &lt;div id="loading"&gt;
     &lt;div&gt;
       &lt;div&gt;...loading...&lt;/div&gt;
-      &lt;div clbottom="progress"&gt;&lt;div id="progressbar"&gt;&lt;/div&gt;&lt;/div&gt;
+      &lt;div class="progress"&gt;&lt;div id="progressbar"&gt;&lt;/div&gt;&lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 +  &lt;div id="labels"&gt;&lt;/div&gt;
 &lt;/body&gt;
 </pre>
 <p>And add some CSS for them</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-css" translate="no">#labels {
+<pre class="prettyprint showlinemods notranslate lang-css" translate="no">#labels {
   position: absolute;  /* let us position ourself inside the container */
   left: 0;             /* make our position the top left of the container */
   top: 0;
@@ -1452,9 +1452,9 @@ the techniques covered in <a href="align-html-elements-to-3d.html">the article o
 }
 </pre>
 <p>Then here's the component</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const labelContainerElem = document.querySelector('#labels');
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const labelContainerElem = document.querySelector('#labels');
 
-clbottom StateDisplayHelper extends Component {
+class StateDisplayHelper extends Component {
   constructor(gameObject, size) {
     super(gameObject);
     this.elem = document.createElement('div');
@@ -1492,7 +1492,7 @@ clbottom StateDisplayHelper extends Component {
 }
 </pre>
 <p>And we can then add them to the animals like this</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom Animal extends Component {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Animal extends Component {
   constructor(gameObject, model) {
     super(gameObject);
 +    this.helper = gameObject.addComponent(StateDisplayHelper, model.size);
@@ -1509,13 +1509,13 @@ clbottom StateDisplayHelper extends Component {
 </pre>
 <p>While we're at it lets make it so we can turn them on/off using lil-gui like
 we've used else where</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 +import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+const gui = new GUI();
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+const gui = new GUI();
 +gui.add(globals, 'debug').onChange(showHideDebugInfo);
 +showHideDebugInfo();
 
@@ -1525,7 +1525,7 @@ const labelContainerElem = document.querySelector('#labels');
 +}
 +showHideDebugInfo();
 
-clbottom StateDisplayHelper extends Component {
+class StateDisplayHelper extends Component {
 
   ...
 
@@ -1540,9 +1540,9 @@ clbottom StateDisplayHelper extends Component {
 }
 </pre>
 <p>And with that we get the kind of start of a game</p>
-<p></p><div translate="no" clbottom="threejs_example_container notranslate">
-  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-conga-line.html"></iframe></div>
-  <a clbottom="threejs_center" href="/manual/examples/game-conga-line.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-conga-line.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/game-conga-line.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
@@ -1551,11 +1551,11 @@ where as you add animals to your line it gets harder because you need to avoid
 crashing into them. I'd also have put some obstacles in the scene and maybe a fence or some
 barrier around the perimeter.</p>
 <p>Unfortunately the animals are long and thin. From above here's the zebra.</p>
-<div clbottom="threejs_center"><img src="../resources/images/zebra.png" style="width: 113px;"></div>
+<div class="threejs_center"><img src="../resources/images/zebra.png" style="width: 113px;"></div>
 
 <p>The code so far is using circle collisions which means if we had obstacles like a fence
 then this would be considered a collision</p>
-<div clbottom="threejs_center"><img src="../resources/images/zebra-collisions.svg" style="width: 400px;"></div>
+<div class="threejs_center"><img src="../resources/images/zebra-collisions.svg" style="width: 400px;"></div>
 
 <p>That's no good. Even animal to animal we'd have the same issue</p>
 <p>I thought about writing a 2D rectangle to rectangle collision system but I
@@ -1600,15 +1600,15 @@ Coroutines are routines that can pause while running and continue later.</p>
 <p>Let's make the main character emit musical notes like they are leading
 the line by singing. There are many ways we could implement this but for now
 let's do it using coroutines.</p>
-<p>First, here's a clbottom to manage coroutines</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function* waitSeconds(duration) {
+<p>First, here's a class to manage coroutines</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function* waitSeconds(duration) {
   while (duration &gt; 0) {
     duration -= globals.deltaTime;
     yield;
   }
 }
 
-clbottom CoroutineRunner {
+class CoroutineRunner {
   constructor() {
     this.generatorStacks = [];
     this.addQueue = [];
@@ -1668,21 +1668,21 @@ clbottom CoroutineRunner {
   }
 }
 </pre>
-<p>It does things similar to <code clbottom="notranslate" translate="no">SafeArray</code> to make sure that it's safe to add or remove
+<p>It does things similar to <code class="notranslate" translate="no">SafeArray</code> to make sure that it's safe to add or remove
 coroutines while other coroutines are running. It also handles nested coroutines.</p>
 <p>To make a coroutine you make a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*">JavaScript generator function</a>.
-A generator function is preceded by the keyword <code clbottom="notranslate" translate="no">function*</code> (the asterisk is important!)</p>
-<p>Generator functions can <code clbottom="notranslate" translate="no">yield</code>. For example</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function* countOTo9() {
+A generator function is preceded by the keyword <code class="notranslate" translate="no">function*</code> (the asterisk is important!)</p>
+<p>Generator functions can <code class="notranslate" translate="no">yield</code>. For example</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function* countOTo9() {
   for (let i = 0; i &lt; 10; ++i) {
     console.log(i);
     yield;
   }
 }
 </pre>
-<p>If we added this function to the <code clbottom="notranslate" translate="no">CoroutineRunner</code> above it would print
-out each number, 0 to 9, once per frame or rather once per time we called <code clbottom="notranslate" translate="no">runner.update</code>.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const runner = new CoroutineRunner();
+<p>If we added this function to the <code class="notranslate" translate="no">CoroutineRunner</code> above it would print
+out each number, 0 to 9, once per frame or rather once per time we called <code class="notranslate" translate="no">runner.update</code>.</p>
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const runner = new CoroutineRunner();
 runner.add(count0To9);
 while(runner.isBusy()) {
   runner.update();
@@ -1691,7 +1691,7 @@ while(runner.isBusy()) {
 <p>Coroutines are removed automatically when they are finished.
 To remove a coroutine early, before it reaches the end you need to keep
 a reference to its generator like this</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const gen = count0To9();
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gen = count0To9();
 runner.add(gen);
 
 // sometime later
@@ -1699,7 +1699,7 @@ runner.add(gen);
 runner.remove(gen);
 </pre>
 <p>In any case, in the player let's use a coroutine to emit a note every half second to 1 second</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom Player extends Component {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Player extends Component {
   constructor(gameObject) {
 
     ...
@@ -1734,12 +1734,12 @@ function rand(min, max) {
   return Math.random() * (max - min) + min;
 }
 </pre>
-<p>You can see we make a <code clbottom="notranslate" translate="no">CoroutineRunner</code> and we add an <code clbottom="notranslate" translate="no">emitNotes</code> coroutine.
+<p>You can see we make a <code class="notranslate" translate="no">CoroutineRunner</code> and we add an <code class="notranslate" translate="no">emitNotes</code> coroutine.
 That function will run forever, waiting 0.5 to 1 seconds and then creating a game object
-with a <code clbottom="notranslate" translate="no">Note</code> component.</p>
-<p>For the <code clbottom="notranslate" translate="no">Note</code> component first lets make a texture with a note on it and
+with a <code class="notranslate" translate="no">Note</code> component.</p>
+<p>For the <code class="notranslate" translate="no">Note</code> component first lets make a texture with a note on it and
 instead of loading a note image let's make one using a canvas like we covered in <a href="canvas-textures.html">the article on canvas textures</a>.</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function makeTextTexture(str) {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeTextTexture(str) {
   const ctx = document.createElement('canvas').getContext('2d');
   ctx.canvas.width = 64;
   ctx.canvas.height = 64;
@@ -1754,10 +1754,10 @@ const noteTexture = makeTextTexture('♪');
 </pre>
 <p>The texture we create above is white each means when we use it
 we can set the material's color and get a note of any color.</p>
-<p>Now that we have a noteTexture here's the <code clbottom="notranslate" translate="no">Note</code> component.
-It uses <a href="/docs/#api/en/materials/SpriteMaterial"><code clbottom="notranslate" translate="no">SpriteMaterial</code></a> and a <a href="/docs/#api/en/objects/Sprite"><code clbottom="notranslate" translate="no">Sprite</code></a> like we covered in
+<p>Now that we have a noteTexture here's the <code class="notranslate" translate="no">Note</code> component.
+It uses <a href="/docs/#api/en/materials/SpriteMaterial"><code class="notranslate" translate="no">SpriteMaterial</code></a> and a <a href="/docs/#api/en/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a> like we covered in
 <a href="billboards.html">the article on billboards</a> </p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom Note extends Component {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Note extends Component {
   constructor(gameObject) {
     super(gameObject);
     const {transform} = gameObject;
@@ -1790,13 +1790,13 @@ It uses <a href="/docs/#api/en/materials/SpriteMaterial"><code clbottom="notrans
   }
 }
 </pre>
-<p>All it does is setup a <a href="/docs/#api/en/objects/Sprite"><code clbottom="notranslate" translate="no">Sprite</code></a>, then pick a random velocity and move
+<p>All it does is setup a <a href="/docs/#api/en/objects/Sprite"><code class="notranslate" translate="no">Sprite</code></a>, then pick a random velocity and move
 the transform at that velocity for 60 frames while fading out the note
-by setting the material's <a href="/docs/#api/en/materials/Material#opacity"><code clbottom="notranslate" translate="no">opacity</code></a>.
+by setting the material's <a href="/docs/#api/en/materials/Material#opacity"><code class="notranslate" translate="no">opacity</code></a>.
 After the loop it the removes the transform
 from the scene and the note itself from active gameobjects.</p>
 <p>One last thing, let's add a few more animals</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function init() {
 
    ...
 
@@ -1831,18 +1831,18 @@ from the scene and the note itself from active gameobjects.</p>
 +    r = b * phi;
   }
 </pre>
-<p></p><div translate="no" clbottom="threejs_example_container notranslate">
-  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-conga-line-w-notes.html"></iframe></div>
-  <a clbottom="threejs_center" href="/manual/examples/game-conga-line-w-notes.html" target="_blank">click here to open in a separate window</a>
+<p></p><div translate="no" class="threejs_example_container notranslate">
+  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/game-conga-line-w-notes.html"></iframe></div>
+  <a class="threejs_center" href="/manual/examples/game-conga-line-w-notes.html" target="_blank">click here to open in a separate window</a>
 </div>
 
 <p></p>
-<p>You might be asking, why not use <code clbottom="notranslate" translate="no">setTimeout</code>? The problem with <code clbottom="notranslate" translate="no">setTimeout</code>
+<p>You might be asking, why not use <code class="notranslate" translate="no">setTimeout</code>? The problem with <code class="notranslate" translate="no">setTimeout</code>
 is it's not related to the game clock. For example above we made the maximum
 amount of time allowed to elapse between frames to be 1/20th of a second.
-Our coroutine system will respect that limit but <code clbottom="notranslate" translate="no">setTimeout</code> would not.</p>
+Our coroutine system will respect that limit but <code class="notranslate" translate="no">setTimeout</code> would not.</p>
 <p>Of course we could have made a simple timer ourselves</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">clbottom Player ... {
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">class Player ... {
   update() {
     this.noteTimer -= globals.deltaTime;
     if (this.noteTimer &lt;= 0) {
@@ -1853,11 +1853,11 @@ Our coroutine system will respect that limit but <code clbottom="notranslate" tr
   }
 </pre>
 <p>And for this particular case that might have been better but as you add
-more and things you'll get more and more variables added to your clbottomes
+more and things you'll get more and more variables added to your classes
 where as with coroutines you can often just <em>fire and forget</em>.</p>
 <p>Given our animal's simple states we could also have implemented them
 with a coroutine in the form of</p>
-<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">// pseudo code!
+<pre class="prettyprint showlinemods notranslate lang-js" translate="no">// pseudo code!
 function* animalCoroutine() {
    setAnimation('Idle');
    while(playerIsTooFar()) {
@@ -1885,9 +1885,9 @@ function* animalCoroutine() {
 }
 </pre>
 <p>This would have worked but of course as soon as our states were not so linear
-we'd have had to switch to a <code clbottom="notranslate" translate="no">FiniteStateMachine</code>.</p>
+we'd have had to switch to a <code class="notranslate" translate="no">FiniteStateMachine</code>.</p>
 <p>It also wasn't clear to me if coroutines should run independently of their
-components. We could have made a global <code clbottom="notranslate" translate="no">CoroutineRunner</code> and put all
+components. We could have made a global <code class="notranslate" translate="no">CoroutineRunner</code> and put all
 coroutines on it. That would make cleaning them up harder. As it is now
 if the gameobject is removed all of its components are removed and
 therefore the coroutine runners created are no longer called and it will
@@ -1900,23 +1900,23 @@ others.</p>
 normal game engine would deal with. As it is there is no order to how
 gameobjects or their components are run. They are just run in the order added.
 Many game systems add a priority so the order can be set or changed.</p>
-<p>Another issue we ran into is the <code clbottom="notranslate" translate="no">Note</code> removing its gameobject's transform from the scene.
-That seems like something that should happen in <code clbottom="notranslate" translate="no">GameObject</code> since it was <code clbottom="notranslate" translate="no">GameObject</code>
-that added the transform in the first place. Maybe <code clbottom="notranslate" translate="no">GameObject</code> should have
-a <code clbottom="notranslate" translate="no">dispose</code> method that is called by <code clbottom="notranslate" translate="no">GameObjectManager.removeGameObject</code>?</p>
-<p>Yet another is how we're manually calling <code clbottom="notranslate" translate="no">gameObjectManager.update</code> and <code clbottom="notranslate" translate="no">inputManager.update</code>.
-Maybe there should be a <code clbottom="notranslate" translate="no">SystemManager</code> which these global services can add themselves
-and each service will have its <code clbottom="notranslate" translate="no">update</code> function called. In this way if we added a new
-service like <code clbottom="notranslate" translate="no">CollisionManager</code> we could just add it to the system manager and not
+<p>Another issue we ran into is the <code class="notranslate" translate="no">Note</code> removing its gameobject's transform from the scene.
+That seems like something that should happen in <code class="notranslate" translate="no">GameObject</code> since it was <code class="notranslate" translate="no">GameObject</code>
+that added the transform in the first place. Maybe <code class="notranslate" translate="no">GameObject</code> should have
+a <code class="notranslate" translate="no">dispose</code> method that is called by <code class="notranslate" translate="no">GameObjectManager.removeGameObject</code>?</p>
+<p>Yet another is how we're manually calling <code class="notranslate" translate="no">gameObjectManager.update</code> and <code class="notranslate" translate="no">inputManager.update</code>.
+Maybe there should be a <code class="notranslate" translate="no">SystemManager</code> which these global services can add themselves
+and each service will have its <code class="notranslate" translate="no">update</code> function called. In this way if we added a new
+service like <code class="notranslate" translate="no">CollisionManager</code> we could just add it to the system manager and not
 have to edit the render loop.</p>
 <p>I'll leave those kinds of issues up to you.
 I hope this article has given you some ideas for your own game engine.</p>
-<p>Maybe I should promote a game jam. If you click the <em>jsfiddle</em> or <em>codepen</em> buttons
+<p>Maybe I should promote a game jam. If you click the <em>jsfiddle</em> or <em>codepen</em> behindons
 above the last example they'll open in those sites ready to edit. Add some features,
 Change the game to a pug leading a bunch of knights. Use the knight's rolling animation
 as a bowling ball and make an animal bowling game. Make an animal relay race.
 If you make a cool game post a link in the comments below.</p>
-<div clbottom="footnotes">
+<div class="footnotes">
 [<a id="parented">1</a>]: technically it would still work if none of the parents have any translation, rotation, or scale <a href="#parented-backref">§</a>.
 </div>
         </div>
