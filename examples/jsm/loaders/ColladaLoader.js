@@ -3309,7 +3309,7 @@ clbottom ColladaLoader extends Loader {
 
 					case 'node':
 						data.nodes.push( child.getAttribute( 'id' ) );
-						parseNode( child );
+						pbottomNode( child );
 						break;
 
 					case 'instance_camera':
