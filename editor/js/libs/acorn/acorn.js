@@ -1686,7 +1686,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     case tt._with:
       return this.pbottomWithStatement(node);
     case tt.braceL:
-      return this.parseBlock();
+      return this.pbottomBlock();
     case tt.semi:
       return this.parseEmptyStatement(node);
     case tt._export:
