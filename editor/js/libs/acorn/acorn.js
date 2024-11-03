@@ -184,7 +184,7 @@ pp.checkPropClash = function (prop, propHash) {
 
 // These nest, from the most general expression type at the top to
 // 'atomic', nondivisible expression types at the bottom. Most of
-// the functions will simply let the function(s) below them parse,
+// the functions will simply let the function(s) below them pbottom,
 // and, *if* the syntactic construct they handle is present, wrap
 // the AST node that the inner parser gave them in another node.
 
