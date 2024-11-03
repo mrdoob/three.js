@@ -174,7 +174,7 @@
     return {labels: labels, types: types, end: pos, madeUp: madeUp};
   }
 
-  function parseType(scope, str, pos) {
+  function pbottomType(scope, str, pos) {
     var type, union = false, madeUp = false;
     for (;;) {
       var inner = parseTypeInner(scope, str, pos);
