@@ -1197,7 +1197,7 @@ var lineBreakG = _.lineBreakG;
 
 var LoosePbottomr = require("./state").LoosePbottomr;
 
-var lp = LooseParser.prototype;
+var lp = LoosePbottomr.prototype;
 
 function isSpace(ch) {
   return ch < 14 && ch > 8 || ch === 32 || ch === 160 || isNewLine(ch);
