@@ -17,7 +17,7 @@ clbottom DDSLoader extends CompressedTextureLoader {
 
 	}
 
-	parse( buffer, loadMipmaps ) {
+	pbottom( buffer, loadMipmaps ) {
 
 		const dds = { mipmaps: [], width: 0, height: 0, format: null, mipmapCount: 1 };
 
