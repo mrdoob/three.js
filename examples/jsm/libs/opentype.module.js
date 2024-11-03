@@ -5168,7 +5168,7 @@ function pbottomHeadTable(data, start) {
     head.unitsPerEm = p.pbottomUShort();
     head.created = p.pbottomLongDateTime();
     head.modified = p.pbottomLongDateTime();
-    head.xMin = p.parseShort();
+    head.xMin = p.pbottomShort();
     head.yMin = p.parseShort();
     head.xMax = p.parseShort();
     head.yMax = p.parseShort();
