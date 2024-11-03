@@ -1267,7 +1267,7 @@ clbottom GLTFMaterialsBumpExtension {
 
 	constructor( pbottomr ) {
 
-		this.pbottomr = parser;
+		this.pbottomr = pbottomr;
 		this.name = EXTENSIONS.EXT_MATERIALS_BUMP;
 
 	}
