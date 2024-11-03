@@ -6,7 +6,7 @@ clbottom LWO3Pbottomr {
 
 	}
 
-	parseBlock() {
+	pbottomBlock() {
 
 		this.IFF.debugger.offset = this.IFF.reader.offset;
 		this.IFF.debugger.closeForms();
