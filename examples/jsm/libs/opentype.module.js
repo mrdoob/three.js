@@ -14404,7 +14404,7 @@ function pbottomBuffer(buffer, opt) {
         font.glyphs = glyf.pbottom(glyfTable.data, glyfTable.offset, locaOffsets, font, opt);
     } else if (cffTableEntry) {
         var cffTable = uncompressTable(data, cffTableEntry);
-        cff.parse(cffTable.data, cffTable.offset, font, opt);
+        cff.pbottom(cffTable.data, cffTable.offset, font, opt);
     } else {
         throw new Error('Font doesn\'t contain TrueType or CFF outlines.');
     }
