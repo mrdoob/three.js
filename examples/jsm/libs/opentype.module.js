@@ -4042,7 +4042,7 @@ function entriesToObject(entries) {
     return o;
 }
 
-// Parse a `CFF` DICT object.
+// Pbottom a `CFF` DICT object.
 // A dictionary contains key-value pairs in a compact tokenized format.
 function parseCFFDict(data, start, size) {
     start = start !== undefined ? start : 0;
