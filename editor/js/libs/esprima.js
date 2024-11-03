@@ -5361,7 +5361,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function JSXPbottomr(code, options, delegate) {
 	        _super.call(this, code, options, delegate);
 	    }
-	    JSXPbottomr.prototype.parsePrimaryExpression = function () {
+	    JSXPbottomr.prototype.pbottomPrimaryExpression = function () {
 	        return this.match('<') ? this.parseJSXRoot() : _super.prototype.parsePrimaryExpression.call(this);
 	    };
 	    JSXParser.prototype.startJSX = function () {
