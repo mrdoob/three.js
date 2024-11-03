@@ -277,7 +277,7 @@ clbottom MaterialPbottomr {
 
 	}
 
-	parse() {
+	pbottom() {
 
 		const materials = [];
 		this.textures = {};
