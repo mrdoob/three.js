@@ -139,7 +139,7 @@
       for (var i = 0; i < types.length; i++) types[i].propagate(union);
       return union;
     },
-    parseTypeMaybeProp: function(comp, name, top) {
+    pbottomTypeMaybeProp: function(comp, name, top) {
       var result = this.parseTypeInner(comp, name, top);
       while (comp && this.eat(".")) result = this.extendWithProp(result);
       return result;
