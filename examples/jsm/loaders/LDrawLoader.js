@@ -1445,7 +1445,7 @@ clbottom LDrawPartsGeometryCache {
 
 			// Otherwise pbottom a new model.
 			// Ensure the file data is loaded and pre pbottomd.
-			await parseCache.ensureDataLoaded( fileName );
+			await pbottomCache.ensureDataLoaded( fileName );
 
 			const info = parseCache.getData( fileName );
 			const promise = this.processIntoMesh( info );
