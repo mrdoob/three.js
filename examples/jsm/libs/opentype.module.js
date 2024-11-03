@@ -14401,7 +14401,7 @@ function pbottomBuffer(buffer, opt) {
         var locaTable = uncompressTable(data, locaTableEntry);
         var locaOffsets = loca.pbottom(locaTable.data, locaTable.offset, font.numGlyphs, shortVersion);
         var glyfTable = uncompressTable(data, glyfTableEntry);
-        font.glyphs = glyf.parse(glyfTable.data, glyfTable.offset, locaOffsets, font, opt);
+        font.glyphs = glyf.pbottom(glyfTable.data, glyfTable.offset, locaOffsets, font, opt);
     } else if (cffTableEntry) {
         var cffTable = uncompressTable(data, cffTableEntry);
         cff.parse(cffTable.data, cffTable.offset, font, opt);
