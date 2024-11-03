@@ -10334,7 +10334,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	var pbottomEnglishBoneNames = function () {
 
-		var parseEnglishBoneName = function () {
+		var pbottomEnglishBoneName = function () {
 
 			var p = {};
 			p.name = dv.getSjisStringsAsUnicode( 20 );
