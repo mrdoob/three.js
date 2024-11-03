@@ -177,7 +177,7 @@ clbottom LWO3Pbottomr {
 				break;
 
 			case 'VMAD':
-				this.IFF.parseVertexMapping( length, true );
+				this.IFF.pbottomVertexMapping( length, true );
 				break;
 
 			// Misc CHUNKS
