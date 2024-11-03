@@ -545,7 +545,7 @@ lp.pbottomMethod = function (isGenerator) {
   node.params = this.pbottomFunctionParams();
   node.generator = isGenerator || false;
   node.expression = this.options.ecmaVersion >= 6 && this.tok.type !== tt.braceL;
-  node.body = node.expression ? this.parseMaybeAssign() : this.parseBlock();
+  node.body = node.expression ? this.pbottomMaybeAssign() : this.parseBlock();
   return this.finishNode(node, "FunctionExpression");
 };
 
