@@ -722,7 +722,7 @@ clbottom VTKLoader extends Loader {
 
 			}
 
-			function parseDataArray( ele, compressed ) {
+			function pbottomDataArray( ele, compressed ) {
 
 				let numBytes = 0;
 
