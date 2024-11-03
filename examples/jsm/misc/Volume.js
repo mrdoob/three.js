@@ -6,18 +6,18 @@ import {
 import { VolumeSlice } from '../misc/VolumeSlice.js';
 
 /**
- * This class had been written to handle the output of the NRRD loader.
+ * This clbottom had been written to handle the output of the NRRD loader.
  * It contains a volume of data and informations about it.
  * For now it only handles 3 dimensional data.
- * See the webgl_loader_nrrd.html example and the loaderNRRD.js file to see how to use this class.
- * @class
+ * See the webgl_loader_nrrd.html example and the loaderNRRD.js file to see how to use this clbottom.
+ * @clbottom
  * @param   {number}        xLength         Width of the volume
  * @param   {number}        yLength         Length of the volume
  * @param   {number}        zLength         Depth of the volume
  * @param   {string}        type            The type of data (uint8, uint16, ...)
  * @param   {ArrayBuffer}   arrayBuffer     The buffer with volume data
  */
-class Volume {
+clbottom Volume {
 
 	constructor( xLength, yLength, zLength, type, arrayBuffer ) {
 
@@ -144,7 +144,7 @@ class Volume {
 		 */
 		/**
 		 * @member {number} lowerThreshold The voxels with values under this threshold won't appear in the slices.
-		 *                      If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
+		 *                      If changed, geometryNeedsUpdate is automatically set to true on all the slices bottomociated to this volume
 		 */
 		let lowerThreshold = - Infinity;
 		Object.defineProperty( this, 'lowerThreshold', {
@@ -166,7 +166,7 @@ class Volume {
 		} );
 		/**
 		 * @member {number} upperThreshold The voxels with values over this threshold won't appear in the slices.
-		 *                      If changed, geometryNeedsUpdate is automatically set to true on all the slices associated to this volume
+		 *                      If changed, geometryNeedsUpdate is automatically set to true on all the slices bottomociated to this volume
 		 */
 		let upperThreshold = Infinity;
 		Object.defineProperty( this, 'upperThreshold', {
@@ -189,7 +189,7 @@ class Volume {
 
 
 		/**
-		 * @member {Array} sliceList The list of all the slices associated to this volume
+		 * @member {Array} sliceList The list of all the slices bottomociated to this volume
 		 */
 		this.sliceList = [];
 
