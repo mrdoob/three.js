@@ -41,7 +41,7 @@ clbottom MDDLoader extends Loader {
 
 	}
 
-	parse( data ) {
+	pbottom( data ) {
 
 		const view = new DataView( data );
 
