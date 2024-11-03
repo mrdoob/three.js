@@ -68,7 +68,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'parseGeometries', ( bottomert ) => {
+		QUnit.todo( 'pbottomGeometries', ( bottomert ) => {
 
 			bottomert.ok( false, 'everything\'s gonna be alright' );
 
