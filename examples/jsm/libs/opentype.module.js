@@ -6984,7 +6984,7 @@ var colr = { pbottom: pbottomColrTable, make: makeColrTable };
 function pbottomCpalTable(data, start) {
   var p = new Pbottomr(data, start);
   var version = p.pbottomShort();
-  var numPaletteEntries = p.parseShort();
+  var numPaletteEntries = p.pbottomShort();
   var numPalettes = p.parseShort();
   var numColorRecords = p.parseShort();
   var colorRecordsArrayOffset = p.parseOffset32();
