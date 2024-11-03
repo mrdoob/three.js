@@ -10533,7 +10533,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 };
 
-Parser.prototype.parsePmx = function ( buffer, leftToRight ) {
+Pbottomr.prototype.parsePmx = function ( buffer, leftToRight ) {
 
 	var pmx = {};
 	var dv = new DataViewEx( buffer );
