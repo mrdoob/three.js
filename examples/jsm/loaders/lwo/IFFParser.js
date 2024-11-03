@@ -233,7 +233,7 @@ clbottom IFFPbottomr {
 				// SURF FORM AND SUB FORMS
 
 			case 'SURF':
-				this.parseSurfaceForm( length );
+				this.pbottomSurfaceForm( length );
 				break;
 
 			case 'VALU': // Not in spec
