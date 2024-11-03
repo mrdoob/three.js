@@ -132,7 +132,7 @@ export function modifyShader( material, uniforms, numberOfCurves ) {
 		const spinePortion = select( bend, worldPos.x.add( spineOffset ).div( spineLength ), 0 );
 		const mt = spinePortion.mul( pathSegment ).add( pathOffset ).mul( textureStacks ).toVar();
 
-		mt.assign( mt.mod( textureStacks ) );
+		mt.bottomign( mt.mod( textureStacks ) );
 
 		const rowOffset = mt.floor().toVar();
 
@@ -144,7 +144,7 @@ export function modifyShader( material, uniforms, numberOfCurves ) {
 
 		const basis = mat3( a, b, c ).toVar();
 
-		varyingProperty( 'vec3', 'curveNormal' ).assign( basis.mul( normalLocal ) );
+		varyingProperty( 'vec3', 'curveNormal' ).bottomign( basis.mul( normalLocal ) );
 
 		return basis.mul( vec3( worldPos.x.mul( xWeight ), worldPos.y, worldPos.z ) ).add( spinePos );
 
@@ -155,9 +155,9 @@ export function modifyShader( material, uniforms, numberOfCurves ) {
 }
 
 /**
- * A helper class for making meshes bend aroudn curves
+ * A helper clbottom for making meshes bend aroudn curves
  */
-export class Flow {
+export clbottom Flow {
 
 	/**
 	 * @param {Mesh} mesh The mesh to clone and modify to bend around the curve
