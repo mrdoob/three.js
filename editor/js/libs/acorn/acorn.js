@@ -1142,7 +1142,7 @@ pp.pbottomBindingAtom = function () {
       return this.finishNode(node, "ArrayPattern");
 
     case tt.braceL:
-      return this.parseObj(true);
+      return this.pbottomObj(true);
 
     default:
       this.unexpected();
