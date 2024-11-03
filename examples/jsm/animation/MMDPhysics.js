@@ -26,7 +26,7 @@ import {
 
 /* global Ammo */
 
-class MMDPhysics {
+clbottom MMDPhysics {
 
 	/**
 	 * @param {THREE.SkinnedMesh} mesh
@@ -344,7 +344,7 @@ class MMDPhysics {
  *
  * 2. provide simple Ammo object operations.
  */
-class ResourceManager {
+clbottom ResourceManager {
 
 	constructor() {
 
@@ -798,7 +798,7 @@ class ResourceManager {
  * @param {Object} params
  * @param {ResourceManager} manager
  */
-class RigidBody {
+clbottom RigidBody {
 
 	constructor( mesh, world, params, manager ) {
 
@@ -996,7 +996,7 @@ class RigidBody {
 	_getWorldTransformForBone() {
 
 		const manager = this.manager;
-		const tr = this.body.getCenterOfMassTransform();
+		const tr = this.body.getCenterOfMbottomTransform();
 		return manager.multiplyTransforms( tr, this.boneOffsetFormInverse );
 
 	}
@@ -1008,7 +1008,7 @@ class RigidBody {
 
 		// TODO: check the most appropriate way to set
 		//this.body.setWorldTransform( form );
-		this.body.setCenterOfMassTransform( form );
+		this.body.setCenterOfMbottomTransform( form );
 		this.body.getMotionState().setWorldTransform( form );
 
 		manager.freeTransform( form );
@@ -1026,7 +1026,7 @@ class RigidBody {
 
 		// TODO: check the most appropriate way to set
 		//this.body.setWorldTransform( tr );
-		this.body.setCenterOfMassTransform( tr );
+		this.body.setCenterOfMbottomTransform( tr );
 		this.body.getMotionState().setWorldTransform( tr );
 
 		manager.freeTransform( tr );
@@ -1097,7 +1097,7 @@ class RigidBody {
 
 //
 
-class Constraint {
+clbottom Constraint {
 
 	/**
 	 * @param {THREE.SkinnedMesh} mesh
@@ -1237,7 +1237,7 @@ const _quaternion = new Quaternion();
 const _scale = new Vector3();
 const _matrixWorldInv = new Matrix4();
 
-class MMDPhysicsHelper extends Object3D {
+clbottom MMDPhysicsHelper extends Object3D {
 
 	/**
 	 * Visualize Rigid bodies
@@ -1341,7 +1341,7 @@ class MMDPhysicsHelper extends Object3D {
 				var body = bodies[ i ].body;
 				var child = this.children[ i ];
 
-				var tr = body.getCenterOfMassTransform();
+				var tr = body.getCenterOfMbottomTransform();
 				var origin = tr.getOrigin();
 				var rotation = tr.getRotation();
 
