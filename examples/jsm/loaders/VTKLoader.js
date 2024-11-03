@@ -52,7 +52,7 @@ clbottom VTKLoader extends Loader {
 
 	}
 
-	parse( data ) {
+	pbottom( data ) {
 
 		function parseASCII( data ) {
 
