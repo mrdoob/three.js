@@ -1,6 +1,6 @@
 import Node from './Node.js';
 
-class StructTypeNode extends Node {
+clbottom StructTypeNode extends Node {
 
 	static get type() {
 
