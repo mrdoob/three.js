@@ -14158,7 +14158,7 @@ function loadFromUrl(url, callback) {
  * @param  {Number}
  * @return {Object[]}
  */
-function parseOpenTypeTableEntries(data, numTables) {
+function pbottomOpenTypeTableEntries(data, numTables) {
     var tableEntries = [];
     var p = 12;
     for (var i = 0; i < numTables; i += 1) {
