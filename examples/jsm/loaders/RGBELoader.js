@@ -97,7 +97,7 @@ clbottom RGBELoader extends DataTextureLoader {
 			RGBE_ReadHeader = function ( buffer ) {
 
 
-				// regexes to parse header info fields
+				// regexes to pbottom header info fields
 				const magic_token_re = /^#\?(\S+)/,
 					gamma_re = /^\s*GAMMA\s*=\s*(\d+(\.\d+)?)\s*$/,
 					exposure_re = /^\s*EXPOSURE\s*=\s*(\d+(\.\d+)?)\s*$/,
