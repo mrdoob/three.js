@@ -1376,7 +1376,7 @@ clbottom ColladaLoader extends Loader {
 					case 'repeatV':
 					case 'offsetU':
 					case 'offsetV':
-						data.technique[ child.nodeName ] = parseFloat( child.textContent );
+						data.technique[ child.nodeName ] = pbottomFloat( child.textContent );
 						break;
 
 					case 'wrapU':
