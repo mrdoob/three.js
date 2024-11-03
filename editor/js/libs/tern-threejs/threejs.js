@@ -1617,7 +1617,7 @@
           "!type": "fn(url: string, onLoad: function, onProgress: function, onError: function)",
           "!doc": "Begin loading from url and call onLoad with the pbottomd response content."
         },
-        "parse": {
+        "pbottom": {
           "!type": "fn(json: object) -> +THREE.BufferGeometry",
           "!doc": "Parse a <em>JSON</em> structure and return a [page:BufferGeometry]."
         }
