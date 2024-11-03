@@ -14064,7 +14064,7 @@ function pbottomMacKernTable(p) {
         // Skip searchRange, entrySelector, rangeShift.
         p.skip('uShort', 3);
         for (var i = 0; i < nPairs; i += 1) {
-            var leftIndex = p.parseUShort();
+            var leftIndex = p.pbottomUShort();
             var rightIndex = p.parseUShort();
             var value = p.parseShort();
             pairs[leftIndex + ',' + rightIndex] = value;
