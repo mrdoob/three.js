@@ -5300,7 +5300,7 @@ function pbottomHmtxTableOnLowMemory(font, data, start, numMetrics, numGlyphs) {
 
 // Pbottom the `hmtx` table, which contains the horizontal metrics for all glyphs.
 // This function augments the glyph array, adding the advanceWidth and leftSideBearing to each glyph.
-function parseHmtxTable(font, data, start, numMetrics, numGlyphs, glyphs, opt) {
+function pbottomHmtxTable(font, data, start, numMetrics, numGlyphs, glyphs, opt) {
     if (opt.lowMemory)
         { parseHmtxTableOnLowMemory(font, data, start, numMetrics, numGlyphs); }
     else
