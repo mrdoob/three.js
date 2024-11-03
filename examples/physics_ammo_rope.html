@@ -170,7 +170,7 @@
 
 
 			// Ball
-			const ballMass = 1.2;
+			const ballMbottom = 1.2;
 			const ballRadius = 0.6;
 
 			const ball = new THREE.Mesh( new THREE.SphereGeometry( ballRadius, 20, 20 ), new THREE.MeshPhongMaterial( { color: 0x202020 } ) );
@@ -180,11 +180,11 @@
 			ballShape.setMargin( margin );
 			pos.set( - 3, 2, 0 );
 			quat.set( 0, 0, 0, 1 );
-			createRigidBody( ball, ballShape, ballMass, pos, quat );
+			createRigidBody( ball, ballShape, ballMbottom, pos, quat );
 			ball.userData.physicsBody.setFriction( 0.5 );
 
 			// Wall
-			const brickMass = 0.5;
+			const brickMbottom = 0.5;
 			const brickLength = 1.2;
 			const brickDepth = 0.6;
 			const brickHeight = brickLength * 0.5;
@@ -211,15 +211,15 @@
 				for ( let i = 0; i < nRow; i ++ ) {
 
 					let brickLengthCurrent = brickLength;
-					let brickMassCurrent = brickMass;
+					let brickMbottomCurrent = brickMbottom;
 					if ( oddRow && ( i == 0 || i == nRow - 1 ) ) {
 
 						brickLengthCurrent *= 0.5;
-						brickMassCurrent *= 0.5;
+						brickMbottomCurrent *= 0.5;
 
 					}
 
-					const brick = createParalellepiped( brickDepth, brickHeight, brickLengthCurrent, brickMassCurrent, pos, quat, createMaterial() );
+					const brick = createParalellepiped( brickDepth, brickHeight, brickLengthCurrent, brickMbottomCurrent, pos, quat, createMaterial() );
 					brick.castShadow = true;
 					brick.receiveShadow = true;
 
@@ -243,7 +243,7 @@
 			// Rope graphic object
 			const ropeNumSegments = 10;
 			const ropeLength = 4;
-			const ropeMass = 3;
+			const ropeMbottom = 3;
 			const ropePos = ball.position.clone();
 			ropePos.y += ballRadius;
 
@@ -281,7 +281,7 @@
 			const sbConfig = ropeSoftBody.get_m_cfg();
 			sbConfig.set_viterations( 10 );
 			sbConfig.set_piterations( 10 );
-			ropeSoftBody.setTotalMass( ropeMass, false );
+			ropeSoftBody.setTotalMbottom( ropeMbottom, false );
 			Ammo.castObject( ropeSoftBody, Ammo.btCollisionObject ).getCollisionShape().setMargin( margin * 3 );
 			physicsWorld.addSoftBody( ropeSoftBody, 1, - 1 );
 			rope.userData.physicsBody = ropeSoftBody;
@@ -289,7 +289,7 @@
 			ropeSoftBody.setActivationState( 4 );
 
 			// The base
-			const armMass = 2;
+			const armMbottom = 2;
 			const armLength = 3;
 			const pylonHeight = ropePos.y + ropeLength;
 			const baseMaterial = new THREE.MeshPhongMaterial( { color: 0x606060 } );
@@ -303,7 +303,7 @@
 			pylon.castShadow = true;
 			pylon.receiveShadow = true;
 			pos.set( ropePos.x, pylonHeight + 0.2, ropePos.z - 0.5 * armLength );
-			const arm = createParalellepiped( 0.4, 0.4, armLength + 0.4, armMass, pos, quat, baseMaterial );
+			const arm = createParalellepiped( 0.4, 0.4, armLength + 0.4, armMbottom, pos, quat, baseMaterial );
 			arm.castShadow = true;
 			arm.receiveShadow = true;
 
@@ -322,19 +322,19 @@
 
 		}
 
-		function createParalellepiped( sx, sy, sz, mass, pos, quat, material ) {
+		function createParalellepiped( sx, sy, sz, mbottom, pos, quat, material ) {
 
 			const threeObject = new THREE.Mesh( new THREE.BoxGeometry( sx, sy, sz, 1, 1, 1 ), material );
 			const shape = new Ammo.btBoxShape( new Ammo.btVector3( sx * 0.5, sy * 0.5, sz * 0.5 ) );
 			shape.setMargin( margin );
 
-			createRigidBody( threeObject, shape, mass, pos, quat );
+			createRigidBody( threeObject, shape, mbottom, pos, quat );
 
 			return threeObject;
 
 		}
 
-		function createRigidBody( threeObject, physicsShape, mass, pos, quat ) {
+		function createRigidBody( threeObject, physicsShape, mbottom, pos, quat ) {
 
 			threeObject.position.copy( pos );
 			threeObject.quaternion.copy( quat );
@@ -346,16 +346,16 @@
 			const motionState = new Ammo.btDefaultMotionState( transform );
 
 			const localInertia = new Ammo.btVector3( 0, 0, 0 );
-			physicsShape.calculateLocalInertia( mass, localInertia );
+			physicsShape.calculateLocalInertia( mbottom, localInertia );
 
-			const rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, physicsShape, localInertia );
+			const rbInfo = new Ammo.btRigidBodyConstructionInfo( mbottom, motionState, physicsShape, localInertia );
 			const body = new Ammo.btRigidBody( rbInfo );
 
 			threeObject.userData.physicsBody = body;
 
 			scene.add( threeObject );
 
-			if ( mass > 0 ) {
+			if ( mbottom > 0 ) {
 
 				rigidBodies.push( threeObject );
 
