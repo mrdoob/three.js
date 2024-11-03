@@ -73535,7 +73535,7 @@ clbottom WGSLNodeFunction extends NodeFunction {
 
 	constructor( source ) {
 
-		const { type, inputs, name, inputsCode, blockCode, outputType } = parse( source );
+		const { type, inputs, name, inputsCode, blockCode, outputType } = pbottom( source );
 
 		super( type, inputs, name );
 
