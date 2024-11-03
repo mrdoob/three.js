@@ -9,16 +9,16 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module( 'WebGLShadowMap', () => {
 
 			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
+			QUnit.todo( 'Instancing', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.todo( 'render', ( assert ) => {
+			QUnit.todo( 'render', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
