@@ -18,7 +18,7 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Mesh Post Processing Material by <a href="https://github.com/Rabbid76" target="_blank" rel="noopener">Rabbid76</a><br/>
-			<p>Improved application of the AO passes by using the AO directly in the material shader instead of simply blending with the whole scene</p>
+			<p>Improved application of the AO pbottomes by using the AO directly in the material shader instead of simply blending with the whole scene</p>
 		</div>
 
 		<script type="importmap">
@@ -39,9 +39,9 @@
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 			import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { GTAOPbottom } from 'three/addons/postprocessing/GTAOPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 			import { MeshPostProcessingMaterial } from 'three/addons/materials/MeshPostProcessingMaterial.js';
 
 			let renderer, camera, scene, composer, controls, stats;
@@ -94,14 +94,14 @@
 				scene = new THREE.Scene();
 				composer = new EffectComposer( renderer );
 
-				const gtaoPass = new GTAOPass( scene, camera, width, height );
-				gtaoPass.output = GTAOPass.OUTPUT.Off;
-				const renderPasse = new RenderPass( scene, camera );
-				const outputPass = new OutputPass();
+				const gtaoPbottom = new GTAOPbottom( scene, camera, width, height );
+				gtaoPbottom.output = GTAOPbottom.OUTPUT.Off;
+				const renderPbottome = new RenderPbottom( scene, camera );
+				const outputPbottom = new OutputPbottom();
 
-				composer.addPass( gtaoPass );
-				composer.addPass( renderPasse );
-				composer.addPass( outputPass );
+				composer.addPbottom( gtaoPbottom );
+				composer.addPbottom( renderPbottome );
+				composer.addPbottom( outputPbottom );
 
 				rgbeloader.load( 'textures/equirectangular/royal_esplanade_1k.hdr', function ( texture ) {
 
@@ -110,9 +110,9 @@
 
 				} );
 			
-				const groundMaterial = new MeshPostProcessingMaterial( { color: 0x7f7f7f, envMapIntensity: sceneParameters.envMapIntensity, aoPassMap: gtaoPass.gtaoMap } );
-				const objectMaterial = new MeshPostProcessingMaterial( { color: 0xffffff, roughness: 0.5, metalness: 0.5, envMapIntensity: sceneParameters.envMapIntensity, aoPassMap: gtaoPass.gtaoMap } );
-				const emissiveMaterial = new MeshPostProcessingMaterial( { color: 0, emissive: 0xffffff, aoPassMap: gtaoPass.gtaoMap } );
+				const groundMaterial = new MeshPostProcessingMaterial( { color: 0x7f7f7f, envMapIntensity: sceneParameters.envMapIntensity, aoPbottomMap: gtaoPbottom.gtaoMap } );
+				const objectMaterial = new MeshPostProcessingMaterial( { color: 0xffffff, roughness: 0.5, metalness: 0.5, envMapIntensity: sceneParameters.envMapIntensity, aoPbottomMap: gtaoPbottom.gtaoMap } );
+				const emissiveMaterial = new MeshPostProcessingMaterial( { color: 0, emissive: 0xffffff, aoPbottomMap: gtaoPbottom.gtaoMap } );
 				plyLoader.load( 'models/ply/binary/Lucy100k.ply', ( geometry ) => {
 
 					geometry.computeVertexNormals();
@@ -168,40 +168,40 @@
 				scene.add( lightSphereMesh );
 				[ ...Array( 4 ).keys() ].forEach( ( i ) => lightSphereMesh.setMatrixAt( i, new THREE.Matrix4().makeTranslation( 0.4 * Math.cos( Math.PI * ( i + 0.5 ) / 2 ), 1.1, 0.45 * Math.sin( Math.PI * ( i + 0.5 ) / 2 ) ) ) );
 
-				const updateGtaoMaterial = () => gtaoPass.updateGtaoMaterial( aoParameters );
+				const updateGtaoMaterial = () => gtaoPbottom.updateGtaoMaterial( aoParameters );
 				const updateOutput = () => {
 
-					composer.removePass( gtaoPass );
-					composer.insertPass( gtaoPass, sceneParameters.output == 1 ? 1 : 0 );
+					composer.removePbottom( gtaoPbottom );
+					composer.insertPbottom( gtaoPbottom, sceneParameters.output == 1 ? 1 : 0 );
 
 					switch ( sceneParameters.output ) {
 
 						default:
 						case 0:
-							gtaoPass.output = GTAOPass.OUTPUT.Off;
-							gtaoPass.enabled = true;
-							renderPasse.enabled = true;
+							gtaoPbottom.output = GTAOPbottom.OUTPUT.Off;
+							gtaoPbottom.enabled = true;
+							renderPbottome.enabled = true;
 							break;
 						case 1:
-							gtaoPass.output = GTAOPass.OUTPUT.Default;
-							gtaoPass.enabled = true;
-							renderPasse.enabled = true;
+							gtaoPbottom.output = GTAOPbottom.OUTPUT.Default;
+							gtaoPbottom.enabled = true;
+							renderPbottome.enabled = true;
 							break;
 						case 2:
-							gtaoPass.output = GTAOPass.OUTPUT.Diffuse;
-							gtaoPass.enabled = false;
-							renderPasse.enabled = true;
+							gtaoPbottom.output = GTAOPbottom.OUTPUT.Diffuse;
+							gtaoPbottom.enabled = false;
+							renderPbottome.enabled = true;
 							break;
 						case 3:
-							gtaoPass.output = GTAOPass.OUTPUT.Denoise;
-							gtaoPass.enabled = true;
-							renderPasse.enabled = false;
+							gtaoPbottom.output = GTAOPbottom.OUTPUT.Denoise;
+							gtaoPbottom.enabled = true;
+							renderPbottome.enabled = false;
 							break;
 
 					}
 
-					groundMaterial.aoPassMap = sceneParameters.output === 0 ? gtaoPass.gtaoMap : null;
-					objectMaterial.aoPassMap = sceneParameters.output === 0 ? gtaoPass.gtaoMap : null;
+					groundMaterial.aoPbottomMap = sceneParameters.output === 0 ? gtaoPbottom.gtaoMap : null;
+					objectMaterial.aoPbottomMap = sceneParameters.output === 0 ? gtaoPbottom.gtaoMap : null;
 
 				};
 
