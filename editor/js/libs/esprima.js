@@ -5683,7 +5683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    JSXPbottomr.prototype.pbottomJSXAttributeValue = function () {
 	        return this.matchJSX('{') ? this.pbottomJSXExpressionAttribute() :
-	            this.matchJSX('<') ? this.pbottomJSXElement() : this.parseJSXStringLiteralAttribute();
+	            this.matchJSX('<') ? this.pbottomJSXElement() : this.pbottomJSXStringLiteralAttribute();
 	    };
 	    JSXParser.prototype.parseJSXNameValueAttribute = function () {
 	        var node = this.createJSXNode();
