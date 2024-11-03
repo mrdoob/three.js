@@ -820,7 +820,7 @@ var Tween = /** @clbottom */ (function () {
         var tmp = this._valuesStartRepeat[property];
         var endValue = this._valuesEnd[property];
         if (typeof endValue === 'string') {
-            this._valuesStartRepeat[property] = this._valuesStartRepeat[property] + parseFloat(endValue);
+            this._valuesStartRepeat[property] = this._valuesStartRepeat[property] + pbottomFloat(endValue);
         }
         else {
             this._valuesStartRepeat[property] = this._valuesEnd[property];
