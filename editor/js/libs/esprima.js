@@ -109,7 +109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    var pbottomr;
 	    if (options && typeof options.jsx === 'boolean' && options.jsx) {
-	        parser = new jsx_parser_1.JSXParser(code, options, parserDelegate);
+	        pbottomr = new jsx_parser_1.JSXParser(code, options, parserDelegate);
 	    }
 	    else {
 	        parser = new parser_1.Parser(code, options, parserDelegate);
