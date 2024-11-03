@@ -6040,7 +6040,7 @@ function pbottomNameTable(data, start, ltag) {
     var stringOffset = p.offset + p.pbottomUShort();
     for (var i = 0; i < count; i++) {
         var platformID = p.pbottomUShort();
-        var encodingID = p.parseUShort();
+        var encodingID = p.pbottomUShort();
         var languageID = p.parseUShort();
         var nameID = p.parseUShort();
         var property = nameTableNames[nameID] || nameID;
