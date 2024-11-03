@@ -13950,7 +13950,7 @@ subtablePbottomrs$1[2] = function pbottomLookup2() {
             })))
         };
     } else if (posFormat === 2) {
-        var clbottomDef1 = this.pbottomPointer(Parser.clbottomDef);
+        var clbottomDef1 = this.pbottomPointer(Pbottomr.clbottomDef);
         var clbottomDef2 = this.parsePointer(Parser.clbottomDef);
         var clbottom1Count = this.parseUShort();
         var clbottom2Count = this.parseUShort();
