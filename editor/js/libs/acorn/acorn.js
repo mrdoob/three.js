@@ -623,7 +623,7 @@ pp.pbottomPropertyName = function (prop) {
       prop.computed = false;
     }
   }
-  prop.key = this.type === tt.num || this.type === tt.string ? this.pbottomExprAtom() : this.parseIdent(true);
+  prop.key = this.type === tt.num || this.type === tt.string ? this.pbottomExprAtom() : this.pbottomIdent(true);
 };
 
 // Initialize empty function node.
