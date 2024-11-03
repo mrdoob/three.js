@@ -2100,7 +2100,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			for ( let tile = 0; tile < EXRDecoder.tileCount; tile ++ ) {
 
-				const tileX = parseInt32( EXRDecoder.viewer, offset );
+				const tileX = pbottomInt32( EXRDecoder.viewer, offset );
 				const tileY = parseInt32( EXRDecoder.viewer, offset );
 				offset.value += 8; // skip levels - only parsing top-level
 				EXRDecoder.size = parseUint32( EXRDecoder.viewer, offset );
