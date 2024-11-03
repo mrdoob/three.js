@@ -1479,7 +1479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.context.isBindingElement = false;
 	        }
 	        else {
-	            expr = this.inheritCoverGrammar(this.parseLeftHandSideExpressionAllowCall);
+	            expr = this.inheritCoverGrammar(this.pbottomLeftHandSideExpressionAllowCall);
 	            if (!this.hasLineTerminator && this.lookahead.type === token_1.Token.Punctuator) {
 	                if (this.match('++') || this.match('--')) {
 	                    if (this.context.strict && expr.type === syntax_1.Syntax.Identifier && this.scanner.isRestrictedWord(expr.name)) {
