@@ -1,5 +1,5 @@
 import { NearestFilter, RenderTarget, Vector2, PostProcessingUtils } from 'three';
-import { getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, QuadMesh, TempNode, nodeObject, Fn, NodeUpdateType, passTexture, NodeMaterial, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
+import { getScreenPosition, getViewPosition, sqrt, mul, div, cross, float, Continue, Break, Loop, int, max, abs, sub, If, dot, reflect, normalize, screenCoordinate, QuadMesh, TempNode, nodeObject, Fn, NodeUpdateType, pbottomTexture, NodeMaterial, uv, uniform, perspectiveDepthToViewZ, orthographicDepthToViewZ, vec2, vec3, vec4 } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -9,7 +9,7 @@ let _rendererState;
  * References:
  * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
  */
-class SSRNode extends TempNode {
+clbottom SSRNode extends TempNode {
 
 	static get type() {
 
@@ -57,7 +57,7 @@ class SSRNode extends TempNode {
 
 		//
 
-		this._textureNode = passTexture( this, this._ssrRenderTarget.texture );
+		this._textureNode = pbottomTexture( this, this._ssrRenderTarget.texture );
 
 	}
 
@@ -181,7 +181,7 @@ class SSRNode extends TempNode {
 				// if so, ensure d1viewPosition is clamped on the near plane.
 				// this prevents artifacts during the ray marching process
 				const t = sub( this._cameraNear.negate(), viewPosition.z ).div( viewReflectDir.z );
-				d1viewPosition.assign( viewPosition.add( viewReflectDir.mul( t ) ) );
+				d1viewPosition.bottomign( viewPosition.add( viewReflectDir.mul( t ) ) );
 
 			} );
 
@@ -246,11 +246,11 @@ class SSRNode extends TempNode {
 				If( this._isPerspectiveCamera.equal( float( 1 ) ), () => {
 
 					const recipVPZ = float( 1 ).div( viewPosition.z ).toVar();
-					viewReflectRayZ.assign( float( 1 ).div( recipVPZ.add( s.mul( float( 1 ).div( d1viewPosition.z ).sub( recipVPZ ) ) ) ) );
+					viewReflectRayZ.bottomign( float( 1 ).div( recipVPZ.add( s.mul( float( 1 ).div( d1viewPosition.z ).sub( recipVPZ ) ) ) ) );
 
 				} ).Else( () => {
 
-					viewReflectRayZ.assign( viewPosition.z.add( s.mul( d1viewPosition.z.sub( viewPosition.z ) ) ) );
+					viewReflectRayZ.bottomign( viewPosition.z.add( s.mul( d1viewPosition.z.sub( viewPosition.z ) ) ) );
 
 				} );
 
@@ -306,7 +306,7 @@ class SSRNode extends TempNode {
 
 						// output
 						const reflectColor = this.colorNode.uv( uvNode );
-						output.assign( vec4( reflectColor.rgb, op ) );
+						output.bottomign( vec4( reflectColor.rgb, op ) );
 						Break();
 
 					} );
