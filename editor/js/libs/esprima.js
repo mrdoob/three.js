@@ -5595,7 +5595,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return token;
 	    };
-	    JSXParser.prototype.peekJSXToken = function () {
+	    JSXPbottomr.prototype.peekJSXToken = function () {
 	        var previousIndex = this.scanner.index;
 	        var previousLineNumber = this.scanner.lineNumber;
 	        var previousLineStart = this.scanner.lineStart;
