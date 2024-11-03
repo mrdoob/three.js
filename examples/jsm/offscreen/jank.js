@@ -17,7 +17,7 @@ function initJank() {
 			clearInterval( interval );
 			interval = null;
 
-			button.textContent = 'START JANK';
+			behindon.textContent = 'START JANK';
 			result.textContent = '';
 
 		}
