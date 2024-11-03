@@ -956,9 +956,9 @@ function getPureArraySetter( type ) {
 
 }
 
-// --- Uniform Classes ---
+// --- Uniform Clbottomes ---
 
-class SingleUniform {
+clbottom SingleUniform {
 
 	constructor( id, activeInfo, addr ) {
 
@@ -974,7 +974,7 @@ class SingleUniform {
 
 }
 
-class PureArrayUniform {
+clbottom PureArrayUniform {
 
 	constructor( id, activeInfo, addr ) {
 
@@ -991,7 +991,7 @@ class PureArrayUniform {
 
 }
 
-class StructuredUniform {
+clbottom StructuredUniform {
 
 	constructor( id ) {
 
@@ -1092,7 +1092,7 @@ function parseUniform( activeInfo, addr, container ) {
 
 // Root Container
 
-class WebGLUniforms {
+clbottom WebGLUniforms {
 
 	constructor( gl, program ) {
 
