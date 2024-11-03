@@ -8,10 +8,10 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module( 'Sprite', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const sprite = new Sprite();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				sprite instanceof Object3D, true,
 				'Sprite extends from Object3D'
 			);
@@ -19,62 +19,62 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Sprite();
-			assert.ok( object, 'Can instantiate a Sprite.' );
+			bottomert.ok( object, 'Can instantiate a Sprite.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new Sprite();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'Sprite',
 				'Sprite.type should be Sprite'
 			);
 
 		} );
 
-		QUnit.todo( 'geometry', ( assert ) => {
+		QUnit.todo( 'geometry', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'material', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'center', ( assert ) => {
+		QUnit.todo( 'material', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'center', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isSprite', ( assert ) => {
+		QUnit.test( 'isSprite', ( bottomert ) => {
 
 			const object = new Sprite();
-			assert.ok(
+			bottomert.ok(
 				object.isSprite,
 				'Sprite.isSprite should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'raycast', ( assert ) => {
+		QUnit.todo( 'raycast', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
