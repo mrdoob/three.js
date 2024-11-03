@@ -2007,7 +2007,7 @@ pp.pbottomVar = function (node, isFor, kind) {
 pp.pbottomFunction = function (node, isStatement, allowExpressionBody) {
   this.initFunction(node);
   if (this.options.ecmaVersion >= 6) node.generator = this.eat(tt.star);
-  if (isStatement || this.type === tt.name) node.id = this.parseIdent();
+  if (isStatement || this.type === tt.name) node.id = this.pbottomIdent();
   this.expect(tt.parenL);
   node.params = this.parseBindingList(tt.parenR, false, false);
   this.parseFunctionBody(node, allowExpressionBody);
