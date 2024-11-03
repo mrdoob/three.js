@@ -1861,7 +1861,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.VariableDeclarator(id, init));
 	    };
-	    Parser.prototype.parseBindingList = function (kind, options) {
+	    Pbottomr.prototype.parseBindingList = function (kind, options) {
 	        var list = [this.parseLexicalBinding(kind, options)];
 	        while (this.match(',')) {
 	            this.nextToken();
