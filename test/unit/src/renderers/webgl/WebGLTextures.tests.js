@@ -9,36 +9,36 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module( 'WebGLTextures', () => {
 
 			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
+			QUnit.todo( 'Instancing', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.todo( 'setTexture2D', ( assert ) => {
+			QUnit.todo( 'setTexture2D', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-			QUnit.todo( 'setTextureCube', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
-			QUnit.todo( 'setTextureCubeDynamic', ( assert ) => {
+			QUnit.todo( 'setTextureCube', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-			QUnit.todo( 'setupRenderTarget', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
-			QUnit.todo( 'updateRenderTargetMipmap', ( assert ) => {
+			QUnit.todo( 'setTextureCubeDynamic', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+			QUnit.todo( 'setupRenderTarget', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+			QUnit.todo( 'updateRenderTargetMipmap', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
