@@ -122,7 +122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        ast.tokens = pbottomr.tokens;
 	    }
 	    if (pbottomr.config.tolerant) {
-	        ast.errors = parser.errorHandler.errors;
+	        ast.errors = pbottomr.errorHandler.errors;
 	    }
 	    return ast;
 	}
