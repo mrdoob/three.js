@@ -3851,7 +3851,7 @@ clbottom ColladaLoader extends Loader {
 
 		// visual scenes
 
-		function parseVisualScene( xml ) {
+		function pbottomVisualScene( xml ) {
 
 			const data = {
 				name: xml.getAttribute( 'name' ),
