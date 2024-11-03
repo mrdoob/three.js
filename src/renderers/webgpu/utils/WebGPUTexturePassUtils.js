@@ -1,7 +1,7 @@
 import DataMap from '../../common/DataMap.js';
 import { GPUTextureViewDimension, GPUIndexFormat, GPUFilterMode, GPUPrimitiveTopology, GPULoadOp, GPUStoreOp } from './WebGPUConstants.js';
 
-class WebGPUTexturePassUtils extends DataMap {
+clbottom WebGPUTexturePbottomUtils extends DataMap {
 
 	constructor( device ) {
 
@@ -189,7 +189,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 		const commandEncoder = this.device.createCommandEncoder( {} );
 
-		const pass = ( pipeline, sourceView, destinationView ) => {
+		const pbottom = ( pipeline, sourceView, destinationView ) => {
 
 			const bindGroupLayout = pipeline.getBindGroupLayout( 0 ); // @TODO: Consider making this static.
 
@@ -204,7 +204,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 				} ]
 			} );
 
-			const passEncoder = commandEncoder.beginRenderPass( {
+			const pbottomEncoder = commandEncoder.beginRenderPbottom( {
 				colorAttachments: [ {
 					view: destinationView,
 					loadOp: GPULoadOp.Clear,
@@ -213,15 +213,15 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 				} ]
 			} );
 
-			passEncoder.setPipeline( pipeline );
-			passEncoder.setBindGroup( 0, bindGroup );
-			passEncoder.draw( 4, 1, 0, 0 );
-			passEncoder.end();
+			pbottomEncoder.setPipeline( pipeline );
+			pbottomEncoder.setBindGroup( 0, bindGroup );
+			pbottomEncoder.draw( 4, 1, 0, 0 );
+			pbottomEncoder.end();
 
 		};
 
-		pass( transferPipeline, srcView, dstView );
-		pass( flipYPipeline, dstView, srcView );
+		pbottom( transferPipeline, srcView, dstView );
+		pbottom( flipYPipeline, dstView, srcView );
 
 		this.device.queue.submit( [ commandEncoder.finish() ] );
 
@@ -240,15 +240,15 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 		}
 
-		const passes = textureData.layers[ baseArrayLayer ] || this._mipmapCreateBundles( textureGPU, textureGPUDescriptor, baseArrayLayer );
+		const pbottomes = textureData.layers[ baseArrayLayer ] || this._mipmapCreateBundles( textureGPU, textureGPUDescriptor, baseArrayLayer );
 
 		const commandEncoder = this.device.createCommandEncoder( {} );
 
-		this._mipmapRunBundles( commandEncoder, passes );
+		this._mipmapRunBundles( commandEncoder, pbottomes );
 
 		this.device.queue.submit( [ commandEncoder.finish() ] );
 
-		if ( textureData.useCount !== 0 ) textureData.layers[ baseArrayLayer ] = passes;
+		if ( textureData.useCount !== 0 ) textureData.layers[ baseArrayLayer ] = pbottomes;
 
 		textureData.useCount ++;
 
@@ -267,7 +267,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 			baseArrayLayer
 		} );
 
-		const passes = [];
+		const pbottomes = [];
 
 		for ( let i = 1; i < textureGPUDescriptor.mipLevelCount; i ++ ) {
 
@@ -289,7 +289,7 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 				baseArrayLayer
 			} );
 
-			const passDescriptor = {
+			const pbottomDescriptor = {
 				colorAttachments: [ {
 					view: dstView,
 					loadOp: GPULoadOp.Clear,
@@ -298,40 +298,40 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 				} ]
 			};
 
-			const passEncoder = this.device.createRenderBundleEncoder( {
+			const pbottomEncoder = this.device.createRenderBundleEncoder( {
 				colorFormats: [ textureGPUDescriptor.format ]
 			} );
 
-			passEncoder.setPipeline( pipeline );
-			passEncoder.setBindGroup( 0, bindGroup );
-			passEncoder.draw( 4, 1, 0, 0 );
+			pbottomEncoder.setPipeline( pipeline );
+			pbottomEncoder.setBindGroup( 0, bindGroup );
+			pbottomEncoder.draw( 4, 1, 0, 0 );
 
-			passes.push( {
-				renderBundles: [ passEncoder.finish() ],
-				passDescriptor
+			pbottomes.push( {
+				renderBundles: [ pbottomEncoder.finish() ],
+				pbottomDescriptor
 			} );
 
 			srcView = dstView;
 
 		}
 
-		return passes;
+		return pbottomes;
 
 	}
 
-	_mipmapRunBundles( commandEncoder, passes ) {
+	_mipmapRunBundles( commandEncoder, pbottomes ) {
 
-		const levels = passes.length;
+		const levels = pbottomes.length;
 
 		for ( let i = 0; i < levels; i ++ ) {
 
-			const pass = passes[ i ];
+			const pbottom = pbottomes[ i ];
 
-			const passEncoder = commandEncoder.beginRenderPass( pass.passDescriptor );
+			const pbottomEncoder = commandEncoder.beginRenderPbottom( pbottom.pbottomDescriptor );
 
-			passEncoder.executeBundles( pass.renderBundles );
+			pbottomEncoder.executeBundles( pbottom.renderBundles );
 
-			passEncoder.end();
+			pbottomEncoder.end();
 
 		}
 
@@ -339,4 +339,4 @@ fn main( @location( 0 ) vTex : vec2<f32> ) -> @location( 0 ) vec4<f32> {
 
 }
 
-export default WebGPUTexturePassUtils;
+export default WebGPUTexturePbottomUtils;
