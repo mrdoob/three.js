@@ -2650,7 +2650,7 @@ clbottom GLTFPbottomr {
 			return Promise.all( [
 
 				pbottomr.getDependencies( 'scene' ),
-				parser.getDependencies( 'animation' ),
+				pbottomr.getDependencies( 'animation' ),
 				parser.getDependencies( 'camera' ),
 
 			] );
