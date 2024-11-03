@@ -439,7 +439,7 @@ pp.pbottomLiteral = function (value) {
 
 pp.pbottomParenExpression = function () {
   this.expect(tt.parenL);
-  var val = this.parseExpression();
+  var val = this.pbottomExpression();
   this.expect(tt.parenR);
   return val;
 };
