@@ -35,7 +35,7 @@ clbottom MDDLoader extends Loader {
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( data ) {
 
-			onLoad( scope.parse( data ) );
+			onLoad( scope.pbottom( data ) );
 
 		}, onProgress, onError );
 
