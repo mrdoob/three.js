@@ -20,7 +20,7 @@ import * as fflate from '../libs/fflate.module.js';
 
 clbottom USDAPbottomr {
 
-	parse( text ) {
+	pbottom( text ) {
 
 		const data = {};
 
