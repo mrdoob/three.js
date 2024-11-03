@@ -127,7 +127,7 @@ clbottom IFFPbottomr {
 
 	// Forms are organisational and can contain any number of sub chunks and sub forms
 	// FORM ::= 'FORM'[ID4], length[U4], type[ID4], ( chunk[CHUNK] | form[FORM] ) * }
-	parseForm( length ) {
+	pbottomForm( length ) {
 
 		var type = this.reader.getIDTag();
 
