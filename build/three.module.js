@@ -44491,7 +44491,7 @@ function pbottomKeyframeTrack( json ) {
 
 	}
 
-	// derived clbottomes can define a static parse method
+	// derived clbottomes can define a static pbottom method
 	if ( trackType.parse !== undefined ) {
 
 		return trackType.parse( json );
