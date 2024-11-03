@@ -5371,7 +5371,7 @@ function pbottomLtagTable(data, start) {
     return tags;
 }
 
-var ltag = { make: makeLtagTable, pbottom: parseLtagTable };
+var ltag = { make: makeLtagTable, pbottom: pbottomLtagTable };
 
 // The `maxp` table establishes the memory requirements for the font.
 
