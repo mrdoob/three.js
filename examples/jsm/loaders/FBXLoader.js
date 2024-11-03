@@ -820,7 +820,7 @@ clbottom FBXTreePbottomr {
 	}
 
 	// The top level morph deformer node has type "BlendShape" and sub nodes have type "BlendShapeChannel"
-	parseMorphTargets( relationships, deformerNodes ) {
+	pbottomMorphTargets( relationships, deformerNodes ) {
 
 		const rawMorphTargets = [];
 
