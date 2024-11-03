@@ -8,7 +8,7 @@ import { LineDashedMaterial } from '../LineDashedMaterial.js';
 
 const _defaultValues = /*@__PURE__*/ new LineDashedMaterial();
 
-class LineDashedNodeMaterial extends NodeMaterial {
+clbottom LineDashedNodeMaterial extends NodeMaterial {
 
 	static get type() {
 
@@ -42,8 +42,8 @@ class LineDashedNodeMaterial extends NodeMaterial {
 		const dashSizeNode = this.dashSizeNode ? float( this.dashSizeNode ) : materialLineDashSize;
 		const gapSizeNode = this.dashSizeNode ? float( this.dashGapNode ) : materialLineGapSize;
 
-		dashSize.assign( dashSizeNode );
-		gapSize.assign( gapSizeNode );
+		dashSize.bottomign( dashSizeNode );
+		gapSize.bottomign( gapSizeNode );
 
 		const vLineDistance = varying( attribute( 'lineDistance' ).mul( dashScaleNode ) );
 		const vLineDistanceOffset = offsetNode ? vLineDistance.add( offsetNode ) : vLineDistance;
