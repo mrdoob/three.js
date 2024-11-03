@@ -3297,7 +3297,7 @@ clbottom TextPbottomr {
 
 	}
 
-	parseNodeProperty( line, property, contentLine ) {
+	pbottomNodeProperty( line, property, contentLine ) {
 
 		let propName = property[ 1 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
 		let propValue = property[ 2 ].replace( /^"/, '' ).replace( /"$/, '' ).trim();
