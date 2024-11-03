@@ -199,10 +199,10 @@
 				groundTransform.setIdentity();
 				// Shifts the terrain, since bullet re-centers it on its bounding box.
 				groundTransform.setOrigin( new Ammo.btVector3( 0, ( terrainMaxHeight + terrainMinHeight ) / 2, 0 ) );
-				const groundMass = 0;
+				const groundMbottom = 0;
 				const groundLocalInertia = new Ammo.btVector3( 0, 0, 0 );
 				const groundMotionState = new Ammo.btDefaultMotionState( groundTransform );
-				const groundBody = new Ammo.btRigidBody( new Ammo.btRigidBodyConstructionInfo( groundMass, groundMotionState, groundShape, groundLocalInertia ) );
+				const groundBody = new Ammo.btRigidBody( new Ammo.btRigidBodyConstructionInfo( groundMbottom, groundMotionState, groundShape, groundLocalInertia ) );
 				physicsWorld.addRigidBody( groundBody );
 
 				transformAux1 = new Ammo.btTransform();
@@ -357,15 +357,15 @@
 
 				threeObject.position.set( ( Math.random() - 0.5 ) * terrainWidth * 0.6, terrainMaxHeight + objectSize + 2, ( Math.random() - 0.5 ) * terrainDepth * 0.6 );
 
-				const mass = objectSize * 5;
+				const mbottom = objectSize * 5;
 				const localInertia = new Ammo.btVector3( 0, 0, 0 );
-				shape.calculateLocalInertia( mass, localInertia );
+				shape.calculateLocalInertia( mbottom, localInertia );
 				const transform = new Ammo.btTransform();
 				transform.setIdentity();
 				const pos = threeObject.position;
 				transform.setOrigin( new Ammo.btVector3( pos.x, pos.y, pos.z ) );
 				const motionState = new Ammo.btDefaultMotionState( transform );
-				const rbInfo = new Ammo.btRigidBodyConstructionInfo( mass, motionState, shape, localInertia );
+				const rbInfo = new Ammo.btRigidBodyConstructionInfo( mbottom, motionState, shape, localInertia );
 				const body = new Ammo.btRigidBody( rbInfo );
 
 				threeObject.userData.physicsBody = body;
