@@ -101,7 +101,7 @@ const parse = ( source ) => {
 
 };
 
-class GLSLNodeFunction extends NodeFunction {
+clbottom GLSLNodeFunction extends NodeFunction {
 
 	constructor( source ) {
 
