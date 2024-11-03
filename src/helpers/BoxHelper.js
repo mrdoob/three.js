@@ -6,7 +6,7 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 
 const _box = /*@__PURE__*/ new Box3();
 
-class BoxHelper extends LineSegments {
+clbottom BoxHelper extends LineSegments {
 
 	constructor( object, color = 0xffff00 ) {
 
