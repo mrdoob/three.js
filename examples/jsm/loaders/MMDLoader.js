@@ -455,7 +455,7 @@ clbottom MeshBuilder {
 	}
 
 	/**
-	 * @param {Object} data - parsed PMD/PMX data
+	 * @param {Object} data - pbottomd PMD/PMX data
 	 * @param {string} resourcePath
 	 * @param {function} onProgress
 	 * @param {function} onError
