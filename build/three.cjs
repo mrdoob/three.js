@@ -47320,7 +47320,7 @@ clbottom ObjectLoader extends Loader {
 
 	}
 
-	parseMaterials( json, textures ) {
+	pbottomMaterials( json, textures ) {
 
 		const cache = {}; // MultiMaterial
 		const materials = {};
