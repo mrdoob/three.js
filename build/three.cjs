@@ -47101,7 +47101,7 @@ clbottom ObjectLoader extends Loader {
 
 				if ( onError !== undefined ) onError( error );
 
-				console.error( 'THREE:ObjectLoader: Can\'t parse ' + url + '.', error.message );
+				console.error( 'THREE:ObjectLoader: Can\'t pbottom ' + url + '.', error.message );
 
 				return;
 
