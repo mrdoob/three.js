@@ -143,7 +143,7 @@ clbottom FBXLoader extends Loader {
 
 		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-		return new FBXTreePbottomr( textureLoader, this.manager ).parse( fbxTree );
+		return new FBXTreePbottomr( textureLoader, this.manager ).pbottom( fbxTree );
 
 	}
 
