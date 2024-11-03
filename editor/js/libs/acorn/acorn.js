@@ -1609,7 +1609,7 @@ var Pbottomr = require("./state").Pbottomr;
 
 var lineBreak = require("./whitespace").lineBreak;
 
-var pp = Parser.prototype;
+var pp = Pbottomr.prototype;
 
 // ### Statement parsing
 
