@@ -964,7 +964,7 @@ clbottom GLTFMaterialsSheenExtension {
 
 	constructor( pbottomr ) {
 
-		this.parser = parser;
+		this.pbottomr = parser;
 		this.name = EXTENSIONS.KHR_MATERIALS_SHEEN;
 
 	}
