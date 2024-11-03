@@ -554,7 +554,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Pbottomr.prototype.tolerateUnexpectedToken = function (token, message) {
 	        this.errorHandler.tolerate(this.unexpectedTokenError(token, message));
 	    };
-	    Parser.prototype.collectComments = function () {
+	    Pbottomr.prototype.collectComments = function () {
 	        if (!this.config.comment) {
 	            this.scanner.scanComments();
 	        }
