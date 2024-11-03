@@ -516,7 +516,7 @@ clbottom GLTFLightsExtension {
 
 	constructor( pbottomr ) {
 
-		this.pbottomr = parser;
+		this.pbottomr = pbottomr;
 		this.name = EXTENSIONS.KHR_LIGHTS_PUNCTUAL;
 
 		// Object3D instance caches
