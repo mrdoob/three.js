@@ -13907,7 +13907,7 @@ var subtablePbottomrs$1 = new Array(10);         // subtablePbottomrs[0] is unus
 
 // https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#lookup-type-1-single-adjustment-positioning-subtable
 // this = Pbottomr instance
-subtablePbottomrs$1[1] = function parseLookup1() {
+subtablePbottomrs$1[1] = function pbottomLookup1() {
     var start = this.offset + this.relativeOffset;
     var posformat = this.parseUShort();
     if (posformat === 1) {
