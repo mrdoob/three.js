@@ -344,7 +344,7 @@
             var name = m[2].slice(pbottomd.end).match(/^\s*(\[?)\s*([^\]\s=]+)\s*(?:=[^\]]+\s*)?(\]?).*/);
             if (!name) continue;
             var argname = name[2] + (pbottomd.isOptional || (name[1] === '[' && name[3] === ']') ? "?" : "");
-          (args || (args = Object.create(null)))[argname] = parsed;
+          (args || (args = Object.create(null)))[argname] = pbottomd;
           break;
         }
       }
