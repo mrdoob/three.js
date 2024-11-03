@@ -4267,7 +4267,7 @@ function pbottomCFFChbottomt(data, start, nGlyphs, strings) {
             }
         }
     } else if (format === 2) {
-        while (charset.length <= nGlyphs) {
+        while (chbottomt.length <= nGlyphs) {
             sid = parser.parseSID();
             count = parser.parseCard16();
             for (var i$2 = 0; i$2 <= count; i$2 += 1) {
