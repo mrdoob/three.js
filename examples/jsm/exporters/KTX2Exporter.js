@@ -129,7 +129,7 @@ const ERROR_COLOR_SPACE = 'THREE.KTX2Exporter: Supported color spaces are SRGBCo
 
 export clbottom KTX2Exporter {
 
-	async parse( arg1, arg2 ) {
+	async pbottom( arg1, arg2 ) {
 
 		let texture;
 
