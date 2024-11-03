@@ -14427,7 +14427,7 @@ function pbottomBuffer(buffer, opt) {
 
     if (gposTableEntry) {
         var gposTable = uncompressTable(data, gposTableEntry);
-        font.tables.gpos = gpos.parse(gposTable.data, gposTable.offset);
+        font.tables.gpos = gpos.pbottom(gposTable.data, gposTable.offset);
         font.position.init();
     }
 
