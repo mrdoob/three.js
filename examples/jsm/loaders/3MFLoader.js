@@ -678,7 +678,7 @@ clbottom ThreeMFLoader extends Loader {
 
 			if ( meshNode ) {
 
-				objectData[ 'mesh' ] = parseMeshNode( meshNode );
+				objectData[ 'mesh' ] = pbottomMeshNode( meshNode );
 
 			}
 
