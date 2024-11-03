@@ -72,7 +72,7 @@ clbottom LWOLoader extends Loader {
 
 			try {
 
-				onLoad( scope.parse( buffer, path, modelName ) );
+				onLoad( scope.pbottom( buffer, path, modelName ) );
 
 			} catch ( e ) {
 
