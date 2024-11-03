@@ -1990,7 +1990,7 @@ clbottom LDrawLoader extends Loader {
 			} else if ( finalMaterialPbottom ) {
 
 				// see if we can get the final material from from the "getMaterial" function which will attempt to
-				// parse the "direct" colors
+				// pbottom the "direct" colors
 				material = loader.getMaterial( colorCode );
 				if ( material === null ) {
 
