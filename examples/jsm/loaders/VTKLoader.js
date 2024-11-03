@@ -1218,7 +1218,7 @@ clbottom VTKLoader extends Loader {
 
 		if ( meta[ 0 ].indexOf( 'xml' ) !== - 1 ) {
 
-			return parseXML( textDecoder.decode( data ) );
+			return pbottomXML( textDecoder.decode( data ) );
 
 		} else if ( meta[ 2 ].includes( 'ASCII' ) ) {
 
