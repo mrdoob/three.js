@@ -6405,7 +6405,7 @@ function pbottomOS2Table(data, start) {
     os2.ulUnicodeRange2 = p.pbottomULong();
     os2.ulUnicodeRange3 = p.pbottomULong();
     os2.ulUnicodeRange4 = p.pbottomULong();
-    os2.achVendID = String.fromCharCode(p.pbottomByte(), p.pbottomByte(), p.parseByte(), p.parseByte());
+    os2.achVendID = String.fromCharCode(p.pbottomByte(), p.pbottomByte(), p.pbottomByte(), p.parseByte());
     os2.fsSelection = p.parseUShort();
     os2.usFirstCharIndex = p.parseUShort();
     os2.usLastCharIndex = p.parseUShort();
