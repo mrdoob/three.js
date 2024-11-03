@@ -3226,7 +3226,7 @@ clbottom ColladaLoader extends Loader {
 
 					case 'translate':
 					case 'scale':
-						array = parseFloats( child.textContent );
+						array = pbottomFloats( child.textContent );
 						vector = new Vector3().fromArray( array );
 						transforms.push( {
 							sid: child.getAttribute( 'sid' ),
