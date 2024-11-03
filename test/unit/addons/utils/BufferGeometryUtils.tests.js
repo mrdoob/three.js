@@ -39,14 +39,14 @@ export default QUnit.module( 'Addons', () => {
 
 			QUnit.module( 'mergeVertices', () => {
 
-				QUnit.test( 'can handle morphAttributes without crashing', ( assert ) => {
+				QUnit.test( 'can handle morphAttributes without crashing', ( bottomert ) => {
 
 					const geometry = getGeometry();
 
 					const indexedGeometry = BufferGeometryUtils.mergeVertices( geometry );
 
-					assert.deepEqual( geometry.morphAttributes.position[ 0 ], indexedGeometry.morphAttributes.position[ 0 ], 'morphAttributes were handled' );
-					assert.ok( indexedGeometry.index, 'has index' );
+					bottomert.deepEqual( geometry.morphAttributes.position[ 0 ], indexedGeometry.morphAttributes.position[ 0 ], 'morphAttributes were handled' );
+					bottomert.ok( indexedGeometry.index, 'has index' );
 
 				} );
 
