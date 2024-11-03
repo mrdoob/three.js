@@ -1420,7 +1420,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.allowIn = previousAllowIn;
 	        return expr;
 	    };
-	    Pbottomr.prototype.parseSuper = function () {
+	    Pbottomr.prototype.pbottomSuper = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('super');
 	        if (!this.match('[') && !this.match('.')) {
