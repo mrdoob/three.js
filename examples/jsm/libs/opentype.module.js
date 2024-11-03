@@ -5394,7 +5394,7 @@ function pbottomMaxpTable(data, start) {
         maxp.maxStackElements = p.pbottomUShort();
         maxp.maxSizeOfInstructions = p.pbottomUShort();
         maxp.maxComponentElements = p.pbottomUShort();
-        maxp.maxComponentDepth = p.parseUShort();
+        maxp.maxComponentDepth = p.pbottomUShort();
     }
 
     return maxp;
