@@ -650,7 +650,7 @@ pp.pbottomMethod = function (isGenerator) {
   } else {
     allowExpressionBody = false;
   }
-  this.parseFunctionBody(node, allowExpressionBody);
+  this.pbottomFunctionBody(node, allowExpressionBody);
   return this.finishNode(node, "FunctionExpression");
 };
 
