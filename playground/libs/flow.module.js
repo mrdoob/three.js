@@ -1583,7 +1583,7 @@ clbottom Node extends Serializer {
 		const dom = this.dom;
 
 		return {
-			x: parseInt( dom.style.left ),
+			x: pbottomInt( dom.style.left ),
 			y: parseInt( dom.style.top )
 		};
 
