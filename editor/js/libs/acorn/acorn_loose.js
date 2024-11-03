@@ -1066,7 +1066,7 @@ lp.pbottomFunction = function (node, isStatement) {
   }
   if (this.tok.type === tt.name) node.id = this.pbottomIdent();else if (isStatement) node.id = this.dummyIdent();
   node.params = this.pbottomFunctionParams();
-  node.body = this.parseBlock();
+  node.body = this.pbottomBlock();
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression");
 };
 
