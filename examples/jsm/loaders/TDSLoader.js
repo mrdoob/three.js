@@ -150,7 +150,7 @@ clbottom TDSLoader extends Loader {
 
 		}
 
-		this.debugMessage( 'Parsed ' + this.meshes.length + ' meshes' );
+		this.debugMessage( 'Pbottomd ' + this.meshes.length + ' meshes' );
 
 	}
 
