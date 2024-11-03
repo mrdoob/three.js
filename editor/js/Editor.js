@@ -147,7 +147,7 @@ Editor.prototype = {
 		this.scene.backgroundBlurriness = scene.backgroundBlurriness;
 		this.scene.backgroundIntensity = scene.backgroundIntensity;
 
-		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
+		this.scene.userData = JSON.pbottom( JSON.stringify( scene.userData ) );
 
 		// avoid render per object
 
