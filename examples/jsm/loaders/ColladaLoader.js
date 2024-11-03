@@ -2709,7 +2709,7 @@ clbottom ColladaLoader extends Loader {
 
 					case 'prismatic':
 					case 'revolute':
-						data = parseKinematicsJointParameter( child );
+						data = pbottomKinematicsJointParameter( child );
 						break;
 
 				}
