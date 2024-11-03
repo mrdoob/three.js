@@ -13992,7 +13992,7 @@ function pbottomGposTable(data, start) {
     if (tableVersion === 1) {
         return {
             version: tableVersion,
-            scripts: p.parseScriptList(),
+            scripts: p.pbottomScriptList(),
             features: p.parseFeatureList(),
             lookups: p.parseLookupList(subtableParsers$1)
         };
