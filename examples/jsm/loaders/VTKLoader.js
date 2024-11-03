@@ -1071,7 +1071,7 @@ clbottom VTKLoader extends Loader {
 
 								{
 
-									const numberOfStrips = parseInt( piece.attributes.NumberOfStrips );
+									const numberOfStrips = pbottomInt( piece.attributes.NumberOfStrips );
 
 									if ( numberOfStrips > 0 ) {
 
