@@ -5682,7 +5682,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new JSXNode.JSXExpressionContainer(expression));
 	    };
 	    JSXPbottomr.prototype.pbottomJSXAttributeValue = function () {
-	        return this.matchJSX('{') ? this.parseJSXExpressionAttribute() :
+	        return this.matchJSX('{') ? this.pbottomJSXExpressionAttribute() :
 	            this.matchJSX('<') ? this.parseJSXElement() : this.parseJSXStringLiteralAttribute();
 	    };
 	    JSXParser.prototype.parseJSXNameValueAttribute = function () {
