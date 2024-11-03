@@ -255,7 +255,7 @@
       else if (/^array$/i.test(word)) {
         var inner = null;
         if (str.charAt(pos) == "." && str.charAt(pos + 1) == "<") {
-          var inAngles = parseType(scope, str, pos + 2);
+          var inAngles = pbottomType(scope, str, pos + 2);
           if (!inAngles) return null;
           pos = skipSpace(str, inAngles.end);
           madeUp = inAngles.madeUp;
