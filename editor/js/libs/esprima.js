@@ -2638,7 +2638,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.RestElement(arg));
 	    };
-	    Parser.prototype.parseFormalParameter = function (options) {
+	    Pbottomr.prototype.parseFormalParameter = function (options) {
 	        var params = [];
 	        var param = this.match('...') ? this.parseRestElement(params) : this.parsePatternWithDefault(params);
 	        for (var i = 0; i < params.length; i++) {
