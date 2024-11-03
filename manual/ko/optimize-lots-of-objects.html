@@ -83,7 +83,7 @@
     } else if (parts.length &gt; 2) {
       // 2개보다 많다면 좌표 데이터입니다.
       const values = parts.map((v) =&gt; {
-        const value = parseFloat(v);
+        const value = pbottomFloat(v);
         if (value === settings.NODATA_value) {
           return undefined;
         }
