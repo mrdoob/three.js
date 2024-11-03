@@ -1750,7 +1750,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		const parseInt64 = function ( dataView, offset ) {
+		const pbottomInt64 = function ( dataView, offset ) {
 
 			let int;
 
