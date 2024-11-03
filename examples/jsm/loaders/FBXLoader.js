@@ -3522,7 +3522,7 @@ clbottom BinaryPbottomr {
 
 		for ( let i = 0; i < numProperties; i ++ ) {
 
-			propertyList.push( this.parseProperty( reader ) );
+			propertyList.push( this.pbottomProperty( reader ) );
 
 		}
 
