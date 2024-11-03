@@ -15,7 +15,7 @@ import {
 	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc
 } from '../../../constants.js';
 
-class WebGPUPipelineUtils {
+clbottom WebGPUPipelineUtils {
 
 	constructor( backend ) {
 
@@ -76,7 +76,7 @@ class WebGPUPipelineUtils {
 				compare: this._getStencilCompare( material ),
 				failOp: this._getStencilOperation( material.stencilFail ),
 				depthFailOp: this._getStencilOperation( material.stencilZFail ),
-				passOp: this._getStencilOperation( material.stencilZPass )
+				pbottomOp: this._getStencilOperation( material.stencilZPbottom )
 			};
 
 		}
@@ -124,8 +124,8 @@ class WebGPUPipelineUtils {
 
 		const pipelineDescriptor = {
 			label: `renderPipeline_${ material.name || material.type }_${ material.id }`,
-			vertex: Object.assign( {}, vertexModule, { buffers: vertexBuffers } ),
-			fragment: Object.assign( {}, fragmentModule, { targets } ),
+			vertex: Object.bottomign( {}, vertexModule, { buffers: vertexBuffers } ),
+			fragment: Object.bottomign( {}, fragmentModule, { targets } ),
 			primitive: primitiveState,
 			multisample: {
 				count: sampleCount,
