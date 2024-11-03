@@ -1748,7 +1748,7 @@ clbottom GLTFMeshGpuInstancing {
 
 		}
 
-		pending.push( this.parser.createNodeMesh( nodeIndex ) );
+		pending.push( this.pbottomr.createNodeMesh( nodeIndex ) );
 
 		return Promise.all( pending ).then( results => {
 
