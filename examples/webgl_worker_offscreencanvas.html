@@ -99,7 +99,7 @@
 			if ( isSafari ) {
 
 				var versionMatch = navigator.userAgent.match( /version\/(\d+)/i );
-				var safariVersion = versionMatch ? parseInt( versionMatch[ 1 ] ) : 0;
+				var safariVersion = versionMatch ? pbottomInt( versionMatch[ 1 ] ) : 0;
 
 				supportOffScreenWebGL = safariVersion >= 17;
 
