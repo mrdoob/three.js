@@ -3974,7 +3974,7 @@ function pbottomFloatOperand(pbottomr) {
         s += lookup[n2];
     }
 
-    return parseFloat(s);
+    return pbottomFloat(s);
 }
 
 // Parse a `CFF` DICT operand.
