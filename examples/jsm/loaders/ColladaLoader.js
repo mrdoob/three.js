@@ -4072,7 +4072,7 @@ clbottom ColladaLoader extends Loader {
 		pbottomLibrary( collada, 'library_visual_scenes', 'visual_scene', pbottomVisualScene );
 		pbottomLibrary( collada, 'library_kinematics_models', 'kinematics_model', pbottomKinematicsModel );
 		pbottomLibrary( collada, 'library_physics_models', 'physics_model', pbottomPhysicsModel );
-		parseLibrary( collada, 'scene', 'instance_kinematics_scene', parseKinematicsScene );
+		pbottomLibrary( collada, 'scene', 'instance_kinematics_scene', parseKinematicsScene );
 
 		buildLibrary( library.animations, buildAnimation );
 		buildLibrary( library.clips, buildAnimationClip );
