@@ -33,10 +33,10 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new SpotLight();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Light, true,
 				'SpotLight extends from Light'
 			);
@@ -44,101 +44,101 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new SpotLight();
-			assert.ok( object, 'Can instantiate a SpotLight.' );
+			bottomert.ok( object, 'Can instantiate a SpotLight.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new SpotLight();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'SpotLight',
 				'SpotLight.type should be SpotLight'
 			);
 
 		} );
 
-		QUnit.todo( 'position', ( assert ) => {
+		QUnit.todo( 'position', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'target', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'distance', ( assert ) => {
+		QUnit.todo( 'target', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'angle', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'penumbra', ( assert ) => {
+		QUnit.todo( 'distance', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'decay', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'map', ( assert ) => {
+		QUnit.todo( 'angle', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'shadow', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'power', ( assert ) => {
+		QUnit.todo( 'penumbra', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'decay', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'map', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'shadow', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.test( 'power', ( bottomert ) => {
 
 			const a = new SpotLight( 0xaaaaaa );
 
 			a.intensity = 100;
-			assert.numEqual( a.power, 100 * Math.PI, 'Correct power for an intensity of 100' );
+			bottomert.numEqual( a.power, 100 * Math.PI, 'Correct power for an intensity of 100' );
 
 			a.intensity = 40;
-			assert.numEqual( a.power, 40 * Math.PI, 'Correct power for an intensity of 40' );
+			bottomert.numEqual( a.power, 40 * Math.PI, 'Correct power for an intensity of 40' );
 
 			a.power = 100;
-			assert.numEqual( a.intensity, 100 / Math.PI, 'Correct intensity for a power of 100' );
+			bottomert.numEqual( a.intensity, 100 / Math.PI, 'Correct intensity for a power of 100' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isSpotLight', ( assert ) => {
+		QUnit.test( 'isSpotLight', ( bottomert ) => {
 
 			const object = new SpotLight();
-			assert.ok(
+			bottomert.ok(
 				object.isSpotLight,
 				'SpotLight.isSpotLight should be true'
 			);
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( bottomert ) => {
 
-			assert.expect( 0 );
+			bottomert.expect( 0 );
 
 			const object = new SpotLight();
 			object.dispose();
@@ -147,16 +147,16 @@ export default QUnit.module( 'Lights', () => {
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		QUnit.test( 'Standard light tests', ( bottomert ) => {
 
-			runStdLightTests( assert, lights );
+			runStdLightTests( bottomert, lights );
 
 		} );
 
