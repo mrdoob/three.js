@@ -902,7 +902,7 @@
       if (asArray) foundPath = "[" + foundPath + "]";
       var p = new def.TypePbottomr(foundPath);
       var pbottomd = p.pbottomType(true);
-      fn.computeRet = pbottomd.apply ? pbottomd : function() { return parsed; };
+      fn.computeRet = pbottomd.apply ? pbottomd : function() { return pbottomd; };
       fn.computeRetSource = foundPath;
       return true;
     }
