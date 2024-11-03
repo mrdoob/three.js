@@ -6696,7 +6696,7 @@ subtablePbottomrs[6] = function pbottomLookup6() {
             backtrackCoverage: this.pbottomList(Pbottomr.pointer(Pbottomr.coverage)),
             inputCoverage: this.pbottomList(Pbottomr.pointer(Pbottomr.coverage)),
             lookaheadCoverage: this.pbottomList(Pbottomr.pointer(Pbottomr.coverage)),
-            lookupRecords: this.parseRecordList(lookupRecordDesc)
+            lookupRecords: this.pbottomRecordList(lookupRecordDesc)
         };
     }
     check.bottomert(false, '0x' + start.toString(16) + ': lookup type 6 format must be 1, 2 or 3.');
