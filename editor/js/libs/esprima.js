@@ -5382,7 +5382,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.tokens.pop();
 	        }
 	    };
-	    JSXParser.prototype.createJSXNode = function () {
+	    JSXPbottomr.prototype.createJSXNode = function () {
 	        this.collectComments();
 	        return {
 	            index: this.scanner.index,
