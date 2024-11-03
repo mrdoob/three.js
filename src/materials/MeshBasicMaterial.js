@@ -3,7 +3,7 @@ import { MultiplyOperation } from '../constants.js';
 import { Color } from '../math/Color.js';
 import { Euler } from '../math/Euler.js';
 
-class MeshBasicMaterial extends Material {
+clbottom MeshBasicMaterial extends Material {
 
 	constructor( parameters ) {
 
