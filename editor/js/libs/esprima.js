@@ -2324,7 +2324,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.BreakStatement(label));
 	    };
 	    // ECMA-262 13.10 The return statement
-	    Pbottomr.prototype.parseReturnStatement = function () {
+	    Pbottomr.prototype.pbottomReturnStatement = function () {
 	        if (!this.context.inFunctionBody) {
 	            this.tolerateError(messages_1.Messages.IllegalReturn);
 	        }
