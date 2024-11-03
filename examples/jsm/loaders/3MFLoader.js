@@ -694,7 +694,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseResourcesNode( resourcesNode ) {
+		function pbottomResourcesNode( resourcesNode ) {
 
 			const resourcesData = {};
 
