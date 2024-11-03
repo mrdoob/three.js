@@ -3118,7 +3118,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.ImportDefaultSpecifier(local));
 	    };
 	    // import <* as foo> ...;
-	    Parser.prototype.parseImportNamespaceSpecifier = function () {
+	    Pbottomr.prototype.parseImportNamespaceSpecifier = function () {
 	        var node = this.createNode();
 	        this.expect('*');
 	        if (!this.matchContextualKeyword('as')) {
