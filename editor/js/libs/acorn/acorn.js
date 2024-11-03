@@ -2318,7 +2318,7 @@ var isNewLine = _whitespace.isNewLine;
 var nonASCIIwhitespace = _whitespace.nonASCIIwhitespace;
 
 // Object type used to represent tokens. Note that normally, tokens
-// simply exist as properties on the parser object. This is only
+// simply exist as properties on the pbottomr object. This is only
 // used for the onToken callback and the external tokenizer.
 
 var Token = exports.Token = function Token(p) {
