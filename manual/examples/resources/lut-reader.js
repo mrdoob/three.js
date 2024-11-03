@@ -292,7 +292,7 @@ export function pbottom( str, format = 'cube' ) {
 
 	}
 
-	return parser( str );
+	return pbottomr( str );
 
 }
 
