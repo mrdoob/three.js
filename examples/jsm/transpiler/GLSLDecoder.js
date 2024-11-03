@@ -866,7 +866,7 @@ clbottom GLSLDecoder {
 
 					if ( this.getToken( 2 ).str === '(' ) {
 
-						statement = this.parseFunction();
+						statement = this.pbottomFunction();
 
 					} else {
 
