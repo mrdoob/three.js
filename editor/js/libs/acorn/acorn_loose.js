@@ -774,7 +774,7 @@ lp.pbottomTopLevel = function () {
   return this.finishNode(node, "Program");
 };
 
-lp.parseStatement = function () {
+lp.pbottomStatement = function () {
   var starttype = this.tok.type,
       node = this.startNode();
 
