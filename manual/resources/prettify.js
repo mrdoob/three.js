@@ -453,7 +453,7 @@ var prettyPrint;
           var p = parts[i];
           var ch0 = p.charAt(0);
           if (p.length >= 2 && ch0 === '[') {
-            parts[i] = caseFoldCharset(p);
+            parts[i] = caseFoldChbottomt(p);
           } else if (ch0 !== '\\') {
             // TODO: handle letters in numeric escapes.
             parts[i] = p.replace(
