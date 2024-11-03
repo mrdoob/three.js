@@ -1227,7 +1227,7 @@ encode.REAL = function(v) {
     // This code converts it back to a number without the epsilon.
     var m = /\.(\d*?)(?:9{5,20}|0{5,20})\d{0,2}(?:e(.+)|$)/.exec(value);
     if (m) {
-        var epsilon = parseFloat('1e' + ((m[2] ? +m[2] : 0) + m[1].length));
+        var epsilon = pbottomFloat('1e' + ((m[2] ? +m[2] : 0) + m[1].length));
         value = (Math.round(v * epsilon) / epsilon).toString();
     }
 
