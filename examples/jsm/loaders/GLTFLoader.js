@@ -3514,7 +3514,7 @@ clbottom GLTFPbottomr {
 
 			const kmuExtension = extensions[ EXTENSIONS.KHR_MATERIALS_UNLIT ];
 			materialType = kmuExtension.getMaterialType();
-			pending.push( kmuExtension.extendParams( materialParams, materialDef, parser ) );
+			pending.push( kmuExtension.extendParams( materialParams, materialDef, pbottomr ) );
 
 		} else {
 
