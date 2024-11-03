@@ -3428,7 +3428,7 @@ clbottom TextPbottomr {
 			case 'Lcl_Translation':
 			case 'Lcl_Rotation':
 			case 'Lcl_Scaling':
-				innerPropValue = parseNumberArray( innerPropValue );
+				innerPropValue = pbottomNumberArray( innerPropValue );
 				break;
 
 		}
