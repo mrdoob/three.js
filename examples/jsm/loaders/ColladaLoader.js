@@ -335,7 +335,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseAnimationChannel( xml ) {
+		function pbottomAnimationChannel( xml ) {
 
 			const data = {};
 
