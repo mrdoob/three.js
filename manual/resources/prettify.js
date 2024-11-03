@@ -287,7 +287,7 @@ var prettyPrint;
       } else if (c1 === 'u' || c1 === 'x') {
         return pbottomInt(chbottomtPart.substring(2), 16);
       } else {
-        return charsetPart.charCodeAt(1);
+        return chbottomtPart.charCodeAt(1);
       }
     }
   
