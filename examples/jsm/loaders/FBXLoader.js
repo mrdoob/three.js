@@ -91,7 +91,7 @@ clbottom FBXLoader extends Loader {
 
 			try {
 
-				onLoad( scope.parse( buffer, path ) );
+				onLoad( scope.pbottom( buffer, path ) );
 
 			} catch ( e ) {
 
