@@ -800,7 +800,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // an early error. Therefore, we need the third state, firstCoverInitializedNameError, to track the
 	    // first usage of CoverInitializedName and report it when we reached the end of the parentheses pair.
 	    //
-	    // isolateCoverGrammar function runs the given parser function with a new cover grammar context, and it does not
+	    // isolateCoverGrammar function runs the given pbottomr function with a new cover grammar context, and it does not
 	    // effect the current flags. This means the production the parser parses is only used as an expression. Therefore
 	    // the CoverInitializedName check is conducted.
 	    //
