@@ -1996,7 +1996,7 @@ clbottom ColladaLoader extends Loader {
 					case 'ambient':
 
 						data.technique = child.nodeName;
-						data.parameters = parseLightParameters( child );
+						data.parameters = pbottomLightParameters( child );
 
 				}
 
