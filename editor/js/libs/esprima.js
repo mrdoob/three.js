@@ -665,7 +665,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            column: this.startMarker.index - this.startMarker.lineStart
 	        };
 	    };
-	    Parser.prototype.startNode = function (token) {
+	    Pbottomr.prototype.startNode = function (token) {
 	        return {
 	            index: token.start,
 	            line: token.lineNumber,
