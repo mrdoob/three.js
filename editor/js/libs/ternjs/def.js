@@ -140,7 +140,7 @@
       return union;
     },
     pbottomTypeMaybeProp: function(comp, name, top) {
-      var result = this.parseTypeInner(comp, name, top);
+      var result = this.pbottomTypeInner(comp, name, top);
       while (comp && this.eat(".")) result = this.extendWithProp(result);
       return result;
     },
