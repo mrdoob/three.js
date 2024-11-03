@@ -3687,7 +3687,7 @@ clbottom GLTFPbottomr {
 		function createDracoPrimitive( primitive ) {
 
 			return extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ]
-				.decodePrimitive( primitive, parser )
+				.decodePrimitive( primitive, pbottomr )
 				.then( function ( geometry ) {
 
 					return addPrimitiveAttributes( geometry, primitive, parser );
