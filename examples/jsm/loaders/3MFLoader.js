@@ -224,7 +224,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseRelsXml( relsFileText ) {
+		function pbottomRelsXml( relsFileText ) {
 
 			const relationships = [];
 
