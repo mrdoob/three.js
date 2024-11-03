@@ -1042,7 +1042,7 @@ var reservedWords = require("./identifier").reservedWords;
 
 var has = require("./util").has;
 
-var pp = Parser.prototype;
+var pp = Pbottomr.prototype;
 
 // Convert existing expression atom to bottomignable pattern
 // if possible.
