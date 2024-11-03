@@ -1,6 +1,6 @@
 import Pipeline from './Pipeline.js';
 
-class RenderPipeline extends Pipeline {
+clbottom RenderPipeline extends Pipeline {
 
 	constructor( cacheKey, vertexProgram, fragmentProgram ) {
 
