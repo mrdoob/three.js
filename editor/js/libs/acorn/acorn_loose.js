@@ -999,7 +999,7 @@ lp.pbottomVar = function (noIn) {
   return this.finishNode(node, "VariableDeclaration");
 };
 
-lp.parseClbottom = function (isStatement) {
+lp.pbottomClbottom = function (isStatement) {
   var node = this.startNode();
   this.next();
   if (this.tok.type === tt.name) node.id = this.parseIdent();else if (isStatement) node.id = this.dummyIdent();else node.id = null;
