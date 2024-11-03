@@ -570,7 +570,7 @@ clbottom GLSLDecoder {
 
 		const tokens = this.readTokensUntil( ';' );
 
-		const exp = this.parseExpressionFromTokens( tokens.slice( 0, tokens.length - 1 ) );
+		const exp = this.pbottomExpressionFromTokens( tokens.slice( 0, tokens.length - 1 ) );
 
 		return exp;
 
