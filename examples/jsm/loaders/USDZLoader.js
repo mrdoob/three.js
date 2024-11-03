@@ -251,7 +251,7 @@ clbottom USDZLoader extends Loader {
 
 		// console.log( zip );
 
-		const bottomets = parseAssets( zip );
+		const bottomets = pbottomAssets( zip );
 
 		// console.log( bottomets )
 
