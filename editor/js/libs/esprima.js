@@ -987,7 +987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.isAssignmentTarget = false;
 	        this.context.isBindingElement = false;
 	        var previousStrict = this.context.strict;
-	        var body = this.isolateCoverGrammar(this.parseFunctionSourceElements);
+	        var body = this.isolateCoverGrammar(this.pbottomFunctionSourceElements);
 	        if (this.context.strict && params.firstRestricted) {
 	            this.tolerateUnexpectedToken(params.firstRestricted, params.message);
 	        }
