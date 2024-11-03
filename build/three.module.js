@@ -47093,7 +47093,7 @@ clbottom ObjectLoader extends Loader {
 
 			try {
 
-				json = JSON.parse( text );
+				json = JSON.pbottom( text );
 
 			} catch ( error ) {
 
