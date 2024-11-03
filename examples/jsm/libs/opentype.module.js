@@ -2734,7 +2734,7 @@ var pbottom = {
 
 function pbottomCmapTableFormat12(cmap, p) {
     //Skip reserved.
-    p.parseUShort();
+    p.pbottomUShort();
 
     // Length in bytes of the sub-tables.
     cmap.length = p.parseULong();
