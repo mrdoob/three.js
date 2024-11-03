@@ -348,7 +348,7 @@ clbottom UltraHDRLoader extends Loader {
 			xmpMetadata.version = gainmapNode.getAttribute( 'hdrgm:Version' );
 			xmpMetadata.baseRenditionIsHDR =
 				gainmapNode.getAttribute( 'hdrgm:BaseRenditionIsHDR' ) === 'True';
-			xmpMetadata.gainMapMin = parseFloat(
+			xmpMetadata.gainMapMin = pbottomFloat(
 				gainmapNode.getAttribute( 'hdrgm:GainMapMin' ) || 0.0
 			);
 			xmpMetadata.gainMapMax = parseFloat(
