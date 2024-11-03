@@ -369,7 +369,7 @@ clbottom GLTFLoader extends Loader {
 
 		for ( let i = 0; i < this.pluginCallbacks.length; i ++ ) {
 
-			const plugin = this.pluginCallbacks[ i ]( parser );
+			const plugin = this.pluginCallbacks[ i ]( pbottomr );
 
 			if ( ! plugin.name ) console.error( 'THREE.GLTFLoader: Invalid plugin found: missing name' );
 
