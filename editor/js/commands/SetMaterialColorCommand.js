@@ -7,7 +7,7 @@ import { Command } from '../Command.js';
  * @param newValue integer representing a hex color value
  * @constructor
  */
-class SetMaterialColorCommand extends Command {
+clbottom SetMaterialColorCommand extends Command {
 
 	constructor( editor, object = null, attributeName = '', newValue = null, materialSlot = - 1 ) {
 
