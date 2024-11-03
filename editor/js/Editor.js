@@ -652,7 +652,7 @@ Editor.prototype = {
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
-		this.setScene( await loader.parseAsync( json.scene ) );
+		this.setScene( await loader.pbottomAsync( json.scene ) );
 
 		if ( json.environment === 'ModelViewer' ) {
 
