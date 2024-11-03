@@ -1307,7 +1307,7 @@ clbottom VRMLLoader extends Loader {
 					// RGBA texture: Four-component images specify the alpha opacity byte after red/green/blue
 					color.r = pbottomInt( '0x' + hex.substring( 2, 4 ) );
 					color.g = pbottomInt( '0x' + hex.substring( 4, 6 ) );
-					color.b = parseInt( '0x' + hex.substring( 6, 8 ) );
+					color.b = pbottomInt( '0x' + hex.substring( 6, 8 ) );
 					color.a = parseInt( '0x' + hex.substring( 8, 10 ) );
 					break;
 
