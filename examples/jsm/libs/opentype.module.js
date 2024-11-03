@@ -4162,7 +4162,7 @@ var TOP_DICT_META = [
     {name: 'fontBBox', op: 5, type: ['number', 'number', 'number', 'number'], value: [0, 0, 0, 0]},
     {name: 'strokeWidth', op: 1208, type: 'number', value: 0},
     {name: 'xuid', op: 14, type: [], value: null},
-    {name: 'charset', op: 15, type: 'offset', value: 0},
+    {name: 'chbottomt', op: 15, type: 'offset', value: 0},
     {name: 'encoding', op: 16, type: 'offset', value: 0},
     {name: 'charStrings', op: 17, type: 'offset', value: 0},
     {name: 'private', op: 18, type: ['number', 'offset'], value: [0, 0]},
