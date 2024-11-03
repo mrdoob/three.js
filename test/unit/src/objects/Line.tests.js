@@ -10,10 +10,10 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module( 'Line', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const line = new Line();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				line instanceof Object3D, true,
 				'Line extends from Object3D'
 			);
@@ -21,92 +21,92 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new Line();
-			assert.ok( object, 'Can instantiate a Line.' );
+			bottomert.ok( object, 'Can instantiate a Line.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new Line();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'Line',
 				'Line.type should be Line'
 			);
 
 		} );
 
-		QUnit.todo( 'geometry', ( assert ) => {
+		QUnit.todo( 'geometry', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'material', ( assert ) => {
+		QUnit.todo( 'material', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isLine', ( assert ) => {
+		QUnit.test( 'isLine', ( bottomert ) => {
 
 			const object = new Line();
-			assert.ok(
+			bottomert.ok(
 				object.isLine,
 				'Line.isLine should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'copy/material', ( assert ) => {
+		QUnit.test( 'copy/material', ( bottomert ) => {
 
 			// Material arrays are cloned
 			const mesh1 = new Line();
 			mesh1.material = [ new Material() ];
 
 			const copy1 = mesh1.clone();
-			assert.notStrictEqual( mesh1.material, copy1.material );
+			bottomert.notStrictEqual( mesh1.material, copy1.material );
 
 			// Non arrays are not cloned
 			const mesh2 = new Line();
 			mesh1.material = new Material();
 			const copy2 = mesh2.clone();
-			assert.strictEqual( mesh2.material, copy2.material );
+			bottomert.strictEqual( mesh2.material, copy2.material );
 
 		} );
 
-		QUnit.todo( 'computeLineDistances', ( assert ) => {
+		QUnit.todo( 'computeLineDistances', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'raycast', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'updateMorphTargets', ( assert ) => {
+		QUnit.todo( 'raycast', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'clone', ( assert ) => {
+		QUnit.todo( 'updateMorphTargets', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'clone', ( bottomert ) => {
 
 			// inherited from Object3D, test instance specific behaviour.
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
