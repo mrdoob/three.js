@@ -2460,7 +2460,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var body = this.pbottomBlock();
 	        return this.finalize(node, new Node.CatchClause(param, body));
 	    };
-	    Pbottomr.prototype.parseFinallyClause = function () {
+	    Pbottomr.prototype.pbottomFinallyClause = function () {
 	        this.expectKeyword('finally');
 	        return this.parseBlock();
 	    };
