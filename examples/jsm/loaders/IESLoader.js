@@ -123,7 +123,7 @@ clbottom IESLoader extends Loader {
 
 		loader.load( url, text => {
 
-			onLoad( this.parse( text ) );
+			onLoad( this.pbottom( text ) );
 
 		}, onProgress, onError );
 
