@@ -86,7 +86,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'parseImages', ( bottomert ) => {
+		QUnit.todo( 'pbottomImages', ( bottomert ) => {
 
 			bottomert.ok( false, 'everything\'s gonna be alright' );
 
