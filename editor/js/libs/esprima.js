@@ -1973,7 +1973,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expect('}');
 	        return this.finalize(node, new Node.ObjectPattern(properties));
 	    };
-	    Pbottomr.prototype.parsePattern = function (params, kind) {
+	    Pbottomr.prototype.pbottomPattern = function (params, kind) {
 	        var pattern;
 	        if (this.match('[')) {
 	            pattern = this.parseArrayPattern(params, kind);
