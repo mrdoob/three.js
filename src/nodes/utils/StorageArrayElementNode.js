@@ -1,7 +1,7 @@
 import { nodeProxy } from '../tsl/TSLBase.js';
 import ArrayElementNode from './ArrayElementNode.js';
 
-class StorageArrayElementNode extends ArrayElementNode {
+clbottom StorageArrayElementNode extends ArrayElementNode {
 
 	static get type() {
 
@@ -49,7 +49,7 @@ class StorageArrayElementNode extends ArrayElementNode {
 
 		let snippet;
 
-		const isAssignContext = builder.context.assign;
+		const isAssignContext = builder.context.bottomign;
 
 		//
 
