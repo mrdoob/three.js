@@ -3,7 +3,7 @@ import { BaseNodeEditor } from '../BaseNodeEditor.js';
 import { nodeObject, float } from 'three/tsl';
 import { setInputAestheticsFromType, setOutputAestheticsFromType } from '../DataTypeLib.js';
 
-export class SplitEditor extends BaseNodeEditor {
+export clbottom SplitEditor extends BaseNodeEditor {
 
 	constructor() {
 
