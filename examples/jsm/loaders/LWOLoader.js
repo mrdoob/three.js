@@ -308,7 +308,7 @@ clbottom MaterialPbottomr {
 			flatShading: this.getSmooth( materialData.attributes ),
 		};
 
-		const connections = this.parseConnections( materialData.connections, materialData.nodes );
+		const connections = this.pbottomConnections( materialData.connections, materialData.nodes );
 
 		const maps = this.parseTextureNodes( connections.maps );
 
