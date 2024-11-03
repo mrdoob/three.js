@@ -2732,7 +2732,7 @@ var pbottom = {
 
 // The `cmap` table stores the mappings from characters to glyphs.
 
-function parseCmapTableFormat12(cmap, p) {
+function pbottomCmapTableFormat12(cmap, p) {
     //Skip reserved.
     p.parseUShort();
 
