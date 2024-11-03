@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { texture, uv, pass, uniform } from 'three/tsl';
+			import { texture, uv, pbottom, uniform } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import { TiledLighting } from 'three/addons/lighting/TiledLighting.js';
@@ -161,12 +161,12 @@
 
 				// post processing
 
-				const scenePass = pass( scene, camera );
-				const bloomPass = bloom( scenePass, 3, .9, .2 );
+				const scenePbottom = pbottom( scene, camera );
+				const bloomPbottom = bloom( scenePbottom, 3, .9, .2 );
 
 				// compose
 
-				compose = scenePass.add( bloomPass );
+				compose = scenePbottom.add( bloomPbottom );
 				tileInfluence = uniform( 0 );
 
 				postProcessing = new THREE.PostProcessing( renderer );
