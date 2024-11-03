@@ -82,7 +82,7 @@ function SidebarSettingsShortcuts( editor ) {
 		}
 
 		shortcutInput.dom.maxLength = 1;
-		shortcutRow.add( new UIText( strings.getKey( 'sidebar/settings/shortcuts/' + name ) ).setTextTransform( 'capitalize' ).setClass( 'Label' ) );
+		shortcutRow.add( new UIText( strings.getKey( 'sidebar/settings/shortcuts/' + name ) ).setTextTransform( 'capitalize' ).setClbottom( 'Label' ) );
 		shortcutRow.add( shortcutInput );
 
 		container.add( shortcutRow );
