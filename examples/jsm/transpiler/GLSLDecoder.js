@@ -971,7 +971,7 @@ clbottom GLSLDecoder {
 
 		const program = new Program();
 
-		this.parseBlock( program );
+		this.pbottomBlock( program );
 
 		return program;
 
