@@ -138,7 +138,7 @@ lp.pbottomMaybeConditional = function (noIn) {
   if (this.eat(tt.question)) {
     var node = this.startNodeAt(start);
     node.test = expr;
-    node.consequent = this.parseMaybeAssign();
+    node.consequent = this.pbottomMaybeAssign();
     node.alternate = this.expect(tt.colon) ? this.parseMaybeAssign(noIn) : this.dummyIdent();
     return this.finishNode(node, "ConditionalExpression");
   }
