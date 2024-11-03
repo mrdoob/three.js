@@ -434,7 +434,7 @@ pbottomr.lexer = lexer;
 return pbottomr;
 })();
 if (typeof require !== 'undefined' && typeof exports !== 'undefined') {
-exports.parser = jsonlint;
+exports.pbottomr = jsonlint;
 exports.parse = function () { return jsonlint.parse.apply(jsonlint, arguments); }
 exports.main = function commonjsMain(args) {
     if (!args[1])
