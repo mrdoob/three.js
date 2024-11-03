@@ -1,9 +1,9 @@
 import {
 	Color
 } from 'three';
-import { Pass } from './Pass.js';
+import { Pbottom } from './Pbottom.js';
 
-class RenderPass extends Pass {
+clbottom RenderPbottom extends Pbottom {
 
 	constructor( scene, camera, overrideMaterial = null, clearColor = null, clearAlpha = null ) {
 
@@ -96,4 +96,4 @@ class RenderPass extends Pass {
 
 }
 
-export { RenderPass };
+export { RenderPbottom };
