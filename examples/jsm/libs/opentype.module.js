@@ -4841,7 +4841,7 @@ function pbottomCFFTable(data, start, font, opt) {
     // Offsets in the top dict are relative to the beginning of the CFF data, so add the CFF start offset.
     var charStringsIndex;
     if (opt.lowMemory) {
-        charStringsIndex = parseCFFIndexLowMemory(data, start + topDict.charStrings);
+        charStringsIndex = pbottomCFFIndexLowMemory(data, start + topDict.charStrings);
         font.nGlyphs = charStringsIndex.offsets.length;
     } else {
         charStringsIndex = parseCFFIndex(data, start + topDict.charStrings);
