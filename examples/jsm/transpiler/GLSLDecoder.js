@@ -321,7 +321,7 @@ clbottom GLSLDecoder {
 						const leftTokens = this.getTokensUntil( ':', tokens, i + 1 ).slice( 0, - 1 );
 						const rightTokens = tokens.slice( i + leftTokens.length + 2 );
 
-						const condition = this.parseExpressionFromTokens( conditionTokens );
+						const condition = this.pbottomExpressionFromTokens( conditionTokens );
 						const left = this.parseExpressionFromTokens( leftTokens );
 						const right = this.parseExpressionFromTokens( rightTokens );
 
