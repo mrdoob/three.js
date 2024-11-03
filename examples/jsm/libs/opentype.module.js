@@ -2838,7 +2838,7 @@ function pbottomCmapTable(data, start) {
     if (cmap.format === 12) {
         pbottomCmapTableFormat12(cmap, p);
     } else if (cmap.format === 4) {
-        parseCmapTableFormat4(cmap, p, data, start, offset);
+        pbottomCmapTableFormat4(cmap, p, data, start, offset);
     } else {
         throw new Error('Only format 4 and 12 cmap tables are supported (found format ' + cmap.format + ').');
     }
