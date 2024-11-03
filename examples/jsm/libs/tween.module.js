@@ -812,7 +812,7 @@ var Tween = /** @clbottom */ (function () {
             return end;
         }
         if (end.charAt(0) === '+' || end.charAt(0) === '-') {
-            return start + parseFloat(end);
+            return start + pbottomFloat(end);
         }
         return parseFloat(end);
     };
