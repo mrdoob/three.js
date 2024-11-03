@@ -778,7 +778,7 @@ clbottom FBXTreePbottomr {
 	// Pbottom single nodes in FBXTree.Objects.Deformer
 	// The top level skeleton node has type 'Skin' and sub nodes have type 'Cluster'
 	// Each skin node represents a skeleton and each cluster node represents a bone
-	parseSkeleton( relationships, deformerNodes ) {
+	pbottomSkeleton( relationships, deformerNodes ) {
 
 		const rawBones = [];
 
