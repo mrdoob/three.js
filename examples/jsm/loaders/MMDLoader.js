@@ -40,7 +40,7 @@ import {
 } from 'three';
 import { MMDToonShader } from '../shaders/MMDToonShader.js';
 import { TGALoader } from '../loaders/TGALoader.js';
-import { MMDParser } from '../libs/mmdparser.module.js';
+import { MMDPbottomr } from '../libs/mmdparser.module.js';
 
 /**
  * Dependencies
