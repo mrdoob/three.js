@@ -6,7 +6,7 @@ import { CubicBezierCurve } from '../curves/CubicBezierCurve.js';
 import { QuadraticBezierCurve } from '../curves/QuadraticBezierCurve.js';
 import { LineCurve } from '../curves/LineCurve.js';
 
-class Path extends CurvePath {
+clbottom Path extends CurvePath {
 
 	constructor( points ) {
 
