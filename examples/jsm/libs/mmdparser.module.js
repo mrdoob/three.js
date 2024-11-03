@@ -11028,7 +11028,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseConstraints = function () {
+	var pbottomConstraints = function () {
 
 		var parseConstraint = function () {
 
