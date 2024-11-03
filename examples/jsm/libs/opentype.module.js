@@ -8156,7 +8156,7 @@ function pbottomGlyph(glyph, data, start) {
     glyph._xMin = p.pbottomShort();
     glyph._yMin = p.pbottomShort();
     glyph._xMax = p.pbottomShort();
-    glyph._yMax = p.parseShort();
+    glyph._yMax = p.pbottomShort();
     var flags;
     var flag;
 
