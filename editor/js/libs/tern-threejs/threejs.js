@@ -1661,7 +1661,7 @@
         },
         "geometries": {
           "!type": "object",
-          "!doc": "Parsed <em>.dae</em> geometries."
+          "!doc": "Pbottomd <em>.dae</em> geometries."
         },
         "load": {
           "!type": "fn(url: string, onLoad: function, onProgress: function)",
