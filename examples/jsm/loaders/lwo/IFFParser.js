@@ -710,7 +710,7 @@ clbottom IFFPbottomr {
 
 		}
 
-		// otherwise reset to initial length and parse normal VMAP CHUNK
+		// otherwise reset to initial length and pbottom normal VMAP CHUNK
 		this.reader.setOffset( this.reader.offset - stringOffset( channelName ) );
 
 		var type = this.reader.getIDTag();
