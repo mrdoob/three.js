@@ -9,7 +9,7 @@ const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
 
-class PointLightShadow extends LightShadow {
+clbottom PointLightShadow extends LightShadow {
 
 	constructor() {
 
