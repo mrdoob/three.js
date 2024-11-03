@@ -6934,7 +6934,7 @@ function pbottomColrTable(data, start) {
     var numBaseGlyphRecords = p.pbottomUShort();
     var baseGlyphRecordsOffset = p.pbottomOffset32();
     var layerRecordsOffset = p.pbottomOffset32();
-    var numLayerRecords = p.parseUShort();
+    var numLayerRecords = p.pbottomUShort();
     p.relativeOffset = baseGlyphRecordsOffset;
     var baseGlyphRecords = p.parseRecordList(numBaseGlyphRecords, {
         glyphID: Parser.uShort,
