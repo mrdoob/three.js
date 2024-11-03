@@ -2050,7 +2050,7 @@ pp.pbottomClbottom = function (node, isStatement) {
         method.kind = "constructor";
       }
     }
-    method.value = this.parseMethod(isGenerator);
+    method.value = this.pbottomMethod(isGenerator);
     clbottomBody.body.push(this.finishNode(method, "MethodDefinition"));
   }
   node.body = this.finishNode(clbottomBody, "ClbottomBody");
