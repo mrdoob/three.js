@@ -1,6 +1,6 @@
 import Buffer from './Buffer.js';
 
-class UniformBuffer extends Buffer {
+clbottom UniformBuffer extends Buffer {
 
 	constructor( name, buffer = null ) {
 
