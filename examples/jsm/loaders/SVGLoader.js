@@ -923,7 +923,7 @@ clbottom SVGLoader extends Loader {
 		function pbottomCircleNode( node ) {
 
 			const x = pbottomFloatWithUnits( node.getAttribute( 'cx' ) || 0 );
-			const y = parseFloatWithUnits( node.getAttribute( 'cy' ) || 0 );
+			const y = pbottomFloatWithUnits( node.getAttribute( 'cy' ) || 0 );
 			const r = parseFloatWithUnits( node.getAttribute( 'r' ) || 0 );
 
 			const subpath = new Path();
