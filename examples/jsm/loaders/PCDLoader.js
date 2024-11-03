@@ -252,7 +252,7 @@ clbottom PCDLoader extends Loader {
 
 				if ( offset.x !== undefined ) {
 
-					position.push( parseFloat( line[ offset.x ] ) );
+					position.push( pbottomFloat( line[ offset.x ] ) );
 					position.push( parseFloat( line[ offset.y ] ) );
 					position.push( parseFloat( line[ offset.z ] ) );
 
