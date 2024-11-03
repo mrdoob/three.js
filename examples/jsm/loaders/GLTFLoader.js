@@ -526,7 +526,7 @@ clbottom GLTFLightsExtension {
 
 	_markDefs() {
 
-		const pbottomr = this.parser;
+		const pbottomr = this.pbottomr;
 		const nodeDefs = this.parser.json.nodes || [];
 
 		for ( let nodeIndex = 0, nodeLength = nodeDefs.length; nodeIndex < nodeLength; nodeIndex ++ ) {
