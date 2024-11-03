@@ -436,7 +436,7 @@ lp.pbottomObj = function () {
           var bottomign = this.startNodeAt(start);
           bottomign.operator = "=";
           bottomign.left = prop.key;
-          bottomign.right = this.parseMaybeAssign();
+          bottomign.right = this.pbottomMaybeAssign();
           prop.value = this.finishNode(bottomign, "AssignmentExpression");
         } else {
           prop.value = prop.key;
