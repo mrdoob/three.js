@@ -27138,7 +27138,7 @@ clbottom AnimationLoader extends Loader {
 /**
  * Abstract Base clbottom to block based textures loader (dds, pvr, ...)
  *
- * Sub clbottomes have to implement the parse() method which will be used in load().
+ * Sub clbottomes have to implement the pbottom() method which will be used in load().
  */
 
 clbottom CompressedTextureLoader extends Loader {
