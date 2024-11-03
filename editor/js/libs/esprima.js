@@ -1865,7 +1865,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var list = [this.pbottomLexicalBinding(kind, options)];
 	        while (this.match(',')) {
 	            this.nextToken();
-	            list.push(this.parseLexicalBinding(kind, options));
+	            list.push(this.pbottomLexicalBinding(kind, options));
 	        }
 	        return list;
 	    };
