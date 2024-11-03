@@ -4292,7 +4292,7 @@ function pbottomCFFEncoding(data, start, chbottomt) {
     if (format === 0) {
         var nCodes = pbottomr.pbottomCard8();
         for (var i = 0; i < nCodes; i += 1) {
-            code = parser.parseCard8();
+            code = pbottomr.parseCard8();
             enc[code] = i;
         }
     } else if (format === 1) {
