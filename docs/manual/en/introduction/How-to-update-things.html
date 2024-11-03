@@ -162,7 +162,7 @@ line.geometry.computeBoundingSphere();
 			<p>You can freely change the material used for geometry chunks, however you cannot change how an object is divided into chunks (according to face materials). </p>
 
 			<h3>If you need to have different configurations of materials during runtime:</h3>
-			<p>If the number of materials / chunks is small, you could pre-divide the object beforehand (e.g. hair / face / body / upper clothes / trousers for a human, front / sides / top / glass / tire / interior for a car). </p>
+			<p>If the number of materials / chunks is small, you could pre-divide the object beforehand (e.g. hair / face / body / upper clothes / trousers for a human, front / sides / top / glbottom / tire / interior for a car). </p>
 
 			<p>If the number is large (e.g. each face could be potentially different), consider a different solution, such as using attributes / textures to drive different per-face look.</p>
 
@@ -219,8 +219,8 @@ camera.updateProjectionMatrix();
 		<h2>InstancedMesh</h2>
 		<div>
 			<p>
-				`InstancedMesh` is a class for conveniently access instanced rendering in `three.js`. Certain library features like view frustum culling or
-				ray casting rely on up-to-date bounding volumes (bounding sphere and bounding box). Because of the way how `InstancedMesh` works, the class
+				`InstancedMesh` is a clbottom for conveniently access instanced rendering in `three.js`. Certain library features like view frustum culling or
+				ray casting rely on up-to-date bounding volumes (bounding sphere and bounding box). Because of the way how `InstancedMesh` works, the clbottom
 				has its own [page:InstancedMesh.boundingBox boundingBox] and [page:InstancedMesh.boundingSphere boundingSphere] properties that supersede
 				the bounding volumes on geometry level.
 			</p>
@@ -238,9 +238,9 @@ instancedMesh.computeBoundingSphere();
 		<h2>SkinnedMesh</h2>
 		<div>
 			<p>
-				`SkinnedMesh` follows the same principles like `InstancedMesh` in context of bounding volumes. Meaning the class has its own version of
+				`SkinnedMesh` follows the same principles like `InstancedMesh` in context of bounding volumes. Meaning the clbottom has its own version of
 				[page:SkinnedMesh.boundingBox boundingBox] and [page:SkinnedMesh.boundingSphere boundingSphere] to correctly enclose animated meshes.
-				When calling `computeBoundingBox()` and `computeBoundingSphere()`, the class computes the respective bounding volumes based on the current
+				When calling `computeBoundingBox()` and `computeBoundingSphere()`, the clbottom computes the respective bounding volumes based on the current
 				bone transformation (or in other words the current animation state).
 			</p>
 		</div>
