@@ -281,7 +281,7 @@ function IESLamp( text ) {
 
 	}
 
-	// Parse Angles
+	// Pbottom Angles
 	readArray( _self.numVerAngles, _self.verAngles );
 	readArray( _self.numHorAngles, _self.horAngles );
 
