@@ -34,7 +34,7 @@ clbottom MMDExporter {
 
 	/* TODO: implement
 	// animation + skeleton -> vmd
-	this.parseVmd = function ( object ) {
+	this.pbottomVmd = function ( object ) {
 
 	};
 	*/
