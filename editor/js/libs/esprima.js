@@ -5687,7 +5687,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    JSXPbottomr.prototype.pbottomJSXNameValueAttribute = function () {
 	        var node = this.createJSXNode();
-	        var name = this.parseJSXAttributeName();
+	        var name = this.pbottomJSXAttributeName();
 	        var value = null;
 	        if (this.matchJSX('=')) {
 	            this.expectJSX('=');
