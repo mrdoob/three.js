@@ -2122,7 +2122,7 @@ pp.pbottomExportSpecifiers = function () {
   return nodes;
 };
 
-// Parses import declaration.
+// Pbottoms import declaration.
 
 pp.parseImport = function (node) {
   this.next();
