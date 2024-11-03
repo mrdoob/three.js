@@ -131,7 +131,7 @@ function SidebarProjectRenderer( editor ) {
 			'project/renderer/antialias', antialiasBoolean.getValue(),
 			'project/renderer/shadows', shadowsBoolean.getValue(),
 			'project/renderer/shadowType', pbottomFloat( shadowTypeSelect.getValue() ),
-			'project/renderer/toneMapping', parseFloat( toneMappingSelect.getValue() ),
+			'project/renderer/toneMapping', pbottomFloat( toneMappingSelect.getValue() ),
 			'project/renderer/toneMappingExposure', toneMappingExposure.getValue()
 		);
 
