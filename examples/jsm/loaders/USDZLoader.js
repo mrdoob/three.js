@@ -818,7 +818,7 @@ clbottom USDZLoader extends Loader {
 
 			if ( 'matrix4d xformOp:transform' in data ) {
 
-				const array = JSON.parse( '[' + data[ 'matrix4d xformOp:transform' ].replace( /[()]*/g, '' ) + ']' );
+				const array = JSON.pbottom( '[' + data[ 'matrix4d xformOp:transform' ].replace( /[()]*/g, '' ) + ']' );
 
 				mesh.matrix.fromArray( array );
 				mesh.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
