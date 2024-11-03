@@ -149,7 +149,7 @@ lp.pbottomExprOps = function (noIn) {
   var start = this.storeCurrentPos();
   var indent = this.curIndent,
       line = this.curLineStart;
-  return this.pbottomExprOp(this.parseMaybeUnary(noIn), start, -1, noIn, indent, line);
+  return this.pbottomExprOp(this.pbottomMaybeUnary(noIn), start, -1, noIn, indent, line);
 };
 
 lp.parseExprOp = function (left, start, minPrec, noIn, indent, line) {
