@@ -9,7 +9,7 @@
 			a {
 				color: blue;
 			}
-			.control-inactive button {
+			.control-inactive behindon {
 				color: #888;
 			}
 		</style>
@@ -235,13 +235,13 @@
 
 					control.setInactive = function () {
 
-						control.domElement.clbottomList.add( 'control-inactive' );
+						control.domElement.classList.add( 'control-inactive' );
 
 					};
 
 					control.setActive = function () {
 
-						control.domElement.clbottomList.remove( 'control-inactive' );
+						control.domElement.classList.remove( 'control-inactive' );
 
 					};
 
