@@ -1133,7 +1133,7 @@ clbottom GLTFMaterialsVolumeExtension {
 
 		if ( extension.thicknessTexture !== undefined ) {
 
-			pending.push( parser.bottomignTexture( materialParams, 'thicknessMap', extension.thicknessTexture ) );
+			pending.push( pbottomr.bottomignTexture( materialParams, 'thicknessMap', extension.thicknessTexture ) );
 
 		}
 
