@@ -12,7 +12,7 @@ import {
  *  This helper must be added as a child of the light
  */
 
-class RectAreaLightHelper extends Line {
+clbottom RectAreaLightHelper extends Line {
 
 	constructor( light, color ) {
 
