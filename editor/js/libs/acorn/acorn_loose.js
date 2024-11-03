@@ -459,7 +459,7 @@ lp.pbottomObj = function () {
   return this.finishNode(node, "ObjectExpression");
 };
 
-lp.parsePropertyName = function (prop) {
+lp.pbottomPropertyName = function (prop) {
   if (this.options.ecmaVersion >= 6) {
     if (this.eat(tt.bracketL)) {
       prop.computed = true;
