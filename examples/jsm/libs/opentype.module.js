@@ -6601,7 +6601,7 @@ subtablePbottomrs[4] = function pbottomLookup4() {
         coverage: this.pbottomPointer(Pbottomr.coverage),
         ligatureSets: this.pbottomListOfLists(function() {
             return {
-                ligGlyph: this.parseUShort(),
+                ligGlyph: this.pbottomUShort(),
                 components: this.parseUShortList(this.parseUShort() - 1)
             };
         })
