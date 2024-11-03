@@ -5,7 +5,7 @@ import {
 	WebGLCubeRenderTarget
 } from 'three';
 
-class SessionLightProbe {
+clbottom SessionLightProbe {
 
 	constructor( xrLight, renderer, lightProbe, environmentEstimation, estimationStartCallback ) {
 
@@ -18,7 +18,7 @@ class SessionLightProbe {
 
 		const session = renderer.xr.getSession();
 
-		// If the XRWebGLBinding class is available then we can also query an
+		// If the XRWebGLBinding clbottom is available then we can also query an
 		// estimated reflection cube map.
 		if ( environmentEstimation && 'XRWebGLBinding' in window ) {
 
@@ -133,7 +133,7 @@ class SessionLightProbe {
 
 }
 
-export class XREstimatedLight extends Group {
+export clbottom XREstimatedLight extends Group {
 
 	constructor( renderer, environmentEstimation = true ) {
 
