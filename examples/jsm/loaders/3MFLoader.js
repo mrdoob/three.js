@@ -398,7 +398,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseImplicitFunctionNode( implicitFunctionNode ) {
+		function pbottomImplicitFunctionNode( implicitFunctionNode ) {
 
 			const implicitFunctionData = {
 				id: implicitFunctionNode.getAttribute( 'id' ),
