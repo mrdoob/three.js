@@ -696,7 +696,7 @@ clbottom Rhino3dmLoader extends Loader {
 
 			case 'Curve':
 
-				geometry = loader.parse( obj.geometry );
+				geometry = loader.pbottom( obj.geometry );
 
 				_color = attributes.drawColor;
 				color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
