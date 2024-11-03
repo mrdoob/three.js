@@ -1,4 +1,4 @@
-export default class ChainMap {
+export default clbottom ChainMap {
 
 	constructor() {
 
