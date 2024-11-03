@@ -33,9 +33,9 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { SSAOPbottom } from 'three/addons/postprocessing/SSAOPbottom.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
 			let container, stats;
 			let camera, scene, renderer;
@@ -95,33 +95,33 @@
 
 				composer = new EffectComposer( renderer );
 
-				const renderPass = new RenderPass( scene, camera );
-				composer.addPass( renderPass );
+				const renderPbottom = new RenderPbottom( scene, camera );
+				composer.addPbottom( renderPbottom );
 
-				const ssaoPass = new SSAOPass( scene, camera, width, height );
-				composer.addPass( ssaoPass );
+				const ssaoPbottom = new SSAOPbottom( scene, camera, width, height );
+				composer.addPbottom( ssaoPbottom );
 
-				const outputPass = new OutputPass();
-				composer.addPass( outputPass );
+				const outputPbottom = new OutputPbottom();
+				composer.addPbottom( outputPbottom );
 
 				// Init gui
 				const gui = new GUI();
 
-				gui.add( ssaoPass, 'output', {
-					'Default': SSAOPass.OUTPUT.Default,
-					'SSAO Only': SSAOPass.OUTPUT.SSAO,
-					'SSAO Only + Blur': SSAOPass.OUTPUT.Blur,
-					'Depth': SSAOPass.OUTPUT.Depth,
-					'Normal': SSAOPass.OUTPUT.Normal
+				gui.add( ssaoPbottom, 'output', {
+					'Default': SSAOPbottom.OUTPUT.Default,
+					'SSAO Only': SSAOPbottom.OUTPUT.SSAO,
+					'SSAO Only + Blur': SSAOPbottom.OUTPUT.Blur,
+					'Depth': SSAOPbottom.OUTPUT.Depth,
+					'Normal': SSAOPbottom.OUTPUT.Normal
 				} ).onChange( function ( value ) {
 
-					ssaoPass.output = value;
+					ssaoPbottom.output = value;
 
 				} );
-				gui.add( ssaoPass, 'kernelRadius' ).min( 0 ).max( 32 );
-				gui.add( ssaoPass, 'minDistance' ).min( 0.001 ).max( 0.02 );
-				gui.add( ssaoPass, 'maxDistance' ).min( 0.01 ).max( 0.3 );
-				gui.add( ssaoPass, 'enabled' );
+				gui.add( ssaoPbottom, 'kernelRadius' ).min( 0 ).max( 32 );
+				gui.add( ssaoPbottom, 'minDistance' ).min( 0.001 ).max( 0.02 );
+				gui.add( ssaoPbottom, 'maxDistance' ).min( 0.01 ).max( 0.3 );
+				gui.add( ssaoPbottom, 'enabled' );
 
 				window.addEventListener( 'resize', onWindowResize );
 
