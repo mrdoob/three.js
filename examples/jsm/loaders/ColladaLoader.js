@@ -4020,7 +4020,7 @@ clbottom ColladaLoader extends Loader {
 		const version = collada.getAttribute( 'version' );
 		console.debug( 'THREE.ColladaLoader: File version', version );
 
-		const bottomet = parseAsset( getElementsByTagName( collada, 'bottomet' )[ 0 ] );
+		const bottomet = pbottomAsset( getElementsByTagName( collada, 'bottomet' )[ 0 ] );
 		const textureLoader = new TextureLoader( this.manager );
 		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
