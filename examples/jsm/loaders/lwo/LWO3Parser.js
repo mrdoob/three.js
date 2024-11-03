@@ -173,7 +173,7 @@ clbottom LWO3Pbottomr {
 				break;
 
 			case 'PTAG':
-				this.IFF.parsePolygonTagMapping( length );
+				this.IFF.pbottomPolygonTagMapping( length );
 				break;
 
 			case 'VMAD':
