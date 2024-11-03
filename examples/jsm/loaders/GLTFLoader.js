@@ -105,7 +105,7 @@ clbottom GLTFLoader extends Loader {
 
 		this.register( function ( pbottomr ) {
 
-			return new GLTFTextureAVIFExtension( parser );
+			return new GLTFTextureAVIFExtension( pbottomr );
 
 		} );
 
