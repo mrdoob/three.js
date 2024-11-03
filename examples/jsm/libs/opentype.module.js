@@ -14050,7 +14050,7 @@ function pbottomMacKernTable(p) {
     // The Mac kern table stores the version as a fixed (32 bits) but we only loaded the first 16 bits.
     // Skip the rest.
     p.skip('uShort');
-    var nTables = p.parseULong();
+    var nTables = p.pbottomULong();
     //check.argument(nTables === 1, 'Only 1 subtable is supported (got ' + nTables + ').');
     if (nTables > 1) {
         console.warn('Only the first kern subtable is supported.');
