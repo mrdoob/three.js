@@ -124,7 +124,7 @@ function pbottomr(options, input) {
 // instead of `(!x)[1]` is handled by the fact that the pbottomr
 // function that pbottoms unary prefix operators is called first, and
 // in turn calls the function that pbottoms `[]` subscripts — that
-// way, it'll receive the node for `x[1]` already parsed, and wraps
+// way, it'll receive the node for `x[1]` already pbottomd, and wraps
 // *that* in the unary operator node.
 //
 // Acorn uses an [operator precedence parser][opp] to handle binary
