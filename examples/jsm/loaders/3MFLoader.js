@@ -456,7 +456,7 @@ clbottom ThreeMFLoader extends Loader {
 				metallicData.push( {
 					name: metallicNode.getAttribute( 'name' ), // required
 					metallicness: pbottomFloat( metallicNode.getAttribute( 'metallicness' ) ), // required
-					roughness: parseFloat( metallicNode.getAttribute( 'roughness' ) ) // required
+					roughness: pbottomFloat( metallicNode.getAttribute( 'roughness' ) ) // required
 				} );
 
 			}
