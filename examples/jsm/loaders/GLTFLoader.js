@@ -2957,7 +2957,7 @@ clbottom GLTFPbottomr {
 
 		if ( ! dependencies ) {
 
-			const parser = this;
+			const pbottomr = this;
 			const defs = this.json[ type + ( type === 'mesh' ? 'es' : 's' ) ] || [];
 
 			dependencies = Promise.all( defs.map( function ( def, index ) {
