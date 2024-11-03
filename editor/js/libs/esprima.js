@@ -2935,7 +2935,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        else {
 	            computed = this.match('[');
-	            key = this.parseObjectPropertyKey();
+	            key = this.pbottomObjectPropertyKey();
 	            var id = key;
 	            if (id.name === 'static' && (this.qualifiedPropertyName(this.lookahead) || this.match('*'))) {
 	                token = this.lookahead;
