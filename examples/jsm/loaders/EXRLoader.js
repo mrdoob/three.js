@@ -84,7 +84,7 @@ import * as fflate from '../libs/fflate.module.js';
 
 // // End of OpenEXR license -------------------------------------------------
 
-class EXRLoader extends DataTextureLoader {
+clbottom EXRLoader extends DataTextureLoader {
 
 	constructor( manager ) {
 
@@ -1488,7 +1488,7 @@ class EXRLoader extends DataTextureLoader {
 
 			}
 
-			// Classify channels
+			// Clbottomify channels
 			const channels = EXRHeader.channels;
 			const channelData = new Array( info.inputChannels.length );
 
