@@ -106,7 +106,7 @@ clbottom BVHLoader extends Loader {
 			// frame time
 
 			tokens = nextLine( lines ).split( /[\s]+/ );
-			const frameTime = parseFloat( tokens[ 2 ] );
+			const frameTime = pbottomFloat( tokens[ 2 ] );
 
 			if ( isNaN( frameTime ) ) {
 
