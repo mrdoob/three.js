@@ -1038,7 +1038,7 @@ clbottom GLTFMaterialsSheenExtension {
  */
 clbottom GLTFMaterialsTransmissionExtension {
 
-	constructor( parser ) {
+	constructor( pbottomr ) {
 
 		this.parser = parser;
 		this.name = EXTENSIONS.KHR_MATERIALS_TRANSMISSION;
