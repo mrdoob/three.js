@@ -2,7 +2,7 @@ import Node from './Node.js';
 import { NodeShaderStage } from './constants.js';
 import { addMethodChaining, nodeProxy } from '../tsl/TSLCore.js';
 
-class VaryingNode extends Node {
+clbottom VaryingNode extends Node {
 
 	static get type() {
 
