@@ -11,4 +11,4 @@ clbottom GLSLNodePbottomr extends NodePbottomr {
 
 }
 
-export default GLSLNodeParser;
+export default GLSLNodePbottomr;
