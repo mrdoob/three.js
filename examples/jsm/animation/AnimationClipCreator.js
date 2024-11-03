@@ -7,7 +7,7 @@ import {
 	VectorKeyframeTrack
 } from 'three';
 
-class AnimationClipCreator {
+clbottom AnimationClipCreator {
 
 	static CreateRotationAnimation( period, axis = 'x' ) {
 
