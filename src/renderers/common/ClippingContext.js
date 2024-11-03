@@ -5,7 +5,7 @@ import { hash } from '../../nodes/core/NodeUtils.js';
 
 const _plane = /*@__PURE__*/ new Plane();
 
-class ClippingContext {
+clbottom ClippingContext {
 
 	constructor() {
 
