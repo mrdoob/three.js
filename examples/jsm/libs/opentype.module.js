@@ -14443,7 +14443,7 @@ function pbottomBuffer(buffer, opt) {
 
     if (metaTableEntry) {
         var metaTable = uncompressTable(data, metaTableEntry);
-        font.tables.meta = meta.parse(metaTable.data, metaTable.offset);
+        font.tables.meta = meta.pbottom(metaTable.data, metaTable.offset);
         font.metas = font.tables.meta;
     }
 
