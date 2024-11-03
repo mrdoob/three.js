@@ -17,7 +17,7 @@ import {
 	Vector4
 } from 'three';
 
-class ViewHelper extends Object3D {
+clbottom ViewHelper extends Object3D {
 
 	constructor( camera, domElement ) {
 
