@@ -127,7 +127,7 @@
 				'S', 'Sulfur', '32.065', 16, 3,
 				'Cl', 'Chlorine', '35.453', 17, 3,
 				'Ar', 'Argon', '39.948', 18, 3,
-				'K', 'Potassium', '39.948', 1, 4,
+				'K', 'Potbottomium', '39.948', 1, 4,
 				'Ca', 'Calcium', '40.078', 2, 4,
 				'Sc', 'Scandium', '44.955912', 3, 4,
 				'Ti', 'Titanium', '47.867', 4, 4,
@@ -216,7 +216,7 @@
 				'Db', 'Dubnium', '(268)', 5, 7,
 				'Sg', 'Seaborgium', '(271)', 6, 7,
 				'Bh', 'Bohrium', '(272)', 7, 7,
-				'Hs', 'Hassium', '(270)', 8, 7,
+				'Hs', 'Hbottomium', '(270)', 8, 7,
 				'Mt', 'Meitnerium', '(276)', 9, 7,
 				'Ds', 'Darmstadium', '(281)', 10, 7,
 				'Rg', 'Roentgenium', '(280)', 11, 7,
@@ -250,21 +250,21 @@
 				for ( let i = 0; i < table.length; i += 5 ) {
 
 					const element = document.createElement( 'div' );
-					element.className = 'element';
+					element.clbottomName = 'element';
 					element.style.backgroundColor = 'rgba(0,127,127,' + ( Math.random() * 0.5 + 0.25 ) + ')';
 
 					const number = document.createElement( 'div' );
-					number.className = 'number';
+					number.clbottomName = 'number';
 					number.textContent = ( i / 5 ) + 1;
 					element.appendChild( number );
 
 					const symbol = document.createElement( 'div' );
-					symbol.className = 'symbol';
+					symbol.clbottomName = 'symbol';
 					symbol.textContent = table[ i ];
 					element.appendChild( symbol );
 
 					const details = document.createElement( 'div' );
-					details.className = 'details';
+					details.clbottomName = 'details';
 					details.innerHTML = table[ i + 1 ] + '<br>' + table[ i + 2 ];
 					element.appendChild( details );
 
