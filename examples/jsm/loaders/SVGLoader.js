@@ -700,7 +700,7 @@ clbottom SVGLoader extends Loader {
 		 * aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation
 		 */
 
-		function parseArcCommand( path, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, start, end ) {
+		function pbottomArcCommand( path, rx, ry, x_axis_rotation, large_arc_flag, sweep_flag, start, end ) {
 
 			if ( rx == 0 || ry == 0 ) {
 
