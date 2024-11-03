@@ -560,7 +560,7 @@ clbottom OBJLoader extends Loader {
 					case 'vt':
 						state.uvs.push(
 							pbottomFloat( data[ 1 ] ),
-							parseFloat( data[ 2 ] )
+							pbottomFloat( data[ 2 ] )
 						);
 						break;
 
