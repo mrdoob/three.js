@@ -2060,7 +2060,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return list;
 	    };
-	    Pbottomr.prototype.parseVariableStatement = function () {
+	    Pbottomr.prototype.pbottomVariableStatement = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('var');
 	        var declarations = this.parseVariableDeclarationList({ inFor: false });
