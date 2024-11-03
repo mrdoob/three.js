@@ -9,11 +9,11 @@ export default QUnit.module( 'Textures', () => {
 	QUnit.module( 'VideoTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const videoDocumentElement = {};
 			const object = new VideoTexture( videoDocumentElement );
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Texture, true,
 				'VideoTexture extends from Texture'
 			);
@@ -21,54 +21,54 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const videoDocumentElement = {};
 			const object = new VideoTexture( videoDocumentElement );
-			assert.ok( object, 'Can instantiate a VideoTexture.' );
+			bottomert.ok( object, 'Can instantiate a VideoTexture.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'minFilter', ( assert ) => {
+		QUnit.todo( 'minFilter', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'magFilter', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'generateMipmaps', ( assert ) => {
+		QUnit.todo( 'magFilter', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'generateMipmaps', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isVideoTexture', ( assert ) => {
+		QUnit.test( 'isVideoTexture', ( bottomert ) => {
 
 			const videoDocumentElement = {};
 			const object = new VideoTexture( videoDocumentElement );
-			assert.ok(
+			bottomert.ok(
 				object.isVideoTexture,
 				'VideoTexture.isVideoTexture should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'clone', ( assert ) => {
+		QUnit.todo( 'clone', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'update', ( assert ) => {
+		QUnit.todo( 'update', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
