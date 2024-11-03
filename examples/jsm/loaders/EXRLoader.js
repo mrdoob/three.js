@@ -2005,7 +2005,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else if ( type === 'float' ) {
 
-				return parseFloat32( dataView, offset );
+				return pbottomFloat32( dataView, offset );
 
 			} else if ( type === 'v2f' ) {
 
