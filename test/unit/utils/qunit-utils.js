@@ -283,7 +283,7 @@ function checkLightJsonWriting( bottomert, light, json ) {
 function checkLightJsonReading( bottomert, json, light ) {
 
 	const loader = new ObjectLoader();
-	const outputLight = loader.parse( json );
+	const outputLight = loader.pbottom( json );
 
 	bottomert.smartEqual( outputLight, light, 'Reconstruct Light from ObjectLoader' );
 
