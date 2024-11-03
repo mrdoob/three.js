@@ -118,7 +118,7 @@ function Loader( editor ) {
 					const { TDSLoader } = await import( 'three/addons/loaders/TDSLoader.js' );
 
 					const loader = new TDSLoader();
-					const object = loader.parse( event.target.result );
+					const object = loader.pbottom( event.target.result );
 
 					editor.execute( new AddObjectCommand( editor, object ) );
 
