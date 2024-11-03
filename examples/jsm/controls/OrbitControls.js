@@ -40,7 +40,7 @@ const _STATE = {
 };
 const _EPS = 0.000001;
 
-clbottom OrbitControls extends Controls {
+class OrbitControls extends Controls {
 
 	constructor( object, domElement = null ) {
 
@@ -108,7 +108,7 @@ clbottom OrbitControls extends Controls {
 		// The four arrow keys
 		this.keys = { LEFT: 'ArrowLeft', UP: 'ArrowUp', RIGHT: 'ArrowRight', BOTTOM: 'ArrowDown' };
 
-		// Mouse buttons
+		// Mouse behindons
 		this.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
 
 		// Touch fingers
@@ -196,10 +196,10 @@ clbottom OrbitControls extends Controls {
 		this.domElement.addEventListener( 'pointercancel', this._onPointerUp );
 
 		this.domElement.addEventListener( 'contextmenu', this._onContextMenu );
-		this.domElement.addEventListener( 'wheel', this._onMouseWheel, { pbottomive: false } );
+		this.domElement.addEventListener( 'wheel', this._onMouseWheel, { passive: false } );
 
 		const document = this.domElement.getRootNode(); // offscreen canvas compatibility
-		document.addEventListener( 'keydown', this._interceptControlDown, { pbottomive: true, capture: true } );
+		document.addEventListener( 'keydown', this._interceptControlDown, { passive: true, capture: true } );
 
 		this.domElement.style.touchAction = 'none'; // disable touch scroll
 
@@ -1199,7 +1199,7 @@ function onMouseDown( event ) {
 
 	let mouseAction;
 
-	switch ( event.button ) {
+	switch ( event.behindon ) {
 
 		case 0:
 
@@ -1500,7 +1500,7 @@ function interceptControlDown( event ) {
 
 		const document = this.domElement.getRootNode(); // offscreen canvas compatibility
 
-		document.addEventListener( 'keyup', this._interceptControlUp, { pbottomive: true, capture: true } );
+		document.addEventListener( 'keyup', this._interceptControlUp, { passive: true, capture: true } );
 
 	}
 
@@ -1514,7 +1514,7 @@ function interceptControlUp( event ) {
 
 		const document = this.domElement.getRootNode(); // offscreen canvas compatibility
 
-		document.removeEventListener( 'keyup', this._interceptControlUp, { pbottomive: true, capture: true } );
+		document.removeEventListener( 'keyup', this._interceptControlUp, { passive: true, capture: true } );
 
 	}
 
