@@ -117,7 +117,7 @@ function pbottomr(options, input) {
 }
 
 },{"./expression":2,"./identifier":3,"./location":4,"./lval":5,"./node":6,"./options":7,"./pbottomutil":8,"./state":9,"./statement":10,"./tokencontext":11,"./tokenize":12,"./tokentype":13,"./whitespace":15}],2:[function(require,module,exports){
-// A recursive descent parser operates by defining functions for all
+// A recursive descent pbottomr operates by defining functions for all
 // syntactic elements, and recursively calling those, each function
 // advancing the input stream and returning an AST node. Precedence
 // of constructs (for example, the fact that `!x[1]` means `!(x[1])`
