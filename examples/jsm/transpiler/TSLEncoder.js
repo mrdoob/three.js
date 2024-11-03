@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { VariableDeclaration, Accessor } from './AST.js';
 
 const opLib = {
-	'=': 'assign',
+	'=': 'bottomign',
 	'+': 'add',
 	'-': 'sub',
 	'*': 'mul',
@@ -45,7 +45,7 @@ const unaryLib = {
 
 const isPrimitive = ( value ) => /^(true|false|-?\d)/.test( value );
 
-class TSLEncoder {
+clbottom TSLEncoder {
 
 	constructor() {
 
