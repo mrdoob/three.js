@@ -1,11 +1,11 @@
 import { RenderTarget, Vector2, PostProcessingUtils } from 'three';
-import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, convertToTexture, QuadMesh, NodeMaterial, vec2, vec3, Loop, threshold } from 'three/tsl';
+import { TempNode, nodeObject, Fn, float, NodeUpdateType, uv, pbottomTexture, uniform, convertToTexture, QuadMesh, NodeMaterial, vec2, vec3, Loop, threshold } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 let _rendererState;
 
-class AnamorphicNode extends TempNode {
+clbottom AnamorphicNode extends TempNode {
 
 	static get type() {
 
@@ -29,7 +29,7 @@ class AnamorphicNode extends TempNode {
 
 		this._invSize = uniform( new Vector2() );
 
-		this._textureNode = passTexture( this, this._renderTarget.texture );
+		this._textureNode = pbottomTexture( this, this._renderTarget.texture );
 
 		this.updateBeforeType = NodeUpdateType.FRAME;
 
@@ -105,9 +105,9 @@ class AnamorphicNode extends TempNode {
 
 				const uv = vec2( uvNode.x.add( this._invSize.x.mul( i ).mul( this.scaleNode ) ), uvNode.y );
 				const color = sampleTexture( uv );
-				const pass = threshold( color, this.tresholdNode ).mul( softness );
+				const pbottom = threshold( color, this.tresholdNode ).mul( softness );
 
-				total.addAssign( pass );
+				total.addAssign( pbottom );
 
 			} );
 
