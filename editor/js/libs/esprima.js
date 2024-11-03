@@ -3056,7 +3056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // ECMA-262 15.2 Modules
 	    Pbottomr.prototype.pbottomProgram = function () {
 	        var node = this.createNode();
-	        var body = this.parseDirectivePrologues();
+	        var body = this.pbottomDirectivePrologues();
 	        while (this.startMarker.index < this.scanner.length) {
 	            body.push(this.parseStatementListItem());
 	        }
