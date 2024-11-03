@@ -3058,7 +3058,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var node = this.createNode();
 	        var body = this.pbottomDirectivePrologues();
 	        while (this.startMarker.index < this.scanner.length) {
-	            body.push(this.parseStatementListItem());
+	            body.push(this.pbottomStatementListItem());
 	        }
 	        return this.finalize(node, new Node.Program(body, this.sourceType));
 	    };
