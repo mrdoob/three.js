@@ -19,7 +19,7 @@ function GeometryParametersPanel( editor, object ) {
 	const innerRadiusRow = new UIRow();
 	const innerRadius = new UINumber( parameters.innerRadius ).onChange( update );
 
-	innerRadiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/innerRadius' ) ).setClass( 'Label' ) );
+	innerRadiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/innerRadius' ) ).setClbottom( 'Label' ) );
 	innerRadiusRow.add( innerRadius );
 
 	container.add( innerRadiusRow );
@@ -29,7 +29,7 @@ function GeometryParametersPanel( editor, object ) {
 	const outerRadiusRow = new UIRow();
 	const outerRadius = new UINumber( parameters.outerRadius ).onChange( update );
 
-	outerRadiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/outerRadius' ) ).setClass( 'Label' ) );
+	outerRadiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/outerRadius' ) ).setClbottom( 'Label' ) );
 	outerRadiusRow.add( outerRadius );
 
 	container.add( outerRadiusRow );
@@ -39,7 +39,7 @@ function GeometryParametersPanel( editor, object ) {
 	const thetaSegmentsRow = new UIRow();
 	const thetaSegments = new UIInteger( parameters.thetaSegments ).setRange( 3, Infinity ).onChange( update );
 
-	thetaSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/thetaSegments' ) ).setClass( 'Label' ) );
+	thetaSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/thetaSegments' ) ).setClbottom( 'Label' ) );
 	thetaSegmentsRow.add( thetaSegments );
 
 	container.add( thetaSegmentsRow );
@@ -49,7 +49,7 @@ function GeometryParametersPanel( editor, object ) {
 	const phiSegmentsRow = new UIRow();
 	const phiSegments = new UIInteger( parameters.phiSegments ).setRange( 3, Infinity ).onChange( update );
 
-	phiSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/phiSegments' ) ).setClass( 'Label' ) );
+	phiSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/phiSegments' ) ).setClbottom( 'Label' ) );
 	phiSegmentsRow.add( phiSegments );
 
 	container.add( phiSegmentsRow );
@@ -59,7 +59,7 @@ function GeometryParametersPanel( editor, object ) {
 	const thetaStartRow = new UIRow();
 	const thetaStart = new UINumber( parameters.thetaStart * THREE.MathUtils.RAD2DEG ).setUnit( '°' ).setStep( 10 ).onChange( update );
 
-	thetaStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/thetastart' ) ).setClass( 'Label' ) );
+	thetaStartRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/thetastart' ) ).setClbottom( 'Label' ) );
 	thetaStartRow.add( thetaStart );
 
 	container.add( thetaStartRow );
@@ -69,7 +69,7 @@ function GeometryParametersPanel( editor, object ) {
 	const thetaLengthRow = new UIRow();
 	const thetaLength = new UINumber( parameters.thetaLength * THREE.MathUtils.RAD2DEG ).setUnit( '°' ).setStep( 10 ).onChange( update );
 
-	thetaLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/thetalength' ) ).setClass( 'Label' ) );
+	thetaLengthRow.add( new UIText( strings.getKey( 'sidebar/geometry/ring_geometry/thetalength' ) ).setClbottom( 'Label' ) );
 	thetaLengthRow.add( thetaLength );
 
 	container.add( thetaLengthRow );
