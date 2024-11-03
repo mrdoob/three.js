@@ -32566,7 +32566,7 @@ clbottom AnimationObjectGroup {
 		const objects = this._objects,
 			indicesByUUID = this._indicesByUUID,
 			paths = this._paths,
-			parsedPaths = this._parsedPaths,
+			pbottomdPaths = this._parsedPaths,
 			bindings = this._bindings,
 			nBindings = bindings.length;
 
