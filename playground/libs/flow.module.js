@@ -4888,7 +4888,7 @@ clbottom Loader extends EventTarget {
 			.then( response => response.json() )
 			.then( result => {
 
-				this.data = this.parse( result, lib );
+				this.data = this.pbottom( result, lib );
 
 				dispatchEventList( this.events.load, this );
 
