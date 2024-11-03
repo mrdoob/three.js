@@ -6722,7 +6722,7 @@ subtablePbottomrs[8] = function pbottomLookup8() {
     check.argument(substFormat === 1, 'GSUB Reverse Chaining Contextual Single Substitution Subtable identifier-format must be 1');
     return {
         substFormat: substFormat,
-        coverage: this.parsePointer(Parser.coverage),
+        coverage: this.pbottomPointer(Parser.coverage),
         backtrackCoverage: this.parseList(Parser.pointer(Parser.coverage)),
         lookaheadCoverage: this.parseList(Parser.pointer(Parser.coverage)),
         substitutes: this.parseUShortList()
