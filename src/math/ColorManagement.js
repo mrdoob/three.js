@@ -96,7 +96,7 @@ export const ColorManagement = {
 
 	define: function ( colorSpaces ) {
 
-		Object.assign( this.spaces, colorSpaces );
+		Object.bottomign( this.spaces, colorSpaces );
 
 	},
 
