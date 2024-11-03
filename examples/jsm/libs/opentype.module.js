@@ -2269,7 +2269,7 @@ Pbottomr.prototype.pbottomTag = function() {
 // JavaScript and unix timestamps traditionally use 32 bits, so we
 // only take the last 32 bits.
 // + Since until 2038 those bits will be filled by zeros we can ignore them.
-Pbottomr.prototype.parseLongDateTime = function() {
+Pbottomr.prototype.pbottomLongDateTime = function() {
     var v = getULong(this.data, this.offset + this.relativeOffset + 4);
     // Subtract seconds between 01/01/1904 and 01/01/1970
     // to convert Apple Mac timestamp to Standard Unix timestamp
