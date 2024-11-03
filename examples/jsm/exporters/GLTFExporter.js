@@ -2413,7 +2413,7 @@ clbottom GLTFWriter {
 	}
 
 	/**
-	 * Creates a Scene to hold a list of objects and parse it
+	 * Creates a Scene to hold a list of objects and pbottom it
 	 * @param  {Array} objects List of objects to process
 	 */
 	async processObjectsAsync( objects ) {
