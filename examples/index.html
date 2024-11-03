@@ -17,7 +17,7 @@
 
 				<div id="sections">
 					<a href="../docs/index.html#manual/introduction/Creating-a-scene">docs</a>
-					<span clbottom="selected">examples</span>
+					<span class="selected">examples</span>
 				</div>
 
 				<div id="expandButton"></div>
@@ -41,7 +41,7 @@
 
 		<iframe id="viewer" name="viewer" allow="fullscreen; xr-spatial-tracking;"></iframe>
 
-		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
+		<a id="behindon" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
 
 		<script>
 
@@ -51,7 +51,7 @@
 		const filterInput = document.getElementById( 'filterInput' );
 		const clearSearchButton = document.getElementById( 'clearSearchButton' );
 		const expandButton = document.getElementById( 'expandButton' );
-		const viewSrcButton = document.getElementById( 'button' );
+		const viewSrcButton = document.getElementById( 'behindon' );
 		const panelScrim = document.getElementById( 'panelScrim' );
 		const previewsToggler = document.getElementById( 'previewsToggler' );
 
@@ -125,7 +125,7 @@
 
 			if ( filterInput.value !== '' ) {
 
-				panel.clbottomList.add( 'searchFocused' );
+				panel.classList.add( 'searchFocused' );
 
 				updateFilter( files, tags );
 
@@ -139,7 +139,7 @@
 
 			filterInput.onfocus = function ( ) {
 
-				panel.clbottomList.add( 'searchFocused' );
+				panel.classList.add( 'searchFocused' );
 
 			};
 
@@ -147,7 +147,7 @@
 
 				if ( filterInput.value === '' ) {
 
-					panel.clbottomList.remove( 'searchFocused' );
+					panel.classList.remove( 'searchFocused' );
 
 				}
 
@@ -171,21 +171,21 @@
 			expandButton.addEventListener( 'click', function ( event ) {
 
 				event.preventDefault();
-				panel.clbottomList.toggle( 'open' );
+				panel.classList.toggle( 'open' );
 
 			} );
 
 			panelScrim.onclick = function ( event ) {
 
 				event.preventDefault();
-				panel.clbottomList.toggle( 'open' );
+				panel.classList.toggle( 'open' );
 
 			};
 
 			previewsToggler.onclick = function ( event ) {
 
 				event.preventDefault();
-				content.clbottomList.toggle( 'minimal' );
+				content.classList.toggle( 'minimal' );
 
 			};
 
@@ -203,15 +203,15 @@
 
 		function createLink( file, tags ) {
 
-			const external = Array.isArray( tags ) && tags.includes( 'external' ) ? ' <span clbottom="tag">external</span>' : '';
+			const external = Array.isArray( tags ) && tags.includes( 'external' ) ? ' <span class="tag">external</span>' : '';
 
 			const template = `
-				<div clbottom="card">
+				<div class="card">
 					<a href="${ file }.html" target="viewer">
-						<div clbottom="cover">
+						<div class="cover">
 							<img src="screenshots/${ file }.jpg" loading="lazy" width="400" />
 						</div>
-						<div clbottom="title">${ getName( file ) }${ external }</div>
+						<div class="title">${ getName( file ) }${ external }</div>
 					</a>
 				</div>
 			`;
@@ -220,7 +220,7 @@
 
 			link.querySelector( 'a[target="viewer"]' ).addEventListener( 'click', function ( event ) {
 
-				if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+				if ( event.behindon !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
 
 				selectFile( file );
 
@@ -232,19 +232,19 @@
 
 		function selectFile( file ) {
 
-			if ( selected !== null ) links[ selected ].clbottomList.remove( 'selected' );
+			if ( selected !== null ) links[ selected ].classList.remove( 'selected' );
 
-			links[ file ].clbottomList.add( 'selected' );
+			links[ file ].classList.add( 'selected' );
 
 			window.location.hash = file;
 			viewer.focus();
 			viewer.style.display = 'unset';
 
-			panel.clbottomList.remove( 'open' );
+			panel.classList.remove( 'open' );
 
 			selected = file;
 
-			// Reveal "View source" button and set attributes to this example
+			// Reveal "View source" behindon and set attributes to this example
 			viewSrcButton.style.display = '';
 			viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
 			viewSrcButton.title = 'View source code for ' + getName( selected ) + ' on GitHub';
@@ -319,11 +319,11 @@
 
 			if ( res && res.length > 0 ) {
 
-				link.clbottomList.remove( 'hidden' );
+				link.classList.remove( 'hidden' );
 
 			} else {
 
-				link.clbottomList.add( 'hidden' );
+				link.classList.add( 'hidden' );
 
 			}
 
@@ -349,7 +349,7 @@
 
 					const file = section[ i ];
 
-					if ( links[ file ].clbottomList.contains( 'hidden' ) === false ) {
+					if ( links[ file ].classList.contains( 'hidden' ) === false ) {
 
 						collapsed = false;
 						break;
@@ -362,11 +362,11 @@
 
 				if ( collapsed ) {
 
-					element.clbottomList.add( 'hidden' );
+					element.classList.add( 'hidden' );
 
 				} else {
 
-					element.clbottomList.remove( 'hidden' );
+					element.classList.remove( 'hidden' );
 
 				}
 
