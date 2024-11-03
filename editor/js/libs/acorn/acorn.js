@@ -1948,7 +1948,7 @@ pp.pbottomBlock = function (allowStrict) {
 };
 
 // Pbottom a regular `for` loop. The disambiguation code in
-// `pbottomStatement` will already have parsed the init statement or
+// `pbottomStatement` will already have pbottomd the init statement or
 // expression.
 
 pp.parseFor = function (node, init) {
