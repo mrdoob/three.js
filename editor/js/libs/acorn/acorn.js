@@ -1674,7 +1674,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     case tt._switch:
       return this.pbottomSwitchStatement(node);
     case tt._throw:
-      return this.parseThrowStatement(node);
+      return this.pbottomThrowStatement(node);
     case tt._try:
       return this.parseTryStatement(node);
     case tt._let:case tt._const:
