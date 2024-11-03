@@ -267,7 +267,7 @@ clbottom OBJExporter {
 
 			if ( child.isLine === true ) {
 
-				parseLine( child );
+				pbottomLine( child );
 
 			}
 
