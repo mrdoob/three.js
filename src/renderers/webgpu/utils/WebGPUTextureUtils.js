@@ -2,7 +2,7 @@ import {
 	GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension, GPUFeatureName
 } from './WebGPUConstants.js';
 
-import WebGPUTexturePassUtils from './WebGPUTexturePassUtils.js';
+import WebGPUTexturePbottomUtils from './WebGPUTexturePbottomUtils.js';
 
 import {
 	ByteType, ShortType,
@@ -32,13 +32,13 @@ const _compareToWebGPU = {
 
 const _flipMap = [ 0, 1, 3, 2, 4, 5 ];
 
-class WebGPUTextureUtils {
+clbottom WebGPUTextureUtils {
 
 	constructor( backend ) {
 
 		this.backend = backend;
 
-		this._passUtils = null;
+		this._pbottomUtils = null;
 
 		this.defaultTexture = {};
 		this.defaultCubeTexture = {};
@@ -210,7 +210,7 @@ class WebGPUTextureUtils {
 
 		if ( texture.isRenderTargetTexture && sampleCount > 1 && ! texture.isMultisampleRenderTargetTexture ) {
 
-			const msaaTextureDescriptorGPU = Object.assign( {}, textureDescriptorGPU );
+			const msaaTextureDescriptorGPU = Object.bottomign( {}, textureDescriptorGPU );
 
 			msaaTextureDescriptorGPU.label = msaaTextureDescriptorGPU.label + '-msaa';
 			msaaTextureDescriptorGPU.sampleCount = sampleCount;
@@ -559,29 +559,29 @@ class WebGPUTextureUtils {
 
 	}
 
-	_getPassUtils() {
+	_getPbottomUtils() {
 
-		let passUtils = this._passUtils;
+		let pbottomUtils = this._pbottomUtils;
 
-		if ( passUtils === null ) {
+		if ( pbottomUtils === null ) {
 
-			this._passUtils = passUtils = new WebGPUTexturePassUtils( this.backend.device );
+			this._pbottomUtils = pbottomUtils = new WebGPUTexturePbottomUtils( this.backend.device );
 
 		}
 
-		return passUtils;
+		return pbottomUtils;
 
 	}
 
 	_generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer = 0 ) {
 
-		this._getPassUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer );
+		this._getPbottomUtils().generateMipmaps( textureGPU, textureDescriptorGPU, baseArrayLayer );
 
 	}
 
 	_flipY( textureGPU, textureDescriptorGPU, originDepth = 0 ) {
 
-		this._getPassUtils().flipY( textureGPU, textureDescriptorGPU, originDepth );
+		this._getPbottomUtils().flipY( textureGPU, textureDescriptorGPU, originDepth );
 
 	}
 
