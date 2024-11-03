@@ -1965,7 +1965,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var properties = [];
 	        this.expect('{');
 	        while (!this.match('}')) {
-	            properties.push(this.parsePropertyPattern(params, kind));
+	            properties.push(this.pbottomPropertyPattern(params, kind));
 	            if (!this.match('}')) {
 	                this.expect(',');
 	            }
