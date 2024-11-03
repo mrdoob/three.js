@@ -369,7 +369,7 @@ function PbottomrState() {
 				const uvLen = this.uvs.length;
 
 				ia = this.pbottomUVIndex( ua, uvLen );
-				ib = this.parseUVIndex( ub, uvLen );
+				ib = this.pbottomUVIndex( ub, uvLen );
 				ic = this.parseUVIndex( uc, uvLen );
 
 				this.addUV( ia, ib, ic );
