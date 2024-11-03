@@ -5390,7 +5390,7 @@ function pbottomMaxpTable(data, start) {
         maxp.maxTwilightPoints = p.pbottomUShort();
         maxp.maxStorage = p.pbottomUShort();
         maxp.maxFunctionDefs = p.pbottomUShort();
-        maxp.maxInstructionDefs = p.parseUShort();
+        maxp.maxInstructionDefs = p.pbottomUShort();
         maxp.maxStackElements = p.parseUShort();
         maxp.maxSizeOfInstructions = p.parseUShort();
         maxp.maxComponentElements = p.parseUShort();
