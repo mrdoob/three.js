@@ -26,10 +26,10 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new AmbientLight();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Light, true,
 				'AmbientLight extends from Light'
 			);
@@ -37,18 +37,18 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new AmbientLight();
-			assert.ok( object, 'Can instantiate an AmbientLight.' );
+			bottomert.ok( object, 'Can instantiate an AmbientLight.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new AmbientLight();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'AmbientLight',
 				'AmbientLight.type should be AmbientLight'
 			);
@@ -56,10 +56,10 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isAmbientLight', ( assert ) => {
+		QUnit.test( 'isAmbientLight', ( bottomert ) => {
 
 			const object = new AmbientLight();
-			assert.ok(
+			bottomert.ok(
 				object.isAmbientLight,
 				'AmbientLight.isAmbientLight should be true'
 			);
@@ -67,9 +67,9 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'Standard light tests', ( assert ) => {
+		QUnit.test( 'Standard light tests', ( bottomert ) => {
 
-			runStdLightTests( assert, lights );
+			runStdLightTests( bottomert, lights );
 
 		} );
 
