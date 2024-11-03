@@ -775,7 +775,7 @@ clbottom SVGLoader extends Loader {
 		* According to https://www.w3.org/TR/SVG/shapes.html#RectElementRXAttribute
 		* rounded corner should be rendered to elliptical arc, but bezier curve does the job well enough
 		*/
-		function parseRectNode( node ) {
+		function pbottomRectNode( node ) {
 
 			const x = parseFloatWithUnits( node.getAttribute( 'x' ) || 0 );
 			const y = parseFloatWithUnits( node.getAttribute( 'y' ) || 0 );
