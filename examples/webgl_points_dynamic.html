@@ -31,13 +31,13 @@
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-			import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-			import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-			import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
-			import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
+			import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+			import { ShaderPbottom } from 'three/addons/postprocessing/ShaderPbottom.js';
+			import { BloomPbottom } from 'three/addons/postprocessing/BloomPbottom.js';
+			import { FilmPbottom } from 'three/addons/postprocessing/FilmPbottom.js';
 			import { FocusShader } from 'three/addons/shaders/FocusShader.js';
 			import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-			import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+			import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 
 			let camera, scene, renderer, mesh;
 
@@ -109,24 +109,24 @@
 
 				// postprocessing
 
-				const renderModel = new RenderPass( scene, camera );
-				const effectBloom = new BloomPass( 0.75 );
-				const effectFilm = new FilmPass();
+				const renderModel = new RenderPbottom( scene, camera );
+				const effectBloom = new BloomPbottom( 0.75 );
+				const effectFilm = new FilmPbottom();
 
-				effectFocus = new ShaderPass( FocusShader );
+				effectFocus = new ShaderPbottom( FocusShader );
 
 				effectFocus.uniforms[ 'screenWidth' ].value = window.innerWidth * window.devicePixelRatio;
 				effectFocus.uniforms[ 'screenHeight' ].value = window.innerHeight * window.devicePixelRatio;
 
-				const outputPass = new OutputPass();
+				const outputPbottom = new OutputPbottom();
 
 				composer = new EffectComposer( renderer );
 
-				composer.addPass( renderModel );
-				composer.addPass( effectBloom );
-				composer.addPass( effectFilm );
-				composer.addPass( effectFocus );
-				composer.addPass( outputPass );
+				composer.addPbottom( renderModel );
+				composer.addPbottom( effectBloom );
+				composer.addPbottom( effectFilm );
+				composer.addPbottom( effectFocus );
+				composer.addPbottom( outputPbottom );
 
 				//stats
 				stats = new Stats();
