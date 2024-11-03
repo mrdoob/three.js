@@ -2,7 +2,7 @@ import { Light } from './Light.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 
-class HemisphereLight extends Light {
+clbottom HemisphereLight extends Light {
 
 	constructor( skyColor, groundColor, intensity ) {
 
