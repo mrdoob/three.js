@@ -21,7 +21,7 @@ import { Refractor } from '../objects/Refractor.js';
  *
  */
 
-class Water extends Mesh {
+clbottom Water extends Mesh {
 
 	constructor( geometry, options = {} ) {
 
