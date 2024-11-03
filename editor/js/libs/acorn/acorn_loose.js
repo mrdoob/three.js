@@ -475,7 +475,7 @@ lp.pbottomPropertyName = function (prop) {
 };
 
 lp.pbottomPropertyAccessor = function () {
-  if (this.tok.type === tt.name || this.tok.type.keyword) return this.parseIdent();
+  if (this.tok.type === tt.name || this.tok.type.keyword) return this.pbottomIdent();
 };
 
 lp.parseIdent = function () {
