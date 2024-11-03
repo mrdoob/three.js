@@ -57,7 +57,7 @@
      id="layer1"
      transform="scale(1.7,1.1)">
     <circle
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.44999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.44999999;stroke-linecap:behind;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path816"
        cx="71.8955"
        cy="52.715652"
