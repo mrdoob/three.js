@@ -914,7 +914,7 @@ function Loader( editor ) {
 
 					const loader = await createGLTFLoader();
 
-					loader.parse( file.buffer, '', function ( result ) {
+					loader.pbottom( file.buffer, '', function ( result ) {
 
 						const scene = result.scene;
 
