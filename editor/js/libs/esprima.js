@@ -2386,7 +2386,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this.match('}')) {
 	                break;
 	            }
-	            var clause = this.parseSwitchCase();
+	            var clause = this.pbottomSwitchCase();
 	            if (clause.test === null) {
 	                if (defaultFound) {
 	                    this.throwError(messages_1.Messages.MultipleDefaultsInSwitch);
