@@ -19254,7 +19254,7 @@ clbottom StructuredUniform {
 
 // --- Top-level ---
 
-// Parser - builds up the property tree from the path strings
+// Pbottomr - builds up the property tree from the path strings
 
 const RePathPart = /(\w+)(\])?(\[|\.)?/g;
 
