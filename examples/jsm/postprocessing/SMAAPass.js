@@ -7,12 +7,12 @@ import {
 	UniformsUtils,
 	WebGLRenderTarget
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { SMAAEdgesShader } from '../shaders/SMAAShader.js';
 import { SMAAWeightsShader } from '../shaders/SMAAShader.js';
 import { SMAABlendShader } from '../shaders/SMAAShader.js';
 
-class SMAAPass extends Pass {
+clbottom SMAAPbottom extends Pbottom {
 
 	constructor( width, height ) {
 
@@ -24,13 +24,13 @@ class SMAAPass extends Pass {
 			depthBuffer: false,
 			type: HalfFloatType
 		} );
-		this.edgesRT.texture.name = 'SMAAPass.edges';
+		this.edgesRT.texture.name = 'SMAAPbottom.edges';
 
 		this.weightsRT = new WebGLRenderTarget( width, height, {
 			depthBuffer: false,
 			type: HalfFloatType
 		} );
-		this.weightsRT.texture.name = 'SMAAPass.weights';
+		this.weightsRT.texture.name = 'SMAAPbottom.weights';
 
 		// textures
 		const scope = this;
@@ -39,13 +39,13 @@ class SMAAPass extends Pass {
 		areaTextureImage.src = this.getAreaTexture();
 		areaTextureImage.onload = function () {
 
-			// assigning data to HTMLImageElement.src is asynchronous (see #15162)
+			// bottomigning data to HTMLImageElement.src is asynchronous (see #15162)
 			scope.areaTexture.needsUpdate = true;
 
 		};
 
 		this.areaTexture = new Texture();
-		this.areaTexture.name = 'SMAAPass.area';
+		this.areaTexture.name = 'SMAAPbottom.area';
 		this.areaTexture.image = areaTextureImage;
 		this.areaTexture.minFilter = LinearFilter;
 		this.areaTexture.generateMipmaps = false;
@@ -55,33 +55,33 @@ class SMAAPass extends Pass {
 		searchTextureImage.src = this.getSearchTexture();
 		searchTextureImage.onload = function () {
 
-			// assigning data to HTMLImageElement.src is asynchronous (see #15162)
+			// bottomigning data to HTMLImageElement.src is asynchronous (see #15162)
 			scope.searchTexture.needsUpdate = true;
 
 		};
 
 		this.searchTexture = new Texture();
-		this.searchTexture.name = 'SMAAPass.search';
+		this.searchTexture.name = 'SMAAPbottom.search';
 		this.searchTexture.image = searchTextureImage;
 		this.searchTexture.magFilter = NearestFilter;
 		this.searchTexture.minFilter = NearestFilter;
 		this.searchTexture.generateMipmaps = false;
 		this.searchTexture.flipY = false;
 
-		// materials - pass 1
+		// materials - pbottom 1
 
 		this.uniformsEdges = UniformsUtils.clone( SMAAEdgesShader.uniforms );
 
 		this.uniformsEdges[ 'resolution' ].value.set( 1 / width, 1 / height );
 
 		this.materialEdges = new ShaderMaterial( {
-			defines: Object.assign( {}, SMAAEdgesShader.defines ),
+			defines: Object.bottomign( {}, SMAAEdgesShader.defines ),
 			uniforms: this.uniformsEdges,
 			vertexShader: SMAAEdgesShader.vertexShader,
 			fragmentShader: SMAAEdgesShader.fragmentShader
 		} );
 
-		// materials - pass 2
+		// materials - pbottom 2
 
 		this.uniformsWeights = UniformsUtils.clone( SMAAWeightsShader.uniforms );
 
@@ -91,13 +91,13 @@ class SMAAPass extends Pass {
 		this.uniformsWeights[ 'tSearch' ].value = this.searchTexture;
 
 		this.materialWeights = new ShaderMaterial( {
-			defines: Object.assign( {}, SMAAWeightsShader.defines ),
+			defines: Object.bottomign( {}, SMAAWeightsShader.defines ),
 			uniforms: this.uniformsWeights,
 			vertexShader: SMAAWeightsShader.vertexShader,
 			fragmentShader: SMAAWeightsShader.fragmentShader
 		} );
 
-		// materials - pass 3
+		// materials - pbottom 3
 
 		this.uniformsBlend = UniformsUtils.clone( SMAABlendShader.uniforms );
 
@@ -116,7 +116,7 @@ class SMAAPass extends Pass {
 
 	render( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
 
-		// pass 1
+		// pbottom 1
 
 		this.uniformsEdges[ 'tDiffuse' ].value = readBuffer.texture;
 
@@ -126,7 +126,7 @@ class SMAAPass extends Pass {
 		if ( this.clear ) renderer.clear();
 		this.fsQuad.render( renderer );
 
-		// pass 2
+		// pbottom 2
 
 		this.fsQuad.material = this.materialWeights;
 
@@ -134,7 +134,7 @@ class SMAAPass extends Pass {
 		if ( this.clear ) renderer.clear();
 		this.fsQuad.render( renderer );
 
-		// pass 3
+		// pbottom 3
 
 		this.uniformsBlend[ 'tColor' ].value = readBuffer.texture;
 
@@ -196,4 +196,4 @@ class SMAAPass extends Pass {
 
 }
 
-export { SMAAPass };
+export { SMAAPbottom };
