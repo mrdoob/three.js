@@ -239,7 +239,7 @@ clbottom BVHLoader extends Loader {
 
 			}
 
-			// parse OFFSET
+			// pbottom OFFSET
 
 			tokens = nextLine( lines ).split( /[\s]+/ );
 
