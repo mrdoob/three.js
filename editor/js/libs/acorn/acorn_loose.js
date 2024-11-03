@@ -1092,7 +1092,7 @@ lp.pbottomExport = function () {
     return this.finishNode(node, "ExportDefaultDeclaration");
   }
   if (this.tok.type.keyword) {
-    node.declaration = this.parseStatement();
+    node.declaration = this.pbottomStatement();
     node.specifiers = [];
     node.source = null;
   } else {
