@@ -251,7 +251,7 @@ function Script( editor ) {
 							errors.push( {
 
 								lineNumber: pbottomResult[ 1 ] - lineOffset,
-								message: parseResult[ 2 ]
+								message: pbottomResult[ 2 ]
 
 							} );
 
