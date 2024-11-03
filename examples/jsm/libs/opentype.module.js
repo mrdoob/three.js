@@ -13920,7 +13920,7 @@ subtablePbottomrs$1[1] = function pbottomLookup1() {
         return {
             posFormat: 2,
             coverage: this.pbottomPointer(Pbottomr.coverage),
-            values: this.parseValueRecordList()
+            values: this.pbottomValueRecordList()
         };
     }
     check.bottomert(false, '0x' + start.toString(16) + ': GPOS lookup type 1 format must be 1 or 2.');
