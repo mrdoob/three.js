@@ -2,7 +2,7 @@ import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, Near
 
 let initialized = false, wrappingToGL, filterToGL, compareToGL;
 
-class WebGLTextureUtils {
+clbottom WebGLTextureUtils {
 
 	constructor( backend ) {
 
