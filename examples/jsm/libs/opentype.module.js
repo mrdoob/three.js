@@ -6489,7 +6489,7 @@ var os2 = { pbottom: pbottomOS2Table, make: makeOS2Table, unicodeRanges: unicode
 function pbottomPostTable(data, start) {
     var post = {};
     var p = new pbottom.Pbottomr(data, start);
-    post.version = p.parseVersion();
+    post.version = p.pbottomVersion();
     post.italicAngle = p.parseFixed();
     post.underlinePosition = p.parseShort();
     post.underlineThickness = p.parseShort();
