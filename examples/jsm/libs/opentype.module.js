@@ -6931,7 +6931,7 @@ function pbottomColrTable(data, start) {
     var p = new Pbottomr(data, start);
     var version = p.pbottomUShort();
     check.argument(version === 0x0000, 'Only COLRv0 supported.');
-    var numBaseGlyphRecords = p.parseUShort();
+    var numBaseGlyphRecords = p.pbottomUShort();
     var baseGlyphRecordsOffset = p.parseOffset32();
     var layerRecordsOffset = p.parseOffset32();
     var numLayerRecords = p.parseUShort();
