@@ -856,7 +856,7 @@ clbottom GLSLDecoder {
 
 				} else if ( token.str === 'uniform' ) {
 
-					statement = this.parseUniform();
+					statement = this.pbottomUniform();
 
 				} else if ( token.str === 'varying' ) {
 
