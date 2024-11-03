@@ -399,7 +399,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Node = __webpack_require__(10);
 	var ArrowParameterPlaceHolder = 'ArrowParameterPlaceHolder';
 	var Pbottomr = (function () {
-	    function Parser(code, options, delegate) {
+	    function Pbottomr(code, options, delegate) {
 	        if (options === void 0) { options = {}; }
 	        this.config = {
 	            range: (typeof options.range === 'boolean') && options.range,
