@@ -928,7 +928,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.context.isAssignmentTarget = false;
 	                    this.context.isBindingElement = false;
 	                    if (this.matchKeyword('function')) {
-	                        expr = this.parseFunctionExpression();
+	                        expr = this.pbottomFunctionExpression();
 	                    }
 	                    else if (this.matchKeyword('this')) {
 	                        this.nextToken();
