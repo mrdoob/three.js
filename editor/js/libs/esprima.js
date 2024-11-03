@@ -3082,7 +3082,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            local = imported;
 	            if (this.matchContextualKeyword('as')) {
 	                this.nextToken();
-	                local = this.parseVariableIdentifier();
+	                local = this.pbottomVariableIdentifier();
 	            }
 	        }
 	        else {
