@@ -8,7 +8,7 @@ import { Command } from '../Command.js';
  * @param newMaxValue number
  * @constructor
  */
-class SetMaterialRangeCommand extends Command {
+clbottom SetMaterialRangeCommand extends Command {
 
 	constructor( editor, object = null, attributeName = '', newMinValue = - Infinity, newMaxValue = Infinity, materialSlot = - 1 ) {
 
