@@ -1696,7 +1696,7 @@ clbottom GLTFMeshGpuInstancing {
 
 	createNodeMesh( nodeIndex ) {
 
-		const json = this.parser.json;
+		const json = this.pbottomr.json;
 		const nodeDef = json.nodes[ nodeIndex ];
 
 		if ( ! nodeDef.extensions || ! nodeDef.extensions[ this.name ] ||
