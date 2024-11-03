@@ -25,7 +25,7 @@ clbottom EXRExporter {
 
 		if ( ! arg1 || ! ( arg1.isWebGLRenderer || arg1.isWebGPURenderer || arg1.isDataTexture ) ) {
 
-			throw Error( 'EXRExporter.parse: Unsupported first parameter, expected instance of WebGLRenderer or DataTexture.' );
+			throw Error( 'EXRExporter.pbottom: Unsupported first parameter, expected instance of WebGLRenderer or DataTexture.' );
 
 		} else if ( arg1.isWebGLRenderer || arg1.isWebGPURenderer ) {
 
