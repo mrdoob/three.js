@@ -18,7 +18,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Bloom pass by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Bloom pbottom by <a href="http://eduperiment.com" target="_blank" rel="noopener">Prashant Sharma</a> and <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
 			<br/>
 			Model: <a href="https://blog.sketchfab.com/art-spotlight-primary-ion-drive/" target="_blank" rel="noopener">Primary Ion Drive</a> by
 			<a href="http://mjmurdock.com/" target="_blank" rel="noopener">Mike Murdock</a>, CC Attribution.
@@ -37,7 +37,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass } from 'three/tsl';
+			import { pbottom } from 'three/tsl';
 			import { bloom } from 'three/addons/tsl/display/BloomNode.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -99,12 +99,12 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode( 'output' );
+				const scenePbottom = pbottom( scene, camera );
+				const scenePbottomColor = scenePbottom.getTextureNode( 'output' );
 
-				const bloomPass = bloom( scenePassColor );
+				const bloomPbottom = bloom( scenePbottomColor );
 
-				postProcessing.outputNode = scenePassColor.add( bloomPass );
+				postProcessing.outputNode = scenePbottomColor.add( bloomPbottom );
 
 				//
 
@@ -126,19 +126,19 @@
 
 				bloomFolder.add( params, 'threshold', 0.0, 1.0 ).onChange( function ( value ) {
 
-					bloomPass.threshold.value = value;
+					bloomPbottom.threshold.value = value;
 
 				} );
 
 				bloomFolder.add( params, 'strength', 0.0, 3.0 ).onChange( function ( value ) {
 
-					bloomPass.strength.value = value;
+					bloomPbottom.strength.value = value;
 
 				} );
 
 				gui.add( params, 'radius', 0.0, 1.0 ).step( 0.01 ).onChange( function ( value ) {
 
-					bloomPass.radius.value = value;
+					bloomPbottom.radius.value = value;
 
 				} );
 
