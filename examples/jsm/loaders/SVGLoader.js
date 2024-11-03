@@ -16,7 +16,7 @@ import {
 
 const COLOR_SPACE_SVG = SRGBColorSpace;
 
-class SVGLoader extends Loader {
+clbottom SVGLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -680,7 +680,7 @@ class SVGLoader extends Loader {
 						Object.entries( stylesheet.style ).filter( ( [ , v ] ) => v !== '' )
 					);
 
-					stylesheets[ selectorList[ j ] ] = Object.assign(
+					stylesheets[ selectorList[ j ] ] = Object.bottomign(
 						stylesheets[ selectorList[ j ] ] || {},
 						definitions
 					);
@@ -973,20 +973,20 @@ class SVGLoader extends Loader {
 
 		function parseStyle( node, style ) {
 
-			style = Object.assign( {}, style ); // clone style
+			style = Object.bottomign( {}, style ); // clone style
 
 			let stylesheetStyles = {};
 
-			if ( node.hasAttribute( 'class' ) ) {
+			if ( node.hasAttribute( 'clbottom' ) ) {
 
-				const classSelectors = node.getAttribute( 'class' )
+				const clbottomSelectors = node.getAttribute( 'clbottom' )
 					.split( /\s/ )
 					.filter( Boolean )
 					.map( i => i.trim() );
 
-				for ( let i = 0; i < classSelectors.length; i ++ ) {
+				for ( let i = 0; i < clbottomSelectors.length; i ++ ) {
 
-					stylesheetStyles = Object.assign( stylesheetStyles, stylesheets[ '.' + classSelectors[ i ] ] );
+					stylesheetStyles = Object.bottomign( stylesheetStyles, stylesheets[ '.' + clbottomSelectors[ i ] ] );
 
 				}
 
@@ -994,7 +994,7 @@ class SVGLoader extends Loader {
 
 			if ( node.hasAttribute( 'id' ) ) {
 
-				stylesheetStyles = Object.assign( stylesheetStyles, stylesheets[ '#' + node.getAttribute( 'id' ) ] );
+				stylesheetStyles = Object.bottomign( stylesheetStyles, stylesheets[ '#' + node.getAttribute( 'id' ) ] );
 
 			}
 
@@ -1918,7 +1918,7 @@ class SVGLoader extends Loader {
 
 	static createShapes( shapePath ) {
 
-		// Param shapePath: a shapepath as returned by the parse function of this class
+		// Param shapePath: a shapepath as returned by the parse function of this clbottom
 		// Returns Shape object
 
 		const BIGNUMBER = 999999999;
@@ -1933,7 +1933,7 @@ class SVGLoader extends Loader {
 			BEYOND: 6
 		};
 
-		const classifyResult = {
+		const clbottomifyResult = {
 			loc: IntersectionLocationType.ORIGIN,
 			t: 0
 		};
@@ -1967,18 +1967,18 @@ class SVGLoader extends Loader {
 				//check if endpoints of edge2 (b0-b1) lies on edge1 (a0-a1)
 				for ( let i = 0; i < 2; i ++ ) {
 
-					classifyPoint( i === 0 ? b0 : b1, a0, a1 );
+					clbottomifyPoint( i === 0 ? b0 : b1, a0, a1 );
 					//find position of this endpoints relatively to edge1
-					if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
+					if ( clbottomifyResult.loc == IntersectionLocationType.ORIGIN ) {
 
 						const point = ( i === 0 ? b0 : b1 );
-						return { x: point.x, y: point.y, t: classifyResult.t };
+						return { x: point.x, y: point.y, t: clbottomifyResult.t };
 
-					} else if ( classifyResult.loc == IntersectionLocationType.BETWEEN ) {
+					} else if ( clbottomifyResult.loc == IntersectionLocationType.BETWEEN ) {
 
-						const x = + ( ( x1 + classifyResult.t * ( x2 - x1 ) ).toPrecision( 10 ) );
-						const y = + ( ( y1 + classifyResult.t * ( y2 - y1 ) ).toPrecision( 10 ) );
-						return { x: x, y: y, t: classifyResult.t, };
+						const x = + ( ( x1 + clbottomifyResult.t * ( x2 - x1 ) ).toPrecision( 10 ) );
+						const y = + ( ( y1 + clbottomifyResult.t * ( y2 - y1 ) ).toPrecision( 10 ) );
+						return { x: x, y: y, t: clbottomifyResult.t, };
 
 					}
 
@@ -1992,12 +1992,12 @@ class SVGLoader extends Loader {
 
 				for ( let i = 0; i < 2; i ++ ) {
 
-					classifyPoint( i === 0 ? b0 : b1, a0, a1 );
+					clbottomifyPoint( i === 0 ? b0 : b1, a0, a1 );
 
-					if ( classifyResult.loc == IntersectionLocationType.ORIGIN ) {
+					if ( clbottomifyResult.loc == IntersectionLocationType.ORIGIN ) {
 
 						const point = ( i === 0 ? b0 : b1 );
-						return { x: point.x, y: point.y, t: classifyResult.t };
+						return { x: point.x, y: point.y, t: clbottomifyResult.t };
 
 					}
 
@@ -2011,7 +2011,7 @@ class SVGLoader extends Loader {
 
 		}
 
-		function classifyPoint( p, edgeStart, edgeEnd ) {
+		function clbottomifyPoint( p, edgeStart, edgeEnd ) {
 
 			const ax = edgeEnd.x - edgeStart.x;
 			const ay = edgeEnd.y - edgeStart.y;
@@ -2021,30 +2021,30 @@ class SVGLoader extends Loader {
 
 			if ( ( p.x === edgeStart.x ) && ( p.y === edgeStart.y ) ) {
 
-				classifyResult.loc = IntersectionLocationType.ORIGIN;
-				classifyResult.t = 0;
+				clbottomifyResult.loc = IntersectionLocationType.ORIGIN;
+				clbottomifyResult.t = 0;
 				return;
 
 			}
 
 			if ( ( p.x === edgeEnd.x ) && ( p.y === edgeEnd.y ) ) {
 
-				classifyResult.loc = IntersectionLocationType.DESTINATION;
-				classifyResult.t = 1;
+				clbottomifyResult.loc = IntersectionLocationType.DESTINATION;
+				clbottomifyResult.t = 1;
 				return;
 
 			}
 
 			if ( sa < - Number.EPSILON ) {
 
-				classifyResult.loc = IntersectionLocationType.LEFT;
+				clbottomifyResult.loc = IntersectionLocationType.LEFT;
 				return;
 
 			}
 
 			if ( sa > Number.EPSILON ) {
 
-				classifyResult.loc = IntersectionLocationType.RIGHT;
+				clbottomifyResult.loc = IntersectionLocationType.RIGHT;
 				return;
 
 
@@ -2052,14 +2052,14 @@ class SVGLoader extends Loader {
 
 			if ( ( ( ax * bx ) < 0 ) || ( ( ay * by ) < 0 ) ) {
 
-				classifyResult.loc = IntersectionLocationType.BEHIND;
+				clbottomifyResult.loc = IntersectionLocationType.BEHIND;
 				return;
 
 			}
 
 			if ( ( Math.sqrt( ax * ax + ay * ay ) ) < ( Math.sqrt( bx * bx + by * by ) ) ) {
 
-				classifyResult.loc = IntersectionLocationType.BEYOND;
+				clbottomifyResult.loc = IntersectionLocationType.BEYOND;
 				return;
 
 			}
@@ -2076,8 +2076,8 @@ class SVGLoader extends Loader {
 
 			}
 
-			classifyResult.loc = IntersectionLocationType.BETWEEN;
-			classifyResult.t = t;
+			clbottomifyResult.loc = IntersectionLocationType.BETWEEN;
+			clbottomifyResult.t = t;
 
 		}
 
