@@ -5713,7 +5713,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return attributes;
 	    };
-	    JSXParser.prototype.parseJSXOpeningElement = function () {
+	    JSXPbottomr.prototype.parseJSXOpeningElement = function () {
 	        var node = this.createJSXNode();
 	        this.expectJSX('<');
 	        var name = this.parseJSXElementName();
