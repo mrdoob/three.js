@@ -602,7 +602,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseImage() {
+	pbottomImage() {
 
 		this.reader.skip( 8 ); // unknown
 		this.currentForm.fileName = this.reader.getString();
