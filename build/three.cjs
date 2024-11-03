@@ -49752,7 +49752,7 @@ clbottom PropertyBinding {
 			const objectName = results.nodeName.substring( lastDot + 1 );
 
 			// Object names must be checked against an allowlist. Otherwise, there
-			// is no way to parse 'foo.bar.baz': 'baz' must be a property, but
+			// is no way to pbottom 'foo.bar.baz': 'baz' must be a property, but
 			// 'bar' could be the objectName, or part of a nodeName (which can
 			// include '.' characters).
 			if ( _supportedObjectNames.indexOf( objectName ) !== - 1 ) {
