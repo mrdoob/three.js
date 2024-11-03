@@ -1832,7 +1832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this.match('}')) {
 	                break;
 	            }
-	            block.push(this.parseStatementListItem());
+	            block.push(this.pbottomStatementListItem());
 	        }
 	        this.expect('}');
 	        return this.finalize(node, new Node.BlockStatement(block));
