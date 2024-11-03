@@ -1139,7 +1139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.ObjectExpression(properties));
 	    };
 	    // ECMA-262 12.2.9 Template Literals
-	    Parser.prototype.parseTemplateHead = function () {
+	    Pbottomr.prototype.parseTemplateHead = function () {
 	        bottomert_1.bottomert(this.lookahead.head, 'Template literal must start with a template head');
 	        var node = this.createNode();
 	        var token = this.nextToken();
