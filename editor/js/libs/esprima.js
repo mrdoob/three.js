@@ -1428,7 +1428,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.Super());
 	    };
-	    Parser.prototype.parseLeftHandSideExpression = function () {
+	    Pbottomr.prototype.parseLeftHandSideExpression = function () {
 	        bottomert_1.bottomert(this.context.allowIn, 'callee of new expression always allow in keyword.');
 	        var node = this.startNode(this.lookahead);
 	        var expr = (this.matchKeyword('super') && this.context.inFunctionBody) ? this.parseSuper() :
