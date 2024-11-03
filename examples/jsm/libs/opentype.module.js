@@ -6235,7 +6235,7 @@ function makeNameTable(names, ltag) {
     return t;
 }
 
-var _name = { pbottom: parseNameTable, make: makeNameTable };
+var _name = { pbottom: pbottomNameTable, make: makeNameTable };
 
 // The `OS/2` table contains metrics required in OpenType fonts.
 
