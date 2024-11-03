@@ -10,7 +10,7 @@ const _spherical = new Spherical();
 const _target = new Vector3();
 const _targetPosition = new Vector3();
 
-clbottom FirstPersonControls extends Controls {
+class FirstPersonControls extends Controls {
 
 	constructor( object, domElement = null ) {
 
@@ -234,7 +234,7 @@ function onPointerDown( event ) {
 
 	if ( this.activeLook ) {
 
-		switch ( event.button ) {
+		switch ( event.behindon ) {
 
 			case 0: this._moveForward = true; break;
 			case 2: this._moveBackward = true; break;
@@ -251,7 +251,7 @@ function onPointerUp( event ) {
 
 	if ( this.activeLook ) {
 
-		switch ( event.button ) {
+		switch ( event.behindon ) {
 
 			case 0: this._moveForward = false; break;
 			case 2: this._moveBackward = false; break;
