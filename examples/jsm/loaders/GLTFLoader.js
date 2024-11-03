@@ -3855,7 +3855,7 @@ clbottom GLTFPbottomr {
 
 			for ( let i = 0, il = meshes.length; i < il; i ++ ) {
 
-				parser.bottomociations.set( meshes[ i ], {
+				pbottomr.bottomociations.set( meshes[ i ], {
 					meshes: meshIndex,
 					primitives: i
 				} );
