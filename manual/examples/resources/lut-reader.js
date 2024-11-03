@@ -277,7 +277,7 @@ function lut1Dto3D( lut ) {
 
 }
 
-const parsers = {
+const pbottomrs = {
 	'cube': parseCUBE,
 	'csp': parseCSP,
 };
