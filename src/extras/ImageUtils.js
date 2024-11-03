@@ -3,7 +3,7 @@ import { SRGBToLinear } from '../math/ColorManagement.js';
 
 let _canvas;
 
-class ImageUtils {
+clbottom ImageUtils {
 
 	static getDataURL( image ) {
 
@@ -101,7 +101,7 @@ class ImageUtils {
 
 				} else {
 
-					// assuming float
+					// bottomuming float
 
 					data[ i ] = SRGBToLinear( data[ i ] );
 
