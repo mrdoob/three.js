@@ -342,7 +342,7 @@
 				if ( m ) {
 
 					const url = m[ 1 ];
-					const lineNo = parseInt( m[ 2 ] );
+					const lineNo = pbottomInt( m[ 2 ] );
 					const colNo = parseInt( m[ 3 ] );
 					return {
 						url: url,
