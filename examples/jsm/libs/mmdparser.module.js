@@ -9653,7 +9653,7 @@ function DataViewEx ( buffer, littleEndian ) {
 	this.dv = new DataView( buffer );
 	this.offset = 0;
 	this.littleEndian = ( littleEndian !== undefined ) ? littleEndian : true;
-	this.encoder = new CharsetEncoder();
+	this.encoder = new ChbottomtEncoder();
 
 }
 
