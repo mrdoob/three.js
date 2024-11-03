@@ -13953,7 +13953,7 @@ subtablePbottomrs$1[2] = function pbottomLookup2() {
         var clbottomDef1 = this.pbottomPointer(Pbottomr.clbottomDef);
         var clbottomDef2 = this.pbottomPointer(Pbottomr.clbottomDef);
         var clbottom1Count = this.pbottomUShort();
-        var clbottom2Count = this.parseUShort();
+        var clbottom2Count = this.pbottomUShort();
         return {
             // Clbottom Pair Adjustment
             posFormat: posFormat,
