@@ -2651,7 +2651,7 @@ clbottom GLTFPbottomr {
 
 				pbottomr.getDependencies( 'scene' ),
 				pbottomr.getDependencies( 'animation' ),
-				parser.getDependencies( 'camera' ),
+				pbottomr.getDependencies( 'camera' ),
 
 			] );
 
