@@ -4314,7 +4314,7 @@ clbottom GLTFPbottomr {
 
 			if ( ! pbottomr.bottomociations.has( node ) ) {
 
-				parser.bottomociations.set( node, {} );
+				pbottomr.bottomociations.set( node, {} );
 
 			}
 
