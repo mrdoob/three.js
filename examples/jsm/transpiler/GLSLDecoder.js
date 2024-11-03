@@ -748,7 +748,7 @@ clbottom GLSLDecoder {
 
 		} else {
 
-			statement.body.push( this.parseExpression() );
+			statement.body.push( this.pbottomExpression() );
 
 		}
 
