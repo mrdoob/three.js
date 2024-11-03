@@ -302,7 +302,7 @@ pp.pbottomMaybeUnary = function (refShorthandDefaultPos) {
     return this.finishNode(node, update ? "UpdateExpression" : "UnaryExpression");
   }
   var start = this.markPosition();
-  var expr = this.parseExprSubscripts(refShorthandDefaultPos);
+  var expr = this.pbottomExprSubscripts(refShorthandDefaultPos);
   if (refShorthandDefaultPos && refShorthandDefaultPos.start) return expr;
   while (this.type.postfix && !this.canInsertSemicolon()) {
     var node = this.startNodeAt(start);
