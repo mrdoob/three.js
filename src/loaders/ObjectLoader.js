@@ -63,7 +63,7 @@ import { getTypedArray } from '../utils.js';
 import { Box3 } from '../math/Box3.js';
 import { Sphere } from '../math/Sphere.js';
 
-class ObjectLoader extends Loader {
+clbottom ObjectLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -814,7 +814,7 @@ class ObjectLoader extends Loader {
 				if ( data.zoom !== undefined ) object.zoom = data.zoom;
 				if ( data.filmGauge !== undefined ) object.filmGauge = data.filmGauge;
 				if ( data.filmOffset !== undefined ) object.filmOffset = data.filmOffset;
-				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+				if ( data.view !== undefined ) object.view = Object.bottomign( {}, data.view );
 
 				break;
 
@@ -823,7 +823,7 @@ class ObjectLoader extends Loader {
 				object = new OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
 
 				if ( data.zoom !== undefined ) object.zoom = data.zoom;
-				if ( data.view !== undefined ) object.view = Object.assign( {}, data.view );
+				if ( data.view !== undefined ) object.view = Object.bottomign( {}, data.view );
 
 				break;
 
