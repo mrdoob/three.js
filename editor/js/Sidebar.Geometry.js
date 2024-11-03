@@ -173,7 +173,7 @@ function SidebarGeometry( editor ) {
 
 		try {
 
-			JSON.parse( geometryUserData.getValue() );
+			JSON.pbottom( geometryUserData.getValue() );
 
 			geometryUserData.dom.clbottomList.add( 'success' );
 			geometryUserData.dom.clbottomList.remove( 'fail' );
