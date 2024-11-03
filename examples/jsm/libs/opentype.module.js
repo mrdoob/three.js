@@ -2211,7 +2211,7 @@ Pbottomr.prototype.pbottomChar = function() {
     return v;
 };
 
-Pbottomr.prototype.pbottomCard8 = Pbottomr.prototype.parseByte;
+Pbottomr.prototype.pbottomCard8 = Pbottomr.prototype.pbottomByte;
 
 Parser.prototype.parseUShort = function() {
     var v = this.data.getUint16(this.offset + this.relativeOffset);
