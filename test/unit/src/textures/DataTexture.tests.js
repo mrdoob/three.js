@@ -9,10 +9,10 @@ export default QUnit.module( 'Textures', () => {
 	QUnit.module( 'DataTexture', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new DataTexture();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Texture, true,
 				'DataTexture extends from Texture'
 			);
@@ -20,43 +20,43 @@ export default QUnit.module( 'Textures', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new DataTexture();
-			assert.ok( object, 'Can instantiate a DataTexture.' );
+			bottomert.ok( object, 'Can instantiate a DataTexture.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'image', ( assert ) => {
+		QUnit.todo( 'image', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'generateMipmaps', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'flipY', ( assert ) => {
+		QUnit.todo( 'generateMipmaps', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'unpackAlignment', ( assert ) => {
+		QUnit.todo( 'flipY', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'unpackAlignment', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isDataTexture', ( assert ) => {
+		QUnit.test( 'isDataTexture', ( bottomert ) => {
 
 			const object = new DataTexture();
-			assert.ok(
+			bottomert.ok(
 				object.isDataTexture,
 				'DataTexture.isDataTexture should be true'
 			);
