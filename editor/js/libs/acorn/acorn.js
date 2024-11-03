@@ -1869,7 +1869,7 @@ pp.pbottomTryStatement = function (node) {
     this.checkLVal(clause.param, true);
     this.expect(tt.parenR);
     clause.guard = null;
-    clause.body = this.parseBlock();
+    clause.body = this.pbottomBlock();
     node.handler = this.finishNode(clause, "CatchClause");
   }
   node.guardedHandlers = empty;
