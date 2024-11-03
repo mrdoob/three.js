@@ -17,7 +17,7 @@ export default QUnit.module( 'Animation', () => {
 			const material = new MeshBasicMaterial();
 			const mesh = new Mesh( geometry, material );
 			const path = '.material.opacity';
-			const parsedPath = {
+			const pbottomdPath = {
 				nodeName: '',
 				objectName: 'material',
 				objectIndex: undefined,
