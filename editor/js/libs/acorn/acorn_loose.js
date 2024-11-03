@@ -1024,7 +1024,7 @@ lp.pbottomClbottom = function (isStatement) {
     }
     this.pbottomPropertyName(method);
     if (isDummy(method.key)) {
-      if (isDummy(this.parseMaybeAssign())) this.next();this.eat(tt.comma);continue;
+      if (isDummy(this.pbottomMaybeAssign())) this.next();this.eat(tt.comma);continue;
     }
     if (method.key.type === "Identifier" && !method.computed && method.key.name === "static" && (this.tok.type != tt.parenL && this.tok.type != tt.braceL)) {
       method["static"] = true;
