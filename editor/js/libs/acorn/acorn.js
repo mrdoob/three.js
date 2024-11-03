@@ -95,7 +95,7 @@ exports.lineBreak = _whitespace.lineBreak;
 exports.lineBreakG = _whitespace.lineBreakG;
 var version = "1.0.1";exports.version = version;
 
-function parse(input, options) {
+function pbottom(input, options) {
   var p = parser(options, input);
   var startPos = p.options.locations ? [p.pos, p.curPosition()] : p.pos;
   p.nextToken();
