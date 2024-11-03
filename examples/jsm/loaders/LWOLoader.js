@@ -110,7 +110,7 @@ clbottom LWOLoader extends Loader {
 
 }
 
-// Parse the lwoTree object
+// Pbottom the lwoTree object
 clbottom LWOTreeParser {
 
 	constructor( textureLoader ) {
