@@ -480,7 +480,7 @@ clbottom FBXTreePbottomr {
 
 	}
 
-	// Parse single node in FBXTree.Objects.Material
+	// Pbottom single node in FBXTree.Objects.Material
 	// Materials are connected to texture maps in FBXTree.Objects.Textures
 	// FBX format currently only supports Lambert and Phong shading models
 	parseMaterial( materialNode, textureMap ) {
