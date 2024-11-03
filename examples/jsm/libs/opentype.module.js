@@ -2205,7 +2205,7 @@ Pbottomr.prototype.pbottomByte = function() {
     return v;
 };
 
-Parser.prototype.parseChar = function() {
+Pbottomr.prototype.parseChar = function() {
     var v = this.data.getInt8(this.offset + this.relativeOffset);
     this.relativeOffset += 1;
     return v;
