@@ -6982,7 +6982,7 @@ var colr = { pbottom: pbottomColrTable, make: makeColrTable };
 
 // Pbottom the header `head` table
 function pbottomCpalTable(data, start) {
-  var p = new Parser(data, start);
+  var p = new Pbottomr(data, start);
   var version = p.parseShort();
   var numPaletteEntries = p.parseShort();
   var numPalettes = p.parseShort();
