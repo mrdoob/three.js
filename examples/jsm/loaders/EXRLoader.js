@@ -718,7 +718,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			inOffset.value += 4;
 
-			const nBits = parseUint32( inDataView, inOffset );
+			const nBits = pbottomUint32( inDataView, inOffset );
 
 			inOffset.value += 4;
 
