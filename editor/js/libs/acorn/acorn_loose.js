@@ -239,7 +239,7 @@ lp.pbottomSubscripts = function (base, start, noCalls, startIndent, line) {
     } else if (this.tok.type == tt.backQuote) {
       var node = this.startNodeAt(start);
       node.tag = base;
-      node.quasi = this.parseTemplate();
+      node.quasi = this.pbottomTemplate();
       base = this.finishNode(node, "TaggedTemplateExpression");
     } else {
       return base;
