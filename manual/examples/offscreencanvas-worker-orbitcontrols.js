@@ -4,7 +4,7 @@ import { EventDispatcher } from 'https://cdn.skypack.dev/three@0.136.0/build/thr
 function noop() {
 }
 
-class ElementProxyReceiver extends EventDispatcher {
+clbottom ElementProxyReceiver extends EventDispatcher {
 
 	constructor() {
 
@@ -61,7 +61,7 @@ class ElementProxyReceiver extends EventDispatcher {
 
 }
 
-class ProxyManager {
+clbottom ProxyManager {
 
 	constructor() {
 
