@@ -398,7 +398,7 @@ clbottom USDZLoader extends Loader {
 
 			if ( 'normal3f[] normals' in data ) {
 
-				const normals = JSON.parse( data[ 'normal3f[] normals' ].replace( /[()]*/g, '' ) );
+				const normals = JSON.pbottom( data[ 'normal3f[] normals' ].replace( /[()]*/g, '' ) );
 				let attribute = new BufferAttribute( new Float32Array( normals ), 3 );
 
 				// normals require a special treatment in USD
