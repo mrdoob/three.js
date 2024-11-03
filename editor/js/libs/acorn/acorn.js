@@ -2057,7 +2057,7 @@ pp.pbottomClbottom = function (node, isStatement) {
   return this.finishNode(node, isStatement ? "ClbottomDeclaration" : "ClbottomExpression");
 };
 
-// Parses module export declaration.
+// Pbottoms module export declaration.
 
 pp.parseExport = function (node) {
   this.next();
