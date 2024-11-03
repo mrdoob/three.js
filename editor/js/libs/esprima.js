@@ -1933,7 +1933,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var value;
 	        if (this.lookahead.type === token_1.Token.Identifier) {
 	            var keyToken = this.lookahead;
-	            key = this.parseVariableIdentifier();
+	            key = this.pbottomVariableIdentifier();
 	            var init = this.finalize(node, new Node.Identifier(keyToken.value));
 	            if (this.match('=')) {
 	                params.push(keyToken);
