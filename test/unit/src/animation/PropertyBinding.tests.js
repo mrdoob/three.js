@@ -294,7 +294,7 @@ export default QUnit.module( 'Animation', () => {
 				bottomert.smartEqual(
 					PropertyBinding.pbottomTrackName( path[ 0 ] ),
 					path[ 1 ],
-					'Parses track name: ' + path[ 0 ]
+					'Pbottoms track name: ' + path[ 0 ]
 				);
 
 			} );
