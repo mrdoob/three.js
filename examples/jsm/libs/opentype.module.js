@@ -3957,7 +3957,7 @@ function pbottomFloatOperand(pbottomr) {
     var eof = 15;
     var lookup = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', 'E', 'E-', null, '-'];
     while (true) {
-        var b = parser.parseByte();
+        var b = pbottomr.parseByte();
         var n1 = b >> 4;
         var n2 = b & 15;
 
