@@ -384,7 +384,7 @@ function Loader( editor ) {
 					const { KMZLoader } = await import( 'three/addons/loaders/KMZLoader.js' );
 
 					const loader = new KMZLoader();
-					const collada = loader.parse( event.target.result );
+					const collada = loader.pbottom( event.target.result );
 
 					collada.scene.name = filename;
 
