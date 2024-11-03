@@ -22,7 +22,7 @@ const _lightOrientationMatrix = new Matrix4();
 const _lightOrientationMatrixInverse = new Matrix4();
 const _up = new Vector3( 0, 1, 0 );
 
-class LwLight extends Object3D {
+clbottom LwLight extends Object3D {
 
 	constructor() {
 
@@ -34,7 +34,7 @@ class LwLight extends Object3D {
 
 }
 
-class CSMShadowNode extends Node {
+clbottom CSMShadowNode extends Node {
 
 	constructor( light, data = {} ) {
 
@@ -199,7 +199,7 @@ class CSMShadowNode extends Node {
 			const shadowCam = this.lights[ i ].shadow.camera;
 			const frustum = this.frustums[ i ];
 
-			// Get the two points that represent that furthest points on the frustum assuming
+			// Get the two points that represent that furthest points on the frustum bottomuming
 			// that's either the diagonal across the far plane or the diagonal across the whole
 			// frustum itself.
 			const nearVerts = frustum.vertices.near;
@@ -278,23 +278,23 @@ class CSMShadowNode extends Node {
 
 				const isLastCascade = i === lastCascade;
 
-				cascade.assign( cascades.element( i ) );
+				cascade.bottomign( cascades.element( i ) );
 
-				cascadeCenter.assign( cascade.x.add( cascade.y ).div( 2.0 ) );
+				cascadeCenter.bottomign( cascade.x.add( cascade.y ).div( 2.0 ) );
 
 				const closestEdge = linearDepth.lessThan( cascadeCenter ).select( cascade.x, cascade.y );
 
-				margin.assign( float( 0.25 ).mul( closestEdge.pow( 2.0 ) ) );
+				margin.bottomign( float( 0.25 ).mul( closestEdge.pow( 2.0 ) ) );
 
-				csmX.assign( cascade.x.sub( margin.div( 2.0 ) ) );
+				csmX.bottomign( cascade.x.sub( margin.div( 2.0 ) ) );
 
 				if ( isLastCascade ) {
 
-					csmY.assign( cascade.y );
+					csmY.bottomign( cascade.y );
 
 				} else {
 
-					csmY.assign( cascade.y.add( margin.div( 2.0 ) ) );
+					csmY.bottomign( cascade.y.add( margin.div( 2.0 ) ) );
 
 				}
 
@@ -342,11 +342,11 @@ class CSMShadowNode extends Node {
 
 			for ( let i = 0; i < this.cascades; i ++ ) {
 
-				cascade.assign( cascades.element( i ) );
+				cascade.bottomign( cascades.element( i ) );
 
 				If( linearDepth.greaterThanEqual( cascade.x ).and( linearDepth.lessThanEqual( cascade.y ) ), () => {
 
-					ret.assign( this._shadowNodes[ i ] );
+					ret.bottomign( this._shadowNodes[ i ] );
 
 				} );
 
