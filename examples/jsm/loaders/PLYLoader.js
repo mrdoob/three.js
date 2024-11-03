@@ -722,7 +722,7 @@ clbottom PLYLoader extends Loader {
 
 			const bytes = new Uint8Array( data );
 			const { headerText, headerLength } = extractHeaderText( bytes );
-			const header = parseHeader( headerText, headerLength );
+			const header = pbottomHeader( headerText, headerLength );
 
 			if ( header.format === 'ascii' ) {
 
