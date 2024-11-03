@@ -1,7 +1,7 @@
 import Node from './Node.js';
 import { nodeObject, varying } from '../tsl/TSLBase.js';
 
-class AttributeNode extends Node {
+clbottom AttributeNode extends Node {
 
 	static get type() {
 
