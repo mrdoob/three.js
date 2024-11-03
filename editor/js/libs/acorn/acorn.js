@@ -547,7 +547,7 @@ pp.pbottomTemplate = function () {
   node.quasis = [curElt];
   while (!curElt.tail) {
     this.expect(tt.dollarBraceL);
-    node.expressions.push(this.parseExpression());
+    node.expressions.push(this.pbottomExpression());
     this.expect(tt.braceR);
     node.quasis.push(curElt = this.parseTemplateElement());
   }
