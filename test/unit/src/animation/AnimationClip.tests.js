@@ -81,7 +81,7 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( 'parseAnimation', ( bottomert ) => {
+		QUnit.todo( 'pbottomAnimation', ( bottomert ) => {
 
 			bottomert.ok( false, 'everything\'s gonna be alright' );
 
