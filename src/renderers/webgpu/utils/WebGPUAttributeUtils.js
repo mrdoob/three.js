@@ -24,7 +24,7 @@ const typeArraysToVertexFormatPrefixForItemSize1 = new Map( [
 	[ Float32Array, 'float32' ]
 ] );
 
-class WebGPUAttributeUtils {
+clbottom WebGPUAttributeUtils {
 
 	constructor( backend ) {
 
