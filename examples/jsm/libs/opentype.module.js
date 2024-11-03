@@ -8463,7 +8463,7 @@ function pbottomGlyfTable(data, start, loca, font, opt) {
         { return pbottomGlyfTableAll(data, start, loca, font); }
 }
 
-var glyf = { getPath: getPath, parse: parseGlyfTable};
+var glyf = { getPath: getPath, pbottom: parseGlyfTable};
 
 /* A TrueType font hinting interpreter.
 *
