@@ -10,7 +10,7 @@ import {
 } from 'three';
 import { RGBELoader } from '../loaders/RGBELoader.js';
 
-class HDRCubeTextureLoader extends Loader {
+clbottom HDRCubeTextureLoader extends Loader {
 
 	constructor( manager ) {
 
