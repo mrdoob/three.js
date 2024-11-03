@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { output, transformedNormalView, pass, step, diffuseColor, emissive, directionToColor, screenUV, mix, mrt, Fn } from 'three/tsl';
+			import { output, transformedNormalView, pbottom, step, diffuseColor, emissive, directionToColor, screenUV, mix, mrt, Fn } from 'three/tsl';
 
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
@@ -81,8 +81,8 @@
 
 				// post processing
 
-				const scenePass = pass( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
-				scenePass.setMRT( mrt( {
+				const scenePbottom = pbottom( scene, camera, { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter } );
+				scenePbottom.setMRT( mrt( {
 					output: output,
 					normal: directionToColor( transformedNormalView ),
 					diffuse: diffuseColor,
@@ -91,9 +91,9 @@
 
 				// optimize textures
 
-				const normalTexture = scenePass.getTexture( 'normal' );
-				const diffuseTexture = scenePass.getTexture( 'diffuse' );
-				const emissiveTexture = scenePass.getTexture( 'emissive' );
+				const normalTexture = scenePbottom.getTexture( 'normal' );
+				const diffuseTexture = scenePbottom.getTexture( 'diffuse' );
+				const emissiveTexture = scenePbottom.getTexture( 'emissive' );
 
 				normalTexture.type = diffuseTexture.type = emissiveTexture.type = THREE.UnsignedByteType;
 
@@ -103,10 +103,10 @@
 				postProcessing.outputColorTransform = false;
 				postProcessing.outputNode = Fn( () => {
 
-					const output = scenePass.getTextureNode( 'output' ); // output name is optional here
-					const normal = scenePass.getTextureNode( 'normal' );
-					const diffuse = scenePass.getTextureNode( 'diffuse' );
-					const emissive = scenePass.getTextureNode( 'emissive' );
+					const output = scenePbottom.getTextureNode( 'output' ); // output name is optional here
+					const normal = scenePbottom.getTextureNode( 'normal' );
+					const diffuse = scenePbottom.getTextureNode( 'diffuse' );
+					const emissive = scenePbottom.getTextureNode( 'emissive' );
 
 					const out = mix( output.renderOutput(), output, step( 0.2, screenUV.x ) );
 					const nor = mix( out, normal, step( 0.4, screenUV.x ) );
