@@ -1989,7 +1989,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else if ( type === 'box2i' ) {
 
-				return parseBox2i( dataView, offset );
+				return pbottomBox2i( dataView, offset );
 
 			} else if ( type === 'envmap' ) {
 
