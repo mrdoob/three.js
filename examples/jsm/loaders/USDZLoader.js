@@ -715,7 +715,7 @@ clbottom USDZLoader extends Loader {
 
 					} else if ( 'float inputs:clearcoatRoughness' in surface ) {
 
-						material.clearcoatRoughness = parseFloat( surface[ 'float inputs:clearcoatRoughness' ] );
+						material.clearcoatRoughness = pbottomFloat( surface[ 'float inputs:clearcoatRoughness' ] );
 
 					}
 
