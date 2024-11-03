@@ -9,10 +9,10 @@ export default QUnit.module( 'Objects', () => {
 	QUnit.module( 'InstancedMesh', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new InstancedMesh();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Mesh, true,
 				'InstancedMesh extends from Mesh'
 			);
@@ -20,96 +20,96 @@ export default QUnit.module( 'Objects', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new InstancedMesh();
-			assert.ok( object, 'Can instantiate a InstancedMesh.' );
+			bottomert.ok( object, 'Can instantiate a InstancedMesh.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'instanceMatrix', ( assert ) => {
+		QUnit.todo( 'instanceMatrix', ( bottomert ) => {
 
 			// InstancedBufferAttribute
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'instanceColor', ( assert ) => {
+		QUnit.todo( 'instanceColor', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'count', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'frustumCulled', ( assert ) => {
+		QUnit.todo( 'count', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'frustumCulled', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC STUFF
-		QUnit.test( 'isInstancedMesh', ( assert ) => {
+		QUnit.test( 'isInstancedMesh', ( bottomert ) => {
 
 			const object = new InstancedMesh();
-			assert.ok(
+			bottomert.ok(
 				object.isInstancedMesh,
 				'InstancedMesh.isInstancedMesh should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'getColorAt', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'getMatrixAt', ( assert ) => {
+		QUnit.todo( 'getColorAt', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'raycast', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'setColorAt', ( assert ) => {
+		QUnit.todo( 'getMatrixAt', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'setMatrixAt', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'updateMorphTargets', ( assert ) => {
+		QUnit.todo( 'raycast', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setColorAt', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'setMatrixAt', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'updateMorphTargets', ( bottomert ) => {
 
 			// signature defined, no implementation
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.test( 'dispose', ( assert ) => {
+		QUnit.test( 'dispose', ( bottomert ) => {
 
-			assert.expect( 0 );
+			bottomert.expect( 0 );
 
 			const object = new InstancedMesh();
 			object.dispose();
