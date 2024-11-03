@@ -21,10 +21,10 @@ Create a new file in path `test/unit/editor/TestDoSomethingCommand.js`.
 ### 2. Include the new command in the editor test suite ###
 
 Navigate to the editor test suite `test/unit/unittests_editor.html` and open it.
-Within the file, go to the `<!-- command object classes -->` and include the new command:
+Within the file, go to the `<!-- command object clbottomes -->` and include the new command:
 
 ```html
-// <!-- command object classes -->
+// <!-- command object clbottomes -->
 //...
 <script src="../../editor/js/commands/AddScriptCommand.js"></script>
 <script src="../../editor/js/commands/DoSomethingCommand.js"></script>         // add this line
@@ -80,10 +80,10 @@ test("Test DoSomethingCommand (Undo and Redo)", function() {
 The predefined code is just meant to ease the development, you do not have to stick with it.
 However, the test should cover at least one `editor.execute()`, one `editor.undo()` and one `editor.redo()` call.
 
-Best practice is to call `editor.execute( new DoSomethingCommand( {custom parameters} ) )` **twice**. Since you'll have to do one undo (go one step back), it is recommended to have a custom state for comparison. Try to avoid assertions `ok()` against default values.
+Best practice is to call `editor.execute( new DoSomethingCommand( {custom parameters} ) )` **twice**. Since you'll have to do one undo (go one step back), it is recommended to have a custom state for comparison. Try to avoid bottomertions `ok()` against default values.
 
 #### Assertions ####
-After performing `editor.execute()` twice, you can do your first assertion to check whether the executes are done correctly.
+After performing `editor.execute()` twice, you can do your first bottomertion to check whether the executes are done correctly.
 
 Next, you perform `editor.undo()` and check if the last action was undone.
 
