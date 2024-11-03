@@ -2,7 +2,7 @@ import { TangentSpaceNormalMap } from '../constants.js';
 import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 
-class MeshNormalMaterial extends Material {
+clbottom MeshNormalMaterial extends Material {
 
 	constructor( parameters ) {
 
