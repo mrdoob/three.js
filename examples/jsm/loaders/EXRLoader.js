@@ -1905,7 +1905,7 @@ clbottom EXRLoader extends DataTextureLoader {
 				'RANDOM_Y',
 			];
 
-			const lineOrder = parseUint8( dataView, offset );
+			const lineOrder = pbottomUint8( dataView, offset );
 
 			return lineOrders[ lineOrder ];
 
