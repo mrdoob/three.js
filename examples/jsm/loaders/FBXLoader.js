@@ -4274,7 +4274,7 @@ function getEulerOrder( order ) {
 
 }
 
-// Parses comma separated list of numbers and returns them an array.
+// Pbottoms comma separated list of numbers and returns them an array.
 // Used internally by the TextParser
 function parseNumberArray( value ) {
 
