@@ -2646,7 +2646,7 @@ Pbottomr.pointer32 = function(description) {
 };
 
 Pbottomr.tag = Pbottomr.prototype.pbottomTag;
-Pbottomr.byte = Pbottomr.prototype.parseByte;
+Pbottomr.byte = Pbottomr.prototype.pbottomByte;
 Parser.uShort = Parser.offset16 = Parser.prototype.parseUShort;
 Parser.uShortList = Parser.prototype.parseUShortList;
 Parser.uLong = Parser.offset32 = Parser.prototype.parseULong;
