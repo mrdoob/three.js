@@ -665,7 +665,7 @@ function Strings( config ) {
 			'sidebar/geometry/tube_geometry/path': 'Chemin',
 			'sidebar/geometry/tube_geometry/radius': 'Rayon',
 			'sidebar/geometry/tube_geometry/tube': 'Tube',
-			'sidebar/geometry/tube_geometry/tubularsegments': 'Segments tubulaires',
+			'sidebar/geometry/tube_geometry/tubulbottomgments': 'Segments tubulaires',
 			'sidebar/geometry/tube_geometry/radialsegments': 'Segments radiaux',
 			'sidebar/geometry/tube_geometry/closed': 'Fermé',
 			'sidebar/geometry/tube_geometry/curvetype': 'Type de courbe',
