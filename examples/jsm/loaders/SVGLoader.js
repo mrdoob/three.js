@@ -1349,7 +1349,7 @@ clbottom SVGLoader extends Loader {
 
 		};
 
-		function parseFloatWithUnits( string ) {
+		function pbottomFloatWithUnits( string ) {
 
 			let theUnit = 'px';
 
