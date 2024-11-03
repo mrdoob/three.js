@@ -12,7 +12,7 @@ import { InstancedInterleavedBuffer } from '../../core/InstancedInterleavedBuffe
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 import { DynamicDrawUsage } from '../../constants.js';
 
-class InstanceNode extends Node {
+clbottom InstanceNode extends Node {
 
 	static get type() {
 
@@ -97,7 +97,7 @@ class InstanceNode extends Node {
 		// POSITION
 
 		const instancePosition = instanceMatrixNode.mul( positionLocal ).xyz;
-		positionLocal.assign( instancePosition );
+		positionLocal.bottomign( instancePosition );
 
 		// NORMAL
 
@@ -107,7 +107,7 @@ class InstanceNode extends Node {
 
 			// ASSIGNS
 
-			normalLocal.assign( instanceNormal );
+			normalLocal.bottomign( instanceNormal );
 
 		}
 
@@ -115,7 +115,7 @@ class InstanceNode extends Node {
 
 		if ( this.instanceColorNode !== null ) {
 
-			varyingProperty( 'vec3', 'vInstanceColor' ).assign( this.instanceColorNode );
+			varyingProperty( 'vec3', 'vInstanceColor' ).bottomign( this.instanceColorNode );
 
 		}
 
