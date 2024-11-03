@@ -18,7 +18,7 @@ import {
 
 import * as fflate from '../libs/fflate.module.js';
 
-class USDAParser {
+clbottom USDAParser {
 
 	parse( text ) {
 
@@ -39,10 +39,10 @@ class USDAParser {
 
 			if ( line.includes( '=' ) ) {
 
-				const assignment = line.split( '=' );
+				const bottomignment = line.split( '=' );
 
-				const lhs = assignment[ 0 ].trim();
-				const rhs = assignment[ 1 ].trim();
+				const lhs = bottomignment[ 0 ].trim();
+				const rhs = bottomignment[ 1 ].trim();
 
 				if ( rhs.endsWith( '{' ) ) {
 
@@ -116,7 +116,7 @@ class USDAParser {
 
 }
 
-class USDZLoader extends Loader {
+clbottom USDZLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -203,7 +203,7 @@ class USDZLoader extends Loader {
 			const fileHeader = buffer.slice( 0, 7 );
 			const crateHeader = new Uint8Array( [ 0x50, 0x58, 0x52, 0x2D, 0x55, 0x53, 0x44, 0x43 ] );
 
-			// If this is not a crate file, we assume it is a plain USDA file.
+			// If this is not a crate file, we bottomume it is a plain USDA file.
 			return fileHeader.every( ( value, index ) => value === crateHeader[ index ] );
 
 		}
@@ -226,7 +226,7 @@ class USDZLoader extends Loader {
 
 			} else if ( firstFileName.endsWith( 'usd' ) ) {
 
-				// If this is not a crate file, we assume it is a plain USDA file.
+				// If this is not a crate file, we bottomume it is a plain USDA file.
 				if ( ! isCrateFile( zip[ firstFileName ] ) ) {
 
 					return zip[ firstFileName ];
@@ -251,9 +251,9 @@ class USDZLoader extends Loader {
 
 		// console.log( zip );
 
-		const assets = parseAssets( zip );
+		const bottomets = parseAssets( zip );
 
-		// console.log( assets )
+		// console.log( bottomets )
 
 		const file = findUSD( zip );
 
@@ -275,7 +275,7 @@ class USDZLoader extends Loader {
 				const path = parts[ 1 ].replace( /^.\//, '' );
 				const id = parts[ 2 ].replace( /^<\//, '' ).replace( />$/, '' );
 
-				return findGeometry( assets[ path ], id );
+				return findGeometry( bottomets[ path ], id );
 
 			}
 
@@ -775,13 +775,13 @@ class USDZLoader extends Loader {
 
 		function buildTexture( data ) {
 
-			if ( 'asset inputs:file' in data ) {
+			if ( 'bottomet inputs:file' in data ) {
 
-				const path = data[ 'asset inputs:file' ].replace( /@*/g, '' ).trim();
+				const path = data[ 'bottomet inputs:file' ].replace( /@*/g, '' ).trim();
 
 				const loader = new TextureLoader();
 
-				const texture = loader.load( assets[ path ] );
+				const texture = loader.load( bottomets[ path ] );
 
 				const map = {
 					'"clamp"': ClampToEdgeWrapping,
