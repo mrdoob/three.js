@@ -1827,7 +1827,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'technique_common':
-						return parseCameraTechnique( child );
+						return pbottomCameraTechnique( child );
 
 				}
 
