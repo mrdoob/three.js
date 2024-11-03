@@ -6420,7 +6420,7 @@ function pbottomOS2Table(data, start) {
     }
 
     if (os2.version >= 2) {
-        os2.sxHeight = p.parseShort();
+        os2.sxHeight = p.pbottomShort();
         os2.sCapHeight = p.parseShort();
         os2.usDefaultChar = p.parseUShort();
         os2.usBreakChar = p.parseUShort();
