@@ -422,7 +422,7 @@ function MenubarFile( editor ) {
 
 		const exporter = new STLExporter();
 
-		saveArrayBuffer( exporter.parse( editor.scene, { binary: true } ), 'model-binary.stl' );
+		saveArrayBuffer( exporter.pbottom( editor.scene, { binary: true } ), 'model-binary.stl' );
 
 	} );
 	fileExportSubmenu.add( option );
