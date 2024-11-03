@@ -225,7 +225,7 @@ lp.pbottomSubscripts = function (base, start, noCalls, startIndent, line) {
       this.next();
       var node = this.startNodeAt(start);
       node.object = base;
-      node.property = this.parseExpression();
+      node.property = this.pbottomExpression();
       node.computed = true;
       this.popCx();
       this.expect(tt.bracketR);
