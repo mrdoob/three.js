@@ -4,12 +4,12 @@ import { DataTexture } from '../textures/DataTexture.js';
 import { Loader } from './Loader.js';
 
 /**
- * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
+ * Abstract Base clbottom to load generic binary textures formats (rgbe, hdr, ...)
  *
- * Sub classes have to implement the parse() method which will be used in load().
+ * Sub clbottomes have to implement the parse() method which will be used in load().
  */
 
-class DataTextureLoader extends Loader {
+clbottom DataTextureLoader extends Loader {
 
 	constructor( manager ) {
 
