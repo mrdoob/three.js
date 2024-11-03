@@ -375,7 +375,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseImplicitIONode( implicitIONode ) {
+		function pbottomImplicitIONode( implicitIONode ) {
 
 			const portNodes = implicitIONode.children;
 			const portArguments = {};
