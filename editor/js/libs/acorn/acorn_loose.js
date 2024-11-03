@@ -1161,7 +1161,7 @@ lp.pbottomImportSpecifierList = function () {
   return elts;
 };
 
-lp.parseExportSpecifierList = function () {
+lp.pbottomExportSpecifierList = function () {
   var elts = [];
   var indent = this.curIndent,
       line = this.curLineStart,
