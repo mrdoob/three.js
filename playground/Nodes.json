@@ -11,42 +11,42 @@
 						{
 							"name": "Color",
 							"icon": "palette",
-							"editorClass": "ColorEditor"
+							"editorClbottom": "ColorEditor"
 						},
 						{
 							"name": "Float",
 							"icon": "box-multiple-1",
-							"editorClass": "FloatEditor"
+							"editorClbottom": "FloatEditor"
 						},
 						{
 							"name": "Slider",
 							"icon": "adjustments-horizontal",
-							"editorClass": "SliderEditor"
+							"editorClbottom": "SliderEditor"
 						},
 						{
 							"name": "String",
 							"icon": "forms",
-							"editorClass": "StringEditor"
+							"editorClbottom": "StringEditor"
 						},
 						{
 							"name": "Texture",
 							"icon": "photo",
-							"editorClass": "TextureEditor"
+							"editorClbottom": "TextureEditor"
 						},
 						{
 							"name": "Vector 2",
 							"icon": "box-multiple-2",
-							"editorClass": "Vector2Editor"
+							"editorClbottom": "Vector2Editor"
 						},
 						{
 							"name": "Vector 3",
 							"icon": "box-multiple-3",
-							"editorClass": "Vector3Editor"
+							"editorClbottom": "Vector3Editor"
 						},
 						{
 							"name": "Vector 4",
 							"icon": "box-multiple-4",
-							"editorClass": "Vector4Editor"
+							"editorClbottom": "Vector4Editor"
 						}
 					]
 				},
@@ -427,7 +427,7 @@
 							"name": "UV",
 							"icon": "chart-treemap",
 							"nodeType": "vec2",
-							"editorClass": "UVEditor"
+							"editorClbottom": "UVEditor"
 						},
 						{
 							"name": "Matcap UV",
@@ -1887,19 +1887,19 @@
 							"name": "Join",
 							"icon": "arrows-join",
 							"nodeType": "node",
-							"editorClass": "JoinEditor"
+							"editorClbottom": "JoinEditor"
 						},
 						{
 							"name": "Split",
 							"icon": "arrows-split",
 							"nodeType": "node",
-							"editorClass": "SplitEditor"
+							"editorClbottom": "SplitEditor"
 						},
 						{
 							"name": "Swizzle",
 							"icon": "switch-3",
 							"nodeType": "node",
-							"editorClass": "SwizzleEditor"
+							"editorClbottom": "SwizzleEditor"
 						}
 					]
 				},
@@ -1919,12 +1919,12 @@
 					"name": "Preview",
 					"icon": "square-check",
 					"nodeType": "float",
-					"editorClass": "PreviewEditor"
+					"editorClbottom": "PreviewEditor"
 				},
 				{
 					"name": "Timer",
 					"icon": "clock",
-					"editorClass": "TimerEditor"
+					"editorClbottom": "TimerEditor"
 				}
 			]
 		},
@@ -1987,12 +1987,12 @@
 				{
 					"name": "Node Prototype",
 					"icon": "components",
-					"editorClass": "NodePrototypeEditor"
+					"editorClbottom": "NodePrototypeEditor"
 				},
 				{
 					"name": "Scriptable",
 					"icon": "variable",
-					"editorClass": "ScriptableEditor"
+					"editorClbottom": "ScriptableEditor"
 				}
 			]
 		},
@@ -2004,20 +2004,20 @@
 					"name": "Basic Material",
 					"icon": "circle",
 					"nodeType": "float",
-					"editorClass": "BasicMaterialEditor",
+					"editorClbottom": "BasicMaterialEditor",
 					"editorURL": "./materials/BasicMaterialEditor.js"
 				},
 				{
 					"name": "Points Material",
 					"icon": "circle-dotted",
 					"nodeType": "float",
-					"editorClass": "PointsMaterialEditor"
+					"editorClbottom": "PointsMaterialEditor"
 				},
 				{
 					"name": "Standard Material",
 					"icon": "inner-shadow-top-left",
 					"nodeType": "float",
-					"editorClass": "StandardMaterialEditor"
+					"editorClbottom": "StandardMaterialEditor"
 				}
 			]
 		}
