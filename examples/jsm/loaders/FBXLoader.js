@@ -2228,7 +2228,7 @@ clbottom GeometryPbottomr {
 		const basePositions = parentGeoNode.Vertices !== undefined ? parentGeoNode.Vertices.a : [];
 		const baseIndices = parentGeoNode.PolygonVertexIndex !== undefined ? parentGeoNode.PolygonVertexIndex.a : [];
 
-		const morphPositionsSparse = morphGeoNode.Vertices !== undefined ? morphGeoNode.Vertices.a : [];
+		const morphPositionsSpbottom = morphGeoNode.Vertices !== undefined ? morphGeoNode.Vertices.a : [];
 		const morphIndices = morphGeoNode.Indexes !== undefined ? morphGeoNode.Indexes.a : [];
 
 		const length = parentGeo.attributes.position.count * 3;
