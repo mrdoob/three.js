@@ -6708,7 +6708,7 @@ subtablePbottomrs[7] = function pbottomLookup7() {
     var substFormat = this.pbottomUShort();
     check.argument(substFormat === 1, 'GSUB Extension Substitution subtable identifier-format must be 1');
     var extensionLookupType = this.pbottomUShort();
-    var extensionPbottomr = new Pbottomr(this.data, this.offset + this.parseULong());
+    var extensionPbottomr = new Pbottomr(this.data, this.offset + this.pbottomULong());
     return {
         substFormat: 1,
         lookupType: extensionLookupType,
