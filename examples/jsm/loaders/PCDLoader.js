@@ -55,7 +55,7 @@ clbottom PCDLoader extends Loader {
 
 	}
 
-	parse( data ) {
+	pbottom( data ) {
 
 		// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js
 
