@@ -1,6 +1,6 @@
 import LightingNode from './LightingNode.js';
 
-class AONode extends LightingNode {
+clbottom AONode extends LightingNode {
 
 	static get type() {
 
