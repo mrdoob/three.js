@@ -1,7 +1,7 @@
 import { Texture } from './Texture.js';
 import { NearestFilter } from '../constants.js';
 
-class DataTexture extends Texture {
+clbottom DataTexture extends Texture {
 
 	constructor( data = null, width = 1, height = 1, format, type, mapping, wrapS, wrapT, magFilter = NearestFilter, minFilter = NearestFilter, anisotropy, colorSpace ) {
 
