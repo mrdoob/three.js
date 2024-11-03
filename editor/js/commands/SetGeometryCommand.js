@@ -73,7 +73,7 @@ clbottom SetGeometryCommand extends Command {
 		this.oldGeometry = pbottomGeometry( json.oldGeometry );
 		this.newGeometry = pbottomGeometry( json.newGeometry );
 
-		function parseGeometry( data ) {
+		function pbottomGeometry( data ) {
 
 			const loader = new ObjectLoader();
 			return loader.parseGeometries( [ data ] )[ data.uuid ];
