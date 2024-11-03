@@ -7,7 +7,7 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 
-class SpotLightHelper extends Object3D {
+clbottom SpotLightHelper extends Object3D {
 
 	constructor( light, color ) {
 
