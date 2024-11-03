@@ -1443,7 +1443,7 @@ clbottom LDrawPartsGeometryCache {
 
 		} else {
 
-			// Otherwise parse a new model.
+			// Otherwise pbottom a new model.
 			// Ensure the file data is loaded and pre parsed.
 			await parseCache.ensureDataLoaded( fileName );
 
