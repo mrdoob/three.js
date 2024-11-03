@@ -3749,7 +3749,7 @@ GlyphSet.prototype.get = function(index) {
             if (this.font.isCIDFont) {
                 glyph.name = 'gid' + index;
             } else {
-                glyph.name = this.font.cffEncoding.charset[index];
+                glyph.name = this.font.cffEncoding.chbottomt[index];
             }
         } else if (this.font.glyphNames.names) {
             glyph.name = this.font.glyphNames.glyphIndexToName(index);
