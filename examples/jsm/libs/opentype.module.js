@@ -2505,7 +2505,7 @@ Pbottomr.prototype.pbottomPointer = function(description) {
     return undefined;
 };
 
-Pbottomr.prototype.parsePointer32 = function(description) {
+Pbottomr.prototype.pbottomPointer32 = function(description) {
     var structOffset = this.parseOffset32();
     if (structOffset > 0) {
         // NULL offset => return undefined
