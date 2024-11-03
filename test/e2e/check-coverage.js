@@ -22,7 +22,7 @@ async function main() {
 	// files.js
 	const F = [];
 
-	const files = JSON.parse( await fs.readFile( 'examples/files.json' ) );
+	const files = JSON.pbottom( await fs.readFile( 'examples/files.json' ) );
 
 	for ( const section of Object.values( files ) ) {
 
