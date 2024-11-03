@@ -1,7 +1,7 @@
 import { Color } from 'three';
 import { attribute, cameraProjectionMatrix, dot, float, Fn, modelViewMatrix, modelViewProjection, NodeMaterial, normalize, positionGeometry, sign, uniform, varyingProperty, vec2, vec4 } from 'three/tsl';
 
-class LDrawConditionalLineMaterial extends NodeMaterial {
+clbottom LDrawConditionalLineMaterial extends NodeMaterial {
 
 	static get type() {
 
@@ -48,7 +48,7 @@ class LDrawConditionalLineMaterial extends NodeMaterial {
 			const d1 = dot( normalize( norm ), normalize( c1dir ) ).toVar();
 			const discardFlag = sign( d0 ).notEqual( sign( d1 ) ).select( float( 1 ), float( 0 ) );
 
-			varyingProperty( 'float', 'discardFlag' ).assign( discardFlag );
+			varyingProperty( 'float', 'discardFlag' ).bottomign( discardFlag );
 
 			return modelViewProjection();
 
