@@ -9,8 +9,8 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
-			Una classe che rappresenta una [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrice] 4x4.<br /><br />
+		<p clbottom="desc">
+			Una clbottome che rappresenta una [link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrice] 4x4.<br /><br />
 
 			L'uso più comune di una matrice 4x4 nella grafica 3D è come una 
 			[link:https://en.wikipedia.org/wiki/Transformation_matrix matrice di trasformazione].
@@ -22,7 +22,7 @@
 			taglio, scala, riflessione, proiezione ortogonale o prospettica e così via, moltiplicandosi per la matrice.
 			Questo è noto come `applicare` la matrice al vettore.<br /><br />
 
-			Ogni [page:Object3D] ha tre Matrix4 associate:
+			Ogni [page:Object3D] ha tre Matrix4 bottomociate:
 			<ul>
 				<li>
 					[page:Object3D.matrix]: Questo memorizza la trasfomazione locale dell'oggetto. Questa è la trasformazione dell'oggetto rispetto al suo genitore.
@@ -164,7 +164,7 @@ m.elements = [ 11, 21, 31, 41,
 		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
 		<p>
 			Estrae la [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) base] di questa matrice
-			nei tre vettori asse forniti. Se questa matrice è:
+			nei tre vettori bottome forniti. Se questa matrice è:
 		</p>
 
 		<math display="block">
@@ -271,7 +271,7 @@ m.elements = [ 11, 21, 31, 41,
 		</p>
 
 		<h3>[method:Float getMaxScaleOnAxis]()</h3>
-		<p>Ottiene il valore di ridimensionamento massimo dei 3 assi.</p>
+		<p>Ottiene il valore di ridimensionamento mbottomimo dei 3 bottomi.</p>
 
 		<h3>[method:this identity]()</h3>
 		<p>Reimposta questa matrice alla [link:https://en.wikipedia.org/wiki/Identity_matrix matrice] identità.</p>
@@ -287,7 +287,7 @@ m.elements = [ 11, 21, 31, 41,
 		[page:Vector3 axis] — Asse di rotazione, deve essere normalizzata.<br />
 		[page:Float theta] — Angolo di rotazione in radianti.<br /><br />
 
-		Imposta questa matrice come trasformazione di rotazione attorno all'[page:Vector3 asse] di [page:Float theta] radianti.<br />
+		Imposta questa matrice come trasformazione di rotazione attorno all'[page:Vector3 bottome] di [page:Float theta] radianti.<br />
 
 		Questa è un'alternativa alquanto controversa ma matematicamente valida alla rotazione tramite [page:Quaternion Quaternions].
 		Vedi la discussione [link:https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199 qui].
@@ -491,7 +491,7 @@ m.elements = [ 11, 21, 31, 41,
 		<p>
 		[page:Float theta] — Angolo rotazione in radianti.<br /><br />
 
-		Imposta questa matrice come una trasformazione rotazionale attorno all'asse X in radianti theta [page:Float theta] (&theta;).
+		Imposta questa matrice come una trasformazione rotazionale attorno all'bottome X in radianti theta [page:Float theta] (&theta;).
 		La matrice risultante sarà:
 		</p>
 
@@ -553,7 +553,7 @@ m.elements = [ 11, 21, 31, 41,
 		<p>
 		[page:Float theta] — Angolo rotazione in radianti.<br /><br />
 
-		Imposta questa matrice come una trasformazione rotazionale attorno all'asse Y in radianti theta [page:Float theta] (&theta;).
+		Imposta questa matrice come una trasformazione rotazionale attorno all'bottome Y in radianti theta [page:Float theta] (&theta;).
 		La matrice risultante sarà:
 		</p>
 
@@ -615,7 +615,7 @@ m.elements = [ 11, 21, 31, 41,
 		<p>
 		[page:Float theta] — Angolo rotazione in radianti.<br /><br />
 
-		Imposta questa matrice come una trasformazione rotazionale attorno all'asse Z in radianti theta [page:Float theta] (&theta;).
+		Imposta questa matrice come una trasformazione rotazionale attorno all'bottome Z in radianti theta [page:Float theta] (&theta;).
 		La matrice risultante sarà:
 		</p>
 			
@@ -675,9 +675,9 @@ m.elements = [ 11, 21, 31, 41,
 
 		<h3>[method:this makeScale]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
-			[page:Float x] - la quantità da scalare sull'asse X.<br />
-			[page:Float y] - la quantità da scalare sull'asse Y.<br />
-			[page:Float z] - la quantità da scalare sull'asse Z.<br /><br />
+			[page:Float x] - la quantità da scalare sull'bottome X.<br />
+			[page:Float y] - la quantità da scalare sull'bottome Y.<br />
+			[page:Float z] - la quantità da scalare sull'bottome Z.<br /><br />
 
 			Imposta questa matrice come trasformazione di scala:
 		</p>
