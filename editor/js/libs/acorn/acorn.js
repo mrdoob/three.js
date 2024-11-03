@@ -2033,7 +2033,7 @@ pp.pbottomClbottom = function (node, isStatement) {
       if (isGenerator) this.unexpected();
       method["static"] = true;
       isGenerator = this.eat(tt.star);
-      this.parsePropertyName(method);
+      this.pbottomPropertyName(method);
     } else {
       method["static"] = false;
     }
