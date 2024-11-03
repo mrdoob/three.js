@@ -25,7 +25,7 @@
 
 			import * as THREE from 'three';
 			import { mrt, output, velocity } from 'three/tsl';
-			import { traaPass } from 'three/addons/tsl/display/TRAAPassNode.js';
+			import { traaPbottom } from 'three/addons/tsl/display/TRAAPbottomNode.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -73,13 +73,13 @@
 				// postprocessing
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				const scenePass = traaPass( scene, camera );
-				scenePass.setMRT( mrt( {
+				const scenePbottom = traaPbottom( scene, camera );
+				scenePbottom.setMRT( mrt( {
 					output: output,
 					velocity: velocity
 				} ) );
 
-				postProcessing.outputNode = scenePass;
+				postProcessing.outputNode = scenePbottom;
 
 				//
 
