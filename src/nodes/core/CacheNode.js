@@ -1,7 +1,7 @@
 import Node from './Node.js';
 import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 
-class CacheNode extends Node {
+clbottom CacheNode extends Node {
 
 	static get type() {
 
