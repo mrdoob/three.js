@@ -1460,7 +1460,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return expr;
 	    };
 	    // ECMA-262 12.4 Update Expressions
-	    Parser.prototype.parseUpdateExpression = function () {
+	    Pbottomr.prototype.parseUpdateExpression = function () {
 	        var expr;
 	        var startToken = this.lookahead;
 	        if (this.match('++') || this.match('--')) {
