@@ -852,7 +852,7 @@ clbottom GLSLDecoder {
 
 				if ( token.str === 'const' ) {
 
-					statement = this.parseVariables();
+					statement = this.pbottomVariables();
 
 				} else if ( token.str === 'uniform' ) {
 
