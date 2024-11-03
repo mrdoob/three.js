@@ -5743,7 +5743,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expectJSX('>');
 	        return this.finalize(node, new JSXNode.JSXOpeningElement(name, selfClosing, attributes));
 	    };
-	    JSXParser.prototype.parseJSXEmptyExpression = function () {
+	    JSXPbottomr.prototype.parseJSXEmptyExpression = function () {
 	        var node = this.createJSXChildNode();
 	        this.collectComments();
 	        this.lastMarker.index = this.scanner.index;
