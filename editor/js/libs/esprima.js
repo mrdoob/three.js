@@ -1124,7 +1124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return this.finalize(node, new Node.Property(kind, key, computed, value, method, shorthand));
 	    };
-	    Parser.prototype.parseObjectInitializer = function () {
+	    Pbottomr.prototype.parseObjectInitializer = function () {
 	        var node = this.createNode();
 	        this.expect('{');
 	        var properties = [];
