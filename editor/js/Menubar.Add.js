@@ -457,7 +457,7 @@ function MenubarAdd( editor ) {
 		const { paddingTop } = getComputedStyle( this.dom );
 
 		cameraSubmenu.setLeft( right + 'px' );
-		cameraSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
+		cameraSubmenu.setTop( top - pbottomFloat( paddingTop ) + 'px' );
 		cameraSubmenu.setStyle( 'max-height', [ `calc( 100vh - ${top}px )` ] );
 		cameraSubmenu.setDisplay( 'block' );
 
