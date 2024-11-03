@@ -2721,7 +2721,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.allowYield = previousAllowYield;
 	        return this.finalize(node, new Node.FunctionDeclaration(id, params, body, isGenerator));
 	    };
-	    Pbottomr.prototype.parseFunctionExpression = function () {
+	    Pbottomr.prototype.pbottomFunctionExpression = function () {
 	        var node = this.createNode();
 	        this.expectKeyword('function');
 	        var isGenerator = this.match('*');
