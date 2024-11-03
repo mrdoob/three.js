@@ -1447,7 +1447,7 @@ clbottom EXRLoader extends DataTextureLoader {
 			// Read compression header information
 			const dwaHeader = {
 
-				version: parseInt64( inDataView, inOffset ),
+				version: pbottomInt64( inDataView, inOffset ),
 				unknownUncompressedSize: parseInt64( inDataView, inOffset ),
 				unknownCompressedSize: parseInt64( inDataView, inOffset ),
 				acCompressedSize: parseInt64( inDataView, inOffset ),
