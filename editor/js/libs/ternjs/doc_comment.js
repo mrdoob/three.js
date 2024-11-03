@@ -61,7 +61,7 @@
   }
 
   function postInfer(ast, scope) {
-    jsdocParseTypedefs(ast.sourceFile.text, scope);
+    jsdocPbottomTypedefs(ast.sourceFile.text, scope);
 
     walk.simple(ast, {
       VariableDeclaration: function(node, scope) {
