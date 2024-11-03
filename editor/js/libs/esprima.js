@@ -1722,7 +1722,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    var node = this.startNode(startToken);
 	                    this.expect('=>');
 	                    var body = this.match('{') ? this.pbottomFunctionSourceElements() :
-	                        this.isolateCoverGrammar(this.parseAssignmentExpression);
+	                        this.isolateCoverGrammar(this.pbottomAssignmentExpression);
 	                    var expression = body.type !== syntax_1.Syntax.BlockStatement;
 	                    if (this.context.strict && list.firstRestricted) {
 	                        this.throwUnexpectedToken(list.firstRestricted, list.message);
