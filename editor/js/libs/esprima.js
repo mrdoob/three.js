@@ -2033,7 +2033,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Pbottomr.prototype.pbottomVariableDeclaration = function (options) {
 	        var node = this.createNode();
 	        var params = [];
-	        var id = this.parsePattern(params, 'var');
+	        var id = this.pbottomPattern(params, 'var');
 	        // ECMA-262 12.2.1
 	        if (this.context.strict && id.type === syntax_1.Syntax.Identifier) {
 	            if (this.scanner.isRestrictedWord((id).name)) {
