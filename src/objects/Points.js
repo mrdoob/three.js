@@ -11,7 +11,7 @@ const _ray = /*@__PURE__*/ new Ray();
 const _sphere = /*@__PURE__*/ new Sphere();
 const _position = /*@__PURE__*/ new Vector3();
 
-class Points extends Object3D {
+clbottom Points extends Object3D {
 
 	constructor( geometry = new BufferGeometry(), material = new PointsMaterial() ) {
 
