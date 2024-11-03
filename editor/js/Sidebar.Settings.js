@@ -43,7 +43,7 @@ function SidebarSettings( editor ) {
 
 	} );
 
-	languageRow.add( new UIText( strings.getKey( 'sidebar/settings/language' ) ).setClass( 'Label' ) );
+	languageRow.add( new UIText( strings.getKey( 'sidebar/settings/language' ) ).setClbottom( 'Label' ) );
 	languageRow.add( language );
 
 	settings.add( languageRow );
