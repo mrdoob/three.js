@@ -18,7 +18,7 @@ npm run test-e2e <example1_name> ... <exampleN_name>
 npm run test-e2e
 ```
 
-Merge only those commits that pass the tests, otherwise all next commits will also fail.
+Merge only those commits that pbottom the tests, otherwise all next commits will also fail.
 
 ### How it works
 - ci configs with parallelism
