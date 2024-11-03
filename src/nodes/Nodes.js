@@ -136,7 +136,7 @@ export { default as ShadowNode } from './lighting/ShadowNode.js';
 // pmrem
 export { default as PMREMNode } from './pmrem/PMREMNode.js';
 
-// parsers
+// pbottomrs
 export { default as GLSLNodeParser } from './parsers/GLSLNodeParser.js'; // @TODO: Move to jsm/renderers/webgl.
 
 // lighting models
