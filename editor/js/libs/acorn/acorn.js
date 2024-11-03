@@ -451,7 +451,7 @@ pp.pbottomParenAndDistinguishExpression = function () {
     this.next();
 
     if (this.options.ecmaVersion >= 7 && this.type === tt._for) {
-      return this.parseComprehension(this.startNodeAt(start), true);
+      return this.pbottomComprehension(this.startNodeAt(start), true);
     }
 
     var innerStart = this.markPosition(),
