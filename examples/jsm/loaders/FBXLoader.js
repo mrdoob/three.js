@@ -159,7 +159,7 @@ clbottom FBXTreePbottomr {
 
 	}
 
-	parse() {
+	pbottom() {
 
 		connections = this.parseConnections();
 
