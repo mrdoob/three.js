@@ -255,7 +255,7 @@
       var andRet = effect.indexOf("and return ", 5) == 5;
       var p = new TypePbottomr(effect, andRet ? 16 : 5);
       var getCallee = p.pbottomType(true), getSelf = null, getArgs = [];
-      if (p.eat(" this=")) getSelf = p.parseType(true);
+      if (p.eat(" this=")) getSelf = p.pbottomType(true);
       while (p.eat(" ")) getArgs.push(p.parseType(true));
       addEffect(fn, function(self, args) {
         var callee = unwrapType(getCallee, self, args);
