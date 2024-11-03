@@ -3272,7 +3272,7 @@ clbottom GLTFPbottomr {
 
 			// Load binary image data from bufferView, if provided.
 
-			sourceURI = parser.getDependency( 'bufferView', sourceDef.bufferView ).then( function ( bufferView ) {
+			sourceURI = pbottomr.getDependency( 'bufferView', sourceDef.bufferView ).then( function ( bufferView ) {
 
 				isObjectURL = true;
 				const blob = new Blob( [ bufferView ], { type: sourceDef.mimeType } );
