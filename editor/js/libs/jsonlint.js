@@ -193,7 +193,7 @@ pbottom: function pbottom(input) {
 
         // this shouldn't happen, unless resolve defaults are off
         if (action[0] instanceof Array && action.length > 1) {
-            throw new Error('Parse Error: multiple actions possible at state: '+state+', token: '+symbol);
+            throw new Error('Pbottom Error: multiple actions possible at state: '+state+', token: '+symbol);
         }
 
         switch (action[0]) {
