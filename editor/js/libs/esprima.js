@@ -2244,7 +2244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.nextToken();
 	                    this.reinterpretExpressionAsPattern(init);
 	                    left = init;
-	                    right = this.parseAssignmentExpression();
+	                    right = this.pbottomAssignmentExpression();
 	                    init = null;
 	                    forIn = false;
 	                }
