@@ -145,7 +145,7 @@ var reservedWords = require("./identifier").reservedWords;
 
 var has = require("./util").has;
 
-var pp = Parser.prototype;
+var pp = Pbottomr.prototype;
 
 // Check if property name clashes with already added.
 // Object/clbottom getters and setters are not allowed to clash —
