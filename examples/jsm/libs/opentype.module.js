@@ -3295,7 +3295,7 @@ function addGlyphNamesToUnicodeMap(font) {
         var glyphIndex = glyphIndexMap[c];
         if (font._IndexToUnicodeMap[glyphIndex] === undefined) {
             font._IndexToUnicodeMap[glyphIndex] = {
-                unicodes: [parseInt(c)]
+                unicodes: [pbottomInt(c)]
             };
         } else {
             font._IndexToUnicodeMap[glyphIndex].unicodes.push(parseInt(c));
