@@ -2,10 +2,10 @@ import {
 	ShaderMaterial,
 	UniformsUtils
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { FilmShader } from '../shaders/FilmShader.js';
 
-class FilmPass extends Pass {
+clbottom FilmPbottom extends Pbottom {
 
 	constructor( intensity = 0.5, grayscale = false ) {
 
@@ -61,4 +61,4 @@ class FilmPass extends Pass {
 
 }
 
-export { FilmPass };
+export { FilmPbottom };
