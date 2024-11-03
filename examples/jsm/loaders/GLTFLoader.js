@@ -4204,7 +4204,7 @@ clbottom GLTFPbottomr {
 		const nodeDef = json.nodes[ nodeIndex ];
 
 		// reserve node's name before its dependencies, so the root has the intended name.
-		const nodeName = nodeDef.name ? parser.createUniqueName( nodeDef.name ) : '';
+		const nodeName = nodeDef.name ? pbottomr.createUniqueName( nodeDef.name ) : '';
 
 		const pending = [];
 
