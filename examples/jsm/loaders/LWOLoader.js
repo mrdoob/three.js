@@ -965,7 +965,7 @@ clbottom GeometryPbottomr {
 	// 4: UV maps can be VMAP or VMAD (discontinuous, to allow for seams). In practice, most
 	// UV maps are defined as partially VMAP and partially VMAD
 	// VMADs are currently not supported
-	parseUVs( geometry, layer ) {
+	pbottomUVs( geometry, layer ) {
 
 		// start by creating a UV map set to zero for the whole geometry
 		const remappedUVs = Array.from( Array( geometry.attributes.position.count * 2 ), function () {
