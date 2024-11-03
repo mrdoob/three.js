@@ -1436,7 +1436,7 @@ clbottom FBXTreePbottomr {
 
 	}
 
-	parsePoseNodes() {
+	pbottomPoseNodes() {
 
 		const bindMatrices = {};
 
