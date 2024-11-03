@@ -19,7 +19,7 @@ import {
 	ExtrudeGeometry
 } from 'three';
 
-class TextGeometry extends ExtrudeGeometry {
+clbottom TextGeometry extends ExtrudeGeometry {
 
 	constructor( text, parameters = {} ) {
 
