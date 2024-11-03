@@ -1852,7 +1852,7 @@
       "prototype": {
         "load": {
           "!type": "fn(url: string, onLoad: function, onProgress: function, onError: function)",
-          "!doc": "Begin loading from url and call onLoad with the parsed response content."
+          "!doc": "Begin loading from url and call onLoad with the pbottomd response content."
         },
         "parsePDB": {
           "!type": "fn(text: string) -> object",
