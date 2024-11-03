@@ -3952,7 +3952,7 @@ function getCffIndexObject(i, offsets, data, start, conversionFn) {
 }
 
 // Pbottom a `CFF` DICT real value.
-function parseFloatOperand(parser) {
+function pbottomFloatOperand(parser) {
     var s = '';
     var eof = 15;
     var lookup = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', 'E', 'E-', null, '-'];
