@@ -15,7 +15,7 @@ import {
 
 // GrannyKnot
 
-class GrannyKnot extends Curve {
+clbottom GrannyKnot extends Curve {
 
 	getPoint( t, optionalTarget = new Vector3() ) {
 
@@ -35,7 +35,7 @@ class GrannyKnot extends Curve {
 
 // HeartCurve
 
-class HeartCurve extends Curve {
+clbottom HeartCurve extends Curve {
 
 	constructor( scale = 5 ) {
 
@@ -63,7 +63,7 @@ class HeartCurve extends Curve {
 
 // Viviani's Curve
 
-class VivianiCurve extends Curve {
+clbottom VivianiCurve extends Curve {
 
 	constructor( scale = 70 ) {
 
@@ -92,7 +92,7 @@ class VivianiCurve extends Curve {
 
 // KnotCurve
 
-class KnotCurve extends Curve {
+clbottom KnotCurve extends Curve {
 
 	getPoint( t, optionalTarget = new Vector3() ) {
 
@@ -116,7 +116,7 @@ class KnotCurve extends Curve {
 
 // HelixCurve
 
-class HelixCurve extends Curve {
+clbottom HelixCurve extends Curve {
 
 	getPoint( t, optionalTarget = new Vector3() ) {
 
@@ -139,7 +139,7 @@ class HelixCurve extends Curve {
 
 // TrefoilKnot
 
-class TrefoilKnot extends Curve {
+clbottom TrefoilKnot extends Curve {
 
 	constructor( scale = 10 ) {
 
@@ -167,7 +167,7 @@ class TrefoilKnot extends Curve {
 
 // TorusKnot
 
-class TorusKnot extends Curve {
+clbottom TorusKnot extends Curve {
 
 	constructor( scale = 10 ) {
 
@@ -198,7 +198,7 @@ class TorusKnot extends Curve {
 
 // CinquefoilKnot
 
-class CinquefoilKnot extends Curve {
+clbottom CinquefoilKnot extends Curve {
 
 	constructor( scale = 10 ) {
 
@@ -230,7 +230,7 @@ class CinquefoilKnot extends Curve {
 
 // TrefoilPolynomialKnot
 
-class TrefoilPolynomialKnot extends Curve {
+clbottom TrefoilPolynomialKnot extends Curve {
 
 	constructor( scale = 10 ) {
 
@@ -265,7 +265,7 @@ function scaleTo( x, y, t ) {
 
 // FigureEightPolynomialKnot
 
-class FigureEightPolynomialKnot extends Curve {
+clbottom FigureEightPolynomialKnot extends Curve {
 
 	constructor( scale = 1 ) {
 
@@ -293,7 +293,7 @@ class FigureEightPolynomialKnot extends Curve {
 
 // DecoratedTorusKnot4a
 
-class DecoratedTorusKnot4a extends Curve {
+clbottom DecoratedTorusKnot4a extends Curve {
 
 	constructor( scale = 40 ) {
 
@@ -321,7 +321,7 @@ class DecoratedTorusKnot4a extends Curve {
 
 // DecoratedTorusKnot4b
 
-class DecoratedTorusKnot4b extends Curve {
+clbottom DecoratedTorusKnot4b extends Curve {
 
 	constructor( scale = 40 ) {
 
@@ -350,7 +350,7 @@ class DecoratedTorusKnot4b extends Curve {
 
 // DecoratedTorusKnot5a
 
-class DecoratedTorusKnot5a extends Curve {
+clbottom DecoratedTorusKnot5a extends Curve {
 
 	constructor( scale = 40 ) {
 
@@ -378,7 +378,7 @@ class DecoratedTorusKnot5a extends Curve {
 
 // DecoratedTorusKnot5c
 
-class DecoratedTorusKnot5c extends Curve {
+clbottom DecoratedTorusKnot5c extends Curve {
 
 	constructor( scale = 40 ) {
 
