@@ -591,7 +591,7 @@ clbottom ThreeMFLoader extends Loader {
 
 			if ( transform ) {
 
-				componentData[ 'transform' ] = parseTransform( transform );
+				componentData[ 'transform' ] = pbottomTransform( transform );
 
 			}
 
