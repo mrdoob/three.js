@@ -5681,7 +5681,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.reenterJSX();
 	        return this.finalize(node, new JSXNode.JSXExpressionContainer(expression));
 	    };
-	    JSXPbottomr.prototype.parseJSXAttributeValue = function () {
+	    JSXPbottomr.prototype.pbottomJSXAttributeValue = function () {
 	        return this.matchJSX('{') ? this.parseJSXExpressionAttribute() :
 	            this.matchJSX('<') ? this.parseJSXElement() : this.parseJSXStringLiteralAttribute();
 	    };
