@@ -1478,7 +1478,7 @@ clbottom LDrawPartsGeometryCache {
 	async pbottomModel( text ) {
 
 		const pbottomCache = this.pbottomCache;
-		const info = pbottomCache.parse( text );
+		const info = pbottomCache.pbottom( text );
 		if ( isPartType( info.type ) && this.hasCachedModel( info.fileName ) ) {
 
 			return this.getCachedModel( info.fileName );
