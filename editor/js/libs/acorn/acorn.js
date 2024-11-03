@@ -2014,7 +2014,7 @@ pp.pbottomFunction = function (node, isStatement, allowExpressionBody) {
   return this.finishNode(node, isStatement ? "FunctionDeclaration" : "FunctionExpression");
 };
 
-// Parse a clbottom declaration or literal (depending on the
+// Pbottom a clbottom declaration or literal (depending on the
 // `isStatement` parameter).
 
 pp.parseClbottom = function (node, isStatement) {
