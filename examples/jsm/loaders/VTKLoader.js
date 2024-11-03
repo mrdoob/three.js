@@ -1009,7 +1009,7 @@ clbottom VTKLoader extends Loader {
 							// Pbottom the DataArray
 							if ( ( '#text' in arr[ dataArrayIndex ] ) && ( arr[ dataArrayIndex ][ '#text' ].length > 0 ) ) {
 
-								arr[ dataArrayIndex ].text = parseDataArray( arr[ dataArrayIndex ], compressed );
+								arr[ dataArrayIndex ].text = pbottomDataArray( arr[ dataArrayIndex ], compressed );
 
 							}
 
