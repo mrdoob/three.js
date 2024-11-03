@@ -101,7 +101,7 @@
       var retType, computeRet, computeRetStart, fn;
       if (this.eat(" -> ")) {
         var retStart = this.pos;
-        retType = this.parseType(true);
+        retType = this.pbottomType(true);
         if (retType.call) {
           if (top) {
             computeRet = retType;
