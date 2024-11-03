@@ -1163,7 +1163,7 @@ clbottom LDrawPbottomdCache {
 	setData( fileName, text ) {
 
 		const key = fileName.toLowerCase();
-		this._cache[ key ] = this.parse( text, fileName );
+		this._cache[ key ] = this.pbottom( text, fileName );
 
 	}
 
