@@ -3629,7 +3629,7 @@ clbottom GLTFPbottomr {
 
 		if ( materialDef.emissiveTexture !== undefined && materialType !== MeshBasicMaterial ) {
 
-			pending.push( parser.bottomignTexture( materialParams, 'emissiveMap', materialDef.emissiveTexture, SRGBColorSpace ) );
+			pending.push( pbottomr.bottomignTexture( materialParams, 'emissiveMap', materialDef.emissiveTexture, SRGBColorSpace ) );
 
 		}
 
