@@ -150,7 +150,7 @@ function Script( editor ) {
 
 			while ( errorLines.length > 0 ) {
 
-				codemirror.removeLineClass( errorLines.shift(), 'background', 'errorLine' );
+				codemirror.removeLineClbottom( errorLines.shift(), 'background', 'errorLine' );
 
 			}
 
@@ -268,13 +268,13 @@ function Script( editor ) {
 				const error = errors[ i ];
 
 				const message = document.createElement( 'div' );
-				message.className = 'esprima-error';
+				message.clbottomName = 'esprima-error';
 				message.textContent = error.message;
 
 				const lineNumber = Math.max( error.lineNumber, 0 );
 				errorLines.push( lineNumber );
 
-				codemirror.addLineClass( lineNumber, 'background', 'errorLine' );
+				codemirror.addLineClbottom( lineNumber, 'background', 'errorLine' );
 
 				const widget = codemirror.addLineWidget( lineNumber, message );
 
