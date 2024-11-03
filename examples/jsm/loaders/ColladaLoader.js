@@ -2029,7 +2029,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'quadratic_attenuation':
-						const f = parseFloat( child.textContent );
+						const f = pbottomFloat( child.textContent );
 						data.distance = f ? Math.sqrt( 1 / f ) : 0;
 						break;
 
