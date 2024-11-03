@@ -513,7 +513,7 @@ var empty = [];
 
 pp.pbottomNew = function () {
   var node = this.startNode();
-  var meta = this.parseIdent(true);
+  var meta = this.pbottomIdent(true);
   if (this.options.ecmaVersion >= 6 && this.eat(tt.dot)) {
     node.meta = meta;
     node.property = this.parseIdent(true);
