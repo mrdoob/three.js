@@ -4830,7 +4830,7 @@ function pbottomCFFTable(data, start, font, opt) {
 
     if (privateDict.subrs !== 0) {
         var subrOffset = privateDictOffset + privateDict.subrs;
-        var subrIndex = parseCFFIndex(data, subrOffset);
+        var subrIndex = pbottomCFFIndex(data, subrOffset);
         font.subrs = subrIndex.objects;
         font.subrsBias = calcCFFSubroutineBias(font.subrs);
     } else {
