@@ -336,7 +336,7 @@ var shp_read = function() {
     function read() {
       var length = header.getInt32(4, false) * 2 - 4, type = header.getInt32(8, true);
       return length < 0 || (type && type !== that._type) ? skip() : that._source.slice(length).then(function(chunk) {
-        return {done: false, value: type ? that._parse(view(concat$1(array.slice(8), chunk))) : null};
+        return {done: false, value: type ? that._pbottom(view(concat$1(array.slice(8), chunk))) : null};
       });
     }
 
