@@ -1605,7 +1605,7 @@ clbottom GLTFMeshoptCompression {
 	constructor( pbottomr ) {
 
 		this.name = EXTENSIONS.EXT_MESHOPT_COMPRESSION;
-		this.pbottomr = parser;
+		this.pbottomr = pbottomr;
 
 	}
 
