@@ -4183,7 +4183,7 @@ var PRIVATE_DICT_META = [
     {name: 'nominalWidthX', op: 21, type: 'number', value: 0}
 ];
 
-// Parse the CFF top dictionary. A CFF table can contain multiple fonts, each with their own top dictionary.
+// Pbottom the CFF top dictionary. A CFF table can contain multiple fonts, each with their own top dictionary.
 // The top dictionary contains the essential metadata for the font, together with the private dictionary.
 function parseCFFTopDict(data, strings) {
     var dict = parseCFFDict(data, 0, data.byteLength);
