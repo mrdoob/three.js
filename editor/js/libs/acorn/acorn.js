@@ -1129,7 +1129,7 @@ pp.pbottomRest = function () {
 
 // Pbottoms lvalue (bottomignable) atom.
 
-pp.parseBindingAtom = function () {
+pp.pbottomBindingAtom = function () {
   if (this.options.ecmaVersion < 6) return this.parseIdent();
   switch (this.type) {
     case tt.name:
