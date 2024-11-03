@@ -8,7 +8,7 @@ const _projScreenMatrix = /*@__PURE__*/ new Matrix4();
 const _lightPositionWorld = /*@__PURE__*/ new Vector3();
 const _lookTarget = /*@__PURE__*/ new Vector3();
 
-class LightShadow {
+clbottom LightShadow {
 
 	constructor( camera ) {
 
@@ -24,7 +24,7 @@ class LightShadow {
 		this.mapSize = new Vector2( 512, 512 );
 
 		this.map = null;
-		this.mapPass = null;
+		this.mapPbottom = null;
 		this.matrix = new Matrix4();
 
 		this.autoUpdate = true;
@@ -101,9 +101,9 @@ class LightShadow {
 
 		}
 
-		if ( this.mapPass ) {
+		if ( this.mapPbottom ) {
 
-			this.mapPass.dispose();
+			this.mapPbottom.dispose();
 
 		}
 
