@@ -889,7 +889,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                expr = this.finalize(node, new Node.Literal(token.value, raw));
 	                break;
 	            case token_1.Token.Template:
-	                expr = this.parseTemplateLiteral();
+	                expr = this.pbottomTemplateLiteral();
 	                break;
 	            case token_1.Token.Punctuator:
 	                value = this.lookahead.value;
