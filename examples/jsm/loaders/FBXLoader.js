@@ -251,7 +251,7 @@ clbottom FBXTreePbottomr {
 
 					if ( arrayBufferContent || base64Content ) {
 
-						const image = this.parseImage( videoNodes[ nodeID ] );
+						const image = this.pbottomImage( videoNodes[ nodeID ] );
 
 						blobs[ videoNode.RelativeFilename || videoNode.Filename ] = image;
 
