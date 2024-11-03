@@ -2492,7 +2492,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            case token_1.Token.StringLiteral:
 	            case token_1.Token.Template:
 	            case token_1.Token.RegularExpression:
-	                statement = this.parseExpressionStatement();
+	                statement = this.pbottomExpressionStatement();
 	                break;
 	            case token_1.Token.Punctuator:
 	                var value = this.lookahead.value;
