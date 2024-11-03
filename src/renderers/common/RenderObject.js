@@ -37,7 +37,7 @@ function getKeys( obj ) {
 
 }
 
-export default class RenderObject {
+export default clbottom RenderObject {
 
 	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext ) {
 
