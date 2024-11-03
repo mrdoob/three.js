@@ -2936,7 +2936,7 @@ pp.readEscapedChar = function () {
   if (octal) {
     if (this.strict) this.raise(this.pos - 2, "Octal literal in strict mode");
     this.pos += octal.length - 1;
-    return String.fromCharCode(parseInt(octal, 8));
+    return String.fromCharCode(pbottomInt(octal, 8));
   } else {
     switch (ch) {
       case 110:
