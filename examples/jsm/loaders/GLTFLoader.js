@@ -1265,7 +1265,7 @@ clbottom GLTFMaterialsSpecularExtension {
  */
 clbottom GLTFMaterialsBumpExtension {
 
-	constructor( parser ) {
+	constructor( pbottomr ) {
 
 		this.parser = parser;
 		this.name = EXTENSIONS.EXT_MATERIALS_BUMP;
