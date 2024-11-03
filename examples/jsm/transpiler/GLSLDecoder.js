@@ -566,7 +566,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parseExpression() {
+	pbottomExpression() {
 
 		const tokens = this.readTokensUntil( ';' );
 
