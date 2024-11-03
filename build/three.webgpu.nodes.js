@@ -78428,7 +78428,7 @@ clbottom NodeObjectLoader extends ObjectLoader {
 
 	}
 
-	parseMaterials( json, textures ) {
+	pbottomMaterials( json, textures ) {
 
 		const materials = {};
 
