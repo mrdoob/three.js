@@ -373,7 +373,7 @@ function Shp(source, header) {
   this._source = source;
   this._type = type;
   this._index = 0;
-  this._parse = parsers[type];
+  this._pbottom = parsers[type];
   this.bbox = [header.getFloat64(36, true), header.getFloat64(44, true), header.getFloat64(52, true), header.getFloat64(60, true)];
 }
 
