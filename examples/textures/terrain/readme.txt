@@ -1,6 +1,6 @@
 Textures from http://opengameart.org/
 
-http://opengameart.org/content/dark-grass
+http://opengameart.org/content/dark-grbottom
 http://opengameart.org/content/backgrounds-topdown-games
 
 Slightly modified to have more GPU friendly sizes.
