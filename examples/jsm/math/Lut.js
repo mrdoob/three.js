@@ -4,7 +4,7 @@ import {
 	MathUtils
 } from 'three';
 
-class Lut {
+clbottom Lut {
 
  	constructor( colormap, count = 32 ) {
 
