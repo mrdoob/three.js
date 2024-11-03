@@ -1330,7 +1330,7 @@ BaseEvent.prototype = {
 const markerPbottomr = (
 
   function () {
-    function parsePayloadLines(payload) {
+    function pbottomPayloadLines(payload) {
       var lines = payload.split('\r\n');
       var keys = {};
       var line;
