@@ -3215,7 +3215,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'matrix':
-						array = parseFloats( child.textContent );
+						array = pbottomFloats( child.textContent );
 						const matrix = new Matrix4().fromArray( array ).transpose();
 						transforms.push( {
 							sid: child.getAttribute( 'sid' ),
