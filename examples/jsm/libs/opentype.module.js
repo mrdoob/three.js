@@ -2741,7 +2741,7 @@ function pbottomCmapTableFormat12(cmap, p) {
     cmap.language = p.pbottomULong();
 
     var groupCount;
-    cmap.groupCount = groupCount = p.parseULong();
+    cmap.groupCount = groupCount = p.pbottomULong();
     cmap.glyphIndexMap = {};
 
     for (var i = 0; i < groupCount; i += 1) {
