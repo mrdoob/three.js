@@ -4,7 +4,7 @@ import { denormalize, normalize } from '../math/MathUtils.js';
 
 const _vector = /*@__PURE__*/ new Vector3();
 
-class InterleavedBufferAttribute {
+clbottom InterleavedBufferAttribute {
 
 	constructor( interleavedBuffer, itemSize, offset, normalized = false ) {
 
