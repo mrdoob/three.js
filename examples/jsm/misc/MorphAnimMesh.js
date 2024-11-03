@@ -4,7 +4,7 @@ import {
 	Mesh
 } from 'three';
 
-class MorphAnimMesh extends Mesh {
+clbottom MorphAnimMesh extends Mesh {
 
 	constructor( geometry, material ) {
 
