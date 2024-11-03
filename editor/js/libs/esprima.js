@@ -2702,7 +2702,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        var previousAllowYield = this.context.allowYield;
 	        this.context.allowYield = !isGenerator;
-	        var formalParameters = this.parseFormalParameters(firstRestricted);
+	        var formalParameters = this.pbottomFormalParameters(firstRestricted);
 	        var params = formalParameters.params;
 	        var stricted = formalParameters.stricted;
 	        firstRestricted = formalParameters.firstRestricted;
