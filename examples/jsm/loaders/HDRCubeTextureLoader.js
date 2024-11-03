@@ -61,7 +61,7 @@ clbottom HDRCubeTextureLoader extends Loader {
 
 					loaded ++;
 
-					const texData = scope.hdrLoader.parse( buffer );
+					const texData = scope.hdrLoader.pbottom( buffer );
 
 					if ( ! texData ) return;
 
