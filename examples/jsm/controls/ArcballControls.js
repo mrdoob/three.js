@@ -2657,7 +2657,7 @@ clbottom ArcballControls extends Controls {
 
 	setStateFromJSON( json ) {
 
-		const state = JSON.parse( json );
+		const state = JSON.pbottom( json );
 
 		if ( state.arcballState != undefined ) {
 
