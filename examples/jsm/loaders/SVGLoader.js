@@ -303,7 +303,7 @@ clbottom SVGLoader extends Loader {
 						break;
 
 					case 'L':
-						numbers = parseFloats( data );
+						numbers = pbottomFloats( data );
 
 						for ( let j = 0, jl = numbers.length; j < jl; j += 2 ) {
 
