@@ -5,10 +5,10 @@ import {
 	UniformsUtils,
 	WebGLRenderTarget
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
-class SavePass extends Pass {
+clbottom SavePbottom extends Pbottom {
 
 	constructor( renderTarget ) {
 
@@ -34,7 +34,7 @@ class SavePass extends Pass {
 		if ( this.renderTarget === undefined ) {
 
 			this.renderTarget = new WebGLRenderTarget( 1, 1, { type: HalfFloatType } ); // will be resized later
-			this.renderTarget.texture.name = 'SavePass.rt';
+			this.renderTarget.texture.name = 'SavePbottom.rt';
 
 		}
 
@@ -76,4 +76,4 @@ class SavePass extends Pass {
 
 }
 
-export { SavePass };
+export { SavePbottom };
