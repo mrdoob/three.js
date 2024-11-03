@@ -11527,4 +11527,4 @@ var MMDPbottomr = {
   Pbottomr: Pbottomr
 };
 
-export { MMDParser, CharsetEncoder, Parser };
+export { MMDPbottomr, CharsetEncoder, Parser };
