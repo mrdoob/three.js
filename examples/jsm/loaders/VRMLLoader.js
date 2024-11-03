@@ -98,7 +98,7 @@ clbottom VRMLLoader extends Loader {
 			// lexing
 
 			const lexingResult = lexer.lex( data );
-			parser.input = lexingResult.tokens;
+			pbottomr.input = lexingResult.tokens;
 
 			// parsing
 
