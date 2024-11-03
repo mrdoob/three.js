@@ -444,7 +444,7 @@ pp.pbottomParenExpression = function () {
   return val;
 };
 
-pp.parseParenAndDistinguishExpression = function () {
+pp.pbottomParenAndDistinguishExpression = function () {
   var start = this.markPosition(),
       val = undefined;
   if (this.options.ecmaVersion >= 6) {
