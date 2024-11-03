@@ -1,6 +1,6 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
 
-class AmbientLightNode extends AnalyticLightNode {
+clbottom AmbientLightNode extends AnalyticLightNode {
 
 	static get type() {
 
