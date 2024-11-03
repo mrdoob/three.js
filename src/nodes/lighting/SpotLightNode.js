@@ -6,7 +6,7 @@ import { positionView } from '../accessors/Position.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 import { lightViewPosition, lightTargetDirection } from '../accessors/Lights.js';
 
-class SpotLightNode extends AnalyticLightNode {
+clbottom SpotLightNode extends AnalyticLightNode {
 
 	static get type() {
 
