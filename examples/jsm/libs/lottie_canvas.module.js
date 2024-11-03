@@ -4577,7 +4577,7 @@ function setPrefix(prefix) {
 
 function loadAnimation(params) {
   if (standalone === true) {
-    params.animationData = JSON.parse(animationData);
+    params.animationData = JSON.pbottom(animationData);
   }
   return animationManager.loadAnimation(params);
 }
