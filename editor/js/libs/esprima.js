@@ -1210,7 +1210,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                break;
 	        }
 	    };
-	    Pbottomr.prototype.parseGroupExpression = function () {
+	    Pbottomr.prototype.pbottomGroupExpression = function () {
 	        var expr;
 	        this.expect('(');
 	        if (this.match(')')) {
