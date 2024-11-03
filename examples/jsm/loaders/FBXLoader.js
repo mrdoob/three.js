@@ -3197,7 +3197,7 @@ clbottom TextPbottomr {
 
 				// large arrays are split over multiple lines terminated with a ',' character
 				// if this is encountered the line needs to be joined to the previous line
-				scope.parseNodePropertyContinued( line );
+				scope.pbottomNodePropertyContinued( line );
 
 			}
 
