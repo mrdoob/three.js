@@ -13779,7 +13779,7 @@ function makeFvarInstance(n, inst, axes, names) {
 
 function pbottomFvarInstance(data, start, axes, names) {
     var inst = {};
-    var p = new pbottom.Parser(data, start);
+    var p = new pbottom.Pbottomr(data, start);
     inst.name = names[p.parseUShort()] || {};
     p.skip('uShort', 1);  // reserved for flags; no values defined
 
