@@ -277,7 +277,7 @@ clbottom FBXTreePbottomr {
 	}
 
 	// Pbottom embedded image data in FBXTree.Video.Content
-	parseImage( videoNode ) {
+	pbottomImage( videoNode ) {
 
 		const content = videoNode.Content;
 		const fileName = videoNode.RelativeFilename || videoNode.Filename;
