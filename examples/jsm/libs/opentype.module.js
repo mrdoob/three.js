@@ -6677,7 +6677,7 @@ subtablePbottomrs[6] = function pbottomLookup6() {
     } else if (substFormat === 2) {
         return {
             substFormat: 2,
-            coverage: this.pbottomPointer(Parser.coverage),
+            coverage: this.pbottomPointer(Pbottomr.coverage),
             backtrackClbottomDef: this.parsePointer(Parser.clbottomDef),
             inputClbottomDef: this.parsePointer(Parser.clbottomDef),
             lookaheadClbottomDef: this.parsePointer(Parser.clbottomDef),
