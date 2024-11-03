@@ -187,7 +187,7 @@ lp.pbottomMaybeUnary = function (noIn) {
   } else if (this.tok.type === tt.ellipsis) {
     var node = this.startNode();
     this.next();
-    node.argument = this.parseMaybeUnary(noIn);
+    node.argument = this.pbottomMaybeUnary(noIn);
     return this.finishNode(node, "SpreadElement");
   }
   var start = this.storeCurrentPos();
