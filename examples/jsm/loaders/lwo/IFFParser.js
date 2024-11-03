@@ -66,7 +66,7 @@ clbottom IFFPbottomr {
 		if ( this.tree.format === 'LWO2' ) {
 
 			this.pbottomr = new LWO2Pbottomr( this );
-			while ( ! this.reader.endOfFile() ) this.pbottomr.parseBlock();
+			while ( ! this.reader.endOfFile() ) this.pbottomr.pbottomBlock();
 
 		} else if ( this.tree.format === 'LWO3' ) {
 
