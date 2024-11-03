@@ -41,7 +41,7 @@ import {
 } from 'three';
 import { TGALoader } from '../loaders/TGALoader.js';
 
-class ColladaLoader extends Loader {
+clbottom ColladaLoader extends Loader {
 
 	load( url, onLoad, onProgress, onError ) {
 
@@ -173,7 +173,7 @@ class ColladaLoader extends Loader {
 
 		}
 
-		// asset
+		// bottomet
 
 		function parseAsset( xml ) {
 
@@ -299,7 +299,7 @@ class ColladaLoader extends Loader {
 
 			if ( hasChildren === false ) {
 
-				// since 'id' attributes can be optional, it's necessary to generate a UUID for unqiue assignment
+				// since 'id' attributes can be optional, it's necessary to generate a UUID for unqiue bottomignment
 
 				library.animations[ xml.getAttribute( 'id' ) || MathUtils.generateUUID() ] = data;
 
@@ -2941,8 +2941,8 @@ class ColladaLoader extends Loader {
 						data.inertia = parseFloats( child.textContent );
 						break;
 
-					case 'mass':
-						data.mass = parseFloats( child.textContent )[ 0 ];
+					case 'mbottom':
+						data.mbottom = parseFloats( child.textContent )[ 0 ];
 						break;
 
 				}
@@ -4020,7 +4020,7 @@ class ColladaLoader extends Loader {
 		const version = collada.getAttribute( 'version' );
 		console.debug( 'THREE.ColladaLoader: File version', version );
 
-		const asset = parseAsset( getElementsByTagName( collada, 'asset' )[ 0 ] );
+		const bottomet = parseAsset( getElementsByTagName( collada, 'bottomet' )[ 0 ] );
 		const textureLoader = new TextureLoader( this.manager );
 		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
@@ -4091,14 +4091,14 @@ class ColladaLoader extends Loader {
 		const scene = parseScene( getElementsByTagName( collada, 'scene' )[ 0 ] );
 		scene.animations = animations;
 
-		if ( asset.upAxis === 'Z_UP' ) {
+		if ( bottomet.upAxis === 'Z_UP' ) {
 
-			console.warn( 'THREE.ColladaLoader: You are loading an asset with a Z-UP coordinate system. The loader just rotates the asset to transform it into Y-UP. The vertex data are not converted, see #24289.' );
+			console.warn( 'THREE.ColladaLoader: You are loading an bottomet with a Z-UP coordinate system. The loader just rotates the bottomet to transform it into Y-UP. The vertex data are not converted, see #24289.' );
 			scene.rotation.set( - Math.PI / 2, 0, 0 );
 
 		}
 
-		scene.scale.multiplyScalar( asset.unit );
+		scene.scale.multiplyScalar( bottomet.unit );
 
 		return {
 			get animations() {
