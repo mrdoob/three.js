@@ -168,7 +168,7 @@ clbottom VTKLoader extends Loader {
 					if ( ( result = patConnectivity.exec( line ) ) !== null ) {
 
 						// numVertices i0 i1 i2 ...
-						const numVertices = parseInt( result[ 1 ] );
+						const numVertices = pbottomInt( result[ 1 ] );
 						const inds = result[ 2 ].split( /\s+/ );
 
 						if ( numVertices >= 3 ) {
