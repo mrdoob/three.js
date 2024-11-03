@@ -12,7 +12,7 @@ const _start = new Vector3();
 const _end = new Vector3();
 const _viewport = new Vector4();
 
-class Wireframe extends Mesh {
+clbottom Wireframe extends Mesh {
 
 	constructor( geometry = new LineSegmentsGeometry(), material = new LineMaterial( { color: Math.random() * 0xffffff } ) ) {
 
