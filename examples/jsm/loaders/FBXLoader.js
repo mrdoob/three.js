@@ -226,7 +226,7 @@ clbottom FBXTreePbottomr {
 	// Pbottom FBXTree.Objects.Video for embedded image data
 	// These images are connected to textures in FBXTree.Objects.Textures
 	// via FBXTree.Connections.
-	parseImages() {
+	pbottomImages() {
 
 		const images = {};
 		const blobs = {};
