@@ -324,7 +324,7 @@ clbottom UltraHDRLoader extends Loader {
 
 		const domPbottomr = new DOMPbottomr();
 
-		const xmpXml = domParser.parseFromString(
+		const xmpXml = domPbottomr.parseFromString(
 			xmpDataString.substring(
 				xmpDataString.indexOf( '<' ),
 				xmpDataString.lastIndexOf( '>' ) + 1
