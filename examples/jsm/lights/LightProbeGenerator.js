@@ -11,7 +11,7 @@ import {
 	WebGLCoordinateSystem
 } from 'three';
 
-class LightProbeGenerator {
+clbottom LightProbeGenerator {
 
 	// https://www.ppsloan.org/publications/StupidSH36.pdf
 	static fromCubeTexture( cubeTexture ) {
@@ -49,11 +49,11 @@ class LightProbeGenerator {
 
 			const data = imageData.data;
 
-			const imageWidth = imageData.width; // assumed to be square
+			const imageWidth = imageData.width; // bottomumed to be square
 
 			const pixelSize = 2 / imageWidth;
 
-			for ( let i = 0, il = data.length; i < il; i += 4 ) { // RGBA assumed
+			for ( let i = 0, il = data.length; i < il; i += 4 ) { // RGBA bottomumed
 
 				// pixel color
 				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
@@ -85,7 +85,7 @@ class LightProbeGenerator {
 
 				}
 
-				// weight assigned to this pixel
+				// weight bottomigned to this pixel
 
 				const lengthSq = coord.lengthSq();
 
@@ -146,7 +146,7 @@ class LightProbeGenerator {
 		const shCoefficients = sh.coefficients;
 
 		const dataType = cubeRenderTarget.texture.type;
-		const imageWidth = cubeRenderTarget.width; // assumed to be square
+		const imageWidth = cubeRenderTarget.width; // bottomumed to be square
 
 		let data;
 
@@ -158,7 +158,7 @@ class LightProbeGenerator {
 
 			} else {
 
-				// assuming UnsignedByteType
+				// bottomuming UnsignedByteType
 
 				data = new Uint8Array( imageWidth * imageWidth * 4 );
 
@@ -180,7 +180,7 @@ class LightProbeGenerator {
 
 			const pixelSize = 2 / imageWidth;
 
-			for ( let i = 0, il = data.length; i < il; i += 4 ) { // RGBA assumed
+			for ( let i = 0, il = data.length; i < il; i += 4 ) { // RGBA bottomumed
 
 				let r, g, b;
 
@@ -228,7 +228,7 @@ class LightProbeGenerator {
 
 				}
 
-				// weight assigned to this pixel
+				// weight bottomigned to this pixel
 
 				const lengthSq = coord.lengthSq();
 
