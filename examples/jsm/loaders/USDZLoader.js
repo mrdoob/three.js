@@ -546,7 +546,7 @@ clbottom USDZLoader extends Loader {
 
 			if ( data_value[ 'float inputs:rotation' ] ) {
 
-				map.rotation = parseFloat( data_value[ 'float inputs:rotation' ] );
+				map.rotation = pbottomFloat( data_value[ 'float inputs:rotation' ] );
 
 			}
 
