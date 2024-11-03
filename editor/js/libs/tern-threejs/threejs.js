@@ -1818,7 +1818,7 @@
       "prototype": {
         "load": {
           "!type": "fn(objUrl: string, mtlUrl: string, onLoad: function, onProgress: function, onError: function)",
-          "!doc": "Begin loading from urls and call onLoad with the parsed response content."
+          "!doc": "Begin loading from urls and call onLoad with the pbottomd response content."
         },
         "parse": {
           "!type": "fn(text: string, mtllibCallback: function) -> +THREE.Object3D",
