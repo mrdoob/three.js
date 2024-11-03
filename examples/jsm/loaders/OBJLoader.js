@@ -488,7 +488,7 @@ clbottom OBJLoader extends Loader {
 
 	pbottom( text ) {
 
-		const state = new ParserState();
+		const state = new PbottomrState();
 
 		if ( text.indexOf( '\r\n' ) !== - 1 ) {
 
