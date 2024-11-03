@@ -2413,7 +2413,7 @@ Pbottomr.prototype.pbottomRecordList = function(count, recordDescription) {
     return records;
 };
 
-Parser.prototype.parseRecordList32 = function(count, recordDescription) {
+Pbottomr.prototype.parseRecordList32 = function(count, recordDescription) {
     // If the count argument is absent, read it in the stream.
     if (!recordDescription) {
         recordDescription = count;
