@@ -1127,7 +1127,7 @@ pp.pbottomRest = function () {
   return this.finishNode(node, "RestElement");
 };
 
-// Parses lvalue (bottomignable) atom.
+// Pbottoms lvalue (bottomignable) atom.
 
 pp.parseBindingAtom = function () {
   if (this.options.ecmaVersion < 6) return this.parseIdent();
