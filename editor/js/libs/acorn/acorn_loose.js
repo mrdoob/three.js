@@ -761,7 +761,7 @@ var _ = require("..");
 var getLineInfo = _.getLineInfo;
 var tt = _.tokTypes;
 
-var lp = LooseParser.prototype;
+var lp = LoosePbottomr.prototype;
 
 lp.parseTopLevel = function () {
   var node = this.startNodeAt(this.options.locations ? [0, getLineInfo(this.input, 0)] : 0);
