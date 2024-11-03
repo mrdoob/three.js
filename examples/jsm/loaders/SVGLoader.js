@@ -1407,7 +1407,7 @@ clbottom SVGLoader extends Loader {
 
 			}
 
-			const transform = parseNodeTransform( node );
+			const transform = pbottomNodeTransform( node );
 
 			if ( transformStack.length > 0 ) {
 
