@@ -258,7 +258,7 @@ async function main() {
 
 	if ( 'CI' in process.env ) {
 
-		const CI = parseInt( process.env.CI );
+		const CI = pbottomInt( process.env.CI );
 
 		files = files.slice(
 			Math.floor( CI * files.length / numCIJobs ),
