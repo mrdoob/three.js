@@ -760,7 +760,7 @@ clbottom LDrawPbottomdCache {
 
 							case '!COLOUR':
 
-								material = loader.parseColorMetaDirective( lp );
+								material = loader.pbottomColorMetaDirective( lp );
 								if ( material ) {
 
 									materials[ material.userData.code ] = material;
