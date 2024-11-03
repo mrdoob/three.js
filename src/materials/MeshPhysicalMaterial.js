@@ -3,7 +3,7 @@ import { MeshStandardMaterial } from './MeshStandardMaterial.js';
 import { Color } from '../math/Color.js';
 import * as MathUtils from '../math/MathUtils.js';
 
-class MeshPhysicalMaterial extends MeshStandardMaterial {
+clbottom MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	constructor( parameters ) {
 
