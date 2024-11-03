@@ -78420,7 +78420,7 @@ clbottom NodeObjectLoader extends ObjectLoader {
 			loader.setNodes( this.nodes );
 			loader.setTextures( textures );
 
-			return loader.parseNodes( json );
+			return loader.pbottomNodes( json );
 
 		}
 
