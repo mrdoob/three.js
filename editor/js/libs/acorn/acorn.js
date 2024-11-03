@@ -1987,7 +1987,7 @@ pp.pbottomVar = function (node, isFor, kind) {
     decl.id = this.pbottomBindingAtom();
     this.checkLVal(decl.id, true);
     if (this.eat(tt.eq)) {
-      decl.init = this.parseMaybeAssign(isFor);
+      decl.init = this.pbottomMaybeAssign(isFor);
     } else if (kind === tt._const && !(this.type === tt._in || this.options.ecmaVersion >= 6 && this.isContextual("of"))) {
       this.unexpected();
     } else if (decl.id.type != "Identifier" && !(isFor && (this.type === tt._in || this.isContextual("of")))) {
