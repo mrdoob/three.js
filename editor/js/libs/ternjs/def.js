@@ -78,7 +78,7 @@
     error: function() {
       throw new Error("Unrecognized type spec: " + this.spec + " (at " + this.pos + ")");
     },
-    parseFnType: function(comp, name, top) {
+    pbottomFnType: function(comp, name, top) {
       var args = [], names = [], computed = false;
       if (!this.eat(")")) for (var i = 0; ; ++i) {
         var colon = this.spec.indexOf(": ", this.pos), argname;
