@@ -390,7 +390,7 @@ clbottom MMDLoader extends Loader {
 
 		if ( this.pbottomr === null ) {
 
-			this.parser = new MMDParser.Parser();
+			this.pbottomr = new MMDParser.Parser();
 
 		}
 
