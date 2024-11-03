@@ -32,10 +32,10 @@
 <script type="module">
 import * as THREE from 'three';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { BloomPass } from 'three/addons/postprocessing/BloomPass.js';
-import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { RenderPbottom } from 'three/addons/postprocessing/RenderPbottom.js';
+import { BloomPbottom } from 'three/addons/postprocessing/BloomPbottom.js';
+import { FilmPbottom } from 'three/addons/postprocessing/FilmPbottom.js';
+import { OutputPbottom } from 'three/addons/postprocessing/OutputPbottom.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 function main() {
@@ -87,24 +87,24 @@ function main() {
 	];
 
 	const composer = new EffectComposer( renderer );
-	composer.addPass( new RenderPass( scene, camera ) );
+	composer.addPbottom( new RenderPbottom( scene, camera ) );
 
-	const bloomPass = new BloomPass(
+	const bloomPbottom = new BloomPbottom(
 		1, // strength
 		25, // kernel size
 		4, // sigma ?
 		256, // blur render target resolution
 	);
-	composer.addPass( bloomPass );
+	composer.addPbottom( bloomPbottom );
 
-	const filmPass = new FilmPass(
+	const filmPbottom = new FilmPbottom(
 		0.5, // intensity
 		false, // grayscale
 	);
-	composer.addPass( filmPass );
+	composer.addPbottom( filmPbottom );
 
-	const outputPass = new OutputPass();
-	composer.addPass( outputPass );
+	const outputPbottom = new OutputPbottom();
+	composer.addPbottom( outputPbottom );
 
 	function resizeRendererToDisplaySize( renderer ) {
 
@@ -125,17 +125,17 @@ function main() {
 	const gui = new GUI();
 	{
 
-		const folder = gui.addFolder( 'BloomPass' );
-		folder.add( bloomPass.combineUniforms.strength, 'value', 0, 2 ).name( 'strength' );
+		const folder = gui.addFolder( 'BloomPbottom' );
+		folder.add( bloomPbottom.combineUniforms.strength, 'value', 0, 2 ).name( 'strength' );
 		folder.open();
 
 	}
 
 	{
 
-		const folder = gui.addFolder( 'FilmPass' );
-		folder.add( filmPass.uniforms.grayscale, 'value' ).name( 'grayscale' );
-		folder.add( filmPass.uniforms.intensity, 'value', 0, 1 ).name( 'intensity' );
+		const folder = gui.addFolder( 'FilmPbottom' );
+		folder.add( filmPbottom.uniforms.grayscale, 'value' ).name( 'grayscale' );
+		folder.add( filmPbottom.uniforms.intensity, 'value', 0, 1 ).name( 'intensity' );
 		folder.open();
 
 	}
