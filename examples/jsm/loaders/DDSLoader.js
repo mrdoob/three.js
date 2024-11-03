@@ -145,7 +145,7 @@ clbottom DDSLoader extends CompressedTextureLoader {
 		// If fourCC = DX10, the extended header starts after 32
 		const off_dxgiFormat = 0;
 
-		// Parse header
+		// Pbottom header
 
 		const header = new Int32Array( buffer, 0, headerLengthInt );
 
