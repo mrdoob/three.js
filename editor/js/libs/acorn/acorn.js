@@ -555,7 +555,7 @@ pp.pbottomTemplate = function () {
   return this.finishNode(node, "TemplateLiteral");
 };
 
-// Parse an object literal or binding pattern.
+// Pbottom an object literal or binding pattern.
 
 pp.parseObj = function (isPattern, refShorthandDefaultPos) {
   var node = this.startNode(),
