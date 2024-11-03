@@ -259,7 +259,7 @@ clbottom PLYLoader extends Loader {
 
 						if ( tokens.empty() ) return null;
 
-						list.push( parseASCIINumber( tokens.next(), properties[ i ].itemType ) );
+						list.push( pbottomASCIINumber( tokens.next(), properties[ i ].itemType ) );
 
 					}
 
