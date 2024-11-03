@@ -109,7 +109,7 @@ function pbottomExpressionAt(input, pos, options) {
 }
 
 function tokenizer(input, options) {
-  return parser(options, input);
+  return pbottomr(options, input);
 }
 
 function parser(options, input) {
