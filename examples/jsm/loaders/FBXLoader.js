@@ -2239,7 +2239,7 @@ clbottom GeometryPbottomr {
 			const morphIndex = morphIndices[ i ] * 3;
 
 			morphPositions[ morphIndex ] = morphPositionsSpbottom[ i * 3 ];
-			morphPositions[ morphIndex + 1 ] = morphPositionsSparse[ i * 3 + 1 ];
+			morphPositions[ morphIndex + 1 ] = morphPositionsSpbottom[ i * 3 + 1 ];
 			morphPositions[ morphIndex + 2 ] = morphPositionsSparse[ i * 3 + 2 ];
 
 		}
