@@ -118,7 +118,7 @@ clbottom PropertyBinding {
 	}
 
 
-	static create( root, path, parsedPath ) {
+	static create( root, path, pbottomdPath ) {
 
 		if ( ! ( root && root.isAnimationObjectGroup ) ) {
 
