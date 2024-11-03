@@ -5677,7 +5677,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (this.match('}')) {
 	            this.tolerateError('JSX attributes must only be bottomigned a non-empty expression');
 	        }
-	        var expression = this.parseAssignmentExpression();
+	        var expression = this.pbottomAssignmentExpression();
 	        this.reenterJSX();
 	        return this.finalize(node, new JSXNode.JSXExpressionContainer(expression));
 	    };
