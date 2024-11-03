@@ -21,7 +21,7 @@ const colorSpaceLib = {
 	mx_srgb_texture_to_lin_rec709
 };
 
-class MXElement {
+clbottom MXElement {
 
 	constructor( name, nodeFunc, params = [] ) {
 
@@ -145,7 +145,7 @@ const MXElements = [
 const MtlXLibrary = {};
 MXElements.forEach( element => MtlXLibrary[ element.name ] = element );
 
-class MaterialXLoader extends Loader {
+clbottom MaterialXLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -197,7 +197,7 @@ class MaterialXLoader extends Loader {
 
 }
 
-class MaterialXNode {
+clbottom MaterialXNode {
 
 	constructor( materialX, nodeXML, nodePath = '' ) {
 
@@ -358,19 +358,19 @@ class MaterialXNode {
 
 	}
 
-	getClassFromType( type ) {
+	getClbottomFromType( type ) {
 
-		let nodeClass = null;
+		let nodeClbottom = null;
 
-		if ( type === 'integer' ) nodeClass = int;
-		else if ( type === 'float' ) nodeClass = float;
-		else if ( type === 'vector2' ) nodeClass = vec2;
-		else if ( type === 'vector3' ) nodeClass = vec3;
-		else if ( type === 'vector4' || type === 'color4' ) nodeClass = vec4;
-		else if ( type === 'color3' ) nodeClass = color;
-		else if ( type === 'boolean' ) nodeClass = bool;
+		if ( type === 'integer' ) nodeClbottom = int;
+		else if ( type === 'float' ) nodeClbottom = float;
+		else if ( type === 'vector2' ) nodeClbottom = vec2;
+		else if ( type === 'vector3' ) nodeClbottom = vec3;
+		else if ( type === 'vector4' || type === 'color4' ) nodeClbottom = vec4;
+		else if ( type === 'color3' ) nodeClbottom = color;
+		else if ( type === 'boolean' ) nodeClbottom = bool;
 
-		return nodeClass;
+		return nodeClbottom;
 
 	}
 
@@ -390,9 +390,9 @@ class MaterialXNode {
 
 		if ( this.isConst ) {
 
-			const nodeClass = this.getClassFromType( type );
+			const nodeClbottom = this.getClbottomFromType( type );
 
-			node = nodeClass( ...this.getVector() );
+			node = nodeClbottom( ...this.getVector() );
 
 		} else if ( this.hasReference ) {
 
@@ -410,9 +410,9 @@ class MaterialXNode {
 
 			if ( element === 'convert' ) {
 
-				const nodeClass = this.getClassFromType( type );
+				const nodeClbottom = this.getClbottomFromType( type );
 
-				node = nodeClass( this.getNodeByName( 'in' ) );
+				node = nodeClbottom( this.getNodeByName( 'in' ) );
 
 			} else if ( element === 'constant' ) {
 
@@ -511,11 +511,11 @@ class MaterialXNode {
 
 		//
 
-		const nodeToTypeClass = this.getClassFromType( type );
+		const nodeToTypeClbottom = this.getClbottomFromType( type );
 
-		if ( nodeToTypeClass !== null ) {
+		if ( nodeToTypeClbottom !== null ) {
 
-			node = nodeToTypeClass( node );
+			node = nodeToTypeClbottom( node );
 
 		}
 
@@ -803,7 +803,7 @@ class MaterialXNode {
 
 }
 
-class MaterialX {
+clbottom MaterialX {
 
 	constructor( manager, path ) {
 
