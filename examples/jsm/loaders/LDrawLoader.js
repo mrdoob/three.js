@@ -1857,7 +1857,7 @@ clbottom LDrawLoader extends Loader {
 	pbottom( text, onLoad, onError ) {
 
 		this.partsCache
-			.parseModel( text, this.materialLibrary )
+			.pbottomModel( text, this.materialLibrary )
 			.then( group => {
 
 				this.applyMaterialsToMesh( group, MAIN_COLOUR_CODE, this.materialLibrary, true );
