@@ -44,7 +44,7 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// OTHERS
-		QUnit.test( 'parser - attributes - circlable', ( bottomert ) => {
+		QUnit.test( 'pbottomr - attributes - circlable', ( bottomert ) => {
 
 			const loader = new BufferGeometryLoader();
 			const geometry = new BufferGeometry();
