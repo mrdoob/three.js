@@ -150,7 +150,7 @@ clbottom LWO2Pbottomr {
 				break;
 
 			case 'CLIP':
-				this.IFF.parseClipLwo2( length );
+				this.IFF.pbottomClipLwo2( length );
 				break;
 
 			// Texture node chunks (not in spec)
