@@ -9,9 +9,9 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module( 'ShaderLib', () => {
 
 			// INSTANCING
-			QUnit.test( 'Instancing', ( assert ) => {
+			QUnit.test( 'Instancing', ( bottomert ) => {
 
-				assert.ok( ShaderLib, 'ShaderLib is defined.' );
+				bottomert.ok( ShaderLib, 'ShaderLib is defined.' );
 
 			} );
 
