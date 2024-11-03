@@ -1333,7 +1333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expect(')');
 	        return args;
 	    };
-	    Parser.prototype.isIdentifierName = function (token) {
+	    Pbottomr.prototype.isIdentifierName = function (token) {
 	        return token.type === token_1.Token.Identifier ||
 	            token.type === token_1.Token.Keyword ||
 	            token.type === token_1.Token.BooleanLiteral ||
