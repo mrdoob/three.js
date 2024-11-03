@@ -104,7 +104,7 @@ clbottom LWOLoader extends Loader {
 
 		const textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-		return new LWOTreeParser( textureLoader ).parse( modelName );
+		return new LWOTreePbottomr( textureLoader ).parse( modelName );
 
 	}
 
