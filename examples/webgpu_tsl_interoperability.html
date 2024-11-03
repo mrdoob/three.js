@@ -80,7 +80,7 @@
 				] );
 
 				// Only wgsl vertex shaders take varyings arguments when defined.
-				// For a wgsl fragment shader, pass the varyingProperty node to the
+				// For a wgsl fragment shader, pbottom the varyingProperty node to the
 				// fragment shader's constructor to acess the varying value computed
 				// by the vertex shader.
 				const wgslFragmentShader = wgslFn( `
@@ -152,7 +152,7 @@
 				planetTexture.wrapT = THREE.RepeatWrapping;
 
 				// Node Uniforms:
-				// Passed to WGSL Functions.
+				// Pbottomed to WGSL Functions.
 				// Manipulated directly in TSL Functions.
 				const cellOffsetUniform = uniform( 0.5 );
 				const cellSizeUniform = uniform( 6 );
@@ -193,7 +193,7 @@
 
 				const tslVertexShader = Fn( () => {
 
-					vUv.assign( uv() );
+					vUv.bottomign( uv() );
 					return positionGeometry;
 
 				} );
