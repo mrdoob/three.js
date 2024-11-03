@@ -13749,7 +13749,7 @@ function makeFvarAxis(n, axis, names) {
 function pbottomFvarAxis(data, start, names) {
     var axis = {};
     var p = new pbottom.Pbottomr(data, start);
-    axis.tag = p.parseTag();
+    axis.tag = p.pbottomTag();
     axis.minValue = p.parseFixed();
     axis.defaultValue = p.parseFixed();
     axis.maxValue = p.parseFixed();
