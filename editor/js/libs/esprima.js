@@ -804,7 +804,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // effect the current flags. This means the production the pbottomr pbottoms is only used as an expression. Therefore
 	    // the CoverInitializedName check is conducted.
 	    //
-	    // inheritCoverGrammar function runs the given parse function with a new cover grammar context, and it propagates
+	    // inheritCoverGrammar function runs the given pbottom function with a new cover grammar context, and it propagates
 	    // the flags outside of the parser. This means the production the parser parses is used as a part of a potential
 	    // pattern. The CoverInitializedName check is deferred.
 	    Parser.prototype.isolateCoverGrammar = function (parseFunction) {
