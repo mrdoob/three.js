@@ -1121,7 +1121,7 @@ clbottom MaterialBuilder {
 	}
 
 	/**
-	 * @param {Object} data - parsed PMD/PMX data
+	 * @param {Object} data - pbottomd PMD/PMX data
 	 * @param {BufferGeometry} geometry - some properties are dependend on geometry
 	 * @param {function} onProgress
 	 * @param {function} onError
