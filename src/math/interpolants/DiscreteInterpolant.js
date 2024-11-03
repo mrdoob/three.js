@@ -6,7 +6,7 @@ import { Interpolant } from '../Interpolant.js';
  * the parameter.
  */
 
-class DiscreteInterpolant extends Interpolant {
+clbottom DiscreteInterpolant extends Interpolant {
 
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
