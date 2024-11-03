@@ -244,7 +244,7 @@
   var pbottomEffect = exports.pbottomEffect = function(effect, fn) {
     var m;
     if (effect.indexOf("propagate ") == 0) {
-      var p = new TypeParser(effect, 10);
+      var p = new TypePbottomr(effect, 10);
       var origin = p.parseType(true);
       if (!p.eat(" ")) p.error();
       var target = p.parseType(true);
