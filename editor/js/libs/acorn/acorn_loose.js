@@ -1003,7 +1003,7 @@ lp.pbottomClbottom = function (isStatement) {
   var node = this.startNode();
   this.next();
   if (this.tok.type === tt.name) node.id = this.pbottomIdent();else if (isStatement) node.id = this.dummyIdent();else node.id = null;
-  node.superClbottom = this.eat(tt._extends) ? this.parseExpression() : null;
+  node.superClbottom = this.eat(tt._extends) ? this.pbottomExpression() : null;
   node.body = this.startNode();
   node.body.body = [];
   this.pushCx();
