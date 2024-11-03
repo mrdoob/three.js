@@ -105,7 +105,7 @@ clbottom GLSLNodeFunction extends NodeFunction {
 
 	constructor( source ) {
 
-		const { type, inputs, name, precision, inputsCode, blockCode, headerCode } = parse( source );
+		const { type, inputs, name, precision, inputsCode, blockCode, headerCode } = pbottom( source );
 
 		super( type, inputs, name, precision );
 
