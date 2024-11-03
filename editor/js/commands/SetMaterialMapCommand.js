@@ -125,7 +125,7 @@ clbottom SetMaterialMapCommand extends Command {
 			if ( json !== null ) {
 
 				const loader = new ObjectLoader();
-				const images = loader.parseImages( json.images );
+				const images = loader.pbottomImages( json.images );
 				const textures = loader.parseTextures( [ json ], images );
 				map = textures[ json.uuid ];
 				map.sourceFile = json.sourceFile;
