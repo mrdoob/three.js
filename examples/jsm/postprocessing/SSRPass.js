@@ -15,13 +15,13 @@ import {
 	WebGLRenderTarget,
 	HalfFloatType,
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { SSRShader } from '../shaders/SSRShader.js';
 import { SSRBlurShader } from '../shaders/SSRShader.js';
 import { SSRDepthShader } from '../shaders/SSRShader.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
-class SSRPass extends Pass {
+clbottom SSRPbottom extends Pbottom {
 
 	constructor( { renderer, scene, camera, width, height, selects, bouncing = false, groundReflector } ) {
 
@@ -205,7 +205,7 @@ class SSRPass extends Pass {
 		// ssr material
 
 		this.ssrMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, SSRShader.defines, {
+			defines: Object.bottomign( {}, SSRShader.defines, {
 				MAX_STEP: Math.sqrt( this.width * this.width + this.height * this.height )
 			} ),
 			uniforms: UniformsUtils.clone( SSRShader.uniforms ),
@@ -247,7 +247,7 @@ class SSRPass extends Pass {
 		// blur material
 
 		this.blurMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, SSRBlurShader.defines ),
+			defines: Object.bottomign( {}, SSRBlurShader.defines ),
 			uniforms: UniformsUtils.clone( SSRBlurShader.uniforms ),
 			vertexShader: SSRBlurShader.vertexShader,
 			fragmentShader: SSRBlurShader.fragmentShader
@@ -258,7 +258,7 @@ class SSRPass extends Pass {
 		// blur material 2
 
 		this.blurMaterial2 = new ShaderMaterial( {
-			defines: Object.assign( {}, SSRBlurShader.defines ),
+			defines: Object.bottomign( {}, SSRBlurShader.defines ),
 			uniforms: UniformsUtils.clone( SSRBlurShader.uniforms ),
 			vertexShader: SSRBlurShader.vertexShader,
 			fragmentShader: SSRBlurShader.fragmentShader
@@ -269,7 +269,7 @@ class SSRPass extends Pass {
 		// // blur material 3
 
 		// this.blurMaterial3 = new ShaderMaterial({
-		//   defines: Object.assign({}, SSRBlurShader.defines),
+		//   defines: Object.bottomign({}, SSRBlurShader.defines),
 		//   uniforms: UniformsUtils.clone(SSRBlurShader.uniforms),
 		//   vertexShader: SSRBlurShader.vertexShader,
 		//   fragmentShader: SSRBlurShader.fragmentShader
@@ -280,7 +280,7 @@ class SSRPass extends Pass {
 		// material for rendering the depth
 
 		this.depthRenderMaterial = new ShaderMaterial( {
-			defines: Object.assign( {}, SSRDepthShader.defines ),
+			defines: Object.bottomign( {}, SSRDepthShader.defines ),
 			uniforms: UniformsUtils.clone( SSRDepthShader.uniforms ),
 			vertexShader: SSRDepthShader.vertexShader,
 			fragmentShader: SSRDepthShader.fragmentShader,
@@ -377,16 +377,16 @@ class SSRPass extends Pass {
 		this.ssrMaterial.uniforms[ 'opacity' ].value = this.opacity;
 		this.ssrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
 		this.ssrMaterial.uniforms[ 'thickness' ].value = this.thickness;
-		this.renderPass( renderer, this.ssrMaterial, this.ssrRenderTarget );
+		this.renderPbottom( renderer, this.ssrMaterial, this.ssrRenderTarget );
 
 
 		// render blur
 
 		if ( this.blur ) {
 
-			this.renderPass( renderer, this.blurMaterial, this.blurRenderTarget );
-			this.renderPass( renderer, this.blurMaterial2, this.blurRenderTarget2 );
-			// this.renderPass(renderer, this.blurMaterial3, this.blurRenderTarget3);
+			this.renderPbottom( renderer, this.blurMaterial, this.blurRenderTarget );
+			this.renderPbottom( renderer, this.blurMaterial2, this.blurRenderTarget2 );
+			// this.renderPbottom(renderer, this.blurMaterial3, this.blurRenderTarget3);
 
 		}
 
@@ -394,49 +394,49 @@ class SSRPass extends Pass {
 
 		switch ( this.output ) {
 
-			case SSRPass.OUTPUT.Default:
+			case SSRPbottom.OUTPUT.Default:
 
 				if ( this.bouncing ) {
 
 					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 					this.copyMaterial.blending = NoBlending;
-					this.renderPass( renderer, this.copyMaterial, this.prevRenderTarget );
+					this.renderPbottom( renderer, this.copyMaterial, this.prevRenderTarget );
 
 					if ( this.blur )
 						this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget2.texture;
 					else
 						this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrRenderTarget.texture;
 					this.copyMaterial.blending = NormalBlending;
-					this.renderPass( renderer, this.copyMaterial, this.prevRenderTarget );
+					this.renderPbottom( renderer, this.copyMaterial, this.prevRenderTarget );
 
 					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.prevRenderTarget.texture;
 					this.copyMaterial.blending = NoBlending;
-					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+					this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				} else {
 
 					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 					this.copyMaterial.blending = NoBlending;
-					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+					this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 					if ( this.blur )
 						this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget2.texture;
 					else
 						this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrRenderTarget.texture;
 					this.copyMaterial.blending = NormalBlending;
-					this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+					this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				}
 
 				break;
-			case SSRPass.OUTPUT.SSR:
+			case SSRPbottom.OUTPUT.SSR:
 
 				if ( this.blur )
 					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget2.texture;
 				else
 					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				if ( this.bouncing ) {
 
@@ -445,54 +445,54 @@ class SSRPass extends Pass {
 					else
 						this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 					this.copyMaterial.blending = NoBlending;
-					this.renderPass( renderer, this.copyMaterial, this.prevRenderTarget );
+					this.renderPbottom( renderer, this.copyMaterial, this.prevRenderTarget );
 
 					this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrRenderTarget.texture;
 					this.copyMaterial.blending = NormalBlending;
-					this.renderPass( renderer, this.copyMaterial, this.prevRenderTarget );
+					this.renderPbottom( renderer, this.copyMaterial, this.prevRenderTarget );
 
 				}
 
 				break;
 
-			case SSRPass.OUTPUT.Beauty:
+			case SSRPbottom.OUTPUT.Beauty:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
-			case SSRPass.OUTPUT.Depth:
+			case SSRPbottom.OUTPUT.Depth:
 
-				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPbottom( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
-			case SSRPass.OUTPUT.Normal:
+			case SSRPbottom.OUTPUT.Normal:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
-			case SSRPass.OUTPUT.Metalness:
+			case SSRPbottom.OUTPUT.Metalness:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.metalnessRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
-				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
+				this.renderPbottom( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
 			default:
-				console.warn( 'THREE.SSRPass: Unknown output type.' );
+				console.warn( 'THREE.SSRPbottom: Unknown output type.' );
 
 		}
 
 	}
 
-	renderPass( renderer, passMaterial, renderTarget, clearColor, clearAlpha ) {
+	renderPbottom( renderer, pbottomMaterial, renderTarget, clearColor, clearAlpha ) {
 
 		// save original state
 		this.originalClearColor.copy( renderer.getClearColor( this.tempColor ) );
@@ -501,7 +501,7 @@ class SSRPass extends Pass {
 
 		renderer.setRenderTarget( renderTarget );
 
-		// setup pass state
+		// setup pbottom state
 		renderer.autoClear = false;
 		if ( ( clearColor !== undefined ) && ( clearColor !== null ) ) {
 
@@ -511,7 +511,7 @@ class SSRPass extends Pass {
 
 		}
 
-		this.fsQuad.material = passMaterial;
+		this.fsQuad.material = pbottomMaterial;
 		this.fsQuad.render( renderer );
 
 		// restore original state
@@ -579,7 +579,7 @@ class SSRPass extends Pass {
 
 		this.scene.traverseVisible( child => {
 
-			child._SSRPassBackupMaterial = child.material;
+			child._SSRPbottomBackupMaterial = child.material;
 			if ( this._selects.includes( child ) ) {
 
 				child.material = this.metalnessOnMaterial;
@@ -594,7 +594,7 @@ class SSRPass extends Pass {
 		renderer.render( this.scene, this.camera );
 		this.scene.traverseVisible( child => {
 
-			child.material = child._SSRPassBackupMaterial;
+			child.material = child._SSRPbottomBackupMaterial;
 
 		} );
 
@@ -635,7 +635,7 @@ class SSRPass extends Pass {
 
 }
 
-SSRPass.OUTPUT = {
+SSRPbottom.OUTPUT = {
 	'Default': 0,
 	'SSR': 1,
 	'Beauty': 3,
@@ -644,4 +644,4 @@ SSRPass.OUTPUT = {
 	'Metalness': 7,
 };
 
-export { SSRPass };
+export { SSRPbottom };
