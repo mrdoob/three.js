@@ -2332,7 +2332,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expectKeyword('return');
 	        var hasArgument = !this.match(';') && !this.match('}') &&
 	            !this.hasLineTerminator && this.lookahead.type !== token_1.Token.EOF;
-	        var argument = hasArgument ? this.parseExpression() : null;
+	        var argument = hasArgument ? this.pbottomExpression() : null;
 	        this.consumeSemicolon();
 	        return this.finalize(node, new Node.ReturnStatement(argument));
 	    };
