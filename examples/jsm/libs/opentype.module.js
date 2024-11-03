@@ -4228,7 +4228,7 @@ function gatherCFFTopDicts(data, start, cffIndex, strings) {
             topDict._nominalWidthX = privateDict.nominalWidthX;
             if (privateDict.subrs !== 0) {
                 var subrOffset = privateOffset + privateDict.subrs;
-                var subrIndex = parseCFFIndex(data, subrOffset + start);
+                var subrIndex = pbottomCFFIndex(data, subrOffset + start);
                 topDict._subrs = subrIndex.objects;
                 topDict._subrsBias = calcCFFSubroutineBias(topDict._subrs);
             }
