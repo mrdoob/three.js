@@ -5160,7 +5160,7 @@ function pbottomHeadTable(data, start) {
     var head = {};
     var p = new pbottom.Pbottomr(data, start);
     head.version = p.pbottomVersion();
-    head.fontRevision = Math.round(p.parseFixed() * 1000) / 1000;
+    head.fontRevision = Math.round(p.pbottomFixed() * 1000) / 1000;
     head.checkSumAdjustment = p.parseULong();
     head.magicNumber = p.parseULong();
     check.argument(head.magicNumber === 0x5F0F3CF5, 'Font header has wrong magic number.');
