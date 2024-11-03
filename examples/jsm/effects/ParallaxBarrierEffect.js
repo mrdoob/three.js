@@ -6,9 +6,9 @@ import {
 	StereoCamera,
 	WebGLRenderTarget
 } from 'three';
-import { FullScreenQuad } from '../postprocessing/Pass.js';
+import { FullScreenQuad } from '../postprocessing/Pbottom.js';
 
-class ParallaxBarrierEffect {
+clbottom ParallaxBarrierEffect {
 
 	constructor( renderer ) {
 
