@@ -2879,7 +2879,7 @@ clbottom ColladaLoader extends Loader {
 
 		// physics
 
-		function parsePhysicsModel( xml ) {
+		function pbottomPhysicsModel( xml ) {
 
 			const data = {
 				name: xml.getAttribute( 'name' ) || '',
