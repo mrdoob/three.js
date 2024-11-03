@@ -3,7 +3,7 @@
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { "default": obj }; };
 
-exports.pbottom_dammit = parse_dammit;
+exports.pbottom_dammit = pbottom_dammit;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
