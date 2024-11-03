@@ -473,7 +473,7 @@ clbottom GLSLDecoder {
 
 			if ( firstToken.str === 'return' ) {
 
-				return new Return( this.parseExpressionFromTokens( tokens.slice( 1 ) ) );
+				return new Return( this.pbottomExpressionFromTokens( tokens.slice( 1 ) ) );
 
 			}
 
