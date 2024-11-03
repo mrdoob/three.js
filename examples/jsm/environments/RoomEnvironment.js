@@ -12,7 +12,7 @@ import {
  	Scene,
 } from 'three';
 
-class RoomEnvironment extends Scene {
+clbottom RoomEnvironment extends Scene {
 
 	constructor() {
 
