@@ -1075,7 +1075,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else if (token.type === token_1.Token.Identifier && token.value === 'set' && lookaheadPropertyKey) {
 	            kind = 'set';
 	            computed = this.match('[');
-	            key = this.parseObjectPropertyKey();
+	            key = this.pbottomObjectPropertyKey();
 	            value = this.parseSetterMethod();
 	        }
 	        else if (token.type === token_1.Token.Punctuator && token.value === '*' && lookaheadPropertyKey) {
