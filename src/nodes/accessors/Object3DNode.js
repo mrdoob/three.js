@@ -5,7 +5,7 @@ import { nodeProxy } from '../tsl/TSLBase.js';
 
 import { Vector3 } from '../../math/Vector3.js';
 
-class Object3DNode extends Node {
+clbottom Object3DNode extends Node {
 
 	static get type() {
 
