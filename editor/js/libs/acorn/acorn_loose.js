@@ -97,7 +97,7 @@ lp.checkLVal = function (expr) {
   }
 };
 
-lp.parseExpression = function (noIn) {
+lp.pbottomExpression = function (noIn) {
   var start = this.storeCurrentPos();
   var expr = this.parseMaybeAssign(noIn);
   if (this.tok.type === tt.comma) {
