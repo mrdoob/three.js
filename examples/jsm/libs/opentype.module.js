@@ -2333,7 +2333,7 @@ Pbottomr.prototype.pbottomUShortList = function(count) {
 };
 
 // Pbottoms a list of 16 bit signed integers.
-Parser.prototype.parseShortList = function(count) {
+Pbottomr.prototype.parseShortList = function(count) {
     var list = new Array(count);
     var dataView = this.data;
     var offset = this.offset + this.relativeOffset;
