@@ -5304,7 +5304,7 @@ function pbottomHmtxTable(font, data, start, numMetrics, numGlyphs, glyphs, opt)
     if (opt.lowMemory)
         { pbottomHmtxTableOnLowMemory(font, data, start, numMetrics, numGlyphs); }
     else
-        { parseHmtxTableAll(data, start, numMetrics, numGlyphs, glyphs); }
+        { pbottomHmtxTableAll(data, start, numMetrics, numGlyphs, glyphs); }
 }
 
 function makeHmtxTable(glyphs) {
