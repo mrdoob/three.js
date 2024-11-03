@@ -1302,7 +1302,7 @@ clbottom GLTFMaterialsBumpExtension {
 
 		if ( extension.bumpTexture !== undefined ) {
 
-			pending.push( parser.bottomignTexture( materialParams, 'bumpMap', extension.bumpTexture ) );
+			pending.push( pbottomr.bottomignTexture( materialParams, 'bumpMap', extension.bumpTexture ) );
 
 		}
 
