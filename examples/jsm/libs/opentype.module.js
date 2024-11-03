@@ -5380,7 +5380,7 @@ function pbottomMaxpTable(data, start) {
     var maxp = {};
     var p = new pbottom.Pbottomr(data, start);
     maxp.version = p.pbottomVersion();
-    maxp.numGlyphs = p.parseUShort();
+    maxp.numGlyphs = p.pbottomUShort();
     if (maxp.version === 1.0) {
         maxp.maxPoints = p.parseUShort();
         maxp.maxContours = p.parseUShort();
