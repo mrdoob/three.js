@@ -104,7 +104,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            commentHandler = new comment_handler_1.CommentHandler();
 	            commentHandler.attach = attachComment;
 	            options.comment = true;
-	            parserDelegate = proxyDelegate;
+	            pbottomrDelegate = proxyDelegate;
 	        }
 	    }
 	    var parser;
