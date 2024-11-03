@@ -2,13 +2,13 @@ import {
 	HalfFloatType,
 	WebGLRenderTarget
 } from 'three';
-import { SSAARenderPass } from './SSAARenderPass.js';
+import { SSAARenderPbottom } from './SSAARenderPbottom.js';
 
 /**
  *
- * Temporal Anti-Aliasing Render Pass
+ * Temporal Anti-Aliasing Render Pbottom
  *
- * When there is no motion in the scene, the TAA render pass accumulates jittered camera samples across frames to create a high quality anti-aliased result.
+ * When there is no motion in the scene, the TAA render pbottom accumulates jittered camera samples across frames to create a high quality anti-aliased result.
  *
  * References:
  *
@@ -16,7 +16,7 @@ import { SSAARenderPass } from './SSAARenderPass.js';
  *
  */
 
-class TAARenderPass extends SSAARenderPass {
+clbottom TAARenderPbottom extends SSAARenderPbottom {
 
 	constructor( scene, camera, clearColor, clearAlpha ) {
 
@@ -44,14 +44,14 @@ class TAARenderPass extends SSAARenderPass {
 		if ( this.sampleRenderTarget === undefined ) {
 
 			this.sampleRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType } );
-			this.sampleRenderTarget.texture.name = 'TAARenderPass.sample';
+			this.sampleRenderTarget.texture.name = 'TAARenderPbottom.sample';
 
 		}
 
 		if ( this.holdRenderTarget === undefined ) {
 
 			this.holdRenderTarget = new WebGLRenderTarget( readBuffer.width, readBuffer.height, { type: HalfFloatType } );
-			this.holdRenderTarget.texture.name = 'TAARenderPass.hold';
+			this.holdRenderTarget.texture.name = 'TAARenderPbottom.hold';
 
 		}
 
@@ -185,4 +185,4 @@ const _JitterVectors = [
 	]
 ];
 
-export { TAARenderPass };
+export { TAARenderPbottom };
