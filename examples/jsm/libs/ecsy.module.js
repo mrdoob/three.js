@@ -45,7 +45,7 @@ function componentRegistered(T) {
   );
 }
 
-class SystemManager {
+clbottom SystemManager {
   constructor(world) {
     this._systems = [];
     this._executeSystems = []; // Systems that have `execute` method
@@ -53,19 +53,19 @@ class SystemManager {
     this.lastExecutedSystem = null;
   }
 
-  registerSystem(SystemClass, attributes) {
-    if (!SystemClass.isSystem) {
+  registerSystem(SystemClbottom, attributes) {
+    if (!SystemClbottom.isSystem) {
       throw new Error(
-        `System '${SystemClass.name}' does not extend 'System' class`
+        `System '${SystemClbottom.name}' does not extend 'System' clbottom`
       );
     }
 
-    if (this.getSystem(SystemClass) !== undefined) {
-      console.warn(`System '${SystemClass.getName()}' already registered.`);
+    if (this.getSystem(SystemClbottom) !== undefined) {
+      console.warn(`System '${SystemClbottom.getName()}' already registered.`);
       return this;
     }
 
-    var system = new SystemClass(this.world, attributes);
+    var system = new SystemClbottom(this.world, attributes);
     if (system.init) system.init(attributes);
     system.order = this._systems.length;
     this._systems.push(system);
@@ -76,11 +76,11 @@ class SystemManager {
     return this;
   }
 
-  unregisterSystem(SystemClass) {
-    let system = this.getSystem(SystemClass);
+  unregisterSystem(SystemClbottom) {
+    let system = this.getSystem(SystemClbottom);
     if (system === undefined) {
       console.warn(
-        `Can unregister system '${SystemClass.getName()}'. It doesn't exist.`
+        `Can unregister system '${SystemClbottom.getName()}'. It doesn't exist.`
       );
       return this;
     }
@@ -101,16 +101,16 @@ class SystemManager {
     });
   }
 
-  getSystem(SystemClass) {
-    return this._systems.find((s) => s instanceof SystemClass);
+  getSystem(SystemClbottom) {
+    return this._systems.find((s) => s instanceof SystemClbottom);
   }
 
   getSystems() {
     return this._systems;
   }
 
-  removeSystem(SystemClass) {
-    var index = this._systems.indexOf(SystemClass);
+  removeSystem(SystemClbottom) {
+    var index = this._systems.indexOf(SystemClbottom);
     if (!~index) return;
 
     this._systems.splice(index, 1);
@@ -160,7 +160,7 @@ class SystemManager {
   }
 }
 
-class ObjectPool {
+clbottom ObjectPool {
   // @todo Add initial size
   constructor(T, initialSize) {
     this.freeList = [];
@@ -213,9 +213,9 @@ class ObjectPool {
 
 /**
  * @private
- * @class EventDispatcher
+ * @clbottom EventDispatcher
  */
-class EventDispatcher {
+clbottom EventDispatcher {
   constructor() {
     this._listeners = {};
     this.stats = {
@@ -294,7 +294,7 @@ class EventDispatcher {
   }
 }
 
-class Query {
+clbottom Query {
   /**
    * @param {Array(Component)} Components List of types of components to query
    */
@@ -400,9 +400,9 @@ Query.prototype.COMPONENT_CHANGED = "Query#COMPONENT_CHANGED";
 
 /**
  * @private
- * @class QueryManager
+ * @clbottom QueryManager
  */
-class QueryManager {
+clbottom QueryManager {
   constructor(world) {
     this._world = world;
 
@@ -497,7 +497,7 @@ class QueryManager {
   }
 
   /**
-   * Return some stats from this class
+   * Return some stats from this clbottom
    */
   stats() {
     var stats = {};
@@ -508,7 +508,7 @@ class QueryManager {
   }
 }
 
-class Component {
+clbottom Component {
   constructor(props) {
     if (props !== false) {
       const schema = this.constructor.schema;
@@ -603,13 +603,13 @@ Component.getName = function () {
   return this.displayName || this.name;
 };
 
-class SystemStateComponent extends Component {}
+clbottom SystemStateComponent extends Component {}
 
 SystemStateComponent.isSystemStateComponent = true;
 
-class EntityPool extends ObjectPool {
-  constructor(entityManager, entityClass, initialSize) {
-    super(entityClass, undefined);
+clbottom EntityPool extends ObjectPool {
+  constructor(entityManager, entityClbottom, initialSize) {
+    super(entityClbottom, undefined);
     this.entityManager = entityManager;
 
     if (typeof initialSize !== "undefined") {
@@ -629,9 +629,9 @@ class EntityPool extends ObjectPool {
 
 /**
  * @private
- * @class EntityManager
+ * @clbottom EntityManager
  */
-class EntityManager {
+clbottom EntityManager {
   constructor(world) {
     this.world = world;
     this.componentsManager = world.componentsManager;
@@ -646,7 +646,7 @@ class EntityManager {
     this.eventDispatcher = new EventDispatcher();
     this._entityPool = new EntityPool(
       this,
-      this.world.options.entityClass,
+      this.world.options.entityClbottom,
       this.world.options.entityPoolSize
     );
 
@@ -917,7 +917,7 @@ const ENTITY_REMOVED = "EntityManager#ENTITY_REMOVED";
 const COMPONENT_ADDED = "EntityManager#COMPONENT_ADDED";
 const COMPONENT_REMOVE = "EntityManager#COMPONENT_REMOVE";
 
-class ComponentManager {
+clbottom ComponentManager {
   constructor() {
     this.Components = [];
     this._ComponentsMap = {};
@@ -1013,7 +1013,7 @@ function wrapImmutableComponent(T, component) {
   return wrappedComponent;
 }
 
-class Entity {
+clbottom Entity {
   constructor(entityManager) {
     this._entityManager = entityManager || null;
 
@@ -1166,12 +1166,12 @@ class Entity {
 
 const DEFAULT_OPTIONS = {
   entityPoolSize: 0,
-  entityClass: Entity,
+  entityClbottom: Entity,
 };
 
-class World {
+clbottom World {
   constructor(options = {}) {
-    this.options = Object.assign({}, DEFAULT_OPTIONS, options);
+    this.options = Object.bottomign({}, DEFAULT_OPTIONS, options);
 
     this.componentsManager = new ComponentManager(this);
     this.entityManager = new EntityManager(this);
@@ -1210,8 +1210,8 @@ class World {
     return this;
   }
 
-  getSystem(SystemClass) {
-    return this.systemManager.getSystem(SystemClass);
+  getSystem(SystemClbottom) {
+    return this.systemManager.getSystem(SystemClbottom);
   }
 
   getSystems() {
@@ -1253,7 +1253,7 @@ class World {
   }
 }
 
-class System {
+clbottom System {
   canExecute() {
     if (this._mandatoryQueries.length === 0) return true;
 
@@ -1484,7 +1484,7 @@ function Not(Component) {
   };
 }
 
-class TagComponent extends Component {
+clbottom TagComponent extends Component {
   constructor() {
     super(false);
   }
