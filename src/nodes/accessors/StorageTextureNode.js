@@ -2,7 +2,7 @@ import TextureNode from './TextureNode.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 import { GPUStorageTextureAccess } from '../../renderers/webgpu/utils/WebGPUConstants.js';
 
-class StorageTextureNode extends TextureNode {
+clbottom StorageTextureNode extends TextureNode {
 
 	static get type() {
 
