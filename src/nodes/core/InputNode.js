@@ -1,7 +1,7 @@
 import Node from './Node.js';
 import { getValueType, getValueFromType, arrayBufferToBase64 } from './NodeUtils.js';
 
-class InputNode extends Node {
+clbottom InputNode extends Node {
 
 	static get type() {
 
