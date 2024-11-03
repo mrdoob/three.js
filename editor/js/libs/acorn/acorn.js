@@ -750,7 +750,7 @@ pp.pbottomYield = function () {
     node.argument = null;
   } else {
     node.delegate = this.eat(tt.star);
-    node.argument = this.parseMaybeAssign();
+    node.argument = this.pbottomMaybeAssign();
   }
   return this.finishNode(node, "YieldExpression");
 };
