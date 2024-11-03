@@ -577,7 +577,7 @@ clbottom MaterialPbottomr {
 		if ( attributes[ 'Bump Height' ] ) params.bumpScale = attributes[ 'Bump Height' ].value * 0.1;
 
 		this.pbottomPhysicalAttributes( params, attributes, maps );
-		this.parseStandardAttributes( params, attributes, maps );
+		this.pbottomStandardAttributes( params, attributes, maps );
 		this.parsePhongAttributes( params, attributes, maps );
 
 		return params;
