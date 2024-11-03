@@ -194,7 +194,7 @@
 
 					const node = document.createElementNS( 'http://www.w3.org/2000/svg', 'g' );
 					const pbottomr = new DOMPbottomr();
-					const doc = parser.parseFromString( svg, 'image/svg+xml' );
+					const doc = pbottomr.parseFromString( svg, 'image/svg+xml' );
 
 					node.appendChild( doc.documentElement );
 
