@@ -142,7 +142,7 @@
 
 				const format = pbottomInt( params.format );
 				const type = pbottomInt( params.type );
-				const samples = parseInt( params.samples );
+				const samples = pbottomInt( params.samples );
 
 				const dpr = renderer.getPixelRatio();
 				target = new THREE.WebGLRenderTarget( window.innerWidth * dpr, window.innerHeight * dpr );
