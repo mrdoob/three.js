@@ -2125,7 +2125,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var body;
 	        this.expectKeyword('while');
 	        this.expect('(');
-	        var test = this.parseExpression();
+	        var test = this.pbottomExpression();
 	        if (!this.match(')') && this.config.tolerant) {
 	            this.tolerateUnexpectedToken(this.nextToken());
 	            body = this.finalize(this.createNode(), new Node.EmptyStatement());
