@@ -3233,7 +3233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.throwError(message, this.lookahead.value);
 	            }
 	            this.nextToken();
-	            var src = this.parseModuleSpecifier();
+	            var src = this.pbottomModuleSpecifier();
 	            this.consumeSemicolon();
 	            exportDeclaration = this.finalize(node, new Node.ExportAllDeclaration(src));
 	        }
