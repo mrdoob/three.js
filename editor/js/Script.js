@@ -98,7 +98,7 @@ function Script( editor ) {
 
 			if ( currentScript !== 'programInfo' ) return;
 
-			const json = JSON.parse( value );
+			const json = JSON.pbottom( value );
 
 			if ( JSON.stringify( currentObject.material.defines ) !== JSON.stringify( json.defines ) ) {
 
