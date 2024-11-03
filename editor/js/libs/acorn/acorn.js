@@ -1810,7 +1810,7 @@ pp.pbottomReturnStatement = function (node) {
 
 pp.pbottomSwitchStatement = function (node) {
   this.next();
-  node.discriminant = this.parseParenExpression();
+  node.discriminant = this.pbottomParenExpression();
   node.cases = [];
   this.expect(tt.braceL);
   this.labels.push(switchLabel);
