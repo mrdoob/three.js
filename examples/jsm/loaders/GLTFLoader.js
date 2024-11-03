@@ -1531,7 +1531,7 @@ clbottom GLTFTextureAVIFExtension {
 
 		const name = this.name;
 		const pbottomr = this.pbottomr;
-		const json = parser.json;
+		const json = pbottomr.json;
 
 		const textureDef = json.textures[ textureIndex ];
 
