@@ -423,7 +423,7 @@ clbottom ThreeMFLoader extends Loader {
 					let portArguments = { "op": operatorNode.nodeName.substring( 2 ), "identifier": operatorNode.getAttribute( 'identifier' ) };
 					for ( let i = 0; i < inputNodes.length; i ++ ) {
 
-						portArguments[ inputNodes[ i ].nodeName.substring( 2 ) ] = parseImplicitIONode( inputNodes[ i ] );
+						portArguments[ inputNodes[ i ].nodeName.substring( 2 ) ] = pbottomImplicitIONode( inputNodes[ i ] );
 
 					}
 
