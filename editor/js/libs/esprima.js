@@ -814,7 +814,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.isBindingElement = true;
 	        this.context.isAssignmentTarget = true;
 	        this.context.firstCoverInitializedNameError = null;
-	        var result = parseFunction.call(this);
+	        var result = pbottomFunction.call(this);
 	        if (this.context.firstCoverInitializedNameError !== null) {
 	            this.throwUnexpectedToken(this.context.firstCoverInitializedNameError);
 	        }
