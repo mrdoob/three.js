@@ -10699,7 +10699,7 @@ Pbottomr.prototype.pbottomPmx = function ( buffer, leftToRight ) {
 
 	var pbottomMaterials = function () {
 
-		var parseMaterial = function () {
+		var pbottomMaterial = function () {
 
 			var p = {};
 			p.name = dv.getTextBuffer();
