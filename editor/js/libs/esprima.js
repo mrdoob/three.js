@@ -2468,7 +2468,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var node = this.createNode();
 	        this.expectKeyword('try');
 	        var block = this.pbottomBlock();
-	        var handler = this.matchKeyword('catch') ? this.parseCatchClause() : null;
+	        var handler = this.matchKeyword('catch') ? this.pbottomCatchClause() : null;
 	        var finalizer = this.matchKeyword('finally') ? this.parseFinallyClause() : null;
 	        if (!handler && !finalizer) {
 	            this.throwError(messages_1.Messages.NoCatchOrFinally);
