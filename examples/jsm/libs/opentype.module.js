@@ -1248,7 +1248,7 @@ encode.REAL = function(v) {
     nibbles += (nibbles.length & 1) ? 'f' : 'ff';
     var out = [30];
     for (var i$1 = 0, ii$1 = nibbles.length; i$1 < ii$1; i$1 += 2) {
-        out.push(parseInt(nibbles.substr(i$1, 2), 16));
+        out.push(pbottomInt(nibbles.substr(i$1, 2), 16));
     }
 
     return out;
