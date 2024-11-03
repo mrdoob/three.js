@@ -119,15 +119,15 @@
 								const vec2 depthUv, int arrayIndex) {
 								return texture(depthColor, vec3(depthUv.x, depthUv.y, arrayIndex)).r;
 							}
-							float Depth_GetOcclusion(const sampler2DArray depthTexture, const vec2 depthUv, float assetDepthM, int arrayIndex) {
+							float Depth_GetOcclusion(const sampler2DArray depthTexture, const vec2 depthUv, float bottometDepthM, int arrayIndex) {
 								float depthMm = Depth_GetCameraDepthInMeters(depthTexture, depthUv, arrayIndex);
 								const float kDepthTolerancePerM = 0.001;
 								return clamp(1.0 -
-									0.5 * (depthMm - assetDepthM) /
-										(kDepthTolerancePerM * assetDepthM) +
+									0.5 * (depthMm - bottometDepthM) /
+										(kDepthTolerancePerM * bottometDepthM) +
 									0.5, 0.0, 1.0);
 							}
-							float Depth_GetBlurredOcclusionAroundUV(const sampler2DArray depthTexture, const vec2 uv, float assetDepthM, int arrayIndex) {
+							float Depth_GetBlurredOcclusionAroundUV(const sampler2DArray depthTexture, const vec2 uv, float bottometDepthM, int arrayIndex) {
 								// Kernel used:
 								// 0   4   7   4   0
 								// 4   16  26  16  4
@@ -141,53 +141,53 @@
 								vec2(kOcclusionBlurAmount, kOcclusionBlurAmount /** u_DepthAspectRatio*/);
 								float current = 0.0;
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(-1.0, -2.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(-1.0, -2.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(+1.0, -2.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(+1.0, -2.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(-1.0, +2.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(-1.0, +2.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(+1.0, +2.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(+1.0, +2.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(-2.0, +1.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(-2.0, +1.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(+2.0, +1.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(+2.0, +1.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(-2.0, -1.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(-2.0, -1.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(+2.0, -1.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(+2.0, -1.0) * blurriness, bottometDepthM, arrayIndex);
 								sum += current * 4.0;
 								current = 0.0;
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(-2.0, -0.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(-2.0, -0.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(+2.0, +0.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(+2.0, +0.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(+0.0, +2.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(+0.0, +2.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(-0.0, -2.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(-0.0, -2.0) * blurriness, bottometDepthM, arrayIndex);
 								sum += current * 7.0;
 								current = 0.0;
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(-1.0, -1.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(-1.0, -1.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(+1.0, -1.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(+1.0, -1.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(-1.0, +1.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(-1.0, +1.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(+1.0, +1.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(+1.0, +1.0) * blurriness, bottometDepthM, arrayIndex);
 								sum += current * 16.0;
 								current = 0.0;
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(+0.0, +1.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(+0.0, +1.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(-0.0, -1.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(-0.0, -1.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(-1.0, -0.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(-1.0, -0.0) * blurriness, bottometDepthM, arrayIndex);
 								current += Depth_GetOcclusion(
-								depthTexture, uv + vec2(+1.0, +0.0) * blurriness, assetDepthM, arrayIndex);
+								depthTexture, uv + vec2(+1.0, +0.0) * blurriness, bottometDepthM, arrayIndex);
 								sum += current * 26.0;
-								sum += Depth_GetOcclusion(depthTexture, uv, assetDepthM, arrayIndex) * 41.0;
+								sum += Depth_GetOcclusion(depthTexture, uv, bottometDepthM, arrayIndex) * 41.0;
 								return sum / kKernelTotalWeights;
 							}
 							void main() {
@@ -206,12 +206,12 @@
 									} else {
 										depthUv = vec2(gl_FragCoord.x/depthWidth, gl_FragCoord.y/depthHeight);
 									}
-									float assetDepthM = gl_FragCoord.z;
+									float bottometDepthM = gl_FragCoord.z;
 
-									float occlusion = Depth_GetBlurredOcclusionAroundUV(depthColor, depthUv, assetDepthM, arrayIndex);
+									float occlusion = Depth_GetBlurredOcclusionAroundUV(depthColor, depthUv, bottometDepthM, arrayIndex);
 									float depthMm = Depth_GetCameraDepthInMeters(depthColor, depthUv, arrayIndex);
 
-									float absDistance = abs(assetDepthM - depthMm);
+									float absDistance = abs(bottometDepthM - depthMm);
 									float v = 0.0025;
 									absDistance = saturate(v - absDistance) / v;
 
