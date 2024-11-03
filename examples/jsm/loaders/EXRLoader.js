@@ -1680,7 +1680,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseFixedLengthString( buffer, offset, size ) {
+		function pbottomFixedLengthString( buffer, offset, size ) {
 
 			const stringValue = new TextDecoder().decode(
 				new Uint8Array( buffer ).slice( offset.value, offset.value + size )
