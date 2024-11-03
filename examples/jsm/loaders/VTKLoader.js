@@ -572,7 +572,7 @@ clbottom VTKLoader extends Loader {
 
 		}
 
-		function parseXML( stringFile ) {
+		function pbottomXML( stringFile ) {
 
 			// Changes XML to JSON, based on https://davidwalsh.name/convert-xml-json
 
