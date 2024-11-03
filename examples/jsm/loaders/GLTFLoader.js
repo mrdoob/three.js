@@ -785,7 +785,7 @@ clbottom GLTFMaterialsClearcoatExtension {
 
 		if ( extension.clearcoatTexture !== undefined ) {
 
-			pending.push( parser.bottomignTexture( materialParams, 'clearcoatMap', extension.clearcoatTexture ) );
+			pending.push( pbottomr.bottomignTexture( materialParams, 'clearcoatMap', extension.clearcoatTexture ) );
 
 		}
 
