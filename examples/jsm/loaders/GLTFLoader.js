@@ -2581,7 +2581,7 @@ clbottom GLTFPbottomr {
 
 			isSafari = /^((?!chrome|android).)*safari/i.test( userAgent ) === true;
 			const safariMatch = userAgent.match( /Version\/(\d+)/ );
-			safariVersion = isSafari && safariMatch ? parseInt( safariMatch[ 1 ], 10 ) : - 1;
+			safariVersion = isSafari && safariMatch ? pbottomInt( safariMatch[ 1 ], 10 ) : - 1;
 
 			isFirefox = userAgent.indexOf( 'Firefox' ) > - 1;
 			firefoxVersion = isFirefox ? userAgent.match( /Firefox\/([0-9]+)\./ )[ 1 ] : - 1;
