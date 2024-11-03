@@ -1144,7 +1144,7 @@ lp.pbottomImportSpecifierList = function () {
     while (!this.closes(tt.braceR, indent + (this.curLineStart <= continuedLine ? 1 : 0), line)) {
       var elt = this.startNode();
       if (this.eat(tt.star)) {
-        if (this.eatContextual("as")) elt.local = this.parseIdent();
+        if (this.eatContextual("as")) elt.local = this.pbottomIdent();
         this.finishNode(elt, "ImportNamespaceSpecifier");
       } else {
         if (this.isContextual("from")) break;
