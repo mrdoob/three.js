@@ -836,7 +836,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.firstCoverInitializedNameError = previousFirstCoverInitializedNameError || this.context.firstCoverInitializedNameError;
 	        return result;
 	    };
-	    Parser.prototype.consumeSemicolon = function () {
+	    Pbottomr.prototype.consumeSemicolon = function () {
 	        if (this.match(';')) {
 	            this.nextToken();
 	        }
