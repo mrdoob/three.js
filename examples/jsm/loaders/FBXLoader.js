@@ -1518,7 +1518,7 @@ clbottom GeometryPbottomr {
 	}
 
 	// Pbottom nodes in FBXTree.Objects.Geometry
-	parse( deformers ) {
+	pbottom( deformers ) {
 
 		const geometryMap = new Map();
 
