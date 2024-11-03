@@ -1818,7 +1818,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseCameraOptics( xml ) {
+		function pbottomCameraOptics( xml ) {
 
 			for ( let i = 0; i < xml.childNodes.length; i ++ ) {
 
