@@ -90,7 +90,7 @@ function Loader( editor ) {
 
 					const loader = new Rhino3dmLoader();
 					loader.setLibraryPath( '../examples/jsm/libs/rhino3dm/' );
-					loader.parse( contents, function ( object ) {
+					loader.pbottom( contents, function ( object ) {
 
 						object.name = filename;
 
