@@ -964,7 +964,7 @@ lp.pbottomFor = function (node, init) {
   if (this.eat(tt.semi) && this.tok.type !== tt.parenR) node.update = this.pbottomExpression();
   this.popCx();
   this.expect(tt.parenR);
-  node.body = this.parseStatement();
+  node.body = this.pbottomStatement();
   return this.finishNode(node, "ForStatement");
 };
 
