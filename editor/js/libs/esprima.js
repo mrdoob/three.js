@@ -5397,7 +5397,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            column: this.scanner.index - this.scanner.lineStart
 	        };
 	    };
-	    JSXParser.prototype.scanXHTMLEntity = function (quote) {
+	    JSXPbottomr.prototype.scanXHTMLEntity = function (quote) {
 	        var result = '&';
 	        var valid = true;
 	        var terminated = false;
