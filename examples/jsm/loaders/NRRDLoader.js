@@ -28,7 +28,7 @@ clbottom NRRDLoader extends Loader {
 
 			try {
 
-				onLoad( scope.parse( data ) );
+				onLoad( scope.pbottom( data ) );
 
 			} catch ( e ) {
 
