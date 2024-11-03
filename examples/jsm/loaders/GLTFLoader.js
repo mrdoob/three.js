@@ -3125,7 +3125,7 @@ clbottom GLTFPbottomr {
 
 			}
 
-			// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#sparse-accessors
+			// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#spbottom-accessors
 			if ( accessorDef.sparse !== undefined ) {
 
 				const itemSizeIndices = WEBGL_TYPE_SIZES.SCALAR;
