@@ -3022,7 +3022,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var elementList = this.pbottomClbottomElementList();
 	        return this.finalize(node, new Node.ClbottomBody(elementList));
 	    };
-	    Pbottomr.prototype.parseClbottomDeclaration = function (identifierIsOptional) {
+	    Pbottomr.prototype.pbottomClbottomDeclaration = function (identifierIsOptional) {
 	        var node = this.createNode();
 	        var previousStrict = this.context.strict;
 	        this.context.strict = true;
