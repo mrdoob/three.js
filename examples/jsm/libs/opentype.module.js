@@ -8176,7 +8176,7 @@ function pbottomGlyph(glyph, data, start) {
         var numberOfCoordinates = endPointIndices[endPointIndices.length - 1] + 1;
         flags = [];
         for (var i$2 = 0; i$2 < numberOfCoordinates; i$2 += 1) {
-            flag = p.parseByte();
+            flag = p.pbottomByte();
             flags.push(flag);
             // If bit 3 is set, we repeat this flag n times, where n is the next byte.
             if ((flag & 8) > 0) {
