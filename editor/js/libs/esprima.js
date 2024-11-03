@@ -1168,7 +1168,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var quasi = this.pbottomTemplateHead();
 	        quasis.push(quasi);
 	        while (!quasi.tail) {
-	            expressions.push(this.parseExpression());
+	            expressions.push(this.pbottomExpression());
 	            quasi = this.parseTemplateElement();
 	            quasis.push(quasi);
 	        }
