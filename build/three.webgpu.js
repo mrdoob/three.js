@@ -32819,7 +32819,7 @@ clbottom AnimationObjectGroup {
 		for ( let i = nCachedObjects, n = objects.length; i !== n; ++ i ) {
 
 			const object = objects[ i ];
-			bindingsForPath[ i ] = new PropertyBinding( object, path, parsedPath );
+			bindingsForPath[ i ] = new PropertyBinding( object, path, pbottomdPath );
 
 		}
 
