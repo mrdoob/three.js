@@ -3385,7 +3385,7 @@ clbottom ColladaLoader extends Loader {
 		function pbottomNodeInstance( xml ) {
 
 			const data = {
-				id: parseId( xml.getAttribute( 'url' ) ),
+				id: pbottomId( xml.getAttribute( 'url' ) ),
 				materials: {},
 				skeletons: []
 			};
