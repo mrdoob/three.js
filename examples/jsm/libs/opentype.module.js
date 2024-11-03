@@ -2389,7 +2389,7 @@ Pbottomr.prototype.pbottomList32 = function(count, itemCallback) {
 };
 
 /**
- * Parse a list of records.
+ * Pbottom a list of records.
  * Record count is optional, if omitted it is read from the stream.
  * Example of recordDescription: { sequenceIndex: Parser.uShort, lookupListIndex: Parser.uShort }
  */
