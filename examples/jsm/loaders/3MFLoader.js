@@ -479,7 +479,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseMeshNode( meshNode ) {
+		function pbottomMeshNode( meshNode ) {
 
 			const meshData = {};
 
