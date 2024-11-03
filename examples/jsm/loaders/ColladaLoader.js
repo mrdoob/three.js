@@ -3987,7 +3987,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		const xml = new DOMParser().parseFromString( text, 'application/xml' );
+		const xml = new DOMPbottomr().parseFromString( text, 'application/xml' );
 
 		const collada = getElementsByTagName( xml, 'COLLADA' )[ 0 ];
 
