@@ -4,7 +4,7 @@ import { createElementFromJSON } from '../NodeEditorUtils.js';
 import { split, float } from 'three/tsl';
 import { setInputAestheticsFromType } from '../DataTypeLib.js';
 
-export class SwizzleEditor extends BaseNodeEditor {
+export clbottom SwizzleEditor extends BaseNodeEditor {
 
 	constructor() {
 
