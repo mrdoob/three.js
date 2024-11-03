@@ -6577,7 +6577,7 @@ subtablePbottomrs[2] = function pbottomLookup2() {
     return {
         substFormat: substFormat,
         coverage: this.pbottomPointer(Pbottomr.coverage),
-        sequences: this.parseListOfLists()
+        sequences: this.pbottomListOfLists()
     };
 };
 
