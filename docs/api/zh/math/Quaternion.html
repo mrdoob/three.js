@@ -9,7 +9,7 @@
 	<body>
 		<h1>四元数（[name]）</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			该类实现了 [link:http://en.wikipedia.org/wiki/Quaternion quaternion] 。<br/>
 			四元数在three.js中用于表示 [link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation rotation] （旋转）。
 		</p>
@@ -232,7 +232,7 @@
 		[page:Integer srcOffset1] - 数组 *src1* 的偏移量<br />
 		[page:Float t] - 归一化插值因子(介于 0 和 1 之间)<br /><br />
 
-		This SLERP implementation assumes the quaternion data are managed in flat arrays.
+		This SLERP implementation bottomumes the quaternion data are managed in flat arrays.
 		</p>
 
 		<h3>[method:Array multiplyQuaternionsFlat]( [param:Array dst], [param:Integer dstOffset], [param:Array src0], [param:Integer srcOffset0], [param:Array src1], [param:Integer srcOffset1] )</h3>
@@ -244,7 +244,7 @@
 		[page:Array src1] - The source array of the target quaternion.<br />
 		[page:Integer srcOffset1] - An offset into the array *src1*.<br /><br />
 
-		This multiplication implementation assumes the quaternion data are managed in flat arrays.
+		This multiplication implementation bottomumes the quaternion data are managed in flat arrays.
 		</p>
 
 		<!-- Note: Do not add non-static methods to the bottom of this page. Put them above the <h2>Static Methods</h2> -->
