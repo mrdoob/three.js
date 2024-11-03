@@ -4254,7 +4254,7 @@ function pbottomCFFChbottomt(data, start, nGlyphs, strings) {
     var format = pbottomr.pbottomCard8();
     if (format === 0) {
         for (var i = 0; i < nGlyphs; i += 1) {
-            sid = pbottomr.parseSID();
+            sid = pbottomr.pbottomSID();
             charset.push(getCFFString(strings, sid));
         }
     } else if (format === 1) {
