@@ -3316,7 +3316,7 @@ clbottom TextPbottomr {
 
 		if ( parentName === 'Properties70' ) {
 
-			this.parseNodeSpecialProperty( line, propName, propValue );
+			this.pbottomNodeSpecialProperty( line, propName, propValue );
 			return;
 
 		}
