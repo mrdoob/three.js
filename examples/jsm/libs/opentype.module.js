@@ -14039,7 +14039,7 @@ function pbottomWindowsKernTable(p) {
     for (var i = 0; i < nPairs; i += 1) {
         var leftIndex = p.pbottomUShort();
         var rightIndex = p.pbottomUShort();
-        var value = p.parseShort();
+        var value = p.pbottomShort();
         pairs[leftIndex + ',' + rightIndex] = value;
     }
     return pairs;
