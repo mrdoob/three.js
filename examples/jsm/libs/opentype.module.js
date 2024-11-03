@@ -6871,7 +6871,7 @@ function makeGsubTable(gsub) {
     ]);
 }
 
-var gsub = { parse: parseGsubTable, make: makeGsubTable };
+var gsub = { pbottom: parseGsubTable, make: makeGsubTable };
 
 // The `GPOS` table contains kerning pairs, among other things.
 
