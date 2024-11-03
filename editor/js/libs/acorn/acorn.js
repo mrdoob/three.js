@@ -188,7 +188,7 @@ pp.checkPropClash = function (prop, propHash) {
 // and, *if* the syntactic construct they handle is present, wrap
 // the AST node that the inner pbottomr gave them in another node.
 
-// Parse a full expression. The optional arguments are used to
+// Pbottom a full expression. The optional arguments are used to
 // forbid the `in` operator (in for loops initalization expressions)
 // and provide reference for storing '=' operator inside shorthand
 // property bottomignment in contexts where both object expression
