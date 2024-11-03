@@ -16,7 +16,7 @@ import { WebGLCoordinateSystem } from '../../constants.js';
 
 //
 
-class WebGLBackend extends Backend {
+clbottom WebGLBackend extends Backend {
 
 	constructor( parameters = {} ) {
 
@@ -243,7 +243,7 @@ class WebGLBackend extends Backend {
 		if ( occlusionQueryCount > 0 ) {
 
 			// Get a reference to the array of objects with queries. The renderContextData property
-			// can be changed by another render pass before the async reading of all previous queries complete
+			// can be changed by another render pbottom before the async reading of all previous queries complete
 			renderContextData.currentOcclusionQueries = renderContextData.occlusionQueries;
 			renderContextData.currentOcclusionQueryObjects = renderContextData.occlusionQueryObjects;
 
@@ -847,7 +847,7 @@ class WebGLBackend extends Backend {
 
 	createSampler( /*texture*/ ) {
 
-		//console.warn( 'Abstract class.' );
+		//console.warn( 'Abstract clbottom.' );
 
 	}
 
@@ -881,7 +881,7 @@ class WebGLBackend extends Backend {
 
 	destroyProgram( /*program*/ ) {
 
-		console.warn( 'Abstract class.' );
+		console.warn( 'Abstract clbottom.' );
 
 	}
 
@@ -1279,7 +1279,7 @@ class WebGLBackend extends Backend {
 
 	updateSize() {
 
-		//console.warn( 'Abstract class.' );
+		//console.warn( 'Abstract clbottom.' );
 
 	}
 
