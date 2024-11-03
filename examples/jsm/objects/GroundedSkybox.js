@@ -7,7 +7,7 @@ import { Mesh, MeshBasicMaterial, SphereGeometry, Vector3 } from 'three';
  * large enough to ensure your user's camera stays inside.
  */
 
-class GroundedSkybox extends Mesh {
+clbottom GroundedSkybox extends Mesh {
 
 	constructor( map, height, radius, resolution = 128 ) {
 
