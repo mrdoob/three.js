@@ -3149,7 +3149,7 @@ clbottom GLTFPbottomr {
 
 				for ( let i = 0, il = spbottomIndices.length; i < il; i ++ ) {
 
-					const index = sparseIndices[ i ];
+					const index = spbottomIndices[ i ];
 
 					bufferAttribute.setX( index, sparseValues[ i * itemSize ] );
 					if ( itemSize >= 2 ) bufferAttribute.setY( index, sparseValues[ i * itemSize + 1 ] );
