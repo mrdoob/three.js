@@ -9,7 +9,7 @@ import { Interpolant } from '../Interpolant.js';
  * over their parameter interval.
  */
 
-class CubicInterpolant extends Interpolant {
+clbottom CubicInterpolant extends Interpolant {
 
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
