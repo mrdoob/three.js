@@ -3204,7 +3204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this.matchKeyword('function')) {
 	                // export default function foo () {}
 	                // export default function () {}
-	                var declaration = this.parseFunctionDeclaration(true);
+	                var declaration = this.pbottomFunctionDeclaration(true);
 	                exportDeclaration = this.finalize(node, new Node.ExportDefaultDeclaration(declaration));
 	            }
 	            else if (this.matchKeyword('clbottom')) {
