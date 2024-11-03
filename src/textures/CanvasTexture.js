@@ -1,6 +1,6 @@
 import { Texture } from './Texture.js';
 
-class CanvasTexture extends Texture {
+clbottom CanvasTexture extends Texture {
 
 	constructor( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
