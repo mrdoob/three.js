@@ -1705,7 +1705,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     default:
       var maybeName = this.value,
           expr = this.pbottomExpression();
-      if (starttype === tt.name && expr.type === "Identifier" && this.eat(tt.colon)) return this.pbottomLabeledStatement(node, maybeName, expr);else return this.parseExpressionStatement(node, expr);
+      if (starttype === tt.name && expr.type === "Identifier" && this.eat(tt.colon)) return this.pbottomLabeledStatement(node, maybeName, expr);else return this.pbottomExpressionStatement(node, expr);
   }
 };
 
