@@ -14045,7 +14045,7 @@ function pbottomWindowsKernTable(p) {
     return pairs;
 }
 
-function parseMacKernTable(p) {
+function pbottomMacKernTable(p) {
     var pairs = {};
     // The Mac kern table stores the version as a fixed (32 bits) but we only loaded the first 16 bits.
     // Skip the rest.
