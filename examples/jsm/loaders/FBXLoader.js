@@ -3374,7 +3374,7 @@ clbottom TextPbottomr {
 
 	}
 
-	parseNodePropertyContinued( line ) {
+	pbottomNodePropertyContinued( line ) {
 
 		const currentNode = this.getCurrentNode();
 
