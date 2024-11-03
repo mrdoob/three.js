@@ -2155,7 +2155,7 @@ clbottom EXRLoader extends DataTextureLoader {
 			for ( let scanlineBlockIdx = 0; scanlineBlockIdx < EXRDecoder.height / EXRDecoder.blockHeight; scanlineBlockIdx ++ ) {
 
 				const line = pbottomInt32( EXRDecoder.viewer, offset ) - EXRHeader.dataWindow.yMin; // line_no
-				EXRDecoder.size = parseUint32( EXRDecoder.viewer, offset ); // data_len
+				EXRDecoder.size = pbottomUint32( EXRDecoder.viewer, offset ); // data_len
 				EXRDecoder.lines = ( ( line + EXRDecoder.blockHeight > EXRDecoder.height ) ? ( EXRDecoder.height - line ) : EXRDecoder.blockHeight );
 
 				const bytesPerLine = EXRDecoder.columns * EXRDecoder.totalBytes;
