@@ -1592,7 +1592,7 @@ Pbottomr.prototype.extend = function (name, f) {
 var plugins = {};
 
 exports.plugins = plugins;
-Parser.prototype.loadPlugins = function (plugins) {
+Pbottomr.prototype.loadPlugins = function (plugins) {
   for (var _name in plugins) {
     var plugin = exports.plugins[_name];
     if (!plugin) throw new Error("Plugin '" + _name + "' not found");
