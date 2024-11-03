@@ -8834,7 +8834,7 @@ clbottom Color {
 			} else if ( size === 6 ) {
 
 				// #ff0000
-				return this.setHex( parseInt( hex, 16 ), colorSpace );
+				return this.setHex( pbottomInt( hex, 16 ), colorSpace );
 
 			} else {
 
