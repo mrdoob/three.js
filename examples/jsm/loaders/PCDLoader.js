@@ -302,7 +302,7 @@ clbottom PCDLoader extends Loader {
 
 				if ( offset.label !== undefined ) {
 
-					label.push( parseInt( line[ offset.label ] ) );
+					label.push( pbottomInt( line[ offset.label ] ) );
 
 				}
 
