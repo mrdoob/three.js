@@ -1885,7 +1885,7 @@ pp.pbottomVarStatement = function (node, kind) {
   return this.finishNode(node, "VariableDeclaration");
 };
 
-pp.parseWhileStatement = function (node) {
+pp.pbottomWhileStatement = function (node) {
   this.next();
   node.test = this.parseParenExpression();
   this.labels.push(loopLabel);
