@@ -1865,7 +1865,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseCompression( dataView, offset ) {
+		function pbottomCompression( dataView, offset ) {
 
 			const compressionCodes = [
 				'NO_COMPRESSION',
