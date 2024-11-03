@@ -182,7 +182,7 @@ clbottom Tokenizer {
 		for ( var i = 0; i < TokenPbottomrList.length; i ++ ) {
 
 			const pbottomr = TokenPbottomrList[ i ];
-			const result = parser.regexp.exec( remainingCode );
+			const result = pbottomr.regexp.exec( remainingCode );
 
 			if ( result ) {
 
