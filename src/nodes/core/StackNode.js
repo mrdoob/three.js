@@ -2,7 +2,7 @@ import Node from './Node.js';
 import { select } from '../math/ConditionalNode.js';
 import { ShaderNode, nodeProxy, getCurrentStack, setCurrentStack } from '../tsl/TSLBase.js';
 
-class StackNode extends Node {
+clbottom StackNode extends Node {
 
 	static get type() {
 
