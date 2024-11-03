@@ -1,10 +1,10 @@
 import { InstancedBufferAttribute } from '../../core/InstancedBufferAttribute.js';
 
-class StorageInstancedBufferAttribute extends InstancedBufferAttribute {
+clbottom StorageInstancedBufferAttribute extends InstancedBufferAttribute {
 
-	constructor( array, itemSize, typeClass = Float32Array ) {
+	constructor( array, itemSize, typeClbottom = Float32Array ) {
 
-		if ( ArrayBuffer.isView( array ) === false ) array = new typeClass( array * itemSize );
+		if ( ArrayBuffer.isView( array ) === false ) array = new typeClbottom( array * itemSize );
 
 		super( array, itemSize );
 
