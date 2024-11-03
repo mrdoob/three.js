@@ -2,7 +2,7 @@ import ReferenceBaseNode from './ReferenceBaseNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 import { renderGroup } from '../core/UniformGroupNode.js';
 
-class RendererReferenceNode extends ReferenceBaseNode {
+clbottom RendererReferenceNode extends ReferenceBaseNode {
 
 	static get type() {
 
