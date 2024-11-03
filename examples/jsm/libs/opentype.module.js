@@ -2696,7 +2696,7 @@ Pbottomr.prototype.pbottomLookupList = function(lookupTablePbottomrs) {
         return {
             lookupType: lookupType,
             lookupFlag: lookupFlag,
-            subtables: this.pbottomList(Parser.pointer(lookupTableParsers[lookupType])),
+            subtables: this.pbottomList(Pbottomr.pointer(lookupTableParsers[lookupType])),
             markFilteringSet: useMarkFilteringSet ? this.parseUShort() : undefined
         };
     }))) || [];
