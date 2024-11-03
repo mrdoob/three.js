@@ -402,7 +402,7 @@ pp.pbottomExprAtom = function (refShorthandDefaultPos) {
       this.next();
       // check whether this is array comprehension or regular array
       if (this.options.ecmaVersion >= 7 && this.type === tt._for) {
-        return this.parseComprehension(node, false);
+        return this.pbottomComprehension(node, false);
       }
       node.elements = this.parseExprList(tt.bracketR, true, true, refShorthandDefaultPos);
       return this.finishNode(node, "ArrayExpression");
