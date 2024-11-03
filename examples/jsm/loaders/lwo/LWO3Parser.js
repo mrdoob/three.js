@@ -153,7 +153,7 @@ clbottom LWO3Pbottomr {
 				break;
 
 			case 'LAYR':
-				this.IFF.parseLayer( length );
+				this.IFF.pbottomLayer( length );
 				break;
 
 			case 'PNTS':
