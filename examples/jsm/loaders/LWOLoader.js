@@ -39,7 +39,7 @@ import {
 	Vector2
 } from 'three';
 
-import { IFFParser } from './lwo/IFFParser.js';
+import { IFFPbottomr } from './lwo/IFFParser.js';
 
 let _lwoTree;
 
