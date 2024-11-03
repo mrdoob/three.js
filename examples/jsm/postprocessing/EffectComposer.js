@@ -6,11 +6,11 @@ import {
 	WebGLRenderTarget
 } from 'three';
 import { CopyShader } from '../shaders/CopyShader.js';
-import { ShaderPass } from './ShaderPass.js';
-import { MaskPass } from './MaskPass.js';
-import { ClearMaskPass } from './MaskPass.js';
+import { ShaderPbottom } from './ShaderPbottom.js';
+import { MaskPbottom } from './MaskPbottom.js';
+import { ClearMaskPbottom } from './MaskPbottom.js';
 
-class EffectComposer {
+clbottom EffectComposer {
 
 	constructor( renderer, renderTarget ) {
 
@@ -43,10 +43,10 @@ class EffectComposer {
 
 		this.renderToScreen = true;
 
-		this.passes = [];
+		this.pbottomes = [];
 
-		this.copyPass = new ShaderPass( CopyShader );
-		this.copyPass.material.blending = NoBlending;
+		this.copyPbottom = new ShaderPbottom( CopyShader );
+		this.copyPbottom.material.blending = NoBlending;
 
 		this.clock = new Clock();
 
@@ -60,37 +60,37 @@ class EffectComposer {
 
 	}
 
-	addPass( pass ) {
+	addPbottom( pbottom ) {
 
-		this.passes.push( pass );
-		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
-
-	}
-
-	insertPass( pass, index ) {
-
-		this.passes.splice( index, 0, pass );
-		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
+		this.pbottomes.push( pbottom );
+		pbottom.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
 
 	}
 
-	removePass( pass ) {
+	insertPbottom( pbottom, index ) {
 
-		const index = this.passes.indexOf( pass );
+		this.pbottomes.splice( index, 0, pbottom );
+		pbottom.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
+
+	}
+
+	removePbottom( pbottom ) {
+
+		const index = this.pbottomes.indexOf( pbottom );
 
 		if ( index !== - 1 ) {
 
-			this.passes.splice( index, 1 );
+			this.pbottomes.splice( index, 1 );
 
 		}
 
 	}
 
-	isLastEnabledPass( passIndex ) {
+	isLastEnabledPbottom( pbottomIndex ) {
 
-		for ( let i = passIndex + 1; i < this.passes.length; i ++ ) {
+		for ( let i = pbottomIndex + 1; i < this.pbottomes.length; i ++ ) {
 
-			if ( this.passes[ i ].enabled ) {
+			if ( this.pbottomes[ i ].enabled ) {
 
 				return false;
 
@@ -116,16 +116,16 @@ class EffectComposer {
 
 		let maskActive = false;
 
-		for ( let i = 0, il = this.passes.length; i < il; i ++ ) {
+		for ( let i = 0, il = this.pbottomes.length; i < il; i ++ ) {
 
-			const pass = this.passes[ i ];
+			const pbottom = this.pbottomes[ i ];
 
-			if ( pass.enabled === false ) continue;
+			if ( pbottom.enabled === false ) continue;
 
-			pass.renderToScreen = ( this.renderToScreen && this.isLastEnabledPass( i ) );
-			pass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive );
+			pbottom.renderToScreen = ( this.renderToScreen && this.isLastEnabledPbottom( i ) );
+			pbottom.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive );
 
-			if ( pass.needsSwap ) {
+			if ( pbottom.needsSwap ) {
 
 				if ( maskActive ) {
 
@@ -135,7 +135,7 @@ class EffectComposer {
 					//context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
 					stencil.setFunc( context.NOTEQUAL, 1, 0xffffffff );
 
-					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime );
+					this.copyPbottom.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime );
 
 					//context.stencilFunc( context.EQUAL, 1, 0xffffffff );
 					stencil.setFunc( context.EQUAL, 1, 0xffffffff );
@@ -146,13 +146,13 @@ class EffectComposer {
 
 			}
 
-			if ( MaskPass !== undefined ) {
+			if ( MaskPbottom !== undefined ) {
 
-				if ( pass instanceof MaskPass ) {
+				if ( pbottom instanceof MaskPbottom ) {
 
 					maskActive = true;
 
-				} else if ( pass instanceof ClearMaskPass ) {
+				} else if ( pbottom instanceof ClearMaskPbottom ) {
 
 					maskActive = false;
 
@@ -201,9 +201,9 @@ class EffectComposer {
 		this.renderTarget1.setSize( effectiveWidth, effectiveHeight );
 		this.renderTarget2.setSize( effectiveWidth, effectiveHeight );
 
-		for ( let i = 0; i < this.passes.length; i ++ ) {
+		for ( let i = 0; i < this.pbottomes.length; i ++ ) {
 
-			this.passes[ i ].setSize( effectiveWidth, effectiveHeight );
+			this.pbottomes[ i ].setSize( effectiveWidth, effectiveHeight );
 
 		}
 
@@ -222,7 +222,7 @@ class EffectComposer {
 		this.renderTarget1.dispose();
 		this.renderTarget2.dispose();
 
-		this.copyPass.dispose();
+		this.copyPbottom.dispose();
 
 	}
 
