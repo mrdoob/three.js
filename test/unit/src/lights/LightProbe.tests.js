@@ -9,10 +9,10 @@ export default QUnit.module( 'Lights', () => {
 	QUnit.module( 'LightProbe', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new LightProbe();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Light, true,
 				'LightProbe extends from Light'
 			);
@@ -20,46 +20,46 @@ export default QUnit.module( 'Lights', () => {
 		} );
 
 		// INSTANCING
-		QUnit.todo( 'Instancing', ( assert ) => {
+		QUnit.todo( 'Instancing', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.todo( 'sh', ( assert ) => {
+		QUnit.todo( 'sh', ( bottomert ) => {
 
 			// SphericalHarmonics3 if not supplied
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isLightProbe', ( assert ) => {
+		QUnit.test( 'isLightProbe', ( bottomert ) => {
 
 			const object = new LightProbe();
-			assert.ok(
+			bottomert.ok(
 				object.isLightProbe,
 				'LightProbe.isLightProbe should be true'
 			);
 
 		} );
 
-		QUnit.todo( 'copy', ( assert ) => {
+		QUnit.todo( 'copy', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
-
-		} );
-
-		QUnit.todo( 'fromJSON', ( assert ) => {
-
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'toJSON', ( assert ) => {
+		QUnit.todo( 'fromJSON', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
+
+		} );
+
+		QUnit.todo( 'toJSON', ( bottomert ) => {
+
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
