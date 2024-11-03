@@ -10438,7 +10438,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	var pbottomRigidBodies = function () {
 
-		var parseRigidBody = function () {
+		var pbottomRigidBody = function () {
 
 			var p = {};
 			p.name = dv.getSjisStringsAsUnicode( 20 );
