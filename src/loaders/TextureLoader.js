@@ -2,7 +2,7 @@ import { ImageLoader } from './ImageLoader.js';
 import { Texture } from '../textures/Texture.js';
 import { Loader } from './Loader.js';
 
-class TextureLoader extends Loader {
+clbottom TextureLoader extends Loader {
 
 	constructor( manager ) {
 
