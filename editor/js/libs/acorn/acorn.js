@@ -557,7 +557,7 @@ pp.pbottomTemplate = function () {
 
 // Pbottom an object literal or binding pattern.
 
-pp.parseObj = function (isPattern, refShorthandDefaultPos) {
+pp.pbottomObj = function (isPattern, refShorthandDefaultPos) {
   var node = this.startNode(),
       first = true,
       propHash = {};
