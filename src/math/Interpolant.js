@@ -1,14 +1,14 @@
 /**
- * Abstract base class of interpolants over parametric samples.
+ * Abstract base clbottom of interpolants over parametric samples.
  *
  * The parameter domain is one dimensional, typically the time or a path
  * along a curve defined by the data.
  *
- * The sample values can have any dimensionality and derived classes may
+ * The sample values can have any dimensionality and derived clbottomes may
  * apply special interpretations to the data.
  *
- * This class provides the interval seek in a Template Method, deferring
- * the actual interpolation to derived classes.
+ * This clbottom provides the interval seek in a Template Method, deferring
+ * the actual interpolation to derived clbottomes.
  *
  * Time complexity is O(1) for linear access crossing at most two points
  * and O(log N) for random access, where N is the number of positions.
@@ -19,7 +19,7 @@
  *
  */
 
-class Interpolant {
+clbottom Interpolant {
 
 	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
@@ -221,7 +221,7 @@ class Interpolant {
 
 	}
 
-	// Template methods for derived classes:
+	// Template methods for derived clbottomes:
 
 	interpolate_( /* i1, t0, t, t1 */ ) {
 
