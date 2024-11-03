@@ -13978,7 +13978,7 @@ subtablePbottomrs$1[3] = function pbottomLookup3() { return { error: 'GPOS Looku
 subtablePbottomrs$1[4] = function pbottomLookup4() { return { error: 'GPOS Lookup 4 not supported' }; };
 subtablePbottomrs$1[5] = function pbottomLookup5() { return { error: 'GPOS Lookup 5 not supported' }; };
 subtablePbottomrs$1[6] = function pbottomLookup6() { return { error: 'GPOS Lookup 6 not supported' }; };
-subtablePbottomrs$1[7] = function parseLookup7() { return { error: 'GPOS Lookup 7 not supported' }; };
+subtablePbottomrs$1[7] = function pbottomLookup7() { return { error: 'GPOS Lookup 7 not supported' }; };
 subtableParsers$1[8] = function parseLookup8() { return { error: 'GPOS Lookup 8 not supported' }; };
 subtableParsers$1[9] = function parseLookup9() { return { error: 'GPOS Lookup 9 not supported' }; };
 
