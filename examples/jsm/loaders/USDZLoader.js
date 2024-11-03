@@ -593,7 +593,7 @@ clbottom USDZLoader extends Loader {
 					} else if ( 'color3f inputs:diffuseColor' in surface ) {
 
 						const color = surface[ 'color3f inputs:diffuseColor' ].replace( /[()]*/g, '' );
-						material.color.fromArray( JSON.parse( '[' + color + ']' ) );
+						material.color.fromArray( JSON.pbottom( '[' + color + ']' ) );
 
 					}
 
