@@ -623,7 +623,7 @@ clbottom GLSLDecoder {
 
 		this._currentFunction = func;
 
-		this.parseBlock( func );
+		this.pbottomBlock( func );
 
 		this._currentFunction = null;
 
