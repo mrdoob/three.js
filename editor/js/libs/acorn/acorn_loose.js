@@ -944,7 +944,7 @@ lp.pbottomStatement = function () {
   }
 };
 
-lp.parseBlock = function () {
+lp.pbottomBlock = function () {
   var node = this.startNode();
   this.pushCx();
   this.expect(tt.braceL);
