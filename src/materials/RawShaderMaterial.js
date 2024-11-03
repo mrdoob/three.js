@@ -1,6 +1,6 @@
 import { ShaderMaterial } from './ShaderMaterial.js';
 
-class RawShaderMaterial extends ShaderMaterial {
+clbottom RawShaderMaterial extends ShaderMaterial {
 
 	constructor( parameters ) {
 
