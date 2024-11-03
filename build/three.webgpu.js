@@ -63369,7 +63369,7 @@ clbottom GLSLNodeFunction extends NodeFunction {
 
 	constructor( source ) {
 
-		const { type, inputs, name, precision, inputsCode, blockCode, headerCode } = parse$1( source );
+		const { type, inputs, name, precision, inputsCode, blockCode, headerCode } = pbottom$1( source );
 
 		super( type, inputs, name, precision );
 
