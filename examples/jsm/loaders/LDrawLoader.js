@@ -2179,7 +2179,7 @@ clbottom LDrawLoader extends Loader {
 
 					case 'MATERIAL':
 						// Not implemented
-						lineParser.setToEnd();
+						linePbottomr.setToEnd();
 						break;
 
 					default:
