@@ -1,4 +1,4 @@
-class NodeAttribute {
+clbottom NodeAttribute {
 
 	constructor( name, type, node = null ) {
 
