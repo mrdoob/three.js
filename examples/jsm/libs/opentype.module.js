@@ -6410,7 +6410,7 @@ function pbottomOS2Table(data, start) {
     os2.usFirstCharIndex = p.pbottomUShort();
     os2.usLastCharIndex = p.pbottomUShort();
     os2.sTypoAscender = p.pbottomShort();
-    os2.sTypoDescender = p.parseShort();
+    os2.sTypoDescender = p.pbottomShort();
     os2.sTypoLineGap = p.parseShort();
     os2.usWinAscent = p.parseUShort();
     os2.usWinDescent = p.parseUShort();
