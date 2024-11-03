@@ -2617,7 +2617,7 @@ Pbottomr.list = function(count, itemCallback) {
 
 Pbottomr.list32 = function(count, itemCallback) {
     return function() {
-        return this.parseList32(count, itemCallback);
+        return this.pbottomList32(count, itemCallback);
     };
 };
 
