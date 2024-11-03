@@ -49,7 +49,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		QUnit.todo( 'pbottomAsync', ( bottomert ) => {
 
-			// async parseAsync( json )
+			// async pbottomAsync( json )
 			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
