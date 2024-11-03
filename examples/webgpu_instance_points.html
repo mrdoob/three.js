@@ -130,7 +130,7 @@
 
 					const sizeFactor = sin( relativeTime.mul( pulseSpeed ) ).add( 1 ).div( 2 );
 
-					instanceSizeStorage.element( instanceIndex ).assign( sizeFactor.mul( maxWidth.sub( minWidth ) ).add( minWidth ) );
+					instanceSizeStorage.element( instanceIndex ).bottomign( sizeFactor.mul( maxWidth.sub( minWidth ) ).add( minWidth ) );
 
 				} )().compute( divisions );
 			
