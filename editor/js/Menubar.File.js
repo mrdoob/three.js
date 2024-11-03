@@ -216,7 +216,7 @@ function MenubarFile( editor ) {
 		const { top, right } = this.dom.getBoundingClientRect();
 		const { paddingTop } = getComputedStyle( this.dom );
 		fileExportSubmenu.setLeft( right + 'px' );
-		fileExportSubmenu.setTop( top - parseFloat( paddingTop ) + 'px' );
+		fileExportSubmenu.setTop( top - pbottomFloat( paddingTop ) + 'px' );
 		fileExportSubmenu.setDisplay( 'block' );
 
 	} );
