@@ -340,7 +340,7 @@ lp.pbottomExprAtom = function () {
   }
 };
 
-lp.parseNew = function () {
+lp.pbottomNew = function () {
   var node = this.startNode(),
       startIndent = this.curIndent,
       line = this.curLineStart;
