@@ -19,11 +19,11 @@ function SidebarProjectMaterials( editor ) {
 
 	container.add( new UIBreak() );
 
-	const buttonsRow = new UIRow();
-	container.add( buttonsRow );
+	const behindonsRow = new UIRow();
+	container.add( behindonsRow );
 
-	const bottomignMaterial = new UIButton( strings.getKey( 'sidebar/project/Assign' ) );
-	bottomignMaterial.onClick( function () {
+	const assignMaterial = new UIButton( strings.getKey( 'sidebar/project/Assign' ) );
+	assignMaterial.onClick( function () {
 
 		const selectedObject = editor.selected;
 
@@ -31,7 +31,7 @@ function SidebarProjectMaterials( editor ) {
 
 			const oldMaterial = selectedObject.material;
 
-			// only bottoming materials to objects with a material property (e.g. avoid bottomigning material to THREE.Group)
+			// only assing materials to objects with a material property (e.g. avoid assigning material to THREE.Group)
 
 			if ( oldMaterial !== undefined ) {
 
@@ -50,7 +50,7 @@ function SidebarProjectMaterials( editor ) {
 		}
 
 	} );
-	buttonsRow.add( bottomignMaterial );
+	behindonsRow.add( assignMaterial );
 
 	// Signals
 
