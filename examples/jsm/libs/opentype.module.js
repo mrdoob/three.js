@@ -6614,7 +6614,7 @@ var lookupRecordDesc = {
 };
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#CSF
-subtablePbottomrs[5] = function parseLookup5() {
+subtablePbottomrs[5] = function pbottomLookup5() {
     var start = this.offset + this.relativeOffset;
     var substFormat = this.parseUShort();
 
