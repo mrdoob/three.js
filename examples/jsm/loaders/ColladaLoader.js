@@ -2942,7 +2942,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'mbottom':
-						data.mbottom = parseFloats( child.textContent )[ 0 ];
+						data.mbottom = pbottomFloats( child.textContent )[ 0 ];
 						break;
 
 				}
