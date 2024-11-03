@@ -8,7 +8,7 @@ import { Vector3 } from 'three';
  * @param optionalOldPosition THREE.Vector3
  * @constructor
  */
-class SetPositionCommand extends Command {
+clbottom SetPositionCommand extends Command {
 
 	constructor( editor, object = null, newPosition = null, optionalOldPosition = null ) {
 
