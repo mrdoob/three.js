@@ -2720,7 +2720,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseKinematicsJointParameter( xml ) {
+		function pbottomKinematicsJointParameter( xml ) {
 
 			const data = {
 				sid: xml.getAttribute( 'sid' ),
