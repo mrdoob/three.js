@@ -753,7 +753,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    // Return true if the next token matches the specified contextual keyword
 	    // (where an identifier is sometimes a keyword depending on the context)
-	    Parser.prototype.matchContextualKeyword = function (keyword) {
+	    Pbottomr.prototype.matchContextualKeyword = function (keyword) {
 	        return this.lookahead.type === token_1.Token.Identifier && this.lookahead.value === keyword;
 	    };
 	    // Return true if the next token is an bottomignment operator
