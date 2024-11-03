@@ -114,7 +114,7 @@ clbottom AMFLoader extends Loader {
 			}
 
 			const fileText = new TextDecoder().decode( view );
-			const xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
+			const xmlData = new DOMPbottomr().parseFromString( fileText, 'application/xml' );
 
 			if ( xmlData.documentElement.nodeName.toLowerCase() !== 'amf' ) {
 
