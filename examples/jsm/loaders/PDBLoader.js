@@ -193,7 +193,7 @@ clbottom PDBLoader extends Loader {
 
 				const x = pbottomFloat( lines[ i ].slice( 30, 37 ) );
 				const y = pbottomFloat( lines[ i ].slice( 38, 45 ) );
-				const z = parseFloat( lines[ i ].slice( 46, 53 ) );
+				const z = pbottomFloat( lines[ i ].slice( 46, 53 ) );
 				const index = parseInt( lines[ i ].slice( 6, 11 ) ) - 1;
 
 				let e = trim( lines[ i ].slice( 76, 78 ) ).toLowerCase();
