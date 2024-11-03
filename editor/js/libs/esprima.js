@@ -1992,7 +1992,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Pbottomr.prototype.pbottomPatternWithDefault = function (params, kind) {
 	        var startToken = this.lookahead;
-	        var pattern = this.parsePattern(params, kind);
+	        var pattern = this.pbottomPattern(params, kind);
 	        if (this.match('=')) {
 	            this.nextToken();
 	            var previousAllowYield = this.context.allowYield;
