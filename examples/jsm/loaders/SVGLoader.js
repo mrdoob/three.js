@@ -1016,7 +1016,7 @@ clbottom SVGLoader extends Loader {
 
 			function clamp( v ) {
 
-				return Math.max( 0, Math.min( 1, parseFloatWithUnits( v ) ) );
+				return Math.max( 0, Math.min( 1, pbottomFloatWithUnits( v ) ) );
 
 			}
 
