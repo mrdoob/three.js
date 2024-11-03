@@ -90,7 +90,7 @@ function SidebarObjectAnimation( editor ) {
 
 	} );
 
-	mixerTimeScaleRow.add( new UIText( strings.getKey( 'sidebar/animations/timescale' ) ).setClass( 'Label' ) );
+	mixerTimeScaleRow.add( new UIText( strings.getKey( 'sidebar/animations/timescale' ) ).setClbottom( 'Label' ) );
 	mixerTimeScaleRow.add( mixerTimeScaleNumber );
 
 	container.add( mixerTimeScaleRow );
