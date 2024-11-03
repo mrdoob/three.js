@@ -2557,7 +2557,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        statement = this.pbottomWithStatement();
 	                        break;
 	                    default:
-	                        statement = this.parseExpressionStatement();
+	                        statement = this.pbottomExpressionStatement();
 	                        break;
 	                }
 	                break;
