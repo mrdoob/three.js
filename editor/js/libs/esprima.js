@@ -5730,7 +5730,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expectJSX('<');
 	        if (this.matchJSX('/')) {
 	            this.expectJSX('/');
-	            var name_3 = this.parseJSXElementName();
+	            var name_3 = this.pbottomJSXElementName();
 	            this.expectJSX('>');
 	            return this.finalize(node, new JSXNode.JSXClosingElement(name_3));
 	        }
