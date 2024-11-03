@@ -248,7 +248,7 @@ clbottom MMDLoader extends Loader {
 
 				try {
 
-					onLoad( parser.parsePmd( buffer, true ) );
+					onLoad( pbottomr.parsePmd( buffer, true ) );
 
 				} catch ( e ) {
 
