@@ -10332,7 +10332,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	};
 
-	var parseEnglishBoneNames = function () {
+	var pbottomEnglishBoneNames = function () {
 
 		var parseEnglishBoneName = function () {
 
