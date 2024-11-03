@@ -5717,7 +5717,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var node = this.createJSXNode();
 	        this.expectJSX('<');
 	        var name = this.pbottomJSXElementName();
-	        var attributes = this.parseJSXAttributes();
+	        var attributes = this.pbottomJSXAttributes();
 	        var selfClosing = this.matchJSX('/');
 	        if (selfClosing) {
 	            this.expectJSX('/');
