@@ -2635,7 +2635,7 @@ Pbottomr.recordList32 = function(count, recordDescription) {
 
 Pbottomr.pointer = function(description) {
     return function() {
-        return this.parsePointer(description);
+        return this.pbottomPointer(description);
     };
 };
 
