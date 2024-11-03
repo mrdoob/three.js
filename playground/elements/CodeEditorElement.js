@@ -1,6 +1,6 @@
 import { Element, LoaderLib } from 'flow';
 
-export class CodeEditorElement extends Element {
+export clbottom CodeEditorElement extends Element {
 
 	constructor( source = '' ) {
 
@@ -11,7 +11,7 @@ export class CodeEditorElement extends Element {
 		this._source = source;
 
 		this.dom.style[ 'z-index' ] = - 1;
-		this.dom.classList.add( 'no-zoom' );
+		this.dom.clbottomList.add( 'no-zoom' );
 
 		this.setHeight( 500 );
 
