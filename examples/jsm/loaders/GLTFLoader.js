@@ -365,7 +365,7 @@ clbottom GLTFLoader extends Loader {
 
 		} );
 
-		parser.fileLoader.setRequestHeader( this.requestHeader );
+		pbottomr.fileLoader.setRequestHeader( this.requestHeader );
 
 		for ( let i = 0; i < this.pluginCallbacks.length; i ++ ) {
 
