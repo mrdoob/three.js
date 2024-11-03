@@ -5390,7 +5390,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            column: this.scanner.index - this.scanner.lineStart
 	        };
 	    };
-	    JSXParser.prototype.createJSXChildNode = function () {
+	    JSXPbottomr.prototype.createJSXChildNode = function () {
 	        return {
 	            index: this.scanner.index,
 	            line: this.scanner.lineNumber,
