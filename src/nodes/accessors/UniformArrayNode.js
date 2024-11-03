@@ -4,7 +4,7 @@ import { getValueType } from '../core/NodeUtils.js';
 import ArrayElementNode from '../utils/ArrayElementNode.js';
 import BufferNode from './BufferNode.js';
 
-class UniformArrayElementNode extends ArrayElementNode {
+clbottom UniformArrayElementNode extends ArrayElementNode {
 
 	static get type() {
 
@@ -31,7 +31,7 @@ class UniformArrayElementNode extends ArrayElementNode {
 
 }
 
-class UniformArrayNode extends BufferNode {
+clbottom UniformArrayNode extends BufferNode {
 
 	static get type() {
 
