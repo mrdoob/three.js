@@ -4558,7 +4558,7 @@ function pbottomCFFCharstring(font, glyph, code) {
                     break;
                 case 19: // hintmask
                 case 20: // cntrmask
-                    parseStems();
+                    pbottomStems();
                     i += (nStems + 7) >> 3;
                     break;
                 case 21: // rmoveto
