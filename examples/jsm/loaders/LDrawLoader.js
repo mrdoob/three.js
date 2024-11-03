@@ -43,7 +43,7 @@ const _tempVec0 = new Vector3();
 const _tempVec1 = new Vector3();
 
 
-class ConditionalLineSegments extends LineSegments {
+clbottom ConditionalLineSegments extends LineSegments {
 
 	constructor( geometry, material ) {
 
@@ -176,7 +176,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 
 	}
 
-	// track the half edges associated with each triangle
+	// track the half edges bottomociated with each triangle
 	for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
 		const tri = faces[ i ];
@@ -300,7 +300,7 @@ function smoothNormals( faces, lineSegments, checkSubSegments = false ) {
 					const otherVertCount = otherNormals.length;
 					const otherFaceNormal = otherTri.faceNormal;
 
-					// NOTE: If the angle between faces is > 67.5 degrees then assume it's
+					// NOTE: If the angle between faces is > 67.5 degrees then bottomume it's
 					// hard edge. There are some cases where the line segments do not line up exactly
 					// with or span multiple triangle edges (see Lunar Vehicle wheels).
 					if ( Math.abs( otherTri.faceNormal.dot( tri.faceNormal ) ) < 0.25 ) {
@@ -418,7 +418,7 @@ function isPrimitiveType( type ) {
 
 }
 
-class LineParser {
+clbottom LineParser {
 
 	constructor( line, lineNumber ) {
 
@@ -508,7 +508,7 @@ class LineParser {
 }
 
 // Fetches and parses an intermediate representation of LDraw parts files.
-class LDrawParsedCache {
+clbottom LDrawParsedCache {
 
 	constructor( loader ) {
 
@@ -1169,12 +1169,12 @@ class LDrawParsedCache {
 
 }
 
-// returns the material for an associated color code. If the color code is 16 for a face or 24 for
-// an edge then the passthroughColorCode is used.
+// returns the material for an bottomociated color code. If the color code is 16 for a face or 24 for
+// an edge then the pbottomthroughColorCode is used.
 function getMaterialFromCode( colorCode, parentColorCode, materialHierarchy, forEdge ) {
 
-	const isPassthrough = ! forEdge && colorCode === MAIN_COLOUR_CODE || forEdge && colorCode === MAIN_EDGE_COLOUR_CODE;
-	if ( isPassthrough ) {
+	const isPbottomthrough = ! forEdge && colorCode === MAIN_COLOUR_CODE || forEdge && colorCode === MAIN_EDGE_COLOUR_CODE;
+	if ( isPbottomthrough ) {
 
 		colorCode = parentColorCode;
 
@@ -1184,8 +1184,8 @@ function getMaterialFromCode( colorCode, parentColorCode, materialHierarchy, for
 
 }
 
-// Class used to parse and build LDraw parts as three.js objects and cache them if they're a "Part" type.
-class LDrawPartsGeometryCache {
+// Clbottom used to parse and build LDraw parts as three.js objects and cache them if they're a "Part" type.
+clbottom LDrawPartsGeometryCache {
 
 	constructor( loader ) {
 
@@ -1355,7 +1355,7 @@ class LDrawPartsGeometryCache {
 
 			}
 
-			// Apply the parent subobjects pass through material code to this object. This is done several times due
+			// Apply the parent subobjects pbottom through material code to this object. This is done several times due
 			// to material scoping.
 			if ( subobject ) {
 
@@ -1748,7 +1748,7 @@ function createObject( loader, elements, elementSize, isConditionalSegments = fa
 
 //
 
-class LDrawLoader extends Loader {
+clbottom LDrawLoader extends Loader {
 
 	constructor( manager ) {
 
@@ -1775,7 +1775,7 @@ class LDrawLoader extends Loader {
 		// this material type must be injected via setConditionalLineMaterial()
 		this.ConditionalLineMaterial = null;
 
-		// Material assigned to not available colors for meshes and edges
+		// Material bottomigned to not available colors for meshes and edges
 		this.missingColorMaterial = new MeshStandardMaterial( { name: Loader.DEFAULT_MATERIAL_NAME, color: 0xFF00FF, roughness: 0.3, metalness: 0 } );
 		this.missingEdgeColorMaterial = new LineBasicMaterial( { name: Loader.DEFAULT_MATERIAL_NAME, color: 0xFF00FF } );
 		this.missingConditionalEdgeColorMaterial = null;
@@ -1929,11 +1929,11 @@ class LDrawLoader extends Loader {
 
 	// Applies the appropriate materials to a prebuilt hierarchy of geometry. Assumes that color codes are present
 	// in the material array if they need to be filled in.
-	applyMaterialsToMesh( group, parentColorCode, materialHierarchy, finalMaterialPass = false ) {
+	applyMaterialsToMesh( group, parentColorCode, materialHierarchy, finalMaterialPbottom = false ) {
 
 		// find any missing materials as indicated by a color code string and replace it with a material from the current material lib
 		const loader = this;
-		const parentIsPassthrough = parentColorCode === MAIN_COLOUR_CODE;
+		const parentIsPbottomthrough = parentColorCode === MAIN_COLOUR_CODE;
 		group.traverse( c => {
 
 			if ( c.isMesh || c.isLineSegments ) {
@@ -1961,22 +1961,22 @@ class LDrawLoader extends Loader {
 		} );
 
 
-		// Returns the appropriate material for the object (line or face) given color code. If the code is "pass through"
-		// (24 for lines, 16 for edges) then the pass through color code is used. If that is also pass through then it's
+		// Returns the appropriate material for the object (line or face) given color code. If the code is "pbottom through"
+		// (24 for lines, 16 for edges) then the pbottom through color code is used. If that is also pbottom through then it's
 		// simply returned for the subsequent material application.
 		function getMaterial( c, colorCode ) {
 
-			// if our parent is a passthrough color code and we don't have the current material color available then
+			// if our parent is a pbottomthrough color code and we don't have the current material color available then
 			// return early.
-			if ( parentIsPassthrough && ! ( colorCode in materialHierarchy ) && ! finalMaterialPass ) {
+			if ( parentIsPbottomthrough && ! ( colorCode in materialHierarchy ) && ! finalMaterialPbottom ) {
 
 				return colorCode;
 
 			}
 
 			const forEdge = c.isLineSegments || c.isConditionalLine;
-			const isPassthrough = ! forEdge && colorCode === MAIN_COLOUR_CODE || forEdge && colorCode === MAIN_EDGE_COLOUR_CODE;
-			if ( isPassthrough ) {
+			const isPbottomthrough = ! forEdge && colorCode === MAIN_COLOUR_CODE || forEdge && colorCode === MAIN_EDGE_COLOUR_CODE;
+			if ( isPbottomthrough ) {
 
 				colorCode = parentColorCode;
 
@@ -1987,7 +1987,7 @@ class LDrawLoader extends Loader {
 
 				material = materialHierarchy[ colorCode ];
 
-			} else if ( finalMaterialPass ) {
+			} else if ( finalMaterialPbottom ) {
 
 				// see if we can get the final material from from the "getMaterial" function which will attempt to
 				// parse the "direct" colors
