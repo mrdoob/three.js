@@ -889,7 +889,7 @@ clbottom IFFPbottomr {
 
 	}
 
-	parseUnknownCHUNK( blockID, length ) {
+	pbottomUnknownCHUNK( blockID, length ) {
 
 		console.warn( 'LWOLoader: unknown chunk type: ' + blockID + ' length: ' + length );
 
