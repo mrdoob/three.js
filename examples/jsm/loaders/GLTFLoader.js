@@ -3537,7 +3537,7 @@ clbottom GLTFPbottomr {
 
 			if ( metallicRoughness.baseColorTexture !== undefined ) {
 
-				pending.push( parser.bottomignTexture( materialParams, 'map', metallicRoughness.baseColorTexture, SRGBColorSpace ) );
+				pending.push( pbottomr.bottomignTexture( materialParams, 'map', metallicRoughness.baseColorTexture, SRGBColorSpace ) );
 
 			}
 
