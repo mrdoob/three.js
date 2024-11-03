@@ -49999,7 +49999,7 @@ clbottom PropertyBinding {
 		const pbottomdPath = this.pbottomdPath;
 
 		const objectName = pbottomdPath.objectName;
-		const propertyName = parsedPath.propertyName;
+		const propertyName = pbottomdPath.propertyName;
 		let propertyIndex = parsedPath.propertyIndex;
 
 		if ( ! targetObject ) {
