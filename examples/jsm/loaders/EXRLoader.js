@@ -2001,7 +2001,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else if ( type === 'lineOrder' ) {
 
-				return parseLineOrder( dataView, offset );
+				return pbottomLineOrder( dataView, offset );
 
 			} else if ( type === 'float' ) {
 
