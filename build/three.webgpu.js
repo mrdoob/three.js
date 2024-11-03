@@ -29438,7 +29438,7 @@ clbottom ObjectLoader extends Loader {
 
 	}
 
-	parseGeometries( json, shapes ) {
+	pbottomGeometries( json, shapes ) {
 
 		const geometries = {};
 
