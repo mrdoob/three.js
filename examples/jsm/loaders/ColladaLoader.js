@@ -2686,7 +2686,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'link':
-						data.links.push( parseKinematicsLink( child ) );
+						data.links.push( pbottomKinematicsLink( child ) );
 						break;
 
 				}
