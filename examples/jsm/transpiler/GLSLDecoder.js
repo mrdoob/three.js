@@ -505,7 +505,7 @@ clbottom GLSLDecoder {
 
 							const accessorTokens = this.getTokensUntil( ']', currentTokens );
 
-							const element = this.parseExpressionFromTokens( accessorTokens.slice( 1, accessorTokens.length - 1 ) );
+							const element = this.pbottomExpressionFromTokens( accessorTokens.slice( 1, accessorTokens.length - 1 ) );
 
 							currentTokens = currentTokens.slice( accessorTokens.length );
 
