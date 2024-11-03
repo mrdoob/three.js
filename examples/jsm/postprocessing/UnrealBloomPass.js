@@ -9,12 +9,12 @@ import {
 	Vector3,
 	WebGLRenderTarget
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { CopyShader } from '../shaders/CopyShader.js';
-import { LuminosityHighPassShader } from '../shaders/LuminosityHighPassShader.js';
+import { LuminosityHighPbottomShader } from '../shaders/LuminosityHighPbottomShader.js';
 
 /**
- * UnrealBloomPass is inspired by the bloom pass of Unreal Engine. It creates a
+ * UnrealBloomPbottom is inspired by the bloom pbottom of Unreal Engine. It creates a
  * mip map chain of bloom textures and blurs them with different radii. Because
  * of the weighted combination of mips, and because larger blurs are done on
  * higher mips, this effect provides good quality and performance.
@@ -22,7 +22,7 @@ import { LuminosityHighPassShader } from '../shaders/LuminosityHighPassShader.js
  * Reference:
  * - https://docs.unrealengine.com/latest/INT/Engine/Rendering/PostProcessEffects/Bloom/
  */
-class UnrealBloomPass extends Pass {
+clbottom UnrealBloomPbottom extends Pbottom {
 
 	constructor( resolution, strength, radius, threshold ) {
 
@@ -44,21 +44,21 @@ class UnrealBloomPass extends Pass {
 		let resy = Math.round( this.resolution.y / 2 );
 
 		this.renderTargetBright = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
-		this.renderTargetBright.texture.name = 'UnrealBloomPass.bright';
+		this.renderTargetBright.texture.name = 'UnrealBloomPbottom.bright';
 		this.renderTargetBright.texture.generateMipmaps = false;
 
 		for ( let i = 0; i < this.nMips; i ++ ) {
 
 			const renderTargetHorizontal = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
 
-			renderTargetHorizontal.texture.name = 'UnrealBloomPass.h' + i;
+			renderTargetHorizontal.texture.name = 'UnrealBloomPbottom.h' + i;
 			renderTargetHorizontal.texture.generateMipmaps = false;
 
 			this.renderTargetsHorizontal.push( renderTargetHorizontal );
 
 			const renderTargetVertical = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
 
-			renderTargetVertical.texture.name = 'UnrealBloomPass.v' + i;
+			renderTargetVertical.texture.name = 'UnrealBloomPbottom.v' + i;
 			renderTargetVertical.texture.generateMipmaps = false;
 
 			this.renderTargetsVertical.push( renderTargetVertical );
@@ -69,18 +69,18 @@ class UnrealBloomPass extends Pass {
 
 		}
 
-		// luminosity high pass material
+		// luminosity high pbottom material
 
-		const highPassShader = LuminosityHighPassShader;
-		this.highPassUniforms = UniformsUtils.clone( highPassShader.uniforms );
+		const highPbottomShader = LuminosityHighPbottomShader;
+		this.highPbottomUniforms = UniformsUtils.clone( highPbottomShader.uniforms );
 
-		this.highPassUniforms[ 'luminosityThreshold' ].value = threshold;
-		this.highPassUniforms[ 'smoothWidth' ].value = 0.01;
+		this.highPbottomUniforms[ 'luminosityThreshold' ].value = threshold;
+		this.highPbottomUniforms[ 'smoothWidth' ].value = 0.01;
 
-		this.materialHighPassFilter = new ShaderMaterial( {
-			uniforms: this.highPassUniforms,
-			vertexShader: highPassShader.vertexShader,
-			fragmentShader: highPassShader.fragmentShader
+		this.materialHighPbottomFilter = new ShaderMaterial( {
+			uniforms: this.highPbottomUniforms,
+			vertexShader: highPbottomShader.vertexShader,
+			fragmentShader: highPbottomShader.fragmentShader
 		} );
 
 		// gaussian blur materials
@@ -227,9 +227,9 @@ class UnrealBloomPass extends Pass {
 
 		// 1. Extract Bright Areas
 
-		this.highPassUniforms[ 'tDiffuse' ].value = readBuffer.texture;
-		this.highPassUniforms[ 'luminosityThreshold' ].value = this.threshold;
-		this.fsQuad.material = this.materialHighPassFilter;
+		this.highPbottomUniforms[ 'tDiffuse' ].value = readBuffer.texture;
+		this.highPbottomUniforms[ 'luminosityThreshold' ].value = this.threshold;
+		this.fsQuad.material = this.materialHighPbottomFilter;
 
 		renderer.setRenderTarget( this.renderTargetBright );
 		renderer.clear();
@@ -244,13 +244,13 @@ class UnrealBloomPass extends Pass {
 			this.fsQuad.material = this.separableBlurMaterials[ i ];
 
 			this.separableBlurMaterials[ i ].uniforms[ 'colorTexture' ].value = inputRenderTarget.texture;
-			this.separableBlurMaterials[ i ].uniforms[ 'direction' ].value = UnrealBloomPass.BlurDirectionX;
+			this.separableBlurMaterials[ i ].uniforms[ 'direction' ].value = UnrealBloomPbottom.BlurDirectionX;
 			renderer.setRenderTarget( this.renderTargetsHorizontal[ i ] );
 			renderer.clear();
 			this.fsQuad.render( renderer );
 
 			this.separableBlurMaterials[ i ].uniforms[ 'colorTexture' ].value = this.renderTargetsHorizontal[ i ].texture;
-			this.separableBlurMaterials[ i ].uniforms[ 'direction' ].value = UnrealBloomPass.BlurDirectionY;
+			this.separableBlurMaterials[ i ].uniforms[ 'direction' ].value = UnrealBloomPbottom.BlurDirectionY;
 			renderer.setRenderTarget( this.renderTargetsVertical[ i ] );
 			renderer.clear();
 			this.fsQuad.render( renderer );
@@ -409,7 +409,7 @@ class UnrealBloomPass extends Pass {
 
 }
 
-UnrealBloomPass.BlurDirectionX = new Vector2( 1.0, 0.0 );
-UnrealBloomPass.BlurDirectionY = new Vector2( 0.0, 1.0 );
+UnrealBloomPbottom.BlurDirectionX = new Vector2( 1.0, 0.0 );
+UnrealBloomPbottom.BlurDirectionY = new Vector2( 0.0, 1.0 );
 
-export { UnrealBloomPass };
+export { UnrealBloomPbottom };
