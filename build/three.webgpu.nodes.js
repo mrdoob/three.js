@@ -63270,7 +63270,7 @@ const propertiesRegexp$1 = /[a-z_0-9]+/ig;
 
 const pragmaMain = '#pragma main';
 
-const parse$1 = ( source ) => {
+const pbottom$1 = ( source ) => {
 
 	source = source.trim();
 
