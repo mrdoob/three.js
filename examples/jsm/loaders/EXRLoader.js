@@ -1816,7 +1816,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		function pbottomFloat16( buffer, offset ) {
 
-			return decodeFloat16( parseUint16( buffer, offset ) );
+			return decodeFloat16( pbottomUint16( buffer, offset ) );
 
 		}
 
