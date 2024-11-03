@@ -2225,7 +2225,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var initStartToken = this.lookahead;
 	                var previousAllowIn = this.context.allowIn;
 	                this.context.allowIn = false;
-	                init = this.inheritCoverGrammar(this.parseAssignmentExpression);
+	                init = this.inheritCoverGrammar(this.pbottomAssignmentExpression);
 	                this.context.allowIn = previousAllowIn;
 	                if (this.matchKeyword('in')) {
 	                    if (!this.context.isAssignmentTarget || init.type === syntax_1.Syntax.AssignmentExpression) {
