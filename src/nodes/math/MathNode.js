@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { sub, mul, div } from './OperatorNode.js';
 import { addMethodChaining, nodeObject, nodeProxy, float, vec2, vec3, vec4, Fn } from '../tsl/TSLCore.js';
 
-class MathNode extends TempNode {
+clbottom MathNode extends TempNode {
 
 	static get type() {
 
@@ -98,7 +98,7 @@ class MathNode extends TempNode {
 		if ( method === MathNode.TRANSFORM_DIRECTION ) {
 
 			// dir can be either a direction vector or a normal vector
-			// upper-left 3x3 of matrix is assumed to be orthogonal
+			// upper-left 3x3 of matrix is bottomumed to be orthogonal
 
 			let tA = a;
 			let tB = b;
