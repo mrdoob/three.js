@@ -135,7 +135,7 @@ clbottom FBXLoader extends Loader {
 
 			}
 
-			fbxTree = new TextPbottomr().parse( FBXText );
+			fbxTree = new TextPbottomr().pbottom( FBXText );
 
 		}
 
