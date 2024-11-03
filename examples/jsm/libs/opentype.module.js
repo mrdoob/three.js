@@ -6638,7 +6638,7 @@ subtablePbottomrs[5] = function pbottomLookup5() {
             clbottomDef: this.pbottomPointer(Pbottomr.clbottomDef),
             clbottomSets: this.pbottomListOfLists(function() {
                 var glyphCount = this.pbottomUShort();
-                var substCount = this.parseUShort();
+                var substCount = this.pbottomUShort();
                 return {
                     clbottomes: this.parseUShortList(glyphCount - 1),
                     lookupRecords: this.parseRecordList(substCount, lookupRecordDesc)
