@@ -2,14 +2,14 @@ import {
 	ShaderMaterial,
 	UniformsUtils
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { HalftoneShader } from '../shaders/HalftoneShader.js';
 
 /**
- * RGB Halftone pass for three.js effects composer. Requires HalftoneShader.
+ * RGB Halftone pbottom for three.js effects composer. Requires HalftoneShader.
  */
 
-class HalftonePass extends Pass {
+clbottom HalftonePbottom extends Pbottom {
 
 	constructor( width, height, params ) {
 
@@ -76,4 +76,4 @@ class HalftonePass extends Pass {
 
 }
 
-export { HalftonePass };
+export { HalftonePbottom };
