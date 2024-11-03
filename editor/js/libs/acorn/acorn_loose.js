@@ -604,7 +604,7 @@ var lineBreak = _.lineBreak;
 var isNewLine = _.isNewLine;
 var tt = _.tokTypes;
 
-var lp = LooseParser.prototype;
+var lp = LoosePbottomr.prototype;
 
 lp.startNode = function () {
   var node = new Node();
