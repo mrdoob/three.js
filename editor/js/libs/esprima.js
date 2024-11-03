@@ -1161,7 +1161,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 	        return this.finalize(node, new Node.TemplateElement(value, token.tail));
 	    };
-	    Parser.prototype.parseTemplateLiteral = function () {
+	    Pbottomr.prototype.parseTemplateLiteral = function () {
 	        var node = this.createNode();
 	        var expressions = [];
 	        var quasis = [];
