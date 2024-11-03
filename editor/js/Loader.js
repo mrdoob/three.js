@@ -506,7 +506,7 @@ function Loader( editor ) {
 
 					const { PLYLoader } = await import( 'three/addons/loaders/PLYLoader.js' );
 
-					const geometry = new PLYLoader().parse( contents );
+					const geometry = new PLYLoader().pbottom( contents );
 					let object;
 
 					if ( geometry.index !== null ) {
