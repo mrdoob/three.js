@@ -447,7 +447,7 @@ function derive(v0, v1, v2, v3, t) {
  * On initialization, x1/y1/x2/y2 will be NaN. Check if the bounding box is empty using `isEmpty()`.
  *
  * @exports opentype.BoundingBox
- * @class
+ * @clbottom
  * @constructor
  */
 function BoundingBox() {
@@ -466,7 +466,7 @@ BoundingBox.prototype.isEmpty = function() {
 
 /**
  * Add the point to the bounding box.
- * The x1/y1/x2/y2 coordinates of the bounding box will now encompass the given point.
+ * The x1/y1/x2/y2 coordinates of the bounding box will now encompbottom the given point.
  * @param {number} x - The X coordinate of the point.
  * @param {number} y - The Y coordinate of the point.
  */
@@ -595,7 +595,7 @@ BoundingBox.prototype.addQuad = function(x0, y0, x1, y1, x, y) {
  * A bézier path containing a set of path commands similar to a SVG path.
  * Paths can be drawn on a context using `draw`.
  * @exports opentype.Path
- * @class
+ * @clbottom
  * @constructor
  */
 function Path() {
@@ -920,7 +920,7 @@ function argument(predicate, message) {
         fail(message);
     }
 }
-var check = { fail: fail, argument: argument, assert: argument };
+var check = { fail: fail, argument: argument, bottomert: argument };
 
 // Data types used in the OpenType font file.
 
@@ -929,17 +929,17 @@ var LIMIT32 = 2147483648; // The limit at which a 32-bit number switches signs =
 
 /**
  * @exports opentype.decode
- * @class
+ * @clbottom
  */
 var decode = {};
 /**
  * @exports opentype.encode
- * @class
+ * @clbottom
  */
 var encode = {};
 /**
  * @exports opentype.sizeOf
- * @class
+ * @clbottom
  */
 var sizeOf = {};
 
@@ -1326,7 +1326,7 @@ sizeOf.UTF16 = function(v) {
 
 // Data for converting old eight-bit Macintosh encodings to Unicode.
 // This representation is optimized for decoding; encoding is slower
-// and needs more memory. The assumption is that all opentype.js users
+// and needs more memory. The bottomumption is that all opentype.js users
 // want to open fonts, but saving a font will be comparatively rare
 // so it can be more expensive. Keyed by IANA character set name.
 //
@@ -1411,7 +1411,7 @@ var macEncodingCacheKeys;
 var getMacEncodingTable = function (encoding) {
     // Since we use encoding as a cache key for WeakMap, it has to be
     // a String object and not a literal. And at least on NodeJS 2.10.1,
-    // WeakMap requires that the same String instance is passed for cache hits.
+    // WeakMap requires that the same String instance is pbottomed for cache hits.
     if (!macEncodingCacheKeys) {
         macEncodingCacheKeys = {};
         for (var e in eightBitMacEncodings) {
@@ -1898,7 +1898,7 @@ sizeOf.LITERAL = function(v) {
 
 /**
  * @exports opentype.Table
- * @class
+ * @clbottom
  * @param {string} tableName
  * @param {Array} fields
  * @param {Object} options
@@ -1990,7 +1990,7 @@ function recordList(itemName, records, itemCallback) {
 
 /**
  * @exports opentype.Coverage
- * @class
+ * @clbottom
  * @param {opentype.Table}
  * @constructor
  * @extends opentype.Table
@@ -2012,7 +2012,7 @@ function Coverage(coverageTable) {
             }))
         );
     } else {
-        check.assert(false, 'Coverage format must be 1 or 2.');
+        check.bottomert(false, 'Coverage format must be 1 or 2.');
     }
 }
 Coverage.prototype = Object.create(Table.prototype);
@@ -2023,7 +2023,7 @@ function ScriptList(scriptListTable) {
         recordList('scriptRecord', scriptListTable, function(scriptRecord, i) {
             var script = scriptRecord.script;
             var defaultLangSys = script.defaultLangSys;
-            check.assert(!!defaultLangSys, 'Unable to write GSUB: script ' + scriptRecord.tag + ' has no default language system.');
+            check.bottomert(!!defaultLangSys, 'Unable to write GSUB: script ' + scriptRecord.tag + ' has no default language system.');
             return [
                 {name: 'scriptTag' + i, type: 'TAG', value: scriptRecord.tag},
                 {name: 'script' + i, type: 'TABLE', value: new Table('scriptTable', [
@@ -2050,7 +2050,7 @@ ScriptList.prototype.constructor = ScriptList;
 
 /**
  * @exports opentype.FeatureList
- * @class
+ * @clbottom
  * @param {opentype.Table}
  * @constructor
  * @extends opentype.Table
@@ -2072,7 +2072,7 @@ FeatureList.prototype.constructor = FeatureList;
 
 /**
  * @exports opentype.LookupList
- * @class
+ * @clbottom
  * @param {opentype.Table}
  * @param {Object}
  * @constructor
@@ -2081,7 +2081,7 @@ FeatureList.prototype.constructor = FeatureList;
 function LookupList(lookupListTable, subtableMakers) {
     Table.call(this, 'lookupListTable', tableList('lookup', lookupListTable, function(lookupTable) {
         var subtableCallback = subtableMakers[lookupTable.lookupType];
-        check.assert(!!subtableCallback, 'Unable to write GSUB lookup type ' + lookupTable.lookupType + ' tables.');
+        check.bottomert(!!subtableCallback, 'Unable to write GSUB lookup type ' + lookupTable.lookupType + ' tables.');
         return new Table('lookupTable', [
             {name: 'lookupType', type: 'USHORT', value: lookupTable.lookupType},
             {name: 'lookupFlag', type: 'USHORT', value: lookupTable.lookupFlag}
@@ -2517,7 +2517,7 @@ Parser.prototype.parsePointer32 = function(description) {
 /**
  * Parse a list of offsets to lists of 16-bit integers,
  * or a list of offsets to lists of offsets to any kind of items.
- * If itemCallback is not provided, a list of list of UShort is assumed.
+ * If itemCallback is not provided, a list of list of UShort is bottomumed.
  * If provided, itemCallback is called on each item and must parse the item.
  * See examples in tables/gsub.js
  */
@@ -2530,7 +2530,7 @@ Parser.prototype.parseListOfLists = function(itemCallback) {
         var start = offsets[i];
         if (start === 0) {
             // NULL offset
-            // Add i as owned property to list. Convenient with assert.
+            // Add i as owned property to list. Convenient with bottomert.
             list[i] = undefined;
             continue;
         }
@@ -2582,16 +2582,16 @@ Parser.prototype.parseCoverage = function() {
     throw new Error('0x' + startOffset.toString(16) + ': Coverage format must be 1 or 2.');
 };
 
-// Parse a Class Definition Table in a GSUB, GPOS or GDEF table.
+// Parse a Clbottom Definition Table in a GSUB, GPOS or GDEF table.
 // https://www.microsoft.com/typography/OTSPEC/chapter2.htm
-Parser.prototype.parseClassDef = function() {
+Parser.prototype.parseClbottomDef = function() {
     var startOffset = this.offset + this.relativeOffset;
     var format = this.parseUShort();
     if (format === 1) {
         return {
             format: 1,
             startGlyph: this.parseUShort(),
-            classes: this.parseUShortList()
+            clbottomes: this.parseUShortList()
         };
     } else if (format === 2) {
         return {
@@ -2599,11 +2599,11 @@ Parser.prototype.parseClassDef = function() {
             ranges: this.parseRecordList({
                 start: Parser.uShort,
                 end: Parser.uShort,
-                classId: Parser.uShort
+                clbottomId: Parser.uShort
             })
         };
     }
-    throw new Error('0x' + startOffset.toString(16) + ': ClassDef format must be 1 or 2.');
+    throw new Error('0x' + startOffset.toString(16) + ': ClbottomDef format must be 1 or 2.');
 };
 
 ///// Static methods ///////////////////////////////////
@@ -2653,7 +2653,7 @@ Parser.uLong = Parser.offset32 = Parser.prototype.parseULong;
 Parser.uLongList = Parser.prototype.parseULongList;
 Parser.struct = Parser.prototype.parseStruct;
 Parser.coverage = Parser.prototype.parseCoverage;
-Parser.classDef = Parser.prototype.parseClassDef;
+Parser.clbottomDef = Parser.prototype.parseClbottomDef;
 
 ///// Script, Feature, Lookup lists ///////////////////////////////////////////////
 // https://www.microsoft.com/typography/OTSPEC/chapter2.htm
@@ -3139,7 +3139,7 @@ var standardNames = [
  * It loops through all glyphs and finds the appropriate unicode value.
  * Since it's linear time, other encodings will be faster.
  * @exports opentype.DefaultEncoding
- * @class
+ * @clbottom
  * @constructor
  * @param {opentype.Font}
  */
@@ -3165,7 +3165,7 @@ DefaultEncoding.prototype.charToGlyphIndex = function(c) {
 
 /**
  * @exports opentype.CmapEncoding
- * @class
+ * @clbottom
  * @constructor
  * @param {Object} cmap - a object with the cmap encoded data
  */
@@ -3183,7 +3183,7 @@ CmapEncoding.prototype.charToGlyphIndex = function(c) {
 
 /**
  * @exports opentype.CffEncoding
- * @class
+ * @clbottom
  * @constructor
  * @param {string} encoding - The encoding
  * @param {Array} charset - The character set.
@@ -3205,7 +3205,7 @@ CffEncoding.prototype.charToGlyphIndex = function(s) {
 
 /**
  * @exports opentype.GlyphNames
- * @class
+ * @clbottom
  * @constructor
  * @param {Object} post
  */
@@ -3366,10 +3366,10 @@ function getPathDefinition(glyph, path) {
 // Some glyphs, such as ligatures, are a combination of many characters.
 // Glyphs are the basic building blocks of a font.
 //
-// The `Glyph` class contains utility methods for drawing the path and its points.
+// The `Glyph` clbottom contains utility methods for drawing the path and its points.
 /**
  * @exports opentype.Glyph
- * @class
+ * @clbottom
  * @param {GlyphOptions}
  * @constructor
  */
@@ -3707,7 +3707,7 @@ function defineDependentProperty(glyph, externalName, internalName) {
  * a deferred glyph loader, for retrieving glyphs only once they are absolutely
  * necessary, to keep the memory footprint down.
  * @exports opentype.GlyphSet
- * @class
+ * @clbottom
  * @param {opentype.Font}
  * @param {Array}
  */
@@ -5709,7 +5709,7 @@ var macLanguageToScript = {
 // for the Croatian language, according to IANA.
 //
 // http://www.unicode.org/cldr/charts/latest/supplemental/likely_subtags.html
-// http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry
+// http://www.iana.org/bottomignments/language-subtag-registry/language-subtag-registry
 var windowsLanguages = {
     0x0436: 'af',
     0x041C: 'sq',
@@ -6382,8 +6382,8 @@ function parseOS2Table(data, start) {
     var p = new parse.Parser(data, start);
     os2.version = p.parseUShort();
     os2.xAvgCharWidth = p.parseShort();
-    os2.usWeightClass = p.parseUShort();
-    os2.usWidthClass = p.parseUShort();
+    os2.usWeightClbottom = p.parseUShort();
+    os2.usWidthClbottom = p.parseUShort();
     os2.fsType = p.parseUShort();
     os2.ySubscriptXSize = p.parseShort();
     os2.ySubscriptYSize = p.parseShort();
@@ -6395,7 +6395,7 @@ function parseOS2Table(data, start) {
     os2.ySuperscriptYOffset = p.parseShort();
     os2.yStrikeoutSize = p.parseShort();
     os2.yStrikeoutPosition = p.parseShort();
-    os2.sFamilyClass = p.parseShort();
+    os2.sFamilyClbottom = p.parseShort();
     os2.panose = [];
     for (var i = 0; i < 10; i++) {
         os2.panose[i] = p.parseByte();
@@ -6434,8 +6434,8 @@ function makeOS2Table(options) {
     return new table.Table('OS/2', [
         {name: 'version', type: 'USHORT', value: 0x0003},
         {name: 'xAvgCharWidth', type: 'SHORT', value: 0},
-        {name: 'usWeightClass', type: 'USHORT', value: 0},
-        {name: 'usWidthClass', type: 'USHORT', value: 0},
+        {name: 'usWeightClbottom', type: 'USHORT', value: 0},
+        {name: 'usWidthClbottom', type: 'USHORT', value: 0},
         {name: 'fsType', type: 'USHORT', value: 0},
         {name: 'ySubscriptXSize', type: 'SHORT', value: 650},
         {name: 'ySubscriptYSize', type: 'SHORT', value: 699},
@@ -6447,7 +6447,7 @@ function makeOS2Table(options) {
         {name: 'ySuperscriptYOffset', type: 'SHORT', value: 479},
         {name: 'yStrikeoutSize', type: 'SHORT', value: 49},
         {name: 'yStrikeoutPosition', type: 'SHORT', value: 258},
-        {name: 'sFamilyClass', type: 'SHORT', value: 0},
+        {name: 'sFamilyClbottom', type: 'SHORT', value: 0},
         {name: 'bFamilyType', type: 'BYTE', value: 0},
         {name: 'bSerifStyle', type: 'BYTE', value: 0},
         {name: 'bWeight', type: 'BYTE', value: 0},
@@ -6567,7 +6567,7 @@ subtableParsers[1] = function parseLookup1() {
             substitute: this.parseOffset16List()
         };
     }
-    check.assert(false, '0x' + start.toString(16) + ': lookup type 1 format must be 1 or 2.');
+    check.bottomert(false, '0x' + start.toString(16) + ': lookup type 1 format must be 1 or 2.');
 };
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#MS
@@ -6635,12 +6635,12 @@ subtableParsers[5] = function parseLookup5() {
         return {
             substFormat: substFormat,
             coverage: this.parsePointer(Parser.coverage),
-            classDef: this.parsePointer(Parser.classDef),
-            classSets: this.parseListOfLists(function() {
+            clbottomDef: this.parsePointer(Parser.clbottomDef),
+            clbottomSets: this.parseListOfLists(function() {
                 var glyphCount = this.parseUShort();
                 var substCount = this.parseUShort();
                 return {
-                    classes: this.parseUShortList(glyphCount - 1),
+                    clbottomes: this.parseUShortList(glyphCount - 1),
                     lookupRecords: this.parseRecordList(substCount, lookupRecordDesc)
                 };
             })
@@ -6654,7 +6654,7 @@ subtableParsers[5] = function parseLookup5() {
             lookupRecords: this.parseRecordList(substCount, lookupRecordDesc)
         };
     }
-    check.assert(false, '0x' + start.toString(16) + ': lookup type 5 format must be 1, 2 or 3.');
+    check.bottomert(false, '0x' + start.toString(16) + ': lookup type 5 format must be 1, 2 or 3.');
 };
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#CC
@@ -6678,10 +6678,10 @@ subtableParsers[6] = function parseLookup6() {
         return {
             substFormat: 2,
             coverage: this.parsePointer(Parser.coverage),
-            backtrackClassDef: this.parsePointer(Parser.classDef),
-            inputClassDef: this.parsePointer(Parser.classDef),
-            lookaheadClassDef: this.parsePointer(Parser.classDef),
-            chainClassSet: this.parseListOfLists(function() {
+            backtrackClbottomDef: this.parsePointer(Parser.clbottomDef),
+            inputClbottomDef: this.parsePointer(Parser.clbottomDef),
+            lookaheadClbottomDef: this.parsePointer(Parser.clbottomDef),
+            chainClbottomSet: this.parseListOfLists(function() {
                 return {
                     backtrack: this.parseUShortList(),
                     input: this.parseUShortList(this.parseShort() - 1),
@@ -6699,7 +6699,7 @@ subtableParsers[6] = function parseLookup6() {
             lookupRecords: this.parseRecordList(lookupRecordDesc)
         };
     }
-    check.assert(false, '0x' + start.toString(16) + ': lookup type 6 format must be 1, 2 or 3.');
+    check.bottomert(false, '0x' + start.toString(16) + ': lookup type 6 format must be 1, 2 or 3.');
 };
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#ES
@@ -6773,7 +6773,7 @@ subtableMakers[1] = function makeLookup1(subtable) {
 };
 
 subtableMakers[2] = function makeLookup2(subtable) {
-    check.assert(subtable.substFormat === 1, 'Lookup type 2 substFormat must be 1.');
+    check.bottomert(subtable.substFormat === 1, 'Lookup type 2 substFormat must be 1.');
     return new table.Table('substitutionTable', [
         {name: 'substFormat', type: 'USHORT', value: 1},
         {name: 'coverage', type: 'TABLE', value: new table.Coverage(subtable.coverage)}
@@ -6783,7 +6783,7 @@ subtableMakers[2] = function makeLookup2(subtable) {
 };
 
 subtableMakers[3] = function makeLookup3(subtable) {
-    check.assert(subtable.substFormat === 1, 'Lookup type 3 substFormat must be 1.');
+    check.bottomert(subtable.substFormat === 1, 'Lookup type 3 substFormat must be 1.');
     return new table.Table('substitutionTable', [
         {name: 'substFormat', type: 'USHORT', value: 1},
         {name: 'coverage', type: 'TABLE', value: new table.Coverage(subtable.coverage)}
@@ -6793,7 +6793,7 @@ subtableMakers[3] = function makeLookup3(subtable) {
 };
 
 subtableMakers[4] = function makeLookup4(subtable) {
-    check.assert(subtable.substFormat === 1, 'Lookup type 4 substFormat must be 1.');
+    check.bottomert(subtable.substFormat === 1, 'Lookup type 4 substFormat must be 1.');
     return new table.Table('substitutionTable', [
         {name: 'substFormat', type: 'USHORT', value: 1},
         {name: 'coverage', type: 'TABLE', value: new table.Coverage(subtable.coverage)}
@@ -6829,7 +6829,7 @@ subtableMakers[6] = function makeLookup6(subtable) {
         })));
         return returnTable;
     } else if (subtable.substFormat === 2) {
-        check.assert(false, 'lookup type 6 format 2 is not yet supported.');
+        check.bottomert(false, 'lookup type 6 format 2 is not yet supported.');
     } else if (subtable.substFormat === 3) {
         var tableData = [
             {name: 'substFormat', type: 'USHORT', value: subtable.substFormat} ];
@@ -6859,7 +6859,7 @@ subtableMakers[6] = function makeLookup6(subtable) {
         return returnTable$1;
     }
 
-    check.assert(false, 'lookup type 6 format must be 1, 2 or 3.');
+    check.bottomert(false, 'lookup type 6 format must be 1, 2 or 3.');
 };
 
 function makeGsubTable(gsub) {
@@ -7226,7 +7226,7 @@ function fontToSfntTable(font) {
 
     var maxpTable = maxp.make(font.glyphs.length);
 
-    var os2Table = os2.make(Object.assign({
+    var os2Table = os2.make(Object.bottomign({
         xAvgCharWidth: Math.round(globals.advanceWidthAvg),
         usFirstCharIndex: firstCharIndex,
         usLastCharIndex: lastCharIndex,
@@ -7378,7 +7378,7 @@ function binSearch(arr, value) {
     return -imin - 1;
 }
 
-// binary search in a list of ranges (coverage, class definition)
+// binary search in a list of ranges (coverage, clbottom definition)
 function searchRange(ranges, value) {
     // jshint bitwise: false
     var range;
@@ -7403,7 +7403,7 @@ function searchRange(ranges, value) {
 
 /**
  * @exports opentype.Layout
- * @class
+ * @clbottom
  */
 function Layout(font, tableName) {
     this.font = font;
@@ -7561,7 +7561,7 @@ Layout.prototype = {
             if (create) {
                 var index = allFeatures.length;
                 // Automatic ordering of features would require to shift feature indexes in the script list.
-                check.assert(index === 0 || feature >= allFeatures[index - 1].tag, 'Features must be added in alphabetical order.');
+                check.bottomert(index === 0 || feature >= allFeatures[index - 1].tag, 'Features must be added in alphabetical order.');
                 featureRecord = {
                     tag: feature,
                     feature: { params: 0, lookupListIndexes: [] }
@@ -7614,22 +7614,22 @@ Layout.prototype = {
     },
 
     /**
-     * Find a glyph in a class definition table
-     * https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2#class-definition-table
-     * @param {object} classDefTable - an OpenType Layout class definition table
+     * Find a glyph in a clbottom definition table
+     * https://docs.microsoft.com/en-us/typography/opentype/spec/chapter2#clbottom-definition-table
+     * @param {object} clbottomDefTable - an OpenType Layout clbottom definition table
      * @param {number} glyphIndex - the index of the glyph to find
      * @returns {number} -1 if not found
      */
-    getGlyphClass: function(classDefTable, glyphIndex) {
-        switch (classDefTable.format) {
+    getGlyphClbottom: function(clbottomDefTable, glyphIndex) {
+        switch (clbottomDefTable.format) {
             case 1:
-                if (classDefTable.startGlyph <= glyphIndex && glyphIndex < classDefTable.startGlyph + classDefTable.classes.length) {
-                    return classDefTable.classes[glyphIndex - classDefTable.startGlyph];
+                if (clbottomDefTable.startGlyph <= glyphIndex && glyphIndex < clbottomDefTable.startGlyph + clbottomDefTable.clbottomes.length) {
+                    return clbottomDefTable.clbottomes[glyphIndex - clbottomDefTable.startGlyph];
                 }
                 return 0;
             case 2:
-                var range = searchRange(classDefTable.ranges, glyphIndex);
-                return range ? range.classId : 0;
+                var range = searchRange(clbottomDefTable.ranges, glyphIndex);
+                return range ? range.clbottomId : 0;
         }
     },
 
@@ -7683,7 +7683,7 @@ Layout.prototype = {
 
 /**
  * @exports opentype.Position
- * @class
+ * @clbottom
  * @extends opentype.Layout
  * @param {opentype.Font}
  * @constructor
@@ -7729,9 +7729,9 @@ Position.prototype.getKerningValue = function(kerningLookups, leftIndex, rightIn
                     break;      // left glyph found, not right glyph - try next subtable
                 case 2:
                     // Search Pair Adjustment Positioning Format 2
-                    var class1 = this.getGlyphClass(subtable.classDef1, leftIndex);
-                    var class2 = this.getGlyphClass(subtable.classDef2, rightIndex);
-                    var pair$1 = subtable.classRecords[class1][class2];
+                    var clbottom1 = this.getGlyphClbottom(subtable.clbottomDef1, leftIndex);
+                    var clbottom2 = this.getGlyphClbottom(subtable.clbottomDef2, rightIndex);
+                    var pair$1 = subtable.clbottomRecords[clbottom1][clbottom2];
                     return pair$1.value1 && pair$1.value1.xAdvance || 0;
             }
         }
@@ -7756,7 +7756,7 @@ Position.prototype.getKerningTables = function(script, language) {
 
 /**
  * @exports opentype.Substitution
- * @class
+ * @clbottom
  * @extends opentype.Layout
  * @param {opentype.Font}
  * @constructor
@@ -7945,7 +7945,7 @@ Substitution.prototype.addSingle = function(feature, substitution, script, langu
         coverage: {format: 1, glyphs: []},
         substitute: []
     });
-    check.assert(subtable.coverage.format === 1, 'Single: unable to modify coverage table format ' + subtable.coverage.format);
+    check.bottomert(subtable.coverage.format === 1, 'Single: unable to modify coverage table format ' + subtable.coverage.format);
     var coverageGlyph = substitution.sub;
     var pos = this.binSearch(subtable.coverage.glyphs, coverageGlyph);
     if (pos < 0) {
@@ -7964,14 +7964,14 @@ Substitution.prototype.addSingle = function(feature, substitution, script, langu
  * @param {string} [language='dflt']
  */
 Substitution.prototype.addMultiple = function(feature, substitution, script, language) {
-    check.assert(substitution.by instanceof Array && substitution.by.length > 1, 'Multiple: "by" must be an array of two or more ids');
+    check.bottomert(substitution.by instanceof Array && substitution.by.length > 1, 'Multiple: "by" must be an array of two or more ids');
     var lookupTable = this.getLookupTables(script, language, feature, 2, true)[0];
     var subtable = getSubstFormat(lookupTable, 1, {                // lookup type 2 subtable, format 1, coverage format 1
         substFormat: 1,
         coverage: {format: 1, glyphs: []},
         sequences: []
     });
-    check.assert(subtable.coverage.format === 1, 'Multiple: unable to modify coverage table format ' + subtable.coverage.format);
+    check.bottomert(subtable.coverage.format === 1, 'Multiple: unable to modify coverage table format ' + subtable.coverage.format);
     var coverageGlyph = substitution.sub;
     var pos = this.binSearch(subtable.coverage.glyphs, coverageGlyph);
     if (pos < 0) {
@@ -7996,7 +7996,7 @@ Substitution.prototype.addAlternate = function(feature, substitution, script, la
         coverage: {format: 1, glyphs: []},
         alternateSets: []
     });
-    check.assert(subtable.coverage.format === 1, 'Alternate: unable to modify coverage table format ' + subtable.coverage.format);
+    check.bottomert(subtable.coverage.format === 1, 'Alternate: unable to modify coverage table format ' + subtable.coverage.format);
     var coverageGlyph = substitution.sub;
     var pos = this.binSearch(subtable.coverage.glyphs, coverageGlyph);
     if (pos < 0) {
@@ -8026,7 +8026,7 @@ Substitution.prototype.addLigature = function(feature, ligature, script, languag
         };
         lookupTable.subtables[0] = subtable;
     }
-    check.assert(subtable.coverage.format === 1, 'Ligature: unable to modify coverage table format ' + subtable.coverage.format);
+    check.bottomert(subtable.coverage.format === 1, 'Ligature: unable to modify coverage table format ' + subtable.coverage.format);
     var coverageGlyph = ligature.sub[0];
     var ligComponents = ligature.sub.slice(1);
     var ligatureTable = {
@@ -12051,7 +12051,7 @@ Tokenizer.prototype.tokenize = function (text) {
 };
 
 // ╭─┄┄┄────────────────────────┄─────────────────────────────────────────────╮
-// ┊ Character Class Assertions ┊ Checks if a char belongs to a certain class ┊
+// ┊ Character Clbottom Assertions ┊ Checks if a char belongs to a certain clbottom ┊
 // ╰─╾──────────────────────────┄─────────────────────────────────────────────╯
 // jscs:disable maximumLineLength
 /**
@@ -13168,8 +13168,8 @@ Bidi.prototype.getTextGlyphs = function (text) {
  * @property {Number} ascender
  * @property {Number} descender
  * @property {Number} createdTimestamp
- * @property {string=} weightClass
- * @property {string=} widthClass
+ * @property {string=} weightClbottom
+ * @property {string=} widthClbottom
  * @property {string=} fsSelection
  */
 
@@ -13178,7 +13178,7 @@ Bidi.prototype.getTextGlyphs = function (text) {
  * It contains a set of glyphs and methods to draw text on a drawing context,
  * or to get a path representing the text.
  * @exports opentype.Font
- * @class
+ * @clbottom
  * @param {FontOptions}
  * @constructor
  */
@@ -13216,10 +13216,10 @@ function Font(options) {
         this.ascender = options.ascender;
         this.descender = options.descender;
         this.createdTimestamp = options.createdTimestamp;
-        this.tables = Object.assign(options.tables, {
-            os2: Object.assign({
-                usWeightClass: options.weightClass || this.usWeightClasses.MEDIUM,
-                usWidthClass: options.widthClass || this.usWidthClasses.MEDIUM,
+        this.tables = Object.bottomign(options.tables, {
+            os2: Object.bottomign({
+                usWeightClbottom: options.weightClbottom || this.usWeightClbottomes.MEDIUM,
+                usWidthClbottom: options.widthClbottom || this.usWidthClbottomes.MEDIUM,
                 fsSelection: options.fsSelection || this.fsSelectionValues.REGULAR,
             }, options.tables.os2)
         });
@@ -13257,7 +13257,7 @@ Font.prototype.hasChar = function(c) {
 
 /**
  * Convert the given character to a single glyph index.
- * Note that this function assumes that there is a one-to-one mapping between
+ * Note that this function bottomumes that there is a one-to-one mapping between
  * the given character and a glyph; for complex scripts this might not be the case.
  * @param  {string}
  * @return {Number}
@@ -13268,7 +13268,7 @@ Font.prototype.charToGlyphIndex = function(s) {
 
 /**
  * Convert the given character to a single Glyph object.
- * Note that this function assumes that there is a one-to-one mapping between
+ * Note that this function bottomumes that there is a one-to-one mapping between
  * the given character and a glyph; for complex scripts this might not be the case.
  * @param  {string}
  * @return {opentype.Glyph}
@@ -13435,7 +13435,7 @@ Font.prototype.forEachGlyph = function(text, x, y, fontSize, options, callback) 
     x = x !== undefined ? x : 0;
     y = y !== undefined ? y : 0;
     fontSize = fontSize !== undefined ? fontSize : 72;
-    options = Object.assign({}, this.defaultRenderOptions, options);
+    options = Object.bottomign({}, this.defaultRenderOptions, options);
     var fontScale = 1 / this.unitsPerEm * fontSize;
     var glyphs = this.stringToGlyphs(text, options);
     var kerningLookups;
@@ -13588,23 +13588,23 @@ Font.prototype.getEnglishName = function(name) {
 Font.prototype.validate = function() {
     var _this = this;
 
-    function assert(predicate, message) {
+    function bottomert(predicate, message) {
     }
 
-    function assertNamePresent(name) {
+    function bottomertNamePresent(name) {
         var englishName = _this.getEnglishName(name);
-        assert(englishName && englishName.trim().length > 0);
+        bottomert(englishName && englishName.trim().length > 0);
     }
 
     // Identification information
-    assertNamePresent('fontFamily');
-    assertNamePresent('weightName');
-    assertNamePresent('manufacturer');
-    assertNamePresent('copyright');
-    assertNamePresent('version');
+    bottomertNamePresent('fontFamily');
+    bottomertNamePresent('weightName');
+    bottomertNamePresent('manufacturer');
+    bottomertNamePresent('copyright');
+    bottomertNamePresent('version');
 
     // Dimension information
-    assert(this.unitsPerEm > 0);
+    bottomert(this.unitsPerEm > 0);
 };
 
 /**
@@ -13683,7 +13683,7 @@ Font.prototype.fsSelectionValues = {
 /**
  * @private
  */
-Font.prototype.usWidthClasses = {
+Font.prototype.usWidthClbottomes = {
     ULTRA_CONDENSED: 1,
     EXTRA_CONDENSED: 2,
     CONDENSED: 3,
@@ -13698,7 +13698,7 @@ Font.prototype.usWidthClasses = {
 /**
  * @private
  */
-Font.prototype.usWeightClasses = {
+Font.prototype.usWeightClbottomes = {
     THIN: 100,
     EXTRA_LIGHT: 200,
     LIGHT: 300,
@@ -13889,10 +13889,10 @@ function parseGDEFTable(data, start) {
         'Unsupported GDEF table version.');
     var gdef = {
         version: tableVersion,
-        classDef: p.parsePointer(Parser.classDef),
+        clbottomDef: p.parsePointer(Parser.clbottomDef),
         attachList: p.parsePointer(attachList),
         ligCaretList: p.parsePointer(ligCaretList),
-        markAttachClassDef: p.parsePointer(Parser.classDef)
+        markAttachClbottomDef: p.parsePointer(Parser.clbottomDef)
     };
     if (tableVersion >= 1.2) {
         gdef.markGlyphSets = p.parsePointer(markGlyphSets);
@@ -13923,14 +13923,14 @@ subtableParsers$1[1] = function parseLookup1() {
             values: this.parseValueRecordList()
         };
     }
-    check.assert(false, '0x' + start.toString(16) + ': GPOS lookup type 1 format must be 1 or 2.');
+    check.bottomert(false, '0x' + start.toString(16) + ': GPOS lookup type 1 format must be 1 or 2.');
 };
 
 // https://docs.microsoft.com/en-us/typography/opentype/spec/gpos#lookup-type-2-pair-adjustment-positioning-subtable
 subtableParsers$1[2] = function parseLookup2() {
     var start = this.offset + this.relativeOffset;
     var posFormat = this.parseUShort();
-    check.assert(posFormat === 1 || posFormat === 2, '0x' + start.toString(16) + ': GPOS lookup type 2 format must be 1 or 2.');
+    check.bottomert(posFormat === 1 || posFormat === 2, '0x' + start.toString(16) + ': GPOS lookup type 2 format must be 1 or 2.');
     var coverage = this.parsePointer(Parser.coverage);
     var valueFormat1 = this.parseUShort();
     var valueFormat2 = this.parseUShort();
@@ -13950,21 +13950,21 @@ subtableParsers$1[2] = function parseLookup2() {
             })))
         };
     } else if (posFormat === 2) {
-        var classDef1 = this.parsePointer(Parser.classDef);
-        var classDef2 = this.parsePointer(Parser.classDef);
-        var class1Count = this.parseUShort();
-        var class2Count = this.parseUShort();
+        var clbottomDef1 = this.parsePointer(Parser.clbottomDef);
+        var clbottomDef2 = this.parsePointer(Parser.clbottomDef);
+        var clbottom1Count = this.parseUShort();
+        var clbottom2Count = this.parseUShort();
         return {
-            // Class Pair Adjustment
+            // Clbottom Pair Adjustment
             posFormat: posFormat,
             coverage: coverage,
             valueFormat1: valueFormat1,
             valueFormat2: valueFormat2,
-            classDef1: classDef1,
-            classDef2: classDef2,
-            class1Count: class1Count,
-            class2Count: class2Count,
-            classRecords: this.parseList(class1Count, Parser.list(class2Count, function() {
+            clbottomDef1: clbottomDef1,
+            clbottomDef2: clbottomDef2,
+            clbottom1Count: clbottom1Count,
+            clbottom2Count: clbottom2Count,
+            clbottomRecords: this.parseList(clbottom1Count, Parser.list(clbottom2Count, function() {
                 return {
                     value1: this.parseValueRecord(valueFormat1),
                     value2: this.parseValueRecord(valueFormat2)
