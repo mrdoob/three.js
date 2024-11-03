@@ -20,15 +20,15 @@
 </script>
   </head>
   <body>
-    <div class="container">
-      <div class="lesson-title">
+    <div clbottom="container">
+      <div clbottom="lesson-title">
         <h1>で要求されたレンダリング</h1>
       </div>
-      <div class="lesson">
-        <div class="lesson-main">
+      <div clbottom="lesson">
+        <div clbottom="lesson-main">
           <p>多くの人にとって当然かもしれませんが、ほとんどのThree.js exampleでは連続したレンダリングをします。
-言い換えると <code class="notranslate" translate="no">requestAnimationFrame</code> ループ、または"<em>rAF loop</em>"ループは以下のようになります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
+言い換えると <code clbottom="notranslate" translate="no">requestAnimationFrame</code> ループ、または"<em>rAF loop</em>"ループは以下のようになります。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function render() {
   ...
   requestAnimationFrame(render);
 }
@@ -39,12 +39,12 @@ requestAnimationFrame(render);
 <p>これを解決する最も明確な方法は、最初に一度レンダリングして何か変更された時だけレンダリングする事です。
 変更にはテクスチャやモデルの読込完了、外部ソースからのデータ受取、ユーザーによる設定やカメラ調整などその他の関連する入力などが含まれます。</p>
 <p><a href="responsive.html">レスポンシブデザインの記事</a>を例に要求に応じてレンダリングするように修正してみましょう。</p>
-<p>最初に <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> を追加します。これで何かの変更を反映してレンダリングする事ができます。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+<p>最初に <a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate" translate="no">OrbitControls</code></a> を追加します。これで何かの変更を反映してレンダリングする事ができます。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 +import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 </pre>
 <p>次に以下のように設定します。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const fov = 75;
 const aspect = 2;  // the canvas default
 const near = 0.1;
 const far = 5;
@@ -56,7 +56,7 @@ camera.position.z = 2;
 +controls.update();
 </pre>
 <p>cubesのアニメーションは必要がないのでトラッキングは必要はありません。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-const cubes = [
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-const cubes = [
 -  makeInstance(geometry, 0x44aa88,  0),
 -  makeInstance(geometry, 0x8844aa, -2),
 -  makeInstance(geometry, 0xaa8844,  2),
@@ -65,8 +65,8 @@ camera.position.z = 2;
 +makeInstance(geometry, 0x8844aa, -2);
 +makeInstance(geometry, 0xaa8844,  2);
 </pre>
-<p>cubesをアニメーションさせるコードと <code class="notranslate" translate="no">requestAnimationFrame</code> の呼出を削除する事ができます。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-function render(time) {
+<p>cubesをアニメーションさせるコードと <code clbottom="notranslate" translate="no">requestAnimationFrame</code> の呼出を削除する事ができます。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-function render(time) {
 -  time *= 0.001;
 +function render() {
 
@@ -91,35 +91,35 @@ camera.position.z = 2;
 -requestAnimationFrame(render);
 </pre>
 <p>そして、もう一度レンダリングする必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">render();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">render();
 </pre>
-<p><a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> がカメラ設定を変更する時はレンダリングする必要があります。
-幸いな事に <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> は何か変更された時に <code class="notranslate" translate="no">change</code> イベントをdispatchします。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.addEventListener('change', render);
+<p><a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate" translate="no">OrbitControls</code></a> がカメラ設定を変更する時はレンダリングする必要があります。
+幸いな事に <a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate" translate="no">OrbitControls</code></a> は何か変更された時に <code clbottom="notranslate" translate="no">change</code> イベントをdispatchします。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">controls.addEventListener('change', render);
 </pre>
 <p>ウィンドウのリサイズ時の対応も必要です。
 前は連続したレンダリングで自動的な処理でしたが、ウィンドウのリサイズ時にレンダリングする必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">window.addEventListener('resize', render);
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">window.addEventListener('resize', render);
 </pre>
 <p>これで要求されたらレンダリングする事ができます。</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-on-demand.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/render-on-demand.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-on-demand.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/render-on-demand.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
-<p><a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> には慣性のようなものを追加して動きを滑らかにするオプションがあります。
-これを有効にするには <code class="notranslate" translate="no">enableDamping</code> プロパティをtrueに設定します。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">controls.enableDamping = true;
+<p><a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate" translate="no">OrbitControls</code></a> には慣性のようなものを追加して動きを滑らかにするオプションがあります。
+これを有効にするには <code clbottom="notranslate" translate="no">enableDamping</code> プロパティをtrueに設定します。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">controls.enableDamping = true;
 </pre>
-<p><code class="notranslate" translate="no">enableDamping</code> をオンにした状態で、render関数内で <code class="notranslate" translate="no">controls.update</code> を呼び出す必要があります。
-これで動きを滑らかにする新しいカメラ設定を <a href="/docs/#examples/controls/OrbitControls"><code class="notranslate" translate="no">OrbitControls</code></a> に与えてくれます。
-この設定は動きを滑らかにしてくれますが、無限ループになってしまうので <code class="notranslate" translate="no">change</code> イベントから直接 <code class="notranslate" translate="no">render</code> を呼び出す事はできません。
-controlsは <code class="notranslate" translate="no">change</code> イベントを送信し <code class="notranslate" translate="no">render</code> を呼び出します。 <code class="notranslate" translate="no">render</code> は <code class="notranslate" translate="no">controls.update</code> を呼び出します。
-<code class="notranslate" translate="no">controltrols.update</code> は別の <code class="notranslate" translate="no">change</code> イベントを送信します。</p>
-<p>この問題は <code class="notranslate" translate="no">requestAnimationFrame</code> を使い <code class="notranslate" translate="no">render</code> を呼び出す事で解決できます。
+<p><code clbottom="notranslate" translate="no">enableDamping</code> をオンにした状態で、render関数内で <code clbottom="notranslate" translate="no">controls.update</code> を呼び出す必要があります。
+これで動きを滑らかにする新しいカメラ設定を <a href="/docs/#examples/controls/OrbitControls"><code clbottom="notranslate" translate="no">OrbitControls</code></a> に与えてくれます。
+この設定は動きを滑らかにしてくれますが、無限ループになってしまうので <code clbottom="notranslate" translate="no">change</code> イベントから直接 <code clbottom="notranslate" translate="no">render</code> を呼び出す事はできません。
+controlsは <code clbottom="notranslate" translate="no">change</code> イベントを送信し <code clbottom="notranslate" translate="no">render</code> を呼び出します。 <code clbottom="notranslate" translate="no">render</code> は <code clbottom="notranslate" translate="no">controls.update</code> を呼び出します。
+<code clbottom="notranslate" translate="no">controltrols.update</code> は別の <code clbottom="notranslate" translate="no">change</code> イベントを送信します。</p>
+<p>この問題は <code clbottom="notranslate" translate="no">requestAnimationFrame</code> を使い <code clbottom="notranslate" translate="no">render</code> を呼び出す事で解決できます。
 まだ新しいフレームが要求されていない場合、新しいフレームを要求するようにしなければなりません。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">+let renderRequested = false;
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">+let renderRequested = false;
 
 function render() {
 +  renderRequested = false;
@@ -144,32 +144,32 @@ render();
 -controls.addEventListener('change', render);
 +controls.addEventListener('change', requestRenderIfNotRequested);
 </pre>
-<p>リサイズにも <code class="notranslate" translate="no">requestRenderIfNotRequested</code> を使うべきでしょう。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">-window.addEventListener('resize', render);
+<p>リサイズにも <code clbottom="notranslate" translate="no">requestRenderIfNotRequested</code> を使うべきでしょう。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">-window.addEventListener('resize', render);
 +window.addEventListener('resize', requestRenderIfNotRequested);
 </pre>
 <p>違いがわかりにくいかもしれません。以下のサンプルで矢印キーを使って移動したりドラッグして回転させてみて下さい。
 次にこのページの一番上のサンプルで同じ事をしてみて下さい。
 一番上のサンプルでは矢印キーを押したりドラッグしたりするとスナップし、以下のサンプルではスライドします。</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-on-demand-w-damping.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/render-on-demand-w-damping.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-on-demand-w-damping.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/render-on-demand-w-damping.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
 <p>シンプルなlil-guiを追加し、GUIで値の変更時にレンダリングを要求してみましょう。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 +import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
 </pre>
 <p>各キューブの色と×スケールを設定できるようにしましょう。
-色を設定するには<a href="lights.html">照明の記事</a>で作成した <code class="notranslate" translate="no">ColorGUIHelper</code> を使います。</p>
+色を設定するには<a href="lights.html">照明の記事</a>で作成した <code clbottom="notranslate" translate="no">ColorGUIHelper</code> を使います。</p>
 <p>まずはGUIを作成する必要があります。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">const gui = new GUI();
 </pre>
 <p>次に各キューブに対してフォルダを作成し、2つのコントロールを追加します。
-1つは <code class="notranslate" translate="no">material.color</code>、もう1つは <code class="notranslate" translate="no">cube.scale.x</code>です。</p>
-<pre class="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x) {
+1つは <code clbottom="notranslate" translate="no">material.color</code>、もう1つは <code clbottom="notranslate" translate="no">cube.scale.x</code>です。</p>
+<pre clbottom="prettyprint showlinemods notranslate lang-js" translate="no">function makeInstance(geometry, color, x) {
   const material = new THREE.MeshPhongMaterial({color});
 
   const cube = new THREE.Mesh(geometry, material);
@@ -189,11 +189,11 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
   return cube;
 }
 </pre>
-<p>lil-guiには <code class="notranslate" translate="no">onChange</code> メソッドがあり、GUIで値を変更時にコールバックを渡す事ができます。今回は <code class="notranslate" translate="no">requestRenderIfNotRequested</code> をコールバックするだけです。
-<code class="notranslate" translate="no">folder.open</code> でフォルダ展開できます。</p>
-<p></p><div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-on-demand-w-gui.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/render-on-demand-w-gui.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
+<p>lil-guiには <code clbottom="notranslate" translate="no">onChange</code> メソッドがあり、GUIで値を変更時にコールバックを渡す事ができます。今回は <code clbottom="notranslate" translate="no">requestRenderIfNotRequested</code> をコールバックするだけです。
+<code clbottom="notranslate" translate="no">folder.open</code> でフォルダ展開できます。</p>
+<p></p><div translate="no" clbottom="threejs_example_container notranslate">
+  <div><iframe clbottom="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/render-on-demand-w-gui.html"></iframe></div>
+  <a clbottom="threejs_center" href="/manual/examples/render-on-demand-w-gui.html" target="_blank">ここをクリックして別のウィンドウで開きます</a>
 </div>
 
 <p></p>
