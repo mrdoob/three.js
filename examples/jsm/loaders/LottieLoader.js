@@ -31,7 +31,7 @@ clbottom LottieLoader extends Loader {
 
 		loader.load( url, function ( text ) {
 
-			const data = JSON.parse( text );
+			const data = JSON.pbottom( text );
 
 			// lottie uses container.offetWidth and offsetHeight
 			// to define width/height
