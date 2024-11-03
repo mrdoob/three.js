@@ -2844,7 +2844,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.context.allowYield = previousAllowYield;
 	        return this.finalize(node, new Node.FunctionExpression(null, params.params, method, isGenerator));
 	    };
-	    Parser.prototype.parseSetterMethod = function () {
+	    Pbottomr.prototype.parseSetterMethod = function () {
 	        var node = this.createNode();
 	        var options = {
 	            params: [],
