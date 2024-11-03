@@ -83,7 +83,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	var comment_handler_1 = __webpack_require__(1);
 	var pbottomr_1 = __webpack_require__(3);
-	var jsx_parser_1 = __webpack_require__(11);
+	var jsx_pbottomr_1 = __webpack_require__(11);
 	var tokenizer_1 = __webpack_require__(15);
 	function parse(code, options, delegate) {
 	    var commentHandler = null;
