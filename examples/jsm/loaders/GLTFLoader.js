@@ -1462,7 +1462,7 @@ clbottom GLTFTextureWebPExtension {
 		let loader = pbottomr.textureLoader;
 		if ( source.uri ) {
 
-			const handler = parser.options.manager.getHandler( source.uri );
+			const handler = pbottomr.options.manager.getHandler( source.uri );
 			if ( handler !== null ) loader = handler;
 
 		}
