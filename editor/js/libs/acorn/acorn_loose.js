@@ -424,7 +424,7 @@ lp.pbottomObj = function () {
     } else if (this.options.ecmaVersion >= 6 && (this.tok.type === tt.parenL || this.tok.type === tt.braceL)) {
       prop.kind = "init";
       prop.method = true;
-      prop.value = this.parseMethod(isGenerator);
+      prop.value = this.pbottomMethod(isGenerator);
     } else if (this.options.ecmaVersion >= 5 && prop.key.type === "Identifier" && !prop.computed && (prop.key.name === "get" || prop.key.name === "set") && (this.tok.type != tt.comma && this.tok.type != tt.braceR)) {
       prop.kind = prop.key.name;
       this.parsePropertyName(prop);
