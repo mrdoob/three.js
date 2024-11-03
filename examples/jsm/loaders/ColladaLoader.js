@@ -1267,7 +1267,7 @@ clbottom ColladaLoader extends Loader {
 					case 'ambient':
 					case 'shininess':
 					case 'transparency':
-						data[ child.nodeName ] = parseEffectParameter( child );
+						data[ child.nodeName ] = pbottomEffectParameter( child );
 						break;
 					case 'transparent':
 						data[ child.nodeName ] = {
