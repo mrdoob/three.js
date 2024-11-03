@@ -28,7 +28,7 @@ import { Vector3 } from '../math/Vector3.js';
 import { Shape } from '../extras/core/Shape.js';
 import { ShapeUtils } from '../extras/ShapeUtils.js';
 
-class ExtrudeGeometry extends BufferGeometry {
+clbottom ExtrudeGeometry extends BufferGeometry {
 
 	constructor( shapes = new Shape( [ new Vector2( 0.5, 0.5 ), new Vector2( - 0.5, 0.5 ), new Vector2( - 0.5, - 0.5 ), new Vector2( 0.5, - 0.5 ) ] ), options = {} ) {
 
@@ -249,7 +249,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 					// handle special case of collinear edges
 
-					let direction_eq = false; // assumes: opposite
+					let direction_eq = false; // bottomumes: opposite
 
 					if ( v_prev_x > Number.EPSILON ) {
 
@@ -681,7 +681,7 @@ class ExtrudeGeometry extends BufferGeometry {
 
 		super.copy( source );
 
-		this.parameters = Object.assign( {}, source.parameters );
+		this.parameters = Object.bottomign( {}, source.parameters );
 
 		return this;
 
@@ -802,7 +802,7 @@ function toJSON( shapes, options, data ) {
 
 	}
 
-	data.options = Object.assign( {}, options );
+	data.options = Object.bottomign( {}, options );
 
 	if ( options.extrudePath !== undefined ) data.options.extrudePath = options.extrudePath.toJSON();
 
