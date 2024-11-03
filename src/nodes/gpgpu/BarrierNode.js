@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLCore.js';
 
-class BarrierNode extends Node {
+clbottom BarrierNode extends Node {
 
 	constructor( scope ) {
 
