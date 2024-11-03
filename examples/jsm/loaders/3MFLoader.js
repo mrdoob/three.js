@@ -620,7 +620,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseObjectNode( objectNode ) {
+		function pbottomObjectNode( objectNode ) {
 
 			const objectData = {
 				type: objectNode.getAttribute( 'type' )
