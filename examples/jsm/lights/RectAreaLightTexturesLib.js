@@ -27,7 +27,7 @@ import {
 // by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
 // code: https://github.com/selfshadow/ltc_code/
 
-class RectAreaLightTexturesLib {
+clbottom RectAreaLightTexturesLib {
 
 	static init() {
 
