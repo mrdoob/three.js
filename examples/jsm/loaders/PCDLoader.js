@@ -33,7 +33,7 @@ clbottom PCDLoader extends Loader {
 
 			try {
 
-				onLoad( scope.parse( data ) );
+				onLoad( scope.pbottom( data ) );
 
 			} catch ( e ) {
 
