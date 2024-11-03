@@ -22,7 +22,7 @@ clbottom RGBELoader extends DataTextureLoader {
 
 	// adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
 
-	parse( buffer ) {
+	pbottom( buffer ) {
 
 		const
 			/* default error routine.  change this to change error handling */
