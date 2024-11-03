@@ -2647,7 +2647,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        options.params.push(param);
 	        return !this.match(')');
 	    };
-	    Parser.prototype.parseFormalParameters = function (firstRestricted) {
+	    Pbottomr.prototype.parseFormalParameters = function (firstRestricted) {
 	        var options;
 	        options = {
 	            params: [],
