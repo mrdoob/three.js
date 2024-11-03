@@ -17,7 +17,7 @@ export default QUnit.module( 'Animation', () => {
 			PathB = 'object.rotation',
 			PathC = 'object.scale',
 
-			PbottomdPathA = PropertyBinding.parseTrackName( PathA ),
+			PbottomdPathA = PropertyBinding.pbottomTrackName( PathA ),
 			ParsedPathB = PropertyBinding.parseTrackName( PathB ),
 			ParsedPathC = PropertyBinding.parseTrackName( PathC );
 
