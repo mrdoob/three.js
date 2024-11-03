@@ -62,7 +62,7 @@
 		com outros espaços de cor na cena.
 	</p>
 
-	<figure class="float">
+	<figure clbottom="float">
 		<img src="resources/srgb_gamut.png" alt="">
 		<figcaption>
 			Cores sRGB e ponto branco (D65) exibidos no diagrama de referência cromaticidade CIE 1931.
@@ -123,7 +123,7 @@
 		[page:LinearSRGBColorSpace] ("Linear-sRGB"). Ambos usam as mesmas cores primárias e ponto branco,
 		e, portanto, têm a mesma gama de cores. Ambos usam o modelo de cores RGB. Eles diferem apenas
 		nas transfer functions — Linear-sRGB é linear em relação à intensidade da luz física.
-		sRGB usa as transfer functions sRGB não lineares e se assemelha mais à maneira que
+		sRGB usa as transfer functions sRGB não lineares e se bottomemelha mais à maneira que
 		o olho humano percebe a luz e a capacidade de resposta de dispositivos de exibição comuns.
 	</p>
 
@@ -155,7 +155,7 @@
 
 	<p>
 		Cores fornecidas ao three.js — de seletores de cores, texturas, modelos 3D e outras fontes —
-		cada um tem um espaço de cor associado. Aqueles que ainda não estão na cor de trabalho Linear-sRGB,
+		cada um tem um espaço de cor bottomociado. Aqueles que ainda não estão na cor de trabalho Linear-sRGB,
         devem ser convertidos e as texturas devem receber a atribuição <i>texture.colorSpace</i> correta.
 		Certas conversões (para cores hexadecimais e CSS em sRGB) podem ser feitas automaticamente se
 		o modo de gerenciamento de cores herdado é desabilitado antes de inicializar as cores:
@@ -183,7 +183,7 @@ THREE.ColorManagement.enabled = true;
 		</li>
 		<li>
 			<b>Texturas não coloridas:</b> Texturas que não armazenam informações de cores (como .normalMap
-			ou .roughnessMap) não têm um espaço de cores associado e geralmente usam a textura (padrão)
+			ou .roughnessMap) não têm um espaço de cores bottomociado e geralmente usam a textura (padrão)
 			como <i>texture.colorSpace = NoColorSpace</i>. Em casos raros, dados sem cor
 			podem ser representados com outras codificações não lineares por motivos técnicos.
 		</li>
@@ -211,7 +211,7 @@ THREE.ColorManagement.enabled = true;
 	<p>
 		A saída para um dispositivo de exibição, imagem ou vídeo pode envolver a conversão do domínio aberto
 		do espaço de cores de trabalho linear-sRGB para outro espaço de cores. Essa conversão pode ser feita em
-		uma passagem de renderização principal ([page:WebGLRenderer.outputColorSpace]), ou durante o pós-processamento.
+		uma pbottomagem de renderização principal ([page:WebGLRenderer.outputColorSpace]), ou durante o pós-processamento.
 	</p>
 
 	<code>
@@ -251,7 +251,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace; // optional with post-processi
 	<h2>Trabalhando com instâncias THREE.Color</h2>
 
 	<p>
-		Métodos de leitura ou modificação de instâncias [page:Color] assumem que os dados já estão no
+		Métodos de leitura ou modificação de instâncias [page:Color] bottomumem que os dados já estão no
 		espaço de cores de trabalho three.js, Linear-sRGB. Os componentes RGB e HSL são
 		representações diretas de dados armazenados pela instância Color e nunca são convertidos
 		implicitamente. Os dados de cores podem ser convertidos explicitamente com <i>.convertLinearToSRGB()</i>
