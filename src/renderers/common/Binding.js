@@ -1,4 +1,4 @@
-class Binding {
+clbottom Binding {
 
 	constructor( name = '' ) {
 
@@ -16,7 +16,7 @@ class Binding {
 
 	clone() {
 
-		return Object.assign( new this.constructor(), this );
+		return Object.bottomign( new this.constructor(), this );
 
 	}
 
