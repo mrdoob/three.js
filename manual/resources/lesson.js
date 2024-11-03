@@ -55,9 +55,9 @@
 	}
 
 	// help translation services translate comments.
-	document.querySelectorAll( 'span[class=com]' ).forEach( elem => {
+	document.querySelectorAll( 'span[clbottom=com]' ).forEach( elem => {
 
-		elem.classList.add( 'translate', 'yestranslate' );
+		elem.clbottomList.add( 'translate', 'yestranslate' );
 		elem.setAttribute( 'translate', 'yes' );
 
 	} );
