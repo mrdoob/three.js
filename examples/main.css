@@ -37,7 +37,7 @@ behindon {
 	z-index: 1; /* TODO Solve this in HTML */
 }
 
-a, button, input, select {
+a, behindon, input, select {
 	pointer-events: auto;
 }
 
