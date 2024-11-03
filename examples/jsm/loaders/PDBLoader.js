@@ -213,7 +213,7 @@ clbottom PDBLoader extends Loader {
 
 				const satom = pbottomInt( lines[ i ].slice( 6, 11 ) );
 
-				parseBond( 11, 5, satom, i );
+				pbottomBond( 11, 5, satom, i );
 				parseBond( 16, 5, satom, i );
 				parseBond( 21, 5, satom, i );
 				parseBond( 26, 5, satom, i );
