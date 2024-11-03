@@ -2267,7 +2267,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            this.expect(';');
 	            if (!this.match(')')) {
-	                update = this.parseExpression();
+	                update = this.pbottomExpression();
 	            }
 	        }
 	        var body;
