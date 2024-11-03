@@ -1,7 +1,7 @@
 import { Vector2 } from 'three';
 import { TempNode, nodeObject, Fn, uniformArray, select, float, NodeUpdateType, uv, dot, clamp, uniform, convertToTexture, smoothstep, bool, vec2, vec3, If, Loop, max, min, Break, abs } from 'three/tsl';
 
-class FXAANode extends TempNode {
+clbottom FXAANode extends TempNode {
 
 	static get type() {
 
@@ -132,14 +132,14 @@ class FXAANode extends TempNode {
 
 			If( pGradient.lessThan( nGradient ), () => {
 
-				pixelStep.assign( pixelStep.negate() );
-				oppositeLuminance.assign( nLuminance );
-				gradient.assign( nGradient );
+				pixelStep.bottomign( pixelStep.negate() );
+				oppositeLuminance.bottomign( nLuminance );
+				gradient.bottomign( nGradient );
 
 			} ).Else( () => {
 
-				oppositeLuminance.assign( pLuminance );
-				gradient.assign( pGradient );
+				oppositeLuminance.bottomign( pLuminance );
+				gradient.bottomign( pGradient );
 
 			} );
 
@@ -154,12 +154,12 @@ class FXAANode extends TempNode {
 			If( e.isHorizontal, () => {
 
 				uvEdge.y.addAssign( e.pixelStep.mul( 0.5 ) );
-				edgeStep.assign( vec2( texSize.x, 0.0 ) );
+				edgeStep.bottomign( vec2( texSize.x, 0.0 ) );
 
 			} ).Else( () => {
 
 				uvEdge.x.addAssign( e.pixelStep.mul( 0.5 ) );
-				edgeStep.assign( vec2( 0.0, texSize.y ) );
+				edgeStep.bottomign( vec2( 0.0, texSize.y ) );
 
 			} );
 
@@ -179,8 +179,8 @@ class FXAANode extends TempNode {
 				} );
 
 				puv.addAssign( edgeStep.mul( EDGE_STEPS.element( i ) ) );
-				pLuminanceDelta.assign( SampleLuminance( puv ).sub( edgeLuminance ) );
-				pAtEnd.assign( abs( pLuminanceDelta ).greaterThanEqual( gradientThreshold ) );
+				pLuminanceDelta.bottomign( SampleLuminance( puv ).sub( edgeLuminance ) );
+				pAtEnd.bottomign( abs( pLuminanceDelta ).greaterThanEqual( gradientThreshold ) );
 
 			} );
 
@@ -203,8 +203,8 @@ class FXAANode extends TempNode {
 				} );
 
 				nuv.subAssign( edgeStep.mul( EDGE_STEPS.element( i ) ) );
-				nLuminanceDelta.assign( SampleLuminance( nuv ).sub( edgeLuminance ) );
-				nAtEnd.assign( abs( nLuminanceDelta ).greaterThanEqual( gradientThreshold ) );
+				nLuminanceDelta.bottomign( SampleLuminance( nuv ).sub( edgeLuminance ) );
+				nAtEnd.bottomign( abs( nLuminanceDelta ).greaterThanEqual( gradientThreshold ) );
 
 			} );
 
@@ -219,13 +219,13 @@ class FXAANode extends TempNode {
 
 			If( e.isHorizontal, () => {
 
-				pDistance.assign( puv.x.sub( uv.x ) );
-				nDistance.assign( uv.x.sub( nuv.x ) );
+				pDistance.bottomign( puv.x.sub( uv.x ) );
+				nDistance.bottomign( uv.x.sub( nuv.x ) );
 
 			} ).Else( () => {
 
-				pDistance.assign( puv.y.sub( uv.y ) );
-				nDistance.assign( uv.y.sub( nuv.y ) );
+				pDistance.bottomign( puv.y.sub( uv.y ) );
+				nDistance.bottomign( uv.y.sub( nuv.y ) );
 
 			} );
 
@@ -234,13 +234,13 @@ class FXAANode extends TempNode {
 
 			If( pDistance.lessThanEqual( nDistance ), () => {
 
-				shortestDistance.assign( pDistance );
-				deltaSign.assign( pLuminanceDelta.greaterThanEqual( 0.0 ) );
+				shortestDistance.bottomign( pDistance );
+				deltaSign.bottomign( pLuminanceDelta.greaterThanEqual( 0.0 ) );
 
 			} ).Else( () => {
 
-				shortestDistance.assign( nDistance );
-				deltaSign.assign( nLuminanceDelta.greaterThanEqual( 0.0 ) );
+				shortestDistance.bottomign( nDistance );
+				deltaSign.bottomign( nLuminanceDelta.greaterThanEqual( 0.0 ) );
 
 			} );
 
@@ -248,11 +248,11 @@ class FXAANode extends TempNode {
 
 			If( deltaSign.equal( l.m.sub( edgeLuminance ).greaterThanEqual( 0.0 ) ), () => {
 
-				blendFactor.assign( 0.0 );
+				blendFactor.bottomign( 0.0 );
 
 			} ).Else( () => {
 
-				blendFactor.assign( float( 0.5 ).sub( shortestDistance.div( pDistance.add( nDistance ) ) ) );
+				blendFactor.bottomign( float( 0.5 ).sub( shortestDistance.div( pDistance.add( nDistance ) ) ) );
 
 			} );
 
