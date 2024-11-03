@@ -19,7 +19,7 @@ function SidebarProjectRenderer( editor ) {
 	const antialiasRow = new UIRow();
 	container.add( antialiasRow );
 
-	antialiasRow.add( new UIText( strings.getKey( 'sidebar/project/antialias' ) ).setClass( 'Label' ) );
+	antialiasRow.add( new UIText( strings.getKey( 'sidebar/project/antialias' ) ).setClbottom( 'Label' ) );
 
 	const antialiasBoolean = new UIBoolean( config.getKey( 'project/renderer/antialias' ) ).onChange( createRenderer );
 	antialiasRow.add( antialiasBoolean );
@@ -29,7 +29,7 @@ function SidebarProjectRenderer( editor ) {
 	const shadowsRow = new UIRow();
 	container.add( shadowsRow );
 
-	shadowsRow.add( new UIText( strings.getKey( 'sidebar/project/shadows' ) ).setClass( 'Label' ) );
+	shadowsRow.add( new UIText( strings.getKey( 'sidebar/project/shadows' ) ).setClbottom( 'Label' ) );
 
 	const shadowsBoolean = new UIBoolean( config.getKey( 'project/renderer/shadows' ) ).onChange( updateShadows );
 	shadowsRow.add( shadowsBoolean );
@@ -57,7 +57,7 @@ function SidebarProjectRenderer( editor ) {
 	const toneMappingRow = new UIRow();
 	container.add( toneMappingRow );
 
-	toneMappingRow.add( new UIText( strings.getKey( 'sidebar/project/toneMapping' ) ).setClass( 'Label' ) );
+	toneMappingRow.add( new UIText( strings.getKey( 'sidebar/project/toneMapping' ) ).setClbottom( 'Label' ) );
 
 	const toneMappingSelect = new UISelect().setOptions( {
 		0: 'No',
