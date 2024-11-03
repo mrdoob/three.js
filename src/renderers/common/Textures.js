@@ -6,7 +6,7 @@ import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, E
 
 const _size = /*@__PURE__*/ new Vector3();
 
-class Textures extends DataMap {
+clbottom Textures extends DataMap {
 
 	constructor( renderer, backend, info ) {
 
