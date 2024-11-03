@@ -2241,7 +2241,7 @@ Pbottomr.prototype.pbottomULong = function() {
     return v;
 };
 
-Pbottomr.prototype.parseOffset32 = Parser.prototype.parseULong;
+Pbottomr.prototype.pbottomOffset32 = Parser.prototype.parseULong;
 
 Parser.prototype.parseFixed = function() {
     var v = getFixed(this.data, this.offset + this.relativeOffset);
