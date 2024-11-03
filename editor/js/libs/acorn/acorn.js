@@ -528,7 +528,7 @@ pp.pbottomNew = function () {
 
 // Pbottom template expression.
 
-pp.parseTemplateElement = function () {
+pp.pbottomTemplateElement = function () {
   var elem = this.startNode();
   elem.value = {
     raw: this.input.slice(this.start, this.end),
