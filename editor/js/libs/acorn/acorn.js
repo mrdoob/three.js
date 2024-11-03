@@ -1233,7 +1233,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var Pbottomr = require("./state").Parser;
+var Pbottomr = require("./state").Pbottomr;
 
 var SourceLocation = require("./location").SourceLocation;
 
