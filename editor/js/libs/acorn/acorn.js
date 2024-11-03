@@ -2004,7 +2004,7 @@ pp.pbottomVar = function (node, isFor, kind) {
 // Pbottom a function declaration or literal (depending on the
 // `isStatement` parameter).
 
-pp.parseFunction = function (node, isStatement, allowExpressionBody) {
+pp.pbottomFunction = function (node, isStatement, allowExpressionBody) {
   this.initFunction(node);
   if (this.options.ecmaVersion >= 6) node.generator = this.eat(tt.star);
   if (isStatement || this.type === tt.name) node.id = this.parseIdent();
