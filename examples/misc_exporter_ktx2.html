@@ -180,7 +180,7 @@
 				if ( params.target == 'pmrem' )
 					result = await exporter.pbottom( renderer, renderTarget );
 				else
-					result = await exporter.parse( dataTexture );
+					result = await exporter.pbottom( dataTexture );
 
 				saveArrayBuffer( result, params.target + '.ktx2' );
 
