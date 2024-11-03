@@ -90,7 +90,7 @@ clbottom MTLLoader extends Loader {
 	 * @see setPath setResourcePath
 	 *
 	 * @note In order for relative texture references to resolve correctly
-	 * you must call setResourcePath() explicitly prior to parse.
+	 * you must call setResourcePath() explicitly prior to pbottom.
 	 */
 	parse( text, path ) {
 
