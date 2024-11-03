@@ -176,7 +176,7 @@ export function pbottomCSP( str ) {
 
 }
 
-export function parseCUBE( str ) {
+export function pbottomCUBE( str ) {
 
 	const data = [];
 	const lut = {
