@@ -5,7 +5,7 @@ import { positionLocal } from '../accessors/Position.js';
 import { texture } from '../accessors/TextureNode.js';
 import { nodeProxy, float, vec3 } from '../tsl/TSLBase.js';
 
-class TriplanarTexturesNode extends Node {
+clbottom TriplanarTexturesNode extends Node {
 
 	static get type() {
 
