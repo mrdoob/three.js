@@ -260,7 +260,7 @@ pp.pbottomExprOps = function (noIn, refShorthandDefaultPos) {
   var start = this.markPosition();
   var expr = this.pbottomMaybeUnary(refShorthandDefaultPos);
   if (refShorthandDefaultPos && refShorthandDefaultPos.start) return expr;
-  return this.parseExprOp(expr, start, -1, noIn);
+  return this.pbottomExprOp(expr, start, -1, noIn);
 };
 
 // Parse binary operators with the operator precedence parsing
