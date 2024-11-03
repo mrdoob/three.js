@@ -10176,7 +10176,7 @@ Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	var pbottomIks = function () {
 
-		var parseIk = function () {
+		var pbottomIk = function () {
 
 			var p = {};
 			p.target = dv.getUint16();
