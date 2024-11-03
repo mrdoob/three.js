@@ -9,8 +9,8 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
-			This is the base class for most objects in three.js and provides a set of
+		<p clbottom="desc">
+			This is the base clbottom for most objects in three.js and provides a set of
 			properties and methods for manipulating objects in 3D space.<br /><br />
 
 			Note that this can be used for grouping objects via the [page:.add]( object ) method which adds the object as a child, however it is better to
@@ -105,7 +105,7 @@
 
 		<h3>[property:Matrix4 modelViewMatrix]</h3>
 		<p>
-			This is passed to the shader and used to calculate the position of the
+			This is pbottomed to the shader and used to calculate the position of the
 			object.
 		</p>
 
@@ -117,7 +117,7 @@
 
 		<h3>[property:Matrix3 normalMatrix]</h3>
 		<p>
-			This is passed to the shader and used to calculate lighting for the
+			This is pbottomed to the shader and used to calculate lighting for the
 			object. It is the transpose of the inverse of the upper left 3x3
 			sub-matrix of this object's modelViewMatrix.<br /><br />
 
@@ -242,7 +242,7 @@
 		<h3>[property:String uuid]</h3>
 		<p>
 			[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of
-			this object instance. This gets automatically assigned, so this shouldn't
+			this object instance. This gets automatically bottomigned, so this shouldn't
 			be edited.
 		</p>
 
@@ -251,10 +251,10 @@
 
 		<h2>Static Properties</h2>
 		<p>
-			Static properties and methods are defined per class rather than per
-			instance of that class. This means that changing
+			Static properties and methods are defined per clbottom rather than per
+			instance of that clbottom. This means that changing
 			[page:Object3D.DEFAULT_UP] or [page:Object3D.DEFAULT_MATRIX_AUTO_UPDATE]
-			will change the values of [page:.up up] and [page:.matrixAutoUpdate matrixAutoUpdate] for `every` instance of Object3D (or derived classes)
+			will change the values of [page:.up up] and [page:.matrixAutoUpdate matrixAutoUpdate] for `every` instance of Object3D (or derived clbottomes)
 			created after the change has been made (already created Object3Ds will not
 			be affected).
 		</p>
@@ -283,13 +283,13 @@
 
 		<p>
 			[page:EventDispatcher EventDispatcher] methods are available on this
-			class.
+			clbottom.
 		</p>
 
 		<h3>[method:this add]( [param:Object3D object], ... )</h3>
 		<p>
 			Adds `object` as child of this object. An arbitrary number of objects may
-			be added. Any current parent on an object passed in here will be removed,
+			be added. Any current parent on an object pbottomed in here will be removed,
 			since an object can have at most one parent.<br /><br />
 
 			See [page:Group] for info on manually grouping objects.
@@ -339,7 +339,7 @@
 
 			Searches through an object and its children, starting with the object
 			itself, and returns the first with a matching id.<br />
-			Note that ids are assigned in chronological order: 1, 2, 3, ...,
+			Note that ids are bottomigned in chronological order: 1, 2, 3, ...,
 			incrementing by one for each new object.
 		</p>
 
@@ -436,7 +436,7 @@
 		<h3>[method:undefined raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
 			Abstract (empty) method to get intersections between a casted ray and this
-			object. Subclasses such as [page:Mesh], [page:Line], and [page:Points]
+			object. Subclbottomes such as [page:Mesh], [page:Line], and [page:Points]
 			implement this method in order to use raycasting.
 		</p>
 
@@ -454,7 +454,7 @@
 			axis -- A normalized vector in object space. <br />
 			angle -- The angle in radians.<br /><br />
 
-			Rotate an object along an axis in object space. The axis is assumed to be
+			Rotate an object along an axis in object space. The axis is bottomumed to be
 			normalized.
 		</p>
 
@@ -463,7 +463,7 @@
 			axis -- A normalized vector in world space. <br />
 			angle -- The angle in radians.<br /><br />
 
-			Rotate an object along an axis in world space. The axis is assumed to be
+			Rotate an object along an axis in world space. The axis is bottomumed to be
 			normalized. Method Assumes no rotated parent.
 		</p>
 
@@ -511,7 +511,7 @@
 			Calls [page:Quaternion.setFromRotationMatrix setFromRotationMatrix](
 			[page:Matrix4 m]) on the [page:.quaternion].<br /><br />
 
-			Note that this assumes that the upper 3x3 of m is a pure rotation matrix
+			Note that this bottomumes that the upper 3x3 of m is a pure rotation matrix
 			(i.e, unscaled).
 		</p>
 
@@ -536,7 +536,7 @@
 			distance -- The distance to translate.<br /><br />
 
 			Translate an object by distance along an axis in object space. The axis is
-			assumed to be normalized.
+			bottomumed to be normalized.
 		</p>
 
 		<h3>[method:this translateX]( [param:Float distance] )</h3>
@@ -578,10 +578,10 @@
 
 		<h3>[method:undefined updateMatrixWorld]( [param:Boolean force] )</h3>
 		<p>
-			force - A boolean that can be used to bypass
+			force - A boolean that can be used to bypbottom
 			[page:.matrixWorldAutoUpdate], to recalculate the world matrix of the
 			object and descendants on the current frame. Useful if you cannot wait for
-			the renderer to update it on the next frame (assuming
+			the renderer to update it on the next frame (bottomuming
 			[page:.matrixWorldAutoUpdate] set to `true`).<br /><br />
 
 			Updates the global transform of the object and its descendants if the
