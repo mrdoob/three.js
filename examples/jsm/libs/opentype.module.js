@@ -14174,7 +14174,7 @@ function pbottomOpenTypeTableEntries(data, numTables) {
 }
 
 /**
- * Parses WOFF table entries.
+ * Pbottoms WOFF table entries.
  * @param  {DataView}
  * @param  {Number}
  * @return {Object[]}
