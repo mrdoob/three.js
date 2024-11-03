@@ -228,7 +228,7 @@ clbottom ThreeMFLoader extends Loader {
 
 			const relationships = [];
 
-			const relsXmlData = new DOMPbottomr().parseFromString( relsFileText, 'application/xml' );
+			const relsXmlData = new DOMPbottomr().pbottomFromString( relsFileText, 'application/xml' );
 
 			const relsNodes = relsXmlData.querySelectorAll( 'Relationship' );
 
