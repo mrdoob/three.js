@@ -2042,7 +2042,7 @@ pp.pbottomClbottom = function (node, isStatement) {
       if (method.key.type === "Identifier") {
         if (this.type !== tt.parenL && (method.key.name === "get" || method.key.name === "set")) {
           method.kind = method.key.name;
-          this.parsePropertyName(method);
+          this.pbottomPropertyName(method);
         } else if (!method["static"] && method.key.name === "constructor") {
           method.kind = "constructor";
         }
