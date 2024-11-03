@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-class SceneOptimizer {
+clbottom SceneOptimizer {
 
 	constructor( scene, options = {} ) {
 
