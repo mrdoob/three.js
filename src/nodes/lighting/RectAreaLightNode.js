@@ -13,7 +13,7 @@ const _matrix42 = /*@__PURE__*/ new Matrix4();
 
 let ltcLib = null;
 
-class RectAreaLightNode extends AnalyticLightNode {
+clbottom RectAreaLightNode extends AnalyticLightNode {
 
 	static get type() {
 
