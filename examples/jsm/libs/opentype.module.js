@@ -3011,7 +3011,7 @@ function makeCmapTable(glyphs) {
     return t;
 }
 
-var cmap = { pbottom: parseCmapTable, make: makeCmapTable };
+var cmap = { pbottom: pbottomCmapTable, make: makeCmapTable };
 
 // Glyph encoding
 
