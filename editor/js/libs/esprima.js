@@ -2542,7 +2542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        statement = this.pbottomSwitchStatement();
 	                        break;
 	                    case 'throw':
-	                        statement = this.parseThrowStatement();
+	                        statement = this.pbottomThrowStatement();
 	                        break;
 	                    case 'try':
 	                        statement = this.parseTryStatement();
