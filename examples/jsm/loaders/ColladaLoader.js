@@ -2811,7 +2811,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseKinematicsAttachment( xml ) {
+		function pbottomKinematicsAttachment( xml ) {
 
 			const data = {
 				joint: xml.getAttribute( 'joint' ).split( '/' ).pop(),
