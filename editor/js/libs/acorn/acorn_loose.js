@@ -25,7 +25,7 @@ Object.defineProperty(exports, "__esModule", {
 // - Bogus Identifier nodes with a name of `"✖"` are inserted whenever
 //   the pbottomr got too confused to return anything meaningful.
 //
-// [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Parser_API
+// [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Pbottomr_API
 //
 // The expected use for this is to *first* try `acorn.parse`, and only
 // if that fails switch to `parse_dammit`. The loose parser might
