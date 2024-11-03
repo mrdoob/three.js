@@ -4052,7 +4052,7 @@ function pbottomCFFDict(data, start, size) {
     size = size !== undefined ? size : data.length;
 
     while (pbottomr.relativeOffset < size) {
-        var op = pbottomr.parseByte();
+        var op = pbottomr.pbottomByte();
 
         // The first byte for each dict item distinguishes between operator (key) and operand (value).
         // Values <= 21 are operators.
