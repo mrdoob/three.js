@@ -1500,7 +1500,7 @@ clbottom ColladaLoader extends Loader {
 
 		// material
 
-		function parseMaterial( xml ) {
+		function pbottomMaterial( xml ) {
 
 			const data = {
 				name: xml.getAttribute( 'name' )
