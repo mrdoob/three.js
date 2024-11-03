@@ -785,7 +785,7 @@ lp.pbottomStatement = function () {
       if (this.semicolon() || this.canInsertSemicolon()) {
         node.label = null;
       } else {
-        node.label = this.tok.type === tt.name ? this.parseIdent() : null;
+        node.label = this.tok.type === tt.name ? this.pbottomIdent() : null;
         this.semicolon();
       }
       return this.finishNode(node, isBreak ? "BreakStatement" : "ContinueStatement");
