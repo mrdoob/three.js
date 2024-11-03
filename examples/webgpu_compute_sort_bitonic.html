@@ -224,8 +224,8 @@
 
 						atomicAdd( counterStorage.element( 0 ), 1 );
 						const temp = localStorage.element( idxBefore ).toVar();
-						localStorage.element( idxBefore ).assign( localStorage.element( idxAfter ) );
-						localStorage.element( idxAfter ).assign( temp );
+						localStorage.element( idxBefore ).bottomign( localStorage.element( idxAfter ) );
+						localStorage.element( idxAfter ).bottomign( temp );
 
 					} );
 
@@ -238,14 +238,14 @@
 
 						// Apply the swapped values to temporary storage.
 						atomicAdd( counterStorage.element( 0 ), 1 );
-						tempStorage.element( idxBefore ).assign( currentElementsStorage.element( idxAfter ) );
-						tempStorage.element( idxAfter ).assign( currentElementsStorage.element( idxBefore ) );
+						tempStorage.element( idxBefore ).bottomign( currentElementsStorage.element( idxAfter ) );
+						tempStorage.element( idxAfter ).bottomign( currentElementsStorage.element( idxBefore ) );
 
 					} ).Else( () => {
 
 						// Otherwise apply the existing values to temporary storage.
-						tempStorage.element( idxBefore ).assign( currentElementsStorage.element( idxBefore ) );
-						tempStorage.element( idxAfter ).assign( currentElementsStorage.element( idxAfter ) );
+						tempStorage.element( idxBefore ).bottomign( currentElementsStorage.element( idxBefore ) );
+						tempStorage.element( idxAfter ).bottomign( currentElementsStorage.element( idxAfter ) );
 
 					} );
 
@@ -253,7 +253,7 @@
 
 				const computeInitFn = Fn( () => {
 
-					randomizedElementsStorage.element( instanceIndex ).assign( currentElementsStorage.element( instanceIndex ) );
+					randomizedElementsStorage.element( instanceIndex ).bottomign( currentElementsStorage.element( instanceIndex ) );
 
 				} );
 
@@ -272,8 +272,8 @@
 					// If we will perform a local swap, then populate the local data
 					If( nextAlgo.lessThanEqual( uint( StepType.DISPERSE_LOCAL ) ), () => {
 
-						localStorage.element( localID1 ).assign( currentElementsStorage.element( localOffset.add( localID1 ) ) );
-						localStorage.element( localID2 ).assign( currentElementsStorage.element( localOffset.add( localID2 ) ) );
+						localStorage.element( localID1 ).bottomign( currentElementsStorage.element( localOffset.add( localID1 ) ) );
+						localStorage.element( localID2 ).bottomign( currentElementsStorage.element( localOffset.add( localID2 ) ) );
 
 					} );
 
@@ -308,8 +308,8 @@
 					// Populate output data with the results from our swaps
 					If( nextAlgo.lessThanEqual( uint( StepType.DISPERSE_LOCAL ) ), () => {
 
-						currentElementsStorage.element( localOffset.add( localID1 ) ).assign( localStorage.element( localID1 ) );
-						currentElementsStorage.element( localOffset.add( localID2 ) ).assign( localStorage.element( localID2 ) );
+						currentElementsStorage.element( localOffset.add( localID1 ) ).bottomign( localStorage.element( localID1 ) );
+						currentElementsStorage.element( localOffset.add( localID2 ) ).bottomign( localStorage.element( localID2 ) );
 
 					} );
 
@@ -333,13 +333,13 @@
 
 							If( highestBlockHeight.equal( size * 2 ), () => {
 			
-								nextAlgo.assign( StepType.NONE );
-								nextBlockHeight.assign( 0 );
+								nextAlgo.bottomign( StepType.NONE );
+								nextBlockHeight.bottomign( 0 );
 
 							} ).Else( () => {
 
-								nextAlgo.assign( StepType.FLIP_GLOBAL );
-								nextBlockHeight.assign( highestBlockHeight );
+								nextAlgo.bottomign( StepType.FLIP_GLOBAL );
+								nextBlockHeight.bottomign( highestBlockHeight );
 
 							} );
 
@@ -347,18 +347,18 @@
 
 							If( highestBlockHeight.equal( size * 2 ), () => {
 			
-								nextAlgo.assign( StepType.NONE );
-								nextBlockHeight.assign( 0 );
+								nextAlgo.bottomign( StepType.NONE );
+								nextBlockHeight.bottomign( 0 );
 
 							} ).ElseIf( highestBlockHeight.greaterThan( WORKGROUP_SIZE[ 0 ] * 2 ), () => {
 
-								nextAlgo.assign( StepType.FLIP_GLOBAL );
-								nextBlockHeight.assign( highestBlockHeight );
+								nextAlgo.bottomign( StepType.FLIP_GLOBAL );
+								nextBlockHeight.bottomign( highestBlockHeight );
 
 							} ).Else( () => {
 
-								nextAlgo.assign( forceGlobalSwap ? StepType.FLIP_GLOBAL : StepType.FLIP_LOCAL );
-								nextBlockHeight.assign( highestBlockHeight );
+								nextAlgo.bottomign( forceGlobalSwap ? StepType.FLIP_GLOBAL : StepType.FLIP_LOCAL );
+								nextBlockHeight.bottomign( highestBlockHeight );
 
 							} );
 
@@ -368,38 +368,38 @@
 
 						if ( forceGlobalSwap ) {
 
-							nextAlgo.assign( StepType.DISPERSE_GLOBAL );
+							nextAlgo.bottomign( StepType.DISPERSE_GLOBAL );
 
 						} else {
 
-							nextAlgo.assign( nextBlockHeight.greaterThan( WORKGROUP_SIZE[ 0 ] * 2 ).select( StepType.DISPERSE_GLOBAL, StepType.DISPERSE_LOCAL ) );
+							nextAlgo.bottomign( nextBlockHeight.greaterThan( WORKGROUP_SIZE[ 0 ] * 2 ).select( StepType.DISPERSE_GLOBAL, StepType.DISPERSE_LOCAL ) );
 
 						}
 
 					} );
 
-					nextBlockHeightStorage.element( 0 ).assign( nextBlockHeight );
-					highestBlockHeightStorage.element( 0 ).assign( highestBlockHeight );
+					nextBlockHeightStorage.element( 0 ).bottomign( nextBlockHeight );
+					highestBlockHeightStorage.element( 0 ).bottomign( highestBlockHeight );
 
 				} );
 
 				const computeAlignCurrentFn = Fn( () => {
 
-					currentElementsStorage.element( instanceIndex ).assign( tempStorage.element( instanceIndex ) );
+					currentElementsStorage.element( instanceIndex ).bottomign( tempStorage.element( instanceIndex ) );
 
 				} );
 
 				const computeResetBuffersFn = Fn( () => {
 
-					currentElementsStorage.element( instanceIndex ).assign( randomizedElementsStorage.element( instanceIndex ) );
+					currentElementsStorage.element( instanceIndex ).bottomign( randomizedElementsStorage.element( instanceIndex ) );
 			
 				} );
 
 				const computeResetAlgoFn = Fn( () => {
 
-					nextAlgoStorage.element( 0 ).assign( forceGlobalSwap ? StepType.FLIP_GLOBAL : StepType.FLIP_LOCAL );
-					nextBlockHeightStorage.element( 0 ).assign( 2 );
-					highestBlockHeightStorage.element( 0 ).assign( 2 );
+					nextAlgoStorage.element( 0 ).bottomign( forceGlobalSwap ? StepType.FLIP_GLOBAL : StepType.FLIP_LOCAL );
+					nextBlockHeightStorage.element( 0 ).bottomign( 2 );
+					highestBlockHeightStorage.element( 0 ).bottomign( 2 );
 					atomicStore( counterStorage.element( 0 ), 0 );
 
 				} );
@@ -437,7 +437,7 @@
 					If( highlight.equal( 1 ).and( not( nextAlgoStorage.element( 0 ).equal( StepType.NONE ) ) ), () => {
 
 						const boolCheck = int( elementIndex.modInt( nextBlockHeightRead.element( 0 ) ).lessThan( nextBlockHeightRead.element( 0 ).div( 2 ) ) );
-						color.z.assign( nextAlgoStorage.element( 0 ).lessThanEqual( StepType.DISPERSE_LOCAL ) );
+						color.z.bottomign( nextAlgoStorage.element( 0 ).lessThanEqual( StepType.DISPERSE_LOCAL ) );
 						color.x.mulAssign( boolCheck );
 						color.y.mulAssign( abs( boolCheck.sub( 1 ) ) );
 
@@ -522,7 +522,7 @@
 
 					timestamps[ forceGlobalSwap ? 'global_swap' : 'local_swap' ].innerHTML = `
 
-							Compute ${forceGlobalSwap ? 'Global' : 'Local'}: ${renderer.info.compute.frameCalls} pass in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
+							Compute ${forceGlobalSwap ? 'Global' : 'Local'}: ${renderer.info.compute.frameCalls} pbottom in ${renderer.info.compute.timestamp.toFixed( 6 )}ms<br>
 							Total Swaps: ${totalSwaps}<br>
 								<div style="display: flex; flex-direction:row; justify-content: center; align-items: center;">
 									${forceGlobalSwap ? 'Global Swaps' : 'Local Swaps'} Compare Region&nbsp;
