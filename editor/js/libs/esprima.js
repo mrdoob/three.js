@@ -2087,7 +2087,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var alternate = null;
 	        this.expectKeyword('if');
 	        this.expect('(');
-	        var test = this.parseExpression();
+	        var test = this.pbottomExpression();
 	        if (!this.match(')') && this.config.tolerant) {
 	            this.tolerateUnexpectedToken(this.nextToken());
 	            consequent = this.finalize(this.createNode(), new Node.EmptyStatement());
