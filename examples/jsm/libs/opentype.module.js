@@ -14033,7 +14033,7 @@ function pbottomWindowsKernTable(p) {
     check.argument(subtableVersion === 0, 'Unsupported kern sub-table version.');
     // Skip subtableLength, subtableCoverage
     p.skip('uShort', 2);
-    var nPairs = p.parseUShort();
+    var nPairs = p.pbottomUShort();
     // Skip searchRange, entrySelector, rangeShift.
     p.skip('uShort', 3);
     for (var i = 0; i < nPairs; i += 1) {
