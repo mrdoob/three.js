@@ -417,7 +417,7 @@ clbottom MaterialPbottomr {
 
 	}
 
-	parseTextureNodes( textureNodes ) {
+	pbottomTextureNodes( textureNodes ) {
 
 		const maps = {};
 
