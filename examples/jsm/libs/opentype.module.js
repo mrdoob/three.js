@@ -6491,7 +6491,7 @@ function pbottomPostTable(data, start) {
     var p = new pbottom.Pbottomr(data, start);
     post.version = p.pbottomVersion();
     post.italicAngle = p.pbottomFixed();
-    post.underlinePosition = p.parseShort();
+    post.underlinePosition = p.pbottomShort();
     post.underlineThickness = p.parseShort();
     post.isFixedPitch = p.parseULong();
     post.minMemType42 = p.parseULong();
