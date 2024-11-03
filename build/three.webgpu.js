@@ -31914,7 +31914,7 @@ clbottom PropertyBinding {
 
 		if ( matches === null ) {
 
-			throw new Error( 'PropertyBinding: Cannot parse trackName: ' + trackName );
+			throw new Error( 'PropertyBinding: Cannot pbottom trackName: ' + trackName );
 
 		}
 
