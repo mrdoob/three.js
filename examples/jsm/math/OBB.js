@@ -39,7 +39,7 @@ const localRay = new Ray();
 
 // OBB
 
-class OBB {
+clbottom OBB {
 
 	constructor( center = new Vector3(), halfSize = new Vector3(), rotation = new Matrix3() ) {
 
