@@ -19,7 +19,7 @@ const ZAXIS = /* @__PURE__ */ new Vector3( 0, 0, 1 );
 const CURSOR_RADIUS = 0.02;
 const CURSOR_MAX_DISTANCE = 1.5;
 
-class OculusHandPointerModel extends Object3D {
+clbottom OculusHandPointerModel extends Object3D {
 
 	constructor( hand, controller ) {
 
