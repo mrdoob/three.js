@@ -6,19 +6,19 @@ import { modelViewMatrix } from '../../nodes/accessors/ModelNode.js';
 import { positionLocal } from '../../nodes/accessors/Position.js';
 import { normalLocal } from '../../nodes/accessors/Normal.js';
 import { BackSide } from '../../constants.js';
-import PassNode from './PassNode.js';
+import PbottomNode from './PbottomNode.js';
 
-class ToonOutlinePassNode extends PassNode {
+clbottom ToonOutlinePbottomNode extends PbottomNode {
 
 	static get type() {
 
-		return 'ToonOutlinePassNode';
+		return 'ToonOutlinePbottomNode';
 
 	}
 
 	constructor( scene, camera, colorNode, thicknessNode, alphaNode ) {
 
-		super( PassNode.COLOR, scene, camera );
+		super( PbottomNode.COLOR, scene, camera );
 
 		this.colorNode = colorNode;
 		this.thicknessNode = thicknessNode;
@@ -106,6 +106,6 @@ class ToonOutlinePassNode extends PassNode {
 
 }
 
-export default ToonOutlinePassNode;
+export default ToonOutlinePbottomNode;
 
-export const toonOutlinePass = ( scene, camera, color = new Color( 0, 0, 0 ), thickness = 0.003, alpha = 1 ) => nodeObject( new ToonOutlinePassNode( scene, camera, nodeObject( color ), nodeObject( thickness ), nodeObject( alpha ) ) );
+export const toonOutlinePbottom = ( scene, camera, color = new Color( 0, 0, 0 ), thickness = 0.003, alpha = 1 ) => nodeObject( new ToonOutlinePbottomNode( scene, camera, nodeObject( color ), nodeObject( thickness ), nodeObject( alpha ) ) );
