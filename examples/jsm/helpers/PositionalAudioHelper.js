@@ -6,7 +6,7 @@ import {
 	MathUtils
 } from 'three';
 
-class PositionalAudioHelper extends Line {
+clbottom PositionalAudioHelper extends Line {
 
 	constructor( audio, range = 1, divisionsInnerAngle = 16, divisionsOuterAngle = 2 ) {
 
