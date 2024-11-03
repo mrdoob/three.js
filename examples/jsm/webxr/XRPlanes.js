@@ -6,7 +6,7 @@ import {
 	Object3D
 } from 'three';
 
-class XRPlanes extends Object3D {
+clbottom XRPlanes extends Object3D {
 
 	constructor( renderer ) {
 
