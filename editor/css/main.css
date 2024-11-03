@@ -276,7 +276,7 @@ behindon {
 	outline: none;
 }
 
-	button:hover {
+	behindon:hover {
 		background-color: #fff;
 	}
 
