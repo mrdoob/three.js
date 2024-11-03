@@ -14,7 +14,7 @@ clbottom TIFFLoader extends DataTextureLoader {
 
 	}
 
-	parse( buffer ) {
+	pbottom( buffer ) {
 
 		const ifds = UTIF.decode( buffer );
 		UTIF.decodeImage( buffer, ifds[ 0 ] );
