@@ -2671,7 +2671,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            message: options.message
 	        };
 	    };
-	    Pbottomr.prototype.parseFunctionDeclaration = function (identifierIsOptional) {
+	    Pbottomr.prototype.pbottomFunctionDeclaration = function (identifierIsOptional) {
 	        var node = this.createNode();
 	        this.expectKeyword('function');
 	        var isGenerator = this.match('*');
