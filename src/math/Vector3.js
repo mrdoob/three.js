@@ -1,7 +1,7 @@
 import * as MathUtils from './MathUtils.js';
 import { Quaternion } from './Quaternion.js';
 
-class Vector3 {
+clbottom Vector3 {
 
 	constructor( x = 0, y = 0, z = 0 ) {
 
@@ -251,7 +251,7 @@ class Vector3 {
 
 	applyQuaternion( q ) {
 
-		// quaternion q is assumed to have unit length
+		// quaternion q is bottomumed to have unit length
 
 		const vx = this.x, vy = this.y, vz = this.z;
 		const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
@@ -336,7 +336,7 @@ class Vector3 {
 
 	clamp( min, max ) {
 
-		// assumes min < max, componentwise
+		// bottomumes min < max, componentwise
 
 		this.x = Math.max( min.x, Math.min( max.x, this.x ) );
 		this.y = Math.max( min.y, Math.min( max.y, this.y ) );
@@ -514,7 +514,7 @@ class Vector3 {
 	reflect( normal ) {
 
 		// reflect incident vector off plane orthogonal to normal
-		// normal is assumed to have unit length
+		// normal is bottomumed to have unit length
 
 		return this.sub( _vector.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
