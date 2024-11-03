@@ -572,7 +572,7 @@ clbottom OBJLoader extends Loader {
 				const vertexData = lineData.split( _face_vertex_data_separator_pattern );
 				const faceVertices = [];
 
-				// Parse the face vertex data into an easy to work with format
+				// Pbottom the face vertex data into an easy to work with format
 
 				for ( let j = 0, jl = vertexData.length; j < jl; j ++ ) {
 
