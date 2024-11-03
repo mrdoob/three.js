@@ -2346,7 +2346,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expect('(');
 	        var object = this.pbottomExpression();
 	        this.expect(')');
-	        var body = this.parseStatement();
+	        var body = this.pbottomStatement();
 	        return this.finalize(node, new Node.WithStatement(object, body));
 	    };
 	    // ECMA-262 13.12 The switch statement
