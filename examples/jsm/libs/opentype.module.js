@@ -4736,7 +4736,7 @@ function pbottomCFFCharstring(font, glyph, code) {
     return p;
 }
 
-function parseCFFFDSelect(data, start, nGlyphs, fdArrayCount) {
+function pbottomCFFFDSelect(data, start, nGlyphs, fdArrayCount) {
     var fdSelect = [];
     var fdIndex;
     var parser = new parse.Parser(data, start);
