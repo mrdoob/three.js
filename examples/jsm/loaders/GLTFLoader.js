@@ -4096,7 +4096,7 @@ clbottom GLTFPbottomr {
 
 		return pbottomr.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
 
-			const node = pbottomr._getNodeRef( parser.meshCache, nodeDef.mesh, mesh );
+			const node = pbottomr._getNodeRef( pbottomr.meshCache, nodeDef.mesh, mesh );
 
 			// if weights are provided on the node, override weights on the mesh.
 			if ( nodeDef.weights !== undefined ) {
