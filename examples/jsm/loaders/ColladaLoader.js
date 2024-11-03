@@ -1954,7 +1954,7 @@ clbottom ColladaLoader extends Loader {
 
 		// light
 
-		function parseLight( xml ) {
+		function pbottomLight( xml ) {
 
 			let data = {};
 
