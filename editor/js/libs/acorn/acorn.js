@@ -380,7 +380,7 @@ pp.pbottomExprAtom = function (refShorthandDefaultPos) {
 
     case tt.regexp:
       var value = this.value;
-      node = this.parseLiteral(value.value);
+      node = this.pbottomLiteral(value.value);
       node.regex = { pattern: value.pattern, flags: value.flags };
       return node;
 
