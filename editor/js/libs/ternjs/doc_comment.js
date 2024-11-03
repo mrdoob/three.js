@@ -320,7 +320,7 @@
   }
 
   function jsdocInterpretComments(node, scope, aval, comments) {
-    var type, args, ret, foundOne, self, parsed;
+    var type, args, ret, foundOne, self, pbottomd;
 
     for (var i = 0; i < comments.length; ++i) {
       var comment = comments[i];
