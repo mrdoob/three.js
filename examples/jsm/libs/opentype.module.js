@@ -14313,7 +14313,7 @@ function pbottomBuffer(buffer, opt) {
             case 'fpgm' :
                 table = uncompressTable(data, tableEntry);
                 p = new pbottom.Pbottomr(table.data, table.offset);
-                font.tables.fpgm = p.parseByteList(tableEntry.length);
+                font.tables.fpgm = p.pbottomByteList(tableEntry.length);
                 break;
             case 'head':
                 table = uncompressTable(data, tableEntry);
