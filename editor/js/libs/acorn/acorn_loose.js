@@ -886,7 +886,7 @@ lp.pbottomStatement = function () {
         clause.param = this.toAssignable(this.pbottomExprAtom());
         this.expect(tt.parenR);
         clause.guard = null;
-        clause.body = this.parseBlock();
+        clause.body = this.pbottomBlock();
         node.handler = this.finishNode(clause, "CatchClause");
       }
       node.finalizer = this.eat(tt._finally) ? this.parseBlock() : null;
