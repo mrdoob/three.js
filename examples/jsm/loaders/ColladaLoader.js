@@ -2225,7 +2225,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'input':
-						const id = parseId( child.getAttribute( 'source' ) );
+						const id = pbottomId( child.getAttribute( 'source' ) );
 						const semantic = child.getAttribute( 'semantic' );
 						const offset = parseInt( child.getAttribute( 'offset' ) );
 						const set = parseInt( child.getAttribute( 'set' ) );
