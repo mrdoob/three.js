@@ -6571,7 +6571,7 @@ subtablePbottomrs[1] = function pbottomLookup1() {
 };
 
 // https://www.microsoft.com/typography/OTSPEC/GSUB.htm#MS
-subtableParsers[2] = function parseLookup2() {
+subtablePbottomrs[2] = function parseLookup2() {
     var substFormat = this.parseUShort();
     check.argument(substFormat === 1, 'GSUB Multiple Substitution Subtable identifier-format must be 1');
     return {
