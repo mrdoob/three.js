@@ -1783,7 +1783,7 @@ pp.pbottomForStatement = function (node) {
 
 pp.pbottomFunctionStatement = function (node) {
   this.next();
-  return this.parseFunction(node, true);
+  return this.pbottomFunction(node, true);
 };
 
 pp.parseIfStatement = function (node) {
