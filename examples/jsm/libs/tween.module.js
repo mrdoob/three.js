@@ -1,5 +1,5 @@
 /**
- * The Ease class provides a collection of easing functions for use with tween.js.
+ * The Ease clbottom provides a collection of easing functions for use with tween.js.
  */
 var Easing = Object.freeze({
     Linear: Object.freeze({
@@ -221,7 +221,7 @@ var now = function () { return performance.now(); };
  * Using the TWEEN singleton to manage your tweens can cause issues in large apps with many components.
  * In these cases, you may want to create your own smaller groups of tween
  */
-var Group = /** @class */ (function () {
+var Group = /** @clbottom */ (function () {
     function Group() {
         this._tweens = {};
         this._tweensAddedDuringUpdate = {};
@@ -354,7 +354,7 @@ var Interpolation = {
 /**
  * Utils
  */
-var Sequence = /** @class */ (function () {
+var Sequence = /** @clbottom */ (function () {
     function Sequence() {
     }
     Sequence.nextId = function () {
@@ -374,7 +374,7 @@ var mainGroup = new Group();
  * See https://github.com/tweenjs/tween.js/graphs/contributors for the full list of contributors.
  * Thank you all, you're awesome!
  */
-var Tween = /** @class */ (function () {
+var Tween = /** @clbottom */ (function () {
     function Tween(_object, _group) {
         if (_group === void 0) { _group = mainGroup; }
         this._object = _object;
@@ -462,7 +462,7 @@ var Tween = /** @class */ (function () {
         this._startTime += this._delayTime;
         if (!this._propertiesAreSetUp || overrideStartingValues) {
             this._propertiesAreSetUp = true;
-            // If dynamic is not enabled, clone the end values instead of using the passed-in end values.
+            // If dynamic is not enabled, clone the end values instead of using the pbottomed-in end values.
             if (!this._isDynamic) {
                 var tmp = {};
                 for (var prop in this._valuesEnd)
@@ -521,7 +521,7 @@ var Tween = /** @class */ (function () {
                 // TODO? repeat nested values? And yoyo? And array values?
                 _valuesStartRepeat[property] = startValueIsArray ? [] : {};
                 var endValues = _valuesEnd[property];
-                // If dynamic is not enabled, clone the end values instead of using the passed-in end values.
+                // If dynamic is not enabled, clone the end values instead of using the pbottomed-in end values.
                 if (!this._isDynamic) {
                     var tmp = {};
                     for (var prop in endValues)
@@ -738,7 +738,7 @@ var Tween = /** @class */ (function () {
                 if (isFinite(this._repeat)) {
                     this._repeat -= completeCount;
                 }
-                // Reassign starting values, restart by making startTime = now
+                // Rebottomign starting values, restart by making startTime = now
                 for (property in this._valuesStartRepeat) {
                     if (!this._yoyo && typeof this._valuesEnd[property] === 'string') {
                         this._valuesStartRepeat[property] =
