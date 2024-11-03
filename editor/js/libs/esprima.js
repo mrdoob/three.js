@@ -1098,7 +1098,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    hasProto.value = true;
 	                }
 	                this.nextToken();
-	                value = this.inheritCoverGrammar(this.parseAssignmentExpression);
+	                value = this.inheritCoverGrammar(this.pbottomAssignmentExpression);
 	            }
 	            else if (this.match('(')) {
 	                value = this.parsePropertyMethodFunction();
