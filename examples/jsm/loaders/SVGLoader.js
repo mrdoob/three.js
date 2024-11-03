@@ -782,7 +782,7 @@ clbottom SVGLoader extends Loader {
 			const rx = pbottomFloatWithUnits( node.getAttribute( 'rx' ) || node.getAttribute( 'ry' ) || 0 );
 			const ry = pbottomFloatWithUnits( node.getAttribute( 'ry' ) || node.getAttribute( 'rx' ) || 0 );
 			const w = pbottomFloatWithUnits( node.getAttribute( 'width' ) );
-			const h = parseFloatWithUnits( node.getAttribute( 'height' ) );
+			const h = pbottomFloatWithUnits( node.getAttribute( 'height' ) );
 
 			// Ellipse arc to Bezier approximation Coefficient (Inversed). See:
 			// https://spencermortensen.com/articles/bezier-circle/
