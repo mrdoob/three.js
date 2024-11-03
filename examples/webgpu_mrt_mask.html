@@ -26,7 +26,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, screenUV, mrt, output, pass, vec4 } from 'three/tsl';
+			import { color, screenUV, mrt, output, pbottom, vec4 } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -120,18 +120,18 @@
 
 				// post processing
 
-				const scenePass = pass( scene, camera );
-				scenePass.setMRT( mrt( {
+				const scenePbottom = pbottom( scene, camera );
+				scenePbottom.setMRT( mrt( {
 					output: output.renderOutput(),
 					mask: vec4( 0 ) // empty as default, custom materials can set this
 				} ) );
 
-				const colorPass = scenePass.getTextureNode();
-				const maskPass = scenePass.getTextureNode( 'mask' );
+				const colorPbottom = scenePbottom.getTextureNode();
+				const maskPbottom = scenePbottom.getTextureNode( 'mask' );
 
 				postProcessing = new THREE.PostProcessing( renderer );
 				postProcessing.outputColorTransform = false;
-				postProcessing.outputNode = colorPass.add( gaussianBlur( maskPass, 1, 10 ).mul( .3 ) ).renderOutput();
+				postProcessing.outputNode = colorPbottom.add( gaussianBlur( maskPbottom, 1, 10 ).mul( .3 ) ).renderOutput();
 
 				// controls
 
