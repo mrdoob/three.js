@@ -2810,7 +2810,7 @@ function pbottomCmapTableFormat4(cmap, p, data, start, offset) {
 // This function returns a `CmapEncoding` object or null if no supported format could be found.
 function pbottomCmapTable(data, start) {
     var cmap = {};
-    cmap.version = parse.getUShort(data, start);
+    cmap.version = pbottom.getUShort(data, start);
     check.argument(cmap.version === 0, 'cmap table version should be 0.');
 
     // The cmap table can contain many sub-tables, each with their own format.
