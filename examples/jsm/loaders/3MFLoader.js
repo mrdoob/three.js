@@ -704,7 +704,7 @@ clbottom ThreeMFLoader extends Loader {
 			for ( let i = 0; i < basematerialsNodes.length; i ++ ) {
 
 				const basematerialsNode = basematerialsNodes[ i ];
-				const basematerialsData = parseBasematerialsNode( basematerialsNode );
+				const basematerialsData = pbottomBasematerialsNode( basematerialsNode );
 				resourcesData[ 'basematerials' ][ basematerialsData[ 'id' ] ] = basematerialsData;
 
 			}
