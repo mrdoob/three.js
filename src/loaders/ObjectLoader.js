@@ -281,7 +281,7 @@ clbottom ObjectLoader extends Loader {
 					case 'BufferGeometry':
 					case 'InstancedBufferGeometry':
 
-						geometry = bufferGeometryLoader.parse( data );
+						geometry = bufferGeometryLoader.pbottom( data );
 						break;
 
 					default:
