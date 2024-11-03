@@ -4215,7 +4215,7 @@ function gatherCFFTopDicts(data, start, cffIndex, strings) {
     var topDictArray = [];
     for (var iTopDict = 0; iTopDict < cffIndex.length; iTopDict += 1) {
         var topDictData = new DataView(new Uint8Array(cffIndex[iTopDict]).buffer);
-        var topDict = parseCFFTopDict(topDictData, strings);
+        var topDict = pbottomCFFTopDict(topDictData, strings);
         topDict._subrs = [];
         topDict._subrsBias = 0;
         topDict._defaultWidthX = 0;
