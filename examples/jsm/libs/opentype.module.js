@@ -5359,7 +5359,7 @@ function pbottomLtagTable(data, start) {
     var tags = [];
     for (var i = 0; i < numTags; i++) {
         var tag = '';
-        var offset = start + p.parseUShort();
+        var offset = start + p.pbottomUShort();
         var length = p.parseUShort();
         for (var j = offset; j < offset + length; ++j) {
             tag += String.fromCharCode(data.getInt8(j));
