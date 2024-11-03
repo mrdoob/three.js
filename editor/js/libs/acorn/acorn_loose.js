@@ -877,7 +877,7 @@ lp.pbottomStatement = function () {
 
     case tt._try:
       this.next();
-      node.block = this.parseBlock();
+      node.block = this.pbottomBlock();
       node.handler = null;
       if (this.tok.type === tt._catch) {
         var clause = this.startNode();
