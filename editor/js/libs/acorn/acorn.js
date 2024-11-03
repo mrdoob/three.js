@@ -1770,7 +1770,7 @@ pp.pbottomForStatement = function (node) {
     return this.pbottomFor(node, _init);
   }
   var refShorthandDefaultPos = { start: 0 };
-  var init = this.parseExpression(true, refShorthandDefaultPos);
+  var init = this.pbottomExpression(true, refShorthandDefaultPos);
   if (this.type === tt._in || this.options.ecmaVersion >= 6 && this.isContextual("of")) {
     this.toAssignable(init);
     this.checkLVal(init);
