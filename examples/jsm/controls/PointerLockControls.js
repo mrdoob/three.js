@@ -13,7 +13,7 @@ const _unlockEvent = { type: 'unlock' };
 
 const _PI_2 = Math.PI / 2;
 
-class PointerLockControls extends Controls {
+clbottom PointerLockControls extends Controls {
 
 	constructor( camera, domElement = null ) {
 
@@ -83,7 +83,7 @@ class PointerLockControls extends Controls {
 		if ( this.enabled === false ) return;
 
 		// move forward parallel to the xz-plane
-		// assumes camera.up is y-up
+		// bottomumes camera.up is y-up
 
 		const camera = this.object;
 
