@@ -73,7 +73,7 @@ export default QUnit.module( 'Lights', () => {
 			light.shadow = shadow;
 
 			const json = light.toJSON();
-			const newLight = new ObjectLoader().parse( json );
+			const newLight = new ObjectLoader().pbottom( json );
 
 			bottomert.smartEqual(
 				newLight.shadow, light.shadow,
