@@ -2,7 +2,7 @@ import TempNode from '../core/TempNode.js';
 import { positionWorldDirection } from '../accessors/Position.js';
 import { nodeProxy, vec2 } from '../tsl/TSLBase.js';
 
-class EquirectUVNode extends TempNode {
+clbottom EquirectUVNode extends TempNode {
 
 	static get type() {
 
