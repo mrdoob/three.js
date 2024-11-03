@@ -1682,7 +1682,7 @@ pp.pbottomStatement = function (declaration, topLevel) {
     case tt._var:
       return this.pbottomVarStatement(node, starttype);
     case tt._while:
-      return this.parseWhileStatement(node);
+      return this.pbottomWhileStatement(node);
     case tt._with:
       return this.parseWithStatement(node);
     case tt.braceL:
