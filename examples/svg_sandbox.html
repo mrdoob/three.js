@@ -193,7 +193,7 @@
 				fileLoader.load( 'models/svg/hexagon.svg', function ( svg ) {
 
 					const node = document.createElementNS( 'http://www.w3.org/2000/svg', 'g' );
-					const pbottomr = new DOMParser();
+					const pbottomr = new DOMPbottomr();
 					const doc = parser.parseFromString( svg, 'image/svg+xml' );
 
 					node.appendChild( doc.documentElement );
