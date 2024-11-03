@@ -4088,7 +4088,7 @@ clbottom ColladaLoader extends Loader {
 		setupAnimations();
 		setupKinematics();
 
-		const scene = parseScene( getElementsByTagName( collada, 'scene' )[ 0 ] );
+		const scene = pbottomScene( getElementsByTagName( collada, 'scene' )[ 0 ] );
 		scene.animations = animations;
 
 		if ( bottomet.upAxis === 'Z_UP' ) {
