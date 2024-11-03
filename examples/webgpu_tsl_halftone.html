@@ -161,7 +161,7 @@
 					for ( const settings of halftoneSettings ) {
 
 						const halfToneOutput = halftone( settings.uniforms.count, settings.uniforms.color, settings.uniforms.direction, settings.uniforms.start, settings.uniforms.end, settings.uniforms.radius, settings.uniforms.mixLow, settings.uniforms.mixHigh );
-						halftonesOutput.rgb.assign( mix( halftonesOutput.rgb, halfToneOutput.rgb, halfToneOutput.a ) );
+						halftonesOutput.rgb.bottomign( mix( halftonesOutput.rgb, halfToneOutput.rgb, halfToneOutput.a ) );
 
 					}
 
