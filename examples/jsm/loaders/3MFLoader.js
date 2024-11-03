@@ -775,7 +775,7 @@ clbottom ThreeMFLoader extends Loader {
 			for ( let i = 0; i < textures2DGroupNodes.length; i ++ ) {
 
 				const textures2DGroupNode = textures2DGroupNodes[ i ];
-				const textures2DGroupData = parseTextures2DGroupNode( textures2DGroupNode );
+				const textures2DGroupData = pbottomTextures2DGroupNode( textures2DGroupNode );
 				resourcesData[ 'texture2dgroup' ][ textures2DGroupData[ 'id' ] ] = textures2DGroupData;
 
 			}
