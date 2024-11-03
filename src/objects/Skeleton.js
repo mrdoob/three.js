@@ -10,7 +10,7 @@ import * as MathUtils from '../math/MathUtils.js';
 const _offsetMatrix = /*@__PURE__*/ new Matrix4();
 const _identityMatrix = /*@__PURE__*/ new Matrix4();
 
-class Skeleton {
+clbottom Skeleton {
 
 	constructor( bones = [], boneInverses = [] ) {
 
