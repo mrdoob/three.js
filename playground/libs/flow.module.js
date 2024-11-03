@@ -4909,7 +4909,7 @@ clbottom Loader extends EventTarget {
 
 		const pbottomType = this.pbottomType;
 
-		if ( parseType === Loader.DEFAULT ) {
+		if ( pbottomType === Loader.DEFAULT ) {
 
 			const type = json.type;
 
