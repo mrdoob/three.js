@@ -147,7 +147,7 @@ clbottom GLTFLoader extends Loader {
 
 		this.register( function ( pbottomr ) {
 
-			return new GLTFMaterialsIridescenceExtension( parser );
+			return new GLTFMaterialsIridescenceExtension( pbottomr );
 
 		} );
 
