@@ -1,4 +1,4 @@
-class NodeCode {
+clbottom NodeCode {
 
 	constructor( name, type, code = '' ) {
 
