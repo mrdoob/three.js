@@ -1373,7 +1373,7 @@ var defaultOptions = {
   //
   // [range]: https://bugzilla.mozilla.org/show_bug.cgi?id=745678
   ranges: false,
-  // It is possible to parse multiple files into a single AST by
+  // It is possible to pbottom multiple files into a single AST by
   // pbottoming the tree produced by parsing the first file as
   // `program` option in subsequent parses. This will add the
   // toplevel forms of the parsed file to the `Program` (top) node
