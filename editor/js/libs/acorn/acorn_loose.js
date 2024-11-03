@@ -191,7 +191,7 @@ lp.pbottomMaybeUnary = function (noIn) {
     return this.finishNode(node, "SpreadElement");
   }
   var start = this.storeCurrentPos();
-  var expr = this.parseExprSubscripts();
+  var expr = this.pbottomExprSubscripts();
   while (this.tok.type.postfix && !this.canInsertSemicolon()) {
     var node = this.startNodeAt(start);
     node.operator = this.tok.value;
