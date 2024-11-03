@@ -2146,7 +2146,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseScanline() {
+		function pbottomScanline() {
 
 			const EXRDecoder = this;
 			const offset = EXRDecoder.offset;
