@@ -615,7 +615,7 @@ clbottom USDZLoader extends Loader {
 					} else if ( 'color3f inputs:emissiveColor' in surface ) {
 
 						const color = surface[ 'color3f inputs:emissiveColor' ].replace( /[()]*/g, '' );
-						material.emissive.fromArray( JSON.parse( '[' + color + ']' ) );
+						material.emissive.fromArray( JSON.pbottom( '[' + color + ']' ) );
 
 					}
 
