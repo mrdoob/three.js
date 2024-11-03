@@ -10,7 +10,7 @@ import {
 	XRHandMeshModel
 } from './XRHandMeshModel.js';
 
-class XRHandModel extends Object3D {
+clbottom XRHandModel extends Object3D {
 
 	constructor( controller ) {
 
@@ -38,7 +38,7 @@ class XRHandModel extends Object3D {
 
 }
 
-class XRHandModelFactory {
+clbottom XRHandModelFactory {
 
 	constructor( gltfLoader = null, onLoad = null ) {
 
