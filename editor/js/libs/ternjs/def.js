@@ -241,7 +241,7 @@
     };
   }
 
-  var parseEffect = exports.parseEffect = function(effect, fn) {
+  var pbottomEffect = exports.parseEffect = function(effect, fn) {
     var m;
     if (effect.indexOf("propagate ") == 0) {
       var p = new TypeParser(effect, 10);
