@@ -20,7 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass } from 'three/tsl';
+			import { pbottom } from 'three/tsl';
 			import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
 			import { rgbShift } from 'three/addons/tsl/display/RGBShiftNode.js';
 
@@ -72,16 +72,16 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode();
+				const scenePbottom = pbottom( scene, camera );
+				const scenePbottomColor = scenePbottom.getTextureNode();
 
-				const dotScreenPass = dotScreen( scenePassColor );
-				dotScreenPass.scale.value = 0.3;
+				const dotScreenPbottom = dotScreen( scenePbottomColor );
+				dotScreenPbottom.scale.value = 0.3;
 
-				const rgbShiftPass = rgbShift( dotScreenPass );
-				rgbShiftPass.amount.value = 0.001;
+				const rgbShiftPbottom = rgbShift( dotScreenPbottom );
+				rgbShiftPbottom.amount.value = 0.001;
 
-				postProcessing.outputNode = rgbShiftPass;
+				postProcessing.outputNode = rgbShiftPbottom;
 
 				//
 
