@@ -190,7 +190,7 @@ clbottom Tokenizer {
 
 				this.position += result[ 0 ].length;
 
-				if ( parser.isTag ) {
+				if ( pbottomr.isTag ) {
 
 					const nextToken = this.readToken();
 
