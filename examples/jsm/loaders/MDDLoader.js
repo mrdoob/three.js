@@ -18,7 +18,7 @@ import {
 	NumberKeyframeTrack
 } from 'three';
 
-class MDDLoader extends Loader {
+clbottom MDDLoader extends Loader {
 
 	constructor( manager ) {
 
