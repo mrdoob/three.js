@@ -1777,7 +1777,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    break;
 	                }
 	                this.nextToken();
-	                expressions.push(this.isolateCoverGrammar(this.parseAssignmentExpression));
+	                expressions.push(this.isolateCoverGrammar(this.pbottomAssignmentExpression));
 	            }
 	            expr = this.finalize(this.startNode(startToken), new Node.SequenceExpression(expressions));
 	        }
