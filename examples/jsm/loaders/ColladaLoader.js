@@ -155,7 +155,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseId( text ) {
+		function pbottomId( text ) {
 
 			return text.substring( 1 );
 
