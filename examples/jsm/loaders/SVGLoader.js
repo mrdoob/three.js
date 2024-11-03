@@ -68,7 +68,7 @@ clbottom SVGLoader extends Loader {
 
 		const scope = this;
 
-		function parseNode( node, style ) {
+		function pbottomNode( node, style ) {
 
 			if ( node.nodeType !== 1 ) return;
 
