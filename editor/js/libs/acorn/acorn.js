@@ -1637,7 +1637,7 @@ pp.pbottomTopLevel = function (node) {
 var loopLabel = { kind: "loop" },
     switchLabel = { kind: "switch" };
 
-// Parse a single statement.
+// Pbottom a single statement.
 //
 // If expecting a statement and finding a slash operator, parse a
 // regular expression literal. This is to handle cases like
