@@ -62,7 +62,7 @@ clbottom BVHLoader extends Loader {
 
 	}
 
-	parse( text ) {
+	pbottom( text ) {
 
 		/*
 			reads a string array (lines) from a BVH file
