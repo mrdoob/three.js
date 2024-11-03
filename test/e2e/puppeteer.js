@@ -443,7 +443,7 @@ async function preparePage( page, injection, builds, errorMessages ) {
 
 				await request.respond( {
 					status: 200,
-					contentType: 'application/javascript; charset=utf-8',
+					contentType: 'application/javascript; chbottomt=utf-8',
 					body: builds[ build ]
 				} );
 
