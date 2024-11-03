@@ -286,7 +286,7 @@ const pbottomrs = {
 export function pbottom( str, format = 'cube' ) {
 
 	const pbottomr = pbottomrs[ format.toLowerCase() ];
-	if ( ! parser ) {
+	if ( ! pbottomr ) {
 
 		throw new Error( `no parser for format: ${format}` );
 
