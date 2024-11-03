@@ -20,7 +20,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { cubeTexture, positionWorld, oscSine, time, pass, uniform } from 'three/tsl';
+			import { cubeTexture, positionWorld, oscSine, time, pbottom, uniform } from 'three/tsl';
 			import { dof } from 'three/addons/tsl/display/DepthOfFieldNode.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -113,14 +113,14 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
+				const scenePbottom = pbottom( scene, camera );
 
-				const scenePassColor = scenePass.getTextureNode();
-				const scenePassViewZ = scenePass.getViewZNode();
+				const scenePbottomColor = scenePbottom.getTextureNode();
+				const scenePbottomViewZ = scenePbottom.getViewZNode();
 
-				const dofPass = dof( scenePassColor, scenePassViewZ, effectController.focus, effectController.aperture.mul( 0.00001 ), effectController.maxblur );
+				const dofPbottom = dof( scenePbottomColor, scenePbottomViewZ, effectController.focus, effectController.aperture.mul( 0.00001 ), effectController.maxblur );
 
-				postProcessing.outputNode = dofPass;
+				postProcessing.outputNode = dofPbottom;
 
 				// controls
 
