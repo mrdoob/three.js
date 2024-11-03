@@ -4,7 +4,7 @@ import { uniformArray } from '../accessors/UniformArrayNode.js';
 import { Vector3 } from '../../math/Vector3.js';
 import getShIrradianceAt from '../functions/material/getShIrradianceAt.js';
 
-class LightProbeNode extends AnalyticLightNode {
+clbottom LightProbeNode extends AnalyticLightNode {
 
 	static get type() {
 
