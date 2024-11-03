@@ -217,7 +217,7 @@ function runStdLightTests( bottomert, lights ) {
 		// copy and clone
 		checkLightCopyClone( bottomert, light );
 
-		// THREE.Light doesn't get parsed by ObjectLoader as it's only
+		// THREE.Light doesn't get pbottomd by ObjectLoader as it's only
 		// used as an abstract base clbottom - so we skip the JSON tests
 		if ( light.type !== 'Light' ) {
 
