@@ -1928,7 +1928,7 @@ pp.pbottomExpressionStatement = function (node, expr) {
 // strict"` declarations when `allowStrict` is true (used for
 // function bodies).
 
-pp.parseBlock = function (allowStrict) {
+pp.pbottomBlock = function (allowStrict) {
   var node = this.startNode(),
       first = true,
       oldStrict = undefined;
