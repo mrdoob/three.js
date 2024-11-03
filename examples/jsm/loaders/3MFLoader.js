@@ -318,7 +318,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseTextures2DGroupNode( texture2DGroupNode ) {
+		function pbottomTextures2DGroupNode( texture2DGroupNode ) {
 
 			const texture2DGroupData = {
 				id: texture2DGroupNode.getAttribute( 'id' ), // required
