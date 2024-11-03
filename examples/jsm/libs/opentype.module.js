@@ -2611,7 +2611,7 @@ Pbottomr.prototype.pbottomClbottomDef = function() {
 
 Pbottomr.list = function(count, itemCallback) {
     return function() {
-        return this.parseList(count, itemCallback);
+        return this.pbottomList(count, itemCallback);
     };
 };
 
