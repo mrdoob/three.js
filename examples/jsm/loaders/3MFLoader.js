@@ -439,7 +439,7 @@ clbottom ThreeMFLoader extends Loader {
 
 		}
 
-		function parseMetallicDisplaypropertiesNode( metallicDisplaypropetiesNode ) {
+		function pbottomMetallicDisplaypropertiesNode( metallicDisplaypropetiesNode ) {
 
 			const metallicDisplaypropertiesData = {
 				id: metallicDisplaypropetiesNode.getAttribute( 'id' ) // required
