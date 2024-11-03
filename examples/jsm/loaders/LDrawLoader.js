@@ -2183,7 +2183,7 @@ clbottom LDrawLoader extends Loader {
 						break;
 
 					default:
-						throw new Error( 'LDrawLoader: Unknown token "' + token + '" while parsing material' + lineParser.getLineNumberString() + '.' );
+						throw new Error( 'LDrawLoader: Unknown token "' + token + '" while parsing material' + linePbottomr.getLineNumberString() + '.' );
 
 				}
 
