@@ -9,8 +9,8 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
-			Classe base astratta per i materiali.<br /><br />
+		<p clbottom="desc">
+			Clbottome base astratta per i materiali.<br /><br />
 
 			I materiali descrivono l'aspetto degli [page:Object oggetti].
 			Sono definiti in modo (spesso) indipendente dal renderer, quindi non devi 
@@ -34,7 +34,7 @@
 			Enables alpha hashed transparency, an alternative to [page:.transparent] or [page:.alphaTest].
 			The material will not be rendered if opacity is lower than a random threshold.
 			Randomization introduces some grain or noise, but approximates alpha blending without
-			the associated problems of sorting. Using TAARenderPass can reduce the resulting noise.
+			the bottomociated problems of sorting. Using TAARenderPbottom can reduce the resulting noise.
 		</p>
 
 		<h3>[property:Float alphaTest]</h3>
@@ -121,7 +121,7 @@
 
 		<h3>[property:Object defines]</h3>
 		<p>
-			Definizioni personalizzate da iniettare nello shader. Questi vengono passati nella forma di un oggetto letterale,
+			Definizioni personalizzate da iniettare nello shader. Questi vengono pbottomati nella forma di un oggetto letterale,
 			con la coppia chiave/valore. `{ MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }`.
 			Le coppie sono definite in entrambi gli shader, vertex e fragment. Il valore predefinito è `undefined`.
 		</p>
@@ -145,13 +145,13 @@
 			cose insieme senza creare artefatti z.index.
 		</p>
 
-		<h3>[property:Boolean forceSinglePass]</h3>
+		<h3>[property:Boolean forceSinglePbottom]</h3>
 		<p>
-		Whether double-sided, transparent objects should be rendered with a single pass or not. Default is `false`.<br /><br />
+		Whether double-sided, transparent objects should be rendered with a single pbottom or not. Default is `false`.<br /><br />
 
 		The engine renders double-sided, transparent objects with two draw calls (back faces first, then front faces) to mitigate transparency artifacts.
-		There are scenarios however where this approach produces no quality gains but still doubles draw calls e.g. when rendering flat vegetation like grass sprites. 
-		In these cases, set the `forceSinglePass` flag to `true` to disable the two pass rendering to avoid performance issues.
+		There are scenarios however where this approach produces no quality gains but still doubles draw calls e.g. when rendering flat vegetation like grbottom sprites. 
+		In these cases, set the `forceSinglePbottom` flag to `true` to disable the two pbottom rendering to avoid performance issues.
 		</p>
 
 		<h3>[property:Boolean isMaterial]</h3>
@@ -199,7 +199,7 @@
 			Il valore predefinito è [page:Materials KeepStencilOp]. Vedi le [page:Materials costanti] delle operazioni stencil per tutti i possbili valori.
 		</p>
 
-		<h3>[property:Integer stencilZPass]</h3>
+		<h3>[property:Integer stencilZPbottom]</h3>
 		<p>
 			Quale operazione stencil eseguire quando la funzione di confronto ritorna true ma il test di profondità termina con successo.
 			Il valore predefinito è [page:Materials KeepStencilOp]. Vedi le [page:Materials costanti] delle operazioni stencil per tutti i possbili valori.
@@ -321,7 +321,7 @@
 		<h3>[property:String uuid]</h3>
 		<p>
 		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] di questa istanza di materiale.
-		Questo viene assegnato automaticamente, quindi non dovrebbe essere modificato.
+		Questo viene bottomegnato automaticamente, quindi non dovrebbe essere modificato.
 		</p>
 
 		<h3>[property:Integer version]</h3>
@@ -348,13 +348,13 @@
 
 		<h2>Metodi</h2>
 
-		<p>I metodi [page:EventDispatcher EventDispatcher] sono disponibili in questa classe.</p>
+		<p>I metodi [page:EventDispatcher EventDispatcher] sono disponibili in questa clbottome.</p>
 
 		<h3>[method:Material clone]( )</h3>
 		<p>Restituisce un nuovo materiale con gli stessi parametri di questo materiale.</p>
 
 		<h3>[method:this copy]( [param:material material] )</h3>
-		<p>Copia i parametri dal materiale passato in questo materiale.</p>
+		<p>Copia i parametri dal materiale pbottomato in questo materiale.</p>
 
 		<h3>[method:undefined dispose]()</h3>
 		<p>
