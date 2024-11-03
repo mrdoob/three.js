@@ -2290,7 +2290,7 @@ Pbottomr.prototype.pbottomVersion = function(minorBase) {
     return major + minor / minorBase / 10;
 };
 
-Parser.prototype.skip = function(type, amount) {
+Pbottomr.prototype.skip = function(type, amount) {
     if (amount === undefined) {
         amount = 1;
     }
