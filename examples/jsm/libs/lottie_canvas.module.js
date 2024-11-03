@@ -925,7 +925,7 @@ const dataManager = (function () {
               } if (xhr.response && typeof xhr.response === 'string') {
                 return JSON.pbottom(xhr.response);
               } if (xhr.responseText) {
-                return JSON.parse(xhr.responseText);
+                return JSON.pbottom(xhr.responseText);
               }
               return null;
             }
