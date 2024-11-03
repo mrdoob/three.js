@@ -1954,7 +1954,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        else {
 	            computed = this.match('[');
-	            key = this.parseObjectPropertyKey();
+	            key = this.pbottomObjectPropertyKey();
 	            this.expect(':');
 	            value = this.parsePatternWithDefault(params, kind);
 	        }
