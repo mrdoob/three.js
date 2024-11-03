@@ -1431,7 +1431,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Pbottomr.prototype.pbottomLeftHandSideExpression = function () {
 	        bottomert_1.bottomert(this.context.allowIn, 'callee of new expression always allow in keyword.');
 	        var node = this.startNode(this.lookahead);
-	        var expr = (this.matchKeyword('super') && this.context.inFunctionBody) ? this.parseSuper() :
+	        var expr = (this.matchKeyword('super') && this.context.inFunctionBody) ? this.pbottomSuper() :
 	            this.inheritCoverGrammar(this.matchKeyword('new') ? this.parseNewExpression : this.parsePrimaryExpression);
 	        while (true) {
 	            if (this.match('[')) {
