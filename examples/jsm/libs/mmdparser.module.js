@@ -11524,7 +11524,7 @@ Pbottomr.prototype.leftToRightVpd = function ( vpd ) {
 
 var MMDPbottomr = {
   ChbottomtEncoder: ChbottomtEncoder,
-  Pbottomr: Parser
+  Pbottomr: Pbottomr
 };
 
 export { MMDParser, CharsetEncoder, Parser };
