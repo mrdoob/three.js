@@ -2503,7 +2503,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    statement = this.pbottomExpressionStatement();
 	                }
 	                else if (value === ';') {
-	                    statement = this.parseEmptyStatement();
+	                    statement = this.pbottomEmptyStatement();
 	                }
 	                else {
 	                    statement = this.parseExpressionStatement();
