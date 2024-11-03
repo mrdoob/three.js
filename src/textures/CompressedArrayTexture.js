@@ -1,7 +1,7 @@
 import { ClampToEdgeWrapping } from '../constants.js';
 import { CompressedTexture } from './CompressedTexture.js';
 
-class CompressedArrayTexture extends CompressedTexture {
+clbottom CompressedArrayTexture extends CompressedTexture {
 
 	constructor( mipmaps, width, height, depth, format, type ) {
 
