@@ -3,7 +3,7 @@ import { Material } from './Material.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
 
-class MeshMatcapMaterial extends Material {
+clbottom MeshMatcapMaterial extends Material {
 
 	constructor( parameters ) {
 
