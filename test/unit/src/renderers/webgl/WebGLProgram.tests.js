@@ -9,41 +9,41 @@ export default QUnit.module( 'Renderers', () => {
 		QUnit.module( 'WebGLProgram', () => {
 
 			// INSTANCING
-			QUnit.todo( 'Instancing', ( assert ) => {
+			QUnit.todo( 'Instancing', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// PROPERTIES
-			QUnit.todo( 'uniforms', ( assert ) => {
+			QUnit.todo( 'uniforms', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'attributes', ( assert ) => {
+			QUnit.todo( 'attributes', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
 			// PUBLIC STUFF
-			QUnit.todo( 'getUniforms', ( assert ) => {
+			QUnit.todo( 'getUniforms', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
-
-			} );
-
-			QUnit.todo( 'getAttributes', ( assert ) => {
-
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
-			QUnit.todo( 'destroy', ( assert ) => {
+			QUnit.todo( 'getAttributes', ( bottomert ) => {
 
-				assert.ok( false, 'everything\'s gonna be alright' );
+				bottomert.ok( false, 'everything\'s gonna be alright' );
+
+			} );
+
+			QUnit.todo( 'destroy', ( bottomert ) => {
+
+				bottomert.ok( false, 'everything\'s gonna be alright' );
 
 			} );
 
