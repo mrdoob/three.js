@@ -445,8 +445,7 @@ class WebGLTextureUtils {
 
 						if ( glFormat !== null ) {
 
-							gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data, 0, 0 );
-
+							gl.compressedTexSubImage3D( gl.TEXTURE_2D_ARRAY, i, 0, 0, 0, mipmap.width, mipmap.height, image.depth, glFormat, mipmap.data );
 
 						} else {
 
@@ -607,9 +606,9 @@ class WebGLTextureUtils {
 
 		const { textureGPU: dstTextureGPU, glTextureType, glType, glFormat } = backend.get( dstTexture );
 
-
 		let width, height, minX, minY;
 		let dstX, dstY;
+
 		if ( srcRegion !== null ) {
 
 			width = srcRegion.max.x - srcRegion.min.x;
@@ -660,20 +659,46 @@ class WebGLTextureUtils {
 		gl.pixelStorei( gl.UNPACK_SKIP_PIXELS, minX );
 		gl.pixelStorei( gl.UNPACK_SKIP_ROWS, minY );
 
+		if ( srcTexture.isRenderTargetTexture || srcTexture.isDepthTexture ) {
 
-		if ( srcTexture.isDataTexture ) {
+			const srcTextureData = backend.get( srcTexture );
+			const dstTextureData = backend.get( dstTexture );
 
-			gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image.data );
+			const srcRenderContextData = backend.get( srcTextureData.renderTarget );
+			const dstRenderContextData = backend.get( dstTextureData.renderTarget );
+
+			const srcFramebuffer = srcRenderContextData.framebuffers[ srcTextureData.cacheKey ];
+			const dstFramebuffer = dstRenderContextData.framebuffers[ dstTextureData.cacheKey ];
+
+			state.bindFramebuffer( gl.READ_FRAMEBUFFER, srcFramebuffer );
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, dstFramebuffer );
+
+			let mask = gl.COLOR_BUFFER_BIT;
+
+			if ( srcTexture.isDepthTexture ) mask = gl.DEPTH_BUFFER_BIT;
+
+			gl.blitFramebuffer( minX, minY, width, height, dstX, dstY, width, height, mask, gl.NEAREST );
+
+			state.bindFramebuffer( gl.READ_FRAMEBUFFER, null );
+			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, null );
 
 		} else {
 
-			if ( srcTexture.isCompressedTexture ) {
+			if ( srcTexture.isDataTexture ) {
 
-				gl.compressedTexSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, image.width, image.height, glFormat, image.data );
+				gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image.data );
 
 			} else {
 
-				gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
+				if ( srcTexture.isCompressedTexture ) {
+
+					gl.compressedTexSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, image.width, image.height, glFormat, image.data );
+
+				} else {
+
+					gl.texSubImage2D( gl.TEXTURE_2D, level, dstX, dstY, width, height, glFormat, glType, image );
+
+				}
 
 			}
 
@@ -692,20 +717,22 @@ class WebGLTextureUtils {
 
 	}
 
-	copyFramebufferToTexture( texture, renderContext ) {
+	copyFramebufferToTexture( texture, renderContext, rectangle ) {
 
 		const { gl } = this;
 		const { state } = this.backend;
 
 		const { textureGPU } = this.backend.get( texture );
 
-		const width = texture.image.width;
-		const height = texture.image.height;
+		const { x, y, z: width, w: height } = rectangle;
 
 		const requireDrawFrameBuffer = texture.isDepthTexture === true || ( renderContext.renderTarget && renderContext.renderTarget.samples > 0 );
 
+		const srcHeight = renderContext.renderTarget ? renderContext.renderTarget.height : this.backend.gerDrawingBufferSize().y;
+
 		if ( requireDrawFrameBuffer ) {
 
+			const partial = ( x !== 0 || y !== 0 );
 			let mask;
 			let attachment;
 
@@ -727,19 +754,45 @@ class WebGLTextureUtils {
 
 			}
 
-			const fb = gl.createFramebuffer();
-			state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+			if ( partial ) {
 
-			gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureGPU, 0 );
+				const renderTargetContextData = this.backend.get( renderContext.renderTarget );
 
-			gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, gl.NEAREST );
+				const fb = renderTargetContextData.framebuffers[ renderContext.getCacheKey() ];
+				const msaaFrameBuffer = renderTargetContextData.msaaFrameBuffer;
 
-			gl.deleteFramebuffer( fb );
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+				state.bindFramebuffer( gl.READ_FRAMEBUFFER, msaaFrameBuffer );
+
+				const flippedY = srcHeight - y - height;
+
+				gl.blitFramebuffer( x, flippedY, x + width, flippedY + height, x, flippedY, x + width, flippedY + height, mask, gl.NEAREST );
+
+				state.bindFramebuffer( gl.READ_FRAMEBUFFER, fb );
+
+				state.bindTexture( gl.TEXTURE_2D, textureGPU );
+
+				gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, x, flippedY, width, height );
+
+				state.unbindTexture();
+
+			} else {
+
+				const fb = gl.createFramebuffer();
+
+				state.bindFramebuffer( gl.DRAW_FRAMEBUFFER, fb );
+
+				gl.framebufferTexture2D( gl.DRAW_FRAMEBUFFER, attachment, gl.TEXTURE_2D, textureGPU, 0 );
+				gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, gl.NEAREST );
+
+				gl.deleteFramebuffer( fb );
+
+			}
 
 		} else {
 
 			state.bindTexture( gl.TEXTURE_2D, textureGPU );
-			gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, 0, 0, width, height );
+			gl.copyTexSubImage2D( gl.TEXTURE_2D, 0, 0, 0, x, srcHeight - height - y, width, height );
 
 			state.unbindTexture();
 

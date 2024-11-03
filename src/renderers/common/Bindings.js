@@ -101,8 +101,9 @@ class Bindings extends DataMap {
 			} else if ( binding.isStorageBuffer ) {
 
 				const attribute = binding.attribute;
+				const attributeType = attribute.isIndirectStorageBufferAttribute ? AttributeType.INDIRECT : AttributeType.STORAGE;
 
-				this.attributes.update( attribute, AttributeType.STORAGE );
+				this.attributes.update( attribute, attributeType );
 
 			}
 
@@ -176,7 +177,7 @@ class Bindings extends DataMap {
 
 						textureData.needsMipmap = true;
 
-					} else if ( texture.generateMipmaps === true && this.textures.needsMipmaps( texture ) && textureData.needsMipmap === true ) {
+					} else if ( this.textures.needsMipmaps( texture ) && textureData.needsMipmap === true ) {
 
 						this.backend.generateMipmaps( texture );
 

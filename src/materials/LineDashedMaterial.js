@@ -7,7 +7,6 @@ class LineDashedMaterial extends LineBasicMaterial {
 		super();
 
 		this.isLineDashedMaterial = true;
-
 		this.type = 'LineDashedMaterial';
 
 		this.scale = 1;

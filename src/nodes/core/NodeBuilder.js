@@ -55,9 +55,17 @@ const typeFromArray = new Map( [
 
 const toFloat = ( value ) => {
 
-	value = Number( value );
+	if ( /e/g.test( value ) ) {
 
-	return value + ( value % 1 ? '' : '.0' );
+		return String( value ).replace( /\+/g, '' );
+
+	} else {
+
+		value = Number( value );
+
+		return value + ( value % 1 ? '' : '.0' );
+
+	}
 
 };
 
@@ -74,10 +82,13 @@ class NodeBuilder {
 		this.camera = null;
 
 		this.nodes = [];
+		this.sequentialNodes = [];
 		this.updateNodes = [];
 		this.updateBeforeNodes = [];
 		this.updateAfterNodes = [];
 		this.hashNodes = {};
+
+		this.monitor = null;
 
 		this.lightsNode = null;
 		this.environmentNode = null;
@@ -106,8 +117,6 @@ class NodeBuilder {
 		this.stack = stack();
 		this.stacks = [];
 		this.tab = '\t';
-
-		this.instanceBindGroups = true;
 
 		this.currentFunctionNode = null;
 
@@ -312,13 +321,21 @@ class NodeBuilder {
 
 	}
 
+	addSequentialNode( node ) {
+
+		if ( this.sequentialNodes.includes( node ) === false ) {
+
+			this.sequentialNodes.push( node );
+
+		}
+
+	}
+
 	buildUpdateNodes() {
 
 		for ( const node of this.nodes ) {
 
 			const updateType = node.getUpdateType();
-			const updateBeforeType = node.getUpdateBeforeType();
-			const updateAfterType = node.getUpdateAfterType();
 
 			if ( updateType !== NodeUpdateType.NONE ) {
 
@@ -326,15 +343,22 @@ class NodeBuilder {
 
 			}
 
+		}
+
+		for ( const node of this.sequentialNodes ) {
+
+			const updateBeforeType = node.getUpdateBeforeType();
+			const updateAfterType = node.getUpdateAfterType();
+
 			if ( updateBeforeType !== NodeUpdateType.NONE ) {
 
-				this.updateBeforeNodes.push( node );
+				this.updateBeforeNodes.push( node.getSelf() );
 
 			}
 
 			if ( updateAfterType !== NodeUpdateType.NONE ) {
 
-				this.updateAfterNodes.push( node );
+				this.updateAfterNodes.push( node.getSelf() );
 
 			}
 
@@ -941,9 +965,58 @@ class NodeBuilder {
 
 	}
 
-	addLineFlowCode( code ) {
+	addFlowCodeHierarchy( node, nodeBlock ) {
+
+		const { flowCodes, flowCodeBlock } = this.getDataFromNode( node );
+
+		let needsFlowCode = true;
+		let nodeBlockHierarchy = nodeBlock;
+
+		while ( nodeBlockHierarchy ) {
+
+			if ( flowCodeBlock.get( nodeBlockHierarchy ) === true ) {
+
+				needsFlowCode = false;
+				break;
+
+			}
+
+			nodeBlockHierarchy = this.getDataFromNode( nodeBlockHierarchy ).parentNodeBlock;
+
+		}
+
+		if ( needsFlowCode ) {
+
+			for ( const flowCode of flowCodes ) {
+
+				this.addLineFlowCode( flowCode );
+
+			}
+
+		}
+
+	}
+
+	addLineFlowCodeBlock( node, code, nodeBlock ) {
+
+		const nodeData = this.getDataFromNode( node );
+		const flowCodes = nodeData.flowCodes || ( nodeData.flowCodes = [] );
+		const codeBlock = nodeData.flowCodeBlock || ( nodeData.flowCodeBlock = new WeakMap() );
+
+		flowCodes.push( code );
+		codeBlock.set( nodeBlock, true );
+
+	}
+
+	addLineFlowCode( code, node = null ) {
 
 		if ( code === '' ) return this;
+
+		if ( node !== null && this.context.nodeBlock ) {
+
+			this.addLineFlowCodeBlock( node, code, this.context.nodeBlock );
+
+		}
 
 		code = this.tab + code;
 
@@ -1251,7 +1324,7 @@ class NodeBuilder {
 
 		if ( material !== null ) {
 
-			let nodeMaterial = renderer.nodes.library.fromMaterial( material );
+			let nodeMaterial = renderer.library.fromMaterial( material );
 
 			if ( nodeMaterial === null ) {
 

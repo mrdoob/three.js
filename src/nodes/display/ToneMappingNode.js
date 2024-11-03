@@ -3,6 +3,7 @@ import { addMethodChaining, nodeObject, vec4 } from '../tsl/TSLCore.js';
 import { rendererReference } from '../accessors/RendererReferenceNode.js';
 
 import { NoToneMapping } from '../../constants.js';
+import { hash } from '../core/NodeUtils.js';
 
 class ToneMappingNode extends TempNode {
 
@@ -25,10 +26,7 @@ class ToneMappingNode extends TempNode {
 
 	getCacheKey() {
 
-		let cacheKey = super.getCacheKey();
-		cacheKey = '{toneMapping:' + this.toneMapping + ',nodes:' + cacheKey + '}';
-
-		return cacheKey;
+		return hash( super.getCacheKey(), this.toneMapping );
 
 	}
 
@@ -41,7 +39,7 @@ class ToneMappingNode extends TempNode {
 
 		let outputNode = null;
 
-		const toneMappingFn = builder.renderer.nodes.library.getToneMappingFunction( toneMapping );
+		const toneMappingFn = builder.renderer.library.getToneMappingFunction( toneMapping );
 
 		if ( toneMappingFn !== null ) {
 

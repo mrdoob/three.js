@@ -15,7 +15,8 @@
 		<script type="importmap">
 			{
 				"imports": {
-					"three": "../build/three.module.js",
+					"three": "../build/three.webgpu.js",
+					"three/tsl": "../build/three.webgpu.js",
 					"three/addons/": "./jsm/"
 				}
 			}
@@ -50,7 +51,7 @@
 				}
 
 				// renderer
-				renderer = new THREE.WebGLRenderer( {
+				renderer = new THREE.WebGPURenderer( {
 					forceWebGL,
 					antialias: true,
 				} );

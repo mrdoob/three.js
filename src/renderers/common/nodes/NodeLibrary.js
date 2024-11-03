@@ -5,7 +5,6 @@ class NodeLibrary {
 		this.lightNodes = new WeakMap();
 		this.materialNodes = new Map();
 		this.toneMappingNodes = new Map();
-		this.colorSpaceNodes = new Map();
 
 	}
 
@@ -33,18 +32,6 @@ class NodeLibrary {
 
 	}
 
-	addColorSpace( colorSpaceNode, colorSpace ) {
-
-		this.addType( colorSpaceNode, colorSpace, this.colorSpaceNodes );
-
-	}
-
-	getColorSpaceFunction( colorSpace ) {
-
-		return this.colorSpaceNodes.get( colorSpace ) || null;
-
-	}
-
 	addToneMapping( toneMappingNode, toneMapping ) {
 
 		this.addType( toneMappingNode, toneMapping, this.toneMappingNodes );
@@ -63,9 +50,9 @@ class NodeLibrary {
 
 	}
 
-	addMaterial( materialNodeClass, materialClass ) {
+	addMaterial( materialNodeClass, materialClassType ) {
 
-		this.addType( materialNodeClass, materialClass.name, this.materialNodes );
+		this.addType( materialNodeClass, materialClassType, this.materialNodes );
 
 	}
 

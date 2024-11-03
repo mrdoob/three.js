@@ -34,7 +34,7 @@ class FlipNode extends TempNode {
 		const sourceCache = builder.getVarFromNode( this );
 		const sourceProperty = builder.getPropertyName( sourceCache );
 
-		builder.addLineFlowCode( sourceProperty + ' = ' + sourceSnippet );
+		builder.addLineFlowCode( sourceProperty + ' = ' + sourceSnippet, this );
 
 		const length = builder.getTypeLength( sourceType );
 		const snippetValues = [];

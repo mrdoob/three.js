@@ -13,8 +13,6 @@ import {
 } from 'three';
 import { LineSegmentsGeometry } from '../../lines/LineSegmentsGeometry.js';
 
-const _viewport = new Vector4();
-
 const _start = new Vector3();
 const _end = new Vector3();
 
@@ -353,19 +351,6 @@ class LineSegments2 extends Mesh {
 		} else {
 
 			raycastScreenSpace( this, camera, intersects );
-
-		}
-
-	}
-
-	onBeforeRender( renderer ) {
-
-		const uniforms = this.material.uniforms;
-
-		if ( uniforms && uniforms.resolution ) {
-
-			renderer.getViewport( _viewport );
-			this.material.uniforms.resolution.value.set( _viewport.z, _viewport.w );
 
 		}
 

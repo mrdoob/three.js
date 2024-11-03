@@ -2,7 +2,7 @@ import DataMap from './DataMap.js';
 
 import { Vector3 } from '../../math/Vector3.js';
 import { DepthTexture } from '../../textures/DepthTexture.js';
-import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, LinearFilter, NearestFilter, EquirectangularReflectionMapping, EquirectangularRefractionMapping, CubeReflectionMapping, CubeRefractionMapping, UnsignedByteType } from '../../constants.js';
+import { DepthStencilFormat, DepthFormat, UnsignedIntType, UnsignedInt248Type, EquirectangularReflectionMapping, EquirectangularRefractionMapping, CubeReflectionMapping, CubeRefractionMapping, UnsignedByteType } from '../../constants.js';
 
 const _size = /*@__PURE__*/ new Vector3();
 
@@ -33,9 +33,11 @@ class Textures extends DataMap {
 		const mipHeight = size.height >> activeMipmapLevel;
 
 		let depthTexture = renderTarget.depthTexture || depthTextureMips[ activeMipmapLevel ];
+		const useDepthTexture = renderTarget.depthBuffer === true || renderTarget.stencilBuffer === true;
+
 		let textureNeedsUpdate = false;
 
-		if ( depthTexture === undefined ) {
+		if ( depthTexture === undefined && useDepthTexture ) {
 
 			depthTexture = new DepthTexture();
 			depthTexture.format = renderTarget.stencilBuffer ? DepthStencilFormat : DepthFormat;
@@ -50,17 +52,21 @@ class Textures extends DataMap {
 		if ( renderTargetData.width !== size.width || size.height !== renderTargetData.height ) {
 
 			textureNeedsUpdate = true;
-			depthTexture.needsUpdate = true;
 
-			depthTexture.image.width = mipWidth;
-			depthTexture.image.height = mipHeight;
+			if ( depthTexture ) {
+
+				depthTexture.needsUpdate = true;
+				depthTexture.image.width = mipWidth;
+				depthTexture.image.height = mipHeight;
+
+			}
 
 		}
 
 		renderTargetData.width = size.width;
 		renderTargetData.height = size.height;
 		renderTargetData.textures = textures;
-		renderTargetData.depthTexture = depthTexture;
+		renderTargetData.depthTexture = depthTexture || null;
 		renderTargetData.depth = renderTarget.depthBuffer;
 		renderTargetData.stencil = renderTarget.stencilBuffer;
 		renderTargetData.renderTarget = renderTarget;
@@ -68,7 +74,12 @@ class Textures extends DataMap {
 		if ( renderTargetData.sampleCount !== sampleCount ) {
 
 			textureNeedsUpdate = true;
-			depthTexture.needsUpdate = true;
+
+			if ( depthTexture ) {
+
+				depthTexture.needsUpdate = true;
+
+			}
 
 			renderTargetData.sampleCount = sampleCount;
 
@@ -88,7 +99,11 @@ class Textures extends DataMap {
 
 		}
 
-		this.updateTexture( depthTexture, options );
+		if ( depthTexture ) {
+
+			this.updateTexture( depthTexture, options );
+
+		}
 
 		// dispose handler
 
@@ -108,7 +123,11 @@ class Textures extends DataMap {
 
 				}
 
-				this._destroyTexture( depthTexture );
+				if ( depthTexture ) {
+
+					this._destroyTexture( depthTexture );
+
+				}
 
 				this.delete( renderTarget );
 
@@ -141,8 +160,7 @@ class Textures extends DataMap {
 
 		if ( texture.isFramebufferTexture ) {
 
-			const renderer = this.renderer;
-			const renderTarget = renderer.getRenderTarget();
+			const renderTarget = this.renderer.getRenderTarget();
 
 			if ( renderTarget ) {
 
@@ -282,8 +300,8 @@ class Textures extends DataMap {
 
 			if ( image.image !== undefined ) image = image.image;
 
-			target.width = image.width;
-			target.height = image.height;
+			target.width = image.width || 1;
+			target.height = image.height || 1;
 			target.depth = texture.isCubeTexture ? 6 : ( image.depth || 1 );
 
 		} else {
@@ -302,7 +320,15 @@ class Textures extends DataMap {
 
 		if ( texture.isCompressedTexture ) {
 
-			mipLevelCount = texture.mipmaps.length;
+			if ( texture.mipmaps ) {
+
+				mipLevelCount = texture.mipmaps.length;
+
+			} else {
+
+				mipLevelCount = 1;
+
+			}
 
 		} else {
 
@@ -316,9 +342,7 @@ class Textures extends DataMap {
 
 	needsMipmaps( texture ) {
 
-		if ( this.isEnvironmentTexture( texture ) ) return true;
-
-		return ( texture.isCompressedTexture === true ) || ( ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter ) );
+		return this.isEnvironmentTexture( texture ) || texture.isCompressedTexture === true || texture.generateMipmaps;
 
 	}
 

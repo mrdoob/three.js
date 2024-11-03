@@ -5,6 +5,7 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
+	ColorManagement,
 	DirectionalLight,
 	EquirectangularReflectionMapping,
 	Euler,
@@ -23,7 +24,6 @@ import {
 	MeshPhongMaterial,
 	NumberKeyframeTrack,
 	Object3D,
-	OrthographicCamera,
 	PerspectiveCamera,
 	PointLight,
 	PropertyBinding,
@@ -539,12 +539,12 @@ class FBXTreeParser {
 
 		if ( materialNode.Diffuse ) {
 
-			parameters.color = new Color().fromArray( materialNode.Diffuse.value ).convertSRGBToLinear();
+			parameters.color = ColorManagement.toWorkingColorSpace( new Color().fromArray( materialNode.Diffuse.value ), SRGBColorSpace );
 
 		} else if ( materialNode.DiffuseColor && ( materialNode.DiffuseColor.type === 'Color' || materialNode.DiffuseColor.type === 'ColorRGB' ) ) {
 
 			// The blender exporter exports diffuse here instead of in materialNode.Diffuse
-			parameters.color = new Color().fromArray( materialNode.DiffuseColor.value ).convertSRGBToLinear();
+			parameters.color = ColorManagement.toWorkingColorSpace( new Color().fromArray( materialNode.DiffuseColor.value ), SRGBColorSpace );
 
 		}
 
@@ -556,12 +556,12 @@ class FBXTreeParser {
 
 		if ( materialNode.Emissive ) {
 
-			parameters.emissive = new Color().fromArray( materialNode.Emissive.value ).convertSRGBToLinear();
+			parameters.emissive = ColorManagement.toWorkingColorSpace( new Color().fromArray( materialNode.Emissive.value ), SRGBColorSpace );
 
 		} else if ( materialNode.EmissiveColor && ( materialNode.EmissiveColor.type === 'Color' || materialNode.EmissiveColor.type === 'ColorRGB' ) ) {
 
 			// The blender exporter exports emissive color here instead of in materialNode.Emissive
-			parameters.emissive = new Color().fromArray( materialNode.EmissiveColor.value ).convertSRGBToLinear();
+			parameters.emissive = ColorManagement.toWorkingColorSpace( new Color().fromArray( materialNode.EmissiveColor.value ), SRGBColorSpace );
 
 		}
 
@@ -571,9 +571,19 @@ class FBXTreeParser {
 
 		}
 
-		if ( materialNode.Opacity ) {
+		// the transparency handling is implemented based on Blender/Unity's approach: https://github.com/sobotka/blender-addons/blob/7d80f2f97161fc8e353a657b179b9aa1f8e5280b/io_scene_fbx/import_fbx.py#L1444-L1459
 
-			parameters.opacity = parseFloat( materialNode.Opacity.value );
+		parameters.opacity = 1 - ( materialNode.TransparencyFactor ? parseFloat( materialNode.TransparencyFactor.value ) : 0 );
+
+		if ( parameters.opacity === 1 || parameters.opacity === 0 ) {
+
+			parameters.opacity = ( materialNode.Opacity ? parseFloat( materialNode.Opacity.value ) : null );
+
+			if ( parameters.opacity === null ) {
+
+				parameters.opacity = 1 - ( materialNode.TransparentColor ? parseFloat( materialNode.TransparentColor.value[ 0 ] ) : 0 );
+
+			}
 
 		}
 
@@ -597,12 +607,12 @@ class FBXTreeParser {
 
 		if ( materialNode.Specular ) {
 
-			parameters.specular = new Color().fromArray( materialNode.Specular.value ).convertSRGBToLinear();
+			parameters.specular = ColorManagement.toWorkingColorSpace( new Color().fromArray( materialNode.Specular.value ), SRGBColorSpace );
 
 		} else if ( materialNode.SpecularColor && materialNode.SpecularColor.type === 'Color' ) {
 
 			// The blender exporter exports specular color here instead of in materialNode.Specular
-			parameters.specular = new Color().fromArray( materialNode.SpecularColor.value ).convertSRGBToLinear();
+			parameters.specular = ColorManagement.toWorkingColorSpace( new Color().fromArray( materialNode.SpecularColor.value ), SRGBColorSpace );
 
 		}
 
@@ -1095,7 +1105,8 @@ class FBXTreeParser {
 					break;
 
 				case 1: // Orthographic
-					model = new OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, nearClippingPlane, farClippingPlane );
+					console.warn( 'THREE.FBXLoader: Orthographic cameras not supported yet.' );
+					model = new Object3D();
 					break;
 
 				default:
@@ -1152,7 +1163,7 @@ class FBXTreeParser {
 
 			if ( lightAttribute.Color !== undefined ) {
 
-				color = new Color().fromArray( lightAttribute.Color.value ).convertSRGBToLinear();
+				color = ColorManagement.toWorkingColorSpace( new Color().fromArray( lightAttribute.Color.value ), SRGBColorSpace );
 
 			}
 
@@ -1330,7 +1341,7 @@ class FBXTreeParser {
 		if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
 
 		if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = getEulerOrder( modelNode.RotationOrder.value );
-		else transformData.eulerOrder = getEulerOrder(0);
+		else transformData.eulerOrder = getEulerOrder( 0 );
 
 		if ( 'Lcl_Translation' in modelNode ) transformData.translation = modelNode.Lcl_Translation.value;
 
@@ -1478,7 +1489,7 @@ class FBXTreeParser {
 
 				if ( r !== 0 || g !== 0 || b !== 0 ) {
 
-					const color = new Color( r, g, b ).convertSRGBToLinear();
+					const color = new Color().setRGB( r, g, b, SRGBColorSpace );
 					sceneGraph.add( new AmbientLight( color, 1 ) );
 
 				}
@@ -2320,7 +2331,9 @@ class GeometryParser {
 
 		for ( let i = 0, c = new Color(); i < buffer.length; i += 4 ) {
 
-			c.fromArray( buffer, i ).convertSRGBToLinear().toArray( buffer, i );
+			c.fromArray( buffer, i );
+			ColorManagement.toWorkingColorSpace( c, SRGBColorSpace );
+			c.toArray( buffer, i );
 
 		}
 
@@ -2811,7 +2824,7 @@ class AnimationParser {
 		}
 
 		// For Maya models using "Joint Orient", Euler order only applies to rotation, not pre/post-rotations
-		const defaultEulerOrder = getEulerOrder(0);
+		const defaultEulerOrder = getEulerOrder( 0 );
 
 		if ( preRotation !== undefined ) {
 
@@ -4139,7 +4152,7 @@ function generateTransform( transformData ) {
 	if ( transformData.translation ) lTranslationM.setPosition( tempVec.fromArray( transformData.translation ) );
 
 	// For Maya models using "Joint Orient", Euler order only applies to rotation, not pre/post-rotations
-	const defaultEulerOrder = getEulerOrder(0);
+	const defaultEulerOrder = getEulerOrder( 0 );
 
 	if ( transformData.preRotation ) {
 

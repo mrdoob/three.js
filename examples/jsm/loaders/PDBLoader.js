@@ -3,7 +3,8 @@ import {
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
-	Color
+	Color,
+	SRGBColorSpace
 } from 'three';
 
 class PDBLoader extends Loader {
@@ -131,7 +132,7 @@ class PDBLoader extends Loader {
 				const g = atom[ 3 ][ 1 ] / 255;
 				const b = atom[ 3 ][ 2 ] / 255;
 
-				c.set( r, g, b ).convertSRGBToLinear();
+				c.setRGB( r, g, b, SRGBColorSpace );
 
 				colorsAtoms.push( c.r, c.g, c.b );
 

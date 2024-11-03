@@ -12,9 +12,9 @@ class MeshStandardMaterial extends Material {
 
 		this.isMeshStandardMaterial = true;
 
-		this.defines = { 'STANDARD': '' };
-
 		this.type = 'MeshStandardMaterial';
+
+		this.defines = { 'STANDARD': '' };
 
 		this.color = new Color( 0xffffff ); // diffuse
 		this.roughness = 1.0;

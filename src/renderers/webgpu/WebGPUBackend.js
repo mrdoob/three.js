@@ -101,6 +101,19 @@ class WebGPUBackend extends Backend {
 
 		}
 
+		device.lost.then( ( info ) => {
+
+			const deviceLossInfo = {
+				api: 'WebGPU',
+				message: info.message || 'Unknown reason',
+				reason: info.reason || null,
+				originalEvent: info
+			};
+
+			renderer.onDeviceLost( deviceLossInfo );
+
+		} );
+
 		const context = ( parameters.context !== undefined ) ? parameters.context : renderer.domElement.getContext( 'webgpu' );
 
 		this.device = device;
@@ -151,10 +164,15 @@ class WebGPUBackend extends Backend {
 				colorAttachments: [ {
 					view: null
 				} ],
-				depthStencilAttachment: {
-					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
-				}
 			};
+
+			if ( this.renderer.depth === true || this.renderer.stencil === true ) {
+
+				descriptor.depthStencilAttachment = {
+					view: this.textureUtils.getDepthBuffer( renderer.depth, renderer.stencil ).createView()
+				};
+
+			}
 
 			const colorAttachment = descriptor.colorAttachments[ 0 ];
 
@@ -263,16 +281,21 @@ class WebGPUBackend extends Backend {
 
 			}
 
-			const depthTextureData = this.get( renderContext.depthTexture );
-
-			const depthStencilAttachment = {
-				view: depthTextureData.texture.createView()
-			};
 
 			descriptor = {
 				colorAttachments,
-				depthStencilAttachment
 			};
+
+			if ( renderContext.depth ) {
+
+				const depthTextureData = this.get( renderContext.depthTexture );
+
+				const depthStencilAttachment = {
+					view: depthTextureData.texture.createView()
+				};
+				descriptor.depthStencilAttachment = depthStencilAttachment;
+
+			}
 
 			descriptors[ cacheKey ] = descriptor;
 
@@ -825,6 +848,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	async waitForGPU() {
+
+		await this.device.queue.onSubmittedWorkDone();
+
+	}
+
 	// render object
 
 	draw( renderObject, info ) {
@@ -836,9 +865,9 @@ class WebGPUBackend extends Backend {
 		const currentSets = renderContextData.currentSets;
 		const passEncoderGPU = renderContextData.currentPass;
 
-		const drawParms = renderObject.getDrawParameters();
+		const drawParams = renderObject.getDrawParameters();
 
-		if ( drawParms === null ) return;
+		if ( drawParams === null ) return;
 
 		// pipeline
 
@@ -960,17 +989,41 @@ class WebGPUBackend extends Backend {
 
 		} else if ( hasIndex === true ) {
 
-			const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParms;
+			const { vertexCount: indexCount, instanceCount, firstVertex: firstIndex } = drawParams;
 
-			passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
+			const indirect = renderObject.getIndirect();
+
+			if ( indirect !== null ) {
+
+				const buffer = this.get( indirect ).buffer;
+
+				passEncoderGPU.drawIndexedIndirect( buffer, 0 );
+
+			} else {
+
+				passEncoderGPU.drawIndexed( indexCount, instanceCount, firstIndex, 0, 0 );
+
+			}
 
 			info.update( object, indexCount, instanceCount );
 
 		} else {
 
-			const { vertexCount, instanceCount, firstVertex } = drawParms;
+			const { vertexCount, instanceCount, firstVertex } = drawParams;
 
-			passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+			const indirect = renderObject.getIndirect();
+
+			if ( indirect !== null ) {
+
+				const buffer = this.get( indirect ).buffer;
+
+				passEncoderGPU.drawIndirect( buffer, 0 );
+
+			} else {
+
+				passEncoderGPU.draw( vertexCount, instanceCount, firstVertex, 0 );
+
+			}
 
 			info.update( object, vertexCount, instanceCount );
 
@@ -1056,11 +1109,11 @@ class WebGPUBackend extends Backend {
 			utils.getSampleCountRenderContext( renderContext ),
 			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
 			utils.getPrimitiveTopology( object, material ),
-			renderObject.clippingContextCacheKey
+			renderObject.getGeometryCacheKey(),
+			renderObject.clippingContext.cacheKey
 		].join();
 
 	}
-
 
 	// textures
 
@@ -1326,6 +1379,12 @@ class WebGPUBackend extends Backend {
 
 	}
 
+	createIndirectStorageAttribute( attribute ) {
+
+		this.attributeUtils.createAttribute( attribute, GPUBufferUsage.STORAGE | GPUBufferUsage.INDIRECT | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST );
+
+	}
+
 	updateAttribute( attribute ) {
 
 		this.attributeUtils.updateAttribute( attribute );
@@ -1419,11 +1478,9 @@ class WebGPUBackend extends Backend {
 
 	}
 
-	copyFramebufferToTexture( texture, renderContext ) {
+	copyFramebufferToTexture( texture, renderContext, rectangle ) {
 
 		const renderContextData = this.get( renderContext );
-
-		const { encoder, descriptor } = renderContextData;
 
 		let sourceGPU = null;
 
@@ -1463,35 +1520,57 @@ class WebGPUBackend extends Backend {
 
 		}
 
-		renderContextData.currentPass.end();
+		let encoder;
+
+		if ( renderContextData.currentPass ) {
+
+			renderContextData.currentPass.end();
+
+			encoder = renderContextData.encoder;
+
+		} else {
+
+			encoder = this.device.createCommandEncoder( { label: 'copyFramebufferToTexture_' + texture.id } );
+
+		}
 
 		encoder.copyTextureToTexture(
 			{
 				texture: sourceGPU,
-				origin: { x: 0, y: 0, z: 0 }
+				origin: { x: rectangle.x, y: rectangle.y, z: 0 }
 			},
 			{
 				texture: destinationGPU
 			},
 			[
-				texture.image.width,
-				texture.image.height
+				rectangle.z,
+				rectangle.w
 			]
 		);
 
 		if ( texture.generateMipmaps ) this.textureUtils.generateMipmaps( texture );
 
-		for ( let i = 0; i < descriptor.colorAttachments.length; i ++ ) {
+		if ( renderContextData.currentPass ) {
 
-			descriptor.colorAttachments[ i ].loadOp = GPULoadOp.Load;
+			const { descriptor } = renderContextData;
+
+			for ( let i = 0; i < descriptor.colorAttachments.length; i ++ ) {
+
+				descriptor.colorAttachments[ i ].loadOp = GPULoadOp.Load;
+
+			}
+
+			if ( renderContext.depth ) descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
+			if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
+
+			renderContextData.currentPass = encoder.beginRenderPass( descriptor );
+			renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
+
+		} else {
+
+			this.device.queue.submit( [ encoder.finish() ] );
 
 		}
-
-		if ( renderContext.depth ) descriptor.depthStencilAttachment.depthLoadOp = GPULoadOp.Load;
-		if ( renderContext.stencil ) descriptor.depthStencilAttachment.stencilLoadOp = GPULoadOp.Load;
-
-		renderContextData.currentPass = encoder.beginRenderPass( descriptor );
-		renderContextData.currentSets = { attributes: {}, bindingGroups: [], pipeline: null, index: null };
 
 	}
 

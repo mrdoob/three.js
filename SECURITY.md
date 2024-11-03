@@ -7,8 +7,7 @@ used before a patch is released.
 
 You may submit the report in the following ways:
 
-- send an email to hello@mrdoob.com; and/or
-- send us a [private vulnerability report](https://github.com/mrdoob/three.js/security/advisories/new)
+- send an email to hello@mrdoob.com.
 
 Please provide the following information in your report:
 

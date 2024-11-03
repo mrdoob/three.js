@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { color, screenUV, hue, timerLocal, reflector } from 'three/tsl';
+			import { color, screenUV, hue, reflector, time, Fn, vec2, length, atan2, float, sin, cos, vec3, sub, mul, pow, dodge, normalWorld } from 'three/tsl';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
@@ -57,9 +57,39 @@
 			const stats = new Stats();
 			document.body.appendChild( stats.dom );
 
+			export const lightSpeed = /*#__PURE__*/ Fn( ( [ suv_immutable ] ) => {
+
+				// forked from https://www.shadertoy.com/view/7ly3D1
+
+				const suv = vec2( suv_immutable );
+				const uv = vec2( length( suv ), atan2( suv.y, suv.x ) );
+				const offset = float( float( .1 ).mul( sin( uv.y.mul( 10. ).sub( time.mul( .6 ) ) ) ).mul( cos( uv.y.mul( 48. ).add( time.mul( .3 ) ) ) ).mul( cos( uv.y.mul( 3.7 ).add( time ) ) ) );
+				const rays = vec3( vec3( sin( uv.y.mul( 150. ).add( time ) ).mul( .5 ).add( .5 ) ).mul( vec3( sin( uv.y.mul( 80. ).sub( time.mul( 0.6 ) ) ).mul( .5 ).add( .5 ) ) ).mul( vec3( sin( uv.y.mul( 45. ).add( time.mul( 0.8 ) ) ).mul( .5 ).add( .5 ) ) ).mul( vec3( sub( 1., cos( uv.y.add( mul( 22., time ).sub( pow( uv.x.add( offset ), .3 ).mul( 60. ) ) ) ) ) ) ).mul( vec3( uv.x.mul( 2. ) ) ) );
+
+				return rays;
+
+			} ).setLayout( {
+				name: 'lightSpeed',
+				type: 'vec3',
+				inputs: [
+					{ name: 'suv', type: 'vec2' }
+				]
+			} );
+
 			// scene
+
 			const scene = new THREE.Scene();
-			scene.backgroundNode = screenUV.distance( .5 ).mix( hue( color( 0x0175ad ), timerLocal( .1 ) ), hue( color( 0x02274f ), timerLocal( .5 ) ) );
+
+			// background
+
+			const coloredVignette = screenUV.distance( .5 ).mix( hue( color( 0x0175ad ), time.mul( .1 ) ), hue( color( 0x02274f ), time.mul( .5 ) ) );
+			const lightSpeedEffect = lightSpeed( normalWorld ).clamp();
+			const lightSpeedSky = normalWorld.y.remapClamp( -.1, 1 ).mix( 0, lightSpeedEffect );
+			const composedBackground = dodge( coloredVignette, lightSpeedSky );
+
+			scene.backgroundNode = composedBackground;
+
+			//
 
 			const helpers = new THREE.Group();
 			helpers.visible = false;
@@ -73,18 +103,24 @@
 			scene.add( dirLight );
 
 			const camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, .25, 50 );
-			camera.position.set( - 2, 2, 4 );
+			camera.position.set( 0, 1, 4 );
 
 			// add models to scene
 			scene.add( sourceModel.scene );
 			scene.add( targetModel.scene );
 
 			// reposition models
-			sourceModel.scene.position.x -= 1;
-			targetModel.scene.position.x += 1;
+			sourceModel.scene.position.x -= .8;
+			targetModel.scene.position.x += .7;
+
+			targetModel.scene.position.z -= .1;
 
 			// reajust model
 			targetModel.scene.scale.setScalar( .01 );
+
+			// flip model
+			sourceModel.scene.rotation.y = Math.PI / 2;
+			targetModel.scene.rotation.y = - Math.PI / 2;
 
 			// retarget
 			const source = getSource( sourceModel );
@@ -155,10 +191,15 @@
 
 				const retargetOptions = {
 
-					preserveHipPosition: false, // lock XZ position of the hip bone to the origin
-
 					// specify the name of the source's hip bone.
 					hip: 'mixamorigHips',
+
+					// specify the influence of the source's hip bone.
+					// use ( 0, 1, 0 ) to ignore xz hip movement.
+					//hipInfluence: new THREE.Vector3( 0, 1, 0 ),
+
+					// specify an animation range in seconds.
+					//trim: [ 3.0, 4.0 ],
 
 					// preserve the scale of the target model
 					scale: 1 / targetModel.scene.scale.y,

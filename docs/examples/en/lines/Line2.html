@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Mesh] &rarr; [page:LineSegments2] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A polyline drawn between vertices.
+		</p>
+
+		<p class="desc">
+			This adds functionality beyond [page:Line], like arbitrary line width and changing width to be in world units.
+			It extends [page:LineSegments2], simplifying constructing segments from a chain of points.
+		</p>
+
+		<h2>Import</h2>
+
+		<p>
+			[name] is an add-on, and therefore must be imported explicitly.
+			See [link:#manual/introduction/Installation Installation / Addons].
+		</p>
+
+		<code>
+			import { Line2 } from 'three/addons/lines/Line2.js';
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_lines_fat WebGL / lines / fat ]<br />
+			[example:webgl_lines_fat_raycasting WebGL / lines / fat / raycasting ]<br />
+			[example:webgpu_lines_fat WebGPU / lines / fat / raycasting ]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:LineGeometry geometry], [param:LineMaterial material] )</h3>
+		<p>
+			[page:LineGeometry geometry] — (optional) Pair(s) of vertices representing each line segment.<br />
+			[page:Material material] — (optional) Material for the line. Default is a [page:LineMaterial] with random color.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:LineSegments2] class for common properties.</p>
+
+		<h3>[property:Boolean isLine2]</h3>
+		<p>Read-only flag to check if a given object is of type [name].</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:LineSegments2] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/lines/Line2.js examples/jsm/lines/Line2.js]
+		</p>
+	</body>
+</html>

@@ -3,9 +3,10 @@ import ChainMap from '../ChainMap.js';
 import NodeBuilderState from './NodeBuilderState.js';
 import { cubeMapNode } from '../../../nodes/utils/CubeMapNode.js';
 import { NodeFrame } from '../../../nodes/Nodes.js';
-import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, normalWorld, pmremTexture, screenUV } from '../../../nodes/TSL.js';
+import { objectGroup, renderGroup, frameGroup, cubeTexture, texture, rangeFog, densityFog, reference, pmremTexture, screenUV } from '../../../nodes/TSL.js';
 
 import { CubeUVReflectionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../../constants.js';
+import { hashArray } from '../../../nodes/core/NodeUtils.js';
 
 const outputNodeMap = new WeakMap();
 
@@ -190,7 +191,7 @@ class Nodes extends DataMap {
 			nodeBuilder.updateNodes,
 			nodeBuilder.updateBeforeNodes,
 			nodeBuilder.updateAfterNodes,
-			nodeBuilder.instanceBindGroups,
+			nodeBuilder.monitor,
 			nodeBuilder.transforms
 		);
 
@@ -226,15 +227,17 @@ class Nodes extends DataMap {
 			const environmentNode = this.getEnvironmentNode( scene );
 			const fogNode = this.getFogNode( scene );
 
-			const cacheKey = [];
+			const values = [];
 
-			if ( lightsNode ) cacheKey.push( lightsNode.getCacheKey( true ) );
-			if ( environmentNode ) cacheKey.push( environmentNode.getCacheKey() );
-			if ( fogNode ) cacheKey.push( fogNode.getCacheKey() );
+			if ( lightsNode ) values.push( lightsNode.getCacheKey( true ) );
+			if ( environmentNode ) values.push( environmentNode.getCacheKey() );
+			if ( fogNode ) values.push( fogNode.getCacheKey() );
+
+			values.push( this.renderer.shadowMap.enabled ? 1 : 0 );
 
 			cacheKeyData = {
 				callId,
-				cacheKey: cacheKey.join( ',' )
+				cacheKey: hashArray( values )
 			};
 
 			this.callHashCache.set( chain, cacheKeyData );
@@ -276,7 +279,7 @@ class Nodes extends DataMap {
 
 					if ( scene.backgroundBlurriness > 0 || background.mapping === CubeUVReflectionMapping ) {
 
-						backgroundNode = pmremTexture( background, normalWorld );
+						backgroundNode = pmremTexture( background );
 
 					} else {
 
@@ -334,11 +337,18 @@ class Nodes extends DataMap {
 
 				if ( fog.isFogExp2 ) {
 
-					fogNode = densityFog( reference( 'color', 'color', fog ), reference( 'density', 'float', fog ) );
+					const color = reference( 'color', 'color', fog ).setGroup( renderGroup );
+					const density = reference( 'density', 'float', fog ).setGroup( renderGroup );
+
+					fogNode = densityFog( color, density );
 
 				} else if ( fog.isFog ) {
 
-					fogNode = rangeFog( reference( 'color', 'color', fog ), reference( 'near', 'float', fog ), reference( 'far', 'float', fog ) );
+					const color = reference( 'color', 'color', fog ).setGroup( renderGroup );
+					const near = reference( 'near', 'float', fog ).setGroup( renderGroup );
+					const far = reference( 'far', 'float', fog ).setGroup( renderGroup );
+
+					fogNode = rangeFog( color, near, far );
 
 				} else {
 
@@ -498,6 +508,15 @@ class Nodes extends DataMap {
 			nodeFrame.updateNode( node );
 
 		}
+
+	}
+
+	needsRefresh( renderObject ) {
+
+		const nodeFrame = this.getNodeFrameForRender( renderObject );
+		const monitor = renderObject.getMonitor();
+
+		return monitor.needsRefresh( renderObject, nodeFrame );
 
 	}
 

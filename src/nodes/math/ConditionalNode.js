@@ -43,10 +43,23 @@ class ConditionalNode extends Node {
 
 	setup( builder ) {
 
+		const condNode = this.condNode.cache();
+		const ifNode = this.ifNode.cache();
+		const elseNode = this.elseNode ? this.elseNode.cache() : null;
+
+		//
+
+		const currentNodeBlock = builder.context.nodeBlock;
+
+		builder.getDataFromNode( ifNode ).parentNodeBlock = currentNodeBlock;
+		if ( elseNode !== null ) builder.getDataFromNode( elseNode ).parentNodeBlock = currentNodeBlock;
+
+		//
+
 		const properties = builder.getNodeProperties( this );
-		properties.condNode = this.condNode.cache();
-		properties.ifNode = this.ifNode.cache();
-		properties.elseNode = this.elseNode ? this.elseNode.cache() : null;
+		properties.condNode = condNode;
+		properties.ifNode = ifNode.context( { nodeBlock: ifNode } );
+		properties.elseNode = elseNode ? elseNode.context( { nodeBlock: elseNode } ) : null;
 
 	}
 

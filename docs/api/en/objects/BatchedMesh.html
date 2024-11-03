@@ -167,7 +167,28 @@
 		<p>
 			[page:Integer instanceId]: The id of an instance to get the visibility state of.
 		</p>
-		<p>Get whether the given instance is marked as "visible" or not.</p>
+		<p>Get whether the given instance is marked as "visible" or not.</p>		
+
+		<h3>
+			[method:Object getGeometryRangeAt]( [param:Integer geometryId], [param:Object target] )
+		</h3>
+		<p>
+			[page:Integer geometryId]: The id of the geometry to get the range of.
+		</p>
+		<p>
+			[page:Object target]: Optional target object to copy the range in to.
+		</p>
+		<p>Get the range representing the subset of triangles related to the attached geometry, indicating the starting offset and count, or `null` if invalid.</p>
+		<p>Return an object of the form:</p>
+		<code>{ start: Integer, count: Integer }</code>
+	
+		<h3>
+			[method:Integer getGeometryIdAt]( [param:Integer instanceId] )
+		</h3>
+		<p>
+			[page:Integer instanceId]: The id of an instance to get the geometryIndex of.
+		</p>
+		<p>Get the geometryIndex of the defined instance.</p>
 
 		<h3>
 			[method:undefined setColorAt]( [param:Integer instanceId], [param:Color color] )
@@ -208,6 +229,19 @@
 		</p>
 
 		<h3>
+			[method:this setGeometryIdAt]( [param:Integer instanceId], [param:Integer geometryId] )
+		</h3>
+		<p>
+			[page:Integer instanceId]: The id of the instance to set the geometryIndex of.
+		</p>
+		<p>
+			[page:Integer geometryId]: The geometryIndex to be use by the instance.
+		</p>
+		<p>
+			Sets the geometryIndex of the instance at the given index.
+		</p>
+
+		<h3>
 			[method:Integer addGeometry]( [param:BufferGeometry geometry], [param:Integer reservedVertexRange], [param:Integer reservedIndexRange] )
 		</h3>
 		<p>
@@ -226,7 +260,13 @@
 		<p>
 			Adds the given geometry to the [name] and returns the associated geometry id referring to it to be used in other functions.
 		</p>
-
+		<h3>
+			[method:Integer deleteGeometry]( [param:Integer geometryId] )
+		</h3>
+		<p>
+			[page:Integer geometryId]: The id of a geometry to remove from the [name] that was previously added via "addGeometry". Any instances referencing
+			this geometry will also be removed as a side effect.
+		</p>
 		<h3>
 			[method:Integer addInstance]( [param:Integer geometryId] )
 		</h3>
@@ -236,6 +276,15 @@
 		<p>
 			Adds a new instance to the [name] using the geometry of the given geometryId and returns a new id referring to the new instance to be used
 			by other functions.
+		</p>
+		<h3>
+			[method:Integer deleteInstance]( [param:Integer instanceId] )
+		</h3>
+		<p>
+			[page:Integer instanceId]: The id of an instance to remove from the [name] that was previously added via "addInstance".
+		</p>
+		<p>
+			Removes an existing instance from the [name] using the given instanceId.
 		</p>
 
 		<h3>
@@ -250,6 +299,36 @@
 		<p>
 			Replaces the geometry at `geometryId` with the provided geometry. Throws an error if there is not enough space reserved for geometry.
 			Calling this will change all instances that are rendering that geometry.
+		</p>
+
+		<h3>
+			[method:this optimize]()
+		</h3>
+		<p>
+			Repacks the sub geometries in [name] to remove any unused space remaining from previously deleted geometry, freeing up space to add new geometry.
+		</p>
+
+		<h3>
+			[method:this setGeometrySize]( maxVertexCount, maxIndexCount )
+		</h3>
+		<p>
+			Resizes the available space in [name]'s vertex and index buffer attributes to the provided sizes. If the provided arguments shrink the geometry buffers
+			but there is not enough unused space at the end of the geometry attributes then an error is thrown. 
+		</p>
+		<p>
+			[page:Integer maxVertexCount] - the max number of vertices to be used by all unique geometries to resize to.<br />
+			[page:Integer maxIndexCount] - the max number of indices to be used by all unique geometries to resize to.<br />
+		</p>
+
+		<h3>
+			[method:this setInstanceCount]( maxInstanceCount )
+		</h3>
+		<p>
+			Resizes the necessary buffers to support the provided number of instances. If the provided arguments shrink the number of instances but there are not enough
+			unused ids at the end of the list then an error is thrown.
+		</p>
+		<p>
+			[page:Integer maxInstanceCount] - the max number of individual instances that can be added and rendered by the [name].<br />
 		</p>
 
 		<!--

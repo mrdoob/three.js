@@ -24,7 +24,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { Fn, texture, uv, uint, positionWorld, billboarding, timerLocal, hash, timerDelta, vec2, instanceIndex, positionGeometry, storage, If } from 'three/tsl';
+			import { Fn, texture, uv, uint, positionWorld, billboarding, time, hash, deltaTime, vec2, instanceIndex, positionGeometry, storage, If } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
@@ -87,6 +87,7 @@
 				collisionPosRT.texture.type = THREE.HalfFloatType;
 				collisionPosRT.texture.magFilter = THREE.NearestFilter;
 				collisionPosRT.texture.minFilter = THREE.NearestFilter;
+				collisionPosRT.texture.generateMipmaps = false;
 
 				collisionPosMaterial = new THREE.MeshBasicNodeMaterial();
 				collisionPosMaterial.colorNode = positionWorld;
@@ -101,8 +102,6 @@
 				const rippleTimeBuffer = createBuffer();
 
 				// compute
-
-				const timer = timerLocal();
 
 				const randUint = () => uint( Math.random() * 0xFFFFFF );
 
@@ -139,7 +138,7 @@
 
 					position.addAssign( velocity );
 
-					rippleTime.x = rippleTime.x.add( timerDelta().mul( 4 ) );
+					rippleTime.x = rippleTime.x.add( deltaTime.mul( 4 ) );
 
 					//
 
@@ -166,8 +165,8 @@
 
 						// next drops will not fall in the same place
 
-						position.x = hash( instanceIndex.add( timer ) ).mul( 100 ).add( - 50 );
-						position.z = hash( instanceIndex.add( timer.add( randUint() ) ) ).mul( 100 ).add( - 50 );
+						position.x = hash( instanceIndex.add( time ) ).mul( 100 ).add( - 50 );
+						position.z = hash( instanceIndex.add( time.add( randUint() ) ) ).mul( 100 ).add( - 50 );
 
 					} );
 
@@ -292,7 +291,7 @@
 
 				//
 
-				renderer.compute( computeInit );
+				renderer.computeAsync( computeInit );
 
 				//
 

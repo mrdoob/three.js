@@ -20,6 +20,7 @@ import { screenSize } from '../display/ScreenNode.js';
 import { viewportMipTexture } from '../display/ViewportTextureNode.js';
 import { textureBicubic } from '../accessors/TextureBicubic.js';
 import { Loop } from '../utils/LoopNode.js';
+import { BackSide } from '../../constants.js';
 
 //
 // Transmission
@@ -67,14 +68,17 @@ const applyIorToRoughness = /*@__PURE__*/ Fn( ( [ roughness, ior ] ) => {
 	]
 } );
 
-const singleViewportMipTexture = /*@__PURE__*/ viewportMipTexture();
+const viewportBackSideTexture = /*@__PURE__*/ viewportMipTexture();
+const viewportFrontSideTexture = /*@__PURE__*/ viewportMipTexture();
 
-const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ] ) => {
+const getTransmissionSample = /*@__PURE__*/ Fn( ( [ fragCoord, roughness, ior ], { material } ) => {
 
-	const transmissionSample = singleViewportMipTexture.uv( fragCoord );
+	const vTexture = material.side == BackSide ? viewportBackSideTexture : viewportFrontSideTexture;
+
+	const transmissionSample = vTexture.uv( fragCoord );
 	//const transmissionSample = viewportMipTexture( fragCoord );
 
-	const lod = log2( float( screenSize.x ) ).mul( applyIorToRoughness( roughness, ior ) );
+	const lod = log2( screenSize.x ).mul( applyIorToRoughness( roughness, ior ) );
 
 	return textureBicubic( transmissionSample, lod );
 
@@ -233,15 +237,16 @@ const evalIridescence = /*@__PURE__*/ Fn( ( { outsideIOR, eta2, cosTheta1, thinF
 	// Force iridescenceIOR -> outsideIOR when thinFilmThickness -> 0.0
 	const iridescenceIOR = mix( outsideIOR, eta2, smoothstep( 0.0, 0.03, thinFilmThickness ) );
 	// Evaluate the cosTheta on the base layer (Snell law)
-	const sinTheta2Sq = outsideIOR.div( iridescenceIOR ).pow2().mul( float( 1 ).sub( cosTheta1.pow2() ) );
+	const sinTheta2Sq = outsideIOR.div( iridescenceIOR ).pow2().mul( cosTheta1.pow2().oneMinus() );
 
 	// Handle TIR:
-	const cosTheta2Sq = float( 1 ).sub( sinTheta2Sq );
-	/*if ( cosTheta2Sq < 0.0 ) {
+	const cosTheta2Sq = sinTheta2Sq.oneMinus();
 
-			return vec3( 1.0 );
+	If( cosTheta2Sq.lessThan( 0 ), () => {
 
-	}*/
+		return vec3( 1.0 );
+
+	} );
 
 	const cosTheta2 = cosTheta2Sq.sqrt();
 
@@ -274,17 +279,18 @@ const evalIridescence = /*@__PURE__*/ Fn( ( { outsideIOR, eta2, cosTheta1, thinF
 
 	// Reflectance term for m = 0 (DC term amplitude)
 	const C0 = R12.add( Rs );
-	let I = C0;
+	const I = C0.toVar();
 
 	// Reflectance term for m > 0 (pairs of diracs)
-	let Cm = Rs.sub( T121 );
-	for ( let m = 1; m <= 2; ++ m ) {
+	const Cm = Rs.sub( T121 ).toVar();
 
-		Cm = Cm.mul( r123 );
+	Loop( { start: 1, end: 2, condition: '<=', name: 'm' }, ( { m } ) => {
+
+		Cm.mulAssign( r123 );
 		const Sm = evalSensitivity( float( m ).mul( OPD ), float( m ).mul( phi ) ).mul( 2.0 );
-		I = I.add( Cm.mul( Sm ) );
+		I.addAssign( Cm.mul( Sm ) );
 
-	}
+	} );
 
 	// Since out of gamut colors might be produced, negative color values are clamped to 0.
 	return I.max( vec3( 0.0 ) );

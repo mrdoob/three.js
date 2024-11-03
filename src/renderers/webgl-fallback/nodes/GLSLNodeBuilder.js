@@ -56,8 +56,6 @@ class GLSLNodeBuilder extends NodeBuilder {
 		this.transforms = [];
 		this.extensions = {};
 
-		this.instanceBindGroups = false;
-
 		this.useComparisonMethod = true;
 
 	}
@@ -234,7 +232,7 @@ ${ flowData.code }
 
 				this.getVarFromNode( node, propertySizeName, 'uint' );
 
-				this.addLineFlowCode( `${ propertySizeName } = uint( textureSize( ${ textureName }, 0 ).x )` );
+				this.addLineFlowCode( `${ propertySizeName } = uint( textureSize( ${ textureName }, 0 ).x )`, storageArrayElementNode );
 
 				bufferNodeData.propertySizeName = propertySizeName;
 
@@ -264,7 +262,7 @@ ${ flowData.code }
 
 			}
 
-			this.addLineFlowCode( `${ propertyName } = ${prefix}(${ snippet })${channel}` );
+			this.addLineFlowCode( `${ propertyName } = ${prefix}(${ snippet })${channel}`, storageArrayElementNode );
 
 			elementNodeData.propertyName = propertyName;
 
@@ -853,6 +851,8 @@ void main() {
 	buildCode() {
 
 		const shadersData = this.material !== null ? { fragment: {}, vertex: {} } : { compute: {} };
+
+		this.sortBindingGroups();
 
 		for ( const shaderStage in shadersData ) {
 

@@ -236,6 +236,7 @@ function checkIntersection( object, raycaster, ray, thresholdSq, a, b ) {
 		index: a,
 		face: null,
 		faceIndex: null,
+		barycoord: null,
 		object: object
 
 	};

@@ -410,7 +410,6 @@ class LineMaterial extends ShaderMaterial {
 		super( {
 
 			type: 'LineMaterial',
-
 			uniforms: UniformsUtils.clone( ShaderLib[ 'line' ].uniforms ),
 
 			vertexShader: ShaderLib[ 'line' ].vertexShader,

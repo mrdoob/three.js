@@ -362,6 +362,14 @@
 				"LightProbeGenerator": "examples/en/lights/LightProbeGenerator"
 			},
 
+			"Lines": {
+				"Line2": "examples/en/lines/Line2",
+				"LineGeometry": "examples/en/lines/LineGeometry",
+				"LineMaterial": "examples/en/lines/LineMaterial",
+				"LineSegments2": "examples/en/lines/LineSegments2",
+				"LineSegmentsGeometry": "examples/en/lines/LineSegmentsGeometry"
+			},
+
 			"Loaders": {
 				"3DMLoader": "examples/en/loaders/3DMLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
@@ -433,7 +441,7 @@
 				"SceneUtils": "examples/en/utils/SceneUtils",
 				"SkeletonUtils": "examples/en/utils/SkeletonUtils"
 			},
-			
+
 			"WebXR": {
 				"XREstimatedLight": "examples/en/webxr/XREstimatedLight"
 			}
@@ -1367,7 +1375,7 @@
 				"TrackballControls": "examples/ko/controls/TrackballControls",
 				"TransformControls": "examples/ko/controls/TransformControls"
 			},
-			
+
 			"WebXR": {
 				"XREstimatedLight": "examples/ko/webxr/XREstimatedLight"
 			}

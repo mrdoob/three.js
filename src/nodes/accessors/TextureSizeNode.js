@@ -23,9 +23,9 @@ class TextureSizeNode extends Node {
 	generate( builder, output ) {
 
 		const textureProperty = this.textureNode.build( builder, 'property' );
-		const levelNode = this.levelNode.build( builder, 'int' );
+		const level = this.levelNode === null ? '0' : this.levelNode.build( builder, 'int' );
 
-		return builder.format( `${ builder.getMethod( 'textureDimensions' ) }( ${ textureProperty }, ${ levelNode } )`, this.getNodeType( builder ), output );
+		return builder.format( `${ builder.getMethod( 'textureDimensions' ) }( ${ textureProperty }, ${ level } )`, this.getNodeType( builder ), output );
 
 	}
 

@@ -70,6 +70,7 @@ export default class RenderObject {
 
 		this._nodeBuilderState = null;
 		this._bindings = null;
+		this._monitor = null;
 
 		this.onDispose = null;
 
@@ -107,6 +108,12 @@ export default class RenderObject {
 
 	}
 
+	getMonitor() {
+
+		return this._monitor || ( this._monitor = this.getNodeBuilderState().monitor );
+
+	}
+
 	getBindings() {
 
 		return this._bindings || ( this._bindings = this.getNodeBuilderState().createBindings() );
@@ -116,6 +123,12 @@ export default class RenderObject {
 	getIndex() {
 
 		return this._geometries.getIndex( this );
+
+	}
+
+	getIndirect() {
+
+		return this._geometries.getIndirect( this );
 
 	}
 
@@ -202,7 +215,18 @@ export default class RenderObject {
 
 		}
 
-		const itemCount = hasIndex === true ? index.count : geometry.attributes.position.count;
+		const position = geometry.attributes.position;
+		let itemCount = Infinity;
+
+		if ( hasIndex ) {
+
+			itemCount = index.count;
+
+		} else if ( position !== undefined && position !== null ) {
+
+			itemCount = position.count;
+
+		}
 
 		firstVertex = Math.max( firstVertex, 0 );
 		lastVertex = Math.min( lastVertex, itemCount );
@@ -215,6 +239,35 @@ export default class RenderObject {
 		drawParams.firstVertex = firstVertex;
 
 		return drawParams;
+
+	}
+
+	getGeometryCacheKey() {
+
+		const { geometry } = this;
+
+		let cacheKey = '';
+
+		for ( const name of Object.keys( geometry.attributes ).sort() ) {
+
+			const attribute = geometry.attributes[ name ];
+
+			cacheKey += name + ',';
+
+			if ( attribute.data ) cacheKey += attribute.data.stride + ',';
+			if ( attribute.offset ) cacheKey += attribute.offset + ',';
+			if ( attribute.itemSize ) cacheKey += attribute.itemSize + ',';
+			if ( attribute.normalized ) cacheKey += 'n,';
+
+		}
+
+		if ( geometry.index ) {
+
+			cacheKey += 'index,';
+
+		}
+
+		return cacheKey;
 
 	}
 
@@ -272,6 +325,12 @@ export default class RenderObject {
 
 		cacheKey += this.clippingContextCacheKey + ',';
 
+		if ( object.geometry ) {
+
+			cacheKey += this.getGeometryCacheKey();
+
+		}
+
 		if ( object.skeleton ) {
 
 			cacheKey += object.skeleton.bones.length + ',';
@@ -298,17 +357,19 @@ export default class RenderObject {
 
 		if ( object.count > 1 ) {
 
-			cacheKey += object.count + ',' + object.uuid + ',';
+			// TODO: https://github.com/mrdoob/three.js/pull/29066#issuecomment-2269400850
+
+			cacheKey += object.uuid + ',';
 
 		}
 
-		return cacheKey;
+		return hashString( cacheKey );
 
 	}
 
 	get needsUpdate() {
 
-		return this.initialNodesCacheKey !== this.getDynamicCacheKey() || this.clippingNeedsUpdate;
+		return /*this.object.static !== true &&*/ ( this.initialNodesCacheKey !== this.getDynamicCacheKey() || this.clippingNeedsUpdate );
 
 	}
 
@@ -316,13 +377,21 @@ export default class RenderObject {
 
 		// Environment Nodes Cache Key
 
-		return this.object.receiveShadow + ',' + this._nodes.getCacheKey( this.scene, this.lightsNode );
+		let cacheKey = this._nodes.getCacheKey( this.scene, this.lightsNode );
+
+		if ( this.object.receiveShadow ) {
+
+			cacheKey += 1;
+
+		}
+
+		return cacheKey;
 
 	}
 
 	getCacheKey() {
 
-		return this.getMaterialCacheKey() + ',' + this.getDynamicCacheKey();
+		return this.getMaterialCacheKey() + this.getDynamicCacheKey();
 
 	}
 

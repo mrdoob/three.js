@@ -193,6 +193,8 @@ class Backend {
 
 	}
 
+	dispose() { }
+
 }
 
 export default Backend;

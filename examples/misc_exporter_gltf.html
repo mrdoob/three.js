@@ -29,10 +29,11 @@
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import * as TextureUtils from 'three/addons/utils/WebGLTextureUtils.js';
 
 			function exportGLTF( input ) {
 
-				const gltfExporter = new GLTFExporter();
+				const gltfExporter = new GLTFExporter().setTextureUtils( TextureUtils );
 
 				const options = {
 					trs: params.trs,
@@ -368,7 +369,13 @@
 				// ---------------------------------------------------------------------
 				// Ortho camera
 				// ---------------------------------------------------------------------
-				const cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, 0.1, 10 );
+
+				const height = 1000; // frustum height
+				const aspect = window.innerWidth / window.innerHeight;
+
+				const cameraOrtho = new THREE.OrthographicCamera( - height * aspect, height * aspect, height, - height, 0, 2000 );
+				cameraOrtho.position.set( 600, 400, 0 );
+				cameraOrtho.lookAt( 0, 0, 0 );
 				scene1.add( cameraOrtho );
 				cameraOrtho.name = 'OrthographicCamera';
 

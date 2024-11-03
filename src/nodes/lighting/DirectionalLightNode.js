@@ -1,5 +1,5 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
-import { lightTargetDirection } from './LightNode.js';
+import { lightTargetDirection } from '../accessors/Lights.js';
 
 class DirectionalLightNode extends AnalyticLightNode {
 

@@ -86,7 +86,7 @@ class StorageTextureNode extends TextureNode {
 
 		const snippet = builder.generateTextureStore( builder, textureProperty, uvSnippet, storeSnippet );
 
-		builder.addLineFlowCode( snippet );
+		builder.addLineFlowCode( snippet, this );
 
 	}
 

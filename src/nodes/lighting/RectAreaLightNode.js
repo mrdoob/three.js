@@ -1,10 +1,12 @@
 import AnalyticLightNode from './AnalyticLightNode.js';
 import { texture } from '../accessors/TextureNode.js';
 import { uniform } from '../core/UniformNode.js';
-import { objectViewPosition } from '../accessors/Object3DNode.js';
+import { lightViewPosition } from '../accessors/Lights.js';
+import { renderGroup } from '../core/UniformGroupNode.js';
 
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector3 } from '../../math/Vector3.js';
+import { NodeUpdateType } from '../core/constants.js';
 
 const _matrix41 = /*@__PURE__*/ new Matrix4();
 const _matrix42 = /*@__PURE__*/ new Matrix4();
@@ -23,8 +25,10 @@ class RectAreaLightNode extends AnalyticLightNode {
 
 		super( light );
 
-		this.halfHeight = uniform( new Vector3() );
-		this.halfWidth = uniform( new Vector3() );
+		this.halfHeight = uniform( new Vector3() ).setGroup( renderGroup );
+		this.halfWidth = uniform( new Vector3() ).setGroup( renderGroup );
+
+		this.updateType = NodeUpdateType.RENDER;
 
 	}
 
@@ -70,7 +74,7 @@ class RectAreaLightNode extends AnalyticLightNode {
 		const { colorNode, light } = this;
 		const lightingModel = builder.context.lightingModel;
 
-		const lightPosition = objectViewPosition( light );
+		const lightPosition = lightViewPosition( light );
 		const reflectedLight = builder.context.reflectedLight;
 
 		lightingModel.directRectArea( {

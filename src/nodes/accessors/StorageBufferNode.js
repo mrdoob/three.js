@@ -19,6 +19,7 @@ class StorageBufferNode extends BufferNode {
 		this.isStorageBufferNode = true;
 
 		this.access = GPUBufferBindingType.Storage;
+		this.isAtomic = false;
 
 		this.bufferObject = false;
 		this.bufferCount = bufferCount;
@@ -65,7 +66,7 @@ class StorageBufferNode extends BufferNode {
 
 	getInputType( /*builder*/ ) {
 
-		return 'storageBuffer';
+		return this.value.isIndirectStorageBufferAttribute ? 'indirectStorageBuffer' : 'storageBuffer';
 
 	}
 
@@ -97,15 +98,21 @@ class StorageBufferNode extends BufferNode {
 
 	}
 
-	generate( builder ) {
+	setAtomic( value ) {
 
-		if ( builder.isAvailable( 'storageBuffer' ) ) {
+		this.isAtomic = value;
 
-			return super.generate( builder );
+		return this;
 
-		}
+	}
 
-		const nodeType = this.getNodeType( builder );
+	toAtomic() {
+
+		return this.setAtomic( true );
+
+	}
+
+	getAttributeData() {
 
 		if ( this._attribute === null ) {
 
@@ -114,10 +121,40 @@ class StorageBufferNode extends BufferNode {
 
 		}
 
+		return {
+			attribute: this._attribute,
+			varying: this._varying
+		};
 
-		const output = this._varying.build( builder, nodeType );
+	}
 
-		builder.registerTransform( output, this._attribute );
+	getNodeType( builder ) {
+
+		if ( builder.isAvailable( 'storageBuffer' ) || builder.isAvailable( 'indirectStorageBuffer' ) ) {
+
+			return super.getNodeType( builder );
+
+		}
+
+		const { attribute } = this.getAttributeData();
+
+		return attribute.getNodeType( builder );
+
+	}
+
+	generate( builder ) {
+
+		if ( builder.isAvailable( 'storageBuffer' ) || builder.isAvailable( 'indirectStorageBuffer' ) ) {
+
+			return super.generate( builder );
+
+		}
+
+		const { attribute, varying } = this.getAttributeData();
+
+		const output = varying.build( builder );
+
+		builder.registerTransform( output, attribute );
 
 		return output;
 

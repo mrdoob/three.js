@@ -20,7 +20,7 @@ class InstancedPointsGeometry extends InstancedBufferGeometry {
 		this.type = 'InstancedPointsGeometry';
 
 		const positions = [ - 1, 1, 0, 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ];
-		const uvs = [ - 1, 1, 1, 1, - 1, - 1, 1, - 1 ];
+		const uvs = [ 0, 1, 1, 1, 0, 0, 1, 0 ];
 		const index = [ 0, 2, 1, 2, 3, 1 ];
 
 		this.setIndex( index );
@@ -77,6 +77,8 @@ class InstancedPointsGeometry extends InstancedBufferGeometry {
 
 		this.computeBoundingBox();
 		this.computeBoundingSphere();
+
+		this.instanceCount = points.length / 3;
 
 		return this;
 

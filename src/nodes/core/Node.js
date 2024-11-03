@@ -361,6 +361,10 @@ class Node extends EventDispatcher {
 
 					nodeData.snippet = result;
 
+				} else if ( nodeData.flowCodes !== undefined && builder.context.nodeBlock !== undefined ) {
+
+					builder.addFlowCodeHierarchy( this, builder.context.nodeBlock );
+
 				}
 
 				result = builder.format( result, type, output );
@@ -374,6 +378,7 @@ class Node extends EventDispatcher {
 		}
 
 		builder.removeChain( this );
+		builder.addSequentialNode( this );
 
 		return result;
 

@@ -27,7 +27,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { float, mx_noise_float, Loop, color, positionLocal, sin, vec2, vec3, mul, timerLocal, uniform, Fn, transformNormalToView } from 'three/tsl';
+			import { float, mx_noise_float, Loop, color, positionLocal, sin, vec2, vec3, mul, time, uniform, Fn, transformNormalToView } from 'three/tsl';
 
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
@@ -69,8 +69,6 @@
 				// TSL functions
 
 				const wavesElevation = Fn( ( [ position ] ) => {
-
-					const time = timerLocal();
 
 					// large waves
 

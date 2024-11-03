@@ -10,9 +10,9 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			[page:Layers] 对象为 [page:Object3D] 分配 1个到 32 个图层。32个图层从 0 到 31 编号标记。
-			在内部实现上，每个图层对象被存储为一个 [link:https://en.wikipedia.org/wiki/Mask_(computing) bit mask]，
-			默认的，所有 [page:Object3D] 对象都存储在第 0 个图层上。<br /><br />
+			[page:Layers] 对象将 [page:Object3D] 分配给编号为0到31的32个层中的1个或多个，
+			这些层在内部存储为 [link:https://en.wikipedia.org/wiki/Mask_(computing) 位掩码] ，
+			默认情况下，所有 [page:Object3D] 都是层0的成员。<br /><br />
 
 			图层对象可以用于控制对象的显示。当 [page:Camera camera] 的内容被渲染时与其共享图层相同的物体会被显示。每个对象都需要与一个
 			[page:Camera camera] 共享图层。<br /><br />

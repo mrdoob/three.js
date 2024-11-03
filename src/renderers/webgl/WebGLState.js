@@ -2,7 +2,19 @@ import { NotEqualDepth, GreaterDepth, GreaterEqualDepth, EqualDepth, LessEqualDe
 import { Color } from '../../math/Color.js';
 import { Vector4 } from '../../math/Vector4.js';
 
-function WebGLState( gl ) {
+const reversedFuncs = {
+	[ NeverDepth ]: AlwaysDepth,
+	[ LessDepth ]: GreaterDepth,
+	[ EqualDepth ]: NotEqualDepth,
+	[ LessEqualDepth ]: GreaterEqualDepth,
+
+	[ AlwaysDepth ]: NeverDepth,
+	[ GreaterDepth ]: LessDepth,
+	[ NotEqualDepth ]: EqualDepth,
+	[ GreaterEqualDepth ]: LessEqualDepth,
+};
+
+function WebGLState( gl, extensions ) {
 
 	function ColorBuffer() {
 
@@ -66,12 +78,45 @@ function WebGLState( gl ) {
 	function DepthBuffer() {
 
 		let locked = false;
+		let reversed = false;
 
 		let currentDepthMask = null;
 		let currentDepthFunc = null;
 		let currentDepthClear = null;
 
 		return {
+
+			setReversed: function ( value ) {
+
+				if ( reversed !== value ) {
+
+					const ext = extensions.get( 'EXT_clip_control' );
+
+					if ( reversed ) {
+
+						ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.ZERO_TO_ONE_EXT );
+
+					} else {
+
+						ext.clipControlEXT( ext.LOWER_LEFT_EXT, ext.NEGATIVE_ONE_TO_ONE_EXT );
+
+					}
+
+					const oldDepth = currentDepthClear;
+					currentDepthClear = null;
+					this.setClear( oldDepth );
+
+				}
+
+				reversed = value;
+
+			},
+
+			getReversed: function () {
+
+				return reversed;
+
+			},
 
 			setTest: function ( depthTest ) {
 
@@ -99,6 +144,8 @@ function WebGLState( gl ) {
 			},
 
 			setFunc: function ( depthFunc ) {
+
+				if ( reversed ) depthFunc = reversedFuncs[ depthFunc ];
 
 				if ( currentDepthFunc !== depthFunc ) {
 
@@ -166,6 +213,12 @@ function WebGLState( gl ) {
 
 				if ( currentDepthClear !== depth ) {
 
+					if ( reversed ) {
+
+						depth = 1 - depth;
+
+					}
+
 					gl.clearDepth( depth );
 					currentDepthClear = depth;
 
@@ -180,6 +233,7 @@ function WebGLState( gl ) {
 				currentDepthMask = null;
 				currentDepthFunc = null;
 				currentDepthClear = null;
+				reversed = false;
 
 			}
 
@@ -1150,6 +1204,9 @@ function WebGLState( gl ) {
 
 		gl.depthMask( true );
 		gl.depthFunc( gl.LESS );
+
+		depthBuffer.setReversed( false );
+
 		gl.clearDepth( 1 );
 
 		gl.stencilMask( 0xffffffff );

@@ -35,6 +35,7 @@ class BufferGeometry extends EventDispatcher {
 		this.type = 'BufferGeometry';
 
 		this.index = null;
+		this.indirect = null;
 		this.attributes = {};
 
 		this.morphAttributes = {};
@@ -70,6 +71,20 @@ class BufferGeometry extends EventDispatcher {
 		}
 
 		return this;
+
+	}
+
+	setIndirect( indirect ) {
+
+		this.indirect = indirect;
+
+		return this;
+
+	}
+
+	getIndirect() {
+
+		return this.indirect;
 
 	}
 
@@ -272,16 +287,39 @@ class BufferGeometry extends EventDispatcher {
 
 	setFromPoints( points ) {
 
-		const position = [];
+		const positionAttribute = this.getAttribute( 'position' );
 
-		for ( let i = 0, l = points.length; i < l; i ++ ) {
+		if ( positionAttribute === undefined ) {
 
-			const point = points[ i ];
-			position.push( point.x, point.y, point.z || 0 );
+			const position = [];
+
+			for ( let i = 0, l = points.length; i < l; i ++ ) {
+
+				const point = points[ i ];
+				position.push( point.x, point.y, point.z || 0 );
+
+			}
+
+			this.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
+
+		} else {
+
+			for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
+
+				const point = points[ i ];
+				positionAttribute.setXYZ( i, point.x, point.y, point.z || 0 );
+
+			}
+
+			if ( points.length > positionAttribute.count ) {
+
+				console.warn( 'THREE.BufferGeometry: Buffer size too small for points data. Use .dispose() and create a new geometry.' );
+
+			}
+
+			positionAttribute.needsUpdate = true;
 
 		}
-
-		this.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 
 		return this;
 

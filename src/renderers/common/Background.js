@@ -1,6 +1,6 @@
 import DataMap from './DataMap.js';
 import Color4 from './Color4.js';
-import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, modelViewProjection } from '../../nodes/TSL.js';
+import { vec4, context, normalWorld, backgroundBlurriness, backgroundIntensity, backgroundRotation, modelViewProjection } from '../../nodes/TSL.js';
 import NodeMaterial from '../../materials/nodes/NodeMaterial.js';
 
 import { Mesh } from '../../objects/Mesh.js';
@@ -56,7 +56,7 @@ class Background extends DataMap {
 
 				const backgroundMeshNode = context( vec4( backgroundNode ).mul( backgroundIntensity ), {
 					// @TODO: Add Texture2D support using node context
-					getUV: () => normalWorld,
+					getUV: () => backgroundRotation.mul( normalWorld ),
 					getTextureLevel: () => backgroundBlurriness
 				} );
 
@@ -111,14 +111,24 @@ class Background extends DataMap {
 
 		if ( renderer.autoClear === true || forceClear === true ) {
 
-			_clearColor.multiplyScalar( _clearColor.a );
-
 			const clearColorValue = renderContext.clearColorValue;
 
 			clearColorValue.r = _clearColor.r;
 			clearColorValue.g = _clearColor.g;
 			clearColorValue.b = _clearColor.b;
 			clearColorValue.a = _clearColor.a;
+
+			// premultiply alpha
+
+			if ( renderer.backend.isWebGLBackend === true || renderer.alpha === true ) {
+
+				clearColorValue.r *= clearColorValue.a;
+				clearColorValue.g *= clearColorValue.a;
+				clearColorValue.b *= clearColorValue.a;
+
+			}
+
+			//
 
 			renderContext.depthClearValue = renderer._clearDepth;
 			renderContext.stencilClearValue = renderer._clearStencil;

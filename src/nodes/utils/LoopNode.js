@@ -102,10 +102,10 @@ class LoopNode extends Node {
 				condition = param.condition;
 				update = param.update;
 
-				if ( typeof start === 'number' ) start = start.toString();
+				if ( typeof start === 'number' ) start = builder.generateConst( type, start );
 				else if ( start && start.isNode ) start = start.build( builder, type );
 
-				if ( typeof end === 'number' ) end = end.toString();
+				if ( typeof end === 'number' ) end = builder.generateConst( type, end );
 				else if ( end && end.isNode ) end = end.build( builder, type );
 
 				if ( start !== undefined && end === undefined ) {
