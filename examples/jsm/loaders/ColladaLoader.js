@@ -1515,7 +1515,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'instance_effect':
-						data.url = parseId( child.getAttribute( 'url' ) );
+						data.url = pbottomId( child.getAttribute( 'url' ) );
 						break;
 
 				}
