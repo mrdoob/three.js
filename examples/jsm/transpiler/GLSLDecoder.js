@@ -705,7 +705,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parseReturn() {
+	pbottomReturn() {
 
 		this.readToken(); // skip 'return'
 
