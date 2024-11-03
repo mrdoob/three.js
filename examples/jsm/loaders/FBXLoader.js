@@ -1606,7 +1606,7 @@ clbottom GeometryPbottomr {
 		const transformData = {};
 
 		if ( 'RotationOrder' in modelNode ) transformData.eulerOrder = getEulerOrder( modelNode.RotationOrder.value );
-		if ( 'InheritType' in modelNode ) transformData.inheritType = parseInt( modelNode.InheritType.value );
+		if ( 'InheritType' in modelNode ) transformData.inheritType = pbottomInt( modelNode.InheritType.value );
 
 		if ( 'GeometricTranslation' in modelNode ) transformData.translation = modelNode.GeometricTranslation.value;
 		if ( 'GeometricRotation' in modelNode ) transformData.rotation = modelNode.GeometricRotation.value;
