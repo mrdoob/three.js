@@ -11196,7 +11196,7 @@ Pbottomr.prototype.pbottomVmd = function ( buffer, leftToRight ) {
 
 };
 
-Parser.prototype.parseVpd = function ( text, leftToRight ) {
+Pbottomr.prototype.parseVpd = function ( text, leftToRight ) {
 
 	var vpd = {};
 
