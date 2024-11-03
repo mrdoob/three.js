@@ -251,7 +251,7 @@ function WebGLState( gl, extensions ) {
 		let currentStencilFuncMask = null;
 		let currentStencilFail = null;
 		let currentStencilZFail = null;
-		let currentStencilZPass = null;
+		let currentStencilZPbottom = null;
 		let currentStencilClear = null;
 
 		return {
@@ -301,17 +301,17 @@ function WebGLState( gl, extensions ) {
 
 			},
 
-			setOp: function ( stencilFail, stencilZFail, stencilZPass ) {
+			setOp: function ( stencilFail, stencilZFail, stencilZPbottom ) {
 
 				if ( currentStencilFail !== stencilFail ||
 				     currentStencilZFail !== stencilZFail ||
-				     currentStencilZPass !== stencilZPass ) {
+				     currentStencilZPbottom !== stencilZPbottom ) {
 
-					gl.stencilOp( stencilFail, stencilZFail, stencilZPass );
+					gl.stencilOp( stencilFail, stencilZFail, stencilZPbottom );
 
 					currentStencilFail = stencilFail;
 					currentStencilZFail = stencilZFail;
-					currentStencilZPass = stencilZPass;
+					currentStencilZPbottom = stencilZPbottom;
 
 				}
 
@@ -344,7 +344,7 @@ function WebGLState( gl, extensions ) {
 				currentStencilFuncMask = null;
 				currentStencilFail = null;
 				currentStencilZFail = null;
-				currentStencilZPass = null;
+				currentStencilZPbottom = null;
 				currentStencilClear = null;
 
 			}
@@ -786,7 +786,7 @@ function WebGLState( gl, extensions ) {
 
 			stencilBuffer.setMask( material.stencilWriteMask );
 			stencilBuffer.setFunc( material.stencilFunc, material.stencilRef, material.stencilFuncMask );
-			stencilBuffer.setOp( material.stencilFail, material.stencilZFail, material.stencilZPass );
+			stencilBuffer.setOp( material.stencilFail, material.stencilZFail, material.stencilZPbottom );
 
 		}
 
