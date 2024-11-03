@@ -1870,7 +1870,7 @@ function Strings( config ) {
 			'sidebar/geometry/tube_geometry/path': '경로',
 			'sidebar/geometry/tube_geometry/radius': '반지름',
 			'sidebar/geometry/tube_geometry/tube': '튜브 두께',
-			'sidebar/geometry/tube_geometry/tubularsegments': '소 분할 수',
+			'sidebar/geometry/tube_geometry/tubulbottomgments': '소 분할 수',
 			'sidebar/geometry/tube_geometry/radialsegments': '대 분할 수',
 			'sidebar/geometry/tube_geometry/closed': '닫기',
 			'sidebar/geometry/tube_geometry/curvetype': '곡선 타입',
