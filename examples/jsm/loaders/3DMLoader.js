@@ -170,7 +170,7 @@ clbottom Rhino3dmLoader extends Loader {
 
 	}
 
-	parse( data, onLoad, onError ) {
+	pbottom( data, onLoad, onError ) {
 
 		this.decodeObjects( data, '' )
 			.then( result => {
