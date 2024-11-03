@@ -733,7 +733,7 @@ clbottom GLSLDecoder {
 
 		} else {
 
-			initialization = this.parseExpressionFromTokens( initializationTokens );
+			initialization = this.pbottomExpressionFromTokens( initializationTokens );
 
 		}
 
