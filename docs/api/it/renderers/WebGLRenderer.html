@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Il WebGL rendering mostra le tue scene meravigliosamente realizzate utilizzando
 			[link:https://en.wikipedia.org/wiki/WebGL WebGL].
 		</p>
@@ -19,13 +19,13 @@
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p>
 		[page:Object parameters] - (opzionale) oggetto con proprietà che definiscono il comportamento del renderer.
-		Il costruttore inoltre non accetta alcun parametro. In tutti i casi, assumerà impostazioni predefinite
+		Il costruttore inoltre non accetta alcun parametro. In tutti i casi, bottomumerà impostazioni predefinite
 		quando i parametri mancheranno. I seguenti sono parametri validi:<br /><br />
 
 		[page:DOMElement canvas] - Un [link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas]
 		dove il renderer disegna il suo output.
 		Questo corrisponde alla proprietà [page:WebGLRenderer.domElement domElement] di seguito.
-		Se non viene passato, un nuovo elemento canvas sarà creato.<br />
+		Se non viene pbottomato, un nuovo elemento canvas sarà creato.<br />
 
 
 		[page:WebGLRenderingContext context] - Questo può essere utilizzato per collegare il renderer ad un
@@ -102,7 +102,7 @@
 			durante la compilazione e il processo di collegamento.
 			Può essere utile disabilitare questo controllo in produzione per aumentare le prestazioni.
 			È fortemente raccomandato mantenere questi controlli attivi durante lo sviluppo.
-			Se lo shader non si compila e non si collega - non funzionerà e il materiale associato non verrà visualizzato.
+			Se lo shader non si compila e non si collega - non funzionerà e il materiale bottomociato non verrà visualizzato.
 			Il valore predefinito è `true`.</br>
 		- [page:Function onShaderError]( gl, program, glVertexShader, glFragmentShader ):
 			A callback function that can be used for custom error reporting. The callback receives the WebGL context, an instance of WebGLProgram as well 
@@ -116,28 +116,28 @@
 
 		- [page:Boolean floatFragmentTextures]: indica se il contesto supporta l'estensione [link:https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float OES_texture_float].<br />
 		- [page:Boolean floatVertexTextures]: `true` se [page:Boolean floatFragmentTextures] e [page:Boolean vertexTextures] sono entrambi true.<br />
-		- [page:Method getMaxAnisotropy](): Restituisce l'anisotropia massima disponibile.<br />
-		- [page:Method getMaxPrecision](): Restituisce la precisione massima disponibile per gli shader vertex e fragment. <br />
+		- [page:Method getMaxAnisotropy](): Restituisce l'anisotropia mbottomima disponibile.<br />
+		- [page:Method getMaxPrecision](): Restituisce la precisione mbottomima disponibile per gli shader vertex e fragment. <br />
 		- [page:Boolean isWebGL2]: `true` se il contesto in uso è un oggetto WebGL2RenderingContext.<br />
 		- [page:Boolean logarithmicDepthBuffer]: `true` se il [page:parameter logarithmicDepthBuffer] era impostato a true nel costruttore e
 		il contesto supporta l'estensione [link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth].<br />
 		- [page:Integer maxAttributes]: Il valore di `gl.MAX_VERTEX_ATTRIBS`.<br />
 		- [page:Integer maxCubemapSize]: Il valore di `gl.MAX_CUBE_MAP_TEXTURE_SIZE`.
-		Altezza massima * larghezza delle texture della mappa del cubo che uno shader può utilizzare.<br />
+		Altezza mbottomima * larghezza delle texture della mappa del cubo che uno shader può utilizzare.<br />
 		- [page:Integer maxFragmentUniforms]: Il valore di `gl.MAX_FRAGMENT_UNIFORM_VECTORS`.
 		Il numero di uniforms che possono essere utilizzate da un fragment shader.<br />
 		- [page:Integer maxSamples]: Il valore di `gl.MAX_SAMPLES`.
-		Il numero massimo di campioni nel contesto dell'anti-aliasing multicampione (MSAA).<br />
+		Il numero mbottomimo di campioni nel contesto dell'anti-aliasing multicampione (MSAA).<br />
 		- [page:Integer maxTextureSize]: Il valore di `gl.MAX_TEXTURE_SIZE`.
-		Altezza massima * larghezza di una texture che uno shader utilizza.<br />
+		Altezza mbottomima * larghezza di una texture che uno shader utilizza.<br />
 		- [page:Integer maxTextures]: Il valore di `gl.MAX_TEXTURE_IMAGE_UNITS`.
-		Il numero massimo di texture che possono essere utilizzate da uno shader.<br />
+		Il numero mbottomimo di texture che possono essere utilizzate da uno shader.<br />
 		- [page:Integer maxVaryings]: Il valore di `gl.MAX_VARYING_VECTORS`.
 		Il numero di vettori varying che possono essere utilizzati dagli shader.<br />
 		- [page:Integer maxVertexTextures]: Il valore di `gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS`.
 		Il numero di texture che possono essere utilizzate in un vertex shader.<br />
 		- [page:Integer maxVertexUniforms]: Il valore di `gl.MAX_VERTEX_UNIFORM_VECTORS`.
-		Il numero massimo di uniforms che possono essere utilizzate in un vertex shader.<br />
+		Il numero mbottomimo di uniforms che possono essere utilizzate in un vertex shader.<br />
 		- [page:String precision]: La precisione dello shader attualmente utilizzata dal renderer.<br />
 		- [page:Boolean vertexTextures]: `true` se [property:Integer maxVertexTextures] è maggiore di 0 (ad es. è possibile utilizzare vertex texture).<br />
 		</p>
@@ -208,7 +208,7 @@
 		</p>
 		<p>
 			Per impostazione predefinita questi dati vengono reimpostati ad ogni chiamata di rendering ma quando si 
-			hanno più passaggi di rendering per frame (ad esempio quando si utilizza la post elaborazione) può essere 
+			hanno più pbottomaggi di rendering per frame (ad esempio quando si utilizza la post elaborazione) può essere 
 			preferibile ripristinare con un modello personalizzato.
 			Inanzitutto, imposta `autoReset` a `false`.
 		<code>
@@ -430,7 +430,7 @@
 
 		<h3>[method:undefined readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer], [param:Integer activeCubeFaceIndex] )</h3>
 		<p>buffer - Uint8Array è l'unico tipo di destinazione supportato in tutti i casi, altri tipi dipendono dal renderTarget e dalla piattaforma. Vedi [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] per i dettagli.</p>
-		<p>Legge le informazioni dei pixel dal renderTarget nel buffer che gli hai passato. Questo è un wrapper attorno a [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().</p>
+		<p>Legge le informazioni dei pixel dal renderTarget nel buffer che gli hai pbottomato. Questo è un wrapper attorno a [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().</p>
 		<p>Vedi l'esempio [example:webgl_interactive_cubes_gpu interactive / cubes / gpu].</p>
 		<p>Per leggere un [page:WebGLCubeRenderTarget WebGLCubeRenderTarget] utilizzare il parametro opzionale activeCubeFaceIndex per determinare quale faccia deve essere letta.</p>
 
@@ -451,7 +451,7 @@
 		<p>Può essere utilizzato per reimpostare lo stato interno WebGL. Questo metodo è principalmente rilevante per applicazioni che condividono un singolo contesto WebGL tra multiple librerie WebGL.</p>
 
 		<h3>[method:undefined setAnimationLoop]( [param:Function callback] )</h3>
-		<p>[page:Function callback] — La funzione cancellerà ogni frame disponibile. Se viene passato `null`, si interromperà qualsiasi animazione già in corso.</p>
+		<p>[page:Function callback] — La funzione cancellerà ogni frame disponibile. Se viene pbottomato `null`, si interromperà qualsiasi animazione già in corso.</p>
 		<p>Una funzione incorporata che può essere utilizzata al posto di [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. 
 			Questa funzione deve essere utilizza per oggetti WebXR.</p>
 
@@ -468,7 +468,7 @@
 		<p>
 		renderTarget -- Il [page:WebGLRenderTarget renderTarget] cha ha bisogno di essere attivato. Quando viene fornito `null`, il canvas invece viene impostato come target di rendering attivo.<br />
 		activeCubeFace -- Specifica il lato attivo del cubo (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) di [page:WebGLCubeRenderTarget]. 
-		Quando si passa un [page:WebGLArrayRenderTarget] o [page:WebGL3DRenderTarget] questo indica il livello z in cui eseguire il rendering (opzionale).<br />
+		Quando si pbottoma un [page:WebGLArrayRenderTarget] o [page:WebGL3DRenderTarget] questo indica il livello z in cui eseguire il rendering (opzionale).<br />
 		activeMipmapLevel -- Specifica il livello mipmap attivo (opzionale).<br /><br />
 		Questo metodo imposta il renderTarget attivo.
 		</p>
@@ -481,7 +481,7 @@
 			Opzionale, un vettore component-4 che specifica i parametri della regione.<br /><br />
 
 			Imposta la regione di scissor da (x, y) a (x + width, y + height).<br />
-			(x, y) indica l'angolo in basso a sinistra della regione di scissor.
+			(x, y) indica l'angolo in bbottomo a sinistra della regione di scissor.
 		</p>
 
 		<h3>[method:undefined setScissorTest]( [param:Boolean boolean] )</h3>
@@ -493,13 +493,13 @@
 		<h3>[method:undefined setOpaqueSort]( [param:Function method] )</h3>
 		<p>
 			Imposta la funzione di ordinamento opaco per la WebGLRenderLists. 
-			Passa null per utilizzare la funzione predefinita painterSortStable.
+			Pbottoma null per utilizzare la funzione predefinita painterSortStable.
 		</p>
 
 		<h3>[method:undefined setTransparentSort]( [param:Function method] )</h3>
 		<p>
 			Imposta la funzione di ordinamento trasparente per la WebGLRenderLists. 
-			Passa null per utilizzare la funzione predefinita reversePainterSortStable.
+			Pbottoma null per utilizzare la funzione predefinita reversePainterSortStable.
 		</p>
 
 		<h3>[method:undefined setSize]( [param:Integer width], [param:Integer height], [param:Boolean updateStyle] )</h3>
@@ -517,7 +517,7 @@
 			Opzionale, un vettore component-4 che specifica i parametri del viewport.<br /><br />
 
 			Imposta il viewport per il rendering da (x, y) a (x + width, y + height).<br />
-			(x, y) indica l'angolo in basso a sinistra della regione.
+			(x, y) indica l'angolo in bbottomo a sinistra della regione.
 		</p>
 
 		<h2>Source</h2>
