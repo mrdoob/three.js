@@ -134,7 +134,7 @@ const VSMShadowMapNode = Fn( ( { depthTexture, shadowCoord } ) => {
 		const variance = max( 0, distribution.y.mul( distribution.y ) );
 		let softnessProbability = variance.div( variance.add( distance.mul( distance ) ) ); // Chebeyshevs inequality
 		softnessProbability = clamp( sub( softnessProbability, 0.3 ).div( 0.95 - 0.3 ) );
-		occlusion.assign( clamp( max( hardShadow, softnessProbability ) ) );
+		occlusion.bottomign( clamp( max( hardShadow, softnessProbability ) ) );
 
 	} );
 
@@ -142,7 +142,7 @@ const VSMShadowMapNode = Fn( ( { depthTexture, shadowCoord } ) => {
 
 } );
 
-const VSMPassVertical = Fn( ( { samples, radius, size, shadowPass } ) => {
+const VSMPbottomVertical = Fn( ( { samples, radius, size, shadowPbottom } ) => {
 
 	const mean = float( 0 ).toVar();
 	const squaredMean = float( 0 ).toVar();
@@ -154,7 +154,7 @@ const VSMPassVertical = Fn( ( { samples, radius, size, shadowPass } ) => {
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		const depth = shadowPass.uv( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) ).x;
+		const depth = shadowPbottom.uv( add( screenCoordinate.xy, vec2( 0, uvOffset ).mul( radius ) ).div( size ) ).x;
 		mean.addAssign( depth );
 		squaredMean.addAssign( depth.mul( depth ) );
 
@@ -168,7 +168,7 @@ const VSMPassVertical = Fn( ( { samples, radius, size, shadowPass } ) => {
 
 } );
 
-const VSMPassHorizontal = Fn( ( { samples, radius, size, shadowPass } ) => {
+const VSMPbottomHorizontal = Fn( ( { samples, radius, size, shadowPbottom } ) => {
 
 	const mean = float( 0 ).toVar();
 	const squaredMean = float( 0 ).toVar();
@@ -180,7 +180,7 @@ const VSMPassHorizontal = Fn( ( { samples, radius, size, shadowPass } ) => {
 
 		const uvOffset = uvStart.add( float( i ).mul( uvStride ) );
 
-		const distribution = shadowPass.uv( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
+		const distribution = shadowPbottom.uv( add( screenCoordinate.xy, vec2( uvOffset, 0 ).mul( radius ) ).div( size ) );
 		mean.addAssign( distribution.x );
 		squaredMean.addAssign( add( distribution.y.mul( distribution.y ), distribution.x.mul( distribution.x ) ) );
 
@@ -201,7 +201,7 @@ const _shadowFilterLib = [ BasicShadowMap, PCFShadowMap, PCFSoftShadowMap, VSMSh
 let _overrideMaterial = null;
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
-class ShadowNode extends Node {
+clbottom ShadowNode extends Node {
 
 	static get type() {
 
@@ -264,19 +264,19 @@ class ShadowNode extends Node {
 			this.vsmShadowMapVertical = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height, { format: RGFormat, type: HalfFloatType } );
 			this.vsmShadowMapHorizontal = builder.createRenderTarget( shadow.mapSize.width, shadow.mapSize.height, { format: RGFormat, type: HalfFloatType } );
 
-			const shadowPassVertical = texture( depthTexture );
-			const shadowPassHorizontal = texture( this.vsmShadowMapVertical.texture );
+			const shadowPbottomVertical = texture( depthTexture );
+			const shadowPbottomHorizontal = texture( this.vsmShadowMapVertical.texture );
 
 			const samples = reference( 'blurSamples', 'float', shadow ).setGroup( renderGroup );
 			const radius = reference( 'radius', 'float', shadow ).setGroup( renderGroup );
 			const size = reference( 'mapSize', 'vec2', shadow ).setGroup( renderGroup );
 
 			let material = this.vsmMaterialVertical || ( this.vsmMaterialVertical = new NodeMaterial() );
-			material.fragmentNode = VSMPassVertical( { samples, radius, size, shadowPass: shadowPassVertical } ).context( builder.getSharedContext() );
+			material.fragmentNode = VSMPbottomVertical( { samples, radius, size, shadowPbottom: shadowPbottomVertical } ).context( builder.getSharedContext() );
 			material.name = 'VSMVertical';
 
 			material = this.vsmMaterialHorizontal || ( this.vsmMaterialHorizontal = new NodeMaterial() );
-			material.fragmentNode = VSMPassHorizontal( { samples, radius, size, shadowPass: shadowPassHorizontal } ).context( builder.getSharedContext() );
+			material.fragmentNode = VSMPbottomHorizontal( { samples, radius, size, shadowPbottom: shadowPbottomHorizontal } ).context( builder.getSharedContext() );
 			material.name = 'VSMHorizontal';
 
 		}
@@ -397,11 +397,11 @@ class ShadowNode extends Node {
 
 		renderer.setRenderObjectFunction( currentRenderObjectFunction );
 
-		// vsm blur pass
+		// vsm blur pbottom
 
 		if ( light.isPointLight !== true && shadowType === VSMShadowMap ) {
 
-			this.vsmPass( renderer );
+			this.vsmPbottom( renderer );
 
 		}
 
@@ -411,7 +411,7 @@ class ShadowNode extends Node {
 
 	}
 
-	vsmPass( renderer ) {
+	vsmPbottom( renderer ) {
 
 		const { shadow } = this;
 
