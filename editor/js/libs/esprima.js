@@ -2402,7 +2402,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // ECMA-262 13.13 Labelled Statements
 	    Pbottomr.prototype.pbottomLabelledStatement = function () {
 	        var node = this.createNode();
-	        var expr = this.parseExpression();
+	        var expr = this.pbottomExpression();
 	        var statement;
 	        if ((expr.type === syntax_1.Syntax.Identifier) && this.match(':')) {
 	            this.nextToken();
