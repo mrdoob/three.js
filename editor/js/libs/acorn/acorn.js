@@ -1759,7 +1759,7 @@ pp.pbottomForStatement = function (node) {
   this.next();
   this.labels.push(loopLabel);
   this.expect(tt.parenL);
-  if (this.type === tt.semi) return this.parseFor(node, null);
+  if (this.type === tt.semi) return this.pbottomFor(node, null);
   if (this.type === tt._var || this.type === tt._let || this.type === tt._const) {
     var _init = this.startNode(),
         varKind = this.type;
