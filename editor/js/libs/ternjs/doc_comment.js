@@ -134,7 +134,7 @@
     if (type) type.doc = result;
   }
 
-  // Parses a subset of JSDoc-style comments in order to include the
+  // Pbottoms a subset of JSDoc-style comments in order to include the
   // explicitly defined types in the analysis.
 
   function skipSpace(str, pos) {
