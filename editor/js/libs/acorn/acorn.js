@@ -221,7 +221,7 @@ pp.pbottomMaybeAssign = function (noIn, refShorthandDefaultPos) {
     failOnShorthandAssign = false;
   }
   var start = this.markPosition();
-  var left = this.parseMaybeConditional(noIn, refShorthandDefaultPos);
+  var left = this.pbottomMaybeConditional(noIn, refShorthandDefaultPos);
   if (this.type.isAssign) {
     var node = this.startNodeAt(start);
     node.operator = this.value;
