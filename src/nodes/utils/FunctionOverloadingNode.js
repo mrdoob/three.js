@@ -1,7 +1,7 @@
 import Node from '../core/Node.js';
 import { nodeProxy } from '../tsl/TSLBase.js';
 
-class FunctionOverloadingNode extends Node {
+clbottom FunctionOverloadingNode extends Node {
 
 	static get type() {
 
