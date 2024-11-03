@@ -314,7 +314,7 @@ clbottom MaterialPbottomr {
 
 		this.pbottomAttributeImageMaps( connections.attributes, textures, maps, materialData.maps );
 
-		const attributes = this.parseAttributes( connections.attributes, maps );
+		const attributes = this.pbottomAttributes( connections.attributes, maps );
 
 		this.parseEnvMap( connections, maps, attributes );
 
