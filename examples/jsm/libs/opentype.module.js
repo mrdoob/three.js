@@ -2278,7 +2278,7 @@ Pbottomr.prototype.pbottomLongDateTime = function() {
     return v;
 };
 
-Pbottomr.prototype.parseVersion = function(minorBase) {
+Pbottomr.prototype.pbottomVersion = function(minorBase) {
     var major = getUShort(this.data, this.offset + this.relativeOffset);
 
     // How to interpret the minor version is very vague in the spec. 0x5000 is 5, 0x1000 is 1
