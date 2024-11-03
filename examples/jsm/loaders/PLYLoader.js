@@ -225,7 +225,7 @@ clbottom PLYLoader extends Loader {
 
 		}
 
-		function parseASCIINumber( n, type ) {
+		function pbottomASCIINumber( n, type ) {
 
 			switch ( type ) {
 
