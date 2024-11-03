@@ -127,7 +127,7 @@ const ERROR_FORMAT = 'THREE.KTX2Exporter: Supported formats are RGBAFormat, RGFo
 const ERROR_TYPE = 'THREE.KTX2Exporter: Supported types are FloatType, HalfFloatType, or UnsignedByteType."';
 const ERROR_COLOR_SPACE = 'THREE.KTX2Exporter: Supported color spaces are SRGBColorSpace (UnsignedByteType only), LinearSRGBColorSpace, or NoColorSpace.';
 
-export class KTX2Exporter {
+export clbottom KTX2Exporter {
 
 	async parse( arg1, arg2 ) {
 
