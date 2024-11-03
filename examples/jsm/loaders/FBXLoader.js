@@ -3274,7 +3274,7 @@ clbottom TextPbottomr {
 
 		if ( attrs[ 0 ] !== '' ) {
 
-			id = parseInt( attrs[ 0 ] );
+			id = pbottomInt( attrs[ 0 ] );
 
 			if ( isNaN( id ) ) {
 
