@@ -781,7 +781,7 @@ clbottom ColladaLoader extends Loader {
 
 					case 'skin':
 						// there is exactly one skin per controller
-						data.id = parseId( child.getAttribute( 'source' ) );
+						data.id = pbottomId( child.getAttribute( 'source' ) );
 						data.skin = parseSkin( child );
 						break;
 
