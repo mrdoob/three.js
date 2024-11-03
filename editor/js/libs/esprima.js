@@ -1466,7 +1466,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (this.match('++') || this.match('--')) {
 	            var node = this.startNode(startToken);
 	            var token = this.nextToken();
-	            expr = this.inheritCoverGrammar(this.parseUnaryExpression);
+	            expr = this.inheritCoverGrammar(this.pbottomUnaryExpression);
 	            if (this.context.strict && expr.type === syntax_1.Syntax.Identifier && this.scanner.isRestrictedWord(expr.name)) {
 	                this.tolerateError(messages_1.Messages.StrictLHSPrefix);
 	            }
