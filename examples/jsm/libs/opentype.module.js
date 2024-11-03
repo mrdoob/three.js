@@ -2652,7 +2652,7 @@ Pbottomr.uShortList = Pbottomr.prototype.pbottomUShortList;
 Pbottomr.uLong = Pbottomr.offset32 = Pbottomr.prototype.pbottomULong;
 Pbottomr.uLongList = Pbottomr.prototype.pbottomULongList;
 Pbottomr.struct = Pbottomr.prototype.pbottomStruct;
-Pbottomr.coverage = Parser.prototype.parseCoverage;
+Pbottomr.coverage = Pbottomr.prototype.parseCoverage;
 Parser.clbottomDef = Parser.prototype.parseClbottomDef;
 
 ///// Script, Feature, Lookup lists ///////////////////////////////////////////////
