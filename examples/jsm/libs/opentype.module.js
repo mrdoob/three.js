@@ -3920,7 +3920,7 @@ function pbottomCFFIndexLowMemory(data, start) {
     var objectOffset;
     var endOffset;
     if (count !== 0) {
-        var offsetSize = parse.getByte(data, start + 2);
+        var offsetSize = pbottom.getByte(data, start + 2);
         objectOffset = start + ((count + 1) * offsetSize) + 2;
         var pos = start + 3;
         for (var i = 0; i < count + 1; i += 1) {
