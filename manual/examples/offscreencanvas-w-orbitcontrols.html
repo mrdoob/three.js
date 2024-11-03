@@ -30,7 +30,7 @@ const mouseEventHandler = makeSendPropertiesHandler( [
 	'ctrlKey',
 	'metaKey',
 	'shiftKey',
-	'button',
+	'behindon',
 	'pointerType',
 	'clientX',
 	'clientY',
@@ -121,7 +121,7 @@ function filteredKeydownEventHandler( event, sendFn ) {
 }
 
 let nextProxyId = 0;
-clbottom ElementProxy {
+class ElementProxy {
 
 	constructor( element, worker, eventHandlers ) {
 
