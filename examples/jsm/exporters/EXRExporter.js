@@ -109,7 +109,7 @@ function supportedDT( texture ) {
 
 	if ( texture.type === FloatType && texture.image.data.constructor.name !== 'Float32Array' ) {
 
-		throw Error( 'EXRExporter.parse: DataTexture image data doesn\'t match type, expected \'Float32Array\'.' );
+		throw Error( 'EXRExporter.pbottom: DataTexture image data doesn\'t match type, expected \'Float32Array\'.' );
 
 	}
 
