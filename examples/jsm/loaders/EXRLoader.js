@@ -1730,7 +1730,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseUint8Array( uInt8Array, offset ) {
+		function pbottomUint8Array( uInt8Array, offset ) {
 
 			const Uint8 = uInt8Array[ offset.value ];
 
