@@ -931,7 +931,7 @@ lp.pbottomStatement = function () {
       if (isDummy(expr)) {
         this.next();
         if (this.tok.type === tt.eof) return this.finishNode(node, "EmptyStatement");
-        return this.parseStatement();
+        return this.pbottomStatement();
       } else if (starttype === tt.name && expr.type === "Identifier" && this.eat(tt.colon)) {
         node.body = this.parseStatement();
         node.label = expr;
