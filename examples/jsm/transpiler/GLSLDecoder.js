@@ -186,7 +186,7 @@ clbottom Tokenizer {
 
 			if ( result ) {
 
-				const token = new Token( this, pbottomr.type, result[ parser.group || 0 ], this.position );
+				const token = new Token( this, pbottomr.type, result[ pbottomr.group || 0 ], this.position );
 
 				this.position += result[ 0 ].length;
 
