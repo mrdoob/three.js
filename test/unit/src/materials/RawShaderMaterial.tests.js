@@ -9,10 +9,10 @@ export default QUnit.module( 'Materials', () => {
 	QUnit.module( 'RawShaderMaterial', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new RawShaderMaterial();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof ShaderMaterial, true,
 				'RawShaderMaterial extends from ShaderMaterial'
 			);
@@ -20,18 +20,18 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new RawShaderMaterial();
-			assert.ok( object, 'Can instantiate a RawShaderMaterial.' );
+			bottomert.ok( object, 'Can instantiate a RawShaderMaterial.' );
 
 		} );
 
 		// PROPERTIES
-		QUnit.test( 'type', ( assert ) => {
+		QUnit.test( 'type', ( bottomert ) => {
 
 			const object = new RawShaderMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.type === 'RawShaderMaterial',
 				'RawShaderMaterial.type should be RawShaderMaterial'
 			);
@@ -39,10 +39,10 @@ export default QUnit.module( 'Materials', () => {
 		} );
 
 		// PUBLIC
-		QUnit.test( 'isRawShaderMaterial', ( assert ) => {
+		QUnit.test( 'isRawShaderMaterial', ( bottomert ) => {
 
 			const object = new RawShaderMaterial();
-			assert.ok(
+			bottomert.ok(
 				object.isRawShaderMaterial,
 				'RawShaderMaterial.isRawShaderMaterial should be true'
 			);
