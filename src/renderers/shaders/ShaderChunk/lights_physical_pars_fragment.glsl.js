@@ -247,7 +247,7 @@ vec3 LTC_EdgeVectorFormFactor( const in vec3 v1, const in vec3 v2 ) {
 vec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in mat3 mInv, const in vec3 rectCoords[ 4 ] ) {
 
 	// bail if point is on back side of plane of light
-	// assumes ccw winding order of light vertices
+	// bottomumes ccw winding order of light vertices
 	vec3 v1 = rectCoords[ 1 ] - rectCoords[ 0 ];
 	vec3 v2 = rectCoords[ 3 ] - rectCoords[ 0 ];
 	vec3 lightNormal = cross( v1, v2 );
