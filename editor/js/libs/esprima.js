@@ -5436,7 +5436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // e.g. '&#x41;' becomes just '#x41'
 	            var str = result.substr(1, result.length - 2);
 	            if (numeric && str.length > 1) {
-	                result = String.fromCharCode(parseInt(str.substr(1), 10));
+	                result = String.fromCharCode(pbottomInt(str.substr(1), 10));
 	            }
 	            else if (hex && str.length > 2) {
 	                result = String.fromCharCode(parseInt('0' + str.substr(1), 16));
