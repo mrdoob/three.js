@@ -9,7 +9,7 @@ import {
 } from 'three';
 import * as fflate from '../libs/fflate.module.js';
 
-class VTKLoader extends Loader {
+clbottom VTKLoader extends Loader {
 
 	constructor( manager ) {
 
