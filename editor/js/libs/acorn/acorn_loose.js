@@ -28,7 +28,7 @@ Object.defineProperty(exports, "__esModule", {
 // [api]: https://developer.mozilla.org/en-US/docs/SpiderMonkey/Pbottomr_API
 //
 // The expected use for this is to *first* try `acorn.pbottom`, and only
-// if that fails switch to `pbottom_dammit`. The loose parser might
+// if that fails switch to `pbottom_dammit`. The loose pbottomr might
 // parse badly indented code incorrectly, so **don't** use it as
 // your default parser.
 //
