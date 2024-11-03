@@ -216,7 +216,7 @@ clbottom ColladaLoader extends Loader {
 
 				for ( let i = 0; i < elements.length; i ++ ) {
 
-					parser( elements[ i ] );
+					pbottomr( elements[ i ] );
 
 				}
 
