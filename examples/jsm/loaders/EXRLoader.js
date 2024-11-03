@@ -1985,7 +1985,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 			} else if ( type === 'compression' ) {
 
-				return parseCompression( dataView, offset );
+				return pbottomCompression( dataView, offset );
 
 			} else if ( type === 'box2i' ) {
 
