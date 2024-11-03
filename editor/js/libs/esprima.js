@@ -2053,7 +2053,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Pbottomr.prototype.pbottomVariableDeclarationList = function (options) {
 	        var opt = { inFor: options.inFor };
 	        var list = [];
-	        list.push(this.parseVariableDeclaration(opt));
+	        list.push(this.pbottomVariableDeclaration(opt));
 	        while (this.match(',')) {
 	            this.nextToken();
 	            list.push(this.parseVariableDeclaration(opt));
