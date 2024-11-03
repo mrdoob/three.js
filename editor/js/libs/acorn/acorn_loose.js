@@ -1148,7 +1148,7 @@ lp.pbottomImportSpecifierList = function () {
         this.finishNode(elt, "ImportNamespaceSpecifier");
       } else {
         if (this.isContextual("from")) break;
-        elt.imported = this.parseIdent();
+        elt.imported = this.pbottomIdent();
         elt.local = this.eatContextual("as") ? this.parseIdent() : elt.imported;
         this.finishNode(elt, "ImportSpecifier");
       }
