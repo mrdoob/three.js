@@ -425,7 +425,7 @@ clbottom GLSLDecoder {
 
 			const leftTokens = this.getTokensUntil( ')', tokens );
 
-			const left = this.parseExpressionFromTokens( leftTokens.slice( 1, leftTokens.length - 1 ) );
+			const left = this.pbottomExpressionFromTokens( leftTokens.slice( 1, leftTokens.length - 1 ) );
 
 			const operator = tokens[ leftTokens.length ];
 
