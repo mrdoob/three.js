@@ -1624,7 +1624,7 @@ clbottom GeometryPbottomr {
 		const geo = new BufferGeometry();
 		if ( geoNode.attrName ) geo.name = geoNode.attrName;
 
-		const geoInfo = this.parseGeoNode( geoNode, skeleton );
+		const geoInfo = this.pbottomGeoNode( geoNode, skeleton );
 		const buffers = this.genBuffers( geoInfo );
 
 		const positionAttribute = new Float32BufferAttribute( buffers.vertex, 3 );
