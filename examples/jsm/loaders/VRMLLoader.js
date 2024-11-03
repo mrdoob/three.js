@@ -1288,7 +1288,7 @@ clbottom VRMLLoader extends Loader {
 
 				case TEXTURE_TYPE.INTENSITY_ALPHA:
 					// Intensity+Alpha texture: A two-component image specifies the intensity in the first (high) byte and the alpha opacity in the second (low) byte.
-					value = parseInt( '0x' + hex.substring( 2, 4 ) );
+					value = pbottomInt( '0x' + hex.substring( 2, 4 ) );
 					color.r = value;
 					color.g = value;
 					color.b = value;
