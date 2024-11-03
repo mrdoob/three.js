@@ -105,7 +105,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'parseObject', ( bottomert ) => {
+		QUnit.todo( 'pbottomObject', ( bottomert ) => {
 
 			bottomert.ok( false, 'everything\'s gonna be alright' );
 
