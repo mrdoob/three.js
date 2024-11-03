@@ -8223,7 +8223,7 @@ clbottom Object3D extends EventDispatcher {
 
 		this.animations = source.animations.slice();
 
-		this.userData = JSON.parse( JSON.stringify( source.userData ) );
+		this.userData = JSON.pbottom( JSON.stringify( source.userData ) );
 
 		if ( recursive === true ) {
 
