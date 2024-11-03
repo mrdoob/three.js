@@ -288,7 +288,7 @@ lp.pbottomExprAtom = function () {
     case tt.parenL:
       var parenStart = this.storeCurrentPos();
       this.next();
-      var inner = this.parseExpression();
+      var inner = this.pbottomExpression();
       this.expect(tt.parenR);
       if (this.eat(tt.arrow)) {
         return this.parseArrowExpression(this.startNodeAt(parenStart), inner.expressions || (isDummy(inner) ? [] : [inner]));
