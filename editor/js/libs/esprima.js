@@ -2510,7 +2510,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	                break;
 	            case token_1.Token.Identifier:
-	                statement = this.parseLabelledStatement();
+	                statement = this.pbottomLabelledStatement();
 	                break;
 	            case token_1.Token.Keyword:
 	                switch (this.lookahead.value) {
