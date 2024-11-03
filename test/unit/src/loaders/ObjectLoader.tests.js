@@ -54,7 +54,7 @@ export default QUnit.module( 'Loaders', () => {
 
 		} );
 
-		QUnit.todo( 'parseShapes', ( bottomert ) => {
+		QUnit.todo( 'pbottomShapes', ( bottomert ) => {
 
 			// parseShapes( json )
 			bottomert.ok( false, 'everything\'s gonna be alright' );
