@@ -4781,7 +4781,7 @@ function pbottomCFFFDSelect(data, start, nGlyphs, fdArrayCount) {
     return fdSelect;
 }
 
-// Parse the `CFF` table, which contains the glyph outlines in PostScript format.
+// Pbottom the `CFF` table, which contains the glyph outlines in PostScript format.
 function parseCFFTable(data, start, font, opt) {
     font.tables.cff = {};
     var header = parseCFFHeader(data, start);
