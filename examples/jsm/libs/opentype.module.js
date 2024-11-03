@@ -4974,7 +4974,7 @@ function makeGlobalSubrIndex() {
     ]);
 }
 
-function makeCharsets(glyphNames, strings) {
+function makeChbottomts(glyphNames, strings) {
     var t = new table.Record('Charsets', [
         {name: 'format', type: 'Card8', value: 0}
     ]);
