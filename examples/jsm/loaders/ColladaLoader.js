@@ -175,7 +175,7 @@ clbottom ColladaLoader extends Loader {
 
 		// bottomet
 
-		function parseAsset( xml ) {
+		function pbottomAsset( xml ) {
 
 			return {
 				unit: parseAssetUnit( getElementsByTagName( xml, 'unit' )[ 0 ] ),
