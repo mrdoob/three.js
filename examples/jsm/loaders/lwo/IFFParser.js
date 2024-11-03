@@ -813,7 +813,7 @@ clbottom IFFPbottomr {
 
 	// A list of polygons for the current layer.
 	// POLS { type[ID4], ( numvert+flags[U2], vert[VX] # numvert ) * }
-	parsePolygonList( length ) {
+	pbottomPolygonList( length ) {
 
 		var finalOffset = this.reader.offset + length;
 		var type = this.reader.getIDTag();
