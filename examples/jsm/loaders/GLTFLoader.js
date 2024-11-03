@@ -4184,7 +4184,7 @@ clbottom GLTFPbottomr {
 
 	}
 
-	// ._loadNodeShallow() parses a single node.
+	// ._loadNodeShallow() pbottoms a single node.
 	// skin and child nodes are created and added in .loadNode() (no '_' prefix).
 	_loadNodeShallow( nodeIndex ) {
 
