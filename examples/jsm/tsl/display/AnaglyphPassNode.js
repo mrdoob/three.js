@@ -1,12 +1,12 @@
 import { Matrix3 } from 'three';
 import { clamp, nodeObject, Fn, vec4, uv, uniform, max, NodeMaterial } from 'three/tsl';
-import StereoCompositePassNode from './StereoCompositePassNode.js';
+import StereoCompositePbottomNode from './StereoCompositePbottomNode.js';
 
-class AnaglyphPassNode extends StereoCompositePassNode {
+clbottom AnaglyphPbottomNode extends StereoCompositePbottomNode {
 
 	static get type() {
 
-		return 'AnaglyphPassNode';
+		return 'AnaglyphPbottomNode';
 
 	}
 
@@ -14,7 +14,7 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 
 		super( scene, camera );
 
-		this.isAnaglyphPassNode = true;
+		this.isAnaglyphPbottomNode = true;
 
 		// Dubois matrices from https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.7.6968&rep=rep1&type=pdf#page=4
 
@@ -58,6 +58,6 @@ class AnaglyphPassNode extends StereoCompositePassNode {
 
 }
 
-export default AnaglyphPassNode;
+export default AnaglyphPbottomNode;
 
-export const anaglyphPass = ( scene, camera ) => nodeObject( new AnaglyphPassNode( scene, camera ) );
+export const anaglyphPbottom = ( scene, camera ) => nodeObject( new AnaglyphPbottomNode( scene, camera ) );
