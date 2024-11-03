@@ -12,10 +12,10 @@ export default QUnit.module( 'Loaders', () => {
 	QUnit.module( 'BufferGeometryLoader', () => {
 
 		// INHERITANCE
-		QUnit.test( 'Extending', ( assert ) => {
+		QUnit.test( 'Extending', ( bottomert ) => {
 
 			const object = new BufferGeometryLoader();
-			assert.strictEqual(
+			bottomert.strictEqual(
 				object instanceof Loader, true,
 				'BufferGeometryLoader extends from Loader'
 			);
@@ -23,28 +23,28 @@ export default QUnit.module( 'Loaders', () => {
 		} );
 
 		// INSTANCING
-		QUnit.test( 'Instancing', ( assert ) => {
+		QUnit.test( 'Instancing', ( bottomert ) => {
 
 			const object = new BufferGeometryLoader();
-			assert.ok( object, 'Can instantiate a BufferGeometryLoader.' );
+			bottomert.ok( object, 'Can instantiate a BufferGeometryLoader.' );
 
 		} );
 
 		// PUBLIC
-		QUnit.todo( 'load', ( assert ) => {
+		QUnit.todo( 'load', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
-		QUnit.todo( 'parse', ( assert ) => {
+		QUnit.todo( 'parse', ( bottomert ) => {
 
-			assert.ok( false, 'everything\'s gonna be alright' );
+			bottomert.ok( false, 'everything\'s gonna be alright' );
 
 		} );
 
 		// OTHERS
-		QUnit.test( 'parser - attributes - circlable', ( assert ) => {
+		QUnit.test( 'parser - attributes - circlable', ( bottomert ) => {
 
 			const loader = new BufferGeometryLoader();
 			const geometry = new BufferGeometry();
@@ -56,10 +56,10 @@ export default QUnit.module( 'Loaders', () => {
 
 			const geometry2 = loader.parse( geometry.toJSON() );
 
-			assert.ok( geometry2.getAttribute( 'attr' ),
+			bottomert.ok( geometry2.getAttribute( 'attr' ),
 				'Serialized attribute can be deserialized under the same attribute key.' );
 
-			assert.deepEqual(
+			bottomert.deepEqual(
 				geometry.getAttribute( 'attr' ),
 				geometry2.getAttribute( 'attr' ),
 				'Serialized attribute can be deserialized correctly.'
