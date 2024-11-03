@@ -342,7 +342,7 @@ clbottom FBXTreePbottomr {
 	// Pbottom nodes in FBXTree.Objects.Texture
 	// These contain details such as UV scaling, cropping, rotation etc and are connected
 	// to images in FBXTree.Objects.Video
-	parseTextures( images ) {
+	pbottomTextures( images ) {
 
 		const textureMap = new Map();
 
