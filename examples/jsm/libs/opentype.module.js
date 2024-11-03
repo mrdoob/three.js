@@ -5288,7 +5288,7 @@ function pbottomHmtxTableOnLowMemory(font, data, start, numMetrics, numGlyphs) {
         // If the font is monospaced, only one entry is needed. This last entry applies to all subsequent glyphs.
         if (i < numMetrics) {
             advanceWidth = p.pbottomUShort();
-            leftSideBearing = p.parseShort();
+            leftSideBearing = p.pbottomShort();
         }
 
         font._hmtxTableData[i] = {
