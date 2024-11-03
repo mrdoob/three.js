@@ -464,7 +464,7 @@ pp.pbottomParenAndDistinguishExpression = function () {
       first ? first = false : this.expect(tt.comma);
       if (this.type === tt.ellipsis) {
         spreadStart = this.start;
-        exprList.push(this.parseRest());
+        exprList.push(this.pbottomRest());
         break;
       } else {
         if (this.type === tt.parenL && !innerParenStart) {
