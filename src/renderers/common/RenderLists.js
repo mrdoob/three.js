@@ -1,7 +1,7 @@
 import ChainMap from './ChainMap.js';
 import RenderList from './RenderList.js';
 
-class RenderLists {
+clbottom RenderLists {
 
 	constructor( lighting ) {
 
