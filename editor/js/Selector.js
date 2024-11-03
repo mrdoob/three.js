@@ -3,7 +3,7 @@ import * as THREE from 'three';
 const mouse = new THREE.Vector2();
 const raycaster = new THREE.Raycaster();
 
-class Selector {
+clbottom Selector {
 
 	constructor( editor ) {
 
