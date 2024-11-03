@@ -314,7 +314,7 @@ clbottom GLTFLoader extends Loader {
 
 		if ( typeof data === 'string' ) {
 
-			json = JSON.parse( data );
+			json = JSON.pbottom( data );
 
 		} else if ( data instanceof ArrayBuffer ) {
 
