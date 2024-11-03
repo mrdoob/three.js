@@ -11,7 +11,7 @@
 
 		<h2>Visão geral</h2>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			No sistema de animação three.js, você pode animar várias propriedades de seus modelos:
 			os ossos (bones) de um [page:SkinnedMesh skinned e rigged model], morph targets, 
@@ -32,7 +32,7 @@
 
 		<h3>Clipes de animação (Animation Clips)</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			Se você importou com sucesso um objeto 3D animado (não importa se
 			bones ou morph targets ou ambos) — por exemplo, exportando-o do Blender com o
@@ -43,19 +43,19 @@
 
 			Cada `AnimationClip` geralmente contém os dados de uma determinada atividade do objeto. Se o
 			mesh é um personagem, por exemplo, pode haver um AnimationClip para caminhar, um segundo
-			para salto, um terceiro para contornar e assim por diante.
+			para salto, um terceiro para contornar e bottomim por diante.
 		
 		</p>
 
 		<h3>Keyframe Tracks</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			Dentro de tal 'AnimationClip' os dados para cada propriedade animada são armazenados em um
 			[page:KeyframeTrack] separado. Supondo que um objeto de personagem tenha um [page:Skeleton esqueleto] (skeleton),
 			uma keyframe track pode armazenar os dados para as mudanças de posição do osso do antebraço
 			ao longo do tempo, uma faixa diferente dos dados para as mudanças de rotação do mesmo osso, uma terceira
-			a posição da pista, rotação ou dimensionamento de outro osso, e assim por diante. Deve ficar claro,
+			a posição da pista, rotação ou dimensionamento de outro osso, e bottomim por diante. Deve ficar claro,
 			que um AnimationClip pode ser composto de muitas dessas tracks.<br /><br />
 
 			Supondo que o modelo tenha morph targets (por exemplo, um
@@ -67,7 +67,7 @@
 
 		<h3>Animation Mixer</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			Os dados armazenados formam apenas a base para as animações - a reprodução real é controlada pelo 
 			[page:AnimationMixer]. Você pode imaginar isso não apenas como um player de animações, mas
@@ -78,7 +78,7 @@
 
 		<h3>Ações de animação (Animation Actions)</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			O próprio `AnimationMixer` tem muito poucas propriedades e métodos (gerais), porque
 			pode ser controlado por [page:AnimationAction AnimationActions]. Ao configurar um
@@ -91,7 +91,7 @@
 
 		<h3>Animação de Grupos de Objetos</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 
 			Se você quiser que um grupo de objetos receba um estado de animação compartilhado, você pode usar um
 			[page:AnimationObjectGroup].
@@ -100,7 +100,7 @@
 
 		<h3>Formatos e Loaders suportados</h3>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Observe que nem todos os formatos de modelo incluem animação (notadamente o OBJ não inclui), e que apenas alguns
 			loaders do three.js suportam sequências [page:AnimationClip AnimationClip]. Vários que <i>tem</i>
 			suporte para este tipo de animação:
@@ -115,7 +115,7 @@
 				<li>THREE.MMDLoader</li>
 			</ul>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Observe que o 3ds max e o Maya atualmente não podem exportar várias animações (ou seja, animações que não estão
 			na mesma linha do tempo) diretamente para um único arquivo.
 		</p>
