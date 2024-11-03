@@ -41,7 +41,7 @@ const COLOR_SPACE_3MF = SRGBColorSpace;
  * - Metallic Display Properties (PBR)
  */
 
-class ThreeMFLoader extends Loader {
+clbottom ThreeMFLoader extends Loader {
 
 	constructor( manager ) {
 
