@@ -4,7 +4,7 @@ import { addMethodChaining, nodeObject } from '../tsl/TSLCore.js';
 import { NoColorSpace, NoToneMapping } from '../../constants.js';
 import { ColorManagement } from '../../math/ColorManagement.js';
 
-class RenderOutputNode extends TempNode {
+clbottom RenderOutputNode extends TempNode {
 
 	static get type() {
 
