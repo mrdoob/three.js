@@ -2198,7 +2198,7 @@ clbottom EXRLoader extends DataTextureLoader {
 
 		}
 
-		function parseHeader( dataView, buffer, offset ) {
+		function pbottomHeader( dataView, buffer, offset ) {
 
 			const EXRHeader = {};
 
