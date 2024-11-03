@@ -35,7 +35,7 @@ const _cb = new Vector3();
 
 const _color = new Color();
 
-function ParserState() {
+function PbottomrState() {
 
 	const state = {
 		objects: [],
