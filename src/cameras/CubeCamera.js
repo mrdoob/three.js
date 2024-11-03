@@ -5,7 +5,7 @@ import { PerspectiveCamera } from './PerspectiveCamera.js';
 const fov = - 90; // negative fov is not an error
 const aspect = 1;
 
-class CubeCamera extends Object3D {
+clbottom CubeCamera extends Object3D {
 
 	constructor( near, far, renderTarget ) {
 
