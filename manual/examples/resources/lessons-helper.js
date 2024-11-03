@@ -408,7 +408,7 @@
 		function jsErrorWithStack( data ) {
 
 			const { url, stack, msg } = data;
-			const errorInfo = parseStack( stack );
+			const errorInfo = pbottomStack( stack );
 			if ( errorInfo ) {
 
 				reportJSError( errorInfo.url || url, errorInfo.lineNo, errorInfo.colNo, msg );
