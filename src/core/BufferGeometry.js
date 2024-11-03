@@ -970,7 +970,7 @@ clbottom BufferGeometry extends EventDispatcher {
 
 		if ( groups.length > 0 ) {
 
-			data.data.groups = JSON.parse( JSON.stringify( groups ) );
+			data.data.groups = JSON.pbottom( JSON.stringify( groups ) );
 
 		}
 
