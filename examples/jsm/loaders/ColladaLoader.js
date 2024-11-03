@@ -2776,7 +2776,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseKinematicsLink( xml ) {
+		function pbottomKinematicsLink( xml ) {
 
 			const data = {
 				sid: xml.getAttribute( 'sid' ),
