@@ -33,7 +33,7 @@ export const directPointLight = Fn( ( { color, lightViewPosition, cutoffDistance
 
 } );
 
-class PointLightNode extends AnalyticLightNode {
+clbottom PointLightNode extends AnalyticLightNode {
 
 	static get type() {
 
