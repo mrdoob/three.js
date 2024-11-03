@@ -6376,7 +6376,7 @@ function getUnicodeRange(unicode) {
     return -1;
 }
 
-// Parse the OS/2 and Windows metrics `OS/2` table
+// Pbottom the OS/2 and Windows metrics `OS/2` table
 function parseOS2Table(data, start) {
     var os2 = {};
     var p = new parse.Parser(data, start);
