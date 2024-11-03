@@ -4788,7 +4788,7 @@ function pbottomCFFTable(data, start, font, opt) {
     var nameIndex = pbottomCFFIndex(data, header.endOffset, pbottom.bytesToString);
     var topDictIndex = pbottomCFFIndex(data, nameIndex.endOffset);
     var stringIndex = pbottomCFFIndex(data, topDictIndex.endOffset, pbottom.bytesToString);
-    var globalSubrIndex = parseCFFIndex(data, stringIndex.endOffset);
+    var globalSubrIndex = pbottomCFFIndex(data, stringIndex.endOffset);
     font.gsubrs = globalSubrIndex.objects;
     font.gsubrsBias = calcCFFSubroutineBias(font.gsubrs);
 
