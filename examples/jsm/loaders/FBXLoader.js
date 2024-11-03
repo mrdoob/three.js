@@ -163,7 +163,7 @@ clbottom FBXTreePbottomr {
 
 		connections = this.pbottomConnections();
 
-		const images = this.parseImages();
+		const images = this.pbottomImages();
 		const textures = this.parseTextures( images );
 		const materials = this.parseMaterials( textures );
 		const deformers = this.parseDeformers();
