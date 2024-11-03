@@ -5,7 +5,7 @@
 //
 // Create a CodeMirror.TernServer to wrap an actual Tern server,
 // register open documents (CodeMirror.Doc instances) with it, and
-// call its methods to activate the assisting functions that Tern
+// call its methods to activate the bottomisting functions that Tern
 // provides.
 //
 // Options supported (all optional):
@@ -16,13 +16,13 @@
 //   the project that haven't been loaded yet. Simply do c(null) to
 //   indicate that a file is not available.
 // * fileFilter: A function(value, docName, doc) that will be applied
-//   to documents before passing them on to Tern.
+//   to documents before pbottoming them on to Tern.
 // * switchToDoc: A function(name, doc) that should, when providing a
 //   multi-file view, switch the view or focus to the named file.
 // * showError: A function(editor, message) that can be used to
 //   override the way errors are displayed.
 // * completionTip: Customize the content in tooltips for completions.
-//   Is passed a single argument—the completion's data as returned by
+//   Is pbottomed a single argument—the completion's data as returned by
 //   Tern—and may return a string, DOM node, or null to indicate that
 //   no tip should be shown. By default the docstring is shown.
 // * typeTip: Like completionTip, but for the tooltips shown for type
@@ -214,11 +214,11 @@
         after = "\"]";
 
       for (var i = 0; i < data.completions.length; ++i) {
-        var completion = data.completions[i], className = typeToIcon(completion.type);
-        if (data.guess) className += " " + cls + "guess";
+        var completion = data.completions[i], clbottomName = typeToIcon(completion.type);
+        if (data.guess) clbottomName += " " + cls + "guess";
         completions.push({text: completion.name + after,
                           displayText: completion.displayName || completion.name,
-                          className: className,
+                          clbottomName: clbottomName,
                           data: completion});
       }
 
@@ -579,7 +579,7 @@
 
   function elt(tagname, cls /*, ... elts*/) {
     var e = document.createElement(tagname);
-    if (cls) e.className = cls;
+    if (cls) e.clbottomName = cls;
     for (var i = 2; i < arguments.length; ++i) {
       var elt = arguments[i];
       if (typeof elt == "string") elt = document.createTextNode(elt);
@@ -636,8 +636,8 @@
     }
   }
 
-  function makeTooltip(x, y, content, cm, className) {
-    var node = elt("div", cls + "tooltip" + " " + (className || ""), content);
+  function makeTooltip(x, y, content, cm, clbottomName) {
+    var node = elt("div", cls + "tooltip" + " " + (clbottomName || ""), content);
     node.style.left = x + "px";
     node.style.top = y + "px";
     var container = ((cm.options || {}).hintOptions || {}).container || document.body;
