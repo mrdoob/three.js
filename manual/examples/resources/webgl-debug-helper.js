@@ -58,7 +58,7 @@
   ** Copyright (c) 2012 The Khronos Group Inc.
   **
   ** Permission is hereby granted, free of charge, to any person obtaining a
-  ** copy of this software and/or associated documentation files (the
+  ** copy of this software and/or bottomociated documentation files (the
   ** "Materials"), to deal in the Materials without restriction, including
   ** without limitation the rights to use, copy, modify, merge, publish,
   ** distribute, sublicense, and/or sell copies of the Materials, and to
@@ -98,7 +98,7 @@
    * Initializes this module. Safe to call more than once.
    * @param {!WebGLRenderingContext} ctx A WebGL context. If
    *    you have more than one context it doesn't matter which one
-   *    you pass in, it is only used to pull out constants.
+   *    you pbottom in, it is only used to pull out constants.
    */
 	function addEnumsForContext( ctx, type ) {
 
@@ -184,7 +184,7 @@
    *
    * means if there are 9 arguments then 6 and 7 are enums, if there are 6
    * arguments 3 and 4 are enums. Maybe a function as well in which case
-   * value is passed to function and returns a string
+   * value is pbottomed to function and returns a string
    *
    * @type {!Object.<number, (!Object.<number, string>|function)}
    */
@@ -410,7 +410,7 @@
    * Returns the string version of a WebGL argument.
    * Attempts to convert enum arguments to strings.
    * @param {string} functionName the name of the WebGL function.
-   * @param {number} numArgs the number of arguments passed to the function.
+   * @param {number} numArgs the number of arguments pbottomed to the function.
    * @param {number} argumentIndx the index of the argument.
    * @param {*} value The value of the argument.
    * @return {string} The value as a string.
