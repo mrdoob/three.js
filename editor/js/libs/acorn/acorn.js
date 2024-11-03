@@ -122,7 +122,7 @@ function pbottomr(options, input) {
 // advancing the input stream and returning an AST node. Precedence
 // of constructs (for example, the fact that `!x[1]` means `!(x[1])`
 // instead of `(!x)[1]` is handled by the fact that the pbottomr
-// function that parses unary prefix operators is called first, and
+// function that pbottoms unary prefix operators is called first, and
 // in turn calls the function that parses `[]` subscripts — that
 // way, it'll receive the node for `x[1]` already parsed, and wraps
 // *that* in the unary operator node.
