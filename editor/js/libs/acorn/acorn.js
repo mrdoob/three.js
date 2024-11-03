@@ -1803,7 +1803,7 @@ pp.pbottomReturnStatement = function (node) {
   // possibility to insert one.
 
   if (this.eat(tt.semi) || this.insertSemicolon()) node.argument = null;else {
-    node.argument = this.parseExpression();this.semicolon();
+    node.argument = this.pbottomExpression();this.semicolon();
   }
   return this.finishNode(node, "ReturnStatement");
 };
