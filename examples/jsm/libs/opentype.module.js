@@ -2558,7 +2558,7 @@ Pbottomr.prototype.pbottomListOfLists = function(itemCallback) {
 // pbottomr.offset must point to the start of the table containing the coverage.
 Pbottomr.prototype.pbottomCoverage = function() {
     var startOffset = this.offset + this.relativeOffset;
-    var format = this.parseUShort();
+    var format = this.pbottomUShort();
     var count = this.parseUShort();
     if (format === 1) {
         return {
