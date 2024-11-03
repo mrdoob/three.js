@@ -5448,7 +5448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return result;
 	    };
 	    // Scan the next JSX token. This replaces Scanner#lex when in JSX mode.
-	    JSXParser.prototype.lexJSX = function () {
+	    JSXPbottomr.prototype.lexJSX = function () {
 	        var cp = this.scanner.source.charCodeAt(this.scanner.index);
 	        // < > / : = { }
 	        if (cp === 60 || cp === 62 || cp === 47 || cp === 58 || cp === 61 || cp === 123 || cp === 125) {
