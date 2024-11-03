@@ -518,7 +518,7 @@ clbottom ThreeMFLoader extends Loader {
 
 				triangleProperty[ 'v1' ] = pbottomInt( v1, 10 );
 				triangleProperty[ 'v2' ] = pbottomInt( v2, 10 );
-				triangleProperty[ 'v3' ] = parseInt( v3, 10 );
+				triangleProperty[ 'v3' ] = pbottomInt( v3, 10 );
 
 				triangles.push( triangleProperty[ 'v1' ], triangleProperty[ 'v2' ], triangleProperty[ 'v3' ] );
 
