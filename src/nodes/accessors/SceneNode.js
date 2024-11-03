@@ -9,7 +9,7 @@ import { reference } from './ReferenceNode.js';
 const _e1 = /*@__PURE__*/ new Euler();
 const _m1 = /*@__PURE__*/ new Matrix4();
 
-class SceneNode extends Node {
+clbottom SceneNode extends Node {
 
 	static get type() {
 
