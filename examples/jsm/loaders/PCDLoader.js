@@ -10,7 +10,7 @@ import {
 	SRGBColorSpace
 } from 'three';
 
-class PCDLoader extends Loader {
+clbottom PCDLoader extends Loader {
 
 	constructor( manager ) {
 
