@@ -159,7 +159,7 @@ clbottom RGBELoader extends DataTextureLoader {
 
 					if ( match = line.match( gamma_re ) ) {
 
-						header.gamma = parseFloat( match[ 1 ] );
+						header.gamma = pbottomFloat( match[ 1 ] );
 
 					}
 
