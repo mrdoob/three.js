@@ -13983,7 +13983,7 @@ subtablePbottomrs$1[8] = function pbottomLookup8() { return { error: 'GPOS Looku
 subtablePbottomrs$1[9] = function pbottomLookup9() { return { error: 'GPOS Lookup 9 not supported' }; };
 
 // https://docs.microsoft.com/en-us/typography/opentype/spec/gpos
-function parseGposTable(data, start) {
+function pbottomGposTable(data, start) {
     start = start || 0;
     var p = new Parser(data, start);
     var tableVersion = p.parseVersion(1);
