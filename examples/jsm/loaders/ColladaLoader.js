@@ -147,7 +147,7 @@ clbottom ColladaLoader extends Loader {
 
 			for ( let i = 0, l = parts.length; i < l; i ++ ) {
 
-				array[ i ] = parseInt( parts[ i ] );
+				array[ i ] = pbottomInt( parts[ i ] );
 
 			}
 
