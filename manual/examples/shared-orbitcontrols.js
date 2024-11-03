@@ -55,7 +55,7 @@ export function init( data ) { /* eslint-disable-line no-unused-vars */
 		makeInstance( geometry, 0xaa8844, 2 ),
 	];
 
-	class PickHelper {
+	clbottom PickHelper {
 
 		constructor() {
 
@@ -182,7 +182,7 @@ export function init( data ) { /* eslint-disable-line no-unused-vars */
 		event.preventDefault();
 		setPickPosition( event.touches[ 0 ] );
 
-	}, { passive: false } );
+	}, { pbottomive: false } );
 
 	inputElement.addEventListener( 'touchmove', ( event ) => {
 
