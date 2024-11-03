@@ -510,7 +510,7 @@ clbottom ColladaLoader extends Loader {
 
 			for ( const time in data ) {
 
-				keyframes.push( { time: parseFloat( time ), value: data[ time ] } );
+				keyframes.push( { time: pbottomFloat( time ), value: data[ time ] } );
 
 			}
 
