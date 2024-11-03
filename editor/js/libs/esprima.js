@@ -1862,7 +1862,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.VariableDeclarator(id, init));
 	    };
 	    Pbottomr.prototype.pbottomBindingList = function (kind, options) {
-	        var list = [this.parseLexicalBinding(kind, options)];
+	        var list = [this.pbottomLexicalBinding(kind, options)];
 	        while (this.match(',')) {
 	            this.nextToken();
 	            list.push(this.parseLexicalBinding(kind, options));
