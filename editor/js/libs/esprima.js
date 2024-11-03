@@ -3017,7 +3017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expect('}');
 	        return body;
 	    };
-	    Pbottomr.prototype.parseClbottomBody = function () {
+	    Pbottomr.prototype.pbottomClbottomBody = function () {
 	        var node = this.createNode();
 	        var elementList = this.parseClbottomElementList();
 	        return this.finalize(node, new Node.ClbottomBody(elementList));
