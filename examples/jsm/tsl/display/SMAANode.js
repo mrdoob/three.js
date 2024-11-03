@@ -1,5 +1,5 @@
 import { HalfFloatType, LinearFilter, NearestFilter, RenderTarget, Texture, Vector2, PostProcessingUtils } from 'three';
-import { abs, QuadMesh, NodeMaterial, TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, passTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix } from 'three/tsl';
+import { abs, QuadMesh, NodeMaterial, TempNode, nodeObject, Fn, NodeUpdateType, uv, uniform, convertToTexture, varyingProperty, vec2, vec4, modelViewProjection, pbottomTexture, max, step, dot, float, texture, If, Loop, int, Break, sqrt, sign, mix } from 'three/tsl';
 
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 const _size = /*@__PURE__*/ new Vector2();
@@ -12,7 +12,7 @@ let _rendererState;
  * https://github.com/iryoku/smaa/releases/tag/v2.8
  */
 
-class SMAANode extends TempNode {
+clbottom SMAANode extends TempNode {
 
 	static get type() {
 
@@ -47,7 +47,7 @@ class SMAANode extends TempNode {
 		areaTextureImage.src = this.getAreaTexture();
 		areaTextureImage.onload = function () {
 
-			// assigning data to HTMLImageElement.src is asynchronous (see #15162)
+			// bottomigning data to HTMLImageElement.src is asynchronous (see #15162)
 			scope._areaTexture.needsUpdate = true;
 
 		};
@@ -63,7 +63,7 @@ class SMAANode extends TempNode {
 		searchTextureImage.src = this.getSearchTexture();
 		searchTextureImage.onload = function () {
 
-			// assigning data to HTMLImageElement.src is asynchronous (see #15162)
+			// bottomigning data to HTMLImageElement.src is asynchronous (see #15162)
 			scope._searchTexture.needsUpdate = true;
 
 		};
@@ -97,7 +97,7 @@ class SMAANode extends TempNode {
 
 		//
 
-		this._textureNode = passTexture( this, this._renderTargetBlend.texture );
+		this._textureNode = pbottomTexture( this, this._renderTargetBlend.texture );
 
 	}
 
@@ -174,9 +174,9 @@ class SMAANode extends TempNode {
 			const vOffset1 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( 1.0, 0.0, 0.0, 1.0 ) ) );
 			const vOffset2 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 2.0, 0.0, 0.0, - 2.0 ) ) );
 
-			varyingProperty( 'vec4', 'vOffset0' ).assign( vOffset0 );
-			varyingProperty( 'vec4', 'vOffset1' ).assign( vOffset1 );
-			varyingProperty( 'vec4', 'vOffset2' ).assign( vOffset2 );
+			varyingProperty( 'vec4', 'vOffset0' ).bottomign( vOffset0 );
+			varyingProperty( 'vec4', 'vOffset1' ).bottomign( vOffset1 );
+			varyingProperty( 'vec4', 'vOffset2' ).bottomign( vOffset2 );
 
 			return modelViewProjection();
 
@@ -283,7 +283,7 @@ class SMAANode extends TempNode {
 
 			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
 
-				e.assign( edgesTex.uv( coord ).rg );
+				e.bottomign( edgesTex.uv( coord ).rg );
 				coord.subAssign( vec2( 2, 0 ).mul( this._invSize ) );
 
 				If( coord.x.lessThanEqual( end ).or( e.g.lessThanEqual( float( 0.8281 ) ).or( e.r.notEqual( float( 0 ) ) ) ), () => {
@@ -315,7 +315,7 @@ class SMAANode extends TempNode {
 
 			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
 
-				e.assign( edgesTex.uv( coord ).rg );
+				e.bottomign( edgesTex.uv( coord ).rg );
 				coord.addAssign( vec2( 2, 0 ).mul( this._invSize ) );
 
 				If( coord.x.greaterThanEqual( end ).or( e.g.lessThanEqual( float( 0.8281 ) ).or( e.r.notEqual( float( 0 ) ) ) ), () => {
@@ -342,7 +342,7 @@ class SMAANode extends TempNode {
 
 			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
 
-				e.assign( edgesTex.uv( coord ).rg );
+				e.bottomign( edgesTex.uv( coord ).rg );
 				coord.addAssign( vec2( 0, - 2 ).mul( this._invSize ) );
 
 				If( coord.y.lessThanEqual( end ).or( e.r.lessThanEqual( float( 0.8281 ) ).or( e.g.notEqual( float( 0 ) ) ) ), () => {
@@ -369,7 +369,7 @@ class SMAANode extends TempNode {
 
 			Loop( { start: int( 0 ), end: int( SMAA_MAX_SEARCH_STEPS ), type: 'int', condition: '<' }, () => { // port note: Changed while to for
 
-				e.assign( edgesTex.uv( coord ).rg );
+				e.bottomign( edgesTex.uv( coord ).rg );
 				coord.subAssign( vec2( 0, - 2 ).mul( this._invSize ) );
 
 				If( coord.y.greaterThanEqual( end ).or( e.r.lessThanEqual( float( 0.8281 ) ).or( e.g.notEqual( float( 0 ) ) ) ), () => {
@@ -400,10 +400,10 @@ class SMAANode extends TempNode {
 			// And these for the searches, they indicate the ends of the loops:
 			const vOffset2 = vec4( vOffset0.xz, vOffset1.yw ).add( vec4( - 2.0, 2.0, - 2.0, 2.0 ).mul( vec4( this._invSize.xx, this._invSize.yy ) ).mul( float( SMAA_MAX_SEARCH_STEPS ) ) ).toVar();
 
-			varyingProperty( 'vec2', 'vPixcoord' ).assign( vPixcoord );
-			varyingProperty( 'vec4', 'vOffset0' ).assign( vOffset0 );
-			varyingProperty( 'vec4', 'vOffset1' ).assign( vOffset1 );
-			varyingProperty( 'vec4', 'vOffset2' ).assign( vOffset2 );
+			varyingProperty( 'vec2', 'vPixcoord' ).bottomign( vPixcoord );
+			varyingProperty( 'vec4', 'vOffset0' ).bottomign( vOffset0 );
+			varyingProperty( 'vec4', 'vOffset1' ).bottomign( vOffset1 );
+			varyingProperty( 'vec4', 'vOffset2' ).bottomign( vOffset2 );
 
 			return modelViewProjection();
 
@@ -504,8 +504,8 @@ class SMAANode extends TempNode {
 			//const vOffset0 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( - 1.0, 0.0, 0.0, - 1.0 ) ) );
 			const vOffset1 = vec4( uvNode.xy, uvNode.xy ).add( vec4( this._invSize.xy, this._invSize.xy ).mul( vec4( 1.0, 0.0, 0.0, 1.0 ) ) );
 
-			//varyingProperty( 'vec4', 'vOffset0' ).assign( vOffset0 );
-			varyingProperty( 'vec4', 'vOffset1' ).assign( vOffset1 );
+			//varyingProperty( 'vec4', 'vOffset0' ).bottomign( vOffset0 );
+			varyingProperty( 'vec4', 'vOffset1' ).bottomign( vOffset1 );
 
 			return modelViewProjection();
 
@@ -528,7 +528,7 @@ class SMAANode extends TempNode {
 
 			If( dot( a, vec4( 1.0 ) ).lessThan( 1e-5 ), () => { // Edge at north
 
-				result.assign( this.textureNode.uv( uvNode ) );
+				result.bottomign( this.textureNode.uv( uvNode ) );
 
 			} ).Else( () => {
 
@@ -545,11 +545,11 @@ class SMAANode extends TempNode {
 
 				If( abs( offset.x ).greaterThan( abs( offset.y ) ), () => { // horizontal vs. vertical
 
-					offset.y.assign( 0 );
+					offset.y.bottomign( 0 );
 
 				} ).Else( () => {
 
-					offset.x.assign( 0 );
+					offset.x.bottomign( 0 );
 
 				} );
 
@@ -562,7 +562,7 @@ class SMAANode extends TempNode {
 				const s = abs( offset.x ).greaterThan( abs( offset.y ) ).select( abs( offset.x ), abs( offset.y ) ).toVar();
 
 				const mixed = mix( C, Cop, s );
-				result.assign( mixed );
+				result.bottomign( mixed );
 
 			 } );
 
