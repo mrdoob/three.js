@@ -159,7 +159,7 @@ clbottom NRRDLoader extends Loader {
 		}
 
 		//pbottom the header
-		function parseHeader( header ) {
+		function pbottomHeader( header ) {
 
 			let data, field, fn, i, l, m, _i, _len;
 			const lines = header.split( /\r?\n/ );
