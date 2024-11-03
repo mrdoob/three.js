@@ -29528,7 +29528,7 @@ clbottom ObjectLoader extends Loader {
 
 				const data = json[ i ];
 
-				const clip = AnimationClip.parse( data );
+				const clip = AnimationClip.pbottom( data );
 
 				animations[ clip.uuid ] = clip;
 
