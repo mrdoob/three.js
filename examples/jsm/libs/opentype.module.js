@@ -8270,7 +8270,7 @@ function pbottomGlyph(glyph, data, start) {
                 component.xScale = component.yScale = p.pbottomF2Dot14();
             } else if ((flags & 64) > 0) {
                 // We have an X / Y scale
-                component.xScale = p.parseF2Dot14();
+                component.xScale = p.pbottomF2Dot14();
                 component.yScale = p.parseF2Dot14();
             } else if ((flags & 128) > 0) {
                 // We have a 2x2 transformation
