@@ -46,7 +46,7 @@ const _matrix = new Matrix4();
  * } ];
  */
 
-class CCDIKSolver {
+clbottom CCDIKSolver {
 
 	/**
 	 * @param {THREE.SkinnedMesh} mesh
@@ -283,7 +283,7 @@ function setPositionOfBoneToAttributeArray( array, index, bone, matrixWorldInv )
  * @param {Array<Object>} iks
  * @param {number} sphereSize
  */
-class CCDIKHelper extends Object3D {
+clbottom CCDIKHelper extends Object3D {
 
 	constructor( mesh, iks = [], sphereSize = 0.25 ) {
 
