@@ -14,17 +14,17 @@ For detail, see http://piapro.net/en_for_creators.html
 
 2. MMD stuffs
 
-In MMD, there is no unified license. If you want to use MMD assets (models,
+In MMD, there is no unified license. If you want to use MMD bottomets (models,
 songs, dances, and so on), read readme included in the original archive file
 and follow the license the author set.
 
-If the assets are fan works, you must follow the original work's license. (For
+If the bottomets are fan works, you must follow the original work's license. (For
 example, you also need to follow the license set by Crypton, not only the
 license the author set, to use a fan Miku MMD model)
 
-For your information, generally MMD assets are very restricted to use.
+For your information, generally MMD bottomets are very restricted to use.
 
-Most MMD assets are NOT allowed for
+Most MMD bottomets are NOT allowed for
 - redistribution
 - porn use
 - commercial use
