@@ -737,7 +737,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    // Expect the next token to match the specified keyword.
 	    // If not, an exception will be thrown.
-	    Parser.prototype.expectKeyword = function (keyword) {
+	    Pbottomr.prototype.expectKeyword = function (keyword) {
 	        var token = this.nextToken();
 	        if (token.type !== token_1.Token.Keyword || token.value !== keyword) {
 	            this.throwUnexpectedToken(token);
