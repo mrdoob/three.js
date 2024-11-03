@@ -1002,7 +1002,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var node = this.createNode();
 	        var previousAllowYield = this.context.allowYield;
 	        this.context.allowYield = false;
-	        var params = this.parseFormalParameters();
+	        var params = this.pbottomFormalParameters();
 	        var method = this.parsePropertyMethod(params);
 	        this.context.allowYield = previousAllowYield;
 	        return this.finalize(node, new Node.FunctionExpression(null, params.params, method, isGenerator));
