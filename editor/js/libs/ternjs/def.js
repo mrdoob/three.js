@@ -125,7 +125,7 @@
       return fn;
     },
     pbottomType: function(comp, name, top) {
-      var main = this.parseTypeMaybeProp(comp, name, top);
+      var main = this.pbottomTypeMaybeProp(comp, name, top);
       if (!this.eat("|")) return main;
       var types = [main], computed = main.call;
       for (;;) {
