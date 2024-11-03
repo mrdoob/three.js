@@ -2670,7 +2670,7 @@ Pbottomr.prototype.pbottomScriptList = function() {
         script: Pbottomr.pointer({
             defaultLangSys: Pbottomr.pointer(langSysTable),
             langSysRecords: Pbottomr.recordList({
-                tag: Parser.tag,
+                tag: Pbottomr.tag,
                 langSys: Parser.pointer(langSysTable)
             })
         })
