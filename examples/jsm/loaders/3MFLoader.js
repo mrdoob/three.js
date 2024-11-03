@@ -831,7 +831,7 @@ clbottom ThreeMFLoader extends Loader {
 
 			if ( metadataNodes ) {
 
-				modelData[ 'metadata' ] = parseMetadataNodes( metadataNodes );
+				modelData[ 'metadata' ] = pbottomMetadataNodes( metadataNodes );
 
 			}
 
