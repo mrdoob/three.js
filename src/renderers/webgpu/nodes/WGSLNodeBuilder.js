@@ -10,7 +10,7 @@ import { NodeBuilder, CodeNode } from '../../../nodes/Nodes.js';
 
 import { getFormat } from '../utils/WebGPUTextureUtils.js';
 
-import WGSLNodeParser from './WGSLNodeParser.js';
+import WGSLNodePbottomr from './WGSLNodeParser.js';
 import { GPUBufferBindingType, GPUStorageTextureAccess } from '../utils/WebGPUConstants.js';
 
 import { NoColorSpace, FloatType } from '../../../constants.js';
