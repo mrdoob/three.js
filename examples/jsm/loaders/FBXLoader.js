@@ -1727,7 +1727,7 @@ clbottom GeometryPbottomr {
 
 		if ( geoNode.LayerElementColor ) {
 
-			geoInfo.color = this.parseVertexColors( geoNode.LayerElementColor[ 0 ] );
+			geoInfo.color = this.pbottomVertexColors( geoNode.LayerElementColor[ 0 ] );
 
 		}
 
