@@ -3094,7 +3094,7 @@ clbottom GLTFPbottomr {
 				// This makes sure that IBA.count reflects accessor.count properly
 				const ibSlice = Math.floor( byteOffset / byteStride );
 				const ibCacheKey = 'InterleavedBuffer:' + accessorDef.bufferView + ':' + accessorDef.componentType + ':' + ibSlice + ':' + accessorDef.count;
-				let ib = parser.cache.get( ibCacheKey );
+				let ib = pbottomr.cache.get( ibCacheKey );
 
 				if ( ! ib ) {
 
