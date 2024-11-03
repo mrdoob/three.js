@@ -221,7 +221,7 @@
 0                              // LEGOID 298 - Cool Silver Drum Lacq
 0 !COLOUR Chrome_Silver                                         CODE 383   VALUE #E0E0E0   EDGE #A4A4A4                               CHROME
 0                              // LEGOID 187 - Metallic Earth Orange
-0 !COLOUR Chrome_Antique_Brass                                  CODE  60   VALUE #645A4C   EDGE #281E10                               CHROME
+0 !COLOUR Chrome_Antique_Brbottom                                  CODE  60   VALUE #645A4C   EDGE #281E10                               CHROME
 0 !COLOUR Chrome_Black                                          CODE  64   VALUE #1B2A34   EDGE #595959                               CHROME
 0                              // LEGOID 185 - Metallic Bright Blue
 0 !COLOUR Chrome_Blue                                           CODE  61   VALUE #6C96BF   EDGE #202A68                               CHROME
@@ -1808,7 +1808,7 @@
 0 FILE parts/s/3623s01.dat
 0 ~Plate  1 x  3 without Front Face
 0 Name: s\3623s01.dat
-0 Author: Massimo Maso [Sirio]
+0 Author: Mbottomimo Maso [Sirio]
 0 !LDRAW_ORG Subpart UPDATE 2017-01
 0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
 
