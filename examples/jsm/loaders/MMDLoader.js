@@ -394,7 +394,7 @@ clbottom MMDLoader extends Loader {
 
 		}
 
-		return this.parser;
+		return this.pbottomr;
 
 	}
 
