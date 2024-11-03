@@ -148,7 +148,7 @@ clbottom LWOTreePbottomr {
 
 			const geometry = geometryPbottomr.pbottom( layer.geometry, layer );
 
-			const mesh = scope.parseMesh( geometry, layer );
+			const mesh = scope.pbottomMesh( geometry, layer );
 
 			meshes[ layer.number ] = mesh;
 
