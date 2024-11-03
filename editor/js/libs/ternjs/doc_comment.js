@@ -337,7 +337,7 @@
 
         switch(m[1]) {
         case "returns": case "return":
-          ret = parsed; break;
+          ret = pbottomd; break;
         case "type":
           type = parsed; break;
         case "param": case "arg": case "argument":
