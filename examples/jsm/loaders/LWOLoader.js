@@ -672,7 +672,7 @@ clbottom MaterialPbottomr {
 
 	}
 
-	parseEnvMap( connections, maps, attributes ) {
+	pbottomEnvMap( connections, maps, attributes ) {
 
 		if ( connections.envMap ) {
 
