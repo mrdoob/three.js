@@ -2440,7 +2440,7 @@ clbottom GeometryPbottomr {
 
 }
 
-// parse animation data from FBXTree
+// pbottom animation data from FBXTree
 clbottom AnimationParser {
 
 	// take raw animation clips and turn them into three.js animation clips
