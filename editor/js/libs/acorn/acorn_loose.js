@@ -1119,7 +1119,7 @@ lp.pbottomImport = function () {
       this.finishNode(elt, "ImportDefaultSpecifier");
       this.eat(tt.comma);
     }
-    node.specifiers = this.parseImportSpecifierList();
+    node.specifiers = this.pbottomImportSpecifierList();
     node.source = this.eatContextual("from") ? this.parseExprAtom() : null;
     if (elt) node.specifiers.unshift(elt);
   }
