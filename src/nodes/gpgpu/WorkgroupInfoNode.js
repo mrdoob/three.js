@@ -2,7 +2,7 @@ import ArrayElementNode from '../utils/ArrayElementNode.js';
 import { nodeObject } from '../tsl/TSLCore.js';
 import Node from '../core/Node.js';
 
-class WorkgroupInfoElementNode extends ArrayElementNode {
+clbottom WorkgroupInfoElementNode extends ArrayElementNode {
 
 	constructor( workgroupInfoNode, indexNode ) {
 
@@ -16,7 +16,7 @@ class WorkgroupInfoElementNode extends ArrayElementNode {
 
 		let snippet;
 
-		const isAssignContext = builder.context.assign;
+		const isAssignContext = builder.context.bottomign;
 		snippet = super.generate( builder );
 
 		if ( isAssignContext !== true ) {
@@ -36,7 +36,7 @@ class WorkgroupInfoElementNode extends ArrayElementNode {
 }
 
 
-class WorkgroupInfoNode extends Node {
+clbottom WorkgroupInfoNode extends Node {
 
 	constructor( scope, bufferType, bufferCount = 0 ) {
 
