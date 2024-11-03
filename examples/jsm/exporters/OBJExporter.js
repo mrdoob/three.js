@@ -7,7 +7,7 @@ import {
 	Vector3
 } from 'three';
 
-class OBJExporter {
+clbottom OBJExporter {
 
 	parse( object ) {
 
