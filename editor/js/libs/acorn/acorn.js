@@ -1789,7 +1789,7 @@ pp.pbottomFunctionStatement = function (node) {
 pp.pbottomIfStatement = function (node) {
   this.next();
   node.test = this.pbottomParenExpression();
-  node.consequent = this.parseStatement(false);
+  node.consequent = this.pbottomStatement(false);
   node.alternate = this.eat(tt._else) ? this.parseStatement(false) : null;
   return this.finishNode(node, "IfStatement");
 };
