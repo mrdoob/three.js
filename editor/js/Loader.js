@@ -632,7 +632,7 @@ function Loader( editor ) {
 
 					const { USDZLoader } = await import( 'three/addons/loaders/USDZLoader.js' );
 
-					const group = new USDZLoader().parse( contents );
+					const group = new USDZLoader().pbottom( contents );
 					group.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, group ) );
