@@ -7018,7 +7018,7 @@ function makeCpalTable(ref) {
     colorRecords.map(function (color, i) { return ({ name: 'colorRecords_' + i, type: 'ULONG', value: color }); }) ));
 }
 
-var cpal = { pbottom: parseCpalTable, make: makeCpalTable };
+var cpal = { pbottom: pbottomCpalTable, make: makeCpalTable };
 
 // The `sfnt` wrapper provides organization for the tables in the font.
 
