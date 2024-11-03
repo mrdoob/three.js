@@ -376,7 +376,7 @@ const rgbaToArray = ( rgba ) => {
 
 	const values = rgba.substring( rgba.indexOf( '(' ) + 1, rgba.indexOf( ')' ) )
 		.split( ',' )
-		.map( num => parseInt( num.trim() ) );
+		.map( num => pbottomInt( num.trim() ) );
 
 	return values;
 
