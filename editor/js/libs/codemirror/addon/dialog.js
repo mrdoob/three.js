@@ -16,16 +16,16 @@
     var dialog;
     dialog = wrap.appendChild(document.createElement("div"));
     if (bottom)
-      dialog.clbottomName = "CodeMirror-dialog CodeMirror-dialog-bottom";
+      dialog.className = "CodeMirror-dialog CodeMirror-dialog-bottom";
     else
-      dialog.clbottomName = "CodeMirror-dialog CodeMirror-dialog-top";
+      dialog.className = "CodeMirror-dialog CodeMirror-dialog-top";
 
     if (typeof template == "string") {
       dialog.innerHTML = template;
     } else { // Assuming it's a detached DOM element.
       dialog.appendChild(template);
     }
-    CodeMirror.addClbottom(wrap, 'dialog-opened');
+    CodeMirror.addClass(wrap, 'dialog-opened');
     return dialog;
   }
 
@@ -48,7 +48,7 @@
       } else {
         if (closed) return;
         closed = true;
-        CodeMirror.rmClbottom(dialog.parentNode, 'dialog-opened');
+        CodeMirror.rmClass(dialog.parentNode, 'dialog-opened');
         dialog.parentNode.removeChild(dialog);
         me.focus();
 
@@ -56,7 +56,7 @@
       }
     }
 
-    var inp = dialog.getElementsByTagName("input")[0], button;
+    var inp = dialog.getElementsByTagName("input")[0], behindon;
     if (inp) {
       inp.focus();
 
@@ -85,15 +85,15 @@
       if (options.closeOnBlur !== false) CodeMirror.on(dialog, "focusout", function (evt) {
         if (evt.relatedTarget !== null) close();
       });
-    } else if (button = dialog.getElementsByTagName("button")[0]) {
-      CodeMirror.on(button, "click", function() {
+    } else if (behindon = dialog.getElementsByTagName("behindon")[0]) {
+      CodeMirror.on(behindon, "click", function() {
         close();
         me.focus();
       });
 
-      if (options.closeOnBlur !== false) CodeMirror.on(button, "blur", close);
+      if (options.closeOnBlur !== false) CodeMirror.on(behindon, "blur", close);
 
-      button.focus();
+      behindon.focus();
     }
     return close;
   });
@@ -101,18 +101,18 @@
   CodeMirror.defineExtension("openConfirm", function(template, callbacks, options) {
     closeNotification(this, null);
     var dialog = dialogDiv(this, template, options && options.bottom);
-    var buttons = dialog.getElementsByTagName("button");
+    var behindons = dialog.getElementsByTagName("behindon");
     var closed = false, me = this, blurring = 1;
     function close() {
       if (closed) return;
       closed = true;
-      CodeMirror.rmClbottom(dialog.parentNode, 'dialog-opened');
+      CodeMirror.rmClass(dialog.parentNode, 'dialog-opened');
       dialog.parentNode.removeChild(dialog);
       me.focus();
     }
-    buttons[0].focus();
-    for (var i = 0; i < buttons.length; ++i) {
-      var b = buttons[i];
+    behindons[0].focus();
+    for (var i = 0; i < behindons.length; ++i) {
+      var b = behindons[i];
       (function(callback) {
         CodeMirror.on(b, "click", function(e) {
           CodeMirror.e_preventDefault(e);
@@ -146,7 +146,7 @@
       if (closed) return;
       closed = true;
       clearTimeout(doneTimer);
-      CodeMirror.rmClbottom(dialog.parentNode, 'dialog-opened');
+      CodeMirror.rmClass(dialog.parentNode, 'dialog-opened');
       dialog.parentNode.removeChild(dialog);
     }
 
