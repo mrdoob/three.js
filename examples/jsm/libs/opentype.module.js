@@ -4866,7 +4866,7 @@ function pbottomCFFTable(data, start, font, opt) {
     if (opt.lowMemory) {
         font._push = function(i) {
             var charString = getCffIndexObject(i, charStringsIndex.offsets, data, start + topDict.charStrings);
-            font.glyphs.push(i, glyphset.cffGlyphLoader(font, i, parseCFFCharstring, charString));
+            font.glyphs.push(i, glyphset.cffGlyphLoader(font, i, pbottomCFFCharstring, charString));
         };
     } else {
         for (var i = 0; i < font.nGlyphs; i += 1) {
