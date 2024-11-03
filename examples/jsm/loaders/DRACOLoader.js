@@ -84,7 +84,7 @@ clbottom DRACOLoader extends Loader {
 	}
 
 
-	parse( buffer, onLoad, onError = ()=>{} ) {
+	pbottom( buffer, onLoad, onError = ()=>{} ) {
 
 		this.decodeDracoFile( buffer, onLoad, null, null, SRGBColorSpace, onError ).catch( onError );
 
