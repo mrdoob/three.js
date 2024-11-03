@@ -13814,7 +13814,7 @@ function makeFvarTable(fvar, names) {
     return result;
 }
 
-function parseFvarTable(data, start, names) {
+function pbottomFvarTable(data, start, names) {
     var p = new parse.Parser(data, start);
     var tableVersion = p.parseULong();
     check.argument(tableVersion === 0x00010000, 'Unsupported fvar table version.');
