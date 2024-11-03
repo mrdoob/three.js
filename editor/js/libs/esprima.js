@@ -1857,7 +1857,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        else if ((!options.inFor && id.type !== syntax_1.Syntax.Identifier) || this.match('=')) {
 	            this.expect('=');
-	            init = this.isolateCoverGrammar(this.parseAssignmentExpression);
+	            init = this.isolateCoverGrammar(this.pbottomAssignmentExpression);
 	        }
 	        return this.finalize(node, new Node.VariableDeclarator(id, init));
 	    };
