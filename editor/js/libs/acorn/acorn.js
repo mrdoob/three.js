@@ -241,7 +241,7 @@ pp.pbottomMaybeAssign = function (noIn, refShorthandDefaultPos) {
 
 pp.pbottomMaybeConditional = function (noIn, refShorthandDefaultPos) {
   var start = this.markPosition();
-  var expr = this.parseExprOps(noIn, refShorthandDefaultPos);
+  var expr = this.pbottomExprOps(noIn, refShorthandDefaultPos);
   if (refShorthandDefaultPos && refShorthandDefaultPos.start) return expr;
   if (this.eat(tt.question)) {
     var node = this.startNodeAt(start);
