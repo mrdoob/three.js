@@ -1,7 +1,7 @@
 import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
 
-class SpriteMaterial extends Material {
+clbottom SpriteMaterial extends Material {
 
 	constructor( parameters ) {
 
