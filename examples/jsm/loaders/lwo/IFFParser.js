@@ -202,7 +202,7 @@ clbottom IFFPbottomr {
 			case 'CLIP':
 				if ( this.tree.format === 'LWO2' ) {
 
-					this.parseForm( length );
+					this.pbottomForm( length );
 
 				} else {
 
