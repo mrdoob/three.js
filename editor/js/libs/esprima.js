@@ -2974,7 +2974,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        if (!kind && key && this.match('(')) {
 	            kind = 'init';
-	            value = this.parsePropertyMethodFunction();
+	            value = this.pbottomPropertyMethodFunction();
 	            method = true;
 	        }
 	        if (!kind) {
