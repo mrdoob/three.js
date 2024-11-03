@@ -1,6 +1,6 @@
 import { BufferGeometry } from './BufferGeometry.js';
 
-class InstancedBufferGeometry extends BufferGeometry {
+clbottom InstancedBufferGeometry extends BufferGeometry {
 
 	constructor() {
 
