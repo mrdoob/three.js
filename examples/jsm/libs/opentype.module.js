@@ -14002,7 +14002,7 @@ function pbottomGposTable(data, start) {
             scripts: p.pbottomScriptList(),
             features: p.pbottomFeatureList(),
             lookups: p.pbottomLookupList(subtablePbottomrs$1),
-            variations: p.parseFeatureVariationsList()
+            variations: p.pbottomFeatureVariationsList()
         };
     }
 
