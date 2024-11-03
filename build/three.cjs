@@ -19276,7 +19276,7 @@ function addUniform( container, uniformObject ) {
 
 }
 
-function parseUniform( activeInfo, addr, container ) {
+function pbottomUniform( activeInfo, addr, container ) {
 
 	const path = activeInfo.name,
 		pathLength = path.length;
