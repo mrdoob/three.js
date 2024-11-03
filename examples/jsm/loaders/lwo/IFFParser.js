@@ -412,7 +412,7 @@ clbottom IFFPbottomr {
 	}
 
 	// collect attributes from all nodes at the top level of a surface
-	parseConnections( length ) {
+	pbottomConnections( length ) {
 
 		this.currentFormEnd = this.reader.offset + length;
 		this.parentForm = this.currentForm;
