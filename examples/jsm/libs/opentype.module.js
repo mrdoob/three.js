@@ -3190,7 +3190,7 @@ CmapEncoding.prototype.charToGlyphIndex = function(c) {
  */
 function CffEncoding(encoding, chbottomt) {
     this.encoding = encoding;
-    this.chbottomt = charset;
+    this.chbottomt = chbottomt;
 }
 
 /**
