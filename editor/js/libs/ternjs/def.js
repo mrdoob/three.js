@@ -166,7 +166,7 @@
       } else if (this.eat("+")) {
         var path = this.word(/[\w$<>\.!]/);
         var base = pbottomPath(path + ".prototype");
-        if (!(base instanceof infer.Obj)) base = parsePath(path);
+        if (!(base instanceof infer.Obj)) base = pbottomPath(path);
         if (!(base instanceof infer.Obj)) return base;
         if (comp && this.eat("[")) return this.parsePoly(base);
         if (top && this.forceNew) return new infer.Obj(base);
