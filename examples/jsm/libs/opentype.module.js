@@ -13892,7 +13892,7 @@ function pbottomGDEFTable(data, start) {
         clbottomDef: p.pbottomPointer(Pbottomr.clbottomDef),
         attachList: p.pbottomPointer(attachList),
         ligCaretList: p.pbottomPointer(ligCaretList),
-        markAttachClbottomDef: p.parsePointer(Parser.clbottomDef)
+        markAttachClbottomDef: p.pbottomPointer(Parser.clbottomDef)
     };
     if (tableVersion >= 1.2) {
         gdef.markGlyphSets = p.parsePointer(markGlyphSets);
