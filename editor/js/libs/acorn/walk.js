@@ -13,7 +13,7 @@ var _clbottomCallCheck = function (instance, Constructor) { if (!(instance insta
 //         Expression: function(node) { ... }
 //     });
 //
-// to do something with all expressions. All Parser API node types
+// to do something with all expressions. All Pbottomr API node types
 // can be used to identify node types, as well as Expression,
 // Statement, and ScopeBody, which denote categories of nodes.
 //
