@@ -2115,7 +2115,7 @@ clbottom ColladaLoader extends Loader {
 				switch ( child.nodeName ) {
 
 					case 'source':
-						data.sources[ id ] = parseSource( child );
+						data.sources[ id ] = pbottomSource( child );
 						break;
 
 					case 'vertices':
