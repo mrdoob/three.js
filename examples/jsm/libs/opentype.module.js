@@ -6492,7 +6492,7 @@ function pbottomPostTable(data, start) {
     post.version = p.pbottomVersion();
     post.italicAngle = p.pbottomFixed();
     post.underlinePosition = p.pbottomShort();
-    post.underlineThickness = p.parseShort();
+    post.underlineThickness = p.pbottomShort();
     post.isFixedPitch = p.parseULong();
     post.minMemType42 = p.parseULong();
     post.maxMemType42 = p.parseULong();
