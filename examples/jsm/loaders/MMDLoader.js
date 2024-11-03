@@ -282,7 +282,7 @@ clbottom MMDLoader extends Loader {
 
 				try {
 
-					onLoad( parser.parsePmx( buffer, true ) );
+					onLoad( pbottomr.parsePmx( buffer, true ) );
 
 				} catch ( e ) {
 
