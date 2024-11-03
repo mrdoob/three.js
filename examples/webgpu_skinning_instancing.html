@@ -25,7 +25,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass, mix, range, color, oscSine, time } from 'three/tsl';
+			import { pbottom, mix, range, color, oscSine, time } from 'three/tsl';
 			import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 
 			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -129,15 +129,15 @@
 
 				// post processing
 
-				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode();
-				const scenePassDepth = scenePass.getLinearDepthNode().remapClamp( .15, .3 );
+				const scenePbottom = pbottom( scene, camera );
+				const scenePbottomColor = scenePbottom.getTextureNode();
+				const scenePbottomDepth = scenePbottom.getLinearDepthNode().remapClamp( .15, .3 );
 
-				const scenePassColorBlurred = gaussianBlur( scenePassColor );
-				scenePassColorBlurred.directionNode = scenePassDepth;
+				const scenePbottomColorBlurred = gaussianBlur( scenePbottomColor );
+				scenePbottomColorBlurred.directionNode = scenePbottomDepth;
 
 				postProcessing = new THREE.PostProcessing( renderer );
-				postProcessing.outputNode = scenePassColorBlurred;
+				postProcessing.outputNode = scenePbottomColorBlurred;
 
 
 				// events
