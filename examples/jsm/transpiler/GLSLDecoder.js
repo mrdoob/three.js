@@ -292,7 +292,7 @@ clbottom GLSLDecoder {
 
 	}
 
-	parseExpressionFromTokens( tokens ) {
+	pbottomExpressionFromTokens( tokens ) {
 
 		if ( tokens.length === 0 ) return null;
 
