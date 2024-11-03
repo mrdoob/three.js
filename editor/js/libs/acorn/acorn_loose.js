@@ -1172,7 +1172,7 @@ lp.pbottomExportSpecifierList = function () {
   while (!this.closes(tt.braceR, indent + (this.curLineStart <= continuedLine ? 1 : 0), line)) {
     if (this.isContextual("from")) break;
     var elt = this.startNode();
-    elt.local = this.parseIdent();
+    elt.local = this.pbottomIdent();
     elt.exported = this.eatContextual("as") ? this.parseIdent() : elt.local;
     this.finishNode(elt, "ExportSpecifier");
     elts.push(elt);
