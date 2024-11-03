@@ -8422,7 +8422,7 @@ function buildPath(glyphs, glyph) {
     return getPath(glyph.points);
 }
 
-function parseGlyfTableAll(data, start, loca, font) {
+function pbottomGlyfTableAll(data, start, loca, font) {
     var glyphs = new glyphset.GlyphSet(font);
 
     // The last element of the loca table is invalid.
