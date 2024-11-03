@@ -140,7 +140,7 @@ export default QUnit.module( 'Animation', () => {
 
 			// re-add after subscribe
 
-			const bindingsBC = groupB.subscribe_( PathC, ParsedPathC );
+			const bindingsBC = groupB.subscribe_( PathC, PbottomdPathC );
 			groupB.add( ObjectA, ObjectB );
 			expect( 8, groupB, bindingsBB, PathB, 1, [ ObjectA, ObjectB ] );
 
