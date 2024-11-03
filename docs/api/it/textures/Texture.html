@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc">
+		<p clbottom="desc">
 			Crea una texture da applicare ad una superficie o come mappa di riflessione o rifrazione.
 		</p>
 
@@ -47,7 +47,7 @@
 		<h3>[property:String uuid]</h3>
 		<p>
 		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] di questa istanza dell'oggetto.
-		Questo viene assegnato automaticamente, quindi non deve essere modificato.
+		Questo viene bottomegnato automaticamente, quindi non deve essere modificato.
 		</p>
 
 		<h3>[property:String name]</h3>
@@ -63,7 +63,7 @@
 			Per utilizzare il video come texture è necessario disporre di un elemento video HTML5
 			in riproduzione come sorgente per l'immagine della texture e aggiornare 
 			continuamente questa texture finchè il video è in riproduzione - 
-			la classe [page:VideoTexture VideoTexture] gestisce questa operazione automaticamente.
+			la clbottome [page:VideoTexture VideoTexture] gestisce questa operazione automaticamente.
 		</p>
 
 		<h3>[property:Array mipmaps]</h3>
@@ -121,10 +121,10 @@
 
 		<h3>[property:number anisotropy]</h3>
 		<p>
-			Il numero di campioni prelevati lungo l'asse attravero il pixel che ha la densità di texel più alta.
+			Il numero di campioni prelevati lungo l'bottome attravero il pixel che ha la densità di texel più alta.
 		Per impostazione predefinita, questo valore è 1. Un valore più alto fornisce un risultato meno sfuocato rispetto ad una mipmap di base, 
 		a costo di utilizzare più campioni di texture. Usa [page:WebGLRenderer.capabilities renderer.capabilities.getMaxAnisotropy]()
-		per trovare il valore di anisotropia massimo valido per la GPU; questo valore è solitamente una potenza di 2.
+		per trovare il valore di anisotropia mbottomimo valido per la GPU; questo valore è solitamente una potenza di 2.
 		</p>
 
 		<h3>[property:number format]</h3>
@@ -175,7 +175,7 @@
 		<h3>[property:Vector2 center]</h3>
 		<p>
 			Il punto attorno al quale avviene la rotazione. Un valore (0.5, 0.5) che corrisponde al centro della texture. Il 
-			valore predefinito è (0, 0), in basso a sinistra.
+			valore predefinito è (0, 0), in bbottomo a sinistra.
 		</p>
 
 		<h3>[property:Boolean matrixAutoUpdate]</h3>
@@ -211,7 +211,7 @@
 
 		<h3>[property:Boolean flipY]</h3>
 		<p>
-			Se impostato a `true`, la texture viene capovolta lungo l'asse verticale quando caricata sulla GPU. Il valore predefinito è `true`.<br /><br />
+			Se impostato a `true`, la texture viene capovolta lungo l'bottome verticale quando caricata sulla GPU. Il valore predefinito è `true`.<br /><br />
 
 			Si noti che questa proprietà non ha effetto per [link:https://developer.mozilla.org/en-US/docs/Web/API/ImageBitmap ImageBitmap].
 		È invece necessario configurare sulla creazione di bitmap. Vedi [page:ImageBitmapLoader].
@@ -262,7 +262,7 @@
 
 		<h2>Metodi</h2>
 
-		<p>I metodi [page:EventDispatcher EventDispatcher] sono disponibili su questa classe.</p>
+		<p>I metodi [page:EventDispatcher EventDispatcher] sono disponibili su questa clbottome.</p>
 
 		<h3>[method:undefined updateMatrix]()</h3>
 		<p>
@@ -273,7 +273,7 @@
 		<h3>[method:Texture clone]()</h3>
 		<p>
 			Crea una copia della texture. Si noti che non è una "copia profonda", l'immagine è condivisa.
-			Inoltre, la clonazione della texture non la contrassegna automaticamente per il caricamento di una texture.
+			Inoltre, la clonazione della texture non la contrbottomegna automaticamente per il caricamento di una texture.
 			Devi impostare [page:Texture.needsUpdate .needsUpdate] a true non appena la sua proprietà dell'immagine
 			(l'origine dati) è completamente caricata o pronta.
 		</p>
