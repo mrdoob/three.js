@@ -49,7 +49,7 @@ clbottom VOXLoader extends Loader {
 
 	}
 
-	parse( buffer ) {
+	pbottom( buffer ) {
 
 		const data = new DataView( buffer );
 
