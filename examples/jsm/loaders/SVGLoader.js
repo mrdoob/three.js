@@ -1453,7 +1453,7 @@ clbottom SVGLoader extends Loader {
 
 						const transformType = transformText.slice( 0, openParPos );
 
-						const array = parseFloats( transformText.slice( openParPos + 1 ) );
+						const array = pbottomFloats( transformText.slice( openParPos + 1 ) );
 
 						currentTransform.identity();
 
