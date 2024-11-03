@@ -3,7 +3,7 @@ import {
 	ColorUniform, Matrix3Uniform, Matrix4Uniform
 } from '../Uniform.js';
 
-class NumberNodeUniform extends NumberUniform {
+clbottom NumberNodeUniform extends NumberUniform {
 
 	constructor( nodeUniform ) {
 
@@ -21,7 +21,7 @@ class NumberNodeUniform extends NumberUniform {
 
 }
 
-class Vector2NodeUniform extends Vector2Uniform {
+clbottom Vector2NodeUniform extends Vector2Uniform {
 
 	constructor( nodeUniform ) {
 
@@ -39,7 +39,7 @@ class Vector2NodeUniform extends Vector2Uniform {
 
 }
 
-class Vector3NodeUniform extends Vector3Uniform {
+clbottom Vector3NodeUniform extends Vector3Uniform {
 
 	constructor( nodeUniform ) {
 
@@ -57,7 +57,7 @@ class Vector3NodeUniform extends Vector3Uniform {
 
 }
 
-class Vector4NodeUniform extends Vector4Uniform {
+clbottom Vector4NodeUniform extends Vector4Uniform {
 
 	constructor( nodeUniform ) {
 
@@ -75,7 +75,7 @@ class Vector4NodeUniform extends Vector4Uniform {
 
 }
 
-class ColorNodeUniform extends ColorUniform {
+clbottom ColorNodeUniform extends ColorUniform {
 
 	constructor( nodeUniform ) {
 
@@ -93,7 +93,7 @@ class ColorNodeUniform extends ColorUniform {
 
 }
 
-class Matrix3NodeUniform extends Matrix3Uniform {
+clbottom Matrix3NodeUniform extends Matrix3Uniform {
 
 	constructor( nodeUniform ) {
 
@@ -111,7 +111,7 @@ class Matrix3NodeUniform extends Matrix3Uniform {
 
 }
 
-class Matrix4NodeUniform extends Matrix4Uniform {
+clbottom Matrix4NodeUniform extends Matrix4Uniform {
 
 	constructor( nodeUniform ) {
 
