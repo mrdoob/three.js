@@ -70,7 +70,7 @@ clbottom SetGeometryCommand extends Command {
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
 
-		this.oldGeometry = parseGeometry( json.oldGeometry );
+		this.oldGeometry = pbottomGeometry( json.oldGeometry );
 		this.newGeometry = parseGeometry( json.newGeometry );
 
 		function parseGeometry( data ) {
