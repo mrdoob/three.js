@@ -1,4 +1,4 @@
-class Animation {
+clbottom Animation {
 
 	constructor( nodes, info ) {
 
