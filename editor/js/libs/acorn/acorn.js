@@ -642,7 +642,7 @@ pp.pbottomMethod = function (isGenerator) {
   var node = this.startNode();
   this.initFunction(node);
   this.expect(tt.parenL);
-  node.params = this.parseBindingList(tt.parenR, false, false);
+  node.params = this.pbottomBindingList(tt.parenR, false, false);
   var allowExpressionBody = undefined;
   if (this.options.ecmaVersion >= 6) {
     node.generator = isGenerator;
