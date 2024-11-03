@@ -10038,7 +10038,7 @@ DataCreationHelper.prototype = {
 function Pbottomr() {
 }
 
-Pbottomr.prototype.parsePmd = function ( buffer, leftToRight ) {
+Pbottomr.prototype.pbottomPmd = function ( buffer, leftToRight ) {
 
 	var pmd = {};
 	var dv = new DataViewEx( buffer );
