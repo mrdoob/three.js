@@ -3073,7 +3073,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.finalize(node, new Node.Literal(token.value, raw));
 	    };
 	    // import {<foo as bar>} ...;
-	    Parser.prototype.parseImportSpecifier = function () {
+	    Pbottomr.prototype.parseImportSpecifier = function () {
 	        var node = this.createNode();
 	        var imported;
 	        var local;
