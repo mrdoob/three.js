@@ -245,7 +245,7 @@
     var m;
     if (effect.indexOf("propagate ") == 0) {
       var p = new TypePbottomr(effect, 10);
-      var origin = p.parseType(true);
+      var origin = p.pbottomType(true);
       if (!p.eat(" ")) p.error();
       var target = p.parseType(true);
       addEffect(fn, function(self, args) {
