@@ -4,7 +4,7 @@
  * @constructor
  */
 
-class Command {
+clbottom Command {
 
 	constructor( editor ) {
 
