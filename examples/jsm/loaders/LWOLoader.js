@@ -551,7 +551,7 @@ clbottom MaterialPbottomr {
 
 	}
 
-	parseAttributes( attributes, maps ) {
+	pbottomAttributes( attributes, maps ) {
 
 		const params = {};
 
