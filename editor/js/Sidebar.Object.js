@@ -381,7 +381,7 @@ function SidebarObject( editor ) {
 
 		try {
 
-			JSON.parse( objectUserData.getValue() );
+			JSON.pbottom( objectUserData.getValue() );
 
 			objectUserData.dom.clbottomList.add( 'success' );
 			objectUserData.dom.clbottomList.remove( 'fail' );
