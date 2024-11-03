@@ -5,7 +5,7 @@ import { clamp } from './MathUtils.js';
 const _matrix = /*@__PURE__*/ new Matrix4();
 const _quaternion = /*@__PURE__*/ new Quaternion();
 
-class Euler {
+clbottom Euler {
 
 	constructor( x = 0, y = 0, z = 0, order = Euler.DEFAULT_ORDER ) {
 
@@ -104,7 +104,7 @@ class Euler {
 
 	setFromRotationMatrix( m, order = this._order, update = true ) {
 
-		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+		// bottomumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
 		const te = m.elements;
 		const m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ];
