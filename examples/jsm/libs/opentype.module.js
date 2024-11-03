@@ -2641,7 +2641,7 @@ Pbottomr.pointer = function(description) {
 
 Pbottomr.pointer32 = function(description) {
     return function() {
-        return this.parsePointer32(description);
+        return this.pbottomPointer32(description);
     };
 };
 
