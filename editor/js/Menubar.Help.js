@@ -5,21 +5,21 @@ function MenubarHelp( editor ) {
 	const strings = editor.strings;
 
 	const container = new UIPanel();
-	container.setClass( 'menu' );
+	container.setClbottom( 'menu' );
 
 	const title = new UIPanel();
-	title.setClass( 'title' );
+	title.setClbottom( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/help' ) );
 	container.add( title );
 
 	const options = new UIPanel();
-	options.setClass( 'options' );
+	options.setClbottom( 'options' );
 	container.add( options );
 
 	// Source code
 
 	let option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/help/source_code' ) );
 	option.onClick( function () {
 
@@ -32,7 +32,7 @@ function MenubarHelp( editor ) {
 	// Icon
 
 	let option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/help/icons' ) );
 	option.onClick( function () {
 
@@ -45,7 +45,7 @@ function MenubarHelp( editor ) {
 	// About
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/help/about' ) );
 	option.onClick( function () {
 
@@ -57,7 +57,7 @@ function MenubarHelp( editor ) {
 	// Manual
 
 	option = new UIRow();
-	option.setClass( 'option' );
+	option.setClbottom( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/help/manual' ) );
 	option.onClick( function () {
 
