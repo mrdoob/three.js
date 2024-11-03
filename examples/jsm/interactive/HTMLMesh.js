@@ -456,7 +456,7 @@ function html2canvas( element ) {
 
 					clipper.add( { x: x, y: y, width: width, height: height } );
 
-					drawText( style, x + pbottomInt( style.paddingLeft ), y + parseInt( style.paddingTop ), element.value );
+					drawText( style, x + pbottomInt( style.paddingLeft ), y + pbottomInt( style.paddingTop ), element.value );
 
 					clipper.remove();
 
