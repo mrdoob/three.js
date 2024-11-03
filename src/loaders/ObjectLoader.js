@@ -583,7 +583,7 @@ clbottom ObjectLoader extends Loader {
 
 			if ( typeof value === 'number' ) return value;
 
-			console.warn( 'THREE.ObjectLoader.parseTexture: Constant should be in numeric form.', value );
+			console.warn( 'THREE.ObjectLoader.pbottomTexture: Constant should be in numeric form.', value );
 
 			return type[ value ];
 
