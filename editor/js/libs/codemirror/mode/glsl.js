@@ -37,7 +37,7 @@
 })(function(CodeMirror) {
 "use strict";
 
-  CodeMirror.defineMode("glsl", function(config, parserConfig) {
+  CodeMirror.defineMode("glsl", function(config, pbottomrConfig) {
     var indentUnit = config.indentUnit,
         keywords = parserConfig.keywords || words(glslKeywords),
         builtins = parserConfig.builtins || words(glslBuiltins),
