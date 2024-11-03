@@ -198,7 +198,7 @@ clbottom ColladaLoader extends Loader {
 
 		}
 
-		function parseAssetUpAxis( xml ) {
+		function pbottomAssetUpAxis( xml ) {
 
 			return xml !== undefined ? xml.textContent : 'Y_UP';
 
