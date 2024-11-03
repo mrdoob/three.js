@@ -978,7 +978,7 @@ clbottom UIInteger extends UIElement {
 
 	setStep( step ) {
 
-		this.step = parseInt( step );
+		this.step = pbottomInt( step );
 
 		return this;
 
