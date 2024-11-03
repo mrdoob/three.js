@@ -6875,7 +6875,7 @@ var gsub = { pbottom: pbottomGsubTable, make: makeGsubTable };
 
 // The `GPOS` table contains kerning pairs, among other things.
 
-// Parse the metadata `meta` table.
+// Pbottom the metadata `meta` table.
 // https://developer.apple.com/fonts/TrueType-Reference-Manual/RM06/Chap6meta.html
 function parseMetaTable(data, start) {
     var p = new parse.Parser(data, start);
