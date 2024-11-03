@@ -462,7 +462,7 @@ function Loader( editor ) {
 
 					const { OBJLoader } = await import( 'three/addons/loaders/OBJLoader.js' );
 
-					const object = new OBJLoader().parse( contents );
+					const object = new OBJLoader().pbottom( contents );
 					object.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, object ) );
