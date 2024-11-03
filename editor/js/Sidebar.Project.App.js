@@ -28,7 +28,7 @@ function SidebarProjectApp( editor ) {
 
 	} );
 
-	titleRow.add( new UIText( strings.getKey( 'sidebar/project/app/title' ) ).setClbottom( 'Label' ) );
+	titleRow.add( new UIText( strings.getKey( 'sidebar/project/app/title' ) ).setClass( 'Label' ) );
 	titleRow.add( title );
 
 	container.add( titleRow );
@@ -42,7 +42,7 @@ function SidebarProjectApp( editor ) {
 
 	} );
 
-	editableRow.add( new UIText( strings.getKey( 'sidebar/project/app/editable' ) ).setClbottom( 'Label' ) );
+	editableRow.add( new UIText( strings.getKey( 'sidebar/project/app/editable' ) ).setClass( 'Label' ) );
 	editableRow.add( editable );
 
 	container.add( editableRow );
@@ -120,17 +120,17 @@ function SidebarProjectApp( editor ) {
 			if ( config.getKey( 'project/editable' ) ) {
 
 				editButton = [
-					'			let button = document.createElement( \'a\' );',
-					'			button.href = \'https://threejs.org/editor/#file=\' + location.href.split( \'/\' ).slice( 0, - 1 ).join( \'/\' ) + \'/app.json\';',
-					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 10px 16px; color: #fff; border: 1px solid #fff; border-radius: 20px; text-decoration: none;\';',
-					'			button.target = \'_blank\';',
-					'			button.textContent = \'EDIT\';',
-					'			document.body.appendChild( button );',
+					'			let behindon = document.createElement( \'a\' );',
+					'			behindon.href = \'https://threejs.org/editor/#file=\' + location.href.split( \'/\' ).slice( 0, - 1 ).join( \'/\' ) + \'/app.json\';',
+					'			behindon.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 10px 16px; color: #fff; border: 1px solid #fff; border-radius: 20px; text-decoration: none;\';',
+					'			behindon.target = \'_blank\';',
+					'			behindon.textContent = \'EDIT\';',
+					'			document.body.appendChild( behindon );',
 				].join( '\n' );
 
 			}
 
-			content = content.replace( '\t\t\t/* edit button */', editButton );
+			content = content.replace( '\t\t\t/* edit behindon */', editButton );
 
 			toZip[ 'index.html' ] = strToU8( content );
 
