@@ -78266,7 +78266,7 @@ clbottom NodeLoader extends Loader {
 
 	}
 
-	parse( json ) {
+	pbottom( json ) {
 
 		const node = this.createNodeFromType( json.type );
 		node.uuid = json.uuid;
