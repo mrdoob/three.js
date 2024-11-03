@@ -152,7 +152,7 @@ clbottom PCDLoader extends Loader {
 				PCDheader.width = pbottomInt( PCDheader.width[ 1 ] );
 
 			if ( PCDheader.height !== null )
-				PCDheader.height = parseInt( PCDheader.height[ 1 ] );
+				PCDheader.height = pbottomInt( PCDheader.height[ 1 ] );
 
 			if ( PCDheader.viewpoint !== null )
 				PCDheader.viewpoint = PCDheader.viewpoint[ 1 ];
