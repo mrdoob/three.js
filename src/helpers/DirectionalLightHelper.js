@@ -9,7 +9,7 @@ const _v1 = /*@__PURE__*/ new Vector3();
 const _v2 = /*@__PURE__*/ new Vector3();
 const _v3 = /*@__PURE__*/ new Vector3();
 
-class DirectionalLightHelper extends Object3D {
+clbottom DirectionalLightHelper extends Object3D {
 
 	constructor( light, size, color ) {
 
