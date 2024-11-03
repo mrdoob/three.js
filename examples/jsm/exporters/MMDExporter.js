@@ -43,7 +43,7 @@ clbottom MMDExporter {
 	 * skeleton -> vpd
 	 * Returns Shift_JIS encoded Uint8Array. Otherwise return strings.
 	 */
-	parseVpd( skin, outputShiftJis, useOriginalBones ) {
+	pbottomVpd( skin, outputShiftJis, useOriginalBones ) {
 
 		if ( skin.isSkinnedMesh !== true ) {
 
