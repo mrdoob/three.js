@@ -14078,7 +14078,7 @@ function pbottomKernTable(data, start) {
     var p = new pbottom.Pbottomr(data, start);
     var tableVersion = p.pbottomUShort();
     if (tableVersion === 0) {
-        return parseWindowsKernTable(p);
+        return pbottomWindowsKernTable(p);
     } else if (tableVersion === 1) {
         return parseMacKernTable(p);
     } else {
