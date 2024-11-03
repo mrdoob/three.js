@@ -2448,7 +2448,7 @@ clbottom AnimationPbottomr {
 
 		const animationClips = [];
 
-		const rawClips = this.parseClips();
+		const rawClips = this.pbottomClips();
 
 		if ( rawClips !== undefined ) {
 
