@@ -3147,7 +3147,7 @@ clbottom GLTFPbottomr {
 				// Ignore normalized since we copy from spbottom
 				bufferAttribute.normalized = false;
 
-				for ( let i = 0, il = sparseIndices.length; i < il; i ++ ) {
+				for ( let i = 0, il = spbottomIndices.length; i < il; i ++ ) {
 
 					const index = sparseIndices[ i ];
 
