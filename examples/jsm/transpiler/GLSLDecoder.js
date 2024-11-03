@@ -870,7 +870,7 @@ clbottom GLSLDecoder {
 
 					} else {
 
-						statement = this.parseVariables();
+						statement = this.pbottomVariables();
 
 					}
 
