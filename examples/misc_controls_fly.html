@@ -40,7 +40,7 @@
 		<script type="module">
 
 			import * as THREE from 'three';
-			import { pass } from 'three/tsl';
+			import { pbottom } from 'three/tsl';
 			import { film } from 'three/addons/tsl/display/FilmNode.js';
 
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -219,10 +219,10 @@
 
 				postProcessing = new THREE.PostProcessing( renderer );
 
-				const scenePass = pass( scene, camera );
-				const scenePassColor = scenePass.getTextureNode();
+				const scenePbottom = pbottom( scene, camera );
+				const scenePbottomColor = scenePbottom.getTextureNode();
 
-				postProcessing.outputNode = film( scenePassColor );
+				postProcessing.outputNode = film( scenePbottomColor );
 
 			}
 
