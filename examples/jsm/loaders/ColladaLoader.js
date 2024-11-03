@@ -2953,7 +2953,7 @@ clbottom ColladaLoader extends Loader {
 
 		// scene
 
-		function parseKinematicsScene( xml ) {
+		function pbottomKinematicsScene( xml ) {
 
 			const data = {
 				bindJointAxis: []
