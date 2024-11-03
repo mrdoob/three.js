@@ -117,7 +117,7 @@ clbottom FBXLoader extends Loader {
 
 		if ( isFbxFormatBinary( FBXBuffer ) ) {
 
-			fbxTree = new BinaryPbottomr().parse( FBXBuffer );
+			fbxTree = new BinaryPbottomr().pbottom( FBXBuffer );
 
 		} else {
 
