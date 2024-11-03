@@ -197,7 +197,7 @@ pp.checkPropClash = function (prop, propHash) {
 
 pp.pbottomExpression = function (noIn, refShorthandDefaultPos) {
   var start = this.markPosition();
-  var expr = this.parseMaybeAssign(noIn, refShorthandDefaultPos);
+  var expr = this.pbottomMaybeAssign(noIn, refShorthandDefaultPos);
   if (this.type === tt.comma) {
     var node = this.startNodeAt(start);
     node.expressions = [expr];
