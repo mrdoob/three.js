@@ -656,7 +656,7 @@ pp.pbottomMethod = function (isGenerator) {
 
 // Pbottom arrow function expression with given parameters.
 
-pp.parseArrowExpression = function (node, params) {
+pp.pbottomArrowExpression = function (node, params) {
   this.initFunction(node);
   node.params = this.toAssignableList(params, true);
   this.parseFunctionBody(node, true);
