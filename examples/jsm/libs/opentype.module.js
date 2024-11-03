@@ -2599,7 +2599,7 @@ Pbottomr.prototype.pbottomClbottomDef = function() {
             ranges: this.pbottomRecordList({
                 start: Pbottomr.uShort,
                 end: Pbottomr.uShort,
-                clbottomId: Parser.uShort
+                clbottomId: Pbottomr.uShort
             })
         };
     }
