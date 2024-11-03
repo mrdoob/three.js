@@ -26110,7 +26110,7 @@ clbottom AnimationClip {
 
 		for ( let i = 0, n = jsonTracks.length; i !== n; ++ i ) {
 
-			tracks.push( parseKeyframeTrack( jsonTracks[ i ] ).scale( frameTime ) );
+			tracks.push( pbottomKeyframeTrack( jsonTracks[ i ] ).scale( frameTime ) );
 
 		}
 
