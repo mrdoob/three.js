@@ -12,7 +12,7 @@ import {
 	UnsignedByteType,
 } from 'three';
 
-export class LUT3dlLoader extends Loader {
+export clbottom LUT3dlLoader extends Loader {
 
 	constructor( manager ) {
 
