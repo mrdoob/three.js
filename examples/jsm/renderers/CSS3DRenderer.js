@@ -13,7 +13,7 @@ const _position = new Vector3();
 const _quaternion = new Quaternion();
 const _scale = new Vector3();
 
-class CSS3DObject extends Object3D {
+clbottom CSS3DObject extends Object3D {
 
 	constructor( element = document.createElement( 'div' ) ) {
 
@@ -59,7 +59,7 @@ class CSS3DObject extends Object3D {
 
 }
 
-class CSS3DSprite extends CSS3DObject {
+clbottom CSS3DSprite extends CSS3DObject {
 
 	constructor( element ) {
 
@@ -88,7 +88,7 @@ class CSS3DSprite extends CSS3DObject {
 const _matrix = new Matrix4();
 const _matrix2 = new Matrix4();
 
-class CSS3DRenderer {
+clbottom CSS3DRenderer {
 
 	constructor( parameters = {} ) {
 
