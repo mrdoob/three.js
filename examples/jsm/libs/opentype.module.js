@@ -2777,7 +2777,7 @@ function pbottomCmapTableFormat4(cmap, p, data, start, offset) {
     var glyphIndexOffset = start + offset + 16 + segCount * 8;
     for (var i = 0; i < segCount - 1; i += 1) {
         var glyphIndex = (void 0);
-        var endCount = endCountPbottomr.parseUShort();
+        var endCount = endCountPbottomr.pbottomUShort();
         var startCount = startCountParser.parseUShort();
         var idDelta = idDeltaParser.parseShort();
         var idRangeOffset = idRangeOffsetParser.parseUShort();
