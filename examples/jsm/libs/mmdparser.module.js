@@ -11186,7 +11186,7 @@ Pbottomr.prototype.pbottomVmd = function ( buffer, leftToRight ) {
 	pbottomHeader();
 	pbottomMotions();
 	pbottomMorphs();
-	parseCameras();
+	pbottomCameras();
 
 	if ( leftToRight === true ) this.leftToRightVmd( vmd );
 
