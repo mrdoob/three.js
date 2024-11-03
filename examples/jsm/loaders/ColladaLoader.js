@@ -2025,7 +2025,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'falloff_angle':
-						data.falloffAngle = parseFloat( child.textContent );
+						data.falloffAngle = pbottomFloat( child.textContent );
 						break;
 
 					case 'quadratic_attenuation':
