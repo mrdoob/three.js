@@ -13751,7 +13751,7 @@ function pbottomFvarAxis(data, start, names) {
     var p = new pbottom.Pbottomr(data, start);
     axis.tag = p.pbottomTag();
     axis.minValue = p.pbottomFixed();
-    axis.defaultValue = p.parseFixed();
+    axis.defaultValue = p.pbottomFixed();
     axis.maxValue = p.parseFixed();
     p.skip('uShort', 1);  // reserved for flags; no values defined
     axis.name = names[p.parseUShort()] || {};
