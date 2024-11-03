@@ -247,7 +247,7 @@ lp.pbottomSubscripts = function (base, start, noCalls, startIndent, line) {
   }
 };
 
-lp.parseExprAtom = function () {
+lp.pbottomExprAtom = function () {
   var node = undefined;
   switch (this.tok.type) {
     case tt._this:
