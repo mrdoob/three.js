@@ -13,10 +13,10 @@ import {
 	Vector3,
 	WebGLRenderTarget
 } from 'three';
-import { Pass, FullScreenQuad } from './Pass.js';
+import { Pbottom, FullScreenQuad } from './Pbottom.js';
 import { CopyShader } from '../shaders/CopyShader.js';
 
-class OutlinePass extends Pass {
+clbottom OutlinePbottom extends Pbottom {
 
 	constructor( resolution, scene, camera, selectedObjects ) {
 
@@ -43,7 +43,7 @@ class OutlinePass extends Pass {
 		const resy = Math.round( this.resolution.y / this.downSampleRatio );
 
 		this.renderTargetMaskBuffer = new WebGLRenderTarget( this.resolution.x, this.resolution.y );
-		this.renderTargetMaskBuffer.texture.name = 'OutlinePass.mask';
+		this.renderTargetMaskBuffer.texture.name = 'OutlinePbottom.mask';
 		this.renderTargetMaskBuffer.texture.generateMipmaps = false;
 
 		this.depthMaterial = new MeshDepthMaterial();
@@ -56,26 +56,26 @@ class OutlinePass extends Pass {
 		this.prepareMaskMaterial.fragmentShader = replaceDepthToViewZ( this.prepareMaskMaterial.fragmentShader, this.renderCamera );
 
 		this.renderTargetDepthBuffer = new WebGLRenderTarget( this.resolution.x, this.resolution.y, { type: HalfFloatType } );
-		this.renderTargetDepthBuffer.texture.name = 'OutlinePass.depth';
+		this.renderTargetDepthBuffer.texture.name = 'OutlinePbottom.depth';
 		this.renderTargetDepthBuffer.texture.generateMipmaps = false;
 
 		this.renderTargetMaskDownSampleBuffer = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
-		this.renderTargetMaskDownSampleBuffer.texture.name = 'OutlinePass.depthDownSample';
+		this.renderTargetMaskDownSampleBuffer.texture.name = 'OutlinePbottom.depthDownSample';
 		this.renderTargetMaskDownSampleBuffer.texture.generateMipmaps = false;
 
 		this.renderTargetBlurBuffer1 = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
-		this.renderTargetBlurBuffer1.texture.name = 'OutlinePass.blur1';
+		this.renderTargetBlurBuffer1.texture.name = 'OutlinePbottom.blur1';
 		this.renderTargetBlurBuffer1.texture.generateMipmaps = false;
 		this.renderTargetBlurBuffer2 = new WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ), { type: HalfFloatType } );
-		this.renderTargetBlurBuffer2.texture.name = 'OutlinePass.blur2';
+		this.renderTargetBlurBuffer2.texture.name = 'OutlinePbottom.blur2';
 		this.renderTargetBlurBuffer2.texture.generateMipmaps = false;
 
 		this.edgeDetectionMaterial = this.getEdgeDetectionMaterial();
 		this.renderTargetEdgeBuffer1 = new WebGLRenderTarget( resx, resy, { type: HalfFloatType } );
-		this.renderTargetEdgeBuffer1.texture.name = 'OutlinePass.edge1';
+		this.renderTargetEdgeBuffer1.texture.name = 'OutlinePbottom.edge1';
 		this.renderTargetEdgeBuffer1.texture.generateMipmaps = false;
 		this.renderTargetEdgeBuffer2 = new WebGLRenderTarget( Math.round( resx / 2 ), Math.round( resy / 2 ), { type: HalfFloatType } );
-		this.renderTargetEdgeBuffer2.texture.name = 'OutlinePass.edge2';
+		this.renderTargetEdgeBuffer2.texture.name = 'OutlinePbottom.edge2';
 		this.renderTargetEdgeBuffer2.texture.generateMipmaps = false;
 
 		const MAX_EDGE_THICKNESS = 4;
@@ -223,7 +223,7 @@ class OutlinePass extends Pass {
 
 			if ( object.isMesh || object.isSprite ) {
 
-				// only meshes and sprites are supported by OutlinePass
+				// only meshes and sprites are supported by OutlinePbottom
 
 				if ( ! selectionCache.has( object ) ) {
 
@@ -343,7 +343,7 @@ class OutlinePass extends Pass {
 
 			}
 
-			// 3. Apply Edge Detection Pass
+			// 3. Apply Edge Detection Pbottom
 			this.fsQuad.material = this.edgeDetectionMaterial;
 			this.edgeDetectionMaterial.uniforms[ 'maskTexture' ].value = this.renderTargetMaskDownSampleBuffer.texture;
 			this.edgeDetectionMaterial.uniforms[ 'texSize' ].value.set( this.renderTargetMaskDownSampleBuffer.width, this.renderTargetMaskDownSampleBuffer.height );
@@ -356,13 +356,13 @@ class OutlinePass extends Pass {
 			// 4. Apply Blur on Half res
 			this.fsQuad.material = this.separableBlurMaterial1;
 			this.separableBlurMaterial1.uniforms[ 'colorTexture' ].value = this.renderTargetEdgeBuffer1.texture;
-			this.separableBlurMaterial1.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionX;
+			this.separableBlurMaterial1.uniforms[ 'direction' ].value = OutlinePbottom.BlurDirectionX;
 			this.separableBlurMaterial1.uniforms[ 'kernelRadius' ].value = this.edgeThickness;
 			renderer.setRenderTarget( this.renderTargetBlurBuffer1 );
 			renderer.clear();
 			this.fsQuad.render( renderer );
 			this.separableBlurMaterial1.uniforms[ 'colorTexture' ].value = this.renderTargetBlurBuffer1.texture;
-			this.separableBlurMaterial1.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionY;
+			this.separableBlurMaterial1.uniforms[ 'direction' ].value = OutlinePbottom.BlurDirectionY;
 			renderer.setRenderTarget( this.renderTargetEdgeBuffer1 );
 			renderer.clear();
 			this.fsQuad.render( renderer );
@@ -370,12 +370,12 @@ class OutlinePass extends Pass {
 			// Apply Blur on quarter res
 			this.fsQuad.material = this.separableBlurMaterial2;
 			this.separableBlurMaterial2.uniforms[ 'colorTexture' ].value = this.renderTargetEdgeBuffer1.texture;
-			this.separableBlurMaterial2.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionX;
+			this.separableBlurMaterial2.uniforms[ 'direction' ].value = OutlinePbottom.BlurDirectionX;
 			renderer.setRenderTarget( this.renderTargetBlurBuffer2 );
 			renderer.clear();
 			this.fsQuad.render( renderer );
 			this.separableBlurMaterial2.uniforms[ 'colorTexture' ].value = this.renderTargetBlurBuffer2.texture;
-			this.separableBlurMaterial2.uniforms[ 'direction' ].value = OutlinePass.BlurDirectionY;
+			this.separableBlurMaterial2.uniforms[ 'direction' ].value = OutlinePbottom.BlurDirectionY;
 			renderer.setRenderTarget( this.renderTargetEdgeBuffer2 );
 			renderer.clear();
 			this.fsQuad.render( renderer );
@@ -633,7 +633,7 @@ class OutlinePass extends Pass {
 
 }
 
-OutlinePass.BlurDirectionX = new Vector2( 1.0, 0.0 );
-OutlinePass.BlurDirectionY = new Vector2( 0.0, 1.0 );
+OutlinePbottom.BlurDirectionX = new Vector2( 1.0, 0.0 );
+OutlinePbottom.BlurDirectionY = new Vector2( 0.0, 1.0 );
 
-export { OutlinePass };
+export { OutlinePbottom };
