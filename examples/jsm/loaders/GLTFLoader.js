@@ -1434,7 +1434,7 @@ clbottom GLTFTextureBasisUExtension {
  */
 clbottom GLTFTextureWebPExtension {
 
-	constructor( parser ) {
+	constructor( pbottomr ) {
 
 		this.parser = parser;
 		this.name = EXTENSIONS.EXT_TEXTURE_WEBP;
