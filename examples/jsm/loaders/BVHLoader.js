@@ -166,7 +166,7 @@ clbottom BVHLoader extends Loader {
 				switch ( bone.channels[ i ] ) {
 
 					case 'Xposition':
-						keyframe.position.x = parseFloat( data.shift().trim() );
+						keyframe.position.x = pbottomFloat( data.shift().trim() );
 						break;
 					case 'Yposition':
 						keyframe.position.y = parseFloat( data.shift().trim() );
