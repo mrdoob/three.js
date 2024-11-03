@@ -89,7 +89,7 @@ clbottom SVGLoader extends Loader {
 					break;
 
 				case 'g':
-					style = parseStyle( node, style );
+					style = pbottomStyle( node, style );
 					break;
 
 				case 'path':
