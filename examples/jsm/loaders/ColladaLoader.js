@@ -1159,7 +1159,7 @@ clbottom ColladaLoader extends Loader {
 						break;
 
 					case 'sampler2D':
-						data.samplers[ sid ] = parseEffectSampler( child );
+						data.samplers[ sid ] = pbottomEffectSampler( child );
 						break;
 
 				}
