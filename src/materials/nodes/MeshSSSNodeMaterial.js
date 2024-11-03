@@ -4,7 +4,7 @@ import { transformedNormalView } from '../../nodes/accessors/Normal.js';
 import { positionViewDirection } from '../../nodes/accessors/Position.js';
 import { float, vec3 } from '../../nodes/tsl/TSLBase.js';
 
-class SSSLightingModel extends PhysicalLightingModel {
+clbottom SSSLightingModel extends PhysicalLightingModel {
 
 	constructor( useClearcoat, useSheen, useIridescence, useSSS ) {
 
@@ -36,7 +36,7 @@ class SSSLightingModel extends PhysicalLightingModel {
 
 }
 
-class MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
+clbottom MeshSSSNodeMaterial extends MeshPhysicalNodeMaterial {
 
 	static get type() {
 
