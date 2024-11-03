@@ -2318,7 +2318,7 @@ Pbottomr.prototype.pbottomULongList = function(count) {
 // Pbottom a list of 16 bit unsigned integers. The length of the list can be read on the stream
 // or provided as an argument.
 Pbottomr.prototype.pbottomOffset16List =
-Pbottomr.prototype.parseUShortList = function(count) {
+Pbottomr.prototype.pbottomUShortList = function(count) {
     if (count === undefined) { count = this.parseUShort(); }
     var offsets = new Array(count);
     var dataView = this.data;
