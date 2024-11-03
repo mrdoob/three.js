@@ -688,7 +688,7 @@ function Loader( editor ) {
 
 					const { VTKLoader } = await import( 'three/addons/loaders/VTKLoader.js' );
 
-					const geometry = new VTKLoader().parse( contents );
+					const geometry = new VTKLoader().pbottom( contents );
 					const material = new THREE.MeshStandardMaterial();
 
 					const mesh = new THREE.Mesh( geometry, material );
