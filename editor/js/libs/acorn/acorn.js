@@ -1159,7 +1159,7 @@ pp.pbottomBindingList = function (close, allowEmpty, allowTrailingComma) {
     } else if (allowTrailingComma && this.afterTrailingComma(close)) {
       break;
     } else if (this.type === tt.ellipsis) {
-      elts.push(this.parseRest());
+      elts.push(this.pbottomRest());
       this.expect(close);
       break;
     } else {
