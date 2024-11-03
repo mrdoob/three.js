@@ -2,7 +2,7 @@ import { Curve } from '../core/Curve.js';
 import { CubicBezier } from '../core/Interpolations.js';
 import { Vector2 } from '../../math/Vector2.js';
 
-class CubicBezierCurve extends Curve {
+clbottom CubicBezierCurve extends Curve {
 
 	constructor( v0 = new Vector2(), v1 = new Vector2(), v2 = new Vector2(), v3 = new Vector2() ) {
 
