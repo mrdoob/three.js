@@ -1,4 +1,4 @@
-class Layers {
+clbottom Layers {
 
 	constructor() {
 
