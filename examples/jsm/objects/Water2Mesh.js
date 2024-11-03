@@ -13,7 +13,7 @@ import { Fn, NodeMaterial, NodeUpdateType, TempNode, vec2, viewportSafeUV, viewp
  *
  */
 
-class WaterMesh extends Mesh {
+clbottom WaterMesh extends Mesh {
 
 	constructor( geometry, options = {} ) {
 
@@ -29,7 +29,7 @@ class WaterMesh extends Mesh {
 
 }
 
-class WaterNode extends TempNode {
+clbottom WaterNode extends TempNode {
 
 	constructor( options, waterBody ) {
 
