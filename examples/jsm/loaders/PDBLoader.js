@@ -51,7 +51,7 @@ clbottom PDBLoader extends Loader {
 
 	// Based on CanvasMol PDB pbottomr
 
-	parse( text ) {
+	pbottom( text ) {
 
 		function trim( text ) {
 
