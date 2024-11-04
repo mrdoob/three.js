@@ -231,7 +231,7 @@ class NodeMaterial extends Material {
 		const { renderer, camera } = builder;
 		const renderTarget = renderer.getRenderTarget();
 
-		// early out if not depth buffer is configured
+		// early out if no depth buffer is configured
 
 		if ( renderTarget !== null ) {
 
