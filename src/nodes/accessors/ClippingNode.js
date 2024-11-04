@@ -1,9 +1,8 @@
 
 import Node from '../core/Node.js';
-import { nodeObject } from '../tsl/TSLBase.js';
+import { nodeObject, Fn, bool, float } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
-import { diffuseColor, property } from '../core/PropertyNode.js';
-import { Fn } from '../tsl/TSLBase.js';
+import { diffuseColor } from '../core/PropertyNode.js';
 import { Loop } from '../utils/LoopNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { uniformArray } from './UniformArrayNode.js';
@@ -48,12 +47,10 @@ class ClippingNode extends Node {
 
 		return Fn( () => {
 
-			const distanceToPlane = property( 'float', 'distanceToPlane' );
-			const distanceGradient = property( 'float', 'distanceToGradient' );
+			const distanceToPlane = float().toVar( 'distanceToPlane' );
+			const distanceGradient = float().toVar( 'distanceToGradient' );
 
-			const clipOpacity = property( 'float', 'clipOpacity' );
-
-			clipOpacity.assign( 1 );
+			const clipOpacity = float( 1 ).toVar( 'clipOpacity' );
 
 			const numUnionPlanes = unionPlanes.length;
 
@@ -72,8 +69,6 @@ class ClippingNode extends Node {
 
 					clipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ) );
 
-					clipOpacity.equal( 0.0 ).discard();
-
 				} );
 
 			}
@@ -83,11 +78,9 @@ class ClippingNode extends Node {
 			if ( numIntersectionPlanes > 0 ) {
 
 				const clippingPlanes = uniformArray( intersectionPlanes );
-				const unionClipOpacity = property( 'float', 'unionclipOpacity' );
+				const intersectionClipOpacity = float( 1 ).toVar( 'intersectionClipOpacity' );
 
 				let plane;
-
-				unionClipOpacity.assign( 1 );
 
 				Loop( numIntersectionPlanes, ( { i } ) => {
 
@@ -96,11 +89,11 @@ class ClippingNode extends Node {
 					distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
 					distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
 
-					unionClipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ).oneMinus() );
+					intersectionClipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ).oneMinus() );
 
 				} );
 
-				clipOpacity.mulAssign( unionClipOpacity.oneMinus() );
+				clipOpacity.mulAssign( intersectionClipOpacity.oneMinus() );
 
 			}
 
@@ -138,11 +131,9 @@ class ClippingNode extends Node {
 			if ( numIntersectionPlanes > 0 ) {
 
 				const clippingPlanes = uniformArray( intersectionPlanes );
-				const clipped = property( 'bool', 'clipped' );
+				const clipped = bool( true ).toVar( 'clipped' );
 
 				let plane;
-
-				clipped.assign( true );
 
 				Loop( numIntersectionPlanes, ( { i } ) => {
 
