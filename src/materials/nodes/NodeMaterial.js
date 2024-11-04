@@ -99,6 +99,9 @@ class NodeMaterial extends Material {
 
 		builder.context.setupNormal = () => this.setupNormal( builder );
 
+		const renderer = builder.renderer;
+		const renderTarget = renderer.getRenderTarget();
+
 		// < VERTEX STAGE >
 
 		builder.addStack();
@@ -121,7 +124,21 @@ class NodeMaterial extends Material {
 
 		const clippingNode = this.setupClipping( builder );
 
-		if ( this.depthWrite === true ) this.setupDepth( builder );
+		if ( this.depthWrite === true ) {
+
+			// only write depth if depth buffer is configured
+
+			if ( renderTarget !== null ) {
+
+				if ( renderTarget.depthBuffer === true ) this.setupDepth( builder );
+
+			} else {
+
+				if ( renderer.depth === true ) this.setupDepth( builder );
+
+			}
+
+		}
 
 		if ( this.fragmentNode === null ) {
 
@@ -148,11 +165,9 @@ class NodeMaterial extends Material {
 
 			// MRT
 
-			const renderTarget = builder.renderer.getRenderTarget();
-
 			if ( renderTarget !== null ) {
 
-				const mrt = builder.renderer.getMRT();
+				const mrt = renderer.getMRT();
 				const materialMRT = this.mrtNode;
 
 				if ( mrt !== null ) {
