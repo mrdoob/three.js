@@ -55,7 +55,7 @@ class StereoCompositePassNode extends PassNode {
 		const { renderer } = frame;
 		const { scene, stereo, renderTarget } = this;
 
-		_rendererState = PostProcessingUtils.resetRendererAndSceneState( renderer, scene, _rendererState );
+		_rendererState = PostProcessingUtils.resetRendererState( renderer, _rendererState );
 
 		//
 
@@ -84,7 +84,7 @@ class StereoCompositePassNode extends PassNode {
 
 		// restore
 
-		PostProcessingUtils.restoreRendererState( renderer, scene, _rendererState );
+		PostProcessingUtils.restoreRendererState( renderer, _rendererState );
 
 	}
 
