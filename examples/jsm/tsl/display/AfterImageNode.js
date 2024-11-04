@@ -1,5 +1,5 @@
-import { RenderTarget, Vector2, PostProcessingUtils } from 'three';
-import { TempNode, nodeObject, Fn, float, vec4, NodeUpdateType, uv, texture, passTexture, uniform, sign, max, convertToTexture, QuadMesh, NodeMaterial } from 'three/tsl';
+import { RenderTarget, Vector2 } from 'three';
+import { TempNode, nodeObject, Fn, float, vec4, NodeUpdateType, uv, texture, passTexture, uniform, sign, max, convertToTexture, QuadMesh, NodeMaterial, PostProcessingUtils } from 'three/tsl';
 
 const _size = /*@__PURE__*/ new Vector2();
 const _quadMeshComp = /*@__PURE__*/ new QuadMesh();
