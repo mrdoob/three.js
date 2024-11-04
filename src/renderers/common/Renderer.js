@@ -1600,7 +1600,7 @@ class Renderer {
 
 	}
 
-	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId = null ) {
+	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
 
 		let overridePositionNode;
 		let overrideFragmentNode;
