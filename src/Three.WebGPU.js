@@ -164,6 +164,7 @@ export * from './Three.Legacy.js';
 
 export * from './materials/nodes/NodeMaterials.js';
 export { default as WebGPURenderer } from './renderers/webgpu/WebGPURenderer.js';
+export { default as ClippingGroup } from './renderers/common/ClippingGroup.js';
 export { default as Lighting } from './renderers/common/Lighting.js';
 export { default as BundleGroup } from './renderers/common/BundleGroup.js';
 export { default as QuadMesh } from './renderers/common/QuadMesh.js';

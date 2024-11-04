@@ -1,9 +1,8 @@
 
 import Node from '../core/Node.js';
-import { nodeObject } from '../tsl/TSLBase.js';
+import { nodeObject, Fn, bool, float } from '../tsl/TSLBase.js';
 import { positionView } from './Position.js';
-import { diffuseColor, property } from '../core/PropertyNode.js';
-import { Fn } from '../tsl/TSLBase.js';
+import { diffuseColor } from '../core/PropertyNode.js';
 import { Loop } from '../utils/LoopNode.js';
 import { smoothstep } from '../math/MathNode.js';
 import { uniformArray } from './UniformArrayNode.js';
@@ -29,69 +28,72 @@ class ClippingNode extends Node {
 		super.setup( builder );
 
 		const clippingContext = builder.clippingContext;
-		const { localClipIntersection, localClippingCount, globalClippingCount } = clippingContext;
+		const { intersectionPlanes, unionPlanes } = clippingContext;
 
-		const numClippingPlanes = globalClippingCount + localClippingCount;
-		const numUnionClippingPlanes = localClipIntersection ? numClippingPlanes - localClippingCount : numClippingPlanes;
 
 		if ( this.scope === ClippingNode.ALPHA_TO_COVERAGE ) {
 
-			return this.setupAlphaToCoverage( clippingContext.planes, numClippingPlanes, numUnionClippingPlanes );
+			return this.setupAlphaToCoverage( intersectionPlanes, unionPlanes );
 
 		} else {
 
-			return this.setupDefault( clippingContext.planes, numClippingPlanes, numUnionClippingPlanes );
+			return this.setupDefault( intersectionPlanes, unionPlanes );
 
 		}
 
 	}
 
-	setupAlphaToCoverage( planes, numClippingPlanes, numUnionClippingPlanes ) {
+	setupAlphaToCoverage( intersectionPlanes, unionPlanes ) {
 
 		return Fn( () => {
 
-			const clippingPlanes = uniformArray( planes );
+			const distanceToPlane = float().toVar( 'distanceToPlane' );
+			const distanceGradient = float().toVar( 'distanceToGradient' );
 
-			const distanceToPlane = property( 'float', 'distanceToPlane' );
-			const distanceGradient = property( 'float', 'distanceToGradient' );
+			const clipOpacity = float( 1 ).toVar( 'clipOpacity' );
 
-			const clipOpacity = property( 'float', 'clipOpacity' );
+			const numUnionPlanes = unionPlanes.length;
 
-			clipOpacity.assign( 1 );
+			if ( numUnionPlanes > 0 ) {
 
-			let plane;
+				const clippingPlanes = uniformArray( unionPlanes );
 
-			Loop( numUnionClippingPlanes, ( { i } ) => {
+				let plane;
 
-				plane = clippingPlanes.element( i );
-
-				distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
-				distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
-
-				clipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ) );
-
-				clipOpacity.equal( 0.0 ).discard();
-
-			} );
-
-			if ( numUnionClippingPlanes < numClippingPlanes ) {
-
-				const unionClipOpacity = property( 'float', 'unionclipOpacity' );
-
-				unionClipOpacity.assign( 1 );
-
-				Loop( { start: numUnionClippingPlanes, end: numClippingPlanes }, ( { i } ) => {
+				Loop( numUnionPlanes, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 
 					distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
 					distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
 
-					unionClipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ).oneMinus() );
+					clipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ) );
 
 				} );
 
-				clipOpacity.mulAssign( unionClipOpacity.oneMinus() );
+			}
+
+			const numIntersectionPlanes = intersectionPlanes.length;
+
+			if ( numIntersectionPlanes > 0 ) {
+
+				const clippingPlanes = uniformArray( intersectionPlanes );
+				const intersectionClipOpacity = float( 1 ).toVar( 'intersectionClipOpacity' );
+
+				let plane;
+
+				Loop( numIntersectionPlanes, ( { i } ) => {
+
+					plane = clippingPlanes.element( i );
+
+					distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
+					distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
+
+					intersectionClipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ).oneMinus() );
+
+				} );
+
+				clipOpacity.mulAssign( intersectionClipOpacity.oneMinus() );
 
 			}
 
@@ -103,28 +105,37 @@ class ClippingNode extends Node {
 
 	}
 
-	setupDefault( planes, numClippingPlanes, numUnionClippingPlanes ) {
+	setupDefault( intersectionPlanes, unionPlanes ) {
 
 		return Fn( () => {
 
-			const clippingPlanes = uniformArray( planes );
+			const numUnionPlanes = unionPlanes.length;
 
-			let plane;
+			if ( numUnionPlanes > 0 ) {
 
-			Loop( numUnionClippingPlanes, ( { i } ) => {
+				const clippingPlanes = uniformArray( unionPlanes );
 
-				plane = clippingPlanes.element( i );
-				positionView.dot( plane.xyz ).greaterThan( plane.w ).discard();
+				let plane;
 
-			} );
+				Loop( numUnionPlanes, ( { i } ) => {
 
-			if ( numUnionClippingPlanes < numClippingPlanes ) {
+					plane = clippingPlanes.element( i );
+					positionView.dot( plane.xyz ).greaterThan( plane.w ).discard();
 
-				const clipped = property( 'bool', 'clipped' );
+				} );
 
-				clipped.assign( true );
+			}
 
-				Loop( { start: numUnionClippingPlanes, end: numClippingPlanes }, ( { i } ) => {
+			const numIntersectionPlanes = intersectionPlanes.length;
+
+			if ( numIntersectionPlanes > 0 ) {
+
+				const clippingPlanes = uniformArray( intersectionPlanes );
+				const clipped = bool( true ).toVar( 'clipped' );
+
+				let plane;
+
+				Loop( numIntersectionPlanes, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 					clipped.assign( positionView.dot( plane.xyz ).greaterThan( plane.w ).and( clipped ) );
