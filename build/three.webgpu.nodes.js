@@ -3,7 +3,7 @@
  * Copyright 2010-2024 Three.js Authors
  * SPDX-License-Identifier: MIT
  */
-const REVISION = '170';
+const REVISION = '171dev';
 
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
@@ -9138,20 +9138,6 @@ let _materialId = 0;
 
 class Material extends EventDispatcher {
 
-	static get type() {
-
-		return 'Material';
-
-	}
-
-	get type() {
-
-		return this.constructor.type;
-
-	}
-
-	set type( _value ) { /* */ }
-
 	constructor() {
 
 		super();
@@ -9163,6 +9149,7 @@ class Material extends EventDispatcher {
 		this.uuid = generateUUID();
 
 		this.name = '';
+		this.type = 'Material';
 
 		this.blending = NormalBlending;
 		this.side = FrontSide;
@@ -9674,17 +9661,13 @@ class Material extends EventDispatcher {
 
 class MeshBasicMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshBasicMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshBasicMaterial = true;
+
+		this.type = 'MeshBasicMaterial';
 
 		this.color = new Color( 0xffffff ); // emissive
 
@@ -12284,17 +12267,13 @@ void main() {
 
 class ShaderMaterial extends Material {
 
-	static get type() {
-
-		return 'ShaderMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isShaderMaterial = true;
+
+		this.type = 'ShaderMaterial';
 
 		this.defines = {};
 		this.uniforms = {};
@@ -13763,17 +13742,13 @@ class InterleavedBufferAttribute {
 
 class SpriteMaterial extends Material {
 
-	static get type() {
-
-		return 'SpriteMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isSpriteMaterial = true;
+
+		this.type = 'SpriteMaterial';
 
 		this.color = new Color( 0xffffff );
 
@@ -16827,17 +16802,13 @@ class BatchedMesh extends Mesh {
 
 class LineBasicMaterial extends Material {
 
-	static get type() {
-
-		return 'LineBasicMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isLineBasicMaterial = true;
+
+		this.type = 'LineBasicMaterial';
 
 		this.color = new Color( 0xffffff );
 
@@ -17176,17 +17147,13 @@ class LineLoop extends Line {
 
 class PointsMaterial extends Material {
 
-	static get type() {
-
-		return 'PointsMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isPointsMaterial = true;
+
+		this.type = 'PointsMaterial';
 
 		this.color = new Color( 0xffffff );
 
@@ -23704,17 +23671,13 @@ var Geometries$1 = /*#__PURE__*/Object.freeze({
 
 class ShadowMaterial extends Material {
 
-	static get type() {
-
-		return 'ShadowMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isShadowMaterial = true;
+
+		this.type = 'ShadowMaterial';
 
 		this.color = new Color( 0x000000 );
 		this.transparent = true;
@@ -23741,17 +23704,13 @@ class ShadowMaterial extends Material {
 
 class RawShaderMaterial extends ShaderMaterial {
 
-	static get type() {
-
-		return 'RawShaderMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super( parameters );
 
 		this.isRawShaderMaterial = true;
+
+		this.type = 'RawShaderMaterial';
 
 	}
 
@@ -23759,17 +23718,13 @@ class RawShaderMaterial extends ShaderMaterial {
 
 class MeshStandardMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshStandardMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshStandardMaterial = true;
+
+		this.type = 'MeshStandardMaterial';
 
 		this.defines = { 'STANDARD': '' };
 
@@ -23883,12 +23838,6 @@ class MeshStandardMaterial extends Material {
 
 class MeshPhysicalMaterial extends MeshStandardMaterial {
 
-	static get type() {
-
-		return 'MeshPhysicalMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
@@ -23901,6 +23850,8 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 			'PHYSICAL': ''
 
 		};
+
+		this.type = 'MeshPhysicalMaterial';
 
 		this.anisotropyRotation = 0;
 		this.anisotropyMap = null;
@@ -24125,17 +24076,13 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 class MeshPhongMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshPhongMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshPhongMaterial = true;
+
+		this.type = 'MeshPhongMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
 		this.specular = new Color( 0x111111 );
@@ -24170,6 +24117,7 @@ class MeshPhongMaterial extends Material {
 
 		this.envMap = null;
 		this.envMapRotation = new Euler();
+
 		this.combine = MultiplyOperation;
 		this.reflectivity = 1;
 		this.refractionRatio = 0.98;
@@ -24245,12 +24193,6 @@ class MeshPhongMaterial extends Material {
 
 class MeshToonMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshToonMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
@@ -24258,6 +24200,8 @@ class MeshToonMaterial extends Material {
 		this.isMeshToonMaterial = true;
 
 		this.defines = { 'TOON': '' };
+
+		this.type = 'MeshToonMaterial';
 
 		this.color = new Color( 0xffffff );
 
@@ -24345,17 +24289,13 @@ class MeshToonMaterial extends Material {
 
 class MeshNormalMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshNormalMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshNormalMaterial = true;
+
+		this.type = 'MeshNormalMaterial';
 
 		this.bumpMap = null;
 		this.bumpScale = 1;
@@ -24405,17 +24345,13 @@ class MeshNormalMaterial extends Material {
 
 class MeshLambertMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshLambertMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshLambertMaterial = true;
+
+		this.type = 'MeshLambertMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
 
@@ -24521,17 +24457,13 @@ class MeshLambertMaterial extends Material {
 
 class MeshDepthMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshDepthMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshDepthMaterial = true;
+
+		this.type = 'MeshDepthMaterial';
 
 		this.depthPacking = BasicDepthPacking;
 
@@ -24575,17 +24507,13 @@ class MeshDepthMaterial extends Material {
 
 class MeshDistanceMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshDistanceMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isMeshDistanceMaterial = true;
+
+		this.type = 'MeshDistanceMaterial';
 
 		this.map = null;
 
@@ -24619,12 +24547,6 @@ class MeshDistanceMaterial extends Material {
 
 class MeshMatcapMaterial extends Material {
 
-	static get type() {
-
-		return 'MeshMatcapMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
@@ -24632,6 +24554,8 @@ class MeshMatcapMaterial extends Material {
 		this.isMeshMatcapMaterial = true;
 
 		this.defines = { 'MATCAP': '' };
+
+		this.type = 'MeshMatcapMaterial';
 
 		this.color = new Color( 0xffffff ); // diffuse
 
@@ -24698,17 +24622,12 @@ class MeshMatcapMaterial extends Material {
 
 class LineDashedMaterial extends LineBasicMaterial {
 
-	static get type() {
-
-		return 'LineDashedMaterial';
-
-	}
-
 	constructor( parameters ) {
 
 		super();
 
 		this.isLineDashedMaterial = true;
+		this.type = 'LineDashedMaterial';
 
 		this.scale = 1;
 		this.dashSize = 3;
@@ -45343,69 +45262,72 @@ class ClippingNode extends Node {
 		super.setup( builder );
 
 		const clippingContext = builder.clippingContext;
-		const { localClipIntersection, localClippingCount, globalClippingCount } = clippingContext;
+		const { intersectionPlanes, unionPlanes } = clippingContext;
 
-		const numClippingPlanes = globalClippingCount + localClippingCount;
-		const numUnionClippingPlanes = localClipIntersection ? numClippingPlanes - localClippingCount : numClippingPlanes;
 
 		if ( this.scope === ClippingNode.ALPHA_TO_COVERAGE ) {
 
-			return this.setupAlphaToCoverage( clippingContext.planes, numClippingPlanes, numUnionClippingPlanes );
+			return this.setupAlphaToCoverage( intersectionPlanes, unionPlanes );
 
 		} else {
 
-			return this.setupDefault( clippingContext.planes, numClippingPlanes, numUnionClippingPlanes );
+			return this.setupDefault( intersectionPlanes, unionPlanes );
 
 		}
 
 	}
 
-	setupAlphaToCoverage( planes, numClippingPlanes, numUnionClippingPlanes ) {
+	setupAlphaToCoverage( intersectionPlanes, unionPlanes ) {
 
 		return Fn( () => {
 
-			const clippingPlanes = uniformArray( planes );
+			const distanceToPlane = float().toVar( 'distanceToPlane' );
+			const distanceGradient = float().toVar( 'distanceToGradient' );
 
-			const distanceToPlane = property( 'float', 'distanceToPlane' );
-			const distanceGradient = property( 'float', 'distanceToGradient' );
+			const clipOpacity = float( 1 ).toVar( 'clipOpacity' );
 
-			const clipOpacity = property( 'float', 'clipOpacity' );
+			const numUnionPlanes = unionPlanes.length;
 
-			clipOpacity.assign( 1 );
+			if ( numUnionPlanes > 0 ) {
 
-			let plane;
+				const clippingPlanes = uniformArray( unionPlanes );
 
-			Loop( numUnionClippingPlanes, ( { i } ) => {
+				let plane;
 
-				plane = clippingPlanes.element( i );
-
-				distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
-				distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
-
-				clipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ) );
-
-				clipOpacity.equal( 0.0 ).discard();
-
-			} );
-
-			if ( numUnionClippingPlanes < numClippingPlanes ) {
-
-				const unionClipOpacity = property( 'float', 'unionclipOpacity' );
-
-				unionClipOpacity.assign( 1 );
-
-				Loop( { start: numUnionClippingPlanes, end: numClippingPlanes }, ( { i } ) => {
+				Loop( numUnionPlanes, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 
 					distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
 					distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
 
-					unionClipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ).oneMinus() );
+					clipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ) );
 
 				} );
 
-				clipOpacity.mulAssign( unionClipOpacity.oneMinus() );
+			}
+
+			const numIntersectionPlanes = intersectionPlanes.length;
+
+			if ( numIntersectionPlanes > 0 ) {
+
+				const clippingPlanes = uniformArray( intersectionPlanes );
+				const intersectionClipOpacity = float( 1 ).toVar( 'intersectionClipOpacity' );
+
+				let plane;
+
+				Loop( numIntersectionPlanes, ( { i } ) => {
+
+					plane = clippingPlanes.element( i );
+
+					distanceToPlane.assign( positionView.dot( plane.xyz ).negate().add( plane.w ) );
+					distanceGradient.assign( distanceToPlane.fwidth().div( 2.0 ) );
+
+					intersectionClipOpacity.mulAssign( smoothstep( distanceGradient.negate(), distanceGradient, distanceToPlane ).oneMinus() );
+
+				} );
+
+				clipOpacity.mulAssign( intersectionClipOpacity.oneMinus() );
 
 			}
 
@@ -45417,28 +45339,37 @@ class ClippingNode extends Node {
 
 	}
 
-	setupDefault( planes, numClippingPlanes, numUnionClippingPlanes ) {
+	setupDefault( intersectionPlanes, unionPlanes ) {
 
 		return Fn( () => {
 
-			const clippingPlanes = uniformArray( planes );
+			const numUnionPlanes = unionPlanes.length;
 
-			let plane;
+			if ( numUnionPlanes > 0 ) {
 
-			Loop( numUnionClippingPlanes, ( { i } ) => {
+				const clippingPlanes = uniformArray( unionPlanes );
 
-				plane = clippingPlanes.element( i );
-				positionView.dot( plane.xyz ).greaterThan( plane.w ).discard();
+				let plane;
 
-			} );
+				Loop( numUnionPlanes, ( { i } ) => {
 
-			if ( numUnionClippingPlanes < numClippingPlanes ) {
+					plane = clippingPlanes.element( i );
+					positionView.dot( plane.xyz ).greaterThan( plane.w ).discard();
 
-				const clipped = property( 'bool', 'clipped' );
+				} );
 
-				clipped.assign( true );
+			}
 
-				Loop( { start: numUnionClippingPlanes, end: numClippingPlanes }, ( { i } ) => {
+			const numIntersectionPlanes = intersectionPlanes.length;
+
+			if ( numIntersectionPlanes > 0 ) {
+
+				const clippingPlanes = uniformArray( intersectionPlanes );
+				const clipped = bool( true ).toVar( 'clipped' );
+
+				let plane;
+
+				Loop( numIntersectionPlanes, ( { i } ) => {
 
 					plane = clippingPlanes.element( i );
 					clipped.assign( positionView.dot( plane.xyz ).greaterThan( plane.w ).and( clipped ) );
@@ -45531,13 +45462,19 @@ class NodeMaterial extends Material {
 
 	}
 
+	get type() {
+
+		return this.constructor.type;
+
+	}
+
+	set type( _value ) { /* */ }
+
 	constructor() {
 
 		super();
 
 		this.isNodeMaterial = true;
-
-		this.type = this.constructor.type;
 
 		this.forceSinglePass = false;
 
@@ -45592,6 +45529,9 @@ class NodeMaterial extends Material {
 
 		builder.context.setupNormal = () => this.setupNormal( builder );
 
+		const renderer = builder.renderer;
+		const renderTarget = renderer.getRenderTarget();
+
 		// < VERTEX STAGE >
 
 		builder.addStack();
@@ -45614,7 +45554,21 @@ class NodeMaterial extends Material {
 
 		const clippingNode = this.setupClipping( builder );
 
-		if ( this.depthWrite === true ) this.setupDepth( builder );
+		if ( this.depthWrite === true ) {
+
+			// only write depth if depth buffer is configured
+
+			if ( renderTarget !== null ) {
+
+				if ( renderTarget.depthBuffer === true ) this.setupDepth( builder );
+
+			} else {
+
+				if ( renderer.depth === true ) this.setupDepth( builder );
+
+			}
+
+		}
 
 		if ( this.fragmentNode === null ) {
 
@@ -45641,11 +45595,9 @@ class NodeMaterial extends Material {
 
 			// MRT
 
-			const renderTarget = builder.renderer.getRenderTarget();
-
 			if ( renderTarget !== null ) {
 
-				const mrt = builder.renderer.getMRT();
+				const mrt = renderer.getMRT();
 				const materialMRT = this.mrtNode;
 
 				if ( mrt !== null ) {
@@ -45694,11 +45646,11 @@ class NodeMaterial extends Material {
 
 		if ( builder.clippingContext === null ) return null;
 
-		const { globalClippingCount, localClippingCount } = builder.clippingContext;
+		const { unionPlanes, intersectionPlanes } = builder.clippingContext;
 
 		let result = null;
 
-		if ( globalClippingCount || localClippingCount ) {
+		if ( unionPlanes.length > 0 || intersectionPlanes.length > 0 ) {
 
 			const samples = builder.renderer.samples;
 
@@ -50320,177 +50272,6 @@ class ChainMap {
 
 }
 
-const _plane = /*@__PURE__*/ new Plane();
-
-class ClippingContext {
-
-	constructor() {
-
-		this.version = 0;
-
-		this.globalClippingCount = 0;
-
-		this.localClippingCount = 0;
-		this.localClippingEnabled = false;
-		this.localClipIntersection = false;
-
-		this.planes = [];
-
-		this.parentVersion = 0;
-		this.viewNormalMatrix = new Matrix3();
-		this.cacheKey = 0;
-
-	}
-
-	projectPlanes( source, offset ) {
-
-		const l = source.length;
-		const planes = this.planes;
-
-		for ( let i = 0; i < l; i ++ ) {
-
-			_plane.copy( source[ i ] ).applyMatrix4( this.viewMatrix, this.viewNormalMatrix );
-
-			const v = planes[ offset + i ];
-			const normal = _plane.normal;
-
-			v.x = - normal.x;
-			v.y = - normal.y;
-			v.z = - normal.z;
-			v.w = _plane.constant;
-
-		}
-
-	}
-
-	updateGlobal( renderer, camera ) {
-
-		const rendererClippingPlanes = renderer.clippingPlanes;
-		this.viewMatrix = camera.matrixWorldInverse;
-
-		this.viewNormalMatrix.getNormalMatrix( this.viewMatrix );
-
-		let update = false;
-
-		if ( Array.isArray( rendererClippingPlanes ) && rendererClippingPlanes.length !== 0 ) {
-
-			const l = rendererClippingPlanes.length;
-
-			if ( l !== this.globalClippingCount ) {
-
-				const planes = [];
-
-				for ( let i = 0; i < l; i ++ ) {
-
-					planes.push( new Vector4() );
-
-				}
-
-				this.globalClippingCount = l;
-				this.planes = planes;
-
-				update = true;
-
-			}
-
-			this.projectPlanes( rendererClippingPlanes, 0 );
-
-		} else if ( this.globalClippingCount !== 0 ) {
-
-			this.globalClippingCount = 0;
-			this.planes = [];
-			update = true;
-
-		}
-
-		if ( renderer.localClippingEnabled !== this.localClippingEnabled ) {
-
-			this.localClippingEnabled = renderer.localClippingEnabled;
-			update = true;
-
-		}
-
-		if ( update ) {
-
-			this.version ++;
-			this.cacheKey = hash$1( this.globalClippingCount, this.localClippingEnabled === true ? 1 : 0 );
-
-		}
-
-	}
-
-	update( parent, material ) {
-
-		let update = false;
-
-		if ( this !== parent && parent.version !== this.parentVersion ) {
-
-			this.globalClippingCount = material.isShadowNodeMaterial ? 0 : parent.globalClippingCount;
-			this.localClippingEnabled = parent.localClippingEnabled;
-			this.planes = Array.from( parent.planes );
-			this.parentVersion = parent.version;
-			this.viewMatrix = parent.viewMatrix;
-			this.viewNormalMatrix = parent.viewNormalMatrix;
-
-			update = true;
-
-		}
-
-		if ( this.localClippingEnabled ) {
-
-			const localClippingPlanes = material.clippingPlanes;
-
-			if ( ( Array.isArray( localClippingPlanes ) && localClippingPlanes.length !== 0 ) ) {
-
-				const l = localClippingPlanes.length;
-				const planes = this.planes;
-				const offset = this.globalClippingCount;
-
-				if ( update || l !== this.localClippingCount ) {
-
-					planes.length = offset + l;
-
-					for ( let i = 0; i < l; i ++ ) {
-
-						planes[ offset + i ] = new Vector4();
-
-					}
-
-					this.localClippingCount = l;
-					update = true;
-
-				}
-
-				this.projectPlanes( localClippingPlanes, offset );
-
-
-			} else if ( this.localClippingCount !== 0 ) {
-
-				this.localClippingCount = 0;
-				update = true;
-
-			}
-
-			if ( this.localClipIntersection !== material.clipIntersection ) {
-
-				this.localClipIntersection = material.clipIntersection;
-				update = true;
-
-			}
-
-		}
-
-		if ( update ) {
-
-			this.version += parent.version;
-			this.cacheKey = hash$1( parent.cacheKey, this.localClippingCount, this.localClipIntersection === true ? 1 : 0 );
-
-		}
-
-	}
-
-}
-
 let _id$7 = 0;
 
 function getKeys( obj ) {
@@ -50529,7 +50310,7 @@ function getKeys( obj ) {
 
 class RenderObject {
 
-	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext ) {
+	constructor( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext ) {
 
 		this._nodes = nodes;
 		this._geometries = geometries;
@@ -50556,9 +50337,8 @@ class RenderObject {
 
 		this.bundle = null;
 
-		this.updateClipping( renderContext.clippingContext );
-
-		this.clippingContextVersion = this.clippingContext.version;
+		this.clippingContext = clippingContext;
+		this.clippingContextCacheKey = clippingContext !== null ? clippingContext.cacheKey : '';
 
 		this.initialNodesCacheKey = this.getDynamicCacheKey();
 		this.initialCacheKey = this.getCacheKey();
@@ -50583,34 +50363,15 @@ class RenderObject {
 
 	updateClipping( parent ) {
 
-		const material = this.material;
-
-		let clippingContext = this.clippingContext;
-
-		if ( Array.isArray( material.clippingPlanes ) ) {
-
-			if ( clippingContext === parent || ! clippingContext ) {
-
-				clippingContext = new ClippingContext();
-				this.clippingContext = clippingContext;
-
-			}
-
-			clippingContext.update( parent, material );
-
-		} else if ( this.clippingContext !== parent ) {
-
-			this.clippingContext = parent;
-
-		}
+		this.clippingContext = parent;
 
 	}
 
 	get clippingNeedsUpdate() {
 
-		if ( this.clippingContext.version === this.clippingContextVersion ) return false;
+		if ( this.clippingContext === null || this.clippingContext.cacheKey === this.clippingContextCacheKey ) return false;
 
-		this.clippingContextVersion = this.clippingContext.version;
+		this.clippingContextCacheKey = this.clippingContext.cacheKey;
 
 		return true;
 
@@ -50837,7 +50598,7 @@ class RenderObject {
 
 		}
 
-		cacheKey += this.clippingContext.cacheKey + ',';
+		cacheKey += this.clippingContextCacheKey + ',';
 
 		if ( object.geometry ) {
 
@@ -50936,7 +50697,7 @@ class RenderObjects {
 
 	}
 
-	get( object, material, scene, camera, lightsNode, renderContext, passId ) {
+	get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
 
@@ -50950,13 +50711,13 @@ class RenderObjects {
 
 		if ( renderObject === undefined ) {
 
-			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, passId );
+			renderObject = this.createRenderObject( this.nodes, this.geometries, this.renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId );
 
 			chainMap.set( chainArray, renderObject );
 
 		} else {
 
-			renderObject.updateClipping( renderContext.clippingContext );
+			renderObject.updateClipping( clippingContext );
 
 			if ( renderObject.version !== material.version || renderObject.needsUpdate ) {
 
@@ -50964,7 +50725,7 @@ class RenderObjects {
 
 					renderObject.dispose();
 
-					renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, passId );
+					renderObject = this.get( object, material, scene, camera, lightsNode, renderContext, clippingContext, passId );
 
 				} else {
 
@@ -50992,11 +50753,11 @@ class RenderObjects {
 
 	}
 
-	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, passId ) {
+	createRenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext, passId ) {
 
 		const chainMap = this.getChainMap( passId );
 
-		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext );
+		const renderObject = new RenderObject( nodes, geometries, renderer, object, material, scene, camera, lightsNode, renderContext, clippingContext );
 
 		renderObject.onDispose = () => {
 
@@ -52215,7 +51976,7 @@ class RenderList {
 
 	}
 
-	getNextRenderItem( object, geometry, material, groupOrder, z, group ) {
+	getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext ) {
 
 		let renderItem = this.renderItems[ this.renderItemsIndex ];
 
@@ -52229,7 +51990,8 @@ class RenderList {
 				groupOrder: groupOrder,
 				renderOrder: object.renderOrder,
 				z: z,
-				group: group
+				group: group,
+				clippingContext: clippingContext
 			};
 
 			this.renderItems[ this.renderItemsIndex ] = renderItem;
@@ -52244,6 +52006,7 @@ class RenderList {
 			renderItem.renderOrder = object.renderOrder;
 			renderItem.z = z;
 			renderItem.group = group;
+			renderItem.clippingContext = clippingContext;
 
 		}
 
@@ -52253,9 +52016,9 @@ class RenderList {
 
 	}
 
-	push( object, geometry, material, groupOrder, z, group ) {
+	push( object, geometry, material, groupOrder, z, group, clippingContext ) {
 
-		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group );
+		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
 		if ( object.occlusionTest === true ) this.occlusionQueryCount ++;
 
@@ -52273,9 +52036,9 @@ class RenderList {
 
 	}
 
-	unshift( object, geometry, material, groupOrder, z, group ) {
+	unshift( object, geometry, material, groupOrder, z, group, clippingContext ) {
 
-		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group );
+		const renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group, clippingContext );
 
 		if ( material.transparent === true || material.transmission > 0 ) {
 
@@ -52333,6 +52096,7 @@ class RenderList {
 			renderItem.renderOrder = null;
 			renderItem.z = null;
 			renderItem.group = null;
+			renderItem.clippingContext = null;
 
 		}
 
@@ -52793,8 +52557,8 @@ class Textures extends DataMap {
 
 			if ( image.image !== undefined ) image = image.image;
 
-			target.width = image.width;
-			target.height = image.height;
+			target.width = image.width || 1;
+			target.height = image.height || 1;
 			target.depth = texture.isCubeTexture ? 6 : ( image.depth || 1 );
 
 		} else {
@@ -52813,7 +52577,15 @@ class Textures extends DataMap {
 
 		if ( texture.isCompressedTexture ) {
 
-			mipLevelCount = texture.mipmaps.length;
+			if ( texture.mipmaps ) {
+
+				mipLevelCount = texture.mipmaps.length;
+
+			} else {
+
+				mipLevelCount = 1;
+
+			}
 
 		} else {
 
@@ -55698,7 +55470,7 @@ class ToonOutlinePassNode extends PassNode {
 
 		const currentRenderObjectFunction = renderer.getRenderObjectFunction();
 
-		renderer.setRenderObjectFunction( ( object, scene, camera, geometry, material, group, lightsNode ) => {
+		renderer.setRenderObjectFunction( ( object, scene, camera, geometry, material, group, lightsNode, clippingContext ) => {
 
 			// only render outline for supported materials
 
@@ -55707,7 +55479,7 @@ class ToonOutlinePassNode extends PassNode {
 				if ( material.wireframe === false ) {
 
 					const outlineMaterial = this._getOutlineMaterial( material );
-					renderer.renderObject( object, scene, camera, geometry, outlineMaterial, group, lightsNode );
+					renderer.renderObject( object, scene, camera, geometry, outlineMaterial, group, lightsNode, clippingContext );
 
 				}
 
@@ -55715,7 +55487,7 @@ class ToonOutlinePassNode extends PassNode {
 
 			// default
 
-			renderer.renderObject( object, scene, camera, geometry, material, group, lightsNode );
+			renderer.renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext );
 
 		} );
 
@@ -59978,7 +59750,7 @@ class Background extends DataMap {
 
 			}
 
-			renderList.unshift( backgroundMesh, backgroundMesh.geometry, backgroundMesh.material, 0, 0, null );
+			renderList.unshift( backgroundMesh, backgroundMesh.geometry, backgroundMesh.material, 0, 0, null, null );
 
 		} else {
 
@@ -63946,6 +63718,164 @@ class Nodes extends DataMap {
 
 }
 
+const _plane = /*@__PURE__*/ new Plane();
+
+class ClippingContext {
+
+	constructor( parentContext = null ) {
+
+		this.version = 0;
+
+		this.clipIntersection = null;
+		this.cacheKey = '';
+
+
+		if ( parentContext === null ) {
+
+			this.intersectionPlanes = [];
+			this.unionPlanes = [];
+
+			this.viewNormalMatrix = new Matrix3();
+			this.clippingGroupContexts = new WeakMap();
+
+			this.shadowPass = false;
+
+		} else {
+
+			this.viewNormalMatrix = parentContext.viewNormalMatrix;
+			this.clippingGroupContexts = parentContext.clippingGroupContexts;
+
+			this.shadowPass = parentContext.shadowPass;
+
+			this.viewMatrix = parentContext.viewMatrix;
+
+		}
+
+		this.parentVersion = null;
+
+	}
+
+	projectPlanes( source, destination, offset ) {
+
+		const l = source.length;
+
+		for ( let i = 0; i < l; i ++ ) {
+
+			_plane.copy( source[ i ] ).applyMatrix4( this.viewMatrix, this.viewNormalMatrix );
+
+			const v = destination[ offset + i ];
+			const normal = _plane.normal;
+
+			v.x = - normal.x;
+			v.y = - normal.y;
+			v.z = - normal.z;
+			v.w = _plane.constant;
+
+		}
+
+	}
+
+	updateGlobal( scene, camera ) {
+
+		this.shadowPass = ( scene.overrideMaterial !== null && scene.overrideMaterial.isShadowNodeMaterial );
+		this.viewMatrix = camera.matrixWorldInverse;
+
+		this.viewNormalMatrix.getNormalMatrix( this.viewMatrix );
+
+	}
+
+	update( parentContext, clippingGroup ) {
+
+		let update = false;
+
+		if ( parentContext.version !== this.parentVersion ) {
+
+			this.intersectionPlanes = Array.from( parentContext.intersectionPlanes );
+			this.unionPlanes = Array.from( parentContext.unionPlanes );
+			this.parentVersion = parentContext.version;
+
+		}
+
+		if ( this.clipIntersection !== clippingGroup.clipIntersection ) {
+
+			this.clipIntersection = clippingGroup.clipIntersection;
+
+			if ( this.clipIntersection ) {
+
+				this.unionPlanes.length = parentContext.unionPlanes.length;
+
+			} else {
+
+				this.intersectionPlanes.length = parentContext.intersectionPlanes.length;
+
+			}
+
+		}
+
+		const srcClippingPlanes = clippingGroup.clippingPlanes;
+		const l = srcClippingPlanes.length;
+
+		let dstClippingPlanes;
+		let offset;
+
+		if ( this.clipIntersection ) {
+
+			dstClippingPlanes = this.intersectionPlanes;
+			offset = parentContext.intersectionPlanes.length;
+
+		} else {
+
+			dstClippingPlanes = this.unionPlanes;
+			offset = parentContext.unionPlanes.length;
+
+		}
+
+		if ( dstClippingPlanes.length !== offset + l ) {
+
+			dstClippingPlanes.length = offset + l;
+
+			for ( let i = 0; i < l; i ++ ) {
+
+				dstClippingPlanes[ offset + i ] = new Vector4();
+
+			}
+
+			update = true;
+
+		}
+
+		this.projectPlanes( srcClippingPlanes, dstClippingPlanes, offset );
+
+		if ( update ) {
+
+			this.version ++;
+			this.cacheKey = `${ this.intersectionPlanes.length }:${ this.unionPlanes.length }`;
+
+		}
+
+	}
+
+	getGroupContext( clippingGroup ) {
+
+		if ( this.shadowPass && ! clippingGroup.clipShadows ) return this;
+
+		let context = this.clippingGroupContexts.get( clippingGroup );
+
+		if ( context === undefined ) {
+
+			context = new ClippingContext( this );
+			this.clippingGroupContexts.set( clippingGroup, context );
+
+		}
+
+		context.update( this, clippingGroup );
+
+		return context;
+
+	}
+
+}
+
 class RenderBundle {
 
 	constructor( scene, camera ) {
@@ -64049,9 +63979,9 @@ class NodeLibrary {
 
 	}
 
-	addMaterial( materialNodeClass, materialClass ) {
+	addMaterial( materialNodeClass, materialClassType ) {
 
-		this.addType( materialNodeClass, materialClass.type, this.materialNodes );
+		this.addType( materialNodeClass, materialClassType, this.materialNodes );
 
 	}
 
@@ -64192,8 +64122,6 @@ class Renderer {
 
 		this.depth = depth;
 		this.stencil = stencil;
-
-		this.clippingPlanes = [];
 
 		this.info = new Info();
 
@@ -64427,7 +64355,7 @@ class Renderer {
 		renderContext.stencil = this.stencil;
 
 		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
-		renderContext.clippingContext.updateGlobal( this, camera );
+		renderContext.clippingContext.updateGlobal( sceneRef, camera );
 
 		//
 
@@ -64438,7 +64366,7 @@ class Renderer {
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
 
-		this._projectObject( scene, camera, 0, renderList );
+		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
 
 		// include lights from target scene
 		if ( targetScene !== scene ) {
@@ -64793,7 +64721,7 @@ class Renderer {
 		renderContext.scissorValue.height >>= activeMipmapLevel;
 
 		if ( ! renderContext.clippingContext ) renderContext.clippingContext = new ClippingContext();
-		renderContext.clippingContext.updateGlobal( this, camera );
+		renderContext.clippingContext.updateGlobal( sceneRef, camera );
 
 		//
 
@@ -64807,7 +64735,7 @@ class Renderer {
 		const renderList = this._renderLists.get( scene, camera );
 		renderList.begin();
 
-		this._projectObject( scene, camera, 0, renderList );
+		this._projectObject( scene, camera, 0, renderList, renderContext.clippingContext );
 
 		renderList.finish();
 
@@ -65496,7 +65424,7 @@ class Renderer {
 
 	}
 
-	_projectObject( object, camera, groupOrder, renderList ) {
+	_projectObject( object, camera, groupOrder, renderList, clippingContext ) {
 
 		if ( object.visible === false ) return;
 
@@ -65507,6 +65435,8 @@ class Renderer {
 			if ( object.isGroup ) {
 
 				groupOrder = object.renderOrder;
+
+				if ( object.isClippingGroup && object.enabled ) clippingContext = clippingContext.getGroupContext( object );
 
 			} else if ( object.isLOD ) {
 
@@ -65530,7 +65460,7 @@ class Renderer {
 
 					if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector4.z, null );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
 
 					}
 
@@ -65568,7 +65498,7 @@ class Renderer {
 
 							if ( groupMaterial && groupMaterial.visible ) {
 
-								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group );
+								renderList.push( object, geometry, groupMaterial, groupOrder, _vector4.z, group, clippingContext );
 
 							}
 
@@ -65576,7 +65506,7 @@ class Renderer {
 
 					} else if ( material.visible ) {
 
-						renderList.push( object, geometry, material, groupOrder, _vector4.z, null );
+						renderList.push( object, geometry, material, groupOrder, _vector4.z, null, clippingContext );
 
 					}
 
@@ -65609,7 +65539,7 @@ class Renderer {
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			this._projectObject( children[ i ], camera, groupOrder, renderList );
+			this._projectObject( children[ i ], camera, groupOrder, renderList, clippingContext );
 
 		}
 
@@ -65676,7 +65606,7 @@ class Renderer {
 			// @TODO: Add support for multiple materials per object. This will require to extract
 			// the material from the renderItem object and pass it with its group data to renderObject().
 
-			const { object, geometry, material, group } = renderItem;
+			const { object, geometry, material, group, clippingContext } = renderItem;
 
 			if ( camera.isArrayCamera ) {
 
@@ -65699,7 +65629,7 @@ class Renderer {
 
 						this.backend.updateViewport( this._currentRenderContext );
 
-						this._currentRenderObjectFunction( object, scene, camera2, geometry, material, group, lightsNode, passId );
+						this._currentRenderObjectFunction( object, scene, camera2, geometry, material, group, lightsNode, clippingContext, passId );
 
 					}
 
@@ -65707,7 +65637,7 @@ class Renderer {
 
 			} else {
 
-				this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, passId );
+				this._currentRenderObjectFunction( object, scene, camera, geometry, material, group, lightsNode, clippingContext, passId );
 
 			}
 
@@ -65715,7 +65645,7 @@ class Renderer {
 
 	}
 
-	renderObject( object, scene, camera, geometry, material, group, lightsNode, passId = null ) {
+	renderObject( object, scene, camera, geometry, material, group, lightsNode, clippingContext = null, passId = null ) {
 
 		let overridePositionNode;
 		let overrideFragmentNode;
@@ -65757,32 +65687,6 @@ class Renderer {
 
 				}
 
-				if ( this.localClippingEnabled ) {
-
-					if ( material.clipShadows ) {
-
-						if ( overrideMaterial.clippingPlanes !== material.clippingPlanes ) {
-
-							overrideMaterial.clippingPlanes = material.clippingPlanes;
-							overrideMaterial.needsUpdate = true;
-
-						}
-
-						if ( overrideMaterial.clipIntersection !== material.clipIntersection ) {
-
-							overrideMaterial.clipIntersection = material.clipIntersection;
-
-						}
-
-					} else if ( Array.isArray( overrideMaterial.clippingPlanes ) ) {
-
-						overrideMaterial.clippingPlanes = null;
-						overrideMaterial.needsUpdate = true;
-
-					}
-
-				}
-
 			}
 
 			material = overrideMaterial;
@@ -65794,16 +65698,16 @@ class Renderer {
 		if ( material.transparent === true && material.side === DoubleSide && material.forceSinglePass === false ) {
 
 			material.side = BackSide;
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, 'backSide' ); // create backSide pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, 'backSide' ); // create backSide pass id
 
 			material.side = FrontSide;
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, passId ); // use default pass id
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, passId ); // use default pass id
 
 			material.side = DoubleSide;
 
 		} else {
 
-			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, passId );
+			this._handleObjectFunction( object, material, scene, camera, lightsNode, group, clippingContext, passId );
 
 		}
 
@@ -65833,9 +65737,9 @@ class Renderer {
 
 	}
 
-	_renderObjectDirect( object, material, scene, camera, lightsNode, group, passId ) {
+	_renderObjectDirect( object, material, scene, camera, lightsNode, group, clippingContext, passId ) {
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 		renderObject.drawRange = object.geometry.drawRange;
 		renderObject.group = group;
 
@@ -65874,9 +65778,9 @@ class Renderer {
 
 	}
 
-	_createObjectPipeline( object, material, scene, camera, lightsNode, passId ) {
+	_createObjectPipeline( object, material, scene, camera, lightsNode, clippingContext, passId ) {
 
-		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, passId );
+		const renderObject = this._objects.get( object, material, scene, camera, lightsNode, this._currentRenderContext, clippingContext, passId );
 
 		//
 
@@ -73122,6 +73026,10 @@ function getFormat( texture, device = null ) {
 				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.ASTC12x12UnormSRGB : GPUTextureFormat.ASTC12x12Unorm;
 				break;
 
+			case RGBAFormat:
+				formatGPU = ( colorSpace === SRGBColorSpace ) ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm;
+				break;
+
 			default:
 				console.error( 'WebGPURenderer: Unsupported texture format.', format );
 
@@ -77354,7 +77262,7 @@ class WebGPUBackend extends Backend {
 			data.sampleCount !== sampleCount || data.colorSpace !== colorSpace ||
 			data.colorFormat !== colorFormat || data.depthStencilFormat !== depthStencilFormat ||
 			data.primitiveTopology !== primitiveTopology ||
-			data.clippingContextCacheKey !== renderObject.clippingContext.cacheKey
+			data.clippingContextCacheKey !== renderObject.clippingContextCacheKey
 		) {
 
 			data.material = material; data.materialVersion = material.version;
@@ -77372,7 +77280,7 @@ class WebGPUBackend extends Backend {
 			data.colorFormat = colorFormat;
 			data.depthStencilFormat = depthStencilFormat;
 			data.primitiveTopology = primitiveTopology;
-			data.clippingContextCacheKey = renderObject.clippingContext.cacheKey;
+			data.clippingContextCacheKey = renderObject.clippingContextCacheKey;
 
 			needsUpdate = true;
 
@@ -77403,7 +77311,7 @@ class WebGPUBackend extends Backend {
 			utils.getCurrentColorSpace( renderContext ), utils.getCurrentColorFormat( renderContext ), utils.getCurrentDepthStencilFormat( renderContext ),
 			utils.getPrimitiveTopology( object, material ),
 			renderObject.getGeometryCacheKey(),
-			renderObject.clippingContext.cacheKey
+			renderObject.clippingContextCacheKey
 		].join();
 
 	}
